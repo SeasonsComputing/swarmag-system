@@ -1,0 +1,21 @@
+{
+  "name": "swarmag-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc -b && tsc-alias -p tsconfig.json",
+    "clean": "tsc -b --clean && node -e \"const fs=require('fs');if(fs.existsSync('build'))fs.rmSync('build',{recursive:true,force:true});\""
+  },
+  "dependencies": {
+    "@netlify/functions": "^2.6.0",
+    "@supabase/supabase-js": "^2.43.2",
+    "uuid": "^11.0.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.10.1",
+    "prettier": "^3.6.2",
+    "tsc-alias": "^1.8.16",
+    "typescript": "^5.4.5"
+  }
+}

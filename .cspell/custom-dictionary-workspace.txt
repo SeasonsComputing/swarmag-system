@@ -1,0 +1,13 @@
+# Custom Dictionary Words
+frontends
+Geotagged
+Kobalte
+Mapbox
+multispectral
+netlify
+passwordless
+RDBMS
+supabase
+swarmag
+uuidv7
+WCAG

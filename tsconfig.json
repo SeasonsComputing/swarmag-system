@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    /* Language and Module Resolution */
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    /* Output and Source Locations */
+    "outDir": "build",
+    "rootDir": "source",
+    
+    // All aliases are relative to the 'baseUrl'
+    "baseUrl": "source", 
+    "paths": {
+      "@utils/*": ["utils/*"], 
+      "@domain/*": ["domain/*"],
+      "@api/*": ["api/*"],
+      "@/*": ["*"] 
+    }
+  },
+  
+  // Tells the compiler which files to include in the build process
+  "include": ["source/**/*.ts"] 
+}
