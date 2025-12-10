@@ -2,10 +2,21 @@
 
 This document defines how the swarmAg System should be implemented in phases:
 
-- Phase 1 — Domain
-- Phase 2 — Administration Website
-- Phase 3 — Operations Mobile App
-- Phase 4 — Customer Portal
+| Phase | Module | Doc | Description |
+| ----- | ------ | --- | ----------- |
+| 1 | Domain | `domain.md` | Domain model of foundational abstractions/contracts/APIs |
+| 2 | Admin Web App | `admin-web-app.md` | Real-time dashboards; jobs/schedules; catalog |
+| 3 | Ops Mobile App | `ops-mobile-app.md` | Field operations and job logging |
+| 4 | Customer Portal | `customer-portal.md` | Read-only customer experience |
+
+**Primary work per phase**
+
+| Phase | Primary Work |
+| ----- | ------------ |
+| 1 | Implement domain types (`source/domain/*`) and initial APIs (`source/api/*`) |
+| 2 | Build admin app with real-time dashboards and catalog admin |
+| 3 | Build `source/apps/ops` using domain types and API functions |
+| 4 | Build read-only customer portal (`source/apps/customer`) using domain types |
 
 The authoritative architecture is in `architecture.md`. 
 
@@ -15,19 +26,26 @@ All code lives in a single repo with this structure (current state):
 
 ```text
 /
-├─ project/                              # docs, specs, & plans
-├─ build/                                # TypeScript outDir, gitignored
-├─ node_modules/                         # Dependent modules, gitignored
-├─ source/                               # System source
-│  ├─ apps/                              # SolidJS apps (ops/admin/customer)
-│  ├─ common/                            # Shared runtime utilities (identifiers, time)
-│  ├─ domain/                            # Canonical domain abstractions
-│  ├─ api/                               # Netlify Functions (backend APIs)
-│  ├─ samples/                           # Example domain data for docs/tests
-│  └─ tests/                             # Placeholder for future automated tests
-├─ package.json                          
+├─ project/                  # docs, specs, plans, style guide
+├─ source/                   # system source
+│  ├─ api/                   # Netlify Functions (backend APIs)
+│  ├─ apps/                  # SolidJS apps (admin/ops/customer)
+│  │  ├─ admin/              # Admin web app
+│  │  ├─ ops/                # Ops mobile app
+│  │  └─ customer/           # Customer portal
+│  ├─ domain/                # canonical domain abstractions
+│  ├─ samples/               # example domain data for docs/tests
+│  ├─ tests/                 # placeholder for future automated tests
+│  └─ utils/                 # shared primitives (identifiers, time)
+├─ build/                    # TypeScript outDir (gitignored)
+├─ node_modules/             # dependencies (gitignored)
+├─ README.md                 # repo overview
+├─ package.json
 ├─ pnpm-lock.yaml
-└─ tsconfig.json                         
+├─ tsconfig.json
+├─ tsconfig.tsbuildinfo      # TypeScript build cache (gitignored)
+├─ swarmag-ops-logo.png      # branding asset
+└─ swarmag-ops-meta-prompt.md # meta prompt reference
 ```
 
 ## 2. Global Rules
@@ -38,8 +56,7 @@ These rules apply to every phase and every file:
    - `module: "ESNext"` + `moduleResolution: "bundler"` so the compiler matches the bundler/runtime behavior.
    - `baseUrl: "source"` with path aliases (`@common/*`, `@domain/*`, `@api/*`, `@/*`) for clean imports.
 2. **Frontend:**
-   - SolidJS + TanStack
-   - Kobalte (**No Tailwind**)
+   - TypeScript + SolidJS + TanStack + Kobalte (**No Tailwind**)
    - Use vanilla CSS (semantic CSS / CSS Modules / tokens).
 3. **Backend:**
    - Netlify Functions for synchronous HTTP APIs.
@@ -62,20 +79,3 @@ When new domain concepts or fields are needed:
 1. Extend `source/domain/*` first.  
 2. Then update backend `source/api/*`.  
 3. Then adapt the front-ends under `source/apps/*`.
-
-## 3. Phased Implementation Order
-
-Development must follow this order:
-
-1. **Phase 1 — Domain: `domain.md`**
-   - Implement `source/domain/*` (canonical types + helpers).
-   - Implement initial `source/api/*` (core APIs) that consume the domain SDK.
-
-2. **Phase 2 — Admin Portal: `admin-web-app.md`**
-   - Build `source/apps/admin` using domain types and API functions.
-
-3. **Phase 3 — Ops Mobile App: `ops-mobile-app.md`**
-   - Build `source/apps/ops` using domain types and API functions.
-
-4. **Phase 4 — Customer Portal: `customer-portal.md`**
-   - Build `source/apps/customer` as a read-only portal using domain types and read-only endpoints.

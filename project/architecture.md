@@ -54,7 +54,7 @@ Netlify Functions for REST, Supabase Edge Functions for async workflows.
 
 ## 6. Coding conventions & UI
 
-SolidJS, Kobalte, & vanilla CSS
+TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS
 
 ## 7. Repository layout
 

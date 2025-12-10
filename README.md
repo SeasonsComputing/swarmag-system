@@ -54,7 +54,7 @@ pnpm tsc -b
 - Orchestration (phase sequencing): `project/orchestration.md`
 - Domain model & API conventions: `project/domain.md`
 - User stories: `project/user-stories.md`
-- App-specific briefs: `project/admin-webapp.md`, `project/ops-mobile.md`, `project/customer-portal.md`
+- App-specific briefs: `project/admin-web-app.md`, `project/ops-mobile-app.md`, `project/customer-portal.md`
 
 ## Development Tips
 

@@ -1,6 +1,6 @@
 # swarmAg System – Administrative Web Application
 
-This document describes the **Admin Webapp**, used by operations management.
+This document describes the **Admin Webapp**, the operational control center for management.
 
 ## 1. Purpose and Scope
 
@@ -9,14 +9,11 @@ The Admin Webapp:
 - Runs at `admin.swarmag.com`.
 - Is a SolidJS + TanStack + Kobalte + vanilla CSS desktop webapp.
 - Provides:
-  - CRUD management for:
-    - Services
-    - Assets
-    - Chemicals
-    - Customers
-    - Contacts
-  - Tools to build JobPlans from JobAssessments.
-  - Dashboards and reporting for jobs and operational status.
+  - Real-time dashboards of jobs, schedules, and job progress.
+  - Assignment and scheduling for assets, crews, and customers.
+  - Catalog management (services, assets, chemicals, customers, contacts).
+  - Tools to build and adjust JobPlans from JobAssessments.
+  - Reporting on operational status.
 
 ## 2. Directory Layout
 
