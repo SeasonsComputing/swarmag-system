@@ -10,7 +10,7 @@ This document defines the foundational abstractions, contracts, and APIs of the 
 
 ### 1.1 Scope
 
-Implement a TypeScript library that expresses the domain concepts described in `swarmag-system-architecture.md`.
+Implement a TypeScript library that expresses the domain concepts described in `architecture.md`.
 
 Core abstractions that define the solution space:
 

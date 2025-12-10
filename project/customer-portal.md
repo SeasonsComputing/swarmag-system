@@ -2,12 +2,7 @@
 
 This document describes the **Customer Portal**, the final MVP iteration.
 
-It depends on:
-
-- `source/domain` for the domain model.
-- `source/api/*` for read-only endpoints that surface job summaries.
-
-## 1. Purpose and Scope
+## 1. Scope & Purpose
 
 The Customer Portal:
 
@@ -42,7 +37,7 @@ source/apps/customer/
 - Read-only:
   - The Customer Portal must not mutate server-side data.
 - Tech stack:
-  - TypeScript + SolidJS + Radix UI.
+  - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
 - Use the repo-level `tsconfig.json` (ESNext modules + bundler resolution, `baseUrl: "source"` with aliases).
   - Rely on the configured aliases when importing (`@domain/*`, `@api/*`, `@utils/*`, `@/*`).
 - Import domain types from `source/domain`.

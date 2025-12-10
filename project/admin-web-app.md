@@ -1,19 +1,13 @@
 # swarmAg System – Administrative Web Application
 
-This document describes the **Admin Portal**, used by operations management.
-
-It depends on:
-
-- `source/domain` for the domain model and shared abstractions.
-- `source/api/*` for backend Netlify Functions.
-- Outputs produced here will later be consumed by the Operations PWA, but that app is not a dependency.
+This document describes the **Admin Webapp**, used by operations management.
 
 ## 1. Purpose and Scope
 
-The Admin Portal:
+The Admin Webapp:
 
 - Runs at `admin.swarmag.com`.
-- Is a SolidJS + Radix UI + Kobalte desktop web app.
+- Is a SolidJS + TanStack + Kobalte + vanilla CSS desktop webapp.
 - Provides:
   - CRUD management for:
     - Services
@@ -49,7 +43,7 @@ source/apps/admin/
 ## 3. Global Rules (Admin App)
 
 - Tech stack:
-  - TypeScript + SolidJS + Radix UI.
+  - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
 - Use the shared `tsconfig.json` (`module: ESNext`, `moduleResolution: bundler`, `baseUrl: "source"`).
   - Prefer the configured aliases (`@domain/*`, `@api/*`, `@utils/*`, `@/*`) for imports.
 - Import all domain types from `source/domain`.

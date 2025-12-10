@@ -1,17 +1,10 @@
-# swarmAg System – Operations PWA
+# swarmAg System – Operations Mobile Application
 
-This document describes the **Operations PWA** used by crews in the field.
+This document describes the **Operations Mobile App** used by crews in the field.
 
-It depends on:
+## 1. Scope
 
-- `source/domain` for the domain model.
-- `source/api/*` for backend Netlify Functions.
-- Admin Portal data (services, assets, chemicals) when available.
-- `swarmag-system-architecture.md`
-
-## 1. Purpose and Scope
-
-The Operations PWA:
+The Operations Mobile App:
 
 - Runs at `ops.swarmag.com`.
 - Is offline-first and installable as a PWA.
@@ -45,7 +38,7 @@ source/apps/ops/
 ## 3. Global Rules (Ops App)
 
 - Tech stack:
-  - TypeScript + SolidJS + Radix UI.
+  - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
   - No Tailwind.
 - Use the repo-level `tsconfig.json` (ESNext modules, bundler resolution, `baseUrl: "source"`).
   - Import via configured aliases: `@domain/*`, `@api/*`, `@utils/*`, and `@/*` for app-local modules.

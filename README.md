@@ -5,10 +5,12 @@ A monorepo for the swarmAg platform: SolidJS frontends, Netlify Functions, and a
 ## Getting Started
 
 Requirements:
+
 - Node 18+
 - pnpm (`npm install -g pnpm`)
 
 Setup and build:
+
 ```bash
 pnpm install
 pnpm tsc -b
@@ -16,12 +18,14 @@ pnpm tsc -b
 
 ## Repository Layout
 
-- `project/` — architecture, orchestration, domain, and user story docs.
-- `source/domain/` — canonical domain model (types/interfaces/classes).
-- `source/utils/` — shared primitives (UUID v7, UTC time).
-- `source/api/` — Netlify Functions exposing domain operations; platform helpers in `source/api/platform/`.
-- `source/samples/` — sample domain objects for reference/tests.
-- `source/apps/` — (placeholder) SolidJS apps for admin, ops, and customer experiences.
+| Path             | Description                                                        |
+| ---------------- | ------------------------------------------------------------------ |
+| `project/`       | Architecture, orchestration, domain, and user story docs           |
+| `source/domain/` | Canonical domain model (types/interfaces/classes)                  |
+| `source/utils/`  | Shared primitives (UUID v7, UTC time)                             |
+| `source/api/`    | Netlify Functions; platform helpers in `source/api/platform/`    |
+| `source/samples/`| Sample domain objects for reference/tests                         |
+| `source/apps/`   | (Placeholder) SolidJS apps for admin, ops, and customer experiences |
 
 ## TypeScript & Aliases
 
@@ -46,11 +50,11 @@ pnpm tsc -b
 
 ## Documentation
 
-- Architecture: `project/swarmag-system-architecture.md`
-- Orchestration (phase sequencing): `project/swarmag-system-orchestration.md`
-- Domain model & API conventions: `project/swarmag-system-domain.md`
-- User stories: `project/swarmag-system-user-stories.md`
-- App-specific briefs: `project/swarmag-system-admin.md`, `project/swarmag-system-ops.md`, `project/swarmag-system-customer.md`
+- Architecture: `project/architecture.md`
+- Orchestration (phase sequencing): `project/orchestration.md`
+- Domain model & API conventions: `project/domain.md`
+- User stories: `project/user-stories.md`
+- App-specific briefs: `project/admin-webapp.md`, `project/ops-mobile.md`, `project/customer-portal.md`
 
 ## Development Tips
 

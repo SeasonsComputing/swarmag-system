@@ -12,7 +12,7 @@ It supports administration, operations workflows & logs, and customer-facing fea
 - **Netlify** — frontends, functions compute, DNS, SSL  
 - **Supabase** — Postgres, Auth, Storage, Realtime  
 - **GitHub Actions** — CI/CD  
-- **SolidJS + Kobalte** — UI platform  
+- **SolidJS + TanStack + Kobalte + vanilla CSS** — UI platform  
 
 ## 2. Goals, constraints, and guiding principles
 
@@ -58,7 +58,7 @@ SolidJS, Kobalte, & vanilla CSS
 
 ## 7. Repository layout
 
-See `swarmag-system-orchestration.md` for the detailed monorepo structure.
+See `orchestration.md` for the detailed monorepo structure.
 
 ## 8. Build, CI/CD, Deployment
 

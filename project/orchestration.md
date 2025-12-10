@@ -7,7 +7,7 @@ This document defines how the swarmAg System should be implemented in phases:
 - Phase 3 — Operations Mobile App
 - Phase 4 — Customer Portal
 
-The authoritative architecture is in `swarmag-system-architecture.md`. 
+The authoritative architecture is in `architecture.md`. 
 
 ## 1. Monorepo Layout
 
@@ -30,16 +30,17 @@ All code lives in a single repo with this structure (current state):
 └─ tsconfig.json                         
 ```
 
-## 2. Global Rules (Apply to All Phases)
+## 2. Global Rules
 
 These rules apply to every phase and every file:
 
 1. **Language:** TypeScript everywhere using the root `tsconfig.json`.
    - `module: "ESNext"` + `moduleResolution: "bundler"` so the compiler matches the bundler/runtime behavior.
    - `baseUrl: "source"` with path aliases (`@common/*`, `@domain/*`, `@api/*`, `@/*`) for clean imports.
-2. **UI:** SolidJS + Kobalte + vanilla CSS.  
-   - **No Tailwind**
-   - Use semantic CSS / CSS Modules / tokens.
+2. **Frontend:**
+   - SolidJS + TanStack
+   - Kobalte (**No Tailwind**)
+   - Use vanilla CSS (semantic CSS / CSS Modules / tokens).
 3. **Backend:**
    - Netlify Functions for synchronous HTTP APIs.
    - Supabase (Postgres, Auth, Storage, Realtime) as the backend platform.
@@ -50,7 +51,7 @@ These rules apply to every phase and every file:
    - UUID v7 for IDs.
    - UTC timestamps.
 6. **Offline & Auditability:**
-   - Operations PWA is offline-capable with a deterministic sync model.
+   - Operations Mobile Application is offline-capable with a deterministic sync model.
    - JobLogs are append-only.
 7. **Zero-cost bias:**
    - Prefer free tiers.
@@ -66,15 +67,15 @@ When new domain concepts or fields are needed:
 
 Development must follow this order:
 
-1. **Phase 1 — Domain: `swarmag-system-domain.md`**
+1. **Phase 1 — Domain: `domain.md`**
    - Implement `source/domain/*` (canonical types + helpers).
    - Implement initial `source/api/*` (core APIs) that consume the domain SDK.
 
-2. **Phase 2 — Admin Portal: `swarmag-system-admin.md`**
+2. **Phase 2 — Admin Portal: `admin-web-app.md`**
    - Build `source/apps/admin` using domain types and API functions.
 
-3. **Phase 3 — Ops Mobile App: `swarmag-system-ops.md`**
+3. **Phase 3 — Ops Mobile App: `ops-mobile-app.md`**
    - Build `source/apps/ops` using domain types and API functions.
 
-4. **Phase 4 — Customer Portal: `swarmag-system-customer.md`**
+4. **Phase 4 — Customer Portal: `customer-portal.md`**
    - Build `source/apps/customer` as a read-only portal using domain types and read-only endpoints.
