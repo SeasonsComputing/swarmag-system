@@ -19,7 +19,7 @@ pnpm tsc -b
 - `project/` — architecture, orchestration, domain, and user story docs.
 - `source/domain/` — canonical domain model (types/interfaces/classes).
 - `source/utils/` — shared primitives (UUID v7, UTC time).
-- `source/api/` — Netlify Functions exposing domain operations; helpers in `source/api/helpers/`.
+- `source/api/` — Netlify Functions exposing domain operations; platform helpers in `source/api/platform/`.
 - `source/samples/` — sample domain objects for reference/tests.
 - `source/apps/` — (placeholder) SolidJS apps for admin, ops, and customer experiences.
 
@@ -32,7 +32,7 @@ pnpm tsc -b
 ## API Conventions
 
 - File naming: `{abstraction}-{action}.ts` (singular), e.g., `job-create.ts`, `service-list.ts`, `job-log-append.ts`.
-- Typed handler pattern: export a domain-aware `handle` plus Netlify `handler` via `withNetlify` (`source/api/helpers/handler.ts`).
+- Typed handler pattern: export a domain-aware `handle` plus Netlify `handler` via `withNetlify` (`source/api/platform/netlify.ts`).
 - Standard actions: `create`, `get`, `list`, `update`, `delete`, `append`, `search`.
 - Responses: JSON with `{ data }` on success; `{ error, details? }` on failure; status codes 400/405/422/500 as appropriate.
 - Append-only where required (e.g., job logs).

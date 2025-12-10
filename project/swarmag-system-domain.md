@@ -14,28 +14,34 @@ Implement a TypeScript library that expresses the domain concepts described in `
 
 Core abstractions that define the solution space:
 
-- `Service`
-- `Asset`
-- `Chemical`
-- `Workflow`
-- `JobAssessment`
-- `JobPlan`
-- `JobLog`
-- `Customer`
-- `Contact`
+| Entity         | Description                                 |
+| -------------- | ------------------------------------------- |
+| `Service`      | Offering provided to customers              |
+| `Asset`        | Equipment/resources used in operations      |
+| `Chemical`     | Materials applied within services           |
+| `Workflow`     | Sequenced steps for delivering a service    |
+| `JobAssessment`| Initial evaluation of a prospective job     |
+| `JobPlan`      | Planned execution details for a job         |
+| `JobLog`       | Append-only record of job events and states |
+| `Customer`     | Organization purchasing services            |
+| `Contact`      | Individual associated with a customer       |
 
 Common abstractions shared within the model:
 
-- `Note`
-- `Location`
-- `Coordinate`
-- `Question`
-- `Answer`
+| Entity      | Description                        |
+| ----------- | ---------------------------------- |
+| `Note`      | Freeform text with author/time     |
+| `Location`  | Coordinate plus optional address   |
+| `Coordinate`| Latitude/longitude pair            |
+| `Question`  | Prompt used in assessments/forms   |
+| `Answer`    | Response to a question             |
 
 Utility data types:
 
-- `ID`
-- `When`
+| Type  | Description                       |
+| ----- | --------------------------------- |
+| `ID`  | UUID v7 string identifier         |
+| `When`| ISO 8601 UTC timestamp as string  |
 
 ### 1.2 Directory Layout
 
@@ -78,9 +84,8 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 
 ```text
 source/api/
-  helpers/
-    http.ts        # jsonResponse, parseJsonBody
-    handler.ts     # ApiRequest/ApiResult types + withNetlify adapter
+  platform/
+    netlify.ts     # ApiRequest/ApiResult and withNetlify adapter
     supabase.ts    # Supabase client factory
   job-create.ts
   job-log-append.ts
@@ -92,29 +97,35 @@ source/api/
 
 ### 2.3 Standard actions by abstraction
 
-- **Service:** `service-create`, `service-get`, `service-list`, `service-update`, `service-delete`.
-- **Asset:** `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete`.
-- **Chemical:** `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete`.
-- **Workflow:** `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete`.
-- **Job:**
-  - Assessments/Plans: `job-create` (creates Job + Assessment + Plan), `job-get`, `job-list`, `job-update` (mutable Plan/Job fields only where allowed).
-  - Logs: `job-log-append` (append-only), `job-log-list` (paginated read).
-- **Customer:** `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete`.
-- **Contact:** `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete`.
-- Optional: `search` variants for richer filtering when needed.
+| Abstraction | Actions | Notes |
+| ----------- | ------- | ----- |
+| Service | `service-create`, `service-get`, `service-list`, `service-update`, `service-delete` | CRUD for catalogued offerings |
+| Asset | `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete` | Manage fleet/equipment |
+| Chemical | `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete` | Track regulated materials |
+| Workflow | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned service playbooks |
+| Job (assess/plan) | `job-create`, `job-get`, `job-list`, `job-update` | `job-create` seeds Job + Assessment + Plan; updates limited to allowed Plan/Job fields |
+| Job (logs) | `job-log-append`, `job-log-list` | Append-only logs; paginated reads |
+| Customer | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records |
+| Contact | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete` | People tied to customers |
+| Optional | `*-search` | Richer filtering when needed |
 
 ### 2.4 Handler pattern
 
-- Each file exports a typed `handle` (domain-aware) and the default Netlify `handler` created via `withNetlify` in `source/api/helpers/handler.ts`.
-- `handle` signature: `(req: ApiRequest<Body, Query>) => ApiResult<Payload> | Promise<ApiResult<Payload>>`.
-- `ApiRequest` contains `method`, parsed `body`, `query`, `headers`, and the raw Netlify event; `ApiResult` contains `statusCode`, optional `headers`, and a JSON-serializable `body`.
-- Import domain types from `source/domain` only; do not redefine them inside API handlers.
+| Item | Detail |
+| ---- | ------ |
+| Exports | Each file exports typed `handle` plus default Netlify `handler = withNetlify(handle)` from `source/api/platform/netlify.ts`. |
+| Signature | `handle: (req: ApiRequest<Body, Query>) => ApiResult<Payload> \| Promise<ApiResult<Payload>>` |
+| Request | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event. |
+| Response | `ApiResult` carries `statusCode`, optional `headers`, and JSON-serializable `body`. |
+| Imports | Only import domain types from `source/domain`; do not redefine entities locally. |
 
 ### 2.5 Validation and errors
 
-- Methods: reject unsupported HTTP methods with `405`.
-- Parsing: reject invalid or missing JSON bodies with `400`.
-- Semantics: reject domain/shape validation failures with `422`.
-- Persistence/unknown: return `500` with an error message; never leak raw stack traces.
-- Responses: always `application/json`; prefer `{ data: ... }` for success and `{ error: string, details?: string }` for failures.
-- Immutability: use `append` actions for append-only resources (e.g., job logs); avoid in-place mutation where the domain requires immutability.
+| Area   | Behavior |
+| ------ | -------- |
+| Methods | Reject unsupported HTTP methods with `HttpCodes.methodNotAllowed` (405). |
+| Parsing | Invalid/missing JSON -> `HttpCodes.badRequest` (400). |
+| Semantics | Shape/domain validation failures -> `HttpCodes.unprocessableEntity` (422). |
+| Persistence | Supabase/unknown failures -> `HttpCodes.internalError` (500); do not leak stacks. |
+| Responses | Always JSON; success `{ data: ... }`; failure `{ error, details? }`. |
+| Immutability | Use `append` actions for append-only resources (e.g., job logs); avoid in-place mutation where required. |

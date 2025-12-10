@@ -1,26 +1,30 @@
 import type { Service } from '@domain/service'
-import { Supabase } from '@api/helpers/supabase'
-import { type ApiRequest, type ApiResult, withNetlify } from '@api/helpers/handler'
+import { Supabase } from '@api/platform/supabase'
+import {
+  HttpCodes,
+  type ApiRequest,
+  type ApiResult,
+  withNetlify,
+} from '@api/platform/netlify'
 
-const clampLimit = (value?: string | null): number => {
-  const parsed = Number.parseInt(value ?? '', 10)
-  if (Number.isNaN(parsed) || parsed <= 0) {
-    return 25
-  }
-
-  return Math.min(parsed, 100)
-}
-
-const parseCursor = (value?: string | null): number => {
-  const parsed = Number.parseInt(value ?? '', 10)
-  return Number.isNaN(parsed) || parsed < 0 ? 0 : parsed
-}
-
+/** Raw database row structure for services, possibly with nested payload. */
 type ServiceRow = Partial<Service> & {
   payload?: Service
   [key: string]: unknown
 }
 
+/** Query string parameters for service list API requests. */
+type ServiceListQuery = {
+  limit?: string
+  cursor?: string
+}
+
+/**
+ * Converts a ServiceRow to Service, either from payload or raw row data.
+ * @param row - The database row to convert.
+ * @returns The mapped Service object.
+ * @throws Error if required fields are missing.
+ */
 const rowToService = (row: ServiceRow): Service => {
   if (row.payload) return row.payload
 
@@ -35,23 +39,26 @@ const rowToService = (row: ServiceRow): Service => {
   throw new Error('Service row is missing required fields')
 }
 
-type ServiceListQuery = {
-  limit?: string
-  cursor?: string
-}
-
+/**
+ * Handles the service list API request with pagination.
+ * @param req - The API request with optional query parameters for limit and cursor.
+ * @returns The API result with paginated services or error.
+ */
 export const handle = async (
   req: ApiRequest<undefined, ServiceListQuery>
 ): Promise<ApiResult> => {
   if (req.method !== 'GET') {
-    return { statusCode: 405, body: { error: 'Method Not Allowed' } }
+    return {
+      statusCode: HttpCodes.methodNotAllowed,
+      body: { error: 'Method Not Allowed' },
+    }
   }
 
-  const limit = clampLimit(req.query?.limit)
-  const cursor = parseCursor(req.query?.cursor)
+  const limit = Supabase.clampLimit(req.query?.limit)
+  const cursor = Supabase.parseCursor(req.query?.cursor)
+  const rangeEnd = cursor + limit - 1
 
   const supabase = Supabase.client()
-  const rangeEnd = cursor + limit - 1
 
   const { data, error, count } = await supabase
     .from('services')
@@ -60,7 +67,7 @@ export const handle = async (
 
   if (error) {
     return {
-      statusCode: 500,
+      statusCode: HttpCodes.internalError,
       body: {
         error: 'Failed to load services',
         details: error.message,
@@ -74,7 +81,7 @@ export const handle = async (
     services = ((data ?? []) as ServiceRow[]).map(rowToService)
   } catch (parseError) {
     return {
-      statusCode: 500,
+      statusCode: HttpCodes.internalError,
       body: {
         error: 'Invalid service record returned from Supabase',
         details: (parseError as Error).message,
@@ -87,7 +94,7 @@ export const handle = async (
     typeof count === 'number' ? nextCursor < count : services.length === limit
 
   return {
-    statusCode: 200,
+    statusCode: HttpCodes.ok,
     body: {
       data: services,
       cursor: nextCursor,
@@ -96,5 +103,4 @@ export const handle = async (
   }
 }
 
-export const handler = withNetlify(handle)
-export default handler
+export default withNetlify(handle)

@@ -12,10 +12,11 @@ import type { Attachment } from './common'
 export type AssetType =
   | 'skidsteer-vehicle'
   | 'toolcat-vehicle'
-  | 'vehicle-tool'
+  | 'vehicle-tool-attachment'
   | 'mapping-drone'
   | 'dispensing-drone'
-  | 'drone-bucket'
+  | 'drone-bucket-wet'
+  | 'drone-bucket-dry'
 
 /** The possible statuses an asset can have. */
 export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'reserved'

@@ -1,15 +1,29 @@
 import { type ID, id } from '@utils/identifier'
 import { type When, when } from '@utils/datetime'
-import type { JobAssessment, JobPlan, JobStatus, Job } from '@domain/job'
-import { Supabase } from '@api/helpers/supabase'
-import { type ApiRequest, type ApiResult, withNetlify } from '@api/helpers/handler'
+import type { 
+  JobAssessment, 
+  JobPlan, 
+  JobStatus, 
+  Job 
+} from '@domain/job'
+import { Supabase } from '@api/platform/supabase'
+import {
+  HttpCodes,
+  type ApiRequest,
+  type ApiResult,
+  withNetlify,
+} from '@api/platform/netlify'
 
+/** Input structure for job assessment data, excluding generated fields. */
 type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>
+
+/** Input structure for job plan data, excluding generated fields and allowing optional status. */
 type JobPlanInput = Omit<
   JobPlan,
   'id' | 'jobId' | 'status' | 'createdAt' | 'updatedAt'
 > & { status?: JobStatus }
 
+/** Body structure for job creation API requests. */
 interface JobCreateBody {
   serviceId: ID
   customerId: ID
@@ -17,29 +31,45 @@ interface JobCreateBody {
   plan: JobPlanInput
 }
 
+/**
+ * Validates the job creation payload.
+ * @param payload - The job creation body to validate.
+ * @returns A string error message if invalid, null if valid.
+ */
 const validate = (payload: JobCreateBody): string | null => {
   if (!payload?.serviceId) return 'serviceId is required'
   if (!payload.customerId) return 'customerId is required'
   if (!payload.plan?.workflowId) return 'plan.workflowId is required'
   if (!payload.plan?.scheduledStart) return 'plan.scheduledStart is required'
   if (!payload.assessment?.assessedAt) return 'assessment.assessedAt is required'
-  if (!payload.assessment?.locations?.length) return 'assessment.locations requires at least one location'
+  if (!payload.assessment?.locations?.length) return 'assessment.locations requires 1+ location'
   return null
 }
 
+/**
+ * Handles the job creation API request.
+ * @param req - The API request containing job creation details.
+ * @returns The API result with created job data or error.
+ */
 export const handle = async (
   req: ApiRequest<JobCreateBody>
 ): Promise<ApiResult> => {
   if (req.method !== 'POST') {
-    return { statusCode: 405, body: { error: 'Method Not Allowed' } }
+    return {
+      statusCode: HttpCodes.methodNotAllowed,
+      body: { error: 'Method Not Allowed' }
+    }
   }
 
   const validationError = validate(req.body)
   if (validationError) {
-    return { statusCode: 422, body: { error: validationError } }
+    return {
+      statusCode: HttpCodes.unprocessableEntity,
+      body: { error: validationError }
+    }
   }
 
-  const at: When = when()
+  const now: When = when()
   const jobId: ID = id()
   const assessmentId: ID = id()
   const planId: ID = id()
@@ -48,8 +78,8 @@ export const handle = async (
   const assessment: JobAssessment = {
     ...req.body.assessment,
     id: assessmentId,
-    createdAt: at,
-    updatedAt: at,
+    createdAt: now,
+    updatedAt: now,
   }
 
   const plan: JobPlan = {
@@ -57,8 +87,8 @@ export const handle = async (
     id: planId,
     jobId,
     status: planStatus,
-    createdAt: at,
-    updatedAt: at,
+    createdAt: now,
+    updatedAt: now,
   }
 
   const job: Job = {
@@ -68,8 +98,8 @@ export const handle = async (
     serviceId: req.body.serviceId,
     customerId: req.body.customerId,
     status: planStatus,
-    createdAt: at,
-    updatedAt: at,
+    createdAt: now,
+    updatedAt: now,
   }
 
   const supabase = Supabase.client()
@@ -113,12 +143,14 @@ export const handle = async (
 
     if (jobError || planError || assessmentError) {
       throw new Error(
-        jobError?.message ?? planError?.message ?? assessmentError?.message
+        jobError?.message ?? 
+        planError?.message ?? 
+        assessmentError?.message
       )
     }
   } catch (error) {
     return {
-      statusCode: 500,
+      statusCode: HttpCodes.internalError,
       body: {
         error: 'Failed to create job',
         details: (error as Error).message,
@@ -127,16 +159,11 @@ export const handle = async (
   }
 
   return {
-    statusCode: 201,
+    statusCode: HttpCodes.created,
     body: {
-      data: {
-        job,
-        plan,
-        assessment,
-      },
+      data: { job, plan, assessment },
     },
   }
 }
 
-export const handler = withNetlify(handle)
-export default handler
+export default withNetlify(handle)

@@ -2,13 +2,15 @@ import { type ID, id } from '@utils/identifier'
 import { type When, when } from '@utils/datetime'
 import type { JobLogEntry, JobLogType } from '@domain/job'
 import type { Attachment, Author, Location } from '@domain/common'
-import { Supabase } from '@api/helpers/supabase'
+import { Supabase } from '@api/platform/supabase'
 import {
+  HttpCodes,
   type ApiRequest,
   type ApiResult,
   withNetlify,
-} from '@api/helpers/handler'
+} from '@api/platform/netlify'
 
+/** Body structure for job log append API requests. */
 interface JobLogBody {
   jobId: ID
   planId: ID
@@ -21,40 +23,41 @@ interface JobLogBody {
   occurredAt?: When
 }
 
+/**
+ * Validates the job log append payload.
+ * @param payload - The job log body to validate.
+ * @returns A string error message if invalid, null if valid.
+ */
 const validate = (payload: JobLogBody): string | null => {
-  if (!payload.jobId) {
-    return 'jobId is required'
-  }
-
-  if (!payload.planId) {
-    return 'planId is required'
-  }
-
-  if (!payload.createdBy) {
-    return 'createdBy is required'
-  }
-
-  if (!payload.type) {
-    return 'type is required'
-  }
-
-  if (!payload.message) {
-    return 'message is required'
-  }
-
+  if (!payload?.jobId) return 'jobId is required'
+  if (!payload.planId) return 'planId is required'
+  if (!payload.createdBy) return 'createdBy is required'
+  if (!payload.type) return 'type is required'
+  if (!payload.message) return 'message is required'
   return null
 }
 
+/**
+ * Handles the job log append API request.
+ * @param req - The API request containing job log entry details.
+ * @returns The API result with created log entry or error.
+ */
 export const handle = async (
   req: ApiRequest<JobLogBody>
 ): Promise<ApiResult> => {
   if (req.method !== 'POST') {
-    return { statusCode: 405, body: { error: 'Method Not Allowed' } }
+    return { 
+      statusCode: HttpCodes.methodNotAllowed, 
+      body: { error: 'Method Not Allowed' } 
+    }
   }
 
   const validationError = validate(req.body)
   if (validationError) {
-    return { statusCode: 422, body: { error: validationError } }
+    return { 
+      statusCode: HttpCodes.unprocessableEntity, 
+      body: { error: validationError } 
+    }
   }
 
   const now: When = when()
@@ -73,6 +76,7 @@ export const handle = async (
   }
 
   const supabase = Supabase.client()
+  
   const { error } = await supabase.from('job_logs').insert({
     id: logEntry.id,
     job_id: logEntry.jobId,
@@ -85,7 +89,7 @@ export const handle = async (
 
   if (error) {
     return {
-      statusCode: 500,
+      statusCode: HttpCodes.internalError,
       body: {
         error: 'Failed to append job log entry',
         details: error.message,
@@ -93,8 +97,7 @@ export const handle = async (
     }
   }
 
-  return { statusCode: 201, body: { data: logEntry } }
+  return { statusCode: HttpCodes.created, body: { data: logEntry } }
 }
 
-export const handler = withNetlify(handle)
-export default handler
+export default withNetlify(handle)
