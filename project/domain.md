@@ -14,7 +14,7 @@ Implement a TypeScript library that expresses the domain concepts described in `
 
 Core abstractions that define the solution space:
 
-| Entity         | Description                                 |
+| Abstraction    | Description                                 |
 | -------------- | ------------------------------------------- |
 | `Service`      | Offering provided to customers              |
 | `Asset`        | Equipment/resources used in operations      |
@@ -28,20 +28,33 @@ Core abstractions that define the solution space:
 
 Common abstractions shared within the model:
 
-| Entity      | Description                        |
-| ----------- | ---------------------------------- |
-| `Note`      | Freeform text with author/time     |
-| `Location`  | Coordinate plus optional address   |
-| `Coordinate`| Latitude/longitude pair            |
-| `Question`  | Prompt used in assessments/forms   |
-| `Answer`    | Response to a question             |
+| Abstraction    | Description                        |
+| -------------- | ---------------------------------- |
+| `User`         | Identity/profile with roles and contact info |
+| `Author`       | Lightweight attribution slice of `User`      |
+| `Note`         | Freeform text with author/time     |
+| `Attachment`   | File reference metadata and uploader |
+| `Address`      | Postal address fields              |
+| `Location`     | Coordinate plus optional address   |
+| `Coordinate`   | Latitude/longitude pair            |
+| `Question`     | Prompt used in assessments/forms   |
+| `Answer`       | Response to a question             |
 
 Utility data types:
 
-| Type  | Description                       |
-| ----- | --------------------------------- |
-| `ID`  | UUID v7 string identifier         |
-| `When`| ISO 8601 UTC timestamp as string  |
+| Type           | Description                       |
+| -------------- | --------------------------------- |
+| `ID`           | UUID v7 string identifier         |
+| `When`         | ISO 8601 UTC timestamp as string  |
+
+Supporting structures present in code (refer to type definitions for details):
+
+| Area           | Structures                           |
+| -------------- | ------------------------------------ |
+| Services       | `ServiceRate`, `ServiceRegulation`   |
+| Workflows      | `WorkflowStep`, `WorkflowVersion`    |
+| Jobs           | `JobAssignment`, `JobChemicalPlan`   |
+| Customers      | `CustomerSite`                       |
 
 ### 1.2 Directory Layout
 
@@ -105,6 +118,7 @@ source/api/
 | Workflow | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned service playbooks |
 | Job (assess/plan) | `job-create`, `job-get`, `job-list`, `job-update` | `job-create` seeds Job + Assessment + Plan; updates limited to allowed Plan/Job fields |
 | Job (logs) | `job-log-append`, `job-log-list` | Append-only logs; paginated reads |
+| User | `user-create`, `user-get`, `user-list`, `user-update`, `user-delete` | Profiles/roles for operators and customers |
 | Customer | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records |
 | Contact | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete` | People tied to customers |
 | Optional | `*-search` | Richer filtering when needed |
