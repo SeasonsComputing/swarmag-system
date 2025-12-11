@@ -10,13 +10,14 @@ import type { Attachment } from './common'
 
 /** The different types of assets available in the system. */
 export type AssetType =
+  | 'transport-truck'
   | 'skidsteer-vehicle'
   | 'toolcat-vehicle'
   | 'vehicle-tool-attachment'
   | 'mapping-drone'
   | 'dispensing-drone'
-  | 'drone-bucket-wet'
-  | 'drone-bucket-dry'
+  | 'drone-spray-tank'
+  | 'drone-granular-hopper'
 
 /** The possible statuses an asset can have. */
 export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'reserved'

@@ -7,6 +7,9 @@ import type {
 /** HTTP header map for Netlify responses/requests. */
 export type HttpHeaders = Record<string, string>
 
+/** HTTP query map for Netlify responses/requests. */
+export type HttpQuery = Record<string, string | undefined>
+
 /** HTTP method for Netlify actions. */
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
 
@@ -25,10 +28,7 @@ export const HttpCodes = {
  * @template Body Request body type.
  * @template Query Query string type.
  */
-export interface ApiRequest<
-  Body = unknown,
-  Query = Record<string, string | undefined>,
-> {
+export interface ApiRequest<Body = unknown, Query = HttpQuery> {
   method: HttpMethod
   body: Body
   query: Query
@@ -52,11 +52,8 @@ export interface ApiResult<Payload = unknown> {
  * @template Query Query string type.
  * @template Payload Response payload type.
  */
-export type ApiHandler<
-  Body = unknown,
-  Query = Record<string, string | undefined>,
-  Payload = unknown,
-> = (req: ApiRequest<Body, Query>) => Promise<ApiResult<Payload>> | ApiResult<Payload>
+export type ApiHandler<Body = unknown, Query = HttpQuery, Payload = unknown>
+  = (req: ApiRequest<Body, Query>) => Promise<ApiResult<Payload>> | ApiResult<Payload>
 
 /**
  * Build a JSON Netlify response with a consistent content type header.
@@ -65,18 +62,15 @@ export type ApiHandler<
  * @param headers Optional additional headers to merge.
  * @returns Netlify handler response.
  */
-const jsonResponse = (
-  statusCode: number,
-  body: unknown,
-  headers: HttpHeaders = {}
-): HandlerResponse => ({
-  statusCode,
-  headers: {
-    'content-type': 'application/json',
-    ...headers,
-  },
-  body: JSON.stringify(body),
-})
+const jsonResponse = (statusCode: number, body: unknown, headers: HttpHeaders = {}):
+  HandlerResponse => ({
+    statusCode,
+    headers: {
+      'content-type': 'application/json',
+      ...headers,
+    },
+    body: JSON.stringify(body),
+  })
 
 /**
  * Safely parse a JSON request body string.
@@ -104,34 +98,34 @@ const parseJsonBody = <T,>(body: string | null): T => {
  */
 export const withNetlify =
   <Body, Query, Payload>(handle: ApiHandler<Body, Query, Payload>): Handler =>
-  async (event) => {
-    let parsedBody: Body
+    async (event) => {
+      let parsedBody: Body
 
-    try {
-      parsedBody = event.body ? parseJsonBody<Body>(event.body) : (undefined as Body)
-    } catch (error) {
-      return jsonResponse(HttpCodes.badRequest, { error: (error as Error).message })
-    }
-
-    const request: ApiRequest<Body, Query> = {
-      method: event.httpMethod as HttpMethod,
-      body: parsedBody,
-      query: (event.queryStringParameters ?? {}) as Query,
-      headers: (event.headers ?? {}) as HttpHeaders,
-      rawEvent: event,
-    }
-
-    try {
-      const result = await handle(request)
-      return {
-        statusCode: result.statusCode,
-        headers: { 'content-type': 'application/json', ...result.headers },
-        body: JSON.stringify(result.body),
+      try {
+        parsedBody = event.body ? parseJsonBody<Body>(event.body) : (undefined as Body)
+      } catch (error) {
+        return jsonResponse(HttpCodes.badRequest, { error: (error as Error).message })
       }
-    } catch (error) {
-      return jsonResponse(HttpCodes.internalError, {
-        error: 'Unhandled error',
-        details: (error as Error).message,
-      })
+
+      const request: ApiRequest<Body, Query> = {
+        method: event.httpMethod as HttpMethod,
+        body: parsedBody,
+        query: (event.queryStringParameters ?? {}) as Query,
+        headers: (event.headers ?? {}) as HttpHeaders,
+        rawEvent: event,
+      }
+
+      try {
+        const result = await handle(request)
+        return {
+          statusCode: result.statusCode,
+          headers: { 'content-type': 'application/json', ...result.headers },
+          body: JSON.stringify(result.body),
+        }
+      } catch (error) {
+        return jsonResponse(HttpCodes.internalError, {
+          error: 'Unhandled error',
+          details: (error as Error).message,
+        })
+      }
     }
-  }

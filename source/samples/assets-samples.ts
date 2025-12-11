@@ -41,7 +41,7 @@ export const sprayerTruckSample: Asset = {
   id: '01J0N9ASSET00000000000002',
   label: 'Ram 5500 Spray Rig',
   description: 'Dual-tank spray truck configured for mixed ground applications.',
-  type: 'vehicle-tool',
+  type: 'drone-granular-hopper',
   status: 'maintenance',
   attachments: [
     {
