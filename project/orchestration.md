@@ -9,7 +9,7 @@ This document defines how the swarmAg System should be implemented in phases:
 | 3 | Ops Mobile App | `ops-mobile-app.md` | Field operations and job logging |
 | 4 | Customer Portal | `customer-portal.md` | Read-only customer experience |
 
-**Primary work per phase**
+## 0. Primary work per phase
 
 | Phase | Primary Work |
 | ----- | ------------ |
