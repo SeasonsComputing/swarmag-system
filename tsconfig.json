@@ -24,5 +24,6 @@
   },
   
   // Tells the compiler which files to include in the build process
-  "include": ["source/**/*.ts"] 
+  "include": ["source/**/*.ts"],
+  "exclude": ["source/tests"]
 }

@@ -24,7 +24,7 @@ pnpm tsc -b
 | `source/domain/` | Canonical domain model (types/interfaces/classes)                   |
 | `source/utils/`  | Shared primitives (UUID v7, UTC time)                               |
 | `source/api/`    | Netlify Functions; platform helpers in `source/api/platform/`       |
-| `source/samples/`| Sample domain objects for reference/tests                           |
+| `source/tests/`  | Test specs and fixtures (barreled samples in `fixtures/`)           |
 | `source/apps/`   | (Placeholder) SolidJS apps for admin, ops, and customer experiences |
 
 ## TypeScript & Aliases
@@ -62,3 +62,4 @@ pnpm tsc -b
 - Import domain types from `source/domain`; do not redefine domain entities locally.
 - For new APIs, follow the handler adapter and naming conventions.
 - Keep append-only semantics intact for logs and audit trails.
+- Tests: `pnpm test` (unit), `pnpm test:watch`, `pnpm test:live` (requires `LIVE_BASE_URL` to hit deployed endpoints); fixtures live under `source/tests/fixtures/samples.ts`.
