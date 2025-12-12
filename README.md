@@ -18,13 +18,13 @@ pnpm tsc -b
 
 ## Repository Layout
 
-| Path             | Description                                                        |
-| ---------------- | ------------------------------------------------------------------ |
-| `project/`       | Architecture, orchestration, domain, and user story docs           |
-| `source/domain/` | Canonical domain model (types/interfaces/classes)                  |
-| `source/utils/`  | Shared primitives (UUID v7, UTC time)                             |
-| `source/api/`    | Netlify Functions; platform helpers in `source/api/platform/`    |
-| `source/samples/`| Sample domain objects for reference/tests                         |
+| Path             | Description                                                         |
+| ---------------- | ------------------------------------------------------------------- |
+| `project/`       | Architecture, orchestration, domain, and user story docs            |
+| `source/domain/` | Canonical domain model (types/interfaces/classes)                   |
+| `source/utils/`  | Shared primitives (UUID v7, UTC time)                               |
+| `source/api/`    | Netlify Functions; platform helpers in `source/api/platform/`       |
+| `source/samples/`| Sample domain objects for reference/tests                           |
 | `source/apps/`   | (Placeholder) SolidJS apps for admin, ops, and customer experiences |
 
 ## TypeScript & Aliases
@@ -45,7 +45,7 @@ pnpm tsc -b
 
 - Attachments carry a `kind` (`photo` | `video` | `map` | `document`).
 - `Customer.contacts` is non-empty and `primaryContactId` lives on `Customer`.
-- Asset types are specialized (`skidsteer-vehicle`, `toolcat-vehicle`, `vehicle-tool`, `mapping-drone`, `dispensing-drone`, `drone-bucket`).
+- Asset types are data records (`AssetType`) referenced by `Asset.type` and `Service.requiredAssetTypes` and curated in `project/data-lists.md`.
 - Locations store coordinates/addresses without a `source` field.
 
 ## Documentation
@@ -55,6 +55,7 @@ pnpm tsc -b
 - Domain model & API conventions: `project/domain.md`
 - User stories: `project/user-stories.md`
 - App-specific briefs: `project/admin-web-app.md`, `project/ops-mobile-app.md`, `project/customer-portal.md`
+- Data lists (services, asset types): `project/data-lists.md`
 
 ## Development Tips
 

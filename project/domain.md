@@ -28,17 +28,17 @@ Core abstractions that define the solution space:
 
 Common abstractions shared within the model:
 
-| Abstraction    | Description                        |
-| -------------- | ---------------------------------- |
+| Abstraction    | Description                                  |
+| -------------- | -------------------------------------------- |
 | `User`         | Identity/profile with roles and contact info |
 | `Author`       | Lightweight attribution slice of `User`      |
-| `Note`         | Freeform text with author/time     |
-| `Attachment`   | File reference metadata and uploader |
-| `Address`      | Postal address fields              |
-| `Location`     | Coordinate plus optional address   |
-| `Coordinate`   | Latitude/longitude pair            |
-| `Question`     | Prompt used in assessments/forms   |
-| `Answer`       | Response to a question             |
+| `Note`         | Freeform text with author/time               |
+| `Attachment`   | File reference metadata and uploader         |
+| `Address`      | Postal address fields                        |
+| `Location`     | Coordinate plus optional address             |
+| `Coordinate`   | Latitude/longitude pair                      |
+| `Question`     | Prompt used in assessments/forms             |
+| `Answer`       | Response to a question                       |
 
 Utility data types:
 
@@ -49,12 +49,13 @@ Utility data types:
 
 Supporting structures present in code (refer to type definitions for details):
 
-| Area           | Structures                           |
-| -------------- | ------------------------------------ |
-| Services       | `ServiceRate`, `ServiceRegulation`   |
-| Workflows      | `WorkflowStep`, `WorkflowVersion`    |
-| Jobs           | `JobAssignment`, `JobChemicalPlan`   |
-| Customers      | `CustomerSite`                       |
+| Area           | Structures / Notes                                        |
+| -------------- | --------------------------------------------------------- |
+| Services       | `sku`; `requiredAssetTypes: ID[]` (links to AssetType)    |
+| Assets         | `AssetType` (`id`, `name`; lifecycle aligned to Services) |
+| Workflows      | `WorkflowStep`, `WorkflowVersion`                         |
+| Jobs           | `JobAssignment`, `JobChemicalPlan`                        |
+| Customers      | `CustomerSite`                                            |
 
 ### 1.2 Directory Layout
 
@@ -81,6 +82,7 @@ source/utils/
 - No runtime dependencies beyond the UUID helper (or a tiny internal implementation).
 - This package is the **single source of truth** for domain types.
 - All other code (apps, functions) must import from `source/domain`.
+- Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type` and `Service.requiredAssetTypes`; keep the canonical list in `project/data-lists.md`.
 - JobAssessments must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
 
 ## 2. API Functions (`source/api/*`)
@@ -112,16 +114,16 @@ source/api/
 
 | Abstraction | Actions | Notes |
 | ----------- | ------- | ----- |
-| Service | `service-create`, `service-get`, `service-list`, `service-update`, `service-delete` | CRUD for catalogued offerings |
-| Asset | `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete` | Manage fleet/equipment |
-| Chemical | `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete` | Track regulated materials |
-| Workflow | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned service playbooks |
+| Service     | `service-create`, `service-get`, `service-list`, `service-update`, `service-delete` | CRUD for catalogued offerings |
+| Asset       | `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete` | Manage fleet/equipment |
+| Chemical    | `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete` | Track regulated materials |
+| Workflow    | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned service playbooks |
 | Job (assess/plan) | `job-create`, `job-get`, `job-list`, `job-update` | `job-create` seeds Job + Assessment + Plan; updates limited to allowed Plan/Job fields |
 | Job (logs) | `job-log-append`, `job-log-list` | Append-only logs; paginated reads |
-| User | `user-create`, `user-get`, `user-list`, `user-update`, `user-delete` | Profiles/roles for operators and customers |
-| Customer | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records |
-| Contact | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete` | People tied to customers |
-| Optional | `*-search` | Richer filtering when needed |
+| User       | `user-create`, `user-get`, `user-list`, `user-update`, `user-delete` | Profiles/roles for operators and customers |
+| Customer   | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records |
+| Contact    | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete` | People tied to customers |
+| Optional   | `*-search` | Richer filtering when needed |
 
 ### 2.4 Handler pattern
 
@@ -135,11 +137,11 @@ source/api/
 
 ### 2.5 Validation and errors
 
-| Area   | Behavior |
-| ------ | -------- |
-| Methods | Reject unsupported HTTP methods with `HttpCodes.methodNotAllowed` (405). |
-| Parsing | Invalid/missing JSON -> `HttpCodes.badRequest` (400). |
-| Semantics | Shape/domain validation failures -> `HttpCodes.unprocessableEntity` (422). |
-| Persistence | Supabase/unknown failures -> `HttpCodes.internalError` (500); do not leak stacks. |
-| Responses | Always JSON; success `{ data: ... }`; failure `{ error, details? }`. |
+| Area         | Behavior |
+| ------------ | -------- |
+| Methods      | Reject unsupported HTTP methods with `HttpCodes.methodNotAllowed` (405). |
+| Parsing      | Invalid/missing JSON -> `HttpCodes.badRequest` (400). |
+| Semantics    | Shape/domain validation failures -> `HttpCodes.unprocessableEntity` (422). |
+| Persistence  | Supabase/unknown failures -> `HttpCodes.internalError` (500); do not leak stacks. |
+| Responses    | Always JSON; success `{ data: ... }`; failure `{ error, details? }`. |
 | Immutability | Use `append` actions for append-only resources (e.g., job logs); avoid in-place mutation where required. |

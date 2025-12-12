@@ -9,15 +9,10 @@ import type { When } from '@utils/datetime'
 import type { Attachment } from './common'
 
 /** The different types of assets available in the system. */
-export type AssetType =
-  | 'transport-truck'
-  | 'skidsteer-vehicle'
-  | 'toolcat-vehicle'
-  | 'vehicle-tool-attachment'
-  | 'mapping-drone'
-  | 'dispensing-drone'
-  | 'drone-spray-tank'
-  | 'drone-granular-hopper'
+export interface AssetType {
+  id: ID;
+  name: string;
+}
 
 /** The possible statuses an asset can have. */
 export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'reserved'
@@ -27,7 +22,8 @@ export interface Asset {
   id: ID
   label: string
   description?: string
-  type: AssetType
+  serialNumber?: string;
+  type: ID;
   status: AssetStatus
   attachments?: Attachment[]
   createdAt: When

@@ -1,10 +1,22 @@
-import type { Asset } from '@domain/asset'
+import type { Asset, AssetType } from '@domain/asset'
+
+export const assetTypeSamples: AssetType[] = [
+  { id: '01TYPE-TRANSPORT-TRUCK', name: 'Transport Truck' },
+  { id: '01TYPE-SKIDSTEER', name: 'Skidsteer Vehicle' },
+  { id: '01TYPE-TOOLCAT', name: 'Toolcat Vehicle' },
+  { id: '01TYPE-VEHICLE-ATTACH', name: 'Vehicle Tool Attachment' },
+  { id: '01TYPE-MAP-DRONE', name: 'Mapping Drone' },
+  { id: '01TYPE-DISPENSE-DRONE', name: 'Dispensing Drone' },
+  { id: '01TYPE-SPRAY-TANK', name: 'Drone Spray Tank' },
+  { id: '01TYPE-GRAN-HOPPER', name: 'Drone Granular Hopper' },
+]
 
 export const droneAssetSample: Asset = {
   id: '01J0N9ASSET00000000000001',
   label: 'DJI Agras T40 #3',
   description: 'High-capacity agricultural drone optimized for large acreage spraying.',
-  type: 'dispensing-drone',
+  serialNumber: 'DJI-T40-0003',
+  type: '01TYPE-DISPENSE-DRONE',
   status: 'active',
   attachments: [
     {
@@ -41,7 +53,8 @@ export const sprayerTruckSample: Asset = {
   id: '01J0N9ASSET00000000000002',
   label: 'Ram 5500 Spray Rig',
   description: 'Dual-tank spray truck configured for mixed ground applications.',
-  type: 'drone-granular-hopper',
+  serialNumber: 'RAM-5500-RIG-2024-01',
+  type: '01TYPE-TRANSPORT-TRUCK',
   status: 'maintenance',
   attachments: [
     {

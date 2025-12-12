@@ -25,15 +25,38 @@ type ServiceListQuery = {
  * @returns The mapped Service object.
  * @throws Error if required fields are missing.
  */
+const isServiceCategory = (
+  value: unknown
+): value is Service['category'] =>
+  value === 'aerial-drone-services' ||
+  value === 'ground-machinery-services'
+
+const isIdArray = (value: unknown): value is string[] =>
+  Array.isArray(value) && value.every((entry) => typeof entry === 'string')
+
 const rowToService = (row: ServiceRow): Service => {
   if (row.payload) return row.payload
 
   if (
     typeof row.id === 'string' &&
-    typeof row.slug === 'string' &&
-    typeof row.name === 'string'
+    typeof row.name === 'string' &&
+    typeof row.sku === 'string' &&
+    isServiceCategory(row.category) &&
+    isIdArray(row.requiredAssetTypes) &&
+    typeof row.createdAt === 'string' &&
+    typeof row.updatedAt === 'string'
   ) {
-    return row as Service
+    return {
+      id: row.id,
+      name: row.name,
+      sku: row.sku,
+      description: row.description,
+      category: row.category,
+      requiredAssetTypes: row.requiredAssetTypes,
+      notes: row.notes,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+    }
   }
 
   throw new Error('Service row is missing required fields')
