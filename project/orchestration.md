@@ -18,7 +18,7 @@ This document defines how the swarmAg System should be implemented in phases:
 | 3 | Build `source/apps/ops` using domain types and API functions |
 | 4 | Build read-only customer portal (`source/apps/customer`) using domain types |
 
-The authoritative architecture is in `architecture.md`. 
+The authoritative architecture is in `architecture.md`.
 
 ## 1. Monorepo Layout
 
