@@ -28,7 +28,7 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 
 ## Asset Types
 
-| Asset Type              |
+| Description             |
 | ----------------------- |
 | Transport Truck         |
 | Skidsteer Vehicle       |
