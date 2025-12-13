@@ -2,17 +2,13 @@
 
 This document defines the foundational abstractions, contracts, and APIs of the swarmAg solution space. The domain model captures both the problem space and the solution space, expressed as classes, types, interfaces, associations, and APIs delivered through a TypeScript library.
 
-- `source/domain` — canonical domain abstractions, associations, properties, et al (Domain Model)
-- `source/utils` - utility data types and helpers
-- `source/api` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints
-
 ## 1. Domain Model (`source/domain`)
 
 ### 1.1 Scope
 
-Implement a TypeScript library that expresses the domain concepts described in `architecture.md`.
+Define the TypeScript domain library described in `architecture.md`, limited to types and associations under `source/domain` plus shared primitives in `source/utils`. All other concerns (API, persistence, UI) consume these types rather than re-declaring them.
 
-Core abstractions that define the solution space:
+### 1.2 Core abstractions that define the solution space
 
 | Abstraction    | Description                                 |
 | -------------- | ------------------------------------------- |
@@ -26,7 +22,7 @@ Core abstractions that define the solution space:
 | `Customer`     | Organization purchasing services            |
 | `Contact`      | Individual associated with a customer       |
 
-Common abstractions shared within the model:
+### 1.3 Common abstractions shared within the model
 
 | Abstraction    | Description                                  |
 | -------------- | -------------------------------------------- |
@@ -40,14 +36,14 @@ Common abstractions shared within the model:
 | `Question`     | Prompt used in assessments/forms             |
 | `Answer`       | Response to a question                       |
 
-Utility data types:
+### 1.4 Utility data types
 
 | Type           | Description                       |
 | -------------- | --------------------------------- |
 | `ID`           | UUID v7 string identifier         |
 | `When`         | ISO 8601 UTC timestamp as string  |
 
-Supporting structures present in code (refer to type definitions for details):
+### 1.5 Supporting structures present in code (refer to type definitions for details)
 
 | Area           | Structures / Notes                                        |
 | -------------- | --------------------------------------------------------- |
@@ -57,24 +53,7 @@ Supporting structures present in code (refer to type definitions for details):
 | Jobs           | `JobAssignment`, `JobChemicalPlan`                        |
 | Customers      | `CustomerSite`                                            |
 
-### 1.2 Directory Layout
-
-```text
-source/domain/
-  common.ts
-  service.ts
-  asset.ts
-  chemical.ts
-  workflow.ts
-  job.ts
-  customer.ts
-
-source/utils/
-  datetime.ts
-  identifier.ts
-```
-
-### 1.3 Rules
+### 1.6 Rules
 
 - Language: TypeScript (strict mode) using the root `tsconfig.json` settings (`module: ESNext`, `moduleResolution: bundler`, `baseUrl: "source"`).
 - Use the configured path aliases when importing: `@domain/*` for domain modules, `@utils/*` for core utilities.
@@ -91,26 +70,12 @@ source/utils/
 
 Functions that expose the domain model over HTTP, persisted in Supabase, and typed with `source/domain`. Each function:
 
+- `source/api` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints
 - Uses the `{abstraction}-{action}.ts` naming convention with singular-tense abstractions.
 - Parses and validates JSON requests against domain types.
 - Returns JSON responses with a consistent envelope and status codes.
 
-### 2.2 Naming and layout
-
-```text
-source/api/
-  platform/
-    netlify.ts     # ApiRequest/ApiResult and withNetlify adapter
-    supabase.ts    # Supabase client factory
-  job-create.ts
-  job-log-append.ts
-  service-list.ts
-  # future: job-get.ts, job-list.ts, job-update.ts
-  # future: service-create.ts, service-get.ts, service-update.ts, service-delete.ts
-  # future: asset-*.ts, chemical-*.ts, workflow-*.ts, customer-*.ts, contact-*.ts
-```
-
-### 2.3 Standard actions by abstraction
+### 2.2 Standard actions by abstraction
 
 | Abstraction | Actions | Notes |
 | ----------- | ------- | ----- |
@@ -125,7 +90,7 @@ source/api/
 | Contact    | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete` | People tied to customers |
 | Optional   | `*-search` | Richer filtering when needed |
 
-### 2.4 Handler pattern
+### 2.3 Handler pattern
 
 | Item | Detail |
 | ---- | ------ |
@@ -135,7 +100,7 @@ source/api/
 | Response | `ApiResult` carries `statusCode`, optional `headers`, and JSON-serializable `body`. |
 | Imports | Only import domain types from `source/domain`; do not redefine entities locally. |
 
-### 2.5 Validation and errors
+### 2.4 Validation and errors
 
 | Area         | Behavior |
 | ------------ | -------- |
