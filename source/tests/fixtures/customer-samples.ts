@@ -1,5 +1,12 @@
 import type { Customer } from '@domain/customer'
 import type { Location } from '@domain/common'
+import { id } from '@utils/identifier'
+
+const customerId = id()
+const accountManagerId = id()
+const primaryContactId = id()
+const siteId = id()
+const contactNoteId = id()
 
 const headquartersLocation: Location = {
   coordinate: { latitude: 33.5779, longitude: -101.8552 },
@@ -14,7 +21,7 @@ const headquartersLocation: Location = {
 }
 
 export const blueMesaRanchCustomer: Customer = {
-  id: '01J0CUSTOMER00001',
+  id: customerId,
   name: 'Blue Mesa Ranch Co.',
   status: 'active',
   address: {
@@ -25,16 +32,16 @@ export const blueMesaRanchCustomer: Customer = {
     country: 'US',
   },
   accountManager: {
-    id: '01HZOPS002',
+    id: accountManagerId,
     displayName: 'Nia Wright',
     roles: ['operations'],
     role: 'Account Exec',
   },
-  primaryContactId: '01J0CONTACT00001',
+  primaryContactId,
   sites: [
     {
-      id: '01J0SITE00001',
-      customerId: '01J0CUSTOMER00001',
+      id: siteId,
+      customerId,
       label: 'North Pasture HQ',
       location: headquartersLocation,
       acreage: 2400,
@@ -43,15 +50,15 @@ export const blueMesaRanchCustomer: Customer = {
   ],
   contacts: [
     {
-      id: '01J0CONTACT00001',
-      customerId: '01J0CUSTOMER00001',
+      id: primaryContactId,
+      customerId,
       name: 'Sloane Ayers',
       email: 'sloane@bluemesa.example',
       phone: '+1-325-555-0110',
       preferredChannel: 'phone',
       notes: [
         {
-          id: '01J0NOTE00001',
+          id: contactNoteId,
           createdAt: '2025-01-09T00:00:00Z',
           content: 'Prefers SMS for scheduling confirmations.',
         },

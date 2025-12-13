@@ -1,44 +1,54 @@
 import type { Asset, AssetType } from '@domain/asset'
+import { id } from '@utils/identifier'
+
+const transportTruckTypeId = id()
+const skidsteerTypeId = id()
+const toolcatTypeId = id()
+const vehicleAttachmentTypeId = id()
+const mappingDroneTypeId = id()
+const dispensingDroneTypeId = id()
+const sprayTankTypeId = id()
+const granularHopperTypeId = id()
 
 export const assetTypeSamples: AssetType[] = [
-  { id: '01TYPE-TRANSPORT-TRUCK', name: 'Transport Truck' },
-  { id: '01TYPE-SKIDSTEER', name: 'Skidsteer Vehicle' },
-  { id: '01TYPE-TOOLCAT', name: 'Toolcat Vehicle' },
-  { id: '01TYPE-VEHICLE-ATTACH', name: 'Vehicle Tool Attachment' },
-  { id: '01TYPE-MAP-DRONE', name: 'Mapping Drone' },
-  { id: '01TYPE-DISPENSE-DRONE', name: 'Dispensing Drone' },
-  { id: '01TYPE-SPRAY-TANK', name: 'Drone Spray Tank' },
-  { id: '01TYPE-GRAN-HOPPER', name: 'Drone Granular Hopper' },
+  { id: transportTruckTypeId, name: 'Transport Truck' },
+  { id: skidsteerTypeId, name: 'Skidsteer Vehicle' },
+  { id: toolcatTypeId, name: 'Toolcat Vehicle' },
+  { id: vehicleAttachmentTypeId, name: 'Vehicle Tool Attachment' },
+  { id: mappingDroneTypeId, name: 'Mapping Drone' },
+  { id: dispensingDroneTypeId, name: 'Dispensing Drone' },
+  { id: sprayTankTypeId, name: 'Drone Spray Tank' },
+  { id: granularHopperTypeId, name: 'Drone Granular Hopper' },
 ]
 
 export const droneAssetSample: Asset = {
-  id: '01J0N9ASSET00000000000001',
+  id: id(),
   label: 'DJI Agras T40 #3',
   description: 'High-capacity agricultural drone optimized for large acreage spraying.',
   serialNumber: 'DJI-T40-0003',
-  type: '01TYPE-DISPENSE-DRONE',
+  type: dispensingDroneTypeId,
   status: 'active',
   attachments: [
     {
-      id: '01J0ATTACHMENT0000000001',
+      id: id(),
       filename: 'agras-t40-manual.pdf',
       url: 'https://storage.swarmag.com/assets/agras-t40/manual.pdf',
       kind: 'document',
       uploadedAt: '2024-12-01T00:00:00Z',
       uploadedBy: {
-        id: '01HZDOCS001',
+        id: id(),
         displayName: 'Documentation Bot',
         roles: ['system'],
       },
     },
     {
-      id: '01J0ATTACHMENT0000000002',
+      id: id(),
       filename: 'preflight-checklist.jpg',
       url: 'https://storage.swarmag.com/assets/agras-t40/photos/preflight.jpg',
       kind: 'photo',
       uploadedAt: '2025-01-18T15:20:00Z',
       uploadedBy: {
-        id: '01HZTECH002',
+        id: id(),
         displayName: 'Noah Price',
         roles: ['maintenance'],
         role: 'Field Tech',
@@ -50,21 +60,21 @@ export const droneAssetSample: Asset = {
 }
 
 export const sprayerTruckSample: Asset = {
-  id: '01J0N9ASSET00000000000002',
+  id: id(),
   label: 'Ram 5500 Spray Rig',
   description: 'Dual-tank spray truck configured for mixed ground applications.',
   serialNumber: 'RAM-5500-RIG-2024-01',
-  type: '01TYPE-TRANSPORT-TRUCK',
+  type: transportTruckTypeId,
   status: 'maintenance',
   attachments: [
     {
-      id: '01J0ATTACHMENT0000000003',
+      id: id(),
       filename: 'sprayer-ram5500-maintenance-log.pdf',
       url: 'https://storage.swarmag.com/assets/ram5500/maintenance-log.pdf',
       kind: 'document',
       uploadedAt: '2024-12-15T00:00:00Z',
       uploadedBy: {
-        id: '01HZADMIN001',
+        id: id(),
         displayName: 'Yara Singh',
         roles: ['operations'],
         role: 'Fleet Manager',

@@ -1,12 +1,21 @@
 import type { JobAssessment, JobLogEntry } from '@domain/job'
+import { id } from '@utils/identifier'
+
+const serviceId = id()
+const customerId = id()
+const contactId = id()
+const assessorId = id()
+const assessmentAttachmentId = id()
+const waterwaysAttachmentId = id()
+const assessmentId = id()
 
 export const ranchMappingAssessment: JobAssessment = {
-  id: '01J0JOBSASSESS00000000001',
-  serviceId: '01J0SERVICEHERBICIDE',
-  customerId: '01J0CUSTOMER00001',
-  contactId: '01J0CONTACT00001',
+  id: assessmentId,
+  serviceId,
+  customerId,
+  contactId,
   assessor: {
-    id: '01HZOPS001',
+    id: assessorId,
     displayName: 'Morgan Diaz',
     roles: ['operations'],
     role: 'Assessment Lead',
@@ -26,26 +35,26 @@ export const ranchMappingAssessment: JobAssessment = {
   notes: [],
   attachments: [
     {
-      id: '01J0ATTACHMENT0000000100',
+      id: assessmentAttachmentId,
       filename: 'north-pasture-map.tif',
-      url: 'https://storage.swarmag.com/job-assessments/01J0JOBSASSESS00000000001/maps/base.tif',
+      url: `https://storage.swarmag.com/job-assessments/${assessmentId}/maps/base.tif`,
       kind: 'map',
       uploadedAt: '2025-01-12T14:05:00Z',
       uploadedBy: {
-        id: '01HZOPS001',
+        id: assessorId,
         displayName: 'Morgan Diaz',
         roles: ['operations'],
         role: 'Assessment Lead',
       },
     },
     {
-      id: '01J0ATTACHMENT0000000101',
+      id: waterwaysAttachmentId,
       filename: 'waterways-annotation.geojson',
-      url: 'https://storage.swarmag.com/job-assessments/01J0JOBSASSESS00000000001/maps/waterways.geojson',
+      url: `https://storage.swarmag.com/job-assessments/${assessmentId}/maps/waterways.geojson`,
       kind: 'map',
       uploadedAt: '2025-01-12T14:08:00Z',
       uploadedBy: {
-        id: '01HZGIS001',
+        id: id(),
         displayName: 'Priya Mehta',
         roles: ['gis'],
         role: 'GIS Analyst',
@@ -56,16 +65,22 @@ export const ranchMappingAssessment: JobAssessment = {
   updatedAt: '2025-01-12T14:10:00Z',
 }
 
+const jobId = id()
+const planId = id()
+const jobLogAuthorId = id()
+const beforeAttachmentId = id()
+const afterAttachmentId = id()
+
 export const fieldPhotoLogEntry: JobLogEntry = {
-  id: '01J0JOBLOG000000000123',
-  jobId: '01J0JOB0000000456',
-  planId: '01J0JOBPLAN000567',
+  id: id(),
+  jobId,
+  planId,
   type: 'checkpoint',
   message: 'Captured before/after images for spray block 3',
   occurredAt: '2025-01-18T16:20:00Z',
   createdAt: '2025-01-18T16:21:00Z',
   createdBy: {
-    id: '01HZOPS010',
+    id: jobLogAuthorId,
     displayName: 'Evan Cole',
     roles: ['operations'],
     role: 'Crew Lead',
@@ -76,26 +91,26 @@ export const fieldPhotoLogEntry: JobLogEntry = {
   },
   attachments: [
     {
-      id: '01J0ATTACHMENT0000000200',
+      id: beforeAttachmentId,
       filename: 'block3-before.jpg',
-      url: 'https://storage.swarmag.com/jobs/01J0JOB0000000456/photos/block3-before.jpg',
+      url: `https://storage.swarmag.com/jobs/${jobId}/photos/block3-before.jpg`,
       kind: 'photo',
       uploadedAt: '2025-01-18T16:21:05Z',
       uploadedBy: {
-        id: '01HZOPS010',
+        id: jobLogAuthorId,
         displayName: 'Evan Cole',
         roles: ['operations'],
         role: 'Crew Lead',
       },
     },
     {
-      id: '01J0ATTACHMENT0000000201',
+      id: afterAttachmentId,
       filename: 'block3-after.jpg',
-      url: 'https://storage.swarmag.com/jobs/01J0JOB0000000456/photos/block3-after.jpg',
+      url: `https://storage.swarmag.com/jobs/${jobId}/photos/block3-after.jpg`,
       kind: 'photo',
       uploadedAt: '2025-01-18T16:21:10Z',
       uploadedBy: {
-        id: '01HZOPS010',
+        id: jobLogAuthorId,
         displayName: 'Evan Cole',
         roles: ['operations'],
         role: 'Crew Lead',

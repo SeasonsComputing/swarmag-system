@@ -1,7 +1,8 @@
 import type { Question } from '@domain/common'
+import { id } from '@utils/identifier'
 
 export const preflightInspectionQuestion: Question = {
-  id: '01J0QEXAMPLE00000000000001',
+  id: id(),
   prompt: 'Has the drone passed the preflight inspection?',
   type: 'single-select',
   required: true,
@@ -12,14 +13,14 @@ export const preflightInspectionQuestion: Question = {
 }
 
 export const chemicalMixRatioQuestion: Question = {
-  id: '01J0QEXAMPLE00000000000002',
+  id: id(),
   prompt: 'Recorded mix ratio (oz/gal)',
   type: 'number',
   helpText: 'Enter the actual ounces per gallon observed during mixing.',
 }
 
 export const ppeVerificationQuestion: Question = {
-  id: '01J0QEXAMPLE00000000000003',
+  id: id(),
   prompt: 'Select every crew member who completed PPE verification',
   type: 'multi-select',
   options: [

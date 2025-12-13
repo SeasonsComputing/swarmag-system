@@ -91,7 +91,8 @@ When new domain concepts or fields are needed:
   3) For deployed smoke checks: `LIVE_BASE_URL=https://<env> pnpm test:live` (optionally `LIVE_SERVICE_LIST_PATH` for non-default routes).
 - Tooling: Vitest (Node env) with TS + aliases from `vitest.config.ts` (`@api`, `@domain`, `@utils`, `@`).
 - Layout:
-  - `source/tests/domain/*` — domain/fixture shape checks.
+  - `source/tests/fixtures/*` — shared samples plus fixture integrity checks.
+  - `source/tests/domain/*` — domain-focused tests (add alongside new domain work).
   - `source/tests/api/*` — handler tests (mock Supabase/Netlify).
   - `source/tests/utils/*` — pure utilities.
   - `source/tests/live/*` — opt-in live smoke (network guarded by env vars).

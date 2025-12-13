@@ -1,13 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import type { AssetStatus } from '@domain/asset'
 import { isWhen } from '@utils/datetime'
+import { isID } from '@utils/identifier'
 import {
   assetSamples,
   assetTypeSamples,
   customerSamples,
   jobSamples,
   sharedQuestionSamples,
-} from '../fixtures/samples'
+} from './samples'
 
 const allowedAssetStatuses: AssetStatus[] = [
   'active',
@@ -16,6 +17,7 @@ const allowedAssetStatuses: AssetStatus[] = [
   'reserved',
 ]
 
+const isId = (value: string): boolean => isID(value)
 const isIso = (value: string): boolean => isWhen(value)
 
 describe('fixture integrity', () => {
@@ -23,8 +25,7 @@ describe('fixture integrity', () => {
     const seenAssetTypes = new Set<string>()
 
     for (const assetType of assetTypeSamples) {
-      expect(typeof assetType.id).toBe('string')
-      expect(assetType.id.length).toBeGreaterThan(0)
+      expect(isId(assetType.id)).toBe(true)
       expect(seenAssetTypes.has(assetType.id)).toBe(false)
       seenAssetTypes.add(assetType.id)
       expect(typeof assetType.name).toBe('string')
@@ -32,11 +33,9 @@ describe('fixture integrity', () => {
     }
 
     for (const asset of assetSamples) {
-      expect(typeof asset.id).toBe('string')
-      expect(asset.id.length).toBeGreaterThan(0)
+      expect(isId(asset.id)).toBe(true)
       expect(allowedAssetStatuses).toContain(asset.status)
-      expect(typeof asset.type).toBe('string')
-      expect(asset.type.length).toBeGreaterThan(0)
+      expect(isId(asset.type)).toBe(true)
       expect(isIso(asset.createdAt)).toBe(true)
       expect(isIso(asset.updatedAt)).toBe(true)
     }
@@ -44,6 +43,10 @@ describe('fixture integrity', () => {
 
   it('job assessment fixture always carries locations and timestamps', () => {
     const { assessment } = jobSamples
+    expect(isId(assessment.id)).toBe(true)
+    expect(isId(assessment.serviceId)).toBe(true)
+    expect(isId(assessment.customerId)).toBe(true)
+    if (assessment.contactId) expect(isId(assessment.contactId)).toBe(true)
     expect(Array.isArray(assessment.locations)).toBe(true)
     expect(assessment.locations.length).toBeGreaterThan(0)
     expect(isIso(assessment.assessedAt)).toBe(true)
@@ -53,10 +56,13 @@ describe('fixture integrity', () => {
 
   it('customer fixtures keep contact linkage intact', () => {
     for (const customer of customerSamples) {
+      expect(isId(customer.id)).toBe(true)
       expect(customer.contacts.length).toBeGreaterThan(0)
       const primaryContactIds = customer.contacts.map((contact) => contact.id)
       expect(primaryContactIds).toContain(customer.primaryContactId)
       expect(customer.sites.every((site) => site.customerId === customer.id)).toBe(true)
+      expect(customer.sites.every((site) => isId(site.id))).toBe(true)
+      expect(customer.contacts.every((contact) => isId(contact.id))).toBe(true)
       expect(isIso(customer.createdAt)).toBe(true)
       expect(isIso(customer.updatedAt)).toBe(true)
     }
@@ -64,6 +70,7 @@ describe('fixture integrity', () => {
 
   it('shared questions include labels and values', () => {
     for (const question of sharedQuestionSamples) {
+      expect(isId(question.id)).toBe(true)
       expect(question.prompt.length).toBeGreaterThan(0)
       if (question.options) {
         expect(
