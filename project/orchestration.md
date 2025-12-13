@@ -29,10 +29,11 @@ All code lives in a single repo with this structure (current state):
 ├─ project/                  # docs, specs, plans, style guide
 ├─ source/                   # system source
 │  ├─ api/                   # Netlify Functions (backend APIs)
-│  ├─ apps/                  # SolidJS apps (admin/ops/customer)
+│  ├─ apps/                  # SolidJS apps (admin/ops/customer) plus shared UI helpers
 │  │  ├─ admin/              # Admin web app
 │  │  ├─ ops/                # Ops mobile app
-│  │  └─ customer/           # Customer portal
+│  │  ├─ customer/           # Customer portal
+│  │  └─ shared/             # Shared UI helpers (e.g., attribution role lookups)
 │  ├─ domain/                # canonical domain abstractions
 │  ├─ tests/                 # automated tests + shared fixtures (samples)
 │  └─ utils/                 # shared primitives (identifiers, time)
