@@ -18,7 +18,7 @@ export const ranchMappingAssessment: JobAssessment = {
     id: assessorId,
     displayName: 'Morgan Diaz',
     roles: ['operations'],
-    role: 'Assessment Lead',
+    role: 'assessment-lead',
   },
   assessedAt: '2025-01-12T14:00:00Z',
   locations: [
@@ -44,7 +44,7 @@ export const ranchMappingAssessment: JobAssessment = {
         id: assessorId,
         displayName: 'Morgan Diaz',
         roles: ['operations'],
-        role: 'Assessment Lead',
+        role: 'assessment-lead',
       },
     },
     {
@@ -56,8 +56,8 @@ export const ranchMappingAssessment: JobAssessment = {
       uploadedBy: {
         id: id(),
         displayName: 'Priya Mehta',
-        roles: ['gis'],
-        role: 'GIS Analyst',
+        roles: ['operations'],
+        role: 'gis-analyst',
       },
     },
   ],
@@ -83,7 +83,7 @@ export const fieldPhotoLogEntry: JobLogEntry = {
     id: jobLogAuthorId,
     displayName: 'Evan Cole',
     roles: ['operations'],
-    role: 'Crew Lead',
+    role: 'crew-lead',
   },
   location: {
     coordinate: { latitude: 32.2144, longitude: -97.1234 },
@@ -100,7 +100,7 @@ export const fieldPhotoLogEntry: JobLogEntry = {
         id: jobLogAuthorId,
         displayName: 'Evan Cole',
         roles: ['operations'],
-        role: 'Crew Lead',
+        role: 'crew-lead',
       },
     },
     {
@@ -113,7 +113,7 @@ export const fieldPhotoLogEntry: JobLogEntry = {
         id: jobLogAuthorId,
         displayName: 'Evan Cole',
         roles: ['operations'],
-        role: 'Crew Lead',
+        role: 'crew-lead',
       },
     },
   ],

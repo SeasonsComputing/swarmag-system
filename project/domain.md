@@ -26,8 +26,8 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 
 | Abstraction    | Description                                  |
 | -------------- | -------------------------------------------- |
-| `User`         | Identity/profile with roles and contact info |
-| `Author`       | Lightweight attribution slice of `User`      |
+| `User`         | Identity/profile with role memberships and contact info |
+| `Author`       | Lightweight attribution slice of `User` with a curated attribution role |
 | `Note`         | Freeform text with author/time               |
 | `Attachment`   | File reference metadata and uploader         |
 | `Address`      | Postal address fields                        |
@@ -63,6 +63,13 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - All other code (apps, functions) must import from `source/domain`.
 - Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type` and `Service.requiredAssetTypes`; keep the canonical list in `project/data-lists.md`.
 - JobAssessments must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
+
+### 1.7 Roles & attribution
+
+- User memberships are constrained to `USER_ROLES` (`administrator`, `sales-representative`, `operations`) defined in `source/domain/common.ts`; `User.roles` is an array so a user may hold multiple memberships.
+- Attribution uses curated roles, not free text: `AUTHOR_ATTRIBUTION_ROLES` in `source/domain/common.ts` lists role ids/labels and the contexts they apply to (e.g., `assessment-lead`, `crew-lead`, `gis-analyst`, `field-tech`, `fleet-manager`, `account-executive`).
+- `Author.role` stores the attribution role id from `AUTHOR_ATTRIBUTION_ROLES`; UI should render the label from that catalog and never collect arbitrary text.
+- If a context does not supply a meaningful attribution role, omit it rather than prompting the user for input.
 
 ## 2. API Functions (`source/api/*`)
 

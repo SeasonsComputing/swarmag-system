@@ -6,6 +6,39 @@
 import type { When } from '@utils/datetime'
 import type { ID } from '@utils/identifier'
 
+/** Allowed role memberships for users. */
+export const USER_ROLES = [
+  'administrator',
+  'sales-representative',
+  'operations',
+] as const
+export type UserRole = (typeof USER_ROLES)[number]
+
+/** Contexts where an author attribution role is used. */
+export type AuthorAttributionContext =
+  | 'customer-account'
+  | 'job-assessment'
+  | 'job-plan'
+  | 'job-log'
+  | 'asset'
+
+/** Curated roles for attribution; avoid free-form labels. */
+export const AUTHOR_ATTRIBUTION_ROLES = [
+  { id: 'account-executive', label: 'Account Executive', contexts: ['customer-account'] },
+  { id: 'assessment-lead', label: 'Assessment Lead', contexts: ['job-assessment'] },
+  { id: 'crew-lead', label: 'Crew Lead', contexts: ['job-plan', 'job-log'] },
+  { id: 'field-tech', label: 'Field Tech', contexts: ['job-log', 'asset'] },
+  { id: 'fleet-manager', label: 'Fleet Manager', contexts: ['asset'] },
+  { id: 'gis-analyst', label: 'GIS Analyst', contexts: ['job-assessment', 'job-log'] },
+] as const satisfies ReadonlyArray<{
+  id: string
+  label: string
+  contexts: readonly AuthorAttributionContext[]
+}>
+
+export type AuthorAttributionRole = (typeof AUTHOR_ATTRIBUTION_ROLES)[number]
+export type AuthorAttributionRoleId = AuthorAttributionRole['id']
+
 /** Represents a user in the system. */
 export interface User {
   id: ID
@@ -13,16 +46,14 @@ export interface User {
   primaryEmail: string
   phoneNumber: string
   avatarUrl?: string
-  roles?: string[]
+  roles?: UserRole[]
   status?: 'active' | 'inactive'
   createdAt?: When
   updatedAt?: When
 }
 
 /** A subset of User information for authorship. */
-export type Author = Pick<User, 'id' | 'displayName' | 'roles'> & {
-  role?: string
-}
+export type Author = Pick<User, 'id' | 'displayName' | 'roles'> & { role?: AuthorAttributionRoleId }
 
 /** Represents a note or comment. */
 export interface Note {

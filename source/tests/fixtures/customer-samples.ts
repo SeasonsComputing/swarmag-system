@@ -35,7 +35,7 @@ export const blueMesaRanchCustomer: Customer = {
     id: accountManagerId,
     displayName: 'Nia Wright',
     roles: ['operations'],
-    role: 'Account Exec',
+    role: 'account-executive',
   },
   primaryContactId,
   sites: [

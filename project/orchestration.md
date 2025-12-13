@@ -9,7 +9,7 @@ This document defines how the swarmAg System should be implemented in phases:
 | 3 | Ops Mobile App | `ops-mobile-app.md` | Field operations and job logging |
 | 4 | Customer Portal | `customer-portal.md` | Read-only customer experience |
 
-## 0. Primary work per phase
+## 1. Primary work per phase
 
 | Phase | Primary Work |
 | ----- | ------------ |
@@ -20,7 +20,7 @@ This document defines how the swarmAg System should be implemented in phases:
 
 The authoritative architecture is in `architecture.md`.
 
-## 1. Monorepo Layout
+## 2. Monorepo Layout
 
 All code lives in a single repo with this structure (current state):
 
@@ -47,7 +47,7 @@ All code lives in a single repo with this structure (current state):
 └─ swarmag-ops-meta-prompt.md # meta prompt reference
 ```
 
-## 2. Global Rules
+## 3. Global Rules
 
 These rules apply to every phase and every file:
 
@@ -83,7 +83,7 @@ When new domain concepts or fields are needed:
 2. Then update backend `source/api/*`.  
 3. Then adapt the front-ends under `source/apps/*`.
 
-## 3. Testing Foundation
+## 4. Testing Foundation
 
 - Quickstart for new engineers:
   1) `pnpm install`

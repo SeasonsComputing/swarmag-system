@@ -38,7 +38,7 @@ export const droneAssetSample: Asset = {
       uploadedBy: {
         id: id(),
         displayName: 'Documentation Bot',
-        roles: ['system'],
+        roles: ['administrator'],
       },
     },
     {
@@ -50,8 +50,8 @@ export const droneAssetSample: Asset = {
       uploadedBy: {
         id: id(),
         displayName: 'Noah Price',
-        roles: ['maintenance'],
-        role: 'Field Tech',
+        roles: ['operations'],
+        role: 'field-tech',
       },
     },
   ],
@@ -77,7 +77,7 @@ export const sprayerTruckSample: Asset = {
         id: id(),
         displayName: 'Yara Singh',
         roles: ['operations'],
-        role: 'Fleet Manager',
+        role: 'fleet-manager',
       },
     },
   ],
