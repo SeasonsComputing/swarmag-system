@@ -1,6 +1,7 @@
 # swarmAg System – Domain
 
-This document defines the foundational abstractions, contracts, and APIs of the swarmAg solution space. The domain model captures both the problem space and the solution space, expressed as classes, types, interfaces, associations, and APIs delivered through a TypeScript library.
+This document defines the foundational abstractions, contracts, and APIs of the swarmAg Operations System, or
+ the `swarmAg System`. The domain model captures both the problem space and the solution space, expressed as classes, types, interfaces, associations, and APIs delivered through a TypeScript library.
 
 ## 1. Domain Model (`source/domain`)
 
@@ -36,14 +37,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 | `Question`     | Prompt used in assessments/forms             |
 | `Answer`       | Response to a question                       |
 
-### 1.4 Utility data types
-
-| Type           | Description                       |
-| -------------- | --------------------------------- |
-| `ID`           | UUID v7 string identifier         |
-| `When`         | ISO 8601 UTC timestamp as string  |
-
-### 1.5 Supporting structures present in code (refer to type definitions for details)
+### 1.4 Supporting structures present in code (refer to type definitions for details)
 
 | Area           | Structures / Notes                                        |
 | -------------- | --------------------------------------------------------- |
@@ -52,6 +46,13 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 | Workflows      | `WorkflowStep`, `WorkflowVersion`                         |
 | Jobs           | `JobAssignment`, `JobChemicalPlan`                        |
 | Customers      | `CustomerSite`                                            |
+
+### 1.5 Utility data types
+
+| Type           | Description                       |
+| -------------- | --------------------------------- |
+| `ID`           | UUID v7 string identifier         |
+| `When`         | ISO 8601 UTC timestamp as string  |
 
 ### 1.6 Rules
 
