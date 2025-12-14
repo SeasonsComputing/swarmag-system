@@ -1,23 +1,28 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import type { ApiRequest } from '@api/platform/netlify'
-import { HttpCodes } from '@api/platform/netlify'
+import handler from '@core/api/job-create'
+import { HttpCodes } from '@core/platform/netlify'
 import { ranchMappingAssessment } from '../fixtures/samples'
+import { runNetlifyHandler } from './helpers/netlify'
 
-const insertCalls: Record<string, unknown> = {}
-const fromMock = vi.fn()
-const clientMock = vi.fn(() => ({ from: fromMock }))
+const { insertCalls, fromMock, clientMock } = vi.hoisted(() => {
+  const insertCalls: Record<string, unknown> = {}
+  const fromMock = vi.fn()
+  const clientMock = vi.fn(() => ({ from: fromMock }))
+  return { insertCalls, fromMock, clientMock }
+})
 
-vi.mock('@api/platform/supabase', () => ({
+vi.mock('@core/platform/supabase', () => ({
   Supabase: {
     client: clientMock,
   },
 }))
 
-// Imported after mocks so the handler uses the mocked Supabase client.
-import { handle } from '@api/job-create'
-
-type JobCreateRequest = Parameters<typeof handle>[0]
-type JobCreateBody = JobCreateRequest['body']
+type JobCreateBody = {
+  serviceId: string
+  customerId: string
+  assessment: Record<string, unknown>
+  plan: Record<string, unknown>
+}
 
 const buildAssessmentInput = () => {
   const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...rest } =
@@ -48,16 +53,6 @@ const buildBody = (overrides: Partial<JobCreateBody> = {}): JobCreateBody => ({
   },
 })
 
-const makeRequest = (
-  overrides: Partial<JobCreateBody> = {}
-): ApiRequest<JobCreateBody> => ({
-  method: 'POST',
-  body: buildBody(overrides),
-  query: {} as Record<string, never>,
-  headers: {},
-  rawEvent: {} as never,
-})
-
 beforeEach(() => {
   Object.keys(insertCalls).forEach((key) => delete insertCalls[key])
   fromMock.mockReset()
@@ -73,19 +68,19 @@ beforeEach(() => {
 
 describe('job-create handler', () => {
   it('rejects invalid payloads before touching Supabase', async () => {
-    const request = makeRequest({
+    const request = buildBody({
       plan: { ...basePlanInput, scheduledStart: undefined as never },
     })
 
-    const response = await handle(request)
+    const response = await runNetlifyHandler(handler, 'POST', request)
 
     expect(response.statusCode).toBe(HttpCodes.unprocessableEntity)
     expect(clientMock).not.toHaveBeenCalled()
   })
 
   it('persists job, plan, and assessment with generated IDs', async () => {
-    const response = await handle(makeRequest())
-    const body = response.body as { data: { job: unknown; plan: unknown; assessment: unknown } }
+    const response = await runNetlifyHandler(handler, 'POST', buildBody())
+    const body = response.body as { data: { job: any; plan: any; assessment: any } }
 
     expect(response.statusCode).toBe(HttpCodes.created)
     expect(clientMock).toHaveBeenCalledTimes(1)

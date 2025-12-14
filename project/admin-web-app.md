@@ -42,9 +42,9 @@ source/apps/admin/
 - Tech stack:
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
 - Use the shared `tsconfig.json` (`module: ESNext`, `moduleResolution: bundler`, `baseUrl: "source"`).
-  - Prefer the configured aliases (`@domain/*`, `@api/*`, `@utils/*`, `@/*`) for imports.
+  - Prefer the configured aliases (`@domain/*`, `@core/*`, `@utils/*`, `@/*`) for imports.
 - Import all domain types from `source/domain`.
-- Use API client code that calls Netlify Functions in `source/api/*`.
+- Use API client code that calls Netlify Functions in `source/core/api/*`.
 - Do not define new domain entities that conflict with the SDK:
   - If new concepts are needed, extend `source/domain` first.
 

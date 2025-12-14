@@ -39,9 +39,9 @@ source/apps/customer/
 - Tech stack:
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
 - Use the repo-level `tsconfig.json` (ESNext modules + bundler resolution, `baseUrl: "source"` with aliases).
-  - Rely on the configured aliases when importing (`@domain/*`, `@api/*`, `@utils/*`, `@/*`).
+  - Rely on the configured aliases when importing (`@domain/*`, `@core/*`, `@utils/*`, `@/*`).
 - Import domain types from `source/domain`.
-- Use only read-only API endpoints exposed by backend Functions.
+- Use only read-only API endpoints exposed by backend Functions in `source/core/api`.
 
 ## 4. Core Features
 

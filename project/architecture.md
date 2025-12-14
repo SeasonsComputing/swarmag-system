@@ -58,7 +58,25 @@ TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS
 
 ## 7. Repository layout
 
-See `orchestration.md` for the detailed monorepo structure.
+This section outlines the monorepo structure and its primary dependency flow; see `orchestration.md` for phase-specific details.
+
+### 7.1. Namespace dependencies
+
+```text
+             ╭───────────╮              
+         ╭───│   apps    │────╮         
+         │   ╰───────────╯    │         
+         ▼                    │         
+     ╭───────────╮            │         
+     │   core    │─────────╮  │         
+     ╰───────────╯         │  │         
+                           ▼  ▼         
+                       ╭───────────╮    
+                       │  domain   │    
+                       ╰───────────╯    
+   ──────────────────────────────────                          
+                 utils   
+```
 
 ## 8. Build, CI/CD, Deployment
 

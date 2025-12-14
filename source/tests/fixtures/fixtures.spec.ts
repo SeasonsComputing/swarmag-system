@@ -17,15 +17,12 @@ const allowedAssetStatuses: AssetStatus[] = [
   'reserved',
 ]
 
-const isId = (value: string): boolean => isID(value)
-const isIso = (value: string): boolean => isWhen(value)
-
 describe('fixture integrity', () => {
   it('asset fixtures respect domain constraints', () => {
     const seenAssetTypes = new Set<string>()
 
     for (const assetType of assetTypeSamples) {
-      expect(isId(assetType.id)).toBe(true)
+      expect(isID(assetType.id)).toBe(true)
       expect(seenAssetTypes.has(assetType.id)).toBe(false)
       seenAssetTypes.add(assetType.id)
       expect(typeof assetType.name).toBe('string')
@@ -33,44 +30,44 @@ describe('fixture integrity', () => {
     }
 
     for (const asset of assetSamples) {
-      expect(isId(asset.id)).toBe(true)
+      expect(isID(asset.id)).toBe(true)
       expect(allowedAssetStatuses).toContain(asset.status)
-      expect(isId(asset.type)).toBe(true)
-      expect(isIso(asset.createdAt)).toBe(true)
-      expect(isIso(asset.updatedAt)).toBe(true)
+      expect(isID(asset.type)).toBe(true)
+      expect(isWhen(asset.createdAt)).toBe(true)
+      expect(isWhen(asset.updatedAt)).toBe(true)
     }
   })
 
   it('job assessment fixture always carries locations and timestamps', () => {
     const { assessment } = jobSamples
-    expect(isId(assessment.id)).toBe(true)
-    expect(isId(assessment.serviceId)).toBe(true)
-    expect(isId(assessment.customerId)).toBe(true)
-    if (assessment.contactId) expect(isId(assessment.contactId)).toBe(true)
+    expect(isID(assessment.id)).toBe(true)
+    expect(isID(assessment.serviceId)).toBe(true)
+    expect(isID(assessment.customerId)).toBe(true)
+    if (assessment.contactId) expect(isID(assessment.contactId)).toBe(true)
     expect(Array.isArray(assessment.locations)).toBe(true)
     expect(assessment.locations.length).toBeGreaterThan(0)
-    expect(isIso(assessment.assessedAt)).toBe(true)
-    expect(isIso(assessment.createdAt)).toBe(true)
-    expect(isIso(assessment.updatedAt)).toBe(true)
+    expect(isWhen(assessment.assessedAt)).toBe(true)
+    expect(isWhen(assessment.createdAt)).toBe(true)
+    expect(isWhen(assessment.updatedAt)).toBe(true)
   })
 
   it('customer fixtures keep contact linkage intact', () => {
     for (const customer of customerSamples) {
-      expect(isId(customer.id)).toBe(true)
+      expect(isID(customer.id)).toBe(true)
       expect(customer.contacts.length).toBeGreaterThan(0)
       const primaryContactIds = customer.contacts.map((contact) => contact.id)
       expect(primaryContactIds).toContain(customer.primaryContactId)
       expect(customer.sites.every((site) => site.customerId === customer.id)).toBe(true)
-      expect(customer.sites.every((site) => isId(site.id))).toBe(true)
-      expect(customer.contacts.every((contact) => isId(contact.id))).toBe(true)
-      expect(isIso(customer.createdAt)).toBe(true)
-      expect(isIso(customer.updatedAt)).toBe(true)
+      expect(customer.sites.every((site) => isID(site.id))).toBe(true)
+      expect(customer.contacts.every((contact) => isID(contact.id))).toBe(true)
+      expect(isWhen(customer.createdAt)).toBe(true)
+      expect(isWhen(customer.updatedAt)).toBe(true)
     }
   })
 
   it('shared questions include labels and values', () => {
     for (const question of sharedQuestionSamples) {
-      expect(isId(question.id)).toBe(true)
+      expect(isID(question.id)).toBe(true)
       expect(question.prompt.length).toBeGreaterThan(0)
       if (question.options) {
         expect(

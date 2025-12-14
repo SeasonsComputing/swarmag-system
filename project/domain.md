@@ -74,13 +74,13 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - `Author.role` stores the attribution role id from `AUTHOR_ATTRIBUTION_ROLES`; UI should render the label from that catalog and never collect arbitrary text.
 - If a context does not supply a meaningful attribution role, omit it rather than prompting the user for input.
 
-## 2. API Functions (`source/api/*`)
+## 2. API Functions (`source/core/api/*`)
 
 ### 2.1 Scope
 
 Functions that expose the domain model over HTTP, persisted in Supabase, and typed with `source/domain`. Each function:
 
-- `source/api` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints
+- `source/core/api` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints
 - Uses the `{abstraction}-{action}.ts` naming convention with singular-tense abstractions.
 - Parses and validates JSON requests against domain types.
 - Returns JSON responses with a consistent envelope and status codes.
@@ -104,7 +104,7 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 
 | Item | Detail |
 | ---- | ------ |
-| Exports | Each file exports typed `handle` plus default Netlify `handler = withNetlify(handle)` from `source/api/platform/netlify.ts`. |
+| Exports | Each file exports typed `handle` plus default Netlify `handler = withNetlify(handle)` from `source/core/platform/netlify.ts`. |
 | Signature | `handle: (req: ApiRequest<Body, Query>) => ApiResult<Payload> \| Promise<ApiResult<Payload>>` |
 | Request | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event. |
 | Response | `ApiResult` carries `statusCode`, optional `headers`, and JSON-serializable `body`. |

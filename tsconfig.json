@@ -12,18 +12,18 @@
     /* Output and Source Locations */
     "outDir": "build",
     "rootDir": "source",
+    "noEmit": true,
     
     // All aliases are relative to the 'baseUrl'
     "baseUrl": "source", 
     "paths": {
       "@utils/*": ["utils/*"], 
       "@domain/*": ["domain/*"],
-      "@api/*": ["api/*"],
+      "@core/*": ["core/*"],
       "@/*": ["*"] 
     }
   },
   
   // Tells the compiler which files to include in the build process
-  "include": ["source/**/*.ts"],
-  "exclude": ["source/tests"]
+  "include": ["source/**/*.ts"]
 }

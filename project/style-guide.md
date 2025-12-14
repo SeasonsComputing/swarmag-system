@@ -1,13 +1,13 @@
 # swarmAg Code Style Guide
 
-Working norms inferred from the current `api/`, `domain/`, and `utils/` sources.
+Working norms inferred from the current `core/api/`, `domain/`, and `utils/` sources.
 
 ## Language & Tooling
 
 | Item      | Guideline |
 | --------- | --------- |
 | Compiler  | `strict`; `module: ESNext`; `moduleResolution: bundler` |
-| Aliases   | `@domain/*`, `@utils/*`, `@api/*`, `@/*` |
+| Aliases   | `@domain/*`, `@utils/*`, `@core/*`, `@/*` |
 | Types     | Prefer type aliases and interfaces; avoid runtime-heavy helpers |
 | Encoding  | ASCII only; no non-ASCII literals |
 
@@ -36,13 +36,13 @@ Working norms inferred from the current `api/`, `domain/`, and `utils/` sources.
 | datetime.ts    | UTC ISO via `when()`; validate with `isWhen()` |
 | Scope          | Keep utilities focused and dependency-light |
 
-## API Functions (`source/api/*`)
+## API Functions (`source/core/api/*`)
 
 | Item        | Guideline |
 | ----------- | --------- |
 | Naming      | `{abstraction}-{action}.ts` (singular), e.g., `job-create.ts` |
 | Exports     | Export typed `handle`; default export `withNetlify(handle)` |
-| Types       | Use `ApiRequest`/`ApiResult` from `@api/platform/netlify` |
+| Types       | Use `ApiRequest`/`ApiResult` from `@core/platform/netlify` |
 | Status      | Use `HttpCodes`; no numeric literals |
 | Platform  | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor` |
 | Validation| Guard with `validate` + `HttpCodes.unprocessableEntity` |

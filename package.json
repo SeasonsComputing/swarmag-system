@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "tsc -b && tsc-alias -p tsconfig.json",
-    "clean": "tsc -b --clean && node -e \"const fs=require('fs');if(fs.existsSync('build'))fs.rmSync('build',{recursive:true,force:true});\"",
+    "build": "tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
+    "clean": "node -e \"const fs=require('fs');if(fs.existsSync('build'))fs.rmSync('build',{recursive:true,force:true});\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:live": "vitest run source/tests/live"

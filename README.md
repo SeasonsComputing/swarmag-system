@@ -23,20 +23,22 @@ pnpm tsc -b
 | `project/`       | Architecture, orchestration, domain, and user story docs            |
 | `source/domain/` | Canonical domain model (types/interfaces/classes)                   |
 | `source/utils/`  | Shared primitives (UUID v7, UTC time)                               |
-| `source/api/`    | Netlify Functions; platform helpers in `source/api/platform/`       |
+| `source/core/api/` | Netlify Functions                                               |
+| `source/core/platform/` | Backend platform helpers (Netlify adapter, Supabase client) |
+| `source/core/migrations/` | Supabase SQL migrations                                  |
 | `source/tests/`  | Test specs and fixtures (barreled samples in `fixtures/`)           |
 | `source/apps/`   | (Placeholder) SolidJS apps for admin, ops, and customer experiences |
 
 ## TypeScript & Aliases
 
 - `module: ESNext`, `moduleResolution: bundler`, `baseUrl: source`.
-- Aliases: `@domain/*`, `@utils/*`, `@api/*`, `@/*`.
+- Aliases: `@domain/*`, `@utils/*`, `@core/*`, `@/*`.
 - UUID v7 (`id()`) and ISO UTC timestamps (`when()`) in `source/utils/`.
 
 ## API Conventions
 
 - File naming: `{abstraction}-{action}.ts` (singular), e.g., `job-create.ts`, `service-list.ts`, `job-log-append.ts`.
-- Typed handler pattern: export a domain-aware `handle` plus Netlify `handler` via `withNetlify` (`source/api/platform/netlify.ts`).
+- Typed handler pattern: export a domain-aware `handle` plus Netlify `handler` via `withNetlify` (`source/core/platform/netlify.ts`).
 - Standard actions: `create`, `get`, `list`, `update`, `delete`, `append`, `search`.
 - Responses: JSON with `{ data }` on success; `{ error, details? }` on failure; status codes 400/405/422/500 as appropriate.
 - Append-only where required (e.g., job logs).

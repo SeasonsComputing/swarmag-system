@@ -9,7 +9,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': sourceDir,
-      '@api': path.resolve(sourceDir, 'api'),
+      '@core': path.resolve(sourceDir, 'core'),
       '@domain': path.resolve(sourceDir, 'domain'),
       '@utils': path.resolve(sourceDir, 'utils'),
     },
