@@ -104,7 +104,7 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 
 | Item | Detail |
 | ---- | ------ |
-| Exports | Each file exports typed `handle` plus default Netlify `handler = withNetlify(handle)` from `source/core/platform/netlify.ts`. |
+| Exports | Each file default-exports the Netlify `handler = withNetlify(handle)` from `source/core/platform/netlify.ts`; keep per-entity mapping helpers in `*-mapping.ts` for DB/domain conversion. |
 | Signature | `handle: (req: ApiRequest<Body, Query>) => ApiResult<Payload> \| Promise<ApiResult<Payload>>` |
 | Request | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event. |
 | Response | `ApiResult` carries `statusCode`, optional `headers`, and JSON-serializable `body`. |

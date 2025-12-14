@@ -88,7 +88,7 @@ These rules apply to every phase and every file:
 When new domain concepts or fields are needed:
 
 1. Extend `source/domain/*` first.  
-2. Then update backend `source/core/api/*`.  
+2. Then update backend `source/core/api/*` (one default-exported Netlify handler per file; use per-entity `*-mapping.ts` helpers for DB/domain conversion).  
 3. Then adapt the front-ends under `source/apps/*`.
 
 ## 4. Testing Foundation

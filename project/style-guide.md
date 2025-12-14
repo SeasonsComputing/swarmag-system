@@ -41,7 +41,7 @@ Working norms inferred from the current `core/api/`, `domain/`, and `utils/` sou
 | Item        | Guideline |
 | ----------- | --------- |
 | Naming      | `{abstraction}-{action}.ts` (singular), e.g., `job-create.ts` |
-| Exports     | Export typed `handle`; default export `withNetlify(handle)` |
+| Exports     | Default export only: Netlify `handler = withNetlify(handle)` |
 | Types       | Use `ApiRequest`/`ApiResult` from `@core/platform/netlify` |
 | Status      | Use `HttpCodes`; no numeric literals |
 | Platform  | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor` |

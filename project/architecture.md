@@ -50,7 +50,7 @@ Entities: Service, Asset, Chemical, Workflow, JobAssessment, JobPlan, JobLog, Cu
 
 ## 5. API design
 
-Netlify Functions for REST, Supabase Edge Functions for async workflows.
+Netlify Functions for REST, Supabase Edge Functions for async workflows. API files live under `source/core/api/*`, default-export Netlify handlers wrapped with `withNetlify`, and use per-entity mapping helpers (e.g., `user-mapping.ts`) to convert between domain models and Supabase row shapes.
 
 ## 6. Coding conventions & UI
 
