@@ -1,5 +1,9 @@
+/**
+ * Mappers for converting between Supabase user rows and domain Users.
+ */
+
 import type { User } from '@domain/common'
-import type { Row } from '@core/platform/binding'
+import type { Row } from '@core/platform/db-binding'
 
 const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
   value === 'active' || value === 'inactive'

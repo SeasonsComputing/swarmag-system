@@ -1,3 +1,7 @@
+/**
+ * Database binding helpers for pagination and row typing.
+ */
+
 /** Default pagination limit when not specified. */
 const DEFAULT_LIMIT = 25
 /** Maximum allowed pagination limit. */

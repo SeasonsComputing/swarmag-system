@@ -1,3 +1,7 @@
+/**
+ * Netlify handler for creating jobs with associated plan and assessment.
+ */
+
 import { type ID, id } from '@utils/identifier'
 import { type When, when } from '@utils/datetime'
 import type { 

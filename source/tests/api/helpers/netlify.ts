@@ -1,3 +1,7 @@
+/**
+ * Test helper for invoking Netlify-wrapped handlers.
+ */
+
 import type { HandlerEvent, HandlerResponse } from '@core/platform/netlify'
 
 /**

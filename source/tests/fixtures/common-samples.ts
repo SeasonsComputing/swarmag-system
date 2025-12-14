@@ -1,3 +1,7 @@
+/**
+ * Common question/answer fixtures for tests.
+ */
+
 import type { Question } from '@domain/common'
 import { id } from '@utils/identifier'
 

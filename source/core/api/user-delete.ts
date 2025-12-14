@@ -1,3 +1,7 @@
+/**
+ * Netlify handler for soft-deleting users.
+ */
+
 import type { User } from '@domain/common'
 import { when } from '@utils/datetime'
 import { Supabase } from '@core/platform/supabase'

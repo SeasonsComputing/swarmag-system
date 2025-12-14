@@ -1,3 +1,7 @@
+/**
+ * Supabase client singleton for server-side operations.
+ */
+
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
 /** Cache-aware Supabase client factory for platform functions. */

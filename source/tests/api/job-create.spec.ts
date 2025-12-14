@@ -1,3 +1,7 @@
+/**
+ * Unit tests for the job-create Netlify handler.
+ */
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import handler from '@core/api/job-create'
 import { HttpCodes } from '@core/platform/netlify'

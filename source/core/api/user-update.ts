@@ -1,3 +1,7 @@
+/**
+ * Netlify handler for updating users.
+ */
+
 import type { User, UserRole } from '@domain/common'
 import { when } from '@utils/datetime'
 import { Supabase } from '@core/platform/supabase'

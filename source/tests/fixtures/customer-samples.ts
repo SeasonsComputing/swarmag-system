@@ -1,3 +1,7 @@
+/**
+ * Customer fixture samples for tests.
+ */
+
 import type { Customer } from '@domain/customer'
 import type { Location } from '@domain/common'
 import { id } from '@utils/identifier'

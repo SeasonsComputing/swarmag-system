@@ -1,3 +1,7 @@
+/**
+ * Helpers for working with author attribution roles in apps.
+ */
+
 import { AUTHOR_ATTRIBUTION_ROLES } from '@domain/common'
 import type {
   AuthorAttributionContext,

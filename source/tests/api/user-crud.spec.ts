@@ -1,3 +1,7 @@
+/**
+ * Unit tests for user CRUD Netlify handlers.
+ */
+
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import handlerCreate from '@core/api/user-create'
 import handlerGet from '@core/api/user-get'
@@ -20,7 +24,7 @@ vi.mock('@core/platform/supabase', () => ({
     client: clientMock,
   },
 }))
-vi.mock('@core/platform/binding', () => ({
+vi.mock('@core/platform/db-binding', () => ({
   isNonEmptyString: (value: unknown): value is string =>
     typeof value === 'string' && value.trim().length > 0,
   clampLimit: () => 25,

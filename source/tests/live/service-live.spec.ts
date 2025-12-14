@@ -1,3 +1,7 @@
+/**
+ * Live test for service-list endpoint (requires LIVE_BASE_URL).
+ */
+
 import { describe, expect, it } from 'vitest'
 
 const baseUrl = process.env.LIVE_BASE_URL

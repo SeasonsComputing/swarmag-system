@@ -1,3 +1,7 @@
+/**
+ * Sample job fixtures for tests.
+ */
+
 import type { JobAssessment, JobLogEntry } from '@domain/job'
 import { id } from '@utils/identifier'
 

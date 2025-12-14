@@ -1,3 +1,7 @@
+/**
+ * Fixture integrity checks for shared sample data.
+ */
+
 import { describe, expect, it } from 'vitest'
 import type { AssetStatus } from '@domain/asset'
 import { isWhen } from '@utils/datetime'

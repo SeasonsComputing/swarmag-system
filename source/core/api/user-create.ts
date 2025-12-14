@@ -1,8 +1,12 @@
+/**
+ * Netlify handler for creating users.
+ */
+
 import type { User, UserRole } from '@domain/common'
 import { id } from '@utils/identifier'
 import { when } from '@utils/datetime'
 import { Supabase } from '@core/platform/supabase'
-import { isNonEmptyString } from '@core/platform/binding'
+import { isNonEmptyString } from '@core/platform/db-binding'
 import {
   HttpCodes,
   type ApiRequest,

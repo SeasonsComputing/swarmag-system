@@ -1,3 +1,7 @@
+/**
+ * Netlify handler for fetching a user by id.
+ */
+
 import type { User } from '@domain/common'
 import { Supabase } from '@core/platform/supabase'
 import {

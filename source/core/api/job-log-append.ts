@@ -1,3 +1,7 @@
+/**
+ * Netlify handler for appending job log entries.
+ */
+
 import { type ID, id } from '@utils/identifier'
 import { type When, when } from '@utils/datetime'
 import type { JobLogEntry, JobLogType } from '@domain/job'
@@ -8,7 +12,7 @@ import {
   type ApiResult,
   withNetlify,
 } from '@core/platform/netlify'
-import { Supabase } from '@core/platform/binding'
+import { Supabase } from '@core/platform/supabase'
 
 /** Body structure for job log append API requests. */
 interface JobLogBody {

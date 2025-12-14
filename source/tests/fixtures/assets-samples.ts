@@ -1,3 +1,7 @@
+/**
+ * Asset fixture samples for tests.
+ */
+
 import type { Asset, AssetType } from '@domain/asset'
 import { id } from '@utils/identifier'
 

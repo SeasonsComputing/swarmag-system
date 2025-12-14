@@ -1,6 +1,10 @@
+/**
+ * Netlify handler for listing services with pagination.
+ */
+
 import type { Service } from '@domain/service'
 import { Supabase } from '@core/platform/supabase'
-import { clampLimit, parseCursor, type ListQuery, type Row } from '@core/platform/binding'
+import { clampLimit, parseCursor, type ListQuery, type Row, isIdArray } from '@core/platform/db-binding'
 import {
   HttpCodes,
   type ApiRequest,
@@ -28,7 +32,7 @@ const rowToService = (row: Row<Service>): Service => {
     typeof row.name === 'string' &&
     typeof row.sku === 'string' &&
     isServiceCategory(row.category) &&
-    Supabase.isIdArray(row.requiredAssetTypes) &&
+    isIdArray(row.requiredAssetTypes) &&
     typeof row.createdAt === 'string' &&
     typeof row.updatedAt === 'string'
   ) {
