@@ -51,6 +51,16 @@ All code lives in a single repo with this structure (current state):
 └─ swarmag-ops-meta-prompt.md # meta prompt reference
 ```
 
+### 2.1. Dependency Rules
+
+| Layer    | May depend on            | Must not depend on    |
+| -------- | ------------------------ | --------------------- |
+| tests/*  | all layers               | n/a                   |
+| apps/*   | core, domain, utils      | apps                  |
+| core/*   | domain, utils            | apps                  |
+| domain/* | utils                    | apps, core            |
+| utils/*  | (none)                   | apps, core, domain    |
+
 ## 3. Global Rules
 
 These rules apply to every phase and every file:
