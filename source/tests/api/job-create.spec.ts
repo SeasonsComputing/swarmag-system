@@ -11,7 +11,7 @@ const { insertCalls, fromMock, clientMock } = vi.hoisted(() => {
   return { insertCalls, fromMock, clientMock }
 })
 
-vi.mock('@core/platform/supabase', () => ({
+vi.mock('@core/platform/binding', () => ({
   Supabase: {
     client: clientMock,
   },

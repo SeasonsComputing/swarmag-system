@@ -1,7 +1,7 @@
 import type { User, UserRole } from '@domain/common'
 import { id } from '@utils/identifier'
 import { when } from '@utils/datetime'
-import { Supabase } from '@core/platform/supabase'
+import { Supabase, isNonEmptyString } from '@core/platform/binding'
 import {
   HttpCodes,
   type ApiRequest,
@@ -9,7 +9,6 @@ import {
   withNetlify,
 } from '@core/platform/netlify'
 import { mapUserToRow } from '@core/api/user-mapping'
-import { Supabase } from '@core/platform/supabase'
 
 interface UserCreateBody {
   displayName: string
@@ -21,9 +20,9 @@ interface UserCreateBody {
 }
 
 const validate = (payload: UserCreateBody): string | null => {
-  if (!Supabase.isNonEmptyString(payload?.displayName)) return 'displayName is required'
-  if (!Supabase.isNonEmptyString(payload.primaryEmail)) return 'primaryEmail is required'
-  if (!Supabase.isNonEmptyString(payload.phoneNumber)) return 'phoneNumber is required'
+  if (!isNonEmptyString(payload?.displayName)) return 'displayName is required'
+  if (!isNonEmptyString(payload.primaryEmail)) return 'primaryEmail is required'
+  if (!isNonEmptyString(payload.phoneNumber)) return 'phoneNumber is required'
   if (payload.status && payload.status !== 'active' && payload.status !== 'inactive') {
     return 'status must be active or inactive'
   }

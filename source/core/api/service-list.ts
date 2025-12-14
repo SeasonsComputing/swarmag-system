@@ -3,7 +3,9 @@ import {
   Supabase,
   type ListQuery,
   type Row,
-} from '@core/platform/supabase'
+  clampLimit,
+  parseCursor,
+} from '@core/platform/binding'
 import {
   HttpCodes,
   type ApiRequest,
@@ -66,8 +68,8 @@ const handle = async (
     }
   }
 
-  const limit = Supabase.clampLimit(req.query?.limit)
-  const cursor = Supabase.parseCursor(req.query?.cursor)
+  const limit = clampLimit(req.query?.limit)
+  const cursor = parseCursor(req.query?.cursor)
   const rangeEnd = cursor + limit - 1
 
   const supabase = Supabase.client()

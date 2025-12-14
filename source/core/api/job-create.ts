@@ -6,13 +6,13 @@ import type {
   JobStatus, 
   Job 
 } from '@domain/job'
-import { Supabase } from '@core/platform/supabase'
 import {
   HttpCodes,
   type ApiRequest,
   type ApiResult,
   withNetlify,
 } from '@core/platform/netlify'
+import { Supabase } from '@core/platform/binding'
 
 /** Input structure for job assessment data, excluding generated fields. */
 type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>
