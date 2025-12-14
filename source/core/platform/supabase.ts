@@ -1,11 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-/** Query string parameters for list endpoints. */
-export type ListQuery = { limit?: string; cursor?: string }
-
-/** Supabase row wrapper that may store the full payload. */
-export type Row<T> = Partial<T> & { payload?: T; [key: string]: unknown }
-
 /** Cache-aware Supabase client factory for platform functions. */
 export class Supabase {
   /** Singleton Supabase client instance cache. */

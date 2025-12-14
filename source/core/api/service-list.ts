@@ -1,10 +1,6 @@
 import type { Service } from '@domain/service'
-import {
-  Supabase,
-  type ListQuery,
-  type Row,
-} from '@core/platform/supabase'
-import { clampLimit, parseCursor } from '@core/platform/binding'
+import { Supabase } from '@core/platform/supabase'
+import { clampLimit, parseCursor, type ListQuery, type Row } from '@core/platform/binding'
 import {
   HttpCodes,
   type ApiRequest,
