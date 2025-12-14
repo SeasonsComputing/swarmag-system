@@ -7,7 +7,7 @@ import {
   type ApiResult,
   withNetlify,
 } from '@core/platform/netlify'
-import { rowToUser } from '@core/api/user-mapper'
+import { mapUserToRow, rowToUser } from '@core/api/user-mapping'
 
 interface UserDeleteBody { id: string }
 
@@ -49,11 +49,7 @@ const handle = async (
 
   const { error: updateError } = await supabase
     .from('users')
-    .update({
-      deleted_at: deletedAt,
-      updated_at: deletedAt,
-      payload: updated,
-    })
+    .update(mapUserToRow(updated))
     .eq('id', user.id)
 
   if (updateError) {

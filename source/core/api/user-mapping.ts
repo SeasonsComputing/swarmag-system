@@ -7,10 +7,22 @@ const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
 const isUserRoles = (value: unknown): value is User['roles'] =>
   Array.isArray(value) && value.every((role) => typeof role === 'string')
 
-/**
- * Convert a Supabase row into a User domain model, preferring the payload when present.
- * Throws when required fields are missing in the raw row.
- */
+/** Map a domain User into a Supabase row shape. */
+export const mapUserToRow = (user: User) => ({
+  id: user.id,
+  display_name: user.displayName,
+  primary_email: user.primaryEmail,
+  phone_number: user.phoneNumber,
+  avatar_url: user.avatarUrl ?? null,
+  roles: user.roles ?? null,
+  status: user.status ?? 'active',
+  created_at: user.createdAt,
+  updated_at: user.updatedAt,
+  deleted_at: user.deletedAt ?? null,
+  payload: user,
+})
+
+/** Convert a Supabase row into a User domain model, preferring the payload when present. */
 export const rowToUser = (row: Row<User>): User => {
   if (row.payload) return row.payload
 

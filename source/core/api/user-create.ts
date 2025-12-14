@@ -8,6 +8,7 @@ import {
   type ApiResult,
   withNetlify,
 } from '@core/platform/netlify'
+import { mapUserToRow } from '@core/api/user-mapping'
 
 interface UserCreateBody {
   displayName: string
@@ -34,20 +35,6 @@ const validate = (payload: UserCreateBody): string | null => {
   return null
 }
 
-const mapToRow = (user: User) => ({
-  id: user.id,
-  display_name: user.displayName,
-  primary_email: user.primaryEmail,
-  phone_number: user.phoneNumber,
-  avatar_url: user.avatarUrl,
-  roles: user.roles,
-  status: user.status ?? 'active',
-  created_at: user.createdAt,
-  updated_at: user.updatedAt,
-  deleted_at: user.deletedAt ?? null,
-  payload: user,
-})
-
 const handle = async (
   req: ApiRequest<UserCreateBody>
 ): Promise<ApiResult> => {
@@ -71,12 +58,12 @@ const handle = async (
     status: req.body.status ?? 'active',
     createdAt: now,
     updatedAt: now,
-    deletedAt: undefined,
-  }
+  deletedAt: undefined,
+}
 
   const { error } = await Supabase.client()
     .from('users')
-    .insert(mapToRow(user))
+    .insert(mapUserToRow(user))
 
   if (error) {
     return {

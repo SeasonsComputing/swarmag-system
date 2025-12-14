@@ -7,7 +7,7 @@ import {
   type ApiResult,
   withNetlify,
 } from '@core/platform/netlify'
-import { rowToUser } from '@core/api/user-mapper'
+import { mapUserToRow, rowToUser } from '@core/api/user-mapping'
 
 interface UserUpdateBody {
   id: string
@@ -28,18 +28,6 @@ const validate = (payload: UserUpdateBody): string | null => {
   if (payload.roles && !Array.isArray(payload.roles)) return 'roles must be an array of UserRole'
   return null
 }
-
-const mapToRow = (user: User) => ({
-  display_name: user.displayName,
-  primary_email: user.primaryEmail,
-  phone_number: user.phoneNumber,
-  avatar_url: user.avatarUrl ?? null,
-  roles: user.roles ?? null,
-  status: user.status ?? 'active',
-  updated_at: user.updatedAt,
-  deleted_at: user.deletedAt ?? null,
-  payload: user,
-})
 
 const handle = async (
   req: ApiRequest<UserUpdateBody>
@@ -88,7 +76,7 @@ const handle = async (
 
   const { error: updateError } = await supabase
     .from('users')
-    .update(mapToRow(updated))
+    .update(mapUserToRow(updated))
     .eq('id', updated.id)
 
   if (updateError) {

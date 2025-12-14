@@ -6,7 +6,7 @@ import {
   type ApiResult,
   withNetlify,
 } from '@core/platform/netlify'
-import { rowToUser } from '@core/api/user-mapper'
+import { rowToUser } from '@core/api/user-mapping'
 
 type UserGetQuery = { id?: string }
 

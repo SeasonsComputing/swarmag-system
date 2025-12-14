@@ -49,6 +49,7 @@ Working norms inferred from the current `core/api/`, `domain/`, and `utils/` sou
 | Methods     | Guard unsupported verbs with `HttpCodes.methodNotAllowed` |
 | Responses   | Success: `{ data: ... }`; failure: `{ error, details? }` |
 | JSON        | Always JSON; `withNetlify` sets headers and wraps errors |
+| Mapping     | Keep per-entity mapping helpers (e.g., `user-mapping.ts`) to convert between domain shapes and Supabase rows instead of ad hoc column maps in each handler |
 
 ## Error Handling
 
