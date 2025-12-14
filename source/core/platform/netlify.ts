@@ -57,6 +57,9 @@ export interface ApiResult<Payload = unknown> {
 export type ApiHandler<Body = unknown, Query = HttpQuery, Payload = unknown>
   = (req: ApiRequest<Body, Query>) => Promise<ApiResult<Payload>> | ApiResult<Payload>
 
+// Re-export Netlify types for consumers that need the raw event/response shapes.
+export type { HandlerEvent, HandlerResponse }
+
 /**
  * Build a JSON Netlify response with a consistent content type header.
  * @param statusCode HTTP status code.

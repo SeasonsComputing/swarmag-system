@@ -1,4 +1,4 @@
-import type { HandlerEvent, HandlerResponse } from '@netlify/functions'
+import type { HandlerEvent, HandlerResponse } from '@core/platform/netlify'
 
 /**
  * Invoke a Netlify-wrapped handler with a minimal synthetic event.
