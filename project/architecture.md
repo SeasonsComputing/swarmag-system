@@ -61,21 +61,20 @@ TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS
 This section outlines the monorepo structure and its primary dependency flow; see `orchestration.md` for phase-specific details.
 
 ```text
-             ╭───────────╮              
-             │   tests   │              
-    ╏        ╰───────────╯              
-   ─╏───────────────────────────────    
-    ▼        ╭───────────╮              
-         ┏╺╺╺│   apps    │╺╺╺╺┓         
-         ▼   ╰───────────╯    ▼         
-   ╭───────────╮        ╭───────────╮   
-   │   core    │╺╺╺╺╺╺╺▶│  domain   │   
-   ╰───────────╯        ╰───────────╯   
-    ╏                                   
-   ─╏───────────────────────────────    
-    ▼        ╭───────────╮              
-             │   utils   │              
-             ╰───────────╯              
+               ╭─────────╮              
+               │  tests  │              
+               ╰─────────╯              
+   ───────────────────────────────────────  
+                ╭────────╮              
+            ╭───│  apps  │───╮         
+            ▼   ╰────────╯   ▼         
+       ╭────────╮        ╭──────────╮   
+       │  core  │───────▶│  domain  │   
+       ╰────────╯        ╰──────────╯   
+   ───────────────────────────────────────  
+               ╭─────────╮              
+               │  utils  │              
+               ╰─────────╯              
 ```
 
 ## 8. Build, CI/CD, Deployment
