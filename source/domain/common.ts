@@ -9,7 +9,7 @@ import type { ID } from '@utils/identifier'
 /** Allowed role memberships for users. */
 export const USER_ROLES = [
   'administrator',
-  'sales-representative',
+  'sales',
   'operations',
 ] as const
 export type UserRole = (typeof USER_ROLES)[number]
@@ -63,6 +63,7 @@ export interface Note {
   content: string
   visibility?: 'internal' | 'shared'
   tags?: string[]
+  images: Attachment[];
 }
 
 /** Represents geographic coordinates. */
