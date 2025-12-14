@@ -1,7 +1,8 @@
 import type { User, UserRole } from '@domain/common'
 import { id } from '@utils/identifier'
 import { when } from '@utils/datetime'
-import { Supabase, isNonEmptyString } from '@core/platform/binding'
+import { Supabase } from '@core/platform/supabase'
+import { isNonEmptyString } from '@core/platform/binding'
 import {
   HttpCodes,
   type ApiRequest,

@@ -3,9 +3,8 @@ import {
   Supabase,
   type ListQuery,
   type Row,
-  clampLimit,
-  parseCursor,
-} from '@core/platform/binding'
+} from '@core/platform/supabase'
+import { clampLimit, parseCursor } from '@core/platform/binding'
 import {
   HttpCodes,
   type ApiRequest,

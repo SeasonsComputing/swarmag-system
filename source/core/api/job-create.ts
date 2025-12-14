@@ -12,7 +12,7 @@ import {
   type ApiResult,
   withNetlify,
 } from '@core/platform/netlify'
-import { Supabase } from '@core/platform/binding'
+import { Supabase } from '@core/platform/supabase'
 
 /** Input structure for job assessment data, excluding generated fields. */
 type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>

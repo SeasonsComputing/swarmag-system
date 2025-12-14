@@ -1,6 +1,6 @@
 import type { User, UserRole } from '@domain/common'
 import { when } from '@utils/datetime'
-import { Supabase } from '@core/platform/binding'
+import { Supabase } from '@core/platform/supabase'
 import {
   HttpCodes,
   type ApiRequest,

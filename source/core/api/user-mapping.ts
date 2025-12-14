@@ -1,5 +1,5 @@
 import type { User } from '@domain/common'
-import type { Row } from '@core/platform/binding'
+import type { Row } from '@core/platform/supabase'
 
 const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
   value === 'active' || value === 'inactive'

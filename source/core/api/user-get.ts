@@ -1,5 +1,5 @@
 import type { User } from '@domain/common'
-import { Supabase } from '@core/platform/binding'
+import { Supabase } from '@core/platform/supabase'
 import {
   HttpCodes,
   type ApiRequest,

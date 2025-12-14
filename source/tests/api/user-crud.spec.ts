@@ -15,12 +15,17 @@ const { users, fromMock, clientMock } = vi.hoisted(() => {
   return { users, fromMock, clientMock }
 })
 
-vi.mock('@core/platform/binding', () => ({
+vi.mock('@core/platform/supabase', () => ({
   Supabase: {
     client: clientMock,
   },
+}))
+vi.mock('@core/platform/binding', () => ({
   isNonEmptyString: (value: unknown): value is string =>
     typeof value === 'string' && value.trim().length > 0,
+  clampLimit: () => 25,
+  parseCursor: () => 0,
+  isIdArray: Array.isArray,
 }))
 
 const resetTables = () => {
