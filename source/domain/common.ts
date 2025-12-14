@@ -50,6 +50,7 @@ export interface User {
   status?: 'active' | 'inactive'
   createdAt?: When
   updatedAt?: When
+  deletedAt?: When
 }
 
 /** A subset of User information for authorship. */

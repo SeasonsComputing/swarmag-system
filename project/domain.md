@@ -64,6 +64,8 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - All other code (apps, functions) must import from `source/domain`.
 - Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type` and `Service.requiredAssetTypes`; keep the canonical list in `project/data-lists.md`.
 - JobAssessments must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
+- Soft deletes: entities that need logical deletion (starting with `User`) expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after delete.
+- ID strategy: UUID v7 for PK/FK to avoid an ID service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure join tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
 
 ### 1.7 Roles & attribution
 

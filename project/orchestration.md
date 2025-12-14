@@ -65,16 +65,20 @@ These rules apply to every phase and every file:
    - Canonical types live in `source/domain`.  
    - Do not redefine domain entities locally.
 5. **IDs & Time:**
-   - UUID v7 for IDs.
+   - UUID v7 for IDs to avoid an ID service, support offline/preassigned keys, and keep inserts mostly ordered; use the native `uuid` type, a v7 generator, avoid redundant indexes, prefer composite keys on pure join tables, and plan for routine vacuum/reindex on heavy-write tables.
    - UTC timestamps.
-6. **Testing:**
+6. **Soft deletes:**
+   - Use `deletedAt` UTC timestamps for logical deletes (starting with `User`); undefined/null means active.
+   - Default to filtering queries to `deleted_at IS NULL` and prefer partial unique indexes on active rows.
+   - Hard deletes/anonymization run via explicit maintenance jobs when necessary.
+7. **Testing:**
    - Unit + handler tests live under `source/tests`.
    - Shared sample fixtures are barreled at `source/tests/fixtures/samples.ts`.
    - Commands: `pnpm test` (unit), `pnpm test:watch`, `pnpm test:live` (requires `LIVE_BASE_URL` to hit deployed endpoints).
-7. **Offline & Auditability:**
+8. **Offline & Auditability:**
    - Operations Mobile Application is offline-capable with a deterministic sync model.
    - JobLogs are append-only.
-8. **Zero-cost bias:**
+9. **Zero-cost bias:**
    - Prefer free tiers.
    - Keep heavy/expensive processing clearly isolated.
 
