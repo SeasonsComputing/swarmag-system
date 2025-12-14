@@ -70,12 +70,18 @@ export class Supabase {
   /**
    * Type guard to ensure a value is an array of string IDs.
    * Useful when reading untyped JSON columns from Supabase.
+   * @param value Unknown value to check.
+   * @returns True when the value is an array of strings.
    */
   static isIdArray(value: unknown): value is string[] {
     return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
   }
 
-  /** Type guard to ensure a non-empty string value. */
+  /**
+   * Type guard to ensure a non-empty string value.
+   * @param value Unknown value to check.
+   * @returns True when the value is a trimmed, non-empty string.
+   */
   static isNonEmptyString(value: unknown): value is string {
     return typeof value === 'string' && value.trim().length > 0
   }
