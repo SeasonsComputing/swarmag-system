@@ -56,13 +56,15 @@ Netlify Functions for REST, Supabase Edge Functions for async workflows.
 
 TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS
 
-## 7. Repository layout
+## 7. Namespace dependencies
 
 This section outlines the monorepo structure and its primary dependency flow; see `orchestration.md` for phase-specific details.
 
-### 7.1. Namespace dependencies
-
 ```text
+             ╭───────────╮              
+             │   tests   │              
+             ╰───────────╯              
+   ───────────────────────────────────  
              ╭───────────╮              
          ╭───│   apps    │────╮         
          │   ╰───────────╯    │         
@@ -74,8 +76,10 @@ This section outlines the monorepo structure and its primary dependency flow; se
                        ╭───────────╮    
                        │  domain   │    
                        ╰───────────╯    
-   ──────────────────────────────────                          
-                 utils   
+   ──────────────────────────────────   
+             ╭───────────╮              
+             │   utils   │              
+             ╰───────────╯              
 ```
 
 ## 8. Build, CI/CD, Deployment
