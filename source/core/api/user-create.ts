@@ -9,6 +9,7 @@ import {
   withNetlify,
 } from '@core/platform/netlify'
 import { mapUserToRow } from '@core/api/user-mapping'
+import { Supabase } from '@core/platform/supabase'
 
 interface UserCreateBody {
   displayName: string
@@ -19,13 +20,10 @@ interface UserCreateBody {
   status?: User['status']
 }
 
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === 'string' && value.trim().length > 0
-
 const validate = (payload: UserCreateBody): string | null => {
-  if (!isNonEmptyString(payload?.displayName)) return 'displayName is required'
-  if (!isNonEmptyString(payload.primaryEmail)) return 'primaryEmail is required'
-  if (!isNonEmptyString(payload.phoneNumber)) return 'phoneNumber is required'
+  if (!Supabase.isNonEmptyString(payload?.displayName)) return 'displayName is required'
+  if (!Supabase.isNonEmptyString(payload.primaryEmail)) return 'primaryEmail is required'
+  if (!Supabase.isNonEmptyString(payload.phoneNumber)) return 'phoneNumber is required'
   if (payload.status && payload.status !== 'active' && payload.status !== 'inactive') {
     return 'status must be active or inactive'
   }
@@ -58,7 +56,7 @@ const handle = async (
     status: req.body.status ?? 'active',
     createdAt: now,
     updatedAt: now,
-  deletedAt: undefined,
+    deletedAt: undefined,
 }
 
   const { error } = await Supabase.client()

@@ -74,4 +74,9 @@ export class Supabase {
   static isIdArray(value: unknown): value is string[] {
     return Array.isArray(value) && value.every((entry) => typeof entry === 'string')
   }
+
+  /** Type guard to ensure a non-empty string value. */
+  static isNonEmptyString(value: unknown): value is string {
+    return typeof value === 'string' && value.trim().length > 0
+  }
 }
