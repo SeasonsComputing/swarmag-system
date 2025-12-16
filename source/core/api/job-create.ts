@@ -4,18 +4,18 @@
 
 import { type ID, id } from '@utils/identifier'
 import { type When, when } from '@utils/datetime'
-import type { 
-  JobAssessment, 
-  JobPlan, 
-  JobStatus, 
-  Job 
+import type {
+  JobAssessment,
+  JobPlan,
+  JobStatus,
+  Job
 } from '@domain/job'
 import {
   HttpCodes,
   type ApiRequest,
   type ApiResult,
-  withNetlify,
-} from '@core/platform/netlify'
+} from '@core/platform/api-binding'
+import { withNetlify } from '@core/platform/netlify'
 import { Supabase } from '@core/platform/supabase'
 
 /** Input structure for job assessment data, excluding generated fields. */
@@ -147,8 +147,8 @@ const handle = async (
 
     if (jobError || planError || assessmentError) {
       throw new Error(
-        jobError?.message ?? 
-        planError?.message ?? 
+        jobError?.message ??
+        planError?.message ??
         assessmentError?.message
       )
     }

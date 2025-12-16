@@ -3,7 +3,7 @@
  */
 
 import  {
-  HttpCodes as BindingHttpCodes, 
+  HttpCodes, 
   type HttpHeaders, 
   type ApiRequest,
   type ApiHandler,
@@ -17,7 +17,6 @@ import type {
 
 // Re-export Netlify types for consumers that need the raw event/response shapes.
 export type { HandlerEvent, HandlerResponse }
-export const HttpCodes = BindingHttpCodes
 
 /**
  * Build a JSON Netlify response with a consistent content type header.

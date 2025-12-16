@@ -10,8 +10,8 @@ import {
   HttpCodes,
   type ApiRequest,
   type ApiResult,
-  withNetlify,
-} from '@core/platform/netlify'
+} from '@core/platform/api-binding'
+import { withNetlify } from '@core/platform/netlify'
 import { Supabase } from '@core/platform/supabase'
 
 /** Body structure for job log append API requests. */

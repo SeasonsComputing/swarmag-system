@@ -8,8 +8,8 @@ import {
   HttpCodes,
   type ApiRequest,
   type ApiResult,
-  withNetlify,
-} from '@core/platform/netlify'
+} from '@core/platform/api-binding'
+import { withNetlify } from '@core/platform/netlify'
 import { rowToUser } from '@core/api/user-mapping'
 
 type UserGetQuery = { id?: string }

@@ -9,8 +9,8 @@ import {
   HttpCodes,
   type ApiRequest,
   type ApiResult,
-  withNetlify,
-} from '@core/platform/netlify'
+} from '@core/platform/api-binding'
+import { withNetlify } from '@core/platform/netlify'
 
 /**
  * Converts a ServiceRow to Service, either from payload or raw row data.

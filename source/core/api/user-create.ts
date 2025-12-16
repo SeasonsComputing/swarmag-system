@@ -11,8 +11,8 @@ import {
   HttpCodes,
   type ApiRequest,
   type ApiResult,
-  withNetlify,
-} from '@core/platform/netlify'
+} from '@core/platform/api-binding'
+import { withNetlify } from '@core/platform/netlify'
 import { mapUserToRow } from '@core/api/user-mapping'
 
 interface UserCreateBody {

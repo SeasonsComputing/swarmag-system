@@ -31,6 +31,7 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 | Description             |
 | ----------------------- |
 | Transport Truck         |
+| Transport Trailer       |
 | Skidsteer Vehicle       |
 | Toolcat Vehicle         |
 | Vehicle Tool Attachment |
@@ -46,8 +47,8 @@ Curated roles used for authorship/attribution (`Author.role` in the domain). The
 | Role ID            | Label               | Contexts                                 |
 | ------------------ | ------------------- | ---------------------------------------- |
 | account-executive  | Account Executive   | customer-account                         |
-| assessment-lead    | Assessment Lead     | job-assessment                           |
+| assessment-lead    | Assessment Lead     | job-assessment, job plan                 |
 | crew-lead          | Crew Lead           | job-plan, job-log                        |
-| field-tech         | Field Tech          | job-log, asset                           |
-| fleet-manager      | Fleet Manager       | asset                                    |
-| gis-analyst        | GIS Analyst         | job-assessment, job-log                  |
+| crew-operator      | Crew Operator       | job-log                                  |
+| crew
+
