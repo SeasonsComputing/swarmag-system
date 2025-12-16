@@ -14,6 +14,11 @@ import { rowToUser } from '@core/api/user-mapping'
 
 type UserGetQuery = { id?: string }
 
+/**
+ * Fetch a user by id when provided via query string.
+ * @param req API request wrapper containing query parameters.
+ * @returns API result with the user payload or an error response.
+ */
 const handle = async (
   req: ApiRequest<undefined, UserGetQuery>
 ): Promise<ApiResult> => {

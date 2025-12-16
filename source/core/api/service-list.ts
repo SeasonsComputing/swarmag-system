@@ -13,10 +13,9 @@ import {
 import { withNetlify } from '@core/platform/netlify'
 
 /**
- * Converts a ServiceRow to Service, either from payload or raw row data.
- * @param row - The database row to convert.
- * @returns The mapped Service object.
- * @throws Error if required fields are missing.
+ * Type guard for supported service categories.
+ * @param value Potential category value.
+ * @returns True when the value matches a known category.
  */
 const isServiceCategory = (value: unknown): value is Service['category'] =>
   value === 'aerial-drone-services' ||
@@ -24,6 +23,12 @@ const isServiceCategory = (value: unknown): value is Service['category'] =>
 
 type ServiceRow = Row<Service>
 
+/**
+ * Converts a ServiceRow to Service, either from payload or raw row data.
+ * @param row The database row to convert.
+ * @returns The mapped Service object.
+ * @throws Error if required fields are missing.
+ */
 const rowToService = (row: Row<Service>): Service => {
   if (row.payload) return row.payload
 

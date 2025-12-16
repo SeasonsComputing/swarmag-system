@@ -24,6 +24,11 @@ interface UserCreateBody {
   status?: User['status']
 }
 
+/**
+ * Validate the incoming user create payload.
+ * @param payload Partial payload from the request body.
+ * @returns Error message string when invalid; otherwise null.
+ */
 const validate = (payload: UserCreateBody): string | null => {
   if (!isNonEmptyString(payload?.displayName)) return 'displayName is required'
   if (!isNonEmptyString(payload.primaryEmail)) return 'primaryEmail is required'
@@ -37,6 +42,11 @@ const validate = (payload: UserCreateBody): string | null => {
   return null
 }
 
+/**
+ * Create a new user record when the request payload is valid.
+ * @param req Netlify-friendly API request wrapper containing the body.
+ * @returns API result with created user or an error response.
+ */
 const handle = async (
   req: ApiRequest<UserCreateBody>
 ): Promise<ApiResult> => {

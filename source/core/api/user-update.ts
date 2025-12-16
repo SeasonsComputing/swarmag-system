@@ -23,9 +23,19 @@ interface UserUpdateBody {
   status?: User['status']
 }
 
+/**
+ * Type guard for accepted user status values in updates.
+ * @param value Potential status value.
+ * @returns True when the value is an allowed status string.
+ */
 const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
   value === 'active' || value === 'inactive'
 
+/**
+ * Validate a partial user update request.
+ * @param payload The incoming body containing fields to patch.
+ * @returns Error message string when invalid; otherwise null.
+ */
 const validate = (payload: UserUpdateBody): string | null => {
   if (!payload?.id) return 'id is required'
   if (payload.status && !isUserStatus(payload.status)) return 'status must be active or inactive'
@@ -33,6 +43,11 @@ const validate = (payload: UserUpdateBody): string | null => {
   return null
 }
 
+/**
+ * Update an existing user while enforcing allowed fields and validation.
+ * @param req API request wrapper containing the update payload.
+ * @returns API result with the updated user or an error response.
+ */
 const handle = async (
   req: ApiRequest<UserUpdateBody>
 ): Promise<ApiResult> => {

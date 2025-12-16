@@ -5,9 +5,19 @@
 import type { User } from '@domain/common'
 import type { Row } from '@core/platform/db-binding'
 
+/**
+ * Type guard for accepted user status values.
+ * @param value Potential status value.
+ * @returns True when the value is an allowed status string.
+ */
 const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
   value === 'active' || value === 'inactive'
 
+/**
+ * Type guard for a User roles array of strings.
+ * @param value Potential roles value.
+ * @returns True when the value is an array of strings.
+ */
 const isUserRoles = (value: unknown): value is User['roles'] =>
   Array.isArray(value) && value.every((role) => typeof role === 'string')
 

@@ -15,6 +15,11 @@ import { mapUserToRow, rowToUser } from '@core/api/user-mapping'
 
 interface UserDeleteBody { id: string }
 
+/**
+ * Soft-delete a user by marking deleted timestamp while keeping the record.
+ * @param req API request wrapper containing the user id to delete.
+ * @returns API result with deletion metadata or an error response.
+ */
 const handle = async (
   req: ApiRequest<UserDeleteBody>
 ): Promise<ApiResult> => {
