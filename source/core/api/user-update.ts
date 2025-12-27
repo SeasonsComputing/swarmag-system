@@ -11,7 +11,7 @@ import {
   type ApiResult,
 } from '@core/platform/api-binding'
 import { withNetlify } from '@core/platform/netlify'
-import { mapUserToRow, rowToUser } from '@core/api/user-mapping'
+import { userToRow, rowToUser } from '@core/api/user-mapping'
 
 interface UserUpdateBody {
   id: string
@@ -95,7 +95,7 @@ const handle = async (
 
   const { error: updateError } = await supabase
     .from('users')
-    .update(mapUserToRow(updated))
+    .update(userToRow(updated))
     .eq('id', updated.id)
 
   if (updateError) {

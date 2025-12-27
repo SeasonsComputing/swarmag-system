@@ -22,7 +22,7 @@ const isUserRoles = (value: unknown): value is User['roles'] =>
   Array.isArray(value) && value.every((role) => typeof role === 'string')
 
 /** Map a domain User into a Supabase row shape. */
-export const mapUserToRow = (user: User) => ({
+export const userToRow = (user: User) => ({
   id: user.id,
   display_name: user.displayName,
   primary_email: user.primaryEmail,

@@ -13,7 +13,7 @@ import {
   type ApiResult,
 } from '@core/platform/api-binding'
 import { withNetlify } from '@core/platform/netlify'
-import { mapUserToRow } from '@core/api/user-mapping'
+import { userToRow } from '@core/api/user-mapping'
 
 interface UserCreateBody {
   displayName: string
@@ -75,7 +75,7 @@ const handle = async (
 
   const { error } = await Supabase.client()
     .from('users')
-    .insert(mapUserToRow(user))
+    .insert(userToRow(user))
 
   if (error) {
     return {
