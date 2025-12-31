@@ -11,48 +11,48 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 
 ### 1.2 Core abstractions that define the solution space
 
-| Abstraction    | Description                                 |
-| -------------- | ------------------------------------------- |
-| `Service`      | Offering provided to customers              |
-| `Asset`        | Equipment/resources used in operations      |
-| `Chemical`     | Materials applied within services           |
-| `Workflow`     | Sequenced steps for delivering a service    |
-| `JobAssessment`| Initial evaluation of a prospective job     |
-| `JobPlan`      | Planned execution details for a job         |
-| `JobLog`       | Append-only record of job events and states |
-| `Customer`     | Organization purchasing services            |
-| `Contact`      | Individual associated with a customer       |
+| Abstraction     | Description                                 |
+| --------------- | ------------------------------------------- |
+| `Service`       | Offering provided to customers              |
+| `Asset`         | Equipment/resources used in operations      |
+| `Chemical`      | Materials applied within services           |
+| `Workflow`      | Sequenced steps for delivering a service    |
+| `JobAssessment` | Initial evaluation of a prospective job     |
+| `JobPlan`       | Planned execution details for a job         |
+| `JobLog`        | Append-only record of job events and states |
+| `Customer`      | Organization purchasing services            |
+| `Contact`       | Individual associated with a customer       |
 
 ### 1.3 Common abstractions shared within the model
 
-| Abstraction    | Description                                  |
-| -------------- | -------------------------------------------- |
-| `User`         | Identity/profile with role memberships and contact info |
-| `Author`       | Lightweight attribution slice of `User` with a curated attribution role |
-| `Note`         | Freeform text with author/time               |
-| `Attachment`   | File reference metadata and uploader         |
-| `Address`      | Postal address fields                        |
-| `Location`     | Coordinate plus optional address             |
-| `Coordinate`   | Latitude/longitude pair                      |
-| `Question`     | Prompt used in assessments/forms             |
-| `Answer`       | Response to a question                       |
+| Abstraction  | Description                                                             |
+| ------------ | ----------------------------------------------------------------------- |
+| `User`       | Identity/profile with role memberships and contact info                 |
+| `Author`     | Lightweight attribution slice of `User` with a curated attribution role |
+| `Note`       | Freeform text with author/time                                          |
+| `Attachment` | File reference metadata and uploader                                    |
+| `Address`    | Postal address fields                                                   |
+| `Location`   | Coordinate plus optional address                                        |
+| `Coordinate` | Latitude/longitude pair                                                 |
+| `Question`   | Prompt used in assessments/forms                                        |
+| `Answer`     | Response to a question                                                  |
 
 ### 1.4 Supporting structures present in code (refer to type definitions for details)
 
-| Area           | Structures / Notes                                        |
-| -------------- | --------------------------------------------------------- |
-| Services       | `sku`; `requiredAssetTypes: ID[]` (links to AssetType)    |
-| Assets         | `AssetType` (`id`, `name`; lifecycle aligned to Services) |
-| Workflows      | `WorkflowStep`, `WorkflowVersion`                         |
-| Jobs           | `JobAssignment`, `JobChemicalPlan`                        |
-| Customers      | `CustomerSite`                                            |
+| Area      | Structures / Notes                                        |
+| --------- | --------------------------------------------------------- |
+| Services  | `sku`; `requiredAssetTypes: ID[]` (links to AssetType)    |
+| Assets    | `AssetType` (`id`, `name`; lifecycle aligned to Services) |
+| Workflows | `WorkflowStep`, `WorkflowVersion`                         |
+| Jobs      | `JobAssignment`, `JobChemicalPlan`                        |
+| Customers | `CustomerSite`                                            |
 
 ### 1.5 Utility data types
 
-| Type           | Description                       |
-| -------------- | --------------------------------- |
-| `ID`           | UUID v7 string identifier         |
-| `When`         | ISO 8601 UTC timestamp as string  |
+| Type   | Description                      |
+| ------ | -------------------------------- |
+| `ID`   | UUID v7 string identifier        |
+| `When` | ISO 8601 UTC timestamp as string |
 
 ### 1.6 Rules
 
@@ -87,36 +87,36 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 
 ### 2.2 Standard actions by abstraction
 
-| Abstraction | Actions | Notes |
-| ----------- | ------- | ----- |
-| Service     | `service-create`, `service-get`, `service-list`, `service-update`, `service-delete` | CRUD for catalogued offerings |
-| Asset       | `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete` | Manage fleet/equipment |
-| Chemical    | `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete` | Track regulated materials |
-| Workflow    | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned service playbooks |
-| Job (assess/plan) | `job-create`, `job-get`, `job-list`, `job-update` | `job-create` seeds Job + Assessment + Plan; updates limited to allowed Plan/Job fields |
-| Job (logs) | `job-log-append`, `job-log-list` | Append-only logs; paginated reads |
-| User       | `user-create`, `user-get`, `user-list`, `user-update`, `user-delete` | Profiles/roles for operators and customers |
-| Customer   | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records |
-| Contact    | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete` | People tied to customers |
-| Optional   | `*-search` | Richer filtering when needed |
+| Abstraction       | Actions                                                                                  | Notes                                                                                  |
+| ----------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Service           | `service-create`, `service-get`, `service-list`, `service-update`, `service-delete`      | CRUD for catalogued offerings                                                          |
+| Asset             | `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete`                | Manage fleet/equipment                                                                 |
+| Chemical          | `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete` | Track regulated materials                                                              |
+| Workflow          | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned service playbooks                                                            |
+| Job (assess/plan) | `job-create`, `job-get`, `job-list`, `job-update`                                        | `job-create` seeds Job + Assessment + Plan; updates limited to allowed Plan/Job fields |
+| Job (logs)        | `job-log-append`, `job-log-list`                                                         | Append-only logs; paginated reads                                                      |
+| User              | `user-create`, `user-get`, `user-list`, `user-update`, `user-delete`                     | Profiles/roles for operators and customers                                             |
+| Customer          | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records                                                                       |
+| Contact           | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete`      | People tied to customers                                                               |
+| Optional          | `*-search`                                                                               | Richer filtering when needed                                                           |
 
 ### 2.3 Handler pattern
 
-| Item | Detail |
-| ---- | ------ |
-| Exports | Each file default-exports the Netlify `handler = withNetlify(handle)` from `source/serverless/lib/netlify.ts`; keep per-abstraction mapping helpers in `*-mapping.ts` for DB/domain conversion. |
-| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody> \| Promise<ApiResponse<ResponseBody>>` |
-| Request | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event. |
-| Response | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`. |
-| Imports | Only import domain types from `source/domain`; do not redefine domain abstractions locally. |
+| Item      | Detail                                                                                                                                                                                          |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exports   | Each file default-exports the Netlify `handler = withNetlify(handle)` from `source/serverless/lib/netlify.ts`; keep per-abstraction mapping helpers in `*-mapping.ts` for DB/domain conversion. |
+| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody> \| Promise<ApiResponse<ResponseBody>>`                                                                              |
+| Request   | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event.                                                                                                        |
+| Response  | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`.                                                                                                           |
+| Imports   | Only import domain types from `source/domain`; do not redefine domain abstractions locally.                                                                                                     |
 
 ### 2.4 Validation and errors
 
-| Area         | Behavior |
-| ------------ | -------- |
-| Methods      | Reject unsupported HTTP methods with `HttpCodes.methodNotAllowed` (405). |
-| Parsing      | Invalid/missing JSON -> `HttpCodes.badRequest` (400). |
-| Semantics    | Shape/domain validation failures -> `HttpCodes.unprocessableEntity` (422). |
-| Persistence  | Supabase/unknown failures -> `HttpCodes.internalError` (500); do not leak stacks. |
-| Responses    | Always JSON; success `{ data: ... }`; failure `{ error, details? }`. |
+| Area         | Behavior                                                                                                 |
+| ------------ | -------------------------------------------------------------------------------------------------------- |
+| Methods      | Reject unsupported HTTP methods with `HttpCodes.methodNotAllowed` (405).                                 |
+| Parsing      | Invalid/missing JSON -> `HttpCodes.badRequest` (400).                                                    |
+| Semantics    | Shape/domain validation failures -> `HttpCodes.unprocessableEntity` (422).                               |
+| Persistence  | Supabase/unknown failures -> `HttpCodes.internalError` (500); do not leak stacks.                        |
+| Responses    | Always JSON; success `{ data: ... }`; failure `{ error, details? }`.                                     |
 | Immutability | Use `append` actions for append-only resources (e.g., job logs); avoid in-place mutation where required. |

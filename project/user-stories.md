@@ -5,9 +5,9 @@
 1. **Inbound inquiry** — A call or email arrives at the company from a new prospect; capture contact details and service interest.
 2. **Sales follow-up** — Sales rep responds to qualify needs, timeline, and service category (aerial vs. ground).
 3. **Customer creation** — Create a new customer record with:
-   - Name and primary account details.
-   - Address (billing/mailing).
-   - Locations/sites to service (each with label, coordinates/address, acreage/notes).
+    - Name and primary account details.
+    - Address (billing/mailing).
+    - Locations/sites to service (each with label, coordinates/address, acreage/notes).
 4. **Contact capture** — Add one or more contacts (phone/email), note preferred channel, and designate a primary contact.
 
 ## Job Assessment

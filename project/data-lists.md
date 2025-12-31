@@ -19,12 +19,12 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 
 ## Ground Machinery Services
 
-| Description                         | Equipment              | SKU        |
-| ----------------------------------- | ---------------------- | ---------- |
-| Mesquite, Hackberry, et al Removal  | John Deere Skidsteer   | G-MITI-01  |
-| Fence-line Tree Trimming            | Bobcat Toolcat         | G-FENCE-01 |
-| Rock Removal, Regrade               | Skidsteer, Toolcat     | G-MACH-01  |
-| Brush Hogging                       | Skidsteer, Toolcat     | G-BRUSH-01 |
+| Description                        | Equipment            | SKU        |
+| ---------------------------------- | -------------------- | ---------- |
+| Mesquite, Hackberry, et al Removal | John Deere Skidsteer | G-MITI-01  |
+| Fence-line Tree Trimming           | Bobcat Toolcat       | G-FENCE-01 |
+| Rock Removal, Regrade              | Skidsteer, Toolcat   | G-MACH-01  |
+| Brush Hogging                      | Skidsteer, Toolcat   | G-BRUSH-01 |
 
 ## Asset Types
 
@@ -44,11 +44,11 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 
 Curated roles used for authorship/attribution (`Author.role` in the domain). These should stay in sync with `AUTHOR_ATTRIBUTION_ROLES` in `source/domain/common.ts`.
 
-| Role ID            | Label               | Contexts                                 |
-| ------------------ | ------------------- | ---------------------------------------- |
-| account-executive  | Account Executive   | customer-account                         |
-| assessment-lead    | Assessment Lead     | job-assessment                           |
-| crew-lead          | Crew Lead           | job-plan, job-log                        |
-| field-tech         | Field Tech          | job-log, asset                           |
-| fleet-manager      | Fleet Manager       | asset                                    |
-| gis-analyst        | GIS Analyst         | job-assessment, job-log                  |
+| Role ID           | Label             | Contexts                |
+| ----------------- | ----------------- | ----------------------- |
+| account-executive | Account Executive | customer-account        |
+| assessment-lead   | Assessment Lead   | job-assessment          |
+| crew-lead         | Crew Lead         | job-plan, job-log       |
+| field-tech        | Field Tech        | job-log, asset          |
+| fleet-manager     | Fleet Manager     | asset                   |
+| gis-analyst       | GIS Analyst       | job-assessment, job-log |

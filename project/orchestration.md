@@ -2,21 +2,21 @@
 
 This document defines how the swarmAg System should be implemented in phases:
 
-| Phase | Module | Doc | Description |
-| ----- | ------ | --- | ----------- |
-| 1 | Domain | `domain.md` | Domain model of foundational abstractions/contracts/APIs |
-| 2 | Admin Web App | `admin-web-app.md` | Real-time dashboards; jobs/schedules; catalog |
-| 3 | Ops Mobile App | `ops-mobile-app.md` | Field operations and job logging |
-| 4 | Customer Portal | `customer-portal.md` | Read-only customer experience |
+| Phase | Module          | Doc                  | Description                                              |
+| ----- | --------------- | -------------------- | -------------------------------------------------------- |
+| 1     | Domain          | `domain.md`          | Domain model of foundational abstractions/contracts/APIs |
+| 2     | Admin Web App   | `admin-web-app.md`   | Real-time dashboards; jobs/schedules; catalog            |
+| 3     | Ops Mobile App  | `ops-mobile-app.md`  | Field operations and job logging                         |
+| 4     | Customer Portal | `customer-portal.md` | Read-only customer experience                            |
 
 ## 1. Primary work per phase
 
-| Phase | Primary Work |
-| ----- | ------------ |
-| 1 | Implement domain types (`source/domain/*`) and initial APIs (`source/serverless/functions/*`) |
-| 2 | Build admin app with real-time dashboards and catalog admin |
-| 3 | Build `source/apps/ops` using domain types and API functions |
-| 4 | Build read-only customer portal (`source/apps/customer`) using domain types |
+| Phase | Primary Work                                                                                  |
+| ----- | --------------------------------------------------------------------------------------------- |
+| 1     | Implement domain types (`source/domain/*`) and initial APIs (`source/serverless/functions/*`) |
+| 2     | Build admin app with real-time dashboards and catalog admin                                   |
+| 3     | Build `source/apps/ops` using domain types and API functions                                  |
+| 4     | Build read-only customer portal (`source/apps/customer`) using domain types                   |
 
 The authoritative architecture is in `architecture.md`.
 
@@ -53,52 +53,52 @@ All code lives in a single repo with this structure (current state):
 
 ### 2.1. Dependency Rules
 
-| Layer    | May depend on            | Must not depend on    |
-| -------- | ------------------------ | --------------------- |
-| tests/*  | all layers               | n/a                   |
-| apps/*   | serverless, domain, utils | apps                 |
-| serverless/* | domain, utils        | apps                  |
-| domain/* | utils                    | apps, serverless      |
-| utils/*  | (none)                   | apps, serverless, domain |
+| Layer        | May depend on             | Must not depend on       |
+| ------------ | ------------------------- | ------------------------ |
+| tests/*      | all layers                | n/a                      |
+| apps/*       | serverless, domain, utils | apps                     |
+| serverless/* | domain, utils             | apps                     |
+| domain/*     | utils                     | apps, serverless         |
+| utils/*      | (none)                    | apps, serverless, domain |
 
 ## 3. Global Rules
 
 These rules apply to every phase and every file:
 
 1. **Language:** TypeScript everywhere using the root `tsconfig.json`.
-   - `module: "ESNext"` + `moduleResolution: "bundler"` so the compiler matches the bundler/runtime behavior.
-   - `baseUrl: "source"` with path aliases (`@common/*`, `@domain/*`, `@serverless/*`, `@/*`) for clean imports.
+    - `module: "ESNext"` + `moduleResolution: "bundler"` so the compiler matches the bundler/runtime behavior.
+    - `baseUrl: "source"` with path aliases (`@common/*`, `@domain/*`, `@serverless/*`, `@/*`) for clean imports.
 2. **Frontend:**
-   - TypeScript + SolidJS + TanStack + Kobalte (**No Tailwind**)
-   - Use vanilla CSS (semantic CSS / CSS Modules / tokens).
+    - TypeScript + SolidJS + TanStack + Kobalte (**No Tailwind**)
+    - Use vanilla CSS (semantic CSS / CSS Modules / tokens).
 3. **Backend:**
-   - Netlify Functions for synchronous HTTP APIs.
-   - Supabase (Postgres, Auth, Storage, Realtime) as the backend platform.
+    - Netlify Functions for synchronous HTTP APIs.
+    - Supabase (Postgres, Auth, Storage, Realtime) as the backend platform.
 4. **Domain Model:**
-   - Canonical types live in `source/domain`.  
-   - Do not redefine domain abstractions locally.
+    - Canonical types live in `source/domain`.
+    - Do not redefine domain abstractions locally.
 5. **IDs & Time:**
-   - UUID v7 for IDs to avoid an ID service, support offline/preassigned keys, and keep inserts mostly ordered; use the native `uuid` type, a v7 generator, avoid redundant indexes, prefer composite keys on pure join tables, and plan for routine vacuum/reindex on heavy-write tables.
-   - UTC timestamps.
+    - UUID v7 for IDs to avoid an ID service, support offline/preassigned keys, and keep inserts mostly ordered; use the native `uuid` type, a v7 generator, avoid redundant indexes, prefer composite keys on pure join tables, and plan for routine vacuum/reindex on heavy-write tables.
+    - UTC timestamps.
 6. **Soft deletes:**
-   - Use `deletedAt` UTC timestamps for logical deletes (starting with `User`); undefined/null means active.
-   - Default to filtering queries to `deleted_at IS NULL` and prefer partial unique indexes on active rows.
-   - Hard deletes/anonymization run via explicit maintenance jobs when necessary.
+    - Use `deletedAt` UTC timestamps for logical deletes (starting with `User`); undefined/null means active.
+    - Default to filtering queries to `deleted_at IS NULL` and prefer partial unique indexes on active rows.
+    - Hard deletes/anonymization run via explicit maintenance jobs when necessary.
 7. **Testing:**
-   - Unit + handler tests live under `source/tests`.
-   - Shared sample fixtures are barreled at `source/tests/fixtures/samples.ts`.
-   - Commands: `pnpm test` (unit), `pnpm test:watch`, `pnpm test:live` (requires `LIVE_BASE_URL` to hit deployed endpoints).
+    - Unit + handler tests live under `source/tests`.
+    - Shared sample fixtures are barreled at `source/tests/fixtures/samples.ts`.
+    - Commands: `pnpm test` (unit), `pnpm test:watch`, `pnpm test:live` (requires `LIVE_BASE_URL` to hit deployed endpoints).
 8. **Offline & Auditability:**
-   - Operations Mobile Application is offline-capable with a deterministic sync model.
-   - JobLogs are append-only.
+    - Operations Mobile Application is offline-capable with a deterministic sync model.
+    - JobLogs are append-only.
 9. **Zero-cost bias:**
-   - Prefer free tiers.
-   - Keep heavy/expensive processing clearly isolated.
+    - Prefer free tiers.
+    - Keep heavy/expensive processing clearly isolated.
 
 When new domain concepts or fields are needed:
 
-1. Extend `source/domain/*` first.  
-2. Then update backend `source/serverless/functions/*` (one default-exported Netlify handler per file; use per-abstraction `*-mapping.ts` helpers for DB/domain conversion).  
+1. Extend `source/domain/*` first.
+2. Then update backend `source/serverless/functions/*` (one default-exported Netlify handler per file; use per-abstraction `*-mapping.ts` helpers for DB/domain conversion).
 3. Then adapt the front-ends under `source/apps/*`.
 
 ## 4. Testing Foundation
