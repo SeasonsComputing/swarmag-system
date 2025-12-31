@@ -64,7 +64,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - All other code (apps, functions) must import from `source/domain`.
 - Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type` and `Service.requiredAssetTypes`; keep the canonical list in `project/data-lists.md`.
 - JobAssessments must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
-- Soft deletes: entities that need logical deletion (starting with `User`) expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after delete.
+- Soft deletes: abstractions that need logical deletion (starting with `User`) expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after delete.
 - ID strategy: UUID v7 for PK/FK to avoid an ID service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure join tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
 
 ### 1.7 Roles & attribution
@@ -74,13 +74,13 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - `Author.role` stores the attribution role id from `AUTHOR_ATTRIBUTION_ROLES`; UI should render the label from that catalog and never collect arbitrary text.
 - If a context does not supply a meaningful attribution role, omit it rather than prompting the user for input.
 
-## 2. API Functions (`source/core/api/*`)
+## 2. API Functions (`source/serverless/functions/*`)
 
 ### 2.1 Scope
 
 Functions that expose the domain model over HTTP, persisted in Supabase, and typed with `source/domain`. Each function:
 
-- `source/core/api` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints
+- `source/serverless/functions` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints
 - Uses the `{abstraction}-{action}.ts` naming convention with singular-tense abstractions.
 - Parses and validates JSON requests against domain types.
 - Returns JSON responses with a consistent envelope and status codes.
@@ -104,11 +104,11 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 
 | Item | Detail |
 | ---- | ------ |
-| Exports | Each file default-exports the Netlify `handler = withNetlify(handle)` from `source/core/platform/netlify.ts`; keep per-entity mapping helpers in `*-mapping.ts` for DB/domain conversion. |
-| Signature | `handle: (req: ApiRequest<Body, Query>) => ApiResult<Payload> \| Promise<ApiResult<Payload>>` |
+| Exports | Each file default-exports the Netlify `handler = withNetlify(handle)` from `source/serverless/lib/netlify.ts`; keep per-abstraction mapping helpers in `*-mapping.ts` for DB/domain conversion. |
+| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody> \| Promise<ApiResponse<ResponseBody>>` |
 | Request | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event. |
-| Response | `ApiResult` carries `statusCode`, optional `headers`, and JSON-serializable `body`. |
-| Imports | Only import domain types from `source/domain`; do not redefine entities locally. |
+| Response | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`. |
+| Imports | Only import domain types from `source/domain`; do not redefine domain abstractions locally. |
 
 ### 2.4 Validation and errors
 

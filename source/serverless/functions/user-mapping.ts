@@ -3,7 +3,7 @@
  */
 
 import type { User } from '@domain/common'
-import type { Row } from '@core/platform/db-binding'
+import type { Row } from '@serverless/lib/db-binding'
 
 /**
  * Type guard for accepted user status values.

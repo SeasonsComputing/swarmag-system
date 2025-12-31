@@ -91,8 +91,8 @@ a short-lived access code will be created and delivered to the customer via sms 
 ### Coding Style
 
 - Prefer Typescript as the primary coding language
-- Prefer UUID v7 as object/entity universal ID's
-- Prefer well-encapsulated, minimalist API's classes/entities
+- Prefer UUID v7 as object/abstraction universal IDs
+- Prefer well-encapsulated, minimalist APIs/classes/abstractions
 - Use Classes whenever needed. This is not purely functional programming.
 
 ### Technology Stack

@@ -89,7 +89,7 @@ export interface JobLogEntry {
   payload?: Record<string, unknown>
 }
 
-/** Represents a job entity in the system. */
+/** Represents a job in the system. */
 export interface Job {
   id: ID
   assessmentId: ID

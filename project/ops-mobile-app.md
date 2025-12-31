@@ -41,7 +41,7 @@ source/apps/ops/
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
   - No Tailwind.
 - Use the repo-level `tsconfig.json` (ESNext modules, bundler resolution, `baseUrl: "source"`).
-- Import via configured aliases: `@domain/*`, `@core/*`, `@utils/*`, and `@/*` for app-local modules.
+- Import via configured aliases: `@domain/*`, `@serverless/*`, `@utils/*`, and `@/*` for app-local modules.
 - Must import domain types from `source/domain`.
 - Must call backend APIs via Netlify Functions (not ad-hoc URLs).
 - Must be structured by features (`src/features/<feature>`).

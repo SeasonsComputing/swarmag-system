@@ -6,7 +6,7 @@
 export type HttpHeaders = Record<string, string>
 
 /** HTTP query map for Netlify responses/requests. */
-export type HttpQuery = Record<string, string | undefined>
+export type HttpQuery = Record<string, string>
 
 /** HTTP method for Netlify actions. */
 export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
@@ -25,32 +25,33 @@ export const HttpCodes = {
 
 /**
  * Typed Netlify request wrapper passed into API handlers.
- * @template Body Request body type.
+ * @template RequestBody Request body type.
  * @template Query Query string type.
  */
-export interface ApiRequest<Body = unknown, Query = HttpQuery> {
+export interface ApiRequest<Body = unknown, Query = HttpQuery, Headers = HttpHeaders> {
   method: HttpMethod
   body: Body
   query: Query
-  headers: HttpHeaders
+  headers: Headers
   rawEvent: unknown
 }
 
 /**
  * Standardized API handler response envelope.
- * @template Payload JSON-serializable response body type.
+ * @template ResponseBody JSON-serializable response body type.
  */
-export interface ApiResult<Payload = unknown> {
+export interface ApiResponse<Body = unknown, Headers = HttpHeaders> {
   statusCode: number
-  headers?: HttpHeaders
-  body: Payload
+  headers?: Headers
+  body: Body
 }
 
 /**
  * Type alias for a typed API handler used by platform adapters.
- * @template Body Request body type.
+ * @template RequestBody Request body type.
  * @template Query Query string type.
- * @template Payload Response payload type.
+ * @template ResponseBody Response body type.
  */
-export type ApiHandler<Body = unknown, Query = HttpQuery, Payload = unknown>
-  = (req: ApiRequest<Body, Query>) => Promise<ApiResult<Payload>> | ApiResult<Payload>
+export type ApiHandler<RequestBody = unknown, Query = HttpQuery, ResponseBody = unknown>
+  = (req: ApiRequest<RequestBody, Query>) =>
+    Promise<ApiResponse<ResponseBody>> | ApiResponse<ResponseBody>

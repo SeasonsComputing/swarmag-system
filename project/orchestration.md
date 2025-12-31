@@ -13,7 +13,7 @@ This document defines how the swarmAg System should be implemented in phases:
 
 | Phase | Primary Work |
 | ----- | ------------ |
-| 1 | Implement domain types (`source/domain/*`) and initial APIs (`source/core/api/*`) |
+| 1 | Implement domain types (`source/domain/*`) and initial APIs (`source/serverless/functions/*`) |
 | 2 | Build admin app with real-time dashboards and catalog admin |
 | 3 | Build `source/apps/ops` using domain types and API functions |
 | 4 | Build read-only customer portal (`source/apps/customer`) using domain types |
@@ -28,10 +28,10 @@ All code lives in a single repo with this structure (current state):
 /
 ├─ project/                  # docs, specs, plans, style guide
 ├─ source/                   # system source
-│  ├─ core/                  # backend code (APIs, platform, migrations)
-│  │  ├─ api/                # Netlify Functions (backend APIs)
-│  │  ├─ platform/           # shared backend platform helpers (Netlify, Supabase)
-│  │  └─ migrations/         # Supabase SQL migrations
+│  ├─ serverless/            # serverless backend (functions + shared lib)
+│  │  ├─ functions/          # Netlify Functions (backend APIs)
+│  │  └─ lib/                # shared serverless helpers (Netlify, Supabase)
+│  ├─ migrations/            # Supabase SQL migrations
 │  ├─ apps/                  # SolidJS apps (admin/ops/customer) plus shared UI helpers
 │  │  ├─ admin/              # Admin web app
 │  │  ├─ ops/                # Ops mobile app
@@ -56,10 +56,10 @@ All code lives in a single repo with this structure (current state):
 | Layer    | May depend on            | Must not depend on    |
 | -------- | ------------------------ | --------------------- |
 | tests/*  | all layers               | n/a                   |
-| apps/*   | core, domain, utils      | apps                  |
-| core/*   | domain, utils            | apps                  |
-| domain/* | utils                    | apps, core            |
-| utils/*  | (none)                   | apps, core, domain    |
+| apps/*   | serverless, domain, utils | apps                 |
+| serverless/* | domain, utils        | apps                  |
+| domain/* | utils                    | apps, serverless      |
+| utils/*  | (none)                   | apps, serverless, domain |
 
 ## 3. Global Rules
 
@@ -67,7 +67,7 @@ These rules apply to every phase and every file:
 
 1. **Language:** TypeScript everywhere using the root `tsconfig.json`.
    - `module: "ESNext"` + `moduleResolution: "bundler"` so the compiler matches the bundler/runtime behavior.
-   - `baseUrl: "source"` with path aliases (`@common/*`, `@domain/*`, `@core/*`, `@/*`) for clean imports.
+   - `baseUrl: "source"` with path aliases (`@common/*`, `@domain/*`, `@serverless/*`, `@/*`) for clean imports.
 2. **Frontend:**
    - TypeScript + SolidJS + TanStack + Kobalte (**No Tailwind**)
    - Use vanilla CSS (semantic CSS / CSS Modules / tokens).
@@ -76,7 +76,7 @@ These rules apply to every phase and every file:
    - Supabase (Postgres, Auth, Storage, Realtime) as the backend platform.
 4. **Domain Model:**
    - Canonical types live in `source/domain`.  
-   - Do not redefine domain entities locally.
+   - Do not redefine domain abstractions locally.
 5. **IDs & Time:**
    - UUID v7 for IDs to avoid an ID service, support offline/preassigned keys, and keep inserts mostly ordered; use the native `uuid` type, a v7 generator, avoid redundant indexes, prefer composite keys on pure join tables, and plan for routine vacuum/reindex on heavy-write tables.
    - UTC timestamps.
@@ -98,7 +98,7 @@ These rules apply to every phase and every file:
 When new domain concepts or fields are needed:
 
 1. Extend `source/domain/*` first.  
-2. Then update backend `source/core/api/*` (one default-exported Netlify handler per file; use per-entity `*-mapping.ts` helpers for DB/domain conversion).  
+2. Then update backend `source/serverless/functions/*` (one default-exported Netlify handler per file; use per-abstraction `*-mapping.ts` helpers for DB/domain conversion).  
 3. Then adapt the front-ends under `source/apps/*`.
 
 ## 4. Testing Foundation
@@ -107,7 +107,7 @@ When new domain concepts or fields are needed:
   1) `pnpm install`
   2) `pnpm test` (unit + handler). Use `pnpm test:watch` while iterating.
   3) For deployed smoke checks: `LIVE_BASE_URL=https://<env> pnpm test:live` (optionally `LIVE_SERVICE_LIST_PATH` for non-default routes).
-- Tooling: Vitest (Node env) with TS + aliases from `vitest.config.ts` (`@core`, `@domain`, `@utils`, `@`).
+- Tooling: Vitest (Node env) with TS + aliases from `vitest.config.ts` (`@serverless`, `@domain`, `@utils`, `@`).
 - Layout:
   - `source/tests/fixtures/*` — shared samples plus fixture integrity checks.
   - `source/tests/domain/*` — domain-focused tests (add alongside new domain work).
@@ -118,7 +118,7 @@ When new domain concepts or fields are needed:
 - Fixtures: examples only (not canonical lists). Assert structure/constraints, not specific curated values or prefixes. If you add fixtures, export them through the barrel.
 - Patterns to follow:
   - Prefer structural assertions: IDs are non-empty `ID`, timestamps are ISO strings (`isWhen`), enums are respected.
-  - Handlers: `vi.mock('@core/platform/supabase')` and assert request validation, status codes, and payload shapes (e.g., inserted rows carry generated IDs and timestamps).
+  - Handlers: `vi.mock('@serverless/lib/supabase')` and assert request validation, status codes, and payload shapes (e.g., inserted rows carry generated IDs and timestamps).
   - Pure utilities: deterministic inputs/outputs with table-driven tests when useful.
   - Live tests: guard with `if (!process.env.LIVE_BASE_URL) test.skip(...)`; keep them fast (smoke only).
 - Build isolation: `tsconfig.json` excludes `source/tests`, so fixtures/specs never ship. Keep all test-only data under `source/tests`.

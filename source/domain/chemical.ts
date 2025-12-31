@@ -21,7 +21,7 @@ export interface ChemicalLabel {
   description?: string
 }
 
-/** Represents a chemical entity in the swarmAg system. */
+/** Represents a chemical in the swarmAg system. */
 export interface Chemical {
   id: ID
   name: string

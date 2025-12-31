@@ -3,8 +3,8 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import handler from '@core/api/job-create'
-import { HttpCodes } from '@core/platform/netlify'
+import handler from '@serverless/functions/job-create'
+import { HttpCodes } from '@serverless/lib/api-binding'
 import { ranchMappingAssessment } from '../fixtures/samples'
 import { runNetlifyHandler } from './helpers/netlify'
 
@@ -15,7 +15,7 @@ const { insertCalls, fromMock, clientMock } = vi.hoisted(() => {
   return { insertCalls, fromMock, clientMock }
 })
 
-vi.mock('@core/platform/supabase', () => ({
+vi.mock('@serverless/lib/supabase', () => ({
   Supabase: {
     client: clientMock,
   },

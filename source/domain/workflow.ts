@@ -25,7 +25,7 @@ export interface WorkflowVersion {
   steps: WorkflowStep[]
 }
 
-/** Represents a workflow entity in the swarmAg system. */
+/** Represents a workflow in the swarmAg system. */
 export interface Workflow {
   id: ID
   serviceId: ID

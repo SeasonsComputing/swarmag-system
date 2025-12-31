@@ -10,7 +10,7 @@ import type { Note } from './common'
 /** The categories of services available. */
 export type ServiceCategory = 'aerial-drone-services' | 'ground-machinery-services'
 
-/** Represents a service entity in the swarmAg system. */
+/** Represents a service in the swarmAg system. */
 export interface Service {
   id: ID
   name: string

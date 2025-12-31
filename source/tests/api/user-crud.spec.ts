@@ -3,11 +3,11 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import handlerCreate from '@core/api/user-create'
-import handlerGet from '@core/api/user-get'
-import handlerUpdate from '@core/api/user-update'
-import handlerDelete from '@core/api/user-delete'
-import { HttpCodes } from '@core/platform/netlify'
+import handlerCreate from '@serverless/functions/user-create'
+import handlerGet from '@serverless/functions/user-get'
+import handlerUpdate from '@serverless/functions/user-update'
+import handlerDelete from '@serverless/functions/user-delete'
+import { HttpCodes } from '@serverless/lib/netlify'
 import { runNetlifyHandler } from './helpers/netlify'
 
 type UsersTable = Record<string, Record<string, any>>
@@ -19,12 +19,12 @@ const { users, fromMock, clientMock } = vi.hoisted(() => {
   return { users, fromMock, clientMock }
 })
 
-vi.mock('@core/platform/supabase', () => ({
+vi.mock('@serverless/lib/supabase', () => ({
   Supabase: {
     client: clientMock,
   },
 }))
-vi.mock('@core/platform/db-binding', () => ({
+vi.mock('@serverless/lib/db-binding', () => ({
   isNonEmptyString: (value: unknown): value is string =>
     typeof value === 'string' && value.trim().length > 0,
   clampLimit: () => 25,

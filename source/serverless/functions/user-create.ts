@@ -5,15 +5,15 @@
 import type { User, UserRole } from '@domain/common'
 import { id } from '@utils/identifier'
 import { when } from '@utils/datetime'
-import { Supabase } from '@core/platform/supabase'
-import { isNonEmptyString } from '@core/platform/db-binding'
+import { Supabase } from '@serverless/lib/supabase'
+import { isNonEmptyString } from '@serverless/lib/db-binding'
 import {
   HttpCodes,
   type ApiRequest,
-  type ApiResult,
-} from '@core/platform/api-binding'
-import { withNetlify } from '@core/platform/netlify'
-import { userToRow } from '@core/api/user-mapping'
+  type ApiResponse,
+} from '@serverless/lib/api-binding'
+import { withNetlify } from '@serverless/lib/netlify'
+import { userToRow } from '@serverless/functions/user-mapping'
 
 interface UserCreateBody {
   displayName: string
@@ -49,7 +49,7 @@ const validate = (payload: UserCreateBody): string | null => {
  */
 const handle = async (
   req: ApiRequest<UserCreateBody>
-): Promise<ApiResult> => {
+): Promise<ApiResponse> => {
   if (req.method !== 'POST') {
     return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
   }

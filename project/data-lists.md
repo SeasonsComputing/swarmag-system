@@ -47,8 +47,8 @@ Curated roles used for authorship/attribution (`Author.role` in the domain). The
 | Role ID            | Label               | Contexts                                 |
 | ------------------ | ------------------- | ---------------------------------------- |
 | account-executive  | Account Executive   | customer-account                         |
-| assessment-lead    | Assessment Lead     | job-assessment, job plan                 |
+| assessment-lead    | Assessment Lead     | job-assessment                           |
 | crew-lead          | Crew Lead           | job-plan, job-log                        |
-| crew-operator      | Crew Operator       | job-log                                  |
-| crew
-
+| field-tech         | Field Tech          | job-log, asset                           |
+| fleet-manager      | Fleet Manager       | asset                                    |
+| gis-analyst        | GIS Analyst         | job-assessment, job-log                  |

@@ -9,10 +9,10 @@ import type { Attachment, Author, Location } from '@domain/common'
 import {
   HttpCodes,
   type ApiRequest,
-  type ApiResult,
-} from '@core/platform/api-binding'
-import { withNetlify } from '@core/platform/netlify'
-import { Supabase } from '@core/platform/supabase'
+  type ApiResponse,
+} from '@serverless/lib/api-binding'
+import { withNetlify } from '@serverless/lib/netlify'
+import { Supabase } from '@serverless/lib/supabase'
 
 /** Body structure for job log append API requests. */
 interface JobLogBody {
@@ -48,7 +48,7 @@ const validate = (payload: JobLogBody): string | null => {
  */
 const handle = async (
   req: ApiRequest<JobLogBody>
-): Promise<ApiResult> => {
+): Promise<ApiResponse> => {
   if (req.method !== 'POST') {
     return { 
       statusCode: HttpCodes.methodNotAllowed, 

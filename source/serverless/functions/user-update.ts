@@ -4,14 +4,14 @@
 
 import type { User, UserRole } from '@domain/common'
 import { when } from '@utils/datetime'
-import { Supabase } from '@core/platform/supabase'
+import { Supabase } from '@serverless/lib/supabase'
 import {
   HttpCodes,
   type ApiRequest,
-  type ApiResult,
-} from '@core/platform/api-binding'
-import { withNetlify } from '@core/platform/netlify'
-import { userToRow, rowToUser } from '@core/api/user-mapping'
+  type ApiResponse,
+} from '@serverless/lib/api-binding'
+import { withNetlify } from '@serverless/lib/netlify'
+import { userToRow, rowToUser } from '@serverless/functions/user-mapping'
 
 interface UserUpdateBody {
   id: string
@@ -50,7 +50,7 @@ const validate = (payload: UserUpdateBody): string | null => {
  */
 const handle = async (
   req: ApiRequest<UserUpdateBody>
-): Promise<ApiResult> => {
+): Promise<ApiResponse> => {
   if (req.method !== 'PATCH' && req.method !== 'PUT') {
     return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
   }

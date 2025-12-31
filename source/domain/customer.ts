@@ -30,7 +30,7 @@ export interface CustomerSite {
   notes?: Note[]
 }
 
-/** Represents a customer entity in the swarmAg system. */
+/** Represents a customer in the swarmAg system. */
 export interface Customer {
   id: ID
   name: string

@@ -3,14 +3,14 @@
  */
 
 import type { Service } from '@domain/service'
-import { Supabase } from '@core/platform/supabase'
-import { clampLimit, parseCursor, type ListQuery, type Row, isIdArray } from '@core/platform/db-binding'
+import { Supabase } from '@serverless/lib/supabase'
+import { clampLimit, parseCursor, type ListQuery, type Row, isIdArray } from '@serverless/lib/db-binding'
 import {
   HttpCodes,
   type ApiRequest,
-  type ApiResult,
-} from '@core/platform/api-binding'
-import { withNetlify } from '@core/platform/netlify'
+  type ApiResponse,
+} from '@serverless/lib/api-binding'
+import { withNetlify } from '@serverless/lib/netlify'
 
 /**
  * Type guard for supported service categories.
@@ -64,7 +64,7 @@ const rowToService = (row: Row<Service>): Service => {
  */
 const handle = async (
   req: ApiRequest<undefined, ListQuery>
-): Promise<ApiResult> => {
+): Promise<ApiResponse> => {
   if (req.method !== 'GET') {
     return {
       statusCode: HttpCodes.methodNotAllowed,

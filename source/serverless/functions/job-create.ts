@@ -13,10 +13,10 @@ import type {
 import {
   HttpCodes,
   type ApiRequest,
-  type ApiResult,
-} from '@core/platform/api-binding'
-import { withNetlify } from '@core/platform/netlify'
-import { Supabase } from '@core/platform/supabase'
+  type ApiResponse,
+} from '@serverless/lib/api-binding'
+import { withNetlify } from '@serverless/lib/netlify'
+import { Supabase } from '@serverless/lib/supabase'
 
 /** Input structure for job assessment data, excluding generated fields. */
 type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>
@@ -57,7 +57,7 @@ const validate = (payload: JobCreateBody): string | null => {
  */
 const handle = async (
   req: ApiRequest<JobCreateBody>
-): Promise<ApiResult> => {
+): Promise<ApiResponse> => {
   if (req.method !== 'POST') {
     return {
       statusCode: HttpCodes.methodNotAllowed,

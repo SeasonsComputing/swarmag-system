@@ -2,7 +2,7 @@
  * Test helper for invoking Netlify-wrapped handlers.
  */
 
-import type { HandlerEvent, HandlerResponse } from '@core/platform/netlify'
+import type { HandlerEvent, HandlerResponse } from '@serverless/lib/netlify'
 
 /**
  * Invoke a Netlify-wrapped handler with a minimal synthetic event.

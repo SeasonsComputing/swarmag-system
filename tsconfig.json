@@ -19,7 +19,7 @@
     "paths": {
       "@utils/*": ["utils/*"], 
       "@domain/*": ["domain/*"],
-      "@core/*": ["core/*"],
+      "@serverless/*": ["serverless/*"],
       "@/*": ["*"] 
     }
   },

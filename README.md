@@ -23,22 +23,22 @@ pnpm tsc -b
 | `project/`       | Architecture, orchestration, domain, and user story docs            |
 | `source/domain/` | Canonical domain model (types/interfaces/classes)                   |
 | `source/utils/`  | Shared primitives (UUID v7, UTC time)                               |
-| `source/core/api/` | Netlify Functions                                               |
-| `source/core/platform/` | Backend platform helpers (Netlify adapter, Supabase client) |
-| `source/core/migrations/` | Supabase SQL migrations                                  |
+| `source/serverless/functions/` | Netlify Functions                                               |
+| `source/serverless/lib/` | Backend platform helpers (Netlify adapter, Supabase client) |
+| `source/migrations/` | Supabase SQL migrations                                  |
 | `source/tests/`  | Test specs and fixtures (barreled samples in `fixtures/`)           |
 | `source/apps/`   | (Placeholder) SolidJS apps for admin, ops, and customer experiences |
 
 ## TypeScript & Aliases
 
 - `module: ESNext`, `moduleResolution: bundler`, `baseUrl: source`.
-- Aliases: `@domain/*`, `@utils/*`, `@core/*`, `@/*`.
+- Aliases: `@domain/*`, `@utils/*`, `@serverless/*`, `@/*`.
 - UUID v7 (`id()`) and ISO UTC timestamps (`when()`) in `source/utils/`.
 
 ## API Conventions
 
 - File naming: `{abstraction}-{action}.ts` (singular), e.g., `job-create.ts`, `service-list.ts`, `job-log-append.ts`.
-- Typed handler pattern: export a domain-aware `handle` plus Netlify `handler` via `withNetlify` (`source/core/platform/netlify.ts`).
+- Typed handler pattern: export a domain-aware `handle` plus Netlify `handler` via `withNetlify` (`source/serverless/lib/netlify.ts`).
 - Standard actions: `create`, `get`, `list`, `update`, `delete`, `append`, `search`.
 - Responses: JSON with `{ data }` on success; `{ error, details? }` on failure; status codes 400/405/422/500 as appropriate.
 - Append-only where required (e.g., job logs).
@@ -61,7 +61,7 @@ pnpm tsc -b
 
 ## Development Tips
 
-- Import domain types from `source/domain`; do not redefine domain entities locally.
+- Import domain types from `source/domain`; do not redefine domain abstractions locally.
 - For new APIs, follow the handler adapter and naming conventions.
 - Keep append-only semantics intact for logs and audit trails.
 - Tests: `pnpm test` (unit), `pnpm test:watch`, `pnpm test:live` (requires `LIVE_BASE_URL` to hit deployed endpoints); fixtures live under `source/tests/fixtures/samples.ts`.

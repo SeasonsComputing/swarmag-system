@@ -1,6 +1,6 @@
 /**
  * Shared types and interfaces used across the swarmAg domain models.
- * These define common data structures for various entities.
+ * These define common data structures for various domain abstractions.
  */
 
 import type { When } from '@utils/datetime'

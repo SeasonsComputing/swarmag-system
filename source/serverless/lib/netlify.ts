@@ -2,11 +2,11 @@
  * Netlify adapter wrapping typed handlers with JSON parsing and error handling.
  */
 
-import  {
-  HttpCodes, 
-  type HttpHeaders, 
-  type ApiRequest,
+import {
+  HttpCodes,
   type ApiHandler,
+  type ApiRequest,
+  type HttpHeaders,
   type HttpMethod,
 } from './api-binding'
 import type {
@@ -25,54 +25,49 @@ export type { HandlerEvent, HandlerResponse }
  * @param headers Optional additional headers to merge.
  * @returns Netlify handler response.
  */
-const jsonResponse = (statusCode: number, body: unknown, headers: HttpHeaders = {}):
+const jsonResponse = (statusCode: number, body: unknown, headers?: HttpHeaders):
   HandlerResponse => ({
     statusCode,
     headers: {
       'content-type': 'application/json',
-      ...headers,
+      ...(headers ?? {}),
     },
     body: JSON.stringify(body),
   })
 
 /**
- * Safely parse a JSON request body string.
- * @template T Parsed payload type.
+ * Parse a JSON request body without throwing.
  * @param body Raw request body.
- * @returns Parsed payload.
- * @throws {Error} When the body is empty or not valid JSON.
+ * @returns Parsed body or an error message when invalid.
  */
-const parseJsonBody = <T,>(body: string | null): T => {
-  if (!body) throw new Error('Empty request body')
+const parseBody = <RequestBody>(body: string | null): { body?: RequestBody; error?: string } => {
+  if (body == null) return {}
   try {
-    return JSON.parse(body) as T
+    return { body: JSON.parse(body) as RequestBody }
   } catch (error) {
-    throw new Error('Invalid JSON body')
+    return { error: (error as Error).message }
   }
 }
 
 /**
  * Adapt a typed API handler to Netlify's `Handler` contract with JSON parsing and error handling.
- * @template Body Request body type.
+ * @template RequestBody Request body type.
  * @template Query Query string type.
- * @template Payload Response payload type.
+ * @template ResponseBody Response body type.
  * @param handle Typed handler to wrap.
  * @returns Netlify handler ready for export.
  */
 export const withNetlify =
-  <Body, Query, Payload>(handle: ApiHandler<Body, Query, Payload>): Handler =>
-    async (event) => {
-      let parsedBody: Body
-
-      try {
-        parsedBody = event.body ? parseJsonBody<Body>(event.body) : (undefined as Body)
-      } catch (error) {
-        return jsonResponse(HttpCodes.badRequest, { error: (error as Error).message })
+  <RequestBody, Query, ResponseBody>(handle: ApiHandler<RequestBody, Query, ResponseBody>): Handler =>
+    async (event: HandlerEvent) => {
+      const { body, error } = parseBody<RequestBody>(event.body)
+      if (error) {
+        return jsonResponse(HttpCodes.badRequest, { error })
       }
 
-      const request: ApiRequest<Body, Query> = {
+      const request: ApiRequest<RequestBody, Query> = {
         method: event.httpMethod as HttpMethod,
-        body: parsedBody,
+        body: body as RequestBody,
         query: (event.queryStringParameters ?? {}) as Query,
         headers: (event.headers ?? {}) as HttpHeaders,
         rawEvent: event,
@@ -80,11 +75,7 @@ export const withNetlify =
 
       try {
         const result = await handle(request)
-        return {
-          statusCode: result.statusCode,
-          headers: { 'content-type': 'application/json', ...result.headers },
-          body: JSON.stringify(result.body),
-        }
+        return jsonResponse(result.statusCode, result.body, result.headers)
       } catch (error) {
         return jsonResponse(HttpCodes.internalError, {
           error: 'Unhandled error',
