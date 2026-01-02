@@ -16,7 +16,9 @@ import {
   type HttpMethod,
 } from './api-binding'
 
-/** Re-export Netlify types for consumers that need the raw event/response shapes. */
+/** 
+ * Re-export Netlify types for consumers that need the raw event/response shapes. 
+ */
 export type { HandlerEvent, HandlerResponse }
 
 /**
