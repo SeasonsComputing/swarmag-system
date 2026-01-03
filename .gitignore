@@ -4,3 +4,9 @@ build
 *.log
 .DS_Store
 *.tsbuildinfo
+.config/
+.branches
+.temp
+.env.keys
+.env.local
+.env.*.local

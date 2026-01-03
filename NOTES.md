@@ -67,6 +67,19 @@ This file summarizes the current baseline so it can be restored after tool reset
 - `project/data-lists.md`
 - `project/user-stories.md`
 
+## Local tooling status
+
+- Netlify CLI installed (requires `XDG_CONFIG_HOME` workaround in this sandbox).
+- Supabase CLI installed at `~/.local/bin/supabase`.
+- `supabase/` initialized in repo.
+- Docker not installed yet (required for local Supabase).
+
+## Pending setup tasks
+
+- Install Docker Engine locally and restart shell for group access.
+- Start local Supabase (`supabase start`) and apply migrations.
+- Create hosted Supabase project for staging and wire `.env.staging`.
+
 ## Working with Ted
 
 - Prefer direct, no-fluff communication and concrete actions.
