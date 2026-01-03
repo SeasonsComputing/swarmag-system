@@ -93,7 +93,7 @@ This file summarizes the current baseline so it can be restored after tool reset
 ## Migration layout
 
 - Supabase CLI reads migrations from `supabase/migrations`.
-- `source/migrations/20241107000000_create_users.sql` copied into `supabase/migrations/`.
+- `supabase/migrations` is a symlink to `source/migrations` to avoid duplication.
 
 ## Working with Ted
 
