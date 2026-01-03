@@ -72,13 +72,28 @@ This file summarizes the current baseline so it can be restored after tool reset
 - Netlify CLI installed (requires `XDG_CONFIG_HOME` workaround in this sandbox).
 - Supabase CLI installed at `~/.local/bin/supabase`.
 - `supabase/` initialized in repo.
-- Docker not installed yet (required for local Supabase).
+- Docker installed; local Supabase started with auth enabled.
+- `.env.local` created with local Supabase URL + keys (gitignored).
+
+## Local dev commands
+
+- Start Supabase (minimal services):  
+  `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor`
+- Reset/apply migrations: `supabase db reset --yes`
+- Show local URLs/keys: `supabase status --output env`
+- Build functions: `pnpm build`
+- Run Netlify dev (sandbox only):  
+  `XDG_CONFIG_HOME=./.config netlify dev`
 
 ## Pending setup tasks
 
-- Install Docker Engine locally and restart shell for group access.
-- Start local Supabase (`supabase start`) and apply migrations.
 - Create hosted Supabase project for staging and wire `.env.staging`.
+- Create Netlify staging site and decide custom domain naming.
+
+## Migration layout
+
+- Supabase CLI reads migrations from `supabase/migrations`.
+- `source/migrations/20241107000000_create_users.sql` copied into `supabase/migrations/`.
 
 ## Working with Ted
 
