@@ -85,6 +85,15 @@ This file summarizes the current baseline so it can be restored after tool reset
 - Run Netlify dev (sandbox only):  
   `XDG_CONFIG_HOME=./.config netlify dev`
 
+## DBeaver local connection
+
+- Host: `127.0.0.1`
+- Port: `54322`
+- Database: `postgres`
+- User: `postgres`
+- Password: `postgres`
+- URL: `postgresql://postgres:postgres@127.0.0.1:54322/postgres`
+
 ## Pending setup tasks
 
 - Create hosted Supabase project for staging and wire `.env.staging`.
@@ -100,3 +109,8 @@ This file summarizes the current baseline so it can be restored after tool reset
 - Prefer direct, no-fluff communication and concrete actions.
 - Emphasize rigorous engineering, architecture quality, and correctness.
 - Keep changes aligned with system conventions and documented standards.
+- Prefer zero warnings across tooling, linting, and builds.
+
+## Recent changes
+
+- Cleaned up markdown lint warnings in `tedvkremer_experience.md` (headings, labels, links).
