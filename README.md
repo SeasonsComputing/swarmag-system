@@ -14,7 +14,7 @@ Architecture, goals, and setup instructions live in `docs/foundation/architectur
 | ------------------------------ | ----------------------------------------------------------- |
 | `docs/`                        | System, architecture, and application specifications        |
 | `source/domain/`               | Canonical domain model (types/interfaces/classes)           |
-| `source/utils/`                | Shared primitives (UUID v7, UTC time)                       |
+| `source/utils/`                | Shared primitives, e.g. datetime & identifier               |
 | `source/serverless/functions/` | Netlify Functions                                           |
 | `source/serverless/lib/`       | Backend platform helpers (Netlify adapter, Supabase client) |
 | `source/migrations/`           | Supabase SQL migrations                                     |
