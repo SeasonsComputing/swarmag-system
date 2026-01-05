@@ -1,5 +1,7 @@
 # swarmAg System
 
+![swarmAg ops logo](swarmag-ops-logo.png)
+
 The swarmAg system supports the administration and operations of the swarmAg agricultural services business. Services fall into two classes—Aerial and Ground—and rely on complex machinery, vehicles, equipment, tools, chemicals, and workflows. Safety, efficiency, repeatability, and performance are first principles, and the system is evaluated against those outcomes. See `https://swarmag.com` for broader context.
 
 This repo is a monorepo for the swarmAg system: SolidJS frontends, Netlify Functions, and a Supabase-backed domain model. The repo focuses first on a typed domain model and API layer, then the Admin, Ops, and Customer apps.
