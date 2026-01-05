@@ -7,7 +7,6 @@ import type {
   HandlerEvent,
   HandlerResponse,
 } from '@netlify/functions'
-
 import {
   HttpCodes,
   type ApiHandler,
