@@ -25,6 +25,7 @@ Last updated: 2026-01-05
 - 2026-01-05: Moved setup/build/test instructions out of `README.md` into `docs/foundation/architecture.md` under a local development quickstart section. README now links to architecture for setup.
 - 2026-01-05: Always number markdown sections and ensure markdown files are free of lint warnings (e.g., table alignment).
 - 2026-01-05: Added markdownlint config and ignore list, fixed a bare URL and table alignment in `docs/history/swarmag-ops-meta-prompt.md`, and verified markdownlint passes.
+- 2026-01-05: Moved API handler conventions and validation rules into `docs/foundation/architecture.md` section 6, and kept the API surface summary in `docs/foundation/domain.md` section 1.8.
 
 ## 0.2 Conversation summary template
 

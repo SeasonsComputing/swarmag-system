@@ -77,18 +77,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - `Author.role` stores the attribution role id from `AUTHOR_ATTRIBUTION_ROLES`; UI should render the label from that catalog and never collect arbitrary text.
 - If a context does not supply a meaningful attribution role, omit it rather than prompting the user for input.
 
-## 2. API Functions (`source/serverless/functions/*`)
-
-### 2.1 Scope
-
-Functions that expose the domain model over HTTP, persisted in Supabase, and typed with `source/domain`. Each function:
-
-- `source/serverless/functions` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints
-- Uses the `{abstraction}-{action}.ts` naming convention with singular-tense abstractions.
-- Parses and validates JSON requests against domain types.
-- Returns JSON responses with a consistent envelope and status codes.
-
-### 2.2 Standard actions by abstraction
+### 1.8 API surface summary
 
 | Abstraction       | Actions                                                                                  | Notes                                                                                  |
 | ----------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
@@ -103,23 +92,4 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 | Contact           | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete`      | People tied to customers                                                               |
 | Optional          | `*-search`                                                                               | Richer filtering when needed                                                           |
 
-### 2.3 Handler pattern
-
-| Item      | Detail                                                                                                                                                                                          |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Exports   | Each file default-exports the Netlify `handler = withNetlify(handle)` from `source/serverless/lib/netlify.ts`; keep per-abstraction mapping helpers in `*-mapping.ts` for DB/domain conversion. |
-| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody> \| Promise<ApiResponse<ResponseBody>>`                                                                              |
-| Request   | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event.                                                                                                        |
-| Response  | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`.                                                                                                           |
-| Imports   | Only import domain types from `source/domain`; do not redefine domain abstractions locally.                                                                                                     |
-
-### 2.4 Validation and errors
-
-| Area         | Behavior                                                                                                 |
-| ------------ | -------------------------------------------------------------------------------------------------------- |
-| Methods      | Reject unsupported HTTP methods with `HttpCodes.methodNotAllowed` (405).                                 |
-| Parsing      | Invalid/missing JSON -> `HttpCodes.badRequest` (400).                                                    |
-| Semantics    | Shape/domain validation failures -> `HttpCodes.unprocessableEntity` (422).                               |
-| Persistence  | Supabase/unknown failures -> `HttpCodes.internalError` (500); do not leak stacks.                        |
-| Responses    | Always JSON; success `{ data: ... }`; failure `{ error, details? }`.                                     |
-| Immutability | Use `append` actions for append-only resources (e.g., job logs); avoid in-place mutation where required. |
+API handler conventions and validation rules live in `docs/foundation/architecture.md`.

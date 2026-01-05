@@ -53,7 +53,36 @@ Canonical domain definitions and rules live in `docs/foundation/domain.md`.
 ## 6. API design
 
 Netlify Functions for REST, Supabase Edge Functions for async workflows. API files live under `source/serverless/functions/*`, default-export Netlify handlers wrapped with `withNetlify`, and use per-abstraction mapping helpers (e.g., `user-mapping.ts`) to convert between domain models and Supabase row shapes.
-API conventions and handler rules live in `docs/foundation/domain.md`.
+
+### 6.1 API conventions
+
+Functions that expose the domain model over HTTP, persisted in Supabase, and typed with `source/domain`. Each function:
+
+- `source/serverless/functions` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints.
+- Uses the `{abstraction}-{action}.ts` naming convention with singular-tense abstractions.
+- Parses and validates JSON requests against domain types.
+- Returns JSON responses with a consistent envelope and status codes.
+
+### 6.2 Handler pattern
+
+| Item      | Detail                                                                                                                                                                                          |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exports   | Each file default-exports the Netlify `handler = withNetlify(handle)` from `source/serverless/lib/netlify.ts`; keep per-abstraction mapping helpers in `*-mapping.ts` for DB/domain conversion. |
+| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody> \| Promise<ApiResponse<ResponseBody>>`                                                                              |
+| Request   | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event.                                                                                                        |
+| Response  | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`.                                                                                                           |
+| Imports   | Only import domain types from `source/domain`; do not redefine domain abstractions locally.                                                                                                     |
+
+### 6.3 Validation and errors
+
+| Area         | Behavior                                                                                                 |
+| ------------ | -------------------------------------------------------------------------------------------------------- |
+| Methods      | Reject unsupported HTTP methods with `HttpCodes.methodNotAllowed` (405).                                 |
+| Parsing      | Invalid/missing JSON -> `HttpCodes.badRequest` (400).                                                    |
+| Semantics    | Shape/domain validation failures -> `HttpCodes.unprocessableEntity` (422).                               |
+| Persistence  | Supabase/unknown failures -> `HttpCodes.internalError` (500); do not leak stacks.                        |
+| Responses    | Always JSON; success `{ data: ... }`; failure `{ error, details? }`.                                     |
+| Immutability | Use `append` actions for append-only resources (e.g., job logs); avoid in-place mutation where required. |
 
 ## 7. Coding conventions & UI
 
