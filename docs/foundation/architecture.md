@@ -6,6 +6,7 @@ The definitive architecture document for the swarmAg System.
 
 The **swarmAg System** is composed of SolidJS web and mobile applications orchestrated via a serverless api (functions backend).
 It supports administration, operations workflows & logs, and customer-facing features for agricultural services that involve regulated chemicals and industrial equipment.
+The system focuses on two service classes—Aerial and Ground—and the workflows, assets, and regulated chemicals required to deliver them safely and repeatably. Quality is measured against safety, efficiency, repeatability, and performance.
 
 ## 2. Core Platforms
 
@@ -52,10 +53,12 @@ Canonical domain definitions and rules live in `docs/foundation/domain.md`.
 ## 6. API design
 
 Netlify Functions for REST, Supabase Edge Functions for async workflows. API files live under `source/serverless/functions/*`, default-export Netlify handlers wrapped with `withNetlify`, and use per-abstraction mapping helpers (e.g., `user-mapping.ts`) to convert between domain models and Supabase row shapes.
+API conventions and handler rules live in `docs/foundation/domain.md`.
 
 ## 7. Coding conventions & UI
 
 TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS
+See `docs/foundation/style-guide.md` for compiler settings, aliases, and code style rules.
 
 ## 8. Namespace dependencies
 
@@ -90,6 +93,33 @@ This section outlines the monorepo structure and its primary dependency flow; se
 - Migrations live in `source/migrations/` and are applied by the deploy pipeline (GitHub Actions or Netlify build step), not by serverless functions.
 - The build runner connects directly to Supabase/Postgres using elevated credentials (service role or DB URL) and runs the migration tool (Supabase CLI or `psql`).
 - Production deploys run migrations; preview/staging should avoid schema changes unless explicitly intended.
+
+### 9.2 Local development quickstart
+
+Requirements:
+
+- Node 18+
+- pnpm (`npm install -g pnpm`)
+
+Setup and build:
+
+```bash
+pnpm install
+pnpm tsc -b
+```
+
+Tests:
+
+```bash
+pnpm test
+pnpm test:watch
+```
+
+Live smoke tests (requires a deployed base URL):
+
+```bash
+LIVE_BASE_URL=https://<env> pnpm test:live
+```
 
 ## 10. Environment variables
 

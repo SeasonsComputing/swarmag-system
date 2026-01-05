@@ -14,7 +14,7 @@ You are a software architect ensuring the project is completed according to cont
 
 ## Purpose
 
-This is a system to support the administration and operations of an agricultural services start-up. Scan the site https://swarmag.com for an understanding of the start-up.
+This is a system to support the administration and operations of an agricultural services start-up. Scan the site [https://swarmag.com](https://swarmag.com) for an understanding of the start-up.
 
 Key points: essentially 2 classes of services: aerial services and ground services. Services employ expensive and complex machinery, vehicles, equipment, tools, chemicals, and workflows. Safety, efficiency, repeatability, and performance are underlying first principles of the services. The system quality is measured against these principles.
 
@@ -149,9 +149,9 @@ A domain-specialized REST API and abstractions commensurate for the Domain Model
 
 Monorepo.
 
-| Package              | Type         | Endpoint          |
-|----------------------|--------------|-------------------|
-| swarmag-system-ops   | Mobile PWA   | ops.swarmag.com   |
+| Package                 | Type         | Endpoint          |
+| ----------------------- | ------------ | ----------------- |
+| swarmag-system-ops      | Mobile PWA   | ops.swarmag.com   |
 | swarmag-system-admin    | Desktop PWA  | admin.swarmag.com |
 | swarmag-system-customer | Website      | me.swarmag.com    |
 | swarmag-system-backend  | REST Service | api.swarmag.com   |

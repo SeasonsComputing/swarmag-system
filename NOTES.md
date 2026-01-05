@@ -21,6 +21,10 @@ Last updated: 2026-01-05
   - The preferred doc layout is: `README.md` (start + roadmap), `docs/foundation/architecture.md` (platform + system + SDK conventions), `docs/foundation/domain.md` (domain rules), app briefs, `docs/foundation/style-guide.md`, `docs/foundation/data-lists.md`, `docs/applications/user-stories.md`, `NOTES.md` (working log).
   - Moved the historical seed prompt to `docs/history/swarmag-ops-meta-prompt.md` and marked it non-authoritative.
 - 2026-01-05: Documentation structure refined into `docs/foundation/` and `docs/applications/`, with `docs/history/` for provenance. Updated all references and README summary accordingly.
+- 2026-01-05: README trimmed to be a start-here entry point. Moved domain notes into `docs/foundation/domain.md`, added links from `docs/foundation/architecture.md` to domain and style guide, and kept only minimal quickstart commands in README.
+- 2026-01-05: Moved setup/build/test instructions out of `README.md` into `docs/foundation/architecture.md` under a local development quickstart section. README now links to architecture for setup.
+- 2026-01-05: Always number markdown sections and ensure markdown files are free of lint warnings (e.g., table alignment).
+- 2026-01-05: Added markdownlint config and ignore list, fixed a bare URL and table alignment in `docs/history/swarmag-ops-meta-prompt.md`, and verified markdownlint passes.
 
 ## 0.2 Conversation summary template
 
