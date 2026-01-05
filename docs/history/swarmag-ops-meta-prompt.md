@@ -1,7 +1,6 @@
 # swarmAg System - Meta Architecture Prompt
 
-_This is the original meta prompt used to initiate the system design and project plan located in
-project/_
+_Historical seed prompt used to initiate the system design. This document is not authoritative; see `docs/foundation/architecture.md` and `docs/foundation/domain.md` for canonical guidance._
 
 Domain & system meta-gen-AI prompt to create an architecture.md gen-AI prompt to generate the software foundation.
 

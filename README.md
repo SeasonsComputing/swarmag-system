@@ -20,7 +20,7 @@ pnpm tsc -b
 
 | Path             | Description                                                         |
 | ---------------- | ------------------------------------------------------------------- |
-| `project/`       | Architecture, orchestration, domain, and user story docs            |
+| `docs/`       | Foundation + applications docs, plus history                        |
 | `source/domain/` | Canonical domain model (types/interfaces/classes)                   |
 | `source/utils/`  | Shared primitives (UUID v7, UTC time)                               |
 | `source/serverless/functions/` | Netlify Functions                                               |
@@ -47,17 +47,43 @@ pnpm tsc -b
 
 - Attachments carry a `kind` (`photo` | `video` | `map` | `document`).
 - `Customer.contacts` is non-empty and `primaryContactId` lives on `Customer`.
-- Asset types are data records (`AssetType`) referenced by `Asset.type` and `Service.requiredAssetTypes` and curated in `project/data-lists.md`.
+- Asset types are data records (`AssetType`) referenced by `Asset.type` and `Service.requiredAssetTypes` and curated in `docs/foundation/data-lists.md`.
 - Locations store coordinates/addresses without a `source` field.
+
+## Roadmap (Current Project State)
+
+1. Foundation — domain types + initial APIs.
+2. Admin Web App — dashboards, scheduling, catalog administration.
+3. Ops Mobile App — offline-first field workflows and job logging.
+4. Customer Portal — read-only job visibility.
 
 ## Documentation
 
-- Architecture: `project/architecture.md`
-- Orchestration (phase sequencing): `project/orchestration.md`
-- Domain model & API conventions: `project/domain.md`
-- User stories: `project/user-stories.md`
-- App-specific briefs: `project/admin-web-app.md`, `project/ops-mobile-app.md`, `project/customer-portal.md`
-- Data lists (services, asset types): `project/data-lists.md`
+- Architecture (canonical platform/system doc): `docs/foundation/architecture.md`
+- Domain model & API conventions: `docs/foundation/domain.md`
+- User stories: `docs/applications/user-stories.md`
+- App-specific briefs: `docs/applications/admin-web-app.md`, `docs/applications/ops-mobile-app.md`, `docs/applications/customer-portal.md`
+- Data lists (services, asset types): `docs/foundation/data-lists.md`
+
+## Docs Index
+
+Foundation:
+
+- `docs/foundation/architecture.md`
+- `docs/foundation/domain.md`
+- `docs/foundation/data-lists.md`
+- `docs/foundation/style-guide.md`
+
+Applications:
+
+- `docs/applications/user-stories.md`
+- `docs/applications/admin-web-app.md`
+- `docs/applications/ops-mobile-app.md`
+- `docs/applications/customer-portal.md`
+
+History:
+
+- `docs/history/swarmag-ops-meta-prompt.md`
 
 ## Development Tips
 

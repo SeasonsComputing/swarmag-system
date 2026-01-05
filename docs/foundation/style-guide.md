@@ -2,7 +2,7 @@
 
 Working norms inferred from the current `serverless/functions/`, `domain/`, and `utils/` sources.
 
-## Language & Tooling
+## 1. Language & Tooling
 
 | Item     | Guideline                                                       |
 | -------- | --------------------------------------------------------------- |
@@ -11,7 +11,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers |
 | Encoding | ASCII only; no non-ASCII literals                               |
 
-## Imports & Organization
+## 2. Imports & Organization
 
 | Item     | Guideline                                                          |
 | -------- | ------------------------------------------------------------------ |
@@ -19,7 +19,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | Ordering | Domain -> utils -> serverless lib; use `import type` where helpful |
 | Exports  | Default export only for Netlify `handler`; prefer named exports    |
 
-## Domain Modeling (`source/domain/*`)
+## 3. Domain Modeling (`source/domain/*`)
 
 | Item         | Guideline                                                |
 | ------------ | -------------------------------------------------------- |
@@ -28,7 +28,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | Primitives   | Reuse `ID` (UUID v7 string) and `When` (ISO 8601 string) |
 | Payloads     | JSON-serializable only; no methods on domain objects     |
 
-## Utilities (`source/utils/*`)
+## 4. Utilities (`source/utils/*`)
 
 | Item          | Guideline                                      |
 | ------------- | ---------------------------------------------- |
@@ -36,7 +36,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | datetime.ts   | UTC ISO via `when()`; validate with `isWhen()` |
 | Scope         | Keep utilities focused and dependency-light    |
 
-## API Functions (`source/serverless/functions/*`)
+## 5. API Functions (`source/serverless/functions/*`)
 
 | Item       | Guideline                                                                                                                                                       |
 | ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -51,7 +51,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | JSON       | Always JSON; `withNetlify` sets headers and wraps errors                                                                                                        |
 | Mapping    | Keep per-abstraction mapping helpers (e.g., `user-mapping.ts`) to convert between domain shapes and Supabase rows instead of ad hoc column maps in each handler |
 
-## Error Handling
+## 6. Error Handling
 
 | Item    | Guideline                                                        |
 | ------- | ---------------------------------------------------------------- |
@@ -59,7 +59,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | Server  | Persistence/unknown -> `HttpCodes.internalError`; safe `details` |
 | Control | Do not throw past `withNetlify`; return `ApiResponse`            |
 
-## Pagination
+## 7. Pagination
 
 | Item    | Guideline                                            |
 | ------- | ---------------------------------------------------- |
@@ -67,14 +67,14 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | Cursor  | Default 0; non-negative only                         |
 | Helpers | Use `Supabase.clampLimit` and `Supabase.parseCursor` |
 
-## Commenting Style
+## 8. Commenting Style
 
 | Item   | Guideline                                              |
 | ------ | ------------------------------------------------------ |
 | JSDoc  | Single-sentence JSDoc on exports, ending with a period |
 | Inline | Add only when logic is non-obvious                     |
 
-## Naming & Data Shapes
+## 9. Naming & Data Shapes
 
 | Item      | Guideline                                                        |
 | --------- | ---------------------------------------------------------------- |

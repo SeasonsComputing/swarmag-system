@@ -7,21 +7,21 @@ The definitive architecture document for the swarmAg System.
 The **swarmAg System** is composed of SolidJS web and mobile applications orchestrated via a serverless api (functions backend).
 It supports administration, operations workflows & logs, and customer-facing features for agricultural services that involve regulated chemicals and industrial equipment.
 
-### Core Platforms
+## 2. Core Platforms
 
 - **Netlify** — frontends, functions compute, DNS, SSL
 - **Supabase** — Postgres, Auth, Storage, Realtime
 - **GitHub Actions** — CI/CD
 - **SolidJS + TanStack + Kobalte + vanilla CSS** — UI platform
 
-## 2. Goals, constraints, and guiding principles
+## 3. Goals, constraints, and guiding principles
 
 - Offline-Capable PWA
 - Append-only logs
 - Zero-cost infrastructure
 - TypeScript ontology
 
-## 3. System overview
+## 4. System overview
 
 Components: Ops PWA, Admin Portal, Customer Portal, API Functions, Supabase Data.
 
@@ -44,21 +44,22 @@ Components: Ops PWA, Admin Portal, Customer Portal, API Functions, Supabase Data
             └──────────────────┘
 ```
 
-## 4. Domain model summary
+## 5. Domain model summary
 
 Abstractions: Service, Asset, Chemical, Workflow, JobAssessment, JobPlan, JobLog, Customer, Contact.
+Canonical domain definitions and rules live in `docs/foundation/domain.md`.
 
-## 5. API design
+## 6. API design
 
 Netlify Functions for REST, Supabase Edge Functions for async workflows. API files live under `source/serverless/functions/*`, default-export Netlify handlers wrapped with `withNetlify`, and use per-abstraction mapping helpers (e.g., `user-mapping.ts`) to convert between domain models and Supabase row shapes.
 
-## 6. Coding conventions & UI
+## 7. Coding conventions & UI
 
 TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS
 
-## 7. Namespace dependencies
+## 8. Namespace dependencies
 
-This section outlines the monorepo structure and its primary dependency flow; see `orchestration.md` for phase-specific details.
+This section outlines the monorepo structure and its primary dependency flow; see `README.md` for the project roadmap.
 
 ```text
                ╭─────────╮
@@ -77,20 +78,20 @@ This section outlines the monorepo structure and its primary dependency flow; se
                ╰─────────╯
 ```
 
-## 8. Build, CI/CD, Deployment
+## 9. Build, CI/CD, Deployment
 
 - GitHub Actions for CI/CD.
 - Netlify for builds and deploys.
 - Supabase for schema, data, auth, and storage.
 - TypeScript compiler set to `module: ESNext` with `moduleResolution: bundler` so imports and aliases match the bundler/runtime behavior.
 
-### 8.1 Database migrations
+### 9.1 Database migrations
 
 - Migrations live in `source/migrations/` and are applied by the deploy pipeline (GitHub Actions or Netlify build step), not by serverless functions.
 - The build runner connects directly to Supabase/Postgres using elevated credentials (service role or DB URL) and runs the migration tool (Supabase CLI or `psql`).
 - Production deploys run migrations; preview/staging should avoid schema changes unless explicitly intended.
 
-## 9. Environment variables
+## 10. Environment variables
 
 At minimum:
 
@@ -98,18 +99,18 @@ At minimum:
 - Netlify: auth token, site IDs for each app.
 - Optional: Mapbox or similar mapping API key.
 
-## 10. Offline model (Ops PWA)
+## 11. Offline model (Ops PWA)
 
 - IndexedDB cache.
 - Append-only queue of operations.
 - Background sync via Service Worker.
 
-## 11. Map pipeline
+## 12. Map pipeline
 
 - Files uploaded to Supabase Storage.
 - Edge Function processes metadata/derivatives.
 
-## 12. Document storage
+## 13. Document storage
 
 - Supabase Storage buckets serve as the shared document store for manuals, job maps, photos, and other binary assets referenced via the `Attachment` domain type.
 - Domain abstractions only persist attachment metadata (filename, uploader, URL, timestamps) while the files live in storage.
@@ -117,27 +118,27 @@ At minimum:
 - Retention: production buckets keep files indefinitely with lifecycle rules for temporary uploads; preview/staging buckets auto-expire after 30 days.
 - Access: Netlify Functions broker signed URLs for uploads/downloads, while Supabase RLS ensures only authorized users can request those URLs.
 
-## 13. Security & compliance
+## 14. Security & compliance
 
 - JWT-based auth (Supabase).
 - Row Level Security (RLS) on all key tables.
 - Immutable JobLogs with retention policies.
 
-## 14. Observability
+## 15. Observability
 
 - Telemetry into Supabase (or equivalent).
 - Error tracking with a service such as Sentry.
 
-## 15. MVP roadmap
+## 16. MVP roadmap
 
 - Foundation → Admin Portal → Ops PWA → Customer Portal
 
-## 16. Compliance & safety
+## 17. Compliance & safety
 
 - Digital checklists.
 - Geotagged logs as needed.
 
-## 17. Implementation recommendations
+## 18. Implementation recommendations
 
 - Stateless functions.
 - Schema validation at boundaries.

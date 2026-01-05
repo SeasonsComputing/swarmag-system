@@ -2,9 +2,9 @@
 
 Canonical lists used to seed and align catalog data (services, asset types). Service SKUs and asset types should stay in sync with `source/domain` and any persisted records.
 
-## Services
+## 1. Services
 
-## Aerial Drone Services
+## 2. Aerial Drone Services
 
 | Description                    | Equipment | SKU        |
 | ------------------------------ | --------- | ---------- |
@@ -17,7 +17,7 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 | Mesquite Herbicide             | XAG P150  | A-CHEM-04  |
 | Commercial Greenhouse Painting | DJI T30   | A-PAINT-01 |
 
-## Ground Machinery Services
+## 3. Ground Machinery Services
 
 | Description                        | Equipment            | SKU        |
 | ---------------------------------- | -------------------- | ---------- |
@@ -26,7 +26,7 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 | Rock Removal, Regrade              | Skidsteer, Toolcat   | G-MACH-01  |
 | Brush Hogging                      | Skidsteer, Toolcat   | G-BRUSH-01 |
 
-## Asset Types
+## 4. Asset Types
 
 | Description             |
 | ----------------------- |
@@ -40,7 +40,7 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 | Drone Spray Tank        |
 | Drone Granular Hopper   |
 
-## Author Attribution Roles
+## 5. Author Attribution Roles
 
 Curated roles used for authorship/attribution (`Author.role` in the domain). These should stay in sync with `AUTHOR_ATTRIBUTION_ROLES` in `source/domain/common.ts`.
 
