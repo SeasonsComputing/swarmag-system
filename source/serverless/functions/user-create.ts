@@ -71,7 +71,7 @@ const handle = async (
     createdAt: now,
     updatedAt: now,
     deletedAt: undefined,
-}
+  }
 
   const { error } = await Supabase.client()
     .from('users')
