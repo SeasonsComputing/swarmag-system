@@ -1,6 +1,6 @@
 # swarmAg System - Working Notes
 
-Last updated: 2026-01-05
+Last updated: 2026-01-06
 
 ## 0. Purpose
 
@@ -153,3 +153,4 @@ This file summarizes the current baseline so it can be restored after tool reset
 ## 15. Recent changes
 
 - Cleaned up markdown lint warnings in `tedvkremer-experience.md` (headings, labels, links).
+- 2026-01-06: `source/serverless/lib/netlify.ts` saw a large expansion in commit `b8d0b23` (CORS config + headers, request body parsing with size limits and content-type validation, query/header normalization, error serialization, standardized responses, and richer JSDoc). Related changes: `source/serverless/lib/api-binding.ts` added `isHttpMethod` and `payloadTooLarge (413)`, and `docs/foundation/style-guide.md` tightened JSDoc expectations. Follow-up note: the most recent edit here was only a small JSDoc addition; runtime logic is already covered by the earlier expansion.
