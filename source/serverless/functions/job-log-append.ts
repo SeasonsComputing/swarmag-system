@@ -4,7 +4,7 @@
 
 import { type ID, id } from '@utils/identifier'
 import { type When, when } from '@utils/datetime'
-import type { JobLogEntry, JobLogType } from '@domain/job'
+import type { JobLogEntry, JobLogPayload, JobLogType } from '@domain/job'
 import type { Attachment, Author, Location } from '@domain/common'
 import {
   HttpCodes,
@@ -22,7 +22,7 @@ interface JobLogBody {
   message: string
   location?: Location
   attachments?: Attachment[]
-  payload?: Record<string, unknown>
+  payload?: JobLogPayload
   createdBy: Author
   occurredAt?: When
 }

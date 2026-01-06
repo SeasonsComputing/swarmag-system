@@ -74,6 +74,9 @@ export type JobLogType =
   | 'telemetry'
   | 'exception'
 
+/** Payload for job log entries. */
+export type JobLogPayload = Record<string, unknown>
+
 /** Represents a log entry for a job, such as status updates or telemetry. */
 export interface JobLogEntry {
   id: ID
@@ -86,7 +89,7 @@ export interface JobLogEntry {
   createdBy: Author
   location?: Location
   attachments?: Attachment[]
-  payload?: Record<string, unknown>
+  payload?: JobLogPayload
 }
 
 /** Represents a job in the system. */
