@@ -9,7 +9,17 @@ export type HttpHeaders = Record<string, string>
 export type HttpQuery = Record<string, string>
 
 /** HTTP method for Netlify actions. */
-export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+const HttpMethodSet = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const
+export type HttpMethod = typeof HttpMethodSet[number]
+
+/**
+ * Type guard for supported HTTP method strings.
+ * @param value Raw value to validate HTTP method.
+ * @returns True when value is a supported HTTP method.
+ */
+export function isHttpMethod(value: string): value is HttpMethod {
+  return (HttpMethodSet as readonly string[]).includes(value)
+}
 
 /** HTTP response codes for Netlify REST calls. */
 export const HttpCodes = {
@@ -19,6 +29,7 @@ export const HttpCodes = {
   badRequest: 400,
   notFound: 404,
   methodNotAllowed: 405,
+  payloadTooLarge: 413,
   unprocessableEntity: 422,
   internalError: 500,
 } as const

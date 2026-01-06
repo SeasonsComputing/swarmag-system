@@ -71,7 +71,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 
 | Item   | Guideline                                              |
 | ------ | ------------------------------------------------------ |
-| JSDoc  | Single-sentence JSDoc on exports, ending with a period |
+| JSDoc  | JSDoc on exports with a one-sentence summary plus @param/@returns (and @throws when relevant), ending sentences with periods |
 | Inline | Add only when logic is non-obvious                     |
 
 ## 9. Naming & Data Shapes
