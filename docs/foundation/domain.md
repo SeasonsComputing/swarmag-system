@@ -73,7 +73,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 ### 1.7 Roles & attribution
 
 - User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `source/domain/common.ts`; `User.roles` is an array so a user may hold multiple memberships.
-- Attribution uses curated roles, not free text: `AUTHOR_ATTRIBUTION_ROLES` in `source/domain/common.ts` lists role ids/labels and the contexts they apply to (e.g., `assessment-lead`, `crew-lead`, `gis-analyst`, `field-tech`, `fleet-manager`, `account-executive`).
+- Attribution uses curated roles, not free text: `AUTHOR_ATTRIBUTION_ROLES` in `source/domain/common.ts` lists role ids/labels and the contexts they apply to (e.g., `assessment-lead`, `crew-lead`, `field-tech`, `fleet-manager`, `account-executive`).
 - `Author.role` stores the attribution role id from `AUTHOR_ATTRIBUTION_ROLES`; UI should render the label from that catalog and never collect arbitrary text.
 - If a context does not supply a meaningful attribution role, omit it rather than prompting the user for input.
 

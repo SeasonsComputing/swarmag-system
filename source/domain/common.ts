@@ -29,7 +29,6 @@ export const AUTHOR_ATTRIBUTION_ROLES = [
   { id: 'crew-lead', label: 'Crew Lead', contexts: ['job-plan', 'job-log'] },
   { id: 'field-tech', label: 'Field Tech', contexts: ['job-log', 'asset'] },
   { id: 'fleet-manager', label: 'Fleet Manager', contexts: ['asset'] },
-  { id: 'gis-analyst', label: 'GIS Analyst', contexts: ['job-assessment', 'job-log'] },
 ] as const satisfies ReadonlyArray<{
   id: string
   label: string

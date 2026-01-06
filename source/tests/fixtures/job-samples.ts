@@ -61,7 +61,7 @@ export const ranchMappingAssessment: JobAssessment = {
         id: id(),
         displayName: 'Priya Mehta',
         roles: ['operations'],
-        role: 'gis-analyst',
+        role: 'field-tech',
       },
     },
   ],

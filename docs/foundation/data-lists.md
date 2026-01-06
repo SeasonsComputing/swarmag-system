@@ -51,4 +51,3 @@ Curated roles used for authorship/attribution (`Author.role` in the domain). The
 | crew-lead         | Crew Lead         | job-plan, job-log       |
 | field-tech        | Field Tech        | job-log, asset          |
 | fleet-manager     | Fleet Manager     | asset                   |
-| gis-analyst       | GIS Analyst       | job-assessment, job-log |
