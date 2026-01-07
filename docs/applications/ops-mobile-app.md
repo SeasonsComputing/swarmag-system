@@ -81,3 +81,4 @@ In `src/features/workflows/WorkflowRunner.tsx`:
 2. Implement a minimal navigation and layout.
 3. Create `WorkflowRunner` with a small, in-memory sample workflow.
 4. Add a basic in-memory JobLog store and wire it into `WorkflowRunner`.
+

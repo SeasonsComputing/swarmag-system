@@ -83,3 +83,4 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | Clarity   | Use domain-specific names (e.g., `JobAssessment`, `JobLogEntry`) |
 | Enums     | String unions for enums (e.g., `JobStatus`, `JobLogType`)        |
 | Optionals | Mark optional fields with `?`; handle defaults in handlers       |
+

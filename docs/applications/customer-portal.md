@@ -73,3 +73,4 @@ All data shapes should map to domain types for jobs and job summaries.
 1. Scaffold the Customer app shell.
 2. Implement the passwordless login UI (with stub backend).
 3. Implement a simple read-only job list and job summary page using placeholder data, then later wire to real read-only APIs.
+

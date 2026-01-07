@@ -10,6 +10,14 @@ Last updated: 2026-01-06
 
 ## 0.1 Conversation summaries
 
+- 2026-01-06: Authority rules and session hygiene updates.
+
+  | Item | Details |
+  | ---- | ------- |
+  | Authority | Created `AUTHORITY.md`, refined rules (class usage, conflict order, doc table/list preference, no new patterns), and added domain → API → apps sequencing. |
+  | Docs | Added “Software Construction Sessions” prompt to `README.md` and switched the file ingest list to an ordered list. |
+  | History | Rewrote recent commit messages via interactive rebase and force-pushed updated history. |
+
 - 2026-01-05: Doc refactor alignment. We agreed the docs were strong but scattered, and that the system is best framed as four products (SDK, Admin, Ops, Customer) plus a platform/architecture layer. Decisions:
   - Keep `NOTES.md` as the agent handoff and institutional memory log; it should be comprehensive, not minimal, and include summaries of our conversations.
   - Retire `docs/orchestration.md` and move phase sequencing/roadmap into `README.md` (README is the "current state" entry point).
@@ -154,3 +162,4 @@ This file summarizes the current baseline so it can be restored after tool reset
 
 - Cleaned up markdown lint warnings in `tedvkremer-experience.md` (headings, labels, links).
 - 2026-01-06: `source/serverless/lib/netlify.ts` saw a large expansion in commit `b8d0b23` (CORS config + headers, request body parsing with size limits and content-type validation, query/header normalization, error serialization, standardized responses, and richer JSDoc). Related changes: `source/serverless/lib/api-binding.ts` added `isHttpMethod` and `payloadTooLarge (413)`, and `docs/foundation/style-guide.md` tightened JSDoc expectations. Follow-up note: the most recent edit here was only a small JSDoc addition; runtime logic is already covered by the earlier expansion.
+

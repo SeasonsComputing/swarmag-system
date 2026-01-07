@@ -93,3 +93,4 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 | Optional          | `*-search`                                                                               | Richer filtering when needed                                                           |
 
 API handler conventions and validation rules live in `docs/foundation/architecture.md`.
+

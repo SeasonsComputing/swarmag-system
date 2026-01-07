@@ -69,3 +69,4 @@ In `src/features/services/`:
 - Implement `src/main.tsx` and `src/routes/App.tsx` with:
   - A basic layout (header + main area).
   - Navigation between key sections (Services, Assets, Chemicals, Jobs, Customers).
+
