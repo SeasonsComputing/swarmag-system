@@ -10,3 +10,4 @@ build
 .env.keys
 .env.local
 .env.*.local
+.netlify

@@ -119,7 +119,7 @@ This file summarizes the current baseline so it can be restored after tool reset
   `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor`
 - Reset/apply migrations: `supabase db reset --yes`
 - Show local URLs/keys: `supabase status --output env`
-- Build functions: `pnpm build`
+- Check TypeScript: `deno task check`
 - Run Netlify dev (sandbox only):  
   `XDG_CONFIG_HOME=./.config netlify dev`
 

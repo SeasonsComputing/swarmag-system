@@ -1,0 +1,14 @@
+{
+  "imports": {
+    "@domain/": "./source/domain/",
+    "@utils/": "./source/utils/",
+    "@serverless/": "./source/serverless/"
+  },
+  "tasks": {
+    "check": "deno check source/**/*.ts",
+    "test": "deno test --allow-env --allow-net --allow-read source/tests",
+    "lint": "deno lint source && deno task lint:md",
+    "lint:md": "deno run --allow-read npm:markdownlint-cli2@0.13.0 \"**/*.md\" \"!node_modules/**\"",
+    "fmt": "deno fmt source docs"
+  }
+}

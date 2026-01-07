@@ -2,7 +2,7 @@
  * Barrel export for shared test fixtures.
  */
 
-export * from './assets-samples'
-export * from './common-samples'
-export * from './customer-samples'
-export * from './job-samples'
+export * from './assets-samples.ts'
+export * from './common-samples.ts'
+export * from './customer-samples.ts'
+export * from './job-samples.ts'

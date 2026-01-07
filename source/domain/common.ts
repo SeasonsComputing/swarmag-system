@@ -3,8 +3,8 @@
  * These define common data structures for various domain abstractions.
  */
 
-import type { When } from '@utils/datetime'
-import type { ID } from '@utils/identifier'
+import type { When } from '@utils/datetime.ts'
+import type { ID } from '@utils/identifier.ts'
 
 /** Allowed role memberships for users. */
 export const USER_ROLES = [

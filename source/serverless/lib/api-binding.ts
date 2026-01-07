@@ -1,15 +1,23 @@
 /**
- * Shared API binding types and HTTP codes used by Netlify adapters.
+ * Shared API binding types and HTTP codes used by adapters.
  */
 
-/** HTTP header map for Netlify responses/requests. */
+/** HTTP header map for responses/requests. */
 export type HttpHeaders = Record<string, string>
 
-/** HTTP query map for Netlify responses/requests. */
+/** HTTP query map for responses/requests. */
 export type HttpQuery = Record<string, string>
 
-/** HTTP method for Netlify actions. */
-const HttpMethodSet = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const
+/** HTTP method for API handlers. */
+const HttpMethodSet = [
+  'GET',
+  'POST',
+  'PUT',
+  'PATCH',
+  'DELETE',
+  'OPTIONS',
+  'HEAD',
+] as const
 export type HttpMethod = typeof HttpMethodSet[number]
 
 /**
@@ -35,7 +43,7 @@ export const HttpCodes = {
 } as const
 
 /**
- * Typed Netlify request wrapper passed into API handlers.
+ * Typed request wrapper passed into API handlers.
  * @template RequestBody Request body type.
  * @template Query Query string type.
  */
@@ -44,7 +52,7 @@ export interface ApiRequest<Body = unknown, Query = HttpQuery, Headers = HttpHea
   body: Body
   query: Query
   headers: Headers
-  rawEvent: unknown
+  rawRequest: Request
 }
 
 /**

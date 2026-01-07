@@ -2,8 +2,8 @@
  * Mappers for converting between Supabase user rows and domain Users.
  */
 
-import type { User } from '@domain/common'
-import type { Row } from '@serverless/lib/db-binding'
+import type { User } from '@domain/common.ts'
+import type { Row } from '@serverless/lib/db-binding.ts'
 
 /**
  * Type guard for accepted user status values.

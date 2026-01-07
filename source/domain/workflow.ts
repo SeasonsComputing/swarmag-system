@@ -3,9 +3,9 @@
  * Workflows define the steps for executing services.
  */
 
-import type { ID } from '@utils/identifier'
-import type { When } from '@utils/datetime'
-import type { Location, Note, Question } from './common'
+import type { ID } from '@utils/identifier.ts'
+import type { When } from '@utils/datetime.ts'
+import type { Location, Note, Question } from './common.ts'
 
 /** A step in a workflow, including checklists and requirements. */
 export interface WorkflowStep {

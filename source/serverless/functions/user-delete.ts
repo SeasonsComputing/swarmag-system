@@ -2,16 +2,16 @@
  * Netlify handler for soft-deleting users.
  */
 
-import type { User } from '@domain/common'
-import { when } from '@utils/datetime'
-import { Supabase } from '@serverless/lib/supabase'
+import type { User } from '@domain/common.ts'
+import { when } from '@utils/datetime.ts'
+import { Supabase } from '@serverless/lib/supabase.ts'
 import {
   HttpCodes,
   type ApiRequest,
   type ApiResponse,
-} from '@serverless/lib/api-binding'
-import { withNetlify } from '@serverless/lib/netlify'
-import { userToRow, rowToUser } from '@serverless/functions/user-mapping'
+} from '@serverless/lib/api-binding.ts'
+import { withNetlify } from '@serverless/lib/netlify.ts'
+import { userToRow, rowToUser } from '@serverless/functions/user-mapping.ts'
 
 interface UserDeleteBody { id: string }
 

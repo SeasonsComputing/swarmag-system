@@ -56,8 +56,8 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 
 ### 1.6 Rules
 
-- Language: TypeScript (strict mode) using the root `tsconfig.json` settings (`module: ESNext`, `moduleResolution: bundler`, `baseUrl: "source"`).
-- Use the configured path aliases when importing: `@domain/*` for domain modules, `@utils/*` for core utilities.
+- Language: TypeScript (strict mode) checked via Deno (`deno task check`).
+- Use the configured import aliases from `deno.json`: `@domain/*` for domain modules, `@utils/*` for core utilities.
 - Types must be JSON-serializable.
 - No runtime dependencies beyond the UUID helper (or a tiny internal implementation).
 - This package is the **single source of truth** for domain types.

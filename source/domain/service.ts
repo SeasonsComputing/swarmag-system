@@ -3,9 +3,9 @@
  * Services are the types of operations offered to customers.
  */
 
-import type { ID } from '@utils/identifier'
-import type { When } from '@utils/datetime'
-import type { Note } from './common'
+import type { ID } from '@utils/identifier.ts'
+import type { When } from '@utils/datetime.ts'
+import type { Note } from './common.ts'
 
 /** The categories of services available. */
 export type ServiceCategory = 'aerial-drone-services' | 'ground-machinery-services'

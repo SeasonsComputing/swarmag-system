@@ -52,7 +52,7 @@ Canonical domain definitions and rules live in `docs/foundation/domain.md`.
 
 ## 6. API design
 
-Netlify Functions for REST, Supabase Edge Functions for async workflows. API files live under `source/serverless/functions/*`, default-export Netlify handlers wrapped with `withNetlify`, and use per-abstraction mapping helpers (e.g., `user-mapping.ts`) to convert between domain models and Supabase row shapes.
+Netlify Edge Functions (Deno) for REST, Supabase Edge Functions for async workflows. API files live under `source/serverless/functions/*`, default-export handlers wrapped with `withNetlify`, and use per-abstraction mapping helpers (e.g., `user-mapping.ts`) to convert between domain models and Supabase row shapes.
 
 ### 6.1 API conventions
 
@@ -115,7 +115,7 @@ This section outlines the monorepo structure and its primary dependency flow; se
 - GitHub Actions for CI/CD.
 - Netlify for builds and deploys.
 - Supabase for schema, data, auth, and storage.
-- TypeScript compiler set to `module: ESNext` with `moduleResolution: bundler` so imports and aliases match the bundler/runtime behavior.
+- TypeScript is checked via Deno; import aliases are defined in `deno.json` so runtime and tooling match.
 
 ### 9.1 Database migrations
 
@@ -127,27 +127,24 @@ This section outlines the monorepo structure and its primary dependency flow; se
 
 Requirements:
 
-- Node 18+
-- pnpm (`npm install -g pnpm`)
+- Deno 1.46+
 
 Setup and build:
 
 ```bash
-pnpm install
-pnpm tsc -b
+deno task check
 ```
 
 Tests:
 
 ```bash
-pnpm test
-pnpm test:watch
+deno task test
 ```
 
 Live smoke tests (requires a deployed base URL):
 
 ```bash
-LIVE_BASE_URL=https://<env> pnpm test:live
+LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read source/tests/live
 ```
 
 ## 10. Environment variables

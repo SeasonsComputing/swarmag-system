@@ -38,8 +38,8 @@ source/apps/customer/
   - The Customer Portal must not mutate server-side data.
 - Tech stack:
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
-- Use the repo-level `tsconfig.json` (ESNext modules + bundler resolution, `baseUrl: "source"` with aliases).
-  - Rely on the configured aliases when importing (`@domain/*`, `@serverless/*`, `@utils/*`, `@/*`).
+- Use the repo-level Deno import aliases from `deno.json`.
+  - Rely on the configured aliases when importing (`@domain/*`, `@serverless/*`, `@utils/*`).
 - Import domain types from `source/domain`.
 - Use only read-only API endpoints exposed by backend Functions in `source/serverless/functions`.
 

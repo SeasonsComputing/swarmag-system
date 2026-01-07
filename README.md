@@ -55,3 +55,14 @@ Architecture, goals, and setup instructions live in `docs/foundation/architectur
 ### 4.3 History
 
 - `docs/history/swarmag-ops-meta-prompt.md`
+
+## 5. Software Construction Sessions
+
+Prepare a software construction session by creating a new chat and submitting the following prompt:
+
+Ingest the following files, assume `AUTHORITY.md` is binding, and continue where we left off.
+
+1. `AUTHORITY.md`
+2. `docs/foundation/*.md`
+3. `NOTES.md`
+4. `source/*` or relevant files

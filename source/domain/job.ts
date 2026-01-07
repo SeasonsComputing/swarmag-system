@@ -3,9 +3,9 @@
  * Jobs represent operational tasks related to services.
  */
 
-import type { ID } from '@utils/identifier'
-import type { When } from '@utils/datetime'
-import type { Answer, Attachment, Author, Location, Note } from './common'
+import type { ID } from '@utils/identifier.ts'
+import type { When } from '@utils/datetime.ts'
+import type { Answer, Attachment, Author, Location, Note } from './common.ts'
 
 /** The possible statuses of a job. */
 export type JobStatus =

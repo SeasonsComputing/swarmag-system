@@ -2,21 +2,21 @@
  * Netlify handler for creating jobs with associated plan and assessment.
  */
 
-import { type ID, id } from '@utils/identifier'
-import { type When, when } from '@utils/datetime'
+import { type ID, id } from '@utils/identifier.ts'
+import { type When, when } from '@utils/datetime.ts'
 import type {
   JobAssessment,
   JobPlan,
   JobStatus,
   Job
-} from '@domain/job'
+} from '@domain/job.ts'
 import {
   HttpCodes,
   type ApiRequest,
   type ApiResponse,
-} from '@serverless/lib/api-binding'
-import { withNetlify } from '@serverless/lib/netlify'
-import { Supabase } from '@serverless/lib/supabase'
+} from '@serverless/lib/api-binding.ts'
+import { withNetlify } from '@serverless/lib/netlify.ts'
+import { Supabase } from '@serverless/lib/supabase.ts'
 
 /** Input structure for job assessment data, excluding generated fields. */
 type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>

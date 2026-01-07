@@ -2,9 +2,9 @@
  * Customer fixture samples for tests.
  */
 
-import type { Customer } from '@domain/customer'
-import type { Location } from '@domain/common'
-import { id } from '@utils/identifier'
+import type { Customer } from '@domain/customer.ts'
+import type { Location } from '@domain/common.ts'
+import { id } from '@utils/identifier.ts'
 
 const customerId = id()
 const accountManagerId = id()
@@ -65,6 +65,7 @@ export const blueMesaRanchCustomer: Customer = {
           id: contactNoteId,
           createdAt: '2025-01-09T00:00:00Z',
           content: 'Prefers SMS for scheduling confirmations.',
+          images: [],
         },
       ],
       createdAt: '2025-01-10T00:00:00Z',

@@ -2,8 +2,8 @@
  * Common question/answer fixtures for tests.
  */
 
-import type { Question } from '@domain/common'
-import { id } from '@utils/identifier'
+import type { Question } from '@domain/common.ts'
+import { id } from '@utils/identifier.ts'
 
 export const preflightInspectionQuestion: Question = {
   id: id(),

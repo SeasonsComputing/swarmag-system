@@ -40,8 +40,8 @@ source/apps/ops/
 - Tech stack:
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
   - No Tailwind.
-- Use the repo-level `tsconfig.json` (ESNext modules, bundler resolution, `baseUrl: "source"`).
-- Import via configured aliases: `@domain/*`, `@serverless/*`, `@utils/*`, and `@/*` for app-local modules.
+- Use the repo-level Deno import aliases from `deno.json`.
+- Import via configured aliases: `@domain/*`, `@serverless/*`, `@utils/*`.
 - Must import domain types from `source/domain`.
 - Must call backend APIs via Netlify Functions (not ad-hoc URLs).
 - Must be structured by features (`src/features/<feature>`).
@@ -77,7 +77,7 @@ In `src/features/workflows/WorkflowRunner.tsx`:
 ## 5. Suggested Order of Work
 
 1. Scaffold the app shell:
-    - `package.json`, `tsconfig.json`, `vite.config.ts`, `index.html`, `src/main.tsx`, `src/routes/App.tsx`.
+    - `deno.json`, `vite.config.ts`, `index.html`, `src/main.tsx`, `src/routes/App.tsx`.
 2. Implement a minimal navigation and layout.
 3. Create `WorkflowRunner` with a small, in-memory sample workflow.
 4. Add a basic in-memory JobLog store and wire it into `WorkflowRunner`.

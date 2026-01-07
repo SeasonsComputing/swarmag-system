@@ -1,4 +1,7 @@
 [build]
-  command = "pnpm build"
-  functions = "build/serverless/functions"
-  publish = "build"
+  command = "deno task check"
+  edge_functions = "source/serverless/functions"
+  publish = "."
+
+[dev]
+  edge_functions = "source/serverless/functions"

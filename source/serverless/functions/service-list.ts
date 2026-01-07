@@ -2,15 +2,15 @@
  * Netlify handler for listing services with pagination.
  */
 
-import type { Service } from '@domain/service'
-import { Supabase } from '@serverless/lib/supabase'
-import { clampLimit, parseCursor, type ListQuery, type Row, isIdArray } from '@serverless/lib/db-binding'
+import type { Service } from '@domain/service.ts'
+import { Supabase } from '@serverless/lib/supabase.ts'
+import { clampLimit, parseCursor, type ListQuery, type Row, isIdArray } from '@serverless/lib/db-binding.ts'
 import {
   HttpCodes,
   type ApiRequest,
   type ApiResponse,
-} from '@serverless/lib/api-binding'
-import { withNetlify } from '@serverless/lib/netlify'
+} from '@serverless/lib/api-binding.ts'
+import { withNetlify } from '@serverless/lib/netlify.ts'
 
 /**
  * Type guard for supported service categories.

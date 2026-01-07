@@ -4,9 +4,9 @@
  * such as vehicles, sprayers, drones, etc.
  */
 
-import type { ID } from '@utils/identifier'
-import type { When } from '@utils/datetime'
-import type { Attachment } from './common'
+import type { ID } from '@utils/identifier.ts'
+import type { When } from '@utils/datetime.ts'
+import type { Attachment } from './common.ts'
 
 /** The different types of assets available in the system. */
 export interface AssetType {

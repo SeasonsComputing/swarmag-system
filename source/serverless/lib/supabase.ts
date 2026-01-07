@@ -2,7 +2,7 @@
  * Supabase client singleton for server-side operations.
  */
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2'
 
 /** Cache-aware Supabase client factory for platform functions. */
 export class Supabase {
@@ -17,7 +17,8 @@ export class Supabase {
   static client(): SupabaseClient {
     if (Supabase.#cache) return Supabase.#cache
 
-    const { SUPABASE_URL, SUPABASE_SERVICE_KEY } = process.env
+    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
+    const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_KEY')
     if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) throw new Error('Supabase credentials missing')
 
     Supabase.#cache = createClient(

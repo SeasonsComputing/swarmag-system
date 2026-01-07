@@ -2,12 +2,12 @@
  * Helpers for working with author attribution roles in apps.
  */
 
-import { AUTHOR_ATTRIBUTION_ROLES } from '@domain/common'
+import { AUTHOR_ATTRIBUTION_ROLES } from '@domain/common.ts'
 import type {
   AuthorAttributionContext,
   AuthorAttributionRole,
   AuthorAttributionRoleId,
-} from '@domain/common'
+} from '@domain/common.ts'
 
 // Widen the const tuple so contexts accept the full AuthorAttributionContext union.
 const ROLES: ReadonlyArray<

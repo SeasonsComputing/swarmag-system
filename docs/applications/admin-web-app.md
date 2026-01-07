@@ -41,8 +41,8 @@ source/apps/admin/
 
 - Tech stack:
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
-- Use the shared `tsconfig.json` (`module: ESNext`, `moduleResolution: bundler`, `baseUrl: "source"`).
-  - Prefer the configured aliases (`@domain/*`, `@serverless/*`, `@utils/*`, `@/*`) for imports.
+- Use the shared Deno import aliases from `deno.json`.
+  - Prefer the configured aliases (`@domain/*`, `@serverless/*`, `@utils/*`) for imports.
 - Import all domain types from `source/domain`.
 - Use API client code that calls Netlify Functions in `source/serverless/functions/*`.
 - Do not define new domain abstractions that conflict with the SDK:

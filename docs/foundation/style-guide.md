@@ -4,20 +4,21 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 
 ## 1. Language & Tooling
 
-| Item     | Guideline                                                       |
-| -------- | --------------------------------------------------------------- |
-| Compiler | `strict`; `module: ESNext`; `moduleResolution: bundler`         |
-| Aliases  | `@domain/*`, `@utils/*`, `@serverless/*`, `@/*`                 |
-| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers |
-| Encoding | ASCII only; no non-ASCII literals                               |
+| Item     | Guideline                                                      |
+| -------- | -------------------------------------------------------------- |
+| Compiler | Deno `check` with strict TypeScript                            |
+| Aliases  | `@domain/*`, `@utils/*`, `@serverless/*` via `deno.json` |
+| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers|
+| Encoding | ASCII only; no non-ASCII literals                              |
 
 ## 2. Imports & Organization
 
-| Item     | Guideline                                                          |
-| -------- | ------------------------------------------------------------------ |
-| Paths    | Use aliases instead of deep relatives                              |
-| Ordering | Domain -> utils -> serverless lib; use `import type` where helpful |
-| Exports  | Default export only for Netlify `handler`; prefer named exports    |
+| Item     | Guideline                                                           |
+| -------- | ------------------------------------------------------------------- |
+| Paths    | Use aliases instead of deep relatives                               |
+| Ordering | Domain -> utils -> serverless lib; use `import type` where helpful  |
+| Exports  | Default export only for Netlify Edge `handler = withNetlify(handle)`|
+| Extensions | Include `.ts` in local/alias import specifiers                     |
 
 ## 3. Domain Modeling (`source/domain/*`)
 

@@ -2,18 +2,18 @@
  * Netlify handler for creating users.
  */
 
-import type { User, UserRole } from '@domain/common'
-import { id } from '@utils/identifier'
-import { when } from '@utils/datetime'
-import { Supabase } from '@serverless/lib/supabase'
-import { isNonEmptyString } from '@serverless/lib/db-binding'
+import type { User, UserRole } from '@domain/common.ts'
+import { id } from '@utils/identifier.ts'
+import { when } from '@utils/datetime.ts'
+import { Supabase } from '@serverless/lib/supabase.ts'
+import { isNonEmptyString } from '@serverless/lib/db-binding.ts'
 import {
   HttpCodes,
   type ApiRequest,
   type ApiResponse,
-} from '@serverless/lib/api-binding'
-import { withNetlify } from '@serverless/lib/netlify'
-import { userToRow } from '@serverless/functions/user-mapping'
+} from '@serverless/lib/api-binding.ts'
+import { withNetlify } from '@serverless/lib/netlify.ts'
+import { userToRow } from '@serverless/functions/user-mapping.ts'
 
 interface UserCreateBody {
   displayName: string

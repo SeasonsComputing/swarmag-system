@@ -3,9 +3,9 @@
  * Customers represent clients who have operations and sites to be serviced.
  */
 
-import type { When } from '@utils/datetime'
-import type { ID } from '@utils/identifier'
-import type { Address, Author, Location, Note } from './common'
+import type { When } from '@utils/datetime.ts'
+import type { ID } from '@utils/identifier.ts'
+import type { Address, Author, Location, Note } from './common.ts'
 
 /** Represents a contact person associated with a customer. */
 export interface Contact {

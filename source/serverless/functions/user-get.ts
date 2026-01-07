@@ -2,15 +2,15 @@
  * Netlify handler for fetching a user by id.
  */
 
-import type { User } from '@domain/common'
-import { Supabase } from '@serverless/lib/supabase'
+import type { User } from '@domain/common.ts'
+import { Supabase } from '@serverless/lib/supabase.ts'
 import {
   HttpCodes,
   type ApiRequest,
   type ApiResponse,
-} from '@serverless/lib/api-binding'
-import { withNetlify } from '@serverless/lib/netlify'
-import { rowToUser } from '@serverless/functions/user-mapping'
+} from '@serverless/lib/api-binding.ts'
+import { withNetlify } from '@serverless/lib/netlify.ts'
+import { rowToUser } from '@serverless/functions/user-mapping.ts'
 
 type UserGetQuery = { id?: string }
 

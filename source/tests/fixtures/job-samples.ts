@@ -2,8 +2,8 @@
  * Sample job fixtures for tests.
  */
 
-import type { JobAssessment, JobLogEntry } from '@domain/job'
-import { id } from '@utils/identifier'
+import type { JobAssessment, JobLogEntry } from '@domain/job.ts'
+import { id } from '@utils/identifier.ts'
 
 const serviceId = id()
 const customerId = id()

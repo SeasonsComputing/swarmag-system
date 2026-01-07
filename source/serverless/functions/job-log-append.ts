@@ -2,17 +2,17 @@
  * Netlify handler for appending job log entries.
  */
 
-import { type ID, id } from '@utils/identifier'
-import { type When, when } from '@utils/datetime'
-import type { JobLogEntry, JobLogPayload, JobLogType } from '@domain/job'
-import type { Attachment, Author, Location } from '@domain/common'
+import { type ID, id } from '@utils/identifier.ts'
+import { type When, when } from '@utils/datetime.ts'
+import type { JobLogEntry, JobLogPayload, JobLogType } from '@domain/job.ts'
+import type { Attachment, Author, Location } from '@domain/common.ts'
 import {
   HttpCodes,
   type ApiRequest,
   type ApiResponse,
-} from '@serverless/lib/api-binding'
-import { withNetlify } from '@serverless/lib/netlify'
-import { Supabase } from '@serverless/lib/supabase'
+} from '@serverless/lib/api-binding.ts'
+import { withNetlify } from '@serverless/lib/netlify.ts'
+import { Supabase } from '@serverless/lib/supabase.ts'
 
 /** Body structure for job log append API requests. */
 interface JobLogBody {

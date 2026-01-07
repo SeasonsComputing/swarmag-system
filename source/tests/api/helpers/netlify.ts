@@ -2,27 +2,37 @@
  * Test helper for invoking Netlify-wrapped handlers.
  */
 
-import type { HandlerEvent, HandlerResponse } from '@serverless/lib/netlify'
-
 /**
- * Invoke a Netlify-wrapped handler with a minimal synthetic event.
+ * Invoke a Netlify-wrapped handler with a minimal Request.
  * Parses the JSON response body for easier assertions.
  */
 export const runNetlifyHandler = async <Body = any, Query extends Record<string, any> = Record<string, any>>(
-  handler: (event: HandlerEvent) => Promise<HandlerResponse>,
+  handler: (request: Request) => Promise<Response>,
   method: string,
   body?: Body,
   query?: Query,
   headers: Record<string, string> = {},
 ) => {
-  const event: HandlerEvent = {
-    httpMethod: method,
-    headers,
-    queryStringParameters: query as any,
-    body: body !== undefined ? JSON.stringify(body) : null,
-  } as any
+  const url = new URL('http://localhost/.netlify/functions/mock')
+  if (query) {
+    for (const [key, value] of Object.entries(query)) {
+      if (value !== undefined) url.searchParams.set(key, String(value))
+    }
+  }
 
-  const res = await handler(event, {} as any)
-  const parsedBody = res.body ? JSON.parse(res.body) : undefined
-  return { statusCode: res.statusCode, headers: res.headers ?? {}, body: parsedBody }
+  const request = new Request(url.toString(), {
+    method,
+    headers: {
+      ...(body !== undefined ? { 'content-type': 'application/json' } : {}),
+      ...headers,
+    },
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  })
+
+  const res = await handler(request)
+  const contentType = res.headers.get('content-type') ?? ''
+  const parsedBody = contentType.includes('application/json')
+    ? await res.json()
+    : await res.text()
+  return { statusCode: res.status, headers: Object.fromEntries(res.headers.entries()), body: parsedBody }
 }
