@@ -60,9 +60,11 @@ Architecture, goals, and setup instructions live in `docs/foundation/architectur
 
 Prepare a software construction session by creating a new chat and submitting the following prompt:
 
-Ingest the following files, assume `AUTHORITY.md` is binding, and continue where we left off.
+Ingest the following files, assume `AUTHORITY.md` is binding.
 
 1. `docs/foundation/` - all markdown files
 2. `source/*`- all source files
 3. `NOTES.md`
 4. `AUTHORITY.md`
+
+You are authorized to access the project root.
