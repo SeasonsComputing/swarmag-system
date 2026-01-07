@@ -46,6 +46,16 @@
 | ---- | ----------- |
 | Markdown sections | Number all Markdown sections. |
 | Markdown lint | Keep Markdown files free of lint warnings. |
+| Blank lines | No multiple consecutive blank lines. |
 | Filenames | Prefer dashes over underscores in filenames. |
 | Tables | Prefer tables over lists when there is more than a simple description. |
 | Table spacing | Tables should be surrounded by blank lines. |
+
+## 8. Collaboration Preferences
+
+| Preference | Requirement |
+| ---------- | ----------- |
+| Communication style | Prefer direct, no-fluff communication and concrete actions. |
+| Engineering focus | Emphasize rigorous engineering, architecture quality, and correctness. |
+| Standards | Keep changes aligned with documented conventions and keep tooling/builds warning-free. |
+| Naming | Prefer dashes over underscores in filenames. |

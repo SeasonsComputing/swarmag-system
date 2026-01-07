@@ -122,6 +122,7 @@ This section outlines the monorepo structure and its primary dependency flow; se
 - Migrations live in `source/migrations/` and are applied by the deploy pipeline (GitHub Actions or Netlify build step), not by serverless functions.
 - The build runner connects directly to Supabase/Postgres using elevated credentials (service role or DB URL) and runs the migration tool (Supabase CLI or `psql`).
 - Production deploys run migrations; preview/staging should avoid schema changes unless explicitly intended.
+- `supabase/migrations` is a symlink to `source/migrations` so the Supabase CLI reads the canonical migrations without duplication.
 
 ### 9.2 Local development quickstart
 
@@ -146,6 +147,26 @@ Live smoke tests (requires a deployed base URL):
 ```bash
 LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read source/tests/live
 ```
+
+### 9.3 Local development helpers
+
+| Command | Purpose |
+| ------- | ------- |
+| `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor` | Start local Supabase with minimal services. |
+| `supabase db reset --yes` | Reset and re-apply migrations. |
+| `supabase status --output env` | Show local Supabase URLs and keys. |
+| `XDG_CONFIG_HOME=./.config netlify dev` | Run Netlify dev in sandbox environments. |
+
+### 9.4 Database GUI connection (DBeaver)
+
+| Field | Value |
+| ----- | ----- |
+| Host | `127.0.0.1` |
+| Port | `54322` |
+| Database | `postgres` |
+| User | `postgres` |
+| Password | `postgres` |
+| URL | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 
 ## 10. Environment variables
 
@@ -200,4 +221,3 @@ At minimum:
 - Schema validation at boundaries.
 - Soft delete pattern for user-centric data: persist a `deletedAt` UTC timestamp (null/undefined means active), filter queries to `deleted_at IS NULL`, and use partial unique indexes on active rows so identifiers like email can be reused after deletion. Hard deletes run in batch maintenance jobs when needed.
 - UUID v7 for primary/foreign keys to avoid an ID service, allow offline/preassigned inserts, and keep btree inserts mostly ordered; use the native `uuid` type with a v7 generator, avoid redundant indexes, favor composite keys on join tables, and monitor index health on write-heavy tables.
-
