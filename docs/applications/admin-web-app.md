@@ -42,10 +42,9 @@ source/apps/admin/
 - Tech stack:
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
 - Use the shared Deno import aliases from `deno.json`.
-  - Prefer the configured aliases (`@domain/*`, `@serverless/*`, `@utils/*`) for imports.
-- Import all domain types from `source/domain`.
-- Use API client code that calls Netlify Functions in `source/serverless/functions/*`.
-- Do not define new domain abstractions that conflict with the SDK:
+  - Prefer the serverless API for all backend access and DTOs.
+- Apps must not import serverless code or persistence logic directly.
+- Do not define new domain abstractions that conflict with the runtime API contracts:
   - If new concepts are needed, extend `source/domain` first.
 
 ## 4. Initial Feature Focus — Services
@@ -56,8 +55,8 @@ In `src/features/services/`:
 
 - `ServiceList.tsx`:
   - Display a table/list of `Service` items.
-  - Use types imported from `source/domain`.
-  - Load data via a client that calls the `service-list` API.
+- Use types imported from the serverless API.
+- Load data via the runtime API client.
 
 - `ServiceForm.tsx`:
   - Create/edit forms for `Service`.
@@ -69,4 +68,3 @@ In `src/features/services/`:
 - Implement `src/main.tsx` and `src/routes/App.tsx` with:
   - A basic layout (header + main area).
   - Navigation between key sections (Services, Assets, Chemicals, Jobs, Customers).
-

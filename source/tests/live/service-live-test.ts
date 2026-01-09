@@ -2,11 +2,11 @@
  * Live test for service-list endpoint (requires LIVE_BASE_URL).
  */
 
-import { assert } from 'https://deno.land/std@0.224.0/assert/mod.ts'
+import { assert } from '@std/assert'
 
 const baseUrl = Deno.env.get('LIVE_BASE_URL')
 const serviceListPath =
-  Deno.env.get('LIVE_SERVICE_LIST_PATH') ?? '/.netlify/functions/service-list'
+  Deno.env.get('LIVE_SERVICE_LIST_PATH') ?? '/.netlify/edge-functions/service-list'
 
 if (!baseUrl) {
   Deno.test('service-list live endpoint (skipped: LIVE_BASE_URL not set)', () => {})

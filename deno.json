@@ -2,10 +2,18 @@
   "imports": {
     "@domain/": "./source/domain/",
     "@utils/": "./source/utils/",
-    "@serverless/": "./source/serverless/"
+    "@serverless-lib/": "./source/serverless/lib/",
+    "@serverless-functions/": "./source/serverless/functions/",
+    "@serverless-mappings/": "./source/serverless/mappings/",
+    "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
+    "@tests-fixtures/": "./source/tests/fixtures/",
+    "@tests-helpers/": "./source/tests/api/helpers/"
   },
   "tasks": {
-    "check": "deno check source/**/*.ts",
+    "guard:architecture": "deno run --allow-read scripts/architecture-guard.ts",
+    "guard:validation": "deno run --allow-read scripts/validation-guard.ts",
+    "check": "deno task guard:architecture && deno task guard:validation && deno check source/**/*.ts",
     "test": "deno test --allow-env --allow-net --allow-read source/tests",
     "lint": "deno lint source && deno task lint:md",
     "lint:md": "deno run --allow-read npm:markdownlint-cli2@0.13.0 \"**/*.md\" \"!node_modules/**\"",

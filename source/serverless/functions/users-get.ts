@@ -3,16 +3,16 @@
  */
 
 import type { User } from '@domain/common.ts'
-import { Supabase } from '@serverless/lib/supabase.ts'
-import {
-  HttpCodes,
-  type ApiRequest,
-  type ApiResponse,
-} from '@serverless/lib/api-binding.ts'
-import { withNetlify } from '@serverless/lib/netlify.ts'
-import { rowToUser } from '@serverless/functions/user-mapping.ts'
+import { Supabase } from '@serverless-lib/supabase.ts'
+import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { rowToUser } from '@serverless-mappings/user-mapping.ts'
+import { validateUserGetQuery, type UserGetQuery } from '@domain/common-validators.ts'
 
-type UserGetQuery = { id?: string }
+/**
+ * Edge function path config
+ */
+export const config = { path: "/api/users/get" };
 
 /**
  * Fetch a user by id when provided via query string.
@@ -26,10 +26,12 @@ const handle = async (
     return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
   }
 
-  const userId = req.query?.id
-  if (!userId) {
-    return { statusCode: HttpCodes.badRequest, body: { error: 'id is required' } }
+  const validationError = validateUserGetQuery(req.query)
+  if (validationError) {
+    return { statusCode: HttpCodes.badRequest, body: { error: validationError } }
   }
+
+  const userId = req.query?.id
 
   const { data, error } = await Supabase.client()
     .from('users')
@@ -44,7 +46,7 @@ const handle = async (
 
   let user: User
   try {
-    user = rowToUser(data as any)
+    user = rowToUser(data)
   } catch (parseError) {
     return {
       statusCode: HttpCodes.internalError,
@@ -55,4 +57,4 @@ const handle = async (
   return { statusCode: HttpCodes.ok, body: { data: user } }
 }
 
-export default withNetlify(handle)
+export default createApiHandler(handle)

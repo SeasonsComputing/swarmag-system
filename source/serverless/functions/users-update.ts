@@ -2,46 +2,18 @@
  * Netlify handler for updating users.
  */
 
-import type { User, UserRole } from '@domain/common.ts'
+import type { User } from '@domain/common.ts'
 import { when } from '@utils/datetime.ts'
-import { Supabase } from '@serverless/lib/supabase.ts'
-import {
-  HttpCodes,
-  type ApiRequest,
-  type ApiResponse,
-} from '@serverless/lib/api-binding.ts'
-import { withNetlify } from '@serverless/lib/netlify.ts'
-import { userToRow, rowToUser } from '@serverless/functions/user-mapping.ts'
-
-interface UserUpdateBody {
-  id: string
-  displayName?: string
-  primaryEmail?: string
-  phoneNumber?: string
-  avatarUrl?: string | null
-  roles?: UserRole[] | null
-  status?: User['status']
-}
+import { Supabase } from '@serverless-lib/supabase.ts'
+import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { userToRow, rowToUser } from '@serverless-mappings/user-mapping.ts'
+import { validateUserUpdateInput, type UserUpdateInput } from '@domain/common-validators.ts'
 
 /**
- * Type guard for accepted user status values in updates.
- * @param value Potential status value.
- * @returns True when the value is an allowed status string.
+ * Edge function path config
  */
-const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
-  value === 'active' || value === 'inactive'
-
-/**
- * Validate a partial user update request.
- * @param payload The incoming body containing fields to patch.
- * @returns Error message string when invalid; otherwise null.
- */
-const validate = (payload: UserUpdateBody): string | null => {
-  if (!payload?.id) return 'id is required'
-  if (payload.status && !isUserStatus(payload.status)) return 'status must be active or inactive'
-  if (payload.roles && !Array.isArray(payload.roles)) return 'roles must be an array of UserRole'
-  return null
-}
+export const config = { path: "/api/users/update" };
 
 /**
  * Update an existing user while enforcing allowed fields and validation.
@@ -49,13 +21,13 @@ const validate = (payload: UserUpdateBody): string | null => {
  * @returns API result with the updated user or an error response.
  */
 const handle = async (
-  req: ApiRequest<UserUpdateBody>
+  req: ApiRequest<UserUpdateInput>
 ): Promise<ApiResponse> => {
   if (req.method !== 'PATCH' && req.method !== 'PUT') {
     return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
   }
 
-  const validationError = validate(req.body)
+  const validationError = validateUserUpdateInput(req.body)
   if (validationError) {
     return { statusCode: HttpCodes.unprocessableEntity, body: { error: validationError } }
   }
@@ -74,7 +46,7 @@ const handle = async (
 
   let current: User
   try {
-    current = rowToUser(existingRow as any)
+    current = rowToUser(existingRow)
   } catch (parseError) {
     return {
       statusCode: HttpCodes.internalError,
@@ -108,4 +80,4 @@ const handle = async (
   return { statusCode: HttpCodes.ok, body: { data: updated } }
 }
 
-export default withNetlify(handle)
+export default createApiHandler(handle)

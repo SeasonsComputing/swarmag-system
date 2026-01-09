@@ -39,9 +39,8 @@ source/apps/customer/
 - Tech stack:
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
 - Use the repo-level Deno import aliases from `deno.json`.
-  - Rely on the configured aliases when importing (`@domain/*`, `@serverless/*`, `@utils/*`).
-- Import domain types from `source/domain`.
-- Use only read-only API endpoints exposed by backend Functions in `source/serverless/functions`.
+  - Rely on the serverless API for backend access and DTOs.
+- Use only read-only API endpoints exposed by the runtime API.
 
 ## 4. Core Features
 
@@ -73,4 +72,3 @@ All data shapes should map to domain types for jobs and job summaries.
 1. Scaffold the Customer app shell.
 2. Implement the passwordless login UI (with stub backend).
 3. Implement a simple read-only job list and job summary page using placeholder data, then later wire to real read-only APIs.
-

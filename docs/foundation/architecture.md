@@ -4,7 +4,7 @@ The definitive architecture document for the swarmAg System.
 
 ## 1. Executive summary
 
-The **swarmAg System** is composed of SolidJS web and mobile applications orchestrated via a serverless api (functions backend).
+The **swarmAg System** is composed of SolidJS web and mobile applications orchestrated via a serverless api (edge functions backend).
 It supports administration, operations workflows & logs, and customer-facing features for agricultural services that involve regulated chemicals and industrial equipment.
 The system focuses on two service classes—Aerial and Ground—and the workflows, assets, and regulated chemicals required to deliver them safely and repeatably. Quality is measured against safety, efficiency, repeatability, and performance.
 
@@ -14,6 +14,7 @@ The system focuses on two service classes—Aerial and Ground—and the workflow
 - **Supabase** — Postgres, Auth, Storage, Realtime
 - **GitHub Actions** — CI/CD
 - **SolidJS + TanStack + Kobalte + vanilla CSS** — UI platform
+- **Deno & Docker** — hosts and containers used across the stack and runtime.
 
 ## 3. Goals, constraints, and guiding principles
 
@@ -24,7 +25,7 @@ The system focuses on two service classes—Aerial and Ground—and the workflow
 
 ## 4. System overview
 
-Components: Ops PWA, Admin Portal, Customer Portal, API Functions, Supabase Data.
+Components: Ops PWA, Admin Portal, Customer Portal, API Edge Functions, Supabase Data.
 
 ```text
        ┌─────────────────┐
@@ -47,31 +48,31 @@ Components: Ops PWA, Admin Portal, Customer Portal, API Functions, Supabase Data
 
 ## 5. Domain model summary
 
-Abstractions: Service, Asset, Chemical, Workflow, JobAssessment, JobPlan, JobLog, Customer, Contact.
-Canonical domain definitions and rules live in `docs/foundation/domain.md`.
+Abstractions: Service, Asset, Chemical, Workflow, JobAssessment, JobPlan, JobLog, Customer, Contact. Canonical domain definitions and rules live in `docs/foundation/domain.md`.
 
 ## 6. API design
 
-Netlify Edge Functions (Deno) for REST, Supabase Edge Functions for async workflows. API files live under `source/serverless/functions/*`, default-export handlers wrapped with `withNetlify`, and use per-abstraction mapping helpers (e.g., `user-mapping.ts`) to convert between domain models and Supabase row shapes.
+Netlify Edge Functions (Deno) for REST, Supabase Edge Functions for async workflows. API files live under `source/serverless/functions/*`, default-export handlers wrapped with `createApiHandler`, and use per-abstraction mapping helpers (e.g., `user-mapping.ts`) from `source/serverless/mappings/` to convert between domain models and Supabase row shapes.
 
 ### 6.1 API conventions
 
 Functions that expose the domain model over HTTP, persisted in Supabase, and typed with `source/domain`. Each function:
 
-- `source/serverless/functions` — API to store & retrieve domain concepts via Netlify Functions via REST endpoints.
-- Uses the `{abstraction}-{action}.ts` naming convention with singular-tense abstractions.
+- `source/serverless/functions` — API to store & retrieve domain concepts via Netlify Edge Functions via REST endpoints.
+- Uses the `{resource}-{action}.ts` naming convention with plural resource names (e.g., `users-create.ts`).
+- Each function exports `config = { path: "/api/{resource}/{action}" }` to bind a stable route.
 - Parses and validates JSON requests against domain types.
 - Returns JSON responses with a consistent envelope and status codes.
 
 ### 6.2 Handler pattern
 
-| Item      | Detail                                                                                                                                                                                          |
-| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Exports   | Each file default-exports the Netlify `handler = withNetlify(handle)` from `source/serverless/lib/netlify.ts`; keep per-abstraction mapping helpers in `*-mapping.ts` for DB/domain conversion. |
-| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody> \| Promise<ApiResponse<ResponseBody>>`                                                                              |
-| Request   | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Netlify event.                                                                                                        |
-| Response  | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`.                                                                                                           |
-| Imports   | Only import domain types from `source/domain`; do not redefine domain abstractions locally.                                                                                                     |
+| Item      | Detail                                                                                                                                                                                              |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Exports   | Each file default-exports the Edge handler `createApiHandler(handle)` from `source/serverless/lib/api-handler.ts`; keep per-abstraction mapping helpers in `source/serverless/mappings/*` for DB/domain conversion. |
+| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody>\|Promise<ApiResponse<ResponseBody>>`                                                                                    |
+| Request   | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Request.                                                                                                                  |
+| Response  | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`.                                                                                                               |
+| Imports   | Only import domain types from `source/domain`; do not redefine domain abstractions locally.                                                                                                         |
 
 ### 6.3 Validation and errors
 
@@ -84,6 +85,12 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 | Responses    | Always JSON; success `{ data: ... }`; failure `{ error, details? }`.                                     |
 | Immutability | Use `append` actions for append-only resources (e.g., job logs); avoid in-place mutation where required. |
 
+Invariant validation lives in `source/domain/*-validators.ts`. Serverless handlers must call domain validators and translate failures; they must not re-implement invariants.
+
+### 6.4 Database Boundaries and Mapping
+
+Database results are an untrusted boundary. Supabase rows are treated as `unknown`, validated in mapping helpers under `source/serverless/mappings/`, and converted to domain types only after runtime checks. Generic row wrapper types (for example, `Row<T>`) are forbidden. Mapping logic lives with the subsystem that consumes it and is neither domain logic nor infrastructure.
+
 ## 7. Coding conventions & UI
 
 TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS
@@ -94,20 +101,51 @@ See `docs/foundation/style-guide.md` for compiler settings, aliases, and code st
 This section outlines the monorepo structure and its primary dependency flow; see `README.md` for the project roadmap.
 
 ```text
-               ╭─────────╮
-               │  tests  │
-               ╰─────────╯
-   ───────────────────────────────────────
-                ╭────────╮
-            ╭───│  apps  │───╮
-            ▼   ╰────────╯   ▼
-       ╭────────────╮    ╭──────────╮
-       │ serverless │───▶│  domain  │
-       ╰────────────╯    ╰──────────╯
-   ───────────────────────────────────────
-               ╭─────────╮
-               │  utils  │
-               ╰─────────╯
+           ┌───────────────┐            
+           │    tests      │            
+           └───────────────┘            
+ ────────────────────────────────────── 
+           ┌───────────────┐            
+           │     apps      │            
+           └───────────────┘            
+ ─────────────────────────────────────  
+           ┌───────────────┐            
+       ╭───│     api       │───╮        
+       │   └───────────────┘   │        
+       ▼                       ▼        
+ ┌───────────────┐    ┌───────────────┐ 
+ │  serverless   │───>│     domain    │ 
+ └───────────────┘    └───────────────┘ 
+ ─────────────────────────────────────  
+           ┌───────────────┐            
+           │     utils     │            
+           └───────────────┘             
+```
+
+### 8.1 Source directory graph
+
+```text
+source/
+  api/
+    src/
+      internal/
+  apps/
+    admin/
+    customer/
+    ops/
+    shared/
+  domain/
+  migrations/
+  serverless/
+    functions/
+    lib/
+  tests/
+    api/
+      helpers/
+    domain/
+    fixtures/
+    live/
+  utils/
 ```
 
 ## 9. Build, CI/CD, Deployment
@@ -116,10 +154,12 @@ This section outlines the monorepo structure and its primary dependency flow; se
 - Netlify for builds and deploys.
 - Supabase for schema, data, auth, and storage.
 - TypeScript is checked via Deno; import aliases are defined in `deno.json` so runtime and tooling match.
+- Netlify Edge Functions use `netlify-import-map.json` (root) via `netlify.toml [functions].deno_import_map`; keep it aligned with `deno.json` and use root-relative paths.
+- CI runs `deno task guard:architecture` to enforce import boundaries; violations fail the build.
 
 ### 9.1 Database migrations
 
-- Migrations live in `source/migrations/` and are applied by the deploy pipeline (GitHub Actions or Netlify build step), not by serverless functions.
+- Migrations live in `source/migrations/` and are applied by the deploy pipeline (GitHub Actions or Netlify build step), not by serverless edge functions.
 - The build runner connects directly to Supabase/Postgres using elevated credentials (service role or DB URL) and runs the migration tool (Supabase CLI or `psql`).
 - Production deploys run migrations; preview/staging should avoid schema changes unless explicitly intended.
 - `supabase/migrations` is a symlink to `source/migrations` so the Supabase CLI reads the canonical migrations without duplication.
@@ -150,23 +190,23 @@ LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read sourc
 
 ### 9.3 Local development helpers
 
-| Command | Purpose |
-| ------- | ------- |
-| `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor` | Start local Supabase with minimal services. |
-| `supabase db reset --yes` | Reset and re-apply migrations. |
-| `supabase status --output env` | Show local Supabase URLs and keys. |
-| `XDG_CONFIG_HOME=./.config netlify dev` | Run Netlify dev in sandbox environments. |
+| Command                                                                                                                      | Purpose                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor` | Start local Supabase with minimal services.                               |
+| `supabase db reset --yes`                                                                                                    | Reset and re-apply migrations.                                            |
+| `supabase status --output env`                                                                                               | Show local Supabase URLs and keys.                                        |
+| `XDG_CONFIG_HOME=./.config netlify dev`                                                                                      | Run Netlify dev (uses `scripts/dev-server.ts` for the custom dev server). |
 
 ### 9.4 Database GUI connection (DBeaver)
 
-| Field | Value |
-| ----- | ----- |
-| Host | `127.0.0.1` |
-| Port | `54322` |
-| Database | `postgres` |
-| User | `postgres` |
-| Password | `postgres` |
-| URL | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
+| Field    | Value                                                     |
+| -------- | --------------------------------------------------------- |
+| Host     | `127.0.0.1`                                               |
+| Port     | `54322`                                                   |
+| Database | `postgres`                                                |
+| User     | `postgres`                                                |
+| Password | `postgres`                                                |
+| URL      | `postgresql://postgres:postgres@127.0.0.1:54322/postgres` |
 
 ## 10. Environment variables
 
@@ -193,7 +233,7 @@ At minimum:
 - Domain abstractions only persist attachment metadata (filename, uploader, URL, timestamps) while the files live in storage.
 - Buckets follow a `<context>-attachments` naming convention (e.g., `assets-attachments`, `jobs-attachments`, `assessments-attachments`) with folder paths such as `jobs/{jobId}/photos/*.jpg` or `job-assessments/{assessmentId}/maps/*.tif`.
 - Retention: production buckets keep files indefinitely with lifecycle rules for temporary uploads; preview/staging buckets auto-expire after 30 days.
-- Access: Netlify Functions broker signed URLs for uploads/downloads, while Supabase RLS ensures only authorized users can request those URLs.
+- Access: Netlify Edge Functions broker signed URLs for uploads/downloads, while Supabase RLS ensures only authorized users can request those URLs.
 
 ## 14. Security & compliance
 
@@ -206,16 +246,12 @@ At minimum:
 - Telemetry into Supabase (or equivalent).
 - Error tracking with a service such as Sentry.
 
-## 16. MVP roadmap
-
-- Foundation → Admin Portal → Ops PWA → Customer Portal
-
-## 17. Compliance & safety
+## 16. Compliance & safety
 
 - Digital checklists.
 - Geotagged logs as needed.
 
-## 18. Implementation recommendations
+## 17. Implementation recommendations
 
 - Stateless functions.
 - Schema validation at boundaries.

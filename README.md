@@ -2,24 +2,24 @@
 
 ![swarmAg ops logo](swarmag-ops-logo.png)
 
-The swarmAg system supports the administration and operations of the swarmAg agricultural services business. Services fall into two classes—Aerial and Ground—and rely on complex machinery, vehicles, equipment, tools, chemicals, and workflows. Safety, efficiency, repeatability, and performance are first principles, and the system is evaluated against those outcomes. See `https://swarmag.com` for broader context.
+The swarmAg Operations System, or the `swarmAg system` supports the administration and operations of the swarmAg agricultural services business. Services fall into two classes—Aerial and Ground—and rely on complex machinery, vehicles, equipment, tools, chemicals, and workflows. Safety, efficiency, repeatability, and performance are first principles, and the system is evaluated against those outcomes. See `https://swarmag.com` for broader context.
 
-The swarmAg system monorepo contains SolidJS frontends, Netlify Functions, and a Supabase-backed domain model. The repo focuses first on a typed domain model and API layer, then the Admin, Ops, and Customer apps.
+The swarmAg system monorepo contains SolidJS frontends, Netlify Edge Functions, and a Supabase-backed domain model. The repo focuses first on a typed domain model and API layer, then the Admin, Ops, and Customer apps.
 
 Architecture, goals, and setup instructions live in `docs/foundation/architecture.md`.
 
 ## 1. Repository Layout
 
-| Path                           | Description                                                 |
-| ------------------------------ | ----------------------------------------------------------- |
-| `docs/`                        | System, architecture, and application specifications        |
-| `source/domain/`               | Canonical domain model (types/interfaces/classes)           |
-| `source/utils/`                | Shared primitives, e.g. datetime & identifier               |
-| `source/serverless/functions/` | Netlify Functions                                           |
-| `source/serverless/lib/`       | Backend platform helpers (Netlify adapter, Supabase client) |
-| `source/migrations/`           | Supabase SQL migrations                                     |
-| `source/tests/`                | Test specs and fixtures (barreled samples in `fixtures/`)   |
-| `source/apps/`                 | Planned SolidJS apps for admin, ops, customer               |
+| Path                                | Description                                                 |
+| ----------------------------------- | ----------------------------------------------------------- |
+| `docs/`                             | System, architecture, and application specifications        |
+| `source/domain/`                    | Canonical domain model (types/interfaces/classes)           |
+| `source/utils/`                     | Shared primitives, e.g. datetime & identifier               |
+| `source/serverless/functions/` | Netlify Edge Functions                                      |
+| `source/serverless/lib/`            | Backend platform helpers (Netlify adapter, Supabase client) |
+| `source/migrations/`                | Supabase SQL migrations                                     |
+| `source/tests/`                     | Test specs and fixtures (barreled samples in `fixtures/`)   |
+| `source/apps/`                      | Planned SolidJS apps for admin, ops, customer               |
 
 ## 2. Roadmap (Current Project State)
 
@@ -66,5 +66,3 @@ Ingest the following files, assume `AUTHORITY.md` is binding.
 2. `source/*`- all source files
 3. `NOTES.md`
 4. `AUTHORITY.md`
-
-You are authorized to access the project root.

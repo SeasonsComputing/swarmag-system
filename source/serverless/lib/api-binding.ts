@@ -1,5 +1,5 @@
 /**
- * Shared API binding types and HTTP codes used by adapters.
+ * Shared API binding types and HTTP protocol constants.
  */
 
 /** HTTP header map for responses/requests. */
@@ -9,6 +9,16 @@ export type HttpHeaders = Record<string, string>
 export type HttpQuery = Record<string, string>
 
 /** HTTP method for API handlers. */
+export type HttpMethod =
+  | 'GET'
+  | 'POST'
+  | 'PUT'
+  | 'PATCH'
+  | 'DELETE'
+  | 'OPTIONS'
+  | 'HEAD'
+
+/** HTTP method set for validation. */
 const HttpMethodSet = [
   'GET',
   'POST',
@@ -18,18 +28,16 @@ const HttpMethodSet = [
   'OPTIONS',
   'HEAD',
 ] as const
-export type HttpMethod = typeof HttpMethodSet[number]
 
 /**
  * Type guard for supported HTTP method strings.
  * @param value Raw value to validate HTTP method.
  * @returns True when value is a supported HTTP method.
  */
-export function isHttpMethod(value: string): value is HttpMethod {
-  return (HttpMethodSet as readonly string[]).includes(value)
-}
+export const isHttpMethod = (value: string): value is HttpMethod =>
+  (HttpMethodSet as readonly string[]).includes(value)
 
-/** HTTP response codes for Netlify REST calls. */
+/** HTTP response codes for REST calls. */
 export const HttpCodes = {
   ok: 200,
   created: 201,
@@ -41,6 +49,15 @@ export const HttpCodes = {
   unprocessableEntity: 422,
   internalError: 500,
 } as const
+
+/** Common HTTP header keys. */
+export const HEADER_CONTENT_TYPE = 'content-type'
+export const HEADER_AUTHORIZATION = 'authorization'
+export const HEADER_VARY = 'vary'
+export const HEADER_ALLOW_ORIGIN = 'access-control-allow-origin'
+export const HEADER_ALLOW_METHODS = 'access-control-allow-methods'
+export const HEADER_ALLOW_HEADERS = 'access-control-allow-headers'
+export const HEADER_ALLOW_CREDENTIALS = 'access-control-allow-credentials'
 
 /**
  * Typed request wrapper passed into API handlers.

@@ -2,44 +2,18 @@
  * Netlify handler for appending job log entries.
  */
 
-import { type ID, id } from '@utils/identifier.ts'
+import { id } from '@utils/identifier.ts'
 import { type When, when } from '@utils/datetime.ts'
-import type { JobLogEntry, JobLogPayload, JobLogType } from '@domain/job.ts'
-import type { Attachment, Author, Location } from '@domain/common.ts'
-import {
-  HttpCodes,
-  type ApiRequest,
-  type ApiResponse,
-} from '@serverless/lib/api-binding.ts'
-import { withNetlify } from '@serverless/lib/netlify.ts'
-import { Supabase } from '@serverless/lib/supabase.ts'
-
-/** Body structure for job log append API requests. */
-interface JobLogBody {
-  jobId: ID
-  planId: ID
-  type: JobLogType
-  message: string
-  location?: Location
-  attachments?: Attachment[]
-  payload?: JobLogPayload
-  createdBy: Author
-  occurredAt?: When
-}
+import type { JobLogEntry } from '@domain/job.ts'
+import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { Supabase } from '@serverless-lib/supabase.ts'
+import { validateJobLogAppendInput, type JobLogAppendInput } from '@domain/job-validators.ts'
 
 /**
- * Validates the job log append payload.
- * @param payload - The job log body to validate.
- * @returns A string error message if invalid, null if valid.
+ * Edge function path config
  */
-const validate = (payload: JobLogBody): string | null => {
-  if (!payload?.jobId) return 'jobId is required'
-  if (!payload.planId) return 'planId is required'
-  if (!payload.createdBy) return 'createdBy is required'
-  if (!payload.type) return 'type is required'
-  if (!payload.message) return 'message is required'
-  return null
-}
+export const config = { path: "/api/jobs-log/append" };
 
 /**
  * Handles the job log append API request.
@@ -47,7 +21,7 @@ const validate = (payload: JobLogBody): string | null => {
  * @returns The API result with created log entry or error.
  */
 const handle = async (
-  req: ApiRequest<JobLogBody>
+  req: ApiRequest<JobLogAppendInput>
 ): Promise<ApiResponse> => {
   if (req.method !== 'POST') {
     return { 
@@ -56,7 +30,7 @@ const handle = async (
     }
   }
 
-  const validationError = validate(req.body)
+  const validationError = validateJobLogAppendInput(req.body)
   if (validationError) {
     return { 
       statusCode: HttpCodes.unprocessableEntity, 
@@ -104,4 +78,4 @@ const handle = async (
   return { statusCode: HttpCodes.created, body: { data: logEntry } }
 }
 
-export default withNetlify(handle)
+export default createApiHandler(handle)

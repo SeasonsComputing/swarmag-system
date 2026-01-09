@@ -2,7 +2,7 @@
  * Fixture integrity checks for shared sample data.
  */
 
-import { assert, assertEquals } from 'https://deno.land/std@0.224.0/assert/mod.ts'
+import { assert, assertEquals } from '@std/assert'
 import type { AssetStatus } from '@domain/asset.ts'
 import { isWhen } from '@utils/datetime.ts'
 import { isID } from '@utils/identifier.ts'
@@ -12,7 +12,7 @@ import {
   customerSamples,
   jobSamples,
   sharedQuestionSamples,
-} from './samples.ts'
+} from '@tests-fixtures/samples.ts'
 
 const allowedAssetStatuses: AssetStatus[] = [
   'active',

@@ -4,16 +4,16 @@
 
 import type { User } from '@domain/common.ts'
 import { when } from '@utils/datetime.ts'
-import { Supabase } from '@serverless/lib/supabase.ts'
-import {
-  HttpCodes,
-  type ApiRequest,
-  type ApiResponse,
-} from '@serverless/lib/api-binding.ts'
-import { withNetlify } from '@serverless/lib/netlify.ts'
-import { userToRow, rowToUser } from '@serverless/functions/user-mapping.ts'
+import { Supabase } from '@serverless-lib/supabase.ts'
+import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { userToRow, rowToUser } from '@serverless-mappings/user-mapping.ts'
+import { validateUserDeleteInput, type UserDeleteInput } from '@domain/common-validators.ts'
 
-interface UserDeleteBody { id: string }
+/**
+ * Edge function path config
+ */
+export const config = { path: "/api/users/delete" };
 
 /**
  * Soft-delete a user by marking deleted timestamp while keeping the record.
@@ -21,14 +21,15 @@ interface UserDeleteBody { id: string }
  * @returns API result with deletion metadata or an error response.
  */
 const handle = async (
-  req: ApiRequest<UserDeleteBody>
+  req: ApiRequest<UserDeleteInput>
 ): Promise<ApiResponse> => {
   if (req.method !== 'DELETE') {
     return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
   }
 
-  if (!req.body?.id) {
-    return { statusCode: HttpCodes.unprocessableEntity, body: { error: 'id is required' } }
+  const validationError = validateUserDeleteInput(req.body)
+  if (validationError) {
+    return { statusCode: HttpCodes.unprocessableEntity, body: { error: validationError } }
   }
 
   const supabase = Supabase.client()
@@ -45,7 +46,7 @@ const handle = async (
 
   let user: User
   try {
-    user = rowToUser(existingRow as any)
+    user = rowToUser(existingRow)
   } catch (parseError) {
     return {
       statusCode: HttpCodes.internalError,
@@ -71,4 +72,4 @@ const handle = async (
   return { statusCode: HttpCodes.ok, body: { data: { id: user.id, deletedAt } } }
 }
 
-export default withNetlify(handle)
+export default createApiHandler(handle)

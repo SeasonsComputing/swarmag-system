@@ -2,14 +2,14 @@
  * Unit tests for user CRUD Netlify handlers.
  */
 
-import { assertEquals, assert } from 'https://deno.land/std@0.224.0/assert/mod.ts'
-import handlerCreate from '@serverless/functions/user-create.ts'
-import handlerGet from '@serverless/functions/user-get.ts'
-import handlerUpdate from '@serverless/functions/user-update.ts'
-import handlerDelete from '@serverless/functions/user-delete.ts'
-import { HttpCodes } from '@serverless/lib/api-binding.ts'
-import { Supabase } from '@serverless/lib/supabase.ts'
-import { runNetlifyHandler } from './helpers/netlify.ts'
+import { assertEquals, assert } from '@std/assert'
+import handlerCreate from '@serverless-functions/users-create.ts'
+import handlerGet from '@serverless-functions/users-get.ts'
+import handlerUpdate from '@serverless-functions/users-update.ts'
+import handlerDelete from '@serverless-functions/users-delete.ts'
+import { HttpCodes } from '@serverless-lib/api-binding.ts'
+import { Supabase } from '@serverless-lib/supabase.ts'
+import { runNetlifyHandler } from '@tests-helpers/netlify.ts'
 
 type UsersTable = Record<string, Record<string, unknown>>
 

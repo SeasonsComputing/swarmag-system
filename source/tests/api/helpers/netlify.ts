@@ -13,7 +13,7 @@ export const runNetlifyHandler = async <Body = any, Query extends Record<string,
   query?: Query,
   headers: Record<string, string> = {},
 ) => {
-  const url = new URL('http://localhost/.netlify/functions/mock')
+  const url = new URL('http://localhost/.netlify/edge-functions/mock')
   if (query) {
     for (const [key, value] of Object.entries(query)) {
       if (value !== undefined) url.searchParams.set(key, String(value))

@@ -5,7 +5,7 @@
 
 import type { ID } from '@utils/identifier.ts'
 import type { When } from '@utils/datetime.ts'
-import type { Answer, Attachment, Author, Location, Note } from './common.ts'
+import type { Answer, Attachment, Author, Location, Note } from '@domain/common.ts'
 
 /** The possible statuses of a job. */
 export type JobStatus =

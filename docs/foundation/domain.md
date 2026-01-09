@@ -1,6 +1,6 @@
 # swarmAg System – Domain
 
-This document defines the foundational abstractions, contracts, and APIs of the swarmAg Operations System, or
+This document defines the foundational abstractions, contracts, and APIs of 
  the `swarmAg System`. The domain model captures both the problem space and the solution space, expressed as classes, types, interfaces, associations, and APIs delivered through a TypeScript library.
 
 ## 1. Domain Model (`source/domain`)
@@ -61,7 +61,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - Types must be JSON-serializable.
 - No runtime dependencies beyond the UUID helper (or a tiny internal implementation).
 - This package is the **single source of truth** for domain types.
-- All other code (apps, functions) must import from `source/domain`.
+- All other code (apps, edge functions) must import from `source/domain`.
 - Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type` and `Service.requiredAssetTypes`; keep the canonical list in `docs/foundation/data-lists.md`.
 - Attachments carry a `kind` (`photo` | `video` | `map` | `document`).
 - `Customer.contacts` is non-empty and `primaryContactId` lives on `Customer`.
@@ -93,4 +93,3 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 | Optional          | `*-search`                                                                               | Richer filtering when needed                                                           |
 
 API handler conventions and validation rules live in `docs/foundation/architecture.md`.
-

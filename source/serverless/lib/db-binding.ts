@@ -12,9 +12,6 @@ const DEFAULT_CURSOR = 0
 /** Query string parameters for list endpoints. */
 export type ListQuery = { limit?: string; cursor?: string }
 
-/** Supabase row wrapper that may store the full payload. */
-export type Row<T> = Partial<T> & { payload?: T; [key: string]: unknown }
-
 /**
  * Clamp a pagination limit to the range 1-100, defaulting to 25 when unset.
  * @param value Raw limit value from the query string.

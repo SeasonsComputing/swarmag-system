@@ -4,51 +4,16 @@
 
 import { type ID, id } from '@utils/identifier.ts'
 import { type When, when } from '@utils/datetime.ts'
-import type {
-  JobAssessment,
-  JobPlan,
-  JobStatus,
-  Job
-} from '@domain/job.ts'
-import {
-  HttpCodes,
-  type ApiRequest,
-  type ApiResponse,
-} from '@serverless/lib/api-binding.ts'
-import { withNetlify } from '@serverless/lib/netlify.ts'
-import { Supabase } from '@serverless/lib/supabase.ts'
-
-/** Input structure for job assessment data, excluding generated fields. */
-type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>
-
-/** Input structure for job plan data, excluding generated fields and allowing optional status. */
-type JobPlanInput = Omit<
-  JobPlan,
-  'id' | 'jobId' | 'status' | 'createdAt' | 'updatedAt'
-> & { status?: JobStatus }
-
-/** Body structure for job creation API requests. */
-interface JobCreateBody {
-  serviceId: ID
-  customerId: ID
-  assessment: JobAssessmentInput
-  plan: JobPlanInput
-}
+import type { JobAssessment, JobPlan, JobStatus, Job } from '@domain/job.ts'
+import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { Supabase } from '@serverless-lib/supabase.ts'
+import { validateJobCreateInput, type JobCreateInput } from '@domain/job-validators.ts'
 
 /**
- * Validates the job creation payload.
- * @param payload - The job creation body to validate.
- * @returns A string error message if invalid, null if valid.
+ * Edge function path config
  */
-const validate = (payload: JobCreateBody): string | null => {
-  if (!payload?.serviceId) return 'serviceId is required'
-  if (!payload.customerId) return 'customerId is required'
-  if (!payload.plan?.workflowId) return 'plan.workflowId is required'
-  if (!payload.plan?.scheduledStart) return 'plan.scheduledStart is required'
-  if (!payload.assessment?.assessedAt) return 'assessment.assessedAt is required'
-  if (!payload.assessment?.locations?.length) return 'assessment.locations requires 1+ location'
-  return null
-}
+export const config = { path: "/api/jobs/create" };
 
 /**
  * Handles the job creation API request.
@@ -56,7 +21,7 @@ const validate = (payload: JobCreateBody): string | null => {
  * @returns The API result with created job data or error.
  */
 const handle = async (
-  req: ApiRequest<JobCreateBody>
+  req: ApiRequest<JobCreateInput>
 ): Promise<ApiResponse> => {
   if (req.method !== 'POST') {
     return {
@@ -65,7 +30,7 @@ const handle = async (
     }
   }
 
-  const validationError = validate(req.body)
+  const validationError = validateJobCreateInput(req.body)
   if (validationError) {
     return {
       statusCode: HttpCodes.unprocessableEntity,
@@ -170,4 +135,4 @@ const handle = async (
   }
 }
 
-export default withNetlify(handle)
+export default createApiHandler(handle)

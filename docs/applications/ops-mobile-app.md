@@ -41,9 +41,8 @@ source/apps/ops/
   - TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS.
   - No Tailwind.
 - Use the repo-level Deno import aliases from `deno.json`.
-- Import via configured aliases: `@domain/*`, `@serverless/*`, `@utils/*`.
-- Must import domain types from `source/domain`.
-- Must call backend APIs via Netlify Functions (not ad-hoc URLs).
+- Import backend DTOs and clients via the serverless API.
+- Must call backend APIs via the runtime API (not ad-hoc URLs).
 - Must be structured by features (`src/features/<feature>`).
 - Accessibility:
   - Aim for WCAG 2.1 AA where reasonable.
@@ -81,4 +80,3 @@ In `src/features/workflows/WorkflowRunner.tsx`:
 2. Implement a minimal navigation and layout.
 3. Create `WorkflowRunner` with a small, in-memory sample workflow.
 4. Add a basic in-memory JobLog store and wire it into `WorkflowRunner`.
-

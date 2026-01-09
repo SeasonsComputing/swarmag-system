@@ -5,7 +5,7 @@
 
 import type { ID } from '@utils/identifier.ts'
 import type { When } from '@utils/datetime.ts'
-import type { Location, Note, Question } from './common.ts'
+import type { Location, Note, Question } from '@domain/common.ts'
 
 /** A step in a workflow, including checklists and requirements. */
 export interface WorkflowStep {

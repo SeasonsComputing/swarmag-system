@@ -5,7 +5,7 @@
 
 import type { ID } from '@utils/identifier.ts'
 import type { When } from '@utils/datetime.ts'
-import type { Attachment, Note } from './common.ts'
+import type { Attachment, Note } from '@domain/common.ts'
 
 /** The different usages for chemicals. */
 export type ChemicalUsage =

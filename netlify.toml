@@ -3,5 +3,11 @@
   edge_functions = "source/serverless/functions"
   publish = "."
 
+[functions]
+  deno_import_map = "netlify-import-map.json"
+
 [dev]
+  command = "deno run --allow-net --allow-env scripts/dev-server.ts"
+  targetPort = 8889
   edge_functions = "source/serverless/functions"
+  framework = "#custom"

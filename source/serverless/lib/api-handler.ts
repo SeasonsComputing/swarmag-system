@@ -1,22 +1,28 @@
 /**
- * Netlify adapter wrapping typed handlers with JSON parsing, validation, and error handling.
+ * Netlify edge handler wrapper for typed API handlers.
  */
 
 import {
+  ApiHandler,
+  ApiRequest,
+  ApiResponse,
   HttpCodes,
+  HttpHeaders,
+  HttpMethod,
+  HttpQuery,
+  HEADER_ALLOW_CREDENTIALS,
+  HEADER_ALLOW_HEADERS,
+  HEADER_ALLOW_METHODS,
+  HEADER_ALLOW_ORIGIN,
+  HEADER_CONTENT_TYPE,
+  HEADER_VARY,
   isHttpMethod,
-  type ApiHandler,
-  type ApiRequest,
-  type ApiResponse,
-  type HttpHeaders,
-  type HttpMethod,
-  type HttpQuery,
 } from './api-binding.ts'
 
 /**
- * Configuration options for the Netlify adapter.
+ * Configuration options for the Edge adapter.
  */
-export interface NetlifyAdapterConfig {
+export interface ApiAdapterConfig {
   /** Enable CORS headers in responses. Default: false */
   cors?: boolean | {
     origin?: string
@@ -38,10 +44,15 @@ export interface NetlifyAdapterConfig {
 const METHODS_WITH_BODY = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE'])
 const DEFAULT_MAX_BODY_SIZE = 6 * 1024 * 1024
 
-/**
- * HTTP status codes that should not include a response body.
+/** 
+ * Error with a stable name for adapter failures.
  */
-const NO_BODY_STATUS_CODES = new Set([204, 304])
+class NamedError extends Error {
+  constructor(name: string, message: string) {
+    super(message)
+    this.name = name
+  }
+}
 
 /**
  * Normalize HTTP headers to lowercase keys for case-insensitive access.
@@ -51,19 +62,6 @@ const NO_BODY_STATUS_CODES = new Set([204, 304])
 const normalizeHeaders = (headers: Headers): HttpHeaders => {
   const normalized: HttpHeaders = {}
   for (const [key, value] of headers.entries()) {
-    normalized[key.toLowerCase()] = value
-  }
-  return normalized
-}
-
-/**
- * Normalize a header map to lowercase keys.
- * @param headers Header map.
- * @returns Normalized headers with lowercase keys.
- */
-const normalizeHeaderMap = (headers: HttpHeaders): HttpHeaders => {
-  const normalized: HttpHeaders = {}
-  for (const [key, value] of Object.entries(headers)) {
     normalized[key.toLowerCase()] = value
   }
   return normalized
@@ -96,21 +94,34 @@ const normalizeQuery = (
 }
 
 /**
+ * Normalize a header map to lowercase keys.
+ * @param headers Header map.
+ * @returns Normalized headers with lowercase keys.
+ */
+const normalizeHeaderMap = (headers: HttpHeaders): HttpHeaders => {
+  const normalized: HttpHeaders = {}
+  for (const [key, value] of Object.entries(headers)) {
+    normalized[key.toLowerCase()] = value
+  }
+  return normalized
+}
+
+/**
  * Build CORS headers based on configuration.
  * @param config CORS configuration.
  * @returns Headers object with CORS headers.
  */
 const buildCorsHeaders = (
-  config: boolean | NonNullable<NetlifyAdapterConfig['cors']>
+  config: boolean | NonNullable<ApiAdapterConfig['cors']>
 ): HttpHeaders => {
   if (config === false) return {}
   const corsConfig = config === true ? {} : config
   return {
-    'access-control-allow-origin': corsConfig.origin ?? '*',
-    'access-control-allow-methods': corsConfig.methods?.join(', ') ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-    'access-control-allow-headers': corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization',
-    'vary': 'Origin',
-    ...(corsConfig.credentials ? { 'access-control-allow-credentials': 'true' } : {}),
+    [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
+    [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ') ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization',
+    [HEADER_VARY]: 'Origin',
+    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {}),
   }
 }
 
@@ -128,6 +139,11 @@ const toHeaders = (headers: HttpHeaders): Headers => {
 }
 
 /**
+ * HTTP status codes that should not include a response body.
+ */
+const NO_BODY_STATUS_CODES = new Set([204, 304])
+
+/**
  * Build a Response with consistent headers.
  * @param statusCode HTTP status code.
  * @param body JSON-serializable payload, or a pre-serialized string when using a custom content-type.
@@ -139,7 +155,7 @@ const buildResponse = (
   statusCode: number,
   body: unknown,
   additionalHeaders: HttpHeaders = {},
-  config: NetlifyAdapterConfig = {}
+  config: ApiAdapterConfig = {}
 ): Response => {
   const corsHeaders = config.cors ? buildCorsHeaders(config.cors) : {}
   const normalizedResponseHeaders = normalizeHeaderMap(additionalHeaders)
@@ -154,7 +170,7 @@ const buildResponse = (
     })
   }
 
-  const customContentType = normalizedResponseHeaders['content-type']
+  const customContentType = normalizedResponseHeaders[HEADER_CONTENT_TYPE]
   const isJsonResponse = !customContentType
     || customContentType.toLowerCase().includes('application/json')
 
@@ -185,7 +201,7 @@ const buildResponse = (
   return new Response(bodyString, {
     status: statusCode,
     headers: toHeaders({
-      ...(isJsonResponse ? { 'content-type': 'application/json' } : {}),
+      ...(isJsonResponse ? { [HEADER_CONTENT_TYPE]: 'application/json' } : {}),
       ...corsHeaders,
       ...normalizedResponseHeaders,
     }),
@@ -204,8 +220,21 @@ const buildErrorResponse = (
   statusCode: number,
   error: string,
   details: string,
-  config: NetlifyAdapterConfig = {}
+  config: ApiAdapterConfig = {}
 ): Response => buildResponse(statusCode, { error, details }, {}, config)
+
+/**
+ * Validate that status code is in valid HTTP range.
+ * @param statusCode Status code to validate.
+ * @returns Validated status code.
+ */
+const validateStatusCode = (statusCode: number): number => {
+  if (!Number.isInteger(statusCode) || statusCode < 100 || statusCode > 599) {
+    console.warn(`Handler returned invalid status code ${statusCode}, using 500`)
+    return HttpCodes.internalError
+  }
+  return statusCode
+}
 
 /**
  * Safely serialize an error for JSON response.
@@ -213,14 +242,8 @@ const buildErrorResponse = (
  * @returns Error object with name and message.
  */
 const serializeError = (err: unknown): { name: string; message: string } => {
-  if (err instanceof Error) {
-    return { name: err.name, message: err.message }
-  }
-
-  if (typeof err === 'string') {
-    return { name: 'Error', message: err }
-  }
-
+  if (err instanceof Error) return { name: err.name, message: err.message }
+  if (typeof err === 'string') return { name: 'Error', message: err }
   if (err && typeof err === 'object') {
     try {
       return { name: 'Error', message: JSON.stringify(err) }
@@ -228,7 +251,6 @@ const serializeError = (err: unknown): { name: string; message: string } => {
       return { name: 'Error', message: String(err) }
     }
   }
-
   return { name: 'Error', message: String(err) }
 }
 
@@ -253,7 +275,7 @@ const parseRequestBody = async (
   request: Request,
   method: HttpMethod,
   contentType: string | undefined,
-  config: NetlifyAdapterConfig
+  config: ApiAdapterConfig
 ): Promise<unknown> => {
   // No body expected for these methods
   if (!METHODS_WITH_BODY.has(method)) return undefined
@@ -266,9 +288,9 @@ const parseRequestBody = async (
   if (contentLength) {
     const parsedLength = Number.parseInt(contentLength, 10)
     if (!Number.isNaN(parsedLength) && parsedLength > maxSize) {
-      throw Object.assign(
-        new Error(`Request body exceeds maximum size of ${maxSize} bytes`),
-        { name: 'PayloadTooLarge' }
+      throw new NamedError(
+        'PayloadTooLarge',
+        `Request body exceeds maximum size of ${maxSize} bytes`
       )
     }
   }
@@ -280,9 +302,9 @@ const parseRequestBody = async (
 
   const bodySize = byteLength(decodedBody)
   if (bodySize > maxSize) {
-    throw Object.assign(
-      new Error(`Request body exceeds maximum size of ${maxSize} bytes`),
-      { name: 'PayloadTooLarge' }
+    throw new NamedError(
+      'PayloadTooLarge',
+      `Request body exceeds maximum size of ${maxSize} bytes`
     )
   }
 
@@ -290,9 +312,9 @@ const parseRequestBody = async (
   if (config.validateContentType !== false) {
     const ct = contentType?.toLowerCase() ?? ''
     if (!ct.includes('application/json')) {
-      throw Object.assign(
-        new Error(`Expected Content-Type: application/json, received: ${contentType ?? 'none'}`),
-        { name: 'InvalidContentType' }
+      throw new NamedError(
+        'InvalidContentType',
+        `Expected Content-Type: application/json, received: ${contentType ?? 'none'}`
       )
     }
   }
@@ -301,28 +323,12 @@ const parseRequestBody = async (
   try {
     return JSON.parse(decodedBody)
   } catch (err) {
-    throw Object.assign(
-      new Error(`Invalid JSON: ${(err as Error).message}`),
-      { name: 'InvalidJSON' }
-    )
+    throw new NamedError('InvalidJSON', `Invalid JSON: ${(err as Error).message}`)
   }
 }
 
 /**
- * Validate that status code is in valid HTTP range.
- * @param statusCode Status code to validate.
- * @returns Validated status code.
- */
-const validateStatusCode = (statusCode: number): number => {
-  if (!Number.isInteger(statusCode) || statusCode < 100 || statusCode > 599) {
-    console.warn(`Handler returned invalid status code ${statusCode}, using 500`)
-    return HttpCodes.internalError
-  }
-  return statusCode
-}
-
-/**
- * Adapt a typed API handler to Netlify's v2 Request/Response contract.
+ * Adapt a typed API handler to the Edge Request/Response contract.
  *
  * @template RequestBody Request body type (for documentation only - validated by handler).
  * @template Query Query parameters type (for documentation only - validated by handler).
@@ -331,19 +337,16 @@ const validateStatusCode = (statusCode: number): number => {
  * @param config Optional adapter configuration for CORS, validation, etc.
  * @returns Fetch handler ready for export.
  */
-export const withNetlify = <RequestBody = unknown, Query = HttpQuery, ResponseBody = unknown>(
+export const createApiHandler = <RequestBody = unknown, Query = HttpQuery, ResponseBody = unknown>(
   handle: ApiHandler<RequestBody, Query, ResponseBody>,
-  config: NetlifyAdapterConfig = {}
+  config: ApiAdapterConfig = {}
 ) => {
   return async (request: Request): Promise<Response> => {
     try {
       const method = request.method
 
       if (method === 'OPTIONS' && config.cors) {
-        return new Response('', {
-          status: HttpCodes.noContent,
-          headers: toHeaders(buildCorsHeaders(config.cors)),
-        })
+        return buildResponse(HttpCodes.noContent, '', {}, config)
       }
 
       if (!isHttpMethod(method)) {
@@ -390,7 +393,7 @@ export const withNetlify = <RequestBody = unknown, Query = HttpQuery, ResponseBo
       return buildResponse(statusCode, result.body, result.headers, config)
     } catch (err) {
       const { name, message } = serializeError(err)
-      console.error('Unhandled error in Netlify adapter:', { name, message, err })
+      console.error('Unhandled error in Edge handler:', { name, message, err })
       return buildErrorResponse(HttpCodes.internalError, name, message, config)
     }
   }

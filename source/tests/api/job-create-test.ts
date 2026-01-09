@@ -2,12 +2,12 @@
  * Unit tests for the job-create Netlify handler.
  */
 
-import { assertEquals, assert } from 'https://deno.land/std@0.224.0/assert/mod.ts'
-import handler from '@serverless/functions/job-create.ts'
-import { HttpCodes } from '@serverless/lib/api-binding.ts'
-import { Supabase } from '@serverless/lib/supabase.ts'
-import { ranchMappingAssessment } from '../fixtures/samples.ts'
-import { runNetlifyHandler } from './helpers/netlify.ts'
+import { assertEquals, assert } from '@std/assert'
+import handler from '@serverless-functions/jobs-create.ts'
+import { HttpCodes } from '@serverless-lib/api-binding.ts'
+import { Supabase } from '@serverless-lib/supabase.ts'
+import { ranchMappingAssessment } from '@tests-fixtures/samples.ts'
+import { runNetlifyHandler } from '@tests-helpers/netlify.ts'
 
 const insertCalls: Record<string, unknown> = {}
 
