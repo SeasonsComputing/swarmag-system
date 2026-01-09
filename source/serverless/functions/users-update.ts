@@ -7,7 +7,7 @@ import { when } from '@utils/datetime.ts'
 import { Supabase } from '@serverless-lib/supabase.ts'
 import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
-import { userToRow, rowToUser } from '@serverless-mappings/user-mapping.ts'
+import { userToRow, rowToUser } from '@serverless-mappings/users-mapping.ts'
 import { validateUserUpdateInput, type UserUpdateInput } from '@domain/common-validators.ts'
 
 /**
