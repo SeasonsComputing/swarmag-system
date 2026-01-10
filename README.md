@@ -62,7 +62,8 @@ Prepare a software construction session by creating a new chat and submitting th
 
 Ingest the following files, assume `AUTHORITY.md` is binding.
 
-1. `docs/foundation/` - all markdown files
-2. `source/*`- all source files
-3. `NOTES.md`
-4. `AUTHORITY.md`
+1. `CLAUDE.md`
+2. `docs/foundation/` - all markdown files
+3. `source/*`- all source files
+4. `NOTES.md`
+5. `AUTHORITY.md`
