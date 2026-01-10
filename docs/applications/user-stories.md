@@ -17,4 +17,3 @@
 3. **Workflow seeding** — Preload an assessment workflow based on the Service type (default workflow per category/SKU).
 4. **Workflow tailoring** — Add or remove additional workflows/tasks to match site-specific needs or hazards.
 5. **Data capture prep** — Note required artifacts (maps, photos, checklists) to collect during the assessment.
-

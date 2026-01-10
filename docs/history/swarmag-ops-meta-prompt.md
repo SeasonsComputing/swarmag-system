@@ -155,4 +155,3 @@ Monorepo.
 | swarmag-system-admin    | Desktop PWA  | admin.swarmag.com |
 | swarmag-system-customer | Website      | me.swarmag.com    |
 | swarmag-system-backend  | REST Service | api.swarmag.com   |
-
