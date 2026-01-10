@@ -3,7 +3,7 @@
  */
 
 import type { Service } from '@domain/service.ts'
-import { Supabase } from '@serverless-lib/supabase.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { clampLimit, parseCursor, type ListQuery, isIdArray } from '@serverless-lib/db-binding.ts'
 import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'

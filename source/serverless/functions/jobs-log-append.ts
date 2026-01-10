@@ -7,7 +7,7 @@ import { type When, when } from '@utils/datetime.ts'
 import type { JobLogEntry } from '@domain/job.ts'
 import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
-import { Supabase } from '@serverless-lib/supabase.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { validateJobLogAppendInput, type JobLogAppendInput } from '@domain/job-validators.ts'
 
 /**

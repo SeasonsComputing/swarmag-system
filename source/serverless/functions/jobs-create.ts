@@ -7,7 +7,7 @@ import { type When, when } from '@utils/datetime.ts'
 import type { JobAssessment, JobPlan, JobStatus, Job } from '@domain/job.ts'
 import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
-import { Supabase } from '@serverless-lib/supabase.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { validateJobCreateInput, type JobCreateInput } from '@domain/job-validators.ts'
 
 /**
