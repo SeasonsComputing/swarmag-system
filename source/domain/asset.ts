@@ -11,7 +11,10 @@ import type { Attachment } from '@domain/common.ts'
 /** The different types of assets available in the system. */
 export interface AssetType {
   id: ID;
-  name: string;
+  label: string;
+  active: boolean;
+  createdAt: When
+  updatedAt: When
 }
 
 /** The possible statuses an asset can have. */
