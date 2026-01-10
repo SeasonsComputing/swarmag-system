@@ -10,16 +10,16 @@ Architecture, goals, and setup instructions live in `docs/foundation/architectur
 
 ## 1. Repository Layout
 
-| Path                                | Description                                                 |
-| ----------------------------------- | ----------------------------------------------------------- |
-| `docs/`                             | System, architecture, and application specifications        |
-| `source/domain/`                    | Canonical domain model (types/interfaces/classes)           |
-| `source/utils/`                     | Shared primitives, e.g. datetime & identifier               |
-| `source/serverless/functions/` | Netlify Edge Functions                                      |
-| `source/serverless/lib/`            | Backend platform helpers (Netlify adapter, Supabase client) |
-| `source/migrations/`                | Supabase SQL migrations                                     |
-| `source/tests/`                     | Test specs and fixtures (barreled samples in `fixtures/`)   |
-| `source/apps/`                      | Planned SolidJS apps for admin, ops, customer               |
+| Path                            | Description                                                 |
+| ------------------------------- | ----------------------------------------------------------- |
+| `docs/`                         | System, architecture, and application specifications        |
+| `source/domain/`                | Canonical domain model (types/interfaces/classes)           |
+| `source/utils/`                 | Shared primitives, e.g. datetime & identifier               |
+| `source/serverless/functions/`  | Netlify Edge Functions                                      |
+| `source/serverless/lib/`        | Backend platform helpers (Netlify adapter, Supabase client) |
+| `source/migrations/`            | Supabase SQL migrations                                     |
+| `source/tests/`                 | Test specs and fixtures (barreled samples in `fixtures/`)   |
+| `source/apps/`                  | Planned SolidJS apps for admin, ops, customer               |
 
 ## 2. Roadmap (Current Project State)
 

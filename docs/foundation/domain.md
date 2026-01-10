@@ -1,7 +1,6 @@
 # swarmAg System – Domain
 
-This document defines the foundational abstractions, contracts, and APIs of 
- the `swarmAg System`. The domain model captures both the problem space and the solution space, expressed as classes, types, interfaces, associations, and APIs delivered through a TypeScript library.
+This document defines the foundational abstractions, contracts, and APIs of the `swarmAg System`. The domain model captures both the problem space and the solution space, expressed as classes, types, interfaces, associations, and APIs delivered through a TypeScript library.
 
 ## 1. Domain Model (`source/domain`)
 
