@@ -5,7 +5,7 @@
 import type { User } from '@domain/common.ts'
 import { id } from '@utils/identifier.ts'
 import { when } from '@utils/datetime.ts'
-import { Supabase } from '@serverless-lib/supabase.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { userToRow } from '@serverless-mappings/users-mapping.ts'

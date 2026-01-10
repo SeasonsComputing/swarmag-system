@@ -8,7 +8,7 @@ import handlerGet from '@serverless-functions/users-get.ts'
 import handlerUpdate from '@serverless-functions/users-update.ts'
 import handlerDelete from '@serverless-functions/users-delete.ts'
 import { HttpCodes } from '@serverless-lib/api-binding.ts'
-import { Supabase } from '@serverless-lib/supabase.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { runNetlifyHandler } from '@tests-helpers/netlify.ts'
 
 type UsersTable = Record<string, Record<string, unknown>>

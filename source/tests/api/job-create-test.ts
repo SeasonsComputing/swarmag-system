@@ -5,7 +5,7 @@
 import { assertEquals, assert } from '@std/assert'
 import handler from '@serverless-functions/jobs-create.ts'
 import { HttpCodes } from '@serverless-lib/api-binding.ts'
-import { Supabase } from '@serverless-lib/supabase.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { ranchMappingAssessment } from '@tests-fixtures/samples.ts'
 import { runNetlifyHandler } from '@tests-helpers/netlify.ts'
 
