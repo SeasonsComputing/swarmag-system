@@ -3,6 +3,8 @@
  * Provides generation and validation of unique IDs.
  */
 
+import { assert } from '@std/assert'
+
 /** Represents a unique identifier as a UUID string. */
 export type ID = string
 
@@ -21,9 +23,7 @@ export const id = (): ID => {
   bytes[5] = Number(timestamp & 0xffn)
 
   const cryptoObj = globalThis.crypto
-  if (!cryptoObj?.getRandomValues) {
-    throw new Error('crypto.getRandomValues is not available')
-  }
+  assert(cryptoObj?.getRandomValues, 'crypto.getRandomValues is not available')
   cryptoObj.getRandomValues(bytes.subarray(6))
 
   bytes[6] = (bytes[6] & 0x0f) | 0x70
