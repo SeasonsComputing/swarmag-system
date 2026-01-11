@@ -2,18 +2,18 @@
  * Netlify handler for soft-deleting users.
  */
 
+import { type UserDeleteInput, validateUserDeleteInput } from '@domain/common-validators.ts'
 import type { User } from '@domain/common.ts'
-import { when } from '@utils/datetime.ts'
-import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
-import { userToRow, rowToUser } from '@serverless-mappings/users-mapping.ts'
-import { validateUserDeleteInput, type UserDeleteInput } from '@domain/common-validators.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
+import { rowToUser, userToRow } from '@serverless-mappings/users-mapping.ts'
+import { when } from '@utils/datetime.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: "/api/users/delete" };
+export const config = { path: '/api/users/delete' }
 
 /**
  * Soft-delete a user by marking deleted timestamp while keeping the record.
@@ -50,7 +50,7 @@ const handle = async (
   } catch (parseError) {
     return {
       statusCode: HttpCodes.internalError,
-      body: { error: 'Invalid user record returned from Supabase', details: (parseError as Error).message },
+      body: { error: 'Invalid user record returned from Supabase', details: (parseError as Error).message }
     }
   }
 
@@ -65,7 +65,7 @@ const handle = async (
   if (updateError) {
     return {
       statusCode: HttpCodes.internalError,
-      body: { error: 'Failed to delete user', details: updateError.message },
+      body: { error: 'Failed to delete user', details: updateError.message }
     }
   }
 

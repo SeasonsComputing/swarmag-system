@@ -10,20 +10,20 @@ const NAMESPACE_DIRS: Record<Exclude<Namespace, 'external'>, string> = {
   domain: '/source/domain/',
   utils: '/source/utils/',
   serverless: '/source/serverless/',
-  apps: '/source/apps/',
+  apps: '/source/apps/'
 }
 
 const ALLOWED_DEPS: Record<Exclude<Namespace, 'external'>, Set<Namespace>> = {
   domain: new Set(['domain', 'utils']),
   utils: new Set(['utils']),
   serverless: new Set(['serverless', 'domain', 'utils', 'external']),
-  apps: new Set(['apps', 'domain', 'external']),
+  apps: new Set(['apps', 'domain', 'external'])
 }
 
 const IMPORT_REGEXES = [
   /\bimport\s+(?:[^'"]+?\s+from\s+)?['"]([^'"]+)['"]/g,
   /\bexport\s+(?:[^'"]+?\s+from\s+)?['"]([^'"]+)['"]/g,
-  /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
+  /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g
 ]
 
 const normalizePath = (value: string): string => value.replaceAll('\\', '/')
@@ -40,8 +40,10 @@ const namespaceForPath = (path: string): Exclude<Namespace, 'external'> | null =
 const namespaceForSpecifier = (specifier: string, filePath: string): Namespace => {
   if (specifier.startsWith('@domain/')) return 'domain'
   if (specifier.startsWith('@utils/')) return 'utils'
-  if (specifier.startsWith('@serverless-lib/')
-    || specifier.startsWith('@serverless-functions/')) {
+  if (
+    specifier.startsWith('@serverless-lib/')
+    || specifier.startsWith('@serverless-functions/')
+  ) {
     return 'serverless'
   }
   if (specifier.startsWith('./') || specifier.startsWith('../')) {
@@ -77,11 +79,10 @@ const findImports = (source: string): Array<{ specifier: string; index: number }
   return imports
 }
 
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const main = async () => {
-  const roots = Object.values(NAMESPACE_DIRS).map((dir) => `${ROOT}${dir}`)
+  const roots = Object.values(NAMESPACE_DIRS).map(dir => `${ROOT}${dir}`)
   const files = (await Promise.all(roots.map(collectFiles))).flat()
   const violations: string[] = []
 

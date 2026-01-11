@@ -2,18 +2,18 @@
  * Netlify handler for appending job log entries.
  */
 
-import { id } from '@utils/identifier.ts'
-import { type When, when } from '@utils/datetime.ts'
+import { type JobLogAppendInput, validateJobLogAppendInput } from '@domain/job-validators.ts'
 import type { JobLogEntry } from '@domain/job.ts'
-import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { validateJobLogAppendInput, type JobLogAppendInput } from '@domain/job-validators.ts'
+import { type When, when } from '@utils/datetime.ts'
+import { id } from '@utils/identifier.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: "/api/jobs-log/append" };
+export const config = { path: '/api/jobs-log/append' }
 
 /**
  * Handles the job log append API request.
@@ -24,17 +24,17 @@ const handle = async (
   req: ApiRequest<JobLogAppendInput>
 ): Promise<ApiResponse> => {
   if (req.method !== 'POST') {
-    return { 
-      statusCode: HttpCodes.methodNotAllowed, 
-      body: { error: 'Method Not Allowed' } 
+    return {
+      statusCode: HttpCodes.methodNotAllowed,
+      body: { error: 'Method Not Allowed' }
     }
   }
 
   const validationError = validateJobLogAppendInput(req.body)
   if (validationError) {
-    return { 
-      statusCode: HttpCodes.unprocessableEntity, 
-      body: { error: validationError } 
+    return {
+      statusCode: HttpCodes.unprocessableEntity,
+      body: { error: validationError }
     }
   }
 
@@ -50,11 +50,11 @@ const handle = async (
     createdBy: req.body.createdBy,
     location: req.body.location,
     attachments: req.body.attachments,
-    payload: req.body.payload,
+    payload: req.body.payload
   }
 
   const supabase = Supabase.client()
-  
+
   const { error } = await supabase.from('job_logs').insert({
     id: logEntry.id,
     job_id: logEntry.jobId,
@@ -62,7 +62,7 @@ const handle = async (
     type: logEntry.type,
     occurred_at: logEntry.occurredAt,
     created_at: logEntry.createdAt,
-    payload: logEntry,
+    payload: logEntry
   })
 
   if (error) {
@@ -70,8 +70,8 @@ const handle = async (
       statusCode: HttpCodes.internalError,
       body: {
         error: 'Failed to append job log entry',
-        details: error.message,
-      },
+        details: error.message
+      }
     }
   }
 

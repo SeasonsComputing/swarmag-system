@@ -18,7 +18,7 @@ const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
  * @returns True when the value is an array of strings.
  */
 const isUserRoles = (value: unknown): value is User['roles'] =>
-  Array.isArray(value) && value.every((role) => typeof role === 'string')
+  Array.isArray(value) && value.every(role => typeof role === 'string')
 
 /** Map a domain User into a Supabase row shape. */
 export const userToRow = (user: User) => ({
@@ -32,7 +32,7 @@ export const userToRow = (user: User) => ({
   created_at: user.createdAt,
   updated_at: user.updatedAt,
   deleted_at: user.deletedAt ?? null,
-  payload: user,
+  payload: user
 })
 
 const parseUserFields = (src: Record<string, unknown>): User | undefined => {
@@ -58,7 +58,7 @@ const parseUserFields = (src: Record<string, unknown>): User | undefined => {
       status,
       createdAt,
       updatedAt,
-      deletedAt,
+      deletedAt
     }
   }
 
@@ -75,7 +75,7 @@ const normalizeUserRecord = (record: Record<string, unknown>): Record<string, un
   deletedAt: typeof record.deletedAt === 'string' ? record.deletedAt : record.deleted_at,
   avatarUrl: typeof record.avatarUrl === 'string' ? record.avatarUrl : record.avatar_url,
   roles: record.roles,
-  status: record.status,
+  status: record.status
 })
 
 /** Convert a Supabase row into a User domain model, preferring the payload when present. */

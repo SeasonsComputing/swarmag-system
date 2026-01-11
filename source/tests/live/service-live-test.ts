@@ -3,10 +3,16 @@
  */
 
 import { assert } from '@std/assert'
+import { validateRequiredVars } from '@utils/environment.ts'
 
-const baseUrl = Deno.env.get('LIVE_BASE_URL')
-const serviceListPath =
-  Deno.env.get('LIVE_SERVICE_LIST_PATH') ?? '/.netlify/edge-functions/service-list'
+let baseUrl: string | undefined
+try {
+  validateRequiredVars(['LIVE_BASE_URL'])
+  baseUrl = Deno.env.get('LIVE_BASE_URL')
+} catch {
+  baseUrl = undefined
+}
+const serviceListPath = Deno.env.get('LIVE_SERVICE_LIST_PATH') ?? '/.netlify/edge-functions/services-list'
 
 if (!baseUrl) {
   Deno.test('service-list live endpoint (skipped: LIVE_BASE_URL not set)', () => {})

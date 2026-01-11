@@ -2,10 +2,10 @@
  * Unit tests for the job-create Netlify handler.
  */
 
-import { assertEquals, assert } from '@std/assert'
 import handler from '@serverless-functions/jobs-create.ts'
 import { HttpCodes } from '@serverless-lib/api-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
+import { assert, assertEquals } from '@std/assert'
 import { ranchMappingAssessment } from '@tests-fixtures/samples.ts'
 import { runNetlifyHandler } from '@tests-helpers/netlify.ts'
 
@@ -18,9 +18,37 @@ type JobCreateBody = {
   plan: Record<string, unknown>
 }
 
+type JobInsert = {
+  id: string
+  payload: {
+    id: string
+    assessmentId: string
+    planId: string
+    status: string
+  }
+}
+
+type PlanInsert = {
+  id: string
+  job_id: string
+  created_at: string
+  payload: {
+    workflowId: string
+    status: string
+    createdAt: string
+  }
+}
+
+type AssessmentInsert = {
+  id: string
+  job_id: string
+  payload: {
+    customerId: string
+  }
+}
+
 const buildAssessmentInput = () => {
-  const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...rest } =
-    ranchMappingAssessment
+  const { id: _id, createdAt: _createdAt, updatedAt: _updatedAt, ...rest } = ranchMappingAssessment
   return { ...rest }
 }
 
@@ -31,7 +59,7 @@ const basePlanInput: JobCreateBody['plan'] = {
   assignments: [],
   assets: [],
   chemicals: [],
-  notes: [],
+  notes: []
 }
 
 const buildBody = (overrides: Partial<JobCreateBody> = {}): JobCreateBody => ({
@@ -39,12 +67,12 @@ const buildBody = (overrides: Partial<JobCreateBody> = {}): JobCreateBody => ({
   customerId: overrides.customerId ?? ranchMappingAssessment.customerId,
   assessment: {
     ...buildAssessmentInput(),
-    ...(overrides.assessment ?? {}),
+    ...(overrides.assessment ?? {})
   },
   plan: {
     ...basePlanInput,
-    ...(overrides.plan ?? {}),
-  },
+    ...(overrides.plan ?? {})
+  }
 })
 
 Deno.test('job-create handler rejects invalid payloads before touching Supabase', async () => {
@@ -52,7 +80,7 @@ Deno.test('job-create handler rejects invalid payloads before touching Supabase'
   let fromCalls = 0
   let clientCalls = 0
 
-  Supabase.client = ((() => {
+  Supabase.client = (() => {
     clientCalls += 1
     return {
       from: (table: string) => {
@@ -61,15 +89,15 @@ Deno.test('job-create handler rejects invalid payloads before touching Supabase'
           insert: (payload: unknown) => {
             insertCalls[table] = payload
             return Promise.resolve({ error: null })
-          },
+          }
         }
-      },
+      }
     }
-  }) as unknown as typeof Supabase.client)
+  }) as unknown as typeof Supabase.client
 
   try {
     const request = buildBody({
-      plan: { ...basePlanInput, scheduledStart: undefined as never },
+      plan: { ...basePlanInput, scheduledStart: undefined as never }
     })
 
     const response = await runNetlifyHandler(handler, 'POST', request)
@@ -79,7 +107,7 @@ Deno.test('job-create handler rejects invalid payloads before touching Supabase'
     assertEquals(fromCalls, 0)
   } finally {
     Supabase.client = originalClient
-    Object.keys(insertCalls).forEach((key) => delete insertCalls[key])
+    Object.keys(insertCalls).forEach(key => delete insertCalls[key])
   }
 })
 
@@ -88,7 +116,7 @@ Deno.test('job-create handler persists job, plan, and assessment with generated 
   let fromCalls = 0
   let clientCalls = 0
 
-  Supabase.client = ((() => {
+  Supabase.client = (() => {
     clientCalls += 1
     return {
       from: (table: string) => {
@@ -97,15 +125,21 @@ Deno.test('job-create handler persists job, plan, and assessment with generated 
           insert: (payload: unknown) => {
             insertCalls[table] = payload
             return Promise.resolve({ error: null })
-          },
+          }
         }
-      },
+      }
     }
-  }) as unknown as typeof Supabase.client)
+  }) as unknown as typeof Supabase.client
 
   try {
     const response = await runNetlifyHandler(handler, 'POST', buildBody())
-    const body = response.body as { data: { job: Record<string, unknown>; plan: Record<string, unknown>; assessment: Record<string, unknown> } }
+    const body = response.body as {
+      data: {
+        job: Record<string, unknown>
+        plan: Record<string, unknown>
+        assessment: Record<string, unknown>
+      }
+    }
 
     assertEquals(response.statusCode, HttpCodes.created)
     assertEquals(clientCalls, 1)
@@ -114,9 +148,9 @@ Deno.test('job-create handler persists job, plan, and assessment with generated 
     assert(insertCalls.job_plans)
     assert(insertCalls.job_assessments)
 
-    const jobInsert = insertCalls.jobs as Record<string, any>
-    const planInsert = insertCalls.job_plans as Record<string, any>
-    const assessmentInsert = insertCalls.job_assessments as Record<string, any>
+    const jobInsert = insertCalls.jobs as JobInsert
+    const planInsert = insertCalls.job_plans as PlanInsert
+    const assessmentInsert = insertCalls.job_assessments as AssessmentInsert
 
     assertEquals(jobInsert.payload.id, jobInsert.id)
     assertEquals(jobInsert.payload.assessmentId, assessmentInsert.id)
@@ -129,13 +163,16 @@ Deno.test('job-create handler persists job, plan, and assessment with generated 
     assertEquals(planInsert.payload.createdAt, planInsert.created_at)
 
     assertEquals(assessmentInsert.job_id, jobInsert.id)
-    assertEquals(assessmentInsert.payload.customerId, ranchMappingAssessment.customerId)
+    assertEquals(
+      assessmentInsert.payload.customerId,
+      ranchMappingAssessment.customerId
+    )
 
     assertEquals(body.data.job.id, jobInsert.id)
     assertEquals(body.data.plan.id, planInsert.id)
     assertEquals(body.data.assessment.id, assessmentInsert.id)
   } finally {
     Supabase.client = originalClient
-    Object.keys(insertCalls).forEach((key) => delete insertCalls[key])
+    Object.keys(insertCalls).forEach(key => delete insertCalls[key])
   }
 })

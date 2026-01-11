@@ -6,10 +6,12 @@ import type { JobAssessment, JobLogEntry, JobPlan, JobStatus } from '@domain/job
 
 export type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>
 
-export type JobPlanInput = Omit<
-  JobPlan,
-  'id' | 'jobId' | 'status' | 'createdAt' | 'updatedAt'
-> & { status?: JobStatus }
+export type JobPlanInput =
+  & Omit<
+    JobPlan,
+    'id' | 'jobId' | 'status' | 'createdAt' | 'updatedAt'
+  >
+  & { status?: JobStatus }
 
 export type JobCreateInput = {
   serviceId: string

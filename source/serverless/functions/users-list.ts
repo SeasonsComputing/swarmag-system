@@ -3,16 +3,16 @@
  */
 
 import type { User } from '@domain/common.ts'
-import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { clampLimit, parseCursor, type ListQuery } from '@serverless-lib/db-binding.ts'
-import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { clampLimit, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { rowToUser } from '@serverless-mappings/users-mapping.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: "/api/users/list" };
+export const config = { path: '/api/users/list' }
 
 /**
  * Handles the user list API request with pagination.
@@ -25,7 +25,7 @@ const handle = async (
   if (req.method !== 'GET') {
     return {
       statusCode: HttpCodes.methodNotAllowed,
-      body: { error: 'Method Not Allowed' },
+      body: { error: 'Method Not Allowed' }
     }
   }
 
@@ -45,8 +45,8 @@ const handle = async (
       statusCode: HttpCodes.internalError,
       body: {
         error: 'Failed to load users',
-        details: error.message,
-      },
+        details: error.message
+      }
     }
   }
 
@@ -58,22 +58,21 @@ const handle = async (
       statusCode: HttpCodes.internalError,
       body: {
         error: 'Invalid user record returned from Supabase',
-        details: (parseError as Error).message,
-      },
+        details: (parseError as Error).message
+      }
     }
   }
 
   const nextCursor = cursor + users.length
-  const hasMore =
-    typeof count === 'number' ? nextCursor < count : users.length === limit
+  const hasMore = typeof count === 'number' ? nextCursor < count : users.length === limit
 
   return {
     statusCode: HttpCodes.ok,
     body: {
       data: users,
       cursor: nextCursor,
-      hasMore,
-    },
+      hasMore
+    }
   }
 }
 

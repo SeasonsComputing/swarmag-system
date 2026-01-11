@@ -27,8 +27,7 @@ export type UserDeleteInput = { id: string }
 
 export type UserGetQuery = { id?: string }
 
-const isNonEmptyString = (value: unknown): value is string =>
-  typeof value === 'string' && value.trim().length > 0
+const isNonEmptyString = (value: unknown): value is string => typeof value === 'string' && value.trim().length > 0
 
 const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
   value === 'active' || value === 'inactive'

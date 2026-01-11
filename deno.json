@@ -14,9 +14,13 @@
     "guard:architecture": "deno run --allow-read scripts/architecture-guard.ts",
     "guard:validation": "deno run --allow-read scripts/validation-guard.ts",
     "check": "deno task guard:architecture && deno task guard:validation && deno check source/**/*.ts",
-    "test": "deno test --allow-env --allow-net --allow-read source/tests",
+    "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",
     "lint": "deno lint source && deno task lint:md",
     "lint:md": "deno run --allow-read --allow-sys --allow-env npm:markdownlint-cli2@0.13.0 \"**/*.md\" \"!node_modules/**\"",
-    "fmt": "deno fmt source docs"
+    "fmt": "deno run -A npm:dprint fmt",
+    "fmt:check": "deno run -A npm:dprint check"
+  },
+  "fmt": {
+    "exclude": ["**/*"]
   }
 }

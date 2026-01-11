@@ -76,7 +76,7 @@ In `src/features/workflows/WorkflowRunner.tsx`:
 ## 5. Suggested Order of Work
 
 1. Scaffold the app shell:
-    - `deno.json`, `vite.config.ts`, `index.html`, `src/main.tsx`, `src/routes/App.tsx`.
+   - `deno.json`, `vite.config.ts`, `index.html`, `src/main.tsx`, `src/routes/App.tsx`.
 2. Implement a minimal navigation and layout.
 3. Create `WorkflowRunner` with a small, in-memory sample workflow.
 4. Add a basic in-memory JobLog store and wire it into `WorkflowRunner`.

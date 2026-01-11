@@ -4,15 +4,15 @@
  * such as vehicles, sprayers, drones, etc.
  */
 
-import type { ID } from '@utils/identifier.ts'
-import type { When } from '@utils/datetime.ts'
 import type { Attachment } from '@domain/common.ts'
+import type { When } from '@utils/datetime.ts'
+import type { ID } from '@utils/identifier.ts'
 
 /** The different types of assets available in the system. */
 export interface AssetType {
-  id: ID;
-  label: string;
-  active: boolean;
+  id: ID
+  label: string
+  active: boolean
   createdAt: When
   updatedAt: When
 }
@@ -25,8 +25,8 @@ export interface Asset {
   id: ID
   label: string
   description?: string
-  serialNumber?: string;
-  type: ID;
+  serialNumber?: string
+  type: ID
   status: AssetStatus
   attachments?: Attachment[]
   createdAt: When

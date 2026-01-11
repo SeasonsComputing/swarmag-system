@@ -2,18 +2,18 @@
  * Netlify handler for creating jobs with associated plan and assessment.
  */
 
-import { type ID, id } from '@utils/identifier.ts'
-import { type When, when } from '@utils/datetime.ts'
-import type { JobAssessment, JobPlan, JobStatus, Job } from '@domain/job.ts'
-import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { type JobCreateInput, validateJobCreateInput } from '@domain/job-validators.ts'
+import type { Job, JobAssessment, JobPlan, JobStatus } from '@domain/job.ts'
+import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { validateJobCreateInput, type JobCreateInput } from '@domain/job-validators.ts'
+import { type When, when } from '@utils/datetime.ts'
+import { type ID, id } from '@utils/identifier.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: "/api/jobs/create" };
+export const config = { path: '/api/jobs/create' }
 
 /**
  * Handles the job creation API request.
@@ -48,7 +48,7 @@ const handle = async (
     ...req.body.assessment,
     id: assessmentId,
     createdAt: now,
-    updatedAt: now,
+    updatedAt: now
   }
 
   const plan: JobPlan = {
@@ -57,7 +57,7 @@ const handle = async (
     jobId,
     status: planStatus,
     createdAt: now,
-    updatedAt: now,
+    updatedAt: now
   }
 
   const job: Job = {
@@ -68,7 +68,7 @@ const handle = async (
     customerId: req.body.customerId,
     status: planStatus,
     createdAt: now,
-    updatedAt: now,
+    updatedAt: now
   }
 
   const supabase = Supabase.client()
@@ -82,7 +82,7 @@ const handle = async (
     status: job.status,
     payload: job,
     created_at: job.createdAt,
-    updated_at: job.updatedAt,
+    updated_at: job.updatedAt
   })
 
   const planInsert = supabase.from('job_plans').insert({
@@ -92,7 +92,7 @@ const handle = async (
     status: plan.status,
     payload: plan,
     created_at: plan.createdAt,
-    updated_at: plan.updatedAt,
+    updated_at: plan.updatedAt
   })
 
   const assessmentInsert = supabase.from('job_assessments').insert({
@@ -100,21 +100,21 @@ const handle = async (
     job_id: job.id,
     payload: assessment,
     created_at: assessment.createdAt,
-    updated_at: assessment.updatedAt,
+    updated_at: assessment.updatedAt
   })
 
   try {
     const [
       { error: jobError },
       { error: planError },
-      { error: assessmentError },
+      { error: assessmentError }
     ] = await Promise.all([jobInsert, planInsert, assessmentInsert])
 
     if (jobError || planError || assessmentError) {
       throw new Error(
-        jobError?.message ??
-        planError?.message ??
-        assessmentError?.message
+        jobError?.message
+          ?? planError?.message
+          ?? assessmentError?.message
       )
     }
   } catch (error) {
@@ -122,16 +122,16 @@ const handle = async (
       statusCode: HttpCodes.internalError,
       body: {
         error: 'Failed to create job',
-        details: (error as Error).message,
-      },
+        details: (error as Error).message
+      }
     }
   }
 
   return {
     statusCode: HttpCodes.created,
     body: {
-      data: { job, plan, assessment },
-    },
+      data: { job, plan, assessment }
+    }
   }
 }
 

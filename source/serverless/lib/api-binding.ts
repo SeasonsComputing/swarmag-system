@@ -26,7 +26,7 @@ const HttpMethodSet = [
   'PATCH',
   'DELETE',
   'OPTIONS',
-  'HEAD',
+  'HEAD'
 ] as const
 
 /**
@@ -34,8 +34,7 @@ const HttpMethodSet = [
  * @param value Raw value to validate HTTP method.
  * @returns True when value is a supported HTTP method.
  */
-export const isHttpMethod = (value: string): value is HttpMethod =>
-  (HttpMethodSet as readonly string[]).includes(value)
+export const isHttpMethod = (value: string): value is HttpMethod => (HttpMethodSet as readonly string[]).includes(value)
 
 /** HTTP response codes for REST calls. */
 export const HttpCodes = {
@@ -47,7 +46,7 @@ export const HttpCodes = {
   methodNotAllowed: 405,
   payloadTooLarge: 413,
   unprocessableEntity: 422,
-  internalError: 500,
+  internalError: 500
 } as const
 
 /** Common HTTP header keys. */
@@ -88,6 +87,6 @@ export interface ApiResponse<Body = unknown, Headers = HttpHeaders> {
  * @template Query Query string type.
  * @template ResponseBody Response body type.
  */
-export type ApiHandler<RequestBody = unknown, Query = HttpQuery, ResponseBody = unknown>
-  = (req: ApiRequest<RequestBody, Query>) =>
-    Promise<ApiResponse<ResponseBody>> | ApiResponse<ResponseBody>
+export type ApiHandler<RequestBody = unknown, Query = HttpQuery, ResponseBody = unknown> = (
+  req: ApiRequest<RequestBody, Query>
+) => Promise<ApiResponse<ResponseBody>> | ApiResponse<ResponseBody>

@@ -22,18 +22,18 @@ export const ranchMappingAssessment: JobAssessment = {
     id: assessorId,
     displayName: 'Morgan Diaz',
     roles: ['operations'],
-    role: 'assessment-lead',
+    role: 'assessment-lead'
   },
   assessedAt: '2025-01-12T14:00:00Z',
   locations: [
     {
       coordinate: { latitude: 31.9686, longitude: -99.9018 },
-      description: 'North pasture, Blue Mesa Ranch',
+      description: 'North pasture, Blue Mesa Ranch'
     },
     {
       coordinate: { latitude: 31.9789, longitude: -99.9142 },
-      description: 'South mesquite grove, Blue Mesa Ranch',
-    },
+      description: 'South mesquite grove, Blue Mesa Ranch'
+    }
   ],
   questions: [],
   notes: [],
@@ -48,8 +48,8 @@ export const ranchMappingAssessment: JobAssessment = {
         id: assessorId,
         displayName: 'Morgan Diaz',
         roles: ['operations'],
-        role: 'assessment-lead',
-      },
+        role: 'assessment-lead'
+      }
     },
     {
       id: waterwaysAttachmentId,
@@ -61,12 +61,12 @@ export const ranchMappingAssessment: JobAssessment = {
         id: id(),
         displayName: 'Priya Mehta',
         roles: ['operations'],
-        role: 'field-tech',
-      },
-    },
+        role: 'field-tech'
+      }
+    }
   ],
   createdAt: '2025-01-12T14:00:00Z',
-  updatedAt: '2025-01-12T14:10:00Z',
+  updatedAt: '2025-01-12T14:10:00Z'
 }
 
 const jobId = id()
@@ -87,11 +87,11 @@ export const fieldPhotoLogEntry: JobLogEntry = {
     id: jobLogAuthorId,
     displayName: 'Evan Cole',
     roles: ['operations'],
-    role: 'crew-lead',
+    role: 'crew-lead'
   },
   location: {
     coordinate: { latitude: 32.2144, longitude: -97.1234 },
-    recordedAt: '2025-01-18T16:21:00Z',
+    recordedAt: '2025-01-18T16:21:00Z'
   },
   attachments: [
     {
@@ -104,8 +104,8 @@ export const fieldPhotoLogEntry: JobLogEntry = {
         id: jobLogAuthorId,
         displayName: 'Evan Cole',
         roles: ['operations'],
-        role: 'crew-lead',
-      },
+        role: 'crew-lead'
+      }
     },
     {
       id: afterAttachmentId,
@@ -117,17 +117,17 @@ export const fieldPhotoLogEntry: JobLogEntry = {
         id: jobLogAuthorId,
         displayName: 'Evan Cole',
         roles: ['operations'],
-        role: 'crew-lead',
-      },
-    },
+        role: 'crew-lead'
+      }
+    }
   ],
   payload: {
     sprayBlock: 3,
-    coverage: 'complete',
-  },
+    coverage: 'complete'
+  }
 }
 
 export const jobSamples = {
   assessment: ranchMappingAssessment,
-  logEntry: fieldPhotoLogEntry,
+  logEntry: fieldPhotoLogEntry
 }

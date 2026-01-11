@@ -2,8 +2,8 @@
  * Customer fixture samples for tests.
  */
 
-import type { Customer } from '@domain/customer.ts'
 import type { Location } from '@domain/common.ts'
+import type { Customer } from '@domain/customer.ts'
 import { id } from '@utils/identifier.ts'
 
 const customerId = id()
@@ -19,9 +19,9 @@ const headquartersLocation: Location = {
     city: 'Lubbock',
     state: 'TX',
     postalCode: '79401',
-    country: 'US',
+    country: 'US'
   },
-  description: 'Corporate HQ and main equipment depot',
+  description: 'Corporate HQ and main equipment depot'
 }
 
 export const blueMesaRanchCustomer: Customer = {
@@ -33,13 +33,13 @@ export const blueMesaRanchCustomer: Customer = {
     city: 'San Angelo',
     state: 'TX',
     postalCode: '76902',
-    country: 'US',
+    country: 'US'
   },
   accountManager: {
     id: accountManagerId,
     displayName: 'Nia Wright',
     roles: ['operations'],
-    role: 'account-executive',
+    role: 'account-executive'
   },
   primaryContactId,
   sites: [
@@ -49,8 +49,8 @@ export const blueMesaRanchCustomer: Customer = {
       label: 'North Pasture HQ',
       location: headquartersLocation,
       acreage: 2400,
-      notes: [],
-    },
+      notes: []
+    }
   ],
   contacts: [
     {
@@ -65,16 +65,16 @@ export const blueMesaRanchCustomer: Customer = {
           id: contactNoteId,
           createdAt: '2025-01-09T00:00:00Z',
           content: 'Prefers SMS for scheduling confirmations.',
-          images: [],
-        },
+          images: []
+        }
       ],
       createdAt: '2025-01-10T00:00:00Z',
-      updatedAt: '2025-01-10T00:00:00Z',
-    },
+      updatedAt: '2025-01-10T00:00:00Z'
+    }
   ],
   notes: [],
   createdAt: '2025-01-10T00:00:00Z',
-  updatedAt: '2025-01-15T12:00:00Z',
+  updatedAt: '2025-01-15T12:00:00Z'
 }
 
 export const customerSamples = [blueMesaRanchCustomer]
