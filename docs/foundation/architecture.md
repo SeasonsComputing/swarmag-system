@@ -69,7 +69,7 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 | Item      | Detail                                                                                                                                                                                                              |
 | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Exports   | Each file default-exports the Edge handler `createApiHandler(handle)` from `source/serverless/lib/api-handler.ts`; keep per-abstraction mapping helpers in `source/serverless/mappings/*` for DB/domain conversion. |
-| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody>\|Promise<ApiResponse<ResponseBody>>`                                                                                                    |
+| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody> or Promise<ApiResponse<ResponseBody>>`                                                                                                  |
 | Request   | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Request.                                                                                                                                  |
 | Response  | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`.                                                                                                                               |
 | Imports   | Only import domain types from `source/domain`; do not redefine domain abstractions locally.                                                                                                                         |
@@ -191,11 +191,11 @@ LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read sourc
 
 ### 9.3 Local development helpers
 
-| Command                                                                                                                      | Purpose                                                                   |
-| ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor` | Start local Supabase with minimal services.                               |
-| `supabase db reset --yes`                                                                                                    | Reset and re-apply migrations.                                            |
-| `supabase status --output env`                                                                                               | Show local Supabase URLs and keys.                                        |
+| Command                                                                                                                      | Purpose                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------                |
+| `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor` | Start local Supabase with minimal services.                                              |
+| `supabase db reset --yes`                                                                                                    | Reset and re-apply migrations.                                                           |
+| `supabase status --output env`                                                                                               | Show local Supabase URLs and keys.                                                       |
 | `XDG_CONFIG_HOME=./.config netlify dev`                                                                                      | Run Netlify dev (uses `source/apps/dev-server/dev-server.ts` for the custom dev server). |
 
 ### 9.4 Database GUI connection (DBeaver)
