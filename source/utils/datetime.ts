@@ -6,6 +6,7 @@
 /** Represents a date-time in ISO 8601 string format. */
 export type When = string
 
+/** Valid ISO datetime format regex. */
 const ISO_DATETIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
 
 /** Gets the current UTC datetime as an ISO string */
