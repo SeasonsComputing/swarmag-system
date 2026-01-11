@@ -127,11 +127,10 @@ This section outlines the monorepo structure and its primary dependency flow; se
 ```text
 source/
   api/
-    src/
-      internal/
   apps/
     admin/
     customer/
+    dev-server/
     ops/
     shared/
   domain/
@@ -139,10 +138,11 @@ source/
   serverless/
     functions/
     lib/
+    mappings/
   tests/
     api/
+      cases/
       helpers/
-    domain/
     fixtures/
     live/
   utils/
@@ -156,6 +156,7 @@ source/
 - TypeScript is checked via Deno; import aliases are defined in `deno.json` so runtime and tooling match.
 - Netlify Edge Functions use `netlify-import-map.json` (root) via `netlify.toml [functions].deno_import_map`; keep it aligned with `deno.json` and use root-relative paths.
 - CI runs `deno task guard:architecture` to enforce import boundaries; violations fail the build.
+- CI runs `deno task guard:leaf` to enforce the leaf-directory rule; violations fail the build.
 
 ### 9.1 Database migrations
 
@@ -195,7 +196,7 @@ LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read sourc
 | `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor` | Start local Supabase with minimal services.                               |
 | `supabase db reset --yes`                                                                                                    | Reset and re-apply migrations.                                            |
 | `supabase status --output env`                                                                                               | Show local Supabase URLs and keys.                                        |
-| `XDG_CONFIG_HOME=./.config netlify dev`                                                                                      | Run Netlify dev (uses `scripts/dev-server.ts` for the custom dev server). |
+| `XDG_CONFIG_HOME=./.config netlify dev`                                                                                      | Run Netlify dev (uses `source/apps/dev-server/dev-server.ts` for the custom dev server). |
 
 ### 9.4 Database GUI connection (DBeaver)
 

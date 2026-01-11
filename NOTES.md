@@ -1,6 +1,6 @@
 # swarmAg System - Working Notes
 
-Last updated: 2026-01-10
+Last updated: 2026-01-11
 
 ## 1. Purpose
 
@@ -19,6 +19,23 @@ Last updated: 2026-01-10
 This file summarizes the current baseline so it can be restored after tool resets.
 
 ## 3. Conversation summaries
+
+- 2026-01-11: App facade, guards, and layout enforcement.
+
+  | Item          | Details                                                                                             |
+  | ------------- | --------------------------------------------------------------------------------------------------- |
+  | App facade    | Replaced env/test access with `App` and documented the usage rules; added JSDoc for App.           |
+  | Guards        | Added env and leaf-directory guards, updated architecture guard to include tests/apps/api rules.   |
+  | Layout        | Enforced leaf-directory layout, moved dev server to `source/apps/dev-server/`, reorganized tests. |
+  | Docs          | Updated architecture/source tree and style guide to reflect leaf-directory and App rules.         |
+
+- 2026-01-11: App facade env rules.
+
+  | Item          | Details                                                                                   |
+  | ------------- | ----------------------------------------------------------------------------------------- |
+  | Environment   | Standardized `App` as the required facade for env access and tests, no direct `Deno.*`.   |
+  | Requirements  | All environment variables are required; no hard-coded defaults are permitted.            |
+  | Enforcement   | `App.init` is the single validation point and must only run once per process.            |
 
 - 2026-01-10: Domain, docs, and Supabase naming updates.
 

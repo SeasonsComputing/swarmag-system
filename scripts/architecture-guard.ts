@@ -2,7 +2,7 @@
  * Architecture guard to enforce import boundaries.
  */
 
-type Namespace = 'domain' | 'utils' | 'serverless' | 'apps' | 'external'
+type Namespace = 'domain' | 'utils' | 'serverless' | 'apps' | 'api' | 'tests' | 'external'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
@@ -10,14 +10,18 @@ const NAMESPACE_DIRS: Record<Exclude<Namespace, 'external'>, string> = {
   domain: '/source/domain/',
   utils: '/source/utils/',
   serverless: '/source/serverless/',
-  apps: '/source/apps/'
+  apps: '/source/apps/',
+  api: '/source/api/',
+  tests: '/source/tests/'
 }
 
 const ALLOWED_DEPS: Record<Exclude<Namespace, 'external'>, Set<Namespace>> = {
-  domain: new Set(['domain', 'utils']),
+  domain: new Set(['domain', 'utils', 'external']),
   utils: new Set(['utils']),
   serverless: new Set(['serverless', 'domain', 'utils', 'external']),
-  apps: new Set(['apps', 'domain', 'external'])
+  apps: new Set(['apps', 'domain', 'utils', 'serverless', 'api', 'external']),
+  api: new Set(['api', 'domain', 'utils', 'serverless', 'external']),
+  tests: new Set(['tests', 'apps', 'api', 'domain', 'utils', 'serverless', 'external'])
 }
 
 const IMPORT_REGEXES = [
@@ -34,12 +38,17 @@ const namespaceForPath = (path: string): Exclude<Namespace, 'external'> | null =
   if (normalized.includes(NAMESPACE_DIRS.utils)) return 'utils'
   if (normalized.includes(NAMESPACE_DIRS.serverless)) return 'serverless'
   if (normalized.includes(NAMESPACE_DIRS.apps)) return 'apps'
+  if (normalized.includes(NAMESPACE_DIRS.api)) return 'api'
+  if (normalized.includes(NAMESPACE_DIRS.tests)) return 'tests'
   return null
 }
 
 const namespaceForSpecifier = (specifier: string, filePath: string): Namespace => {
   if (specifier.startsWith('@domain/')) return 'domain'
   if (specifier.startsWith('@utils/')) return 'utils'
+  if (specifier.startsWith('@tests-fixtures/') || specifier.startsWith('@tests-helpers/')) {
+    return 'tests'
+  }
   if (
     specifier.startsWith('@serverless-lib/')
     || specifier.startsWith('@serverless-functions/')
@@ -81,9 +90,22 @@ const findImports = (source: string): Array<{ specifier: string; index: number }
 
 const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
+const exists = async (path: string): Promise<boolean> => {
+  try {
+    const info = await Deno.stat(path)
+    return info.isDirectory
+  } catch {
+    return false
+  }
+}
+
 const main = async () => {
   const roots = Object.values(NAMESPACE_DIRS).map(dir => `${ROOT}${dir}`)
-  const files = (await Promise.all(roots.map(collectFiles))).flat()
+  const existingRoots = []
+  for (const root of roots) {
+    if (await exists(root)) existingRoots.push(root)
+  }
+  const files = (await Promise.all(existingRoots.map(collectFiles))).flat()
   const violations: string[] = []
 
   for (const file of files) {

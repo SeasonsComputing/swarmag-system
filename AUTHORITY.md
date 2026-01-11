@@ -15,12 +15,19 @@
 - Get it right the first time; do not defer correctness or completeness.
 - Prefer less over more; keep solutions minimal and KISS.
 
+### 2.1 Namespace dependencies
+
+- Follow the top-level dependency boundaries defined in `docs/foundation/architecture.md` section 8.
+
 ## 3. Language, Build, and Tooling
 
 - Write all code in TypeScript.
 - Keep TypeScript compiler settings aligned with `module: ESNext`, `moduleResolution: bundler`, and `baseUrl: source`.
 - Use path aliases `@domain/*`, `@utils/*`, `@serverless-lib`, and `@serverless-api/*` for imports.
 - Keep tooling, linting, and builds free of warnings.
+- Use `App` for environment access and tests; do not use `Deno.env` or `Deno.test` outside `source/utils/app.ts`.
+- Treat all environment variables as required; do not use hard-coded defaults.
+- Files must live in leaf directories; directories with subdirectories must not contain files.
 
 ## 4. Identifiers and Time
 

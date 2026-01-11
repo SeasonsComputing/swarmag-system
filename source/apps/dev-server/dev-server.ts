@@ -2,9 +2,9 @@
  * Minimal dev server for Netlify Dev custom framework.
  */
 
-import { validateRequiredVars } from '@utils/environment.ts'
+import { App } from '@utils/app.ts'
 
-validateRequiredVars([
+App.init([
   'SUPABASE_URL',
   'SUPABASE_SERVICE_KEY',
   'SUPABASE_ANON_KEY',
@@ -13,7 +13,7 @@ validateRequiredVars([
   'LIVE_SERVICE_LIST_PATH'
 ])
 
-const port = Number(Deno.env.get('DEV_SERVER_PORT'))
+const port = Number(App.get('DEV_SERVER_PORT'))
 const init = { status: 200, headers: { 'content-type': 'text/plain; charset=utf-8' } }
 const handler = () => new Response('swarmAg dev server', init)
 Deno.serve({ port }, handler)

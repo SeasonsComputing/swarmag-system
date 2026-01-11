@@ -20,6 +20,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | Exports     | Default export only for Netlify Edge `createApiHandler(handle)`                                     |
 | Extensions  | Include `.ts` in local/alias import specifiers                                                      |
 | Import maps | Keep `netlify-import-map.json` aligned with `deno.json`; use root-relative paths in the Netlify map |
+| Layout      | Files live only in leaf directories; directories with subdirectories must not contain files         |
 
 ## 3. Domain Modeling (`source/domain/*`)
 
@@ -37,6 +38,7 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 | ------------- | ---------------------------------------------- |
 | identifier.ts | UUID v7 via `id()`; validate with `isID()`     |
 | datetime.ts   | UTC ISO via `when()`; validate with `isWhen()` |
+| app.ts        | Use `App.init` to validate required env vars, `App.get` to read them, and `App.test` for tests |
 | Scope         | Keep utilities focused and dependency-light    |
 
 ## 5. API Functions (`source/serverless/functions/*`)
@@ -101,6 +103,8 @@ const user = rowToUser(data)
 | JSDoc    | JSDoc on exports with a one-sentence summary plus @param/@returns (and @throws when relevant), ending sentences with periods |
 | Inline   | Add only when logic is non-obvious                                                                                           |
 | Internal | Add brief JSDoc when grouping internal type aliases that clarify adapter shapes (e.g., raw Netlify event types)              |
+| Fields   | Comment class attributes and fields with brief JSDoc.                                                                        |
+| Types    | Comment type aliases and interfaces with brief JSDoc.                                                                        |
 
 ## 10. Naming & Data Shapes
 
