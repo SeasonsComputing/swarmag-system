@@ -17,7 +17,7 @@ const NAMESPACE_DIRS: Record<Exclude<Namespace, 'external'>, string> = {
 
 const ALLOWED_DEPS: Record<Exclude<Namespace, 'external'>, Set<Namespace>> = {
   domain: new Set(['domain', 'utils', 'external']),
-  utils: new Set(['utils']),
+  utils: new Set(['utils', 'external']),
   serverless: new Set(['serverless', 'domain', 'utils', 'external']),
   apps: new Set(['apps', 'domain', 'utils', 'serverless', 'api', 'external']),
   api: new Set(['api', 'domain', 'utils', 'serverless', 'external']),
