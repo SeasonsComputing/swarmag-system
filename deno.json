@@ -12,8 +12,10 @@
   },
   "tasks": {
     "guard:architecture": "deno run --allow-read scripts/architecture-guard.ts",
+    "guard:env": "deno run --allow-read scripts/env-guard.ts",
+    "guard:leaf": "deno run --allow-read scripts/leaf-guard.ts",
     "guard:validation": "deno run --allow-read scripts/validation-guard.ts",
-    "check": "deno task guard:architecture && deno task guard:validation && deno check source/**/*.ts",
+    "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno check source/**/*.ts",
     "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",
     "lint": "deno lint source && deno task lint:md",
     "lint:md": "deno run --allow-read --allow-sys --allow-env npm:markdownlint-cli2@0.13.0 \"**/*.md\" \"!node_modules/**\"",
