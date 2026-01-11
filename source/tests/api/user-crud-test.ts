@@ -2,13 +2,13 @@
  * Unit tests for user CRUD Netlify handlers.
  */
 
-import { assertEquals, assert } from '@std/assert'
 import handlerCreate from '@serverless-functions/users-create.ts'
+import handlerDelete from '@serverless-functions/users-delete.ts'
 import handlerGet from '@serverless-functions/users-get.ts'
 import handlerUpdate from '@serverless-functions/users-update.ts'
-import handlerDelete from '@serverless-functions/users-delete.ts'
 import { HttpCodes } from '@serverless-lib/api-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
+import { assert, assertEquals } from '@std/assert'
 import { runNetlifyHandler } from '@tests-helpers/netlify.ts'
 
 type UsersTable = Record<string, Record<string, unknown>>
@@ -16,7 +16,7 @@ type UsersTable = Record<string, Record<string, unknown>>
 const users: UsersTable = {}
 
 const resetTables = () => {
-  Object.keys(users).forEach((key) => delete users[key])
+  Object.keys(users).forEach(key => delete users[key])
 }
 
 const buildUserInsert = (payload: Record<string, unknown>) => ({
@@ -24,7 +24,7 @@ const buildUserInsert = (payload: Record<string, unknown>) => ({
   created_at: payload.created_at,
   updated_at: payload.updated_at,
   deleted_at: null,
-  payload,
+  payload
 })
 
 const selectBuilder = () => {
@@ -40,50 +40,49 @@ const selectBuilder = () => {
       if (col === 'deleted_at') filterDeletedNull = value === null
       return builder
     },
-    single: async () => {
-      const row = Object.values(users).find((user) => {
+    single: () => {
+      const row = Object.values(users).find(user => {
         const matchesId = idFilter ? user.id === idFilter : true
-        const matchesDeleted =
-          filterDeletedNull ? user.deleted_at === null : true
+        const matchesDeleted = filterDeletedNull ? user.deleted_at === null : true
         return matchesId && matchesDeleted
       })
 
       return row
         ? { data: row, error: null }
         : { data: null, error: new Error('No rows') }
-    },
+    }
   }
 
   return builder
 }
 
 const updateBuilder = (updates: Record<string, unknown>) => ({
-  eq: async (col: string, value: string) => {
+  eq: (col: string, value: string) => {
     if (col === 'id' && users[value]) {
       users[value] = { ...users[value], ...updates }
       return { error: null }
     }
     return { error: new Error('No rows') }
-  },
+  }
 })
 
 Deno.test('user CRUD handlers', async () => {
   const originalClient = Supabase.client
 
-  Supabase.client = ((() => ({
+  Supabase.client = (() => ({
     from: (table: string) => {
       if (table !== 'users') throw new Error(`Unexpected table ${table}`)
 
       return {
-        insert: async (payload: Record<string, unknown>) => {
+        insert: (payload: Record<string, unknown>) => {
           users[payload.id as string] = buildUserInsert(payload)
           return { error: null }
         },
         select: () => selectBuilder(),
-        update: (payload: Record<string, unknown>) => updateBuilder(payload),
+        update: (payload: Record<string, unknown>) => updateBuilder(payload)
       }
-    },
-  })) as unknown as typeof Supabase.client)
+    }
+  })) as unknown as typeof Supabase.client
 
   try {
     resetTables()
@@ -94,7 +93,7 @@ Deno.test('user CRUD handlers', async () => {
       {
         displayName: 'Ada Lovelace',
         primaryEmail: 'ada@example.com',
-        phoneNumber: '555-0100',
+        phoneNumber: '555-0100'
       }
     )
     assertEquals(createResponse.statusCode, HttpCodes.created)

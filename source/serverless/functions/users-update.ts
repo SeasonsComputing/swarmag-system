@@ -2,18 +2,18 @@
  * Netlify handler for updating users.
  */
 
+import { type UserUpdateInput, validateUserUpdateInput } from '@domain/common-validators.ts'
 import type { User } from '@domain/common.ts'
-import { when } from '@utils/datetime.ts'
-import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
-import { userToRow, rowToUser } from '@serverless-mappings/users-mapping.ts'
-import { validateUserUpdateInput, type UserUpdateInput } from '@domain/common-validators.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
+import { rowToUser, userToRow } from '@serverless-mappings/users-mapping.ts'
+import { when } from '@utils/datetime.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: "/api/users/update" };
+export const config = { path: '/api/users/update' }
 
 /**
  * Update an existing user while enforcing allowed fields and validation.
@@ -50,7 +50,7 @@ const handle = async (
   } catch (parseError) {
     return {
       statusCode: HttpCodes.internalError,
-      body: { error: 'Invalid user record returned from Supabase', details: (parseError as Error).message },
+      body: { error: 'Invalid user record returned from Supabase', details: (parseError as Error).message }
     }
   }
 
@@ -62,7 +62,7 @@ const handle = async (
     avatarUrl: req.body.avatarUrl === null ? undefined : req.body.avatarUrl?.trim() ?? current.avatarUrl,
     roles: req.body.roles === null ? undefined : req.body.roles ?? current.roles,
     status: req.body.status ?? current.status,
-    updatedAt: when(),
+    updatedAt: when()
   }
 
   const { error: updateError } = await supabase
@@ -73,7 +73,7 @@ const handle = async (
   if (updateError) {
     return {
       statusCode: HttpCodes.internalError,
-      body: { error: 'Failed to update user', details: updateError.message },
+      body: { error: 'Failed to update user', details: updateError.message }
     }
   }
 

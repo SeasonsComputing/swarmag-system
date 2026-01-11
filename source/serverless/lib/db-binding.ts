@@ -40,7 +40,7 @@ export const parseCursor = (value?: string | null): number => {
  * @returns True when the value is an array of strings.
  */
 export const isIdArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every((entry) => typeof entry === 'string')
+  Array.isArray(value) && value.every(entry => typeof entry === 'string')
 
 /**
  * Type guard to ensure a non-empty string value.

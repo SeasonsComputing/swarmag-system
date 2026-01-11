@@ -28,22 +28,22 @@ The system focuses on two service classes—Aerial and Ground—and the workflow
 Components: Ops PWA, Admin Portal, Customer Portal, API Edge Functions, Supabase Data.
 
 ```text
-       ┌─────────────────┐
-       │ ops.swarmag.com │─────╮
-       └─────────────────┘     │
-     ┌───────────────────┐     │
-     │ admin.swarmag.com │─────│
-     └───────────────────┘     │
-        ┌────────────────┐     │
-        │ me.swarmag.com │─────│
-        └────────────────┘     │
-                               ▼
-                        ┌─────────────────┐
-                     ╭──│ api.swarmag.com │
-                     ▼  └─────────────────┘
-            ┌──────────────────┐
-            │ data.swarmag.com │
-            └──────────────────┘
+  ┌─────────────────┐
+  │ ops.swarmag.com │─────╮
+  └─────────────────┘     │
+┌───────────────────┐     │
+│ admin.swarmag.com │─────│
+└───────────────────┘     │
+   ┌────────────────┐     │
+   │ me.swarmag.com │─────│
+   └────────────────┘     │
+                          ▼
+                   ┌─────────────────┐
+                ╭──│ api.swarmag.com │
+                ▼  └─────────────────┘
+       ┌──────────────────┐
+       │ data.swarmag.com │
+       └──────────────────┘
 ```
 
 ## 5. Domain model summary
@@ -66,13 +66,13 @@ Functions that expose the domain model over HTTP, persisted in Supabase, and typ
 
 ### 6.2 Handler pattern
 
-| Item      | Detail                                                                                                                                                                                              |
-| --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Item      | Detail                                                                                                                                                                                                              |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Exports   | Each file default-exports the Edge handler `createApiHandler(handle)` from `source/serverless/lib/api-handler.ts`; keep per-abstraction mapping helpers in `source/serverless/mappings/*` for DB/domain conversion. |
-| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody>\|Promise<ApiResponse<ResponseBody>>`                                                                                    |
-| Request   | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Request.                                                                                                                  |
-| Response  | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`.                                                                                                               |
-| Imports   | Only import domain types from `source/domain`; do not redefine domain abstractions locally.                                                                                                         |
+| Signature | `handle: (req: ApiRequest<RequestBody, Query>) => ApiResponse<ResponseBody>\|Promise<ApiResponse<ResponseBody>>`                                                                                                    |
+| Request   | `ApiRequest` carries `method`, parsed `body`, `query`, `headers`, and raw Request.                                                                                                                                  |
+| Response  | `ApiResponse` carries `statusCode`, optional `headers`, and JSON-serializable `body`.                                                                                                                               |
+| Imports   | Only import domain types from `source/domain`; do not redefine domain abstractions locally.                                                                                                                         |
 
 ### 6.3 Validation and errors
 
@@ -101,25 +101,25 @@ See `docs/foundation/style-guide.md` for compiler settings, aliases, and code st
 This section outlines the monorepo structure and its primary dependency flow; see `README.md` for the project roadmap.
 
 ```text
-           ┌───────────────┐            
-           │    tests      │            
-           └───────────────┘            
- ────────────────────────────────────── 
-           ┌───────────────┐            
-           │     apps      │            
-           └───────────────┘            
- ─────────────────────────────────────  
-           ┌───────────────┐            
-       ╭───│     api       │───╮        
-       │   └───────────────┘   │        
-       ▼                       ▼        
- ┌───────────────┐    ┌───────────────┐ 
- │  serverless   │───>│     domain    │ 
- └───────────────┘    └───────────────┘ 
- ─────────────────────────────────────  
-           ┌───────────────┐            
-           │     utils     │            
-           └───────────────┘             
+          ┌───────────────┐            
+          │    tests      │            
+          └───────────────┘            
+────────────────────────────────────── 
+          ┌───────────────┐            
+          │     apps      │            
+          └───────────────┘            
+─────────────────────────────────────  
+          ┌───────────────┐            
+      ╭───│     api       │───╮        
+      │   └───────────────┘   │        
+      ▼                       ▼        
+┌───────────────┐    ┌───────────────┐ 
+│  serverless   │───>│     domain    │ 
+└───────────────┘    └───────────────┘ 
+─────────────────────────────────────  
+          ┌───────────────┐            
+          │     utils     │            
+          └───────────────┘
 ```
 
 ### 8.1 Source directory graph

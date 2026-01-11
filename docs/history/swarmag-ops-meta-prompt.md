@@ -110,33 +110,33 @@ a short-lived access code will be created and delivered to the customer via sms 
 
 ### Deployment Stack
 
-|  Feature Set     |  Endpoint              |  Platform                                     |
-|------------------|------------------------|-----------------------------------------------|
-|  Operations      |  ops.swarmag.com       |  Netlify, SolidJS, TanStack, Radix UI, Docker |
-|  Administration  |  admin.swarmag.com     |  Netlify, SolidJS, TanStack, Radix UI, Docker |
-|  Customer        |  customer.swarmag.com  |  Netlify, SolidJS, TanStack, Radix UI, Docker |
-|  API             |  api.swarmag.com       |  Netlify, NestJS, Node, JWT, Swagger, Docker  |
-|  Data            |  data.swarmag.com      |  supebase, postgreSQL                         |
+| Feature Set    | Endpoint             | Platform                                     |
+| -------------- | -------------------- | -------------------------------------------- |
+| Operations     | ops.swarmag.com      | Netlify, SolidJS, TanStack, Radix UI, Docker |
+| Administration | admin.swarmag.com    | Netlify, SolidJS, TanStack, Radix UI, Docker |
+| Customer       | customer.swarmag.com | Netlify, SolidJS, TanStack, Radix UI, Docker |
+| API            | api.swarmag.com      | Netlify, NestJS, Node, JWT, Swagger, Docker  |
+| Data           | data.swarmag.com     | supebase, postgreSQL                         |
 
 ### Network Diagram
 
 ```text
-       ┌─────────────────┐
-       │ ops.swarmag.com │─────╮
-       └─────────────────┘     │
-     ┌───────────────────┐     │
-     │ admin.swarmag.com │─────│
-     └───────────────────┘     │
-        ┌────────────────┐     │
-        │ me.swarmag.com │─────│
-        └────────────────┘     │
-                               ▼
-                        ┌─────────────────┐
-                     ╭──│ api.swarmag.com │
-                     ▼  └─────────────────┘
-            ┌──────────────────┐
-            │ data.swarmag.com │
-            └──────────────────┘
+  ┌─────────────────┐
+  │ ops.swarmag.com │─────╮
+  └─────────────────┘     │
+┌───────────────────┐     │
+│ admin.swarmag.com │─────│
+└───────────────────┘     │
+   ┌────────────────┐     │
+   │ me.swarmag.com │─────│
+   └────────────────┘     │
+                          ▼
+                   ┌─────────────────┐
+                ╭──│ api.swarmag.com │
+                ▼  └─────────────────┘
+       ┌──────────────────┐
+       │ data.swarmag.com │
+       └──────────────────┘
 ```
 
 ### Software

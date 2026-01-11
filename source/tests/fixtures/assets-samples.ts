@@ -15,14 +15,62 @@ const sprayTankTypeId = id()
 const granularHopperTypeId = id()
 
 export const assetTypeSamples: AssetType[] = [
-  { id: transportTruckTypeId, name: 'Transport Truck' },
-  { id: skidsteerTypeId, name: 'Skidsteer Vehicle' },
-  { id: toolcatTypeId, name: 'Toolcat Vehicle' },
-  { id: vehicleAttachmentTypeId, name: 'Vehicle Tool Attachment' },
-  { id: mappingDroneTypeId, name: 'Mapping Drone' },
-  { id: dispensingDroneTypeId, name: 'Dispensing Drone' },
-  { id: sprayTankTypeId, name: 'Drone Spray Tank' },
-  { id: granularHopperTypeId, name: 'Drone Granular Hopper' },
+  {
+    id: transportTruckTypeId,
+    label: 'Transport Truck',
+    active: true,
+    createdAt: '2024-11-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  },
+  {
+    id: skidsteerTypeId,
+    label: 'Skidsteer Vehicle',
+    active: true,
+    createdAt: '2024-11-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  },
+  {
+    id: toolcatTypeId,
+    label: 'Toolcat Vehicle',
+    active: true,
+    createdAt: '2024-11-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  },
+  {
+    id: vehicleAttachmentTypeId,
+    label: 'Vehicle Tool Attachment',
+    active: true,
+    createdAt: '2024-11-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  },
+  {
+    id: mappingDroneTypeId,
+    label: 'Mapping Drone',
+    active: true,
+    createdAt: '2024-11-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  },
+  {
+    id: dispensingDroneTypeId,
+    label: 'Dispensing Drone',
+    active: true,
+    createdAt: '2024-11-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  },
+  {
+    id: sprayTankTypeId,
+    label: 'Drone Spray Tank',
+    active: true,
+    createdAt: '2024-11-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  },
+  {
+    id: granularHopperTypeId,
+    label: 'Drone Granular Hopper',
+    active: true,
+    createdAt: '2024-11-01T00:00:00Z',
+    updatedAt: '2025-01-01T00:00:00Z'
+  }
 ]
 
 export const droneAssetSample: Asset = {
@@ -42,8 +90,8 @@ export const droneAssetSample: Asset = {
       uploadedBy: {
         id: id(),
         displayName: 'Documentation Bot',
-        roles: ['administrator'],
-      },
+        roles: ['administrator']
+      }
     },
     {
       id: id(),
@@ -55,12 +103,12 @@ export const droneAssetSample: Asset = {
         id: id(),
         displayName: 'Noah Price',
         roles: ['operations'],
-        role: 'field-tech',
-      },
-    },
+        role: 'field-tech'
+      }
+    }
   ],
   createdAt: '2024-12-01T00:00:00Z',
-  updatedAt: '2025-01-18T15:24:00Z',
+  updatedAt: '2025-01-18T15:24:00Z'
 }
 
 export const sprayerTruckSample: Asset = {
@@ -81,12 +129,12 @@ export const sprayerTruckSample: Asset = {
         id: id(),
         displayName: 'Yara Singh',
         roles: ['operations'],
-        role: 'fleet-manager',
-      },
-    },
+        role: 'fleet-manager'
+      }
+    }
   ],
   createdAt: '2024-11-15T00:00:00Z',
-  updatedAt: '2025-01-15T11:00:00Z',
+  updatedAt: '2025-01-15T11:00:00Z'
 }
 
 export const assetSamples: Asset[] = [droneAssetSample, sprayerTruckSample]

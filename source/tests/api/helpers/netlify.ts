@@ -6,12 +6,15 @@
  * Invoke a Netlify-wrapped handler with a minimal Request.
  * Parses the JSON response body for easier assertions.
  */
-export const runNetlifyHandler = async <Body = any, Query extends Record<string, any> = Record<string, any>>(
+export const runNetlifyHandler = async <
+  Body = unknown,
+  Query extends Record<string, unknown> = Record<string, unknown>
+>(
   handler: (request: Request) => Promise<Response>,
   method: string,
   body?: Body,
   query?: Query,
-  headers: Record<string, string> = {},
+  headers: Record<string, string> = {}
 ) => {
   const url = new URL('http://localhost/.netlify/edge-functions/mock')
   if (query) {
@@ -24,9 +27,9 @@ export const runNetlifyHandler = async <Body = any, Query extends Record<string,
     method,
     headers: {
       ...(body !== undefined ? { 'content-type': 'application/json' } : {}),
-      ...headers,
+      ...headers
     },
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined
   })
 
   const res = await handler(request)

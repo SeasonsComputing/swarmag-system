@@ -6,17 +6,17 @@ import {
   ApiHandler,
   ApiRequest,
   ApiResponse,
-  HttpCodes,
-  HttpHeaders,
-  HttpMethod,
-  HttpQuery,
   HEADER_ALLOW_CREDENTIALS,
   HEADER_ALLOW_HEADERS,
   HEADER_ALLOW_METHODS,
   HEADER_ALLOW_ORIGIN,
   HEADER_CONTENT_TYPE,
   HEADER_VARY,
-  isHttpMethod,
+  HttpCodes,
+  HttpHeaders,
+  HttpMethod,
+  HttpQuery,
+  isHttpMethod
 } from './api-binding.ts'
 
 /**
@@ -44,7 +44,7 @@ export interface ApiAdapterConfig {
 const METHODS_WITH_BODY = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE'])
 const DEFAULT_MAX_BODY_SIZE = 6 * 1024 * 1024
 
-/** 
+/**
  * Error with a stable name for adapter failures.
  */
 class NamedError extends Error {
@@ -121,7 +121,7 @@ const buildCorsHeaders = (
     [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ') ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
     [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization',
     [HEADER_VARY]: 'Origin',
-    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {}),
+    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {})
   }
 }
 
@@ -165,8 +165,8 @@ const buildResponse = (
       status: statusCode,
       headers: toHeaders({
         ...corsHeaders,
-        ...normalizedResponseHeaders,
-      }),
+        ...normalizedResponseHeaders
+      })
     })
   }
 
@@ -203,8 +203,8 @@ const buildResponse = (
     headers: toHeaders({
       ...(isJsonResponse ? { [HEADER_CONTENT_TYPE]: 'application/json' } : {}),
       ...corsHeaders,
-      ...normalizedResponseHeaders,
-    }),
+      ...normalizedResponseHeaders
+    })
   })
 }
 
@@ -259,8 +259,7 @@ const serializeError = (err: unknown): { name: string; message: string } => {
  * @param value Raw string.
  * @returns Byte length.
  */
-const byteLength = (value: string): number =>
-  new TextEncoder().encode(value).length
+const byteLength = (value: string): number => new TextEncoder().encode(value).length
 
 /**
  * Parse and validate request body with size limits.
@@ -384,7 +383,7 @@ export const createApiHandler = <RequestBody = unknown, Query = HttpQuery, Respo
         body: body as RequestBody,
         query: query as Query,
         headers,
-        rawRequest: request,
+        rawRequest: request
       }
 
       const result: ApiResponse<ResponseBody, HttpHeaders> = await handle(apiRequest)

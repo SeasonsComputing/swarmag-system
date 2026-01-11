@@ -3,15 +3,15 @@
  */
 
 import type { Service } from '@domain/service.ts'
-import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { clampLimit, parseCursor, type ListQuery, isIdArray } from '@serverless-lib/db-binding.ts'
-import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { clampLimit, isIdArray, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: "/api/services/list" };
+export const config = { path: '/api/services/list' }
 
 /**
  * Type guard for supported service categories.
@@ -19,8 +19,8 @@ export const config = { path: "/api/services/list" };
  * @returns True when the value matches a known category.
  */
 const isServiceCategory = (value: unknown): value is Service['category'] =>
-  value === 'aerial-drone-services' ||
-  value === 'ground-machinery-services'
+  value === 'aerial-drone-services'
+  || value === 'ground-machinery-services'
 
 /**
  * Converts a ServiceRow to Service, either from payload or raw row data.
@@ -37,13 +37,13 @@ const rowToService = (row: unknown): Service => {
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Record<string, unknown>
     if (
-      typeof payload.id === 'string' &&
-      typeof payload.name === 'string' &&
-      typeof payload.sku === 'string' &&
-      isServiceCategory(payload.category) &&
-      isIdArray(payload.requiredAssetTypes) &&
-      typeof payload.createdAt === 'string' &&
-      typeof payload.updatedAt === 'string'
+      typeof payload.id === 'string'
+      && typeof payload.name === 'string'
+      && typeof payload.sku === 'string'
+      && isServiceCategory(payload.category)
+      && isIdArray(payload.requiredAssetTypes)
+      && typeof payload.createdAt === 'string'
+      && typeof payload.updatedAt === 'string'
     ) {
       return {
         id: payload.id,
@@ -54,19 +54,19 @@ const rowToService = (row: unknown): Service => {
         requiredAssetTypes: payload.requiredAssetTypes,
         notes: Array.isArray(payload.notes) ? payload.notes : undefined,
         createdAt: payload.createdAt,
-        updatedAt: payload.updatedAt,
+        updatedAt: payload.updatedAt
       }
     }
   }
 
   if (
-    typeof record.id === 'string' &&
-    typeof record.name === 'string' &&
-    typeof record.sku === 'string' &&
-    isServiceCategory(record.category) &&
-    isIdArray(record.requiredAssetTypes) &&
-    typeof record.createdAt === 'string' &&
-    typeof record.updatedAt === 'string'
+    typeof record.id === 'string'
+    && typeof record.name === 'string'
+    && typeof record.sku === 'string'
+    && isServiceCategory(record.category)
+    && isIdArray(record.requiredAssetTypes)
+    && typeof record.createdAt === 'string'
+    && typeof record.updatedAt === 'string'
   ) {
     return {
       id: record.id,
@@ -77,7 +77,7 @@ const rowToService = (row: unknown): Service => {
       requiredAssetTypes: record.requiredAssetTypes,
       notes: Array.isArray(record.notes) ? record.notes : undefined,
       createdAt: record.createdAt,
-      updatedAt: record.updatedAt,
+      updatedAt: record.updatedAt
     }
   }
 
@@ -95,7 +95,7 @@ const handle = async (
   if (req.method !== 'GET') {
     return {
       statusCode: HttpCodes.methodNotAllowed,
-      body: { error: 'Method Not Allowed' },
+      body: { error: 'Method Not Allowed' }
     }
   }
 
@@ -115,8 +115,8 @@ const handle = async (
       statusCode: HttpCodes.internalError,
       body: {
         error: 'Failed to load services',
-        details: error.message,
-      },
+        details: error.message
+      }
     }
   }
 
@@ -129,22 +129,21 @@ const handle = async (
       statusCode: HttpCodes.internalError,
       body: {
         error: 'Invalid service record returned from Supabase',
-        details: (parseError as Error).message,
-      },
+        details: (parseError as Error).message
+      }
     }
   }
 
   const nextCursor = cursor + services.length
-  const hasMore =
-    typeof count === 'number' ? nextCursor < count : services.length === limit
+  const hasMore = typeof count === 'number' ? nextCursor < count : services.length === limit
 
   return {
     statusCode: HttpCodes.ok,
     body: {
       data: services,
       cursor: nextCursor,
-      hasMore,
-    },
+      hasMore
+    }
   }
 }
 

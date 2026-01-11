@@ -1,6 +1,6 @@
 # swarmAg System - Working Notes
 
-Last updated: 2026-01-07
+Last updated: 2026-01-10
 
 ## 1. Purpose
 
@@ -20,31 +20,53 @@ This file summarizes the current baseline so it can be restored after tool reset
 
 ## 3. Conversation summaries
 
+- 2026-01-10: Domain, docs, and Supabase naming updates.
+
+  | Item         | Details                                                                                                                                                                         |
+  | ------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+  | Domain model | Renamed `AssetType.name` to `label`, added `active/createdAt/updatedAt`, and introduced the data dictionary (`docs/foundation/data-dictionary.md`) with related domain updates. |
+  | Docs         | Added `CLAUDE.md`, referenced it in the setup prompt, and standardized markdown formatting/lint config.                                                                         |
+  | Serverless   | Renamed the Supabase helper to `db-supabase` and updated imports across serverless functions and tests.                                                                         |
+
+- 2026-01-09: Users mapping rename.
+
+  | Item     | Details                                                                                |
+  | -------- | -------------------------------------------------------------------------------------- |
+  | Mappings | Renamed `user-mapping.ts` to `users-mapping.ts` and updated imports in user functions. |
+
+- 2026-01-08: Serverless layout alignment and validator split.
+
+  | Item       | Details                                                                                                                                    |
+  | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+  | Serverless | Reorganized serverless structure (pluralized function filenames, moved mappings), updated Netlify handler naming, and aligned import maps. |
+  | Validators | Split domain validators into common/job-specific modules and updated guards/scripts.                                                       |
+  | Docs       | Synced documentation to match the new layout and conventions.                                                                              |
+
 - 2026-01-07: Doc hygiene and authority updates.
 
-  | Item | Details |
-  | ---- | ------- |
-  | Notes | Reorganized `NOTES.md` to keep only the handoff sections and moved recent changes into the timeline. |
+  | Item         | Details                                                                                                                    |
+  | ------------ | -------------------------------------------------------------------------------------------------------------------------- |
+  | Notes        | Reorganized `NOTES.md` to keep only the handoff sections and moved recent changes into the timeline.                       |
   | Architecture | Added local dev helpers, DBeaver connection details, and the migrations symlink note to `docs/foundation/architecture.md`. |
-  | Authority | Moved collaboration preferences into `AUTHORITY.md` and added the "no multiple consecutive blank lines" rule. |
-  | README | Removed the setup/collaboration sections and pointed to `AUTHORITY.md` for collaboration preferences. |
+  | Authority    | Moved collaboration preferences into `AUTHORITY.md` and added the "no multiple consecutive blank lines" rule.              |
+  | README       | Removed the setup/collaboration sections and pointed to `AUTHORITY.md` for collaboration preferences.                      |
 
 - 2026-01-06: Netlify adapter expansion and lint cleanup.
 
-  | Item | Details |
-  | ---- | ------- |
+  | Item            | Details                                                                                                                                    |
+  | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
   | Netlify adapter | Expanded `source/serverless/lib/api-handler.ts` with CORS, request parsing, size limits, header normalization, and standardized responses. |
-  | API bindings | Added `isHttpMethod` and `payloadTooLarge` (413) to `source/serverless/lib/api-binding.ts`. |
-  | Docs | Cleaned markdown lint warnings in `docs/history/tedvkremer-experience.md` (headings, labels, links). |
-  | Follow-up | The most recent edit after the expansion was a small JSDoc addition. |
+  | API bindings    | Added `isHttpMethod` and `payloadTooLarge` (413) to `source/serverless/lib/api-binding.ts`.                                                |
+  | Docs            | Cleaned markdown lint warnings in `docs/history/tedvkremer-experience.md` (headings, labels, links).                                       |
+  | Follow-up       | The most recent edit after the expansion was a small JSDoc addition.                                                                       |
 
 - 2026-01-06: Authority rules and session hygiene updates.
 
-  | Item | Details |
-  | ---- | ------- |
+  | Item      | Details                                                                                                                                                    |
+  | --------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
   | Authority | Created `AUTHORITY.md`, refined rules (class usage, conflict order, doc table/list preference, no new patterns), and added domain → API → apps sequencing. |
-  | Docs | Added “Software Construction Sessions” prompt to `README.md` and switched the file ingest list to an ordered list. |
-  | History | Rewrote recent commit messages via interactive rebase and force-pushed updated history. |
+  | Docs      | Added “Software Construction Sessions” prompt to `README.md` and switched the file ingest list to an ordered list.                                         |
+  | History   | Rewrote recent commit messages via interactive rebase and force-pushed updated history.                                                                    |
 
 - 2026-01-05: Doc refactor alignment. We agreed the docs were strong but scattered, and that the system is best framed as three products (Admin, Ops, Customer) plus a platform/architecture layer. Decisions:
   - Keep `NOTES.md` as the agent handoff and institutional memory log; it should be comprehensive, not minimal, and include summaries of our conversations.

@@ -5,7 +5,7 @@
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 const TARGET_DIRS = [
-  `${ROOT}/source/serverless/functions`,
+  `${ROOT}/source/serverless/functions`
 ]
 
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
@@ -26,8 +26,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
   return entries
 }
 
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const main = async () => {
   const files = (await Promise.all(TARGET_DIRS.map(collectFiles))).flat()

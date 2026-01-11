@@ -10,7 +10,7 @@ import type { ID } from '@utils/identifier.ts'
 export const USER_ROLES = [
   'administrator',
   'sales',
-  'operations',
+  'operations'
 ] as const
 export type UserRole = (typeof USER_ROLES)[number]
 
@@ -28,7 +28,7 @@ export const AUTHOR_ATTRIBUTION_ROLES = [
   { id: 'assessment-lead', label: 'Assessment Lead', contexts: ['job-assessment'] },
   { id: 'crew-lead', label: 'Crew Lead', contexts: ['job-plan', 'job-log'] },
   { id: 'field-tech', label: 'Field Tech', contexts: ['job-log', 'asset'] },
-  { id: 'fleet-manager', label: 'Fleet Manager', contexts: ['asset'] },
+  { id: 'fleet-manager', label: 'Fleet Manager', contexts: ['asset'] }
 ] as const satisfies ReadonlyArray<{
   id: string
   label: string
@@ -63,7 +63,7 @@ export interface Note {
   content: string
   visibility?: 'internal' | 'shared'
   tags?: string[]
-  images: Attachment[];
+  images: Attachment[]
 }
 
 /** Represents geographic coordinates. */

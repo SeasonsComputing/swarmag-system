@@ -2,19 +2,19 @@
  * Netlify handler for creating users.
  */
 
+import { type UserCreateInput, validateUserCreateInput } from '@domain/common-validators.ts'
 import type { User } from '@domain/common.ts'
-import { id } from '@utils/identifier.ts'
-import { when } from '@utils/datetime.ts'
-import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { userToRow } from '@serverless-mappings/users-mapping.ts'
-import { validateUserCreateInput, type UserCreateInput } from '@domain/common-validators.ts'
+import { when } from '@utils/datetime.ts'
+import { id } from '@utils/identifier.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: "/api/users/create" };
+export const config = { path: '/api/users/create' }
 
 /**
  * Create a new user record when the request payload is valid.
@@ -44,7 +44,7 @@ const handle = async (
     status: req.body.status ?? 'active',
     createdAt: now,
     updatedAt: now,
-    deletedAt: undefined,
+    deletedAt: undefined
   }
 
   const { error } = await Supabase.client()
@@ -54,7 +54,7 @@ const handle = async (
   if (error) {
     return {
       statusCode: HttpCodes.internalError,
-      body: { error: 'Failed to create user', details: error.message },
+      body: { error: 'Failed to create user', details: error.message }
     }
   }
 

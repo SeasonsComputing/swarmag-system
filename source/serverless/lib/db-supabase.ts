@@ -24,7 +24,7 @@ export class Supabase {
     Supabase.#cache = createClient(
       SUPABASE_URL,
       SUPABASE_SERVICE_KEY,
-      { auth: { persistSession: false } },
+      { auth: { persistSession: false } }
     )
 
     return Supabase.#cache

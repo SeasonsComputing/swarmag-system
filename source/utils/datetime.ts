@@ -6,8 +6,7 @@
 /** Represents a date-time in ISO 8601 string format. */
 export type When = string
 
-const ISO_DATETIME_REGEX =
-  /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
+const ISO_DATETIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
 
 /** Gets the current UTC datetime as an ISO string */
 export const when = (): When => new Date().toISOString()

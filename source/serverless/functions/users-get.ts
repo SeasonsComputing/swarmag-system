@@ -2,17 +2,17 @@
  * Netlify handler for fetching a user by id.
  */
 
+import { type UserGetQuery, validateUserGetQuery } from '@domain/common-validators.ts'
 import type { User } from '@domain/common.ts'
-import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { HttpCodes, type ApiRequest, type ApiResponse } from '@serverless-lib/api-binding.ts'
+import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { rowToUser } from '@serverless-mappings/users-mapping.ts'
-import { validateUserGetQuery, type UserGetQuery } from '@domain/common-validators.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: "/api/users/get" };
+export const config = { path: '/api/users/get' }
 
 /**
  * Fetch a user by id when provided via query string.
@@ -50,7 +50,7 @@ const handle = async (
   } catch (parseError) {
     return {
       statusCode: HttpCodes.internalError,
-      body: { error: 'Invalid user record returned from Supabase', details: (parseError as Error).message },
+      body: { error: 'Invalid user record returned from Supabase', details: (parseError as Error).message }
     }
   }
 

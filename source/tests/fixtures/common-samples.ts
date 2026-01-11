@@ -12,15 +12,15 @@ export const preflightInspectionQuestion: Question = {
   required: true,
   options: [
     { value: 'pass', label: 'Pass' },
-    { value: 'fail', label: 'Fail', requiresNote: true },
-  ],
+    { value: 'fail', label: 'Fail', requiresNote: true }
+  ]
 }
 
 export const chemicalMixRatioQuestion: Question = {
   id: id(),
   prompt: 'Recorded mix ratio (oz/gal)',
   type: 'number',
-  helpText: 'Enter the actual ounces per gallon observed during mixing.',
+  helpText: 'Enter the actual ounces per gallon observed during mixing.'
 }
 
 export const ppeVerificationQuestion: Question = {
@@ -30,12 +30,12 @@ export const ppeVerificationQuestion: Question = {
   options: [
     { value: 'lead', label: 'Crew Lead' },
     { value: 'technician', label: 'Field Technician' },
-    { value: 'observer', label: 'Observer', requiresNote: true },
-  ],
+    { value: 'observer', label: 'Observer', requiresNote: true }
+  ]
 }
 
 export const sharedQuestionSamples: Question[] = [
   preflightInspectionQuestion,
   chemicalMixRatioQuestion,
-  ppeVerificationQuestion,
+  ppeVerificationQuestion
 ]
