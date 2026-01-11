@@ -60,10 +60,10 @@ Architecture, goals, and setup instructions live in `docs/foundation/architectur
 
 Prepare a software construction session by creating a new chat and submitting the following prompt:
 
-Ingest the following files, assume `AUTHORITY.md` is binding.
+Ingest the following files:
 
 1. `CLAUDE.md`
-2. `docs/foundation/` - all markdown files
+2. `docs/*` - all markdown files
 3. `source/*`- all source files
-4. `NOTES.md`
-5. `AUTHORITY.md`
+4. `NOTES.md` - AI's historical log
+5. `AUTHORITY.md` - preeminent binding document
