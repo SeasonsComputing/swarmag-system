@@ -98,7 +98,7 @@ See `docs/foundation/style-guide.md` for compiler settings, aliases, and code st
 
 ## 8. Namespace dependencies
 
-This section outlines the monorepo structure and its primary dependency flow; see `README.md` for the project roadmap.
+This section outlines the monorepo structure and its primary dependency flow.
 
 ```text
           ┌───────────────┐            
