@@ -3,6 +3,7 @@
  */
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { App } from '@utils/app.ts'
 
 /** Cache-aware Supabase client factory for platform functions. */
 export class Supabase {
@@ -17,9 +18,8 @@ export class Supabase {
   static client(): SupabaseClient {
     if (Supabase.#cache) return Supabase.#cache
 
-    const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
-    const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_KEY')
-    if (!SUPABASE_URL || !SUPABASE_SERVICE_KEY) throw new Error('Supabase credentials missing')
+    const SUPABASE_URL = App.get('SUPABASE_URL')
+    const SUPABASE_SERVICE_KEY = App.get('SUPABASE_SERVICE_KEY')
 
     Supabase.#cache = createClient(
       SUPABASE_URL,
