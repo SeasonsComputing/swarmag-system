@@ -14,7 +14,7 @@ The system focuses on two service classes—Aerial and Ground—and the workflow
 - **Supabase** — Postgres, Auth, Storage, Realtime
 - **GitHub Actions** — CI/CD
 - **SolidJS + TanStack + Kobalte + vanilla CSS** — UI platform
-- **Deno & Docker** — hosts and containers used across the stack and runtime.
+- **Deno & Docker** — runtime hosts used across the stack.
 
 ## 3. Goals, constraints, and guiding principles
 
@@ -192,7 +192,7 @@ LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read sourc
 ### 9.3 Local development helpers
 
 | Command                                                                                                                      | Purpose                                                                                  |
-| ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------                |
+| ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
 | `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor` | Start local Supabase with minimal services.                                              |
 | `supabase db reset --yes`                                                                                                    | Reset and re-apply migrations.                                                           |
 | `supabase status --output env`                                                                                               | Show local Supabase URLs and keys.                                                       |
