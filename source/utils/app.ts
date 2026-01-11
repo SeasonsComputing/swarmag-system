@@ -2,6 +2,8 @@
  * App facade helpers for startup checks and platform utilities.
  */
 
+import { assert } from '@std/assert'
+
 /** Registered environment variable names. */
 type Variables = Set<string>
 
@@ -20,10 +22,9 @@ export class App {
    * Validate required environment variables and cache their names.
    * @param required - Environment variable names to validate and register.
    * @returns Nothing.
-   * @throws {Error} When called more than once or required variables are missing.
    */
   static init(required: readonly string[]): void {
-    if (App.#initialized) throw new Error('App already initialized')
+    assert(!App.#initialized, 'App already initialized')
     App.#cache = new Set(required)
     App.#validate(required)
     App.#initialized = true
@@ -33,13 +34,12 @@ export class App {
    * Return a required environment variable value.
    * @param name - Environment variable name to read.
    * @returns Environment variable value.
-   * @throws {Error} When called before init, the variable is unregistered, or missing.
    */
   static get(name: string): string {
-    if (!App.#initialized) throw new Error('App not initialized')
-    if (!App.#cache.has(name)) throw new Error(`App variable not registered: ${name}`)
+    assert(App.#initialized, 'App not initialized')
+    assert(App.#cache.has(name), `App variable not registered: ${name}`)
     const value = Deno.env.get(name)
-    if (!value) throw new Error(`Missing required .env variable: ${name}`)
+    assert(value, `${name} validated during init but missing at runtime`)
     return value
   }
 
@@ -64,13 +64,10 @@ export class App {
    * Validate that required environment variables are present.
    * @param required - Environment variable names to check.
    * @returns Nothing.
-   * @throws {Error} When any required variables are missing.
    */
   static #validate(required: readonly string[]): void {
     const env = Deno.env.toObject()
     const missing = required.filter(key => !env[key])
-    if (missing.length > 0) {
-      throw new Error(`Missing required .env variables: ${missing.join(', ')}`)
-    }
+    assert(missing.length === 0, `Missing required .env variables: ${missing.join(', ')}`)
   }
 }
