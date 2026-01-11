@@ -498,9 +498,9 @@ Technical Contributions:
 ## Career Origins
 
 Early Career (1980s):
-Began career four decades ago working for father's software startup developing accounting solutions for the TRS-80. This formative experience established:
+Started writing accounting software on the TRS-80 at age 10 for father's software startup. No games — all business from day one. This formative experience established:
 
-- Foundation in entrepreneurship
+- Foundation in entrepreneurship and shipping production code
 - Strong work ethic
 - Passion for technology and creativity
 - Drive for excellence and achievement

@@ -64,6 +64,7 @@ Ingest the following files:
 
 1. `CLAUDE.md`
 2. `docs/*` - all markdown files
-3. `source/*`- all source files
-4. `NOTES.md` - AI's historical log
-5. `AUTHORITY.md` - preeminent binding document
+3. `source/*` - all source files
+4. `scripts/*` - all script files
+5. `NOTES.md` - AI's historical log
+6. `AUTHORITY.md` - preeminent binding document
