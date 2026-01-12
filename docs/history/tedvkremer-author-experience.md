@@ -1,6 +1,6 @@
-# Ted V. Kremer - Professional Experience Document
+# Ted V. Kremer - Professional Experience
 
-## Contact Information
+## 1. Contact Information
 
 - **Name:** Ted V. Kremer
 - **Email:** <tedvkremer@gmail.com> / <ted@seasonscomputing.com>
@@ -9,75 +9,78 @@
 - **Company:** Seasons Computing
 - **Website:** <https://seasonscomputing.com>
 
-## Professional Summary
+## 2. Professional Summary
 
 Software technology executive and architect with four decades of experience spanning entrepreneurship, full-stack development, and SDLC management. Serial entrepreneur with multiple successful exits, patent portfolio, and deep expertise in machine learning, NLP, and distributed systems. Effective as technology executive, software architect, full-stack developer, and SDLC manager for startups, SMBs, and enterprises.
 
-### Career Philosophy
+### 2.1 Career Philosophy
 
 Dedicated to building excellent products, teams, and companies through innovation, leadership, and adoption of cutting-edge methodologies. Early adopter of paradigm shifts including object-oriented/dynamic/functional programming, unstructured data storage, cloud computing, distributed processing, and machine learning.
 
-## Core Technical Competencies
+## 3. Core Technical Competencies
 
-### Languages & Frameworks
+### 3.1 Languages & Frameworks
 
 - **Primary:** TypeScript, JavaScript, C++, C, PHP, Java
 - **Frontend:** React, HTML, CSS, Ajax, jQuery, Bootstrap
 - **Backend:** Node.js, NestJS, Laravel, Spring, Hibernate
 - **Legacy:** Swing, AWT, MFC, Stingray, XVT, COM, ATL, ActiveX, CORBA
 
-### Architecture & Infrastructure
+### 3.2 Architecture & Infrastructure
 
 - **Platforms:** Linux, Win32, Web, AWS (EC2, S3, SDB, SQS, RDS, SES, R53)
 - **Architectural Patterns:** Cloud, Microservice, Grid, Client/Server, Single Page Application, Responsive & Adaptive Design
 - **DevOps:** Docker, CI/CD, SCM, Jenkins/Hudson, Maven
 
-### Data & Integration
+### 3.3 Data & Integration
 
 - **Databases:** PostgreSQL, MySQL, Oracle, SQL Server, MongoDB
 - **Data Technologies:** TypeORM, ODBC/JDBC, JSON, XML, XSLT, XQuery
 - **APIs:** REST, SOAP
 - **Search & NoSQL:** eXist, Lucene, MongoDB, Redis
 
-### Specialized Domains
+### 3.4 Specialized Domains
 
 - **AI/ML:** Machine Learning, Natural Language Processing, Text Mining, Data Mining
 - **Analytics:** OLAP, Sentiment Analysis, Topic Extraction, Predictive Modeling
 - **Storage Paradigms:** Document-text, Key-value, Message-oriented, Relational, NoSQL
 
-### Methodologies
+### 3.5 Methodologies
 
 Agile, XP, Scrum, UML, RUP, CMM, DevOps
 
-## Patent Portfolio
+## 4. Patent Portfolio
 
-1. **"Tribe or group-based analysis of social media including generating intelligence from a tribe's weblogs or blogs"**
-   - Inventors: Ted V Kremer, et al
-   - Company: Umbria
-   - Date: September 2008
-   - Patent: US 20080215607
+### 4.1 "Tribe or group-based analysis of social media including generating intelligence from a tribe's weblogs or blogs"
 
-2. **"Systems and methods for developing intelligence from information existing on a network"**
-   - Inventors: Ted V Kremer, et al
-   - Company: Umbria
-   - Date: March 2006
-   - Patent: US 20060053156
+- **Inventors:** Ted V Kremer, et al
+- **Company:** Umbria
+- **Date:** September 2008
+- **Patent:** US 20080215607
 
-3. **"Distributed architecture for mammographic image acquisition and processing"**
-   - Inventors: Ted V Kremer, et al
-   - Company: Hologic
-   - Date: December 2005
-   - Patents: US 7639780, US 20040114714, US 20080279439, US 7406150
+### 4.2 "Systems and methods for developing intelligence from information existing on a network"
 
-## Professional Experience
+- **Inventors:** Ted V Kremer, et al
+- **Company:** Umbria
+- **Date:** March 2006
+- **Patent:** US 20060053156
 
-### Seasons Computing (2014-2018, 2024-2025)
+### 4.3 "Distributed architecture for mammographic image acquisition and processing"
+
+- **Inventors:** Ted V Kremer, et al
+- **Company:** Hologic
+- **Date:** December 2005
+- **Patents:** US 7639780, US 20040114714, US 20080279439, US 7406150
+
+## 5. Professional Experience
+
+### 5.1 Seasons Computing (2014-2018, 2024-2025)
 
 **Role:** Founder / Principal Consultant
 
 Software construction services company providing technology executive leadership, software architecture, full-stack development, and SDLC management to startups, SMBs, and enterprises.
 
-Service Offerings:
+#### 5.1.1 Service Offerings
 
 - Technology executive guidance and strategic planning
 - Software architecture design and implementation
@@ -85,87 +88,87 @@ Service Offerings:
 - SDLC function management and optimization
 - Technology marketing and digital strategy
 
-#### Client Projects (Seasons Computing)
+#### 5.1.2 Client Projects (Seasons Computing)
 
-MedCAD (2024-2025)
+##### 5.1.2.1 MedCAD (2024-2025)
 
-- Industry: Patient-matched medical device manufacturing
-- Products: Cranial implants, patient-matched plating, surgical planning, 3D modeling
-- Deliverables: Website design, programming, technology marketing, mobile strategy, SEO
-- Additional: Branding strategy consulting, marketing communications content
+- **Industry:** Patient-matched medical device manufacturing
+- **Products:** Cranial implants, patient-matched plating, surgical planning, 3D modeling
+- **Deliverables:** Website design, programming, technology marketing, mobile strategy, SEO
+- **Additional:** Branding strategy consulting, marketing communications content
 
-Drum Free Experience (2024)
+##### 5.1.2.2 Drum Free Experience (2024)
 
-- Services: Website design and development, technology consulting
+- **Services:** Website design and development, technology consulting
 
-Farm Best Feed (2019)
+##### 5.1.2.3 Farm Best Feed (2019)
 
-- Services: Website design, programming, technology marketing, SEO
+- **Services:** Website design, programming, technology marketing, SEO
 
-Hometown Boys Construction (2018)
+##### 5.1.2.4 Hometown Boys Construction (2018)
 
-- Services: Website design, programming, digital marketing
+- **Services:** Website design, programming, digital marketing
 
-Underground Nutrientz (2017)
+##### 5.1.2.5 Underground Nutrientz (2017)
 
-- Services: Website design, programming, technology marketing
+- **Services:** Website design, programming, technology marketing
 
-Venice Nail Salon (2016)
+##### 5.1.2.6 Venice Nail Salon (2016)
 
-- Services: Website design, programming, digital presence
+- **Services:** Website design, programming, digital presence
 
-Roofics (2015)
+##### 5.1.2.7 Roofics (2015)
 
-- Services: Website design, programming, technology marketing
+- **Services:** Website design, programming, technology marketing
 
 ---
 
-### Tapwow (2019-2023)
+### 5.2 Tapwow (2019-2023)
 
 **Role:** Technical Founder, Chief Technology Officer
 
 Digital marker platform transforming utilization of NFC, GS1, QRC, and RFID technologies for manufacturing, supply chain tracking, product authentication, and user engagement.
 
-Key Responsibilities:
+#### 5.2.1 Key Responsibilities
 
 - Executive technology strategy and execution
 - System architecture evolution from static 3-tier to dynamic multi-tier model
 - Core component software development
 - Technical presentations to customers, investors, and acquisition prospects
 
-Technology Stack:
+#### 5.2.2 Technology Stack
 
-Backend:
+##### 5.2.2.1 Backend
 
-- Infrastructure: AWS (EC2, RDS, SES, S3, R53), Nginx, Docker
-- Runtime: Node.js
-- Framework: NestJS
-- Database: PostgreSQL, Redis
-- Language: TypeScript
-- ORM: TypeORM
-- Tools: Swagger, JWT, [Sentry](https://sentry.io), Handlebars
+- **Infrastructure:** AWS (EC2, RDS, SES, S3, R53), Nginx, Docker
+- **Runtime:** Node.js
+- **Framework:** NestJS
+- **Database:** PostgreSQL, Redis
+- **Language:** TypeScript
+- **ORM:** TypeORM
+- **Tools:** Swagger, JWT, Sentry, Handlebars
 
-Frontend:
+##### 5.2.2.2 Frontend
 
-- Framework: React
-- UI Library: Ant Design
-- Server: Express
-- State Management: MobX
-- Language: JavaScript
+- **Framework:** React
+- **UI Library:** Ant Design
+- **Server:** Express
+- **State Management:** MobX
+- **Language:** JavaScript
 
-Additional:
+##### 5.2.2.3 Additional
 
-- Database: MongoDB
-- CMS: Strapi
-- Analytics: Tableau Embedded/Server
+- **Database:** MongoDB
+- **CMS:** Strapi
+- **Analytics:** Tableau Embedded/Server
 
-SDLC Tools:
+##### 5.2.2.4 SDLC Tools
 
-- Version Control: GitHub
-- Documentation: Confluence
-- Project Management: Jira
+- **Version Control:** GitHub
+- **Documentation:** Confluence
+- **Project Management:** Jira
 
-Achievements:
+#### 5.2.3 Achievements
 
 - Successfully transitioned architecture to scalable, generalized platform
 - Established complete modern development workflow and toolchain
@@ -173,19 +176,19 @@ Achievements:
 
 ---
 
-### Grow Big Supply (2012-2014)
+### 5.3 Grow Big Supply (2012-2014)
 
 **Role:** Technical Founder, Chief Technology Officer
 
 North America's largest and only 24x7 brick-and-mortar hydroponics superstore. Innovative retail company requiring comprehensive technology infrastructure.
 
-Key Responsibilities:
+#### 5.3.1 Key Responsibilities
 
 - Complete technology vision and execution
 - First executive hire, guiding growth from 4 people to 20+ employees
 - Scaled retail operations from ~$500/day to ~$30,000/day average
 
-Platform & Service Implementations:
+#### 5.3.2 Platform & Service Implementations
 
 - **Business Operations:** Accounting, Inventory, ERP, CRM
 - **Sales Systems:** Commercial sales, Retail point-of-sale, E-commerce
@@ -193,7 +196,7 @@ Platform & Service Implementations:
 - **Marketing:** SEM, Print, Email, Radio campaigns
 - **Services:** Professional services, Education & e-learning platforms
 
-Impact:
+#### 5.3.3 Impact
 
 - Defined evolutionary rollout strategy ensuring minimal disruption
 - Built scalable infrastructure supporting 60x retail growth
@@ -201,58 +204,58 @@ Impact:
 
 ---
 
-### 30dB (2010-2011)
+### 5.4 30dB (2010-2011)
 
 **Role:** Cofounder, Chief Technology Officer
 
 Real-time crowd opinion aggregation platform combining topic extraction, sentiment detection, social networking, and search.
 
-Technical Leadership:
+#### 5.4.1 Technical Leadership
 
 - Authored complete architecture and science strategy
 - Designed deployment platform and core visualizations
 - Defined technology stack for scalable text mining operations
 
-Architecture:
+#### 5.4.2 Architecture
 
 - AWS-based distributed, queue-driven system
 - Text mining and NLP pipeline
 - Machine learning for sentiment and topic analysis
 - Real-time content collection and processing
 
-Vendor Management:
+#### 5.4.3 Vendor Management
 
 - Selected vendors for change management, administration, API libraries
 - Managed hosting, email, and infrastructure providers
 
-Development:
+#### 5.4.4 Development
 
 - Managed development of initial MVP iteration
 - Established development processes and standards
 
 ---
 
-### Umbria Communications (2003-2008)
+### 5.5 Umbria Communications (2003-2008)
 
 **Role:** Cofounder, Chief Technology Officer
 
 Market research company converting unsolicited online opinions into actionable insights through proprietary NLP and machine learning. Acquired by JD Powers and Associates in 2008.
 
-Technology Focus:
+#### 5.5.1 Technology Focus
 
 - Topic extraction from unstructured text
 - Sentiment analysis algorithms
 - Author demographic classification
 - Large-scale internet crawling and text mining
 
-Leadership Responsibilities:
+#### 5.5.2 Leadership Responsibilities
 
 - Managed diverse engineering teams
 - Implemented agile development methodologies
 - Oversaw operational budgets and vendor relationships
 - Co-architected scalable data center infrastructure
 
-Data Center Architecture:
+#### 5.5.3 Data Center Architecture
 
 - Highly available and scalable infrastructure
 - Internet crawling at scale
@@ -260,7 +263,7 @@ Data Center Architecture:
 - Machine learning processing
 - Web portal delivery
 
-Text Mining Platform:
+#### 5.5.4 Text Mining Platform
 
 - **Technology:** C++, CLucene, XML, XSLT
 - **Architecture:** Lightweight HTTP REST microservices
@@ -268,14 +271,14 @@ Text Mining Platform:
 - **Design:** Open and scalable solution
 - **Data Source:** Internet opinion data
 
-Market Research Portal:
+#### 5.5.5 Market Research Portal
 
 - **Technology:** HTML, JavaScript, Java, RMI, Servlets, XML, XSLT
 - **Features:** Analysis, visualization, personalization
 - **Architecture:** Open and scalable design
 - **Target Users:** Market researchers and analysts
 
-Press Recognition:
+#### 5.5.6 Press Recognition
 
 - "The Blogtrotters" - Westword
 - "Blog-Searching Umbria Gets Powerful" - Westword
@@ -284,15 +287,15 @@ Press Recognition:
 
 ---
 
-### Green Planet Software (2003)
+### 5.6 Green Planet Software (2003)
 
 **Role:** Cofounder, Chief Technology Officer
 
 Early-stage startup developing private desktop recommendation engine for news, blogs, books, and advertising based on internet activity.
 
-Technical Contributions:
+#### 5.6.1 Technical Contributions
 
-Client-Side Components:
+##### 5.6.1.1 Client-Side Components
 
 - Architected lightweight, cross-platform C++ and ATL text mining components
 - Implemented dynamic component loading, threading, networking
@@ -302,13 +305,13 @@ Client-Side Components:
 - Implemented term/document frequency analysis
 - Built clustering and categorization models
 
-Server-Side Systems:
+##### 5.6.1.2 Server-Side Systems
 
 - Designed web crawling infrastructure
 - Programmed server-side text mining with Java and WebSphinx
 - Integrated C++ components for performance-critical operations
 
-Innovation:
+##### 5.6.1.3 Innovation
 
 - Privacy-focused recommendation engine (desktop-based, no data sharing)
 - Client-side machine learning for personalization
@@ -316,85 +319,85 @@ Innovation:
 
 ---
 
-### Fischer Imaging (2002-2003)
+### 5.7 Fischer Imaging (2002-2003)
 
 **Role:** Software Architect
 
 Medical imaging company developing full-field digital mammography system for acquisition and review over unreliable wide area networks.
 
-System Architecture:
+#### 5.7.1 System Architecture
 
 - Multi-node distributed system for digital mammography
 - Complete logical and physical layer design
 - Object models and data models for medical imaging
 - Fixed-function system optimized for specific workflows
 
-User Interface Design:
+#### 5.7.2 User Interface Design
 
 - Patient comfort optimization
 - Technician workflow efficiency
 - Physician review optimization
 - Complete UI implementation for medical device
 
-Generalized Foundation:
+#### 5.7.3 Generalized Foundation
 
 - Multi-product architecture supporting product line
 - XML-based database code generation scheme (30%+ code auto-generated)
 - JAXB-driven product configuration system
 - Generalized Java Swing medical application framework
 
-Team Leadership:
+#### 5.7.4 Team Leadership
 
 - Mentored large team on first large-scale client/server project
 - Guided team through object-oriented design and Java adoption
 - Established architectural patterns and best practices
 
-Patents Resulting:
+#### 5.7.5 Patents Resulting
 
 - Multiple patents on distributed mammographic imaging architecture
 - Filed under Hologic (Fischer Imaging acquisition)
 
 ---
 
-### Athene Software (1998-2001)
+### 5.8 Athene Software (1998-2001)
 
 **Role:** Technical Founder, Chief Software Architect
 
 Combined operational and analytical CRM application using machine learning to predict customer lifecycle events and drive actionable multi-channel results.
 
-Leadership Role:
+#### 5.8.1 Leadership Role
 
 - Team lead and primary programmer for APT Churn 1.0
 - Selected all technologies and vendors
 - Set software engineering standards
 - Presented architecture to customers, partners, investors
 
-Architecture:
+#### 5.8.2 Architecture
 
 - Component-oriented, open, standards-based solution
 - Enterprise data integration
 - Predictive data mining integration
 - World-class web application framework
 
-Web Application Design:
+#### 5.8.3 Web Application Design
 
 - Internationalized HTML, CSS, DOM, JavaScript application
 - Generalized web portal/application shell
 - Versatile deployment architecture
 
-Enterprise Integration:
+#### 5.8.4 Enterprise Integration
 
 - J2EE enterprise API (EJB, JNDI, JDBC)
 - XML-based component architecture
 - Standards-based integration patterns
 
-Personalization & Distribution:
+#### 5.8.5 Personalization & Distribution
 
 - XML/XSLT-based drop-in components
 - Mass-personalized distribution (SMTP, SMS, direct mail)
 - XML/XSLT software artifact generation system
 
-Advanced Development:
+#### 5.8.6 Advanced Development
 
 - JavaScript object model with scoping, interface conformance, events
 - Web component framework with advanced UI capabilities
@@ -402,51 +405,51 @@ Advanced Development:
 
 ---
 
-### Flatirons Computing (1996-1998)
+### 5.9 Flatirons Computing (1996-1998)
 
 **Role:** Cofounder / Principal Consultant
 
 Boulder, Colorado software consultancy founded with database and machine learning thought-leader Richard Wolniewicz, Ph.D.
 
-Business Responsibilities:
+#### 5.9.1 Business Responsibilities
 
 - Lead generation and business development
 - Financial management
 - Client project delivery
 
-#### Client Projects (Flatirons Computing)
+#### 5.9.2 Client Projects (Flatirons Computing)
 
-HeurisTec
+##### 5.9.2.1 HeurisTec
 
-- Project: SuperSked for Windows scheduling application
-- Technologies: C++, MFC, ODBC, Visual Basic, ActiveX
+- **Project:** SuperSked for Windows scheduling application
+- **Technologies:** C++, MFC, ODBC, Visual Basic, ActiveX
 
-Qwest Communications
+##### 5.9.2.2 Qwest Communications
 
-- Project: Network Operations Center (NOC) work request application
-- Technologies: Visual Basic, ActiveX Document Server, DCOM, ADO, Oracle
+- **Project:** Network Operations Center (NOC) work request application
+- **Technologies:** Visual Basic, ActiveX Document Server, DCOM, ADO, Oracle
 
-TransLogic
+##### 5.9.2.3 TransLogic
 
-- Project: Scheduling application for pneumatic tube systems
-- Technologies: C++, XVT-Power++
+- **Project:** Scheduling application for pneumatic tube systems
+- **Technologies:** C++, XVT-Power++
 
-Blue Cross/Blue Shield
+##### 5.9.2.4 Blue Cross/Blue Shield
 
-- Project: Asset management application
-- Technologies: C++, MFC
+- **Project:** Asset management application
+- **Technologies:** C++, MFC
 
 ---
 
-### XVT Software (1992-1996)
+### 5.10 XVT Software (1992-1996)
 
 **Role:** Principal Engineer (1994-1996), Software Engineer (1992-1994)
 
 Pioneer in cross-platform GUI development tools for C and C++. Winner of prestigious Jolt Cola Award.
 
-#### Principal Engineer (1994-1996)
+#### 5.10.1 Principal Engineer (1994-1996)
 
-XVT-Architect (State-of-the-art cross-platform C++ GUI development tool):
+##### 5.10.1.1 XVT-Architect (State-of-the-art cross-platform C++ GUI development tool)
 
 - Co-designed complete architecture
 - Co-designed metasystem for modeling object types and instances
@@ -455,9 +458,9 @@ XVT-Architect (State-of-the-art cross-platform C++ GUI development tool):
 - Programmed application designer for non-visual component modeling
 - Mentored engineers on OO analysis, design, implementation
 
-#### Software Engineer (1992-1994)
+#### 5.10.2 Software Engineer (1992-1994)
 
-XVT-Power++ (Cross-platform C++ application framework):
+##### 5.10.2.1 XVT-Power++ (Cross-platform C++ application framework)
 
 - Primary programmer for state-of-the-art framework
 - Implemented UI components: splitter, menus, imaging, font, pen, brush
@@ -467,54 +470,57 @@ XVT-Power++ (Cross-platform C++ application framework):
 - Internationalized framework
 - Productized for commercial library distribution
 
-Technical Analysis:
+#### 5.10.3 Technical Analysis
 
 - Evaluated competing technologies: MFC, OWL, zApp, Zinc, Galaxy, Neuron Data
 - Provided competitive intelligence for product positioning
 
-Recognition:
+#### 5.10.4 Recognition
 
 - Recipient of XVT Software Award of Excellence (two consecutive years)
 
 ---
 
-### ProtoSoft (1990-1992)
+### 5.11 ProtoSoft (1990-1992)
 
 **Role:** Software Engineer
 
 Cross-platform meta-modeling software design tool supporting multiple notations and methods.
 
-**Project:** ParadigmPlus
+#### 5.11.1 ParadigmPlus
 
-Technical Contributions:
+##### 5.11.1.2 Technical Contributions
 
 - Programmed diagramming kernel
-- Technologies: C, XVT, Raima dbVista
+- **Technologies:** C, XVT, Raima dbVista
 - Implemented modeling capabilities for multiple notation systems
 - Database integration for model persistence
 
 ---
 
-## Career Origins
+## 6. Career Origins
 
-Early Career (1980s):
-Started writing accounting software on the TRS-80 at age 10 for father's software startup. No games — all business from day one. This formative experience established:
+### 6.1 Early Career (1980s)
+
+Started writing accounting software on the TRS-80 at age 10 for father's software startup. No games — all business from day one.
+
+#### 6.1.1 This Formative Experience Established
 
 - Foundation in entrepreneurship and shipping production code
 - Strong work ethic
 - Passion for technology and creativity
 - Drive for excellence and achievement
 
-## Personal Attributes
+## 7. Personal Attributes
 
-Work Style:
+### 7.1 Work Style
 
 - Strong work ethic
 - Perfectionist approach to quality
 - Optimistic outlook
 - Perpetual learner and early technology adopter
 
-Interests:
+### 7.2 Interests
 
 - Music (musician)
 - Gastronomy
@@ -524,13 +530,13 @@ Interests:
 - Space exploration
 - Design
 
-Personal Background:
+### 7.3 Personal Background
 
-- Born: February 8, 1971, Akron, Ohio
-- Education: Lufkin High School, Texas (1989); Computer Science studies at San Jacinto College, Houston
-- Relocated: Boulder, Colorado (1992)
+- **Born:** February 8, 1971, Akron, Ohio
+- **Education:** Lufkin High School, Texas (1989); Computer Science studies at San Jacinto College, Houston
+- **Relocated:** Boulder, Colorado (1992)
 
-## Notable Achievements
+## 8. Notable Achievements
 
 1. **Serial Entrepreneur:** Multiple successful startups from inception through exit
 2. **Patent Portfolio:** 3 patent families covering social media analysis, web intelligence, and medical imaging
@@ -539,29 +545,25 @@ Personal Background:
 5. **Scale Experience:** Guided companies through significant growth phases (4 to 20+ employees, $500 to $30K daily revenue)
 6. **Technical Innovation:** Early adoption of ML/NLP (2003), cloud computing (2008), distributed systems, microservices architecture
 
-## Career Themes
+## 9. Career Themes
 
-Technology Evolution Leadership:
+### 9.1 Technology Evolution Leadership
 
 - Championed paradigm shifts in programming (OO, dynamic, functional)
 - Early adopter of unstructured data storage and cloud computing
 - Pioneer in distributed processing and machine learning applications
 - Advocate for modern architectural patterns (microservices, REST, SPA)
 
-Methodological Advancement:
+### 9.2 Methodological Advancement
 
 - CMM and Unified Process implementation
 - Agile methodology adoption and team coaching
 - DevOps and CI/CD pipeline establishment
 - Modern SDLC best practices
 
-Business Impact:
+### 9.3 Business Impact
 
 - Executive technology strategy and execution
 - Investor and customer technical presentations
 - Acquisition readiness and due diligence
 - Cross-functional team leadership (development, marketing, sales)
-
----
-
-Document prepared for Codex ingestion - January 2025
