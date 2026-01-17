@@ -7,7 +7,6 @@
   deno_import_map = "netlify-import-map.json"
 
 [dev]
-  command = "deno run --allow-net --allow-env source/apps/dev-server/dev-server.ts"
-  targetPort = 8889
+  command = "deno run --allow-net --allow-env source/tests/apps/dev-server.ts"
   edge_functions = "source/serverless/functions"
   framework = "#custom"

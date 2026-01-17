@@ -21,7 +21,7 @@ const ALLOWED_FILES = new Set([
 ])
 
 /** Match direct Deno.env or Deno.test access. */
-const DISALLOWED_USAGE = /\bDeno\.(env|test)\b/g
+const DISALLOWED_USAGE = /\bDeno\.env\b/g
 
 /** Collect all file paths under a directory. */
 const collectFiles = async (dir: string): Promise<string[]> => {

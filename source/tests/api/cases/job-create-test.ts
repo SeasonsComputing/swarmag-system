@@ -6,7 +6,6 @@ import handler from '@serverless-functions/jobs-create.ts'
 import { HttpCodes } from '@serverless-lib/api-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { assert, assertEquals } from '@std/assert'
-import { App } from '@utils/app.ts'
 import { ranchMappingAssessment } from '@tests-fixtures/samples.ts'
 import { runNetlifyHandler } from '@tests-helpers/netlify.ts'
 
@@ -76,7 +75,7 @@ const buildBody = (overrides: Partial<JobCreateBody> = {}): JobCreateBody => ({
   }
 })
 
-App.test('job-create handler rejects invalid payloads before touching Supabase', async () => {
+Deno.test('job-create handler rejects invalid payloads before touching Supabase', async () => {
   const originalClient = Supabase.client
   let fromCalls = 0
   let clientCalls = 0
@@ -112,7 +111,7 @@ App.test('job-create handler rejects invalid payloads before touching Supabase',
   }
 })
 
-App.test('job-create handler persists job, plan, and assessment with generated IDs', async () => {
+Deno.test('job-create handler persists job, plan, and assessment with generated IDs', async () => {
   const originalClient = Supabase.client
   let fromCalls = 0
   let clientCalls = 0
