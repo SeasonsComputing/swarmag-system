@@ -1,12 +1,4 @@
 {
-  "cSpell.customDictionaries": {
-    "custom-dictionary-workspace": {
-      "name": "custom-dictionary-workspace",
-      "path": "${workspaceFolder:swarmag-system}/.cspell/custom-dictionary-workspace.txt",
-      "addWords": true,
-      "scope": "workspace"
-    }
-  },
   "editor.formatOnSave": true,
   "dprint.path": "/home/tedvkremer/.deno/bin/dprint",
   "editor.defaultFormatter": "dprint.dprint",
@@ -17,7 +9,9 @@
     "editor.defaultFormatter": "dprint.dprint"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "dprint.dprint"
+    "editor.defaultFormatter": "dprint.dprint",
+    "editor.formatOnSave": true,
+    "editor.wordWrap": "off"
   },
   "deno.enable": true,
   "deno.lint": true

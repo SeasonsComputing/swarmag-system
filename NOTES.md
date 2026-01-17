@@ -22,20 +22,20 @@ This file summarizes the current baseline so it can be restored after tool reset
 
 - 2026-01-11: App facade, guards, and layout enforcement.
 
-  | Item          | Details                                                                                             |
-  | ------------- | --------------------------------------------------------------------------------------------------- |
-  | App facade    | Replaced env/test access with `App` and documented the usage rules; added JSDoc for App.           |
-  | Guards        | Added env and leaf-directory guards, updated architecture guard to include tests/apps/api rules.   |
-  | Layout        | Enforced leaf-directory layout, moved dev server to `source/apps/dev-server/`, reorganized tests. |
-  | Docs          | Updated architecture/source tree and style guide to reflect leaf-directory and App rules.         |
+  | Item       | Details                                                                                           |
+  | ---------- | ------------------------------------------------------------------------------------------------- |
+  | App facade | Replaced env/test access with `App` and documented the usage rules; added JSDoc for App.          |
+  | Guards     | Added env and leaf-directory guards, updated architecture guard to include tests/apps/api rules.  |
+  | Layout     | Enforced leaf-directory layout, moved dev server to `source/apps/dev-server/`, reorganized tests. |
+  | Docs       | Updated architecture/source tree and style guide to reflect leaf-directory and App rules.         |
 
 - 2026-01-11: App facade env rules.
 
-  | Item          | Details                                                                                   |
-  | ------------- | ----------------------------------------------------------------------------------------- |
-  | Environment   | Standardized `App` as the required facade for env access and tests, no direct `Deno.*`.   |
-  | Requirements  | All environment variables are required; no hard-coded defaults are permitted.            |
-  | Enforcement   | `App.init` is the single validation point and must only run once per process.            |
+  | Item         | Details                                                                                 |
+  | ------------ | --------------------------------------------------------------------------------------- |
+  | Environment  | Standardized `App` as the required facade for env access and tests, no direct `Deno.*`. |
+  | Requirements | All environment variables are required; no hard-coded defaults are permitted.           |
+  | Enforcement  | `App.init` is the single validation point and must only run once per process.           |
 
 - 2026-01-10: Domain, docs, and Supabase naming updates.
 
@@ -85,19 +85,35 @@ This file summarizes the current baseline so it can be restored after tool reset
   | Docs      | Added “Software Construction Sessions” prompt to `README.md` and switched the file ingest list to an ordered list.                                         |
   | History   | Rewrote recent commit messages via interactive rebase and force-pushed updated history.                                                                    |
 
-- 2026-01-05: Doc refactor alignment. We agreed the docs were strong but scattered, and that the system is best framed as three products (Admin, Ops, Customer) plus a platform/architecture layer. Decisions:
-  - Keep `NOTES.md` as the agent handoff and institutional memory log; it should be comprehensive, not minimal, and include summaries of our conversations.
-  - Retire `docs/orchestration.md` and move phase sequencing/roadmap into `README.md` (README is the "current state" entry point).
-  - Keep `docs/foundation/architecture.md` as the master, stable architecture doc; it should avoid becoming a dumping ground and should change rarely.
-  - `docs/foundation/domain.md` remains the canonical domain definition; `docs/foundation/architecture.md` should link to it rather than duplicate domain rules.
-  - App briefs (`docs/applications/admin-web-app.md`, `docs/applications/ops-mobile-app.md`, `docs/applications/customer-portal.md`) remain product-specific and should not repeat platform/domain.
+- 2026-01-05: Doc refactor alignment. We agreed the docs were strong but scattered, and that the system is best framed
+  as three products (Admin, Ops, Customer) plus a platform/architecture layer. Decisions:
+  - Keep `NOTES.md` as the agent handoff and institutional memory log; it should be comprehensive, not minimal, and
+    include summaries of our conversations.
+  - Retire `docs/orchestration.md` and move phase sequencing/roadmap into `README.md` (README is the "current state"
+    entry point).
+  - Keep `docs/foundation/architecture.md` as the master, stable architecture doc; it should avoid becoming a dumping
+    ground and should change rarely.
+  - `docs/foundation/domain.md` remains the canonical domain definition; `docs/foundation/architecture.md` should link
+    to it rather than duplicate domain rules.
+  - App briefs (`docs/applications/admin-web-app.md`, `docs/applications/ops-mobile-app.md`,
+    `docs/applications/customer-portal.md`) remain product-specific and should not repeat platform/domain.
   - `docs/foundation/data-lists.md` stays as canonical catalogs, referenced by domain.
-  - `NOTES.md` should reference canonical docs (`README.md`, `docs/foundation/architecture.md`) and capture any ongoing decisions or context for future agents.
-  - The preferred doc layout is: `README.md` (start + roadmap), `docs/foundation/architecture.md` (platform + system conventions), `docs/foundation/domain.md` (domain rules), app briefs, `docs/foundation/style-guide.md`, `docs/foundation/data-lists.md`, `docs/applications/user-stories.md`, `NOTES.md` (working log).
+  - `NOTES.md` should reference canonical docs (`README.md`, `docs/foundation/architecture.md`) and capture any ongoing
+    decisions or context for future agents.
+  - The preferred doc layout is: `README.md` (start + roadmap), `docs/foundation/architecture.md` (platform + system
+    conventions), `docs/foundation/domain.md` (domain rules), app briefs, `docs/foundation/style-guide.md`,
+    `docs/foundation/data-lists.md`, `docs/applications/user-stories.md`, `NOTES.md` (working log).
   - Moved the historical seed prompt to `docs/history/swarmag-ops-meta-prompt.md` and marked it non-authoritative.
-- 2026-01-05: Documentation structure refined into `docs/foundation/` and `docs/applications/`, with `docs/history/` for provenance. Updated all references and README summary accordingly.
-- 2026-01-05: README trimmed to be a start-here entry point. Moved domain notes into `docs/foundation/domain.md`, added links from `docs/foundation/architecture.md` to domain and style guide, and kept only minimal quickstart commands in README.
-- 2026-01-05: Moved setup/build/test instructions out of `README.md` into `docs/foundation/architecture.md` under a local development quickstart section. README now links to architecture for setup.
-- 2026-01-05: Always number markdown sections and ensure markdown files are free of lint warnings (e.g., table alignment).
-- 2026-01-05: Added markdownlint config and ignore list, fixed a bare URL and table alignment in `docs/history/swarmag-ops-meta-prompt.md`, and verified markdownlint passes.
-- 2026-01-05: Moved API handler conventions and validation rules into `docs/foundation/architecture.md` section 6, and kept the API surface summary in `docs/foundation/domain.md` section 1.8.
+- 2026-01-05: Documentation structure refined into `docs/foundation/` and `docs/applications/`, with `docs/history/` for
+  provenance. Updated all references and README summary accordingly.
+- 2026-01-05: README trimmed to be a start-here entry point. Moved domain notes into `docs/foundation/domain.md`, added
+  links from `docs/foundation/architecture.md` to domain and style guide, and kept only minimal quickstart commands in
+  README.
+- 2026-01-05: Moved setup/build/test instructions out of `README.md` into `docs/foundation/architecture.md` under a
+  local development quickstart section. README now links to architecture for setup.
+- 2026-01-05: Always number markdown sections and ensure markdown files are free of lint warnings (e.g., table
+  alignment).
+- 2026-01-05: Added markdownlint config and ignore list, fixed a bare URL and table alignment in
+  `docs/history/swarmag-ops-meta-prompt.md`, and verified markdownlint passes.
+- 2026-01-05: Moved API handler conventions and validation rules into `docs/foundation/architecture.md` section 6, and
+  kept the API surface summary in `docs/foundation/domain.md` section 1.8.

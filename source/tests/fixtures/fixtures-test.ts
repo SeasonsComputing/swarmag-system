@@ -13,7 +13,6 @@ import {
 } from '@tests-fixtures/samples.ts'
 import { isWhen } from '@utils/datetime.ts'
 import { isID } from '@utils/identifier.ts'
-import { App } from '@utils/app.ts'
 
 const allowedAssetStatuses: AssetStatus[] = [
   'active',
@@ -22,7 +21,7 @@ const allowedAssetStatuses: AssetStatus[] = [
   'reserved'
 ]
 
-App.test('fixture integrity: asset fixtures respect domain constraints', () => {
+Deno.test('fixture integrity: asset fixtures respect domain constraints', () => {
   const seenAssetTypes = new Set<string>()
 
   for (const assetType of assetTypeSamples) {
@@ -45,7 +44,7 @@ App.test('fixture integrity: asset fixtures respect domain constraints', () => {
   }
 })
 
-App.test('fixture integrity: job assessment fixture always carries locations and timestamps', () => {
+Deno.test('fixture integrity: job assessment fixture always carries locations and timestamps', () => {
   const { assessment } = jobSamples
   assert(isID(assessment.id))
   assert(isID(assessment.serviceId))
@@ -58,7 +57,7 @@ App.test('fixture integrity: job assessment fixture always carries locations and
   assert(isWhen(assessment.updatedAt))
 })
 
-App.test('fixture integrity: customer fixtures keep contact linkage intact', () => {
+Deno.test('fixture integrity: customer fixtures keep contact linkage intact', () => {
   for (const customer of customerSamples) {
     assert(isID(customer.id))
     assert(customer.contacts.length > 0)
@@ -74,7 +73,7 @@ App.test('fixture integrity: customer fixtures keep contact linkage intact', () 
   }
 })
 
-App.test('fixture integrity: shared questions include labels and values', () => {
+Deno.test('fixture integrity: shared questions include labels and values', () => {
   for (const question of sharedQuestionSamples) {
     assert(isID(question.id))
     assert(question.prompt.length > 0)

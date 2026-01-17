@@ -10,7 +10,6 @@ import { HttpCodes } from '@serverless-lib/api-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { assert, assertEquals } from '@std/assert'
 import { runNetlifyHandler } from '@tests-helpers/netlify.ts'
-import { App } from '@utils/app.ts'
 
 type UsersTable = Record<string, Record<string, unknown>>
 
@@ -67,7 +66,7 @@ const updateBuilder = (updates: Record<string, unknown>) => ({
   }
 })
 
-App.test('user CRUD handlers', async () => {
+Deno.test('user CRUD handlers', async () => {
   const originalClient = Supabase.client
 
   Supabase.client = (() => ({
