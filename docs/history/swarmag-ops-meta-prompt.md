@@ -69,8 +69,7 @@ Contact has a name, email address, phone number, and note(s).
 
 The Admin Portal is intended to be used from minimally a tablet. So desktop design constraints are acceptable.
 
-The Admin Portal primary is access controlled. There is only 1 authorization level for the admin.
-Authentication is authorization simplifying development reducing the feature scope.
+The Admin Portal primary is access controlled. There is only 1 authorization level for the admin. Authentication is authorization simplifying development reducing the feature scope.
 
 The Admin Portal primary screen is a Dashboard containing current and historical Jobs, Equipment, Tools, Chemicals, Crews & Scheduling.
 
@@ -82,8 +81,7 @@ Some functionality of the Admin Portal may be delegated to the Ops App for job s
 
 ### Customer Portal (Website)
 
-The customer portal is passwordless. The customer will enter their phone number or email address;
-a short-lived access code will be created and delivered to the customer via sms or email.
+The customer portal is passwordless. The customer will enter their phone number or email address; a short-lived access code will be created and delivered to the customer via sms or email.
 
 ## Implementation
 

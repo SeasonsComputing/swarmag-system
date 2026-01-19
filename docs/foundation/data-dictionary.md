@@ -1,7 +1,6 @@
 # swarmAg System – Data Dictionary
 
-Comprehensive reference for all domain types, interfaces, and data structures
-defined in `source/domain`.
+Comprehensive reference for all domain types, interfaces, and data structures defined in `source/domain`.
 
 ## 1. Primitives
 
@@ -264,8 +263,7 @@ Possible statuses an asset can have.
 
 Source: `source/domain/chemical.ts`
 
-Represents chemicals used in operations (herbicides, pesticides, fertilizers,
-etc.).
+Represents chemicals used in operations (herbicides, pesticides, fertilizers, etc.).
 
 | Field                  | Type                                 | Required | Description                        |
 | ---------------------- | ------------------------------------ | -------- | ---------------------------------- |
@@ -350,8 +348,7 @@ A step in a workflow with checklists and requirements.
 
 Source: `source/domain/job.ts`
 
-Jobs represent operational tasks related to services, composed of assessments,
-plans, and logs.
+Jobs represent operational tasks related to services, composed of assessments, plans, and logs.
 
 ### 8.1 Job
 

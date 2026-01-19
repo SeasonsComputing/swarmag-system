@@ -4,9 +4,7 @@ The definitive architecture document for the swarmAg System.
 
 ## 1. Executive summary
 
-The **swarmAg System** is composed of SolidJS web and mobile applications orchestrated via a serverless api (edge functions backend).
-It supports administration, operations workflows & logs, and customer-facing features for agricultural services that involve regulated chemicals and industrial equipment.
-The system focuses on two service classes—Aerial and Ground—and the workflows, assets, and regulated chemicals required to deliver them safely and repeatably. Quality is measured against safety, efficiency, repeatability, and performance.
+The **swarmAg System** is composed of SolidJS web and mobile applications orchestrated via a serverless api (edge functions backend). It supports administration, operations workflows & logs, and customer-facing features for agricultural services that involve regulated chemicals and industrial equipment. The system focuses on two service classes—Aerial and Ground—and the workflows, assets, and regulated chemicals required to deliver them safely and repeatably. Quality is measured against safety, efficiency, repeatability, and performance.
 
 ## 2. Core Platforms
 
@@ -93,8 +91,7 @@ Database results are an untrusted boundary. Supabase rows are treated as `unknow
 
 ## 7. Coding conventions & UI
 
-TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS
-See `docs/foundation/style-guide.md` for compiler settings, aliases, and code style rules.
+TypeScript + SolidJS + TanStack + Kobalte + vanilla CSS See `docs/foundation/style-guide.md` for compiler settings, aliases, and code style rules.
 
 ## 8. Namespace dependencies
 

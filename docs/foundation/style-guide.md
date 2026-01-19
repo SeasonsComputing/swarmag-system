@@ -1,6 +1,6 @@
 # swarmAg Code Style Guide
 
-Working norms inferred from the current `serverless/functions/`, `domain/`, and `utils/` sources.
+This guide defines the coding conventions and patterns used throughout the swarmAg codebase. Follow these standards when writing or modifying code in `serverless/functions/`, `domain/`, and `utils/`.
 
 ## 1. Language & Tooling
 
@@ -34,12 +34,12 @@ Working norms inferred from the current `serverless/functions/`, `domain/`, and 
 
 ## 4. Utilities (`source/utils/*`)
 
-| Item          | Guideline                                      |
-| ------------- | ---------------------------------------------- |
-| identifier.ts | UUID v7 via `id()`; validate with `isID()`     |
-| datetime.ts   | UTC ISO via `when()`; validate with `isWhen()` |
+| Item          | Guideline                                                                                      |
+| ------------- | ---------------------------------------------------------------------------------------------- |
+| identifier.ts | UUID v7 via `id()`; validate with `isID()`                                                     |
+| datetime.ts   | UTC ISO via `when()`; validate with `isWhen()`                                                 |
 | app.ts        | Use `App.init` to validate required env vars, `App.get` to read them, and `App.test` for tests |
-| Scope         | Keep utilities focused and dependency-light    |
+| Scope         | Keep utilities focused and dependency-light                                                    |
 
 ## 5. API Functions (`source/serverless/functions/*`)
 
