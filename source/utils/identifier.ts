@@ -23,8 +23,8 @@ export const id = (): ID => {
   bytes[4] = Number((timestamp >> 8n) & 0xffn)
   bytes[5] = Number(timestamp & 0xffn)
 
-  const { crypto } = globalThis
-  assert(crypto?.getRandomValues, 'crypto.getRandomValues is not available')
+  const { crypto } = self
+  assert(crypto?.getRandomValues, 'crypto.getRandomValues required')
   crypto.getRandomValues(bytes.subarray(6))
 
   bytes[6] = (bytes[6] & 0x0f) | 0x70
