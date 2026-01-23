@@ -234,11 +234,7 @@ See `docs/foundation/style-guide.md` for full details.
 - Netlify Edge Functions broker signed URLs for uploads/downloads.
 - Supabase RLS ensures only authorized users can request URLs.
 
-## 10. Working Notes & Context
-
-`NOTES.md` contains working log and agent handoff context, including conversation summaries and decisions. Refer to it for recent changes and institutional memory.
-
-## 11. Key Documentation Files
+## 10. Key Documentation Files
 
 - `README.md` — Start here; repo layout and roadmap.
 - `AUTHORITY.md` — Binding engineering rules and collaboration preferences.
@@ -248,4 +244,3 @@ See `docs/foundation/style-guide.md` for full details.
 - `docs/foundation/data-lists.md` — Canonical catalogs (services, asset types).
 - `docs/applications/user-stories.md` — User stories.
 - `docs/applications/admin-web-app.md`, `ops-mobile-app.md`, `customer-portal.md` — App-specific briefs.
-- `NOTES.md` — Working log and context for future agents.
