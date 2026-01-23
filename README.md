@@ -62,9 +62,8 @@ Prepare a software construction session by creating a new chat and submitting th
 
 Ingest the following files:
 
-1. `CLAUDE.md` | `CODEX.md` | `GEMINI.md` - load the configuration for the AI you are
+1. `CLAUDE.md` - load the configuration for the AI you are
 2. `docs/*` - all markdown files
 3. `source/*` - all source files
 4. `scripts/*` - all script files
-5. `NOTES.md` - AI's historical log
-6. `AUTHORITY.md` - preeminent binding document
+5. `AUTHORITY.md` - preeminent binding document
