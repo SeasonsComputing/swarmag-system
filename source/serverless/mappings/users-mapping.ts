@@ -3,6 +3,7 @@
  */
 
 import type { User } from '@domain/common.ts'
+import type { Dictionary } from '@utils'
 
 /**
  * Type guard for accepted user status values.
@@ -35,7 +36,7 @@ export const userToRow = (user: User) => ({
   payload: user
 })
 
-const parseUserFields = (src: Record<string, unknown>): User | undefined => {
+const parseUserFields = (src: Dictionary): User | undefined => {
   const id = typeof src.id === 'string' ? src.id : undefined
   const displayName = typeof src.displayName === 'string' ? src.displayName : undefined
   const primaryEmail = typeof src.primaryEmail === 'string' ? src.primaryEmail : undefined
@@ -65,7 +66,7 @@ const parseUserFields = (src: Record<string, unknown>): User | undefined => {
   return undefined
 }
 
-const normalizeUserRecord = (record: Record<string, unknown>): Record<string, unknown> => ({
+const normalizeUserRecord = (record: Dictionary): Dictionary => ({
   id: record.id,
   displayName: typeof record.displayName === 'string' ? record.displayName : record.display_name,
   primaryEmail: typeof record.primaryEmail === 'string' ? record.primaryEmail : record.primary_email,
@@ -84,9 +85,9 @@ export const rowToUser = (row: unknown): User => {
     throw new Error('User row is missing required fields')
   }
 
-  const record = row as Record<string, unknown>
+  const record = row as Dictionary
   if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Record<string, unknown>
+    const payload = record.payload as Dictionary
     const parsedPayload = parseUserFields(payload)
     if (parsedPayload) return parsedPayload
   }

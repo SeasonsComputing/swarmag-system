@@ -4,8 +4,7 @@
  */
 
 import type { Address, Author, Location, Note } from '@domain/common.ts'
-import type { When } from '@utils/datetime.ts'
-import type { ID } from '@utils/identifier.ts'
+import type { ID, When } from '@utils'
 
 /** Represents a contact person associated with a customer. */
 export interface Contact {

@@ -10,6 +10,8 @@
 - Use the prescribed stack (Netlify Edge Functions + Supabase + TypeScript + SolidJS + TanStack + Kobalte + Docker) and do not add new frameworks or services without explicit approval.
 - Maintain zero-cost deployment constraints for all environments.
 - Prefer classes when state, lifecycle, or invariants must be enforced; use free functions only for pure utilities.
+- Prefer utility classes (static methods only) for stateless operations that benefit from namespace grouping and encapsulation.
+- Favor encapsulation; hide implementation details (HTTP, RPC, result envelopes) behind clean interfaces that return domain types or throw exceptions.
 - Do not introduce new patterns, abstractions, or conventions unless explicitly requested.
 - Extend the domain model first, then implement or update the API layer that exposes it, and only then build or modify the apps that consume it.
 - Get it right the first time; do not defer correctness or completeness.
@@ -78,7 +80,15 @@
 - Upper layers translate domain validation failures but must not redefine the rules.
 - DRY applies to truth, not transport.
 
-## 10. Collaboration Preferences
+## 10. Api Layer
+
+- The Api layer (`source/api/`) is the typed SDK for apps to consume the serverless runtime.
+- Api classes are utility classes with static methods only; no instance state.
+- Api methods return domain types directly; never expose HTTP, result envelopes, or RPC internals.
+- Api methods throw exceptions on errors; callers handle failures via try/catch.
+- Name Api classes as `{Abstraction}Api` (e.g., `UsersApi`, `JobsApi`).
+
+## 11. Collaboration Preferences
 
 | Preference          | Requirement                                                                            |
 | ------------------- | -------------------------------------------------------------------------------------- |
@@ -88,7 +98,7 @@
 | Naming              | Prefer dashes over underscores in filenames.                                           |
 | Version guidance    | Do not suggest legacy/older tooling variants; assume current, modern tooling only.     |
 
-## 11. Execution Permissions
+## 12. Execution Permissions
 
 | Permission     | Requirement                                    |
 | -------------- | ---------------------------------------------- |

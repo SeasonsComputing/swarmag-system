@@ -17,6 +17,7 @@ const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 /** Relative paths that are allowed to use Deno.env or Deno.test. */
 const ALLOWED_FILES = new Set([
   'source/utils/app.ts',
+  'source/serverless/lib/runtime-deno.ts',
   'scripts/env-guard.ts'
 ])
 

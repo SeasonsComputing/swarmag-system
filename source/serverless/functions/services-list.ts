@@ -7,6 +7,7 @@ import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/ap
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { clampLimit, isIdArray, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
+import type { Dictionary } from '@utils'
 
 /**
  * Edge function path config
@@ -33,9 +34,9 @@ const rowToService = (row: unknown): Service => {
     throw new Error('Service row is missing required fields')
   }
 
-  const record = row as Record<string, unknown>
+  const record = row as Dictionary
   if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Record<string, unknown>
+    const payload = record.payload as Dictionary
     if (
       typeof payload.id === 'string'
       && typeof payload.name === 'string'

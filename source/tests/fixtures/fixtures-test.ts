@@ -11,8 +11,7 @@ import {
   jobSamples,
   sharedQuestionSamples
 } from '@tests-fixtures/samples.ts'
-import { isWhen } from '@utils/datetime.ts'
-import { isID } from '@utils/identifier.ts'
+import { isID, isWhen } from '@utils'
 
 const allowedAssetStatuses: AssetStatus[] = [
   'active',

@@ -7,8 +7,7 @@ import type { JobLogEntry } from '@domain/job.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { type When, when } from '@utils/datetime.ts'
-import { id } from '@utils/identifier.ts'
+import { id, type When, when } from '@utils'
 
 /**
  * Edge function path config

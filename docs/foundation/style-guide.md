@@ -1,28 +1,39 @@
 # swarmAg Code Style Guide
 
-This guide defines the coding conventions and patterns used throughout the swarmAg codebase. Follow these standards when writing or modifying code in `serverless/functions/`, `domain/`, and `utils/`.
+This guide defines the coding conventions and patterns used throughout the swarmAg codebase. Follow these standards when writing or modifying code in `serverless/functions/`, `domain/`, `api/`, and `utils/`.
 
-## 1. Language & Tooling
+## 1. Language and Tooling
 
-| Item     | Guideline                                                                                                                       |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| Compiler | Deno `check` with strict TypeScript                                                                                             |
-| Aliases  | `@domain/*`, `@utils/*`, `@serverless-lib/*`, `@serverless-functions/*`, `@serverless-mappings/*`, test aliases via `deno.json` |
-| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers                                                                 |
-| Encoding | ASCII only; no non-ASCII literals                                                                                               |
+| Item     | Guideline                                                                                                                                 |
+| -------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| Compiler | Deno `check` with strict TypeScript                                                                                                       |
+| Aliases  | `@domain/*`, `@utils/*`, `@api/*`, `@serverless-lib/*`, `@serverless-functions/*`, `@serverless-mappings/*`, test aliases via `deno.json` |
+| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers                                                                           |
+| Encoding | ASCII only; no non-ASCII literals                                                                                                         |
 
-## 2. Imports & Organization
+## 2. Imports and Organization
 
 | Item        | Guideline                                                                                           |
 | ----------- | --------------------------------------------------------------------------------------------------- |
 | Paths       | Use aliases instead of deep relatives                                                               |
-| Ordering    | Domain -> utils -> serverless lib; use `import type` where helpful                                  |
+| Ordering    | Domain -> utils -> api -> serverless lib; use `import type` where helpful                           |
 | Exports     | Default export only for Netlify Edge `createApiHandler(handle)`                                     |
 | Extensions  | Include `.ts` in local/alias import specifiers                                                      |
 | Import maps | Keep `netlify-import-map.json` aligned with `deno.json`; use root-relative paths in the Netlify map |
 | Layout      | Files live only in leaf directories; directories with subdirectories must not contain files         |
 
-## 3. Domain Modeling (`source/domain/*`)
+## 3. Naming Conventions
+
+| Item            | Guideline                                                                              |
+| --------------- | -------------------------------------------------------------------------------------- |
+| Acronyms        | Use title case for acronyms in identifiers: `Api`, `Url`, `Id`, not `API`, `URL`, `ID` |
+| Classes         | PascalCase: `UsersApi`, `JobsApi`                                                      |
+| Files           | Kebab-case: `users-api.ts`, `job-validators.ts`                                        |
+| Type aliases    | PascalCase: `UserCreateInput`, `JobStatus`                                             |
+| Constants       | camelCase for exported constants: `httpCodes` (exception: `HttpCodes` object)          |
+| Domain-specific | Use domain names: `JobAssessment`, `JobLogEntry`, not generic names                    |
+
+## 4. Domain Modeling (`source/domain/*`)
 
 | Item         | Guideline                                                                                   |
 | ------------ | ------------------------------------------------------------------------------------------- |
@@ -32,7 +43,7 @@ This guide defines the coding conventions and patterns used throughout the swarm
 | Payloads     | JSON-serializable only; no methods on domain objects                                        |
 | Validators   | Validators live in `source/domain/{abstraction}-validators.ts` (singular abstraction names) |
 
-## 4. Utilities (`source/utils/*`)
+## 5. Utilities (`source/utils/*`)
 
 | Item          | Guideline                                                                                      |
 | ------------- | ---------------------------------------------------------------------------------------------- |
@@ -41,23 +52,36 @@ This guide defines the coding conventions and patterns used throughout the swarm
 | app.ts        | Use `App.init` to validate required env vars, `App.get` to read them, and `App.test` for tests |
 | Scope         | Keep utilities focused and dependency-light                                                    |
 
-## 5. API Functions (`source/serverless/functions/*`)
+## 6. API Layer (`source/api/*`)
 
-| Item       | Guideline                                                                                                                      |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| Naming     | `{resource}-{action}.ts` (plural resource), e.g., `users-create.ts`                                                            |
-| Exports    | Default export only: Netlify `createApiHandler(handle)`                                                                        |
-| Config     | Export `config = { path: "/api/{resource}/{action}" }` for routing                                                             |
-| Types      | Use `ApiRequest`/`ApiResponse` from `@serverless-lib/api-binding`                                                              |
-| Status     | Use `HttpCodes`; no numeric literals                                                                                           |
-| Platform   | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor`                                                               |
-| Validation | Guard with `validate` + `HttpCodes.unprocessableEntity`                                                                        |
-| Methods    | Guard unsupported verbs with `HttpCodes.methodNotAllowed`                                                                      |
-| Responses  | Success: `{ data: ... }`; failure: `{ error, details? }`                                                                       |
-| JSON       | Always JSON; `createApiHandler` sets headers and wraps errors                                                                  |
-| Mapping    | Use mapping helpers from `source/serverless/mappings/` (e.g., `user-mapping.ts`) instead of ad hoc column maps in each handler |
+| Item           | Guideline                                                                                    |
+| -------------- | -------------------------------------------------------------------------------------------- |
+| Purpose        | Typed SDK for apps to consume the serverless runtime                                         |
+| Structure      | Utility classes with static methods only; no instance state                                  |
+| Naming         | `{Abstraction}Api` class in `{abstraction}-api.ts` file (e.g., `UsersApi` in `users-api.ts`) |
+| Return types   | Return domain types directly (`User`, `User[]`); never expose HTTP or result envelopes       |
+| Error handling | Throw exceptions on errors; callers handle failures via try/catch                            |
+| Encapsulation  | Hide all RPC internals (fetch, headers, JSON parsing, result unwrapping)                     |
+| Methods        | Use `create`, `update`, `delete`, `get`, `list` to match serverless endpoint naming          |
+| Base URL       | Configure via environment variable using `App` utility class                                 |
 
-## 6. Database Mapping
+## 7. API Functions (`source/serverless/functions/*`)
+
+| Item       | Guideline                                                                                                                       |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Naming     | `{resource}-{action}.ts` (plural resource), e.g., `users-create.ts`                                                             |
+| Exports    | Default export only: Netlify `createApiHandler(handle)`                                                                         |
+| Config     | Export `config = { path: "/api/{resource}/{action}" }` for routing                                                              |
+| Types      | Use `ApiRequest`/`ApiResponse` from `@serverless-lib/api-binding`                                                               |
+| Status     | Use `HttpCodes`; no numeric literals                                                                                            |
+| Platform   | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor`                                                                |
+| Validation | Guard with `validate` + `HttpCodes.unprocessableEntity`                                                                         |
+| Methods    | Guard unsupported verbs with `HttpCodes.methodNotAllowed`                                                                       |
+| Responses  | Success: `{ data: ... }`; failure: `{ error, details? }`                                                                        |
+| JSON       | Always JSON; `createApiHandler` sets headers and wraps errors                                                                   |
+| Mapping    | Use mapping helpers from `source/serverless/mappings/` (e.g., `users-mapping.ts`) instead of ad hoc column maps in each handler |
+
+## 8. Database Mapping
 
 | Rule           | Requirement                                                       |
 | -------------- | ----------------------------------------------------------------- |
@@ -80,7 +104,7 @@ Good:
 const user = rowToUser(data)
 ```
 
-## 7. Error Handling
+## 9. Error Handling
 
 | Item    | Guideline                                                        |
 | ------- | ---------------------------------------------------------------- |
@@ -88,7 +112,7 @@ const user = rowToUser(data)
 | Server  | Persistence/unknown -> `HttpCodes.internalError`; safe `details` |
 | Control | Do not throw past `createApiHandler`; return `ApiResponse`       |
 
-## 8. Pagination
+## 10. Pagination
 
 | Item    | Guideline                                            |
 | ------- | ---------------------------------------------------- |
@@ -96,7 +120,7 @@ const user = rowToUser(data)
 | Cursor  | Default 0; non-negative only                         |
 | Helpers | Use `Supabase.clampLimit` and `Supabase.parseCursor` |
 
-## 9. Commenting Style
+## 11. Commenting Style
 
 | Item     | Guideline                                                                                                                    |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -106,7 +130,7 @@ const user = rowToUser(data)
 | Fields   | Comment class attributes and fields with brief JSDoc.                                                                        |
 | Types    | Comment type aliases and interfaces with brief JSDoc.                                                                        |
 
-## 10. Naming & Data Shapes
+## 12. Naming and Data Shapes
 
 | Item      | Guideline                                                        |
 | --------- | ---------------------------------------------------------------- |

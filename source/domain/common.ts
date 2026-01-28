@@ -3,8 +3,7 @@
  * These define common data structures for various domain abstractions.
  */
 
-import type { When } from '@utils/datetime.ts'
-import type { ID } from '@utils/identifier.ts'
+import type { ID, When } from '@utils'
 
 /** Allowed role memberships for users. */
 export const USER_ROLES = [
@@ -22,13 +21,25 @@ export type AuthorAttributionContext =
   | 'job-log'
   | 'asset'
 
-/** Curated roles for attribution; avoid free-form labels. */
+/** Curated roles for attribution avoid free-form labels. */
 export const AUTHOR_ATTRIBUTION_ROLES = [
-  { id: 'account-executive', label: 'Account Executive', contexts: ['customer-account'] },
-  { id: 'assessment-lead', label: 'Assessment Lead', contexts: ['job-assessment'] },
-  { id: 'crew-lead', label: 'Crew Lead', contexts: ['job-plan', 'job-log'] },
-  { id: 'field-tech', label: 'Field Tech', contexts: ['job-log', 'asset'] },
-  { id: 'fleet-manager', label: 'Fleet Manager', contexts: ['asset'] }
+  {
+    id: 'account-manager',
+    label: 'Account Executive',
+    contexts: [
+      'customer-account',
+      'job-assessment',
+      'job-plan',
+      'job-log',
+      'asset'
+    ]
+  },
+  {
+    id: 'crew-lead',
+    label: 'Crew Lead',
+    contexts: ['job-plan', 'job-log', 'asset']
+  },
+  { id: 'crew-staff', label: 'Crew Staff', contexts: ['job-log', 'asset'] }
 ] as const satisfies ReadonlyArray<{
   id: string
   label: string
@@ -53,7 +64,9 @@ export interface User {
 }
 
 /** A subset of User information for authorship. */
-export type Author = Pick<User, 'id' | 'displayName' | 'roles'> & { role?: AuthorAttributionRoleId }
+export type Author = Pick<User, 'id' | 'displayName' | 'roles'> & {
+  role?: AuthorAttributionRoleId
+}
 
 /** Represents a note or comment. */
 export interface Note {

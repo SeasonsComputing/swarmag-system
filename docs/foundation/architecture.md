@@ -29,18 +29,18 @@ Components: Ops PWA, Admin Portal, Customer Portal, API Edge Functions, Supabase
   ┌─────────────────┐
   │ ops.swarmag.com │─────╮
   └─────────────────┘     │
-┌───────────────────┐     │
-│ admin.swarmag.com │─────│
+┌───────────────────┐     │                        web-app: 
+│ admin.swarmag.com │─────│                /app, /api, /domain, /utils
 └───────────────────┘     │
    ┌────────────────┐     │
    │ me.swarmag.com │─────│
    └────────────────┘     │
                           ▼
-                   ┌─────────────────┐
-                ╭──│ api.swarmag.com │
+                   ┌─────────────────┐            netlify:
+                ╭──│ api.swarmag.com │     /serverless, /domain, /utils
                 ▼  └─────────────────┘
-       ┌──────────────────┐
-       │ data.swarmag.com │
+       ┌──────────────────┐                       supabase:
+       │ data.swarmag.com │                      /migrations
        └──────────────────┘
 ```
 

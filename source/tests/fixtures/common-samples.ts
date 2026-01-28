@@ -3,7 +3,7 @@
  */
 
 import type { Question } from '@domain/common.ts'
-import { id } from '@utils/identifier.ts'
+import { id } from '@utils'
 
 export const preflightInspectionQuestion: Question = {
   id: id(),

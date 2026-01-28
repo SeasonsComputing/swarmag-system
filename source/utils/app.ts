@@ -20,7 +20,7 @@ export class App {
    * @returns Nothing.
    */
   static init(required: readonly string[]): void {
-    assert(App.#initialized, 'App already initialized')
+    assert(!App.#initialized, 'App already initialized')
     App.#cache = new Set(required)
     App.#validate(required)
     App.#initialized = true
