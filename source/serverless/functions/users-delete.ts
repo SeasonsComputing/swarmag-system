@@ -8,7 +8,7 @@ import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/ap
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { rowToUser, userToRow } from '@serverless-mappings/users-mapping.ts'
-import { when } from '@utils/datetime.ts'
+import { when } from '@utils'
 
 /**
  * Edge function path config

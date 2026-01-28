@@ -65,5 +65,4 @@ Ingest the following files:
 1. `CLAUDE.md` - guidance for Claude Code
 2. `docs/*` - all markdown files
 3. `source/*` - all source files
-4. `scripts/*` - all script files
-5. `AUTHORITY.md` - preeminent binding document
+4. `AUTHORITY.md` - preeminent binding document

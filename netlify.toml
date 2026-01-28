@@ -1,5 +1,4 @@
 [build]
-  command = "deno task check"
   edge_functions = "source/serverless/functions"
   publish = "."
 
@@ -7,6 +6,4 @@
   deno_import_map = "netlify-import-map.json"
 
 [dev]
-  command = "deno run --allow-net --allow-env source/tests/apps/dev-server.ts"
   edge_functions = "source/serverless/functions"
-  framework = "#custom"

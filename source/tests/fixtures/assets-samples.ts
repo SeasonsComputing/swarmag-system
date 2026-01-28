@@ -3,7 +3,7 @@
  */
 
 import type { Asset, AssetType } from '@domain/asset.ts'
-import { id } from '@utils/identifier.ts'
+import { id } from '@utils'
 
 const transportTruckTypeId = id()
 const skidsteerTypeId = id()

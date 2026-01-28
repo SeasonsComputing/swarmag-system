@@ -4,8 +4,7 @@
  */
 
 import type { Answer, Attachment, Author, Location, Note } from '@domain/common.ts'
-import type { When } from '@utils/datetime.ts'
-import type { ID } from '@utils/identifier.ts'
+import type { Dictionary, ID, When } from '@utils'
 
 /** The possible statuses of a job. */
 export type JobStatus =
@@ -75,7 +74,7 @@ export type JobLogType =
   | 'exception'
 
 /** Payload for job log entries. */
-export type JobLogPayload = Record<string, unknown>
+export type JobLogPayload = Dictionary
 
 /** Represents a log entry for a job, such as status updates or telemetry. */
 export interface JobLogEntry {

@@ -3,7 +3,7 @@
  */
 
 import type { JobAssessment, JobLogEntry } from '@domain/job.ts'
-import { id } from '@utils/identifier.ts'
+import { id } from '@utils'
 
 const serviceId = id()
 const customerId = id()
