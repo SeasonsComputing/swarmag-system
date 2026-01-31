@@ -45,25 +45,26 @@ This guide defines the coding conventions and patterns used throughout the swarm
 
 ## 5. Utilities (`source/utils/*`)
 
-| Item          | Guideline                                                                                      |
-| ------------- | ---------------------------------------------------------------------------------------------- |
-| identifier.ts | UUID v7 via `id()`; validate with `isID()`                                                     |
-| datetime.ts   | UTC ISO via `when()`; validate with `isWhen()`                                                 |
-| app.ts        | Use `App.init` to validate required env vars, `App.get` to read them, and `App.test` for tests |
-| Scope         | Keep utilities focused and dependency-light                                                    |
+| Item               | Guideline                                                             |
+| ------------------ | --------------------------------------------------------------------- |
+| identifier.ts      | UUID v7 via `id()`; validate with `isID()`                            |
+| datetime.ts        | UTC ISO via `when()`; validate with `isWhen()`                        |
+| runtime.ts         | `RuntimeConfig` class and `RuntimeProvider` interface for config      |
+| configure-deno.ts  | Deno environment provider; exports `ConfigureDeno`                    |
+| Scope              | Keep utilities focused and dependency-light                           |
 
 ## 6. API Layer (`source/api/*`)
 
-| Item           | Guideline                                                                                    |
-| -------------- | -------------------------------------------------------------------------------------------- |
-| Purpose        | Typed SDK for apps to consume the serverless runtime                                         |
-| Structure      | Utility classes with static methods only; no instance state                                  |
-| Naming         | `{Abstraction}Api` class in `{abstraction}-api.ts` file (e.g., `UsersApi` in `users-api.ts`) |
-| Return types   | Return domain types directly (`User`, `User[]`); never expose HTTP or result envelopes       |
-| Error handling | Throw exceptions on errors; callers handle failures via try/catch                            |
-| Encapsulation  | Hide all RPC internals (fetch, headers, JSON parsing, result unwrapping)                     |
-| Methods        | Use `create`, `update`, `delete`, `get`, `list` to match serverless endpoint naming          |
-| Base URL       | Configure via environment variable using `App` utility class                                 |
+| Item           | Guideline                                                                                      |
+| -------------- | ---------------------------------------------------------------------------------------------- |
+| Purpose        | Typed SDK for apps to consume the serverless runtime                                           |
+| Factory        | Use `makeApiClient<T, TCreate, TUpdate>(spec)` to create typed client objects                  |
+| Naming         | `{Abstraction}Api` object in `{abstraction}-api.ts` file (e.g., `UsersApi` in `users-api.ts`)  |
+| Return types   | Return domain types directly (`User`, `User[]`); never expose HTTP or result envelopes         |
+| Error handling | Throw `ApiError` on errors; callers handle failures via try/catch                              |
+| Encapsulation  | Hide all RPC internals (fetch, headers, JSON parsing, result unwrapping)                       |
+| Methods        | Use `create`, `update`, `delete`, `get`, `list` to match serverless endpoint naming            |
+| Base URL       | Configure via `Config.get('VITE_API_URL')` from api/config bootstrap                           |
 
 ## 7. API Functions (`source/serverless/functions/*`)
 
@@ -187,10 +188,10 @@ Bootstrap files (`config.ts`) live in each deployment context's `config/` direct
 
 ```typescript
 // serverless/config/config.ts
-import { ConfigureDeno } from '@serverless-lib/configure-deno.ts'
+import { ConfigureDeno } from '@utils/configure-deno.ts'
 import { ConfigureNetlify } from '@serverless-lib/configure-netlify.ts'
 
-const Config = 'Netlify' in self ? ConfigureNetlify : ConfigureDeno
+const Config = 'Deno' in self ? ConfigureDeno : ConfigureNetlify
 
 Config.init([
   'SUPABASE_URL',

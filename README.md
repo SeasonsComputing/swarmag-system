@@ -60,20 +60,20 @@ SwarmAg uses environment-specific configuration files for each deployment contex
 # Serverless API functions
 cp source/serverless/config/serverless-local.env.example source/serverless/config/serverless-local.env
 
-# Admin web app
-cp source/apps/admin/config/admin-local.env.example source/apps/admin/config/admin-local.env
-
-# Tests
-cp source/tests/config/tests-local.env.example source/tests/config/tests-local.env
+# API client (for apps)
+cp source/api/config/api-local.env.example source/api/config/api-local.env
 ```
 
-Edit each file With your local values:
+Edit each file with your local values:
 
 ```bash
 # source/serverless/config/serverless-local.env
 SUPABASE_URL=http://localhost:54321
 SUPABASE_SERVICE_KEY=your-local-service-key
 JWT_SECRET=your-local-jwt-secret
+
+# source/api/config/api-local.env
+VITE_API_URL=http://localhost:8888
 ```
 
 **Never commit** these files - they're in `.gitignore` by default.
@@ -96,11 +96,11 @@ Build-time environment variables are injected by the build system. Vite reads fr
 # Test serverless config
 netlify dev  # Should start without "Missing required config" errors
 
-# Test suite
-deno task test  # Should run without environment errors
+# Type check and guards
+deno task check  # Should pass all checks
 ```
 
-See `docs/foundation/architecture.md` section 18 for the complete configuration reference.
+See `docs/foundation/architecture.md` section 19 for the complete configuration reference.
 
 ## 5. Software Construction Sessions
 
