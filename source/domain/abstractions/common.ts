@@ -27,41 +27,28 @@ export interface User {
   deletedAt?: When
 }
 
-/** A subset of User information for authorship. */
-export type Author = Pick<User, 'id' | 'displayName' | 'roles'>
-
 /** Represents a note or comment. */
 export interface Note {
   id: ID
   createdAt: When
-  author?: Author
+  authorId?: ID
   content: string
   visibility?: 'internal' | 'shared'
   tags?: string[]
   images: Attachment[]
 }
 
-/** Represents geographic coordinates. */
-export interface Coordinate {
+/** Represents a location with coordinates and optional address fields. */
+export interface Location {
   latitude: number
   longitude: number
   altitudeMeters?: number
-}
-
-/** Represents a physical address. */
-export interface Address {
-  line1: string
+  line1?: string
   line2?: string
-  city: string
-  state: string
-  postalCode: string
-  country: string
-}
-
-/** Represents a location with coordinate and optional address. */
-export interface Location {
-  coordinate: Coordinate
-  address?: Address
+  city?: string
+  state?: string
+  postalCode?: string
+  country?: string
   recordedAt?: When
   accuracyMeters?: number
   description?: string
@@ -100,18 +87,16 @@ export interface Answer {
   questionId: ID
   value: AnswerValue
   capturedAt: When
-  capturedBy: Author
+  capturedById: ID
   note?: Note
 }
 
 /** Represents a file attachment. */
-export type AttachmentKind = 'photo' | 'video' | 'map' | 'document'
-
 export interface Attachment {
   id: ID
   filename: string
   url: string
-  kind: AttachmentKind
+  contentType: string
   uploadedAt: When
-  uploadedBy: Author
+  uploadedById: ID
 }

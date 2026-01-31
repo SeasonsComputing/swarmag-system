@@ -28,7 +28,7 @@ export interface RuntimeProvider {
  * Provides a priori validation and fast-fail validation
  * @UtilityClass
  */
-export class RuntimeConfig {
+export class RuntimeConfig implements RuntimeProvider {
   /** Registered environment variable names. */
   #cache: StringSet | null = null
 
@@ -65,5 +65,13 @@ export class RuntimeConfig {
     const value = this.#provider.get(name)
     if (!value) this.#provider.fail(`${name} missing at runtime`)
     return value
+  }
+
+  /**
+   * Fail with a message.
+   * @param msg - Failure message.
+   */
+  fail(msg: string): never {
+    this.#provider.fail(msg)
   }
 }

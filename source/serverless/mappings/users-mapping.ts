@@ -21,64 +21,51 @@ export const userToRow = (user: User) => ({
   payload: user
 })
 
-const parseUserFields = (src: Dictionary): User | undefined => {
-  const id = typeof src.id === 'string' ? src.id : undefined
-  const displayName = typeof src.displayName === 'string' ? src.displayName : undefined
-  const primaryEmail = typeof src.primaryEmail === 'string' ? src.primaryEmail : undefined
-  const phoneNumber = typeof src.phoneNumber === 'string' ? src.phoneNumber : undefined
-  const createdAt = typeof src.createdAt === 'string' ? src.createdAt : undefined
-  const updatedAt = typeof src.updatedAt === 'string' ? src.updatedAt : undefined
-  const deletedAt = typeof src.deletedAt === 'string' ? src.deletedAt : undefined
-  const avatarUrl = typeof src.avatarUrl === 'string' ? src.avatarUrl : undefined
-  const roles = isUserRoles(src.roles) ? src.roles : undefined
-  const status = isUserStatus(src.status) ? src.status : undefined
-
-  if (id && displayName && primaryEmail && phoneNumber && createdAt && updatedAt) {
-    return {
-      id,
-      displayName,
-      primaryEmail,
-      phoneNumber,
-      avatarUrl,
-      roles,
-      status,
-      createdAt,
-      updatedAt,
-      deletedAt
-    }
-  }
-
-  return undefined
-}
-
-const normalizeUserRecord = (record: Dictionary): Dictionary => ({
-  id: record.id,
-  displayName: typeof record.displayName === 'string' ? record.displayName : record.display_name,
-  primaryEmail: typeof record.primaryEmail === 'string' ? record.primaryEmail : record.primary_email,
-  phoneNumber: typeof record.phoneNumber === 'string' ? record.phoneNumber : record.phone_number,
-  createdAt: typeof record.createdAt === 'string' ? record.createdAt : record.created_at,
-  updatedAt: typeof record.updatedAt === 'string' ? record.updatedAt : record.updated_at,
-  deletedAt: typeof record.deletedAt === 'string' ? record.deletedAt : record.deleted_at,
-  avatarUrl: typeof record.avatarUrl === 'string' ? record.avatarUrl : record.avatar_url,
-  roles: record.roles,
-  status: record.status
-})
-
-/** Convert a Supabase row into a User domain model, preferring the payload when present. */
+/**
+ * Convert a Supabase row into a User domain model.
+ * Payload is truth - if present, use it directly.
+ * Falls back to column mapping for legacy records.
+ */
 export const rowToUser = (row: unknown): User => {
   if (!row || typeof row !== 'object') {
     throw new Error('User row is missing required fields')
   }
 
   const record = row as Dictionary
+
+  // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Dictionary
-    const parsedPayload = parseUserFields(payload)
-    if (parsedPayload) return parsedPayload
+    if (
+      typeof payload.id === 'string'
+      && typeof payload.displayName === 'string'
+      && typeof payload.primaryEmail === 'string'
+      && typeof payload.phoneNumber === 'string'
+    ) {
+      return payload as unknown as User
+    }
   }
 
-  const parsedRecord = parseUserFields(normalizeUserRecord(record))
-  if (parsedRecord) return parsedRecord
+  // Legacy fallback - map from columns
+  const id = record.id as string
+  const displayName = (record.display_name ?? record.displayName) as string
+  const primaryEmail = (record.primary_email ?? record.primaryEmail) as string
+  const phoneNumber = (record.phone_number ?? record.phoneNumber) as string
 
-  throw new Error('User row is missing required fields')
+  if (!id || !displayName || !primaryEmail || !phoneNumber) {
+    throw new Error('User row is missing required fields')
+  }
+
+  return {
+    id,
+    displayName,
+    primaryEmail,
+    phoneNumber,
+    avatarUrl: (record.avatar_url ?? record.avatarUrl) as string | undefined,
+    roles: isUserRoles(record.roles) ? record.roles : undefined,
+    status: isUserStatus(record.status) ? record.status : undefined,
+    createdAt: (record.created_at ?? record.createdAt) as string | undefined,
+    updatedAt: (record.updated_at ?? record.updatedAt) as string | undefined,
+    deletedAt: (record.deleted_at ?? record.deletedAt) as string | undefined
+  }
 }

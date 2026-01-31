@@ -3,18 +3,13 @@
  * Defines wire shapes for request/response contracts.
  */
 
-import type { JobAssessment, JobLogEntry, JobPlan, JobStatus } from '@domain/abstractions/job.ts'
+import type { JobAssessment, JobLogEntry, JobPlan } from '@domain/abstractions/job.ts'
 
 /** Input for creating a job assessment. */
 export type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>
 
 /** Input for creating a job plan. */
-export type JobPlanInput =
-  & Omit<
-    JobPlan,
-    'id' | 'jobId' | 'status' | 'createdAt' | 'updatedAt'
-  >
-  & { status?: JobStatus }
+export type JobPlanInput = Omit<JobPlan, 'id' | 'jobId' | 'createdAt' | 'updatedAt'>
 
 /** Input for creating a job with assessment and plan. */
 export type JobCreateInput = {
@@ -33,6 +28,6 @@ export type JobLogAppendInput = {
   location?: JobLogEntry['location']
   attachments?: JobLogEntry['attachments']
   payload?: JobLogEntry['payload']
-  createdBy: JobLogEntry['createdBy']
+  createdById: JobLogEntry['createdById']
   occurredAt?: JobLogEntry['occurredAt']
 }

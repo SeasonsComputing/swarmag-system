@@ -85,25 +85,17 @@ export const droneAssetSample: Asset = {
       id: id(),
       filename: 'agras-t40-manual.pdf',
       url: 'https://storage.swarmag.com/assets/agras-t40/manual.pdf',
-      kind: 'document',
+      contentType: 'application/pdf',
       uploadedAt: '2024-12-01T00:00:00Z',
-      uploadedBy: {
-        id: id(),
-        displayName: 'Documentation Bot',
-        roles: ['administrator']
-      }
+      uploadedById: id()
     },
     {
       id: id(),
       filename: 'preflight-checklist.jpg',
       url: 'https://storage.swarmag.com/assets/agras-t40/photos/preflight.jpg',
-      kind: 'photo',
+      contentType: 'image/jpeg',
       uploadedAt: '2025-01-18T15:20:00Z',
-      uploadedBy: {
-        id: id(),
-        displayName: 'Noah Price',
-        roles: ['operations']
-      }
+      uploadedById: id()
     }
   ],
   createdAt: '2024-12-01T00:00:00Z',
@@ -122,13 +114,9 @@ export const sprayerTruckSample: Asset = {
       id: id(),
       filename: 'sprayer-ram5500-maintenance-log.pdf',
       url: 'https://storage.swarmag.com/assets/ram5500/maintenance-log.pdf',
-      kind: 'document',
+      contentType: 'application/pdf',
       uploadedAt: '2024-12-15T00:00:00Z',
-      uploadedBy: {
-        id: id(),
-        displayName: 'Yara Singh',
-        roles: ['operations']
-      }
+      uploadedById: id()
     }
   ],
   createdAt: '2024-11-15T00:00:00Z',

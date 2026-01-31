@@ -5,85 +5,14 @@
 import type { Service } from '@domain/abstractions/service.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
-import { clampLimit, isIdArray, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
+import { clampLimit, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
-import type { Dictionary } from '@utils'
+import { rowToService } from '@serverless-mappings/services-mapping.ts'
 
 /**
  * Edge function path config
  */
 export const config = { path: '/api/services/list' }
-
-/**
- * Type guard for supported service categories.
- * @param value Potential category value.
- * @returns True when the value matches a known category.
- */
-const isServiceCategory = (value: unknown): value is Service['category'] =>
-  value === 'aerial-drone-services'
-  || value === 'ground-machinery-services'
-
-/**
- * Converts a ServiceRow to Service, either from payload or raw row data.
- * @param row The database row to convert.
- * @returns The mapped Service object.
- * @throws Error if required fields are missing.
- */
-const rowToService = (row: unknown): Service => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('Service row is missing required fields')
-  }
-
-  const record = row as Dictionary
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string'
-      && typeof payload.name === 'string'
-      && typeof payload.sku === 'string'
-      && isServiceCategory(payload.category)
-      && isIdArray(payload.requiredAssetTypes)
-      && typeof payload.createdAt === 'string'
-      && typeof payload.updatedAt === 'string'
-    ) {
-      return {
-        id: payload.id,
-        name: payload.name,
-        sku: payload.sku,
-        description: typeof payload.description === 'string' ? payload.description : undefined,
-        category: payload.category,
-        requiredAssetTypes: payload.requiredAssetTypes,
-        notes: Array.isArray(payload.notes) ? payload.notes : undefined,
-        createdAt: payload.createdAt,
-        updatedAt: payload.updatedAt
-      }
-    }
-  }
-
-  if (
-    typeof record.id === 'string'
-    && typeof record.name === 'string'
-    && typeof record.sku === 'string'
-    && isServiceCategory(record.category)
-    && isIdArray(record.requiredAssetTypes)
-    && typeof record.createdAt === 'string'
-    && typeof record.updatedAt === 'string'
-  ) {
-    return {
-      id: record.id,
-      name: record.name,
-      sku: record.sku,
-      description: typeof record.description === 'string' ? record.description : undefined,
-      category: record.category,
-      requiredAssetTypes: record.requiredAssetTypes,
-      notes: Array.isArray(record.notes) ? record.notes : undefined,
-      createdAt: record.createdAt,
-      updatedAt: record.updatedAt
-    }
-  }
-
-  throw new Error('Service row is missing required fields')
-}
 
 /**
  * Handles the service list API request with pagination.

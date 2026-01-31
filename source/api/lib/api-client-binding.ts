@@ -4,7 +4,7 @@
 
 import type { DeleteResult, ListOptions, ListResult } from '@domain/protocol/common-protocol.ts'
 import type { Dictionary, ID } from '@utils'
-import { Config } from '../config/config.ts'
+import { Config } from '../config/api-config.ts'
 
 export type { DeleteResult, ListOptions, ListResult }
 

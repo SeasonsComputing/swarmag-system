@@ -3,7 +3,7 @@
  * Jobs represent operational tasks related to services.
  */
 
-import type { Answer, Attachment, Author, Location, Note } from '@domain/abstractions/common.ts'
+import type { Answer, Attachment, Location, Note } from '@domain/abstractions/common.ts'
 import type { Dictionary, ID, When } from '@utils'
 
 /** The possible statuses of a job. */
@@ -21,7 +21,7 @@ export interface JobAssessment {
   serviceId: ID
   customerId: ID
   contactId?: ID
-  assessor: Author
+  assessorId: ID
   assessedAt: When
   locations: [Location, ...Location[]]
   questions: Answer[]
@@ -53,7 +53,6 @@ export interface JobPlan {
   id: ID
   jobId: ID
   workflowId: ID
-  status: JobStatus
   scheduledStart: When
   scheduledEnd?: When
   targetLocations: Location[]
@@ -61,6 +60,7 @@ export interface JobPlan {
   assets: ID[]
   chemicals: JobChemicalPlan[]
   notes?: Note[]
+  payload?: Dictionary
   createdAt: When
   updatedAt: When
 }
@@ -85,7 +85,7 @@ export interface JobLogEntry {
   message: string
   occurredAt: When
   createdAt: When
-  createdBy: Author
+  createdById: ID
   location?: Location
   attachments?: Attachment[]
   payload?: JobLogPayload

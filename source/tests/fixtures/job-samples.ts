@@ -12,25 +12,24 @@ const assessorId = id()
 const assessmentAttachmentId = id()
 const waterwaysAttachmentId = id()
 const assessmentId = id()
+const priyaId = id()
 
 export const ranchMappingAssessment: JobAssessment = {
   id: assessmentId,
   serviceId,
   customerId,
   contactId,
-  assessor: {
-    id: assessorId,
-    displayName: 'Morgan Diaz',
-    roles: ['operations']
-  },
+  assessorId,
   assessedAt: '2025-01-12T14:00:00Z',
   locations: [
     {
-      coordinate: { latitude: 31.9686, longitude: -99.9018 },
+      latitude: 31.9686,
+      longitude: -99.9018,
       description: 'North pasture, Blue Mesa Ranch'
     },
     {
-      coordinate: { latitude: 31.9789, longitude: -99.9142 },
+      latitude: 31.9789,
+      longitude: -99.9142,
       description: 'South mesquite grove, Blue Mesa Ranch'
     }
   ],
@@ -41,25 +40,17 @@ export const ranchMappingAssessment: JobAssessment = {
       id: assessmentAttachmentId,
       filename: 'north-pasture-map.tif',
       url: `https://storage.swarmag.com/job-assessments/${assessmentId}/maps/base.tif`,
-      kind: 'map',
+      contentType: 'image/tiff',
       uploadedAt: '2025-01-12T14:05:00Z',
-      uploadedBy: {
-        id: assessorId,
-        displayName: 'Morgan Diaz',
-        roles: ['operations']
-      }
+      uploadedById: assessorId
     },
     {
       id: waterwaysAttachmentId,
       filename: 'waterways-annotation.geojson',
       url: `https://storage.swarmag.com/job-assessments/${assessmentId}/maps/waterways.geojson`,
-      kind: 'map',
+      contentType: 'application/geo+json',
       uploadedAt: '2025-01-12T14:08:00Z',
-      uploadedBy: {
-        id: id(),
-        displayName: 'Priya Mehta',
-        roles: ['operations']
-      }
+      uploadedById: priyaId
     }
   ],
   createdAt: '2025-01-12T14:00:00Z',
@@ -80,13 +71,10 @@ export const fieldPhotoLogEntry: JobLogEntry = {
   message: 'Captured before/after images for spray block 3',
   occurredAt: '2025-01-18T16:20:00Z',
   createdAt: '2025-01-18T16:21:00Z',
-  createdBy: {
-    id: jobLogAuthorId,
-    displayName: 'Evan Cole',
-    roles: ['operations']
-  },
+  createdById: jobLogAuthorId,
   location: {
-    coordinate: { latitude: 32.2144, longitude: -97.1234 },
+    latitude: 32.2144,
+    longitude: -97.1234,
     recordedAt: '2025-01-18T16:21:00Z'
   },
   attachments: [
@@ -94,25 +82,17 @@ export const fieldPhotoLogEntry: JobLogEntry = {
       id: beforeAttachmentId,
       filename: 'block3-before.jpg',
       url: `https://storage.swarmag.com/jobs/${jobId}/photos/block3-before.jpg`,
-      kind: 'photo',
+      contentType: 'image/jpeg',
       uploadedAt: '2025-01-18T16:21:05Z',
-      uploadedBy: {
-        id: jobLogAuthorId,
-        displayName: 'Evan Cole',
-        roles: ['operations']
-      }
+      uploadedById: jobLogAuthorId
     },
     {
       id: afterAttachmentId,
       filename: 'block3-after.jpg',
       url: `https://storage.swarmag.com/jobs/${jobId}/photos/block3-after.jpg`,
-      kind: 'photo',
+      contentType: 'image/jpeg',
       uploadedAt: '2025-01-18T16:21:10Z',
-      uploadedBy: {
-        id: jobLogAuthorId,
-        displayName: 'Evan Cole',
-        roles: ['operations']
-      }
+      uploadedById: jobLogAuthorId
     }
   ],
   payload: {

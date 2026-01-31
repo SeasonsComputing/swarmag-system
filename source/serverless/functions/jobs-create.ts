@@ -42,7 +42,7 @@ const handle = async (
   const jobId: ID = id()
   const assessmentId: ID = id()
   const planId: ID = id()
-  const planStatus: JobStatus = req.body.plan.status ?? 'scheduled'
+  const jobStatus: JobStatus = 'scheduled'
 
   const assessment: JobAssessment = {
     ...req.body.assessment,
@@ -55,7 +55,6 @@ const handle = async (
     ...req.body.plan,
     id: planId,
     jobId,
-    status: planStatus,
     createdAt: now,
     updatedAt: now
   }
@@ -66,7 +65,7 @@ const handle = async (
     planId,
     serviceId: req.body.serviceId,
     customerId: req.body.customerId,
-    status: planStatus,
+    status: jobStatus,
     createdAt: now,
     updatedAt: now
   }
@@ -89,7 +88,6 @@ const handle = async (
     id: plan.id,
     job_id: job.id,
     workflow_id: plan.workflowId,
-    status: plan.status,
     payload: plan,
     created_at: plan.createdAt,
     updated_at: plan.updatedAt
