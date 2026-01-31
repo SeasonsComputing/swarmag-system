@@ -83,21 +83,21 @@ LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read sourc
 
 ### 3.2 Directory purposes
 
-| Path                           | Purpose                                                           |
-| ------------------------------ | ----------------------------------------------------------------- |
-| `source/domain/abstractions/`  | Canonical domain types (User, Service, Asset, Job, etc.)          |
-| `source/domain/validators/`    | Domain invariant validators and type guards                       |
-| `source/domain/protocol/`      | Request/response shapes and protocol validation                   |
-| `source/utils/`                | Shared primitives: `id()` (UUID v7), `when()` (ISO 8601 UTC)      |
-| `source/api/`                  | Typed SDK for apps to consume the serverless runtime              |
-| `source/serverless/functions/` | Netlify Edge Functions (REST API endpoints)                       |
-| `source/serverless/lib/`       | Backend platform helpers (Netlify adapter, Supabase client)       |
-| `source/serverless/mappings/`  | DB row ↔ domain type conversion helpers                           |
-| `source/migrations/`           | Supabase SQL migrations (symlinked to `supabase/migrations`)      |
-| `source/tests/`                | Test specs and fixtures                                           |
-| `source/apps/`                 | SolidJS apps (admin, ops, customer)                               |
-| `docs/foundation/`             | Architecture, domain model, style guide                           |
-| `docs/applications/`           | App-specific briefs and user stories                              |
+| Path                           | Purpose                                                      |
+| ------------------------------ | ------------------------------------------------------------ |
+| `source/domain/abstractions/`  | Canonical domain types (User, Service, Asset, Job, etc.)     |
+| `source/domain/validators/`    | Domain invariant validators and type guards                  |
+| `source/domain/protocol/`      | Request/response shapes and protocol validation              |
+| `source/utils/`                | Shared primitives: `id()` (UUID v7), `when()` (ISO 8601 UTC) |
+| `source/api/`                  | Typed SDK for apps to consume the serverless runtime         |
+| `source/serverless/functions/` | Netlify Edge Functions (REST API endpoints)                  |
+| `source/serverless/lib/`       | Backend platform helpers (Netlify adapter, Supabase client)  |
+| `source/serverless/mappings/`  | DB row ↔ domain type conversion helpers                      |
+| `source/migrations/`           | Supabase SQL migrations (symlinked to `supabase/migrations`) |
+| `source/tests/`                | Test specs and fixtures                                      |
+| `source/apps/`                 | SolidJS apps (admin, ops, customer)                          |
+| `docs/foundation/`             | Architecture, domain model, style guide                      |
+| `docs/applications/`           | App-specific briefs and user stories                         |
 
 ### 3.3 Development sequence
 
