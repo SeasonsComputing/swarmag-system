@@ -9,7 +9,7 @@ const ROOT = Deno.cwd().replaceAll('\\', '/')
 const TARGET_DIRS = [
   `${ROOT}/source`,
   `${ROOT}/docs`,
-  `${ROOT}/scripts`
+  `${ROOT}/devops/scripts`
 ]
 
 /** Directory names to skip during traversal. */

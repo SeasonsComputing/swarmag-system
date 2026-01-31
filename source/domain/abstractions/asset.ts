@@ -4,7 +4,7 @@
  * such as vehicles, sprayers, drones, etc.
  */
 
-import type { Attachment } from '@domain/common.ts'
+import type { Attachment } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@utils'
 
 /** The different types of assets available in the system. */

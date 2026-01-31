@@ -23,38 +23,84 @@ Architecture, goals, and setup instructions live in `docs/foundation/architectur
 
 ## 2. Roadmap (Current Project State)
 
-1. Foundation — domain types + initial APIs.
-2. Admin Web App — dashboards, scheduling, catalog administration.
-3. Ops Mobile App — offline-first field workflows and job logging.
-4. Customer Portal — read-only job visibility.
+- Foundation — domain types + initial APIs.
+- Admin Web App — dashboards, scheduling, catalog administration.
+- Ops Mobile App — offline-first field workflows and job logging.
+- Customer Portal — read-only job visibility.
 
 ## 3. Documentation
 
-- Architecture (canonical platform/system doc): `docs/foundation/architecture.md`
-- Domain model & API conventions: `docs/foundation/domain.md`
-- User stories: `docs/applications/user-stories.md`
-- App-specific briefs: `docs/applications/admin-web-app.md`, `docs/applications/ops-mobile-app.md`, `docs/applications/customer-portal.md`
-- Data lists (services, asset types): `docs/foundation/data-lists.md`
-
-## 4. Docs Index
-
-### 4.1 Foundation
+### 3.1 Foundation
 
 - `docs/foundation/architecture.md`
 - `docs/foundation/domain.md`
 - `docs/foundation/data-lists.md`
 - `docs/foundation/style-guide.md`
 
-### 4.2 Applications
+### 3.2 Applications
 
 - `docs/applications/user-stories.md`
 - `docs/applications/admin-web-app.md`
 - `docs/applications/ops-mobile-app.md`
 - `docs/applications/customer-portal.md`
 
-### 4.3 History
+### 3.3 History (origin)
 
 - `docs/history/swarmag-ops-meta-prompt.md`
+
+## 4. Configuration Setup
+
+SwarmAg uses environment-specific configuration files for each deployment context.
+
+### 4.1 Local development setup
+
+**Create local environment files** for each context you'll be working with:
+
+```bash
+# Serverless API functions
+cp source/serverless/config/serverless-local.env.example source/serverless/config/serverless-local.env
+
+# Admin web app
+cp source/apps/admin/config/admin-local.env.example source/apps/admin/config/admin-local.env
+
+# Tests
+cp source/tests/config/tests-local.env.example source/tests/config/tests-local.env
+```
+
+Edit each file With your local values:
+
+```bash
+# source/serverless/config/serverless-local.env
+SUPABASE_URL=http://localhost:54321
+SUPABASE_SERVICE_KEY=your-local-service-key
+JWT_SECRET=your-local-jwt-secret
+```
+
+**Never commit** these files - they're in `.gitignore` by default.
+
+### 4.2 Stage/Production setup
+
+**Serverless (Netlify):**
+
+1. Log into Netlify Dashboard.
+2. Navigate to your site > Settings > Environment Variables.
+3. Add required variables: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `JWT_SECRET`.
+
+**Apps (Build-time):**
+
+Build-time environment variables are injected by the build system. Vite reads from `VITE_*` prefixed variables.
+
+### 4.3 Verification
+
+```bash
+# Test serverless config
+netlify dev  # Should start without "Missing required config" errors
+
+# Test suite
+deno task test  # Should run without environment errors
+```
+
+See `docs/foundation/architecture.md` section 18 for the complete configuration reference.
 
 ## 5. Software Construction Sessions
 

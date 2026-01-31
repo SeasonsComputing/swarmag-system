@@ -2,8 +2,8 @@
  * Netlify handler for fetching a user by id.
  */
 
-import { type UserGetQuery, validateUserGetQuery } from '@domain/common-validators.ts'
-import type { User } from '@domain/common.ts'
+import type { User } from '@domain/abstractions/common.ts'
+import { isNonEmptyString } from '@domain/validators/common-validators.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
@@ -20,18 +20,16 @@ export const config = { path: '/api/users/get' }
  * @returns API result with the user payload or an error response.
  */
 const handle = async (
-  req: ApiRequest<undefined, UserGetQuery>
+  req: ApiRequest<undefined, { id?: string }>
 ): Promise<ApiResponse> => {
   if (req.method !== 'GET') {
     return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
   }
 
-  const validationError = validateUserGetQuery(req.query)
-  if (validationError) {
-    return { statusCode: HttpCodes.badRequest, body: { error: validationError } }
-  }
-
   const userId = req.query?.id
+  if (!isNonEmptyString(userId)) {
+    return { statusCode: HttpCodes.badRequest, body: { error: 'id is required' } }
+  }
 
   const { data, error } = await Supabase.client()
     .from('users')

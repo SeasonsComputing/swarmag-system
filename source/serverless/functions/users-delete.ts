@@ -2,8 +2,8 @@
  * Netlify handler for soft-deleting users.
  */
 
-import { type UserDeleteInput, validateUserDeleteInput } from '@domain/common-validators.ts'
-import type { User } from '@domain/common.ts'
+import type { User } from '@domain/abstractions/common.ts'
+import { isNonEmptyString } from '@domain/validators/common-validators.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
@@ -21,22 +21,22 @@ export const config = { path: '/api/users/delete' }
  * @returns API result with deletion metadata or an error response.
  */
 const handle = async (
-  req: ApiRequest<UserDeleteInput>
+  req: ApiRequest<{ id?: string }>
 ): Promise<ApiResponse> => {
   if (req.method !== 'DELETE') {
     return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
   }
 
-  const validationError = validateUserDeleteInput(req.body)
-  if (validationError) {
-    return { statusCode: HttpCodes.unprocessableEntity, body: { error: validationError } }
+  const userId = req.body?.id
+  if (!isNonEmptyString(userId)) {
+    return { statusCode: HttpCodes.unprocessableEntity, body: { error: 'id is required' } }
   }
 
   const supabase = Supabase.client()
   const { data: existingRow, error: fetchError } = await supabase
     .from('users')
     .select('*')
-    .eq('id', req.body.id)
+    .eq('id', userId)
     .is('deleted_at', null)
     .single()
 

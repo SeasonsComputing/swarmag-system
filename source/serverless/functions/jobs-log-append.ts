@@ -2,8 +2,9 @@
  * Netlify handler for appending job log entries.
  */
 
-import { type JobLogAppendInput, validateJobLogAppendInput } from '@domain/job-validators.ts'
-import type { JobLogEntry } from '@domain/job.ts'
+import type { JobLogEntry } from '@domain/abstractions/job.ts'
+import type { JobLogAppendInput } from '@domain/protocol/job-protocol.ts'
+import { validateJobLogAppendInput } from '@domain/validators/job-validators.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'

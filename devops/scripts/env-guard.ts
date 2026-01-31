@@ -1,5 +1,5 @@
 /**
- * Guard against direct Deno.env or Deno.test usage outside App.
+ * Guard against direct Deno.env usage outside config providers.
  */
 
 /** Absolute path to the repo root. */
@@ -8,17 +8,16 @@ const ROOT = Deno.cwd().replaceAll('\\', '/')
 /** Directories to scan for guard violations. */
 const TARGET_DIRS = [
   `${ROOT}/source`,
-  `${ROOT}/scripts`
+  `${ROOT}/devops`
 ]
 
 /** Directory names to skip during traversal. */
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
-/** Relative paths that are allowed to use Deno.env or Deno.test. */
+/** Relative paths that are allowed to use Deno.env. */
 const ALLOWED_FILES = new Set([
-  'source/utils/app.ts',
-  'source/serverless/lib/runtime-deno.ts',
-  'scripts/env-guard.ts'
+  'devops/scripts/env-guard.ts',
+  'source/utils/configure-deno.ts'
 ])
 
 /** Match direct Deno.env or Deno.test access. */

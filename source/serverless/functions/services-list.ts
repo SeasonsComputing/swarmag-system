@@ -2,7 +2,7 @@
  * Netlify handler for listing services with pagination.
  */
 
-import type { Service } from '@domain/service.ts'
+import type { Service } from '@domain/abstractions/service.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { clampLimit, isIdArray, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'

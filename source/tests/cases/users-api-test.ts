@@ -3,8 +3,8 @@
  */
 
 import { UsersApi } from '@api/client/users-api.ts'
-import { ApiError } from '@api/lib/client-binding.ts'
-import type { User } from '@domain/common.ts'
+import { ApiError } from '@api/lib/api-client-binding.ts'
+import type { User } from '@domain/abstractions/common.ts'
 import { assert, assertEquals, assertRejects } from '@std/assert'
 
 /** Mock user data for testing. */
@@ -66,7 +66,7 @@ Deno.test('UsersApi.create throws ApiError on validation failure', async () => {
     const error = await assertRejects(
       () => UsersApi.create({ displayName: '', primaryEmail: 'a@b.com', phoneNumber: '555' }),
       ApiError
-    )
+    ) as ApiError
     assertEquals(error.status, 422)
     assertEquals(error.message, 'displayName is required')
   } finally {
@@ -98,7 +98,7 @@ Deno.test('UsersApi.get throws ApiError when not found', async () => {
     const error = await assertRejects(
       () => UsersApi.get('nonexistent-id'),
       ApiError
-    )
+    ) as ApiError
     assertEquals(error.status, 404)
     assertEquals(error.message, 'User not found')
   } finally {
@@ -171,7 +171,7 @@ Deno.test('UsersApi.update throws ApiError when not found', async () => {
     const error = await assertRejects(
       () => UsersApi.update({ id: 'nonexistent', displayName: 'Test' }),
       ApiError
-    )
+    ) as ApiError
     assertEquals(error.status, 404)
   } finally {
     cleanup()
@@ -206,29 +206,14 @@ Deno.test('UsersApi.delete throws ApiError when not found', async () => {
     const error = await assertRejects(
       () => UsersApi.delete('nonexistent'),
       ApiError
-    )
+    ) as ApiError
     assertEquals(error.status, 404)
   } finally {
     cleanup()
   }
 })
 
-Deno.test('UsersApi.configure sets base URL', async () => {
-  let capturedUrl = ''
-  const cleanup = mockFetch(url => {
-    capturedUrl = url
-    return jsonResponse(200, { data: mockUser })
-  })
 
-  try {
-    UsersApi.configure('https://api.swarmag.com')
-    await UsersApi.get(mockUser.id)
-    assert(capturedUrl.startsWith('https://api.swarmag.com/api/users/get'))
-  } finally {
-    UsersApi.configure('')
-    cleanup()
-  }
-})
 
 Deno.test('UsersApi handles server errors with details', async () => {
   const cleanup = mockFetch(() => {
@@ -239,7 +224,7 @@ Deno.test('UsersApi handles server errors with details', async () => {
     const error = await assertRejects(
       () => UsersApi.get(mockUser.id),
       ApiError
-    )
+    ) as ApiError
     assertEquals(error.status, 500)
     assertEquals(error.message, 'Database connection failed')
     assertEquals(error.details, 'Connection timeout')

@@ -3,7 +3,7 @@
  * Jobs represent operational tasks related to services.
  */
 
-import type { Answer, Attachment, Author, Location, Note } from '@domain/common.ts'
+import type { Answer, Attachment, Author, Location, Note } from '@domain/abstractions/common.ts'
 import type { Dictionary, ID, When } from '@utils'
 
 /** The possible statuses of a job. */

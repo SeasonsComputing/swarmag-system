@@ -2,8 +2,9 @@
  * Netlify handler for creating jobs with associated plan and assessment.
  */
 
-import { type JobCreateInput, validateJobCreateInput } from '@domain/job-validators.ts'
-import type { Job, JobAssessment, JobPlan, JobStatus } from '@domain/job.ts'
+import type { Job, JobAssessment, JobPlan, JobStatus } from '@domain/abstractions/job.ts'
+import type { JobCreateInput } from '@domain/protocol/job-protocol.ts'
+import { validateJobCreateInput } from '@domain/validators/job-validators.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'

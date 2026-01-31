@@ -2,8 +2,8 @@
  * Supabase client singleton for server-side operations.
  */
 
+import { Config } from '@serverless/config/config.ts'
 import { createClient, type SupabaseClient } from '@supabase/client'
-import { App } from '@utils'
 
 /** Cache-aware Supabase client factory for platform functions. */
 export class Supabase {
@@ -18,8 +18,8 @@ export class Supabase {
   static client(): SupabaseClient {
     if (Supabase.#cache) return Supabase.#cache
 
-    const SUPABASE_URL = App.get('SUPABASE_URL')
-    const SUPABASE_SERVICE_KEY = App.get('SUPABASE_SERVICE_KEY')
+    const SUPABASE_URL = Config.get('SUPABASE_URL')
+    const SUPABASE_SERVICE_KEY = Config.get('SUPABASE_SERVICE_KEY')
 
     Supabase.#cache = createClient(
       SUPABASE_URL,

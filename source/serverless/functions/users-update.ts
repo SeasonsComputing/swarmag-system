@@ -2,8 +2,8 @@
  * Netlify handler for updating users.
  */
 
-import { type UserUpdateInput, validateUserUpdateInput } from '@domain/common-validators.ts'
-import type { User } from '@domain/common.ts'
+import type { User } from '@domain/abstractions/common.ts'
+import { type UserUpdateInput, validateUserUpdateInput } from '@domain/protocol/common-protocol.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'

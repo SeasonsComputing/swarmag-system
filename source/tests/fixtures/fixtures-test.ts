@@ -2,7 +2,7 @@
  * Fixture integrity checks for shared sample data.
  */
 
-import type { AssetStatus } from '@domain/asset.ts'
+import type { AssetStatus } from '@domain/abstractions/asset.ts'
 import { assert, assertEquals } from '@std/assert'
 import {
   assetSamples,

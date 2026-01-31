@@ -2,7 +2,7 @@
  * Netlify handler for listing users with pagination.
  */
 
-import type { User } from '@domain/common.ts'
+import type { User } from '@domain/abstractions/common.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { clampLimit, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'

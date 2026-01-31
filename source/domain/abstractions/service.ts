@@ -3,7 +3,7 @@
  * Services are the types of operations offered to customers.
  */
 
-import type { Note } from '@domain/common.ts'
+import type { Note } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@utils'
 
 /** The categories of services available. */
