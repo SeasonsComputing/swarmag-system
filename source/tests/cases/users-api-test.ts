@@ -107,9 +107,11 @@ Deno.test('UsersApi.get throws ApiError when not found', async () => {
 })
 
 Deno.test('UsersApi.list returns paginated users', async () => {
-  const cleanup = mockFetch(url => {
-    assert(url.includes('limit=10'))
-    assert(url.includes('cursor=0'))
+  const cleanup = mockFetch((_url, init) => {
+    assertEquals(init?.method, 'POST')
+    const body = JSON.parse(init?.body as string)
+    assertEquals(body.limit, 10)
+    assertEquals(body.cursor, 0)
     return jsonResponse(200, {
       data: [mockUser],
       cursor: 1,
@@ -129,9 +131,10 @@ Deno.test('UsersApi.list returns paginated users', async () => {
 })
 
 Deno.test('UsersApi.list works without options', async () => {
-  const cleanup = mockFetch(url => {
-    assert(!url.includes('limit='))
-    assert(!url.includes('cursor='))
+  const cleanup = mockFetch((_url, init) => {
+    assertEquals(init?.method, 'POST')
+    const body = JSON.parse(init?.body as string)
+    assertEquals(body, {})
     return jsonResponse(200, { data: [], cursor: 0, hasMore: false })
   })
 
@@ -147,7 +150,7 @@ Deno.test('UsersApi.update returns updated user', async () => {
   const updatedUser = { ...mockUser, displayName: 'Ada Byron' }
 
   const cleanup = mockFetch((_url, init) => {
-    assertEquals(init?.method, 'PATCH')
+    assertEquals(init?.method, 'PUT')
     const body = JSON.parse(init?.body as string)
     assertEquals(body.id, mockUser.id)
     assertEquals(body.displayName, 'Ada Byron')

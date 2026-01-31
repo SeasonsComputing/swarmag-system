@@ -3,10 +3,10 @@
  * Detects Solid vs Deno environment and initializes appropriate provider.
  */
 
-import { ConfigureSolid } from '@api/lib/configure-solid.ts'
+import { getConfigureSolid } from '@api/lib/configure-solid.ts'
 import { ConfigureDeno } from '@utils/configure-deno.ts'
 
-const Config = 'Deno' in self ? ConfigureDeno : ConfigureSolid
+const Config = 'Deno' in self ? ConfigureDeno : getConfigureSolid()
 
 Config.init(['VITE_API_URL'])
 

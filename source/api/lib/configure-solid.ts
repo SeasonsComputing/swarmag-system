@@ -16,10 +16,8 @@ declare global {
  * Configuration provider for Solid app.
  */
 class SolidProvider implements RuntimeProvider {
-  constructor() {
-    if (!import.meta?.env) this.fail('Solid runtime not available')
-  }
   get(key: string): string | undefined {
+    if (!import.meta?.env) this.fail('Solid runtime not available')
     return import.meta.env![key]
   }
   fail(msg: string): never {
@@ -27,4 +25,13 @@ class SolidProvider implements RuntimeProvider {
   }
 }
 
-export const ConfigureSolid = new RuntimeConfig(new SolidProvider())
+/** Lazy singleton - only instantiated when accessed. */
+let instance: RuntimeConfig | null = null
+
+/** Get the Solid configuration provider. */
+export function getConfigureSolid(): RuntimeConfig {
+  if (!instance) {
+    instance = new RuntimeConfig(new SolidProvider())
+  }
+  return instance
+}
