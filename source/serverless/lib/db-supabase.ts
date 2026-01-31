@@ -2,8 +2,8 @@
  * Supabase client singleton for server-side operations.
  */
 
-import { Config } from '@serverless/config/config.ts'
 import { createClient, type SupabaseClient } from '@supabase/client'
+import { Config } from '../config/serverless-config.ts'
 
 /** Cache-aware Supabase client factory for platform functions. */
 export class Supabase {

@@ -1,23 +1,23 @@
 /**
- * Netlify handler for listing services with pagination.
+ * Netlify handler for listing jobs with pagination.
  */
 
-import type { Service } from '@domain/abstractions/service.ts'
+import type { Job } from '@domain/abstractions/job.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { clampLimit, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { rowToService } from '@serverless-mappings/services-mapping.ts'
+import { rowToJob } from '@serverless-mappings/jobs-mapping.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: '/api/services/list' }
+export const config = { path: '/api/jobs/list' }
 
 /**
- * Handles the service list API request with pagination.
+ * Handles the job list API request with pagination.
  * @param req - The API request with optional query parameters for limit and cursor.
- * @returns The API result with paginated services or error.
+ * @returns The API result with paginated jobs or error.
  */
 const handle = async (
   req: ApiRequest<undefined, ListQuery>
@@ -34,9 +34,8 @@ const handle = async (
   const rangeEnd = cursor + limit - 1
 
   const supabase = Supabase.client()
-
   const { data, error, count } = await supabase
-    .from('services')
+    .from('jobs')
     .select('*', { count: 'exact' })
     .range(cursor, rangeEnd)
 
@@ -44,33 +43,32 @@ const handle = async (
     return {
       statusCode: HttpCodes.internalError,
       body: {
-        error: 'Failed to load services',
+        error: 'Failed to load jobs',
         details: error.message
       }
     }
   }
 
-  let services: Service[] = []
-
+  let jobs: Job[] = []
   try {
-    services = (data ?? []).map(rowToService)
+    jobs = (data ?? []).map(rowToJob)
   } catch (parseError) {
     return {
       statusCode: HttpCodes.internalError,
       body: {
-        error: 'Invalid service record returned from Supabase',
+        error: 'Invalid job record returned from Supabase',
         details: (parseError as Error).message
       }
     }
   }
 
-  const nextCursor = cursor + services.length
-  const hasMore = typeof count === 'number' ? nextCursor < count : services.length === limit
+  const nextCursor = cursor + jobs.length
+  const hasMore = typeof count === 'number' ? nextCursor < count : jobs.length === limit
 
   return {
     statusCode: HttpCodes.ok,
     body: {
-      data: services,
+      data: jobs,
       cursor: nextCursor,
       hasMore
     }

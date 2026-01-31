@@ -1,23 +1,23 @@
 /**
- * Netlify handler for listing services with pagination.
+ * Netlify handler for listing chemicals with pagination.
  */
 
-import type { Service } from '@domain/abstractions/service.ts'
+import type { Chemical } from '@domain/abstractions/chemical.ts'
 import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { clampLimit, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
-import { rowToService } from '@serverless-mappings/services-mapping.ts'
+import { rowToChemical } from '@serverless-mappings/chemicals-mapping.ts'
 
 /**
  * Edge function path config
  */
-export const config = { path: '/api/services/list' }
+export const config = { path: '/api/chemicals/list' }
 
 /**
- * Handles the service list API request with pagination.
+ * Handles the chemical list API request with pagination.
  * @param req - The API request with optional query parameters for limit and cursor.
- * @returns The API result with paginated services or error.
+ * @returns The API result with paginated chemicals or error.
  */
 const handle = async (
   req: ApiRequest<undefined, ListQuery>
@@ -34,9 +34,8 @@ const handle = async (
   const rangeEnd = cursor + limit - 1
 
   const supabase = Supabase.client()
-
   const { data, error, count } = await supabase
-    .from('services')
+    .from('chemicals')
     .select('*', { count: 'exact' })
     .range(cursor, rangeEnd)
 
@@ -44,33 +43,32 @@ const handle = async (
     return {
       statusCode: HttpCodes.internalError,
       body: {
-        error: 'Failed to load services',
+        error: 'Failed to load chemicals',
         details: error.message
       }
     }
   }
 
-  let services: Service[] = []
-
+  let chemicals: Chemical[] = []
   try {
-    services = (data ?? []).map(rowToService)
+    chemicals = (data ?? []).map(rowToChemical)
   } catch (parseError) {
     return {
       statusCode: HttpCodes.internalError,
       body: {
-        error: 'Invalid service record returned from Supabase',
+        error: 'Invalid chemical record returned from Supabase',
         details: (parseError as Error).message
       }
     }
   }
 
-  const nextCursor = cursor + services.length
-  const hasMore = typeof count === 'number' ? nextCursor < count : services.length === limit
+  const nextCursor = cursor + chemicals.length
+  const hasMore = typeof count === 'number' ? nextCursor < count : chemicals.length === limit
 
   return {
     statusCode: HttpCodes.ok,
     body: {
-      data: services,
+      data: chemicals,
       cursor: nextCursor,
       hasMore
     }

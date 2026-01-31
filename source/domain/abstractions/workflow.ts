@@ -17,21 +17,16 @@ export interface WorkflowStep {
   notes?: Note[]
 }
 
-/** A version of the workflow with effective dates. */
-export interface WorkflowVersion {
-  version: number
-  effectiveFrom: When
-  steps: WorkflowStep[]
-}
-
 /** Represents a workflow in the swarmAg system. */
 export interface Workflow {
   id: ID
   serviceId: ID
   name: string
   description?: string
+  version: number
+  effectiveFrom: When
+  steps: WorkflowStep[]
   locationsRequired?: Location[]
-  versions: WorkflowVersion[]
   createdAt: When
   updatedAt: When
 }

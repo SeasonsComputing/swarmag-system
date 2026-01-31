@@ -47,7 +47,7 @@ const handle = async (
     message: req.body.message,
     occurredAt: req.body.occurredAt ?? now,
     createdAt: now,
-    createdBy: req.body.createdBy,
+    createdById: req.body.createdById,
     location: req.body.location,
     attachments: req.body.attachments,
     payload: req.body.payload

@@ -3,7 +3,7 @@
  * Customers represent clients who have operations and sites to be serviced.
  */
 
-import type { Address, Author, Location, Note } from '@domain/abstractions/common.ts'
+import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@utils'
 
 /** Represents a contact person associated with a customer. */
@@ -34,8 +34,13 @@ export interface Customer {
   id: ID
   name: string
   status: 'active' | 'inactive' | 'prospect'
-  address: Address
-  accountManager?: Author
+  line1: string
+  line2?: string
+  city: string
+  state: string
+  postalCode: string
+  country: string
+  accountManagerId?: ID
   primaryContactId?: ID
   sites: CustomerSite[]
   contacts: [Contact, ...Contact[]]

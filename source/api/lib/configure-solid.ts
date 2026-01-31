@@ -25,13 +25,4 @@ class SolidProvider implements RuntimeProvider {
   }
 }
 
-/** Lazy singleton - only instantiated when accessed. */
-let instance: RuntimeConfig | null = null
-
-/** Get the Solid configuration provider. */
-export function getConfigureSolid(): RuntimeConfig {
-  if (!instance) {
-    instance = new RuntimeConfig(new SolidProvider())
-  }
-  return instance
-}
+export const ConfigureSolid = new RuntimeConfig(new SolidProvider())

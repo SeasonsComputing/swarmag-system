@@ -13,14 +13,13 @@ const siteId = id()
 const contactNoteId = id()
 
 const headquartersLocation: Location = {
-  coordinate: { latitude: 33.5779, longitude: -101.8552 },
-  address: {
-    line1: '1200 AgriTech Way',
-    city: 'Lubbock',
-    state: 'TX',
-    postalCode: '79401',
-    country: 'US'
-  },
+  latitude: 33.5779,
+  longitude: -101.8552,
+  line1: '1200 AgriTech Way',
+  city: 'Lubbock',
+  state: 'TX',
+  postalCode: '79401',
+  country: 'US',
   description: 'Corporate HQ and main equipment depot'
 }
 
@@ -28,18 +27,12 @@ export const blueMesaRanchCustomer: Customer = {
   id: customerId,
   name: 'Blue Mesa Ranch Co.',
   status: 'active',
-  address: {
-    line1: 'PO Box 410',
-    city: 'San Angelo',
-    state: 'TX',
-    postalCode: '76902',
-    country: 'US'
-  },
-  accountManager: {
-    id: accountManagerId,
-    displayName: 'Nia Wright',
-    roles: ['sales']
-  },
+  line1: 'PO Box 410',
+  city: 'San Angelo',
+  state: 'TX',
+  postalCode: '76902',
+  country: 'US',
+  accountManagerId,
   primaryContactId,
   sites: [
     {

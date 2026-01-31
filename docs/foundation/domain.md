@@ -2,13 +2,39 @@
 
 This document defines the foundational abstractions, contracts, and APIs of the `swarmAg System`. The domain model captures both the problem space and the solution space, expressed as classes, types, interfaces, associations, and APIs delivered through a TypeScript library.
 
-## 1. Domain Model (`source/domain`)
+## 1. Solution Space
 
-### 1.1 Scope
+### 1.1 Service
+
+Service is a listed-product that represents something we sell with a SKU. Services are part of a category (aerial, ground); have a description; an inventory of assets required (machines, tools, supplies, workers).
+
+Many services require the use of Regulated Chemicals. We must manage the acquisition, storage, mixing, and application of chemicals to maintain our license.
+
+Service Category is type of service we offer (aerial-drone-service, ground-machinery-service). A Service Category has one or more Workflows suitable to the category.
+
+### 1.2 Workflow & Tasks
+
+Workflow may be composed of a graph of Tasks of which a Workflow is one kind (Composite). For example "Drone Chemical Prep", "Mesquite Chemical Prepare", "Mesquite Mitigation Procedure", "Drone Obstacle Preflight". Each Task in a Workflow is either a Note or a Question. Note is static text used to inform and warn Operations. Each Question is constrained as yes-no, one-of, date, time, quantity (real number), or comment. A Workflow informs a Job Assessment.
+
+### 1.3 Job: Assessment, Plan, & Log
+
+A Job is an aggregate of Assessment, Plan, and Log.
+
+A Job Assessment is an assessment of work to be completed on-behalf of a Customer. Job Assessments define the location(s), price estimate, service(s) (see Service), schedule start, and duration estimate. Once a Job Assessment has been agreed-to (signed obligation) then a Job Plan is created for the Job Assessment.
+
+We use sophisticated multispectral mapping drones for aerial and ground services. A Job Assessment will contain 1 more of these maps to inform the Job Plan and direct the Job Log.
+
+Job Plan is used to define the specialized workflow for a Job Assessment. Job Plans are the primary means to inform the job crew of work to be completed. The Job Plan lists the members of the crew to complete the work. Job Plans detail the physical assets required. Job Plans have a schedule divided into phases (preparation, setup, operations, clean-up, complete, retrospective). Job Phases are composed of one or more Workflows. A Workflow may not span phases to simplify the system. A Job Plan can be structured (phases derived from workflows) or free-form (one-off built by hand).
+
+Job Log memorializes the physical work of executing a Job Plan. The Job Log follows the Job Plan sequentially, capturing photos, GPS coordinates, comments, records actual time accrued and any exceptions or changes made in the field. The Job Log saves any issues or notes about the job _in general_.
+
+## 2. Domain Model (`source/domain`)
+
+### 2.1 Scope
 
 Define the TypeScript domain library described in `architecture.md`, limited to types and associations under `source/domain` plus shared primitives in `source/utils`. All other concerns (API, persistence, UI) consume these types rather than re-declaring them.
 
-### 1.2 Core abstractions that define the solution space
+### 2.2 Core abstractions that define the solution space
 
 | Abstraction     | Description                                 |
 | --------------- | ------------------------------------------- |
@@ -22,7 +48,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 | `Customer`      | Organization purchasing services            |
 | `Contact`       | Individual associated with a customer       |
 
-### 1.3 Common abstractions shared within the model
+### 2.3 Common abstractions shared within the model
 
 | Abstraction  | Description                                                      |
 | ------------ | ---------------------------------------------------------------- |
@@ -36,7 +62,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 | `Question`   | Prompt used in assessments/forms                                 |
 | `Answer`     | Response to a question                                           |
 
-### 1.4 Supporting structures present in code (refer to type definitions for details)
+### 2.4 Supporting structures present in code (refer to type definitions for details)
 
 | Area      | Structures / Notes                                        |
 | --------- | --------------------------------------------------------- |
@@ -46,14 +72,14 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 | Jobs      | `JobAssignment`, `JobChemicalPlan`                        |
 | Customers | `CustomerSite`                                            |
 
-### 1.5 Utility data types
+### 2.5 Utility data types
 
 | Type   | Description                      |
 | ------ | -------------------------------- |
 | `ID`   | UUID v7 string identifier        |
 | `When` | ISO 8601 UTC timestamp as string |
 
-### 1.6 Rules
+### 2.6 Rules
 
 - Language: TypeScript (strict mode) checked via Deno (`deno task check`).
 - Use the configured import aliases from `deno.json`: `@domain/*` for domain modules, `@utils/*` for core utilities.
@@ -69,12 +95,12 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - Soft deletes: abstractions that need logical deletion (starting with `User`) expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after delete.
 - ID strategy: UUID v7 for PK/FK to avoid an ID service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure join tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
 
-### 1.7 Roles & attribution
+### 2.7 Roles & attribution
 
 - User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `source/domain/common.ts`; `User.roles` is an array so a user may hold multiple memberships.
 - `Author` is a lightweight slice of `User` containing `id`, `displayName`, and `roles`; it carries the user's membership roles for attribution context.
 
-### 1.8 API surface summary
+### 2.8 API surface summary
 
 | Abstraction       | Actions                                                                                  | Notes                                                                                  |
 | ----------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
