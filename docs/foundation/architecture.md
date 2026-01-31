@@ -120,7 +120,7 @@ source/api/
 
 | Item           | Convention                                                                      |
 | -------------- | ------------------------------------------------------------------------------- |
-| Factory        | Use `makeApiClient<T, TCreate, TRead, TUpdate, TDelete>(spec)` factory function |
+| Factory        | Use `makeApiClient<T, TCreate, TUpdate>(spec)` factory function                 |
 | Naming         | `{Abstraction}Api` object in `{abstractions}-api.ts` (e.g., `UsersApi`)         |
 | Return types   | Return domain types directly (`User`, `User[]`); never expose HTTP envelopes    |
 | Error handling | Throw `ApiError` on failures; callers use try/catch                             |
@@ -393,8 +393,8 @@ RuntimeConfig (class in utils/runtime.ts)
   get(name: string): string
 
 Provider Implementations:
+  utils/configure-deno.ts              → DenoProvider (console.error + Deno.exit)
   serverless/lib/configure-netlify.ts  → NetlifyProvider (throws Response)
-  serverless/lib/configure-deno.ts     → DenoProvider (console.error + Deno.exit)
   api/lib/configure-solid.ts           → SolidProvider (throws Error)
 
 Bootstrap Files (config.ts):
@@ -429,22 +429,16 @@ api/config/
   api-local.env
   api-stage.env
   api-prod.env
-
-tests/config/
-  config.ts
-  tests-local.env
-  tests-stage.env
-  tests-prod.env
 ```
 
 ### 19.5 Usage pattern
 
 ```typescript
 // Bootstrap file declares required parameters once
-import { ConfigureDeno } from '@serverless-lib/configure-deno.ts'
+import { ConfigureDeno } from '@utils/configure-deno.ts'
 import { ConfigureNetlify } from '@serverless-lib/configure-netlify.ts'
 
-const Config = 'Netlify' in self ? ConfigureNetlify : ConfigureDeno
+const Config = 'Deno' in self ? ConfigureDeno : ConfigureNetlify
 
 Config.init(['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET'])
 

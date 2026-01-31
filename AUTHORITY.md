@@ -110,10 +110,10 @@ Direct access to `Deno.env` or `Netlify.env` is restricted to config provider im
 
 **Allowed:**
 
+- `utils/configure-deno.ts` - Accesses `Deno.env`.
 - `serverless/lib/configure-netlify.ts` - Accesses `Netlify.env`.
-- `serverless/lib/configure-deno.ts` - Accesses `Deno.env`.
-- `tests/lib/test-config.ts` - Accesses `Deno.env`.
-- `apps/lib/configure-solid.ts` - Accesses `import.meta.env`.
+- `api/lib/configure-solid.ts` - Accesses `import.meta.env`.
+- `tests/lib/test-config.ts` - Accesses `Deno.env` (if needed for test-specific config).
 
 **Forbidden:**
 
@@ -157,17 +157,16 @@ source/
 
 ### 14.3 Config providers
 
-Config provider implementations must live in deployment context `lib/` directories:
+Config provider implementations:
 
 ```text
 source/
+  utils/
+    configure-deno.ts       # Shared Deno provider (used by serverless, api, tests)
   serverless/lib/
-    configure-netlify.ts
-    configure-deno.ts
-  apps/lib/
-    configure-solid.ts
-  tests/lib/
-    test-config.ts
+    configure-netlify.ts    # Netlify-specific provider
+  api/lib/
+    configure-solid.ts      # Browser/SSR provider for apps
 ```
 
-**Rationale:** This organization enforces architectural boundaries and prevents cross-context configuration pollution.
+**Rationale:** `ConfigureDeno` lives in utils as a shared foundation. Context-specific providers (Netlify, Solid) live in their respective lib directories.
