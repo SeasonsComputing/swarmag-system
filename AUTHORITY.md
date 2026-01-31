@@ -25,9 +25,8 @@
 
 - Write all code in TypeScript.
 - Keep TypeScript compiler settings aligned with `module: ESNext`, `moduleResolution: bundler`, and `baseUrl: source`.
-- Use path aliases `@domain/*`, `@utils/*`, `@serverless-lib`, and `@serverless-api/*` for imports.
+- Use path aliases `@domain/*`, `@utils/*`, `@api/*`, `@serverless-lib/*`, `@serverless-functions/*`, `@serverless-mappings/*` for imports.
 - Keep tooling, linting, and builds free of warnings.
-- Use `App` for environment access and tests; do not use `Deno.env` or `Deno.test` outside `source/utils/app.ts`.
 - Treat all environment variables as required; do not use hard-coded defaults.
 - Files must live in leaf directories; directories with subdirectories must not contain files.
 
@@ -104,3 +103,71 @@
 | -------------- | ---------------------------------------------- |
 | Project access | You are authorized to access the project root. |
 | Deno           | You are authorized to run Deno.                |
+
+## 13. Environment Variable Access
+
+Direct access to `Deno.env` or `Netlify.env` is restricted to config provider implementations:
+
+**Allowed:**
+
+- `serverless/lib/configure-netlify.ts` - Accesses `Netlify.env`.
+- `serverless/lib/configure-deno.ts` - Accesses `Deno.env`.
+- `tests/lib/test-config.ts` - Accesses `Deno.env`.
+- `apps/lib/configure-solid.ts` - Accesses `import.meta.env`.
+
+**Forbidden:**
+
+- Application code using `Deno.env.get()` directly.
+- Utility functions accessing environment variables.
+- Domain logic reading configuration directly.
+
+**Rationale:** Centralizing environment access through config providers enables context-appropriate error handling, a priori parameter validation, consistent fast-fail behavior, and runtime environment detection.
+
+## 14. Configuration File Locations
+
+### 14.1 Bootstrap files
+
+Bootstrap files (`config.ts`) must live in deployment context `config/` directories:
+
+```text
+source/
+  serverless/config/config.ts
+  apps/admin/config/config.ts
+  apps/ops/config/config.ts
+  apps/customer/config/config.ts
+  tests/config/config.ts
+```
+
+### 14.2 Environment files
+
+Environment value files (`.env`) must be co-located with bootstrap files:
+
+```text
+source/
+  serverless/config/
+    serverless-local.env
+    serverless-stage.env
+    serverless-prod.env
+  apps/admin/config/
+    admin-local.env
+    admin-stage.env
+    admin-prod.env
+  [etc.]
+```
+
+### 14.3 Config providers
+
+Config provider implementations must live in deployment context `lib/` directories:
+
+```text
+source/
+  serverless/lib/
+    configure-netlify.ts
+    configure-deno.ts
+  apps/lib/
+    configure-solid.ts
+  tests/lib/
+    test-config.ts
+```
+
+**Rationale:** This organization enforces architectural boundaries and prevents cross-context configuration pollution.

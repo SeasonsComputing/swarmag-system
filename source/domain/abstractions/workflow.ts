@@ -3,7 +3,7 @@
  * Workflows define the steps for executing services.
  */
 
-import type { Location, Note, Question } from '@domain/common.ts'
+import type { Location, Note, Question } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@utils'
 
 /** A step in a workflow, including checklists and requirements. */

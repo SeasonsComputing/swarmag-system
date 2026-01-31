@@ -2,36 +2,13 @@
  * Domain-level invariant validators for jobs.
  */
 
-import type { JobAssessment, JobLogEntry, JobPlan, JobStatus } from '@domain/job.ts'
+import type { JobCreateInput, JobLogAppendInput } from '@domain/protocol/job-protocol.ts'
 
-export type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>
-
-export type JobPlanInput =
-  & Omit<
-    JobPlan,
-    'id' | 'jobId' | 'status' | 'createdAt' | 'updatedAt'
-  >
-  & { status?: JobStatus }
-
-export type JobCreateInput = {
-  serviceId: string
-  customerId: string
-  assessment: JobAssessmentInput
-  plan: JobPlanInput
-}
-
-export type JobLogAppendInput = {
-  jobId: JobLogEntry['jobId']
-  planId: JobLogEntry['planId']
-  type: JobLogEntry['type']
-  message: string
-  location?: JobLogEntry['location']
-  attachments?: JobLogEntry['attachments']
-  payload?: JobLogEntry['payload']
-  createdBy: JobLogEntry['createdBy']
-  occurredAt?: JobLogEntry['occurredAt']
-}
-
+/**
+ * Validate job creation input.
+ * @param input - Job creation input to validate.
+ * @returns Error message or null if valid.
+ */
 export const validateJobCreateInput = (input?: JobCreateInput | null): string | null => {
   if (!input?.serviceId) return 'serviceId is required'
   if (!input.customerId) return 'customerId is required'
@@ -42,6 +19,11 @@ export const validateJobCreateInput = (input?: JobCreateInput | null): string | 
   return null
 }
 
+/**
+ * Validate job log append input.
+ * @param input - Job log append input to validate.
+ * @returns Error message or null if valid.
+ */
 export const validateJobLogAppendInput = (input?: JobLogAppendInput | null): string | null => {
   if (!input?.jobId) return 'jobId is required'
   if (!input.planId) return 'planId is required'

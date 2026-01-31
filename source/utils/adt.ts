@@ -7,6 +7,7 @@
  */
 
 /**
- * A generic object type with string keys and unknown values.
+ * Abstract data types.
  */
 export type Dictionary = Record<string, unknown>
+export class StringSet extends Set<string> {}

@@ -3,7 +3,7 @@
  * Chemicals include herbicides, pesticides, fertilizers, etc. used in operations.
  */
 
-import type { Attachment, Note } from '@domain/common.ts'
+import type { Attachment, Note } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@utils'
 
 /** The different usages for chemicals. */

@@ -3,7 +3,7 @@
  * Customers represent clients who have operations and sites to be serviced.
  */
 
-import type { Address, Author, Location, Note } from '@domain/common.ts'
+import type { Address, Author, Location, Note } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@utils'
 
 /** Represents a contact person associated with a customer. */

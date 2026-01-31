@@ -1,22 +1,25 @@
 {
   "imports": {
     "@api/": "./source/api/",
+    "@apps/": "./source/apps/",
     "@domain/": "./source/domain/",
     "@utils": "./source/utils/mod.ts",
     "@utils/": "./source/utils/",
+    "@serverless/": "./source/serverless/",
     "@serverless-lib/": "./source/serverless/lib/",
     "@serverless-functions/": "./source/serverless/functions/",
     "@serverless-mappings/": "./source/serverless/mappings/",
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
     "@supabase/client": "https://esm.sh/@supabase/supabase-js@2",
     "@tests-fixtures/": "./source/tests/fixtures/",
-    "@tests-helpers/": "./source/tests/api/helpers/"
+    "@tests-helpers/": "./source/tests/helpers/",
+    "@tests-lib/": "./source/tests/lib/"
   },
   "tasks": {
-    "guard:architecture": "deno run --allow-read scripts/architecture-guard.ts",
-    "guard:env": "deno run --allow-read scripts/env-guard.ts",
-    "guard:leaf": "deno run --allow-read scripts/leaf-guard.ts",
-    "guard:validation": "deno run --allow-read scripts/validation-guard.ts",
+    "guard:architecture": "deno run --allow-read devops/scripts/architecture-guard.ts",
+    "guard:env": "deno run --allow-read devops/scripts/env-guard.ts",
+    "guard:leaf": "deno run --allow-read devops/scripts/leaf-guard.ts",
+    "guard:validation": "deno run --allow-read devops/scripts/validation-guard.ts",
     "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno check source/**/*.ts && deno task lint",
     "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",
     "lint": "deno lint source && deno task lint:md",

@@ -2,8 +2,8 @@
  * Customer fixture samples for tests.
  */
 
-import type { Location } from '@domain/common.ts'
-import type { Customer } from '@domain/customer.ts'
+import type { Location } from '@domain/abstractions/common.ts'
+import type { Customer } from '@domain/abstractions/customer.ts'
 import { id } from '@utils'
 
 const customerId = id()
@@ -38,8 +38,7 @@ export const blueMesaRanchCustomer: Customer = {
   accountManager: {
     id: accountManagerId,
     displayName: 'Nia Wright',
-    roles: ['operations'],
-    role: 'account-executive'
+    roles: ['sales']
   },
   primaryContactId,
   sites: [

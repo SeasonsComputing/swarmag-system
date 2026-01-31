@@ -24,17 +24,17 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 
 ### 1.3 Common abstractions shared within the model
 
-| Abstraction  | Description                                                             |
-| ------------ | ----------------------------------------------------------------------- |
-| `User`       | Identity/profile with role memberships and contact info                 |
-| `Author`     | Lightweight attribution slice of `User` with a curated attribution role |
-| `Note`       | Freeform text with author/time                                          |
-| `Attachment` | File reference metadata and uploader                                    |
-| `Address`    | Postal address fields                                                   |
-| `Location`   | Coordinate plus optional address                                        |
-| `Coordinate` | Latitude/longitude pair                                                 |
-| `Question`   | Prompt used in assessments/forms                                        |
-| `Answer`     | Response to a question                                                  |
+| Abstraction  | Description                                                      |
+| ------------ | ---------------------------------------------------------------- |
+| `User`       | Identity/profile with role memberships and contact info          |
+| `Author`     | Lightweight attribution slice of `User` (id, displayName, roles) |
+| `Note`       | Freeform text with author/time                                   |
+| `Attachment` | File reference metadata and uploader                             |
+| `Address`    | Postal address fields                                            |
+| `Location`   | Coordinate plus optional address                                 |
+| `Coordinate` | Latitude/longitude pair                                          |
+| `Question`   | Prompt used in assessments/forms                                 |
+| `Answer`     | Response to a question                                           |
 
 ### 1.4 Supporting structures present in code (refer to type definitions for details)
 
@@ -72,9 +72,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 ### 1.7 Roles & attribution
 
 - User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `source/domain/common.ts`; `User.roles` is an array so a user may hold multiple memberships.
-- Attribution uses curated roles, not free text: `AUTHOR_ATTRIBUTION_ROLES` in `source/domain/common.ts` lists role ids/labels and the contexts they apply to (e.g., `assessment-lead`, `crew-lead`, `field-tech`, `fleet-manager`, `account-executive`).
-- `Author.role` stores the attribution role id from `AUTHOR_ATTRIBUTION_ROLES`; UI should render the label from that catalog and never collect arbitrary text.
-- If a context does not supply a meaningful attribution role, omit it rather than prompting the user for input.
+- `Author` is a lightweight slice of `User` containing `id`, `displayName`, and `roles`; it carries the user's membership roles for attribution context.
 
 ### 1.8 API surface summary
 

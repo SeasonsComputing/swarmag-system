@@ -1,13 +1,16 @@
 {
   "imports": {
     "@domain/": "./source/domain/",
+    "@utils": "./source/utils/mod.ts",
     "@utils/": "./source/utils/",
+    "@serverless/": "./source/serverless/",
     "@serverless-lib/": "./source/serverless/lib/",
     "@serverless-mappings/": "./source/serverless/mappings/",
     "@serverless-functions/": "./source/serverless/functions/",
     "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
-    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2",
+    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2",
     "@tests-fixtures/": "./source/tests/fixtures/",
-    "@tests-helpers/": "./source/tests/api/helpers/"
+    "@tests-helpers/": "./source/tests/helpers/",
+    "@tests-lib/": "./source/tests/lib/"
   }
 }

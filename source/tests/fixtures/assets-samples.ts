@@ -2,7 +2,7 @@
  * Asset fixture samples for tests.
  */
 
-import type { Asset, AssetType } from '@domain/asset.ts'
+import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import { id } from '@utils'
 
 const transportTruckTypeId = id()
@@ -102,8 +102,7 @@ export const droneAssetSample: Asset = {
       uploadedBy: {
         id: id(),
         displayName: 'Noah Price',
-        roles: ['operations'],
-        role: 'field-tech'
+        roles: ['operations']
       }
     }
   ],
@@ -128,8 +127,7 @@ export const sprayerTruckSample: Asset = {
       uploadedBy: {
         id: id(),
         displayName: 'Yara Singh',
-        roles: ['operations'],
-        role: 'fleet-manager'
+        roles: ['operations']
       }
     }
   ],

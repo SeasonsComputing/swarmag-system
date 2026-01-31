@@ -85,20 +85,82 @@ LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read sourc
 
 | Path                           | Purpose                                                           |
 | ------------------------------ | ----------------------------------------------------------------- |
-| `source/domain/`               | Canonical domain types (Service, Asset, Job, etc.) and validators |
+| `source/domain/abstractions/`  | Canonical domain types (User, Service, Asset, Job, etc.)          |
+| `source/domain/validators/`    | Domain invariant validators and type guards                       |
+| `source/domain/protocol/`      | Request/response shapes and protocol validation                   |
 | `source/utils/`                | Shared primitives: `id()` (UUID v7), `when()` (ISO 8601 UTC)      |
+| `source/api/`                  | Typed SDK for apps to consume the serverless runtime              |
 | `source/serverless/functions/` | Netlify Edge Functions (REST API endpoints)                       |
 | `source/serverless/lib/`       | Backend platform helpers (Netlify adapter, Supabase client)       |
 | `source/serverless/mappings/`  | DB row ↔ domain type conversion helpers                           |
 | `source/migrations/`           | Supabase SQL migrations (symlinked to `supabase/migrations`)      |
 | `source/tests/`                | Test specs and fixtures                                           |
-| `source/apps/`                 | Planned SolidJS apps (admin, ops, customer)                       |
+| `source/apps/`                 | SolidJS apps (admin, ops, customer)                               |
 | `docs/foundation/`             | Architecture, domain model, style guide                           |
 | `docs/applications/`           | App-specific briefs and user stories                              |
 
 ### 3.3 Development sequence
 
 **Extend the domain model first, then implement or update the API layer that exposes it, and only then build or modify the apps that consume it.**
+
+### 3.4 Runtime configuration system
+
+SwarmAg uses a consistent configuration interface across all deployment contexts with context-appropriate error handling.
+
+**Config Providers** implement a static class pattern with three methods:
+
+- `init(required: readonly string[])` - Validates and caches required parameters.
+- `get(name: string): string` - Returns guaranteed non-null value.
+- `fail(message: string): never` - Context-appropriate error handling.
+
+**Bootstrap Files** (`config.ts`) live in each context's `config/` directory and:
+
+- Detect runtime environment (serverless only).
+- Call `init()` with required parameters.
+- Re-export as `Config` for isomorphic access.
+
+**Environment Files** (`.env`) are co-located with bootstrap files:
+
+- Format: `{context}-{environment}.env`.
+- One per deployment context per environment (local/stage/prod).
+- Never committed if they contain secrets.
+
+**Implementation Locations:**
+
+```text
+source/
+  serverless/
+    lib/
+      configure-netlify.ts    # Netlify Edge implementation
+      configure-deno.ts       # Plain Deno implementation
+    config/
+      config.ts            # Bootstrap with runtime detection
+      serverless-*.env     # Environment values
+  api/
+    lib/
+      configure-solid.ts   # Browser/SSR implementation
+    config/
+      config.ts            # Bootstrap for API client
+      api-*.env            # Environment values
+  tests/
+    config/
+      config.ts            # Bootstrap
+      tests-*.env          # Environment values
+```
+
+**Usage:** Application code always imports from bootstrap:
+
+```typescript
+import { Config } from '@serverless/config/config.ts'
+
+const dbUrl = Config.get('SUPABASE_URL') // Guaranteed string, no null checks
+```
+
+**Error Handling:** Each context fails fast with appropriate mechanism:
+
+- **Netlify Edge**: `throw new Response(message, { status: 500 })`
+- **Browser/SSR**: `throw new Error(message)`
+- **CLI/Tests**: `console.error(message); Deno.exit(1)`
 
 ## 4. Domain Model
 
@@ -113,7 +175,9 @@ See `docs/foundation/domain.md` for canonical definitions and rules.
 - All identifiers are UUID v7 generated via `id()` from `@utils/identifier`; validate with `isID()`.
 - All timestamps are ISO 8601 UTC strings generated via `when()` from `@utils/datetime`; validate with `isWhen()`.
 - Domain types must be JSON-serializable.
-- Validators live in `source/domain/*-validators.ts` and are the single source of truth for invariants.
+- Abstractions live in `source/domain/abstractions/` - pure data shapes with no sibling imports.
+- Validators live in `source/domain/validators/` - invariant checks that import only from abstractions.
+- Protocol types live in `source/domain/protocol/` - wire shapes that import from abstractions and validators.
 - Soft deletes: `deletedAt?: When`; undefined/null means active, filter queries to `deleted_at IS NULL`.
 - Job logs are append-only.
 
@@ -121,13 +185,15 @@ See `docs/foundation/domain.md` for canonical definitions and rules.
 
 Configured in `deno.json`:
 
+- `@api/` → `source/api/`
 - `@domain/` → `source/domain/`
-- `@utils/` → `source/utils/`
+- `@utils` → `source/utils/mod.ts`
 - `@serverless-lib/` → `source/serverless/lib/`
 - `@serverless-functions/` → `source/serverless/functions/`
 - `@serverless-mappings/` → `source/serverless/mappings/`
 - `@tests-fixtures/` → `source/tests/fixtures/`
-- `@tests-helpers/` → `source/tests/api/helpers/`
+- `@tests-helpers/` → `source/tests/helpers/`
+- `@tests-lib/` → `source/tests/lib/`
 
 **Netlify Edge Functions:** Use `netlify-import-map.json` (kept aligned with `deno.json`, with root-relative paths).
 
@@ -168,7 +234,7 @@ For list endpoints:
 
 - Clamp `limit` to 1-100 with default of 25.
 - Parse `cursor` as non-negative integer defaulting to 0.
-- Use `Supabase.clampLimit` and `Supabase.parseCursor`.
+- Use `clampLimit()` and `parseCursor()` from `@serverless-lib/db-binding.ts`.
 
 ## 6. Authority & Constraints
 

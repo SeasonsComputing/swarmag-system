@@ -2,7 +2,7 @@
  * Common question/answer fixtures for tests.
  */
 
-import type { Question } from '@domain/common.ts'
+import type { Question } from '@domain/abstractions/common.ts'
 import { id } from '@utils'
 
 export const preflightInspectionQuestion: Question = {

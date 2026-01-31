@@ -13,42 +13,6 @@ export const USER_ROLES = [
 ] as const
 export type UserRole = (typeof USER_ROLES)[number]
 
-/** Contexts where an author attribution role is used. */
-export type AuthorAttributionContext =
-  | 'customer-account'
-  | 'job-assessment'
-  | 'job-plan'
-  | 'job-log'
-  | 'asset'
-
-/** Curated roles for attribution avoid free-form labels. */
-export const AUTHOR_ATTRIBUTION_ROLES = [
-  {
-    id: 'account-manager',
-    label: 'Account Executive',
-    contexts: [
-      'customer-account',
-      'job-assessment',
-      'job-plan',
-      'job-log',
-      'asset'
-    ]
-  },
-  {
-    id: 'crew-lead',
-    label: 'Crew Lead',
-    contexts: ['job-plan', 'job-log', 'asset']
-  },
-  { id: 'crew-staff', label: 'Crew Staff', contexts: ['job-log', 'asset'] }
-] as const satisfies ReadonlyArray<{
-  id: string
-  label: string
-  contexts: readonly AuthorAttributionContext[]
-}>
-
-export type AuthorAttributionRole = (typeof AUTHOR_ATTRIBUTION_ROLES)[number]
-export type AuthorAttributionRoleId = AuthorAttributionRole['id']
-
 /** Represents a user in the system. */
 export interface User {
   id: ID
@@ -64,9 +28,7 @@ export interface User {
 }
 
 /** A subset of User information for authorship. */
-export type Author = Pick<User, 'id' | 'displayName' | 'roles'> & {
-  role?: AuthorAttributionRoleId
-}
+export type Author = Pick<User, 'id' | 'displayName' | 'roles'>
 
 /** Represents a note or comment. */
 export interface Note {

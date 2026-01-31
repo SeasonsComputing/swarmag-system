@@ -137,3 +137,120 @@ const user = rowToUser(data)
 | Clarity   | Use domain-specific names (e.g., `JobAssessment`, `JobLogEntry`) |
 | Enums     | String unions for enums (e.g., `JobStatus`, `JobLogType`)        |
 | Optionals | Mark optional fields with `?`; handle defaults in handlers       |
+
+## 13. Runtime Configuration Conventions
+
+### 13.1 Config provider classes
+
+Config provider classes follow a consistent static class pattern with isomorphic interface conformance. Use the class name (not `this`) when referring to static members:
+
+```typescript
+export class ExampleConfig {
+  static #initialized = false
+  static #cache = new Set<string>()
+
+  static init(required: readonly string[]): void {
+    if (ExampleConfig.#initialized) ExampleConfig.fail('Already initialized')
+
+    const missing = required.filter(key => !ExampleConfig.#source.get(key))
+    if (missing.length > 0) {
+      ExampleConfig.fail(`Missing required config: ${missing.join(', ')}`)
+    }
+
+    ExampleConfig.#cache = new Set(required)
+    ExampleConfig.#initialized = true
+  }
+
+  static get(name: string): string {
+    if (!ExampleConfig.#initialized) ExampleConfig.fail('Not initialized')
+    if (!ExampleConfig.#cache.has(name)) ExampleConfig.fail(`Config not registered: ${name}`)
+
+    const value = ExampleConfig.#source.get(name)
+    if (!value) ExampleConfig.fail(`${name} missing at runtime`)
+    return value
+  }
+
+  static fail(message: string): never {
+    // Context-appropriate error handling
+  }
+}
+```
+
+### 13.2 Bootstrap files
+
+Bootstrap files (`config.ts`) live in each deployment context's `config/` directory and:
+
+1. Import appropriate config provider(s).
+2. Detect runtime environment if needed (serverless only).
+3. Call `init()` with required parameters list.
+4. Re-export as `Config` for isomorphic interface.
+
+```typescript
+// serverless/config/config.ts
+import { ConfigureDeno } from '@serverless-lib/configure-deno.ts'
+import { ConfigureNetlify } from '@serverless-lib/configure-netlify.ts'
+
+const Config = 'Netlify' in self ? ConfigureNetlify : ConfigureDeno
+
+Config.init([
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_KEY'
+])
+
+export { Config }
+```
+
+### 13.3 Environment files
+
+Environment files follow the naming convention `{context}-{environment}.env`:
+
+- Use kebab-case for filenames.
+- One file per deployment context per environment.
+- Co-located with bootstrap file in `config/` directory.
+- Never committed if they contain secrets (use `.gitignore`).
+
+Example structure:
+
+```text
+serverless/config/
+  config.ts
+  serverless-local.env
+  serverless-stage.env
+  serverless-prod.env
+```
+
+### 13.4 Import conventions
+
+Always import from bootstrap, never from provider directly:
+
+```typescript
+import { Config } from '@apps/admin/config/config.ts' // Correct
+import { ConfigureNetlify } from '@serverless-lib/configure-netlify.ts' // Wrong
+import { Config } from '@serverless/config/config.ts' // Correct
+```
+
+### 13.5 Parameter naming
+
+Configuration parameter names should be:
+
+- **SCREAMING_SNAKE_CASE** for environment variables.
+- Prefixed appropriately: `VITE_` for client-side app variables, no prefix for server-side.
+- Descriptive and unambiguous: `SUPABASE_URL`, `API_BASE_URL` (not `URL`, `DB`).
+
+### 13.6 Error messages
+
+Error messages from config failures should be:
+
+- Actionable: "Missing required config: SUPABASE_URL".
+- Context-aware: Include what failed and why.
+- Consistent: Use same phrasing across providers.
+- Never expose secrets in error messages.
+
+### 13.7 Documentation
+
+When adding new configuration parameters:
+
+1. Add to architecture parameter matrix table.
+2. Add to appropriate `.env` files with example values.
+3. Update bootstrap `init()` call to include new parameter.
+4. Document purpose and valid value formats.

@@ -2,7 +2,7 @@
  * Sample job fixtures for tests.
  */
 
-import type { JobAssessment, JobLogEntry } from '@domain/job.ts'
+import type { JobAssessment, JobLogEntry } from '@domain/abstractions/job.ts'
 import { id } from '@utils'
 
 const serviceId = id()
@@ -21,8 +21,7 @@ export const ranchMappingAssessment: JobAssessment = {
   assessor: {
     id: assessorId,
     displayName: 'Morgan Diaz',
-    roles: ['operations'],
-    role: 'assessment-lead'
+    roles: ['operations']
   },
   assessedAt: '2025-01-12T14:00:00Z',
   locations: [
@@ -47,8 +46,7 @@ export const ranchMappingAssessment: JobAssessment = {
       uploadedBy: {
         id: assessorId,
         displayName: 'Morgan Diaz',
-        roles: ['operations'],
-        role: 'assessment-lead'
+        roles: ['operations']
       }
     },
     {
@@ -60,8 +58,7 @@ export const ranchMappingAssessment: JobAssessment = {
       uploadedBy: {
         id: id(),
         displayName: 'Priya Mehta',
-        roles: ['operations'],
-        role: 'field-tech'
+        roles: ['operations']
       }
     }
   ],
@@ -86,8 +83,7 @@ export const fieldPhotoLogEntry: JobLogEntry = {
   createdBy: {
     id: jobLogAuthorId,
     displayName: 'Evan Cole',
-    roles: ['operations'],
-    role: 'crew-lead'
+    roles: ['operations']
   },
   location: {
     coordinate: { latitude: 32.2144, longitude: -97.1234 },
@@ -103,8 +99,7 @@ export const fieldPhotoLogEntry: JobLogEntry = {
       uploadedBy: {
         id: jobLogAuthorId,
         displayName: 'Evan Cole',
-        roles: ['operations'],
-        role: 'crew-lead'
+        roles: ['operations']
       }
     },
     {
@@ -116,8 +111,7 @@ export const fieldPhotoLogEntry: JobLogEntry = {
       uploadedBy: {
         id: jobLogAuthorId,
         displayName: 'Evan Cole',
-        roles: ['operations'],
-        role: 'crew-lead'
+        roles: ['operations']
       }
     }
   ],

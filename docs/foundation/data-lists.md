@@ -39,15 +39,3 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 | Dispensing Drone        |
 | Drone Spray Tank        |
 | Drone Granular Hopper   |
-
-## 5. Author Attribution Roles
-
-Curated roles used for authorship/attribution (`Author.role` in the domain). These should stay in sync with `AUTHOR_ATTRIBUTION_ROLES` in `source/domain/common.ts`.
-
-| Role ID           | Label             | Contexts          |
-| ----------------- | ----------------- | ----------------- |
-| account-executive | Account Executive | customer-account  |
-| assessment-lead   | Assessment Lead   | job-assessment    |
-| crew-lead         | Crew Lead         | job-plan, job-log |
-| field-tech        | Field Tech        | job-log, asset    |
-| fleet-manager     | Fleet Manager     | asset             |

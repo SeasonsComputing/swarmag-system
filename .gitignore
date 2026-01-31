@@ -11,3 +11,8 @@ build
 .env.local
 .env.*.local
 .netlify
+
+# Environment files (keep .example files only)
+**/*-local.env
+**/*-stage.env
+**/*-prod.env
