@@ -132,14 +132,14 @@ source/api/
 
 The `api-client-binding.ts` module exports:
 
-| Export            | Purpose                                                               |
-| ----------------- | --------------------------------------------------------------------- |
-| `makeApiClient`   | Factory function to create typed API client objects                   |
-| `ApiSpecification`| Configuration interface for the factory (`{ basePath: string }`)      |
-| `ListOptions`     | Pagination parameters (`{ limit?: number; cursor?: number }`)         |
-| `ListResult<T>`   | Paginated response (`{ data: T[]; cursor: number; hasMore: boolean}`) |
-| `DeleteResult`    | Soft-delete response (`{ id: ID; deletedAt: When }`)                  |
-| `ApiError`        | Error class with `status` and optional `details`                      |
+| Export             | Purpose                                                               |
+| ------------------ | --------------------------------------------------------------------- |
+| `makeApiClient`    | Factory function to create typed API client objects                   |
+| `ApiSpecification` | Configuration interface for the factory (`{ basePath: string }`)      |
+| `ListOptions`      | Pagination parameters (`{ limit?: number; cursor?: number }`)         |
+| `ListResult<T>`    | Paginated response (`{ data: T[]; cursor: number; hasMore: boolean}`) |
+| `DeleteResult`     | Soft-delete response (`{ id: ID; deletedAt: When }`)                  |
+| `ApiError`         | Error class with `status` and optional `details`                      |
 
 ### 7.5 Usage pattern
 
@@ -435,8 +435,8 @@ api/config/
 
 ```typescript
 // Bootstrap file declares required parameters once
-import { ConfigureDeno } from '@utils/configure-deno.ts'
 import { ConfigureNetlify } from '@serverless-lib/configure-netlify.ts'
+import { ConfigureDeno } from '@utils/configure-deno.ts'
 
 const Config = 'Deno' in self ? ConfigureDeno : ConfigureNetlify
 

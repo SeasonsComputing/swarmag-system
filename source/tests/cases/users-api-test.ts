@@ -213,8 +213,6 @@ Deno.test('UsersApi.delete throws ApiError when not found', async () => {
   }
 })
 
-
-
 Deno.test('UsersApi handles server errors with details', async () => {
   const cleanup = mockFetch(() => {
     return jsonResponse(500, { error: 'Database connection failed', details: 'Connection timeout' })

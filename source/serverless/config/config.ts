@@ -3,8 +3,8 @@
  * Detects Netlify vs Deno environment and initializes appropriate provider.
  */
 
-import { ConfigureDeno } from '@utils/configure-deno.ts'
 import { ConfigureNetlify } from '@serverless-lib/configure-netlify.ts'
+import { ConfigureDeno } from '@utils/configure-deno.ts'
 
 const Config = 'Deno' in self ? ConfigureDeno : ConfigureNetlify
 

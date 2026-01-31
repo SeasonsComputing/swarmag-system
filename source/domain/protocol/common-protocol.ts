@@ -72,5 +72,3 @@ export const validateUserUpdateInput = (input?: UserUpdateInput | null): string 
   if (input?.roles && !isUserRoles(input.roles)) return 'roles must be an array of UserRole'
   return null
 }
-
-
