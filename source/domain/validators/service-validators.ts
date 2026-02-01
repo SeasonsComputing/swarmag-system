@@ -3,7 +3,10 @@
  */
 
 import type { Service } from '@domain/abstractions/service.ts'
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
+import type { ServiceCreateInput, ServiceUpdateInput } from '@domain/protocol/service-protocol.ts'
+import { isNonEmptyString } from './helper-validators.ts'
+
+export type { ServiceCreateInput, ServiceUpdateInput }
 
 /**
  * Type guard for supported service categories.
@@ -20,25 +23,6 @@ export const isServiceCategory = (value: unknown): value is Service['category'] 
  */
 export const isIdArray = (value: unknown): value is string[] =>
   Array.isArray(value) && value.every(item => typeof item === 'string' && item.length > 0)
-
-/** Input type for creating a service. */
-export interface ServiceCreateInput {
-  name: string
-  sku: string
-  description?: string
-  category: Service['category']
-  requiredAssetTypes: string[]
-}
-
-/** Input type for updating a service. */
-export interface ServiceUpdateInput {
-  id: string
-  name?: string
-  sku?: string
-  description?: string | null
-  category?: Service['category']
-  requiredAssetTypes?: string[]
-}
 
 /**
  * Validate service creation input.

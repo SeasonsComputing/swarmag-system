@@ -3,8 +3,16 @@
  */
 
 import type { Service } from '@domain/abstractions/service.ts'
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
-import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
+import { isNonEmptyString } from '@domain/validators/helper-validators.ts'
+import {
+  type ApiRequest,
+  type ApiResponse,
+  toBadRequest,
+  toInternalError,
+  toMethodNotAllowed,
+  toNotFound,
+  toOk
+} from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { rowToService } from '@serverless-mappings/services-mapping.ts'
@@ -19,39 +27,24 @@ export const config = { path: '/api/services/get' }
  * @param req - API request wrapper containing query parameters.
  * @returns API result with the service payload or an error response.
  */
-const handle = async (
-  req: ApiRequest<undefined, { id?: string }>
-): Promise<ApiResponse> => {
-  if (req.method !== 'GET') {
-    return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
-  }
+const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiResponse> => {
+  if (req.method !== 'GET') return toMethodNotAllowed()
 
   const serviceId = req.query?.id
-  if (!isNonEmptyString(serviceId)) {
-    return { statusCode: HttpCodes.badRequest, body: { error: 'id is required' } }
-  }
+  if (!isNonEmptyString(serviceId)) return toBadRequest('id is required')
 
-  const { data, error } = await Supabase.client()
-    .from('services')
-    .select('*')
-    .eq('id', serviceId)
-    .single()
+  const { data, error } = await Supabase.client().from('services').select('*').eq('id', serviceId).single()
 
-  if (error || !data) {
-    return { statusCode: HttpCodes.notFound, body: { error: 'Service not found' } }
-  }
+  if (error || !data) return toNotFound('Service not found')
 
   let service: Service
   try {
     service = rowToService(data)
   } catch (parseError) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: { error: 'Invalid service record returned from Supabase', details: (parseError as Error).message }
-    }
+    return toInternalError('Invalid service record returned from Supabase', parseError as Error)
   }
 
-  return { statusCode: HttpCodes.ok, body: { data: service } }
+  return toOk(service)
 }
 
 export default createApiHandler(handle)

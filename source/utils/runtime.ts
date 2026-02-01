@@ -1,6 +1,5 @@
 /**
  * Implementation internals of the runtime configuration.
- * @module runtime
  */
 
 import { StringSet } from './adt.ts'
@@ -14,7 +13,9 @@ export interface RuntimeProvider {
    * @param key - Environment variable name to read.
    * @returns Environment variable value.
    */
-  get(key: string): string | undefined
+  get(key: string):
+    | string
+    | undefined
 
   /**
    * Fail with a message.

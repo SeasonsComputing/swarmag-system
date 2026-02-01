@@ -2,9 +2,9 @@
  * Domain-level invariant validators for jobs.
  */
 
-import type { JobStatus } from '@domain/abstractions/job.ts'
-import type { JobCreateInput, JobLogAppendInput } from '@domain/protocol/job-protocol.ts'
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
+import type { JobStatus } from '../abstractions/job.ts'
+import type { JobCreateInput, JobLogAppendInput } from '../protocol/job-protocol.ts'
+import { isNonEmptyString } from './helper-validators.ts'
 
 /**
  * Type guard for job status.

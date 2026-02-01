@@ -14,18 +14,9 @@ export const isAssetStatus = (value: unknown): value is Asset['status'] =>
   value === 'active' || value === 'maintenance' || value === 'retired' || value === 'reserved'
 
 /** Map a domain Asset into a Supabase row shape. */
-export const assetToRow = (asset: Asset) => ({
-  id: asset.id,
-  label: asset.label,
-  description: asset.description ?? null,
-  serial_number: asset.serialNumber ?? null,
-  type: asset.type,
-  status: asset.status,
-  attachments: asset.attachments ?? null,
-  created_at: asset.createdAt,
-  updated_at: asset.updatedAt,
-  payload: asset
-})
+export const assetToRow = (asset: Asset) => ({ id: asset.id, label: asset.label, description: asset.description ?? null,
+  serial_number: asset.serialNumber ?? null, type: asset.type, status: asset.status,
+  attachments: asset.attachments ?? null, created_at: asset.createdAt, updated_at: asset.updatedAt, payload: asset })
 
 /**
  * Convert a Supabase row into an Asset domain model.
@@ -65,28 +56,16 @@ export const rowToAsset = (row: unknown): Asset => {
     throw new Error('Asset row is missing required fields')
   }
 
-  return {
-    id,
-    label,
-    description: (record.description ?? undefined) as string | undefined,
-    serialNumber: (record.serial_number ?? record.serialNumber ?? undefined) as string | undefined,
-    type,
-    status,
+  return { id, label, description: (record.description ?? undefined) as string | undefined,
+    serialNumber: (record.serial_number ?? record.serialNumber ?? undefined) as string | undefined, type, status,
     attachments: Array.isArray(record.attachments) ? record.attachments : undefined,
     createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
-  }
+    updatedAt: (record.updated_at ?? record.updatedAt) as string }
 }
 
 /** Map a domain AssetType into a Supabase row shape. */
-export const assetTypeToRow = (assetType: AssetType) => ({
-  id: assetType.id,
-  label: assetType.label,
-  active: assetType.active,
-  created_at: assetType.createdAt,
-  updated_at: assetType.updatedAt,
-  payload: assetType
-})
+export const assetTypeToRow = (assetType: AssetType) => ({ id: assetType.id, label: assetType.label,
+  active: assetType.active, created_at: assetType.createdAt, updated_at: assetType.updatedAt, payload: assetType })
 
 /**
  * Convert a Supabase row into an AssetType domain model.
@@ -104,11 +83,7 @@ export const rowToAssetType = (row: unknown): AssetType => {
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string'
-      && typeof payload.label === 'string'
-      && typeof payload.active === 'boolean'
-    ) {
+    if (typeof payload.id === 'string' && typeof payload.label === 'string' && typeof payload.active === 'boolean') {
       return payload as unknown as AssetType
     }
   }
@@ -122,11 +97,6 @@ export const rowToAssetType = (row: unknown): AssetType => {
     throw new Error('AssetType row is missing required fields')
   }
 
-  return {
-    id,
-    label,
-    active,
-    createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
-  }
+  return { id, label, active, createdAt: (record.created_at ?? record.createdAt) as string,
+    updatedAt: (record.updated_at ?? record.updatedAt) as string }
 }

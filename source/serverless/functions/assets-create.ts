@@ -4,7 +4,14 @@
 
 import type { Asset } from '@domain/abstractions/asset.ts'
 import { type AssetCreateInput, validateAssetCreate } from '@domain/validators/asset-validators.ts'
-import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
+import {
+  type ApiRequest,
+  type ApiResponse,
+  toCreated,
+  toInternalError,
+  toMethodNotAllowed,
+  toUnprocessable
+} from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { assetToRow } from '@serverless-mappings/assets-mapping.ts'
@@ -20,43 +27,22 @@ export const config = { path: '/api/assets/create' }
  * @param req - Netlify-friendly API request wrapper containing the body.
  * @returns API result with created asset or an error response.
  */
-const handle = async (
-  req: ApiRequest<AssetCreateInput>
-): Promise<ApiResponse> => {
-  if (req.method !== 'POST') {
-    return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
-  }
+const handle = async (req: ApiRequest<AssetCreateInput>): Promise<ApiResponse> => {
+  if (req.method !== 'POST') return toMethodNotAllowed()
 
   const validationError = validateAssetCreate(req.body)
-  if (validationError) {
-    return { statusCode: HttpCodes.unprocessableEntity, body: { error: validationError } }
-  }
+  if (validationError) return toUnprocessable(validationError)
 
   const now = when()
-  const asset: Asset = {
-    id: id(),
-    label: req.body.label.trim(),
-    description: req.body.description?.trim(),
-    serialNumber: req.body.serialNumber?.trim(),
-    type: req.body.type,
-    status: req.body.status ?? 'active',
-    attachments: undefined,
-    createdAt: now,
-    updatedAt: now
-  }
+  const asset: Asset = { id: id(), label: req.body.label.trim(), description: req.body.description?.trim(),
+    serialNumber: req.body.serialNumber?.trim(), type: req.body.type, status: req.body.status ?? 'active',
+    attachments: undefined, createdAt: now, updatedAt: now }
 
-  const { error } = await Supabase.client()
-    .from('assets')
-    .insert(assetToRow(asset))
+  const { error } = await Supabase.client().from('assets').insert(assetToRow(asset))
 
-  if (error) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: { error: 'Failed to create asset', details: error.message }
-    }
-  }
+  if (error) return toInternalError('Failed to create asset', error)
 
-  return { statusCode: HttpCodes.created, body: { data: asset } }
+  return toCreated(asset)
 }
 
 export default createApiHandler(handle)

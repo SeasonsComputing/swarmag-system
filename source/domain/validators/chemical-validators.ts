@@ -3,7 +3,10 @@
  */
 
 import type { Chemical } from '@domain/abstractions/chemical.ts'
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
+import type { ChemicalCreateInput, ChemicalUpdateInput } from '@domain/protocol/chemical-protocol.ts'
+import { isNonEmptyString } from './helper-validators.ts'
+
+export type { ChemicalCreateInput, ChemicalUpdateInput }
 
 /**
  * Type guard for chemical usage.
@@ -24,31 +27,6 @@ export const isChemicalUsage = (value: unknown): value is Chemical['usage'] =>
  */
 export const isSignalWord = (value: unknown): value is Chemical['signalWord'] =>
   value === undefined || value === null || value === 'danger' || value === 'warning' || value === 'caution'
-
-/** Input type for creating a chemical. */
-export interface ChemicalCreateInput {
-  name: string
-  epaNumber?: string
-  usage: Chemical['usage']
-  signalWord?: Chemical['signalWord']
-  restrictedUse: boolean
-  reEntryIntervalHours?: number
-  storageLocation?: string
-  sdsUrl?: string
-}
-
-/** Input type for updating a chemical. */
-export interface ChemicalUpdateInput {
-  id: string
-  name?: string
-  epaNumber?: string | null
-  usage?: Chemical['usage']
-  signalWord?: Chemical['signalWord'] | null
-  restrictedUse?: boolean
-  reEntryIntervalHours?: number | null
-  storageLocation?: string | null
-  sdsUrl?: string | null
-}
 
 /**
  * Validate chemical creation input.

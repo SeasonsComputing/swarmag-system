@@ -71,7 +71,16 @@
 - Diagrams explain intent; CI enforces reality.
 - Developer-owned bundling and committed build artifacts are forbidden.
 
-## 9. Domain Validation Ownership
+## 9. Terminology
+
+| Term        | Usage                                                              |
+| ----------- | ------------------------------------------------------------------ |
+| Abstraction | Domain types in `source/domain/` (User, Job, Asset, etc.)          |
+| Entity      | Reserved for RDBMS schema discussions (tables, rows, foreign keys) |
+
+Use "abstraction" when referring to domain model types; use "entity" only when discussing database schema.
+
+## 10. Domain Validation Ownership
 
 - All invariant validation lives in `source/domain`.
 - Shared validation logic must be implemented once in the domain and reused elsewhere.
@@ -79,7 +88,7 @@
 - Upper layers translate domain validation failures but must not redefine the rules.
 - DRY applies to truth, not transport.
 
-## 10. Api Layer
+## 11. Api Layer
 
 - The Api layer (`source/api/`) is the typed SDK for apps to consume the serverless runtime.
 - Api classes are utility classes with static methods only; no instance state.
@@ -87,7 +96,7 @@
 - Api methods throw exceptions on errors; callers handle failures via try/catch.
 - Name Api classes as `{Abstraction}Api` (e.g., `UsersApi`, `JobsApi`).
 
-## 11. Collaboration Preferences
+## 12. Collaboration Preferences
 
 | Preference          | Requirement                                                                            |
 | ------------------- | -------------------------------------------------------------------------------------- |
@@ -97,14 +106,14 @@
 | Naming              | Prefer dashes over underscores in filenames.                                           |
 | Version guidance    | Do not suggest legacy/older tooling variants; assume current, modern tooling only.     |
 
-## 12. Execution Permissions
+## 13. Execution Permissions
 
 | Permission     | Requirement                                    |
 | -------------- | ---------------------------------------------- |
 | Project access | You are authorized to access the project root. |
 | Deno           | You are authorized to run Deno.                |
 
-## 13. Environment Variable Access
+## 14. Environment Variable Access
 
 Direct access to `Deno.env` or `Netlify.env` is restricted to config provider implementations:
 
@@ -123,9 +132,9 @@ Direct access to `Deno.env` or `Netlify.env` is restricted to config provider im
 
 **Rationale:** Centralizing environment access through config providers enables context-appropriate error handling, a priori parameter validation, consistent fast-fail behavior, and runtime environment detection.
 
-## 14. Configuration File Locations
+## 15. Configuration File Locations
 
-### 14.1 Bootstrap files
+### 15.1 Bootstrap files
 
 Bootstrap files (`config.ts`) must live in deployment context `config/` directories:
 
@@ -138,7 +147,7 @@ source/
   tests/config/config.ts
 ```
 
-### 14.2 Environment files
+### 15.2 Environment files
 
 Environment value files (`.env`) must be co-located with bootstrap files:
 
@@ -155,7 +164,7 @@ source/
   [etc.]
 ```
 
-### 14.3 Config providers
+### 15.3 Config providers
 
 Config provider implementations:
 

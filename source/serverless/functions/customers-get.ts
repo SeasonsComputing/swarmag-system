@@ -3,8 +3,16 @@
  */
 
 import type { Customer } from '@domain/abstractions/customer.ts'
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
-import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
+import { isNonEmptyString } from '@domain/validators/helper-validators.ts'
+import {
+  type ApiRequest,
+  type ApiResponse,
+  toBadRequest,
+  toInternalError,
+  toMethodNotAllowed,
+  toNotFound,
+  toOk
+} from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { rowToCustomer } from '@serverless-mappings/customers-mapping.ts'
@@ -19,39 +27,24 @@ export const config = { path: '/api/customers/get' }
  * @param req - API request wrapper containing query parameters.
  * @returns API result with the customer payload or an error response.
  */
-const handle = async (
-  req: ApiRequest<undefined, { id?: string }>
-): Promise<ApiResponse> => {
-  if (req.method !== 'GET') {
-    return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
-  }
+const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiResponse> => {
+  if (req.method !== 'GET') return toMethodNotAllowed()
 
   const customerId = req.query?.id
-  if (!isNonEmptyString(customerId)) {
-    return { statusCode: HttpCodes.badRequest, body: { error: 'id is required' } }
-  }
+  if (!isNonEmptyString(customerId)) return toBadRequest('id is required')
 
-  const { data, error } = await Supabase.client()
-    .from('customers')
-    .select('*')
-    .eq('id', customerId)
-    .single()
+  const { data, error } = await Supabase.client().from('customers').select('*').eq('id', customerId).single()
 
-  if (error || !data) {
-    return { statusCode: HttpCodes.notFound, body: { error: 'Customer not found' } }
-  }
+  if (error || !data) return toNotFound('Customer not found')
 
   let customer: Customer
   try {
     customer = rowToCustomer(data)
   } catch (parseError) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: { error: 'Invalid customer record returned from Supabase', details: (parseError as Error).message }
-    }
+    return toInternalError('Invalid customer record returned from Supabase', parseError as Error)
   }
 
-  return { statusCode: HttpCodes.ok, body: { data: customer } }
+  return toOk(customer)
 }
 
 export default createApiHandler(handle)

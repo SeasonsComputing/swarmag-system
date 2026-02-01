@@ -2,8 +2,16 @@
  * Netlify handler for deleting chemicals.
  */
 
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
-import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
+import { isNonEmptyString } from '@domain/validators/helper-validators.ts'
+import {
+  type ApiRequest,
+  type ApiResponse,
+  HttpCodes,
+  toInternalError,
+  toMethodNotAllowed,
+  toNotFound,
+  toUnprocessable
+} from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { when } from '@utils'
@@ -18,40 +26,21 @@ export const config = { path: '/api/chemicals/delete' }
  * @param req - API request wrapper containing the chemical id to delete.
  * @returns API result with deletion metadata or an error response.
  */
-const handle = async (
-  req: ApiRequest<{ id?: string }>
-): Promise<ApiResponse> => {
-  if (req.method !== 'DELETE') {
-    return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
-  }
+const handle = async (req: ApiRequest<{ id?: string }>): Promise<ApiResponse> => {
+  if (req.method !== 'DELETE') return toMethodNotAllowed()
 
   const chemicalId = req.body?.id
-  if (!isNonEmptyString(chemicalId)) {
-    return { statusCode: HttpCodes.unprocessableEntity, body: { error: 'id is required' } }
-  }
+  if (!isNonEmptyString(chemicalId)) return toUnprocessable('id is required')
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase
-    .from('chemicals')
-    .select('id')
-    .eq('id', chemicalId)
+  const { data: existingRow, error: fetchError } = await supabase.from('chemicals').select('id').eq('id', chemicalId)
     .single()
 
-  if (fetchError || !existingRow) {
-    return { statusCode: HttpCodes.notFound, body: { error: 'Chemical not found' } }
-  }
+  if (fetchError || !existingRow) return toNotFound('Chemical not found')
 
-  const { error: deleteError } = await supabase
-    .from('chemicals')
-    .delete()
-    .eq('id', chemicalId)
+  const { error: deleteError } = await supabase.from('chemicals').delete().eq('id', chemicalId)
 
-  if (deleteError) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: { error: 'Failed to delete chemical', details: deleteError.message }
-    }
-  }
+  if (deleteError) return toInternalError('Failed to delete chemical', deleteError)
 
   return { statusCode: HttpCodes.ok, body: { data: { id: chemicalId, deletedAt: when() } } }
 }

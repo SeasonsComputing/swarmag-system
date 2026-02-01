@@ -2,24 +2,10 @@
  * Domain-level invariant validators for workflows.
  */
 
-import type { WorkflowStep } from '@domain/abstractions/workflow.ts'
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
+import type { WorkflowCreateInput, WorkflowUpdateInput } from '@domain/protocol/workflow-protocol.ts'
+import { isNonEmptyString } from './helper-validators.ts'
 
-/** Input type for creating a workflow. */
-export interface WorkflowCreateInput {
-  serviceId: string
-  name: string
-  description?: string
-  steps: WorkflowStep[]
-}
-
-/** Input type for updating a workflow. */
-export interface WorkflowUpdateInput {
-  id: string
-  name?: string
-  description?: string | null
-  steps?: WorkflowStep[]
-}
+export type { WorkflowCreateInput, WorkflowUpdateInput }
 
 /**
  * Validate workflow creation input.

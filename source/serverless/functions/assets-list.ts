@@ -3,7 +3,13 @@
  */
 
 import type { Asset } from '@domain/abstractions/asset.ts'
-import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
+import {
+  type ApiRequest,
+  type ApiResponse,
+  HttpCodes,
+  toInternalError,
+  toMethodNotAllowed
+} from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { clampLimit, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
@@ -19,60 +25,29 @@ export const config = { path: '/api/assets/list' }
  * @param req - The API request with optional query parameters for limit and cursor.
  * @returns The API result with paginated assets or error.
  */
-const handle = async (
-  req: ApiRequest<undefined, ListQuery>
-): Promise<ApiResponse> => {
-  if (req.method !== 'GET') {
-    return {
-      statusCode: HttpCodes.methodNotAllowed,
-      body: { error: 'Method Not Allowed' }
-    }
-  }
+const handle = async (req: ApiRequest<undefined, ListQuery>): Promise<ApiResponse> => {
+  if (req.method !== 'GET') return toMethodNotAllowed()
 
   const limit = clampLimit(req.query?.limit)
   const cursor = parseCursor(req.query?.cursor)
   const rangeEnd = cursor + limit - 1
 
   const supabase = Supabase.client()
-  const { data, error, count } = await supabase
-    .from('assets')
-    .select('*', { count: 'exact' })
-    .range(cursor, rangeEnd)
+  const { data, error, count } = await supabase.from('assets').select('*', { count: 'exact' }).range(cursor, rangeEnd)
 
-  if (error) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: {
-        error: 'Failed to load assets',
-        details: error.message
-      }
-    }
-  }
+  if (error) return toInternalError('Failed to load assets', error)
 
   let assets: Asset[] = []
   try {
     assets = (data ?? []).map(rowToAsset)
   } catch (parseError) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: {
-        error: 'Invalid asset record returned from Supabase',
-        details: (parseError as Error).message
-      }
-    }
+    return toInternalError('Invalid asset record from database', parseError)
   }
 
   const nextCursor = cursor + assets.length
   const hasMore = typeof count === 'number' ? nextCursor < count : assets.length === limit
 
-  return {
-    statusCode: HttpCodes.ok,
-    body: {
-      data: assets,
-      cursor: nextCursor,
-      hasMore
-    }
-  }
+  return { statusCode: HttpCodes.ok, body: { data: assets, cursor: nextCursor, hasMore } }
 }
 
 export default createApiHandler(handle)

@@ -23,30 +23,15 @@ export const isChemicalUsage = (value: unknown): value is Chemical['usage'] =>
  * @returns True when the value matches a known signal word.
  */
 export const isSignalWord = (value: unknown): value is Chemical['signalWord'] =>
-  value === undefined
-  || value === null
-  || value === 'danger'
-  || value === 'warning'
-  || value === 'caution'
+  value === undefined || value === null || value === 'danger' || value === 'warning' || value === 'caution'
 
 /** Map a domain Chemical into a Supabase row shape. */
-export const chemicalToRow = (chemical: Chemical) => ({
-  id: chemical.id,
-  name: chemical.name,
-  epa_number: chemical.epaNumber ?? null,
-  usage: chemical.usage,
-  signal_word: chemical.signalWord ?? null,
-  restricted_use: chemical.restrictedUse,
-  re_entry_interval_hours: chemical.reEntryIntervalHours ?? null,
-  storage_location: chemical.storageLocation ?? null,
-  sds_url: chemical.sdsUrl ?? null,
-  labels: chemical.labels ?? null,
-  attachments: chemical.attachments ?? null,
-  notes: chemical.notes ?? null,
-  created_at: chemical.createdAt,
-  updated_at: chemical.updatedAt,
-  payload: chemical
-})
+export const chemicalToRow = (chemical: Chemical) => ({ id: chemical.id, name: chemical.name,
+  epa_number: chemical.epaNumber ?? null, usage: chemical.usage, signal_word: chemical.signalWord ?? null,
+  restricted_use: chemical.restrictedUse, re_entry_interval_hours: chemical.reEntryIntervalHours ?? null,
+  storage_location: chemical.storageLocation ?? null, sds_url: chemical.sdsUrl ?? null, labels: chemical.labels ?? null,
+  attachments: chemical.attachments ?? null, notes: chemical.notes ?? null, created_at: chemical.createdAt,
+  updated_at: chemical.updatedAt, payload: chemical })
 
 /**
  * Convert a Supabase row into a Chemical domain model.
@@ -88,13 +73,8 @@ export const rowToChemical = (row: unknown): Chemical => {
 
   const signalWord = record.signal_word ?? record.signalWord
 
-  return {
-    id,
-    name,
-    epaNumber: (record.epa_number ?? record.epaNumber ?? undefined) as string | undefined,
-    usage,
-    signalWord: isSignalWord(signalWord) ? signalWord ?? undefined : undefined,
-    restrictedUse,
+  return { id, name, epaNumber: (record.epa_number ?? record.epaNumber ?? undefined) as string | undefined, usage,
+    signalWord: isSignalWord(signalWord) ? signalWord ?? undefined : undefined, restrictedUse,
     reEntryIntervalHours: (record.re_entry_interval_hours ?? record.reEntryIntervalHours ?? undefined) as
       | number
       | undefined,
@@ -104,6 +84,5 @@ export const rowToChemical = (row: unknown): Chemical => {
     attachments: Array.isArray(record.attachments) ? record.attachments : undefined,
     notes: Array.isArray(record.notes) ? record.notes : undefined,
     createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
-  }
+    updatedAt: (record.updated_at ?? record.updatedAt) as string }
 }

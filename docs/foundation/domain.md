@@ -50,17 +50,14 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 
 ### 2.3 Common abstractions shared within the model
 
-| Abstraction  | Description                                                      |
-| ------------ | ---------------------------------------------------------------- |
-| `User`       | Identity/profile with role memberships and contact info          |
-| `Author`     | Lightweight attribution slice of `User` (id, displayName, roles) |
-| `Note`       | Freeform text with author/time                                   |
-| `Attachment` | File reference metadata and uploader                             |
-| `Address`    | Postal address fields                                            |
-| `Location`   | Coordinate plus optional address                                 |
-| `Coordinate` | Latitude/longitude pair                                          |
-| `Question`   | Prompt used in assessments/forms                                 |
-| `Answer`     | Response to a question                                           |
+| Abstraction  | Location      | Description                                             |
+| ------------ | ------------- | ------------------------------------------------------- |
+| `Location`   | `common.ts`   | Coordinate plus optional address                        |
+| `Note`       | `common.ts`   | Freeform text with author/time                          |
+| `Attachment` | `common.ts`   | File reference metadata and uploader                    |
+| `User`       | `user.ts`     | Identity/profile with role memberships and contact info |
+| `Question`   | `workflow.ts` | Prompt used in assessments/forms                        |
+| `Answer`     | `workflow.ts` | Response to a question                                  |
 
 ### 2.4 Supporting structures present in code (refer to type definitions for details)
 
@@ -97,10 +94,27 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 
 ### 2.7 Roles & attribution
 
-- User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `source/domain/common.ts`; `User.roles` is an array so a user may hold multiple memberships.
-- `Author` is a lightweight slice of `User` containing `id`, `displayName`, and `roles`; it carries the user's membership roles for attribution context.
+- User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `source/domain/abstractions/user.ts`; `User.roles` is an array so a user may hold multiple memberships.
 
-### 2.8 API surface summary
+### 2.8 Domain layer file organization
+
+The domain layer follows an abstraction-per-file pattern across three subdirectories:
+
+| Layer           | Abstraction file              | Shared/helper file     |
+| --------------- | ----------------------------- | ---------------------- |
+| `abstractions/` | `{abstraction}.ts`            | `common.ts`            |
+| `validators/`   | `{abstraction}-validators.ts` | `helper-validators.ts` |
+| `protocol/`     | `{abstraction}-protocol.ts`   | `helpers-protocol.ts`  |
+
+**Placement rules:**
+
+- Abstraction-specific types belong in abstraction files (e.g., `User` in `user.ts`), not `common.ts`.
+- Truly shared types (Location, Note, Attachment) stay in `common.ts`.
+- Concept-owning types live with their owner (Question, Answer in `workflow.ts`).
+- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `helpers-protocol.ts`.
+- Shared validators (isNonEmptyString) live in `helper-validators.ts`.
+
+### 2.9 API surface summary
 
 | Abstraction       | Actions                                                                                  | Notes                                                                                  |
 | ----------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |

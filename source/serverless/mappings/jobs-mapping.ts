@@ -19,17 +19,9 @@ export const isJobStatus = (value: unknown): value is JobStatus =>
   || value === 'cancelled'
 
 /** Map a domain Job into a Supabase row shape. */
-export const jobToRow = (job: Job) => ({
-  id: job.id,
-  assessment_id: job.assessmentId,
-  plan_id: job.planId,
-  service_id: job.serviceId,
-  customer_id: job.customerId,
-  status: job.status,
-  created_at: job.createdAt,
-  updated_at: job.updatedAt,
-  payload: job
-})
+export const jobToRow = (job: Job) => ({ id: job.id, assessment_id: job.assessmentId, plan_id: job.planId,
+  service_id: job.serviceId, customer_id: job.customerId, status: job.status, created_at: job.createdAt,
+  updated_at: job.updatedAt, payload: job })
 
 /**
  * Convert a Supabase row into a Job domain model.
@@ -69,46 +61,21 @@ export const rowToJob = (row: unknown): Job => {
   const customerId = (record.customer_id ?? record.customerId) as string
   const status = record.status
 
-  if (
-    !id
-    || !assessmentId
-    || !planId
-    || !serviceId
-    || !customerId
-    || !isJobStatus(status)
-  ) {
+  if (!id || !assessmentId || !planId || !serviceId || !customerId || !isJobStatus(status)) {
     throw new Error('Job row is missing required fields')
   }
 
-  return {
-    id,
-    assessmentId,
-    planId,
-    serviceId,
-    customerId,
-    status,
+  return { id, assessmentId, planId, serviceId, customerId, status,
     createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
-  }
+    updatedAt: (record.updated_at ?? record.updatedAt) as string }
 }
 
 /** Map a domain JobAssessment into a Supabase row shape. */
-export const jobAssessmentToRow = (assessment: JobAssessment) => ({
-  id: assessment.id,
-  service_id: assessment.serviceId,
-  customer_id: assessment.customerId,
-  contact_id: assessment.contactId ?? null,
-  assessor_id: assessment.assessorId,
-  assessed_at: assessment.assessedAt,
-  locations: assessment.locations,
-  questions: assessment.questions,
-  risks: assessment.risks ?? null,
-  notes: assessment.notes ?? null,
-  attachments: assessment.attachments ?? null,
-  created_at: assessment.createdAt,
-  updated_at: assessment.updatedAt,
-  payload: assessment
-})
+export const jobAssessmentToRow = (assessment: JobAssessment) => ({ id: assessment.id, service_id: assessment.serviceId,
+  customer_id: assessment.customerId, contact_id: assessment.contactId ?? null, assessor_id: assessment.assessorId,
+  assessed_at: assessment.assessedAt, locations: assessment.locations, questions: assessment.questions,
+  risks: assessment.risks ?? null, notes: assessment.notes ?? null, attachments: assessment.attachments ?? null,
+  created_at: assessment.createdAt, updated_at: assessment.updatedAt, payload: assessment })
 
 /**
  * Convert a Supabase row into a JobAssessment domain model.
@@ -142,21 +109,10 @@ export const rowToJobAssessment = (row: unknown): JobAssessment => {
 }
 
 /** Map a domain JobPlan into a Supabase row shape. */
-export const jobPlanToRow = (plan: JobPlan) => ({
-  id: plan.id,
-  job_id: plan.jobId,
-  workflow_id: plan.workflowId,
-  scheduled_start: plan.scheduledStart,
-  scheduled_end: plan.scheduledEnd ?? null,
-  target_locations: plan.targetLocations,
-  assignments: plan.assignments,
-  assets: plan.assets,
-  chemicals: plan.chemicals,
-  notes: plan.notes ?? null,
-  created_at: plan.createdAt,
-  updated_at: plan.updatedAt,
-  payload: plan
-})
+export const jobPlanToRow = (plan: JobPlan) => ({ id: plan.id, job_id: plan.jobId, workflow_id: plan.workflowId,
+  scheduled_start: plan.scheduledStart, scheduled_end: plan.scheduledEnd ?? null,
+  target_locations: plan.targetLocations, assignments: plan.assignments, assets: plan.assets, chemicals: plan.chemicals,
+  notes: plan.notes ?? null, created_at: plan.createdAt, updated_at: plan.updatedAt, payload: plan })
 
 /**
  * Convert a Supabase row into a JobPlan domain model.
@@ -188,19 +144,10 @@ export const rowToJobPlan = (row: unknown): JobPlan => {
 }
 
 /** Map a domain JobLogEntry into a Supabase row shape. */
-export const jobLogEntryToRow = (entry: JobLogEntry) => ({
-  id: entry.id,
-  job_id: entry.jobId,
-  plan_id: entry.planId,
-  type: entry.type,
-  message: entry.message,
-  occurred_at: entry.occurredAt,
-  created_at: entry.createdAt,
-  created_by_id: entry.createdById,
-  location: entry.location ?? null,
-  attachments: entry.attachments ?? null,
-  payload: entry
-})
+export const jobLogEntryToRow = (entry: JobLogEntry) => ({ id: entry.id, job_id: entry.jobId, plan_id: entry.planId,
+  type: entry.type, message: entry.message, occurred_at: entry.occurredAt, created_at: entry.createdAt,
+  created_by_id: entry.createdById, location: entry.location ?? null, attachments: entry.attachments ?? null,
+  payload: entry })
 
 /**
  * Convert a Supabase row into a JobLogEntry domain model.

@@ -24,12 +24,9 @@ import {
  */
 export interface ApiAdapterConfig {
   /** Enable CORS headers in responses. Default: false */
-  cors?: boolean | {
-    origin?: string
-    methods?: string[]
-    headers?: string[]
-    credentials?: boolean
-  }
+  cors?:
+    | boolean
+    | { origin?: string; methods?: string[]; headers?: string[]; credentials?: boolean }
   /** Maximum request body size in bytes. Default: 6MB (Netlify limit) */
   maxBodySize?: number
   /** Validate Content-Type header for requests with bodies. Default: true */
@@ -73,10 +70,7 @@ const normalizeHeaders = (headers: Headers): HttpHeaders => {
  * @param enableMultiValue Whether to merge multi-value parameters.
  * @returns Clean query object with string values (multi-values joined with commas).
  */
-const normalizeQuery = (
-  params: URLSearchParams,
-  enableMultiValue: boolean
-): HttpQuery => {
+const normalizeQuery = (params: URLSearchParams, enableMultiValue: boolean): HttpQuery => {
   const normalized: HttpQuery = {}
   const keys = new Set<string>()
   params.forEach((_value, key) => keys.add(key))
@@ -111,18 +105,13 @@ const normalizeHeaderMap = (headers: HttpHeaders): HttpHeaders => {
  * @param config CORS configuration.
  * @returns Headers object with CORS headers.
  */
-const buildCorsHeaders = (
-  config: boolean | NonNullable<ApiAdapterConfig['cors']>
-): HttpHeaders => {
+const buildCorsHeaders = (config: boolean | NonNullable<ApiAdapterConfig['cors']>): HttpHeaders => {
   if (config === false) return {}
   const corsConfig = config === true ? {} : config
-  return {
-    [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
+  return { [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
     [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ') ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization',
-    [HEADER_VARY]: 'Origin',
-    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {})
-  }
+    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization', [HEADER_VARY]: 'Origin',
+    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {}) }
 }
 
 /**
@@ -137,91 +126,6 @@ const toHeaders = (headers: HttpHeaders): Headers => {
   }
   return responseHeaders
 }
-
-/**
- * HTTP status codes that should not include a response body.
- */
-const NO_BODY_STATUS_CODES = new Set([204, 304])
-
-/**
- * Build a Response with consistent headers.
- * @param statusCode HTTP status code.
- * @param body JSON-serializable payload, or a pre-serialized string when using a custom content-type.
- * @param additionalHeaders Optional additional headers to merge.
- * @param config Adapter configuration for CORS, etc.
- * @returns Fetch Response.
- */
-const buildResponse = (
-  statusCode: number,
-  body: unknown,
-  additionalHeaders: HttpHeaders = {},
-  config: ApiAdapterConfig = {}
-): Response => {
-  const corsHeaders = config.cors ? buildCorsHeaders(config.cors) : {}
-  const normalizedResponseHeaders = normalizeHeaderMap(additionalHeaders)
-
-  if (NO_BODY_STATUS_CODES.has(statusCode)) {
-    return new Response('', {
-      status: statusCode,
-      headers: toHeaders({
-        ...corsHeaders,
-        ...normalizedResponseHeaders
-      })
-    })
-  }
-
-  const customContentType = normalizedResponseHeaders[HEADER_CONTENT_TYPE]
-  const isJsonResponse = !customContentType
-    || customContentType.toLowerCase().includes('application/json')
-
-  let bodyString: string
-  if (isJsonResponse) {
-    try {
-      bodyString = JSON.stringify(body === undefined ? null : body)
-    } catch (err) {
-      console.error('Handler returned non-serializable response body:', body)
-      return buildErrorResponse(
-        HttpCodes.internalError,
-        'InvalidResponse',
-        `Response body is not JSON-serializable: ${(err as Error).message}`,
-        config
-      )
-    }
-  } else if (typeof body === 'string') {
-    bodyString = body
-  } else {
-    return buildErrorResponse(
-      HttpCodes.internalError,
-      'InvalidResponse',
-      'Non-JSON responses must provide a string body',
-      config
-    )
-  }
-
-  return new Response(bodyString, {
-    status: statusCode,
-    headers: toHeaders({
-      ...(isJsonResponse ? { [HEADER_CONTENT_TYPE]: 'application/json' } : {}),
-      ...corsHeaders,
-      ...normalizedResponseHeaders
-    })
-  })
-}
-
-/**
- * Build a standardized error response envelope.
- * @param statusCode HTTP status code.
- * @param error Error name or label.
- * @param details Error details string.
- * @param config Adapter configuration.
- * @returns Fetch Response.
- */
-const buildErrorResponse = (
-  statusCode: number,
-  error: string,
-  details: string,
-  config: ApiAdapterConfig = {}
-): Response => buildResponse(statusCode, { error, details }, {}, config)
 
 /**
  * Validate that status code is in valid HTTP range.
@@ -287,10 +191,7 @@ const parseRequestBody = async (
   if (contentLength) {
     const parsedLength = Number.parseInt(contentLength, 10)
     if (!Number.isNaN(parsedLength) && parsedLength > maxSize) {
-      throw new NamedError(
-        'PayloadTooLarge',
-        `Request body exceeds maximum size of ${maxSize} bytes`
-      )
+      throw new NamedError('PayloadTooLarge', `Request body exceeds maximum size of ${maxSize} bytes`)
     }
   }
 
@@ -301,20 +202,15 @@ const parseRequestBody = async (
 
   const bodySize = byteLength(decodedBody)
   if (bodySize > maxSize) {
-    throw new NamedError(
-      'PayloadTooLarge',
-      `Request body exceeds maximum size of ${maxSize} bytes`
-    )
+    throw new NamedError('PayloadTooLarge', `Request body exceeds maximum size of ${maxSize} bytes`)
   }
 
   // Validate Content-Type for bodies
   if (config.validateContentType !== false) {
     const ct = contentType?.toLowerCase() ?? ''
     if (!ct.includes('application/json')) {
-      throw new NamedError(
-        'InvalidContentType',
-        `Expected Content-Type: application/json, received: ${contentType ?? 'none'}`
-      )
+      throw new NamedError('InvalidContentType',
+        `Expected Content-Type: application/json, received: ${contentType ?? 'none'}`)
     }
   }
 
@@ -325,6 +221,72 @@ const parseRequestBody = async (
     throw new NamedError('InvalidJSON', `Invalid JSON: ${(err as Error).message}`)
   }
 }
+
+/**
+ * HTTP status codes that should not include a response body.
+ */
+const NO_BODY_STATUS_CODES = new Set([204, 304])
+
+/**
+ * Build a Response with consistent headers.
+ * @param statusCode HTTP status code.
+ * @param body JSON-serializable payload, or a pre-serialized string when using a custom content-type.
+ * @param additionalHeaders Optional additional headers to merge.
+ * @param config Adapter configuration for CORS, etc.
+ * @returns Fetch Response.
+ */
+const makeResponse = (
+  statusCode: number,
+  body: unknown,
+  additionalHeaders: HttpHeaders = {},
+  config: ApiAdapterConfig = {}
+): Response => {
+  const corsHeaders = config.cors ? buildCorsHeaders(config.cors) : {}
+  const normalizedResponseHeaders = normalizeHeaderMap(additionalHeaders)
+
+  if (NO_BODY_STATUS_CODES.has(statusCode)) {
+    return new Response('', { status: statusCode,
+      headers: toHeaders({ ...corsHeaders, ...normalizedResponseHeaders }) })
+  }
+
+  const customContentType = normalizedResponseHeaders[HEADER_CONTENT_TYPE]
+  const isJsonResponse = !customContentType || customContentType.toLowerCase().includes('application/json')
+
+  let bodyString: string
+  if (isJsonResponse) {
+    try {
+      bodyString = JSON.stringify(body === undefined ? null : body)
+    } catch (err) {
+      console.error('Handler returned non-serializable response body:', body)
+      return makeErrorResponse(HttpCodes.internalError, 'InvalidResponse',
+        `Response body is not JSON-serializable: ${(err as Error).message}`, config)
+    }
+  } else if (typeof body === 'string') {
+    bodyString = body
+  } else {
+    return makeErrorResponse(HttpCodes.internalError, 'InvalidResponse',
+      'Non-JSON responses must provide a string body', config)
+  }
+
+  return new Response(bodyString, { status: statusCode,
+    headers: toHeaders({ ...(isJsonResponse ? { [HEADER_CONTENT_TYPE]: 'application/json' } : {}), ...corsHeaders,
+      ...normalizedResponseHeaders }) })
+}
+
+/**
+ * Build a standardized error response envelope.
+ * @param statusCode HTTP status code.
+ * @param error Error name or label.
+ * @param details Error details string.
+ * @param config Adapter configuration.
+ * @returns Fetch Response.
+ */
+export const makeErrorResponse = (
+  statusCode: number,
+  error: string,
+  details: string,
+  config: ApiAdapterConfig = {}
+): Response => makeResponse(statusCode, { error, details }, {}, config)
 
 /**
  * Adapt a typed API handler to the Edge Request/Response contract.
@@ -345,55 +307,39 @@ export const createApiHandler = <RequestBody = unknown, Query = HttpQuery, Respo
       const method = request.method
 
       if (method === 'OPTIONS' && config.cors) {
-        return buildResponse(HttpCodes.noContent, '', {}, config)
+        return makeResponse(HttpCodes.noContent, '', {}, config)
       }
 
       if (!isHttpMethod(method)) {
-        return buildErrorResponse(
-          HttpCodes.methodNotAllowed,
-          'MethodNotAllowed',
-          `HTTP method '${method}' is not supported`,
-          config
-        )
+        return makeErrorResponse(HttpCodes.methodNotAllowed, 'MethodNotAllowed',
+          `HTTP method '${method}' is not supported`, config)
       }
 
       const headers = normalizeHeaders(request.headers)
 
       let body: unknown
       try {
-        body = await parseRequestBody(
-          request,
-          method,
-          headers['content-type'],
-          config
-        )
+        body = await parseRequestBody(request, method, headers['content-type'], config)
       } catch (err) {
         const { name, message } = serializeError(err)
-        const statusCode = name === 'PayloadTooLarge'
-          ? HttpCodes.payloadTooLarge
-          : HttpCodes.badRequest
-        return buildErrorResponse(statusCode, name, message, config)
+        const statusCode = name === 'PayloadTooLarge' ? HttpCodes.payloadTooLarge : HttpCodes.badRequest
+        return makeErrorResponse(statusCode, name, message, config)
       }
 
       const url = new URL(request.url)
       const query = normalizeQuery(url.searchParams, config.multiValueQueryParams ?? false)
 
-      const apiRequest: ApiRequest<RequestBody, Query, HttpHeaders> = {
-        method,
-        body: body as RequestBody,
-        query: query as Query,
-        headers,
-        rawRequest: request
-      }
+      const apiRequest: ApiRequest<RequestBody, Query, HttpHeaders> = { method, body: body as RequestBody,
+        query: query as Query, headers, rawRequest: request }
 
       const result: ApiResponse<ResponseBody, HttpHeaders> = await handle(apiRequest)
       const statusCode = validateStatusCode(result.statusCode)
 
-      return buildResponse(statusCode, result.body, result.headers, config)
+      return makeResponse(statusCode, result.body, result.headers, config)
     } catch (err) {
       const { name, message } = serializeError(err)
       console.error('Unhandled error in Edge handler:', { name, message, err })
-      return buildErrorResponse(HttpCodes.internalError, name, message, config)
+      return makeErrorResponse(HttpCodes.internalError, name, message, config)
     }
   }
 }

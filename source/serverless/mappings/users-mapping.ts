@@ -2,24 +2,15 @@
  * Mappers for converting between Supabase user rows and domain Users.
  */
 
-import type { User } from '@domain/abstractions/common.ts'
-import { isUserRoles, isUserStatus } from '@domain/validators/common-validators.ts'
+import type { User } from '@domain/abstractions/user.ts'
+import { isUserRoles, isUserStatus } from '@domain/validators/user-validators.ts'
 import type { Dictionary } from '@utils'
 
 /** Map a domain User into a Supabase row shape. */
-export const userToRow = (user: User) => ({
-  id: user.id,
-  display_name: user.displayName,
-  primary_email: user.primaryEmail,
-  phone_number: user.phoneNumber,
-  avatar_url: user.avatarUrl ?? null,
-  roles: user.roles ?? null,
-  status: user.status ?? 'active',
-  created_at: user.createdAt,
-  updated_at: user.updatedAt,
-  deleted_at: user.deletedAt ?? null,
-  payload: user
-})
+export const userToRow = (user: User) => ({ id: user.id, display_name: user.displayName,
+  primary_email: user.primaryEmail, phone_number: user.phoneNumber, avatar_url: user.avatarUrl ?? null,
+  roles: user.roles ?? null, status: user.status ?? 'active', created_at: user.createdAt, updated_at: user.updatedAt,
+  deleted_at: user.deletedAt ?? null, payload: user })
 
 /**
  * Convert a Supabase row into a User domain model.
@@ -56,16 +47,11 @@ export const rowToUser = (row: unknown): User => {
     throw new Error('User row is missing required fields')
   }
 
-  return {
-    id,
-    displayName,
-    primaryEmail,
-    phoneNumber,
+  return { id, displayName, primaryEmail, phoneNumber,
     avatarUrl: (record.avatar_url ?? record.avatarUrl) as string | undefined,
     roles: isUserRoles(record.roles) ? record.roles : undefined,
     status: isUserStatus(record.status) ? record.status : undefined,
     createdAt: (record.created_at ?? record.createdAt) as string | undefined,
     updatedAt: (record.updated_at ?? record.updatedAt) as string | undefined,
-    deletedAt: (record.deleted_at ?? record.deletedAt) as string | undefined
-  }
+    deletedAt: (record.deleted_at ?? record.deletedAt) as string | undefined }
 }

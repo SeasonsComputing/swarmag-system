@@ -3,11 +3,9 @@
  */
 
 import { makeApiClient } from '@api/lib/api-client-binding.ts'
-import type { User } from '@domain/abstractions/common.ts'
-import type { UserCreateInput, UserUpdateInput } from '@domain/protocol/common-protocol.ts'
+import type { User } from '@domain/abstractions/user.ts'
+import type { UserCreateInput, UserUpdateInput } from '@domain/protocol/user-protocol.ts'
 
-const UsersApi = makeApiClient<User, UserCreateInput, UserUpdateInput>({
-  basePath: '/api/users'
-})
+const UsersApi = makeApiClient<User, UserCreateInput, UserUpdateInput>({ basePath: '/api/users' })
 
 export { UsersApi }

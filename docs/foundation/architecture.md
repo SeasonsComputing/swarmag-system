@@ -145,16 +145,11 @@ The `api-client-binding.ts` module exports:
 
 ```typescript
 // Define API client using factory
-const UsersApi = makeApiClient<User, UserCreateInput, UserUpdateInput>({
-  basePath: '/api/users'
-})
+const UsersApi = makeApiClient<User, UserCreateInput, UserUpdateInput>({ basePath: '/api/users' })
 
 // Create
-const user = await UsersApi.create({
-  displayName: 'Ada Lovelace',
-  primaryEmail: 'ada@example.com',
-  phoneNumber: '555-0100'
-})
+const user = await UsersApi.create({ displayName: 'Ada Lovelace', primaryEmail: 'ada@example.com',
+  phoneNumber: '555-0100' })
 
 // Get by ID
 const fetched = await UsersApi.get(user.id)
@@ -260,6 +255,51 @@ source/
 devops/
   scripts/
 ```
+
+### 9.2 Domain layer organization
+
+The domain layer follows a strict abstraction-per-file pattern. Each domain abstraction has corresponding files across three subdirectories:
+
+```text
+source/domain/
+  abstractions/
+    common.ts              # Shared types: Location, Note, Attachment
+    user.ts                # User, UserRole, USER_ROLES
+    service.ts             # Service, ServiceCategory
+    asset.ts               # Asset, AssetType, AssetStatus
+    chemical.ts            # Chemical, ChemicalUsage, SignalWord
+    customer.ts            # Customer, Contact, CustomerSite
+    workflow.ts            # Workflow, WorkflowStep, Question, Answer
+    job.ts                 # Job, JobAssessment, JobPlan, JobLogEntry
+  validators/
+    helper-validators.ts   # Shared: isNonEmptyString
+    user-validators.ts     # isUserStatus, isUserRoles, validateUserCreateInput, validateUserUpdateInput
+    service-validators.ts  # isServiceCategory, validateServiceCreate, validateServiceUpdate
+    asset-validators.ts    # isAssetStatus, validateAssetCreate, validateAssetUpdate
+    chemical-validators.ts # isChemicalUsage, validateChemicalCreate, validateChemicalUpdate
+    customer-validators.ts # isCustomerStatus, validateCustomerCreate, validateCustomerUpdate
+    workflow-validators.ts # validateWorkflowCreate, validateWorkflowUpdate
+    job-validators.ts      # isJobStatus, validateJobCreate, validateJobLogAppend
+  protocol/
+    helpers-protocol.ts    # Shared: ListOptions, ListResult, DeleteResult
+    user-protocol.ts       # UserCreateInput, UserUpdateInput
+    job-protocol.ts        # JobCreateInput, JobLogAppendInput
+```
+
+**Naming conventions:**
+
+| Layer           | Abstraction file              | Shared/helper file     |
+| --------------- | ----------------------------- | ---------------------- |
+| `abstractions/` | `{abstraction}.ts`            | `common.ts`            |
+| `validators/`   | `{abstraction}-validators.ts` | `helper-validators.ts` |
+| `protocol/`     | `{abstraction}-protocol.ts`   | `helpers-protocol.ts`  |
+
+**Placement rules:**
+
+- Abstraction-specific types belong in abstraction files, not `common.ts`.
+- Types used by multiple abstractions (Location, Note, Attachment) stay in `common.ts`.
+- Workflow-related types (Question, Answer, QuestionType) live in `workflow.ts` since workflows own that concept.
+- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `helpers-protocol.ts`.
 
 ## 10. Build, CI/CD, Deployment
 

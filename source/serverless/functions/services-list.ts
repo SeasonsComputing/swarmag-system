@@ -3,7 +3,13 @@
  */
 
 import type { Service } from '@domain/abstractions/service.ts'
-import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
+import {
+  type ApiRequest,
+  type ApiResponse,
+  HttpCodes,
+  toInternalError,
+  toMethodNotAllowed
+} from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { clampLimit, type ListQuery, parseCursor } from '@serverless-lib/db-binding.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
@@ -19,15 +25,8 @@ export const config = { path: '/api/services/list' }
  * @param req - The API request with optional query parameters for limit and cursor.
  * @returns The API result with paginated services or error.
  */
-const handle = async (
-  req: ApiRequest<undefined, ListQuery>
-): Promise<ApiResponse> => {
-  if (req.method !== 'GET') {
-    return {
-      statusCode: HttpCodes.methodNotAllowed,
-      body: { error: 'Method Not Allowed' }
-    }
-  }
+const handle = async (req: ApiRequest<undefined, ListQuery>): Promise<ApiResponse> => {
+  if (req.method !== 'GET') return toMethodNotAllowed()
 
   const limit = clampLimit(req.query?.limit)
   const cursor = parseCursor(req.query?.cursor)
@@ -35,46 +34,22 @@ const handle = async (
 
   const supabase = Supabase.client()
 
-  const { data, error, count } = await supabase
-    .from('services')
-    .select('*', { count: 'exact' })
-    .range(cursor, rangeEnd)
+  const { data, error, count } = await supabase.from('services').select('*', { count: 'exact' }).range(cursor, rangeEnd)
 
-  if (error) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: {
-        error: 'Failed to load services',
-        details: error.message
-      }
-    }
-  }
+  if (error) return toInternalError('Failed to load services', error)
 
   let services: Service[] = []
 
   try {
     services = (data ?? []).map(rowToService)
   } catch (parseError) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: {
-        error: 'Invalid service record returned from Supabase',
-        details: (parseError as Error).message
-      }
-    }
+    return toInternalError('Invalid service record returned from Supabase', parseError as Error)
   }
 
   const nextCursor = cursor + services.length
   const hasMore = typeof count === 'number' ? nextCursor < count : services.length === limit
 
-  return {
-    statusCode: HttpCodes.ok,
-    body: {
-      data: services,
-      cursor: nextCursor,
-      hasMore
-    }
-  }
+  return { statusCode: HttpCodes.ok, body: { data: services, cursor: nextCursor, hasMore } }
 }
 
 export default createApiHandler(handle)
