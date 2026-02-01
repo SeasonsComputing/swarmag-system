@@ -1,51 +1,26 @@
 /**
- * Protocol types for common entity operations.
- * Defines wire shapes for request/response contracts.
+ * Domain-level invariant validators for user abstraction
  */
 
-import type { User, UserRole } from '@domain/abstractions/common.ts'
-import { isNonEmptyString, isUserRoles, isUserStatus } from '@domain/validators/common-validators.ts'
-import type { ID, When } from '@utils'
+import type { User, UserRole } from '@domain/abstractions/user.ts'
+import type { UserCreateInput, UserUpdateInput } from '@domain/protocol/user-protocol.ts'
+import { isNonEmptyString } from './helper-validators.ts'
 
-/** Input for creating a user. */
-export type UserCreateInput = {
-  displayName: string
-  primaryEmail: string
-  phoneNumber: string
-  avatarUrl?: string
-  roles?: UserRole[]
-  status?: User['status']
-}
+/**
+ * Type guard for accepted user status values.
+ * @param value - Potential status value.
+ * @returns True when the value is an allowed status string.
+ */
+export const isUserStatus = (value: unknown): value is NonNullable<User['status']> =>
+  value === 'active' || value === 'inactive'
 
-/** Input for updating a user. */
-export type UserUpdateInput = {
-  id: string
-  displayName?: string
-  primaryEmail?: string
-  phoneNumber?: string
-  avatarUrl?: string | null
-  roles?: UserRole[] | null
-  status?: User['status']
-}
-
-/** Pagination options for list operations. */
-export interface ListOptions {
-  limit?: number
-  cursor?: number
-}
-
-/** Paginated list result. */
-export interface ListResult<T> {
-  data: T[]
-  cursor: number
-  hasMore: boolean
-}
-
-/** Deletion result with timestamp. */
-export interface DeleteResult {
-  id: ID
-  deletedAt: When
-}
+/**
+ * Type guard for a User roles array.
+ * @param value - Potential roles value.
+ * @returns True when the value is an array of role strings.
+ */
+export const isUserRoles = (value: unknown): value is UserRole[] =>
+  Array.isArray(value) && value.every(role => typeof role === 'string')
 
 /**
  * Validate user creation input.

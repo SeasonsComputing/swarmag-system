@@ -6,9 +6,9 @@
 import { RuntimeConfig, type RuntimeProvider } from '@utils'
 
 /** Netlify.env ambient declaration */
-declare const Netlify: {
-  env: { get(key: string): string | undefined }
-} | undefined
+declare const Netlify:
+  | { env: { get(key: string): string | undefined } }
+  | undefined
 
 /**
  * Configuration provider for Netlify Edge Functions.

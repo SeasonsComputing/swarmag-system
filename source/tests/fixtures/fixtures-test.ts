@@ -13,12 +13,7 @@ import {
 } from '@tests-fixtures/samples.ts'
 import { isID, isWhen } from '@utils'
 
-const allowedAssetStatuses: AssetStatus[] = [
-  'active',
-  'maintenance',
-  'retired',
-  'reserved'
-]
+const allowedAssetStatuses: AssetStatus[] = ['active', 'maintenance', 'retired', 'reserved']
 
 Deno.test('fixture integrity: asset fixtures respect domain constraints', () => {
   const seenAssetTypes = new Set<string>()

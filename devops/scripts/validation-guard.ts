@@ -4,9 +4,7 @@
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
-const TARGET_DIRS = [
-  `${ROOT}/source/serverless/functions`
-]
+const TARGET_DIRS = [`${ROOT}/source/serverless/functions`]
 
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 

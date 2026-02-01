@@ -6,19 +6,13 @@
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 /** Directories to scan for guard violations. */
-const TARGET_DIRS = [
-  `${ROOT}/source`,
-  `${ROOT}/devops`
-]
+const TARGET_DIRS = [`${ROOT}/source`, `${ROOT}/devops`]
 
 /** Directory names to skip during traversal. */
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
 /** Relative paths that are allowed to use Deno.env. */
-const ALLOWED_FILES = new Set([
-  'devops/scripts/env-guard.ts',
-  'source/utils/configure-deno.ts'
-])
+const ALLOWED_FILES = new Set(['devops/scripts/env-guard.ts', 'source/utils/configure-deno.ts'])
 
 /** Match direct Deno.env or Deno.test access. */
 const DISALLOWED_USAGE = /\bDeno\.env\b/g

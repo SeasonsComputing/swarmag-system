@@ -7,10 +7,20 @@
     "quoteStyle": "alwaysSingle",
     "arrowFunction.useParentheses": "preferNone",
     "trailingCommas": "never",
-    "preferSingleLine": false,
+    "preferSingleLine": true,
     "memberExpression.linePerExpression": false,
     "objectExpression.preferHanging": true,
-    "arguments.preferHanging": "always"
+    "arguments.preferHanging": "always",
+    "ifStatement.useBraces": "whenNotSingleLine",
+    "ifStatement.singleBodyPosition": "sameLine",
+    "whileStatement.useBraces": "whenNotSingleLine",
+    "whileStatement.singleBodyPosition": "sameLine",
+    "forStatement.useBraces": "whenNotSingleLine",
+    "forStatement.singleBodyPosition": "sameLine",
+    "forInStatement.useBraces": "whenNotSingleLine",
+    "forInStatement.singleBodyPosition": "sameLine",
+    "forOfStatement.useBraces": "whenNotSingleLine",
+    "forOfStatement.singleBodyPosition": "sameLine"
   },
   "json": {
     "indentWidth": 2

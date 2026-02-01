@@ -2,8 +2,15 @@
  * Domain-level invariant validators for customers.
  */
 
-import type { Contact, Customer } from '@domain/abstractions/customer.ts'
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
+import type { Customer } from '@domain/abstractions/customer.ts'
+import type {
+  CustomerCreateInput,
+  CustomerUpdateInput,
+  PrimaryContactInput,
+} from '@domain/protocol/customer-protocol.ts'
+import { isNonEmptyString } from './helper-validators.ts'
+
+export type { CustomerCreateInput, CustomerUpdateInput, PrimaryContactInput }
 
 /**
  * Type guard for customer status.
@@ -12,43 +19,6 @@ import { isNonEmptyString } from '@domain/validators/common-validators.ts'
  */
 export const isCustomerStatus = (value: unknown): value is Customer['status'] =>
   value === 'active' || value === 'inactive' || value === 'prospect'
-
-/** Input type for primary contact in customer creation. */
-export interface PrimaryContactInput {
-  name: string
-  email?: string
-  phone?: string
-  preferredChannel?: Contact['preferredChannel']
-}
-
-/** Input type for creating a customer. */
-export interface CustomerCreateInput {
-  name: string
-  status?: Customer['status']
-  line1: string
-  line2?: string
-  city: string
-  state: string
-  postalCode: string
-  country: string
-  accountManagerId?: string
-  primaryContact: PrimaryContactInput
-}
-
-/** Input type for updating a customer. */
-export interface CustomerUpdateInput {
-  id: string
-  name?: string
-  status?: Customer['status']
-  line1?: string
-  line2?: string | null
-  city?: string
-  state?: string
-  postalCode?: string
-  country?: string
-  accountManagerId?: string | null
-  primaryContactId?: string
-}
 
 /**
  * Validate customer creation input.

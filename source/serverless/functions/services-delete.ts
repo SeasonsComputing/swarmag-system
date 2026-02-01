@@ -2,8 +2,16 @@
  * Netlify handler for deleting services.
  */
 
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
-import { type ApiRequest, type ApiResponse, HttpCodes } from '@serverless-lib/api-binding.ts'
+import { isNonEmptyString } from '@domain/validators/helper-validators.ts'
+import {
+  type ApiRequest,
+  type ApiResponse,
+  HttpCodes,
+  toInternalError,
+  toMethodNotAllowed,
+  toNotFound,
+  toUnprocessable
+} from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
 import { when } from '@utils'
@@ -18,40 +26,21 @@ export const config = { path: '/api/services/delete' }
  * @param req - API request wrapper containing the service id to delete.
  * @returns API result with deletion metadata or an error response.
  */
-const handle = async (
-  req: ApiRequest<{ id?: string }>
-): Promise<ApiResponse> => {
-  if (req.method !== 'DELETE') {
-    return { statusCode: HttpCodes.methodNotAllowed, body: { error: 'Method Not Allowed' } }
-  }
+const handle = async (req: ApiRequest<{ id?: string }>): Promise<ApiResponse> => {
+  if (req.method !== 'DELETE') return toMethodNotAllowed()
 
   const serviceId = req.body?.id
-  if (!isNonEmptyString(serviceId)) {
-    return { statusCode: HttpCodes.unprocessableEntity, body: { error: 'id is required' } }
-  }
+  if (!isNonEmptyString(serviceId)) return toUnprocessable('id is required')
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase
-    .from('services')
-    .select('id')
-    .eq('id', serviceId)
+  const { data: existingRow, error: fetchError } = await supabase.from('services').select('id').eq('id', serviceId)
     .single()
 
-  if (fetchError || !existingRow) {
-    return { statusCode: HttpCodes.notFound, body: { error: 'Service not found' } }
-  }
+  if (fetchError || !existingRow) return toNotFound('Service not found')
 
-  const { error: deleteError } = await supabase
-    .from('services')
-    .delete()
-    .eq('id', serviceId)
+  const { error: deleteError } = await supabase.from('services').delete().eq('id', serviceId)
 
-  if (deleteError) {
-    return {
-      statusCode: HttpCodes.internalError,
-      body: { error: 'Failed to delete service', details: deleteError.message }
-    }
-  }
+  if (deleteError) return toInternalError('Failed to delete service', deleteError)
 
   return { statusCode: HttpCodes.ok, body: { data: { id: serviceId, deletedAt: when() } } }
 }

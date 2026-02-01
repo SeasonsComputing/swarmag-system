@@ -3,7 +3,10 @@
  */
 
 import type { Asset } from '@domain/abstractions/asset.ts'
-import { isNonEmptyString } from '@domain/validators/common-validators.ts'
+import type { AssetCreateInput, AssetUpdateInput } from '@domain/protocol/asset-protocol.ts'
+import { isNonEmptyString } from './helper-validators.ts'
+
+export type { AssetCreateInput, AssetUpdateInput }
 
 /**
  * Type guard for asset status.
@@ -12,25 +15,6 @@ import { isNonEmptyString } from '@domain/validators/common-validators.ts'
  */
 export const isAssetStatus = (value: unknown): value is Asset['status'] =>
   value === 'active' || value === 'maintenance' || value === 'retired' || value === 'reserved'
-
-/** Input type for creating an asset. */
-export interface AssetCreateInput {
-  label: string
-  description?: string
-  serialNumber?: string
-  type: string
-  status?: Asset['status']
-}
-
-/** Input type for updating an asset. */
-export interface AssetUpdateInput {
-  id: string
-  label?: string
-  description?: string | null
-  serialNumber?: string | null
-  type?: string
-  status?: Asset['status']
-}
 
 /**
  * Validate asset creation input.

@@ -15,10 +15,6 @@ if ('Deno' in self) {
   Config = ConfigureNetlify
 }
 
-Config.init([
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_KEY',
-  'JWT_SECRET'
-])
+Config.init(['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET'])
 
 export { Config }

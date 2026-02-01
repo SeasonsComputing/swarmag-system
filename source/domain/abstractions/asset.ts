@@ -17,7 +17,11 @@ export interface AssetType {
 }
 
 /** The possible statuses an asset can have. */
-export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'reserved'
+export type AssetStatus =
+  | 'active'
+  | 'maintenance'
+  | 'retired'
+  | 'reserved'
 
 /** Represents an asset in the swarmAg system. */
 export interface Asset {

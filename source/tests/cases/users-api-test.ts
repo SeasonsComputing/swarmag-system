@@ -4,26 +4,17 @@
 
 import { UsersApi } from '@api/client/users-api.ts'
 import { ApiError } from '@api/lib/api-client-binding.ts'
-import type { User } from '@domain/abstractions/common.ts'
+import type { User } from '@domain/abstractions/user.ts'
 import { assert, assertEquals, assertRejects } from '@std/assert'
 
 /** Mock user data for testing. */
-const mockUser: User = {
-  id: '019400a1-b2c3-7def-8901-234567890abc',
-  displayName: 'Ada Lovelace',
-  primaryEmail: 'ada@example.com',
-  phoneNumber: '555-0100',
-  status: 'active',
-  createdAt: '2024-01-15T10:30:00.000Z',
-  updatedAt: '2024-01-15T10:30:00.000Z'
-}
+const mockUser: User = { id: '019400a1-b2c3-7def-8901-234567890abc', displayName: 'Ada Lovelace',
+  primaryEmail: 'ada@example.com', phoneNumber: '555-0100', status: 'active', createdAt: '2024-01-15T10:30:00.000Z',
+  updatedAt: '2024-01-15T10:30:00.000Z' }
 
 /** Create a mock Response with JSON body. */
 const jsonResponse = (status: number, body: unknown): Response => {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' }
-  })
+  return new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })
 }
 
 /** Install a fetch mock and return cleanup function. */
@@ -44,11 +35,8 @@ Deno.test('UsersApi.create returns created user', async () => {
   })
 
   try {
-    const user = await UsersApi.create({
-      displayName: 'Ada Lovelace',
-      primaryEmail: 'ada@example.com',
-      phoneNumber: '555-0100'
-    })
+    const user = await UsersApi.create({ displayName: 'Ada Lovelace', primaryEmail: 'ada@example.com',
+      phoneNumber: '555-0100' })
 
     assertEquals(user.id, mockUser.id)
     assertEquals(user.displayName, 'Ada Lovelace')
@@ -95,10 +83,7 @@ Deno.test('UsersApi.get throws ApiError when not found', async () => {
   })
 
   try {
-    const error = await assertRejects(
-      () => UsersApi.get('nonexistent-id'),
-      ApiError
-    ) as ApiError
+    const error = await assertRejects(() => UsersApi.get('nonexistent-id'), ApiError) as ApiError
     assertEquals(error.status, 404)
     assertEquals(error.message, 'User not found')
   } finally {
@@ -112,11 +97,7 @@ Deno.test('UsersApi.list returns paginated users', async () => {
     const body = JSON.parse(init?.body as string)
     assertEquals(body.limit, 10)
     assertEquals(body.cursor, 0)
-    return jsonResponse(200, {
-      data: [mockUser],
-      cursor: 1,
-      hasMore: false
-    })
+    return jsonResponse(200, { data: [mockUser], cursor: 1, hasMore: false })
   })
 
   try {
@@ -171,10 +152,8 @@ Deno.test('UsersApi.update throws ApiError when not found', async () => {
   })
 
   try {
-    const error = await assertRejects(
-      () => UsersApi.update({ id: 'nonexistent', displayName: 'Test' }),
-      ApiError
-    ) as ApiError
+    const error = await assertRejects(() => UsersApi.update({ id: 'nonexistent', displayName: 'Test' }),
+      ApiError) as ApiError
     assertEquals(error.status, 404)
   } finally {
     cleanup()
@@ -206,10 +185,7 @@ Deno.test('UsersApi.delete throws ApiError when not found', async () => {
   })
 
   try {
-    const error = await assertRejects(
-      () => UsersApi.delete('nonexistent'),
-      ApiError
-    ) as ApiError
+    const error = await assertRejects(() => UsersApi.delete('nonexistent'), ApiError) as ApiError
     assertEquals(error.status, 404)
   } finally {
     cleanup()
@@ -222,10 +198,7 @@ Deno.test('UsersApi handles server errors with details', async () => {
   })
 
   try {
-    const error = await assertRejects(
-      () => UsersApi.get(mockUser.id),
-      ApiError
-    ) as ApiError
+    const error = await assertRejects(() => UsersApi.get(mockUser.id), ApiError) as ApiError
     assertEquals(error.status, 500)
     assertEquals(error.message, 'Database connection failed')
     assertEquals(error.details, 'Connection timeout')

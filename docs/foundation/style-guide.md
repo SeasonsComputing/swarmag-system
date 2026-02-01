@@ -15,12 +15,23 @@ This guide defines the coding conventions and patterns used throughout the swarm
 
 | Item        | Guideline                                                                                           |
 | ----------- | --------------------------------------------------------------------------------------------------- |
-| Paths       | Use aliases instead of deep relatives                                                               |
+| Paths       | Use aliases for cross-directory imports; use relative (`./`) for same-directory imports             |
 | Ordering    | Domain -> utils -> api -> serverless lib; use `import type` where helpful                           |
 | Exports     | Default export only for Netlify Edge `createApiHandler(handle)`                                     |
 | Extensions  | Include `.ts` in local/alias import specifiers                                                      |
 | Import maps | Keep `netlify-import-map.json` aligned with `deno.json`; use root-relative paths in the Netlify map |
 | Layout      | Files live only in leaf directories; directories with subdirectories must not contain files         |
+
+**Import path examples:**
+
+```typescript
+// Same directory - use relative
+import { isNonEmptyString } from './helper-validators.ts'
+
+// Different directory - use alias
+import type { User } from '@domain/abstractions/user.ts'
+import type { ID, When } from '@utils'
+```
 
 ## 3. Naming Conventions
 
@@ -35,13 +46,31 @@ This guide defines the coding conventions and patterns used throughout the swarm
 
 ## 4. Domain Modeling (`source/domain/*`)
 
-| Item         | Guideline                                                                                   |
-| ------------ | ------------------------------------------------------------------------------------------- |
-| Abstractions | Interfaces with immutable intent; no mutation helpers                                       |
-| Docs         | Single-sentence JSDoc on types/enums                                                        |
-| Primitives   | Reuse `ID` (UUID v7 string) and `When` (ISO 8601 string)                                    |
-| Payloads     | JSON-serializable only; no methods on domain objects                                        |
-| Validators   | Validators live in `source/domain/{abstraction}-validators.ts` (singular abstraction names) |
+| Item         | Guideline                                                                  |
+| ------------ | -------------------------------------------------------------------------- |
+| Abstractions | Interfaces with immutable intent; no mutation helpers                      |
+| Docs         | Single-sentence JSDoc on types/enums                                       |
+| Primitives   | Reuse `ID` (UUID v7 string) and `When` (ISO 8601 string)                   |
+| Payloads     | JSON-serializable only; no methods on domain objects                       |
+| Organization | Abstraction-per-file pattern across abstractions, validators, and protocol |
+
+### 4.1 Domain file organization
+
+Each domain abstraction has corresponding files across three subdirectories:
+
+| Layer           | Abstraction file              | Shared/helper file     |
+| --------------- | ----------------------------- | ---------------------- |
+| `abstractions/` | `{abstraction}.ts`            | `common.ts`            |
+| `validators/`   | `{abstraction}-validators.ts` | `helper-validators.ts` |
+| `protocol/`     | `{abstraction}-protocol.ts`   | `helpers-protocol.ts`  |
+
+**Placement rules:**
+
+- Abstraction-specific types (User, UserRole) belong in abstraction files (`user.ts`), not `common.ts`.
+- Shared types used by multiple abstractions (Location, Note, Attachment) stay in `common.ts`.
+- Concept-owning types live with their owner (Question, Answer live in `workflow.ts`).
+- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `helpers-protocol.ts`.
+- Shared validators (isNonEmptyString) live in `helper-validators.ts`.
 
 ## 5. Utilities (`source/utils/*`)
 
@@ -105,7 +134,27 @@ Good:
 const user = rowToUser(data)
 ```
 
-## 9. Error Handling
+## 9. Control Flow
+
+### 9.1 Single-line if statements
+
+Prefer single-line if statements when there is no else clause and the line is under 120 columns:
+
+```typescript
+// Preferred
+if (req.method !== 'GET') return toMethodNotAllowed()
+if (!isNonEmptyString(userId)) return toBadRequest('id is required')
+if (error || !data) return toNotFound('User not found')
+
+// Avoid
+if (req.method !== 'GET') {
+  return toMethodNotAllowed()
+}
+```
+
+Use braces when there is an else clause or when the line exceeds 120 columns.
+
+## 10. Error Handling
 
 | Item    | Guideline                                                        |
 | ------- | ---------------------------------------------------------------- |
@@ -113,7 +162,7 @@ const user = rowToUser(data)
 | Server  | Persistence/unknown -> `HttpCodes.internalError`; safe `details` |
 | Control | Do not throw past `createApiHandler`; return `ApiResponse`       |
 
-## 10. Pagination
+## 11. Pagination
 
 | Item    | Guideline                                            |
 | ------- | ---------------------------------------------------- |
@@ -121,7 +170,7 @@ const user = rowToUser(data)
 | Cursor  | Default 0; non-negative only                         |
 | Helpers | Use `Supabase.clampLimit` and `Supabase.parseCursor` |
 
-## 11. Commenting Style
+## 12. Commenting Style
 
 | Item     | Guideline                                                                                                                    |
 | -------- | ---------------------------------------------------------------------------------------------------------------------------- |
@@ -131,7 +180,7 @@ const user = rowToUser(data)
 | Fields   | Comment class attributes and fields with brief JSDoc.                                                                        |
 | Types    | Comment type aliases and interfaces with brief JSDoc.                                                                        |
 
-## 12. Naming and Data Shapes
+## 13. Naming and Data Shapes
 
 | Item      | Guideline                                                        |
 | --------- | ---------------------------------------------------------------- |
@@ -139,9 +188,9 @@ const user = rowToUser(data)
 | Enums     | String unions for enums (e.g., `JobStatus`, `JobLogType`)        |
 | Optionals | Mark optional fields with `?`; handle defaults in handlers       |
 
-## 13. Runtime Configuration Conventions
+## 14. Runtime Configuration Conventions
 
-### 13.1 Config provider classes
+### 14.1 Config provider classes
 
 Config provider classes follow a consistent static class pattern with isomorphic interface conformance. Use the class name (not `this`) when referring to static members:
 
@@ -177,7 +226,7 @@ export class ExampleConfig {
 }
 ```
 
-### 13.2 Bootstrap files
+### 14.2 Bootstrap files
 
 Bootstrap files (`config.ts`) live in each deployment context's `config/` directory and:
 
@@ -193,15 +242,12 @@ import { ConfigureDeno } from '@utils/configure-deno.ts'
 
 const Config = 'Deno' in self ? ConfigureDeno : ConfigureNetlify
 
-Config.init([
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_KEY'
-])
+Config.init(['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'])
 
 export { Config }
 ```
 
-### 13.3 Environment files
+### 14.3 Environment files
 
 Environment files follow the naming convention `{context}-{environment}.env`:
 
@@ -220,7 +266,7 @@ serverless/config/
   serverless-prod.env
 ```
 
-### 13.4 Import conventions
+### 14.4 Import conventions
 
 Always import from bootstrap, never from provider directly:
 
@@ -230,7 +276,7 @@ import { ConfigureNetlify } from '@serverless-lib/configure-netlify.ts' // Wrong
 import { Config } from '@serverless/config/config.ts' // Correct
 ```
 
-### 13.5 Parameter naming
+### 14.5 Parameter naming
 
 Configuration parameter names should be:
 
@@ -238,7 +284,7 @@ Configuration parameter names should be:
 - Prefixed appropriately: `VITE_` for client-side app variables, no prefix for server-side.
 - Descriptive and unambiguous: `SUPABASE_URL`, `API_BASE_URL` (not `URL`, `DB`).
 
-### 13.6 Error messages
+### 14.6 Error messages
 
 Error messages from config failures should be:
 
@@ -247,7 +293,7 @@ Error messages from config failures should be:
 - Consistent: Use same phrasing across providers.
 - Never expose secrets in error messages.
 
-### 13.7 Documentation
+### 14.7 Documentation
 
 When adding new configuration parameters:
 

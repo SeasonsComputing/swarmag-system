@@ -13,7 +13,7 @@ Source: `source/utils/identifier.ts`, `source/utils/datetime.ts`
 
 ## 2. User and Authorization
 
-Source: `source/domain/common.ts`
+Source: `source/domain/user.ts`
 
 ### 2.1 User
 
