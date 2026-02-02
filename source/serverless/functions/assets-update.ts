@@ -3,7 +3,10 @@
  */
 
 import type { Asset } from '@domain/abstractions/asset.ts'
-import { type AssetUpdateInput, validateAssetUpdate } from '@domain/validators/asset-validators.ts'
+import {
+  type AssetUpdateInput,
+  validateAssetUpdate
+} from '@domain/validators/asset-validators.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -35,8 +38,8 @@ const handle = async (req: ApiRequest<AssetUpdateInput>): Promise<ApiResponse> =
   if (validationError) return toUnprocessable(validationError)
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase.from('assets').select('*').eq('id', req.body.id)
-    .single()
+  const { data: existingRow, error: fetchError } = await supabase.from('assets').select('*')
+    .eq('id', req.body.id).single()
 
   if (fetchError || !existingRow) return toNotFound('Asset not found')
 
@@ -47,12 +50,24 @@ const handle = async (req: ApiRequest<AssetUpdateInput>): Promise<ApiResponse> =
     return toInternalError('Invalid asset record from database', parseError)
   }
 
-  const updated: Asset = { ...current, label: req.body.label?.trim() ?? current.label,
-    description: req.body.description === null ? undefined : req.body.description?.trim() ?? current.description,
-    serialNumber: req.body.serialNumber === null ? undefined : req.body.serialNumber?.trim() ?? current.serialNumber,
-    type: req.body.type ?? current.type, status: req.body.status ?? current.status, updatedAt: when() }
+  const updated: Asset = {
+    ...current,
+    label: req.body.label?.trim() ?? current.label,
+    description: req.body.description === null
+      ? undefined
+      : req.body.description?.trim() ?? current.description,
+    serialNumber: req.body.serialNumber === null
+      ? undefined
+      : req.body.serialNumber?.trim() ?? current.serialNumber,
+    type: req.body.type ?? current.type,
+    status: req.body.status ?? current.status,
+    updatedAt: when()
+  }
 
-  const { error: updateError } = await supabase.from('assets').update(assetToRow(updated)).eq('id', updated.id)
+  const { error: updateError } = await supabase.from('assets').update(assetToRow(updated)).eq(
+    'id',
+    updated.id
+  )
 
   if (updateError) return toInternalError('Failed to update asset', updateError)
 

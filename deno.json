@@ -24,8 +24,8 @@
     "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",
     "lint": "deno lint source && deno task lint:md",
     "lint:md": "deno run --allow-read --allow-sys --allow-env npm:markdownlint-cli2@0.13.0 \"**/*.md\" \"!node_modules/**\"",
-    "fmt": "deno run -A npm:dprint fmt",
-    "fmt:check": "deno run -A npm:dprint check"
+    "fmt": "dprint fmt",
+    "fmt:check": "dprint check"
   },
   "fmt": {
     "exclude": ["**/*"]

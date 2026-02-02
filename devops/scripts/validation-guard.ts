@@ -24,7 +24,8 @@ const collectFiles = async (dir: string): Promise<string[]> => {
   return entries
 }
 
-const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number =>
+  source.slice(0, index).split('\n').length
 
 const main = async () => {
   const files = (await Promise.all(TARGET_DIRS.map(collectFiles))).flat()

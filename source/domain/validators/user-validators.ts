@@ -31,8 +31,12 @@ export const validateUserCreateInput = (input?: UserCreateInput | null): string 
   if (!isNonEmptyString(input?.displayName)) return 'displayName is required'
   if (!isNonEmptyString(input?.primaryEmail)) return 'primaryEmail is required'
   if (!isNonEmptyString(input?.phoneNumber)) return 'phoneNumber is required'
-  if (input?.status && !isUserStatus(input.status)) return 'status must be active or inactive'
-  if (input?.roles && !isUserRoles(input.roles)) return 'roles must be an array of UserRole'
+  if (input?.status && !isUserStatus(input.status)) {
+    return 'status must be active or inactive'
+  }
+  if (input?.roles && !isUserRoles(input.roles)) {
+    return 'roles must be an array of UserRole'
+  }
   return null
 }
 
@@ -43,7 +47,11 @@ export const validateUserCreateInput = (input?: UserCreateInput | null): string 
  */
 export const validateUserUpdateInput = (input?: UserUpdateInput | null): string | null => {
   if (!isNonEmptyString(input?.id)) return 'id is required'
-  if (input?.status && !isUserStatus(input.status)) return 'status must be active or inactive'
-  if (input?.roles && !isUserRoles(input.roles)) return 'roles must be an array of UserRole'
+  if (input?.status && !isUserStatus(input.status)) {
+    return 'status must be active or inactive'
+  }
+  if (input?.roles && !isUserRoles(input.roles)) {
+    return 'roles must be an array of UserRole'
+  }
   return null
 }

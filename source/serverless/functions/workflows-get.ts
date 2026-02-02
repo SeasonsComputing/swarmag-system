@@ -33,7 +33,8 @@ const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiR
   const workflowId = req.query?.id
   if (!isNonEmptyString(workflowId)) return toBadRequest('id is required')
 
-  const { data, error } = await Supabase.client().from('workflows').select('*').eq('id', workflowId).single()
+  const { data, error } = await Supabase.client().from('workflows').select('*').eq('id',
+    workflowId).single()
 
   if (error || !data) return toNotFound('Workflow not found')
 
@@ -41,7 +42,8 @@ const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiR
   try {
     workflow = rowToWorkflow(data)
   } catch (parseError) {
-    return toInternalError('Invalid workflow record returned from Supabase', parseError as Error)
+    return toInternalError('Invalid workflow record returned from Supabase',
+      parseError as Error)
   }
 
   return toOk(workflow)

@@ -3,7 +3,10 @@
  */
 
 import type { Service } from '@domain/abstractions/service.ts'
-import { type ServiceCreateInput, validateServiceCreate } from '@domain/validators/service-validators.ts'
+import {
+  type ServiceCreateInput,
+  validateServiceCreate
+} from '@domain/validators/service-validators.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -34,9 +37,17 @@ const handle = async (req: ApiRequest<ServiceCreateInput>): Promise<ApiResponse>
   if (validationError) return toUnprocessable(validationError)
 
   const now = when()
-  const service: Service = { id: id(), name: req.body.name.trim(), sku: req.body.sku.trim(),
-    description: req.body.description?.trim(), category: req.body.category,
-    requiredAssetTypes: req.body.requiredAssetTypes, notes: undefined, createdAt: now, updatedAt: now }
+  const service: Service = {
+    id: id(),
+    name: req.body.name.trim(),
+    sku: req.body.sku.trim(),
+    description: req.body.description?.trim(),
+    category: req.body.category,
+    requiredAssetTypes: req.body.requiredAssetTypes,
+    notes: undefined,
+    createdAt: now,
+    updatedAt: now
+  }
 
   const { error } = await Supabase.client().from('services').insert(serviceToRow(service))
 

@@ -35,10 +35,10 @@ const handle = async (req: ApiRequest<{ id?: string }>): Promise<ApiResponse> =>
   if (!isNonEmptyString(userId)) return toUnprocessable('id is required')
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase.from('users').select('*').eq('id', userId).is(
-    'deleted_at',
-    null
-  ).single()
+  const { data: existingRow, error: fetchError } = await supabase.from('users').select('*').eq(
+    'id',
+    userId
+  ).is('deleted_at', null).single()
 
   if (fetchError || !existingRow) return toNotFound('User not found')
 
@@ -52,7 +52,10 @@ const handle = async (req: ApiRequest<{ id?: string }>): Promise<ApiResponse> =>
   const deletedAt = when()
   const updated: User = { ...user, deletedAt, updatedAt: deletedAt }
 
-  const { error: updateError } = await supabase.from('users').update(userToRow(updated)).eq('id', user.id)
+  const { error: updateError } = await supabase.from('users').update(userToRow(updated)).eq(
+    'id',
+    user.id
+  )
 
   if (updateError) return toInternalError('Failed to delete user', updateError)
 

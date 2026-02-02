@@ -35,9 +35,18 @@ const handle = async (req: ApiRequest<UserCreateInput>): Promise<ApiResponse> =>
   if (validationError) return toUnprocessable(validationError)
 
   const now = when()
-  const user: User = { id: id(), displayName: req.body.displayName.trim(), primaryEmail: req.body.primaryEmail.trim(),
-    phoneNumber: req.body.phoneNumber.trim(), avatarUrl: req.body.avatarUrl?.trim(), roles: req.body.roles,
-    status: req.body.status ?? 'active', createdAt: now, updatedAt: now, deletedAt: undefined }
+  const user: User = {
+    id: id(),
+    displayName: req.body.displayName.trim(),
+    primaryEmail: req.body.primaryEmail.trim(),
+    phoneNumber: req.body.phoneNumber.trim(),
+    avatarUrl: req.body.avatarUrl?.trim(),
+    roles: req.body.roles,
+    status: req.body.status ?? 'active',
+    createdAt: now,
+    updatedAt: now,
+    deletedAt: undefined
+  }
 
   const { error } = await Supabase.client().from('users').insert(userToRow(user))
 

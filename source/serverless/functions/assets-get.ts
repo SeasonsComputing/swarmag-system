@@ -33,7 +33,8 @@ const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiR
   const assetId = req.query?.id
   if (!isNonEmptyString(assetId)) return toBadRequest('id is required')
 
-  const { data, error } = await Supabase.client().from('assets').select('*').eq('id', assetId).single()
+  const { data, error } = await Supabase.client().from('assets').select('*').eq('id', assetId)
+    .single()
 
   if (error || !data) return toNotFound('Asset not found')
 

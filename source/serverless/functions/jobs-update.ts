@@ -35,8 +35,10 @@ const handle = async (req: ApiRequest<JobUpdateInput>): Promise<ApiResponse> => 
   if (validationError) return toUnprocessable(validationError)
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase.from('jobs').select('*').eq('id', req.body.id)
-    .single()
+  const { data: existingRow, error: fetchError } = await supabase.from('jobs').select('*').eq(
+    'id',
+    req.body.id
+  ).single()
 
   if (fetchError || !existingRow) return toNotFound('Job not found')
 
@@ -47,9 +49,14 @@ const handle = async (req: ApiRequest<JobUpdateInput>): Promise<ApiResponse> => 
     return toInternalError('Invalid job record returned from Supabase', parseError as Error)
   }
 
-  const updated: Job = { ...current, status: req.body.status ?? current.status, updatedAt: when() }
+  const updated: Job = {
+    ...current,
+    status: req.body.status ?? current.status,
+    updatedAt: when()
+  }
 
-  const { error: updateError } = await supabase.from('jobs').update(jobToRow(updated)).eq('id', updated.id)
+  const { error: updateError } = await supabase.from('jobs').update(jobToRow(updated)).eq('id',
+    updated.id)
 
   if (updateError) return toInternalError('Failed to update job', updateError)
 

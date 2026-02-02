@@ -33,7 +33,8 @@ const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiR
   const customerId = req.query?.id
   if (!isNonEmptyString(customerId)) return toBadRequest('id is required')
 
-  const { data, error } = await Supabase.client().from('customers').select('*').eq('id', customerId).single()
+  const { data, error } = await Supabase.client().from('customers').select('*').eq('id',
+    customerId).single()
 
   if (error || !data) return toNotFound('Customer not found')
 
@@ -41,7 +42,8 @@ const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiR
   try {
     customer = rowToCustomer(data)
   } catch (parseError) {
-    return toInternalError('Invalid customer record returned from Supabase', parseError as Error)
+    return toInternalError('Invalid customer record returned from Supabase',
+      parseError as Error)
   }
 
   return toOk(customer)

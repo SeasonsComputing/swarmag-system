@@ -34,7 +34,9 @@ const handle = async (req: ApiRequest<undefined, ListQuery>): Promise<ApiRespons
 
   const supabase = Supabase.client()
 
-  const { data, error, count } = await supabase.from('services').select('*', { count: 'exact' }).range(cursor, rangeEnd)
+  const { data, error, count } = await supabase.from('services').select('*', {
+    count: 'exact'
+  }).range(cursor, rangeEnd)
 
   if (error) return toInternalError('Failed to load services', error)
 
@@ -43,7 +45,8 @@ const handle = async (req: ApiRequest<undefined, ListQuery>): Promise<ApiRespons
   try {
     services = (data ?? []).map(rowToService)
   } catch (parseError) {
-    return toInternalError('Invalid service record returned from Supabase', parseError as Error)
+    return toInternalError('Invalid service record returned from Supabase',
+      parseError as Error)
   }
 
   const nextCursor = cursor + services.length

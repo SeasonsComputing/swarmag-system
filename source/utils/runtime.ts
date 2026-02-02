@@ -51,7 +51,9 @@ export class RuntimeConfig implements RuntimeProvider {
   init(required: readonly string[]): void {
     if (this.#cache) this.#provider.fail('Already initialized')
     const missing = required.filter(key => !this.#provider.get(key))
-    if (missing.length > 0) this.#provider.fail(`Missing required config: ${missing.join(', ')}`)
+    if (missing.length > 0) {
+      this.#provider.fail(`Missing required config: ${missing.join(', ')}`)
+    }
     this.#cache = new StringSet(required)
   }
 

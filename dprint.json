@@ -1,5 +1,5 @@
 {
-  "lineWidth": 120,
+  "lineWidth": 95,
   "indentWidth": 2,
   "useTabs": false,
   "typescript": {
@@ -9,7 +9,7 @@
     "trailingCommas": "never",
     "preferSingleLine": true,
     "memberExpression.linePerExpression": false,
-    "objectExpression.preferHanging": true,
+    "objectExpression.preferHanging": false,
     "arguments.preferHanging": "always",
     "ifStatement.useBraces": "whenNotSingleLine",
     "ifStatement.singleBodyPosition": "sameLine",
@@ -26,8 +26,7 @@
     "indentWidth": 2
   },
   "markdown": {
-    "lineWidth": 120,
-    "textWrap": "never"
+    "lineWidth": 95
   },
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.93.0.wasm",

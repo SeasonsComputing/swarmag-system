@@ -15,10 +15,18 @@ export const isServiceCategory = (value: unknown): value is Service['category'] 
   value === 'aerial-drone-services' || value === 'ground-machinery-services'
 
 /** Map a domain Service into a Supabase row shape. */
-export const serviceToRow = (service: Service) => ({ id: service.id, name: service.name, sku: service.sku,
-  description: service.description ?? null, category: service.category,
-  required_asset_types: service.requiredAssetTypes, notes: service.notes ?? null, created_at: service.createdAt,
-  updated_at: service.updatedAt, payload: service })
+export const serviceToRow = (service: Service) => ({
+  id: service.id,
+  name: service.name,
+  sku: service.sku,
+  description: service.description ?? null,
+  category: service.category,
+  required_asset_types: service.requiredAssetTypes,
+  notes: service.notes ?? null,
+  created_at: service.createdAt,
+  updated_at: service.updatedAt,
+  payload: service
+})
 
 /**
  * Convert a Supabase row into a Service domain model.
@@ -60,8 +68,15 @@ export const rowToService = (row: unknown): Service => {
     throw new Error('Service row is missing required fields')
   }
 
-  return { id, name, sku, description: (record.description ?? undefined) as string | undefined, category,
-    requiredAssetTypes, notes: Array.isArray(record.notes) ? record.notes : undefined,
+  return {
+    id,
+    name,
+    sku,
+    description: (record.description ?? undefined) as string | undefined,
+    category,
+    requiredAssetTypes,
+    notes: Array.isArray(record.notes) ? record.notes : undefined,
     createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string }
+    updatedAt: (record.updated_at ?? record.updatedAt) as string
+  }
 }

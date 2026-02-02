@@ -33,7 +33,8 @@ const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiR
   const chemicalId = req.query?.id
   if (!isNonEmptyString(chemicalId)) return toBadRequest('id is required')
 
-  const { data, error } = await Supabase.client().from('chemicals').select('*').eq('id', chemicalId).single()
+  const { data, error } = await Supabase.client().from('chemicals').select('*').eq('id',
+    chemicalId).single()
 
   if (error || !data) return toNotFound('Chemical not found')
 

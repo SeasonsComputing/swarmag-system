@@ -33,7 +33,8 @@ const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiR
   const jobId = req.query?.id
   if (!isNonEmptyString(jobId)) return toBadRequest('id is required')
 
-  const { data, error } = await Supabase.client().from('jobs').select('*').eq('id', jobId).single()
+  const { data, error } = await Supabase.client().from('jobs').select('*').eq('id', jobId)
+    .single()
 
   if (error || !data) return toNotFound('Job not found')
 

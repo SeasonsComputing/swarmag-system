@@ -33,8 +33,9 @@ const handle = async (req: ApiRequest<{ id?: string }>): Promise<ApiResponse> =>
   if (!isNonEmptyString(workflowId)) return toUnprocessable('id is required')
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase.from('workflows').select('id').eq('id', workflowId)
-    .single()
+  const { data: existingRow, error: fetchError } = await supabase.from('workflows').select(
+    'id'
+  ).eq('id', workflowId).single()
 
   if (fetchError || !existingRow) return toNotFound('Workflow not found')
 

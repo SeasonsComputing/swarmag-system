@@ -36,7 +36,9 @@ export const validateJobCreateInput = (input?: JobCreateInput | null): string | 
   if (!input.plan?.workflowId) return 'plan.workflowId is required'
   if (!input.plan?.scheduledStart) return 'plan.scheduledStart is required'
   if (!input.assessment?.assessedAt) return 'assessment.assessedAt is required'
-  if (!input.assessment?.locations?.length) return 'assessment.locations requires 1+ location'
+  if (!input.assessment?.locations?.length) {
+    return 'assessment.locations requires 1+ location'
+  }
   return null
 }
 

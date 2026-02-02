@@ -36,10 +36,10 @@ const handle = async (req: ApiRequest<UserUpdateInput>): Promise<ApiResponse> =>
   if (validationError) return toUnprocessable(validationError)
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase.from('users').select('*').eq('id', req.body.id).is(
-    'deleted_at',
-    null
-  ).single()
+  const { data: existingRow, error: fetchError } = await supabase.from('users').select('*').eq(
+    'id',
+    req.body.id
+  ).is('deleted_at', null).single()
 
   if (fetchError || !existingRow) return toNotFound('User not found')
 
@@ -50,14 +50,23 @@ const handle = async (req: ApiRequest<UserUpdateInput>): Promise<ApiResponse> =>
     return toInternalError('Invalid user record from database', parseError)
   }
 
-  const updated: User = { ...current, displayName: req.body.displayName?.trim() ?? current.displayName,
+  const updated: User = {
+    ...current,
+    displayName: req.body.displayName?.trim() ?? current.displayName,
     primaryEmail: req.body.primaryEmail?.trim() ?? current.primaryEmail,
     phoneNumber: req.body.phoneNumber?.trim() ?? current.phoneNumber,
-    avatarUrl: req.body.avatarUrl === null ? undefined : req.body.avatarUrl?.trim() ?? current.avatarUrl,
+    avatarUrl: req.body.avatarUrl === null
+      ? undefined
+      : req.body.avatarUrl?.trim() ?? current.avatarUrl,
     roles: req.body.roles === null ? undefined : req.body.roles ?? current.roles,
-    status: req.body.status ?? current.status, updatedAt: when() }
+    status: req.body.status ?? current.status,
+    updatedAt: when()
+  }
 
-  const { error: updateError } = await supabase.from('users').update(userToRow(updated)).eq('id', updated.id)
+  const { error: updateError } = await supabase.from('users').update(userToRow(updated)).eq(
+    'id',
+    updated.id
+  )
 
   if (updateError) return toInternalError('Failed to update user', updateError)
 

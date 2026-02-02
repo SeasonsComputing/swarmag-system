@@ -3,7 +3,10 @@
  */
 
 import type { Chemical } from '@domain/abstractions/chemical.ts'
-import { type ChemicalCreateInput, validateChemicalCreate } from '@domain/validators/chemical-validators.ts'
+import {
+  type ChemicalCreateInput,
+  validateChemicalCreate
+} from '@domain/validators/chemical-validators.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -34,11 +37,22 @@ const handle = async (req: ApiRequest<ChemicalCreateInput>): Promise<ApiResponse
   if (validationError) return toUnprocessable(validationError)
 
   const now = when()
-  const chemical: Chemical = { id: id(), name: req.body.name.trim(), epaNumber: req.body.epaNumber?.trim(),
-    usage: req.body.usage, signalWord: req.body.signalWord, restrictedUse: req.body.restrictedUse,
-    reEntryIntervalHours: req.body.reEntryIntervalHours, storageLocation: req.body.storageLocation?.trim(),
-    sdsUrl: req.body.sdsUrl?.trim(), labels: undefined, attachments: undefined, notes: undefined, createdAt: now,
-    updatedAt: now }
+  const chemical: Chemical = {
+    id: id(),
+    name: req.body.name.trim(),
+    epaNumber: req.body.epaNumber?.trim(),
+    usage: req.body.usage,
+    signalWord: req.body.signalWord,
+    restrictedUse: req.body.restrictedUse,
+    reEntryIntervalHours: req.body.reEntryIntervalHours,
+    storageLocation: req.body.storageLocation?.trim(),
+    sdsUrl: req.body.sdsUrl?.trim(),
+    labels: undefined,
+    attachments: undefined,
+    notes: undefined,
+    createdAt: now,
+    updatedAt: now
+  }
 
   const { error } = await Supabase.client().from('chemicals').insert(chemicalToRow(chemical))
 

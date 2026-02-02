@@ -12,7 +12,10 @@ const TARGET_DIRS = [`${ROOT}/source`, `${ROOT}/devops`]
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
 /** Relative paths that are allowed to use Deno.env. */
-const ALLOWED_FILES = new Set(['devops/scripts/env-guard.ts', 'source/utils/configure-deno.ts'])
+const ALLOWED_FILES = new Set([
+  'devops/scripts/env-guard.ts',
+  'source/utils/configure-deno.ts'
+])
 
 /** Match direct Deno.env or Deno.test access. */
 const DISALLOWED_USAGE = /\bDeno\.env\b/g
@@ -33,7 +36,8 @@ const collectFiles = async (dir: string): Promise<string[]> => {
 }
 
 /** Convert a zero-based index into a 1-based line number. */
-const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number =>
+  source.slice(0, index).split('\n').length
 
 const main = async () => {
   const files = (await Promise.all(TARGET_DIRS.map(collectFiles))).flat()

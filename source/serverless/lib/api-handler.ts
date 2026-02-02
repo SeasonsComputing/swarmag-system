@@ -105,13 +105,19 @@ const normalizeHeaderMap = (headers: HttpHeaders): HttpHeaders => {
  * @param config CORS configuration.
  * @returns Headers object with CORS headers.
  */
-const buildCorsHeaders = (config: boolean | NonNullable<ApiAdapterConfig['cors']>): HttpHeaders => {
+const buildCorsHeaders = (
+  config: boolean | NonNullable<ApiAdapterConfig['cors']>
+): HttpHeaders => {
   if (config === false) return {}
   const corsConfig = config === true ? {} : config
-  return { [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
-    [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ') ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization', [HEADER_VARY]: 'Origin',
-    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {}) }
+  return {
+    [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
+    [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ')
+      ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization',
+    [HEADER_VARY]: 'Origin',
+    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {})
+  }
 }
 
 /**
@@ -191,7 +197,8 @@ const parseRequestBody = async (
   if (contentLength) {
     const parsedLength = Number.parseInt(contentLength, 10)
     if (!Number.isNaN(parsedLength) && parsedLength > maxSize) {
-      throw new NamedError('PayloadTooLarge', `Request body exceeds maximum size of ${maxSize} bytes`)
+      throw new NamedError('PayloadTooLarge',
+        `Request body exceeds maximum size of ${maxSize} bytes`)
     }
   }
 
@@ -202,7 +209,8 @@ const parseRequestBody = async (
 
   const bodySize = byteLength(decodedBody)
   if (bodySize > maxSize) {
-    throw new NamedError('PayloadTooLarge', `Request body exceeds maximum size of ${maxSize} bytes`)
+    throw new NamedError('PayloadTooLarge',
+      `Request body exceeds maximum size of ${maxSize} bytes`)
   }
 
   // Validate Content-Type for bodies
@@ -245,12 +253,15 @@ const makeResponse = (
   const normalizedResponseHeaders = normalizeHeaderMap(additionalHeaders)
 
   if (NO_BODY_STATUS_CODES.has(statusCode)) {
-    return new Response('', { status: statusCode,
-      headers: toHeaders({ ...corsHeaders, ...normalizedResponseHeaders }) })
+    return new Response('', {
+      status: statusCode,
+      headers: toHeaders({ ...corsHeaders, ...normalizedResponseHeaders })
+    })
   }
 
   const customContentType = normalizedResponseHeaders[HEADER_CONTENT_TYPE]
-  const isJsonResponse = !customContentType || customContentType.toLowerCase().includes('application/json')
+  const isJsonResponse = !customContentType
+    || customContentType.toLowerCase().includes('application/json')
 
   let bodyString: string
   if (isJsonResponse) {
@@ -268,9 +279,14 @@ const makeResponse = (
       'Non-JSON responses must provide a string body', config)
   }
 
-  return new Response(bodyString, { status: statusCode,
-    headers: toHeaders({ ...(isJsonResponse ? { [HEADER_CONTENT_TYPE]: 'application/json' } : {}), ...corsHeaders,
-      ...normalizedResponseHeaders }) })
+  return new Response(bodyString, {
+    status: statusCode,
+    headers: toHeaders({
+      ...(isJsonResponse ? { [HEADER_CONTENT_TYPE]: 'application/json' } : {}),
+      ...corsHeaders,
+      ...normalizedResponseHeaders
+    })
+  })
 }
 
 /**
@@ -298,10 +314,11 @@ export const makeErrorResponse = (
  * @param config Optional adapter configuration for CORS, validation, etc.
  * @returns Fetch handler ready for export.
  */
-export const createApiHandler = <RequestBody = unknown, Query = HttpQuery, ResponseBody = unknown>(
-  handle: ApiHandler<RequestBody, Query, ResponseBody>,
-  config: ApiAdapterConfig = {}
-) => {
+export const createApiHandler = <
+  RequestBody = unknown,
+  Query = HttpQuery,
+  ResponseBody = unknown
+>(handle: ApiHandler<RequestBody, Query, ResponseBody>, config: ApiAdapterConfig = {}) => {
   return async (request: Request): Promise<Response> => {
     try {
       const method = request.method
@@ -322,15 +339,22 @@ export const createApiHandler = <RequestBody = unknown, Query = HttpQuery, Respo
         body = await parseRequestBody(request, method, headers['content-type'], config)
       } catch (err) {
         const { name, message } = serializeError(err)
-        const statusCode = name === 'PayloadTooLarge' ? HttpCodes.payloadTooLarge : HttpCodes.badRequest
+        const statusCode = name === 'PayloadTooLarge'
+          ? HttpCodes.payloadTooLarge
+          : HttpCodes.badRequest
         return makeErrorResponse(statusCode, name, message, config)
       }
 
       const url = new URL(request.url)
       const query = normalizeQuery(url.searchParams, config.multiValueQueryParams ?? false)
 
-      const apiRequest: ApiRequest<RequestBody, Query, HttpHeaders> = { method, body: body as RequestBody,
-        query: query as Query, headers, rawRequest: request }
+      const apiRequest: ApiRequest<RequestBody, Query, HttpHeaders> = {
+        method,
+        body: body as RequestBody,
+        query: query as Query,
+        headers,
+        rawRequest: request
+      }
 
       const result: ApiResponse<ResponseBody, HttpHeaders> = await handle(apiRequest)
       const statusCode = validateStatusCode(result.statusCode)
