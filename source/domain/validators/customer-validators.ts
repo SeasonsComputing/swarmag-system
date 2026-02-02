@@ -6,7 +6,7 @@ import type { Customer } from '@domain/abstractions/customer.ts'
 import type {
   CustomerCreateInput,
   CustomerUpdateInput,
-  PrimaryContactInput,
+  PrimaryContactInput
 } from '@domain/protocol/customer-protocol.ts'
 import { isNonEmptyString } from './helper-validators.ts'
 
