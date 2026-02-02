@@ -6,9 +6,14 @@ type Namespace = 'domain' | 'utils' | 'serverless' | 'apps' | 'api' | 'tests' | 
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
-const NAMESPACE_DIRS: Record<Exclude<Namespace, 'external'>, string> = { domain: '/source/domain/',
-  utils: '/source/utils/', serverless: '/source/serverless/', apps: '/source/apps/', api: '/source/api/',
-  tests: '/source/tests/' }
+const NAMESPACE_DIRS: Record<Exclude<Namespace, 'external'>, string> = {
+  domain: '/source/domain/',
+  utils: '/source/utils/',
+  serverless: '/source/serverless/',
+  apps: '/source/apps/',
+  api: '/source/api/',
+  tests: '/source/tests/'
+}
 
 const ALLOWED_DEPS: Record<Exclude<Namespace, 'external'>, Set<Namespace>> = {
   domain: new Set(['domain', 'utils', 'external']),
@@ -44,7 +49,9 @@ const namespaceForSpecifier = (specifier: string, filePath: string): Namespace =
   if (specifier.startsWith('@tests-fixtures/') || specifier.startsWith('@tests-helpers/')) {
     return 'tests'
   }
-  if (specifier.startsWith('@serverless-lib/') || specifier.startsWith('@serverless-functions/')) {
+  if (
+    specifier.startsWith('@serverless-lib/') || specifier.startsWith('@serverless-functions/')
+  ) {
     return 'serverless'
   }
   if (specifier.startsWith('./') || specifier.startsWith('../')) {
@@ -80,7 +87,8 @@ const findImports = (source: string): Array<{ specifier: string; index: number }
   return imports
 }
 
-const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number =>
+  source.slice(0, index).split('\n').length
 
 const exists = async (path: string): Promise<boolean> => {
   try {

@@ -3,7 +3,10 @@
  */
 
 import type { Asset } from '@domain/abstractions/asset.ts'
-import { type AssetCreateInput, validateAssetCreate } from '@domain/validators/asset-validators.ts'
+import {
+  type AssetCreateInput,
+  validateAssetCreate
+} from '@domain/validators/asset-validators.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -34,9 +37,17 @@ const handle = async (req: ApiRequest<AssetCreateInput>): Promise<ApiResponse> =
   if (validationError) return toUnprocessable(validationError)
 
   const now = when()
-  const asset: Asset = { id: id(), label: req.body.label.trim(), description: req.body.description?.trim(),
-    serialNumber: req.body.serialNumber?.trim(), type: req.body.type, status: req.body.status ?? 'active',
-    attachments: undefined, createdAt: now, updatedAt: now }
+  const asset: Asset = {
+    id: id(),
+    label: req.body.label.trim(),
+    description: req.body.description?.trim(),
+    serialNumber: req.body.serialNumber?.trim(),
+    type: req.body.type,
+    status: req.body.status ?? 'active',
+    attachments: undefined,
+    createdAt: now,
+    updatedAt: now
+  }
 
   const { error } = await Supabase.client().from('assets').insert(assetToRow(asset))
 

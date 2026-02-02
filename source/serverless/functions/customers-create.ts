@@ -3,7 +3,10 @@
  */
 
 import type { Contact, Customer } from '@domain/abstractions/customer.ts'
-import { type CustomerCreateInput, validateCustomerCreate } from '@domain/validators/customer-validators.ts'
+import {
+  type CustomerCreateInput,
+  validateCustomerCreate
+} from '@domain/validators/customer-validators.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -37,15 +40,36 @@ const handle = async (req: ApiRequest<CustomerCreateInput>): Promise<ApiResponse
   const customerId = id()
   const primaryContactId = id()
 
-  const primaryContact: Contact = { id: primaryContactId, customerId, name: req.body.primaryContact.name.trim(),
-    email: req.body.primaryContact.email?.trim(), phone: req.body.primaryContact.phone?.trim(),
-    preferredChannel: req.body.primaryContact.preferredChannel, notes: undefined, createdAt: now, updatedAt: now }
+  const primaryContact: Contact = {
+    id: primaryContactId,
+    customerId,
+    name: req.body.primaryContact.name.trim(),
+    email: req.body.primaryContact.email?.trim(),
+    phone: req.body.primaryContact.phone?.trim(),
+    preferredChannel: req.body.primaryContact.preferredChannel,
+    notes: undefined,
+    createdAt: now,
+    updatedAt: now
+  }
 
-  const customer: Customer = { id: customerId, name: req.body.name.trim(), status: req.body.status ?? 'prospect',
-    line1: req.body.line1.trim(), line2: req.body.line2?.trim(), city: req.body.city.trim(),
-    state: req.body.state.trim(), postalCode: req.body.postalCode.trim(), country: req.body.country.trim(),
-    accountManagerId: req.body.accountManagerId, primaryContactId, sites: [], contacts: [primaryContact],
-    notes: undefined, createdAt: now, updatedAt: now }
+  const customer: Customer = {
+    id: customerId,
+    name: req.body.name.trim(),
+    status: req.body.status ?? 'prospect',
+    line1: req.body.line1.trim(),
+    line2: req.body.line2?.trim(),
+    city: req.body.city.trim(),
+    state: req.body.state.trim(),
+    postalCode: req.body.postalCode.trim(),
+    country: req.body.country.trim(),
+    accountManagerId: req.body.accountManagerId,
+    primaryContactId,
+    sites: [],
+    contacts: [primaryContact],
+    notes: undefined,
+    createdAt: now,
+    updatedAt: now
+  }
 
   const { error } = await Supabase.client().from('customers').insert(customerToRow(customer))
 

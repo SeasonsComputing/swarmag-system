@@ -33,8 +33,8 @@ const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiR
   const userId = req.query?.id
   if (!isNonEmptyString(userId)) return toBadRequest('id is required')
 
-  const { data, error } = await Supabase.client().from('users').select('*').eq('id', userId).is('deleted_at', null)
-    .single()
+  const { data, error } = await Supabase.client().from('users').select('*').eq('id', userId)
+    .is('deleted_at', null).single()
 
   if (error || !data) return toNotFound('User not found')
 

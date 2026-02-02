@@ -26,11 +26,21 @@ const HttpMethodSet = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD
  * @param value Raw value to validate HTTP method.
  * @returns True when value is a supported HTTP method.
  */
-export const isHttpMethod = (value: string): value is HttpMethod => (HttpMethodSet as readonly string[]).includes(value)
+export const isHttpMethod = (value: string): value is HttpMethod =>
+  (HttpMethodSet as readonly string[]).includes(value)
 
 /** HTTP response codes for REST calls. */
-export const HttpCodes = { ok: 200, created: 201, noContent: 204, badRequest: 400, notFound: 404, methodNotAllowed: 405,
-  payloadTooLarge: 413, unprocessableEntity: 422, internalError: 500 } as const
+export const HttpCodes = {
+  ok: 200,
+  created: 201,
+  noContent: 204,
+  badRequest: 400,
+  notFound: 404,
+  methodNotAllowed: 405,
+  payloadTooLarge: 413,
+  unprocessableEntity: 422,
+  internalError: 500
+} as const
 
 /** Common HTTP header keys. */
 export const HEADER_CONTENT_TYPE = 'content-type'
@@ -96,37 +106,49 @@ const extractErrorMessage = (err: unknown): string => {
  * @param data Response data.
  * @returns ApiResponse with status 200.
  */
-export const toOk = <T>(data: T): ApiResponse<{ data: T }> => ({ statusCode: HttpCodes.ok, body: { data } })
+export const toOk = <T>(data: T): ApiResponse<{ data: T }> => ({
+  statusCode: HttpCodes.ok,
+  body: { data }
+})
 
 /**
  * Build a 201 Created response with data payload.
  * @param data Created resource data.
  * @returns ApiResponse with status 201.
  */
-export const toCreated = <T>(data: T): ApiResponse<{ data: T }> => ({ statusCode: HttpCodes.created, body: { data } })
+export const toCreated = <T>(data: T): ApiResponse<{ data: T }> => ({
+  statusCode: HttpCodes.created,
+  body: { data }
+})
 
 /**
  * Build a 400 Bad Request error response.
  * @param error Error message.
  * @returns ApiResponse with status 400.
  */
-export const toBadRequest = (error: string): ApiResponse<{ error: string }> => ({ statusCode: HttpCodes.badRequest,
-  body: { error } })
+export const toBadRequest = (error: string): ApiResponse<{ error: string }> => ({
+  statusCode: HttpCodes.badRequest,
+  body: { error }
+})
 
 /**
  * Build a 404 Not Found error response.
  * @param error Error message.
  * @returns ApiResponse with status 404.
  */
-export const toNotFound = (error: string): ApiResponse<{ error: string }> => ({ statusCode: HttpCodes.notFound,
-  body: { error } })
+export const toNotFound = (error: string): ApiResponse<{ error: string }> => ({
+  statusCode: HttpCodes.notFound,
+  body: { error }
+})
 
 /**
  * Build a 405 Method Not Allowed error response.
  * @returns ApiResponse with status 405.
  */
-export const toMethodNotAllowed = (): ApiResponse<{ error: string }> => ({ statusCode: HttpCodes.methodNotAllowed,
-  body: { error: 'Method Not Allowed' } })
+export const toMethodNotAllowed = (): ApiResponse<{ error: string }> => ({
+  statusCode: HttpCodes.methodNotAllowed,
+  body: { error: 'Method Not Allowed' }
+})
 
 /**
  * Build a 422 Unprocessable Entity error response.
@@ -147,5 +169,7 @@ export const toUnprocessable = (error: string): ApiResponse<{ error: string }> =
 export const toInternalError = (
   error: string,
   details?: unknown
-): ApiResponse<{ error: string; details?: string }> => ({ statusCode: HttpCodes.internalError,
-  body: details ? { error, details: extractErrorMessage(details) } : { error } })
+): ApiResponse<{ error: string; details?: string }> => ({
+  statusCode: HttpCodes.internalError,
+  body: details ? { error, details: extractErrorMessage(details) } : { error }
+})

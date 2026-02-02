@@ -21,7 +21,9 @@ export class Supabase {
     const SUPABASE_URL = Config.get('SUPABASE_URL')
     const SUPABASE_SERVICE_KEY = Config.get('SUPABASE_SERVICE_KEY')
 
-    Supabase.#cache = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, { auth: { persistSession: false } })
+    Supabase.#cache = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
+      auth: { persistSession: false }
+    })
 
     return Supabase.#cache
   }

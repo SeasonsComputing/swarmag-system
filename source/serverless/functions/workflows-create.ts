@@ -3,7 +3,10 @@
  */
 
 import type { Workflow } from '@domain/abstractions/workflow.ts'
-import { validateWorkflowCreate, type WorkflowCreateInput } from '@domain/validators/workflow-validators.ts'
+import {
+  validateWorkflowCreate,
+  type WorkflowCreateInput
+} from '@domain/validators/workflow-validators.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -34,9 +37,18 @@ const handle = async (req: ApiRequest<WorkflowCreateInput>): Promise<ApiResponse
   if (validationError) return toUnprocessable(validationError)
 
   const now = when()
-  const workflow: Workflow = { id: id(), serviceId: req.body.serviceId, name: req.body.name.trim(),
-    description: req.body.description?.trim(), version: 1, effectiveFrom: now, steps: req.body.steps,
-    locationsRequired: undefined, createdAt: now, updatedAt: now }
+  const workflow: Workflow = {
+    id: id(),
+    serviceId: req.body.serviceId,
+    name: req.body.name.trim(),
+    description: req.body.description?.trim(),
+    version: 1,
+    effectiveFrom: now,
+    steps: req.body.steps,
+    locationsRequired: undefined,
+    createdAt: now,
+    updatedAt: now
+  }
 
   const { error } = await Supabase.client().from('workflows').insert(workflowToRow(workflow))
 

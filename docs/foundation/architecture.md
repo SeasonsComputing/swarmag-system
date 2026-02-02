@@ -145,11 +145,16 @@ The `api-client-binding.ts` module exports:
 
 ```typescript
 // Define API client using factory
-const UsersApi = makeApiClient<User, UserCreateInput, UserUpdateInput>({ basePath: '/api/users' })
+const UsersApi = makeApiClient<User, UserCreateInput, UserUpdateInput>({
+  basePath: '/api/users'
+})
 
 // Create
-const user = await UsersApi.create({ displayName: 'Ada Lovelace', primaryEmail: 'ada@example.com',
-  phoneNumber: '555-0100' })
+const user = await UsersApi.create({
+  displayName: 'Ada Lovelace',
+  primaryEmail: 'ada@example.com',
+  phoneNumber: '555-0100'
+})
 
 // Get by ID
 const fetched = await UsersApi.get(user.id)
@@ -301,6 +306,12 @@ source/domain/
 - Workflow-related types (Question, Answer, QuestionType) live in `workflow.ts` since workflows own that concept.
 - Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `helpers-protocol.ts`.
 
+### .3 Packaging & Distribution Invariant
+
+Top-level directories are independently shippable packages.
+api/ defines consumer intent, providers implement it, and applications compose providers.
+No package may assume how another is deployed.
+
 ## 10. Build, CI/CD, Deployment
 
 - GitHub Actions for CI/CD.
@@ -344,12 +355,19 @@ LIVE_BASE_URL=https://<env> deno test --allow-env --allow-net --allow-read sourc
 
 ### 10.3 Local development helpers
 
-| Command                                                                                                                      | Purpose                                                                                  |
-| ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor` | Start local Supabase with minimal services.                                              |
-| `supabase db reset --yes`                                                                                                    | Reset and re-apply migrations.                                                           |
-| `supabase status --output env`                                                                                               | Show local Supabase URLs and keys.                                                       |
-| `XDG_CONFIG_HOME=./.config netlify dev`                                                                                      | Run Netlify dev (uses `source/apps/dev-server/dev-server.ts` for the custom dev server). |
+```bash
+# Start local Supabase with minimal services
+supabase start --exclude realtime,storage-api,imgproxy,mailpit,postgres-meta,studio,edge-runtime,logflare,vector,supavisor
+
+# Reset and re-apply migrations
+supabase db reset --yes
+
+# Show local Supabase URLs and keys
+supabase status --output env
+
+# Run Netlify dev (uses source/apps/dev-server/dev-server.ts for the custom dev server)
+XDG_CONFIG_HOME=./.config netlify dev
+```
 
 ### 10.4 Database GUI connection (DBeaver)
 

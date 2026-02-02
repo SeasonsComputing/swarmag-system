@@ -34,16 +34,31 @@ const handle = async (req: ApiRequest<JobLogAppendInput>): Promise<ApiResponse> 
   if (validationError) return toUnprocessable(validationError)
 
   const now: When = when()
-  const logEntry: JobLogEntry = { id: id(), jobId: req.body.jobId, planId: req.body.planId, type: req.body.type,
-    message: req.body.message, occurredAt: req.body.occurredAt ?? now, createdAt: now,
-    createdById: req.body.createdById, location: req.body.location, attachments: req.body.attachments,
-    payload: req.body.payload }
+  const logEntry: JobLogEntry = {
+    id: id(),
+    jobId: req.body.jobId,
+    planId: req.body.planId,
+    type: req.body.type,
+    message: req.body.message,
+    occurredAt: req.body.occurredAt ?? now,
+    createdAt: now,
+    createdById: req.body.createdById,
+    location: req.body.location,
+    attachments: req.body.attachments,
+    payload: req.body.payload
+  }
 
   const supabase = Supabase.client()
 
-  const { error } = await supabase.from('job_logs').insert({ id: logEntry.id, job_id: logEntry.jobId,
-    plan_id: logEntry.planId, type: logEntry.type, occurred_at: logEntry.occurredAt, created_at: logEntry.createdAt,
-    payload: logEntry })
+  const { error } = await supabase.from('job_logs').insert({
+    id: logEntry.id,
+    job_id: logEntry.jobId,
+    plan_id: logEntry.planId,
+    type: logEntry.type,
+    occurred_at: logEntry.occurredAt,
+    created_at: logEntry.createdAt,
+    payload: logEntry
+  })
 
   if (error) return toInternalError('Failed to append job log entry', error)
 

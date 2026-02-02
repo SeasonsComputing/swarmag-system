@@ -39,31 +39,60 @@ const handle = async (req: ApiRequest<JobCreateInput>): Promise<ApiResponse> => 
   const planId: ID = id()
   const jobStatus: JobStatus = 'scheduled'
 
-  const assessment: JobAssessment = { ...req.body.assessment, id: assessmentId, createdAt: now, updatedAt: now }
+  const assessment: JobAssessment = {
+    ...req.body.assessment,
+    id: assessmentId,
+    createdAt: now,
+    updatedAt: now
+  }
 
   const plan: JobPlan = { ...req.body.plan, id: planId, jobId, createdAt: now, updatedAt: now }
 
-  const job: Job = { id: jobId, assessmentId, planId, serviceId: req.body.serviceId, customerId: req.body.customerId,
-    status: jobStatus, createdAt: now, updatedAt: now }
+  const job: Job = {
+    id: jobId,
+    assessmentId,
+    planId,
+    serviceId: req.body.serviceId,
+    customerId: req.body.customerId,
+    status: jobStatus,
+    createdAt: now,
+    updatedAt: now
+  }
 
   const supabase = Supabase.client()
 
-  const jobInsert = supabase.from('jobs').insert({ id: job.id, service_id: job.serviceId, customer_id: job.customerId,
-    assessment_id: assessment.id, plan_id: plan.id, status: job.status, payload: job, created_at: job.createdAt,
-    updated_at: job.updatedAt })
+  const jobInsert = supabase.from('jobs').insert({
+    id: job.id,
+    service_id: job.serviceId,
+    customer_id: job.customerId,
+    assessment_id: assessment.id,
+    plan_id: plan.id,
+    status: job.status,
+    payload: job,
+    created_at: job.createdAt,
+    updated_at: job.updatedAt
+  })
 
-  const planInsert = supabase.from('job_plans').insert({ id: plan.id, job_id: job.id, workflow_id: plan.workflowId,
-    payload: plan, created_at: plan.createdAt, updated_at: plan.updatedAt })
+  const planInsert = supabase.from('job_plans').insert({
+    id: plan.id,
+    job_id: job.id,
+    workflow_id: plan.workflowId,
+    payload: plan,
+    created_at: plan.createdAt,
+    updated_at: plan.updatedAt
+  })
 
-  const assessmentInsert = supabase.from('job_assessments').insert({ id: assessment.id, job_id: job.id,
-    payload: assessment, created_at: assessment.createdAt, updated_at: assessment.updatedAt })
+  const assessmentInsert = supabase.from('job_assessments').insert({
+    id: assessment.id,
+    job_id: job.id,
+    payload: assessment,
+    created_at: assessment.createdAt,
+    updated_at: assessment.updatedAt
+  })
 
   try {
-    const [{ error: jobError }, { error: planError }, { error: assessmentError }] = await Promise.all([
-      jobInsert,
-      planInsert,
-      assessmentInsert
-    ])
+    const [{ error: jobError }, { error: planError }, { error: assessmentError }] =
+      await Promise.all([jobInsert, planInsert, assessmentInsert])
 
     if (jobError || planError || assessmentError) {
       throw new Error(jobError?.message ?? planError?.message ?? assessmentError?.message)

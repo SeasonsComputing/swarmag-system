@@ -39,8 +39,12 @@ export const validateAssetCreate = (input?: AssetCreateInput | null): string | n
 export const validateAssetUpdate = (input?: AssetUpdateInput | null): string | null => {
   if (!input) return 'Request body is required'
   if (!isNonEmptyString(input.id)) return 'id is required'
-  if (input.label !== undefined && !isNonEmptyString(input.label)) return 'label cannot be empty'
-  if (input.type !== undefined && !isNonEmptyString(input.type)) return 'type cannot be empty'
+  if (input.label !== undefined && !isNonEmptyString(input.label)) {
+    return 'label cannot be empty'
+  }
+  if (input.type !== undefined && !isNonEmptyString(input.type)) {
+    return 'type cannot be empty'
+  }
   if (input.status !== undefined && !isAssetStatus(input.status)) {
     return 'status must be active, maintenance, retired, or reserved'
   }

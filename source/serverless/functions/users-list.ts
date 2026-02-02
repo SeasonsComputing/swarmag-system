@@ -33,8 +33,8 @@ const handle = async (req: ApiRequest<undefined, ListQuery>): Promise<ApiRespons
   const rangeEnd = cursor + limit - 1
 
   const supabase = Supabase.client()
-  const { data, error, count } = await supabase.from('users').select('*', { count: 'exact' }).is('deleted_at', null)
-    .range(cursor, rangeEnd)
+  const { data, error, count } = await supabase.from('users').select('*', { count: 'exact' })
+    .is('deleted_at', null).range(cursor, rangeEnd)
 
   if (error) return toInternalError('Failed to load users', error)
 

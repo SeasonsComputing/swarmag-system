@@ -14,11 +14,25 @@ export const isCustomerStatus = (value: unknown): value is Customer['status'] =>
   value === 'active' || value === 'inactive' || value === 'prospect'
 
 /** Map a domain Customer into a Supabase row shape. */
-export const customerToRow = (customer: Customer) => ({ id: customer.id, name: customer.name, status: customer.status,
-  line1: customer.line1, line2: customer.line2 ?? null, city: customer.city, state: customer.state,
-  postal_code: customer.postalCode, country: customer.country, account_manager_id: customer.accountManagerId ?? null,
-  primary_contact_id: customer.primaryContactId ?? null, sites: customer.sites, contacts: customer.contacts,
-  notes: customer.notes ?? null, created_at: customer.createdAt, updated_at: customer.updatedAt, payload: customer })
+export const customerToRow = (customer: Customer) => ({
+  id: customer.id,
+  name: customer.name,
+  status: customer.status,
+  line1: customer.line1,
+  line2: customer.line2 ?? null,
+  city: customer.city,
+  state: customer.state,
+  postal_code: customer.postalCode,
+  country: customer.country,
+  account_manager_id: customer.accountManagerId ?? null,
+  primary_contact_id: customer.primaryContactId ?? null,
+  sites: customer.sites,
+  contacts: customer.contacts,
+  notes: customer.notes ?? null,
+  created_at: customer.createdAt,
+  updated_at: customer.updatedAt,
+  payload: customer
+})
 
 /**
  * Convert a Supabase row into a Customer domain model.
@@ -80,11 +94,26 @@ export const rowToCustomer = (row: unknown): Customer => {
     throw new Error('Customer row is missing required fields')
   }
 
-  return { id, name, status, line1, line2: (record.line2 ?? undefined) as string | undefined, city, state, postalCode,
+  return {
+    id,
+    name,
+    status,
+    line1,
+    line2: (record.line2 ?? undefined) as string | undefined,
+    city,
+    state,
+    postalCode,
     country,
-    accountManagerId: (record.account_manager_id ?? record.accountManagerId ?? undefined) as string | undefined,
-    primaryContactId: (record.primary_contact_id ?? record.primaryContactId ?? undefined) as string | undefined, sites,
-    contacts: contacts as Customer['contacts'], notes: Array.isArray(record.notes) ? record.notes : undefined,
+    accountManagerId: (record.account_manager_id ?? record.accountManagerId ?? undefined) as
+      | string
+      | undefined,
+    primaryContactId: (record.primary_contact_id ?? record.primaryContactId ?? undefined) as
+      | string
+      | undefined,
+    sites,
+    contacts: contacts as Customer['contacts'],
+    notes: Array.isArray(record.notes) ? record.notes : undefined,
     createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string }
+    updatedAt: (record.updated_at ?? record.updatedAt) as string
+  }
 }

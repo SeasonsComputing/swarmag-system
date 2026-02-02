@@ -2,7 +2,10 @@
  * Domain-level invariant validators for workflows.
  */
 
-import type { WorkflowCreateInput, WorkflowUpdateInput } from '@domain/protocol/workflow-protocol.ts'
+import type {
+  WorkflowCreateInput,
+  WorkflowUpdateInput
+} from '@domain/protocol/workflow-protocol.ts'
 import { isNonEmptyString } from './helper-validators.ts'
 
 export type { WorkflowCreateInput, WorkflowUpdateInput }
@@ -29,8 +32,14 @@ export const validateWorkflowCreate = (input?: WorkflowCreateInput | null): stri
 export const validateWorkflowUpdate = (input?: WorkflowUpdateInput | null): string | null => {
   if (!input) return 'Request body is required'
   if (!isNonEmptyString(input.id)) return 'id is required'
-  if (input.name !== undefined && !isNonEmptyString(input.name)) return 'name cannot be empty'
-  if (input.steps !== undefined && !Array.isArray(input.steps)) return 'steps must be an array'
-  if (input.steps !== undefined && input.steps.length === 0) return 'steps must have at least one step'
+  if (input.name !== undefined && !isNonEmptyString(input.name)) {
+    return 'name cannot be empty'
+  }
+  if (input.steps !== undefined && !Array.isArray(input.steps)) {
+    return 'steps must be an array'
+  }
+  if (input.steps !== undefined && input.steps.length === 0) {
+    return 'steps must have at least one step'
+  }
   return null
 }

@@ -1,6 +1,7 @@
 # swarmAg Code Style Guide
 
-This guide defines the coding conventions and patterns used throughout the swarmAg codebase. Follow these standards when writing or modifying code in `serverless/functions/`, `domain/`, `api/`, and `utils/`.
+This guide defines the coding conventions and patterns used throughout the swarmAg codebase. Follow these standards when writing or modifying 
+any software artifact with the system.
 
 ## 1. Language and Tooling
 
@@ -213,7 +214,9 @@ export class ExampleConfig {
 
   static get(name: string): string {
     if (!ExampleConfig.#initialized) ExampleConfig.fail('Not initialized')
-    if (!ExampleConfig.#cache.has(name)) ExampleConfig.fail(`Config not registered: ${name}`)
+    if (!ExampleConfig.#cache.has(name)) {
+      ExampleConfig.fail(`Config not registered: ${name}`)
+    }
 
     const value = ExampleConfig.#source.get(name)
     if (!value) ExampleConfig.fail(`${name} missing at runtime`)

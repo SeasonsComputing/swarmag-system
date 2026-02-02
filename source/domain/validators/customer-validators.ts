@@ -37,7 +37,9 @@ export const validateCustomerCreate = (input?: CustomerCreateInput | null): stri
   if (!isNonEmptyString(input.postalCode)) return 'postalCode is required'
   if (!isNonEmptyString(input.country)) return 'country is required'
   if (!input.primaryContact) return 'primaryContact is required'
-  if (!isNonEmptyString(input.primaryContact.name)) return 'primaryContact.name is required'
+  if (!isNonEmptyString(input.primaryContact.name)) {
+    return 'primaryContact.name is required'
+  }
   return null
 }
 
@@ -49,14 +51,26 @@ export const validateCustomerCreate = (input?: CustomerCreateInput | null): stri
 export const validateCustomerUpdate = (input?: CustomerUpdateInput | null): string | null => {
   if (!input) return 'Request body is required'
   if (!isNonEmptyString(input.id)) return 'id is required'
-  if (input.name !== undefined && !isNonEmptyString(input.name)) return 'name cannot be empty'
+  if (input.name !== undefined && !isNonEmptyString(input.name)) {
+    return 'name cannot be empty'
+  }
   if (input.status !== undefined && !isCustomerStatus(input.status)) {
     return 'status must be active, inactive, or prospect'
   }
-  if (input.line1 !== undefined && !isNonEmptyString(input.line1)) return 'line1 cannot be empty'
-  if (input.city !== undefined && !isNonEmptyString(input.city)) return 'city cannot be empty'
-  if (input.state !== undefined && !isNonEmptyString(input.state)) return 'state cannot be empty'
-  if (input.postalCode !== undefined && !isNonEmptyString(input.postalCode)) return 'postalCode cannot be empty'
-  if (input.country !== undefined && !isNonEmptyString(input.country)) return 'country cannot be empty'
+  if (input.line1 !== undefined && !isNonEmptyString(input.line1)) {
+    return 'line1 cannot be empty'
+  }
+  if (input.city !== undefined && !isNonEmptyString(input.city)) {
+    return 'city cannot be empty'
+  }
+  if (input.state !== undefined && !isNonEmptyString(input.state)) {
+    return 'state cannot be empty'
+  }
+  if (input.postalCode !== undefined && !isNonEmptyString(input.postalCode)) {
+    return 'postalCode cannot be empty'
+  }
+  if (input.country !== undefined && !isNonEmptyString(input.country)) {
+    return 'country cannot be empty'
+  }
   return null
 }

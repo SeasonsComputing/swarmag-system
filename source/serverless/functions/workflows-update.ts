@@ -3,7 +3,10 @@
  */
 
 import type { Workflow } from '@domain/abstractions/workflow.ts'
-import { validateWorkflowUpdate, type WorkflowUpdateInput } from '@domain/validators/workflow-validators.ts'
+import {
+  validateWorkflowUpdate,
+  type WorkflowUpdateInput
+} from '@domain/validators/workflow-validators.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -35,8 +38,8 @@ const handle = async (req: ApiRequest<WorkflowUpdateInput>): Promise<ApiResponse
   if (validationError) return toUnprocessable(validationError)
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase.from('workflows').select('*').eq('id', req.body.id)
-    .single()
+  const { data: existingRow, error: fetchError } = await supabase.from('workflows').select('*')
+    .eq('id', req.body.id).single()
 
   if (fetchError || !existingRow) return toNotFound('Workflow not found')
 
@@ -44,18 +47,28 @@ const handle = async (req: ApiRequest<WorkflowUpdateInput>): Promise<ApiResponse
   try {
     current = rowToWorkflow(existingRow)
   } catch (parseError) {
-    return toInternalError('Invalid workflow record returned from Supabase', parseError as Error)
+    return toInternalError('Invalid workflow record returned from Supabase',
+      parseError as Error)
   }
 
   const now = when()
   const stepsChanged = req.body.steps !== undefined
 
-  const updated: Workflow = { ...current, name: req.body.name?.trim() ?? current.name,
-    description: req.body.description === null ? undefined : req.body.description?.trim() ?? current.description,
-    steps: req.body.steps ?? current.steps, version: stepsChanged ? current.version + 1 : current.version,
-    effectiveFrom: stepsChanged ? now : current.effectiveFrom, updatedAt: now }
+  const updated: Workflow = {
+    ...current,
+    name: req.body.name?.trim() ?? current.name,
+    description: req.body.description === null
+      ? undefined
+      : req.body.description?.trim() ?? current.description,
+    steps: req.body.steps ?? current.steps,
+    version: stepsChanged ? current.version + 1 : current.version,
+    effectiveFrom: stepsChanged ? now : current.effectiveFrom,
+    updatedAt: now
+  }
 
-  const { error: updateError } = await supabase.from('workflows').update(workflowToRow(updated)).eq('id', updated.id)
+  const { error: updateError } = await supabase.from('workflows').update(
+    workflowToRow(updated)
+  ).eq('id', updated.id)
 
   if (updateError) return toInternalError('Failed to update workflow', updateError)
 

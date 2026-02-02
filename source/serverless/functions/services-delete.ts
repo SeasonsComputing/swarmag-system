@@ -33,8 +33,8 @@ const handle = async (req: ApiRequest<{ id?: string }>): Promise<ApiResponse> =>
   if (!isNonEmptyString(serviceId)) return toUnprocessable('id is required')
 
   const supabase = Supabase.client()
-  const { data: existingRow, error: fetchError } = await supabase.from('services').select('id').eq('id', serviceId)
-    .single()
+  const { data: existingRow, error: fetchError } = await supabase.from('services').select('id')
+    .eq('id', serviceId).single()
 
   if (fetchError || !existingRow) return toNotFound('Service not found')
 
