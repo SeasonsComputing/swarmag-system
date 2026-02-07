@@ -6,7 +6,7 @@ This document defines the foundational abstractions, contracts, and APIs of the 
 
 ### 1.1 Service
 
-Service is a listed-product that represents something we sell with a SKU. Services are part of a category (aerial, ground); have a description; an inventory of assets required (machines, tools, supplies, workers).
+Service is a listed-product that represents something we sell with an SKU. Services are part of a category (aerial, ground); have a description; an inventory of assets required (machines, tools, supplies, workers).
 
 Many services require the use of Regulated Chemicals. We must manage the acquisition, storage, mixing, and application of chemicals to maintain our license.
 
@@ -18,15 +18,17 @@ Workflow may be composed of a graph of Tasks of which a Workflow is one kind (Co
 
 ### 1.3 Job: Assessment, Plan, & Log
 
-A Job is an aggregate of Assessment, Plan, and Log.
+Job is the work agreement/contract and the hub of the model. It is created first.
 
-A Job Assessment is an assessment of work to be completed on-behalf of a Customer. Job Assessments define the location(s), price estimate, service(s) (see Service), schedule start, and duration estimate. Once a Job Assessment has been agreed-to (signed obligation) then a Job Plan is created for the Job Assessment.
+A Job Assessment evaluates the work to be completed on-behalf of a Customer. Job Assessments define the location(s), price estimate, service(s) (see Service), schedule start, and duration estimate. Once a Job Assessment has been agreed-to (signed obligation) then a Job Plan is created for the Job.
 
 We use sophisticated multispectral mapping drones for aerial and ground services. A Job Assessment will contain 1 more of these maps to inform the Job Plan and direct the Job Log.
 
-Job Plan is used to define the specialized workflow for a Job Assessment. Job Plans are the primary means to inform the job crew of work to be completed. The Job Plan lists the members of the crew to complete the work. Job Plans detail the physical assets required. Job Plans have a schedule divided into phases (preparation, setup, operations, clean-up, complete, retrospective). Job Phases are composed of one or more Workflows. A Workflow may not span phases to simplify the system. A Job Plan can be structured (phases derived from workflows) or free-form (one-off built by hand).
+Job Plan defines the execution for a Job. Job Plans are the primary means to inform the job crew of work to be completed. The Job Plan lists the members of the crew to complete the work. Job Plans detail the physical assets required. Job Plans have a schedule divided into phases (preparation, setup, operations, clean-up, complete, retrospective). Job Phases are composed of one or more Workflows. A Workflow may not span phases to simplify the system. A Job Plan can be structured (phases derived from workflows) or free-form (one-off built by hand).
 
-Job Log memorializes the physical work of executing a Job Plan. The Job Log follows the Job Plan sequentially, capturing photos, GPS coordinates, comments, records actual time accrued and any exceptions or changes made in the field. The Job Log saves any issues or notes about the job _in general_.
+Job Log memorializes the physical work of executing a Job Plan. Logs are append-only. The Job Log follows the Job Plan sequentially, capturing photos, GPS coordinates, comments, records actual time accrued and any exceptions or changes made in the field. The Job Log saves any issues or notes about the job _in general_.
+
+Job has an Assessment and Plan and many Logs. There are no circular foreign keys; Assessment, Plan, and Logs point to Job.
 
 ## 2. Domain Model (`source/domain`)
 
@@ -89,7 +91,7 @@ Define the TypeScript domain library described in `architecture.md`, limited to 
 - `Customer.contacts` is non-empty and `primaryContactId` lives on `Customer`.
 - Locations store coordinates/addresses without a `source` field.
 - JobAssessments must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
-- Soft deletes: abstractions that need logical deletion (starting with `User`) expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after delete.
+- Soft deletes: all abstractions expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after delete.
 - ID strategy: UUID v7 for PK/FK to avoid an ID service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure join tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
 
 ### 2.7 Roles & attribution
@@ -116,17 +118,17 @@ The domain layer follows an abstraction-per-file pattern across three subdirecto
 
 ### 2.9 API surface summary
 
-| Abstraction       | Actions                                                                                  | Notes                                                                                  |
-| ----------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Service           | `service-create`, `service-get`, `service-list`, `service-update`, `service-delete`      | CRUD for catalogued offerings                                                          |
-| Asset             | `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete`                | Manage fleet/equipment                                                                 |
-| Chemical          | `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete` | Track regulated materials                                                              |
-| Workflow          | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned service playbooks                                                            |
-| Job (assess/plan) | `job-create`, `job-get`, `job-list`, `job-update`                                        | `job-create` seeds Job + Assessment + Plan; updates limited to allowed Plan/Job fields |
-| Job (logs)        | `job-log-append`, `job-log-list`                                                         | Append-only logs; paginated reads                                                      |
-| User              | `user-create`, `user-get`, `user-list`, `user-update`, `user-delete`                     | Profiles/roles for operators and customers                                             |
-| Customer          | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records                                                                       |
-| Contact           | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete`      | People tied to customers                                                               |
-| Optional          | `*-search`                                                                               | Richer filtering when needed                                                           |
+| Abstraction       | Actions                                                                                  | Notes                                                                         |
+| ----------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| Service           | `service-create`, `service-get`, `service-list`, `service-update`, `service-delete`      | CRUD for catalogued offerings                                                 |
+| Asset             | `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete`                | Manage fleet/equipment                                                        |
+| Chemical          | `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete` | Track regulated materials                                                     |
+| Workflow          | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned service playbooks                                                   |
+| Job (assess/plan) | `job-create`, `job-get`, `job-list`, `job-update`                                        | `job-create` creates the Job agreement; assessment/plan are follow-on actions |
+| Job (logs)        | `job-log-append`, `job-log-list`                                                         | Append-only logs; paginated reads                                             |
+| User              | `user-create`, `user-get`, `user-list`, `user-update`, `user-delete`                     | Profiles/roles for operators and customers                                    |
+| Customer          | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records                                                              |
+| Contact           | `contact-create`, `contact-get`, `contact-list`, `contact-update`, `contact-delete`      | People tied to customers                                                      |
+| Optional          | `*-search`                                                                               | Richer filtering when needed                                                  |
 
 API handler conventions and validation rules live in `docs/foundation/architecture.md`.
