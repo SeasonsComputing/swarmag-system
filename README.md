@@ -104,11 +104,33 @@ See `docs/foundation/architecture.md` section 19 for the complete configuration 
 
 ## 5. Software Construction Sessions
 
-Prepare a software construction session by creating a new chat and submitting the following prompt:
+**Prepare a software construction session** by creating a new chat with your chosen AI assistant and instructing it to first ingest and comply with the project’s governing constitution and artifacts. Specifically, have the assistant ingest `CONSTITUTION.md` as the highest-authority document, followed by all Markdown files under `docs/` (architecture, domain, style, and data definitions), and then the full source tree under `source/`. The AI must treat `CONSTITUTION.md` as binding law, respect the defined authority model (Chief Architect → Architect AI → Coding Engine), refrain from architectural or domain changes without explicit instruction, and operate conservatively—pausing and escalating whenever intent or rules are unclear.
 
-Ingest the following files:
+## 5.1. Ingestion Scope (Authoritative)
 
-1. `CLAUDE.md` - guidance for Claude Code
-2. `docs/*` - all markdown files
-3. `source/*` - all source files
-4. `AUTHORITY.md` - preeminent binding document
+**Ingest the following files, in order of authority and context:**
+
+1. `CONSTITUTION.md`  
+   The highest-authority governing document. Binding law for all human and AI contributions.
+2. `README.md`  
+   Project orientation, workflow, and operational context. Establishes intent and usage expectations.
+3. `docs/*`  
+   All Markdown documentation, including architecture, domain model, style guide, and data definitions.
+4. `devops/*`  
+   Architecture guards, CI enforcement rules, and build-time constraints. These are **enforceable law**, not advisory documentation.
+5. Configuration files, including (but not limited to):  
+   - `deno.json`  
+   - `netlify.toml`  
+   - `netlify-import-map.json`  
+   - CI configuration files  
+   These files define hard runtime, build, and import constraints and must not be overridden or assumed.
+6. `source/*`  
+   The complete source tree for domain, API, serverless functions, tests, and applications.
+
+### 5.2. Rules
+
+- `CONSTITUTION.md` must be treated as binding law.
+- Architectural, domain, persistence, or migration changes are forbidden without explicit instruction from the Chief Architect.
+- Architecture guards under `devops/` are authoritative and non-optional; violations are errors, not warnings.
+- Configuration files define immutable constraints and must be respected exactly.
+- When intent, rules, or constraints are unclear, the AI must choose the most conservative interpretation and escalate before proceeding.
