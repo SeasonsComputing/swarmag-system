@@ -48,6 +48,39 @@ Components: Ops PWA, Admin Portal, Customer Portal, API Edge Functions, Supabase
 
 Abstractions: Service, Asset, Chemical, Workflow, JobAssessment, JobPlan, JobLog, Customer, Contact. Canonical domain definitions and rules live in `docs/foundation/domain.md`.
 
+```text
+                +--------------------------+
+                |       Domain Model       |
+                |   (authoritative truth)  |
+                +------------+-------------+
+                             |
+                      validated types
+                             |
+                +------------v-------------+
+                |      API Abstraction     |
+                |   (logical API surface)  |
+                +------------+-------------+
+                             |
+        +--------------------+--------------------+
+        |                    |                    |
++-------v--------+   +-------v--------+   +-------v--------+
+| Serverless API |   | Direct DB API  |   |  Offline API   |
+| (Netlify/Edge) |   | (Supabase SDK) |   |  (IndexedDB)   |
++-------+--------+   +-------+--------+   +-------+--------+
+        |                    |                    |
+        +----------+---------+----------+---------+
+                   |                    |
+           +-------v-------+    +-------v-------+ 
+           | Repositories  |    |  Local Repos  |
+           | (SQL-backed)  |    |  (IndexedDB)  |
+           +-------+-------+    +-------+-------+
+                   |                    |
+           +-------v--------------------v--------+
+           |               Storage               |
+           |  (Postgres / Supabase / IndexedDB)  |
+           +-------------------------------------+
+```
+
 ## 6. Backend API design
 
 Netlify Edge Functions for REST, Supabase Edge Functions for async workflows. API files live under `source/serverless/functions/*`, default-export handlers wrapped with `createApiHandler`, and use per-abstraction mapping helpers (e.g., `users-mapping.ts`) from `source/serverless/mappings/` to convert between domain models and Supabase row shapes.
