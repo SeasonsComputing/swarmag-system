@@ -3,7 +3,12 @@
  */
 
 import type { JobStatus } from '../abstractions/job.ts'
-import type { JobCreateInput, JobLogAppendInput } from '../protocol/job-protocol.ts'
+import type {
+  JobAssessmentInput,
+  JobCreateInput,
+  JobLogAppendInput,
+  JobPlanInput
+} from '../protocol/job-protocol.ts'
 import { isNonEmptyString } from './helper-validators.ts'
 
 /**
@@ -33,12 +38,34 @@ export interface JobUpdateInput {
 export const validateJobCreateInput = (input?: JobCreateInput | null): string | null => {
   if (!input?.serviceId) return 'serviceId is required'
   if (!input.customerId) return 'customerId is required'
-  if (!input.plan?.workflowId) return 'plan.workflowId is required'
-  if (!input.plan?.scheduledStart) return 'plan.scheduledStart is required'
-  if (!input.assessment?.assessedAt) return 'assessment.assessedAt is required'
-  if (!input.assessment?.locations?.length) {
-    return 'assessment.locations requires 1+ location'
-  }
+  return null
+}
+
+/**
+ * Validate job assessment creation input.
+ * @param input - Job assessment creation input to validate.
+ * @returns Error message or null if valid.
+ */
+export const validateJobAssessmentCreateInput = (
+  input?: JobAssessmentInput | null
+): string | null => {
+  if (!input) return 'Request body is required'
+  if (!isNonEmptyString(input.jobId)) return 'jobId is required'
+  if (!isNonEmptyString(input.assessorId)) return 'assessorId is required'
+  if (!input.locations?.length) return 'locations requires 1+ location'
+  return null
+}
+
+/**
+ * Validate job plan creation input.
+ * @param input - Job plan creation input to validate.
+ * @returns Error message or null if valid.
+ */
+export const validateJobPlanCreateInput = (input?: JobPlanInput | null): string | null => {
+  if (!input) return 'Request body is required'
+  if (!isNonEmptyString(input.jobId)) return 'jobId is required'
+  if (!isNonEmptyString(input.workflowId)) return 'workflowId is required'
+  if (!input.scheduledStart) return 'scheduledStart is required'
   return null
 }
 
@@ -49,7 +76,6 @@ export const validateJobCreateInput = (input?: JobCreateInput | null): string | 
  */
 export const validateJobLogAppendInput = (input?: JobLogAppendInput | null): string | null => {
   if (!input?.jobId) return 'jobId is required'
-  if (!input.planId) return 'planId is required'
   if (!input.createdById) return 'createdById is required'
   if (!input.type) return 'type is required'
   if (!input.message) return 'message is required'

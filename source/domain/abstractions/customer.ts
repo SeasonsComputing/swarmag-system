@@ -47,4 +47,5 @@ export interface Customer {
   notes?: Note[]
   createdAt: When
   updatedAt: When
+  deletedAt?: When
 }

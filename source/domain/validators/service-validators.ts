@@ -20,14 +20,6 @@ export const isServiceCategory = (value: unknown): value is Service['category'] 
   value === 'aerial-drone-services' || value === 'ground-machinery-services'
 
 /**
- * Type guard for an array of ID strings.
- * @param value - Potential ID array value.
- * @returns True when the value is an array of non-empty strings.
- */
-export const isIdArray = (value: unknown): value is string[] =>
-  Array.isArray(value) && value.every(item => typeof item === 'string' && item.length > 0)
-
-/**
  * Validate service creation input.
  * @param input - Service creation input to validate.
  * @returns Error message or null if valid.
@@ -38,9 +30,6 @@ export const validateServiceCreate = (input?: ServiceCreateInput | null): string
   if (!isNonEmptyString(input.sku)) return 'sku is required'
   if (!isServiceCategory(input.category)) {
     return 'category must be aerial-drone-services or ground-machinery-services'
-  }
-  if (!isIdArray(input.requiredAssetTypes)) {
-    return 'requiredAssetTypes must be an array of IDs'
   }
   return null
 }
@@ -61,9 +50,6 @@ export const validateServiceUpdate = (input?: ServiceUpdateInput | null): string
   }
   if (input.category !== undefined && !isServiceCategory(input.category)) {
     return 'category must be aerial-drone-services or ground-machinery-services'
-  }
-  if (input.requiredAssetTypes !== undefined && !isIdArray(input.requiredAssetTypes)) {
-    return 'requiredAssetTypes must be an array of IDs'
   }
   return null
 }

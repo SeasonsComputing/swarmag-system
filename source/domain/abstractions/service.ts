@@ -18,8 +18,15 @@ export interface Service {
   sku: string
   description?: string
   category: ServiceCategory
-  requiredAssetTypes: ID[]
   notes?: Note[]
   createdAt: When
   updatedAt: When
+  deletedAt?: When
+}
+
+/** Represents the required asset type for a service. */
+export interface ServiceRequiredAssetType {
+  serviceId: ID
+  assetTypeId: ID
+  deletedAt?: When
 }

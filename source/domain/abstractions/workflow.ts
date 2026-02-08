@@ -4,7 +4,7 @@
  */
 
 import type { ID, When } from '@utils'
-import type { Note } from './common.ts'
+import type { Location, Note } from './common.ts'
 
 /** A step in a workflow, including checklists and requirements. */
 export interface WorkflowStep {
@@ -29,6 +29,7 @@ export interface Workflow {
   locationsRequired?: Location[]
   createdAt: When
   updatedAt: When
+  deletedAt?: When
 }
 
 /** The types of questions that can be asked. */
