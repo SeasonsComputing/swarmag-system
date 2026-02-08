@@ -36,4 +36,5 @@ export interface Chemical {
   notes?: Note[]
   createdAt: When
   updatedAt: When
+  deletedAt?: When
 }

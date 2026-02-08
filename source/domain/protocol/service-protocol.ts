@@ -10,7 +10,6 @@ export interface ServiceCreateInput {
   sku: string
   description?: string
   category: Service['category']
-  requiredAssetTypes: string[]
 }
 
 /** Input type for updating a service. */
@@ -20,5 +19,4 @@ export interface ServiceUpdateInput {
   sku?: string
   description?: string | null
   category?: Service['category']
-  requiredAssetTypes?: string[]
 }

@@ -6,23 +6,20 @@
 import type { JobAssessment, JobLogEntry, JobPlan } from '@domain/abstractions/job.ts'
 
 /** Input for creating a job assessment. */
-export type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt'>
+export type JobAssessmentInput = Omit<JobAssessment, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
 
 /** Input for creating a job plan. */
-export type JobPlanInput = Omit<JobPlan, 'id' | 'jobId' | 'createdAt' | 'updatedAt'>
+export type JobPlanInput = Omit<JobPlan, 'id' | 'createdAt' | 'updatedAt' | 'deletedAt'>
 
-/** Input for creating a job with assessment and plan. */
+/** Input for creating a job. */
 export type JobCreateInput = {
   serviceId: string
   customerId: string
-  assessment: JobAssessmentInput
-  plan: JobPlanInput
 }
 
 /** Input for appending to a job log. */
 export type JobLogAppendInput = {
   jobId: JobLogEntry['jobId']
-  planId: JobLogEntry['planId']
   type: JobLogEntry['type']
   message: string
   location?: JobLogEntry['location']

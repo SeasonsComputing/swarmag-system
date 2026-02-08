@@ -16,14 +16,11 @@ export type JobStatus =
   | 'completed'
   | 'cancelled'
 
-/** Represents an assessment performed for a potential job. */
+/** Represents an assessment performed for a job. */
 export interface JobAssessment {
   id: ID
-  serviceId: ID
-  customerId: ID
-  contactId?: ID
+  jobId: ID
   assessorId: ID
-  assessedAt: When
   locations: [Location, ...Location[]]
   questions: Answer[]
   risks?: Note[]
@@ -31,22 +28,34 @@ export interface JobAssessment {
   attachments?: Attachment[]
   createdAt: When
   updatedAt: When
+  deletedAt?: When
 }
 
 /** Represents an assignment of a team member to a job plan, including their role. */
-export interface JobAssignment {
-  memberId: ID
+export interface JobPlanAssignment {
+  planId: ID
+  userId: ID
   role: string
   notes?: string
+  deletedAt?: When
 }
 
 /** The planned use of a chemical in a job. */
-export interface JobChemicalPlan {
+export interface JobPlanChemical {
+  planId: ID
   chemicalId: ID
   amount: number
   unit: 'gallon' | 'liter' | 'pound' | 'kilogram'
   targetArea?: number
   targetAreaUnit?: 'acre' | 'hectare'
+  deletedAt?: When
+}
+
+/** Represents the assignment of an asset to a job plan. */
+export interface JobPlanAsset {
+  planId: ID
+  assetId: ID
+  deletedAt?: When
 }
 
 /** The detailed plan for executing a job. */
@@ -57,13 +66,10 @@ export interface JobPlan {
   scheduledStart: When
   scheduledEnd?: When
   targetLocations: Location[]
-  assignments: JobAssignment[]
-  assets: ID[]
-  chemicals: JobChemicalPlan[]
   notes?: Note[]
-  payload?: Dictionary
   createdAt: When
   updatedAt: When
+  deletedAt?: When
 }
 
 /** The types of log entries for a job. */
@@ -81,7 +87,6 @@ export type JobLogPayload = Dictionary
 export interface JobLogEntry {
   id: ID
   jobId: ID
-  planId: ID
   type: JobLogType
   message: string
   occurredAt: When
@@ -95,11 +100,10 @@ export interface JobLogEntry {
 /** Represents a job in the system. */
 export interface Job {
   id: ID
-  assessmentId: ID
-  planId: ID
-  serviceId: ID
   customerId: ID
+  serviceId: ID
   status: JobStatus
   createdAt: When
   updatedAt: When
+  deletedAt?: When
 }

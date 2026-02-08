@@ -14,6 +14,7 @@ export interface AssetType {
   active: boolean
   createdAt: When
   updatedAt: When
+  deletedAt?: When
 }
 
 /** The possible statuses an asset can have. */
@@ -34,4 +35,5 @@ export interface Asset {
   attachments?: Attachment[]
   createdAt: When
   updatedAt: When
+  deletedAt?: When
 }
