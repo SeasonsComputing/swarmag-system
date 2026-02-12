@@ -11,6 +11,8 @@ build
 .env.local
 .env.*.local
 .netlify
+.claude
+.zed
 
 # Environment files (keep .example files only)
 **/*-local.env
