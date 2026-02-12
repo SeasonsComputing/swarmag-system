@@ -1,8 +1,9 @@
 {
   "imports": {
-    "@domain/": "./source/domain/",
     "@utils": "./source/utilities/mod.ts",
     "@utils/": "./source/utilities/",
+
+    "@domain/": "./source/domain/",
 
     "@back-config/": "./source/back/config/",
     "@back-functions/": "./source/back/functions/",
