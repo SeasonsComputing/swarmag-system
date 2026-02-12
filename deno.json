@@ -1,25 +1,29 @@
 {
   "imports": {
-    "@api/": "./source/api/",
-    "@apps/": "./source/apps/",
     "@domain/": "./source/domain/",
-    "@utils": "./source/utils/mod.ts",
-    "@utils/": "./source/utils/",
-    "@serverless/": "./source/serverless/",
-    "@serverless-lib/": "./source/serverless/lib/",
-    "@serverless-functions/": "./source/serverless/functions/",
-    "@serverless-mappings/": "./source/serverless/mappings/",
-    "@std/assert": "https://deno.land/std@0.224.0/assert/mod.ts",
-    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2",
-    "@tests-fixtures/": "./source/tests/fixtures/",
-    "@tests-helpers/": "./source/tests/helpers/",
-    "@tests-lib/": "./source/tests/lib/"
+    "@utils": "./source/utilities/mod.ts",
+    "@utils/": "./source/utilities/",
+
+    "@back-config/": "./source/back/config/",
+    "@back-functions/": "./source/back/functions/",
+    "@back-lib/": "./source/back/library/",
+
+    "@ux-api/": "./source/ux/api/",
+    "@ux-app-ops/": "./source/ux/applications/operations/",
+    "@ux-app-admin/": "./source/ux/applications/administration/",
+    "@ux-app-customer/": "./source/ux/applications/customer/",
+    "@ux-components/": "./source/ux/applications/components/",
+    "@ux-lib/": "./source/ux/applications/library/",
+
+    "@devops": "./source/devops/",
+    "@tests": "./source/tests/"
   },
   "tasks": {
-    "guard:architecture": "deno run --allow-read devops/scripts/architecture-guard.ts",
-    "guard:env": "deno run --allow-read devops/scripts/env-guard.ts",
-    "guard:leaf": "deno run --allow-read devops/scripts/leaf-guard.ts",
-    "guard:validation": "deno run --allow-read devops/scripts/validation-guard.ts",
+    "guard:architecture": "deno run --allow-read devops/architecture-guard.ts",
+    "guard:env": "deno run --allow-read devops/env-guard.ts",
+    "guard:leaf": "deno run --allow-read devops/leaf-guard.ts",
+    "guard:validation": "deno run --allow-read devops/validation-guard.ts",
+
     "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno check source/**/*.ts && deno task lint",
     "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",
     "lint": "deno lint source && deno task lint:md",
@@ -28,6 +32,8 @@
     "fmt:check": "dprint check"
   },
   "fmt": {
-    "exclude": ["**/*"]
+    "exclude": [
+      "**/*"
+    ]
   }
 }
