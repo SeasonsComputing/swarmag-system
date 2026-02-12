@@ -9,11 +9,12 @@ import type { Answer } from './workflow.ts'
 
 /** The possible statuses of a job. */
 export type JobStatus =
-  | 'draft'
-  | 'ready'
-  | 'scheduled'
-  | 'in-progress'
+  | 'opened'
+  | 'assessed'
+  | 'planned'
+  | 'inprogress'
   | 'completed'
+  | 'closed'
   | 'cancelled'
 
 /** Represents an assessment performed for a job. */
