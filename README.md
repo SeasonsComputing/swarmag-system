@@ -1,136 +1,143 @@
-# swarmAg System
+# swarmAg Operations System -- README
 
 ![swarmAg ops logo](swarmag-ops-logo.png)
 
-The swarmAg Operations System, or the `swarmAg system` supports the administration and operations of the swarmAg agricultural services business. Services fall into two classes—Aerial and Ground—and rely on complex machinery, vehicles, equipment, tools, chemicals, and workflows. Safety, efficiency, repeatability, and performance are first principles, and the system is evaluated against those outcomes. See `https://swarmag.com` for broader context.
+The swarmAg Operations System (`swarmAg system`) supports operations across aerial and ground agricultural services. The monorepo is organized around a typed domain core, backend/runtime infrastructure, and user experience applications.
 
-The swarmAg system monorepo contains SolidJS frontends, Netlify Edge Functions, and a Supabase-backed domain model. The repo focuses first on a typed domain model and API layer, then the Admin, Ops, and Customer apps.
+Primary architectural context lives in `documentation/foundation/architecture-core.md`.
 
-Architecture, goals, and setup instructions live in `docs/foundation/architecture.md`.
+## 1. Repository Structure
 
-## 1. Repository Layout
+### 1.1 Top-level Namespaces
 
-| Path                           | Description                                                 |
-| ------------------------------ | ----------------------------------------------------------- |
-| `docs/`                        | System, architecture, and application specifications        |
-| `source/domain/`               | Canonical domain model (types/interfaces/classes)           |
-| `source/utils/`                | Shared primitives, e.g. datetime & identifier               |
-| `source/serverless/functions/` | Netlify Edge Functions                                      |
-| `source/serverless/lib/`       | Backend platform helpers (Netlify adapter, Supabase client) |
-| `source/migrations/`           | Supabase SQL migrations                                     |
-| `source/tests/`                | Test specs and fixtures (barreled samples in `fixtures/`)   |
-| `source/apps/`                 | Planned SolidJS apps for admin, ops, customer               |
+| Path             | Description                                              |
+| ---------------- | -------------------------------------------------------- |
+| `deploy/`        | Deployment artifacts and environment-specific output     |
+| `documentation/` | Product, architecture, domain, and history documentation |
+| `source/`        | Application and platform implementation code             |
+| `supabase/`      | Supabase project configuration and local metadata        |
 
-## 2. Roadmap (Current Project State)
+### 1.2 Documentation (`documentation\`)
 
-- Foundation — domain types + initial APIs.
-- Admin Web App — dashboards, scheduling, catalog administration.
-- Ops Mobile App — offline-first field workflows and job logging.
-- Customer Portal — read-only job visibility.
+| Path            | Description                                                   |
+| --------------- | ------------------------------------------------------------- |
+| `applications/` | Application-level requirements and UX/product specs           |
+| `foundation/`   | Core architecture, domain, style, and data definitions        |
+| `history/`      | Historical architecture notes and project evolution artifacts |
 
-## 3. Documentation
+#### 1.2.1 Foundation (`documentation\foundation\`)
 
-### 3.1 Foundation
+| Path                   | Description                                            |
+| ---------------------- | ------------------------------------------------------ |
+| `architecture-core.md` | Core architecture principles and system-wide structure |
+| `architecture-back.md` | Backend architecture, boundaries, and runtime model    |
+| `architecture-ux.md`   | UX architecture and frontend layering                  |
+| `domain.md`            | Domain model concepts, entities, and invariants        |
+| `data-dictionary.md`   | Canonical field and data element definitions           |
+| `data-lists.md`        | Controlled vocabularies and enumerated values          |
+| `style-guide.md`       | Style and authoring conventions                        |
 
-- `docs/foundation/architecture.md`
-- `docs/foundation/domain.md`
-- `docs/foundation/data-lists.md`
-- `docs/foundation/style-guide.md`
+#### 1.2.2 Applications (`documentation\applications\`)
 
-### 3.2 Applications
+| Path                 | Description                                        |
+| -------------------- | -------------------------------------------------- |
+| `user-stories.md`    | Cross-application user stories and workflow goals  |
+| `admin-web-app.md`   | Administration app scope and requirements          |
+| `ops-mobile-app.md`  | Operations mobile app scope and field workflows    |
+| `customer-portal.md` | Customer portal scope, visibility, and constraints |
 
-- `docs/applications/user-stories.md`
-- `docs/applications/admin-web-app.md`
-- `docs/applications/ops-mobile-app.md`
-- `docs/applications/customer-portal.md`
+### 1.3 Source Layers (`source\`)
 
-### 3.3 History (origin)
+| Path         | Description                                                       |
+| ------------ | ----------------------------------------------------------------- |
+| `back/`      | Backend runtime modules (config, functions, library, migrations)  |
+| `devops/`    | Architecture and environment guard scripts                        |
+| `domain/`    | Domain model and domain-layer contracts                           |
+| `tests/`     | Test suites and supporting fixtures                               |
+| `utilities/` | Shared utility modules used across layers                         |
+| `ux/`        | Client-facing user experiences, apps, contracts, and UI libraries |
 
-- `docs/history/swarmag-ops-meta-prompt.md`
+#### 1.3.1 Domain (`source/domain`)
 
-## 4. Configuration Setup
+| Path            | Description                                    |
+| --------------- | ---------------------------------------------- |
+| `abstractions/` | Core domain abstractions                       |
+| `adapters/`     | Domain adapters and boundary translation logic |
+| `protocol/`     | Domain protocols and interface contracts       |
+| `validators/`   | Domain validation logic and invariants         |
 
-SwarmAg uses environment-specific configuration files for each deployment context.
+#### 1.3.2 Backend (`source/back`)
 
-### 4.1 Local development setup
+| Path          | Description                                                     |
+| ------------- | --------------------------------------------------------------- |
+| `config/`     | Backend runtime configuration loading and environment templates |
+| `functions/`  | Serverless/edge function entry points                           |
+| `library/`    | Backend shared libraries and runtime bindings                   |
+| `migrations/` | SQL migration files for backend persistence setup               |
 
-**Create local environment files** for each context you'll be working with:
+#### 1.3.3 User Experience (`source/ux`)
+
+| Path                           | Description                            |
+| ------------------------------ | -------------------------------------- |
+| `api/client/`                  | UX API client into the backend         |
+| `api/contracts/`               | UX API client contracts                |
+| `applications/administration/` | Administration application code        |
+| `applications/components/`     | Shared application-level UI components |
+| `applications/customer/`       | Customer application code              |
+| `applications/operations/`     | Operations application code            |
+| `applications/library/`        | Shared UX library/runtime helpers      |
+
+## 2. Local Configuration
+
+Create local environment files from the current examples:
 
 ```bash
-# Serverless API functions
-cp source/serverless/config/serverless-local.env.example source/serverless/config/serverless-local.env
+# Backend runtime config
+cp source/back/config/back-local.env.example source/back/config/back-local.env
 
-# API client (for apps)
-cp source/api/config/api-local.env.example source/api/config/api-local.env
+# Administration UX app config
+cp source/ux/applications/administration/config/app-admin-local.env.example source/ux/applications/administration/config/app-admin-local.env
 ```
 
-Edit each file with your local values:
+Populate values as needed for your environment:
 
-```bash
-# source/serverless/config/serverless-local.env
+```dotenv
+# source/back/config/back-local.env
 SUPABASE_URL=http://localhost:54321
-SUPABASE_SERVICE_KEY=your-local-service-key
-JWT_SECRET=your-local-jwt-secret
+SUPABASE_SERVICE_KEY=...
+JWT_SECRET=...
 
-# source/api/config/api-local.env
+# source/ux/applications/administration/config/app-admin-local.env
 VITE_API_URL=http://localhost:8888
 ```
 
-**Never commit** these files - they're in `.gitignore` by default.
+Do not commit local env files.
 
-### 4.2 Stage/Production setup
-
-**Serverless (Netlify):**
-
-1. Log into Netlify Dashboard.
-2. Navigate to your site > Settings > Environment Variables.
-3. Add required variables: `SUPABASE_URL`, `SUPABASE_SERVICE_KEY`, `JWT_SECRET`.
-
-**Apps (Build-time):**
-
-Build-time environment variables are injected by the build system. Vite reads from `VITE_*` prefixed variables.
-
-### 4.3 Verification
+## 3. Project Commands
 
 ```bash
-# Test serverless config
-netlify dev  # Should start without "Missing required config" errors
+# Full checks (guards + typecheck + lint)
+deno task check
 
-# Type check and guards
-deno task check  # Should pass all checks
+# Tests
+deno task test
+
+# Lint + markdown lint
+deno task lint
+
+# Format and format-check
+deno task fmt
+deno task fmt:check
 ```
 
-See `docs/foundation/architecture.md` section 19 for the complete configuration reference.
+## 4. Working Rules
 
-## 5. Software Construction Sessions
-
-**Prepare a software construction session** by creating a new chat with your chosen AI assistant and instructing it to first ingest and comply with the project’s governing constitution and artifacts. Specifically, have the assistant ingest `CONSTITUTION.md` as the highest-authority document, followed by all Markdown files under `docs/` (architecture, domain, style, and data definitions), and then the full source tree under `source/`. The AI must treat `CONSTITUTION.md` as binding law, respect the defined authority model (Chief Architect → Architect AI → Coding Engine), refrain from architectural or domain changes without explicit instruction, and operate conservatively—pausing and escalating whenever intent or rules are unclear.
-
-## 5.1. Ingestion Scope (Authoritative)
-
-**Ingest the following files, in order of authority and context:**
-
-1. `CONSTITUTION.md`  
-   The highest-authority governing document. Binding law for all human and AI contributions.
-2. `README.md`  
-   Project orientation, workflow, and operational context. Establishes intent and usage expectations.
-3. `docs/*`  
-   All Markdown documentation, including architecture, domain model, style guide, and data definitions.
-4. `devops/*`  
-   Architecture guards, CI enforcement rules, and build-time constraints. These are **enforceable law**, not advisory documentation.
-5. Configuration files, including (but not limited to):  
-   - `deno.json`  
-   - `netlify.toml`  
-   - `netlify-import-map.json`  
-   - CI configuration files  
-   These files define hard runtime, build, and import constraints and must not be overridden or assumed.
-6. `source/*`  
-   The complete source tree for domain, API, serverless functions, tests, and applications.
-
-### 5.2. Rules
-
-- `CONSTITUTION.md` must be treated as binding law.
-- Architectural, domain, persistence, or migration changes are forbidden without explicit instruction from the Chief Architect.
-- Architecture guards under `devops/` are authoritative and non-optional; violations are errors, not warnings.
-- Configuration files define immutable constraints and must be respected exactly.
-- When intent, rules, or constraints are unclear, the AI must choose the most conservative interpretation and escalate before proceeding.
+| Rule                      | Description                                                                                                                                                           |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CONSTITUTION.md`         | Governing authority for all human and AI contributions. Apply conservative changes, respect architecture guards, and escalate when intent or constraints are unclear. |
+| `README.md`               | Starting point for understanding the project. Keep it up-to-date and accurate.                                                                                        |
+| `cspell.json`             | Spell checker configuration. Keep it up-to-date and accurate.                                                                                                         |
+| `dprint.json`             | Code formatter configuration. Keep it up-to-date and accurate.                                                                                                        |
+| `deno.json`               | Deno project configuration. Keep it up-to-date and accurate.                                                                                                          |
+| `netlify.toml`            | Netlify runtime/build configuration. Keep it up-to-date and accurate.                                                                                                 |
+| `netlify-import-map.json` | Netlify import map configuration. Keep it up-to-date and accurate.                                                                                                    |
