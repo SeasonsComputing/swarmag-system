@@ -1,9 +1,10 @@
 [build]
-  edge_functions = "source/serverless/functions"
+  edge_functions = "source/back/functions"
   publish = "."
 
 [functions]
+  directory = "source/back/functions"
   deno_import_map = "netlify-import-map.json"
 
 [dev]
-  edge_functions = "source/serverless/functions"
+  edge_functions = "source/back/functions"
