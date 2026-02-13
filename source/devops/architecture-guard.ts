@@ -8,17 +8,17 @@ const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 const NAMESPACE_DIRS: Record<Exclude<Namespace, 'external'>, string> = {
   domain: '/source/domain/',
-  utils: '/source/utils/',
-  serverless: '/source/serverless/',
-  apps: '/source/apps/',
-  api: '/source/api/',
+  utils: '/source/utilities/',
+  back: '/source/back/',
+  apps: '/source/ux/applications/',
+  api: '/source/ux/api/',
   tests: '/source/tests/'
 }
 
 const ALLOWED_DEPS: Record<Exclude<Namespace, 'external'>, Set<Namespace>> = {
   domain: new Set(['domain', 'utils', 'external']),
   utils: new Set(['utils', 'external']),
-  serverless: new Set(['serverless', 'domain', 'utils', 'external']),
+  back: new Set(['back', 'domain', 'utils', 'external']),
   apps: new Set(['apps', 'domain', 'utils', 'serverless', 'api', 'external']),
   api: new Set(['api', 'domain', 'utils', 'serverless', 'external']),
   tests: new Set(['tests', 'apps', 'api', 'domain', 'utils', 'serverless', 'external'])
@@ -45,7 +45,7 @@ const namespaceForPath = (path: string): Exclude<Namespace, 'external'> | null =
 
 const namespaceForSpecifier = (specifier: string, filePath: string): Namespace => {
   if (specifier.startsWith('@domain/')) return 'domain'
-  if (specifier.startsWith('@utils/')) return 'utils'
+  if (specifier.startsWith('@utility/')) return 'utils'
   if (specifier.startsWith('@tests-fixtures/') || specifier.startsWith('@tests-helpers/')) {
     return 'tests'
   }

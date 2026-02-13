@@ -4,7 +4,9 @@
 
 This document defines the backend architecture of the swarmAg system. The backend is a single Netlify Edge Functions surface that implements the `Api.*` contracts defined in `architecture-core.md`, stores data in Supabase Postgres, and returns validated domain abstractions.
 
-**Prerequisites:** Read `domain.md` and `architecture-core.md` first to understand the domain model and system boundary.
+**Prerequisites:** 
+
+Read `domain.md` and `architecture-core.md` first to understand the domain model and system boundary.
 
 ## Backend Structure
 
@@ -12,34 +14,30 @@ This document defines the backend architecture of the swarmAg system. The backen
 
 The backend is intentionally simple and concrete:
 
-- **One backend:** Netlify Edge Functions
-- **One database:** Supabase Postgres
-- **No abstraction layers:** Functions call adapters directly
-- **Baked libraries:** `@back-lib/` contains verified infrastructure
+- **Cloud Providers:** Netlify and Supabase
+- **Edge Functions:** Netlify and Supabase edge functions
+- **Relational Database:** Supabase Postgres
+- **Storage Buckets:** Supabase storage buckets
+- **Networking**: Netlify networking services
 
 ### Backend Layout
 
-```
-source/back/
-  functions/        # Flat HTTP handlers (Netlify requirement)
-    users-get.ts
-    users-create.ts
-    jobs-create.ts
-    ...
-  library/          # Shared infrastructure (verified, baked)
-    api-binding.ts
-    api-handler.ts
-    db-supabase.ts
-    ...
-  config/
-    back-config.ts
-    back-local.env.example
-    back-stage.env.example
-    back-prod.env.example
-  migrations/
+```text
+swarmag/
+├── source/
+│   └── back/
+│       ├── edge-netlify/
+│       │   ├── config/
+│       │   └── functions/
+│       ├── edge-supabase/
+│       │   ├── config/
+│       │   └── functions/
+│       ├── lib/
+│       └── migrations/
+└── supabase/
 ```
 
-## Functions (HTTP handlers)
+## Functions (HTTP handlers) (TODO: update)
 
 Functions are thin wrappers:
 
@@ -53,11 +51,10 @@ Functions do NOT:
 - Introduce persistence abstractions
 - Re-implement adapter logic
 
-### Function Pattern
+### Function Pattern (TODO: update)
 
 ```typescript
 // source/back/functions/jobs-create.ts
-import { rowToJob } from '@domain/adapters/jobs-adapter.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -69,7 +66,8 @@ import {
 import { createApiHandler } from '@back-lib/api-handler.ts'
 import { Supabase } from '@back-lib/db-supabase.ts'
 import type { Job } from '@domain/abstractions/job.ts'
-import { validateJobCreateInput } from '@domain/validators/job-validators.ts'
+import { rowToJob } from '@domain/adapters/jobs-adapter.ts'
+import { validateJobCreateInput } from '@domain/validators/job-validator.ts'
 
 export const config = { path: '/api/jobs/create' }
 
@@ -93,9 +91,9 @@ export default createApiHandler(handle)
 
 Libraries and adapters already exist and are verified.
 
-## Adapters
+## Adapters (TODO: update -- NO "row", to{Abstraction}, from{Abstraction})
 
-Adapters live in `source/domain/adapters/` and define the storage-to-domain boundary. They are shared by both backend functions and ux API providers.
+Adapters live in `source/domain/adapter/` and define the storage-to-domain boundary. They are shared by both backend functions and ux API providers.
 
 Rules:
 
@@ -106,7 +104,7 @@ Rules:
 Example:
 
 ```typescript
-// source/domain/adapters/jobs-adapter.ts
+// source/domain/adapter/jobs-adapter.ts
 import type { Job } from '@domain/abstractions/job.ts'
 
 export function rowToJob(row: Record<string, unknown>): Job {
@@ -118,7 +116,7 @@ export function jobToRow(job: Job): Record<string, unknown> {
 }
 ```
 
-## Configuration Management
+## Configuration Management (TODO: move to core)
 
 ### Runtime Configuration Pattern
 
@@ -134,7 +132,7 @@ Runtime configuration providers are split by runtime surface:
 Each deployment package has a runtime bootstrap file that:
 
 1. Detects runtime environment
-2. Imports appropriate provider from `@utils`
+2. Imports appropriate provider from `@utility`
 3. Initializes required variables
 4. Exports `Config` singleton
 
@@ -142,12 +140,12 @@ Each deployment package has a runtime bootstrap file that:
 
 ```typescript
 // source/back/config/back-config.ts
-import { RuntimeConfig } from '@utils'
+import { RuntimeConfig } from '@core-std'
 
 let Config: RuntimeConfig
 
 if ('Deno' in self) {
-  const { ConfigureDeno } = await import('@utils/configure-deno.ts')
+  const { ConfigureDeno } = await import('@utility/configure-deno.ts')
   Config = ConfigureDeno
 } else {
   const { ConfigureNetlify } = await import('@back-lib/configure-netlify.ts')
@@ -166,7 +164,7 @@ import { Config } from '@back-config/back-config.ts'
 const url = Config.get('SUPABASE_URL')
 
 // Never import providers directly
-// ❌ import { ConfigureDeno } from '@utils/configure-deno.ts'
+// ❌ import { ConfigureDeno } from '@utility/configure-deno.ts'
 ```
 
 **Environment Files:**
@@ -178,7 +176,7 @@ Each package includes:
 
 Actual env files (`.env`, gitignored) follow same naming without `.example`.
 
-## Deployment Artifacts
+## Deployment Artifacts (TODO: move to core)
 
 ### Build Output Structure
 
@@ -198,34 +196,29 @@ deploy/
 All deployment artifacts follow: `swarmag-{component}-pkg.{hash}.{ext}`
 
 - **Prefix:** `swarmag-` (namespace)
-- **Component:** Package name (admin, ops, customer, adapters, utils)
+- **Component:** Package name (app-admin, app-ops, app-customer, core, edge-netlify, edge-supabase)
 - **Suffix:** `-pkg` (signals "packaged artifact")
 - **Hash:** Content hash for cache invalidation
 - **Extension:** `.js`, `.json`, etc.
 
 ### Deployment Manifest
 
-Each deployment includes a manifest (`swarmag-{app}-pkg.json`):
+Each deployment includes a manifest (`swarmag-{app|edge|core}(-{qualifier})-pkg.json`):
 
 ```json
 {
-  "deployment": "admin",
+  "deployment": "app-admin",
   "version": "1.2.3",
   "built": "2026-02-11T19:15:00Z",
   "commit": "abc123def",
   "packages": {
     "app": {
-      "file": "swarmag-admin-pkg.abc123.js",
+      "file": "swarmag-app-admin-pkg.abc123.js",
       "hash": "abc123",
       "size": "245KB"
     },
-    "adapters": {
-      "file": "swarmag-adapters-pkg.def456.js",
-      "hash": "def456",
-      "size": "12KB"
-    },
-    "utils": {
-      "file": "swarmag-utils-pkg.ghi789.js",
+    "core": {
+      "file": "swarmag-core-pkg.ghi789.js",
       "hash": "ghi789",
       "size": "8KB"
     }
@@ -257,7 +250,7 @@ Testing focuses on correctness at the storage boundary and handler orchestration
 - **Function tests:** HTTP request -> response mapping, method guards, and error translation
 - **Integration tests:** Job lifecycle flows through backend functions against a test database
 
-## Security
+## Security (TODO: move to core)
 
 ### Authentication
 
@@ -274,10 +267,4 @@ Testing focuses on correctness at the storage boundary and handler orchestration
 - All input validated using domain validators before persistence
 - Adapters assume validated input and return domain abstractions only
 
-**End of Backend Document**
-
-See also:
-
-- `architecture-core.md` - System boundary and invariants
-- `architecture-ux.md` - UX implementation
-- `domain.md` - Domain model definitions
+**End of Architecture Backend Document**

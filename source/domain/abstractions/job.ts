@@ -3,7 +3,7 @@
  * Jobs represent operational tasks related to services.
  */
 
-import type { Dictionary, ID, When } from '@utils'
+import type { Dictionary, ID, When } from '@core-std'
 import type { Attachment, Location, Note } from './common.ts'
 import type { Answer } from './workflow.ts'
 

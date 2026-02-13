@@ -4,7 +4,7 @@
  */
 
 import type { Attachment, Note } from '@domain/abstractions/common.ts'
-import type { ID, When } from '@utils'
+import type { ID, When } from '@core-std'
 
 /** The different usages for chemicals. */
 export type ChemicalUsage =

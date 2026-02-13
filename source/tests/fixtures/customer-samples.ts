@@ -4,7 +4,7 @@
 
 import type { Location } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
-import { id } from '@utils'
+import { id } from '@core-std'
 
 const customerId = id()
 const accountManagerId = id()

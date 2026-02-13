@@ -1,36 +1,37 @@
 {
   "imports": {
-    "@utils": "./source/utilities/mod.ts",
-    "@utils/": "./source/utilities/",
-
+    "@core/": "./source/core/",
+    "@back": "./source/back/",
+    "@ux/": "./source/ux/",
     "@domain/": "./source/domain/",
+    "@devops": "./source/devops/",
+    "@tests": "./source/tests/",
+
+    "@core-std": "./source/core/standard/standard.ts",
+    "@ux-api": "./source/ux/api/api.ts",
 
     "@back-config/": "./source/back/config/",
-    "@back-functions/": "./source/back/functions/",
-    "@back-lib/": "./source/back/library/",
+    "@back-netlify-edge/": "./source/back/edge-netlify/",
+    "@back-supabase-edge/": "./source/back/edge-supabase/",
+    "@back-lib/": "./source/back/lib/",
 
-    "@ux-api/": "./source/ux/api/",
-    "@ux-app-ops/": "./source/ux/applications/operations/",
-    "@ux-app-admin/": "./source/ux/applications/administration/",
-    "@ux-app-customer/": "./source/ux/applications/customer/",
-    "@ux-components/": "./source/ux/applications/components/",
-    "@ux-lib/": "./source/ux/applications/library/",
-
-    "@devops": "./source/devops/",
-    "@tests": "./source/tests/"
+    "@ux-app-ops/": "./source/ux/app-ops/",
+    "@ux-app-admin/": "./source/ux/app-admin/",
+    "@ux-app-customer/": "./source/ux/app-customer/",
+    "@ux-components/": "./source/ux/components/",
+    "@ux-lib/": "./source/ux/lib/"
   },
   "tasks": {
-    "guard:architecture": "deno run --allow-read devops/architecture-guard.ts",
-    "guard:env": "deno run --allow-read devops/env-guard.ts",
-    "guard:leaf": "deno run --allow-read devops/leaf-guard.ts",
-    "guard:validation": "deno run --allow-read devops/validation-guard.ts",
-
     "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno check source/**/*.ts && deno task lint",
     "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",
-    "lint": "deno lint source && deno task lint:md",
-    "lint:md": "deno run --allow-read --allow-sys --allow-env npm:markdownlint-cli2@0.13.0 \"**/*.md\" \"!node_modules/**\"",
+    "lint": "deno lint",
     "fmt": "dprint fmt",
-    "fmt:check": "dprint check"
+    "fmt:check": "dprint check",
+
+    "guard:architecture": "deno run --allow-read source/devops/architecture-guard.ts",
+    "guard:env": "deno run --allow-read source/devops/env-guard.ts",
+    "guard:leaf": "deno run --allow-read source/devops/leaf-guard.ts",
+    "guard:validation": "deno run --allow-read source/devops/validation-guard.ts"
   },
   "fmt": {
     "exclude": [

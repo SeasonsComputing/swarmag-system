@@ -3,7 +3,7 @@
  */
 
 import type { Question } from '@domain/abstractions/workflow.ts'
-import { id } from '@utils'
+import { id } from '@core-std'
 
 export const preflightInspectionQuestion: Question = {
   id: id(),

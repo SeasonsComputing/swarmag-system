@@ -3,7 +3,7 @@
  */
 
 import type { JobAssessment, JobLogEntry } from '@domain/abstractions/job.ts'
-import { id } from '@utils'
+import { id } from '@core-std'
 
 const serviceId = id()
 const customerId = id()

@@ -3,7 +3,7 @@
  * Workflows define the steps for executing services.
  */
 
-import type { ID, When } from '@utils'
+import type { ID, When } from '@core-std'
 import type { Location, Note } from './common.ts'
 
 /** A step in a workflow, including checklists and requirements. */

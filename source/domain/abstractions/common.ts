@@ -2,7 +2,7 @@
  * Common domain abstractions, shared across the domain model
  */
 
-import type { ID, When } from '@utils'
+import type { ID, When } from '@core-std'
 
 /** Represents a location with coordinates and optional address fields. */
 export interface Location {

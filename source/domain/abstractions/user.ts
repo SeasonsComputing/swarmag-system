@@ -3,7 +3,7 @@
  * These define common data structures for various domain abstractions.
  */
 
-import type { ID, When } from '@utils'
+import type { ID, When } from '@core-std'
 
 /** Allowed role memberships for users. */
 export const USER_ROLES = ['administrator', 'sales', 'operations'] as const

@@ -5,12 +5,12 @@ any software artifact with the system.
 
 ## 1. Language and Tooling
 
-| Item     | Guideline                                                                                                                                              |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Compiler | Deno `check` with strict TypeScript                                                                                                                    |
-| Aliases  | `@domain/`, `@utils`, `@utils/`, `@back-config/`, `@back-functions/`, `@back-lib/`, `@ux-api/`, `@ux-app-admin/`, `@ux-app-ops/`, `@ux-app-customer/`, `@ux-components/`, `@ux-lib/`, `@devops`, `@tests` |
-| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers                                                                                        |
-| Encoding | ASCII only; no non-ASCII literals                                                                                                                      |
+| Item     | Guideline                                                                                                                                                                                                 |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Compiler | Deno `check` with strict TypeScript                                                                                                                                                                       |
+| Aliases  | `@domain/`, `@utility`, `@utility/`, `@back-config/`, `@back-functions/`, `@back-lib/`, `@ux-api/`, `@ux-app-admin/`, `@ux-app-ops/`, `@ux-app-customer/`, `@ux-components/`, `@ux-lib/`, `@devops`, `@tests` |
+| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers                                                                                                                                           |
+| Encoding | ASCII only; no non-ASCII literals                                                                                                                                                                         |
 
 ## 2. Imports and Organization
 
@@ -27,11 +27,11 @@ any software artifact with the system.
 
 ```typescript
 // Same directory - use relative
-import { isNonEmptyString } from './helper-validators.ts'
+import { isNonEmptyString } from './helper-validator.ts'
 
 // Different directory - use alias
 import type { User } from '@domain/abstractions/user.ts'
-import type { ID, When } from '@utils'
+import type { ID, When } from '@core-std'
 ```
 
 ## Directory Organization Rules
@@ -50,9 +50,9 @@ source/
 
 **Rules:**
 
-1. `source/domain/abstractions/` and `source/domain/protocol/` are domain-first and infrastructure-agnostic
+1. `source/domain/abstraction/` and `source/domain/protocol/` are domain-first and infrastructure-agnostic
 2. `source/utilities/` has no domain dependencies
-3. `source/domain/adapters/` depends on domain + utilities
+3. `source/domain/adapter/` depends on domain + utilities
 4. `source/back/` depends on domain, domain adapters, and utilities
 5. `source/ux/` depends on domain and the UX API layer (never backend internals)
 
@@ -61,7 +61,7 @@ source/
 **Required aliases:**
 
 - `@domain/` - Domain modules
-- `@utils` and `@utils/` - Utilities
+- `@utility` and `@utility/` - Utilities
 - `@back-config/`, `@back-functions/`, `@back-lib/` - Backend namespaces
 - `@ux-api/` - UX API layer
 - `@ux-app-admin/`, `@ux-app-ops/`, `@ux-app-customer/` - UX app namespaces
@@ -86,7 +86,7 @@ Each deployment package must have:
 **Rules:**
 
 1. Runtime providers live in `source/utilities/configure-deno.ts` and `source/back/library/configure-netlify.ts`
-2. Package config imports from `@utils`, never defines providers
+2. Package config imports from `@utility`, never defines providers
 3. Never import providers directly (always use `./config/config.ts`)
 4. Never access `Deno.env`, `import.meta.env` directly (use `Config.get()`)
 
@@ -108,7 +108,7 @@ Never commit deployment artifacts.
 | --------------- | -------------------------------------------------------------------------------------- |
 | Acronyms        | Use title case for acronyms in identifiers: `Api`, `Url`, `Id`, not `API`, `URL`, `ID` |
 | Classes         | PascalCase: `UsersApi`, `JobsApi`                                                      |
-| Files           | Kebab-case: `users-api.ts`, `job-validators.ts`                                        |
+| Files           | Kebab-case: `users-api.ts`, `job-validator.ts`                                        |
 | Type aliases    | PascalCase: `UserCreateInput`, `JobStatus`                                             |
 | Constants       | camelCase for exported constants: `httpCodes` (exception: `HttpCodes` object)          |
 | Domain-specific | Use domain names: `JobAssessment`, `JobLogEntry`, not generic names                    |
@@ -130,16 +130,16 @@ Each domain abstraction has corresponding files across three subdirectories:
 | Layer           | Abstraction file              | Shared/helper file     |
 | --------------- | ----------------------------- | ---------------------- |
 | `abstractions/` | `{abstraction}.ts`            | `common.ts`            |
-| `validators/`   | `{abstraction}-validators.ts` | `helper-validators.ts` |
-| `protocol/`     | `{abstraction}-protocol.ts`   | `helpers-protocol.ts`  |
+| `validators/`   | `{abstraction}-validator.ts` | `helper-validator.ts` |
+| `protocol/`     | `{abstraction}-protocol.ts`   | `helper-protocol.ts`  |
 
 **Placement rules:**
 
 - Abstraction-specific types (User, UserRole) belong in abstraction files (`user.ts`), not `common.ts`.
 - Shared types used by multiple abstractions (Location, Note, Attachment) stay in `common.ts`.
 - Concept-owning types live with their owner (Question, Answer live in `workflow.ts`).
-- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `helpers-protocol.ts`.
-- Shared validators (isNonEmptyString) live in `helper-validators.ts`.
+- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `helper-protocol.ts`.
+- Shared validators (isNonEmptyString) live in `helper-validator.ts`.
 
 ## 5. Utilities (`source/utilities/*`)
 
@@ -166,19 +166,19 @@ Each domain abstraction has corresponding files across three subdirectories:
 
 ## 7. Backend Functions (`source/back/functions/*`)
 
-| Item       | Guideline                                                                                                   |
-| ---------- | ----------------------------------------------------------------------------------------------------------- |
-| Naming     | `{resource}-{action}.ts` (plural resource), e.g., `users-create.ts`                                         |
-| Exports    | Default export only: Netlify `createApiHandler(handle)`                                                     |
-| Config     | Export `config = { path: "/api/{resource}/{action}" }` for routing                                          |
-| Types      | Use `ApiRequest`/`ApiResponse` from `@back-lib/api-binding`                                                 |
-| Status     | Use `HttpCodes`; no numeric literals                                                                        |
-| Platform   | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor`                                            |
-| Validation | Guard with `validate` + `HttpCodes.unprocessableEntity`                                                     |
-| Methods    | Guard unsupported verbs with `HttpCodes.methodNotAllowed`                                                   |
-| Responses  | Success: `{ data: ... }`; failure: `{ error, details? }`                                                    |
-| JSON       | Always JSON; `createApiHandler` sets headers and wraps errors                                               |
-| Adaptation | Use adapters from `source/domain/adapters/` (e.g., `jobs-adapter.ts`) instead of ad hoc column maps in each handler |
+| Item       | Guideline                                                                                                           |
+| ---------- | ------------------------------------------------------------------------------------------------------------------- |
+| Naming     | `{resource}-{action}.ts` (plural resource), e.g., `users-create.ts`                                                 |
+| Exports    | Default export only: Netlify `createApiHandler(handle)`                                                             |
+| Config     | Export `config = { path: "/api/{resource}/{action}" }` for routing                                                  |
+| Types      | Use `ApiRequest`/`ApiResponse` from `@back-lib/api-binding`                                                         |
+| Status     | Use `HttpCodes`; no numeric literals                                                                                |
+| Platform   | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor`                                                    |
+| Validation | Guard with `validate` + `HttpCodes.unprocessableEntity`                                                             |
+| Methods    | Guard unsupported verbs with `HttpCodes.methodNotAllowed`                                                           |
+| Responses  | Success: `{ data: ... }`; failure: `{ error, details? }`                                                            |
+| JSON       | Always JSON; `createApiHandler` sets headers and wraps errors                                                       |
+| Adaptation | Use adapters from `source/domain/adapter/` (e.g., `jobs-adapter.ts`) instead of ad hoc column maps in each handler |
 
 ## 8. Adapters and Storage Adaptation
 
@@ -308,8 +308,8 @@ Bootstrap files (`config.ts`) live in each deployment context's `config/` direct
 
 ```typescript
 // source/back/config/back-config.ts
-import { ConfigureDeno } from '@utils/configure-deno.ts'
 import { ConfigureNetlify } from '@back-lib/configure-netlify.ts'
+import { ConfigureDeno } from '@utility/configure-deno.ts'
 
 const Config = 'Deno' in self ? ConfigureDeno : ConfigureNetlify
 

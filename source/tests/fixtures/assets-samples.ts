@@ -3,7 +3,7 @@
  */
 
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
-import { id } from '@utils'
+import { id } from '@core-std'
 
 const transportTruckTypeId = id()
 const skidsteerTypeId = id()

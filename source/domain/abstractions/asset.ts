@@ -5,7 +5,7 @@
  */
 
 import type { Attachment } from '@domain/abstractions/common.ts'
-import type { ID, When } from '@utils'
+import type { ID, When } from '@core-std'
 
 /** The different types of assets available in the system. */
 export interface AssetType {

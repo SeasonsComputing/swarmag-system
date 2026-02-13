@@ -4,7 +4,7 @@
  */
 
 import type { Note } from '@domain/abstractions/common.ts'
-import type { ID, When } from '@utils'
+import type { ID, When } from '@core-std'
 
 /** The categories of services available. */
 export type ServiceCategory =

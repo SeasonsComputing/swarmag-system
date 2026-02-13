@@ -145,7 +145,7 @@ Foreign-key cascades exist to ensure correctness **when cleanup is authorized**,
 - Type: `ID` - UUID v7 string
 - Generator: `id()` - Creates new UUID v7
 - Validator: `isID(value)` - Validates UUID v7 format
-- Import: `import { type ID, id, isID } from '@utils'`
+- Import: `import { type ID, id, isID } from '@core-std'`
 
 All entity identifiers must use the `ID` type. Generate new IDs with `id()`, never use external libraries or manual string construction.
 
@@ -154,15 +154,15 @@ All entity identifiers must use the `ID` type. Generate new IDs with `id()`, nev
 - Type: `When` - ISO 8601 UTC timestamp string
 - Generator: `when()` - Creates current timestamp
 - Validator: `isWhen(value)` - Validates ISO 8601 format
-- Import: `import { type When, when, isWhen } from '@utils'`
+- Import: `import { type When, when, isWhen } from '@core-std'`
 
 All temporal values must use the `When` type. Generate timestamps with `when()`, never use `new Date()` or similar patterns directly.
 
 **Example Usage:**
 
 ```typescript
-import { type ID, id, isID } from '@utils'
-import { isWhen, type When, when } from '@utils'
+import { type ID, id, isID } from '@core-std'
+import { isWhen, type When, when } from '@core-std'
 
 const userId: ID = id()
 const createdAt: When = when()

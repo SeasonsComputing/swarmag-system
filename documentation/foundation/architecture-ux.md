@@ -78,12 +78,12 @@ export interface JobApi {
 
 A client implementation lives under `source/ux/api/client/` and calls backend functions while preserving domain-level types.
 
-| Client Module | Purpose |
-| --- | --- |
-| `api.ts` | Public API surface consumed by UX applications |
+| Client Module   | Purpose                                            |
+| --------------- | -------------------------------------------------- |
+| `api.ts`        | Public API surface consumed by UX applications     |
 | `api-client.ts` | HTTP client plumbing and request/response handling |
 
-API clients adapt transport results into domain abstractions using `source/domain/adapters/`.
+API clients adapt transport results into domain abstractions using `source/domain/adapter/`.
 
 ## Client Usage
 
