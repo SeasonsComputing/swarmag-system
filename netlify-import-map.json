@@ -4,8 +4,8 @@
     "@supabase/client": "https://esm.sh/@supabase/supabase-js@2",
 
     "@domain/": "./source/domain/",
-    "@utils": "./source/utilities/mod.ts",
-    "@utils/": "./source/utilities/",
+    "@utility": "./source/utilities/mod.ts",
+    "@utility/": "./source/utilities/",
 
     "@back-config/": "./source/back/config/",
     "@back-functions/": "./source/back/functions/",

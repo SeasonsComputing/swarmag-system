@@ -72,20 +72,19 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | ------------- | --------------------------------------------------------------- |
 | `config/`     | Backend runtime configuration loading and environment templates |
 | `functions/`  | Serverless/edge function entry points                           |
-| `library/`    | Backend shared libraries and runtime bindings                   |
+| `lib/`        | Backend shared libraries and runtime bindings                   |
 | `migrations/` | SQL migration files for backend persistence setup               |
 
 #### 1.3.3 User Experience (`source/ux`)
 
-| Path                           | Description                            |
-| ------------------------------ | -------------------------------------- |
-| `api/client/`                  | UX API client into the backend         |
-| `api/contracts/`               | UX API client contracts                |
-| `applications/administration/` | Administration application code        |
-| `applications/components/`     | Shared application-level UI components |
-| `applications/customer/`       | Customer application code              |
-| `applications/operations/`     | Operations application code            |
-| `applications/library/`        | Shared UX library/runtime helpers      |
+| Path            | Description                            |
+| --------------- | -------------------------------------- |
+| `api/`          | UX API client into the backend         |
+| `components/`   | Shared application-level UI components |
+| `lib/`          | Shared UX library/runtime helpers      |
+| `app-admin/`    | Administration application code        |
+| `app-customer/` | Customer application code              |
+| `app-ops/`      | Operations application code            |
 
 ## 2. Local Configuration
 
@@ -96,7 +95,7 @@ Create local environment files from the current examples:
 cp source/back/config/back-local.env.example source/back/config/back-local.env
 
 # Administration UX app config
-cp source/ux/applications/administration/config/app-admin-local.env.example source/ux/applications/administration/config/app-admin-local.env
+cp source/ux/app-admin/config/app-admin-local.env.example source/ux/applications/administration/config/app-admin-local.env
 ```
 
 Populate values as needed for your environment:

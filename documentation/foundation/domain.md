@@ -14,9 +14,9 @@ A Service Category represents a class of service we offer (e.g., aerial-drone-se
 
 ### 1.2 Workflow & Tasks
 
-A Workflow describes how work is generally performed. It may be composed of a graph of Tasks, where a Workflow is itself one kind of Task (composite). Examples include "Drone Chemical Prep", "Mesquite Chemical Preparation", "Mesquite Mitigation Procedure", and "Drone Obstacle Preflight".
+A Workflow describes how work is generally performed. It may be composed of a graph of Tasks, where a Workflow is itself one kind of Task (composite). Examples include "Drone Chemical Preparation", "Mesquite Chemical Preparation", "Mesquite Mitigation Procedure", and "Drone Obstacle Preflight".
 
-Each Task in a Workflow is either a Note or a Question. Notes are static text used to inform or warn operations staff. Questions are expressed using a small set of fundamental response forms, including yes/no, selection, date/time, quantity (real number), and free-form comment. All workflow questions reduce to one of these forms, though answers may include supporting artifacts such as notes or attachments.
+Each Task in a Workflow is either a Note or a Question. Notes are static text used to inform or warn operations staff. Questions are expressed using a small set of fundamental response forms, including yes/no, selection, date/time, quantity (real number), and free-form comment. All workflow questions reduce to one of these forms, though answers may include supporting artifacts captured as Notes. Notes may contain or Attachments. Attachments are mime-type specified, such as images, videos, or documents.
 
 Workflows guide how work is assessed and inform how it is later planned and executed.
 
@@ -32,7 +32,7 @@ A Job Plan defines how a specific Job will be executed. Plans are created after 
 
 A Job Log memorializes the physical execution of a Job. Logs are append-only and record what actually occurred, including photos, GPS coordinates, comments, time accrued, and any exceptions or deviations encountered. Logs may also capture notes about the job as a whole.
 
-A Job has an Assessment, a Plan, and one or more Logs. There are no circular foreign keys; Assessments, Plans, and Logs reference the Job.
+A Job has an Assessment, a Plan, and a collection of Log entries. Log entries are created during the execution of a Job, by a User, and are appended to the Job's Log. There are no circular foreign keys; Assessments, Plans, and Logs reference the Job.
 
 ## 2. Domain Model (`source/domain`)
 
@@ -40,7 +40,14 @@ A Job has an Assessment, a Plan, and one or more Logs. There are no circular for
 
 This section defines the core domain model of the system. It establishes the fundamental types, concepts, and associations that express domain truth and business intent.
 
-The domain model is implemented as a TypeScript library under `source/domain`, with shared primitives in `source/utilities`. It is the authoritative source of meaning for the system.
+The domain model is implemented as a TypeScript library under `source/domain`. It is the authoritative source of meaning for the system. The domain model is composed of `abstractions`, `adapters`, `validators`, and `protocols`.
+
+| Domain         | Description |
+| -------------- | ----------- |
+| `abstractions` | todo        |
+| `adapters`     | todo        |
+| `validators`   | todo        |
+| `protocols`    | todo        |
 
 All architectural, API, persistence, and user-interface concerns are derived from and constrained by this model. They consume these types rather than redefining or reshaping them.
 
@@ -68,7 +75,7 @@ These abstractions describe **domain meaning**, not persistence, API shape, or u
 
 The following abstractions are shared across multiple domain concepts and represent either pure value objects or embedded subordinate compositions. They do not have independent lifecycles.
 
-| Abstraction  | Location      | Description                                                        |
+| Abstraction  | Module        | Description                                                        |
 | ------------ | ------------- | ------------------------------------------------------------------ |
 | `Location`   | `common.ts`   | Geographic coordinates with optional address information           |
 | `Note`       | `common.ts`   | Freeform text with author and timestamp                            |
@@ -95,9 +102,9 @@ These structures are present in code to model associations explicitly and to pre
 
 These structures exist to model **relationships**, not to redefine the core abstractions themselves.
 
-### 2.5 Utility data types
+### 2.5 Standard data types
 
-The following utility types are used consistently across the domain model.
+The following standard data types are used consistently across the domain model.
 
 | Type   | Description                                    |
 | ------ | ---------------------------------------------- |
@@ -109,9 +116,8 @@ These types provide consistency and clarity without imposing storage or transpor
 ### 2.6 Rules
 
 - Language: TypeScript (strict mode) checked via Deno (`deno task check`).
-- Use the configured import aliases from `deno.json`: `@domain/` for domain modules, and `@utils`/`@utils/` for core utilities.
 - Types must be JSON-serializable.
-- No runtime dependencies beyond the UUID helper (or a tiny internal implementation).
+- No runtime dependencies beyond `@core-std`
 - This package is the **single source of truth** for domain types.
 - All other code (ux, edge functions) must import from `source/domain`.
 - Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type` and `Service.requiredAssetTypes`; keep the canonical list in `documentation/foundation/data-lists.md`.
@@ -124,7 +130,7 @@ These types provide consistency and clarity without imposing storage or transpor
 
 ### 2.7 Roles & attribution
 
-- User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `source/domain/abstractions/user.ts`.
+- User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `source/domain/abstraction/user.ts`.
 - `User.roles` is an array; a user may hold multiple memberships simultaneously.
 - Role semantics describe authorization intent only; enforcement occurs outside the domain layer.
 
@@ -132,19 +138,20 @@ These types provide consistency and clarity without imposing storage or transpor
 
 The domain layer follows an abstraction-per-file pattern across three subdirectories:
 
-| Layer           | Abstraction file              | Shared/helper file     |
-| --------------- | ----------------------------- | ---------------------- |
-| `abstractions/` | `{abstraction}.ts`            | `common.ts`            |
-| `validators/`   | `{abstraction}-validators.ts` | `helper-validators.ts` |
-| `protocol/`     | `{abstraction}-protocol.ts`   | `helpers-protocol.ts`  |
+| Layer           | Abstraction file             |
+| --------------- | ---------------------------- |
+| `abstractions/` | `{abstraction}.ts`           |
+| `adapters/`     | `{abstraction}-adapter.ts`   |
+| `protocols/`    | `{abstraction}-protocol.ts`  |
+| `validators/`   | `{abstraction}-validator.ts` |
 
 **Placement rules:**
 
 - Abstraction-specific types belong with their owning abstraction (e.g., `User` in `user.ts`).
 - Pure value objects and shared subordinate types (Location, Note, Attachment) live in `common.ts`.
 - Concept-owning types live with their owner (e.g., Question and Answer in `workflow.ts`).
-- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `helpers-protocol.ts`.
-- Shared validators (e.g., `isNonEmptyString`) live in `helper-validators.ts`.
+- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `@core/binding/protocols.ts`.
+- Shared validators (e.g., `isNonEmptyString`) live in `@core/binding/validators.ts`.
 
 ### 2.9 API surface summary
 

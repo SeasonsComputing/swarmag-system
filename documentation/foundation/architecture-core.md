@@ -14,13 +14,13 @@ This document defines the foundational architectural structure and principles fo
 
 The system is built on the following technology stack:
 
-| Platform                                       | Purpose                                          |
-| ---------------------------------------------- | ------------------------------------------------ |
-| **Netlify**                                    | Static hosting, edge functions compute, DNS, SSL |
-| **Supabase**                                   | Postgres database, Auth, Storage, Realtime       |
-| **GitHub Actions**                             | CI/CD pipelines                                  |
-| **SolidJS + TanStack + Kobalte + vanilla CSS** | UI platform                                      |
-| **Deno & Docker**                              | Runtime hosts used across the stack              |
+| Platform     | Purpose                              | Features/Technology                         |
+| ------------ | ------------------------------------ | ------------------------------------------- |
+| **Netlify**  | Website, Networking, Compute         | Static hosting, Edge compute, DNS, SSL      |
+| **Supabase** | Persistence, Authentication, Compute | Postgres RDBMS, Edge compute, Auth, Storage |
+| **GitHub**   | RCS, CI/CD                           | Versioning, Build pipelines                 |
+| **SolidJS**  | Application UX                       | PWA, SPA, TanStack, Kobalte, Vanilla CSS    |
+| **Deno**     | Typescript runtime                   | Service hosts used across the stack         |
 
 These platforms are considered stable and are not subject to change without architectural review.
 
@@ -58,17 +58,20 @@ Infrastructure code (handlers, adapters) should be derivable from authoritative 
 
 ### 3.2 Constraints
 
-**Offline-First Operations**
+**Offline-Operations**
 
-The Ops application must be fully operable without network connectivity. This is a first-class requirement, not a degraded mode.
+Operational telemetry and job log records must be fully operable without network connectivity. This is a first-class requirement, not a degraded mode.
 
 **Append-Only Logs**
 
 Execution logs are immutable records of reality. They are never updated or deleted during normal operation.
 
-**Netlify Edge Functions**
+**Netlify and/or Supabase Edge Functions**
 
-Backend functions must remain flat in a single directory due to Netlify discovery requirements. No subdirectories under `source/back/functions/`.
+Backend functions must remain flat in a single directory due to edge discovery requirements.
+
+- `source/back/netlify/functions/`
+- `source/back/supabase/functions/`
 
 ### 3.3 Non-Goals
 
@@ -91,56 +94,17 @@ Backend functions must remain flat in a single directory due to Netlify discover
 
 The system consists of five primary components:
 
-| Component             | Purpose                                        | Technology             |
-| --------------------- | ---------------------------------------------- | ---------------------- |
-| **Ops PWA**           | Offline-first field execution (installed app)  | SolidJS, IndexedDB     |
-| **Admin PWA**         | Management and configuration (installed app)   | SolidJS                |
-| **Customer Portal**   | Customer-facing scheduling and status (static) | SolidJS                |
-| **Backend Functions** | HTTP API surface                               | Netlify Edge Functions |
-| **Supabase Data**     | Persistent storage and auth                    | Postgres, Supabase     |
+| Component                  | Purpose                                        | Technology             |
+| -------------------------- | ---------------------------------------------- | ---------------------- |
+| **Ops PWA**                | Offline-first field execution (installed app)  | SolidJS, IndexedDB     |
+| **Admin PWA**              | Management and configuration (installed app)   | SolidJS                |
+| **Customer Portal**        | Customer-facing scheduling and status (static) | SolidJS                |
+| **Backend Business Rules** | Implemented as Edge Functions                  | Netlify, Supabase      |
+| **Supabase Data**          | Persistent storage and auth                    | Postgres, Supabase     |
 
 UX API providers (clients) are part of the UX layer and select the correct backend or storage implementation at runtime.
 
-### 4.2 System Diagram
-
-```text
-+-----------------------+  +-----------------------+  +-----------------------+
-|       Ops PWA         |  |      Admin PWA        |  |       Customer        |
-|     (installed)       |  |     (installed)       |  |       (static)        |
-|   ops.swarmag.com     |  |  admin.swarmag.com    |  |   me.swarmag.com      |
-+-----------+-----------+  +-----------+-----------+  +-----------+-----------+
-            |                          |                          |
-            +--------------------------+--------------------------+
-                                       |
-                                       v
-                           +-----------+-----------+
-                           |        Api.*          | (logical interface)
-                           |       (client)        |
-                           +-----------+-----------+
-                                       |
-                           +-----------+-----------+
-                           |   Provider Selection  |
-                           +-----+-----------+-----+
-                                 |           |
-                     +-----------+--+     +--+-----------+
-                     |  netlify     |     |  indexeddb   |
-                     |  provider    |     |  provider    |
-                     +------+-------+     +------+-------+
-                            |                    |
-                            v                    v
-                  +---------+---------+   +-------+-------+
-                  |   Backend Functions |  |   IndexedDB  |
-                  |  (Netlify Edge)     |  |    (local)   |
-                  +---------+---------+   +-------+-------+
-                            |
-                            v
-                  +---------+---------+
-                  |     Supabase      |
-                  |    (Postgres)     |
-                  +-------------------+
-```
-
-### 4.3 Domain Model Summary
+### 4.2 Domain Model Summary
 
 Core abstractions: **Service**, **Asset**, **Chemical**, **Workflow**, **Job**, **JobAssessment**, **JobPlan**, **JobLog**, **Customer**, **User**.
 
@@ -182,12 +146,12 @@ Example:
 ```typescript
 // source/ux/api/contracts/job-api.ts
 export interface JobApi {
-  create(input: JobCreateInput): Promise<Job>
-  get(id: ID): Promise<Job | null>
-  list(options?: ListOptions): Promise<ListResult<Job>>
-  assess(jobId: ID, input: AssessmentInput): Promise<JobAssessment>
-  plan(jobId: ID, input: PlanInput): Promise<JobPlan>
-  logAppend(jobId: ID, entry: JobLogEntry): Promise<void>
+  create(input: JobCreateInput): Promise<Job>;
+  get(id: ID): Promise<Job | null>;
+  list(options?: ListOptions): Promise<ListResult<Job>>;
+  assess(jobId: ID, input: AssessmentInput): Promise<JobAssessment>;
+  plan(jobId: ID, input: PlanInput): Promise<JobPlan>;
+  logAppend(jobId: ID, entry: JobLogEntry): Promise<void>;
 }
 ```
 
@@ -212,47 +176,6 @@ The system supports three API providers, each implementing the same `Api.*` cont
 
 Detailed backend implementation is described in `architecture-back.md`.
 
-### 5.3 Architectural Diagram
-
-The domain model drives all downstream architecture:
-
-```text
-                +--------------------------+
-                |      API Abstraction     |
-                |   (logical API surface)  |
-                +------------+-------------+
-                             |
-                 +-----------+-----------+
-                 |  Provider Selection  |
-                 +-----+-----------+-----+
-                       |           |
-         +-------------+--+     +--+-------------+
-         |   netlify      |     |   indexeddb    |
-         |   provider     |     |   provider     |
-         +-------+--------+     +--------+-------+
-                 |                       |
-                 v                       v
-       +---------+---------+     +-------+-------+
-       |  Backend Functions |     |   IndexedDB  |
-       |  (Netlify Edge)    |     |    (local)   |
-       +---------+---------+     +-------+-------+
-                 |
-                 v
-       +---------+---------+
-       |     Supabase      |
-       |    (Postgres)     |
-       +-------------------+
-
---------------------------------------------------------------
-
-             +--------------------------------+
-             |          Domain Model          |
-             |      (authoritative truth)     |
-             +----------------+---------------+
-             |  types, protocol, validators   |
-             +----------------+---------------+
-```
-
 ## 6. Dependency Direction & Authority
 
 ### 6.1 Canonical Sources of Truth
@@ -261,25 +184,25 @@ In order of authority:
 
 1. **Constitution** (`CONSTITUTION.md`) - governance, roles, philosophy
 2. **Domain Model** (`domain.md`) - problem space, solution space, domain meaning
-3. **Architecture Foundation** (`architecture-core.md`) - system boundary and invariants
+3. **Architecture Core** (`architecture-core.md`) - system boundary and invariants
 4. **Architecture Backend** (`architecture-back.md`) - backend implementation
 5. **Architecture UX** (`architecture-ux.md`) - UX implementation
 6. **Style Guide** (`style-guide.md`) - coding standards, conventions
 
 All code, schemas, and infrastructure are derived artifacts. If code conflicts with these documents, the code is wrong.
 
-### 6.2 Dependency Rules
+### 6.2 Dependency Rules (TODO: update)
 
 ```
-source/utilities      ──────────────── (no dependencies)
+source/utility      ──────────────── (no dependencies)
   ↑
-source/domain         ──> source/utilities
+source/domain         ──> source/utility
   ↑
-source/domain/adapters ──> source/domain, source/utilities
+source/domain/adapters ──> source/domain, source/utility
   ↑
-source/back           ──> source/domain, source/domain/adapters, source/utilities
+source/back           ──> source/domain, source/domain/adapters, source/utility
   ↑
-source/ux/api         ──> source/domain, source/domain/adapters, source/utilities
+source/ux/api         ──> source/domain, source/domain/adapters, source/utility
   ↑
 source/ux/applications/* ──> source/ux/api, source/domain
 ```
@@ -288,67 +211,82 @@ These rules are enforced through import discipline and architectural guards. Vio
 
 ## 7. Directory Structure
 
-```
+```text
 swarmag/
-  documentation/
-  source/
-    back/             # Backend (Netlify Edge Functions)
-      config/
-      functions/      # Flat HTTP handlers
-      library/        # Shared backend infrastructure
-      migrations/
-    devops/           # Architecture and environment guards
-    domain/           # Pure domain model
-      abstractions/
-      adapters/       # Storage ↔ domain boundary adapters
-      protocol/
-      validators/
-    tests/
-      cases/
-      fixtures/
-    utilities/        # Shared utilities and Deno runtime provider
-    ux/               # User experience layer
-      api/
-        client/
-        contracts/
-      applications/
-        administration/
-        components/
-        customer/
-        library/
-        operations/
-  supabase/
-  deploy/             # Build artifacts (gitignored)
+├── deploy/
+├── documentation/
+│   ├── foundation/
+│   ├── applications/
+│   └── archive/
+├── source/
+│   ├── core/
+│   │   ├── binding/
+│   │   ├── configure/
+│   │   └── standard/
+│   ├── domain/
+│   │   ├── abstractions/
+│   │   ├── adapters/
+│   │   ├── protocols/
+│   │   └── validators/
+│   ├── back/
+│   │   ├── edge-netlify/
+│   │   │   ├── config/
+│   │   │   └── functions/
+│   │   ├── edge-supabase/
+│   │   │   ├── config/
+│   │   │   └── functions/
+│   │   ├── lib/
+│   │   └── migrations/
+│   ├── ux/
+│   │   ├── api/
+│   │   ├── app-ops/
+│   │   │   └── config/
+│   │   ├── app-admin/
+│   │   │   └── config/
+│   │   ├── app-customer/
+│   │   │   └── config/
+│   │   ├── components/
+│   │   └── lib/
+│   ├── devops/
+│   └── tests/
+└── supabase/
 ```
 
 ### 7.1 Import Aliases
 
-```json
-{
-  "imports": {
-    "@domain/": "./source/domain/",
-    "@utils": "./source/utilities/mod.ts",
-    "@utils/": "./source/utilities/",
-    "@back-config/": "./source/back/config/",
-    "@back-functions/": "./source/back/functions/",
-    "@back-lib/": "./source/back/library/",
-    "@ux-api/": "./source/ux/api/",
-    "@ux-app-ops/": "./source/ux/applications/operations/",
-    "@ux-app-admin/": "./source/ux/applications/administration/",
-    "@ux-app-customer/": "./source/ux/applications/customer/",
-    "@ux-components/": "./source/ux/applications/components/",
-    "@ux-lib/": "./source/ux/applications/library/",
-    "@devops": "./source/devops/",
-    "@tests": "./source/tests/"
-  }
+```jsonc
+"imports": {
+  // Source layered namespaces
+  "@core/": "./source/core/",
+  "@domain/": "./source/domain/",
+  "@back": "./source/back/",
+  "@ux/": "./source/ux/",
+  "@devops": "./source/devops/",   
+  "@tests": "./source/tests/",
+
+  // Convenience barrels
+  "@core-std": "./source/core/standard/standard.ts",
+  "@ux-api": "./source/ux/api/api.ts",
+
+  // Backend namespaces
+  "@back-edge-netlify/": "./source/back/edge-netlify/",
+  "@back-edge-supabase/": "./source/back/edge-supabase/",
+  "@back-lib/": "./source/back/lib/",
+
+  // UX namespaces
+  "@ux-app-ops/": "./source/ux/app-ops/",
+  "@ux-app-admin/": "./source/ux/app-admin/",
+  "@ux-app-customer/": "./source/ux/app-customer/",
+  "@ux-components/": "./source/ux/components/",
+  "@ux-lib/": "./source/ux/lib/"
 }
 ```
 
-## 8. Offline-First Guarantees
+## 8. Offline-First Guarantees (TODO: update)
 
 The Ops application must be fully operable without network connectivity. This is achieved through:
 
-### 8.1 Local-First Execution
+### 8.1 Local-First Execution (TODO: update)
 
 The operations UX is designed to continue execution when connectivity is degraded:
 
@@ -361,13 +299,14 @@ The operations UX is designed to continue execution when connectivity is degrade
 UX uses the shared API client namespace:
 
 ```typescript
-import { Api } from '@ux-api/client/api.ts'
+import { api } from "@ux-api"
 
-const api = Api
-await api.jobs.list()
+await api.authenticate(userID)   // saves api.#token, throws exception
+
+await api.Jobs.list()
 ```
 
-### 8.3 Sync Strategy (Optional)
+### 8.3 Sync Strategy (TODO: update)
 
 Offline operations may be queued for later reconciliation:
 
@@ -377,33 +316,18 @@ Offline operations may be queued for later reconciliation:
 
 **Critical:** Offline is not a fallback or degraded mode. It is a first-class execution environment with the same correctness guarantees as online execution.
 
-## 9. System Diagram Updates
-
-```
-source/
-  domain/           ──┐
-    adapters/       ──┤── Used by both back and ux/api
-  utilities/        ──┤
-  back/             ──┤
-  ux/               ──┘
-    api/
-      client/
-```
-
-## 10. Architectural Invariants
+## 9. Architectural Invariants (TODO: update)
 
 These rules must never be violated:
 
 1. **Domain is pure** - no infrastructure dependencies
 2. **API is the boundary** - UX applications import the API layer, not backend libraries
 3. **Adapters are the storage boundary** - under `source/domain/adapters/`
-4. **Functions are thin** - orchestration only, call adapters directly
-5. **Offline is first-class** - not degraded or bolted on
-6. **Soft delete everywhere** - except append-only and pure joins
-7. **Functions stay flat** - Netlify requirement, non-negotiable
-8. **Import maps only** - no cross-layer relative imports
-9. **Regenerable infrastructure** - meaning lives in domain/schema/contracts
-10. **Conservative interpretation** - stop rather than guess
+4. **Offline is first-class** - not degraded or bolted on (TODO: update)
+5. **Soft delete everywhere** - except append-only and pure joins
+6. **Functions stay flat** - Edge functions requirement, non-negotiable
+7. **Import maps only** - no cross-top-layer relative imports
+8. **Regenerable infrastructure** - meaning lives in domain/*
 
 Code that violates these invariants is wrong, regardless of whether it "works."
 
@@ -412,11 +336,8 @@ Code that violates these invariants is wrong, regardless of whether it "works."
 ### 11.1 Adding New Domain Concepts
 
 1. Update `domain.md` (solution space, then domain model)
-2. Implement domain abstractions, validators, protocol
-3. Update schema and create migration
-4. Update API contracts (`source/ux/api/contracts/`)
-5. Update adapters (`source/domain/adapters/`)
-6. Implement backend functions
+2. Implement domain abstractions, validators, protocols, and adapters
+3. Update schema and create migration54. Implement backend functions
 7. Update UX application integration
 
 Domain changes flow unidirectionally through the system.
@@ -443,11 +364,4 @@ Code is deleted, not commented out:
 
 Dead code is a liability.
 
-**End of Foundation Document**
-
-See also:
-
-- `architecture-back.md` - Backend implementation details
-- `architecture-ux.md` - UX implementation details
-- `domain.md` - Domain model definitions
-- `CONSTITUTION.md` - Governance and authority
+**End of Architecture Core Document**
