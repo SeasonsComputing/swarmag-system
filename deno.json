@@ -19,7 +19,9 @@
     "@ux-app-admin/": "./source/ux/app-admin/",
     "@ux-app-customer/": "./source/ux/app-customer/",
     "@ux-components/": "./source/ux/components/",
-    "@ux-lib/": "./source/ux/lib/"
+    "@ux-lib/": "./source/ux/lib/",
+
+    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2"
   },
   "tasks": {
     "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno check source/**/*.ts && deno task lint",

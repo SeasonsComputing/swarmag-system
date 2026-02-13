@@ -3,7 +3,7 @@
  */
 
 import { createClient, type SupabaseClient } from '@supabase/client'
-import { Config } from '../config/serverless-config.ts'
+//import { Config } from '../config/serverless-config.ts'
 
 /** Cache-aware Supabase client factory for platform functions. */
 export class Supabase {
@@ -18,8 +18,9 @@ export class Supabase {
   static client(): SupabaseClient {
     if (Supabase.#cache) return Supabase.#cache
 
-    const SUPABASE_URL = Config.get('SUPABASE_URL')
-    const SUPABASE_SERVICE_KEY = Config.get('SUPABASE_SERVICE_KEY')
+    // TODO: critical!
+    const SUPABASE_URL = 'https://data.swarmag.com' //Config.get('SUPABASE_URL')
+    const SUPABASE_SERVICE_KEY = `supabase-key` //Config.get('SUPABASE_SERVICE_KEY')
 
     Supabase.#cache = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY, {
       auth: { persistSession: false }
