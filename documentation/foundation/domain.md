@@ -1,6 +1,6 @@
 # swarmAg System – Domain
 
-This document defines the foundational abstractions, contracts, and APIs of the `swarmAg System`. The domain model captures both the problem space and the solution space, expressed as classes, types, interfaces, associations, and APIs delivered through a TypeScript library.
+This document defines the foundational abstractions, contracts, and APIs of the `swarmAg System`. The domain model captures the solution space expressed as classes, types, interfaces, associations, and APIs specified using TypeScript.
 
 ## 1. Solution Space
 
@@ -130,7 +130,7 @@ These types provide consistency and clarity without imposing storage or transpor
 
 ### 2.7 Roles & attribution
 
-- User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `source/domain/abstraction/user.ts`.
+- User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `@domain/abstraction/user.ts`.
 - `User.roles` is an array; a user may hold multiple memberships simultaneously.
 - Role semantics describe authorization intent only; enforcement occurs outside the domain layer.
 
@@ -150,25 +150,198 @@ The domain layer follows an abstraction-per-file pattern across three subdirecto
 - Abstraction-specific types belong with their owning abstraction (e.g., `User` in `user.ts`).
 - Pure value objects and shared subordinate types (Location, Note, Attachment) live in `common.ts`.
 - Concept-owning types live with their owner (e.g., Question and Answer in `workflow.ts`).
-- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `@core/binding/protocols.ts`.
-- Shared validators (e.g., `isNonEmptyString`) live in `@core/binding/validators.ts`.
+- Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-client.ts`.
+- Shared validators (e.g., `isNonEmptyString` & `isIdArray`) live in `@domain/validators/helper-validator.ts`.
 
-### 2.9 API surface summary
+### 2.9 Data Dictionary
 
-The domain model informs, but does not define, the API surface. The following actions reflect current domain intent and lifecycle sequencing.
+The following sections define the domain types and shape constraints from `@domain/abstractions`.
 
-| Abstraction    | Actions                                                                                  | Notes                                              |
-| -------------- | ---------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Service        | `service-create`, `service-get`, `service-list`, `service-update`, `service-delete`      | CRUD for catalogued offerings                      |
-| Asset          | `asset-create`, `asset-get`, `asset-list`, `asset-update`, `asset-delete`                | Manage equipment and resources                     |
-| Chemical       | `chemical-create`, `chemical-get`, `chemical-list`, `chemical-update`, `chemical-delete` | Track regulated materials                          |
-| Workflow       | `workflow-create`, `workflow-get`, `workflow-list`, `workflow-update`, `workflow-delete` | Versioned workflow templates                       |
-| Job            | `job-create`, `job-get`, `job-list`, `job-update`                                        | Job agreement created first                        |
-| Job Assessment | `job-assessment-create`, `job-assessment-get`, `job-assessment-update`                   | Assessment precedes planning                       |
-| Job Plan       | `job-plan-create`, `job-plan-get`, `job-plan-update`                                     | Plan instantiated from workflow prior to execution |
-| Job Log        | `job-log-append`, `job-log-list`                                                         | Append-only execution records                      |
-| User           | `user-create`, `user-get`, `user-list`, `user-update`, `user-delete`                     | Operator and staff identities                      |
-| Customer       | `customer-create`, `customer-get`, `customer-list`, `customer-update`, `customer-delete` | Customer records                                   |
-| Optional       | `*-search`                                                                               | Richer filtering when required                     |
+#### 2.9.1 Core (`@core-std`)
 
-API handler conventions, validation rules, and transport concerns are documented in `documentation/foundation/architecture-back.md`.
+```text
+ID (alias)
+  Shape: UUID v7 string
+  Notes: Primary/foreign identifier type
+
+When (alias)
+  Shape: ISO 8601 UTC string
+  Notes: Timestamp type
+
+Dictionary (alias)
+  Shape: JSON-like key/value map
+  Notes: Flexible structured data container
+```
+
+#### 2.9.2 Common (`@domain/abstractions/common.ts`)
+
+```text
+Location (object)
+  Fields: latitude, longitude, altitudeMeters?, line1?, line2?, city?, state?, postalCode?, country?, recordedAt?, accuracyMeters?, description?
+  Notes: Geographic position plus optional address metadata
+
+Attachment (object)
+  Fields: id, filename, url, contentType, uploadedAt, uploadedById
+  Notes: Uploaded artifact metadata
+
+Note (object)
+  Fields: id, createdAt, authorId?, content, visibility?(internal|shared), tags?, images: Attachment[]
+  Notes: Freeform note with optional visibility/taxonomy
+```
+
+#### 2.9.3 Assets (`@domain/abstractions/asset.ts`)
+
+```text
+AssetType (object)
+  Fields: id, label, active, createdAt, updatedAt, deletedAt?
+  Notes: Reference type for categorizing assets
+  Values: foundation/data-lists.md, Section 2. Asset Types
+
+AssetStatus (enum)
+  Values: active | maintenance | retired | reserved
+  Notes: Lifecycle/availability state
+
+Asset (object)
+  Fields: id, label, description?, serialNumber?, type(AssetType.id), status(AssetStatus), attachments?, createdAt, updatedAt, deletedAt?
+  Notes: Operational equipment/resource
+```
+
+#### 2.9.4 Chemicals (`@domain/abstractions/chemical.ts`)
+
+```text
+ChemicalUsage (enum)
+  Values: herbicide | pesticide | fertilizer | fungicide | adjuvant
+  Notes: Domain usage classification
+
+ChemicalLabel (object)
+  Fields: url, description?
+  Notes: Label/document pointer
+
+Chemical (object)
+  Fields: id, name, epaNumber?, usage, signalWord?(danger|warning|caution), restrictedUse, reEntryIntervalHours?, storageLocation?, sdsUrl?, labels?, attachments?, notes?, createdAt, updatedAt, deletedAt?
+  Notes: Regulated material record
+```
+
+#### 2.9.5 Customers (`@domain/abstractions/customer.ts`)
+
+```text
+Contact (object)
+  Fields: id, customerId, name, email?, phone?, preferredChannel?(email|sms|phone), notes?, createdAt, updatedAt
+  Notes: Customer-associated contact person
+
+CustomerSite (object)
+  Fields: id, customerId, label, location, acreage?, notes?
+  Notes: Serviceable customer location
+
+Customer (object)
+  Fields: id, name, status(active|inactive|prospect), line1, line2?, city, state, postalCode, country, accountManagerId?, primaryContactId?, sites: CustomerSite[], contacts: [Contact, ...Contact[]], notes?, createdAt, updatedAt, deletedAt?
+  Notes: Customer account aggregate; contacts must be non-empty
+```
+
+#### 2.9.6 Services (`@domain/abstractions/service.ts`)
+
+```text
+ServiceCategory (enum)
+  Values: aerial-drone-services | ground-machinery-services
+  Notes: Service family classification
+
+Service (object)
+  Fields: id, name, sku, description?, category, notes?, createdAt, updatedAt, deletedAt?
+  Notes: Sellable operational offering
+
+ServiceRequiredAssetType (object)
+  Fields: serviceId, assetTypeId, deletedAt?
+  Notes: Association between services and required asset types
+```
+
+#### 2.9.7 Users (`@domain/abstractions/user.ts`)
+
+```text
+USER_ROLES (const tuple)
+  Values: administrator | sales | operations
+  Notes: Canonical role set
+
+UserRole (union)
+  Values: (typeof USER_ROLES)[number]
+  Notes: Role type derived from tuple
+
+User (object)
+  Fields: id, displayName, primaryEmail, phoneNumber, avatarUrl?, roles?, status?(active|inactive), createdAt?, updatedAt?, deletedAt?
+  Notes: System user identity and membership
+```
+
+#### 2.9.8 Workflows (`@domain/abstractions/workflow.ts`)
+
+```text
+QuestionType (enum)
+  Values: text | number | boolean | single-select | multi-select
+  Notes: Supported question input modes
+
+QuestionOption (object)
+  Fields: value, label?, requiresNote?
+  Notes: Selectable option metadata
+
+Question (object)
+  Fields: id, prompt, type, helpText?, required?, options?
+  Notes: Workflow checklist prompt
+
+AnswerValue (union)
+  Values: string | number | boolean | string[]
+  Notes: Permitted answer value payloads
+
+Answer (object)
+  Fields: questionId, value, capturedAt, capturedById, note?
+  Notes: Captured response instance
+
+WorkflowStep (object)
+  Fields: id, title, description?, checklist: Question[], requiresLocationCapture?, requiresPhoto?, notes?
+  Notes: Atomic executable step
+
+Workflow (object)
+  Fields: id, serviceId, name, description?, version, effectiveFrom, steps, locationsRequired?, createdAt, updatedAt, deletedAt?
+  Notes: Versioned execution template
+```
+
+#### 2.9.9 Jobs (`@domain/abstractions/job.ts`)
+
+```text
+JobStatus (enum)
+  Values: opened | assessed | planned | inprogress | completed | closed | cancelled
+  Notes: Job lifecycle state
+
+JobAssessment (object)
+  Fields: id, jobId, assessorId, locations: [Location, ...Location[]], questions: Answer[], risks?, notes?, attachments?, createdAt, updatedAt, deletedAt?
+  Notes: Pre-planning assessment; requires one or more locations
+
+JobPlanAssignment (object)
+  Fields: planId, userId, role, notes?, deletedAt?
+  Notes: Assignment of user to plan role
+
+JobPlanChemical (object)
+  Fields: planId, chemicalId, amount, unit(gallon|liter|pound|kilogram), targetArea?, targetAreaUnit?(acre|hectare), deletedAt?
+  Notes: Planned chemical usage
+
+JobPlanAsset (object)
+  Fields: planId, assetId, deletedAt?
+  Notes: Asset allocated to a plan
+
+JobPlan (object)
+  Fields: id, jobId, workflowId, scheduledStart, scheduledEnd?, targetLocations: Location[], notes?, createdAt, updatedAt, deletedAt?
+  Notes: Job-specific execution plan
+
+JobLogType (enum)
+  Values: status | checkpoint | note | telemetry | exception
+  Notes: Execution log entry class
+
+JobLogPayload (alias)
+  Shape: Dictionary
+  Notes: Flexible structured metadata for log entries
+
+JobLogEntry (object)
+  Fields: id, jobId, type, message, occurredAt, createdAt, createdById, location?, attachments?, payload?
+  Notes: Append-only event record
+
+Job (object)
+  Fields: id, customerId, serviceId, status, createdAt, updatedAt, deletedAt?
+  Notes: Work agreement lifecycle anchor
+```

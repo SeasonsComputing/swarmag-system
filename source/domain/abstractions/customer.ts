@@ -3,8 +3,8 @@
  * Customers represent clients who have operations and sites to be serviced.
  */
 
-import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@core-std'
+import type { Location, Note } from '@domain/abstractions/common.ts'
 
 /** Represents a contact person associated with a customer. */
 export interface Contact {

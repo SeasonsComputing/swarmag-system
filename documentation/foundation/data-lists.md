@@ -4,7 +4,7 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 
 ## 1. Services
 
-## 2. Aerial Drone Services
+### 1.1. Aerial Drone Services
 
 | Description                    | Equipment | SKU        |
 | ------------------------------ | --------- | ---------- |
@@ -17,7 +17,7 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 | Mesquite Herbicide             | XAG P150  | A-CHEM-04  |
 | Commercial Greenhouse Painting | DJI T30   | A-PAINT-01 |
 
-## 3. Ground Machinery Services
+### 1.2. Ground Machinery Services
 
 | Description                        | Equipment            | SKU        |
 | ---------------------------------- | -------------------- | ---------- |
@@ -26,7 +26,7 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 | Rock Removal, Regrade              | Skidsteer, Toolcat   | G-MACH-01  |
 | Brush Hogging                      | Skidsteer, Toolcat   | G-BRUSH-01 |
 
-## 4. Asset Types
+## 2. Asset Types
 
 | Description             |
 | ----------------------- |

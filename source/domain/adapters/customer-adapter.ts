@@ -2,8 +2,8 @@
  * Mappers for converting between Supabase customer rows and domain Customers.
  */
 
-import type { Customer } from '@domain/abstractions/customer.ts'
 import type { Dictionary } from '@core-std'
+import type { Customer } from '@domain/abstractions/customer.ts'
 
 /**
  * Type guard for customer status.

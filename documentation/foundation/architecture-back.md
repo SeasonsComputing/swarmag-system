@@ -1,10 +1,10 @@
 # Architecture: swarmAg System — Backend
 
-## Overview
+## Overview (TODO: update)
 
 This document defines the backend architecture of the swarmAg system. The backend is a single Netlify Edge Functions surface that implements the `Api.*` contracts defined in `architecture-core.md`, stores data in Supabase Postgres, and returns validated domain abstractions.
 
-**Prerequisites:** 
+**Prerequisites:**
 
 Read `domain.md` and `architecture-core.md` first to understand the domain model and system boundary.
 
@@ -23,18 +23,14 @@ The backend is intentionally simple and concrete:
 ### Backend Layout
 
 ```text
-swarmag/
-├── source/
-│   └── back/
-│       ├── edge-netlify/
-│       │   ├── config/
-│       │   └── functions/
-│       ├── edge-supabase/
-│       │   ├── config/
-│       │   └── functions/
-│       ├── lib/
-│       └── migrations/
-└── supabase/
+source/back/
+  ├── migrations/
+  ├── netlify-edge/
+  │   ├── config/
+  │   └── functions/
+  └── supabase-edge/
+      ├── config/
+      └── functions/
 ```
 
 ## Functions (HTTP handlers) (TODO: update)
@@ -62,11 +58,11 @@ import {
   toInternalError,
   toMethodNotAllowed,
   toOk
-} from '@back-lib/api-binding.ts'
-import { createApiHandler } from '@back-lib/api-handler.ts'
-import { Supabase } from '@back-lib/db-supabase.ts'
+} from '@core/api/crud-rest-provider-adapter.ts'
+import { createApiHandler } from '@core/api/api-handler.ts'
+import { Supabase } from '@core/db/supabase.ts'
 import type { Job } from '@domain/abstractions/job.ts'
-import { rowToJob } from '@domain/adapters/jobs-adapter.ts'
+import { rowToJob } from '@domain/adapters/job-adapter.ts'
 import { validateJobCreateInput } from '@domain/validators/job-validator.ts'
 
 export const config = { path: '/api/jobs/create' }
@@ -77,7 +73,11 @@ const handle = async (req: ApiRequest): Promise<ApiResponse> => {
   const input = await req.json()
   if (!validateJobCreateInput(input)) return toBadRequest('Invalid input')
 
-  const { data, error } = await Supabase.client().from('jobs').insert(input).select().single()
+  const { data, error } = await Supabase.client()
+    .from('jobs')
+    .insert(input)
+    .select()
+    .single()
 
   if (error || !data) return toInternalError('Failed to create job')
 

@@ -2,8 +2,8 @@
  * Asset fixture samples for tests.
  */
 
-import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import { id } from '@core-std'
+import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 
 const transportTruckTypeId = id()
 const skidsteerTypeId = id()

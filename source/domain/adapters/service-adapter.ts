@@ -2,9 +2,9 @@
  * Mappers for converting between Supabase service rows and domain Services.
  */
 
+import type { Dictionary } from '@core-std'
 import type { Service } from '@domain/abstractions/service.ts'
 import { isIdArray } from '@serverless-lib/db-binding.ts'
-import type { Dictionary } from '@core-std'
 
 /**
  * Type guard for supported service categories.
@@ -47,11 +47,9 @@ export const rowToService = (row: unknown): Service => {
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Dictionary
     if (
-      typeof payload.id === 'string'
-      && typeof payload.name === 'string'
-      && typeof payload.sku === 'string'
-      && isServiceCategory(payload.category)
-      && isIdArray(payload.requiredAssetTypes)
+      typeof payload.id === 'string' && typeof payload.name === 'string' && typeof payload
+          .sku === 'string'
+      && isServiceCategory(payload.category) && isIdArray(payload.requiredAssetTypes)
     ) {
       return payload as unknown as Service
     }

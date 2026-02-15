@@ -2,6 +2,7 @@
  * Mappers for converting between Supabase job rows and domain Jobs.
  */
 
+import type { Dictionary } from '@core-std'
 import type {
   Job,
   JobAssessment,
@@ -9,7 +10,6 @@ import type {
   JobPlan,
   JobStatus
 } from '@domain/abstractions/job.ts'
-import type { Dictionary } from '@core-std'
 
 /**
  * Type guard for job status.
@@ -126,12 +126,11 @@ export const rowToJobAssessment = (row: unknown): JobAssessment => {
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Dictionary
     if (
-      typeof payload.id === 'string'
-      && typeof payload.serviceId === 'string'
-      && typeof payload.customerId === 'string'
-      && typeof payload.assessorId === 'string'
-      && Array.isArray(payload.locations)
-      && payload.locations.length > 0
+      typeof payload.id === 'string' && typeof payload.serviceId === 'string' && typeof payload
+          .customerId === 'string'
+      && typeof payload.assessorId === 'string' && Array.isArray(payload.locations) && payload
+          .locations
+          .length > 0
     ) {
       return payload as unknown as JobAssessment
     }
@@ -174,9 +173,8 @@ export const rowToJobPlan = (row: unknown): JobPlan => {
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Dictionary
     if (
-      typeof payload.id === 'string'
-      && typeof payload.jobId === 'string'
-      && typeof payload.workflowId === 'string'
+      typeof payload.id === 'string' && typeof payload.jobId === 'string' && typeof payload
+          .workflowId === 'string'
       && typeof payload.scheduledStart === 'string'
     ) {
       return payload as unknown as JobPlan
@@ -218,11 +216,9 @@ export const rowToJobLogEntry = (row: unknown): JobLogEntry => {
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Dictionary
     if (
-      typeof payload.id === 'string'
-      && typeof payload.jobId === 'string'
-      && typeof payload.planId === 'string'
-      && typeof payload.type === 'string'
-      && typeof payload.message === 'string'
+      typeof payload.id === 'string' && typeof payload.jobId === 'string' && typeof payload
+          .planId === 'string'
+      && typeof payload.type === 'string' && typeof payload.message === 'string'
     ) {
       return payload as unknown as JobLogEntry
     }

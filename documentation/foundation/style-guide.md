@@ -5,12 +5,12 @@ any software artifact with the system.
 
 ## 1. Language and Tooling
 
-| Item     | Guideline                                                                                                                                                                                                 |
-| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Compiler | Deno `check` with strict TypeScript                                                                                                                                                                       |
+| Item     | Guideline                                                                                                                                                                                                     |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Compiler | Deno `check` with strict TypeScript                                                                                                                                                                           |
 | Aliases  | `@domain/`, `@utility`, `@utility/`, `@back-config/`, `@back-functions/`, `@back-lib/`, `@ux-api/`, `@ux-app-admin/`, `@ux-app-ops/`, `@ux-app-customer/`, `@ux-components/`, `@ux-lib/`, `@devops`, `@tests` |
-| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers                                                                                                                                           |
-| Encoding | ASCII only; no non-ASCII literals                                                                                                                                                                         |
+| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers                                                                                                                                               |
+| Encoding | ASCII only; no non-ASCII literals                                                                                                                                                                             |
 
 ## 2. Imports and Organization
 
@@ -30,8 +30,8 @@ any software artifact with the system.
 import { isNonEmptyString } from './helper-validator.ts'
 
 // Different directory - use alias
-import type { User } from '@domain/abstractions/user.ts'
 import type { ID, When } from '@core-std'
+import type { User } from '@domain/abstractions/user.ts'
 ```
 
 ## Directory Organization Rules
@@ -108,7 +108,7 @@ Never commit deployment artifacts.
 | --------------- | -------------------------------------------------------------------------------------- |
 | Acronyms        | Use title case for acronyms in identifiers: `Api`, `Url`, `Id`, not `API`, `URL`, `ID` |
 | Classes         | PascalCase: `UsersApi`, `JobsApi`                                                      |
-| Files           | Kebab-case: `users-api.ts`, `job-validator.ts`                                        |
+| Files           | Kebab-case: `users-api.ts`, `job-validator.ts`                                         |
 | Type aliases    | PascalCase: `UserCreateInput`, `JobStatus`                                             |
 | Constants       | camelCase for exported constants: `httpCodes` (exception: `HttpCodes` object)          |
 | Domain-specific | Use domain names: `JobAssessment`, `JobLogEntry`, not generic names                    |
@@ -127,11 +127,11 @@ Never commit deployment artifacts.
 
 Each domain abstraction has corresponding files across three subdirectories:
 
-| Layer           | Abstraction file              | Shared/helper file     |
-| --------------- | ----------------------------- | ---------------------- |
-| `abstractions/` | `{abstraction}.ts`            | `common.ts`            |
+| Layer           | Abstraction file             | Shared/helper file    |
+| --------------- | ---------------------------- | --------------------- |
+| `abstractions/` | `{abstraction}.ts`           | `common.ts`           |
 | `validators/`   | `{abstraction}-validator.ts` | `helper-validator.ts` |
-| `protocol/`     | `{abstraction}-protocol.ts`   | `helper-protocol.ts`  |
+| `protocol/`     | `{abstraction}-protocol.ts`  | `helper-protocol.ts`  |
 
 **Placement rules:**
 
@@ -166,18 +166,18 @@ Each domain abstraction has corresponding files across three subdirectories:
 
 ## 7. Backend Functions (`source/back/functions/*`)
 
-| Item       | Guideline                                                                                                           |
-| ---------- | ------------------------------------------------------------------------------------------------------------------- |
-| Naming     | `{resource}-{action}.ts` (plural resource), e.g., `users-create.ts`                                                 |
-| Exports    | Default export only: Netlify `createApiHandler(handle)`                                                             |
-| Config     | Export `config = { path: "/api/{resource}/{action}" }` for routing                                                  |
-| Types      | Use `ApiRequest`/`ApiResponse` from `@back-lib/api-binding`                                                         |
-| Status     | Use `HttpCodes`; no numeric literals                                                                                |
-| Platform   | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor`                                                    |
-| Validation | Guard with `validate` + `HttpCodes.unprocessableEntity`                                                             |
-| Methods    | Guard unsupported verbs with `HttpCodes.methodNotAllowed`                                                           |
-| Responses  | Success: `{ data: ... }`; failure: `{ error, details? }`                                                            |
-| JSON       | Always JSON; `createApiHandler` sets headers and wraps errors                                                       |
+| Item       | Guideline                                                                                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------ |
+| Naming     | `{resource}-{action}.ts` (plural resource), e.g., `users-create.ts`                                                |
+| Exports    | Default export only: Netlify `createApiHandler(handle)`                                                            |
+| Config     | Export `config = { path: "/api/{resource}/{action}" }` for routing                                                 |
+| Types      | Use `ApiRequest`/`ApiResponse` from `@back-lib/api-binding`                                                        |
+| Status     | Use `HttpCodes`; no numeric literals                                                                               |
+| Platform   | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor`                                                   |
+| Validation | Guard with `validate` + `HttpCodes.unprocessableEntity`                                                            |
+| Methods    | Guard unsupported verbs with `HttpCodes.methodNotAllowed`                                                          |
+| Responses  | Success: `{ data: ... }`; failure: `{ error, details? }`                                                           |
+| JSON       | Always JSON; `createApiHandler` sets headers and wraps errors                                                      |
 | Adaptation | Use adapters from `source/domain/adapter/` (e.g., `jobs-adapter.ts`) instead of ad hoc column maps in each handler |
 
 ## 8. Adapters and Storage Adaptation

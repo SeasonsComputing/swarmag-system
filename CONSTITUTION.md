@@ -90,7 +90,7 @@ Once an agenda is established and agreed upon:
 
 The agenda is the contract.
 
-## 4. Architectural Law
+## 4. Architectural Law (TODO: move to architecture-core)
 
 ### 4.1 Persistence and Modeling
 

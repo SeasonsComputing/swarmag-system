@@ -2,8 +2,8 @@
  * Mappers for converting between Supabase workflow rows and domain Workflows.
  */
 
-import type { Workflow } from '@domain/abstractions/workflow.ts'
 import type { Dictionary } from '@core-std'
+import type { Workflow } from '@domain/abstractions/workflow.ts'
 
 /** Map a domain Workflow into a Dictionary shape. */
 export const workflowToRow = (workflow: Workflow) => ({
@@ -39,11 +39,9 @@ export const rowToWorkflow = (row: unknown): Workflow => {
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Dictionary
     if (
-      typeof payload.id === 'string'
-      && typeof payload.serviceId === 'string'
-      && typeof payload.name === 'string'
-      && typeof payload.version === 'number'
-      && typeof payload.effectiveFrom === 'string'
+      typeof payload.id === 'string' && typeof payload.serviceId === 'string' && typeof payload
+          .name === 'string'
+      && typeof payload.version === 'number' && typeof payload.effectiveFrom === 'string'
       && Array.isArray(payload.steps)
     ) {
       return payload as unknown as Workflow

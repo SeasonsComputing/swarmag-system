@@ -13,6 +13,7 @@ The system is built domain-first, with explicit boundaries between concerns and 
 The domain model (`source/domain`) is the single source of truth for business meaning. All other layers (persistence, API, UI) consume domain types rather than redefining them.
 
 Domain code:
+
 - Contains no references to HTTP, SQL, or runtime concerns
 - Defines validation rules and invariants
 - Provides protocol shapes (input/output types)
@@ -21,6 +22,7 @@ Domain code:
 ### 2.2 Explicit Boundaries
 
 Every architectural boundary is explicit and enforced:
+
 - Domain never imports from infrastructure
 - Handlers orchestrate; they don't implement
 - Persistence adapts to domain, never the reverse
@@ -31,6 +33,7 @@ Implicit coupling is treated as a defect.
 ### 2.3 Conservative Interpretation
 
 When intent is unclear:
+
 - Choose the most conservative interpretation
 - Favor doing nothing over doing the wrong thing
 - Stop and escalate rather than proceeding with assumptions
@@ -40,6 +43,7 @@ This applies to both human and AI contributors.
 ### 2.4 Minimalism
 
 Prefer:
+
 - Fewer abstractions over more
 - Explicit repetition over premature generalization
 - Concrete solutions over speculative frameworks
@@ -70,12 +74,14 @@ All lifecycled entities support soft delete via `deleted_at` timestamp. Hard del
 ### 3.2 Non-Goals
 
 **Not building:**
+
 - Real-time collaboration features
 - Complex state machines
 - Speculative "enterprise" features
 - Premature optimization
 
 **Not supporting:**
+
 - Multiple tenants (single organization system)
 - Historical versioning (append-only logs are sufficient)
 - Complex workflow engines (simple sequential execution)
@@ -85,6 +91,7 @@ All lifecycled entities support soft delete via `deleted_at` timestamp. Hard del
 ### 4.1 Canonical Sources of Truth
 
 In order of authority:
+
 1. **Constitution** (`CONSTITUTION.md`) - governance, roles, philosophy
 2. **Domain Model** (`domain.md`) - problem space, solution space, domain meaning
 3. **Architecture** (`architecture.md`) - structural realization
@@ -121,12 +128,14 @@ Apps ──▶ Api.* ──▶ Backend Selection ──▶ Storage
 ```
 
 Key properties:
+
 - Apps never import repositories, SQL, or storage libraries
 - Apps never branch on storage technology
 - Backend selection is explicit and testable
 - The API contract is stable; backends are replaceable
 
 This architecture enables:
+
 - Online execution via serverless (HTTP)
 - Online trusted execution via direct database access (Supabase SDK)
 - Offline execution via local storage (IndexedDB)
@@ -140,6 +149,7 @@ All three backends implement the same logical API surface and return validated d
 The API abstraction is defined under `source/api/contracts/` as TypeScript interfaces expressing domain intent without implementation.
 
 Example:
+
 ```typescript
 // api/contracts/job-api.ts
 export interface JobApi {
@@ -153,6 +163,7 @@ export interface JobApi {
 ```
 
 These contracts:
+
 - Express domain lifecycle and sequencing
 - Use only domain types (no transport, no storage)
 - Are implemented by multiple backends
@@ -166,11 +177,11 @@ Client applications import `Api.*` but never import backend implementations dire
 
 The system supports three backend adapters, each implementing the same `Api.*` contracts:
 
-| Backend | Purpose | Storage | Transport |
-|---------|---------|---------|-----------|
-| Serverless | Online HTTP access | Postgres/Supabase | Netlify Edge Functions |
-| Direct-DB | Online trusted access | Postgres/Supabase | Supabase SDK (no HTTP) |
-| Offline | Disconnected execution | IndexedDB | None |
+| Backend    | Purpose                | Storage           | Transport              |
+| ---------- | ---------------------- | ----------------- | ---------------------- |
+| Serverless | Online HTTP access     | Postgres/Supabase | Netlify Edge Functions |
+| Direct-DB  | Online trusted access  | Postgres/Supabase | Supabase SDK (no HTTP) |
+| Offline    | Disconnected execution | IndexedDB         | None                   |
 
 ### 7.1 Serverless Backend
 
@@ -179,6 +190,7 @@ The system supports three backend adapters, each implementing the same `Api.*` c
 **Purpose:** HTTP-accessible API for external clients (Admin app, Ops app when online).
 
 **Structure:**
+
 ```
 backends/serverless/
   functions/        # Flat {abstraction}-{verb}.ts files (Netlify requirement)
@@ -187,6 +199,7 @@ backends/serverless/
 ```
 
 **Responsibilities:**
+
 - HTTP request/response handling
 - Authentication/authorization
 - Input validation (using domain validators)
@@ -194,6 +207,7 @@ backends/serverless/
 - Error translation (domain errors → HTTP status codes)
 
 **Critical Rules:**
+
 - Functions must remain flat in `functions/` (Netlify discovery requirement)
 - Functions are thin orchestration; no business logic
 - Functions never import `Supabase` directly; use repositories
@@ -206,18 +220,21 @@ backends/serverless/
 **Purpose:** Trusted server-side access bypassing HTTP (e.g., batch jobs, admin tasks, reports).
 
 **Structure:**
+
 ```
 backends/direct-db/
   repositories/     # Supabase SDK-backed persistence
 ```
 
 **Responsibilities:**
+
 - Direct Supabase SDK usage
 - Same domain type contracts as serverless
 - No HTTP overhead
 - Used for trusted, high-throughput operations
 
 **Critical Rules:**
+
 - Implements same `Api.*` contracts as serverless
 - Never used from untrusted client code
 - Repositories may share SQL logic with serverless but are separate implementations
@@ -229,6 +246,7 @@ backends/direct-db/
 **Purpose:** Fully offline execution for Ops app in disconnected field environments.
 
 **Structure:**
+
 ```
 backends/offline/
   repositories/     # IndexedDB-backed persistence
@@ -236,12 +254,14 @@ backends/offline/
 ```
 
 **Responsibilities:**
+
 - Local-only execution (no network)
 - IndexedDB storage
 - Same API semantics as online backends
 - Append-only operation queue for later sync (optional)
 
 **Critical Rules:**
+
 - Must implement identical `Api.*` contracts
 - Must support full job execution lifecycle offline
 - Must maintain referential integrity locally
@@ -258,6 +278,7 @@ Repositories are **backend-internal persistence adapters**. They translate domai
 ### 8.1 Responsibilities
 
 Repositories:
+
 - Translate domain types → storage operations (SQL, SDK calls, IndexedDB)
 - Enforce soft-delete filtering (`deleted_at IS NULL`)
 - Manage transactions
@@ -265,6 +286,7 @@ Repositories:
 - Return validated domain types only
 
 Repositories do NOT:
+
 - Live in `source/domain/`
 - Define domain concepts
 - Expose storage rows or internal types
@@ -273,6 +295,7 @@ Repositories do NOT:
 ### 8.2 Location
 
 Each backend has its own repositories:
+
 - `backends/serverless/repositories/` (Postgres via Supabase client)
 - `backends/direct-db/repositories/` (Postgres via Supabase SDK)
 - `backends/offline/repositories/` (IndexedDB)
@@ -286,27 +309,26 @@ Each repository exposes domain-aligned methods:
 ```typescript
 // backends/serverless/repositories/user-repository.ts
 import type { User, UserCreateInput } from '@domain/abstractions/user.ts'
-import type { ID } from '@utility/types.ts'
 import { Supabase } from '@serverless-lib/db-supabase.ts'
+import type { ID } from '@utility/types.ts'
 import { rowToUser } from './mappers/user-mapper.ts'
 
 export const userRepository = {
   async get(id: ID): Promise<User | null> {
-    const { data, error } = await Supabase.client()
+    const { data, error } = await Supabase
+      .client()
       .from('users')
       .select('*')
       .eq('id', id)
       .is('deleted_at', null)
       .single()
-    
+
     if (error || !data) return null
     return rowToUser(data)
   },
-  
   async create(input: UserCreateInput): Promise<User> {
     // ...
   },
-  
   async softDelete(id: ID): Promise<void> {
     // ...
   }
@@ -316,6 +338,7 @@ export const userRepository = {
 ### 8.4 Mapping
 
 Row ↔ domain mapping is explicit and centralized:
+
 - `backends/serverless/repositories/mappers/user-mapper.ts`
 - Mapping functions validate and transform storage rows into domain types
 - Parse errors are thrown, not silently ignored
@@ -413,6 +436,7 @@ The Ops application must be fully operable without network connectivity. This is
 The offline backend (`backends/offline/`) implements the complete `Api.*` surface using IndexedDB.
 
 Key properties:
+
 - Same lifecycle semantics as online (Assessment → Plan → Execution)
 - Referential integrity enforced locally
 - Soft-delete behavior preserved
@@ -432,6 +456,7 @@ await api.job.create(input)
 ```
 
 Selection criteria:
+
 - Network connectivity (navigator.onLine)
 - Trust level (admin vs field)
 - Execution context (browser vs server)
@@ -439,6 +464,7 @@ Selection criteria:
 ### 10.3 Sync Strategy (Optional)
 
 Offline operations may be queued for later reconciliation:
+
 - Append-only operation log
 - Conflict-free sync when reconnected
 - Out of scope for initial implementation
@@ -454,6 +480,7 @@ Serverless functions follow a strict orchestration-only pattern.
 ### 11.1 Responsibilities
 
 Handlers:
+
 - Validate HTTP method
 - Extract and validate input (using domain validators)
 - Call repository methods
@@ -461,6 +488,7 @@ Handlers:
 - Handle errors (domain errors → HTTP status codes)
 
 Handlers do NOT:
+
 - Contain business logic
 - Import `Supabase` directly
 - Perform row mapping
@@ -472,7 +500,6 @@ Handlers do NOT:
 // backends/serverless/functions/users-get.ts
 import type { User } from '@domain/abstractions/user.ts'
 import { isNonEmptyString } from '@domain/validators/helper-validators.ts'
-import { userRepository } from '@serverless-repositories/user-repository.ts'
 import {
   type ApiRequest,
   type ApiResponse,
@@ -482,19 +509,18 @@ import {
   toOk
 } from '@serverless-lib/api-binding.ts'
 import { createApiHandler } from '@serverless-lib/api-handler.ts'
+import { userRepository } from '@serverless-repositories/user-repository.ts'
 
 export const config = { path: '/api/users/get' }
 
-const handle = async (
-  req: ApiRequest<undefined, { id?: string }>
-): Promise<ApiResponse> => {
+const handle = async (req: ApiRequest<undefined, { id?: string }>): Promise<ApiResponse> => {
   if (req.method !== 'GET') return toMethodNotAllowed()
-  
+
   const userId = req.query?.id
   if (!isNonEmptyString(userId)) return toBadRequest('id is required')
-  
+
   const user = await userRepository.get(userId)
-  
+
   if (!user) return toNotFound('User not found')
   return toOk(user)
 }
@@ -505,6 +531,7 @@ export default createApiHandler(handle)
 ### 11.3 Regeneration
 
 Handlers are mechanical projections of:
+
 - API contracts (`api/contracts/`)
 - Domain validators (`domain/validators/`)
 - Repository interfaces
@@ -518,6 +545,7 @@ Because they contain no unique logic, handlers may be regenerated at any time wi
 ### 12.1 Domain Testing
 
 Domain types and validators are tested in isolation using sample data fixtures:
+
 - `{abstraction}-samples.ts` exports instantiated domain objects
 - `test-fixtures.ts` registers validation tests
 - No infrastructure dependencies
@@ -525,6 +553,7 @@ Domain types and validators are tested in isolation using sample data fixtures:
 ### 12.2 Repository Testing
 
 Repositories are tested against real storage (test database or in-memory IndexedDB):
+
 - Test create/read/update/soft-delete operations
 - Verify soft-delete filtering
 - Verify row ↔ domain mapping correctness
@@ -533,6 +562,7 @@ Repositories are tested against real storage (test database or in-memory Indexed
 ### 12.3 Handler Testing
 
 Handlers are tested as HTTP request → response mappings:
+
 - Mock repository responses
 - Verify input validation
 - Verify error translation
@@ -541,6 +571,7 @@ Handlers are tested as HTTP request → response mappings:
 ### 12.4 Integration Testing
 
 Full backend flows tested end-to-end:
+
 - Create job → assess → plan → log
 - Verify lifecycle sequencing
 - Verify referential integrity
@@ -553,6 +584,7 @@ Full backend flows tested end-to-end:
 ### 13.1 Serverless Deployment (Netlify)
 
 Netlify configuration:
+
 ```toml
 # netlify.toml
 [functions]
@@ -569,6 +601,7 @@ Import map resolution handled by Deno build step.
 ### 13.2 Database Migrations
 
 Migrations are authoritative and derived from the locked schema:
+
 - Located in `source/db/migrations/`
 - Applied in ascending timestamp order
 - Never modified after deployment
@@ -577,6 +610,7 @@ Migrations are authoritative and derived from the locked schema:
 ### 13.3 Environment Configuration
 
 Configuration is explicit and colocated with deployment context:
+
 - `backends/serverless/.env` for edge functions
 - `apps/admin/.env` for admin app
 - No shared environment files
@@ -601,6 +635,7 @@ Domain changes flow unidirectionally through the system.
 ### 14.2 Adding New Backends
 
 New backends (e.g., mobile-native, embedded) follow the same pattern:
+
 1. Implement `Api.*` contracts
 2. Create backend-specific repositories
 3. Register with backend selection logic
@@ -611,6 +646,7 @@ Existing backends and apps are unaffected.
 ### 14.3 Deprecation
 
 Code is deleted, not commented out:
+
 - Mark deprecated in documentation first
 - Remove after one deployment cycle
 - Clean up imports and dependencies

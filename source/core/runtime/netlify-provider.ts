@@ -15,10 +15,10 @@ declare const Netlify:
  */
 export class ProviderNetlify implements RuntimeProvider {
   constructor() {
-    if (!Netlify) this.fail('Netlify runtime not available')
+    if (!Netlify?.env) this.fail('Netlify runtime not available')
   }
   get(key: string): string | undefined {
-    return Netlify!.env.get(key)
+    return Netlify.env.get(key)
   }
   fail(msg: string): never {
     throw new Response(msg, { status: 500 })

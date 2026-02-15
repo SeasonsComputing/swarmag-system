@@ -2,8 +2,8 @@
  * Mappers for converting between Supabase asset rows and domain Assets.
  */
 
-import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import type { Dictionary } from '@core-std'
+import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 
 /**
  * Type guard for asset status.
@@ -46,9 +46,8 @@ export const rowToAsset = (row: unknown): Asset => {
   if (record.payload && typeof record.payload === 'object') {
     const payload = record.payload as Dictionary
     if (
-      typeof payload.id === 'string'
-      && typeof payload.label === 'string'
-      && typeof payload.type === 'string'
+      typeof payload.id === 'string' && typeof payload.label === 'string' && typeof payload
+          .type === 'string'
       && isAssetStatus(payload.status)
     ) {
       return payload as unknown as Asset

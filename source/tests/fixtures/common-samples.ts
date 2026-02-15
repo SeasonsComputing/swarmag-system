@@ -2,8 +2,8 @@
  * Common question/answer fixtures for tests.
  */
 
-import type { Question } from '@domain/abstractions/workflow.ts'
 import { id } from '@core-std'
+import type { Question } from '@domain/abstractions/workflow.ts'
 
 export const preflightInspectionQuestion: Question = {
   id: id(),
