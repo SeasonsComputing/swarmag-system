@@ -23,9 +23,9 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | --------------- | ------------------------------------------------------------- |
 | `applications/` | Application-level requirements and UX/product specs           |
 | `foundation/`   | Core architecture, domain, style, and data definitions        |
-| `history/`      | Historical architecture notes and project evolution artifacts |
+| `archive/`      | Historical architecture notes and project evolution artifacts |
 
-#### 1.2.1 Foundation (`documentation\foundation\`)
+#### 1.2.1 Foundation (`documentation/foundation/`)
 
 | Path                   | Description                                            |
 | ---------------------- | ------------------------------------------------------ |
@@ -33,11 +33,10 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | `architecture-back.md` | Backend architecture, boundaries, and runtime model    |
 | `architecture-ux.md`   | UX architecture and frontend layering                  |
 | `domain.md`            | Domain model concepts, entities, and invariants        |
-| `data-dictionary.md`   | Canonical field and data element definitions           |
 | `data-lists.md`        | Controlled vocabularies and enumerated values          |
 | `style-guide.md`       | Style and authoring conventions                        |
 
-#### 1.2.2 Applications (`documentation\applications\`)
+#### 1.2.2 Applications (`documentation/applications/`)
 
 | Path                 | Description                                        |
 | -------------------- | -------------------------------------------------- |
@@ -46,18 +45,27 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | `ops-mobile-app.md`  | Operations mobile app scope and field workflows    |
 | `customer-portal.md` | Customer portal scope, visibility, and constraints |
 
-### 1.3 Source Layers (`source\`)
+### 1.3 Source Layers (`source/`)
 
-| Path         | Description                                                       |
-| ------------ | ----------------------------------------------------------------- |
-| `back/`      | Backend runtime modules (config, functions, library, migrations)  |
-| `devops/`    | Architecture and environment guard scripts                        |
-| `domain/`    | Domain model and domain-layer contracts                           |
-| `tests/`     | Test suites and supporting fixtures                               |
-| `utilities/` | Shared utility modules used across layers                         |
-| `ux/`        | Client-facing user experiences, apps, contracts, and UI libraries |
+| Path      | Description                                                       |
+| --------- | ----------------------------------------------------------------- |
+| `back/`   | Backend runtime modules (config, functions, library, migrations)  |
+| `core/`   | Fundamental types and utilities used by all layers                |
+| `devops/` | Architecture and environment guard scripts                        |
+| `domain/` | Domain model and domain-layer contracts                           |
+| `tests/`  | Test suites and supporting fixtures                               |
+| `ux/`     | Client-facing user experiences, apps, contracts, and UI libraries |
 
-#### 1.3.1 Domain (`source/domain`)
+### 1.3.1 Core (`source/core/`)
+
+| Path       | Description                                      |
+| ---------- | ------------------------------------------------ |
+| `api/`     | API binding facilities for REST, HTTP & RDBMS    |
+| `db/`      | Database provider and connection management      |
+| `runtime/` | Configuration facilities and available providers |
+| `std/`     | ADT's, When & ID                                 |
+
+#### 1.3.2 Domain (`source/domain/`)
 
 | Path            | Description                                    |
 | --------------- | ---------------------------------------------- |
@@ -66,27 +74,24 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | `protocol/`     | Domain protocols and interface contracts       |
 | `validators/`   | Domain validation logic and invariants         |
 
-#### 1.3.2 Backend (`source/back`)
+#### 1.3.3 Backend (`source/back/`)
 
-| Path          | Description                                                     |
-| ------------- | --------------------------------------------------------------- |
-| `config/`     | Backend runtime configuration loading and environment templates |
-| `functions/`  | Serverless/edge function entry points                           |
-| `lib/`        | Backend shared libraries and runtime bindings                   |
-| `migrations/` | SQL migration files for backend persistence setup               |
+| Path             | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| `migrations/`    | SQL migration files for backend persistence setup |
+| `supabase-edge/` | Serverless/edge function entry points             |
 
-#### 1.3.3 User Experience (`source/ux`)
+#### 1.3.4 User Experience (`source/ux/`)
 
-| Path            | Description                            |
-| --------------- | -------------------------------------- |
-| `api/`          | UX API client into the backend         |
-| `components/`   | Shared application-level UI components |
-| `lib/`          | Shared UX library/runtime helpers      |
-| `app-admin/`    | Administration application code        |
-| `app-customer/` | Customer application code              |
-| `app-ops/`      | Operations application code            |
+| Path            | Description                     |
+| --------------- | ------------------------------- |
+| `api/`          | UX API client into the backend  |
+| `app-admin/`    | Administration application code |
+| `app-customer/` | Customer application code       |
+| `app-common/`   | Common application code         |
+| `app-config/`   | Config provider for all apps    |
 
-## 2. Local Configuration
+## 2. Local Configuration (TODO: update)
 
 Create local environment files from the current examples:
 
