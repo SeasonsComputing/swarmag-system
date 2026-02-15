@@ -239,14 +239,15 @@ swarmag/
 │   │   │   └── functions/
 │   ├── ux/
 │   │   ├── api/
-│   │   ├── app-ops/
-│   │   │   └── config/
 │   │   ├── app-admin/
 │   │   │   └── config/
 │   │   ├── app-customer/
 │   │   │   └── config/
-│   │   ├── components/
-│   │   └── lib/
+│   │   ├── app-ops/
+│   │   │   └── config/
+│   │   └── app-common/
+│   │       ├── components/
+│   │       └── lib/
 │   ├── devops/
 │   └── tests/
 └── supabase/
@@ -255,31 +256,34 @@ swarmag/
 ### 7.1 Import Aliases
 
 ```jsonc
-"imports": {  
-  // Source layered namespaces
-  "@core/": "./source/core/",
-  "@back": "./source/back/",
-  "@ux/": "./source/ux/",
-  "@domain/": "./source/domain/",
-  "@devops": "./source/devops/",
-  "@tests": "./source/tests/",
+{
+  "imports": {
+    // Top-level namespace
+    "@core/": "./source/core/",
+    "@domain/": "./source/domain/",
+    "@back": "./source/back/",
+    "@ux/": "./source/ux/",
+    "@devops": "./source/devops/",
+    "@tests": "./source/tests/",
 
-  // Convenience barrels
-  "@core-std": "./source/core/std/std.ts",
+    // Convenience barrels
+    "@core-std": "./source/core/std/std.ts",
+    "@ux-api": "./source/ux/api/api.ts",
 
-  // Backend namespaces
-  "@back-netlify-functions/": "./source/back/netlify-edge/functions/",
-  "@back-supabase-functions/": "./source/back/supabase-edge/functions/",
+    // Backend namespaces
+    "@back-netlify-functions/": "./source/back/netlify-edge/functions/",
+    "@back-supabase-functions/": "./source/back/supabase-edge/functions/",
 
-  // UX namespaces
-  "@ux-app-ops/": "./source/ux/app-ops/",
-  "@ux-app-admin/": "./source/ux/app-admin/",
-  "@ux-app-customer/": "./source/ux/app-customer/",
-  "@ux-components/": "./source/ux/components/",
-  "@ux-lib/": "./source/ux/lib/",
+    // UX application namespaces
+    "@ux-app-ops/": "./source/ux/app-ops/",
+    "@ux-app-admin/": "./source/ux/app-admin/",
+    "@ux-app-customer/": "./source/ux/app-customer/",
+    "@ux-app-common/": "./source/ux/app-common/",
 
-  // DB client library
-  "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
+    // Vendor namespaces
+    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
 ```
 
 ## 8. Offline-First Guarantees (TODO: update)

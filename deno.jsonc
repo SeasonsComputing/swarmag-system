@@ -1,23 +1,28 @@
 {
   "imports": {
+    // Top-level namespace
     "@core/": "./source/core/",
+    "@domain/": "./source/domain/",
     "@back": "./source/back/",
     "@ux/": "./source/ux/",
-    "@domain/": "./source/domain/",
     "@devops": "./source/devops/",
     "@tests": "./source/tests/",
 
+    // Convenience barrels
     "@core-std": "./source/core/std/std.ts",
+    "@ux-api": "./source/ux/api/api.ts",
 
+    // Backend namespaces
     "@back-netlify-functions/": "./source/back/netlify-edge/functions/",
     "@back-supabase-functions/": "./source/back/supabase-edge/functions/",
 
+    // UX application namespaces
     "@ux-app-ops/": "./source/ux/app-ops/",
     "@ux-app-admin/": "./source/ux/app-admin/",
     "@ux-app-customer/": "./source/ux/app-customer/",
-    "@ux-components/": "./source/ux/components/",
-    "@ux-lib/": "./source/ux/lib/",
+    "@ux-app-common/": "./source/ux/app-common/",
 
+    // Vendor namespaces
     "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
   },
   "tasks": {
