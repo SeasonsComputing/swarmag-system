@@ -8,19 +8,20 @@ The UX layer consumes typed API contracts defined in `source/ux/api/contracts/` 
 
 **Prerequisites:** Read `architecture-core.md` first to understand the system boundary and API abstraction.
 
-## UX Structure (TODO: update)
+## UX Structure
 
-```
-source/ux/
-  ├── api/
-  ├── app-ops/
-  │   └── config/
-  ├── app-admin/
-  │   └── config/
-  ├── app-customer/
-  │   └── config/
-  ├── components/
-  └── lib/
+```text
+ux/
+├── api/
+├── app-admin/
+│   └── config/
+├── app-customer/
+│   └── config/
+├── app-ops/
+│   └── config/
+└── app-common/
+    ├── components/
+    └── lib/
 ```
 
 ## UX Applications
@@ -55,7 +56,7 @@ source/ux/
 - Static/read-mostly
 - Public-facing
 
-## `api` Namespace (TODO: update, this is now api namespace, @ux/client/api.ts)
+## `api` Namespace (`@ux-api`)
 
 ```text
 const api = {

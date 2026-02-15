@@ -23,14 +23,14 @@ The backend is intentionally simple and concrete:
 ### Backend Layout
 
 ```text
-source/back/
-  ├── migrations/
-  ├── netlify-edge/
-  │   ├── config/
-  │   └── functions/
-  └── supabase-edge/
-      ├── config/
-      └── functions/
+back/
+├── migrations/
+├── netlify-edge/
+│   ├── config/
+│   └── functions/
+└── supabase-edge/
+    ├── config/
+    └── functions/
 ```
 
 ## Functions (HTTP handlers) (TODO: update)
