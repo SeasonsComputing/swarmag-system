@@ -4,8 +4,8 @@
  * such as vehicles, sprayers, drones, etc.
  */
 
-import type { Attachment } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@core-std'
+import type { Attachment } from '@domain/abstractions/common.ts'
 
 /** The different types of assets available in the system. */
 export interface AssetType {

@@ -7,7 +7,7 @@
     "quoteStyle": "alwaysSingle",
     "arrowFunction.useParentheses": "preferNone",
     "trailingCommas": "never",
-    "preferSingleLine": true,
+    "preferSingleLine": false,
     "memberExpression.linePerExpression": false,
     "objectExpression.preferHanging": false,
     "arguments.preferHanging": "always",

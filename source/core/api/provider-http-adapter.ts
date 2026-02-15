@@ -1,7 +1,7 @@
 /*
 ╔═════════════════════════════════════════════════════════════════════════════╗
-║ REST API ADAPTER/HoC                                                        ║
-║ Platform-Agnostic HTTP Handler Utilities                                    ║
+║ HTTP API PROVIDER                                                           ║
+║ Platform-agnostic HTTP handler utilities                                    ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -47,9 +47,9 @@ Usage pattern:
   return toNotFound('...')    // Client error
   return toInternalError(...) // Server error
 
-API ADAPTER
+API PROVIDER: HTTP-HANDLER-ADAPTER
 ───────────────────────────────────────────────────────────────────────────────
-createApiHandler<RequestBody, Query, ResponseBody>(
+makeApiProvider<RequestBody, Query, ResponseBody>(
   handle: ApiHandler,
   config?: ApiAdapterConfig
 ): (request: Request) => Promise<Response>
@@ -83,7 +83,7 @@ Error-handling:
 
 BASIC HANDLER
 ───────────────────────────────────────────────────────────────────────────────
-export default createApiHandler(async (req) => {
+export default makeApiProvider(async (req) => {
   if (req.method !== 'POST') return toMethodNotAllowed()
   const user = await createUser(req.body)
   return toCreated(user)
@@ -91,7 +91,7 @@ export default createApiHandler(async (req) => {
 
 WITH CORS & VALIDATION
 ───────────────────────────────────────────────────────────────────────────────
-export default createApiHandler(async (req) => {
+export default makeApiProvider(async (req) => {
   const validated = validateUserInput(req.body)
   if (!validated.ok) return toUnprocessable(validated.error)
   return toOk(await saveUser(validated.data))
@@ -103,16 +103,16 @@ export default createApiHandler(async (req) => {
 PLATFORM-SPECIFIC EXPORTS
 ───────────────────────────────────────────────────────────────────────────────
 // Netlify Edge Functions
-export default createApiHandler(handle)
+export default makeApiProivder(handler)
 export const config = { path: "/api/users" }
 
 // Supabase Edge Functions
 import { serve } from 'std/http/server.ts'
-serve(createApiHandler(handle))
+serve(makeApiProivder(handler))
 
-═══════════════════════════════════════════════════════════════════════════════
-INTERNALS
-═══════════════════════════════════════════════════════════════════════════════
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ INTERNALS                                                                   ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 DESIGN PRINCIPLES:
 ───────────────────────────────────────────────────────────────────────────────
@@ -132,44 +132,37 @@ DESIGN PRINCIPLES:
 FETCH-REQUEST-RESPONSE FLOW:
 ───────────────────────────────────────────────────────────────────────────────
 ┌─────────────────┐
-|  Fetch Request  |  (Raw HTTP from client)
+|  Fetch Request  |         (Raw HTTP from client)
 └────────┬────────┘
-         |
          ▼
 ┌─────────────────┐
-| createApiHandler|  (Adapter wrapper)
+| makeApiProvider |        (Provider Adapter HoC)
 └────────┬────────┘
-         |
          ├──▶ Parse & validate HTTP method
          ├──▶ Normalize headers (lowercase)
          ├──▶ Parse body (JSON, size limits)
          ├──▶ Extract query parameters
          ├──▶ Handle CORS (if configured)
-         |
          ▼
 ┌─────────────────┐
-|   ApiRequest    |  (Typed, validated request)
+|   ApiRequest    |      (Typed, validated request)
 └────────┬────────┘
-         |
          ▼
 ┌─────────────────┐
-|  Your Handler   |  (Business logic)
+|  Your Handler   |         (Business logic)
 └────────┬────────┘
-         |
          ▼
 ┌─────────────────┐
-|   ApiResponse   |  (Typed response envelope)
+|   ApiResponse   |    (Typed response envelope)
 └────────┬────────┘
-         |
          ├──▶ Validate status code
          ├──▶ Serialize body (JSON)
          ├──▶ Apply CORS headers
          ├──▶ Set Content-Type
-         |
          ▼
-┌─────────────────┐
-| Fetch Response  |  (Standardized HTTP response)
-└─────────────────┘
+┌────────────────┐
+| Fetch Response |   (Standardized HTTP response)
+└────────────────┘
 
   ADAPTER CONFIGURATION
   ───────────────────────────────────────────────────────────────────────────────
@@ -436,7 +429,7 @@ const DEFAULT_MAX_BODY_SIZE = 6 * 1024 * 1024
 /**
  * Error with a stable name for adapter failures.
  */
-class NamedError extends Error {
+export class NamedError extends Error {
   constructor(name: string, message: string) {
     super(message)
     this.name = name
@@ -543,17 +536,46 @@ const validateStatusCode = (statusCode: number): number => {
  * @param err Unknown error value.
  * @returns Error object with name and message.
  */
-const serializeError = (err: unknown): { name: string; message: string } => {
-  if (err instanceof Error) return { name: err.name, message: err.message }
-  if (typeof err === 'string') return { name: 'Error', message: err }
+type Message = { name: string; message: string; stack?: string }
+const serializeError = (err: unknown): Message => {
+  // 1. Force everything into an Error-like shape immediately
+  const normalized = err instanceof Error
+    ? err
+    : (typeof err === 'object' && err !== null && 'message' in err)
+    ? err as Error // It looks like an error, treat it like one
+    : new Error(typeof err === 'string' ? err : JSON.stringify(err) || String(err))
+
+  // 2. Extract properties manually (because stringify skips non-enumerable Error props)
+  const result: { name: string; message: string; stack?: string } = {
+    name: normalized.name || 'Error',
+    message: String(normalized.message || 'Unknown error'),
+    stack: normalized.stack
+  }
+
+  // 3. Handle additional custom metadata (e.g., status codes, "cause")
   if (err && typeof err === 'object') {
     try {
-      return { name: 'Error', message: JSON.stringify(err) }
+      // Pick up extra custom properties that aren't name/message/stack
+      const extraData = JSON.parse(JSON.stringify(err, getCircularReplacer()))
+      return { ...extraData, ...result }
     } catch {
-      return { name: 'Error', message: String(err) }
+      // If circular, we still have the name/message/stack from step 2
     }
   }
-  return { name: 'Error', message: String(err) }
+
+  return result
+}
+
+// Helper to prevent the "Circular structure to JSON" crash
+const getCircularReplacer = () => {
+  const seen = new WeakSet()
+  return (_key: string, value: any) => {
+    if (typeof value === 'object' && value !== null) {
+      if (seen.has(value)) return '[Circular]'
+      seen.add(value)
+    }
+    return value
+  }
 }
 
 /**
@@ -706,7 +728,7 @@ export const makeErrorResponse = (
  * @param config Optional adapter configuration for CORS, validation, etc.
  * @returns Fetch handler ready for export.
  */
-export const createApiHandler = <
+export const makeApiProvider = <
   RequestBody = unknown,
   Query = HttpQuery,
   ResponseBody = unknown

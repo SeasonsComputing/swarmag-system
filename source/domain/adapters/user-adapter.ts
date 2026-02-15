@@ -2,9 +2,9 @@
  * Mappers for converting between Supabase user rows and domain Users.
  */
 
+import type { Dictionary } from '@core-std'
 import type { User } from '@domain/abstractions/user.ts'
 import { isUserRoles, isUserStatus } from '@domain/validators/user-validator.ts'
-import type { Dictionary } from '@core-std'
 
 /** Map a domain User into a Dictionary shape. */
 export const userToRow = (user: User) => ({

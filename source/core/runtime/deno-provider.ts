@@ -3,12 +3,12 @@
  * Accesses environment variables via Deno.env and exits process on error.
  */
 
-import { RuntimeConfig, type RuntimeProvider } from '@core-std'
+import type { RuntimeProvider } from './runtime-provider.ts'
 
 /**
  * Configuration provider for Deno.
  */
-export class ProviderDeno implements RuntimeProvider {
+export class DenoProvider implements RuntimeProvider {
   constructor() {
     if (!Deno?.env) this.fail('Deno runtime not available')
   }

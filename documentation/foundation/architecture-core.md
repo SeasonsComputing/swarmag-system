@@ -94,13 +94,13 @@ Backend functions must remain flat in a single directory due to edge discovery r
 
 The system consists of five primary components:
 
-| Component                  | Purpose                                        | Technology             |
-| -------------------------- | ---------------------------------------------- | ---------------------- |
-| **Ops PWA**                | Offline-first field execution (installed app)  | SolidJS, IndexedDB     |
-| **Admin PWA**              | Management and configuration (installed app)   | SolidJS                |
-| **Customer Portal**        | Customer-facing scheduling and status (static) | SolidJS                |
-| **Backend Business Rules** | Implemented as Edge Functions                  | Netlify, Supabase      |
-| **Supabase Data**          | Persistent storage and auth                    | Postgres, Supabase     |
+| Component                  | Purpose                                        | Technology         |
+| -------------------------- | ---------------------------------------------- | ------------------ |
+| **Ops PWA**                | Offline-first field execution (installed app)  | SolidJS, IndexedDB |
+| **Admin PWA**              | Management and configuration (installed app)   | SolidJS            |
+| **Customer Portal**        | Customer-facing scheduling and status (static) | SolidJS            |
+| **Backend Business Rules** | Implemented as Edge Functions                  | Netlify, Supabase  |
+| **Supabase Data**          | Persistent storage and auth                    | Postgres, Supabase |
 
 UX API providers (clients) are part of the UX layer and select the correct backend or storage implementation at runtime.
 
@@ -112,7 +112,7 @@ Supporting abstractions: **Location**, **Note**, **Attachment**, **Question**, *
 
 The domain model is pure TypeScript with no infrastructure dependencies. Canonical domain definitions and rules live in `documentation/foundation/domain.md`. All architectural, API, persistence, and user-interface concerns are derived from and constrained by this model.
 
-## 5. System Boundary
+## 5. System Boundary (TODO: update)
 
 The system boundary is the **logical API surface** (`Api.*`), not any particular transport or storage mechanism.
 
@@ -137,7 +137,7 @@ This architecture enables:
 
 All three providers implement the same logical API surface and return validated domain types.
 
-### 5.1 API Abstraction
+### 5.1 API Abstraction (TODO: update)
 
 The API abstraction is defined under `source/ux/api/contracts/` as TypeScript interfaces expressing domain intent without implementation.
 
@@ -145,13 +145,13 @@ Example:
 
 ```typescript
 // source/ux/api/contracts/job-api.ts
-export interface JobApi {
-  create(input: JobCreateInput): Promise<Job>;
-  get(id: ID): Promise<Job | null>;
-  list(options?: ListOptions): Promise<ListResult<Job>>;
-  assess(jobId: ID, input: AssessmentInput): Promise<JobAssessment>;
-  plan(jobId: ID, input: PlanInput): Promise<JobPlan>;
-  logAppend(jobId: ID, entry: JobLogEntry): Promise<void>;
+export interface JobApi { // TODO: wrong
+  create(input: JobCreateInput): Promise<Job>
+  get(id: ID): Promise<Job | null>
+  list(options?: ListOptions): Promise<ListResult<Job>>
+  assess(jobId: ID, input: AssessmentInput): Promise<JobAssessment>
+  plan(jobId: ID, input: PlanInput): Promise<JobPlan>
+  logAppend(jobId: ID, entry: JobLogEntry): Promise<void>
 }
 ```
 
@@ -164,9 +164,9 @@ These contracts:
 
 Client ux import `Api.*` but never import provider implementations directly.
 
-### 5.2 API Providers (Clients)
+### 5.2 API Providers and Clients
 
-The system supports three API providers, each implementing the same `Api.*` contracts:
+The system supports three CRUD API providers, each implementing the same CRUD contracts:
 
 | Provider  | Purpose                   | Storage / Transport |
 | --------- | ------------------------- | ------------------- |
@@ -220,23 +220,23 @@ swarmag/
 │   └── archive/
 ├── source/
 │   ├── core/
-│   │   ├── binding/
-│   │   ├── configure/
-│   │   └── standard/
+│   │   ├── api/
+│   │   ├── db/
+│   │   ├── runtime/
+│   │   └── std/
 │   ├── domain/
 │   │   ├── abstractions/
 │   │   ├── adapters/
 │   │   ├── protocols/
 │   │   └── validators/
 │   ├── back/
-│   │   ├── edge-netlify/
+│   │   ├── migrations/
+│   │   ├── netlify-edge/
 │   │   │   ├── config/
 │   │   │   └── functions/
-│   │   ├── edge-supabase/
+│   │   ├── supabase-edge/
 │   │   │   ├── config/
 │   │   │   └── functions/
-│   │   ├── lib/
-│   │   └── migrations/
 │   ├── ux/
 │   │   ├── api/
 │   │   ├── app-ops/
@@ -255,31 +255,31 @@ swarmag/
 ### 7.1 Import Aliases
 
 ```jsonc
-"imports": {
+"imports": {  
   // Source layered namespaces
   "@core/": "./source/core/",
-  "@domain/": "./source/domain/",
   "@back": "./source/back/",
   "@ux/": "./source/ux/",
-  "@devops": "./source/devops/",   
+  "@domain/": "./source/domain/",
+  "@devops": "./source/devops/",
   "@tests": "./source/tests/",
 
   // Convenience barrels
-  "@core-std": "./source/core/standard/standard.ts",
-  "@ux-api": "./source/ux/api/api.ts",
+  "@core-std": "./source/core/std/std.ts",
 
   // Backend namespaces
-  "@back-edge-netlify/": "./source/back/edge-netlify/",
-  "@back-edge-supabase/": "./source/back/edge-supabase/",
-  "@back-lib/": "./source/back/lib/",
+  "@back-netlify-functions/": "./source/back/netlify-edge/functions/",
+  "@back-supabase-functions/": "./source/back/supabase-edge/functions/",
 
   // UX namespaces
   "@ux-app-ops/": "./source/ux/app-ops/",
   "@ux-app-admin/": "./source/ux/app-admin/",
   "@ux-app-customer/": "./source/ux/app-customer/",
   "@ux-components/": "./source/ux/components/",
-  "@ux-lib/": "./source/ux/lib/"
-}
+  "@ux-lib/": "./source/ux/lib/",
+
+  // DB client library
+  "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
 ```
 
 ## 8. Offline-First Guarantees (TODO: update)
@@ -299,9 +299,9 @@ The operations UX is designed to continue execution when connectivity is degrade
 UX uses the shared API client namespace:
 
 ```typescript
-import { api } from "@ux-api"
+import { api } from '@ux-api'
 
-await api.authenticate(userID)   // saves api.#token, throws exception
+await api.authenticate(userID) // saves api.#token, throws exception
 
 await api.Jobs.list()
 ```
@@ -338,7 +338,7 @@ Code that violates these invariants is wrong, regardless of whether it "works."
 1. Update `domain.md` (solution space, then domain model)
 2. Implement domain abstractions, validators, protocols, and adapters
 3. Update schema and create migration54. Implement backend functions
-7. Update UX application integration
+4. Update UX application integration
 
 Domain changes flow unidirectionally through the system.
 

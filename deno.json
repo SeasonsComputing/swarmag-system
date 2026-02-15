@@ -7,13 +7,10 @@
     "@devops": "./source/devops/",
     "@tests": "./source/tests/",
 
-    "@core-std": "./source/core/standard/standard.ts",
-    "@ux-api": "./source/ux/api/api.ts",
+    "@core-std": "./source/core/std/std.ts",
 
-    "@back-config/": "./source/back/config/",
-    "@back-netlify-edge/": "./source/back/edge-netlify/",
-    "@back-supabase-edge/": "./source/back/edge-supabase/",
-    "@back-lib/": "./source/back/lib/",
+    "@back-netlify-functions/": "./source/back/netlify-edge/functions/",
+    "@back-supabase-functions/": "./source/back/supabase-edge/functions/",
 
     "@ux-app-ops/": "./source/ux/app-ops/",
     "@ux-app-admin/": "./source/ux/app-admin/",
@@ -21,7 +18,7 @@
     "@ux-components/": "./source/ux/components/",
     "@ux-lib/": "./source/ux/lib/",
 
-    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2"
+    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
   },
   "tasks": {
     "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno check source/**/*.ts && deno task lint",

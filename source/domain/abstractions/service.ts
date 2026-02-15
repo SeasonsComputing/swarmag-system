@@ -3,8 +3,8 @@
  * Services are the types of operations offered to customers.
  */
 
-import type { Note } from '@domain/abstractions/common.ts'
 import type { ID, When } from '@core-std'
+import type { Note } from '@domain/abstractions/common.ts'
 
 /** The categories of services available. */
 export type ServiceCategory =

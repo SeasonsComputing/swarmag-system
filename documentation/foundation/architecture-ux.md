@@ -1,6 +1,6 @@
 # Architecture: swarmAg System — UX
 
-## Overview
+## Overview (TODO: update)
 
 This document describes the UX layer of the swarmAg system: the Admin, Ops, and Customer applications, the shared UX infrastructure, and the API client architecture used by those apps.
 
@@ -8,19 +8,19 @@ The UX layer consumes typed API contracts defined in `source/ux/api/contracts/` 
 
 **Prerequisites:** Read `architecture-core.md` first to understand the system boundary and API abstraction.
 
-## UX Structure
+## UX Structure (TODO: update)
 
 ```
 source/ux/
-  api/
-    client/             # API client implementations and factory
-    contracts/          # API interface definitions
-  applications/
-    administration/
-    operations/
-    customer/
-    components/
-    library/
+  ├── api/
+  ├── app-ops/
+  │   └── config/
+  ├── app-admin/
+  │   └── config/
+  ├── app-customer/
+  │   └── config/
+  ├── components/
+  └── lib/
 ```
 
 ## UX Applications
@@ -54,27 +54,34 @@ source/ux/
 
 - Static/read-mostly
 - Public-facing
-- SEO optimized
 
-## API Contracts
+## `api` Namespace (TODO: update, this is now api namespace, @ux/client/api.ts)
 
-Contracts define the logical API surface and domain intent without implementation. They live in `source/ux/api/contracts/` and are imported by UX applications and API clients.
-
-Example:
-
-```typescript
-// source/ux/api/contracts/job-api.ts
-export interface JobApi {
-  create(input: JobCreateInput): Promise<Job>
-  get(id: ID): Promise<Job | null>
-  list(options?: ListOptions): Promise<ListResult<Job>>
-  assess(jobId: ID, input: AssessmentInput): Promise<JobAssessment>
-  plan(jobId: ID, input: PlanInput): Promise<JobPlan>
-  logAppend(jobId: ID, entry: JobLogEntry): Promise<void>
+```text
+const api = {
+  // authentication
+  authenticate(): Promise<Token>
+  login(email: string, password: string): Promise<User>
+  logout(): Promise<void>
+  register(email: string, password: string): Promise<User>
+  
+  // app services
+  isNetworkAvailable(): Promise<boolean>
+  deepCloneJob(jobId: ID): Promise<Job>
+  
+  // crud: direct to db
+  Users: makeCrudRdbmsClient<User>()
+  Customers: makeCrudRdbmsClient<Customer>()
+  
+  // crud: over httpd
+  JobsRemote: makeCrudHttpdClient<Job>()
+  
+  // crud: to local indexed-db
+  JobsLocal: makeCrudIndexedDbClient<Job>()
 }
 ```
 
-## API Clients
+## API Clients (TODO: update)
 
 A client implementation lives under `source/ux/api/client/` and calls backend functions while preserving domain-level types.
 
@@ -93,7 +100,7 @@ import { Api } from '@ux-api/client/api.ts'
 const api = Api
 ```
 
-## Ops UX: Offline-First Patterns
+## Ops UX: Offline-First Patterns (TODO: update)
 
 The Ops UX treats offline execution as the default:
 
@@ -112,9 +119,3 @@ Shared UX infrastructure lives in `source/ux/applications/library/` and provides
 - Shared UX primitives
 
 **End of UX Document**
-
-See also:
-
-- `architecture-core.md` - System boundary and invariants
-- `architecture-back.md` - Backend implementation
-- `domain.md` - Domain model definitions

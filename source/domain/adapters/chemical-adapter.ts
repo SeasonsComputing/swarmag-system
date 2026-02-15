@@ -2,8 +2,8 @@
  * Mappers for converting between Supabase chemical rows and domain Chemicals.
  */
 
-import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Dictionary } from '@core-std'
+import type { Chemical } from '@domain/abstractions/chemical.ts'
 
 /**
  * Type guard for chemical usage.

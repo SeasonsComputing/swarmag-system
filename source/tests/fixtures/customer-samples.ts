@@ -2,9 +2,9 @@
  * Customer fixture samples for tests.
  */
 
+import { id } from '@core-std'
 import type { Location } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
-import { id } from '@core-std'
 
 const customerId = id()
 const accountManagerId = id()

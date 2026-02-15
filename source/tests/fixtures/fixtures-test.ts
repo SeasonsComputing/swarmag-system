@@ -2,6 +2,7 @@
  * Fixture integrity checks for shared sample data.
  */
 
+import { isID, isWhen } from '@core-std'
 import type { AssetStatus } from '@domain/abstractions/asset.ts'
 import { assert, assertEquals } from '@std/assert'
 import {
@@ -11,7 +12,6 @@ import {
   jobSamples,
   sharedQuestionSamples
 } from '@tests-fixtures/samples.ts'
-import { isID, isWhen } from '@core-std'
 
 const allowedAssetStatuses: AssetStatus[] = ['active', 'maintenance', 'retired', 'reserved']
 

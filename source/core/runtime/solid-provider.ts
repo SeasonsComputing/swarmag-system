@@ -15,9 +15,11 @@ declare global {
 /**
  * Configuration provider for Solid app.
  */
-export class ProviderSolid implements RuntimeProvider {
-  get(key: string): string | undefined {
+export class SolidProvider implements RuntimeProvider {
+  constructor() {
     if (!import.meta?.env) this.fail('Solid runtime not available')
+  }
+  get(key: string): string {
     return import.meta.env![key]
   }
   fail(msg: string): never {
