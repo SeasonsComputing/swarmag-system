@@ -3,7 +3,7 @@
  */
 
 import { UsersApi } from '@api/client/users-api.ts'
-import { ApiError } from '@api/lib/api-client-binding.ts'
+import { ApiError } from '@api/lib/api-contract.ts'
 import type { User } from '@domain/abstractions/user.ts'
 import { assert, assertEquals, assertRejects } from '@std/assert'
 
