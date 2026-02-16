@@ -1,6 +1,6 @@
 /*
 ╔═════════════════════════════════════════════════════════════════════════════╗
-║ API client contracts for CRUD & business rule operations                    ║
+║ API contracts for CRUD, List & business rule operations                     ║
 ║ TODO                                                                        ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
 
@@ -21,9 +21,13 @@ EXAMPLES
 TODO
 */
 
-import type { Dictionary, ID } from '@core-std'
+import type { Dictionary, ID, When } from '@core-std'
 
-/** Error thrown when an Api call fails. */
+// ────────────────────────────────────────────────────────────────────────────
+// Error Handling
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Error thrown when an API call fails. */
 export class ApiError extends Error {
   constructor(
     message: string,
@@ -35,11 +39,12 @@ export class ApiError extends Error {
   }
 }
 
- // CRUD & Busioness Rule Contract
- // ═════════════════════════════════════════════════════════════════════════════
+// ────────────────────────────────────────────────────────────────────────────
+// CRUD & Business Rule API Contracts
+// ────────────────────────────────────────────────────────────────────────────
 
-/** CRUD API client contract */
-export interface ApiClientCrud<T, TCreate, TUpdate> {
+/** CRUD API contract */
+export interface ApiCrudContract<T, TCreate, TUpdate> {
   create(input: TCreate): Promise<T>
   get(id: ID): Promise<T>
   update(input: TUpdate): Promise<T>
@@ -47,9 +52,9 @@ export interface ApiClientCrud<T, TCreate, TUpdate> {
   list?(options?: ListOptions): Promise<ListResult<T>>
 }
 
-/** Business rule API client contract */
-export interface ApiClientBusRule {
-  run(input: Dictionary): Promise<Dictionary>
+/** Business rule API contract */
+export interface ApiBusRuleContract {
+  run(params: Dictionary): Promise<Dictionary>
 }
 
 /** Deletion result with timestamp. */
@@ -58,8 +63,9 @@ export type DeleteResult = {
   deletedAt: When
 }
 
-// LIST API
-// ═════════════════════════════════════════════════════════════════════════════
+// ────────────────────────────────────────────────────────────────────────────
+// List API contracts
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Default pagination limit when not specified. */
 const DEFAULT_LIMIT = 25
