@@ -36,11 +36,11 @@ The system includes three SolidJS applications:
 | **Ops**     | Field execution (offline-capable)          | Operations crews   |
 | **Customer**| Scheduling and status (read-only)          | Customers          |
 
-**Shared Infrastructure:**
+#### 2.2.1 Shared Infrastructure
 - `source/ux/app-common/` - Shared components and utilities
 - All apps use SolidJS + TanStack + Kobalte + Vanilla CSS
 
-**Shared Infrastructure:**
+#### 2.2.2 Shared Infrastructure
 - `source/ux/app-common/` - Shared components and utilities
 - All apps use SolidJS + TanStack + Kobalte + Vanilla CSS
 
@@ -64,24 +64,24 @@ The API namespace is composed once using client makers (Supabase SDK, IndexedDB,
 
 The foundation provides:
 
-**Type Safety:**
+#### 3.2.1 Type Safety
 - Import domain types from `@domain/abstractions/`
 - All API operations return typed domain objects
 - TypeScript strict mode enforced
 
-**Storage Abstraction:**
+#### 3.2.2 Storage Abstraction
 - Direct database access via RLS (no HTTP for CRUD)
 - Offline storage via IndexedDB (Ops app)
 - Orchestration via edge functions (complex operations)
 - Client makers handle all serialization
 
-**Offline Capability:**
+#### 3.2.3 Offline Capability
 - `api.JobsLocal` (IndexedDB client) available to all apps
 - Ops app uses for field execution
 - Deep clone via `api.deepCloneJob` business rule
 - Log upload via `api.uploadJobLogs` business rule
 
-**Configuration:**
+#### 3.2.4 Configuration
 - Per-app config module initializes `Config` singleton
 - Environment-specific `.env` files per deployment
 - See `architecture-core.md` Section 6 for pattern
@@ -90,19 +90,19 @@ The foundation provides:
 
 ### 4.1 Import Discipline
 
-**UX applications MAY import:**
+#### 4.1.1 UX applications MAY import
 - `@ux-api` - Composed API namespace
 - `@domain/abstractions/*` - Domain types
 - `@core-std` - Standard types (ID, When, Dictionary)
 - `@ux-app-common/*` - Shared UX components
 
-**UX applications MUST NOT import:**
+#### 4.1.2 UX applications MUST NOT import
 - `@core/api/*` - Client makers (use composed `@ux-api`)
 - `@core/db/*` - Database clients
 - `@back/*` - Backend edge functions
 - `@domain/adapters/*` - Storage serialization
 
-**Violations detected by architectural guards are build failures.**
+#### 4.1.3 Violations detected by architectural guards are build failures.
 
 ### 4.2 Configuration Pattern
 
@@ -120,7 +120,7 @@ Config.init(new BrowserProvider(), [
 export { Config }
 ```
 
-**Pattern:**
+#### 4.2.1 Pattern
 - Import `Config` singleton from `@core/runtime/config.ts`
 - Initialize with browser provider and required keys
 - Re-export for use within the app
@@ -149,7 +149,7 @@ export { Config }
 
 ## 6. UX Architecture Patterns
 
-**Status: To Be Documented**
+### 6.1 Status: To Be Documented
 
 UX architectural patterns will be documented after initial iteration with the SolidJS + TanStack + Kobalte stack. Topics to be addressed:
 
@@ -183,4 +183,4 @@ See `documentation/applications/` for current application requirements and user 
 5. **Configuration is explicit** - Per-app config modules, no magic globals
 6. **UX patterns emerge** - Document architecture after iteration, not before
 
-**End of Architecture UX Document**
+_End of Architecture UX Document_
