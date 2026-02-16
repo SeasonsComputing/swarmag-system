@@ -14,8 +14,9 @@ TODO
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-CrudRdbmsSpecification
-makeCrudRdbmsClient
+CrudSupabaseSpecification
+makeCrudSupabaseClient
+makeBusRuleSupabaseClient
 
 EXAMPLES
 ───────────────────────────────────────────────────────────────────────────────

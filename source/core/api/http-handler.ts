@@ -1,14 +1,14 @@
 /*
 ╔═════════════════════════════════════════════════════════════════════════════╗
-║ HTTP API PROVIDER                                                           ║
+║ HTTP-HANDLER                                                                ║
 ║ Platform-agnostic HTTP handler utilities                                    ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Provides a typed, platform-agnostic abstraction over the Fetch API Request
-Response contract for building REST APIs. Works identically on Netlify and
-Supabase functions (edge runtime), and any Node or Deno-based
+Provides a typed, platform-agnostic abstraction over the Fetch API
+Request/Response contract for building REST APIs. Works identically on
+Netlify or Supabase functions (edge runtime) or Node and Deno-based
 application server (host runtime).
 
 ╔═════════════════════════════════════════════════════════════════════════════╗
@@ -22,36 +22,36 @@ HttpMethod, HttpQuery, HttpHeaders
 HttpCodes
   → Semantic constants: HttpCodes.ok, HttpCodes.badRequest, etc.
   → Eliminates magic numbers, improves readability
-ApiRequest<Body, Query, Headers>
+HttpRequest<Body, Query, Headers>
   → Typed request wrapper: { method, body, query, headers, raw }
   → Handlers receive this instead of raw Fetch Request
-ApiResponse<Body, Headers>
+HttpResponse<Body, Headers>
   → Typed response envelope: { statusCode, body, headers? }
   → Handlers return this instead of raw Fetch Response
-ApiHandler<RequestBody, Query, ResponseBody>
+HttpHandler<RequestBody, Query, ResponseBody>
   → Type alias for handler functions: (req) => Promise<response>
 
 RESPONSE BUILDER HELPERS
 ───────────────────────────────────────────────────────────────────────────────
 Success builders:
-  toOk(data)         → 200 { data: T }
-  toCreated(data)    → 201 { data: T }
+  toOk(data)                  → 200 { data: T }
+  toCreated(data)             → 201 { data: T }
 Error builders:
-  toBadRequest(msg)      → 400 { error: string }
-  toNotFound(msg)        → 404 { error: string }
-  toMethodNotAllowed()   → 405 { error: string }
-  toUnprocessable(msg)   → 422 { error: string }
-  toInternalError(msg)   → 500 { error: string, details?: string }
+  toBadRequest(msg)           → 400 { error: string }
+  toNotFound(msg)             → 404 { error: string }
+  toMethodNotAllowed()        → 405 { error: string }
+  toUnprocessable(msg)        → 422 { error: string }
+  toInternalError(msg)        → 500 { error: string, details?: string }
 Usage pattern:
   return toOk(user)           // Success case
   return toNotFound('...')    // Client error
   return toInternalError(...) // Server error
 
-API PROVIDER: HTTP-HANDLER-ADAPTER
+HTTP HANDLER WRAPPER (ADAPTER)
 ───────────────────────────────────────────────────────────────────────────────
-makeApiProvider<RequestBody, Query, ResponseBody>(
-  handle: ApiHandler,
-  config?: ApiAdapterConfig
+wrapHttpHandler<RequestBody, Query, ResponseBody>(
+  handle: HttpHandler,
+  config?: HttpHandlerConfig
 ): (request: Request) => Promise<Response>
 
 The primary export - wraps your handler with:
@@ -63,7 +63,7 @@ Pre-processing:
   ✓ Body parsing with size limits & Content-Type checks
   ✓ Query parameter extraction
 Handler Invokation:
-  ✓ Pass typed ApiRequest to your handler
+  ✓ Pass typed HttpRequest to your handler
   ✓ Catch and serialize any thrown errors
 Post-processing:
   ✓ Validate status code
@@ -77,21 +77,17 @@ Error-handling:
   ✓ Handler errors → 500 responses with safe serialization
   ✓ Never leaks stack traces or sensitive data
 
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ EXAMPLES                                                                    ║
-╚═════════════════════════════════════════════════════════════════════════════╝
-
-BASIC HANDLER
+EXAMPLE OF BASIC HANDLER
 ───────────────────────────────────────────────────────────────────────────────
-export default makeApiProvider(async (req) => {
+export default wrapHttpHandler(async (req) => {
   if (req.method !== 'POST') return toMethodNotAllowed()
   const user = await createUser(req.body)
   return toCreated(user)
 })
 
-WITH CORS & VALIDATION
+EXAMPLE WITH CORS & VALIDATION
 ───────────────────────────────────────────────────────────────────────────────
-export default makeApiProvider(async (req) => {
+export default wrapHttpHandler(async (req) => {
   const validated = validateUserInput(req.body)
   if (!validated.ok) return toUnprocessable(validated.error)
   return toOk(await saveUser(validated.data))
@@ -99,16 +95,6 @@ export default makeApiProvider(async (req) => {
   cors: true,
   maxBodySize: 1024 * 1024 // 1MB limit
 })
-
-PLATFORM-SPECIFIC EXPORTS
-───────────────────────────────────────────────────────────────────────────────
-// Netlify Edge Functions
-export default makeApiProivder(handler)
-export const config = { path: "/api/users" }
-
-// Supabase Edge Functions
-import { serve } from 'std/http/server.ts'
-serve(makeApiProivder(handler))
 
 ╔═════════════════════════════════════════════════════════════════════════════╗
 ║ INTERNALS                                                                   ║
@@ -129,15 +115,15 @@ DESIGN PRINCIPLES:
 6. Zero Runtime Dependencies
    Pure TypeScript with no external packages
 
-FETCH-REQUEST-RESPONSE FLOW:
+FETCH REQUEST-RESPONSE FLOW:
 ───────────────────────────────────────────────────────────────────────────────
 ┌─────────────────┐
 |  Fetch Request  |         (Raw HTTP from client)
 └────────┬────────┘
          ▼
-┌─────────────────┐
-| makeApiProvider |        (Provider Adapter HoC)
-└────────┬────────┘
+┌──────────────────┐
+| wrapHttpHandler  |        (Handler Adapter HoC)
+└────────┬─────────┘
          ├──▶ Parse & validate HTTP method
          ├──▶ Normalize headers (lowercase)
          ├──▶ Parse body (JSON, size limits)
@@ -145,7 +131,7 @@ FETCH-REQUEST-RESPONSE FLOW:
          ├──▶ Handle CORS (if configured)
          ▼
 ┌─────────────────┐
-|   ApiRequest    |      (Typed, validated request)
+|   HttpRequest   |      (Typed, validated request)
 └────────┬────────┘
          ▼
 ┌─────────────────┐
@@ -153,7 +139,7 @@ FETCH-REQUEST-RESPONSE FLOW:
 └────────┬────────┘
          ▼
 ┌─────────────────┐
-|   ApiResponse   |    (Typed response envelope)
+|  HttpResponse   |    (Typed response envelope)
 └────────┬────────┘
          ├──▶ Validate status code
          ├──▶ Serialize body (JSON)
@@ -164,17 +150,13 @@ FETCH-REQUEST-RESPONSE FLOW:
 | Fetch Response |   (Standardized HTTP response)
 └────────────────┘
 
-  ADAPTER CONFIGURATION
+  HANDLER CONFIGURATION
   ───────────────────────────────────────────────────────────────────────────────
-  ApiAdapterConfig
+  HttpHandlerConfig
     → CORS: boolean | { origin, methods, headers, credentials }
     → maxBodySize: bytes (default 6MB for Netlify compatibility)
     → validateContentType: enforce application/json (default true)
     → multiValueQueryParams: handle ?tag=a&tag=b (default false)
-  METHODS_WITH_BODY
-    → Set<POST, PUT, PATCH, DELETE> for body parsing logic
-  NamedError
-    → Internal error type with stable .name for error routing
 
   REQUEST NORMALIZATION
   ───────────────────────────────────────────────────────────────────────────────
@@ -189,7 +171,7 @@ FETCH-REQUEST-RESPONSE FLOW:
 
   CORS & RESPONSE BUILDING
   ───────────────────────────────────────────────────────────────────────────────
-  buildCorsHeaders(config) → HttpHeaders
+  makeCorsHeaders(config) → HttpHeaders
     → Generate Access-Control-* headers from config
     → Defaults: origin='*', methods=all, headers=common
   toHeaders(HttpHeaders) → Headers
@@ -205,32 +187,34 @@ FETCH-REQUEST-RESPONSE FLOW:
     → Handles Error instances, strings, objects, primitives
   byteLength(string) → number
     → Calculate UTF-8 byte size (for body size limits)
+  NamedError
+    → Internal error type with stable .name for error routing
 
   REQUEST BODY PARSING
   ───────────────────────────────────────────────────────────────────────────────
   parseRequestBody(request, method, contentType, config) → unknown      |
     → Core body parsing pipeline with validation:                       |
-    1. Skip if method doesn't expect body (GET, HEAD, OPTIONS)
-    2. Check Content-Length header against maxBodySize
-    3. Read body text and measure actual byte length
-    4. Validate Content-Type is application/json (if enabled)
-    5. Parse JSON with error handling
+      1. Skip if method doesn't expect body (GET, HEAD, OPTIONS)
+      2. Check Content-Length header against maxBodySize
+      3. Read body text and measure actual byte length
+      4. Validate Content-Type is application/json (if enabled)
+      5. Parse JSON with error handling
   Throws NamedError on failure:
     - PayloadTooLarge: body exceeds maxBodySize
     - InvalidContentType: not application/json
     - InvalidJSON: JSON.parse() failed
 
-  `RESPONSE OUTPUT
+  RESPONSE OUTPUT
   ───────────────────────────────────────────────────────────────────────────────
   NO_BODY_STATUS_CODES = [204, 304]
-  → Status codes that should return empty body
-    makeResponse(statusCode, body, headers?, config?) → Response
-  → Core response builder with consistent structure:
-    1. Merge CORS headers if configured
-    2. Handle no-body status codes (204, 304)
-    3. Serialize body to JSON (or pass through string)
-    4. Set Content-Type header
-    5. Return Fetch Response instance
+    → Status codes that should return empty body
+  makeResponse(statusCode, body, headers?, config?) → Response
+    → Core response builder with consistent structure:
+      1. Merge CORS headers if configured
+      2. Handle no-body status codes (204, 304)
+      3. Serialize body to JSON (or pass through string)
+      4. Set Content-Type header
+      5. Return Fetch Response instance
   makeErrorResponse(statusCode, error, details, config?) → Response
     → Convenience wrapper for error responses
     → Always returns { error: string, details?: string }
@@ -242,7 +226,7 @@ export type HttpHeaders = Record<string, string>
 /** HTTP query map for responses/requests. */
 export type HttpQuery = Record<string, string>
 
-/** HTTP method for API handlers. */
+/** HTTP method for handlers. */
 export type HttpMethod =
   | 'GET'
   | 'POST'
@@ -286,11 +270,15 @@ export const HEADER_ALLOW_HEADERS = 'access-control-allow-headers'
 export const HEADER_ALLOW_CREDENTIALS = 'access-control-allow-credentials'
 
 /**
- * Typed request wrapper passed into API handlers.
+ * Typed request wrapper passed into handlers.
  * @template RequestBody Request body type.
  * @template Query Query string type.
  */
-export interface ApiRequest<Body = unknown, Query = HttpQuery, Headers = HttpHeaders> {
+export interface HttpRequest<
+  Body = unknown,
+  Query = HttpQuery,
+  Headers = HttpHeaders
+> {
   method: HttpMethod
   body: Body
   query: Query
@@ -299,26 +287,33 @@ export interface ApiRequest<Body = unknown, Query = HttpQuery, Headers = HttpHea
 }
 
 /**
- * Standardized API handler response envelope.
+ * Standardized handler response envelope.
  * @template ResponseBody JSON-serializable response body type.
  */
-export interface ApiResponse<Body = unknown, Headers = HttpHeaders> {
+export interface HttpResponse<
+  Body = unknown,
+  Headers = HttpHeaders
+> {
   statusCode: number
   headers?: Headers
   body: Body
 }
 
 /**
- * Type alias for a typed API handler used by platform adapters.
+ * Type alias for a typed HTTP handler.
  * @template RequestBody Request body type.
  * @template Query Query string type.
  * @template ResponseBody Response body type.
  */
-export type ApiHandler<RequestBody = unknown, Query = HttpQuery, ResponseBody = unknown> = (
-  req: ApiRequest<RequestBody, Query>
+export type HttpHandler<
+  RequestBody = unknown,
+  Query = HttpQuery,
+  ResponseBody = unknown
+> = (
+  req: HttpRequest<RequestBody, Query>
 ) =>
-  | Promise<ApiResponse<ResponseBody>>
-  | ApiResponse<ResponseBody>
+  | Promise<HttpResponse<ResponseBody>>
+  | HttpResponse<ResponseBody>
 
 /**
  * Extract error message from unknown error value.
@@ -334,9 +329,9 @@ const extractErrorMessage = (err: unknown): string => {
 /**
  * Build a 200 OK response with data payload.
  * @param data Response data.
- * @returns ApiResponse with status 200.
+ * @returns HttpResponse with status 200.
  */
-export const toOk = <T>(data: T): ApiResponse<{ data: T }> => ({
+export const toOk = <T>(data: T): HttpResponse<{ data: T }> => ({
   statusCode: HttpCodes.ok,
   body: { data }
 })
@@ -344,9 +339,9 @@ export const toOk = <T>(data: T): ApiResponse<{ data: T }> => ({
 /**
  * Build a 201 Created response with data payload.
  * @param data Created resource data.
- * @returns ApiResponse with status 201.
+ * @returns HttpResponse with status 201.
  */
-export const toCreated = <T>(data: T): ApiResponse<{ data: T }> => ({
+export const toCreated = <T>(data: T): HttpResponse<{ data: T }> => ({
   statusCode: HttpCodes.created,
   body: { data }
 })
@@ -354,9 +349,9 @@ export const toCreated = <T>(data: T): ApiResponse<{ data: T }> => ({
 /**
  * Build a 400 Bad Request error response.
  * @param error Error message.
- * @returns ApiResponse with status 400.
+ * @returns HttpResponse with status 400.
  */
-export const toBadRequest = (error: string): ApiResponse<{ error: string }> => ({
+export const toBadRequest = (error: string): HttpResponse<{ error: string }> => ({
   statusCode: HttpCodes.badRequest,
   body: { error }
 })
@@ -364,18 +359,18 @@ export const toBadRequest = (error: string): ApiResponse<{ error: string }> => (
 /**
  * Build a 404 Not Found error response.
  * @param error Error message.
- * @returns ApiResponse with status 404.
+ * @returns HttpResponse with status 404.
  */
-export const toNotFound = (error: string): ApiResponse<{ error: string }> => ({
+export const toNotFound = (error: string): HttpResponse<{ error: string }> => ({
   statusCode: HttpCodes.notFound,
   body: { error }
 })
 
 /**
  * Build a 405 Method Not Allowed error response.
- * @returns ApiResponse with status 405.
+ * @returns HttpResponse with status 405.
  */
-export const toMethodNotAllowed = (): ApiResponse<{ error: string }> => ({
+export const toMethodNotAllowed = (): HttpResponse<{ error: string }> => ({
   statusCode: HttpCodes.methodNotAllowed,
   body: { error: 'Method Not Allowed' }
 })
@@ -383,9 +378,9 @@ export const toMethodNotAllowed = (): ApiResponse<{ error: string }> => ({
 /**
  * Build a 422 Unprocessable Entity error response.
  * @param error Validation error message.
- * @returns ApiResponse with status 422.
+ * @returns HttpResponse with status 422.
  */
-export const toUnprocessable = (error: string): ApiResponse<{ error: string }> => ({
+export const toUnprocessable = (error: string): HttpResponse<{ error: string }> => ({
   statusCode: HttpCodes.unprocessableEntity,
   body: { error }
 })
@@ -394,20 +389,20 @@ export const toUnprocessable = (error: string): ApiResponse<{ error: string }> =
  * Build a 500 Internal Server Error response.
  * @param error Error message.
  * @param details Optional error details or error object.
- * @returns ApiResponse with status 500.
+ * @returns HttpResponse with status 500.
  */
 export const toInternalError = (
   error: string,
   details?: unknown
-): ApiResponse<{ error: string; details?: string }> => ({
+): HttpResponse<{ error: string; details?: string }> => ({
   statusCode: HttpCodes.internalError,
   body: details ? { error, details: extractErrorMessage(details) } : { error }
 })
 
 /**
- * Configuration options for the Edge adapter.
+ * Configuration options for the HTTP provider.
  */
-export interface ApiAdapterConfig {
+export interface HttpHandlerConfig {
   /** Enable CORS headers in responses. Default: false */
   cors?:
     | boolean
@@ -468,7 +463,6 @@ const normalizeQuery = (params: URLSearchParams, enableMultiValue: boolean): Htt
       normalized[key] = values[0]
     }
   }
-
   return normalized
 }
 
@@ -486,12 +480,12 @@ const normalizeHeaderMap = (headers: HttpHeaders): HttpHeaders => {
 }
 
 /**
- * Build CORS headers based on configuration.
+ * Make CORS headers based on configuration.
  * @param config CORS configuration.
  * @returns Headers object with CORS headers.
  */
-const buildCorsHeaders = (
-  config: boolean | NonNullable<ApiAdapterConfig['cors']>
+const makeCorsHeaders = (
+  config: boolean | NonNullable<HttpHandlerConfig['cors']>
 ): HttpHeaders => {
   if (config === false) return {}
   const corsConfig = config === true ? {} : config
@@ -562,14 +556,13 @@ const serializeError = (err: unknown): Message => {
       // If circular, we still have the name/message/stack from step 2
     }
   }
-
   return result
 }
 
 // Helper to prevent the "Circular structure to JSON" crash
 const getCircularReplacer = () => {
   const seen = new WeakSet()
-  return (_key: string, value: any) => {
+  return (_key: string, value: unknown) => {
     if (typeof value === 'object' && value !== null) {
       if (seen.has(value)) return '[Circular]'
       seen.add(value)
@@ -598,7 +591,7 @@ const parseRequestBody = async (
   request: Request,
   method: HttpMethod,
   contentType: string | undefined,
-  config: ApiAdapterConfig
+  config: HttpHandlerConfig
 ): Promise<unknown> => {
   // No body expected for these methods
   if (!METHODS_WITH_BODY.has(method)) return undefined
@@ -661,9 +654,9 @@ const makeResponse = (
   statusCode: number,
   body: unknown,
   additionalHeaders: HttpHeaders = {},
-  config: ApiAdapterConfig = {}
+  config: HttpHandlerConfig = {}
 ): Response => {
-  const corsHeaders = config.cors ? buildCorsHeaders(config.cors) : {}
+  const corsHeaders = config.cors ? makeCorsHeaders(config.cors) : {}
   const normalizedResponseHeaders = normalizeHeaderMap(additionalHeaders)
 
   if (NO_BODY_STATUS_CODES.has(statusCode)) {
@@ -715,27 +708,27 @@ export const makeErrorResponse = (
   statusCode: number,
   error: string,
   details: string,
-  config: ApiAdapterConfig = {}
+  config: HttpHandlerConfig = {}
 ): Response => makeResponse(statusCode, { error, details }, {}, config)
 
 /**
- * Adapt a typed API handler to the Edge Request/Response contract.
+ * Adapt a typed HTTP handler to the Request/Response contract.
  *
  * @template RequestBody Request body type (for documentation only - validated by handler).
  * @template Query Query parameters type (for documentation only - validated by handler).
  * @template ResponseBody Response body type.
  * @param handle Typed handler to wrap. Must validate its own inputs.
  * @param config Optional adapter configuration for CORS, validation, etc.
- * @returns Fetch handler ready for export.
+ * @returns HTTP handler ready for export.
  */
-export const makeApiProvider = <
+export const wrapHttpHandler = <
   RequestBody = unknown,
   Query = HttpQuery,
   ResponseBody = unknown
 >(
-  handle: ApiHandler<RequestBody, Query, ResponseBody>,
-  config: ApiAdapterConfig = {}
-): ApiHandler => {
+  handle: HttpHandler<RequestBody, Query, ResponseBody>,
+  config: HttpHandlerConfig = {}
+): HttpHandler => {
   return async (request: Request): Promise<Response> => {
     try {
       const method = request.method
@@ -765,7 +758,7 @@ export const makeApiProvider = <
       const url = new URL(request.url)
       const query = normalizeQuery(url.searchParams, config.multiValueQueryParams ?? false)
 
-      const apiRequest: ApiRequest<RequestBody, Query, HttpHeaders> = {
+      const HttpRequest: HttpRequest<RequestBody, Query, HttpHeaders> = {
         method,
         body: body as RequestBody,
         query: query as Query,
@@ -773,13 +766,13 @@ export const makeApiProvider = <
         rawRequest: request
       }
 
-      const result: ApiResponse<ResponseBody, HttpHeaders> = await handle(apiRequest)
+      const result: HttpResponse<ResponseBody, HttpHeaders> = await handle(HttpRequest)
       const statusCode = validateStatusCode(result.statusCode)
 
       return makeResponse(statusCode, result.body, result.headers, config)
     } catch (err) {
       const { name, message } = serializeError(err)
-      console.error('Unhandled error in Edge handler:', { name, message, err })
+      console.error('Unhandled error in HTTP handler:', { name, message, err })
       return makeErrorResponse(HttpCodes.internalError, name, message, config)
     }
   }
