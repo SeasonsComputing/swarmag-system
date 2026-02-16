@@ -7,7 +7,7 @@ import type { User } from '@domain/abstractions/user.ts'
 import { isUserRoles, isUserStatus } from '@domain/validators/user-validator.ts'
 
 /** Map a domain User into a Dictionary shape. */
-export const userToRow = (user: User) => ({
+export const fromUser = (user: User): Dictionary => ({
   id: user.id,
   display_name: user.displayName,
   primary_email: user.primaryEmail,
@@ -26,12 +26,10 @@ export const userToRow = (user: User) => ({
  * Payload is truth - if present, use it directly.
  * Falls back to column mapping for legacy records.
  */
-export const rowToUser = (row: unknown): User => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('User row is missing required fields')
+export const toUser = (record: Dictionary): User => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('User dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -53,7 +51,7 @@ export const rowToUser = (row: unknown): User => {
   const phoneNumber = (record.phone_number ?? record.phoneNumber) as string
 
   if (!id || !displayName || !primaryEmail || !phoneNumber) {
-    throw new Error('User row is missing required fields')
+    throw new Error('User dictionary is missing required fields')
   }
 
   return {

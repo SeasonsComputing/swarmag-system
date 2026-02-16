@@ -6,7 +6,7 @@ import type { Dictionary } from '@core-std'
 import type { Workflow } from '@domain/abstractions/workflow.ts'
 
 /** Map a domain Workflow into a Dictionary shape. */
-export const workflowToRow = (workflow: Workflow) => ({
+export const fromWorkflow = (workflow: Workflow): Dictionary => ({
   id: workflow.id,
   service_id: workflow.serviceId,
   name: workflow.name,
@@ -24,16 +24,14 @@ export const workflowToRow = (workflow: Workflow) => ({
  * Convert a Dictionary into a Workflow domain model.
  * Payload is truth - if present, use it directly.
  * Falls back to column mapping for legacy records.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped Workflow object.
  * @throws Error if required fields are missing.
  */
-export const rowToWorkflow = (row: unknown): Workflow => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('Workflow row is missing required fields')
+export const toWorkflow = (record: Dictionary): Workflow => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('Workflow dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -60,7 +58,7 @@ export const rowToWorkflow = (row: unknown): Workflow => {
     !id || !serviceId || !name || typeof version !== 'number' || !effectiveFrom
     || !Array.isArray(steps)
   ) {
-    throw new Error('Workflow row is missing required fields')
+    throw new Error('Workflow dictionary is missing required fields')
   }
 
   return {

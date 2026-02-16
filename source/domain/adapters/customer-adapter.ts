@@ -14,7 +14,7 @@ export const isCustomerStatus = (value: unknown): value is Customer['status'] =>
   value === 'active' || value === 'inactive' || value === 'prospect'
 
 /** Map a domain Customer into a Dictionary shape. */
-export const customerToRow = (customer: Customer) => ({
+export const fromCustomer = (customer: Customer): Dictionary => ({
   id: customer.id,
   name: customer.name,
   status: customer.status,
@@ -38,16 +38,14 @@ export const customerToRow = (customer: Customer) => ({
  * Convert a Dictionary into a Customer domain model.
  * Payload is truth - if present, use it directly.
  * Falls back to column mapping for legacy records.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped Customer object.
  * @throws Error if required fields are missing.
  */
-export const rowToCustomer = (row: unknown): Customer => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('Customer row is missing required fields')
+export const toCustomer = (record: Dictionary): Customer => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('Customer dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -91,7 +89,7 @@ export const rowToCustomer = (row: unknown): Customer => {
     || !Array.isArray(contacts)
     || contacts.length === 0
   ) {
-    throw new Error('Customer row is missing required fields')
+    throw new Error('Customer dictionary is missing required fields')
   }
 
   return {
