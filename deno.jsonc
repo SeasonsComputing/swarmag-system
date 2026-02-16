@@ -1,6 +1,9 @@
 {
   "imports": {
-    // Top-level namespace
+    // ────────────────────────────────────────────────────────────────────────────
+    // Primary Top-level Aliases
+    // ────────────────────────────────────────────────────────────────────────────
+
     "@core/": "./source/core/",
     "@domain/": "./source/domain/",
     "@back": "./source/back/",
@@ -8,20 +11,27 @@
     "@devops": "./source/devops/",
     "@tests": "./source/tests/",
 
-    // Convenience barrels
+    // ────────────────────────────────────────────────────────────────────────────
+    // Convenience Barrel Aliases
+    // ────────────────────────────────────────────────────────────────────────────
+
     "@core-std": "./source/core/std/std.ts",
     "@ux-api": "./source/ux/api/api.ts",
 
-    // Backend namespaces
-    "@back-supabase-edge/": "./source/back/supabase-edge/",
+    // ────────────────────────────────────────────────────────────────────────────
+    // Package Aliases
+    // ────────────────────────────────────────────────────────────────────────────
 
-    // UX application namespaces
+    "@back-supabase-edge/": "./source/back/supabase-edge/",
     "@ux-app-ops/": "./source/ux/app-ops/",
     "@ux-app-admin/": "./source/ux/app-admin/",
     "@ux-app-customer/": "./source/ux/app-customer/",
     "@ux-app-common/": "./source/ux/app-common/",
 
-    // Vendor namespaces
+    // ────────────────────────────────────────────────────────────────────────────
+    // Vendor Aliases
+    // ────────────────────────────────────────────────────────────────────────────
+
     "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
   },
   "tasks": {
@@ -31,14 +41,14 @@
     "fmt": "dprint fmt",
     "fmt:check": "dprint check",
 
-    "guard:architecture": "deno run --allow-read source/devops/architecture-guard.ts",
-    "guard:env": "deno run --allow-read source/devops/env-guard.ts",
-    "guard:leaf": "deno run --allow-read source/devops/leaf-guard.ts",
-    "guard:validation": "deno run --allow-read source/devops/validation-guard.ts"
+    "guard:architecture": "deno run --allow-read source/devops/guard-architecture.ts",
+    "guard:env": "deno run --allow-read source/devops/guard-env.ts",
+    "guard:leaf": "deno run --allow-read source/devops/guard-leaf.ts",
+    "guard:validation": "deno run --allow-read source/devops/guard-validation.ts",
   },
   "fmt": {
     "exclude": [
-      "**/*"
-    ]
-  }
+      "**/*",
+    ],
+  },
 }

@@ -23,7 +23,6 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | --------------- | ------------------------------------------------------------- |
 | `applications/` | Application-level requirements and UX/product specs           |
 | `foundation/`   | Core architecture, domain, style, and data definitions        |
-| `archive/`      | Historical architecture notes and project evolution artifacts |
 
 #### 1.2.1 Foundation (`documentation/foundation/`)
 
@@ -51,49 +50,50 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | --------- | ----------------------------------------------------------------- |
 | `back/`   | Backend runtime modules (config, functions, migrations)           |
 | `core/`   | Fundamental types and utilities used by all layers                |
-| `devops/` | Architecture and environment guard scripts                        |
+| `devops/` | Architecture and environment `guard-*` scripts                        |
 | `domain/` | Domain model and domain-layer contracts                           |
 | `tests/`  | Test suites and supporting fixtures                               |
 | `ux/`     | Client-facing user experiences, apps, contracts, and UI libraries |
 
 #### 1.3.1 Core (`source/core/`)
 
-| Path       | Description                                                     |
-| ---------- | --------------------------------------------------------------- |
+| Path       | Description                                                      |
+| ---------- | ---------------------------------------------------------------- |
 | `api/`     | Client makers and provider adapters (CRUD, HTTP, business rules) |
-| `db/`      | Database client singletons (Supabase)                           |
-| `runtime/` | Configuration management (Config singleton, runtime providers)  |
-| `std/`     | Standard types (ID, When, Dictionary)                           |
+| `db/`      | Database client singletons (Supabase)                            |
+| `runtime/` | Configuration management (Config singleton, runtime providers)   |
+| `std/`     | Standard types (ID, When, Dictionary)                            |
 
 #### 1.3.2 Domain (`source/domain/`)
 
-| Path            | Description                                            |
-| --------------- | ------------------------------------------------------ |
-| `abstractions/` | Core domain types (User, Job, Service, Asset, etc.)    |
-| `adapters/`     | Storage serialization (Dictionary ↔ domain types)      |
-| `protocols/`    | Input/output contracts (CreateInput, UpdateInput)      |
-| `validators/`   | Domain validation rules and invariants                 |
+| Path            | Description                                         |
+| --------------- | --------------------------------------------------- |
+| `abstractions/` | Core domain types (User, Job, Service, Asset, etc.) |
+| `adapters/`     | Storage serialization (Dictionary ↔ domain types)   |
+| `protocols/`    | Input/output contracts (CreateInput, UpdateInput)   |
+| `validators/`   | Domain validation rules and invariants              |
 
 #### 1.3.3 Backend (`source/back/`)
 
-| Path            | Description                                       |
-| --------------- | ------------------------------------------------- |
-| `migrations/`   | SQL migrations (schema + RLS policies)            |
-| `supabase-edge/`| Supabase Edge Functions (orchestration only)      |
+| Path             | Description                                  |
+| ---------------- | -------------------------------------------- |
+| `migrations/`    | SQL migrations (schema + RLS policies)       |
+| `supabase-edge/` | Supabase Edge Functions (orchestration only) |
 
-#### 1.3.4 UX (`source/ux/`)
+#### 1.3.4 Frontend (`source/ux/`)
 
-| Path           | Description                                        |
-| -------------- | -------------------------------------------------- |
-| `api/`         | Composed API namespace (@ux-api barrel export)     |
-| `app-admin/`   | Admin PWA application (desktop/tablet)             |
-| `app-ops/`     | Operations PWA application (mobile, offline-first) |
-| `app-customer/`| Customer portal application (static, read-only)    |
-| `app-common/`  | Shared UX components and utilities                 |
+| Path            | Description                                        |
+| --------------- | -------------------------------------------------- |
+| `api/`          | Composed API namespace (@ux-api barrel export)     |
+| `app-admin/`    | Admin PWA application (desktop/tablet)             |
+| `app-ops/`      | Operations PWA application (mobile, offline-first) |
+| `app-customer/` | Customer portal application (static, read-only)    |
+| `app-common/`   | Shared UX components and utilities                 |
 
 ## 2. Local Configuration
 
 ### 2.1 Backend Configuration
+
 ```bash
 # Create backend config from example
 cp source/back/supabase-edge/config/back-local.env.example \
@@ -101,6 +101,7 @@ cp source/back/supabase-edge/config/back-local.env.example \
 ```
 
 Required variables:
+
 ```dotenv
 # source/back/supabase-edge/config/back-local.env
 SUPABASE_URL=http://localhost:54321
@@ -111,6 +112,7 @@ JWT_SECRET=your-jwt-secret
 ### 2.2 UX Configuration
 
 Each UX application has its own configuration module that initializes the core `Config` singleton with the appropriate runtime provider.
+
 ```bash
 # Create config for each app
 cp source/ux/app-admin/config/admin-local.env.example \
@@ -124,6 +126,7 @@ cp source/ux/app-customer/config/customer-local.env.example \
 ```
 
 Required variables (similar for all apps):
+
 ```dotenv
 VITE_SUPABASE_URL=http://localhost:54321
 VITE_SUPABASE_ANON_KEY=your-anon-key
@@ -147,6 +150,7 @@ See `architecture-core.md` Section 6 for complete configuration management detai
 - All runtime config values validated at bootstrap via `Config.init()`
 
 ## 3. Project Commands
+
 ```bash
 # Full checks (guards + typecheck + lint)
 deno task check
