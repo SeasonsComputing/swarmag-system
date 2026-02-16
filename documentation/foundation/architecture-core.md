@@ -2,7 +2,7 @@
 
 ## 1. Executive Summary
 
-The **swarmAg System** is a domain-driven platform for agricultural service operations, built around a logical API boundary with interchangeable client providers. It consists of progressive web applications for administration and field execution, a customer portal, and a single Netlify backend backed by Supabase Postgres. Offline execution is enabled via IndexedDB-based UX providers.
+The **swarmAg System** is a domain-driven platform for agricultural service operations, built around a composed API namespace pattern. It consists of progressive web applications for administration and field execution, a customer portal, and Supabase Edge Functions for orchestration. Offline execution is enabled via deep cloning to IndexedDB.
 
 The system focuses on two service classes—**Aerial** and **Ground**—and the workflows, assets, and regulated chemicals required to deliver them safely and repeatably.
 
@@ -145,10 +145,10 @@ The system consists of five primary components:
 | **Ops PWA**                | Offline-first field execution (installed app)  | SolidJS, IndexedDB |
 | **Admin PWA**              | Management and configuration (installed app)   | SolidJS            |
 | **Customer Portal**        | Customer-facing scheduling and status (static) | SolidJS            |
-| **Backend Business Rules** | Implemented as Edge Functions                  | Netlify, Supabase  |
-| **Supabase Data**          | Persistent storage and auth                    | Postgres, Supabase |
+| **Backend Orchestration**  | Edge Functions for complex operations          | Supabase Edge      |
+| **Persistent Storage**     | PostgreSQL with Row Level Security             | Supabase           |
 
-UX API providers (clients) are part of the UX layer and select the correct backend or storage implementation at runtime.
+UX applications compose their API namespace (`@ux-api`) using client makers that connect directly to Supabase or IndexedDB.
 
 ### 4.2 Domain Model Summary
 
@@ -166,7 +166,7 @@ The system boundary is the **API namespace** (`source/ux/api/`), not a transport
 
 The API namespace is a **composed interface** built from domain abstractions using client makers that conform to standard contracts.
 
-**Core Principle:**
+#### 5.1.1 Core Principle
 
 The API is not a fixed interface or protocol—it is a **composition pattern** where applications declare their operational requirements by selecting appropriate client makers for each domain abstraction.
 ```typescript
@@ -189,7 +189,7 @@ export const api = {
 }
 ```
 
-**Key Properties:**
+#### 5.1.2 Key Properties
 
 - **Domain-driven** - API surface mirrors domain model, not storage technology
 - **Contract-based** - All clients conform to `ApiClientCrud` or `ApiClientBusRule` contracts
@@ -442,8 +442,8 @@ swarmag/
     "@ux-app-common/": "./source/ux/app-common/",
 
     // Vendor namespaces
-    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2",
-  },
+    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
+  }
 }
 ```
 
@@ -627,24 +627,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 - Applies to both human and AI contributors
 - Fast-fail configuration over defensive programming
 
-### 9.2 Dependency Flow
-
-Dependencies flow downward through layers. Lower layers have no knowledge of higher layers:
-```
-tests/devops  ──> ux, back, domain, core
-  ↓
-ux            ──> domain, core
-  ↓
-back          ──> domain, core
-  ↓
-domain        ──> core
-  ↓
-core          (no dependencies)
-```
-
-Violations detected by architectural guards are build failures.
-
-### 9.3 Enforcement
+### 9.2 Enforcement
 
 These invariants are enforced through:
 - Import discipline (developer responsibility)
