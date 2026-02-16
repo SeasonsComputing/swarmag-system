@@ -17,7 +17,7 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | `source/`        | Application and platform implementation code             |
 | `supabase/`      | Supabase project configuration and local metadata        |
 
-### 1.2 Documentation (`documentation\`)
+### 1.2 Documentation (`documentation/`)
 
 | Path            | Description                                                   |
 | --------------- | ------------------------------------------------------------- |
@@ -49,58 +49,55 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 | Path      | Description                                                       |
 | --------- | ----------------------------------------------------------------- |
-| `back/`   | Backend runtime modules (config, functions, library, migrations)  |
+| `back/`   | Backend runtime modules (config, functions, migrations)           |
 | `core/`   | Fundamental types and utilities used by all layers                |
 | `devops/` | Architecture and environment guard scripts                        |
 | `domain/` | Domain model and domain-layer contracts                           |
 | `tests/`  | Test suites and supporting fixtures                               |
 | `ux/`     | Client-facing user experiences, apps, contracts, and UI libraries |
 
-### 1.3.1 Core (`source/core/`)
+#### 1.3.1 Core (`source/core/`)
 
-| Path       | Description                                      |
-| ---------- | ------------------------------------------------ |
-| `api/`     | API binding facilities for REST, HTTP & RDBMS    |
-| `db/`      | Database provider and connection management      |
-| `runtime/` | Configuration facilities and available providers |
-| `std/`     | ADT's, When & ID                                 |
+| Path       | Description                                                     |
+| ---------- | --------------------------------------------------------------- |
+| `api/`     | Client makers and provider adapters (CRUD, HTTP, business rules) |
+| `db/`      | Database client singletons (Supabase)                           |
+| `runtime/` | Configuration management (Config singleton, runtime providers)  |
+| `std/`     | Standard types (ID, When, Dictionary)                           |
 
 #### 1.3.2 Domain (`source/domain/`)
 
-| Path            | Description                                    |
-| --------------- | ---------------------------------------------- |
-| `abstractions/` | Core domain abstractions                       |
-| `adapters/`     | Domain adapters and boundary translation logic |
-| `protocol/`     | Domain protocols and interface contracts       |
-| `validators/`   | Domain validation logic and invariants         |
+| Path            | Description                                            |
+| --------------- | ------------------------------------------------------ |
+| `abstractions/` | Core domain types (User, Job, Service, Asset, etc.)    |
+| `adapters/`     | Storage serialization (Dictionary ↔ domain types)      |
+| `protocols/`    | Input/output contracts (CreateInput, UpdateInput)      |
+| `validators/`   | Domain validation rules and invariants                 |
 
 #### 1.3.3 Backend (`source/back/`)
 
-| Path             | Description                                       |
-| ---------------- | ------------------------------------------------- |
-| `migrations/`    | SQL migration files for backend persistence setup |
-| `supabase-edge/` | Serverless/edge function entry points             |
+| Path            | Description                                       |
+| --------------- | ------------------------------------------------- |
+| `migrations/`   | SQL migrations (schema + RLS policies)            |
+| `supabase-edge/`| Supabase Edge Functions (orchestration only)      |
 
-#### 1.3.4 User Experience (`source/ux/`)
+#### 1.3.4 UX (`source/ux/`)
 
-| Path            | Description                     |
-| --------------- | ------------------------------- |
-| `api/`          | UX API client into the backend  |
-| `app-admin/`    | Administration application code |
-| `app-customer/` | Customer application code       |
-| `app-common/`   | Common application code         |
-| `app-config/`   | Config provider for all apps    |
+| Path           | Description                                        |
+| -------------- | -------------------------------------------------- |
+| `api/`         | Composed API namespace (@ux-api barrel export)     |
+| `app-admin/`   | Admin PWA application (desktop/tablet)             |
+| `app-ops/`     | Operations PWA application (mobile, offline-first) |
+| `app-customer/`| Customer portal application (static, read-only)    |
+| `app-common/`  | Shared UX components and utilities                 |
 
 ## 2. Local Configuration
 
-The system uses environment-based configuration with runtime detection. UX applications share a single configuration module that is packaged with each app deployment, similar to how `core` and `domain` modules are packaged.
-
 ### 2.1 Backend Configuration
-
-Backend edge functions require Supabase connection credentials:
 ```bash
-# Create local backend config from example
-cp source/back/supabase-edge/config/back-local.env.example source/back/supabase-edge/config/back-local.env
+# Create backend config from example
+cp source/back/supabase-edge/config/back-local.env.example \
+   source/back/supabase-edge/config/back-local.env
 ```
 
 Required variables:
@@ -108,39 +105,48 @@ Required variables:
 # source/back/supabase-edge/config/back-local.env
 SUPABASE_URL=http://localhost:54321
 SUPABASE_SERVICE_KEY=your-service-role-key
-SUPABASE_ANON_KEY=your-anon-key
 JWT_SECRET=your-jwt-secret
 ```
 
 ### 2.2 UX Configuration
 
-All UX applications share a single configuration module (`source/ux/config/ux-config.ts`) that is packaged with each app deployment.
+Each UX application has its own configuration module that initializes the core `Config` singleton with the appropriate runtime provider.
 ```bash
-# Create shared UX config from example
-cp source/ux/config/ux-local.env.example source/ux/config/ux-local.env
+# Create config for each app
+cp source/ux/app-admin/config/admin-local.env.example \
+   source/ux/app-admin/config/admin-local.env
+
+cp source/ux/app-ops/config/ops-local.env.example \
+   source/ux/app-ops/config/ops-local.env
+
+cp source/ux/app-customer/config/customer-local.env.example \
+   source/ux/app-customer/config/customer-local.env
 ```
 
-Required variables:
+Required variables (similar for all apps):
 ```dotenv
-# source/ux/config/ux-local.env
-VITE_SUPABASE_EDGE_URL=http://localhost:54321/functions/v1
 VITE_SUPABASE_URL=http://localhost:54321
-VITE_SUPABASE_SERVICE_KEY=your-service-role-key
-VITE_JWT_SECRET=your-jwt-secret
+VITE_SUPABASE_ANON_KEY=your-anon-key
 ```
 
-UX applications connect directly to Supabase via Row Level Security policies. The shared config module is bundled with each application during deployment, just as the `core` and `domain` layers are.
+### 2.3 Configuration Pattern
 
-### 2.3 Configuration Rules
+The system uses a singleton `Config` pattern defined in `@core/runtime/config.ts`:
 
-- **Never commit actual `.env` files** - only commit `.env.example` files
-- Local configs are gitignored via `**/*-local.env` pattern
+- **Core defines the singleton** - Configuration lives at the lowest layer
+- **Packages inject providers** - Each deployment context supplies its runtime provider
+- **Config packaged with apps** - Configuration modules bundled during build
+
+See `architecture-core.md` Section 6 for complete configuration management details.
+
+### 2.4 Configuration Rules
+
+- **Never commit actual `.env` files** - only commit `.env.example` templates
+- Local configs gitignored via `**/*-local.env` pattern
 - Stage and prod configs follow same pattern: `*-stage.env`, `*-prod.env`
-- All runtime config values are validated at bootstrap via `Config.init()`
-- Shared modules (`core`, `domain`, `ux/config`) are packaged with consuming applications
+- All runtime config values validated at bootstrap via `Config.init()`
 
 ## 3. Project Commands
-
 ```bash
 # Full checks (guards + typecheck + lint)
 deno task check
@@ -148,7 +154,7 @@ deno task check
 # Tests
 deno task test
 
-# Lint + markdown lint
+# Lint
 deno task lint
 
 # Format and format-check
@@ -164,4 +170,4 @@ deno task fmt:check
 | `README.md`       | Starting point for understanding the project. Keep it up-to-date and accurate.                                                                                        |
 | `cspell.json`     | Spell checker configuration. Keep it up-to-date and accurate.                                                                                                         |
 | `dprint.json`     | Code formatter configuration. Keep it up-to-date and accurate.                                                                                                        |
-| `deno.json`       | Deno project configuration. Keep it up-to-date and accurate.                                                                                                          |
+| `deno.jsonc`      | Deno project configuration. Keep it up-to-date and accurate.                                                                                                          |
