@@ -170,6 +170,8 @@ The API namespace is a **composed interface** built from domain abstractions usi
 
 #### 5.1.1 Core Principle
 
+TODO: this is misleading. A single api namespace suitable to the entire solution space is composed using makers. however there is not an api namespace per app
+
 The API is not a fixed interface or protocol—it is a **composition pattern** where applications declare their operational requirements by selecting appropriate client makers for each domain abstraction.
 
 ```typescript
@@ -182,11 +184,13 @@ import { makeCrudRdbmsClient } from '@core/api/client-crud-supabase.ts'
 export const api = {
   // Domain abstractions using appropriate storage bindings
   Users: makeCrudRdbmsClient<User, UserCreateInput, UserUpdateInput>({ table: 'users' }),
-  Customers: makeCrudRdbmsClient<Customer, CustomerCreateInput, CustomerUpdateInput>({ table: 'customers' }),
-  
+  Customers: makeCrudRdbmsClient<Customer, CustomerCreateInput, CustomerUpdateInput>({
+    table: 'customers'
+  }),
+
   // Offline storage for field operations
   JobsLocal: makeCrudIndexedDbClient<Job, JobCreateInput, JobUpdateInput>({ store: 'jobs' }),
-  
+
   // Orchestration operations
   deepCloneJob: makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
 }
@@ -203,7 +207,7 @@ export const api = {
 
 The system defines two client contracts (in `source/core/api/api-contract.ts`):
 
-#### 5.2.1 CRUD Contract
+#### 5.2.1 CRUD & List Contract
 
 ```typescript
 interface ApiCrudContract<T, TCreate, TUpdate> {
@@ -223,7 +227,7 @@ type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
 
 ```typescript
 interface ApiBusRuleContract {
-  run(input: Dictionary): Promise<Dictionary>
+  run(params: Dictionary): Promise<Dictionary>
 }
 ```
 
@@ -267,7 +271,7 @@ Client makers are factory functions that produce clients conforming to contracts
 
 | Maker                          | Contract             | Purpose                          | Implementation     |
 | ------------------------------ | -------------------- | -------------------------------- | ------------------ |
-| `makeCrudRdbmsClient<T>()`     | `ApiCrudContract`    | Direct Supabase SDK access       | PostgreSQL via RLS |
+| `makeCrudSupabaseClient<T>()`  | `ApiCrudContract`    | Direct Supabase SDK access       | PostgreSQL via RLS |
 | `makeCrudIndexedDbClient<T>()` | `ApiCrudContract`    | Offline local storage            | Browser IndexedDB  |
 | `makeCrudHttpClient<T>()`      | `ApiCrudContract`    | HTTP calls to edge functions     | Fetch API          |
 | `makeBusRuleHttpClient()`      | `ApiBusRuleContract` | Orchestration via edge functions | Fetch API          |
@@ -420,15 +424,14 @@ const url = Config.get('SUPABASE_URL')
 
 // It's ok for configs to be shared across packages
 // This same config is bundled with each deployment package
-// 
+//
 import { Config } from '@ux/config/config.ts'
 const url = Config.get('SUPABASE_URL')
 
-
 // Never use relative paths climbing namespace tree (INCORRECT)
 // ❌ import { Config } from '../config/config.ts'
- 
-// When lower layers unaware of which package they've been 
+
+// When lower layers unaware of which package they've been
 // imported into require config, user `core` runtime config
 import { Config } from '@core/runtime/config.ts'
 ```
@@ -552,7 +555,7 @@ swarmag-system/
     // ────────────────────────────────────────────────────────────────────────────
     // Primary Top-level Aliases
     // ────────────────────────────────────────────────────────────────────────────
-  
+
     "@core/": "./source/core/",
     "@domain/": "./source/domain/",
     "@back": "./source/back/",
@@ -576,7 +579,7 @@ swarmag-system/
     "@ux-app-admin/": "./source/ux/app-admin/",
     "@ux-app-customer/": "./source/ux/app-customer/",
     "@ux-app-common/": "./source/ux/app-common/",
-    
+
     // ────────────────────────────────────────────────────────────────────────────
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
