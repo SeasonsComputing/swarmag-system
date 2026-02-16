@@ -32,7 +32,7 @@
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
-    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
+    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2",
   },
   "tasks": {
     "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno check source/**/*.ts && deno task lint",

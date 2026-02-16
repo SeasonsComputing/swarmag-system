@@ -19,10 +19,10 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 ### 1.2 Documentation (`documentation/`)
 
-| Path            | Description                                                   |
-| --------------- | ------------------------------------------------------------- |
-| `applications/` | Application-level requirements and UX/product specs           |
-| `foundation/`   | Core architecture, domain, style, and data definitions        |
+| Path            | Description                                            |
+| --------------- | ------------------------------------------------------ |
+| `applications/` | Application-level requirements and UX/product specs    |
+| `foundation/`   | Core architecture, domain, style, and data definitions |
 
 #### 1.2.1 Foundation (`documentation/foundation/`)
 
@@ -50,7 +50,7 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | --------- | ----------------------------------------------------------------- |
 | `back/`   | Backend runtime modules (config, functions, migrations)           |
 | `core/`   | Fundamental types and utilities used by all layers                |
-| `devops/` | Architecture and environment `guard-*` scripts                        |
+| `devops/` | Architecture and environment `guard-*` scripts                    |
 | `domain/` | Domain model and domain-layer contracts                           |
 | `tests/`  | Test suites and supporting fixtures                               |
 | `ux/`     | Client-facing user experiences, apps, contracts, and UI libraries |

@@ -18,7 +18,7 @@ any software artifact with the system.
 | ----------- | --------------------------------------------------------------------------------------------------- |
 | Paths       | Use aliases for cross-directory imports; use relative (`./`) for same-directory imports             |
 | Ordering    | Domain -> utils -> adapters -> api -> back-lib; use `import type` where helpful                     |
-| Exports     | Default export only for Netlify Edge `wrapHttpHandler(handle)`                                    |
+| Exports     | Default export only for Netlify Edge `wrapHttpHandler(handle)`                                      |
 | Extensions  | Include `.ts` in local/alias import specifiers                                                      |
 | Import maps | Keep `netlify-import-map.json` aligned with `deno.json`; use root-relative paths in the Netlify map |
 | Layout      | Files live only in leaf directories; directories with subdirectories must not contain files         |
@@ -169,7 +169,7 @@ Each domain abstraction has corresponding files across three subdirectories:
 | Item       | Guideline                                                                                                          |
 | ---------- | ------------------------------------------------------------------------------------------------------------------ |
 | Naming     | `{resource}-{action}.ts` (plural resource), e.g., `users-create.ts`                                                |
-| Exports    | Default export only: Netlify `wrapHttpHandler(handle)`                                                           |
+| Exports    | Default export only: Netlify `wrapHttpHandler(handle)`                                                             |
 | Config     | Export `config = { path: "/api/{resource}/{action}" }` for routing                                                 |
 | Types      | Use `HttpRequest`/`HttpResponse` from `@core/api/`                                                                 |
 | Status     | Use `HttpCodes`; no numeric literals                                                                               |
@@ -177,7 +177,7 @@ Each domain abstraction has corresponding files across three subdirectories:
 | Validation | Guard with `validate` + `HttpCodes.unprocessableEntity`                                                            |
 | Methods    | Guard unsupported verbs with `HttpCodes.methodNotAllowed`                                                          |
 | Responses  | Success: `{ data: ... }`; failure: `{ error, details? }`                                                           |
-| JSON       | Always JSON; `wrapHttpHandler` sets headers and wraps errors                                                     |
+| JSON       | Always JSON; `wrapHttpHandler` sets headers and wraps errors                                                       |
 | Adaptation | Use adapters from `source/domain/adapter/` (e.g., `jobs-adapter.ts`) instead of ad hoc column maps in each handler |
 
 ## 8. Adapters and Storage Adaptation
@@ -229,7 +229,7 @@ Use braces when there is an else clause or when the line exceeds 120 columns.
 | ------- | ---------------------------------------------------------------- |
 | Parsing | Invalid JSON -> `HttpCodes.badRequest`                           |
 | Server  | Persistence/unknown -> `HttpCodes.internalError`; safe `details` |
-| Control | Do not throw past `wrapHttpHandler`; return `HttpResponse`     |
+| Control | Do not throw past `wrapHttpHandler`; return `HttpResponse`       |
 
 ## 11. Pagination
 

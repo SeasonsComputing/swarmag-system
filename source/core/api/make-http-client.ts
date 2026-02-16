@@ -25,9 +25,9 @@ TODO
 
 import type { Dictionary, ID } from '@core-std'
 import {
-  ApiError,
   type ApiBusRuleContract,
   type ApiCrudContract,
+  ApiError,
   type ListResult
 } from './api-contract.ts'
 

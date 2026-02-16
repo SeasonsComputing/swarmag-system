@@ -93,11 +93,11 @@ Use when you need fine-grained control over HTTP semantics:
 // source/back/supabase-edge/functions/jobs-batch-update.ts
 import type { Dictionary } from '@core-std'
 import {
-  wrapHttpHandler,
   toBadRequest,
   toMethodNotAllowed,
   toOk,
-  toUnprocessable
+  toUnprocessable,
+  wrapHttpHandler
 } from '@core/api/http-handler.ts'
 import type { HttpRequest, HttpResponse } from '@core/api/http-handler.ts'
 import { validateJobBatchUpdate } from '@domain/validators/job-validator.ts'
