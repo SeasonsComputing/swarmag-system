@@ -451,7 +451,7 @@ export const wrapHttpHandler = <
   return async (request: Request): Promise<Response> => {
     try {
       //
-      // Validate & Normalize Request
+      // Validate & normalize the request
       //
 
       const method = request.method
@@ -494,6 +494,10 @@ export const wrapHttpHandler = <
       //
 
       const result: HttpResponse<ResponseBody, HttpHeaders> = await handler(HttpRequest)
+
+      //
+      // Validate and prepare response
+      //
 
       const statusCode = validateStatusCode(result.statusCode)
       return makeResponse(statusCode, result.body, result.headers, config)
