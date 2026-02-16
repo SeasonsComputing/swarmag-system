@@ -31,13 +31,13 @@ Edge functions handle **orchestration only** - complex multi-step operations tha
 
 ### 3.1 When to Use Edge Functions
 
-**YES - Use edge functions for:**
+#### 3.1.1 YES - Use edge functions for
 - Multi-step transactions requiring coordination (deep clone Job aggregate)
 - Operations with complex business rules spanning multiple tables
 - Background processing or async workflows
 - Operations requiring elevated privileges
 
-**NO - Do NOT use edge functions for:**
+#### 3.1.2 NO - Do NOT use edge functions for
 - Simple CRUD operations (use direct Supabase SDK client)
 - Read-only queries (use direct Supabase SDK client)
 - Client-side validation (use domain validators)
@@ -73,7 +73,7 @@ const runDeepClone = async (input: Dictionary): Promise<Dictionary> => {
 export default makeBusRuleProvider(runDeepClone, { cors: true })
 ```
 
-**When to use:**
+##### 3.2.1.1 When to use
 - Simple input/output (Dictionary → Dictionary)
 - No custom HTTP status codes needed
 - Straightforward orchestration logic
@@ -125,7 +125,7 @@ export default makeApiProvider(handle, {
 })
 ```
 
-**When to use:**
+##### 3.2.2.1 When to use
 - Need HTTP method routing (GET/POST/PUT/DELETE)
 - Custom validation with specific error codes (400/422)
 - Query parameter handling
@@ -148,7 +148,7 @@ Edge functions do NOT:
 
 ### 3.4 Platform Requirements
 
-**All edge functions must:**
+#### 3.4.1 All edge functions must
 - Stay flat in `source/back/supabase-edge/functions/` (no subdirectories)
 - Be a single file per function
 - Use platform discovery naming (filename = function name)
@@ -159,24 +159,24 @@ Edge functions do NOT:
 
 Schema is defined in SQL migrations under `source/back/migrations/`.
 
-**Migration Rules:**
+#### 4.1.1 Migration Rules
 - One migration per conceptual change
 - Timestamp-based naming: `YYYYMMDDHHMMSS_description.sql`
 - Never modify deployed migrations (forward-only)
 - Include both UP and DOWN operations
 - Define tables in 4th Normal Form (4NF) by default
 
-**JSONB Exceptions:**
+#### 4.1.2 JSONB Exceptions
 Use JSONB only for:
 1. End-user specialization (custom fields)
 2. Third-party metadata (opaque payloads)
 3. Payload-as-truth (versioning snapshots)
 4. Subordinate composition (embedded entities without independent lifecycle)
 
-**Seed Data:**
+#### 4.1.3 Seed Data
 Initial catalog values for `Services` and `AssetTypes` are defined in `documentation/foundation/data-lists.md`. These should be loaded via a dedicated seed migration after schema creation.
 
-**Example Seed Migration:**
+#### 4.1.4 Example Seed Migration
 ```sql
 -- Load canonical service catalog
 INSERT INTO services (id, name, sku, category, created_at, updated_at) VALUES
@@ -189,7 +189,7 @@ INSERT INTO services (id, name, sku, category, created_at, updated_at) VALUES
 
 Authorization is enforced at the **database layer** via RLS policies, not application code.
 
-**Policy Pattern:**
+#### 4.2.1 Policy Pattern
 ```sql
 -- Example: Users can only see their own job logs
 CREATE POLICY "job_logs_select_own"
@@ -204,7 +204,7 @@ WITH CHECK (
 );
 ```
 
-**RLS Principles:**
+#### 4.2.2 RLS Principles
 - Policies live in migrations (single source of truth)
 - Cannot be bypassed by client code
 - Automatic enforcement across all access paths
@@ -259,7 +259,7 @@ export function fromJob(job: Job): Dictionary {
 }
 ```
 
-**Adapter Rules:**
+#### 5.1.1 Adapter Rules
 - File naming: `{abstraction}-adapter.ts`
 - Functions: `to{Abstraction}(dict)` and `from{Abstraction}(abstraction)`
 - Shared by edge functions and UX SDK clients
@@ -292,7 +292,7 @@ Backend environment files follow the package naming convention:
 - `back-stage.env` - Staging environment (gitignored)
 - `back-prod.env` - Production environment (gitignored)
 
-**Example:**
+#### 6.2.1 Example
 ```bash
 # back-local.env.example
 SUPABASE_URL=https://your-project.supabase.co
@@ -322,18 +322,18 @@ See `architecture-core.md` Section 6 for the complete configuration pattern and 
 
 Backend testing focuses on:
 
-**Adapter Tests:**
+### 7.1 Adapter Tests
 - Verify `to{Abstraction}` and `from{Abstraction}` roundtrip correctly
 - Test edge cases (missing optional fields, invalid types)
 - Located in `source/tests/`
 
-**Integration Tests:**
+### 7.2 Integration Tests
 - Test edge functions against local Supabase instance
 - Verify RLS policies enforce authorization correctly
 - Test multi-user scenarios
 - Located in `source/tests/`
 
-**Migration Tests:**
+### 7.3 Migration Tests
 - Verify migrations apply cleanly (up and down)
 - Test RLS policies with different user contexts
 - Automated via `supabase test db`
@@ -347,7 +347,7 @@ Functions deploy via Supabase CLI:
 supabase functions deploy job-deep-clone
 ```
 
-**Import Map:**
+#### 8.1.1 Import Map
 Platform-specific import map required for edge runtime:
 - `supabase-import-map.json` - Synchronized with `deno.jsonc`
 
@@ -358,7 +358,7 @@ Migrations deploy via Supabase CLI:
 supabase db push
 ```
 
-**Migration Safety:**
+#### 8.2.1 Migration Safety
 - Always test migrations locally first (`supabase db reset`)
 - Verify RLS policies in staging environment
 - Never modify deployed migrations (create new ones)
@@ -389,7 +389,7 @@ const handler = async (input: Dictionary): Promise<Dictionary> => {
 }
 ```
 
-**Validation Flow:**
+#### 9.3.1 Validation Flow
 1. Edge function validates input using domain validators
 2. Adapters convert to domain types (assumes valid input)
 3. RLS policies enforce authorization at database
@@ -405,4 +405,4 @@ const handler = async (input: Dictionary): Promise<Dictionary> => {
 6. **Soft delete everywhere** - Except append-only logs and pure joins
 7. **Functions stay flat** - No subdirectories (platform requirement)
 
-**End of Architecture Backend Document**
+_End of Architecture Backend Document_
