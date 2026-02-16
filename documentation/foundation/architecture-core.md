@@ -338,9 +338,109 @@ Supabase Edge Functions handle **complex orchestration** that cannot be expresse
 
 Edge functions are **thin orchestration wrappers** implemented using provider makers (covered in `architecture-back.md`).
 
-## 6. Dependency Direction & Authority
+## 6. Configuration Management
 
-### 6.1 Canonical Sources of Truth
+### 6.1 Runtime Configuration Pattern
+
+The system uses a **singleton configuration pattern** with runtime-specific providers. The `Config` singleton lives in `@core/runtime/config.ts` and is initialized by each deployment package with the appropriate provider.
+
+**Design Principles:**
+- **Core defines the singleton** - Configuration abstraction lives in lowest layer
+- **Packages inject providers** - Higher layers supply runtime-specific implementations
+- **Dependencies flow downward** - Core has no knowledge of specific providers
+
+### 6.2 Configuration Provider Interface
+
+Runtime providers implement the `RuntimeProvider` interface:
+```typescript
+// source/core/runtime/runtime-provider.ts
+export interface RuntimeProvider {
+  get(key: string): string | undefined
+}
+```
+
+**Available Providers:**
+- `SupabaseProvider` - Supabase Edge Functions runtime (`@core/runtime/supabase-provider.ts`)
+- `DenoProvider` - Deno development/testing runtime (`@core/runtime/deno-provider.ts`)
+- *(Additional providers as needed for other runtimes)*
+
+### 6.3 Package Configuration Pattern
+
+Each deployment package creates a configuration module that:
+1. Imports the `Config` singleton from `@core/runtime/config.ts`
+2. Creates the appropriate runtime provider
+3. Initializes with required environment variables
+4. Re-exports the configured singleton
+
+**Example:**
+```typescript
+// source/back/supabase-edge/config/supabase-config.ts
+import { Config } from '@core/runtime/config.ts'
+import { SupabaseProvider } from '@core/runtime/supabase-provider.ts'
+
+// Initialize the core singleton with Supabase runtime provider
+Config.init(new SupabaseProvider(), [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_KEY',
+  'JWT_SECRET'
+])
+
+// Re-export the configured singleton
+export { Config }
+```
+
+### 6.4 Usage Pattern
+
+Code within a package always imports from the package-local configuration module:
+```typescript
+// Import from package config using alias (CORRECT)
+import { Config } from '@back-supabase-edge/config/config.ts'
+const url = Config.get('SUPABASE_URL')
+
+// Never use relative paths climbing namespace tree (INCORRECT)
+// ❌ import { Config } from '../config/config.ts'
+
+// Never import Config directly from core (INCORRECT)
+// ❌ import { Config } from '@core/runtime/config.ts'
+```
+
+### 6.5 Environment Files
+
+Each package maintains environment-specific configuration files:
+
+**Naming Convention:**
+- `{package}-local.env.example` - Template with placeholder values
+- `{package}-local.env` - Local development (gitignored)
+- `{package}-stage.env` - Staging environment (gitignored)
+- `{package}-prod.env` - Production environment (gitignored)
+
+**Example:**
+```bash
+# back-local.env.example
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_KEY=your-service-key-here
+JWT_SECRET=your-jwt-secret-here
+```
+
+**Security:**
+- Never commit actual `.env` files (only `.env.example` templates)
+- Use platform-specific secret management in production
+- Rotate secrets regularly
+
+### 6.6 Why This Works
+
+This pattern allows:
+- **Core utilities to access configuration** - Config singleton available at lowest layer
+- **Proper dependency flow** - Higher layers inject providers, core doesn't know about them
+- **Runtime flexibility** - Same code works across Deno, Supabase, Netlify, browser
+- **Type safety** - Required keys declared at initialization, missing keys fail fast
+- **Testability** - Mock providers for testing without environment dependencies
+
+**Key Insight:** Configuration is declared in higher layers (packages) but accessible in lower layers (core) through dependency injection, maintaining proper architectural boundaries.
+
+## 7. Dependency Direction & Authority
+
+### 7.1 Canonical Sources of Truth
 
 In order of authority:
 
@@ -353,7 +453,7 @@ In order of authority:
 
 All code, schemas, and infrastructure are derived artifacts. If code conflicts with these documents, the code is wrong.
 
-### 6.2 Dependency Rules
+### 7.2 Dependency Rules
 ```
 tests/devops  ──> ux, back, domain, core
   ↓
@@ -392,9 +492,6 @@ swarmag/
 │   │   └── validators/
 │   ├── back/
 │   │   ├── migrations/
-│   │   ├── netlify-edge/
-│   │   │   ├── config/
-│   │   │   └── functions/
 │   │   ├── supabase-edge/
 │   │   │   ├── config/
 │   │   │   └── functions/
@@ -432,8 +529,7 @@ swarmag/
     "@ux-api": "./source/ux/api/api.ts",
 
     // Backend namespaces
-    "@back-netlify-functions/": "./source/back/netlify-edge/functions/",
-    "@back-supabase-functions/": "./source/back/supabase-edge/functions/",
+    "@back-supabase-edge/": "./source/back/supabase-edge/",
 
     // UX application namespaces
     "@ux-app-ops/": "./source/ux/app-ops/",
