@@ -42,11 +42,11 @@ This section defines the core domain model of the system. It establishes the fun
 
 The domain model is implemented as a TypeScript library under `source/domain`. It is the authoritative source of meaning for the system. The domain model is composed of `abstractions`, `adapters`, `validators`, and `protocols`.
 
-| Domain         | Description                                                                                           |
-| -------------- | ----------------------------------------------------------------------------------------------------- |
-| `abstractions` | Core domain types and interfaces representing business entities and their relationships               |
-| `adapters`     | Serialization logic converting between storage/transport representations and domain abstractions      |
-| `validators`   | Validation logic ensuring data integrity at system boundaries (both ingress and egress)               |
+| Domain         | Description                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------- |
+| `abstractions` | Core domain types and interfaces representing business entities and their relationships                    |
+| `adapters`     | Serialization logic converting between storage/transport representations and domain abstractions           |
+| `validators`   | Validation logic ensuring data integrity at system boundaries (both ingress and egress)                    |
 | `protocols`    | Partial and essential abstraction state definitions for boundary transmission (creation, updates, queries) |
 
 All architectural, API, persistence, and user-interface concerns are derived from and constrained by this model. They consume these types rather than redefining or reshaping them.
@@ -152,14 +152,14 @@ The domain layer follows an abstraction-per-file pattern across three subdirecto
 - Abstraction-specific types belong with their owning abstraction (e.g., `User` in `user.ts`).
 - Pure value objects and shared subordinate types (Location, Note, Attachment) live in `common.ts`.
 - Concept-owning types live with their owner (e.g., Question and Answer in `workflow.ts`).
-- Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-client.ts`.
+- Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-contract.ts`.
 - Shared validators (e.g., `isNonEmptyString` & `isIdArray`) live in `@domain/validators/helper-validator.ts`.
 
 ### 2.9 Data Dictionary
 
 The following sections define the domain types and shape constraints from `@domain/abstractions`.
 
-#### 2.9.1 Core (`@core-std`)
+#### 2.9.1 Core Standard (`@core-std`)
 
 ```text
 ID (alias)

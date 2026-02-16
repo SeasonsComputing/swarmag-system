@@ -93,6 +93,7 @@ Execution logs are immutable records of reality. They are never updated or delet
 #### 3.2.3 Supabase Edge Functions
 
 Edge functions must remain flat in a single directory due to platform discovery requirements:
+
 - `source/back/supabase-edge/functions/`
 
 No subdirectories under `functions/`. Each function is a single file.
@@ -111,6 +112,7 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
 ##### 3.2.4.2 Platform-Specific Import Maps
 
 Development and local execution use `deno.jsonc` import map. Platform edge functions require platform-specific import maps:
+
 - Supabase Edge Functions: `supabase-import-map.json` (synchronized with `deno.jsonc`)
 
 Import maps must be kept in sync manually. Path aliases use root-relative paths for consistency across environments.
@@ -140,13 +142,13 @@ All lifecycled entities support soft delete via `deletedAt?: When`. Hard deletes
 
 The system consists of five primary components:
 
-| Component                  | Purpose                                        | Technology         |
-| -------------------------- | ---------------------------------------------- | ------------------ |
-| **Ops PWA**                | Offline-first field execution (installed app)  | SolidJS, IndexedDB |
-| **Admin PWA**              | Management and configuration (installed app)   | SolidJS            |
-| **Customer Portal**        | Customer-facing scheduling and status (static) | SolidJS            |
-| **Backend Orchestration**  | Edge Functions for complex operations          | Supabase Edge      |
-| **Persistent Storage**     | PostgreSQL with Row Level Security             | Supabase           |
+| Component                 | Purpose                                        | Technology         |
+| ------------------------- | ---------------------------------------------- | ------------------ |
+| **Ops PWA**               | Offline-first field execution (installed app)  | SolidJS, IndexedDB |
+| **Admin PWA**             | Management and configuration (installed app)   | SolidJS            |
+| **Customer Portal**       | Customer-facing scheduling and status (static) | SolidJS            |
+| **Backend Orchestration** | Edge Functions for complex operations          | Supabase Edge      |
+| **Persistent Storage**    | PostgreSQL with Row Level Security             | Supabase           |
 
 UX applications compose their API namespace (`@ux-api`) using client makers that connect directly to Supabase or IndexedDB.
 
@@ -169,11 +171,12 @@ The API namespace is a **composed interface** built from domain abstractions usi
 #### 5.1.1 Core Principle
 
 The API is not a fixed interface or protocol—it is a **composition pattern** where applications declare their operational requirements by selecting appropriate client makers for each domain abstraction.
+
 ```typescript
 // source/ux/api/api.ts
-import { makeCrudRdbmsClient } from '@core/api/client-crud-supabase.ts'
-import { makeCrudIndexedDbClient } from '@core/api/client-crud-indexeddb.ts'
 import { makeBusRuleHttpClient } from '@core/api/client-busrule-http.ts'
+import { makeCrudIndexedDbClient } from '@core/api/client-crud-indexeddb.ts'
+import { makeCrudRdbmsClient } from '@core/api/client-crud-supabase.ts'
 
 // API namespace composed from client makers
 export const api = {
@@ -192,17 +195,18 @@ export const api = {
 #### 5.1.2 Key Properties
 
 - **Domain-driven** - API surface mirrors domain model, not storage technology
-- **Contract-based** - All clients conform to `ApiClientCrud` or `ApiClientBusRule` contracts
+- **Contract-based** - All clients conform to `ApiCrudContract` or `ApiBusRuleContract` contracts
 - **Composition over abstraction** - Select bindings explicitly rather than runtime provider switching
 - **Type-safe** - Full TypeScript typing from domain through to storage
 
 ### 5.2 Client Contracts
 
-The system defines two client contracts (in `source/core/api/client-crud-contract.ts`):
+The system defines two client contracts (in `source/core/api/api-contract.ts`):
 
 #### 5.2.1 CRUD Contract
+
 ```typescript
-interface ApiClientCrud<T, TCreate, TUpdate> {
+interface ApiCrudContract<T, TCreate, TUpdate> {
   create(input: TCreate): Promise<T>
   get(id: ID): Promise<T>
   update(input: TUpdate): Promise<T>
@@ -216,13 +220,15 @@ type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
 ```
 
 #### 5.2.2 Business Rule Contract
+
 ```typescript
-interface ApiClientBusRule {
+interface ApiBusRuleContract {
   run(input: Dictionary): Promise<Dictionary>
 }
 ```
 
 #### 5.2.3 Error Propagation
+
 ```typescript
 class ApiError extends Error {
   constructor(
@@ -234,6 +240,7 @@ class ApiError extends Error {
 ```
 
 All client makers throw `ApiError` on failures. Applications handle errors uniformly:
+
 ```typescript
 try {
   const user = await api.Users.get(userId)
@@ -258,16 +265,17 @@ These contracts ensure **uniform interfaces** regardless of underlying storage o
 
 Client makers are factory functions that produce clients conforming to contracts:
 
-| Maker                        | Contract          | Purpose                              | Implementation        |
-| ---------------------------- | ----------------- | ------------------------------------ | --------------------- |
-| `makeCrudRdbmsClient<T>()`   | `ApiClientCrud`   | Direct Supabase SDK access           | PostgreSQL via RLS    |
-| `makeCrudIndexedDbClient<T>()` | `ApiClientCrud` | Offline local storage                | Browser IndexedDB     |
-| `makeCrudHttpClient<T>()`    | `ApiClientCrud`   | HTTP calls to edge functions         | Fetch API             |
-| `makeBusRuleHttpClient()`    | `ApiClientBusRule` | Orchestration via edge functions     | Fetch API             |
+| Maker                          | Contract             | Purpose                          | Implementation     |
+| ------------------------------ | -------------------- | -------------------------------- | ------------------ |
+| `makeCrudRdbmsClient<T>()`     | `ApiCrudContract`    | Direct Supabase SDK access       | PostgreSQL via RLS |
+| `makeCrudIndexedDbClient<T>()` | `ApiCrudContract`    | Offline local storage            | Browser IndexedDB  |
+| `makeCrudHttpClient<T>()`      | `ApiCrudContract`    | HTTP calls to edge functions     | Fetch API          |
+| `makeBusRuleHttpClient()`      | `ApiBusRuleContract` | Orchestration via edge functions | Fetch API          |
 
 #### 5.3.1 Maker Pattern
 
 Each maker takes a specification object and returns a fully-typed client:
+
 ```typescript
 // CRUD maker
 const Users = makeCrudRdbmsClient<User, UserCreateInput, UserUpdateInput>({
@@ -283,6 +291,7 @@ await cloneJob.run({ jobId: 'job-123' })
 ### 5.4 Application Usage
 
 UX applications import the composed API namespace:
+
 ```typescript
 import { api } from '@ux-api'
 
@@ -298,11 +307,13 @@ const result = await api.deepCloneJob.run({ jobId })
 ```
 
 #### 5.4.1 Applications never
+
 - Import storage libraries directly (`@supabase-client`, IndexedDB APIs)
 - Branch on storage technology
 - Know implementation details of client makers
 
 #### 5.4.2 Applications always
+
 - Import from `@ux-api` namespace
 - Work with domain types
 - Handle `ApiError` for failures
@@ -310,6 +321,7 @@ const result = await api.deepCloneJob.run({ jobId })
 ### 5.5 Authorization Model
 
 Authorization is enforced at the **database layer** via Supabase Row Level Security (RLS) policies:
+
 ```sql
 -- Example RLS policy
 CREATE POLICY "users_own_data"
@@ -318,6 +330,7 @@ USING (created_by_id = auth.uid());
 ```
 
 #### 5.5.1 Benefits
+
 - Authorization rules live in migrations (single source of truth)
 - Cannot be bypassed by client code
 - Automatic enforcement across all access paths
@@ -328,11 +341,13 @@ USING (created_by_id = auth.uid());
 Supabase Edge Functions handle **complex orchestration** that cannot be expressed as simple CRUD operations.
 
 #### 5.6.1 When to use
+
 - Multi-step transactions requiring coordination
 - Operations with complex business rules
 - Deep cloning (copying complete Job aggregate with related entities)
 
 #### 5.6.2 When NOT to use
+
 - Simple CRUD operations (use direct Supabase SDK client)
 - Read-only queries (use direct Supabase SDK client)
 
@@ -345,6 +360,7 @@ Edge functions are **thin orchestration wrappers** implemented using provider ma
 The system uses a **singleton configuration pattern** with runtime-specific providers. The `Config` singleton lives in `@core/runtime/config.ts` and is initialized by each deployment package with the appropriate provider.
 
 #### 6.1.1 Design Principles
+
 - **Core defines the singleton** - Configuration abstraction lives in lowest layer
 - **Packages inject providers** - Higher layers supply runtime-specific implementations
 - **Dependencies flow downward** - Core has no knowledge of specific providers
@@ -352,6 +368,7 @@ The system uses a **singleton configuration pattern** with runtime-specific prov
 ### 6.2 Configuration Provider Interface
 
 Runtime providers implement the `RuntimeProvider` interface:
+
 ```typescript
 // source/core/runtime/runtime-provider.ts
 export interface RuntimeProvider {
@@ -360,19 +377,22 @@ export interface RuntimeProvider {
 ```
 
 #### 6.2.1 Available Providers
+
 - `SupabaseProvider` - Supabase Edge Functions runtime (`@core/runtime/supabase-provider.ts`)
 - `DenoProvider` - Deno development/testing runtime (`@core/runtime/deno-provider.ts`)
-- *(Additional providers as needed for other runtimes)*
+- _(Additional providers as needed for other runtimes)_
 
 ### 6.3 Package Configuration Pattern
 
 Each deployment package creates a configuration module that:
+
 1. Imports the `Config` singleton from `@core/runtime/config.ts`
 2. Creates the appropriate runtime provider
 3. Initializes with required environment variables
 4. Re-exports the configured singleton
 
 #### 6.3.1 Example
+
 ```typescript
 // source/back/supabase-edge/config/supabase-config.ts
 import { Config } from '@core/runtime/config.ts'
@@ -392,16 +412,25 @@ export { Config }
 ### 6.4 Usage Pattern
 
 Code within a package always imports from the package-local configuration module:
+
 ```typescript
 // Import from package config using alias (CORRECT)
 import { Config } from '@back-supabase-edge/config/config.ts'
 const url = Config.get('SUPABASE_URL')
 
+// It's ok for configs to be shared across packages
+// This same config is bundled with each deployment package
+// 
+import { Config } from '@ux/config/config.ts'
+const url = Config.get('SUPABASE_URL')
+
+
 // Never use relative paths climbing namespace tree (INCORRECT)
 // ❌ import { Config } from '../config/config.ts'
-
-// Never import Config directly from core (INCORRECT)
-// ❌ import { Config } from '@core/runtime/config.ts'
+ 
+// When lower layers unaware of which package they've been 
+// imported into require config, user `core` runtime config
+import { Config } from '@core/runtime/config.ts'
 ```
 
 ### 6.5 Environment Files
@@ -409,12 +438,14 @@ const url = Config.get('SUPABASE_URL')
 Each package maintains environment-specific configuration files:
 
 #### 6.5.1 Naming Convention
+
 - `{package}-local.env.example` - Template with placeholder values
 - `{package}-local.env` - Local development (gitignored)
 - `{package}-stage.env` - Staging environment (gitignored)
 - `{package}-prod.env` - Production environment (gitignored)
 
 #### 6.5.2 Example
+
 ```bash
 # back-local.env.example
 SUPABASE_URL=https://your-project.supabase.co
@@ -423,6 +454,7 @@ JWT_SECRET=your-jwt-secret-here
 ```
 
 #### 6.5.3 Security
+
 - Never commit actual `.env` files (only `.env.example` templates)
 - Use platform-specific secret management in production
 - Rotate secrets regularly
@@ -430,6 +462,7 @@ JWT_SECRET=your-jwt-secret-here
 ### 6.6 Why This Works
 
 This pattern allows:
+
 - **Core utilities to access configuration** - Config singleton available at lowest layer
 - **Proper dependency flow** - Higher layers inject providers, core doesn't know about them
 - **Runtime flexibility** - Same code works across Deno, Supabase, Netlify, browser
@@ -454,10 +487,11 @@ In order of authority:
 All code, schemas, and infrastructure are derived artifacts. If code conflicts with these documents, the code is wrong.
 
 ### 7.2 Dependency Rules
-```
+
+```text
 tests/devops  ──> ux, back, domain, core
   ↓
-ux            ──> domain, core
+ ux           ──> domain, core
   ↓
 back          ──> domain, core
   ↓
@@ -473,12 +507,11 @@ These rules are enforced through import discipline and architectural guards. Vio
 ## 7. Directory Structure
 
 ```text
-swarmag/
+swarmag-system/
 ├── deploy/
 ├── documentation/
 │   ├── foundation/
-│   ├── applications/
-│   └── archive/
+│   └── applications/
 ├── source/
 │   ├── core/
 │   │   ├── api/
@@ -516,7 +549,10 @@ swarmag/
 ```jsonc
 {
   "imports": {
-    // Top-level namespace
+    // ────────────────────────────────────────────────────────────────────────────
+    // Primary Top-level Aliases
+    // ────────────────────────────────────────────────────────────────────────────
+  
     "@core/": "./source/core/",
     "@domain/": "./source/domain/",
     "@back": "./source/back/",
@@ -524,20 +560,27 @@ swarmag/
     "@devops": "./source/devops/",
     "@tests": "./source/tests/",
 
-    // Convenience barrels
+    // ────────────────────────────────────────────────────────────────────────────
+    // Convenience Barrel Aliases
+    // ────────────────────────────────────────────────────────────────────────────
+
     "@core-std": "./source/core/std/std.ts",
     "@ux-api": "./source/ux/api/api.ts",
 
-    // Backend namespaces
-    "@back-supabase-edge/": "./source/back/supabase-edge/",
+    // ────────────────────────────────────────────────────────────────────────────
+    // Package Aliases
+    // ────────────────────────────────────────────────────────────────────────────
 
-    // UX application namespaces
+    "@back-supabase-edge/": "./source/back/supabase-edge/",
     "@ux-app-ops/": "./source/ux/app-ops/",
     "@ux-app-admin/": "./source/ux/app-admin/",
     "@ux-app-customer/": "./source/ux/app-customer/",
     "@ux-app-common/": "./source/ux/app-common/",
+    
+    // ────────────────────────────────────────────────────────────────────────────
+    // Vendor Aliases
+    // ────────────────────────────────────────────────────────────────────────────
 
-    // Vendor namespaces
     "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
   }
 }
@@ -552,12 +595,14 @@ Field operations must be fully executable without network connectivity. The Ops 
 When a Job is ready for field execution, the complete Job aggregate is cloned to local IndexedDB storage:
 
 #### 8.1.1 What Gets Cloned
+
 - Job entity
 - JobAssessment (with locations, questions, risks, attachments)
 - JobPlan (with assignments, chemicals, assets, target locations)
 - Related domain data (Users, Workflows, Assets, Chemicals)
 
 #### 8.1.2 Clone Operation
+
 ```typescript
 // Orchestration edge function creates complete local copy
 const localJob = await api.deepCloneJob.run({ jobId: 'job-123' })
@@ -569,6 +614,7 @@ const plan = await api.JobPlansLocal.get(job.planId)
 ```
 
 #### 8.1.3 Key Properties
+
 - Complete Job aggregate copied to IndexedDB before field deployment
 - All referenced entities (users, workflows, assets) included
 - Job Plan locked during execution (no remote modifications)
@@ -579,6 +625,7 @@ const plan = await api.JobPlansLocal.get(job.planId)
 Field crews execute Jobs entirely from local storage:
 
 #### 8.2.1 Execution Pattern
+
 ```typescript
 import { api } from '@ux-api'
 
@@ -598,6 +645,7 @@ await api.JobLogsLocal.create({
 ```
 
 #### 8.2.2 Characteristics
+
 - Zero network dependency during execution
 - Append-only logs prevent conflicts
 - Plan is immutable (read-only during execution)
@@ -608,14 +656,15 @@ await api.JobLogsLocal.create({
 After field work completes, logs are uploaded in bulk. This is **not synchronization**—it's a one-way append operation:
 
 #### 8.3.1 Upload Pattern
+
 ```typescript
 // When connectivity returns
 const logs = await api.JobLogsLocal.list({ jobId })
 
 // Bulk append to remote (orchestration edge function)
-await api.uploadJobLogs.run({ 
+await api.uploadJobLogs.run({
   jobId,
-  logs: logs.data 
+  logs: logs.data
 })
 
 // Optional: Clear local storage after successful upload
@@ -623,6 +672,7 @@ await api.JobsLocal.delete(jobId)
 ```
 
 #### 8.3.2 No Conflict Resolution
+
 - Logs are append-only (no updates to reconcile)
 - Job Plan was locked during execution (no remote changes)
 - Timestamps and user IDs establish ordering
@@ -633,6 +683,7 @@ await api.JobsLocal.delete(jobId)
 This pattern eliminates sync complexity:
 
 #### 8.4.1 What We Avoid
+
 - Conflict resolution algorithms
 - Operational transform logic
 - Last-write-wins semantics
@@ -640,6 +691,7 @@ This pattern eliminates sync complexity:
 - Network partition handling
 
 #### 8.4.2 What We Gain
+
 - Guaranteed offline execution
 - Simple append-only semantics
 - Clear operational boundaries
@@ -726,6 +778,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 ### 9.2 Enforcement
 
 These invariants are enforced through:
+
 - Import discipline (developer responsibility)
 - Architectural guards (`source/devops/guards/`)
 - Type system constraints (TypeScript strict mode)
@@ -754,15 +807,20 @@ New clients are added by composing makers in the `@ux-api` namespace:
 4. **Test full lifecycle** - Verify create, read, update, delete, list operations
 
 #### 10.2.1 Example
+
 ```typescript
 // source/ux/api/api.ts
 import { makeCrudRdbmsClient } from '@core/api/client-crud-supabase.ts'
 
 export const api = {
   // ... existing clients
-  
+
   // New domain abstraction
-  Services: makeCrudRdbmsClient<Service, ServiceCreateInput, ServiceUpdateInput>({
+  Services: makeCrudRdbmsClient<
+    Service,
+    ServiceCreateInput,
+    ServiceUpdateInput
+  >({
     table: 'services'
   })
 }

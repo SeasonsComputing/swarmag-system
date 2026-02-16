@@ -220,6 +220,10 @@ FETCH REQUEST-RESPONSE FLOW:
     → Always returns { error: string, details?: string }
 `*/
 
+// ───────────────────────────────────────────────────────────────────────────────
+// PUBLIC EXPORTS
+// ───────────────────────────────────────────────────────────────────────────────
+
 /** HTTP header map for responses/requests. */
 export type HttpHeaders = Record<string, string>
 
@@ -235,9 +239,6 @@ export type HttpMethod =
   | 'DELETE'
   | 'OPTIONS'
   | 'HEAD'
-
-/** HTTP method set for validation. */
-const HttpMethodSet = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'] as const
 
 /**
  * Type guard for supported HTTP method strings.
@@ -314,17 +315,6 @@ export type HttpHandler<
 ) =>
   | Promise<HttpResponse<ResponseBody>>
   | HttpResponse<ResponseBody>
-
-/**
- * Extract error message from unknown error value.
- * @param err Unknown error value.
- * @returns Error message string.
- */
-const extractErrorMessage = (err: unknown): string => {
-  if (err instanceof Error) return err.message
-  if (typeof err === 'string') return err
-  return String(err)
-}
 
 /**
  * Build a 200 OK response with data payload.
@@ -416,12 +406,6 @@ export interface HttpHandlerConfig {
 }
 
 /**
- * HTTP methods that typically include request bodies.
- */
-const METHODS_WITH_BODY = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE'])
-const DEFAULT_MAX_BODY_SIZE = 6 * 1024 * 1024
-
-/**
  * Error with a stable name for adapter failures.
  */
 export class NamedError extends Error {
@@ -430,6 +414,120 @@ export class NamedError extends Error {
     this.name = name
   }
 }
+
+/**
+ * Build a standardized error response envelope.
+ * @param statusCode HTTP status code.
+ * @param error Error name or label.
+ * @param details Error details string.
+ * @param config Adapter configuration.
+ * @returns Fetch Response.
+ */
+export const makeErrorResponse = (
+  statusCode: number,
+  error: string,
+  details: string,
+  config: HttpHandlerConfig = {}
+): Response => makeResponse(statusCode, { error, details }, {}, config)
+
+/**
+ * Adapt a typed HTTP handler to the Request/Response contract.
+ *
+ * @template RequestBody Request body type (for documentation only - validated by handler).
+ * @template Query Query parameters type (for documentation only - validated by handler).
+ * @template ResponseBody Response body type.
+ * @param handle Typed handler to wrap. Must validate its own inputs.
+ * @param config Optional adapter configuration for CORS, validation, etc.
+ * @returns HTTP handler ready for export.
+ */
+export const wrapHttpHandler = <
+  RequestBody = unknown,
+  Query = HttpQuery,
+  ResponseBody = unknown
+>(
+  handler: HttpHandler<RequestBody, Query, ResponseBody>,
+  config: HttpHandlerConfig = {}
+): HttpHandler => {
+  return async (request: Request): Promise<Response> => {
+    try {
+      //
+      // Validate & Normalize Request
+      //
+
+      const method = request.method
+
+      if (method === 'OPTIONS' && config.cors) {
+        return makeResponse(HttpCodes.noContent, '', {}, config)
+      }
+
+      if (!isHttpMethod(method)) {
+        return makeErrorResponse(HttpCodes.methodNotAllowed, 'MethodNotAllowed',
+          `HTTP method '${method}' is not supported`, config)
+      }
+
+      const headers = normalizeHeaders(request.headers)
+
+      let body: unknown
+      try {
+        body = await parseRequestBody(request, method, headers['content-type'], config)
+      } catch (err) {
+        const { name, message } = serializeError(err)
+        const statusCode = name === 'PayloadTooLarge'
+          ? HttpCodes.payloadTooLarge
+          : HttpCodes.badRequest
+        return makeErrorResponse(statusCode, name, message, config)
+      }
+
+      const url = new URL(request.url)
+      const query = normalizeQuery(url.searchParams, config.multiValueQueryParams ?? false)
+
+      const HttpRequest: HttpRequest<RequestBody, Query, HttpHeaders> = {
+        method,
+        body: body as RequestBody,
+        query: query as Query,
+        headers,
+        rawRequest: request
+      }
+
+      //
+      // Delegate to the handler function
+      //
+
+      const result: HttpResponse<ResponseBody, HttpHeaders> = await handler(HttpRequest)
+
+      const statusCode = validateStatusCode(result.statusCode)
+      return makeResponse(statusCode, result.body, result.headers, config)
+    } catch (err) {
+      const { name, message } = serializeError(err)
+      console.error('Unhandled error in HTTP handler:', { name, message, err })
+      return makeErrorResponse(HttpCodes.internalError, name, message, config)
+    }
+  }
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// PRIVATE IMPLEMENTATION
+// ───────────────────────────────────────────────────────────────────────────────
+
+/** HTTP method set for validation. */
+const HttpMethodSet = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'] as const
+
+/**
+ * Extract error message from unknown error value.
+ * @param err Unknown error value.
+ * @returns Error message string.
+ */
+const extractErrorMessage = (err: unknown): string => {
+  if (err instanceof Error) return err.message
+  if (typeof err === 'string') return err
+  return String(err)
+}
+
+/**
+ * HTTP methods that typically include request bodies.
+ */
+const METHODS_WITH_BODY = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE'])
+const DEFAULT_MAX_BODY_SIZE = 6 * 1024 * 1024
 
 /**
  * Normalize HTTP headers to lowercase keys for case-insensitive access.
@@ -694,86 +792,4 @@ const makeResponse = (
       ...normalizedResponseHeaders
     })
   })
-}
-
-/**
- * Build a standardized error response envelope.
- * @param statusCode HTTP status code.
- * @param error Error name or label.
- * @param details Error details string.
- * @param config Adapter configuration.
- * @returns Fetch Response.
- */
-export const makeErrorResponse = (
-  statusCode: number,
-  error: string,
-  details: string,
-  config: HttpHandlerConfig = {}
-): Response => makeResponse(statusCode, { error, details }, {}, config)
-
-/**
- * Adapt a typed HTTP handler to the Request/Response contract.
- *
- * @template RequestBody Request body type (for documentation only - validated by handler).
- * @template Query Query parameters type (for documentation only - validated by handler).
- * @template ResponseBody Response body type.
- * @param handle Typed handler to wrap. Must validate its own inputs.
- * @param config Optional adapter configuration for CORS, validation, etc.
- * @returns HTTP handler ready for export.
- */
-export const wrapHttpHandler = <
-  RequestBody = unknown,
-  Query = HttpQuery,
-  ResponseBody = unknown
->(
-  handle: HttpHandler<RequestBody, Query, ResponseBody>,
-  config: HttpHandlerConfig = {}
-): HttpHandler => {
-  return async (request: Request): Promise<Response> => {
-    try {
-      const method = request.method
-
-      if (method === 'OPTIONS' && config.cors) {
-        return makeResponse(HttpCodes.noContent, '', {}, config)
-      }
-
-      if (!isHttpMethod(method)) {
-        return makeErrorResponse(HttpCodes.methodNotAllowed, 'MethodNotAllowed',
-          `HTTP method '${method}' is not supported`, config)
-      }
-
-      const headers = normalizeHeaders(request.headers)
-
-      let body: unknown
-      try {
-        body = await parseRequestBody(request, method, headers['content-type'], config)
-      } catch (err) {
-        const { name, message } = serializeError(err)
-        const statusCode = name === 'PayloadTooLarge'
-          ? HttpCodes.payloadTooLarge
-          : HttpCodes.badRequest
-        return makeErrorResponse(statusCode, name, message, config)
-      }
-
-      const url = new URL(request.url)
-      const query = normalizeQuery(url.searchParams, config.multiValueQueryParams ?? false)
-
-      const HttpRequest: HttpRequest<RequestBody, Query, HttpHeaders> = {
-        method,
-        body: body as RequestBody,
-        query: query as Query,
-        headers,
-        rawRequest: request
-      }
-
-      const result: HttpResponse<ResponseBody, HttpHeaders> = await handle(HttpRequest)
-      const statusCode = validateStatusCode(result.statusCode)
-
-      return makeResponse(statusCode, result.body, result.headers, config)
-    } catch (err) {
-      const { name, message } = serializeError(err)
-      console.error('Unhandled error in HTTP handler:', { name, message, err })
-      return makeErrorResponse(HttpCodes.internalError, name, message, config)
-    }
-  }
 }

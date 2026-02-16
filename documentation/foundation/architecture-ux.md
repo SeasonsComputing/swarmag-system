@@ -11,6 +11,7 @@ UX architectural patterns (component structure, state management, routing, etc.)
 ## 2. UX Applications
 
 ### 2.1 Directory Structure
+
 ```text
 ux/
 ├── api/
@@ -30,17 +31,19 @@ ux/
 
 The system includes three SolidJS applications:
 
-| Application | Purpose                                    | Primary Users      |
-| ----------- | ------------------------------------------ | ------------------ |
-| **Admin**   | Management and configuration               | Internal staff     |
-| **Ops**     | Field execution (offline-capable)          | Operations crews   |
-| **Customer**| Scheduling and status (read-only)          | Customers          |
+| Application  | Purpose                           | Primary Users    |
+| ------------ | --------------------------------- | ---------------- |
+| **Admin**    | Management and configuration      | Internal staff   |
+| **Ops**      | Field execution (offline-capable) | Operations crews |
+| **Customer** | Scheduling and status (read-only) | Customers        |
 
 #### 2.2.1 Shared Infrastructure
+
 - `source/ux/app-common/` - Shared components and utilities
 - All apps use SolidJS + TanStack + Kobalte + Vanilla CSS
 
 #### 2.2.2 Shared Infrastructure
+
 - `source/ux/app-common/` - Shared components and utilities
 - All apps use SolidJS + TanStack + Kobalte + Vanilla CSS
 
@@ -49,13 +52,14 @@ The system includes three SolidJS applications:
 ### 3.1 Single Composed API
 
 All UX applications consume the **same API namespace** defined in `source/ux/api/api.ts`:
+
 ```typescript
 import { api } from '@ux-api'
 
 // All apps use the same API
 const user = await api.Users.get(userId)
 const jobs = await api.Jobs.list()
-const localJob = await api.JobsLocal.get(jobId)  // Ops app uses this
+const localJob = await api.JobsLocal.get(jobId) // Ops app uses this
 ```
 
 The API namespace is composed once using client makers (Supabase SDK, IndexedDB, HTTP). Applications consume it directly without configuration or provider selection.
@@ -65,38 +69,45 @@ The API namespace is composed once using client makers (Supabase SDK, IndexedDB,
 The foundation provides:
 
 #### 3.2.1 Type Safety
+
 - Import domain types from `@domain/abstractions/`
 - All API operations return typed domain objects
 - TypeScript strict mode enforced
 
 #### 3.2.2 Storage Abstraction
+
 - Direct database access via RLS (no HTTP for CRUD)
 - Offline storage via IndexedDB (Ops app)
 - Orchestration via edge functions (complex operations)
 - Client makers handle all serialization
 
 #### 3.2.3 Offline Capability
+
 - `api.JobsLocal` (IndexedDB client) available to all apps
 - Ops app uses for field execution
 - Deep clone via `api.deepCloneJob` business rule
 - Log upload via `api.uploadJobLogs` business rule
 
 #### 3.2.4 Configuration
+
 - Per-app config module initializes `Config` singleton
 - Environment-specific `.env` files per deployment
 - See `architecture-core.md` Section 6 for pattern
-- 
+-
+
 ## 4. Architectural Boundaries
 
 ### 4.1 Import Discipline
 
 #### 4.1.1 UX applications MAY import
+
 - `@ux-api` - Composed API namespace
 - `@domain/abstractions/*` - Domain types
 - `@core-std` - Standard types (ID, When, Dictionary)
 - `@ux-app-common/*` - Shared UX components
 
 #### 4.1.2 UX applications MUST NOT import
+
 - `@core/api/*` - Client makers (use composed `@ux-api`)
 - `@core/db/*` - Database clients
 - `@back/*` - Backend edge functions
@@ -107,10 +118,11 @@ The foundation provides:
 ### 4.2 Configuration Pattern
 
 Each application has its own configuration module:
+
 ```typescript
 // source/ux/app-admin/config/config.ts
-import { Config } from '@core/runtime/config.ts'
 import { BrowserProvider } from '@core/runtime/browser-provider.ts'
+import { Config } from '@core/runtime/config.ts'
 
 Config.init(new BrowserProvider(), [
   'VITE_SUPABASE_URL',
@@ -121,6 +133,7 @@ export { Config }
 ```
 
 #### 4.2.1 Pattern
+
 - Import `Config` singleton from `@core/runtime/config.ts`
 - Initialize with browser provider and required keys
 - Re-export for use within the app
@@ -165,14 +178,14 @@ See `documentation/applications/` for current application requirements and user 
 
 ## 7. Technology Stack
 
-| Layer        | Technology                          |
-| ------------ | ----------------------------------- |
-| Framework    | SolidJS (reactive, compiled)        |
-| Data Fetching| TanStack Query                      |
-| UI Primitives| Kobalte (accessible components)     |
-| Styling      | Vanilla CSS (no preprocessor)       |
-| Build        | Vite                                |
-| Runtime      | Modern browsers (ES2022+)           |
+| Layer         | Technology                      |
+| ------------- | ------------------------------- |
+| Framework     | SolidJS (reactive, compiled)    |
+| Data Fetching | TanStack Query                  |
+| UI Primitives | Kobalte (accessible components) |
+| Styling       | Vanilla CSS (no preprocessor)   |
+| Build         | Vite                            |
+| Runtime       | Modern browsers (ES2022+)       |
 
 ## 8. Key Principles
 
