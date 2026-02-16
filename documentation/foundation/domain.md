@@ -42,16 +42,18 @@ This section defines the core domain model of the system. It establishes the fun
 
 The domain model is implemented as a TypeScript library under `source/domain`. It is the authoritative source of meaning for the system. The domain model is composed of `abstractions`, `adapters`, `validators`, and `protocols`.
 
-| Domain         | Description |
-| -------------- | ----------- |
-| `abstractions` | todo        |
-| `adapters`     | todo        |
-| `validators`   | todo        |
-| `protocols`    | todo        |
+| Domain         | Description                                                                                           |
+| -------------- | ----------------------------------------------------------------------------------------------------- |
+| `abstractions` | Core domain types and interfaces representing business entities and their relationships               |
+| `adapters`     | Serialization logic converting between storage/transport representations and domain abstractions      |
+| `validators`   | Validation logic ensuring data integrity at system boundaries (both ingress and egress)               |
+| `protocols`    | Partial and essential abstraction state definitions for boundary transmission (creation, updates, queries) |
 
 All architectural, API, persistence, and user-interface concerns are derived from and constrained by this model. They consume these types rather than redefining or reshaping them.
 
 `architecture-core.md` documents how the system is organized to support this domain model; it does not define the domain itself.
+
+**Adapter naming convention:** Adapters use `Dictionary` (or `dict`) rather than `row` or `record` to represent serialized forms. Functions follow the pattern `to{Abstraction}(dict: Dictionary)` and `from{Abstraction}(abstraction: Abstraction): Dictionary`. This emphasizes storage-agnostic serialization rather than database-specific terminology.
 
 ### 2.2 Core abstractions that define the domain
 
@@ -73,7 +75,7 @@ These abstractions describe **domain meaning**, not persistence, API shape, or u
 
 ### 2.3 Common abstractions shared within the model
 
-The following abstractions are shared across multiple domain concepts and represent either pure value objects or embedded subordinate compositions. They do not have independent lifecycles.
+The following abstractions are shared across multiple domain concepts and represent either pure value objects or embedded subordinate compositions. They do not have independent life-cycles.
 
 | Abstraction  | Module        | Description                                                        |
 | ------------ | ------------- | ------------------------------------------------------------------ |
