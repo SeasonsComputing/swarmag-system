@@ -6,15 +6,19 @@
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 /** Directories to scan for guard violations. */
-const TARGET_DIRS = [`${ROOT}/source`, `${ROOT}/devops`]
+const TARGET_DIRS = [`${ROOT}/source`]
 
 /** Directory names to skip during traversal. */
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
 /** Relative paths that are allowed to use Deno.env. */
 const ALLOWED_FILES = new Set([
-  'devops/scripts/env-guard.ts',
-  'source/utils/configure-deno.ts'
+  'source/devops/guard-env.ts',
+  'source/core/runtime/deno-provider.ts',
+  'source/core/runtime/supabase-provider.ts',
+  'source/core/runtime/browser-provider.ts',
+  // Current runtime provider filename in this repository.
+  'source/core/runtime/solid-provider.ts'
 ])
 
 /** Match direct Deno.env or Deno.test access. */
@@ -28,7 +32,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
     if (entry.isDirectory) {
       if (EXCLUDED_DIRS.has(entry.name)) continue
       entries.push(...await collectFiles(entryPath))
-    } else if (entry.isFile && (entry.name.endsWith('') || entry.name.endsWith('.tsx'))) {
+    } else if (entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
       entries.push(entryPath)
     }
   }
@@ -39,8 +43,22 @@ const collectFiles = async (dir: string): Promise<string[]> => {
 const lineNumber = (source: string, index: number): number =>
   source.slice(0, index).split('\n').length
 
+const exists = async (path: string): Promise<boolean> => {
+  try {
+    const info = await Deno.stat(path)
+    return info.isDirectory
+  } catch {
+    return false
+  }
+}
+
 const main = async () => {
-  const files = (await Promise.all(TARGET_DIRS.map(collectFiles))).flat()
+  const roots = []
+  for (const dir of TARGET_DIRS) {
+    if (await exists(dir)) roots.push(dir)
+  }
+
+  const files = (await Promise.all(roots.map(collectFiles))).flat()
   const violations: string[] = []
 
   for (const file of files) {

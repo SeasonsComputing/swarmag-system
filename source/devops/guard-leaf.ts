@@ -6,7 +6,7 @@
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 /** Directories to scan for leaf-only files. */
-const TARGET_DIRS = [`${ROOT}/source`, `${ROOT}/docs`, `${ROOT}/devops/scripts`]
+const TARGET_DIRS = [`${ROOT}/source`, `${ROOT}/documentation`]
 
 /** Directory names to skip during traversal. */
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
