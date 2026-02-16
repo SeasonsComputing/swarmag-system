@@ -25,7 +25,7 @@ export const isJobStatus = (value: unknown): value is JobStatus =>
   || value === 'cancelled'
 
 /** Map a domain Job into a Dictionary shape. */
-export const jobToRow = (job: Job) => ({
+export const fromJob = (job: Job): Dictionary => ({
   id: job.id,
   assessment_id: job.assessmentId,
   plan_id: job.planId,
@@ -41,16 +41,14 @@ export const jobToRow = (job: Job) => ({
  * Convert a Dictionary into a Job domain model.
  * Payload is truth - if present, use it directly.
  * Falls back to column mapping for legacy records.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped Job object.
  * @throws Error if required fields are missing.
  */
-export const rowToJob = (row: unknown): Job => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('Job row is missing required fields')
+export const toJob = (record: Dictionary): Job => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('Job dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -76,7 +74,7 @@ export const rowToJob = (row: unknown): Job => {
   const status = record.status
 
   if (!id || !assessmentId || !planId || !serviceId || !customerId || !isJobStatus(status)) {
-    throw new Error('Job row is missing required fields')
+    throw new Error('Job dictionary is missing required fields')
   }
 
   return {
@@ -92,7 +90,7 @@ export const rowToJob = (row: unknown): Job => {
 }
 
 /** Map a domain JobAssessment into a Dictionary shape. */
-export const jobAssessmentToRow = (assessment: JobAssessment) => ({
+export const fromJobAssessment = (assessment: JobAssessment): Dictionary => ({
   id: assessment.id,
   service_id: assessment.serviceId,
   customer_id: assessment.customerId,
@@ -111,16 +109,14 @@ export const jobAssessmentToRow = (assessment: JobAssessment) => ({
 
 /**
  * Convert a Dictionary into a JobAssessment domain model.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped JobAssessment object.
  * @throws Error if required fields are missing.
  */
-export const rowToJobAssessment = (row: unknown): JobAssessment => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('JobAssessment row is missing required fields')
+export const toJobAssessment = (record: Dictionary): JobAssessment => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('JobAssessment dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -136,11 +132,11 @@ export const rowToJobAssessment = (row: unknown): JobAssessment => {
     }
   }
 
-  throw new Error('JobAssessment row is missing required fields')
+  throw new Error('JobAssessment dictionary is missing required fields')
 }
 
 /** Map a domain JobPlan into a Dictionary shape. */
-export const jobPlanToRow = (plan: JobPlan) => ({
+export const fromJobPlan = (plan: JobPlan): Dictionary => ({
   id: plan.id,
   job_id: plan.jobId,
   workflow_id: plan.workflowId,
@@ -158,16 +154,14 @@ export const jobPlanToRow = (plan: JobPlan) => ({
 
 /**
  * Convert a Dictionary into a JobPlan domain model.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped JobPlan object.
  * @throws Error if required fields are missing.
  */
-export const rowToJobPlan = (row: unknown): JobPlan => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('JobPlan row is missing required fields')
+export const toJobPlan = (record: Dictionary): JobPlan => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('JobPlan dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -181,11 +175,11 @@ export const rowToJobPlan = (row: unknown): JobPlan => {
     }
   }
 
-  throw new Error('JobPlan row is missing required fields')
+  throw new Error('JobPlan dictionary is missing required fields')
 }
 
 /** Map a domain JobLogEntry into a Dictionary shape. */
-export const jobLogEntryToRow = (entry: JobLogEntry) => ({
+export const fromJobLogEntry = (entry: JobLogEntry): Dictionary => ({
   id: entry.id,
   job_id: entry.jobId,
   plan_id: entry.planId,
@@ -201,16 +195,14 @@ export const jobLogEntryToRow = (entry: JobLogEntry) => ({
 
 /**
  * Convert a Dictionary into a JobLogEntry domain model.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped JobLogEntry object.
  * @throws Error if required fields are missing.
  */
-export const rowToJobLogEntry = (row: unknown): JobLogEntry => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('JobLogEntry row is missing required fields')
+export const toJobLogEntry = (record: Dictionary): JobLogEntry => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('JobLogEntry dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -224,5 +216,5 @@ export const rowToJobLogEntry = (row: unknown): JobLogEntry => {
     }
   }
 
-  throw new Error('JobLogEntry row is missing required fields')
+  throw new Error('JobLogEntry dictionary is missing required fields')
 }

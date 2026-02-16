@@ -4,7 +4,7 @@
 
 import type { Dictionary } from '@core-std'
 import type { Service } from '@domain/abstractions/service.ts'
-import { isIdArray } from '@serverless-lib/db-binding.ts'
+import { isIdArray } from '@domain/validators/helper-validator.ts'
 
 /**
  * Type guard for supported service categories.
@@ -15,7 +15,7 @@ export const isServiceCategory = (value: unknown): value is Service['category'] 
   value === 'aerial-drone-services' || value === 'ground-machinery-services'
 
 /** Map a domain Service into a Dictionary shape. */
-export const serviceToRow = (service: Service) => ({
+export const fromService = (service: Service): Dictionary => ({
   id: service.id,
   name: service.name,
   sku: service.sku,
@@ -32,16 +32,14 @@ export const serviceToRow = (service: Service) => ({
  * Convert a Dictionary into a Service domain model.
  * Payload is truth - if present, use it directly.
  * Falls back to column mapping for legacy records.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped Service object.
  * @throws Error if required fields are missing.
  */
-export const rowToService = (row: unknown): Service => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('Service row is missing required fields')
+export const toService = (record: Dictionary): Service => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('Service dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -63,7 +61,7 @@ export const rowToService = (row: unknown): Service => {
   const requiredAssetTypes = record.required_asset_types ?? record.requiredAssetTypes
 
   if (!id || !name || !sku || !isServiceCategory(category) || !isIdArray(requiredAssetTypes)) {
-    throw new Error('Service row is missing required fields')
+    throw new Error('Service dictionary is missing required fields')
   }
 
   return {

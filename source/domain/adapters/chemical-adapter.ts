@@ -27,7 +27,7 @@ export const isSignalWord = (value: unknown): value is Chemical['signalWord'] =>
   || value === 'caution'
 
 /** Map a domain Chemical into a Dictionary shape. */
-export const chemicalToRow = (chemical: Chemical) => ({
+export const fromChemical = (chemical: Chemical): Dictionary => ({
   id: chemical.id,
   name: chemical.name,
   epa_number: chemical.epaNumber ?? null,
@@ -49,16 +49,14 @@ export const chemicalToRow = (chemical: Chemical) => ({
  * Convert a Dictionary into a Chemical domain model.
  * Payload is truth - if present, use it directly.
  * Falls back to column mapping for legacy records.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped Chemical object.
  * @throws Error if required fields are missing.
  */
-export const rowToChemical = (row: unknown): Chemical => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('Chemical row is missing required fields')
+export const toChemical = (record: Dictionary): Chemical => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('Chemical dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -80,7 +78,7 @@ export const rowToChemical = (row: unknown): Chemical => {
   const restrictedUse = record.restricted_use ?? record.restrictedUse
 
   if (!id || !name || !isChemicalUsage(usage) || typeof restrictedUse !== 'boolean') {
-    throw new Error('Chemical row is missing required fields')
+    throw new Error('Chemical dictionary is missing required fields')
   }
 
   const signalWord = record.signal_word ?? record.signalWord

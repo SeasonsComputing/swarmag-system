@@ -14,7 +14,7 @@ export const isAssetStatus = (value: unknown): value is Asset['status'] =>
   value === 'active' || value === 'maintenance' || value === 'retired' || value === 'reserved'
 
 /** Map a domain Asset into a Dictionary shape. */
-export const assetToRow = (asset: Asset) => ({
+export const fromAsset = (asset: Asset): Dictionary => ({
   id: asset.id,
   label: asset.label,
   description: asset.description ?? null,
@@ -31,16 +31,14 @@ export const assetToRow = (asset: Asset) => ({
  * Convert a Dictionary into an Asset domain model.
  * Payload is truth - if present, use it directly.
  * Falls back to column mapping for legacy records.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped Asset object.
  * @throws Error if required fields are missing.
  */
-export const rowToAsset = (row: unknown): Asset => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('Asset row is missing required fields')
+export const toAsset = (record: Dictionary): Asset => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('Asset dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -61,7 +59,7 @@ export const rowToAsset = (row: unknown): Asset => {
   const status = record.status
 
   if (!id || !label || !type || !isAssetStatus(status)) {
-    throw new Error('Asset row is missing required fields')
+    throw new Error('Asset dictionary is missing required fields')
   }
 
   return {
@@ -80,7 +78,7 @@ export const rowToAsset = (row: unknown): Asset => {
 }
 
 /** Map a domain AssetType into a Dictionary shape. */
-export const assetTypeToRow = (assetType: AssetType) => ({
+export const fromAssetType = (assetType: AssetType): Dictionary => ({
   id: assetType.id,
   label: assetType.label,
   active: assetType.active,
@@ -91,16 +89,14 @@ export const assetTypeToRow = (assetType: AssetType) => ({
 
 /**
  * Convert a Dictionary into an AssetType domain model.
- * @param row - The database row to convert.
+ * @param dict - The dictionary to convert.
  * @returns The mapped AssetType object.
  * @throws Error if required fields are missing.
  */
-export const rowToAssetType = (row: unknown): AssetType => {
-  if (!row || typeof row !== 'object') {
-    throw new Error('AssetType row is missing required fields')
+export const toAssetType = (record: Dictionary): AssetType => {
+  if (!record || typeof record !== 'object') {
+    throw new Error('AssetType dictionary is missing required fields')
   }
-
-  const record = row as Dictionary
 
   // Payload as truth - direct cast if present
   if (record.payload && typeof record.payload === 'object') {
@@ -119,7 +115,7 @@ export const rowToAssetType = (row: unknown): AssetType => {
   const active = record.active
 
   if (!id || !label || typeof active !== 'boolean') {
-    throw new Error('AssetType row is missing required fields')
+    throw new Error('AssetType dictionary is missing required fields')
   }
 
   return {
