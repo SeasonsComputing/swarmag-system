@@ -4,7 +4,12 @@
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
-const TARGET_DIRS = [`${ROOT}/source/serverless/functions`]
+const TARGET_DIRS = [
+  `${ROOT}/source/back/supabase-edge/functions`,
+  `${ROOT}/source/ux/app-admin`,
+  `${ROOT}/source/ux/app-ops`,
+  `${ROOT}/source/ux/app-customer`
+]
 
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
@@ -17,7 +22,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
     if (entry.isDirectory) {
       if (EXCLUDED_DIRS.has(entry.name)) continue
       entries.push(...await collectFiles(entryPath))
-    } else if (entry.isFile && (entry.name.endsWith('') || entry.name.endsWith('.tsx'))) {
+    } else if (entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
       entries.push(entryPath)
     }
   }
@@ -27,8 +32,22 @@ const collectFiles = async (dir: string): Promise<string[]> => {
 const lineNumber = (source: string, index: number): number =>
   source.slice(0, index).split('\n').length
 
+const exists = async (path: string): Promise<boolean> => {
+  try {
+    const info = await Deno.stat(path)
+    return info.isDirectory
+  } catch {
+    return false
+  }
+}
+
 const main = async () => {
-  const files = (await Promise.all(TARGET_DIRS.map(collectFiles))).flat()
+  const roots = []
+  for (const dir of TARGET_DIRS) {
+    if (await exists(dir)) roots.push(dir)
+  }
+
+  const files = (await Promise.all(roots.map(collectFiles))).flat()
   const violations: string[] = []
 
   for (const file of files) {
