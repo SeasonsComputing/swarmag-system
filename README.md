@@ -91,31 +91,53 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | `app-common/`   | Common application code         |
 | `app-config/`   | Config provider for all apps    |
 
-## 2. Local Configuration (TODO: update)
+## 2. Local Configuration
 
-Create local environment files from the current examples:
+The system uses environment-based configuration with runtime detection. UX applications share a single configuration module that is packaged with each app deployment, similar to how `core` and `domain` modules are packaged.
 
+### 2.1 Backend Configuration
+
+Backend edge functions require Supabase connection credentials:
 ```bash
-# Backend runtime config
-cp source/back/config/back-local.env.example source/back/config/back-local.env
-
-# Administration UX app config
-cp source/ux/app-admin/config/app-admin-local.env.example source/ux/applications/administration/config/app-admin-local.env
+# Create local backend config from example
+cp source/back/supabase-edge/config/back-local.env.example source/back/supabase-edge/config/back-local.env
 ```
 
-Populate values as needed for your environment:
-
+Required variables:
 ```dotenv
-# source/back/config/back-local.env
+# source/back/supabase-edge/config/back-local.env
 SUPABASE_URL=http://localhost:54321
-SUPABASE_SERVICE_KEY=...
-JWT_SECRET=...
-
-# source/ux/applications/administration/config/app-admin-local.env
-VITE_API_URL=http://localhost:8888
+SUPABASE_SERVICE_KEY=your-service-role-key
+SUPABASE_ANON_KEY=your-anon-key
+JWT_SECRET=your-jwt-secret
 ```
 
-Do not commit local env files.
+### 2.2 UX Configuration
+
+All UX applications share a single configuration module (`source/ux/config/ux-config.ts`) that is packaged with each app deployment.
+```bash
+# Create shared UX config from example
+cp source/ux/config/ux-local.env.example source/ux/config/ux-local.env
+```
+
+Required variables:
+```dotenv
+# source/ux/config/ux-local.env
+VITE_SUPABASE_EDGE_URL=http://localhost:54321/functions/v1
+VITE_SUPABASE_URL=http://localhost:54321
+VITE_SUPABASE_SERVICE_KEY=your-service-role-key
+VITE_JWT_SECRET=your-jwt-secret
+```
+
+UX applications connect directly to Supabase via Row Level Security policies. The shared config module is bundled with each application during deployment, just as the `core` and `domain` layers are.
+
+### 2.3 Configuration Rules
+
+- **Never commit actual `.env` files** - only commit `.env.example` files
+- Local configs are gitignored via `**/*-local.env` pattern
+- Stage and prod configs follow same pattern: `*-stage.env`, `*-prod.env`
+- All runtime config values are validated at bootstrap via `Config.init()`
+- Shared modules (`core`, `domain`, `ux/config`) are packaged with consuming applications
 
 ## 3. Project Commands
 
@@ -136,12 +158,10 @@ deno task fmt:check
 
 ## 4. Working Rules
 
-| Rule                      | Description                                                                                                                                                           |
-| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CONSTITUTION.md`         | Governing authority for all human and AI contributions. Apply conservative changes, respect architecture guards, and escalate when intent or constraints are unclear. |
-| `README.md`               | Starting point for understanding the project. Keep it up-to-date and accurate.                                                                                        |
-| `cspell.json`             | Spell checker configuration. Keep it up-to-date and accurate.                                                                                                         |
-| `dprint.json`             | Code formatter configuration. Keep it up-to-date and accurate.                                                                                                        |
-| `deno.json`               | Deno project configuration. Keep it up-to-date and accurate.                                                                                                          |
-| `netlify.toml`            | Netlify runtime/build configuration. Keep it up-to-date and accurate.                                                                                                 |
-| `netlify-import-map.json` | Netlify import map configuration. Keep it up-to-date and accurate.                                                                                                    |
+| Rule              | Description                                                                                                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CONSTITUTION.md` | Governing authority for all human and AI contributions. Apply conservative changes, respect architecture guards, and escalate when intent or constraints are unclear. |
+| `README.md`       | Starting point for understanding the project. Keep it up-to-date and accurate.                                                                                        |
+| `cspell.json`     | Spell checker configuration. Keep it up-to-date and accurate.                                                                                                         |
+| `dprint.json`     | Code formatter configuration. Keep it up-to-date and accurate.                                                                                                        |
+| `deno.json`       | Deno project configuration. Keep it up-to-date and accurate.                                                                                                          |
