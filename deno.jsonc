@@ -13,8 +13,7 @@
     "@ux-api": "./source/ux/api/api.ts",
 
     // Backend namespaces
-    "@back-netlify-functions/": "./source/back/netlify-edge/functions/",
-    "@back-supabase-functions/": "./source/back/supabase-edge/functions/",
+    "@back-supabase-edge/": "./source/back/supabase-edge/",
 
     // UX application namespaces
     "@ux-app-ops/": "./source/ux/app-ops/",

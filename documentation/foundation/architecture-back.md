@@ -1,270 +1,408 @@
 # Architecture: swarmAg System — Backend
 
-## Overview (TODO: update)
+## 1. Overview
 
-This document defines the backend architecture of the swarmAg system. The backend is a single Netlify Edge Functions surface that implements the `Api.*` contracts defined in `architecture-core.md`, stores data in Supabase Postgres, and returns validated domain abstractions.
+This document defines the backend architecture of the swarmAg system. The backend consists of:
+- **Supabase Edge Functions** - Orchestration operations only
+- **PostgreSQL Database** - Persistent storage with Row Level Security
+- **Storage Buckets** - File and image storage
+- **Migrations** - Schema evolution and RLS policies
 
-**Prerequisites:**
+**Prerequisites:** Read `domain.md` and `architecture-core.md` first to understand the domain model and system boundary.
 
-Read `domain.md` and `architecture-core.md` first to understand the domain model and system boundary.
+## 2. Backend Structure
 
-## Backend Structure
+The backend is intentionally minimal. Most operations go **directly to the database** from UX applications via Supabase SDK. Edge functions exist only for orchestration that cannot be expressed as simple CRUD.
 
-### Simplicity by Design
-
-The backend is intentionally simple and concrete:
-
-- **Cloud Providers:** Netlify and Supabase
-- **Edge Functions:** Netlify and Supabase edge functions
-- **Relational Database:** Supabase Postgres
-- **Storage Buckets:** Supabase storage buckets
-- **Networking**: Netlify networking services
-
-### Backend Layout
-
+### 2.1 Directory Structure
 ```text
 back/
-├── migrations/
-├── netlify-edge/
-│   ├── config/
-│   └── functions/
+├── migrations/          # SQL migrations (schema + RLS policies)
 └── supabase-edge/
-    ├── config/
-    └── functions/
+    ├── config/          # Runtime configuration
+    └── functions/       # Flat orchestration functions
 ```
 
-## Functions (HTTP handlers) (TODO: update)
+**Key Principle:** If it can be a direct database operation with RLS, it shouldn't be an edge function.
 
-Functions are thin wrappers:
+## 3. Supabase Edge Functions
 
-1. Validate HTTP method and input
-2. Call adapters for storage operations
-3. Return HTTP response
+Edge functions handle **orchestration only** - complex multi-step operations that cannot be performed client-side.
 
-Functions do NOT:
+### 3.1 When to Use Edge Functions
 
-- Contain business logic
-- Introduce persistence abstractions
-- Re-implement adapter logic
+**YES - Use edge functions for:**
+- Multi-step transactions requiring coordination (deep clone Job aggregate)
+- Operations with complex business rules spanning multiple tables
+- Background processing or async workflows
+- Operations requiring elevated privileges
 
-### Function Pattern (TODO: update)
+**NO - Do NOT use edge functions for:**
+- Simple CRUD operations (use direct Supabase SDK client)
+- Read-only queries (use direct Supabase SDK client)
+- Client-side validation (use domain validators)
+- Authorization (use RLS policies)
 
+### 3.2 Edge Function Patterns
+
+#### 3.2.1 Business Rule Pattern (Simple Orchestration)
+
+Use for operations that coordinate multiple steps without needing HTTP-level control:
 ```typescript
-// source/back/functions/jobs-create.ts
-import {
-  type ApiRequest,
-  type ApiResponse,
-  toBadRequest,
-  toInternalError,
-  toMethodNotAllowed,
-  toOk
-} from '@core/api/crud-rest-provider-adapter.ts'
-import { createApiHandler } from '@core/api/api-handler.ts'
+// source/back/supabase-edge/functions/job-deep-clone.ts
+import { makeBusRuleProvider } from '@core/api/provider-busrule-adapter.ts'
+import { Config } from '@back-supabase-edge/config/config.ts'
 import { Supabase } from '@core/db/supabase.ts'
-import type { Job } from '@domain/abstractions/job.ts'
-import { rowToJob } from '@domain/adapters/job-adapter.ts'
-import { validateJobCreateInput } from '@domain/validators/job-validator.ts'
+import type { Dictionary } from '@core-std'
 
-export const config = { path: '/api/jobs/create' }
+const runDeepClone = async (input: Dictionary): Promise<Dictionary> => {
+  const jobId = input.jobId as string
+  
+  // Multi-step orchestration
+  const job = await fetchJob(jobId)
+  const assessment = await fetchAssessment(job.assessmentId)
+  const plan = await fetchPlan(job.planId)
+  const logs = await fetchLogs(job.id)
+  
+  // Create coordinated clone
+  const clonedJob = await createJobClone(job, assessment, plan, logs)
+  
+  return { clonedJobId: clonedJob.id }
+}
+
+export default makeBusRuleProvider(runDeepClone, { cors: true })
+```
+
+**When to use:**
+- Simple input/output (Dictionary → Dictionary)
+- No custom HTTP status codes needed
+- Straightforward orchestration logic
+- Default error handling sufficient
+
+#### 3.2.2 REST Pattern (Full HTTP Control)
+
+Use when you need fine-grained control over HTTP semantics:
+```typescript
+// source/back/supabase-edge/functions/jobs-batch-update.ts
+import { 
+  makeApiProvider, 
+  toOk, 
+  toBadRequest, 
+  toMethodNotAllowed,
+  toUnprocessable 
+} from '@core/api/provider-http-adapter.ts'
+import type { ApiRequest, ApiResponse } from '@core/api/provider-http-adapter.ts'
+import { validateJobBatchUpdate } from '@domain/validators/job-validator.ts'
+import type { Dictionary } from '@core-std'
 
 const handle = async (req: ApiRequest): Promise<ApiResponse> => {
+  // HTTP method validation
   if (req.method !== 'POST') return toMethodNotAllowed()
-
-  const input = await req.json()
-  if (!validateJobCreateInput(input)) return toBadRequest('Invalid input')
-
-  const { data, error } = await Supabase.client()
-    .from('jobs')
-    .insert(input)
-    .select()
-    .single()
-
-  if (error || !data) return toInternalError('Failed to create job')
-
-  return toOk(rowToJob(data))
+  
+  // Domain validation with specific error responses
+  const validated = validateJobBatchUpdate(req.body)
+  if (!validated.success) {
+    return toUnprocessable(validated.error)
+  }
+  
+  // Query parameter handling
+  const dryRun = req.query.dry_run === 'true'
+  
+  // Complex orchestration with conditional logic
+  const results = await batchUpdateJobs(validated.data, dryRun)
+  
+  // Custom response structure
+  return toOk({
+    updated: results.updated,
+    failed: results.failed,
+    dryRun
+  })
 }
 
-export default createApiHandler(handle)
+export default makeApiProvider(handle, { 
+  cors: true,
+  maxBodySize: 1024 * 1024  // 1MB limit for batch operations
+})
 ```
 
-**Backend implementation = generate these flat functions.**
+**When to use:**
+- Need HTTP method routing (GET/POST/PUT/DELETE)
+- Custom validation with specific error codes (400/422)
+- Query parameter handling
+- Custom response structures beyond simple Dictionary
+- Size limits or other HTTP-level controls
 
-Libraries and adapters already exist and are verified.
+### 3.3 Function Responsibilities
 
-## Adapters (TODO: update -- NO "row", to{Abstraction}, from{Abstraction})
+Edge functions:
+- Orchestrate multi-step operations
+- Use `Supabase.client()` for database access
+- Use domain adapters for serialization
+- Use domain validators for input validation
+- Return domain types or simple dictionaries
 
-Adapters live in `source/domain/adapter/` and define the storage-to-domain boundary. They are shared by both backend functions and ux API providers.
+Edge functions do NOT:
+- Contain business logic (that lives in domain)
+- Implement authorization (use RLS policies)
+- Duplicate CRUD operations (use direct SDK)
 
-Rules:
+### 3.4 Platform Requirements
 
-- File naming: `*-adapter.ts` only.
-- Functions adapt storage rows to domain abstractions and back
-- Validation occurs inside adapters; callers receive domain abstractions
+**All edge functions must:**
+- Stay flat in `source/back/supabase-edge/functions/` (no subdirectories)
+- Be a single file per function
+- Use platform discovery naming (filename = function name)
 
-Example:
+## 4. Database Layer
 
+### 4.1 PostgreSQL Schema
+
+Schema is defined in SQL migrations under `source/back/migrations/`.
+
+**Migration Rules:**
+- One migration per conceptual change
+- Timestamp-based naming: `YYYYMMDDHHMMSS_description.sql`
+- Never modify deployed migrations (forward-only)
+- Include both UP and DOWN operations
+- Define tables in 4th Normal Form (4NF) by default
+
+**JSONB Exceptions:**
+Use JSONB only for:
+1. End-user specialization (custom fields)
+2. Third-party metadata (opaque payloads)
+3. Payload-as-truth (versioning snapshots)
+4. Subordinate composition (embedded entities without independent lifecycle)
+
+**Seed Data:**
+Initial catalog values for `Services` and `AssetTypes` are defined in `documentation/foundation/data-lists.md`. These should be loaded via a dedicated seed migration after schema creation.
+
+**Example Seed Migration:**
+```sql
+-- Load canonical service catalog
+INSERT INTO services (id, name, sku, category, created_at, updated_at) VALUES
+  (gen_random_uuid(), 'Pesticide, Herbicide', 'A-CHEM-01', 'aerial-drone-services', now(), now()),
+  (gen_random_uuid(), 'Mesquite Removal', 'G-MITI-01', 'ground-machinery-services', now(), now());
+  -- ... (see data-lists.md for complete catalog)
+```
+
+### 4.2 Row Level Security (RLS)
+
+Authorization is enforced at the **database layer** via RLS policies, not application code.
+
+**Policy Pattern:**
+```sql
+-- Example: Users can only see their own job logs
+CREATE POLICY "job_logs_select_own"
+ON job_logs FOR SELECT
+USING (created_by_id = auth.uid());
+
+-- Example: Only operations role can create job logs
+CREATE POLICY "job_logs_insert_ops"
+ON job_logs FOR INSERT
+WITH CHECK (
+  auth.jwt() ->> 'role' = 'operations'
+);
+```
+
+**RLS Principles:**
+- Policies live in migrations (single source of truth)
+- Cannot be bypassed by client code
+- Automatic enforcement across all access paths
+- Tested via integration tests with different user contexts
+
+### 4.3 Soft Deletes
+
+All lifecycled entities implement soft delete via `deleted_at` column:
+```sql
+ALTER TABLE jobs ADD COLUMN deleted_at TIMESTAMPTZ;
+
+-- RLS policy filters soft-deleted rows
+CREATE POLICY "jobs_select_active"
+ON jobs FOR SELECT
+USING (deleted_at IS NULL);
+```
+
+**Exceptions:** Append-only logs and pure join tables (no lifecycle).
+
+## 5. Domain Adapters
+
+Adapters live in `source/domain/adapters/` and convert between database representations and domain abstractions.
+
+### 5.1 Adapter Pattern
 ```typescript
-// source/domain/adapter/jobs-adapter.ts
+// source/domain/adapters/job-adapter.ts
+import type { Dictionary } from '@core-std'
 import type { Job } from '@domain/abstractions/job.ts'
 
-export function rowToJob(row: Record<string, unknown>): Job {
-  // Validate and adapt storage row to domain abstraction
+export function toJob(dict: Dictionary): Job {
+  return {
+    id: dict.id as string,
+    customerId: dict.customer_id as string,
+    serviceId: dict.service_id as string,
+    status: dict.status as JobStatus,
+    createdAt: dict.created_at as When,
+    updatedAt: dict.updated_at as When,
+    deletedAt: dict.deleted_at as When | undefined
+  }
 }
 
-export function jobToRow(job: Job): Record<string, unknown> {
-  // Adapt domain abstraction to storage row
-}
-```
-
-## Configuration Management (TODO: move to core)
-
-### Runtime Configuration Pattern
-
-The system uses runtime-agnostic configuration with environment-specific providers.
-
-**Provider Location:**
-Runtime configuration providers are split by runtime surface:
-
-- `source/utilities/configure-deno.ts` - Deno runtime
-- `source/back/library/configure-netlify.ts` - Netlify Edge runtime
-
-**Package Configuration:**
-Each deployment package has a runtime bootstrap file that:
-
-1. Detects runtime environment
-2. Imports appropriate provider from `@utility`
-3. Initializes required variables
-4. Exports `Config` singleton
-
-**Example:**
-
-```typescript
-// source/back/config/back-config.ts
-import { RuntimeConfig } from '@core-std'
-
-let Config: RuntimeConfig
-
-if ('Deno' in self) {
-  const { ConfigureDeno } = await import('@utility/configure-deno.ts')
-  Config = ConfigureDeno
-} else {
-  const { ConfigureNetlify } = await import('@back-lib/configure-netlify.ts')
-  Config = ConfigureNetlify
-}
-
-Config.init(['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET'])
-export { Config }
-```
-
-**Usage:**
-
-```typescript
-// Always import from package-local config
-import { Config } from '@back-config/back-config.ts'
-const url = Config.get('SUPABASE_URL')
-
-// Never import providers directly
-// ❌ import { ConfigureDeno } from '@utility/configure-deno.ts'
-```
-
-**Environment Files:**
-Each package includes:
-
-- `back-local.env.example`
-- `back-stage.env.example`
-- `back-prod.env.example`
-
-Actual env files (`.env`, gitignored) follow same naming without `.example`.
-
-## Deployment Artifacts (TODO: move to core)
-
-### Build Output Structure
-
-Deployment artifacts are generated to `deploy/` directory:
-
-```
-deploy/
-  admin/
-    swarmag-admin-pkg.{hash}.js
-    swarmag-adapters-pkg.{hash}.js
-    swarmag-utils-pkg.{hash}.js
-    swarmag-admin-pkg.json
-```
-
-### Package Naming Convention
-
-All deployment artifacts follow: `swarmag-{component}-pkg.{hash}.{ext}`
-
-- **Prefix:** `swarmag-` (namespace)
-- **Component:** Package name (app-admin, app-ops, app-customer, core, edge-netlify, edge-supabase)
-- **Suffix:** `-pkg` (signals "packaged artifact")
-- **Hash:** Content hash for cache invalidation
-- **Extension:** `.js`, `.json`, etc.
-
-### Deployment Manifest
-
-Each deployment includes a manifest (`swarmag-{app|edge|core}(-{qualifier})-pkg.json`):
-
-```json
-{
-  "deployment": "app-admin",
-  "version": "1.2.3",
-  "built": "2026-02-11T19:15:00Z",
-  "commit": "abc123def",
-  "packages": {
-    "app": {
-      "file": "swarmag-app-admin-pkg.abc123.js",
-      "hash": "abc123",
-      "size": "245KB"
-    },
-    "core": {
-      "file": "swarmag-core-pkg.ghi789.js",
-      "hash": "ghi789",
-      "size": "8KB"
-    }
+export function fromJob(job: Job): Dictionary {
+  return {
+    id: job.id,
+    customer_id: job.customerId,
+    service_id: job.serviceId,
+    status: job.status,
+    created_at: job.createdAt,
+    updated_at: job.updatedAt,
+    deleted_at: job.deletedAt
   }
 }
 ```
 
-### Build Strategy
+**Adapter Rules:**
+- File naming: `{abstraction}-adapter.ts`
+- Functions: `to{Abstraction}(dict)` and `from{Abstraction}(abstraction)`
+- Shared by edge functions and UX SDK clients
+- No business logic or validation (that's in validators)
 
-**Pre-built chunks:**
+## 6. Configuration Management
 
-- `adapters` and `utils` are built once and cached
-- Only rebuilt when their source changes
-- Apps reference pre-built chunks by hash
-- Improves build performance (2s -> 200ms per app)
+Edge functions use the singleton `Config` pattern defined in `architecture-core.md` Section 6.
 
-**Content hashing:**
+### 6.1 Supabase Edge Function Configuration
 
-- Each file includes content hash in filename
-- Browser caching automatic
-- No "cache invalidation" issues
-- Rollback = deploy older hashed files
+```typescript
+// source/back/supabase-edge/config/supabase-config.ts
+import { Config } from '@core/runtime/config.ts'
+import { SupabaseProvider } from '@core/runtime/supabase-provider.ts'
 
-## Testing
+Config.init(new SupabaseProvider(), [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_KEY',
+  'JWT_SECRET'
+])
 
-Testing focuses on correctness at the storage boundary and handler orchestration:
+export { Config }
+```
 
-- **Adapter tests:** Validate storage-to-domain adaptation and invariants
-- **Function tests:** HTTP request -> response mapping, method guards, and error translation
-- **Integration tests:** Job lifecycle flows through backend functions against a test database
+### 6.2 Environment Files
 
-## Security (TODO: move to core)
+Backend environment files follow the package naming convention:
+- `back-local.env.example` - Template for local development
+- `back-stage.env` - Staging environment (gitignored)
+- `back-prod.env` - Production environment (gitignored)
 
-### Authentication
+**Example:**
+```bash
+# back-local.env.example
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_KEY=your-service-key-here
+JWT_SECRET=your-jwt-secret-here
+```
 
-- JWT tokens passed via `Authorization` header
-- Verified by backend functions before calling adapters
+### 6.3 Usage in Edge Functions
 
-### Authorization
+```typescript
+import { Config } from '@back-supabase-edge/config/config.ts'
+import { makeApiProvider } from '@core/api/provider-http-adapter.ts'
+import type { Dictionary } from '@core-std'
 
-- Enforced by Postgres RLS policies
-- Defined in migrations; backend assumes RLS is authoritative
+const async runBusRule = (input: Dictionary): Promise<Dictionary> => {
+  const supabaseUrl = Config.get('SUPABASE_URL')
+  // ... orchestration logic
+  return result
+}
 
-### Input Validation
+export default makeApiProvider(runBusRule)
+```
 
-- All input validated using domain validators before persistence
-- Adapters assume validated input and return domain abstractions only
+See `architecture-core.md` Section 6 for the complete configuration pattern and rationale.
+
+## 7. Testing Strategy
+
+Backend testing focuses on:
+
+**Adapter Tests:**
+- Verify `to{Abstraction}` and `from{Abstraction}` roundtrip correctly
+- Test edge cases (missing optional fields, invalid types)
+- Located in `source/tests/`
+
+**Integration Tests:**
+- Test edge functions against local Supabase instance
+- Verify RLS policies enforce authorization correctly
+- Test multi-user scenarios
+- Located in `source/tests/`
+
+**Migration Tests:**
+- Verify migrations apply cleanly (up and down)
+- Test RLS policies with different user contexts
+- Automated via `supabase test db`
+
+## 8. Deployment
+
+### 8.1 Supabase Edge Functions
+
+Functions deploy via Supabase CLI:
+```bash
+supabase functions deploy job-deep-clone
+```
+
+**Import Map:**
+Platform-specific import map required for edge runtime:
+- `supabase-import-map.json` - Synchronized with `deno.jsonc`
+
+### 8.2 Database Migrations
+
+Migrations deploy via Supabase CLI:
+```bash
+supabase db push
+```
+
+**Migration Safety:**
+- Always test migrations locally first (`supabase db reset`)
+- Verify RLS policies in staging environment
+- Never modify deployed migrations (create new ones)
+
+## 9. Security
+
+### 9.1 Authentication
+
+- JWT tokens issued by Supabase Auth
+- Tokens verified automatically by Supabase SDK
+- Edge functions access user context via `auth.uid()` in RLS
+
+### 9.2 Authorization
+
+- **Primary:** RLS policies enforce all access control
+- **Secondary:** Edge functions validate inputs via domain validators
+- **Never:** Application-level authorization checks (RLS is authoritative)
+
+### 9.3 Input Validation
+```typescript
+import { validateJobCreateInput } from '@domain/validators/job-validator.ts'
+
+const handler = async (input: Dictionary): Promise<Dictionary> => {
+  if (!validateJobCreateInput(input)) {
+    throw new Error('Invalid input')
+  }
+  // ... proceed with validated input
+}
+```
+
+**Validation Flow:**
+1. Edge function validates input using domain validators
+2. Adapters convert to domain types (assumes valid input)
+3. RLS policies enforce authorization at database
+4. Domain types returned to client
+
+## 10. Key Principles
+
+1. **Orchestration only** - Edge functions coordinate, don't implement business logic
+2. **RLS is authoritative** - Authorization lives in database, not application
+3. **Direct-to-DB preferred** - Only use edge functions when SDK client can't suffice
+4. **Adapters are shared** - Same serialization logic for edge functions and UX clients
+5. **Migrations are forward-only** - Never modify deployed migrations
+6. **Soft delete everywhere** - Except append-only logs and pure joins
+7. **Functions stay flat** - No subdirectories (platform requirement)
 
 **End of Architecture Backend Document**
