@@ -89,7 +89,7 @@ A Job Work Log memorializes the physical execution of a Job. Logs are append-onl
 
 A Job has an Assessment, a Plan, and a collection of Log entries. Log entries are created during the execution of a Job, by a User, and are appended to the Job's Log. There are no circular foreign keys; Assessments, Plans, and Logs reference the Job.
 
-### 1.4 Job Workflow & Job Work
+### 1.5 Job Workflow & Job Work
 
 TODO: **review for clarity, no rewrite**
 
