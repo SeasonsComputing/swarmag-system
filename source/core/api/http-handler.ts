@@ -192,17 +192,17 @@ FETCH REQUEST-RESPONSE FLOW:
 
   REQUEST BODY PARSING
   ───────────────────────────────────────────────────────────────────────────────
-  parseRequestBody(request, method, contentType, config) → unknown      |
-    → Core body parsing pipeline with validation:                       |
+  parseRequestBody(request, method, contentType, config) → unknown
+    → Core body parsing pipeline with validation:
       1. Skip if method doesn't expect body (GET, HEAD, OPTIONS)
       2. Check Content-Length header against maxBodySize
       3. Read body text and measure actual byte length
       4. Validate Content-Type is application/json (if enabled)
       5. Parse JSON with error handling
   Throws NamedError on failure:
-    - PayloadTooLarge: body exceeds maxBodySize
-    - InvalidContentType: not application/json
-    - InvalidJSON: JSON.parse() failed
+    → PayloadTooLarge: body exceeds maxBodySize
+    → InvalidContentType: not application/json
+    → InvalidJSON: JSON.parse() failed
 
   RESPONSE OUTPUT
   ───────────────────────────────────────────────────────────────────────────────
