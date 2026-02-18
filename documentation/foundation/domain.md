@@ -85,26 +85,45 @@ A Job Log memorializes the physical execution of a Job. Logs are append-only and
 
 A Job has an Assessment, a Plan, and a collection of Log entries. Log entries are created during the execution of a Job, by a User, and are appended to the Job's Log. There are no circular foreign keys; Assessments, Plans, and Logs reference the Job.
 
-### 1.4 Job Work (TODO: rewrite for clarity)
+### 1.4 Job Work 
 
-Job work is the physical execution of a Job. It is the primary means by which field crews are informed of the work to be performed and are prepared prior to execution to support guided, often offline operation in the field. Job work is defined by the Workflows assigned to the Job Plan
+TODO: rewrite for clarity
+
+Job Work is the physical execution of a Job. It is the primary means by which field crews are informed of the work to be performed and are prepared prior to execution to support guided, often offline operation in the field. Job Work is defined by the Workflows assigned to the Job Plan, which is itself defined by the Workflows assigned to the Job Assessment. 
 
 Each Workflow, its Tasks and their associated checklist of Questions are a template used to scope and plan the job. Each job is different so the Job Assessment may edit the workflow to capture the variation. 
 
 Job Assessment has workflow templates and workflow instances are created from the templates. Workflow templates/masters are essentially read only. Perhaps a la prototypical inheritance or simply a clone of the workflow master. The Job Plan can edit the workflow instances from the assessment or add more workflow masters and instances.
 
-TODO: I think we're missing an essential abstraction, the Job Work. Job has a Job Assessment, Job Plan and Job Work. 
-      A Job Work entity is added to the Job when the works begins transitioning the Job state to 'inprogress'
-      Job Work captures state about the overall job. Job.state == 'inprogress' is our lock state.
-      Only Jobs in this state can be deepCloned for progressing the Job Plan Workflow, Tasks, and checklists
+To facilitate the role a Workflow plays in a orchestrating a Job, a new abstraction called JobWorkflow is introduced. Job has a collection of JobWorkflows (1:m). JobAssessment, JobPlan, and JobWork each contain an association to their Job and therefore to the JobWorkflows. Just as Tasks and Task checklist are ordered, so too are JobWorkflows ordered. 
 
-TODO: I removed target locations from Job Plan. 
+Workflows are templates chosen and assigned to a Job as JobWorkflows. Template mutation is an administration authorization and so are generally read-only. When a JobAssessment is performed the workflow may be modified as part of the UX. The process of mutation/editing is to clone the Workflow with the JobWorkflow and update it the id of the clone.
 
-TODO: would it be useful to have the root Job have a collection of Workflows that 
-      essentially define how to perform the assessment itself. 
-      The Job Log would then become the input to automate a draft of the Job Assessment.
+JobWorkflow has an id, a user Id, a basis workflow id, and a specialized workflow id. This structure allows for tracking a chain of Workflow modifications from assessment and planning as a basis workflow could be the original read-only template or a modified version of it.
+
+Starting a job involves transition the status to `inprogress` and finalizing the workflow, essentially setting in stone the JobWorkflow. 
+
+TODO: should JobWorkFlows be assigned to a crew member for execution as part of the JobWorkflow creation process?
+
+JobWork is the process of executing a JobWorkflow. A specialized UX within operations will walk a crew member through the workflow tasks, presenting the task checklist and logging the answers in the JobLog.
 
 ## 2. Domain Model (`source/domain`)
+
+TODO: I want to restructure this to bifurcate the swarmAg domain model from the patterns used to codify the domain model:
+      Domain: 
+        - User, Customer, Workflow, Task, Job, ...
+      Patterns (Abstraction): 
+        - abstractions, adapters, validators, protocols and associations
+      Patterns (Association): Embedded as JSONB columns or 4th normal form using PK & FK columns
+        Embedded array of abstractions are always arrays of type abstraction, and use Typescript Variadic Tuple Types + Optional Elements to declare their cardinality within the data-dictionary and generated abstraction types.
+          - [Abstraction] - 1 and only 1
+          - [Abstraction?] - 0 or 1
+          - [Abstraction, ...Abstraction[]] - 1 or more
+          - [Abstraction?, ...Abstraction[]] - 0 or more
+        4NF includes:
+          - 1:1 FK on owner or parent
+          - 1:m FK on the many side
+          - m:m FK junction table (I use the expression "join-table" though I think you may be correct in "junction table" as the technical term)
 
 ### 2.1 Scope
 
@@ -123,7 +142,7 @@ All architectural, API, persistence, and user-interface concerns are derived fro
 
 `architecture-core.md` documents how the system is organized to support this domain model; it does not define the domain itself.
 
-**Adapter naming convention:** Adapters use `Dictionary` (or `dict`) rather than `row` or `record` to represent serialized forms. Functions follow the pattern `to{Abstraction}(dict: Dictionary)` and `from{Abstraction}(abstraction: Abstraction): Dictionary`. This emphasizes storage-agnostic serialization rather than database-specific terminology.
+**Adapter naming convention:** Adapters use `Dictionary` (or `dict`) rather than `row` or `record` to represent serialized forms. Functions follow the pattern `to{Abstraction}(dict: Dictionary): Abstraction` and `from{Abstraction}(abstraction: Abstraction): Dictionary`. This emphasizes storage-agnostic serialization rather than database-specific terminology.
 
 ### 2.2 Core abstractions that define the domain
 
@@ -258,7 +277,7 @@ Attachment (object)
 
 Note (object)
   Fields: id, createdAt, authorId?, content, visibility?(internal|shared), 
-          tags: string[], attachments: Attachment[]
+          tags: [string?, ...string[]], attachments: [Attachment?, ...Attachment[]]
   Notes: Freeform note with optional visibility/taxonomy
 ```
 
@@ -276,7 +295,7 @@ AssetStatus (enum)
 
 Asset (object)
   Fields: id, label, description?, serialNumber?, type(AssetType.id), status(AssetStatus),
-          notes: Note[], createdAt, updatedAt, deletedAt?
+          notes: [Note?, ...Note[]], createdAt, updatedAt, deletedAt?
   Notes: Operational equipment/resource
 ```
 
@@ -301,7 +320,7 @@ Chemical (object)
 ```text
 Contact (object)
   Fields: id, customerId, name, email?, phone?, preferredChannel?(email|text|phone), 
-          notes: Note[], createdAt, updatedAt
+          notes: [Note?, ...Note[]], createdAt, updatedAt
   Notes: Customer-associated contact person
 
 CustomerSite (object)
@@ -310,8 +329,8 @@ CustomerSite (object)
 
 Customer (object)
   Fields: id, name, status(active|inactive|prospect), line1, line2?, city, state, postalCode,
-          country, accountManagerId?, primaryContactId?, sites: CustomerSite[], 
-          contacts: [Contact, ...Contact[]], notes: Note[], 
+          country, accountManagerId?, primaryContactId?, sites: [CustomerSite, ...CustomerSite[]], 
+          contacts: [Contact?, ...Contact[]], notes: [Note?, ...Note[]], 
           createdAt, updatedAt, deletedAt?
   Notes: Customer account aggregate; contacts must be non-empty
 ```
@@ -344,7 +363,8 @@ UserRole (union)
   Notes: Role type derived from tuple
 
 User (object)
-  Fields: id, displayName, primaryEmail, phoneNumber, avatarUrl?, roles?, status?(active|inactive), createdAt?, updatedAt?, deletedAt?
+  Fields: id, displayName, primaryEmail, phoneNumber, avatarUrl?, roles?, 
+          status?(active|inactive), createdAt?, updatedAt?, deletedAt?
   Notes: System user identity and membership
 ```
 
@@ -376,8 +396,8 @@ Task (object)
   Notes: Atomic executable step
 
 Workflow (object)
-  Fields: id, name, description?, version, tags: string[],
-          tasks: Tasks[], createdAt, updatedAt, deletedAt?
+  Fields: id, name, description?, version, tags: [string?, ...string[]],
+          tasks: [Task, ...Task[]], createdAt, updatedAt, deletedAt?
   Notes: Versioned execution template
 ```
 
@@ -390,7 +410,8 @@ JobStatus (enum)
 
 JobAssessment (object)
   Fields: id, jobId, assessorId, locations: [Location, ...Location[]],  
-          risks: Note[], notes: Note[], createdAt, updatedAt, deletedAt?
+          risks: [Note?, ...Note[]], notes: [Note?, ...Note[]], 
+          createdAt, updatedAt, deletedAt?
   Notes: Pre-planning assessment; requires one or more locations
 
 JobPlanAssignment (object)
@@ -406,22 +427,19 @@ JobPlanAsset (object)
   Notes: Asset allocated to a plan
 
 JobPlan (object)
-  Fields: id, jobId, scheduledStart, scheduledEnd?, notes: Notes[], createdAt, updatedAt, deletedAt?
+  Fields: id, jobId, scheduledStart, scheduledEnd?, notes: [Note?, ...Note[]], 
+          createdAt, updatedAt, deletedAt?
   Notes: Job-specific execution plan
 
 JobLogType (enum)
   Values: status | checkpoint | note | telemetry | exception
   Notes: Execution log entry class
-
-JobLogPayload (alias)
-  Shape: Dictionary
-  Notes: Flexible structured metadata for log entries
-
+`
 JobLogEntry (object)
-  Fields: id, jobId, type, message, occurredAt, createdAt, createdById, location?, attachments?, payload?
+  Fields: id, jobId, userId, answer: [Answer], metadata: [Dictionary]
   Notes: Append-only event record
 
 Job (object)
-  Fields: id, customerId, status, notes: Note[], createdAt, updatedAt, deletedAt?
+  Fields: id, customerId, status, createdAt, updatedAt, deletedAt?
   Notes: Work agreement lifecycle anchor
 ```
