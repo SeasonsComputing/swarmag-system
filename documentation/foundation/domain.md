@@ -155,11 +155,11 @@ The domain layer follows an abstraction-per-file pattern across three subdirecto
 - Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-contract.ts`.
 - Shared validators (e.g., `isNonEmptyString` & `isIdArray`) live in `@domain/validators/helper-validator.ts`.
 
-### 2.9 Data Dictionary
+## 3. Data Dictionary
 
 The following sections define the domain types and shape constraints from `@domain/abstractions`.
 
-#### 2.9.1 Core Standard (`@core-std`)
+### 3.1 Core Standard (`@core-std`)
 
 ```text
 ID (alias)
@@ -175,7 +175,7 @@ Dictionary (alias)
   Notes: Flexible structured data container
 ```
 
-#### 2.9.2 Common (`@domain/abstractions/common.ts`)
+### 3.2 Common (`@domain/abstractions/common.ts`)
 
 ```text
 Location (object)
@@ -191,7 +191,7 @@ Note (object)
   Notes: Freeform note with optional visibility/taxonomy
 ```
 
-#### 2.9.3 Assets (`@domain/abstractions/asset.ts`)
+### 3.3 Assets (`@domain/abstractions/asset.ts`)
 
 ```text
 AssetType (object)
@@ -208,7 +208,7 @@ Asset (object)
   Notes: Operational equipment/resource
 ```
 
-#### 2.9.4 Chemicals (`@domain/abstractions/chemical.ts`)
+### 3.4 Chemicals (`@domain/abstractions/chemical.ts`)
 
 ```text
 ChemicalUsage (enum)
@@ -224,11 +224,11 @@ Chemical (object)
   Notes: Regulated material record
 ```
 
-#### 2.9.5 Customers (`@domain/abstractions/customer.ts`)
+### 3.5 Customers (`@domain/abstractions/customer.ts`)
 
 ```text
 Contact (object)
-  Fields: id, customerId, name, email?, phone?, preferredChannel?(email|sms|phone), notes?, createdAt, updatedAt
+  Fields: id, customerId, name, email?, phone?, preferredChannel?(email|text|phone), notes?, createdAt, updatedAt
   Notes: Customer-associated contact person
 
 CustomerSite (object)
@@ -240,7 +240,7 @@ Customer (object)
   Notes: Customer account aggregate; contacts must be non-empty
 ```
 
-#### 2.9.6 Services (`@domain/abstractions/service.ts`)
+### 3.6 Services (`@domain/abstractions/service.ts`)
 
 ```text
 ServiceCategory (enum)
@@ -256,7 +256,7 @@ ServiceRequiredAssetType (object)
   Notes: Association between services and required asset types
 ```
 
-#### 2.9.7 Users (`@domain/abstractions/user.ts`)
+### 3.7 Users (`@domain/abstractions/user.ts`)
 
 ```text
 USER_ROLES (const tuple)
@@ -272,7 +272,7 @@ User (object)
   Notes: System user identity and membership
 ```
 
-#### 2.9.8 Workflows (`@domain/abstractions/workflow.ts`)
+### 3.8 Workflows (`@domain/abstractions/workflow.ts`)
 
 ```text
 QuestionType (enum)
@@ -304,7 +304,7 @@ Workflow (object)
   Notes: Versioned execution template
 ```
 
-#### 2.9.9 Jobs (`@domain/abstractions/job.ts`)
+### 3.9 Jobs (`@domain/abstractions/job.ts`)
 
 ```text
 JobStatus (enum)

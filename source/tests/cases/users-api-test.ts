@@ -2,10 +2,10 @@
  * Unit tests for UsersApi abstraction layer.
  */
 
-import { UsersApi } from '@api/client/users-api.ts'
-import { ApiError } from '@api/lib/api-contract.ts'
+import { ApiError } from '@core-api/api-contract.ts'
 import type { User } from '@domain/abstractions/user.ts'
 import { assert, assertEquals, assertRejects } from '@std/assert'
+import { api } from '@ux-api'
 
 /** Mock user data for testing. */
 const mockUser: User = {
@@ -37,7 +37,7 @@ const mockFetch = (
   }
 }
 
-Deno.test('UsersApi.create returns created user', async () => {
+Deno.test('api.Users.create returns created user', async () => {
   const cleanup = mockFetch((_url, init) => {
     assertEquals(init?.method, 'POST')
     const body = JSON.parse(init?.body as string)
@@ -46,7 +46,7 @@ Deno.test('UsersApi.create returns created user', async () => {
   })
 
   try {
-    const user = await UsersApi.create({
+    const user = await api.Users.create({
       displayName: 'Ada Lovelace',
       primaryEmail: 'ada@example.com',
       phoneNumber: '555-0100'
@@ -59,14 +59,14 @@ Deno.test('UsersApi.create returns created user', async () => {
   }
 })
 
-Deno.test('UsersApi.create throws ApiError on validation failure', async () => {
+Deno.test('api.Users.create throws ApiError on validation failure', async () => {
   const cleanup = mockFetch(() => {
     return jsonResponse(422, { error: 'displayName is required' })
   })
 
   try {
     const error = await assertRejects(
-      () => UsersApi.create({ displayName: '', primaryEmail: 'a@b.com', phoneNumber: '555' }),
+      () => api.Users.create({ displayName: '', primaryEmail: 'a@b.com', phoneNumber: '555' }),
       ApiError
     ) as ApiError
     assertEquals(error.status, 422)
@@ -76,14 +76,14 @@ Deno.test('UsersApi.create throws ApiError on validation failure', async () => {
   }
 })
 
-Deno.test('UsersApi.get returns user by ID', async () => {
+Deno.test('api.Users.get returns user by ID', async () => {
   const cleanup = mockFetch(url => {
     assert(url.includes(`id=${mockUser.id}`))
     return jsonResponse(200, { data: mockUser })
   })
 
   try {
-    const user = await UsersApi.get(mockUser.id)
+    const user = await api.Users.get(mockUser.id)
     assertEquals(user.id, mockUser.id)
     assertEquals(user.primaryEmail, 'ada@example.com')
   } finally {
@@ -91,13 +91,13 @@ Deno.test('UsersApi.get returns user by ID', async () => {
   }
 })
 
-Deno.test('UsersApi.get throws ApiError when not found', async () => {
+Deno.test('api.Users.get throws ApiError when not found', async () => {
   const cleanup = mockFetch(() => {
     return jsonResponse(404, { error: 'User not found' })
   })
 
   try {
-    const error = await assertRejects(() => UsersApi.get('nonexistent-id'),
+    const error = await assertRejects(() => api.Users.get('nonexistent-id'),
       ApiError) as ApiError
     assertEquals(error.status, 404)
     assertEquals(error.message, 'User not found')
@@ -106,7 +106,7 @@ Deno.test('UsersApi.get throws ApiError when not found', async () => {
   }
 })
 
-Deno.test('UsersApi.list returns paginated users', async () => {
+Deno.test('api.Users.list returns paginated users', async () => {
   const cleanup = mockFetch((_url, init) => {
     assertEquals(init?.method, 'POST')
     const body = JSON.parse(init?.body as string)
@@ -116,7 +116,7 @@ Deno.test('UsersApi.list returns paginated users', async () => {
   })
 
   try {
-    const result = await UsersApi.list({ limit: 10, cursor: 0 })
+    const result = await api.Users.list({ limit: 10, cursor: 0 })
     assertEquals(result.data.length, 1)
     assertEquals(result.data[0].id, mockUser.id)
     assertEquals(result.cursor, 1)
@@ -126,7 +126,7 @@ Deno.test('UsersApi.list returns paginated users', async () => {
   }
 })
 
-Deno.test('UsersApi.list works without options', async () => {
+Deno.test('api.Users.list works without options', async () => {
   const cleanup = mockFetch((_url, init) => {
     assertEquals(init?.method, 'POST')
     const body = JSON.parse(init?.body as string)
@@ -135,14 +135,14 @@ Deno.test('UsersApi.list works without options', async () => {
   })
 
   try {
-    const result = await UsersApi.list()
+    const result = await api.Users.list()
     assertEquals(result.data.length, 0)
   } finally {
     cleanup()
   }
 })
 
-Deno.test('UsersApi.update returns updated user', async () => {
+Deno.test('api.Users.update returns updated user', async () => {
   const updatedUser = { ...mockUser, displayName: 'Ada Byron' }
 
   const cleanup = mockFetch((_url, init) => {
@@ -154,21 +154,21 @@ Deno.test('UsersApi.update returns updated user', async () => {
   })
 
   try {
-    const user = await UsersApi.update({ id: mockUser.id, displayName: 'Ada Byron' })
+    const user = await api.Users.update({ id: mockUser.id, displayName: 'Ada Byron' })
     assertEquals(user.displayName, 'Ada Byron')
   } finally {
     cleanup()
   }
 })
 
-Deno.test('UsersApi.update throws ApiError when not found', async () => {
+Deno.test('api.Users.update throws ApiError when not found', async () => {
   const cleanup = mockFetch(() => {
     return jsonResponse(404, { error: 'User not found' })
   })
 
   try {
     const error = await assertRejects(
-      () => UsersApi.update({ id: 'nonexistent', displayName: 'Test' }),
+      () => api.Users.update({ id: 'nonexistent', displayName: 'Test' }),
       ApiError
     ) as ApiError
     assertEquals(error.status, 404)
@@ -177,7 +177,7 @@ Deno.test('UsersApi.update throws ApiError when not found', async () => {
   }
 })
 
-Deno.test('UsersApi.delete returns deletion result', async () => {
+Deno.test('api.Users.delete returns deletion result', async () => {
   const deletedAt = '2024-01-16T12:00:00.000Z'
 
   const cleanup = mockFetch((_url, init) => {
@@ -188,7 +188,7 @@ Deno.test('UsersApi.delete returns deletion result', async () => {
   })
 
   try {
-    const result = await UsersApi.delete(mockUser.id)
+    const result = await api.Users.delete(mockUser.id)
     assertEquals(result.id, mockUser.id)
     assertEquals(result.deletedAt, deletedAt)
   } finally {
@@ -196,13 +196,13 @@ Deno.test('UsersApi.delete returns deletion result', async () => {
   }
 })
 
-Deno.test('UsersApi.delete throws ApiError when not found', async () => {
+Deno.test('api.Users.delete throws ApiError when not found', async () => {
   const cleanup = mockFetch(() => {
     return jsonResponse(404, { error: 'User not found' })
   })
 
   try {
-    const error = await assertRejects(() => UsersApi.delete('nonexistent'),
+    const error = await assertRejects(() => api.Users.delete('nonexistent'),
       ApiError) as ApiError
     assertEquals(error.status, 404)
   } finally {
@@ -219,7 +219,7 @@ Deno.test('UsersApi handles server errors with details', async () => {
   })
 
   try {
-    const error = await assertRejects(() => UsersApi.get(mockUser.id), ApiError) as ApiError
+    const error = await assertRejects(() => api.Users.get(mockUser.id), ApiError) as ApiError
     assertEquals(error.status, 500)
     assertEquals(error.message, 'Database connection failed')
     assertEquals(error.details, 'Connection timeout')

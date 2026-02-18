@@ -7,7 +7,7 @@ import type {
   CustomerCreateInput,
   CustomerUpdateInput,
   PrimaryContactInput
-} from '@domain/protocol/customer-protocol.ts'
+} from '@domain/protocols/customer-protocol.ts'
 import { isNonEmptyString } from './helper-validator.ts'
 
 export type { CustomerCreateInput, CustomerUpdateInput, PrimaryContactInput }

@@ -3,7 +3,7 @@
  */
 
 import type { Asset } from '@domain/abstractions/asset.ts'
-import type { AssetCreateInput, AssetUpdateInput } from '@domain/protocol/asset-protocol.ts'
+import type { AssetCreateInput, AssetUpdateInput } from '@domain/protocols/asset-protocol.ts'
 import { isNonEmptyString } from './helper-validator.ts'
 
 export type { AssetCreateInput, AssetUpdateInput }

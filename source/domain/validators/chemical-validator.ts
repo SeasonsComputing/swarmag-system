@@ -6,7 +6,7 @@ import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type {
   ChemicalCreateInput,
   ChemicalUpdateInput
-} from '@domain/protocol/chemical-protocol.ts'
+} from '@domain/protocols/chemical-protocol.ts'
 import { isNonEmptyString } from './helper-validator.ts'
 
 export type { ChemicalCreateInput, ChemicalUpdateInput }

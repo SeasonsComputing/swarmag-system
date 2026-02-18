@@ -3,7 +3,7 @@
  */
 
 import { StringSet } from '@core-std'
-import { RuntimeProvider } from './runtime-provider'
+import { RuntimeProvider } from './runtime-provider.ts'
 
 /**
  * Runtime configuration
