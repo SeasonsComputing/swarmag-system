@@ -28,6 +28,7 @@ import {
   type ApiBusRuleContract,
   type ApiCrudContract,
   ApiError,
+  DeleteResult,
   type ListResult
 } from './api-contract.ts'
 

@@ -1,5 +1,7 @@
 # Architecture: swarmAg System — UX
 
+![swarmAg ops logo](../../swarmag-ops-logo.png)
+
 ## 1. Overview
 
 This document defines how UX applications integrate with the swarmAg system architecture. It focuses on **what the UX layer receives from the foundation**, not implementation patterns.

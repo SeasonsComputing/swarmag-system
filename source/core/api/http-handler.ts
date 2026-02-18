@@ -23,13 +23,13 @@ HttpCodes
   → Semantic constants: HttpCodes.ok, HttpCodes.badRequest, etc.
   → Eliminates magic numbers, improves readability
 HttpRequest<Body, Query, Headers>
-  → Typed request wrapper: { method, body, query, headers, raw }
+  → Typed request wrapper: { method, body, query, headers, rawRequest }
   → Handlers receive this instead of raw Fetch Request
 HttpResponse<Body, Headers>
   → Typed response envelope: { statusCode, body, headers? }
   → Handlers return this instead of raw Fetch Response
 HttpHandler<RequestBody, Query, ResponseBody>
-  → Type alias for handler functions: (req) => Promise<response>
+  → Type alias for handler functions: async (request: Request): Promise<Response>
 
 RESPONSE BUILDER HELPERS
 ───────────────────────────────────────────────────────────────────────────────
@@ -50,7 +50,7 @@ Usage pattern:
 HTTP HANDLER WRAPPER (ADAPTER)
 ───────────────────────────────────────────────────────────────────────────────
 wrapHttpHandler<RequestBody, Query, ResponseBody>(
-  handle: HttpHandler,
+  handler: HttpHandler,
   config?: HttpHandlerConfig
 ): (request: Request) => Promise<Response>
 
@@ -62,7 +62,7 @@ Pre-processing:
   ✓ Header normalization (lowercase keys)
   ✓ Body parsing with size limits & Content-Type checks
   ✓ Query parameter extraction
-Handler Invokation:
+Handler Delegation:
   ✓ Pass typed HttpRequest to your handler
   ✓ Catch and serialize any thrown errors
 Post-processing:
@@ -240,14 +240,6 @@ export type HttpMethod =
   | 'OPTIONS'
   | 'HEAD'
 
-/**
- * Type guard for supported HTTP method strings.
- * @param value Raw value to validate HTTP method.
- * @returns True when value is a supported HTTP method.
- */
-export const isHttpMethod = (value: string): value is HttpMethod =>
-  (HttpMethodSet as readonly string[]).includes(value)
-
 /** HTTP response codes for REST calls. */
 export const HttpCodes = {
   ok: 200,
@@ -261,25 +253,16 @@ export const HttpCodes = {
   internalError: 500
 } as const
 
-/** Common HTTP header keys. */
-export const HEADER_CONTENT_TYPE = 'content-type'
-export const HEADER_AUTHORIZATION = 'authorization'
-export const HEADER_VARY = 'vary'
-export const HEADER_ALLOW_ORIGIN = 'access-control-allow-origin'
-export const HEADER_ALLOW_METHODS = 'access-control-allow-methods'
-export const HEADER_ALLOW_HEADERS = 'access-control-allow-headers'
-export const HEADER_ALLOW_CREDENTIALS = 'access-control-allow-credentials'
-
 /**
  * Typed request wrapper passed into handlers.
  * @template RequestBody Request body type.
  * @template Query Query string type.
  */
-export interface HttpRequest<
+export type HttpRequest<
   Body = unknown,
   Query = HttpQuery,
   Headers = HttpHeaders
-> {
+> = {
   method: HttpMethod
   body: Body
   query: Query
@@ -291,10 +274,10 @@ export interface HttpRequest<
  * Standardized handler response envelope.
  * @template ResponseBody JSON-serializable response body type.
  */
-export interface HttpResponse<
+export type HttpResponse<
   Body = unknown,
   Headers = HttpHeaders
-> {
+> = {
   statusCode: number
   headers?: Headers
   body: Body
@@ -311,7 +294,7 @@ export type HttpHandler<
   Query = HttpQuery,
   ResponseBody = unknown
 > = (
-  req: HttpRequest<RequestBody, Query>
+  request: HttpRequest<RequestBody, Query>
 ) =>
   | Promise<HttpResponse<ResponseBody>>
   | HttpResponse<ResponseBody>
@@ -406,32 +389,7 @@ export interface HttpHandlerConfig {
 }
 
 /**
- * Error with a stable name for adapter failures.
- */
-export class NamedError extends Error {
-  constructor(name: string, message: string) {
-    super(message)
-    this.name = name
-  }
-}
-
-/**
- * Build a standardized error response envelope.
- * @param statusCode HTTP status code.
- * @param error Error name or label.
- * @param details Error details string.
- * @param config Adapter configuration.
- * @returns Fetch Response.
- */
-export const makeErrorResponse = (
-  statusCode: number,
-  error: string,
-  details: string,
-  config: HttpHandlerConfig = {}
-): Response => makeResponse(statusCode, { error, details }, {}, config)
-
-/**
- * Adapt a typed HTTP handler to the Request/Response contract.
+ * Wrap a typed HTTP handler to the HttpRequest/HttpResponse contract.
  *
  * @template RequestBody Request body type (for documentation only - validated by handler).
  * @template Query Query parameters type (for documentation only - validated by handler).
@@ -447,7 +405,7 @@ export const wrapHttpHandler = <
 >(
   handler: HttpHandler<RequestBody, Query, ResponseBody>,
   config: HttpHandlerConfig = {}
-): HttpHandler => {
+) => {
   return async (request: Request): Promise<Response> => {
     try {
       //
@@ -490,7 +448,7 @@ export const wrapHttpHandler = <
       }
 
       //
-      // Delegate to the handler function
+      // Delegate to handler
       //
 
       const result: HttpResponse<ResponseBody, HttpHeaders> = await handler(HttpRequest)
@@ -513,8 +471,38 @@ export const wrapHttpHandler = <
 // PRIVATE IMPLEMENTATION
 // ───────────────────────────────────────────────────────────────────────────────
 
+type Message = { name: string; message: string; stack?: string }
+
 /** HTTP method set for validation. */
-const HttpMethodSet = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'] as const
+const HttpMethodSet = [
+  'GET',
+  'POST',
+  'PUT',
+  'PATCH',
+  'DELETE',
+  'OPTIONS',
+  'HEAD'
+] as const
+
+/**
+ * HTTP methods that typically include request bodies.
+ */
+const METHODS_WITH_BODY = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE'])
+const DEFAULT_MAX_BODY_SIZE = 6 * 1024 * 1024
+
+/**
+ * HTTP status codes that should not include a response body.
+ */
+const NO_BODY_STATUS_CODES = new Set([204, 304])
+
+/** Common HTTP header keys. */
+const HEADER_CONTENT_TYPE = 'content-type'
+const HEADER_AUTHORIZATION = 'authorization'
+const HEADER_VARY = 'vary'
+const HEADER_ALLOW_ORIGIN = 'access-control-allow-origin'
+const HEADER_ALLOW_METHODS = 'access-control-allow-methods'
+const HEADER_ALLOW_HEADERS = 'access-control-allow-headers'
+const HEADER_ALLOW_CREDENTIALS = 'access-control-allow-credentials'
 
 /**
  * Extract error message from unknown error value.
@@ -526,12 +514,6 @@ const extractErrorMessage = (err: unknown): string => {
   if (typeof err === 'string') return err
   return String(err)
 }
-
-/**
- * HTTP methods that typically include request bodies.
- */
-const METHODS_WITH_BODY = new Set<HttpMethod>(['POST', 'PUT', 'PATCH', 'DELETE'])
-const DEFAULT_MAX_BODY_SIZE = 6 * 1024 * 1024
 
 /**
  * Normalize HTTP headers to lowercase keys for case-insensitive access.
@@ -632,7 +614,6 @@ const validateStatusCode = (statusCode: number): number => {
  * @param err Unknown error value.
  * @returns Error object with name and message.
  */
-type Message = { name: string; message: string; stack?: string }
 const serializeError = (err: unknown): Message => {
   // 1. Force everything into an Error-like shape immediately
   const normalized = err instanceof Error
@@ -740,11 +721,6 @@ const parseRequestBody = async (
 }
 
 /**
- * HTTP status codes that should not include a response body.
- */
-const NO_BODY_STATUS_CODES = new Set([204, 304])
-
-/**
  * Build a Response with consistent headers.
  * @param statusCode HTTP status code.
  * @param body JSON-serializable payload, or a pre-serialized string when using a custom content-type.
@@ -797,3 +773,36 @@ const makeResponse = (
     })
   })
 }
+
+/**
+ * Build a standardized error response envelope.
+ * @param statusCode HTTP status code.
+ * @param error Error name or label.
+ * @param details Error details string.
+ * @param config Adapter configuration.
+ * @returns Fetch Response.
+ */
+const makeErrorResponse = (
+  statusCode: number,
+  error: string,
+  details: string,
+  config: HttpHandlerConfig = {}
+): Response => makeResponse(statusCode, { error, details }, {}, config)
+
+/**
+ * Error with a stable name for adapter failures.
+ */
+class NamedError extends Error {
+  constructor(name: string, message: string) {
+    super(message)
+    this.name = name
+  }
+}
+
+/**
+ * Type guard for supported HTTP method strings.
+ * @param value Raw value to validate HTTP method.
+ * @returns True when value is a supported HTTP method.
+ */
+const isHttpMethod = (value: string): value is HttpMethod =>
+  (HttpMethodSet as readonly string[]).includes(value)

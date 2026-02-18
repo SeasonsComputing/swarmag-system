@@ -1,5 +1,7 @@
 # Architecture: swarmAg System — Backend
 
+![swarmAg ops logo](../../swarmag-ops-logo.png)
+
 ## 1. Overview
 
 This document defines the backend architecture of the swarmAg system. The backend consists of:
@@ -57,11 +59,11 @@ Use for operations that coordinate multiple steps without needing HTTP-level con
 // source/back/supabase-edge/functions/job-deep-clone.ts
 import { Config } from '@back-supabase-edge/config/config.ts'
 import type { Dictionary } from '@core-std'
-import { makeBusRuleProvider } from '@core/api/provider-busrule-adapter.ts'
+import { makeBusRuleHttpProvider } from '@core/api/make-http-provider.ts'
 import { Supabase } from '@core/db/supabase.ts'
 
-const runDeepClone = async (input: Dictionary): Promise<Dictionary> => {
-  const jobId = input.jobId as string
+const handler = async (params: Dictionary): Promise<Dictionary> => {
+  const jobId = params.jobId as string
 
   // Multi-step orchestration
   const job = await fetchJob(jobId)
@@ -75,7 +77,9 @@ const runDeepClone = async (input: Dictionary): Promise<Dictionary> => {
   return { clonedJobId: clonedJob.id }
 }
 
-export default makeBusRuleProvider(runDeepClone, { cors: true })
+const runDeepClone = makeBusRuleHttpProvider(handler, { cors: true })
+
+export default { runDeepClone }
 ```
 
 ##### 3.2.1.1 When to use

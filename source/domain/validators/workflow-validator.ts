@@ -5,7 +5,7 @@
 import type {
   WorkflowCreateInput,
   WorkflowUpdateInput
-} from '@domain/protocol/workflow-protocol.ts'
+} from '@domain/protocols/workflow-protocol.ts'
 import { isNonEmptyString } from './helper-validator.ts'
 
 export type { WorkflowCreateInput, WorkflowUpdateInput }

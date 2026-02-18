@@ -1,5 +1,7 @@
 # Architecture: swarmAg System — Core
 
+![swarmAg ops logo](../../swarmag-ops-logo.png)
+
 ## 1. Executive Summary
 
 The **swarmAg System** is a domain-driven platform for agricultural service operations, built around a composed API namespace pattern. It consists of progressive web applications for administration and field execution, a customer portal, and Supabase Edge Functions for orchestration. Offline execution is enabled via deep cloning to IndexedDB.
@@ -142,13 +144,13 @@ All lifecycled entities support soft delete via `deletedAt?: When`. Hard deletes
 
 The system consists of five primary components:
 
-| Component                 | Purpose                                                  | Technology         |
-| ------------------------- | -------------------------------------------------------- | ------------------ |
-| **Ops PWA**               | Offline-first field execution (installed app)            | SolidJS, IndexedDB |
-| **Admin PWA**             | Management and configuration (installed app)             | SolidJS            |
+| Component                 | Purpose                                           | Technology         |
+| ------------------------- | ------------------------------------------------- | ------------------ |
+| **Ops PWA**               | Offline-first field execution (installed app)     | SolidJS, IndexedDB |
+| **Admin PWA**             | Management and configuration (installed app)      | SolidJS            |
 | **Customer Portal**       | Passwordless, customer-facing report from job log | SolidJS            |
-| **Backend Orchestration** | Edge Functions for complex operations                    | Supabase Edge      |
-| **Persistent Storage**    | PostgreSQL with Row Level Security                       | Supabase           |
+| **Backend Orchestration** | Edge Functions for complex operations             | Supabase Edge      |
+| **Persistent Storage**    | PostgreSQL with Row Level Security                | Supabase           |
 
 UX applications compose their API namespace (`@ux-api`) using client makers that connect directly to Supabase or IndexedDB.
 
@@ -176,32 +178,28 @@ The API is not a fixed interface or protocol—it is a **composition pattern** w
 
 ```typescript
 // source/ux/api/api.ts
-import { makeBusRuleHttpClient } from "@core/api/client-busrule-http.ts";
-import { makeCrudIndexedDbClient } from "@core/api/client-crud-indexeddb.ts";
-import { makeCrudRdbmsClient } from "@core/api/client-crud-supabase.ts";
+import { makeBusRuleHttpClient } from '@core/api/make-http-client.ts'
+import { makeCrudIndexedDbClient } from '@core/api/make-indexeddb-client.ts'
+import { makeCrudSupabaseClient } from '@core/api/make-supabase-client.ts'
 
 // API namespace composed from client makers
 export const api = {
   // Domain abstractions using appropriate storage bindings
   Users: makeCrudRdbmsClient<User, UserCreateInput, UserUpdateInput>({
-    table: "users",
+    table: 'users'
   }),
-  Customers: makeCrudRdbmsClient<
-    Customer,
-    CustomerCreateInput,
-    CustomerUpdateInput
-  >({
-    table: "customers",
+  Customers: makeCrudRdbmsClient<Customer, CustomerCreateInput, CustomerUpdateInput>({
+    table: 'customers'
   }),
 
   // Offline storage for field operations
   JobsLocal: makeCrudIndexedDbClient<Job, JobCreateInput, JobUpdateInput>({
-    store: "jobs",
+    store: 'jobs'
   }),
 
   // Orchestration operations
-  deepCloneJob: makeBusRuleHttpClient({ basePath: "/api/jobs/deep-clone" }),
-};
+  deepCloneJob: makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
+}
 ```
 
 #### 5.1.2 Key Properties
@@ -219,23 +217,23 @@ The system defines two client contracts (in `source/core/api/api-contract.ts`):
 
 ```typescript
 interface ApiCrudContract<T, TCreate, TUpdate> {
-  create(input: TCreate): Promise<T>;
-  get(id: ID): Promise<T>;
-  update(input: TUpdate): Promise<T>;
-  delete(id: ID): Promise<DeleteResult>;
-  list?(options?: ListOptions): Promise<ListResult<T>>;
+  create(input: TCreate): Promise<T>
+  get(id: ID): Promise<T>
+  update(input: TUpdate): Promise<T>
+  delete(id: ID): Promise<DeleteResult>
+  list?(options?: ListOptions): Promise<ListResult<T>>
 }
 
-type DeleteResult = { id: ID; deletedAt: When };
-type ListOptions = { limit?: number; cursor?: number };
-type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean };
+type DeleteResult = { id: ID; deletedAt: When }
+type ListOptions = { limit?: number; cursor?: number }
+type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
 ```
 
 #### 5.2.2 Business Rule Contract
 
 ```typescript
 interface ApiBusRuleContract {
-  run(params: Dictionary): Promise<Dictionary>;
+  run(params: Dictionary): Promise<Dictionary>
 }
 ```
 
@@ -255,11 +253,11 @@ All client makers throw `ApiError` on failures. Applications handle errors unifo
 
 ```typescript
 try {
-  const user = await api.Users.get(userId);
+  const user = await api.Users.get(userId)
 } catch (error) {
   if (error instanceof ApiError) {
-    console.error(`${error.status}: ${error.message}`);
-    if (error.details) console.error(error.details);
+    console.error(`${error.status}: ${error.message}`)
+    if (error.details) console.error(error.details)
   }
 }
 ```
@@ -291,13 +289,13 @@ Each maker takes a specification object and returns a fully-typed client:
 ```typescript
 // CRUD maker
 const Users = makeCrudRdbmsClient<User, UserCreateInput, UserUpdateInput>({
-  table: "users",
-});
-await Users.create({ displayName: "Ada", email: "ada@example.com" });
+  table: 'users'
+})
+await Users.create({ displayName: 'Ada', email: 'ada@example.com' })
 
 // Business rule maker
-const cloneJob = makeBusRuleHttpClient({ basePath: "/api/jobs/deep-clone" });
-await cloneJob.run({ jobId: "job-123" });
+const cloneJob = makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
+await cloneJob.run({ jobId: 'job-123' })
 ```
 
 ### 5.4 Application Usage
@@ -305,17 +303,17 @@ await cloneJob.run({ jobId: "job-123" });
 UX applications import the composed API namespace:
 
 ```typescript
-import { api } from "@ux-api";
+import { api } from '@ux-api'
 
 // CRUD operations - direct to database
-const user = await api.Users.get(userId);
-const customers = await api.Customers.list({ limit: 25 });
+const user = await api.Users.get(userId)
+const customers = await api.Customers.list({ limit: 25 })
 
 // Offline operations
-const localJob = await api.JobsLocal.get(jobId);
+const localJob = await api.JobsLocal.get(jobId)
 
 // Orchestration operations
-const result = await api.deepCloneJob.run({ jobId });
+const result = await api.deepCloneJob.run({ jobId })
 ```
 
 #### 5.4.1 Applications never
@@ -384,7 +382,7 @@ Runtime providers implement the `RuntimeProvider` interface:
 ```typescript
 // source/core/runtime/runtime-provider.ts
 export interface RuntimeProvider {
-  get(key: string): string | undefined;
+  get(key: string): string | undefined
 }
 ```
 
@@ -407,18 +405,18 @@ Each deployment package creates a configuration module that:
 
 ```typescript
 // source/back/supabase-edge/config/supabase-config.ts
-import { Config } from "@core/runtime/config.ts";
-import { SupabaseProvider } from "@core/runtime/supabase-provider.ts";
+import { Config } from '@core/runtime/config.ts'
+import { SupabaseProvider } from '@core/runtime/supabase-provider.ts'
 
 // Initialize the core singleton with Supabase runtime provider
 Config.init(new SupabaseProvider(), [
-  "SUPABASE_URL",
-  "SUPABASE_SERVICE_KEY",
-  "JWT_SECRET",
-]);
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_KEY',
+  'JWT_SECRET'
+])
 
 // Re-export the configured singleton
-export { Config };
+export { Config }
 ```
 
 ### 6.4 Usage Pattern
@@ -427,21 +425,21 @@ Code within a package always imports from the package-local configuration module
 
 ```typescript
 // Import from package config using alias (CORRECT)
-import { Config } from "@back-supabase-edge/config/config.ts";
-const url = Config.get("SUPABASE_URL");
+import { Config } from '@back-supabase-edge/config/config.ts'
+const url = Config.get('SUPABASE_URL')
 
 // It's ok for configs to be shared across packages
 // This same config is bundled with each deployment package
 //
-import { Config } from "@ux/config/config.ts";
-const url = Config.get("SUPABASE_URL");
+import { Config } from '@ux/config/config.ts'
+const url = Config.get('SUPABASE_URL')
 
 // Never use relative paths climbing namespace tree (INCORRECT)
 // ❌ import { Config } from '../config/config.ts'
 
 // When lower layers unaware of which package they've been
 // imported into require config, user `core` runtime config
-import { Config } from "@core/runtime/config.ts";
+import { Config } from '@core/runtime/config.ts'
 ```
 
 ### 6.5 Environment Files
@@ -592,8 +590,8 @@ swarmag-system/
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
-    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2",
-  },
+    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
+  }
 }
 ```
 
@@ -616,12 +614,12 @@ When a Job is ready for field execution, the complete Job aggregate is cloned to
 
 ```typescript
 // Orchestration edge function creates complete local copy
-const localJob = await api.deepCloneJob.run({ jobId: "job-123" });
+const localJob = await api.deepCloneJob.run({ jobId: 'job-123' })
 
 // Job now exists in IndexedDB with all dependencies
-const job = await api.JobsLocal.get("job-123");
-const assessment = await api.JobAssessmentsLocal.get(job.assessmentId);
-const plan = await api.JobPlansLocal.get(job.planId);
+const job = await api.JobsLocal.get('job-123')
+const assessment = await api.JobAssessmentsLocal.get(job.assessmentId)
+const plan = await api.JobPlansLocal.get(job.planId)
 ```
 
 #### 8.1.3 Key Properties
@@ -638,21 +636,21 @@ Field crews execute Jobs entirely from local storage:
 #### 8.2.1 Execution Pattern
 
 ```typescript
-import { api } from "@ux-api";
+import { api } from '@ux-api'
 
 // All operations against IndexedDB clients
-const job = await api.JobsLocal.get(jobId);
-const plan = await api.JobPlansLocal.get(job.planId);
+const job = await api.JobsLocal.get(jobId)
+const plan = await api.JobPlansLocal.get(job.planId)
 
 // Append-only log entries stored locally
 await api.JobLogsLocal.create({
   jobId,
-  type: "checkpoint",
-  message: "Started drone preflight",
+  type: 'checkpoint',
+  message: 'Started drone preflight',
   occurredAt: when(),
   createdById: userId,
-  location: { latitude, longitude },
-});
+  location: { latitude, longitude }
+})
 ```
 
 #### 8.2.2 Characteristics
@@ -670,16 +668,16 @@ After field work completes, logs are uploaded in bulk. This is **not synchroniza
 
 ```typescript
 // When connectivity returns
-const logs = await api.JobLogsLocal.list({ jobId });
+const logs = await api.JobLogsLocal.list({ jobId })
 
 // Bulk append to remote (orchestration edge function)
 await api.uploadJobLogs.run({
   jobId,
-  logs: logs.data,
-});
+  logs: logs.data
+})
 
 // Optional: Clear local storage after successful upload
-await api.JobsLocal.delete(jobId);
+await api.JobsLocal.delete(jobId)
 ```
 
 #### 8.3.2 No Conflict Resolution
@@ -821,7 +819,7 @@ New clients are added by composing makers in the `@ux-api` namespace:
 
 ```typescript
 // source/ux/api/api.ts
-import { makeCrudRdbmsClient } from "@core/api/client-crud-supabase.ts";
+import { makeCrudRdbmsClient } from '@core/api/client-crud-supabase.ts'
 
 export const api = {
   // ... existing clients
@@ -832,9 +830,9 @@ export const api = {
     ServiceCreateInput,
     ServiceUpdateInput
   >({
-    table: "services",
-  }),
-};
+    table: 'services'
+  })
+}
 ```
 
 Existing UX applications immediately have access to the new client via `api.Services`.

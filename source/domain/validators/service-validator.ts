@@ -6,7 +6,7 @@ import type { Service } from '@domain/abstractions/service.ts'
 import type {
   ServiceCreateInput,
   ServiceUpdateInput
-} from '@domain/protocol/service-protocol.ts'
+} from '@domain/protocols/service-protocol.ts'
 import { isNonEmptyString } from './helper-validator.ts'
 
 export type { ServiceCreateInput, ServiceUpdateInput }

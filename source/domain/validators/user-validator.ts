@@ -3,7 +3,7 @@
  */
 
 import type { User, UserRole } from '@domain/abstractions/user.ts'
-import type { UserCreateInput, UserUpdateInput } from '@domain/protocol/user-protocol.ts'
+import type { UserCreateInput, UserUpdateInput } from '@domain/protocols/user-protocol.ts'
 import { isNonEmptyString } from './helper-validator.ts'
 
 /**
