@@ -38,14 +38,14 @@ A Service Category represents a class of service we offer (e.g., aerial-drone-se
 
 #### 1.2.3 Tools
 
-| Tool | Description |
-| --- | --- |
-| Sickle Shears | Precise cutting of brush and small mesquite clusters at ground level. |
-| Buncher Shears | Precise cutting of medium to large mesquite at ground level aided by hydraulic arms. |
-| Telescoping Shears | Precise cutting of high-reaching trees or brush, or those located on pond downslope. |
-| 6-way Dozer Blade | Hydraulic attachment that offers six directions of movement to precisely grade, push, and spread materials for detailed earthmoving and finishing work. |
-| Tree Saw | Specialized, hydraulically-powered tool featuring a large circular blade designed for quickly and safely felling trees and clearing heavy brush. |
-| Chemical Applicators | Custom sponge/dauber systems ensure thorough target surface coverage with precise, controlled volumes of herbicide. |
+| Tool                 | Description                                                                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Sickle Shears        | Precise cutting of brush and small mesquite clusters at ground level.                                                                                   |
+| Buncher Shears       | Precise cutting of medium to large mesquite at ground level aided by hydraulic arms.                                                                    |
+| Telescoping Shears   | Precise cutting of high-reaching trees or brush, or those located on pond downslope.                                                                    |
+| 6-way Dozer Blade    | Hydraulic attachment that offers six directions of movement to precisely grade, push, and spread materials for detailed earthmoving and finishing work. |
+| Tree Saw             | Specialized, hydraulically-powered tool featuring a large circular blade designed for quickly and safely felling trees and clearing heavy brush.        |
+| Chemical Applicators | Custom sponge/dauber systems ensure thorough target surface coverage with precise, controlled volumes of herbicide.                                     |
 
 #### 1.2.4 Asset Types
 
@@ -71,59 +71,57 @@ Each Task in a Workflow is a simple checklist supporting the task. Each item in 
 
 Workflows guide how work is assessed and inform how it is later planned and executed.
 
-### 1.3 Job: Assessment, Plan, & Log
+### 1.3 Job
 
 A Job represents a work agreement with a customer and serves as the hub of the model. A Job is created first and anchors all related work artifacts.
 
-A Job Assessment evaluates the work to be completed on behalf of a customer. Assessments define the locations involved and gather the information required to determine scope, feasibility, and approach. A Job Assessment must exist before a Job Plan may be created.
+### 1.4 Job Assessment, Job Plan, & Job Work Log
 
-We use multispectral mapping drones for both aerial and ground services. A Job Assessment may include one or more maps to inform planning and guide execution.
+TODO: **review for clarity, no rewrite**
+
+A Job Assessment evaluates the work to be completed on behalf of a customer. Assessments define the locations involved and gather the information required to determine scope, feasibility, and approach. Job Assessments scope the Job using Workflow definitions that direct the Job. A Job Assessment must exist before a Job Plan may be created.
+
+We use multispectral mapping drones for both aerial and ground services. A Job Assessment may include one or more annotations, Notes, which in turn may include attachments which may include maps or images.
 
 A Job Plan defines how a specific Job will be executed. Plans are created after assessment and translate intent into concrete, job-specific instruction. Job Plans are the primary means by which field crews are informed of the work to be performed and are prepared prior to execution to support guided, often offline operation in the field.
 
-A Job Log memorializes the physical execution of a Job. Logs are append-only and record what actually occurred, including photos, GPS coordinates, comments, time accrued, and any exceptions or deviations encountered. Logs may also capture notes about the job as a whole.
+A Job Work Log memorializes the physical execution of a Job. Logs are append-only and record the Answers to the Questions with the Task checklist. Additionally, the Job Work Log records any metadata about what actually occurred, including telemetry, GPS coordinates, comments, time accrued, and any exceptions or deviations encountered. Logs may also capture notes about the job as a whole.
 
 A Job has an Assessment, a Plan, and a collection of Log entries. Log entries are created during the execution of a Job, by a User, and are appended to the Job's Log. There are no circular foreign keys; Assessments, Plans, and Logs reference the Job.
 
-### 1.4 Job Work 
+### 1.4 Job Workflow & Job Work
 
-TODO: rewrite for clarity
+TODO: **review for clarity, no rewrite**
 
-Job Work is the physical execution of a Job. It is the primary means by which field crews are informed of the work to be performed and are prepared prior to execution to support guided, often offline operation in the field. Job Work is defined by the Workflows assigned to the Job Plan, which is itself defined by the Workflows assigned to the Job Assessment. 
+Work is the physical execution of a Job. It produces the progress and knowledge captured by field crews during a job. Work is directed by a sequence of Workflows. Each Workflow, its Tasks and their associated checklist of Questions are a template used to assess and plan the job.
 
-Each Workflow, its Tasks and their associated checklist of Questions are a template used to scope and plan the job. Each job is different so the Job Assessment may edit the workflow to capture the variation. 
+To facilitate the role a Workflow plays in orchestrating a Job, two new abstractions, Job Workflow and Job Work are introduced. Job has a collection of Job Workflows. Job Assessment, Job Plan, and Job Work each contain an association to their Job and therefore to the Job Workflows. Just as Tasks and Task checklist are sequenced, so too Job Workflows are sequenced.
 
-Job Assessment has workflow templates and workflow instances are created from the templates. Workflow templates/masters are essentially read only. Perhaps a la prototypical inheritance or simply a clone of the workflow master. The Job Plan can edit the workflow instances from the assessment or add more workflow masters and instances.
+Job Workflows are prepared prior to the Job Work. The Job Assessment phase includes selecting the Workflows to be used on a Job. As each job is different the Job Assessment may edit the workflows to capture the specialization. Creating, editing, and deleting Workflows are an administration authorization and so are read-only for Job Assessment and Job Plan. The Job Workflow is thus associated with a Workflow read-only basis and an optional Workflow modification -- which is a clone of the basis-workflow. The Job Plan phase may add additional basis Workflows and optionally modify them. The Job Plan may also modify Job Workflows that were modified during assessment. The assessment-modified Workflow then becomes the basis-workflow for a Job Workflow added by the Job Plan.
 
-To facilitate the role a Workflow plays in a orchestrating a Job, a new abstraction called JobWorkflow is introduced. Job has a collection of JobWorkflows (1:m). JobAssessment, JobPlan, and JobWork each contain an association to their Job and therefore to the JobWorkflows. Just as Tasks and Task checklist are ordered, so too are JobWorkflows ordered. 
+Starting Job Work involves transitioning the Job's status to `inprogress` and finalizing the workflow, essentially setting in stone the work to be done. As stated, Job Work is the process of executing a Job Workflow. A specialized UX within operations will walk a crew member through the workflow tasks, presenting the task checklist items as Questions and logging the Answers in the Job Work Log along with any metadata.
 
-Workflows are templates chosen and assigned to a Job as JobWorkflows. Template mutation is an administration authorization and so are generally read-only. When a JobAssessment is performed the workflow may be modified as part of the UX. The process of mutation/editing is to clone the Workflow with the JobWorkflow and update it the id of the clone.
-
-JobWorkflow has an id, a user Id, a basis workflow id, and a specialized workflow id. This structure allows for tracking a chain of Workflow modifications from assessment and planning as a basis workflow could be the original read-only template or a modified version of it.
-
-Starting a job involves transition the status to `inprogress` and finalizing the workflow, essentially setting in stone the JobWorkflow. 
-
-TODO: should JobWorkFlows be assigned to a crew member for execution as part of the JobWorkflow creation process?
-
-JobWork is the process of executing a JobWorkflow. A specialized UX within operations will walk a crew member through the workflow tasks, presenting the task checklist and logging the answers in the JobLog.
+TODO: **should Job Workflows be assigned to a crew member for execution as part of the Job Plan? Essentially doling out the work to be done vs. each crew member stepping on each other's toes. My intuition is yes. I have not worked through what that means yet. Let's not let this impeded today's progress. We must consider how to assign workflows to crew members and how to manage conflicts that may arise at some point soon.**
 
 ## 2. Domain Model (`source/domain`)
 
-TODO: I want to restructure this to bifurcate the swarmAg domain model from the patterns used to codify the domain model:
-      Domain: 
-        - User, Customer, Workflow, Task, Job, ...
-      Patterns (Abstraction): 
-        - abstractions, adapters, validators, protocols and associations
-      Patterns (Association): Embedded as JSONB columns or 4th normal form using PK & FK columns
-        Embedded array of abstractions are always arrays of type abstraction, and use Typescript Variadic Tuple Types + Optional Elements to declare their cardinality within the data-dictionary and generated abstraction types.
-          - [Abstraction] - 1 and only 1
-          - [Abstraction?] - 0 or 1
-          - [Abstraction, ...Abstraction[]] - 1 or more
-          - [Abstraction?, ...Abstraction[]] - 0 or more
-        4NF includes:
-          - 1:1 FK on owner or parent
-          - 1:m FK on the many side
-          - m:m FK junction table (I use the expression "join-table" though I think you may be correct in "junction table" as the technical term)
+TODO: **rewrite for clarity and content**
+
+I want to restructure this to bifurcate the swarmAg domain model from the patterns used to codify the domain model:
+  Domain Model: User, Customer, Workflow, Task, Job, ...
+  Abstraction Patterns: abstractions, adapters, validators, protocols
+  Association Patterns: Embedded as JSONB columns or 4th normal form using PK & FK columns
+  
+  Embedded array of abstractions are always arrays of type abstraction, and use Typescript Variadic Tuple Types + Optional Elements to declare their cardinality within the data-dictionary and generated abstraction types. 
+  - [Abstraction] - 1 and only 1 
+  - [Abstraction?] - 0 or 1 
+  - [Abstraction, ...Abstraction[]] - 1 or more 
+  - [Abstraction?, ...Abstraction[]] - 0 or more
+  
+  4NF includes: 
+  - 1:1 FK on owner or parent side
+  - 1:m FK on many side 
+  - m:m FK junction table (I use the expression "join-table" though I think you may be correct in "junction table" as the technical term)
 
 ### 2.1 Scope
 
@@ -276,7 +274,7 @@ Attachment (object)
   Notes: Uploaded artifact metadata
 
 Note (object)
-  Fields: id, createdAt, authorId?, content, visibility?(internal|shared), 
+  Fields: id, createdAt, authorId?, content, visibility?(internal|shared),
           tags: [string?, ...string[]], attachments: [Attachment?, ...Attachment[]]
   Notes: Freeform note with optional visibility/taxonomy
 ```
@@ -319,7 +317,7 @@ Chemical (object)
 
 ```text
 Contact (object)
-  Fields: id, customerId, name, email?, phone?, preferredChannel?(email|text|phone), 
+  Fields: id, customerId, name, email?, phone?, preferredChannel?(email|text|phone),
           notes: [Note?, ...Note[]], createdAt, updatedAt
   Notes: Customer-associated contact person
 
@@ -329,8 +327,8 @@ CustomerSite (object)
 
 Customer (object)
   Fields: id, name, status(active|inactive|prospect), line1, line2?, city, state, postalCode,
-          country, accountManagerId?, primaryContactId?, sites: [CustomerSite, ...CustomerSite[]], 
-          contacts: [Contact?, ...Contact[]], notes: [Note?, ...Note[]], 
+          country, accountManagerId?, primaryContactId?, sites: [CustomerSite, ...CustomerSite[]],
+          contacts: [Contact?, ...Contact[]], notes: [Note?, ...Note[]],
           createdAt, updatedAt, deletedAt?
   Notes: Customer account aggregate; contacts must be non-empty
 ```
@@ -363,7 +361,7 @@ UserRole (union)
   Notes: Role type derived from tuple
 
 User (object)
-  Fields: id, displayName, primaryEmail, phoneNumber, avatarUrl?, roles?, 
+  Fields: id, displayName, primaryEmail, phoneNumber, avatarUrl?, roles?,
           status?(active|inactive), createdAt?, updatedAt?, deletedAt?
   Notes: System user identity and membership
 ```
@@ -409,8 +407,8 @@ JobStatus (enum)
   Notes: Job lifecycle state
 
 JobAssessment (object)
-  Fields: id, jobId, assessorId, locations: [Location, ...Location[]],  
-          risks: [Note?, ...Note[]], notes: [Note?, ...Note[]], 
+  Fields: id, jobId, assessorId, locations: [Location, ...Location[]],
+          risks: [Note?, ...Note[]], notes: [Note?, ...Note[]],
           createdAt, updatedAt, deletedAt?
   Notes: Pre-planning assessment; requires one or more locations
 
@@ -427,7 +425,7 @@ JobPlanAsset (object)
   Notes: Asset allocated to a plan
 
 JobPlan (object)
-  Fields: id, jobId, scheduledStart, scheduledEnd?, notes: [Note?, ...Note[]], 
+  Fields: id, jobId, scheduledStart, scheduledEnd?, notes: [Note?, ...Note[]],
           createdAt, updatedAt, deletedAt?
   Notes: Job-specific execution plan
 
