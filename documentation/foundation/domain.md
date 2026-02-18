@@ -89,11 +89,20 @@ A Job has an Assessment, a Plan, and a collection of Log entries. Log entries ar
 
 Job work is the physical execution of a Job. It is the primary means by which field crews are informed of the work to be performed and are prepared prior to execution to support guided, often offline operation in the field. Job work is defined by the Workflows assigned to the Job Plan
 
-Each Workflow, it's Tasks and their associated checklist of Questions are a template used to scope and plan the job. Each job is different so the Job Assessment may edit the workflow to capture the variation. 
+Each Workflow, its Tasks and their associated checklist of Questions are a template used to scope and plan the job. Each job is different so the Job Assessment may edit the workflow to capture the variation. 
 
-TODO: Job Assessment has workflow templates and workflow instances. Workflow templates/masters are essentially read only. Workflow instance derives from the templates. Perhaps a la prototypical inheritance or simply a clone of the workflow master. The Job Plan can edit the workflow instances from the assessment or add more workflow masters and instances.
+Job Assessment has workflow templates and workflow instances are created from the templates. Workflow templates/masters are essentially read only. Perhaps a la prototypical inheritance or simply a clone of the workflow master. The Job Plan can edit the workflow instances from the assessment or add more workflow masters and instances.
 
-TODO: would it be useful to have the root Job have a collection of Workflows that essentially define how to perform the assessment itself. The Job Log would then become the input to automate a draft of the Job Assessment.
+TODO: I think we're missing an essential abstraction, the Job Work. Job has a Job Assessment, Job Plan and Job Work. 
+      A Job Work entity is added to the Job when the works begins transitioning the Job state to 'inprogress'
+      Job Work captures state about the overall job. Job.state == 'inprogress' is our lock state.
+      Only Jobs in this state can be deepCloned for progressing the Job Plan Workflow, Tasks, and checklists
+
+TODO: I removed target locations from Job Plan. 
+
+TODO: would it be useful to have the root Job have a collection of Workflows that 
+      essentially define how to perform the assessment itself. 
+      The Job Log would then become the input to automate a draft of the Job Assessment.
 
 ## 2. Domain Model (`source/domain`)
 
@@ -380,7 +389,8 @@ JobStatus (enum)
   Notes: Job lifecycle state
 
 JobAssessment (object)
-  Fields: id, jobId, assessorId, locations: [Location, ...Location[]], answers: Answer[], risks?, notes?, attachments?, createdAt, updatedAt, deletedAt?
+  Fields: id, jobId, assessorId, locations: [Location, ...Location[]],  
+          risks: Note[], notes: Note[], createdAt, updatedAt, deletedAt?
   Notes: Pre-planning assessment; requires one or more locations
 
 JobPlanAssignment (object)
@@ -396,8 +406,7 @@ JobPlanAsset (object)
   Notes: Asset allocated to a plan
 
 JobPlan (object)
-  Fields: id, jobId, workflowId, scheduledStart, scheduledEnd?, targetLocations: Location[], notes: Notes[],
-          createdAt, updatedAt, deletedAt?
+  Fields: id, jobId, scheduledStart, scheduledEnd?, notes: Notes[], createdAt, updatedAt, deletedAt?
   Notes: Job-specific execution plan
 
 JobLogType (enum)
