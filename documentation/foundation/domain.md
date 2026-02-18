@@ -6,17 +6,68 @@ This document defines the foundational abstractions, contracts, and APIs of the 
 
 ### 1.1 Service
 
-A Service is a listed product representing work we sell, identified by an SKU. Services belong to a category (for example, aerial or ground), have a description, and define the kinds of assets required to execute the work (machines, tools, supplies, and labor).
+A Service is a listed product representing work we sell, identified by an SKU. Services belong to a category (for example, aerial or ground), have a description, and define the kinds of assets required to execute the work (equipment, tools, supplies).
 
 Many services require the use of regulated chemicals. The acquisition, storage, mixing, and application of chemicals must be managed to maintain licensing and regulatory compliance.
 
 A Service Category represents a class of service we offer (e.g., aerial-drone-service, ground-machinery-service). Each Service Category has one or more Workflows suitable for performing services within that category.
 
+### 1.2 Services by Category
+
+#### 1.2.1 Aerial Drone Service
+
+| Description                    | Equipment | SKU        |
+| ------------------------------ | --------- | ---------- |
+| Pesticide, Herbicide           | XAG P150  | A-CHEM-01  |
+| Fertilizer                     | XAG P150  | A-CHEM-02  |
+| Seed                           | XAG P150  | A-SEED-01  |
+| Pond Weeds & Algae             | DJI T30   | A-CHEM-03  |
+| Pond Feeding                   | DJI T30   | A-FEED-01  |
+| Precision Mapping              | DJI P4    | A-MAP-01   |
+| Mesquite Herbicide             | XAG P150  | A-CHEM-04  |
+| Commercial Greenhouse Painting | DJI T30   | A-PAINT-01 |
+
+#### 1.2.2 Ground Machinery Services
+
+| Description                        | Equipment            | SKU        |
+| ---------------------------------- | -------------------- | ---------- |
+| Mesquite, Hackberry, et al Removal | John Deere Skidsteer | G-MITI-01  |
+| Fence-line Tree Trimming           | Bobcat Toolcat       | G-FENCE-01 |
+| Rock Removal, Regrade              | Skidsteer, Toolcat   | G-MACH-01  |
+| Brush Hogging                      | Skidsteer, Toolcat   | G-BRUSH-01 |
+
+#### 1.2.3 Tools
+
+| Tool | Description |
+| --- | --- |
+| Sickle Shears | Precise cutting of brush and small mesquite clusters at ground level. |
+| Buncher Shears | Precise cutting of medium to large mesquite at ground level aided by hydraulic arms. |
+| Telescoping Shears | Precise cutting of high-reaching trees or brush, or those located on pond downslope. |
+| 6-way Dozer Blade | Hydraulic attachment that offers six directions of movement to precisely grade, push, and spread materials for detailed earthmoving and finishing work. |
+| Tree Saw | Specialized, hydraulically-powered tool featuring a large circular blade designed for quickly and safely felling trees and clearing heavy brush. |
+| Chemical Applicators | Custom sponge/dauber systems ensure thorough target surface coverage with precise, controlled volumes of herbicide. |
+
+#### 1.2.4 Asset Types
+
+| Description             |
+| ----------------------- |
+| Transport Truck         |
+| Transport Trailer       |
+| Skidsteer Vehicle       |
+| Toolcat Vehicle         |
+| Vehicle Tool Attachment |
+| Mapping Drone           |
+| Dispensing Drone        |
+| Drone Spray Tank        |
+| Drone Granular Hopper   |
+
 ### 1.2 Workflow & Tasks
 
-A Workflow describes how work is generally performed. It may be composed of a graph of Tasks, where a Workflow is itself one kind of Task (composite). Examples include "Drone Chemical Preparation", "Mesquite Chemical Preparation", "Mesquite Mitigation Procedure", and "Drone Obstacle Preflight".
+A Workflow describes how work is generally performed. Examples of workflows include "Drone Chemical Preparation", "Mesquite Chemical Preparation", "Mesquite Mitigation Procedure", and "Drone Obstacle Preflight".
 
-Each Task in a Workflow is either a Note or a Question. Notes are static text used to inform or warn operations staff. Questions are expressed using a small set of fundamental response forms, including yes/no, selection, date/time, quantity (real number), and free-form comment. All workflow questions reduce to one of these forms, though answers may include supporting artifacts captured as Notes. Notes may contain or Attachments. Attachments are mime-type specified, such as images, videos, or documents.
+A Workflow is structured as a sequence of Tasks. Examples of tasks include "Packed the chemicals.", "Checked the drone's battery.", "Reviewed the weather forecast.", "Reviewed the drone's flight plan.".
+
+Each Task in a Workflow is a simple checklist supporting the task. Each item in the checklist can be either a Note or a Question. Notes are static text used to inform or warn operations staff. Questions are expressed using a small set of fundamental response formats: yes/no, selection, datetime, quantity (real number). All Tasks and Answers may be annotated with one or more Notes. Notes may contain one or more Attachments. Attachments are mime-type specified, such as images, videos, or documents.
 
 Workflows guide how work is assessed and inform how it is later planned and executed.
 
@@ -33,6 +84,16 @@ A Job Plan defines how a specific Job will be executed. Plans are created after 
 A Job Log memorializes the physical execution of a Job. Logs are append-only and record what actually occurred, including photos, GPS coordinates, comments, time accrued, and any exceptions or deviations encountered. Logs may also capture notes about the job as a whole.
 
 A Job has an Assessment, a Plan, and a collection of Log entries. Log entries are created during the execution of a Job, by a User, and are appended to the Job's Log. There are no circular foreign keys; Assessments, Plans, and Logs reference the Job.
+
+### 1.4 Job Work (TODO: rewrite for clarity)
+
+Job work is the physical execution of a Job. It is the primary means by which field crews are informed of the work to be performed and are prepared prior to execution to support guided, often offline operation in the field. Job work is defined by the Workflows assigned to the Job Plan
+
+Each Workflow, it's Tasks and their associated checklist of Questions are a template used to scope and plan the job. Each job is different so the Job Assessment may edit the workflow to capture the variation. 
+
+TODO: Job Assessment has workflow templates and workflow instances. Workflow templates/masters are essentially read only. Workflow instance derives from the templates. Perhaps a la prototypical inheritance or simply a clone of the workflow master. The Job Plan can edit the workflow instances from the assessment or add more workflow masters and instances.
+
+TODO: would it be useful to have the root Job have a collection of Workflows that essentially define how to perform the assessment itself. The Job Log would then become the input to automate a draft of the Job Assessment.
 
 ## 2. Domain Model (`source/domain`)
 
@@ -187,7 +248,8 @@ Attachment (object)
   Notes: Uploaded artifact metadata
 
 Note (object)
-  Fields: id, createdAt, authorId?, content, visibility?(internal|shared), tags?, images: Attachment[]
+  Fields: id, createdAt, authorId?, content, visibility?(internal|shared), 
+          tags: string[], attachments: Attachment[]
   Notes: Freeform note with optional visibility/taxonomy
 ```
 
@@ -204,7 +266,8 @@ AssetStatus (enum)
   Notes: Lifecycle/availability state
 
 Asset (object)
-  Fields: id, label, description?, serialNumber?, type(AssetType.id), status(AssetStatus), attachments?, createdAt, updatedAt, deletedAt?
+  Fields: id, label, description?, serialNumber?, type(AssetType.id), status(AssetStatus),
+          notes: Note[], createdAt, updatedAt, deletedAt?
   Notes: Operational equipment/resource
 ```
 
@@ -228,7 +291,8 @@ Chemical (object)
 
 ```text
 Contact (object)
-  Fields: id, customerId, name, email?, phone?, preferredChannel?(email|text|phone), notes?, createdAt, updatedAt
+  Fields: id, customerId, name, email?, phone?, preferredChannel?(email|text|phone), 
+          notes: Note[], createdAt, updatedAt
   Notes: Customer-associated contact person
 
 CustomerSite (object)
@@ -236,7 +300,10 @@ CustomerSite (object)
   Notes: Serviceable customer location
 
 Customer (object)
-  Fields: id, name, status(active|inactive|prospect), line1, line2?, city, state, postalCode, country, accountManagerId?, primaryContactId?, sites: CustomerSite[], contacts: [Contact, ...Contact[]], notes?, createdAt, updatedAt, deletedAt?
+  Fields: id, name, status(active|inactive|prospect), line1, line2?, city, state, postalCode,
+          country, accountManagerId?, primaryContactId?, sites: CustomerSite[], 
+          contacts: [Contact, ...Contact[]], notes: Note[], 
+          createdAt, updatedAt, deletedAt?
   Notes: Customer account aggregate; contacts must be non-empty
 ```
 
@@ -295,12 +362,13 @@ Answer (object)
   Fields: questionId, value, capturedAt, capturedById, note?
   Notes: Captured response instance
 
-WorkflowStep (object)
-  Fields: id, title, description?, checklist: Question[], requiresLocationCapture?, requiresPhoto?, notes?
+Task (object)
+  Fields: id, title, description?, checklist: Question[]
   Notes: Atomic executable step
 
 Workflow (object)
-  Fields: id, serviceId, name, description?, version, effectiveFrom, steps, locationsRequired?, createdAt, updatedAt, deletedAt?
+  Fields: id, name, description?, version, tags: string[],
+          tasks: Tasks[], createdAt, updatedAt, deletedAt?
   Notes: Versioned execution template
 ```
 
@@ -312,7 +380,7 @@ JobStatus (enum)
   Notes: Job lifecycle state
 
 JobAssessment (object)
-  Fields: id, jobId, assessorId, locations: [Location, ...Location[]], questions: Answer[], risks?, notes?, attachments?, createdAt, updatedAt, deletedAt?
+  Fields: id, jobId, assessorId, locations: [Location, ...Location[]], answers: Answer[], risks?, notes?, attachments?, createdAt, updatedAt, deletedAt?
   Notes: Pre-planning assessment; requires one or more locations
 
 JobPlanAssignment (object)
@@ -328,7 +396,8 @@ JobPlanAsset (object)
   Notes: Asset allocated to a plan
 
 JobPlan (object)
-  Fields: id, jobId, workflowId, scheduledStart, scheduledEnd?, targetLocations: Location[], notes?, createdAt, updatedAt, deletedAt?
+  Fields: id, jobId, workflowId, scheduledStart, scheduledEnd?, targetLocations: Location[], notes: Notes[],
+          createdAt, updatedAt, deletedAt?
   Notes: Job-specific execution plan
 
 JobLogType (enum)
@@ -344,6 +413,6 @@ JobLogEntry (object)
   Notes: Append-only event record
 
 Job (object)
-  Fields: id, customerId, serviceId, status, createdAt, updatedAt, deletedAt?
+  Fields: id, customerId, status, notes: Note[], createdAt, updatedAt, deletedAt?
   Notes: Work agreement lifecycle anchor
 ```
