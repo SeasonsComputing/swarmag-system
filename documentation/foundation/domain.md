@@ -386,11 +386,11 @@ AnswerValue (union)
   Notes: Permitted answer value payloads
 
 Answer (object)
-  Fields: questionId, value, capturedAt, capturedById, note?
+  Fields: questionId, value, capturedAt, capturedById, notes: [Note?, ...Note[]]
   Notes: Captured response instance
 
 Task (object)
-  Fields: id, title, description?, checklist: Question[]
+  Fields: id, title, description?, checklist: [Question, ...Question[]]
   Notes: Atomic executable step
 
 Workflow (object)
