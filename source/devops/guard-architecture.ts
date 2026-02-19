@@ -31,8 +31,7 @@ const ALLOWED_DEPS: Record<Namespace, Set<Namespace>> = {
 /** UX apps forbidden from importing these internals */
 const UX_FORBIDDEN_IMPORTS = [
   '@core/api/',
-  '@core/db/',
-  '@core/runtime/',
+  '@core/cfg/',
   '@back',
   '@back-supabase-edge/',
   '@domain/adapters/'
@@ -167,7 +166,7 @@ const checkConfigImports = (
 
   for (const { specifier } of imports) {
     // Direct Config import only in config modules
-    if (specifier === '@core/runtime/config.ts' && !configModule) {
+    if (specifier === '@core/cfg/config.ts' && !configModule) {
       violations.push(
         'Direct Config import (use package config module: @back-supabase-edge/config/... or @ux-app-*/config/...)'
       )
@@ -175,7 +174,7 @@ const checkConfigImports = (
 
     // Provider imports only in config modules
     if (
-      specifier.startsWith('@core/runtime/')
+      specifier.startsWith('@core/cfg/')
       && specifier.endsWith('provider.ts')
       && !configModule
     ) {

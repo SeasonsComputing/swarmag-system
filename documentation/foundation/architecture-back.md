@@ -60,7 +60,7 @@ Use for operations that coordinate multiple steps without needing HTTP-level con
 import { Config } from '@back-supabase-edge/config/config.ts'
 import type { Dictionary } from '@core-std'
 import { makeBusRuleHttpProvider } from '@core/api/make-http-provider.ts'
-import { Supabase } from '@core/db/supabase.ts'
+import { Supabase } from '@core/api/supabase.ts'
 
 const handler = async (params: Dictionary): Promise<Dictionary> => {
   const jobId = params.jobId as string
@@ -298,8 +298,8 @@ Edge functions use the singleton `Config` pattern defined in `architecture-core.
 
 ```typescript
 // source/back/supabase-edge/config/supabase-config.ts
-import { Config } from '@core/runtime/config.ts'
-import { SupabaseProvider } from '@core/runtime/supabase-provider.ts'
+import { Config } from '@core/cfg/config.ts'
+import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
 Config.init(new SupabaseProvider(), [
   'SUPABASE_URL',

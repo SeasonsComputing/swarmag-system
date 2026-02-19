@@ -10,12 +10,12 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 ### 1.1 Top-level Namespaces
 
-| Path             | Description                                              |
-| ---------------- | -------------------------------------------------------- |
-| `deploy/`        | Deployment artifacts and environment-specific output     |
-| `documentation/` | Product, architecture, domain, and history documentation |
-| `source/`        | Application and platform implementation code             |
-| `supabase/`      | Supabase project configuration and local metadata        |
+| Path             | Description                                          |
+| ---------------- | ---------------------------------------------------- |
+| `deploy/`        | Deployment artifacts and environment-specific output |
+| `documentation/` | Foundation and application documentation             |
+| `source/`        | Source code organized into layers                    |
+| `supabase/`      | Supabase project configuration and local metadata    |
 
 ### 1.2 Documentation (`documentation/`)
 
@@ -39,7 +39,6 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 | Path                 | Description                                        |
 | -------------------- | -------------------------------------------------- |
-| `user-stories.md`    | Cross-application user stories and workflow goals  |
 | `admin-web-app.md`   | Administration app scope and requirements          |
 | `ops-mobile-app.md`  | Operations mobile app scope and field workflows    |
 | `customer-portal.md` | Customer portal scope, visibility, and constraints |
@@ -57,12 +56,11 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 #### 1.3.1 Core (`source/core/`)
 
-| Path       | Description                                                      |
-| ---------- | ---------------------------------------------------------------- |
-| `api/`     | Client makers and provider adapters (CRUD, HTTP, business rules) |
-| `db/`      | Database client singletons (Supabase)                            |
-| `runtime/` | Configuration management (Config singleton, runtime providers)   |
-| `std/`     | Standard types (ID, When, Dictionary)                            |
+| Path   | Description                                                      |
+| ------ | ---------------------------------------------------------------- |
+| `api/` | Client makers and provider adapters (CRUD, HTTP, business rules) |
+| `cfg/` | Configuration management (Config singleton, runtime providers)   |
+| `std/` | Standard types (ID, When, Dictionary)                            |
 
 #### 1.3.2 Domain (`source/domain/`)
 
@@ -134,7 +132,7 @@ VITE_SUPABASE_ANON_KEY=your-anon-key
 
 ### 2.3 Configuration Pattern
 
-The system uses a singleton `Config` pattern defined in `@core/runtime/config.ts`:
+The system uses a singleton `Config` pattern defined in `@core/cfg/config.ts`:
 
 - **Core defines the singleton** - Configuration lives at the lowest layer
 - **Packages inject providers** - Each deployment context supplies its runtime provider

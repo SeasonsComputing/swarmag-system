@@ -17,12 +17,9 @@ EXPORTED APIs & TYPEs
 ApiError
 ApiCrudContract
 ApiBusRuleContract
-
 DeleteResult
-
 ListOptions
 ListResult<T>
-
 listPageLimitValue(string): number
 listCursorValue(string): number
 

@@ -3,7 +3,7 @@
  * Accesses environment variables via Netlify.env and throws HTTP Response errors.
  */
 
-import type { RuntimeProvider } from '@core/runtime/runtime-provider.ts'
+import type { RuntimeProvider } from '@core/cfg/runtime-provider.ts'
 
 /** Netlify.env ambient declaration */
 declare const Netlify:
