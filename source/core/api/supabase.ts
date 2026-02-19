@@ -2,7 +2,7 @@
  * Supabase client singleton for server-side operations.
  */
 
-import { Config } from '@core/runtime/config.ts'
+import { Config } from '@core/cfg/config.ts'
 import { createClient, type SupabaseClient } from '@supabase-client'
 
 /** Cache-aware Supabase client factory for platform functions. */

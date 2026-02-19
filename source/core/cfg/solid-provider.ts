@@ -3,7 +3,7 @@
  * Accesses environment variables via import.meta.env and throws Error.
  */
 
-import type { RuntimeProvider } from '@core/runtime/runtime-provider.ts'
+import type { RuntimeProvider } from '@core/cfg/runtime-provider.ts'
 
 /** Solid: env forward declaration */
 declare global {

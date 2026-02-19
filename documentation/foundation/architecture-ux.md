@@ -110,8 +110,7 @@ The foundation provides:
 
 #### 4.1.2 UX applications MUST NOT import
 
-- `@core/api/*` - Client makers (use composed `@ux-api`)
-- `@core/db/*` - Database clients
+- `@core/api/*` - API contracts
 - `@back/*` - Backend edge functions
 - `@domain/adapters/*` - Storage serialization
 
@@ -123,8 +122,8 @@ Each application has its own configuration module:
 
 ```typescript
 // source/ux/app-admin/config/config.ts
-import { BrowserProvider } from '@core/runtime/browser-provider.ts'
-import { Config } from '@core/runtime/config.ts'
+import { BrowserProvider } from '@core/cfg/browser-provider.ts'
+import { Config } from '@core/cfg/config.ts'
 
 Config.init(new BrowserProvider(), [
   'VITE_SUPABASE_URL',
@@ -136,7 +135,7 @@ export { Config }
 
 #### 4.2.1 Pattern
 
-- Import `Config` singleton from `@core/runtime/config.ts`
+- Import `Config` singleton from `@core/cfg/config.ts`
 - Initialize with browser provider and required keys
 - Re-export for use within the app
 - Environment files: `{app}-local.env`, `{app}-stage.env`, `{app}-prod.env`

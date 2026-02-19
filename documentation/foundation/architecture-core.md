@@ -367,7 +367,7 @@ Edge functions are **thin orchestration wrappers** implemented using provider ma
 
 ### 6.1 Runtime Configuration Pattern
 
-The system uses a **singleton configuration pattern** with runtime-specific providers. The `Config` singleton lives in `@core/runtime/config.ts` and is initialized by each deployment package with the appropriate provider.
+The system uses a **singleton configuration pattern** with runtime-specific providers. The `Config` singleton lives in `@core/cfg/config.ts` and is initialized by each deployment package with the appropriate provider.
 
 #### 6.1.1 Design Principles
 
@@ -380,7 +380,7 @@ The system uses a **singleton configuration pattern** with runtime-specific prov
 Runtime providers implement the `RuntimeProvider` interface:
 
 ```typescript
-// source/core/runtime/runtime-provider.ts
+// source/core/cfg/runtime-provider.ts
 export interface RuntimeProvider {
   get(key: string): string | undefined
 }
@@ -388,15 +388,15 @@ export interface RuntimeProvider {
 
 #### 6.2.1 Available Providers
 
-- `SupabaseProvider` - Supabase Edge Functions runtime (`@core/runtime/supabase-provider.ts`)
-- `DenoProvider` - Deno development/testing runtime (`@core/runtime/deno-provider.ts`)
+- `SupabaseProvider` - Supabase Edge Functions runtime (`@core/cfg/supabase-provider.ts`)
+- `DenoProvider` - Deno development/testing runtime (`@core/cfg/deno-provider.ts`)
 - _(Additional providers as needed for other runtimes)_
 
 ### 6.3 Package Configuration Pattern
 
 Each deployment package creates a configuration module that:
 
-1. Imports the `Config` singleton from `@core/runtime/config.ts`
+1. Imports the `Config` singleton from `@core/cfg/config.ts`
 2. Creates the appropriate runtime provider
 3. Initializes with required environment variables
 4. Re-exports the configured singleton
@@ -405,8 +405,8 @@ Each deployment package creates a configuration module that:
 
 ```typescript
 // source/back/supabase-edge/config/supabase-config.ts
-import { Config } from '@core/runtime/config.ts'
-import { SupabaseProvider } from '@core/runtime/supabase-provider.ts'
+import { Config } from '@core/cfg/config.ts'
+import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
 // Initialize the core singleton with Supabase runtime provider
 Config.init(new SupabaseProvider(), [
@@ -439,7 +439,7 @@ const url = Config.get('SUPABASE_URL')
 
 // When lower layers unaware of which package they've been
 // imported into require config, user `core` runtime config
-import { Config } from '@core/runtime/config.ts'
+import { Config } from '@core/cfg/config.ts'
 ```
 
 ### 6.5 Environment Files
@@ -524,8 +524,7 @@ swarmag-system/
 ├── source/
 │   ├── core/
 │   │   ├── api/
-│   │   ├── db/
-│   │   ├── runtime/
+│   │   ├── cfg/
 │   │   └── std/
 │   ├── domain/
 │   │   ├── abstractions/

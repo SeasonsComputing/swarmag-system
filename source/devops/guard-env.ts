@@ -14,11 +14,11 @@ const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 /** Relative paths that are allowed to use Deno.env. */
 const ALLOWED_FILES = new Set([
   'source/devops/guard-env.ts',
-  'source/core/runtime/deno-provider.ts',
-  'source/core/runtime/supabase-provider.ts',
-  'source/core/runtime/browser-provider.ts',
+  'source/core/cfg/deno-provider.ts',
+  'source/core/cfg/supabase-provider.ts',
+  'source/core/cfg/browser-provider.ts',
   // Current runtime provider filename in this repository.
-  'source/core/runtime/solid-provider.ts'
+  'source/core/cfg/solid-provider.ts'
 ])
 
 /** Match direct Deno.env or Deno.test access. */
