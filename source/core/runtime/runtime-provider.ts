@@ -7,9 +7,7 @@ export interface RuntimeProvider {
    * @param key - Environment variable name to read.
    * @returns Environment variable value.
    */
-  get(key: string):
-    | string
-    | unknown
+  get(key: string): string | undefined
 
   /**
    * Fail with a message.

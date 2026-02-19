@@ -2,5 +2,5 @@
  * ADTs
  */
 
-export type Dictionary = Record<string, unknown>
+export type Dictionary<V = unknown> = Record<string, V>
 export class StringSet extends Set<string> {}

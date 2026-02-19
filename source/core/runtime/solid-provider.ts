@@ -1,9 +1,9 @@
 /**
- * Browser/SSR Solid application configuration provider.
+ * Solid application configuration provider.
  * Accesses environment variables via import.meta.env and throws Error.
  */
 
-import { RuntimeConfig, type RuntimeProvider } from '@core-std'
+import type { RuntimeProvider } from '@core/runtime/runtime-provider.ts'
 
 /** Solid: env forward declaration */
 declare global {
@@ -17,10 +17,11 @@ declare global {
  */
 export class SolidProvider implements RuntimeProvider {
   constructor() {
-    if (!import.meta?.env) this.fail('Solid runtime not available')
+    const isSolid = import.meta?.env !== undefined
+    if (!isSolid) this.fail('Solid runtime not available')
   }
-  get(key: string): string {
-    return import.meta.env![key]
+  get(key: string): string | undefined {
+    return import.meta?.env![key]
   }
   fail(msg: string): never {
     throw new Error(`Config error: ${msg}`)

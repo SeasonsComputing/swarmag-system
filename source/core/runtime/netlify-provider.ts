@@ -3,7 +3,7 @@
  * Accesses environment variables via Netlify.env and throws HTTP Response errors.
  */
 
-import { RuntimeConfig, type RuntimeProvider } from '@core-std'
+import type { RuntimeProvider } from '@core/runtime/runtime-provider.ts'
 
 /** Netlify.env ambient declaration */
 declare const Netlify:
@@ -15,10 +15,11 @@ declare const Netlify:
  */
 export class ProviderNetlify implements RuntimeProvider {
   constructor() {
-    if (!Netlify?.env) this.fail('Netlify runtime not available')
+    const isNetlify = 'Netlify' in globalThis
+    if (!isNetlify) this.fail('Netlify runtime not available')
   }
   get(key: string): string | undefined {
-    return Netlify.env.get(key)
+    return Netlify?.env.get(key)
   }
   fail(msg: string): never {
     throw new Response(msg, { status: 500 })
