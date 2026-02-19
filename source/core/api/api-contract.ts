@@ -14,7 +14,17 @@ TODO
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-TODO
+ApiError
+ApiCrudContract
+ApiBusRuleContract
+
+DeleteResult
+
+ListOptions
+ListResult<T>
+
+listPageLimitValue(string): number
+listCursorValue(string): number
 
 EXAMPLES
 ───────────────────────────────────────────────────────────────────────────────
@@ -94,7 +104,7 @@ export type ListResult<T> = {
  * @param value Raw limit value from the query string.
  * @returns Clamped limit value.
  */
-export const clampLimit = (value?: string | null): number => {
+export const listPageLimitValue = (value?: string | null): number => {
   const parsed = Number.parseInt(value ?? '', 10)
   if (Number.isNaN(parsed) || parsed <= 0) return DEFAULT_LIMIT
   return Math.min(parsed, MAX_LIMIT)
@@ -105,7 +115,7 @@ export const clampLimit = (value?: string | null): number => {
  * @param value Raw cursor value from the query string.
  * @returns Parsed cursor.
  */
-export const parseCursor = (value?: string | null): number => {
+export const listCursorValue = (value?: string | null): number => {
   const parsed = Number.parseInt(value ?? '', 10)
   return Number.isNaN(parsed) || parsed < 0 ? DEFAULT_CURSOR : parsed
 }

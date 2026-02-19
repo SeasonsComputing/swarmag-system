@@ -10,13 +10,14 @@ import type { RuntimeProvider } from './runtime-provider.ts'
  */
 export class DenoProvider implements RuntimeProvider {
   constructor() {
-    if (!Deno?.env) this.fail('Deno runtime not available')
+    const isDeno = 'Deno' in globalThis
+    if (!isDeno) this.fail('Deno runtime not available')
   }
   get(key: string): string | undefined {
     return Deno.env.get(key)
   }
   fail(msg: string): never {
-    console.error(`Config error: ${msg}`)
+    console.error(`${msg}`)
     Deno.exit(1)
   }
 }

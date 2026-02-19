@@ -29,6 +29,7 @@ import {
   type ApiCrudContract,
   ApiError,
   DeleteResult,
+  type ListOptions,
   type ListResult
 } from './api-contract.ts'
 
