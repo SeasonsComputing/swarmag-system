@@ -6,12 +6,12 @@ Code that conflicts with this guide is wrong — not the guide.
 
 ## 1. Language & Tooling
 
-| Item       | Guideline                                                                                                                                               |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime    | Deno with strict TypeScript (`deno task check`)                                                                                                         |
-| Encoding   | ASCII only; no non-ASCII literals                                                                                                                       |
+| Item       | Guideline                                                                                                                                              |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Runtime    | Deno with strict TypeScript (`deno task check`)                                                                                                        |
+| Encoding   | ASCII only; no non-ASCII literals                                                                                                                      |
 | Types      | Use `type` for data shapes, abstractions, aliases, and unions; use `interface` only for encapsulated API contracts that something explicitly implements |
-| Primitives | Use `ID` (UUID v7 string) and `When` (ISO 8601 UTC string) from `@core-std`                                                                             |
+| Primitives | Use `ID` (UUID v7 string) and `When` (ISO 8601 UTC string) from `@core-std`                                                                            |
 
 ## 2. Import Aliases
 
@@ -114,7 +114,11 @@ export type AssetType = {
 }
 
 /** Lifecycle and availability state. */
-export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'reserved'
+export type AssetStatus =
+  | 'active'
+  | 'maintenance'
+  | 'retired'
+  | 'reserved'
 
 /** Operational equipment or resource. */
 export type Asset = {
@@ -249,7 +253,6 @@ function parseRequestBody() { ... }
 - EXAMPLE is valid, runnable TypeScript — not pseudocode.
 - Headers stay current. A stale header is worse than no header.
 
-### 4.5 Section dividers
 
 ### 4.5 Section dividers
 
@@ -271,12 +274,12 @@ Non-trivial files divide the code body into PUBLIC EXPORTS and PRIVATE IMPLEMENT
 
 ### 4.6 Comment conventions
 
-| Context                       | Style                                                               |
-| ----------------------------- | ------------------------------------------------------------------- |
-| Spec file types               | Single-line `/** */` — one sentence, only when name is insufficient |
-| Functional exported functions | JSDoc with `@param` and `@returns` for non-obvious args             |
-| Private helpers               | Inline `//` — only when intent isn't obvious from the code          |
-| Dead comments                 | Delete them. Version control exists.                                |
+| Context | Style |
+| --- | --- |
+| Spec file types | Single-line `/** */` — one sentence, only when name is insufficient |
+| Functional exported functions | JSDoc with `@param` and `@returns` for non-obvious args |
+| Private helpers | Inline `//` — only when intent isn't obvious from the code |
+| Dead comments | Delete them. Version control exists. |
 
 ## 5. Code Tone
 
@@ -373,17 +376,12 @@ import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
 Config.init(
   new SolidProvider(),
-  [
-    'VITE_SUPABASE_EDGE_URL',
-    'VITE_SUPABASE_RDBMS_URL',
-    'VITE_SUPABASE_SERVICE_KEY',
-    'VITE_JWT_SECRET'
-  ],
+  ['VITE_SUPABASE_EDGE_URL', 'VITE_SUPABASE_RDBMS_URL', 'VITE_SUPABASE_SERVICE_KEY', 'VITE_JWT_SECRET'],
   {
-    SUPABASE_EDGE_URL: 'VITE_SUPABASE_EDGE_URL',
-    SUPABASE_RDBMS_URL: 'VITE_SUPABASE_RDBMS_URL',
-    SUPABASE_SERVICE_KEY: 'VITE_SUPABASE_SERVICE_KEY',
-    JWT_SECRET: 'VITE_JWT_SECRET'
+    'SUPABASE_EDGE_URL':    'VITE_SUPABASE_EDGE_URL',
+    'SUPABASE_RDBMS_URL':   'VITE_SUPABASE_RDBMS_URL',
+    'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
+    'JWT_SECRET':           'VITE_JWT_SECRET'
   }
 )
 
