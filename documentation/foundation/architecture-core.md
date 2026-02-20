@@ -172,9 +172,7 @@ The API namespace is a **composed interface** built from domain abstractions usi
 
 #### 5.1.1 Core Principle
 
-TODO: this is misleading. A single api namespace suitable to the entire solution space is composed using makers. however there is not an api namespace per app
-
-The API is not a fixed interface or protocol—it is a **composition pattern** where applications declare their operational requirements by selecting appropriate client makers for each domain abstraction.
+A single API namespace, defined in `source/ux/api/api.ts`, is composed once for the entire solution space using client makers. All UX applications consume this shared namespace — there is no per-application namespace. The composition selects the appropriate maker for each domain abstraction based on storage mechanism.
 
 ```typescript
 // source/ux/api/api.ts
@@ -371,9 +369,11 @@ The system uses a **singleton configuration pattern** with runtime-specific prov
 
 #### 6.1.1 Design Principles
 
-- **Core defines the singleton** - Configuration abstraction lives in lowest layer
-- **Packages inject providers** - Higher layers supply runtime-specific implementations
-- **Dependencies flow downward** - Core has no knowledge of specific providers
+The configuration pattern is built on three invariants:
+
+- Core defines the singleton — configuration abstraction lives at the lowest layer
+- Packages inject providers — higher layers supply runtime-specific implementations
+- Dependencies flow downward — core has no knowledge of specific providers
 
 ### 6.2 Configuration Provider Interface
 
@@ -388,9 +388,10 @@ export interface RuntimeProvider {
 
 #### 6.2.1 Available Providers
 
-- `SupabaseProvider` - Supabase Edge Functions runtime (`@core/cfg/supabase-provider.ts`)
-- `DenoProvider` - Deno development/testing runtime (`@core/cfg/deno-provider.ts`)
-- _(Additional providers as needed for other runtimes)_
+- `SupabaseProvider` — Supabase Edge Functions runtime (`@core/cfg/supabase-provider.ts`)
+- `DenoProvider` — Deno development/testing runtime (`@core/cfg/deno-provider.ts`)
+- `SolidProvider` — Vite/SolidJS browser runtime (`@core/cfg/solid-provider.ts`)
+- `MockProvider` — Test contexts (`@core/cfg/mock-provider.ts`)
 
 ### 6.3 Package Configuration Pattern
 
@@ -498,6 +499,7 @@ JWT_SECRET=your-jwt-secret-here
 - Use platform-specific secret management in production
 - Rotate secrets regularly
 
+
 ### 6.6 Why This Works
 
 #### 6.6.1 Core utilities can access configuration
@@ -555,7 +557,7 @@ These rules are enforced through import discipline and architectural guards. Vio
 
 **Key Principle:** Dependencies flow downward. Lower layers have no knowledge of higher layers. Core is the foundation with no dependencies.
 
-## 7. Directory Structure
+## 8. Directory Structure
 
 ```text
 swarmag-system/
@@ -636,22 +638,22 @@ swarmag-system/
 }
 ```
 
-## 8. Offline-First Guarantees
+## 9. Offline-First Guarantees
 
 Field operations must be fully executable without network connectivity. The Ops application achieves this through **deep cloning** of Job aggregates to IndexedDB, not sync/reconciliation patterns.
 
-### 8.1 Deep Clone Pattern
+### 9.1 Deep Clone Pattern
 
 When a Job is ready for field execution, the complete Job aggregate is cloned to local IndexedDB storage:
 
-#### 8.1.1 What Gets Cloned
+#### 9.1.1 What Gets Cloned
 
 - Job entity
 - JobAssessment (with locations, questions, risks, attachments)
 - JobPlan (with assignments, chemicals, assets, target locations)
 - Related domain data (Users, Workflows, Assets, Chemicals)
 
-#### 8.1.2 Clone Operation
+#### 9.1.2 Clone Operation
 
 ```typescript
 // Orchestration edge function creates complete local copy
@@ -663,18 +665,18 @@ const assessment = await api.JobAssessmentsLocal.get(job.assessmentId)
 const plan = await api.JobPlansLocal.get(job.planId)
 ```
 
-#### 8.1.3 Key Properties
+#### 9.1.3 Key Properties
 
 - Complete Job aggregate copied to IndexedDB before field deployment
 - All referenced entities (users, workflows, assets) included
 - Job Plan locked during execution (no remote modifications)
 - Local storage is read-write for execution, read-only for plan
 
-### 8.2 Offline Execution
+### 9.2 Offline Execution
 
 Field crews execute Jobs entirely from local storage:
 
-#### 8.2.1 Execution Pattern
+#### 9.2.1 Execution Pattern
 
 ```typescript
 import { api } from '@ux-api'
@@ -694,18 +696,18 @@ await api.JobLogsLocal.create({
 })
 ```
 
-#### 8.2.2 Characteristics
+#### 9.2.2 Characteristics
 
 - Zero network dependency during execution
 - Append-only logs prevent conflicts
 - Plan is immutable (read-only during execution)
 - Logs are per-user, timestamped, GPS-tagged
 
-### 8.3 Log Upload (No Sync)
+### 9.3 Log Upload (No Sync)
 
 After field work completes, logs are uploaded in bulk. This is **not synchronization**—it's a one-way append operation:
 
-#### 8.3.1 Upload Pattern
+#### 9.3.1 Upload Pattern
 
 ```typescript
 // When connectivity returns
@@ -721,18 +723,18 @@ await api.uploadJobLogs.run({
 await api.JobsLocal.delete(jobId)
 ```
 
-#### 8.3.2 No Conflict Resolution
+#### 9.3.2 No Conflict Resolution
 
 - Logs are append-only (no updates to reconcile)
 - Job Plan was locked during execution (no remote changes)
 - Timestamps and user IDs establish ordering
 - No merge conflicts possible
 
-### 8.4 Architecture Benefits
+### 9.4 Architecture Benefits
 
 This pattern eliminates sync complexity:
 
-#### 8.4.1 What We Avoid
+#### 9.4.1 What We Avoid
 
 - Conflict resolution algorithms
 - Operational transform logic
@@ -740,7 +742,7 @@ This pattern eliminates sync complexity:
 - Distributed transaction coordination
 - Network partition handling
 
-#### 8.4.2 What We Gain
+#### 9.4.2 What We Gain
 
 - Guaranteed offline execution
 - Simple append-only semantics
@@ -750,82 +752,82 @@ This pattern eliminates sync complexity:
 
 **Critical Principle:** Offline is not a degraded mode—it is the **primary execution environment** for field operations. Network connectivity is only required for clone preparation and log upload, not execution.
 
-## 9. Architectural Invariants
+## 10. Architectural Invariants
 
 These rules must never be violated. Code that violates these invariants is wrong, regardless of whether it "works."
 
-### 9.1 Core Invariants
+### 10.1 Core Invariants
 
-#### 9.1.1 Domain is pure
+#### 10.1.1 Domain is pure
 
 - Domain layer (`source/domain/`) has no infrastructure dependencies
 - Domain depends only on `@core-std` (ID, When, Dictionary types)
 - No references to HTTP, SQL, storage, or runtime concerns
 - Validators, protocols, and adapters all remain infrastructure-agnostic
 
-#### 9.1.2 API namespace is the boundary
+#### 10.1.2 API namespace is the boundary
 
 - UX applications import from `@ux-api`, never from backend or storage libraries
 - Applications never import `@supabase-client`, IndexedDB APIs, or edge functions directly
 - The API namespace composes clients using maker factories, not runtime provider selection
 
-#### 9.1.3 Adapters are serialization boundaries
+#### 10.1.3 Adapters are serialization boundaries
 
 - Adapters live in `source/domain/adapters/`
 - Convert between storage representations (Dictionary) and domain abstractions
 - Shared by all storage mechanisms (Supabase, IndexedDB, HTTP)
 - No adapter contains business logic or validation
 
-#### 9.1.4 Authorization at database layer
+#### 10.1.4 Authorization at database layer
 
 - Row Level Security (RLS) policies enforce authorization
 - Authorization rules live in migrations, not application code
 - Cannot be bypassed by client code
 - Applies uniformly across all access paths
 
-#### 9.1.5 Offline is first-class
+#### 10.1.5 Offline is first-class
 
 - Offline execution via deep clones, not degraded sync mode
 - Job Plans locked during execution (immutable)
 - Logs are append-only (no merge conflicts)
 - Network required only for clone preparation and log upload
 
-#### 9.1.6 Soft delete everywhere
+#### 10.1.6 Soft delete everywhere
 
 - All lifecycled entities expose `deletedAt?: When`
 - Queries filter `WHERE deleted_at IS NULL`
 - Hard deletes only under explicit data retention policies
 - Exceptions: append-only logs and pure join tables
 
-#### 9.1.7 Edge functions stay flat
+#### 10.1.7 Edge functions stay flat
 
 - Supabase Edge Functions in `source/back/supabase-edge/functions/`
 - No subdirectories (platform discovery requirement)
 - Each function is a single file
 - Functions are thin orchestration wrappers, not business logic
 
-#### 9.1.8 Import maps only
+#### 10.1.8 Import maps only
 
 - All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@ux-api`)
 - No relative imports across top-level namespaces
 - Import maps defined in `deno.jsonc`
 - Platform-specific maps (e.g., `supabase-import-map.json`) synchronized manually
 
-#### 9.1.9 Regenerable infrastructure
+#### 10.1.9 Regenerable infrastructure
 
 - Infrastructure code derivable from domain, schema, and contracts
 - If deleting infrastructure loses meaning, something upstream is wrong
 - Adapters, clients, providers are all mechanically generateable
 - Meaning lives in `domain/`, not implementation
 
-#### 9.1.10 Conservative interpretation
+#### 10.1.10 Conservative interpretation
 
 - When intent is unclear, favor doing nothing over doing the wrong thing
 - Stop and escalate rather than proceeding with assumptions
 - Applies to both human and AI contributors
 - Fast-fail configuration over defensive programming
 
-### 9.2 Enforcement
+### 10.2 Enforcement
 
 These invariants are enforced through:
 
@@ -836,18 +838,19 @@ These invariants are enforced through:
 
 When invariants conflict with convenience, **invariants win**.
 
-## 10. Evolution & Maintenance
+## 11. Evolution & Maintenance
 
-### 10.1 Adding New Domain Concepts
+### 11.1 Adding New Domain Concepts
 
 1. Update `domain.md` (solution space, then domain model)
 2. Implement domain abstractions, validators, protocols, and adapters
-3. Update schema and create migration54. Implement backend functions
+3. Update schema and create migration
+4. Implement backend functions
 4. Update UX application integration
 
 Domain changes flow unidirectionally through the system.
 
-### 10.2 Adding New API Clients
+### 11.2 Adding New API Clients
 
 New clients are added by composing makers in the `@ux-api` namespace:
 
@@ -856,7 +859,7 @@ New clients are added by composing makers in the `@ux-api` namespace:
 3. **Configure specification** - Provide table name, store name, or endpoint path
 4. **Test full lifecycle** - Verify create, read, update, delete, list operations
 
-#### 10.2.1 Example
+#### 11.2.1 Example
 
 ```typescript
 // source/ux/api/api.ts
@@ -878,7 +881,7 @@ export const api = {
 
 Existing UX applications immediately have access to the new client via `api.Services`.
 
-### 10.3 Deprecation
+### 11.3 Deprecation
 
 Code is deleted, not commented out:
 
