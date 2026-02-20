@@ -398,10 +398,12 @@ Each deployment package creates a configuration module that:
 
 1. Imports the `Config` singleton from `@core/cfg/config.ts`
 2. Creates the appropriate runtime provider
-3. Initializes with required environment variables
+3. Initializes with required environment variables and optional aliases
 4. Re-exports the configured singleton
 
-#### 6.3.1 Example
+#### 6.3.1 Backend example (no aliases needed)
+
+Backend runtimes control their own key names — no platform prefix is imposed. The two-argument form is sufficient:
 
 ```typescript
 // source/back/supabase-edge/config/supabase-config.ts
