@@ -93,12 +93,9 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 ### 2.1 Backend Configuration
 
 ```bash
-# Create backend config from example
 cp source/back/supabase-edge/config/back-local.env.example \
    source/back/supabase-edge/config/back-local.env
 ```
-
-Required variables:
 
 ```dotenv
 # source/back/supabase-edge/config/back-local.env
@@ -109,42 +106,36 @@ JWT_SECRET=your-jwt-secret
 
 ### 2.2 UX Configuration
 
-Each UX application has its own configuration module that initializes the core `Config` singleton with the appropriate runtime provider.
-
 ```bash
-# Create config for each app
-cp source/ux/app-admin/config/admin-local.env.example \
-   source/ux/app-admin/config/admin-local.env
-
-cp source/ux/app-ops/config/ops-local.env.example \
-   source/ux/app-ops/config/ops-local.env
-
-cp source/ux/app-customer/config/customer-local.env.example \
-   source/ux/app-customer/config/customer-local.env
+cp source/ux/config/ux-local.env.example \
+   source/ux/config/ux-local.env
 ```
-
-Required variables (similar for all apps):
 
 ```dotenv
-VITE_SUPABASE_URL=http://localhost:54321
-VITE_SUPABASE_ANON_KEY=your-anon-key
+# source/ux/config/ux-local.env
+VITE_SUPABASE_EDGE_URL=http://localhost:54321
+VITE_SUPABASE_RDBMS_URL=http://localhost:54321
+VITE_SUPABASE_SERVICE_KEY=your-service-role-key
+VITE_JWT_SECRET=your-jwt-secret
 ```
+
+UX apps use `VITE_`-prefixed keys as required by Vite. The `Config` alias map declared in `source/ux/config/ux-config.ts` exposes these as unprefixed names to all consuming code — `Config.get('SUPABASE_EDGE_URL')`, `Config.get('JWT_SECRET')`, etc.
 
 ### 2.3 Configuration Pattern
 
-The system uses a singleton `Config` pattern defined in `@core/cfg/config.ts`:
+The system uses a singleton `Config` defined in `@core/cfg/config.ts`, initialized once per deployment context via `Config.init(provider, keys, aliases?)`:
 
-- **Core defines the singleton** - Configuration lives at the lowest layer
-- **Packages inject providers** - Each deployment context supplies its runtime provider
-- **Config packaged with apps** - Configuration modules bundled during build
+- `provider` — runtime-specific implementation (`SolidProvider`, `SupabaseProvider`, `DenoProvider`)
+- `keys` — required environment variable names; bootstrap fails immediately if any are missing
+- `aliases` — optional map of logical name → environment key for platform-specific prefixing
 
-See `architecture-core.md` Section 6 for complete configuration management details.
+See `architecture-core.md` section 6 for complete configuration management detail.
 
 ### 2.4 Configuration Rules
 
-- **Never commit actual `.env` files** - only commit `.env.example` templates
+- Never commit actual `.env` files — only commit `.env.example` templates
 - Local configs gitignored via `**/*-local.env` pattern
-- Stage and prod configs follow same pattern: `*-stage.env`, `*-prod.env`
+- Stage and prod configs follow the same pattern: `*-stage.env`, `*-prod.env`
 - All runtime config values validated at bootstrap via `Config.init()`
 
 ## 3. Project Commands

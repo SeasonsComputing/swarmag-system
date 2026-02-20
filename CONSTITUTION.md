@@ -63,7 +63,7 @@ When a decision is unclear, the Architect AI must **pause and escalate**.
 
 ### 2.3 Coding Engine AI
 
-A **Coding Engine AI** (e.g., Codex or equivalent) is a mechanical executor.
+A **Coding Engine AI** is a mechanical executor.
 
 Its role is to:
 
@@ -90,91 +90,11 @@ Once an agenda is established and agreed upon:
 
 The agenda is the contract.
 
-## 4. Architectural Law (TODO: move to architecture-core)
+## 4. Architectural Law
 
-### 4.1 Persistence and Modeling
+Architectural law — persistence modeling, domain authority, directionality, deletion semantics, and identifier conventions — is defined in `architecture-core.md`. That document is the authoritative reference for all structural and invariant rules.
 
-- The system defaults to **4th Normal Form (4NF)**
-- Separate tables, explicit foreign keys, and query-based navigation are the norm
-
-**JSONB usage is an exception**, permitted only for:
-
-1. End-user specialization (custom or user-defined attributes)
-2. Third-party metadata (opaque external payloads)
-3. Payload-as-truth (versioning and audit snapshots)
-4. Subordinate composition (part-of relationships with no independent lifecycle and no external foreign keys)
-
-Anything referencing external entities must be normalized.
-
-### 4.2 Domain and Lifecycle Authority
-
-- Domain meaning is defined centrally and enforced consistently
-- Invariant validation lives in the domain layer only
-- Upper layers translate errors but never redefine rules
-
-**Job is the business hub**:
-
-- Job is created first
-- Assessment evaluates a Job
-- Plan defines execution for a Job
-- Logs record execution of a Job
-
-Circular foreign keys are forbidden.
-
-### 4.3 Directionality and Multiplicity
-
-- Associations are **unidirectional by default**
-- Children hold foreign keys to parents
-- Parents do not store child ID collections
-- Navigation occurs through queries
-
-Bidirectional navigation exists only via explicit junction tables.
-
-### 4.4 Deletion Semantics
-
-- All entities support soft delete via `deleted_at`
-- The system never hard-deletes during normal operation
-- Hard deletes occur only under data-retention policy execution
-
-Foreign-key cascades exist to ensure correctness **when cleanup is authorized**, not as a runtime convenience.
-
-### 4.5 Identifiers and Timestamps
-
-**Identifiers (ID):**
-
-- Type: `ID` - UUID v7 string
-- Generator: `id()` - Creates new UUID v7
-- Validator: `isID(value)` - Validates UUID v7 format
-- Import: `import { type ID, id, isID } from '@core-std'`
-
-All entity identifiers must use the `ID` type. Generate new IDs with `id()`, never use external libraries or manual string construction.
-
-**Timestamps (When):**
-
-- Type: `When` - ISO 8601 UTC timestamp string
-- Generator: `when()` - Creates current timestamp
-- Validator: `isWhen(value)` - Validates ISO 8601 format
-- Import: `import { type When, when, isWhen } from '@core-std'`
-
-All temporal values must use the `When` type. Generate timestamps with `when()`, never use `new Date()` or similar patterns directly.
-
-**Example Usage:**
-
-```typescript
-import { type ID, id, isID } from '@core-std'
-import { isWhen, type When, when } from '@core-std'
-
-const userId: ID = id()
-const createdAt: When = when()
-
-if (isID(someValue)) {
-  // Valid ID
-}
-
-if (isWhen(timestamp)) {
-  // Valid timestamp
-}
-```
+In case of conflict between any other document and `architecture-core.md`, `architecture-core.md` governs. In case of conflict between `architecture-core.md` and this Constitution, this Constitution governs.
 
 ## 5. Engineering Philosophy and First Principles
 
@@ -182,31 +102,39 @@ The system is governed by disciplined engineering, not novelty.
 
 ### 5.1 Core Principles
 
-- **Agile guarantees with disciplined engineering**\
-  The “what” and “why” evolve; the “how” remains grounded in best practice.
+#### 5.1.1 Agile guarantees with disciplined engineering
 
-- **Less is almost always more**\
-  Fewer features, less code, and simpler designs yield greater reliability.
+The "what" and "why" evolve; the "how" remains grounded in best practice.
 
-- **Pareto-driven feature design**\
-  Deliver the essential 20% that satisfies 80% of real needs.
+#### 5.1.2 Less is almost always more
 
-- **Better to kill a feature than ship it incomplete**\
-  Half-built features create long-term cost and reputational damage.
+Fewer features, less code, and simpler designs yield greater reliability.
 
-- **Do it right, do it now**\
-  Deferring correctness compounds failure and institutionalizes bad judgment.
+#### 5.1.3 Pareto-driven feature design
 
-- **Working code is the minimum bar**\
-  Durability, clarity, restraint, and first-principles alignment are the goal.
+Deliver the essential 20% that satisfies 80% of real needs.
 
-- **Leaders set standards through behavior**\
-  Implicit actions are as influential as explicit rules.
+#### 5.1.4 Better to kill a feature than ship it incomplete
 
-- **Pride and purpose drive excellence**\
-  Quality emerges from meaning, not speed or novelty.
+Half-built features create long-term cost and reputational damage.
 
-AI systems must treat these principles as **operational constraints**, not philosophy.
+#### 5.1.5 Do it right, do it now
+
+Deferring correctness compounds failure and institutionalizes bad judgment.
+
+#### 5.1.6 Working code is the minimum bar
+
+Durability, clarity, restraint, and first-principles alignment are the goal.
+
+#### 5.1.7 Leaders set standards through behavior
+
+Implicit actions are as influential as explicit rules.
+
+#### 5.1.8 Pride and purpose drive excellence
+
+Quality emerges from meaning, not speed or novelty.
+
+AI systems must treat these principles as operational constraints, not philosophy.
 
 ## 6. Historical and Technical Foresight
 
@@ -221,7 +149,7 @@ The system reflects experience across multiple paradigm shifts in:
 AI systems must assume:
 
 - Constraints likely exist for historical reasons
-- “Modern best practice” does not override earned judgment
+- "Modern best practice" does not override earned judgment
 - Novelty is not inherently progress
 
 Re-litigating settled decisions without cause is forbidden.
@@ -235,7 +163,7 @@ Engineering decisions carry real business consequences, including:
 - Acquisition readiness and due diligence
 - Long-term operational cost
 
-Incomplete, misleading, or sloppy systems impose **first-order business risk**.
+Incomplete, misleading, or sloppy systems impose first-order business risk.
 
 AI systems must treat reputational damage as a primary concern, not a side effect.
 
@@ -245,14 +173,78 @@ AI systems must treat reputational damage as a primary concern, not a side effec
 
 If any AI system is uncertain how to apply a rule:
 
-- It must choose the **most conservative interpretation**
-- It must **pause and escalate** rather than proceed
+- It must choose the most conservative interpretation
+- It must pause and escalate rather than proceed
 
 Doing nothing is preferable to doing the wrong thing.
 
-## 9. Supersession Notice
+## 9. Coding Standards as Constitutional Law
 
-This document supersedes and replaces all prior AI- or collaboration-specific guidance files
+The `style-guide.md` is the authoritative reference for coding conventions. The principles below are constitutional — they govern all code produced by any contributor, human or AI. They are not preferences.
+
+### 9.1 The Single Commandment
+
+Minimize visual noise. Every naming rule, formatting decision, and structural choice derives from this. Code must be immediately readable. Names carry meaning through structure, not decoration.
+
+### 9.2 Type vs. Interface
+
+`type` is the default for all data shapes, domain abstractions, aliases, and unions.
+
+`interface` is reserved exclusively for encapsulated API contracts — shapes that something explicitly implements or conforms to: `ApiCrudContract`, `RuntimeProvider`, `HttpHandler`.
+
+The distinction is not object-vs-alias. It is data shape vs. contract surface. If something implements it, use `interface`. If something has that shape, use `type`.
+
+### 9.3 Symbol Casing
+
+All words — regardless of their natural language form — are transformed into the casing convention of their symbol class. There are no special cases for acronyms, abbreviations, or domain shorthand.
+
+| Symbol class                                             | Convention      | Example                                   |
+| -------------------------------------------------------- | --------------- | ----------------------------------------- |
+| File names                                               | kebab-case      | `job-adapter.ts`, `api-config.ts`         |
+| Types, type aliases, interfaces, classes, const-as-class | PascalCase      | `JobAssessment`, `ApiConfig`, `HttpCodes` |
+| Functions, methods, arrow functions                      | camelCase       | `fromJobAssessment`, `apiClient`          |
+| Global immutable constants                               | SCREAMING_SNAKE | `USER_ROLES`                              |
+
+### 9.4 File Format
+
+Every source file follows this layout, without exception:
+
+```
+FILE HEADER    ← box-drawing block comment
+IMPORTS        ← external first, then internal
+PUBLIC EXPORTS
+PRIVATE IMPL
+```
+
+Simple files (pure type declarations, thin bootstraps) use a compact header: title, purpose, exports. Complex files with non-trivial private implementation add an INTERNALS block and a runnable EXAMPLE. See `style-guide.md` section 4 for the canonical format and examples.
+
+### 9.5 Code Tone
+
+These are non-negotiable:
+
+#### 9.5.1 Explicit over clever
+
+Code must be readable by a developer unfamiliar with the codebase. If it requires explanation, it requires refactoring or a comment.
+
+#### 9.5.2 Fast-fail
+
+Validate at boundaries. Throw early with clear messages. Never proceed on bad state.
+
+#### 9.5.3 No defensive programming
+
+Do not null-check values that cannot be null by contract. Do not write try/catch around code that should not fail. Trust the type system.
+
+#### 9.5.4 No payload-as-truth adapters
+
+Adapters map column-by-column. There is no `payload` field that bypasses mapping. The domain type is the truth; the adapter derives it from storage columns.
+
+#### 9.5.5 No magic
+
+No implicit behavior, no runtime reflection, no metaprogramming. Configuration is explicit; providers are injected; contracts are stated in types.
+
+## 10. Supersession Notice
+
+This document supersedes and replaces all prior AI- or collaboration-specific guidance files.
 
 All rules, authority, and expectations are now centralized here.
 
