@@ -1,374 +1,425 @@
 # swarmAg Code Style Guide
 
-This guide defines the coding conventions and patterns used throughout the swarmAg codebase. Follow these standards when writing or modifying
-any software artifact with the system.
+This guide is the authoritative reference for coding conventions throughout the swarmAg codebase. The governing principles in this guide are also codified as constitutional law in `CONSTITUTION.md` section 9. In case of conflict, the CONSTITUTION takes precedence.
 
-## 1. Language and Tooling
+Code that conflicts with this guide is wrong — not the guide.
 
-| Item     | Guideline                                                                                                                                                                                                     |
-| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Compiler | Deno `check` with strict TypeScript                                                                                                                                                                           |
-| Aliases  | `@domain/`, `@utility`, `@utility/`, `@back-config/`, `@back-functions/`, `@back-lib/`, `@ux-api/`, `@ux-app-admin/`, `@ux-app-ops/`, `@ux-app-customer/`, `@ux-components/`, `@ux-lib/`, `@devops`, `@tests` |
-| Types    | Prefer type aliases and interfaces; avoid runtime-heavy helpers                                                                                                                                               |
-| Encoding | ASCII only; no non-ASCII literals                                                                                                                                                                             |
+## 1. Language & Tooling
 
-## 2. Imports and Organization
+| Item       | Guideline                                                                                                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime    | Deno with strict TypeScript (`deno task check`)                                                                                                         |
+| Encoding   | ASCII only; no non-ASCII literals                                                                                                                       |
+| Types      | Use `type` for data shapes, abstractions, aliases, and unions; use `interface` only for encapsulated API contracts that something explicitly implements |
+| Primitives | Use `ID` (UUID v7 string) and `When` (ISO 8601 UTC string) from `@core-std`                                                                             |
 
-| Item        | Guideline                                                                                           |
-| ----------- | --------------------------------------------------------------------------------------------------- |
-| Paths       | Use aliases for cross-directory imports; use relative (`./`) for same-directory imports             |
-| Ordering    | Domain -> utils -> adapters -> api -> back-lib; use `import type` where helpful                     |
-| Exports     | Default export only for Netlify Edge `wrapHttpHandler(handle)`                                      |
-| Extensions  | Include `.ts` in local/alias import specifiers                                                      |
-| Import maps | Keep `netlify-import-map.json` aligned with `deno.json`; use root-relative paths in the Netlify map |
-| Layout      | Files live only in leaf directories; directories with subdirectories must not contain files         |
+## 2. Import Aliases
 
-**Import path examples:**
+All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use relative imports across top-level namespaces.
 
-```typescript
-// Same directory - use relative
-import { isNonEmptyString } from './helper-validator.ts'
+### 2.1 Primary top-level aliases
 
-// Different directory - use alias
-import type { ID, When } from '@core-std'
-import type { User } from '@domain/abstractions/user.ts'
-```
+| Alias      | Resolves to      |
+| ---------- | ---------------- |
+| `@core/`   | `source/core/`   |
+| `@domain/` | `source/domain/` |
+| `@back`    | `source/back/`   |
+| `@ux/`     | `source/ux/`     |
+| `@devops`  | `source/devops/` |
+| `@tests`   | `source/tests/`  |
 
-## Directory Organization Rules
+### 2.2 Convenience barrel aliases
 
-### Source Structure
+| Alias       | Resolves to              |
+| ----------- | ------------------------ |
+| `@core-std` | `source/core/std/std.ts` |
+| `@ux-api`   | `source/ux/api/api.ts`   |
 
-```
-source/
-  back/             # Backend runtime and migrations
-  devops/           # Guard scripts
-  domain/           # Domain abstractions + adapters + protocol + validators
-  tests/            # Cases and fixtures
-  utilities/        # Shared utilities
-  ux/               # User experience applications and API client
-```
+### 2.3 Package aliases
 
-**Rules:**
+| Alias                  | Resolves to                  |
+| ---------------------- | ---------------------------- |
+| `@back-supabase-edge/` | `source/back/supabase-edge/` |
+| `@ux-app-ops/`         | `source/ux/app-ops/`         |
+| `@ux-app-admin/`       | `source/ux/app-admin/`       |
+| `@ux-app-customer/`    | `source/ux/app-customer/`    |
+| `@ux-app-common/`      | `source/ux/app-common/`      |
 
-1. `source/domain/abstraction/` and `source/domain/protocol/` are domain-first and infrastructure-agnostic
-2. `source/utilities/` has no domain dependencies
-3. `source/domain/adapter/` depends on domain + utilities
-4. `source/back/` depends on domain, domain adapters, and utilities
-5. `source/ux/` depends on domain and the UX API layer (never backend internals)
+### 2.4 Vendor aliases
 
-### Import Alias Discipline
-
-**Required aliases:**
-
-- `@domain/` - Domain modules
-- `@utility` and `@utility/` - Utilities
-- `@back-config/`, `@back-functions/`, `@back-lib/` - Backend namespaces
-- `@ux-api/` - UX API layer
-- `@ux-app-admin/`, `@ux-app-ops/`, `@ux-app-customer/` - UX app namespaces
-- `@ux-components/`, `@ux-lib/` - Shared UX modules
-- `@devops`, `@tests` - Guard and test roots
-
-**Never use relative imports across boundaries.**
-
-### Configuration Files
-
-Each deployment package must have:
-
-```
-{package}/
-  config/
-    config.ts              # Runtime detection + Config export
-    local.env.example
-    stage.env.example
-    prod.env.example
-```
-
-**Rules:**
-
-1. Runtime providers live in `source/utilities/configure-deno.ts` and `source/back/library/configure-netlify.ts`
-2. Package config imports from `@utility`, never defines providers
-3. Never import providers directly (always use `./config/config.ts`)
-4. Never access `Deno.env`, `import.meta.env` directly (use `Config.get()`)
-
-### Deployment Artifacts
-
-Build artifacts go to `deploy/` (gitignored):
-
-```
-deploy/{app}/
-  swarmag-{component}-pkg.{hash}.{ext}
-  swarmag-{app}-pkg.json
-```
-
-Never commit deployment artifacts.
+| Alias              | Resolves to                              |
+| ------------------ | ---------------------------------------- |
+| `@supabase-client` | `https://esm.sh/@supabase/supabase-js@2` |
 
 ## 3. Naming Conventions
 
-| Item            | Guideline                                                                              |
-| --------------- | -------------------------------------------------------------------------------------- |
-| Acronyms        | Use title case for acronyms in identifiers: `Api`, `Url`, `Id`, not `API`, `URL`, `ID` |
-| Classes         | PascalCase: `UsersApi`, `JobsApi`                                                      |
-| Files           | Kebab-case: `users-api.ts`, `job-validator.ts`                                         |
-| Type aliases    | PascalCase: `UserCreateInput`, `JobStatus`                                             |
-| Constants       | camelCase for exported constants: `httpCodes` (exception: `HttpCodes` object)          |
-| Domain-specific | Use domain names: `JobAssessment`, `JobLogEntry`, not generic names                    |
+### 3.1 The single commandment
 
-## 4. Domain Modeling (`source/domain/*`)
+Minimize visual noise. Every naming rule derives from this. Names must be immediately readable, carry no redundant weight, and signal meaning through structure rather than decoration.
 
-| Item         | Guideline                                                                  |
-| ------------ | -------------------------------------------------------------------------- |
-| Abstractions | Interfaces with immutable intent; no mutation helpers                      |
-| Docs         | Single-sentence JSDoc on types/enums                                       |
-| Primitives   | Reuse `ID` (UUID v7 string) and `When` (ISO 8601 string)                   |
-| Payloads     | JSON-serializable only; no methods on domain objects                       |
-| Organization | Abstraction-per-file pattern across abstractions, validators, and protocol |
+### 3.2 Symbol classes
 
-### 4.1 Domain file organization
+Each symbol class has one casing convention. All words — regardless of their natural language form — are transformed into the convention for their class. There are no special cases for acronyms, abbreviations, or domain shorthand. The symbol class determines the transformation.
 
-Each domain abstraction has corresponding files across three subdirectories:
+| Symbol class                                             | Convention      | Example                                   |
+| -------------------------------------------------------- | --------------- | ----------------------------------------- |
+| File names                                               | kebab-case      | `job-adapter.ts`, `api-config.ts`         |
+| Types, type aliases, interfaces, classes, const-as-class | PascalCase      | `JobAssessment`, `ApiConfig`, `HttpCodes` |
+| Functions, methods, arrow functions                      | camelCase       | `fromJobAssessment`, `apiClient`          |
+| Global immutable constants                               | SCREAMING_SNAKE | `USER_ROLES`                              |
 
-| Layer           | Abstraction file             | Shared/helper file    |
-| --------------- | ---------------------------- | --------------------- |
-| `abstractions/` | `{abstraction}.ts`           | `common.ts`           |
-| `validators/`   | `{abstraction}-validator.ts` | `helper-validator.ts` |
-| `protocol/`     | `{abstraction}-protocol.ts`  | `helper-protocol.ts`  |
+### 3.3 The acronym corollary
 
-**Placement rules:**
+Acronyms are not a special case — they are words, and words transform with their symbol class.
 
-- Abstraction-specific types (User, UserRole) belong in abstraction files (`user.ts`), not `common.ts`.
-- Shared types used by multiple abstractions (Location, Note, Attachment) stay in `common.ts`.
-- Concept-owning types live with their owner (Question, Answer live in `workflow.ts`).
-- Generic protocol shapes (ListOptions, ListResult, DeleteResult) live in `helper-protocol.ts`.
-- Shared validators (isNonEmptyString) live in `helper-validator.ts`.
+| Natural form | PascalCase | camelCase | kebab-case |
+| ------------ | ---------- | --------- | ---------- |
+| API          | `Api`      | `api`     | `api-`     |
+| URL          | `Url`      | `url`     | `url-`     |
+| ID           | `Id`       | `id`      | `id-`      |
 
-## 5. Utilities (`source/utilities/*`)
+Exception by executive privilege: `ID` (the `@core-std` type alias), `id()`, and `isID()` retain all-caps. `ID` is a standalone token predating this rule. All other uses of "id" follow the table.
 
-| Item              | Guideline                                                        |
-| ----------------- | ---------------------------------------------------------------- |
-| identifier.ts     | UUID v7 via `id()`; validate with `isID()`                       |
-| datetime.ts       | UTC ISO via `when()`; validate with `isWhen()`                   |
-| runtime.ts        | `RuntimeConfig` class and `RuntimeProvider` interface for config |
-| configure-deno.ts | Deno environment provider; exports `ConfigureDeno`               |
-| Scope             | Keep utilities focused and dependency-light                      |
+### 3.4 Makers vs. wrappers
 
-## 6. UX API Layer (`source/ux/api/*`)
+Factory functions that produce API clients are prefixed `make` and live in `make-*.ts` files. Handler adapters that wrap functions live in `wrap-*.ts` files. These are architecturally distinct; naming must reflect it.
 
-| Item           | Guideline                                                                                     |
-| -------------- | --------------------------------------------------------------------------------------------- |
-| Purpose        | Typed SDK for ux to consume backend functions and local providers                             |
-| Factory        | Use `makeApiClient<T, TCreate, TUpdate>(spec)` to create typed client objects                 |
-| Naming         | `{Abstraction}Api` object in `{abstraction}-api.ts` file (e.g., `UsersApi` in `users-api.ts`) |
-| Return types   | Return domain types directly (`User`, `User[]`); never expose HTTP or result envelopes        |
-| Error handling | Throw `ApiError` on errors; callers handle failures via try/catch                             |
-| Encapsulation  | Hide all RPC internals (fetch, headers, JSON parsing, result unwrapping)                      |
-| Methods        | Use `create`, `update`, `delete`, `get`, `list` to match backend endpoint naming              |
-| Base URL       | Configure via `Config.get('VITE_API_URL')` from ux api config bootstrap                       |
+## 4. Source Code File Format
 
-## 7. Backend Functions (`source/back/functions/*`)
+Documentation intensity follows implementation complexity. The code speaks first; commentary fills only what the code cannot.
 
-| Item       | Guideline                                                                                                          |
-| ---------- | ------------------------------------------------------------------------------------------------------------------ |
-| Naming     | `{resource}-{action}.ts` (plural resource), e.g., `users-create.ts`                                                |
-| Exports    | Default export only: Netlify `wrapHttpHandler(handle)`                                                             |
-| Config     | Export `config = { path: "/api/{resource}/{action}" }` for routing                                                 |
-| Types      | Use `HttpRequest`/`HttpResponse` from `@core/api/`                                                                 |
-| Status     | Use `HttpCodes`; no numeric literals                                                                               |
-| Platform   | Use `Supabase.client()`; paginate via `clampLimit`/`parseCursor`                                                   |
-| Validation | Guard with `validate` + `HttpCodes.unprocessableEntity`                                                            |
-| Methods    | Guard unsupported verbs with `HttpCodes.methodNotAllowed`                                                          |
-| Responses  | Success: `{ data: ... }`; failure: `{ error, details? }`                                                           |
-| JSON       | Always JSON; `wrapHttpHandler` sets headers and wraps errors                                                       |
-| Adaptation | Use adapters from `source/domain/adapter/` (e.g., `jobs-adapter.ts`) instead of ad hoc column maps in each handler |
+### 4.1 Spec files
 
-## 8. Adapters and Storage Adaptation
+Type declarations, enums, pure domain shapes. The code is the documentation. Inline `/** */` comments only where a name alone is insufficient. No box, no dash-rules, no sections.
 
-| Rule           | Requirement                                                      |
-| -------------- | ---------------------------------------------------------------- |
-| Boundary types | Use `unknown` at storage boundaries; never coerce with `as any`. |
-| Validation     | Validate once, then return a domain abstraction.                 |
-| Abstractions   | Do not introduce generic row wrappers like `Row<T>`.             |
-| Checks         | Prefer small, explicit runtime checks over clever typing.        |
-| Failure mode   | Adapter code may throw on invalid input.                         |
-| Scope          | Shared helpers must live in the narrowest possible scope.        |
-
-Bad:
-
-```ts
-const user = rowToUser(data as any)
-```
-
-Good:
-
-```ts
-const user = rowToUser(data)
-```
-
-## 9. Control Flow
-
-### 9.1 Single-line if statements
-
-Prefer single-line if statements when there is no else clause and the line is under 120 columns:
+`source/domain/abstractions/asset.ts`:
 
 ```typescript
-// Preferred
-if (req.method !== 'GET') return toMethodNotAllowed()
-if (!isNonEmptyString(userId)) return toBadRequest('id is required')
-if (error || !data) return toNotFound('User not found')
+/**
+ * Domain models for assets in the swarmAg system.
+ * Assets represent equipment and resources used in operations,
+ * such as vehicles, sprayers, drones, etc.
+ */
+import type { ID, When } from '@core-std'
+import type { Attachment } from '@domain/abstractions/common.ts'
 
-// Avoid
-if (req.method !== 'GET') {
-  return toMethodNotAllowed()
+/** Reference type for categorizing assets. */
+export type AssetType = {
+  id: ID
+  label: string
+  active: boolean
+  createdAt: When
+  updatedAt: When
+  deletedAt?: When
+}
+
+/** Lifecycle and availability state. */
+export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'reserved'
+
+/** Operational equipment or resource. */
+export type Asset = {
+  id: ID
+  label: string
+  description?: string
+  serialNumber?: string
+  type: ID
+  status: AssetStatus
+  attachments: [Attachment?, ...Attachment[]]
+  createdAt: When
+  updatedAt: When
+  deletedAt?: When
 }
 ```
 
-Use braces when there is an else clause or when the line exceeds 120 columns.
+### 4.2 Functional files
 
-## 10. Error Handling
+Bootstraps, adapters, validators, contracts, makers — files where behavior matters and the public surface benefits from a documented contract. A box header replaces the top JSDoc. JSDoc on exported functions where params or return values need prose. No section dividers needed — no significant private machinery to separate.
 
-| Item    | Guideline                                                        |
-| ------- | ---------------------------------------------------------------- |
-| Parsing | Invalid JSON -> `HttpCodes.badRequest`                           |
-| Server  | Persistence/unknown -> `HttpCodes.internalError`; safe `details` |
-| Control | Do not throw past `wrapHttpHandler`; return `HttpResponse`       |
-
-## 11. Pagination
-
-| Item    | Guideline                                            |
-| ------- | ---------------------------------------------------- |
-| Limits  | Clamp to `1..100`; default 25                        |
-| Cursor  | Default 0; non-negative only                         |
-| Helpers | Use `Supabase.clampLimit` and `Supabase.parseCursor` |
-
-## 12. Commenting Style
-
-| Item     | Guideline                                                                                                                    |
-| -------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| JSDoc    | JSDoc on exports with a one-sentence summary plus @param/@returns (and @throws when relevant), ending sentences with periods |
-| Inline   | Add only when logic is non-obvious                                                                                           |
-| Internal | Add brief JSDoc when grouping internal type aliases that clarify adapter shapes (e.g., raw Netlify event types)              |
-| Fields   | Comment class attributes and fields with brief JSDoc.                                                                        |
-| Types    | Comment type aliases and interfaces with brief JSDoc.                                                                        |
-
-## 13. Naming and Data Shapes
-
-| Item      | Guideline                                                        |
-| --------- | ---------------------------------------------------------------- |
-| Clarity   | Use domain-specific names (e.g., `JobAssessment`, `JobLogEntry`) |
-| Enums     | String unions for enums (e.g., `JobStatus`, `JobLogType`)        |
-| Optionals | Mark optional fields with `?`; handle defaults in handlers       |
-
-## 14. Runtime Configuration Conventions
-
-### 14.1 Config provider classes
-
-Config provider classes follow a consistent static class pattern with isomorphic interface conformance. Use the class name (not `this`) when referring to static members:
+`source/core/cfg/config.ts`:
 
 ```typescript
-export class ExampleConfig {
-  static #initialized = false
-  static #cache = new Set<string>()
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Runtime configuration singleton                                             ║
+║ Validated, fast-fail access to environment variables across all runtimes.   ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
-  static init(required: readonly string[]): void {
-    if (ExampleConfig.#initialized) ExampleConfig.fail('Already initialized')
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Initialized once at bootstrap with a runtime provider and a list of required
+keys. All subsequent reads go through Config.get(). Throws immediately on
+missing keys, double initialization, or unregistered access.
 
-    const missing = required.filter(key => !ExampleConfig.#source.get(key))
-    if (missing.length > 0) {
-      ExampleConfig.fail(`Missing required config: ${missing.join(', ')}`)
-    }
-
-    ExampleConfig.#cache = new Set(required)
-    ExampleConfig.#initialized = true
-  }
-
-  static get(name: string): string {
-    if (!ExampleConfig.#initialized) ExampleConfig.fail('Not initialized')
-    if (!ExampleConfig.#cache.has(name)) {
-      ExampleConfig.fail(`Config not registered: ${name}`)
-    }
-
-    const value = ExampleConfig.#source.get(name)
-    if (!value) ExampleConfig.fail(`${name} missing at runtime`)
-    return value
-  }
-
-  static fail(message: string): never {
-    // Context-appropriate error handling
-  }
-}
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+Config.init(provider, keys, aliases?)  Initialize with provider and required keys
+Config.get(name)                       Return required config value; throws if missing
+Config.fail(msg)                       Throw never; use for invariant violations
+*/
 ```
 
-### 14.2 Bootstrap files
+### 4.3 Non-trivial functional files
 
-Bootstrap files (`config.ts`) live in each deployment context's `config/` directory and:
+Complex implementations with a well-defined public surface and significant private machinery. Full decoration — box header, typed export signatures grouped by category, internals summary, runnable example. In the code body, PUBLIC EXPORTS and PRIVATE IMPLEMENTATION are each bounded top and bottom by section dividers.
 
-1. Import appropriate config provider(s).
-2. Detect runtime environment if needed (backend only).
-3. Call `init()` with required parameters list.
-4. Re-export as `Config` for isomorphic interface.
+`source/core/api/wrap-http-handler.ts`:
 
 ```typescript
-// source/back/config/back-config.ts
-import { ConfigureNetlify } from '@back-lib/configure-netlify.ts'
-import { ConfigureDeno } from '@utility/configure-deno.ts'
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ HTTP handler types, response builders, and handler wrapper                  ║
+║ Platform-agnostic typed handler contract for all edge functions.            ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
-const Config = 'Deno' in self ? ConfigureDeno : ConfigureNetlify
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Defines the typed HTTP handler contract and wraps it into a Fetch API-
+compatible function. All edge functions use wrapHttpHandler as their
+entry point. Uses only Web Standards — no platform-specific imports.
 
-Config.init(['SUPABASE_URL', 'SUPABASE_SERVICE_KEY'])
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ EXPORTED APIs & TYPEs                                                       ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+TYPES
+───────────────────────────────────────────────────────────────────────────────
+HttpHandler<RequestBody, Query, ResponseBody>
+  → Typed async function: HttpRequest → HttpResponse
+HttpRequest<Body, Query, Headers>
+  → Typed request wrapper passed into handlers
+HttpResponse<Body, Headers>
+  → Standardized response envelope: { statusCode, body, headers? }
+
+RESPONSE BUILDERS
+───────────────────────────────────────────────────────────────────────────────
+toOk(data)           → 200 { data: T }
+toCreated(data)      → 201 { data: T }
+toBadRequest(error)  → 400 { error: string }
+toNotFound(error)    → 404 { error: string }
+toInternalError(...) → 500 { error: string, details?: string }
+
+WRAPPER
+───────────────────────────────────────────────────────────────────────────────
+wrapHttpHandler(handler, config?) → (request: Request) → Promise<Response>
+  → Wraps typed handler with CORS, body parsing, method validation,
+    error serialization, and response normalization.
+
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ INTERNALS                                                                   ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+normalizeHeaders, parseRequestBody, makeCorsHeaders, serializeError
+  → Private pipeline functions; not exported; no external contract.
+
+EXAMPLE
+───────────────────────────────────────────────────────────────────────────────
+export default wrapHttpHandler(async (req) => {
+  if (req.method !== 'POST') return toMethodNotAllowed()
+  const user = await createUser(req.body)
+  return toCreated(user)
+}, { cors: true })
+*/
+
+import { ... } from '...'
+
+// ────────────────────────────────────────────────────────────────────────────
+// PUBLIC EXPORTS
+// ────────────────────────────────────────────────────────────────────────────
+
+export type HttpHandler = ...
+export const toOk = ...
+export const wrapHttpHandler = ...
+
+// ────────────────────────────────────────────────────────────────────────────
+// PRIVATE IMPLEMENTATION
+// ────────────────────────────────────────────────────────────────────────────
+
+function normalizeHeaders() { ... }
+function parseRequestBody() { ... }
+```
+
+### 4.4 Header rules
+
+- Spec files carry no box, no dash-rules, no sections. Inline `/** */` only where the name is insufficient.
+- Functional file box width: 77 characters. Title and description on consecutive lines — no blank lines inside the box.
+- One blank line between the box close and PURPOSE.
+- One blank line between PURPOSE prose and the next section label.
+- One blank line between distinct subsection groups within EXPORTED APIs & TYPEs.
+- No blank line between a section label and its dash-rule.
+- No blank line between the dash-rule and its content.
+- INTERNALS and EXAMPLE only when private implementation is non-trivial.
+- EXAMPLE is valid, runnable TypeScript — not pseudocode.
+- Headers stay current. A stale header is worse than no header.
+
+### 4.5 Section dividers
+
+### 4.5 Section dividers
+
+Non-trivial files divide the code body into PUBLIC EXPORTS and PRIVATE IMPLEMENTATION, each bounded top and bottom. Consistent width, no variation:
+
+```typescript
+// ────────────────────────────────────────────────────────────────────────────
+// PUBLIC EXPORTS
+// ────────────────────────────────────────────────────────────────────────────
+
+// ... exported types, functions, constants ...
+
+// ────────────────────────────────────────────────────────────────────────────
+// PRIVATE IMPLEMENTATION
+// ────────────────────────────────────────────────────────────────────────────
+
+// ... unexported helpers ...
+```
+
+### 4.6 Comment conventions
+
+| Context                       | Style                                                               |
+| ----------------------------- | ------------------------------------------------------------------- |
+| Spec file types               | Single-line `/** */` — one sentence, only when name is insufficient |
+| Functional exported functions | JSDoc with `@param` and `@returns` for non-obvious args             |
+| Private helpers               | Inline `//` — only when intent isn't obvious from the code          |
+| Dead comments                 | Delete them. Version control exists.                                |
+
+## 5. Code Tone
+
+These are non-negotiable. They are also codified in `CONSTITUTION.md` section 9.5.
+
+### 5.1 Explicit over clever
+
+Code must be readable by a developer unfamiliar with the codebase. If it requires explanation, it requires refactoring or a comment.
+
+### 5.2 Fast-fail
+
+Validate at boundaries. Throw early with clear messages. Never proceed on bad state.
+
+### 5.3 No defensive programming
+
+Do not null-check values that cannot be null by contract. Do not write try/catch around code that should not fail. Trust the type system.
+
+### 5.4 No payload-as-truth adapters
+
+Adapters map column-by-column. There is no `payload` field that bypasses mapping. The domain type is the truth; the adapter derives it from storage columns.
+
+### 5.5 No redundant exports
+
+Export only what callers need. Private helpers stay private.
+
+### 5.6 No magic
+
+No implicit behavior, no runtime reflection, no metaprogramming. Configuration is explicit; providers are injected; contracts are stated in types.
+
+## 6. Domain Layer (`source/domain/`)
+
+### 6.1 File organization
+
+Each abstraction has four files, one per sub-layer:
+
+| Sub-layer       | File                         |
+| --------------- | ---------------------------- |
+| `abstractions/` | `{abstraction}.ts`           |
+| `adapters/`     | `{abstraction}-adapter.ts`   |
+| `protocols/`    | `{abstraction}-protocol.ts`  |
+| `validators/`   | `{abstraction}-validator.ts` |
+
+Shared types: `common.ts`, `helper-validator.ts`. Generic protocol shapes live in `@core/api/api-contract.ts`.
+
+### 6.2 Abstractions
+
+- `type` for all domain abstractions, object shapes, aliases, and unions. `interface` only for API contracts that something explicitly implements — `ApiCrudContract`, `RuntimeProvider`, etc.
+- Single-sentence JSDoc on every exported type and enum.
+- Embedded subordinate types use variadic tuple notation: `[Type, ...Type[]]`.
+- All lifecycled abstractions expose `deletedAt?: When`.
+- JSON-serializable only; no methods on domain objects.
+
+### 6.3 Adapters
+
+- Functions only: `toAbstraction(dict: Dictionary): Abstraction` and `fromAbstraction(abstraction: Abstraction): Dictionary`.
+- Map every field explicitly. No `...spread`, no `payload` shortcut.
+- Throw `Error` with a descriptive message on missing required fields — fast-fail.
+- Use `snake_case` keys for database column names; camelCase for domain fields.
+
+### 6.4 Validators
+
+- Functions only: `validateAbstractionCreate(input): string | null` — return error message or `null`.
+- Validate at system boundaries only. Never re-validate inside domain logic.
+- Use shared helpers from `helper-validator.ts` (`isNonEmptyString`, `isId`, etc.).
+
+### 6.5 Protocols
+
+- Input types for create and update operations: `AbstractionCreateInput`, `AbstractionUpdateInput`.
+- Partial shapes — only fields relevant to the operation.
+- No domain logic; protocols are data shapes for transmission.
+
+## 7. Configuration Pattern
+
+The system uses a singleton `Config` with injected runtime providers. Defined in `@core/cfg/config.ts`; initialized once per deployment context.
+
+```typescript
+Config.init(provider, keys, aliases?)
+```
+
+### 7.1 Arguments
+
+- `provider` — runtime-specific `RuntimeProvider` instance (`SolidProvider`, `SupabaseProvider`, `DenoProvider`)
+- `keys` — required environment variable names; fails fast at bootstrap if any are missing
+- `aliases` — optional map of logical name to environment key; allows consuming code to use stable names regardless of platform-specific key prefixes
+
+### 7.2 Why aliases matter
+
+Vite requires client-side environment variables to be prefixed `VITE_`. Without aliases, every call site must know the prefix. With aliases, the bootstrap declares the mapping once and all consuming code uses the clean logical name:
+
+```typescript
+// source/ux/config/ux-config.ts
+import { Config } from '@core/cfg/config.ts'
+import { SolidProvider } from '@core/cfg/solid-provider.ts'
+
+Config.init(
+  new SolidProvider(),
+  [
+    'VITE_SUPABASE_EDGE_URL',
+    'VITE_SUPABASE_RDBMS_URL',
+    'VITE_SUPABASE_SERVICE_KEY',
+    'VITE_JWT_SECRET'
+  ],
+  {
+    SUPABASE_EDGE_URL: 'VITE_SUPABASE_EDGE_URL',
+    SUPABASE_RDBMS_URL: 'VITE_SUPABASE_RDBMS_URL',
+    SUPABASE_SERVICE_KEY: 'VITE_SUPABASE_SERVICE_KEY',
+    JWT_SECRET: 'VITE_JWT_SECRET'
+  }
+)
 
 export { Config }
 ```
 
-### 14.3 Environment files
+Consuming code calls `Config.get('SUPABASE_EDGE_URL')` — no `VITE_` prefix, no platform knowledge.
 
-Environment files follow the naming convention `{env}.env.example` and `{env}.env`:
+### 7.3 Rules
 
-- Use kebab-case for filenames when necessary.
-- One file per deployment package per environment.
-- Co-located with bootstrap file in `config/` directory.
-- Never committed if they contain secrets (use `.gitignore`).
+- `Config.init()` — call once at bootstrap; throws if called twice.
+- `Config.get(name)` — resolves alias if present, then returns value; throws if not initialized, key not registered, or value missing. Never returns undefined.
+- `Config.fail(msg)` — throws `never`; use for invariant violations.
+- Never access `Deno.env` or `import.meta.env` directly. Always go through `Config.get()`.
 
-Example structure:
+## 8. Error Handling
+
+- Throw `Error` with actionable messages: `'JobAssessment dictionary missing required field: jobId'`.
+- Never swallow errors silently.
+- Never log and continue — log and throw, or throw without logging.
+- Never expose stack traces or internal state in HTTP responses.
+- Use `toInternalError()` for unexpected server failures in edge functions.
+
+## 9. Testing Conventions
 
 ```text
-source/back/config/
-  back-config.ts
-  back-local.env.example
-  back-stage.env.example
-  back-prod.env.example
+source/tests/
+  cases/              <- test files: {abstraction}-api-test.ts
+  fixtures/
+    samples.ts        <- barrel export for all fixtures
+    {abstraction}-samples.ts  <- named constants producing valid domain objects
+    fixtures-test.ts  <- fixture integrity checks
 ```
 
-### 14.4 Import conventions
-
-Always import from bootstrap, never from provider directly:
-
-```typescript
-import { Config } from '@back-config/back-config.ts' // Correct
-import { ConfigureNetlify } from '@back-lib/configure-netlify.ts' // Wrong
-import { Config } from '@ux-app-admin/config/app-admin-config.ts' // Correct
-```
-
-### 14.5 Parameter naming
-
-Configuration parameter names should be:
-
-- **SCREAMING_SNAKE_CASE** for environment variables.
-- Prefixed appropriately: `VITE_` for client-side app variables, no prefix for server-side.
-- Descriptive and unambiguous: `SUPABASE_URL`, `API_BASE_URL` (not `URL`, `DB`).
-
-### 14.6 Error messages
-
-Error messages from config failures should be:
-
-- Actionable: "Missing required config: SUPABASE_URL".
-- Context-aware: Include what failed and why.
-- Consistent: Use same phrasing across providers.
-- Never expose secrets in error messages.
-
-### 14.7 Documentation
-
-When adding new configuration parameters:
-
-1. Add to architecture parameter matrix table.
-2. Add to appropriate `.env` files with example values.
-3. Update bootstrap `init()` call to include new parameter.
-4. Document purpose and valid value formats.
+- Test files live in `source/tests/cases/`, named `{abstraction}-api-test.ts`.
+- `{abstraction}-samples.ts` — exports named constants and factory functions producing valid, realistic domain objects. These are the ground truth for tests.
+- `fixtures-test.ts` — validates fixture integrity: ID format, required fields, association linkage. If a fixture fails here the domain types have drifted.
+- Tests exercise the public contract of each layer, not implementation details.
+- Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.

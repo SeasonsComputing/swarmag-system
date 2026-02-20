@@ -1,4 +1,3 @@
-
 /**
  * Implementation internals of the runtime configuration.
  */
@@ -12,7 +11,9 @@ type RuntimeAliases = { [key: string]: string }
 /** Provider used until initialized */
 export const nullProvider: RuntimeProvider = {
   get: (key: string): string | undefined => undefined,
-  fail: (msg: string): never => { throw new Error(msg) }
+  fail: (msg: string): never => {
+    throw new Error(msg)
+  }
 }
 
 /**
