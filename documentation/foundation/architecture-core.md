@@ -410,16 +410,44 @@ Backend runtimes control their own key names — no platform prefix is imposed. 
 import { Config } from '@core/cfg/config.ts'
 import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
-// Initialize the core singleton with Supabase runtime provider
 Config.init(new SupabaseProvider(), [
   'SUPABASE_URL',
   'SUPABASE_SERVICE_KEY',
   'JWT_SECRET'
 ])
 
-// Re-export the configured singleton
 export { Config }
 ```
+
+#### 6.3.2 UX example (aliases required)
+
+Vite requires client-side environment variables to carry a `VITE_` prefix. The alias map declares the mapping once at bootstrap so consuming code uses clean logical names throughout:
+
+```typescript
+// source/ux/config/ux-config.ts
+import { Config } from '@core/cfg/config.ts'
+import { SolidProvider } from '@core/cfg/solid-provider.ts'
+
+Config.init(
+  new SolidProvider(),
+  [
+    'VITE_SUPABASE_EDGE_URL',
+    'VITE_SUPABASE_RDBMS_URL',
+    'VITE_SUPABASE_SERVICE_KEY',
+    'VITE_JWT_SECRET'
+  ],
+  {
+    'SUPABASE_EDGE_URL':    'VITE_SUPABASE_EDGE_URL',
+    'SUPABASE_RDBMS_URL':   'VITE_SUPABASE_RDBMS_URL',
+    'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
+    'JWT_SECRET':           'VITE_JWT_SECRET'
+  }
+)
+
+export { Config }
+```
+
+Consuming code calls `Config.get('SUPABASE_EDGE_URL')` — no `VITE_` prefix, no platform knowledge.
 
 ### 6.4 Usage Pattern
 
@@ -472,15 +500,27 @@ JWT_SECRET=your-jwt-secret-here
 
 ### 6.6 Why This Works
 
-This pattern allows:
+#### 6.6.1 Core utilities can access configuration
 
-- **Core utilities to access configuration** - Config singleton available at lowest layer
-- **Proper dependency flow** - Higher layers inject providers, core doesn't know about them
-- **Runtime flexibility** - Same code works across Deno, Supabase, Netlify, browser
-- **Type safety** - Required keys declared at initialization, missing keys fail fast
-- **Testability** - Mock providers for testing without environment dependencies
+The `Config` singleton lives at the lowest layer, accessible anywhere in the dependency graph without creating upward dependencies.
 
-**Key Insight:** Configuration is declared in higher layers (packages) but accessible in lower layers (core) through dependency injection, maintaining proper architectural boundaries.
+#### 6.6.2 Proper dependency flow
+
+Higher layers inject providers; core has no knowledge of specific runtime implementations. The pattern enforces the dependency direction without exception.
+
+#### 6.6.3 Runtime flexibility
+
+The same code works across Deno, Supabase Edge Functions, Netlify, and browser runtimes. Only the provider changes — the consumption pattern is identical.
+
+#### 6.6.4 Fast-fail at bootstrap
+
+Required keys are declared at initialization. Missing keys throw immediately — not at the call site, not in production. Problems surface before the application reaches a running state.
+
+#### 6.6.5 Testability
+
+Mock providers can be injected for testing without environment dependencies. Test contexts initialize `Config` with a `MockProvider` carrying whatever values they need.
+
+Configuration is declared in higher layers but accessible in lower layers through dependency injection, maintaining proper architectural boundaries throughout.
 
 ## 7. Dependency Direction & Authority
 
