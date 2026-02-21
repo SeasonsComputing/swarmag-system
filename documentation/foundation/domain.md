@@ -99,8 +99,6 @@ Starting Job Work involves transitioning the Job's status to `inprogress`. At th
 
 TODO: **Should Job Workflows be assigned to a crew member for execution as part of the Job Plan? Essentially doling out the work to be done vs. each crew member stepping on each other's toes. My intuition is yes. I have not worked through what that means yet. Let's not let this impede today's progress. We must consider how to assign workflows to crew members and how to manage conflicts that may arise at some point soon.**
 
----
-
 ## 2. Domain Model (`source/domain`)
 
 The domain model has two distinct concerns: the **swarmAg domain** (the business abstractions — Service, Customer, Workflow, Job, etc.) and the **patterns used to codify it** (how those abstractions are structured, associated, and serialized in TypeScript and PostgreSQL).
@@ -262,8 +260,6 @@ The domain layer follows an abstraction-per-file pattern across four subdirector
 - Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-contract.ts`.
 - Shared validators (e.g., `isNonEmptyString`, `isIdArray`) live in `@domain/validators/helper-validator.ts`.
 
----
-
 ## 3. Data Dictionary
 
 The following sections define the domain types and shape constraints from `@domain/abstractions`.
@@ -405,7 +401,12 @@ User (object)
 
 ```text
 QuestionType (enum)
-  Values: text | number | boolean | single-select | multi-select
+  Values: 
+    | text 
+    | number 
+    | boolean 
+    | single-select 
+    | multi-select
   Notes: Supported question input modes
 
 QuestionOption (object)
@@ -418,7 +419,11 @@ Question (object)
   Notes: Workflow checklist prompt
 
 AnswerValue (union)
-  Values: string | number | boolean | string[]
+  Values: 
+    | string 
+    | number 
+    | boolean 
+    | string[]
   Notes: Permitted answer value payloads
 
 Answer (object)
@@ -440,7 +445,15 @@ Workflow (object)
 
 ```text
 JobStatus (enum)
-  Values: opened | assessed | planned | inprogress | completed | closed | cancelled
+  Values: 
+    | 'open'
+    | 'assessing'
+    | 'planning'
+    | 'preparing'
+    | 'executing'
+    | 'finalizing'
+    | 'closed'
+    | 'cancelled'
   Notes: Job lifecycle state
 
 JobAssessment (object)
@@ -485,20 +498,18 @@ JobWork (object)
          execution manifest
 
 JobWorkLogEntry (object)
-  Fields: id, jobId, userId, answer: [Answer?], metadata: [Dictionary?],
-          createdAt
-  Notes: Append-only execution event; at least one of answer or metadata
-         must be present — enforced by validator; answer is present when
-         responding to a task checklist question; metadata captures
-         telemetry and operational context at point of capture;
+  Fields: id, jobId, userId, createdAt
+  Shape: one of:
+    { answer: [Answer], metadata: [Dictionary?] }
+    { answer: [Answer?], metadata: [Dictionary] }
+  Notes: Append-only execution event; answer captures task checklist
+         responses; metadata captures telemetry and operational context;
          see data-lists.md for canonical metadata key namespace
-
+         
 Job (object)
   Fields: id, customerId, status(JobStatus), createdAt, updatedAt, deletedAt?
   Notes: Work agreement lifecycle anchor
 ```
-
----
 
 ## 4. Metadata Key Namespace
 
