@@ -47,4 +47,5 @@ export const id = (): string => {
 }
 
 /** Validates if a string is a valid UUID v7. */
-export const isId = (value: string): value is Id => UUID_V7_REGEX.test(value)
+export const isId = (value: unknown): value is Id =>
+  typeof value === 'string' && UUID_V7_REGEX.test(value)
