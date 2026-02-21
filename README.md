@@ -60,7 +60,7 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | ------ | ---------------------------------------------------------------- |
 | `api/` | Client makers and provider adapters (CRUD, HTTP, business rules) |
 | `cfg/` | Configuration management (Config singleton, runtime providers)   |
-| `std/` | Standard types (ID, When, Dictionary)                            |
+| `std/` | Standard types (Id, When, Dictionary)                            |
 
 #### 1.3.2 Domain (`source/domain/`)
 

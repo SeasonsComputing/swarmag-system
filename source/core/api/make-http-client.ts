@@ -23,7 +23,7 @@ EXAMPLE
 TODO
 */
 
-import type { Dictionary, ID } from '@core-std'
+import type { Dictionary, Id } from '@core-std'
 import {
   type ApiBusRuleContract,
   type ApiCrudContract,
@@ -60,7 +60,7 @@ export function makeCrudHttpClient<T, TCreate, TUpdate>(
       })
       return unwrap<T>(res)
     },
-    async get(id: ID): Promise<T> {
+    async get(id: Id): Promise<T> {
       const res = await fetch(`${basePath}/get?id=${id}`)
       return unwrap<T>(res)
     },
@@ -72,7 +72,7 @@ export function makeCrudHttpClient<T, TCreate, TUpdate>(
       })
       return unwrap<T>(res)
     },
-    async delete(id: ID): Promise<DeleteResult> {
+    async delete(id: Id): Promise<DeleteResult> {
       const res = await fetch(`${basePath}/delete`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },

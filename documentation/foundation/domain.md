@@ -213,7 +213,7 @@ The following standard data types are used consistently across the domain model.
 
 | Type         | Description                                    |
 | ------------ | ---------------------------------------------- |
-| `ID`         | UUID v7 string identifier                      |
+| `Id`         | UUID v7 string identifier                      |
 | `When`       | ISO 8601 UTC timestamp represented as a string |
 | `Dictionary` | JSON-like key/value map                        |
 
@@ -232,7 +232,7 @@ These types provide consistency and clarity without imposing storage or transpor
 - Locations store coordinates/addresses without a `source` field.
 - `JobAssessment` must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
 - Soft deletes: all lifecycled abstractions expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after soft delete. Exceptions: append-only logs and pure junction tables.
-- ID strategy: UUID v7 for PK/FK to avoid an ID service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure junction tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
+- Id strategy: UUID v7 for PK/FK to avoid an Id service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure junction tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
 - `JobWorkLog` entries are append-only; a `JobWorkLogEntry` with neither `answer` nor `metadata` is invalid — enforced by validator.
 - `Workflow` masters are read-only to all roles except administrator. Modification during assessment or planning is achieved exclusively by cloning.
 - `JobWork.work` is the finalized execution manifest and is immutable once created.
@@ -271,7 +271,7 @@ The following sections define the domain types and shape constraints from `@doma
 ### 3.1 Core Standard (`@core-std`)
 
 ```text
-ID (alias)
+Id (alias)
   Shape: UUID v7 string
   Notes: Primary/foreign identifier type
 
@@ -477,7 +477,7 @@ JobPlan (object)
   Notes: Job-specific execution plan
 
 JobWork (object)
-  Fields: id, jobId, work: [ID, ...ID[]], startedAt, startedById,
+  Fields: id, jobId, work: [Id, ...Id[]], startedAt, startedById,
           completedAt?, createdAt, updatedAt, deletedAt?
   Notes: Execution record; creation transitions Job to inprogress;
          work is an ordered array of resolved Workflow IDs (basis if
