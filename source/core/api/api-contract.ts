@@ -28,7 +28,7 @@ EXAMPLES
 TODO
 */
 
-import type { Dictionary, ID, When } from '@core-std'
+import type { Dictionary, Id, When } from '@core-std'
 
 // ────────────────────────────────────────────────────────────────────────────
 // Error Handling
@@ -53,9 +53,9 @@ export class ApiError extends Error {
 /** CRUD API contract */
 export interface ApiCrudContract<T, TCreate, TUpdate> {
   create(input: TCreate): Promise<T>
-  get(id: ID): Promise<T>
+  get(id: Id): Promise<T>
   update(input: TUpdate): Promise<T>
-  delete(id: ID): Promise<DeleteResult>
+  delete(id: Id): Promise<DeleteResult>
   list?(options?: ListOptions): Promise<ListResult<T>>
 }
 
@@ -66,7 +66,7 @@ export interface ApiBusRuleContract {
 
 /** Deletion result with timestamp. */
 export type DeleteResult = {
-  id: ID
+  id: Id
   deletedAt: When
 }
 

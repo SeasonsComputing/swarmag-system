@@ -216,13 +216,13 @@ The system defines two client contracts (in `source/core/api/api-contract.ts`):
 ```typescript
 interface ApiCrudContract<T, TCreate, TUpdate> {
   create(input: TCreate): Promise<T>
-  get(id: ID): Promise<T>
+  get(id: Id): Promise<T>
   update(input: TUpdate): Promise<T>
-  delete(id: ID): Promise<DeleteResult>
+  delete(id: Id): Promise<DeleteResult>
   list?(options?: ListOptions): Promise<ListResult<T>>
 }
 
-type DeleteResult = { id: ID; deletedAt: When }
+type DeleteResult = { id: Id; deletedAt: When }
 type ListOptions = { limit?: number; cursor?: number }
 type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
 ```
@@ -438,10 +438,10 @@ Config.init(
     'VITE_JWT_SECRET'
   ],
   {
-    'SUPABASE_EDGE_URL':    'VITE_SUPABASE_EDGE_URL',
-    'SUPABASE_RDBMS_URL':   'VITE_SUPABASE_RDBMS_URL',
+    'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
+    'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
     'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
-    'JWT_SECRET':           'VITE_JWT_SECRET'
+    'JWT_SECRET': 'VITE_JWT_SECRET'
   }
 )
 
@@ -498,7 +498,6 @@ JWT_SECRET=your-jwt-secret-here
 - Never commit actual `.env` files (only `.env.example` templates)
 - Use platform-specific secret management in production
 - Rotate secrets regularly
-
 
 ### 6.6 Why This Works
 
@@ -761,7 +760,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 #### 10.1.1 Domain is pure
 
 - Domain layer (`source/domain/`) has no infrastructure dependencies
-- Domain depends only on `@core-std` (ID, When, Dictionary types)
+- Domain depends only on `@core-std` (Id, When, Dictionary types)
 - No references to HTTP, SQL, storage, or runtime concerns
 - Validators, protocols, and adapters all remain infrastructure-agnostic
 
@@ -846,7 +845,7 @@ When invariants conflict with convenience, **invariants win**.
 2. Implement domain abstractions, validators, protocols, and adapters
 3. Update schema and create migration
 4. Implement backend functions
-4. Update UX application integration
+5. Update UX application integration
 
 Domain changes flow unidirectionally through the system.
 

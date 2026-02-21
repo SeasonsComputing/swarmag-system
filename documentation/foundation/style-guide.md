@@ -6,12 +6,12 @@ Code that conflicts with this guide is wrong — not the guide.
 
 ## 1. Language & Tooling
 
-| Item       | Guideline                                                                                                                                              |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Runtime    | Deno with strict TypeScript (`deno task check`)                                                                                                        |
-| Encoding   | ASCII only; no non-ASCII literals                                                                                                                      |
+| Item       | Guideline                                                                                                                                               |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime    | Deno with strict TypeScript (`deno task check`)                                                                                                         |
+| Encoding   | ASCII only; no non-ASCII literals                                                                                                                       |
 | Types      | Use `type` for data shapes, abstractions, aliases, and unions; use `interface` only for encapsulated API contracts that something explicitly implements |
-| Primitives | Use `ID` (UUID v7 string) and `When` (ISO 8601 UTC string) from `@core-std`                                                                            |
+| Primitives | Use `Id` (UUID v7 string) and `When` (ISO 8601 UTC string) from `@core-std`                                                                             |
 
 ## 2. Import Aliases
 
@@ -76,9 +76,9 @@ Acronyms are not a special case — they are words, and words transform with the
 | ------------ | ---------- | --------- | ---------- |
 | API          | `Api`      | `api`     | `api-`     |
 | URL          | `Url`      | `url`     | `url-`     |
-| ID           | `Id`       | `id`      | `id-`      |
+| Id           | `Id`       | `id`      | `id-`      |
 
-Exception by executive privilege: `ID` (the `@core-std` type alias), `id()`, and `isID()` retain all-caps. `ID` is a standalone token predating this rule. All other uses of "id" follow the table.
+Exception by executive privilege: `Id` (the `@core-std` type alias), `id()`, and `isId()` retain all-caps. `Id` is a standalone token predating this rule. All other uses of "id" follow the table.
 
 ### 3.4 Makers vs. wrappers
 
@@ -100,12 +100,12 @@ Type declarations, enums, pure domain shapes. The code is the documentation. Inl
  * Assets represent equipment and resources used in operations,
  * such as vehicles, sprayers, drones, etc.
  */
-import type { ID, When } from '@core-std'
+import type { Id, When } from '@core-std'
 import type { Attachment } from '@domain/abstractions/common.ts'
 
 /** Reference type for categorizing assets. */
 export type AssetType = {
-  id: ID
+  id: Id
   label: string
   active: boolean
   createdAt: When
@@ -122,11 +122,11 @@ export type AssetStatus =
 
 /** Operational equipment or resource. */
 export type Asset = {
-  id: ID
+  id: Id
   label: string
   description?: string
   serialNumber?: string
-  type: ID
+  type: Id
   status: AssetStatus
   attachments: [Attachment?, ...Attachment[]]
   createdAt: When
@@ -253,7 +253,6 @@ function parseRequestBody() { ... }
 - EXAMPLE is valid, runnable TypeScript — not pseudocode.
 - Headers stay current. A stale header is worse than no header.
 
-
 ### 4.5 Section dividers
 
 Non-trivial files divide the code body into PUBLIC EXPORTS and PRIVATE IMPLEMENTATION, each bounded top and bottom. Consistent width, no variation:
@@ -274,12 +273,12 @@ Non-trivial files divide the code body into PUBLIC EXPORTS and PRIVATE IMPLEMENT
 
 ### 4.6 Comment conventions
 
-| Context | Style |
-| --- | --- |
-| Spec file types | Single-line `/** */` — one sentence, only when name is insufficient |
-| Functional exported functions | JSDoc with `@param` and `@returns` for non-obvious args |
-| Private helpers | Inline `//` — only when intent isn't obvious from the code |
-| Dead comments | Delete them. Version control exists. |
+| Context                       | Style                                                               |
+| ----------------------------- | ------------------------------------------------------------------- |
+| Spec file types               | Single-line `/** */` — one sentence, only when name is insufficient |
+| Functional exported functions | JSDoc with `@param` and `@returns` for non-obvious args             |
+| Private helpers               | Inline `//` — only when intent isn't obvious from the code          |
+| Dead comments                 | Delete them. Version control exists.                                |
 
 ## 5. Code Tone
 
@@ -376,12 +375,17 @@ import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
 Config.init(
   new SolidProvider(),
-  ['VITE_SUPABASE_EDGE_URL', 'VITE_SUPABASE_RDBMS_URL', 'VITE_SUPABASE_SERVICE_KEY', 'VITE_JWT_SECRET'],
+  [
+    'VITE_SUPABASE_EDGE_URL',
+    'VITE_SUPABASE_RDBMS_URL',
+    'VITE_SUPABASE_SERVICE_KEY',
+    'VITE_JWT_SECRET'
+  ],
   {
-    'SUPABASE_EDGE_URL':    'VITE_SUPABASE_EDGE_URL',
-    'SUPABASE_RDBMS_URL':   'VITE_SUPABASE_RDBMS_URL',
+    'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
+    'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
     'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
-    'JWT_SECRET':           'VITE_JWT_SECRET'
+    'JWT_SECRET': 'VITE_JWT_SECRET'
   }
 )
 
@@ -418,6 +422,6 @@ source/tests/
 
 - Test files live in `source/tests/cases/`, named `{abstraction}-api-test.ts`.
 - `{abstraction}-samples.ts` — exports named constants and factory functions producing valid, realistic domain objects. These are the ground truth for tests.
-- `fixtures-test.ts` — validates fixture integrity: ID format, required fields, association linkage. If a fixture fails here the domain types have drifted.
+- `fixtures-test.ts` — validates fixture integrity: Id format, required fields, association linkage. If a fixture fails here the domain types have drifted.
 - Tests exercise the public contract of each layer, not implementation details.
 - Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.
