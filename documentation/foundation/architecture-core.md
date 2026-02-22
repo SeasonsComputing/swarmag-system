@@ -606,10 +606,10 @@ swarmag-system/
 
     "@core/": "./source/core/",
     "@domain/": "./source/domain/",
-    "@back": "./source/back/",
+    "@back/": "./source/back/",
     "@ux/": "./source/ux/",
-    "@devops": "./source/devops/",
-    "@tests": "./source/tests/",
+    "@devops/": "./source/devops/",
+    "@tests/": "./source/tests/",
 
     // ────────────────────────────────────────────────────────────────────────────
     // Convenience Barrel Aliases

@@ -23,6 +23,7 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | --------------- | ------------------------------------------------------ |
 | `applications/` | Application-level requirements and UX/product specs    |
 | `foundation/`   | Core architecture, domain, style, and data definitions |
+| `prompts/`      | Only prompts that may be re-run. One off's not saved.  |
 
 #### 1.2.1 Foundation (`documentation/foundation/`)
 
