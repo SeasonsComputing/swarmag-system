@@ -84,7 +84,7 @@ Infrastructure code (handlers, adapters) should be derivable from authoritative 
 
 ### 3.2 Constraints
 
-#### 3.2.1 Offline-First Operations
+#### 3.2.1 Field Execution Operations
 
 Operational telemetry and job log records must be fully operable without network connectivity. This is a first-class requirement, not a degraded mode.
 
@@ -146,7 +146,7 @@ The system consists of five primary components:
 
 | Component                 | Purpose                                           | Technology         |
 | ------------------------- | ------------------------------------------------- | ------------------ |
-| **Ops PWA**               | Offline-first field execution (installed app)     | SolidJS, IndexedDB |
+| **Ops PWA**               | Field execution (installed app)                   | SolidJS, IndexedDB |
 | **Admin PWA**             | Management and configuration (installed app)      | SolidJS            |
 | **Customer Portal**       | Passwordless, customer-facing report from job log | SolidJS            |
 | **Backend Orchestration** | Edge Functions for complex operations             | Supabase Edge      |
@@ -637,7 +637,7 @@ swarmag-system/
 }
 ```
 
-## 9. Offline-First Guarantees
+## 9. Field Execution Guarantees
 
 Field operations must be fully executable without network connectivity. The Ops application achieves this through **deep cloning** of Job aggregates to IndexedDB, not sync/reconciliation patterns.
 

@@ -1,11 +1,11 @@
 /**
- * Common domain abstractions, shared across the domain model
+ * Shared subordinate types used across multiple domain abstractions.
+ * These are pure value objects with no independent lifecycle.
  */
+import type { Id, When } from '@core-std'
 
-import type { ID, When } from '@core-std'
-
-/** Represents a location with coordinates and optional address fields. */
-export interface Location {
+/** Geographic position plus optional address and observation metadata. */
+export type Location = {
   latitude: number
   longitude: number
   altitudeMeters?: number
@@ -20,23 +20,24 @@ export interface Location {
   description?: string
 }
 
-/** Represents a note or comment. */
-export interface Note {
-  id: ID
-  createdAt: When
-  authorId?: ID
-  content: string
-  visibility?: 'internal' | 'shared'
-  tags?: string[]
-  images: Attachment[]
-}
-
-/** Represents a file attachment. */
-export interface Attachment {
-  id: ID
+/** Uploaded artifact metadata. */
+export type Attachment = {
+  id: Id
   filename: string
   url: string
   contentType: string
+  kind: 'photo' | 'video' | 'map' | 'document'
   uploadedAt: When
-  uploadedById: ID
+  uploadedById: Id
+}
+
+/** Freeform note with optional visibility, taxonomy, and attachments. */
+export type Note = {
+  id: Id
+  createdAt: When
+  authorId?: Id
+  content: string
+  visibility?: 'internal' | 'shared'
+  tags: [string?, ...string[]]
+  attachments: [Attachment?, ...Attachment[]]
 }

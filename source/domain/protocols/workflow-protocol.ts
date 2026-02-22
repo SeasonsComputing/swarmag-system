@@ -1,21 +1,25 @@
 /**
- * Protocol types for workflow API requests and responses.
+ * Protocol input shapes for Workflow create and update operations.
+ * Partial shapes for boundary transmission — no domain logic.
  */
+import type { Id } from '@core-std'
+import type { Workflow, Task } from '@domain/abstractions/workflow.ts'
 
-import type { WorkflowStep } from '@domain/abstractions/workflow.ts'
-
-/** Input type for creating a workflow. */
-export interface WorkflowCreateInput {
-  serviceId: string
+/** Input shape for creating a Workflow. */
+export type WorkflowCreateInput = {
   name: string
   description?: string
-  steps: WorkflowStep[]
+  version: number
+  tags?: [string?, ...string[]]
+  tasks: [Task, ...Task[]]
 }
 
-/** Input type for updating a workflow. */
-export interface WorkflowUpdateInput {
-  id: string
+/** Input shape for updating a Workflow. */
+export type WorkflowUpdateInput = {
+  id: Id
   name?: string
-  description?: string | null
-  steps?: WorkflowStep[]
+  description?: string
+  version?: number
+  tags?: [string?, ...string[]]
+  tasks?: [Task, ...Task[]]
 }

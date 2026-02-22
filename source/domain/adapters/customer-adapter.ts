@@ -1,117 +1,122 @@
 /**
- * Mappers for converting between Supabase customer rows and domain Customers.
+ * Adapter for converting between Dictionary (storage) and Customer domain abstractions.
+ * Maps snake_case column names to camelCase domain fields and back.
  */
-
 import type { Dictionary } from '@core-std'
-import type { Customer } from '@domain/abstractions/customer.ts'
+import type { Contact, CustomerSite, Customer } from '@domain/abstractions/customer.ts'
 
-/**
- * Type guard for customer status.
- * @param value - Potential status value.
- * @returns True when the value matches a known status.
- */
-export const isCustomerStatus = (value: unknown): value is Customer['status'] =>
-  value === 'active' || value === 'inactive' || value === 'prospect'
+/** Converts a storage dictionary to a Contact domain object. */
+export const toContact = (dict: Dictionary): Contact => {
+  if (!dict['id']) throw new Error('Contact dictionary missing required field: id')
+  if (!dict['customer_id']) throw new Error('Contact dictionary missing required field: customer_id')
+  if (!dict['name']) throw new Error('Contact dictionary missing required field: name')
+  if (!dict['created_at']) throw new Error('Contact dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('Contact dictionary missing required field: updated_at')
 
-/** Map a domain Customer into a Dictionary shape. */
+  return {
+    id: dict['id'] as string,
+    customerId: dict['customer_id'] as string,
+    name: dict['name'] as string,
+    email: dict['email'] as string | undefined,
+    phone: dict['phone'] as string | undefined,
+    preferredChannel: dict['preferred_channel'] as Contact['preferredChannel'],
+    notes: (dict['notes'] ?? []) as Contact['notes'],
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+  }
+}
+
+/** Converts a Contact domain object to a storage dictionary. */
+export const fromContact = (contact: Contact): Dictionary => ({
+  id: contact.id,
+  customer_id: contact.customerId,
+  name: contact.name,
+  email: contact.email,
+  phone: contact.phone,
+  preferred_channel: contact.preferredChannel,
+  notes: contact.notes,
+  created_at: contact.createdAt,
+  updated_at: contact.updatedAt,
+})
+
+/** Converts a storage dictionary to a CustomerSite domain object. */
+export const toCustomerSite = (dict: Dictionary): CustomerSite => {
+  if (!dict['id']) throw new Error('CustomerSite dictionary missing required field: id')
+  if (!dict['customer_id']) throw new Error('CustomerSite dictionary missing required field: customer_id')
+  if (!dict['label']) throw new Error('CustomerSite dictionary missing required field: label')
+  if (!dict['location']) throw new Error('CustomerSite dictionary missing required field: location')
+
+  return {
+    id: dict['id'] as string,
+    customerId: dict['customer_id'] as string,
+    label: dict['label'] as string,
+    location: dict['location'] as CustomerSite['location'],
+    acreage: dict['acreage'] as number | undefined,
+    notes: (dict['notes'] ?? []) as CustomerSite['notes'],
+  }
+}
+
+/** Converts a CustomerSite domain object to a storage dictionary. */
+export const fromCustomerSite = (site: CustomerSite): Dictionary => ({
+  id: site.id,
+  customer_id: site.customerId,
+  label: site.label,
+  location: site.location,
+  acreage: site.acreage,
+  notes: site.notes,
+})
+
+/** Converts a storage dictionary to a Customer domain object. */
+export const toCustomer = (dict: Dictionary): Customer => {
+  if (!dict['id']) throw new Error('Customer dictionary missing required field: id')
+  if (!dict['name']) throw new Error('Customer dictionary missing required field: name')
+  if (!dict['status']) throw new Error('Customer dictionary missing required field: status')
+  if (!dict['line1']) throw new Error('Customer dictionary missing required field: line1')
+  if (!dict['city']) throw new Error('Customer dictionary missing required field: city')
+  if (!dict['state']) throw new Error('Customer dictionary missing required field: state')
+  if (!dict['postal_code']) throw new Error('Customer dictionary missing required field: postal_code')
+  if (!dict['country']) throw new Error('Customer dictionary missing required field: country')
+  if (!dict['created_at']) throw new Error('Customer dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('Customer dictionary missing required field: updated_at')
+
+  return {
+    id: dict['id'] as string,
+    name: dict['name'] as string,
+    status: dict['status'] as Customer['status'],
+    line1: dict['line1'] as string,
+    line2: dict['line2'] as string | undefined,
+    city: dict['city'] as string,
+    state: dict['state'] as string,
+    postalCode: dict['postal_code'] as string,
+    country: dict['country'] as string,
+    accountManagerId: dict['account_manager_id'] as string | undefined,
+    primaryContactId: dict['primary_contact_id'] as string | undefined,
+    sites: (dict['sites'] ?? []) as Customer['sites'],
+    contacts: (dict['contacts'] as Customer['contacts']),
+    notes: (dict['notes'] ?? []) as Customer['notes'],
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
+  }
+}
+
+/** Converts a Customer domain object to a storage dictionary. */
 export const fromCustomer = (customer: Customer): Dictionary => ({
   id: customer.id,
   name: customer.name,
   status: customer.status,
   line1: customer.line1,
-  line2: customer.line2 ?? null,
+  line2: customer.line2,
   city: customer.city,
   state: customer.state,
   postal_code: customer.postalCode,
   country: customer.country,
-  account_manager_id: customer.accountManagerId ?? null,
-  primary_contact_id: customer.primaryContactId ?? null,
+  account_manager_id: customer.accountManagerId,
+  primary_contact_id: customer.primaryContactId,
   sites: customer.sites,
   contacts: customer.contacts,
-  notes: customer.notes ?? null,
+  notes: customer.notes,
   created_at: customer.createdAt,
   updated_at: customer.updatedAt,
-  payload: customer
+  deleted_at: customer.deletedAt,
 })
-
-/**
- * Convert a Dictionary into a Customer domain model.
- * Payload is truth - if present, use it directly.
- * Falls back to column mapping for legacy records.
- * @param dict - The dictionary to convert.
- * @returns The mapped Customer object.
- * @throws Error if required fields are missing.
- */
-export const toCustomer = (record: Dictionary): Customer => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('Customer dictionary is missing required fields')
-  }
-
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string'
-      && typeof payload.name === 'string'
-      && isCustomerStatus(payload.status)
-      && typeof payload.line1 === 'string'
-      && typeof payload.city === 'string'
-      && Array.isArray(payload.sites)
-      && Array.isArray(payload.contacts)
-      && payload.contacts.length > 0
-    ) {
-      return payload as unknown as Customer
-    }
-  }
-
-  // Legacy fallback - map from columns
-  const id = record.id as string
-  const name = record.name as string
-  const status = record.status
-  const line1 = record.line1 as string
-  const city = record.city as string
-  const state = record.state as string
-  const postalCode = (record.postal_code ?? record.postalCode) as string
-  const country = record.country as string
-  const sites = record.sites
-  const contacts = record.contacts
-
-  if (
-    !id
-    || !name
-    || !isCustomerStatus(status)
-    || !line1
-    || !city
-    || !state
-    || !postalCode
-    || !country
-    || !Array.isArray(sites)
-    || !Array.isArray(contacts)
-    || contacts.length === 0
-  ) {
-    throw new Error('Customer dictionary is missing required fields')
-  }
-
-  return {
-    id,
-    name,
-    status,
-    line1,
-    line2: (record.line2 ?? undefined) as string | undefined,
-    city,
-    state,
-    postalCode,
-    country,
-    accountManagerId: (record.account_manager_id ?? record.accountManagerId ?? undefined) as
-      | string
-      | undefined,
-    primaryContactId: (record.primary_contact_id ?? record.primaryContactId ?? undefined) as
-      | string
-      | undefined,
-    sites,
-    contacts: contacts as Customer['contacts'],
-    notes: Array.isArray(record.notes) ? record.notes : undefined,
-    createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
-  }
-}

@@ -2,9 +2,9 @@
  * Unit tests for UsersApi abstraction layer.
  */
 
-import { ApiError } from '@core-api/api-contract.ts'
+import { ApiError } from '@core/api/api-contract.ts'
 import type { User } from '@domain/abstractions/user.ts'
-import { assert, assertEquals, assertRejects } from '@std/assert'
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1'
 import { api } from '@ux-api'
 
 /** Mock user data for testing. */
@@ -13,6 +13,7 @@ const mockUser: User = {
   displayName: 'Ada Lovelace',
   primaryEmail: 'ada@example.com',
   phoneNumber: '555-0100',
+  roles: [],
   status: 'active',
   createdAt: '2024-01-15T10:30:00.000Z',
   updatedAt: '2024-01-15T10:30:00.000Z'
@@ -76,7 +77,7 @@ Deno.test('api.Users.create throws ApiError on validation failure', async () => 
   }
 })
 
-Deno.test('api.Users.get returns user by ID', async () => {
+Deno.test('api.Users.get returns user by Id', async () => {
   const cleanup = mockFetch(url => {
     assert(url.includes(`id=${mockUser.id}`))
     return jsonResponse(200, { data: mockUser })
