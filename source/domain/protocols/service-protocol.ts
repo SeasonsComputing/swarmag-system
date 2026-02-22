@@ -4,8 +4,8 @@
  */
 
 import type { Id } from '@core-std'
-import type { ServiceCategory } from '@domain/abstractions/service.ts'
 import type { Note } from '@domain/abstractions/common.ts'
+import type { ServiceCategory } from '@domain/abstractions/service.ts'
 
 /** Input shape for creating a Service. */
 export type ServiceCreateInput = {

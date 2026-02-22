@@ -4,8 +4,8 @@
  */
 
 import type { Id } from '@core-std'
-import type { Customer } from '@domain/abstractions/customer.ts'
 import type { Note } from '@domain/abstractions/common.ts'
+import type { Customer } from '@domain/abstractions/customer.ts'
 
 /** Input shape for creating a Customer. */
 export type CustomerCreateInput = {

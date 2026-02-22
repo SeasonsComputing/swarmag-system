@@ -46,9 +46,9 @@ in the domain package.
 ### From `@core-std`
 
 ```typescript
-import type { Id, When, Dictionary } from "@core-std";
-import { isId, isWhen } from "@core-std";
-import { isNonEmptyString, isPositiveNumber } from "@core-std";
+import type { Dictionary, Id, When } from '@core-std'
+import { isId, isWhen } from '@core-std'
+import { isNonEmptyString, isPositiveNumber } from '@core-std'
 ```
 
 Do not reimplement `isId`, `isWhen`, `isNonEmptyString`, or `isPositiveNumber` locally.
@@ -57,7 +57,7 @@ Do not invent local equivalents. Import from `@core-std` and use directly.
 ### Cross-domain
 
 ```typescript
-import type { Note } from "@domain/abstractions/common.ts";
+import type { Note } from '@domain/abstractions/common.ts'
 ```
 
 Always use the full path alias. Never use relative imports across top-level namespaces.
@@ -112,14 +112,14 @@ values from any prior source.
 
 ```typescript
 export type JobStatus =
-  | "open"
-  | "assessing"
-  | "planning"
-  | "preparing"
-  | "executing"
-  | "finalizing"
-  | "closed"
-  | "cancelled";
+  | 'open'
+  | 'assessing'
+  | 'planning'
+  | 'preparing'
+  | 'executing'
+  | 'finalizing'
+  | 'closed'
+  | 'cancelled'
 ```
 
 `closed` and `cancelled` are terminal states. All others are active present-tense states
@@ -186,15 +186,17 @@ Notable rules from `domain.md §2.9`:
   `answer` or `metadata` is present:
 
 ```typescript
-export type JobWorkLogEntry = {
-  id: Id;
-  jobId: Id;
-  userId: Id;
-  createdAt: When;
-} & (
-  | { answer: Answer; metadata?: Dictionary }
-  | { answer?: Answer; metadata: Dictionary }
-);
+export type JobWorkLogEntry =
+  & {
+    id: Id
+    jobId: Id
+    userId: Id
+    createdAt: When
+  }
+  & (
+    | { answer: Answer; metadata?: Dictionary }
+    | { answer?: Answer; metadata: Dictionary }
+  )
 ```
 
 - `JobWork.work` is immutable once created

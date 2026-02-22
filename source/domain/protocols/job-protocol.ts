@@ -3,10 +3,15 @@
  * Partial shapes for boundary transmission — no domain logic.
  */
 
-import type { Id, When, Dictionary } from '@core-std'
-import type { JobStatus, JobPlanChemical, JobPlanAsset, JobPlanAssignment } from '@domain/abstractions/job.ts'
-import type { Answer } from '@domain/abstractions/workflow.ts'
+import type { Dictionary, Id, When } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
+import type {
+  JobPlanAsset,
+  JobPlanAssignment,
+  JobPlanChemical,
+  JobStatus
+} from '@domain/abstractions/job.ts'
+import type { Answer } from '@domain/abstractions/workflow.ts'
 
 /** Input shape for creating a Job. */
 export type JobCreateInput = {

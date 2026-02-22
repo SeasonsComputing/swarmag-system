@@ -10,10 +10,16 @@ import type { Workflow } from '@domain/abstractions/workflow.ts'
 export const toWorkflow = (dict: Dictionary): Workflow => {
   if (!dict['id']) throw new Error('Workflow dictionary missing required field: id')
   if (!dict['name']) throw new Error('Workflow dictionary missing required field: name')
-  if (dict['version'] === undefined || dict['version'] === null) throw new Error('Workflow dictionary missing required field: version')
+  if (dict['version'] === undefined || dict['version'] === null) {
+    throw new Error('Workflow dictionary missing required field: version')
+  }
   if (!dict['tasks']) throw new Error('Workflow dictionary missing required field: tasks')
-  if (!dict['created_at']) throw new Error('Workflow dictionary missing required field: created_at')
-  if (!dict['updated_at']) throw new Error('Workflow dictionary missing required field: updated_at')
+  if (!dict['created_at']) {
+    throw new Error('Workflow dictionary missing required field: created_at')
+  }
+  if (!dict['updated_at']) {
+    throw new Error('Workflow dictionary missing required field: updated_at')
+  }
 
   return {
     id: dict['id'] as string,
@@ -24,7 +30,7 @@ export const toWorkflow = (dict: Dictionary): Workflow => {
     tasks: dict['tasks'] as Workflow['tasks'],
     createdAt: dict['created_at'] as string,
     updatedAt: dict['updated_at'] as string,
-    deletedAt: dict['deleted_at'] as string | undefined,
+    deletedAt: dict['deleted_at'] as string | undefined
   }
 }
 
@@ -38,5 +44,5 @@ export const fromWorkflow = (workflow: Workflow): Dictionary => ({
   tasks: workflow.tasks,
   created_at: workflow.createdAt,
   updated_at: workflow.updatedAt,
-  deleted_at: workflow.deletedAt,
+  deleted_at: workflow.deletedAt
 })

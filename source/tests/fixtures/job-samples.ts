@@ -41,4 +41,7 @@ export const fieldMetadataLogEntry: JobWorkLogEntry = {
   }
 }
 
-export const jobSamples = { assessment: ranchMappingAssessment, logEntry: fieldMetadataLogEntry }
+export const jobSamples = {
+  assessment: ranchMappingAssessment,
+  logEntry: fieldMetadataLogEntry
+}

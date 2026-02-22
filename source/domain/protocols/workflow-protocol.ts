@@ -4,7 +4,7 @@
  */
 
 import type { Id } from '@core-std'
-import type { Workflow, Task } from '@domain/abstractions/workflow.ts'
+import type { Task, Workflow } from '@domain/abstractions/workflow.ts'
 
 /** Input shape for creating a Workflow. */
 export type WorkflowCreateInput = {

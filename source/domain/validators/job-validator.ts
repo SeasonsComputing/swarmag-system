@@ -3,18 +3,18 @@
  * Returns an error message string on failure, null on success.
  */
 
-import { isId, isWhen, isNonEmptyString } from '@core-std'
+import { isId, isNonEmptyString, isWhen } from '@core-std'
 import type {
-  JobCreateInput,
-  JobUpdateInput,
   JobAssessmentCreateInput,
   JobAssessmentUpdateInput,
-  JobWorkflowCreateInput,
-  JobWorkflowUpdateInput,
+  JobCreateInput,
   JobPlanCreateInput,
   JobPlanUpdateInput,
+  JobUpdateInput,
   JobWorkCreateInput,
-  JobWorkLogEntryCreateInput,
+  JobWorkflowCreateInput,
+  JobWorkflowUpdateInput,
+  JobWorkLogEntryCreateInput
 } from '@domain/protocols/job-protocol.ts'
 
 /** Validates input for creating a Job. */
@@ -26,23 +26,33 @@ export const validateJobCreate = (input: JobCreateInput): string | null => {
 /** Validates input for updating a Job. */
 export const validateJobUpdate = (input: JobUpdateInput): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.status !== undefined && !isNonEmptyString(input.status)) return 'status must be a non-empty string'
+  if (input.status !== undefined && !isNonEmptyString(input.status)) {
+    return 'status must be a non-empty string'
+  }
   return null
 }
 
 /** Validates input for creating a JobAssessment. */
-export const validateJobAssessmentCreate = (input: JobAssessmentCreateInput): string | null => {
+export const validateJobAssessmentCreate = (
+  input: JobAssessmentCreateInput
+): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
   if (!isId(input.assessorId)) return 'assessorId must be a valid Id'
-  if (!input.locations || !Array.isArray(input.locations) || input.locations.length === 0) return 'locations must be a non-empty array'
+  if (!input.locations || !Array.isArray(input.locations) || input.locations.length === 0) {
+    return 'locations must be a non-empty array'
+  }
   return null
 }
 
 /** Validates input for updating a JobAssessment. */
-export const validateJobAssessmentUpdate = (input: JobAssessmentUpdateInput): string | null => {
+export const validateJobAssessmentUpdate = (
+  input: JobAssessmentUpdateInput
+): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
   if (input.locations !== undefined) {
-    if (!Array.isArray(input.locations) || input.locations.length === 0) return 'locations must be a non-empty array'
+    if (!Array.isArray(input.locations) || input.locations.length === 0) {
+      return 'locations must be a non-empty array'
+    }
   }
   return null
 }
@@ -50,7 +60,10 @@ export const validateJobAssessmentUpdate = (input: JobAssessmentUpdateInput): st
 /** Validates input for creating a JobWorkflow. */
 export const validateJobWorkflowCreate = (input: JobWorkflowCreateInput): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (typeof input.sequence !== 'number' || !Number.isInteger(input.sequence) || input.sequence < 0) return 'sequence must be a non-negative integer'
+  if (
+    typeof input.sequence !== 'number' || !Number.isInteger(input.sequence)
+    || input.sequence < 0
+  ) return 'sequence must be a non-negative integer'
   if (!isId(input.basisWorkflowId)) return 'basisWorkflowId must be a valid Id'
   return null
 }
@@ -58,8 +71,14 @@ export const validateJobWorkflowCreate = (input: JobWorkflowCreateInput): string
 /** Validates input for updating a JobWorkflow. */
 export const validateJobWorkflowUpdate = (input: JobWorkflowUpdateInput): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.sequence !== undefined && (typeof input.sequence !== 'number' || !Number.isInteger(input.sequence) || input.sequence < 0)) return 'sequence must be a non-negative integer'
-  if (input.modifiedWorkflowId !== undefined && !isId(input.modifiedWorkflowId)) return 'modifiedWorkflowId must be a valid Id'
+  if (
+    input.sequence !== undefined
+    && (typeof input.sequence !== 'number' || !Number.isInteger(input.sequence)
+      || input.sequence < 0)
+  ) return 'sequence must be a non-negative integer'
+  if (input.modifiedWorkflowId !== undefined && !isId(input.modifiedWorkflowId)) {
+    return 'modifiedWorkflowId must be a valid Id'
+  }
   return null
 }
 
@@ -73,15 +92,21 @@ export const validateJobPlanCreate = (input: JobPlanCreateInput): string | null 
 /** Validates input for updating a JobPlan. */
 export const validateJobPlanUpdate = (input: JobPlanUpdateInput): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.scheduledStart !== undefined && !isWhen(input.scheduledStart)) return 'scheduledStart must be a valid timestamp'
-  if (input.scheduledEnd !== undefined && !isWhen(input.scheduledEnd)) return 'scheduledEnd must be a valid timestamp'
+  if (input.scheduledStart !== undefined && !isWhen(input.scheduledStart)) {
+    return 'scheduledStart must be a valid timestamp'
+  }
+  if (input.scheduledEnd !== undefined && !isWhen(input.scheduledEnd)) {
+    return 'scheduledEnd must be a valid timestamp'
+  }
   return null
 }
 
 /** Validates input for creating a JobWork. */
 export const validateJobWorkCreate = (input: JobWorkCreateInput): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (!input.work || !Array.isArray(input.work) || input.work.length === 0) return 'work must be a non-empty array of Ids'
+  if (!input.work || !Array.isArray(input.work) || input.work.length === 0) {
+    return 'work must be a non-empty array of Ids'
+  }
   for (const workId of input.work) {
     if (!isId(workId)) return `work contains an invalid Id: ${workId}`
   }
@@ -91,9 +116,13 @@ export const validateJobWorkCreate = (input: JobWorkCreateInput): string | null 
 }
 
 /** Validates input for creating a JobWorkLogEntry; at least one of answer or metadata must be present. */
-export const validateJobWorkLogEntryCreate = (input: JobWorkLogEntryCreateInput): string | null => {
+export const validateJobWorkLogEntryCreate = (
+  input: JobWorkLogEntryCreateInput
+): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
   if (!isId(input.userId)) return 'userId must be a valid Id'
-  if (input.answer === undefined && input.metadata === undefined) return 'at least one of answer or metadata is required'
+  if (input.answer === undefined && input.metadata === undefined) {
+    return 'at least one of answer or metadata is required'
+  }
   return null
 }

@@ -4,8 +4,8 @@
 
 import { ApiError } from '@core/api/api-contract.ts'
 import type { User } from '@domain/abstractions/user.ts'
-import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1'
 import { api } from '@ux-api'
+import { assert, assertEquals, assertRejects } from 'jsr:@std/assert@1'
 
 /** Mock user data for testing. */
 const mockUser: User = {

@@ -4,15 +4,21 @@
  */
 
 import type { Dictionary } from '@core-std'
-import type { Contact, CustomerSite, Customer } from '@domain/abstractions/customer.ts'
+import type { Contact, Customer, CustomerSite } from '@domain/abstractions/customer.ts'
 
 /** Converts a storage dictionary to a Contact domain object. */
 export const toContact = (dict: Dictionary): Contact => {
   if (!dict['id']) throw new Error('Contact dictionary missing required field: id')
-  if (!dict['customer_id']) throw new Error('Contact dictionary missing required field: customer_id')
+  if (!dict['customer_id']) {
+    throw new Error('Contact dictionary missing required field: customer_id')
+  }
   if (!dict['name']) throw new Error('Contact dictionary missing required field: name')
-  if (!dict['created_at']) throw new Error('Contact dictionary missing required field: created_at')
-  if (!dict['updated_at']) throw new Error('Contact dictionary missing required field: updated_at')
+  if (!dict['created_at']) {
+    throw new Error('Contact dictionary missing required field: created_at')
+  }
+  if (!dict['updated_at']) {
+    throw new Error('Contact dictionary missing required field: updated_at')
+  }
 
   return {
     id: dict['id'] as string,
@@ -23,7 +29,7 @@ export const toContact = (dict: Dictionary): Contact => {
     preferredChannel: dict['preferred_channel'] as Contact['preferredChannel'],
     notes: (dict['notes'] ?? []) as Contact['notes'],
     createdAt: dict['created_at'] as string,
-    updatedAt: dict['updated_at'] as string,
+    updatedAt: dict['updated_at'] as string
   }
 }
 
@@ -37,15 +43,19 @@ export const fromContact = (contact: Contact): Dictionary => ({
   preferred_channel: contact.preferredChannel,
   notes: contact.notes,
   created_at: contact.createdAt,
-  updated_at: contact.updatedAt,
+  updated_at: contact.updatedAt
 })
 
 /** Converts a storage dictionary to a CustomerSite domain object. */
 export const toCustomerSite = (dict: Dictionary): CustomerSite => {
   if (!dict['id']) throw new Error('CustomerSite dictionary missing required field: id')
-  if (!dict['customer_id']) throw new Error('CustomerSite dictionary missing required field: customer_id')
+  if (!dict['customer_id']) {
+    throw new Error('CustomerSite dictionary missing required field: customer_id')
+  }
   if (!dict['label']) throw new Error('CustomerSite dictionary missing required field: label')
-  if (!dict['location']) throw new Error('CustomerSite dictionary missing required field: location')
+  if (!dict['location']) {
+    throw new Error('CustomerSite dictionary missing required field: location')
+  }
 
   return {
     id: dict['id'] as string,
@@ -53,7 +63,7 @@ export const toCustomerSite = (dict: Dictionary): CustomerSite => {
     label: dict['label'] as string,
     location: dict['location'] as CustomerSite['location'],
     acreage: dict['acreage'] as number | undefined,
-    notes: (dict['notes'] ?? []) as CustomerSite['notes'],
+    notes: (dict['notes'] ?? []) as CustomerSite['notes']
   }
 }
 
@@ -64,7 +74,7 @@ export const fromCustomerSite = (site: CustomerSite): Dictionary => ({
   label: site.label,
   location: site.location,
   acreage: site.acreage,
-  notes: site.notes,
+  notes: site.notes
 })
 
 /** Converts a storage dictionary to a Customer domain object. */
@@ -75,10 +85,16 @@ export const toCustomer = (dict: Dictionary): Customer => {
   if (!dict['line1']) throw new Error('Customer dictionary missing required field: line1')
   if (!dict['city']) throw new Error('Customer dictionary missing required field: city')
   if (!dict['state']) throw new Error('Customer dictionary missing required field: state')
-  if (!dict['postal_code']) throw new Error('Customer dictionary missing required field: postal_code')
+  if (!dict['postal_code']) {
+    throw new Error('Customer dictionary missing required field: postal_code')
+  }
   if (!dict['country']) throw new Error('Customer dictionary missing required field: country')
-  if (!dict['created_at']) throw new Error('Customer dictionary missing required field: created_at')
-  if (!dict['updated_at']) throw new Error('Customer dictionary missing required field: updated_at')
+  if (!dict['created_at']) {
+    throw new Error('Customer dictionary missing required field: created_at')
+  }
+  if (!dict['updated_at']) {
+    throw new Error('Customer dictionary missing required field: updated_at')
+  }
 
   return {
     id: dict['id'] as string,
@@ -97,7 +113,7 @@ export const toCustomer = (dict: Dictionary): Customer => {
     notes: (dict['notes'] ?? []) as Customer['notes'],
     createdAt: dict['created_at'] as string,
     updatedAt: dict['updated_at'] as string,
-    deletedAt: dict['deleted_at'] as string | undefined,
+    deletedAt: dict['deleted_at'] as string | undefined
   }
 }
 
@@ -119,5 +135,5 @@ export const fromCustomer = (customer: Customer): Dictionary => ({
   notes: customer.notes,
   created_at: customer.createdAt,
   updated_at: customer.updatedAt,
-  deleted_at: customer.deletedAt,
+  deleted_at: customer.deletedAt
 })
