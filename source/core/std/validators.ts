@@ -2,16 +2,17 @@
  * Generic validators
  */
 
- /** Error thrown for failed validation */
+/** Error thrown for failed validation */
 export class ValidatorError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number,
-    public readonly details?: string
-  ) {
+  constructor(message: string, public readonly details?: string) {
     super(message)
     this.name = 'ValidatorError'
   }
+}
+
+/** Throw ValidatorError with message */
+export const notValid = (message: string): never => {
+  throw new ValidatorError(message)
 }
 
 /** Checks if the given value is a non-empty string */
