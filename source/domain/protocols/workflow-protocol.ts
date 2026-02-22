@@ -2,6 +2,7 @@
  * Protocol input shapes for Workflow create and update operations.
  * Partial shapes for boundary transmission — no domain logic.
  */
+
 import type { Id } from '@core-std'
 import type { Workflow, Task } from '@domain/abstractions/workflow.ts'
 

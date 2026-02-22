@@ -3,6 +3,7 @@
  * Assets represent equipment and resources used in operations,
  * such as vehicles, sprayers, and drones.
  */
+
 import type { Id, When } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 

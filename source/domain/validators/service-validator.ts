@@ -2,6 +2,7 @@
  * Validators for service protocol inputs at system boundaries.
  * Returns an error message string on failure, null on success.
  */
+
 import { isNonEmptyString, isId } from '@core-std'
 import type { ServiceCreateInput, ServiceUpdateInput } from '@domain/protocols/service-protocol.ts'
 

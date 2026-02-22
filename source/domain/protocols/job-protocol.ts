@@ -2,6 +2,7 @@
  * Protocol input shapes for Job and all job lifecycle artifact create and update operations.
  * Partial shapes for boundary transmission — no domain logic.
  */
+
 import type { Id, When, Dictionary } from '@core-std'
 import type { JobStatus, JobPlanChemical, JobPlanAsset, JobPlanAssignment } from '@domain/abstractions/job.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'

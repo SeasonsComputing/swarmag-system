@@ -2,6 +2,7 @@
  * Validators for customer protocol inputs at system boundaries.
  * Returns an error message string on failure, null on success.
  */
+
 import { isNonEmptyString, isId } from '@core-std'
 import type { CustomerCreateInput, CustomerUpdateInput } from '@domain/protocols/customer-protocol.ts'
 

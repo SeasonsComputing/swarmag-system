@@ -2,6 +2,7 @@
  * Protocol input shapes for Chemical create and update operations.
  * Partial shapes for boundary transmission — no domain logic.
  */
+
 import type { Id } from '@core-std'
 import type { ChemicalUsage, ChemicalLabel, Chemical } from '@domain/abstractions/chemical.ts'
 import type { Attachment, Note } from '@domain/abstractions/common.ts'

@@ -10,23 +10,17 @@ existing files under `source/domain/`. The authoritative sources are:
 - `documentation/foundation/architecture-core.md` — structural law, import discipline, layering
 - `CONSTITUTION.md` — governing law; overrides all else in conflict
 
----
-
 ## File Format — Non-Negotiable
 
 **All files in `source/domain/` use Spec Style per `style-guide.md §4.1`.**
-
 This applies to all four archetypes without exception: abstractions, adapters, validators,
 protocols. No box headers. No dash-rules. No section dividers. No PURPOSE blocks.
-
 Spec style means:
 
 - Module-level JSDoc block at the top of every file
 - Single-sentence `/** */` on every exported type, function, and constant where the name
   alone is insufficient
 - Nothing else
-
----
 
 ## Naming — Non-Negotiable
 
@@ -40,17 +34,12 @@ Spec style means:
 **Acronyms are words.** All words transform to their symbol class convention. No exceptions.
 `Id` not `ID`. `isId` not `isID`. `Url` not `URL`. `Api` not `API`.
 
----
-
 ## Type vs Interface — Non-Negotiable
 
 `type` for all domain abstractions, object shapes, aliases, and unions. Always.
-
 `interface` is reserved exclusively for API contracts that something explicitly implements.
 There are no such contracts in `source/domain/`. Therefore: zero `interface` declarations
 in the domain package.
-
----
 
 ## Imports — Non-Negotiable
 
@@ -73,8 +62,6 @@ import type { Note } from "@domain/abstractions/common.ts";
 
 Always use the full path alias. Never use relative imports across top-level namespaces.
 
----
-
 ## Abstraction Rules (`abstractions/`)
 
 - One file per abstraction, named `{abstraction}.ts`
@@ -86,8 +73,6 @@ Always use the full path alias. Never use relative imports across top-level name
 - All lifecycled abstractions expose `deletedAt?: When`
 - Exceptions: append-only log entries and pure junction types (no `deletedAt`)
 - JSON-serializable only; no methods on domain objects
-
----
 
 ## Adapter Rules (`adapters/`)
 
@@ -101,8 +86,6 @@ Always use the full path alias. Never use relative imports across top-level name
 - No payload-as-truth pattern. No `payload` field. No legacy fallback branches.
 - No private helper functions invented inside the adapter file
 
----
-
 ## Validator Rules (`validators/`)
 
 - One validate function per protocol input type
@@ -114,8 +97,6 @@ Always use the full path alias. Never use relative imports across top-level name
 - Validate at boundaries only; no re-validation inside domain logic
 - If a protocol type exists, its validator must exist — complete the vertical slice
 
----
-
 ## Protocol Rules (`protocols/`)
 
 - Input types for create and update operations only
@@ -123,8 +104,6 @@ Always use the full path alias. Never use relative imports across top-level name
 - Partial shapes — only fields relevant to the operation
 - Omit: `id`, `createdAt`, `updatedAt`, `deletedAt` from create inputs
 - No domain logic; protocols are pure data shapes for transmission
-
----
 
 ## JobStatus — Updated Values
 
@@ -146,8 +125,6 @@ export type JobStatus =
 `closed` and `cancelled` are terminal states. All others are active present-tense states
 describing what the job is currently doing. Do not use: `opened`, `assessed`, `planned`,
 `inprogress`, `completed`, or any prior form.
-
----
 
 ## File Inventory
 
@@ -194,14 +171,11 @@ Generate all of the following files. Every abstraction gets all four archetypes.
 - `workflow-protocol.ts`
 - `job-protocol.ts`
 
----
-
 ## Domain Model Reference
 
 Refer to `documentation/foundation/domain.md` Section 3 (Data Dictionary) for the complete
 field-level specification of every abstraction. That document is the authoritative source
 for field names, types, cardinality, and constraints.
-
 Notable rules from `domain.md §2.9`:
 
 - `Customer.contacts` is non-empty: `[Contact, ...Contact[]]`

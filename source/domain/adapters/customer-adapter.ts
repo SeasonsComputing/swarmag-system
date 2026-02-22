@@ -2,6 +2,7 @@
  * Adapter for converting between Dictionary (storage) and Customer domain abstractions.
  * Maps snake_case column names to camelCase domain fields and back.
  */
+
 import type { Dictionary } from '@core-std'
 import type { Contact, CustomerSite, Customer } from '@domain/abstractions/customer.ts'
 

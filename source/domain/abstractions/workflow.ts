@@ -2,6 +2,7 @@
  * Domain models for workflows in the swarmAg system.
  * Workflows are versioned execution templates composed of sequenced tasks.
  */
+
 import type { Id, When } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 

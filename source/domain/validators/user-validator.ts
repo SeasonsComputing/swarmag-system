@@ -2,6 +2,7 @@
  * Validators for user protocol inputs at system boundaries.
  * Returns an error message string on failure, null on success.
  */
+
 import { isNonEmptyString, isId } from '@core-std'
 import type { UserCreateInput, UserUpdateInput } from '@domain/protocols/user-protocol.ts'
 
