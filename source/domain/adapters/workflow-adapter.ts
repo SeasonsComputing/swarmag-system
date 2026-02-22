@@ -1,80 +1,41 @@
 /**
- * Mappers for converting between Supabase workflow rows and domain Workflows.
+ * Adapter for converting between Dictionary (storage) and Workflow domain abstractions.
+ * Maps snake_case column names to camelCase domain fields and back.
  */
-
 import type { Dictionary } from '@core-std'
 import type { Workflow } from '@domain/abstractions/workflow.ts'
 
-/** Map a domain Workflow into a Dictionary shape. */
-export const fromWorkflow = (workflow: Workflow): Dictionary => ({
-  id: workflow.id,
-  service_id: workflow.serviceId,
-  name: workflow.name,
-  description: workflow.description ?? null,
-  version: workflow.version,
-  effective_from: workflow.effectiveFrom,
-  steps: workflow.steps,
-  locations_required: workflow.locationsRequired ?? null,
-  created_at: workflow.createdAt,
-  updated_at: workflow.updatedAt,
-  payload: workflow
-})
-
-/**
- * Convert a Dictionary into a Workflow domain model.
- * Payload is truth - if present, use it directly.
- * Falls back to column mapping for legacy records.
- * @param dict - The dictionary to convert.
- * @returns The mapped Workflow object.
- * @throws Error if required fields are missing.
- */
-export const toWorkflow = (record: Dictionary): Workflow => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('Workflow dictionary is missing required fields')
-  }
-
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string' && typeof payload.serviceId === 'string' && typeof payload
-          .name === 'string'
-      && typeof payload.version === 'number' && typeof payload.effectiveFrom === 'string'
-      && Array.isArray(payload.steps)
-    ) {
-      return payload as unknown as Workflow
-    }
-  }
-
-  // Legacy fallback - map from columns
-  const id = record.id as string
-  const serviceId = (record.service_id ?? record.serviceId) as string
-  const name = record.name as string
-  const version = record.version as number
-  const effectiveFrom = (record.effective_from ?? record.effectiveFrom) as string
-  const steps = record.steps
-
-  if (
-    !id || !serviceId || !name || typeof version !== 'number' || !effectiveFrom
-    || !Array.isArray(steps)
-  ) {
-    throw new Error('Workflow dictionary is missing required fields')
-  }
+/** Converts a storage dictionary to a Workflow domain object. */
+export const toWorkflow = (dict: Dictionary): Workflow => {
+  if (!dict['id']) throw new Error('Workflow dictionary missing required field: id')
+  if (!dict['name']) throw new Error('Workflow dictionary missing required field: name')
+  if (dict['version'] === undefined || dict['version'] === null) throw new Error('Workflow dictionary missing required field: version')
+  if (!dict['tasks']) throw new Error('Workflow dictionary missing required field: tasks')
+  if (!dict['created_at']) throw new Error('Workflow dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('Workflow dictionary missing required field: updated_at')
 
   return {
-    id,
-    serviceId,
-    name,
-    description: (record.description ?? undefined) as string | undefined,
-    version,
-    effectiveFrom,
-    steps,
-    locationsRequired: Array.isArray(record.locations_required ?? record.locationsRequired)
-      ? (record.locations_required ?? record.locationsRequired) as Workflow[
-        'locationsRequired'
-      ]
-      : undefined,
-    createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
+    id: dict['id'] as string,
+    name: dict['name'] as string,
+    description: dict['description'] as string | undefined,
+    version: dict['version'] as number,
+    tags: (dict['tags'] ?? []) as Workflow['tags'],
+    tasks: dict['tasks'] as Workflow['tasks'],
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
   }
 }
+
+/** Converts a Workflow domain object to a storage dictionary. */
+export const fromWorkflow = (workflow: Workflow): Dictionary => ({
+  id: workflow.id,
+  name: workflow.name,
+  description: workflow.description,
+  version: workflow.version,
+  tags: workflow.tags,
+  tasks: workflow.tasks,
+  created_at: workflow.createdAt,
+  updated_at: workflow.updatedAt,
+  deleted_at: workflow.deletedAt,
+})

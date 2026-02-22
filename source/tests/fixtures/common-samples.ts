@@ -21,7 +21,8 @@ export const chemicalMixRatioQuestion: Question = {
   id: id(),
   prompt: 'Recorded mix ratio (oz/gal)',
   type: 'number',
-  helpText: 'Enter the actual ounces per gallon observed during mixing.'
+  helpText: 'Enter the actual ounces per gallon observed during mixing.',
+  options: []
 }
 
 export const ppeVerificationQuestion: Question = {

@@ -1,32 +1,31 @@
 /**
- * Domain models for services in the swarmAg system.
- * Services are the types of operations offered to customers.
+ * Domain models for services offered by swarmAg.
+ * Services are sellable operational offerings identified by SKU and category.
  */
-
-import type { ID, When } from '@core-std'
+import type { Id, When } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 
-/** The categories of services available. */
+/** Service family classification. */
 export type ServiceCategory =
   | 'aerial-drone-services'
   | 'ground-machinery-services'
 
-/** Represents a service in the swarmAg system. */
-export interface Service {
-  id: ID
+/** Sellable operational offering with SKU, category, and asset requirements. */
+export type Service = {
+  id: Id
   name: string
   sku: string
   description?: string
   category: ServiceCategory
-  notes?: Note[]
+  notes: [Note?, ...Note[]]
   createdAt: When
   updatedAt: When
   deletedAt?: When
 }
 
-/** Represents the required asset type for a service. */
-export interface ServiceRequiredAssetType {
-  serviceId: ID
-  assetTypeId: ID
+/** Junction type associating a service with a required asset type. */
+export type ServiceRequiredAssetType = {
+  serviceId: Id
+  assetTypeId: Id
   deletedAt?: When
 }

@@ -1,52 +1,24 @@
 /**
- * Domain-level invariant validators for assets.
+ * Validators for asset protocol inputs at system boundaries.
+ * Returns an error message string on failure, null on success.
  */
-
-import type { Asset } from '@domain/abstractions/asset.ts'
+import { isId, isNonEmptyString } from '@core-std'
 import type { AssetCreateInput, AssetUpdateInput } from '@domain/protocols/asset-protocol.ts'
-import { isNonEmptyString } from './helper-validator.ts'
 
-export type { AssetCreateInput, AssetUpdateInput }
-
-/**
- * Type guard for asset status.
- * @param value - Potential status value.
- * @returns True when the value matches a known status.
- */
-export const isAssetStatus = (value: unknown): value is Asset['status'] =>
-  value === 'active' || value === 'maintenance' || value === 'retired' || value === 'reserved'
-
-/**
- * Validate asset creation input.
- * @param input - Asset creation input to validate.
- * @returns Error message or null if valid.
- */
-export const validateAssetCreate = (input?: AssetCreateInput | null): string | null => {
-  if (!input) return 'Request body is required'
+/** Validates input for creating an Asset. */
+export const validateAssetCreate = (input: AssetCreateInput): string | null => {
   if (!isNonEmptyString(input.label)) return 'label is required'
   if (!isNonEmptyString(input.type)) return 'type is required'
-  if (input.status !== undefined && !isAssetStatus(input.status)) {
-    return 'status must be active, maintenance, retired, or reserved'
-  }
+  if (!isId(input.type)) return 'type must be a valid Id'
+  if (!isNonEmptyString(input.status)) return 'status is required'
   return null
 }
 
-/**
- * Validate asset update input.
- * @param input - Asset update input to validate.
- * @returns Error message or null if valid.
- */
-export const validateAssetUpdate = (input?: AssetUpdateInput | null): string | null => {
-  if (!input) return 'Request body is required'
-  if (!isNonEmptyString(input.id)) return 'id is required'
-  if (input.label !== undefined && !isNonEmptyString(input.label)) {
-    return 'label cannot be empty'
-  }
-  if (input.type !== undefined && !isNonEmptyString(input.type)) {
-    return 'type cannot be empty'
-  }
-  if (input.status !== undefined && !isAssetStatus(input.status)) {
-    return 'status must be active, maintenance, retired, or reserved'
-  }
+/** Validates input for updating an Asset. */
+export const validateAssetUpdate = (input: AssetUpdateInput): string | null => {
+  if (!isId(input.id)) return 'id must be a valid Id'
+  if (input.label !== undefined && !isNonEmptyString(input.label)) return 'label must be a non-empty string'
+  if (input.type !== undefined && !isId(input.type)) return 'type must be a valid Id'
+  if (input.status !== undefined && !isNonEmptyString(input.status)) return 'status must be a non-empty string'
   return null
 }

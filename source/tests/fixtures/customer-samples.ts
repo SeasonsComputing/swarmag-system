@@ -53,7 +53,8 @@ export const blueMesaRanchCustomer: Customer = {
       id: contactNoteId,
       createdAt: '2025-01-09T00:00:00Z',
       content: 'Prefers SMS for scheduling confirmations.',
-      images: []
+      tags: [],
+      attachments: []
     }],
     createdAt: '2025-01-10T00:00:00Z',
     updatedAt: '2025-01-10T00:00:00Z'

@@ -1,22 +1,26 @@
 /**
- * Protocol types for service API requests and responses.
+ * Protocol input shapes for Service create and update operations.
+ * Partial shapes for boundary transmission — no domain logic.
  */
+import type { Id } from '@core-std'
+import type { ServiceCategory } from '@domain/abstractions/service.ts'
+import type { Note } from '@domain/abstractions/common.ts'
 
-import type { Service } from '@domain/abstractions/service.ts'
-
-/** Input type for creating a service. */
-export interface ServiceCreateInput {
+/** Input shape for creating a Service. */
+export type ServiceCreateInput = {
   name: string
   sku: string
   description?: string
-  category: Service['category']
+  category: ServiceCategory
+  notes?: [Note?, ...Note[]]
 }
 
-/** Input type for updating a service. */
-export interface ServiceUpdateInput {
-  id: string
+/** Input shape for updating a Service. */
+export type ServiceUpdateInput = {
+  id: Id
   name?: string
   sku?: string
-  description?: string | null
-  category?: Service['category']
+  description?: string
+  category?: ServiceCategory
+  notes?: [Note?, ...Note[]]
 }

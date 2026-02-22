@@ -60,7 +60,7 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | ------ | ---------------------------------------------------------------- |
 | `api/` | Client makers and provider adapters (CRUD, HTTP, business rules) |
 | `cfg/` | Configuration management (Config singleton, runtime providers)   |
-| `std/` | Standard types (ID, When, Dictionary)                            |
+| `std/` | Standard types (Id, When, Dictionary)                            |
 
 #### 1.3.2 Domain (`source/domain/`)
 
@@ -80,13 +80,13 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 #### 1.3.4 Frontend (`source/ux/`)
 
-| Path            | Description                                        |
-| --------------- | -------------------------------------------------- |
-| `api/`          | Composed API namespace (@ux-api barrel export)     |
-| `app-admin/`    | Admin PWA application (desktop/tablet)             |
-| `app-ops/`      | Operations PWA application (mobile, offline-first) |
-| `app-customer/` | Customer portal application (static, read-only)    |
-| `app-common/`   | Shared UX components and utilities                 |
+| Path            | Description                                          |
+| --------------- | ---------------------------------------------------- |
+| `api/`          | Composed API namespace (@ux-api barrel export)       |
+| `app-admin/`    | Admin PWA application (desktop/tablet)               |
+| `app-ops/`      | Operations PWA application (mobile, field execution) |
+| `app-customer/` | Customer portal application (static, read-only)      |
+| `app-common/`   | Shared UX components and utilities                   |
 
 ## 2. Local Configuration
 
