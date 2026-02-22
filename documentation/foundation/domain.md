@@ -99,8 +99,6 @@ Starting Job Work involves transitioning the Job's status to `inprogress`. At th
 
 TODO: **Should Job Workflows be assigned to a crew member for execution as part of the Job Plan? Essentially doling out the work to be done vs. each crew member stepping on each other's toes. My intuition is yes. I have not worked through what that means yet. Let's not let this impede today's progress. We must consider how to assign workflows to crew members and how to manage conflicts that may arise at some point soon.**
 
----
-
 ## 2. Domain Model (`source/domain`)
 
 The domain model has two distinct concerns: the **swarmAg domain** (the business abstractions — Service, Customer, Workflow, Job, etc.) and the **patterns used to codify it** (how those abstractions are structured, associated, and serialized in TypeScript and PostgreSQL).
@@ -213,7 +211,7 @@ The following standard data types are used consistently across the domain model.
 
 | Type         | Description                                    |
 | ------------ | ---------------------------------------------- |
-| `ID`         | UUID v7 string identifier                      |
+| `Id`         | UUID v7 string identifier                      |
 | `When`       | ISO 8601 UTC timestamp represented as a string |
 | `Dictionary` | JSON-like key/value map                        |
 
@@ -232,7 +230,7 @@ These types provide consistency and clarity without imposing storage or transpor
 - Locations store coordinates/addresses without a `source` field.
 - `JobAssessment` must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
 - Soft deletes: all lifecycled abstractions expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after soft delete. Exceptions: append-only logs and pure junction tables.
-- ID strategy: UUID v7 for PK/FK to avoid an ID service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure junction tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
+- Id strategy: UUID v7 for PK/FK to avoid an Id service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure junction tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
 - `JobWorkLog` entries are append-only; a `JobWorkLogEntry` with neither `answer` nor `metadata` is invalid — enforced by validator.
 - `Workflow` masters are read-only to all roles except administrator. Modification during assessment or planning is achieved exclusively by cloning.
 - `JobWork.work` is the finalized execution manifest and is immutable once created.
@@ -262,8 +260,6 @@ The domain layer follows an abstraction-per-file pattern across four subdirector
 - Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-contract.ts`.
 - Shared validators (e.g., `isNonEmptyString`, `isIdArray`) live in `@domain/validators/helper-validator.ts`.
 
----
-
 ## 3. Data Dictionary
 
 The following sections define the domain types and shape constraints from `@domain/abstractions`.
@@ -271,7 +267,7 @@ The following sections define the domain types and shape constraints from `@doma
 ### 3.1 Core Standard (`@core-std`)
 
 ```text
-ID (alias)
+Id (alias)
   Shape: UUID v7 string
   Notes: Primary/foreign identifier type
 
@@ -405,7 +401,12 @@ User (object)
 
 ```text
 QuestionType (enum)
-  Values: text | number | boolean | single-select | multi-select
+  Values: 
+    | text 
+    | number 
+    | boolean 
+    | single-select 
+    | multi-select
   Notes: Supported question input modes
 
 QuestionOption (object)
@@ -418,7 +419,11 @@ Question (object)
   Notes: Workflow checklist prompt
 
 AnswerValue (union)
-  Values: string | number | boolean | string[]
+  Values: 
+    | string 
+    | number 
+    | boolean 
+    | string[]
   Notes: Permitted answer value payloads
 
 Answer (object)
@@ -440,7 +445,15 @@ Workflow (object)
 
 ```text
 JobStatus (enum)
-  Values: opened | assessed | planned | inprogress | completed | closed | cancelled
+  Values: 
+    | 'open'
+    | 'assessing'
+    | 'planning'
+    | 'preparing'
+    | 'executing'
+    | 'finalizing'
+    | 'closed'
+    | 'cancelled'
   Notes: Job lifecycle state
 
 JobAssessment (object)
@@ -477,7 +490,7 @@ JobPlan (object)
   Notes: Job-specific execution plan
 
 JobWork (object)
-  Fields: id, jobId, work: [ID, ...ID[]], startedAt, startedById,
+  Fields: id, jobId, work: [Id, ...Id[]], startedAt, startedById,
           completedAt?, createdAt, updatedAt, deletedAt?
   Notes: Execution record; creation transitions Job to inprogress;
          work is an ordered array of resolved Workflow IDs (basis if
@@ -485,20 +498,18 @@ JobWork (object)
          execution manifest
 
 JobWorkLogEntry (object)
-  Fields: id, jobId, userId, answer: [Answer?], metadata: [Dictionary?],
-          createdAt
-  Notes: Append-only execution event; at least one of answer or metadata
-         must be present — enforced by validator; answer is present when
-         responding to a task checklist question; metadata captures
-         telemetry and operational context at point of capture;
+  Fields: id, jobId, userId, createdAt
+  Shape: one of:
+    { answer: [Answer], metadata: [Dictionary?] }
+    { answer: [Answer?], metadata: [Dictionary] }
+  Notes: Append-only execution event; answer captures task checklist
+         responses; metadata captures telemetry and operational context;
          see data-lists.md for canonical metadata key namespace
-
+         
 Job (object)
   Fields: id, customerId, status(JobStatus), createdAt, updatedAt, deletedAt?
   Notes: Work agreement lifecycle anchor
 ```
-
----
 
 ## 4. Metadata Key Namespace
 

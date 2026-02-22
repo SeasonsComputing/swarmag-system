@@ -13,4 +13,5 @@ const ISO_DATETIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
 export const when = (): When => new Date().toISOString()
 
 /** Checks if a string is a valid ISO date-time. */
-export const isWhen = (value: string): value is When => ISO_DATETIME_REGEX.test(value)
+export const isWhen = (value: unknown): value is When =>
+  typeof value === 'string' && ISO_DATETIME_REGEX.test(value)

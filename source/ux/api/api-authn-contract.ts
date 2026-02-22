@@ -2,6 +2,8 @@
  * Authentication (AuthN) Api Contract
  */
 
+import type { User } from '@domain/abstractions/user.ts'
+
 type LogonInput = { username: string; password: string }
 type Session = { id: string; user: User }
 

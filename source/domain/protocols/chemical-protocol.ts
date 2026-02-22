@@ -1,31 +1,38 @@
 /**
- * Protocol types for chemical operations.
- * Defines wire shapes for request/response contracts.
+ * Protocol input shapes for Chemical create and update operations.
+ * Partial shapes for boundary transmission — no domain logic.
  */
+import type { Id } from '@core-std'
+import type { ChemicalUsage, ChemicalLabel, Chemical } from '@domain/abstractions/chemical.ts'
+import type { Attachment, Note } from '@domain/abstractions/common.ts'
 
-import type { Chemical } from '@domain/abstractions/chemical.ts'
-
-/** Input type for creating a chemical. */
-export interface ChemicalCreateInput {
+/** Input shape for creating a Chemical. */
+export type ChemicalCreateInput = {
   name: string
   epaNumber?: string
-  usage: Chemical['usage']
+  usage: ChemicalUsage
   signalWord?: Chemical['signalWord']
   restrictedUse: boolean
   reEntryIntervalHours?: number
   storageLocation?: string
   sdsUrl?: string
+  labels?: [ChemicalLabel?, ...ChemicalLabel[]]
+  attachments?: [Attachment?, ...Attachment[]]
+  notes?: [Note?, ...Note[]]
 }
 
-/** Input type for updating a chemical. */
-export interface ChemicalUpdateInput {
-  id: string
+/** Input shape for updating a Chemical. */
+export type ChemicalUpdateInput = {
+  id: Id
   name?: string
-  epaNumber?: string | null
-  usage?: Chemical['usage']
-  signalWord?: Chemical['signalWord'] | null
+  epaNumber?: string
+  usage?: ChemicalUsage
+  signalWord?: Chemical['signalWord']
   restrictedUse?: boolean
-  reEntryIntervalHours?: number | null
-  storageLocation?: string | null
-  sdsUrl?: string | null
+  reEntryIntervalHours?: number
+  storageLocation?: string
+  sdsUrl?: string
+  labels?: [ChemicalLabel?, ...ChemicalLabel[]]
+  attachments?: [Attachment?, ...Attachment[]]
+  notes?: [Note?, ...Note[]]
 }

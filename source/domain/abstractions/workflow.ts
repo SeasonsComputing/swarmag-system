@@ -1,38 +1,11 @@
 /**
  * Domain models for workflows in the swarmAg system.
- * Workflows define the steps for executing services.
+ * Workflows are versioned execution templates composed of sequenced tasks.
  */
+import type { Id, When } from '@core-std'
+import type { Note } from '@domain/abstractions/common.ts'
 
-import type { ID, When } from '@core-std'
-import type { Location, Note } from './common.ts'
-
-/** A step in a workflow, including checklists and requirements. */
-export interface WorkflowStep {
-  id: ID
-  title: string
-  description?: string
-  checklist: Question[]
-  requiresLocationCapture?: boolean
-  requiresPhoto?: boolean
-  notes?: Note[]
-}
-
-/** Represents a workflow in the swarmAg system. */
-export interface Workflow {
-  id: ID
-  serviceId: ID
-  name: string
-  description?: string
-  version: number
-  effectiveFrom: When
-  steps: WorkflowStep[]
-  locationsRequired?: Location[]
-  createdAt: When
-  updatedAt: When
-  deletedAt?: When
-}
-
-/** The types of questions that can be asked. */
+/** Supported question input modes. */
 export type QuestionType =
   | 'text'
   | 'number'
@@ -40,35 +13,52 @@ export type QuestionType =
   | 'single-select'
   | 'multi-select'
 
-/** An option for a multiple choice question. */
-export interface QuestionOption {
+/** Selectable option metadata for select-type questions. */
+export type QuestionOption = {
   value: string
   label?: string
   requiresNote?: boolean
 }
 
-/** Represents a question in an assessment or form. */
-export interface Question {
-  id: ID
+/** Workflow checklist prompt with type and optional selection options. */
+export type Question = {
+  id: Id
   prompt: string
   type: QuestionType
   helpText?: string
   required?: boolean
-  options?: QuestionOption[]
+  options: [QuestionOption?, ...QuestionOption[]]
 }
 
-/** The value of an answer. */
-export type AnswerValue =
-  | string
-  | number
-  | boolean
-  | string[]
+/** Permitted answer value payloads. */
+export type AnswerValue = string | number | boolean | string[]
 
-/** An answer to a question. */
-export interface Answer {
-  questionId: ID
+/** Captured response to a workflow question; notes carry crew annotations. */
+export type Answer = {
+  questionId: Id
   value: AnswerValue
   capturedAt: When
-  capturedById: ID
-  note?: Note
+  capturedById: Id
+  notes: [Note?, ...Note[]]
+}
+
+/** Atomic executable step in a workflow; checklist must be non-empty. */
+export type Task = {
+  id: Id
+  title: string
+  description?: string
+  checklist: [Question, ...Question[]]
+}
+
+/** Versioned execution template; read-only except for administrator role. */
+export type Workflow = {
+  id: Id
+  name: string
+  description?: string
+  version: number
+  tags: [string?, ...string[]]
+  tasks: [Task, ...Task[]]
+  createdAt: When
+  updatedAt: When
+  deletedAt?: When
 }

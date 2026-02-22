@@ -1,220 +1,289 @@
 /**
- * Mappers for converting between Supabase job rows and domain Jobs.
+ * Adapter for converting between Dictionary (storage) and Job domain abstractions.
+ * Maps snake_case column names to camelCase domain fields and back.
  */
-
 import type { Dictionary } from '@core-std'
 import type {
   Job,
+  JobStatus,
   JobAssessment,
-  JobLogEntry,
+  JobWorkflow,
+  JobPlanAssignment,
+  JobPlanChemical,
+  JobPlanAsset,
   JobPlan,
-  JobStatus
+  JobWork,
+  JobWorkLogEntry,
 } from '@domain/abstractions/job.ts'
 
-/**
- * Type guard for job status.
- * @param value - Potential status value.
- * @returns True when the value matches a known status.
- */
-export const isJobStatus = (value: unknown): value is JobStatus =>
-  value === 'draft'
-  || value === 'ready'
-  || value === 'scheduled'
-  || value === 'in-progress'
-  || value === 'completed'
-  || value === 'cancelled'
+/** Converts a storage dictionary to a Job domain object. */
+export const toJob = (dict: Dictionary): Job => {
+  if (!dict['id']) throw new Error('Job dictionary missing required field: id')
+  if (!dict['customer_id']) throw new Error('Job dictionary missing required field: customer_id')
+  if (!dict['status']) throw new Error('Job dictionary missing required field: status')
+  if (!dict['created_at']) throw new Error('Job dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('Job dictionary missing required field: updated_at')
 
-/** Map a domain Job into a Dictionary shape. */
+  return {
+    id: dict['id'] as string,
+    customerId: dict['customer_id'] as string,
+    status: dict['status'] as JobStatus,
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
+  }
+}
+
+/** Converts a Job domain object to a storage dictionary. */
 export const fromJob = (job: Job): Dictionary => ({
   id: job.id,
-  assessment_id: job.assessmentId,
-  plan_id: job.planId,
-  service_id: job.serviceId,
   customer_id: job.customerId,
   status: job.status,
   created_at: job.createdAt,
   updated_at: job.updatedAt,
-  payload: job
+  deleted_at: job.deletedAt,
 })
 
-/**
- * Convert a Dictionary into a Job domain model.
- * Payload is truth - if present, use it directly.
- * Falls back to column mapping for legacy records.
- * @param dict - The dictionary to convert.
- * @returns The mapped Job object.
- * @throws Error if required fields are missing.
- */
-export const toJob = (record: Dictionary): Job => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('Job dictionary is missing required fields')
-  }
-
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string'
-      && typeof payload.assessmentId === 'string'
-      && typeof payload.planId === 'string'
-      && typeof payload.serviceId === 'string'
-      && typeof payload.customerId === 'string'
-      && isJobStatus(payload.status)
-    ) {
-      return payload as unknown as Job
-    }
-  }
-
-  // Legacy fallback - map from columns
-  const id = record.id as string
-  const assessmentId = (record.assessment_id ?? record.assessmentId) as string
-  const planId = (record.plan_id ?? record.planId) as string
-  const serviceId = (record.service_id ?? record.serviceId) as string
-  const customerId = (record.customer_id ?? record.customerId) as string
-  const status = record.status
-
-  if (!id || !assessmentId || !planId || !serviceId || !customerId || !isJobStatus(status)) {
-    throw new Error('Job dictionary is missing required fields')
-  }
+/** Converts a storage dictionary to a JobAssessment domain object. */
+export const toJobAssessment = (dict: Dictionary): JobAssessment => {
+  if (!dict['id']) throw new Error('JobAssessment dictionary missing required field: id')
+  if (!dict['job_id']) throw new Error('JobAssessment dictionary missing required field: job_id')
+  if (!dict['assessor_id']) throw new Error('JobAssessment dictionary missing required field: assessor_id')
+  if (!dict['locations']) throw new Error('JobAssessment dictionary missing required field: locations')
+  if (!dict['created_at']) throw new Error('JobAssessment dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('JobAssessment dictionary missing required field: updated_at')
 
   return {
-    id,
-    assessmentId,
-    planId,
-    serviceId,
-    customerId,
-    status,
-    createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
+    id: dict['id'] as string,
+    jobId: dict['job_id'] as string,
+    assessorId: dict['assessor_id'] as string,
+    locations: dict['locations'] as JobAssessment['locations'],
+    risks: (dict['risks'] ?? []) as JobAssessment['risks'],
+    notes: (dict['notes'] ?? []) as JobAssessment['notes'],
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
   }
 }
 
-/** Map a domain JobAssessment into a Dictionary shape. */
+/** Converts a JobAssessment domain object to a storage dictionary. */
 export const fromJobAssessment = (assessment: JobAssessment): Dictionary => ({
   id: assessment.id,
-  service_id: assessment.serviceId,
-  customer_id: assessment.customerId,
-  contact_id: assessment.contactId ?? null,
+  job_id: assessment.jobId,
   assessor_id: assessment.assessorId,
-  assessed_at: assessment.assessedAt,
   locations: assessment.locations,
-  questions: assessment.questions,
-  risks: assessment.risks ?? null,
-  notes: assessment.notes ?? null,
-  attachments: assessment.attachments ?? null,
+  risks: assessment.risks,
+  notes: assessment.notes,
   created_at: assessment.createdAt,
   updated_at: assessment.updatedAt,
-  payload: assessment
+  deleted_at: assessment.deletedAt,
 })
 
-/**
- * Convert a Dictionary into a JobAssessment domain model.
- * @param dict - The dictionary to convert.
- * @returns The mapped JobAssessment object.
- * @throws Error if required fields are missing.
- */
-export const toJobAssessment = (record: Dictionary): JobAssessment => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('JobAssessment dictionary is missing required fields')
-  }
+/** Converts a storage dictionary to a JobWorkflow domain object. */
+export const toJobWorkflow = (dict: Dictionary): JobWorkflow => {
+  if (!dict['id']) throw new Error('JobWorkflow dictionary missing required field: id')
+  if (!dict['job_id']) throw new Error('JobWorkflow dictionary missing required field: job_id')
+  if (dict['sequence'] === undefined || dict['sequence'] === null) throw new Error('JobWorkflow dictionary missing required field: sequence')
+  if (!dict['basis_workflow_id']) throw new Error('JobWorkflow dictionary missing required field: basis_workflow_id')
+  if (!dict['created_at']) throw new Error('JobWorkflow dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('JobWorkflow dictionary missing required field: updated_at')
 
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string' && typeof payload.serviceId === 'string' && typeof payload
-          .customerId === 'string'
-      && typeof payload.assessorId === 'string' && Array.isArray(payload.locations) && payload
-          .locations
-          .length > 0
-    ) {
-      return payload as unknown as JobAssessment
-    }
+  return {
+    id: dict['id'] as string,
+    jobId: dict['job_id'] as string,
+    sequence: dict['sequence'] as number,
+    basisWorkflowId: dict['basis_workflow_id'] as string,
+    modifiedWorkflowId: dict['modified_workflow_id'] as string | undefined,
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
   }
-
-  throw new Error('JobAssessment dictionary is missing required fields')
 }
 
-/** Map a domain JobPlan into a Dictionary shape. */
+/** Converts a JobWorkflow domain object to a storage dictionary. */
+export const fromJobWorkflow = (jobWorkflow: JobWorkflow): Dictionary => ({
+  id: jobWorkflow.id,
+  job_id: jobWorkflow.jobId,
+  sequence: jobWorkflow.sequence,
+  basis_workflow_id: jobWorkflow.basisWorkflowId,
+  modified_workflow_id: jobWorkflow.modifiedWorkflowId,
+  created_at: jobWorkflow.createdAt,
+  updated_at: jobWorkflow.updatedAt,
+  deleted_at: jobWorkflow.deletedAt,
+})
+
+/** Converts a storage dictionary to a JobPlanAssignment domain object. */
+export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => {
+  if (!dict['plan_id']) throw new Error('JobPlanAssignment dictionary missing required field: plan_id')
+  if (!dict['user_id']) throw new Error('JobPlanAssignment dictionary missing required field: user_id')
+  if (!dict['role']) throw new Error('JobPlanAssignment dictionary missing required field: role')
+
+  return {
+    planId: dict['plan_id'] as string,
+    userId: dict['user_id'] as string,
+    role: dict['role'] as string,
+    notes: (dict['notes'] ?? []) as JobPlanAssignment['notes'],
+    deletedAt: dict['deleted_at'] as string | undefined,
+  }
+}
+
+/** Converts a JobPlanAssignment domain object to a storage dictionary. */
+export const fromJobPlanAssignment = (assignment: JobPlanAssignment): Dictionary => ({
+  plan_id: assignment.planId,
+  user_id: assignment.userId,
+  role: assignment.role,
+  notes: assignment.notes,
+  deleted_at: assignment.deletedAt,
+})
+
+/** Converts a storage dictionary to a JobPlanChemical domain object. */
+export const toJobPlanChemical = (dict: Dictionary): JobPlanChemical => {
+  if (!dict['plan_id']) throw new Error('JobPlanChemical dictionary missing required field: plan_id')
+  if (!dict['chemical_id']) throw new Error('JobPlanChemical dictionary missing required field: chemical_id')
+  if (dict['amount'] === undefined || dict['amount'] === null) throw new Error('JobPlanChemical dictionary missing required field: amount')
+  if (!dict['unit']) throw new Error('JobPlanChemical dictionary missing required field: unit')
+
+  return {
+    planId: dict['plan_id'] as string,
+    chemicalId: dict['chemical_id'] as string,
+    amount: dict['amount'] as number,
+    unit: dict['unit'] as JobPlanChemical['unit'],
+    targetArea: dict['target_area'] as number | undefined,
+    targetAreaUnit: dict['target_area_unit'] as JobPlanChemical['targetAreaUnit'],
+    deletedAt: dict['deleted_at'] as string | undefined,
+  }
+}
+
+/** Converts a JobPlanChemical domain object to a storage dictionary. */
+export const fromJobPlanChemical = (chemical: JobPlanChemical): Dictionary => ({
+  plan_id: chemical.planId,
+  chemical_id: chemical.chemicalId,
+  amount: chemical.amount,
+  unit: chemical.unit,
+  target_area: chemical.targetArea,
+  target_area_unit: chemical.targetAreaUnit,
+  deleted_at: chemical.deletedAt,
+})
+
+/** Converts a storage dictionary to a JobPlanAsset domain object. */
+export const toJobPlanAsset = (dict: Dictionary): JobPlanAsset => {
+  if (!dict['plan_id']) throw new Error('JobPlanAsset dictionary missing required field: plan_id')
+  if (!dict['asset_id']) throw new Error('JobPlanAsset dictionary missing required field: asset_id')
+
+  return {
+    planId: dict['plan_id'] as string,
+    assetId: dict['asset_id'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
+  }
+}
+
+/** Converts a JobPlanAsset domain object to a storage dictionary. */
+export const fromJobPlanAsset = (asset: JobPlanAsset): Dictionary => ({
+  plan_id: asset.planId,
+  asset_id: asset.assetId,
+  deleted_at: asset.deletedAt,
+})
+
+/** Converts a storage dictionary to a JobPlan domain object. */
+export const toJobPlan = (dict: Dictionary): JobPlan => {
+  if (!dict['id']) throw new Error('JobPlan dictionary missing required field: id')
+  if (!dict['job_id']) throw new Error('JobPlan dictionary missing required field: job_id')
+  if (!dict['scheduled_start']) throw new Error('JobPlan dictionary missing required field: scheduled_start')
+  if (!dict['created_at']) throw new Error('JobPlan dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('JobPlan dictionary missing required field: updated_at')
+
+  return {
+    id: dict['id'] as string,
+    jobId: dict['job_id'] as string,
+    scheduledStart: dict['scheduled_start'] as string,
+    scheduledEnd: dict['scheduled_end'] as string | undefined,
+    notes: (dict['notes'] ?? []) as JobPlan['notes'],
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
+  }
+}
+
+/** Converts a JobPlan domain object to a storage dictionary. */
 export const fromJobPlan = (plan: JobPlan): Dictionary => ({
   id: plan.id,
   job_id: plan.jobId,
-  workflow_id: plan.workflowId,
   scheduled_start: plan.scheduledStart,
-  scheduled_end: plan.scheduledEnd ?? null,
-  target_locations: plan.targetLocations,
-  assignments: plan.assignments,
-  assets: plan.assets,
-  chemicals: plan.chemicals,
-  notes: plan.notes ?? null,
+  scheduled_end: plan.scheduledEnd,
+  notes: plan.notes,
   created_at: plan.createdAt,
   updated_at: plan.updatedAt,
-  payload: plan
+  deleted_at: plan.deletedAt,
 })
 
-/**
- * Convert a Dictionary into a JobPlan domain model.
- * @param dict - The dictionary to convert.
- * @returns The mapped JobPlan object.
- * @throws Error if required fields are missing.
- */
-export const toJobPlan = (record: Dictionary): JobPlan => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('JobPlan dictionary is missing required fields')
-  }
+/** Converts a storage dictionary to a JobWork domain object. */
+export const toJobWork = (dict: Dictionary): JobWork => {
+  if (!dict['id']) throw new Error('JobWork dictionary missing required field: id')
+  if (!dict['job_id']) throw new Error('JobWork dictionary missing required field: job_id')
+  if (!dict['work']) throw new Error('JobWork dictionary missing required field: work')
+  if (!dict['started_at']) throw new Error('JobWork dictionary missing required field: started_at')
+  if (!dict['started_by_id']) throw new Error('JobWork dictionary missing required field: started_by_id')
+  if (!dict['created_at']) throw new Error('JobWork dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('JobWork dictionary missing required field: updated_at')
 
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string' && typeof payload.jobId === 'string' && typeof payload
-          .workflowId === 'string'
-      && typeof payload.scheduledStart === 'string'
-    ) {
-      return payload as unknown as JobPlan
-    }
+  return {
+    id: dict['id'] as string,
+    jobId: dict['job_id'] as string,
+    work: dict['work'] as JobWork['work'],
+    startedAt: dict['started_at'] as string,
+    startedById: dict['started_by_id'] as string,
+    completedAt: dict['completed_at'] as string | undefined,
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
   }
-
-  throw new Error('JobPlan dictionary is missing required fields')
 }
 
-/** Map a domain JobLogEntry into a Dictionary shape. */
-export const fromJobLogEntry = (entry: JobLogEntry): Dictionary => ({
+/** Converts a JobWork domain object to a storage dictionary. */
+export const fromJobWork = (work: JobWork): Dictionary => ({
+  id: work.id,
+  job_id: work.jobId,
+  work: work.work,
+  started_at: work.startedAt,
+  started_by_id: work.startedById,
+  completed_at: work.completedAt,
+  created_at: work.createdAt,
+  updated_at: work.updatedAt,
+  deleted_at: work.deletedAt,
+})
+
+/** Converts a storage dictionary to a JobWorkLogEntry domain object. */
+export const toJobWorkLogEntry = (dict: Dictionary): JobWorkLogEntry => {
+  if (!dict['id']) throw new Error('JobWorkLogEntry dictionary missing required field: id')
+  if (!dict['job_id']) throw new Error('JobWorkLogEntry dictionary missing required field: job_id')
+  if (!dict['user_id']) throw new Error('JobWorkLogEntry dictionary missing required field: user_id')
+  if (!dict['created_at']) throw new Error('JobWorkLogEntry dictionary missing required field: created_at')
+
+  const base = {
+    id: dict['id'] as string,
+    jobId: dict['job_id'] as string,
+    userId: dict['user_id'] as string,
+    createdAt: dict['created_at'] as string,
+  }
+
+  const answer = dict['answer'] as JobWorkLogEntry['answer']
+  const metadata = dict['metadata'] as JobWorkLogEntry['metadata']
+
+  if (answer !== undefined && answer !== null) {
+    return { ...base, answer, metadata: metadata as JobWorkLogEntry['metadata'] }
+  }
+  if (metadata !== undefined && metadata !== null) {
+    return { ...base, answer: answer as JobWorkLogEntry['answer'], metadata }
+  }
+  throw new Error('JobWorkLogEntry dictionary must have at least one of: answer, metadata')
+}
+
+/** Converts a JobWorkLogEntry domain object to a storage dictionary. */
+export const fromJobWorkLogEntry = (entry: JobWorkLogEntry): Dictionary => ({
   id: entry.id,
   job_id: entry.jobId,
-  plan_id: entry.planId,
-  type: entry.type,
-  message: entry.message,
-  occurred_at: entry.occurredAt,
+  user_id: entry.userId,
   created_at: entry.createdAt,
-  created_by_id: entry.createdById,
-  location: entry.location ?? null,
-  attachments: entry.attachments ?? null,
-  payload: entry
+  answer: 'answer' in entry ? entry.answer : undefined,
+  metadata: 'metadata' in entry ? entry.metadata : undefined,
 })
-
-/**
- * Convert a Dictionary into a JobLogEntry domain model.
- * @param dict - The dictionary to convert.
- * @returns The mapped JobLogEntry object.
- * @throws Error if required fields are missing.
- */
-export const toJobLogEntry = (record: Dictionary): JobLogEntry => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('JobLogEntry dictionary is missing required fields')
-  }
-
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string' && typeof payload.jobId === 'string' && typeof payload
-          .planId === 'string'
-      && typeof payload.type === 'string' && typeof payload.message === 'string'
-    ) {
-      return payload as unknown as JobLogEntry
-    }
-  }
-
-  throw new Error('JobLogEntry dictionary is missing required fields')
-}

@@ -105,7 +105,7 @@ The foundation provides:
 
 - `@ux-api` - Composed API namespace
 - `@domain/abstractions/*` - Domain types
-- `@core-std` - Standard types (ID, When, Dictionary)
+- `@core-std` - Standard types (Id, When, Dictionary)
 - `@ux-app-common/*` - Shared UX components
 
 #### 4.1.2 UX applications MUST NOT import

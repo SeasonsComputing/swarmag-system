@@ -1,128 +1,71 @@
 /**
- * Mappers for converting between Supabase asset rows and domain Assets.
+ * Adapter for converting between Dictionary (storage) and Asset domain abstractions.
+ * Maps snake_case column names to camelCase domain fields and back.
  */
-
 import type { Dictionary } from '@core-std'
-import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
+import type { AssetType, AssetStatus, Asset } from '@domain/abstractions/asset.ts'
 
-/**
- * Type guard for asset status.
- * @param value - Potential status value.
- * @returns True when the value matches a known status.
- */
-export const isAssetStatus = (value: unknown): value is Asset['status'] =>
-  value === 'active' || value === 'maintenance' || value === 'retired' || value === 'reserved'
-
-/** Map a domain Asset into a Dictionary shape. */
-export const fromAsset = (asset: Asset): Dictionary => ({
-  id: asset.id,
-  label: asset.label,
-  description: asset.description ?? null,
-  serial_number: asset.serialNumber ?? null,
-  type: asset.type,
-  status: asset.status,
-  attachments: asset.attachments ?? null,
-  created_at: asset.createdAt,
-  updated_at: asset.updatedAt,
-  payload: asset
-})
-
-/**
- * Convert a Dictionary into an Asset domain model.
- * Payload is truth - if present, use it directly.
- * Falls back to column mapping for legacy records.
- * @param dict - The dictionary to convert.
- * @returns The mapped Asset object.
- * @throws Error if required fields are missing.
- */
-export const toAsset = (record: Dictionary): Asset => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('Asset dictionary is missing required fields')
-  }
-
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string' && typeof payload.label === 'string' && typeof payload
-          .type === 'string'
-      && isAssetStatus(payload.status)
-    ) {
-      return payload as unknown as Asset
-    }
-  }
-
-  // Legacy fallback - map from columns
-  const id = record.id as string
-  const label = record.label as string
-  const type = record.type as string
-  const status = record.status
-
-  if (!id || !label || !type || !isAssetStatus(status)) {
-    throw new Error('Asset dictionary is missing required fields')
-  }
+/** Converts a storage dictionary to an AssetType domain object. */
+export const toAssetType = (dict: Dictionary): AssetType => {
+  if (!dict['id']) throw new Error('AssetType dictionary missing required field: id')
+  if (!dict['label']) throw new Error('AssetType dictionary missing required field: label')
+  if (dict['active'] === undefined || dict['active'] === null) throw new Error('AssetType dictionary missing required field: active')
+  if (!dict['created_at']) throw new Error('AssetType dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('AssetType dictionary missing required field: updated_at')
 
   return {
-    id,
-    label,
-    description: (record.description ?? undefined) as string | undefined,
-    serialNumber: (record.serial_number ?? record.serialNumber ?? undefined) as
-      | string
-      | undefined,
-    type,
-    status,
-    attachments: Array.isArray(record.attachments) ? record.attachments : undefined,
-    createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
+    id: dict['id'] as string,
+    label: dict['label'] as string,
+    active: dict['active'] as boolean,
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
   }
 }
 
-/** Map a domain AssetType into a Dictionary shape. */
+/** Converts an AssetType domain object to a storage dictionary. */
 export const fromAssetType = (assetType: AssetType): Dictionary => ({
   id: assetType.id,
   label: assetType.label,
   active: assetType.active,
   created_at: assetType.createdAt,
   updated_at: assetType.updatedAt,
-  payload: assetType
+  deleted_at: assetType.deletedAt,
 })
 
-/**
- * Convert a Dictionary into an AssetType domain model.
- * @param dict - The dictionary to convert.
- * @returns The mapped AssetType object.
- * @throws Error if required fields are missing.
- */
-export const toAssetType = (record: Dictionary): AssetType => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('AssetType dictionary is missing required fields')
-  }
-
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string' && typeof payload.label === 'string'
-      && typeof payload.active === 'boolean'
-    ) {
-      return payload as unknown as AssetType
-    }
-  }
-
-  // Legacy fallback - map from columns
-  const id = record.id as string
-  const label = record.label as string
-  const active = record.active
-
-  if (!id || !label || typeof active !== 'boolean') {
-    throw new Error('AssetType dictionary is missing required fields')
-  }
+/** Converts a storage dictionary to an Asset domain object. */
+export const toAsset = (dict: Dictionary): Asset => {
+  if (!dict['id']) throw new Error('Asset dictionary missing required field: id')
+  if (!dict['label']) throw new Error('Asset dictionary missing required field: label')
+  if (!dict['type']) throw new Error('Asset dictionary missing required field: type')
+  if (!dict['status']) throw new Error('Asset dictionary missing required field: status')
+  if (!dict['created_at']) throw new Error('Asset dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('Asset dictionary missing required field: updated_at')
 
   return {
-    id,
-    label,
-    active,
-    createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
+    id: dict['id'] as string,
+    label: dict['label'] as string,
+    description: dict['description'] as string | undefined,
+    serialNumber: dict['serial_number'] as string | undefined,
+    type: dict['type'] as string,
+    status: dict['status'] as AssetStatus,
+    notes: (dict['notes'] ?? []) as Asset['notes'],
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
   }
 }
+
+/** Converts an Asset domain object to a storage dictionary. */
+export const fromAsset = (asset: Asset): Dictionary => ({
+  id: asset.id,
+  label: asset.label,
+  description: asset.description,
+  serial_number: asset.serialNumber,
+  type: asset.type,
+  status: asset.status,
+  notes: asset.notes,
+  created_at: asset.createdAt,
+  updated_at: asset.updatedAt,
+  deleted_at: asset.deletedAt,
+})

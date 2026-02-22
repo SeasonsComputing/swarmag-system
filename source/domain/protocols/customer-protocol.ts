@@ -1,42 +1,38 @@
 /**
- * Protocol types for customer API requests and responses.
+ * Protocol input shapes for Customer create and update operations.
+ * Partial shapes for boundary transmission — no domain logic.
  */
+import type { Id } from '@core-std'
+import type { Customer } from '@domain/abstractions/customer.ts'
+import type { Note } from '@domain/abstractions/common.ts'
 
-import type { Contact, Customer } from '@domain/abstractions/customer.ts'
-
-/** Input type for primary contact in customer creation. */
-export interface PrimaryContactInput {
+/** Input shape for creating a Customer. */
+export type CustomerCreateInput = {
   name: string
-  email?: string
-  phone?: string
-  preferredChannel?: Contact['preferredChannel']
-}
-
-/** Input type for creating a customer. */
-export interface CustomerCreateInput {
-  name: string
-  status?: Customer['status']
+  status: Customer['status']
   line1: string
   line2?: string
   city: string
   state: string
   postalCode: string
   country: string
-  accountManagerId?: string
-  primaryContact: PrimaryContactInput
+  accountManagerId?: Id
+  primaryContactId?: Id
+  notes?: [Note?, ...Note[]]
 }
 
-/** Input type for updating a customer. */
-export interface CustomerUpdateInput {
-  id: string
+/** Input shape for updating a Customer. */
+export type CustomerUpdateInput = {
+  id: Id
   name?: string
   status?: Customer['status']
   line1?: string
-  line2?: string | null
+  line2?: string
   city?: string
   state?: string
   postalCode?: string
   country?: string
-  accountManagerId?: string | null
-  primaryContactId?: string
+  accountManagerId?: Id
+  primaryContactId?: Id
+  notes?: [Note?, ...Note[]]
 }

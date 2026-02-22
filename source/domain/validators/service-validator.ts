@@ -1,55 +1,23 @@
 /**
- * Domain-level invariant validators for services.
+ * Validators for service protocol inputs at system boundaries.
+ * Returns an error message string on failure, null on success.
  */
+import { isNonEmptyString, isId } from '@core-std'
+import type { ServiceCreateInput, ServiceUpdateInput } from '@domain/protocols/service-protocol.ts'
 
-import type { Service } from '@domain/abstractions/service.ts'
-import type {
-  ServiceCreateInput,
-  ServiceUpdateInput
-} from '@domain/protocols/service-protocol.ts'
-import { isNonEmptyString } from './helper-validator.ts'
-
-export type { ServiceCreateInput, ServiceUpdateInput }
-
-/**
- * Type guard for supported service categories.
- * @param value - Potential category value.
- * @returns True when the value matches a known category.
- */
-export const isServiceCategory = (value: unknown): value is Service['category'] =>
-  value === 'aerial-drone-services' || value === 'ground-machinery-services'
-
-/**
- * Validate service creation input.
- * @param input - Service creation input to validate.
- * @returns Error message or null if valid.
- */
-export const validateServiceCreate = (input?: ServiceCreateInput | null): string | null => {
-  if (!input) return 'Request body is required'
+/** Validates input for creating a Service. */
+export const validateServiceCreate = (input: ServiceCreateInput): string | null => {
   if (!isNonEmptyString(input.name)) return 'name is required'
   if (!isNonEmptyString(input.sku)) return 'sku is required'
-  if (!isServiceCategory(input.category)) {
-    return 'category must be aerial-drone-services or ground-machinery-services'
-  }
+  if (!isNonEmptyString(input.category)) return 'category is required'
   return null
 }
 
-/**
- * Validate service update input.
- * @param input - Service update input to validate.
- * @returns Error message or null if valid.
- */
-export const validateServiceUpdate = (input?: ServiceUpdateInput | null): string | null => {
-  if (!input) return 'Request body is required'
-  if (!isNonEmptyString(input.id)) return 'id is required'
-  if (input.name !== undefined && !isNonEmptyString(input.name)) {
-    return 'name cannot be empty'
-  }
-  if (input.sku !== undefined && !isNonEmptyString(input.sku)) {
-    return 'sku cannot be empty'
-  }
-  if (input.category !== undefined && !isServiceCategory(input.category)) {
-    return 'category must be aerial-drone-services or ground-machinery-services'
-  }
+/** Validates input for updating a Service. */
+export const validateServiceUpdate = (input: ServiceUpdateInput): string | null => {
+  if (!isId(input.id)) return 'id must be a valid Id'
+  if (input.name !== undefined && !isNonEmptyString(input.name)) return 'name must be a non-empty string'
+  if (input.sku !== undefined && !isNonEmptyString(input.sku)) return 'sku must be a non-empty string'
+  if (input.category !== undefined && !isNonEmptyString(input.category)) return 'category must be a non-empty string'
   return null
 }
