@@ -3,7 +3,7 @@
  * The Job is the central lifecycle anchor for all work agreements.
  */
 
-import type { Id, When, Dictionary } from '@core-std'
+import type { Dictionary, Id, When } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'
 
@@ -116,12 +116,14 @@ export type JobWork = {
  * Append-only execution event.
  * At least one of answer or metadata must be present — enforced by discriminated union.
  */
-export type JobWorkLogEntry = {
-  id: Id
-  jobId: Id
-  userId: Id
-  createdAt: When
-} & (
-  | { answer: Answer; metadata?: Dictionary }
-  | { answer?: Answer; metadata: Dictionary }
-)
+export type JobWorkLogEntry =
+  & {
+    id: Id
+    jobId: Id
+    userId: Id
+    createdAt: When
+  }
+  & (
+    | { answer: Answer; metadata?: Dictionary }
+    | { answer?: Answer; metadata: Dictionary }
+  )

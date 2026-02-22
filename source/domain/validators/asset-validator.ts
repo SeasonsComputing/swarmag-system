@@ -18,8 +18,12 @@ export const validateAssetCreate = (input: AssetCreateInput): string | null => {
 /** Validates input for updating an Asset. */
 export const validateAssetUpdate = (input: AssetUpdateInput): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.label !== undefined && !isNonEmptyString(input.label)) return 'label must be a non-empty string'
+  if (input.label !== undefined && !isNonEmptyString(input.label)) {
+    return 'label must be a non-empty string'
+  }
   if (input.type !== undefined && !isId(input.type)) return 'type must be a valid Id'
-  if (input.status !== undefined && !isNonEmptyString(input.status)) return 'status must be a non-empty string'
+  if (input.status !== undefined && !isNonEmptyString(input.status)) {
+    return 'status must be a non-empty string'
+  }
   return null
 }

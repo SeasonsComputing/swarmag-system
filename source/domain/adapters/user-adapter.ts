@@ -9,9 +9,15 @@ import type { User } from '@domain/abstractions/user.ts'
 /** Converts a storage dictionary to a User domain object. */
 export const toUser = (dict: Dictionary): User => {
   if (!dict['id']) throw new Error('User dictionary missing required field: id')
-  if (!dict['display_name']) throw new Error('User dictionary missing required field: display_name')
-  if (!dict['primary_email']) throw new Error('User dictionary missing required field: primary_email')
-  if (!dict['phone_number']) throw new Error('User dictionary missing required field: phone_number')
+  if (!dict['display_name']) {
+    throw new Error('User dictionary missing required field: display_name')
+  }
+  if (!dict['primary_email']) {
+    throw new Error('User dictionary missing required field: primary_email')
+  }
+  if (!dict['phone_number']) {
+    throw new Error('User dictionary missing required field: phone_number')
+  }
 
   return {
     id: dict['id'] as string,
@@ -23,7 +29,7 @@ export const toUser = (dict: Dictionary): User => {
     status: dict['status'] as User['status'],
     createdAt: dict['created_at'] as string | undefined,
     updatedAt: dict['updated_at'] as string | undefined,
-    deletedAt: dict['deleted_at'] as string | undefined,
+    deletedAt: dict['deleted_at'] as string | undefined
   }
 }
 
@@ -38,5 +44,5 @@ export const fromUser = (user: User): Dictionary => ({
   status: user.status,
   created_at: user.createdAt,
   updated_at: user.updatedAt,
-  deleted_at: user.deletedAt,
+  deleted_at: user.deletedAt
 })

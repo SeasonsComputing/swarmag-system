@@ -4,7 +4,7 @@
  */
 
 import type { Id } from '@core-std'
-import type { UserRole, User } from '@domain/abstractions/user.ts'
+import type { User, UserRole } from '@domain/abstractions/user.ts'
 
 /** Input shape for creating a User. */
 export type UserCreateInput = {

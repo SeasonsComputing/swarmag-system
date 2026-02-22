@@ -4,7 +4,11 @@
  */
 
 import type { Dictionary } from '@core-std'
-import type { ServiceCategory, Service, ServiceRequiredAssetType } from '@domain/abstractions/service.ts'
+import type {
+  Service,
+  ServiceCategory,
+  ServiceRequiredAssetType
+} from '@domain/abstractions/service.ts'
 
 /** Converts a storage dictionary to a Service domain object. */
 export const toService = (dict: Dictionary): Service => {
@@ -12,8 +16,12 @@ export const toService = (dict: Dictionary): Service => {
   if (!dict['name']) throw new Error('Service dictionary missing required field: name')
   if (!dict['sku']) throw new Error('Service dictionary missing required field: sku')
   if (!dict['category']) throw new Error('Service dictionary missing required field: category')
-  if (!dict['created_at']) throw new Error('Service dictionary missing required field: created_at')
-  if (!dict['updated_at']) throw new Error('Service dictionary missing required field: updated_at')
+  if (!dict['created_at']) {
+    throw new Error('Service dictionary missing required field: created_at')
+  }
+  if (!dict['updated_at']) {
+    throw new Error('Service dictionary missing required field: updated_at')
+  }
 
   return {
     id: dict['id'] as string,
@@ -24,7 +32,7 @@ export const toService = (dict: Dictionary): Service => {
     notes: (dict['notes'] ?? []) as Service['notes'],
     createdAt: dict['created_at'] as string,
     updatedAt: dict['updated_at'] as string,
-    deletedAt: dict['deleted_at'] as string | undefined,
+    deletedAt: dict['deleted_at'] as string | undefined
   }
 }
 
@@ -38,24 +46,32 @@ export const fromService = (service: Service): Dictionary => ({
   notes: service.notes,
   created_at: service.createdAt,
   updated_at: service.updatedAt,
-  deleted_at: service.deletedAt,
+  deleted_at: service.deletedAt
 })
 
 /** Converts a storage dictionary to a ServiceRequiredAssetType domain object. */
 export const toServiceRequiredAssetType = (dict: Dictionary): ServiceRequiredAssetType => {
-  if (!dict['service_id']) throw new Error('ServiceRequiredAssetType dictionary missing required field: service_id')
-  if (!dict['asset_type_id']) throw new Error('ServiceRequiredAssetType dictionary missing required field: asset_type_id')
+  if (!dict['service_id']) {
+    throw new Error('ServiceRequiredAssetType dictionary missing required field: service_id')
+  }
+  if (!dict['asset_type_id']) {
+    throw new Error(
+      'ServiceRequiredAssetType dictionary missing required field: asset_type_id'
+    )
+  }
 
   return {
     serviceId: dict['service_id'] as string,
     assetTypeId: dict['asset_type_id'] as string,
-    deletedAt: dict['deleted_at'] as string | undefined,
+    deletedAt: dict['deleted_at'] as string | undefined
   }
 }
 
 /** Converts a ServiceRequiredAssetType domain object to a storage dictionary. */
-export const fromServiceRequiredAssetType = (junction: ServiceRequiredAssetType): Dictionary => ({
+export const fromServiceRequiredAssetType = (
+  junction: ServiceRequiredAssetType
+): Dictionary => ({
   service_id: junction.serviceId,
   asset_type_id: junction.assetTypeId,
-  deleted_at: junction.deletedAt,
+  deleted_at: junction.deletedAt
 })

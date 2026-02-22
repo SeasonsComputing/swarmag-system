@@ -4,7 +4,7 @@
  */
 
 import type { Id } from '@core-std'
-import type { ChemicalUsage, ChemicalLabel, Chemical } from '@domain/abstractions/chemical.ts'
+import type { Chemical, ChemicalLabel, ChemicalUsage } from '@domain/abstractions/chemical.ts'
 import type { Attachment, Note } from '@domain/abstractions/common.ts'
 
 /** Input shape for creating a Chemical. */
