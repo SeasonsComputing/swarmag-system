@@ -334,7 +334,6 @@ Chemical (object)
           signalWord?(danger|warning|caution), restrictedUse,
           reEntryIntervalHours?, storageLocation?, sdsUrl?,
           labels: [ChemicalLabel?, ...ChemicalLabel[]],
-          attachments: [Attachment?, ...Attachment[]],
           notes: [Note?, ...Note[]], createdAt, updatedAt, deletedAt?
   Notes: Regulated material record
 ```
