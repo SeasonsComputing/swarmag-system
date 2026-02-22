@@ -4,6 +4,7 @@
 
 import type { User } from '@domain/abstractions/user.ts'
 
+// Placeholders. TODO: where should non-domain protocol et al belong?
 type LogonInput = { username: string; password: string }
 type Session = { id: string; user: User }
 
