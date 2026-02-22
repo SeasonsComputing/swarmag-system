@@ -2,6 +2,7 @@
  * Shared subordinate types used across multiple domain abstractions.
  * These are pure value objects with no independent lifecycle.
  */
+
 import type { Id, When } from '@core-std'
 
 /** Geographic position plus optional address and observation metadata. */

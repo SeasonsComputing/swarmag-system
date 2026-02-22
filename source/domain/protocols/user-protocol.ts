@@ -2,6 +2,7 @@
  * Protocol input shapes for User create and update operations.
  * Partial shapes for boundary transmission — no domain logic.
  */
+
 import type { Id } from '@core-std'
 import type { UserRole, User } from '@domain/abstractions/user.ts'
 

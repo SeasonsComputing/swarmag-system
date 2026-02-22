@@ -100,6 +100,7 @@ Type declarations, enums, pure domain shapes. The code is the documentation. Inl
  * Assets represent equipment and resources used in operations,
  * such as vehicles, sprayers, drones, etc.
  */
+
 import type { Id, When } from '@core-std'
 import type { Attachment } from '@domain/abstractions/common.ts'
 

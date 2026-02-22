@@ -2,6 +2,7 @@
  * Domain models for customers in the swarmAg system.
  * Customers are organizations purchasing services; they own sites and contacts.
  */
+
 import type { Id, When } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
 

@@ -2,6 +2,7 @@
  * Domain models for regulated chemicals used in swarmAg operations.
  * Captures identity, classification, safety, and compliance data.
  */
+
 import type { Id, When } from '@core-std'
 import type { Attachment, Note } from '@domain/abstractions/common.ts'
 

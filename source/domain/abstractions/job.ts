@@ -2,6 +2,7 @@
  * Domain models for jobs and all job lifecycle artifacts in swarmAg.
  * The Job is the central lifecycle anchor for all work agreements.
  */
+
 import type { Id, When, Dictionary } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'

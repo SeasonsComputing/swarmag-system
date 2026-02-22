@@ -2,6 +2,7 @@
  * Validators for workflow protocol inputs at system boundaries.
  * Returns an error message string on failure, null on success.
  */
+
 import { isNonEmptyString, isId, isPositiveNumber } from '@core-std'
 import type { WorkflowCreateInput, WorkflowUpdateInput } from '@domain/protocols/workflow-protocol.ts'
 

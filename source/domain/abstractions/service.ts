@@ -2,6 +2,7 @@
  * Domain models for services offered by swarmAg.
  * Services are sellable operational offerings identified by SKU and category.
  */
+
 import type { Id, When } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 

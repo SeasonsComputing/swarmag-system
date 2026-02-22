@@ -2,6 +2,7 @@
  * Validators for job protocol inputs at system boundaries.
  * Returns an error message string on failure, null on success.
  */
+
 import { isId, isWhen, isNonEmptyString } from '@core-std'
 import type {
   JobCreateInput,

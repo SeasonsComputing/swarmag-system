@@ -2,6 +2,7 @@
  * Domain models for system users in swarmAg.
  * Users carry identity and role membership for authorization intent.
  */
+
 import type { Id, When } from '@core-std'
 
 /** Canonical role set for all system users. */
