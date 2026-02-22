@@ -1,15 +1,14 @@
 /**
  * Domain models for assets in the swarmAg system.
  * Assets represent equipment and resources used in operations,
- * such as vehicles, sprayers, drones, etc.
+ * such as vehicles, sprayers, and drones.
  */
+import type { Id, When } from '@core-std'
+import type { Note } from '@domain/abstractions/common.ts'
 
-import type { ID, When } from '@core-std'
-import type { Attachment } from '@domain/abstractions/common.ts'
-
-/** The different types of assets available in the system. */
-export interface AssetType {
-  id: ID
+/** Reference type for categorizing assets. */
+export type AssetType = {
+  id: Id
   label: string
   active: boolean
   createdAt: When
@@ -17,22 +16,23 @@ export interface AssetType {
   deletedAt?: When
 }
 
-/** The possible statuses an asset can have. */
+/** Lifecycle and availability state of an asset. */
 export type AssetStatus =
   | 'active'
   | 'maintenance'
   | 'retired'
   | 'reserved'
 
-/** Represents an asset in the swarmAg system. */
-export interface Asset {
-  id: ID
+/** Operational equipment or resource used to perform services. */
+export type Asset = {
+  id: Id
   label: string
   description?: string
   serialNumber?: string
-  type: ID
+  /** References AssetType.id */
+  type: Id
   status: AssetStatus
-  attachments?: Attachment[]
+  notes: [Note?, ...Note[]]
   createdAt: When
   updatedAt: When
   deletedAt?: When

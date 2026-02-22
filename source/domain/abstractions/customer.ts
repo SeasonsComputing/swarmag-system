@@ -1,37 +1,36 @@
 /**
  * Domain models for customers in the swarmAg system.
- * Customers represent clients who have operations and sites to be serviced.
+ * Customers are organizations purchasing services; they own sites and contacts.
  */
-
-import type { ID, When } from '@core-std'
+import type { Id, When } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
 
-/** Represents a contact person associated with a customer. */
-export interface Contact {
-  id: ID
-  customerId: ID
+/** A contact person associated with a customer account. */
+export type Contact = {
+  id: Id
+  customerId: Id
   name: string
   email?: string
   phone?: string
-  preferredChannel?: 'email' | 'sms' | 'phone'
-  notes?: Note[]
+  preferredChannel?: 'email' | 'text' | 'phone'
+  notes: [Note?, ...Note[]]
   createdAt: When
   updatedAt: When
 }
 
-/** Represents a site or location associated with a customer. */
-export interface CustomerSite {
-  id: ID
-  customerId: ID
+/** A serviceable location belonging to a customer. */
+export type CustomerSite = {
+  id: Id
+  customerId: Id
   label: string
   location: Location
   acreage?: number
-  notes?: Note[]
+  notes: [Note?, ...Note[]]
 }
 
-/** Represents a customer in the swarmAg system. */
-export interface Customer {
-  id: ID
+/** Customer account aggregate; contacts must be non-empty. */
+export type Customer = {
+  id: Id
   name: string
   status: 'active' | 'inactive' | 'prospect'
   line1: string
@@ -40,11 +39,11 @@ export interface Customer {
   state: string
   postalCode: string
   country: string
-  accountManagerId?: ID
-  primaryContactId?: ID
-  sites: CustomerSite[]
+  accountManagerId?: Id
+  primaryContactId?: Id
+  sites: [CustomerSite?, ...CustomerSite[]]
   contacts: [Contact, ...Contact[]]
-  notes?: Note[]
+  notes: [Note?, ...Note[]]
   createdAt: When
   updatedAt: When
   deletedAt?: When

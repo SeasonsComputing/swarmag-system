@@ -7,7 +7,7 @@ import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
 Config.init(
   new SolidProvider(),
-  // Propertie
+  // Properties
   [
     'VITE_SUPABASE_EDGE_URL',
     'VITE_SUPABASE_RDBMS_URL',

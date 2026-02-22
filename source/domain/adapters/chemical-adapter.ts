@@ -1,107 +1,53 @@
 /**
- * Mappers for converting between Supabase chemical rows and domain Chemicals.
+ * Adapter for converting between Dictionary (storage) and Chemical domain abstractions.
+ * Maps snake_case column names to camelCase domain fields and back.
  */
-
 import type { Dictionary } from '@core-std'
-import type { Chemical } from '@domain/abstractions/chemical.ts'
+import type { ChemicalUsage, ChemicalLabel, Chemical } from '@domain/abstractions/chemical.ts'
 
-/**
- * Type guard for chemical usage.
- * @param value - Potential usage value.
- * @returns True when the value matches a known usage.
- */
-export const isChemicalUsage = (value: unknown): value is Chemical['usage'] =>
-  value === 'herbicide'
-  || value === 'pesticide'
-  || value === 'fertilizer'
-  || value === 'fungicide'
-  || value === 'adjuvant'
+/** Converts a storage dictionary to a Chemical domain object. */
+export const toChemical = (dict: Dictionary): Chemical => {
+  if (!dict['id']) throw new Error('Chemical dictionary missing required field: id')
+  if (!dict['name']) throw new Error('Chemical dictionary missing required field: name')
+  if (!dict['usage']) throw new Error('Chemical dictionary missing required field: usage')
+  if (dict['restricted_use'] === undefined || dict['restricted_use'] === null) throw new Error('Chemical dictionary missing required field: restricted_use')
+  if (!dict['created_at']) throw new Error('Chemical dictionary missing required field: created_at')
+  if (!dict['updated_at']) throw new Error('Chemical dictionary missing required field: updated_at')
 
-/**
- * Type guard for chemical signal word.
- * @param value - Potential signal word value.
- * @returns True when the value matches a known signal word.
- */
-export const isSignalWord = (value: unknown): value is Chemical['signalWord'] =>
-  value === undefined || value === null || value === 'danger' || value === 'warning'
-  || value === 'caution'
+  return {
+    id: dict['id'] as string,
+    name: dict['name'] as string,
+    epaNumber: dict['epa_number'] as string | undefined,
+    usage: dict['usage'] as ChemicalUsage,
+    signalWord: dict['signal_word'] as Chemical['signalWord'],
+    restrictedUse: dict['restricted_use'] as boolean,
+    reEntryIntervalHours: dict['re_entry_interval_hours'] as number | undefined,
+    storageLocation: dict['storage_location'] as string | undefined,
+    sdsUrl: dict['sds_url'] as string | undefined,
+    labels: (dict['labels'] ?? []) as Chemical['labels'],
+    attachments: (dict['attachments'] ?? []) as Chemical['attachments'],
+    notes: (dict['notes'] ?? []) as Chemical['notes'],
+    createdAt: dict['created_at'] as string,
+    updatedAt: dict['updated_at'] as string,
+    deletedAt: dict['deleted_at'] as string | undefined,
+  }
+}
 
-/** Map a domain Chemical into a Dictionary shape. */
+/** Converts a Chemical domain object to a storage dictionary. */
 export const fromChemical = (chemical: Chemical): Dictionary => ({
   id: chemical.id,
   name: chemical.name,
-  epa_number: chemical.epaNumber ?? null,
+  epa_number: chemical.epaNumber,
   usage: chemical.usage,
-  signal_word: chemical.signalWord ?? null,
+  signal_word: chemical.signalWord,
   restricted_use: chemical.restrictedUse,
-  re_entry_interval_hours: chemical.reEntryIntervalHours ?? null,
-  storage_location: chemical.storageLocation ?? null,
-  sds_url: chemical.sdsUrl ?? null,
-  labels: chemical.labels ?? null,
-  attachments: chemical.attachments ?? null,
-  notes: chemical.notes ?? null,
+  re_entry_interval_hours: chemical.reEntryIntervalHours,
+  storage_location: chemical.storageLocation,
+  sds_url: chemical.sdsUrl,
+  labels: chemical.labels,
+  attachments: chemical.attachments,
+  notes: chemical.notes,
   created_at: chemical.createdAt,
   updated_at: chemical.updatedAt,
-  payload: chemical
+  deleted_at: chemical.deletedAt,
 })
-
-/**
- * Convert a Dictionary into a Chemical domain model.
- * Payload is truth - if present, use it directly.
- * Falls back to column mapping for legacy records.
- * @param dict - The dictionary to convert.
- * @returns The mapped Chemical object.
- * @throws Error if required fields are missing.
- */
-export const toChemical = (record: Dictionary): Chemical => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('Chemical dictionary is missing required fields')
-  }
-
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string'
-      && typeof payload.name === 'string'
-      && isChemicalUsage(payload.usage)
-      && typeof payload.restrictedUse === 'boolean'
-    ) {
-      return payload as unknown as Chemical
-    }
-  }
-
-  // Legacy fallback - map from columns
-  const id = record.id as string
-  const name = record.name as string
-  const usage = record.usage
-  const restrictedUse = record.restricted_use ?? record.restrictedUse
-
-  if (!id || !name || !isChemicalUsage(usage) || typeof restrictedUse !== 'boolean') {
-    throw new Error('Chemical dictionary is missing required fields')
-  }
-
-  const signalWord = record.signal_word ?? record.signalWord
-
-  return {
-    id,
-    name,
-    epaNumber: (record.epa_number ?? record.epaNumber ?? undefined) as string | undefined,
-    usage,
-    signalWord: isSignalWord(signalWord) ? signalWord ?? undefined : undefined,
-    restrictedUse,
-    reEntryIntervalHours:
-      (record.re_entry_interval_hours ?? record.reEntryIntervalHours ?? undefined) as
-        | number
-        | undefined,
-    storageLocation: (record.storage_location ?? record.storageLocation ?? undefined) as
-      | string
-      | undefined,
-    sdsUrl: (record.sds_url ?? record.sdsUrl ?? undefined) as string | undefined,
-    labels: Array.isArray(record.labels) ? record.labels : undefined,
-    attachments: Array.isArray(record.attachments) ? record.attachments : undefined,
-    notes: Array.isArray(record.notes) ? record.notes : undefined,
-    createdAt: (record.created_at ?? record.createdAt) as string,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string
-  }
-}

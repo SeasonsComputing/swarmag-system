@@ -71,21 +71,7 @@ export const droneAssetSample: Asset = {
   serialNumber: 'DJI-T40-0003',
   type: dispensingDroneTypeId,
   status: 'active',
-  attachments: [{
-    id: id(),
-    filename: 'agras-t40-manual.pdf',
-    url: 'https://storage.swarmag.com/assets/agras-t40/manual.pdf',
-    contentType: 'application/pdf',
-    uploadedAt: '2024-12-01T00:00:00Z',
-    uploadedById: id()
-  }, {
-    id: id(),
-    filename: 'preflight-checklist.jpg',
-    url: 'https://storage.swarmag.com/assets/agras-t40/photos/preflight.jpg',
-    contentType: 'image/jpeg',
-    uploadedAt: '2025-01-18T15:20:00Z',
-    uploadedById: id()
-  }],
+  notes: [],
   createdAt: '2024-12-01T00:00:00Z',
   updatedAt: '2025-01-18T15:24:00Z'
 }
@@ -97,14 +83,7 @@ export const sprayerTruckSample: Asset = {
   serialNumber: 'RAM-5500-RIG-2024-01',
   type: transportTruckTypeId,
   status: 'maintenance',
-  attachments: [{
-    id: id(),
-    filename: 'sprayer-ram5500-maintenance-log.pdf',
-    url: 'https://storage.swarmag.com/assets/ram5500/maintenance-log.pdf',
-    contentType: 'application/pdf',
-    uploadedAt: '2024-12-15T00:00:00Z',
-    uploadedById: id()
-  }],
+  notes: [],
   createdAt: '2024-11-15T00:00:00Z',
   updatedAt: '2025-01-15T11:00:00Z'
 }

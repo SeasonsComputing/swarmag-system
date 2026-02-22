@@ -1,50 +1,74 @@
 /**
- * Domain models for jobs in the swarmAg system.
- * Jobs represent operational tasks related to services.
+ * Domain models for jobs and all job lifecycle artifacts in swarmAg.
+ * The Job is the central lifecycle anchor for all work agreements.
  */
+import type { Id, When, Dictionary } from '@core-std'
+import type { Location, Note } from '@domain/abstractions/common.ts'
+import type { Answer } from '@domain/abstractions/workflow.ts'
 
-import type { Dictionary, ID, When } from '@core-std'
-import type { Attachment, Location, Note } from './common.ts'
-import type { Answer } from './workflow.ts'
-
-/** The possible statuses of a job. */
+/** Job lifecycle state. */
 export type JobStatus =
-  | 'opened'
-  | 'assessed'
-  | 'planned'
-  | 'inprogress'
-  | 'completed'
+  | 'open'
+  | 'assessing'
+  | 'planning'
+  | 'preparing'
+  | 'executing'
+  | 'finalizing'
   | 'closed'
   | 'cancelled'
 
-/** Represents an assessment performed for a job. */
-export interface JobAssessment {
-  id: ID
-  jobId: ID
-  assessorId: ID
-  locations: [Location, ...Location[]]
-  questions: Answer[]
-  risks?: Note[]
-  notes?: Note[]
-  attachments?: Attachment[]
+/** Work agreement lifecycle anchor. */
+export type Job = {
+  id: Id
+  customerId: Id
+  status: JobStatus
   createdAt: When
   updatedAt: When
   deletedAt?: When
 }
 
-/** Represents an assignment of a team member to a job plan, including their role. */
-export interface JobPlanAssignment {
-  planId: ID
-  userId: ID
-  role: string
-  notes?: string
+/** Pre-planning assessment; requires one or more locations. */
+export type JobAssessment = {
+  id: Id
+  jobId: Id
+  assessorId: Id
+  locations: [Location, ...Location[]]
+  risks: [Note?, ...Note[]]
+  notes: [Note?, ...Note[]]
+  createdAt: When
+  updatedAt: When
   deletedAt?: When
 }
 
-/** The planned use of a chemical in a job. */
-export interface JobPlanChemical {
-  planId: ID
-  chemicalId: ID
+/**
+ * Job-specific workflow instance.
+ * basisWorkflowId references the read-only Workflow master.
+ * modifiedWorkflowId is always a clone, created only when specialization is required.
+ */
+export type JobWorkflow = {
+  id: Id
+  jobId: Id
+  sequence: number
+  basisWorkflowId: Id
+  modifiedWorkflowId?: Id
+  createdAt: When
+  updatedAt: When
+  deletedAt?: When
+}
+
+/** Assignment of a user to a role within a job plan. */
+export type JobPlanAssignment = {
+  planId: Id
+  userId: Id
+  role: string
+  notes: [Note?, ...Note[]]
+  deletedAt?: When
+}
+
+/** Planned chemical usage for a job. */
+export type JobPlanChemical = {
+  planId: Id
+  chemicalId: Id
   amount: number
   unit: 'gallon' | 'liter' | 'pound' | 'kilogram'
   targetArea?: number
@@ -52,59 +76,51 @@ export interface JobPlanChemical {
   deletedAt?: When
 }
 
-/** Represents the assignment of an asset to a job plan. */
-export interface JobPlanAsset {
-  planId: ID
-  assetId: ID
+/** Asset allocated to a job plan. */
+export type JobPlanAsset = {
+  planId: Id
+  assetId: Id
   deletedAt?: When
 }
 
-/** The detailed plan for executing a job. */
-export interface JobPlan {
-  id: ID
-  jobId: ID
-  workflowId: ID
+/** Job-specific execution plan created after assessment. */
+export type JobPlan = {
+  id: Id
+  jobId: Id
   scheduledStart: When
   scheduledEnd?: When
-  targetLocations: Location[]
-  notes?: Note[]
+  notes: [Note?, ...Note[]]
   createdAt: When
   updatedAt: When
   deletedAt?: When
 }
 
-/** The types of log entries for a job. */
-export type JobLogType =
-  | 'status'
-  | 'checkpoint'
-  | 'note'
-  | 'telemetry'
-  | 'exception'
-
-/** Payload for job log entries. */
-export type JobLogPayload = Dictionary
-
-/** Represents a log entry for a job, such as status updates or telemetry. */
-export interface JobLogEntry {
-  id: ID
-  jobId: ID
-  type: JobLogType
-  message: string
-  occurredAt: When
-  createdAt: When
-  createdById: ID
-  location?: Location
-  attachments?: Attachment[]
-  payload?: JobLogPayload
-}
-
-/** Represents a job in the system. */
-export interface Job {
-  id: ID
-  customerId: ID
-  serviceId: ID
-  status: JobStatus
+/**
+ * Execution record; work is the immutable ordered manifest of resolved Workflow IDs.
+ * Creation transitions the Job to executing; work is read-only once set.
+ */
+export type JobWork = {
+  id: Id
+  jobId: Id
+  work: [Id, ...Id[]]
+  startedAt: When
+  startedById: Id
+  completedAt?: When
   createdAt: When
   updatedAt: When
   deletedAt?: When
 }
+
+/**
+ * Append-only execution event.
+ * At least one of answer or metadata must be present — enforced by discriminated union.
+ */
+export type JobWorkLogEntry = {
+  id: Id
+  jobId: Id
+  userId: Id
+  createdAt: When
+} & (
+  | { answer: Answer; metadata?: Dictionary }
+  | { answer?: Answer; metadata: Dictionary }
+)

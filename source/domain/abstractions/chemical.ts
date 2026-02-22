@@ -1,12 +1,11 @@
 /**
- * Domain models for chemicals in the swarmAg system.
- * Chemicals include herbicides, pesticides, fertilizers, etc. used in operations.
+ * Domain models for regulated chemicals used in swarmAg operations.
+ * Captures identity, classification, safety, and compliance data.
  */
-
-import type { ID, When } from '@core-std'
+import type { Id, When } from '@core-std'
 import type { Attachment, Note } from '@domain/abstractions/common.ts'
 
-/** The different usages for chemicals. */
+/** Domain usage classification for a chemical. */
 export type ChemicalUsage =
   | 'herbicide'
   | 'pesticide'
@@ -14,15 +13,15 @@ export type ChemicalUsage =
   | 'fungicide'
   | 'adjuvant'
 
-/** Represents a label or documentation for a chemical. */
-export interface ChemicalLabel {
+/** Label or regulatory document pointer for a chemical. */
+export type ChemicalLabel = {
   url: string
   description?: string
 }
 
-/** Represents a chemical in the swarmAg system. */
-export interface Chemical {
-  id: ID
+/** Regulated material record with safety, storage, and compliance metadata. */
+export type Chemical = {
+  id: Id
   name: string
   epaNumber?: string
   usage: ChemicalUsage
@@ -31,9 +30,9 @@ export interface Chemical {
   reEntryIntervalHours?: number
   storageLocation?: string
   sdsUrl?: string
-  labels?: ChemicalLabel[]
-  attachments?: Attachment[]
-  notes?: Note[]
+  labels: [ChemicalLabel?, ...ChemicalLabel[]]
+  attachments: [Attachment?, ...Attachment[]]
+  notes: [Note?, ...Note[]]
   createdAt: When
   updatedAt: When
   deletedAt?: When

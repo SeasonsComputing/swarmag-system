@@ -1,69 +1,41 @@
 /**
- * Mappers for converting between Supabase user rows and domain Users.
+ * Adapter for converting between Dictionary (storage) and User domain abstractions.
+ * Maps snake_case column names to camelCase domain fields and back.
  */
-
 import type { Dictionary } from '@core-std'
 import type { User } from '@domain/abstractions/user.ts'
-import { isUserRoles, isUserStatus } from '@domain/validators/user-validator.ts'
 
-/** Map a domain User into a Dictionary shape. */
+/** Converts a storage dictionary to a User domain object. */
+export const toUser = (dict: Dictionary): User => {
+  if (!dict['id']) throw new Error('User dictionary missing required field: id')
+  if (!dict['display_name']) throw new Error('User dictionary missing required field: display_name')
+  if (!dict['primary_email']) throw new Error('User dictionary missing required field: primary_email')
+  if (!dict['phone_number']) throw new Error('User dictionary missing required field: phone_number')
+
+  return {
+    id: dict['id'] as string,
+    displayName: dict['display_name'] as string,
+    primaryEmail: dict['primary_email'] as string,
+    phoneNumber: dict['phone_number'] as string,
+    avatarUrl: dict['avatar_url'] as string | undefined,
+    roles: (dict['roles'] ?? []) as User['roles'],
+    status: dict['status'] as User['status'],
+    createdAt: dict['created_at'] as string | undefined,
+    updatedAt: dict['updated_at'] as string | undefined,
+    deletedAt: dict['deleted_at'] as string | undefined,
+  }
+}
+
+/** Converts a User domain object to a storage dictionary. */
 export const fromUser = (user: User): Dictionary => ({
   id: user.id,
   display_name: user.displayName,
   primary_email: user.primaryEmail,
   phone_number: user.phoneNumber,
-  avatar_url: user.avatarUrl ?? null,
-  roles: user.roles ?? null,
-  status: user.status ?? 'active',
+  avatar_url: user.avatarUrl,
+  roles: user.roles,
+  status: user.status,
   created_at: user.createdAt,
   updated_at: user.updatedAt,
-  deleted_at: user.deletedAt ?? null,
-  payload: user
+  deleted_at: user.deletedAt,
 })
-
-/**
- * Convert a Dictionary into a User domain model.
- * Payload is truth - if present, use it directly.
- * Falls back to column mapping for legacy records.
- */
-export const toUser = (record: Dictionary): User => {
-  if (!record || typeof record !== 'object') {
-    throw new Error('User dictionary is missing required fields')
-  }
-
-  // Payload as truth - direct cast if present
-  if (record.payload && typeof record.payload === 'object') {
-    const payload = record.payload as Dictionary
-    if (
-      typeof payload.id === 'string'
-      && typeof payload.displayName === 'string'
-      && typeof payload.primaryEmail === 'string'
-      && typeof payload.phoneNumber === 'string'
-    ) {
-      return payload as unknown as User
-    }
-  }
-
-  // Legacy fallback - map from columns
-  const id = record.id as string
-  const displayName = (record.display_name ?? record.displayName) as string
-  const primaryEmail = (record.primary_email ?? record.primaryEmail) as string
-  const phoneNumber = (record.phone_number ?? record.phoneNumber) as string
-
-  if (!id || !displayName || !primaryEmail || !phoneNumber) {
-    throw new Error('User dictionary is missing required fields')
-  }
-
-  return {
-    id,
-    displayName,
-    primaryEmail,
-    phoneNumber,
-    avatarUrl: (record.avatar_url ?? record.avatarUrl) as string | undefined,
-    roles: isUserRoles(record.roles) ? record.roles : undefined,
-    status: isUserStatus(record.status) ? record.status : undefined,
-    createdAt: (record.created_at ?? record.createdAt) as string | undefined,
-    updatedAt: (record.updated_at ?? record.updatedAt) as string | undefined,
-    deletedAt: (record.deleted_at ?? record.deletedAt) as string | undefined
-  }
-}

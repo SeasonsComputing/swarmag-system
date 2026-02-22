@@ -1,74 +1,23 @@
 /**
- * Domain-level invariant validators for chemicals.
+ * Validators for chemical protocol inputs at system boundaries.
+ * Returns an error message string on failure, null on success.
  */
+import { isNonEmptyString, isId } from '@core-std'
+import type { ChemicalCreateInput, ChemicalUpdateInput } from '@domain/protocols/chemical-protocol.ts'
 
-import type { Chemical } from '@domain/abstractions/chemical.ts'
-import type {
-  ChemicalCreateInput,
-  ChemicalUpdateInput
-} from '@domain/protocols/chemical-protocol.ts'
-import { isNonEmptyString } from './helper-validator.ts'
-
-export type { ChemicalCreateInput, ChemicalUpdateInput }
-
-/**
- * Type guard for chemical usage.
- * @param value - Potential usage value.
- * @returns True when the value matches a known usage.
- */
-export const isChemicalUsage = (value: unknown): value is Chemical['usage'] =>
-  value === 'herbicide'
-  || value === 'pesticide'
-  || value === 'fertilizer'
-  || value === 'fungicide'
-  || value === 'adjuvant'
-
-/**
- * Type guard for chemical signal word.
- * @param value - Potential signal word value.
- * @returns True when the value matches a known signal word.
- */
-export const isSignalWord = (value: unknown): value is Chemical['signalWord'] =>
-  value === undefined || value === null || value === 'danger' || value === 'warning'
-  || value === 'caution'
-
-/**
- * Validate chemical creation input.
- * @param input - Chemical creation input to validate.
- * @returns Error message or null if valid.
- */
-export const validateChemicalCreate = (input?: ChemicalCreateInput | null): string | null => {
-  if (!input) return 'Request body is required'
+/** Validates input for creating a Chemical. */
+export const validateChemicalCreate = (input: ChemicalCreateInput): string | null => {
   if (!isNonEmptyString(input.name)) return 'name is required'
-  if (!isChemicalUsage(input.usage)) {
-    return 'usage must be herbicide, pesticide, fertilizer, fungicide, or adjuvant'
-  }
-  if (typeof input.restrictedUse !== 'boolean') return 'restrictedUse is required'
-  if (input.signalWord !== undefined && !isSignalWord(input.signalWord)) {
-    return 'signalWord must be danger, warning, or caution'
-  }
+  if (!isNonEmptyString(input.usage)) return 'usage is required'
+  if (typeof input.restrictedUse !== 'boolean') return 'restrictedUse is required and must be a boolean'
   return null
 }
 
-/**
- * Validate chemical update input.
- * @param input - Chemical update input to validate.
- * @returns Error message or null if valid.
- */
-export const validateChemicalUpdate = (input?: ChemicalUpdateInput | null): string | null => {
-  if (!input) return 'Request body is required'
-  if (!isNonEmptyString(input.id)) return 'id is required'
-  if (input.name !== undefined && !isNonEmptyString(input.name)) {
-    return 'name cannot be empty'
-  }
-  if (input.usage !== undefined && !isChemicalUsage(input.usage)) {
-    return 'usage must be herbicide, pesticide, fertilizer, fungicide, or adjuvant'
-  }
-  if (
-    input.signalWord !== undefined && input.signalWord !== null
-    && !isSignalWord(input.signalWord)
-  ) {
-    return 'signalWord must be danger, warning, or caution'
-  }
+/** Validates input for updating a Chemical. */
+export const validateChemicalUpdate = (input: ChemicalUpdateInput): string | null => {
+  if (!isId(input.id)) return 'id must be a valid Id'
+  if (input.name !== undefined && !isNonEmptyString(input.name)) return 'name must be a non-empty string'
+  if (input.usage !== undefined && !isNonEmptyString(input.usage)) return 'usage must be a non-empty string'
+  if (input.restrictedUse !== undefined && typeof input.restrictedUse !== 'boolean') return 'restrictedUse must be a boolean'
   return null
 }
