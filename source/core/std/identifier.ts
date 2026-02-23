@@ -10,7 +10,7 @@ export type Id = string
 const UUID_V7_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
 
 /** Creates a new UUID v7 identifier. */
-let lastTimestamp = -1, seq = 0
+let lastTimestamp = -1
 export const id = (): string => {
   const bytes = new Uint8Array(16)
   crypto.getRandomValues(bytes)
@@ -39,11 +39,13 @@ export const id = (): string => {
   // Set Variant 1 (10xx)
   bytes[8] = (bytes[8] & 0x3f) | 0x80
 
-  // Faster Hex Conversion
-  const hex = Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('')
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${
-    hex.slice(20)
-  }`
+  // Convert bytes to hex string in a single pass, directly over the Uint8Array,
+  // avoiding the intermediate array allocations of Array.from().map().join()
+  let hex = ''
+  for (let i = 0; i < 16; i++) hex += bytes[i].toString(16).padStart(2, '0')
+
+  // dprint-ignore
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`
 }
 
 /** Validates if a string is a valid UUID v7. */

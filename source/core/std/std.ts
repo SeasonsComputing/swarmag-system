@@ -1,4 +1,5 @@
 export * from './adt.ts'
 export * from './datetime.ts'
 export * from './identifier.ts'
+export * from './instance.ts'
 export * from './validators.ts'
