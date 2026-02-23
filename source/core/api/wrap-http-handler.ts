@@ -225,10 +225,10 @@ FETCH REQUEST-RESPONSE FLOW:
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** HTTP header map for responses/requests. */
-export type HttpHeaders = Record<string, string>
+export type HttpHeaders = Dictionary<string>
 
 /** HTTP query map for responses/requests. */
-export type HttpQuery = Record<string, string>
+export type HttpQuery = Dictionary<string>
 
 /** HTTP method for handlers. */
 export type HttpMethod =
