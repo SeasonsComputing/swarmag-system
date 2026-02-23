@@ -47,7 +47,7 @@ in the domain package.
 
 ```typescript
 import type { Dictionary, Id, When } from '@core-std'
-import { isId, isWhen } from '@core-std'
+import { isId, isWhen, notValid } from '@core-std'
 import { isNonEmptyString, isPositiveNumber } from '@core-std'
 ```
 
@@ -80,9 +80,10 @@ Always use the full path alias. Never use relative imports across top-level name
   and `fromAbstraction(abstraction: Abstraction): Dictionary`
 - Map every field explicitly, column by column. No spread. No shortcuts.
 - `snake_case` keys for database columns; `camelCase` for domain fields
-- JSONB columns (notes, attachments, embedded arrays) map as objects — never
-  `JSON.parse()` or `JSON.stringify()`. Supabase deserializes JSONB automatically.
-- Fast-fail on missing required fields: throw `Error` with a descriptive message
+- JSONB columns (notes, attachments, embedded arrays) map as objects.
+  Never serialize the object using`JSON.parse()` or `JSON.stringify()`. 
+  Supabase deserializes JSONB automatically.
+- Fast-fail on missing required fields: use `notValid` from `@core-std` with a descriptive message
 - No payload-as-truth pattern. No `payload` field. No legacy fallback branches.
 - No private helper functions invented inside the adapter file
 
