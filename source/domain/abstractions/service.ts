@@ -1,6 +1,6 @@
 /**
- * Domain models for services offered by swarmAg.
- * Services are sellable operational offerings identified by SKU and category.
+ * Domain abstractions for services in the swarmAg system.
+ * Services are sellable operational offerings identified by SKU.
  */
 
 import type { Id, When } from '@core-std'
@@ -11,20 +11,21 @@ export type ServiceCategory =
   | 'aerial-drone-services'
   | 'ground-machinery-services'
 
-/** Sellable operational offering with SKU, category, and asset requirements. */
+/** Sellable operational offering. */
 export type Service = {
   id: Id
   name: string
   sku: string
   description?: string
   category: ServiceCategory
+  tagsWorkflowCandidates: [string?, ...string[]]
   notes: [Note?, ...Note[]]
   createdAt: When
   updatedAt: When
   deletedAt?: When
 }
 
-/** Junction type associating a service with a required asset type. */
+/** Junction — services to required asset types. */
 export type ServiceRequiredAssetType = {
   serviceId: Id
   assetTypeId: Id

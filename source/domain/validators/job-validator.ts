@@ -1,9 +1,8 @@
 /**
- * Validators for job protocol inputs at system boundaries.
- * Returns an error message string on failure, null on success.
+ * Validators for Job domain boundary inputs.
  */
 
-import { isId, isNonEmptyString, isWhen } from '@core-std'
+import { isId, isNonEmptyString, isPositiveNumber, isWhen } from '@core-std'
 import type {
   JobAssessmentCreateInput,
   JobAssessmentUpdateInput,
@@ -17,13 +16,14 @@ import type {
   JobWorkLogEntryCreateInput
 } from '@domain/protocols/job-protocol.ts'
 
-/** Validates input for creating a Job. */
+/** Validate input for creating a Job; returns an error message or null. */
 export const validateJobCreate = (input: JobCreateInput): string | null => {
   if (!isId(input.customerId)) return 'customerId must be a valid Id'
+  if (!isNonEmptyString(input.status)) return 'status is required'
   return null
 }
 
-/** Validates input for updating a Job. */
+/** Validate input for updating a Job; returns an error message or null. */
 export const validateJobUpdate = (input: JobUpdateInput): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
   if (input.status !== undefined && !isNonEmptyString(input.status)) {
@@ -32,64 +32,60 @@ export const validateJobUpdate = (input: JobUpdateInput): string | null => {
   return null
 }
 
-/** Validates input for creating a JobAssessment. */
+/** Validate input for creating a JobAssessment; returns an error message or null. */
 export const validateJobAssessmentCreate = (
   input: JobAssessmentCreateInput
 ): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
   if (!isId(input.assessorId)) return 'assessorId must be a valid Id'
-  if (!input.locations || !Array.isArray(input.locations) || input.locations.length === 0) {
-    return 'locations must be a non-empty array'
+  if (!input.locations || input.locations.length === 0) {
+    return 'locations must contain at least one item'
   }
   return null
 }
 
-/** Validates input for updating a JobAssessment. */
+/** Validate input for updating a JobAssessment; returns an error message or null. */
 export const validateJobAssessmentUpdate = (
   input: JobAssessmentUpdateInput
 ): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.locations !== undefined) {
-    if (!Array.isArray(input.locations) || input.locations.length === 0) {
-      return 'locations must be a non-empty array'
-    }
+  if (input.locations !== undefined && input.locations.length === 0) {
+    return 'locations must contain at least one item'
   }
   return null
 }
 
-/** Validates input for creating a JobWorkflow. */
+/** Validate input for creating a JobWorkflow; returns an error message or null. */
 export const validateJobWorkflowCreate = (input: JobWorkflowCreateInput): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (
-    typeof input.sequence !== 'number' || !Number.isInteger(input.sequence)
-    || input.sequence < 0
-  ) return 'sequence must be a non-negative integer'
+  if (!isPositiveNumber(input.sequence)) return 'sequence must be a positive number'
   if (!isId(input.basisWorkflowId)) return 'basisWorkflowId must be a valid Id'
   return null
 }
 
-/** Validates input for updating a JobWorkflow. */
+/** Validate input for updating a JobWorkflow; returns an error message or null. */
 export const validateJobWorkflowUpdate = (input: JobWorkflowUpdateInput): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
-  if (
-    input.sequence !== undefined
-    && (typeof input.sequence !== 'number' || !Number.isInteger(input.sequence)
-      || input.sequence < 0)
-  ) return 'sequence must be a non-negative integer'
+  if (input.sequence !== undefined && !isPositiveNumber(input.sequence)) {
+    return 'sequence must be a positive number'
+  }
   if (input.modifiedWorkflowId !== undefined && !isId(input.modifiedWorkflowId)) {
     return 'modifiedWorkflowId must be a valid Id'
   }
   return null
 }
 
-/** Validates input for creating a JobPlan. */
+/** Validate input for creating a JobPlan; returns an error message or null. */
 export const validateJobPlanCreate = (input: JobPlanCreateInput): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
   if (!isWhen(input.scheduledStart)) return 'scheduledStart must be a valid timestamp'
+  if (input.scheduledEnd !== undefined && !isWhen(input.scheduledEnd)) {
+    return 'scheduledEnd must be a valid timestamp'
+  }
   return null
 }
 
-/** Validates input for updating a JobPlan. */
+/** Validate input for updating a JobPlan; returns an error message or null. */
 export const validateJobPlanUpdate = (input: JobPlanUpdateInput): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
   if (input.scheduledStart !== undefined && !isWhen(input.scheduledStart)) {
@@ -101,21 +97,18 @@ export const validateJobPlanUpdate = (input: JobPlanUpdateInput): string | null 
   return null
 }
 
-/** Validates input for creating a JobWork. */
+/** Validate input for creating a JobWork; returns an error message or null. */
 export const validateJobWorkCreate = (input: JobWorkCreateInput): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (!input.work || !Array.isArray(input.work) || input.work.length === 0) {
-    return 'work must be a non-empty array of Ids'
-  }
-  for (const workId of input.work) {
-    if (!isId(workId)) return `work contains an invalid Id: ${workId}`
+  if (!input.work || input.work.length === 0) {
+    return 'work must contain at least one Workflow Id'
   }
   if (!isWhen(input.startedAt)) return 'startedAt must be a valid timestamp'
   if (!isId(input.startedById)) return 'startedById must be a valid Id'
   return null
 }
 
-/** Validates input for creating a JobWorkLogEntry; at least one of answer or metadata must be present. */
+/** Validate input for creating a JobWorkLogEntry; returns an error message or null. */
 export const validateJobWorkLogEntryCreate = (
   input: JobWorkLogEntryCreateInput
 ): string | null => {

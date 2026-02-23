@@ -1,11 +1,11 @@
 /**
- * Shared subordinate types used across multiple domain abstractions.
- * These are pure value objects with no independent lifecycle.
+ * Shared subordinate value objects used across domain abstractions.
+ * These types have no independent lifecycle and are always embedded.
  */
 
 import type { Id, When } from '@core-std'
 
-/** Geographic position plus optional address and observation metadata. */
+/** Geographic position with optional address metadata. */
 export type Location = {
   latitude: number
   longitude: number
@@ -32,7 +32,7 @@ export type Attachment = {
   uploadedById: Id
 }
 
-/** Freeform note with optional visibility, taxonomy, and attachments. */
+/** Freeform note with optional visibility and taxonomy. */
 export type Note = {
   id: Id
   createdAt: When

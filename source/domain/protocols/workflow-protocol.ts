@@ -1,12 +1,11 @@
 /**
- * Protocol input shapes for Workflow create and update operations.
- * Partial shapes for boundary transmission — no domain logic.
+ * Protocol input types for Workflow boundary operations.
  */
 
 import type { Id } from '@core-std'
-import type { Task, Workflow } from '@domain/abstractions/workflow.ts'
+import type { Task } from '@domain/abstractions/workflow.ts'
 
-/** Input shape for creating a Workflow. */
+/** Input for creating a Workflow. */
 export type WorkflowCreateInput = {
   name: string
   description?: string
@@ -15,7 +14,7 @@ export type WorkflowCreateInput = {
   tasks: [Task, ...Task[]]
 }
 
-/** Input shape for updating a Workflow. */
+/** Input for updating a Workflow. */
 export type WorkflowUpdateInput = {
   id: Id
   name?: string

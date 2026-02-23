@@ -1,12 +1,12 @@
 /**
- * Domain models for customers in the swarmAg system.
- * Customers are organizations purchasing services; they own sites and contacts.
+ * Domain abstractions for customers in the swarmAg system.
+ * Customers are organizations that purchase services.
  */
 
 import type { Id, When } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
 
-/** A contact person associated with a customer account. */
+/** Customer-associated contact person. */
 export type Contact = {
   id: Id
   customerId: Id
@@ -19,7 +19,7 @@ export type Contact = {
   updatedAt: When
 }
 
-/** A serviceable location belonging to a customer. */
+/** Serviceable customer location. */
 export type CustomerSite = {
   id: Id
   customerId: Id

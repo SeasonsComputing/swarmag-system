@@ -1,15 +1,14 @@
 /**
- * Validators for chemical protocol inputs at system boundaries.
- * Returns an error message string on failure, null on success.
+ * Validators for Chemical boundary inputs.
  */
 
-import { isId, isNonEmptyString } from '@core-std'
+import { isNonEmptyString } from '@core-std'
 import type {
   ChemicalCreateInput,
   ChemicalUpdateInput
 } from '@domain/protocols/chemical-protocol.ts'
 
-/** Validates input for creating a Chemical. */
+/** Validate input for creating a Chemical; returns an error message or null. */
 export const validateChemicalCreate = (input: ChemicalCreateInput): string | null => {
   if (!isNonEmptyString(input.name)) return 'name is required'
   if (!isNonEmptyString(input.usage)) return 'usage is required'
@@ -19,9 +18,9 @@ export const validateChemicalCreate = (input: ChemicalCreateInput): string | nul
   return null
 }
 
-/** Validates input for updating a Chemical. */
+/** Validate input for updating a Chemical; returns an error message or null. */
 export const validateChemicalUpdate = (input: ChemicalUpdateInput): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+  if (!isNonEmptyString(input.id)) return 'id is required'
   if (input.name !== undefined && !isNonEmptyString(input.name)) {
     return 'name must be a non-empty string'
   }

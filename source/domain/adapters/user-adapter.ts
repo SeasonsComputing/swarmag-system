@@ -1,23 +1,17 @@
 /**
- * Adapter for converting between Dictionary (storage) and User domain abstractions.
- * Maps snake_case column names to camelCase domain fields and back.
+ * Adapters for converting between Dictionary and User domain abstractions.
  */
 
 import type { Dictionary } from '@core-std'
+import { notValid } from '@core-std'
 import type { User } from '@domain/abstractions/user.ts'
 
-/** Converts a storage dictionary to a User domain object. */
+/** Convert a Dictionary to a User domain object. */
 export const toUser = (dict: Dictionary): User => {
-  if (!dict['id']) throw new Error('User dictionary missing required field: id')
-  if (!dict['display_name']) {
-    throw new Error('User dictionary missing required field: display_name')
-  }
-  if (!dict['primary_email']) {
-    throw new Error('User dictionary missing required field: primary_email')
-  }
-  if (!dict['phone_number']) {
-    throw new Error('User dictionary missing required field: phone_number')
-  }
+  if (!dict['id']) notValid('User dictionary missing required field: id')
+  if (!dict['display_name']) notValid('User dictionary missing required field: display_name')
+  if (!dict['primary_email']) notValid('User dictionary missing required field: primary_email')
+  if (!dict['phone_number']) notValid('User dictionary missing required field: phone_number')
 
   return {
     id: dict['id'] as string,
@@ -33,7 +27,7 @@ export const toUser = (dict: Dictionary): User => {
   }
 }
 
-/** Converts a User domain object to a storage dictionary. */
+/** Convert a User domain object to a Dictionary. */
 export const fromUser = (user: User): Dictionary => ({
   id: user.id,
   display_name: user.displayName,

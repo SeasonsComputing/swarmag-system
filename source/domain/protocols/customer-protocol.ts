@@ -1,16 +1,15 @@
 /**
- * Protocol input shapes for Customer create and update operations.
- * Partial shapes for boundary transmission — no domain logic.
+ * Protocol input types for Customer boundary operations.
  */
 
 import type { Id } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
-import type { Customer } from '@domain/abstractions/customer.ts'
+import type { Contact, CustomerSite } from '@domain/abstractions/customer.ts'
 
-/** Input shape for creating a Customer. */
+/** Input for creating a Customer. */
 export type CustomerCreateInput = {
   name: string
-  status: Customer['status']
+  status: 'active' | 'inactive' | 'prospect'
   line1: string
   line2?: string
   city: string
@@ -19,14 +18,16 @@ export type CustomerCreateInput = {
   country: string
   accountManagerId?: Id
   primaryContactId?: Id
+  sites?: [CustomerSite?, ...CustomerSite[]]
+  contacts?: [Contact, ...Contact[]]
   notes?: [Note?, ...Note[]]
 }
 
-/** Input shape for updating a Customer. */
+/** Input for updating a Customer. */
 export type CustomerUpdateInput = {
   id: Id
   name?: string
-  status?: Customer['status']
+  status?: 'active' | 'inactive' | 'prospect'
   line1?: string
   line2?: string
   city?: string
@@ -35,5 +36,7 @@ export type CustomerUpdateInput = {
   country?: string
   accountManagerId?: Id
   primaryContactId?: Id
+  sites?: [CustomerSite?, ...CustomerSite[]]
+  contacts?: [Contact, ...Contact[]]
   notes?: [Note?, ...Note[]]
 }
