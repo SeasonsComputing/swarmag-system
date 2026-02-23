@@ -95,7 +95,7 @@ To facilitate the role a Workflow plays in orchestrating a Job, two abstractions
 
 Job Workflows are prepared prior to Job Work. The Job Assessment phase includes selecting the Workflows to be used on a Job. As each job is different, the Job Assessment may edit the workflows to capture the specialization. Creating, editing, and deleting Workflows are an administration authorization and so are read-only for Job Assessment and Job Plan. A Job Workflow is therefore associated with a basis Workflow (read-only reference) and an optional modified Workflow — which is always a clone of the basis Workflow. The Job Plan phase may add additional basis Workflows and optionally modify them. The Job Plan may also further modify Job Workflows that were already modified during assessment; in that case the assessment-modified Workflow becomes the basis for the Job Plan's modification.
 
-Starting Job Work involves transitioning the Job's status to `inprogress`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks, presenting the task checklist items as Questions and logging the Answers as Job Work Log entries along with any captured metadata.
+Starting Job Work involves transitioning the Job's status to `executing`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks, presenting the task checklist items as Questions and logging the Answers as Job Work Log entries along with any captured metadata.
 
 TODO: **Should Job Workflows be assigned to a crew member for execution as part of the Job Plan? Essentially doling out the work to be done vs. each crew member stepping on each other's toes. My intuition is yes. I have not worked through what that means yet. Let's not let this impede today's progress. We must consider how to assign workflows to crew members and how to manage conflicts that may arise at some point soon.**
 
@@ -258,7 +258,7 @@ The domain layer follows an abstraction-per-file pattern across four subdirector
 - Pure value objects and shared subordinate types (`Location`, `Note`, `Attachment`) live in `common.ts`.
 - Concept-owning types live with their owner (e.g., `Question` and `Answer` in `workflow.ts`).
 - Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-contract.ts`.
-- Shared validators (e.g., `isNonEmptyString`, `isIdArray`) live in `@domain/validators/helper-validator.ts`.
+- Shared primitive validators (e.g., `isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`) live in `@core-std`. Domain-specific guards live in their abstraction's validator file.
 
 ## 3. Data Dictionary
 
@@ -370,6 +370,7 @@ ServiceCategory (enum)
 
 Service (object)
   Fields: id, name, sku, description?, category(ServiceCategory),
+          tagsWorkflowCandidates: [string?, ...string[]],
           notes: [Note?, ...Note[]], createdAt, updatedAt, deletedAt?
   Notes: Sellable operational offering
 
@@ -491,7 +492,7 @@ JobPlan (object)
 JobWork (object)
   Fields: id, jobId, work: [Id, ...Id[]], startedAt, startedById,
           completedAt?, createdAt, updatedAt, deletedAt?
-  Notes: Execution record; creation transitions Job to inprogress;
+  Notes: Execution record; creation transitions Job to executing;
          work is an ordered array of resolved Workflow IDs (basis if
          unmodified, modified clone otherwise) — the immutable
          execution manifest
