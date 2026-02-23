@@ -1,15 +1,14 @@
 /**
- * Validators for customer protocol inputs at system boundaries.
- * Returns an error message string on failure, null on success.
+ * Validators for Customer boundary inputs.
  */
 
-import { isId, isNonEmptyString } from '@core-std'
+import { isNonEmptyString } from '@core-std'
 import type {
   CustomerCreateInput,
   CustomerUpdateInput
 } from '@domain/protocols/customer-protocol.ts'
 
-/** Validates input for creating a Customer. */
+/** Validate input for creating a Customer; returns an error message or null. */
 export const validateCustomerCreate = (input: CustomerCreateInput): string | null => {
   if (!isNonEmptyString(input.name)) return 'name is required'
   if (!isNonEmptyString(input.status)) return 'status is required'
@@ -21,9 +20,9 @@ export const validateCustomerCreate = (input: CustomerCreateInput): string | nul
   return null
 }
 
-/** Validates input for updating a Customer. */
+/** Validate input for updating a Customer; returns an error message or null. */
 export const validateCustomerUpdate = (input: CustomerUpdateInput): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+  if (!isNonEmptyString(input.id)) return 'id is required'
   if (input.name !== undefined && !isNonEmptyString(input.name)) {
     return 'name must be a non-empty string'
   }

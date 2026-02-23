@@ -1,12 +1,12 @@
 /**
- * Domain models for regulated chemicals used in swarmAg operations.
- * Captures identity, classification, safety, and compliance data.
+ * Domain abstractions for regulated chemicals in the swarmAg system.
+ * Chemicals require licensing and regulatory compliance management.
  */
 
 import type { Id, When } from '@core-std'
-import type { Attachment, Note } from '@domain/abstractions/common.ts'
+import type { Note } from '@domain/abstractions/common.ts'
 
-/** Domain usage classification for a chemical. */
+/** Domain usage classification. */
 export type ChemicalUsage =
   | 'herbicide'
   | 'pesticide'
@@ -14,13 +14,13 @@ export type ChemicalUsage =
   | 'fungicide'
   | 'adjuvant'
 
-/** Label or regulatory document pointer for a chemical. */
+/** Label or document pointer for a chemical. */
 export type ChemicalLabel = {
   url: string
   description?: string
 }
 
-/** Regulated material record with safety, storage, and compliance metadata. */
+/** Regulated material record. */
 export type Chemical = {
   id: Id
   name: string
@@ -32,7 +32,6 @@ export type Chemical = {
   storageLocation?: string
   sdsUrl?: string
   labels: [ChemicalLabel?, ...ChemicalLabel[]]
-  attachments: [Attachment?, ...Attachment[]]
   notes: [Note?, ...Note[]]
   createdAt: When
   updatedAt: When

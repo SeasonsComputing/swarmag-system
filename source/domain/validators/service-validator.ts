@@ -1,15 +1,14 @@
 /**
- * Validators for service protocol inputs at system boundaries.
- * Returns an error message string on failure, null on success.
+ * Validators for Service boundary inputs.
  */
 
-import { isId, isNonEmptyString } from '@core-std'
+import { isNonEmptyString } from '@core-std'
 import type {
   ServiceCreateInput,
   ServiceUpdateInput
 } from '@domain/protocols/service-protocol.ts'
 
-/** Validates input for creating a Service. */
+/** Validate input for creating a Service; returns an error message or null. */
 export const validateServiceCreate = (input: ServiceCreateInput): string | null => {
   if (!isNonEmptyString(input.name)) return 'name is required'
   if (!isNonEmptyString(input.sku)) return 'sku is required'
@@ -17,9 +16,9 @@ export const validateServiceCreate = (input: ServiceCreateInput): string | null 
   return null
 }
 
-/** Validates input for updating a Service. */
+/** Validate input for updating a Service; returns an error message or null. */
 export const validateServiceUpdate = (input: ServiceUpdateInput): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+  if (!isNonEmptyString(input.id)) return 'id is required'
   if (input.name !== undefined && !isNonEmptyString(input.name)) {
     return 'name must be a non-empty string'
   }

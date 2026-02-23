@@ -1,9 +1,10 @@
 /**
- * Domain models for jobs and all job lifecycle artifacts in swarmAg.
- * The Job is the central lifecycle anchor for all work agreements.
+ * Domain abstractions for jobs in the swarmAg system.
+ * Job is the lifecycle anchor for all field work agreements.
  */
 
-import type { Dictionary, Id, When } from '@core-std'
+import type { Id, When } from '@core-std'
+import type { Dictionary } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'
 
@@ -57,7 +58,7 @@ export type JobWorkflow = {
   deletedAt?: When
 }
 
-/** Assignment of a user to a role within a job plan. */
+/** Assignment of user to plan role. */
 export type JobPlanAssignment = {
   planId: Id
   userId: Id
@@ -66,7 +67,7 @@ export type JobPlanAssignment = {
   deletedAt?: When
 }
 
-/** Planned chemical usage for a job. */
+/** Planned chemical usage. */
 export type JobPlanChemical = {
   planId: Id
   chemicalId: Id
@@ -77,14 +78,14 @@ export type JobPlanChemical = {
   deletedAt?: When
 }
 
-/** Asset allocated to a job plan. */
+/** Asset allocated to a plan. */
 export type JobPlanAsset = {
   planId: Id
   assetId: Id
   deletedAt?: When
 }
 
-/** Job-specific execution plan created after assessment. */
+/** Job-specific execution plan. */
 export type JobPlan = {
   id: Id
   jobId: Id
@@ -97,8 +98,9 @@ export type JobPlan = {
 }
 
 /**
- * Execution record; work is the immutable ordered manifest of resolved Workflow IDs.
- * Creation transitions the Job to executing; work is read-only once set.
+ * Execution record.
+ * work is the ordered array of resolved Workflow IDs — the immutable execution manifest.
+ * Creation transitions Job to executing.
  */
 export type JobWork = {
   id: Id
@@ -114,7 +116,7 @@ export type JobWork = {
 
 /**
  * Append-only execution event.
- * At least one of answer or metadata must be present — enforced by discriminated union.
+ * At least one of answer or metadata must be present.
  */
 export type JobWorkLogEntry =
   & {

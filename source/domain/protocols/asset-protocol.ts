@@ -1,13 +1,12 @@
 /**
- * Protocol input shapes for Asset create and update operations.
- * Partial shapes for boundary transmission — no domain logic.
+ * Protocol input types for Asset boundary operations.
  */
 
 import type { Id } from '@core-std'
 import type { AssetStatus } from '@domain/abstractions/asset.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 
-/** Input shape for creating an Asset. */
+/** Input for creating an Asset. */
 export type AssetCreateInput = {
   label: string
   description?: string
@@ -17,7 +16,7 @@ export type AssetCreateInput = {
   notes?: [Note?, ...Note[]]
 }
 
-/** Input shape for updating an Asset. */
+/** Input for updating an Asset. */
 export type AssetUpdateInput = {
   id: Id
   label?: string

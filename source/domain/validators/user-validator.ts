@@ -1,12 +1,11 @@
 /**
- * Validators for user protocol inputs at system boundaries.
- * Returns an error message string on failure, null on success.
+ * Validators for User boundary inputs.
  */
 
-import { isId, isNonEmptyString } from '@core-std'
+import { isNonEmptyString } from '@core-std'
 import type { UserCreateInput, UserUpdateInput } from '@domain/protocols/user-protocol.ts'
 
-/** Validates input for creating a User. */
+/** Validate input for creating a User; returns an error message or null. */
 export const validateUserCreate = (input: UserCreateInput): string | null => {
   if (!isNonEmptyString(input.displayName)) return 'displayName is required'
   if (!isNonEmptyString(input.primaryEmail)) return 'primaryEmail is required'
@@ -14,9 +13,9 @@ export const validateUserCreate = (input: UserCreateInput): string | null => {
   return null
 }
 
-/** Validates input for updating a User. */
+/** Validate input for updating a User; returns an error message or null. */
 export const validateUserUpdate = (input: UserUpdateInput): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+  if (!isNonEmptyString(input.id)) return 'id is required'
   if (input.displayName !== undefined && !isNonEmptyString(input.displayName)) {
     return 'displayName must be a non-empty string'
   }

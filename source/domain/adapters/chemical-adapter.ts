@@ -1,38 +1,33 @@
 /**
- * Adapter for converting between Dictionary (storage) and Chemical domain abstractions.
- * Maps snake_case column names to camelCase domain fields and back.
+ * Adapters for converting between Dictionary and Chemical domain abstractions.
  */
 
 import type { Dictionary } from '@core-std'
-import type { Chemical, ChemicalLabel, ChemicalUsage } from '@domain/abstractions/chemical.ts'
+import { notValid } from '@core-std'
+import type { Chemical } from '@domain/abstractions/chemical.ts'
 
-/** Converts a storage dictionary to a Chemical domain object. */
+/** Convert a Dictionary to a Chemical domain object. */
 export const toChemical = (dict: Dictionary): Chemical => {
-  if (!dict['id']) throw new Error('Chemical dictionary missing required field: id')
-  if (!dict['name']) throw new Error('Chemical dictionary missing required field: name')
-  if (!dict['usage']) throw new Error('Chemical dictionary missing required field: usage')
+  if (!dict['id']) notValid('Chemical dictionary missing required field: id')
+  if (!dict['name']) notValid('Chemical dictionary missing required field: name')
+  if (!dict['usage']) notValid('Chemical dictionary missing required field: usage')
   if (dict['restricted_use'] === undefined || dict['restricted_use'] === null) {
-    throw new Error('Chemical dictionary missing required field: restricted_use')
+    notValid('Chemical dictionary missing required field: restricted_use')
   }
-  if (!dict['created_at']) {
-    throw new Error('Chemical dictionary missing required field: created_at')
-  }
-  if (!dict['updated_at']) {
-    throw new Error('Chemical dictionary missing required field: updated_at')
-  }
+  if (!dict['created_at']) notValid('Chemical dictionary missing required field: created_at')
+  if (!dict['updated_at']) notValid('Chemical dictionary missing required field: updated_at')
 
   return {
     id: dict['id'] as string,
     name: dict['name'] as string,
     epaNumber: dict['epa_number'] as string | undefined,
-    usage: dict['usage'] as ChemicalUsage,
+    usage: dict['usage'] as Chemical['usage'],
     signalWord: dict['signal_word'] as Chemical['signalWord'],
     restrictedUse: dict['restricted_use'] as boolean,
     reEntryIntervalHours: dict['re_entry_interval_hours'] as number | undefined,
     storageLocation: dict['storage_location'] as string | undefined,
     sdsUrl: dict['sds_url'] as string | undefined,
     labels: (dict['labels'] ?? []) as Chemical['labels'],
-    attachments: (dict['attachments'] ?? []) as Chemical['attachments'],
     notes: (dict['notes'] ?? []) as Chemical['notes'],
     createdAt: dict['created_at'] as string,
     updatedAt: dict['updated_at'] as string,
@@ -40,7 +35,7 @@ export const toChemical = (dict: Dictionary): Chemical => {
   }
 }
 
-/** Converts a Chemical domain object to a storage dictionary. */
+/** Convert a Chemical domain object to a Dictionary. */
 export const fromChemical = (chemical: Chemical): Dictionary => ({
   id: chemical.id,
   name: chemical.name,
@@ -52,7 +47,6 @@ export const fromChemical = (chemical: Chemical): Dictionary => ({
   storage_location: chemical.storageLocation,
   sds_url: chemical.sdsUrl,
   labels: chemical.labels,
-  attachments: chemical.attachments,
   notes: chemical.notes,
   created_at: chemical.createdAt,
   updated_at: chemical.updatedAt,

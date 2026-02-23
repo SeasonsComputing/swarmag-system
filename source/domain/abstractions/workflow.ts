@@ -1,6 +1,6 @@
 /**
- * Domain models for workflows in the swarmAg system.
- * Workflows are versioned execution templates composed of sequenced tasks.
+ * Domain abstractions for workflows in the swarmAg system.
+ * Workflows are versioned execution templates directing how work is performed.
  */
 
 import type { Id, When } from '@core-std'
@@ -14,14 +14,14 @@ export type QuestionType =
   | 'single-select'
   | 'multi-select'
 
-/** Selectable option metadata for select-type questions. */
+/** Selectable option metadata. */
 export type QuestionOption = {
   value: string
   label?: string
   requiresNote?: boolean
 }
 
-/** Workflow checklist prompt with type and optional selection options. */
+/** Workflow checklist prompt. */
 export type Question = {
   id: Id
   prompt: string
@@ -32,9 +32,13 @@ export type Question = {
 }
 
 /** Permitted answer value payloads. */
-export type AnswerValue = string | number | boolean | string[]
+export type AnswerValue =
+  | string
+  | number
+  | boolean
+  | string[]
 
-/** Captured response to a workflow question; notes carry crew annotations. */
+/** Captured response instance; notes carry crew annotations and attachments. */
 export type Answer = {
   questionId: Id
   value: AnswerValue
@@ -43,7 +47,7 @@ export type Answer = {
   notes: [Note?, ...Note[]]
 }
 
-/** Atomic executable step in a workflow; checklist must be non-empty. */
+/** Atomic executable step; checklist must be non-empty. */
 export type Task = {
   id: Id
   title: string

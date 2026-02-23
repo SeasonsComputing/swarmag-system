@@ -1,7 +1,6 @@
 /**
- * Domain models for assets in the swarmAg system.
- * Assets represent equipment and resources used in operations,
- * such as vehicles, sprayers, and drones.
+ * Domain abstractions for assets in the swarmAg system.
+ * Assets represent equipment and resources used in field operations.
  */
 
 import type { Id, When } from '@core-std'
@@ -17,20 +16,19 @@ export type AssetType = {
   deletedAt?: When
 }
 
-/** Lifecycle and availability state of an asset. */
+/** Lifecycle and availability state. */
 export type AssetStatus =
   | 'active'
   | 'maintenance'
   | 'retired'
   | 'reserved'
 
-/** Operational equipment or resource used to perform services. */
+/** Operational equipment or resource. */
 export type Asset = {
   id: Id
   label: string
   description?: string
   serialNumber?: string
-  /** References AssetType.id */
   type: Id
   status: AssetStatus
   notes: [Note?, ...Note[]]

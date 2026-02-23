@@ -1,12 +1,11 @@
 /**
- * Validators for asset protocol inputs at system boundaries.
- * Returns an error message string on failure, null on success.
+ * Validators for Asset boundary inputs.
  */
 
 import { isId, isNonEmptyString } from '@core-std'
 import type { AssetCreateInput, AssetUpdateInput } from '@domain/protocols/asset-protocol.ts'
 
-/** Validates input for creating an Asset. */
+/** Validate input for creating an Asset; returns an error message or null. */
 export const validateAssetCreate = (input: AssetCreateInput): string | null => {
   if (!isNonEmptyString(input.label)) return 'label is required'
   if (!isNonEmptyString(input.type)) return 'type is required'
@@ -15,7 +14,7 @@ export const validateAssetCreate = (input: AssetCreateInput): string | null => {
   return null
 }
 
-/** Validates input for updating an Asset. */
+/** Validate input for updating an Asset; returns an error message or null. */
 export const validateAssetUpdate = (input: AssetUpdateInput): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
   if (input.label !== undefined && !isNonEmptyString(input.label)) {

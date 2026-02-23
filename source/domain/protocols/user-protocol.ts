@@ -1,22 +1,21 @@
 /**
- * Protocol input shapes for User create and update operations.
- * Partial shapes for boundary transmission — no domain logic.
+ * Protocol input types for User boundary operations.
  */
 
 import type { Id } from '@core-std'
-import type { User, UserRole } from '@domain/abstractions/user.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
 
-/** Input shape for creating a User. */
+/** Input for creating a User. */
 export type UserCreateInput = {
   displayName: string
   primaryEmail: string
   phoneNumber: string
   avatarUrl?: string
   roles?: [UserRole?, ...UserRole[]]
-  status?: User['status']
+  status?: 'active' | 'inactive'
 }
 
-/** Input shape for updating a User. */
+/** Input for updating a User. */
 export type UserUpdateInput = {
   id: Id
   displayName?: string
@@ -24,5 +23,5 @@ export type UserUpdateInput = {
   phoneNumber?: string
   avatarUrl?: string
   roles?: [UserRole?, ...UserRole[]]
-  status?: User['status']
+  status?: 'active' | 'inactive'
 }
