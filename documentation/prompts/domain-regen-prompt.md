@@ -81,7 +81,7 @@ Always use the full path alias. Never use relative imports across top-level name
 - Map every field explicitly, column by column. No spread. No shortcuts.
 - `snake_case` keys for database columns; `camelCase` for domain fields
 - JSONB columns (notes, attachments, embedded arrays) map as objects.
-  Never serialize the object using`JSON.parse()` or `JSON.stringify()`. 
+  Never serialize the object using`JSON.parse()` or `JSON.stringify()`.
   Supabase deserializes JSONB automatically.
 - Fast-fail on missing required fields: use `notValid` from `@core-std` with a descriptive message
 - No payload-as-truth pattern. No `payload` field. No legacy fallback branches.
