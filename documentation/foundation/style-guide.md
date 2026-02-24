@@ -23,10 +23,10 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | ---------- | ---------------- |
 | `@core/`   | `source/core/`   |
 | `@domain/` | `source/domain/` |
-| `@back`    | `source/back/`   |
+| `@back/`   | `source/back/`   |
 | `@ux/`     | `source/ux/`     |
-| `@devops`  | `source/devops/` |
-| `@tests`   | `source/tests/`  |
+| `@devops/` | `source/devops/` |
+| `@tests/`  | `source/tests/`  |
 
 ### 2.2 Convenience barrel aliases
 
@@ -35,7 +35,7 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | `@core-std` | `source/core/std/std.ts` |
 | `@ux-api`   | `source/ux/api/api.ts`   |
 
-### 2.3 Package aliases
+### 2.3 Deployment package aliases
 
 | Alias                  | Resolves to                  |
 | ---------------------- | ---------------------------- |
@@ -43,7 +43,6 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | `@ux-app-ops/`         | `source/ux/app-ops/`         |
 | `@ux-app-admin/`       | `source/ux/app-admin/`       |
 | `@ux-app-customer/`    | `source/ux/app-customer/`    |
-| `@ux-app-common/`      | `source/ux/app-common/`      |
 
 ### 2.4 Vendor aliases
 
@@ -76,15 +75,24 @@ Acronyms are not a special case — they are words, and words transform with the
 | ------------ | ---------- | --------- | ---------- |
 | API          | `Api`      | `api`     | `api-`     |
 | URL          | `Url`      | `url`     | `url-`     |
-| Id           | `Id`       | `id`      | `id-`      |
-
-Exception by executive privilege: `Id` (the `@core-std` type alias), `id()`, and `isId()` retain all-caps. `Id` is a standalone token predating this rule. All other uses of "id" follow the table.
+| ID           | `Id`       | `id`      | `id-`      |
 
 ### 3.4 Makers vs. wrappers
 
 Factory functions that produce API clients are prefixed `make` and live in `make-*.ts` files. Handler adapters that wrap functions live in `wrap-*.ts` files. These are architecturally distinct; naming must reflect it.
 
-## 4. Source Code File Format
+## 4. Source Code Formatting
+
+All TypeScript is formatted by `dprint` via `deno task fmt`. The formatter is authoritative — do not argue with it.
+
+Two rules are non-negotiable and must be reflected in all code samples and generated code:
+
+- **No semicolons** — statement terminators are omitted throughout
+- **Single quotes** — string literals use `'...'` not `"..."`
+
+These are enforced by `dprint.json` configuration and will cause `deno task fmt:check` to fail if violated.
+
+## 5. Source Code File Format
 
 Documentation intensity follows implementation complexity. The code speaks first; commentary fills only what the code cannot.
 
@@ -115,11 +123,7 @@ export type AssetType = {
 }
 
 /** Lifecycle and availability state. */
-export type AssetStatus =
-  | 'active'
-  | 'maintenance'
-  | 'retired'
-  | 'reserved'
+export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'reserved'
 
 /** Operational equipment or resource. */
 export type Asset = {
@@ -322,7 +326,7 @@ Each abstraction has four files, one per sub-layer:
 | `protocols/`    | `{abstraction}-protocol.ts`  |
 | `validators/`   | `{abstraction}-validator.ts` |
 
-Shared types: `common.ts`, `helper-validator.ts`. Generic protocol shapes live in `@core/api/api-contract.ts`.
+Shared abstractions: `abstractions/common.ts`.
 
 ### 6.2 Abstractions
 
@@ -343,7 +347,7 @@ Shared types: `common.ts`, `helper-validator.ts`. Generic protocol shapes live i
 
 - Functions only: `validateAbstractionCreate(input): string | null` — return error message or `null`.
 - Validate at system boundaries only. Never re-validate inside domain logic.
-- Use shared helpers from `helper-validator.ts` (`isNonEmptyString`, `isId`, etc.).
+- Use shared primitive validators from `@core-std` (`isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`). Domain-specific guards live in their abstraction's validator file.
 
 ### 6.5 Protocols
 
@@ -374,21 +378,17 @@ Vite requires client-side environment variables to be prefixed `VITE_`. Without 
 import { Config } from '@core/cfg/config.ts'
 import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
-Config.init(
-  new SolidProvider(),
-  [
-    'VITE_SUPABASE_EDGE_URL',
-    'VITE_SUPABASE_RDBMS_URL',
-    'VITE_SUPABASE_SERVICE_KEY',
-    'VITE_JWT_SECRET'
-  ],
-  {
-    'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
-    'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
-    'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
-    'JWT_SECRET': 'VITE_JWT_SECRET'
-  }
-)
+Config.init(new SolidProvider(), [
+  'VITE_SUPABASE_EDGE_URL',
+  'VITE_SUPABASE_RDBMS_URL',
+  'VITE_SUPABASE_SERVICE_KEY',
+  'VITE_JWT_SECRET'
+], {
+  'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
+  'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
+  'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
+  'JWT_SECRET': 'VITE_JWT_SECRET'
+})
 
 export { Config }
 ```
@@ -414,11 +414,11 @@ Consuming code calls `Config.get('SUPABASE_EDGE_URL')` — no `VITE_` prefix, no
 
 ```text
 source/tests/
-  cases/              <- test files: {abstraction}-api-test.ts
+  cases/                      <- test files: {abstraction}-api-test.ts
   fixtures/
-    samples.ts        <- barrel export for all fixtures
+    samples.ts                <- barrel export for all fixtures
     {abstraction}-samples.ts  <- named constants producing valid domain objects
-    fixtures-test.ts  <- fixture integrity checks
+    fixtures-test.ts          <- fixture integrity checks
 ```
 
 - Test files live in `source/tests/cases/`, named `{abstraction}-api-test.ts`.

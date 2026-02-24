@@ -17,16 +17,13 @@ UX architectural patterns (component structure, state management, routing, etc.)
 ```text
 ux/
 ├── api/
-│   └── api.ts              # Composed API namespace (@ux-api barrel)
 ├── app-admin/
-│   └── config/             # Admin app configuration
 ├── app-customer/
-│   └── config/             # Customer app configuration
 ├── app-ops/
-│   └── config/             # Ops app configuration
-└── app-common/
-    ├── components/         # Shared UI components
-    └── lib/                # Shared utilities
+├── common/
+│   ├── components/         # Shared UI components
+│   └── lib/                # Shared utilities
+└── config/
 ```
 
 ### 2.2 Applications
@@ -35,18 +32,18 @@ The system includes three SolidJS applications:
 
 | Application  | Purpose                           | Primary Users    |
 | ------------ | --------------------------------- | ---------------- |
-| **Admin**    | Management and configuration      | Internal staff   |
-| **Ops**      | Field execution (offline-capable) | Operations crews |
+| **Admin**    | Management and configuration      | Leadership staff |
+| **Ops**      | Field execution                   | Operations crews |
 | **Customer** | Scheduling and status (read-only) | Customers        |
 
 #### 2.2.1 Shared Infrastructure
 
-- `source/ux/app-common/` - Shared components and utilities
+- `source/ux/common/` - Shared components and utilities
 - All apps use SolidJS + TanStack + Kobalte + Vanilla CSS
 
 #### 2.2.2 Shared Infrastructure
 
-- `source/ux/app-common/` - Shared components and utilities
+- `source/ux/common/` - Shared components and utilities
 - All apps use SolidJS + TanStack + Kobalte + Vanilla CSS
 
 ## 3. API Namespace Integration
@@ -95,7 +92,6 @@ The foundation provides:
 - Per-app config module initializes `Config` singleton
 - Environment-specific `.env` files per deployment
 - See `architecture-core.md` Section 6 for pattern
--
 
 ## 4. Architectural Boundaries
 
@@ -103,16 +99,22 @@ The foundation provides:
 
 #### 4.1.1 UX applications MAY import
 
-- `@ux-api` - Composed API namespace
-- `@domain/abstractions/*` - Domain types
+**Convenience Barrels**
+
 - `@core-std` - Standard types (Id, When, Dictionary)
-- `@ux-app-common/*` - Shared UX components
+- `@ux-api` - Composed API namespace
+
+**Aliases**
+
+- '@core/*' - Core modules
+- `@domain/*` - Domain modules
+- `@ux/common/*` - Shared UX modules
+- `@ux/config/*` - Configuration module
+- `@ux-app-{admin|ops|customer}/*` - Deployment-specific UX modules
 
 #### 4.1.2 UX applications MUST NOT import
 
-- `@core/api/*` - API contracts
-- `@back/*` - Backend edge functions
-- `@domain/adapters/*` - Storage serialization
+- `@back/*` - Backend
 
 #### 4.1.3 Violations detected by architectural guards are build failures.
 
@@ -121,14 +123,21 @@ The foundation provides:
 Each application has its own configuration module:
 
 ```typescript
-// source/ux/app-admin/config/config.ts
-import { BrowserProvider } from '@core/cfg/browser-provider.ts'
+// source/ux/app-admin/config/admin-config.ts
 import { Config } from '@core/cfg/config.ts'
+import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
-Config.init(new BrowserProvider(), [
-  'VITE_SUPABASE_URL',
-  'VITE_SUPABASE_ANON_KEY'
-])
+Config.init(new SolidProvider(), [
+  'VITE_SUPABASE_EDGE_URL',
+  'VITE_SUPABASE_RDBMS_URL',
+  'VITE_SUPABASE_SERVICE_KEY',
+  'VITE_JWT_SECRET'
+], {
+  'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
+  'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
+  'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
+  'JWT_SECRET': 'VITE_JWT_SECRET'
+})
 
 export { Config }
 ```
@@ -136,7 +145,7 @@ export { Config }
 #### 4.2.1 Pattern
 
 - Import `Config` singleton from `@core/cfg/config.ts`
-- Initialize with browser provider and required keys
+- Initialize with SolidProvider and required keys
 - Re-export for use within the app
 - Environment files: `{app}-local.env`, `{app}-stage.env`, `{app}-prod.env`
 
@@ -144,16 +153,16 @@ export { Config }
 
 ### 5.1 Admin Application
 
-- **Runtime:** Browser (desktop/tablet optimized)
+- **Runtime:** Browser (desktop/tablet optimized PWA)
 - **Storage:** Direct Supabase SDK via `api.Users`, `api.Jobs`, etc.
-- **Deployment:** Static files via Netlify CDN
+- **Deployment:** Installable PWA via Netlify CDN
 
 ### 5.2 Ops Application
 
 - **Runtime:** Browser (mobile-optimized PWA)
 - **Storage:** IndexedDB via `api.JobsLocal` when offline, Supabase when online
 - **Offline:** Uses deep-cloned Job aggregates, append-only logs
-- **Deployment:** Installable PWA via Netlify
+- **Deployment:** Installable PWA via Netlify CDN
 
 ### 5.3 Customer Application
 

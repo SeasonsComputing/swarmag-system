@@ -2,11 +2,11 @@
  * Implementation internals of the runtime configuration.
  */
 
-import { StringSet } from '@core-std'
+import { type Dictionary, StringSet } from '@core-std'
 import { RuntimeProvider } from './runtime-provider.ts'
 
 /** Config Aliases */
-type RuntimeAliases = { [key: string]: string }
+type RuntimeAliases = Dictionary<string>
 
 /** Provider used until initialized */
 export const nullProvider: RuntimeProvider = {

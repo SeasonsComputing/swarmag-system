@@ -95,7 +95,7 @@ To facilitate the role a Workflow plays in orchestrating a Job, two abstractions
 
 Job Workflows are prepared prior to Job Work. The Job Assessment phase includes selecting the Workflows to be used on a Job. As each job is different, the Job Assessment may edit the workflows to capture the specialization. Creating, editing, and deleting Workflows are an administration authorization and so are read-only for Job Assessment and Job Plan. A Job Workflow is therefore associated with a basis Workflow (read-only reference) and an optional modified Workflow — which is always a clone of the basis Workflow. The Job Plan phase may add additional basis Workflows and optionally modify them. The Job Plan may also further modify Job Workflows that were already modified during assessment; in that case the assessment-modified Workflow becomes the basis for the Job Plan's modification.
 
-Starting Job Work involves transitioning the Job's status to `executing`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks, presenting the task checklist items as Questions and logging the Answers as Job Work Log entries along with any captured metadata.
+Starting Job Work involves transitioning the Job's status to `executing`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks, presenting the task checklist items as Questions and logging the Answers as Job Work Log entries.
 
 TODO: **Should Job Workflows be assigned to a crew member for execution as part of the Job Plan? Essentially doling out the work to be done vs. each crew member stepping on each other's toes. My intuition is yes. I have not worked through what that means yet. Let's not let this impede today's progress. We must consider how to assign workflows to crew members and how to manage conflicts that may arise at some point soon.**
 
@@ -115,8 +115,9 @@ The domain layer is organized into four sub-layers:
 | --------------- | ---------------------------------------------------------------------------------------------------------- |
 | `abstractions/` | Core domain types and interfaces representing business entities and their relationships                    |
 | `adapters/`     | Serialization logic converting between storage/transport representations and domain abstractions           |
-| `validators/`   | Validation logic ensuring data integrity at system boundaries (both ingress and egress)                    |
 | `protocols/`    | Partial and essential abstraction state definitions for boundary transmission (creation, updates, queries) |
+| `schema/`       | Generated canonical SQL schema (`schema.sql`); authoritative current-state, derived from domain            |
+| `validators/`   | Validation logic ensuring data integrity at system boundaries (both ingress and egress)                    |
 
 ### 2.3 Association Patterns
 
@@ -226,14 +227,15 @@ These types provide consistency and clarity without imposing storage or transpor
 - All other code (ux, edge functions) must import from `source/domain`.
 - Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type` and `Service.requiredAssetTypes`; keep the canonical list in `documentation/foundation/data-lists.md`.
 - Attachments carry a `kind` (`photo` | `video` | `map` | `document`).
-- `Customer.contacts` is non-empty and `primaryContactId` lives on `Customer`.
+- `Customer.contacts` is non-empty; the primary contact is flagged via `Contact.isPrimary`.
 - Locations store coordinates/addresses without a `source` field.
 - `JobAssessment` must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
-- Soft deletes: all lifecycled abstractions expose `deletedAt?: When`; callers treat undefined/null as active, filter queries to `deleted_at IS NULL`, and keep partial unique indexes on active rows so identifiers can be reused after soft delete. Exceptions: append-only logs and pure junction tables.
-- Id strategy: UUID v7 for PK/FK to avoid an Id service, allow offline/preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure junction tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
-- `JobWorkLog` entries are append-only; a `JobWorkLogEntry` with neither `answer` nor `metadata` is invalid — enforced by validator.
+- Lifecycled abstractions extend `Instantiable` from `@core-std` — do not redeclare `id`, `createdAt`, `updatedAt`, `deletedAt?` inline. `Instantiable` carries soft-delete semantics: callers treat `deletedAt` undefined/null as active, filter queries to `deleted_at IS NULL`. Exceptions: append-only logs and pure junction tables.
+- Id strategy: UUID v7 for PK/FK to avoid an Id service, allow preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure junction tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
+- `JobWorkLogEntry` is append-only with a required `answer` field; telemetry and system-generated entries use `QuestionType = 'internal'` — no separate metadata field.
 - `Workflow` masters are read-only to all roles except administrator. Modification during assessment or planning is achieved exclusively by cloning.
 - `JobWork.work` is the finalized execution manifest and is immutable once created.
+- Shared primitive validators (`isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`) live in `@core-std`. Domain-specific guards live in their abstraction's validator file.
 
 ### 2.10 Roles & attribution
 
@@ -258,7 +260,7 @@ The domain layer follows an abstraction-per-file pattern across four subdirector
 - Pure value objects and shared subordinate types (`Location`, `Note`, `Attachment`) live in `common.ts`.
 - Concept-owning types live with their owner (e.g., `Question` and `Answer` in `workflow.ts`).
 - Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-contract.ts`.
-- Shared primitive validators (e.g., `isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`) live in `@core-std`. Domain-specific guards live in their abstraction's validator file.
+- Shared primitive validators live in `@core-std`; domain-specific guards live in their abstraction's validator file.
 
 ## 3. Data Dictionary
 
@@ -278,6 +280,11 @@ When (alias)
 Dictionary (alias)
   Shape: JSON-like key/value map
   Notes: Flexible structured data container
+
+Instantiable (type)
+  Fields: id: Id, createdAt: When, updatedAt: When, deletedAt?: When
+  Notes: Lifecycle base for all persisted abstractions with independent database rows;
+         extend via intersection — do not redeclare these fields inline
 ```
 
 ### 3.2 Common (`@domain/abstractions/common.ts`)
@@ -302,7 +309,7 @@ Note (object)
 ### 3.3 Assets (`@domain/abstractions/asset.ts`)
 
 ```text
-AssetType (object)
+AssetType (Instantiable)
   Fields: id, label, active, createdAt, updatedAt, deletedAt?
   Notes: Reference type for categorizing assets
   Values: foundation/data-lists.md, Section 2. Asset Types
@@ -311,7 +318,7 @@ AssetStatus (enum)
   Values: active | maintenance | retired | reserved
   Notes: Lifecycle/availability state
 
-Asset (object)
+Asset (Instantiable)
   Fields: id, label, description?, serialNumber?, type(AssetType.id),
           status(AssetStatus), notes: [Note?, ...Note[]],
           createdAt, updatedAt, deletedAt?
@@ -329,7 +336,7 @@ ChemicalLabel (object)
   Fields: url, description?
   Notes: Label/document pointer
 
-Chemical (object)
+Chemical (Instantiable)
   Fields: id, name, epaNumber?, usage(ChemicalUsage),
           signalWord?(danger|warning|caution), restrictedUse,
           reEntryIntervalHours?, storageLocation?, sdsUrl?,
@@ -342,20 +349,20 @@ Chemical (object)
 
 ```text
 Contact (object)
-  Fields: id, customerId, name, email?, phone?,
+  Fields: name, email?, phone?, isPrimary,
           preferredChannel?(email|text|phone),
-          notes: [Note?, ...Note[]], createdAt, updatedAt
-  Notes: Customer-associated contact person
+          notes: [Note?, ...Note[]]
+  Notes: Embedded customer contact; isPrimary flags the primary contact
 
 CustomerSite (object)
   Fields: id, customerId, label, location, acreage?,
           notes: [Note?, ...Note[]]
   Notes: Serviceable customer location
 
-Customer (object)
+Customer (Instantiable)
   Fields: id, name, status(active|inactive|prospect), line1, line2?,
           city, state, postalCode, country, accountManagerId?,
-          primaryContactId?, sites: [CustomerSite?, ...CustomerSite[]],
+          sites: [CustomerSite?, ...CustomerSite[]],
           contacts: [Contact, ...Contact[]], notes: [Note?, ...Note[]],
           createdAt, updatedAt, deletedAt?
   Notes: Customer account aggregate; contacts must be non-empty
@@ -368,13 +375,13 @@ ServiceCategory (enum)
   Values: aerial-drone-services | ground-machinery-services
   Notes: Service family classification
 
-Service (object)
+Service (Instantiable)
   Fields: id, name, sku, description?, category(ServiceCategory),
           tagsWorkflowCandidates: [string?, ...string[]],
           notes: [Note?, ...Note[]], createdAt, updatedAt, deletedAt?
   Notes: Sellable operational offering
 
-ServiceRequiredAssetType (object)
+ServiceRequiredAssetType (Junction)
   Fields: serviceId, assetTypeId, deletedAt?
   Notes: Junction — services to required asset types
 ```
@@ -390,11 +397,11 @@ UserRole (union)
   Values: (typeof USER_ROLES)[number]
   Notes: Role type derived from tuple
 
-User (object)
-  Fields: id, displayName, primaryEmail, phoneNumber, avatarUrl?,
+User (Instantiable)
+  Fields: displayName, primaryEmail, phoneNumber, avatarUrl?,
           roles: [UserRole?, ...UserRole[]],
-          status?(active|inactive), createdAt?, updatedAt?, deletedAt?
-  Notes: System user identity and membership
+          status?(active|inactive)
+  Notes: System user identity and membership; extends Instantiable
 ```
 
 ### 3.8 Workflows (`@domain/abstractions/workflow.ts`)
@@ -407,7 +414,9 @@ QuestionType (enum)
     | boolean 
     | single-select 
     | multi-select
-  Notes: Supported question input modes
+    | internal
+  Notes: Supported question input modes; internal is reserved for system-generated
+         log entries such as telemetry, GPS, and operational metadata
 
 QuestionOption (object)
   Fields: value, label?, requiresNote?
@@ -435,7 +444,7 @@ Task (object)
   Fields: id, title, description?, checklist: [Question, ...Question[]]
   Notes: Atomic executable step; checklist must be non-empty
 
-Workflow (object)
+Workflow (Instantiable)
   Fields: id, name, description?, version, tags: [string?, ...string[]],
           tasks: [Task, ...Task[]], createdAt, updatedAt, deletedAt?
   Notes: Versioned execution template; read-only except for administrator role
@@ -456,13 +465,13 @@ JobStatus (enum)
     | 'cancelled'
   Notes: Job lifecycle state
 
-JobAssessment (object)
+JobAssessment (Instantiable)
   Fields: id, jobId, assessorId, locations: [Location, ...Location[]],
           risks: [Note?, ...Note[]], notes: [Note?, ...Note[]],
           createdAt, updatedAt, deletedAt?
   Notes: Pre-planning assessment; requires one or more locations
 
-JobWorkflow (object)
+JobWorkflow (Instantiable)
   Fields: id, jobId, sequence, basisWorkflowId, modifiedWorkflowId?,
           createdAt, updatedAt, deletedAt?
   Notes: Job-specific workflow instance; basisWorkflowId references the
@@ -484,12 +493,12 @@ JobPlanAsset (object)
   Fields: planId, assetId, deletedAt?
   Notes: Asset allocated to a plan
 
-JobPlan (object)
+JobPlan (Instantiable)
   Fields: id, jobId, scheduledStart, scheduledEnd?,
           notes: [Note?, ...Note[]], createdAt, updatedAt, deletedAt?
   Notes: Job-specific execution plan
 
-JobWork (object)
+JobWork (Instantiable)
   Fields: id, jobId, work: [Id, ...Id[]], startedAt, startedById,
           completedAt?, createdAt, updatedAt, deletedAt?
   Notes: Execution record; creation transitions Job to executing;
@@ -498,36 +507,12 @@ JobWork (object)
          execution manifest
 
 JobWorkLogEntry (object)
-  Fields: id, jobId, userId, createdAt
-  Shape: one of:
-    { answer: [Answer], metadata: [Dictionary?] }
-    { answer: [Answer?], metadata: [Dictionary] }
-  Notes: Append-only execution event; answer captures task checklist
-         responses; metadata captures telemetry and operational context;
-         see data-lists.md for canonical metadata key namespace
+  Fields: id, jobId, userId, answer: Answer, createdAt
+  Notes: Append-only execution event; answer is always present and captures
+         both crew checklist responses (text, number, boolean, single-select,
+         multi-select) and system-generated telemetry via internal question type
          
-Job (object)
+Job (Instantiable)
   Fields: id, customerId, status(JobStatus), createdAt, updatedAt, deletedAt?
   Notes: Work agreement lifecycle anchor
-```
-
-## 4. Metadata Key Namespace
-
-Canonical keys for `JobWorkLogEntry.metadata`. Keys use dot-separated hierarchical notation. This list is the seed set and will grow as operational needs surface. Keep the canonical list in `documentation/foundation/data-lists.md`, Section 5. Metadata Keys.
-
-```text
-telemetry.gps.latitude
-telemetry.gps.longitude
-telemetry.gps.altitude
-telemetry.gps.accuracy
-telemetry.battery.percent
-telemetry.battery.voltage
-telemetry.environment.temperatureCelsius
-telemetry.environment.windSpeedMph
-telemetry.environment.windDirection
-telemetry.environment.humidityPercent
-execution.durationSeconds
-execution.crewCount
-response.skipped
-response.skipReason
 ```

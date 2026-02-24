@@ -1,6 +1,7 @@
 # Data Lists
 
-Canonical lists used to seed and align catalog data (services, asset types). Service SKUs and asset types should stay in sync with `source/domain` and any persisted records.
+Canonical lists used to seed and align catalog data (services, asset types). 
+Service SKUs and asset types should stay in sync with `source/domain` and any persisted records.
 
 ## 1. Services
 
@@ -40,21 +41,25 @@ Canonical lists used to seed and align catalog data (services, asset types). Ser
 | Drone Spray Tank        |
 | Drone Granular Hopper   |
 
-## 5. Metadata Keys
+## 5. Internal Questions
 
-| Description                              |
-| ---------------------------------------- |
-| telemetry.gps.latitude                   |
-| telemetry.gps.longitude                  |
-| telemetry.gps.altitude                   |
-| telemetry.gps.accuracy                   |
-| telemetry.battery.percent                |
-| telemetry.battery.voltage                |
-| telemetry.environment.temperatureCelsius |
-| telemetry.environment.windSpeedMph       |
-| telemetry.environment.windDirection      |
-| telemetry.environment.humidityPercent    |
-| execution.durationSeconds                |
-| execution.crewCount                      |
-| response.skipped                         |
-| response.skipReason                      |
+Canonical `Question` instances with `type = 'internal'` used for system-generated telemetry and operational log entries. 
+These are seed data and are referenced by `JobWorkLogEntry.answer.questionId`. 
+The Key is the `Question.prompt` value — for internal questions it serves as both the display value and machine-readable identifier.
+
+| Key (Question.prompt)                    | Answer Type |
+| ---------------------------------------- | ----------- |
+| telemetry.gps.latitude                   | number      |
+| telemetry.gps.longitude                  | number      |
+| telemetry.gps.altitude                   | number      |
+| telemetry.gps.accuracy                   | number      |
+| telemetry.battery.percent                | number      |
+| telemetry.battery.voltage                | number      |
+| telemetry.environment.temperatureCelsius | number      |
+| telemetry.environment.windSpeedMph       | number      |
+| telemetry.environment.windDirection      | text        |
+| telemetry.environment.humidityPercent    | number      |
+| execution.durationSeconds                | number      |
+| execution.crewCount                      | number      |
+| response.skipped                         | boolean     |
+| response.skipReason                      | text        |
