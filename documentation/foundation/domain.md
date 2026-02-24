@@ -125,7 +125,7 @@ Associations between abstractions follow two patterns.
 
 #### 2.3.1 Embedded (JSONB columns)
 
-Subordinate abstractions with no independent lifecycle are embedded directly. Embedded abstractions are always stored as a JSON array in JSONB, regardless of cardinality. Cardinality is expressed in TypeScript using Variadic Tuple Types:
+Subordinate abstractions with no independent lifecycle are embedded directly. Embedded abstractions are always represented as typed TypeScript arrays, regardless of cardinality. The corresponding RDBMS column type is JSONB. Cardinality is expressed in TypeScript using Variadic Tuple Types:
 
 | Notation                           | Cardinality |
 | ---------------------------------- | ----------- |
@@ -382,8 +382,8 @@ Service (Instantiable)
   Notes: Sellable operational offering
 
 ServiceRequiredAssetType (Junction)
-  Fields: serviceId, assetTypeId, deletedAt?
-  Notes: Junction — services to required asset types
+  Fields: serviceId, assetTypeId
+  Notes: Junction — services to required asset types; hard delete only
 ```
 
 ### 3.7 Users (`@domain/abstractions/user.ts`)
