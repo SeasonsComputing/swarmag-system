@@ -220,6 +220,8 @@ FETCH REQUEST-RESPONSE FLOW:
     → Always returns { error: string, details?: string }
 `*/
 
+import type { Dictionary } from '@core-std'
+
 // ───────────────────────────────────────────────────────────────────────────────
 // PUBLIC EXPORTS
 // ───────────────────────────────────────────────────────────────────────────────

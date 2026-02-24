@@ -61,7 +61,8 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | ------ | ---------------------------------------------------------------- |
 | `api/` | Client makers and provider adapters (CRUD, HTTP, business rules) |
 | `cfg/` | Configuration management (Config singleton, runtime providers)   |
-| `std/` | Standard types (Id, When, Dictionary)                            |
+| `db/`  | Cached database client (`supabase.ts`)                           |
+| `std/` | Standard types (Id, When, Dictionary, Instantiable)              |
 
 #### 1.3.2 Domain (`source/domain/`)
 
@@ -70,13 +71,14 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | `abstractions/` | Core domain types (User, Job, Service, Asset, etc.) |
 | `adapters/`     | Storage serialization (Dictionary ↔ domain types)   |
 | `protocols/`    | Input/output contracts (CreateInput, UpdateInput)   |
+| `schema/`       | Generated canonical schema (`schema.sql`)           |
 | `validators/`   | Domain validation rules and invariants              |
 
 #### 1.3.3 Backend (`source/back/`)
 
 | Path             | Description                                  |
 | ---------------- | -------------------------------------------- |
-| `migrations/`    | SQL migrations (schema + RLS policies)       |
+| `migrations/`    | Forward-only SQL deltas and RLS policies     |
 | `supabase-edge/` | Supabase Edge Functions (orchestration only) |
 
 #### 1.3.4 Frontend (`source/ux/`)
@@ -87,7 +89,7 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | `app-admin/`    | Admin PWA application (desktop/tablet)               |
 | `app-ops/`      | Operations PWA application (mobile, field execution) |
 | `app-customer/` | Customer portal application (static, read-only)      |
-| `app-common/`   | Shared UX components and utilities                   |
+| `common/`       | Shared UX components and utilities                   |
 
 ## 2. Local Configuration
 

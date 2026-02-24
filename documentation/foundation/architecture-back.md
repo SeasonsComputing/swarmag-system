@@ -9,7 +9,7 @@ This document defines the backend architecture of the swarmAg system. The backen
 - **Supabase Edge Functions** - Orchestration operations only
 - **PostgreSQL Database** - Persistent storage with Row Level Security
 - **Storage Buckets** - File and image storage
-- **Migrations** - Schema evolution and RLS policies
+- **Migrations** - Forward-only schema deltas and RLS policies
 
 **Prerequisites:** Read `domain.md` and `architecture-core.md` first to understand the domain model and system boundary.
 
@@ -21,7 +21,7 @@ The backend is intentionally minimal. Most operations go **directly to the datab
 
 ```text
 back/
-├── migrations/          # SQL migrations (schema + RLS policies)
+├── migrations/          # Forward-only schema deltas and RLS policies
 └── supabase-edge/
     ├── config/          # Runtime configuration
     └── functions/       # Flat orchestration functions
@@ -59,8 +59,7 @@ Use for operations that coordinate multiple steps without needing HTTP-level con
 // source/back/supabase-edge/functions/job-deep-clone.ts
 import { Config } from '@back-supabase-edge/config/config.ts'
 import type { Dictionary } from '@core-std'
-import { makeBusRuleHttpProvider } from '@core/api/make-http-provider.ts'
-import { Supabase } from '@core/api/supabase.ts'
+import { wrapHttpHandler } from '@core/api/wrap-http-handler.ts'
 
 const handler = async (params: Dictionary): Promise<Dictionary> => {
   const jobId = params.jobId as string
@@ -77,9 +76,7 @@ const handler = async (params: Dictionary): Promise<Dictionary> => {
   return { clonedJobId: clonedJob.id }
 }
 
-const runDeepClone = makeBusRuleHttpProvider(handler, { cors: true })
-
-export default { runDeepClone }
+export default wrapHttpHandler(handler, { cors: true })
 ```
 
 ##### 3.2.1.1 When to use
@@ -96,14 +93,14 @@ Use when you need fine-grained control over HTTP semantics:
 ```typescript
 // source/back/supabase-edge/functions/jobs-batch-update.ts
 import type { Dictionary } from '@core-std'
+import type { HttpRequest, HttpResponse } from '@core/api/wrap-http-handler.ts'
 import {
   toBadRequest,
   toMethodNotAllowed,
   toOk,
   toUnprocessable,
   wrapHttpHandler
-} from '@core/api/http-handler.ts'
-import type { HttpRequest, HttpResponse } from '@core/api/http-handler.ts'
+} from '@core/api/wrap-http-handler.ts'
 import { validateJobBatchUpdate } from '@domain/validators/job-validator.ts'
 
 const handler = async (req: HttpRequest): Promise<HttpResponse> => {
@@ -172,15 +169,17 @@ Edge functions do NOT:
 
 ### 4.1 PostgreSQL Schema
 
-Schema is defined in SQL migrations under `source/back/migrations/`.
+The canonical schema lives in `source/domain/schema/schema.sql` and is generated from the domain model. It is the authoritative current-state SQL — not a migration. Migrations in `source/back/migrations/` are forward-only change records that express deltas from one schema state to the next.
+
+**Do not define the schema in migrations.** The schema file is the source of truth; migrations derive from it.
 
 #### 4.1.1 Migration Rules
 
 - One migration per conceptual change
 - Timestamp-based naming: `YYYYMMDDHHMMSS_description.sql`
-- Never modify deployed migrations (forward-only)
-- Include both UP and DOWN operations
-- Define tables in 4th Normal Form (4NF) by default
+- Forward-only — never modify deployed migrations
+- Express deltas only (ALTER TABLE, CREATE INDEX, new RLS policies, etc.)
+- Do not repeat full table definitions — those belong in the schema file
 
 #### 4.1.2 JSONB Exceptions
 
@@ -193,17 +192,7 @@ Use JSONB only for:
 
 #### 4.1.3 Seed Data
 
-Initial catalog values for `Services` and `AssetTypes` are defined in `documentation/foundation/data-lists.md`. These should be loaded via a dedicated seed migration after schema creation.
-
-#### 4.1.4 Example Seed Migration
-
-```sql
--- Load canonical service catalog
-INSERT INTO services (id, name, sku, category, created_at, updated_at) VALUES
-  (gen_random_uuid(), 'Pesticide, Herbicide', 'A-CHEM-01', 'aerial-drone-services', now(), now()),
-  (gen_random_uuid(), 'Mesquite Removal', 'G-MITI-01', 'ground-machinery-services', now(), now());
-  -- ... (see data-lists.md for complete catalog)
-```
+Initial catalog values for `Services`, `AssetTypes`, and canonical `internal` Questions are defined in `documentation/foundation/data-lists.md`. These should be loaded via a dedicated seed migration after schema creation.
 
 ### 4.2 Row Level Security (RLS)
 
@@ -331,7 +320,7 @@ JWT_SECRET=your-jwt-secret-here
 
 ```typescript
 import { Config } from '@back-supabase-edge/config/config.ts'
-import { wrapHttpHandler } from '@core/api/http-handler.ts'
+import { wrapHttpHandler } from '@core/api/wrap-http-handler.ts'
 import type { Dictionary } from '@core-std'
 
 const async runBusRule = (input: Dictionary): Promise<Dictionary> => {
@@ -438,8 +427,9 @@ const handler = async (input: Dictionary): Promise<Dictionary> => {
 2. **RLS is authoritative** - Authorization lives in database, not application
 3. **Direct-to-DB preferred** - Only use edge functions when SDK client can't suffice
 4. **Adapters are shared** - Same serialization logic for edge functions and UX clients
-5. **Migrations are forward-only** - Never modify deployed migrations
-6. **Soft delete everywhere** - Except append-only logs and pure joins
-7. **Functions stay flat** - No subdirectories (platform requirement)
+5. **Schema lives in domain** - `source/domain/schema/schema.sql` is the canonical current state; generated from domain
+6. **Migrations are forward-only** - Express deltas only; never modify deployed migrations
+7. **Soft delete via Instantiable** - Except append-only logs and pure joins
+8. **Functions stay flat** - No subdirectories (platform requirement)
 
 _End of Architecture Backend Document_

@@ -46,6 +46,16 @@ export class ApiError extends Error {
   }
 }
 
+/** ApiError handler */
+export function apiError(error: unknown): boolean {
+  if (error instanceof ApiError) {
+    console.error(`${error.status}: ${error.message}`)
+    if (error.details) console.error(error.details)
+    return true
+  }
+  return false
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // CRUD & Business Rule API Contracts
 // ────────────────────────────────────────────────────────────────────────────

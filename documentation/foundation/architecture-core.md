@@ -183,10 +183,10 @@ import { makeCrudSupabaseClient } from '@core/api/make-supabase-client.ts'
 // API namespace composed from client makers
 export const api = {
   // Domain abstractions using appropriate storage bindings
-  Users: makeCrudRdbmsClient<User, UserCreateInput, UserUpdateInput>({
+  Users: makeCrudSupabaseClient<User, UserCreateInput, UserUpdateInput>({
     table: 'users'
   }),
-  Customers: makeCrudRdbmsClient<Customer, CustomerCreateInput, CustomerUpdateInput>({
+  Customers: makeCrudSupabaseClient<Customer, CustomerCreateInput, CustomerUpdateInput>({
     table: 'customers'
   }),
 
@@ -252,11 +252,9 @@ All client makers throw `ApiError` on failures. Applications handle errors unifo
 ```typescript
 try {
   const user = await api.Users.get(userId)
+  ...
 } catch (error) {
-  if (error instanceof ApiError) {
-    console.error(`${error.status}: ${error.message}`)
-    if (error.details) console.error(error.details)
-  }
+  if (!apiError(error)) throw error
 }
 ```
 
@@ -286,7 +284,7 @@ Each maker takes a specification object and returns a fully-typed client:
 
 ```typescript
 // CRUD maker
-const Users = makeCrudRdbmsClient<User, UserCreateInput, UserUpdateInput>({
+const Users = makeCrudSupabaseClient<User, UserCreateInput, UserUpdateInput>({
   table: 'users'
 })
 await Users.create({ displayName: 'Ada', email: 'ada@example.com' })
@@ -383,6 +381,7 @@ Runtime providers implement the `RuntimeProvider` interface:
 // source/core/cfg/runtime-provider.ts
 export interface RuntimeProvider {
   get(key: string): string | undefined
+  fail(key: string): never
 }
 ```
 
@@ -429,21 +428,17 @@ Vite requires client-side environment variables to carry a `VITE_` prefix. The a
 import { Config } from '@core/cfg/config.ts'
 import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
-Config.init(
-  new SolidProvider(),
-  [
-    'VITE_SUPABASE_EDGE_URL',
-    'VITE_SUPABASE_RDBMS_URL',
-    'VITE_SUPABASE_SERVICE_KEY',
-    'VITE_JWT_SECRET'
-  ],
-  {
-    'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
-    'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
-    'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
-    'JWT_SECRET': 'VITE_JWT_SECRET'
-  }
-)
+Config.init(new SolidProvider(), [
+  'VITE_SUPABASE_EDGE_URL',
+  'VITE_SUPABASE_RDBMS_URL',
+  'VITE_SUPABASE_SERVICE_KEY',
+  'VITE_JWT_SECRET'
+], {
+  'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
+  'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
+  'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
+  'JWT_SECRET': 'VITE_JWT_SECRET'
+})
 
 export { Config }
 ```
@@ -457,13 +452,13 @@ Code within a package always imports from the package-local configuration module
 ```typescript
 // Import from package config using alias (CORRECT)
 import { Config } from '@back-supabase-edge/config/config.ts'
-const url = Config.get('SUPABASE_URL')
+const url = Config.get('SUPABASE_RDBMS_URL')
 
 // It's ok for configs to be shared across packages
 // This same config is bundled with each deployment package
 //
 import { Config } from '@ux/config/config.ts'
-const url = Config.get('SUPABASE_URL')
+const url = Config.get('SUPABASE_RDBMS_URL')
 
 // Never use relative paths climbing namespace tree (INCORRECT)
 // ❌ import { Config } from '../config/config.ts'
@@ -568,11 +563,13 @@ swarmag-system/
 │   ├── core/
 │   │   ├── api/
 │   │   ├── cfg/
+│   │   ├── db/
 │   │   └── std/
 │   ├── domain/
 │   │   ├── abstractions/
 │   │   ├── adapters/
 │   │   ├── protocols/
+│   │   ├── schema/
 │   │   └── validators/
 │   ├── back/
 │   │   ├── migrations/
@@ -587,7 +584,7 @@ swarmag-system/
 │   │   │   └── config/
 │   │   ├── app-ops/
 │   │   │   └── config/
-│   │   └── app-common/
+│   │   └── common/
 │   │       ├── components/
 │   │       └── lib/
 │   ├── devops/
@@ -619,14 +616,13 @@ swarmag-system/
     "@ux-api": "./source/ux/api/api.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Package Aliases
+    // Deployment Package Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
     "@back-supabase-edge/": "./source/back/supabase-edge/",
     "@ux-app-ops/": "./source/ux/app-ops/",
     "@ux-app-admin/": "./source/ux/app-admin/",
     "@ux-app-customer/": "./source/ux/app-customer/",
-    "@ux-app-common/": "./source/ux/app-common/",
 
     // ────────────────────────────────────────────────────────────────────────────
     // Vendor Aliases
@@ -791,9 +787,10 @@ These rules must never be violated. Code that violates these invariants is wrong
 - Logs are append-only (no merge conflicts)
 - Network required only for clone preparation and log upload
 
-#### 10.1.6 Soft delete everywhere
+#### 10.1.6 Soft delete via Instantiable
 
-- All lifecycled entities expose `deletedAt?: When`
+- All lifecycled abstractions extend `Instantiable` from `@core-std`, which carries `id`, `createdAt`, `updatedAt`, `deletedAt?`
+- Do not redeclare these fields inline — extend via intersection
 - Queries filter `WHERE deleted_at IS NULL`
 - Hard deletes only under explicit data retention policies
 - Exceptions: append-only logs and pure join tables
@@ -843,9 +840,10 @@ When invariants conflict with convenience, **invariants win**.
 
 1. Update `domain.md` (solution space, then domain model)
 2. Implement domain abstractions, validators, protocols, and adapters
-3. Update schema and create migration
-4. Implement backend functions
-5. Update UX application integration
+3. Regenerate `source/domain/schema/schema.sql` from domain
+4. Write a forward-only migration in `source/back/migrations/` for the delta
+5. Implement backend functions
+6. Update UX application integration
 
 Domain changes flow unidirectionally through the system.
 
@@ -862,13 +860,13 @@ New clients are added by composing makers in the `@ux-api` namespace:
 
 ```typescript
 // source/ux/api/api.ts
-import { makeCrudRdbmsClient } from '@core/api/client-crud-supabase.ts'
+import { makeCrudSupabaseClient } from '@core/api/make-supabase-client.ts'
 
 export const api = {
   // ... existing clients
 
   // New domain abstraction
-  Services: makeCrudRdbmsClient<
+  Services: makeCrudSupabaseClient<
     Service,
     ServiceCreateInput,
     ServiceUpdateInput
