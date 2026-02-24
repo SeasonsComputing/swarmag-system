@@ -1,204 +1,304 @@
 # Domain Package Regeneration Prompt
 
-## Mission
+You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no architectural authority. Implement exactly what is specified. Do not invent abstractions, reinterpret intent, or cross architectural boundaries.
 
-Generate the complete `source/domain/` package from scratch. Do not read or reference any
-existing files under `source/domain/`. The authoritative sources are:
+## Authority
 
-- `documentation/foundation/domain.md` — domain model, data dictionary, rules
-- `documentation/foundation/style-guide.md` — file format, naming, code tone
-- `documentation/foundation/architecture-core.md` — structural law, import discipline, layering
-- `CONSTITUTION.md` — governing law; overrides all else in conflict
+`domain.md` is the single source of truth for all types, shapes, and invariants. `style-guide.md` governs all code conventions. `CONSTITUTION.md` governs all behavior. `architecture-core.md` governs all architectural decisions. In case of conflict: `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `style-guide.md`. 
 
-## File Format — Non-Negotiable
+Ingest all of these files prior to assessing your tasks.
 
-**All files in `source/domain/` use Spec Style per `style-guide.md §4.1`.**
-This applies to all four archetypes without exception: abstractions, adapters, validators,
-protocols. No box headers. No dash-rules. No section dividers. No PURPOSE blocks.
-Spec style means:
+## Task
 
-- Module-level JSDoc block at the top of every file
-- Single-sentence `/** */` on every exported type, function, and constant where the name
-  alone is insufficient
-- Nothing else
+Regenerate the entire `source/domain/` package from scratch. Delete existing files and replace them completely. Do not patch.
+Confirm that you have no conflicts, questions or concerns prior to generating the domain package.
 
-## Naming — Non-Negotiable
+## Target File Inventory
 
-| Symbol class               | Convention      | Example                          |
-| -------------------------- | --------------- | -------------------------------- |
-| Files                      | kebab-case      | `job-adapter.ts`                 |
-| Types, aliases, unions     | PascalCase      | `JobStatus`, `AssetType`         |
-| Functions, arrow functions | camelCase       | `toAsset`, `validateAssetCreate` |
-| Global immutable constants | SCREAMING_SNAKE | `USER_ROLES`                     |
-
-**Acronyms are words.** All words transform to their symbol class convention. No exceptions.
-`Id` not `ID`. `isId` not `isID`. `Url` not `URL`. `Api` not `API`.
-
-## Type vs Interface — Non-Negotiable
-
-`type` for all domain abstractions, object shapes, aliases, and unions. Always.
-`interface` is reserved exclusively for API contracts that something explicitly implements.
-There are no such contracts in `source/domain/`. Therefore: zero `interface` declarations
-in the domain package.
-
-## Imports — Non-Negotiable
-
-### From `@core-std`
-
-```typescript
-import type { Dictionary, Id, When } from '@core-std'
-import { isId, isWhen, notValid } from '@core-std'
-import { isNonEmptyString, isPositiveNumber } from '@core-std'
+```
+source/domain/
+  abstractions/
+    common.ts
+    asset.ts
+    chemical.ts
+    customer.ts
+    service.ts
+    user.ts
+    workflow.ts
+    job.ts
+  adapters/
+    common-adapter.ts
+    asset-adapter.ts
+    chemical-adapter.ts
+    customer-adapter.ts
+    service-adapter.ts
+    user-adapter.ts
+    workflow-adapter.ts
+    job-adapter.ts
+  protocols/
+    asset-protocol.ts
+    chemical-protocol.ts
+    customer-protocol.ts
+    service-protocol.ts
+    user-protocol.ts
+    workflow-protocol.ts
+    job-protocol.ts
+  validators/
+    asset-validator.ts
+    chemical-validator.ts
+    customer-validator.ts
+    service-validator.ts
+    user-validator.ts
+    workflow-validator.ts
+    job-validator.ts
 ```
 
-Do not reimplement `isId`, `isWhen`, `isNonEmptyString`, or `isPositiveNumber` locally.
-Do not invent local equivalents. Import from `@core-std` and use directly.
+`schema/schema.sql` is generated separately. Do not create it here.
 
-### Cross-domain
+## Formatting Rules (non-negotiable)
 
-```typescript
-import type { Note } from '@domain/abstractions/common.ts'
+- No semicolons
+- Single quotes for all string literals
+- TypeScript strict mode
+- No `any` — use `unknown` at boundaries, cast after validation
+- No inline `id`, `createdAt`, `updatedAt`, `deletedAt?` on Instantiable types — extend via intersection only
+
+## Import Aliases
+
+Use these aliases exactly — trailing slashes required on directory aliases:
+
 ```
-
-Always use the full path alias. Never use relative imports across top-level namespaces.
+@core-std       → source/core/std/std.ts       (barrel: Id, When, Dictionary, Instantiable, notValid, isNonEmptyString, isId, isWhen, isPositiveNumber)
+@core/          → source/core/
+@domain/        → source/domain/
+```
 
 ## Abstraction Rules (`abstractions/`)
 
-- One file per abstraction, named `{abstraction}.ts`
-- Shared subordinate types (`Location`, `Note`, `Attachment`) live in `common.ts`
-- Embedded subordinate types use variadic tuple notation:
-  - `[Type?, ...Type[]]` — zero or more
-  - `[Type, ...Type[]]` — one or more
-  - `[Type]` — exactly one
-- All lifecycled abstractions expose `deletedAt?: When`
-- Exceptions: append-only log entries and pure junction types (no `deletedAt`)
-- JSON-serializable only; no methods on domain objects
+### File format
 
-## Adapter Rules (`adapters/`)
+Spec files — type declarations, enums, pure domain shapes:
+- No box header. Top-level JSDoc block: one paragraph, domain context only.
+- Single-sentence `/** */` on every exported type and enum, only where the name alone is insufficient.
+- No section dividers. No inline comments beyond JSDoc.
 
-- Two functions per abstraction: `toAbstraction(dict: Dictionary): Abstraction`
-  and `fromAbstraction(abstraction: Abstraction): Dictionary`
-- Map every field explicitly, column by column. No spread. No shortcuts.
-- `snake_case` keys for database columns; `camelCase` for domain fields
-- JSONB columns (notes, attachments, embedded arrays) map as objects.
-  Never serialize the object using`JSON.parse()` or `JSON.stringify()`.
-  Supabase deserializes JSONB automatically.
-- Fast-fail on missing required fields: use `notValid` from `@core-std` with a descriptive message
-- No payload-as-truth pattern. No `payload` field. No legacy fallback branches.
-- No private helper functions invented inside the adapter file
+### Instantiable pattern
 
-## Validator Rules (`validators/`)
-
-- One validate function per protocol input type
-- Signature: `validateAbstractionCreate(input): string | null`
-  and `validateAbstractionUpdate(input): string | null`
-- Return an error message string on failure, `null` on success
-- Use `isId`, `isWhen`, `isNonEmptyString`, `isPositiveNumber` from `@core-std`
-- Do not invent local type guards — use canonical imports
-- Validate at boundaries only; no re-validation inside domain logic
-- If a protocol type exists, its validator must exist — complete the vertical slice
-
-## Protocol Rules (`protocols/`)
-
-- Input types for create and update operations only
-- Naming: `AbstractionCreateInput`, `AbstractionUpdateInput`
-- Partial shapes — only fields relevant to the operation
-- Omit: `id`, `createdAt`, `updatedAt`, `deletedAt` from create inputs
-- No domain logic; protocols are pure data shapes for transmission
-
-## JobStatus — Updated Values
-
-The `JobStatus` union has been redesigned. Use these values exactly. Do not use the old
-values from any prior source.
+Lifecycled abstractions extend `Instantiable` from `@core-std` via intersection. Do not redeclare `id`, `createdAt`, `updatedAt`, `deletedAt?` inline:
 
 ```typescript
-export type JobStatus =
-  | 'open'
-  | 'assessing'
-  | 'planning'
-  | 'preparing'
-  | 'executing'
-  | 'finalizing'
-  | 'closed'
-  | 'cancelled'
+import type { Instantiable } from '@core-std'
+
+export type Asset = Instantiable & {
+  label: string
+  // ... domain fields only
+}
 ```
 
-`closed` and `cancelled` are terminal states. All others are active present-tense states
-describing what the job is currently doing. Do not use: `opened`, `assessed`, `planned`,
-`inprogress`, `completed`, or any prior form.
+Instantiable types per `domain.md`:
+`AssetType`, `Asset`, `Chemical`, `Customer`, `Service`, `Workflow`,
+`Job`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobWork`, `User`
 
-## File Inventory
+Non-Instantiable types (value objects, junctions, embeds) do not extend Instantiable even if they carry some lifecycle-like fields.
 
-Generate all of the following files. Every abstraction gets all four archetypes.
+### Variadic tuple notation
 
-### `source/domain/abstractions/`
+Embedded subordinate collections use variadic tuples to express cardinality:
 
-- `common.ts` — `Location`, `Attachment`, `Note`
-- `asset.ts` — `AssetType`, `AssetStatus`, `Asset`
-- `chemical.ts` — `ChemicalUsage`, `ChemicalLabel`, `Chemical`
-- `customer.ts` — `Contact`, `CustomerSite`, `Customer`
-- `service.ts` — `ServiceCategory`, `Service`, `ServiceRequiredAssetType`
-- `user.ts` — `USER_ROLES`, `UserRole`, `User`
-- `workflow.ts` — `QuestionType`, `QuestionOption`, `Question`, `AnswerValue`, `Answer`, `Task`, `Workflow`
-- `job.ts` — `JobStatus`, `Job`, `JobAssessment`, `JobWorkflow`, `JobPlanAssignment`, `JobPlanChemical`, `JobPlanAsset`, `JobPlan`, `JobWork`, `JobWorkLogEntry`
+| Notation     | Cardinality |
+| ------------ | ----------- |
+| `[T]`        | exactly 1   |
+| `[T?]`       | 0 or 1      |
+| `[T, ...T[]]`  | 1 or more   |
+| `[T?, ...T[]]` | 0 or more   |
 
-### `source/domain/adapters/`
+### Type vs interface
 
-- `asset-adapter.ts`
-- `chemical-adapter.ts`
-- `customer-adapter.ts`
-- `service-adapter.ts`
-- `user-adapter.ts`
-- `workflow-adapter.ts`
-- `job-adapter.ts`
+- `type` for all domain shapes, aliases, unions, and enums
+- `interface` only for contracts that something explicitly implements (`ApiCrudContract`, `RuntimeProvider`)
 
-### `source/domain/validators/`
+### Placement rules
 
-- `asset-validator.ts`
-- `chemical-validator.ts`
-- `customer-validator.ts`
-- `service-validator.ts`
-- `user-validator.ts`
-- `workflow-validator.ts`
-- `job-validator.ts`
+- `Location`, `Note`, `Attachment` → `common.ts`
+- `Question`, `Answer`, `Task`, `QuestionType`, `QuestionOption`, `AnswerValue` → `workflow.ts`
+- `JobStatus`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobPlanAssignment`, `JobPlanChemical`, `JobPlanAsset`, `JobWork`, `JobWorkLogEntry`, `Job` → `job.ts`
+- All others in their named file
 
-### `source/domain/protocols/`
-
-- `asset-protocol.ts`
-- `chemical-protocol.ts`
-- `customer-protocol.ts`
-- `service-protocol.ts`
-- `user-protocol.ts`
-- `workflow-protocol.ts`
-- `job-protocol.ts`
-
-## Domain Model Reference
-
-Refer to `documentation/foundation/domain.md` Section 3 (Data Dictionary) for the complete
-field-level specification of every abstraction. That document is the authoritative source
-for field names, types, cardinality, and constraints.
-Notable rules from `domain.md §2.9`:
+### Notable invariants from `domain.md §2.9`
 
 - `Customer.contacts` is non-empty: `[Contact, ...Contact[]]`
+- `Contact.isPrimary` flags the primary contact — `Customer` has no `primaryContactId` field
+- `Contact` is a pure embedded value object — no `id`, no lifecycle fields
 - `Task.checklist` is non-empty: `[Question, ...Question[]]`
 - `Workflow.tasks` is non-empty: `[Task, ...Task[]]`
 - `JobAssessment.locations` is non-empty: `[Location, ...Location[]]`
-- `JobWorkLogEntry` uses a discriminated union to structurally enforce that at least one of
-  `answer` or `metadata` is present:
-
-```typescript
-export type JobWorkLogEntry =
-  & {
+- `JobWorkLogEntry` is a flat type with required `answer` — no discriminated union, no `metadata` field:
+  ```typescript
+  export type JobWorkLogEntry = {
     id: Id
     jobId: Id
     userId: Id
+    answer: Answer
     createdAt: When
   }
-  & (
-    | { answer: Answer; metadata?: Dictionary }
-    | { answer?: Answer; metadata: Dictionary }
-  )
-```
-
+  ```
+- Telemetry uses `QuestionType = 'internal'` — same `Answer` structure, no special casing
 - `JobWork.work` is immutable once created
 - `Workflow` masters are read-only except for administrator role
+- `User` extends `Instantiable` — `createdAt`/`updatedAt` are required, enforced at persistence layer
+
+## Adapter Rules (`adapters/`)
+
+### File format
+
+Functional files — box header with PURPOSE and EXPORTED APIs sections:
+
+```typescript
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ {Abstraction} adapter                                                       ║
+║ Dictionary ↔ {Abstraction} serialization                                    ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Converts between Supabase row dictionaries and {Abstraction} domain types.
+
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+to{Abstraction}(dict: Dictionary): {Abstraction}
+from{Abstraction}({abstraction}: {Abstraction}): Dictionary
+*/
+```
+
+### Adapter pattern
+
+```typescript
+import type { Dictionary, When } from '@core-std'
+import { notValid } from '@core-std'
+import type { Job } from '@domain/abstractions/job.ts'
+
+export const toJob = (dict: Dictionary): Job => {
+  if (!dict.id) return notValid('Job dictionary missing required field: id')
+  if (!dict.customer_id) return notValid('Job dictionary missing required field: customer_id')
+  return {
+    id: dict.id as string,
+    customerId: dict.customer_id as string,
+    status: dict.status as JobStatus,
+    createdAt: dict.created_at as When,
+    updatedAt: dict.updated_at as When,
+    deletedAt: dict.deleted_at as When | undefined,
+  }
+}
+
+export const fromJob = (job: Job): Dictionary => ({
+  id: job.id,
+  customer_id: job.customerId,
+  status: job.status,
+  created_at: job.createdAt,
+  updated_at: job.updatedAt,
+  deleted_at: job.deletedAt,
+})
+```
+
+### Adapter rules
+
+- Functions only — `to{Abstraction}` and `from{Abstraction}`
+- Map every field explicitly — no `...spread`, no `payload` shortcut
+- `snake_case` for database column names; `camelCase` for domain fields
+- Fast-fail on missing required fields using `notValid` from `@core-std`
+- `notValid` returns `never` — place all `notValid` calls before the return statement, never inside or after it. The compiler must see an unconditional return after all guards.
+- Pattern: validate all required fields first (each returning `notValid(...)`), then return the constructed object as the single final statement. This satisfies TypeScript control flow analysis.
+- JSONB columns (embedded subordinate compositions) are handled automatically by the Supabase SDK — no `JSON.parse()` or `JSON.stringify()` needed; map the field by name and trust the type
+- Embedded subordinate associations are **always** stored as a JSON array, regardless of cardinality — even a single embedded object uses `[object]`. Empty is `[]`. Never `null`, never a bare object.
+
+## Protocol Rules (`protocols/`)
+
+### File format
+
+Spec file format — top JSDoc block, no box header.
+
+### Protocol pattern
+
+```typescript
+import type { Id } from '@core-std'
+import type { JobStatus } from '@domain/abstractions/job.ts'
+
+/** Input for creating a Job. */
+export type JobCreateInput = {
+  customerId: Id
+}
+
+/** Input for updating a Job. */
+export type JobUpdateInput = {
+  id: Id
+  status?: JobStatus
+}
+```
+
+### Protocol rules
+
+- `{Abstraction}CreateInput` and `{Abstraction}UpdateInput` for each lifecycled abstraction
+- Partial shapes — only fields relevant to the operation
+- `UpdateInput` always includes `id: Id`
+- No domain logic; protocols are data shapes for transmission only
+- Read-only abstractions (`Workflow` masters) may omit `UpdateInput`
+
+## Validator Rules (`validators/`)
+
+### File format
+
+Functional files — box header with PURPOSE and EXPORTED APIs.
+
+### Validator pattern
+
+```typescript
+import { isNonEmptyString, isId } from '@core-std'
+import type { JobCreateInput } from '@domain/protocols/job-protocol.ts'
+
+/** Confirm `JobCreateInput` validity; return message on failure otherwise null */
+export const validateJobCreate = (input: unknown): string | null => {
+  if (!input || typeof input !== 'object') return 'input must be an object'
+  const i = input as Record<string, unknown>
+  if (!isId(i.customerId)) return 'customerId must be a valid Id'
+  return null
+}
+```
+
+### Validator rules
+
+- Return `string | null` — error message or `null` for valid
+- Validate at system boundaries only; never re-validate inside domain logic
+- Use primitive validators from `@core-std`: `isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`
+- Domain-specific guards defined inline in their validator file
+- No throwing — validators return, not throw; callers decide what to do with errors
+
+## Data Dictionary Reference
+
+Reproduce types exactly as specified in `domain.md §3`. Key mappings:
+
+| DD notation                                  | TypeScript                              |
+| -------------------------------------------- | --------------------------------------- |
+| `(Instantiable)`                             | `= Instantiable & { ... }`              |
+| `(object)`                                   | `= { ... }`                             |
+| `(enum)`                                     | `= 'val1' \| 'val2'`                    |
+| `(union)`                                    | `= TypeA \| TypeB`                      |
+| `(alias)`                                    | `= PrimitiveType`                       |
+| `(Junction)`                                 | plain object, no Instantiable           |
+| `Fields: id, ...` on Instantiable            | omit `id` — provided by Instantiable    |
+| `field(TypeA\|TypeB)`                        | `field: TypeA \| TypeB`                 |
+| `[T, ...T[]]`                                | variadic tuple as written               |
+| `createdAt, updatedAt, deletedAt?` on Instantiable | omit — provided by Instantiable   |
+
+## Quality Bar
+
+The output must pass `deno task check` without errors. Before finalizing each file verify:
+
+1. Every `Instantiable` type uses intersection — no inline lifecycle fields
+2. Every adapter validates all required fields with `notValid` calls before the single return statement
+3. Every adapter function has exactly one return path (the constructed object)
+4. No semicolons anywhere
+5. Single quotes everywhere
+6. No `any`
+7. All imports use correct aliases with trailing slashes on directory aliases
+8. `common.ts` types imported into every file that references them
