@@ -1,4 +1,4 @@
-# Architecture: swarmAg System — Backend
+# swarmAg System — Architecture Backend
 
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
 

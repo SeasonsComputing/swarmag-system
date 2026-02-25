@@ -3,9 +3,12 @@
  */
 
 import { Config } from '@core/cfg/config.ts'
-import { ProviderNetlify } from '@core/cfg/supabase-provider.ts'
+import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
-Config.provider(new SupabaseProvider())
-Config.init(['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET'])
+Config.init(new SupabaseProvider(), [
+  'SUPABASE_RDBMS_URL',
+  'SUPABASE_SERVICE_KEY',
+  'JWT_SECRET'
+])
 
 export { Config }
