@@ -6,7 +6,8 @@
 
 Implementation patterns for the `source/domain/` package. This document governs **how** domain meaning is expressed in code. For **what** the domain means, see `domain.md`.
 
-Authority chain for implementation: `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → this document → `style-guide.md`.
+Authority chain for implementation:
+  `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md` → `style-guide.md`
 
 ## 2. File Organization
 
@@ -17,7 +18,7 @@ The domain layer follows an abstraction-per-file pattern across five subdirector
 | `abstractions/` | `{abstraction}.ts`           | TypeScript types — the domain truth                  |
 | `adapters/`     | `{abstraction}-adapter.ts`   | Dictionary ↔ domain type serialization               |
 | `protocols/`    | `{abstraction}-protocol.ts`  | Create/update input shapes for boundary transmission |
-| `validators/`   | `{abstraction}-validator.ts` | Boundary validation — returns `string | null`        |
+| `validators/`   | `{abstraction}-validator.ts` | Boundary validation — returns `string                |
 | `schema/`       | `schema.sql`                 | Generated canonical PostgreSQL schema                |
 
 **Placement rules:**
@@ -28,30 +29,13 @@ The domain layer follows an abstraction-per-file pattern across five subdirector
 - Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) → `@core/api/api-contract.ts`
 - Shared primitive validators → `@core-std`; domain-specific guards → their abstraction's validator file
 
+### 2.1 File format
+
+All domain files must conform to `style-guide.md` section 6.1 Spec files.
+
 ## 3. Abstraction Archetype (`abstractions/`)
 
-### 3.1 File format
-
-Spec files — pure type declarations. No box header.
-
-```typescript
-/**
- * One paragraph. Domain context only. What this file models and why.
- */
-
-import type { Instantiable } from '@core-std'
-import type { CompositionMany, AssociationOne } from '@core-std'
-import type { Note } from '@domain/abstractions/common.ts'
-
-/** Single-sentence JSDoc — only where the name alone is insufficient. */
-export type Asset = Instantiable & {
-  label: string
-  type: AssociationOne<AssetType>
-  notes: CompositionMany<Note>
-}
-```
-
-### 3.2 Rules
+### 3.1 Rules
 
 - `type` for all domain shapes, aliases, unions, enums. `interface` only for contracts that something explicitly implements.
 - Lifecycled abstractions extend `Instantiable` via intersection — never redeclare `id`, `createdAt`, `updatedAt`, `deletedAt?` inline.
@@ -60,7 +44,7 @@ export type Asset = Instantiable & {
 - JSON-serializable only — no methods on domain objects.
 - No variadic tuple types anywhere.
 
-### 3.3 Relation type reference
+### 3.2 Relation type reference
 
 | Use case                        | Type                     |
 | ------------------------------- | ------------------------ |
@@ -70,40 +54,22 @@ export type Asset = Instantiable & {
 | Embed 1 or more                 | `CompositionPositive<T>` |
 | Required FK (many side of 1:m)  | `AssociationOne<T>`      |
 | Optional FK (nullable column)   | `AssociationOptional<T>` |
-| Junction FK (both sides of m:m) | `AssociationJunction<T>`     |
+| Junction FK (both sides of m:m) | `AssociationJunction<T>` |
 
 ## 4. Adapter Archetype (`adapters/`)
 
-### 4.1 File format
-
-Functional file — box header with PURPOSE and EXPORTED APIs:
+### 4.1 Pattern
 
 ```typescript
-/*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Asset adapter                                                               ║
-║ Dictionary ↔ Asset serialization                                            ║
-╚═════════════════════════════════════════════════════════════════════════════╝
-
-PURPOSE
-───────────────────────────────────────────────────────────────────────────────
-Converts between Supabase row dictionaries and Asset domain types.
-
-EXPORTED APIs & TYPEs
-───────────────────────────────────────────────────────────────────────────────
-toAsset(dict: Dictionary): Asset
-fromAsset(asset: Asset): Dictionary
-*/
-```
-
-### 4.2 Pattern
-
-```typescript
+/**
+ * Asset et al adapters to and from Dictionary representation
+ */
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
 import type { Asset } from '@domain/abstractions/asset.ts'
-import { toNote, fromNote } from '@domain/adapters/common-adapter.ts'
+import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
+/** Create an Asset instance from dictionary representation */
 export const toAsset = (dict: Dictionary): Asset => {
   if (!dict.id) return notValid('Asset dictionary missing required field: id')
   if (!dict.label) return notValid('Asset dictionary missing required field: label')
@@ -115,10 +81,11 @@ export const toAsset = (dict: Dictionary): Asset => {
     notes: (dict.notes as Note[]).map(toNote),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined,
+    deletedAt: dict.deleted_at as When | undefined
   }
 }
 
+/** Create a dictionary representation of Asset instance */
 export const fromAsset = (asset: Asset): Dictionary => ({
   id: asset.id,
   label: asset.label,
@@ -127,11 +94,11 @@ export const fromAsset = (asset: Asset): Dictionary => ({
   notes: asset.notes.map(fromNote),
   created_at: asset.createdAt,
   updated_at: asset.updatedAt,
-  deleted_at: asset.deletedAt,
+  deleted_at: asset.deletedAt
 })
 ```
 
-### 4.3 `common-adapter.ts`
+### 4.2 `common-adapter.ts`
 
 Exports composition helpers only — not row-level adapters:
 
@@ -143,7 +110,7 @@ toAttachment / fromAttachment
 
 These are imported by all other adapters that handle embedded `Note`, `Location`, or `Attachment` fields.
 
-### 4.4 Rules
+### 4.3 Rules
 
 - Functions only — `to{Abstraction}` and `from{Abstraction}`
 - Map every field explicitly — no `...spread`, no payload shortcut
@@ -156,9 +123,7 @@ These are imported by all other adapters that handle embedded `Note`, `Location`
 
 ## 5. Protocol Archetype (`protocols/`)
 
-### 5.1 File format
-
-Spec file — top JSDoc block, no box header:
+### 5.1 Pattern
 
 ```typescript
 /**
@@ -194,19 +159,35 @@ export type AssetUpdateInput = {
 
 ## 6. Validator Archetype (`validators/`)
 
-### 6.1 File format
-
-Functional file — box header with PURPOSE and EXPORTED APIs.
-
-### 6.2 Pattern
+### 6.1 Pattern
 
 ```typescript
-import { isId, isNonEmptyString, isCompositionPositive } from '@core-std'
-import type { Task, Question } from '@domain/abstractions/workflow.ts'
+/**
+ * Workflow protocol validator
+ */
+
+import { isCompositionPositive, isId, isNonEmptyString } from '@core-std'
+import type { Question, Task } from '@domain/abstractions/workflow.ts'
 import type { WorkflowCreateInput } from '@domain/protocols/workflow-protocol.ts'
 
-// ── Private guards ───────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
+// VALIDATORS
+// ────────────────────────────────────────────────────────────────────────────
 
+/** Validates WorkflowCreateInput; returns error message or null. */
+export const validateWorkflowCreate = (input: WorkflowCreateInput): string | null => {
+  if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
+  if (!isCompositionPositive(input.tasks, isTask)) {
+    return 'tasks must be a non-empty association of valid tasks'
+  }
+  return null
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// PRIVATE VALIDATOR DECOMPOSITION
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Validate question component */
 const isQuestion = (v: unknown): v is Question => {
   if (!v || typeof v !== 'object') return false
   const q = v as Record<string, unknown>
@@ -215,22 +196,13 @@ const isQuestion = (v: unknown): v is Question => {
     && QUESTION_TYPES.includes(q.type as Question['type'])
 }
 
+/** Validate task component */
 const isTask = (v: unknown): v is Task => {
   if (!v || typeof v !== 'object') return false
   const t = v as Record<string, unknown>
   return isId(t.id)
     && isNonEmptyString(t.title)
     && isCompositionPositive(t.checklist, isQuestion)
-}
-
-// ── Public validators ────────────────────────────────────────────────────────
-
-/** Validates WorkflowCreateInput; returns error message or null. */
-export const validateWorkflowCreate = (input: WorkflowCreateInput): string | null => {
-  if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
-  if (!isCompositionPositive(input.tasks, isTask)) return 'tasks must be a non-empty association of valid tasks'
-  return null
-}
 ```
 
 ### 6.3 Explicit decomposition rules (non-negotiable)

@@ -36,7 +36,7 @@ export const blueMesaRanchCustomer: Customer = {
     id: siteId,
     customerId,
     label: 'North Pasture HQ',
-    location: headquartersLocation,
+    location: [headquartersLocation],
     acreage: 2400,
     notes: []
   }],

@@ -142,11 +142,11 @@ Subordinate abstractions with no independent lifecycle are embedded directly. Al
 
 Independently lifecycled abstractions are referenced via foreign keys. The phantom type parameter documents the referenced abstraction. Resolves to `Id` or `Id | undefined` at runtime.
 
-| Type                    | Cardinality                        | Column type      |
-| ----------------------- | ---------------------------------- | ---------------- |
-| `AssociationOne<T>`     | required FK — many side of 1:m or 1:1 | `UUID NOT NULL`  |
-| `AssociationOptional<T>`| optional FK — nullable column      | `UUID`           |
-| `AssociationJunction<T>`    | junction FK — both sides of m:m    | `UUID NOT NULL`  |
+| Type                     | Cardinality                           | Column type     |
+| ------------------------ | ------------------------------------- | --------------- |
+| `AssociationOne<T>`      | required FK — many side of 1:m or 1:1 | `UUID NOT NULL` |
+| `AssociationOptional<T>` | optional FK — nullable column         | `UUID`          |
+| `AssociationJunction<T>` | junction FK — both sides of m:m       | `UUID NOT NULL` |
 
 ### 3.4 Scope
 
@@ -335,12 +335,12 @@ Location (object)
   Notes: Geographic position plus optional address metadata
 
 Attachment (object)
-  Fields: id, filename, url, contentType, kind(photo|video|map|document),
+  Fields: filename, url, contentType, kind(photo|video|map|document),
           uploadedAt, uploadedById
   Notes: Uploaded artifact metadata
 
 Note (object)
-  Fields: id, createdAt, authorId?, content, visibility?(internal|shared),
+  Fields: createdAt, authorId?, content, visibility?(internal|shared),
           tags: CompositionMany<string>, attachments: CompositionMany<Attachment>
   Notes: Freeform note with optional visibility/taxonomy
 ```

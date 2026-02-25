@@ -255,6 +255,15 @@ export const HttpCodes = {
   internalError: 500
 } as const
 
+/** Common HTTP header keys. */
+export const HEADER_CONTENT_TYPE = 'content-type'
+export const HEADER_AUTHORIZATION = 'authorization'
+export const HEADER_VARY = 'vary'
+export const HEADER_ALLOW_ORIGIN = 'access-control-allow-origin'
+export const HEADER_ALLOW_METHODS = 'access-control-allow-methods'
+export const HEADER_ALLOW_HEADERS = 'access-control-allow-headers'
+export const HEADER_ALLOW_CREDENTIALS = 'access-control-allow-credentials'
+
 /**
  * Typed request wrapper passed into handlers.
  * @template RequestBody Request body type.
@@ -439,7 +448,8 @@ export const wrapHttpHandler = <
       }
 
       const url = new URL(request.url)
-      const query = normalizeQuery(url.searchParams, config.multiValueQueryParams ?? false)
+      const query = normalizeQuery(url.searchParams,
+        config.multiValueQueryParams ?? false)
 
       const HttpRequest: HttpRequest<RequestBody, Query, HttpHeaders> = {
         method,
@@ -497,15 +507,6 @@ const DEFAULT_MAX_BODY_SIZE = 6 * 1024 * 1024
  */
 const NO_BODY_STATUS_CODES = new Set([204, 304])
 
-/** Common HTTP header keys. */
-const HEADER_CONTENT_TYPE = 'content-type'
-const HEADER_AUTHORIZATION = 'authorization'
-const HEADER_VARY = 'vary'
-const HEADER_ALLOW_ORIGIN = 'access-control-allow-origin'
-const HEADER_ALLOW_METHODS = 'access-control-allow-methods'
-const HEADER_ALLOW_HEADERS = 'access-control-allow-headers'
-const HEADER_ALLOW_CREDENTIALS = 'access-control-allow-credentials'
-
 /**
  * Extract error message from unknown error value.
  * @param err Unknown error value.
@@ -536,7 +537,10 @@ const normalizeHeaders = (headers: Headers): HttpHeaders => {
  * @param enableMultiValue Whether to merge multi-value parameters.
  * @returns Clean query object with string values (multi-values joined with commas).
  */
-const normalizeQuery = (params: URLSearchParams, enableMultiValue: boolean): HttpQuery => {
+const normalizeQuery = (
+  params: URLSearchParams,
+  enableMultiValue: boolean
+): HttpQuery => {
   const normalized: HttpQuery = {}
   const keys = new Set<string>()
   params.forEach((_value, key) => keys.add(key))
@@ -579,7 +583,8 @@ const makeCorsHeaders = (
     [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
     [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ')
       ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization',
+    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ')
+      ?? 'Content-Type, Authorization',
     [HEADER_VARY]: 'Origin',
     ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {})
   }

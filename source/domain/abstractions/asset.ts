@@ -1,38 +1,28 @@
 /**
- * Domain abstractions for assets in the swarmAg system.
- * Assets represent equipment and resources used in field operations.
+ * Domain models for assets in the swarmAg system.
+ * Assets represent equipment and resources used in operations —
+ * vehicles, drones, sprayers, tools, and attachments. AssetType
+ * provides a reference taxonomy for categorizing assets.
  */
 
-import type { Id, When } from '@core-std'
+import type { AssociationOne, CompositionMany, Instantiable } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 
 /** Reference type for categorizing assets. */
-export type AssetType = {
-  id: Id
+export type AssetType = Instantiable & {
   label: string
   active: boolean
-  createdAt: When
-  updatedAt: When
-  deletedAt?: When
 }
 
 /** Lifecycle and availability state. */
-export type AssetStatus =
-  | 'active'
-  | 'maintenance'
-  | 'retired'
-  | 'reserved'
+export type AssetStatus = 'active' | 'maintenance' | 'retired' | 'reserved'
 
 /** Operational equipment or resource. */
-export type Asset = {
-  id: Id
+export type Asset = Instantiable & {
   label: string
   description?: string
   serialNumber?: string
-  type: Id
+  type: AssociationOne<AssetType>
   status: AssetStatus
-  notes: [Note?, ...Note[]]
-  createdAt: When
-  updatedAt: When
-  deletedAt?: When
+  notes: CompositionMany<Note>
 }

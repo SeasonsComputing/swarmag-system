@@ -17,11 +17,12 @@ declare global {
  */
 export class SolidProvider implements RuntimeProvider {
   constructor() {
-    const isSolid = import.meta?.env !== undefined
-    if (!isSolid) this.fail('Solid runtime not available')
+    const env = import.meta?.env
+    if (!env) this.fail('Solid runtime not available')
   }
   get(key: string): string | undefined {
-    return import.meta?.env![key]
+    const env = import.meta?.env
+    return env ? env[key] : undefined
   }
   fail(msg: string): never {
     throw new Error(`Config error: ${msg}`)

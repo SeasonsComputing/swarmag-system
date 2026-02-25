@@ -82,7 +82,9 @@ const namespaceForSpecifier = (specifier: string, fromFile: string): Namespace =
 
   // Tests
   if (specifier.startsWith('@tests')) return 'tests'
-  if (specifier.startsWith('@tests-fixtures/') || specifier.startsWith('@tests-helpers/')) {
+  if (
+    specifier.startsWith('@tests-fixtures/') || specifier.startsWith('@tests-helpers/')
+  ) {
     return 'tests'
   }
 
@@ -103,7 +105,9 @@ const collectFiles = async (dir: string): Promise<string[]> => {
     if (entry.isDirectory) {
       if (EXCLUDED_DIRS.has(entry.name)) continue
       entries.push(...await collectFiles(entryPath))
-    } else if (entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
+    } else if (
+      entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))
+    ) {
       entries.push(entryPath)
     }
   }
@@ -137,7 +141,10 @@ const isConfigModule = (file: string): boolean => {
     && normalized.endsWith('config.ts')
 }
 
-const checkUxImports = (file: string, imports: Array<{ specifier: string }>): string[] => {
+const checkUxImports = (
+  file: string,
+  imports: Array<{ specifier: string }>
+): string[] => {
   if (!isUxAppFile(file)) return []
 
   const violations: string[] = []
@@ -244,7 +251,9 @@ const main = async () => {
       console.error(`  ${violation}`)
     }
     console.error('')
-    console.error('See documentation/foundation/architecture-core.md for dependency rules')
+    console.error(
+      'See documentation/foundation/architecture-core.md for dependency rules'
+    )
     Deno.exit(1)
   }
 
