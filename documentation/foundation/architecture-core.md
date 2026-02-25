@@ -1,8 +1,8 @@
-# Architecture: swarmAg System — Core
+# swarmAg System — Architecture Core
 
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
 
-## 1. Executive Summary
+## 1. Overview
 
 The **swarmAg System** is a domain-driven platform for agricultural service operations, built around a composed API namespace pattern. It consists of progressive web applications for administration and field execution, a customer portal, and Supabase Edge Functions for orchestration. Offline execution is enabled via deep cloning to IndexedDB.
 

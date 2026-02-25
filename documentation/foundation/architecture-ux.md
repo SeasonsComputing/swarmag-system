@@ -1,4 +1,4 @@
-# Architecture: swarmAg System — UX
+# swarmAg System — Architecture UX
 
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
 

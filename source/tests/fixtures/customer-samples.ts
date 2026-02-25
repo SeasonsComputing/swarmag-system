@@ -8,7 +8,6 @@ import type { Customer } from '@domain/abstractions/customer.ts'
 
 const customerId = id()
 const accountManagerId = id()
-const primaryContactId = id()
 const siteId = id()
 const contactNoteId = id()
 
@@ -33,7 +32,6 @@ export const blueMesaRanchCustomer: Customer = {
   postalCode: '76902',
   country: 'US',
   accountManagerId,
-  primaryContactId,
   sites: [{
     id: siteId,
     customerId,
@@ -43,11 +41,10 @@ export const blueMesaRanchCustomer: Customer = {
     notes: []
   }],
   contacts: [{
-    id: primaryContactId,
-    customerId,
     name: 'Sloane Ayers',
     email: 'sloane@bluemesa.example',
     phone: '+1-325-555-0110',
+    isPrimary: true,
     preferredChannel: 'phone',
     notes: [{
       id: contactNoteId,
@@ -55,9 +52,7 @@ export const blueMesaRanchCustomer: Customer = {
       content: 'Prefers SMS for scheduling confirmations.',
       tags: [],
       attachments: []
-    }],
-    createdAt: '2025-01-10T00:00:00Z',
-    updatedAt: '2025-01-10T00:00:00Z'
+    }]
   }],
   notes: [],
   createdAt: '2025-01-10T00:00:00Z',

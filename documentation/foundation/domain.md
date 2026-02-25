@@ -1,10 +1,14 @@
-# swarmAg System – Domain
+# swarmAg System — Domain Model
 
-This document defines the foundational abstractions, contracts, and APIs of the `swarmAg System`. The domain model captures the solution space expressed as classes, types, interfaces, associations, and APIs specified using TypeScript.
+![swarmAg ops logo](../../swarmag-ops-logo.png)
 
-## 1. Solution Space
+## 1. Overview
 
-### 1.1 Service
+This document defines the foundational abstractions, contracts, and APIs of the `swarmAg System`. The domain model captures the solution space expressed as types, attributes, enums, unions and relations declaratively using TypeScript.
+
+## 2. Solution Space
+
+### 2.1 Service
 
 A Service is a listed product representing work we sell, identified by an SKU. Services belong to a category (for example, aerial or ground), have a description, and define the kinds of assets required to execute the work (equipment, tools, supplies).
 
@@ -12,9 +16,9 @@ Many services require the use of regulated chemicals. The acquisition, storage, 
 
 A Service Category represents a class of service we offer (e.g., aerial-drone-service, ground-machinery-service). Each Service Category has one or more Workflows suitable for performing services within that category.
 
-### 1.2 Services by Category
+### 2.2 Services by Category
 
-#### 1.2.1 Aerial Drone Service
+#### 2.2.1 Aerial Drone Service
 
 | Description                    | Equipment | SKU        |
 | ------------------------------ | --------- | ---------- |
@@ -27,7 +31,7 @@ A Service Category represents a class of service we offer (e.g., aerial-drone-se
 | Mesquite Herbicide             | XAG P150  | A-CHEM-04  |
 | Commercial Greenhouse Painting | DJI T30   | A-PAINT-01 |
 
-#### 1.2.2 Ground Machinery Services
+#### 2.2.2 Ground Machinery Services
 
 | Description                        | Equipment            | SKU        |
 | ---------------------------------- | -------------------- | ---------- |
@@ -36,7 +40,7 @@ A Service Category represents a class of service we offer (e.g., aerial-drone-se
 | Rock Removal, Regrade              | Skidsteer, Toolcat   | G-MACH-01  |
 | Brush Hogging                      | Skidsteer, Toolcat   | G-BRUSH-01 |
 
-#### 1.2.3 Tools
+#### 2.2.3 Tools
 
 | Tool                 | Description                                                                                                                                             |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -47,7 +51,7 @@ A Service Category represents a class of service we offer (e.g., aerial-drone-se
 | Tree Saw             | Specialized, hydraulically-powered tool featuring a large circular blade designed for quickly and safely felling trees and clearing heavy brush.        |
 | Chemical Applicators | Custom sponge/dauber systems ensure thorough target surface coverage with precise, controlled volumes of herbicide.                                     |
 
-#### 1.2.4 Asset Types
+#### 2.2.4 Asset Types
 
 | Description             |
 | ----------------------- |
@@ -61,7 +65,7 @@ A Service Category represents a class of service we offer (e.g., aerial-drone-se
 | Drone Spray Tank        |
 | Drone Granular Hopper   |
 
-### 1.3 Workflow & Tasks
+### 2.3 Workflow & Tasks
 
 A Workflow describes how work is generally performed. Examples of workflows include "Drone Chemical Preparation", "Mesquite Chemical Preparation", "Mesquite Mitigation Procedure", and "Drone Obstacle Preflight".
 
@@ -71,11 +75,11 @@ Each Task in a Workflow is a simple checklist supporting the task. Each item in 
 
 Workflows guide how work is assessed and inform how it is later planned and executed.
 
-### 1.4 Job
+### 2.4 Job
 
 A Job represents a work agreement with a customer and serves as the hub of the model. A Job is created first and anchors all related work artifacts.
 
-### 1.5 Job Assessment, Job Plan, & Job Work Log
+### 2.5 Job Assessment, Job Plan, & Job Work Log
 
 A Job Assessment evaluates the work to be completed on behalf of a customer. Assessments define the locations involved and gather the information required to determine scope, feasibility, and approach. Job Assessments scope the Job using Workflow definitions that direct the Job. A Job Assessment must exist before a Job Plan may be created.
 
@@ -87,7 +91,7 @@ A Job Work Log memorializes the physical execution of a Job. Logs are append-onl
 
 A Job has an Assessment, a Plan, and a collection of Log entries. Log entries are created during the execution of a Job, by a User, and are appended to the Job's Log. There are no circular foreign keys; Assessments, Plans, and Logs reference the Job.
 
-### 1.6 Job Workflow & Job Work
+### 2.6 Job Workflow & Job Work
 
 Work is the physical execution of a Job. It produces the progress and knowledge captured by field crews during a job. Work is directed by a sequence of Workflows. Each Workflow, its Tasks and their associated checklist of Questions are a template used to assess and plan the job.
 
@@ -97,17 +101,17 @@ Job Workflows are prepared prior to Job Work. The Job Assessment phase includes 
 
 Starting Job Work involves transitioning the Job's status to `executing`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks, presenting the task checklist items as Questions and logging the Answers as Job Work Log entries.
 
-TODO: **Should Job Workflows be assigned to a crew member for execution as part of the Job Plan? Essentially doling out the work to be done vs. each crew member stepping on each other's toes. My intuition is yes. I have not worked through what that means yet. Let's not let this impede today's progress. We must consider how to assign workflows to crew members and how to manage conflicts that may arise at some point soon.**
+Job Workflows are assigned to crew staff during the planning phase.
 
-## 2. Domain Model (`source/domain`)
+## 3. Domain Model (`source/domain`)
 
 The domain model has two distinct concerns: the **swarmAg domain** (the business abstractions — Service, Customer, Workflow, Job, etc.) and the **patterns used to codify it** (how those abstractions are structured, associated, and serialized in TypeScript and PostgreSQL).
 
-### 2.1 Domain Abstractions
+### 3.1 Domain Abstractions
 
 The swarmAg domain is expressed as TypeScript types under `source/domain/abstractions/`. These types are the single source of truth for domain meaning. All other code — API clients, edge functions, UX applications — consumes these types and does not redefine them.
 
-### 2.2 Abstraction Patterns
+### 3.2 Abstraction Patterns
 
 The domain layer is organized into four sub-layers:
 
@@ -119,32 +123,32 @@ The domain layer is organized into four sub-layers:
 | `schema/`       | Generated canonical SQL schema (`schema.sql`); authoritative current-state, derived from domain            |
 | `validators/`   | Validation logic ensuring data integrity at system boundaries (both ingress and egress)                    |
 
-### 2.3 Association Patterns
+### 3.3 Relation Patterns
 
-Associations between abstractions follow two patterns.
+All relationships between domain abstractions are expressed using typed relation primitives from `@core-std/relations.ts`. Two orthogonal concepts:
 
-#### 2.3.1 Embedded (JSONB columns)
+#### 3.3.1 Composition (embedded, JSONB)
 
-Subordinate abstractions with no independent lifecycle are embedded directly. Embedded abstractions are always represented as typed TypeScript arrays, regardless of cardinality. The corresponding RDBMS column type is JSONB. Cardinality is expressed in TypeScript using Variadic Tuple Types:
+Subordinate abstractions with no independent lifecycle are embedded directly. Always represented as `readonly T[]` at runtime. Always `[]` when empty, never `null`. The RDBMS column type is JSONB.
 
-| Notation                           | Cardinality |
-| ---------------------------------- | ----------- |
-| `[Abstraction]`                    | exactly 1   |
-| `[Abstraction?]`                   | 0 or 1      |
-| `[Abstraction, ...Abstraction[]]`  | 1 or more   |
-| `[Abstraction?, ...Abstraction[]]` | 0 or more   |
+| Type                     | Cardinality | Validated by            |
+| ------------------------ | ----------- | ----------------------- |
+| `CompositionOne<T>`      | exactly 1   | `isCompositionOne`      |
+| `CompositionOptional<T>` | 0 or 1      | `isCompositionOptional` |
+| `CompositionMany<T>`     | 0 or more   | `isCompositionMany`     |
+| `CompositionPositive<T>` | 1 or more   | `isCompositionPositive` |
 
-#### 2.3.2 4th Normal Form (FK columns)
+#### 3.3.2 Association (FK reference, UUID column)
 
-Independent abstractions with their own lifecycle are associated via foreign keys:
+Independently lifecycled abstractions are referenced via foreign keys. The phantom type parameter documents the referenced abstraction. Resolves to `Id` or `Id | undefined` at runtime.
 
-| Relationship | Pattern                        |
-| ------------ | ------------------------------ |
-| 1:1          | FK on the owner or parent side |
-| 1:m          | FK on the many side            |
-| m:m          | FK junction table              |
+| Type                    | Cardinality                        | Column type      |
+| ----------------------- | ---------------------------------- | ---------------- |
+| `AssociationOne<T>`     | required FK — many side of 1:m or 1:1 | `UUID NOT NULL`  |
+| `AssociationOptional<T>`| optional FK — nullable column      | `UUID`           |
+| `AssociationJunction<T>`    | junction FK — both sides of m:m    | `UUID NOT NULL`  |
 
-### 2.4 Scope
+### 3.4 Scope
 
 This section defines the core domain model of the system. It establishes the fundamental types, concepts, and associations that express domain truth and business intent.
 
@@ -154,7 +158,7 @@ The domain model is implemented as a TypeScript library under `source/domain`. I
 
 **Adapter naming convention:** Adapters use `Dictionary` (or `dict`) rather than `row` or `record` to represent serialized forms. Functions follow the pattern `to{Abstraction}(dict: Dictionary): Abstraction` and `from{Abstraction}(abstraction: Abstraction): Dictionary`. This emphasizes storage-agnostic serialization rather than database-specific terminology.
 
-### 2.5 Core abstractions that define the domain
+### 3.5 Core abstractions that define the domain
 
 These abstractions represent the primary concepts of the system and form the core of the domain model. They are expressed as TypeScript types under `source/domain` and define the vocabulary used throughout the system.
 
@@ -174,7 +178,7 @@ These abstractions represent the primary concepts of the system and form the cor
 
 These abstractions describe **domain meaning**, not persistence, API shape, or user interface concerns.
 
-### 2.6 Common abstractions shared within the model
+### 3.6 Common abstractions shared within the model
 
 The following abstractions are shared across multiple domain concepts and represent either pure value objects or embedded subordinate compositions. They do not have independent life-cycles.
 
@@ -189,7 +193,7 @@ The following abstractions are shared across multiple domain concepts and repres
 
 These abstractions are **composed into** higher-level domain objects and are not referenced independently.
 
-### 2.7 Supporting domain relationships and junctions
+### 3.7 Supporting domain relationships and junctions
 
 In addition to the core abstractions, the domain includes supporting structures that express relationships between concepts without embedding or ownership.
 
@@ -206,7 +210,7 @@ These structures are present in code to model associations explicitly and to pre
 
 These structures exist to model **relationships**, not to redefine the core abstractions themselves.
 
-### 2.8 Standard data types
+### 3.8 Standard data types
 
 The following standard data types are used consistently across the domain model.
 
@@ -218,55 +222,36 @@ The following standard data types are used consistently across the domain model.
 
 These types provide consistency and clarity without imposing storage or transport constraints.
 
-### 2.9 Rules
+### 3.9 Domain Invariants
 
-- Language: TypeScript (strict mode) checked via Deno (`deno task check`).
 - Types must be JSON-serializable.
 - No runtime dependencies beyond `@core-std`.
-- This package is the **single source of truth** for domain types.
-- All other code (ux, edge functions) must import from `source/domain`.
-- Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type` and `Service.requiredAssetTypes`; keep the canonical list in `documentation/foundation/data-lists.md`.
+- This package is the **single source of truth** for domain types. All other code (ux, edge functions) must import from `source/domain`.
+- Asset types are modeled as data records (`AssetType`) and referenced by `Asset.type`; keep the canonical list in `documentation/foundation/data-lists.md`.
 - Attachments carry a `kind` (`photo` | `video` | `map` | `document`).
 - `Customer.contacts` is non-empty; the primary contact is flagged via `Contact.isPrimary`.
-- Locations store coordinates/addresses without a `source` field.
-- `JobAssessment` must capture one or more `Location` entries (`locations` tuple) to support noncontiguous ranch assessments.
-- Lifecycled abstractions extend `Instantiable` from `@core-std` — do not redeclare `id`, `createdAt`, `updatedAt`, `deletedAt?` inline. `Instantiable` carries soft-delete semantics: callers treat `deletedAt` undefined/null as active, filter queries to `deleted_at IS NULL`. Exceptions: append-only logs and pure junction tables.
-- Id strategy: UUID v7 for PK/FK to avoid an Id service, allow preassigned keys, and let related rows be inserted together; mitigations include using the native `uuid` type, a v7 generator, avoiding redundant indexes, preferring composite keys for pure junction tables, and routine maintenance (vacuum/reindex) on heavy-write tables.
-- `JobWorkLogEntry` is append-only with a required `answer` field; telemetry and system-generated entries use `QuestionType = 'internal'` — no separate metadata field.
+- `JobAssessment` must capture one or more `Location` entries to support noncontiguous ranch assessments.
+- Lifecycled abstractions extend `Instantiable` — soft-delete semantics: `deletedAt` undefined/null means active. Exceptions: append-only logs and pure junction tables.
+- Embedded subordinate compositions use `Composition*` types from `@core-std/relations.ts`. Always `[]` when empty, never `null`.
+- FK references to independently lifecycled abstractions use `Association*` types from `@core-std/relations.ts`.
+- Id strategy: UUID v7 for all PK/FK.
+- `JobWorkLogEntry` is append-only; telemetry uses `QuestionType = 'internal'` — no separate metadata field.
 - `Workflow` masters are read-only to all roles except administrator. Modification during assessment or planning is achieved exclusively by cloning.
 - `JobWork.work` is the finalized execution manifest and is immutable once created.
-- Shared primitive validators (`isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`) live in `@core-std`. Domain-specific guards live in their abstraction's validator file.
 
-### 2.10 Roles & attribution
+See `domain-archetypes.md` for implementation rules governing how these invariants are expressed in TypeScript, adapters, protocols, and validators.
+
+### 3.10 Roles & attribution
 
 - User memberships are constrained to `USER_ROLES` (`administrator`, `sales`, `operations`) defined in `@domain/abstractions/user.ts`.
 - `User.roles` is an array; a user may hold multiple memberships simultaneously.
 - Role semantics describe authorization intent only; enforcement occurs outside the domain layer.
 
-### 2.11 Domain layer file organization
-
-The domain layer follows an abstraction-per-file pattern across four subdirectories:
-
-| Layer           | Abstraction file             |
-| --------------- | ---------------------------- |
-| `abstractions/` | `{abstraction}.ts`           |
-| `adapters/`     | `{abstraction}-adapter.ts`   |
-| `protocols/`    | `{abstraction}-protocol.ts`  |
-| `validators/`   | `{abstraction}-validator.ts` |
-
-**Placement rules:**
-
-- Abstraction-specific types belong with their owning abstraction (e.g., `User` in `user.ts`).
-- Pure value objects and shared subordinate types (`Location`, `Note`, `Attachment`) live in `common.ts`.
-- Concept-owning types live with their owner (e.g., `Question` and `Answer` in `workflow.ts`).
-- Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) live in `@core/api/api-contract.ts`.
-- Shared primitive validators live in `@core-std`; domain-specific guards live in their abstraction's validator file.
-
-## 3. Data Dictionary
+## 4. Data Dictionary
 
 The following sections define the domain types and shape constraints from `@domain/abstractions`.
 
-### 3.1 Core Standard (`@core-std`)
+### 4.1 Core Standard (`@core-std`)
 
 ```text
 Id (alias)
@@ -285,9 +270,63 @@ Instantiable (type)
   Fields: id: Id, createdAt: When, updatedAt: When, deletedAt?: When
   Notes: Lifecycle base for all persisted abstractions with independent database rows;
          extend via intersection — do not redeclare these fields inline
+
+CompositionOne<T> (type)
+  Shape: readonly T[]
+  Notes: Exactly 1 embedded subordinate; stored as single-element JSONB array
+
+CompositionOptional<T> (type)
+  Shape: readonly T[]
+  Notes: 0 or 1 embedded subordinate; stored as JSONB array
+
+CompositionMany<T> (type)
+  Shape: readonly T[]
+  Notes: 0 or more embedded subordinates; stored as JSONB array; always [] when empty
+
+CompositionPositive<T> (type)
+  Shape: readonly T[]
+  Notes: 1 or more embedded subordinates; stored as JSONB array; never empty
+
+isCompositionOne<T>(value, guard) (function)
+  Returns: value is CompositionOne<T>
+  Notes: Validates exactly 1 element
+
+isCompositionOptional<T>(value, guard) (function)
+  Returns: value is CompositionOptional<T>
+  Notes: Validates 0 or 1 element
+
+isCompositionMany<T>(value, guard) (function)
+  Returns: value is CompositionMany<T>
+  Notes: Validates 0 or more elements
+
+isCompositionPositive<T>(value, guard) (function)
+  Returns: value is CompositionPositive<T>
+  Notes: Validates 1 or more elements
+
+demandOne<T>(c: CompositionOne<T>) (function)
+  Returns: T
+  Notes: Extracts single value; trusts type system per Constitution §9.5.3
+
+optionalOne<T>(c: CompositionOptional<T>) (function)
+  Returns: T | undefined
+  Notes: Extracts value or undefined from optional composition
+
+AssociationOne<T> (type)
+  Shape: Id
+  Notes: Required FK to independently lifecycled row; phantom T documents referenced type;
+         many side of 1:m or true 1:1
+
+AssociationOptional<T> (type)
+  Shape: Id | undefined
+  Notes: Optional FK — nullable column; phantom T documents referenced type
+
+AssociationJunction<T> (type)
+  Shape: Id
+  Notes: Junction FK for m:m relationships; phantom T documents referenced type;
+         both sides of a junction declare AssociationJunction
 ```
 
-### 3.2 Common (`@domain/abstractions/common.ts`)
+### 4.2 Common (`@domain/abstractions/common.ts`)
 
 ```text
 Location (object)
@@ -302,11 +341,11 @@ Attachment (object)
 
 Note (object)
   Fields: id, createdAt, authorId?, content, visibility?(internal|shared),
-          tags: [string?, ...string[]], attachments: [Attachment?, ...Attachment[]]
+          tags: CompositionMany<string>, attachments: CompositionMany<Attachment>
   Notes: Freeform note with optional visibility/taxonomy
 ```
 
-### 3.3 Assets (`@domain/abstractions/asset.ts`)
+### 4.3 Assets (`@domain/abstractions/asset.ts`)
 
 ```text
 AssetType (Instantiable)
@@ -319,13 +358,13 @@ AssetStatus (enum)
   Notes: Lifecycle/availability state
 
 Asset (Instantiable)
-  Fields: id, label, description?, serialNumber?, type(AssetType.id),
-          status(AssetStatus), notes: [Note?, ...Note[]],
+  Fields: id, label, description?, serialNumber?, type: AssociationOne<AssetType>,
+          status(AssetStatus), notes: CompositionMany<Note>,
           createdAt, updatedAt, deletedAt?
   Notes: Operational equipment/resource
 ```
 
-### 3.4 Chemicals (`@domain/abstractions/chemical.ts`)
+### 4.4 Chemicals (`@domain/abstractions/chemical.ts`)
 
 ```text
 ChemicalUsage (enum)
@@ -340,35 +379,37 @@ Chemical (Instantiable)
   Fields: id, name, epaNumber?, usage(ChemicalUsage),
           signalWord?(danger|warning|caution), restrictedUse,
           reEntryIntervalHours?, storageLocation?, sdsUrl?,
-          labels: [ChemicalLabel?, ...ChemicalLabel[]],
-          notes: [Note?, ...Note[]], createdAt, updatedAt, deletedAt?
+          labels: CompositionMany<ChemicalLabel>,
+          notes: CompositionMany<Note>, createdAt, updatedAt, deletedAt?
   Notes: Regulated material record
 ```
 
-### 3.5 Customers (`@domain/abstractions/customer.ts`)
+### 4.5 Customers (`@domain/abstractions/customer.ts`)
 
 ```text
 Contact (object)
   Fields: name, email?, phone?, isPrimary,
           preferredChannel?(email|text|phone),
-          notes: [Note?, ...Note[]]
+          notes: CompositionMany<Note>
   Notes: Embedded customer contact; isPrimary flags the primary contact
 
 CustomerSite (object)
-  Fields: id, customerId, label, location, acreage?,
-          notes: [Note?, ...Note[]]
+  Fields: id, customerId: AssociationOne<Customer>, label,
+          location: CompositionOne<Location>, acreage?,
+          notes: CompositionMany<Note>
   Notes: Serviceable customer location
 
 Customer (Instantiable)
   Fields: id, name, status(active|inactive|prospect), line1, line2?,
-          city, state, postalCode, country, accountManagerId?,
-          sites: [CustomerSite?, ...CustomerSite[]],
-          contacts: [Contact, ...Contact[]], notes: [Note?, ...Note[]],
+          city, state, postalCode, country,
+          accountManagerId: AssociationOptional<User>,
+          sites: CompositionMany<CustomerSite>,
+          contacts: CompositionPositive<Contact>, notes: CompositionMany<Note>,
           createdAt, updatedAt, deletedAt?
   Notes: Customer account aggregate; contacts must be non-empty
 ```
 
-### 3.6 Services (`@domain/abstractions/service.ts`)
+### 4.6 Services (`@domain/abstractions/service.ts`)
 
 ```text
 ServiceCategory (enum)
@@ -377,16 +418,16 @@ ServiceCategory (enum)
 
 Service (Instantiable)
   Fields: id, name, sku, description?, category(ServiceCategory),
-          tagsWorkflowCandidates: [string?, ...string[]],
-          notes: [Note?, ...Note[]], createdAt, updatedAt, deletedAt?
+          tagsWorkflowCandidates: CompositionMany<string>,
+          notes: CompositionMany<Note>, createdAt, updatedAt, deletedAt?
   Notes: Sellable operational offering
 
 ServiceRequiredAssetType (Junction)
-  Fields: serviceId, assetTypeId
-  Notes: Junction — services to required asset types; hard delete only
+  Fields: serviceId: AssociationJunction<Service>, assetTypeId: AssociationJunction<AssetType>
+  Notes: m:m junction — services to required asset types; hard delete only
 ```
 
-### 3.7 Users (`@domain/abstractions/user.ts`)
+### 4.7 Users (`@domain/abstractions/user.ts`)
 
 ```text
 USER_ROLES (const tuple)
@@ -399,12 +440,12 @@ UserRole (union)
 
 User (Instantiable)
   Fields: displayName, primaryEmail, phoneNumber, avatarUrl?,
-          roles: [UserRole?, ...UserRole[]],
+          roles: CompositionPositive<UserRole>,
           status?(active|inactive)
   Notes: System user identity and membership; extends Instantiable
 ```
 
-### 3.8 Workflows (`@domain/abstractions/workflow.ts`)
+### 4.8 Workflows (`@domain/abstractions/workflow.ts`)
 
 ```text
 QuestionType (enum)
@@ -424,7 +465,7 @@ QuestionOption (object)
 
 Question (object)
   Fields: id, prompt, type(QuestionType), helpText?, required?,
-          options: [QuestionOption?, ...QuestionOption[]]
+          options: CompositionMany<QuestionOption>
   Notes: Workflow checklist prompt
 
 AnswerValue (union)
@@ -437,20 +478,20 @@ AnswerValue (union)
 
 Answer (object)
   Fields: questionId, value(AnswerValue), capturedAt, capturedById,
-          notes: [Note?, ...Note[]]
+          notes: CompositionMany<Note>
   Notes: Captured response instance; notes carry crew annotations and attachments
 
 Task (object)
-  Fields: id, title, description?, checklist: [Question, ...Question[]]
+  Fields: id, title, description?, checklist: CompositionPositive<Question>
   Notes: Atomic executable step; checklist must be non-empty
 
 Workflow (Instantiable)
-  Fields: id, name, description?, version, tags: [string?, ...string[]],
-          tasks: [Task, ...Task[]], createdAt, updatedAt, deletedAt?
+  Fields: id, name, description?, version, tags: CompositionMany<string>,
+          tasks: CompositionPositive<Task>, createdAt, updatedAt, deletedAt?
   Notes: Versioned execution template; read-only except for administrator role
 ```
 
-### 3.9 Jobs (`@domain/abstractions/job.ts`)
+### 4.9 Jobs (`@domain/abstractions/job.ts`)
 
 ```text
 JobStatus (enum)
@@ -466,40 +507,47 @@ JobStatus (enum)
   Notes: Job lifecycle state
 
 JobAssessment (Instantiable)
-  Fields: id, jobId, assessorId, locations: [Location, ...Location[]],
-          risks: [Note?, ...Note[]], notes: [Note?, ...Note[]],
+  Fields: id, jobId: AssociationOne<Job>, assessorId: AssociationOne<User>,
+          locations: CompositionPositive<Location>,
+          risks: CompositionMany<Note>, notes: CompositionMany<Note>,
           createdAt, updatedAt, deletedAt?
   Notes: Pre-planning assessment; requires one or more locations
 
 JobWorkflow (Instantiable)
-  Fields: id, jobId, sequence, basisWorkflowId, modifiedWorkflowId?,
+  Fields: id, jobId: AssociationOne<Job>, sequence,
+          basisWorkflowId: AssociationOne<Workflow>,
+          modifiedWorkflowId: AssociationOptional<Workflow>,
           createdAt, updatedAt, deletedAt?
   Notes: Job-specific workflow instance; basisWorkflowId references the
          read-only Workflow master; modifiedWorkflowId is always a clone
          of the basis, created only when specialization is required during
          assessment or planning
 
-JobPlanAssignment (object)
-  Fields: planId, userId, role, notes: [Note?, ...Note[]], deletedAt?
-  Notes: Assignment of user to plan role
+JobPlanAssignment (Instantiable)
+  Fields: id, planId: AssociationOne<JobPlan>, userId: AssociationOne<User>,
+          role(UserRole), notes: CompositionMany<Note>,
+          createdAt, updatedAt, deletedAt?
+  Notes: Assignment of user to plan role; many side of 1:m with JobPlan
 
-JobPlanChemical (object)
-  Fields: planId, chemicalId, amount,
-          unit(gallon|liter|pound|kilogram),
-          targetArea?, targetAreaUnit?(acre|hectare), deletedAt?
-  Notes: Planned chemical usage
+JobPlanChemical (Instantiable)
+  Fields: id, planId: AssociationOne<JobPlan>, chemicalId: AssociationOne<Chemical>,
+          amount, unit(gallon|liter|pound|kilogram),
+          targetArea?, targetAreaUnit?(acre|hectare),
+          createdAt, updatedAt, deletedAt?
+  Notes: Planned chemical usage; many side of 1:m with JobPlan
 
-JobPlanAsset (object)
-  Fields: planId, assetId, deletedAt?
-  Notes: Asset allocated to a plan
+JobPlanAsset (Junction)
+  Fields: planId: AssociationJunction<JobPlan>, assetId: AssociationJunction<Asset>
+  Notes: m:m junction — plans to assets; hard delete only
 
 JobPlan (Instantiable)
-  Fields: id, jobId, scheduledStart, scheduledEnd?,
-          notes: [Note?, ...Note[]], createdAt, updatedAt, deletedAt?
+  Fields: id, jobId: AssociationOne<Job>, scheduledStart, scheduledEnd?,
+          notes: CompositionMany<Note>, createdAt, updatedAt, deletedAt?
   Notes: Job-specific execution plan
 
 JobWork (Instantiable)
-  Fields: id, jobId, work: [Id, ...Id[]], startedAt, startedById,
+  Fields: id, jobId: AssociationOne<Job>, work: CompositionPositive<Id>,
+          startedAt, startedById: AssociationOne<User>,
           completedAt?, createdAt, updatedAt, deletedAt?
   Notes: Execution record; creation transitions Job to executing;
          work is an ordered array of resolved Workflow IDs (basis if
@@ -507,12 +555,14 @@ JobWork (Instantiable)
          execution manifest
 
 JobWorkLogEntry (object)
-  Fields: id, jobId, userId, answer: Answer, createdAt
+  Fields: id, jobId: AssociationOne<Job>, userId: AssociationOne<User>,
+          answer: CompositionOne<Answer>, createdAt
   Notes: Append-only execution event; answer is always present and captures
          both crew checklist responses (text, number, boolean, single-select,
          multi-select) and system-generated telemetry via internal question type
-         
+
 Job (Instantiable)
-  Fields: id, customerId, status(JobStatus), createdAt, updatedAt, deletedAt?
+  Fields: id, customerId: AssociationOne<Customer>, status(JobStatus),
+          createdAt, updatedAt, deletedAt?
   Notes: Work agreement lifecycle anchor
 ```

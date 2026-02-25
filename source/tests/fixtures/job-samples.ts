@@ -9,6 +9,7 @@ const jobId = id()
 const assessmentId = id()
 const assessorId = id()
 const userId = id()
+const telemetryQuestionId = id()
 
 export const ranchMappingAssessment: JobAssessment = {
   id: assessmentId,
@@ -33,12 +34,14 @@ export const fieldMetadataLogEntry: JobWorkLogEntry = {
   id: id(),
   jobId,
   userId,
-  createdAt: '2025-01-18T16:21:00Z',
-  metadata: {
-    'telemetry.gps.latitude': 32.2144,
-    'telemetry.gps.longitude': -97.1234,
-    'execution.durationSeconds': 180
-  }
+  answer: {
+    questionId: telemetryQuestionId,
+    value: '32.2144,-97.1234',
+    capturedAt: '2025-01-18T16:21:00Z',
+    capturedById: userId,
+    notes: []
+  },
+  createdAt: '2025-01-18T16:21:00Z'
 }
 
 export const jobSamples = {
