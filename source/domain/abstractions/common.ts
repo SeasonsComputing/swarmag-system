@@ -1,9 +1,10 @@
 /**
- * Shared subordinate value objects used across domain abstractions.
- * These types have no independent lifecycle and are always embedded.
+ * Shared value objects used across the swarmAg domain.
+ * Location, Note, and Attachment have no independent lifecycle and are
+ * embedded as compositions within owning abstractions.
  */
 
-import type { Id, When } from '@core-std'
+import type { CompositionMany, Id, When } from '@core-std'
 
 /** Geographic position with optional address metadata. */
 export type Location = {
@@ -21,24 +22,27 @@ export type Location = {
   description?: string
 }
 
+/** Kind of uploaded artifact. */
+export type AttachmentKind = 'photo' | 'video' | 'map' | 'document'
+
 /** Uploaded artifact metadata. */
 export type Attachment = {
   id: Id
   filename: string
   url: string
   contentType: string
-  kind: 'photo' | 'video' | 'map' | 'document'
+  kind: AttachmentKind
   uploadedAt: When
   uploadedById: Id
 }
 
-/** Freeform note with optional visibility and taxonomy. */
+/** Freeform note with optional visibility, taxonomy, and attachments. */
 export type Note = {
   id: Id
   createdAt: When
   authorId?: Id
   content: string
   visibility?: 'internal' | 'shared'
-  tags: [string?, ...string[]]
-  attachments: [Attachment?, ...Attachment[]]
+  tags: CompositionMany<string>
+  attachments: CompositionMany<Attachment>
 }

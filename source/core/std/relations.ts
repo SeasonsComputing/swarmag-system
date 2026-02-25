@@ -1,5 +1,5 @@
 /**
- * Relational type primitives for the swarmAg domain model.
+ * Abstraction relation type primitives
  *
  * Two orthogonal concepts:
  *
@@ -41,28 +41,27 @@ export type CompositionPositive<T> = readonly T[]
 /** Returns true if value is an array of exactly 1 element satisfying guard. */
 export const isCompositionOne = <T>(
   value: unknown,
-  guard: (v: unknown) => v is T,
+  guard: (v: unknown) => v is T
 ): value is CompositionOne<T> =>
   Array.isArray(value) && value.length === 1 && guard(value[0])
 
 /** Returns true if value is an array of 0 or 1 elements satisfying guard. */
 export const isCompositionOptional = <T>(
   value: unknown,
-  guard: (v: unknown) => v is T,
+  guard: (v: unknown) => v is T
 ): value is CompositionOptional<T> =>
   Array.isArray(value) && value.length <= 1 && (value.length === 0 || guard(value[0]))
 
 /** Returns true if value is an array where every element satisfies guard. */
 export const isCompositionMany = <T>(
   value: unknown,
-  guard: (v: unknown) => v is T,
-): value is CompositionMany<T> =>
-  Array.isArray(value) && value.every(guard)
+  guard: (v: unknown) => v is T
+): value is CompositionMany<T> => Array.isArray(value) && value.every(guard)
 
 /** Returns true if value is a non-empty array where every element satisfies guard. */
 export const isCompositionPositive = <T>(
   value: unknown,
-  guard: (v: unknown) => v is T,
+  guard: (v: unknown) => v is T
 ): value is CompositionPositive<T> =>
   Array.isArray(value) && value.length >= 1 && value.every(guard)
 

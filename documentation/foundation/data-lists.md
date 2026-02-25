@@ -1,6 +1,6 @@
 # Data Lists
 
-Canonical lists used to seed and align catalog data (services, asset types). 
+Canonical lists used to seed and align catalog data (services, asset types).
 Service SKUs and asset types should stay in sync with `source/domain` and any persisted records.
 
 ## 1. Services
@@ -43,8 +43,8 @@ Service SKUs and asset types should stay in sync with `source/domain` and any pe
 
 ## 5. Internal Questions
 
-Canonical `Question` instances with `type = 'internal'` used for system-generated telemetry and operational log entries. 
-These are seed data and are referenced by `JobWorkLogEntry.answer.questionId`. 
+Canonical `Question` instances with `type = 'internal'` used for system-generated telemetry and operational log entries.
+These are seed data and are referenced by `JobWorkLogEntry.answer.questionId`.
 The Key is the `Question.prompt` value — for internal questions it serves as both the display value and machine-readable identifier.
 
 | Key (Question.prompt)                    | Answer Type |

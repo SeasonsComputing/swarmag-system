@@ -1,37 +1,43 @@
 /**
- * Domain abstractions for customers in the swarmAg system.
- * Customers are organizations that purchase services.
+ * Domain models for customers in the swarmAg system.
+ * A Customer is an organization purchasing services. Contacts are embedded
+ * subordinates; the primary contact is flagged via Contact.isPrimary rather
+ * than a separate FK. Sites are embedded serviceable locations.
  */
 
-import type { Id, When } from '@core-std'
+import type {
+  AssociationOne,
+  AssociationOptional,
+  CompositionMany,
+  CompositionOne,
+  CompositionPositive,
+  Instantiable
+} from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
+import type { User } from '@domain/abstractions/user.ts'
 
-/** Customer-associated contact person. */
+/** Embedded customer contact; isPrimary flags the primary contact. */
 export type Contact = {
-  id: Id
-  customerId: Id
   name: string
   email?: string
   phone?: string
+  isPrimary: boolean
   preferredChannel?: 'email' | 'text' | 'phone'
-  notes: [Note?, ...Note[]]
-  createdAt: When
-  updatedAt: When
+  notes: CompositionMany<Note>
 }
 
 /** Serviceable customer location. */
 export type CustomerSite = {
-  id: Id
-  customerId: Id
+  id: string
+  customerId: AssociationOne<Customer>
   label: string
-  location: Location
+  location: CompositionOne<Location>
   acreage?: number
-  notes: [Note?, ...Note[]]
+  notes: CompositionMany<Note>
 }
 
 /** Customer account aggregate; contacts must be non-empty. */
-export type Customer = {
-  id: Id
+export type Customer = Instantiable & {
   name: string
   status: 'active' | 'inactive' | 'prospect'
   line1: string
@@ -40,12 +46,8 @@ export type Customer = {
   state: string
   postalCode: string
   country: string
-  accountManagerId?: Id
-  primaryContactId?: Id
-  sites: [CustomerSite?, ...CustomerSite[]]
-  contacts: [Contact, ...Contact[]]
-  notes: [Note?, ...Note[]]
-  createdAt: When
-  updatedAt: When
-  deletedAt?: When
+  accountManagerId: AssociationOptional<User>
+  sites: CompositionMany<CustomerSite>
+  contacts: CompositionPositive<Contact>
+  notes: CompositionMany<Note>
 }

@@ -4,7 +4,7 @@
 
 import { isId, isWhen } from '@core-std'
 import type { AssetStatus } from '@domain/abstractions/asset.ts'
-import { assert, assertEquals } from 'jsr:@std/assert@1'
+import { assert, assertEquals } from '@std/assert'
 import {
   assetSamples,
   assetTypeSamples,
@@ -13,7 +13,12 @@ import {
   sharedQuestionSamples
 } from './samples.ts'
 
-const allowedAssetStatuses: AssetStatus[] = ['active', 'maintenance', 'retired', 'reserved']
+const allowedAssetStatuses: AssetStatus[] = [
+  'active',
+  'maintenance',
+  'retired',
+  'reserved'
+]
 
 Deno.test('fixture integrity: asset fixtures respect domain constraints', () => {
   const seenAssetTypes = new Set<string>()
@@ -66,7 +71,9 @@ Deno.test('fixture integrity: shared questions include labels and values', () =>
     assert(isId(question.id))
     assert(question.prompt.length > 0)
     if (question.options) {
-      assert(question.options.filter(Boolean).every(option => option!.value && option!.label))
+      assert(
+        question.options.filter(Boolean).every(option => option!.value && option!.label)
+      )
     }
   }
 })

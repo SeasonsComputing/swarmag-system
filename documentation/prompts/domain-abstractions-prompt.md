@@ -4,14 +4,15 @@ You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no archi
 
 ## Authority
 
-In case of conflict: `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md` → `style-guide.md`.
+In case of conflict: 
+  `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md` → `style-guide.md`
 
-You MUST Ingest all of these files PRIOR to assessing your task. 
+You MUST Ingest all of these files PRIOR to assessing your task.
 Confirm you have no conflicts, questions, or concerns before generating any files.
 
 ## Task
 
-Regenerate the `source/domain/abstractions/` sub-package from scratch. Delete existing files and replace them completely. Do not patch.
+Generate the `source/domain/abstractions/` sub-package from scratch. Delete existing files and replace them completely. Do not patch.
 
 ## Target File Inventory
 
@@ -74,15 +75,15 @@ Instantiable types: `AssetType`, `Asset`, `Chemical`, `Customer`, `Service`, `Wo
 All embedded subordinate compositions use `Composition*<T>` — never variadic tuples or bare arrays.
 All FK references use `Association*<T>` — never bare `Id` fields.
 
-| Use case                        | Type                      |
-| ------------------------------- | ------------------------- |
-| Embed exactly 1                 | `CompositionOne<T>`       |
-| Embed 0 or 1                    | `CompositionOptional<T>`  |
-| Embed 0 or more                 | `CompositionMany<T>`      |
-| Embed 1 or more                 | `CompositionPositive<T>`  |
-| Required FK (many side of 1:m)  | `AssociationOne<T>`       |
-| Optional FK (nullable column)   | `AssociationOptional<T>`  |
-| Junction FK (both sides of m:m) | `AssociationJunction<T>`  |
+| Use case                        | Type                     |
+| ------------------------------- | ------------------------ |
+| Embed exactly 1                 | `CompositionOne<T>`      |
+| Embed 0 or 1                    | `CompositionOptional<T>` |
+| Embed 0 or more                 | `CompositionMany<T>`     |
+| Embed 1 or more                 | `CompositionPositive<T>` |
+| Required FK (many side of 1:m)  | `AssociationOne<T>`      |
+| Optional FK (nullable column)   | `AssociationOptional<T>` |
+| Junction FK (both sides of m:m) | `AssociationJunction<T>` |
 
 ## Placement Rules
 
@@ -120,19 +121,19 @@ All FK references use `Association*<T>` — never bare `Id` fields.
 
 Reproduce types exactly as specified in `domain.md §3`. Key DD → TypeScript mappings:
 
-| DD notation              | TypeScript                         |
-| ------------------------ | ---------------------------------- |
-| `(Instantiable)`         | `= Instantiable & { ... }`         |
-| `(object)`               | `= { ... }`                        |
-| `(enum)`                 | `= 'val1' \| 'val2'`               |
-| `(union)`                | `= TypeA \| TypeB`                 |
-| `(alias)`                | `= PrimitiveType`                  |
-| `(Junction)`             | plain object, no Instantiable      |
-| `CompositionOne<T>`      | `CompositionOne<T>` from `@core-std` |
-| `AssociationOne<T>`      | `AssociationOne<T>` from `@core-std` |
-| `AssociationOptional<T>` | `AssociationOptional<T>` from `@core-std` |
-| `AssociationJunction<T>` | `AssociationJunction<T>` from `@core-std` |
-| `createdAt, updatedAt, deletedAt?` on Instantiable | omit — provided by Instantiable |
+| DD notation                                        | TypeScript                                |
+| -------------------------------------------------- | ----------------------------------------- |
+| `(Instantiable)`                                   | `= Instantiable & { ... }`                |
+| `(object)`                                         | `= { ... }`                               |
+| `(enum)`                                           | `= 'val1' \| 'val2'`                      |
+| `(union)`                                          | `= TypeA \| TypeB`                        |
+| `(alias)`                                          | `= PrimitiveType`                         |
+| `(Junction)`                                       | plain object, no Instantiable             |
+| `CompositionOne<T>`                                | `CompositionOne<T>` from `@core-std`      |
+| `AssociationOne<T>`                                | `AssociationOne<T>` from `@core-std`      |
+| `AssociationOptional<T>`                           | `AssociationOptional<T>` from `@core-std` |
+| `AssociationJunction<T>`                           | `AssociationJunction<T>` from `@core-std` |
+| `createdAt, updatedAt, deletedAt?` on Instantiable | omit — provided by Instantiable           |
 
 ## Quality Bar
 

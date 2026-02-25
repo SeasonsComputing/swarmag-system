@@ -1,12 +1,14 @@
 /**
- * Domain abstractions for regulated chemicals in the swarmAg system.
- * Chemicals require licensing and regulatory compliance management.
+ * Domain models for regulated chemicals in the swarmAg system.
+ * Chemicals are regulated materials applied during aerial and ground services.
+ * Acquisition, storage, mixing, and application must be managed for licensing
+ * and regulatory compliance.
  */
 
-import type { Id, When } from '@core-std'
+import type { CompositionMany, Instantiable } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 
-/** Domain usage classification. */
+/** Domain usage classification for a chemical. */
 export type ChemicalUsage =
   | 'herbicide'
   | 'pesticide'
@@ -21,8 +23,7 @@ export type ChemicalLabel = {
 }
 
 /** Regulated material record. */
-export type Chemical = {
-  id: Id
+export type Chemical = Instantiable & {
   name: string
   epaNumber?: string
   usage: ChemicalUsage
@@ -31,9 +32,6 @@ export type Chemical = {
   reEntryIntervalHours?: number
   storageLocation?: string
   sdsUrl?: string
-  labels: [ChemicalLabel?, ...ChemicalLabel[]]
-  notes: [Note?, ...Note[]]
-  createdAt: When
-  updatedAt: When
-  deletedAt?: When
+  labels: CompositionMany<ChemicalLabel>
+  notes: CompositionMany<Note>
 }
