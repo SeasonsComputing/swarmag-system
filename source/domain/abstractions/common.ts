@@ -1,12 +1,13 @@
 /**
- * Shared value objects used across the swarmAg domain.
- * Location, Note, and Attachment have no independent lifecycle and are
- * embedded as compositions within owning abstractions.
+ * Common value objects shared across the swarmAg domain.
+ * Location, Note, and Attachment are embedded subordinate compositions
+ * with no independent lifecycle.
  */
 
-import type { CompositionMany, Id, When } from '@core-std'
+import type { AssociationOne, CompositionMany, When } from '@core-std'
+import type { User } from '@domain/abstractions/user.ts'
 
-/** Geographic position with optional address metadata. */
+/** Geographic position plus optional address metadata. */
 export type Location = {
   latitude: number
   longitude: number
@@ -22,25 +23,20 @@ export type Location = {
   description?: string
 }
 
-/** Kind of uploaded artifact. */
-export type AttachmentKind = 'photo' | 'video' | 'map' | 'document'
-
 /** Uploaded artifact metadata. */
 export type Attachment = {
-  id: Id
   filename: string
   url: string
   contentType: string
-  kind: AttachmentKind
+  kind: 'photo' | 'video' | 'map' | 'document'
   uploadedAt: When
-  uploadedById: Id
+  uploadedById: AssociationOne<User>
 }
 
-/** Freeform note with optional visibility, taxonomy, and attachments. */
+/** Freeform note with optional visibility and taxonomy. */
 export type Note = {
-  id: Id
   createdAt: When
-  authorId?: Id
+  authorId?: AssociationOne<User>
   content: string
   visibility?: 'internal' | 'shared'
   tags: CompositionMany<string>

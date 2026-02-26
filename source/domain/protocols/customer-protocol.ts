@@ -3,13 +3,29 @@
  */
 
 import type { Id } from '@core-std'
+import type { Contact, Customer } from '@domain/abstractions/customer.ts'
 import type { Location } from '@domain/abstractions/common.ts'
-import type { Contact } from '@domain/abstractions/customer.ts'
+
+/** Input for creating a CustomerSite. */
+export type CustomerSiteCreate = {
+  customerId: Id
+  label: string
+  location: Location
+  acreage?: number
+}
+
+/** Input for updating a CustomerSite. */
+export type CustomerSiteUpdate = {
+  id: Id
+  label?: string
+  location?: Location
+  acreage?: number
+}
 
 /** Input for creating a Customer. */
-export type CustomerCreateInput = {
+export type CustomerCreate = {
   name: string
-  status: 'active' | 'inactive' | 'prospect'
+  status: Customer['status']
   line1: string
   line2?: string
   city: string
@@ -21,10 +37,10 @@ export type CustomerCreateInput = {
 }
 
 /** Input for updating a Customer. */
-export type CustomerUpdateInput = {
+export type CustomerUpdate = {
   id: Id
   name?: string
-  status?: 'active' | 'inactive' | 'prospect'
+  status?: Customer['status']
   line1?: string
   line2?: string
   city?: string
@@ -32,20 +48,4 @@ export type CustomerUpdateInput = {
   postalCode?: string
   country?: string
   accountManagerId?: Id
-}
-
-/** Input for creating a CustomerSite. */
-export type CustomerSiteCreateInput = {
-  customerId: Id
-  label: string
-  location: Location
-  acreage?: number
-}
-
-/** Input for updating a CustomerSite. */
-export type CustomerSiteUpdateInput = {
-  id: Id
-  label?: string
-  location?: Location
-  acreage?: number
 }

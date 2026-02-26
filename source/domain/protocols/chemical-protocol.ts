@@ -3,14 +3,14 @@
  */
 
 import type { Id } from '@core-std'
-import type { ChemicalUsage } from '@domain/abstractions/chemical.ts'
+import type { Chemical, ChemicalUsage } from '@domain/abstractions/chemical.ts'
 
 /** Input for creating a Chemical. */
-export type ChemicalCreateInput = {
+export type ChemicalCreate = {
   name: string
   epaNumber?: string
   usage: ChemicalUsage
-  signalWord?: 'danger' | 'warning' | 'caution'
+  signalWord?: Chemical['signalWord']
   restrictedUse: boolean
   reEntryIntervalHours?: number
   storageLocation?: string
@@ -18,12 +18,12 @@ export type ChemicalCreateInput = {
 }
 
 /** Input for updating a Chemical. */
-export type ChemicalUpdateInput = {
+export type ChemicalUpdate = {
   id: Id
   name?: string
   epaNumber?: string
   usage?: ChemicalUsage
-  signalWord?: 'danger' | 'warning' | 'caution'
+  signalWord?: Chemical['signalWord']
   restrictedUse?: boolean
   reEntryIntervalHours?: number
   storageLocation?: string

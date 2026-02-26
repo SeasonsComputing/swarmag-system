@@ -1,17 +1,11 @@
 /**
- * Workflow et al adapters to and from Dictionary representation
+ * Workflow et al adapters to and from Dictionary representation.
  */
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
-import type {
-  Answer,
-  Question,
-  QuestionOption,
-  Task,
-  Workflow
-} from '@domain/abstractions/workflow.ts'
-import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
+import type { Answer, AnswerValue, Question, QuestionOption, QuestionType, Task, Workflow } from '@domain/abstractions/workflow.ts'
+import { toNote, fromNote } from '@domain/adapters/common-adapter.ts'
 
 /** Create a QuestionOption from serialized dictionary format */
 export const toQuestionOption = (dict: Dictionary): QuestionOption => ({
@@ -31,10 +25,10 @@ export const fromQuestionOption = (option: QuestionOption): Dictionary => ({
 export const toQuestion = (dict: Dictionary): Question => ({
   id: dict.id as string,
   prompt: dict.prompt as string,
-  type: dict.type as Question['type'],
+  type: dict.type as QuestionType,
   helpText: dict.help_text as string | undefined,
   required: dict.required as boolean | undefined,
-  options: ((dict.options as Dictionary[]) ?? []).map(toQuestionOption)
+  options: (dict.options as Dictionary[]).map(toQuestionOption)
 })
 
 /** Serialize a Question to dictionary format */
@@ -50,10 +44,10 @@ export const fromQuestion = (question: Question): Dictionary => ({
 /** Create an Answer from serialized dictionary format */
 export const toAnswer = (dict: Dictionary): Answer => ({
   questionId: dict.question_id as string,
-  value: dict.value as Answer['value'],
+  value: dict.value as AnswerValue,
   capturedAt: dict.captured_at as string,
   capturedById: dict.captured_by_id as string,
-  notes: ((dict.notes as Dictionary[]) ?? []).map(toNote)
+  notes: (dict.notes as Dictionary[]).map(toNote)
 })
 
 /** Serialize an Answer to dictionary format */
@@ -70,7 +64,7 @@ export const toTask = (dict: Dictionary): Task => ({
   id: dict.id as string,
   title: dict.title as string,
   description: dict.description as string | undefined,
-  checklist: ((dict.checklist as Dictionary[]) ?? []).map(toQuestion) as Task['checklist']
+  checklist: (dict.checklist as Dictionary[]).map(toQuestion)
 })
 
 /** Serialize a Task to dictionary format */
@@ -90,8 +84,8 @@ export const toWorkflow = (dict: Dictionary): Workflow => {
     name: dict.name as string,
     description: dict.description as string | undefined,
     version: dict.version as number,
-    tags: (dict.tags as string[]) ?? [],
-    tasks: ((dict.tasks as Dictionary[]) ?? []).map(toTask) as Workflow['tasks'],
+    tags: (dict.tags as string[]).map((v) => v),
+    tasks: (dict.tasks as Dictionary[]).map(toTask),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined
@@ -104,7 +98,7 @@ export const fromWorkflow = (workflow: Workflow): Dictionary => ({
   name: workflow.name,
   description: workflow.description,
   version: workflow.version,
-  tags: workflow.tags,
+  tags: workflow.tags.map((v) => v),
   tasks: workflow.tasks.map(fromTask),
   created_at: workflow.createdAt,
   updated_at: workflow.updatedAt,

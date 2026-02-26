@@ -6,7 +6,7 @@ import type { Id } from '@core-std'
 import type { ServiceCategory } from '@domain/abstractions/service.ts'
 
 /** Input for creating a Service. */
-export type ServiceCreateInput = {
+export type ServiceCreate = {
   name: string
   sku: string
   description?: string
@@ -14,7 +14,7 @@ export type ServiceCreateInput = {
 }
 
 /** Input for updating a Service. */
-export type ServiceUpdateInput = {
+export type ServiceUpdate = {
   id: Id
   name?: string
   sku?: string
@@ -23,7 +23,7 @@ export type ServiceUpdateInput = {
 }
 
 /** Input for creating a ServiceRequiredAssetType junction. */
-export type ServiceRequiredAssetTypeCreateInput = {
+export type ServiceRequiredAssetTypeCreate = {
   serviceId: Id
   assetTypeId: Id
 }

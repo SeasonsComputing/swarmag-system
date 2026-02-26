@@ -1,11 +1,11 @@
 /**
- * Asset et al adapters to and from Dictionary representation
+ * Asset et al adapters to and from Dictionary representation.
  */
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
-import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
-import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
+import type { Asset, AssetStatus, AssetType } from '@domain/abstractions/asset.ts'
+import { toNote, fromNote } from '@domain/adapters/common-adapter.ts'
 
 /** Create an AssetType from serialized dictionary format */
 export const toAssetType = (dict: Dictionary): AssetType => {
@@ -36,14 +36,15 @@ export const toAsset = (dict: Dictionary): Asset => {
   if (!dict.id) return notValid('Asset dictionary missing required field: id')
   if (!dict.label) return notValid('Asset dictionary missing required field: label')
   if (!dict.type_id) return notValid('Asset dictionary missing required field: type_id')
+  if (!dict.status) return notValid('Asset dictionary missing required field: status')
   return {
     id: dict.id as string,
     label: dict.label as string,
     description: dict.description as string | undefined,
     serialNumber: dict.serial_number as string | undefined,
     type: dict.type_id as string,
-    status: dict.status as Asset['status'],
-    notes: ((dict.notes as Dictionary[]) ?? []).map(toNote),
+    status: dict.status as AssetStatus,
+    notes: (dict.notes as Dictionary[]).map(toNote),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined
