@@ -35,7 +35,7 @@
     "@supabase-client": "https://esm.sh/@supabase/supabase-js@2",
   },
   "tasks": {
-    "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno check source/**/*.ts && deno task lint",
+    "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:core-std-types && deno check source/**/*.ts && deno task lint",
     "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",
     "lint": "deno lint",
     "fmt": "dprint fmt",
@@ -45,6 +45,7 @@
     "guard:env": "deno run --allow-read source/devops/guard-env.ts",
     "guard:leaf": "deno run --allow-read source/devops/guard-leaf.ts",
     "guard:validation": "deno run --allow-read source/devops/guard-validation.ts",
+    "guard:core-std-types": "deno run --allow-read source/devops/guard-core-std-types.ts",
   },
   "fmt": {
     "exclude": [

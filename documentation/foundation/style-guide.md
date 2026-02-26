@@ -4,7 +4,9 @@
 
 ## 1. Overview
 
-This guide is the authoritative reference for coding conventions throughout the swarmAg codebase. The governing principles in this guide are also codified as constitutional law in `CONSTITUTION.md` section 9. In case of conflict, the CONSTITUTION takes precedence.
+This guide is the authoritative reference for coding conventions throughout the swarmAg codebase. The
+governing principles in this guide are also codified as constitutional law in `CONSTITUTION.md` section 9. In
+case of conflict, the CONSTITUTION takes precedence.
 
 Code that conflicts with this guide is wrong — not the guide.
 
@@ -19,7 +21,8 @@ Code that conflicts with this guide is wrong — not the guide.
 
 ## 3. Import Aliases
 
-All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use relative imports across top-level namespaces.
+All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use relative imports across
+top-level namespaces.
 
 ### 3.1 Primary top-level aliases
 
@@ -58,11 +61,14 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 
 ### 4.1 The single commandment
 
-Minimize visual noise. Every naming rule derives from this. Names must be immediately readable, carry no redundant weight, and signal meaning through structure rather than decoration.
+Minimize visual noise. Every naming rule derives from this. Names must be immediately readable, carry no
+redundant weight, and signal meaning through structure rather than decoration.
 
 ### 4.2 Symbol classes
 
-Each symbol class has one casing convention. All words — regardless of their natural language form — are transformed into the convention for their class. There are no special cases for acronyms, abbreviations, or domain shorthand. The symbol class determines the transformation.
+Each symbol class has one casing convention. All words — regardless of their natural language form — are
+transformed into the convention for their class. There are no special cases for acronyms, abbreviations, or
+domain shorthand. The symbol class determines the transformation.
 
 | Symbol class                                             | Convention      | Example                                   |
 | -------------------------------------------------------- | --------------- | ----------------------------------------- |
@@ -83,11 +89,13 @@ Acronyms are not a special case — they are words, and words transform with the
 
 ### 4.4 Makers vs. wrappers
 
-Factory functions that produce API clients are prefixed `make` and live in `make-*.ts` files. Handler adapters that wrap functions live in `wrap-*.ts` files. These are architecturally distinct; naming must reflect it.
+Factory functions that produce API clients are prefixed `make` and live in `make-*.ts` files. Handler adapters
+that wrap functions live in `wrap-*.ts` files. These are architecturally distinct; naming must reflect it.
 
 ## 5. Source Code Formatting
 
-All TypeScript is formatted by `dprint` via `deno task fmt`. The formatter is authoritative — do not argue with it.
+All TypeScript is formatted by `dprint` via `deno task fmt`. The formatter is authoritative — do not argue
+with it.
 
 Two rules are non-negotiable and must be reflected in all code samples and generated code:
 
@@ -98,11 +106,13 @@ These are enforced by `dprint.json` configuration and will cause `deno task fmt:
 
 ## 6. Source Code File Format
 
-Documentation intensity follows implementation complexity. The code speaks first; commentary fills only what the code cannot.
+Documentation intensity follows implementation complexity. The code speaks first; commentary fills only what
+the code cannot.
 
 ### 6.1 Spec files
 
-Type declarations, enums, pure domain shapes. The code is the documentation. Inline `/** */` comments only where a name alone is insufficient. No box, no dash-rules, no sections.
+Type declarations, enums, pure domain shapes. The code is the documentation. Inline `/** */` comments only
+where a name alone is insufficient. No box, no dash-rules, no sections.
 
 `source/domain/abstractions/asset.ts`:
 
@@ -146,7 +156,9 @@ export type Asset = {
 
 ### 6.2 Functional files
 
-Bootstraps, adapters, validators, contracts, makers — files where behavior matters and the public surface benefits from a documented contract. A box header replaces the top JSDoc. JSDoc on exported functions where params or return values need prose. No section dividers needed — no significant private machinery to separate.
+Bootstraps, adapters, validators, contracts, makers — files where behavior matters and the public surface
+benefits from a documented contract. A box header replaces the top JSDoc. JSDoc on exported functions where
+params or return values need prose. No section dividers needed — no significant private machinery to separate.
 
 `source/core/cfg/config.ts`:
 
@@ -173,7 +185,9 @@ Config.fail(msg)                       Throw never; use for invariant violations
 
 ### 6.3 Non-trivial functional files
 
-Complex implementations with a well-defined public surface and significant private machinery. Full decoration — box header, typed export signatures grouped by category, internals summary, runnable example. In the code body, PUBLIC EXPORTS and PRIVATE IMPLEMENTATION are each bounded top and bottom by section dividers.
+Complex implementations with a well-defined public surface and significant private machinery. Full decoration
+— box header, typed export signatures grouped by category, internals summary, runnable example. In the code
+body, PUBLIC EXPORTS and PRIVATE IMPLEMENTATION are each bounded top and bottom by section dividers.
 
 `source/core/api/wrap-http-handler.ts`:
 
@@ -252,7 +266,8 @@ function parseRequestBody() { ... }
 ### 6.4 Header rules
 
 - Spec files carry no box, no dash-rules, no sections. Inline `/** */` only where the name is insufficient.
-- Functional file box width: 77 characters. Title and description on consecutive lines — no blank lines inside the box.
+- Functional file box width: 77 characters. Title and description on consecutive lines — no blank lines inside
+  the box.
 - One blank line between the box close and PURPOSE.
 - One blank line between PURPOSE prose and the next section label.
 - One blank line between distinct subsection groups within EXPORTED APIs & TYPEs.
@@ -264,7 +279,8 @@ function parseRequestBody() { ... }
 
 ### 6.5 Section dividers
 
-Non-trivial files divide the code body into PUBLIC EXPORTS and PRIVATE IMPLEMENTATION, each bounded top and bottom. Consistent width, no variation:
+Non-trivial files divide the code body into PUBLIC EXPORTS and PRIVATE IMPLEMENTATION, each bounded top and
+bottom. Consistent width, no variation:
 
 ```typescript
 // ────────────────────────────────────────────────────────────────────────────
@@ -295,7 +311,8 @@ These are non-negotiable. They are also codified in `CONSTITUTION.md` section 9.
 
 ### 7.1 Explicit over clever
 
-Code must be readable by a developer unfamiliar with the codebase. If it requires explanation, it requires refactoring or a comment.
+Code must be readable by a developer unfamiliar with the codebase. If it requires explanation, it requires
+refactoring or a comment.
 
 ### 7.2 Fast-fail
 
@@ -303,11 +320,13 @@ Validate at boundaries. Throw early with clear messages. Never proceed on bad st
 
 ### 7.3 No defensive programming
 
-Do not null-check values that cannot be null by contract. Do not write try/catch around code that should not fail. Trust the type system.
+Do not null-check values that cannot be null by contract. Do not write try/catch around code that should not
+fail. Trust the type system.
 
 ### 7.4 No payload-as-truth adapters
 
-Adapters map column-by-column. There is no `payload` field that bypasses mapping. The domain type is the truth; the adapter derives it from storage columns.
+Adapters map column-by-column. There is no `payload` field that bypasses mapping. The domain type is the
+truth; the adapter derives it from storage columns.
 
 ### 7.5 No redundant exports
 
@@ -315,7 +334,38 @@ Export only what callers need. Private helpers stay private.
 
 ### 7.6 No magic
 
-No implicit behavior, no runtime reflection, no metaprogramming. Configuration is explicit; providers are injected; contracts are stated in types.
+No implicit behavior, no runtime reflection, no metaprogramming. Configuration is explicit; providers are
+injected; contracts are stated in types.
+
+### 7.7 Prefer @core-std types
+
+Use types and classes from `@core-std` instead of ad-hoc primitives and container generics.
+
+| Prefer from `@core-std` | Do not use |
+| ----------------------- | ---------- |
+| `Dictionary<V = unknown>` | `Record<string, V>` |
+| `StringDictionary` | `Record<string, string>` |
+| `StringSet` | `Set<string>` |
+| `Id` | raw `string` for identifiers |
+| `When` | raw `string` for ISO datetimes |
+| `Instantiable` | inline `{ id, createdAt, updatedAt, deletedAt? }` lifecycle shape |
+| `CompositionOne<T>` | ad-hoc tuple/array for exactly-one embedded composition |
+| `CompositionOptional<T>` | ad-hoc nullable/optional array for zero-or-one embedded composition |
+| `CompositionMany<T>` | ad-hoc `T[]` where composition semantics are intended |
+| `CompositionPositive<T>` | ad-hoc non-empty array encodings (`[T, ...T[]]`) for composition semantics |
+| `AssociationOne<T>` | raw `Id` for required FK references |
+| `AssociationOptional<T>` | raw `Id \| undefined` for optional FK references |
+| `AssociationJunction<T>` | raw `Id` in junction abstractions |
+| `ValidatorError` | generic `Error` for validation failures |
+
+Rules:
+
+- Import std primitives from `@core-std` only.
+- Never declare `Record<string, unknown>`, `Record<string, string>`, or `Set<string>` outside `source/core/std/`.
+- When narrowing unknown objects in guards, use `Dictionary` casts (`const x = v as Dictionary`) instead of
+  `Record<string, unknown>`.
+- Use `Dictionary<string>` (or `StringDictionary` where useful) for key/value string maps.
+
 
 ## 8. Domain Layer (`source/domain/`)
 
@@ -334,17 +384,22 @@ Shared abstractions: `abstractions/common.ts`.
 
 ### 8.2 Abstractions
 
-- `type` for all domain abstractions, object shapes, aliases, and unions. `interface` only for API contracts that something explicitly implements — `ApiCrudContract`, `RuntimeProvider`, etc.
+- `type` for all domain abstractions, object shapes, aliases, and unions. `interface` only for API contracts
+  that something explicitly implements — `ApiCrudContract`, `RuntimeProvider`, etc.
 - Single-sentence JSDoc on every exported type and enum.
-- Embedded subordinate associations use `Association<T, C>` from `@core-std` — never variadic tuple types. Import `Association` and `Cardinality` from `@core-std`.
-- All lifecycled abstractions expose `deletedAt?: When` via `Instantiable` intersection — do not redeclare inline.
+- Embedded subordinate associations use `Association<T, C>` from `@core-std` — never variadic tuple types.
+  Import `Association` and `Cardinality` from `@core-std`.
+- All lifecycled abstractions expose `deletedAt?: When` via `Instantiable` intersection — do not redeclare
+  inline.
 - JSON-serializable only; no methods on domain objects.
 
 ### 8.3 Adapters
 
-- Functions only: `toAbstraction(dict: Dictionary): Abstraction` and `fromAbstraction(abstraction: Abstraction): Dictionary`.
+- Functions only: `toAbstraction(dict: Dictionary): Abstraction` and
+  `fromAbstraction(abstraction: Abstraction): Dictionary`.
 - Map every field explicitly. No `...spread`, no `payload` shortcut.
-- Fast-fail on missing required fields using `notValid` from `@core-std` — not `throw`. All `notValid` calls precede the single return statement.
+- Fast-fail on missing required fields using `notValid` from `@core-std` — not `throw`. All `notValid` calls
+  precede the single return statement.
 - `snake_case` keys for database column names; `camelCase` for domain fields.
 - Embedded `Association` fields: cast from `Dictionary` on read, map directly on write:
   ```typescript
@@ -356,8 +411,11 @@ Shared abstractions: `abstractions/common.ts`.
 
 - Functions only: `validate{Abstraction}Create(input): string | null` — return error message or `null`.
 - Validate at system boundaries only. Never re-validate inside domain logic.
-- Use shared primitive validators from `@core-std` (`isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`). Domain-specific guards live in their abstraction's validator file.
-- Follow the explicit decomposition archetype (`domain.md §2.12`): every domain object gets a named private `is{Abstraction}` guard; no anonymous object-level guards inline in `isAssociation` calls; anonymous arrows permitted only for primitive pass-throughs.
+- Use shared primitive validators from `@core-std` (`isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`).
+  Domain-specific guards live in their abstraction's validator file.
+- Follow the explicit decomposition archetype (`domain.md §2.12`): every domain object gets a named private
+  `is{Abstraction}` guard; no anonymous object-level guards inline in `isAssociation` calls; anonymous arrows
+  permitted only for primitive pass-throughs.
 
 ### 8.5 Protocols
 
@@ -367,7 +425,8 @@ Shared abstractions: `abstractions/common.ts`.
 
 ## 9. Configuration Pattern
 
-The system uses a singleton `Config` with injected runtime providers. Defined in `@core/cfg/config.ts`; initialized once per deployment context.
+The system uses a singleton `Config` with injected runtime providers. Defined in `@core/cfg/config.ts`;
+initialized once per deployment context.
 
 ```typescript
 Config.init(provider, keys, aliases?)
@@ -375,13 +434,17 @@ Config.init(provider, keys, aliases?)
 
 ### 9.1 Arguments
 
-- `provider` — runtime-specific `RuntimeProvider` instance (`SolidProvider`, `SupabaseProvider`, `DenoProvider`)
+- `provider` — runtime-specific `RuntimeProvider` instance (`SolidProvider`, `SupabaseProvider`,
+  `DenoProvider`)
 - `keys` — required environment variable names; fails fast at bootstrap if any are missing
-- `aliases` — optional map of logical name to environment key; allows consuming code to use stable names regardless of platform-specific key prefixes
+- `aliases` — optional map of logical name to environment key; allows consuming code to use stable names
+  regardless of platform-specific key prefixes
 
 ### 9.2 Why aliases matter
 
-Vite requires client-side environment variables to be prefixed `VITE_`. Without aliases, every call site must know the prefix. With aliases, the bootstrap declares the mapping once and all consuming code uses the clean logical name:
+Vite requires client-side environment variables to be prefixed `VITE_`. Without aliases, every call site must
+know the prefix. With aliases, the bootstrap declares the mapping once and all consuming code uses the clean
+logical name:
 
 ```typescript
 // source/ux/config/ux-config.ts
@@ -408,7 +471,8 @@ Consuming code calls `Config.get('SUPABASE_EDGE_URL')` — no `VITE_` prefix, no
 ### 9.3 Rules
 
 - `Config.init()` — call once at bootstrap; throws if called twice.
-- `Config.get(name)` — resolves alias if present, then returns value; throws if not initialized, key not registered, or value missing. Never returns undefined.
+- `Config.get(name)` — resolves alias if present, then returns value; throws if not initialized, key not
+  registered, or value missing. Never returns undefined.
 - `Config.fail(msg)` — throws `never`; use for invariant violations.
 - Never access `Deno.env` or `import.meta.env` directly. Always go through `Config.get()`.
 
@@ -432,7 +496,10 @@ source/tests/
 ```
 
 - Test files live in `source/tests/cases/`, named `{abstraction}-api-test.ts`.
-- `{abstraction}-samples.ts` — exports named constants and factory functions producing valid, realistic domain objects. These are the ground truth for tests.
-- `fixtures-test.ts` — validates fixture integrity: Id format, required fields, association linkage. If a fixture fails here the domain types have drifted.
+- `{abstraction}-samples.ts` — exports named constants and factory functions producing valid, realistic domain
+  objects. These are the ground truth for tests.
+- `fixtures-test.ts` — validates fixture integrity: Id format, required fields, association linkage. If a
+  fixture fails here the domain types have drifted.
 - Tests exercise the public contract of each layer, not implementation details.
-- Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.
+- Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips
+  cleanly.
