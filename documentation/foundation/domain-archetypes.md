@@ -6,7 +6,7 @@
 
 Implementation patterns for the `source/domain/` package. This document governs **how** domain meaning is expressed in code. For **what** the domain means, see `domain.md`.
 
-Authority chain for implementation:
+Authority chain for implementation: 
   `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md` → `style-guide.md`
 
 ## 2. File Organization
@@ -184,13 +184,13 @@ export const validateWorkflowCreate = (input: WorkflowCreateInput): string | nul
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// PRIVATE VALIDATOR DECOMPOSITION
+  // VALIDATOR DECOMPOSITION
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Validate question component */
 const isQuestion = (v: unknown): v is Question => {
   if (!v || typeof v !== 'object') return false
-  const q = v as Record<string, unknown>
+  const q = v as Dictionary
   return isId(q.id)
     && isNonEmptyString(q.prompt)
     && QUESTION_TYPES.includes(q.type as Question['type'])
@@ -199,7 +199,7 @@ const isQuestion = (v: unknown): v is Question => {
 /** Validate task component */
 const isTask = (v: unknown): v is Task => {
   if (!v || typeof v !== 'object') return false
-  const t = v as Record<string, unknown>
+  const t = v as Dictionary
   return isId(t.id)
     && isNonEmptyString(t.title)
     && isCompositionPositive(t.checklist, isQuestion)

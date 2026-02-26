@@ -1,15 +1,12 @@
 # Domain Sub-Layers Generation Prompt
 
-You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no architectural authority. Implement
-exactly what is specified. Do not invent abstractions, reinterpret intent, or cross architectural boundaries.
+You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no architectural authority. Implement exactly what is specified. Do not invent abstractions, reinterpret intent, or cross architectural boundaries.
 
 ## Authority
 
-In case of conflict: `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md` →
-`style-guide.md`
+In case of conflict: `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md` → `style-guide.md`
 
-You MUST ingest all of these files PRIOR to assessing your task. Confirm you have no conflicts, questions, or
-concerns before generating any files.
+You MUST ingest all of these files PRIOR to assessing your task. Confirm you have no conflicts, questions, or concerns before generating any files.
 
 ## Task
 
@@ -71,10 +68,7 @@ Trailing slashes required on directory aliases:
 @domain/        → source/domain/
 ```
 
-`@core-std` barrel exports: `Id`, `When`, `Dictionary`, `Instantiable`, `notValid`, `isNonEmptyString`,
-`isId`, `isWhen`, `isPositiveNumber`, `CompositionOne`, `CompositionOptional`, `CompositionMany`,
-`CompositionPositive`, `AssociationOne`, `AssociationOptional`, `AssociationJunction`, `isCompositionOne`,
-`isCompositionOptional`, `isCompositionMany`, `isCompositionPositive`, `demandOne`, `optionalOne`
+`@core-std` barrel exports: `Id`, `When`, `Dictionary`, `Instantiable`, `notValid`, `isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`, `CompositionOne`, `CompositionOptional`, `CompositionMany`, `CompositionPositive`, `AssociationOne`, `AssociationOptional`, `AssociationJunction`, `isCompositionOne`, `isCompositionOptional`, `isCompositionMany`, `isCompositionPositive`, `demandOne`, `optionalOne`
 
 ## Abstraction Source Files
 
@@ -140,29 +134,23 @@ toNote / fromNote
 toAttachment / fromAttachment
 ```
 
-`Location`, `Note`, `Attachment` have no `id` or lifecycle fields of their own (except `Note.id: Id` and
-`Attachment.id: Id` which are plain value fields, not FK references — map them directly as `string`).
+`Location`, `Note`, `Attachment` have no `id` or lifecycle fields of their own (except `Note.id: Id` and `Attachment.id: Id` which are plain value fields, not FK references — map them directly as `string`).
 
 ### 1.3 Field Mapping Rules
 
 - DB column names are `snake_case`; domain fields are `camelCase`
-- FK `AssociationOne<T>` / `AssociationOptional<T>` / `AssociationJunction<T>` fields: strip the `Id` suffix
-  for the DB column name
+- FK `AssociationOne<T>` / `AssociationOptional<T>` / `AssociationJunction<T>` fields: strip the `Id` suffix for the DB column name
   - `customerId` → `customer_id`, `planId` → `plan_id`, `basisWorkflowId` → `basis_workflow_id`
 - `AssociationOptional<T>` resolves to `Id | undefined` — cast as `dict.foo_id as string | undefined`
-- `CompositionMany<T>` / `CompositionPositive<T>` fields are stored as JSONB — Supabase SDK deserializes
-  automatically; map with `.map(toChild)` / `.map(fromChild)` — no `JSON.parse`/`JSON.stringify`
-- `CompositionOne<T>` fields: wrap in single-element array on `from`, unwrap with `[0]` on `to` after mapping
-  — e.g. `answer: [toAnswer(dict.answer as Dictionary)]`
-- Fast-fail on every required scalar field using `notValid` — all `notValid` calls must precede the single
-  `return` statement so the compiler sees an unconditional return path
+- `CompositionMany<T>` / `CompositionPositive<T>` fields are stored as JSONB — Supabase SDK deserializes automatically; map with `.map(toChild)` / `.map(fromChild)` — no `JSON.parse`/`JSON.stringify`
+- `CompositionOne<T>` fields: wrap in single-element array on `from`, unwrap with `[0]` on `to` after mapping — e.g. `answer: [toAnswer(dict.answer as Dictionary)]`
+- Fast-fail on every required scalar field using `notValid` — all `notValid` calls must precede the single `return` statement so the compiler sees an unconditional return path
 - Optional fields: do not guard — cast directly: `description: dict.description as string | undefined`
 - `deletedAt` is always optional: `deletedAt: dict.deleted_at as When | undefined`
 
 ### 1.4 Junction and Flat Types
 
-`ServiceRequiredAssetType`, `JobPlanAsset` are pure junctions with no lifecycle. Provide adapters but omit
-`notValid` guards for the two FK columns since both are required by the junction contract — simply cast:
+`ServiceRequiredAssetType`, `JobPlanAsset` are pure junctions with no lifecycle. Provide adapters but omit `notValid` guards for the two FK columns since both are required by the junction contract — simply cast:
 
 ```typescript
 export const toServiceRequiredAssetType = (dict: Dictionary): ServiceRequiredAssetType => ({
@@ -171,8 +159,7 @@ export const toServiceRequiredAssetType = (dict: Dictionary): ServiceRequiredAss
 })
 ```
 
-`JobWorkLogEntry` has no lifecycle (no `updatedAt`, no `deletedAt`) but does have `id` and `createdAt` as
-plain value fields — map them directly.
+`JobWorkLogEntry` has no lifecycle (no `updatedAt`, no `deletedAt`) but does have `id` and `createdAt` as plain value fields — map them directly.
 
 ### 1.5 Notable Per-Type Mappings
 
@@ -224,14 +211,11 @@ export type FooUpdateInput = {
 - FK fields use bare `Id` — not `Association*` types
 - No business logic; protocols are transmission shapes only
 - Embedded composition fields that are writable use their child's create shape:
-  - e.g. `Customer.contacts` in `CustomerCreateInput` uses the `Contact` type directly (it has no
-    create/update protocol of its own)
+  - e.g. `Customer.contacts` in `CustomerCreateInput` uses the `Contact` type directly (it has no create/update protocol of its own)
 - Read-only master abstractions (`Workflow`) omit `UpdateInput`; provide `WorkflowCreateInput` only
-- Junction types (`ServiceRequiredAssetType`, `JobPlanAsset`) provide only a create shape — no `id`, no
-  `UpdateInput`
+- Junction types (`ServiceRequiredAssetType`, `JobPlanAsset`) provide only a create shape — no `id`, no `UpdateInput`
 - `JobWorkLogEntry` is append-only — provide `JobWorkLogEntryCreateInput` only; no `UpdateInput`
-- `JobWork` is created once and its `work` manifest is immutable — provide `JobWorkCreateInput` only; no
-  `UpdateInput`
+- `JobWork` is created once and its `work` manifest is immutable — provide `JobWorkCreateInput` only; no `UpdateInput`
 - `JobWorkflow` supports both create and update (sequence or modifiedWorkflowId may change during planning)
 
 ### 2.3 Per-Abstraction Guidance
@@ -256,8 +240,7 @@ export type FooUpdateInput = {
 | `JobWork`           | `jobId: Id`, `work: Id[]`, `startedAt: When`, `startedById: Id`                                                               | _(immutable manifest — no UpdateInput)_                                                        |
 | `JobWorkLogEntry`   | `jobId: Id`, `userId: Id`, `answer: Answer`                                                                                   | _(append-only — no UpdateInput)_                                                               |
 
-Import `Location`, `Contact`, `Answer`, `Task`, `UserRole`, `When` from their respective abstraction files as
-needed. Import `Id`, `When` from `@core-std`.
+Import `Location`, `Contact`, `Answer`, `Task`, `UserRole`, `When` from their respective abstraction files as needed. Import `Id`, `When` from `@core-std`.
 
 ---
 
@@ -298,8 +281,7 @@ const isFoo = (v: unknown): v is Foo => { ... }
 - Validate at system boundaries only — never re-validate inside domain logic
 - Use `@core-std` primitives: `isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`, `isComposition*`
 - No throwing — validators return, callers decide
-- `UpdateInput` validators: validate `id` first (`isId`), then validate any provided optional fields (only
-  validate non-undefined fields)
+- `UpdateInput` validators: validate `id` first (`isId`), then validate any provided optional fields (only validate non-undefined fields)
 
 ### 3.3 Explicit Decomposition Rules (non-negotiable)
 
@@ -307,8 +289,7 @@ Per `CONSTITUTION.md §9.5.1` (Explicit over clever):
 
 1. **Named guards** — every domain object type validated in the file gets a private `is{Abstraction}` guard
 2. **Recursive delegation** — `isComposition*(data, is{Child})` to delegate down the tree
-3. **Primitive-only anonymous functions** — anonymous arrows permitted only for primitives:
-   `(v): v is string => isNonEmptyString(v)`; all object validation must be a named guard
+3. **Primitive-only anonymous functions** — anonymous arrows permitted only for primitives: `(v): v is string => isNonEmptyString(v)`; all object validation must be a named guard
 4. **Input narrowing** — guards narrow with `Record<string, unknown>` and `@core-std` primitives
 
 ### 3.4 Per-Abstraction Validator Notes
@@ -331,8 +312,7 @@ Per `CONSTITUTION.md §9.5.1` (Explicit over clever):
 | `JobWork`           | `jobId` isId; `work` isCompositionPositive using `isId`; `startedAt` isWhen; `startedById` isId          | _(no UpdateInput — omit update validator)_                |
 | `JobWorkLogEntry`   | `jobId` isId; `userId` isId; `answer` isCompositionOne using `isAnswer`                                  | _(no UpdateInput — omit update validator)_                |
 
-**Enum constants to define privately** in each validator file (derive from abstractions — do not redefine
-union types, just make tuple arrays for `includes` checks):
+**Enum constants to define privately** in each validator file (derive from abstractions — do not redefine union types, just make tuple arrays for `includes` checks):
 
 ```typescript
 const ASSET_STATUSES = ['active', 'maintenance', 'retired', 'reserved'] as const
@@ -355,12 +335,9 @@ Import `USER_ROLES` directly from `@domain/abstractions/user.ts` rather than red
 
 Private object guards needed per file:
 
-- `asset-validator.ts`: `isAssetType` not needed (AssetType is referenced only by id in protocols); no
-  sub-object guards required beyond primitives
-- `chemical-validator.ts`: `isChemicalLabel` (for label composition in Chemical — but ChemicalCreateInput only
-  takes scalar fields, so no guard needed for create validator; skip composition guards)
-- `customer-validator.ts`: `isContact`, `isLocation` (for CustomerCreateInput.contacts and
-  CustomerSiteCreateInput.location)
+- `asset-validator.ts`: `isAssetType` not needed (AssetType is referenced only by id in protocols); no sub-object guards required beyond primitives
+- `chemical-validator.ts`: `isChemicalLabel` (for label composition in Chemical — but ChemicalCreateInput only takes scalar fields, so no guard needed for create validator; skip composition guards)
+- `customer-validator.ts`: `isContact`, `isLocation` (for CustomerCreateInput.contacts and CustomerSiteCreateInput.location)
 - `workflow-validator.ts`: `isQuestion`, `isQuestionOption`, `isTask`
 - `job-validator.ts`: `isLocation` (reuse pattern from customer-validator), `isAnswer`
 
@@ -409,8 +386,7 @@ const isTask = (v: unknown): v is Task => {
 Before finalizing each file verify:
 
 1. **Adapters**
-   - Every `Instantiable` field (`createdAt`, `updatedAt`, `deletedAt?`) mapped to/from `snake_case` DB
-     columns
+   - Every `Instantiable` field (`createdAt`, `updatedAt`, `deletedAt?`) mapped to/from `snake_case` DB columns
    - Every FK field (`Association*`) maps to/from a `_id`-suffixed DB column
    - Every `Composition*` field mapped with `.map()` — no raw casts of array fields
    - All `notValid` guards precede the single `return` — no unreachable returns
@@ -427,7 +403,6 @@ Before finalizing each file verify:
    - Every exported validator returns `string | null`
    - Every object-level validation uses a named private `is*` guard
    - Enum checks use `includes` against a local `as const` tuple
-   - `UpdateInput` validators only validate fields that are present (check `!== undefined` before validating
-     optional fields)
+   - `UpdateInput` validators only validate fields that are present (check `!== undefined` before validating optional fields)
    - No semicolons; single quotes; no `any`
    - `deno task check` passes
