@@ -4,11 +4,9 @@ You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no archi
 
 ## Authority
 
-In case of conflict: 
-  `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md` → `style-guide.md`
+In case of conflict: `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md` → `style-guide.md`
 
-You MUST Ingest all of these files PRIOR to assessing your task.
-Confirm you have no conflicts, questions, or concerns before generating any files.
+You MUST Ingest all of these files PRIOR to assessing your task. Confirm you have no conflicts, questions, or concerns before generating any files.
 
 ## Task
 
@@ -46,10 +44,7 @@ Trailing slashes required on directory aliases:
 @domain/        → source/domain/
 ```
 
-`@core-std` barrel exports: `Id`, `When`, `Dictionary`, `Instantiable`, `notValid`,
-`isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`,
-`CompositionOne`, `CompositionOptional`, `CompositionMany`, `CompositionPositive`,
-`AssociationOne`, `AssociationOptional`, `AssociationJunction`
+`@core-std` barrel exports: `Id`, `When`, `Dictionary`, `Instantiable`, `notValid`, `isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`, `CompositionOne`, `CompositionOptional`, `CompositionMany`, `CompositionPositive`, `AssociationOne`, `AssociationOptional`, `AssociationJunction`
 
 ## File Format
 
@@ -67,13 +62,11 @@ export type Asset = Instantiable & {
 }
 ```
 
-Instantiable types: `AssetType`, `Asset`, `Chemical`, `Customer`, `Service`, `Workflow`,
-`Job`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobPlanAssignment`, `JobPlanChemical`, `JobWork`, `User`
+Instantiable types: `AssetType`, `Asset`, `Chemical`, `Customer`, `Service`, `Workflow`, `Job`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobPlanAssignment`, `JobPlanChemical`, `JobWork`, `User`
 
 ## Relation Types
 
-All embedded subordinate compositions use `Composition*<T>` — never variadic tuples or bare arrays.
-All FK references use `Association*<T>` — never bare `Id` fields.
+All embedded subordinate compositions use `Composition*<T>` — never variadic tuples or bare arrays. All FK references use `Association*<T>` — never bare `Id` fields.
 
 | Use case                        | Type                     |
 | ------------------------------- | ------------------------ |
