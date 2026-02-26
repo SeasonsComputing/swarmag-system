@@ -74,16 +74,16 @@ Trailing slashes required on directory aliases:
 
 The complete, authoritative domain type definitions are in `source/domain/abstractions/`:
 
-| File          | Key types exported                                                                                                                                  |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `common.ts`   | `Location`, `Attachment`, `AttachmentKind`, `Note`                                                                                                  |
-| `asset.ts`    | `AssetType`, `AssetStatus`, `Asset`                                                                                                                 |
-| `chemical.ts` | `ChemicalUsage`, `ChemicalLabel`, `Chemical`                                                                                                        |
-| `customer.ts` | `Contact`, `CustomerSite`, `Customer`                                                                                                               |
-| `service.ts`  | `ServiceCategory`, `Service`, `ServiceRequiredAssetType`                                                                                            |
-| `user.ts`     | `USER_ROLES`, `UserRole`, `User`                                                                                                                    |
-| `workflow.ts` | `QuestionType`, `QuestionOption`, `Question`, `AnswerValue`, `Answer`, `Task`, `Workflow`                                                           |
-| `job.ts`      | `JobStatus`, `Job`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobPlanAssignment`, `JobPlanChemical`, `JobPlanAsset`, `JobWork`, `JobWorkLogEntry` |
+| File          | Key types exported                                                                                                                                                                                    |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `common.ts`   | `Location`, `Attachment`, `AttachmentKind`, `Note`                                                                                                                                                    |
+| `asset.ts`    | `ASSET_STATUSES`, `AssetStatus`, `AssetType`, `Asset`                                                                                                                                                 |
+| `chemical.ts` | `CHEMICAL_USAGES`, `ChemicalUsage`, `ChemicalLabel`, `Chemical`                                                                                                                                       |
+| `customer.ts` | `Contact`, `CustomerSite`, `Customer`                                                                                                                                                                 |
+| `service.ts`  | `SERVICE_CATEGORIES`, `ServiceCategory`, `Service`, `ServiceRequiredAssetType`                                                                                                                        |
+| `user.ts`     | `USER_ROLES`, `UserRole`, `User`                                                                                                                                                                      |
+| `workflow.ts` | `QUESTION_TYPES`, `QuestionType`, `QuestionOption`, `Question`, `AnswerValue`, `Answer`, `Task`, `Workflow`                                                                                           |
+| `job.ts`      | `JOB_STATUSES`, `JobStatus`, `CHEMICAL_UNITS`, `ChemicalUnit`, `Job`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobPlanAssignment`, `JobPlanChemical`, `JobPlanAsset`, `JobWork`, `JobWorkLogEntry` |
 
 ---
 
@@ -190,13 +190,13 @@ import type { Id } from '@core-std'
 import type { FooStatus } from '@domain/abstractions/foo.ts'
 
 /** Input for creating a Foo. */
-export type FooCreateInput = {
+export type FooCreate = {
   label: string
   status: FooStatus
 }
 
 /** Input for updating a Foo. */
-export type FooUpdateInput = {
+export type FooUpdate = {
   id: Id
   label?: string
   status?: FooStatus
@@ -205,22 +205,22 @@ export type FooUpdateInput = {
 
 ### 2.2 Rules
 
-- `{Abstraction}CreateInput` and `{Abstraction}UpdateInput` per lifecycled abstraction
-- `UpdateInput` always includes `id: Id`
+- `{Abstraction}Create` and `{Abstraction}Update` per lifecycled abstraction
+- `{Abstraction}Update` always includes `id: Id`
 - Partial shapes — only fields meaningful for the operation; omit `createdAt`, `updatedAt`, `deletedAt`
 - FK fields use bare `Id` — not `Association*` types
 - No business logic; protocols are transmission shapes only
 - Embedded composition fields that are writable use their child's create shape:
-  - e.g. `Customer.contacts` in `CustomerCreateInput` uses the `Contact` type directly (it has no create/update protocol of its own)
-- Read-only master abstractions (`Workflow`) omit `UpdateInput`; provide `WorkflowCreateInput` only
-- Junction types (`ServiceRequiredAssetType`, `JobPlanAsset`) provide only a create shape — no `id`, no `UpdateInput`
-- `JobWorkLogEntry` is append-only — provide `JobWorkLogEntryCreateInput` only; no `UpdateInput`
-- `JobWork` is created once and its `work` manifest is immutable — provide `JobWorkCreateInput` only; no `UpdateInput`
+  - e.g. `Customer.contacts` in `CustomerCreate` uses the `Contact` type directly (it has no create/update protocol of its own)
+- Read-only master abstractions (`Workflow`) omit `{Abstraction}Update`; provide `WorkflowCreate` only
+- Junction types (`ServiceRequiredAssetType`, `JobPlanAsset`) provide only a create shape — no `id`, no `{Abstraction}Update`
+- `JobWorkLogEntry` is append-only — provide `JobWorkLogEntryCreate` only; no `{Abstraction}Update`
+- `JobWork` is created once and its `work` manifest is immutable — provide `JobWorkCreate` only; no `{Abstraction}Update`
 - `JobWorkflow` supports both create and update (sequence or modifiedWorkflowId may change during planning)
 
 ### 2.3 Per-Abstraction Guidance
 
-| Abstraction         | CreateInput fields                                                                                                            | UpdateInput fields (id + optionals)                                                            |
+| Abstraction         | Create fields                                                                                                                 | Update fields (id + optionals)                                                                 |
 | ------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
 | `AssetType`         | `label`, `active`                                                                                                             | `label?`, `active?`                                                                            |
 | `Asset`             | `label`, `type: Id`, `status`                                                                                                 | `label?`, `type?: Id`, `status?`                                                               |
@@ -236,9 +236,9 @@ export type FooUpdateInput = {
 | `JobPlan`           | `jobId: Id`, `scheduledStart: When`, `scheduledEnd?: When`                                                                    | `scheduledStart?`, `scheduledEnd?`                                                             |
 | `JobPlanAssignment` | `planId: Id`, `userId: Id`, `role: UserRole`                                                                                  | `role?`                                                                                        |
 | `JobPlanChemical`   | `planId: Id`, `chemicalId: Id`, `amount`, `unit`, `targetArea?`, `targetAreaUnit?`                                            | `amount?`, `unit?`, `targetArea?`, `targetAreaUnit?`                                           |
-| `JobPlanAsset`      | `planId: Id`, `assetId: Id`                                                                                                   | _(junction — no UpdateInput)_                                                                  |
-| `JobWork`           | `jobId: Id`, `work: Id[]`, `startedAt: When`, `startedById: Id`                                                               | _(immutable manifest — no UpdateInput)_                                                        |
-| `JobWorkLogEntry`   | `jobId: Id`, `userId: Id`, `answer: Answer`                                                                                   | _(append-only — no UpdateInput)_                                                               |
+| `JobPlanAsset`      | `planId: Id`, `assetId: Id`                                                                                                   | _(junction — no Update)_                                                                  |
+| `JobWork`           | `jobId: Id`, `work: Id[]`, `startedAt: When`, `startedById: Id`                                                               | _(immutable manifest — no Update)_                                                        |
+| `JobWorkLogEntry`   | `jobId: Id`, `userId: Id`, `answer: Answer`                                                                                   | _(append-only — no Update)_                                                               |
 
 Import `Location`, `Contact`, `Answer`, `Task`, `UserRole`, `When` from their respective abstraction files as needed. Import `Id`, `When` from `@core-std`.
 
@@ -255,14 +255,14 @@ Import `Location`, `Contact`, `Answer`, `Task`, `UserRole`, `When` from their re
 
 import { isCompositionPositive, isId, isNonEmptyString } from '@core-std'
 import type { Foo } from '@domain/abstractions/foo.ts'
-import type { FooCreateInput } from '@domain/protocols/foo-protocol.ts'
+import type { FooCreate } from '@domain/protocols/foo-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validates FooCreateInput; returns error message or null. */
-export const validateFooCreate = (input: FooCreateInput): string | null => {
+/** Validates FooCreate; returns error message or null. */
+export const validateFooCreate = (input: FooCreate): string | null => {
   if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
   return null
 }
@@ -276,23 +276,48 @@ const isFoo = (v: unknown): v is Foo => { ... }
 
 ### 3.2 Rules
 
-- Export `validate{Abstraction}Create` (and `validate{Abstraction}Update` where `UpdateInput` exists)
+- Export `validate{Abstraction}Create` (and `validate{Abstraction}Update` where `{Abstraction}Update` exists)
 - Return `string | null` — error message or `null` for valid
 - Validate at system boundaries only — never re-validate inside domain logic
 - Use `@core-std` primitives: `isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`, `isComposition*`
 - No throwing — validators return, callers decide
-- `UpdateInput` validators: validate `id` first (`isId`), then validate any provided optional fields (only validate non-undefined fields)
+- Update validators: validate `id` first (`isId`), then validate any provided optional fields (only validate non-undefined fields)
 
-### 3.3 Explicit Decomposition Rules (non-negotiable)
+### 3.3 Const-Enum Membership (non-negotiable)
+
+Validators import the const-enum tuple from the abstraction file and use `.includes()` for membership checks. **Never redeclare a local tuple copy in a validator file.**
+
+```typescript
+// CORRECT — import and reuse
+import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
+QUESTION_TYPES.includes(q.type as Question['type'])
+
+// WRONG — local redeclaration is a violation
+const QUESTION_TYPES = ['text', 'number', ...] as const
+```
+
+Import the following tuples from their abstraction files:
+
+| Tuple constant       | Import from                        |
+| -------------------- | ---------------------------------- |
+| `ASSET_STATUSES`     | `@domain/abstractions/asset.ts`    |
+| `CHEMICAL_USAGES`    | `@domain/abstractions/chemical.ts` |
+| `SERVICE_CATEGORIES` | `@domain/abstractions/service.ts`  |
+| `USER_ROLES`         | `@domain/abstractions/user.ts`     |
+| `QUESTION_TYPES`     | `@domain/abstractions/workflow.ts` |
+| `JOB_STATUSES`       | `@domain/abstractions/job.ts`      |
+| `CHEMICAL_UNITS`     | `@domain/abstractions/job.ts`      |
+
+### 3.4 Explicit Decomposition Rules (non-negotiable)
 
 Per `CONSTITUTION.md §9.5.1` (Explicit over clever):
 
 1. **Named guards** — every domain object type validated in the file gets a private `is{Abstraction}` guard
 2. **Recursive delegation** — `isComposition*(data, is{Child})` to delegate down the tree
 3. **Primitive-only anonymous functions** — anonymous arrows permitted only for primitives: `(v): v is string => isNonEmptyString(v)`; all object validation must be a named guard
-4. **Input narrowing** — guards narrow with `Record<string, unknown>` and `@core-std` primitives
+4. **Input narrowing** — guards narrow with `Dictionary` casts from `@core-std`, not `Record<string, unknown>`
 
-### 3.4 Per-Abstraction Validator Notes
+### 3.5 Per-Abstraction Validator Notes
 
 | Abstraction         | Create validations (key rules)                                                                           | Update validations                                        |
 | ------------------- | -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- |
@@ -302,44 +327,23 @@ Per `CONSTITUTION.md §9.5.1` (Explicit over clever):
 | `Customer`          | `name` non-empty; required address fields non-empty; `contacts` isCompositionPositive using `isContact`  | `id` isId                                                 |
 | `Service`           | `name` non-empty; `sku` non-empty; `category` in `SERVICE_CATEGORIES`                                    | `id` isId                                                 |
 | `User`              | `displayName`, `primaryEmail`, `phoneNumber` non-empty; `roles` isCompositionPositive using `isUserRole` | `id` isId                                                 |
-| `Workflow`          | `name` non-empty; `version` isPositiveNumber; `tasks` isCompositionPositive using `isTask`               | _(no UpdateInput — omit update validator)_                |
+| `Workflow`          | `name` non-empty; `version` isPositiveNumber; `tasks` isCompositionPositive using `isTask`               | _(no Update — omit update validator)_                |
 | `Job`               | `customerId` isId                                                                                        | `id` isId; `status` in `JOB_STATUSES` if provided         |
 | `JobAssessment`     | `jobId` isId; `assessorId` isId; `locations` isCompositionPositive using `isLocation`                    | `id` isId                                                 |
 | `JobWorkflow`       | `jobId` isId; `sequence` isPositiveNumber; `basisWorkflowId` isId                                        | `id` isId                                                 |
 | `JobPlan`           | `jobId` isId; `scheduledStart` isWhen                                                                    | `id` isId                                                 |
 | `JobPlanAssignment` | `planId` isId; `userId` isId; `role` in `USER_ROLES`                                                     | `id` isId                                                 |
-| `JobPlanChemical`   | `planId` isId; `chemicalId` isId; `amount` isPositiveNumber; `unit` in chemical units                    | `id` isId                                                 |
-| `JobWork`           | `jobId` isId; `work` isCompositionPositive using `isId`; `startedAt` isWhen; `startedById` isId          | _(no UpdateInput — omit update validator)_                |
-| `JobWorkLogEntry`   | `jobId` isId; `userId` isId; `answer` isCompositionOne using `isAnswer`                                  | _(no UpdateInput — omit update validator)_                |
-
-**Enum constants to define privately** in each validator file (derive from abstractions — do not redefine union types, just make tuple arrays for `includes` checks):
-
-```typescript
-const ASSET_STATUSES = ['active', 'maintenance', 'retired', 'reserved'] as const
-const CHEMICAL_USAGES = ['herbicide', 'pesticide', 'fertilizer', 'fungicide', 'adjuvant'] as const
-const SERVICE_CATEGORIES = ['aerial-drone-services', 'ground-machinery-services'] as const
-const JOB_STATUSES = [
-  'open',
-  'assessing',
-  'planning',
-  'preparing',
-  'executing',
-  'finalizing',
-  'closed',
-  'cancelled'
-] as const
-const CHEMICAL_UNITS = ['gallon', 'liter', 'pound', 'kilogram'] as const
-```
-
-Import `USER_ROLES` directly from `@domain/abstractions/user.ts` rather than redeclaring it.
+| `JobPlanChemical`   | `planId` isId; `chemicalId` isId; `amount` isPositiveNumber; `unit` in `CHEMICAL_UNITS`                  | `id` isId                                                 |
+| `JobWork`           | `jobId` isId; `work` isCompositionPositive using `isId`; `startedAt` isWhen; `startedById` isId          | _(no Update — omit update validator)_                |
+| `JobWorkLogEntry`   | `jobId` isId; `userId` isId; `answer` isCompositionOne using `isAnswer`                                  | _(no Update — omit update validator)_                |
 
 Private object guards needed per file:
 
-- `asset-validator.ts`: `isAssetType` not needed (AssetType is referenced only by id in protocols); no sub-object guards required beyond primitives
-- `chemical-validator.ts`: `isChemicalLabel` (for label composition in Chemical — but ChemicalCreateInput only takes scalar fields, so no guard needed for create validator; skip composition guards)
-- `customer-validator.ts`: `isContact`, `isLocation` (for CustomerCreateInput.contacts and CustomerSiteCreateInput.location)
-- `workflow-validator.ts`: `isQuestion`, `isQuestionOption`, `isTask`
-- `job-validator.ts`: `isLocation` (reuse pattern from customer-validator), `isAnswer`
+- `asset-validator.ts`: no sub-object guards required beyond primitives
+- `chemical-validator.ts`: no sub-object guards required for create validator (ChemicalCreate takes scalar fields only)
+- `customer-validator.ts`: `isContact`, `isLocation`
+- `workflow-validator.ts`: `isQuestionOption`, `isQuestion`, `isTask`
+- `job-validator.ts`: `isLocation`, `isAnswer`
 
 `isAnswer` guard shape:
 
@@ -353,10 +357,10 @@ const isAnswer = (v: unknown): v is Answer => {
 }
 ```
 
-`isQuestion` guard shape:
+`isQuestion` guard shape — import `QUESTION_TYPES`, do not redeclare:
 
 ```typescript
-const QUESTION_TYPES = ['text', 'number', 'boolean', 'single-select', 'multi-select', 'internal'] as const
+import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
 
 const isQuestion = (v: unknown): v is Question => {
   if (!v || typeof v !== 'object') return false
@@ -395,14 +399,14 @@ Before finalizing each file verify:
 2. **Protocols**
    - No `Instantiable` lifecycle fields in any input type
    - FK fields use bare `Id`, not `Association*` types
-   - `UpdateInput` always has `id: Id` as first field
-   - Append-only / immutable abstractions have no `UpdateInput`
+   - `{Abstraction}Update` always has `id: Id` as first field
+   - Append-only / immutable abstractions have no `{Abstraction}Update`
    - No semicolons; single quotes; no `any`
 
 3. **Validators**
    - Every exported validator returns `string | null`
    - Every object-level validation uses a named private `is*` guard
-   - Enum checks use `includes` against a local `as const` tuple
-   - `UpdateInput` validators only validate fields that are present (check `!== undefined` before validating optional fields)
+   - Enum membership checks import the tuple from the abstraction file — no local redeclarations
+   - Update validators only validate fields that are present (check `!== undefined` before validating optional fields)
    - No semicolons; single quotes; no `any`
    - `deno task check` passes
