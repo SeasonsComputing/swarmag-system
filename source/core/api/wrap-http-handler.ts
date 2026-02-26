@@ -220,7 +220,7 @@ FETCH REQUEST-RESPONSE FLOW:
     → Always returns { error: string, details?: string }
 `*/
 
-import type { Dictionary } from '@core-std'
+import { StringSet, type Dictionary } from '@core-std'
 
 // ───────────────────────────────────────────────────────────────────────────────
 // PUBLIC EXPORTS
@@ -542,7 +542,7 @@ const normalizeQuery = (
   enableMultiValue: boolean
 ): HttpQuery => {
   const normalized: HttpQuery = {}
-  const keys = new Set<string>()
+  const keys = new StringSet()
   params.forEach((_value, key) => keys.add(key))
   for (const key of keys) {
     const values = params.getAll(key)

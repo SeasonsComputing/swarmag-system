@@ -2,7 +2,7 @@
  * Fixture integrity checks for shared sample data.
  */
 
-import { isId, isWhen } from '@core-std'
+import { isId, isWhen, StringSet } from '@core-std'
 import type { AssetStatus } from '@domain/abstractions/asset.ts'
 import { assert, assertEquals } from '@std/assert'
 import {
@@ -21,7 +21,7 @@ const allowedAssetStatuses: AssetStatus[] = [
 ]
 
 Deno.test('fixture integrity: asset fixtures respect domain constraints', () => {
-  const seenAssetTypes = new Set<string>()
+  const seenAssetTypes = new StringSet()
 
   for (const assetType of assetTypeSamples) {
     assert(isId(assetType.id))
