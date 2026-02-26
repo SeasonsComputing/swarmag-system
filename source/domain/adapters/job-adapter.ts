@@ -18,13 +18,20 @@ import type {
   JobWorkLogEntry
 } from '@domain/abstractions/job.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
-import { toLocation, fromLocation, toNote, fromNote } from '@domain/adapters/common-adapter.ts'
-import { toAnswer, fromAnswer } from '@domain/adapters/workflow-adapter.ts'
+import {
+  fromLocation,
+  fromNote,
+  toLocation,
+  toNote
+} from '@domain/adapters/common-adapter.ts'
+import { fromAnswer, toAnswer } from '@domain/adapters/workflow-adapter.ts'
 
 /** Create a Job from serialized dictionary format */
 export const toJob = (dict: Dictionary): Job => {
   if (!dict.id) return notValid('Job dictionary missing required field: id')
-  if (!dict.customer_id) return notValid('Job dictionary missing required field: customer_id')
+  if (!dict.customer_id) {
+    return notValid('Job dictionary missing required field: customer_id')
+  }
   if (!dict.status) return notValid('Job dictionary missing required field: status')
   return {
     id: dict.id as string,
@@ -49,8 +56,12 @@ export const fromJob = (job: Job): Dictionary => ({
 /** Create a JobAssessment from serialized dictionary format */
 export const toJobAssessment = (dict: Dictionary): JobAssessment => {
   if (!dict.id) return notValid('JobAssessment dictionary missing required field: id')
-  if (!dict.job_id) return notValid('JobAssessment dictionary missing required field: job_id')
-  if (!dict.assessor_id) return notValid('JobAssessment dictionary missing required field: assessor_id')
+  if (!dict.job_id) {
+    return notValid('JobAssessment dictionary missing required field: job_id')
+  }
+  if (!dict.assessor_id) {
+    return notValid('JobAssessment dictionary missing required field: assessor_id')
+  }
   return {
     id: dict.id as string,
     jobId: dict.job_id as string,
@@ -80,8 +91,12 @@ export const fromJobAssessment = (assessment: JobAssessment): Dictionary => ({
 /** Create a JobWorkflow from serialized dictionary format */
 export const toJobWorkflow = (dict: Dictionary): JobWorkflow => {
   if (!dict.id) return notValid('JobWorkflow dictionary missing required field: id')
-  if (!dict.job_id) return notValid('JobWorkflow dictionary missing required field: job_id')
-  if (!dict.basis_workflow_id) return notValid('JobWorkflow dictionary missing required field: basis_workflow_id')
+  if (!dict.job_id) {
+    return notValid('JobWorkflow dictionary missing required field: job_id')
+  }
+  if (!dict.basis_workflow_id) {
+    return notValid('JobWorkflow dictionary missing required field: basis_workflow_id')
+  }
   return {
     id: dict.id as string,
     jobId: dict.job_id as string,
@@ -110,7 +125,9 @@ export const fromJobWorkflow = (jobWorkflow: JobWorkflow): Dictionary => ({
 export const toJobPlan = (dict: Dictionary): JobPlan => {
   if (!dict.id) return notValid('JobPlan dictionary missing required field: id')
   if (!dict.job_id) return notValid('JobPlan dictionary missing required field: job_id')
-  if (!dict.scheduled_start) return notValid('JobPlan dictionary missing required field: scheduled_start')
+  if (!dict.scheduled_start) {
+    return notValid('JobPlan dictionary missing required field: scheduled_start')
+  }
   return {
     id: dict.id as string,
     jobId: dict.job_id as string,
@@ -138,9 +155,15 @@ export const fromJobPlan = (plan: JobPlan): Dictionary => ({
 /** Create a JobPlanAssignment from serialized dictionary format */
 export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => {
   if (!dict.id) return notValid('JobPlanAssignment dictionary missing required field: id')
-  if (!dict.plan_id) return notValid('JobPlanAssignment dictionary missing required field: plan_id')
-  if (!dict.user_id) return notValid('JobPlanAssignment dictionary missing required field: user_id')
-  if (!dict.role) return notValid('JobPlanAssignment dictionary missing required field: role')
+  if (!dict.plan_id) {
+    return notValid('JobPlanAssignment dictionary missing required field: plan_id')
+  }
+  if (!dict.user_id) {
+    return notValid('JobPlanAssignment dictionary missing required field: user_id')
+  }
+  if (!dict.role) {
+    return notValid('JobPlanAssignment dictionary missing required field: role')
+  }
   return {
     id: dict.id as string,
     planId: dict.plan_id as string,
@@ -168,8 +191,12 @@ export const fromJobPlanAssignment = (assignment: JobPlanAssignment): Dictionary
 /** Create a JobPlanChemical from serialized dictionary format */
 export const toJobPlanChemical = (dict: Dictionary): JobPlanChemical => {
   if (!dict.id) return notValid('JobPlanChemical dictionary missing required field: id')
-  if (!dict.plan_id) return notValid('JobPlanChemical dictionary missing required field: plan_id')
-  if (!dict.chemical_id) return notValid('JobPlanChemical dictionary missing required field: chemical_id')
+  if (!dict.plan_id) {
+    return notValid('JobPlanChemical dictionary missing required field: plan_id')
+  }
+  if (!dict.chemical_id) {
+    return notValid('JobPlanChemical dictionary missing required field: chemical_id')
+  }
   return {
     id: dict.id as string,
     planId: dict.plan_id as string,
@@ -214,11 +241,13 @@ export const fromJobPlanAsset = (junction: JobPlanAsset): Dictionary => ({
 export const toJobWork = (dict: Dictionary): JobWork => {
   if (!dict.id) return notValid('JobWork dictionary missing required field: id')
   if (!dict.job_id) return notValid('JobWork dictionary missing required field: job_id')
-  if (!dict.started_by_id) return notValid('JobWork dictionary missing required field: started_by_id')
+  if (!dict.started_by_id) {
+    return notValid('JobWork dictionary missing required field: started_by_id')
+  }
   return {
     id: dict.id as string,
     jobId: dict.job_id as string,
-    work: (dict.work as string[]).map((v) => v),
+    work: (dict.work as string[]).map(v => v),
     startedAt: dict.started_at as When,
     startedById: dict.started_by_id as string,
     completedAt: dict.completed_at as When | undefined,
@@ -232,7 +261,7 @@ export const toJobWork = (dict: Dictionary): JobWork => {
 export const fromJobWork = (work: JobWork): Dictionary => ({
   id: work.id,
   job_id: work.jobId,
-  work: work.work.map((v) => v),
+  work: work.work.map(v => v),
   started_at: work.startedAt,
   started_by_id: work.startedById,
   completed_at: work.completedAt,
@@ -244,8 +273,12 @@ export const fromJobWork = (work: JobWork): Dictionary => ({
 /** Create a JobWorkLogEntry from serialized dictionary format */
 export const toJobWorkLogEntry = (dict: Dictionary): JobWorkLogEntry => {
   if (!dict.id) return notValid('JobWorkLogEntry dictionary missing required field: id')
-  if (!dict.job_id) return notValid('JobWorkLogEntry dictionary missing required field: job_id')
-  if (!dict.user_id) return notValid('JobWorkLogEntry dictionary missing required field: user_id')
+  if (!dict.job_id) {
+    return notValid('JobWorkLogEntry dictionary missing required field: job_id')
+  }
+  if (!dict.user_id) {
+    return notValid('JobWorkLogEntry dictionary missing required field: user_id')
+  }
   return {
     id: dict.id as string,
     jobId: dict.job_id as string,

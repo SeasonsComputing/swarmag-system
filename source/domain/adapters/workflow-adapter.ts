@@ -4,8 +4,16 @@
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
-import type { Answer, AnswerValue, Question, QuestionOption, QuestionType, Task, Workflow } from '@domain/abstractions/workflow.ts'
-import { toNote, fromNote } from '@domain/adapters/common-adapter.ts'
+import type {
+  Answer,
+  AnswerValue,
+  Question,
+  QuestionOption,
+  QuestionType,
+  Task,
+  Workflow
+} from '@domain/abstractions/workflow.ts'
+import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
 /** Create a QuestionOption from serialized dictionary format */
 export const toQuestionOption = (dict: Dictionary): QuestionOption => ({
@@ -84,7 +92,7 @@ export const toWorkflow = (dict: Dictionary): Workflow => {
     name: dict.name as string,
     description: dict.description as string | undefined,
     version: dict.version as number,
-    tags: (dict.tags as string[]).map((v) => v),
+    tags: (dict.tags as string[]).map(v => v),
     tasks: (dict.tasks as Dictionary[]).map(toTask),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
@@ -98,7 +106,7 @@ export const fromWorkflow = (workflow: Workflow): Dictionary => ({
   name: workflow.name,
   description: workflow.description,
   version: workflow.version,
-  tags: workflow.tags.map((v) => v),
+  tags: workflow.tags.map(v => v),
   tasks: workflow.tasks.map(fromTask),
   created_at: workflow.createdAt,
   updated_at: workflow.updatedAt,

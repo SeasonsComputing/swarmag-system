@@ -2,7 +2,13 @@
  * Workflow protocol validators.
  */
 
-import { isCompositionMany, isCompositionPositive, isId, isNonEmptyString, isPositiveNumber } from '@core-std'
+import {
+  isCompositionMany,
+  isCompositionPositive,
+  isId,
+  isNonEmptyString,
+  isPositiveNumber
+} from '@core-std'
 import type { Dictionary } from '@core-std'
 import type { Question, QuestionOption, Task } from '@domain/abstractions/workflow.ts'
 import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
@@ -16,7 +22,9 @@ import type { WorkflowCreate } from '@domain/protocols/workflow-protocol.ts'
 export const validateWorkflowCreate = (input: WorkflowCreate): string | null => {
   if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
   if (!isPositiveNumber(input.version)) return 'version must be a positive number'
-  if (!isCompositionPositive(input.tasks, isTask)) return 'tasks must be a non-empty array of valid tasks'
+  if (!isCompositionPositive(input.tasks, isTask)) {
+    return 'tasks must be a non-empty array of valid tasks'
+  }
   return null
 }
 

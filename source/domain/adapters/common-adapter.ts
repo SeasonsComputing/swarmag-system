@@ -65,7 +65,7 @@ export const toNote = (dict: Dictionary): Note => ({
   authorId: dict.author_id as string | undefined,
   content: dict.content as string,
   visibility: dict.visibility as Note['visibility'],
-  tags: (dict.tags as string[]).map((v) => v),
+  tags: (dict.tags as string[]).map(v => v),
   attachments: (dict.attachments as Dictionary[]).map(toAttachment)
 })
 
@@ -75,6 +75,6 @@ export const fromNote = (note: Note): Dictionary => ({
   author_id: note.authorId,
   content: note.content,
   visibility: note.visibility,
-  tags: note.tags.map((v) => v),
+  tags: note.tags.map(v => v),
   attachments: note.attachments.map(fromAttachment)
 })

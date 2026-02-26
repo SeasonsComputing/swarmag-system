@@ -353,7 +353,7 @@ AssetType (Instantiable)
   Notes: Reference type for categorizing assets
   Values: foundation/data-lists.md, Section 2. Asset Types
 
-AssetStatus (enum)
+AssetStatus (const-enum)
   Values: active | maintenance | retired | reserved
   Notes: Lifecycle/availability state
 
@@ -367,7 +367,7 @@ Asset (Instantiable)
 ### 4.4 Chemicals (`@domain/abstractions/chemical.ts`)
 
 ```text
-ChemicalUsage (enum)
+ChemicalUsage (const-enum)
   Values: herbicide | pesticide | fertilizer | fungicide | adjuvant
   Notes: Domain usage classification
 
@@ -412,7 +412,7 @@ Customer (Instantiable)
 ### 4.6 Services (`@domain/abstractions/service.ts`)
 
 ```text
-ServiceCategory (enum)
+ServiceCategory (const-enum)
   Values: aerial-drone-services | ground-machinery-services
   Notes: Service family classification
 
@@ -448,7 +448,7 @@ User (Instantiable)
 ### 4.8 Workflows (`@domain/abstractions/workflow.ts`)
 
 ```text
-QuestionType (enum)
+QuestionType (const-enum)
   Values: 
     | text 
     | number 
@@ -494,7 +494,7 @@ Workflow (Instantiable)
 ### 4.9 Jobs (`@domain/abstractions/job.ts`)
 
 ```text
-JobStatus (enum)
+JobStatus (const-enum)
   Values: 
     | 'open'
     | 'assessing'

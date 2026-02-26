@@ -5,7 +5,12 @@
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
 import type { Contact, Customer, CustomerSite } from '@domain/abstractions/customer.ts'
-import { toLocation, fromLocation, toNote, fromNote } from '@domain/adapters/common-adapter.ts'
+import {
+  fromLocation,
+  fromNote,
+  toLocation,
+  toNote
+} from '@domain/adapters/common-adapter.ts'
 
 /** Create a Contact from serialized dictionary format */
 export const toContact = (dict: Dictionary): Contact => ({
@@ -55,8 +60,12 @@ export const toCustomer = (dict: Dictionary): Customer => {
   if (!dict.line1) return notValid('Customer dictionary missing required field: line1')
   if (!dict.city) return notValid('Customer dictionary missing required field: city')
   if (!dict.state) return notValid('Customer dictionary missing required field: state')
-  if (!dict.postal_code) return notValid('Customer dictionary missing required field: postal_code')
-  if (!dict.country) return notValid('Customer dictionary missing required field: country')
+  if (!dict.postal_code) {
+    return notValid('Customer dictionary missing required field: postal_code')
+  }
+  if (!dict.country) {
+    return notValid('Customer dictionary missing required field: country')
+  }
   return {
     id: dict.id as string,
     name: dict.name as string,

@@ -192,7 +192,16 @@ Use JSONB only for:
 
 #### 4.1.3 Seed Data
 
-Initial catalog values for `Services`, `AssetTypes`, and canonical `internal` Questions are defined in `documentation/foundation/data-lists.md`. These should be loaded via a dedicated seed migration after schema creation.
+Canonical seed data known at schema time is part of `schema.sql` — not a migration. Seed data required for the system to function from first boot belongs with the schema that defines the structure it populates.
+
+The following seed data is defined in `schema.sql`:
+
+- **Asset types** — canonical `asset_types` records from `data-lists.md §4`
+- **Services** — canonical `services` records from `data-lists.md §2` and `§3`
+- **Internal questions** — canonical `workflows` seed record containing all `QuestionType = 'internal'` questions from `data-lists.md §5`
+- **Bootstrap admin user** — a fixed `devops-admin@swarmag.com` user with `administrator` role and stable UUID; required to access the database after first deploy; password reset via Supabase Auth dashboard post-deploy
+
+Migrations express deltas from this initial state.
 
 ### 4.2 Row Level Security (RLS)
 
@@ -216,17 +225,27 @@ WITH CHECK (
 
 #### 4.2.2 RLS Principles
 
-- Policies live in migrations (single source of truth)
+- Policies live in `schema.sql` alongside their tables — canonical current state
+- Migrations express RLS deltas (policy changes, additions, removals)
 - Cannot be bypassed by client code
 - Automatic enforcement across all access paths
 - Tested via integration tests with different user contexts
 
 ### 4.3 Soft Deletes
 
-All lifecycled entities implement soft delete via `deleted_at` column:
+All lifecycled entities implement soft delete via `deleted_at` column, declared in `schema.sql`:
 
 ```sql
-ALTER TABLE jobs ADD COLUMN deleted_at TIMESTAMPTZ;
+CREATE TABLE jobs (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
+  status      TEXT NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at  TIMESTAMPTZ
+);
+
+ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 
 -- RLS policy filters soft-deleted rows
 CREATE POLICY "jobs_select_active"
@@ -424,7 +443,7 @@ const handler = async (input: Dictionary): Promise<Dictionary> => {
 ## 10. Key Principles
 
 1. **Orchestration only** - Edge functions coordinate, don't implement business logic
-2. **RLS is authoritative** - Authorization lives in database, not application
+2. **RLS is authoritative** - Authorization lives in database, not application; policies defined in `schema.sql`, deltas in migrations
 3. **Direct-to-DB preferred** - Only use edge functions when SDK client can't suffice
 4. **Adapters are shared** - Same serialization logic for edge functions and UX clients
 5. **Schema lives in domain** - `source/domain/schema/schema.sql` is the canonical current state; generated from domain
