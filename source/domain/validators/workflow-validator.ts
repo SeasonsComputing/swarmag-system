@@ -1,38 +1,22 @@
 /**
- * Workflow protocol validator
+ * Workflow protocol validators.
  */
 
-import {
-  type Dictionary,
-  isCompositionMany,
-  isCompositionPositive,
-  isId,
-  isNonEmptyString,
-  isPositiveNumber
-} from '@core-std'
+import { isCompositionMany, isCompositionPositive, isId, isNonEmptyString, isPositiveNumber } from '@core-std'
+import type { Dictionary } from '@core-std'
 import type { Question, QuestionOption, Task } from '@domain/abstractions/workflow.ts'
-import type { WorkflowCreateInput } from '@domain/protocols/workflow-protocol.ts'
-
-const QUESTION_TYPES = [
-  'text',
-  'number',
-  'boolean',
-  'single-select',
-  'multi-select',
-  'internal'
-] as const
+import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
+import type { WorkflowCreate } from '@domain/protocols/workflow-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validates WorkflowCreateInput; returns error message or null. */
-export const validateWorkflowCreate = (input: WorkflowCreateInput): string | null => {
+/** Validates WorkflowCreate; returns error message or null. */
+export const validateWorkflowCreate = (input: WorkflowCreate): string | null => {
   if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
   if (!isPositiveNumber(input.version)) return 'version must be a positive number'
-  if (!isCompositionPositive(input.tasks, isTask)) {
-    return 'tasks must be a non-empty array of valid tasks'
-  }
+  if (!isCompositionPositive(input.tasks, isTask)) return 'tasks must be a non-empty array of valid tasks'
   return null
 }
 

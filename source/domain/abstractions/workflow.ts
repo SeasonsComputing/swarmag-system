@@ -1,29 +1,30 @@
 /**
  * Domain models for workflows in the swarmAg system.
- * A Workflow is a versioned, reusable template describing how work is generally
- * performed. It is structured as a non-empty sequence of Tasks, each with a
- * non-empty checklist of Questions. Workflow masters are read-only except for
- * the administrator role; modification during assessment or planning is achieved
- * exclusively by cloning.
+ * Workflows are versioned execution templates guiding field operations.
  */
 
-import type { CompositionMany, CompositionPositive, Instantiable } from '@core-std'
+import type {
+  AssociationOne,
+  CompositionMany,
+  CompositionPositive,
+  Id,
+  Instantiable
+} from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
+import type { User } from '@domain/abstractions/user.ts'
 
-/**
- * Supported question input modes.
- * internal is reserved for system-generated log entries such as telemetry,
- * GPS coordinates, and operational metadata.
- */
-export type QuestionType =
-  | 'text'
-  | 'number'
-  | 'boolean'
-  | 'single-select'
-  | 'multi-select'
-  | 'internal'
+/** Supported question input modes; internal is reserved for system-generated log entries. */
+export const QUESTION_TYPES = [
+  'text',
+  'number',
+  'boolean',
+  'single-select',
+  'multi-select',
+  'internal'
+] as const
+export type QuestionType = (typeof QUESTION_TYPES)[number]
 
-/** Selectable option metadata for single-select and multi-select questions. */
+/** Selectable option metadata. */
 export type QuestionOption = {
   value: string
   label?: string
@@ -32,7 +33,7 @@ export type QuestionOption = {
 
 /** Workflow checklist prompt. */
 export type Question = {
-  id: string
+  id: Id
   prompt: string
   type: QuestionType
   helpText?: string
@@ -45,16 +46,16 @@ export type AnswerValue = string | number | boolean | string[]
 
 /** Captured response instance; notes carry crew annotations and attachments. */
 export type Answer = {
-  questionId: string
+  questionId: Id
   value: AnswerValue
   capturedAt: string
-  capturedById: string
+  capturedById: AssociationOne<User>
   notes: CompositionMany<Note>
 }
 
 /** Atomic executable step; checklist must be non-empty. */
 export type Task = {
-  id: string
+  id: Id
   title: string
   description?: string
   checklist: CompositionPositive<Question>

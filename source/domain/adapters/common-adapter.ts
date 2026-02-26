@@ -1,7 +1,7 @@
 /**
  * Common value object adapters to and from Dictionary representation.
- * Location, Note, and Attachment are composition helpers used by all
- * other adapters — they have no independent row-level lifecycle.
+ * Provides toLocation, toNote, toAttachment and their inverse functions
+ * for use by all other adapters that handle embedded compositions.
  */
 
 import type { Dictionary, When } from '@core-std'
@@ -41,7 +41,6 @@ export const fromLocation = (location: Location): Dictionary => ({
 
 /** Create an Attachment from serialized dictionary format */
 export const toAttachment = (dict: Dictionary): Attachment => ({
-  id: dict.id as string,
   filename: dict.filename as string,
   url: dict.url as string,
   contentType: dict.content_type as string,
@@ -52,7 +51,6 @@ export const toAttachment = (dict: Dictionary): Attachment => ({
 
 /** Serialize an Attachment to dictionary format */
 export const fromAttachment = (attachment: Attachment): Dictionary => ({
-  id: attachment.id,
   filename: attachment.filename,
   url: attachment.url,
   content_type: attachment.contentType,
@@ -63,22 +61,20 @@ export const fromAttachment = (attachment: Attachment): Dictionary => ({
 
 /** Create a Note from serialized dictionary format */
 export const toNote = (dict: Dictionary): Note => ({
-  id: dict.id as string,
   createdAt: dict.created_at as When,
   authorId: dict.author_id as string | undefined,
   content: dict.content as string,
   visibility: dict.visibility as Note['visibility'],
-  tags: (dict.tags as string[]) ?? [],
-  attachments: ((dict.attachments as Dictionary[]) ?? []).map(toAttachment)
+  tags: (dict.tags as string[]).map((v) => v),
+  attachments: (dict.attachments as Dictionary[]).map(toAttachment)
 })
 
 /** Serialize a Note to dictionary format */
 export const fromNote = (note: Note): Dictionary => ({
-  id: note.id,
   created_at: note.createdAt,
   author_id: note.authorId,
   content: note.content,
   visibility: note.visibility,
-  tags: note.tags,
+  tags: note.tags.map((v) => v),
   attachments: note.attachments.map(fromAttachment)
 })

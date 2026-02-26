@@ -1,8 +1,6 @@
 /**
- * Domain models for users in the swarmAg system.
- * A User holds identity and role information. Roles are non-empty;
- * at least one role is required. USER_ROLES is the canonical tuple
- * from which UserRole is derived.
+ * Domain model for system users in the swarmAg system.
+ * Users carry identity, role membership, and contact information.
  */
 
 import type { CompositionPositive, Instantiable } from '@core-std'
@@ -10,10 +8,10 @@ import type { CompositionPositive, Instantiable } from '@core-std'
 /** Canonical role set. */
 export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
 
-/** Role type derived from the canonical tuple. */
+/** Role type derived from tuple. */
 export type UserRole = (typeof USER_ROLES)[number]
 
-/** System user identity and membership; at least one role is required. */
+/** System user identity and membership. */
 export type User = Instantiable & {
   displayName: string
   primaryEmail: string

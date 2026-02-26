@@ -1,51 +1,26 @@
 /**
  * Domain models for jobs in the swarmAg system.
- * A Job is the lifecycle anchor for a unit of work agreed to with a customer.
- * It is assessed (JobAssessment), planned (JobPlan), and executed (JobWork).
- * JobWorkflow instances sequence the workflows that guide each phase.
- * JobWorkLogEntry is the append-only record of execution events.
+ * Job is the lifecycle anchor for all work agreed to with a customer.
  */
 
-import type {
-  AssociationJunction,
-  AssociationOne,
-  AssociationOptional,
-  CompositionMany,
-  CompositionOne,
-  CompositionPositive,
-  Id,
-  Instantiable,
-  When
-} from '@core-std'
-import type { Asset } from '@domain/abstractions/asset.ts'
-import type { Chemical } from '@domain/abstractions/chemical.ts'
+import type { Id, When, Instantiable, CompositionMany, CompositionPositive, CompositionOne, AssociationOne, AssociationOptional, AssociationJunction } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
-import type { Customer } from '@domain/abstractions/customer.ts'
 import type { User, UserRole } from '@domain/abstractions/user.ts'
+import type { Chemical } from '@domain/abstractions/chemical.ts'
+import type { Asset } from '@domain/abstractions/asset.ts'
 import type { Workflow } from '@domain/abstractions/workflow.ts'
+import type { Customer } from '@domain/abstractions/customer.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'
 
 /** Job lifecycle state. */
-export type JobStatus =
-  | 'open'
-  | 'assessing'
-  | 'planning'
-  | 'preparing'
-  | 'executing'
-  | 'finalizing'
-  | 'closed'
-  | 'cancelled'
+export const JOB_STATUSES = ['open', 'assessing', 'planning', 'preparing', 'executing', 'finalizing', 'closed', 'cancelled'] as const
+export type JobStatus = (typeof JOB_STATUSES)[number]
 
-/** Work agreement lifecycle anchor. */
-export type Job = Instantiable & {
-  customerId: AssociationOne<Customer>
-  status: JobStatus
-}
+/** Planned chemical quantity units. */
+export const CHEMICAL_UNITS = ['gallon', 'liter', 'pound', 'kilogram'] as const
+export type ChemicalUnit = (typeof CHEMICAL_UNITS)[number]
 
-/**
- * Pre-planning assessment; requires one or more locations.
- * risks carries risk notes; notes carries general assessment notes.
- */
+/** Pre-planning assessment; requires one or more locations. */
 export type JobAssessment = Instantiable & {
   jobId: AssociationOne<Job>
   assessorId: AssociationOne<User>
@@ -54,25 +29,12 @@ export type JobAssessment = Instantiable & {
   notes: CompositionMany<Note>
 }
 
-/**
- * Job-specific workflow instance.
- * basisWorkflowId references the read-only Workflow master.
- * modifiedWorkflowId is always a clone of the basis, created only when
- * specialization is required during assessment or planning.
- */
+/** Job-specific workflow instance; modifiedWorkflowId is always a clone of the basis. */
 export type JobWorkflow = Instantiable & {
   jobId: AssociationOne<Job>
   sequence: number
   basisWorkflowId: AssociationOne<Workflow>
   modifiedWorkflowId: AssociationOptional<Workflow>
-}
-
-/** Job-specific execution plan. */
-export type JobPlan = Instantiable & {
-  jobId: AssociationOne<Job>
-  scheduledStart: When
-  scheduledEnd?: When
-  notes: CompositionMany<Note>
 }
 
 /** Assignment of user to plan role; many side of 1:m with JobPlan. */
@@ -88,7 +50,7 @@ export type JobPlanChemical = Instantiable & {
   planId: AssociationOne<JobPlan>
   chemicalId: AssociationOne<Chemical>
   amount: number
-  unit: 'gallon' | 'liter' | 'pound' | 'kilogram'
+  unit: ChemicalUnit
   targetArea?: number
   targetAreaUnit?: 'acre' | 'hectare'
 }
@@ -99,11 +61,15 @@ export type JobPlanAsset = {
   assetId: AssociationJunction<Asset>
 }
 
-/**
- * Execution record.
- * Creation transitions the Job to executing.
- * work is an ordered array of resolved Workflow IDs — the immutable execution manifest.
- */
+/** Job-specific execution plan. */
+export type JobPlan = Instantiable & {
+  jobId: AssociationOne<Job>
+  scheduledStart: When
+  scheduledEnd?: When
+  notes: CompositionMany<Note>
+}
+
+/** Execution record; work is the immutable ordered execution manifest. */
 export type JobWork = Instantiable & {
   jobId: AssociationOne<Job>
   work: CompositionPositive<Id>
@@ -112,15 +78,15 @@ export type JobWork = Instantiable & {
   completedAt?: When
 }
 
-/**
- * Append-only execution event.
- * answer is always present and captures both crew checklist responses and
- * system-generated telemetry via the internal question type.
- */
-export type JobWorkLogEntry = {
-  id: Id
+/** Append-only execution event; answer captures both crew responses and system telemetry. */
+export type JobWorkLogEntry = Pick<Instantiable, 'id' | 'createdAt'> & {
   jobId: AssociationOne<Job>
   userId: AssociationOne<User>
   answer: CompositionOne<Answer>
-  createdAt: When
+}
+
+/** Work agreement lifecycle anchor. */
+export type Job = Instantiable & {
+  customerId: AssociationOne<Customer>
+  status: JobStatus
 }

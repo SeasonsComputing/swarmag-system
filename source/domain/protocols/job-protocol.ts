@@ -3,38 +3,38 @@
  */
 
 import type { Id, When } from '@core-std'
-import type { Location } from '@domain/abstractions/common.ts'
-import type { JobStatus } from '@domain/abstractions/job.ts'
-import type { UserRole } from '@domain/abstractions/user.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'
+import type { Location } from '@domain/abstractions/common.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
+import type { ChemicalUnit, JobPlanChemical, JobStatus } from '@domain/abstractions/job.ts'
 
 /** Input for creating a Job. */
-export type JobCreateInput = {
+export type JobCreate = {
   customerId: Id
 }
 
 /** Input for updating a Job. */
-export type JobUpdateInput = {
+export type JobUpdate = {
   id: Id
   status?: JobStatus
 }
 
 /** Input for creating a JobAssessment. */
-export type JobAssessmentCreateInput = {
+export type JobAssessmentCreate = {
   jobId: Id
   assessorId: Id
   locations: Location[]
 }
 
 /** Input for updating a JobAssessment. */
-export type JobAssessmentUpdateInput = {
+export type JobAssessmentUpdate = {
   id: Id
   assessorId?: Id
   locations?: Location[]
 }
 
 /** Input for creating a JobWorkflow. */
-export type JobWorkflowCreateInput = {
+export type JobWorkflowCreate = {
   jobId: Id
   sequence: number
   basisWorkflowId: Id
@@ -42,66 +42,66 @@ export type JobWorkflowCreateInput = {
 }
 
 /** Input for updating a JobWorkflow. */
-export type JobWorkflowUpdateInput = {
+export type JobWorkflowUpdate = {
   id: Id
   sequence?: number
   modifiedWorkflowId?: Id
 }
 
 /** Input for creating a JobPlan. */
-export type JobPlanCreateInput = {
+export type JobPlanCreate = {
   jobId: Id
   scheduledStart: When
   scheduledEnd?: When
 }
 
 /** Input for updating a JobPlan. */
-export type JobPlanUpdateInput = {
+export type JobPlanUpdate = {
   id: Id
   scheduledStart?: When
   scheduledEnd?: When
 }
 
 /** Input for creating a JobPlanAssignment. */
-export type JobPlanAssignmentCreateInput = {
+export type JobPlanAssignmentCreate = {
   planId: Id
   userId: Id
   role: UserRole
 }
 
 /** Input for updating a JobPlanAssignment. */
-export type JobPlanAssignmentUpdateInput = {
+export type JobPlanAssignmentUpdate = {
   id: Id
   role?: UserRole
 }
 
 /** Input for creating a JobPlanChemical. */
-export type JobPlanChemicalCreateInput = {
+export type JobPlanChemicalCreate = {
   planId: Id
   chemicalId: Id
   amount: number
-  unit: 'gallon' | 'liter' | 'pound' | 'kilogram'
+  unit: ChemicalUnit
   targetArea?: number
-  targetAreaUnit?: 'acre' | 'hectare'
+  targetAreaUnit?: JobPlanChemical['targetAreaUnit']
 }
 
 /** Input for updating a JobPlanChemical. */
-export type JobPlanChemicalUpdateInput = {
+export type JobPlanChemicalUpdate = {
   id: Id
   amount?: number
-  unit?: 'gallon' | 'liter' | 'pound' | 'kilogram'
+  unit?: ChemicalUnit
   targetArea?: number
-  targetAreaUnit?: 'acre' | 'hectare'
+  targetAreaUnit?: JobPlanChemical['targetAreaUnit']
 }
 
 /** Input for creating a JobPlanAsset junction. */
-export type JobPlanAssetCreateInput = {
+export type JobPlanAssetCreate = {
   planId: Id
   assetId: Id
 }
 
 /** Input for creating a JobWork record. */
-export type JobWorkCreateInput = {
+export type JobWorkCreate = {
   jobId: Id
   work: Id[]
   startedAt: When
@@ -109,7 +109,7 @@ export type JobWorkCreateInput = {
 }
 
 /** Input for creating a JobWorkLogEntry. */
-export type JobWorkLogEntryCreateInput = {
+export type JobWorkLogEntryCreate = {
   jobId: Id
   userId: Id
   answer: Answer

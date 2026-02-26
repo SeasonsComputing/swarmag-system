@@ -1,8 +1,6 @@
 /**
  * Domain models for customers in the swarmAg system.
- * A Customer is an organization purchasing services. Contacts are embedded
- * subordinates; the primary contact is flagged via Contact.isPrimary rather
- * than a separate FK. Sites are embedded serviceable locations.
+ * Customers are organizations that purchase services.
  */
 
 import type {
@@ -11,6 +9,7 @@ import type {
   CompositionMany,
   CompositionOne,
   CompositionPositive,
+  Id,
   Instantiable
 } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
@@ -28,7 +27,7 @@ export type Contact = {
 
 /** Serviceable customer location. */
 export type CustomerSite = {
-  id: string
+  id: Id
   customerId: AssociationOne<Customer>
   label: string
   location: CompositionOne<Location>

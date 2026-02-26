@@ -9,7 +9,6 @@ import type { Customer } from '@domain/abstractions/customer.ts'
 const customerId = id()
 const accountManagerId = id()
 const siteId = id()
-const contactNoteId = id()
 
 const headquartersLocation: Location = {
   latitude: 33.5779,
@@ -47,7 +46,6 @@ export const blueMesaRanchCustomer: Customer = {
     isPrimary: true,
     preferredChannel: 'phone',
     notes: [{
-      id: contactNoteId,
       createdAt: '2025-01-09T00:00:00Z',
       content: 'Prefers SMS for scheduling confirmations.',
       tags: [],

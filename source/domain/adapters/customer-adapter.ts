@@ -1,16 +1,11 @@
 /**
- * Customer et al adapters to and from Dictionary representation
+ * Customer et al adapters to and from Dictionary representation.
  */
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
 import type { Contact, Customer, CustomerSite } from '@domain/abstractions/customer.ts'
-import {
-  fromLocation,
-  fromNote,
-  toLocation,
-  toNote
-} from '@domain/adapters/common-adapter.ts'
+import { toLocation, fromLocation, toNote, fromNote } from '@domain/adapters/common-adapter.ts'
 
 /** Create a Contact from serialized dictionary format */
 export const toContact = (dict: Dictionary): Contact => ({
@@ -19,7 +14,7 @@ export const toContact = (dict: Dictionary): Contact => ({
   phone: dict.phone as string | undefined,
   isPrimary: dict.is_primary as boolean,
   preferredChannel: dict.preferred_channel as Contact['preferredChannel'],
-  notes: ((dict.notes as Dictionary[]) ?? []).map(toNote)
+  notes: (dict.notes as Dictionary[]).map(toNote)
 })
 
 /** Serialize a Contact to dictionary format */
@@ -37,9 +32,9 @@ export const toCustomerSite = (dict: Dictionary): CustomerSite => ({
   id: dict.id as string,
   customerId: dict.customer_id as string,
   label: dict.label as string,
-  location: [toLocation(dict.location as Dictionary)],
+  location: (dict.location as Dictionary[]).map(toLocation),
   acreage: dict.acreage as number | undefined,
-  notes: ((dict.notes as Dictionary[]) ?? []).map(toNote)
+  notes: (dict.notes as Dictionary[]).map(toNote)
 })
 
 /** Serialize a CustomerSite to dictionary format */
@@ -47,7 +42,7 @@ export const fromCustomerSite = (site: CustomerSite): Dictionary => ({
   id: site.id,
   customer_id: site.customerId,
   label: site.label,
-  location: fromLocation(site.location[0]),
+  location: site.location.map(fromLocation),
   acreage: site.acreage,
   notes: site.notes.map(fromNote)
 })
@@ -56,15 +51,12 @@ export const fromCustomerSite = (site: CustomerSite): Dictionary => ({
 export const toCustomer = (dict: Dictionary): Customer => {
   if (!dict.id) return notValid('Customer dictionary missing required field: id')
   if (!dict.name) return notValid('Customer dictionary missing required field: name')
+  if (!dict.status) return notValid('Customer dictionary missing required field: status')
   if (!dict.line1) return notValid('Customer dictionary missing required field: line1')
   if (!dict.city) return notValid('Customer dictionary missing required field: city')
   if (!dict.state) return notValid('Customer dictionary missing required field: state')
-  if (!dict.postal_code) {
-    return notValid('Customer dictionary missing required field: postal_code')
-  }
-  if (!dict.country) {
-    return notValid('Customer dictionary missing required field: country')
-  }
+  if (!dict.postal_code) return notValid('Customer dictionary missing required field: postal_code')
+  if (!dict.country) return notValid('Customer dictionary missing required field: country')
   return {
     id: dict.id as string,
     name: dict.name as string,
@@ -76,11 +68,9 @@ export const toCustomer = (dict: Dictionary): Customer => {
     postalCode: dict.postal_code as string,
     country: dict.country as string,
     accountManagerId: dict.account_manager_id as string | undefined,
-    sites: ((dict.sites as Dictionary[]) ?? []).map(toCustomerSite),
-    contacts: ((dict.contacts as Dictionary[]) ?? []).map(
-      toContact
-    ) as Customer['contacts'],
-    notes: ((dict.notes as Dictionary[]) ?? []).map(toNote),
+    sites: (dict.sites as Dictionary[]).map(toCustomerSite),
+    contacts: (dict.contacts as Dictionary[]).map(toContact),
+    notes: (dict.notes as Dictionary[]).map(toNote),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined

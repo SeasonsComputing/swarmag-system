@@ -5,7 +5,7 @@
 import type { Task } from '@domain/abstractions/workflow.ts'
 
 /** Input for creating a Workflow. */
-export type WorkflowCreateInput = {
+export type WorkflowCreate = {
   name: string
   description?: string
   version: number
