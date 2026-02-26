@@ -579,14 +579,12 @@ swarmag-system/
 │   ├── ux/
 │   │   ├── api/
 │   │   ├── app-admin/
-│   │   │   └── config/
 │   │   ├── app-customer/
-│   │   │   └── config/
 │   │   ├── app-ops/
-│   │   │   └── config/
-│   │   └── common/
-│   │       ├── components/
-│   │       └── lib/
+│   │   ├── common/
+│   │   │   ├── components/
+│   │   │   └── lib/
+│   │   └── config/
 │   ├── devops/
 │   └── tests/
 └── supabase/
