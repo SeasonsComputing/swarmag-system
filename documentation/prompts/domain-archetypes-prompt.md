@@ -236,9 +236,9 @@ export type FooUpdate = {
 | `JobPlan`           | `jobId: Id`, `scheduledStart: When`, `scheduledEnd?: When`                                                                    | `scheduledStart?`, `scheduledEnd?`                                                             |
 | `JobPlanAssignment` | `planId: Id`, `userId: Id`, `role: UserRole`                                                                                  | `role?`                                                                                        |
 | `JobPlanChemical`   | `planId: Id`, `chemicalId: Id`, `amount`, `unit`, `targetArea?`, `targetAreaUnit?`                                            | `amount?`, `unit?`, `targetArea?`, `targetAreaUnit?`                                           |
-| `JobPlanAsset`      | `planId: Id`, `assetId: Id`                                                                                                   | _(junction — no Update)_                                                                  |
-| `JobWork`           | `jobId: Id`, `work: Id[]`, `startedAt: When`, `startedById: Id`                                                               | _(immutable manifest — no Update)_                                                        |
-| `JobWorkLogEntry`   | `jobId: Id`, `userId: Id`, `answer: Answer`                                                                                   | _(append-only — no Update)_                                                               |
+| `JobPlanAsset`      | `planId: Id`, `assetId: Id`                                                                                                   | _(junction — no Update)_                                                                       |
+| `JobWork`           | `jobId: Id`, `work: Id[]`, `startedAt: When`, `startedById: Id`                                                               | _(immutable manifest — no Update)_                                                             |
+| `JobWorkLogEntry`   | `jobId: Id`, `userId: Id`, `answer: Answer`                                                                                   | _(append-only — no Update)_                                                                    |
 
 Import `Location`, `Contact`, `Answer`, `Task`, `UserRole`, `When` from their respective abstraction files as needed. Import `Id`, `When` from `@core-std`.
 
@@ -327,15 +327,15 @@ Per `CONSTITUTION.md §9.5.1` (Explicit over clever):
 | `Customer`          | `name` non-empty; required address fields non-empty; `contacts` isCompositionPositive using `isContact`  | `id` isId                                                 |
 | `Service`           | `name` non-empty; `sku` non-empty; `category` in `SERVICE_CATEGORIES`                                    | `id` isId                                                 |
 | `User`              | `displayName`, `primaryEmail`, `phoneNumber` non-empty; `roles` isCompositionPositive using `isUserRole` | `id` isId                                                 |
-| `Workflow`          | `name` non-empty; `version` isPositiveNumber; `tasks` isCompositionPositive using `isTask`               | _(no Update — omit update validator)_                |
+| `Workflow`          | `name` non-empty; `version` isPositiveNumber; `tasks` isCompositionPositive using `isTask`               | _(no Update — omit update validator)_                     |
 | `Job`               | `customerId` isId                                                                                        | `id` isId; `status` in `JOB_STATUSES` if provided         |
 | `JobAssessment`     | `jobId` isId; `assessorId` isId; `locations` isCompositionPositive using `isLocation`                    | `id` isId                                                 |
 | `JobWorkflow`       | `jobId` isId; `sequence` isPositiveNumber; `basisWorkflowId` isId                                        | `id` isId                                                 |
 | `JobPlan`           | `jobId` isId; `scheduledStart` isWhen                                                                    | `id` isId                                                 |
 | `JobPlanAssignment` | `planId` isId; `userId` isId; `role` in `USER_ROLES`                                                     | `id` isId                                                 |
 | `JobPlanChemical`   | `planId` isId; `chemicalId` isId; `amount` isPositiveNumber; `unit` in `CHEMICAL_UNITS`                  | `id` isId                                                 |
-| `JobWork`           | `jobId` isId; `work` isCompositionPositive using `isId`; `startedAt` isWhen; `startedById` isId          | _(no Update — omit update validator)_                |
-| `JobWorkLogEntry`   | `jobId` isId; `userId` isId; `answer` isCompositionOne using `isAnswer`                                  | _(no Update — omit update validator)_                |
+| `JobWork`           | `jobId` isId; `work` isCompositionPositive using `isId`; `startedAt` isWhen; `startedById` isId          | _(no Update — omit update validator)_                     |
+| `JobWorkLogEntry`   | `jobId` isId; `userId` isId; `answer` isCompositionOne using `isAnswer`                                  | _(no Update — omit update validator)_                     |
 
 Private object guards needed per file:
 

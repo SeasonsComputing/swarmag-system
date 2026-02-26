@@ -3,8 +3,8 @@
  */
 
 import type { Id } from '@core-std'
-import type { Contact, Customer } from '@domain/abstractions/customer.ts'
 import type { Location } from '@domain/abstractions/common.ts'
+import type { Contact, Customer } from '@domain/abstractions/customer.ts'
 
 /** Input for creating a CustomerSite. */
 export type CustomerSiteCreate = {

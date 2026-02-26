@@ -3,17 +3,36 @@
  * Job is the lifecycle anchor for all work agreed to with a customer.
  */
 
-import type { Id, When, Instantiable, CompositionMany, CompositionPositive, CompositionOne, AssociationOne, AssociationOptional, AssociationJunction } from '@core-std'
-import type { Location, Note } from '@domain/abstractions/common.ts'
-import type { User, UserRole } from '@domain/abstractions/user.ts'
-import type { Chemical } from '@domain/abstractions/chemical.ts'
+import type {
+  AssociationJunction,
+  AssociationOne,
+  AssociationOptional,
+  CompositionMany,
+  CompositionOne,
+  CompositionPositive,
+  Id,
+  Instantiable,
+  When
+} from '@core-std'
 import type { Asset } from '@domain/abstractions/asset.ts'
-import type { Workflow } from '@domain/abstractions/workflow.ts'
+import type { Chemical } from '@domain/abstractions/chemical.ts'
+import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
+import type { User, UserRole } from '@domain/abstractions/user.ts'
+import type { Workflow } from '@domain/abstractions/workflow.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'
 
 /** Job lifecycle state. */
-export const JOB_STATUSES = ['open', 'assessing', 'planning', 'preparing', 'executing', 'finalizing', 'closed', 'cancelled'] as const
+export const JOB_STATUSES = [
+  'open',
+  'assessing',
+  'planning',
+  'preparing',
+  'executing',
+  'finalizing',
+  'closed',
+  'cancelled'
+] as const
 export type JobStatus = (typeof JOB_STATUSES)[number]
 
 /** Planned chemical quantity units. */

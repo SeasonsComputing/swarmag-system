@@ -25,6 +25,7 @@ Begin the file with:
 --
 -- Authoritative current-state DDL. Generated from domain.md.
 -- Do not edit manually — regenerate from domain model.
+-- Includes canonical seed data known at schema time.
 -- Migrations in source/back/migrations/ express deltas from this state.
 -- =============================================================================
 ```
@@ -39,8 +40,7 @@ Conform strictly to `style-guide.md §12`. Key rules:
 - `UUID` for all PKs and FKs; default `gen_random_uuid()`
 - `TIMESTAMPTZ` for all timestamps — never `TIMESTAMP`
 - `TEXT` for strings — never `VARCHAR(n)` unless a length constraint is architecturally required
-- `JSONB NOT NULL DEFAULT '[]'::jsonb` for all `CompositionMany` and `CompositionPositive` fields
-- `JSONB NOT NULL` for `CompositionOne` fields — no default (always required)
+- `JSONB NOT NULL DEFAULT '[]'::jsonb` for all `Composition*` fields — all compositions are stored as arrays regardless of cardinality; cardinality is enforced at the application layer
 - `NOT NULL` on all required columns; nullable for optional fields and `deleted_at`
 - `CHECK` constraint for every const-enum column — see §12.5
 - No semicolons on anything except SQL statement terminators
@@ -71,35 +71,35 @@ Section header format:
 
 ### Instantiable Tables (have `deleted_at`)
 
-| Domain type         | Table name                  |
-| ------------------- | --------------------------- |
-| `User`              | `users`                     |
-| `AssetType`         | `asset_types`               |
-| `Asset`             | `assets`                    |
-| `Chemical`          | `chemicals`                 |
-| `Customer`          | `customers`                 |
-| `Service`           | `services`                  |
-| `Workflow`          | `workflows`                 |
-| `Job`               | `jobs`                      |
-| `JobAssessment`     | `job_assessments`           |
-| `JobWorkflow`       | `job_workflows`             |
-| `JobPlan`           | `job_plans`                 |
-| `JobPlanAssignment` | `job_plan_assignments`      |
-| `JobPlanChemical`   | `job_plan_chemicals`        |
-| `JobWork`           | `job_work`                  |
+| Domain type         | Table name             |
+| ------------------- | ---------------------- |
+| `User`              | `users`                |
+| `AssetType`         | `asset_types`          |
+| `Asset`             | `assets`               |
+| `Chemical`          | `chemicals`            |
+| `Customer`          | `customers`            |
+| `Service`           | `services`             |
+| `Workflow`          | `workflows`            |
+| `Job`               | `jobs`                 |
+| `JobAssessment`     | `job_assessments`      |
+| `JobWorkflow`       | `job_workflows`        |
+| `JobPlan`           | `job_plans`            |
+| `JobPlanAssignment` | `job_plan_assignments` |
+| `JobPlanChemical`   | `job_plan_chemicals`   |
+| `JobWork`           | `job_work`             |
 
 ### Append-Only Tables (no `updated_at`, no `deleted_at`)
 
-| Domain type         | Table name                  |
-| ------------------- | --------------------------- |
-| `JobWorkLogEntry`   | `job_work_log_entries`      |
+| Domain type       | Table name             |
+| ----------------- | ---------------------- |
+| `JobWorkLogEntry` | `job_work_log_entries` |
 
 ### Junction Tables (no lifecycle columns)
 
-| Domain type                  | Table name                       |
-| ---------------------------- | -------------------------------- |
-| `ServiceRequiredAssetType`   | `service_required_asset_types`   |
-| `JobPlanAsset`               | `job_plan_assets`                |
+| Domain type                | Table name                     |
+| -------------------------- | ------------------------------ |
+| `ServiceRequiredAssetType` | `service_required_asset_types` |
+| `JobPlanAsset`             | `job_plan_assets`              |
 
 ## Per-Table DDL Specifications
 
@@ -122,6 +122,7 @@ CREATE TABLE users (
 ```
 
 RLS policies:
+
 - `users_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `users_select_self` — SELECT — `USING (id = auth.uid())`
 - `users_insert_admin` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'administrator')`
@@ -146,6 +147,7 @@ CREATE TABLE asset_types (
 ```
 
 RLS policies:
+
 - `asset_types_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `asset_types_insert_admin` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'administrator')`
 - `asset_types_update_admin` — UPDATE — `USING (auth.jwt() ->> 'role' = 'administrator')`
@@ -174,6 +176,7 @@ CREATE TABLE assets (
 ```
 
 RLS policies:
+
 - `assets_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `assets_insert_admin` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'administrator')`
 - `assets_update_admin` — UPDATE — `USING (auth.jwt() ->> 'role' = 'administrator')`
@@ -207,6 +210,7 @@ CREATE TABLE chemicals (
 ```
 
 RLS policies:
+
 - `chemicals_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `chemicals_insert_admin` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'administrator')`
 - `chemicals_update_admin` — UPDATE — `USING (auth.jwt() ->> 'role' = 'administrator')`
@@ -241,6 +245,7 @@ CREATE TABLE customers (
 ```
 
 RLS policies:
+
 - `customers_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `customers_select_managed` — SELECT — `USING (account_manager_id = auth.uid())`
 - `customers_insert_sales` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales'))`
@@ -270,6 +275,7 @@ CREATE TABLE services (
 ```
 
 RLS policies:
+
 - `services_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `services_insert_admin` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'administrator')`
 - `services_update_admin` — UPDATE — `USING (auth.jwt() ->> 'role' = 'administrator')`
@@ -291,6 +297,7 @@ CREATE TABLE service_required_asset_types (
 ```
 
 RLS policies:
+
 - `service_required_asset_types_select` — SELECT — `USING (true)`
 - `service_required_asset_types_insert_admin` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'administrator')`
 - `service_required_asset_types_delete_admin` — DELETE — `USING (auth.jwt() ->> 'role' = 'administrator')`
@@ -316,6 +323,7 @@ CREATE TABLE workflows (
 ```
 
 RLS policies:
+
 - `workflows_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `workflows_insert_admin` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'administrator')`
 - `workflows_update_admin` — UPDATE — `USING (auth.jwt() ->> 'role' = 'administrator')`
@@ -343,6 +351,7 @@ CREATE TABLE jobs (
 ```
 
 RLS policies:
+
 - `jobs_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `jobs_insert_sales` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales'))`
 - `jobs_update_sales` — UPDATE — `USING (auth.jwt() ->> 'role' IN ('administrator', 'sales'))`
@@ -368,6 +377,7 @@ CREATE TABLE job_assessments (
 ```
 
 RLS policies:
+
 - `job_assessments_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `job_assessments_insert_ops` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
 - `job_assessments_update_ops` — UPDATE — `USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
@@ -392,6 +402,7 @@ CREATE TABLE job_workflows (
 ```
 
 RLS policies:
+
 - `job_workflows_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `job_workflows_insert_ops` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
 - `job_workflows_update_ops` — UPDATE — `USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
@@ -416,6 +427,7 @@ CREATE TABLE job_plans (
 ```
 
 RLS policies:
+
 - `job_plans_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `job_plans_insert_ops` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
 - `job_plans_update_ops` — UPDATE — `USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
@@ -442,6 +454,7 @@ CREATE TABLE job_plan_assignments (
 ```
 
 RLS policies:
+
 - `job_plan_assignments_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `job_plan_assignments_insert_ops` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
 - `job_plan_assignments_update_ops` — UPDATE — `USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
@@ -471,6 +484,7 @@ CREATE TABLE job_plan_chemicals (
 ```
 
 RLS policies:
+
 - `job_plan_chemicals_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `job_plan_chemicals_insert_ops` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
 - `job_plan_chemicals_update_ops` — UPDATE — `USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'))`
@@ -492,6 +506,7 @@ CREATE TABLE job_plan_assets (
 ```
 
 RLS policies:
+
 - `job_plan_assets_select` — SELECT — `USING (true)`
 - `job_plan_assets_insert_ops` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'operations'))`
 - `job_plan_assets_delete_ops` — DELETE — `USING (auth.jwt() ->> 'role' IN ('administrator', 'operations'))`
@@ -507,7 +522,7 @@ CREATE TABLE job_work (
   id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id         UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   started_by_id  UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-  work           JSONB       NOT NULL,
+  work           JSONB       NOT NULL DEFAULT '[]'::jsonb,
   started_at     TIMESTAMPTZ NOT NULL,
   completed_at   TIMESTAMPTZ,
   created_at     TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -516,9 +531,10 @@ CREATE TABLE job_work (
 );
 ```
 
-Notes: `work` is `JSONB NOT NULL` with no default — it is the immutable execution manifest and must be provided at creation. `CompositionPositive<Id>` — never empty.
+Notes: `work` is `JSONB NOT NULL DEFAULT '[]'::jsonb` — `CompositionPositive<Id>`, the immutable execution manifest. Cardinality enforced at application layer.
 
 RLS policies:
+
 - `job_work_select_active` — SELECT — `USING (deleted_at IS NULL)`
 - `job_work_insert_ops` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'operations')`
 - `job_work_update_ops` — UPDATE — `USING (auth.jwt() ->> 'role' IN ('administrator', 'operations'))`
@@ -536,14 +552,15 @@ CREATE TABLE job_work_log_entries (
   id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
   job_id     UUID        NOT NULL REFERENCES jobs(id) ON DELETE RESTRICT,
   user_id    UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
-  answer     JSONB       NOT NULL,
+  answer     JSONB       NOT NULL DEFAULT '[]'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ```
 
-Notes: `answer` is `JSONB NOT NULL` with no default — `CompositionOne<Answer>` is always present. FK to `jobs` uses RESTRICT — log entries must not vanish silently if a job is soft-deleted (job deletion should be blocked while logs exist).
+Notes: `answer` is `JSONB NOT NULL DEFAULT '[]'::jsonb` — `CompositionOne<Answer>`, cardinality enforced at application layer. FK to `jobs` uses RESTRICT — log entries must not vanish silently if a job is soft-deleted (job deletion should be blocked while logs exist).
 
 RLS policies:
+
 - `job_work_log_entries_select_own` — SELECT — `USING (user_id = auth.uid())`
 - `job_work_log_entries_select_ops` — SELECT — `USING (auth.jwt() ->> 'role' IN ('administrator', 'operations'))`
 - `job_work_log_entries_insert_ops` — INSERT — `WITH CHECK (auth.jwt() ->> 'role' = 'operations' AND user_id = auth.uid())`
@@ -554,29 +571,97 @@ Indexes: `job_work_log_entries_job_id_idx`, `job_work_log_entries_user_id_idx`, 
 
 ## FK Cascade Policy Reference
 
-| Child table              | FK column            | References             | Policy   | Rationale                        |
-| ------------------------ | -------------------- | ---------------------- | -------- | -------------------------------- |
-| `assets`                 | `type_id`            | `asset_types`          | RESTRICT | cross-entity reference           |
-| `customers`              | `account_manager_id` | `users`                | RESTRICT | cross-entity reference           |
-| `service_required_asset_types` | `service_id`   | `services`             | CASCADE  | owned by service                 |
-| `service_required_asset_types` | `asset_type_id`| `asset_types`          | RESTRICT | cross-entity reference           |
-| `jobs`                   | `customer_id`        | `customers`            | RESTRICT | cross-entity reference           |
-| `job_assessments`        | `job_id`             | `jobs`                 | CASCADE  | owned by job                     |
-| `job_assessments`        | `assessor_id`        | `users`                | RESTRICT | cross-entity reference           |
-| `job_workflows`          | `job_id`             | `jobs`                 | CASCADE  | owned by job                     |
-| `job_workflows`          | `basis_workflow_id`  | `workflows`            | RESTRICT | cross-entity reference           |
-| `job_workflows`          | `modified_workflow_id`| `workflows`           | RESTRICT | cross-entity reference           |
-| `job_plans`              | `job_id`             | `jobs`                 | CASCADE  | owned by job                     |
-| `job_plan_assignments`   | `plan_id`            | `job_plans`            | CASCADE  | owned by plan                    |
-| `job_plan_assignments`   | `user_id`            | `users`                | RESTRICT | cross-entity reference           |
-| `job_plan_chemicals`     | `plan_id`            | `job_plans`            | CASCADE  | owned by plan                    |
-| `job_plan_chemicals`     | `chemical_id`        | `chemicals`            | RESTRICT | cross-entity reference           |
-| `job_plan_assets`        | `plan_id`            | `job_plans`            | CASCADE  | owned by plan                    |
-| `job_plan_assets`        | `asset_id`           | `assets`               | RESTRICT | cross-entity reference           |
-| `job_work`               | `job_id`             | `jobs`                 | CASCADE  | owned by job                     |
-| `job_work`               | `started_by_id`      | `users`                | RESTRICT | cross-entity reference           |
-| `job_work_log_entries`   | `job_id`             | `jobs`                 | RESTRICT | logs must not vanish silently    |
-| `job_work_log_entries`   | `user_id`            | `users`                | RESTRICT | cross-entity reference           |
+| Child table                    | FK column              | References    | Policy   | Rationale                     |
+| ------------------------------ | ---------------------- | ------------- | -------- | ----------------------------- |
+| `assets`                       | `type_id`              | `asset_types` | RESTRICT | cross-entity reference        |
+| `customers`                    | `account_manager_id`   | `users`       | RESTRICT | cross-entity reference        |
+| `service_required_asset_types` | `service_id`           | `services`    | CASCADE  | owned by service              |
+| `service_required_asset_types` | `asset_type_id`        | `asset_types` | RESTRICT | cross-entity reference        |
+| `jobs`                         | `customer_id`          | `customers`   | RESTRICT | cross-entity reference        |
+| `job_assessments`              | `job_id`               | `jobs`        | CASCADE  | owned by job                  |
+| `job_assessments`              | `assessor_id`          | `users`       | RESTRICT | cross-entity reference        |
+| `job_workflows`                | `job_id`               | `jobs`        | CASCADE  | owned by job                  |
+| `job_workflows`                | `basis_workflow_id`    | `workflows`   | RESTRICT | cross-entity reference        |
+| `job_workflows`                | `modified_workflow_id` | `workflows`   | RESTRICT | cross-entity reference        |
+| `job_plans`                    | `job_id`               | `jobs`        | CASCADE  | owned by job                  |
+| `job_plan_assignments`         | `plan_id`              | `job_plans`   | CASCADE  | owned by plan                 |
+| `job_plan_assignments`         | `user_id`              | `users`       | RESTRICT | cross-entity reference        |
+| `job_plan_chemicals`           | `plan_id`              | `job_plans`   | CASCADE  | owned by plan                 |
+| `job_plan_chemicals`           | `chemical_id`          | `chemicals`   | RESTRICT | cross-entity reference        |
+| `job_plan_assets`              | `plan_id`              | `job_plans`   | CASCADE  | owned by plan                 |
+| `job_plan_assets`              | `asset_id`             | `assets`      | RESTRICT | cross-entity reference        |
+| `job_work`                     | `job_id`               | `jobs`        | CASCADE  | owned by job                  |
+| `job_work`                     | `started_by_id`        | `users`       | RESTRICT | cross-entity reference        |
+| `job_work_log_entries`         | `job_id`               | `jobs`        | RESTRICT | logs must not vanish silently |
+| `job_work_log_entries`         | `user_id`              | `users`       | RESTRICT | cross-entity reference        |
+
+## Seed Data
+
+Add a final section to `schema.sql` after all table definitions:
+
+```sql
+-- =============================================================================
+-- Seed Data
+-- =============================================================================
+```
+
+Seed data is canonical, known at schema time, and required for the system to function from first boot. It is part of `schema.sql` — not a migration.
+
+### Bootstrap Admin User
+
+A fixed bootstrap admin user is required to access the database after first deploy. Password is set via Supabase Auth dashboard post-deploy.
+
+```sql
+INSERT INTO users (id, display_name, primary_email, phone_number, roles, status)
+VALUES (
+  '00000000-0000-7000-8000-000000000001',
+  'DevOps Admin',
+  'devops-admin@swarmag.com',
+  '',
+  '["administrator"]'::jsonb,
+  'active'
+);
+```
+
+### Asset Types
+
+Insert all records from `data-lists.md §4 Asset Types`. One `INSERT` per record. Use stable UUIDs (UUID v7 format, sequential from `00000000-0000-7000-8000-000000000010`).
+
+Fields: `id`, `label`, `active` (all `true`).
+
+### Services
+
+Insert all records from `data-lists.md §2 Aerial Drone Services` and `§3 Ground Machinery Services`. One `INSERT` per record. Use stable UUIDs sequential from `00000000-0000-7000-8000-000000000020`.
+
+Fields: `id`, `name`, `sku`, `category`.
+
+- Aerial services: `category = 'aerial-drone-services'`
+- Ground services: `category = 'ground-machinery-services'`
+
+### Internal Questions Workflow
+
+Insert a single canonical `workflows` record that contains all internal questions from `data-lists.md §5` as a single task. This workflow serves as the registry for all system-generated telemetry and operational log entries.
+
+```sql
+INSERT INTO workflows (id, name, description, version, tags, tasks)
+VALUES (
+  '00000000-0000-7000-8000-000000000100',
+  'Internal Telemetry Questions',
+  'System-generated internal questions for telemetry and operational log entries. Read-only.',
+  1,
+  '["internal", "system"]'::jsonb,
+  -- tasks: single task containing all internal questions from data-lists.md §5
+  -- each question: { id, prompt, type, required: false, options: [] }
+  -- question ids: stable UUIDs sequential from 00000000-0000-7000-8000-000000000200
+  '[{ ... }]'::jsonb
+);
+```
+
+Build the `tasks` JSONB array from `data-lists.md §5` exactly:
+
+- One task: `{ "id": "00000000-0000-7000-8000-000000000200", "title": "Internal Telemetry", "checklist": [ ... ] }`
+- Each question in checklist: `{ "id": "<stable-uuid>", "prompt": "<key from data-lists>", "type": "internal", "required": false, "options": [] }`
+- Assign sequential stable UUIDs to each question starting from `00000000-0000-7000-8000-000000000201`
 
 ## Quality Bar
 
@@ -588,9 +673,8 @@ Before finalizing verify:
 4. Every const-enum column has a `CHECK` constraint with the complete value set from `domain.md`
 5. Every FK column has an explicit index (unless covered by PRIMARY KEY)
 6. Every table has `ENABLE ROW LEVEL SECURITY` and at least one `SELECT` policy
-7. All `CompositionMany` / `CompositionPositive` JSONB columns default to `'[]'::jsonb`
-8. All `CompositionOne` JSONB columns have `NOT NULL` but no default
-9. FK cascade policies match the reference table exactly
-10. No `VARCHAR`, no `TIMESTAMP` (without zone), no `SERIAL` — use `TEXT`, `TIMESTAMPTZ`, `UUID`
-11. Table order respects FK dependencies — referenced tables appear before referencing tables
-12. Section headers present for all seven sections
+7. All `Composition*` JSONB columns have `NOT NULL DEFAULT '[]'::jsonb` — cardinality is application-layer concern, not DB-layer
+8. FK cascade policies match the reference table exactly
+9. No `VARCHAR`, no `TIMESTAMP` (without zone), no `SERIAL` — use `TEXT`, `TIMESTAMPTZ`, `UUID`
+10. Table order respects FK dependencies — referenced tables appear before referencing tables
+11. Section headers present for all eight sections (seven domain sections + seed data)

@@ -3,10 +3,14 @@
  */
 
 import type { Id, When } from '@core-std'
-import type { Answer } from '@domain/abstractions/workflow.ts'
 import type { Location } from '@domain/abstractions/common.ts'
+import type {
+  ChemicalUnit,
+  JobPlanChemical,
+  JobStatus
+} from '@domain/abstractions/job.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
-import type { ChemicalUnit, JobPlanChemical, JobStatus } from '@domain/abstractions/job.ts'
+import type { Answer } from '@domain/abstractions/workflow.ts'
 
 /** Input for creating a Job. */
 export type JobCreate = {

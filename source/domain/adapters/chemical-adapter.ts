@@ -4,8 +4,12 @@
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
-import type { Chemical, ChemicalLabel, ChemicalUsage } from '@domain/abstractions/chemical.ts'
-import { toNote, fromNote } from '@domain/adapters/common-adapter.ts'
+import type {
+  Chemical,
+  ChemicalLabel,
+  ChemicalUsage
+} from '@domain/abstractions/chemical.ts'
+import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
 /** Create a ChemicalLabel from serialized dictionary format */
 export const toChemicalLabel = (dict: Dictionary): ChemicalLabel => ({

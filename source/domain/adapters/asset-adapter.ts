@@ -5,7 +5,7 @@
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
 import type { Asset, AssetStatus, AssetType } from '@domain/abstractions/asset.ts'
-import { toNote, fromNote } from '@domain/adapters/common-adapter.ts'
+import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
 /** Create an AssetType from serialized dictionary format */
 export const toAssetType = (dict: Dictionary): AssetType => {
