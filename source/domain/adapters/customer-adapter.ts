@@ -34,7 +34,6 @@ export const fromContact = (contact: Contact): Dictionary => ({
 
 /** Create a CustomerSite from serialized dictionary format */
 export const toCustomerSite = (dict: Dictionary): CustomerSite => ({
-  id: dict.id as string,
   customerId: dict.customer_id as string,
   label: dict.label as string,
   location: (dict.location as Dictionary[]).map(toLocation),
@@ -44,7 +43,6 @@ export const toCustomerSite = (dict: Dictionary): CustomerSite => ({
 
 /** Serialize a CustomerSite to dictionary format */
 export const fromCustomerSite = (site: CustomerSite): Dictionary => ({
-  id: site.id,
   customer_id: site.customerId,
   label: site.label,
   location: site.location.map(fromLocation),

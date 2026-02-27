@@ -420,7 +420,7 @@ Contact (object)
   Purpose: Embedded customer contact; isPrimary flags the primary contact
 
 CustomerSite (object)
-  Fields: id, customerId: AssociationOne<Customer>, label,
+  Fields: customerId: AssociationOne<Customer>, label,
           location: CompositionOne<Location>, acreage?,
           Purpose: CompositionMany<Note>
   Relations: Customer, Location, Note

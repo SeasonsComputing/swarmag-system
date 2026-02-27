@@ -2,33 +2,20 @@
  * Protocol input shapes for Asset boundary operations.
  */
 
-import type { Id } from '@core-std'
-import type { AssetStatus } from '@domain/abstractions/asset.ts'
+import type {
+  CreateFromInstantiable,
+  UpdateFromInstantiable
+} from '@core-std'
+import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 
 /** Input for creating an AssetType. */
-export type AssetTypeCreate = {
-  label: string
-  active: boolean
-}
+export type AssetTypeCreate = CreateFromInstantiable<AssetType>
 
 /** Input for updating an AssetType. */
-export type AssetTypeUpdate = {
-  id: Id
-  label?: string
-  active?: boolean
-}
+export type AssetTypeUpdate = UpdateFromInstantiable<AssetType>
 
 /** Input for creating an Asset. */
-export type AssetCreate = {
-  label: string
-  type: Id
-  status: AssetStatus
-}
+export type AssetCreate = CreateFromInstantiable<Asset>
 
 /** Input for updating an Asset. */
-export type AssetUpdate = {
-  id: Id
-  label?: string
-  type?: Id
-  status?: AssetStatus
-}
+export type AssetUpdate = UpdateFromInstantiable<Asset>

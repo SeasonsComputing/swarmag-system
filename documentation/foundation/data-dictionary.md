@@ -253,7 +253,6 @@ Attributes: **State**
 
 | **Attribute** | **Type** |
 | ------------- | -------- |
-| `id`          | Id       |
 | `label`       | string   |
 | `acreage?`    | number   |
 

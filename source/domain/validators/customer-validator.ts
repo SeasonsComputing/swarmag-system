@@ -4,43 +4,22 @@
 
 import {
   isCompositionMany,
+  isCompositionOne,
   isCompositionPositive,
   isId,
   isNonEmptyString
 } from '@core-std'
 import type { Dictionary } from '@core-std'
-import type { Location } from '@domain/abstractions/common.ts'
-import type { Contact } from '@domain/abstractions/customer.ts'
+import type { Location, Note } from '@domain/abstractions/common.ts'
+import type { Contact, CustomerSite } from '@domain/abstractions/customer.ts'
 import type {
   CustomerCreate,
-  CustomerSiteCreate,
-  CustomerSiteUpdate,
   CustomerUpdate
 } from '@domain/protocols/customer-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
-
-/** Validates CustomerSiteCreate; returns error message or null. */
-export const validateCustomerSiteCreate = (input: CustomerSiteCreate): string | null => {
-  if (!isId(input.customerId)) return 'customerId must be a valid Id'
-  if (!isNonEmptyString(input.label)) return 'label must be a non-empty string'
-  if (!isLocation(input.location)) return 'location must be a valid Location'
-  return null
-}
-
-/** Validates CustomerSiteUpdate; returns error message or null. */
-export const validateCustomerSiteUpdate = (input: CustomerSiteUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.label !== undefined && !isNonEmptyString(input.label)) {
-    return 'label must be a non-empty string'
-  }
-  if (input.location !== undefined && !isLocation(input.location)) {
-    return 'location must be a valid Location'
-  }
-  return null
-}
 
 /** Validates CustomerCreate; returns error message or null. */
 export const validateCustomerCreate = (input: CustomerCreate): string | null => {
@@ -53,6 +32,12 @@ export const validateCustomerCreate = (input: CustomerCreate): string | null => 
   if (!isNonEmptyString(input.country)) return 'country must be a non-empty string'
   if (!isCompositionPositive(input.contacts, isContact)) {
     return 'contacts must be a non-empty array of valid contacts'
+  }
+  if (!isCompositionMany(input.sites, isCustomerSite)) {
+    return 'sites must be an array of valid customer sites'
+  }
+  if (!isCompositionMany(input.notes, isNote)) {
+    return 'notes must be an array of valid notes'
   }
   return null
 }
@@ -81,6 +66,12 @@ export const validateCustomerUpdate = (input: CustomerUpdate): string | null => 
   if (input.country !== undefined && !isNonEmptyString(input.country)) {
     return 'country must be a non-empty string'
   }
+  if (input.sites !== undefined && !isCompositionMany(input.sites, isCustomerSite)) {
+    return 'sites must be an array of valid customer sites'
+  }
+  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
+    return 'notes must be an array of valid notes'
+  }
   return null
 }
 
@@ -101,4 +92,15 @@ const isContact = (v: unknown): v is Contact => {
     && typeof c.isPrimary === 'boolean'
     && isCompositionMany(c.notes,
       (n): n is unknown => typeof n === 'object' && n !== null)
+}
+
+const isNote = (v: unknown): v is Note => typeof v === 'object' && v !== null
+
+const isCustomerSite = (v: unknown): v is CustomerSite => {
+  if (!v || typeof v !== 'object') return false
+  const s = v as Dictionary
+  return isId(s.customerId as unknown)
+    && isNonEmptyString(s.label as unknown)
+    && isCompositionOne(s.location, isLocation)
+    && isCompositionMany(s.notes, isNote)
 }

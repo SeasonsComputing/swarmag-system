@@ -2,28 +2,23 @@
  * Protocol input shapes for Service boundary operations.
  */
 
-import type { Id } from '@core-std'
-import type { ServiceCategory } from '@domain/abstractions/service.ts'
+import type {
+  CreateFromInstantiable,
+  UpdateFromInstantiable
+} from '@core-std'
+import type {
+  Service,
+  ServiceRequiredAssetType
+} from '@domain/abstractions/service.ts'
 
 /** Input for creating a Service. */
-export type ServiceCreate = {
-  name: string
-  sku: string
-  description?: string
-  category: ServiceCategory
-}
+export type ServiceCreate = CreateFromInstantiable<Service>
 
 /** Input for updating a Service. */
-export type ServiceUpdate = {
-  id: Id
-  name?: string
-  sku?: string
-  description?: string
-  category?: ServiceCategory
-}
+export type ServiceUpdate = UpdateFromInstantiable<Service>
 
 /** Input for creating a ServiceRequiredAssetType junction. */
-export type ServiceRequiredAssetTypeCreate = {
-  serviceId: Id
-  assetTypeId: Id
-}
+export type ServiceRequiredAssetTypeCreate = Pick<
+  ServiceRequiredAssetType,
+  'serviceId' | 'assetTypeId'
+>
