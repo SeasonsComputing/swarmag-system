@@ -256,73 +256,90 @@ The following sections define the domain types and shape constraints from `@doma
 ```text
 Id (alias)
   Shape: UUID v7 string
-  Notes: Primary/foreign identifier type
+  Relations: None
+  Purpose: Primary/foreign identifier type
 
 When (alias)
   Shape: ISO 8601 UTC string
-  Notes: Timestamp type
+  Relations: None
+  Purpose: Timestamp type
 
 Dictionary (alias)
   Shape: JSON-like key/value map
-  Notes: Flexible structured data container
+  Relations: None
+  Purpose: Flexible structured data container
 
 Instantiable (type)
   Fields: id: Id, createdAt: When, updatedAt: When, deletedAt?: When
-  Notes: Lifecycle base for all persisted abstractions with independent database rows;
+  Relations: None
+  Purpose: Lifecycle base for all persisted abstractions with independent database rows;
          extend via intersection — do not redeclare these fields inline
 
 CompositionOne<T> (type)
   Shape: readonly T[]
-  Notes: Exactly 1 embedded subordinate; stored as single-element JSONB array
+  Relations: None
+  Purpose: Exactly 1 embedded subordinate; stored as single-element JSONB array
 
 CompositionOptional<T> (type)
   Shape: readonly T[]
-  Notes: 0 or 1 embedded subordinate; stored as JSONB array
+  Relations: None
+  Purpose: 0 or 1 embedded subordinate; stored as JSONB array
 
 CompositionMany<T> (type)
   Shape: readonly T[]
-  Notes: 0 or more embedded subordinates; stored as JSONB array; always [] when empty
+  Relations: None
+  Purpose: 0 or more embedded subordinates; stored as JSONB array; always [] when empty
 
 CompositionPositive<T> (type)
   Shape: readonly T[]
-  Notes: 1 or more embedded subordinates; stored as JSONB array; never empty
+  Relations: None
+  Purpose: 1 or more embedded subordinates; stored as JSONB array; never empty
 
 isCompositionOne<T>(value, guard) (function)
   Returns: value is CompositionOne<T>
-  Notes: Validates exactly 1 element
+  Relations: CompositionOne
+  Purpose: Validates exactly 1 element
 
 isCompositionOptional<T>(value, guard) (function)
   Returns: value is CompositionOptional<T>
-  Notes: Validates 0 or 1 element
+  Relations: CompositionOptional
+  Purpose: Validates 0 or 1 element
 
 isCompositionMany<T>(value, guard) (function)
   Returns: value is CompositionMany<T>
-  Notes: Validates 0 or more elements
+  Relations: CompositionMany
+  Purpose: Validates 0 or more elements
 
 isCompositionPositive<T>(value, guard) (function)
   Returns: value is CompositionPositive<T>
-  Notes: Validates 1 or more elements
+  Relations: CompositionPositive
+  Purpose: Validates 1 or more elements
 
 demandOne<T>(c: CompositionOne<T>) (function)
   Returns: T
-  Notes: Extracts single value; trusts type system per Constitution §9.5.3
+  Relations: CompositionOne
+  Purpose: Extracts single value; trusts type system per Constitution §9.5.3
 
 optionalOne<T>(c: CompositionOptional<T>) (function)
   Returns: T | undefined
-  Notes: Extracts value or undefined from optional composition
+  Relations: CompositionOptional
+  Purpose: Extracts value or undefined from optional composition
 
 AssociationOne<T> (type)
   Shape: Id
-  Notes: Required FK to independently lifecycled row; phantom T documents referenced type;
+  Relations: None
+  Purpose: Required FK to independently lifecycled row; phantom T documents referenced type;
          many side of 1:m or true 1:1
 
 AssociationOptional<T> (type)
   Shape: Id | undefined
-  Notes: Optional FK — nullable column; phantom T documents referenced type
+  Relations: None
+  Purpose: Optional FK — nullable column; phantom T documents referenced type
 
 AssociationJunction<T> (type)
   Shape: Id
-  Notes: Junction FK for m:m relationships; phantom T documents referenced type;
+  Relations: None
+  Purpose: Junction FK for m:m relationships; phantom T documents referenced type;
          both sides of a junction declare AssociationJunction
 ```
 
@@ -332,36 +349,41 @@ AssociationJunction<T> (type)
 Location (object)
   Fields: latitude, longitude, altitudeMeters?, line1?, line2?, city?, state?,
           postalCode?, country?, recordedAt?, accuracyMeters?, description?
-  Notes: Geographic position plus optional address metadata
+  Relations: None
+  Purpose: Geographic position plus optional address metadata
 
 Attachment (object)
   Fields: filename, url, contentType, kind(photo|video|map|document),
           uploadedAt, uploadedById
-  Notes: Uploaded artifact metadata
+  Relations: User
+  Purpose: Uploaded artifact metadata
 
 Note (object)
   Fields: createdAt, authorId?, content, visibility?(internal|shared),
           tags: CompositionMany<string>, attachments: CompositionMany<Attachment>
-  Notes: Freeform note with optional visibility/taxonomy
+  Relations: Attachment, User
+  Purpose: Freeform note with optional visibility/taxonomy
 ```
 
 ### 4.3 Assets (`@domain/abstractions/asset.ts`)
 
 ```text
 AssetType (Instantiable)
-  Fields: id, label, active, createdAt, updatedAt, deletedAt?
-  Notes: Reference type for categorizing assets
+  Fields: label, active
+  Relations: None
+  Purpose: Reference type for categorizing assets
   Values: foundation/data-lists.md, Section 2. Asset Types
 
 AssetStatus (const-enum)
   Values: active | maintenance | retired | reserved
-  Notes: Lifecycle/availability state
+  Relations: Asset
+  Purpose: Lifecycle/availability state
 
 Asset (Instantiable)
-  Fields: id, label, description?, serialNumber?, type: AssociationOne<AssetType>,
-          status(AssetStatus), notes: CompositionMany<Note>,
-          createdAt, updatedAt, deletedAt?
-  Notes: Operational equipment/resource
+  Fields: label, description?, serialNumber?, type: AssociationOne<AssetType>,
+          status(AssetStatus), Purpose: CompositionMany<Note>,
+  Relations: AssetType, Note
+  Purpose: Operational equipment/resource
 ```
 
 ### 4.4 Chemicals (`@domain/abstractions/chemical.ts`)
@@ -369,19 +391,22 @@ Asset (Instantiable)
 ```text
 ChemicalUsage (const-enum)
   Values: herbicide | pesticide | fertilizer | fungicide | adjuvant
-  Notes: Domain usage classification
+  Relations: Chemical
+  Purpose: Domain usage classification
 
 ChemicalLabel (object)
   Fields: url, description?
-  Notes: Label/document pointer
+  Relations: None
+  Purpose: Label/document pointer
 
 Chemical (Instantiable)
-  Fields: id, name, epaNumber?, usage(ChemicalUsage),
+  Fields: name, epaNumber?, usage(ChemicalUsage),
           signalWord?(danger|warning|caution), restrictedUse,
           reEntryIntervalHours?, storageLocation?, sdsUrl?,
           labels: CompositionMany<ChemicalLabel>,
-          notes: CompositionMany<Note>, createdAt, updatedAt, deletedAt?
-  Notes: Regulated material record
+          Purpose: CompositionMany<Note>
+  Relations: ChemicalLabel, Note
+  Purpose: Regulated material record
 ```
 
 ### 4.5 Customers (`@domain/abstractions/customer.ts`)
@@ -390,23 +415,25 @@ Chemical (Instantiable)
 Contact (object)
   Fields: name, email?, phone?, isPrimary,
           preferredChannel?(email|text|phone),
-          notes: CompositionMany<Note>
-  Notes: Embedded customer contact; isPrimary flags the primary contact
+          Purpose: CompositionMany<Note>
+  Relations: Note
+  Purpose: Embedded customer contact; isPrimary flags the primary contact
 
 CustomerSite (object)
   Fields: id, customerId: AssociationOne<Customer>, label,
           location: CompositionOne<Location>, acreage?,
-          notes: CompositionMany<Note>
-  Notes: Serviceable customer location
+          Purpose: CompositionMany<Note>
+  Relations: Customer, Location, Note
+  Purpose: Serviceable customer location
 
 Customer (Instantiable)
-  Fields: id, name, status(active|inactive|prospect), line1, line2?,
+  Fields: name, status(active|inactive|prospect), line1, line2?,
           city, state, postalCode, country,
           accountManagerId: AssociationOptional<User>,
           sites: CompositionMany<CustomerSite>,
-          contacts: CompositionPositive<Contact>, notes: CompositionMany<Note>,
-          createdAt, updatedAt, deletedAt?
-  Notes: Customer account aggregate; contacts must be non-empty
+          contacts: CompositionPositive<Contact>, Purpose: CompositionMany<Note>,
+  Relations: User, CustomerSite, Contact, Note
+  Purpose: Customer account aggregate; contacts must be non-empty
 ```
 
 ### 4.6 Services (`@domain/abstractions/service.ts`)
@@ -414,142 +441,136 @@ Customer (Instantiable)
 ```text
 ServiceCategory (const-enum)
   Values: aerial-drone-services | ground-machinery-services
-  Notes: Service family classification
+  Relations: Service
+  Purpose: Service family classification
 
 Service (Instantiable)
-  Fields: id, name, sku, description?, category(ServiceCategory),
+  Fields: name, sku, description?, category(ServiceCategory),
           tagsWorkflowCandidates: CompositionMany<string>,
-          notes: CompositionMany<Note>, createdAt, updatedAt, deletedAt?
-  Notes: Sellable operational offering
+          Purpose: CompositionMany<Note>
+  Relations: Note
+  Purpose: Sellable operational offering
 
 ServiceRequiredAssetType (Junction)
   Fields: serviceId: AssociationJunction<Service>, assetTypeId: AssociationJunction<AssetType>
-  Notes: m:m junction — services to required asset types; hard delete only
+  Relations: Service, AssetType
+  Purpose: m:m junction — services to required asset types; hard delete only
 ```
 
 ### 4.7 Users (`@domain/abstractions/user.ts`)
 
 ```text
-USER_ROLES (const tuple)
+UserRole (const-enum)
   Values: administrator | sales | operations
-  Notes: Canonical role set
-
-UserRole (union)
-  Values: (typeof USER_ROLES)[number]
-  Notes: Role type derived from tuple
+  Relations: User
+  Purpose: Canonical role set
 
 User (Instantiable)
   Fields: displayName, primaryEmail, phoneNumber, avatarUrl?,
           roles: CompositionPositive<UserRole>,
           status?(active|inactive)
-  Notes: System user identity and membership; extends Instantiable
+  Relations: None
+  Purpose: System user identity and membership; extends Instantiable
 ```
 
 ### 4.8 Workflows (`@domain/abstractions/workflow.ts`)
 
 ```text
 QuestionType (const-enum)
-  Values: 
-    | text 
-    | number 
-    | boolean 
-    | single-select 
-    | multi-select
-    | internal
-  Notes: Supported question input modes; internal is reserved for system-generated
+  Values: text | number | boolean | single-select | multi-select | internal
+  Relations: Question
+  Purpose: Supported question input modes; internal is reserved for system-generated
          log entries such as telemetry, GPS, and operational metadata
 
 QuestionOption (object)
   Fields: value, label?, requiresNote?
-  Notes: Selectable option metadata
+  Relations: None
+  Purpose: Selectable option metadata
 
 Question (object)
   Fields: id, prompt, type(QuestionType), helpText?, required?,
           options: CompositionMany<QuestionOption>
-  Notes: Workflow checklist prompt
+  Relations: QuestionOption
+  Purpose: Workflow checklist prompt
 
 AnswerValue (union)
-  Values: 
-    | string 
-    | number 
-    | boolean 
-    | string[]
-  Notes: Permitted answer value payloads
+  Values: string, number, boolean, string[]
+  Relations: Answer
+  Purpose: Permitted answer value payloads
 
 Answer (object)
   Fields: questionId, value(AnswerValue), capturedAt, capturedById,
-          notes: CompositionMany<Note>
-  Notes: Captured response instance; notes carry crew annotations and attachments
+          Purpose: CompositionMany<Note>
+  Relations: Note, User
+  Purpose: Captured response instance; notes carry crew annotations and attachments
 
 Task (object)
   Fields: id, title, description?, checklist: CompositionPositive<Question>
-  Notes: Atomic executable step; checklist must be non-empty
+  Relations: Question
+  Purpose: Atomic executable step; checklist must be non-empty
 
 Workflow (Instantiable)
-  Fields: id, name, description?, version, tags: CompositionMany<string>,
-          tasks: CompositionPositive<Task>, createdAt, updatedAt, deletedAt?
-  Notes: Versioned execution template; read-only except for administrator role
+  Fields: name, description?, version, tags: CompositionMany<string>,
+          tasks: CompositionPositive<Task>
+  Relations: Task
+  Purpose: Versioned execution template; read-only except for administrator role
 ```
 
 ### 4.9 Jobs (`@domain/abstractions/job.ts`)
 
 ```text
 JobStatus (const-enum)
-  Values: 
-    | 'open'
-    | 'assessing'
-    | 'planning'
-    | 'preparing'
-    | 'executing'
-    | 'finalizing'
-    | 'closed'
-    | 'cancelled'
-  Notes: Job lifecycle state
+  Values: 'open' | 'assessing' | 'planning' | 'preparing' | 'executing' | 'finalizing' | 'closed' | 'cancelled'
+  Relations: Job
+  Purpose: Job lifecycle state
 
 JobAssessment (Instantiable)
-  Fields: id, jobId: AssociationOne<Job>, assessorId: AssociationOne<User>,
+  Fields: jobId: AssociationOne<Job>, assessorId: AssociationOne<User>,
           locations: CompositionPositive<Location>,
-          risks: CompositionMany<Note>, notes: CompositionMany<Note>,
-          createdAt, updatedAt, deletedAt?
-  Notes: Pre-planning assessment; requires one or more locations
+          risks: CompositionMany<Note>, Purpose: CompositionMany<Note>,
+  Relations: Job, User, Location, Note
+  Purpose: Pre-planning assessment; requires one or more locations
 
 JobWorkflow (Instantiable)
-  Fields: id, jobId: AssociationOne<Job>, sequence,
+  Fields: jobId: AssociationOne<Job>, sequence,
           basisWorkflowId: AssociationOne<Workflow>,
           modifiedWorkflowId: AssociationOptional<Workflow>,
-          createdAt, updatedAt, deletedAt?
-  Notes: Job-specific workflow instance; basisWorkflowId references the
+  Relations: Job, Workflow
+  Purpose: Job-specific workflow instance; basisWorkflowId references the
          read-only Workflow master; modifiedWorkflowId is always a clone
          of the basis, created only when specialization is required during
          assessment or planning
 
 JobPlanAssignment (Instantiable)
-  Fields: id, planId: AssociationOne<JobPlan>, userId: AssociationOne<User>,
-          role(UserRole), notes: CompositionMany<Note>,
-          createdAt, updatedAt, deletedAt?
-  Notes: Assignment of user to plan role; many side of 1:m with JobPlan
+  Fields: planId: AssociationOne<JobPlan>, userId: AssociationOne<User>,
+          role(UserRole), Purpose: CompositionMany<Note>,
+  Relations: JobPlan, User, Note
+  Purpose: Assignment of user to plan role; many side of 1:m with JobPlan
 
 JobPlanChemical (Instantiable)
-  Fields: id, planId: AssociationOne<JobPlan>, chemicalId: AssociationOne<Chemical>,
+  Fields: planId: AssociationOne<JobPlan>, chemicalId: AssociationOne<Chemical>,
           amount, unit(gallon|liter|pound|kilogram),
           targetArea?, targetAreaUnit?(acre|hectare),
-          createdAt, updatedAt, deletedAt?
-  Notes: Planned chemical usage; many side of 1:m with JobPlan
+  Relations: JobPlan, Chemical
+  Purpose: Planned chemical usage; many side of 1:m with JobPlan
 
 JobPlanAsset (Junction)
   Fields: planId: AssociationJunction<JobPlan>, assetId: AssociationJunction<Asset>
-  Notes: m:m junction — plans to assets; hard delete only
+  Relations: JobPlan, Asset
+  Purpose: m:m junction — plans to assets; hard delete only
 
 JobPlan (Instantiable)
-  Fields: id, jobId: AssociationOne<Job>, scheduledStart, scheduledEnd?,
-          notes: CompositionMany<Note>, createdAt, updatedAt, deletedAt?
-  Notes: Job-specific execution plan
+  Fields: jobId: AssociationOne<Job>, scheduledStart, scheduledEnd?,
+          Purpose: CompositionMany<Note>
+  Relations: Job, Note
+  Purpose: Job-specific execution plan
 
 JobWork (Instantiable)
-  Fields: id, jobId: AssociationOne<Job>, work: CompositionPositive<Id>,
+  Fields: jobId: AssociationOne<Job>, work: CompositionPositive<Id>,
           startedAt, startedById: AssociationOne<User>,
-          completedAt?, createdAt, updatedAt, deletedAt?
-  Notes: Execution record; creation transitions Job to executing;
+          completedAt?
+  Relations: Job, User, Workflow
+  Purpose: Execution record; creation transitions Job to executing;
          work is an ordered array of resolved Workflow IDs (basis if
          unmodified, modified clone otherwise) — the immutable
          execution manifest
@@ -557,12 +578,13 @@ JobWork (Instantiable)
 JobWorkLogEntry (object)
   Fields: id, jobId: AssociationOne<Job>, userId: AssociationOne<User>,
           answer: CompositionOne<Answer>, createdAt
-  Notes: Append-only execution event; answer is always present and captures
+  Relations: Job, User, Answer
+  Purpose: Append-only execution event; answer is always present and captures
          both crew checklist responses (text, number, boolean, single-select,
          multi-select) and system-generated telemetry via internal question type
 
 Job (Instantiable)
-  Fields: id, customerId: AssociationOne<Customer>, status(JobStatus),
-          createdAt, updatedAt, deletedAt?
-  Notes: Work agreement lifecycle anchor
+  Fields: customerId: AssociationOne<Customer>, status(JobStatus),
+  Relations: Customer
+  Purpose: Work agreement lifecycle anchor
 ```
