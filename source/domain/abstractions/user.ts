@@ -6,7 +6,11 @@
 import type { CompositionPositive, Instantiable } from '@core-std'
 
 /** Canonical role set. */
-export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
+export const USER_ROLES = [
+  'administrator',
+  'sales',
+  'operations'
+] as const
 
 /** Role type derived from tuple. */
 export type UserRole = (typeof USER_ROLES)[number]
