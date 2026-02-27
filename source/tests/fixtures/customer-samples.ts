@@ -8,7 +8,6 @@ import type { Customer } from '@domain/abstractions/customer.ts'
 
 const customerId = id()
 const accountManagerId = id()
-const siteId = id()
 
 const headquartersLocation: Location = {
   latitude: 33.5779,
@@ -32,7 +31,6 @@ export const blueMesaRanchCustomer: Customer = {
   country: 'US',
   accountManagerId,
   sites: [{
-    id: siteId,
     customerId,
     label: 'North Pasture HQ',
     location: [headquartersLocation],

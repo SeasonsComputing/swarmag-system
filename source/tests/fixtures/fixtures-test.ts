@@ -60,7 +60,6 @@ Deno.test('fixture integrity: customer fixtures keep contact linkage intact', ()
     assert(customer.contacts.length > 0)
     assert(customer.contacts.some(contact => contact.isPrimary))
     assert(customer.sites.filter(Boolean).every(site => site!.customerId === customer.id))
-    assert(customer.sites.filter(Boolean).every(site => isId(site!.id)))
     assert(isWhen(customer.createdAt))
     assert(isWhen(customer.updatedAt))
   }

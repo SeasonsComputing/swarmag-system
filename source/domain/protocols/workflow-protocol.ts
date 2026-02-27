@@ -2,13 +2,8 @@
  * Protocol input shapes for Workflow boundary operations.
  */
 
-import type { Task } from '@domain/abstractions/workflow.ts'
+import type { CreateFromInstantiable } from '@core-std'
+import type { Workflow } from '@domain/abstractions/workflow.ts'
 
 /** Input for creating a Workflow. */
-export type WorkflowCreate = {
-  name: string
-  description?: string
-  version: number
-  tags: string[]
-  tasks: Task[]
-}
+export type WorkflowCreate = CreateFromInstantiable<Workflow>

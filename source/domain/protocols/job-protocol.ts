@@ -2,119 +2,63 @@
  * Protocol input shapes for Job boundary operations.
  */
 
-import type { Id, When } from '@core-std'
-import type { Location } from '@domain/abstractions/common.ts'
 import type {
-  ChemicalUnit,
+  CreateFromInstantiable,
+  UpdateFromInstantiable
+} from '@core-std'
+import type {
+  Job,
+  JobAssessment,
+  JobPlan,
+  JobPlanAsset,
+  JobPlanAssignment,
   JobPlanChemical,
-  JobStatus
+  JobWork,
+  JobWorkflow,
+  JobWorkLogEntry
 } from '@domain/abstractions/job.ts'
-import type { UserRole } from '@domain/abstractions/user.ts'
-import type { Answer } from '@domain/abstractions/workflow.ts'
 
 /** Input for creating a Job. */
-export type JobCreate = {
-  customerId: Id
-}
+export type JobCreate = CreateFromInstantiable<Job>
 
 /** Input for updating a Job. */
-export type JobUpdate = {
-  id: Id
-  status?: JobStatus
-}
+export type JobUpdate = UpdateFromInstantiable<Job>
 
 /** Input for creating a JobAssessment. */
-export type JobAssessmentCreate = {
-  jobId: Id
-  assessorId: Id
-  locations: Location[]
-}
+export type JobAssessmentCreate = CreateFromInstantiable<JobAssessment>
 
 /** Input for updating a JobAssessment. */
-export type JobAssessmentUpdate = {
-  id: Id
-  assessorId?: Id
-  locations?: Location[]
-}
+export type JobAssessmentUpdate = UpdateFromInstantiable<JobAssessment>
 
 /** Input for creating a JobWorkflow. */
-export type JobWorkflowCreate = {
-  jobId: Id
-  sequence: number
-  basisWorkflowId: Id
-  modifiedWorkflowId?: Id
-}
+export type JobWorkflowCreate = CreateFromInstantiable<JobWorkflow>
 
 /** Input for updating a JobWorkflow. */
-export type JobWorkflowUpdate = {
-  id: Id
-  sequence?: number
-  modifiedWorkflowId?: Id
-}
+export type JobWorkflowUpdate = UpdateFromInstantiable<JobWorkflow>
 
 /** Input for creating a JobPlan. */
-export type JobPlanCreate = {
-  jobId: Id
-  scheduledStart: When
-  scheduledEnd?: When
-}
+export type JobPlanCreate = CreateFromInstantiable<JobPlan>
 
 /** Input for updating a JobPlan. */
-export type JobPlanUpdate = {
-  id: Id
-  scheduledStart?: When
-  scheduledEnd?: When
-}
+export type JobPlanUpdate = UpdateFromInstantiable<JobPlan>
 
 /** Input for creating a JobPlanAssignment. */
-export type JobPlanAssignmentCreate = {
-  planId: Id
-  userId: Id
-  role: UserRole
-}
+export type JobPlanAssignmentCreate = CreateFromInstantiable<JobPlanAssignment>
 
 /** Input for updating a JobPlanAssignment. */
-export type JobPlanAssignmentUpdate = {
-  id: Id
-  role?: UserRole
-}
+export type JobPlanAssignmentUpdate = UpdateFromInstantiable<JobPlanAssignment>
 
 /** Input for creating a JobPlanChemical. */
-export type JobPlanChemicalCreate = {
-  planId: Id
-  chemicalId: Id
-  amount: number
-  unit: ChemicalUnit
-  targetArea?: number
-  targetAreaUnit?: JobPlanChemical['targetAreaUnit']
-}
+export type JobPlanChemicalCreate = CreateFromInstantiable<JobPlanChemical>
 
 /** Input for updating a JobPlanChemical. */
-export type JobPlanChemicalUpdate = {
-  id: Id
-  amount?: number
-  unit?: ChemicalUnit
-  targetArea?: number
-  targetAreaUnit?: JobPlanChemical['targetAreaUnit']
-}
+export type JobPlanChemicalUpdate = UpdateFromInstantiable<JobPlanChemical>
 
 /** Input for creating a JobPlanAsset junction. */
-export type JobPlanAssetCreate = {
-  planId: Id
-  assetId: Id
-}
+export type JobPlanAssetCreate = Pick<JobPlanAsset, 'planId' | 'assetId'>
 
 /** Input for creating a JobWork record. */
-export type JobWorkCreate = {
-  jobId: Id
-  work: Id[]
-  startedAt: When
-  startedById: Id
-}
+export type JobWorkCreate = CreateFromInstantiable<JobWork>
 
 /** Input for creating a JobWorkLogEntry. */
-export type JobWorkLogEntryCreate = {
-  jobId: Id
-  userId: Id
-  answer: Answer
-}
+export type JobWorkLogEntryCreate = Pick<JobWorkLogEntry, 'jobId' | 'userId' | 'answer'>

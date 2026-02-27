@@ -9,7 +9,6 @@ import type {
   CompositionMany,
   CompositionOne,
   CompositionPositive,
-  Id,
   Instantiable
 } from '@core-std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
@@ -27,7 +26,6 @@ export type Contact = {
 
 /** Serviceable customer location. */
 export type CustomerSite = {
-  id: Id
   customerId: AssociationOne<Customer>
   label: string
   location: CompositionOne<Location>

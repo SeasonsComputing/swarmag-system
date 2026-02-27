@@ -182,7 +182,9 @@ export const validateJobWorkLogEntryCreate = (
 ): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
   if (!isId(input.userId)) return 'userId must be a valid Id'
-  if (!isCompositionOne([input.answer], isAnswer)) return 'answer must be a valid Answer'
+  if (!isCompositionOne(input.answer, isAnswer)) {
+    return 'answer must be a composition one of valid Answer'
+  }
   return null
 }
 

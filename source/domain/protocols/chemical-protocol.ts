@@ -2,30 +2,14 @@
  * Protocol input shapes for Chemical boundary operations.
  */
 
-import type { Id } from '@core-std'
-import type { Chemical, ChemicalUsage } from '@domain/abstractions/chemical.ts'
+import type {
+  CreateFromInstantiable,
+  UpdateFromInstantiable
+} from '@core-std'
+import type { Chemical } from '@domain/abstractions/chemical.ts'
 
 /** Input for creating a Chemical. */
-export type ChemicalCreate = {
-  name: string
-  epaNumber?: string
-  usage: ChemicalUsage
-  signalWord?: Chemical['signalWord']
-  restrictedUse: boolean
-  reEntryIntervalHours?: number
-  storageLocation?: string
-  sdsUrl?: string
-}
+export type ChemicalCreate = CreateFromInstantiable<Chemical>
 
 /** Input for updating a Chemical. */
-export type ChemicalUpdate = {
-  id: Id
-  name?: string
-  epaNumber?: string
-  usage?: ChemicalUsage
-  signalWord?: Chemical['signalWord']
-  restrictedUse?: boolean
-  reEntryIntervalHours?: number
-  storageLocation?: string
-  sdsUrl?: string
-}
+export type ChemicalUpdate = UpdateFromInstantiable<Chemical>
