@@ -23,15 +23,19 @@ The domain layer follows an abstraction-per-file pattern across five subdirector
 
 **Placement rules:**
 
-- `Location`, `Note`, `Attachment` → `common.ts` / `common-adapter.ts`
-- `Question`, `Answer`, `Task`, `QuestionType`, `QUESTION_TYPES`, `QuestionOption`, `AnswerValue` → `workflow.ts`
-- `JobStatus`, `JOB_STATUSES`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobPlanAssignment`, `JobPlanChemical`, `JobPlanAsset`, `JobWork`, `JobWorkLogEntry`, `Job` → `job.ts`
+- `Location`, `Note`, `Attachment`, `Answer`, `AnswerValue` → `common.ts` / `common-adapter.ts`
+- `QuestionType`, `QUESTION_TYPES`, `QuestionOption`, `Question`, `Task`, `TaskQuestion`, `WorkflowTask`, `Workflow` → `workflow.ts`
+- `JobStatus`, `JOB_STATUSES`, `Job`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobPlanAssignment`, `JobPlanChemical`, `JobPlanAsset`, `JobWork`, `JobWorkLogEntry` → `job.ts`
 - Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) → `@core/api/api-contract.ts`
 - Shared primitive validators → `@core-std`; domain-specific guards → their abstraction's validator file
 
 ### 2.1 File format
 
 All domain files must conform to `style-guide.md` section 6.1 Spec files.
+
+### 2.2 Topic-area namespaces
+
+Protocol, adapter, and validator files are organized by topic-area namespace, not one-to-one with abstractions. `job-protocol.ts` covers all job-area types; `asset-protocol.ts` covers all asset-area types; and so on. A single file per sub-layer per topic area.
 
 ## 3. Abstraction Archetype (`abstractions/`)
 
@@ -43,6 +47,7 @@ All domain files must conform to `style-guide.md` section 6.1 Spec files.
 - FK references use `Association*<T>` from `@core-std/relations.ts`.
 - JSON-serializable only — no methods on domain objects.
 - No variadic tuple types anywhere.
+- Abstraction definitions are the single source of truth for protocol field sets — `CreateFromInstantiable<T>` and `UpdateFromInstantiable<T>` from `@core-std` derive protocol shapes directly from the abstraction type. No manual synchronization required.
 
 ### 3.2 Const-enum pattern (non-negotiable)
 
@@ -141,39 +146,53 @@ These are imported by all other adapters that handle embedded `Note`, `Location`
 
 ## 5. Protocol Archetype (`protocols/`)
 
-### 5.1 Pattern
+### 5.1 Three Rules
+
+**Rule 1 — Instantiable types use utility type derivation.**
+
+Lifecycled abstractions (those extending `Instantiable`) get create and update protocol shapes derived directly from the abstraction type via `@core-std` utility types:
 
 ```typescript
-/**
- * Protocol input shapes for Asset boundary operations.
- */
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
+import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 
-import type { Id } from '@core-std'
-import type { AssetStatus } from '@domain/abstractions/asset.ts'
+/** Input for creating an AssetType. */
+export type AssetTypeCreate = CreateFromInstantiable<AssetType>
+
+/** Input for updating an AssetType. */
+export type AssetTypeUpdate = UpdateFromInstantiable<AssetType>
 
 /** Input for creating an Asset. */
-export type AssetCreate = {
-  label: string
-  type: Id
-  status: AssetStatus
-}
+export type AssetCreate = CreateFromInstantiable<Asset>
 
 /** Input for updating an Asset. */
-export type AssetUpdate = {
-  id: Id
-  label?: string
-  status?: AssetStatus
-}
+export type AssetUpdate = UpdateFromInstantiable<Asset>
+```
+
+`CreateFromInstantiable<T>` strips `id`, `createdAt`, `updatedAt`, and `deletedAt` — the fields the system manages. `UpdateFromInstantiable<T>` is `id` (required) plus all create fields as optional partial. Never hand-write `Omit`/`Pick`/`Partial` compositions for lifecycled types.
+
+**Rule 2 — Composite objects and junctions need no protocol entry.**
+
+Composite objects (embedded subordinates without independent lifecycle) and junction types (pure FK pairs) are used directly by callers. The type is already the shape. No protocol entry is declared for them.
+
+**Rule 3 — Exceptions are hand-coded.**
+
+Types that do not fit Rules 1 or 2 are hand-coded with `Pick` as needed:
+
+```typescript
+// Append-only — no update shape; only the fields the caller supplies
+export type JobWorkLogEntryCreate = Pick<JobWorkLogEntry, 'jobId' | 'userId' | 'answer'>
+
+// Read-only master — create only, no update shape
+export type WorkflowCreate = CreateFromInstantiable<Workflow>
 ```
 
 ### 5.2 Rules
 
-- `{Abstraction}Create` and `{Abstraction}Update` per lifecycled abstraction
-- `{Abstraction}Update` always includes `id: Id`
-- Partial shapes — only fields relevant to the operation
-- No domain logic — protocols are data shapes for transmission only
-- Read-only abstractions (`Workflow` masters) omit `{Abstraction}Update`
-- FK fields use bare `Id` — not `Association*` types (protocols are boundary shapes, not domain types)
+- Never hand-write `Omit`/`Pick`/`Partial` compositions for `Instantiable` types — use the utility types
+- Composite objects and junctions have no protocol entries
+- Exceptions are the only place `Pick` appears — and only when no utility type applies
+- No domain logic — protocols are data shapes for boundary transmission only
 
 ## 6. Validator Archetype (`validators/`)
 
