@@ -10,11 +10,11 @@ import type { ChemicalUnit, JobStatus } from '@domain/abstractions/job.ts'
 import { USER_ROLES } from '@domain/abstractions/user.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'
+import type { JobPlanAsset } from '@domain/abstractions/job.ts'
 import type {
   JobAssessmentCreate,
   JobAssessmentUpdate,
   JobCreate,
-  JobPlanAssetCreate,
   JobPlanAssignmentCreate,
   JobPlanAssignmentUpdate,
   JobPlanChemicalCreate,
@@ -159,7 +159,7 @@ export const validateJobPlanChemicalUpdate = (
 }
 
 /** Validates JobPlanAssetCreate; returns error message or null. */
-export const validateJobPlanAssetCreate = (input: JobPlanAssetCreate): string | null => {
+export const validateJobPlanAssetCreate = (input: JobPlanAsset): string | null => {
   if (!isId(input.planId)) return 'planId must be a valid Id'
   if (!isId(input.assetId)) return 'assetId must be a valid Id'
   return null

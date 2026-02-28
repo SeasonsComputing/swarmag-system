@@ -31,7 +31,7 @@ DROP TABLE IF EXISTS users;
 -- =============================================================================
 
 CREATE TABLE users (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            UUID        PRIMARY KEY,
   display_name  TEXT        NOT NULL,
   primary_email TEXT        NOT NULL UNIQUE,
   phone_number  TEXT        NOT NULL,
@@ -73,7 +73,7 @@ CREATE INDEX users_deleted_at_idx ON users (deleted_at);
 -- =============================================================================
 
 CREATE TABLE asset_types (
-  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id         UUID        PRIMARY KEY,
   label      TEXT        NOT NULL,
   active     BOOLEAN     NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -98,7 +98,7 @@ CREATE POLICY asset_types_update_admin ON asset_types
 CREATE INDEX asset_types_deleted_at_idx ON asset_types (deleted_at);
 
 CREATE TABLE assets (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            UUID        PRIMARY KEY,
   type_id       UUID        NOT NULL REFERENCES asset_types(id) ON DELETE RESTRICT,
   label         TEXT        NOT NULL,
   description   TEXT,
@@ -134,7 +134,7 @@ CREATE INDEX assets_deleted_at_idx ON assets (deleted_at);
 -- =============================================================================
 
 CREATE TABLE chemicals (
-  id                      UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                      UUID        PRIMARY KEY,
   name                    TEXT        NOT NULL,
   epa_number              TEXT,
   usage                   TEXT        NOT NULL
@@ -174,7 +174,7 @@ CREATE INDEX chemicals_deleted_at_idx ON chemicals (deleted_at);
 -- =============================================================================
 
 CREATE TABLE customers (
-  id                 UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                 UUID        PRIMARY KEY,
   account_manager_id UUID        REFERENCES users(id) ON DELETE RESTRICT,
   name               TEXT        NOT NULL,
   status             TEXT        NOT NULL
@@ -220,7 +220,7 @@ CREATE INDEX customers_deleted_at_idx ON customers (deleted_at);
 -- =============================================================================
 
 CREATE TABLE services (
-  id                       UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                       UUID        PRIMARY KEY,
   name                     TEXT        NOT NULL,
   sku                      TEXT        NOT NULL UNIQUE,
   description              TEXT,
@@ -277,7 +277,7 @@ CREATE INDEX service_required_asset_types_asset_type_id_idx ON service_required_
 -- =============================================================================
 
 CREATE TABLE workflows (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          UUID        PRIMARY KEY,
   name        TEXT        NOT NULL,
   description TEXT,
   version     INTEGER     NOT NULL DEFAULT 1,
@@ -309,7 +309,7 @@ CREATE INDEX workflows_deleted_at_idx ON workflows (deleted_at);
 -- =============================================================================
 
 CREATE TABLE jobs (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          UUID        PRIMARY KEY,
   customer_id UUID        NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
   status      TEXT        NOT NULL DEFAULT 'open'
                           CONSTRAINT jobs_status_check
@@ -341,7 +341,7 @@ CREATE INDEX jobs_status_idx ON jobs (status);
 CREATE INDEX jobs_deleted_at_idx ON jobs (deleted_at);
 
 CREATE TABLE job_assessments (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          UUID        PRIMARY KEY,
   job_id      UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   assessor_id UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   locations   JSONB       NOT NULL DEFAULT '[]'::jsonb,
@@ -371,7 +371,7 @@ CREATE INDEX job_assessments_assessor_id_idx ON job_assessments (assessor_id);
 CREATE INDEX job_assessments_deleted_at_idx ON job_assessments (deleted_at);
 
 CREATE TABLE job_workflows (
-  id                   UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                   UUID        PRIMARY KEY,
   job_id               UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   basis_workflow_id    UUID        NOT NULL REFERENCES workflows(id) ON DELETE RESTRICT,
   modified_workflow_id UUID        REFERENCES workflows(id) ON DELETE RESTRICT,
@@ -401,7 +401,7 @@ CREATE INDEX job_workflows_modified_workflow_id_idx ON job_workflows (modified_w
 CREATE INDEX job_workflows_deleted_at_idx ON job_workflows (deleted_at);
 
 CREATE TABLE job_plans (
-  id              UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id              UUID        PRIMARY KEY,
   job_id          UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   scheduled_start TIMESTAMPTZ NOT NULL,
   scheduled_end   TIMESTAMPTZ,
@@ -429,7 +429,7 @@ CREATE INDEX job_plans_job_id_idx ON job_plans (job_id);
 CREATE INDEX job_plans_deleted_at_idx ON job_plans (deleted_at);
 
 CREATE TABLE job_plan_assignments (
-  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id         UUID        PRIMARY KEY,
   plan_id    UUID        NOT NULL REFERENCES job_plans(id) ON DELETE CASCADE,
   user_id    UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   role       TEXT        NOT NULL
@@ -460,7 +460,7 @@ CREATE INDEX job_plan_assignments_user_id_idx ON job_plan_assignments (user_id);
 CREATE INDEX job_plan_assignments_deleted_at_idx ON job_plan_assignments (deleted_at);
 
 CREATE TABLE job_plan_chemicals (
-  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id               UUID        PRIMARY KEY,
   plan_id          UUID        NOT NULL REFERENCES job_plans(id) ON DELETE CASCADE,
   chemical_id      UUID        NOT NULL REFERENCES chemicals(id) ON DELETE RESTRICT,
   amount           NUMERIC     NOT NULL,
@@ -516,7 +516,7 @@ CREATE POLICY job_plan_assets_delete_ops ON job_plan_assets
 CREATE INDEX job_plan_assets_asset_id_idx ON job_plan_assets (asset_id);
 
 CREATE TABLE job_work (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            UUID        PRIMARY KEY,
   job_id        UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   started_by_id UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   work          JSONB       NOT NULL DEFAULT '[]'::jsonb,
@@ -546,7 +546,7 @@ CREATE INDEX job_work_started_by_id_idx ON job_work (started_by_id);
 CREATE INDEX job_work_deleted_at_idx ON job_work (deleted_at);
 
 CREATE TABLE job_work_log_entries (
-  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id         UUID        PRIMARY KEY,
   job_id     UUID        NOT NULL REFERENCES jobs(id) ON DELETE RESTRICT,
   user_id    UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   answer     JSONB       NOT NULL DEFAULT '[]'::jsonb,
@@ -575,9 +575,10 @@ CREATE INDEX job_work_log_entries_created_at_idx ON job_work_log_entries (create
 -- Seed Data
 -- =============================================================================
 
+-- Seed ID assignment: 019ca1aa-4aa0-7aed-b032-17cb3f638578
 INSERT INTO users (id, display_name, primary_email, phone_number, roles, status)
 VALUES (
-  '00000000-0000-7000-8000-000000000001',
+  '019ca1aa-4aa0-7aed-b032-17cb3f638578',
   'DevOps Admin',
   'devops-admin@swarmag.com',
   '',
@@ -592,105 +593,149 @@ SET
   roles = EXCLUDED.roles,
   status = EXCLUDED.status;
 
+
+-- Seed ID assignment: 019ca1aa-4aa1-7d8d-9765-4c15af94cddf
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000010', 'Transport Truck', true)
+VALUES ('019ca1aa-4aa1-7d8d-9765-4c15af94cddf', 'Transport Truck', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa1-7f54-b187-4d0d87038fd5
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000011', 'Transport Trailer', true)
+VALUES ('019ca1aa-4aa1-7f54-b187-4d0d87038fd5', 'Transport Trailer', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa1-7bf4-b876-277bd97a3f4c
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000012', 'Skidsteer Vehicle', true)
+VALUES ('019ca1aa-4aa1-7bf4-b876-277bd97a3f4c', 'Skidsteer Vehicle', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-75f4-9f29-e32f929a4b29
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000013', 'Toolcat Vehicle', true)
+VALUES ('019ca1aa-4aa2-75f4-9f29-e32f929a4b29', 'Toolcat Vehicle', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7ecf-9330-6292e9c4c889
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000014', 'Vehicle Tool Attachment', true)
+VALUES ('019ca1aa-4aa2-7ecf-9330-6292e9c4c889', 'Vehicle Tool Attachment', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7328-9c0b-9cb55e6710ad
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000015', 'Mapping Drone', true)
+VALUES ('019ca1aa-4aa2-7328-9c0b-9cb55e6710ad', 'Mapping Drone', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7696-9c66-3613bc317eac
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000016', 'Dispensing Drone', true)
+VALUES ('019ca1aa-4aa2-7696-9c66-3613bc317eac', 'Dispensing Drone', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7937-b296-bcfaf46cfd67
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000017', 'Drone Spray Tank', true)
+VALUES ('019ca1aa-4aa2-7937-b296-bcfaf46cfd67', 'Drone Spray Tank', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7dc8-b442-a166ba4a67fd
 INSERT INTO asset_types (id, label, active)
-VALUES ('00000000-0000-7000-8000-000000000018', 'Drone Granular Hopper', true)
+VALUES ('019ca1aa-4aa2-7dc8-b442-a166ba4a67fd', 'Drone Granular Hopper', true)
 ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7989-8feb-02fcb0b317a4
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000020', 'Pesticide, Herbicide', 'A-CHEM-01', 'aerial-drone-services')
+VALUES ('019ca1aa-4aa2-7989-8feb-02fcb0b317a4', 'Pesticide, Herbicide', 'A-CHEM-01', 'aerial-drone-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7389-98b8-95e2efb6ecff
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000021', 'Fertilizer', 'A-CHEM-02', 'aerial-drone-services')
+VALUES ('019ca1aa-4aa2-7389-98b8-95e2efb6ecff', 'Fertilizer', 'A-CHEM-02', 'aerial-drone-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-74dc-93c3-c1a2eb1b1422
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000022', 'Seed', 'A-SEED-01', 'aerial-drone-services')
+VALUES ('019ca1aa-4aa2-74dc-93c3-c1a2eb1b1422', 'Seed', 'A-SEED-01', 'aerial-drone-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-72a3-b9fc-59f8b535533f
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000023', 'Pond Weeds & Algae', 'A-CHEM-03', 'aerial-drone-services')
+VALUES ('019ca1aa-4aa2-72a3-b9fc-59f8b535533f', 'Pond Weeds & Algae', 'A-CHEM-03', 'aerial-drone-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7917-882e-50fe35ec82dc
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000024', 'Pond Feeding', 'A-FEED-01', 'aerial-drone-services')
+VALUES ('019ca1aa-4aa2-7917-882e-50fe35ec82dc', 'Pond Feeding', 'A-FEED-01', 'aerial-drone-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7586-aa7b-73e0ea1b7998
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000025', 'Precision Mapping', 'A-MAP-01', 'aerial-drone-services')
+VALUES ('019ca1aa-4aa2-7586-aa7b-73e0ea1b7998', 'Precision Mapping', 'A-MAP-01', 'aerial-drone-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa2-7edb-9e2e-a014d32ed4b7
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000026', 'Mesquite Herbicide', 'A-CHEM-04', 'aerial-drone-services')
+VALUES ('019ca1aa-4aa2-7edb-9e2e-a014d32ed4b7', 'Mesquite Herbicide', 'A-CHEM-04', 'aerial-drone-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa3-70a6-994b-1bfb7a862df7
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000027', 'Commercial Greenhouse Painting', 'A-PAINT-01', 'aerial-drone-services')
+VALUES ('019ca1aa-4aa3-70a6-994b-1bfb7a862df7', 'Commercial Greenhouse Painting', 'A-PAINT-01', 'aerial-drone-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa3-7238-a345-306d184d5953
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000028', 'Mesquite, Hackberry, et al Removal', 'G-MITI-01', 'ground-machinery-services')
+VALUES ('019ca1aa-4aa3-7238-a345-306d184d5953', 'Mesquite, Hackberry, et al Removal', 'G-MITI-01', 'ground-machinery-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa3-7125-82aa-3000815e28df
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000029', 'Fence-line Tree Trimming', 'G-FENCE-01', 'ground-machinery-services')
+VALUES ('019ca1aa-4aa3-7125-82aa-3000815e28df', 'Fence-line Tree Trimming', 'G-FENCE-01', 'ground-machinery-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa3-7b12-a909-468331c3e036
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000030', 'Rock Removal, Regrade', 'G-MACH-01', 'ground-machinery-services')
+VALUES ('019ca1aa-4aa3-7b12-a909-468331c3e036', 'Rock Removal, Regrade', 'G-MACH-01', 'ground-machinery-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa3-79f0-9fb4-cf704f98618c
 INSERT INTO services (id, name, sku, category)
-VALUES ('00000000-0000-7000-8000-000000000031', 'Brush Hogging', 'G-BRUSH-01', 'ground-machinery-services')
+VALUES ('019ca1aa-4aa3-79f0-9fb4-cf704f98618c', 'Brush Hogging', 'G-BRUSH-01', 'ground-machinery-services')
 ON CONFLICT (id) DO UPDATE
 SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
 
+
+-- Seed ID assignment: 019ca1aa-4aa3-7f2d-89b3-08f2e71c329f
 INSERT INTO workflows (id, name, description, version, tags, tasks)
 VALUES (
-  '00000000-0000-7000-8000-000000000100',
+  '019ca1aa-4aa3-7f2d-89b3-08f2e71c329f',
   'Internal Telemetry Questions',
   'System-generated internal questions for telemetry and operational log entries. Read-only.',
   1,
@@ -809,3 +854,4 @@ SET
   version = EXCLUDED.version,
   tags = EXCLUDED.tags,
   tasks = EXCLUDED.tasks;
+

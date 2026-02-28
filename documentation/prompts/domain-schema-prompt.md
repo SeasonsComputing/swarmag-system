@@ -14,6 +14,8 @@ Generate `source/domain/schema/schema.sql` from scratch. Delete the existing fil
 
 This file is the **canonical current-state schema** — not a migration. It must be idempotent and fully reproducible. It defines all tables, constraints, indexes, RLS enablement, and RLS policies.
 
+At the top of the generated schema (immediately after the file header), emit `DROP TABLE IF EXISTS ...;` statements for all tables in reverse dependency order.
+
 ## File Header
 
 Begin the file with:
@@ -37,7 +39,7 @@ Conform strictly to `style-guide.md §12`. Key rules:
 - `snake_case` for all identifiers
 - Table names are plural nouns
 - Column order: `id` → FK columns → domain columns → lifecycle columns (`created_at`, `updated_at`, `deleted_at`)
-- `UUID` for all PKs and FKs; default `gen_random_uuid()`
+- `UUID` for all PKs and FKs; PK columns are `UUID PRIMARY KEY` with no default
 - `TIMESTAMPTZ` for all timestamps — never `TIMESTAMP`
 - `TEXT` for strings — never `VARCHAR(n)` unless a length constraint is architecturally required
 - `JSONB NOT NULL DEFAULT '[]'::jsonb` for all `Composition*` fields — all compositions are stored as arrays regardless of cardinality; cardinality is enforced at the application layer
@@ -107,7 +109,7 @@ Section header format:
 
 ```sql
 CREATE TABLE users (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            UUID        PRIMARY KEY,
   display_name  TEXT        NOT NULL,
   primary_email TEXT        NOT NULL UNIQUE,
   phone_number  TEXT        NOT NULL,
@@ -137,7 +139,7 @@ Indexes: `users_primary_email_idx` (already covered by UNIQUE), `users_deleted_a
 
 ```sql
 CREATE TABLE asset_types (
-  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id         UUID        PRIMARY KEY,
   label      TEXT        NOT NULL,
   active     BOOLEAN     NOT NULL DEFAULT true,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -160,7 +162,7 @@ Indexes: `asset_types_deleted_at_idx`
 
 ```sql
 CREATE TABLE assets (
-  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id            UUID        PRIMARY KEY,
   type_id       UUID        NOT NULL REFERENCES asset_types(id) ON DELETE RESTRICT,
   label         TEXT        NOT NULL,
   description   TEXT,
@@ -189,7 +191,7 @@ Indexes: `assets_type_id_idx`, `assets_deleted_at_idx`
 
 ```sql
 CREATE TABLE chemicals (
-  id                    UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                    UUID        PRIMARY KEY,
   name                  TEXT        NOT NULL,
   epa_number            TEXT,
   usage                 TEXT        NOT NULL
@@ -223,7 +225,7 @@ Indexes: `chemicals_deleted_at_idx`
 
 ```sql
 CREATE TABLE customers (
-  id                  UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                  UUID        PRIMARY KEY,
   account_manager_id  UUID        REFERENCES users(id) ON DELETE RESTRICT,
   name                TEXT        NOT NULL,
   status              TEXT        NOT NULL
@@ -259,7 +261,7 @@ Indexes: `customers_account_manager_id_idx`, `customers_deleted_at_idx`
 
 ```sql
 CREATE TABLE services (
-  id                       UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                       UUID        PRIMARY KEY,
   name                     TEXT        NOT NULL,
   sku                      TEXT        NOT NULL UNIQUE,
   description              TEXT,
@@ -310,7 +312,7 @@ Indexes: `service_required_asset_types_asset_type_id_idx`
 
 ```sql
 CREATE TABLE workflows (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          UUID        PRIMARY KEY,
   name        TEXT        NOT NULL,
   description TEXT,
   version     INTEGER     NOT NULL DEFAULT 1,
@@ -336,7 +338,7 @@ Indexes: `workflows_deleted_at_idx`
 
 ```sql
 CREATE TABLE jobs (
-  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id          UUID        PRIMARY KEY,
   customer_id UUID        NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
   status      TEXT        NOT NULL DEFAULT 'open'
                           CONSTRAINT jobs_status_check
@@ -364,7 +366,7 @@ Indexes: `jobs_customer_id_idx`, `jobs_status_idx`, `jobs_deleted_at_idx`
 
 ```sql
 CREATE TABLE job_assessments (
-  id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id           UUID        PRIMARY KEY,
   job_id       UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   assessor_id  UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   locations    JSONB       NOT NULL DEFAULT '[]'::jsonb,
@@ -390,7 +392,7 @@ Indexes: `job_assessments_job_id_idx`, `job_assessments_assessor_id_idx`, `job_a
 
 ```sql
 CREATE TABLE job_workflows (
-  id                   UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id                   UUID        PRIMARY KEY,
   job_id               UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   basis_workflow_id    UUID        NOT NULL REFERENCES workflows(id) ON DELETE RESTRICT,
   modified_workflow_id UUID        REFERENCES workflows(id) ON DELETE RESTRICT,
@@ -415,7 +417,7 @@ Indexes: `job_workflows_job_id_idx`, `job_workflows_basis_workflow_id_idx`, `job
 
 ```sql
 CREATE TABLE job_plans (
-  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id               UUID        PRIMARY KEY,
   job_id           UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   scheduled_start  TIMESTAMPTZ NOT NULL,
   scheduled_end    TIMESTAMPTZ,
@@ -440,7 +442,7 @@ Indexes: `job_plans_job_id_idx`, `job_plans_deleted_at_idx`
 
 ```sql
 CREATE TABLE job_plan_assignments (
-  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id         UUID        PRIMARY KEY,
   plan_id    UUID        NOT NULL REFERENCES job_plans(id) ON DELETE CASCADE,
   user_id    UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   role       TEXT        NOT NULL
@@ -467,7 +469,7 @@ Indexes: `job_plan_assignments_plan_id_idx`, `job_plan_assignments_user_id_idx`,
 
 ```sql
 CREATE TABLE job_plan_chemicals (
-  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id               UUID        PRIMARY KEY,
   plan_id          UUID        NOT NULL REFERENCES job_plans(id) ON DELETE CASCADE,
   chemical_id      UUID        NOT NULL REFERENCES chemicals(id) ON DELETE RESTRICT,
   amount           NUMERIC     NOT NULL,
@@ -519,7 +521,7 @@ Indexes: `job_plan_assets_asset_id_idx`
 
 ```sql
 CREATE TABLE job_work (
-  id             UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id             UUID        PRIMARY KEY,
   job_id         UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   started_by_id  UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   work           JSONB       NOT NULL DEFAULT '[]'::jsonb,
@@ -549,7 +551,7 @@ Append-only — no `updated_at`, no `deleted_at`.
 
 ```sql
 CREATE TABLE job_work_log_entries (
-  id         UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  id         UUID        PRIMARY KEY,
   job_id     UUID        NOT NULL REFERENCES jobs(id) ON DELETE RESTRICT,
   user_id    UUID        NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   answer     JSONB       NOT NULL DEFAULT '[]'::jsonb,
@@ -607,6 +609,13 @@ Add a final section to `schema.sql` after all table definitions:
 
 Seed data is canonical, known at schema time, and required for the system to function from first boot. It is part of `schema.sql` — not a migration.
 
+Assign seed record IDs from `source/devops/seed-ids.txt` in file order, one UUID per seed record (`INSERT` block), and add a comment above each `INSERT` block:
+
+```sql
+-- Seed ID assignment: <uuid-from-seed-ids.txt>
+INSERT INTO ...
+```
+
 ### Bootstrap Admin User
 
 A fixed bootstrap admin user is required to access the database after first deploy. Password is set via Supabase Auth dashboard post-deploy.
@@ -625,13 +634,13 @@ VALUES (
 
 ### Asset Types
 
-Insert all records from `data-lists.md §4 Asset Types`. One `INSERT` per record. Use stable UUIDs (UUID v7 format, sequential from `00000000-0000-7000-8000-000000000010`).
+Insert all records from `data-lists.md §4 Asset Types`. One `INSERT` per record. IDs come from `source/devops/seed-ids.txt` assignment order.
 
 Fields: `id`, `label`, `active` (all `true`).
 
 ### Services
 
-Insert all records from `data-lists.md §2 Aerial Drone Services` and `§3 Ground Machinery Services`. One `INSERT` per record. Use stable UUIDs sequential from `00000000-0000-7000-8000-000000000020`.
+Insert all records from `data-lists.md §2 Aerial Drone Services` and `§3 Ground Machinery Services`. One `INSERT` per record. IDs come from `source/devops/seed-ids.txt` assignment order.
 
 Fields: `id`, `name`, `sku`, `category`.
 
@@ -645,23 +654,23 @@ Insert a single canonical `workflows` record that contains all internal question
 ```sql
 INSERT INTO workflows (id, name, description, version, tags, tasks)
 VALUES (
-  '00000000-0000-7000-8000-000000000100',
+  '<uuid-from-seed-ids.txt>',
   'Internal Telemetry Questions',
   'System-generated internal questions for telemetry and operational log entries. Read-only.',
   1,
   '["internal", "system"]'::jsonb,
   -- tasks: single task containing all internal questions from data-lists.md §5
   -- each question: { id, prompt, type, required: false, options: [] }
-  -- question ids: stable UUIDs sequential from 00000000-0000-7000-8000-000000000200
+  -- question ids: stable UUIDs (may be fixed literals; not seed record IDs)
   '[{ ... }]'::jsonb
 );
 ```
 
 Build the `tasks` JSONB array from `data-lists.md §5` exactly:
 
-- One task: `{ "id": "00000000-0000-7000-8000-000000000200", "title": "Internal Telemetry", "checklist": [ ... ] }`
+- One task: `{ "id": "<stable-task-uuid>", "title": "Internal Telemetry", "checklist": [ ... ] }`
 - Each question in checklist: `{ "id": "<stable-uuid>", "prompt": "<key from data-lists>", "type": "internal", "required": false, "options": [] }`
-- Assign sequential stable UUIDs to each question starting from `00000000-0000-7000-8000-000000000201`
+- Question UUIDs are stable and deterministic across regenerations
 
 ## Quality Bar
 
