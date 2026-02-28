@@ -10,7 +10,6 @@ import type {
   Job,
   JobAssessment,
   JobPlan,
-  JobPlanAsset,
   JobPlanAssignment,
   JobPlanChemical,
   JobWork,
@@ -53,9 +52,6 @@ export type JobPlanChemicalCreate = CreateFromInstantiable<JobPlanChemical>
 
 /** Input for updating a JobPlanChemical. */
 export type JobPlanChemicalUpdate = UpdateFromInstantiable<JobPlanChemical>
-
-/** Input for creating a JobPlanAsset junction. */
-export type JobPlanAssetCreate = Pick<JobPlanAsset, 'planId' | 'assetId'>
 
 /** Input for creating a JobWork record. */
 export type JobWorkCreate = CreateFromInstantiable<JobWork>
