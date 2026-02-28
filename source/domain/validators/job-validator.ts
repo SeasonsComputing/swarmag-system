@@ -7,10 +7,10 @@ import type { Dictionary } from '@core-std'
 import type { Location } from '@domain/abstractions/common.ts'
 import { CHEMICAL_UNITS, JOB_STATUSES } from '@domain/abstractions/job.ts'
 import type { ChemicalUnit, JobStatus } from '@domain/abstractions/job.ts'
+import type { JobPlanAsset } from '@domain/abstractions/job.ts'
 import { USER_ROLES } from '@domain/abstractions/user.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
 import type { Answer } from '@domain/abstractions/workflow.ts'
-import type { JobPlanAsset } from '@domain/abstractions/job.ts'
 import type {
   JobAssessmentCreate,
   JobAssessmentUpdate,

@@ -65,13 +65,17 @@ A Service Category represents a class of service we offer (e.g., aerial-drone-se
 | Drone Spray Tank        |
 | Drone Granular Hopper   |
 
-### 2.3 Workflow & Tasks
+### 2.3 Workflow, Tasks & Questions
 
 A Workflow describes how work is generally performed. Examples of workflows include "Drone Chemical Preparation", "Mesquite Chemical Preparation", "Mesquite Mitigation Procedure", and "Drone Obstacle Preflight".
 
-A Workflow is structured as a sequence of Tasks. Examples of tasks include "Packed the chemicals.", "Checked the drone's battery.", "Reviewed the weather forecast.", "Reviewed the drone's flight plan.".
+A Workflow is structured as an ordered sequence of Tasks. Tasks are independently lifecycled and reusable across Workflows. For example, a "Prepare Chemicals" task appears in both aerial and ground chemical workflows. The sequence of Tasks within a Workflow is defined by the WorkflowTask junction, which carries the ordering.
 
-Each Task in a Workflow is a simple checklist supporting the task. Each item in the checklist can be either a Note or a Question. Notes are static text used to inform or warn operations staff. Questions are expressed using a small set of fundamental response formats: yes/no, selection, datetime, quantity (real number). All Tasks and Answers may be annotated with one or more Notes. Notes may contain one or more Attachments. Attachments are mime-type specified, such as images, videos, or documents.
+Each Task is a named grouping of an ordered sequence of Questions. Questions are independently lifecycled and reusable across Tasks. The sequence of Questions within a Task is defined by the TaskQuestion junction, which carries the ordering.
+
+Questions are expressed using a small set of fundamental response formats: text, number, yes/no, single-select, multi-select. A special `internal` question type is reserved for system-generated log entries such as telemetry, GPS coordinates, and operational metadata. Internal questions exist as seed records in the question library and are referenced directly by log entries — no wrapper workflow is required.
+
+All Answers may be annotated with one or more Notes. Notes may contain one or more Attachments. Attachments are mime-type specified, such as images, videos, or documents.
 
 Workflows guide how work is assessed and inform how it is later planned and executed.
 
@@ -93,13 +97,13 @@ A Job has an Assessment, a Plan, and a collection of Log entries. Log entries ar
 
 ### 2.6 Job Workflow & Job Work
 
-Work is the physical execution of a Job. It produces the progress and knowledge captured by field crews during a job. Work is directed by a sequence of Workflows. Each Workflow, its Tasks and their associated checklist of Questions are a template used to assess and plan the job.
+Work is the physical execution of a Job. It produces the progress and knowledge captured by field crews during a job. Work is directed by a sequence of Workflows. Each Workflow and its associated Tasks and Questions are a template used to assess and plan the job.
 
-To facilitate the role a Workflow plays in orchestrating a Job, two abstractions are introduced: Job Workflow and Job Work. A Job has a collection of Job Workflows. Job Assessment, Job Plan, and Job Work each contain an association to their Job and therefore to the Job Workflows. Just as Tasks and Task checklists are sequenced, so too Job Workflows are sequenced.
+To facilitate the role a Workflow plays in orchestrating a Job, two abstractions are introduced: Job Workflow and Job Work. A Job has a collection of Job Workflows. Job Assessment, Job Plan, and Job Work each contain an association to their Job and therefore to the Job Workflows. Just as Tasks and Questions are sequenced via their junction tables, so too Job Workflows are sequenced.
 
-Job Workflows are prepared prior to Job Work. The Job Assessment phase includes selecting the Workflows to be used on a Job. As each job is different, the Job Assessment may edit the workflows to capture the specialization. Creating, editing, and deleting Workflows are an administration authorization and so are read-only for Job Assessment and Job Plan. A Job Workflow is therefore associated with a basis Workflow (read-only reference) and an optional modified Workflow — which is always a clone of the basis Workflow. The Job Plan phase may add additional basis Workflows and optionally modify them. The Job Plan may also further modify Job Workflows that were already modified during assessment; in that case the assessment-modified Workflow becomes the basis for the Job Plan's modification.
+Job Workflows are prepared prior to Job Work. The Job Assessment phase includes selecting the Workflows to be used on a Job. As each job is different, the Job Assessment may edit the workflows to capture the specialization. Creating, editing, and deleting Workflows are an administration authorization and so are read-only for Job Assessment and Job Plan. A Job Workflow is therefore associated with a basis Workflow (read-only reference) and an optional modified Workflow — which is always a clone of the basis Workflow, including its WorkflowTask and TaskQuestion junction records. The Job Plan phase may add additional basis Workflows and optionally modify them. The Job Plan may also further modify Job Workflows that were already modified during assessment; in that case the assessment-modified Workflow becomes the basis for the Job Plan's modification.
 
-Starting Job Work involves transitioning the Job's status to `executing`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks, presenting the task checklist items as Questions and logging the Answers as Job Work Log entries.
+Starting Job Work involves transitioning the Job's status to `executing`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks and their questions, logging the Answers as Job Work Log entries.
 
 Job Workflows are assigned to crew staff during the planning phase.
 
@@ -162,34 +166,34 @@ The domain model is implemented as a TypeScript library under `source/domain`. I
 
 These abstractions represent the primary concepts of the system and form the core of the domain model. They are expressed as TypeScript types under `source/domain` and define the vocabulary used throughout the system.
 
-| Abstraction     | Description                                                                       |
-| --------------- | --------------------------------------------------------------------------------- |
-| `Service`       | Offering provided to customers, defining the kind of work performed               |
-| `Asset`         | Equipment or resources used to perform services                                   |
-| `Chemical`      | Regulated materials applied as part of certain services                           |
-| `Workflow`      | Reusable template describing how work is generally performed                      |
-| `Job`           | Unit of work agreed to with a customer; lifecycle anchor                          |
-| `JobAssessment` | Evaluation of a job's scope, locations, and requirements                          |
-| `JobWorkflow`   | Job-specific workflow instance referencing a basis and optional modified Workflow |
-| `JobPlan`       | Job-specific execution plan                                                       |
-| `JobWork`       | Execution record; finalizes the workflow manifest and gates field execution       |
-| `JobWorkLog`    | Append-only record of execution events and observations                           |
-| `Customer`      | Organization purchasing services                                                  |
+| Abstraction     | Description                                                                          |
+| --------------- | ------------------------------------------------------------------------------------ |
+| `Service`       | Offering provided to customers, defining the kind of work performed                  |
+| `Asset`         | Equipment or resources used to perform services                                      |
+| `Chemical`      | Regulated materials applied as part of certain services                              |
+| `Workflow`      | Reusable template describing how work is generally performed                         |
+| `Task`          | Reusable named grouping of questions; sequenced within workflows via junction        |
+| `Question`      | Reusable prompt used to gather structured input; sequenced within tasks via junction |
+| `Job`           | Unit of work agreed to with a customer; lifecycle anchor                             |
+| `JobAssessment` | Evaluation of a job's scope, locations, and requirements                             |
+| `JobWorkflow`   | Job-specific workflow instance referencing a basis and optional modified Workflow    |
+| `JobPlan`       | Job-specific execution plan                                                          |
+| `JobWork`       | Execution record; finalizes the workflow manifest and gates field execution          |
+| `JobWorkLog`    | Append-only record of execution events and observations                              |
+| `Customer`      | Organization purchasing services                                                     |
 
 These abstractions describe **domain meaning**, not persistence, API shape, or user interface concerns.
 
 ### 3.6 Common abstractions shared within the model
 
-The following abstractions are shared across multiple domain concepts and represent either pure value objects or embedded subordinate compositions. They do not have independent life-cycles.
+The following abstractions are shared across multiple domain concepts and represent pure value objects or embedded subordinate compositions. They do not have independent lifecycles.
 
-| Abstraction  | Module        | Description                                              |
-| ------------ | ------------- | -------------------------------------------------------- |
-| `Location`   | `common.ts`   | Geographic coordinates with optional address information |
-| `Note`       | `common.ts`   | Freeform text with author and timestamp                  |
-| `Attachment` | `common.ts`   | Metadata describing an uploaded file or artifact         |
-| `User`       | `user.ts`     | Identity and role information for system users           |
-| `Question`   | `workflow.ts` | Prompt used to gather structured input                   |
-| `Answer`     | `workflow.ts` | Response to a question, with supporting notes            |
+| Abstraction  | Module      | Description                                              |
+| ------------ | ----------- | -------------------------------------------------------- |
+| `Location`   | `common.ts` | Geographic coordinates with optional address information |
+| `Note`       | `common.ts` | Freeform text with author and timestamp                  |
+| `Attachment` | `common.ts` | Metadata describing an uploaded file or artifact         |
+| `Answer`     | `common.ts` | Response to a question, with supporting notes            |
 
 These abstractions are **composed into** higher-level domain objects and are not referenced independently.
 
@@ -197,16 +201,14 @@ These abstractions are **composed into** higher-level domain objects and are not
 
 In addition to the core abstractions, the domain includes supporting structures that express relationships between concepts without embedding or ownership.
 
-These structures are present in code to model associations explicitly and to preserve flexibility as the system evolves.
-
-| Area          | Structures / Notes                                                            |
-| ------------- | ----------------------------------------------------------------------------- |
-| Services      | Asset requirements expressed as associations between services and asset types |
-| Assets        | Asset types defined independently and selected based on service requirements  |
-| Workflows     | Versioned workflows with sequenced task composition                           |
-| Job Workflows | Basis and modified workflow references per job, with sequence                 |
-| Planning      | Associations between plans and assigned users, assets, and chemicals          |
-| Customers     | Embedded subordinate data such as sites and contacts                          |
+| Area          | Structures / Notes                                                                |
+| ------------- | --------------------------------------------------------------------------------- |
+| Services      | Asset requirements expressed as m:m associations between services and asset types |
+| Workflows     | Versioned workflows with sequenced task associations via WorkflowTask junction    |
+| Tasks         | Reusable tasks with sequenced question associations via TaskQuestion junction     |
+| Job Workflows | Basis and modified workflow references per job, with sequence                     |
+| Planning      | Associations between plans and assigned users, assets, and chemicals              |
+| Customers     | Embedded subordinate data such as sites and contacts                              |
 
 These structures exist to model **relationships**, not to redefine the core abstractions themselves.
 
@@ -234,9 +236,12 @@ These types provide consistency and clarity without imposing storage or transpor
 - Lifecycled abstractions extend `Instantiable` — soft-delete semantics: `deletedAt` undefined/null means active. Exceptions: append-only logs and pure junction tables.
 - Embedded subordinate compositions use `Composition*` types from `@core-std/relations.ts`. Always `[]` when empty, never `null`.
 - FK references to independently lifecycled abstractions use `Association*` types from `@core-std/relations.ts`.
-- Id strategy: UUID v7 for all PK/FK.
-- `JobWorkLogEntry` is append-only; telemetry uses `QuestionType = 'internal'` — no separate metadata field.
-- `Workflow` masters are read-only to all roles except administrator. Modification during assessment or planning is achieved exclusively by cloning.
+- Id strategy: UUID v7 for all PK/FK; application always supplies the ID — no database-generated defaults.
+- `Task` and `Question` are independently lifecycled and reusable. Sequence is carried by the junction — `WorkflowTask.sequence` and `TaskQuestion.sequence` — never by the entity itself.
+- `Answer.questionId` is a legitimate `AssociationOne<Question>` FK reference to an independently lifecycled Question row.
+- Internal telemetry questions exist as seed rows in the `questions` table with `QuestionType = 'internal'`. No wrapper workflow is required.
+- `JobWorkLogEntry` is append-only; telemetry uses `QuestionType = 'internal'` questions referenced directly by `Answer.questionId`.
+- `Workflow` masters are read-only to all roles except administrator. Modification during assessment or planning is achieved exclusively by cloning — including the WorkflowTask and TaskQuestion junction records.
 - `JobWork.work` is the finalized execution manifest and is immutable once created.
 
 See `domain-archetypes.md` for implementation rules governing how these invariants are expressed in TypeScript, adapters, protocols, and validators.
@@ -363,6 +368,12 @@ Note (object)
           tags: CompositionMany<string>, attachments: CompositionMany<Attachment>
   Relations: Attachment, User
   Purpose: Freeform note with optional visibility/taxonomy
+
+Answer (object)
+  Fields: questionId: AssociationOne<Question>, value(AnswerValue), capturedAt,
+          capturedById: AssociationOne<User>, notes: CompositionMany<Note>
+  Relations: Question, User, Note
+  Purpose: Captured response to a question; notes carry crew annotations and attachments
 ```
 
 ### 4.3 Assets (`@domain/abstractions/asset.ts`)
@@ -381,9 +392,9 @@ AssetStatus (const-enum)
 
 Asset (Instantiable)
   Fields: label, description?, serialNumber?, type: AssociationOne<AssetType>,
-          status(AssetStatus), Purpose: CompositionMany<Note>,
+          status: AssetStatus, notes: CompositionMany<Note>
   Relations: AssetType, Note
-  Purpose: Operational equipment/resource
+  Purpose: Operational equipment or resource
 ```
 
 ### 4.4 Chemicals (`@domain/abstractions/chemical.ts`)
@@ -400,11 +411,11 @@ ChemicalLabel (object)
   Purpose: Label/document pointer
 
 Chemical (Instantiable)
-  Fields: name, epaNumber?, usage(ChemicalUsage),
+  Fields: name, epaNumber?, usage: ChemicalUsage,
           signalWord?(danger|warning|caution), restrictedUse,
           reEntryIntervalHours?, storageLocation?, sdsUrl?,
           labels: CompositionMany<ChemicalLabel>,
-          Purpose: CompositionMany<Note>
+          notes: CompositionMany<Note>
   Relations: ChemicalLabel, Note
   Purpose: Regulated material record
 ```
@@ -415,14 +426,14 @@ Chemical (Instantiable)
 Contact (object)
   Fields: name, email?, phone?, isPrimary,
           preferredChannel?(email|text|phone),
-          Purpose: CompositionMany<Note>
+          notes: CompositionMany<Note>
   Relations: Note
   Purpose: Embedded customer contact; isPrimary flags the primary contact
 
 CustomerSite (object)
   Fields: customerId: AssociationOne<Customer>, label,
           location: CompositionOne<Location>, acreage?,
-          Purpose: CompositionMany<Note>
+          notes: CompositionMany<Note>
   Relations: Customer, Location, Note
   Purpose: Serviceable customer location
 
@@ -431,7 +442,8 @@ Customer (Instantiable)
           city, state, postalCode, country,
           accountManagerId: AssociationOptional<User>,
           sites: CompositionMany<CustomerSite>,
-          contacts: CompositionPositive<Contact>, Purpose: CompositionMany<Note>,
+          contacts: CompositionPositive<Contact>,
+          notes: CompositionMany<Note>
   Relations: User, CustomerSite, Contact, Note
   Purpose: Customer account aggregate; contacts must be non-empty
 ```
@@ -445,9 +457,9 @@ ServiceCategory (const-enum)
   Purpose: Service family classification
 
 Service (Instantiable)
-  Fields: name, sku, description?, category(ServiceCategory),
+  Fields: name, sku, description?, category: ServiceCategory,
           tagsWorkflowCandidates: CompositionMany<string>,
-          Purpose: CompositionMany<Note>
+          notes: CompositionMany<Note>
   Relations: Note
   Purpose: Sellable operational offering
 
@@ -468,9 +480,9 @@ UserRole (const-enum)
 User (Instantiable)
   Fields: displayName, primaryEmail, phoneNumber, avatarUrl?,
           roles: CompositionPositive<UserRole>,
-          status?(active|inactive)
+          status?: active | inactive
   Relations: None
-  Purpose: System user identity and membership; extends Instantiable
+  Purpose: System user identity and membership
 ```
 
 ### 4.8 Workflows (`@domain/abstractions/workflow.ts`)
@@ -485,72 +497,93 @@ QuestionType (const-enum)
 QuestionOption (object)
   Fields: value, label?, requiresNote?
   Relations: None
-  Purpose: Selectable option metadata
-
-Question (object)
-  Fields: id, prompt, type(QuestionType), helpText?, required?,
-          options: CompositionMany<QuestionOption>
-  Relations: QuestionOption
-  Purpose: Workflow checklist prompt
+  Purpose: Selectable option metadata for single-select and multi-select questions
 
 AnswerValue (union)
-  Values: string, number, boolean, string[]
+  Values: string | number | boolean | string[]
   Relations: Answer
   Purpose: Permitted answer value payloads
 
-Answer (object)
-  Fields: questionId, value(AnswerValue), capturedAt, capturedById,
-          Purpose: CompositionMany<Note>
-  Relations: Note, User
-  Purpose: Captured response instance; notes carry crew annotations and attachments
+Question (Instantiable)
+  Fields: prompt, type: QuestionType, helpText?, required?,
+          options: CompositionMany<QuestionOption>
+  Relations: None
+  Purpose: Reusable prompt; independently lifecycled and shared across tasks;
+         internal questions are seed records referenced directly by log entries
 
-Task (object)
-  Fields: id, title, description?, checklist: CompositionPositive<Question>
-  Relations: Question
-  Purpose: Atomic executable step; checklist must be non-empty
+Task (Instantiable)
+  Fields: title, description?, notes: CompositionMany<Note>
+  Relations: None
+  Purpose: Reusable named grouping of questions; independently lifecycled and
+         shared across workflows; question sequence defined by TaskQuestion junction
+
+TaskQuestion (Junction)
+  Fields: taskId: AssociationJunction<Task>, questionId: AssociationJunction<Question>,
+          sequence: number
+  Relations: Task, Question
+  Purpose: m:m junction — tasks to questions with explicit ordering; hard delete only
 
 Workflow (Instantiable)
-  Fields: name, description?, version, tags: CompositionMany<string>,
-          tasks: CompositionPositive<Task>
-  Relations: Task
-  Purpose: Versioned execution template; read-only except for administrator role
+  Fields: name, description?, version: number, tags: CompositionMany<string>,
+          notes: CompositionMany<Note>
+  Relations: None
+  Purpose: Reusable versioned execution template; read-only except for administrator role;
+         task sequence defined by WorkflowTask junction
+
+WorkflowTask (Junction)
+  Fields: workflowId: AssociationJunction<Workflow>, taskId: AssociationJunction<Task>,
+          sequence: number
+  Relations: Workflow, Task
+  Purpose: m:m junction — workflows to tasks with explicit ordering; hard delete only
 ```
 
 ### 4.9 Jobs (`@domain/abstractions/job.ts`)
 
 ```text
 JobStatus (const-enum)
-  Values: 'open' | 'assessing' | 'planning' | 'preparing' | 'executing' | 'finalizing' | 'closed' | 'cancelled'
+  Values: open | assessing | planning | preparing | executing | finalizing | closed | cancelled
   Relations: Job
   Purpose: Job lifecycle state
+
+Job (Instantiable)
+  Fields: customerId: AssociationOne<Customer>, status: JobStatus
+  Relations: Customer
+  Purpose: Work agreement lifecycle anchor
 
 JobAssessment (Instantiable)
   Fields: jobId: AssociationOne<Job>, assessorId: AssociationOne<User>,
           locations: CompositionPositive<Location>,
-          risks: CompositionMany<Note>, Purpose: CompositionMany<Note>,
+          risks: CompositionMany<Note>, notes: CompositionMany<Note>
   Relations: Job, User, Location, Note
   Purpose: Pre-planning assessment; requires one or more locations
 
 JobWorkflow (Instantiable)
-  Fields: jobId: AssociationOne<Job>, sequence,
+  Fields: jobId: AssociationOne<Job>, sequence: number,
           basisWorkflowId: AssociationOne<Workflow>,
-          modifiedWorkflowId: AssociationOptional<Workflow>,
+          modifiedWorkflowId: AssociationOptional<Workflow>
   Relations: Job, Workflow
   Purpose: Job-specific workflow instance; basisWorkflowId references the
          read-only Workflow master; modifiedWorkflowId is always a clone
          of the basis, created only when specialization is required during
-         assessment or planning
+         assessment or planning; cloning includes WorkflowTask and TaskQuestion
+         junction records
+
+JobPlan (Instantiable)
+  Fields: jobId: AssociationOne<Job>, scheduledStart: When, scheduledEnd?: When,
+          notes: CompositionMany<Note>
+  Relations: Job, Note
+  Purpose: Job-specific execution plan
 
 JobPlanAssignment (Instantiable)
   Fields: planId: AssociationOne<JobPlan>, userId: AssociationOne<User>,
-          role(UserRole), Purpose: CompositionMany<Note>,
+          role: UserRole, notes: CompositionMany<Note>
   Relations: JobPlan, User, Note
   Purpose: Assignment of user to plan role; many side of 1:m with JobPlan
 
 JobPlanChemical (Instantiable)
   Fields: planId: AssociationOne<JobPlan>, chemicalId: AssociationOne<Chemical>,
-          amount, unit(gallon|liter|pound|kilogram),
-          targetArea?, targetAreaUnit?(acre|hectare),
+          amount: number, unit(gallon|liter|pound|kilogram),
+          targetArea?: number, targetAreaUnit?(acre|hectare)
   Relations: JobPlan, Chemical
   Purpose: Planned chemical usage; many side of 1:m with JobPlan
 
@@ -559,32 +592,18 @@ JobPlanAsset (Junction)
   Relations: JobPlan, Asset
   Purpose: m:m junction — plans to assets; hard delete only
 
-JobPlan (Instantiable)
-  Fields: jobId: AssociationOne<Job>, scheduledStart, scheduledEnd?,
-          Purpose: CompositionMany<Note>
-  Relations: Job, Note
-  Purpose: Job-specific execution plan
-
 JobWork (Instantiable)
   Fields: jobId: AssociationOne<Job>, work: CompositionPositive<Id>,
-          startedAt, startedById: AssociationOne<User>,
-          completedAt?
+          startedAt: When, startedById: AssociationOne<User>, completedAt?: When
   Relations: Job, User, Workflow
   Purpose: Execution record; creation transitions Job to executing;
          work is an ordered array of resolved Workflow IDs (basis if
-         unmodified, modified clone otherwise) — the immutable
-         execution manifest
+         unmodified, modified clone otherwise) — the immutable execution manifest
 
 JobWorkLogEntry (object)
-  Fields: id, jobId: AssociationOne<Job>, userId: AssociationOne<User>,
-          answer: CompositionOne<Answer>, createdAt
-  Relations: Job, User, Answer
-  Purpose: Append-only execution event; answer is always present and captures
-         both crew checklist responses (text, number, boolean, single-select,
-         multi-select) and system-generated telemetry via internal question type
-
-Job (Instantiable)
-  Fields: customerId: AssociationOne<Customer>, status(JobStatus),
-  Relations: Customer
-  Purpose: Work agreement lifecycle anchor
+  Fields: id: Id, jobId: AssociationOne<Job>, userId: AssociationOne<User>,
+          answer: CompositionOne<Answer>, createdAt: When
+  Relations: Job, User, Answer, Question
+  Purpose: Append-only execution event; answer.questionId references an
+         independently lifecycled Question row
 ```

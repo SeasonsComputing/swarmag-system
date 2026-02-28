@@ -198,8 +198,10 @@ The following seed data is defined in `schema.sql`:
 
 - **Asset types** — canonical `asset_types` records from `data-lists.md §4`
 - **Services** — canonical `services` records from `data-lists.md §2` and `§3`
-- **Internal questions** — canonical `workflows` seed record containing all `QuestionType = 'internal'` questions from `data-lists.md §5`
+- **Internal questions** — canonical `questions` seed records with `QuestionType = 'internal'` from `data-lists.md §5`; these are independently lifecycled rows referenced directly by `Answer.questionId` — no wrapper workflow or task required
 - **Bootstrap admin user** — a fixed `devops-admin@swarmag.com` user with `administrator` role and stable UUID; required to access the database after first deploy; password reset via Supabase Auth dashboard post-deploy
+
+All seed record IDs are stable UUID v7 values drawn from `documentation/devops/seed-ids.txt` and hardcoded into `schema.sql`. No seed record uses a database-generated ID.
 
 Migrations express deltas from this initial state.
 

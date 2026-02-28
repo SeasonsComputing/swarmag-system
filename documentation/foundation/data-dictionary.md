@@ -100,6 +100,27 @@ Attributes: **State**
 | `visibility?` | internal \| shared      |
 | `tags`        | CompositionMany<string> |
 
+### 3.4 Answer
+
+Type: **object**
+
+Purpose: **Captured response to a question; notes carry crew annotations and attachments**
+
+Attributes: **Relations**
+
+| **Attribute**  | **Relation**    | **Abstraction** |
+| -------------- | --------------- | --------------- |
+| `questionId`   | AssociationOne  | Question        |
+| `capturedById` | AssociationOne  | User            |
+| `notes`        | CompositionMany | Note            |
+
+Attributes: **State**
+
+| **Attribute** | **Type**    |
+| ------------- | ----------- |
+| `value`       | AnswerValue |
+| `capturedAt`  | When        |
+
 ## 4. Assets
 
 Source: `@domain/abstractions/asset.ts`
@@ -134,7 +155,7 @@ Purpose: **Lifecycle/availability state**
 
 Type: **Instantiable**
 
-Purpose: **Operational equipment/resource**
+Purpose: **Operational equipment or resource**
 
 Attributes: **Relations**
 
@@ -354,7 +375,7 @@ Purpose: **Canonical role set**
 
 Type: **Instantiable**
 
-Purpose: **System user identity and membership; extends Instantiable**
+Purpose: **System user identity and membership**
 
 Attributes: **Relations**
 
@@ -395,7 +416,7 @@ Purpose: **Supported question input modes; internal is reserved for system-gener
 
 Type: **object**
 
-Purpose: **Selectable option metadata**
+Purpose: **Selectable option metadata for single-select and multi-select questions**
 
 Attributes: **State**
 
@@ -405,11 +426,24 @@ Attributes: **State**
 | `label?`        | string   |
 | `requiresNote?` | boolean  |
 
-### 9.3 Question
+### 9.3 AnswerValue
 
-Type: **object**
+Type: **union**
 
-Purpose: **Workflow checklist prompt**
+Purpose: **Permitted answer value payloads**
+
+| **Type**   |
+| ---------- |
+| `string`   |
+| `number`   |
+| `boolean`  |
+| `string[]` |
+
+### 9.4 Question
+
+Type: **Instantiable**
+
+Purpose: **Reusable prompt; independently lifecycled and shared across tasks; internal questions are seed records referenced directly by log entries**
 
 Attributes: **Relations**
 
@@ -421,32 +455,16 @@ Attributes: **State**
 
 | **Attribute** | **Type**     |
 | ------------- | ------------ |
-| `id`          | Id           |
 | `prompt`      | string       |
 | `type`        | QuestionType |
 | `helpText?`   | string       |
 | `required?`   | boolean      |
 
-### 9.4 AnswerValue
+### 9.5 Task
 
-Type: **union**
+Type: **Instantiable**
 
-Purpose: **Permitted answer value payloads**
-
-Attributes: **State**
-
-| **Attribute** | **Type** |
-| ------------- | -------- |
-| `string`      | string   |
-| `number`      | number   |
-| `boolean`     | boolean  |
-| `string[]`    | string[] |
-
-### 9.5 Answer
-
-Type: **object**
-
-Purpose: **Captured response instance; notes carry crew annotations and attachments**
+Purpose: **Reusable named grouping of questions; independently lifecycled and shared across workflows; question sequence defined by TaskQuestion junction**
 
 Attributes: **Relations**
 
@@ -456,44 +474,41 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**  | **Type**    |
-| -------------- | ----------- |
-| `questionId`   | Id          |
-| `value`        | AnswerValue |
-| `capturedAt`   | When        |
-| `capturedById` | Id          |
+| **Attribute**  | **Type** |
+| -------------- | -------- |
+| `title`        | string   |
+| `description?` | string   |
 
-### 9.6 Task
+### 9.6 TaskQuestion
 
-Type: **object**
+Type: **Junction**
 
-Purpose: **Atomic executable step; checklist must be non-empty**
+Purpose: **m:m junction — tasks to questions with explicit ordering; hard delete only**
 
 Attributes: **Relations**
 
 | **Attribute** | **Relation**        | **Abstraction** |
 | ------------- | ------------------- | --------------- |
-| `checklist`   | CompositionPositive | Question        |
+| `taskId`      | AssociationJunction | Task            |
+| `questionId`  | AssociationJunction | Question        |
 
 Attributes: **State**
 
-| **Attribute**  | **Type** |
-| -------------- | -------- |
-| `id`           | Id       |
-| `title`        | string   |
-| `description?` | string   |
+| **Attribute** | **Type** |
+| ------------- | -------- |
+| `sequence`    | number   |
 
 ### 9.7 Workflow
 
 Type: **Instantiable**
 
-Purpose: **Versioned execution template; read-only except for administrator role**
+Purpose: **Reusable versioned execution template; read-only except for administrator role; task sequence defined by WorkflowTask junction**
 
 Attributes: **Relations**
 
-| **Attribute** | **Relation**        | **Abstraction** |
-| ------------- | ------------------- | --------------- |
-| `tasks`       | CompositionPositive | Task            |
+| **Attribute** | **Relation**    | **Abstraction** |
+| ------------- | --------------- | --------------- |
+| `notes`       | CompositionMany | Note            |
 
 Attributes: **State**
 
@@ -503,6 +518,25 @@ Attributes: **State**
 | `description?` | string                  |
 | `version`      | number                  |
 | `tags`         | CompositionMany<string> |
+
+### 9.8 WorkflowTask
+
+Type: **Junction**
+
+Purpose: **m:m junction — workflows to tasks with explicit ordering; hard delete only**
+
+Attributes: **Relations**
+
+| **Attribute** | **Relation**        | **Abstraction** |
+| ------------- | ------------------- | --------------- |
+| `workflowId`  | AssociationJunction | Workflow        |
+| `taskId`      | AssociationJunction | Task            |
+
+Attributes: **State**
+
+| **Attribute** | **Type** |
+| ------------- | -------- |
+| `sequence`    | number   |
 
 ## 10. Jobs
 
@@ -514,18 +548,36 @@ Type: **const-enum**
 
 Purpose: **Job lifecycle state**
 
-| Values         |
-| -------------- |
-| `'open'`       |
-| `'assessing'`  |
-| `'planning'`   |
-| `'preparing'`  |
-| `'executing'`  |
-| `'finalizing'` |
-| `'closed'`     |
-| `'cancelled'`  |
+| Values       |
+| ------------ |
+| `open`       |
+| `assessing`  |
+| `planning`   |
+| `preparing`  |
+| `executing`  |
+| `finalizing` |
+| `closed`     |
+| `cancelled`  |
 
-### 10.2 JobAssessment
+### 10.2 Job
+
+Type: **Instantiable**
+
+Purpose: **Work agreement lifecycle anchor**
+
+Attributes: **Relations**
+
+| **Attribute** | **Relation**   | **Abstraction** |
+| ------------- | -------------- | --------------- |
+| `customerId`  | AssociationOne | Customer        |
+
+Attributes: **State**
+
+| **Attribute** | **Type**  |
+| ------------- | --------- |
+| `status`      | JobStatus |
+
+### 10.3 JobAssessment
 
 Type: **Instantiable**
 
@@ -541,11 +593,11 @@ Attributes: **Relations**
 | `risks`       | CompositionMany     | Note            |
 | `notes`       | CompositionMany     | Note            |
 
-### 10.3 JobWorkflow
+### 10.4 JobWorkflow
 
 Type: **Instantiable**
 
-Purpose: **Job-specific workflow instance; basisWorkflowId references the read-only Workflow master; modifiedWorkflowId is always a clone of the basis, created only when specialization is required during assessment or planning**
+Purpose: **Job-specific workflow instance; basisWorkflowId references the read-only Workflow master; modifiedWorkflowId is always a clone of the basis — including its WorkflowTask and TaskQuestion junction records — created only when specialization is required**
 
 Attributes: **Relations**
 
@@ -561,7 +613,27 @@ Attributes: **State**
 | ------------- | -------- |
 | `sequence`    | number   |
 
-### 10.4 JobPlanAssignment
+### 10.5 JobPlan
+
+Type: **Instantiable**
+
+Purpose: **Job-specific execution plan**
+
+Attributes: **Relations**
+
+| **Attribute** | **Relation**    | **Abstraction** |
+| ------------- | --------------- | --------------- |
+| `jobId`       | AssociationOne  | Job             |
+| `notes`       | CompositionMany | Note            |
+
+Attributes: **State**
+
+| **Attribute**    | **Type** |
+| ---------------- | -------- |
+| `scheduledStart` | When     |
+| `scheduledEnd?`  | When     |
+
+### 10.6 JobPlanAssignment
 
 Type: **Instantiable**
 
@@ -581,7 +653,7 @@ Attributes: **State**
 | ------------- | -------- |
 | `role`        | UserRole |
 
-### 10.5 JobPlanChemical
+### 10.7 JobPlanChemical
 
 Type: **Instantiable**
 
@@ -603,7 +675,7 @@ Attributes: **State**
 | `targetArea?`     | number                               |
 | `targetAreaUnit?` | acre \| hectare                      |
 
-### 10.6 JobPlanAsset
+### 10.8 JobPlanAsset
 
 Type: **Junction**
 
@@ -616,27 +688,7 @@ Attributes: **Relations**
 | `planId`      | AssociationJunction | JobPlan         |
 | `assetId`     | AssociationJunction | Asset           |
 
-### 10.7 JobPlan
-
-Type: **Instantiable**
-
-Purpose: **Job-specific execution plan**
-
-Attributes: **Relations**
-
-| **Attribute** | **Relation**    | **Abstraction** |
-| ------------- | --------------- | --------------- |
-| `jobId`       | AssociationOne  | Job             |
-| `notes`       | CompositionMany | Note            |
-
-Attributes: **State**
-
-| **Attribute**    | **Type** |
-| ---------------- | -------- |
-| `scheduledStart` | When     |
-| `scheduledEnd?`  | When     |
-
-### 10.8 JobWork
+### 10.9 JobWork
 
 Type: **Instantiable**
 
@@ -657,11 +709,11 @@ Attributes: **State**
 | `startedAt`    | When                    |
 | `completedAt?` | When                    |
 
-### 10.9 JobWorkLogEntry
+### 10.10 JobWorkLogEntry
 
 Type: **object**
 
-Purpose: **Append-only execution event; answer is always present and captures both crew checklist responses (text, number, boolean, single-select, multi-select) and system-generated telemetry via internal question type**
+Purpose: **Append-only execution event; answer.questionId references an independently lifecycled Question row**
 
 Attributes: **Relations**
 
@@ -677,21 +729,3 @@ Attributes: **State**
 | ------------- | -------- |
 | `id`          | Id       |
 | `createdAt`   | When     |
-
-### 10.10 Job
-
-Type: **Instantiable**
-
-Purpose: **Work agreement lifecycle anchor**
-
-Attributes: **Relations**
-
-| **Attribute** | **Relation**   | **Abstraction** |
-| ------------- | -------------- | --------------- |
-| `customerId`  | AssociationOne | Customer        |
-
-Attributes: **State**
-
-| **Attribute** | **Type**  |
-| ------------- | --------- |
-| `status`      | JobStatus |
