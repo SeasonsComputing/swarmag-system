@@ -18,7 +18,7 @@ const RULES = [
   },
   {
     pattern: /\bRecord\s*<\s*string\s*,\s*string\s*>/g,
-    message: 'Use Dictionary<string> (or StringDictionary) from @core-std'
+    message: 'Use StringDictionary from @core-std'
   },
   {
     pattern: /\bSet\s*<\s*string\s*>/g,
