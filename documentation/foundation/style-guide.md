@@ -336,7 +336,7 @@ Rules:
 - Import std primitives from `@core-std` only.
 - Never declare `Record<string, unknown>`, `Record<string, string>`, or `Set<string>` outside `source/core/std/`.
 - When narrowing unknown objects in guards, use `Dictionary` casts (`const x = v as Dictionary`) instead of `Record<string, unknown>`.
-- Use `Dictionary<string>` (or `StringDictionary` where useful) for key/value string maps.
+- Use `StringDictionary` for key/value string/string maps.
 
 ## 8. Domain Layer (`source/domain/`)
 

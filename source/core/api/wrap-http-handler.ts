@@ -220,17 +220,17 @@ FETCH REQUEST-RESPONSE FLOW:
     → Always returns { error: string, details?: string }
 `*/
 
-import { type Dictionary, StringSet } from '@core-std'
+import { type StringDictionary, StringSet } from '@core-std'
 
 // ───────────────────────────────────────────────────────────────────────────────
 // PUBLIC EXPORTS
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** HTTP header map for responses/requests. */
-export type HttpHeaders = Dictionary<string>
+export type HttpHeaders = StringDictionary
 
 /** HTTP query map for responses/requests. */
-export type HttpQuery = Dictionary<string>
+export type HttpQuery = StringDictionary
 
 /** HTTP method for handlers. */
 export type HttpMethod =
