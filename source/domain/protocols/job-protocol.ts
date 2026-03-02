@@ -1,11 +1,11 @@
 /**
- * Protocol input shapes for Job boundary operations.
+ * Protocols for the job domain area: create and update shapes for all job types.
+ * JobPlanAsset is a junction type — no protocol entry.
+ * JobWork is an immutable manifest — no JobWorkUpdate.
+ * JobWorkLogEntry is append-only — no update shape.
  */
 
-import type {
-  CreateFromInstantiable,
-  UpdateFromInstantiable
-} from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
 import type {
   Job,
   JobAssessment,
@@ -53,8 +53,8 @@ export type JobPlanChemicalCreate = CreateFromInstantiable<JobPlanChemical>
 /** Input for updating a JobPlanChemical. */
 export type JobPlanChemicalUpdate = UpdateFromInstantiable<JobPlanChemical>
 
-/** Input for creating a JobWork record. */
+/** Input for creating a JobWork; no update — execution manifest is immutable. */
 export type JobWorkCreate = CreateFromInstantiable<JobWork>
 
-/** Input for creating a JobWorkLogEntry. */
+/** Input for creating a JobWorkLogEntry; append-only, no update. */
 export type JobWorkLogEntryCreate = Pick<JobWorkLogEntry, 'jobId' | 'userId' | 'answer'>

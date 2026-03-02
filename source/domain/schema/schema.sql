@@ -2,7 +2,7 @@
 -- swarmAg System — Canonical Schema
 -- source/domain/schema/schema.sql
 --
--- Authoritative current-state DDL. Generated from domain.md.
+-- Authoritative current-state DDL. Generated from domain model.
 -- Do not edit manually — regenerate from domain model.
 -- Includes canonical seed data known at schema time.
 -- Migrations in source/back/migrations/ express deltas from this state.
@@ -17,7 +17,11 @@ DROP TABLE IF EXISTS job_plans;
 DROP TABLE IF EXISTS job_workflows;
 DROP TABLE IF EXISTS job_assessments;
 DROP TABLE IF EXISTS jobs;
+DROP TABLE IF EXISTS workflow_tasks;
+DROP TABLE IF EXISTS task_questions;
 DROP TABLE IF EXISTS workflows;
+DROP TABLE IF EXISTS tasks;
+DROP TABLE IF EXISTS questions;
 DROP TABLE IF EXISTS service_required_asset_types;
 DROP TABLE IF EXISTS services;
 DROP TABLE IF EXISTS customers;
@@ -33,11 +37,11 @@ DROP TABLE IF EXISTS users;
 CREATE TABLE users (
   id            UUID        PRIMARY KEY,
   display_name  TEXT        NOT NULL,
-  primary_email TEXT        NOT NULL UNIQUE,
+  primary_email TEXT        NOT NULL,
   phone_number  TEXT        NOT NULL,
   avatar_url    TEXT,
   roles         JSONB       NOT NULL DEFAULT '[]'::jsonb,
-  status        TEXT        NOT NULL DEFAULT 'active'
+  status        TEXT        CONSTRAINT users_status_check
                             CHECK (status IN ('active', 'inactive')),
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -48,7 +52,7 @@ ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY users_select_active ON users
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY users_select_self ON users
   FOR SELECT
@@ -66,6 +70,10 @@ CREATE POLICY users_update_admin ON users
   FOR UPDATE
   USING (auth.jwt() ->> 'role' = 'administrator');
 
+CREATE POLICY users_delete_admin ON users
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
 CREATE INDEX users_deleted_at_idx ON users (deleted_at);
 
 -- =============================================================================
@@ -75,7 +83,7 @@ CREATE INDEX users_deleted_at_idx ON users (deleted_at);
 CREATE TABLE asset_types (
   id         UUID        PRIMARY KEY,
   label      TEXT        NOT NULL,
-  active     BOOLEAN     NOT NULL DEFAULT true,
+  active     BOOLEAN     NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ
@@ -85,7 +93,7 @@ ALTER TABLE asset_types ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY asset_types_select_active ON asset_types
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY asset_types_insert_admin ON asset_types
   FOR INSERT
@@ -93,6 +101,10 @@ CREATE POLICY asset_types_insert_admin ON asset_types
 
 CREATE POLICY asset_types_update_admin ON asset_types
   FOR UPDATE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY asset_types_delete_admin ON asset_types
+  FOR DELETE
   USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX asset_types_deleted_at_idx ON asset_types (deleted_at);
@@ -116,7 +128,7 @@ ALTER TABLE assets ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY assets_select_active ON assets
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY assets_insert_admin ON assets
   FOR INSERT
@@ -124,6 +136,10 @@ CREATE POLICY assets_insert_admin ON assets
 
 CREATE POLICY assets_update_admin ON assets
   FOR UPDATE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY assets_delete_admin ON assets
+  FOR DELETE
   USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX assets_type_id_idx ON assets (type_id);
@@ -142,8 +158,8 @@ CREATE TABLE chemicals (
                                       CHECK (usage IN ('herbicide', 'pesticide', 'fertilizer', 'fungicide', 'adjuvant')),
   signal_word             TEXT        CONSTRAINT chemicals_signal_word_check
                                       CHECK (signal_word IN ('danger', 'warning', 'caution')),
-  restricted_use          BOOLEAN     NOT NULL DEFAULT false,
-  re_entry_interval_hours NUMERIC,
+  restricted_use          BOOLEAN     NOT NULL,
+  re_entry_interval_hours INTEGER,
   storage_location        TEXT,
   sds_url                 TEXT,
   labels                  JSONB       NOT NULL DEFAULT '[]'::jsonb,
@@ -157,7 +173,7 @@ ALTER TABLE chemicals ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY chemicals_select_active ON chemicals
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY chemicals_insert_admin ON chemicals
   FOR INSERT
@@ -165,6 +181,10 @@ CREATE POLICY chemicals_insert_admin ON chemicals
 
 CREATE POLICY chemicals_update_admin ON chemicals
   FOR UPDATE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY chemicals_delete_admin ON chemicals
+  FOR DELETE
   USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX chemicals_deleted_at_idx ON chemicals (deleted_at);
@@ -198,7 +218,7 @@ ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY customers_select_active ON customers
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY customers_select_managed ON customers
   FOR SELECT
@@ -208,9 +228,13 @@ CREATE POLICY customers_insert_sales ON customers
   FOR INSERT
   WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales'));
 
-CREATE POLICY customers_update_managed ON customers
+CREATE POLICY customers_update_sales ON customers
   FOR UPDATE
-  USING (account_manager_id = auth.uid() OR auth.jwt() ->> 'role' = 'administrator');
+  USING (auth.jwt() ->> 'role' IN ('administrator', 'sales'));
+
+CREATE POLICY customers_delete_admin ON customers
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX customers_account_manager_id_idx ON customers (account_manager_id);
 CREATE INDEX customers_deleted_at_idx ON customers (deleted_at);
@@ -222,7 +246,7 @@ CREATE INDEX customers_deleted_at_idx ON customers (deleted_at);
 CREATE TABLE services (
   id                       UUID        PRIMARY KEY,
   name                     TEXT        NOT NULL,
-  sku                      TEXT        NOT NULL UNIQUE,
+  sku                      TEXT        NOT NULL,
   description              TEXT,
   category                 TEXT        NOT NULL
                                        CONSTRAINT services_category_check
@@ -238,7 +262,7 @@ ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY services_select_active ON services
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY services_insert_admin ON services
   FOR INSERT
@@ -246,6 +270,10 @@ CREATE POLICY services_insert_admin ON services
 
 CREATE POLICY services_update_admin ON services
   FOR UPDATE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY services_delete_admin ON services
+  FOR DELETE
   USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX services_deleted_at_idx ON services (deleted_at);
@@ -260,7 +288,7 @@ ALTER TABLE service_required_asset_types ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY service_required_asset_types_select ON service_required_asset_types
   FOR SELECT
-  USING (true);
+  USING (auth.uid() IS NOT NULL);
 
 CREATE POLICY service_required_asset_types_insert_admin ON service_required_asset_types
   FOR INSERT
@@ -273,16 +301,80 @@ CREATE POLICY service_required_asset_types_delete_admin ON service_required_asse
 CREATE INDEX service_required_asset_types_asset_type_id_idx ON service_required_asset_types (asset_type_id);
 
 -- =============================================================================
--- Workflows
+-- Workflows, Tasks & Questions
 -- =============================================================================
+
+CREATE TABLE questions (
+  id         UUID        PRIMARY KEY,
+  prompt     TEXT        NOT NULL,
+  type       TEXT        NOT NULL
+                         CONSTRAINT questions_type_check
+                         CHECK (type IN ('text', 'number', 'boolean', 'single-select', 'multi-select', 'internal')),
+  help_text  TEXT,
+  required   BOOLEAN,
+  options    JSONB       NOT NULL DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at TIMESTAMPTZ
+);
+
+ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY questions_select_active ON questions
+  FOR SELECT
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
+
+CREATE POLICY questions_insert_admin ON questions
+  FOR INSERT
+  WITH CHECK (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY questions_update_admin ON questions
+  FOR UPDATE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY questions_delete_admin ON questions
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE INDEX questions_deleted_at_idx ON questions (deleted_at);
+
+CREATE TABLE tasks (
+  id          UUID        PRIMARY KEY,
+  title       TEXT        NOT NULL,
+  description TEXT,
+  notes       JSONB       NOT NULL DEFAULT '[]'::jsonb,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at  TIMESTAMPTZ
+);
+
+ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY tasks_select_active ON tasks
+  FOR SELECT
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
+
+CREATE POLICY tasks_insert_admin ON tasks
+  FOR INSERT
+  WITH CHECK (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY tasks_update_admin ON tasks
+  FOR UPDATE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY tasks_delete_admin ON tasks
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE INDEX tasks_deleted_at_idx ON tasks (deleted_at);
 
 CREATE TABLE workflows (
   id          UUID        PRIMARY KEY,
   name        TEXT        NOT NULL,
   description TEXT,
-  version     INTEGER     NOT NULL DEFAULT 1,
+  version     INTEGER     NOT NULL,
   tags        JSONB       NOT NULL DEFAULT '[]'::jsonb,
-  tasks       JSONB       NOT NULL DEFAULT '[]'::jsonb,
+  notes       JSONB       NOT NULL DEFAULT '[]'::jsonb,
   created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at  TIMESTAMPTZ
@@ -292,7 +384,7 @@ ALTER TABLE workflows ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY workflows_select_active ON workflows
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY workflows_insert_admin ON workflows
   FOR INSERT
@@ -302,7 +394,57 @@ CREATE POLICY workflows_update_admin ON workflows
   FOR UPDATE
   USING (auth.jwt() ->> 'role' = 'administrator');
 
+CREATE POLICY workflows_delete_admin ON workflows
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
 CREATE INDEX workflows_deleted_at_idx ON workflows (deleted_at);
+
+CREATE TABLE workflow_tasks (
+  workflow_id UUID    NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+  task_id     UUID    NOT NULL REFERENCES tasks(id) ON DELETE RESTRICT,
+  sequence    INTEGER NOT NULL,
+  PRIMARY KEY (workflow_id, task_id)
+);
+
+ALTER TABLE workflow_tasks ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY workflow_tasks_select ON workflow_tasks
+  FOR SELECT
+  USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY workflow_tasks_insert_admin ON workflow_tasks
+  FOR INSERT
+  WITH CHECK (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY workflow_tasks_delete_admin ON workflow_tasks
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE INDEX workflow_tasks_task_id_idx ON workflow_tasks (task_id);
+
+CREATE TABLE task_questions (
+  task_id     UUID    NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  question_id UUID    NOT NULL REFERENCES questions(id) ON DELETE RESTRICT,
+  sequence    INTEGER NOT NULL,
+  PRIMARY KEY (task_id, question_id)
+);
+
+ALTER TABLE task_questions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY task_questions_select ON task_questions
+  FOR SELECT
+  USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY task_questions_insert_admin ON task_questions
+  FOR INSERT
+  WITH CHECK (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE POLICY task_questions_delete_admin ON task_questions
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
+CREATE INDEX task_questions_question_id_idx ON task_questions (question_id);
 
 -- =============================================================================
 -- Jobs
@@ -311,7 +453,7 @@ CREATE INDEX workflows_deleted_at_idx ON workflows (deleted_at);
 CREATE TABLE jobs (
   id          UUID        PRIMARY KEY,
   customer_id UUID        NOT NULL REFERENCES customers(id) ON DELETE RESTRICT,
-  status      TEXT        NOT NULL DEFAULT 'open'
+  status      TEXT        NOT NULL
                           CONSTRAINT jobs_status_check
                           CHECK (status IN (
                             'open', 'assessing', 'planning', 'preparing',
@@ -326,7 +468,7 @@ ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY jobs_select_active ON jobs
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY jobs_insert_sales ON jobs
   FOR INSERT
@@ -336,8 +478,11 @@ CREATE POLICY jobs_update_sales ON jobs
   FOR UPDATE
   USING (auth.jwt() ->> 'role' IN ('administrator', 'sales'));
 
+CREATE POLICY jobs_delete_admin ON jobs
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
+
 CREATE INDEX jobs_customer_id_idx ON jobs (customer_id);
-CREATE INDEX jobs_status_idx ON jobs (status);
 CREATE INDEX jobs_deleted_at_idx ON jobs (deleted_at);
 
 CREATE TABLE job_assessments (
@@ -356,7 +501,7 @@ ALTER TABLE job_assessments ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY job_assessments_select_active ON job_assessments
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY job_assessments_insert_ops ON job_assessments
   FOR INSERT
@@ -365,6 +510,10 @@ CREATE POLICY job_assessments_insert_ops ON job_assessments
 CREATE POLICY job_assessments_update_ops ON job_assessments
   FOR UPDATE
   USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'));
+
+CREATE POLICY job_assessments_delete_admin ON job_assessments
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX job_assessments_job_id_idx ON job_assessments (job_id);
 CREATE INDEX job_assessments_assessor_id_idx ON job_assessments (assessor_id);
@@ -375,7 +524,6 @@ CREATE TABLE job_workflows (
   job_id               UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
   basis_workflow_id    UUID        NOT NULL REFERENCES workflows(id) ON DELETE RESTRICT,
   modified_workflow_id UUID        REFERENCES workflows(id) ON DELETE RESTRICT,
-  sequence             INTEGER     NOT NULL,
   created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at           TIMESTAMPTZ
@@ -385,7 +533,7 @@ ALTER TABLE job_workflows ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY job_workflows_select_active ON job_workflows
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY job_workflows_insert_ops ON job_workflows
   FOR INSERT
@@ -394,6 +542,10 @@ CREATE POLICY job_workflows_insert_ops ON job_workflows
 CREATE POLICY job_workflows_update_ops ON job_workflows
   FOR UPDATE
   USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'));
+
+CREATE POLICY job_workflows_delete_admin ON job_workflows
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX job_workflows_job_id_idx ON job_workflows (job_id);
 CREATE INDEX job_workflows_basis_workflow_id_idx ON job_workflows (basis_workflow_id);
@@ -415,7 +567,7 @@ ALTER TABLE job_plans ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY job_plans_select_active ON job_plans
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY job_plans_insert_ops ON job_plans
   FOR INSERT
@@ -424,6 +576,10 @@ CREATE POLICY job_plans_insert_ops ON job_plans
 CREATE POLICY job_plans_update_ops ON job_plans
   FOR UPDATE
   USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'));
+
+CREATE POLICY job_plans_delete_admin ON job_plans
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX job_plans_job_id_idx ON job_plans (job_id);
 CREATE INDEX job_plans_deleted_at_idx ON job_plans (deleted_at);
@@ -445,7 +601,7 @@ ALTER TABLE job_plan_assignments ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY job_plan_assignments_select_active ON job_plan_assignments
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY job_plan_assignments_insert_ops ON job_plan_assignments
   FOR INSERT
@@ -454,6 +610,10 @@ CREATE POLICY job_plan_assignments_insert_ops ON job_plan_assignments
 CREATE POLICY job_plan_assignments_update_ops ON job_plan_assignments
   FOR UPDATE
   USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'));
+
+CREATE POLICY job_plan_assignments_delete_admin ON job_plan_assignments
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX job_plan_assignments_plan_id_idx ON job_plan_assignments (plan_id);
 CREATE INDEX job_plan_assignments_user_id_idx ON job_plan_assignments (user_id);
@@ -479,7 +639,7 @@ ALTER TABLE job_plan_chemicals ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY job_plan_chemicals_select_active ON job_plan_chemicals
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY job_plan_chemicals_insert_ops ON job_plan_chemicals
   FOR INSERT
@@ -488,6 +648,10 @@ CREATE POLICY job_plan_chemicals_insert_ops ON job_plan_chemicals
 CREATE POLICY job_plan_chemicals_update_ops ON job_plan_chemicals
   FOR UPDATE
   USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'));
+
+CREATE POLICY job_plan_chemicals_delete_admin ON job_plan_chemicals
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX job_plan_chemicals_plan_id_idx ON job_plan_chemicals (plan_id);
 CREATE INDEX job_plan_chemicals_chemical_id_idx ON job_plan_chemicals (chemical_id);
@@ -503,15 +667,15 @@ ALTER TABLE job_plan_assets ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY job_plan_assets_select ON job_plan_assets
   FOR SELECT
-  USING (true);
+  USING (auth.uid() IS NOT NULL);
 
 CREATE POLICY job_plan_assets_insert_ops ON job_plan_assets
   FOR INSERT
-  WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'operations'));
+  WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'));
 
 CREATE POLICY job_plan_assets_delete_ops ON job_plan_assets
   FOR DELETE
-  USING (auth.jwt() ->> 'role' IN ('administrator', 'operations'));
+  USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'));
 
 CREATE INDEX job_plan_assets_asset_id_idx ON job_plan_assets (asset_id);
 
@@ -531,15 +695,19 @@ ALTER TABLE job_work ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY job_work_select_active ON job_work
   FOR SELECT
-  USING (deleted_at IS NULL);
+  USING (deleted_at IS NULL AND auth.uid() IS NOT NULL);
 
 CREATE POLICY job_work_insert_ops ON job_work
   FOR INSERT
-  WITH CHECK (auth.jwt() ->> 'role' = 'operations');
+  WITH CHECK (auth.jwt() ->> 'role' IN ('administrator', 'operations'));
 
 CREATE POLICY job_work_update_ops ON job_work
   FOR UPDATE
   USING (auth.jwt() ->> 'role' IN ('administrator', 'operations'));
+
+CREATE POLICY job_work_delete_admin ON job_work
+  FOR DELETE
+  USING (auth.jwt() ->> 'role' = 'administrator');
 
 CREATE INDEX job_work_job_id_idx ON job_work (job_id);
 CREATE INDEX job_work_started_by_id_idx ON job_work (started_by_id);
@@ -559,13 +727,16 @@ CREATE POLICY job_work_log_entries_select_own ON job_work_log_entries
   FOR SELECT
   USING (user_id = auth.uid());
 
-CREATE POLICY job_work_log_entries_select_ops ON job_work_log_entries
+CREATE POLICY job_work_log_entries_select_roles ON job_work_log_entries
   FOR SELECT
-  USING (auth.jwt() ->> 'role' IN ('administrator', 'operations'));
+  USING (auth.jwt() ->> 'role' IN ('administrator', 'sales', 'operations'));
 
 CREATE POLICY job_work_log_entries_insert_ops ON job_work_log_entries
   FOR INSERT
-  WITH CHECK (auth.jwt() ->> 'role' = 'operations' AND user_id = auth.uid());
+  WITH CHECK (
+    auth.jwt() ->> 'role' IN ('administrator', 'operations')
+    AND (auth.jwt() ->> 'role' = 'administrator' OR user_id = auth.uid())
+  );
 
 CREATE INDEX job_work_log_entries_job_id_idx ON job_work_log_entries (job_id);
 CREATE INDEX job_work_log_entries_user_id_idx ON job_work_log_entries (user_id);
@@ -575,283 +746,118 @@ CREATE INDEX job_work_log_entries_created_at_idx ON job_work_log_entries (create
 -- Seed Data
 -- =============================================================================
 
--- Seed ID assignment: 019ca1aa-4aa0-7aed-b032-17cb3f638578
 INSERT INTO users (id, display_name, primary_email, phone_number, roles, status)
 VALUES (
-  '019ca1aa-4aa0-7aed-b032-17cb3f638578',
+  '00000000-0000-7000-8000-000000000001',
   'DevOps Admin',
   'devops-admin@swarmag.com',
   '',
   '["administrator"]'::jsonb,
   'active'
-)
-ON CONFLICT (id) DO UPDATE
-SET
-  display_name = EXCLUDED.display_name,
-  primary_email = EXCLUDED.primary_email,
-  phone_number = EXCLUDED.phone_number,
-  roles = EXCLUDED.roles,
-  status = EXCLUDED.status;
+);
 
-
--- Seed ID assignment: 019ca1aa-4aa1-7d8d-9765-4c15af94cddf
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa1-7d8d-9765-4c15af94cddf', 'Transport Truck', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243a-7518-8f56-b36ebe1e6a45', 'Transport Truck', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa1-7f54-b187-4d0d87038fd5
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa1-7f54-b187-4d0d87038fd5', 'Transport Trailer', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243b-7896-a19e-029a0739b359', 'Transport Trailer', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa1-7bf4-b876-277bd97a3f4c
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa1-7bf4-b876-277bd97a3f4c', 'Skidsteer Vehicle', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243b-7859-8b5b-6c46714c51d5', 'Skidsteer Vehicle', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa2-75f4-9f29-e32f929a4b29
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa2-75f4-9f29-e32f929a4b29', 'Toolcat Vehicle', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243b-7fbe-99e9-38da0528b22c', 'Toolcat Vehicle', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7ecf-9330-6292e9c4c889
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa2-7ecf-9330-6292e9c4c889', 'Vehicle Tool Attachment', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243b-7d90-b015-d7cf8ba58a2f', 'Vehicle Tool Attachment', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7328-9c0b-9cb55e6710ad
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa2-7328-9c0b-9cb55e6710ad', 'Mapping Drone', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243b-7d19-89d0-11b387b05517', 'Mapping Drone', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7696-9c66-3613bc317eac
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa2-7696-9c66-3613bc317eac', 'Dispensing Drone', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243b-7f8c-89f0-a859d4f88e62', 'Dispensing Drone', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7937-b296-bcfaf46cfd67
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa2-7937-b296-bcfaf46cfd67', 'Drone Spray Tank', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243c-7a67-839d-53dfa0e29698', 'Drone Spray Tank', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7dc8-b442-a166ba4a67fd
 INSERT INTO asset_types (id, label, active)
-VALUES ('019ca1aa-4aa2-7dc8-b442-a166ba4a67fd', 'Drone Granular Hopper', true)
-ON CONFLICT (id) DO UPDATE SET label = EXCLUDED.label, active = EXCLUDED.active;
+VALUES ('019cb02a-243c-7ddf-8b6b-a5952bac66d6', 'Drone Granular Hopper', true);
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7989-8feb-02fcb0b317a4
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa2-7989-8feb-02fcb0b317a4', 'Pesticide, Herbicide', 'A-CHEM-01', 'aerial-drone-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-7926-82ac-60b8dd988f2e', 'Pesticide, Herbicide', 'A-CHEM-01', 'aerial-drone-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7389-98b8-95e2efb6ecff
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa2-7389-98b8-95e2efb6ecff', 'Fertilizer', 'A-CHEM-02', 'aerial-drone-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-750b-8715-89bba9238f0c', 'Fertilizer', 'A-CHEM-02', 'aerial-drone-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa2-74dc-93c3-c1a2eb1b1422
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa2-74dc-93c3-c1a2eb1b1422', 'Seed', 'A-SEED-01', 'aerial-drone-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-7350-8e35-a8baffd9ade3', 'Seed', 'A-SEED-01', 'aerial-drone-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa2-72a3-b9fc-59f8b535533f
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa2-72a3-b9fc-59f8b535533f', 'Pond Weeds & Algae', 'A-CHEM-03', 'aerial-drone-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-7190-bfa4-df5ea9aa7d88', 'Pond Weeds & Algae', 'A-CHEM-03', 'aerial-drone-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7917-882e-50fe35ec82dc
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa2-7917-882e-50fe35ec82dc', 'Pond Feeding', 'A-FEED-01', 'aerial-drone-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-73b4-8bf1-c63f03b6ab7c', 'Pond Feeding', 'A-FEED-01', 'aerial-drone-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7586-aa7b-73e0ea1b7998
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa2-7586-aa7b-73e0ea1b7998', 'Precision Mapping', 'A-MAP-01', 'aerial-drone-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-7165-ba66-ee5a6cae99f0', 'Precision Mapping', 'A-MAP-01', 'aerial-drone-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa2-7edb-9e2e-a014d32ed4b7
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa2-7edb-9e2e-a014d32ed4b7', 'Mesquite Herbicide', 'A-CHEM-04', 'aerial-drone-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-74d6-9c74-d3dded62e688', 'Mesquite Herbicide', 'A-CHEM-04', 'aerial-drone-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa3-70a6-994b-1bfb7a862df7
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa3-70a6-994b-1bfb7a862df7', 'Commercial Greenhouse Painting', 'A-PAINT-01', 'aerial-drone-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-7db5-98f0-5fa4fd41b814', 'Commercial Greenhouse Painting', 'A-PAINT-01', 'aerial-drone-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa3-7238-a345-306d184d5953
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa3-7238-a345-306d184d5953', 'Mesquite, Hackberry, et al Removal', 'G-MITI-01', 'ground-machinery-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-7c3f-9c11-404dc6ff9452', 'Mesquite, Hackberry, et al Removal', 'G-MITI-01', 'ground-machinery-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa3-7125-82aa-3000815e28df
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa3-7125-82aa-3000815e28df', 'Fence-line Tree Trimming', 'G-FENCE-01', 'ground-machinery-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243c-78ba-8a06-284a089cdfc8', 'Fence-line Tree Trimming', 'G-FENCE-01', 'ground-machinery-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa3-7b12-a909-468331c3e036
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa3-7b12-a909-468331c3e036', 'Rock Removal, Regrade', 'G-MACH-01', 'ground-machinery-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243d-7bc0-a812-fd0c8c1bde2d', 'Rock Removal, Regrade', 'G-MACH-01', 'ground-machinery-services');
 
-
--- Seed ID assignment: 019ca1aa-4aa3-79f0-9fb4-cf704f98618c
 INSERT INTO services (id, name, sku, category)
-VALUES ('019ca1aa-4aa3-79f0-9fb4-cf704f98618c', 'Brush Hogging', 'G-BRUSH-01', 'ground-machinery-services')
-ON CONFLICT (id) DO UPDATE
-SET name = EXCLUDED.name, sku = EXCLUDED.sku, category = EXCLUDED.category;
+VALUES ('019cb02a-243d-7e0d-8b64-3d90441cc86b', 'Brush Hogging', 'G-BRUSH-01', 'ground-machinery-services');
 
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7aa6-8155-d3c04fba64c5', 'telemetry.gps.latitude', 'internal', '[]'::jsonb);
 
--- Seed ID assignment: 019ca1aa-4aa3-7f2d-89b3-08f2e71c329f
-INSERT INTO workflows (id, name, description, version, tags, tasks)
-VALUES (
-  '019ca1aa-4aa3-7f2d-89b3-08f2e71c329f',
-  'Internal Telemetry Questions',
-  'System-generated internal questions for telemetry and operational log entries. Read-only.',
-  1,
-  '["internal", "system"]'::jsonb,
-  '[
-    {
-      "id": "00000000-0000-7000-8000-000000000200",
-      "title": "Internal Telemetry",
-      "checklist": [
-        {
-          "id": "00000000-0000-7000-8000-000000000201",
-          "prompt": "telemetry.gps.latitude",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000202",
-          "prompt": "telemetry.gps.longitude",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000203",
-          "prompt": "telemetry.gps.altitude",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000204",
-          "prompt": "telemetry.gps.accuracy",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000205",
-          "prompt": "telemetry.battery.percent",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000206",
-          "prompt": "telemetry.battery.voltage",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000207",
-          "prompt": "telemetry.environment.temperatureCelsius",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000208",
-          "prompt": "telemetry.environment.windSpeedMph",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000209",
-          "prompt": "telemetry.environment.windDirection",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000210",
-          "prompt": "telemetry.environment.humidityPercent",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000211",
-          "prompt": "execution.durationSeconds",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000212",
-          "prompt": "execution.crewCount",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000213",
-          "prompt": "response.skipped",
-          "type": "internal",
-          "required": false,
-          "options": []
-        },
-        {
-          "id": "00000000-0000-7000-8000-000000000214",
-          "prompt": "response.skipReason",
-          "type": "internal",
-          "required": false,
-          "options": []
-        }
-      ]
-    }
-  ]'::jsonb
-)
-ON CONFLICT (id) DO UPDATE
-SET
-  name = EXCLUDED.name,
-  description = EXCLUDED.description,
-  version = EXCLUDED.version,
-  tags = EXCLUDED.tags,
-  tasks = EXCLUDED.tasks;
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-714c-bd46-057f55ea4f8d', 'telemetry.gps.longitude', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7aea-837b-ec815e3d2d99', 'telemetry.gps.altitude', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7922-8014-956c403f43ff', 'telemetry.gps.accuracy', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7f8b-9c6d-8880765364b1', 'telemetry.battery.percent', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7f0f-8db2-abf2bd7237f5', 'telemetry.battery.voltage', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7620-a175-11fbac5ddad1', 'telemetry.environment.temperatureCelsius', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7d7e-8f70-89d229f8411a', 'telemetry.environment.windSpeedMph', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-719e-a586-7b9b1e4778a2', 'telemetry.environment.windDirection', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7f99-b22b-dff58e6ec708', 'telemetry.environment.humidityPercent', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7506-a339-82bdf122aeaf', 'execution.durationSeconds', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-79e7-9d23-c4abc7c73c19', 'execution.crewCount', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-78bd-ab34-f5534d4c6c4e', 'response.skipped', 'internal', '[]'::jsonb);
+
+INSERT INTO questions (id, prompt, type, options)
+VALUES ('019cb02a-243d-7f38-9bab-ecdbb30dcf91', 'response.skipReason', 'internal', '[]'::jsonb);
 

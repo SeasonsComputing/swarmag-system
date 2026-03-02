@@ -1,8 +1,3 @@
-/**
- * Domain models for jobs in the swarmAg system.
- * Job is the lifecycle anchor for all work agreed to with a customer.
- */
-
 import type {
   AssociationJunction,
   AssociationOne,
@@ -16,11 +11,10 @@ import type {
 } from '@core-std'
 import type { Asset } from '@domain/abstractions/asset.ts'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
-import type { Location, Note } from '@domain/abstractions/common.ts'
+import type { Answer, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import type { User, UserRole } from '@domain/abstractions/user.ts'
 import type { Workflow } from '@domain/abstractions/workflow.ts'
-import type { Answer } from '@domain/abstractions/workflow.ts'
 
 /** Job lifecycle state. */
 export const JOB_STATUSES = [
@@ -33,13 +27,17 @@ export const JOB_STATUSES = [
   'closed',
   'cancelled'
 ] as const
+
+/** Job lifecycle state value. */
 export type JobStatus = (typeof JOB_STATUSES)[number]
 
-/** Planned chemical quantity units. */
-export const CHEMICAL_UNITS = ['gallon', 'liter', 'pound', 'kilogram'] as const
-export type ChemicalUnit = (typeof CHEMICAL_UNITS)[number]
+/** Work agreement lifecycle anchor. */
+export type Job = Instantiable & {
+  customerId: AssociationOne<Customer>
+  status: JobStatus
+}
 
-/** Pre-planning assessment; requires one or more locations. */
+/** Pre-planning assessment with one or more scoped locations. */
 export type JobAssessment = Instantiable & {
   jobId: AssociationOne<Job>
   assessorId: AssociationOne<User>
@@ -48,36 +46,11 @@ export type JobAssessment = Instantiable & {
   notes: CompositionMany<Note>
 }
 
-/** Job-specific workflow instance; modifiedWorkflowId is always a clone of the basis. */
+/** Job-owned workflow selection referencing basis and optional modified workflow. */
 export type JobWorkflow = Instantiable & {
   jobId: AssociationOne<Job>
-  sequence: number
   basisWorkflowId: AssociationOne<Workflow>
-  modifiedWorkflowId: AssociationOptional<Workflow>
-}
-
-/** Assignment of user to plan role; many side of 1:m with JobPlan. */
-export type JobPlanAssignment = Instantiable & {
-  planId: AssociationOne<JobPlan>
-  userId: AssociationOne<User>
-  role: UserRole
-  notes: CompositionMany<Note>
-}
-
-/** Planned chemical usage; many side of 1:m with JobPlan. */
-export type JobPlanChemical = Instantiable & {
-  planId: AssociationOne<JobPlan>
-  chemicalId: AssociationOne<Chemical>
-  amount: number
-  unit: ChemicalUnit
-  targetArea?: number
-  targetAreaUnit?: 'acre' | 'hectare'
-}
-
-/** m:m junction — plans to assets; hard delete only. */
-export type JobPlanAsset = {
-  planId: AssociationJunction<JobPlan>
-  assetId: AssociationJunction<Asset>
+  modifiedWorkflowId?: AssociationOptional<Workflow>
 }
 
 /** Job-specific execution plan. */
@@ -88,24 +61,54 @@ export type JobPlan = Instantiable & {
   notes: CompositionMany<Note>
 }
 
-/** Execution record; work is the immutable ordered execution manifest. */
+/** Assignment of a user to a plan role. */
+export type JobPlanAssignment = Instantiable & {
+  planId: AssociationOne<JobPlan>
+  userId: AssociationOne<User>
+  role: UserRole
+  notes: CompositionMany<Note>
+}
+
+/** Planned chemical quantity unit set. */
+export const PLANNED_CHEMICAL_UNITS = ['gallon', 'liter', 'pound', 'kilogram'] as const
+
+/** Planned chemical quantity unit value. */
+export type PlannedChemicalUnit = (typeof PLANNED_CHEMICAL_UNITS)[number]
+
+/** Planned target-area unit set. */
+export const TARGET_AREA_UNITS = ['acre', 'hectare'] as const
+
+/** Planned target-area unit value. */
+export type TargetAreaUnit = (typeof TARGET_AREA_UNITS)[number]
+
+/** Planned chemical usage line item. */
+export type JobPlanChemical = Instantiable & {
+  planId: AssociationOne<JobPlan>
+  chemicalId: AssociationOne<Chemical>
+  amount: number
+  unit: PlannedChemicalUnit
+  targetArea?: number
+  targetAreaUnit?: TargetAreaUnit
+}
+
+/** Junction linking plans to assets. */
+export type JobPlanAsset = {
+  planId: AssociationJunction<JobPlan>
+  assetId: AssociationJunction<Asset>
+}
+
+/** Execution record with immutable workflow manifest. */
 export type JobWork = Instantiable & {
   jobId: AssociationOne<Job>
+  startedById: AssociationOne<User>
   work: CompositionPositive<Id>
   startedAt: When
-  startedById: AssociationOne<User>
   completedAt?: When
 }
 
-/** Append-only execution event; answer captures both crew responses and system telemetry. */
+/** Append-only execution event carrying one captured answer. */
 export type JobWorkLogEntry = Pick<Instantiable, 'id' | 'createdAt'> & {
   jobId: AssociationOne<Job>
   userId: AssociationOne<User>
   answer: CompositionOne<Answer>
-}
-
-/** Work agreement lifecycle anchor. */
-export type Job = Instantiable & {
-  customerId: AssociationOne<Customer>
-  status: JobStatus
 }

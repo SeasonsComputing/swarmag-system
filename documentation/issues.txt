@@ -1,0 +1,19 @@
+Validation for `Note` and `Attachment` is in `source/domain` only (none in `source/back` or `source/ux`).
+
+`Note` validation:
+- [`asset-validator.ts:75`](/home/tedvkremer/Projects/Code/swarmag-system/source/domain/validators/asset-validator.ts:75) `isNote` guard (`content`, `createdAt`, `attachments` array), used by asset create/update at lines 44/62.
+- [`chemical-validator.ts:74`](/home/tedvkremer/Projects/Code/swarmag-system/source/domain/validators/chemical-validator.ts:74) same pattern, used at lines 29/53.
+- [`customer-validator.ts:98`](/home/tedvkremer/Projects/Code/swarmag-system/source/domain/validators/customer-validator.ts:98) same pattern, used at lines 43/82 (also in `isContact` and `isCustomerSite`).
+- [`service-validator.ts:66`](/home/tedvkremer/Projects/Code/swarmag-system/source/domain/validators/service-validator.ts:66) same pattern, used at lines 28/53.
+- [`workflow-validator.ts:62`](/home/tedvkremer/Projects/Code/swarmag-system/source/domain/validators/workflow-validator.ts:62) same pattern, used at lines 27/39/52.
+- [`job-validator.ts:297`](/home/tedvkremer/Projects/Code/swarmag-system/source/domain/validators/job-validator.ts:297) same pattern, used across assessment/plan/assignment validations (for `notes` and `risks`).
+
+`Attachment` validation:
+- [`common-adapter.ts:61`](/home/tedvkremer/Projects/Code/swarmag-system/source/domain/adapters/common-adapter.ts:61) `toAttachment` fast-fails required fields: `filename`, `url`, `content_type`, `kind`, `uploaded_at`, `uploaded_by_id`.
+- [`common-adapter.ts:97`](/home/tedvkremer/Projects/Code/swarmag-system/source/domain/adapters/common-adapter.ts:97) `toNote` validates note required fields and maps `attachments` through `toAttachment`, so each attachment is validated there.
+
+There is no standalone `validateNote*` or `validateAttachment*` function; note checks are inline guards, and attachment checks are adapter-level fast-fail validation.
+
+-----------------------------------------
+
+general purpose export first then internals

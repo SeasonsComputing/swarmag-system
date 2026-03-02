@@ -3,7 +3,7 @@
  */
 
 import { id } from '@core-std'
-import type { Question } from '@domain/abstractions/workflow.ts'
+import type { Question } from '@domain/abstractions/common.ts'
 
 export const preflightInspectionQuestion: Question = {
   id: id(),
@@ -14,7 +14,9 @@ export const preflightInspectionQuestion: Question = {
     value: 'fail',
     label: 'Fail',
     requiresNote: true
-  }]
+  }],
+  createdAt: '2024-11-01T00:00:00Z',
+  updatedAt: '2025-01-01T00:00:00Z'
 }
 
 export const chemicalMixRatioQuestion: Question = {
@@ -22,7 +24,8 @@ export const chemicalMixRatioQuestion: Question = {
   prompt: 'Recorded mix ratio (oz/gal)',
   type: 'number',
   helpText: 'Enter the actual ounces per gallon observed during mixing.',
-  options: []
+  createdAt: '2024-11-01T00:00:00Z',
+  updatedAt: '2025-01-01T00:00:00Z'
 }
 
 export const ppeVerificationQuestion: Question = {
@@ -32,7 +35,9 @@ export const ppeVerificationQuestion: Question = {
   options: [{ value: 'lead', label: 'Crew Lead' }, {
     value: 'technician',
     label: 'Field Technician'
-  }, { value: 'observer', label: 'Observer', requiresNote: true }]
+  }, { value: 'observer', label: 'Observer', requiresNote: true }],
+  createdAt: '2024-11-01T00:00:00Z',
+  updatedAt: '2025-01-01T00:00:00Z'
 }
 
 export const sharedQuestionSamples: Question[] = [

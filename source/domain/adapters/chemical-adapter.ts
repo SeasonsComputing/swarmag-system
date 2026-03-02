@@ -1,5 +1,5 @@
 /**
- * Chemical et al adapters to and from Dictionary representation.
+ * Adapters for the chemical domain area: Chemical and ChemicalLabel.
  */
 
 import type { Dictionary, When } from '@core-std'
@@ -7,33 +7,34 @@ import { notValid } from '@core-std'
 import type {
   Chemical,
   ChemicalLabel,
+  ChemicalSignalWord,
   ChemicalUsage
 } from '@domain/abstractions/chemical.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-/** Create a ChemicalLabel from serialized dictionary format */
-export const toChemicalLabel = (dict: Dictionary): ChemicalLabel => ({
-  url: dict.url as string,
-  description: dict.description as string | undefined
-})
+const toChemicalLabel = (dict: Dictionary): ChemicalLabel => {
+  if (!dict.url) return notValid('ChemicalLabel dictionary missing required field: url')
+  return {
+    url: dict.url as string,
+    description: dict.description as string | undefined
+  }
+}
 
-/** Serialize a ChemicalLabel to dictionary format */
-export const fromChemicalLabel = (label: ChemicalLabel): Dictionary => ({
+const fromChemicalLabel = (label: ChemicalLabel): Dictionary => ({
   url: label.url,
   description: label.description
 })
 
-/** Create a Chemical from serialized dictionary format */
+/** Create a Chemical instance from dictionary representation. */
 export const toChemical = (dict: Dictionary): Chemical => {
   if (!dict.id) return notValid('Chemical dictionary missing required field: id')
   if (!dict.name) return notValid('Chemical dictionary missing required field: name')
-  if (!dict.usage) return notValid('Chemical dictionary missing required field: usage')
   return {
     id: dict.id as string,
     name: dict.name as string,
     epaNumber: dict.epa_number as string | undefined,
     usage: dict.usage as ChemicalUsage,
-    signalWord: dict.signal_word as Chemical['signalWord'],
+    signalWord: dict.signal_word as ChemicalSignalWord | undefined,
     restrictedUse: dict.restricted_use as boolean,
     reEntryIntervalHours: dict.re_entry_interval_hours as number | undefined,
     storageLocation: dict.storage_location as string | undefined,
@@ -46,7 +47,7 @@ export const toChemical = (dict: Dictionary): Chemical => {
   }
 }
 
-/** Serialize a Chemical to dictionary format */
+/** Create a dictionary representation of a Chemical instance. */
 export const fromChemical = (chemical: Chemical): Dictionary => ({
   id: chemical.id,
   name: chemical.name,

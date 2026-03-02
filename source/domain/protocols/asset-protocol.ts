@@ -1,11 +1,8 @@
 /**
- * Protocol input shapes for Asset boundary operations.
+ * Protocols for the asset domain area: AssetType and Asset create and update shapes.
  */
 
-import type {
-  CreateFromInstantiable,
-  UpdateFromInstantiable
-} from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 
 /** Input for creating an AssetType. */
