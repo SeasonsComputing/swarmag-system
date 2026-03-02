@@ -100,7 +100,95 @@ Attributes: **State**
 | `visibility?` | internal \| shared      |
 | `tags`        | CompositionMany<string> |
 
-### 3.4 Answer
+### 3.4 QuestionType
+
+Type: **const-enum**
+
+Purpose: **Supported question input modes; internal is reserved for system-generated log entries such as telemetry, GPS, and operational metadata**
+
+| Values          |
+| --------------- |
+| `text`          |
+| `number`        |
+| `boolean`       |
+| `single-select` |
+| `multi-select`  |
+| `internal`      |
+
+### 3.5 QuestionOption
+
+Type: **object**
+
+Purpose: **Selectable option metadata; only valid on SelectQuestion**
+
+Attributes: **State**
+
+| **Attribute**   | **Type** |
+| --------------- | -------- |
+| `value`         | string   |
+| `label?`        | string   |
+| `requiresNote?` | boolean  |
+
+### 3.6 ScalarQuestion
+
+Type: **union-type**
+
+Purpose: **Scalar input question; independently lifecycled; type field discriminates from SelectQuestion**
+
+Attributes: **State**
+
+| **Attribute** | **Type**                              |
+| ------------- | ------------------------------------- |
+| `type`        | text \| number \| boolean \| internal |
+| `prompt`      | string                                |
+| `helpText?`   | string                                |
+| `required?`   | boolean                               |
+
+### 3.7 SelectQuestion
+
+Type: **union-type**
+
+Purpose: **Select input question; independently lifecycled; carries non-empty options list; type field discriminates from ScalarQuestion**
+
+Attributes: **Relations**
+
+| **Attribute** | **Relation**        | **Abstraction** |
+| ------------- | ------------------- | --------------- |
+| `options`     | CompositionPositive | QuestionOption  |
+
+Attributes: **State**
+
+| **Attribute** | **Type**                      |
+| ------------- | ----------------------------- |
+| `type`        | single-select \| multi-select |
+| `prompt`      | string                        |
+| `helpText?`   | string                        |
+| `required?`   | boolean                       |
+
+### 3.8 Question
+
+Type: **union-type**
+
+Constituents: `ScalarQuestion | SelectQuestion`
+
+Discriminator: `type`
+
+Purpose: **General purpose reusable prompt; independently lifecycled and shared across tasks; internal questions are seed records referenced directly by log entries**
+
+### 3.9 AnswerValue
+
+Type: **union-type**
+
+Purpose: **Permitted answer value payloads**
+
+| **Type**   |
+| ---------- |
+| `string`   |
+| `number`   |
+| `boolean`  |
+| `string[]` |
+
+### 3.10 Answer
 
 Type: **object**
 

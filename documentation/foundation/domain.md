@@ -99,7 +99,7 @@ A Job has an Assessment, a Plan, and a collection of Log entries. Log entries ar
 
 Work is the physical execution of a Job. It produces the progress and knowledge captured by field crews during a job. Work is directed by a sequence of Workflows. Each Workflow and its associated Tasks and Questions are a template used to assess and plan the job.
 
-To facilitate the role a Workflow plays in orchestrating a Job, two abstractions are introduced: Job Workflow and Job Work. A Job has a collection of Job Workflows. Job Assessment, Job Plan, and Job Work each contain an association to their Job and therefore to the Job Workflows. Just as Tasks and Questions are sequenced via their junction tables, so too Job Workflows are sequenced.
+To facilitate the role a Workflow plays in orchestrating a Job, two abstractions are introduced: Job Workflow and Job Work. A Job has a collection of Job Workflows. Job Assessment, Job Plan, and Job Work each contain an association to their Job and therefore to the Job Workflows. Just as Tasks and Questions are sequenced via their junction tables, so too is the order of Job Workflows defined by `JobWork.work` — the immutable execution manifest.
 
 Job Workflows are prepared prior to Job Work. The Job Assessment phase includes selecting the Workflows to be used on a Job. As each job is different, the Job Assessment may edit the workflows to capture the specialization. Creating, editing, and deleting Workflows are an administration authorization and so are read-only for Job Assessment and Job Plan. A Job Workflow is therefore associated with a basis Workflow (read-only reference) and an optional modified Workflow — which is always a clone of the basis Workflow, including its WorkflowTask and TaskQuestion junction records. The Job Plan phase may add additional basis Workflows and optionally modify them. The Job Plan may also further modify Job Workflows that were already modified during assessment; in that case the assessment-modified Workflow becomes the basis for the Job Plan's modification.
 
@@ -188,12 +188,13 @@ These abstractions describe **domain meaning**, not persistence, API shape, or u
 
 The following abstractions are shared across multiple domain concepts and represent pure value objects or embedded subordinate compositions. They do not have independent lifecycles.
 
-| Abstraction  | Module      | Description                                              |
-| ------------ | ----------- | -------------------------------------------------------- |
-| `Location`   | `common.ts` | Geographic coordinates with optional address information |
-| `Note`       | `common.ts` | Freeform text with author and timestamp                  |
-| `Attachment` | `common.ts` | Metadata describing an uploaded file or artifact         |
-| `Answer`     | `common.ts` | Response to a question, with supporting notes            |
+| Abstraction  | Module      | Description                                                                                         |
+| ------------ | ----------- | --------------------------------------------------------------------------------------------------- |
+| `Location`   | `common.ts` | Geographic coordinates with optional address information                                            |
+| `Note`       | `common.ts` | Freeform text with author and timestamp                                                             |
+| `Attachment` | `common.ts` | Metadata describing an uploaded file or artifact                                                    |
+| `Question`   | `common.ts` | Reusable prompt; independently lifecycled; discriminated union of ScalarQuestion and SelectQuestion |
+| `Answer`     | `common.ts` | Response to a question, with supporting notes                                                       |
 
 These abstractions are **composed into** higher-level domain objects and are not referenced independently.
 
@@ -206,7 +207,7 @@ In addition to the core abstractions, the domain includes supporting structures 
 | Services      | Asset requirements expressed as m:m associations between services and asset types |
 | Workflows     | Versioned workflows with sequenced task associations via WorkflowTask junction    |
 | Tasks         | Reusable tasks with sequenced question associations via TaskQuestion junction     |
-| Job Workflows | Basis and modified workflow references per job, with sequence                     |
+| Job Workflows | Basis and modified workflow references per job; order defined by `JobWork.work`   |
 | Planning      | Associations between plans and assigned users, assets, and chemicals              |
 | Customers     | Embedded subordinate data such as sites and contacts                              |
 
