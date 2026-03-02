@@ -23,11 +23,9 @@ The domain layer follows an abstraction-per-file pattern across five subdirector
 
 **Placement rules:**
 
-- `Location`, `Note`, `Attachment`, `Answer`, `AnswerValue` → `common.ts` / `common-adapter.ts`
-- `QuestionType`, `QUESTION_TYPES`, `QuestionOption`, `Question`, `Task`, `TaskQuestion`, `WorkflowTask`, `Workflow` → `workflow.ts`
-- `JobStatus`, `JOB_STATUSES`, `Job`, `JobAssessment`, `JobWorkflow`, `JobPlan`, `JobPlanAssignment`, `JobPlanChemical`, `JobPlanAsset`, `JobWork`, `JobWorkLogEntry` → `job.ts`
-- Generic protocol shapes (`ListOptions`, `ListResult`, `DeleteResult`) → `@core/api/api-contract.ts`
-- Shared primitive validators → `@core-std`; domain-specific guards → their abstraction's validator file
+- `Location`, `Attachment`, `Note`, `QuestionType`, `QUESTION_TYPES`, `QuestionOption`,
+  `ScalarQuestion`, `SelectQuestion`, `Question`, `AnswerValue`, `Answer` → `common.ts` / `common-adapter.ts`
+- `Task`, `TaskQuestion`, `Workflow`, `WorkflowTask` → `workflow.ts`
 
 ### 2.1 File format
 
@@ -49,7 +47,99 @@ Protocol, adapter, and validator files are organized by topic-area namespace, no
 - No variadic tuple types anywhere.
 - Abstraction definitions are the single source of truth for protocol field sets — `CreateFromInstantiable<T>` and `UpdateFromInstantiable<T>` from `@core-std` derive protocol shapes directly from the abstraction type. No manual synchronization required.
 
-### 3.2 Const-enum pattern (non-negotiable)
+### 3.2 Union-Type Pattern
+
+When a domain concept has structurally distinct variants that share a discriminator field,
+express it as named constituent types combined into a discriminated union.
+
+**Rule:** Do not embed optional fields that only apply to some variants. Each constituent
+type carries only the fields that are meaningful for that variant. This is the same
+first principle as not putting `radius` on a `Rectangle`.
+
+**Pattern:**
+
+```typescript
+/** Constituent A — scalar input; no options. */
+export type ScalarQuestion = Instantiable & {
+  type: 'text' | 'number' | 'boolean' | 'internal'
+  prompt: string
+  helpText?: string
+  required?: boolean
+}
+
+/** Constituent B — select input; options required and non-empty. */
+export type SelectQuestion = Instantiable & {
+  type: 'single-select' | 'multi-select'
+  prompt: string
+  helpText?: string
+  required?: boolean
+  options: CompositionPositive<QuestionOption>
+}
+
+/** Discriminated union — the boundary type used throughout the system. */
+export type Question = ScalarQuestion | SelectQuestion
+```
+
+**Rules:**
+
+- Constituent types are named and exported — they carry independent domain meaning
+- The union type is the boundary type — what adapters, validators, and callers use
+- The discriminator field (`type`) must be present in every constituent
+- `CompositionPositive` (not `CompositionMany`) on fields that must be non-empty
+  when present — a select question with zero options is nonsensical
+- No anonymous union arms — named constituents only
+
+**Adapter pattern for union types:**
+
+```typescript
+export const toQuestion = (dict: Dictionary): Question => {
+  const type = dict.type as QuestionType
+  if (type === 'single-select' || type === 'multi-select') {
+    return {
+      id: dict.id as string,
+      type,
+      prompt: dict.prompt as string,
+      helpText: dict.help_text as string | undefined,
+      required: dict.required as boolean | undefined,
+      options: (dict.options as Dictionary[]).map(toQuestionOption),
+      createdAt: dict.created_at as When,
+      updatedAt: dict.updated_at as When,
+      deletedAt: dict.deleted_at as When | undefined
+    } satisfies SelectQuestion
+  }
+  return {
+    id: dict.id as string,
+    type,
+    prompt: dict.prompt as string,
+    helpText: dict.help_text as string | undefined,
+    required: dict.required as boolean | undefined,
+    createdAt: dict.created_at as When,
+    updatedAt: dict.updated_at as When,
+    deletedAt: dict.deleted_at as When | undefined
+  } satisfies ScalarQuestion
+}
+```
+
+**Validator pattern for union types:**
+
+```typescript
+export const validateQuestionCreate = (input: QuestionCreate): string | null => {
+  if (!isNonEmptyString(input.prompt)) return 'prompt must be a non-empty string'
+  if (!QUESTION_TYPES.includes(input.type as QuestionType)) {
+    return 'type must be a valid QuestionType'
+  }
+  if (input.type === 'single-select' || input.type === 'multi-select') {
+    if (!isCompositionPositive(input.options, isQuestionOption)) {
+      return 'options must be a non-empty array of valid QuestionOption values'
+    }
+  }
+  return null
+}
+```
+
+**Canonical example:** `Question` = `ScalarQuestion | SelectQuestion` in `common.ts`.
+
+### 3.3 Const-enum pattern (non-negotiable)
 
 Any domain value set that requires runtime validation must be expressed as a `const` tuple paired with a derived type alias. Never use a bare union literal for values that appear in runtime membership checks.
 
@@ -67,7 +157,7 @@ Rules:
 - Validators use `TUPLE.includes(v as Type)` for membership checks.
 - A plain union literal is only acceptable when the values are never used in runtime checks.
 
-### 3.3 Relation type reference
+### 3.4 Relation type reference
 
 | Use case                        | Type                     |
 | ------------------------------- | ------------------------ |
@@ -203,10 +293,7 @@ export type WorkflowCreate = CreateFromInstantiable<Workflow>
  * Workflow protocol validator
  */
 
-import { isCompositionPositive, isId, isNonEmptyString, isPositiveNumber } from '@core-std'
-import type { Dictionary } from '@core-std'
-import type { Question, Task } from '@domain/abstractions/workflow.ts'
-import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
+import { isNonEmptyString, isPositiveNumber } from '@core-std'
 import type { WorkflowCreate } from '@domain/protocols/workflow-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -217,30 +304,7 @@ import type { WorkflowCreate } from '@domain/protocols/workflow-protocol.ts'
 export const validateWorkflowCreate = (input: WorkflowCreate): string | null => {
   if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
   if (!isPositiveNumber(input.version)) return 'version must be a positive number'
-  if (!isCompositionPositive(input.tasks, isTask)) {
-    return 'tasks must be a non-empty array of valid tasks'
-  }
   return null
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// VALIDATOR DECOMPOSITION
-// ────────────────────────────────────────────────────────────────────────────
-
-const isQuestion = (v: unknown): v is Question => {
-  if (!v || typeof v !== 'object') return false
-  const q = v as Dictionary
-  return isId(q.id as unknown)
-    && isNonEmptyString(q.prompt as unknown)
-    && QUESTION_TYPES.includes(q.type as Question['type'])
-}
-
-const isTask = (v: unknown): v is Task => {
-  if (!v || typeof v !== 'object') return false
-  const t = v as Dictionary
-  return isId(t.id as unknown)
-    && isNonEmptyString(t.title as unknown)
-    && isCompositionPositive(t.checklist, isQuestion)
 }
 ```
 
@@ -250,7 +314,7 @@ Validators import the const-enum tuple from the abstraction file and use `.inclu
 
 ```typescript
 // CORRECT — import the tuple, never redeclare
-import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
+import { QUESTION_TYPES } from '@domain/abstractions/common.ts'
 QUESTION_TYPES.includes(q.type as Question['type'])
 
 // WRONG — local redeclaration is a violation
