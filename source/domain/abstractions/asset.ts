@@ -1,9 +1,3 @@
-/**
- * Domain models for assets in the swarmAg system.
- * Assets represent equipment and resources used in operations,
- * such as vehicles, sprayers, and drones.
- */
-
 import type { AssociationOne, CompositionMany, Instantiable } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 
@@ -15,6 +9,8 @@ export type AssetType = Instantiable & {
 
 /** Lifecycle and availability state. */
 export const ASSET_STATUSES = ['active', 'maintenance', 'retired', 'reserved'] as const
+
+/** Lifecycle and availability state value. */
 export type AssetStatus = (typeof ASSET_STATUSES)[number]
 
 /** Operational equipment or resource. */

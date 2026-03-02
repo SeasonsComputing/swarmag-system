@@ -1,10 +1,16 @@
 /**
- * Customer et al adapters to and from Dictionary representation.
+ * Adapters for the customer domain area: Contact, CustomerSite, and Customer.
  */
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
-import type { Contact, Customer, CustomerSite } from '@domain/abstractions/customer.ts'
+import type {
+  Contact,
+  ContactChannel,
+  Customer,
+  CustomerSite,
+  CustomerStatus
+} from '@domain/abstractions/customer.ts'
 import {
   fromLocation,
   fromNote,
@@ -12,18 +18,19 @@ import {
   toNote
 } from '@domain/adapters/common-adapter.ts'
 
-/** Create a Contact from serialized dictionary format */
-export const toContact = (dict: Dictionary): Contact => ({
-  name: dict.name as string,
-  email: dict.email as string | undefined,
-  phone: dict.phone as string | undefined,
-  isPrimary: dict.is_primary as boolean,
-  preferredChannel: dict.preferred_channel as Contact['preferredChannel'],
-  notes: (dict.notes as Dictionary[]).map(toNote)
-})
+const toContact = (dict: Dictionary): Contact => {
+  if (!dict.name) return notValid('Contact dictionary missing required field: name')
+  return {
+    name: dict.name as string,
+    email: dict.email as string | undefined,
+    phone: dict.phone as string | undefined,
+    isPrimary: dict.is_primary as boolean,
+    preferredChannel: dict.preferred_channel as ContactChannel | undefined,
+    notes: (dict.notes as Dictionary[]).map(toNote)
+  }
+}
 
-/** Serialize a Contact to dictionary format */
-export const fromContact = (contact: Contact): Dictionary => ({
+const fromContact = (contact: Contact): Dictionary => ({
   name: contact.name,
   email: contact.email,
   phone: contact.phone,
@@ -32,42 +39,38 @@ export const fromContact = (contact: Contact): Dictionary => ({
   notes: contact.notes.map(fromNote)
 })
 
-/** Create a CustomerSite from serialized dictionary format */
-export const toCustomerSite = (dict: Dictionary): CustomerSite => ({
-  customerId: dict.customer_id as string,
-  label: dict.label as string,
-  location: (dict.location as Dictionary[]).map(toLocation),
-  acreage: dict.acreage as number | undefined,
-  notes: (dict.notes as Dictionary[]).map(toNote)
-})
+const toCustomerSite = (dict: Dictionary): CustomerSite => {
+  if (!dict.customer_id) {
+    return notValid('CustomerSite dictionary missing required field: customer_id')
+  }
+  if (!dict.label) {
+    return notValid('CustomerSite dictionary missing required field: label')
+  }
+  return {
+    customerId: dict.customer_id as string,
+    location: (dict.location as Dictionary[]).map(toLocation),
+    label: dict.label as string,
+    acreage: dict.acreage as number | undefined,
+    notes: (dict.notes as Dictionary[]).map(toNote)
+  }
+}
 
-/** Serialize a CustomerSite to dictionary format */
-export const fromCustomerSite = (site: CustomerSite): Dictionary => ({
+const fromCustomerSite = (site: CustomerSite): Dictionary => ({
   customer_id: site.customerId,
-  label: site.label,
   location: site.location.map(fromLocation),
+  label: site.label,
   acreage: site.acreage,
   notes: site.notes.map(fromNote)
 })
 
-/** Create a Customer from serialized dictionary format */
+/** Create a Customer instance from dictionary representation. */
 export const toCustomer = (dict: Dictionary): Customer => {
   if (!dict.id) return notValid('Customer dictionary missing required field: id')
   if (!dict.name) return notValid('Customer dictionary missing required field: name')
-  if (!dict.status) return notValid('Customer dictionary missing required field: status')
-  if (!dict.line1) return notValid('Customer dictionary missing required field: line1')
-  if (!dict.city) return notValid('Customer dictionary missing required field: city')
-  if (!dict.state) return notValid('Customer dictionary missing required field: state')
-  if (!dict.postal_code) {
-    return notValid('Customer dictionary missing required field: postal_code')
-  }
-  if (!dict.country) {
-    return notValid('Customer dictionary missing required field: country')
-  }
   return {
     id: dict.id as string,
     name: dict.name as string,
-    status: dict.status as Customer['status'],
+    status: dict.status as CustomerStatus,
     line1: dict.line1 as string,
     line2: dict.line2 as string | undefined,
     city: dict.city as string,
@@ -84,7 +87,7 @@ export const toCustomer = (dict: Dictionary): Customer => {
   }
 }
 
-/** Serialize a Customer to dictionary format */
+/** Create a dictionary representation of a Customer instance. */
 export const fromCustomer = (customer: Customer): Dictionary => ({
   id: customer.id,
   name: customer.name,

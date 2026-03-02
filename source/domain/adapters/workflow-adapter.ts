@@ -1,89 +1,67 @@
 /**
- * Workflow et al adapters to and from Dictionary representation.
+ * Adapters for the workflow domain area: Task, TaskQuestion, Workflow, WorkflowTask.
+ * Question adapters live in common-adapter.ts — not here.
  */
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
 import type {
-  Answer,
-  AnswerValue,
-  Question,
-  QuestionOption,
-  QuestionType,
   Task,
-  Workflow
+  TaskQuestion,
+  Workflow,
+  WorkflowTask
 } from '@domain/abstractions/workflow.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-/** Create a QuestionOption from serialized dictionary format */
-export const toQuestionOption = (dict: Dictionary): QuestionOption => ({
-  value: dict.value as string,
-  label: dict.label as string | undefined,
-  requiresNote: dict.requires_note as boolean | undefined
-})
+/** Create a Task instance from dictionary representation. */
+export const toTask = (dict: Dictionary): Task => {
+  if (!dict.id) return notValid('Task dictionary missing required field: id')
+  if (!dict.title) return notValid('Task dictionary missing required field: title')
+  return {
+    id: dict.id as string,
+    title: dict.title as string,
+    description: dict.description as string | undefined,
+    notes: (dict.notes as Dictionary[]).map(toNote),
+    createdAt: dict.created_at as When,
+    updatedAt: dict.updated_at as When,
+    deletedAt: dict.deleted_at as When | undefined
+  }
+}
 
-/** Serialize a QuestionOption to dictionary format */
-export const fromQuestionOption = (option: QuestionOption): Dictionary => ({
-  value: option.value,
-  label: option.label,
-  requires_note: option.requiresNote
-})
-
-/** Create a Question from serialized dictionary format */
-export const toQuestion = (dict: Dictionary): Question => ({
-  id: dict.id as string,
-  prompt: dict.prompt as string,
-  type: dict.type as QuestionType,
-  helpText: dict.help_text as string | undefined,
-  required: dict.required as boolean | undefined,
-  options: (dict.options as Dictionary[]).map(toQuestionOption)
-})
-
-/** Serialize a Question to dictionary format */
-export const fromQuestion = (question: Question): Dictionary => ({
-  id: question.id,
-  prompt: question.prompt,
-  type: question.type,
-  help_text: question.helpText,
-  required: question.required,
-  options: question.options.map(fromQuestionOption)
-})
-
-/** Create an Answer from serialized dictionary format */
-export const toAnswer = (dict: Dictionary): Answer => ({
-  questionId: dict.question_id as string,
-  value: dict.value as AnswerValue,
-  capturedAt: dict.captured_at as string,
-  capturedById: dict.captured_by_id as string,
-  notes: (dict.notes as Dictionary[]).map(toNote)
-})
-
-/** Serialize an Answer to dictionary format */
-export const fromAnswer = (answer: Answer): Dictionary => ({
-  question_id: answer.questionId,
-  value: answer.value,
-  captured_at: answer.capturedAt,
-  captured_by_id: answer.capturedById,
-  notes: answer.notes.map(fromNote)
-})
-
-/** Create a Task from serialized dictionary format */
-export const toTask = (dict: Dictionary): Task => ({
-  id: dict.id as string,
-  title: dict.title as string,
-  description: dict.description as string | undefined,
-  checklist: (dict.checklist as Dictionary[]).map(toQuestion)
-})
-
-/** Serialize a Task to dictionary format */
+/** Create a dictionary representation of a Task instance. */
 export const fromTask = (task: Task): Dictionary => ({
   id: task.id,
   title: task.title,
   description: task.description,
-  checklist: task.checklist.map(fromQuestion)
+  notes: task.notes.map(fromNote),
+  created_at: task.createdAt,
+  updated_at: task.updatedAt,
+  deleted_at: task.deletedAt
 })
 
-/** Create a Workflow from serialized dictionary format */
+/** Create a TaskQuestion instance from dictionary representation. */
+export const toTaskQuestion = (dict: Dictionary): TaskQuestion => {
+  if (!dict.task_id) {
+    return notValid('TaskQuestion dictionary missing required field: task_id')
+  }
+  if (!dict.question_id) {
+    return notValid('TaskQuestion dictionary missing required field: question_id')
+  }
+  return {
+    taskId: dict.task_id as string,
+    questionId: dict.question_id as string,
+    sequence: dict.sequence as number
+  }
+}
+
+/** Create a dictionary representation of a TaskQuestion instance. */
+export const fromTaskQuestion = (junction: TaskQuestion): Dictionary => ({
+  task_id: junction.taskId,
+  question_id: junction.questionId,
+  sequence: junction.sequence
+})
+
+/** Create a Workflow instance from dictionary representation. */
 export const toWorkflow = (dict: Dictionary): Workflow => {
   if (!dict.id) return notValid('Workflow dictionary missing required field: id')
   if (!dict.name) return notValid('Workflow dictionary missing required field: name')
@@ -92,23 +70,45 @@ export const toWorkflow = (dict: Dictionary): Workflow => {
     name: dict.name as string,
     description: dict.description as string | undefined,
     version: dict.version as number,
-    tags: (dict.tags as string[]).map(v => v),
-    tasks: (dict.tasks as Dictionary[]).map(toTask),
+    tags: dict.tags as string[],
+    notes: (dict.notes as Dictionary[]).map(toNote),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined
   }
 }
 
-/** Serialize a Workflow to dictionary format */
+/** Create a dictionary representation of a Workflow instance. */
 export const fromWorkflow = (workflow: Workflow): Dictionary => ({
   id: workflow.id,
   name: workflow.name,
   description: workflow.description,
   version: workflow.version,
-  tags: workflow.tags.map(v => v),
-  tasks: workflow.tasks.map(fromTask),
+  tags: workflow.tags,
+  notes: workflow.notes.map(fromNote),
   created_at: workflow.createdAt,
   updated_at: workflow.updatedAt,
   deleted_at: workflow.deletedAt
+})
+
+/** Create a WorkflowTask instance from dictionary representation. */
+export const toWorkflowTask = (dict: Dictionary): WorkflowTask => {
+  if (!dict.workflow_id) {
+    return notValid('WorkflowTask dictionary missing required field: workflow_id')
+  }
+  if (!dict.task_id) {
+    return notValid('WorkflowTask dictionary missing required field: task_id')
+  }
+  return {
+    workflowId: dict.workflow_id as string,
+    taskId: dict.task_id as string,
+    sequence: dict.sequence as number
+  }
+}
+
+/** Create a dictionary representation of a WorkflowTask instance. */
+export const fromWorkflowTask = (junction: WorkflowTask): Dictionary => ({
+  workflow_id: junction.workflowId,
+  task_id: junction.taskId,
+  sequence: junction.sequence
 })

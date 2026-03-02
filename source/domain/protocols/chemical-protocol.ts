@@ -1,11 +1,8 @@
 /**
- * Protocol input shapes for Chemical boundary operations.
+ * Protocols for the chemical domain area: Chemical create and update shapes.
  */
 
-import type {
-  CreateFromInstantiable,
-  UpdateFromInstantiable
-} from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 
 /** Input for creating a Chemical. */

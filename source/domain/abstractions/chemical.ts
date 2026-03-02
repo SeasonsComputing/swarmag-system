@@ -1,12 +1,7 @@
-/**
- * Domain models for regulated chemicals in the swarmAg system.
- * Chemicals require compliance tracking for licensing and regulatory purposes.
- */
-
 import type { CompositionMany, Instantiable } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 
-/** Domain usage classification. */
+/** Domain usage classification for chemicals. */
 export const CHEMICAL_USAGES = [
   'herbicide',
   'pesticide',
@@ -14,9 +9,17 @@ export const CHEMICAL_USAGES = [
   'fungicide',
   'adjuvant'
 ] as const
+
+/** Domain usage classification value. */
 export type ChemicalUsage = (typeof CHEMICAL_USAGES)[number]
 
-/** Label or document pointer. */
+/** Label signal word set. */
+export const CHEMICAL_SIGNAL_WORDS = ['danger', 'warning', 'caution'] as const
+
+/** Label signal word value. */
+export type ChemicalSignalWord = (typeof CHEMICAL_SIGNAL_WORDS)[number]
+
+/** Label or document pointer for a chemical record. */
 export type ChemicalLabel = {
   url: string
   description?: string
@@ -27,7 +30,7 @@ export type Chemical = Instantiable & {
   name: string
   epaNumber?: string
   usage: ChemicalUsage
-  signalWord?: 'danger' | 'warning' | 'caution'
+  signalWord?: ChemicalSignalWord
   restrictedUse: boolean
   reEntryIntervalHours?: number
   storageLocation?: string

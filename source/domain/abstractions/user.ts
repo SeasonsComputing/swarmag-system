@@ -1,19 +1,16 @@
-/**
- * Domain model for system users in the swarmAg system.
- * Users carry identity, role membership, and contact information.
- */
-
 import type { CompositionPositive, Instantiable } from '@core-std'
 
 /** Canonical role set. */
-export const USER_ROLES = [
-  'administrator',
-  'sales',
-  'operations'
-] as const
+export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
 
-/** Role type derived from tuple. */
+/** Canonical user role value. */
 export type UserRole = (typeof USER_ROLES)[number]
+
+/** User lifecycle state set. */
+export const USER_STATUSES = ['active', 'inactive'] as const
+
+/** User lifecycle state value. */
+export type UserStatus = (typeof USER_STATUSES)[number]
 
 /** System user identity and membership. */
 export type User = Instantiable & {
@@ -21,6 +18,6 @@ export type User = Instantiable & {
   primaryEmail: string
   phoneNumber: string
   avatarUrl?: string
+  status?: UserStatus
   roles: CompositionPositive<UserRole>
-  status?: 'active' | 'inactive'
 }

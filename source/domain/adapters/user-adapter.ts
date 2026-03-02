@@ -1,12 +1,12 @@
 /**
- * User adapters to and from Dictionary representation.
+ * Adapters for the user domain area: User.
  */
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
-import type { User, UserRole } from '@domain/abstractions/user.ts'
+import type { User, UserRole, UserStatus } from '@domain/abstractions/user.ts'
 
-/** Create a User from serialized dictionary format */
+/** Create a User instance from dictionary representation. */
 export const toUser = (dict: Dictionary): User => {
   if (!dict.id) return notValid('User dictionary missing required field: id')
   if (!dict.display_name) {
@@ -24,23 +24,23 @@ export const toUser = (dict: Dictionary): User => {
     primaryEmail: dict.primary_email as string,
     phoneNumber: dict.phone_number as string,
     avatarUrl: dict.avatar_url as string | undefined,
-    roles: (dict.roles as string[]).map(v => v as UserRole),
-    status: dict.status as User['status'],
+    status: dict.status as UserStatus | undefined,
+    roles: dict.roles as UserRole[],
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined
   }
 }
 
-/** Serialize a User to dictionary format */
+/** Create a dictionary representation of a User instance. */
 export const fromUser = (user: User): Dictionary => ({
   id: user.id,
   display_name: user.displayName,
   primary_email: user.primaryEmail,
   phone_number: user.phoneNumber,
   avatar_url: user.avatarUrl,
-  roles: user.roles.map(v => v),
   status: user.status,
+  roles: user.roles,
   created_at: user.createdAt,
   updated_at: user.updatedAt,
   deleted_at: user.deletedAt

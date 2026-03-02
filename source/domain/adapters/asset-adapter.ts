@@ -1,5 +1,5 @@
 /**
- * Asset et al adapters to and from Dictionary representation.
+ * Adapters for the asset domain area: AssetType and Asset.
  */
 
 import type { Dictionary, When } from '@core-std'
@@ -7,7 +7,7 @@ import { notValid } from '@core-std'
 import type { Asset, AssetStatus, AssetType } from '@domain/abstractions/asset.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-/** Create an AssetType from serialized dictionary format */
+/** Create an AssetType instance from dictionary representation. */
 export const toAssetType = (dict: Dictionary): AssetType => {
   if (!dict.id) return notValid('AssetType dictionary missing required field: id')
   if (!dict.label) return notValid('AssetType dictionary missing required field: label')
@@ -21,7 +21,7 @@ export const toAssetType = (dict: Dictionary): AssetType => {
   }
 }
 
-/** Serialize an AssetType to dictionary format */
+/** Create a dictionary representation of an AssetType instance. */
 export const fromAssetType = (assetType: AssetType): Dictionary => ({
   id: assetType.id,
   label: assetType.label,
@@ -31,12 +31,11 @@ export const fromAssetType = (assetType: AssetType): Dictionary => ({
   deleted_at: assetType.deletedAt
 })
 
-/** Create an Asset from serialized dictionary format */
+/** Create an Asset instance from dictionary representation. */
 export const toAsset = (dict: Dictionary): Asset => {
   if (!dict.id) return notValid('Asset dictionary missing required field: id')
   if (!dict.label) return notValid('Asset dictionary missing required field: label')
   if (!dict.type_id) return notValid('Asset dictionary missing required field: type_id')
-  if (!dict.status) return notValid('Asset dictionary missing required field: status')
   return {
     id: dict.id as string,
     label: dict.label as string,
@@ -51,7 +50,7 @@ export const toAsset = (dict: Dictionary): Asset => {
   }
 }
 
-/** Serialize an Asset to dictionary format */
+/** Create a dictionary representation of an Asset instance. */
 export const fromAsset = (asset: Asset): Dictionary => ({
   id: asset.id,
   label: asset.label,
