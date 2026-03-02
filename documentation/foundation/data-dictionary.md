@@ -597,7 +597,7 @@ Attributes: **Relations**
 
 Type: **Instantiable**
 
-Purpose: **Job-specific workflow instance; basisWorkflowId references the read-only Workflow master; modifiedWorkflowId is always a clone of the basis — including its WorkflowTask and TaskQuestion junction records — created only when specialization is required**
+Purpose: **Many side of Job's 1:m — a Job owns an ordered collection of JobWorkflows; basisWorkflowId references the read-only Workflow master; modifiedWorkflowId is always a clone of the basis — including its WorkflowTask and TaskQuestion junction records — created only when specialization is required**
 
 Attributes: **Relations**
 
@@ -606,12 +606,6 @@ Attributes: **Relations**
 | `jobId`              | AssociationOne      | Job             |
 | `basisWorkflowId`    | AssociationOne      | Workflow        |
 | `modifiedWorkflowId` | AssociationOptional | Workflow        |
-
-Attributes: **State**
-
-| **Attribute** | **Type** |
-| ------------- | -------- |
-| `sequence`    | number   |
 
 ### 10.5 JobPlan
 
