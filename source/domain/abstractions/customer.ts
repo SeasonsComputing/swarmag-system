@@ -1,3 +1,7 @@
+/**
+ * Domain models for customers in the swarmAg system.
+ */
+
 import type {
   AssociationOne,
   AssociationOptional,
@@ -9,19 +13,17 @@ import type {
 import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { User } from '@domain/abstractions/user.ts'
 
-/** Preferred contact channel for customer communication. */
-export const CONTACT_CHANNELS = ['email', 'text', 'phone'] as const
+/** Contact channel preferences. */
+export const CONTACT_PREFERRED_CHANNELS = ['email', 'text', 'phone'] as const
+export type ContactPreferredChannel = (typeof CONTACT_PREFERRED_CHANNELS)[number]
 
-/** Preferred contact channel value. */
-export type ContactChannel = (typeof CONTACT_CHANNELS)[number]
-
-/** Embedded customer contact with primary designation. */
+/** Embedded customer contact. */
 export type Contact = {
   name: string
   email?: string
   phone?: string
   isPrimary: boolean
-  preferredChannel?: ContactChannel
+  preferredChannel?: ContactPreferredChannel
   notes: CompositionMany<Note>
 }
 
@@ -29,19 +31,21 @@ export type Contact = {
 export type CustomerSite = {
   customerId: AssociationOne<Customer>
   location: CompositionOne<Location>
+  notes: CompositionMany<Note>
   label: string
   acreage?: number
-  notes: CompositionMany<Note>
 }
 
-/** Customer account lifecycle state. */
+/** Customer lifecycle state. */
 export const CUSTOMER_STATUSES = ['active', 'inactive', 'prospect'] as const
-
-/** Customer account lifecycle state value. */
 export type CustomerStatus = (typeof CUSTOMER_STATUSES)[number]
 
-/** Customer account aggregate with at least one contact. */
+/** Customer account aggregate. */
 export type Customer = Instantiable & {
+  accountManagerId?: AssociationOptional<User>
+  sites: CompositionMany<CustomerSite>
+  contacts: CompositionPositive<Contact>
+  notes: CompositionMany<Note>
   name: string
   status: CustomerStatus
   line1: string
@@ -50,8 +54,4 @@ export type Customer = Instantiable & {
   state: string
   postalCode: string
   country: string
-  accountManagerId?: AssociationOptional<User>
-  sites: CompositionMany<CustomerSite>
-  contacts: CompositionPositive<Contact>
-  notes: CompositionMany<Note>
 }

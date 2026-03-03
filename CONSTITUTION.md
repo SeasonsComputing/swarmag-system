@@ -109,7 +109,7 @@ Doing nothing is preferable to doing the wrong thing.
 
 ## 6. Coding Standards as Constitutional Law
 
-The `style-guide.md` is the authoritative reference for coding conventions. 
+The `style-guide.md` is the authoritative reference for coding conventions.
 
 These are non-negotiable:
 
