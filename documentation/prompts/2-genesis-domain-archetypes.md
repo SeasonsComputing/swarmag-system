@@ -4,7 +4,7 @@ You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no
 architectural authority. Implement exactly what is specified. Do not invent
 abstractions, reinterpret intent, or cross architectural boundaries.
 
-## Authority
+## 1. Authority
 
 In case of conflict:
 `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md`
@@ -13,13 +13,13 @@ In case of conflict:
 You MUST ingest all of these files PRIOR to assessing your task. Confirm you
 have no conflicts, questions, or concerns before generating any files.
 
-## Prerequisite
+## 2. Prerequisite
 
 Ingest all files under `source/domain/abstractions/` before generating any
 output. The abstraction files are the authoritative type source. If any
 abstraction conflicts with `data-dictionary.md`, escalate — do not proceed.
 
-## Task
+## 3. Task
 
 Generate the three domain sub-layers from scratch:
 
@@ -29,7 +29,7 @@ Generate the three domain sub-layers from scratch:
 
 Delete all existing files and replace them completely. Do not patch.
 
-## Target File Inventory
+## 4. Target File Inventory
 
 ```
 source/domain/adapters/
@@ -61,18 +61,29 @@ source/domain/validators/
   job-validator.ts
 ```
 
-## Placement Rules (non-negotiable)
+## 5. Placement Rules (non-negotiable)
 
-`common-adapter.ts` owns adapters for:
-`Location`, `Attachment`, `Note`, `QuestionOption`, `ScalarQuestion`,
-`SelectQuestion`, `Question`, `Answer`
+### 5.1 `common-adapter.ts` owns adapters for
 
-`workflow-adapter.ts` owns adapters for:
-`Task`, `TaskQuestion`, `Workflow`, `WorkflowTask`
+- `Location`
+- `Attachment`
+- `Note`
+- `QuestionOption`
+- `ScalarQuestion`
+- `SelectQuestion`
+- `Question`
+- `Answer`
+
+### 5.2 `workflow-adapter.ts` owns adapters for
+
+- `Task`
+- `TaskQuestion`
+- `Workflow`
+- `WorkflowTask`
 
 All other adapter files own their named domain area.
 
-## Protocol Rules (non-negotiable)
+## 6. Protocol Rules (non-negotiable)
 
 Per `domain-archetypes.md` section 5:
 
@@ -94,7 +105,7 @@ for lifecycled types.
 get `QuestionCreate` and `QuestionUpdate` via `CreateFromInstantiable<Question>`
 and `UpdateFromInstantiable<Question>`. These belong in `common-protocol.ts`.
 
-## Adapter Rules (non-negotiable)
+## 7. Adapter Rules (non-negotiable)
 
 Per `domain-archetypes.md` section 4:
 
@@ -110,38 +121,44 @@ Per `domain-archetypes.md` section 4:
 - Junction types and composite objects delegate to `common-adapter.ts`
   helpers
 
-**Union-type adapter pattern for `Question`:**
+### 7.1 Union-type adapter pattern for `Question`
 
 ```typescript
 export const toQuestion = (dict: Dictionary): Question => {
   const type = dict.type as QuestionType
-  if (type === 'single-select' || type === 'multi-select') {
-    return {
-      id: dict.id as string,
-      type,
-      prompt: dict.prompt as string,
-      helpText: dict.help_text as string | undefined,
-      required: dict.required as boolean | undefined,
-      options: (dict.options as Dictionary[]).map(toQuestionOption),
-      createdAt: dict.created_at as When,
-      updatedAt: dict.updated_at as When,
-      deletedAt: dict.deleted_at as When | undefined
-    } satisfies SelectQuestion
+  switch (type) {
+    case 'single-select':
+    case 'multi-select':
+      return {
+        id: dict.id as string,
+        type,
+        prompt: dict.prompt as string,
+        helpText: dict.help_text as string | undefined,
+        required: dict.required as boolean | undefined,
+        options: (dict.options as Dictionary[]).map(toQuestionOption),
+        createdAt: dict.created_at as When,
+        updatedAt: dict.updated_at as When,
+        deletedAt: dict.deleted_at as When | undefined
+      } satisfies SelectQuestion
+    case 'text':
+    case 'number':
+    case 'boolean':
+    case 'internal':
+      return {
+        id: dict.id as string,
+        type,
+        prompt: dict.prompt as string,
+        helpText: dict.help_text as string | undefined,
+        required: dict.required as boolean | undefined,
+        createdAt: dict.created_at as When,
+        updatedAt: dict.updated_at as When,
+        deletedAt: dict.deleted_at as When | undefined
+      } satisfies ScalarQuestion
   }
-  return {
-    id: dict.id as string,
-    type,
-    prompt: dict.prompt as string,
-    helpText: dict.help_text as string | undefined,
-    required: dict.required as boolean | undefined,
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  } satisfies ScalarQuestion
 }
 ```
 
-## Validator Rules (non-negotiable)
+## 8. Validator Rules (non-negotiable)
 
 Per `domain-archetypes.md` sections 6.1–6.4:
 
@@ -155,27 +172,32 @@ Per `domain-archetypes.md` sections 6.1–6.4:
 - Update validators: validate `id` first, then only fields `!== undefined`
 - No Update validator for: `Workflow`, `JobWork`, `JobWorkLogEntry`
 
-**Union-type validator pattern for `Question`:**
+### 8.1 Union-type validator pattern for `Question`
 
 ```typescript
 export const validateQuestionCreate = (input: QuestionCreate): string | null => {
   if (!isNonEmptyString(input.prompt)) return 'prompt must be a non-empty string'
-  if (!QUESTION_TYPES.includes(input.type as QuestionType)) {
-    return 'type must be a valid QuestionType'
+  if (!QUESTION_TYPES.includes(input.type as QuestionType)) return 'type must be a valid QuestionType'
+  switch (input.type) {
+    case 'single-select':
+    case 'multi-select':
+      if (!isCompositionPositive(input.options, isQuestionOption)) {
+        return 'options must be a non-empty array of valid QuestionOption values'
+      }
+      return null
+    case 'text':
+    case 'number':
+    case 'boolean':
+    case 'internal':
+      return null
   }
-  if (input.type === 'single-select' || input.type === 'multi-select') {
-    if (!isCompositionPositive(input.options, isQuestionOption)) {
-      return 'options must be a non-empty array of valid QuestionOption values'
-    }
-  }
-  return null
 }
 ```
 
 `QUESTION_TYPES` is imported from `@domain/abstractions/common.ts` — not
 `workflow.ts`.
 
-## Formatting Rules (non-negotiable)
+## 9. Formatting Rules (non-negotiable)
 
 - No semicolons
 - Single quotes
@@ -183,11 +205,11 @@ export const validateQuestionCreate = (input: QuestionCreate): string | null => 
 - No `any` — use `unknown` at boundaries
 - File format per `style-guide.md` section 6.1 Spec files
 
-## Quality Bar
+## 10. Quality Bar
 
 Before finalizing verify:
 
-**Adapters**
+### 10.1 Adapters
 
 - `common-adapter.ts` exports `toQuestion`/`fromQuestion` with union switch
 - `toQuestion` uses `satisfies SelectQuestion` / `satisfies ScalarQuestion`
@@ -196,7 +218,7 @@ Before finalizing verify:
 - `workflow-adapter.ts` — `toWorkflow`/`fromWorkflow` has no `tasks` field
 - Every lifecycle field mapped, no raw array casts, `notValid` guards present
 
-**Protocols**
+### 10.2 Protocols
 
 - `common-protocol.ts` exports `QuestionCreate` and `QuestionUpdate`
 - No hand-written `Omit`/`Pick`/`Partial` for `Instantiable` types
@@ -204,7 +226,7 @@ Before finalizing verify:
 - `WorkflowUpdate` does not exist
 - `JobWorkUpdate` does not exist
 
-**Validators**
+### 10.3 Validators
 
 - `common-validator.ts` exports `validateQuestionCreate` and `validateQuestionUpdate`
 - `QUESTION_TYPES` imported from `@domain/abstractions/common.ts`

@@ -4,7 +4,7 @@ You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no
 architectural authority. Implement exactly what is specified. Do not invent
 abstractions, reinterpret intent, or cross architectural boundaries.
 
-## Authority
+## 1. Authority
 
 In case of conflict:
 `CONSTITUTION.md` → `architecture-core.md` → `domain.md` → `domain-archetypes.md`
@@ -13,12 +13,12 @@ In case of conflict:
 You MUST ingest all of these files PRIOR to assessing your task. Confirm you
 have no conflicts, questions, or concerns before generating any files.
 
-## Task
+## 2. Task
 
 Generate `source/domain/abstractions/` from scratch. Delete all existing files
 and replace them completely. Do not patch.
 
-## Target File Inventory
+## 3. Target File Inventory
 
 ```
 source/domain/abstractions/
@@ -32,13 +32,13 @@ source/domain/abstractions/
   job.ts
 ```
 
-## Authoritative Source
+## 4. Authoritative Source
 
 `data-dictionary.md` is the authoritative reference for all types, fields,
 relations, and purpose statements. `domain.md` provides narrative context and
 invariants. In case of conflict between them, `domain.md` governs.
 
-## Placement Rules (non-negotiable)
+## 5. Placement Rules (non-negotiable)
 
 Per `domain-archetypes.md` section 2:
 
@@ -53,7 +53,7 @@ Per `domain-archetypes.md` section 2:
 
 All other files own their named domain area as defined in `data-dictionary.md`.
 
-## Key Invariants (non-negotiable)
+## 6. Key Invariants (non-negotiable)
 
 - `Task` and `Question` are `Instantiable` — independently lifecycled with
   their own rows; sequence is carried by junction, never by the entity
@@ -67,7 +67,7 @@ All other files own their named domain area as defined in `data-dictionary.md`.
 - All `Composition*` fields are always initialized — never `null`, always `[]`
   when empty
 
-## Union-Type Pattern for Question (non-negotiable)
+## 7. Union-Type Pattern for Question (non-negotiable)
 
 Per `domain-archetypes.md` section 3.2. `Question` is a discriminated union of
 named constituent types. Do not embed optional fields that only apply to some
@@ -104,7 +104,7 @@ Rules:
 - `QUESTION_TYPES` const-enum tuple and `QuestionType` derived type are
   exported from `common.ts`
 
-## Formatting Rules (non-negotiable)
+## 8. Formatting Rules (non-negotiable)
 
 - No semicolons
 - Single quotes for all string literals
@@ -113,7 +113,7 @@ Rules:
 - No inline `id`, `createdAt`, `updatedAt`, `deletedAt?` on Instantiable types
 - File format per `style-guide.md` section 6.1 Spec files
 
-## Import Aliases
+## 9. Import Aliases
 
 ```
 @core-std  → source/core/std/std.ts
@@ -127,7 +127,7 @@ Rules:
 `CompositionOptional`, `CompositionMany`, `CompositionPositive`,
 `AssociationOne`, `AssociationOptional`, `AssociationJunction`
 
-## Const-Enum Pattern (non-negotiable)
+## 10. Const-Enum Pattern (non-negotiable)
 
 Per `domain-archetypes.md` section 3.3:
 
@@ -144,7 +144,7 @@ export type AssetStatus = (typeof ASSET_STATUSES)[number]
 Never use a bare union literal for values that require runtime membership
 checks. Always pair a `const` tuple with a derived type alias.
 
-## Instantiable Pattern (non-negotiable)
+## 11. Instantiable Pattern (non-negotiable)
 
 ```typescript
 export type Asset = Instantiable & {
@@ -154,7 +154,7 @@ export type Asset = Instantiable & {
 
 Never redeclare `id`, `createdAt`, `updatedAt`, `deletedAt?` inline.
 
-## Junction Pattern (non-negotiable)
+## 12. Junction Pattern (non-negotiable)
 
 Plain objects — no `Instantiable`, no lifecycle fields:
 
@@ -166,11 +166,11 @@ export type WorkflowTask = {
 }
 ```
 
-## Quality Bar
+## 13. Quality Bar
 
 Before finalizing verify each file:
 
-**`common.ts`**
+### 13.1 `common.ts`
 
 - `QUESTION_TYPES` const tuple and `QuestionType` derived type exported
 - `QuestionOption` exported
@@ -180,7 +180,7 @@ Before finalizing verify each file:
 - `AnswerValue` union type exported
 - `Answer` object type exported — `questionId: AssociationOne<Question>`
 
-**`workflow.ts`**
+### 13.2 `workflow.ts`
 
 - `Task` extends `Instantiable` — no embedded questions field
 - `TaskQuestion` is a plain junction type with `sequence`
@@ -188,13 +188,13 @@ Before finalizing verify each file:
 - `WorkflowTask` is a plain junction type with `sequence`
 - No imports of `Question`, `QuestionType`, `Answer`, `AnswerValue` — those live in `common.ts`
 
-**`job.ts`**
+### 13.3 `job.ts`
 
 - `JobWorkflow` has no `sequence` field
 - `JobWork.work` is `CompositionPositive<Id>`
 - `JobWorkLogEntry` is `Pick<Instantiable, 'id' | 'createdAt'>` intersection
 
-**All files**
+### 13.4 All files
 
 - Every `Instantiable` type uses intersection — no inline lifecycle fields
 - Every const-enum has both the tuple and the derived type alias
