@@ -177,7 +177,7 @@ Purpose: **General purpose reusable prompt; independently lifecycled and shared 
 
 ### 3.9 AnswerValue
 
-Type: **union-type**
+Type: **union**
 
 Purpose: **Permitted answer value payloads**
 
@@ -485,70 +485,7 @@ Attributes: **State**
 
 Source: `@domain/abstractions/workflow.ts`
 
-### 9.1 QuestionType
-
-Type: **const-enum**
-
-Purpose: **Supported question input modes; internal is reserved for system-generated log entries such as telemetry, GPS, and operational metadata**
-
-| Values          |
-| --------------- |
-| `text`          |
-| `number`        |
-| `boolean`       |
-| `single-select` |
-| `multi-select`  |
-| `internal`      |
-
-### 9.2 QuestionOption
-
-Type: **object**
-
-Purpose: **Selectable option metadata for single-select and multi-select questions**
-
-Attributes: **State**
-
-| **Attribute**   | **Type** |
-| --------------- | -------- |
-| `value`         | string   |
-| `label?`        | string   |
-| `requiresNote?` | boolean  |
-
-### 9.3 AnswerValue
-
-Type: **union**
-
-Purpose: **Permitted answer value payloads**
-
-| **Type**   |
-| ---------- |
-| `string`   |
-| `number`   |
-| `boolean`  |
-| `string[]` |
-
-### 9.4 Question
-
-Type: **Instantiable**
-
-Purpose: **Reusable prompt; independently lifecycled and shared across tasks; internal questions are seed records referenced directly by log entries**
-
-Attributes: **Relations**
-
-| **Attribute** | **Relation**    | **Abstraction** |
-| ------------- | --------------- | --------------- |
-| `options`     | CompositionMany | QuestionOption  |
-
-Attributes: **State**
-
-| **Attribute** | **Type**     |
-| ------------- | ------------ |
-| `prompt`      | string       |
-| `type`        | QuestionType |
-| `helpText?`   | string       |
-| `required?`   | boolean      |
-
-### 9.5 Task
+### 9.1 Task
 
 Type: **Instantiable**
 
@@ -567,7 +504,7 @@ Attributes: **State**
 | `title`        | string   |
 | `description?` | string   |
 
-### 9.6 TaskQuestion
+### 9.2 TaskQuestion
 
 Type: **Junction**
 
@@ -586,7 +523,7 @@ Attributes: **State**
 | ------------- | -------- |
 | `sequence`    | number   |
 
-### 9.7 Workflow
+### 9.3 Workflow
 
 Type: **Instantiable**
 
@@ -607,7 +544,7 @@ Attributes: **State**
 | `version`      | number                  |
 | `tags`         | CompositionMany<string> |
 
-### 9.8 WorkflowTask
+### 9.4 WorkflowTask
 
 Type: **Junction**
 
