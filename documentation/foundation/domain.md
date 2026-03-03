@@ -196,7 +196,7 @@ The following abstractions are shared across multiple domain concepts and repres
 | `Question`   | `common.ts` | Reusable prompt; independently lifecycled; discriminated union of ScalarQuestion and SelectQuestion |
 | `Answer`     | `common.ts` | Response to a question, with supporting notes                                                       |
 
-These abstractions are **composed into** higher-level domain objects and are not referenced independently.
+These abstractions are **composed into** higher-level domain objects, do not join with Instantiable and are not referenced independently.
 
 ### 3.7 Supporting domain relationships and junctions
 

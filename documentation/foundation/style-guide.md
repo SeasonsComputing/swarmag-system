@@ -70,6 +70,7 @@ Each symbol class has one casing convention. All words — regardless of their n
 | Types, type aliases, interfaces, classes, const-as-class | PascalCase      | `JobAssessment`, `ApiConfig`, `HttpCodes` |
 | Functions, methods, arrow functions                      | camelCase       | `fromJobAssessment`, `apiClient`          |
 | Global immutable constants                               | SCREAMING_SNAKE | `USER_ROLES`, `ASSET_STATUSES`            |
+| SQL tables and columns                                   | snake_case      | `created_at`, 'deleted_at`
 
 ### 4.3 The acronym corollary
 
@@ -244,7 +245,7 @@ function parseRequestBody() { ... }
 
 ### 6.4 Header rules
 
-- Spec files carry no box, no dash-rules, no sections. Inline `/** */` only where the name is insufficient.
+- Spec files carry no box, no dash-rules. Inline `/** */` only where the name is insufficient.
 - Functional file box width: 77 characters. Title and description on consecutive lines — no blank lines inside the box.
 - One blank line between the box close and PURPOSE.
 - One blank line between PURPOSE prose and the next section label.
@@ -255,9 +256,23 @@ function parseRequestBody() { ... }
 - EXAMPLE is valid, runnable TypeScript — not pseudocode.
 - Headers stay current. A stale header is worse than no header.
 
-### 6.5 Section dividers
+### 6.5 Exported symbols
 
-Non-trivial files divide the code body into PUBLIC EXPORTS and PRIVATE IMPLEMENTATION, each bounded top and bottom. Consistent width, no variation:
+Exported symbols are always listed in the top of the file with non-exports below them.
+
+### 6.6 Section divider header
+
+Files with clear categories of declarations and functions divide the code body into sections, each with a section divider header. Consistent width, no variation:
+
+```typescript
+// ────────────────────────────────────────────────────────────────────────────
+// {SECTION LABEL}
+// ────────────────────────────────────────────────────────────────────────────
+````
+
+#### 6.6.1 Encapsulation & Information hiding
+
+Files with a public API and implementation (internal) API are divided into sections: PUBLIC EXPORTS then PRIVATE INTERNALS:
 
 ```typescript
 // ────────────────────────────────────────────────────────────────────────────
@@ -267,7 +282,7 @@ Non-trivial files divide the code body into PUBLIC EXPORTS and PRIVATE IMPLEMENT
 // ... exported types, functions, constants ...
 
 // ────────────────────────────────────────────────────────────────────────────
-// PRIVATE IMPLEMENTATION
+// PRIVATE INTERNALS
 // ────────────────────────────────────────────────────────────────────────────
 
 // ... unexported helpers ...
@@ -340,9 +355,9 @@ Rules:
 
 ## 8. Domain Layer (`source/domain/`)
 
-### 8.1 File organization
+### 8.1 Domain Archetypes
 
-Each abstraction has four files, one per sub-layer:
+Each domain topic maps to four archetypes:
 
 | Sub-layer       | File                         |
 | --------------- | ---------------------------- |
@@ -355,7 +370,7 @@ Shared abstractions: `abstractions/common.ts`.
 
 ### 8.2 Abstractions
 
-- `type` for all domain abstractions, object shapes, aliases, and unions. `interface` only for API contracts that something explicitly implements — `ApiCrudContract`, `RuntimeProvider`, etc.
+- `type` for all domain abstractions, object shapes, aliases, and unions. `interface` only for API contracts.
 - Single-sentence JSDoc on every exported type and const-enum.
 - All lifecycled abstractions expose `deletedAt?: When` via `Instantiable` intersection — do not redeclare inline.
 - JSON-serializable only; no methods on domain objects.
@@ -379,6 +394,8 @@ Rules:
 - A plain union literal (`type Foo = 'a' | 'b'`) is only acceptable when the values are never used in runtime checks. If in doubt, use the const-enum pattern.
 
 ### 8.3 Adapters
+
+Domain adapters serialize a domain abstraction to and from a `@core-std` Dictionary mapping abstraction-styled names to schema-styled names.
 
 - Functions only: `toAbstraction(dict: Dictionary): Abstraction` and `fromAbstraction(abstraction: Abstraction): Dictionary`.
 - Map every field explicitly. No `...spread`, no `payload` shortcut.
@@ -404,11 +421,11 @@ Rules:
 
 The system uses a singleton `Config` with injected runtime providers. Defined in `@core/cfg/config.ts`; initialized once per deployment context.
 
+### 9.1 Config initialization
+
 ```typescript
 Config.init(provider, keys, aliases?)
 ```
-
-### 9.1 Arguments
 
 - `provider` — runtime-specific `RuntimeProvider` instance (`SolidProvider`, `SupabaseProvider`, `DenoProvider`)
 - `keys` — required environment variable names; fails fast at bootstrap if any are missing
@@ -597,21 +614,24 @@ Scope: describes who or what is permitted — `active`, `own`, `ops`, `admin`
 
 ### 12.9 JSONB Columns
 
-JSONB is permitted only for the four exceptions defined in `architecture-back.md §4.1.2`:
-
-1. End-user specialization (custom fields)
-2. Third-party metadata (opaque payloads)
-3. Payload-as-truth (versioning snapshots)
-4. Subordinate composition (`Composition*<T>` — embedded entities without independent lifecycle)
-
-All `Composition*<T>` fields from the domain map to JSONB columns. Column name matches the domain field name in `snake_case`. Default to empty array `'[]'::jsonb` for `CompositionMany` and `CompositionPositive` columns:
+JSONB is permitted only for subordinate composition: `Composition*<T>` relation attributes. 
+Composition objects are always stored as a JSONB column containing an array of T irrespective of cardinality.
+This simplifies down stream code, it's never null and cardinality is a simple check of the array length.
+Column name matches the domain field name in `snake_case`. 
+Default to empty array `'[]'::jsonb` for `CompositionMany` and `CompositionPositive` columns:
 
 ```sql
 notes  JSONB NOT NULL DEFAULT '[]'::jsonb,
 tasks  JSONB NOT NULL DEFAULT '[]'::jsonb,
 ```
 
-`CompositionOne` has no meaningful empty state — omit the default and treat as required.
+`CompositionOne` must have a value so omit the default and treat as required.
+
+There are three exceptions to the JSONB column rule; employing any of these exceptions requires authorization of the Chief Architect 
+
+1. End-user specialization (custom fields)
+2. Third-party metadata (opaque payloads)
+3. Payload-as-truth (versioning snapshots)
 
 ### 12.10 Soft Delete
 

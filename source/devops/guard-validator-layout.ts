@@ -32,7 +32,9 @@ const main = async () => {
       continue
     }
 
-    const validatorsSectionIndex = sections.findIndex((s) => s.title === VALIDATORS_SECTION_TITLE)
+    const validatorsSectionIndex = sections.findIndex(s =>
+      s.title === VALIDATORS_SECTION_TITLE
+    )
     if (validatorsSectionIndex < 0) {
       violations.push(`${relative} is missing section "// ${VALIDATORS_SECTION_TITLE}"`)
       continue
@@ -51,9 +53,14 @@ const main = async () => {
 
     let exportMatch: RegExpExecArray | null
     while ((exportMatch = EXPORT_VALIDATOR_REGEX.exec(source)) !== null) {
-      if (exportMatch.index < sections[validatorsSectionIndex].index || exportMatch.index > internalsStart) {
+      if (
+        exportMatch.index < sections[validatorsSectionIndex].index
+        || exportMatch.index > internalsStart
+      ) {
         const line = lineNumber(source, exportMatch.index)
-        violations.push(`${relative}:${line} validator export is outside the top validators section`)
+        violations.push(
+          `${relative}:${line} validator export is outside the top validators section`
+        )
       }
     }
   }
