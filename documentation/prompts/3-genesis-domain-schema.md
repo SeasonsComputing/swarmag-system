@@ -219,14 +219,12 @@ This is a genesis run. Treat seed IDs as fully consumed by this run.
 Required behavior:
 
 1. If `source/devops/seed-ids.txt` exists, rename it before generating anything
-   (for example: `seed-ids.<timestamp>.bak.txt`).
+   (`seed-ids.txt.<timestamp>`).
 2. Create a brand-new `source/devops/seed-ids.txt` for this run.
 3. Fill that new file with exactly the IDs needed by this schema seed section.
 4. Consume IDs in contiguous file order while writing schema seed inserts.
-5. After schema generation completes, truncate `source/devops/seed-ids.txt` to
-   empty so zero IDs remain available.
-
-Assignment order from the newly generated `seed-ids.txt` must be contiguous:
+5. After schema generation completes, remove `source/devops/seed-ids.txt`
+6. Assignment order from the newly generated `seed-ids.txt` must be contiguous:
 
 1. Asset types (9)
 2. Services (12)
@@ -339,4 +337,3 @@ Before finalizing verify all are true:
 - `seed-ids.txt` was rotated if present, regenerated for this run, fully consumed in schema order, and left empty at completion
 - no `VARCHAR(n)` and no `TIMESTAMP`
 - schema lint apply and runtime apply both succeed with `ON_ERROR_STOP=1`
-

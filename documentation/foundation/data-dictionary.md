@@ -88,6 +88,7 @@ Attributes: **Relations**
 
 | **Attribute** | **Relation**    | **Abstraction** |
 | ------------- | --------------- | --------------- |
+| `authorId`    | AssociationOne  | User            |
 | `attachments` | CompositionMany | Attachment      |
 
 Attributes: **State**
@@ -95,7 +96,6 @@ Attributes: **State**
 | **Attribute** | **Type**                |
 | ------------- | ----------------------- |
 | `createdAt`   | When                    |
-| `authorId?`   | Id                      |
 | `content`     | string                  |
 | `visibility?` | internal \| shared      |
 | `tags`        | CompositionMany<string> |
