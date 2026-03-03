@@ -43,6 +43,7 @@ source/domain/adapters/
   job-adapter.ts
 
 source/domain/protocols/
+  common-protocol.ts
   asset-protocol.ts
   chemical-protocol.ts
   customer-protocol.ts
@@ -52,6 +53,7 @@ source/domain/protocols/
   job-protocol.ts
 
 source/domain/validators/
+  common-validator.ts
   asset-validator.ts
   chemical-validator.ts
   customer-validator.ts
@@ -61,141 +63,48 @@ source/domain/validators/
   job-validator.ts
 ```
 
-## 5. Placement Rules (non-negotiable)
+## 5. Implementation Rules
 
-### 5.1 `common-adapter.ts` owns adapters for
+All implementation rules are defined in `domain-archetypes.md`. Apply them in
+full. The sections below are cross-references only — not restatements.
 
-- `Location`
-- `Attachment`
-- `Note`
-- `QuestionOption`
-- `ScalarQuestion`
-- `SelectQuestion`
-- `Question`
-- `Answer`
+| Concern                   | Spec reference                     |
+| ------------------------- | ---------------------------------- |
+| Adapters                  | `domain-archetypes.md` section 4   |
+| Protocols                 | `domain-archetypes.md` section 5   |
+| Validators                | `domain-archetypes.md` section 6   |
+| Shared composition guards | `domain-archetypes.md` section 6.5 |
+| File format               | `style-guide.md` section 6.2       |
+| Naming                    | `style-guide.md` section 4         |
 
-### 5.2 `workflow-adapter.ts` owns adapters for
+## 6. Placement Rules (non-negotiable)
 
-- `Task`
-- `TaskQuestion`
-- `Workflow`
-- `WorkflowTask`
+Per `domain-archetypes.md` section 2:
 
-All other adapter files own their named domain area.
+`common-adapter.ts` owns: `Location`, `Attachment`, `Note`, `QuestionOption`,
+`ScalarQuestion`, `SelectQuestion`, `Question`, `Answer`
 
-## 6. Protocol Rules (non-negotiable)
+`workflow-adapter.ts` owns: `Task`, `TaskQuestion`, `Workflow`, `WorkflowTask`
 
-Per `domain-archetypes.md` section 5:
+`common-validator.ts` owns: `isAttachment`, `isNote`, `isAnswer`,
+`isQuestionOption`, `validateQuestionCreate`, `validateQuestionUpdate`
 
-**Rule 1** — All `Instantiable` types use `CreateFromInstantiable<T>` and
-`UpdateFromInstantiable<T>`. Never hand-write `Omit`/`Pick`/`Partial`
-for lifecycled types.
+All other files own their named domain area.
 
-**Rule 2** — Composite objects and junction types have no protocol entry.
+## 7. Protocol Exceptions (non-negotiable)
 
-**Rule 3** — Exceptions hand-coded with `Pick` only:
+Per `domain-archetypes.md` section 5.1 Rule 3:
 
 - `JobWorkLogEntryCreate = Pick<JobWorkLogEntry, 'jobId' | 'userId' | 'answer'>`
 - `WorkflowCreate = CreateFromInstantiable<Workflow>` — no `WorkflowUpdate`
-  (read-only master)
 - `JobWorkCreate = CreateFromInstantiable<JobWork>` — no `JobWorkUpdate`
-  (immutable manifest)
 
-`ScalarQuestion`, `SelectQuestion`, and `Question` are `Instantiable` — they
-get `QuestionCreate` and `QuestionUpdate` via `CreateFromInstantiable<Question>`
-and `UpdateFromInstantiable<Question>`. These belong in `common-protocol.ts`.
+## 8. Validator Exceptions (non-negotiable)
 
-## 7. Adapter Rules (non-negotiable)
+Per `domain-archetypes.md` section 6.6:
 
-Per `domain-archetypes.md` section 4:
-
-- Export `to{Abstraction}(dict: Dictionary): Abstraction` and
-  `from{Abstraction}(abstraction: Abstraction): Dictionary` — no other exports
-- Column mapping: camelCase ↔ snake_case
-- Every `Instantiable` field mapped: `createdAt` ↔ `created_at`,
-  `updatedAt` ↔ `updated_at`, `deletedAt` ↔ `deleted_at`
-- Every FK field maps to/from `_id`-suffixed snake_case column
-- Every `Composition*` field mapped with `.map()` — no raw array casts
-- `notValid` guards on required fields precede the single return — no
-  unreachable returns
-- Junction types and composite objects delegate to `common-adapter.ts`
-  helpers
-
-### 7.1 Union-type adapter pattern for `Question`
-
-```typescript
-export const toQuestion = (dict: Dictionary): Question => {
-  const type = dict.type as QuestionType
-  switch (type) {
-    case 'single-select':
-    case 'multi-select':
-      return {
-        id: dict.id as string,
-        type,
-        prompt: dict.prompt as string,
-        helpText: dict.help_text as string | undefined,
-        required: dict.required as boolean | undefined,
-        options: (dict.options as Dictionary[]).map(toQuestionOption),
-        createdAt: dict.created_at as When,
-        updatedAt: dict.updated_at as When,
-        deletedAt: dict.deleted_at as When | undefined
-      } satisfies SelectQuestion
-    case 'text':
-    case 'number':
-    case 'boolean':
-    case 'internal':
-      return {
-        id: dict.id as string,
-        type,
-        prompt: dict.prompt as string,
-        helpText: dict.help_text as string | undefined,
-        required: dict.required as boolean | undefined,
-        createdAt: dict.created_at as When,
-        updatedAt: dict.updated_at as When,
-        deletedAt: dict.deleted_at as When | undefined
-      } satisfies ScalarQuestion
-  }
-}
-```
-
-## 8. Validator Rules (non-negotiable)
-
-Per `domain-archetypes.md` sections 6.1–6.4:
-
-- Export `validate{Abstraction}Create` and `validate{Abstraction}Update`
-  where an Update protocol exists
-- Return `string | null` — error message or null for valid
-- Named private `is{Abstraction}` guard for every object type validated
-- Recursive delegation: `isComposition*(data, is{Child})` for nested types
-- Const-enum membership: import tuple from abstraction file, use `.includes()`
-  — never redeclare locally
-- Update validators: validate `id` first, then only fields `!== undefined`
 - No Update validator for: `Workflow`, `JobWork`, `JobWorkLogEntry`
-
-### 8.1 Union-type validator pattern for `Question`
-
-```typescript
-export const validateQuestionCreate = (input: QuestionCreate): string | null => {
-  if (!isNonEmptyString(input.prompt)) return 'prompt must be a non-empty string'
-  if (!QUESTION_TYPES.includes(input.type as QuestionType)) return 'type must be a valid QuestionType'
-  switch (input.type) {
-    case 'single-select':
-    case 'multi-select':
-      if (!isCompositionPositive(input.options, isQuestionOption)) {
-        return 'options must be a non-empty array of valid QuestionOption values'
-      }
-      return null
-    case 'text':
-    case 'number':
-    case 'boolean':
-    case 'internal':
-      return null
-  }
-}
-```
-
-`QUESTION_TYPES` is imported from `@domain/abstractions/common.ts` — not
-`workflow.ts`.
+- No `validateNote*`, `validateAttachment*`, `validateAnswer*` anywhere
 
 ## 9. Formatting Rules (non-negotiable)
 
@@ -203,20 +112,19 @@ export const validateQuestionCreate = (input: QuestionCreate): string | null => 
 - Single quotes
 - TypeScript strict mode — `deno task check` must pass
 - No `any` — use `unknown` at boundaries
-- File format per `style-guide.md` section 6.1 Spec files
 
 ## 10. Quality Bar
 
-Before finalizing verify:
+Before finalizing, verify:
 
 ### 10.1 Adapters
 
-- `common-adapter.ts` exports `toQuestion`/`fromQuestion` with union switch
-- `toQuestion` uses `satisfies SelectQuestion` / `satisfies ScalarQuestion`
-- `workflow-adapter.ts` has no `toQuestion`/`fromQuestion` — those are in common
+- `common-adapter.ts` exports `toQuestion`/`fromQuestion` with exhaustive `switch`
+- `toQuestion` arms use `satisfies SelectQuestion` / `satisfies ScalarQuestion`
+- `workflow-adapter.ts` has no `toQuestion`/`fromQuestion` — those belong in common
 - `job-adapter.ts` — `toJobWorkflow`/`fromJobWorkflow` has no `sequence` field
 - `workflow-adapter.ts` — `toWorkflow`/`fromWorkflow` has no `tasks` field
-- Every lifecycle field mapped, no raw array casts, `notValid` guards present
+- Every `Instantiable` lifecycle field mapped; no raw array casts; `notValid` guards present
 
 ### 10.2 Protocols
 
@@ -225,14 +133,17 @@ Before finalizing verify:
 - No protocol entries for junction types or composite objects
 - `WorkflowUpdate` does not exist
 - `JobWorkUpdate` does not exist
+- No JSDoc on protocol type exports
 
 ### 10.3 Validators
 
-- `common-validator.ts` exports `validateQuestionCreate` and `validateQuestionUpdate`
+- `common-validator.ts` exports exactly: `isAttachment`, `isNote`, `isAnswer`,
+  `isQuestionOption`, `validateQuestionCreate`, `validateQuestionUpdate`
+- No `isNote`, `isAttachment`, or `isAnswer` declared locally in any other
+  validator file — imported from `common-validator.ts` instead
+- No `validateNote*`, `validateAttachment*`, or `validateAnswer*` anywhere
 - `QUESTION_TYPES` imported from `@domain/abstractions/common.ts`
-- All exports return `string | null`
-- Named guards for all object types validated
-- No local const-enum redeclarations
-- `JobWorkflow` validator validates `jobId` and `basisWorkflowId` on Create —
+- All `validate*` exports return `string | null`
+- `JobWorkflow` validator: validates `jobId` and `basisWorkflowId` on Create —
   no `sequence` validation
 - `deno task check` passes

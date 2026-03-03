@@ -1,4 +1,4 @@
-# swarmAg System — Data Dictionary
+# swarmAg Operations System — Data Dictionary
 
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
 
