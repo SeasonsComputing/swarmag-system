@@ -30,9 +30,9 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | Path                   | Description                                                      |
 | ---------------------- | ---------------------------------------------------------------- |
 | `architecture-core.md` | Core architecture principles and system-wide structure           |
-| `architecture-back.md` | Backend architecture, boundaries, and runtime model             |
+| `architecture-back.md` | Backend architecture, boundaries, and runtime model              |
 | `architecture-ux.md`   | UX architecture and frontend layering                            |
-| `domain.md`            | Domain model concepts, entities, and invariants                 |
+| `domain.md`            | Domain model concepts, entities, and invariants                  |
 | `domain-archetypes.md` | Domain implementation patterns for abstractions and related code |
 | `data-dictionary.md`   | Normalized implementation-ready type and relation reference      |
 | `data-lists.md`        | Controlled vocabularies and enumerated values                    |
@@ -40,20 +40,21 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 #### 1.2.2 Applications (`documentation/applications/`)
 
-| Path                 | Description                                           |
-| -------------------- | ----------------------------------------------------- |
-| `admin-web-app.md`   | Administration app scope and requirements             |
-| `ops-mobile-app.md`  | Operations mobile app scope and field workflows       |
-| `customer-portal.md` | Customer portal scope, visibility, and constraints    |
+| Path                 | Description                                            |
+| -------------------- | ------------------------------------------------------ |
+| `admin-web-app.md`   | Administration app scope and requirements              |
+| `ops-mobile-app.md`  | Operations mobile app scope and field workflows        |
+| `customer-portal.md` | Customer portal scope, visibility, and constraints     |
 | `user-stories.md`    | Cross-application user stories and scenario narratives |
 
 #### 1.2.3 Prompts (`documentation/prompts/`)
 
-| Path                              | Description                                          |
-| --------------------------------- | ---------------------------------------------------- |
+| Path                               | Description                                           |
+| ---------------------------------- | ----------------------------------------------------- |
 | `1-genesis-domain-abstractions.md` | Prompt for generating domain abstraction files        |
 | `2-genesis-domain-archetypes.md`   | Prompt for generating adapters, protocols, validators |
 | `3-genesis-domain-schema.md`       | Prompt for generating schema and migration baseline   |
+
 ### 1.3 Source Layers (`source/`)
 
 | Path      | Description                                                       |
