@@ -226,9 +226,9 @@ Required behavior:
 5. After schema generation completes, remove `source/devops/seed-ids.txt`
 6. Assignment order from the newly generated `seed-ids.txt` must be contiguous:
 
-1. Asset types (9)
-2. Services (12)
-3. Internal questions (14)
+7. Asset types (9)
+8. Services (12)
+9. Internal questions (14)
 
 Do not invent seed IDs and do not reuse IDs outside this sequence.
 

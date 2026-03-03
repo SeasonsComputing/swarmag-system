@@ -1,4 +1,12 @@
-import type { AssociationJunction, CompositionMany, Instantiable } from '@core-std'
+/**
+ * Domain models for workflows and task sequencing.
+ */
+
+import type {
+  AssociationJunction,
+  CompositionMany,
+  Instantiable
+} from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 
 /** Reusable named grouping of questions. */
@@ -8,10 +16,10 @@ export type Task = Instantiable & {
   notes: CompositionMany<Note>
 }
 
-/** Junction linking tasks to question rows with explicit order. */
+/** m:m junction between tasks and questions with explicit ordering. */
 export type TaskQuestion = {
   taskId: AssociationJunction<Task>
-  questionId: AssociationJunction<Instantiable>
+  questionId: AssociationJunction<import('@domain/abstractions/common.ts').Question>
   sequence: number
 }
 
@@ -24,7 +32,7 @@ export type Workflow = Instantiable & {
   notes: CompositionMany<Note>
 }
 
-/** Junction linking workflows to tasks with explicit order. */
+/** m:m junction between workflows and tasks with explicit ordering. */
 export type WorkflowTask = {
   workflowId: AssociationJunction<Workflow>
   taskId: AssociationJunction<Task>

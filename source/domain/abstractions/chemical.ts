@@ -1,3 +1,7 @@
+/**
+ * Domain models for chemicals in the swarmAg system.
+ */
+
 import type { CompositionMany, Instantiable } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
 
@@ -9,17 +13,13 @@ export const CHEMICAL_USAGES = [
   'fungicide',
   'adjuvant'
 ] as const
-
-/** Domain usage classification value. */
 export type ChemicalUsage = (typeof CHEMICAL_USAGES)[number]
 
-/** Label signal word set. */
+/** Label signal word classifications. */
 export const CHEMICAL_SIGNAL_WORDS = ['danger', 'warning', 'caution'] as const
-
-/** Label signal word value. */
 export type ChemicalSignalWord = (typeof CHEMICAL_SIGNAL_WORDS)[number]
 
-/** Label or document pointer for a chemical record. */
+/** Label or document pointer for a chemical. */
 export type ChemicalLabel = {
   url: string
   description?: string

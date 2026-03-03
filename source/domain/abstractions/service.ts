@@ -1,4 +1,12 @@
-import type { AssociationJunction, CompositionMany, Instantiable } from '@core-std'
+/**
+ * Domain models for services in the swarmAg system.
+ */
+
+import type {
+  AssociationJunction,
+  CompositionMany,
+  Instantiable
+} from '@core-std'
 import type { AssetType } from '@domain/abstractions/asset.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 
@@ -7,8 +15,6 @@ export const SERVICE_CATEGORIES = [
   'aerial-drone-services',
   'ground-machinery-services'
 ] as const
-
-/** Service family classification value. */
 export type ServiceCategory = (typeof SERVICE_CATEGORIES)[number]
 
 /** Sellable operational offering. */
@@ -21,7 +27,7 @@ export type Service = Instantiable & {
   notes: CompositionMany<Note>
 }
 
-/** Junction linking services to required asset types. */
+/** m:m junction between services and required asset types. */
 export type ServiceRequiredAssetType = {
   serviceId: AssociationJunction<Service>
   assetTypeId: AssociationJunction<AssetType>

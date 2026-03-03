@@ -1,3 +1,7 @@
+/**
+ * Domain models for jobs and execution lifecycle in the swarmAg system.
+ */
+
 import type {
   AssociationJunction,
   AssociationOne,
@@ -27,8 +31,6 @@ export const JOB_STATUSES = [
   'closed',
   'cancelled'
 ] as const
-
-/** Job lifecycle state value. */
 export type JobStatus = (typeof JOB_STATUSES)[number]
 
 /** Work agreement lifecycle anchor. */
@@ -37,7 +39,7 @@ export type Job = Instantiable & {
   status: JobStatus
 }
 
-/** Pre-planning assessment with one or more scoped locations. */
+/** Pre-planning assessment. */
 export type JobAssessment = Instantiable & {
   jobId: AssociationOne<Job>
   assessorId: AssociationOne<User>
@@ -46,7 +48,7 @@ export type JobAssessment = Instantiable & {
   notes: CompositionMany<Note>
 }
 
-/** Job-owned workflow selection referencing basis and optional modified workflow. */
+/** Job-specific workflow assignment and specialization state. */
 export type JobWorkflow = Instantiable & {
   jobId: AssociationOne<Job>
   basisWorkflowId: AssociationOne<Workflow>
@@ -56,48 +58,44 @@ export type JobWorkflow = Instantiable & {
 /** Job-specific execution plan. */
 export type JobPlan = Instantiable & {
   jobId: AssociationOne<Job>
+  notes: CompositionMany<Note>
   scheduledStart: When
   scheduledEnd?: When
-  notes: CompositionMany<Note>
 }
 
-/** Assignment of a user to a plan role. */
+/** Assignment of user to plan role. */
 export type JobPlanAssignment = Instantiable & {
   planId: AssociationOne<JobPlan>
   userId: AssociationOne<User>
-  role: UserRole
   notes: CompositionMany<Note>
+  role: UserRole
 }
 
-/** Planned chemical quantity unit set. */
-export const PLANNED_CHEMICAL_UNITS = ['gallon', 'liter', 'pound', 'kilogram'] as const
+/** Chemical amount units for plan usage. */
+export const CHEMICAL_AMOUNT_UNITS = ['gallon', 'liter', 'pound', 'kilogram'] as const
+export type ChemicalAmountUnit = (typeof CHEMICAL_AMOUNT_UNITS)[number]
 
-/** Planned chemical quantity unit value. */
-export type PlannedChemicalUnit = (typeof PLANNED_CHEMICAL_UNITS)[number]
-
-/** Planned target-area unit set. */
+/** Target area units for planned application. */
 export const TARGET_AREA_UNITS = ['acre', 'hectare'] as const
-
-/** Planned target-area unit value. */
 export type TargetAreaUnit = (typeof TARGET_AREA_UNITS)[number]
 
-/** Planned chemical usage line item. */
+/** Planned chemical usage. */
 export type JobPlanChemical = Instantiable & {
   planId: AssociationOne<JobPlan>
   chemicalId: AssociationOne<Chemical>
   amount: number
-  unit: PlannedChemicalUnit
+  unit: ChemicalAmountUnit
   targetArea?: number
   targetAreaUnit?: TargetAreaUnit
 }
 
-/** Junction linking plans to assets. */
+/** m:m junction between plans and assets. */
 export type JobPlanAsset = {
   planId: AssociationJunction<JobPlan>
   assetId: AssociationJunction<Asset>
 }
 
-/** Execution record with immutable workflow manifest. */
+/** Execution record and finalized workflow manifest. */
 export type JobWork = Instantiable & {
   jobId: AssociationOne<Job>
   startedById: AssociationOne<User>
@@ -106,7 +104,7 @@ export type JobWork = Instantiable & {
   completedAt?: When
 }
 
-/** Append-only execution event carrying one captured answer. */
+/** Append-only execution event. */
 export type JobWorkLogEntry = Pick<Instantiable, 'id' | 'createdAt'> & {
   jobId: AssociationOne<Job>
   userId: AssociationOne<User>

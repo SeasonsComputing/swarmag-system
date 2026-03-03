@@ -1,3 +1,7 @@
+/**
+ * Common domain abstractions shared across the swarmAg system.
+ */
+
 import type {
   AssociationOne,
   CompositionMany,
@@ -24,12 +28,6 @@ export type Location = {
   description?: string
 }
 
-/** Attachment kind classification. */
-export const ATTACHMENT_KINDS = ['photo', 'video', 'map', 'document'] as const
-
-/** Attachment kind value. */
-export type AttachmentKind = (typeof ATTACHMENT_KINDS)[number]
-
 /** Uploaded artifact metadata. */
 export type Attachment = {
   filename: string
@@ -40,21 +38,23 @@ export type Attachment = {
   uploadedById: Id
 }
 
-/** Note visibility scope. */
-export const NOTE_VISIBILITIES = ['internal', 'shared'] as const
-
-/** Note visibility value. */
-export type NoteVisibility = (typeof NOTE_VISIBILITIES)[number]
+/** Attachment classifications. */
+export const ATTACHMENT_KINDS = ['photo', 'video', 'map', 'document'] as const
+export type AttachmentKind = (typeof ATTACHMENT_KINDS)[number]
 
 /** Freeform note with optional visibility and taxonomy. */
 export type Note = {
+  authorId: AssociationOne<User>
+  attachments: CompositionMany<Attachment>
   createdAt: When
-  authorId?: Id
   content: string
   visibility?: NoteVisibility
   tags: CompositionMany<string>
-  attachments: CompositionMany<Attachment>
 }
+
+/** Note visibility modes. */
+export const NOTE_VISIBILITIES = ['internal', 'shared'] as const
+export type NoteVisibility = (typeof NOTE_VISIBILITIES)[number]
 
 /** Supported question input modes. */
 export const QUESTION_TYPES = [
@@ -65,8 +65,6 @@ export const QUESTION_TYPES = [
   'multi-select',
   'internal'
 ] as const
-
-/** Supported question input mode value. */
 export type QuestionType = (typeof QUESTION_TYPES)[number]
 
 /** Selectable option metadata for select questions. */
@@ -84,7 +82,7 @@ export type ScalarQuestion = Instantiable & {
   required?: boolean
 }
 
-/** Select input question with non-empty options. */
+/** Select input question; options required and non-empty. */
 export type SelectQuestion = Instantiable & {
   type: 'single-select' | 'multi-select'
   prompt: string
@@ -93,17 +91,17 @@ export type SelectQuestion = Instantiable & {
   options: CompositionPositive<QuestionOption>
 }
 
-/** Discriminated union boundary type for reusable prompts. */
+/** Reusable prompt boundary type. */
 export type Question = ScalarQuestion | SelectQuestion
 
-/** Permitted answer payload values. */
+/** Permitted answer value payloads. */
 export type AnswerValue = string | number | boolean | string[]
 
-/** Captured response to a question with crew annotations. */
+/** Captured response to a question. */
 export type Answer = {
   questionId: AssociationOne<Question>
   capturedById: AssociationOne<User>
+  notes: CompositionMany<Note>
   value: AnswerValue
   capturedAt: When
-  notes: CompositionMany<Note>
 }

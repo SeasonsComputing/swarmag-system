@@ -70,7 +70,7 @@ Each symbol class has one casing convention. All words — regardless of their n
 | Types, type aliases, interfaces, classes, const-as-class | PascalCase      | `JobAssessment`, `ApiConfig`, `HttpCodes` |
 | Functions, methods, arrow functions                      | camelCase       | `fromJobAssessment`, `apiClient`          |
 | Global immutable constants                               | SCREAMING_SNAKE | `USER_ROLES`, `ASSET_STATUSES`            |
-| SQL tables and columns                                   | snake_case      | `created_at`, 'deleted_at`
+| SQL tables and columns                                   | snake_case      | `created_at`, 'deleted_at`                |
 
 ### 4.3 The acronym corollary
 
@@ -268,7 +268,7 @@ Files with clear categories of declarations and functions divide the code body i
 // ────────────────────────────────────────────────────────────────────────────
 // {SECTION LABEL}
 // ────────────────────────────────────────────────────────────────────────────
-````
+```
 
 #### 6.6.1 Encapsulation & Information hiding
 
@@ -614,10 +614,10 @@ Scope: describes who or what is permitted — `active`, `own`, `ops`, `admin`
 
 ### 12.9 JSONB Columns
 
-JSONB is permitted only for subordinate composition: `Composition*<T>` relation attributes. 
+JSONB is permitted only for subordinate composition: `Composition*<T>` relation attributes.
 Composition objects are always stored as a JSONB column containing an array of T irrespective of cardinality.
 This simplifies down stream code, it's never null and cardinality is a simple check of the array length.
-Column name matches the domain field name in `snake_case`. 
+Column name matches the domain field name in `snake_case`.
 Default to empty array `'[]'::jsonb` for `CompositionMany` and `CompositionPositive` columns:
 
 ```sql
@@ -627,7 +627,7 @@ tasks  JSONB NOT NULL DEFAULT '[]'::jsonb,
 
 `CompositionOne` must have a value so omit the default and treat as required.
 
-There are three exceptions to the JSONB column rule; employing any of these exceptions requires authorization of the Chief Architect 
+There are three exceptions to the JSONB column rule; employing any of these exceptions requires authorization of the Chief Architect
 
 1. End-user specialization (custom fields)
 2. Third-party metadata (opaque payloads)

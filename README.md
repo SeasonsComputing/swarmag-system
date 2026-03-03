@@ -23,27 +23,37 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | --------------- | ------------------------------------------------------ |
 | `applications/` | Application-level requirements and UX/product specs    |
 | `foundation/`   | Core architecture, domain, style, and data definitions |
-| `prompts/`      | Only prompts that may be re-run. One off's not saved.  |
+| `prompts/`      | Re-runnable build prompts for structured generation    |
 
 #### 1.2.1 Foundation (`documentation/foundation/`)
 
-| Path                   | Description                                            |
-| ---------------------- | ------------------------------------------------------ |
-| `architecture-core.md` | Core architecture principles and system-wide structure |
-| `architecture-back.md` | Backend architecture, boundaries, and runtime model    |
-| `architecture-ux.md`   | UX architecture and frontend layering                  |
-| `domain.md`            | Domain model concepts, entities, and invariants        |
-| `data-lists.md`        | Controlled vocabularies and enumerated values          |
-| `style-guide.md`       | Style and authoring conventions                        |
+| Path                   | Description                                                      |
+| ---------------------- | ---------------------------------------------------------------- |
+| `architecture-core.md` | Core architecture principles and system-wide structure           |
+| `architecture-back.md` | Backend architecture, boundaries, and runtime model             |
+| `architecture-ux.md`   | UX architecture and frontend layering                            |
+| `domain.md`            | Domain model concepts, entities, and invariants                 |
+| `domain-archetypes.md` | Domain implementation patterns for abstractions and related code |
+| `data-dictionary.md`   | Normalized implementation-ready type and relation reference      |
+| `data-lists.md`        | Controlled vocabularies and enumerated values                    |
+| `style-guide.md`       | Style and authoring conventions                                  |
 
 #### 1.2.2 Applications (`documentation/applications/`)
 
-| Path                 | Description                                        |
-| -------------------- | -------------------------------------------------- |
-| `admin-web-app.md`   | Administration app scope and requirements          |
-| `ops-mobile-app.md`  | Operations mobile app scope and field workflows    |
-| `customer-portal.md` | Customer portal scope, visibility, and constraints |
+| Path                 | Description                                           |
+| -------------------- | ----------------------------------------------------- |
+| `admin-web-app.md`   | Administration app scope and requirements             |
+| `ops-mobile-app.md`  | Operations mobile app scope and field workflows       |
+| `customer-portal.md` | Customer portal scope, visibility, and constraints    |
+| `user-stories.md`    | Cross-application user stories and scenario narratives |
 
+#### 1.2.3 Prompts (`documentation/prompts/`)
+
+| Path                              | Description                                          |
+| --------------------------------- | ---------------------------------------------------- |
+| `1-genesis-domain-abstractions.md` | Prompt for generating domain abstraction files        |
+| `2-genesis-domain-archetypes.md`   | Prompt for generating adapters, protocols, validators |
+| `3-genesis-domain-schema.md`       | Prompt for generating schema and migration baseline   |
 ### 1.3 Source Layers (`source/`)
 
 | Path      | Description                                                       |
@@ -174,7 +184,7 @@ All software construction activity operates in conformance with the governing pr
 
 The constitution is designed to make most efficient and cost-effective use of AI reasoning and coding facilities across AI providers following the 3-role ["Model of Development w/ AI Coding"](https://seasonscomputing.com/tvk-mod-3rm.md).
 
-The human participates as the Chief Architect with AI Architect and AI Coding Engine roles provided by AI reasoning and AI coding platforms respectively. 
+The human participates as the Chief Architect with AI Architect and AI Coding Engine roles provided by AI reasoning and AI coding platforms respectively.
 
 ### 5.1 Context
 
