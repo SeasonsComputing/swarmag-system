@@ -1,4 +1,4 @@
-# swarmAg System — Architecture Core
+# swarmAg Operations System — Architecture Core
 
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
 
