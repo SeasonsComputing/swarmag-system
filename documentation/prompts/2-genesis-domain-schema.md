@@ -218,17 +218,15 @@ This is a genesis run. Treat seed IDs as fully consumed by this run.
 
 Required behavior:
 
-1. If `source/devops/seed-ids.txt` exists, rename it before generating anything
-   (`seed-ids.txt.<timestamp>`).
+1. If `source/devops/seed-ids.txt` exists, remove it
 2. Create a brand-new `source/devops/seed-ids.txt` for this run.
 3. Fill that new file with exactly the IDs needed by this schema seed section.
 4. Consume IDs in contiguous file order while writing schema seed inserts.
 5. After schema generation completes, remove `source/devops/seed-ids.txt`
 6. Assignment order from the newly generated `seed-ids.txt` must be contiguous:
-
-7. Asset types (9)
-8. Services (12)
-9. Internal questions (14)
+   - Asset types (9)
+   - Services (12)
+   - Internal questions (14)
 
 Do not invent seed IDs and do not reuse IDs outside this sequence.
 

@@ -104,9 +104,9 @@ Documentation intensity follows implementation complexity. The code speaks first
 
 ### 6.1 Spec files
 
-Type declarations, enums, pure domain shapes. The code is the documentation. Inline `/** */` comments only where a name alone is insufficient. No box, no dash-rules, no sections.
+The code is the documentation. Inline `/** */` comments only where a name alone is insufficient. No box, no dash-rules, no sections.
 
-`source/domain/abstractions/asset.ts`:
+Example:
 
 ```typescript
 /**
@@ -141,9 +141,9 @@ export type Asset = Instantiable & {
 
 ### 6.2 Functional files
 
-Bootstraps, adapters, validators, contracts, makers — files where behavior matters and the public surface benefits from a documented contract. A box header replaces the top JSDoc. JSDoc on exported functions where params or return values need prose. No section dividers needed — no significant private machinery to separate.
+Files where behavior matters and the public surface benefits from a documented contract. A box header replaces the top JSDoc. JSDoc on exported functions where params or return values need prose. No section dividers needed — no significant private machinery to separate.
 
-`source/core/cfg/config.ts`:
+Example:
 
 ```typescript
 /*
@@ -169,6 +169,8 @@ Config.fail(msg)                       Throw never; use for invariant violations
 ### 6.3 Non-trivial functional files
 
 Complex implementations with a well-defined public surface and significant private machinery. Full decoration — box header, typed export signatures grouped by category, internals summary, runnable example.
+
+Example:
 
 ```typescript
 /*
@@ -332,15 +334,11 @@ Rules:
 - When narrowing unknown objects in guards, use `Dictionary` casts (`const x = v as Dictionary`) instead of `Record<string, unknown>`.
 - Use `StringDictionary` for key/value string/string maps.
 
-## 8. Domain Layer (`source/domain/`)
-
-See `domain-archetypes.md` for all domain layer conventions — abstractions, adapters, protocols, validators, and schema.
-
-## 9. Configuration Pattern
+## 8. Configuration Pattern
 
 The system uses a singleton `Config` with injected runtime providers. Defined in `@core/cfg/config.ts`; initialized once per deployment context.
 
-### 9.1 Config initialization
+### 8.1 Config initialization
 
 ```typescript
 Config.init(provider, keys, aliases?)
@@ -350,7 +348,7 @@ Config.init(provider, keys, aliases?)
 - `keys` — required environment variable names; fails fast at bootstrap if any are missing
 - `aliases` — optional map of logical name to environment key; allows consuming code to use stable names regardless of platform-specific key prefixes
 
-### 9.2 Why aliases matter
+### 8.2 Why aliases matter
 
 Vite requires client-side environment variables to be prefixed `VITE_`. Without aliases, every call site must know the prefix. With aliases, the bootstrap declares the mapping once and all consuming code uses the clean logical name:
 
@@ -376,14 +374,14 @@ export { Config }
 
 Consuming code calls `Config.get('SUPABASE_EDGE_URL')` — no `VITE_` prefix, no platform knowledge.
 
-### 9.3 Rules
+### 8.3 Rules
 
 - `Config.init()` — call once at bootstrap; throws if called twice.
 - `Config.get(name)` — resolves alias if present, then returns value; throws if not initialized, key not registered, or value missing. Never returns undefined.
 - `Config.fail(msg)` — throws `never`; use for invariant violations.
 - Never access `Deno.env` or `import.meta.env` directly. Always go through `Config.get()`.
 
-## 10. Error Handling
+## 9. Error Handling
 
 - Throw `Error` with actionable messages: `'JobAssessment dictionary missing required field: jobId'`.
 - Never swallow errors silently.
@@ -391,7 +389,121 @@ Consuming code calls `Config.get('SUPABASE_EDGE_URL')` — no `VITE_` prefix, no
 - Never expose stack traces or internal state in HTTP responses.
 - Use `toInternalError()` for unexpected server failures in edge functions.
 
-## 11. Testing Conventions
+## 10. Schema
+
+General schema authoring conventions for canonical DDL (`source/domain/schema/schema.sql`).
+
+### 10.1 Identifiers
+
+- All table names, column names, constraint names, index names, and policy names use `snake_case`.
+- Table names are plural nouns.
+- No quoted identifiers.
+
+### 10.2 Column ordering
+
+Columns within a table follow this order:
+
+1. `id` (primary key, always first)
+2. Foreign key columns (`*_id`)
+3. Domain columns
+4. Lifecycle columns (`created_at`, `updated_at`, `deleted_at`)
+
+### 10.3 Data types
+
+| Domain type       | PostgreSQL type | Notes                                     |
+| ----------------- | --------------- | ----------------------------------------- |
+| `Id`              | `UUID`          | UUID v7; application-supplied, no default |
+| `When`            | `TIMESTAMPTZ`   | Always timezone-aware; never `TIMESTAMP`  |
+| `string`          | `TEXT`          | Never `VARCHAR(n)`                        |
+| `number` (int)    | `INTEGER`       |                                           |
+| `number` (float)  | `NUMERIC`       |                                           |
+| `boolean`         | `BOOLEAN`       |                                           |
+| `Composition*<T>` | `JSONB`         | Embedded subordinate; never normalized    |
+| const-enum values | `TEXT`          | Constrained via named `CHECK`             |
+
+### 10.4 NOT NULL discipline
+
+- Required domain columns are `NOT NULL`.
+- Optional domain fields are nullable.
+- `updated_at` is `NOT NULL DEFAULT now()`.
+- `deleted_at` is nullable.
+- Junction foreign keys are `NOT NULL`.
+
+### 10.5 CHECK constraints for const-enum columns
+
+- Every const-enum-backed column has a named `CHECK` constraint.
+- Constraint naming: `{table}_{column}_check`.
+
+### 10.6 Foreign key cascade policies
+
+| Relationship type             | Policy               | Rationale                                         |
+| ----------------------------- | -------------------- | ------------------------------------------------- |
+| Ownership (parent owns child) | `ON DELETE CASCADE`  | Child has no meaning without parent               |
+| Cross-entity reference        | `ON DELETE RESTRICT` | Prevent silent data loss across entity boundaries |
+
+### 10.7 Indexes
+
+- Primary keys are indexed automatically.
+- Add an explicit index on every foreign key column.
+- Add explicit indexes for columns referenced by RLS `USING` clauses.
+- Index naming: `{table}_{column}_idx`.
+
+### 10.8 Row Level Security
+
+- Enable RLS on every table.
+- Define policies immediately after each `CREATE TABLE` block.
+- Policy naming: `"{table}_{operation}_{scope}"` (lowercase, double-quoted).
+- Operation tokens: `select`, `insert`, `update`, `delete`.
+
+### 10.9 JSONB columns
+
+- JSONB is only for `Composition*<T>` subordinate compositions.
+- Composition columns store arrays regardless of cardinality.
+- Use `DEFAULT '[]'::jsonb` for `CompositionMany` and `CompositionPositive`.
+- `CompositionOne` is required and has no empty-array default.
+
+### 10.10 Soft delete
+
+- Lifecycled tables (`Instantiable`) use `deleted_at TIMESTAMPTZ`.
+- Active rows are `deleted_at IS NULL`.
+- RLS `SELECT` policies must filter soft-deleted rows.
+
+### 10.11 SQL comment and spacing conventions
+
+Use this fixed-width section divider:
+
+```sql
+-- ─────────────────────────────────────────────────────────────────────────────
+-- section_name
+-- ─────────────────────────────────────────────────────────────────────────────
+```
+
+Spacing:
+
+- One blank line between `CREATE TABLE` and `ALTER TABLE ... ENABLE ROW LEVEL SECURITY`.
+- One blank line between `ENABLE ROW LEVEL SECURITY` and first `CREATE POLICY`.
+- One blank line between consecutive `CREATE POLICY` blocks.
+- One blank line between consecutive `CREATE INDEX` blocks.
+
+## 11. SQL DDL Conventions
+
+SQL DDL ownership is split by artifact type:
+
+- **Canonical schema DDL** (`<domain_root>/schema/schema.sql`) defines the full current-state schema.
+- **Migration DDL** (`<backend_root>/migrations/`) defines forward-only deltas from one state to the next.
+
+### 11.1 Rules
+
+- Keep canonical schema and migrations aligned; either artifact may be used to reconstruct expected runtime state.
+- Canonical schema is idempotent and reproducible.
+- Migrations are append-only and never rewritten after application in shared environments.
+- A migration changes only what is required for that versioned step.
+- Destructive changes must be explicit and reviewed (drop/rename/type narrowing/data rewrite).
+- Data backfills in migrations must be deterministic and safe to rerun when possible.
+- Constraint, index, and policy naming follows section 10 naming conventions.
+- If canonical schema and migrations conflict, treat it as a release blocker until reconciled.
+
+## 12. Testing Conventions
 
 ```text
 source/tests/
@@ -407,10 +519,3 @@ source/tests/
 - `fixtures-test.ts` — validates fixture integrity: Id format, required fields, association linkage. If a fixture fails here the domain types have drifted.
 - Tests exercise the public contract of each layer, not implementation details.
 - Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.
-
-## 12. SQL DDL Conventions
-
-SQL DDL conventions are bifurcated by ownership:
-
-- **Schema DDL** (`source/domain/schema/schema.sql`) — See `domain-archetypes.md` section 7. The schema is a domain artifact derived from the domain model.
-- **Migration conventions** (`source/back/migrations/`) — See `architecture-back.md` section 4. Migrations are forward-only backend deltas.

@@ -5,13 +5,63 @@
 ## 1. Overview
 
 This document is the normalized reference for domain abstraction types, relations, and state attributes.
-It is derived from section 4 (Data Dictionary) in `documentation/foundation/domain.md` and presents the same model in a table-first, implementation-ready format for adapters, validators, protocols, and schema alignment.
 
-## 2. Core Standard
+It is derived from `documentation/foundation/domain.md` and presents the same model in a table-first, implementation-ready format for abstractions, adapters, validators, protocols, and schema alignment.
+
+## 2. Topic Namespace
+
+| Topic     | Source                             | Contents                 |
+| --------- | ---------------------------------- | ------------------------ |
+| Common    | `@domain/abstractions/common.ts`   | Location                 |
+|           |                                    | Attachment               |
+|           |                                    | Note                     |
+|           |                                    | QuestionType             |
+|           |                                    | SelectableOption         |
+|           |                                    | ScalarQuestion           |
+|           |                                    | SelectQuestion           |
+|           |                                    | Question                 |
+|           |                                    | Answer                   |
+|           |                                    |                          |
+| Assets    | `@domain/abstractions/asset.ts`    | AssetType                |
+|           |                                    | AssetStatus              |
+|           |                                    | Asset                    |
+|           |                                    |                          |
+| Chemicals | `@domain/abstractions/chemical.ts` | ChemicalUsage            |
+|           |                                    | ChemicalLabel            |
+|           |                                    | Chemical                 |
+|           |                                    |                          |
+| Customers | `@domain/abstractions/customer.ts` | Contact                  |
+|           |                                    | CustomerSite             |
+|           |                                    | Customer                 |
+|           |                                    |                          |
+| Services  | `@domain/abstractions/service.ts`  | ServiceCategory          |
+|           |                                    | Service                  |
+|           |                                    | ServiceRequiredAssetType |
+|           |                                    |                          |
+| Users     | `@domain/abstractions/user.ts`     | UserRole                 |
+|           |                                    | User                     |
+|           |                                    |                          |
+| Workflows | `@domain/abstractions/workflow.ts` | Task                     |
+|           |                                    | TaskQuestion             |
+|           |                                    | Workflow                 |
+|           |                                    | WorkflowTask             |
+|           |                                    |                          |
+| Jobs      | `@domain/abstractions/job.ts`      | JobStatus                |
+|           |                                    | Job                      |
+|           |                                    | JobAssessment            |
+|           |                                    | JobWorkflow              |
+|           |                                    | JobPlan                  |
+|           |                                    | JobPlanAssignment        |
+|           |                                    | JobPlanChemical          |
+|           |                                    | JobPlanAsset             |
+|           |                                    | JobWork                  |
+|           |                                    | JobWorkLogEntry          |
+
+## 3. Core Standard
 
 Source: `@core-std`
 
-### 2.1 Abstract Data Types
+### 3.1 Abstract Data Types
 
 | **Name**   | **Type**                | **Purpose**                        |
 | ---------- | ----------------------- | ---------------------------------- |
@@ -19,7 +69,7 @@ Source: `@core-std`
 | When       | ISO 8601 UTC string     | Timestamp type                     |
 | Dictionary | JSON-like key/value map | Flexible structured data container |
 
-### 2.2 Instantiable
+### 3.2 Instantiable
 
 Type: **type**
 
@@ -34,11 +84,11 @@ Attributes: **State**
 | `updatedAt`   | When     |
 | `deletedAt?`  | When     |
 
-## 3. Common
+## 4. Common
 
 Source: `@domain/abstractions/common.ts`
 
-### 3.1 Location
+### 4.1 Location
 
 Type: **object**
 
@@ -61,7 +111,7 @@ Attributes: **State**
 | `accuracyMeters?` | number   |
 | `description?`    | string   |
 
-### 3.2 Attachment
+### 4.2 Attachment
 
 Type: **object**
 
@@ -78,7 +128,7 @@ Attributes: **State**
 | `uploadedAt`   | When                              |
 | `uploadedById` | Id                                |
 
-### 3.3 Note
+### 4.3 Note
 
 Type: **object**
 
@@ -88,7 +138,6 @@ Attributes: **Relations**
 
 | **Attribute** | **Relation**    | **Abstraction** |
 | ------------- | --------------- | --------------- |
-| `authorId`    | AssociationOne  | User            |
 | `attachments` | CompositionMany | Attachment      |
 
 Attributes: **State**
@@ -100,7 +149,7 @@ Attributes: **State**
 | `visibility?` | internal \| shared      |
 | `tags`        | CompositionMany<string> |
 
-### 3.4 QuestionType
+### 4.4 QuestionType
 
 Type: **const-enum**
 
@@ -115,7 +164,7 @@ Purpose: **Supported question input modes; internal is reserved for system-gener
 | `multi-select`  |
 | `internal`      |
 
-### 3.5 SelectableOption
+### 4.5 SelectableOption
 
 Type: **object**
 
@@ -129,11 +178,11 @@ Attributes: **State**
 | `label?`        | string   |
 | `requiresNote?` | boolean  |
 
-### 3.6 ScalarQuestion
+### 4.6 ScalarQuestion
 
 Type: **union-type**
 
-Purpose: **Scalar input question; independently lifecycled; type field discriminates from SelectQuestion**
+Purpose: **Scalar input question; Instantiable life-cycled; type field discriminates from SelectQuestion**
 
 Attributes: **State**
 
@@ -144,13 +193,13 @@ Attributes: **State**
 | `helpText?`   | string                                |
 | `required?`   | boolean                               |
 
-### 3.7 SelectQuestion
+### 4.7 SelectQuestion
 
 Type: **union-type**
 
 Type junction: `ScalarQuestion`
 
-Purpose: **Select input question; independently lifecycled; carries non-empty options list; type field discriminates from ScalarQuestion**
+Purpose: **Select input question; Instantiable life-cycled; carries non-empty options list; type field discriminates from ScalarQuestion**
 
 Attributes: **Relations**
 
@@ -158,7 +207,7 @@ Attributes: **Relations**
 | ------------- | ------------------- | ---------------- |
 | `options`     | CompositionPositive | SelectableOption |
 
-### 3.8 Question
+### 4.8 Question
 
 Type: **union-type**
 
@@ -166,22 +215,9 @@ Constituents: `ScalarQuestion | SelectQuestion`
 
 Discriminator: `type`
 
-Purpose: **General purpose reusable prompt; independently lifecycled and shared across tasks; internal questions are seed records referenced directly by log entries**
+Purpose: **General purpose reusable prompt; Instantiable life-cycled and shared across tasks; internal questions are seed records referenced directly by log entries**
 
-### 3.9 AnswerValue
-
-Type: **union**
-
-Purpose: **Permitted answer value payloads**
-
-| **Type**   |
-| ---------- |
-| `string`   |
-| `number`   |
-| `boolean`  |
-| `string[]` |
-
-### 3.10 Answer
+### 4.9 Answer
 
 Type: **object**
 
@@ -197,16 +233,16 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute** | **Type**    |
-| ------------- | ----------- |
-| `value`       | AnswerValue |
-| `capturedAt`  | When        |
+| **Attribute** | **Type**                                |
+| ------------- | --------------------------------------- |
+| `value`       | string \| number \| boolean \| string[] |
+| `capturedAt`  | When                                    |
 
-## 4. Assets
+## 5. Assets
 
 Source: `@domain/abstractions/asset.ts`
 
-### 4.1 AssetType
+### 5.1 AssetType
 
 Type: **Instantiable**
 
@@ -219,7 +255,7 @@ Attributes: **State**
 | `label`       | string   |
 | `active`      | boolean  |
 
-### 4.2 AssetStatus
+### 5.2 AssetStatus
 
 Type: **const-enum**
 
@@ -232,7 +268,7 @@ Purpose: **Lifecycle/availability state**
 | `retired`     |
 | `reserved`    |
 
-### 4.3 Asset
+### 5.3 Asset
 
 Type: **Instantiable**
 
@@ -254,11 +290,11 @@ Attributes: **State**
 | `serialNumber?` | string      |
 | `status`        | AssetStatus |
 
-## 5. Chemicals
+## 6. Chemicals
 
 Source: `@domain/abstractions/chemical.ts`
 
-### 5.1 ChemicalUsage
+### 6.1 ChemicalUsage
 
 Type: **const-enum**
 
@@ -272,7 +308,7 @@ Purpose: **Domain usage classification**
 | `fungicide`  |
 | `adjuvant`   |
 
-### 5.2 ChemicalLabel
+### 6.2 ChemicalLabel
 
 Type: **object**
 
@@ -285,7 +321,7 @@ Attributes: **State**
 | `url`          | string   |
 | `description?` | string   |
 
-### 5.3 Chemical
+### 6.3 Chemical
 
 Type: **Instantiable**
 
@@ -311,11 +347,11 @@ Attributes: **State**
 | `storageLocation?`      | string                       |
 | `sdsUrl?`               | string                       |
 
-## 6. Customers
+## 7. Customers
 
 Source: `@domain/abstractions/customer.ts`
 
-### 6.1 Contact
+### 7.1 Contact
 
 Type: **object**
 
@@ -337,7 +373,7 @@ Attributes: **State**
 | `isPrimary`         | boolean                |
 | `preferredChannel?` | email \| text \| phone |
 
-### 6.2 CustomerSite
+### 7.2 CustomerSite
 
 Type: **object**
 
@@ -358,7 +394,7 @@ Attributes: **State**
 | `label`       | string   |
 | `acreage?`    | number   |
 
-### 6.3 Customer
+### 7.3 Customer
 
 Type: **Instantiable**
 
@@ -386,11 +422,11 @@ Attributes: **State**
 | `postalCode`  | string                         |
 | `country`     | string                         |
 
-## 7. Services
+## 8. Services
 
 Source: `@domain/abstractions/service.ts`
 
-### 7.1 ServiceCategory
+### 8.1 ServiceCategory
 
 Type: **const-enum**
 
@@ -401,7 +437,7 @@ Purpose: **Service family classification**
 | `aerial-drone-services`     |
 | `ground-machinery-services` |
 
-### 7.2 Service
+### 8.2 Service
 
 Type: **Instantiable**
 
@@ -423,7 +459,7 @@ Attributes: **State**
 | `category`               | ServiceCategory         |
 | `tagsWorkflowCandidates` | CompositionMany<string> |
 
-### 7.3 ServiceRequiredAssetType
+### 8.3 ServiceRequiredAssetType
 
 Type: **Junction**
 
@@ -436,11 +472,11 @@ Attributes: **Relations**
 | `serviceId`   | AssociationJunction | Service         |
 | `assetTypeId` | AssociationJunction | AssetType       |
 
-## 8. Users
+## 9. Users
 
 Source: `@domain/abstractions/user.ts`
 
-### 8.1 UserRole
+### 9.1 UserRole
 
 Type: **const-enum**
 
@@ -452,7 +488,7 @@ Purpose: **Canonical role set**
 | `sales`         |
 | `operations`    |
 
-### 8.2 User
+### 9.2 User
 
 Type: **Instantiable**
 
@@ -474,15 +510,15 @@ Attributes: **State**
 | `avatarUrl?`   | string             |
 | `status?`      | active \| inactive |
 
-## 9. Workflows
+## 10. Workflows
 
 Source: `@domain/abstractions/workflow.ts`
 
-### 9.1 Task
+### 10.1 Task
 
 Type: **Instantiable**
 
-Purpose: **Reusable named grouping of questions; independently lifecycled and shared across workflows; question sequence defined by TaskQuestion junction**
+Purpose: **Reusable named grouping of questions; Instantiable life-cycled and shared across workflows; question sequence defined by TaskQuestion junction**
 
 Attributes: **Relations**
 
@@ -497,7 +533,7 @@ Attributes: **State**
 | `title`        | string   |
 | `description?` | string   |
 
-### 9.2 TaskQuestion
+### 10.2 TaskQuestion
 
 Type: **Junction**
 
@@ -516,7 +552,7 @@ Attributes: **State**
 | ------------- | -------- |
 | `sequence`    | number   |
 
-### 9.3 Workflow
+### 10.3 Workflow
 
 Type: **Instantiable**
 
@@ -537,7 +573,7 @@ Attributes: **State**
 | `version`      | number                  |
 | `tags`         | CompositionMany<string> |
 
-### 9.4 WorkflowTask
+### 10.4 WorkflowTask
 
 Type: **Junction**
 
@@ -556,11 +592,11 @@ Attributes: **State**
 | ------------- | -------- |
 | `sequence`    | number   |
 
-## 10. Jobs
+## 11. Jobs
 
 Source: `@domain/abstractions/job.ts`
 
-### 10.1 JobStatus
+### 11.1 JobStatus
 
 Type: **const-enum**
 
@@ -577,7 +613,7 @@ Purpose: **Job lifecycle state**
 | `closed`     |
 | `cancelled`  |
 
-### 10.2 Job
+### 11.2 Job
 
 Type: **Instantiable**
 
@@ -595,7 +631,7 @@ Attributes: **State**
 | ------------- | --------- |
 | `status`      | JobStatus |
 
-### 10.3 JobAssessment
+### 11.3 JobAssessment
 
 Type: **Instantiable**
 
@@ -611,7 +647,7 @@ Attributes: **Relations**
 | `risks`       | CompositionMany     | Note            |
 | `notes`       | CompositionMany     | Note            |
 
-### 10.4 JobWorkflow
+### 11.4 JobWorkflow
 
 Type: **Instantiable**
 
@@ -625,7 +661,7 @@ Attributes: **Relations**
 | `basisWorkflowId`    | AssociationOne      | Workflow        |
 | `modifiedWorkflowId` | AssociationOptional | Workflow        |
 
-### 10.5 JobPlan
+### 11.5 JobPlan
 
 Type: **Instantiable**
 
@@ -645,7 +681,7 @@ Attributes: **State**
 | `scheduledStart` | When     |
 | `scheduledEnd?`  | When     |
 
-### 10.6 JobPlanAssignment
+### 11.6 JobPlanAssignment
 
 Type: **Instantiable**
 
@@ -665,7 +701,7 @@ Attributes: **State**
 | ------------- | -------- |
 | `role`        | UserRole |
 
-### 10.7 JobPlanChemical
+### 11.7 JobPlanChemical
 
 Type: **Instantiable**
 
@@ -687,7 +723,7 @@ Attributes: **State**
 | `targetArea?`     | number                               |
 | `targetAreaUnit?` | acre \| hectare                      |
 
-### 10.8 JobPlanAsset
+### 11.8 JobPlanAsset
 
 Type: **Junction**
 
@@ -700,7 +736,7 @@ Attributes: **Relations**
 | `planId`      | AssociationJunction | JobPlan         |
 | `assetId`     | AssociationJunction | Asset           |
 
-### 10.9 JobWork
+### 11.9 JobWork
 
 Type: **Instantiable**
 
@@ -721,11 +757,11 @@ Attributes: **State**
 | `startedAt`    | When                    |
 | `completedAt?` | When                    |
 
-### 10.10 JobWorkLogEntry
+### 11.10 JobWorkLogEntry
 
 Type: **object**
 
-Purpose: **Append-only execution event; answer.questionId references an independently lifecycled Question row**
+Purpose: **Append-only execution event; answer.questionId references an Instantiable life-cycled Question row**
 
 Attributes: **Relations**
 
