@@ -138,6 +138,7 @@ Attributes: **Relations**
 
 | **Attribute** | **Relation**    | **Abstraction** |
 | ------------- | --------------- | --------------- |
+| `authorId`    | AssociationOne  | User            |
 | `attachments` | CompositionMany | Attachment      |
 
 Attributes: **State**
