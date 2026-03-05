@@ -1,4 +1,4 @@
-# 1-genesis-domain-archetypes
+# swarmAg Operations System — Genesis Domain Archetypes Prompt
 
 You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no
 architectural authority. Implement exactly what is specified. Do not invent
@@ -31,7 +31,7 @@ Follow this execution order, and pause for approval after each archetype before 
 
 ## 3. Implementation Rules
 
-All implementation rules are defined in `domain-archetypes.md`. Apply them in
+All implementation rules are defined in `domain-archetypes.md` and `style-guide.md`. Apply them in
 full. The table below is cross-reference only.
 
 | Concern                   | Spec reference                     |
