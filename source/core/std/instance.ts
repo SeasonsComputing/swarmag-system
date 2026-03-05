@@ -14,6 +14,9 @@ export type Instantiable = {
   deletedAt?: When
 }
 
+/** An Instance specialized to only allow creation. No update or delete. */
+export type InstantiableOnly = Pick<Instantiable, 'id' | 'createdAt'>
+
 /** Create shape for an Instantiable by excluding lifecycle-managed fields. */
 export type CreateFromInstantiable<T extends Instantiable> = Omit<T, keyof Instantiable>
 
