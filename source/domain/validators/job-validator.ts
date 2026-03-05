@@ -1,6 +1,60 @@
-/**
- * Job protocol validator.
- */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Job protocol validator                                                     ║
+║ Boundary validation for job protocol payloads.                             ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Validates create and update protocol payloads for job topic abstractions.
+
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+validateJobCreate(input)
+  Validate JobCreate payloads.
+
+validateJobUpdate(input)
+  Validate JobUpdate payloads.
+
+validateJobAssessmentCreate(input)
+  Validate JobAssessmentCreate payloads.
+
+validateJobAssessmentUpdate(input)
+  Validate JobAssessmentUpdate payloads.
+
+validateJobWorkflowCreate(input)
+  Validate JobWorkflowCreate payloads.
+
+validateJobWorkflowUpdate(input)
+  Validate JobWorkflowUpdate payloads.
+
+validateJobPlanCreate(input)
+  Validate JobPlanCreate payloads.
+
+validateJobPlanUpdate(input)
+  Validate JobPlanUpdate payloads.
+
+validateJobPlanAssignmentCreate(input)
+  Validate JobPlanAssignmentCreate payloads.
+
+validateJobPlanAssignmentUpdate(input)
+  Validate JobPlanAssignmentUpdate payloads.
+
+validateJobPlanChemicalCreate(input)
+  Validate JobPlanChemicalCreate payloads.
+
+validateJobPlanChemicalUpdate(input)
+  Validate JobPlanChemicalUpdate payloads.
+
+validateJobWorkCreate(input)
+  Validate JobWorkCreate payloads.
+
+validateJobWorkUpdate(input)
+  Validate JobWorkUpdate payloads.
+
+validateJobWorkLogEntryCreate(input)
+  Validate JobWorkLogEntryCreate payloads.
+*/
 
 import {
   type Dictionary,
@@ -99,7 +153,8 @@ export const validateJobAssessmentUpdate = (
     return 'assessorId must be a valid Id when provided'
   }
   if (
-    input.locations !== undefined && !isCompositionPositive(input.locations, isLocation)
+    input.locations !== undefined
+    && !isCompositionPositive(input.locations, isLocation)
   ) {
     return 'locations must be a non-empty array of valid Location values when provided'
   }
@@ -141,12 +196,13 @@ export const validateJobWorkflowUpdate = (input: JobWorkflowUpdate): string | nu
 /** Validates JobPlanCreate; returns error message or null. */
 export const validateJobPlanCreate = (input: JobPlanCreate): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
+  if (!isId(input.plannerId)) return 'plannerId must be a valid Id'
+  if (!isCompositionMany(input.notes, isNote)) {
+    return 'notes must be an array of valid Note values'
+  }
   if (!isWhen(input.scheduledStart)) return 'scheduledStart must be a valid When'
   if (input.scheduledEnd !== undefined && !isWhen(input.scheduledEnd)) {
     return 'scheduledEnd must be a valid When when provided'
-  }
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
   }
   return null
 }
@@ -154,17 +210,21 @@ export const validateJobPlanCreate = (input: JobPlanCreate): string | null => {
 /** Validates JobPlanUpdate; returns error message or null. */
 export const validateJobPlanUpdate = (input: JobPlanUpdate): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
+
   if (input.jobId !== undefined && !isId(input.jobId)) {
     return 'jobId must be a valid Id when provided'
+  }
+  if (input.plannerId !== undefined && !isId(input.plannerId)) {
+    return 'plannerId must be a valid Id when provided'
+  }
+  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
+    return 'notes must be an array of valid Note values when provided'
   }
   if (input.scheduledStart !== undefined && !isWhen(input.scheduledStart)) {
     return 'scheduledStart must be a valid When when provided'
   }
   if (input.scheduledEnd !== undefined && !isWhen(input.scheduledEnd)) {
     return 'scheduledEnd must be a valid When when provided'
-  }
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
   }
   return null
 }
@@ -174,12 +234,12 @@ export const validateJobPlanAssignmentCreate = (
   input: JobPlanAssignmentCreate
 ): string | null => {
   if (!isId(input.planId)) return 'planId must be a valid Id'
-  if (!isId(input.userId)) return 'userId must be a valid Id'
-  if (!USER_ROLES.includes(input.role as UserRole)) {
-    return 'role must be a valid UserRole'
-  }
+  if (!isId(input.crewMemberId)) return 'crewMemberId must be a valid Id'
   if (!isCompositionMany(input.notes, isNote)) {
     return 'notes must be an array of valid Note values'
+  }
+  if (!USER_ROLES.includes(input.role as UserRole)) {
+    return 'role must be a valid UserRole'
   }
   return null
 }
@@ -193,16 +253,15 @@ export const validateJobPlanAssignmentUpdate = (
   if (input.planId !== undefined && !isId(input.planId)) {
     return 'planId must be a valid Id when provided'
   }
-  if (input.userId !== undefined && !isId(input.userId)) {
-    return 'userId must be a valid Id when provided'
-  }
-  if (input.role !== undefined && !USER_ROLES.includes(input.role as UserRole)) {
-    return 'role must be a valid UserRole when provided'
+  if (input.crewMemberId !== undefined && !isId(input.crewMemberId)) {
+    return 'crewMemberId must be a valid Id when provided'
   }
   if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
     return 'notes must be an array of valid Note values when provided'
   }
-
+  if (input.role !== undefined && !USER_ROLES.includes(input.role as UserRole)) {
+    return 'role must be a valid UserRole when provided'
+  }
   return null
 }
 
@@ -225,7 +284,6 @@ export const validateJobPlanChemicalCreate = (
   ) {
     return 'targetAreaUnit must be a valid JobPlanTargetAreaUnit when provided'
   }
-
   return null
 }
 
@@ -259,7 +317,6 @@ export const validateJobPlanChemicalUpdate = (
   ) {
     return 'targetAreaUnit must be a valid JobPlanTargetAreaUnit when provided'
   }
-
   return null
 }
 
@@ -267,14 +324,13 @@ export const validateJobPlanChemicalUpdate = (
 export const validateJobWorkCreate = (input: JobWorkCreate): string | null => {
   if (!isId(input.jobId)) return 'jobId must be a valid Id'
   if (!isId(input.startedById)) return 'startedById must be a valid Id'
-  if (!isCompositionPositive(input.work, (value): value is string => isId(value))) {
+  if (!isCompositionPositive(input.work, (entry): entry is string => isId(entry))) {
     return 'work must be a non-empty array of valid Id values'
   }
   if (!isWhen(input.startedAt)) return 'startedAt must be a valid When'
   if (input.completedAt !== undefined && !isWhen(input.completedAt)) {
     return 'completedAt must be a valid When when provided'
   }
-
   return null
 }
 
@@ -290,7 +346,7 @@ export const validateJobWorkUpdate = (input: JobWorkUpdate): string | null => {
   }
   if (
     input.work !== undefined
-    && !isCompositionPositive(input.work, (value): value is string => isId(value))
+    && !isCompositionPositive(input.work, (entry): entry is string => isId(entry))
   ) {
     return 'work must be a non-empty array of valid Id values when provided'
   }
@@ -300,7 +356,6 @@ export const validateJobWorkUpdate = (input: JobWorkUpdate): string | null => {
   if (input.completedAt !== undefined && !isWhen(input.completedAt)) {
     return 'completedAt must be a valid When when provided'
   }
-
   return null
 }
 
@@ -333,7 +388,9 @@ const isLocation = (
   if (data.altitudeMeters !== undefined) {
     if (
       typeof data.altitudeMeters !== 'number' || !Number.isFinite(data.altitudeMeters)
-    ) return false
+    ) {
+      return false
+    }
   }
   if (data.line1 !== undefined && !isNonEmptyString(data.line1)) return false
   if (data.line2 !== undefined && !isNonEmptyString(data.line2)) return false
@@ -345,7 +402,9 @@ const isLocation = (
   if (data.accuracyMeters !== undefined) {
     if (
       typeof data.accuracyMeters !== 'number' || !Number.isFinite(data.accuracyMeters)
-    ) return false
+    ) {
+      return false
+    }
   }
   if (data.description !== undefined && !isNonEmptyString(data.description)) return false
 

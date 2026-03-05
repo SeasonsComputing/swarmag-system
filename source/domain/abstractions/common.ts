@@ -38,7 +38,6 @@ export type Attachment = {
   contentType: string
   kind: AttachmentKind
   uploadedAt: When
-  uploadedById: AssociationOne<User>
 }
 
 /** Note visibility classification. */
@@ -47,64 +46,71 @@ export type NoteVisibility = (typeof NOTE_VISIBILITIES)[number]
 
 /** Freeform note with optional visibility and tags. */
 export type Note = {
+  attachments: CompositionMany<Attachment>
   createdAt: When
   content: string
   visibility?: NoteVisibility
   tags: CompositionMany<string>
-  attachments: CompositionMany<Attachment>
 }
 
 /** Supported question input modes. */
 export const QUESTION_TYPES = [
+  'internal',
   'text',
   'number',
   'boolean',
   'single-select',
-  'multi-select',
-  'internal'
+  'multi-select'
 ] as const
 export type QuestionType = (typeof QUESTION_TYPES)[number]
 
-/** Scalar question input modes. */
-export const SCALAR_QUESTION_TYPES = ['text', 'number', 'boolean', 'internal'] as const
+/** Common shape shared by all question constituents. */
+export type BaseQuestion = Instantiable & {
+  type: QuestionType
+  prompt: string
+  helpText?: string
+  required?: boolean
+}
+
+/** System-generated question referenced directly by log entries. */
+export type InternalQuestion = BaseQuestion & {
+  type: 'internal'
+}
+
+/** Scalar input question without options. */
+export const SCALAR_QUESTION_TYPES = ['text', 'number', 'boolean'] as const
 export type ScalarQuestionType = (typeof SCALAR_QUESTION_TYPES)[number]
 
-/** Select question input modes. */
-export const SELECT_QUESTION_TYPES = ['single-select', 'multi-select'] as const
-export type SelectQuestionType = (typeof SELECT_QUESTION_TYPES)[number]
+/** Scalar question constituent. */
+export type ScalarQuestion = BaseQuestion & {
+  type: ScalarQuestionType
+}
 
 /** Selectable option metadata for select-type questions. */
-export type SelectableOption = {
+export type SelectOption = {
   value: string
   label?: string
   requiresNote?: boolean
 }
 
-/** Scalar input question without options. */
-export type ScalarQuestion = Instantiable & {
-  type: ScalarQuestionType
-  prompt: string
-  helpText?: string
-  required?: boolean
-}
+/** Select input question kind values. */
+export const SELECT_QUESTION_TYPES = ['single-select', 'multi-select'] as const
+export type SelectQuestionType = (typeof SELECT_QUESTION_TYPES)[number]
 
 /** Select input question with a non-empty options set. */
-export type SelectQuestion = Instantiable & {
+export type SelectQuestion = BaseQuestion & {
   type: SelectQuestionType
-  prompt: string
-  helpText?: string
-  required?: boolean
-  options: CompositionPositive<SelectableOption>
+  options: CompositionPositive<SelectOption>
 }
 
 /** Reusable prompt abstraction represented as a discriminated union. */
-export type Question = ScalarQuestion | SelectQuestion
+export type Question = ScalarQuestion | SelectQuestion | InternalQuestion
 
 /** Captured response to a question with optional crew annotations. */
 export type Answer = {
   questionId: AssociationOne<Question>
-  value: string | number | boolean | string[]
-  capturedAt: When
   capturedById: AssociationOne<User>
   notes: CompositionMany<Note>
+  value: string | number | boolean | string[]
+  capturedAt: When
 }

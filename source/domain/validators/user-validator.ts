@@ -1,6 +1,21 @@
-/**
- * User protocol validator.
- */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ User protocol validator                                                    ║
+║ Boundary validation for user protocol payloads.                            ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Validates create and update protocol payloads for user topic abstractions.
+
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+validateUserCreate(input)
+  Validate UserCreate payloads.
+
+validateUserUpdate(input)
+  Validate UserUpdate payloads.
+*/
 
 import { isCompositionPositive, isId, isNonEmptyString } from '@core-std'
 import {
@@ -20,6 +35,13 @@ import type {
 
 /** Validates UserCreate; returns error message or null. */
 export const validateUserCreate = (input: UserCreate): string | null => {
+  if (
+    !isCompositionPositive(input.roles, (entry): entry is UserRole => {
+      return USER_ROLES.includes(entry as UserRole)
+    })
+  ) {
+    return 'roles must be a non-empty array of valid UserRole values'
+  }
   if (!isNonEmptyString(input.displayName)) {
     return 'displayName must be a non-empty string'
   }
@@ -35,14 +57,6 @@ export const validateUserCreate = (input: UserCreate): string | null => {
   if (input.status !== undefined && !USER_STATUSES.includes(input.status as UserStatus)) {
     return 'status must be a valid UserStatus when provided'
   }
-  if (
-    !isCompositionPositive(input.roles, (value): value is UserRole => {
-      return USER_ROLES.includes(value as UserRole)
-    })
-  ) {
-    return 'roles must be a non-empty array of valid UserRole values'
-  }
-
   return null
 }
 
@@ -50,6 +64,14 @@ export const validateUserCreate = (input: UserCreate): string | null => {
 export const validateUserUpdate = (input: UserUpdate): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
 
+  if (
+    input.roles !== undefined
+    && !isCompositionPositive(input.roles, (entry): entry is UserRole => {
+      return USER_ROLES.includes(entry as UserRole)
+    })
+  ) {
+    return 'roles must be a non-empty array of valid UserRole values when provided'
+  }
   if (input.displayName !== undefined && !isNonEmptyString(input.displayName)) {
     return 'displayName must be a non-empty string when provided'
   }
@@ -65,15 +87,6 @@ export const validateUserUpdate = (input: UserUpdate): string | null => {
   if (input.status !== undefined && !USER_STATUSES.includes(input.status as UserStatus)) {
     return 'status must be a valid UserStatus when provided'
   }
-  if (
-    input.roles !== undefined
-    && !isCompositionPositive(input.roles, (value): value is UserRole => {
-      return USER_ROLES.includes(value as UserRole)
-    })
-  ) {
-    return 'roles must be a non-empty array of valid UserRole values when provided'
-  }
-
   return null
 }
 

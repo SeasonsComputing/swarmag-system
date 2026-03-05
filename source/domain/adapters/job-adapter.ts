@@ -1,10 +1,45 @@
-/**
- * Job domain adapters.
- */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Job domain adapters                                                        ║
+║ Dictionary <-> domain serialization for job topic abstractions.            ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Converts between persisted dictionary payloads and job domain abstractions.
+
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+toJob(dict) / fromJob(job)
+  Convert Job dictionaries and domain objects.
+
+toJobAssessment(dict) / fromJobAssessment(assessment)
+  Convert JobAssessment dictionaries and domain objects.
+
+toJobWorkflow(dict) / fromJobWorkflow(jobWorkflow)
+  Convert JobWorkflow dictionaries and domain objects.
+
+toJobPlan(dict) / fromJobPlan(jobPlan)
+  Convert JobPlan dictionaries and domain objects.
+
+toJobPlanAssignment(dict) / fromJobPlanAssignment(assignment)
+  Convert JobPlanAssignment dictionaries and domain objects.
+
+toJobPlanChemical(dict) / fromJobPlanChemical(planChemical)
+  Convert JobPlanChemical dictionaries and domain objects.
+
+toJobPlanAsset(dict) / fromJobPlanAsset(planAsset)
+  Convert JobPlanAsset dictionaries and domain objects.
+
+toJobWork(dict) / fromJobWork(jobWork)
+  Convert JobWork dictionaries and domain objects.
+
+toJobWorkLogEntry(dict) / fromJobWorkLogEntry(entry)
+  Convert JobWorkLogEntry dictionaries and domain objects.
+*/
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
-import type { Note } from '@domain/abstractions/common.ts'
 import type {
   Job,
   JobAssessment,
@@ -19,6 +54,7 @@ import type {
   JobWorkflow,
   JobWorkLogEntry
 } from '@domain/abstractions/job.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
 import {
   fromAnswer,
   fromLocation,
@@ -27,6 +63,10 @@ import {
   toLocation,
   toNote
 } from '@domain/adapters/common-adapter.ts'
+
+// ────────────────────────────────────────────────────────────────────────────
+// PUBLIC EXPORTS
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Create a Job from its dictionary representation. */
 export const toJob = (dict: Dictionary): Job => {
@@ -92,8 +132,8 @@ export const toJobAssessment = (dict: Dictionary): JobAssessment => {
     jobId: dict.job_id as string,
     assessorId: dict.assessor_id as string,
     locations: (dict.locations as Dictionary[]).map(toLocation),
-    risks: (dict.risks as Note[]).map(toNote),
-    notes: (dict.notes as Note[]).map(toNote),
+    risks: (dict.risks as Dictionary[]).map(toNote),
+    notes: (dict.notes as Dictionary[]).map(toNote),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined
@@ -155,10 +195,13 @@ export const fromJobWorkflow = (jobWorkflow: JobWorkflow): Dictionary => ({
 export const toJobPlan = (dict: Dictionary): JobPlan => {
   if (!dict.id) return notValid('JobPlan dictionary missing required field: id')
   if (!dict.job_id) return notValid('JobPlan dictionary missing required field: job_id')
+  if (!dict.planner_id) {
+    return notValid('JobPlan dictionary missing required field: planner_id')
+  }
+  if (!dict.notes) return notValid('JobPlan dictionary missing required field: notes')
   if (!dict.scheduled_start) {
     return notValid('JobPlan dictionary missing required field: scheduled_start')
   }
-  if (!dict.notes) return notValid('JobPlan dictionary missing required field: notes')
   if (!dict.created_at) {
     return notValid('JobPlan dictionary missing required field: created_at')
   }
@@ -169,9 +212,10 @@ export const toJobPlan = (dict: Dictionary): JobPlan => {
   return {
     id: dict.id as string,
     jobId: dict.job_id as string,
+    plannerId: dict.planner_id as string,
+    notes: (dict.notes as Dictionary[]).map(toNote),
     scheduledStart: dict.scheduled_start as When,
     scheduledEnd: dict.scheduled_end as When | undefined,
-    notes: (dict.notes as Note[]).map(toNote),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined
@@ -182,9 +226,10 @@ export const toJobPlan = (dict: Dictionary): JobPlan => {
 export const fromJobPlan = (jobPlan: JobPlan): Dictionary => ({
   id: jobPlan.id,
   job_id: jobPlan.jobId,
+  planner_id: jobPlan.plannerId,
+  notes: jobPlan.notes.map(fromNote),
   scheduled_start: jobPlan.scheduledStart,
   scheduled_end: jobPlan.scheduledEnd,
-  notes: jobPlan.notes.map(fromNote),
   created_at: jobPlan.createdAt,
   updated_at: jobPlan.updatedAt,
   deleted_at: jobPlan.deletedAt
@@ -196,14 +241,14 @@ export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => {
   if (!dict.plan_id) {
     return notValid('JobPlanAssignment dictionary missing required field: plan_id')
   }
-  if (!dict.user_id) {
-    return notValid('JobPlanAssignment dictionary missing required field: user_id')
-  }
-  if (!dict.role) {
-    return notValid('JobPlanAssignment dictionary missing required field: role')
+  if (!dict.crew_member_id) {
+    return notValid('JobPlanAssignment dictionary missing required field: crew_member_id')
   }
   if (!dict.notes) {
     return notValid('JobPlanAssignment dictionary missing required field: notes')
+  }
+  if (!dict.role) {
+    return notValid('JobPlanAssignment dictionary missing required field: role')
   }
   if (!dict.created_at) {
     return notValid('JobPlanAssignment dictionary missing required field: created_at')
@@ -215,9 +260,9 @@ export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => {
   return {
     id: dict.id as string,
     planId: dict.plan_id as string,
-    userId: dict.user_id as string,
-    role: dict.role as import('@domain/abstractions/user.ts').UserRole,
-    notes: (dict.notes as Note[]).map(toNote),
+    crewMemberId: dict.crew_member_id as string,
+    notes: (dict.notes as Dictionary[]).map(toNote),
+    role: dict.role as UserRole,
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined
@@ -228,9 +273,9 @@ export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => {
 export const fromJobPlanAssignment = (assignment: JobPlanAssignment): Dictionary => ({
   id: assignment.id,
   plan_id: assignment.planId,
-  user_id: assignment.userId,
-  role: assignment.role,
+  crew_member_id: assignment.crewMemberId,
   notes: assignment.notes.map(fromNote),
+  role: assignment.role,
   created_at: assignment.createdAt,
   updated_at: assignment.updatedAt,
   deleted_at: assignment.deletedAt

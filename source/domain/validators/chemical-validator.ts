@@ -1,6 +1,21 @@
-/**
- * Chemical protocol validator.
- */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Chemical protocol validator                                                ║
+║ Boundary validation for chemical protocol payloads.                        ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Validates create and update protocol payloads for chemical topic abstractions.
+
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+validateChemicalCreate(input)
+  Validate ChemicalCreate payloads.
+
+validateChemicalUpdate(input)
+  Validate ChemicalUpdate payloads.
+*/
 
 import {
   type Dictionary,
@@ -28,6 +43,12 @@ import { isNote } from '@domain/validators/common-validator.ts'
 
 /** Validates ChemicalCreate; returns error message or null. */
 export const validateChemicalCreate = (input: ChemicalCreate): string | null => {
+  if (!isCompositionMany(input.labels, isChemicalLabel)) {
+    return 'labels must be an array of valid ChemicalLabel values'
+  }
+  if (!isCompositionMany(input.notes, isNote)) {
+    return 'notes must be an array of valid Note values'
+  }
   if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
   if (input.epaNumber !== undefined && !isNonEmptyString(input.epaNumber)) {
     return 'epaNumber must be a non-empty string when provided'
@@ -56,12 +77,6 @@ export const validateChemicalCreate = (input: ChemicalCreate): string | null => 
   if (input.sdsUrl !== undefined && !isNonEmptyString(input.sdsUrl)) {
     return 'sdsUrl must be a non-empty string when provided'
   }
-  if (!isCompositionMany(input.labels, isChemicalLabel)) {
-    return 'labels must be an array of valid ChemicalLabel values'
-  }
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
-  }
   return null
 }
 
@@ -69,6 +84,12 @@ export const validateChemicalCreate = (input: ChemicalCreate): string | null => 
 export const validateChemicalUpdate = (input: ChemicalUpdate): string | null => {
   if (!isId(input.id)) return 'id must be a valid Id'
 
+  if (input.labels !== undefined && !isCompositionMany(input.labels, isChemicalLabel)) {
+    return 'labels must be an array of valid ChemicalLabel values when provided'
+  }
+  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
+    return 'notes must be an array of valid Note values when provided'
+  }
   if (input.name !== undefined && !isNonEmptyString(input.name)) {
     return 'name must be a non-empty string when provided'
   }
@@ -76,7 +97,8 @@ export const validateChemicalUpdate = (input: ChemicalUpdate): string | null => 
     return 'epaNumber must be a non-empty string when provided'
   }
   if (
-    input.usage !== undefined && !CHEMICAL_USAGES.includes(input.usage as ChemicalUsage)
+    input.usage !== undefined
+    && !CHEMICAL_USAGES.includes(input.usage as ChemicalUsage)
   ) {
     return 'usage must be a valid ChemicalUsage when provided'
   }
@@ -101,13 +123,6 @@ export const validateChemicalUpdate = (input: ChemicalUpdate): string | null => 
   if (input.sdsUrl !== undefined && !isNonEmptyString(input.sdsUrl)) {
     return 'sdsUrl must be a non-empty string when provided'
   }
-  if (input.labels !== undefined && !isCompositionMany(input.labels, isChemicalLabel)) {
-    return 'labels must be an array of valid ChemicalLabel values when provided'
-  }
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
-  }
-
   return null
 }
 

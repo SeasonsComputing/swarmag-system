@@ -15,12 +15,12 @@ export type ServiceCategory = (typeof SERVICE_CATEGORIES)[number]
 
 /** Sellable operational offering. */
 export type Service = Instantiable & {
+  notes: CompositionMany<Note>
   name: string
   sku: string
   description?: string
   category: ServiceCategory
   tagsWorkflowCandidates: CompositionMany<string>
-  notes: CompositionMany<Note>
 }
 
 /** Junction mapping services to required asset types. */
