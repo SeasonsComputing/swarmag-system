@@ -4,7 +4,7 @@
 
 ## 1. Overview
 
-This guide is the authoritative reference for coding standards and conventions throughout the `swarmAg System` codebase.
+This guide is the authoritative reference for coding standards and conventions throughout the codebase.
 In case of conflict, the `CONSTITUTION.md` takes precedence.
 
 Code that conflicts with this guide is wrong — not the guide.
@@ -40,21 +40,6 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | `@core-std` | `source/core/std/std.ts` |
 | `@ux-api`   | `source/ux/api/api.ts`   |
 
-### 3.3 Deployment package aliases
-
-| Alias                  | Resolves to                  |
-| ---------------------- | ---------------------------- |
-| `@back-supabase-edge/` | `source/back/supabase-edge/` |
-| `@ux-app-ops/`         | `source/ux/app-ops/`         |
-| `@ux-app-admin/`       | `source/ux/app-admin/`       |
-| `@ux-app-customer/`    | `source/ux/app-customer/`    |
-
-### 3.4 Vendor aliases
-
-| Alias              | Resolves to                              |
-| ------------------ | ---------------------------------------- |
-| `@supabase-client` | `https://esm.sh/@supabase/supabase-js@2` |
-
 ## 4. Naming Conventions
 
 ### 4.1 The single commandment
@@ -83,10 +68,6 @@ Acronyms are not a special case — they are words, and words transform with the
 | URL          | `Url`      | `url`     | `url-`     |
 | ID           | `Id`       | `id`      | `id-`      |
 
-### 4.4 Makers vs. wrappers
-
-Factory functions that produce API clients are prefixed `make` and live in `make-*.ts` files. Handler adapters that wrap functions live in `wrap-*.ts` files. These are architecturally distinct; naming must reflect it.
-
 ## 5. Source Code Formatting
 
 All TypeScript is formatted by `dprint` via `deno task fmt`. The formatter is authoritative — do not argue with it.
@@ -110,32 +91,27 @@ Example:
 
 ```typescript
 /**
- * Domain models for assets in the swarmAg system.
- * Assets represent equipment and resources used in operations,
- * such as vehicles, sprayers, and drones.
+ * Domain models for vehicles.
  */
 
-import type { AssociationOne, CompositionMany, Instantiable } from '@core-std'
-import type { Note } from '@domain/abstractions/common.ts'
+import type { AssociationOne, Instantiable } from '@core-std'
 
-/** Reference type for categorizing assets. */
-export type AssetType = Instantiable & {
+/** Reference type for categorizing vehicles. */
+export type VehicleType = Instantiable & {
   label: string
   active: boolean
 }
 
-/** Lifecycle and availability state. */
-export const ASSET_STATUSES = ['active', 'maintenance', 'retired', 'reserved'] as const
-export type AssetStatus = (typeof ASSET_STATUSES)[number]
+/** Lifecycle/availability state. */
+export const VEHICLE_STATUSES = ['active', 'maintenance', 'retired'] as const
+export type VehicleStatus = (typeof VEHICLE_STATUSES)[number]
 
-/** Operational equipment or resource. */
-export type Asset = Instantiable & {
+/** Operational vehicle. */
+export type Vehicle = Instantiable & {
   label: string
-  description?: string
   serialNumber?: string
-  type: AssociationOne<AssetType>
-  status: AssetStatus
-  notes: CompositionMany<Note>
+  type: AssociationOne<VehicleType>
+  status: VehicleStatus
 }
 ```
 
@@ -251,7 +227,7 @@ Files with clear categories of declarations and functions divide the code body i
 // ────────────────────────────────────────────────────────────────────────────
 ```
 
-#### 6.6.1 Encapsulation & Information hiding
+#### 6.6.1 Encapsulation & information hiding
 
 Files with a public API and implementation (internal) API are divided into sections: PUBLIC EXPORTS then PRIVATE INTERNALS:
 
@@ -296,7 +272,7 @@ Do not null-check values that cannot be null by contract. Do not write try/catch
 
 ### 7.4 No payload-as-truth adapters
 
-Adapters map column-by-column. There is no `payload` field that bypasses mapping. The domain type is the truth; the adapter derives it from storage columns.
+Adapters map column-by-column. There is no `payload` field that bypasses mapping. The abstraction type is the truth; the adapter derives it from storage columns.
 
 ### 7.5 No redundant exports
 
@@ -306,9 +282,11 @@ Export only what callers need. Private helpers stay private.
 
 No implicit behavior, no runtime reflection, no metaprogramming. Configuration is explicit; providers are injected; contracts are stated in interfaces; structured data as types.
 
-### 7.7 Prefer @core-std types
+## 8. Implementation Patterns
 
-Use types and classes from `@core-std` instead of ad-hoc primitives and container generics.
+### 8.1 `@core-std` types
+
+Use types from `@core-std` instead of ad-hoc primitives and container generics.
 
 | Prefer from `@core-std`   | Do not use                                                                 |
 | ------------------------- | -------------------------------------------------------------------------- |
@@ -318,6 +296,7 @@ Use types and classes from `@core-std` instead of ad-hoc primitives and containe
 | `Id`                      | raw `string` for identifiers                                               |
 | `When`                    | raw `string` for ISO datetimes                                             |
 | `Instantiable`            | inline `{ id, createdAt, updatedAt, deletedAt? }` lifecycle shape          |
+| `InstantiableOnly`        | inline `{ id, createdAt }` create-and-read-only lifecycle shape            |
 | `CompositionOne<T>`       | ad-hoc tuple/array for exactly-one embedded composition                    |
 | `CompositionOptional<T>`  | ad-hoc nullable/optional array for zero-or-one embedded composition        |
 | `CompositionMany<T>`      | ad-hoc `T[]` where composition semantics are intended                      |
@@ -325,20 +304,141 @@ Use types and classes from `@core-std` instead of ad-hoc primitives and containe
 | `AssociationOne<T>`       | raw `Id` for required FK references                                        |
 | `AssociationOptional<T>`  | raw `Id \| undefined` for optional FK references                           |
 | `AssociationJunction<T>`  | raw `Id` in junction abstractions                                          |
-| `ValidatorError`          | generic `Error` for validation failures                                    |
-
-Rules:
+| `ValidatorError`          | thrown by `notValid()`; generic `Error` for validation failures            |
 
 - Import std primitives from `@core-std` only.
 - Never declare `Record<string, unknown>`, `Record<string, string>`, or `Set<string>` outside `source/core/std/`.
 - When narrowing unknown objects in guards, use `Dictionary` casts (`const x = v as Dictionary`) instead of `Record<string, unknown>`.
 - Use `StringDictionary` for key/value string/string maps.
 
-## 8. Configuration Pattern
+### 8.2 `const-enum`
+
+Any value set requiring runtime validation is expressed as a `const` tuple paired with a derived type alias.
+
+```typescript
+/** Supported shape kinds. */
+export const SHAPE_KINDS = ['circle', 'rect', 'triangle'] as const
+export type ShapeKind = (typeof SHAPE_KINDS)[number]
+```
+
+- Tuple named `SCREAMING_SNAKE`; derived type named `PascalCase`.
+- Both exported from the same file — never redeclared elsewhere.
+- Consumers import the tuple and use `.includes()` — never redeclare a local copy.
+
+```typescript
+// CORRECT
+import { SHAPE_KINDS } from '@domain/abstractions/shape.ts'
+SHAPE_KINDS.includes(input.kind as ShapeKind)
+
+// WRONG — local redeclaration is a violation
+const SHAPE_KINDS = ['circle', 'rect'] as const
+```
+
+### 8.3 `intersection-type`
+
+When a type extends a base type with additional or narrowed fields, express as a named intersection.
+
+```typescript
+export type CircleShape = BaseShape & {
+  kind: 'circle'
+  radius: number
+}
+```
+
+- Always a named export — anonymous intersections are a violation.
+- The narrowed discriminator field must appear in the intersection body, not the base.
+- Used as constituents of a `union-type`.
+
+### 8.4 `union-type`
+
+When a concept has structurally distinct variants sharing a discriminator field, express as a named base type, named intersection-type constituents, and a discriminated union.
+
+```typescript
+/** Common shape fields. */
+export type BaseShape = {
+  kind: ShapeKind
+  color?: string
+}
+
+/** Circle — no dimensional fields other than radius. */
+export type CircleShape = BaseShape & {
+  kind: 'circle'
+  radius: number
+}
+
+/** Rectangle — defined by width and height. */
+export type RectShape = BaseShape & {
+  kind: 'rect'
+  width: number
+  height: number
+}
+
+/** Discriminated union — boundary type used throughout the system. */
+export type Shape = CircleShape | RectShape
+```
+
+- Base type holds shared fields only — no discriminator narrowing.
+- Constituent types are named, exported intersection-types — they carry independent meaning.
+- The union type is the boundary type used at all call sites.
+- The discriminator field (`kind`) must be present in every constituent.
+- No anonymous union arms.
+
+**Adapter consumption** — switch on the discriminator, exhaustive, no fall-through default:
+
+```typescript
+export const toShape = (dict: Dictionary): Shape => {
+  const kind = dict.kind as ShapeKind
+
+  switch (kind) {
+    case 'circle':
+      return {
+        kind,
+        color: dict.color as string | undefined,
+        radius: dict.radius as number
+      } satisfies CircleShape
+
+    case 'rect':
+      return {
+        kind,
+        color: dict.color as string | undefined,
+        width: dict.width as number,
+        height: dict.height as number
+      } satisfies RectShape
+
+    case 'triangle':
+      // extend when TriangleShape is defined
+      return notValid(`unsupported shape kind: ${kind}`)
+  }
+}
+```
+
+**Validator consumption** — same discriminator-switch pattern, branch-specific checks:
+
+```typescript
+export const validateShapeCreate = (input: ShapeCreate): string | null => {
+  if (!SHAPE_KINDS.includes(input.kind as ShapeKind)) return 'kind must be a valid ShapeKind'
+
+  switch (input.kind) {
+    case 'circle':
+      if (!isPositiveNumber(input.radius)) return 'radius must be a positive number'
+      return null
+
+    case 'rect':
+      if (!isPositiveNumber(input.width)) return 'width must be a positive number'
+      if (!isPositiveNumber(input.height)) return 'height must be a positive number'
+      return null
+
+    case 'triangle':
+      return notValid(`unsupported shape kind: ${input.kind}`)
+  }
+}
+```
+
+### 8.5 Runtime configuration pattern
 
 The system uses a singleton `Config` with injected runtime providers. Defined in `@core/cfg/config.ts`; initialized once per deployment context.
 
-### 8.1 Config initialization
+**Initialization:**
 
 ```typescript
 Config.init(provider, keys, aliases?)
@@ -348,9 +448,7 @@ Config.init(provider, keys, aliases?)
 - `keys` — required environment variable names; fails fast at bootstrap if any are missing
 - `aliases` — optional map of logical name to environment key; allows consuming code to use stable names regardless of platform-specific key prefixes
 
-### 8.2 Why aliases matter
-
-Vite requires client-side environment variables to be prefixed `VITE_`. Without aliases, every call site must know the prefix. With aliases, the bootstrap declares the mapping once and all consuming code uses the clean logical name:
+Vite requires client-side variables to carry a `VITE_` prefix. Aliases declare the mapping once at bootstrap; all consuming code uses the clean logical name:
 
 ```typescript
 // source/ux/config/ux-config.ts
@@ -372,18 +470,26 @@ Config.init(new SolidProvider(), [
 export { Config }
 ```
 
-Consuming code calls `Config.get('SUPABASE_EDGE_URL')` — no `VITE_` prefix, no platform knowledge.
-
-### 8.3 Rules
+**Rules:**
 
 - `Config.init()` — call once at bootstrap; throws if called twice.
 - `Config.get(name)` — resolves alias if present, then returns value; throws if not initialized, key not registered, or value missing. Never returns undefined.
 - `Config.fail(msg)` — throws `never`; use for invariant violations.
 - Never access `Deno.env` or `import.meta.env` directly. Always go through `Config.get()`.
 
+### 8.6 Makers vs. wrappers
+
+These are architecturally distinct patterns — naming must reflect it.
+
+**Makers** (`make-*.ts`) produce configured API client instances. They are factory functions that accept a provider or configuration and return a ready-to-use client. Called once at composition root.
+
+**Wrappers** (`wrap-*.ts`) adapt a function's calling convention without changing its behavior. They accept a handler function and return a new function that normalizes lifecycle concerns (CORS, body parsing, error serialization) around it.
+
+Naming rule: `make` prefix for factories; `wrap` prefix for adapters. File name matches the prefix.
+
 ## 9. Error Handling
 
-- Throw `Error` with actionable messages: `'JobAssessment dictionary missing required field: jobId'`.
+- Throw `Error` with actionable messages: `'Asset dictionary missing required field: id'`.
 - Never swallow errors silently.
 - Never log and continue — log and throw, or throw without logging.
 - Never expose stack traces or internal state in HTTP responses.
@@ -419,12 +525,12 @@ Columns within a table follow this order:
 | `number` (float)  | `NUMERIC`       |                                           |
 | `boolean`         | `BOOLEAN`       |                                           |
 | `Composition*<T>` | `JSONB`         | Embedded subordinate; never normalized    |
-| const-enum values | `TEXT`          | Constrained via named `CHECK`             |
+| `const-enum`      | `TEXT`          | Constrained via named `CHECK`             |
 
 ### 10.4 NOT NULL discipline
 
-- Required domain columns are `NOT NULL`.
-- Optional domain fields are nullable.
+- Required columns are `NOT NULL`.
+- Optional fields are nullable.
 - `updated_at` is `NOT NULL DEFAULT now()`.
 - `deleted_at` is nullable.
 - Junction foreign keys are `NOT NULL`.
@@ -464,9 +570,10 @@ Columns within a table follow this order:
 
 ### 10.10 Soft delete
 
-- Lifecycled tables (`Instantiable`) use `deleted_at TIMESTAMPTZ`.
+- `Instantiable` tables use `deleted_at TIMESTAMPTZ`.
 - Active rows are `deleted_at IS NULL`.
 - RLS `SELECT` policies must filter soft-deleted rows.
+- `InstantiableOnly` tables have no `updated_at` or `deleted_at` columns.
 
 ### 10.11 SQL comment and spacing conventions
 
@@ -489,8 +596,8 @@ Spacing:
 
 SQL DDL ownership is split by artifact type:
 
-- **Canonical schema DDL** (`<domain_root>/schema/schema.sql`) defines the full current-state schema.
-- **Migration DDL** (`<backend_root>/migrations/`) defines forward-only deltas from one state to the next.
+- **Canonical schema DDL** (`@domain/schema/schema.sql`) defines the full current-state schema.
+- **Migration DDL** (`@back/migrations/`) defines forward-only deltas from one state to the next.
 
 ### 11.1 Rules
 
