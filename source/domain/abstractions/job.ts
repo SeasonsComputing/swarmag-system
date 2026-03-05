@@ -11,6 +11,7 @@ import type {
   CompositionPositive,
   Id,
   Instantiable,
+  InstantiableOnly,
   When
 } from '@core-std'
 import type { Asset } from '@domain/abstractions/asset.ts'
@@ -52,23 +53,24 @@ export type JobAssessment = Instantiable & {
 export type JobWorkflow = Instantiable & {
   jobId: AssociationOne<Job>
   basisWorkflowId: AssociationOne<Workflow>
-  modifiedWorkflowId?: AssociationOptional<Workflow>
+  modifiedWorkflowId: AssociationOptional<Workflow>
 }
 
 /** Job-specific execution plan. */
 export type JobPlan = Instantiable & {
   jobId: AssociationOne<Job>
+  plannerId: AssociationOne<User>
+  notes: CompositionMany<Note>
   scheduledStart: When
   scheduledEnd?: When
-  notes: CompositionMany<Note>
 }
 
 /** Assignment of a user to a planned role. */
 export type JobPlanAssignment = Instantiable & {
   planId: AssociationOne<JobPlan>
-  userId: AssociationOne<User>
-  role: UserRole
+  crewMemberId: AssociationOne<User>
   notes: CompositionMany<Note>
+  role: UserRole
 }
 
 /** Supported units for planned chemical quantity. */
@@ -105,10 +107,8 @@ export type JobWork = Instantiable & {
 }
 
 /** Append-only execution event. */
-export type JobWorkLogEntry = {
-  id: Id
+export type JobWorkLogEntry = InstantiableOnly & {
   jobId: AssociationOne<Job>
   userId: AssociationOne<User>
   answer: CompositionOne<Answer>
-  createdAt: When
 }

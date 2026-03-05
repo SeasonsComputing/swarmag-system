@@ -19,21 +19,21 @@ export type ContactPreferredChannel = (typeof CONTACT_PREFERRED_CHANNELS)[number
 
 /** Embedded customer contact. */
 export type Contact = {
+  notes: CompositionMany<Note>
   name: string
   email?: string
   phone?: string
   isPrimary: boolean
   preferredChannel?: ContactPreferredChannel
-  notes: CompositionMany<Note>
 }
 
 /** Serviceable customer location. */
 export type CustomerSite = {
   customerId: AssociationOne<Customer>
-  label: string
-  acreage?: number
   location: CompositionOne<Location>
   notes: CompositionMany<Note>
+  label: string
+  acreage?: number
 }
 
 /** Customer account status. */
@@ -42,6 +42,10 @@ export type CustomerStatus = (typeof CUSTOMER_STATUSES)[number]
 
 /** Customer account aggregate. */
 export type Customer = Instantiable & {
+  accountManagerId: AssociationOptional<User>
+  sites: CompositionMany<CustomerSite>
+  contacts: CompositionPositive<Contact>
+  notes: CompositionMany<Note>
   name: string
   status: CustomerStatus
   line1: string
@@ -50,8 +54,4 @@ export type Customer = Instantiable & {
   state: string
   postalCode: string
   country: string
-  accountManagerId?: AssociationOptional<User>
-  sites: CompositionMany<CustomerSite>
-  contacts: CompositionPositive<Contact>
-  notes: CompositionMany<Note>
 }

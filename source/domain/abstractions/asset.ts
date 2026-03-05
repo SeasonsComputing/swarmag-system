@@ -17,10 +17,10 @@ export type AssetStatus = (typeof ASSET_STATUSES)[number]
 
 /** Operational equipment or resource. */
 export type Asset = Instantiable & {
+  type: AssociationOne<AssetType>
+  notes: CompositionMany<Note>
   label: string
   description?: string
   serialNumber?: string
-  type: AssociationOne<AssetType>
   status: AssetStatus
-  notes: CompositionMany<Note>
 }

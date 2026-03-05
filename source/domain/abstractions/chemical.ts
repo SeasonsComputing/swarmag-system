@@ -27,6 +27,8 @@ export type ChemicalSignalWord = (typeof CHEMICAL_SIGNAL_WORDS)[number]
 
 /** Regulated material record. */
 export type Chemical = Instantiable & {
+  labels: CompositionMany<ChemicalLabel>
+  notes: CompositionMany<Note>
   name: string
   epaNumber?: string
   usage: ChemicalUsage
@@ -35,6 +37,4 @@ export type Chemical = Instantiable & {
   reEntryIntervalHours?: number
   storageLocation?: string
   sdsUrl?: string
-  labels: CompositionMany<ChemicalLabel>
-  notes: CompositionMany<Note>
 }

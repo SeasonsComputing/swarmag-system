@@ -7,9 +7,9 @@ import type { Note, Question } from '@domain/abstractions/common.ts'
 
 /** Reusable named grouping of questions. */
 export type Task = Instantiable & {
-  title: string
-  description?: string
   notes: CompositionMany<Note>
+  label: string
+  description?: string
 }
 
 /** Junction mapping task questions with explicit ordering. */
@@ -21,11 +21,11 @@ export type TaskQuestion = {
 
 /** Reusable versioned execution template. */
 export type Workflow = Instantiable & {
+  notes: CompositionMany<Note>
   name: string
   description?: string
   version: number
   tags: CompositionMany<string>
-  notes: CompositionMany<Note>
 }
 
 /** Junction mapping workflow tasks with explicit ordering. */

@@ -14,10 +14,10 @@ export type UserStatus = (typeof USER_STATUSES)[number]
 
 /** System user identity and membership. */
 export type User = Instantiable & {
+  roles: CompositionPositive<UserRole>
   displayName: string
   primaryEmail: string
   phoneNumber: string
   avatarUrl?: string
   status?: UserStatus
-  roles: CompositionPositive<UserRole>
 }

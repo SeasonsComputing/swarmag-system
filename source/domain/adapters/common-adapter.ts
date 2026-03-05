@@ -1,6 +1,34 @@
-/**
- * Common domain adapters.
- */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Common domain adapters                                                     ║
+║ Dictionary <-> domain serialization for shared composition value objects.  ║
+╚═════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Provides serialization boundaries for common abstractions reused across all
+domain topic areas.
+
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+toLocation(dict) / fromLocation(location)
+  Convert Location dictionaries and domain objects.
+
+toAttachment(dict) / fromAttachment(attachment)
+  Convert Attachment dictionaries and domain objects.
+
+toNote(dict) / fromNote(note)
+  Convert Note dictionaries and domain objects.
+
+toSelectOption(dict) / fromSelectOption(option)
+  Convert SelectOption dictionaries and domain objects.
+
+toQuestion(dict) / fromQuestion(question)
+  Convert Question union dictionaries and domain objects.
+
+toAnswer(dict) / fromAnswer(answer)
+  Convert Answer dictionaries and domain objects.
+*/
 
 import type { Dictionary, When } from '@core-std'
 import { notValid } from '@core-std'
@@ -8,19 +36,23 @@ import type {
   Answer,
   Attachment,
   AttachmentKind,
+  InternalQuestion,
+  Location,
   Note,
   NoteVisibility,
   Question,
   QuestionType,
   ScalarQuestion,
-  SelectableOption,
+  SelectOption,
   SelectQuestion
 } from '@domain/abstractions/common.ts'
 
+// ────────────────────────────────────────────────────────────────────────────
+// PUBLIC EXPORTS
+// ────────────────────────────────────────────────────────────────────────────
+
 /** Create a Location from its dictionary representation. */
-export const toLocation = (
-  dict: Dictionary
-): import('@domain/abstractions/common.ts').Location => {
+export const toLocation = (dict: Dictionary): Location => {
   if (dict.latitude === undefined) {
     return notValid('Location dictionary missing required field: latitude')
   }
@@ -45,9 +77,7 @@ export const toLocation = (
 }
 
 /** Create a dictionary representation from a Location. */
-export const fromLocation = (
-  location: import('@domain/abstractions/common.ts').Location
-): Dictionary => ({
+export const fromLocation = (location: Location): Dictionary => ({
   latitude: location.latitude,
   longitude: location.longitude,
   altitude_meters: location.altitudeMeters,
@@ -75,17 +105,13 @@ export const toAttachment = (dict: Dictionary): Attachment => {
   if (!dict.uploaded_at) {
     return notValid('Attachment dictionary missing required field: uploaded_at')
   }
-  if (!dict.uploaded_by_id) {
-    return notValid('Attachment dictionary missing required field: uploaded_by_id')
-  }
 
   return {
     filename: dict.filename as string,
     url: dict.url as string,
     contentType: dict.content_type as string,
     kind: dict.kind as AttachmentKind,
-    uploadedAt: dict.uploaded_at as When,
-    uploadedById: dict.uploaded_by_id as string
+    uploadedAt: dict.uploaded_at as When
   }
 }
 
@@ -95,43 +121,42 @@ export const fromAttachment = (attachment: Attachment): Dictionary => ({
   url: attachment.url,
   content_type: attachment.contentType,
   kind: attachment.kind,
-  uploaded_at: attachment.uploadedAt,
-  uploaded_by_id: attachment.uploadedById
+  uploaded_at: attachment.uploadedAt
 })
 
 /** Create a Note from its dictionary representation. */
 export const toNote = (dict: Dictionary): Note => {
+  if (!dict.attachments) {
+    return notValid('Note dictionary missing required field: attachments')
+  }
   if (!dict.created_at) {
     return notValid('Note dictionary missing required field: created_at')
   }
   if (!dict.content) return notValid('Note dictionary missing required field: content')
   if (!dict.tags) return notValid('Note dictionary missing required field: tags')
-  if (!dict.attachments) {
-    return notValid('Note dictionary missing required field: attachments')
-  }
 
   return {
+    attachments: (dict.attachments as Dictionary[]).map(toAttachment),
     createdAt: dict.created_at as When,
     content: dict.content as string,
     visibility: dict.visibility as NoteVisibility | undefined,
-    tags: (dict.tags as string[]).map(value => value),
-    attachments: (dict.attachments as Dictionary[]).map(toAttachment)
+    tags: (dict.tags as string[]).map(value => value)
   }
 }
 
 /** Create a dictionary representation from a Note. */
 export const fromNote = (note: Note): Dictionary => ({
+  attachments: note.attachments.map(fromAttachment),
   created_at: note.createdAt,
   content: note.content,
   visibility: note.visibility,
-  tags: note.tags.map(value => value),
-  attachments: note.attachments.map(fromAttachment)
+  tags: note.tags.map(value => value)
 })
 
-/** Create a SelectableOption from its dictionary representation. */
-export const toSelectableOption = (dict: Dictionary): SelectableOption => {
+/** Create a SelectOption from its dictionary representation. */
+export const toSelectOption = (dict: Dictionary): SelectOption => {
   if (!dict.value) {
-    return notValid('SelectableOption dictionary missing required field: value')
+    return notValid('SelectOption dictionary missing required field: value')
   }
 
   return {
@@ -141,8 +166,8 @@ export const toSelectableOption = (dict: Dictionary): SelectableOption => {
   }
 }
 
-/** Create a dictionary representation from a SelectableOption. */
-export const fromSelectableOption = (option: SelectableOption): Dictionary => ({
+/** Create a dictionary representation from a SelectOption. */
+export const fromSelectOption = (option: SelectOption): Dictionary => ({
   value: option.value,
   label: option.label,
   requires_note: option.requiresNote
@@ -168,14 +193,13 @@ export const toQuestion = (dict: Dictionary): Question => {
       if (!dict.options) {
         return notValid('Question dictionary missing required field: options')
       }
-
       return {
         id: dict.id as string,
         type,
         prompt: dict.prompt as string,
         helpText: dict.help_text as string | undefined,
         required: dict.required as boolean | undefined,
-        options: (dict.options as Dictionary[]).map(toSelectableOption),
+        options: (dict.options as Dictionary[]).map(toSelectOption),
         createdAt: dict.created_at as When,
         updatedAt: dict.updated_at as When,
         deletedAt: dict.deleted_at as When | undefined
@@ -184,7 +208,6 @@ export const toQuestion = (dict: Dictionary): Question => {
     case 'text':
     case 'number':
     case 'boolean':
-    case 'internal':
       return {
         id: dict.id as string,
         type,
@@ -195,6 +218,18 @@ export const toQuestion = (dict: Dictionary): Question => {
         updatedAt: dict.updated_at as When,
         deletedAt: dict.deleted_at as When | undefined
       } satisfies ScalarQuestion
+
+    case 'internal':
+      return {
+        id: dict.id as string,
+        type,
+        prompt: dict.prompt as string,
+        helpText: dict.help_text as string | undefined,
+        required: dict.required as boolean | undefined,
+        createdAt: dict.created_at as When,
+        updatedAt: dict.updated_at as When,
+        deletedAt: dict.deleted_at as When | undefined
+      } satisfies InternalQuestion
   }
 }
 
@@ -209,7 +244,7 @@ export const fromQuestion = (question: Question): Dictionary => {
         prompt: question.prompt,
         help_text: question.helpText,
         required: question.required,
-        options: question.options.map(fromSelectableOption),
+        options: question.options.map(fromSelectOption),
         created_at: question.createdAt,
         updated_at: question.updatedAt,
         deleted_at: question.deletedAt
@@ -237,31 +272,31 @@ export const toAnswer = (dict: Dictionary): Answer => {
   if (!dict.question_id) {
     return notValid('Answer dictionary missing required field: question_id')
   }
+  if (!dict.captured_by_id) {
+    return notValid('Answer dictionary missing required field: captured_by_id')
+  }
+  if (!dict.notes) return notValid('Answer dictionary missing required field: notes')
   if (dict.value === undefined) {
     return notValid('Answer dictionary missing required field: value')
   }
   if (!dict.captured_at) {
     return notValid('Answer dictionary missing required field: captured_at')
   }
-  if (!dict.captured_by_id) {
-    return notValid('Answer dictionary missing required field: captured_by_id')
-  }
-  if (!dict.notes) return notValid('Answer dictionary missing required field: notes')
 
   return {
     questionId: dict.question_id as string,
-    value: dict.value as string | number | boolean | string[],
-    capturedAt: dict.captured_at as When,
     capturedById: dict.captured_by_id as string,
-    notes: (dict.notes as Dictionary[]).map(toNote)
+    notes: (dict.notes as Dictionary[]).map(toNote),
+    value: dict.value as string | number | boolean | string[],
+    capturedAt: dict.captured_at as When
   }
 }
 
 /** Create a dictionary representation from an Answer. */
 export const fromAnswer = (answer: Answer): Dictionary => ({
   question_id: answer.questionId,
-  value: answer.value,
-  captured_at: answer.capturedAt,
   captured_by_id: answer.capturedById,
-  notes: answer.notes.map(fromNote)
+  notes: answer.notes.map(fromNote),
+  value: answer.value,
+  captured_at: answer.capturedAt
 })
