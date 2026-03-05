@@ -8,10 +8,10 @@ import type {
   SelectQuestion
 } from '@domain/abstractions/common.ts'
 
-type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
-type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
-type ScalarQuestionUpdate = UpdateFromInstantiable<ScalarQuestion>
-type SelectQuestionUpdate = UpdateFromInstantiable<SelectQuestion>
+export type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
+export type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
+export type ScalarQuestionUpdate = UpdateFromInstantiable<ScalarQuestion>
+export type SelectQuestionUpdate = UpdateFromInstantiable<SelectQuestion>
 
 export type QuestionCreate = ScalarQuestionCreate | SelectQuestionCreate
 export type QuestionUpdate = ScalarQuestionUpdate | SelectQuestionUpdate
