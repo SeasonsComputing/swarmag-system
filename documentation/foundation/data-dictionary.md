@@ -21,31 +21,24 @@ It is derived from `documentation/foundation/domain.md` and presents the same mo
 |           |                                    | SelectQuestion           |
 |           |                                    | Question                 |
 |           |                                    | Answer                   |
-|           |                                    |                          |
 | Assets    | `@domain/abstractions/asset.ts`    | AssetType                |
 |           |                                    | AssetStatus              |
 |           |                                    | Asset                    |
-|           |                                    |                          |
 | Chemicals | `@domain/abstractions/chemical.ts` | ChemicalUsage            |
 |           |                                    | ChemicalLabel            |
 |           |                                    | Chemical                 |
-|           |                                    |                          |
 | Customers | `@domain/abstractions/customer.ts` | Contact                  |
 |           |                                    | CustomerSite             |
 |           |                                    | Customer                 |
-|           |                                    |                          |
 | Services  | `@domain/abstractions/service.ts`  | ServiceCategory          |
 |           |                                    | Service                  |
 |           |                                    | ServiceRequiredAssetType |
-|           |                                    |                          |
 | Users     | `@domain/abstractions/user.ts`     | UserRole                 |
 |           |                                    | User                     |
-|           |                                    |                          |
 | Workflows | `@domain/abstractions/workflow.ts` | Task                     |
 |           |                                    | TaskQuestion             |
 |           |                                    | Workflow                 |
 |           |                                    | WorkflowTask             |
-|           |                                    |                          |
 | Jobs      | `@domain/abstractions/job.ts`      | JobStatus                |
 |           |                                    | Job                      |
 |           |                                    | JobAssessment            |
