@@ -41,12 +41,13 @@
     "fmt": "dprint fmt",
     "fmt:check": "dprint check",
 
-    "guard:architecture": "deno run --allow-read source/devops/guard-architecture.ts",
-    "guard:env": "deno run --allow-read source/devops/guard-env.ts",
-    "guard:leaf": "deno run --allow-read source/devops/guard-leaf.ts",
-    "guard:validation": "deno run --allow-read source/devops/guard-validation.ts",
-    "guard:validator-layout": "deno run --allow-read source/devops/guard-validator-layout.ts",
-    "guard:core-std-types": "deno run --allow-read source/devops/guard-core-std-types.ts",
+    "guard:architecture": "deno run --allow-read source/devops/guards/guard-architecture.ts",
+    "guard:env": "deno run --allow-read source/devops/guards/guard-env.ts",
+    "guard:leaf": "deno run --allow-read source/devops/guards/guard-leaf.ts",
+    "guard:validation": "deno run --allow-read source/devops/guards/guard-validation.ts",
+    "guard:validator-layout": "deno run --allow-read source/devops/guards/guard-validator-layout.ts",
+    "guard:domain-style": "deno run --allow-read source/devops/guards/guard-domain-style.ts",
+    "guard:core-std-types": "deno run --allow-read source/devops/guards/guard-core-std-types.ts",
   },
   "fmt": {
     "exclude": [
