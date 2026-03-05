@@ -192,7 +192,7 @@ The human participates as the Chief Architect with AI Architect and AI Coding En
 To reduce AI access-token depletion it is recommended that each work session be in manageable chunks of 2-4 hours and the each session begins as a new chat. Context for both chats begin by ingesting the following project assets:
 
 ```text
-"Ingest the following project assets, then inform the Chief Architect and wait for tasks:"
+Ingest the following project assets, then inform the Chief Architect and wait for tasks:
   1. `README.md` <- this document
   2. `CONSTITUTION.md`
   3. `documentation/foundation/*.md`
