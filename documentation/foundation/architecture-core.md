@@ -183,15 +183,15 @@ import { makeCrudSupabaseClient } from '@core/api/make-supabase-client.ts'
 // API namespace composed from client makers
 export const api = {
   // Domain abstractions using appropriate storage bindings
-  Users: makeCrudSupabaseClient<User, UserCreateInput, UserUpdateInput>({
+  Users: makeCrudSupabaseClient<User, UserCreate, UserUpdate>({
     table: 'users'
   }),
-  Customers: makeCrudSupabaseClient<Customer, CustomerCreateInput, CustomerUpdateInput>({
+  Customers: makeCrudSupabaseClient<Customer, CustomerCreate, CustomerUpdate>({
     table: 'customers'
   }),
 
   // Offline storage for field operations
-  JobsLocal: makeCrudIndexedDbClient<Job, JobCreateInput, JobUpdateInput>({
+  JobsLocal: makeCrudIndexedDbClient<Job, JobCreate, JobUpdate>({
     store: 'jobs'
   }),
 
@@ -866,8 +866,8 @@ export const api = {
   // New domain abstraction
   Services: makeCrudSupabaseClient<
     Service,
-    ServiceCreateInput,
-    ServiceUpdateInput
+    ServiceCreate,
+    ServiceUpdate
   >({
     table: 'services'
   })
@@ -886,5 +886,3 @@ Code is deleted, not commented out:
 - Update tests
 
 Dead code is a liability.
-
-_End of Architecture Core Document_
