@@ -154,14 +154,6 @@ The system consists of five primary components:
 
 UX applications compose their API namespace (`@ux-api`) using client makers that connect directly to Supabase or IndexedDB.
 
-### 4.2 Domain Model Summary
-
-Core abstractions: **Service**, **Asset**, **Chemical**, **Workflow**, **Job**, **JobAssessment**, **JobPlan**, **JobLog**, **Customer**, **User**.
-
-Supporting abstractions: **Location**, **Note**, **Attachment**, **Question**, **Answer**, **AssetType**.
-
-The domain model is pure TypeScript with no infrastructure dependencies. Canonical domain definitions and rules live in `documentation/foundation/domain.md`. All architectural, API, persistence, and user-interface concerns are derived from and constrained by this model.
-
 ## 5. System Boundary
 
 The system boundary is the **API namespace** (`source/ux/api/`), not a transport layer or provider abstraction.
@@ -284,7 +276,7 @@ Each maker takes a specification object and returns a fully-typed client:
 
 ```typescript
 // CRUD maker
-const Users = makeCrudSupabaseClient<User, UserCreateInput, UserUpdateInput>({
+const Users = makeCrudSupabaseClient<User, UserCreate, UserUpdate>({
   table: 'users'
 })
 await Users.create({ displayName: 'Ada', email: 'ada@example.com' })
