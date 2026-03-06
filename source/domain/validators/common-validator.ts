@@ -39,21 +39,18 @@ import {
   isWhen
 } from '@core-std'
 import {
-  ATTACHMENT_KINDS,
+  type Answer,
   type Attachment,
-  NOTE_VISIBILITIES,
+  ATTACHMENT_KINDS,
   type Note,
+  NOTE_VISIBILITIES,
   QUESTION_TYPES,
   type QuestionType,
   SELECT_QUESTION_TYPES,
   type SelectOption,
-  type SelectQuestionType,
-  type Answer
+  type SelectQuestionType
 } from '@domain/abstractions/common.ts'
-import type {
-  QuestionCreate,
-  QuestionUpdate
-} from '@domain/protocols/common-protocol.ts'
+import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/common-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -154,7 +151,9 @@ export const isNote = (value: unknown): value is Note => {
   ) {
     return false
   }
-  if (!isCompositionMany(data.tags, (entry): entry is string => typeof entry === 'string')) {
+  if (
+    !isCompositionMany(data.tags, (entry): entry is string => typeof entry === 'string')
+  ) {
     return false
   }
 

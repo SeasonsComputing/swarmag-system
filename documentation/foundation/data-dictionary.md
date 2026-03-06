@@ -121,13 +121,13 @@ Type: **object**
 
 Attributes: **State**
 
-| **Attribute**  | **Type**                                          |
-| -------------- | ------------------------------------------------- |
-| `filename`     | string                                            |
-| `url`          | string                                            |
-| `contentType`  | string                                            |
-| `kind`         | `'photo'` \| `'video'` \| `'map'` \| `'document'` |
-| `uploadedAt`   | When                                              |
+| **Attribute** | **Type**                                          |
+| ------------- | ------------------------------------------------- |
+| `filename`    | string                                            |
+| `url`         | string                                            |
+| `contentType` | string                                            |
+| `kind`        | `'photo'` \| `'video'` \| `'map'` \| `'document'` |
+| `uploadedAt`  | When                                              |
 
 ### 4.3 Note
 

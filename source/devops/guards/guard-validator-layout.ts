@@ -9,8 +9,7 @@ const VALIDATORS_SECTION_TITLE = 'VALIDATORS'
 const SECTION_BLOCK_REGEX = /^\/\/ ─+\n\/\/ ([A-Z][A-Z ]*[A-Z])\n\/\/ ─+$/gm
 const EXPORT_VALIDATOR_REGEX = /^export const validate[A-Za-z0-9_]*\s*=/gm
 
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const main = async () => {
   const violations: string[] = []
@@ -32,9 +31,7 @@ const main = async () => {
       continue
     }
 
-    const validatorsSectionIndex = sections.findIndex(s =>
-      s.title === VALIDATORS_SECTION_TITLE
-    )
+    const validatorsSectionIndex = sections.findIndex(s => s.title === VALIDATORS_SECTION_TITLE)
     if (validatorsSectionIndex < 0) {
       violations.push(`${relative} is missing section "// ${VALIDATORS_SECTION_TITLE}"`)
       continue
@@ -58,9 +55,7 @@ const main = async () => {
         || exportMatch.index > internalsStart
       ) {
         const line = lineNumber(source, exportMatch.index)
-        violations.push(
-          `${relative}:${line} validator export is outside the top validators section`
-        )
+        violations.push(`${relative}:${line} validator export is outside the top validators section`)
       }
     }
   }

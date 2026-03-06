@@ -111,8 +111,12 @@ async function parseBody(response: Response): Promise<Dictionary> {
 async function unwrap<T>(response: Response): Promise<T> {
   const body = await parseBody(response)
   if (!response.ok) {
-    throw new ApiError((body.error as string) ?? 'Request failed', response.status, body
-      .details as string | undefined)
+    throw new ApiError(
+      (body.error as string) ?? 'Request failed',
+      response.status,
+      body
+        .details as string | undefined
+    )
   }
   return body.data as T
 }
@@ -130,8 +134,12 @@ async function unwrapList<T>(
 ): Promise<ListResult<T>> {
   const body = await parseBody(response)
   if (!response.ok) {
-    throw new ApiError((body.error as string) ?? fallbackError, response.status, body
-      .details as string | undefined)
+    throw new ApiError(
+      (body.error as string) ?? fallbackError,
+      response.status,
+      body
+        .details as string | undefined
+    )
   }
   return {
     data: body.data as T[],

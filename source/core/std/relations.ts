@@ -42,8 +42,7 @@ export type CompositionPositive<T> = readonly T[]
 export const isCompositionOne = <T>(
   value: unknown,
   guard: (v: unknown) => v is T
-): value is CompositionOne<T> =>
-  Array.isArray(value) && value.length === 1 && guard(value[0])
+): value is CompositionOne<T> => Array.isArray(value) && value.length === 1 && guard(value[0])
 
 /** Returns true if value is an array of 0 or 1 elements satisfying guard. */
 export const isCompositionOptional = <T>(
@@ -62,8 +61,7 @@ export const isCompositionMany = <T>(
 export const isCompositionPositive = <T>(
   value: unknown,
   guard: (v: unknown) => v is T
-): value is CompositionPositive<T> =>
-  Array.isArray(value) && value.length >= 1 && value.every(guard)
+): value is CompositionPositive<T> => Array.isArray(value) && value.length >= 1 && value.every(guard)
 
 /**
  * Extracts the single value from a CompositionOne.
