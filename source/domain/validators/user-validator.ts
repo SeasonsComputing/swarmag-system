@@ -1,7 +1,7 @@
 /*
 ╔═════════════════════════════════════════════════════════════════════════════╗
-║ User protocol validator                                                    ║
-║ Boundary validation for user protocol payloads.                            ║
+║ User protocol validator                                                     ║
+║ Boundary validation for user protocol payloads.                             ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -10,11 +10,8 @@ Validates create and update protocol payloads for user topic abstractions.
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-validateUserCreate(input)
-  Validate UserCreate payloads.
-
-validateUserUpdate(input)
-  Validate UserUpdate payloads.
+validateUserCreate(input)    Validate UserCreate payloads.
+validateUserUpdate(input)    Validate UserUpdate payloads.
 */
 
 import {
@@ -64,7 +61,3 @@ export const validateUserUpdate = (input: UserUpdate): string | null => {
     expectConstEnum(input.status, 'status', USER_STATUSES, true)
   )
 }
-
-// ────────────────────────────────────────────────────────────────────────────
-// INTERNALS
-// ────────────────────────────────────────────────────────────────────────────
