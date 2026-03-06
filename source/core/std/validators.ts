@@ -60,8 +60,8 @@ export const isConstEnum = <T extends readonly string[]>(
 /** Standard validator return value: error message or null. */
 export type ExpectResult = string | null
 
-/**Validator expect guard from composition */
-export type ExpectGuard = <T>(entry: unknown) => entry is T
+/** Type guard used by expectComposition helpers. */
+export type ExpectGuard<T> = (entry: unknown) => entry is T
 
 /** Return the first non-null validation result, or null when all are valid. */
 export const expectValid = (...results: ExpectResult[]): ExpectResult =>
@@ -132,48 +132,32 @@ export const expectConstEnum = <T extends readonly string[]>(
 export const expectCompositionOne = <T>(
   value: unknown,
   field: string,
-  guard: ExpectGuard,
+  guard: ExpectGuard<T>,
   optional = false
 ): ExpectResult => {
-  if (value === undefined) {
-    return optional
-      ? null
-      : `${field} must be a single-element composition`
-  }
-  return isCompositionOne(value, guard)
-    ? null
-    : `${field} must be a single-element composition`
+  if (value === undefined) return optional ? null : `${field} must be a single-element composition`
+  return isCompositionOne(value, guard) ? null : `${field} must be a single-element composition`
 }
 
 /** Validate a required or optional CompositionOptional value. */
 export const expectCompositionOptional = <T>(
   value: unknown,
   field: string,
-  guard: ExpectGuard,
+  guard: ExpectGuard<T>,
   optional = false
 ): ExpectResult => {
-  if (value === undefined) {
-    return optional
-      ? null
-      : `${field} must be an optional composition`
-  }
-  return isCompositionOptional(value, guard)
-    ? null
-    : `${field} must be an optional composition`
+  if (value === undefined) return optional ? null : `${field} must be an optional composition`
+  return isCompositionOptional(value, guard) ? null : `${field} must be an optional composition`
 }
 
 /** Validate a required or optional CompositionMany value. */
 export const expectCompositionMany = <T>(
   value: unknown,
   field: string,
-  guard: ExpectGuard,
+  guard: ExpectGuard<T>,
   optional = false
 ): ExpectResult => {
-  if (value === undefined) {
-    return optional
-      ? null
-      : `${field} must be an array composition`
-  }
+  if (value === undefined) return optional ? null : `${field} must be an array composition`
   return isCompositionMany(value, guard) ? null : `${field} must be an array composition`
 }
 
@@ -181,15 +165,9 @@ export const expectCompositionMany = <T>(
 export const expectCompositionPositive = <T>(
   value: unknown,
   field: string,
-  guard: ExpectGuard,
+  guard: ExpectGuard<T>,
   optional = false
 ): ExpectResult => {
-  if (value === undefined) {
-    return optional
-      ? null
-      : `${field} must be a non-empty array composition`
-  }
-  return isCompositionPositive(value, guard)
-    ? null
-    : `${field} must be a non-empty array composition`
+  if (value === undefined) return optional ? null : `${field} must be a non-empty array composition`
+  return isCompositionPositive(value, guard) ? null : `${field} must be a non-empty array composition`
 }
