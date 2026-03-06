@@ -193,7 +193,7 @@ To reduce AI access-token depletion it is recommended that each work session be 
 
 ```text
 Ingest the following project assets, then inform the Chief Architect and wait for tasks:
-  1. `README.md` <- this document
+  1. `README.md`
   2. `CONSTITUTION.md`
   3. `documentation/foundation/*.md`
   4. `source/core/**/*.ts`

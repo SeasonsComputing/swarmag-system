@@ -108,10 +108,6 @@ Documentation intensity follows implementation complexity. The code speaks first
 
 ### 6.1 Spec files
 
-The code is the documentation. Inline `/** */` comments only where a name alone is insufficient. No box, no dash-rules, no sections.
-
-Example:
-
 ```typescript
 /**
  * Common types and utilities for handling ISO datetime strings.
@@ -142,111 +138,60 @@ Finally a "EXPORTED APIs & TYPEs" subsection divider where symbols are enumerate
 Boxes should have equal length lines to ensure the box sides align with the box corners.
 
 Example:
-
 ```typescript
 /*
-╔═══════════════════════════════════════════════════════════════════════════════════════╗
-║ Runtime configuration singleton                                                       ║
-║ Validated, fast-fail access to environment variables across all runtimes.             ║
-╚═══════════════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ User protocol validator                                                      ║
+║ Boundary validation for user protocol payloads.                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
-─────────────────────────────────────────────────────────────────────────────────────────
-Initialized once at bootstrap with a runtime provider and a list of required
-keys. All subsequent reads go through Config.get(). Throws immediately on
-missing keys, double initialization, or unregistered access.
+───────────────────────────────────────────────────────────────────────────────
+Validates create and update protocol payloads for user topic abstractions.
 
 EXPORTED APIs & TYPEs
-─────────────────────────────────────────────────────────────────────────────────────────
-Config.init(provider, keys, aliases?)  Initialize with provider and required keys
-Config.get(name)                       Return required config value; throws if missing
-Config.fail(msg)                       Throw never; use for invariant violations
+───────────────────────────────────────────────────────────────────────────────
+validateUserCreate(input)  Validate UserCreate payloads.
+validateUserUpdate(input)  Validate UserUpdate payloads.
 */
 ```
 
-### 6.3 Non-trivial functional files
-
-Complex implementations with a well-defined public surface and significant private machinery.
-
-The file-header starts as 6.2 Functional files followed by a boxed "INTERNALS" section-separator, which is followed by an enumeration of internal symbols where the symbol is declared on one line immediately followed by a comment of the purpose of the internal symbol. This is followed by a "EXAMPLES" subsection divider with an example of the usage.
-
-Example:
-
-```typescript
-/*
-╔═══════════════════════════════════════════════════════════════════════════════════════╗
-║ HTTP handler wrapper                                                                  ║
-║ Normalizes Supabase Edge Function request/response lifecycle.                         ║
-╚═══════════════════════════════════════════════════════════════════════════════════════╝
-
-PURPOSE
-─────────────────────────────────────────────────────────────────────────────────────────
-Wraps typed handler functions with CORS, body parsing, method validation,
-error serialization, and response normalization.
-
-EXPORTED APIs & TYPEs
-─────────────────────────────────────────────────────────────────────────────────────────
-HttpHandler
-  → (request: Request) → Promise<Response>
-  → Wraps typed handler with CORS, body parsing, method validation,
-    error serialization, and response normalization.
-
-╔═══════════════════════════════════════════════════════════════════════════════════════╗
-║ INTERNALS                                                                             ║
-╚═══════════════════════════════════════════════════════════════════════════════════════╝
-normalizeHeaders, parseRequestBody, makeCorsHeaders, serializeError
-  → Private pipeline functions; not exported; no external contract.
-
-EXAMPLE
-─────────────────────────────────────────────────────────────────────────────────────────
-export default wrapHttpHandler(async (req) => {
-  if (req.method !== 'POST') return toMethodNotAllowed()
-  const user = await createUser(req.body)
-  return toCreated(user)
-}, { cors: true })
-*/
-```
-
-### 6.4 Header rules
+### 6.3 Header rules
 
 - One blank line between the box close and PURPOSE.
 - One blank line between PURPOSE prose and the next section label.
 - One blank line between distinct subsection groups within EXPORTED APIs & TYPEs.
 - No blank line between a section label and its dash-rule.
 - No blank line between the dash-rule and its content.
-- INTERNALS and EXAMPLE only when private implementation is non-trivial.
-- EXAMPLE is valid, runnable TypeScript — not pseudocode.
 - Headers stay current. A stale header is worse than no header.
 
-### 6.5 Section divider
+### 6.4 Section divider
 
 Files with clear categories of declarations and functions divide the code body into sections, each with a section divider header. Consistent width, no variation:
-
 ```typescript
-// ──────────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 // {SECTION LABEL}
-// ──────────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 ```
 
-### 6.6 Encapsulation & information hiding
+### 6.5 Encapsulation & information hiding
 
 Files with a public API and implementation (internal) API are divided into sections: PUBLIC EXPORTS then PRIVATE INTERNALS:
-
 ```typescript
-// ──────────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 // PUBLIC EXPORTS
-// ──────────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 
 // ... exported types, functions, constants ...
 
-// ──────────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 // PRIVATE INTERNALS
-// ──────────────────────────────────────────────────────────────────────────────────────
+// ────────────────────────────────────────────────────────────────────────────
 
 // ... unexported helpers ...
 ```
 
-### 6.7 Comment conventions
+### 6.6 Comment conventions
 
 | Context                       | Style                                                               |
 | ----------------------------- | ------------------------------------------------------------------- |
@@ -389,7 +334,6 @@ export type Shape = CircleShape | RectShape
 ```typescript
 export const toShape = (dict: Dictionary): Shape => {
   const kind = dict.kind as ShapeKind
-
   switch (kind) {
     case 'circle':
       return {
@@ -397,7 +341,6 @@ export const toShape = (dict: Dictionary): Shape => {
         color: dict.color as string | undefined,
         radius: dict.radius as number
       } satisfies CircleShape
-
     case 'rect':
       return {
         kind,
@@ -405,10 +348,6 @@ export const toShape = (dict: Dictionary): Shape => {
         width: dict.width as number,
         height: dict.height as number
       } satisfies RectShape
-
-    case 'triangle':
-      // extend when TriangleShape is defined
-      return notValid(`unsupported shape kind: ${kind}`)
   }
 }
 ```
@@ -416,18 +355,17 @@ export const toShape = (dict: Dictionary): Shape => {
 **Validator consumption** — same discriminator-switch pattern, branch-specific checks:
 
 ```typescript
-export const validateShapeCreate = (input: ShapeCreate): string | null => {
-  if (!SHAPE_KINDS.includes(input.kind as ShapeKind)) return 'kind must be a valid ShapeKind'
-
+export const validateShapeCreate = (input: ShapeCreate): ExpectResult => {
+  const error = expectConstEnum(input.kind, 'kind', SHAPE_KINDS)
+  if (error) return error
   switch (input.kind) {
     case 'circle':
-      if (!isPositiveNumber(input.radius)) return 'radius must be a positive number'
-      return null
-
+      return expectPositiveNumber(input.radius, 'radius')
     case 'rect':
-      if (!isPositiveNumber(input.width)) return 'width must be a positive number'
-      if (!isPositiveNumber(input.height)) return 'height must be a positive number'
-      return null
+      return expectValid(
+        expectPositiveNumber(input.width, 'width'),
+        expectPositiveNumber(input.height, 'height')
+      )
   }
 }
 ```
