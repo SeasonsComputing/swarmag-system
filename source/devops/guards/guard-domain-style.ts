@@ -28,8 +28,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
   return entries
 }
 
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const main = async () => {
   const violations: string[] = []
@@ -65,24 +64,30 @@ const main = async () => {
       if (trimmed.length === 0) continue
 
       if (/^\s{2,}\S/.test(line)) {
-        const lineNo = lineNumber(source, exportedBodyStart + exportedBody
-          .split('\n')
-          .slice(0, i)
-          .join('\n').length + (i > 0 ? 1 : 0))
-        violations.push(
-          `${relative}:${lineNo} EXPORTED APIs & TYPEs entry uses continuation line; keep symbol and description on one line`
+        const lineNo = lineNumber(
+          source,
+          exportedBodyStart + exportedBody
+            .split('\n')
+            .slice(0, i)
+            .join('\n').length
+            + (i > 0 ? 1 : 0)
         )
+        violations
+          .push(`${relative}:${lineNo} EXPORTED APIs & TYPEs entry uses continuation line; keep symbol and description on one line`)
         continue
       }
 
       if (!/\S\s{2,}\S/.test(line)) {
-        const lineNo = lineNumber(source, exportedBodyStart + exportedBody
-          .split('\n')
-          .slice(0, i)
-          .join('\n').length + (i > 0 ? 1 : 0))
-        violations.push(
-          `${relative}:${lineNo} EXPORTED APIs & TYPEs entry must contain symbol and description on the same line`
+        const lineNo = lineNumber(
+          source,
+          exportedBodyStart + exportedBody
+            .split('\n')
+            .slice(0, i)
+            .join('\n').length
+            + (i > 0 ? 1 : 0)
         )
+        violations
+          .push(`${relative}:${lineNo} EXPORTED APIs & TYPEs entry must contain symbol and description on the same line`)
       }
     }
   }

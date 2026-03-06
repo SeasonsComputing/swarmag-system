@@ -430,8 +430,12 @@ export const wrapHttpHandler = <
       }
 
       if (!isHttpMethod(method)) {
-        return makeErrorResponse(HttpCodes.methodNotAllowed, 'MethodNotAllowed',
-          `HTTP method '${method}' is not supported`, config)
+        return makeErrorResponse(
+          HttpCodes.methodNotAllowed,
+          'MethodNotAllowed',
+          `HTTP method '${method}' is not supported`,
+          config
+        )
       }
 
       const headers = normalizeHeaders(request.headers)
@@ -448,8 +452,7 @@ export const wrapHttpHandler = <
       }
 
       const url = new URL(request.url)
-      const query = normalizeQuery(url.searchParams,
-        config.multiValueQueryParams ?? false)
+      const query = normalizeQuery(url.searchParams, config.multiValueQueryParams ?? false)
 
       const HttpRequest: HttpRequest<RequestBody, Query, HttpHeaders> = {
         method,
@@ -694,8 +697,7 @@ const parseRequestBody = async (
   if (contentLength) {
     const parsedLength = Number.parseInt(contentLength, 10)
     if (!Number.isNaN(parsedLength) && parsedLength > maxSize) {
-      throw new NamedError('PayloadTooLarge',
-        `Request body exceeds maximum size of ${maxSize} bytes`)
+      throw new NamedError('PayloadTooLarge', `Request body exceeds maximum size of ${maxSize} bytes`)
     }
   }
 
@@ -706,16 +708,17 @@ const parseRequestBody = async (
 
   const bodySize = byteLength(decodedBody)
   if (bodySize > maxSize) {
-    throw new NamedError('PayloadTooLarge',
-      `Request body exceeds maximum size of ${maxSize} bytes`)
+    throw new NamedError('PayloadTooLarge', `Request body exceeds maximum size of ${maxSize} bytes`)
   }
 
   // Validate Content-Type for bodies
   if (config.validateContentType !== false) {
     const ct = contentType?.toLowerCase() ?? ''
     if (!ct.includes('application/json')) {
-      throw new NamedError('InvalidContentType',
-        `Expected Content-Type: application/json, received: ${contentType ?? 'none'}`)
+      throw new NamedError(
+        'InvalidContentType',
+        `Expected Content-Type: application/json, received: ${contentType ?? 'none'}`
+      )
     }
   }
 
@@ -761,14 +764,22 @@ const makeResponse = (
       bodyString = JSON.stringify(body === undefined ? null : body)
     } catch (err) {
       console.error('Handler returned non-serializable response body:', body)
-      return makeErrorResponse(HttpCodes.internalError, 'InvalidResponse',
-        `Response body is not JSON-serializable: ${(err as Error).message}`, config)
+      return makeErrorResponse(
+        HttpCodes.internalError,
+        'InvalidResponse',
+        `Response body is not JSON-serializable: ${(err as Error).message}`,
+        config
+      )
     }
   } else if (typeof body === 'string') {
     bodyString = body
   } else {
-    return makeErrorResponse(HttpCodes.internalError, 'InvalidResponse',
-      'Non-JSON responses must provide a string body', config)
+    return makeErrorResponse(
+      HttpCodes.internalError,
+      'InvalidResponse',
+      'Non-JSON responses must provide a string body',
+      config
+    )
   }
 
   return new Response(bodyString, {

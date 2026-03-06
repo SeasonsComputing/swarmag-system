@@ -23,12 +23,7 @@ validateWorkflowUpdate(input)
   Validate WorkflowUpdate payloads.
 */
 
-import {
-  isCompositionMany,
-  isId,
-  isNonEmptyString,
-  isPositiveNumber
-} from '@core-std'
+import { isCompositionMany, isId, isNonEmptyString, isPositiveNumber } from '@core-std'
 import type {
   TaskCreate,
   TaskUpdate,

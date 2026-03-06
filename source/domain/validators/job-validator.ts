@@ -92,10 +92,7 @@ import type {
   JobWorkLogEntryCreate,
   JobWorkUpdate
 } from '@domain/protocols/job-protocol.ts'
-import {
-  isAnswer,
-  isNote
-} from '@domain/validators/common-validator.ts'
+import { isAnswer, isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS

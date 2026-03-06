@@ -125,8 +125,7 @@ const findImports = (source: string): Array<{ specifier: string; index: number }
   return imports
 }
 
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const isUxAppFile = (file: string): boolean => {
   const normalized = normalizePath(file)
@@ -151,9 +150,7 @@ const checkUxImports = (
   for (const { specifier } of imports) {
     for (const forbidden of UX_FORBIDDEN_IMPORTS) {
       if (specifier.startsWith(forbidden)) {
-        violations.push(
-          `Forbidden import: ${specifier} (use @ux-api, @domain, or @core-std instead)`
-        )
+        violations.push(`Forbidden import: ${specifier} (use @ux-api, @domain, or @core-std instead)`)
       }
     }
   }
@@ -174,9 +171,8 @@ const checkConfigImports = (
   for (const { specifier } of imports) {
     // Direct Config import only in config modules
     if (specifier === '@core/cfg/config.ts' && !configModule) {
-      violations.push(
-        'Direct Config import (use package config module: @back-supabase-edge/config/... or @ux-app-*/config/...)'
-      )
+      violations
+        .push('Direct Config import (use package config module: @back-supabase-edge/config/... or @ux-app-*/config/...)')
     }
 
     // Provider imports only in config modules
@@ -225,9 +221,8 @@ const main = async () => {
       const target = namespaceForSpecifier(entry.specifier, file)
       if (!allowed.has(target)) {
         const line = lineNumber(source, entry.index)
-        violations.push(
-          `${relative}:${line} - ${namespace} cannot import from ${target} (imports "${entry.specifier}")`
-        )
+        violations
+          .push(`${relative}:${line} - ${namespace} cannot import from ${target} (imports "${entry.specifier}")`)
       }
     }
 
@@ -251,9 +246,7 @@ const main = async () => {
       console.error(`  ${violation}`)
     }
     console.error('')
-    console.error(
-      'See documentation/foundation/architecture-core.md for dependency rules'
-    )
+    console.error('See documentation/foundation/architecture-core.md for dependency rules')
     Deno.exit(1)
   }
 

@@ -1,5 +1,5 @@
 {
-  "lineWidth": 90,
+  "lineWidth": 105,
   "indentWidth": 2,
   "useTabs": false,
   "typescript": {
@@ -10,7 +10,7 @@
     "preferSingleLine": false,
     "memberExpression.linePerExpression": false,
     "objectExpression.preferHanging": false,
-    "arguments.preferHanging": "always",
+    "arguments.preferHanging": "onlySingleItem",
     "ifStatement.useBraces": "whenNotSingleLine",
     "ifStatement.singleBodyPosition": "sameLine",
     "whileStatement.useBraces": "whenNotSingleLine",

@@ -18,14 +18,8 @@ validateServiceUpdate(input)
 */
 
 import { isCompositionMany, isId, isNonEmptyString } from '@core-std'
-import {
-  SERVICE_CATEGORIES,
-  type ServiceCategory
-} from '@domain/abstractions/service.ts'
-import type {
-  ServiceCreate,
-  ServiceUpdate
-} from '@domain/protocols/service-protocol.ts'
+import { SERVICE_CATEGORIES, type ServiceCategory } from '@domain/abstractions/service.ts'
+import type { ServiceCreate, ServiceUpdate } from '@domain/protocols/service-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────

@@ -14,7 +14,7 @@ Code that conflicts with this guide is wrong — not the guide.
 | Item            | Guideline                                                                                                                                               |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Runtime         | Deno with strict TypeScript (`deno task check`)                                                                                                         |
-| Encoding        | ASCII only; no non-ASCII literals                                                                                                                       |
+| Encoding        | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint.                                                  |
 | Types           | Use `type` for data shapes, abstractions, aliases, and unions; use `interface` only for encapsulated API contracts that something explicitly implements |
 | Primitives/ADTs | Use `Id` (UUID v7 string), `When` (ISO 8601 UTC string), `StringSet`, `Dictionary` and `StringDictionary` from `@core-std`                              |
 
@@ -72,12 +72,35 @@ Acronyms are not a special case — they are words, and words transform with the
 
 All TypeScript is formatted by `dprint` via `deno task fmt`. The formatter is authoritative — do not argue with it.
 
-Two rules are non-negotiable and must be reflected in all code samples and generated code:
+### 5.1 Rules
 
 - **No semicolons** — statement terminators are omitted throughout
 - **Single quotes** — string literals use `'...'` not `"..."`
+- **Line length** — maximum length of any line is `105` characters.
+- **Comment box length** — comment box maximum length is `80` characters
+- **File order of symbols** — exported symbols are listed at the top of the file with non-exports below them, when possible.
 
-These are enforced by `dprint.json` configuration and will cause `deno task fmt:check` to fail if violated.
+### 5.2 Single-line statements
+
+Prefer single-line statements for simple, non-loop control flow and import statements when readability is preserved.
+
+- Never use single-line loop bodies (`for`, `for...of`, `for await...of`, `while`, `do...while`); always use braces and multiline bodies.
+- Use multiline form when a statement exceeds max line length or when a single-line form reduces readability.
+- Single-line `if`/guard-return is allowed only for one simple action.
+
+Examples:
+
+```typescript
+export type Bar = Ding & Bat
+
+if (!input) return null
+
+let wingDings = { now: when() }
+
+for (const item of items) {
+  process(item)
+}
+```
 
 ## 6. Source Code File Format
 
@@ -91,51 +114,50 @@ Example:
 
 ```typescript
 /**
- * Domain models for vehicles.
+ * Common types and utilities for handling ISO datetime strings.
+ * Provides type safety and validation for date-time values.
  */
 
-import type { AssociationOne, Instantiable } from '@core-std'
+/** Represents a date-time in ISO 8601 string format. */
+export type When = string
 
-/** Reference type for categorizing vehicles. */
-export type VehicleType = Instantiable & {
-  label: string
-  active: boolean
-}
+/** Valid ISO datetime format regex. */
+const ISO_DATETIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
 
-/** Lifecycle/availability state. */
-export const VEHICLE_STATUSES = ['active', 'maintenance', 'retired'] as const
-export type VehicleStatus = (typeof VEHICLE_STATUSES)[number]
+/** Gets the current UTC datetime as an ISO string */
+export const when = (): When => new Date().toISOString()
 
-/** Operational vehicle. */
-export type Vehicle = Instantiable & {
-  label: string
-  serialNumber?: string
-  type: AssociationOne<VehicleType>
-  status: VehicleStatus
-}
+/** Checks if a string is a valid ISO date-time. */
+export const isWhen = (value: unknown): value is When =>
+  typeof value === 'string' && ISO_DATETIME_REGEX.test(value)
 ```
 
 ### 6.2 Functional files
 
-Files where behavior matters and the public surface benefits from a documented contract. A box header replaces the top JSDoc. JSDoc on exported functions where params or return values need prose. No section dividers needed — no significant private machinery to separate.
+Files where behavior matters and the public surface benefits from a documented contract.
+
+A box header replaces the file-header JSDoc, followed by a detailed "PURPOSE" subsection divider.
+Finally a "EXPORTED APIs & TYPEs" subsection divider where symbols are enumerated with brief description of each symbol on the same line.
+
+Boxes should have equal length lines to ensure the box sides align with the box corners.
 
 Example:
 
 ```typescript
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Runtime configuration singleton                                             ║
-║ Validated, fast-fail access to environment variables across all runtimes.   ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════╗
+║ Runtime configuration singleton                                                       ║
+║ Validated, fast-fail access to environment variables across all runtimes.             ║
+╚═══════════════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
-───────────────────────────────────────────────────────────────────────────────
+─────────────────────────────────────────────────────────────────────────────────────────
 Initialized once at bootstrap with a runtime provider and a list of required
 keys. All subsequent reads go through Config.get(). Throws immediately on
 missing keys, double initialization, or unregistered access.
 
 EXPORTED APIs & TYPEs
-───────────────────────────────────────────────────────────────────────────────
+─────────────────────────────────────────────────────────────────────────────────────────
 Config.init(provider, keys, aliases?)  Initialize with provider and required keys
 Config.get(name)                       Return required config value; throws if missing
 Config.fail(msg)                       Throw never; use for invariant violations
@@ -144,66 +166,49 @@ Config.fail(msg)                       Throw never; use for invariant violations
 
 ### 6.3 Non-trivial functional files
 
-Complex implementations with a well-defined public surface and significant private machinery. Full decoration — box header, typed export signatures grouped by category, internals summary, runnable example.
+Complex implementations with a well-defined public surface and significant private machinery.
+
+The file-header starts as 6.2 Functional files followed by a boxed "INTERNALS" section-separator, which is followed by an enumeration of internal symbols where the symbol is declared on one line immediately followed by a comment of the purpose of the internal symbol. This is followed by a "EXAMPLES" subsection divider with an example of the usage.
 
 Example:
 
 ```typescript
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ HTTP handler wrapper                                                        ║
-║ Normalizes Supabase Edge Function request/response lifecycle.               ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════╗
+║ HTTP handler wrapper                                                                  ║
+║ Normalizes Supabase Edge Function request/response lifecycle.                         ║
+╚═══════════════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
-───────────────────────────────────────────────────────────────────────────────
+─────────────────────────────────────────────────────────────────────────────────────────
 Wraps typed handler functions with CORS, body parsing, method validation,
 error serialization, and response normalization.
 
 EXPORTED APIs & TYPEs
-───────────────────────────────────────────────────────────────────────────────
+─────────────────────────────────────────────────────────────────────────────────────────
 HttpHandler
   → (request: Request) → Promise<Response>
   → Wraps typed handler with CORS, body parsing, method validation,
     error serialization, and response normalization.
 
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ INTERNALS                                                                   ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════════════════╗
+║ INTERNALS                                                                             ║
+╚═══════════════════════════════════════════════════════════════════════════════════════╝
 normalizeHeaders, parseRequestBody, makeCorsHeaders, serializeError
   → Private pipeline functions; not exported; no external contract.
 
 EXAMPLE
-───────────────────────────────────────────────────────────────────────────────
+─────────────────────────────────────────────────────────────────────────────────────────
 export default wrapHttpHandler(async (req) => {
   if (req.method !== 'POST') return toMethodNotAllowed()
   const user = await createUser(req.body)
   return toCreated(user)
 }, { cors: true })
 */
-
-import { ... } from '...'
-
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC EXPORTS
-// ────────────────────────────────────────────────────────────────────────────
-
-export type HttpHandler = ...
-export const toOk = ...
-export const wrapHttpHandler = ...
-
-// ────────────────────────────────────────────────────────────────────────────
-// PRIVATE IMPLEMENTATION
-// ────────────────────────────────────────────────────────────────────────────
-
-function normalizeHeaders() { ... }
-function parseRequestBody() { ... }
 ```
 
 ### 6.4 Header rules
 
-- Spec files carry no box, no dash-rules. Inline `/** */` only where the name is insufficient.
-- Functional file box width: 77 characters. Title and description on consecutive lines — no blank lines inside the box.
 - One blank line between the box close and PURPOSE.
 - One blank line between PURPOSE prose and the next section label.
 - One blank line between distinct subsection groups within EXPORTED APIs & TYPEs.
@@ -213,34 +218,30 @@ function parseRequestBody() { ... }
 - EXAMPLE is valid, runnable TypeScript — not pseudocode.
 - Headers stay current. A stale header is worse than no header.
 
-### 6.5 Exported symbols
-
-Exported symbols are always listed at the top of the file with non-exports below them.
-
-### 6.6 Section divider header
+### 6.5 Section divider
 
 Files with clear categories of declarations and functions divide the code body into sections, each with a section divider header. Consistent width, no variation:
 
 ```typescript
-// ────────────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────────────
 // {SECTION LABEL}
-// ────────────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────────────
 ```
 
-#### 6.6.1 Encapsulation & information hiding
+### 6.6 Encapsulation & information hiding
 
 Files with a public API and implementation (internal) API are divided into sections: PUBLIC EXPORTS then PRIVATE INTERNALS:
 
 ```typescript
-// ────────────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────────────
 // PUBLIC EXPORTS
-// ────────────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────────────
 
 // ... exported types, functions, constants ...
 
-// ────────────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────────────
 // PRIVATE INTERNALS
-// ────────────────────────────────────────────────────────────────────────────
+// ──────────────────────────────────────────────────────────────────────────────────────
 
 // ... unexported helpers ...
 ```
@@ -280,7 +281,7 @@ Export only what callers need. Private helpers stay private.
 
 ### 7.6 No magic
 
-No implicit behavior, no runtime reflection, no metaprogramming. Configuration is explicit; providers are injected; contracts are stated in interfaces; structured data as types.
+No implicit behavior, no runtime reflection, no meta-programming. Configuration is explicit; providers are injected; contracts are stated in interfaces; structured data as types.
 
 ## 8. Implementation Patterns
 
@@ -294,7 +295,7 @@ Use types from `@core-std` instead of ad-hoc primitives and container generics.
 | `StringDictionary`        | `Record<string, string>`                                                   |
 | `StringSet`               | `Set<string>`                                                              |
 | `Id`                      | raw `string` for identifiers                                               |
-| `When`                    | raw `string` for ISO datetimes                                             |
+| `When`                    | raw `string` for ISO datetime                                              |
 | `Instantiable`            | inline `{ id, createdAt, updatedAt, deletedAt? }` lifecycle shape          |
 | `InstantiableOnly`        | inline `{ id, createdAt }` create-and-read-only lifecycle shape            |
 | `CompositionOne<T>`       | ad-hoc tuple/array for exactly-one embedded composition                    |
@@ -427,9 +428,6 @@ export const validateShapeCreate = (input: ShapeCreate): string | null => {
       if (!isPositiveNumber(input.width)) return 'width must be a positive number'
       if (!isPositiveNumber(input.height)) return 'height must be a positive number'
       return null
-
-    case 'triangle':
-      return notValid(`unsupported shape kind: ${input.kind}`)
   }
 }
 ```
@@ -580,9 +578,9 @@ Columns within a table follow this order:
 Use this fixed-width section divider:
 
 ```sql
--- ─────────────────────────────────────────────────────────────────────────────
+-- ──────────────────────────────────────────────────────────────────────────────────────
 -- section_name
--- ─────────────────────────────────────────────────────────────────────────────
+-- ──────────────────────────────────────────────────────────────────────────────────────
 ```
 
 Spacing:

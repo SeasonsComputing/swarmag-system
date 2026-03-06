@@ -56,9 +56,7 @@ export const toService = (dict: Dictionary): Service => {
     sku: dict.sku as string,
     description: dict.description as string | undefined,
     category: dict.category as ServiceCategory,
-    tagsWorkflowCandidates: (dict.tags_workflow_candidates as string[]).map(value =>
-      value
-    ),
+    tagsWorkflowCandidates: (dict.tags_workflow_candidates as string[]).map(value => value),
     createdAt: dict.created_at as When,
     updatedAt: dict.updated_at as When,
     deletedAt: dict.deleted_at as When | undefined
@@ -84,14 +82,10 @@ export const toServiceRequiredAssetType = (
   dict: Dictionary
 ): ServiceRequiredAssetType => {
   if (!dict.service_id) {
-    return notValid(
-      'ServiceRequiredAssetType dictionary missing required field: service_id'
-    )
+    return notValid('ServiceRequiredAssetType dictionary missing required field: service_id')
   }
   if (!dict.asset_type_id) {
-    return notValid(
-      'ServiceRequiredAssetType dictionary missing required field: asset_type_id'
-    )
+    return notValid('ServiceRequiredAssetType dictionary missing required field: asset_type_id')
   }
 
   return {

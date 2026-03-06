@@ -15,7 +15,7 @@ Implementation patterns for the `source/domain/` package. This document governs 
 → `domain-archetypes.md`
 → `style-guide.md`
 
-### 1.2 Scope Boundary
+### 1.2 Scope Boundary of Governing Documents
 
 - `domain.md` owns domain meaning.
 - `data-dictionary.md` owns topic namespaces, abstraction inventory, and field-level reference tables.
@@ -36,7 +36,7 @@ The domain layer follows a file-per-topic-namespace pattern, where each file con
 
 ### 2.1 File format
 
-Abstraction files conform to `style-guide.md` §6.1 Spec files. Adapter, protocol, and validator files conform to `style-guide.md` §6.2 Functional files.
+All domain files conform to `style-guide.md` section 6.2 Functional files.
 
 ## 3. Abstraction Archetype (`abstractions/`)
 
@@ -168,23 +168,19 @@ export type JobWorkLogEntryCreate = Pick<JobWorkLogEntry, 'jobId' | 'userId' | '
 ### 6.1 Pattern
 
 ```typescript
-import { isNonEmptyString, isPositiveNumber } from '@core-std'
-import type { WorkflowCreate } from '@domain/protocols/workflow-protocol.ts'
+import TODO
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validates WorkflowCreate; returns error message or null. */
-export const validateWorkflowCreate = (input: WorkflowCreate): string | null => {
-  if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
-  if (!isPositiveNumber(input.version)) return 'version must be a positive number'
-  return null
-}
+TODO
 
 // ────────────────────────────────────────────────────────────────────────────
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
+
+TODO
 ```
 
 ### 6.2 Explicit decomposition rules (non-negotiable)

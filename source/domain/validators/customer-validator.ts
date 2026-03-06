@@ -28,8 +28,8 @@ import {
   isWhen
 } from '@core-std'
 import {
-  CONTACT_PREFERRED_CHANNELS,
   type Contact,
+  CONTACT_PREFERRED_CHANNELS,
   type ContactPreferredChannel,
   CUSTOMER_STATUSES,
   type CustomerSite,
