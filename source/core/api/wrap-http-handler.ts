@@ -11,10 +11,6 @@ Request/Response contract for building REST APIs. Works identically on
 Netlify or Supabase functions (edge runtime) or Node and Deno-based
 application server (host runtime).
 
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ USAGE                                                                       ║
-╚═════════════════════════════════════════════════════════════════════════════╝
-
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
 HttpMethod, HttpQuery, HttpHeaders
@@ -95,10 +91,6 @@ export default wrapHttpHandler(async (req) => {
   cors: true,
   maxBodySize: 1024 * 1024 // 1MB limit
 })
-
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ INTERNALS                                                                   ║
-╚═════════════════════════════════════════════════════════════════════════════╝
 
 DESIGN PRINCIPLES:
 ───────────────────────────────────────────────────────────────────────────────
