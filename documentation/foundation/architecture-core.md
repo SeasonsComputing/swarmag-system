@@ -878,3 +878,5 @@ Code is deleted, not commented out:
 - Update tests
 
 Dead code is a liability.
+
+_End of Architecture Core Document_
