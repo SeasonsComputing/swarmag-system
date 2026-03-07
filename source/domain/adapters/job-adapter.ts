@@ -1,60 +1,69 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Job domain adapters                                                        ║
-║ Dictionary <-> domain serialization for job topic abstractions.            ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Job domain adapter                                                           ║
+║ Serialization for job topic abstractions.                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Converts between persisted dictionary payloads and job domain abstractions.
+Serializes between Dictionary and all job-related domain types: Job,
+JobAssessment, JobWorkflow, JobPlan, JobPlanAssignment, JobPlanChemical,
+JobPlanAsset, JobWork, and JobWorkLogEntry.
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-toJob(dict) / fromJob(job)
-  Convert Job dictionaries and domain objects.
-
-toJobAssessment(dict) / fromJobAssessment(assessment)
-  Convert JobAssessment dictionaries and domain objects.
-
-toJobWorkflow(dict) / fromJobWorkflow(jobWorkflow)
-  Convert JobWorkflow dictionaries and domain objects.
-
-toJobPlan(dict) / fromJobPlan(jobPlan)
-  Convert JobPlan dictionaries and domain objects.
-
-toJobPlanAssignment(dict) / fromJobPlanAssignment(assignment)
-  Convert JobPlanAssignment dictionaries and domain objects.
-
-toJobPlanChemical(dict) / fromJobPlanChemical(planChemical)
-  Convert JobPlanChemical dictionaries and domain objects.
-
-toJobPlanAsset(dict) / fromJobPlanAsset(planAsset)
-  Convert JobPlanAsset dictionaries and domain objects.
-
-toJobWork(dict) / fromJobWork(jobWork)
-  Convert JobWork dictionaries and domain objects.
-
-toJobWorkLogEntry(dict) / fromJobWorkLogEntry(entry)
-  Convert JobWorkLogEntry dictionaries and domain objects.
+toJob                        Deserialize Job from a storage dictionary.
+fromJob                      Serialize Job to a storage dictionary.
+toJobAssessment              Deserialize JobAssessment from a storage dictionary.
+fromJobAssessment            Serialize JobAssessment to a storage dictionary.
+toJobWorkflow                Deserialize JobWorkflow from a storage dictionary.
+fromJobWorkflow              Serialize JobWorkflow to a storage dictionary.
+toJobPlan                    Deserialize JobPlan from a storage dictionary.
+fromJobPlan                  Serialize JobPlan to a storage dictionary.
+toJobPlanAssignment          Deserialize JobPlanAssignment from a storage dictionary.
+fromJobPlanAssignment        Serialize JobPlanAssignment to a storage dictionary.
+toJobPlanChemical            Deserialize JobPlanChemical from a storage dictionary.
+fromJobPlanChemical          Serialize JobPlanChemical to a storage dictionary.
+toJobPlanAsset               Deserialize JobPlanAsset junction from a storage dictionary.
+fromJobPlanAsset             Serialize JobPlanAsset junction to a storage dictionary.
+toJobWork                    Deserialize JobWork from a storage dictionary.
+fromJobWork                  Serialize JobWork to a storage dictionary.
+toJobWorkLogEntry            Deserialize JobWorkLogEntry from a storage dictionary.
+fromJobWorkLogEntry          Serialize JobWorkLogEntry to a storage dictionary.
 */
 
-import type { Dictionary, When } from '@core-std'
-import { notValid } from '@core-std'
 import type {
+  AssociationJunction,
+  AssociationOne,
+  AssociationOptional,
+  CompositionMany,
+  CompositionOne,
+  CompositionPositive,
+  Dictionary,
+  Id,
+  When
+} from '@core-std'
+import type { Asset } from '@domain/abstractions/asset.ts'
+import type { Chemical } from '@domain/abstractions/chemical.ts'
+import type { Answer, Location, Note } from '@domain/abstractions/common.ts'
+import type { Customer } from '@domain/abstractions/customer.ts'
+import type {
+  AreaUnit,
+  ChemicalAmountUnit,
   Job,
   JobAssessment,
   JobPlan,
   JobPlanAsset,
   JobPlanAssignment,
   JobPlanChemical,
-  JobPlanChemicalUnit,
-  JobPlanTargetAreaUnit,
   JobStatus,
   JobWork,
   JobWorkflow,
   JobWorkLogEntry
 } from '@domain/abstractions/job.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
+import type { User } from '@domain/abstractions/user.ts'
+import type { Workflow } from '@domain/abstractions/workflow.ts'
 import {
   fromAnswer,
   fromLocation,
@@ -64,368 +73,204 @@ import {
   toNote
 } from '@domain/adapters/common-adapter.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC EXPORTS
-// ────────────────────────────────────────────────────────────────────────────
-
-/** Create a Job from its dictionary representation. */
-export const toJob = (dict: Dictionary): Job => {
-  if (!dict.id) return notValid('Job dictionary missing required field: id')
-  if (!dict.customer_id) {
-    return notValid('Job dictionary missing required field: customer_id')
-  }
-  if (!dict.status) return notValid('Job dictionary missing required field: status')
-  if (!dict.created_at) {
-    return notValid('Job dictionary missing required field: created_at')
-  }
-  if (!dict.updated_at) {
-    return notValid('Job dictionary missing required field: updated_at')
-  }
-
-  return {
-    id: dict.id as string,
-    customerId: dict.customer_id as string,
-    status: dict.status as JobStatus,
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  }
-}
-
-/** Create a dictionary representation from a Job. */
-export const fromJob = (job: Job): Dictionary => ({
-  id: job.id,
-  customer_id: job.customerId,
-  status: job.status,
-  created_at: job.createdAt,
-  updated_at: job.updatedAt,
-  deleted_at: job.deletedAt
+/** Deserialize Job from a storage dictionary. */
+export const toJob = (dict: Dictionary): Job => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  customerId: dict.customer_id as AssociationOne<Customer>,
+  status: dict.status as JobStatus
 })
 
-/** Create a JobAssessment from its dictionary representation. */
-export const toJobAssessment = (dict: Dictionary): JobAssessment => {
-  if (!dict.id) return notValid('JobAssessment dictionary missing required field: id')
-  if (!dict.job_id) {
-    return notValid('JobAssessment dictionary missing required field: job_id')
-  }
-  if (!dict.assessor_id) {
-    return notValid('JobAssessment dictionary missing required field: assessor_id')
-  }
-  if (!dict.locations) {
-    return notValid('JobAssessment dictionary missing required field: locations')
-  }
-  if (!dict.risks) {
-    return notValid('JobAssessment dictionary missing required field: risks')
-  }
-  if (!dict.notes) {
-    return notValid('JobAssessment dictionary missing required field: notes')
-  }
-  if (!dict.created_at) {
-    return notValid('JobAssessment dictionary missing required field: created_at')
-  }
-  if (!dict.updated_at) {
-    return notValid('JobAssessment dictionary missing required field: updated_at')
-  }
+/** Serialize Job to a storage dictionary. */
+export const fromJob = (job: Job): Dictionary => ({
+  id: job.id,
+  created_at: job.createdAt,
+  updated_at: job.updatedAt,
+  deleted_at: job.deletedAt,
+  customer_id: job.customerId,
+  status: job.status
+})
 
-  return {
-    id: dict.id as string,
-    jobId: dict.job_id as string,
-    assessorId: dict.assessor_id as string,
-    locations: (dict.locations as Dictionary[]).map(toLocation),
-    risks: (dict.risks as Dictionary[]).map(toNote),
-    notes: (dict.notes as Dictionary[]).map(toNote),
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  }
-}
+/** Deserialize JobAssessment from a storage dictionary. */
+export const toJobAssessment = (dict: Dictionary): JobAssessment => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  jobId: dict.job_id as AssociationOne<Job>,
+  assessorId: dict.assessor_id as AssociationOne<User>,
+  locations: (dict.locations as Dictionary[]).map(toLocation) as CompositionPositive<Location>,
+  risks: (dict.risks as Dictionary[]).map(toNote) as CompositionMany<Note>,
+  notes: (dict.notes as Dictionary[]).map(toNote) as CompositionMany<Note>
+})
 
-/** Create a dictionary representation from a JobAssessment. */
+/** Serialize JobAssessment to a storage dictionary. */
 export const fromJobAssessment = (assessment: JobAssessment): Dictionary => ({
   id: assessment.id,
+  created_at: assessment.createdAt,
+  updated_at: assessment.updatedAt,
+  deleted_at: assessment.deletedAt,
   job_id: assessment.jobId,
   assessor_id: assessment.assessorId,
   locations: assessment.locations.map(fromLocation),
   risks: assessment.risks.map(fromNote),
-  notes: assessment.notes.map(fromNote),
-  created_at: assessment.createdAt,
-  updated_at: assessment.updatedAt,
-  deleted_at: assessment.deletedAt
+  notes: assessment.notes.map(fromNote)
 })
 
-/** Create a JobWorkflow from its dictionary representation. */
-export const toJobWorkflow = (dict: Dictionary): JobWorkflow => {
-  if (!dict.id) return notValid('JobWorkflow dictionary missing required field: id')
-  if (!dict.job_id) {
-    return notValid('JobWorkflow dictionary missing required field: job_id')
-  }
-  if (!dict.basis_workflow_id) {
-    return notValid('JobWorkflow dictionary missing required field: basis_workflow_id')
-  }
-  if (!dict.created_at) {
-    return notValid('JobWorkflow dictionary missing required field: created_at')
-  }
-  if (!dict.updated_at) {
-    return notValid('JobWorkflow dictionary missing required field: updated_at')
-  }
+/** Deserialize JobWorkflow from a storage dictionary. */
+export const toJobWorkflow = (dict: Dictionary): JobWorkflow => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  jobId: dict.job_id as AssociationOne<Job>,
+  basisWorkflowId: dict.basis_workflow_id as AssociationOne<Workflow>,
+  modifiedWorkflowId: dict.modified_workflow_id as AssociationOptional<Workflow>
+})
 
-  return {
-    id: dict.id as string,
-    jobId: dict.job_id as string,
-    basisWorkflowId: dict.basis_workflow_id as string,
-    modifiedWorkflowId: dict.modified_workflow_id as string | undefined,
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  }
-}
-
-/** Create a dictionary representation from a JobWorkflow. */
+/** Serialize JobWorkflow to a storage dictionary. */
 export const fromJobWorkflow = (jobWorkflow: JobWorkflow): Dictionary => ({
   id: jobWorkflow.id,
-  job_id: jobWorkflow.jobId,
-  basis_workflow_id: jobWorkflow.basisWorkflowId,
-  modified_workflow_id: jobWorkflow.modifiedWorkflowId,
   created_at: jobWorkflow.createdAt,
   updated_at: jobWorkflow.updatedAt,
-  deleted_at: jobWorkflow.deletedAt
+  deleted_at: jobWorkflow.deletedAt,
+  job_id: jobWorkflow.jobId,
+  basis_workflow_id: jobWorkflow.basisWorkflowId,
+  modified_workflow_id: jobWorkflow.modifiedWorkflowId
 })
 
-/** Create a JobPlan from its dictionary representation. */
-export const toJobPlan = (dict: Dictionary): JobPlan => {
-  if (!dict.id) return notValid('JobPlan dictionary missing required field: id')
-  if (!dict.job_id) return notValid('JobPlan dictionary missing required field: job_id')
-  if (!dict.planner_id) {
-    return notValid('JobPlan dictionary missing required field: planner_id')
-  }
-  if (!dict.notes) return notValid('JobPlan dictionary missing required field: notes')
-  if (!dict.scheduled_start) {
-    return notValid('JobPlan dictionary missing required field: scheduled_start')
-  }
-  if (!dict.created_at) {
-    return notValid('JobPlan dictionary missing required field: created_at')
-  }
-  if (!dict.updated_at) {
-    return notValid('JobPlan dictionary missing required field: updated_at')
-  }
-
-  return {
-    id: dict.id as string,
-    jobId: dict.job_id as string,
-    plannerId: dict.planner_id as string,
-    notes: (dict.notes as Dictionary[]).map(toNote),
-    scheduledStart: dict.scheduled_start as When,
-    scheduledEnd: dict.scheduled_end as When | undefined,
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  }
-}
-
-/** Create a dictionary representation from a JobPlan. */
-export const fromJobPlan = (jobPlan: JobPlan): Dictionary => ({
-  id: jobPlan.id,
-  job_id: jobPlan.jobId,
-  planner_id: jobPlan.plannerId,
-  notes: jobPlan.notes.map(fromNote),
-  scheduled_start: jobPlan.scheduledStart,
-  scheduled_end: jobPlan.scheduledEnd,
-  created_at: jobPlan.createdAt,
-  updated_at: jobPlan.updatedAt,
-  deleted_at: jobPlan.deletedAt
+/** Deserialize JobPlan from a storage dictionary. */
+export const toJobPlan = (dict: Dictionary): JobPlan => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  jobId: dict.job_id as AssociationOne<Job>,
+  plannerId: dict.planner_id as AssociationOne<User>,
+  notes: (dict.notes as Dictionary[]).map(toNote) as CompositionMany<Note>,
+  scheduledStart: dict.scheduled_start as When,
+  scheduledEnd: dict.scheduled_end as When | undefined
 })
 
-/** Create a JobPlanAssignment from its dictionary representation. */
-export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => {
-  if (!dict.id) return notValid('JobPlanAssignment dictionary missing required field: id')
-  if (!dict.plan_id) {
-    return notValid('JobPlanAssignment dictionary missing required field: plan_id')
-  }
-  if (!dict.crew_member_id) {
-    return notValid('JobPlanAssignment dictionary missing required field: crew_member_id')
-  }
-  if (!dict.notes) {
-    return notValid('JobPlanAssignment dictionary missing required field: notes')
-  }
-  if (!dict.role) {
-    return notValid('JobPlanAssignment dictionary missing required field: role')
-  }
-  if (!dict.created_at) {
-    return notValid('JobPlanAssignment dictionary missing required field: created_at')
-  }
-  if (!dict.updated_at) {
-    return notValid('JobPlanAssignment dictionary missing required field: updated_at')
-  }
+/** Serialize JobPlan to a storage dictionary. */
+export const fromJobPlan = (plan: JobPlan): Dictionary => ({
+  id: plan.id,
+  created_at: plan.createdAt,
+  updated_at: plan.updatedAt,
+  deleted_at: plan.deletedAt,
+  job_id: plan.jobId,
+  planner_id: plan.plannerId,
+  notes: plan.notes.map(fromNote),
+  scheduled_start: plan.scheduledStart,
+  scheduled_end: plan.scheduledEnd
+})
 
-  return {
-    id: dict.id as string,
-    planId: dict.plan_id as string,
-    crewMemberId: dict.crew_member_id as string,
-    notes: (dict.notes as Dictionary[]).map(toNote),
-    role: dict.role as UserRole,
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  }
-}
+/** Deserialize JobPlanAssignment from a storage dictionary. */
+export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  planId: dict.plan_id as AssociationOne<JobPlan>,
+  crewMemberId: dict.crew_member_id as AssociationOne<User>,
+  notes: (dict.notes as Dictionary[]).map(toNote) as CompositionMany<Note>,
+  role: dict.role as UserRole
+})
 
-/** Create a dictionary representation from a JobPlanAssignment. */
+/** Serialize JobPlanAssignment to a storage dictionary. */
 export const fromJobPlanAssignment = (assignment: JobPlanAssignment): Dictionary => ({
   id: assignment.id,
+  created_at: assignment.createdAt,
+  updated_at: assignment.updatedAt,
+  deleted_at: assignment.deletedAt,
   plan_id: assignment.planId,
   crew_member_id: assignment.crewMemberId,
   notes: assignment.notes.map(fromNote),
-  role: assignment.role,
-  created_at: assignment.createdAt,
-  updated_at: assignment.updatedAt,
-  deleted_at: assignment.deletedAt
+  role: assignment.role
 })
 
-/** Create a JobPlanChemical from its dictionary representation. */
-export const toJobPlanChemical = (dict: Dictionary): JobPlanChemical => {
-  if (!dict.id) return notValid('JobPlanChemical dictionary missing required field: id')
-  if (!dict.plan_id) {
-    return notValid('JobPlanChemical dictionary missing required field: plan_id')
-  }
-  if (!dict.chemical_id) {
-    return notValid('JobPlanChemical dictionary missing required field: chemical_id')
-  }
-  if (dict.amount === undefined) {
-    return notValid('JobPlanChemical dictionary missing required field: amount')
-  }
-  if (!dict.unit) {
-    return notValid('JobPlanChemical dictionary missing required field: unit')
-  }
-  if (!dict.created_at) {
-    return notValid('JobPlanChemical dictionary missing required field: created_at')
-  }
-  if (!dict.updated_at) {
-    return notValid('JobPlanChemical dictionary missing required field: updated_at')
-  }
+/** Deserialize JobPlanChemical from a storage dictionary. */
+export const toJobPlanChemical = (dict: Dictionary): JobPlanChemical => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  planId: dict.plan_id as AssociationOne<JobPlan>,
+  chemicalId: dict.chemical_id as AssociationOne<Chemical>,
+  amount: dict.amount as number,
+  unit: dict.unit as ChemicalAmountUnit,
+  targetArea: dict.target_area as number | undefined,
+  targetAreaUnit: dict.target_area_unit as AreaUnit
+})
 
-  return {
-    id: dict.id as string,
-    planId: dict.plan_id as string,
-    chemicalId: dict.chemical_id as string,
-    amount: dict.amount as number,
-    unit: dict.unit as JobPlanChemicalUnit,
-    targetArea: dict.target_area as number | undefined,
-    targetAreaUnit: dict.target_area_unit as JobPlanTargetAreaUnit | undefined,
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  }
-}
-
-/** Create a dictionary representation from a JobPlanChemical. */
+/** Serialize JobPlanChemical to a storage dictionary. */
 export const fromJobPlanChemical = (planChemical: JobPlanChemical): Dictionary => ({
   id: planChemical.id,
+  created_at: planChemical.createdAt,
+  updated_at: planChemical.updatedAt,
+  deleted_at: planChemical.deletedAt,
   plan_id: planChemical.planId,
   chemical_id: planChemical.chemicalId,
   amount: planChemical.amount,
   unit: planChemical.unit,
   target_area: planChemical.targetArea,
-  target_area_unit: planChemical.targetAreaUnit,
-  created_at: planChemical.createdAt,
-  updated_at: planChemical.updatedAt,
-  deleted_at: planChemical.deletedAt
+  target_area_unit: planChemical.targetAreaUnit
 })
 
-/** Create a JobPlanAsset from its dictionary representation. */
-export const toJobPlanAsset = (dict: Dictionary): JobPlanAsset => {
-  if (!dict.plan_id) {
-    return notValid('JobPlanAsset dictionary missing required field: plan_id')
-  }
-  if (!dict.asset_id) {
-    return notValid('JobPlanAsset dictionary missing required field: asset_id')
-  }
-
-  return {
-    planId: dict.plan_id as string,
-    assetId: dict.asset_id as string
-  }
-}
-
-/** Create a dictionary representation from a JobPlanAsset. */
-export const fromJobPlanAsset = (planAsset: JobPlanAsset): Dictionary => ({
-  plan_id: planAsset.planId,
-  asset_id: planAsset.assetId
+/** Deserialize JobPlanAsset junction from a storage dictionary. */
+export const toJobPlanAsset = (dict: Dictionary): JobPlanAsset => ({
+  planId: dict.plan_id as AssociationJunction<JobPlan>,
+  assetId: dict.asset_id as AssociationJunction<Asset>
 })
 
-/** Create a JobWork from its dictionary representation. */
-export const toJobWork = (dict: Dictionary): JobWork => {
-  if (!dict.id) return notValid('JobWork dictionary missing required field: id')
-  if (!dict.job_id) return notValid('JobWork dictionary missing required field: job_id')
-  if (!dict.started_by_id) {
-    return notValid('JobWork dictionary missing required field: started_by_id')
-  }
-  if (!dict.work) return notValid('JobWork dictionary missing required field: work')
-  if (!dict.started_at) {
-    return notValid('JobWork dictionary missing required field: started_at')
-  }
-  if (!dict.created_at) {
-    return notValid('JobWork dictionary missing required field: created_at')
-  }
-  if (!dict.updated_at) {
-    return notValid('JobWork dictionary missing required field: updated_at')
-  }
+/** Serialize JobPlanAsset junction to a storage dictionary. */
+export const fromJobPlanAsset = (junction: JobPlanAsset): Dictionary => ({
+  plan_id: junction.planId,
+  asset_id: junction.assetId
+})
 
-  return {
-    id: dict.id as string,
-    jobId: dict.job_id as string,
-    startedById: dict.started_by_id as string,
-    work: (dict.work as string[]).map(value => value),
-    startedAt: dict.started_at as When,
-    completedAt: dict.completed_at as When | undefined,
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  }
-}
+/** Deserialize JobWork from a storage dictionary. */
+export const toJobWork = (dict: Dictionary): JobWork => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  jobId: dict.job_id as AssociationOne<Job>,
+  startedById: dict.started_by_id as AssociationOne<User>,
+  work: dict.work as CompositionPositive<Id>,
+  startedAt: dict.started_at as When,
+  completedAt: dict.completed_at as When | undefined
+})
 
-/** Create a dictionary representation from a JobWork. */
+/** Serialize JobWork to a storage dictionary. */
 export const fromJobWork = (jobWork: JobWork): Dictionary => ({
   id: jobWork.id,
-  job_id: jobWork.jobId,
-  started_by_id: jobWork.startedById,
-  work: jobWork.work.map(value => value),
-  started_at: jobWork.startedAt,
-  completed_at: jobWork.completedAt,
   created_at: jobWork.createdAt,
   updated_at: jobWork.updatedAt,
-  deleted_at: jobWork.deletedAt
+  deleted_at: jobWork.deletedAt,
+  job_id: jobWork.jobId,
+  started_by_id: jobWork.startedById,
+  work: jobWork.work,
+  started_at: jobWork.startedAt,
+  completed_at: jobWork.completedAt
 })
 
-/** Create a JobWorkLogEntry from its dictionary representation. */
-export const toJobWorkLogEntry = (dict: Dictionary): JobWorkLogEntry => {
-  if (!dict.id) return notValid('JobWorkLogEntry dictionary missing required field: id')
-  if (!dict.job_id) {
-    return notValid('JobWorkLogEntry dictionary missing required field: job_id')
-  }
-  if (!dict.user_id) {
-    return notValid('JobWorkLogEntry dictionary missing required field: user_id')
-  }
-  if (!dict.answer) {
-    return notValid('JobWorkLogEntry dictionary missing required field: answer')
-  }
-  if (!dict.created_at) {
-    return notValid('JobWorkLogEntry dictionary missing required field: created_at')
-  }
+/** Deserialize JobWorkLogEntry from a storage dictionary. */
+export const toJobWorkLogEntry = (dict: Dictionary): JobWorkLogEntry => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  jobId: dict.job_id as AssociationOne<Job>,
+  userId: dict.user_id as AssociationOne<User>,
+  answer: [toAnswer(dict.answer as Dictionary)] as CompositionOne<Answer>
+})
 
-  return {
-    id: dict.id as string,
-    jobId: dict.job_id as string,
-    userId: dict.user_id as string,
-    answer: (dict.answer as Dictionary[]).map(toAnswer),
-    createdAt: dict.created_at as When
-  }
-}
-
-/** Create a dictionary representation from a JobWorkLogEntry. */
+/** Serialize JobWorkLogEntry to a storage dictionary. */
 export const fromJobWorkLogEntry = (entry: JobWorkLogEntry): Dictionary => ({
   id: entry.id,
+  created_at: entry.createdAt,
   job_id: entry.jobId,
   user_id: entry.userId,
-  answer: entry.answer.map(fromAnswer),
-  created_at: entry.createdAt
+  answer: fromAnswer(entry.answer[0]!)
 })

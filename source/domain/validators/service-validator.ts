@@ -1,89 +1,77 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Service protocol validator                                                 ║
-║ Boundary validation for service protocol payloads.                         ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Service domain validator                                                     ║
+║ Boundary validation for service topic abstractions.                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update protocol payloads for service topic abstractions.
+Validates create and update protocol payloads for Service and the
+ServiceRequiredAssetType junction.
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-validateServiceCreate(input)
-  Validate ServiceCreate payloads.
-
-validateServiceUpdate(input)
-  Validate ServiceUpdate payloads.
+validateServiceCreate                   Validate ServiceCreate payloads.
+validateServiceUpdate                   Validate ServiceUpdate payloads.
+validateServiceRequiredAssetTypeCreate  Validate ServiceRequiredAssetTypeCreate payloads.
 */
 
-import { isCompositionMany, isId, isNonEmptyString } from '@core-std'
-import { SERVICE_CATEGORIES, type ServiceCategory } from '@domain/abstractions/service.ts'
-import type { ServiceCreate, ServiceUpdate } from '@domain/protocols/service-protocol.ts'
+import {
+  expectCompositionMany,
+  expectConstEnum,
+  type ExpectGuard,
+  expectId,
+  expectNonEmptyString,
+  type ExpectResult,
+  expectValid
+} from '@core-std'
+import type { Note } from '@domain/abstractions/common.ts'
+import { SERVICE_CATEGORIES } from '@domain/abstractions/service.ts'
+import type {
+  ServiceCreate,
+  ServiceRequiredAssetTypeCreate,
+  ServiceUpdate
+} from '@domain/protocols/service-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validates ServiceCreate; returns error message or null. */
-export const validateServiceCreate = (input: ServiceCreate): string | null => {
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
-  }
-  if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
-  if (!isNonEmptyString(input.sku)) return 'sku must be a non-empty string'
-  if (input.description !== undefined && !isNonEmptyString(input.description)) {
-    return 'description must be a non-empty string when provided'
-  }
-  if (!SERVICE_CATEGORIES.includes(input.category as ServiceCategory)) {
-    return 'category must be a valid ServiceCategory'
-  }
-  if (
-    !isCompositionMany(
-      input.tagsWorkflowCandidates,
-      (entry): entry is string => isNonEmptyString(entry)
-    )
-  ) {
-    return 'tagsWorkflowCandidates must be an array of non-empty strings'
-  }
-  return null
-}
+/** Validate ServiceCreate payloads. */
+export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
+  expectValid(
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectNonEmptyString(input.name, 'name'),
+    expectNonEmptyString(input.sku, 'sku'),
+    expectNonEmptyString(input.description, 'description', true),
+    expectConstEnum(input.category, 'category', SERVICE_CATEGORIES),
+    expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isString, true)
+  )
 
-/** Validates ServiceUpdate; returns error message or null. */
-export const validateServiceUpdate = (input: ServiceUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+/** Validate ServiceUpdate payloads. */
+export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectNonEmptyString(input.name, 'name', true),
+    expectNonEmptyString(input.sku, 'sku', true),
+    expectNonEmptyString(input.description, 'description', true),
+    expectConstEnum(input.category, 'category', SERVICE_CATEGORIES, true),
+    expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isString, true)
+  )
 
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
-  }
-  if (input.name !== undefined && !isNonEmptyString(input.name)) {
-    return 'name must be a non-empty string when provided'
-  }
-  if (input.sku !== undefined && !isNonEmptyString(input.sku)) {
-    return 'sku must be a non-empty string when provided'
-  }
-  if (input.description !== undefined && !isNonEmptyString(input.description)) {
-    return 'description must be a non-empty string when provided'
-  }
-  if (
-    input.category !== undefined
-    && !SERVICE_CATEGORIES.includes(input.category as ServiceCategory)
-  ) {
-    return 'category must be a valid ServiceCategory when provided'
-  }
-  if (
-    input.tagsWorkflowCandidates !== undefined
-    && !isCompositionMany(
-      input.tagsWorkflowCandidates,
-      (entry): entry is string => isNonEmptyString(entry)
-    )
-  ) {
-    return 'tagsWorkflowCandidates must be an array of non-empty strings when provided'
-  }
-  return null
-}
+/** Validate ServiceRequiredAssetTypeCreate payloads. */
+export const validateServiceRequiredAssetTypeCreate = (
+  input: ServiceRequiredAssetTypeCreate
+): ExpectResult =>
+  expectValid(
+    expectId(input.serviceId, 'serviceId'),
+    expectId(input.assetTypeId, 'assetTypeId')
+  )
 
 // ────────────────────────────────────────────────────────────────────────────
-// INTERNALS
+// GUARDS
 // ────────────────────────────────────────────────────────────────────────────
+
+const isString: ExpectGuard<string> = (v): v is string => typeof v === 'string'

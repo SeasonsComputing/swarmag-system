@@ -14,6 +14,7 @@ const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 /** Relative paths that are allowed to use Deno.env. */
 const ALLOWED_FILES = new Set([
   'source/devops/guard-env.ts',
+  'source/devops/guards/guard-env.ts',
   'source/core/cfg/deno-provider.ts',
   'source/core/cfg/supabase-provider.ts',
   'source/core/cfg/browser-provider.ts',

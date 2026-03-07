@@ -1,33 +1,41 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Workflow protocol validator                                                ║
-║ Boundary validation for workflow protocol payloads.                        ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Workflow domain validator                                                    ║
+║ Boundary validation for workflow topic abstractions.                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update protocol payloads for workflow topic abstractions.
+Validates create and update protocol payloads for Task, Workflow, and their
+junction types (TaskQuestion, WorkflowTask). Junction types have create
+validators only.
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-validateTaskCreate(input)
-  Validate TaskCreate payloads.
-
-validateTaskUpdate(input)
-  Validate TaskUpdate payloads.
-
-validateWorkflowCreate(input)
-  Validate WorkflowCreate payloads.
-
-validateWorkflowUpdate(input)
-  Validate WorkflowUpdate payloads.
+validateTaskCreate          Validate TaskCreate payloads.
+validateTaskUpdate          Validate TaskUpdate payloads.
+validateTaskQuestionCreate  Validate TaskQuestionCreate payloads.
+validateWorkflowCreate      Validate WorkflowCreate payloads.
+validateWorkflowUpdate      Validate WorkflowUpdate payloads.
+validateWorkflowTaskCreate  Validate WorkflowTaskCreate payloads.
 */
 
-import { isCompositionMany, isId, isNonEmptyString, isPositiveNumber } from '@core-std'
+import {
+  expectCompositionMany,
+  type ExpectGuard,
+  expectId,
+  expectNonEmptyString,
+  expectPositiveNumber,
+  type ExpectResult,
+  expectValid
+} from '@core-std'
+import type { Note } from '@domain/abstractions/common.ts'
 import type {
   TaskCreate,
+  TaskQuestionCreate,
   TaskUpdate,
   WorkflowCreate,
+  WorkflowTaskCreate,
   WorkflowUpdate
 } from '@domain/protocols/workflow-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
@@ -36,77 +44,62 @@ import { isNote } from '@domain/validators/common-validator.ts'
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validates TaskCreate; returns error message or null. */
-export const validateTaskCreate = (input: TaskCreate): string | null => {
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
-  }
-  if (!isNonEmptyString(input.label)) return 'label must be a non-empty string'
-  if (input.description !== undefined && !isNonEmptyString(input.description)) {
-    return 'description must be a non-empty string when provided'
-  }
-  return null
-}
+/** Validate TaskCreate payloads. */
+export const validateTaskCreate = (input: TaskCreate): ExpectResult =>
+  expectValid(
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectNonEmptyString(input.label, 'label'),
+    expectNonEmptyString(input.description, 'description', true)
+  )
 
-/** Validates TaskUpdate; returns error message or null. */
-export const validateTaskUpdate = (input: TaskUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+/** Validate TaskUpdate payloads. */
+export const validateTaskUpdate = (input: TaskUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectNonEmptyString(input.label, 'label', true),
+    expectNonEmptyString(input.description, 'description', true)
+  )
 
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
-  }
-  if (input.label !== undefined && !isNonEmptyString(input.label)) {
-    return 'label must be a non-empty string when provided'
-  }
-  if (input.description !== undefined && !isNonEmptyString(input.description)) {
-    return 'description must be a non-empty string when provided'
-  }
-  return null
-}
+/** Validate TaskQuestionCreate payloads. */
+export const validateTaskQuestionCreate = (input: TaskQuestionCreate): ExpectResult =>
+  expectValid(
+    expectId(input.taskId, 'taskId'),
+    expectId(input.questionId, 'questionId'),
+    expectPositiveNumber(input.sequence, 'sequence')
+  )
 
-/** Validates WorkflowCreate; returns error message or null. */
-export const validateWorkflowCreate = (input: WorkflowCreate): string | null => {
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
-  }
-  if (!isNonEmptyString(input.name)) return 'name must be a non-empty string'
-  if (input.description !== undefined && !isNonEmptyString(input.description)) {
-    return 'description must be a non-empty string when provided'
-  }
-  if (!isPositiveNumber(input.version)) return 'version must be a positive number'
-  if (
-    !isCompositionMany(input.tags, (entry): entry is string => isNonEmptyString(entry))
-  ) {
-    return 'tags must be an array of non-empty strings'
-  }
-  return null
-}
+/** Validate WorkflowCreate payloads. */
+export const validateWorkflowCreate = (input: WorkflowCreate): ExpectResult =>
+  expectValid(
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectNonEmptyString(input.name, 'name'),
+    expectNonEmptyString(input.description, 'description', true),
+    expectPositiveNumber(input.version, 'version'),
+    expectCompositionMany(input.tags, 'tags', isString, true)
+  )
 
-/** Validates WorkflowUpdate; returns error message or null. */
-export const validateWorkflowUpdate = (input: WorkflowUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+/** Validate WorkflowUpdate payloads. */
+export const validateWorkflowUpdate = (input: WorkflowUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectNonEmptyString(input.name, 'name', true),
+    expectNonEmptyString(input.description, 'description', true),
+    expectPositiveNumber(input.version, 'version', true),
+    expectCompositionMany(input.tags, 'tags', isString, true)
+  )
 
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
-  }
-  if (input.name !== undefined && !isNonEmptyString(input.name)) {
-    return 'name must be a non-empty string when provided'
-  }
-  if (input.description !== undefined && !isNonEmptyString(input.description)) {
-    return 'description must be a non-empty string when provided'
-  }
-  if (input.version !== undefined && !isPositiveNumber(input.version)) {
-    return 'version must be a positive number when provided'
-  }
-  if (
-    input.tags !== undefined
-    && !isCompositionMany(input.tags, (entry): entry is string => isNonEmptyString(entry))
-  ) {
-    return 'tags must be an array of non-empty strings when provided'
-  }
-  return null
-}
+/** Validate WorkflowTaskCreate payloads. */
+export const validateWorkflowTaskCreate = (input: WorkflowTaskCreate): ExpectResult =>
+  expectValid(
+    expectId(input.workflowId, 'workflowId'),
+    expectId(input.taskId, 'taskId'),
+    expectPositiveNumber(input.sequence, 'sequence')
+  )
 
 // ────────────────────────────────────────────────────────────────────────────
-// INTERNALS
+// GUARDS
 // ────────────────────────────────────────────────────────────────────────────
+
+const isString: ExpectGuard<string> = (v): v is string => typeof v === 'string'

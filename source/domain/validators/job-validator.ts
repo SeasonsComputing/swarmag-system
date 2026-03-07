@@ -1,84 +1,58 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Job protocol validator                                                     ║
-║ Boundary validation for job protocol payloads.                             ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Job domain validator                                                         ║
+║ Boundary validation for job topic abstractions.                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update protocol payloads for job topic abstractions.
+Validates create and update protocol payloads for all job-related abstractions.
+JobPlanAsset and JobWorkLogEntry have create validators only.
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-validateJobCreate(input)
-  Validate JobCreate payloads.
-
-validateJobUpdate(input)
-  Validate JobUpdate payloads.
-
-validateJobAssessmentCreate(input)
-  Validate JobAssessmentCreate payloads.
-
-validateJobAssessmentUpdate(input)
-  Validate JobAssessmentUpdate payloads.
-
-validateJobWorkflowCreate(input)
-  Validate JobWorkflowCreate payloads.
-
-validateJobWorkflowUpdate(input)
-  Validate JobWorkflowUpdate payloads.
-
-validateJobPlanCreate(input)
-  Validate JobPlanCreate payloads.
-
-validateJobPlanUpdate(input)
-  Validate JobPlanUpdate payloads.
-
-validateJobPlanAssignmentCreate(input)
-  Validate JobPlanAssignmentCreate payloads.
-
-validateJobPlanAssignmentUpdate(input)
-  Validate JobPlanAssignmentUpdate payloads.
-
-validateJobPlanChemicalCreate(input)
-  Validate JobPlanChemicalCreate payloads.
-
-validateJobPlanChemicalUpdate(input)
-  Validate JobPlanChemicalUpdate payloads.
-
-validateJobWorkCreate(input)
-  Validate JobWorkCreate payloads.
-
-validateJobWorkUpdate(input)
-  Validate JobWorkUpdate payloads.
-
-validateJobWorkLogEntryCreate(input)
-  Validate JobWorkLogEntryCreate payloads.
+validateJobCreate                  Validate JobCreate payloads.
+validateJobUpdate                  Validate JobUpdate payloads.
+validateJobAssessmentCreate        Validate JobAssessmentCreate payloads.
+validateJobAssessmentUpdate        Validate JobAssessmentUpdate payloads.
+validateJobWorkflowCreate          Validate JobWorkflowCreate payloads.
+validateJobWorkflowUpdate          Validate JobWorkflowUpdate payloads.
+validateJobPlanCreate              Validate JobPlanCreate payloads.
+validateJobPlanUpdate              Validate JobPlanUpdate payloads.
+validateJobPlanAssignmentCreate    Validate JobPlanAssignmentCreate payloads.
+validateJobPlanAssignmentUpdate    Validate JobPlanAssignmentUpdate payloads.
+validateJobPlanChemicalCreate      Validate JobPlanChemicalCreate payloads.
+validateJobPlanChemicalUpdate      Validate JobPlanChemicalUpdate payloads.
+validateJobPlanAssetCreate         Validate JobPlanAssetCreate payloads.
+validateJobWorkCreate              Validate JobWorkCreate payloads.
+validateJobWorkUpdate              Validate JobWorkUpdate payloads.
+validateJobWorkLogEntryCreate      Validate JobWorkLogEntryCreate payloads.
 */
 
 import {
-  type Dictionary,
-  isCompositionMany,
-  isCompositionOne,
-  isCompositionPositive,
-  isId,
-  isNonEmptyString,
-  isPositiveNumber,
-  isWhen
+  expectCompositionMany,
+  expectCompositionOne,
+  expectCompositionPositive,
+  expectConstEnum,
+  type ExpectGuard,
+  expectId,
+  expectPositiveNumber,
+  type ExpectResult,
+  expectValid,
+  expectWhen
 } from '@core-std'
+import type { Answer, Note } from '@domain/abstractions/common.ts'
 import {
-  JOB_PLAN_CHEMICAL_UNITS,
-  JOB_PLAN_TARGET_AREA_UNITS,
-  JOB_STATUSES,
-  type JobPlanChemicalUnit,
-  type JobPlanTargetAreaUnit,
-  type JobStatus
+  AREA_UNITS,
+  CHEMICAL_AMOUNT_UNITS,
+  JOB_STATUSES
 } from '@domain/abstractions/job.ts'
-import { USER_ROLES, type UserRole } from '@domain/abstractions/user.ts'
+import { USER_ROLES } from '@domain/abstractions/user.ts'
 import type {
   JobAssessmentCreate,
   JobAssessmentUpdate,
   JobCreate,
+  JobPlanAssetCreate,
   JobPlanAssignmentCreate,
   JobPlanAssignmentUpdate,
   JobPlanChemicalCreate,
@@ -92,318 +66,155 @@ import type {
   JobWorkLogEntryCreate,
   JobWorkUpdate
 } from '@domain/protocols/job-protocol.ts'
-import { isAnswer, isNote } from '@domain/validators/common-validator.ts'
+import { isLocation, isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validates JobCreate; returns error message or null. */
-export const validateJobCreate = (input: JobCreate): string | null => {
-  if (!isId(input.customerId)) return 'customerId must be a valid Id'
-  if (!JOB_STATUSES.includes(input.status as JobStatus)) {
-    return 'status must be a valid JobStatus'
-  }
-  return null
-}
+/** Validate JobCreate payloads. */
+export const validateJobCreate = (input: JobCreate): ExpectResult =>
+  expectValid(
+    expectId(input.customerId, 'customerId'),
+    expectConstEnum(input.status, 'status', JOB_STATUSES, true)
+  )
 
-/** Validates JobUpdate; returns error message or null. */
-export const validateJobUpdate = (input: JobUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.customerId !== undefined && !isId(input.customerId)) {
-    return 'customerId must be a valid Id when provided'
-  }
-  if (input.status !== undefined && !JOB_STATUSES.includes(input.status as JobStatus)) {
-    return 'status must be a valid JobStatus when provided'
-  }
-  return null
-}
+/** Validate JobUpdate payloads. */
+export const validateJobUpdate = (input: JobUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectConstEnum(input.status, 'status', JOB_STATUSES, true)
+  )
 
-/** Validates JobAssessmentCreate; returns error message or null. */
-export const validateJobAssessmentCreate = (
-  input: JobAssessmentCreate
-): string | null => {
-  if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (!isId(input.assessorId)) return 'assessorId must be a valid Id'
-  if (!isCompositionPositive(input.locations, isLocation)) {
-    return 'locations must be a non-empty array of valid Location values'
-  }
-  if (!isCompositionMany(input.risks, isNote)) {
-    return 'risks must be an array of valid Note values'
-  }
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
-  }
-  return null
-}
+/** Validate JobAssessmentCreate payloads. */
+export const validateJobAssessmentCreate = (input: JobAssessmentCreate): ExpectResult =>
+  expectValid(
+    expectId(input.jobId, 'jobId'),
+    expectId(input.assessorId, 'assessorId'),
+    expectCompositionPositive(input.locations, 'locations', isLocation),
+    expectCompositionMany(input.risks, 'risks', isNote as ExpectGuard<Note>, true),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true)
+  )
 
-/** Validates JobAssessmentUpdate; returns error message or null. */
-export const validateJobAssessmentUpdate = (
-  input: JobAssessmentUpdate
-): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+/** Validate JobAssessmentUpdate payloads. */
+export const validateJobAssessmentUpdate = (input: JobAssessmentUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectId(input.assessorId, 'assessorId', true),
+    expectCompositionPositive(input.locations, 'locations', isLocation, true),
+    expectCompositionMany(input.risks, 'risks', isNote as ExpectGuard<Note>, true),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true)
+  )
 
-  if (input.jobId !== undefined && !isId(input.jobId)) {
-    return 'jobId must be a valid Id when provided'
-  }
-  if (input.assessorId !== undefined && !isId(input.assessorId)) {
-    return 'assessorId must be a valid Id when provided'
-  }
-  if (
-    input.locations !== undefined
-    && !isCompositionPositive(input.locations, isLocation)
-  ) {
-    return 'locations must be a non-empty array of valid Location values when provided'
-  }
-  if (input.risks !== undefined && !isCompositionMany(input.risks, isNote)) {
-    return 'risks must be an array of valid Note values when provided'
-  }
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
-  }
+/** Validate JobWorkflowCreate payloads. */
+export const validateJobWorkflowCreate = (input: JobWorkflowCreate): ExpectResult =>
+  expectValid(
+    expectId(input.jobId, 'jobId'),
+    expectId(input.basisWorkflowId, 'basisWorkflowId'),
+    expectId(input.modifiedWorkflowId, 'modifiedWorkflowId', true)
+  )
 
-  return null
-}
+/** Validate JobWorkflowUpdate payloads. */
+export const validateJobWorkflowUpdate = (input: JobWorkflowUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectId(input.modifiedWorkflowId, 'modifiedWorkflowId', true)
+  )
 
-/** Validates JobWorkflowCreate; returns error message or null. */
-export const validateJobWorkflowCreate = (input: JobWorkflowCreate): string | null => {
-  if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (!isId(input.basisWorkflowId)) return 'basisWorkflowId must be a valid Id'
-  if (input.modifiedWorkflowId !== undefined && !isId(input.modifiedWorkflowId)) {
-    return 'modifiedWorkflowId must be a valid Id when provided'
-  }
-  return null
-}
+/** Validate JobPlanCreate payloads. */
+export const validateJobPlanCreate = (input: JobPlanCreate): ExpectResult =>
+  expectValid(
+    expectId(input.jobId, 'jobId'),
+    expectId(input.plannerId, 'plannerId'),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectWhen(input.scheduledStart, 'scheduledStart'),
+    expectWhen(input.scheduledEnd, 'scheduledEnd', true)
+  )
 
-/** Validates JobWorkflowUpdate; returns error message or null. */
-export const validateJobWorkflowUpdate = (input: JobWorkflowUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.jobId !== undefined && !isId(input.jobId)) {
-    return 'jobId must be a valid Id when provided'
-  }
-  if (input.basisWorkflowId !== undefined && !isId(input.basisWorkflowId)) {
-    return 'basisWorkflowId must be a valid Id when provided'
-  }
-  if (input.modifiedWorkflowId !== undefined && !isId(input.modifiedWorkflowId)) {
-    return 'modifiedWorkflowId must be a valid Id when provided'
-  }
-  return null
-}
+/** Validate JobPlanUpdate payloads. */
+export const validateJobPlanUpdate = (input: JobPlanUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectId(input.plannerId, 'plannerId', true),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectWhen(input.scheduledStart, 'scheduledStart', true),
+    expectWhen(input.scheduledEnd, 'scheduledEnd', true)
+  )
 
-/** Validates JobPlanCreate; returns error message or null. */
-export const validateJobPlanCreate = (input: JobPlanCreate): string | null => {
-  if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (!isId(input.plannerId)) return 'plannerId must be a valid Id'
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
-  }
-  if (!isWhen(input.scheduledStart)) return 'scheduledStart must be a valid When'
-  if (input.scheduledEnd !== undefined && !isWhen(input.scheduledEnd)) {
-    return 'scheduledEnd must be a valid When when provided'
-  }
-  return null
-}
+/** Validate JobPlanAssignmentCreate payloads. */
+export const validateJobPlanAssignmentCreate = (input: JobPlanAssignmentCreate): ExpectResult =>
+  expectValid(
+    expectId(input.planId, 'planId'),
+    expectId(input.crewMemberId, 'crewMemberId'),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectConstEnum(input.role, 'role', USER_ROLES)
+  )
 
-/** Validates JobPlanUpdate; returns error message or null. */
-export const validateJobPlanUpdate = (input: JobPlanUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+/** Validate JobPlanAssignmentUpdate payloads. */
+export const validateJobPlanAssignmentUpdate = (input: JobPlanAssignmentUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectConstEnum(input.role, 'role', USER_ROLES, true)
+  )
 
-  if (input.jobId !== undefined && !isId(input.jobId)) {
-    return 'jobId must be a valid Id when provided'
-  }
-  if (input.plannerId !== undefined && !isId(input.plannerId)) {
-    return 'plannerId must be a valid Id when provided'
-  }
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
-  }
-  if (input.scheduledStart !== undefined && !isWhen(input.scheduledStart)) {
-    return 'scheduledStart must be a valid When when provided'
-  }
-  if (input.scheduledEnd !== undefined && !isWhen(input.scheduledEnd)) {
-    return 'scheduledEnd must be a valid When when provided'
-  }
-  return null
-}
+/** Validate JobPlanChemicalCreate payloads. */
+export const validateJobPlanChemicalCreate = (input: JobPlanChemicalCreate): ExpectResult =>
+  expectValid(
+    expectId(input.planId, 'planId'),
+    expectId(input.chemicalId, 'chemicalId'),
+    expectPositiveNumber(input.amount, 'amount'),
+    expectConstEnum(input.unit, 'unit', CHEMICAL_AMOUNT_UNITS),
+    expectPositiveNumber(input.targetArea, 'targetArea', true),
+    expectConstEnum(input.targetAreaUnit, 'targetAreaUnit', AREA_UNITS, true)
+  )
 
-/** Validates JobPlanAssignmentCreate; returns error message or null. */
-export const validateJobPlanAssignmentCreate = (
-  input: JobPlanAssignmentCreate
-): string | null => {
-  if (!isId(input.planId)) return 'planId must be a valid Id'
-  if (!isId(input.crewMemberId)) return 'crewMemberId must be a valid Id'
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
-  }
-  if (!USER_ROLES.includes(input.role as UserRole)) {
-    return 'role must be a valid UserRole'
-  }
-  return null
-}
+/** Validate JobPlanChemicalUpdate payloads. */
+export const validateJobPlanChemicalUpdate = (input: JobPlanChemicalUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectPositiveNumber(input.amount, 'amount', true),
+    expectConstEnum(input.unit, 'unit', CHEMICAL_AMOUNT_UNITS, true),
+    expectPositiveNumber(input.targetArea, 'targetArea', true),
+    expectConstEnum(input.targetAreaUnit, 'targetAreaUnit', AREA_UNITS, true)
+  )
 
-/** Validates JobPlanAssignmentUpdate; returns error message or null. */
-export const validateJobPlanAssignmentUpdate = (
-  input: JobPlanAssignmentUpdate
-): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
+/** Validate JobPlanAssetCreate payloads. */
+export const validateJobPlanAssetCreate = (input: JobPlanAssetCreate): ExpectResult =>
+  expectValid(
+    expectId(input.planId, 'planId'),
+    expectId(input.assetId, 'assetId')
+  )
 
-  if (input.planId !== undefined && !isId(input.planId)) {
-    return 'planId must be a valid Id when provided'
-  }
-  if (input.crewMemberId !== undefined && !isId(input.crewMemberId)) {
-    return 'crewMemberId must be a valid Id when provided'
-  }
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
-  }
-  if (input.role !== undefined && !USER_ROLES.includes(input.role as UserRole)) {
-    return 'role must be a valid UserRole when provided'
-  }
-  return null
-}
+/** Validate JobWorkCreate payloads. */
+export const validateJobWorkCreate = (input: JobWorkCreate): ExpectResult =>
+  expectValid(
+    expectId(input.jobId, 'jobId'),
+    expectId(input.startedById, 'startedById'),
+    expectCompositionPositive(input.work, 'work', isId),
+    expectWhen(input.startedAt, 'startedAt'),
+    expectWhen(input.completedAt, 'completedAt', true)
+  )
 
-/** Validates JobPlanChemicalCreate; returns error message or null. */
-export const validateJobPlanChemicalCreate = (
-  input: JobPlanChemicalCreate
-): string | null => {
-  if (!isId(input.planId)) return 'planId must be a valid Id'
-  if (!isId(input.chemicalId)) return 'chemicalId must be a valid Id'
-  if (!isPositiveNumber(input.amount)) return 'amount must be a positive number'
-  if (!JOB_PLAN_CHEMICAL_UNITS.includes(input.unit as JobPlanChemicalUnit)) {
-    return 'unit must be a valid JobPlanChemicalUnit'
-  }
-  if (input.targetArea !== undefined && !isPositiveNumber(input.targetArea)) {
-    return 'targetArea must be a positive number when provided'
-  }
-  if (
-    input.targetAreaUnit !== undefined
-    && !JOB_PLAN_TARGET_AREA_UNITS.includes(input.targetAreaUnit as JobPlanTargetAreaUnit)
-  ) {
-    return 'targetAreaUnit must be a valid JobPlanTargetAreaUnit when provided'
-  }
-  return null
-}
+/** Validate JobWorkUpdate payloads. */
+export const validateJobWorkUpdate = (input: JobWorkUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectWhen(input.completedAt, 'completedAt', true)
+  )
 
-/** Validates JobPlanChemicalUpdate; returns error message or null. */
-export const validateJobPlanChemicalUpdate = (
-  input: JobPlanChemicalUpdate
-): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
-
-  if (input.planId !== undefined && !isId(input.planId)) {
-    return 'planId must be a valid Id when provided'
-  }
-  if (input.chemicalId !== undefined && !isId(input.chemicalId)) {
-    return 'chemicalId must be a valid Id when provided'
-  }
-  if (input.amount !== undefined && !isPositiveNumber(input.amount)) {
-    return 'amount must be a positive number when provided'
-  }
-  if (
-    input.unit !== undefined
-    && !JOB_PLAN_CHEMICAL_UNITS.includes(input.unit as JobPlanChemicalUnit)
-  ) {
-    return 'unit must be a valid JobPlanChemicalUnit when provided'
-  }
-  if (input.targetArea !== undefined && !isPositiveNumber(input.targetArea)) {
-    return 'targetArea must be a positive number when provided'
-  }
-  if (
-    input.targetAreaUnit !== undefined
-    && !JOB_PLAN_TARGET_AREA_UNITS.includes(input.targetAreaUnit as JobPlanTargetAreaUnit)
-  ) {
-    return 'targetAreaUnit must be a valid JobPlanTargetAreaUnit when provided'
-  }
-  return null
-}
-
-/** Validates JobWorkCreate; returns error message or null. */
-export const validateJobWorkCreate = (input: JobWorkCreate): string | null => {
-  if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (!isId(input.startedById)) return 'startedById must be a valid Id'
-  if (!isCompositionPositive(input.work, (entry): entry is string => isId(entry))) {
-    return 'work must be a non-empty array of valid Id values'
-  }
-  if (!isWhen(input.startedAt)) return 'startedAt must be a valid When'
-  if (input.completedAt !== undefined && !isWhen(input.completedAt)) {
-    return 'completedAt must be a valid When when provided'
-  }
-  return null
-}
-
-/** Validates JobWorkUpdate; returns error message or null. */
-export const validateJobWorkUpdate = (input: JobWorkUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
-
-  if (input.jobId !== undefined && !isId(input.jobId)) {
-    return 'jobId must be a valid Id when provided'
-  }
-  if (input.startedById !== undefined && !isId(input.startedById)) {
-    return 'startedById must be a valid Id when provided'
-  }
-  if (
-    input.work !== undefined
-    && !isCompositionPositive(input.work, (entry): entry is string => isId(entry))
-  ) {
-    return 'work must be a non-empty array of valid Id values when provided'
-  }
-  if (input.startedAt !== undefined && !isWhen(input.startedAt)) {
-    return 'startedAt must be a valid When when provided'
-  }
-  if (input.completedAt !== undefined && !isWhen(input.completedAt)) {
-    return 'completedAt must be a valid When when provided'
-  }
-  return null
-}
-
-/** Validates JobWorkLogEntryCreate; returns error message or null. */
-export const validateJobWorkLogEntryCreate = (
-  input: JobWorkLogEntryCreate
-): string | null => {
-  if (!isId(input.jobId)) return 'jobId must be a valid Id'
-  if (!isId(input.userId)) return 'userId must be a valid Id'
-  if (!isCompositionOne(input.answer, isAnswer)) {
-    return 'answer must be a single-element composition containing a valid Answer'
-  }
-  return null
-}
+/** Validate JobWorkLogEntryCreate payloads. */
+export const validateJobWorkLogEntryCreate = (input: JobWorkLogEntryCreate): ExpectResult =>
+  expectValid(
+    expectId(input.jobId, 'jobId'),
+    expectId(input.userId, 'userId'),
+    expectCompositionOne(input.answer, 'answer', isAnswer)
+  )
 
 // ────────────────────────────────────────────────────────────────────────────
-// INTERNALS
+// GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isLocation = (
-  value: unknown
-): value is import('@domain/abstractions/common.ts').Location => {
-  if (typeof value !== 'object' || value === null) return false
+const isId: ExpectGuard<string> = (v): v is string => typeof v === 'string' && v.length > 0
 
-  const data = value as Dictionary
-
-  if (typeof data.latitude !== 'number' || !Number.isFinite(data.latitude)) return false
-  if (typeof data.longitude !== 'number' || !Number.isFinite(data.longitude)) return false
-
-  if (data.altitudeMeters !== undefined) {
-    if (
-      typeof data.altitudeMeters !== 'number' || !Number.isFinite(data.altitudeMeters)
-    ) {
-      return false
-    }
-  }
-  if (data.line1 !== undefined && !isNonEmptyString(data.line1)) return false
-  if (data.line2 !== undefined && !isNonEmptyString(data.line2)) return false
-  if (data.city !== undefined && !isNonEmptyString(data.city)) return false
-  if (data.state !== undefined && !isNonEmptyString(data.state)) return false
-  if (data.postalCode !== undefined && !isNonEmptyString(data.postalCode)) return false
-  if (data.country !== undefined && !isNonEmptyString(data.country)) return false
-  if (data.recordedAt !== undefined && !isWhen(data.recordedAt)) return false
-  if (data.accuracyMeters !== undefined) {
-    if (
-      typeof data.accuracyMeters !== 'number' || !Number.isFinite(data.accuracyMeters)
-    ) {
-      return false
-    }
-  }
-  if (data.description !== undefined && !isNonEmptyString(data.description)) return false
-
-  return true
-}
+const isAnswer: ExpectGuard<Answer> = (v): v is Answer => v !== null && typeof v === 'object'

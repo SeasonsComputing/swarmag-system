@@ -186,18 +186,3 @@ All software construction activity operates in conformance with the governing pr
 The constitution is designed to make most efficient and cost-effective use of AI reasoning and coding facilities across AI providers following the 3-role ["Model of Development w/ AI Coding"](https://seasonscomputing.com/tvk-mod-3rm.md).
 
 The human participates as the Chief Architect with AI Architect and AI Coding Engine roles provided by AI reasoning and AI coding platforms respectively.
-
-### 5.1 Context
-
-To reduce AI access-token depletion it is recommended that each work session be in manageable chunks of 2-4 hours and the each session begins as a new chat. Context for both chats begin by ingesting the following project assets:
-
-```text
-Ingest the following project assets, then inform the Chief Architect and wait for tasks:
-  1. `README.md`
-  2. `CONSTITUTION.md`
-  3. `documentation/foundation/*.md`
-  4. `source/core/**/*.ts`
-  5. `source/domain/**/*.ts`
-```
-
-Once ingested the AI Architect and AI Code Engine have enough context to navigate the monorepo and execute the session's tasks.

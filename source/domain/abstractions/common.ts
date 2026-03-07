@@ -1,6 +1,35 @@
-/**
- * Common domain abstractions shared across topic areas.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Common domain abstractions                                                   ║
+║ Shared types used across the swarmAg domain.                                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Defines embedded value objects and reusable primitives shared across the
+swarmAg domain: locations, attachments, notes, questions, and answers.
+
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+Location              Geographic position plus optional address metadata.
+ATTACHMENT_KINDS      Canonical attachment kind values.
+AttachmentKind        Attachment kind union type.
+Attachment            Uploaded artifact metadata.
+NOTE_VISIBILITIES     Canonical note visibility values.
+NoteVisibility        Note visibility union type.
+Note                  Freeform note with visibility and taxonomy.
+QUESTION_TYPES        Canonical question type values.
+QuestionType          Question type discriminator.
+BaseQuestion          Common shape shared by all Question constituents.
+ScalarQuestionType    Derived scalar question kind type.
+ScalarQuestion        Scalar input question; no options.
+SelectOption          Selectable option metadata.
+SelectQuestionType    Derived select question kind type.
+SelectQuestion        Select input question; options required and non-empty.
+InternalQuestion      System-generated question; referenced directly by log entries.
+Question              Discriminated union of all question types.
+Answer                Captured response to a question.
+*/
 
 import type {
   AssociationOne,
@@ -9,7 +38,10 @@ import type {
   Instantiable,
   When
 } from '@core-std'
-import type { User } from '@domain/abstractions/user.ts'
+
+// ────────────────────────────────────────────────────────────────────────────
+// LOCATION
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Geographic position plus optional address metadata. */
 export type Location = {
@@ -27,7 +59,11 @@ export type Location = {
   description?: string
 }
 
-/** Attachment kind for uploaded artifacts. */
+// ────────────────────────────────────────────────────────────────────────────
+// ATTACHMENT
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Canonical attachment kind values. */
 export const ATTACHMENT_KINDS = ['photo', 'video', 'map', 'document'] as const
 export type AttachmentKind = (typeof ATTACHMENT_KINDS)[number]
 
@@ -40,20 +76,28 @@ export type Attachment = {
   uploadedAt: When
 }
 
-/** Note visibility classification. */
+// ────────────────────────────────────────────────────────────────────────────
+// NOTE
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Canonical note visibility values. */
 export const NOTE_VISIBILITIES = ['internal', 'shared'] as const
 export type NoteVisibility = (typeof NOTE_VISIBILITIES)[number]
 
-/** Freeform note with optional visibility and tags. */
+/** Freeform note with visibility and taxonomy. */
 export type Note = {
-  attachments: CompositionMany<Attachment>
   createdAt: When
   content: string
-  visibility?: NoteVisibility
+  visibility: NoteVisibility
   tags: CompositionMany<string>
+  attachments: CompositionMany<Attachment>
 }
 
-/** Supported question input modes. */
+// ────────────────────────────────────────────────────────────────────────────
+// QUESTION
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Canonical question type values. */
 export const QUESTION_TYPES = [
   'internal',
   'text',
@@ -64,7 +108,7 @@ export const QUESTION_TYPES = [
 ] as const
 export type QuestionType = (typeof QUESTION_TYPES)[number]
 
-/** Common shape shared by all question constituents. */
+/** Common shape shared by all Question constituents. */
 export type BaseQuestion = Instantiable & {
   type: QuestionType
   prompt: string
@@ -72,45 +116,46 @@ export type BaseQuestion = Instantiable & {
   required?: boolean
 }
 
-/** System-generated question referenced directly by log entries. */
-export type InternalQuestion = BaseQuestion & {
-  type: 'internal'
-}
+/** Derived scalar question kind type. */
+export type ScalarQuestionType = Extract<QuestionType, 'text' | 'number' | 'boolean'>
 
-/** Scalar input question without options. */
-export const SCALAR_QUESTION_TYPES = ['text', 'number', 'boolean'] as const
-export type ScalarQuestionType = (typeof SCALAR_QUESTION_TYPES)[number]
-
-/** Scalar question constituent. */
+/** Scalar input question; no options. */
 export type ScalarQuestion = BaseQuestion & {
   type: ScalarQuestionType
 }
 
-/** Selectable option metadata for select-type questions. */
+/** Selectable option metadata; only valid on SelectQuestion. */
 export type SelectOption = {
   value: string
   label?: string
   requiresNote?: boolean
 }
 
-/** Select input question kind values. */
-export const SELECT_QUESTION_TYPES = ['single-select', 'multi-select'] as const
-export type SelectQuestionType = (typeof SELECT_QUESTION_TYPES)[number]
+/** Derived select question kind type. */
+export type SelectQuestionType = Extract<QuestionType, 'single-select' | 'multi-select'>
 
-/** Select input question with a non-empty options set. */
+/** Select input question; options required and non-empty. */
 export type SelectQuestion = BaseQuestion & {
   type: SelectQuestionType
   options: CompositionPositive<SelectOption>
 }
 
-/** Reusable prompt abstraction represented as a discriminated union. */
-export type Question = ScalarQuestion | SelectQuestion | InternalQuestion
+/** System-generated question; seed records referenced directly by log entries. */
+export type InternalQuestion = BaseQuestion & {
+  type: 'internal'
+}
 
-/** Captured response to a question with optional crew annotations. */
+/** Discriminated union of all question types. */
+export type Question = InternalQuestion | ScalarQuestion | SelectQuestion
+
+// ────────────────────────────────────────────────────────────────────────────
+// ANSWER
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Captured response to a question; notes carry crew annotations and attachments. */
 export type Answer = {
   questionId: AssociationOne<Question>
-  capturedById: AssociationOne<User>
-  notes: CompositionMany<Note>
   value: string | number | boolean | string[]
   capturedAt: When
+  notes: CompositionMany<Note>
 }

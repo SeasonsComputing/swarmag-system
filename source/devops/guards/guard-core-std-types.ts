@@ -8,7 +8,8 @@ const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
 const ALLOWED_FILES = new Set([
   'source/core/std/adt.ts',
-  'source/devops/guard-core-std-types.ts'
+  'source/devops/guard-core-std-types.ts',
+  'source/devops/guards/guard-core-std-types.ts'
 ])
 
 const RULES = [

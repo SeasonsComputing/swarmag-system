@@ -79,6 +79,7 @@ All TypeScript is formatted by `dprint` via `deno task fmt`. The formatter is au
 - **Line length** — maximum length of any line is `105` characters.
 - **Comment box length** — comment box maximum length is `80` characters
 - **File order of symbols** — exported symbols are listed at the top of the file with non-exports below them, when possible.
+- **Comment exported types** — every exported type has a comment. Single-line if sufficient. Multi-line if warranted.
 
 ### 5.2 Single-line statements
 
@@ -138,6 +139,7 @@ Finally a "EXPORTED APIs & TYPEs" subsection divider where symbols are enumerate
 Boxes should have equal length lines to ensure the box sides align with the box corners.
 
 Example:
+
 ```typescript
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
@@ -158,6 +160,7 @@ validateUserUpdate(input)  Validate UserUpdate payloads.
 
 ### 6.3 Header rules
 
+- Ensure box sides align with box corners
 - One blank line between the box close and PURPOSE.
 - One blank line between PURPOSE prose and the next section label.
 - One blank line between distinct subsection groups within EXPORTED APIs & TYPEs.
@@ -168,6 +171,7 @@ validateUserUpdate(input)  Validate UserUpdate payloads.
 ### 6.4 Section divider
 
 Files with clear categories of declarations and functions divide the code body into sections, each with a section divider header. Consistent width, no variation:
+
 ```typescript
 // ────────────────────────────────────────────────────────────────────────────
 // {SECTION LABEL}
@@ -177,6 +181,7 @@ Files with clear categories of declarations and functions divide the code body i
 ### 6.5 Encapsulation & information hiding
 
 Files with a public API and implementation (internal) API are divided into sections: PUBLIC EXPORTS then PRIVATE INTERNALS:
+
 ```typescript
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC EXPORTS

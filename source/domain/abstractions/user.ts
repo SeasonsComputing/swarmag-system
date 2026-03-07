@@ -1,14 +1,30 @@
-/**
- * User domain abstractions.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ User domain abstractions                                                     ║
+║ System user identity and role membership.                                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Defines the User abstraction, role enumeration, and status enumeration for
+system user identity and membership.
+
+EXPORTED APIs & TYPEs
+───────────────────────────────────────────────────────────────────────────────
+USER_ROLES     Canonical role values.
+UserRole       User role union type.
+USER_STATUSES  Canonical user status values.
+UserStatus     User status union type.
+User           System user identity and membership.
+*/
 
 import type { CompositionPositive, Instantiable } from '@core-std'
 
-/** Canonical role set. */
+/** Canonical role values. */
 export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
 export type UserRole = (typeof USER_ROLES)[number]
 
-/** User lifecycle status. */
+/** Canonical user status values. */
 export const USER_STATUSES = ['active', 'inactive'] as const
 export type UserStatus = (typeof USER_STATUSES)[number]
 
@@ -19,5 +35,5 @@ export type User = Instantiable & {
   primaryEmail: string
   phoneNumber: string
   avatarUrl?: string
-  status?: UserStatus
+  status: UserStatus
 }
