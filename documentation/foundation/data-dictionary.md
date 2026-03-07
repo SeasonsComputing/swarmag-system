@@ -121,17 +121,17 @@ Type: **object**
 
 Attributes: **State**
 
-| **Attribute** | **Type**                                          |
-| ------------- | ------------------------------------------------- |
-| `filename`    | string                                            |
-| `url`         | string                                            |
-| `contentType` | string                                            |
-| `kind`        | `'photo'` \| `'video'` \| `'map'` \| `'document'` |
-| `uploadedAt`  | When                                              |
+| **Attribute** | **Type**                                                               |
+| ------------- | ---------------------------------------------------------------------- |
+| `filename`    | string                                                                 |
+| `url`         | string                                                                 |
+| `contentType` | string                                                                 |
+| `kind`        | `'photo'` \| `'video'` \| `'map'` \| `'document'` (default: `'photo'`) |
+| `uploadedAt`  | When                                                                   |
 
 ### 4.3 Note
 
-Purpose: **Freeform note with optional visibility/taxonomy**
+Purpose: **Freeform note with visibility and taxonomy**
 
 Type: **object**
 
@@ -143,12 +143,12 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute** | **Type**                   |
-| ------------- | -------------------------- |
-| `createdAt`   | When                       |
-| `content`     | string                     |
-| `visibility?` | `'internal'` \| `'shared'` |
-| `tags`        | CompositionMany\<string\>  |
+| **Attribute** | **Type**                                           |
+| ------------- | -------------------------------------------------- |
+| `createdAt`   | When                                               |
+| `content`     | string                                             |
+| `visibility`  | `'internal'` \| `'shared'` (default: `'internal'`) |
+| `tags`        | CompositionMany\<string\>                          |
 
 ### 4.4 QuestionType
 
@@ -260,11 +260,10 @@ Type: **object**
 
 Attributes: **Relations**
 
-| **Attribute**  | **Relation**    | **Abstraction** |
-| -------------- | --------------- | --------------- |
-| `questionId`   | AssociationOne  | Question        |
-| `capturedById` | AssociationOne  | User            |
-| `notes`        | CompositionMany | Note            |
+| **Attribute** | **Relation**    | **Abstraction** |
+| ------------- | --------------- | --------------- |
+| `questionId`  | AssociationOne  | Question        |
+| `notes`       | CompositionMany | Note            |
 
 Attributes: **State**
 
@@ -371,16 +370,16 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**           | **Type**                                 |
-| ----------------------- | ---------------------------------------- |
-| `name`                  | string                                   |
-| `epaNumber?`            | string                                   |
-| `usage`                 | ChemicalUsage                            |
-| `signalWord?`           | `'danger'` \| `'warning'` \| `'caution'` |
-| `restrictedUse`         | boolean                                  |
-| `reEntryIntervalHours?` | number                                   |
-| `storageLocation?`      | string                                   |
-| `sdsUrl?`               | string                                   |
+| **Attribute**           | **Type**                                                                 |
+| ----------------------- | ------------------------------------------------------------------------ |
+| `name`                  | string                                                                   |
+| `epaNumber?`            | string                                                                   |
+| `usage`                 | ChemicalUsage                                                            |
+| `signalWord`            | `'none'` \| `'danger'` \| `'warning'` \| `'caution'` (default: `'none'`) |
+| `restrictedUse`         | boolean                                                                  |
+| `reEntryIntervalHours?` | number                                                                   |
+| `storageLocation?`      | string                                                                   |
+| `sdsUrl?`               | string                                                                   |
 
 ## 7. Customers
 
@@ -400,13 +399,13 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**       | **Type**                           |
-| ------------------- | ---------------------------------- |
-| `name`              | string                             |
-| `email?`            | string                             |
-| `phone?`            | string                             |
-| `isPrimary`         | boolean                            |
-| `preferredChannel?` | `'email'` \| `'text'` \| `'phone'` |
+| **Attribute**      | **Type**                                               |
+| ------------------ | ------------------------------------------------------ |
+| `name`             | string                                                 |
+| `email?`           | string                                                 |
+| `phone?`           | string                                                 |
+| `isPrimary`        | boolean                                                |
+| `preferredChannel` | `'email'` \| `'text'` \| `'phone'` (default: `'text'`) |
 
 ### 7.2 CustomerSite
 
@@ -446,16 +445,16 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute** | **Type**                                   |
-| ------------- | ------------------------------------------ |
-| `name`        | string                                     |
-| `status`      | `'active'` \| `'inactive'` \| `'prospect'` |
-| `line1`       | string                                     |
-| `line2?`      | string                                     |
-| `city`        | string                                     |
-| `state`       | string                                     |
-| `postalCode`  | string                                     |
-| `country`     | string                                     |
+| **Attribute** | **Type**                                                           |
+| ------------- | ------------------------------------------------------------------ |
+| `name`        | string                                                             |
+| `status`      | `'active'` \| `'inactive'` \| `'prospect'` (default: `'prospect'`) |
+| `line1`       | string                                                             |
+| `line2?`      | string                                                             |
+| `city`        | string                                                             |
+| `state`       | string                                                             |
+| `postalCode`  | string                                                             |
+| `country`     | string                                                             |
 
 ## 8. Services
 
@@ -537,13 +536,13 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**  | **Type**                   |
-| -------------- | -------------------------- |
-| `displayName`  | string                     |
-| `primaryEmail` | string                     |
-| `phoneNumber`  | string                     |
-| `avatarUrl?`   | string                     |
-| `status?`      | `'active'` \| `'inactive'` |
+| **Attribute**  | **Type**                                         |
+| -------------- | ------------------------------------------------ |
+| `displayName`  | string                                           |
+| `primaryEmail` | string                                           |
+| `phoneNumber`  | string                                           |
+| `avatarUrl?`   | string                                           |
+| `status`       | `'active'` \| `'inactive'` (default: `'active'`) |
 
 ## 10. Workflow
 
@@ -752,12 +751,12 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**     | **Type**                                             |
-| ----------------- | ---------------------------------------------------- |
-| `amount`          | number                                               |
-| `unit`            | `'gallon'` \| `'liter'` \| `'pound'` \| `'kilogram'` |
-| `targetArea?`     | number                                               |
-| `targetAreaUnit?` | `'acre'` \| `'hectare'`                              |
+| **Attribute**    | **Type**                                                                   |
+| ---------------- | -------------------------------------------------------------------------- |
+| `amount`         | number                                                                     |
+| `unit`           | `'gallon'` \| `'liter'` \| `'pound'` \| `'kilogram'` (default: `'gallon'`) |
+| `targetArea?`    | number                                                                     |
+| `targetAreaUnit` | `'acre'` \| `'hectare'` (default: `'acre'`)                                |
 
 ### 11.8 JobPlanAsset
 

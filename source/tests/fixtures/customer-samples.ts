@@ -46,6 +46,7 @@ export const blueMesaRanchCustomer: Customer = {
     notes: [{
       createdAt: '2025-01-09T00:00:00Z',
       content: 'Prefers SMS for scheduling confirmations.',
+      visibility: 'shared',
       tags: [],
       attachments: []
     }]

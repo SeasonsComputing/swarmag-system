@@ -38,7 +38,6 @@ export const fieldMetadataLogEntry: JobWorkLogEntry = {
     questionId: telemetryQuestionId,
     value: '32.2144,-97.1234',
     capturedAt: '2025-01-18T16:21:00Z',
-    capturedById: userId,
     notes: []
   }],
   createdAt: '2025-01-18T16:21:00Z'

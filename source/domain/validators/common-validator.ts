@@ -1,153 +1,97 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Common protocol validators                                                  ║
-║ Shared guards and question protocol validation for common abstractions.     ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Common domain validator                                                      ║
+║ Boundary validation for common topic abstractions.                           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates common protocol inputs and centralizes shared composition guards
-used across all domain validators.
+Validates create and update protocol payloads for Question. Also exports
+shared guards (isNote, isLocation) used by other domain validators.
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-validateQuestionCreate(input)  Validate QuestionCreate payloads.
-validateQuestionUpdate(input)  Validate QuestionUpdate payloads.
-isAttachment(value)            Guard for Attachment composition values.
-isNote(value)                  Guard for Note composition values.
-isAnswer(value)                Guard for Answer composition values.
-isSelectOption(value)          Guard for SelectOption composition values.
+validateQuestionCreate  Validate QuestionCreate payloads.
+validateQuestionUpdate  Validate QuestionUpdate payloads.
+isNote                  Type guard for Note; used by other validators.
+isLocation              Type guard for Location; used by other validators.
 */
 
 import {
-  type Dictionary,
   expectBoolean,
-  expectCompositionMany,
   expectCompositionPositive,
   expectConstEnum,
+  type ExpectGuard,
   expectId,
   expectNonEmptyString,
-  expectValid,
-  expectWhen,
-  isString
+  type ExpectResult,
+  expectValid
 } from '@core-std'
 import {
-  type Answer,
-  type Attachment,
-  ATTACHMENT_KINDS,
+  type Location,
   type Note,
-  NOTE_VISIBILITIES,
   QUESTION_TYPES,
-  SELECT_QUESTION_TYPES,
-  type SelectOption,
-  type SelectQuestionType
+  type SelectOption
 } from '@domain/abstractions/common.ts'
-import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/common-protocol.ts'
+import type {
+  QuestionCreate,
+  QuestionUpdate,
+  SelectQuestionCreate,
+  SelectQuestionUpdate
+} from '@domain/protocols/common-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// VALIDATORS
+// PUBLIC EXPORTS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validates QuestionCreate; returns error message or null. */
-export const validateQuestionCreate = (input: QuestionCreate): string | null => {
-  const error = expectValid(
-    expectNonEmptyString(input.prompt, 'prompt'),
-    expectConstEnum(input.type, 'type', QUESTION_TYPES),
-    expectNonEmptyString(input.helpText, 'helpText', true),
-    expectBoolean(input.required, 'required', true)
-  )
-  if (error) return error
-
+/** Validate QuestionCreate payloads. */
+export const validateQuestionCreate = (input: QuestionCreate): ExpectResult => {
+  const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES)
+  if (typeError) return typeError
   switch (input.type) {
-    case 'single-select':
-    case 'multi-select':
-      return expectCompositionPositive(input.options, 'options', isSelectOption)
-
     case 'internal':
+      return null
     case 'text':
     case 'number':
     case 'boolean':
       return null
+    case 'single-select':
+    case 'multi-select':
+      return expectCompositionPositive(
+        (input as SelectQuestionCreate).options,
+        'options',
+        isSelectOption
+      )
   }
 }
 
-/** Validates QuestionUpdate; returns error message or null. */
-export const validateQuestionUpdate = (input: QuestionUpdate): string | null => {
-  const options = 'options' in input ? input.options : undefined
+/** Validate QuestionUpdate payloads. */
+export const validateQuestionUpdate = (input: QuestionUpdate): ExpectResult => {
+  const idError = expectId(input.id, 'id')
+  if (idError) return idError
+  const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES, true)
+  if (typeError) return typeError
   return expectValid(
-    expectId(input.id, 'id'),
-    expectConstEnum(input.type, 'type', QUESTION_TYPES, true),
     expectNonEmptyString(input.prompt, 'prompt', true),
-    expectNonEmptyString(input.helpText, 'helpText', true),
     expectBoolean(input.required, 'required', true),
-    expectCompositionPositive(options, 'options', isSelectOption, true),
-    expectOptionsMatchType(options, input.type)
+    expectCompositionPositive(
+      (input as SelectQuestionUpdate).options,
+      'options',
+      isSelectOption,
+      true
+    )
   )
 }
 
+/** Type guard for Note; used by other validators. */
+export const isNote = (v: unknown): v is Note => v !== null && typeof v === 'object'
+
+/** Type guard for Location; used by other validators. */
+export const isLocation = (v: unknown): v is Location => v !== null && typeof v === 'object'
+
 // ────────────────────────────────────────────────────────────────────────────
-// GUARDS
+// PRIVATE INTERNALS
 // ────────────────────────────────────────────────────────────────────────────
 
-export const isAttachment = (value: unknown): value is Attachment => {
-  if (typeof value !== 'object' || value === null) return false
-  const data = value as Dictionary
-  return expectValid(
-    expectNonEmptyString(data.filename, 'filename'),
-    expectNonEmptyString(data.url, 'url'),
-    expectNonEmptyString(data.contentType, 'contentType'),
-    expectConstEnum(data.kind, 'kind', ATTACHMENT_KINDS),
-    expectWhen(data.uploadedAt, 'uploadedAt')
-  ) === null
-}
-
-export const isNote = (value: unknown): value is Note => {
-  if (typeof value !== 'object' || value === null) return false
-  const data = value as Dictionary
-  return expectValid(
-    expectCompositionMany(data.attachments, 'attachments', isAttachment),
-    expectWhen(data.createdAt, 'createdAt'),
-    expectNonEmptyString(data.content, 'content'),
-    expectConstEnum(data.visibility, 'visibility', NOTE_VISIBILITIES, true),
-    expectCompositionMany(data.tags, 'tags', isString)
-  ) === null
-}
-
-export const isSelectOption = (value: unknown): value is SelectOption => {
-  if (typeof value !== 'object' || value === null) return false
-  const data = value as Dictionary
-  return expectValid(
-    expectNonEmptyString(data.value, 'value'),
-    expectNonEmptyString(data.label, 'label', true),
-    expectBoolean(data.requiresNote, 'requiresNote', true)
-  ) === null
-}
-
-export const isAnswer = (value: unknown): value is Answer => {
-  if (typeof value !== 'object' || value === null) return false
-  const data = value as Dictionary
-  const answerValue = data.value
-  const isScalar = isString(answerValue)
-    || typeof answerValue === 'number'
-    || typeof answerValue === 'boolean'
-  const isStringArray = expectCompositionMany(answerValue, 'value', isString) === null
-  const valueError = !isScalar && !isStringArray
-    ? 'value must be string, number, boolean, or string[]'
-    : null
-  return expectValid(
-    expectId(data.questionId, 'questionId'),
-    expectId(data.capturedById, 'capturedById'),
-    expectCompositionMany(data.notes, 'notes', isNote),
-    valueError,
-    expectWhen(data.capturedAt, 'capturedAt')
-  ) === null
-}
-
-const expectOptionsMatchType = (
-  options: unknown,
-  type: unknown
-): string | null => {
-  if (options === undefined || type === undefined) return null
-  if (SELECT_QUESTION_TYPES.includes(type as SelectQuestionType)) return null
-  return 'options may only be provided when type is single-select or multi-select'
-}
+const isSelectOption: ExpectGuard<SelectOption> = (v): v is SelectOption =>
+  v !== null && typeof v === 'object'

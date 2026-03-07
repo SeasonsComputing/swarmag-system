@@ -6,46 +6,41 @@ abstractions, reinterpret intent, or cross architectural boundaries.
 
 ## 1. Authority
 
-Source documents of authority:
+Authoritative source set, in order:
 
-- `CONSTITUTION.md`
-- `architecture-core.md`
-- `domain.md`
-- `domain-archetypes.md`
-- `data-dictionary.md`
-- `style-guide.md`
+1. `CONSTITUTION.md`
+2. `documentation/foundation/architecture-core.md`
+3. `documentation/foundation/domain.md`
+4. `documentation/foundation/domain-archetypes.md`
+5. `documentation/foundation/data-dictionary.md`
+6. `documentation/foundation/style-guide.md`
+7. `AGENTS.md`
 
-You MUST ingest all of these files before assessing the task. If any conflict
-or ambiguity is detected, pause and escalate before generating files.
+Do not restate or fork these rules in this prompt. This prompt is orchestration only.
 
-## 2. Task
+## 2. Task Contract
 
-Generate the domain-layer archetypes from scratch. Remove all existing files in these directories and fully replace them. Do not patch existing files.
-
-Follow this execution order, and pause for approval after each archetype before continuing. Items 2–4 depend on item 1:
+Regenerate the domain archetype outputs by fully replacing:
 
 1. `source/domain/abstractions/`
 2. `source/domain/adapters/`
 3. `source/domain/protocols/`
 4. `source/domain/validators/`
 
-## 3. Implementation Rules
+Do not patch legacy artifacts in-place; replace the generated set.
 
-All implementation rules are defined in `domain-archetypes.md` and `style-guide.md`. Apply them in
-full. The table below is cross-reference only.
+## 3. Execution Contract
 
-| Concern                   | Spec reference                     |
-| ------------------------- | ---------------------------------- |
-| Abstractions              | `domain-archetypes.md` section 3   |
-| Adapters                  | `domain-archetypes.md` section 4   |
-| Protocols                 | `domain-archetypes.md` section 5   |
-| Validators                | `domain-archetypes.md` section 6   |
-| Shared composition guards | `domain-archetypes.md` section 6.5 |
-| Import aliases            | `style-guide.md` section 3         |
-| Naming                    | `style-guide.md` section 4         |
-| File format               | `style-guide.md` section 6         |
+1. Ingest the authority set.
+2. Generate all four archetype directories in one run.
+3. Run `deno task genesis:domain`.
+4. If any check fails, fix and re-run until all pass.
+5. Return only when audit is green.
 
-## 4. Type Rules and Checks
+## 4. Output Contract
 
-- No `any` — use `unknown` at boundaries.
-- TypeScript strict mode — `deno task check` must pass.
+Responses that include code changes must include:
+
+- `STYLE_AUDIT: PASS` or `STYLE_AUDIT: FAIL`
+- If `FAIL`: `- path:line — rule — issue`
+- If `PASS`: list of audited generated files/directories

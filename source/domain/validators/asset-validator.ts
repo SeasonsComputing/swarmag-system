@@ -1,30 +1,33 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Asset protocol validator                                                   ║
-║ Boundary validation for asset protocol payloads.                           ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Asset domain validator                                                       ║
+║ Boundary validation for asset topic abstractions.                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update protocol payloads for asset topic abstractions.
+Validates create and update protocol payloads for AssetType and Asset.
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-validateAssetTypeCreate(input)
-  Validate AssetTypeCreate payloads.
-
-validateAssetTypeUpdate(input)
-  Validate AssetTypeUpdate payloads.
-
-validateAssetCreate(input)
-  Validate AssetCreate payloads.
-
-validateAssetUpdate(input)
-  Validate AssetUpdate payloads.
+validateAssetTypeCreate  Validate AssetTypeCreate payloads.
+validateAssetTypeUpdate  Validate AssetTypeUpdate payloads.
+validateAssetCreate      Validate AssetCreate payloads.
+validateAssetUpdate      Validate AssetUpdate payloads.
 */
 
-import { isCompositionMany, isId, isNonEmptyString } from '@core-std'
-import { ASSET_STATUSES, type AssetStatus } from '@domain/abstractions/asset.ts'
+import {
+  expectBoolean,
+  expectCompositionMany,
+  expectConstEnum,
+  type ExpectGuard,
+  expectId,
+  expectNonEmptyString,
+  type ExpectResult,
+  expectValid
+} from '@core-std'
+import { ASSET_STATUSES } from '@domain/abstractions/asset.ts'
+import type { Note } from '@domain/abstractions/common.ts'
 import type {
   AssetCreate,
   AssetTypeCreate,
@@ -37,72 +40,40 @@ import { isNote } from '@domain/validators/common-validator.ts'
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validates AssetTypeCreate; returns error message or null. */
-export const validateAssetTypeCreate = (input: AssetTypeCreate): string | null => {
-  if (!isNonEmptyString(input.label)) return 'label must be a non-empty string'
-  if (typeof input.active !== 'boolean') return 'active must be a boolean'
-  return null
-}
+/** Validate AssetTypeCreate payloads. */
+export const validateAssetTypeCreate = (input: AssetTypeCreate): ExpectResult =>
+  expectValid(
+    expectNonEmptyString(input.label, 'label'),
+    expectBoolean(input.active, 'active')
+  )
 
-/** Validates AssetTypeUpdate; returns error message or null. */
-export const validateAssetTypeUpdate = (input: AssetTypeUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
-  if (input.label !== undefined && !isNonEmptyString(input.label)) {
-    return 'label must be a non-empty string when provided'
-  }
-  if (input.active !== undefined && typeof input.active !== 'boolean') {
-    return 'active must be a boolean when provided'
-  }
-  return null
-}
+/** Validate AssetTypeUpdate payloads. */
+export const validateAssetTypeUpdate = (input: AssetTypeUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectNonEmptyString(input.label, 'label', true),
+    expectBoolean(input.active, 'active', true)
+  )
 
-/** Validates AssetCreate; returns error message or null. */
-export const validateAssetCreate = (input: AssetCreate): string | null => {
-  if (!isId(input.type)) return 'type must be a valid Id'
-  if (!isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values'
-  }
-  if (!isNonEmptyString(input.label)) return 'label must be a non-empty string'
-  if (input.description !== undefined && !isNonEmptyString(input.description)) {
-    return 'description must be a non-empty string when provided'
-  }
-  if (input.serialNumber !== undefined && !isNonEmptyString(input.serialNumber)) {
-    return 'serialNumber must be a non-empty string when provided'
-  }
-  if (!ASSET_STATUSES.includes(input.status as AssetStatus)) {
-    return 'status must be a valid AssetStatus'
-  }
-  return null
-}
+/** Validate AssetCreate payloads. */
+export const validateAssetCreate = (input: AssetCreate): ExpectResult =>
+  expectValid(
+    expectId(input.type, 'type'),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectNonEmptyString(input.label, 'label'),
+    expectNonEmptyString(input.description, 'description', true),
+    expectNonEmptyString(input.serialNumber, 'serialNumber', true),
+    expectConstEnum(input.status, 'status', ASSET_STATUSES)
+  )
 
-/** Validates AssetUpdate; returns error message or null. */
-export const validateAssetUpdate = (input: AssetUpdate): string | null => {
-  if (!isId(input.id)) return 'id must be a valid Id'
-
-  if (input.type !== undefined && !isId(input.type)) {
-    return 'type must be a valid Id when provided'
-  }
-  if (input.notes !== undefined && !isCompositionMany(input.notes, isNote)) {
-    return 'notes must be an array of valid Note values when provided'
-  }
-  if (input.label !== undefined && !isNonEmptyString(input.label)) {
-    return 'label must be a non-empty string when provided'
-  }
-  if (input.description !== undefined && !isNonEmptyString(input.description)) {
-    return 'description must be a non-empty string when provided'
-  }
-  if (input.serialNumber !== undefined && !isNonEmptyString(input.serialNumber)) {
-    return 'serialNumber must be a non-empty string when provided'
-  }
-  if (
-    input.status !== undefined
-    && !ASSET_STATUSES.includes(input.status as AssetStatus)
-  ) {
-    return 'status must be a valid AssetStatus when provided'
-  }
-  return null
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// INTERNALS
-// ────────────────────────────────────────────────────────────────────────────
+/** Validate AssetUpdate payloads. */
+export const validateAssetUpdate = (input: AssetUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectId(input.type, 'type', true),
+    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectNonEmptyString(input.label, 'label', true),
+    expectNonEmptyString(input.description, 'description', true),
+    expectNonEmptyString(input.serialNumber, 'serialNumber', true),
+    expectConstEnum(input.status, 'status', ASSET_STATUSES, true)
+  )

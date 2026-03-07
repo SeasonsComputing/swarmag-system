@@ -12,7 +12,6 @@ Implementation patterns for the `source/domain/` package. This document governs 
 → `architecture-core.md`
 → `domain.md`
 → `data-dictionary.md`
-→ `domain-archetypes.md`
 → `style-guide.md`
 
 ### 1.2 Scope Boundary of Governing Documents
@@ -26,233 +25,487 @@ Implementation patterns for the `source/domain/` package. This document governs 
 
 The domain layer follows a file-per-topic-namespace pattern, where each file contains the abstractions that define the topic namespace, organized by archetype directory.
 
-| Archetype       | File                   | Purpose                                              |
-| --------------- | ---------------------- | ---------------------------------------------------- |
-| `abstractions/` | `{topic}.ts`           | TypeScript types — the domain truth                  |
-| `adapters/`     | `{topic}-adapter.ts`   | Dictionary ↔ domain type serialization               |
-| `protocols/`    | `{topic}-protocol.ts`  | Create/update input shapes for boundary transmission |
-| `validators/`   | `{topic}-validator.ts` | Boundary validation — returns `string \| null`       |
-| `schema/`       | `schema.sql`           | Generated canonical PostgreSQL schema                |
+| Archetype       | File                   | Purpose                                                     |
+| --------------- | ---------------------- | ----------------------------------------------------------- |
+| `abstractions/` | `{topic}.ts`           | TypeScript types — the domain truth                         |
+| `adapters/`     | `{topic}-adapter.ts`   | Dictionary ↔ domain type serialization                      |
+| `protocols/`    | `{topic}-protocol.ts`  | Create and update protocol shapes for boundary transmission |
+| `validators/`   | `{topic}-validator.ts` | Boundary validation — returns `ExpectResult`                |
+| `schema/`       | `schema.sql`           | Generated canonical PostgreSQL schema                       |
 
-### 2.1 File format
+### 2.1 File Format
 
-All domain files conform to `style-guide.md` section 6.2 Functional files.
+All domain files conform to `style-guide.md` Functional files format.
 
-## 3. Abstraction Archetype (`abstractions/`)
+## 3. Abstractions
 
-### 3.1 Rules
+Source: `@domain/abstractions/{topic}.ts`
 
-- `type` for all domain shapes, aliases, unions. `interface` only for contracts that something explicitly implements.
-- Lifecycled abstractions extend `Instantiable` via intersection — never redeclare `id`, `createdAt`, `updatedAt`, `deletedAt?` inline.
-- Append-only abstractions extend `InstantiableOnly` — never redeclare `id`, `createdAt` inline.
-- Embedded subordinate compositions use `Composition*<T>` from `@core-std`.
-- FK references use `Association*<T>` from `@core-std`.
-- JSON-serializable only — no methods on domain objects.
-- No variadic tuple types anywhere.
-- Abstraction definitions are the single source of truth for protocol field sets — `CreateFromInstantiable<T>` and `UpdateFromInstantiable<T>` derive protocol shapes directly. No manual synchronization required.
-- `const-enum` and `union-type` / `intersection-type` patterns: see `style-guide.md` §8.2, §8.3, §8.4.
+Abstractions are pure TypeScript types. They have no infrastructure dependencies and carry no behavior. They are the domain truth — all other archetypes are derived from them.
 
-## 4. Adapter Archetype (`adapters/`)
+### 3.1 Type Classification
 
-### 4.1 Pattern
+Every abstraction in the data dictionary has an explicit type classification. The classification determines the TypeScript pattern used.
+
+| Classification      | Pattern                                     | Lifecycle base                               |
+| ------------------- | ------------------------------------------- | -------------------------------------------- |
+| `Instantiable`      | Named `type` extending `Instantiable`       | `id`, `createdAt`, `updatedAt`, `deletedAt?` |
+| `InstantiableOnly`  | Named `type` extending `InstantiableOnly`   | `id`, `createdAt`                            |
+| `Junction`          | Named `type` using `AssociationJunction<T>` | None                                         |
+| `object`            | Named `type` — plain shape, no lifecycle    | None                                         |
+| `const-enum`        | `const` tuple + derived type alias          | None                                         |
+| `intersection-type` | Named `type` extending a base type          | Inherits from base                           |
+| `union-type`        | Named discriminated union of constituents   | None                                         |
+
+### 3.2 Instantiable
+
+Extend `Instantiable` from `@core-std` via intersection. Never redeclare `id`, `createdAt`, `updatedAt`, or `deletedAt` inline.
 
 ```typescript
-import type { Dictionary, When } from '@core-std'
-import { notValid } from '@core-std'
-import type { Asset, AssetStatus } from '@domain/abstractions/asset.ts'
+import type { AssociationOne, CompositionMany, Instantiable } from '@core-std'
 import type { Note } from '@domain/abstractions/common.ts'
-import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// ADAPTERS
-// ────────────────────────────────────────────────────────────────────────────
+/** System user identity and membership. */
+export type User = Instantiable & {
+  roles: CompositionPositive<UserRole>
+  displayName: string
+  primaryEmail: string
+  phoneNumber: string
+  avatarUrl?: string
+  status: 'active' | 'inactive'
+}
+```
 
-/** Create an Asset from its dictionary representation. */
-export const toAsset = (dict: Dictionary): Asset => {
-  if (!dict.id) return notValid('Asset dictionary missing required field: id')
-  if (!dict.label) return notValid('Asset dictionary missing required field: label')
-  return {
-    id: dict.id as string,
-    label: dict.label as string,
-    type: dict.type_id as string,
-    status: dict.status as AssetStatus,
-    notes: (dict.notes as Dictionary[]).map(toNote),
-    createdAt: dict.created_at as When,
-    updatedAt: dict.updated_at as When,
-    deletedAt: dict.deleted_at as When | undefined
-  }
+### 3.3 InstantiableOnly
+
+Extend `InstantiableOnly` from `@core-std` cannot be updated not deleted. Used for append-only records.
+
+```typescript
+import type { AssociationOne, CompositionOne, InstantiableOnly } from '@core-std'
+import type { Answer } from '@domain/abstractions/common.ts'
+import type { Job } from '@domain/abstractions/job.ts'
+import type { User } from '@domain/abstractions/user.ts'
+
+/** Work execution event; append-only log. */
+export type JobWorkLogEntry = InstantiableOnly & {
+  jobId: AssociationOne<Job>
+  userId: AssociationOne<User>
+  answer: CompositionOne<Answer>
+}
+```
+
+### 3.4 Junction
+
+Junction abstractions use `AssociationJunction<T>` for all foreign keys. No lifecycle fields — junctions are hard-deleted only.
+
+```typescript
+import type { AssociationJunction, Id } from '@core-std'
+import type { Question } from '@domain/abstractions/common.ts'
+import type { Task } from '@domain/abstractions/workflow.ts'
+
+/** m:m junction — tasks to questions with explicit ordering. */
+export type TaskQuestion = {
+  taskId: AssociationJunction<Task>
+  questionId: AssociationJunction<Question>
+  sequence: number
+}
+```
+
+### 3.5 Object
+
+Plain shape with no lifecycle base. Used for embedded subordinates and value objects.
+
+```typescript
+/** Geographic position plus optional address metadata. */
+export type Location = {
+  latitude: number
+  longitude: number
+  altitudeMeters?: number
+  line1?: string
+  line2?: string
+  city?: string
+  state?: string
+  postalCode?: string
+  country?: string
+  recordedAt?: When
+  accuracyMeters?: number
+  description?: string
+}
+```
+
+### 3.6 Const-Enum
+
+Any value set requiring runtime validation. Defined as a `const` tuple paired with a derived type alias. Both exported from the abstractions file. Never redeclared elsewhere.
+
+```typescript
+/** Canonical role set. */
+export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
+export type UserRole = (typeof USER_ROLES)[number]
+```
+
+### 3.7 Union-Type
+
+Discriminated union of named intersection-type constituents sharing a discriminator field. Follow `style-guide.md` `union-type` pattern exactly.
+
+```typescript
+/** Supported question input modes. */
+export const QUESTION_TYPES = [
+  'internal',
+  'text',
+  'number',
+  'boolean',
+  'single-select',
+  'multi-select'
+] as const
+export type QuestionType = (typeof QUESTION_TYPES)[number]
+
+/** Common shape shared by all Question constituents. */
+export type BaseQuestion = Instantiable & {
+  type: QuestionType
+  prompt: string
+  helpText?: string
+  required?: boolean
 }
 
-/** Create a dictionary representation from an Asset. */
-export const fromAsset = (asset: Asset): Dictionary => ({
-  id: asset.id,
-  label: asset.label,
-  type_id: asset.type,
-  status: asset.status,
-  notes: asset.notes.map(fromNote),
-  created_at: asset.createdAt,
-  updated_at: asset.updatedAt,
-  deleted_at: asset.deletedAt
-})
+/** System-generated question. */
+export type InternalQuestion = BaseQuestion & {
+  type: 'internal'
+}
+
+/** Scalar input question; no options. */
+export type ScalarQuestion = BaseQuestion & {
+  type: 'text' | 'number' | 'boolean'
+}
+
+/** Select input question; options required and non-empty. */
+export type SelectQuestion = BaseQuestion & {
+  type: 'single-select' | 'multi-select'
+  options: CompositionPositive<SelectOption>
+}
+
+/** Discriminated union — boundary type used throughout the system. */
+export type Question = InternalQuestion | ScalarQuestion | SelectQuestion
 ```
 
-### 4.2 `common-adapter.ts`
+### 3.8 Association and Composition Relations
 
-Exports shared composition helpers imported by all other adapters:
+Relations from the data dictionary map directly to `@core-std` types. Never use raw `Id` or `T[]` where a relation type is specified.
 
-```
-toLocation / fromLocation
-toAttachment / fromAttachment
-toNote / fromNote
-toSelectOption / fromSelectOption
-toQuestion / fromQuestion
-toAnswer / fromAnswer
-```
+| Data dictionary relation | `@core-std` type         |
+| ------------------------ | ------------------------ |
+| `AssociationOne`         | `AssociationOne<T>`      |
+| `AssociationOptional`    | `AssociationOptional<T>` |
+| `AssociationJunction`    | `AssociationJunction<T>` |
+| `CompositionOne`         | `CompositionOne<T>`      |
+| `CompositionOptional`    | `CompositionOptional<T>` |
+| `CompositionMany`        | `CompositionMany<T>`     |
+| `CompositionPositive`    | `CompositionPositive<T>` |
 
-`toQuestion` / `fromQuestion` apply the `union-type` adapter pattern — see `style-guide.md` §8.3.
+## 4. Protocols
 
-### 4.3 Rules
+Source: `@domain/protocols/{topic}-protocol.ts`
 
-- Functions only — `to{Abstraction}(dict: Dictionary): Abstraction` and `from{Abstraction}(abstraction: Abstraction): Dictionary`
-- Map every field explicitly — no `...spread`, no payload shortcut
-- `snake_case` for database column names; `camelCase` for domain fields
-- Fast-fail on missing required fields using `notValid` from `@core-std` — not `throw`
-- All `notValid` calls precede the single return statement
-- `Composition*` fields mapped with `.map(toChild)` / `.map(fromChild)` — no raw array casts
-- `Association*` fields resolve to `Id` or `Id | undefined` — cast from Dictionary as `string`
+Protocols define the create and update input shapes transmitted across the system boundary. They are the contract validated at ingress.
 
-## 5. Protocol Archetype (`protocols/`)
+### 4.1 Naming
 
-### 5.1 Three Rules
+| Shape          | Name            | Helper                          |
+| -------------- | --------------- | ------------------------------- |
+| Create payload | `{Topic}Create` | CreateFromInstantiable<{Topic}> |
+| Update payload | `{Topic}Update` | UpdateFromInstantiable<{Topic}> |
 
-**Rule 1 — Instantiable types use utility type derivation.**
+### 4.2 Create and Update
+
+The create and update protocol contain only fields required to create or update an abstraction. All lifecycle fields are excluded — those are set by the persistence layer.
 
 ```typescript
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
-import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
+import type { User } from '@domain/abstractions/user.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// PROTOCOLS
+// PROTOCOL
 // ────────────────────────────────────────────────────────────────────────────
 
-export type AssetTypeCreate = CreateFromInstantiable<AssetType>
-export type AssetTypeUpdate = UpdateFromInstantiable<AssetType>
-export type AssetCreate = CreateFromInstantiable<Asset>
-export type AssetUpdate = UpdateFromInstantiable<Asset>
+export type UserCreate = CreateFromInstantiable<User>
+export type UserUpdate = UpdateFromInstantiable<User>
 ```
 
-`CreateFromInstantiable<T>` strips `id`, `createdAt`, `updatedAt`, `deletedAt`. `UpdateFromInstantiable<T>` is `id` (required) plus all create fields as optional. Never hand-write `Omit`/`Pick`/`Partial` for lifecycled types. No JSDoc on protocol type exports — the name is the documentation.
+### 4.3 Junction and InstantiableOnly Protocols
 
-For `union-type` abstractions, apply utility types to each constituent independently and reassemble as a protocol union.
+Junction abstractions have no update protocol — they are created and hard-deleted only.
 
-**Rule 2 — Composite objects and junctions need no protocol entry.**
+`InstantiableOnly` abstractions have a create protocol only — no update protocol.
 
-Composite objects and junction types are used directly by callers. The type is already the shape.
+## 5. Validators
 
-**Rule 3 — Exceptions are hand-coded with `Pick`.**
+Source: `@domain/validators/{topic}-validator.ts`
 
-```typescript
-export type JobWorkLogEntryCreate = Pick<JobWorkLogEntry, 'jobId' | 'userId' | 'answer'>
-```
+Validators enforce protocol contracts at the system boundary.
 
-### 5.2 Rules
+All field checks use `expect*` helpers from `@core-std` (`validators.ts`).
 
-- Never hand-write `Omit`/`Pick`/`Partial` for `Instantiable` types — use the utility types
-- Composite objects and junctions have no protocol entries
-- `Pick` appears only in Rule 3 exceptions
-- No domain logic — protocols are data shapes for boundary transmission only
-- No JSDoc on protocol type exports — names are self-documenting
+### 5.1 Naming
 
-## 6. Validator Archetype (`validators/`)
+| Validator function | Name                    |
+| ------------------ | ----------------------- |
+| Create validator   | `validate{Topic}Create` |
+| Update validator   | `validate{Topic}Update` |
 
-### 6.1 Pattern
+### 5.2 Structure
 
 ```typescript
-import TODO
+import {
+  expectCompositionPositive,
+  expectConstEnum,
+  type ExpectGuard,
+  expectId,
+  expectNonEmptyString,
+  type ExpectResult,
+  expectValid
+} from '@core/std/validators.ts'
+import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/user.ts'
+import type { UserCreate } from '@domain/protocols/user-protocol.ts'
+import type { UserUpdate } from '@domain/protocols/user-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
-TODO
+/** Validate UserCreate payloads. */
+export const validateUserCreate = (input: UserCreate): ExpectResult =>
+  expectValid(
+    expectCompositionPositive(input.roles, 'roles', isUserRole),
+    expectNonEmptyString(input.displayName, 'displayName'),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
+    expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
+    expectConstEnum(input.status, 'status', USER_STATUSES, true)
+  )
+
+/** Validate UserUpdate payloads. */
+export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectCompositionPositive(input.roles, 'roles', isUserRole, true),
+    expectNonEmptyString(input.displayName, 'displayName', true),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail', true),
+    expectNonEmptyString(input.phoneNumber, 'phoneNumber', true),
+    expectConstEnum(input.status, 'status', USER_STATUSES, true)
+  )
 
 // ────────────────────────────────────────────────────────────────────────────
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-TODO
+const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
 ```
 
-### 6.2 Explicit decomposition rules (non-negotiable)
+### 5.3 Union-Type Validation
 
-1. **Named guards** — every domain object type validated in the file's own topic area gets a named `is{Abstraction}` guard. No anonymous object-level guards inline in `isComposition*` calls.
-2. **Recursive delegation** — use `isComposition*(data, is{Child})` to delegate down the tree. Each level is named and declared separately.
-3. **Primitive-only anonymous functions** — anonymous arrows permitted only for primitives: `(v): v is string => isNonEmptyString(v)`. All object validation must be a named guard.
-4. **Input narrowing** — guards narrow with `Dictionary` casts from `@core-std`, not `Record<string, unknown>`.
-
-### 6.3 Shared composition guards (non-negotiable)
-
-`Note`, `Attachment`, and `Answer` have no protocol entries because **the type itself is the protocol** — they are value objects that arrive at the boundary exactly as defined. Their validation is therefore a **guard** (shape check), not a create/update validator pair.
-
-Because these types are embedded as compositions across nearly every domain topic area, their guards are defined **once** in `common-validator.ts` and **exported**. Defining a local `isNote`, `isAttachment`, or `isAnswer` in any other validator file is a violation equivalent to redeclaring a const-enum tuple.
-
-**§6.2 rule 1 scope:** "named guard for every object type validated in the file" applies to types owned by that file's topic area. Shared common-type guards are the explicit exception.
-
-**Exported guards from `common-validator.ts`:**
-
-| Guard            | Rationale                                              | Consumed by                                                                                                               |
-| ---------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `isAttachment`   | Type is the protocol; used inside `isNote`             | `isNote`                                                                                                                  |
-| `isNote`         | Type is the protocol; embedded across all topics       | `asset-validator`, `chemical-validator`, `customer-validator`, `service-validator`, `workflow-validator`, `job-validator` |
-| `isAnswer`       | Type is the protocol; field on `JobWorkLogEntryCreate` | `job-validator`                                                                                                           |
-| `isSelectOption` | Composition element of `SelectQuestion`                | `validateQuestionCreate`, `validateQuestionUpdate`                                                                        |
-
-**Import pattern:**
+Validate the discriminator first with `expectConstEnum`, then switch on the type for branch-specific field checks.
 
 ```typescript
-import { isAnswer, isNote } from '@domain/validators/common-validator.ts'
+import { expectCompositionPositive, expectConstEnum, ExpectResult } from '@core-std'
+import { QUESTION_TYPES } from '@domain/abstractions/common.ts'
+import type { QuestionType, SelectOption } from '@domain/abstractions/common.ts'
+import type { QuestionCreate } from '@domain/protocols/common-protocol.ts'
+
+// ────────────────────────────────────────────────────────────────────────────
+// VALIDATORS
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Validate QuestionCreate payloads. */
+export const validateQuestionCreate = (input: QuestionCreate): ExpectResult => {
+  const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES)
+  if (typeError) return typeError
+  switch (input.type) {
+    case 'internal':
+      return null
+    case 'text':
+    case 'number':
+    case 'boolean':
+      return null
+    case 'single-select':
+    case 'multi-select':
+      return expectCompositionPositive(input.options, 'options', isSelectOption)
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// GUARDS
+// ────────────────────────────────────────────────────────────────────────────
+
+const isSelectOption = (v: unknown): v is SelectOption => v !== null && typeof v === 'object'
 ```
 
-**`common-validator.ts` exports exactly:**
+### 5.5 Update Validators
 
-- Guards: `isAttachment`, `isNote`, `isAnswer`, `isSelectOption`
-- Validators: `validateQuestionCreate`, `validateQuestionUpdate`
+Update validators follow the same structure as create validators. Exports at top, guards in a GUARDS section below.
 
-No `validateNote*`, `validateAttachment*`, or `validateAnswer*` functions exist anywhere — these types have no protocols; guards are sufficient.
+```typescript
+import {
+  expectCompositionPositive,
+  expectConstEnum,
+  expectId,
+  expectNonEmptyString,
+  ExpectResult,
+  expectValid
+} from '@core-std'
+import { USER_ROLES } from '@domain/abstractions/user.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
+import type { UserUpdate } from '@domain/protocols/user-protocol.ts'
 
-### 6.4 Rules
+// ────────────────────────────────────────────────────────────────────────────
+// VALIDATORS
+// ────────────────────────────────────────────────────────────────────────────
 
-- Return `string | null` — error message or `null` for valid
-- Validate at system boundaries only — never re-validate inside domain logic
-- Use `@core-std` primitives: `isNonEmptyString`, `isId`, `isWhen`, `isPositiveNumber`, `isComposition*`
-- No throwing — validators return, callers decide
-- Import const-enum tuples from abstraction files — never redeclare locally
-- Update validators: validate `id` first, then only fields `!== undefined`
-- No Update validator for: `JobWorkLogEntry`
+/** Validate UserUpdate payloads. */
+export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
+  expectValid(
+    expectId(input.id, 'id'),
+    expectNonEmptyString(input.displayName, 'displayName'),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
+    expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
+    expectCompositionPositive(input.roles, 'roles', isUserRole)
+  )
 
-## 7. Schema Archetype (`schema/`)
+// ────────────────────────────────────────────────────────────────────────────
+// GUARDS
+// ────────────────────────────────────────────────────────────────────────────
 
-`source/domain/schema/schema.sql` is a domain artifact — generated from the domain model, owned by the domain layer. It is the authoritative current-state DDL for the entire system. It is not a migration.
+const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
+```
 
-**The schema and migrations are bifurcated by design:**
+## 6. Adapters
 
-- `schema.sql` — complete, idempotent, reproducible current state; generated from the domain model; includes canonical seed data known at schema time
-- `source/back/migrations/` — forward-only deltas expressing change over time; governed by `architecture-back.md`
+Source: `@domain/adapters/{topic}-adapter.ts`
 
-General DDL authoring conventions live in `style-guide.md` §10. This section captures domain-specific schema constraints.
+Adapters serialize between the storage representation (`Dictionary`) and domain abstractions. They contain no business logic and no validation.
 
-### 7.1 Domain-specific table classes
+### 6.1 Naming
 
-- `InstantiableOnly` tables (`job_work_log_entries`) are append-only: `id` and `created_at` only; no `updated_at`, no `deleted_at`.
-- Pure junction tables with no lifecycle columns:
-  - `workflow_tasks`
-  - `task_questions`
-  - `service_required_asset_types`
-  - `job_plan_assets`
-- Policy operation constraints:
-  - Junction tables allow `SELECT`, `INSERT`, `DELETE` only.
-  - `job_work_log_entries` allows `SELECT`, `INSERT` only.
+| Adapter function | Name          |
+| ---------------- | ------------- |
+| Storage → domain | `to{Topic}`   |
+| Domain → storage | `from{Topic}` |
 
-### 7.2 Seed data
+### 6.2 Structure
 
-Canonical seed data known at schema time belongs in `schema.sql` — not a migration. All seed record IDs are stable UUID v7 values drawn from `documentation/devops/seed-ids.txt` — application-supplied, never database-generated. No seed record uses a database-generated ID.
+Each adapter file exports a `to` function and a `from` function for each abstraction in the topic namespace that is persisted. Plain `object` types embedded as compositions are serialized inline within their parent's adapter — they do not get standalone adapter functions.
+
+```typescript
+import type { Dictionary } from '@core-std'
+import type { User } from '@domain/abstractions/user.ts'
+
+/** Deserialize User from storage dictionary. */
+export const toUser = (dict: Dictionary): User => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  roles: dict.roles as CompositionPositive<UserRole>,
+  displayName: dict.display_name as string,
+  primaryEmail: dict.primary_email as string,
+  phoneNumber: dict.phone_number as string,
+  avatarUrl: dict.avatar_url as string | undefined,
+  status: dict.status as 'active' | 'inactive' | undefined
+})
+
+/** Serialize User to storage dictionary. */
+export const fromUser = (user: User): Dictionary => ({
+  id: user.id,
+  created_at: user.createdAt,
+  updated_at: user.updatedAt,
+  deleted_at: user.deletedAt,
+  roles: user.roles,
+  display_name: user.displayName,
+  primary_email: user.primaryEmail,
+  phone_number: user.phoneNumber,
+  avatar_url: user.avatarUrl,
+  status: user.status
+})
+```
+
+### 6.3 Column Mapping
+
+Domain fields are `camelCase`. Storage columns are `snake_case`. Map every field explicitly — no spread, no payload passthrough.
+
+| Domain field   | Storage column   |
+| -------------- | ---------------- |
+| `id`           | `id`             |
+| `createdAt`    | `created_at`     |
+| `updatedAt`    | `updated_at`     |
+| `deletedAt`    | `deleted_at`     |
+| `{camelField}` | `{snake_column}` |
+
+### 6.4 Composition Serialization
+
+Composition fields (`CompositionOne`, `CompositionMany`, `CompositionPositive`) are stored as JSONB. Deserialize inline within the parent's `to` function.
+
+```typescript
+/** Deserialize Asset from storage dictionary. */
+export const toAsset = (dict: Dictionary): Asset => ({
+  id: dict.id as Id,
+  createdAt: dict.created_at as When,
+  updatedAt: dict.updated_at as When,
+  deletedAt: dict.deleted_at as When | undefined,
+  typeId: dict.type_id as AssociationOne<AssetType>,
+  notes: (dict.notes as Dictionary[]).map(toNote),
+  label: dict.label as string,
+  description: dict.description as string | undefined,
+  serialNumber: dict.serial_number as string | undefined,
+  status: dict.status as AssetStatus
+})
+```
+
+### 6.5 Union-Type Adapters
+
+```typescript
+/** Deserialize Question from storage dictionary. */
+export const toQuestion = (dict: Dictionary): Question => {
+  const type = dict.type as QuestionType
+  switch (type) {
+    case 'internal':
+      return {
+        id: dict.id as Id,
+        createdAt: dict.created_at as When,
+        updatedAt: dict.updated_at as When,
+        deletedAt: dict.deleted_at as When | undefined,
+        type,
+        prompt: dict.prompt as string,
+        helpText: dict.help_text as string | undefined,
+        required: dict.required as boolean | undefined
+      } satisfies InternalQuestion
+    case 'text':
+    case 'number':
+    case 'boolean':
+      return {
+        id: dict.id as Id,
+        createdAt: dict.created_at as When,
+        updatedAt: dict.updated_at as When,
+        deletedAt: dict.deleted_at as When | undefined,
+        type,
+        prompt: dict.prompt as string,
+        helpText: dict.help_text as string | undefined,
+        required: dict.required as boolean | undefined
+      } satisfies ScalarQuestion
+    case 'single-select':
+    case 'multi-select':
+      return {
+        id: dict.id as Id,
+        createdAt: dict.created_at as When,
+        updatedAt: dict.updated_at as When,
+        deletedAt: dict.deleted_at as When | undefined,
+        type,
+        prompt: dict.prompt as string,
+        helpText: dict.help_text as string | undefined,
+        required: dict.required as boolean | undefined,
+        options: (dict.options as Dictionary[]).map(toSelectOption) as CompositionPositive<SelectOption>
+      } satisfies SelectQuestion
+  }
+}
+```
+
+### 6.6 Round-Trip Integrity
+
+Every adapter must support a clean round-trip: `toTopic(fromTopic(obj))` produces a structurally identical object. This is enforced by the fixture round-trip test in `source/tests/cases/fixtures-test.ts`.
