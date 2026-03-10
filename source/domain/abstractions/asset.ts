@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines asset type reference records, lifecycle status enumeration, and the
+Defines asset type reference records, life-cycle status enumeration, and the
 Asset abstraction for operational equipment and resources.
 
 EXPORTED APIs & TYPEs

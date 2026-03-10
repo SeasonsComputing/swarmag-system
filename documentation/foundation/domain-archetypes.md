@@ -52,7 +52,7 @@ Every abstraction in the data dictionary has an explicit type classification. Th
 | `Instantiable`      | Named `type` extending `Instantiable`       | `id`, `createdAt`, `updatedAt`, `deletedAt?` |
 | `InstantiableOnly`  | Named `type` extending `InstantiableOnly`   | `id`, `createdAt`                            |
 | `Junction`          | Named `type` using `AssociationJunction<T>` | None                                         |
-| `object`            | Named `type` — plain shape, no lifecycle    | None                                         |
+| `object`            | Named `type` — plain shape, no life-cycle    | None                                         |
 | `const-enum`        | `const` tuple + derived type alias          | None                                         |
 | `intersection-type` | Named `type` extending a base type          | Inherits from base                           |
 | `union-type`        | Named discriminated union of constituents   | None                                         |
@@ -97,7 +97,7 @@ export type JobWorkLogEntry = InstantiableOnly & {
 
 ### 3.4 Junction
 
-Junction abstractions use `AssociationJunction<T>` for all foreign keys. No lifecycle fields — junctions are hard-deleted only.
+Junction abstractions use `AssociationJunction<T>` for all foreign keys. No life-cycle fields — junctions are hard-deleted only.
 
 ```typescript
 import type { AssociationJunction, Id } from '@core-std'
@@ -114,7 +114,7 @@ export type TaskQuestion = {
 
 ### 3.5 Object
 
-Plain shape with no lifecycle base. Used for embedded subordinates and value objects.
+Plain shape with no life-cycle base. Used for embedded subordinates and value objects.
 
 ```typescript
 /** Geographic position plus optional address metadata. */
@@ -217,7 +217,7 @@ Protocols define the create and update input shapes transmitted across the syste
 
 ### 4.2 Create and Update
 
-The create and update protocol contain only fields required to create or update an abstraction. All lifecycle fields are excluded — those are set by the persistence layer.
+The create and update protocol contain only fields required to create or update an abstraction. All life-cycle fields are excluded — those are set by the persistence layer.
 
 ```typescript
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
@@ -509,3 +509,89 @@ export const toQuestion = (dict: Dictionary): Question => {
 ### 6.6 Round-Trip Integrity
 
 Every adapter must support a clean round-trip: `toTopic(fromTopic(obj))` produces a structurally identical object. This is enforced by the fixture round-trip test in `source/tests/cases/fixtures-test.ts`.
+
+## 7. Schema
+
+Source: `@domain/schema/schema.sql`
+
+DDL is derived from domain abstractions per `style-guide.md` sections 10–11. This section covers archetype-to-table mappings and shapes that require explicit specification.
+
+### 7.1 Archetype-to-table mapping
+
+| Archetype          | Table                                                                         | Lifecycle columns                              |
+| ------------------ | ----------------------------------------------------------------------------- | ---------------------------------------------- |
+| `Instantiable`     | One table per abstraction                                                     | `id`, `created_at`, `updated_at`, `deleted_at` |
+| `InstantiableOnly` | One table per abstraction                                                     | `id`, `created_at` only                        |
+| `Junction`         | One table; composite PK                                                       | None                                           |
+| `object`           | No table — serialized as JSONB within parent                                  | —                                              |
+| `const-enum`       | No table — `CHECK` constraint on parent column                                | —                                              |
+| `union-type`       | Single table; all branch fields present, optional defaults on variant columns | Base life-cycle                                 |
+
+### 7.2 Table inventory
+
+**Instantiable** (`id`, `created_at`, `updated_at`, `deleted_at`):
+`users`, `asset_types`, `assets`, `chemicals`, `customers`, `services`, `workflows`, `tasks`, `questions`, `jobs`, `job_assessments`, `job_workflows`, `job_plans`, `job_plan_assignments`, `job_plan_chemicals`, `job_work`
+
+**InstantiableOnly** (`id`, `created_at` only):
+`job_work_log_entries`
+
+**Junction** (composite PK, no life-cycle):
+`workflow_tasks`, `task_questions`, `service_required_asset_types`, `job_plan_assets`
+
+### 7.3 Notable table shapes
+
+Tables where domain intent is not mechanically obvious.
+
+**`questions`** — single table for the `Question` union-type; all variant fields present, optional or defaulted:
+
+```sql
+CREATE TABLE questions (
+  id         UUID        PRIMARY KEY,
+  prompt     TEXT        NOT NULL,
+  type       TEXT        NOT NULL
+                         CHECK (type IN ('text', 'number', 'boolean',
+                                        'single-select', 'multi-select', 'internal')),
+  help_text  TEXT,
+  required   BOOLEAN,
+  options    JSONB       NOT NULL DEFAULT '[]'::jsonb,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at TIMESTAMPTZ
+);
+```
+
+**`workflow_tasks`** — junction carries `sequence`; workflow owns the relationship (`CASCADE`), task is shared (`RESTRICT`):
+
+```sql
+CREATE TABLE workflow_tasks (
+  workflow_id UUID    NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
+  task_id     UUID    NOT NULL REFERENCES tasks(id) ON DELETE RESTRICT,
+  sequence    INTEGER NOT NULL,
+  PRIMARY KEY (workflow_id, task_id)
+);
+```
+
+**`task_questions`** — junction carries `sequence`; task owns (`CASCADE`), question is shared (`RESTRICT`):
+
+```sql
+CREATE TABLE task_questions (
+  task_id     UUID    NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+  question_id UUID    NOT NULL REFERENCES questions(id) ON DELETE RESTRICT,
+  sequence    INTEGER NOT NULL,
+  PRIMARY KEY (task_id, question_id)
+);
+```
+
+**`job_workflows`** — no `sequence` column; execution order is resolved at runtime by `JobWork.work`:
+
+```sql
+CREATE TABLE job_workflows (
+  id                   UUID        PRIMARY KEY,
+  job_id               UUID        NOT NULL REFERENCES jobs(id) ON DELETE CASCADE,
+  basis_workflow_id    UUID        NOT NULL REFERENCES workflows(id) ON DELETE RESTRICT,
+  modified_workflow_id UUID        REFERENCES workflows(id) ON DELETE RESTRICT,
+  created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at           TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at           TIMESTAMPTZ
+);
+```

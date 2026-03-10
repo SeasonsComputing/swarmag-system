@@ -84,7 +84,7 @@ All relationships between domain abstractions are expressed using typed relation
 
 #### 3.3.1 Composition (embedded, JSONB)
 
-Subordinate abstractions with no independent lifecycle are embedded directly. Always represented as `readonly T[]` at runtime. Always `[]` when empty, never `null`. The RDBMS column type is JSONB.
+Subordinate abstractions with no independent life-cycle are embedded directly. Always represented as `readonly T[]` at runtime. Always `[]` when empty, never `null`. The RDBMS column type is JSONB.
 
 | Type                     | Cardinality | Validated by            |
 | ------------------------ | ----------- | ----------------------- |
@@ -125,7 +125,7 @@ These abstractions represent the primary concepts of the system and form the cor
 | `Workflow`      | Reusable template describing how work is generally performed                         |
 | `Task`          | Reusable named grouping of questions; sequenced within workflows via junction        |
 | `Question`      | Reusable prompt used to gather structured input; sequenced within tasks via junction |
-| `Job`           | Unit of work agreed to with a customer; lifecycle anchor                             |
+| `Job`           | Unit of work agreed to with a customer; life-cycle anchor                             |
 | `JobAssessment` | Evaluation of a job's scope, locations, and requirements                             |
 | `JobWorkflow`   | Job-specific workflow instance referencing a basis and optional modified Workflow    |
 | `JobPlan`       | Job-specific execution plan                                                          |
@@ -137,7 +137,7 @@ These abstractions describe **domain meaning**, not persistence, API shape, or u
 
 ### 3.6 Common abstractions shared within the model
 
-The following abstractions are shared across multiple domain concepts and represent pure value objects or embedded subordinate compositions. They do not have independent lifecycles.
+The following abstractions are shared across multiple domain concepts and represent pure value objects or embedded subordinate compositions. They do not have independent life-cycles.
 
 | Abstraction  | Module      | Description                                                                                         |
 | ------------ | ----------- | --------------------------------------------------------------------------------------------------- |

@@ -17,7 +17,7 @@ export type Instantiable = {
 /** An Instance specialized to only allow creation. No update or delete. */
 export type InstantiableOnly = Pick<Instantiable, 'id' | 'createdAt'>
 
-/** Create shape for an Instantiable by excluding lifecycle-managed fields. */
+/** Create shape for an Instantiable by excluding life-cycle-managed fields. */
 export type CreateFromInstantiable<T extends Instantiable> = Omit<T, keyof Instantiable>
 
 /** Update shape for an Instantiable: required id plus partial create fields. */
@@ -27,7 +27,7 @@ export type UpdateFromInstantiable<T extends Instantiable> =
 
 /**
  * Create an Instantiable conforming instance
- * Allow's id to be overridden; lifecycle state always reset
+ * Allow's id to be overridden; life-cycle state always reset
  */
 export const instance = <T extends Instantiable>(state: Partial<T> = {}): T => {
   const { deletedAt: _, ...rest } = state

@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Job domain abstractions                                                      ║
-║ Work agreement lifecycle, assessment, planning, and execution types.         ║
+║ Work agreement life-cycle, assessment, planning, and execution types.         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -12,9 +12,9 @@ JobWork, and JobWorkLogEntry.
 
 EXPORTED APIs & TYPEs
 ───────────────────────────────────────────────────────────────────────────────
-JOB_STATUSES           Canonical job lifecycle state values.
+JOB_STATUSES           Canonical job life-cycle state values.
 JobStatus              Job status union type.
-Job                    Work agreement lifecycle anchor.
+Job                    Work agreement life-cycle anchor.
 JobAssessment          Pre-planning job assessment; requires one or more locations.
 JobWorkflow            Workflows required of a job; basis may be customized.
 JobPlan                Planning for a job based on an assessment.
@@ -53,7 +53,7 @@ import type { Workflow } from '@domain/abstractions/workflow.ts'
 // JOB
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Canonical job lifecycle state values. */
+/** Canonical job life-cycle state values. */
 export const JOB_STATUSES = [
   'open',
   'assessing',
@@ -66,7 +66,7 @@ export const JOB_STATUSES = [
 ] as const
 export type JobStatus = (typeof JOB_STATUSES)[number]
 
-/** Work agreement lifecycle anchor. */
+/** Work agreement life-cycle anchor. */
 export type Job = Instantiable & {
   customerId: AssociationOne<Customer>
   status: JobStatus

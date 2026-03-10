@@ -632,7 +632,7 @@ Source: `@domain/abstractions/job.ts`
 
 ### 11.1 JobStatus
 
-Purpose: **Job lifecycle state**
+Purpose: **Job life-cycle state**
 
 Type: **const-enum**
 
@@ -649,7 +649,7 @@ Type: **const-enum**
 
 ### 11.2 Job
 
-Purpose: **Work agreement lifecycle anchor**
+Purpose: **Work agreement life-cycle anchor**
 
 Type: **Instantiable**
 

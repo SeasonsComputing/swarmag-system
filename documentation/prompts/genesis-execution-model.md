@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Clarify when to use the genesis prompt versus a generator script.
+Clarify the genesis workflow and the separation of concerns between orchestration contracts and generation logic.
 
 ## Two Artifacts, Two Roles
 
@@ -10,26 +10,23 @@ Clarify when to use the genesis prompt versus a generator script.
 
 - Role: **orchestration contract** for AI sessions.
 - Use: at the start of a new chat.
-- Defines: authority docs to ingest, required outputs, and pass/fail reporting contract.
+- Defines: authority docs to ingest, required outputs (archetypes + schema), and pass/fail reporting contracts.
+- Covers: both domain archetype generation (Phase I & II) and schema generation (Phase III).
 
-### 2) `source/devops/genesis/generate-domain.ts`
+### 2) `source/devops/genesis/generate-domain.ts` _(aspirational — not yet built)_
 
 - Role: **deterministic generation engine**.
-- Use: during execution inside the repo.
-- Defines: how files are produced from authority sources.
+- Goal: produce domain archetype files mechanically from authority sources.
+- When built, the AI prompt becomes purely orchestration; the script becomes the generator.
 
-## When To Execute Which
+## Execution Flow (Current)
 
-1. Start a new chat and provide the genesis prompt.
-2. The AI executes `deno task genesis:domain`.
-3. That task runs the generator script and required checks.
-4. The AI reports `STYLE_AUDIT: PASS` or `STYLE_AUDIT: FAIL`.
+1. Start a new chat and provide `genesis-domain-archetypes.md` as the session prompt.
+2. The AI executes both phases: archetype generation then schema generation.
+3. The AI runs `deno task genesis:domain` and all schema validation steps.
+4. The AI reports `STYLE_AUDIT` and `SCHEMA_AUDIT` results.
 
 ## Rule of Separation
 
 - Prompt files contain **policy and workflow**, not generation logic.
-- Generator scripts contain **generation logic**, not governance prose.
-
-## Near-Term Plan
-
-After domain generation is clean, fold `genesis-domain-schema.md` into the single genesis orchestration flow so schema and domain generation share one entrypoint contract.
+- Generator scripts (when they exist) contain **generation logic**, not governance prose.

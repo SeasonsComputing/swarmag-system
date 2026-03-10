@@ -3,7 +3,7 @@
  *
  * Two orthogonal concepts:
  *
- * Composition — inward, embedded subordinate values with no independent lifecycle.
+ * Composition — inward, embedded subordinate values with no independent life-cycle.
  *   Stored as JSONB arrays. Always [] when empty, never null.
  *   All four Composition types resolve to readonly T[] at runtime — cardinality
  *   is a documentation contract enforced at boundaries via the is* guards.
@@ -12,7 +12,7 @@
  *   CompositionMany     0 or more
  *   CompositionPositive 1 or more
  *
- * Association — outward, foreign key references to independently lifecycled rows.
+ * Association — outward, foreign key references to independently life-cycle rows.
  *   Stored as UUID columns. Phantom type parameter carries the referenced type
  *   for documentation and tooling; resolves to Id at runtime.
  *   AssociationOne      required FK — many side of 1:m or true 1:1
@@ -77,7 +77,7 @@ export const optionalOne = <T>(c: CompositionOptional<T>): T | undefined => c[0]
 // ────────────────────────────────────────────────────────────────────────────
 
 /**
- * Required FK reference to a type with an independent lifecycle.
+ * Required FK reference to a type with an independent life-cycle.
  * Phantom type parameter T documents the referenced abstraction.
  * Resolves to Id at runtime.
  */

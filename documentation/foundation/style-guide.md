@@ -1,6 +1,4 @@
-# swarmAg Operations System — Coding Style Guide, Standards & Conventions
-
-![swarmAg ops logo](../../swarmag-ops-logo.png)
+# Seasons Computing — Coding Style Guide, Standards & Conventions
 
 ## 1. Overview
 
@@ -246,8 +244,8 @@ Use types from `@core-std` instead of ad-hoc primitives and container generics.
 | `StringSet`               | `Set<string>`                                                              |
 | `Id`                      | raw `string` for identifiers                                               |
 | `When`                    | raw `string` for ISO datetime                                              |
-| `Instantiable`            | inline `{ id, createdAt, updatedAt, deletedAt? }` lifecycle shape          |
-| `InstantiableOnly`        | inline `{ id, createdAt }` create-and-read-only lifecycle shape            |
+| `Instantiable`            | inline `{ id, createdAt, updatedAt, deletedAt? }` life-cycle shape          |
+| `InstantiableOnly`        | inline `{ id, createdAt }` create-and-read-only life-cycle shape            |
 | `CompositionOne<T>`       | ad-hoc tuple/array for exactly-one embedded composition                    |
 | `CompositionOptional<T>`  | ad-hoc nullable/optional array for zero-or-one embedded composition        |
 | `CompositionMany<T>`      | ad-hoc `T[]` where composition semantics are intended                      |
@@ -424,7 +422,7 @@ These are architecturally distinct patterns — naming must reflect it.
 
 **Makers** (`make-*.ts`) produce configured API client instances. They are factory functions that accept a provider or configuration and return a ready-to-use client. Called once at composition root.
 
-**Wrappers** (`wrap-*.ts`) adapt a function's calling convention without changing its behavior. They accept a handler function and return a new function that normalizes lifecycle concerns (CORS, body parsing, error serialization) around it.
+**Wrappers** (`wrap-*.ts`) adapt a function's calling convention without changing its behavior. They accept a handler function and return a new function that normalizes life-cycle concerns (CORS, body parsing, error serialization) around it.
 
 Naming rule: `make` prefix for factories; `wrap` prefix for adapters. File name matches the prefix.
 
@@ -501,6 +499,8 @@ Columns within a table follow this order:
 - Define policies immediately after each `CREATE TABLE` block.
 - Policy naming: `"{table}_{operation}_{scope}"` (lowercase, double-quoted).
 - Operation tokens: `select`, `insert`, `update`, `delete`.
+- Junction tables: `SELECT`, `INSERT`, `DELETE` only — no `UPDATE` policy.
+- `InstantiableOnly` (append-only) tables: `SELECT`, `INSERT` only — no `UPDATE`, no `DELETE` policy.
 
 ### 10.9 JSONB columns
 
@@ -532,6 +532,39 @@ Spacing:
 - One blank line between `ENABLE ROW LEVEL SECURITY` and first `CREATE POLICY`.
 - One blank line between consecutive `CREATE POLICY` blocks.
 - One blank line between consecutive `CREATE INDEX` blocks.
+
+### 10.12 Schema file header
+
+Every `schema.sql` begins with:
+
+```sql
+-- =============================================================================
+-- swarmAg System — Canonical Schema
+-- source/domain/schema/schema.sql
+--
+-- Authoritative current-state DDL. Generated from domain model.
+-- Do not edit manually — regenerate from domain model.
+-- Includes canonical seed data known at schema time.
+-- Migrations in source/back/migrations/ express deltas from this state.
+-- =============================================================================
+```
+
+### 10.13 Drop order
+
+Emit `DROP TABLE IF EXISTS` for all domain tables in reverse dependency order at the top of the file, before any `CREATE TABLE` statements.
+
+### 10.14 Schema section order
+
+Sections within `schema.sql` follow this order:
+
+1. Users
+2. Asset Types & Assets
+3. Chemicals
+4. Customers
+5. Services
+6. Workflows, Tasks & Questions
+7. Jobs
+8. Seed Data
 
 ## 11. SQL DDL Conventions
 
