@@ -27,16 +27,33 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 #### 1.2.1 Foundation (`documentation/foundation/`)
 
-| Path                   | Description                                                      |
+**Domain Model: Solution Space**
+
+| Document        | Description                                                |
+| --------------- | ---------------------------------------------------------- |
+| `domain.md`     | Domain's solution space concepts, entities, and invariants |
+| `data-lists.md` | Controlled vocabularies and enumerated values              |
+
+**Domain Model: Implementation Space**
+
+| Document               | Description                                                      |
 | ---------------------- | ---------------------------------------------------------------- |
-| `architecture-core.md` | Core architecture principles and system-wide structure           |
-| `architecture-back.md` | Backend architecture, boundaries, and runtime model              |
-| `architecture-ux.md`   | UX architecture and frontend layering                            |
-| `domain.md`            | Domain model concepts, entities, and invariants                  |
-| `domain-archetypes.md` | Domain implementation patterns for abstractions and related code |
 | `data-dictionary.md`   | Normalized implementation-ready type and relation reference      |
-| `data-lists.md`        | Controlled vocabularies and enumerated values                    |
-| `style-guide.md`       | Style and authoring conventions                                  |
+| `domain-archetypes.md` | Domain implementation patterns for abstractions and related code |
+
+**Architecture**
+
+| Path                   | Description                                            |
+| ---------------------- | ------------------------------------------------------ |
+| `architecture-core.md` | Core architecture principles and system-wide structure |
+| `architecture-back.md` | Backend architecture, boundaries, and runtime model    |
+| `architecture-ux.md`   | UX architecture and frontend layering                  |
+
+**
+
+| Path             | Description                     |
+| ---------------- | ------------------------------- |
+| `style-guide.md` | Style and authoring conventions |
 
 #### 1.2.2 Applications (`documentation/applications/`)
 

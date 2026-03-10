@@ -121,7 +121,7 @@ Import maps must be kept in sync manually. Path aliases use root-relative paths 
 
 #### 3.2.5 Soft Delete Everywhere
 
-All lifecycled entities support soft delete via `deletedAt?: When`. Hard deletes occur only under explicit data retention policy execution. Exceptions: append-only logs and pure join tables.
+All life-cycle entities support soft delete via `deletedAt?: When`. Hard deletes occur only under explicit data retention policy execution. Exceptions: append-only logs and pure join tables.
 
 ### 3.3 Non-Goals
 
@@ -779,7 +779,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.6 Soft delete via Instantiable
 
-- All lifecycled abstractions extend `Instantiable` from `@core-std`, which carries `id`, `createdAt`, `updatedAt`, `deletedAt?`
+- All life-cycle abstractions extend `Instantiable` from `@core-std`, which carries `id`, `createdAt`, `updatedAt`, `deletedAt?`
 - Do not redeclare these fields inline — extend via intersection
 - Queries filter `WHERE deleted_at IS NULL`
 - Hard deletes only under explicit data retention policies
@@ -844,7 +844,7 @@ New clients are added by composing makers in the `@ux-api` namespace:
 1. **Identify storage mechanism** - Determine appropriate client maker (Supabase SDK, IndexedDB, HTTP)
 2. **Compose into API namespace** - Add to `source/ux/api/api.ts` using appropriate maker
 3. **Configure specification** - Provide table name, store name, or endpoint path
-4. **Test full lifecycle** - Verify create, read, update, delete, list operations
+4. **Test full life-cycle** - Verify create, read, update, delete, list operations
 
 #### 11.2.1 Example
 
