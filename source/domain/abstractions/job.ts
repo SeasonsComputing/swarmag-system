@@ -40,7 +40,7 @@ import type {
   Instantiable,
   InstantiableOnly,
   When
-} from '@core-std'
+} from '@core/std'
 import type { Asset } from '@domain/abstractions/asset.ts'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Answer, Location, Note } from '@domain/abstractions/common.ts'

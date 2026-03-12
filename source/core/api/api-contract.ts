@@ -28,7 +28,7 @@ EXAMPLES
 TODO
 */
 
-import type { Dictionary, Id, When } from '@core-std'
+import type { Dictionary, Id, When } from '@core/std'
 
 // ────────────────────────────────────────────────────────────────────────────
 // Error Handling

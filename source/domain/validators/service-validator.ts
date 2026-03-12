@@ -24,7 +24,7 @@ import {
   expectNonEmptyString,
   type ExpectResult,
   expectValid
-} from '@core-std'
+} from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import { SERVICE_CATEGORIES } from '@domain/abstractions/service.ts'
 import type {

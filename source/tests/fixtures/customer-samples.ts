@@ -2,7 +2,7 @@
  * Customer fixture samples for tests.
  */
 
-import { id } from '@core-std'
+import { id } from '@core/std'
 import type { Location } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
 

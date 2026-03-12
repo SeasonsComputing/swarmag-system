@@ -40,13 +40,9 @@ import {
   type ExpectResult,
   expectValid,
   expectWhen
-} from '@core-std'
+} from '@core/std'
 import type { Answer, Note } from '@domain/abstractions/common.ts'
-import {
-  AREA_UNITS,
-  CHEMICAL_AMOUNT_UNITS,
-  JOB_STATUSES
-} from '@domain/abstractions/job.ts'
+import { AREA_UNITS, CHEMICAL_AMOUNT_UNITS, JOB_STATUSES } from '@domain/abstractions/job.ts'
 import { USER_ROLES } from '@domain/abstractions/user.ts'
 import type {
   JobAssessmentCreate,

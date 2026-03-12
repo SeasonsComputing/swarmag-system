@@ -34,7 +34,7 @@ import type {
   Dictionary,
   Id,
   When
-} from '@core-std'
+} from '@core/std'
 import type {
   Answer,
   Attachment,

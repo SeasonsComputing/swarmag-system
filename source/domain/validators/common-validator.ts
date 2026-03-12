@@ -26,7 +26,7 @@ import {
   expectNonEmptyString,
   type ExpectResult,
   expectValid
-} from '@core-std'
+} from '@core/std'
 import {
   type Location,
   type Note,
@@ -41,7 +41,7 @@ import type {
 } from '@domain/protocols/common-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// PUBLIC EXPORTS
+// VALIDATORS
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Validate QuestionCreate payloads. */
@@ -90,7 +90,7 @@ export const isNote = (v: unknown): v is Note => v !== null && typeof v === 'obj
 export const isLocation = (v: unknown): v is Location => v !== null && typeof v === 'object'
 
 // ────────────────────────────────────────────────────────────────────────────
-// PRIVATE INTERNALS
+// GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
 const isSelectOption: ExpectGuard<SelectOption> = (v): v is SelectOption =>

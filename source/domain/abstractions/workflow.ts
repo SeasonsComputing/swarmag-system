@@ -18,11 +18,7 @@ Workflow      Versioned template of ordered tasks.
 WorkflowTask  Junction — ordered tasks that define a workflow.
 */
 
-import type {
-  AssociationJunction,
-  CompositionMany,
-  Instantiable
-} from '@core-std'
+import type { AssociationJunction, CompositionMany, Instantiable } from '@core/std'
 import type { Note, Question } from '@domain/abstractions/common.ts'
 
 /** Reusable named grouping of ordered questions. */

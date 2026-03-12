@@ -1,5 +1,5 @@
 /**
- * Guard against bypassing @core-std container primitives.
+ * Guard against bypassing @core/std container primitives.
  */
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
@@ -15,15 +15,15 @@ const ALLOWED_FILES = new Set([
 const RULES = [
   {
     pattern: /\bRecord\s*<\s*string\s*,\s*unknown\s*>/g,
-    message: 'Use Dictionary from @core-std instead of Record<string, unknown>'
+    message: 'Use Dictionary from @core/std instead of Record<string, unknown>'
   },
   {
     pattern: /\bRecord\s*<\s*string\s*,\s*string\s*>/g,
-    message: 'Use StringDictionary from @core-std'
+    message: 'Use StringDictionary from @core/std'
   },
   {
     pattern: /\bSet\s*<\s*string\s*>/g,
-    message: 'Use StringSet from @core-std instead of Set<string>'
+    message: 'Use StringSet from @core/std instead of Set<string>'
   }
 ] as const
 

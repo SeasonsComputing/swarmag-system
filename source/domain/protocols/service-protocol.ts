@@ -16,7 +16,7 @@ ServiceUpdate                    Update payload for a Service.
 ServiceRequiredAssetTypeCreate   Create payload for a ServiceRequiredAssetType junction.
 */
 
-import type { AssociationJunction, CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
+import type { AssociationJunction, CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { AssetType } from '@domain/abstractions/asset.ts'
 import type { Service } from '@domain/abstractions/service.ts'
 

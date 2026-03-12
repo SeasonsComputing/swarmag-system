@@ -3,7 +3,7 @@
  */
 
 import { Config } from '@core/cfg/config.ts'
-import { createClient, type SupabaseClient } from '@supabase-client'
+import { createClient, type SupabaseClient } from '@supabase/client'
 
 /** Cache-aware Supabase client factory for platform functions. */
 export class Supabase {

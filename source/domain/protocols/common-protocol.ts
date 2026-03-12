@@ -22,7 +22,7 @@ SelectQuestionUpdate    Update payload for a SelectQuestion.
 QuestionUpdate          Discriminated union of all question update payloads.
 */
 
-import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type {
   InternalQuestion,
   ScalarQuestion,

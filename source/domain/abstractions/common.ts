@@ -37,7 +37,7 @@ import type {
   CompositionPositive,
   Instantiable,
   When
-} from '@core-std'
+} from '@core/std'
 
 // ────────────────────────────────────────────────────────────────────────────
 // LOCATION

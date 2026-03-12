@@ -36,7 +36,7 @@ import type {
   CreateFromInstantiable,
   InstantiableOnly,
   UpdateFromInstantiable
-} from '@core-std'
+} from '@core/std'
 import type { Asset } from '@domain/abstractions/asset.ts'
 import type {
   Job,

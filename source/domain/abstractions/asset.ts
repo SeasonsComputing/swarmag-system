@@ -17,7 +17,7 @@ AssetStatus   Lifecycle and availability state.
 Asset         Operational equipment or resource.
 */
 
-import type { AssociationOne, CompositionMany, Instantiable } from '@core-std'
+import type { AssociationOne, CompositionMany, Instantiable } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 
 /** Reference type for categorizing assets. */

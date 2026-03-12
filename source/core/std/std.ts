@@ -1,13 +1,10 @@
 /**
- * Core standard barrel.
+ * Core standard barrel for shared primitives.
  *
- * Single import surface for shared core primitives:
- * - ADT helpers (`Dictionary`, `StringDictionary`, `StringSet`)
- * - Identity/time (`Id`, `When`)
- * - Lifecycle (`Instantiable`, `instance`)
- * - Relation primitives (`Composition*`, `Association*`)
- * - Generic validators (`ValidatorError`, `notValid`, `is*`)
+ * Use `@core/std` as the single import surface for foundational types,
+ * lifecycle utilities, relation helpers, and generic validators.
  */
+
 export * from './adt.ts'
 export * from './datetime.ts'
 export * from './identifier.ts'

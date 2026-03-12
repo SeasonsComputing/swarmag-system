@@ -27,7 +27,7 @@ import type {
   CompositionOne,
   CompositionPositive,
   Instantiable
-} from '@core-std'
+} from '@core/std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { User } from '@domain/abstractions/user.ts'
 

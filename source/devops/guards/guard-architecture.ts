@@ -58,21 +58,21 @@ const namespaceForPath = (path: string): Namespace | null => {
 
 const namespaceForSpecifier = (specifier: string, fromFile: string): Namespace => {
   // Core
-  if (specifier.startsWith('@core/') || specifier === '@core-std') return 'core'
+  if (specifier.startsWith('@core/') || specifier === '@core/std') return 'core'
 
   // Domain
   if (specifier.startsWith('@domain/')) return 'domain'
 
   // Back
-  if (specifier.startsWith('@back') || specifier.startsWith('@back-supabase-edge/')) {
+  if (specifier.startsWith('@back') || specifier.startsWith('@back/supabase-edge/')) {
     return 'back'
   }
 
   // UX
   if (
     specifier.startsWith('@ux/')
-    || specifier === '@ux-api'
-    || specifier.startsWith('@ux-app-')
+    || specifier === '@ux/api'
+    || specifier.startsWith('@ux/app-')
   ) {
     return 'ux'
   }

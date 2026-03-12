@@ -28,7 +28,7 @@ import {
   expectPositiveNumber,
   type ExpectResult,
   expectValid
-} from '@core-std'
+} from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import type {
   TaskCreate,

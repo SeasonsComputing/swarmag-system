@@ -24,7 +24,7 @@ import type {
   AssociationJunction,
   CreateFromInstantiable,
   UpdateFromInstantiable
-} from '@core-std'
+} from '@core/std'
 import type { Question } from '@domain/abstractions/common.ts'
 import type { Task, Workflow } from '@domain/abstractions/workflow.ts'
 

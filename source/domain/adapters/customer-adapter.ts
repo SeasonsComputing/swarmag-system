@@ -24,7 +24,7 @@ import type {
   Dictionary,
   Id,
   When
-} from '@core-std'
+} from '@core/std'
 import type { Location, Note } from '@domain/abstractions/common.ts'
 import type {
   Contact,

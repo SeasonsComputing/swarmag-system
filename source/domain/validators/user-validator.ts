@@ -22,7 +22,7 @@ import {
   expectNonEmptyString,
   type ExpectResult,
   expectValid
-} from '@core-std'
+} from '@core/std'
 import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/user.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 
