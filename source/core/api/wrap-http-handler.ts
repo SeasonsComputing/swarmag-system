@@ -212,7 +212,7 @@ FETCH REQUEST-RESPONSE FLOW:
     → Always returns { error: string, details?: string }
 `*/
 
-import { type StringDictionary, StringSet } from '@core-std'
+import { type StringDictionary, StringSet } from '@core/std'
 
 // ───────────────────────────────────────────────────────────────────────────────
 // PUBLIC EXPORTS

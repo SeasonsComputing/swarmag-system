@@ -17,7 +17,7 @@ toServiceRequiredAssetType      Deserialize ServiceRequiredAssetType from a dict
 fromServiceRequiredAssetType    Serialize ServiceRequiredAssetType to a dictionary.
 */
 
-import type { AssociationJunction, CompositionMany, Dictionary, Id, When } from '@core-std'
+import type { AssociationJunction, CompositionMany, Dictionary, Id, When } from '@core/std'
 import type { AssetType } from '@domain/abstractions/asset.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 import type {

@@ -2,7 +2,7 @@
  * Implementation internals of the runtime configuration.
  */
 
-import { type StringDictionary, StringSet } from '@core-std'
+import { type StringDictionary, StringSet } from '@core/std'
 import { RuntimeProvider } from './runtime-provider.ts'
 
 /** Config Aliases */

@@ -2,7 +2,7 @@
  * Fixture integrity checks for shared sample data.
  */
 
-import { isId, isWhen, StringSet } from '@core-std'
+import { isId, isWhen, StringSet } from '@core/std'
 import type { AssetStatus } from '@domain/abstractions/asset.ts'
 import { assert, assertEquals } from '@std/assert'
 import {

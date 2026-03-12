@@ -15,7 +15,7 @@ makeCrudHttpClient
 makeBusRuleHttpClient
 */
 
-import type { Dictionary, Id } from '@core-std'
+import type { Dictionary, Id } from '@core/std'
 import {
   // type ApiBusRuleContract,
   type ApiCrudContract,

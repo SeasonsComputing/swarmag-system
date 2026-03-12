@@ -14,7 +14,7 @@ ChemicalCreate  Create payload for a Chemical.
 ChemicalUpdate  Update payload for a Chemical.
 */
 
-import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 
 // ────────────────────────────────────────────────────────────────────────────

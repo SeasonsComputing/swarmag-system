@@ -14,7 +14,7 @@ CustomerCreate  Create payload for a Customer.
 CustomerUpdate  Update payload for a Customer.
 */
 
-import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { Customer } from '@domain/abstractions/customer.ts'
 
 // ────────────────────────────────────────────────────────────────────────────

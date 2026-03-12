@@ -2,7 +2,7 @@
  * Sample job fixtures for tests.
  */
 
-import { id } from '@core-std'
+import { id } from '@core/std'
 import type { JobAssessment, JobWorkLogEntry } from '@domain/abstractions/job.ts'
 
 const jobId = id()

@@ -16,7 +16,7 @@ toAsset        Deserialize Asset from a storage dictionary.
 fromAsset      Serialize Asset to a storage dictionary.
 */
 
-import type { AssociationOne, CompositionMany, Dictionary, Id, When } from '@core-std'
+import type { AssociationOne, CompositionMany, Dictionary, Id, When } from '@core/std'
 import type { Asset, AssetStatus, AssetType } from '@domain/abstractions/asset.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'

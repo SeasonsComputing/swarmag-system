@@ -24,7 +24,7 @@ import {
   expectPositiveNumber,
   type ExpectResult,
   expectValid
-} from '@core-std'
+} from '@core/std'
 import {
   CHEMICAL_SIGNAL_WORDS,
   CHEMICAL_USAGES,

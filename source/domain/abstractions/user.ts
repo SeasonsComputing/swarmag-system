@@ -18,7 +18,7 @@ UserStatus     User status union type.
 User           System user identity and membership.
 */
 
-import type { CompositionPositive, Instantiable } from '@core-std'
+import type { CompositionPositive, Instantiable } from '@core/std'
 
 /** Canonical role values. */
 export const USER_ROLES = ['administrator', 'sales', 'operations'] as const

@@ -1,12 +1,11 @@
 /**
  * Abstraction relation type primitives
  *
- * Two orthogonal concepts:
- *
  * Composition — inward, embedded subordinate values with no independent life-cycle.
  *   Stored as JSONB arrays. Always [] when empty, never null.
  *   All four Composition types resolve to readonly T[] at runtime — cardinality
  *   is a documentation contract enforced at boundaries via the is* guards.
+ *
  *   CompositionOne      exactly 1
  *   CompositionOptional 0 or 1
  *   CompositionMany     0 or more
@@ -15,12 +14,13 @@
  * Association — outward, foreign key references to independently life-cycle rows.
  *   Stored as UUID columns. Phantom type parameter carries the referenced type
  *   for documentation and tooling; resolves to Id at runtime.
+ *
  *   AssociationOne      required FK — many side of 1:m or true 1:1
  *   AssociationOptional optional FK — nullable column
  *   AssociationJunction FK pair in an m:m junction table — both sides declare this
  */
 
-import type { Id } from '@core-std'
+import type { Id } from './identifier.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // COMPOSITION

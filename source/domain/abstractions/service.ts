@@ -17,11 +17,7 @@ Service                    Sellable operational offering.
 ServiceRequiredAssetType   Junction — asset types required for a service.
 */
 
-import type {
-  AssociationJunction,
-  CompositionMany,
-  Instantiable
-} from '@core-std'
+import type { AssociationJunction, CompositionMany, Instantiable } from '@core/std'
 import type { AssetType } from '@domain/abstractions/asset.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 

@@ -16,7 +16,7 @@ AssetCreate      Create payload for an Asset.
 AssetUpdate      Update payload for an Asset.
 */
 
-import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 
 // ────────────────────────────────────────────────────────────────────────────

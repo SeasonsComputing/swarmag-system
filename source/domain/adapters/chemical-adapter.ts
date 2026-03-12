@@ -15,7 +15,7 @@ toChemical    Deserialize Chemical from a storage dictionary.
 fromChemical  Serialize Chemical to a storage dictionary.
 */
 
-import type { CompositionMany, Dictionary, Id, When } from '@core-std'
+import type { CompositionMany, Dictionary, Id, When } from '@core/std'
 import type {
   Chemical,
   ChemicalLabel,

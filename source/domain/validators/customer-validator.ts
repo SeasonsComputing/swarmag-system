@@ -23,7 +23,7 @@ import {
   expectNonEmptyString,
   type ExpectResult,
   expectValid
-} from '@core-std'
+} from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import type { Contact, CustomerSite } from '@domain/abstractions/customer.ts'
 import { CUSTOMER_STATUSES } from '@domain/abstractions/customer.ts'

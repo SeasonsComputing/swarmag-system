@@ -25,7 +25,7 @@ import {
   expectNonEmptyString,
   type ExpectResult,
   expectValid
-} from '@core-std'
+} from '@core/std'
 import { ASSET_STATUSES } from '@domain/abstractions/asset.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 import type {

@@ -14,7 +14,7 @@ UserCreate  Create payload for a User.
 UserUpdate  Update payload for a User.
 */
 
-import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 
 // ────────────────────────────────────────────────────────────────────────────

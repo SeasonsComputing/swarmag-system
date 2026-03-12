@@ -14,7 +14,7 @@ toUser    Deserialize User from a storage dictionary.
 fromUser  Serialize User to a storage dictionary.
 */
 
-import type { CompositionPositive, Dictionary, Id, When } from '@core-std'
+import type { CompositionPositive, Dictionary, Id, When } from '@core/std'
 import type { User, UserRole, UserStatus } from '@domain/abstractions/user.ts'
 
 /** Deserialize User from a storage dictionary. */

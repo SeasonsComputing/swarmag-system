@@ -21,7 +21,7 @@ toWorkflowTask      Deserialize WorkflowTask junction from a storage dictionary.
 fromWorkflowTask    Serialize WorkflowTask junction to a storage dictionary.
 */
 
-import type { AssociationJunction, CompositionMany, Dictionary, Id, When } from '@core-std'
+import type { AssociationJunction, CompositionMany, Dictionary, Id, When } from '@core/std'
 import type { Note, Question } from '@domain/abstractions/common.ts'
 import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'

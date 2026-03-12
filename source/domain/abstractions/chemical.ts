@@ -20,7 +20,7 @@ ChemicalLabel         Label and document pointer for a chemical.
 Chemical              Regulated material record.
 */
 
-import type { CompositionMany, Instantiable } from '@core-std'
+import type { CompositionMany, Instantiable } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 
 /** Canonical chemical usage classification values. */
