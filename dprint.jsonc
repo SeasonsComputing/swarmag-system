@@ -1,0 +1,53 @@
+{
+  "$schema": "https://dprint.dev/schemas/v0.json",
+  "lineWidth": 95,
+  "indentWidth": 2,
+  "useTabs": false,
+  "excludes": ["vendors/**"],
+  "typescript": {
+    "semiColons": "asi",
+    "quoteStyle": "alwaysSingle",
+    "arrowFunction.useParentheses": "preferNone",
+    "trailingCommas": "never",
+    "preferSingleLine": false,
+    "preferHanging": true,
+    "memberExpression.linePerExpression": true,
+    "objectExpression.preferHanging": "true",
+    "typeLiteral.preferHanging": "false",
+    "unionAndIntersectionType.preferHanging": "false",
+    "tupleType.preferHanging": "never",
+    "arguments.preferHanging": "never",
+    "exportDeclaration.forceMultiLine": "never",
+    "ifStatement.useBraces": "whenNotSingleLine",
+    "ifStatement.singleBodyPosition": "sameLine",
+    "whileStatement.useBraces": "whenNotSingleLine",
+    "whileStatement.singleBodyPosition": "sameLine",
+    "forStatement.useBraces": "whenNotSingleLine",
+    "forStatement.singleBodyPosition": "sameLine",
+    "forInStatement.useBraces": "whenNotSingleLine",
+    "forInStatement.singleBodyPosition": "sameLine",
+    "forOfStatement.useBraces": "whenNotSingleLine",
+    "forOfStatement.singleBodyPosition": "sameLine"
+  },
+  "json": {
+    "indentWidth": 2,
+    "trailingCommas": "never"
+  },
+  "markdown": {
+    "lineWidth": 95
+  },
+  "malva": {
+    "printWidth": 95,
+    "quotes": "alwaysSingle"
+  },
+  "markup": {
+    "quotes": "alwaysSingle"
+  },
+  "plugins": [
+    "https://plugins.dprint.dev/typescript-0.95.15.wasm",
+    "https://plugins.dprint.dev/json-0.21.1.wasm",
+    "https://plugins.dprint.dev/markdown-0.21.1.wasm",
+    "https://plugins.dprint.dev/g-plane/malva-v0.15.2.wasm",
+    "https://plugins.dprint.dev/g-plane/markup_fmt-v0.26.0.wasm"
+  ]
+}
