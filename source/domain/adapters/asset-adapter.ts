@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Serializes between Dictionary and AssetType and Asset domain types.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 toAssetType    Deserialize AssetType from a storage dictionary.
 fromAssetType  Serialize AssetType to a storage dictionary.

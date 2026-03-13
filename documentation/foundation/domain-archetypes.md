@@ -1,6 +1,6 @@
-# swarmAg Operations System — Domain Model Archetypes
-
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
+
+# swarmAg Operations System — Domain Model Archetypes
 
 ## 1. Overview
 
@@ -52,17 +52,17 @@ Every abstraction in the data dictionary has an explicit type classification. Th
 | `Instantiable`      | Named `type` extending `Instantiable`       | `id`, `createdAt`, `updatedAt`, `deletedAt?` |
 | `InstantiableOnly`  | Named `type` extending `InstantiableOnly`   | `id`, `createdAt`                            |
 | `Junction`          | Named `type` using `AssociationJunction<T>` | None                                         |
-| `object`            | Named `type` — plain shape, no life-cycle    | None                                         |
+| `object`            | Named `type` — plain shape, no life-cycle   | None                                         |
 | `const-enum`        | `const` tuple + derived type alias          | None                                         |
 | `intersection-type` | Named `type` extending a base type          | Inherits from base                           |
 | `union-type`        | Named discriminated union of constituents   | None                                         |
 
 ### 3.2 Instantiable
 
-Extend `Instantiable` from `@core-std` via intersection. Never redeclare `id`, `createdAt`, `updatedAt`, or `deletedAt` inline.
+Extend `Instantiable` from `@core/std` via intersection. Never redeclare `id`, `createdAt`, `updatedAt`, or `deletedAt` inline.
 
 ```typescript
-import type { AssociationOne, CompositionMany, Instantiable } from '@core-std'
+import type { AssociationOne, CompositionMany, Instantiable } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
 
@@ -79,10 +79,10 @@ export type User = Instantiable & {
 
 ### 3.3 InstantiableOnly
 
-Extend `InstantiableOnly` from `@core-std` cannot be updated not deleted. Used for append-only records.
+Extend `InstantiableOnly` from `@core/std` can neither be updated nor deleted. Used for append-only tables.
 
 ```typescript
-import type { AssociationOne, CompositionOne, InstantiableOnly } from '@core-std'
+import type { AssociationOne, CompositionOne, InstantiableOnly } from '@core/std'
 import type { Answer } from '@domain/abstractions/common.ts'
 import type { Job } from '@domain/abstractions/job.ts'
 import type { User } from '@domain/abstractions/user.ts'
@@ -100,7 +100,7 @@ export type JobWorkLogEntry = InstantiableOnly & {
 Junction abstractions use `AssociationJunction<T>` for all foreign keys. No life-cycle fields — junctions are hard-deleted only.
 
 ```typescript
-import type { AssociationJunction, Id } from '@core-std'
+import type { AssociationJunction, Id } from '@core/std'
 import type { Question } from '@domain/abstractions/common.ts'
 import type { Task } from '@domain/abstractions/workflow.ts'
 
@@ -190,9 +190,10 @@ export type Question = InternalQuestion | ScalarQuestion | SelectQuestion
 
 ### 3.8 Association and Composition Relations
 
-Relations from the data dictionary map directly to `@core-std` types. Never use raw `Id` or `T[]` where a relation type is specified.
+Relations from the data dictionary map directly to `@core/std` types.
+Never use raw `Id` or `T[]` where a relation type is specified.
 
-| Data dictionary relation | `@core-std` type         |
+| Data dictionary relation | Type                     |
 | ------------------------ | ------------------------ |
 | `AssociationOne`         | `AssociationOne<T>`      |
 | `AssociationOptional`    | `AssociationOptional<T>` |
@@ -220,7 +221,7 @@ Protocols define the create and update input shapes transmitted across the syste
 The create and update protocol contain only fields required to create or update an abstraction. All life-cycle fields are excluded — those are set by the persistence layer.
 
 ```typescript
-import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core-std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -243,7 +244,7 @@ Source: `@domain/validators/{topic}-validator.ts`
 
 Validators enforce protocol contracts at the system boundary.
 
-All field checks use `expect*` helpers from `@core-std` (`validators.ts`).
+All field checks use `expect*` helpers from `@core/std` (`validators.ts`).
 
 ### 5.1 Naming
 
@@ -258,15 +259,13 @@ All field checks use `expect*` helpers from `@core-std` (`validators.ts`).
 import {
   expectCompositionPositive,
   expectConstEnum,
-  type ExpectGuard,
   expectId,
   expectNonEmptyString,
-  type ExpectResult,
   expectValid
 } from '@core/std/validators.ts'
+import type { ExpectGuard, ExpectResult } from '@core/std/validators.ts'
 import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/user.ts'
-import type { UserCreate } from '@domain/protocols/user-protocol.ts'
-import type { UserUpdate } from '@domain/protocols/user-protocol.ts'
+import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -297,7 +296,8 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
+const isUserRole = (v: unknown): v is UserRole =>
+  expectConstEnum(v, 'role', USER_ROLES) === null
 ```
 
 ### 5.3 Union-Type Validation
@@ -305,7 +305,7 @@ const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USE
 Validate the discriminator first with `expectConstEnum`, then switch on the type for branch-specific field checks.
 
 ```typescript
-import { expectCompositionPositive, expectConstEnum, ExpectResult } from '@core-std'
+import { expectCompositionPositive, expectConstEnum, ExpectResult } from '@core/std'
 import { QUESTION_TYPES } from '@domain/abstractions/common.ts'
 import type { QuestionType, SelectOption } from '@domain/abstractions/common.ts'
 import type { QuestionCreate } from '@domain/protocols/common-protocol.ts'
@@ -350,7 +350,7 @@ import {
   expectNonEmptyString,
   ExpectResult,
   expectValid
-} from '@core-std'
+} from '@core/std'
 import { USER_ROLES } from '@domain/abstractions/user.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
 import type { UserUpdate } from '@domain/protocols/user-protocol.ts'
@@ -373,7 +373,8 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
+const isUserRole = (v: unknown): v is UserRole =>
+  expectConstEnum(v, 'role', USER_ROLES) === null
 ```
 
 ## 6. Adapters
@@ -394,7 +395,7 @@ Adapters serialize between the storage representation (`Dictionary`) and domain 
 Each adapter file exports a `to` function and a `from` function for each abstraction in the topic namespace that is persisted. Plain `object` types embedded as compositions are serialized inline within their parent's adapter — they do not get standalone adapter functions.
 
 ```typescript
-import type { Dictionary } from '@core-std'
+import type { Dictionary } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 
 /** Deserialize User from storage dictionary. */
@@ -500,7 +501,9 @@ export const toQuestion = (dict: Dictionary): Question => {
         prompt: dict.prompt as string,
         helpText: dict.help_text as string | undefined,
         required: dict.required as boolean | undefined,
-        options: (dict.options as Dictionary[]).map(toSelectOption) as CompositionPositive<SelectOption>
+        options: (dict.options as Dictionary[]).map(toSelectOption) as CompositionPositive<
+          SelectOption
+        >
       } satisfies SelectQuestion
   }
 }
@@ -525,7 +528,7 @@ DDL is derived from domain abstractions per `style-guide.md` sections 10–11. T
 | `Junction`         | One table; composite PK                                                       | None                                           |
 | `object`           | No table — serialized as JSONB within parent                                  | —                                              |
 | `const-enum`       | No table — `CHECK` constraint on parent column                                | —                                              |
-| `union-type`       | Single table; all branch fields present, optional defaults on variant columns | Base life-cycle                                 |
+| `union-type`       | Single table; all branch fields present, optional defaults on variant columns | Base life-cycle                                |
 
 ### 7.2 Table inventory
 

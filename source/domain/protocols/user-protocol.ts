@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines create and update protocol shapes for the User abstraction.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 UserCreate  Create payload for a User.
 UserUpdate  Update payload for a User.

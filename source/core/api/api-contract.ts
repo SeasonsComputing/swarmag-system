@@ -1,31 +1,26 @@
 /*
 ╔═════════════════════════════════════════════════════════════════════════════╗
 ║ API contracts for CRUD, List & business rule operations                     ║
-║ TODO                                                                        ║
+║ Shared transport-agnostic contracts and pagination helpers                  ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-TODO
+Defines the canonical client contracts used across the API composition layer:
+CRUD operations, business-rule operations, uniform delete/list result shapes,
+and query-string pagination normalization.
 
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ USAGE                                                                       ║
-╚═════════════════════════════════════════════════════════════════════════════╝
-
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-ApiError
-ApiCrudContract
-ApiBusRuleContract
-DeleteResult
-ListOptions
-ListResult<T>
-listPageLimitValue(string): number
-listCursorValue(string): number
-
-EXAMPLES
-───────────────────────────────────────────────────────────────────────────────
-TODO
+ApiError                           Standard API failure error shape.
+apiError(error): boolean           Runtime type guard and logger for ApiError.
+ApiCrudContract                    Generic CRUD/list client contract.
+ApiBusRuleContract                 Generic business-rule execution contract.
+DeleteResult                       Uniform soft-delete response payload.
+ListOptions                        Pagination request options.
+ListResult<T>                      Pagination response payload.
+listPageLimitValue(string): number Parse/clamp list page size.
+listCursorValue(string): number    Parse/sanitize list cursor offset.
 */
 
 import type { Dictionary, Id, When } from '@core/std'
@@ -75,10 +70,7 @@ export interface ApiBusRuleContract {
 }
 
 /** Deletion result with timestamp. */
-export type DeleteResult = {
-  id: Id
-  deletedAt: When
-}
+export type DeleteResult = { id: Id; deletedAt: When }
 
 // ────────────────────────────────────────────────────────────────────────────
 // List API contracts
@@ -94,17 +86,10 @@ const MAX_LIMIT = 100
 const DEFAULT_CURSOR = 0
 
 /** Pagination options for list operations. */
-export type ListOptions = {
-  limit?: number
-  cursor?: number
-}
+export type ListOptions = { limit?: number; cursor?: number }
 
 /** Paginated list result. */
-export type ListResult<T> = {
-  data: T[]
-  cursor: number
-  hasMore: boolean
-}
+export type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
 
 /**
  * Clamp a pagination limit to the range 1-100, defaulting to 25 when unset.

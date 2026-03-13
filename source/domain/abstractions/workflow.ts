@@ -10,7 +10,7 @@ Defines Task, TaskQuestion, Workflow, and WorkflowTask abstractions for
 describing how work is generally performed through ordered sequences of
 tasks and questions.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Task          Reusable named grouping of ordered questions.
 TaskQuestion  Junction — tasks to questions with explicit ordering.

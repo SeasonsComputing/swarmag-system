@@ -11,7 +11,7 @@ Request/Response contract for building REST APIs. Works identically on
 Netlify or Supabase functions (edge runtime) or Node and Deno-based
 application server (host runtime).
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 HttpMethod, HttpQuery, HttpHeaders
   → Fundamental HTTP primitives used throughout
@@ -215,7 +215,7 @@ FETCH REQUEST-RESPONSE FLOW:
 import { type StringDictionary, StringSet } from '@core/std'
 
 // ───────────────────────────────────────────────────────────────────────────────
-// PUBLIC EXPORTS
+// PUBLIC
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** HTTP header map for responses/requests. */
@@ -261,11 +261,7 @@ export const HEADER_ALLOW_CREDENTIALS = 'access-control-allow-credentials'
  * @template RequestBody Request body type.
  * @template Query Query string type.
  */
-export type HttpRequest<
-  Body = unknown,
-  Query = HttpQuery,
-  Headers = HttpHeaders
-> = {
+export type HttpRequest<Body = unknown, Query = HttpQuery, Headers = HttpHeaders> = {
   method: HttpMethod
   body: Body
   query: Query
@@ -277,10 +273,7 @@ export type HttpRequest<
  * Standardized handler response envelope.
  * @template ResponseBody JSON-serializable response body type.
  */
-export type HttpResponse<
-  Body = unknown,
-  Headers = HttpHeaders
-> = {
+export type HttpResponse<Body = unknown, Headers = HttpHeaders> = {
   statusCode: number
   headers?: Headers
   body: Body
@@ -292,11 +285,7 @@ export type HttpResponse<
  * @template Query Query string type.
  * @template ResponseBody Response body type.
  */
-export type HttpHandler<
-  RequestBody = unknown,
-  Query = HttpQuery,
-  ResponseBody = unknown
-> = (
+export type HttpHandler<RequestBody = unknown, Query = HttpQuery, ResponseBody = unknown> = (
   request: HttpRequest<RequestBody, Query>
 ) =>
   | Promise<HttpResponse<ResponseBody>>
@@ -405,10 +394,7 @@ export const wrapHttpHandler = <
   RequestBody = unknown,
   Query = HttpQuery,
   ResponseBody = unknown
->(
-  handler: HttpHandler<RequestBody, Query, ResponseBody>,
-  config: HttpHandlerConfig = {}
-) => {
+>(handler: HttpHandler<RequestBody, Query, ResponseBody>, config: HttpHandlerConfig = {}) => {
   return async (request: Request): Promise<Response> => {
     try {
       //
@@ -475,21 +461,13 @@ export const wrapHttpHandler = <
 }
 
 // ───────────────────────────────────────────────────────────────────────────────
-// PRIVATE IMPLEMENTATION
+// PRIVATE
 // ───────────────────────────────────────────────────────────────────────────────
 
 type Message = { name: string; message: string; stack?: string }
 
 /** HTTP method set for validation. */
-const HttpMethodSet = [
-  'GET',
-  'POST',
-  'PUT',
-  'PATCH',
-  'DELETE',
-  'OPTIONS',
-  'HEAD'
-] as const
+const HttpMethodSet = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'] as const
 
 /**
  * HTTP methods that typically include request bodies.
@@ -532,10 +510,7 @@ const normalizeHeaders = (headers: Headers): HttpHeaders => {
  * @param enableMultiValue Whether to merge multi-value parameters.
  * @returns Clean query object with string values (multi-values joined with commas).
  */
-const normalizeQuery = (
-  params: URLSearchParams,
-  enableMultiValue: boolean
-): HttpQuery => {
+const normalizeQuery = (params: URLSearchParams, enableMultiValue: boolean): HttpQuery => {
   const normalized: HttpQuery = {}
   const keys = new StringSet()
   params.forEach((_value, key) => keys.add(key))
@@ -578,8 +553,7 @@ const makeCorsHeaders = (
     [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
     [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ')
       ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ')
-      ?? 'Content-Type, Authorization',
+    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization',
     [HEADER_VARY]: 'Origin',
     ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {})
   }
@@ -689,18 +663,22 @@ const parseRequestBody = async (
   if (contentLength) {
     const parsedLength = Number.parseInt(contentLength, 10)
     if (!Number.isNaN(parsedLength) && parsedLength > maxSize) {
-      throw new NamedError('PayloadTooLarge', `Request body exceeds maximum size of ${maxSize} bytes`)
+      throw new NamedError(
+        'PayloadTooLarge',
+        `Request body exceeds maximum size of ${maxSize} bytes`
+      )
     }
   }
 
   const decodedBody = await request.text()
-  if (!decodedBody) {
-    return undefined
-  }
+  if (!decodedBody) return undefined
 
   const bodySize = byteLength(decodedBody)
   if (bodySize > maxSize) {
-    throw new NamedError('PayloadTooLarge', `Request body exceeds maximum size of ${maxSize} bytes`)
+    throw new NamedError(
+      'PayloadTooLarge',
+      `Request body exceeds maximum size of ${maxSize} bytes`
+    )
   }
 
   // Validate Content-Type for bodies

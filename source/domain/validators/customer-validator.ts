@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Validates create and update protocol payloads for Customer.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateCustomerCreate  Validate CustomerCreate payloads.
 validateCustomerUpdate  Validate CustomerUpdate payloads.
@@ -73,7 +73,8 @@ export const validateCustomerUpdate = (input: CustomerUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isContact: ExpectGuard<Contact> = (v): v is Contact => v !== null && typeof v === 'object'
+const isContact: ExpectGuard<Contact> = (v): v is Contact =>
+  v !== null && typeof v === 'object'
 
 const isCustomerSite: ExpectGuard<CustomerSite> = (v): v is CustomerSite =>
   v !== null && typeof v === 'object'

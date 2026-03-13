@@ -9,7 +9,7 @@ PURPOSE
 Serializes between Dictionary and Task, TaskQuestion, Workflow, and
 WorkflowTask domain types.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 toTask              Deserialize Task from a storage dictionary.
 fromTask            Serialize Task to a storage dictionary.
@@ -23,7 +23,12 @@ fromWorkflowTask    Serialize WorkflowTask junction to a storage dictionary.
 
 import type { AssociationJunction, CompositionMany, Dictionary, Id, When } from '@core/std'
 import type { Note, Question } from '@domain/abstractions/common.ts'
-import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
+import type {
+  Task,
+  TaskQuestion,
+  Workflow,
+  WorkflowTask
+} from '@domain/abstractions/workflow.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
 /** Deserialize Task from a storage dictionary. */

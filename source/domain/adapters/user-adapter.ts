@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Serializes between Dictionary and User domain types.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 toUser    Deserialize User from a storage dictionary.
 fromUser  Serialize User to a storage dictionary.

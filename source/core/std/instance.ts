@@ -7,12 +7,7 @@ import { type When, when } from './datetime.ts'
 import { type Id, id } from './identifier.ts'
 
 /** Instance type specification */
-export type Instantiable = {
-  id: Id
-  createdAt: When
-  updatedAt: When
-  deletedAt?: When
-}
+export type Instantiable = { id: Id; createdAt: When; updatedAt: When; deletedAt?: When }
 
 /** An Instance specialized to only allow creation. No update or delete. */
 export type InstantiableOnly = Pick<Instantiable, 'id' | 'createdAt'>

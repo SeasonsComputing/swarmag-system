@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Validates create and update protocol payloads for Chemical.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateChemicalCreate  Validate ChemicalCreate payloads.
 validateChemicalUpdate  Validate ChemicalUpdate payloads.

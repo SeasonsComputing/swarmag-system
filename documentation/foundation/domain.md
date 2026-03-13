@@ -1,6 +1,6 @@
-# swarmAg Operations System — Domain Model
-
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
+
+# swarmAg Operations System — Domain Model
 
 ## 1. Overview
 
@@ -80,7 +80,7 @@ The domain layers are organized into four archetypes:
 
 ### 3.3 Relation Patterns
 
-All relationships between domain abstractions are expressed using typed relation primitives from `@core-std/relations.ts`. Two orthogonal concepts:
+All relationships between domain abstractions are expressed using typed relation primitives from `@core/std`.
 
 #### 3.3.1 Composition (embedded, JSONB)
 
@@ -125,7 +125,7 @@ These abstractions represent the primary concepts of the system and form the cor
 | `Workflow`      | Reusable template describing how work is generally performed                         |
 | `Task`          | Reusable named grouping of questions; sequenced within workflows via junction        |
 | `Question`      | Reusable prompt used to gather structured input; sequenced within tasks via junction |
-| `Job`           | Unit of work agreed to with a customer; life-cycle anchor                             |
+| `Job`           | Unit of work agreed to with a customer; life-cycle anchor                            |
 | `JobAssessment` | Evaluation of a job's scope, locations, and requirements                             |
 | `JobWorkflow`   | Job-specific workflow instance referencing a basis and optional modified Workflow    |
 | `JobPlan`       | Job-specific execution plan                                                          |
@@ -179,9 +179,6 @@ These types provide consistency and clarity without imposing storage or transpor
 ### 3.9 Domain Invariants
 
 - Types must be JSON-serializable.
-- No runtime dependencies beyond `@core-std`.
+- No runtime dependencies beyond `@core/std`.
 - This package is the **single source of truth** for domain types. All other code (ux, edge functions) must import from `source/domain`.
-- Life-cycled abstractions extend `Instantiable` — soft-delete semantics: `deletedAt` undefined/null means active. Exceptions: append-only logs and pure junction tables.
-- Embedded subordinate compositions use `Composition*` types from `@core-std/relations.ts`. Always `[]` when empty, never `null`.
-- FK references to Instantiable life-cycled abstractions use `Association*` types from `@core-std/relations.ts`.
 - Id strategy: UUID v7 for all PK/FK; application always supplies the ID — no database-generated defaults.

@@ -1,6 +1,6 @@
-# swarmAg Operations System — Architecture UX
-
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
+
+# swarmAg Operations System — Architecture UX
 
 ## 1. Overview
 
@@ -53,7 +53,7 @@ The system includes three SolidJS applications:
 All UX applications consume the **same API namespace** defined in `source/ux/api/api.ts`:
 
 ```typescript
-import { api } from '@ux-api'
+import { api } from '@ux/api'
 
 // All apps use the same API
 const user = await api.Users.get(userId)
@@ -101,8 +101,8 @@ The foundation provides:
 
 **Convenience Barrels**
 
-- `@core-std` - Standard types (Id, When, Dictionary)
-- `@ux-api` - Composed API namespace
+- `@core/std` - Standard types (Id, When, Dictionary)
+- `@ux/api` - Composed API namespace
 
 **Aliases**
 
@@ -110,7 +110,7 @@ The foundation provides:
 - `@domain/*` - Domain modules
 - `@ux/common/*` - Shared UX modules
 - `@ux/config/*` - Configuration module
-- `@ux-app-{admin|ops|customer}/*` - Deployment-specific UX modules
+- `@ux/app-{admin|ops|customer}/*` - Deployment-specific UX modules
 
 #### 4.1.2 UX applications MUST NOT import
 

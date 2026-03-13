@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Validates create and update protocol payloads for User.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateUserCreate  Validate UserCreate payloads.
 validateUserUpdate  Validate UserUpdate payloads.

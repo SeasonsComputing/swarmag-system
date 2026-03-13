@@ -1,6 +1,6 @@
-# swarmAg Operations System — Data Dictionary
-
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
+
+# swarmAg Operations System — Data Dictionary
 
 ## 1. Overview
 
@@ -56,7 +56,7 @@ The `domain.md` and `data-dictionary.md` go hand-in-hand in mapping a conceptual
 
 ## 3. Core Standard
 
-Source: `@core-std`
+Source: `@core/std`
 
 ### 3.1 Instantiable
 

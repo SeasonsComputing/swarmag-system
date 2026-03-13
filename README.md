@@ -1,6 +1,6 @@
-# swarmAg Operations System -- README
-
 ![swarmAg ops logo](swarmag-ops-logo.png)
+
+# swarmAg Operations System -- README
 
 The swarmAg Operations System (`swarmAg System`) supports operations across aerial and ground agricultural services. The monorepo is organized around a typed domain core, backend/runtime infrastructure, and user experience applications.
 
@@ -49,11 +49,11 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | `architecture-back.md` | Backend architecture, boundaries, and runtime model    |
 | `architecture-ux.md`   | UX architecture and frontend layering                  |
 
-**
+**Conventions**
 
-| Path             | Description                     |
-| ---------------- | ------------------------------- |
-| `style-guide.md` | Style and authoring conventions |
+| Path             | Description                        |
+| ---------------- | ---------------------------------- |
+| `style-guide.md` | Code and content style conventions |
 
 #### 1.2.2 Applications (`documentation/applications/`)
 

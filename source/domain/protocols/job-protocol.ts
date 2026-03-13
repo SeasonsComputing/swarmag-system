@@ -11,7 +11,7 @@ Job, JobAssessment, JobWorkflow, JobPlan, JobPlanAssignment, JobPlanChemical,
 JobPlanAsset, JobWork, and JobWorkLogEntry. Junction and InstantiableOnly
 types have create protocols only.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 JobCreate                 Create payload for a Job.
 JobUpdate                 Update payload for a Job.

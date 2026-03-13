@@ -20,19 +20,17 @@ Do not restate or fork these rules in this prompt. This prompt is orchestration 
 
 ## 2. Task Contract
 
-There are 5 domain model _archetypes_, concepts organized by topics that participate in the software for different purposes and contexts, yet essential the same topic. 
+The domain model SDK is composed of _archetypes_ each of which has a unique manifestation within the source code. The 5 archetypes are: abstractions, adapters, protocols, validators, and schema. Each archetype is organized as a directory containing the archetype artifacts unique to it.
 
-Topics: Asset, Chemical, Customer, Job, Service, User, Workflow
+The definitive topic list including each topic's contents is `data-dictionary.md`
 
-**Abstraction** - domain model concept, organized into topical categories e.g., etc.
-**Adapters** - add
-**Protocols** - 
-**Validators** -
-**Schema** - 
+Always prompt the user to determine if this is a "genesis" run or not. If it's a genesis run then always remove all artifacts for an archetype prior to generation. Avoid git history, genesis is intended to supplant all prior knowledge, as if running this prompt for the first time.
+
+Next prompt the user for which archetype, with "all" as an option.
+
+Next proceed generation in the following order using the above parameters.
 
 ### 2.1 Phase I — Domain Abstractions
-
-Fully replace:
 
 1. `source/domain/abstractions/`
 
@@ -41,8 +39,6 @@ Fully replace:
 2. `source/domain/adapters/`
 3. `source/domain/protocols/`
 4. `source/domain/validators/`
-
-Do not patch legacy artifacts in-place; replace the generated set.
 
 ### 2.3 Phase III — Schema
 

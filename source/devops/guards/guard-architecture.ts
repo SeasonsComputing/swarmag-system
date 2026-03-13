@@ -15,7 +15,9 @@ const NAMESPACE_DIRS = {
   tests: '/source/tests'
 } as const
 
-type Namespace = keyof typeof NAMESPACE_DIRS | 'external'
+type Namespace =
+  | keyof typeof NAMESPACE_DIRS
+  | 'external'
 
 /** Allowed dependencies per namespace (downward dependency flow) */
 const ALLOWED_DEPS: Record<Namespace, Set<Namespace>> = {
@@ -70,9 +72,7 @@ const namespaceForSpecifier = (specifier: string, fromFile: string): Namespace =
 
   // UX
   if (
-    specifier.startsWith('@ux/')
-    || specifier === '@ux/api'
-    || specifier.startsWith('@ux/app-')
+    specifier.startsWith('@ux/') || specifier === '@ux/api' || specifier.startsWith('@ux/app-')
   ) {
     return 'ux'
   }
@@ -82,9 +82,7 @@ const namespaceForSpecifier = (specifier: string, fromFile: string): Namespace =
 
   // Tests
   if (specifier.startsWith('@tests')) return 'tests'
-  if (
-    specifier.startsWith('@tests-fixtures/') || specifier.startsWith('@tests-helpers/')
-  ) {
+  if (specifier.startsWith('@tests-fixtures/') || specifier.startsWith('@tests-helpers/')) {
     return 'tests'
   }
 
@@ -105,9 +103,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
     if (entry.isDirectory) {
       if (EXCLUDED_DIRS.has(entry.name)) continue
       entries.push(...await collectFiles(entryPath))
-    } else if (
-      entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))
-    ) {
+    } else if (entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
       entries.push(entryPath)
     }
   }
@@ -125,7 +121,8 @@ const findImports = (source: string): Array<{ specifier: string; index: number }
   return imports
 }
 
-const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number =>
+  source.slice(0, index).split('\n').length
 
 const isUxAppFile = (file: string): boolean => {
   const normalized = normalizePath(file)
@@ -136,21 +133,19 @@ const isUxAppFile = (file: string): boolean => {
 
 const isConfigModule = (file: string): boolean => {
   const normalized = normalizePath(file)
-  return normalized.includes('/config/')
-    && normalized.endsWith('config.ts')
+  return normalized.includes('/config/') && normalized.endsWith('config.ts')
 }
 
-const checkUxImports = (
-  file: string,
-  imports: Array<{ specifier: string }>
-): string[] => {
+const checkUxImports = (file: string, imports: Array<{ specifier: string }>): string[] => {
   if (!isUxAppFile(file)) return []
 
   const violations: string[] = []
   for (const { specifier } of imports) {
     for (const forbidden of UX_FORBIDDEN_IMPORTS) {
       if (specifier.startsWith(forbidden)) {
-        violations.push(`Forbidden import: ${specifier} (use @ux-api, @domain, or @core-std instead)`)
+        violations.push(
+          `Forbidden import: ${specifier} (use @ux-api, @domain, or @core-std instead)`
+        )
       }
     }
   }
@@ -158,10 +153,7 @@ const checkUxImports = (
 }
 
 /** Validate Config singleton usage */
-const checkConfigImports = (
-  file: string,
-  imports: Array<{ specifier: string }>
-): string[] => {
+const checkConfigImports = (file: string, imports: Array<{ specifier: string }>): string[] => {
   const violations: string[] = []
   const configModule = isConfigModule(file)
   const fileNamespace = namespaceForPath(file)
@@ -171,15 +163,14 @@ const checkConfigImports = (
   for (const { specifier } of imports) {
     // Direct Config import only in config modules
     if (specifier === '@core/cfg/config.ts' && !configModule) {
-      violations
-        .push('Direct Config import (use package config module: @back-supabase-edge/config/... or @ux-app-*/config/...)')
+      violations.push(
+        'Direct Config import (use package config module: @back-supabase-edge/config/... or @ux-app-*/config/...)'
+      )
     }
 
     // Provider imports only in config modules
     if (
-      specifier.startsWith('@core/cfg/')
-      && specifier.endsWith('provider.ts')
-      && !configModule
+      specifier.startsWith('@core/cfg/') && specifier.endsWith('provider.ts') && !configModule
     ) {
       violations.push('Direct provider import (only allowed in config modules)')
     }
@@ -221,8 +212,9 @@ const main = async () => {
       const target = namespaceForSpecifier(entry.specifier, file)
       if (!allowed.has(target)) {
         const line = lineNumber(source, entry.index)
-        violations
-          .push(`${relative}:${line} - ${namespace} cannot import from ${target} (imports "${entry.specifier}")`)
+        violations.push(
+          `${relative}:${line} - ${namespace} cannot import from ${target} (imports "${entry.specifier}")`
+        )
       }
     }
 

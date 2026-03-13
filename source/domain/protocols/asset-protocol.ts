@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines create and update protocol shapes for AssetType and Asset.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AssetTypeCreate  Create payload for an AssetType.
 AssetTypeUpdate  Update payload for an AssetType.

@@ -11,7 +11,7 @@ fromQuestion as primary public adapters. Also exports helpers for embedded
 object types (Note, Attachment, Location, SelectOption, Answer) for use by
 other adapter modules in the domain layer.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 toAttachment    Deserialize Attachment from a storage dictionary.
 fromAttachment  Serialize Attachment to a storage dictionary.
@@ -51,7 +51,7 @@ import type {
 } from '@domain/abstractions/common.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// PUBLIC EXPORTS
+// PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Deserialize Attachment from a storage dictionary. */
@@ -191,7 +191,9 @@ export const toQuestion = (dict: Dictionary): Question => {
         prompt: dict.prompt as string,
         helpText: dict.help_text as string | undefined,
         required: dict.required as boolean | undefined,
-        options: (dict.options as Dictionary[]).map(toSelectOption) as CompositionPositive<SelectOption>
+        options: (dict.options as Dictionary[]).map(toSelectOption) as CompositionPositive<
+          SelectOption
+        >
       } satisfies SelectQuestion
   }
 }

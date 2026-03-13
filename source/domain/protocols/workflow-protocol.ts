@@ -10,7 +10,7 @@ Defines create and update protocol shapes for Task, Workflow, and their
 junction types (TaskQuestion, WorkflowTask). Junction types have create
 protocols only — no update.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 TaskCreate          Create payload for a Task.
 TaskUpdate          Update payload for a Task.

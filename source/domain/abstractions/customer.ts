@@ -9,7 +9,7 @@ PURPOSE
 Defines the Customer aggregate with embedded contacts, sites, and notes.
 Includes contact channel and customer status enumerations.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 CONTACT_CHANNELS   Canonical contact preferred channel values.
 ContactChannel     Contact channel union type.

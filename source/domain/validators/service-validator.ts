@@ -9,7 +9,7 @@ PURPOSE
 Validates create and update protocol payloads for Service and the
 ServiceRequiredAssetType junction.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateServiceCreate                   Validate ServiceCreate payloads.
 validateServiceUpdate                   Validate ServiceUpdate payloads.
@@ -46,7 +46,12 @@ export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
     expectNonEmptyString(input.sku, 'sku'),
     expectNonEmptyString(input.description, 'description', true),
     expectConstEnum(input.category, 'category', SERVICE_CATEGORIES),
-    expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isString, true)
+    expectCompositionMany(
+      input.tagsWorkflowCandidates,
+      'tagsWorkflowCandidates',
+      isString,
+      true
+    )
   )
 
 /** Validate ServiceUpdate payloads. */
@@ -58,7 +63,12 @@ export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
     expectNonEmptyString(input.sku, 'sku', true),
     expectNonEmptyString(input.description, 'description', true),
     expectConstEnum(input.category, 'category', SERVICE_CATEGORIES, true),
-    expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isString, true)
+    expectCompositionMany(
+      input.tagsWorkflowCandidates,
+      'tagsWorkflowCandidates',
+      isString,
+      true
+    )
   )
 
 /** Validate ServiceRequiredAssetTypeCreate payloads. */

@@ -12,20 +12,16 @@ const ALLOWED_FILES = new Set([
   'source/devops/guards/guard-core-std-types.ts'
 ])
 
-const RULES = [
-  {
-    pattern: /\bRecord\s*<\s*string\s*,\s*unknown\s*>/g,
-    message: 'Use Dictionary from @core/std instead of Record<string, unknown>'
-  },
-  {
-    pattern: /\bRecord\s*<\s*string\s*,\s*string\s*>/g,
-    message: 'Use StringDictionary from @core/std'
-  },
-  {
-    pattern: /\bSet\s*<\s*string\s*>/g,
-    message: 'Use StringSet from @core/std instead of Set<string>'
-  }
-] as const
+const RULES = [{
+  pattern: /\bRecord\s*<\s*string\s*,\s*unknown\s*>/g,
+  message: 'Use Dictionary from @core/std instead of Record<string, unknown>'
+}, {
+  pattern: /\bRecord\s*<\s*string\s*,\s*string\s*>/g,
+  message: 'Use StringDictionary from @core/std'
+}, {
+  pattern: /\bSet\s*<\s*string\s*>/g,
+  message: 'Use StringSet from @core/std instead of Set<string>'
+}] as const
 
 const collectFiles = async (dir: string): Promise<string[]> => {
   const entries: string[] = []
@@ -34,16 +30,15 @@ const collectFiles = async (dir: string): Promise<string[]> => {
     if (entry.isDirectory) {
       if (EXCLUDED_DIRS.has(entry.name)) continue
       entries.push(...await collectFiles(entryPath))
-    } else if (
-      entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))
-    ) {
+    } else if (entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
       entries.push(entryPath)
     }
   }
   return entries
 }
 
-const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number =>
+  source.slice(0, index).split('\n').length
 
 const exists = async (path: string): Promise<boolean> => {
   try {

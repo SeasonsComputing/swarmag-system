@@ -10,7 +10,7 @@ Validates create and update protocol payloads for Task, Workflow, and their
 junction types (TaskQuestion, WorkflowTask). Junction types have create
 validators only.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateTaskCreate          Validate TaskCreate payloads.
 validateTaskUpdate          Validate TaskUpdate payloads.

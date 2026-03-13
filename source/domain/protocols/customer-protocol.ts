@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines create and update protocol shapes for the Customer abstraction.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 CustomerCreate  Create payload for a Customer.
 CustomerUpdate  Update payload for a Customer.

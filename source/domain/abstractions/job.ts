@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Job domain abstractions                                                      ║
-║ Work agreement life-cycle, assessment, planning, and execution types.         ║
+║ Work agreement life-cycle, assessment, planning, and execution types.        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -10,7 +10,7 @@ Defines the Job aggregate and all related abstractions: JobAssessment,
 JobWorkflow, JobPlan, JobPlanAssignment, JobPlanChemical, JobPlanAsset,
 JobWork, and JobWorkLogEntry.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 JOB_STATUSES           Canonical job life-cycle state values.
 JobStatus              Job status union type.
@@ -45,8 +45,7 @@ import type { Asset } from '@domain/abstractions/asset.ts'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Answer, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
-import type { UserRole } from '@domain/abstractions/user.ts'
-import type { User } from '@domain/abstractions/user.ts'
+import type { User, UserRole } from '@domain/abstractions/user.ts'
 import type { Workflow } from '@domain/abstractions/workflow.ts'
 
 // ────────────────────────────────────────────────────────────────────────────

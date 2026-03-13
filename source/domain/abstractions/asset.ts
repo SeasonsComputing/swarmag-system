@@ -9,12 +9,12 @@ PURPOSE
 Defines asset type reference records, life-cycle status enumeration, and the
 Asset abstraction for operational equipment and resources.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AssetType     Reference type for categorizing assets.
+AssetType       Reference type for categorizing assets.
 ASSET_STATUSES  Canonical asset status values.
-AssetStatus   Lifecycle and availability state.
-Asset         Operational equipment or resource.
+AssetStatus     Lifecycle and availability state.
+Asset           Operational equipment or resource.
 */
 
 import type { AssociationOne, CompositionMany, Instantiable } from '@core/std'
