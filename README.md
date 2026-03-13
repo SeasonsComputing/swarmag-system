@@ -113,7 +113,7 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 | Path            | Description                                          |
 | --------------- | ---------------------------------------------------- |
-| `api/`          | Composed API namespace (@ux-api barrel export)       |
+| `api/`          | Composed API namespace (@ux/api barrel export)       |
 | `app-admin/`    | Admin PWA application (desktop/tablet)               |
 | `app-ops/`      | Operations PWA application (mobile, field execution) |
 | `app-customer/` | Customer portal application (static, read-only)      |
