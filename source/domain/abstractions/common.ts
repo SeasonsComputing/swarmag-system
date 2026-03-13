@@ -9,7 +9,7 @@ PURPOSE
 Defines embedded value objects and reusable primitives shared across the
 swarmAg domain: locations, attachments, notes, questions, and answers.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Location              Geographic position plus optional address metadata.
 ATTACHMENT_KINDS      Canonical attachment kind values.

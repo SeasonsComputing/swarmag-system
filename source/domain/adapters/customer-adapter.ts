@@ -9,7 +9,7 @@ PURPOSE
 Serializes between Dictionary and Customer domain types, including the
 embedded Contact and CustomerSite compositions.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 toCustomer    Deserialize Customer from a storage dictionary.
 fromCustomer  Serialize Customer to a storage dictionary.
@@ -77,7 +77,7 @@ export const fromCustomer = (customer: Customer): Dictionary => ({
 })
 
 // ────────────────────────────────────────────────────────────────────────────
-// PRIVATE INTERNALS
+// PRIVATE
 // ────────────────────────────────────────────────────────────────────────────
 
 const toContact = (dict: Dictionary): Contact => ({

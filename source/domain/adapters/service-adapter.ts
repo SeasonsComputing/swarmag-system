@@ -9,7 +9,7 @@ PURPOSE
 Serializes between Dictionary and Service domain types. ServiceRequiredAssetType
 is a junction with no independent persistence; adapted inline where needed.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 toService                       Deserialize Service from a storage dictionary.
 fromService                     Serialize Service to a storage dictionary.
@@ -62,7 +62,9 @@ export const toServiceRequiredAssetType = (dict: Dictionary): ServiceRequiredAss
 })
 
 /** Serialize ServiceRequiredAssetType junction to a storage dictionary. */
-export const fromServiceRequiredAssetType = (junction: ServiceRequiredAssetType): Dictionary => ({
+export const fromServiceRequiredAssetType = (
+  junction: ServiceRequiredAssetType
+): Dictionary => ({
   service_id: junction.serviceId,
   asset_type_id: junction.assetTypeId
 })

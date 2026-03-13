@@ -9,7 +9,7 @@ PURPOSE
 Defines the User abstraction, role enumeration, and status enumeration for
 system user identity and membership.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 USER_ROLES     Canonical role values.
 UserRole       User role union type.

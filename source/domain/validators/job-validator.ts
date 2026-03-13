@@ -9,7 +9,7 @@ PURPOSE
 Validates create and update protocol payloads for all job-related abstractions.
 JobPlanAsset and JobWorkLogEntry have create validators only.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateJobCreate                  Validate JobCreate payloads.
 validateJobUpdate                  Validate JobUpdate payloads.
@@ -138,7 +138,9 @@ export const validateJobPlanUpdate = (input: JobPlanUpdate): ExpectResult =>
   )
 
 /** Validate JobPlanAssignmentCreate payloads. */
-export const validateJobPlanAssignmentCreate = (input: JobPlanAssignmentCreate): ExpectResult =>
+export const validateJobPlanAssignmentCreate = (
+  input: JobPlanAssignmentCreate
+): ExpectResult =>
   expectValid(
     expectId(input.planId, 'planId'),
     expectId(input.crewMemberId, 'crewMemberId'),
@@ -147,7 +149,9 @@ export const validateJobPlanAssignmentCreate = (input: JobPlanAssignmentCreate):
   )
 
 /** Validate JobPlanAssignmentUpdate payloads. */
-export const validateJobPlanAssignmentUpdate = (input: JobPlanAssignmentUpdate): ExpectResult =>
+export const validateJobPlanAssignmentUpdate = (
+  input: JobPlanAssignmentUpdate
+): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
     expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),

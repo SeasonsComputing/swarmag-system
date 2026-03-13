@@ -1,23 +1,26 @@
 /*
 ╔═════════════════════════════════════════════════════════════════════════════╗
 ║ Make client implementation for API contracts over HTTP                      ║
-║ TODO                                                                        ║
+║ HTTP transport bindings for CRUD and business-rule API contracts            ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-TODO
+Builds transport-agnostic API contracts over HTTP by providing factory
+functions for CRUD resources and business-rule endpoints with uniform error
+envelope handling.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CrudHttpSpecification
-makeCrudHttpClient
-makeBusRuleHttpClient
+CrudHttpSpecification                  CRUD HTTP client configuration.
+BusRuleHttpSpecification               Business-rule HTTP client configuration.
+makeCrudHttpClient(spec)               Build CRUD/list client over HTTP.
+makeBusRuleHttpClient(spec)            Build business-rule runner over HTTP.
 */
 
 import type { Dictionary, Id } from '@core/std'
 import {
-  // type ApiBusRuleContract,
+  type ApiBusRuleContract,
   type ApiCrudContract,
   ApiError,
   DeleteResult,
@@ -26,13 +29,11 @@ import {
 } from './api-contract.ts'
 
 // ───────────────────────────────────────────────────────────────────────────────
-// PUBLIC EXPORTS
+// PUBLIC
 // ───────────────────────────────────────────────────────────────────────────────
 
-/** Configuration for an API client. */
-export interface CrudHttpSpecification<T, TCreate, TUpdate> {
-  basePath: string
-}
+/** Configuration for a business-rule HTTP API client. */
+export type HttpSpecification = { basePath: string }
 
 /**
  * Factory to produce an API client.
@@ -40,7 +41,7 @@ export interface CrudHttpSpecification<T, TCreate, TUpdate> {
  * @returns API client object with CRUD methods.
  */
 export function makeCrudHttpClient<T, TCreate, TUpdate>(
-  spec: CrudHttpSpecification<T, TCreate, TUpdate>
+  spec: HttpSpecification
 ): ApiCrudContract<T, TCreate, TUpdate> {
   const { basePath } = spec
   const api: ApiCrudContract<T, TCreate, TUpdate> = {
@@ -84,8 +85,27 @@ export function makeCrudHttpClient<T, TCreate, TUpdate>(
   return api
 }
 
+/**
+ * Factory to produce a business-rule API client over HTTP.
+ * @param spec - API specification with base path.
+ * @returns API client object with BusRule methods.
+ */
+export function makeBusRuleHttpClient(spec: HttpSpecification): ApiBusRuleContract {
+  const { basePath } = spec
+  return {
+    async run(params: Dictionary): Promise<Dictionary> {
+      const res = await fetch(basePath, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params)
+      })
+      return unwrap<Dictionary>(res)
+    }
+  }
+}
+
 // ───────────────────────────────────────────────────────────────────────────────
-// PRIVATE IMPLEMENTATION
+// PRIVATE
 // ───────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -114,8 +134,7 @@ async function unwrap<T>(response: Response): Promise<T> {
     throw new ApiError(
       (body.error as string) ?? 'Request failed',
       response.status,
-      body
-        .details as string | undefined
+      body.details as string | undefined
     )
   }
   return body.data as T
@@ -137,8 +156,7 @@ async function unwrapList<T>(
     throw new ApiError(
       (body.error as string) ?? fallbackError,
       response.status,
-      body
-        .details as string | undefined
+      body.details as string | undefined
     )
   }
   return {

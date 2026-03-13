@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Validates create and update protocol payloads for AssetType and Asset.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateAssetTypeCreate  Validate AssetTypeCreate payloads.
 validateAssetTypeUpdate  Validate AssetTypeUpdate payloads.

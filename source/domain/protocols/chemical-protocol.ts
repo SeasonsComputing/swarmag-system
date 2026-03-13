@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines create and update protocol shapes for the Chemical abstraction.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 ChemicalCreate  Create payload for a Chemical.
 ChemicalUpdate  Update payload for a Chemical.

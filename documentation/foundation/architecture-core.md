@@ -1,6 +1,6 @@
-# swarmAg Operations System — Architecture Core
-
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
+
+# swarmAg Operations System — Architecture Core
 
 ## 1. Overview
 
@@ -152,7 +152,7 @@ The system consists of five primary components:
 | **Backend Orchestration** | Edge Functions for complex operations             | Supabase Edge      |
 | **Persistent Storage**    | PostgreSQL with Row Level Security                | Supabase           |
 
-UX applications compose their API namespace (`@ux-api`) using client makers that connect directly to Supabase or IndexedDB.
+UX applications compose their API namespace (`@ux/api`) using client makers that connect directly to Supabase or IndexedDB.
 
 ## 5. System Boundary
 
@@ -175,17 +175,13 @@ import { makeCrudSupabaseClient } from '@core/api/make-supabase-client.ts'
 // API namespace composed from client makers
 export const api = {
   // Domain abstractions using appropriate storage bindings
-  Users: makeCrudSupabaseClient<User, UserCreate, UserUpdate>({
-    table: 'users'
-  }),
+  Users: makeCrudSupabaseClient<User, UserCreate, UserUpdate>({ table: 'users' }),
   Customers: makeCrudSupabaseClient<Customer, CustomerCreate, CustomerUpdate>({
     table: 'customers'
   }),
 
   // Offline storage for field operations
-  JobsLocal: makeCrudIndexedDbClient<Job, JobCreate, JobUpdate>({
-    store: 'jobs'
-  }),
+  JobsLocal: makeCrudIndexedDbClient<Job, JobCreate, JobUpdate>({ store: 'jobs' }),
 
   // Orchestration operations
   deepCloneJob: makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
@@ -263,12 +259,13 @@ These contracts ensure **uniform interfaces** regardless of underlying storage o
 
 Client makers are factory functions that produce clients conforming to contracts:
 
-| Maker                          | Contract             | Purpose                          | Implementation     |
-| ------------------------------ | -------------------- | -------------------------------- | ------------------ |
-| `makeCrudSupabaseClient<T>()`  | `ApiCrudContract`    | Direct Supabase SDK access       | PostgreSQL via RLS |
-| `makeCrudIndexedDbClient<T>()` | `ApiCrudContract`    | Offline local storage            | Browser IndexedDB  |
-| `makeCrudHttpClient<T>()`      | `ApiCrudContract`    | HTTP calls to edge functions     | Fetch API          |
-| `makeBusRuleHttpClient()`      | `ApiBusRuleContract` | Orchestration via edge functions | Fetch API          |
+| Maker                            | Contract             | Purpose                          | Implementation     |
+| -------------------------------- | -------------------- | -------------------------------- | ------------------ |
+| `makeCrudSupabaseClient<T>()`    | `ApiCrudContract`    | Direct Supabase RDBMS SDK access | PostgreSQL via RLS |
+| `makeBusRuleSupabaseClient<T>()` | `ApiBusRuleContract` | Direct Supabase Edge SDK access  | Edge functions     |
+| `makeCrudIndexedDbClient<T>()`   | `ApiCrudContract`    | Offline local storage            | Browser IndexedDB  |
+| `makeCrudHttpClient<T>()`        | `ApiCrudContract`    | HTTP calls to edge functions     | Fetch API          |
+| `makeBusRuleHttpClient()`        | `ApiBusRuleContract` | Orchestration via edge functions | Fetch API          |
 
 #### 5.3.1 Maker Pattern
 
@@ -276,9 +273,7 @@ Each maker takes a specification object and returns a fully-typed client:
 
 ```typescript
 // CRUD maker
-const Users = makeCrudSupabaseClient<User, UserCreate, UserUpdate>({
-  table: 'users'
-})
+const Users = makeCrudSupabaseClient<User, UserCreate, UserUpdate>({ table: 'users' })
 await Users.create({ displayName: 'Ada', email: 'ada@example.com' })
 
 // Business rule maker
@@ -291,7 +286,7 @@ await cloneJob.run({ jobId: 'job-123' })
 UX applications import the composed API namespace:
 
 ```typescript
-import { api } from '@ux-api'
+import { api } from '@ux/api'
 
 // CRUD operations - direct to database
 const user = await api.Users.get(userId)
@@ -306,13 +301,13 @@ const result = await api.deepCloneJob.run({ jobId })
 
 #### 5.4.1 Applications never
 
-- Import storage libraries directly (`@supabase-client`, IndexedDB APIs)
+- Import storage libraries directly (`@supabase/client`, IndexedDB APIs)
 - Branch on storage technology
 - Know implementation details of client makers
 
 #### 5.4.2 Applications always
 
-- Import from `@ux-api` namespace
+- Import from `@ux/api` namespace
 - Work with domain types
 - Handle `ApiError` for failures
 
@@ -402,11 +397,7 @@ Backend runtimes control their own key names — no platform prefix is imposed. 
 import { Config } from '@core/cfg/config.ts'
 import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
-Config.init(new SupabaseProvider(), [
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_KEY',
-  'JWT_SECRET'
-])
+Config.init(new SupabaseProvider(), ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET'])
 
 export { Config }
 ```
@@ -443,7 +434,7 @@ Code within a package always imports from the package-local configuration module
 
 ```typescript
 // Import from package config using alias (CORRECT)
-import { Config } from '@back-supabase-edge/config/config.ts'
+import { Config } from '@back/supabase-edge/config/config.ts'
 const url = Config.get('SUPABASE_RDBMS_URL')
 
 // It's ok for configs to be shared across packages
@@ -597,28 +588,25 @@ swarmag-system/
     "@ux/": "./source/ux/",
     "@devops/": "./source/devops/",
     "@tests/": "./source/tests/",
-
     // ────────────────────────────────────────────────────────────────────────────
     // Convenience Barrel Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
-    "@core-std": "./source/core/std/std.ts",
-    "@ux-api": "./source/ux/api/api.ts",
-
+    "@core/std": "./source/core/std/std.ts",
+    "@ux/api": "./source/ux/api/api.ts",
     // ────────────────────────────────────────────────────────────────────────────
     // Deployment Package Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
-    "@back-supabase-edge/": "./source/back/supabase-edge/",
-    "@ux-app-ops/": "./source/ux/app-ops/",
-    "@ux-app-admin/": "./source/ux/app-admin/",
-    "@ux-app-customer/": "./source/ux/app-customer/",
-
+    "@back/supabase-edge/": "./source/back/supabase-edge/",
+    "@ux/app-ops/": "./source/ux/app-ops/",
+    "@ux/app-admin/": "./source/ux/app-admin/",
+    "@ux/app-customer/": "./source/ux/app-customer/",
     // ────────────────────────────────────────────────────────────────────────────
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
-    "@supabase-client": "https://esm.sh/@supabase/supabase-js@2"
+    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2"
   }
 }
 ```
@@ -664,7 +652,7 @@ Field crews execute Jobs entirely from local storage:
 #### 9.2.1 Execution Pattern
 
 ```typescript
-import { api } from '@ux-api'
+import { api } from '@ux/api'
 
 // All operations against IndexedDB clients
 const job = await api.JobsLocal.get(jobId)
@@ -699,10 +687,7 @@ After field work completes, logs are uploaded in bulk. This is **not synchroniza
 const logs = await api.JobLogsLocal.list({ jobId })
 
 // Bulk append to remote (orchestration edge function)
-await api.uploadJobLogs.run({
-  jobId,
-  logs: logs.data
-})
+await api.uploadJobLogs.run({ jobId, logs: logs.data })
 
 // Optional: Clear local storage after successful upload
 await api.JobsLocal.delete(jobId)
@@ -746,14 +731,14 @@ These rules must never be violated. Code that violates these invariants is wrong
 #### 10.1.1 Domain is pure
 
 - Domain layer (`source/domain/`) has no infrastructure dependencies
-- Domain depends only on `@core-std` (Id, When, Dictionary types)
+- Domain depends only on `@core/std` (Id, When, Dictionary types)
 - No references to HTTP, SQL, storage, or runtime concerns
 - Validators, protocols, and adapters all remain infrastructure-agnostic
 
 #### 10.1.2 API namespace is the boundary
 
-- UX applications import from `@ux-api`, never from backend or storage libraries
-- Applications never import `@supabase-client`, IndexedDB APIs, or edge functions directly
+- UX applications import from `@ux/api`, never from backend or storage libraries
+- Applications never import `@supabase/client`, IndexedDB APIs, or edge functions directly
 - The API namespace composes clients using maker factories, not runtime provider selection
 
 #### 10.1.3 Adapters are serialization boundaries
@@ -779,7 +764,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.6 Soft delete via Instantiable
 
-- All life-cycle abstractions extend `Instantiable` from `@core-std`, which carries `id`, `createdAt`, `updatedAt`, `deletedAt?`
+- All life-cycle abstractions extend `Instantiable` from `@core/std`, which carries `id`, `createdAt`, `updatedAt`, `deletedAt?`
 - Do not redeclare these fields inline — extend via intersection
 - Queries filter `WHERE deleted_at IS NULL`
 - Hard deletes only under explicit data retention policies
@@ -794,7 +779,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.8 Import maps only
 
-- All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@ux-api`)
+- All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@ux/api`)
 - No relative imports across top-level namespaces
 - Import maps defined in `deno.jsonc`
 - Platform-specific maps (e.g., `supabase-import-map.json`) synchronized manually
@@ -839,7 +824,7 @@ Domain changes flow unidirectionally through the system.
 
 ### 11.2 Adding New API Clients
 
-New clients are added by composing makers in the `@ux-api` namespace:
+New clients are added by composing makers in the `@ux/api` namespace:
 
 1. **Identify storage mechanism** - Determine appropriate client maker (Supabase SDK, IndexedDB, HTTP)
 2. **Compose into API namespace** - Add to `source/ux/api/api.ts` using appropriate maker
@@ -856,11 +841,7 @@ export const api = {
   // ... existing clients
 
   // New domain abstraction
-  Services: makeCrudSupabaseClient<
-    Service,
-    ServiceCreate,
-    ServiceUpdate
-  >({
+  Services: makeCrudSupabaseClient<Service, ServiceCreate, ServiceUpdate>({
     table: 'services'
   })
 }

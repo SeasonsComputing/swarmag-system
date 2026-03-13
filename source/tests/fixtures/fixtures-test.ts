@@ -70,9 +70,11 @@ Deno.test('fixture integrity: shared questions include labels and values', () =>
     assert(isId(question.id))
     assert(question.prompt.length > 0)
     if (question.type === 'single-select' || question.type === 'multi-select') {
-      assert(question.options.filter(Boolean).every((
-        option: { value: string; label?: string }
-      ) => option.value && option.label))
+      assert(
+        question.options.filter(Boolean).every((
+          option: { value: string; label?: string }
+        ) => option.value && option.label)
+      )
     }
   }
 })

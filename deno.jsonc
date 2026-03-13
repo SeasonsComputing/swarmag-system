@@ -10,23 +10,12 @@
     "@ux/": "./source/ux/",
     "@devops/": "./source/devops/",
     "@tests/": "./source/tests/",
-
     // ────────────────────────────────────────────────────────────────────────────
     // Convenience Barrel Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
     "@core/std": "./source/core/std/std.ts",
     "@ux/api": "./source/ux/api/api.ts",
-
-    // ────────────────────────────────────────────────────────────────────────────
-    // Deployment Package Aliases
-    // ────────────────────────────────────────────────────────────────────────────
-
-    "@back/supabase-edge/": "./source/back/supabase-edge/",
-    "@ux/app-ops/": "./source/ux/app-ops/",
-    "@ux/app-admin/": "./source/ux/app-admin/",
-    "@ux/app-customer/": "./source/ux/app-customer/",
-
     // ────────────────────────────────────────────────────────────────────────────
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
@@ -42,7 +31,6 @@
     "lint": "deno lint",
     "fmt": "dprint fmt",
     "fmt:check": "dprint check",
-
     // Verification guards
     "guard:architecture": "deno run --allow-read source/devops/guards/guard-architecture.ts",
     "guard:env": "deno run --allow-read source/devops/guards/guard-env.ts",
@@ -58,7 +46,5 @@
     //  - swarmag-ux-app-admin.zip
     //  - swarmag-ux-app-customer.zip
   },
-  "fmt": {
-    "exclude": ["**/*"]
-  }
+  "fmt": { "exclude": ["**/*"] }
 }

@@ -10,7 +10,7 @@ Serializes between Dictionary and all job-related domain types: Job,
 JobAssessment, JobWorkflow, JobPlan, JobPlanAssignment, JobPlanChemical,
 JobPlanAsset, JobWork, and JobWorkLogEntry.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 toJob                        Deserialize Job from a storage dictionary.
 fromJob                      Serialize Job to a storage dictionary.

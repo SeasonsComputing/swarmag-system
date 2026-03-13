@@ -1,9 +1,10 @@
-# Seasons Computing — Coding Style Guide, Standards & Conventions
+![Seasons Computing logo](../../seasonscomputing-logo.png)
+
+# Coding Style Guide, Standards & Conventions
 
 ## 1. Overview
 
 This guide is the authoritative reference for coding standards and conventions throughout the codebase.
-In case of conflict, the `CONSTITUTION.md` takes precedence.
 
 Code that conflicts with this guide is wrong — not the guide.
 
@@ -14,7 +15,7 @@ Code that conflicts with this guide is wrong — not the guide.
 | Runtime         | Deno with strict TypeScript (`deno task check`)                                                                                                         |
 | Encoding        | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint.                                                  |
 | Types           | Use `type` for data shapes, abstractions, aliases, and unions; use `interface` only for encapsulated API contracts that something explicitly implements |
-| Primitives/ADTs | Use `Id` (UUID v7 string), `When` (ISO 8601 UTC string), `StringSet`, `Dictionary` and `StringDictionary` from `@core-std`                              |
+| Primitives/ADTs | Use `Id` (UUID v7 string), `When` (ISO 8601 UTC string), `StringSet`, `Dictionary` and `StringDictionary` from `@core/std`                              |
 
 ## 3. Import Aliases
 
@@ -35,8 +36,8 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 
 | Alias       | Resolves to              |
 | ----------- | ------------------------ |
-| `@core-std` | `source/core/std/std.ts` |
-| `@ux-api`   | `source/ux/api/api.ts`   |
+| `@core/std` | `source/core/std/std.ts` |
+| `@ux/api`   | `source/ux/api/api.ts`   |
 
 ## 4. Naming Conventions
 
@@ -131,8 +132,8 @@ export const isWhen = (value: unknown): value is When =>
 
 Files where behavior matters and the public surface benefits from a documented contract.
 
-A box header replaces the file-header JSDoc, followed by a detailed "PURPOSE" subsection divider.
-Finally a "EXPORTED APIs & TYPEs" subsection divider where symbols are enumerated with brief description of each symbol on the same line.
+A box header replaces the file-header JSDoc, followed by a detailed "PURPOSE" subsection header.
+Finally a "PUBLIC" subsection header where symbols are enumerated with brief description of each symbol on the same line.
 
 Boxes should have equal length lines to ensure the box sides align with the box corners.
 
@@ -149,7 +150,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Validates create and update protocol payloads for user topic abstractions.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateUserCreate(input)  Validate UserCreate payloads.
 validateUserUpdate(input)  Validate UserUpdate payloads.
@@ -159,16 +160,15 @@ validateUserUpdate(input)  Validate UserUpdate payloads.
 ### 6.3 Header rules
 
 - Ensure box sides align with box corners
-- One blank line between the box close and PURPOSE.
-- One blank line between PURPOSE prose and the next section label.
-- One blank line between distinct subsection groups within EXPORTED APIs & TYPEs.
-- No blank line between a section label and its dash-rule.
-- No blank line between the dash-rule and its content.
+- Subsection header (e.g. PURPOSE, PUBLIC)
+  - 1 blank line prior to subsection
+  - Subsection heading in ALL CAPS
+  - 1 masc-length dash-rule after the header
 - Headers stay current. A stale header is worse than no header.
 
-### 6.4 Section divider
+### 6.4 Section header
 
-Files with clear categories of declarations and functions divide the code body into sections, each with a section divider header. Consistent width, no variation:
+Files with clear categories of declarations and functions divide the code body into sections, each with a section header. Consistent width, no variation:
 
 ```typescript
 // ────────────────────────────────────────────────────────────────────────────
@@ -176,25 +176,15 @@ Files with clear categories of declarations and functions divide the code body i
 // ────────────────────────────────────────────────────────────────────────────
 ```
 
-### 6.5 Encapsulation & information hiding
+Examples:
 
-Files with a public API and implementation (internal) API are divided into sections: PUBLIC EXPORTS then PRIVATE INTERNALS:
+- PUBLIC
+- PRIVATE
+- PROTOCOLS
+- VALIDATORS
+- GUARDS
 
-```typescript
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC EXPORTS
-// ────────────────────────────────────────────────────────────────────────────
-
-// ... exported types, functions, constants ...
-
-// ────────────────────────────────────────────────────────────────────────────
-// PRIVATE INTERNALS
-// ────────────────────────────────────────────────────────────────────────────
-
-// ... unexported helpers ...
-```
-
-### 6.6 Comment conventions
+### 6.5 Comment conventions
 
 | Context                       | Style                                                               |
 | ----------------------------- | ------------------------------------------------------------------- |
@@ -233,19 +223,19 @@ No implicit behavior, no runtime reflection, no meta-programming. Configuration 
 
 ## 8. Implementation Patterns
 
-### 8.1 `@core-std` types
+### 8.1 `@core/std` types
 
-Use types from `@core-std` instead of ad-hoc primitives and container generics.
+Use types from `@core/std` instead of ad-hoc primitives and container generics.
 
-| Prefer from `@core-std`   | Do not use                                                                 |
+| Prefer from `@core/std`   | Do not use                                                                 |
 | ------------------------- | -------------------------------------------------------------------------- |
 | `Dictionary<V = unknown>` | `Record<string, unknown>`                                                  |
 | `StringDictionary`        | `Record<string, string>`                                                   |
 | `StringSet`               | `Set<string>`                                                              |
 | `Id`                      | raw `string` for identifiers                                               |
 | `When`                    | raw `string` for ISO datetime                                              |
-| `Instantiable`            | inline `{ id, createdAt, updatedAt, deletedAt? }` life-cycle shape          |
-| `InstantiableOnly`        | inline `{ id, createdAt }` create-and-read-only life-cycle shape            |
+| `Instantiable`            | inline `{ id, createdAt, updatedAt, deletedAt? }` life-cycle shape         |
+| `InstantiableOnly`        | inline `{ id, createdAt }` create-and-read-only life-cycle shape           |
 | `CompositionOne<T>`       | ad-hoc tuple/array for exactly-one embedded composition                    |
 | `CompositionOptional<T>`  | ad-hoc nullable/optional array for zero-or-one embedded composition        |
 | `CompositionMany<T>`      | ad-hoc `T[]` where composition semantics are intended                      |
@@ -255,7 +245,7 @@ Use types from `@core-std` instead of ad-hoc primitives and container generics.
 | `AssociationJunction<T>`  | raw `Id` in junction abstractions                                          |
 | `ValidatorError`          | thrown by `notValid()`; generic `Error` for validation failures            |
 
-- Import std primitives from `@core-std` only.
+- Import std primitives from `@core/std` only.
 - Never declare `Record<string, unknown>`, `Record<string, string>`, or `Set<string>` outside `source/core/std/`.
 - When narrowing unknown objects in guards, use `Dictionary` casts (`const x = v as Dictionary`) instead of `Record<string, unknown>`.
 - Use `StringDictionary` for key/value string/string maps.
@@ -288,10 +278,7 @@ const SHAPE_KINDS = ['circle', 'rect'] as const
 When a type extends a base type with additional or narrowed fields, express as a named intersection.
 
 ```typescript
-export type CircleShape = BaseShape & {
-  kind: 'circle'
-  radius: number
-}
+export type CircleShape = BaseShape & { kind: 'circle'; radius: number }
 ```
 
 - Always a named export — anonymous intersections are a violation.
@@ -304,23 +291,17 @@ When a concept has structurally distinct variants sharing a discriminator field,
 
 ```typescript
 /** Common shape fields. */
-export type BaseShape = {
-  kind: ShapeKind
-  color?: string
-}
+export type BaseShape = { kind: ShapeKind; color?: string }
 
 /** Circle — no dimensional fields other than radius. */
-export type CircleShape = BaseShape & {
-  kind: 'circle'
-  radius: number
-}
+export type CircleShape =
+  & BaseShape
+  & { kind: 'circle'; radius: number }
 
 /** Rectangle — defined by width and height. */
-export type RectShape = BaseShape & {
-  kind: 'rect'
-  width: number
-  height: number
-}
+export type RectShape =
+  & BaseShape
+  & { kind: 'rect'; width: number; height: number }
 
 /** Discriminated union — boundary type used throughout the system. */
 export type Shape = CircleShape | RectShape

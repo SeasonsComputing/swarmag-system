@@ -10,7 +10,7 @@ Defines create and update protocol shapes for Question — the only
 Instantiable abstraction in the common topic namespace. Create and update
 shapes are discriminated unions mirroring the Question union type.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 InternalQuestionCreate  Create payload for an InternalQuestion.
 ScalarQuestionCreate    Create payload for a ScalarQuestion.
@@ -38,11 +38,17 @@ export type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
 export type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
 
 /** Discriminated union of all question create payloads. */
-export type QuestionCreate = InternalQuestionCreate | ScalarQuestionCreate | SelectQuestionCreate
+export type QuestionCreate =
+  | InternalQuestionCreate
+  | ScalarQuestionCreate
+  | SelectQuestionCreate
 
 export type InternalQuestionUpdate = UpdateFromInstantiable<InternalQuestion>
 export type ScalarQuestionUpdate = UpdateFromInstantiable<ScalarQuestion>
 export type SelectQuestionUpdate = UpdateFromInstantiable<SelectQuestion>
 
 /** Discriminated union of all question update payloads. */
-export type QuestionUpdate = InternalQuestionUpdate | ScalarQuestionUpdate | SelectQuestionUpdate
+export type QuestionUpdate =
+  | InternalQuestionUpdate
+  | ScalarQuestionUpdate
+  | SelectQuestionUpdate

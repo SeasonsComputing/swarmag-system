@@ -9,7 +9,7 @@ PURPOSE
 Serializes between Dictionary and Chemical domain types, including the
 embedded ChemicalLabel composition.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 toChemical    Deserialize Chemical from a storage dictionary.
 fromChemical  Serialize Chemical to a storage dictionary.
@@ -62,7 +62,7 @@ export const fromChemical = (chemical: Chemical): Dictionary => ({
 })
 
 // ────────────────────────────────────────────────────────────────────────────
-// PRIVATE INTERNALS
+// PRIVATE
 // ────────────────────────────────────────────────────────────────────────────
 
 const toChemicalLabel = (dict: Dictionary): ChemicalLabel => ({

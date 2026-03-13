@@ -1,3 +1,5 @@
+![Seasons Computing logo](seasonscomputing-logo.png)
+
 # Software Architecture Constitution
 
 ## 1. Purpose and Authority

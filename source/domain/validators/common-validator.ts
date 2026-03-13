@@ -9,7 +9,7 @@ PURPOSE
 Validates create and update protocol payloads for Question. Also exports
 shared guards (isNote, isLocation) used by other domain validators.
 
-EXPORTED APIs & TYPEs
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateQuestionCreate  Validate QuestionCreate payloads.
 validateQuestionUpdate  Validate QuestionUpdate payloads.

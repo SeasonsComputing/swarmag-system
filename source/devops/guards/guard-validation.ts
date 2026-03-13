@@ -22,16 +22,15 @@ const collectFiles = async (dir: string): Promise<string[]> => {
     if (entry.isDirectory) {
       if (EXCLUDED_DIRS.has(entry.name)) continue
       entries.push(...await collectFiles(entryPath))
-    } else if (
-      entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))
-    ) {
+    } else if (entry.isFile && (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx'))) {
       entries.push(entryPath)
     }
   }
   return entries
 }
 
-const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number =>
+  source.slice(0, index).split('\n').length
 
 const exists = async (path: string): Promise<boolean> => {
   try {

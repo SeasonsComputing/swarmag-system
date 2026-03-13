@@ -1,6 +1,6 @@
-# swarmAg Operations System — Architecture Backend
-
 ![swarmAg ops logo](../../swarmag-ops-logo.png)
+
+# swarmAg Operations System — Architecture Backend
 
 ## 1. Overview
 
@@ -55,9 +55,9 @@ Edge functions handle **orchestration only** — complex multi-step operations t
 
 ```typescript
 // source/back/supabase-edge/functions/job-deep-clone.ts
-import { Config } from '@back-supabase-edge/config/config.ts'
-import type { Dictionary } from '@core-std'
+import { Config } from '@back/supabase-edge/config/config.ts'
 import { wrapHttpHandler } from '@core/api/wrap-http-handler.ts'
+import type { Dictionary } from '@core/std'
 
 const handler = async (params: Dictionary): Promise<Dictionary> => {
   const jobId = params.jobId as string
@@ -78,7 +78,6 @@ Use when: simple Dictionary → Dictionary, no custom HTTP status codes, default
 
 ```typescript
 // source/back/supabase-edge/functions/jobs-batch-update.ts
-import type { Dictionary } from '@core-std'
 import type { HttpRequest, HttpResponse } from '@core/api/wrap-http-handler.ts'
 import {
   toBadRequest,
@@ -87,6 +86,7 @@ import {
   toUnprocessable,
   wrapHttpHandler
 } from '@core/api/wrap-http-handler.ts'
+import type { Dictionary } from '@core/std'
 import { validateJobBatchUpdate } from '@domain/validators/job-validator.ts'
 
 const handler = async (req: HttpRequest): Promise<HttpResponse> => {
@@ -188,11 +188,7 @@ Edge functions use the singleton `Config` pattern defined in `architecture-core.
 import { Config } from '@core/cfg/config.ts'
 import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
-Config.init(new SupabaseProvider(), [
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_KEY',
-  'JWT_SECRET'
-])
+Config.init(new SupabaseProvider(), ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET'])
 
 export { Config }
 ```
@@ -206,9 +202,9 @@ export { Config }
 ### 5.3 Usage in Edge Functions
 
 ```typescript
-import { Config } from '@back-supabase-edge/config/config.ts'
-import type { Dictionary } from '@core-std'
+import { Config } from '@back/supabase-edge/config/config.ts'
 import { wrapHttpHandler } from '@core/api/wrap-http-handler.ts'
+import type { Dictionary } from '@core/std'
 
 const runBusRule = async (input: Dictionary): Promise<Dictionary> => {
   const supabaseUrl = Config.get('SUPABASE_URL')
