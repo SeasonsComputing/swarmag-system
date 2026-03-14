@@ -20,7 +20,13 @@ export class Supabase {
       Supabase.#cache = createClient(
         Config.get('SUPABASE_RDBMS_URL'),
         Config.get('SUPABASE_SERVICE_KEY'),
-        { auth: { persistSession: false } }
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+          }
+        }
       )
     }
     return Supabase.#cache
