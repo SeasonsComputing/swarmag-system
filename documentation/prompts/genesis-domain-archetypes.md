@@ -57,7 +57,7 @@ Required for each genesis run:
 2. Create a new `source/devops/seed-ids.txt`.
 3. Fill with exactly the IDs needed for seed data, in contiguous file order.
 4. Consume IDs in order while writing seed inserts.
-5. After schema generation completes, empty the file (zero-length, keep present).
+5. After schema generation completes successfully, delete the file.
 
 Assignment order (contiguous):
 
@@ -115,7 +115,7 @@ docker exec -i <db_container> psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
    - `asset_types` seed count
    - `services` seed count
    - internal `questions` seed count (`type = 'internal'`)
-10. Empty `seed-ids.txt`.
+10. Delete `seed-ids.txt`.
 11. Return only when both phases are green.
 
 ## 4. Output Contract
@@ -146,6 +146,6 @@ Before reporting `SCHEMA_AUDIT: PASS`:
 - All const-enum columns have named `CHECK` constraints
 - Every table has RLS enabled
 - Drop order covers all tables in reverse dependency order
-- `seed-ids.txt` was rotated, populated, consumed in order, and left empty
+- `seed-ids.txt` was rotated, populated, consumed in order, and deleted
 - No `VARCHAR(n)`, no bare `TIMESTAMP`
 - Both lint and runtime applies succeed with `ON_ERROR_STOP=1`
