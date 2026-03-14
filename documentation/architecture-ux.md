@@ -1,4 +1,4 @@
-![swarmAg ops logo](../../swarmag-ops-logo.png)
+![swarmAg Operations System](../swarmag-ops-logo.png)
 
 # swarmAg Operations System — Architecture UX
 
@@ -6,7 +6,7 @@
 
 This document defines how UX applications integrate with the swarmAg system architecture. It focuses on **what the UX layer receives from the foundation**, not implementation patterns.
 
-UX architectural patterns (component structure, state management, routing, etc.) will be documented after initial iteration with the stack. See `documentation/applications/` for current application requirements.
+UX architectural patterns (component structure, state management, routing, etc.) will be documented after initial iteration with the stack. See `documentation/` for current application requirements.
 
 **Prerequisites:** Read `architecture-core.md` to understand the API namespace pattern and system boundaries.
 
@@ -175,6 +175,7 @@ export { Config }
 ### 6.1 Application Shell Structure
 
 Each application follows a three-layer shell:
+
 ```text
 app
 ├── shell            # auth guard + content frame
@@ -198,6 +199,7 @@ is enforced by RLS at the database layer.
 There is no navigation menu in any app. The dashboard is the primary
 interface and the primary navigation surface. Dashboard widgets and cards
 are the entry points into domain pages. Navigation is:
+
 ```text
 dashboard → domain page → back to dashboard
 ```
@@ -208,6 +210,7 @@ Each app defines its own route tree using TanStack Router declared in
 `app.tsx`. There is no shared route registry.
 
 #### 6.2.1 Route Shape
+
 ```text
 /             → redirect to /dashboard or /login
 /login        → login (unauthenticated)
@@ -225,11 +228,13 @@ route-level concern, not a per-component concern.
 Authentication is handled by `authn-supabase-client.ts` — a singleton
 module that directly implements `ApiAuthnContract`. It is not a maker;
 there is exactly one auth implementation.
+
 ```text
 source/core/api/authn-supabase-client.ts
 ```
 
 It is composed into the API namespace as `api.Authn`:
+
 ```typescript
 import { authnClient } from '@core/api/authn-supabase-client.ts'
 
@@ -252,6 +257,7 @@ all flow through `onAuthStateChange`. The store reacts identically in
 every case: clear to unauthenticated, guard redirects to login.
 
 #### 6.3.2 Logon Flow
+
 ```text
 user submits credentials
   → api.Authn.logon(credentials)
@@ -264,6 +270,7 @@ user submits credentials
 ```
 
 #### 6.3.3 Logout Flow
+
 ```text
 user triggers logout
   → api.Authn.logout()
@@ -277,12 +284,13 @@ user triggers logout
 
 The session store is a SolidJS store shared across all apps via
 `source/ux/common/stores/session-store.ts`.
+
 ```typescript
 type SessionStore = {
   user: User | null
   isAuthenticated: boolean
-  isLoading: boolean     // true during initial Supabase session check on boot
-  isDataReady: boolean   // true when app is ready to render dashboard
+  isLoading: boolean // true during initial Supabase session check on boot
+  isDataReady: boolean // true when app is ready to render dashboard
 }
 ```
 
@@ -302,15 +310,16 @@ concerns. It is used across all apps, not only Ops.
 
 Each app owns its own named idb store. Stores are not shared across apps.
 
-| Store                  | App      | Content                               |
-| ---------------------- | -------- | ------------------------------------- |
-| `swarmag-admin-app`    | Admin    | dashboard layout, panel config, theme |
+| Store                  | App      | Content                                               |
+| ---------------------- | -------- | ----------------------------------------------------- |
+| `swarmag-admin-app`    | Admin    | dashboard layout, panel config, theme                 |
 | `swarmag-ops-app`      | Ops      | dashboard layout, panel config, theme, job aggregates |
-| `swarmag-customer-app` | Customer | dashboard layout, theme               |
+| `swarmag-customer-app` | Customer | dashboard layout, theme                               |
 
 #### 6.5.2 App State Keys
 
 App state within each store is a `Dictionary` with namespaced string keys:
+
 ```text
 swarmag-ops-app:theme
 swarmag-ops-app:dashboard:layout
@@ -325,13 +334,13 @@ table has no metadata column.
 
 ### 6.6 State Management
 
-| Concern          | Mechanism       | Location                           |
-| ---------------- | --------------- | ---------------------------------- |
-| auth / session   | SolidJS store   | `common/stores/session-store.ts`   |
-| app preferences  | idb             | `common/stores/app-state-store.ts` |
-| server data      | TanStack Query  | per-page query hooks               |
-| local ui state   | SolidJS signals | component-local                    |
-| ops field data   | idb             | `app-ops/stores/jobs-store.ts`     |
+| Concern         | Mechanism       | Location                           |
+| --------------- | --------------- | ---------------------------------- |
+| auth / session  | SolidJS store   | `common/stores/session-store.ts`   |
+| app preferences | idb             | `common/stores/app-state-store.ts` |
+| server data     | TanStack Query  | per-page query hooks               |
+| local ui state  | SolidJS signals | component-local                    |
+| ops field data  | idb             | `app-ops/stores/jobs-store.ts`     |
 
 #### 6.6.1 Rules
 
@@ -376,6 +385,7 @@ A component moves to `common/` when a second app needs it — not before.
 Premature generalization is a violation.
 
 ### 6.8 File Inventory
+
 ```text
 source/ux/
   api/
@@ -425,6 +435,7 @@ source/ux/
 ### 6.9 Build Composition
 
 Each app is an independent Vite build producing a deployable PWA bundle:
+
 ```text
 swarmag-app-admin    = ux/app-admin    + ux/common + ux/config
 swarmag-app-ops      = ux/app-ops      + ux/common + ux/config

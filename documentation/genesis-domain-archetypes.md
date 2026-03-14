@@ -9,11 +9,11 @@ abstractions, reinterpret intent, or cross architectural boundaries.
 Authoritative source set, in order:
 
 1. `CONSTITUTION.md`
-2. `documentation/foundation/architecture-core.md`
-3. `documentation/foundation/domain.md`
-4. `documentation/foundation/domain-archetypes.md`
-5. `documentation/foundation/data-dictionary.md`
-6. `documentation/foundation/style-guide.md`
+2. `documentation/architecture-core.md`
+3. `documentation/domain.md`
+4. `documentation/domain-archetypes.md`
+5. `documentation/domain-data-dictionary.md`
+6. `documentation/style-guide.md`
 7. `AGENTS.md`
 
 Do not restate or fork these rules in this prompt. This prompt is orchestration only.
@@ -22,7 +22,7 @@ Do not restate or fork these rules in this prompt. This prompt is orchestration 
 
 The domain model SDK is composed of _archetypes_ each of which has a unique manifestation within the source code. The 5 archetypes are: abstractions, adapters, protocols, validators, and schema. Each archetype is organized as a directory containing the archetype artifacts unique to it.
 
-The definitive topic list including each topic's contents is `data-dictionary.md`
+The definitive topic list including each topic's contents is `domain-data-dictionary.md`
 
 Always prompt the user to determine if this is a "genesis" run or not. If it's a genesis run then always remove all artifacts for an archetype prior to generation. Avoid git history, genesis is intended to supplant all prior knowledge, as if running this prompt for the first time.
 

@@ -1,4 +1,4 @@
-![swarmAg ops logo](../../swarmag-ops-logo.png)
+![swarmAg Operations System](../swarmag-ops-logo.png)
 
 # swarmAg Operations System — Data Dictionary
 
@@ -8,7 +8,7 @@ This document is the normalized reference for domain abstraction types, relation
 
 It is derived from `domain.md` and presents the same model in a table-first, implementation-ready format for use in topic artifact productions -- Abstractions -- and the archetypes -- Adapters, Protocols, Validators and Schema -- that are tightly coupled to them.
 
-The `domain.md` and `data-dictionary.md` go hand-in-hand in mapping a conceptual solution space to physical artifacts that codify the solution as software.
+The `domain.md` and `domain-data-dictionary.md` go hand-in-hand in mapping a conceptual solution space to physical artifacts that codify the solution as software.
 
 ## 2. Topic Namespace
 

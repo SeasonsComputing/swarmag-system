@@ -238,7 +238,7 @@ const main = async () => {
       console.error(`  ${violation}`)
     }
     console.error('')
-    console.error('See documentation/foundation/architecture-core.md for dependency rules')
+    console.error('See documentation/architecture-core.md for dependency rules')
     Deno.exit(1)
   }
 

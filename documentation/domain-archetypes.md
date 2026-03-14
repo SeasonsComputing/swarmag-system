@@ -1,4 +1,4 @@
-![swarmAg ops logo](../../swarmag-ops-logo.png)
+![swarmAg Operations System](../swarmag-ops-logo.png)
 
 # swarmAg Operations System — Domain Model Archetypes
 
@@ -11,13 +11,13 @@ Implementation patterns for the `source/domain/` package. This document governs 
 `CONSTITUTION.md`
 → `architecture-core.md`
 → `domain.md`
-→ `data-dictionary.md`
+→ `domain-data-dictionary.md`
 → `style-guide.md`
 
 ### 1.2 Scope Boundary of Governing Documents
 
 - `domain.md` owns domain meaning.
-- `data-dictionary.md` owns topic namespaces, abstraction inventory, and field-level reference tables.
+- `domain-data-dictionary.md` owns topic namespaces, abstraction inventory, and field-level reference tables.
 - `style-guide.md` owns implementation patterns, file layouts, and coding conventions.
 - `domain-archetypes.md` owns how to craft topic namespaces from the data dictionary into archetype artifacts.
 

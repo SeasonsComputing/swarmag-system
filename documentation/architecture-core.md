@@ -1,4 +1,4 @@
-![swarmAg ops logo](../../swarmag-ops-logo.png)
+![swarmAg Operations System](../swarmag-ops-logo.png)
 
 # swarmAg Operations System — Architecture Core
 
@@ -539,8 +539,6 @@ These rules are enforced through import discipline and architectural guards. Vio
 ```text
 swarmag-system/
 ├── documentation/
-│   ├── foundation/
-│   └── applications/
 ├── source/
 │   ├── core/
 │   │   ├── api/
@@ -587,12 +585,14 @@ swarmag-system/
     "@ux/": "./source/ux/",
     "@devops/": "./source/devops/",
     "@tests/": "./source/tests/",
+
     // ────────────────────────────────────────────────────────────────────────────
     // Convenience Barrel Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
     "@core/std": "./source/core/std/std.ts",
     "@ux/api": "./source/ux/api/api.ts",
+
     // ────────────────────────────────────────────────────────────────────────────
     // Deployment Package Aliases
     // ────────────────────────────────────────────────────────────────────────────
@@ -601,6 +601,7 @@ swarmag-system/
     "@ux/app-ops/": "./source/ux/app-ops/",
     "@ux/app-admin/": "./source/ux/app-admin/",
     "@ux/app-customer/": "./source/ux/app-customer/",
+
     // ────────────────────────────────────────────────────────────────────────────
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
