@@ -49,12 +49,12 @@ Per `style-guide.md` §10–11 and `domain-archetypes.md` §7.
 
 #### Seed ID Protocol
 
-Use `source/devops/seed-ids.txt` as the sole ID source for seed records.
+Use `source/devops/genesis/seed-ids.txt` as the sole ID source for seed records.
 
 Required for each genesis run:
 
 1. Remove `source/devops/seed-ids.txt` if it exists.
-2. Create a new `source/devops/seed-ids.txt`.
+2. Replace `source/devops/genesis/seed-ids.txt` with a new file.
 3. Fill with exactly the IDs needed for seed data, in contiguous file order.
 4. Consume IDs in order while writing seed inserts.
 5. After schema generation completes successfully, delete the file.
@@ -72,7 +72,7 @@ Assignment order (contiguous):
 3. **Phase 1:** Generate all four archetype directories in one run.
 4. Run `deno task genesis:domain`. Fix and re-run until all checks pass.
 5. **Phase 2:** Generate `schema.sql` per §2.2 and the authority set.
-6. Rotate and populate `seed-ids.txt` per the Seed ID Protocol.
+6. Rotate and populate `source/devops/genesis/seed-ids.txt` per the Seed ID Protocol.
 7. Lint schema in a disposable database:
 
 ```bash
@@ -115,7 +115,7 @@ docker exec -i <db_container> psql -U postgres -d postgres -v ON_ERROR_STOP=1 \
    - `asset_types` seed count
    - `services` seed count
    - internal `questions` seed count (`type = 'internal'`)
-10. Delete `seed-ids.txt`.
+10. Delete `source/devops/genesis/seed-ids.txt`.
 11. Return only when both phases are green.
 
 ## 4. Output Contract
@@ -146,6 +146,6 @@ Before reporting `SCHEMA_AUDIT: PASS`:
 - All const-enum columns have named `CHECK` constraints
 - Every table has RLS enabled
 - Drop order covers all tables in reverse dependency order
-- `seed-ids.txt` was rotated, populated, consumed in order, and deleted
+- `source/devops/genesis/seed-ids.txt` was rotated, populated, consumed in order, and deleted
 - No `VARCHAR(n)`, no bare `TIMESTAMP`
 - Both lint and runtime applies succeed with `ON_ERROR_STOP=1`
