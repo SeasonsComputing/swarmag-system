@@ -1,54 +1,24 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Common protocol shapes                                                       ║
-║ Create and update payloads for common topic abstractions.                    ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Common protocol contracts                                                   ║
+║ Create and update payload contracts for common topic abstractions           ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines create and update protocol shapes for Question — the only
-Instantiable abstraction in the common topic namespace. Create and update
-shapes are discriminated unions mirroring the Question union type.
+Defines boundary payload contracts for persisted common abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-InternalQuestionCreate  Create payload for an InternalQuestion.
-ScalarQuestionCreate    Create payload for a ScalarQuestion.
-SelectQuestionCreate    Create payload for a SelectQuestion.
-QuestionCreate          Discriminated union of all question create payloads.
-InternalQuestionUpdate  Update payload for an InternalQuestion.
-ScalarQuestionUpdate    Update payload for a ScalarQuestion.
-SelectQuestionUpdate    Update payload for a SelectQuestion.
-QuestionUpdate          Discriminated union of all question update payloads.
+QuestionCreate                     Create payload contract for Question.
+QuestionUpdate                     Update payload contract for Question.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
-import type {
-  InternalQuestion,
-  ScalarQuestion,
-  SelectQuestion
-} from '@domain/abstractions/common.ts'
+import type { Question } from '@domain/abstractions/common.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PROTOCOL
-// ────────────────────────────────────────────────────────────────────────────
+/** Create payload contract for Question. */
+export type QuestionCreate = CreateFromInstantiable<Question>
 
-export type InternalQuestionCreate = CreateFromInstantiable<InternalQuestion>
-export type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
-export type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
-
-/** Discriminated union of all question create payloads. */
-export type QuestionCreate =
-  | InternalQuestionCreate
-  | ScalarQuestionCreate
-  | SelectQuestionCreate
-
-export type InternalQuestionUpdate = UpdateFromInstantiable<InternalQuestion>
-export type ScalarQuestionUpdate = UpdateFromInstantiable<ScalarQuestion>
-export type SelectQuestionUpdate = UpdateFromInstantiable<SelectQuestion>
-
-/** Discriminated union of all question update payloads. */
-export type QuestionUpdate =
-  | InternalQuestionUpdate
-  | ScalarQuestionUpdate
-  | SelectQuestionUpdate
+/** Update payload contract for Question. */
+export type QuestionUpdate = UpdateFromInstantiable<Question>

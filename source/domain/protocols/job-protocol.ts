@@ -1,47 +1,39 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Job protocol shapes                                                          ║
-║ Create and update payloads for job topic abstractions.                       ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Job protocol contracts                                                      ║
+║ Create and update payload contracts for job lifecycle abstractions          ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines create and update protocol shapes for all job-related abstractions:
-Job, JobAssessment, JobWorkflow, JobPlan, JobPlanAssignment, JobPlanChemical,
-JobPlanAsset, JobWork, and JobWorkLogEntry. Junction and InstantiableOnly
-types have create protocols only.
+Defines boundary payload contracts for job persisted abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-JobCreate                 Create payload for a Job.
-JobUpdate                 Update payload for a Job.
-JobAssessmentCreate       Create payload for a JobAssessment.
-JobAssessmentUpdate       Update payload for a JobAssessment.
-JobWorkflowCreate         Create payload for a JobWorkflow.
-JobWorkflowUpdate         Update payload for a JobWorkflow.
-JobPlanCreate             Create payload for a JobPlan.
-JobPlanUpdate             Update payload for a JobPlan.
-JobPlanAssignmentCreate   Create payload for a JobPlanAssignment.
-JobPlanAssignmentUpdate   Update payload for a JobPlanAssignment.
-JobPlanChemicalCreate     Create payload for a JobPlanChemical.
-JobPlanChemicalUpdate     Update payload for a JobPlanChemical.
-JobPlanAssetCreate        Create payload for a JobPlanAsset junction.
-JobWorkCreate             Create payload for a JobWork.
-JobWorkUpdate             Update payload for a JobWork.
-JobWorkLogEntryCreate     Create payload for a JobWorkLogEntry.
+JobCreate                          Create payload contract for Job.
+JobUpdate                          Update payload contract for Job.
+JobAssessmentCreate                Create payload contract for JobAssessment.
+JobAssessmentUpdate                Update payload contract for JobAssessment.
+JobWorkflowCreate                  Create payload contract for JobWorkflow.
+JobWorkflowUpdate                  Update payload contract for JobWorkflow.
+JobPlanCreate                      Create payload contract for JobPlan.
+JobPlanUpdate                      Update payload contract for JobPlan.
+JobPlanAssignmentCreate            Create payload contract for JobPlanAssignment.
+JobPlanAssignmentUpdate            Update payload contract for JobPlanAssignment.
+JobPlanChemicalCreate              Create payload contract for JobPlanChemical.
+JobPlanChemicalUpdate              Update payload contract for JobPlanChemical.
+JobPlanAssetCreate                 Create payload contract for JobPlanAsset.
+JobWorkCreate                      Create payload contract for JobWork.
+JobWorkUpdate                      Update payload contract for JobWork.
+JobWorkLogEntryCreate              Create payload contract for JobWorkLogEntry.
 */
 
-import type {
-  AssociationJunction,
-  CreateFromInstantiable,
-  InstantiableOnly,
-  UpdateFromInstantiable
-} from '@core/std'
-import type { Asset } from '@domain/abstractions/asset.ts'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type {
   Job,
   JobAssessment,
   JobPlan,
+  JobPlanAsset,
   JobPlanAssignment,
   JobPlanChemical,
   JobWork,
@@ -49,36 +41,50 @@ import type {
   JobWorkLogEntry
 } from '@domain/abstractions/job.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PROTOCOL
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Create payload contract for Job. */
 export type JobCreate = CreateFromInstantiable<Job>
+
+/** Update payload contract for Job. */
 export type JobUpdate = UpdateFromInstantiable<Job>
 
+/** Create payload contract for JobAssessment. */
 export type JobAssessmentCreate = CreateFromInstantiable<JobAssessment>
+
+/** Update payload contract for JobAssessment. */
 export type JobAssessmentUpdate = UpdateFromInstantiable<JobAssessment>
 
+/** Create payload contract for JobWorkflow. */
 export type JobWorkflowCreate = CreateFromInstantiable<JobWorkflow>
+
+/** Update payload contract for JobWorkflow. */
 export type JobWorkflowUpdate = UpdateFromInstantiable<JobWorkflow>
 
+/** Create payload contract for JobPlan. */
 export type JobPlanCreate = CreateFromInstantiable<JobPlan>
+
+/** Update payload contract for JobPlan. */
 export type JobPlanUpdate = UpdateFromInstantiable<JobPlan>
 
+/** Create payload contract for JobPlanAssignment. */
 export type JobPlanAssignmentCreate = CreateFromInstantiable<JobPlanAssignment>
+
+/** Update payload contract for JobPlanAssignment. */
 export type JobPlanAssignmentUpdate = UpdateFromInstantiable<JobPlanAssignment>
 
+/** Create payload contract for JobPlanChemical. */
 export type JobPlanChemicalCreate = CreateFromInstantiable<JobPlanChemical>
+
+/** Update payload contract for JobPlanChemical. */
 export type JobPlanChemicalUpdate = UpdateFromInstantiable<JobPlanChemical>
 
-/** Junction create — no update protocol; junctions are created and hard-deleted only. */
-export type JobPlanAssetCreate = {
-  planId: AssociationJunction<JobPlan>
-  assetId: AssociationJunction<Asset>
-}
+/** Create payload contract for JobPlanAsset. */
+export type JobPlanAssetCreate = JobPlanAsset
 
+/** Create payload contract for JobWork. */
 export type JobWorkCreate = CreateFromInstantiable<JobWork>
+
+/** Update payload contract for JobWork. */
 export type JobWorkUpdate = UpdateFromInstantiable<JobWork>
 
-/** InstantiableOnly create — no update protocol; log entries are append-only. */
-export type JobWorkLogEntryCreate = Omit<JobWorkLogEntry, keyof InstantiableOnly>
+/** Create payload contract for JobWorkLogEntry. */
+export type JobWorkLogEntryCreate = Omit<JobWorkLogEntry, 'id' | 'createdAt'>

@@ -1,37 +1,37 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ User domain adapter                                                          ║
-║ Serialization for user topic abstractions.                                   ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ User domain adapters                                                        ║
+║ Dictionary serialization for user topic abstractions                        ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Serializes between Dictionary and User domain types.
+Serializes user topic abstractions between Dictionary and domain shapes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toUser    Deserialize User from a storage dictionary.
-fromUser  Serialize User to a storage dictionary.
+toUser                              Deserialize User from Dictionary.
+fromUser                            Serialize User to Dictionary.
 */
 
-import type { CompositionPositive, Dictionary, Id, When } from '@core/std'
-import type { User, UserRole, UserStatus } from '@domain/abstractions/user.ts'
+import type { Dictionary, Id, When } from '@core/std'
+import type { User } from '@domain/abstractions/user.ts'
 
-/** Deserialize User from a storage dictionary. */
+/** Deserialize User from Dictionary. */
 export const toUser = (dict: Dictionary): User => ({
   id: dict.id as Id,
   createdAt: dict.created_at as When,
   updatedAt: dict.updated_at as When,
   deletedAt: dict.deleted_at as When | undefined,
-  roles: dict.roles as CompositionPositive<UserRole>,
+  roles: dict.roles as User['roles'],
   displayName: dict.display_name as string,
   primaryEmail: dict.primary_email as string,
   phoneNumber: dict.phone_number as string,
   avatarUrl: dict.avatar_url as string | undefined,
-  status: dict.status as UserStatus
+  status: dict.status as User['status']
 })
 
-/** Serialize User to a storage dictionary. */
+/** Serialize User to Dictionary. */
 export const fromUser = (user: User): Dictionary => ({
   id: user.id,
   created_at: user.createdAt,

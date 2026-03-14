@@ -1,50 +1,48 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Workflow domain abstractions                                                 ║
-║ Reusable task and workflow templates.                                        ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Workflow domain abstractions                                                ║
+║ Workflow/task abstractions and sequencing junctions                         ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines Task, TaskQuestion, Workflow, and WorkflowTask abstractions for
-describing how work is generally performed through ordered sequences of
-tasks and questions.
+Defines reusable workflow and task abstractions with sequencing junctions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Task          Reusable named grouping of ordered questions.
-TaskQuestion  Junction — tasks to questions with explicit ordering.
-Workflow      Versioned template of ordered tasks.
-WorkflowTask  Junction — ordered tasks that define a workflow.
+Task                               Reusable named grouping of questions.
+TaskQuestion                       Junction linking tasks to ordered questions.
+Workflow                           Versioned workflow template abstraction.
+WorkflowTask                       Junction linking workflows to ordered tasks.
 */
 
 import type { AssociationJunction, CompositionMany, Instantiable } from '@core/std'
-import type { Note, Question } from '@domain/abstractions/common.ts'
+import type { Question } from '@domain/abstractions/common.ts'
 
 /** Reusable named grouping of ordered questions. */
 export type Task = Instantiable & {
-  notes: CompositionMany<Note>
+  notes: CompositionMany<import('@domain/abstractions/common.ts').Note>
   label: string
   description?: string
 }
 
-/** Junction — tasks to questions with explicit ordering; hard delete only. */
+/** Junction mapping tasks to ordered questions. */
 export type TaskQuestion = {
   taskId: AssociationJunction<Task>
   questionId: AssociationJunction<Question>
   sequence: number
 }
 
-/** Versioned template of ordered tasks; read-only except for administrator role. */
+/** Versioned template of ordered tasks. */
 export type Workflow = Instantiable & {
-  notes: CompositionMany<Note>
+  notes: CompositionMany<import('@domain/abstractions/common.ts').Note>
   name: string
   description?: string
   version: number
   tags: CompositionMany<string>
 }
 
-/** Junction — ordered tasks that define a workflow; hard delete only. */
+/** Junction mapping workflows to ordered tasks. */
 export type WorkflowTask = {
   workflowId: AssociationJunction<Workflow>
   taskId: AssociationJunction<Task>

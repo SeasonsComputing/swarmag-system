@@ -1,29 +1,27 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Chemical domain abstractions                                                 ║
-║ Regulated chemical material records.                                         ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Chemical domain abstractions                                                ║
+║ Regulated chemical record abstractions and supporting enums                 ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines the Chemical abstraction and supporting types for regulated materials
-applied as part of certain services, including usage classification, signal
-words, and label document pointers.
+Defines regulated material abstractions and related value classifications.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CHEMICAL_USAGES       Canonical chemical usage classification values.
-ChemicalUsage         Chemical usage union type.
-CHEMICAL_SIGNAL_WORDS  Canonical chemical signal word values.
-ChemicalSignalWord    Chemical signal word union type.
-ChemicalLabel         Label and document pointer for a chemical.
-Chemical              Regulated material record.
+CHEMICAL_USAGES                    Allowed domain usage values.
+ChemicalUsage                      Chemical usage union.
+CHEMICAL_SIGNAL_WORDS              Allowed chemical signal words.
+ChemicalSignalWord                 Chemical signal word union.
+ChemicalLabel                      Label/document metadata.
+Chemical                           Regulated material abstraction.
 */
 
 import type { CompositionMany, Instantiable } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 
-/** Canonical chemical usage classification values. */
+/** Domain usage classification values. */
 export const CHEMICAL_USAGES = [
   'herbicide',
   'pesticide',
@@ -33,11 +31,11 @@ export const CHEMICAL_USAGES = [
 ] as const
 export type ChemicalUsage = (typeof CHEMICAL_USAGES)[number]
 
-/** Canonical chemical signal word values. */
+/** Hazard communication signal words. */
 export const CHEMICAL_SIGNAL_WORDS = ['none', 'danger', 'warning', 'caution'] as const
 export type ChemicalSignalWord = (typeof CHEMICAL_SIGNAL_WORDS)[number]
 
-/** Label and document pointer for a chemical. */
+/** Label/document pointer. */
 export type ChemicalLabel = {
   url: string
   description?: string

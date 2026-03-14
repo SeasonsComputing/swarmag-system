@@ -1,38 +1,31 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Chemical domain validator                                                    ║
-║ Boundary validation for chemical topic abstractions.                         ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Chemical protocol validators                                                ║
+║ Boundary validation for chemical protocol payloads                          ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update protocol payloads for Chemical.
+Validates create and update payloads for chemical protocol contracts.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateChemicalCreate  Validate ChemicalCreate payloads.
-validateChemicalUpdate  Validate ChemicalUpdate payloads.
+validateChemicalCreate              Validate ChemicalCreate payloads.
+validateChemicalUpdate              Validate ChemicalUpdate payloads.
 */
 
 import {
   expectBoolean,
   expectCompositionMany,
   expectConstEnum,
-  type ExpectGuard,
   expectId,
   expectNonEmptyString,
   expectPositiveNumber,
   type ExpectResult,
   expectValid
 } from '@core/std'
-import {
-  CHEMICAL_SIGNAL_WORDS,
-  CHEMICAL_USAGES,
-  type ChemicalLabel
-} from '@domain/abstractions/chemical.ts'
-import type { Note } from '@domain/abstractions/common.ts'
+import { CHEMICAL_SIGNAL_WORDS, CHEMICAL_USAGES } from '@domain/abstractions/chemical.ts'
 import type { ChemicalCreate, ChemicalUpdate } from '@domain/protocols/chemical-protocol.ts'
-import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -41,12 +34,12 @@ import { isNote } from '@domain/validators/common-validator.ts'
 /** Validate ChemicalCreate payloads. */
 export const validateChemicalCreate = (input: ChemicalCreate): ExpectResult =>
   expectValid(
-    expectCompositionMany(input.labels, 'labels', isChemicalLabel),
-    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectCompositionMany(input.labels, 'labels', isObject),
+    expectCompositionMany(input.notes, 'notes', isObject),
     expectNonEmptyString(input.name, 'name'),
     expectNonEmptyString(input.epaNumber, 'epaNumber', true),
     expectConstEnum(input.usage, 'usage', CHEMICAL_USAGES),
-    expectConstEnum(input.signalWord, 'signalWord', CHEMICAL_SIGNAL_WORDS, true),
+    expectConstEnum(input.signalWord, 'signalWord', CHEMICAL_SIGNAL_WORDS),
     expectBoolean(input.restrictedUse, 'restrictedUse'),
     expectPositiveNumber(input.reEntryIntervalHours, 'reEntryIntervalHours', true),
     expectNonEmptyString(input.storageLocation, 'storageLocation', true),
@@ -57,8 +50,8 @@ export const validateChemicalCreate = (input: ChemicalCreate): ExpectResult =>
 export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
-    expectCompositionMany(input.labels, 'labels', isChemicalLabel, true),
-    expectCompositionMany(input.notes, 'notes', isNote as ExpectGuard<Note>, true),
+    expectCompositionMany(input.labels, 'labels', isObject, true),
+    expectCompositionMany(input.notes, 'notes', isObject, true),
     expectNonEmptyString(input.name, 'name', true),
     expectNonEmptyString(input.epaNumber, 'epaNumber', true),
     expectConstEnum(input.usage, 'usage', CHEMICAL_USAGES, true),
@@ -73,5 +66,5 @@ export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isChemicalLabel: ExpectGuard<ChemicalLabel> = (v): v is ChemicalLabel =>
-  v !== null && typeof v === 'object'
+const isObject = (value: unknown): value is object =>
+  value !== null && typeof value === 'object'
