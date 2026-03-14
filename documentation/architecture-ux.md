@@ -393,7 +393,7 @@ source/ux/
     api-authn-contract.ts
 
   config/
-    app-config.ts
+    ux-config.ts
 
   common/
     components/
