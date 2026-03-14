@@ -1,4 +1,4 @@
-# swarmAg Operations System — Genesis Domain Archetypes Prompt
+# Genesis Domain Archetypes
 
 You are an AI Coding Engine operating under `CONSTITUTION.md`. You have no
 architectural authority. Implement exactly what is specified. Do not invent
@@ -14,7 +14,6 @@ Authoritative source set, in order:
 4. `documentation/domain-archetypes.md`
 5. `documentation/domain-data-dictionary.md`
 6. `documentation/style-guide.md`
-7. `AGENTS.md`
 
 Do not restate or fork these rules in this prompt. This prompt is orchestration only.
 
