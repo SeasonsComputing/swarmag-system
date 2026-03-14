@@ -1,4 +1,4 @@
-![swarmAg ops logo](../../swarmag-ops-logo.png)
+![swarmAg Operations System](../swarmag-ops-logo.png)
 
 # swarmAg Operations System — Domain Model
 

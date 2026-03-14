@@ -1,4 +1,4 @@
-![swarmAg ops logo](../../swarmag-ops-logo.png)
+![swarmAg Operations System](../swarmag-ops-logo.png)
 
 # swarmAg Operations System — Architecture Backend
 
@@ -170,9 +170,9 @@ WITH CHECK (auth.jwt() ->> 'role' = 'operations');
 
 Canonical seed data known at schema time is part of `schema.sql` — not a migration. The following seed data is defined in `schema.sql`:
 
-- **Asset types** — canonical `asset_types` records from `data-lists.md §4`
-- **Services** — canonical `services` records from `data-lists.md §2` and `§3`
-- **Internal questions** — canonical `questions` seed records with `QuestionType = 'internal'` from `data-lists.md §5`
+- **Asset types** — canonical `asset_types` records from `domain-seed-data.md §4`
+- **Services** — canonical `services` records from `domain-seed-data.md §2` and `§3`
+- **Internal questions** — canonical `questions` seed records with `QuestionType = 'internal'` from `domain-seed-data.md §5`
 - **Bootstrap admin user** — `devops-admin@swarmag.com` with `administrator` role and stable UUID; password reset via Supabase Auth dashboard post-deploy
 
 All seed record IDs are stable UUID v7 values drawn from `source/devops/genesis/seed-ids.txt`. No seed record uses a database-generated ID.

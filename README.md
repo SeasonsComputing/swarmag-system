@@ -1,44 +1,52 @@
-![swarmAg ops logo](swarmag-ops-logo.png)
+![swarmAg Operations System](swarmag-ops-logo.png)
 
 # swarmAg Operations System -- README
 
 The swarmAg Operations System (`swarmAg System`) supports operations across aerial and ground agricultural services. The monorepo is organized around a typed domain core, backend/runtime infrastructure, and user experience applications.
 
-Primary architectural context lives in `documentation/foundation/architecture-core.md`.
+Primary architectural context lives in `documentation/architecture-core.md`.
 
 ## 1. Repository Structure
 
 ### 1.1 Top-level Namespaces
 
-| Path             | Description                                          |
-| ---------------- | ---------------------------------------------------- |
-| `documentation/` | Foundation and application documentation             |
-| `source/`        | Source code organized into layers                    |
-| `supabase/`      | Supabase project configuration and local metadata    |
+| Path             | Description                                       |
+| ---------------- | ------------------------------------------------- |
+| `documentation/` | Foundation and application documentation          |
+| `source/`        | Source code organized into layers                 |
+| `supabase/`      | Supabase project configuration and local metadata |
 
 ### 1.2 Documentation (`documentation/`)
 
-| Path            | Description                                            |
-| --------------- | ------------------------------------------------------ |
-| `applications/` | Application-level requirements and UX/product specs    |
-| `foundation/`   | Core architecture, domain, style, and data definitions |
-| `prompts/`      | Re-runnable build prompts for structured generation    |
+| File                           | Description                                              |
+| ------------------------------ | -------------------------------------------------------- |
+| `architecture-core.md`         | Core architecture principles and system-wide structure   |
+| `architecture-back.md`         | Backend architecture, boundaries, and runtime model      |
+| `architecture-ux.md`           | UX architecture and frontend layering                    |
+| `domain.md`                    | Domain solution-space concepts and invariants            |
+| `domain-seed-data.md`          | Controlled vocabularies and canonical seed data          |
+| `domain-data-dictionary.md`    | Normalized implementation-ready type and relation model  |
+| `domain-archetypes.md`         | Domain implementation patterns for archetype artifacts   |
+| `style-guide.md`               | Code and content style conventions                       |
+| `genesis-domain-archetypes.md` | Re-runnable prompt contract for domain archetype genesis |
+| `genesis-execution-model.md`   | Genesis workflow and orchestration/generator separation  |
+| `user-stories.md`              | Cross-application user stories and scenario narratives   |
 
-#### 1.2.1 Foundation (`documentation/foundation/`)
+#### 1.2.1 Domain Model
 
 **Domain Model: Solution Space**
 
-| Document        | Description                                                |
-| --------------- | ---------------------------------------------------------- |
-| `domain.md`     | Domain's solution space concepts, entities, and invariants |
-| `data-lists.md` | Controlled vocabularies and enumerated values              |
+| Document              | Description                                                |
+| --------------------- | ---------------------------------------------------------- |
+| `domain.md`           | Domain's solution space concepts, entities, and invariants |
+| `domain-seed-data.md` | Controlled vocabularies and canonical seed data            |
 
 **Domain Model: Implementation Space**
 
-| Document               | Description                                                      |
-| ---------------------- | ---------------------------------------------------------------- |
-| `data-dictionary.md`   | Normalized implementation-ready type and relation reference      |
-| `domain-archetypes.md` | Domain implementation patterns for abstractions and related code |
+| Document                    | Description                                                      |
+| --------------------------- | ---------------------------------------------------------------- |
+| `domain-data-dictionary.md` | Normalized implementation-ready type and relation reference      |
+| `domain-archetypes.md`      | Domain implementation patterns for abstractions and related code |
 
 **Architecture**
 
@@ -54,22 +62,18 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 | ---------------- | ---------------------------------- |
 | `style-guide.md` | Code and content style conventions |
 
-#### 1.2.2 Applications (`documentation/applications/`)
+#### 1.2.2 Applications (`documentation/`)
 
-| Path                 | Description                                            |
-| -------------------- | ------------------------------------------------------ |
-| `admin-web-app.md`   | Administration app scope and requirements              |
-| `ops-mobile-app.md`  | Operations mobile app scope and field workflows        |
-| `customer-portal.md` | Customer portal scope, visibility, and constraints     |
-| `user-stories.md`    | Cross-application user stories and scenario narratives |
+| Path              | Description                                            |
+| ----------------- | ------------------------------------------------------ |
+| `user-stories.md` | Cross-application user stories and scenario narratives |
 
-#### 1.2.3 Prompts (`documentation/prompts/`)
+#### 1.2.3 Prompts (`documentation/`)
 
-| Path                               | Description                                           |
-| ---------------------------------- | ----------------------------------------------------- |
-| `1-genesis-domain-abstractions.md` | Prompt for generating domain abstraction files        |
-| `2-genesis-domain-archetypes.md`   | Prompt for generating adapters, protocols, validators |
-| `3-genesis-domain-schema.md`       | Prompt for generating schema and migration baseline   |
+| Path                           | Description                                           |
+| ------------------------------ | ----------------------------------------------------- |
+| `genesis-domain-archetypes.md` | Prompt for generating adapters, protocols, validators |
+| `genesis-execution-model.md`   | Genesis execution workflow model                      |
 
 ### 1.3 Source Layers (`source/`)
 

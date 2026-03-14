@@ -6,7 +6,7 @@ Clarify the genesis workflow and the separation of concerns between orchestratio
 
 ## Two Artifacts, Two Roles
 
-### 1) `documentation/prompts/genesis-domain-archetypes.md`
+### 1) `documentation/genesis-domain-archetypes.md`
 
 - Role: **orchestration contract** for AI sessions.
 - Use: at the start of a new chat.
