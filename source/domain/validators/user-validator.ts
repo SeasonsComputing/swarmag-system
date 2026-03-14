@@ -1,23 +1,22 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ User domain validator                                                        ║
-║ Boundary validation for user topic abstractions.                             ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ User protocol validators                                                    ║
+║ Boundary validation for user protocol payloads                              ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update protocol payloads for User.
+Validates create and update payloads for user protocol contracts.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateUserCreate  Validate UserCreate payloads.
-validateUserUpdate  Validate UserUpdate payloads.
+validateUserCreate                  Validate UserCreate payloads.
+validateUserUpdate                  Validate UserUpdate payloads.
 */
 
 import {
   expectCompositionPositive,
   expectConstEnum,
-  type ExpectGuard,
   expectId,
   expectNonEmptyString,
   type ExpectResult,
@@ -38,7 +37,7 @@ export const validateUserCreate = (input: UserCreate): ExpectResult =>
     expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
     expectNonEmptyString(input.avatarUrl, 'avatarUrl', true),
-    expectConstEnum(input.status, 'status', USER_STATUSES, true)
+    expectConstEnum(input.status, 'status', USER_STATUSES)
   )
 
 /** Validate UserUpdate payloads. */
@@ -57,5 +56,5 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isUserRole: ExpectGuard<UserRole> = (v): v is UserRole =>
-  expectConstEnum(v, 'role', USER_ROLES) === null
+const isUserRole = (value: unknown): value is UserRole =>
+  expectConstEnum(value, 'role', USER_ROLES) === null

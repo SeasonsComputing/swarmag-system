@@ -1,27 +1,26 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Asset domain adapter                                                         ║
-║ Serialization for asset topic abstractions.                                  ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Asset domain adapters                                                       ║
+║ Dictionary serialization for asset topic abstractions                       ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Serializes between Dictionary and AssetType and Asset domain types.
+Serializes asset topic abstractions between Dictionary and domain shapes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toAssetType    Deserialize AssetType from a storage dictionary.
-fromAssetType  Serialize AssetType to a storage dictionary.
-toAsset        Deserialize Asset from a storage dictionary.
-fromAsset      Serialize Asset to a storage dictionary.
+toAssetType                         Deserialize AssetType from Dictionary.
+fromAssetType                       Serialize AssetType to Dictionary.
+toAsset                             Deserialize Asset from Dictionary.
+fromAsset                           Serialize Asset to Dictionary.
 */
 
-import type { AssociationOne, CompositionMany, Dictionary, Id, When } from '@core/std'
-import type { Asset, AssetStatus, AssetType } from '@domain/abstractions/asset.ts'
-import type { Note } from '@domain/abstractions/common.ts'
+import type { Dictionary, Id, When } from '@core/std'
+import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-/** Deserialize AssetType from a storage dictionary. */
+/** Deserialize AssetType from Dictionary. */
 export const toAssetType = (dict: Dictionary): AssetType => ({
   id: dict.id as Id,
   createdAt: dict.created_at as When,
@@ -31,7 +30,7 @@ export const toAssetType = (dict: Dictionary): AssetType => ({
   active: dict.active as boolean
 })
 
-/** Serialize AssetType to a storage dictionary. */
+/** Serialize AssetType to Dictionary. */
 export const fromAssetType = (assetType: AssetType): Dictionary => ({
   id: assetType.id,
   created_at: assetType.createdAt,
@@ -41,21 +40,21 @@ export const fromAssetType = (assetType: AssetType): Dictionary => ({
   active: assetType.active
 })
 
-/** Deserialize Asset from a storage dictionary. */
+/** Deserialize Asset from Dictionary. */
 export const toAsset = (dict: Dictionary): Asset => ({
   id: dict.id as Id,
   createdAt: dict.created_at as When,
   updatedAt: dict.updated_at as When,
   deletedAt: dict.deleted_at as When | undefined,
-  type: dict.type_id as AssociationOne<AssetType>,
-  notes: (dict.notes as Dictionary[]).map(toNote) as CompositionMany<Note>,
+  type: dict.type_id as Id,
+  notes: (dict.notes as Dictionary[]).map(toNote),
   label: dict.label as string,
   description: dict.description as string | undefined,
   serialNumber: dict.serial_number as string | undefined,
-  status: dict.status as AssetStatus
+  status: dict.status as Asset['status']
 })
 
-/** Serialize Asset to a storage dictionary. */
+/** Serialize Asset to Dictionary. */
 export const fromAsset = (asset: Asset): Dictionary => ({
   id: asset.id,
   created_at: asset.createdAt,

@@ -1,47 +1,40 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Service domain adapter                                                       ║
-║ Serialization for service topic abstractions.                                ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Service domain adapters                                                     ║
+║ Dictionary serialization for service topic abstractions                     ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Serializes between Dictionary and Service domain types. ServiceRequiredAssetType
-is a junction with no independent persistence; adapted inline where needed.
+Serializes service topic abstractions between Dictionary and domain shapes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toService                       Deserialize Service from a storage dictionary.
-fromService                     Serialize Service to a storage dictionary.
-toServiceRequiredAssetType      Deserialize ServiceRequiredAssetType from a dictionary.
-fromServiceRequiredAssetType    Serialize ServiceRequiredAssetType to a dictionary.
+toService                           Deserialize Service from Dictionary.
+fromService                         Serialize Service to Dictionary.
+toServiceRequiredAssetType          Deserialize ServiceRequiredAssetType from Dictionary.
+fromServiceRequiredAssetType        Serialize ServiceRequiredAssetType to Dictionary.
 */
 
-import type { AssociationJunction, CompositionMany, Dictionary, Id, When } from '@core/std'
-import type { AssetType } from '@domain/abstractions/asset.ts'
-import type { Note } from '@domain/abstractions/common.ts'
-import type {
-  Service,
-  ServiceCategory,
-  ServiceRequiredAssetType
-} from '@domain/abstractions/service.ts'
+import type { Dictionary, Id, When } from '@core/std'
+import type { Service, ServiceRequiredAssetType } from '@domain/abstractions/service.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-/** Deserialize Service from a storage dictionary. */
+/** Deserialize Service from Dictionary. */
 export const toService = (dict: Dictionary): Service => ({
   id: dict.id as Id,
   createdAt: dict.created_at as When,
   updatedAt: dict.updated_at as When,
   deletedAt: dict.deleted_at as When | undefined,
-  notes: (dict.notes as Dictionary[]).map(toNote) as CompositionMany<Note>,
+  notes: (dict.notes as Dictionary[]).map(toNote),
   name: dict.name as string,
   sku: dict.sku as string,
   description: dict.description as string | undefined,
-  category: dict.category as ServiceCategory,
-  tagsWorkflowCandidates: dict.tags_workflow_candidates as CompositionMany<string>
+  category: dict.category as Service['category'],
+  tagsWorkflowCandidates: dict.tags_workflow_candidates as string[]
 })
 
-/** Serialize Service to a storage dictionary. */
+/** Serialize Service to Dictionary. */
 export const fromService = (service: Service): Dictionary => ({
   id: service.id,
   created_at: service.createdAt,
@@ -55,16 +48,16 @@ export const fromService = (service: Service): Dictionary => ({
   tags_workflow_candidates: service.tagsWorkflowCandidates
 })
 
-/** Deserialize ServiceRequiredAssetType junction from a storage dictionary. */
+/** Deserialize ServiceRequiredAssetType from Dictionary. */
 export const toServiceRequiredAssetType = (dict: Dictionary): ServiceRequiredAssetType => ({
-  serviceId: dict.service_id as AssociationJunction<Service>,
-  assetTypeId: dict.asset_type_id as AssociationJunction<AssetType>
+  serviceId: dict.service_id as Id,
+  assetTypeId: dict.asset_type_id as Id
 })
 
-/** Serialize ServiceRequiredAssetType junction to a storage dictionary. */
+/** Serialize ServiceRequiredAssetType to Dictionary. */
 export const fromServiceRequiredAssetType = (
-  junction: ServiceRequiredAssetType
+  serviceRequiredAssetType: ServiceRequiredAssetType
 ): Dictionary => ({
-  service_id: junction.serviceId,
-  asset_type_id: junction.assetTypeId
+  service_id: serviceRequiredAssetType.serviceId,
+  asset_type_id: serviceRequiredAssetType.assetTypeId
 })

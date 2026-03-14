@@ -1,20 +1,19 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Asset domain abstractions                                                    ║
-║ Operational equipment and resource types.                                    ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Asset domain abstractions                                                   ║
+║ Asset reference and operational equipment abstractions                      ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines asset type reference records, life-cycle status enumeration, and the
-Asset abstraction for operational equipment and resources.
+Defines asset reference and operational equipment abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AssetType       Reference type for categorizing assets.
-ASSET_STATUSES  Canonical asset status values.
-AssetStatus     Lifecycle and availability state.
-Asset           Operational equipment or resource.
+AssetType                          Asset type reference abstraction.
+ASSET_STATUSES                     Allowed asset lifecycle states.
+AssetStatus                        Asset lifecycle state union.
+Asset                              Operational equipment abstraction.
 */
 
 import type { AssociationOne, CompositionMany, Instantiable } from '@core/std'
@@ -26,7 +25,7 @@ export type AssetType = Instantiable & {
   active: boolean
 }
 
-/** Canonical asset status values. */
+/** Asset lifecycle and availability states. */
 export const ASSET_STATUSES = ['active', 'maintenance', 'retired', 'reserved'] as const
 export type AssetStatus = (typeof ASSET_STATUSES)[number]
 

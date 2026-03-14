@@ -1,25 +1,24 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ User protocol shapes                                                         ║
-║ Create and update payloads for user topic abstractions.                      ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ User protocol contracts                                                     ║
+║ Create and update payload contracts for user abstractions                   ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines create and update protocol shapes for the User abstraction.
+Defines boundary payload contracts for user persisted abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UserCreate  Create payload for a User.
-UserUpdate  Update payload for a User.
+UserCreate                         Create payload contract for User.
+UserUpdate                         Update payload contract for User.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PROTOCOL
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Create payload contract for User. */
 export type UserCreate = CreateFromInstantiable<User>
+
+/** Update payload contract for User. */
 export type UserUpdate = UpdateFromInstantiable<User>

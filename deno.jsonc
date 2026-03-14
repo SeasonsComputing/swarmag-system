@@ -27,7 +27,10 @@
   },
   "tasks": {
     // Validation tasks
-    "check": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno check source/**/*.ts && deno task lint",
+    "check": "deno task check:guards && deno task check:types && deno task check:lint",
+    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types",
+    "check:types": "deno check source/**/*.ts",
+    "check:lint": "deno task lint",
     "genesis:domain": "deno task check:domain-genesis",
     "check:domain-genesis": "deno task guard:domain-style && deno task guard:core-std-types && deno check source/domain/**/*.ts && deno lint source/domain/**/*.ts",
     "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",

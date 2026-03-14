@@ -1,23 +1,22 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Customer domain abstractions                                                 ║
-║ Customer account, site, and contact types.                                   ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Customer domain abstractions                                                ║
+║ Customer account abstractions with embedded contacts and sites              ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines the Customer aggregate with embedded contacts, sites, and notes.
-Includes contact channel and customer status enumerations.
+Defines customer account abstractions and embedded contact/site objects.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CONTACT_CHANNELS   Canonical contact preferred channel values.
-ContactChannel     Contact channel union type.
-Contact            Embedded customer contact with channel preference.
-CustomerSite       Serviceable customer location.
-CUSTOMER_STATUSES  Canonical customer status values.
-CustomerStatus     Customer status union type.
-Customer           Customer account aggregate.
+CONTACT_PREFERRED_CHANNELS          Allowed contact communication channels.
+ContactPreferredChannel             Contact communication channel union.
+Contact                             Embedded customer contact abstraction.
+CustomerSite                        Serviceable customer site abstraction.
+CUSTOMER_STATUSES                   Allowed customer lifecycle states.
+CustomerStatus                      Customer lifecycle state union.
+Customer                            Customer account aggregate abstraction.
 */
 
 import type {
@@ -31,18 +30,18 @@ import type {
 import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { User } from '@domain/abstractions/user.ts'
 
-/** Canonical contact preferred channel values. */
-export const CONTACT_CHANNELS = ['email', 'text', 'phone'] as const
-export type ContactChannel = (typeof CONTACT_CHANNELS)[number]
+/** Allowed contact communication channels. */
+export const CONTACT_PREFERRED_CHANNELS = ['email', 'text', 'phone'] as const
+export type ContactPreferredChannel = (typeof CONTACT_PREFERRED_CHANNELS)[number]
 
-/** Embedded customer contact; isPrimary flags the primary contact. */
+/** Embedded customer contact. */
 export type Contact = {
   notes: CompositionMany<Note>
   name: string
   email?: string
   phone?: string
   isPrimary: boolean
-  preferredChannel: ContactChannel
+  preferredChannel: ContactPreferredChannel
 }
 
 /** Serviceable customer location. */
@@ -54,13 +53,13 @@ export type CustomerSite = {
   acreage?: number
 }
 
-/** Canonical customer status values. */
+/** Allowed customer lifecycle states. */
 export const CUSTOMER_STATUSES = ['active', 'inactive', 'prospect'] as const
 export type CustomerStatus = (typeof CUSTOMER_STATUSES)[number]
 
-/** Customer account aggregate; contacts must be non-empty. */
+/** Customer account aggregate. */
 export type Customer = Instantiable & {
-  accountManagerId: AssociationOptional<User>
+  accountManagerId?: AssociationOptional<User>
   sites: CompositionMany<CustomerSite>
   contacts: CompositionPositive<Contact>
   notes: CompositionMany<Note>

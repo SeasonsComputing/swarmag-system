@@ -1,27 +1,26 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Service domain abstractions                                                  ║
-║ Sellable operational offerings and asset type requirements.                  ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Service domain abstractions                                                 ║
+║ Service catalog abstractions and required asset-type junctions              ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines the Service abstraction, service category enumeration, and the
-ServiceRequiredAssetType junction linking services to required asset types.
+Defines sellable service abstractions and required asset type relationships.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-SERVICE_CATEGORIES         Canonical service category values.
-ServiceCategory            Service category union type.
-Service                    Sellable operational offering.
-ServiceRequiredAssetType   Junction — asset types required for a service.
+SERVICE_CATEGORIES                  Allowed service family classifications.
+ServiceCategory                     Service family classification union.
+Service                             Sellable operational offering abstraction.
+ServiceRequiredAssetType            Junction linking services to asset types.
 */
 
 import type { AssociationJunction, CompositionMany, Instantiable } from '@core/std'
 import type { AssetType } from '@domain/abstractions/asset.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 
-/** Canonical service category values. */
+/** Service family classification values. */
 export const SERVICE_CATEGORIES = [
   'aerial-drone-services',
   'ground-machinery-services'
@@ -38,7 +37,7 @@ export type Service = Instantiable & {
   tagsWorkflowCandidates: CompositionMany<string>
 }
 
-/** Junction — asset types required for a service; hard delete only. */
+/** Required asset-type relation for a service. */
 export type ServiceRequiredAssetType = {
   serviceId: AssociationJunction<Service>
   assetTypeId: AssociationJunction<AssetType>

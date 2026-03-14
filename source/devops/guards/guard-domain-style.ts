@@ -14,8 +14,6 @@ const DOMAIN_ABSTRACTIONS_DIR = `${DOMAIN_DIR}/abstractions`
 const EXCLUDED_DIRS = new Set(['schema'])
 
 const SECTION_BLOCK_REGEX = /^\/\*([\s\S]*?)\*\//m
-const PURPOSE_REGEX = /\nPURPOSE\n─+\n/
-const EXPORTED_REGEX = /\nPUBLIC\n─+\n([\s\S]*?)\n\*\//m
 const CONST_ENUM_DECLARATION_REGEX =
   /export const ([A-Z0-9_]+)\s*=\s*\[[\s\S]*?\]\s*as const/gm
 const INLINE_LITERAL_UNION_REGEX = /:\s*'[^']+'\s*\|\s*'[^']+'/g
@@ -38,6 +36,121 @@ const collectFiles = async (dir: string): Promise<string[]> => {
 
 const lineNumber = (source: string, index: number): number =>
   source.slice(0, index).split('\n').length
+
+const lineOffset = (lines: string[], lineIndex: number): number =>
+  lines.slice(0, lineIndex).join('\n').length + (lineIndex > 0 ? 1 : 0)
+
+const isDashRule = (line: string): boolean => /^─+$/.test(line.trim())
+
+const auditHeaderStyleGuide63 = (
+  source: string,
+  relative: string,
+  headerText: string,
+  headerStartIndex: number
+): string[] => {
+  const violations: string[] = []
+  const lines = headerText.split('\n')
+  const headerStartLine = lineNumber(source, headerStartIndex)
+
+  const boxTop = lines.findIndex(line => line.trim().startsWith('╔'))
+  const boxBottom = lines.findIndex(line => line.trim().startsWith('╚'))
+  if (boxTop === -1 || boxBottom === -1 || boxBottom <= boxTop) {
+    violations.push(
+      `${relative}:${headerStartLine} header box is missing aligned top/bottom borders`
+    )
+  } else {
+    const top = lines[boxTop]
+    const bottom = lines[boxBottom]
+    if (!/^╔═+╗$/.test(top.trim())) {
+      violations.push(
+        `${relative}:${headerStartLine + boxTop} header top border must be ╔═...═╗`
+      )
+    }
+    if (!/^╚═+╝$/.test(bottom.trim())) {
+      violations.push(
+        `${relative}:${headerStartLine + boxBottom} header bottom border must be ╚═...═╝`
+      )
+    }
+    if (top.length !== bottom.length) {
+      violations.push(
+        `${relative}:${
+          headerStartLine + boxBottom
+        } header top and bottom borders must have equal length`
+      )
+    }
+
+    for (let i = boxTop + 1; i < boxBottom; i++) {
+      const line = lines[i]
+      if (line.trim().length === 0) continue
+      if (!line.startsWith('║') || !line.endsWith('║')) {
+        violations.push(
+          `${relative}:${
+            headerStartLine + i
+          } header body rows must be wrapped with matching ║ side borders`
+        )
+        continue
+      }
+      if (line.length !== top.length) {
+        violations.push(
+          `${relative}:${
+            headerStartLine + i
+          } header box side alignment mismatch with top border width`
+        )
+      }
+    }
+  }
+
+  const sections = ['PURPOSE', 'PUBLIC']
+  for (const section of sections) {
+    const sectionLine = lines.findIndex(line => line.trim() === section)
+    if (sectionLine === -1) {
+      const caseInsensitiveLine = lines.findIndex(
+        line => line.trim().toUpperCase() === section
+      )
+      if (caseInsensitiveLine !== -1) {
+        violations.push(
+          `${relative}:${
+            headerStartLine + caseInsensitiveLine
+          } subsection heading must be ALL CAPS: ${section}`
+        )
+      } else {
+        violations.push(
+          `${relative}:${headerStartLine} header is missing ${section} subsection`
+        )
+      }
+      continue
+    }
+
+    if (sectionLine === 0 || lines[sectionLine - 1].trim() !== '') {
+      violations.push(
+        `${relative}:${
+          headerStartLine + sectionLine
+        } ${section} must have exactly one blank line prior`
+      )
+    }
+
+    const ruleLine = sectionLine + 1
+    if (ruleLine >= lines.length || !isDashRule(lines[ruleLine])) {
+      violations.push(
+        `${relative}:${
+          headerStartLine + sectionLine
+        } ${section} must be followed by a dash-rule line`
+      )
+    }
+  }
+
+  return violations
+}
+
+const getPublicBody = (headerText: string): { body: string; startLine: number } | null => {
+  const lines = headerText.split('\n')
+  const sectionLine = lines.findIndex(line => line.trim() === 'PUBLIC')
+  if (sectionLine === -1) return null
+  const ruleLine = sectionLine + 1
+  if (ruleLine >= lines.length || !isDashRule(lines[ruleLine])) return null
+  const bodyLines = lines.slice(ruleLine + 1)
+  return { body: bodyLines.join('\n'), startLine: ruleLine + 1 }
+}
 
 const checkConstEnumPair = (
   source: string,
@@ -102,18 +215,21 @@ const main = async () => {
       continue
     }
 
-    if (!PURPOSE_REGEX.test(source)) {
-      violations.push(`${relative} is missing PURPOSE section in header`)
-    }
+    const headerText = headerMatch[1]
+    violations.push(
+      ...auditHeaderStyleGuide63(source, relative, headerText, headerMatch.index)
+    )
 
-    const exportedMatch = EXPORTED_REGEX.exec(source)
-    if (!exportedMatch) {
+    const publicBody = getPublicBody(headerText)
+    if (!publicBody) {
       violations.push(`${relative} is missing PUBLIC section in header`)
       continue
     }
 
-    const exportedBody = exportedMatch[1]
-    const exportedBodyStart = exportedMatch.index + exportedMatch[0].indexOf(exportedBody)
+    const exportedBody = publicBody.body
+    const headerLines = headerText.split('\n')
+    const headerOffset = lineOffset(headerLines, publicBody.startLine)
+    const exportedBodyStart = headerMatch.index + 2 + headerOffset
     const lines = exportedBody.split('\n')
 
     for (let i = 0; i < lines.length; i++) {
