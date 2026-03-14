@@ -175,7 +175,7 @@ Canonical seed data known at schema time is part of `schema.sql` — not a migra
 - **Internal questions** — canonical `questions` seed records with `QuestionType = 'internal'` from `data-lists.md §5`
 - **Bootstrap admin user** — `devops-admin@swarmag.com` with `administrator` role and stable UUID; password reset via Supabase Auth dashboard post-deploy
 
-All seed record IDs are stable UUID v7 values drawn from `documentation/devops/seed-ids.txt`. No seed record uses a database-generated ID.
+All seed record IDs are stable UUID v7 values drawn from `source/devops/genesis/seed-ids.txt`. No seed record uses a database-generated ID.
 
 ## 5. Configuration Management
 

@@ -172,19 +172,272 @@ export { Config }
 
 ## 6. UX Architecture Patterns
 
-### 6.1 Status: To Be Documented
+### 6.1 Application Shell Structure
 
-UX architectural patterns will be documented after initial iteration with the SolidJS + TanStack + Kobalte stack. Topics to be addressed:
+Each application follows a three-layer shell:
+```text
+app
+├── shell            # auth guard + content frame
+│   ├── login        # unauthenticated entry point
+│   └── dashboard    # authenticated root; primary nav surface
+└── pages            # route-driven content panels
+```
 
-- Component composition patterns
-- State management strategy
-- Routing architecture
-- Form handling patterns
-- Data flow and reactivity
-- Error boundary patterns
-- Loading and optimistic UI
+The shell is app-specific. `login`, `auth-guard`, `content`, and all
+stores are shared via `source/ux/common/`.
 
-See `documentation/applications/` for current application requirements and user stories.
+#### 6.1.1 Auth Guard
+
+The shell root reads `sessionStore.isAuthenticated` before rendering any
+authenticated content. Unauthenticated users are redirected to login. This
+is the only authorization check in the UX layer — all data authorization
+is enforced by RLS at the database layer.
+
+#### 6.1.2 Dashboard as Primary Navigation
+
+There is no navigation menu in any app. The dashboard is the primary
+interface and the primary navigation surface. Dashboard widgets and cards
+are the entry points into domain pages. Navigation is:
+```text
+dashboard → domain page → back to dashboard
+```
+
+### 6.2 Routing
+
+Each app defines its own route tree using TanStack Router declared in
+`app.tsx`. There is no shared route registry.
+
+#### 6.2.1 Route Shape
+```text
+/             → redirect to /dashboard or /login
+/login        → login (unauthenticated)
+/dashboard    → dashboard (auth-guarded)
+/[domain]     → domain pages (auth-guarded)
+```
+
+#### 6.2.2 Protected Routes
+
+Protected routes wrap content in the auth guard component. The guard is a
+route-level concern, not a per-component concern.
+
+### 6.3 Authentication
+
+Authentication is handled by `authn-supabase-client.ts` — a singleton
+module that directly implements `ApiAuthnContract`. It is not a maker;
+there is exactly one auth implementation.
+```text
+source/core/api/authn-supabase-client.ts
+```
+
+It is composed into the API namespace as `api.Authn`:
+```typescript
+import { authnClient } from '@core/api/authn-supabase-client.ts'
+
+const api = {
+  Authn: authnClient,
+  ...
+}
+```
+
+#### 6.3.1 Auth State Binding
+
+`authn-supabase-client.ts` registers a Supabase `onAuthStateChange`
+listener at module load. On every auth event it writes the resolved
+session into `sessionStore`. This is the single binding point between
+Supabase Auth and SolidJS reactivity. No component touches Supabase Auth
+directly.
+
+Session termination events — token expiry, idle timeout, browser close —
+all flow through `onAuthStateChange`. The store reacts identically in
+every case: clear to unauthenticated, guard redirects to login.
+
+#### 6.3.2 Logon Flow
+```text
+user submits credentials
+  → api.Authn.logon(credentials)
+  → Supabase signInWithPassword
+  → fetch domain user via api.Users.get(uid)
+  → return Session { user }
+  → onAuthStateChange fires
+  → sessionStore updated
+  → auth guard reacts → renders dashboard
+```
+
+#### 6.3.3 Logout Flow
+```text
+user triggers logout
+  → api.Authn.logout()
+  → Supabase signOut
+  → onAuthStateChange fires
+  → sessionStore cleared
+  → auth guard reacts → renders login
+```
+
+### 6.4 Session Store
+
+The session store is a SolidJS store shared across all apps via
+`source/ux/common/stores/session-store.ts`.
+```typescript
+type SessionStore = {
+  user: User | null
+  isAuthenticated: boolean
+  isLoading: boolean     // true during initial Supabase session check on boot
+  isDataReady: boolean   // true when app is ready to render dashboard
+}
+```
+
+- `isLoading` prevents a flash of the login screen for already-authenticated
+  users on page load — the shell renders nothing until the boot check resolves
+- `isDataReady` is set `true` by Admin immediately on session establishment;
+  set `true` by Ops only after idb job hydration completes
+- No component reads from Supabase Auth directly — all session state is
+  consumed from this store
+
+### 6.5 idb Usage
+
+idb is the browser-side persistent store for all non-business-data
+concerns. It is used across all apps, not only Ops.
+
+#### 6.5.1 idb Stores
+
+Each app owns its own named idb store. Stores are not shared across apps.
+
+| Store                  | App      | Content                               |
+| ---------------------- | -------- | ------------------------------------- |
+| `swarmag-admin-app`    | Admin    | dashboard layout, panel config, theme |
+| `swarmag-ops-app`      | Ops      | dashboard layout, panel config, theme, job aggregates |
+| `swarmag-customer-app` | Customer | dashboard layout, theme               |
+
+#### 6.5.2 App State Keys
+
+App state within each store is a `Dictionary` with namespaced string keys:
+```text
+swarmag-ops-app:theme
+swarmag-ops-app:dashboard:layout
+swarmag-ops-app:dashboard:panels
+```
+
+#### 6.5.3 Key Principle
+
+User metadata (preferences, layout, theme) lives in idb, not in the
+`users` table. It is device-specific and not business data. The `users`
+table has no metadata column.
+
+### 6.6 State Management
+
+| Concern          | Mechanism       | Location                           |
+| ---------------- | --------------- | ---------------------------------- |
+| auth / session   | SolidJS store   | `common/stores/session-store.ts`   |
+| app preferences  | idb             | `common/stores/app-state-store.ts` |
+| server data      | TanStack Query  | per-page query hooks               |
+| local ui state   | SolidJS signals | component-local                    |
+| ops field data   | idb             | `app-ops/stores/jobs-store.ts`     |
+
+#### 6.6.1 Rules
+
+- Signals for local, transient ui state — inputs, open/close, hover
+- Stores for shared cross-component state — session, app preferences
+- TanStack Query for all server data — caching, loading, error states
+- No prop-drilling of session or user — read from session store directly
+
+### 6.7 Common Component Boundaries
+
+`source/ux/common/` is the swarmAg design system foundation. All
+components in `common/` are reactive and adaptive by default.
+
+#### 6.7.1 Belongs in `common/`
+
+- `login` — designed brand experience, not a generic form instance
+- `auth-guard` — route-level session check
+- `form-panel` — general adaptive form container (full-screen mobile,
+  modal-centered desktop)
+- `content` — main content frame
+- session store
+- app state store
+
+#### 6.7.2 Stays in the app
+
+- dashboard content and layout
+- domain pages
+- app-specific route tree
+- app-specific idb store instance
+
+#### 6.7.3 Exception — Ops Crew Workflow Engine
+
+The ops crew workflow/task/checklist engine is a purpose-built UI mode,
+not derived from `form-panel` or standard shell components. It is
+launched from the ops dashboard. Design principles: app is invisible,
+crew stays focused on job and safety, large touch targets, minimal
+cognitive load.
+
+#### 6.7.4 Rule
+
+A component moves to `common/` when a second app needs it — not before.
+Premature generalization is a violation.
+
+### 6.8 File Inventory
+```text
+source/ux/
+  api/
+    api.ts
+    api-authn-contract.ts
+
+  config/
+    app-config.ts
+
+  common/
+    components/
+      login/
+        login.tsx
+      forms/
+        form-panel.tsx
+      auth-guard.tsx
+      shell/
+        content.tsx
+    stores/
+      session-store.ts
+      app-state-store.ts
+
+  app-admin/
+    index.html
+    vite.config.ts
+    app.tsx
+    dashboard/
+      dashboard.tsx
+
+  app-ops/
+    index.html
+    vite.config.ts
+    app.tsx
+    dashboard/
+      dashboard.tsx
+    stores/
+      jobs-store.ts
+
+  app-customer/
+    index.html
+    vite.config.ts
+    app.tsx
+    dashboard/
+      dashboard.tsx
+```
+
+### 6.9 Build Composition
+
+Each app is an independent Vite build producing a deployable PWA bundle:
+```text
+swarmag-app-admin    = ux/app-admin    + ux/common + ux/config
+swarmag-app-ops      = ux/app-ops      + ux/common + ux/config
+swarmag-app-customer = ux/app-customer + ux/common + ux/config
+```
+
+- Three Vite configs, one per app
+- Three Netlify sites, one per app
+- `ux/common/` and `ux/config/` are compile-time inclusions via path
+  aliases — not packages, not runtime imports
+- Build output is ephemeral — temp directory, zipped, deployed via
+  Netlify CLI in `devops/scripts/`
+- No build artifacts are checked into the repository
 
 ## 7. Technology Stack
 

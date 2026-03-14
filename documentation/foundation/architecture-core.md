@@ -538,7 +538,6 @@ These rules are enforced through import discipline and architectural guards. Vio
 
 ```text
 swarmag-system/
-├── deploy/
 ├── documentation/
 │   ├── foundation/
 │   └── applications/

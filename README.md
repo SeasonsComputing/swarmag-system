@@ -12,7 +12,6 @@ Primary architectural context lives in `documentation/foundation/architecture-co
 
 | Path             | Description                                          |
 | ---------------- | ---------------------------------------------------- |
-| `deploy/`        | Deployment artifacts and environment-specific output |
 | `documentation/` | Foundation and application documentation             |
 | `source/`        | Source code organized into layers                    |
 | `supabase/`      | Supabase project configuration and local metadata    |
