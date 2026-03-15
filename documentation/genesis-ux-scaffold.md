@@ -129,7 +129,7 @@ Standard Vite SPA entry. References `app.tsx` as module entry. Sets
 Vite config for `app-admin`.
 
 - Imports path aliases from `deno.jsonc` — use `denoResolve()` or manual alias
-  map consistent with `architecture-core.md` §7.1.
+  map consistent with `architecture-core.md` §3.2.4.
 - Output dir: `dist/app-admin`.
 - Plugin: SolidJS.
 - No other plugins unless required by the stack.
