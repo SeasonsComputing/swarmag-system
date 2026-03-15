@@ -104,14 +104,37 @@ No subdirectories under `functions/`. Each function is a single file.
 
 All cross-boundary imports use Deno import maps with path aliases defined in `deno.jsonc`.
 
-##### 3.2.4.1 Import Map Structure
+```jsonc
+{
+  "imports": {
+    // ────────────────────────────────────────────────────────────────────────────
+    // Primary Top-level Aliases
+    // ────────────────────────────────────────────────────────────────────────────
 
-- **Top-level namespaces** - Map to logical architectural layers (`@core/`, `@domain/`, `@back/`, `@ux/`, `@devops/`, `@tests/`)
-- **Convenience barrels** - Provided only for high-frequency dependencies (`@core-std`, `@ux-api`)
-- **Package-specific namespaces** - Deployment target aliases (`@back-supabase-functions/`, `@ux-app-ops/`, `@ux-app-admin/`, etc.)
-- **Vendor namespaces** - External dependencies with explicit version control (`@supabase-client`)
+    "@core/": "./source/core/",
+    "@domain/": "./source/domain/",
+    "@back/": "./source/back/",
+    "@ux/": "./source/ux/",
+    "@devops/": "./source/devops/",
+    "@tests/": "./source/tests/",
 
-##### 3.2.4.2 Platform-Specific Import Maps
+    // ────────────────────────────────────────────────────────────────────────────
+    // Convenience Barrel Aliases
+    // ────────────────────────────────────────────────────────────────────────────
+
+    "@core/std": "./source/core/std/std.ts",
+    "@ux/api": "./source/ux/api/api.ts",
+
+    // ────────────────────────────────────────────────────────────────────────────
+    // Vendor Aliases
+    // ────────────────────────────────────────────────────────────────────────────
+
+    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2"
+  }
+}
+```
+
+**Platform-Specific Import Maps**
 
 Development and local execution use `deno.jsonc` import map. Platform edge functions require platform-specific import maps:
 
@@ -568,38 +591,6 @@ swarmag-system/
 │   ├── devops/
 │   └── tests/
 └── supabase/
-```
-
-### 7.1 Import Aliases
-
-```jsonc
-{
-  "imports": {
-    // ────────────────────────────────────────────────────────────────────────────
-    // Primary Top-level Aliases
-    // ────────────────────────────────────────────────────────────────────────────
-
-    "@core/": "./source/core/",
-    "@domain/": "./source/domain/",
-    "@back/": "./source/back/",
-    "@ux/": "./source/ux/",
-    "@devops/": "./source/devops/",
-    "@tests/": "./source/tests/",
-
-    // ────────────────────────────────────────────────────────────────────────────
-    // Convenience Barrel Aliases
-    // ────────────────────────────────────────────────────────────────────────────
-
-    "@core/std": "./source/core/std/std.ts",
-    "@ux/api": "./source/ux/api/api.ts",
-
-    // ────────────────────────────────────────────────────────────────────────────
-    // Vendor Aliases
-    // ────────────────────────────────────────────────────────────────────────────
-
-    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2"
-  }
-}
 ```
 
 ## 9. Field Execution Guarantees
