@@ -1,5 +1,5 @@
 /**
- * Admin app runtime configuration bootstrap
+ * UX/SolidJS runtime configuration bootstrap
  */
 
 import { Config } from '@core/cfg/config.ts'
