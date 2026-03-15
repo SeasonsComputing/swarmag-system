@@ -226,10 +226,10 @@ The session store is a SolidJS store shared across all apps via
 ```typescript
 type SessionStore = {
   userId: Id | null
-  user: User | null            // hydrated after auth via api.hydrateUser(userId)
+  user: User | null // hydrated after auth via api.hydrateUser(userId)
   isAuthenticated: boolean
-  isLoading: boolean           // true during initial session check on boot
-  isDataReady: boolean         // true when app is ready to render dashboard
+  isLoading: boolean // true during initial session check on boot
+  isDataReady: boolean // true when app is ready to render dashboard
 }
 ```
 
@@ -238,18 +238,18 @@ type SessionStore = {
 - `userId` is set immediately from `Session` on auth; `user` is populated
   after `api.hydrateUser(userId)` resolves
 - `isDataReady` is set `true` by Admin and Customer immediately on session
-  establishment; set `true` by Ops only after the idb job manifest load completes
+  establishment; set `true` by Ops only after the indexedDb job manifest load completes
 - No component reads from Supabase Auth directly — all session state is
   consumed from this store
 
-### 6.5 idb Usage
+### 6.5 IndexedDb Usage
 
-idb is the browser-side persistent store for all non-business-data
+IndexedDb is the browser-side persistent store for all non-business-data
 concerns. It is used across all apps, not only Ops.
 
-#### 6.5.1 idb Stores
+#### 6.5.1 IndexedDb Stores
 
-Each app owns its own named idb store. Stores are not shared across apps.
+Each app owns its own named indexedDb store. Stores are not shared across apps.
 
 | Store                  | App      | Content                                               |
 | ---------------------- | -------- | ----------------------------------------------------- |
@@ -259,7 +259,7 @@ Each app owns its own named idb store. Stores are not shared across apps.
 
 #### 6.5.2 Key Principle
 
-User metadata (preferences, layout, theme) lives in idb, not in the
+User metadata (preferences, layout, theme) lives in indexedDb, not in the
 `users` table. It is device-specific and not business data. The `users`
 table has no metadata column.
 
@@ -268,10 +268,10 @@ table has no metadata column.
 | Concern         | Mechanism       | Location                           |
 | --------------- | --------------- | ---------------------------------- |
 | auth / session  | SolidJS store   | `common/stores/session-store.ts`   |
-| app preferences | idb             | `common/stores/app-state-store.ts` |
+| app preferences | IndexedDb       | `common/stores/app-state-store.ts` |
 | server data     | TanStack Query  | per-page query hooks               |
 | local ui state  | SolidJS signals | component-local                    |
-| ops field data  | idb             | `app-ops/stores/jobs-store.ts`     |
+| ops field data  | IndexedDb       | `app-ops/stores/jobs-store.ts`     |
 
 #### 6.6.1 Rules
 
@@ -300,7 +300,7 @@ components in `common/` are reactive and adaptive by default.
 - dashboard content and layout
 - domain pages
 - app-specific route tree
-- app-specific idb store instance
+- app-specific indexedDb store instance
 
 #### 6.7.3 Exception — Ops Crew Workflow Engine
 
