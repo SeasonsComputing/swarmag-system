@@ -1,6 +1,6 @@
 # swarmAg Operations System — AI Agent Protocol
 
-## Session Context
+## 1. Session Context
 
 Every AI session begins by ingesting the following project assets. Ingest in order, then inform the Chief Architect and wait for tasks:
 
@@ -9,19 +9,19 @@ Every AI session begins by ingesting the following project assets. Ingest in ord
 3. `source/core/**/*.ts`
 4. `source/domain/**/*.ts`
 
-## Mandatory Style-Guide Enforcement (Blocking)
+## 2. Mandatory Style-Guide Enforcement (Blocking)
 
 For every code-generation or regeneration task in this repository, `documentation/style-guide.md` is a hard gate.
 
-### Non-negotiable rule
+### 2.1 Non-negotiable rule
 
 Treat any style-guide violation as a correctness failure. Do not proceed while violations exist.
 
-### Required workflow (every turn)
+### 2.2 Required workflow (every turn)
 
 1. Confirm Session Context ingestion is complete before work begins.
-2. For domain archetype regeneration, execute `documentation/genesis-domain-archetypes.md` as the single generation contract.
-3. Run `deno task genesis:domain` before reporting completion.
+2. For any production/regeneration task, execute the single authoritative production contract for that task (for example, `documentation/genesis-domain-archetypes.md` for domain archetype genesis).
+3. Run the matching verification task for that production contract before reporting completion (for example, `deno task genesis:domain` for domain archetype genesis; otherwise run the relevant guard/check task set).
 4. If any violation is found:
    - Report `STYLE_AUDIT: FAIL`
    - List violations with file and line
@@ -29,19 +29,19 @@ Treat any style-guide violation as a correctness failure. Do not proceed while v
    - Re-run audit
 5. Only report completion when `STYLE_AUDIT: PASS`.
 
-### Blocking checks
+### 2.3 Blocking checks
 
 - Enforce `documentation/style-guide.md` exactly as written.
 - Treat `source/devops/guards/*.ts` as the executable enforcement layer for style and architecture checks.
 - Do not duplicate style or archetype rules in AGENTS or prompts; reference foundation docs and guards only.
 - If foundation rules change, update guards/tasks; do not fork rules into operational prompt docs.
 
-### Output contract (must be present in responses with code changes)
+### 2.4 Output contract (must be present in responses with code changes)
 
 - `STYLE_AUDIT: PASS` or `STYLE_AUDIT: FAIL`
 - If `FAIL`: violations list (`- path:line — rule — issue`)
 - If `PASS`: brief confirmation of audited files
 
-### Sequenced generation rule
+### 2.5 Sequenced generation rule
 
 Do not request approval to continue when a generation phase fails checks. Fix and re-run to green first.
