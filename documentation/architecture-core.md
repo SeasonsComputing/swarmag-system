@@ -594,15 +594,6 @@ swarmag-system/
     "@ux/api": "./source/ux/api/api.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Deployment Package Aliases
-    // ────────────────────────────────────────────────────────────────────────────
-
-    "@back/supabase-edge/": "./source/back/supabase-edge/",
-    "@ux/app-ops/": "./source/ux/app-ops/",
-    "@ux/app-admin/": "./source/ux/app-admin/",
-    "@ux/app-customer/": "./source/ux/app-customer/",
-
-    // ────────────────────────────────────────────────────────────────────────────
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
