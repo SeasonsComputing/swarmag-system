@@ -78,7 +78,11 @@ type SessionStore = {
   this store.
 - `isDataReady` is not set here; each app shell sets it after its own boot
   sequence completes.
-- Exports: `sessionStore` (read-only reactive), `logout()`.
+- Exports:
+  - `sessionStore` — read-only reactive store
+  - `logout()` — calls `api.Auth.logout()`
+  - `setSessionUser(user: User): void` — called by app shell after `api.hydrateUser` resolves
+  - `setDataReady(): void` — called by app shell after boot sequence completes
 
 **`app-state-store.ts`**
 
@@ -180,14 +184,16 @@ Application root.
 
 - Imports `Config` from `@ux/config/ux-config.ts` — not directly from `@core/cfg`.
 - Constructs `appStateStore` via `makeAppStateStore('swarmag-admin-app')`.
-- Uses TanStack Router. Two routes:
+- Uses TanStack Router. Routes:
+  - `/` → redirect to `/dashboard` or `/login` based on auth state
   - `/login` → `<Login><AdminContactField /></Login>`
-  - `/*` → `<AuthGuard><Shell /></AuthGuard>`
+  - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
+  - `/[domain]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
 - `<Shell>` renders `<Content>` with `<Dashboard />` inside.
 - Boot sequence after authentication:
-  1. Call `api.hydrateUser(sessionStore.userId)` and write result to
-     `sessionStore.user`.
-  2. Set `sessionStore.isDataReady = true`. Admin has no idb job load step.
+  1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
+     `setSessionUser(user)`.
+  2. Call `setDataReady()`. Admin has no idb job load step.
 
 **`dashboard/dashboard.tsx`**
 
@@ -239,18 +245,18 @@ by the workflow engine only.
 
 ```typescript
 type JobsStore = {
-  jobs: JobSummary[] // lightweight manifest — id, status, title
+  jobs: JobSummary[]  // lightweight manifest — id, status, title
   isLoaded: boolean
 }
 ```
 
 - `isLoaded` starts `false`. Set `true` after the initial idb read resolves.
-- Exports: `jobsStore` (read-only reactive), `loadJobs()` (async — reads job
-  manifest from idb via `api.JobsLocal`).
+- Exports: `jobsStore` (read-only reactive), `loadJobs()` (async).
 - No Supabase calls. This store reads from idb only.
-- `api.JobsLocal` is a TODO stub at scaffold time — `loadJobs()` must compile
-  and return an empty manifest until the client maker is implemented. Include
-  an explicit `// TODO: api.JobsLocal not yet implemented` comment.
+- `api.JobsLocal` is not yet implemented. For the scaffold phase, `loadJobs()`
+  sets `jobs: []` and `isLoaded: true` immediately. Include an explicit
+  `// TODO: replace with api.JobsLocal read when client maker is implemented`
+  comment at the stub site.
 
 **`app.tsx`**
 
@@ -258,16 +264,17 @@ Application root.
 
 - Imports `Config` from `@ux/config/ux-config.ts` — not directly from `@core/cfg`.
 - Constructs `appStateStore` via `makeAppStateStore('swarmag-ops-app')`.
-- Uses TanStack Router. Two routes:
+- Uses TanStack Router. Routes:
+  - `/` → redirect to `/dashboard` or `/login` based on auth state
   - `/login` → `<Login><OpsContactField /></Login>`
-  - `/*` → `<AuthGuard><Shell /></AuthGuard>`
+  - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
+  - `/[domain]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
 - `<Shell>` renders `<Content>` with `<Dashboard />` inside.
 - Boot sequence after authentication:
-  1. Call `api.hydrateUser(sessionStore.userId)` and write result to
-     `sessionStore.user`.
+  1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
+     `setSessionUser(user)`.
   2. Call `loadJobs()` from `jobs-store.ts`.
-  3. When `jobsStore.isLoaded` becomes `true`, set
-     `sessionStore.isDataReady = true`.
+  3. When `jobsStore.isLoaded` becomes `true`, call `setDataReady()`.
 - Dashboard renders only after `isDataReady` is `true`. While loading, render
   a loading indicator inside `<Content>`.
 
@@ -313,14 +320,16 @@ Application root.
 
 - Imports `Config` from `@ux/config/ux-config.ts` — not directly from `@core/cfg`.
 - Constructs `appStateStore` via `makeAppStateStore('swarmag-customer-app')`.
-- Uses TanStack Router. Two routes:
+- Uses TanStack Router. Routes:
+  - `/` → redirect to `/dashboard` or `/login` based on auth state
   - `/login` → `<Login><CustomerContactField /></Login>`
-  - `/*` → `<AuthGuard><Shell /></AuthGuard>`
+  - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
+  - `/[domain]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
 - `<Shell>` renders `<Content>` with `<Dashboard />` inside.
 - Boot sequence after authentication:
-  1. Call `api.hydrateUser(sessionStore.userId)` and write result to
-     `sessionStore.user`.
-  2. Set `sessionStore.isDataReady = true`. Customer has no idb job load step.
+  1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
+     `setSessionUser(user)`.
+  2. Call `setDataReady()`. Customer has no idb job load step.
 
 **`dashboard/dashboard.tsx`**
 
@@ -331,6 +340,8 @@ Customer dashboard stub.
 
 ---
 
+
+
 ## 3. Execution Contract
 
 1. Ingest the authority set in §1.
@@ -340,8 +351,10 @@ Customer dashboard stub.
 4. **Phase II:** Generate `app-admin/` files.
 5. **Phase III:** Generate `app-ops/` files.
 6. **Phase IV:** Generate `app-customer/` files.
-7. Run `deno task check` across all generated files (covers `.ts` and `.tsx`).
-   Fix and re-run until clean.
+7. Before running `deno task check`: confirm `deno.jsonc` `check:types` glob
+   covers `source/**/*.{ts,tsx}`. If it only covers `*.ts`, update the glob
+   first — this scaffold generates `.tsx` files.
+   Run `deno task check` across all generated files. Fix and re-run until clean.
 8. Report `STYLE_AUDIT` per the output contract below.
 9. Return only when `STYLE_AUDIT: PASS`.
 
@@ -359,20 +372,20 @@ Before reporting `STYLE_AUDIT: PASS`:
 
 - `session-store.ts`: `userId` and `user` are separate fields; `isLoading` and
   `isDataReady` are distinct; all auth calls go through `api.Auth` — no direct
-  Supabase Auth imports.
+  Supabase Auth imports; exports `setSessionUser(user)` and `setDataReady()`.
 - `auth-guard.tsx`: renders nothing during `isLoading`; redirects via TanStack
   Router on unauthenticated; no data fetching.
 - `login.tsx`: two-step OTP flow; accepts `children` slot; calls
   `api.Auth.sendOtp` and `api.Auth.verifyOtp`; does not navigate directly.
 - `app-admin/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router; calls `api.hydrateUser` before setting `isDataReady`.
+  TanStack Router with full route shape; calls `setSessionUser` then `setDataReady`.
 - `app-ops/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router; calls `api.hydrateUser` then `loadJobs()`; sets `isDataReady`
-  only after `jobsStore.isLoaded` is `true`.
+  TanStack Router with full route shape; calls `setSessionUser`, then `loadJobs()`,
+  then `setDataReady()` only after `jobsStore.isLoaded` is `true`.
 - `app-customer/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router; calls `api.hydrateUser` before setting `isDataReady`.
-- `jobs-store.ts`: shape uses `JobSummary[]` and `isLoaded`; reads from
-  `api.JobsLocal` only — no Supabase calls; TODO stub compiles clean.
+  TanStack Router with full route shape; calls `setSessionUser` then `setDataReady`.
+- `jobs-store.ts`: shape uses `JobSummary[]` and `isLoaded`; `loadJobs()` stub
+  sets `jobs: []` and `isLoaded: true` with TODO comment; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from `session-store.ts`
   directly.
 - All exported symbols have `/** */` JSDoc per `style-guide.md` §6.5.
@@ -380,6 +393,8 @@ Before reporting `STYLE_AUDIT: PASS`:
 - No `@back/*` imports anywhere in `source/ux/`.
 - No direct `@core/cfg` imports in any `app.tsx` — config flows through
   `@ux/config/ux-config.ts`.
-- `deno task check` exits clean across all `.ts` and `.tsx` files.
+- `deno.jsonc` `check:types` glob covers `source/**/*.{ts,tsx}` before running.
+- `deno task check` exits clean.
+
 
 _End of Genesis Prompt for UX Application Scaffolding Document_
