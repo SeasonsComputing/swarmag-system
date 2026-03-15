@@ -77,6 +77,13 @@ source/ux/common/
     app-state-store.ts
 ```
 
+Pre-existing auth client integration remains unchanged and is out of scaffold
+generation scope:
+
+```text
+source/ux/common/lib/auth-supabase-client.ts
+```
+
 #### 2.2.2 Specifications
 
 **`session-store.ts`**
@@ -388,12 +395,14 @@ Before reporting `STYLE_AUDIT: PASS`:
 - `login.tsx`: two-step OTP flow; accepts `children` slot; calls
   `api.Auth.sendOtp` and `api.Auth.verifyOtp`; does not navigate directly.
 - `app-admin/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router with full route shape; calls `setSessionUser` then `setDataReady`.
+  TanStack Router with `/`, `/login`, and `/dashboard`; calls `setSessionUser`
+  then `setDataReady`.
 - `app-ops/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router with full route shape; calls `setSessionUser`, then `loadJobs()`,
+  TanStack Router with `/`, `/login`, and `/dashboard`; calls `setSessionUser`, then `loadJobs()`,
   then `setDataReady()` only after `jobsStore.isLoaded` is `true`.
 - `app-customer/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router with full route shape; calls `setSessionUser` then `setDataReady`.
+  TanStack Router with `/`, `/login`, and `/dashboard`; calls `setSessionUser`
+  then `setDataReady`.
 - `jobs-store.ts`: shape uses `JobSummary[]` and `isLoaded`; `loadJobs()` stub
   sets `jobs: []` and `isLoaded: true` with TODO comment; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from `session-store.ts`
