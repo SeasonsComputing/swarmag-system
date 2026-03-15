@@ -144,8 +144,6 @@ Main content frame.
 - Accepts `children: JSX.Element`.
 - No business logic.
 
----
-
 ### 2.2 Phase II — App Admin Shell
 
 Generate the `app-admin` application shell.
@@ -201,8 +199,6 @@ Admin dashboard stub.
 
 - Renders a heading and a placeholder message. No domain data yet.
 - This file will be replaced during domain page generation.
-
----
 
 ### 2.3 Phase III — App Ops Shell
 
@@ -285,8 +281,6 @@ Ops dashboard stub.
 - Renders a heading and a placeholder message. No domain data yet.
 - This file will be replaced during crew workflow engine generation.
 
----
-
 ### 2.4 Phase IV — App Customer Shell
 
 Generate the `app-customer` application shell.
@@ -337,10 +331,6 @@ Customer dashboard stub.
 
 - Renders a heading and a placeholder message. No domain data yet.
 - This file will be replaced during customer portal generation.
-
----
-
-
 
 ## 3. Execution Contract
 
@@ -395,6 +385,5 @@ Before reporting `STYLE_AUDIT: PASS`:
   `@ux/config/ux-config.ts`.
 - `deno.jsonc` `check:types` glob covers `source/**/*.{ts,tsx}` before running.
 - `deno task check` exits clean.
-
 
 _End of Genesis Prompt for UX Application Scaffolding Document_
