@@ -2,21 +2,20 @@
  * Authentication (AuthN) API contract.
  */
 
-import type { User } from '@domain/abstractions/user.ts'
+import type { Id } from '@core/std'
 
-/** Credentials payload for password-based logon. */
-export type LogonInput = { username: string; password: string }
-
-/** Authenticated session returned on successful logon. */
-export type Session = { user: User }
+/** Authenticated session returned on successful OTP verification. */
+export type Session = { userId: Id }
 
 /**
- * Contract for credentialed authn and passwordless authn.
+ * Passwordless OTP authentication contract.
+ * Step 1 — sendOtp: delivers a one-time code to the provided email address.
+ * Step 2 — verifyOtp: validates the code and returns an authenticated session.
  */
 export interface ApiAuthnContract {
-  logon(credentials: LogonInput): Promise<Session>
+  sendOtp(email: string): Promise<void>
+  verifyOtp(email: string, code: string): Promise<Session>
   logout(): Promise<void>
-  forgotPassword(email: string): Promise<void>
-  requestAccessCode(contact: string): Promise<void>
-  verifyAccessCode(contact: string, code: string): Promise<Session>
+  getSession(): Promise<Session | null>
+  onAuthStateChange(callback: (session: Session | null) => void): () => void
 }
