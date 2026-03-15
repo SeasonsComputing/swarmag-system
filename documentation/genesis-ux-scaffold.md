@@ -70,8 +70,8 @@ source/ux/common/
     forms/
       form-panel.tsx
     shell/
+      auth-guard.tsx
       content.tsx
-    auth-guard.tsx
   stores/
     session-store.ts
     app-state-store.ts
@@ -86,95 +86,21 @@ source/ux/common/lib/auth-supabase-client.ts
 
 #### 2.2.2 Specifications
 
-**`session-store.ts`**
+Common UX behavior is defined by architecture and is not restated here:
 
-Implements the `SessionStore` reactive store. Shape (from `architecture-ux.md` §6.4):
+- Authentication flow and auth-state binding: `architecture-ux.md` §6.3
+- Session store contract: `architecture-ux.md` §6.4
+- IndexedDb usage and app store naming: `architecture-ux.md` §6.5
+- State-management responsibilities: `architecture-ux.md` §6.6
+- Component boundaries and shell behavior: `architecture-ux.md` §6.7
+- File inventory baseline (with this prompt's path adjustments): `architecture-ux.md` §6.8
 
-```typescript
-type SessionStore = {
-  userId: Id | null
-  user: User | null // hydrated after auth via api.hydrateUser(userId)
-  isAuthenticated: boolean
-  isLoading: boolean // true during initial session check on boot
-  isDataReady: boolean // true when app is ready to render dashboard
-}
-```
+Scaffold-only deltas for Phase I:
 
-- Backed by SolidJS `createStore`.
-- Bootstraps by calling `api.Auth.getSession()` once on module load; sets
-  `isLoading: false` on resolution.
-- Subscribes to `api.Auth.onAuthStateChange`; keeps store in sync.
-- On auth state change: sets `userId` from `Session`; `user` remains `null`
-  until the app shell calls `api.hydrateUser(userId)` and writes the result.
-- No component reads Supabase Auth directly — all session state flows through
-  this store.
-- `isDataReady` is not set here; each app shell sets it after its own boot
-  sequence completes.
-- Exports:
-  - `sessionStore` — read-only reactive store
-  - `logout()` — calls `api.Auth.logout()`
-  - `setSessionUser(user: User): void` — called by app shell after `api.hydrateUser` resolves
-  - `setDataReady(): void` — called by app shell after boot sequence completes
-
-**`app-state-store.ts`**
-
-Implements the `AppStateStore` reactive store. Persists app preferences to idb.
-
-- Backed by SolidJS `createStore`.
-- `storeName` is injected at construction — the idb store name differs per app
-  (`swarmag-admin-app`, `swarmag-ops-app`, `swarmag-customer-app`).
-- Reads initial state from idb on construction; writes on every mutation.
-- Keys follow the pattern `{storeName}:theme`, `{storeName}:dashboard:layout`,
+- `auth-guard.tsx` path is `source/ux/common/components/shell/auth-guard.tsx`.
+- `app-state-store.ts` persists app preference keys as:
+  `{storeName}:theme`, `{storeName}:dashboard:layout`,
   `{storeName}:dashboard:panels`.
-- No business data. No domain types.
-- Exports: factory function `makeAppStateStore(storeName: string)`.
-
-**`auth-guard.tsx`**
-
-Route-level session guard component.
-
-- Reads `sessionStore.isLoading` and `sessionStore.isAuthenticated`.
-- While `isLoading` is `true`: renders nothing (prevents login flash).
-- When `isLoading` is `false` and `isAuthenticated` is `false`: redirects to
-  `/login` via TanStack Router `<Navigate>`.
-- When authenticated: renders `<props.children>` (the protected subtree).
-- No domain logic. No data fetching.
-
-**`login.tsx`**
-
-Brand entry point — not a generic form. Implements a two-step passwordless OTP
-flow: collect contact → verify code.
-
-- Step 1: renders `<props.children>` as the contact input slot — each app
-  supplies its own prompt and field (email for admin/ops, email for customer).
-  Calls `api.Auth.sendOtp(email)` on submit.
-- Step 2: renders a code entry field. Calls `api.Auth.verifyOtp(email, token)`
-  on submit.
-- On successful verification, the auth state change listener in
-  `session-store.ts` drives the transition to the authenticated shell.
-  `login.tsx` does not navigate directly.
-- Shows an error message on failure at either step.
-- No navigation imports needed; session store drives app state.
-- Accepts `children: JSX.Element` — the contact input slot.
-
-**`form-panel.tsx`**
-
-Adaptive form container.
-
-- Renders full-screen on mobile, modal-centered on desktop.
-- Uses a CSS media query via a CSS class — no JS breakpoint detection.
-- Accepts `title: string`, `children: JSX.Element`, and optional
-  `onClose: () => void` props.
-- No domain coupling.
-
-**`content.tsx`**
-
-Main content frame.
-
-- Renders a `<main>` element that occupies remaining viewport height after the
-  app shell header.
-- Accepts `children: JSX.Element`.
-- No business logic.
 
 ### 2.3 Phase II — App Admin Shell
 
@@ -212,13 +138,9 @@ Vite config for `app-admin`.
 
 Application root.
 
-- Imports `Config` from `@ux/config/ux-config.ts` — not directly from `@core/cfg`.
-- Constructs `appStateStore` via `makeAppStateStore('swarmag-admin-app')`.
-- Uses TanStack Router. Routes:
-  - `/` → redirect to `/dashboard` or `/login` based on auth state
-  - `/login` → `<Login><AdminContactField /></Login>`
-  - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
-- `<Shell>` renders `<Content>` with `<Dashboard />` inside.
+- Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
+- Import `Config` from `@ux/config/ux-config.ts` only.
+- Construct app state with `makeAppStateStore('swarmag-admin-app')`.
 - Boot sequence after authentication:
   1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
      `setSessionUser(user)`.
@@ -289,13 +211,9 @@ type JobsStore = {
 
 Application root.
 
-- Imports `Config` from `@ux/config/ux-config.ts` — not directly from `@core/cfg`.
-- Constructs `appStateStore` via `makeAppStateStore('swarmag-ops-app')`.
-- Uses TanStack Router. Routes:
-  - `/` → redirect to `/dashboard` or `/login` based on auth state
-  - `/login` → `<Login><OpsContactField /></Login>`
-  - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
-- `<Shell>` renders `<Content>` with `<Dashboard />` inside.
+- Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
+- Import `Config` from `@ux/config/ux-config.ts` only.
+- Construct app state with `makeAppStateStore('swarmag-ops-app')`.
 - Boot sequence after authentication:
   1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
      `setSessionUser(user)`.
@@ -342,13 +260,9 @@ Vite config for `app-customer`. Same structure as `app-admin`; output dir
 
 Application root.
 
-- Imports `Config` from `@ux/config/ux-config.ts` — not directly from `@core/cfg`.
-- Constructs `appStateStore` via `makeAppStateStore('swarmag-customer-app')`.
-- Uses TanStack Router. Routes:
-  - `/` → redirect to `/dashboard` or `/login` based on auth state
-  - `/login` → `<Login><CustomerContactField /></Login>`
-  - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
-- `<Shell>` renders `<Content>` with `<Dashboard />` inside.
+- Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
+- Import `Config` from `@ux/config/ux-config.ts` only.
+- Construct app state with `makeAppStateStore('swarmag-customer-app')`.
 - Boot sequence after authentication:
   1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
      `setSessionUser(user)`.
@@ -387,22 +301,16 @@ Responses that include code changes must include:
 
 Before reporting `STYLE_AUDIT: PASS`:
 
-- `session-store.ts`: `userId` and `user` are separate fields; `isLoading` and
-  `isDataReady` are distinct; all auth calls go through `api.Auth` — no direct
-  Supabase Auth imports; exports `setSessionUser(user)` and `setDataReady()`.
-- `auth-guard.tsx`: renders nothing during `isLoading`; redirects via TanStack
-  Router on unauthenticated; no data fetching.
-- `login.tsx`: two-step OTP flow; accepts `children` slot; calls
-  `api.Auth.sendOtp` and `api.Auth.verifyOtp`; does not navigate directly.
-- `app-admin/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router with `/`, `/login`, and `/dashboard`; calls `setSessionUser`
-  then `setDataReady`.
-- `app-ops/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router with `/`, `/login`, and `/dashboard`; calls `setSessionUser`, then `loadJobs()`,
-  then `setDataReady()` only after `jobsStore.isLoaded` is `true`.
-- `app-customer/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; uses
-  TanStack Router with `/`, `/login`, and `/dashboard`; calls `setSessionUser`
-  then `setDataReady`.
+- All Common UX artifacts conform to `architecture-ux.md` §6.3-§6.8.
+- `auth-guard.tsx` is generated at
+  `source/ux/common/components/shell/auth-guard.tsx`.
+- `app-admin/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; calls
+  `setSessionUser`, then `setDataReady`.
+- `app-ops/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`; calls
+  `setSessionUser`, then `loadJobs()`, then `setDataReady()` only after
+  `jobsStore.isLoaded` is `true`.
+- `app-customer/app.tsx`: imports `Config` from `@ux/config/ux-config.ts`;
+  calls `setSessionUser`, then `setDataReady`.
 - `jobs-store.ts`: shape uses `JobSummary[]` and `isLoaded`; `loadJobs()` stub
   sets `jobs: []` and `isLoaded: true` with TODO comment; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from `session-store.ts`

@@ -330,8 +330,8 @@ source/ux/
 │   │   │   └── login.tsx
 │   │   ├── forms/
 │   │   │   └── form-panel.tsx
-│   │   ├── auth-guard.tsx
 │   │   └── shell/
+│   │       ├── auth-guard.tsx
 │   │       └── content.tsx
 │   ├── lib/
 │   │   └── auth-supabase-client.ts
