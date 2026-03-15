@@ -1,4 +1,4 @@
-# Genesis Execution Model
+# Genesis Prompt -- Execution Model
 
 ## Purpose
 
