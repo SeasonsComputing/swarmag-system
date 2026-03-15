@@ -12,22 +12,6 @@ UX architectural patterns (component structure, state management, routing, etc.)
 
 ## 2. UX Applications
 
-### 2.1 Directory Structure
-
-```text
-ux/
-├── api/
-├── app-admin/
-├── app-customer/
-├── app-ops/
-├── common/
-│   ├── components/         # Shared UI components
-│   └── lib/                # Shared utilities
-└── config/
-```
-
-### 2.2 Applications
-
 The system includes three SolidJS applications:
 
 | Application  | Purpose                           | Primary Users    |
@@ -36,15 +20,7 @@ The system includes three SolidJS applications:
 | **Ops**      | Field execution                   | Operations crews |
 | **Customer** | Scheduling and status (read-only) | Customers        |
 
-#### 2.2.1 Shared Infrastructure
-
-- `source/ux/common/` - Shared components and utilities
-- All apps use SolidJS + TanStack + Kobalte + Vanilla CSS
-
-#### 2.2.2 Shared Infrastructure
-
-- `source/ux/common/` - Shared components and utilities
-- All apps use SolidJS + TanStack + Kobalte + Vanilla CSS
+All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Shared infrastructure lives in `source/ux/common/`.
 
 ## 3. API Namespace Integration
 
@@ -69,7 +45,7 @@ The foundation provides:
 
 #### 3.2.1 Type Safety
 
-- Import domain types from `@domain/abstractions/`
+- Import domain archetypes from `@domain` of abstractions, protocols, adapters, and validators
 - All API operations return typed domain objects
 - TypeScript strict mode enforced
 
@@ -87,12 +63,6 @@ The foundation provides:
 - Deep clone via `api.deepCloneJob` business rule
 - Log upload via `api.uploadJobLogs` business rule
 
-#### 3.2.4 Configuration
-
-- Per-app config module initializes `Config` singleton
-- Environment-specific `.env` files per deployment
-- See `architecture-core.md` Section 6 for pattern
-
 ## 4. Architectural Boundaries
 
 ### 4.1 Import Discipline
@@ -106,69 +76,32 @@ The foundation provides:
 
 **Aliases**
 
-- '@core/*' - Core modules
+- `@core/*` - Core modules
 - `@domain/*` - Domain modules
 - `@ux/common/*` - Shared UX modules
 - `@ux/config/*` - Configuration module
 - `@ux/app-{admin|ops|customer}/*` - Deployment-specific UX modules
 
-#### 4.1.2 UX applications MUST NOT import
+#### 4.1.2 Violations
 
-- `@back/*` - Backend
-
-#### 4.1.3 Violations detected by architectural guards are build failures.
+Violations detected by architectural guards are build failures.
 
 ### 4.2 Configuration Pattern
 
-Each application has its own configuration module:
+All applications import `Config` from `@ux/config/ux-config.ts` — never
+directly from `@core/cfg/config.ts`. Direct core imports in app files are
+a guard violation.
 
-```typescript
-// source/ux/app-admin/config/admin-config.ts
-import { Config } from '@core/cfg/config.ts'
-import { SolidProvider } from '@core/cfg/solid-provider.ts'
-
-Config.init(new SolidProvider(), [
-  'VITE_SUPABASE_EDGE_URL',
-  'VITE_SUPABASE_RDBMS_URL',
-  'VITE_SUPABASE_SERVICE_KEY',
-  'VITE_JWT_SECRET'
-], {
-  'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
-  'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
-  'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
-  'JWT_SECRET': 'VITE_JWT_SECRET'
-})
-
-export { Config }
-```
-
-#### 4.2.1 Pattern
-
-- Import `Config` singleton from `@core/cfg/config.ts`
-- Initialize with SolidProvider and required keys
-- Re-export for use within the app
-- Environment files: `{app}-local.env`, `{app}-stage.env`, `{app}-prod.env`
+- Update `ux-config.ts` keys and aliases as required env variables expand
+- Environment files: `local.env`, `stage.env`, `prod.env` at repo root
 
 ## 5. Application-Specific Notes
 
-### 5.1 Admin Application
-
-- **Runtime:** Browser (desktop/tablet optimized PWA)
-- **Storage:** Direct Supabase SDK via `api.Users`, `api.Jobs`, etc.
-- **Deployment:** Installable PWA via Netlify CDN
-
-### 5.2 Ops Application
-
-- **Runtime:** Browser (mobile-optimized PWA)
-- **Storage:** IndexedDB via `api.JobsLocal` when offline, Supabase when online
-- **Offline:** Uses deep-cloned Job aggregates, append-only logs
-- **Deployment:** Installable PWA via Netlify CDN
-
-### 5.3 Customer Application
-
-- **Runtime:** Browser (static site)
-- **Storage:** Direct Supabase SDK (read-only queries)
-- **Deployment:** Static files via Netlify CDN
+| App          | Runtime                      | Storage                            | Deployment           |
+| ------------ | ---------------------------- | ---------------------------------- | -------------------- |
+| **Admin**    | Browser (desktop/tablet PWA) | Supabase SDK                       | Netlify CDN (PWA)    |
+| **Ops**      | Browser (mobile PWA)         | IndexedDB offline, Supabase online | Netlify CDN (PWA)    |
+| **Customer** | Browser (static site)        | Supabase SDK (read-only)           | Netlify CDN (static) |
 
 ## 6. UX Architecture Patterns
 
@@ -225,28 +158,28 @@ route-level concern, not a per-component concern.
 
 ### 6.3 Authentication
 
-Authentication is handled by `authn-supabase-client.ts` — a singleton
-module that directly implements `ApiAuthnContract`. It is not a maker;
+Authentication is handled by `auth-supabase-client.ts` — a singleton
+module that directly implements `ApiAuthContract`. It is not a maker;
 there is exactly one auth implementation.
 
 ```text
-source/core/api/authn-supabase-client.ts
+source/ux/common/lib/auth-supabase-client.ts
 ```
 
-It is composed into the API namespace as `api.Authn`:
+It is composed into the API namespace as `api.Auth`:
 
 ```typescript
-import { authnClient } from '@core/api/authn-supabase-client.ts'
+import { authClient } from '@ux/common/lib/auth-supabase-client.ts'
 
-const api = {
-  Authn: authnClient,
+export const api = {
+  Auth: authClient,
   ...
 }
 ```
 
 #### 6.3.1 Auth State Binding
 
-`authn-supabase-client.ts` registers a Supabase `onAuthStateChange`
+`auth-supabase-client.ts` registers a Supabase `onAuthStateChange`
 listener at module load. On every auth event it writes the resolved
 session into `sessionStore`. This is the single binding point between
 Supabase Auth and SolidJS reactivity. No component touches Supabase Auth
@@ -256,24 +189,29 @@ Session termination events — token expiry, idle timeout, browser close —
 all flow through `onAuthStateChange`. The store reacts identically in
 every case: clear to unauthenticated, guard redirects to login.
 
-#### 6.3.2 Logon Flow
+#### 6.3.2 OTP Flow
+
+All apps use passwordless email OTP. No passwords are stored or transmitted.
 
 ```text
-user submits credentials
-  → api.Authn.logon(credentials)
-  → Supabase signInWithPassword
-  → fetch domain user via api.Users.get(uid)
-  → return Session { user }
+user submits email
+  → api.Auth.sendOtp(email)
+  → Supabase delivers one-time code to email address
+  → user submits code
+  → api.Auth.verifyOtp(email, code)
+  → returns Session { userId }
   → onAuthStateChange fires
   → sessionStore updated
   → auth guard reacts → renders dashboard
+  → app shell calls api.hydrateUser(userId)
+  → sessionStore.user populated
 ```
 
 #### 6.3.3 Logout Flow
 
 ```text
 user triggers logout
-  → api.Authn.logout()
+  → api.Auth.logout()
   → Supabase signOut
   → onAuthStateChange fires
   → sessionStore cleared
@@ -287,17 +225,20 @@ The session store is a SolidJS store shared across all apps via
 
 ```typescript
 type SessionStore = {
-  user: User | null
+  userId: Id | null
+  user: User | null            // hydrated after auth via api.hydrateUser(userId)
   isAuthenticated: boolean
-  isLoading: boolean // true during initial Supabase session check on boot
-  isDataReady: boolean // true when app is ready to render dashboard
+  isLoading: boolean           // true during initial session check on boot
+  isDataReady: boolean         // true when app is ready to render dashboard
 }
 ```
 
 - `isLoading` prevents a flash of the login screen for already-authenticated
   users on page load — the shell renders nothing until the boot check resolves
-- `isDataReady` is set `true` by Admin immediately on session establishment;
-  set `true` by Ops only after idb job hydration completes
+- `userId` is set immediately from `Session` on auth; `user` is populated
+  after `api.hydrateUser(userId)` resolves
+- `isDataReady` is set `true` by Admin and Customer immediately on session
+  establishment; set `true` by Ops only after the idb job manifest load completes
 - No component reads from Supabase Auth directly — all session state is
   consumed from this store
 
@@ -316,17 +257,7 @@ Each app owns its own named idb store. Stores are not shared across apps.
 | `swarmag-ops-app`      | Ops      | dashboard layout, panel config, theme, job aggregates |
 | `swarmag-customer-app` | Customer | dashboard layout, theme                               |
 
-#### 6.5.2 App State Keys
-
-App state within each store is a `Dictionary` with namespaced string keys:
-
-```text
-swarmag-ops-app:theme
-swarmag-ops-app:dashboard:layout
-swarmag-ops-app:dashboard:panels
-```
-
-#### 6.5.3 Key Principle
+#### 6.5.2 Key Principle
 
 User metadata (preferences, layout, theme) lives in idb, not in the
 `users` table. It is device-specific and not business data. The `users`
@@ -388,48 +319,45 @@ Premature generalization is a violation.
 
 ```text
 source/ux/
-  api/
-    api.ts
-    api-authn-contract.ts
-
-  config/
-    ux-config.ts
-
-  common/
-    components/
-      login/
-        login.tsx
-      forms/
-        form-panel.tsx
-      auth-guard.tsx
-      shell/
-        content.tsx
-    stores/
-      session-store.ts
-      app-state-store.ts
-
-  app-admin/
-    index.html
-    vite.config.ts
-    app.tsx
-    dashboard/
-      dashboard.tsx
-
-  app-ops/
-    index.html
-    vite.config.ts
-    app.tsx
-    dashboard/
-      dashboard.tsx
-    stores/
-      jobs-store.ts
-
-  app-customer/
-    index.html
-    vite.config.ts
-    app.tsx
-    dashboard/
-      dashboard.tsx
+├── api/
+│   ├── api.ts
+│   └── api-auth-contract.ts
+├── config/
+│   └── ux-config.ts
+├── common/
+│   ├── components/
+│   │   ├── login/
+│   │   │   └── login.tsx
+│   │   ├── forms/
+│   │   │   └── form-panel.tsx
+│   │   ├── auth-guard.tsx
+│   │   └── shell/
+│   │       └── content.tsx
+│   ├── lib/
+│   │   └── auth-supabase-client.ts
+│   └── stores/
+│       ├── session-store.ts
+│       └── app-state-store.ts
+├── app-admin/
+│   ├── index.html
+│   ├── vite.config.ts
+│   ├── app.tsx
+│   └── dashboard/
+│       └── dashboard.tsx
+├── app-ops/
+│   ├── index.html
+│   ├── vite.config.ts
+│   ├── app.tsx
+│   ├── dashboard/
+│   │   └── dashboard.tsx
+│   └── stores/
+│       └── jobs-store.ts
+└── app-customer/
+    ├── index.html
+    ├── vite.config.ts
+    ├── app.tsx
+    └── dashboard/
+        └── dashboard.tsx
 ```
 
 ### 6.9 Build Composition
@@ -467,7 +395,6 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/config
 2. **Types flow from domain** - All data structures defined in `@domain/abstractions/`
 3. **Storage is transparent** - Client makers handle Supabase, IndexedDB, HTTP
 4. **Import discipline enforced** - Architectural guards prevent boundary violations
-5. **Configuration is explicit** - Per-app config modules, no magic globals
-6. **UX patterns emerge** - Document architecture after iteration, not before
+5. **UX patterns emerge** - Document architecture after iteration, not before
 
 _End of Architecture UX Document_
