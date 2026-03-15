@@ -16,6 +16,12 @@ Authoritative source set, in order:
 
 Do not restate or fork these rules in this prompt. This prompt is orchestration only.
 
+## RUN BLOCKER -- DELETE BEFORE EXECUTION
+
+This prompt is genesis-only and must be run exactly once for UX scaffold bootstrap.
+Do not execute while this section exists. The operator must delete this section
+before running the prompt.
+
 ## 2. Task Contract
 
 The UX scaffold is the foundational layer of all three deployed applications:
@@ -23,11 +29,10 @@ The UX scaffold is the foundational layer of all three deployed applications:
 `common/` and the minimal application shell for each app — enough to boot,
 authenticate, and render a dashboard. No domain pages are generated here.
 
-Always prompt the user to determine if this is a "genesis" run or not. If it is a
-genesis run, remove all existing artifacts under `source/ux/common/`,
-`source/ux/app-admin/`, `source/ux/app-ops/`, and `source/ux/app-customer/` before
-generation. Genesis supplants all prior knowledge; treat every file as if being
-written for the first time.
+Genesis supplants all prior knowledge; treat every file as if being written for
+the first time.
+For any scaffold-created leaf directory with no implementation file yet, add
+`placeholder.txt`.
 
 Next proceed generation in the following phase order.
 
@@ -186,7 +191,7 @@ Application root.
   - `/` → redirect to `/dashboard` or `/login` based on auth state
   - `/login` → `<Login><AdminContactField /></Login>`
   - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
-  - `/[domain]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
+  - `/[tbd]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
 - `<Shell>` renders `<Content>` with `<Dashboard />` inside.
 - Boot sequence after authentication:
   1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
@@ -264,7 +269,7 @@ Application root.
   - `/` → redirect to `/dashboard` or `/login` based on auth state
   - `/login` → `<Login><OpsContactField /></Login>`
   - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
-  - `/[domain]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
+  - `/[tbd]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
 - `<Shell>` renders `<Content>` with `<Dashboard />` inside.
 - Boot sequence after authentication:
   1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
@@ -318,7 +323,7 @@ Application root.
   - `/` → redirect to `/dashboard` or `/login` based on auth state
   - `/login` → `<Login><CustomerContactField /></Login>`
   - `/dashboard` → `<AuthGuard><Shell /></AuthGuard>` (renders `<Dashboard />`)
-  - `/[domain]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
+  - `/[tbd]` → `<AuthGuard><Shell /></AuthGuard>` (domain pages, added later)
 - `<Shell>` renders `<Content>` with `<Dashboard />` inside.
 - Boot sequence after authentication:
   1. Call `api.hydrateUser(sessionStore.userId)` and pass result to
@@ -335,8 +340,8 @@ Customer dashboard stub.
 ## 3. Execution Contract
 
 1. Ingest the authority set in §1.
-2. If genesis run: remove all artifacts under `source/ux/common/`,
-   `source/ux/app-admin/`, `source/ux/app-ops/`, and `source/ux/app-customer/`.
+2. Remove all artifacts under `source/ux/common/`, `source/ux/app-admin/`,
+   `source/ux/app-ops/`, and `source/ux/app-customer/`.
 3. **Phase I:** Generate all `common/` files.
 4. **Phase II:** Generate `app-admin/` files.
 5. **Phase III:** Generate `app-ops/` files.
