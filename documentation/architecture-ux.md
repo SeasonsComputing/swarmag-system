@@ -97,11 +97,11 @@ a guard violation.
 
 ## 5. Application-Specific Notes
 
-| App          | Runtime                      | Storage                            | Deployment           |
-| ------------ | ---------------------------- | ---------------------------------- | -------------------- |
-| **Admin**    | Browser (desktop/tablet PWA) | Supabase SDK                       | Netlify CDN (PWA)    |
-| **Ops**      | Browser (mobile PWA)         | IndexedDB offline, Supabase online | Netlify CDN (PWA)    |
-| **Customer** | Browser (static site)        | Supabase SDK (read-only)           | Netlify CDN (static) |
+| App          | Runtime                      | Storage                              | Deployment            |
+| ------------ | ---------------------------- | ------------------------------------ | --------------------- |
+| **Admin**    | Browser (desktop/tablet PWA) | Supabase SDK                         | Netlify CDN (PWA)     |
+| **Ops**      | Browser (mobile PWA)         | IndexedDB offline, Supabase online   | Netlify CDN (PWA)     |
+| **Customer** | Browser (static site)        | Supabase SDK (read-only)             | Netlify CDN (static)  |
 
 ## 6. UX Architecture Patterns
 
