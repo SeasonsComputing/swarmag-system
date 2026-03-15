@@ -11,24 +11,28 @@ export class Supabase {
   static #cache: SupabaseClient | null = null
 
   /**
-   * Return a singleton Supabase service client configured from environment variables.
+   * Return a singleton Supabase client configured from environment variables.
+   * Auth options are determined by SUPABASE_CLIENT_MODE: 'browser' | 'edge'.
    * @returns Reusable Supabase client.
    * @throws When required credentials are missing.
    */
   static client(): SupabaseClient {
-    if (Supabase.#cache == null) {
-      Supabase.#cache = createClient(
-        Config.get('SUPABASE_RDBMS_URL'),
-        Config.get('SUPABASE_SERVICE_KEY'),
-        {
-          auth: {
-            persistSession: false,
-            autoRefreshToken: false,
-            detectSessionInUrl: false
-          }
-        }
-      )
+    if (Supabase.#cache) return Supabase.#cache
+
+    // Supabase client parameters
+    const isBrowser = Config.get('SUPABASE_CLIENT_MODE') === 'browser'
+    const key = isBrowser
+      ? Config.get('SUPABASE_ANON_KEY')
+      : Config.get('SUPABASE_SERVICE_KEY')
+    const url = Config.get('SUPABASE_RDBMS_URL')
+    const auth = {
+      persistSession: isBrowser,
+      autoRefreshToken: isBrowser,
+      detectSessionInUrl: isBrowser
     }
+
+    // connect and cache client
+    Supabase.#cache = createClient(url, key, { auth })
     return Supabase.#cache
   }
 }
