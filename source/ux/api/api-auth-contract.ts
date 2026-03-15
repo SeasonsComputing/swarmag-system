@@ -1,5 +1,5 @@
 /**
- * Authentication (AuthN) API contract.
+ * Authentication (Auth) API contract.
  */
 
 import type { Id } from '@core/std'
@@ -12,7 +12,7 @@ export type Session = { userId: Id }
  * Step 1 — sendOtp: delivers a one-time code to the provided email address.
  * Step 2 — verifyOtp: validates the code and returns an authenticated session.
  */
-export interface ApiAuthnContract {
+export interface ApiAuthContract {
   sendOtp(email: string): Promise<void>
   verifyOtp(email: string, code: string): Promise<Session>
   logout(): Promise<void>
