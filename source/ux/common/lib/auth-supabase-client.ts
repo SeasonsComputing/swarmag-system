@@ -1,18 +1,18 @@
 /**
- * Supabase implementation of ApiAuthnContract.
+ * Supabase implementation of ApiAuthContract.
  * Registers onAuthStateChange at module load; writes session into sessionStore.
  */
 
 import { Supabase } from '@core/db/supabase.ts'
 import type { Id } from '@core/std'
-import type { ApiAuthnContract, Session } from '@ux/api/api-authn-contract.ts'
+import type { ApiAuthContract, Session } from '@ux/api/api-auth-contract.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Supabase passwordless OTP auth client. Implements ApiAuthnContract. */
-export const authnClient: ApiAuthnContract = {
+/** Supabase passwordless OTP auth client. Implements ApiAuthContract. */
+export const authClient: ApiAuthContract = {
   /** Sends a one-time code to the provided email address via Supabase Auth. */
   async sendOtp(email: string): Promise<void> {
     const { error } = await Supabase.client().auth.signInWithOtp({ email })

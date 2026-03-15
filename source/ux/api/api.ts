@@ -7,10 +7,10 @@ import type { Id } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 import { fromUser, toUser } from '@domain/adapters/user-adapter.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
-import { authnClient } from '@ux/common/lib/authn-supabase-client.ts'
+import { authClient } from '@ux/common/lib/auth-supabase-client.ts'
 
 export const api = {
-  Auth: authnClient,
+  Auth: authClient,
 
   Users: makeCrudSupabaseClient<User, UserCreate, UserUpdate>({
     table: 'users',
