@@ -2,7 +2,7 @@
 
 # swarmAg Operations System — Domain Seed Data
 
-Canonical lists used to seed and align catalog data (services, asset types). 
+Canonical lists used to seed and align catalog data (services, asset types).
 Service SKUs and asset types should stay in sync with `source/domain` and any persisted records.
 
 ## 1. Services
