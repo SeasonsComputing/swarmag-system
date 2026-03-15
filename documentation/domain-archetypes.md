@@ -598,3 +598,5 @@ CREATE TABLE job_workflows (
   deleted_at           TIMESTAMPTZ
 );
 ```
+
+_End of Domain Archetypes Document_

@@ -302,4 +302,5 @@ Before reporting `STYLE_AUDIT: PASS`:
 - All section headers use the canonical width per `style-guide.md` §6.4.
 - No `@back/*` imports anywhere in `source/ux/`.
 - `deno task check` exits clean.
--
+
+_End of Genesis Prompt for UX Application Scaffolding Document_

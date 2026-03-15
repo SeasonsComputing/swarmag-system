@@ -1,8 +1,9 @@
 ![swarmAg Operations System](../swarmag-ops-logo.png)
 
-# swarmAg Operations System — Data Lists
+# swarmAg Operations System — Domain Seed Data
 
-Canonical lists used to seed and align catalog data (services, asset types). Service SKUs and asset types should stay in sync with `source/domain` and any persisted records.
+Canonical lists used to seed and align catalog data (services, asset types). 
+Service SKUs and asset types should stay in sync with `source/domain` and any persisted records.
 
 ## 1. Services
 
@@ -62,3 +63,5 @@ Canonical `Question` instances with `type = 'internal'` used for system-generate
 | execution.crewCount                      | number      |
 | response.skipped                         | boolean     |
 | response.skipReason                      | text        |
+
+_End of Domain Seed Data Document_

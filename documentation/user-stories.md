@@ -1,3 +1,5 @@
+![swarmAg Operations System](../swarmag-ops-logo.png)
+
 # swarmAg Operations System – User Stories
 
 ## 1 Customer Relationship Management
@@ -83,3 +85,5 @@
 2.
 
 ## 9. User Management
+
+_End of User Stories Document_
