@@ -148,3 +148,5 @@ Before reporting `SCHEMA_AUDIT: PASS`:
 - `source/devops/genesis/seed-ids.txt` was rotated, populated, consumed in order, and deleted
 - No `VARCHAR(n)`, no bare `TIMESTAMP`
 - Both lint and runtime applies succeed with `ON_ERROR_STOP=1`
+
+_End of Genesis Prompt for Domain Archetypes Document_

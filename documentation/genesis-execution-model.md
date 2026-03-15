@@ -30,3 +30,5 @@ Clarify the genesis workflow and the separation of concerns between orchestratio
 
 - Prompt files contain **policy and workflow**, not generation logic.
 - Generator scripts (when they exist) contain **generation logic**, not governance prose.
+
+_End of Genesis Prompt for Execution Model_

@@ -182,3 +182,5 @@ These types provide consistency and clarity without imposing storage or transpor
 - No runtime dependencies beyond `@core/std`.
 - This package is the **single source of truth** for domain types. All other code (ux, edge functions) must import from `source/domain`.
 - Id strategy: UUID v7 for all PK/FK; application always supplies the ID — no database-generated defaults.
+
+_End of Domain Model Document_

@@ -1,4 +1,4 @@
-![Seasons Computing logo](../../seasonscomputing-logo.png)
+![Seasons Computing logo](../seasonscomputing-logo.png)
 
 # Coding Style Guide, Standards & Conventions
 
@@ -581,3 +581,5 @@ source/tests/
 - `fixtures-test.ts` — validates fixture integrity: Id format, required fields, association linkage. If a fixture fails here the domain types have drifted.
 - Tests exercise the public contract of each layer, not implementation details.
 - Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.
+
+_End of Style Guide Document_

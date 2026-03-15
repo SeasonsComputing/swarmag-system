@@ -96,9 +96,9 @@ The agenda is the contract.
 
 ## 4. Architectural Law
 
-Architectural law — persistence modeling, domain authority, directionality, deletion semantics, and identifier conventions — is defined in `architecture-core.md`. That document is the authoritative reference for all structural and invariant rules.
+Architectural law — persistence modeling, domain authority, directionality, deletion semantics, and identifier conventions — is defined in an architecture document, typically `architecture.md` or `architecture-core.md`. The architecture document is the authoritative reference for all structural and invariant rules.
 
-In case of conflict between any other document and `architecture-core.md`, `architecture-core.md` governs. In case of conflict between `architecture-core.md` and this Constitution, this Constitution governs.
+In case of conflict between any other document and this Constitution, this Constitution governs.
 
 ## 5. Interpretation and Enforcement
 
@@ -124,4 +124,4 @@ All rules, authority, and expectations are now centralized here.
 
 Compliance with this Constitution is a condition of participation for both human and artificial contributors.
 
-**End of Constitution**
+_End of Constitution Document_
