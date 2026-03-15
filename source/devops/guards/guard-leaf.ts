@@ -11,6 +11,17 @@ const TARGET_DIRS = [`${ROOT}/source`, `${ROOT}/documentation`]
 /** Directory names to skip during traversal. */
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
+/** Non-leaf package roots that may contain both files and subdirectories. */
+const ALLOWED_NON_LEAF_DIRS = new Set([
+  `${ROOT}/source/ux/app-admin`,
+  `${ROOT}/source/ux/app-ops`,
+  `${ROOT}/source/ux/app-customer`,
+  `${ROOT}/source/back/supabase-edge`
+])
+
+/** Normalize path separators for stable comparisons across platforms. */
+const normalizePath = (value: string): string => value.replaceAll('\\', '/')
+
 /** Collect violations for files in non-leaf directories. */
 const collectViolations = async (dir: string): Promise<string[]> => {
   const violations: string[] = []
@@ -28,7 +39,7 @@ const collectViolations = async (dir: string): Promise<string[]> => {
     }
   }
 
-  if (hasSubdirs && files.length > 0) {
+  if (hasSubdirs && files.length > 0 && !ALLOWED_NON_LEAF_DIRS.has(normalizePath(dir))) {
     for (const file of files) {
       const relative = file.replace(`${ROOT}/`, '')
       violations.push(`${relative} lives in a non-leaf directory`)
