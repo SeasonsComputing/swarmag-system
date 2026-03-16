@@ -46,6 +46,9 @@ A Job Work Log memorializes the physical execution of a Job. Logs are append-onl
 
 A Job has an Assessment, a Plan, and a collection of Log entries. Log entries are created during the execution of a Job, by a User, and are appended to the Job's Log. There are no circular foreign keys; Assessments, Plans, and Logs reference the Job.
 
+Temporal attributes follow a consistent pattern across assessment, plan and work phases. Scheduled timestamps are persisted as well as actual start timestamps.
+Actual timestamps — started and completed — are recorded in the field and are never backfilled from scheduled values.
+
 ### 2.5 Job Workflow & Job Work
 
 Work is the physical execution of a Job. It produces the progress and knowledge captured by field crews during a job. Work is directed by a sequence of Workflows. Each Workflow and its associated Tasks and Questions are a template used to assess and plan the job.
