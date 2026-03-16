@@ -671,6 +671,14 @@ Purpose: **Pre-planning job assessment; requires one or more locations**
 
 Type: **Instantiable**
 
+Attributes: **State**
+
+| **Attribute**  | **Type** |
+| -------------- | -------- |
+| `scheduledAt`  | When     |
+| `startedAt?`   | When     |
+| `completedAt?` | When     |
+
 Attributes: **Relations**
 
 | **Attribute** | **Relation**        | **Abstraction** |
@@ -711,10 +719,10 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**    | **Type** |
-| ---------------- | -------- |
-| `scheduledStart` | When     |
-| `scheduledEnd?`  | When     |
+| **Attribute**      | **Type** |
+| ------------------ | -------- |
+| `scheduledStart`   | When     |
+| `durationEstimate` | number   |
 
 ### 11.6 JobPlanAssignment
 
