@@ -79,6 +79,9 @@ export const toJobAssessment = (dict: Dictionary): JobAssessment => ({
   deletedAt: dict.deleted_at as When | undefined,
   jobId: dict.job_id as Id,
   assessorId: dict.assessor_id as Id,
+  scheduledAt: dict.scheduled_at as When,
+  startedAt: dict.started_at as When | undefined,
+  completedAt: dict.completed_at as When | undefined,
   locations: (dict.locations as Dictionary[]).map(toLocation),
   risks: (dict.risks as Dictionary[]).map(toNote),
   notes: (dict.notes as Dictionary[]).map(toNote)
@@ -92,6 +95,9 @@ export const fromJobAssessment = (jobAssessment: JobAssessment): Dictionary => (
   deleted_at: jobAssessment.deletedAt,
   job_id: jobAssessment.jobId,
   assessor_id: jobAssessment.assessorId,
+  scheduled_at: jobAssessment.scheduledAt,
+  started_at: jobAssessment.startedAt,
+  completed_at: jobAssessment.completedAt,
   locations: jobAssessment.locations.map(fromLocation),
   risks: jobAssessment.risks.map(fromNote),
   notes: jobAssessment.notes.map(fromNote)
@@ -129,7 +135,7 @@ export const toJobPlan = (dict: Dictionary): JobPlan => ({
   plannerId: dict.planner_id as Id,
   notes: (dict.notes as Dictionary[]).map(toNote),
   scheduledStart: dict.scheduled_start as When,
-  scheduledEnd: dict.scheduled_end as When | undefined
+  durationEstimate: dict.duration_estimate as number
 })
 
 /** Serialize JobPlan to Dictionary. */
@@ -142,7 +148,7 @@ export const fromJobPlan = (jobPlan: JobPlan): Dictionary => ({
   planner_id: jobPlan.plannerId,
   notes: jobPlan.notes.map(fromNote),
   scheduled_start: jobPlan.scheduledStart,
-  scheduled_end: jobPlan.scheduledEnd
+  duration_estimate: jobPlan.durationEstimate
 })
 
 /** Deserialize JobPlanAssignment from Dictionary. */
