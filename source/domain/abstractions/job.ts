@@ -69,6 +69,9 @@ export type Job = Instantiable & {
 export type JobAssessment = Instantiable & {
   jobId: AssociationOne<Job>
   assessorId: AssociationOne<User>
+  scheduledAt: When
+  startedAt?: When
+  completedAt?: When
   locations: CompositionPositive<Location>
   risks: CompositionMany<Note>
   notes: CompositionMany<Note>
@@ -87,7 +90,7 @@ export type JobPlan = Instantiable & {
   plannerId: AssociationOne<User>
   notes: CompositionMany<Note>
   scheduledStart: When
-  scheduledEnd?: When
+  durationEstimate: number
 }
 
 /** Planned user assignment for a job plan. */

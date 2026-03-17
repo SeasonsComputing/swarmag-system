@@ -15,6 +15,7 @@ export const ranchMappingAssessment: JobAssessment = {
   id: assessmentId,
   jobId,
   assessorId,
+  scheduledAt: '2025-01-12T13:30:00Z',
   locations: [{
     latitude: 31.9686,
     longitude: -99.9018,

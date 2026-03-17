@@ -88,6 +88,9 @@ export const validateJobAssessmentCreate = (input: JobAssessmentCreate): ExpectR
   expectValid(
     expectId(input.jobId, 'jobId'),
     expectId(input.assessorId, 'assessorId'),
+    expectWhen(input.scheduledAt, 'scheduledAt'),
+    expectWhen(input.startedAt, 'startedAt', true),
+    expectWhen(input.completedAt, 'completedAt', true),
     expectCompositionPositive(input.locations, 'locations', isObject),
     expectCompositionMany(input.risks, 'risks', isObject),
     expectCompositionMany(input.notes, 'notes', isObject)
@@ -99,6 +102,9 @@ export const validateJobAssessmentUpdate = (input: JobAssessmentUpdate): ExpectR
     expectId(input.id, 'id'),
     expectId(input.jobId, 'jobId', true),
     expectId(input.assessorId, 'assessorId', true),
+    expectWhen(input.scheduledAt, 'scheduledAt', true),
+    expectWhen(input.startedAt, 'startedAt', true),
+    expectWhen(input.completedAt, 'completedAt', true),
     expectCompositionPositive(input.locations, 'locations', isObject, true),
     expectCompositionMany(input.risks, 'risks', isObject, true),
     expectCompositionMany(input.notes, 'notes', isObject, true)
@@ -128,7 +134,7 @@ export const validateJobPlanCreate = (input: JobPlanCreate): ExpectResult =>
     expectId(input.plannerId, 'plannerId'),
     expectCompositionMany(input.notes, 'notes', isObject),
     expectWhen(input.scheduledStart, 'scheduledStart'),
-    expectWhen(input.scheduledEnd, 'scheduledEnd', true)
+    expectPositiveNumber(input.durationEstimate, 'durationEstimate')
   )
 
 /** Validate JobPlanUpdate payloads. */
@@ -139,7 +145,7 @@ export const validateJobPlanUpdate = (input: JobPlanUpdate): ExpectResult =>
     expectId(input.plannerId, 'plannerId', true),
     expectCompositionMany(input.notes, 'notes', isObject, true),
     expectWhen(input.scheduledStart, 'scheduledStart', true),
-    expectWhen(input.scheduledEnd, 'scheduledEnd', true)
+    expectPositiveNumber(input.durationEstimate, 'durationEstimate', true)
   )
 
 /** Validate JobPlanAssignmentCreate payloads. */
