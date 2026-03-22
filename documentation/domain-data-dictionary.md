@@ -6,9 +6,9 @@
 
 This document is the normalized reference for domain abstraction types, relations, and state attributes.
 
-It is derived from `domain.md` and presents the same model in a table-first, implementation-ready format for use in topic artifact productions -- Abstractions -- and the archetypes -- Adapters, Protocols, Validators and Schema -- that are tightly coupled to them.
+It is derived from `domain-model.md` and presents the same model in a table-first, implementation-ready format for use in topic artifact productions -- Abstractions -- and the archetypes -- Adapters, Protocols, Validators and Schema -- that are tightly coupled to them.
 
-The `domain.md` and `domain-data-dictionary.md` go hand-in-hand in mapping a conceptual solution space to physical artifacts that codify the solution as software.
+The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping a conceptual solution space to physical artifacts that codify the solution as software.
 
 ## 2. Topic Namespace
 

@@ -11,7 +11,7 @@ Authoritative source set, in order:
 1. `CONSTITUTION.md`
 2. `documentation/architecture-core.md`
 3. `documentation/architecture-ux.md`
-4. `documentation/domain.md`
+4. `documentation/domain-model.md`
 5. `documentation/style-guide.md`
 
 Do not restate or fork these rules in this prompt. This prompt is orchestration only.
