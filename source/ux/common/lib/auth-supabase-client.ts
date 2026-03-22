@@ -12,7 +12,7 @@ import type { ApiAuthContract, Session } from '@ux/api/api-auth-contract.ts'
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Supabase passwordless OTP auth client. Implements ApiAuthContract. */
-export const authClient: ApiAuthContract = {
+export const AuthSupabaseClient: ApiAuthContract = {
   /** Sends a one-time code to the provided email address via Supabase Auth. */
   async sendOtp(email: string): Promise<void> {
     const { error } = await Supabase.client().auth.signInWithOtp({ email })
