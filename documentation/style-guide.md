@@ -163,7 +163,7 @@ validateUserUpdate(input)  Validate UserUpdate payloads.
 - Subsection header (e.g. PURPOSE, PUBLIC)
   - 1 blank line prior to subsection
   - Subsection heading in ALL CAPS
-  - 1 masc-length dash-rule after the header
+  - 1 max-length dash-rule after the header
 - Headers stay current. A stale header is worse than no header.
 
 ### 6.4 Section header
