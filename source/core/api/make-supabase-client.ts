@@ -16,14 +16,7 @@ makeCrudSupabaseClient(spec)          Build CRUD/list client over Supabase.
 */
 
 import { Supabase } from '@core/db/supabase.ts'
-import {
-  type Dictionary,
-  type Id,
-  instance,
-  type Instantiable,
-  type When,
-  when
-} from '@core/std'
+import { type Dictionary, type Id, instance, type Instantiable, type When, when } from '@core/std'
 import type { PostgrestError } from '@supabase/client'
 import {
   type ApiCrudContract,

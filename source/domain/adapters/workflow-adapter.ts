@@ -21,12 +21,7 @@ fromWorkflowTask                    Serialize WorkflowTask to Dictionary.
 */
 
 import type { Dictionary, Id, When } from '@core/std'
-import type {
-  Task,
-  TaskQuestion,
-  Workflow,
-  WorkflowTask
-} from '@domain/abstractions/workflow.ts'
+import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
 /** Deserialize Task from Dictionary. */

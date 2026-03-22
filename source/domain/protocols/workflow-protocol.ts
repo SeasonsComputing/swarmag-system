@@ -19,12 +19,7 @@ WorkflowTaskCreate                 Create payload contract for WorkflowTask.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
-import type {
-  Task,
-  TaskQuestion,
-  Workflow,
-  WorkflowTask
-} from '@domain/abstractions/workflow.ts'
+import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
 
 /** Create payload contract for Task. */
 export type TaskCreate = CreateFromInstantiable<Task>

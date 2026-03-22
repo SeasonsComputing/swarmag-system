@@ -296,8 +296,7 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isUserRole = (v: unknown): v is UserRole =>
-  expectConstEnum(v, 'role', USER_ROLES) === null
+const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
 ```
 
 ### 5.3 Union-Type Validation
@@ -373,8 +372,7 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isUserRole = (v: unknown): v is UserRole =>
-  expectConstEnum(v, 'role', USER_ROLES) === null
+const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
 ```
 
 ## 6. Adapters

@@ -58,20 +58,20 @@ provider selection.
 
 All entries in `source/ux/api/api.ts`:
 
-| Entry                  | Kind              | Purpose                                                    |
-| ---------------------- | ----------------- | ---------------------------------------------------------- |
-| `api.Auth`             | `ApiAuthContract` | Passwordless OTP auth; session management                  |
-| `api.Users`            | `ApiCrudContract` | User CRUD via Supabase                                     |
-| `api.Assets`           | `ApiCrudContract` | Asset CRUD via Supabase                                    |
-| `api.Chemicals`        | `ApiCrudContract` | Chemical CRUD via Supabase                                 |
-| `api.Customers`        | `ApiCrudContract` | Customer CRUD via Supabase                                 |
-| `api.Services`         | `ApiCrudContract` | Service CRUD via Supabase                                  |
-| `api.Workflows`        | `ApiCrudContract` | Workflow CRUD via Supabase                                 |
-| `api.Jobs`             | `ApiCrudContract` | Job CRUD via Supabase                                      |
-| `api.JobsLocal`        | `ApiCrudContract` | Job aggregate CRUD via IndexedDB (field execution)         |
-| `api.deepCloneJob`     | `ApiBusRuleContract` | Clone job aggregate to IndexedDB for field execution    |
-| `api.uploadJobLogs`    | `ApiBusRuleContract` | Bulk append field logs to remote                        |
-| `api.createJobTitle`   | method            | Derive display title string from a `JobDefinition`         |
+| Entry                | Kind                 | Purpose                                              |
+| -------------------- | -------------------- | ---------------------------------------------------- |
+| `api.Auth`           | `ApiAuthContract`    | Passwordless OTP auth; session management            |
+| `api.Users`          | `ApiCrudContract`    | User CRUD via Supabase                               |
+| `api.Assets`         | `ApiCrudContract`    | Asset CRUD via Supabase                              |
+| `api.Chemicals`      | `ApiCrudContract`    | Chemical CRUD via Supabase                           |
+| `api.Customers`      | `ApiCrudContract`    | Customer CRUD via Supabase                           |
+| `api.Services`       | `ApiCrudContract`    | Service CRUD via Supabase                            |
+| `api.Workflows`      | `ApiCrudContract`    | Workflow CRUD via Supabase                           |
+| `api.Jobs`           | `ApiCrudContract`    | Job CRUD via Supabase                                |
+| `api.JobsLocal`      | `ApiCrudContract`    | Job aggregate CRUD via IndexedDB (field execution)   |
+| `api.deepCloneJob`   | `ApiBusRuleContract` | Clone job aggregate to IndexedDB for field execution |
+| `api.uploadJobLogs`  | `ApiBusRuleContract` | Bulk append field logs to remote                     |
+| `api.createJobTitle` | method               | Derive display title string from a `JobDefinition`   |
 
 #### 3.2.1 `api.createJobTitle`
 
@@ -246,7 +246,7 @@ user submits email
   → Supabase delivers one-time code to email address
   → user submits code
   → api.Auth.verifyOtp(email, code)
-  → returns Session { userId }
+  → returns Session { userId } // true when app is ready to render dashboard
   → onAuthStateChange fires
   → sessionStore updated
   → auth guard reacts → renders dashboard
@@ -274,10 +274,10 @@ The session store is a SolidJS store shared across all apps via
 ```typescript
 type SessionStore = {
   userId: Id | null
-  user: User | null        // populated after auth via api.Users.get(userId)
+  user: User | null
   isAuthenticated: boolean
-  isLoading: boolean       // true during initial session check on boot
-  isDataReady: boolean     // true when app is ready to render dashboard
+  isLoading: boolean
+  isDataReady: boolean
 }
 ```
 
@@ -306,12 +306,10 @@ export const [sessionStore, setSessionStore] = createStore<SessionStore>({
 })
 
 /** Set the hydrated domain User after successful authentication. */
-export const setSessionUser = (user: User): void =>
-  setSessionStore('user', user)
+export const setSessionUser = (user: User): void => setSessionStore('user', user)
 
 /** Signal that all boot-time data is loaded and the app is ready to render. */
-export const setDataReady = (): void =>
-  setSessionStore('isDataReady', true)
+export const setDataReady = (): void => setSessionStore('isDataReady', true)
 ```
 
 ### 6.5 IndexedDb Usage

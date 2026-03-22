@@ -37,8 +37,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
   return entries
 }
 
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const exists = async (path: string): Promise<boolean> => {
   try {

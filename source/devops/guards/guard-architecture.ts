@@ -121,8 +121,7 @@ const findImports = (source: string): Array<{ specifier: string; index: number }
   return imports
 }
 
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const isUxAppFile = (file: string): boolean => {
   const normalized = normalizePath(file)

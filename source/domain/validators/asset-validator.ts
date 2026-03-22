@@ -79,5 +79,4 @@ export const validateAssetUpdate = (input: AssetUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isObject = (value: unknown): value is AssetStatus =>
-  value !== null && typeof value === 'object'
+const isObject = (value: unknown): value is AssetStatus => value !== null && typeof value === 'object'

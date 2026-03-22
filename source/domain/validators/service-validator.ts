@@ -75,6 +75,5 @@ export const validateServiceRequiredAssetTypeCreate = (
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isObject = (value: unknown): value is object =>
-  value !== null && typeof value === 'object'
+const isObject = (value: unknown): value is object => value !== null && typeof value === 'object'
 const isString = (value: unknown): value is string => typeof value === 'string'

@@ -66,5 +66,4 @@ export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isObject = (value: unknown): value is object =>
-  value !== null && typeof value === 'object'
+const isObject = (value: unknown): value is object => value !== null && typeof value === 'object'
