@@ -61,8 +61,7 @@ export const isCompositionMany = <T>(
 export const isCompositionPositive = <T>(
   value: unknown,
   guard: (v: unknown) => v is T
-): value is CompositionPositive<T> =>
-  Array.isArray(value) && value.length >= 1 && value.every(guard)
+): value is CompositionPositive<T> => Array.isArray(value) && value.length >= 1 && value.every(guard)
 
 /**
  * Extracts the single value from a CompositionOne.
@@ -89,9 +88,7 @@ export type AssociationOne<_T> = Id
  * Phantom type parameter T documents the referenced abstraction.
  * Resolves to Id | undefined at runtime.
  */
-export type AssociationOptional<_T> =
-  | Id
-  | undefined
+export type AssociationOptional<_T> = Id | undefined
 
 /**
  * Junction FK — one Id in an m:m junction row; both sides of the junction declare this.

@@ -134,12 +134,10 @@ export const [sessionStore, setSessionStore] = createStore<SessionStore>({
 })
 
 /** Set the hydrated domain User after successful authentication. */
-export const setSessionUser = (user: User): void =>
-  setSessionStore('user', user)
+export const setSessionUser = (user: User): void => setSessionStore('user', user)
 
 /** Signal that all boot-time data is loaded and the app is ready to render. */
-export const setDataReady = (): void =>
-  setSessionStore('isDataReady', true)
+export const setDataReady = (): void => setSessionStore('isDataReady', true)
 ```
 
 `SessionStore` shape per `architecture-ux.md` §6.4.

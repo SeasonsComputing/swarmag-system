@@ -231,6 +231,5 @@ export const validateJobWorkLogEntryCreate = (input: JobWorkLogEntryCreate): Exp
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isObject = (value: unknown): value is object =>
-  value !== null && typeof value === 'object'
+const isObject = (value: unknown): value is object => value !== null && typeof value === 'object'
 const isIdString = (value: unknown): value is string => typeof value === 'string'

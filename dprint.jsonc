@@ -1,6 +1,6 @@
 {
   "$schema": "https://dprint.dev/schemas/v0.json",
-  "lineWidth": 95,
+  "lineWidth": 105,
   "indentWidth": 2,
   "useTabs": false,
   "excludes": ["vendors/**"],
@@ -34,10 +34,10 @@
     "trailingCommas": "never"
   },
   "markdown": {
-    "lineWidth": 95
+    "lineWidth": 105
   },
   "malva": {
-    "printWidth": 95,
+    "printWidth": 105,
     "quotes": "alwaysSingle"
   },
   "markup": {

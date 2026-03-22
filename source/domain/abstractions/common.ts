@@ -32,13 +32,7 @@ Question                           Discriminated union of question variants.
 Answer                             Captured response payload for log entries.
 */
 
-import type {
-  AssociationOne,
-  CompositionMany,
-  CompositionPositive,
-  Instantiable,
-  When
-} from '@core/std'
+import type { AssociationOne, CompositionMany, CompositionPositive, Instantiable, When } from '@core/std'
 
 /** Geographic position plus optional address metadata. */
 export type Location = {

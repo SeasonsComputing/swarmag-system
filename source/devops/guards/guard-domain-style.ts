@@ -14,11 +14,9 @@ const DOMAIN_ABSTRACTIONS_DIR = `${DOMAIN_DIR}/abstractions`
 const EXCLUDED_DIRS = new Set(['schema'])
 
 const SECTION_BLOCK_REGEX = /^\/\*([\s\S]*?)\*\//m
-const CONST_ENUM_DECLARATION_REGEX =
-  /export const ([A-Z0-9_]+)\s*=\s*\[[\s\S]*?\]\s*as const/gm
+const CONST_ENUM_DECLARATION_REGEX = /export const ([A-Z0-9_]+)\s*=\s*\[[\s\S]*?\]\s*as const/gm
 const INLINE_LITERAL_UNION_REGEX = /:\s*'[^']+'\s*\|\s*'[^']+'/g
-const INLINE_LITERAL_UNION_TYPE_ALIAS_REGEX =
-  /export type [A-Za-z0-9_]+\s*=\s*'[^']+'\s*\|\s*'[^']+'/g
+const INLINE_LITERAL_UNION_TYPE_ALIAS_REGEX = /export type [A-Za-z0-9_]+\s*=\s*'[^']+'\s*\|\s*'[^']+'/g
 
 const collectFiles = async (dir: string): Promise<string[]> => {
   const entries: string[] = []
@@ -34,8 +32,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
   return entries
 }
 
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const lineOffset = (lines: string[], lineIndex: number): number =>
   lines.slice(0, lineIndex).join('\n').length + (lineIndex > 0 ? 1 : 0)
@@ -73,9 +70,7 @@ const auditHeaderStyleGuide63 = (
     }
     if (top.length !== bottom.length) {
       violations.push(
-        `${relative}:${
-          headerStartLine + boxBottom
-        } header top and bottom borders must have equal length`
+        `${relative}:${headerStartLine + boxBottom} header top and bottom borders must have equal length`
       )
     }
 
@@ -92,9 +87,7 @@ const auditHeaderStyleGuide63 = (
       }
       if (line.length !== top.length) {
         violations.push(
-          `${relative}:${
-            headerStartLine + i
-          } header box side alignment mismatch with top border width`
+          `${relative}:${headerStartLine + i} header box side alignment mismatch with top border width`
         )
       }
     }
@@ -123,18 +116,14 @@ const auditHeaderStyleGuide63 = (
 
     if (sectionLine === 0 || lines[sectionLine - 1].trim() !== '') {
       violations.push(
-        `${relative}:${
-          headerStartLine + sectionLine
-        } ${section} must have exactly one blank line prior`
+        `${relative}:${headerStartLine + sectionLine} ${section} must have exactly one blank line prior`
       )
     }
 
     const ruleLine = sectionLine + 1
     if (ruleLine >= lines.length || !isDashRule(lines[ruleLine])) {
       violations.push(
-        `${relative}:${
-          headerStartLine + sectionLine
-        } ${section} must be followed by a dash-rule line`
+        `${relative}:${headerStartLine + sectionLine} ${section} must be followed by a dash-rule line`
       )
     }
   }

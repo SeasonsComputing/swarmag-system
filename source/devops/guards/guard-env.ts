@@ -41,8 +41,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
 }
 
 /** Convert a zero-based index into a 1-based line number. */
-const lineNumber = (source: string, index: number): number =>
-  source.slice(0, index).split('\n').length
+const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const exists = async (path: string): Promise<boolean> => {
   try {
