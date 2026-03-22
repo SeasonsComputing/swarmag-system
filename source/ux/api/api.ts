@@ -15,8 +15,5 @@ export const api = {
     table: 'users',
     fromStorage: toUser,
     toStorage: fromUser
-  }),
-
-  // TODO: compose remaining domain clients
-  // (Assets, Chemicals, Customers, Services, Workflows, Jobs)
+  })
 }
