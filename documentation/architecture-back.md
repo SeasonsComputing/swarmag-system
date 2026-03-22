@@ -11,7 +11,7 @@ This document defines the backend architecture of the swarmAg system. The backen
 - **Storage Buckets** — File and image storage
 - **Migrations** — Forward-only schema deltas and RLS policy changes
 
-**Prerequisites:** Read `domain.md` and `architecture-core.md` first to understand the domain model and system boundary.
+**Prerequisites:** Read `domain-model.md` and `architecture-core.md` first to understand the domain model and system boundary.
 
 ## 2. Backend Structure
 

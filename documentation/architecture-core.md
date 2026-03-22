@@ -531,7 +531,7 @@ Configuration is declared in higher layers but accessible in lower layers throug
 In order of authority:
 
 1. **Constitution** (`CONSTITUTION.md`) - governance, roles, philosophy
-2. **Domain Model** (`domain.md`) - problem space, solution space, domain meaning
+2. **Domain Model** (`domain-model.md`) - problem space, solution space, domain meaning
 3. **Architecture Core** (`architecture-core.md`) - system boundary and invariants
 4. **Architecture Backend** (`architecture-back.md`) - backend implementation
 5. **Architecture UX** (`architecture-ux.md`) - UX implementation
@@ -795,7 +795,7 @@ When invariants conflict with convenience, **invariants win**.
 
 ### 11.1 Adding New Domain Concepts
 
-1. Update `domain.md` (solution space, then domain model)
+1. Update `domain-model.md` (solution space, then domain model)
 2. Implement domain abstractions, validators, protocols, and adapters
 3. Regenerate `source/domain/schema/schema.sql` from domain
 4. Write a forward-only migration in `source/back/migrations/` for the delta

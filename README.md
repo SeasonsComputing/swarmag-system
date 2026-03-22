@@ -18,62 +18,19 @@ Primary architectural context lives in `documentation/architecture-core.md`.
 
 ### 1.2 Documentation (`documentation/`)
 
-| File                           | Description                                              |
-| ------------------------------ | -------------------------------------------------------- |
-| `architecture-core.md`         | Core architecture principles and system-wide structure   |
-| `architecture-back.md`         | Backend architecture, boundaries, and runtime model      |
-| `architecture-ux.md`           | UX architecture and frontend layering                    |
-| `domain.md`                    | Domain solution-space concepts and invariants            |
-| `domain-seed-data.md`          | Controlled vocabularies and canonical seed data          |
-| `domain-data-dictionary.md`    | Normalized implementation-ready type and relation model  |
-| `domain-archetypes.md`         | Domain implementation patterns for archetype artifacts   |
-| `style-guide.md`               | Code and content style conventions                       |
-| `genesis-domain-archetypes.md` | Re-runnable prompt contract for domain archetype genesis |
-| `genesis-execution-model.md`   | Genesis workflow and orchestration/generator separation  |
-| `user-stories.md`              | Cross-application user stories and scenario narratives   |
-
-#### 1.2.1 Domain Model
-
-**Domain Model: Solution Space**
-
-| Document              | Description                                                |
-| --------------------- | ---------------------------------------------------------- |
-| `domain.md`           | Domain's solution space concepts, entities, and invariants |
-| `domain-seed-data.md` | Controlled vocabularies and canonical seed data            |
-
-**Domain Model: Implementation Space**
-
-| Document                    | Description                                                      |
-| --------------------------- | ---------------------------------------------------------------- |
-| `domain-data-dictionary.md` | Normalized implementation-ready type and relation reference      |
-| `domain-archetypes.md`      | Domain implementation patterns for abstractions and related code |
-
-**Architecture**
-
-| Path                   | Description                                            |
-| ---------------------- | ------------------------------------------------------ |
-| `architecture-core.md` | Core architecture principles and system-wide structure |
-| `architecture-back.md` | Backend architecture, boundaries, and runtime model    |
-| `architecture-ux.md`   | UX architecture and frontend layering                  |
-
-**Conventions**
-
-| Path             | Description                        |
-| ---------------- | ---------------------------------- |
-| `style-guide.md` | Code and content style conventions |
-
-#### 1.2.2 Applications (`documentation/`)
-
-| Path              | Description                                            |
-| ----------------- | ------------------------------------------------------ |
-| `user-stories.md` | Cross-application user stories and scenario narratives |
-
-#### 1.2.3 Prompts (`documentation/`)
-
-| Path                           | Description                                           |
-| ------------------------------ | ----------------------------------------------------- |
-| `genesis-domain-archetypes.md` | Prompt for generating adapters, protocols, validators |
-| `genesis-execution-model.md`   | Genesis execution workflow model                      |
+| Category     | File                        | Description                                             |
+| ------------ | --------------------------- | ------------------------------------------------------- |
+| Architecture | `architecture-core.md`      | Core architecture principles and system-wide structure  |
+|              | `architecture-back.md`      | Backend architecture, boundaries, and runtime model     |
+|              | `architecture-ux.md`        | UX architecture and frontend layering                   |
+| Domain       | `domain-model.md`           | Domain solution-space concepts and invariants           |
+|              | `domain-seed-data.md`       | Controlled vocabularies and canonical seed data         |
+|              | `domain-data-dictionary.md` | Normalized implementation-ready type and relation model |
+|              | `domain-archetypes.md`      | Domain implementation patterns for archetype artifacts  |
+| AI Prompt    | `genesis-domain-sdk.md`     | Prompt contract for domain sdk genesis                  |
+|              | `genesis-ux-scaffold.md`    | Prompt contract for UX applications scaffolding         |
+| Convention   | `style-guide.md`            | Code and content style conventions                      |
+| Application  | `user-stories.md`           | Cross-application user stories and scenario narratives  |
 
 ### 1.3 Source Layers (`source/`)
 
@@ -121,6 +78,7 @@ Primary architectural context lives in `documentation/architecture-core.md`.
 | `app-ops/`      | Operations PWA application (mobile, field execution) |
 | `app-customer/` | Customer portal application (static, read-only)      |
 | `common/`       | Shared UX components and utilities                   |
+| `config/`       | Configuration bootstrap for UX applications          |
 
 ## 2. Local Configuration
 
