@@ -1,24 +1,22 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Chemical protocol contracts                                                 ║
-║ Create and update payload contracts for chemical topic abstractions         ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Chemical protocol types                                                      ║
+║ Boundary payload contracts for chemical topic abstractions.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines boundary payload contracts for chemical persisted abstractions.
+Defines create and update protocol payload shapes for chemical abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-ChemicalCreate                     Create payload contract for Chemical.
-ChemicalUpdate                     Update payload contract for Chemical.
+ChemicalCreate  Create payload for Chemical.
+ChemicalUpdate  Update payload for Chemical.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 
-/** Create payload contract for Chemical. */
+/* Chemical protocol */
 export type ChemicalCreate = CreateFromInstantiable<Chemical>
-
-/** Update payload contract for Chemical. */
 export type ChemicalUpdate = UpdateFromInstantiable<Chemical>

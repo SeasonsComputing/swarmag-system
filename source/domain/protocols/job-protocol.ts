@@ -1,31 +1,31 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Job protocol contracts                                                      ║
-║ Create and update payload contracts for job lifecycle abstractions          ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Job protocol types                                                           ║
+║ Boundary payload contracts for job topic abstractions.                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines boundary payload contracts for job persisted abstractions.
+Defines create and update protocol payload shapes for job abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-JobCreate                          Create payload contract for Job.
-JobUpdate                          Update payload contract for Job.
-JobAssessmentCreate                Create payload contract for JobAssessment.
-JobAssessmentUpdate                Update payload contract for JobAssessment.
-JobWorkflowCreate                  Create payload contract for JobWorkflow.
-JobWorkflowUpdate                  Update payload contract for JobWorkflow.
-JobPlanCreate                      Create payload contract for JobPlan.
-JobPlanUpdate                      Update payload contract for JobPlan.
-JobPlanAssignmentCreate            Create payload contract for JobPlanAssignment.
-JobPlanAssignmentUpdate            Update payload contract for JobPlanAssignment.
-JobPlanChemicalCreate              Create payload contract for JobPlanChemical.
-JobPlanChemicalUpdate              Update payload contract for JobPlanChemical.
-JobPlanAssetCreate                 Create payload contract for JobPlanAsset.
-JobWorkCreate                      Create payload contract for JobWork.
-JobWorkUpdate                      Update payload contract for JobWork.
-JobWorkLogEntryCreate              Create payload contract for JobWorkLogEntry.
+JobCreate               Create payload for Job.
+JobUpdate               Update payload for Job.
+JobAssessmentCreate     Create payload for JobAssessment.
+JobAssessmentUpdate     Update payload for JobAssessment.
+JobWorkflowCreate       Create payload for JobWorkflow.
+JobWorkflowUpdate       Update payload for JobWorkflow.
+JobPlanCreate           Create payload for JobPlan.
+JobPlanUpdate           Update payload for JobPlan.
+JobPlanAssignmentCreate Create payload for JobPlanAssignment.
+JobPlanAssignmentUpdate Update payload for JobPlanAssignment.
+JobPlanChemicalCreate   Create payload for JobPlanChemical.
+JobPlanChemicalUpdate   Update payload for JobPlanChemical.
+JobPlanAssetCreate      Create payload for JobPlanAsset junction.
+JobWorkCreate           Create payload for JobWork.
+JobWorkUpdate           Update payload for JobWork.
+JobWorkLogEntryCreate   Create payload for JobWorkLogEntry.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
@@ -37,54 +37,40 @@ import type {
   JobPlanAssignment,
   JobPlanChemical,
   JobWork,
-  JobWorkflow,
-  JobWorkLogEntry
+  JobWorkLogEntry,
+  JobWorkflow
 } from '@domain/abstractions/job.ts'
 
-/** Create payload contract for Job. */
+/* Job protocol */
 export type JobCreate = CreateFromInstantiable<Job>
-
-/** Update payload contract for Job. */
 export type JobUpdate = UpdateFromInstantiable<Job>
 
-/** Create payload contract for JobAssessment. */
+/* JobAssessment protocol */
 export type JobAssessmentCreate = CreateFromInstantiable<JobAssessment>
-
-/** Update payload contract for JobAssessment. */
 export type JobAssessmentUpdate = UpdateFromInstantiable<JobAssessment>
 
-/** Create payload contract for JobWorkflow. */
+/* JobWorkflow protocol */
 export type JobWorkflowCreate = CreateFromInstantiable<JobWorkflow>
-
-/** Update payload contract for JobWorkflow. */
 export type JobWorkflowUpdate = UpdateFromInstantiable<JobWorkflow>
 
-/** Create payload contract for JobPlan. */
+/* JobPlan protocol */
 export type JobPlanCreate = CreateFromInstantiable<JobPlan>
-
-/** Update payload contract for JobPlan. */
 export type JobPlanUpdate = UpdateFromInstantiable<JobPlan>
 
-/** Create payload contract for JobPlanAssignment. */
+/* JobPlanAssignment protocol */
 export type JobPlanAssignmentCreate = CreateFromInstantiable<JobPlanAssignment>
-
-/** Update payload contract for JobPlanAssignment. */
 export type JobPlanAssignmentUpdate = UpdateFromInstantiable<JobPlanAssignment>
 
-/** Create payload contract for JobPlanChemical. */
+/* JobPlanChemical protocol */
 export type JobPlanChemicalCreate = CreateFromInstantiable<JobPlanChemical>
-
-/** Update payload contract for JobPlanChemical. */
 export type JobPlanChemicalUpdate = UpdateFromInstantiable<JobPlanChemical>
 
-/** Create payload contract for JobPlanAsset. */
+/* JobPlanAsset protocol */
 export type JobPlanAssetCreate = JobPlanAsset
 
-/** Create payload contract for JobWork. */
+/* JobWork protocol */
 export type JobWorkCreate = CreateFromInstantiable<JobWork>
-
-/** Update payload contract for JobWork. */
 export type JobWorkUpdate = UpdateFromInstantiable<JobWork>
 
-/** Create payload contract for JobWorkLogEntry. */
+/* JobWorkLogEntry Create protocol */
 export type JobWorkLogEntryCreate = Omit<JobWorkLogEntry, 'id' | 'createdAt'>

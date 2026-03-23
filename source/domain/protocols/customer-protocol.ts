@@ -1,24 +1,22 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Customer protocol contracts                                                 ║
-║ Create and update payload contracts for customer abstractions               ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Customer protocol types                                                      ║
+║ Boundary payload contracts for customer topic abstractions.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines boundary payload contracts for customer persisted abstractions.
+Defines create and update protocol payload shapes for customer abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CustomerCreate                     Create payload contract for Customer.
-CustomerUpdate                     Update payload contract for Customer.
+CustomerCreate  Create payload for Customer.
+CustomerUpdate  Update payload for Customer.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { Customer } from '@domain/abstractions/customer.ts'
 
-/** Create payload contract for Customer. */
+/* Customer protocol */
 export type CustomerCreate = CreateFromInstantiable<Customer>
-
-/** Update payload contract for Customer. */
 export type CustomerUpdate = UpdateFromInstantiable<Customer>

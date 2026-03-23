@@ -1,40 +1,40 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Workflow protocol contracts                                                 ║
-║ Create and update payload contracts for workflow abstractions               ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Workflow protocol types                                                      ║
+║ Boundary payload contracts for workflow topic abstractions.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines boundary payload contracts for workflow persisted abstractions.
+Defines create and update protocol payload shapes for workflow abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-TaskCreate                         Create payload contract for Task.
-TaskUpdate                         Update payload contract for Task.
-TaskQuestionCreate                 Create payload contract for TaskQuestion.
-WorkflowCreate                     Create payload contract for Workflow.
-WorkflowUpdate                     Update payload contract for Workflow.
-WorkflowTaskCreate                 Create payload contract for WorkflowTask.
+TaskCreate          Create payload for Task.
+TaskUpdate          Update payload for Task.
+TaskQuestionCreate  Create payload for TaskQuestion junction.
+TaskQuestionUpdate  Update payload for TaskQuestion junction.
+WorkflowCreate      Create payload for Workflow.
+WorkflowUpdate      Update payload for Workflow.
+WorkflowTaskCreate  Create payload for WorkflowTask junction.
+WorkflowTaskUpdate  Update payload for WorkflowTask junction.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
 
-/** Create payload contract for Task. */
+/* Task protocol */
 export type TaskCreate = CreateFromInstantiable<Task>
-
-/** Update payload contract for Task. */
 export type TaskUpdate = UpdateFromInstantiable<Task>
 
-/** Create payload contract for TaskQuestion. */
+/* TaskQuestion protocol */
 export type TaskQuestionCreate = TaskQuestion
+export type TaskQuestionUpdate = TaskQuestion
 
-/** Create payload contract for Workflow. */
+/* Workflow protocol */
 export type WorkflowCreate = CreateFromInstantiable<Workflow>
-
-/** Update payload contract for Workflow. */
 export type WorkflowUpdate = UpdateFromInstantiable<Workflow>
 
-/** Create payload contract for WorkflowTask. */
+/* WorkflowTask protocol */
 export type WorkflowTaskCreate = WorkflowTask
+export type WorkflowTaskUpdate = WorkflowTask

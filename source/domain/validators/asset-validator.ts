@@ -1,19 +1,19 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Asset protocol validators                                                   ║
-║ Boundary validation for asset protocol payloads                             ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Asset protocol validators                                                    ║
+║ Boundary validation for asset protocol payloads.                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update payloads for asset topic protocol contracts.
+Validates create and update protocol payloads for asset abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateAssetTypeCreate             Validate AssetTypeCreate payloads.
-validateAssetTypeUpdate             Validate AssetTypeUpdate payloads.
-validateAssetCreate                 Validate AssetCreate payloads.
-validateAssetUpdate                 Validate AssetUpdate payloads.
+validateAssetTypeCreate(input)  Validate AssetTypeCreate payloads.
+validateAssetTypeUpdate(input)  Validate AssetTypeUpdate payloads.
+validateAssetCreate(input)  Validate AssetCreate payloads.
+validateAssetUpdate(input)  Validate AssetUpdate payloads.
 */
 
 import {
@@ -35,17 +35,15 @@ import type {
 import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// VALIDATORS
+// PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validate AssetTypeCreate payloads. */
 export const validateAssetTypeCreate = (input: AssetTypeCreate): ExpectResult =>
   expectValid(
     expectNonEmptyString(input.label, 'label'),
     expectBoolean(input.active, 'active')
   )
 
-/** Validate AssetTypeUpdate payloads. */
 export const validateAssetTypeUpdate = (input: AssetTypeUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -53,7 +51,6 @@ export const validateAssetTypeUpdate = (input: AssetTypeUpdate): ExpectResult =>
     expectBoolean(input.active, 'active', true)
   )
 
-/** Validate AssetCreate payloads. */
 export const validateAssetCreate = (input: AssetCreate): ExpectResult =>
   expectValid(
     expectId(input.type, 'type'),
@@ -64,7 +61,6 @@ export const validateAssetCreate = (input: AssetCreate): ExpectResult =>
     expectConstEnum(input.status, 'status', ASSET_STATUSES)
   )
 
-/** Validate AssetUpdate payloads. */
 export const validateAssetUpdate = (input: AssetUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),

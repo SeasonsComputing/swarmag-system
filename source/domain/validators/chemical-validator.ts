@@ -1,18 +1,18 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Chemical protocol validators                                                ║
-║ Boundary validation for chemical protocol payloads                          ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Chemical protocol validators                                                 ║
+║ Boundary validation for chemical protocol payloads.                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update payloads for chemical protocol contracts.
+Validates create and update protocol payloads for chemical abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateChemicalCreate              Validate ChemicalCreate payloads.
-validateChemicalUpdate              Validate ChemicalUpdate payloads.
-isChemicalLabel                     Typed object guard for ChemicalLabel.
+validateChemicalCreate(input)  Validate ChemicalCreate payloads.
+validateChemicalUpdate(input)  Validate ChemicalUpdate payloads.
+isChemicalLabel(v)  Guard for ChemicalLabel object values.
 */
 
 import {
@@ -25,16 +25,18 @@ import {
   type ExpectResult,
   expectValid
 } from '@core/std'
-import type { ChemicalLabel } from '@domain/abstractions/chemical.ts'
-import { CHEMICAL_SIGNAL_WORDS, CHEMICAL_USAGES } from '@domain/abstractions/chemical.ts'
+import {
+  CHEMICAL_SIGNAL_WORDS,
+  CHEMICAL_USAGES,
+  type ChemicalLabel
+} from '@domain/abstractions/chemical.ts'
 import type { ChemicalCreate, ChemicalUpdate } from '@domain/protocols/chemical-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// VALIDATORS
+// PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validate ChemicalCreate payloads. */
 export const validateChemicalCreate = (input: ChemicalCreate): ExpectResult =>
   expectValid(
     expectCompositionMany(input.labels, 'labels', isChemicalLabel),
@@ -49,7 +51,6 @@ export const validateChemicalCreate = (input: ChemicalCreate): ExpectResult =>
     expectNonEmptyString(input.sdsUrl, 'sdsUrl', true)
   )
 
-/** Validate ChemicalUpdate payloads. */
 export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -65,10 +66,11 @@ export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
     expectNonEmptyString(input.sdsUrl, 'sdsUrl', true)
   )
 
-// ────────────────────────────────────────────────────────────────────────────
-// GUARDS
-// ────────────────────────────────────────────────────────────────────────────
-
-/** Typed object guard for ChemicalLabel. */
-export const isChemicalLabel = (value: unknown): value is ChemicalLabel =>
-  value !== null && typeof value === 'object'
+export const isChemicalLabel = (v: unknown): v is ChemicalLabel => {
+  if (v === null || typeof v !== 'object') return false
+  const label = v as ChemicalLabel
+  return expectValid(
+    expectNonEmptyString(label.url, 'url'),
+    expectNonEmptyString(label.description, 'description', true)
+  ) === null
+}

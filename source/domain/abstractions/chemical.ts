@@ -1,27 +1,18 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Chemical domain abstractions                                                ║
-║ Regulated chemical record abstractions and supporting enums                 ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Chemical domain abstractions                                                 ║
+║ Canonical types for regulated material records.                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines regulated material abstractions and related value classifications.
-
-PUBLIC
-───────────────────────────────────────────────────────────────────────────────
-CHEMICAL_USAGES                    Allowed domain usage values.
-ChemicalUsage                      Chemical usage union.
-CHEMICAL_SIGNAL_WORDS              Allowed chemical signal words.
-ChemicalSignalWord                 Chemical signal word union.
-ChemicalLabel                      Label/document metadata.
-Chemical                           Regulated material abstraction.
+Defines chemical classification, label metadata, and chemical records.
 */
 
 import type { CompositionMany, Instantiable } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 
-/** Domain usage classification values. */
+/** Allowed chemical usage classification values. */
 export const CHEMICAL_USAGES = [
   'herbicide',
   'pesticide',
@@ -31,11 +22,11 @@ export const CHEMICAL_USAGES = [
 ] as const
 export type ChemicalUsage = (typeof CHEMICAL_USAGES)[number]
 
-/** Hazard communication signal words. */
+/** Allowed chemical signal word values. */
 export const CHEMICAL_SIGNAL_WORDS = ['none', 'danger', 'warning', 'caution'] as const
 export type ChemicalSignalWord = (typeof CHEMICAL_SIGNAL_WORDS)[number]
 
-/** Label/document pointer. */
+/** Label or document pointer metadata. */
 export type ChemicalLabel = {
   url: string
   description?: string

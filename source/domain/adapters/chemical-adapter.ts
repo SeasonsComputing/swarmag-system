@@ -1,45 +1,46 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Chemical domain adapters                                                    ║
-║ Dictionary serialization for chemical topic abstractions                    ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Chemical domain adapters                                                     ║
+║ Dictionary serialization for chemical topic abstractions.                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Serializes chemical topic abstractions between Dictionary and domain shapes.
+Maps storage dictionaries to chemical abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toChemicalLabel                     Deserialize ChemicalLabel from Dictionary.
-fromChemicalLabel                   Serialize ChemicalLabel to Dictionary.
-toChemical                          Deserialize Chemical from Dictionary.
-fromChemical                        Serialize Chemical to Dictionary.
+toChemicalLabel(dict)  Deserialize ChemicalLabel from dictionary.
+fromChemicalLabel(label)  Serialize ChemicalLabel to dictionary.
+toChemical(dict)  Deserialize Chemical from dictionary.
+fromChemical(chemical)  Serialize Chemical to dictionary.
 */
 
-import type { Dictionary, Id, When } from '@core/std'
+import type { Dictionary } from '@core/std'
 import type { Chemical, ChemicalLabel } from '@domain/abstractions/chemical.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-/** Deserialize ChemicalLabel from Dictionary. */
+// ────────────────────────────────────────────────────────────────────────────
+// PUBLIC
+// ────────────────────────────────────────────────────────────────────────────
+
 export const toChemicalLabel = (dict: Dictionary): ChemicalLabel => ({
   url: dict.url as string,
   description: dict.description as string | undefined
 })
 
-/** Serialize ChemicalLabel to Dictionary. */
-export const fromChemicalLabel = (chemicalLabel: ChemicalLabel): Dictionary => ({
-  url: chemicalLabel.url,
-  description: chemicalLabel.description
+export const fromChemicalLabel = (label: ChemicalLabel): Dictionary => ({
+  url: label.url,
+  description: label.description
 })
 
-/** Deserialize Chemical from Dictionary. */
 export const toChemical = (dict: Dictionary): Chemical => ({
-  id: dict.id as Id,
-  createdAt: dict.created_at as When,
-  updatedAt: dict.updated_at as When,
-  deletedAt: dict.deleted_at as When | undefined,
-  labels: (dict.labels as Dictionary[]).map(toChemicalLabel),
-  notes: (dict.notes as Dictionary[]).map(toNote),
+  id: dict.id as string,
+  createdAt: dict.created_at as string,
+  updatedAt: dict.updated_at as string,
+  deletedAt: dict.deleted_at as string | undefined,
+  labels: (dict.labels as Dictionary[] | undefined ?? []).map(toChemicalLabel),
+  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
   name: dict.name as string,
   epaNumber: dict.epa_number as string | undefined,
   usage: dict.usage as Chemical['usage'],
@@ -50,7 +51,6 @@ export const toChemical = (dict: Dictionary): Chemical => ({
   sdsUrl: dict.sds_url as string | undefined
 })
 
-/** Serialize Chemical to Dictionary. */
 export const fromChemical = (chemical: Chemical): Dictionary => ({
   id: chemical.id,
   created_at: chemical.createdAt,
