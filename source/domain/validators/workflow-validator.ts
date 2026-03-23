@@ -24,7 +24,8 @@ import {
   expectNonEmptyString,
   expectPositiveNumber,
   type ExpectResult,
-  expectValid
+  expectValid,
+  isNonEmptyString
 } from '@core/std'
 import type {
   TaskCreate,
@@ -34,6 +35,7 @@ import type {
   WorkflowTaskCreate,
   WorkflowUpdate
 } from '@domain/protocols/workflow-protocol.ts'
+import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -42,7 +44,7 @@ import type {
 /** Validate TaskCreate payloads. */
 export const validateTaskCreate = (input: TaskCreate): ExpectResult =>
   expectValid(
-    expectCompositionMany(input.notes, 'notes', isObject),
+    expectCompositionMany(input.notes, 'notes', isNote),
     expectNonEmptyString(input.label, 'label'),
     expectNonEmptyString(input.description, 'description', true)
   )
@@ -51,7 +53,7 @@ export const validateTaskCreate = (input: TaskCreate): ExpectResult =>
 export const validateTaskUpdate = (input: TaskUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
-    expectCompositionMany(input.notes, 'notes', isObject, true),
+    expectCompositionMany(input.notes, 'notes', isNote, true),
     expectNonEmptyString(input.label, 'label', true),
     expectNonEmptyString(input.description, 'description', true)
   )
@@ -67,22 +69,22 @@ export const validateTaskQuestionCreate = (input: TaskQuestionCreate): ExpectRes
 /** Validate WorkflowCreate payloads. */
 export const validateWorkflowCreate = (input: WorkflowCreate): ExpectResult =>
   expectValid(
-    expectCompositionMany(input.notes, 'notes', isObject),
+    expectCompositionMany(input.notes, 'notes', isNote),
     expectNonEmptyString(input.name, 'name'),
     expectNonEmptyString(input.description, 'description', true),
     expectPositiveNumber(input.version, 'version'),
-    expectCompositionMany(input.tags, 'tags', isString)
+    expectCompositionMany(input.tags, 'tags', isNonEmptyString)
   )
 
 /** Validate WorkflowUpdate payloads. */
 export const validateWorkflowUpdate = (input: WorkflowUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
-    expectCompositionMany(input.notes, 'notes', isObject, true),
+    expectCompositionMany(input.notes, 'notes', isNote, true),
     expectNonEmptyString(input.name, 'name', true),
     expectNonEmptyString(input.description, 'description', true),
     expectPositiveNumber(input.version, 'version', true),
-    expectCompositionMany(input.tags, 'tags', isString, true)
+    expectCompositionMany(input.tags, 'tags', isNonEmptyString, true)
   )
 
 /** Validate WorkflowTaskCreate payloads. */
@@ -92,10 +94,3 @@ export const validateWorkflowTaskCreate = (input: WorkflowTaskCreate): ExpectRes
     expectId(input.taskId, 'taskId'),
     expectPositiveNumber(input.sequence, 'sequence')
   )
-
-// ────────────────────────────────────────────────────────────────────────────
-// GUARDS
-// ────────────────────────────────────────────────────────────────────────────
-
-const isObject = (value: unknown): value is object => value !== null && typeof value === 'object'
-const isString = (value: unknown): value is string => typeof value === 'string'

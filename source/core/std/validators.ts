@@ -37,9 +37,6 @@ export const notValid = (message: string): never => {
 export const isNonEmptyString = (value: unknown): value is string =>
   typeof value === 'string' && value.trim().length > 0
 
-/** Check whether value is a string. */
-export const isString = (value: unknown): value is string => typeof value === 'string'
-
 /** Check whether value is a positive number. */
 export const isPositiveNumber = (value: unknown): value is number =>
   typeof value === 'number' && Number.isFinite(value) && value > 0
