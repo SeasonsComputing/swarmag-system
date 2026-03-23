@@ -37,8 +37,8 @@ import type {
   JobPlanAssignment,
   JobPlanChemical,
   JobWork,
-  JobWorkLogEntry,
-  JobWorkflow
+  JobWorkflow,
+  JobWorkLogEntry
 } from '@domain/abstractions/job.ts'
 
 /* Job protocol */
