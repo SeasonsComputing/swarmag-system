@@ -7,6 +7,13 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines sellable services and required asset type junction abstractions.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+SERVICE_CATEGORIES         Allowed service category values.
+ServiceCategory            Service category derived from SERVICE_CATEGORIES.
+Service                    Sellable operational offering abstraction.
+ServiceRequiredAssetType   Junction for service-to-asset-type requirement.
 */
 
 import type { AssociationJunction, CompositionMany, Instantiable } from '@core/std'

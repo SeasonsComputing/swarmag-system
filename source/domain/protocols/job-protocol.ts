@@ -10,22 +10,22 @@ Defines create and update protocol payload shapes for job abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-JobCreate               Create payload for Job.
-JobUpdate               Update payload for Job.
-JobAssessmentCreate     Create payload for JobAssessment.
-JobAssessmentUpdate     Update payload for JobAssessment.
-JobWorkflowCreate       Create payload for JobWorkflow.
-JobWorkflowUpdate       Update payload for JobWorkflow.
-JobPlanCreate           Create payload for JobPlan.
-JobPlanUpdate           Update payload for JobPlan.
-JobPlanAssignmentCreate Create payload for JobPlanAssignment.
-JobPlanAssignmentUpdate Update payload for JobPlanAssignment.
-JobPlanChemicalCreate   Create payload for JobPlanChemical.
-JobPlanChemicalUpdate   Update payload for JobPlanChemical.
-JobPlanAssetCreate      Create payload for JobPlanAsset junction.
-JobWorkCreate           Create payload for JobWork.
-JobWorkUpdate           Update payload for JobWork.
-JobWorkLogEntryCreate   Create payload for JobWorkLogEntry.
+JobCreate                 Create payload for Job.
+JobUpdate                 Update payload for Job.
+JobAssessmentCreate       Create payload for JobAssessment.
+JobAssessmentUpdate       Update payload for JobAssessment.
+JobWorkflowCreate         Create payload for JobWorkflow.
+JobWorkflowUpdate         Update payload for JobWorkflow.
+JobPlanCreate             Create payload for JobPlan.
+JobPlanUpdate             Update payload for JobPlan.
+JobPlanAssignmentCreate   Create payload for JobPlanAssignment.
+JobPlanAssignmentUpdate   Update payload for JobPlanAssignment.
+JobPlanChemicalCreate     Create payload for JobPlanChemical.
+JobPlanChemicalUpdate     Update payload for JobPlanChemical.
+JobPlanAssetCreate        Create payload for JobPlanAsset junction.
+JobWorkCreate             Create payload for JobWork.
+JobWorkUpdate             Update payload for JobWork.
+JobWorkLogEntryCreate     Create payload for JobWorkLogEntry.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'

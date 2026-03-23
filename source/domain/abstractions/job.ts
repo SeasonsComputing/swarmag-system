@@ -7,6 +7,24 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines job abstractions spanning assessment, planning, and execution records.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+JOB_STATUSES                Allowed job status values.
+JobStatus                   Job status derived from JOB_STATUSES.
+Job                         Work agreement life-cycle anchor.
+JobAssessment               Pre-planning job assessment abstraction.
+JobWorkflow                 Workflows required of a job.
+JobPlan                     Planning record for a job.
+JobPlanAssignment           Planned user assignment for a job.
+JOB_PLAN_CHEMICAL_UNITS     Allowed units for planned chemical amount.
+JobPlanChemicalUnit         Planned chemical amount unit derived from tuple.
+JOB_PLAN_TARGET_AREA_UNITS  Allowed units for planned target area.
+JobPlanTargetAreaUnit       Planned target area unit derived from tuple.
+JobPlanChemical             Planned chemical usage record.
+JobPlanAsset                Junction for planned assets on a job plan.
+JobWork                     Execution record for a job.
+JobWorkLogEntry             Append-only execution event.
 */
 
 import type {

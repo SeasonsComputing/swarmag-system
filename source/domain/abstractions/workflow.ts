@@ -7,6 +7,13 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines reusable task and workflow abstractions with ordered junction records.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+Task          Reusable named grouping of ordered questions.
+TaskQuestion  Junction from task to question with sequence.
+Workflow      Versioned template of ordered tasks.
+WorkflowTask  Junction from workflow to task with sequence.
 */
 
 import type { AssociationJunction, CompositionMany, Instantiable } from '@core/std'

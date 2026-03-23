@@ -7,6 +7,15 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines chemical classification, label metadata, and chemical records.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+CHEMICAL_USAGES        Allowed chemical usage classification values.
+ChemicalUsage          Chemical usage derived from CHEMICAL_USAGES.
+CHEMICAL_SIGNAL_WORDS  Allowed chemical signal word values.
+ChemicalSignalWord     Signal word derived from CHEMICAL_SIGNAL_WORDS.
+ChemicalLabel          Label or document pointer metadata.
+Chemical               Regulated material record.
 */
 
 import type { CompositionMany, Instantiable } from '@core/std'
