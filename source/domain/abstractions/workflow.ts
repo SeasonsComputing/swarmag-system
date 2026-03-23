@@ -17,11 +17,11 @@ WorkflowTask                       Junction linking workflows to ordered tasks.
 */
 
 import type { AssociationJunction, CompositionMany, Instantiable } from '@core/std'
-import type { Question } from '@domain/abstractions/common.ts'
+import type { Note, Question } from '@domain/abstractions/common.ts'
 
 /** Reusable named grouping of ordered questions. */
 export type Task = Instantiable & {
-  notes: CompositionMany<import('@domain/abstractions/common.ts').Note>
+  notes: CompositionMany<Note>
   label: string
   description?: string
 }
@@ -35,7 +35,7 @@ export type TaskQuestion = {
 
 /** Versioned template of ordered tasks. */
 export type Workflow = Instantiable & {
-  notes: CompositionMany<import('@domain/abstractions/common.ts').Note>
+  notes: CompositionMany<Note>
   name: string
   description?: string
   version: number

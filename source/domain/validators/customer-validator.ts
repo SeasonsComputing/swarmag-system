@@ -12,6 +12,8 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateCustomerCreate              Validate CustomerCreate payloads.
 validateCustomerUpdate              Validate CustomerUpdate payloads.
+isCustomerSite                      Typed object guard for CustomerSite.
+isContact                           Typed object guard for Contact.
 */
 
 import {
@@ -23,8 +25,10 @@ import {
   type ExpectResult,
   expectValid
 } from '@core/std'
+import type { Contact, CustomerSite } from '@domain/abstractions/customer.ts'
 import { CUSTOMER_STATUSES } from '@domain/abstractions/customer.ts'
 import type { CustomerCreate, CustomerUpdate } from '@domain/protocols/customer-protocol.ts'
+import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -34,9 +38,9 @@ import type { CustomerCreate, CustomerUpdate } from '@domain/protocols/customer-
 export const validateCustomerCreate = (input: CustomerCreate): ExpectResult =>
   expectValid(
     expectId(input.accountManagerId, 'accountManagerId', true),
-    expectCompositionMany(input.sites, 'sites', isObject),
-    expectCompositionPositive(input.contacts, 'contacts', isObject),
-    expectCompositionMany(input.notes, 'notes', isObject),
+    expectCompositionMany(input.sites, 'sites', isCustomerSite),
+    expectCompositionPositive(input.contacts, 'contacts', isContact),
+    expectCompositionMany(input.notes, 'notes', isNote),
     expectNonEmptyString(input.name, 'name'),
     expectConstEnum(input.status, 'status', CUSTOMER_STATUSES),
     expectNonEmptyString(input.line1, 'line1'),
@@ -52,9 +56,9 @@ export const validateCustomerUpdate = (input: CustomerUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
     expectId(input.accountManagerId, 'accountManagerId', true),
-    expectCompositionMany(input.sites, 'sites', isObject, true),
-    expectCompositionPositive(input.contacts, 'contacts', isObject, true),
-    expectCompositionMany(input.notes, 'notes', isObject, true),
+    expectCompositionMany(input.sites, 'sites', isCustomerSite, true),
+    expectCompositionPositive(input.contacts, 'contacts', isContact, true),
+    expectCompositionMany(input.notes, 'notes', isNote, true),
     expectNonEmptyString(input.name, 'name', true),
     expectConstEnum(input.status, 'status', CUSTOMER_STATUSES, true),
     expectNonEmptyString(input.line1, 'line1', true),
@@ -69,4 +73,10 @@ export const validateCustomerUpdate = (input: CustomerUpdate): ExpectResult =>
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isObject = (value: unknown): value is object => value !== null && typeof value === 'object'
+/** Typed object guard for CustomerSite. */
+export const isCustomerSite = (value: unknown): value is CustomerSite =>
+  value !== null && typeof value === 'object'
+
+/** Typed object guard for Contact. */
+export const isContact = (value: unknown): value is Contact =>
+  value !== null && typeof value === 'object'

@@ -21,7 +21,8 @@ import {
   expectId,
   expectNonEmptyString,
   type ExpectResult,
-  expectValid
+  expectValid,
+  isNonEmptyString
 } from '@core/std'
 import { SERVICE_CATEGORIES } from '@domain/abstractions/service.ts'
 import type {
@@ -29,6 +30,7 @@ import type {
   ServiceRequiredAssetTypeCreate,
   ServiceUpdate
 } from '@domain/protocols/service-protocol.ts'
+import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -37,19 +39,19 @@ import type {
 /** Validate ServiceCreate payloads. */
 export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
   expectValid(
-    expectCompositionMany(input.notes, 'notes', isObject),
+    expectCompositionMany(input.notes, 'notes', isNote),
     expectNonEmptyString(input.name, 'name'),
     expectNonEmptyString(input.sku, 'sku'),
     expectNonEmptyString(input.description, 'description', true),
     expectConstEnum(input.category, 'category', SERVICE_CATEGORIES),
-    expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isString)
+    expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isNonEmptyString)
   )
 
 /** Validate ServiceUpdate payloads. */
 export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
-    expectCompositionMany(input.notes, 'notes', isObject, true),
+    expectCompositionMany(input.notes, 'notes', isNote, true),
     expectNonEmptyString(input.name, 'name', true),
     expectNonEmptyString(input.sku, 'sku', true),
     expectNonEmptyString(input.description, 'description', true),
@@ -57,7 +59,7 @@ export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
     expectCompositionMany(
       input.tagsWorkflowCandidates,
       'tagsWorkflowCandidates',
-      isString,
+      isNonEmptyString,
       true
     )
   )
@@ -70,10 +72,3 @@ export const validateServiceRequiredAssetTypeCreate = (
     expectId(input.serviceId, 'serviceId'),
     expectId(input.assetTypeId, 'assetTypeId')
   )
-
-// ────────────────────────────────────────────────────────────────────────────
-// GUARDS
-// ────────────────────────────────────────────────────────────────────────────
-
-const isObject = (value: unknown): value is object => value !== null && typeof value === 'object'
-const isString = (value: unknown): value is string => typeof value === 'string'

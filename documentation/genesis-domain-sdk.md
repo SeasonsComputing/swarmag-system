@@ -35,6 +35,10 @@ Generate `source/domain/abstractions/` as canonical domain abstractions.
 
 Per `domain-data-dictionary.md`, `domain-archetypes.md` and `style-guide.md`.
 
+The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Phase II:
+
+- Any inline `import('...').TypeName` expression in type positions — use top-level `import type` per `style-guide.md` §3.3.
+
 ### 2.2 Phase II - Adapters, Protocols and Validators
 
 Ingest `source/domain/abstractions/*.ts`.
@@ -48,7 +52,6 @@ The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Ph
 - `CreateFromInstantiable` or `UpdateFromInstantiable` applied directly to a union type — use per-variant types per `domain-archetypes.md` §4.4.
 - Any `isObject` guard in a validator — use named exported guards per `domain-archetypes.md` §5.6.
 - Any local id-string guard (e.g. `isIdString`) — use `isId` from `@core/std`.
-- Any inline `import('...').TypeName` expression in type positions — use top-level `import type` per `style-guide.md` §3.3.
 
 ### 2.3 Phase III — Schema
 

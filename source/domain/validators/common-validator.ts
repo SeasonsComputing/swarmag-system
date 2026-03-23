@@ -12,6 +12,11 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateQuestionCreate              Validate QuestionCreate payloads.
 validateQuestionUpdate              Validate QuestionUpdate payloads.
+isLocation                          Typed object guard for Location.
+isAttachment                        Typed object guard for Attachment.
+isNote                              Typed object guard for Note.
+isSelectOption                      Typed object guard for SelectOption.
+isAnswer                            Typed object guard for Answer.
 */
 
 import {
@@ -23,6 +28,10 @@ import {
   expectValid
 } from '@core/std'
 import {
+  type Answer,
+  type Attachment,
+  type Location,
+  type Note,
   QUESTION_TYPES,
   type QuestionType,
   SELECT_QUESTION_TYPES,
@@ -78,5 +87,20 @@ export const validateQuestionUpdate = (input: QuestionUpdate): ExpectResult => {
 const isSelectQuestionType = (value: QuestionType): boolean =>
   expectConstEnum(value, 'type', SELECT_QUESTION_TYPES) === null
 
-const isSelectOption = (value: unknown): value is SelectOption =>
+/** Typed object guard for Location. */
+export const isLocation = (value: unknown): value is Location =>
   value !== null && typeof value === 'object'
+
+/** Typed object guard for Attachment. */
+export const isAttachment = (value: unknown): value is Attachment =>
+  value !== null && typeof value === 'object'
+
+/** Typed object guard for Note. */
+export const isNote = (value: unknown): value is Note => value !== null && typeof value === 'object'
+
+/** Typed object guard for SelectOption. */
+export const isSelectOption = (value: unknown): value is SelectOption =>
+  value !== null && typeof value === 'object'
+
+/** Typed object guard for Answer. */
+export const isAnswer = (value: unknown): value is Answer => value !== null && typeof value === 'object'

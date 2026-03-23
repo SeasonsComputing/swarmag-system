@@ -25,13 +25,14 @@ import {
   type ExpectResult,
   expectValid
 } from '@core/std'
-import { ASSET_STATUSES, type AssetStatus } from '@domain/abstractions/asset.ts'
+import { ASSET_STATUSES } from '@domain/abstractions/asset.ts'
 import type {
   AssetCreate,
   AssetTypeCreate,
   AssetTypeUpdate,
   AssetUpdate
 } from '@domain/protocols/asset-protocol.ts'
+import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -56,7 +57,7 @@ export const validateAssetTypeUpdate = (input: AssetTypeUpdate): ExpectResult =>
 export const validateAssetCreate = (input: AssetCreate): ExpectResult =>
   expectValid(
     expectId(input.type, 'type'),
-    expectCompositionMany(input.notes, 'notes', isObject),
+    expectCompositionMany(input.notes, 'notes', isNote),
     expectNonEmptyString(input.label, 'label'),
     expectNonEmptyString(input.description, 'description', true),
     expectNonEmptyString(input.serialNumber, 'serialNumber', true),
@@ -68,15 +69,9 @@ export const validateAssetUpdate = (input: AssetUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
     expectId(input.type, 'type', true),
-    expectCompositionMany(input.notes, 'notes', isObject, true),
+    expectCompositionMany(input.notes, 'notes', isNote, true),
     expectNonEmptyString(input.label, 'label', true),
     expectNonEmptyString(input.description, 'description', true),
     expectNonEmptyString(input.serialNumber, 'serialNumber', true),
     expectConstEnum(input.status, 'status', ASSET_STATUSES, true)
   )
-
-// ────────────────────────────────────────────────────────────────────────────
-// GUARDS
-// ────────────────────────────────────────────────────────────────────────────
-
-const isObject = (value: unknown): value is AssetStatus => value !== null && typeof value === 'object'
