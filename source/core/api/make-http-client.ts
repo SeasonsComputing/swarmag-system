@@ -12,13 +12,12 @@ envelope handling.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CrudHttpSpecification                  CRUD HTTP client configuration.
-BusRuleHttpSpecification               Business-rule HTTP client configuration.
-makeCrudHttpClient(spec)               Build CRUD/list client over HTTP.
-makeBusRuleHttpClient(spec)            Build business-rule runner over HTTP.
+HttpSpecification            CRUD & Business Rule HTTP client configuration.
+makeCrudHttpClient(spec)     Build CRUD/list client over HTTP.
+makeBusRuleHttpClient(spec)  Build business-rule runner over HTTP.
 */
 
-import type { Dictionary, Id } from '@core/std'
+import type { Dictionary, Id, Instantiable } from '@core/std'
 import {
   type ApiBusRuleContract,
   type ApiCrudContract,
@@ -28,23 +27,20 @@ import {
   type ListResult
 } from './api-contract.ts'
 
-// ───────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ───────────────────────────────────────────────────────────────────────────────
-
 /** Configuration for a business-rule HTTP API client. */
 export type HttpSpecification = { basePath: string }
 
 /**
- * Factory to produce an API client.
+ * Maker to produce an API client.
  * @param spec - API specification with base path.
  * @returns API client object with CRUD methods.
  */
-export function makeCrudHttpClient<T, TCreate, TUpdate>(
+export function makeCrudHttpClient<T extends Instantiable, TCreate, TUpdate>(
   spec: HttpSpecification
 ): ApiCrudContract<T, TCreate, TUpdate> {
   const { basePath } = spec
-  const api: ApiCrudContract<T, TCreate, TUpdate> = {
+  return {
+    /* Create record over HTTP and unwrap API envelope. */
     async create(input: TCreate): Promise<T> {
       const res = await fetch(`${basePath}/create`, {
         method: 'POST',
@@ -53,10 +49,14 @@ export function makeCrudHttpClient<T, TCreate, TUpdate>(
       })
       return unwrap<T>(res)
     },
+
+    /* Get record by id over HTTP and unwrap API envelope. */
     async get(id: Id): Promise<T> {
       const res = await fetch(`${basePath}/get?id=${id}`)
       return unwrap<T>(res)
     },
+
+    /* Update record over HTTP and unwrap API envelope. */
     async update(input: TUpdate): Promise<T> {
       const res = await fetch(`${basePath}/update`, {
         method: 'PUT',
@@ -65,6 +65,8 @@ export function makeCrudHttpClient<T, TCreate, TUpdate>(
       })
       return unwrap<T>(res)
     },
+
+    /* Soft-delete record over HTTP and unwrap delete payload. */
     async delete(id: Id): Promise<DeleteResult> {
       const res = await fetch(`${basePath}/delete`, {
         method: 'DELETE',
@@ -73,6 +75,8 @@ export function makeCrudHttpClient<T, TCreate, TUpdate>(
       })
       return unwrap<DeleteResult>(res)
     },
+
+    /* List records over HTTP using list payload options. */
     async list(options?: ListOptions): Promise<ListResult<T>> {
       const res = await fetch(`${basePath}/list`, {
         method: 'POST',
@@ -82,7 +86,6 @@ export function makeCrudHttpClient<T, TCreate, TUpdate>(
       return unwrapList<T>(res, 'Failed to list items')
     }
   }
-  return api
 }
 
 /**
@@ -105,7 +108,7 @@ export function makeBusRuleHttpClient(spec: HttpSpecification): ApiBusRuleContra
 }
 
 // ───────────────────────────────────────────────────────────────────────────────
-// PRIVATE
+// INTERNALS
 // ───────────────────────────────────────────────────────────────────────────────
 
 /**
