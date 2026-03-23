@@ -26,7 +26,10 @@
     "@supabase/client": "https://esm.sh/@supabase/supabase-js@2"
   },
   "tasks": {
-    // Validation tasks
+    // ────────────────────────────────────────────────────────────────────────────
+    // Validation Checks
+    // ────────────────────────────────────────────────────────────────────────────
+
     "check": "deno task check:guards && deno task check:types && deno task check:lint",
     "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types",
     "check:types": "deno check source/**/*.ts source/**/*.tsx",
@@ -38,20 +41,28 @@
     "fmt": "dprint fmt",
     "fmt:check": "dprint check",
 
-    // Verification guards
+    // ────────────────────────────────────────────────────────────────────────────
+    // Verification Guards
+    // ────────────────────────────────────────────────────────────────────────────
+
     "guard:architecture": "deno run --allow-read source/devops/guards/guard-architecture.ts",
     "guard:env": "deno run --allow-read source/devops/guards/guard-env.ts",
     "guard:leaf": "deno run --allow-read source/devops/guards/guard-leaf.ts",
     "guard:validation": "deno run --allow-read source/devops/guards/guard-validation.ts",
     "guard:domain-style": "deno run --allow-read source/devops/guards/guard-domain-style.ts",
     "guard:core-std-types": "deno run --allow-read source/devops/guards/guard-core-std-types.ts"
-    // Packaging tasks
+    // ────────────────────────────────────────────────────────────────────────────
+    // Deployment Packaging
+    // ────────────────────────────────────────────────────────────────────────────
+
     // TODO:
     //  - swarmag-schema.zip
     //  - swarmag-back-supabase-functions.zip
-    //  - swarmag-ux-app-ops.zip
+    //  - swarmag-ux-app-ops.zipTasks
     //  - swarmag-ux-app-admin.zip
     //  - swarmag-ux-app-customer.zip
   },
-  "fmt": { "exclude": ["**/*"] }
+  "fmt": { "exclude": ["**/*"] },
+  "nodeModulesDir": "auto",
+  "allowScripts": ["npm:dprint@0.51.1"]
 }
