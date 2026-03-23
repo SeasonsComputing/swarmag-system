@@ -7,6 +7,16 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines customer aggregates with embedded contact and site structures.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+CONTACT_PREFERRED_CHANNELS  Allowed contact communication channels.
+ContactPreferredChannel     Channel type derived from CONTACT_PREFERRED_CHANNELS.
+Contact                     Embedded customer contact abstraction.
+CustomerSite                Serviceable customer location abstraction.
+CUSTOMER_STATUSES           Allowed customer status values.
+CustomerStatus              Customer status derived from CUSTOMER_STATUSES.
+Customer                    Customer account aggregate abstraction.
 */
 
 import type {

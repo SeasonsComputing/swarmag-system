@@ -7,6 +7,14 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines user role catalog and user account abstractions.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+USER_ROLES      Allowed user role values.
+UserRole        User role derived from USER_ROLES.
+USER_STATUSES   Allowed user status values.
+UserStatus      User status derived from USER_STATUSES.
+User            System user identity and membership abstraction.
 */
 
 import type { CompositionPositive, Instantiable } from '@core/std'

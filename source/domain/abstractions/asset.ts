@@ -7,6 +7,13 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines asset reference and operational asset abstractions.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+AssetType       Reference type for categorizing assets.
+ASSET_STATUSES  Allowed asset status values.
+AssetStatus     Asset status derived from ASSET_STATUSES.
+Asset           Operational equipment or resource.
 */
 
 import type { AssociationOne, CompositionMany, Instantiable } from '@core/std'

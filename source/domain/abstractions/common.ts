@@ -7,6 +7,30 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines shared domain value objects and reusable question abstractions.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+LOCATION_FIELDS         Canonical field keys for Location.
+Location                Geographic position plus optional address metadata.
+ATTACHMENT_KINDS        Allowed attachment kind values.
+AttachmentKind          Attachment kind derived from ATTACHMENT_KINDS.
+Attachment              Uploaded artifact metadata.
+NOTE_VISIBILITIES       Allowed note visibility values.
+NoteVisibility          Note visibility derived from NOTE_VISIBILITIES.
+Note                    Freeform note with visibility and taxonomy.
+QUESTION_TYPES          Supported question input modes.
+QuestionType            Question type derived from QUESTION_TYPES.
+SCALAR_QUESTION_TYPES   Scalar question discriminator values.
+ScalarQuestionType      Scalar question type derived from SCALAR_QUESTION_TYPES.
+SELECT_QUESTION_TYPES   Select question discriminator values.
+SelectQuestionType      Select question type derived from SELECT_QUESTION_TYPES.
+BaseQuestion            Common shape shared by all question constituents.
+InternalQuestion        System-generated question variant.
+ScalarQuestion          Scalar input question variant.
+SelectOption            Selectable option metadata.
+SelectQuestion          Select input question variant with required options.
+Question                Discriminated union of all question variants.
+Answer                  Captured response to a question.
 */
 
 import type { AssociationOne, CompositionMany, CompositionPositive, Instantiable, When } from '@core/std'
