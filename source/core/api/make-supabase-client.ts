@@ -28,10 +28,6 @@ import {
   type ListResult
 } from './api-contract.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
 /** Configuration for a CRUD Supabase API client. */
 export type CrudSupabaseSpecification<T extends Instantiable> = {
   table: string
@@ -40,20 +36,21 @@ export type CrudSupabaseSpecification<T extends Instantiable> = {
 }
 
 /**
- * Factory to produce a CRUD/list API client over Supabase.
+ * Maker to produce a CRUD/list API client over Supabase.
  * @param spec API specification with table and domain mappers.
  * @returns API client object with CRUD/list methods.
  */
-export const makeCrudSupabaseClient = <T extends Instantiable, TCreate, TUpdate>(
+export function makeCrudSupabaseClient<T extends Instantiable, TCreate, TUpdate>(
   spec: CrudSupabaseSpecification<T>
-): ApiCrudContract<T, TCreate, TUpdate> => {
+): ApiCrudContract<T, TCreate, TUpdate> {
   const { table, fromStorage, toStorage } = spec
 
   return {
+    /* Create record in Supabase from create payload and return mapped entity. */
     async create(input: TCreate): Promise<T> {
       const entity = instance<T>(asDictionary(input, 'create payload') as Partial<T>)
-
       const payload = toStorage(entity)
+
       const { data, error } = await Supabase.client()
         .from(table)
         .insert(payload)
@@ -64,6 +61,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable, TCreate, TUpdate>
       return fromStorage(data as Dictionary)
     },
 
+    /* Get non-deleted record by id from Supabase and map to domain entity. */
     async get(recordId: Id): Promise<T> {
       const { data, error } = await Supabase.client()
         .from(table)
@@ -76,6 +74,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable, TCreate, TUpdate>
       return fromStorage(data as Dictionary)
     },
 
+    /* Apply update patch to an existing non-deleted Supabase record. */
     async update(input: TUpdate): Promise<T> {
       const inputPatch = asDictionary(input, 'update payload')
       const recordId = inputPatch.id as Id | undefined
@@ -110,6 +109,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable, TCreate, TUpdate>
       return fromStorage(data as Dictionary)
     },
 
+    /* Soft-delete record in Supabase and return delete contract payload. */
     async delete(recordId: Id): Promise<DeleteResult> {
       const deletedAt = when()
       const { data, error } = await Supabase.client()
@@ -125,6 +125,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable, TCreate, TUpdate>
       return { id: row.id as Id, deletedAt: row.deleted_at as When }
     },
 
+    /* List paginated non-deleted records from Supabase. */
     async list(options?: ListOptions): Promise<ListResult<T>> {
       const limit = listPageLimitValue(options?.limit?.toString())
       const cursor = listCursorValue(options?.cursor?.toString())
@@ -150,7 +151,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable, TCreate, TUpdate>
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// PRIVATE
+// INTERNALS
 // ────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -160,7 +161,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable, TCreate, TUpdate>
  * @throws ApiError with mapped status.
  */
 const toApiError = (error: PostgrestError, fallback: string): never => {
-  const status = error.code === 'PGRST116' ? 404 : 400
+  const status = Supabase.errorToStatus(error)
   throw new ApiError(error.message || fallback, status, error.details ?? undefined)
 }
 
