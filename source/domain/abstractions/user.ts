@@ -1,33 +1,25 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ User domain abstractions                                                    ║
-║ User identity and authorization role abstractions                           ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ User domain abstractions                                                     ║
+║ Canonical types for user identity and role membership.                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines user identity abstractions and role/status value sets.
-
-PUBLIC
-───────────────────────────────────────────────────────────────────────────────
-USER_ROLES                         Allowed user roles.
-UserRole                           User role union.
-USER_STATUSES                      Allowed user statuses.
-UserStatus                         User status union.
-User                               System user identity abstraction.
+Defines user role catalog and user account abstractions.
 */
 
 import type { CompositionPositive, Instantiable } from '@core/std'
 
-/** Canonical user role values. */
+/** Allowed user role values. */
 export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
 export type UserRole = (typeof USER_ROLES)[number]
 
-/** User availability statuses. */
+/** Allowed user status values. */
 export const USER_STATUSES = ['active', 'inactive'] as const
 export type UserStatus = (typeof USER_STATUSES)[number]
 
-/** System user identity and membership. */
+/** System user identity and membership abstraction. */
 export type User = Instantiable & {
   roles: CompositionPositive<UserRole>
   displayName: string

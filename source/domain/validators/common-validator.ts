@@ -1,106 +1,159 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Common protocol validators                                                  ║
-║ Boundary validation for common protocol payloads                            ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Common protocol validators                                                   ║
+║ Boundary validation for shared question and object payload shapes.           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update payloads for Question protocol contracts.
+Validates common protocol payloads and exports common object type guards.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateQuestionCreate              Validate QuestionCreate payloads.
-validateQuestionUpdate              Validate QuestionUpdate payloads.
-isLocation                          Typed object guard for Location.
-isAttachment                        Typed object guard for Attachment.
-isNote                              Typed object guard for Note.
-isSelectOption                      Typed object guard for SelectOption.
-isAnswer                            Typed object guard for Answer.
+validateQuestionCreate(input)  Validate QuestionCreate payloads.
+validateQuestionUpdate(input)  Validate QuestionUpdate payloads.
+isLocation(v)  Guard for Location object values.
+isAttachment(v)  Guard for Attachment object values.
+isNote(v)  Guard for Note object values.
+isSelectOption(v)  Guard for SelectOption object values.
+isAnswer(v)  Guard for Answer object values.
 */
 
 import {
+  expectBoolean,
+  expectCompositionMany,
   expectCompositionPositive,
   expectConstEnum,
   expectId,
   expectNonEmptyString,
   type ExpectResult,
-  expectValid
+  expectValid,
+  expectWhen,
+  isNonEmptyString
 } from '@core/std'
 import {
   type Answer,
   type Attachment,
+  ATTACHMENT_KINDS,
   type Location,
   type Note,
+  NOTE_VISIBILITIES,
   QUESTION_TYPES,
-  type QuestionType,
-  SELECT_QUESTION_TYPES,
   type SelectOption
 } from '@domain/abstractions/common.ts'
 import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/common-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// VALIDATORS
+// PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validate QuestionCreate payloads. */
 export const validateQuestionCreate = (input: QuestionCreate): ExpectResult => {
   const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES)
   if (typeError) return typeError
 
-  const base = expectValid(
+  const baseError = expectValid(
     expectNonEmptyString(input.prompt, 'prompt'),
-    expectNonEmptyString(input.helpText, 'helpText', true)
+    expectNonEmptyString(input.helpText, 'helpText', true),
+    expectBoolean(input.required, 'required', true)
   )
-  if (base) return base
+  if (baseError) return baseError
 
-  if (isSelectQuestionType(input.type)) {
-    const options = 'options' in input ? input.options : undefined
-    return expectCompositionPositive(options, 'options', isSelectOption)
+  switch (input.type) {
+    case 'internal':
+    case 'text':
+    case 'number':
+    case 'boolean':
+      return null
+    case 'single-select':
+    case 'multi-select':
+      return expectCompositionPositive(input.options, 'options', isSelectOption)
   }
-
-  return null
 }
 
-/** Validate QuestionUpdate payloads. */
 export const validateQuestionUpdate = (input: QuestionUpdate): ExpectResult => {
-  const base = expectValid(
+  const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES, true)
+  if (typeError) return typeError
+
+  const baseError = expectValid(
     expectId(input.id, 'id'),
-    expectConstEnum(input.type, 'type', QUESTION_TYPES, true),
     expectNonEmptyString(input.prompt, 'prompt', true),
-    expectNonEmptyString(input.helpText, 'helpText', true)
+    expectNonEmptyString(input.helpText, 'helpText', true),
+    expectBoolean(input.required, 'required', true)
   )
-  if (base) return base
+  if (baseError) return baseError
 
-  if (input.type && isSelectQuestionType(input.type)) {
-    const options = 'options' in input ? input.options : undefined
-    return expectCompositionPositive(options, 'options', isSelectOption, true)
+  if (input.type === undefined) return null
+  switch (input.type) {
+    case 'internal':
+    case 'text':
+    case 'number':
+    case 'boolean':
+      return null
+    case 'single-select':
+    case 'multi-select':
+      return expectCompositionPositive(input.options, 'options', isSelectOption, true)
   }
-
-  return null
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// GUARDS
-// ────────────────────────────────────────────────────────────────────────────
+export const isLocation = (v: unknown): v is Location => {
+  if (v === null || typeof v !== 'object') return false
+  const location = v as Location
+  return expectValid(
+        expectNonEmptyString(location.line1, 'line1', true),
+        expectNonEmptyString(location.line2, 'line2', true),
+        expectNonEmptyString(location.city, 'city', true),
+        expectNonEmptyString(location.state, 'state', true),
+        expectNonEmptyString(location.postalCode, 'postalCode', true),
+        expectNonEmptyString(location.country, 'country', true),
+        expectWhen(location.recordedAt, 'recordedAt', true)
+      ) === null && typeof location.latitude === 'number' && typeof location.longitude === 'number'
+}
 
-const isSelectQuestionType = (value: QuestionType): boolean =>
-  expectConstEnum(value, 'type', SELECT_QUESTION_TYPES) === null
+export const isAttachment = (v: unknown): v is Attachment => {
+  if (v === null || typeof v !== 'object') return false
+  const attachment = v as Attachment
+  return expectValid(
+    expectNonEmptyString(attachment.filename, 'filename'),
+    expectNonEmptyString(attachment.url, 'url'),
+    expectNonEmptyString(attachment.contentType, 'contentType'),
+    expectConstEnum(attachment.kind, 'kind', ATTACHMENT_KINDS),
+    expectWhen(attachment.uploadedAt, 'uploadedAt')
+  ) === null
+}
 
-/** Typed object guard for Location. */
-export const isLocation = (value: unknown): value is Location =>
-  value !== null && typeof value === 'object'
+export const isNote = (v: unknown): v is Note => {
+  if (v === null || typeof v !== 'object') return false
+  const note = v as Note
+  return expectValid(
+    expectCompositionMany(note.attachments, 'attachments', isAttachment),
+    expectWhen(note.createdAt, 'createdAt'),
+    expectNonEmptyString(note.content, 'content'),
+    expectConstEnum(note.visibility, 'visibility', NOTE_VISIBILITIES),
+    expectCompositionMany(note.tags, 'tags', isNonEmptyString)
+  ) === null
+}
 
-/** Typed object guard for Attachment. */
-export const isAttachment = (value: unknown): value is Attachment =>
-  value !== null && typeof value === 'object'
+export const isSelectOption = (v: unknown): v is SelectOption => {
+  if (v === null || typeof v !== 'object') return false
+  const option = v as SelectOption
+  return expectValid(
+    expectNonEmptyString(option.value, 'value'),
+    expectNonEmptyString(option.label, 'label', true),
+    expectBoolean(option.requiresNote, 'requiresNote', true)
+  ) === null
+}
 
-/** Typed object guard for Note. */
-export const isNote = (value: unknown): value is Note => value !== null && typeof value === 'object'
+export const isAnswer = (v: unknown): v is Answer => {
+  if (v === null || typeof v !== 'object') return false
+  const answer = v as Answer
+  const value = answer.value
+  const isAllowedValue = typeof value === 'string' || typeof value === 'number'
+    || typeof value === 'boolean'
+    || (Array.isArray(value) && value.every(item => typeof item === 'string'))
 
-/** Typed object guard for SelectOption. */
-export const isSelectOption = (value: unknown): value is SelectOption =>
-  value !== null && typeof value === 'object'
-
-/** Typed object guard for Answer. */
-export const isAnswer = (value: unknown): value is Answer => value !== null && typeof value === 'object'
+  return expectValid(
+        expectId(answer.questionId, 'questionId'),
+        expectCompositionMany(answer.notes, 'notes', isNote),
+        expectWhen(answer.capturedAt, 'capturedAt')
+      ) === null && isAllowedValue
+}

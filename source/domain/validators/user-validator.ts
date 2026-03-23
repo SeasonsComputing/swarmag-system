@@ -1,17 +1,17 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ User protocol validators                                                    ║
-║ Boundary validation for user protocol payloads                              ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ User protocol validators                                                     ║
+║ Boundary validation for user protocol payloads.                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update payloads for user protocol contracts.
+Validates create and update protocol payloads for user abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateUserCreate                  Validate UserCreate payloads.
-validateUserUpdate                  Validate UserUpdate payloads.
+validateUserCreate(input)  Validate UserCreate payloads.
+validateUserUpdate(input)  Validate UserUpdate payloads.
 */
 
 import {
@@ -26,10 +26,9 @@ import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/u
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// VALIDATORS
+// PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validate UserCreate payloads. */
 export const validateUserCreate = (input: UserCreate): ExpectResult =>
   expectValid(
     expectCompositionPositive(input.roles, 'roles', isUserRole),
@@ -40,7 +39,6 @@ export const validateUserCreate = (input: UserCreate): ExpectResult =>
     expectConstEnum(input.status, 'status', USER_STATUSES)
   )
 
-/** Validate UserUpdate payloads. */
 export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -52,9 +50,4 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
     expectConstEnum(input.status, 'status', USER_STATUSES, true)
   )
 
-// ────────────────────────────────────────────────────────────────────────────
-// GUARDS
-// ────────────────────────────────────────────────────────────────────────────
-
-const isUserRole = (value: unknown): value is UserRole =>
-  expectConstEnum(value, 'role', USER_ROLES) === null
+const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null

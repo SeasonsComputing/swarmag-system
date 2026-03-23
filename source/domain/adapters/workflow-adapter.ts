@@ -1,41 +1,43 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Workflow domain adapters                                                    ║
-║ Dictionary serialization for workflow topic abstractions                    ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Workflow domain adapters                                                     ║
+║ Dictionary serialization for workflow topic abstractions.                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Serializes workflow topic abstractions between Dictionary and domain shapes.
+Maps storage dictionaries to workflow abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toTask                              Deserialize Task from Dictionary.
-fromTask                            Serialize Task to Dictionary.
-toTaskQuestion                      Deserialize TaskQuestion from Dictionary.
-fromTaskQuestion                    Serialize TaskQuestion to Dictionary.
-toWorkflow                          Deserialize Workflow from Dictionary.
-fromWorkflow                        Serialize Workflow to Dictionary.
-toWorkflowTask                      Deserialize WorkflowTask from Dictionary.
-fromWorkflowTask                    Serialize WorkflowTask to Dictionary.
+toTask(dict)  Deserialize Task from dictionary.
+fromTask(task)  Serialize Task to dictionary.
+toTaskQuestion(dict)  Deserialize TaskQuestion from dictionary.
+fromTaskQuestion(record)  Serialize TaskQuestion to dictionary.
+toWorkflow(dict)  Deserialize Workflow from dictionary.
+fromWorkflow(workflow)  Serialize Workflow to dictionary.
+toWorkflowTask(dict)  Deserialize WorkflowTask from dictionary.
+fromWorkflowTask(record)  Serialize WorkflowTask to dictionary.
 */
 
-import type { Dictionary, Id, When } from '@core/std'
+import type { Dictionary } from '@core/std'
 import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-/** Deserialize Task from Dictionary. */
+// ────────────────────────────────────────────────────────────────────────────
+// PUBLIC
+// ────────────────────────────────────────────────────────────────────────────
+
 export const toTask = (dict: Dictionary): Task => ({
-  id: dict.id as Id,
-  createdAt: dict.created_at as When,
-  updatedAt: dict.updated_at as When,
-  deletedAt: dict.deleted_at as When | undefined,
-  notes: (dict.notes as Dictionary[]).map(toNote),
+  id: dict.id as string,
+  createdAt: dict.created_at as string,
+  updatedAt: dict.updated_at as string,
+  deletedAt: dict.deleted_at as string | undefined,
+  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
   label: dict.label as string,
   description: dict.description as string | undefined
 })
 
-/** Serialize Task to Dictionary. */
 export const fromTask = (task: Task): Dictionary => ({
   id: task.id,
   created_at: task.createdAt,
@@ -46,34 +48,30 @@ export const fromTask = (task: Task): Dictionary => ({
   description: task.description
 })
 
-/** Deserialize TaskQuestion from Dictionary. */
 export const toTaskQuestion = (dict: Dictionary): TaskQuestion => ({
-  taskId: dict.task_id as Id,
-  questionId: dict.question_id as Id,
+  taskId: dict.task_id as string,
+  questionId: dict.question_id as string,
   sequence: dict.sequence as number
 })
 
-/** Serialize TaskQuestion to Dictionary. */
-export const fromTaskQuestion = (taskQuestion: TaskQuestion): Dictionary => ({
-  task_id: taskQuestion.taskId,
-  question_id: taskQuestion.questionId,
-  sequence: taskQuestion.sequence
+export const fromTaskQuestion = (record: TaskQuestion): Dictionary => ({
+  task_id: record.taskId,
+  question_id: record.questionId,
+  sequence: record.sequence
 })
 
-/** Deserialize Workflow from Dictionary. */
 export const toWorkflow = (dict: Dictionary): Workflow => ({
-  id: dict.id as Id,
-  createdAt: dict.created_at as When,
-  updatedAt: dict.updated_at as When,
-  deletedAt: dict.deleted_at as When | undefined,
-  notes: (dict.notes as Dictionary[]).map(toNote),
+  id: dict.id as string,
+  createdAt: dict.created_at as string,
+  updatedAt: dict.updated_at as string,
+  deletedAt: dict.deleted_at as string | undefined,
+  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
   name: dict.name as string,
   description: dict.description as string | undefined,
   version: dict.version as number,
-  tags: dict.tags as string[]
+  tags: (dict.tags as string[] | undefined) ?? []
 })
 
-/** Serialize Workflow to Dictionary. */
 export const fromWorkflow = (workflow: Workflow): Dictionary => ({
   id: workflow.id,
   created_at: workflow.createdAt,
@@ -86,16 +84,14 @@ export const fromWorkflow = (workflow: Workflow): Dictionary => ({
   tags: workflow.tags
 })
 
-/** Deserialize WorkflowTask from Dictionary. */
 export const toWorkflowTask = (dict: Dictionary): WorkflowTask => ({
-  workflowId: dict.workflow_id as Id,
-  taskId: dict.task_id as Id,
+  workflowId: dict.workflow_id as string,
+  taskId: dict.task_id as string,
   sequence: dict.sequence as number
 })
 
-/** Serialize WorkflowTask to Dictionary. */
-export const fromWorkflowTask = (workflowTask: WorkflowTask): Dictionary => ({
-  workflow_id: workflowTask.workflowId,
-  task_id: workflowTask.taskId,
-  sequence: workflowTask.sequence
+export const fromWorkflowTask = (record: WorkflowTask): Dictionary => ({
+  workflow_id: record.workflowId,
+  task_id: record.taskId,
+  sequence: record.sequence
 })

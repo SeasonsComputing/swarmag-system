@@ -1,36 +1,36 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Common protocol contracts                                                   ║
-║ Create and update payload contracts for common topic abstractions           ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Common protocol types                                                        ║
+║ Boundary payload contracts for common topic abstractions.                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines boundary payload contracts for persisted common abstractions.
+Defines create and update protocol payload shapes for common abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-InternalQuestionCreate             Create payload contract for InternalQuestion.
-ScalarQuestionCreate               Create payload contract for ScalarQuestion.
-SelectQuestionCreate               Create payload contract for SelectQuestion.
-QuestionCreate                     Create payload contract for Question union.
-InternalQuestionUpdate             Update payload contract for InternalQuestion.
-ScalarQuestionUpdate               Update payload contract for ScalarQuestion.
-SelectQuestionUpdate               Update payload contract for SelectQuestion.
-QuestionUpdate                     Update payload contract for Question union.
+QuestionCreate  Union create payload for Question variants.
+QuestionUpdate  Union update payload for Question variants.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { InternalQuestion, ScalarQuestion, SelectQuestion } from '@domain/abstractions/common.ts'
 
-/** Create payload contract for Question. */
+/*  Question Create protocol */
 export type InternalQuestionCreate = CreateFromInstantiable<InternalQuestion>
 export type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
 export type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
-export type QuestionCreate = InternalQuestionCreate | ScalarQuestionCreate | SelectQuestionCreate
+export type QuestionCreate =
+  | InternalQuestionCreate
+  | ScalarQuestionCreate
+  | SelectQuestionCreate
 
-/** Update payload contract for Question. */
+/* Question Update protocol */
 export type InternalQuestionUpdate = UpdateFromInstantiable<InternalQuestion>
 export type ScalarQuestionUpdate = UpdateFromInstantiable<ScalarQuestion>
 export type SelectQuestionUpdate = UpdateFromInstantiable<SelectQuestion>
-export type QuestionUpdate = InternalQuestionUpdate | ScalarQuestionUpdate | SelectQuestionUpdate
+export type QuestionUpdate =
+  | InternalQuestionUpdate
+  | ScalarQuestionUpdate
+  | SelectQuestionUpdate

@@ -1,28 +1,26 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Service protocol contracts                                                  ║
-║ Create and update payload contracts for service abstractions                ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Service protocol types                                                       ║
+║ Boundary payload contracts for service topic abstractions.                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines boundary payload contracts for service persisted abstractions.
+Defines create and update protocol payload shapes for service abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-ServiceCreate                      Create payload contract for Service.
-ServiceUpdate                      Update payload contract for Service.
-ServiceRequiredAssetTypeCreate     Create payload contract for service junction.
+ServiceCreate                   Create payload for Service.
+ServiceUpdate                   Update payload for Service.
+ServiceRequiredAssetTypeCreate  Create payload for required asset junction.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { Service, ServiceRequiredAssetType } from '@domain/abstractions/service.ts'
 
-/** Create payload contract for Service. */
+/* Service protocol */
 export type ServiceCreate = CreateFromInstantiable<Service>
-
-/** Update payload contract for Service. */
 export type ServiceUpdate = UpdateFromInstantiable<Service>
 
-/** Create payload contract for ServiceRequiredAssetType. */
+/* ServiceRequiredAssetType protocol*/
 export type ServiceRequiredAssetTypeCreate = ServiceRequiredAssetType

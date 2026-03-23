@@ -1,19 +1,12 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Workflow domain abstractions                                                ║
-║ Workflow/task abstractions and sequencing junctions                         ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Workflow domain abstractions                                                 ║
+║ Canonical types for tasks, workflows, and ordering junctions.                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines reusable workflow and task abstractions with sequencing junctions.
-
-PUBLIC
-───────────────────────────────────────────────────────────────────────────────
-Task                               Reusable named grouping of questions.
-TaskQuestion                       Junction linking tasks to ordered questions.
-Workflow                           Versioned workflow template abstraction.
-WorkflowTask                       Junction linking workflows to ordered tasks.
+Defines reusable task and workflow abstractions with ordered junction records.
 */
 
 import type { AssociationJunction, CompositionMany, Instantiable } from '@core/std'
@@ -26,7 +19,7 @@ export type Task = Instantiable & {
   description?: string
 }
 
-/** Junction mapping tasks to ordered questions. */
+/** Junction from task to question with sequence. */
 export type TaskQuestion = {
   taskId: AssociationJunction<Task>
   questionId: AssociationJunction<Question>
@@ -42,7 +35,7 @@ export type Workflow = Instantiable & {
   tags: CompositionMany<string>
 }
 
-/** Junction mapping workflows to ordered tasks. */
+/** Junction from workflow to task with sequence. */
 export type WorkflowTask = {
   workflowId: AssociationJunction<Workflow>
   taskId: AssociationJunction<Task>

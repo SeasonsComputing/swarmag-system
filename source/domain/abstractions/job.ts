@@ -1,30 +1,12 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Job domain abstractions                                                     ║
-║ Job lifecycle, planning, execution, and log-entry abstractions              ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Job domain abstractions                                                      ║
+║ Canonical types for job life-cycle planning and execution.                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines job lifecycle abstractions including planning and execution records.
-
-PUBLIC
-───────────────────────────────────────────────────────────────────────────────
-JOB_STATUSES                        Allowed job lifecycle states.
-JobStatus                           Job lifecycle state union.
-Job                                 Work agreement lifecycle anchor.
-JobAssessment                       Pre-planning job assessment abstraction.
-JobWorkflow                         Job workflow basis/modification abstraction.
-JobPlan                             Job planning abstraction.
-JobPlanAssignment                   Planned crew assignment abstraction.
-JOB_PLAN_CHEMICAL_UNITS             Allowed chemical amount units.
-JobPlanChemicalUnit                 Chemical amount unit union.
-JOB_PLAN_TARGET_AREA_UNITS          Allowed target area units.
-JobPlanTargetAreaUnit               Target area unit union.
-JobPlanChemical                     Planned chemical usage abstraction.
-JobPlanAsset                        Junction linking plans to assets.
-JobWork                             Execution record and workflow manifest.
-JobWorkLogEntry                     Append-only execution event log entry.
+Defines job abstractions spanning assessment, planning, and execution records.
 */
 
 import type {
@@ -46,7 +28,7 @@ import type { Customer } from '@domain/abstractions/customer.ts'
 import type { User, UserRole } from '@domain/abstractions/user.ts'
 import type { Workflow } from '@domain/abstractions/workflow.ts'
 
-/** Job lifecycle state values. */
+/** Allowed job status values. */
 export const JOB_STATUSES = [
   'open',
   'assessing',
@@ -59,19 +41,19 @@ export const JOB_STATUSES = [
 ] as const
 export type JobStatus = (typeof JOB_STATUSES)[number]
 
-/** Work agreement lifecycle anchor. */
+/** Work agreement life-cycle anchor. */
 export type Job = Instantiable & {
   customerId: AssociationOne<Customer>
   status: JobStatus
 }
 
-/** Pre-planning job assessment. */
+/** Pre-planning job assessment abstraction. */
 export type JobAssessment = Instantiable & {
-  jobId: AssociationOne<Job>
-  assessorId: AssociationOne<User>
   scheduledAt: When
   startedAt?: When
   completedAt?: When
+  jobId: AssociationOne<Job>
+  assessorId: AssociationOne<User>
   locations: CompositionPositive<Location>
   risks: CompositionMany<Note>
   notes: CompositionMany<Note>
@@ -81,7 +63,7 @@ export type JobAssessment = Instantiable & {
 export type JobWorkflow = Instantiable & {
   jobId: AssociationOne<Job>
   basisWorkflowId: AssociationOne<Workflow>
-  modifiedWorkflowId?: AssociationOptional<Workflow>
+  modifiedWorkflowId: AssociationOptional<Workflow>
 }
 
 /** Planning record for a job. */
@@ -93,7 +75,7 @@ export type JobPlan = Instantiable & {
   durationEstimate: number
 }
 
-/** Planned user assignment for a job plan. */
+/** Planned user assignment for a job. */
 export type JobPlanAssignment = Instantiable & {
   planId: AssociationOne<JobPlan>
   crewMemberId: AssociationOne<User>
@@ -101,15 +83,15 @@ export type JobPlanAssignment = Instantiable & {
   role: UserRole
 }
 
-/** Allowed amount units for planned chemicals. */
+/** Allowed units for planned chemical amount. */
 export const JOB_PLAN_CHEMICAL_UNITS = ['gallon', 'liter', 'pound', 'kilogram'] as const
 export type JobPlanChemicalUnit = (typeof JOB_PLAN_CHEMICAL_UNITS)[number]
 
-/** Allowed target area units for planned chemicals. */
+/** Allowed units for planned target area. */
 export const JOB_PLAN_TARGET_AREA_UNITS = ['acre', 'hectare'] as const
 export type JobPlanTargetAreaUnit = (typeof JOB_PLAN_TARGET_AREA_UNITS)[number]
 
-/** Planned chemical usage for a job plan. */
+/** Planned chemical usage record. */
 export type JobPlanChemical = Instantiable & {
   planId: AssociationOne<JobPlan>
   chemicalId: AssociationOne<Chemical>
@@ -119,13 +101,13 @@ export type JobPlanChemical = Instantiable & {
   targetAreaUnit: JobPlanTargetAreaUnit
 }
 
-/** Junction linking job plans to required assets. */
+/** Junction for planned assets on a job plan. */
 export type JobPlanAsset = {
   planId: AssociationJunction<JobPlan>
   assetId: AssociationJunction<Asset>
 }
 
-/** Execution record with immutable workflow manifest. */
+/** Execution record for a job. */
 export type JobWork = Instantiable & {
   jobId: AssociationOne<Job>
   startedById: AssociationOne<User>
@@ -134,7 +116,7 @@ export type JobWork = Instantiable & {
   completedAt?: When
 }
 
-/** Append-only work execution event. */
+/** Append-only execution event. */
 export type JobWorkLogEntry = InstantiableOnly & {
   jobId: AssociationOne<Job>
   userId: AssociationOne<User>

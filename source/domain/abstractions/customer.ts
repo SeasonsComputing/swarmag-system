@@ -1,22 +1,12 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Customer domain abstractions                                                ║
-║ Customer account abstractions with embedded contacts and sites              ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Customer domain abstractions                                                 ║
+║ Canonical types for customer accounts, contacts, and sites.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines customer account abstractions and embedded contact/site objects.
-
-PUBLIC
-───────────────────────────────────────────────────────────────────────────────
-CONTACT_PREFERRED_CHANNELS          Allowed contact communication channels.
-ContactPreferredChannel             Contact communication channel union.
-Contact                             Embedded customer contact abstraction.
-CustomerSite                        Serviceable customer site abstraction.
-CUSTOMER_STATUSES                   Allowed customer lifecycle states.
-CustomerStatus                      Customer lifecycle state union.
-Customer                            Customer account aggregate abstraction.
+Defines customer aggregates with embedded contact and site structures.
 */
 
 import type {
@@ -34,7 +24,7 @@ import type { User } from '@domain/abstractions/user.ts'
 export const CONTACT_PREFERRED_CHANNELS = ['email', 'text', 'phone'] as const
 export type ContactPreferredChannel = (typeof CONTACT_PREFERRED_CHANNELS)[number]
 
-/** Embedded customer contact. */
+/** Embedded customer contact abstraction. */
 export type Contact = {
   notes: CompositionMany<Note>
   name: string
@@ -44,7 +34,7 @@ export type Contact = {
   preferredChannel: ContactPreferredChannel
 }
 
-/** Serviceable customer location. */
+/** Serviceable customer location abstraction. */
 export type CustomerSite = {
   customerId: AssociationOne<Customer>
   location: CompositionOne<Location>
@@ -53,13 +43,13 @@ export type CustomerSite = {
   acreage?: number
 }
 
-/** Allowed customer lifecycle states. */
+/** Allowed customer status values. */
 export const CUSTOMER_STATUSES = ['active', 'inactive', 'prospect'] as const
 export type CustomerStatus = (typeof CUSTOMER_STATUSES)[number]
 
-/** Customer account aggregate. */
+/** Customer account aggregate abstraction. */
 export type Customer = Instantiable & {
-  accountManagerId?: AssociationOptional<User>
+  accountManagerId: AssociationOptional<User>
   sites: CompositionMany<CustomerSite>
   contacts: CompositionPositive<Contact>
   notes: CompositionMany<Note>

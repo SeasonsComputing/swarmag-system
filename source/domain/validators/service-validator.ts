@@ -1,18 +1,18 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Service protocol validators                                                 ║
-║ Boundary validation for service protocol payloads                           ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Service protocol validators                                                  ║
+║ Boundary validation for service protocol payloads.                           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Validates create and update payloads for service protocol contracts.
+Validates create and update protocol payloads for service abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateServiceCreate               Validate ServiceCreate payloads.
-validateServiceUpdate               Validate ServiceUpdate payloads.
-validateServiceRequiredAssetTypeCreate  Validate ServiceRequiredAssetTypeCreate payloads.
+validateServiceCreate(input)  Validate ServiceCreate payloads.
+validateServiceUpdate(input)  Validate ServiceUpdate payloads.
+validateServiceRequiredAssetTypeCreate(input)  Validate service asset requirement payloads.
 */
 
 import {
@@ -33,10 +33,9 @@ import type {
 import { isNote } from '@domain/validators/common-validator.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// VALIDATORS
+// PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Validate ServiceCreate payloads. */
 export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
   expectValid(
     expectCompositionMany(input.notes, 'notes', isNote),
@@ -47,7 +46,6 @@ export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
     expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isNonEmptyString)
   )
 
-/** Validate ServiceUpdate payloads. */
 export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -64,7 +62,6 @@ export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
     )
   )
 
-/** Validate ServiceRequiredAssetTypeCreate payloads. */
 export const validateServiceRequiredAssetTypeCreate = (
   input: ServiceRequiredAssetTypeCreate
 ): ExpectResult =>

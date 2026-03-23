@@ -1,40 +1,42 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Service domain adapters                                                     ║
-║ Dictionary serialization for service topic abstractions                     ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Service domain adapters                                                      ║
+║ Dictionary serialization for service topic abstractions.                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Serializes service topic abstractions between Dictionary and domain shapes.
+Maps storage dictionaries to service abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toService                           Deserialize Service from Dictionary.
-fromService                         Serialize Service to Dictionary.
-toServiceRequiredAssetType          Deserialize ServiceRequiredAssetType from Dictionary.
-fromServiceRequiredAssetType        Serialize ServiceRequiredAssetType to Dictionary.
+toService(dict)  Deserialize Service from dictionary.
+fromService(service)  Serialize Service to dictionary.
+toServiceRequiredAssetType(dict)  Deserialize service requirement junction.
+fromServiceRequiredAssetType(record)  Serialize service requirement junction.
 */
 
-import type { Dictionary, Id, When } from '@core/std'
+import type { Dictionary } from '@core/std'
 import type { Service, ServiceRequiredAssetType } from '@domain/abstractions/service.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-/** Deserialize Service from Dictionary. */
+// ────────────────────────────────────────────────────────────────────────────
+// PUBLIC
+// ────────────────────────────────────────────────────────────────────────────
+
 export const toService = (dict: Dictionary): Service => ({
-  id: dict.id as Id,
-  createdAt: dict.created_at as When,
-  updatedAt: dict.updated_at as When,
-  deletedAt: dict.deleted_at as When | undefined,
-  notes: (dict.notes as Dictionary[]).map(toNote),
+  id: dict.id as string,
+  createdAt: dict.created_at as string,
+  updatedAt: dict.updated_at as string,
+  deletedAt: dict.deleted_at as string | undefined,
+  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
   name: dict.name as string,
   sku: dict.sku as string,
   description: dict.description as string | undefined,
   category: dict.category as Service['category'],
-  tagsWorkflowCandidates: dict.tags_workflow_candidates as string[]
+  tagsWorkflowCandidates: (dict.tags_workflow_candidates as string[] | undefined) ?? []
 })
 
-/** Serialize Service to Dictionary. */
 export const fromService = (service: Service): Dictionary => ({
   id: service.id,
   created_at: service.createdAt,
@@ -48,16 +50,12 @@ export const fromService = (service: Service): Dictionary => ({
   tags_workflow_candidates: service.tagsWorkflowCandidates
 })
 
-/** Deserialize ServiceRequiredAssetType from Dictionary. */
 export const toServiceRequiredAssetType = (dict: Dictionary): ServiceRequiredAssetType => ({
-  serviceId: dict.service_id as Id,
-  assetTypeId: dict.asset_type_id as Id
+  serviceId: dict.service_id as string,
+  assetTypeId: dict.asset_type_id as string
 })
 
-/** Serialize ServiceRequiredAssetType to Dictionary. */
-export const fromServiceRequiredAssetType = (
-  serviceRequiredAssetType: ServiceRequiredAssetType
-): Dictionary => ({
-  service_id: serviceRequiredAssetType.serviceId,
-  asset_type_id: serviceRequiredAssetType.assetTypeId
+export const fromServiceRequiredAssetType = (record: ServiceRequiredAssetType): Dictionary => ({
+  service_id: record.serviceId,
+  asset_type_id: record.assetTypeId
 })
