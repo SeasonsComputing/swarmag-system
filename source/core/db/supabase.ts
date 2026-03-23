@@ -3,7 +3,7 @@
  */
 
 import { Config } from '@core/cfg/config.ts'
-import { createClient, type SupabaseClient } from '@supabase/client'
+import { createClient, PostgrestError, type SupabaseClient } from '@supabase/client'
 
 /** Cache-aware Supabase client factory for platform functions. */
 export class Supabase {
@@ -34,5 +34,15 @@ export class Supabase {
     // connect and cache client
     Supabase.#cache = createClient(url, key, { auth })
     return Supabase.#cache
+  }
+
+  /** Map postgrest error code to status */
+  static errorToStatus(error: PostgrestError): number {
+    if (error.code === 'PGRST116') return 404
+    if (error.code === '23505') return 409 // unique_violation
+    if (error.code === '42501') return 403 // insufficient_privilege / RLS denial
+    if (error.code === '23503') return 409 // fk_violation
+    if (error.code === '22P02') return 400 // invalid input syntax
+    return 500
   }
 }
