@@ -234,9 +234,45 @@ export type UserUpdate = UpdateFromInstantiable<User>
 
 ### 4.3 Junction and InstantiableOnly Protocols
 
-Junction abstractions have no update protocol — they are created and hard-deleted only.
+Junction composite keys are identity — no lifecycle fields to strip. The protocol shape is the whole type.
 
-`InstantiableOnly` abstractions have a create protocol only — no update protocol.
+**Pure-key junctions** (composite keys only, no state attributes): Create protocol only — no Update. Junction is created and hard-deleted.
+
+```typescript
+// ServiceRequiredAssetType = { serviceId, assetTypeId } — no state
+export type ServiceRequiredAssetTypeCreate = ServiceRequiredAssetType
+```
+
+**State-bearing junctions** (composite keys plus state attributes, e.g. `sequence`): Both Create and Update. Both are the whole type — composite keys are included in both payloads as identity.
+
+```typescript
+// TaskQuestion = { taskId, questionId, sequence } — sequence is state
+export type TaskQuestionCreate = TaskQuestion
+export type TaskQuestionUpdate = TaskQuestion
+```
+
+`InstantiableOnly` abstractions have a Create protocol only — no Update protocol.
+
+### 4.4 Union-Type Protocols
+
+When an abstraction is a `union-type` (discriminated union of concrete variants), derive per-variant create and update types from each concrete member. Never apply `CreateFromInstantiable` or `UpdateFromInstantiable` directly to the union. Export a union alias as the boundary call-site type.
+
+```typescript
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
+import type { InternalQuestion, ScalarQuestion, SelectQuestion } from '@domain/abstractions/common.ts'
+
+export type InternalQuestionCreate = CreateFromInstantiable<InternalQuestion>
+export type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
+export type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
+/** Union alias — discriminate before use. */
+export type QuestionCreate = InternalQuestionCreate | ScalarQuestionCreate | SelectQuestionCreate
+
+export type InternalQuestionUpdate = UpdateFromInstantiable<InternalQuestion>
+export type ScalarQuestionUpdate = UpdateFromInstantiable<ScalarQuestion>
+export type SelectQuestionUpdate = UpdateFromInstantiable<SelectQuestion>
+/** Union alias — discriminate before use. */
+export type QuestionUpdate = InternalQuestionUpdate | ScalarQuestionUpdate | SelectQuestionUpdate
+```
 
 ## 5. Validators
 
@@ -374,6 +410,27 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 
 const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
 ```
+
+### 5.6 Object Guards
+
+Every object-type abstraction that appears as a `CompositionOne`, `CompositionMany`, or `CompositionPositive` member must have a named, exported type guard in its topic's validator file. Guards must be typed to the specific abstraction — never generic.
+
+```typescript
+// common-validator.ts — exports guards for all common composable object types
+export const isNote = (v: unknown): v is Note => v !== null && typeof v === 'object'
+export const isLocation = (v: unknown): v is Location => v !== null && typeof v === 'object'
+export const isAttachment = (v: unknown): v is Attachment => v !== null && typeof v === 'object'
+export const isSelectOption = (v: unknown): v is SelectOption => v !== null && typeof v === 'object'
+```
+
+Validators that compose object types from another topic import the typed guard — they do not define their own:
+
+```typescript
+// job-validator.ts
+import { isLocation, isNote } from '@domain/validators/common-validator.ts'
+```
+
+Import direction follows domain dependency flow: common guards flow outward to topic validators.
 
 ## 6. Adapters
 

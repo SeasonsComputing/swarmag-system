@@ -39,6 +39,11 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | `@core/std` | `source/core/std/std.ts` |
 | `@ux/api`   | `source/ux/api/api.ts`   |
 
+### 3.3 Import Rules
+
+- All cross-file type references must use top-level `import type` declarations. Inline `import('...').TypeName` expressions in type positions are prohibited — every type used from another module must appear in the file's top-level import block.
+- Do not re-implement utilities already provided by `@core/std`. Use the canonical form: `isId` not a local `isIdString`; `isWhen` not a local date-string guard; etc.
+
 ## 4. Naming Conventions
 
 ### 4.1 The single commandment
@@ -278,7 +283,10 @@ const SHAPE_KINDS = ['circle', 'rect'] as const
 When a type extends a base type with additional or narrowed fields, express as a named intersection.
 
 ```typescript
-export type CircleShape = BaseShape & { kind: 'circle'; radius: number }
+export type CircleShape = BaseShape & {
+  kind: 'circle'
+  radius: number
+}
 ```
 
 - Always a named export — anonymous intersections are a violation.
@@ -291,17 +299,23 @@ When a concept has structurally distinct variants sharing a discriminator field,
 
 ```typescript
 /** Common shape fields. */
-export type BaseShape = { kind: ShapeKind; color?: string }
+export type BaseShape = {
+  kind: ShapeKind
+  color?: string
+}
 
 /** Circle — no dimensional fields other than radius. */
-export type CircleShape =
-  & BaseShape
-  & { kind: 'circle'; radius: number }
+export type CircleShape = BaseShape & {
+  kind: 'circle'
+  radius: number
+}
 
 /** Rectangle — defined by width and height. */
-export type RectShape =
-  & BaseShape
-  & { kind: 'rect'; width: number; height: number }
+export type RectShape = BaseShape & {
+  kind: 'rect'
+  width: number
+  height: number
+}
 
 /** Discriminated union — boundary type used throughout the system. */
 export type Shape = CircleShape | RectShape
