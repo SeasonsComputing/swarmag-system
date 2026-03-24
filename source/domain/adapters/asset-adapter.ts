@@ -10,20 +10,17 @@ Maps storage dictionaries to asset abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toAssetType(dict)  Deserialize AssetType from dictionary.
+toAssetType(dict)         Deserialize AssetType from dictionary.
 fromAssetType(assetType)  Serialize AssetType to dictionary.
-toAsset(dict)  Deserialize Asset from dictionary.
-fromAsset(asset)  Serialize Asset to dictionary.
+toAsset(dict)             Deserialize Asset from dictionary.
+fromAsset(asset)          Serialize Asset to dictionary.
 */
 
 import type { Dictionary } from '@core/std'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Deserialize AssetType from dictionary. */
 export const toAssetType = (dict: Dictionary): AssetType => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -33,6 +30,7 @@ export const toAssetType = (dict: Dictionary): AssetType => ({
   active: dict.active as boolean
 })
 
+/** Serialize AssetType to dictionary. */
 export const fromAssetType = (assetType: AssetType): Dictionary => ({
   id: assetType.id,
   created_at: assetType.createdAt,
@@ -42,6 +40,7 @@ export const fromAssetType = (assetType: AssetType): Dictionary => ({
   active: assetType.active
 })
 
+/** Deserialize Asset from dictionary. */
 export const toAsset = (dict: Dictionary): Asset => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -55,6 +54,7 @@ export const toAsset = (dict: Dictionary): Asset => ({
   status: dict.status as Asset['status']
 })
 
+/** Serialize Asset to dictionary. */
 export const fromAsset = (asset: Asset): Dictionary => ({
   id: asset.id,
   created_at: asset.createdAt,

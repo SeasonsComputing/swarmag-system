@@ -10,18 +10,18 @@ Maps storage dictionaries to common abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toLocation(dict)  Deserialize Location from dictionary.
-fromLocation(location)  Serialize Location to dictionary.
-toAttachment(dict)  Deserialize Attachment from dictionary.
+toLocation(dict)            Deserialize Location from dictionary.
+fromLocation(location)      Serialize Location to dictionary.
+toAttachment(dict)          Deserialize Attachment from dictionary.
 fromAttachment(attachment)  Serialize Attachment to dictionary.
-toNote(dict)  Deserialize Note from dictionary.
-fromNote(note)  Serialize Note to dictionary.
-toSelectOption(dict)  Deserialize SelectOption from dictionary.
-fromSelectOption(option)  Serialize SelectOption to dictionary.
-toQuestion(dict)  Deserialize Question from dictionary.
-fromQuestion(question)  Serialize Question to dictionary.
-toAnswer(dict)  Deserialize Answer from dictionary.
-fromAnswer(answer)  Serialize Answer to dictionary.
+toNote(dict)                Deserialize Note from dictionary.
+fromNote(note)              Serialize Note to dictionary.
+toSelectOption(dict)        Deserialize SelectOption from dictionary.
+fromSelectOption(option)    Serialize SelectOption to dictionary.
+toQuestion(dict)            Deserialize Question from dictionary.
+fromQuestion(question)      Serialize Question to dictionary.
+toAnswer(dict)              Deserialize Answer from dictionary.
+fromAnswer(answer)          Serialize Answer to dictionary.
 */
 
 import type { Dictionary } from '@core/std'
@@ -38,10 +38,7 @@ import type {
   SelectQuestion
 } from '@domain/abstractions/common.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Deserialize Location from dictionary. */
 export const toLocation = (dict: Dictionary): Location => ({
   latitude: dict.latitude as number,
   longitude: dict.longitude as number,
@@ -57,6 +54,7 @@ export const toLocation = (dict: Dictionary): Location => ({
   description: dict.description as string | undefined
 })
 
+/** Serialize Location to dictionary. */
 export const fromLocation = (location: Location): Dictionary => ({
   latitude: location.latitude,
   longitude: location.longitude,
@@ -72,6 +70,7 @@ export const fromLocation = (location: Location): Dictionary => ({
   description: location.description
 })
 
+/** Deserialize Attachment from dictionary. */
 export const toAttachment = (dict: Dictionary): Attachment => ({
   filename: dict.filename as string,
   url: dict.url as string,
@@ -80,6 +79,7 @@ export const toAttachment = (dict: Dictionary): Attachment => ({
   uploadedAt: dict.uploaded_at as string
 })
 
+/** Serialize Attachment to dictionary. */
 export const fromAttachment = (attachment: Attachment): Dictionary => ({
   filename: attachment.filename,
   url: attachment.url,
@@ -88,6 +88,7 @@ export const fromAttachment = (attachment: Attachment): Dictionary => ({
   uploaded_at: attachment.uploadedAt
 })
 
+/** Deserialize Note from dictionary. */
 export const toNote = (dict: Dictionary): Note => ({
   attachments: (dict.attachments as Dictionary[] | undefined ?? []).map(toAttachment),
   createdAt: dict.created_at as string,
@@ -96,6 +97,7 @@ export const toNote = (dict: Dictionary): Note => ({
   tags: (dict.tags as string[] | undefined) ?? []
 })
 
+/** Serialize Note to dictionary. */
 export const fromNote = (note: Note): Dictionary => ({
   attachments: note.attachments.map(fromAttachment),
   created_at: note.createdAt,
@@ -104,18 +106,21 @@ export const fromNote = (note: Note): Dictionary => ({
   tags: note.tags
 })
 
+/** Deserialize SelectOption from dictionary. */
 export const toSelectOption = (dict: Dictionary): SelectOption => ({
   value: dict.value as string,
   label: dict.label as string | undefined,
   requiresNote: dict.requires_note as boolean | undefined
 })
 
+/** Serialize SelectOption to dictionary. */
 export const fromSelectOption = (option: SelectOption): Dictionary => ({
   value: option.value,
   label: option.label,
   requires_note: option.requiresNote
 })
 
+/** Deserialize Question from dictionary. */
 export const toQuestion = (dict: Dictionary): Question => {
   const type = dict.type as QuestionType
   switch (type) {
@@ -159,6 +164,7 @@ export const toQuestion = (dict: Dictionary): Question => {
   }
 }
 
+/** Serialize Question to dictionary. */
 export const fromQuestion = (question: Question): Dictionary => {
   switch (question.type) {
     case 'internal':
@@ -192,6 +198,7 @@ export const fromQuestion = (question: Question): Dictionary => {
   }
 }
 
+/** Deserialize Answer from dictionary. */
 export const toAnswer = (dict: Dictionary): Answer => ({
   questionId: dict.question_id as string,
   notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
@@ -199,6 +206,7 @@ export const toAnswer = (dict: Dictionary): Answer => ({
   capturedAt: dict.captured_at as string
 })
 
+/** Serialize Answer to dictionary. */
 export const fromAnswer = (answer: Answer): Dictionary => ({
   question_id: answer.questionId,
   notes: answer.notes.map(fromNote),

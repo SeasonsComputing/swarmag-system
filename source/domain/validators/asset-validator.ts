@@ -12,8 +12,8 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateAssetTypeCreate(input)  Validate AssetTypeCreate payloads.
 validateAssetTypeUpdate(input)  Validate AssetTypeUpdate payloads.
-validateAssetCreate(input)  Validate AssetCreate payloads.
-validateAssetUpdate(input)  Validate AssetUpdate payloads.
+validateAssetCreate(input)      Validate AssetCreate payloads.
+validateAssetUpdate(input)      Validate AssetUpdate payloads.
 */
 
 import {
@@ -34,16 +34,14 @@ import type {
 } from '@domain/protocols/asset-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Validate AssetTypeCreate payloads. */
 export const validateAssetTypeCreate = (input: AssetTypeCreate): ExpectResult =>
   expectValid(
     expectNonEmptyString(input.label, 'label'),
     expectBoolean(input.active, 'active')
   )
 
+/** Validate AssetTypeUpdate payloads. */
 export const validateAssetTypeUpdate = (input: AssetTypeUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -51,6 +49,7 @@ export const validateAssetTypeUpdate = (input: AssetTypeUpdate): ExpectResult =>
     expectBoolean(input.active, 'active', true)
   )
 
+/** Validate AssetCreate payloads. */
 export const validateAssetCreate = (input: AssetCreate): ExpectResult =>
   expectValid(
     expectId(input.type, 'type'),
@@ -61,6 +60,7 @@ export const validateAssetCreate = (input: AssetCreate): ExpectResult =>
     expectConstEnum(input.status, 'status', ASSET_STATUSES)
   )
 
+/** Validate AssetUpdate payloads. */
 export const validateAssetUpdate = (input: AssetUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),

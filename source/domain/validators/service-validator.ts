@@ -10,8 +10,8 @@ Validates create and update protocol payloads for service abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateServiceCreate(input)  Validate ServiceCreate payloads.
-validateServiceUpdate(input)  Validate ServiceUpdate payloads.
+validateServiceCreate(input)                   Validate ServiceCreate payloads.
+validateServiceUpdate(input)                   Validate ServiceUpdate payloads.
 validateServiceRequiredAssetTypeCreate(input)  Validate service asset requirement payloads.
 */
 
@@ -32,10 +32,7 @@ import type {
 } from '@domain/protocols/service-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Validate ServiceCreate payloads. */
 export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
   expectValid(
     expectCompositionMany(input.notes, 'notes', isNote),
@@ -46,6 +43,7 @@ export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
     expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isNonEmptyString)
   )
 
+/** Validate ServiceUpdate payloads. */
 export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -62,6 +60,7 @@ export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
     )
   )
 
+/** Validate ServiceRequiredAssetTypeCreate payloads. */
 export const validateServiceRequiredAssetTypeCreate = (
   input: ServiceRequiredAssetTypeCreate
 ): ExpectResult =>

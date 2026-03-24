@@ -12,11 +12,11 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateQuestionCreate(input)  Validate QuestionCreate payloads.
 validateQuestionUpdate(input)  Validate QuestionUpdate payloads.
-isLocation(v)  Guard for Location object values.
-isAttachment(v)  Guard for Attachment object values.
-isNote(v)  Guard for Note object values.
-isSelectOption(v)  Guard for SelectOption object values.
-isAnswer(v)  Guard for Answer object values.
+isLocation(v)                  Guard for Location object values.
+isAttachment(v)                Guard for Attachment object values.
+isNote(v)                      Guard for Note object values.
+isSelectOption(v)              Guard for SelectOption object values.
+isAnswer(v)                    Guard for Answer object values.
 */
 
 import {
@@ -43,10 +43,7 @@ import {
 } from '@domain/abstractions/common.ts'
 import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/common-protocol.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Validate QuestionCreate payloads. */
 export const validateQuestionCreate = (input: QuestionCreate): ExpectResult => {
   const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES)
   if (typeError) return typeError
@@ -70,6 +67,7 @@ export const validateQuestionCreate = (input: QuestionCreate): ExpectResult => {
   }
 }
 
+/** Validate QuestionUpdate payloads. */
 export const validateQuestionUpdate = (input: QuestionUpdate): ExpectResult => {
   const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES, true)
   if (typeError) return typeError
@@ -95,6 +93,7 @@ export const validateQuestionUpdate = (input: QuestionUpdate): ExpectResult => {
   }
 }
 
+/** Guard for Location values. */
 export const isLocation = (v: unknown): v is Location => {
   if (v === null || typeof v !== 'object') return false
   const location = v as Location
@@ -109,6 +108,7 @@ export const isLocation = (v: unknown): v is Location => {
       ) === null && typeof location.latitude === 'number' && typeof location.longitude === 'number'
 }
 
+/** Guard for Attachment values. */
 export const isAttachment = (v: unknown): v is Attachment => {
   if (v === null || typeof v !== 'object') return false
   const attachment = v as Attachment
@@ -121,6 +121,7 @@ export const isAttachment = (v: unknown): v is Attachment => {
   ) === null
 }
 
+/** Guard for Note values. */
 export const isNote = (v: unknown): v is Note => {
   if (v === null || typeof v !== 'object') return false
   const note = v as Note
@@ -133,6 +134,7 @@ export const isNote = (v: unknown): v is Note => {
   ) === null
 }
 
+/** Guard for SelectOption values. */
 export const isSelectOption = (v: unknown): v is SelectOption => {
   if (v === null || typeof v !== 'object') return false
   const option = v as SelectOption
@@ -143,6 +145,7 @@ export const isSelectOption = (v: unknown): v is SelectOption => {
   ) === null
 }
 
+/** Guard for Answer values. */
 export const isAnswer = (v: unknown): v is Answer => {
   if (v === null || typeof v !== 'object') return false
   const answer = v as Answer

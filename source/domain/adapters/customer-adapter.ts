@@ -10,11 +10,11 @@ Maps storage dictionaries to customer abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toContact(dict)  Deserialize Contact from dictionary.
-fromContact(contact)  Serialize Contact to dictionary.
-toCustomerSite(dict)  Deserialize CustomerSite from dictionary.
+toContact(dict)         Deserialize Contact from dictionary.
+fromContact(contact)    Serialize Contact to dictionary.
+toCustomerSite(dict)    Deserialize CustomerSite from dictionary.
 fromCustomerSite(site)  Serialize CustomerSite to dictionary.
-toCustomer(dict)  Deserialize Customer from dictionary.
+toCustomer(dict)        Deserialize Customer from dictionary.
 fromCustomer(customer)  Serialize Customer to dictionary.
 */
 
@@ -22,10 +22,7 @@ import type { Dictionary } from '@core/std'
 import type { Contact, Customer, CustomerSite } from '@domain/abstractions/customer.ts'
 import { fromLocation, fromNote, toLocation, toNote } from '@domain/adapters/common-adapter.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Deserialize Contact from dictionary. */
 export const toContact = (dict: Dictionary): Contact => ({
   notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
   name: dict.name as string,
@@ -35,6 +32,7 @@ export const toContact = (dict: Dictionary): Contact => ({
   preferredChannel: dict.preferred_channel as Contact['preferredChannel']
 })
 
+/** Serialize Contact to dictionary. */
 export const fromContact = (contact: Contact): Dictionary => ({
   notes: contact.notes.map(fromNote),
   name: contact.name,
@@ -44,6 +42,7 @@ export const fromContact = (contact: Contact): Dictionary => ({
   preferred_channel: contact.preferredChannel
 })
 
+/** Deserialize CustomerSite from dictionary. */
 export const toCustomerSite = (dict: Dictionary): CustomerSite => ({
   customerId: dict.customer_id as string,
   location: [toLocation(dict.location as Dictionary)],
@@ -52,6 +51,7 @@ export const toCustomerSite = (dict: Dictionary): CustomerSite => ({
   acreage: dict.acreage as number | undefined
 })
 
+/** Serialize CustomerSite to dictionary. */
 export const fromCustomerSite = (site: CustomerSite): Dictionary => ({
   customer_id: site.customerId,
   location: fromLocation(site.location[0] as never),
@@ -60,6 +60,7 @@ export const fromCustomerSite = (site: CustomerSite): Dictionary => ({
   acreage: site.acreage
 })
 
+/** Deserialize Customer from dictionary. */
 export const toCustomer = (dict: Dictionary): Customer => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -79,6 +80,7 @@ export const toCustomer = (dict: Dictionary): Customer => ({
   country: dict.country as string
 })
 
+/** Serialize Customer to dictionary. */
 export const fromCustomer = (customer: Customer): Dictionary => ({
   id: customer.id,
   created_at: customer.createdAt,

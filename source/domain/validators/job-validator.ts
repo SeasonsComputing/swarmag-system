@@ -10,22 +10,22 @@ Validates create and update protocol payloads for job abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateJobCreate(input)  Validate JobCreate payloads.
-validateJobUpdate(input)  Validate JobUpdate payloads.
-validateJobAssessmentCreate(input)  Validate JobAssessmentCreate payloads.
-validateJobAssessmentUpdate(input)  Validate JobAssessmentUpdate payloads.
-validateJobWorkflowCreate(input)  Validate JobWorkflowCreate payloads.
-validateJobWorkflowUpdate(input)  Validate JobWorkflowUpdate payloads.
-validateJobPlanCreate(input)  Validate JobPlanCreate payloads.
-validateJobPlanUpdate(input)  Validate JobPlanUpdate payloads.
+validateJobCreate(input)                Validate JobCreate payloads.
+validateJobUpdate(input)                Validate JobUpdate payloads.
+validateJobAssessmentCreate(input)      Validate JobAssessmentCreate payloads.
+validateJobAssessmentUpdate(input)      Validate JobAssessmentUpdate payloads.
+validateJobWorkflowCreate(input)        Validate JobWorkflowCreate payloads.
+validateJobWorkflowUpdate(input)        Validate JobWorkflowUpdate payloads.
+validateJobPlanCreate(input)            Validate JobPlanCreate payloads.
+validateJobPlanUpdate(input)            Validate JobPlanUpdate payloads.
 validateJobPlanAssignmentCreate(input)  Validate JobPlanAssignmentCreate payloads.
 validateJobPlanAssignmentUpdate(input)  Validate JobPlanAssignmentUpdate payloads.
-validateJobPlanChemicalCreate(input)  Validate JobPlanChemicalCreate payloads.
-validateJobPlanChemicalUpdate(input)  Validate JobPlanChemicalUpdate payloads.
-validateJobPlanAssetCreate(input)  Validate JobPlanAssetCreate payloads.
-validateJobWorkCreate(input)  Validate JobWorkCreate payloads.
-validateJobWorkUpdate(input)  Validate JobWorkUpdate payloads.
-validateJobWorkLogEntryCreate(input)  Validate JobWorkLogEntryCreate payloads.
+validateJobPlanChemicalCreate(input)    Validate JobPlanChemicalCreate payloads.
+validateJobPlanChemicalUpdate(input)    Validate JobPlanChemicalUpdate payloads.
+validateJobPlanAssetCreate(input)       Validate JobPlanAssetCreate payloads.
+validateJobWorkCreate(input)            Validate JobWorkCreate payloads.
+validateJobWorkUpdate(input)            Validate JobWorkUpdate payloads.
+validateJobWorkLogEntryCreate(input)    Validate JobWorkLogEntryCreate payloads.
 */
 
 import {
@@ -66,16 +66,14 @@ import type {
 } from '@domain/protocols/job-protocol.ts'
 import { isAnswer, isLocation, isNote } from '@domain/validators/common-validator.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Validate JobCreate payloads. */
 export const validateJobCreate = (input: JobCreate): ExpectResult =>
   expectValid(
     expectId(input.customerId, 'customerId'),
     expectConstEnum(input.status, 'status', JOB_STATUSES)
   )
 
+/** Validate JobUpdate payloads. */
 export const validateJobUpdate = (input: JobUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -83,6 +81,7 @@ export const validateJobUpdate = (input: JobUpdate): ExpectResult =>
     expectConstEnum(input.status, 'status', JOB_STATUSES, true)
   )
 
+/** Validate JobAssessmentCreate payloads. */
 export const validateJobAssessmentCreate = (input: JobAssessmentCreate): ExpectResult =>
   expectValid(
     expectWhen(input.scheduledAt, 'scheduledAt'),
@@ -95,6 +94,7 @@ export const validateJobAssessmentCreate = (input: JobAssessmentCreate): ExpectR
     expectCompositionMany(input.notes, 'notes', isNote)
   )
 
+/** Validate JobAssessmentUpdate payloads. */
 export const validateJobAssessmentUpdate = (input: JobAssessmentUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -108,6 +108,7 @@ export const validateJobAssessmentUpdate = (input: JobAssessmentUpdate): ExpectR
     expectCompositionMany(input.notes, 'notes', isNote, true)
   )
 
+/** Validate JobWorkflowCreate payloads. */
 export const validateJobWorkflowCreate = (input: JobWorkflowCreate): ExpectResult =>
   expectValid(
     expectId(input.jobId, 'jobId'),
@@ -115,6 +116,7 @@ export const validateJobWorkflowCreate = (input: JobWorkflowCreate): ExpectResul
     expectId(input.modifiedWorkflowId, 'modifiedWorkflowId', true)
   )
 
+/** Validate JobWorkflowUpdate payloads. */
 export const validateJobWorkflowUpdate = (input: JobWorkflowUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -123,6 +125,7 @@ export const validateJobWorkflowUpdate = (input: JobWorkflowUpdate): ExpectResul
     expectId(input.modifiedWorkflowId, 'modifiedWorkflowId', true)
   )
 
+/** Validate JobPlanCreate payloads. */
 export const validateJobPlanCreate = (input: JobPlanCreate): ExpectResult =>
   expectValid(
     expectId(input.jobId, 'jobId'),
@@ -132,6 +135,7 @@ export const validateJobPlanCreate = (input: JobPlanCreate): ExpectResult =>
     expectPositiveNumber(input.durationEstimate, 'durationEstimate')
   )
 
+/** Validate JobPlanUpdate payloads. */
 export const validateJobPlanUpdate = (input: JobPlanUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -142,6 +146,7 @@ export const validateJobPlanUpdate = (input: JobPlanUpdate): ExpectResult =>
     expectPositiveNumber(input.durationEstimate, 'durationEstimate', true)
   )
 
+/** Validate JobPlanAssignmentCreate payloads. */
 export const validateJobPlanAssignmentCreate = (
   input: JobPlanAssignmentCreate
 ): ExpectResult =>
@@ -152,6 +157,7 @@ export const validateJobPlanAssignmentCreate = (
     expectConstEnum(input.role, 'role', USER_ROLES)
   )
 
+/** Validate JobPlanAssignmentUpdate payloads. */
 export const validateJobPlanAssignmentUpdate = (
   input: JobPlanAssignmentUpdate
 ): ExpectResult =>
@@ -163,6 +169,7 @@ export const validateJobPlanAssignmentUpdate = (
     expectConstEnum(input.role, 'role', USER_ROLES, true)
   )
 
+/** Validate JobPlanChemicalCreate payloads. */
 export const validateJobPlanChemicalCreate = (input: JobPlanChemicalCreate): ExpectResult =>
   expectValid(
     expectId(input.planId, 'planId'),
@@ -173,6 +180,7 @@ export const validateJobPlanChemicalCreate = (input: JobPlanChemicalCreate): Exp
     expectConstEnum(input.targetAreaUnit, 'targetAreaUnit', JOB_PLAN_TARGET_AREA_UNITS)
   )
 
+/** Validate JobPlanChemicalUpdate payloads. */
 export const validateJobPlanChemicalUpdate = (input: JobPlanChemicalUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -184,12 +192,14 @@ export const validateJobPlanChemicalUpdate = (input: JobPlanChemicalUpdate): Exp
     expectConstEnum(input.targetAreaUnit, 'targetAreaUnit', JOB_PLAN_TARGET_AREA_UNITS, true)
   )
 
+/** Validate JobPlanAssetCreate payloads. */
 export const validateJobPlanAssetCreate = (input: JobPlanAssetCreate): ExpectResult =>
   expectValid(
     expectId(input.planId, 'planId'),
     expectId(input.assetId, 'assetId')
   )
 
+/** Validate JobWorkCreate payloads. */
 export const validateJobWorkCreate = (input: JobWorkCreate): ExpectResult =>
   expectValid(
     expectId(input.jobId, 'jobId'),
@@ -199,6 +209,7 @@ export const validateJobWorkCreate = (input: JobWorkCreate): ExpectResult =>
     expectWhen(input.completedAt, 'completedAt', true)
   )
 
+/** Validate JobWorkUpdate payloads. */
 export const validateJobWorkUpdate = (input: JobWorkUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -209,6 +220,7 @@ export const validateJobWorkUpdate = (input: JobWorkUpdate): ExpectResult =>
     expectWhen(input.completedAt, 'completedAt', true)
   )
 
+/** Validate JobWorkLogEntryCreate payloads. */
 export const validateJobWorkLogEntryCreate = (
   input: JobWorkLogEntryCreate
 ): ExpectResult =>

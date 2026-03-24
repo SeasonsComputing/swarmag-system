@@ -37,6 +37,29 @@ The domain layer follows a file-per-topic-namespace pattern, where each file con
 
 All domain files conform to `style-guide.md` Functional files format.
 
+### 2.2 Header Public Formatting
+
+The file-header `PUBLIC` subsection is mandatory for all domain archetype files.
+
+`PUBLIC` entries must follow these rules:
+
+- One symbol per line.
+- Symbol and description must be on the same line.
+- Use at least two spaces between symbol and description.
+- Align the description column vertically for all entries in that file header.
+
+### 2.3 Export Comment and Body Section Rules
+
+Exported symbols follow explicit one-line comments:
+
+- Every exported function and exported type alias has a single-line JSDoc comment directly above the export.
+- For const-enum pairs in abstractions, use one single-line JSDoc comment above the `const` tuple; the derived `type` directly below inherits that header context.
+
+In-source section dividers are conditional:
+
+- If a file contains only exported symbols at top level, omit in-source `PUBLIC` divider banners.
+- If a file contains exports and private helpers, keep explicit section dividers (for example `PUBLIC`, `GUARDS`) to separate concerns.
+
 ## 3. Abstractions
 
 Source: `@domain/abstractions/{topic}.ts`
@@ -335,6 +358,13 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
 ```
 
+Validator formatting requirements:
+
+- File-header `PUBLIC` entries must have aligned description columns.
+- Every exported validator and exported guard has a single-line JSDoc comment immediately above its export.
+- Omit in-source `PUBLIC` divider banners when the validator file is export-only.
+- Keep section dividers when private helpers exist.
+
 ### 5.3 Union-Type Validation
 
 Validate the discriminator first with `expectConstEnum`, then switch on the type for branch-specific field checks.
@@ -481,6 +511,12 @@ export const fromUser = (user: User): Dictionary => ({
   status: user.status
 })
 ```
+
+Adapter formatting requirements:
+
+- File-header `PUBLIC` entries must have aligned description columns.
+- Every exported adapter function has a single-line JSDoc comment immediately above its export.
+- Omit in-source `PUBLIC` divider banners for export-only adapter files.
 
 ### 6.3 Column Mapping
 

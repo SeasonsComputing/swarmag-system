@@ -12,7 +12,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateChemicalCreate(input)  Validate ChemicalCreate payloads.
 validateChemicalUpdate(input)  Validate ChemicalUpdate payloads.
-isChemicalLabel(v)  Guard for ChemicalLabel object values.
+isChemicalLabel(v)             Guard for ChemicalLabel object values.
 */
 
 import {
@@ -33,10 +33,7 @@ import {
 import type { ChemicalCreate, ChemicalUpdate } from '@domain/protocols/chemical-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Validate ChemicalCreate payloads. */
 export const validateChemicalCreate = (input: ChemicalCreate): ExpectResult =>
   expectValid(
     expectCompositionMany(input.labels, 'labels', isChemicalLabel),
@@ -51,6 +48,7 @@ export const validateChemicalCreate = (input: ChemicalCreate): ExpectResult =>
     expectNonEmptyString(input.sdsUrl, 'sdsUrl', true)
   )
 
+/** Validate ChemicalUpdate payloads. */
 export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -66,6 +64,7 @@ export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
     expectNonEmptyString(input.sdsUrl, 'sdsUrl', true)
   )
 
+/** Guard for ChemicalLabel values. */
 export const isChemicalLabel = (v: unknown): v is ChemicalLabel => {
   if (v === null || typeof v !== 'object') return false
   const label = v as ChemicalLabel
