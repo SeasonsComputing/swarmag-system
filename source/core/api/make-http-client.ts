@@ -22,9 +22,12 @@ import {
   type ApiBusRuleContract,
   type ApiCrudContract,
   ApiError,
-  DeleteResult,
+  type ApiErrorDetail,
+  checkApiError,
+  type DeleteResult,
   type ListOptions,
-  type ListResult
+  type ListResult,
+  throwApiError
 } from './api-contract.ts'
 
 /** Configuration for a business-rule HTTP API client. */
@@ -42,7 +45,7 @@ export function makeCrudHttpClient<T extends Instantiable, TCreate, TUpdate>(
   return {
     /* Create record over HTTP and unwrap API envelope. */
     async create(input: TCreate): Promise<T> {
-      const res = await fetch(`${basePath}/create`, {
+      const res = await request(`${basePath}/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(input)
@@ -52,13 +55,13 @@ export function makeCrudHttpClient<T extends Instantiable, TCreate, TUpdate>(
 
     /* Get record by id over HTTP and unwrap API envelope. */
     async get(id: Id): Promise<T> {
-      const res = await fetch(`${basePath}/get?id=${id}`)
+      const res = await request(`${basePath}/get?id=${encodeURIComponent(id)}`)
       return unwrap<T>(res)
     },
 
     /* Update record over HTTP and unwrap API envelope. */
     async update(input: TUpdate): Promise<T> {
-      const res = await fetch(`${basePath}/update`, {
+      const res = await request(`${basePath}/update`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(input)
@@ -68,7 +71,7 @@ export function makeCrudHttpClient<T extends Instantiable, TCreate, TUpdate>(
 
     /* Soft-delete record over HTTP and unwrap delete payload. */
     async delete(id: Id): Promise<DeleteResult> {
-      const res = await fetch(`${basePath}/delete`, {
+      const res = await request(`${basePath}/delete`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id })
@@ -78,7 +81,7 @@ export function makeCrudHttpClient<T extends Instantiable, TCreate, TUpdate>(
 
     /* List records over HTTP using list payload options. */
     async list(options?: ListOptions): Promise<ListResult<T>> {
-      const res = await fetch(`${basePath}/list`, {
+      const res = await request(`${basePath}/list`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(options ?? {})
@@ -97,7 +100,7 @@ export function makeBusRuleHttpClient(spec: HttpSpecification): ApiBusRuleContra
   const { basePath } = spec
   return {
     async run(params: Dictionary): Promise<Dictionary> {
-      const res = await fetch(basePath, {
+      const res = await request(basePath, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(params)
@@ -110,6 +113,25 @@ export function makeBusRuleHttpClient(spec: HttpSpecification): ApiBusRuleContra
 // ───────────────────────────────────────────────────────────────────────────────
 // INTERNALS
 // ───────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Execute fetch and normalize transport failures to ApiError.
+ * @param input Request URL.
+ * @param init Request options.
+ * @returns Fetch response.
+ * @throws ApiError on network/transport failure.
+ */
+async function request(input: string, init?: RequestInit): Promise<Response> {
+  try {
+    return await fetch(input, init)
+  } catch (error) {
+    throwApiError(
+      { message: error instanceof Error ? error.message : undefined },
+      'Network request failed',
+      503
+    )
+  }
+}
 
 /**
  * Parse the JSON body from a response.
@@ -134,11 +156,11 @@ async function parseBody(response: Response): Promise<Dictionary> {
 async function unwrap<T>(response: Response): Promise<T> {
   const body = await parseBody(response)
   if (!response.ok) {
-    throw new ApiError(
-      (body.error as string) ?? 'Request failed',
-      response.status,
-      body.details as string | undefined
-    )
+    const apiError: ApiErrorDetail = {
+      message: body.error as string | undefined,
+      details: body.details as string | undefined
+    }
+    checkApiError(apiError, 'Request failed', response.status)
   }
   return body.data as T
 }
@@ -156,11 +178,11 @@ async function unwrapList<T>(
 ): Promise<ListResult<T>> {
   const body = await parseBody(response)
   if (!response.ok) {
-    throw new ApiError(
-      (body.error as string) ?? fallbackError,
-      response.status,
-      body.details as string | undefined
-    )
+    const apiError: ApiErrorDetail = {
+      message: body.error as string | undefined,
+      details: body.details as string | undefined
+    }
+    checkApiError(apiError, fallbackError, response.status)
   }
   return {
     data: body.data as T[],

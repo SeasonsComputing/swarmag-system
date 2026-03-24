@@ -17,10 +17,10 @@ makeCrudSupabaseClient(spec)          Build CRUD/list client over Supabase.
 
 import { Supabase } from '@core/db/supabase.ts'
 import { type Dictionary, type Id, instance, type Instantiable, type When, when } from '@core/std'
-import type { PostgrestError } from '@supabase/client'
 import {
   type ApiCrudContract,
   ApiError,
+  checkApiError,
   type DeleteResult,
   listCursorValue,
   type ListOptions,
@@ -57,7 +57,7 @@ export function makeCrudSupabaseClient<T extends Instantiable, TCreate, TUpdate>
         .select()
         .single()
 
-      if (error) toApiError(error, 'Failed to create record')
+      checkApiError(error, 'Failed to create record', Supabase.errorToStatus)
       return fromStorage(data as Dictionary)
     },
 
@@ -70,7 +70,7 @@ export function makeCrudSupabaseClient<T extends Instantiable, TCreate, TUpdate>
         .is('deleted_at', null)
         .single()
 
-      if (error) toApiError(error, 'Failed to get record')
+      checkApiError(error, 'Failed to get record', Supabase.errorToStatus)
       return fromStorage(data as Dictionary)
     },
 
@@ -105,7 +105,7 @@ export function makeCrudSupabaseClient<T extends Instantiable, TCreate, TUpdate>
         .select()
         .single()
 
-      if (error) toApiError(error, 'Failed to update record')
+      checkApiError(error, 'Failed to update record', Supabase.errorToStatus)
       return fromStorage(data as Dictionary)
     },
 
@@ -120,7 +120,7 @@ export function makeCrudSupabaseClient<T extends Instantiable, TCreate, TUpdate>
         .select('id, deleted_at')
         .single()
 
-      if (error) toApiError(error, 'Failed to delete record')
+      checkApiError(error, 'Failed to delete record', Supabase.errorToStatus)
       const row = data as Dictionary
       return { id: row.id as Id, deletedAt: row.deleted_at as When }
     },
@@ -137,7 +137,7 @@ export function makeCrudSupabaseClient<T extends Instantiable, TCreate, TUpdate>
         .order('created_at', { ascending: true })
         .range(cursor, cursor + limit)
 
-      if (error) toApiError(error, 'Failed to list records')
+      checkApiError(error, 'Failed to list records', Supabase.errorToStatus)
       const rows = (data ?? []) as Dictionary[]
       const hasMore = rows.length > limit
       const page = hasMore ? rows.slice(0, limit) : rows
@@ -153,17 +153,6 @@ export function makeCrudSupabaseClient<T extends Instantiable, TCreate, TUpdate>
 // ────────────────────────────────────────────────────────────────────────────
 // INTERNALS
 // ────────────────────────────────────────────────────────────────────────────
-
-/**
- * Map a PostgrestError to ApiError.
- * @param error Supabase PostgREST error.
- * @param fallback Fallback message when error message is empty.
- * @throws ApiError with mapped status.
- */
-const toApiError = (error: PostgrestError, fallback: string): never => {
-  const status = Supabase.errorToStatus(error)
-  throw new ApiError(error.message || fallback, status, error.details ?? undefined)
-}
 
 /**
  * Ensure value is a dictionary object.

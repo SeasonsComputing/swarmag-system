@@ -13,6 +13,9 @@ and query-string pagination normalization.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 ApiError                           Standard API failure error shape.
+ApiErrorDetail                     Normalized error detail shape for mapping.
+checkApiError(error, ...): void    Throw ApiError when provider error exists.
+throwApiError(error, ...): never   Always throw ApiError from provider error.
 apiError(error): boolean           Runtime type guard and logger for ApiError.
 ApiCrudContract                    Generic CRUD/list client contract.
 ApiBusRuleContract                 Generic business-rule execution contract.
@@ -39,6 +42,45 @@ export class ApiError extends Error {
     super(message)
     this.name = 'ApiError'
   }
+}
+
+/** Normalized provider-error shape for ApiError mapping. */
+export type ApiErrorDetail = {
+  message?: string
+  details?: string
+  code?: string
+  status?: number
+}
+
+/**
+ * Throw ApiError when provider error is present.
+ * Uses fallback message when provider message is empty.
+ * Details default to provider details, then provider code.
+ */
+export function checkApiError<T extends ApiErrorDetail>(
+  error: T | null | undefined,
+  fallback: string,
+  status: number | ((error: T) => number),
+  details?: (error: T) => string | undefined
+): void {
+  if (!error) return
+  throwApiError(error, fallback, status, details)
+}
+
+/**
+ * Always throw ApiError using provider-error details.
+ * Uses fallback message when provider message is empty.
+ * Details default to provider details, then provider code.
+ */
+export function throwApiError<T extends ApiErrorDetail>(
+  error: T,
+  fallback: string,
+  status: number | ((error: T) => number),
+  details?: (error: T) => string | undefined
+): never {
+  const mappedStatus = typeof status === 'function' ? status(error) : status
+  const mappedDetails = details ? details(error) : error.details ?? error.code
+  throw new ApiError(error.message || fallback, mappedStatus, mappedDetails)
 }
 
 /** ApiError handler */
@@ -70,7 +112,10 @@ export interface ApiBusRuleContract {
 }
 
 /** Deletion result with timestamp. */
-export type DeleteResult = { id: Id; deletedAt: When }
+export type DeleteResult = {
+  id: Id
+  deletedAt: When
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // List API contracts

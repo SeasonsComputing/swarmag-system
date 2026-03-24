@@ -3,20 +3,17 @@
  * Registers onAuthStateChange at module load; writes session into sessionStore.
  */
 
+import { checkApiError, throwApiError } from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import type { Id } from '@core/std'
 import type { ApiAuthContract, Session } from '@ux/api/api-auth-contract.ts'
-
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
 
 /** Supabase passwordless OTP auth client. Implements ApiAuthContract. */
 export const AuthSupabaseClient: ApiAuthContract = {
   /** Sends a one-time code to the provided email address via Supabase Auth. */
   async sendOtp(email: string): Promise<void> {
     const { error } = await Supabase.client().auth.signInWithOtp({ email })
-    if (error) throw new Error(error.message)
+    checkApiError(error, 'Failed to send OTP', authErrorStatus, authErrorDetails)
   },
 
   /** Verifies the one-time code and returns an authenticated session. */
@@ -26,19 +23,21 @@ export const AuthSupabaseClient: ApiAuthContract = {
       token: code,
       type: 'email'
     })
-    if (error || !data.user) throw new Error(error?.message ?? 'Verification failed')
+    checkApiError(error, 'Verification failed', authErrorStatus, authErrorDetails)
+    if (!data.user) throwApiError({ message: 'Verification failed' }, 'Verification failed', 401)
     return toSession(data.user.id)
   },
 
   /** Signs out the current user. onAuthStateChange fires and clears sessionStore. */
   async logout(): Promise<void> {
     const { error } = await Supabase.client().auth.signOut()
-    if (error) throw new Error(error.message)
+    checkApiError(error, 'Failed to sign out', authErrorStatus, authErrorDetails)
   },
 
   /** Returns the current session on boot; null if unauthenticated. */
   async getSession(): Promise<Session | null> {
-    const { data } = await Supabase.client().auth.getSession()
+    const { data, error } = await Supabase.client().auth.getSession()
+    checkApiError(error, 'Failed to fetch session', authErrorStatus, authErrorDetails)
     return (!data.session?.user) ? null : toSession(data.session.user.id)
   },
 
@@ -56,7 +55,19 @@ export const AuthSupabaseClient: ApiAuthContract = {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// PRIVATE
+// INTERNALS
 // ────────────────────────────────────────────────────────────────────────────
 
+/** Convert Supabase user id to API Session shape. */
 const toSession = (userId: string): Session => ({ userId: userId as Id })
+
+/** Resolve auth error status with 401 fallback. */
+const authErrorStatus = (error: { status?: number }): number => {
+  const rawStatus = error.status
+  return typeof rawStatus === 'number' && Number.isInteger(rawStatus) && rawStatus > 0
+    ? rawStatus
+    : 401
+}
+
+/** Map auth error code to ApiError details field. */
+const authErrorDetails = (error: { code?: string }): string | undefined => error.code
