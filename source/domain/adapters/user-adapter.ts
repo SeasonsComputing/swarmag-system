@@ -10,17 +10,14 @@ Maps storage dictionaries to user abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toUser(dict)  Deserialize User from dictionary.
+toUser(dict)    Deserialize User from dictionary.
 fromUser(user)  Serialize User to dictionary.
 */
 
 import type { Dictionary } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Deserialize User from dictionary. */
 export const toUser = (dict: Dictionary): User => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -34,6 +31,7 @@ export const toUser = (dict: Dictionary): User => ({
   status: dict.status as User['status']
 })
 
+/** Serialize User to dictionary. */
 export const fromUser = (user: User): Dictionary => ({
   id: user.id,
   created_at: user.createdAt,

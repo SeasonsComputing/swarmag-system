@@ -10,30 +10,29 @@ Maps storage dictionaries to chemical abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toChemicalLabel(dict)  Deserialize ChemicalLabel from dictionary.
+toChemicalLabel(dict)     Deserialize ChemicalLabel from dictionary.
 fromChemicalLabel(label)  Serialize ChemicalLabel to dictionary.
-toChemical(dict)  Deserialize Chemical from dictionary.
-fromChemical(chemical)  Serialize Chemical to dictionary.
+toChemical(dict)          Deserialize Chemical from dictionary.
+fromChemical(chemical)    Serialize Chemical to dictionary.
 */
 
 import type { Dictionary } from '@core/std'
 import type { Chemical, ChemicalLabel } from '@domain/abstractions/chemical.ts'
 import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Deserialize ChemicalLabel from dictionary. */
 export const toChemicalLabel = (dict: Dictionary): ChemicalLabel => ({
   url: dict.url as string,
   description: dict.description as string | undefined
 })
 
+/** Serialize ChemicalLabel to dictionary. */
 export const fromChemicalLabel = (label: ChemicalLabel): Dictionary => ({
   url: label.url,
   description: label.description
 })
 
+/** Deserialize Chemical from dictionary. */
 export const toChemical = (dict: Dictionary): Chemical => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -51,6 +50,7 @@ export const toChemical = (dict: Dictionary): Chemical => ({
   sdsUrl: dict.sds_url as string | undefined
 })
 
+/** Serialize Chemical to dictionary. */
 export const fromChemical = (chemical: Chemical): Dictionary => ({
   id: chemical.id,
   created_at: chemical.createdAt,

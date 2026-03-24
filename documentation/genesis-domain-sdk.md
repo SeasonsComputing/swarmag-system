@@ -38,6 +38,9 @@ Per `domain-data-dictionary.md`, `domain-archetypes.md` and `style-guide.md`.
 The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Phase II:
 
 - Any inline `import('...').TypeName` expression in type positions — use top-level `import type` per `style-guide.md` §3.3.
+- Missing file-header `PUBLIC` subsection, or `PUBLIC` entries without aligned description column.
+- Missing single-line JSDoc comment above exported abstractions.
+- For const-enum abstraction pairs, missing shared single-line JSDoc comment above the exported tuple.
 
 ### 2.2 Phase II - Adapters, Protocols and Validators
 
@@ -52,6 +55,9 @@ The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Ph
 - `CreateFromInstantiable` or `UpdateFromInstantiable` applied directly to a union type — use per-variant types per `domain-archetypes.md` §4.4.
 - Any `isObject` guard in a validator — use named exported guards per `domain-archetypes.md` §5.6.
 - Any local id-string guard (e.g. `isIdString`) — use `isId` from `@core/std`.
+- Missing file-header `PUBLIC` subsection, or `PUBLIC` entries without aligned description column.
+- Missing single-line JSDoc comment above exported adapter, protocol, or validator symbols.
+- In export-only adapter/validator files, presence of in-source `PUBLIC` divider banners.
 
 ### 2.3 Phase III — Schema
 

@@ -12,8 +12,8 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateCustomerCreate(input)  Validate CustomerCreate payloads.
 validateCustomerUpdate(input)  Validate CustomerUpdate payloads.
-isContact(v)  Guard for Contact object values.
-isCustomerSite(v)  Guard for CustomerSite object values.
+isContact(v)                   Guard for Contact object values.
+isCustomerSite(v)              Guard for CustomerSite object values.
 */
 
 import {
@@ -37,10 +37,7 @@ import {
 import type { CustomerCreate, CustomerUpdate } from '@domain/protocols/customer-protocol.ts'
 import { isLocation, isNote } from '@domain/validators/common-validator.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Validate CustomerCreate payloads. */
 export const validateCustomerCreate = (input: CustomerCreate): ExpectResult =>
   expectValid(
     expectId(input.accountManagerId, 'accountManagerId', true),
@@ -57,6 +54,7 @@ export const validateCustomerCreate = (input: CustomerCreate): ExpectResult =>
     expectNonEmptyString(input.country, 'country')
   )
 
+/** Validate CustomerUpdate payloads. */
 export const validateCustomerUpdate = (input: CustomerUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
@@ -74,6 +72,7 @@ export const validateCustomerUpdate = (input: CustomerUpdate): ExpectResult =>
     expectNonEmptyString(input.country, 'country', true)
   )
 
+/** Guard for Contact values. */
 export const isContact = (v: unknown): v is Contact => {
   if (v === null || typeof v !== 'object') return false
   const contact = v as Contact
@@ -87,6 +86,7 @@ export const isContact = (v: unknown): v is Contact => {
   ) === null
 }
 
+/** Guard for CustomerSite values. */
 export const isCustomerSite = (v: unknown): v is CustomerSite => {
   if (v === null || typeof v !== 'object') return false
   const site = v as CustomerSite

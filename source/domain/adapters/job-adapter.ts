@@ -10,24 +10,24 @@ Maps storage dictionaries to job abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toJob(dict)  Deserialize Job from dictionary.
-fromJob(job)  Serialize Job to dictionary.
-toJobAssessment(dict)  Deserialize JobAssessment from dictionary.
-fromJobAssessment(assessment)  Serialize JobAssessment to dictionary.
-toJobWorkflow(dict)  Deserialize JobWorkflow from dictionary.
-fromJobWorkflow(record)  Serialize JobWorkflow to dictionary.
-toJobPlan(dict)  Deserialize JobPlan from dictionary.
-fromJobPlan(plan)  Serialize JobPlan to dictionary.
-toJobPlanAssignment(dict)  Deserialize JobPlanAssignment from dictionary.
+toJob(dict)                        Deserialize Job from dictionary.
+fromJob(job)                       Serialize Job to dictionary.
+toJobAssessment(dict)              Deserialize JobAssessment from dictionary.
+fromJobAssessment(assessment)      Serialize JobAssessment to dictionary.
+toJobWorkflow(dict)                Deserialize JobWorkflow from dictionary.
+fromJobWorkflow(record)            Serialize JobWorkflow to dictionary.
+toJobPlan(dict)                    Deserialize JobPlan from dictionary.
+fromJobPlan(plan)                  Serialize JobPlan to dictionary.
+toJobPlanAssignment(dict)          Deserialize JobPlanAssignment from dictionary.
 fromJobPlanAssignment(assignment)  Serialize JobPlanAssignment to dictionary.
-toJobPlanChemical(dict)  Deserialize JobPlanChemical from dictionary.
-fromJobPlanChemical(chemical)  Serialize JobPlanChemical to dictionary.
-toJobPlanAsset(dict)  Deserialize JobPlanAsset from dictionary.
-fromJobPlanAsset(record)  Serialize JobPlanAsset to dictionary.
-toJobWork(dict)  Deserialize JobWork from dictionary.
-fromJobWork(work)  Serialize JobWork to dictionary.
-toJobWorkLogEntry(dict)  Deserialize JobWorkLogEntry from dictionary.
-fromJobWorkLogEntry(entry)  Serialize JobWorkLogEntry to dictionary.
+toJobPlanChemical(dict)            Deserialize JobPlanChemical from dictionary.
+fromJobPlanChemical(chemical)      Serialize JobPlanChemical to dictionary.
+toJobPlanAsset(dict)               Deserialize JobPlanAsset from dictionary.
+fromJobPlanAsset(record)           Serialize JobPlanAsset to dictionary.
+toJobWork(dict)                    Deserialize JobWork from dictionary.
+fromJobWork(work)                  Serialize JobWork to dictionary.
+toJobWorkLogEntry(dict)            Deserialize JobWorkLogEntry from dictionary.
+fromJobWorkLogEntry(entry)         Serialize JobWorkLogEntry to dictionary.
 */
 
 import type { Dictionary } from '@core/std'
@@ -51,10 +51,7 @@ import {
   toNote
 } from '@domain/adapters/common-adapter.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
-// ────────────────────────────────────────────────────────────────────────────
-
+/** Deserialize Job from dictionary. */
 export const toJob = (dict: Dictionary): Job => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -64,6 +61,7 @@ export const toJob = (dict: Dictionary): Job => ({
   status: dict.status as Job['status']
 })
 
+/** Serialize Job to dictionary. */
 export const fromJob = (job: Job): Dictionary => ({
   id: job.id,
   created_at: job.createdAt,
@@ -73,6 +71,7 @@ export const fromJob = (job: Job): Dictionary => ({
   status: job.status
 })
 
+/** Deserialize JobAssessment from dictionary. */
 export const toJobAssessment = (dict: Dictionary): JobAssessment => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -88,6 +87,7 @@ export const toJobAssessment = (dict: Dictionary): JobAssessment => ({
   notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote)
 })
 
+/** Serialize JobAssessment to dictionary. */
 export const fromJobAssessment = (assessment: JobAssessment): Dictionary => ({
   id: assessment.id,
   created_at: assessment.createdAt,
@@ -103,6 +103,7 @@ export const fromJobAssessment = (assessment: JobAssessment): Dictionary => ({
   notes: assessment.notes.map(fromNote)
 })
 
+/** Deserialize JobWorkflow from dictionary. */
 export const toJobWorkflow = (dict: Dictionary): JobWorkflow => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -113,6 +114,7 @@ export const toJobWorkflow = (dict: Dictionary): JobWorkflow => ({
   modifiedWorkflowId: dict.modified_workflow_id as string | undefined
 })
 
+/** Serialize JobWorkflow to dictionary. */
 export const fromJobWorkflow = (record: JobWorkflow): Dictionary => ({
   id: record.id,
   created_at: record.createdAt,
@@ -123,6 +125,7 @@ export const fromJobWorkflow = (record: JobWorkflow): Dictionary => ({
   modified_workflow_id: record.modifiedWorkflowId
 })
 
+/** Deserialize JobPlan from dictionary. */
 export const toJobPlan = (dict: Dictionary): JobPlan => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -135,6 +138,7 @@ export const toJobPlan = (dict: Dictionary): JobPlan => ({
   durationEstimate: dict.duration_estimate as number
 })
 
+/** Serialize JobPlan to dictionary. */
 export const fromJobPlan = (plan: JobPlan): Dictionary => ({
   id: plan.id,
   created_at: plan.createdAt,
@@ -147,6 +151,7 @@ export const fromJobPlan = (plan: JobPlan): Dictionary => ({
   duration_estimate: plan.durationEstimate
 })
 
+/** Deserialize JobPlanAssignment from dictionary. */
 export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -158,6 +163,7 @@ export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => ({
   role: dict.role as JobPlanAssignment['role']
 })
 
+/** Serialize JobPlanAssignment to dictionary. */
 export const fromJobPlanAssignment = (assignment: JobPlanAssignment): Dictionary => ({
   id: assignment.id,
   created_at: assignment.createdAt,
@@ -169,6 +175,7 @@ export const fromJobPlanAssignment = (assignment: JobPlanAssignment): Dictionary
   role: assignment.role
 })
 
+/** Deserialize JobPlanChemical from dictionary. */
 export const toJobPlanChemical = (dict: Dictionary): JobPlanChemical => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -182,6 +189,7 @@ export const toJobPlanChemical = (dict: Dictionary): JobPlanChemical => ({
   targetAreaUnit: dict.target_area_unit as JobPlanChemical['targetAreaUnit']
 })
 
+/** Serialize JobPlanChemical to dictionary. */
 export const fromJobPlanChemical = (chemical: JobPlanChemical): Dictionary => ({
   id: chemical.id,
   created_at: chemical.createdAt,
@@ -195,16 +203,19 @@ export const fromJobPlanChemical = (chemical: JobPlanChemical): Dictionary => ({
   target_area_unit: chemical.targetAreaUnit
 })
 
+/** Deserialize JobPlanAsset from dictionary. */
 export const toJobPlanAsset = (dict: Dictionary): JobPlanAsset => ({
   planId: dict.plan_id as string,
   assetId: dict.asset_id as string
 })
 
+/** Serialize JobPlanAsset to dictionary. */
 export const fromJobPlanAsset = (record: JobPlanAsset): Dictionary => ({
   plan_id: record.planId,
   asset_id: record.assetId
 })
 
+/** Deserialize JobWork from dictionary. */
 export const toJobWork = (dict: Dictionary): JobWork => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -217,6 +228,7 @@ export const toJobWork = (dict: Dictionary): JobWork => ({
   completedAt: dict.completed_at as string | undefined
 })
 
+/** Serialize JobWork to dictionary. */
 export const fromJobWork = (work: JobWork): Dictionary => ({
   id: work.id,
   created_at: work.createdAt,
@@ -229,6 +241,7 @@ export const fromJobWork = (work: JobWork): Dictionary => ({
   completed_at: work.completedAt
 })
 
+/** Deserialize JobWorkLogEntry from dictionary. */
 export const toJobWorkLogEntry = (dict: Dictionary): JobWorkLogEntry => ({
   id: dict.id as string,
   createdAt: dict.created_at as string,
@@ -237,6 +250,7 @@ export const toJobWorkLogEntry = (dict: Dictionary): JobWorkLogEntry => ({
   answer: [toAnswer(dict.answer as Dictionary)]
 })
 
+/** Serialize JobWorkLogEntry to dictionary. */
 export const fromJobWorkLogEntry = (entry: JobWorkLogEntry): Dictionary => ({
   id: entry.id,
   created_at: entry.createdAt,
