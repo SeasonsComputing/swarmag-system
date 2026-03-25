@@ -4,16 +4,11 @@
 
 ## 1. Overview
 
-This document defines how UX applications integrate with the swarmAg system
-architecture. It focuses on **what the UX layer receives from the foundation**,
-not implementation patterns.
+This document defines how UX applications integrate with the swarmAg system architecture. It focuses on **what the UX layer receives from the foundation**, not implementation patterns.
 
-UX architectural patterns (component structure, state management, routing,
-etc.) will be documented after initial iteration with the stack. See
-`documentation/` for current application requirements.
+UX architectural patterns (component structure, state management, routing, etc.) will be documented after initial iteration with the stack. See `documentation/` for current application requirements.
 
-**Prerequisites:** Read `architecture-core.md` to understand the API namespace
-pattern and system boundaries.
+**Prerequisites:** Read `architecture-core.md` to understand the API namespace pattern and system boundaries.
 
 ## 2. UX Applications
 
@@ -25,8 +20,7 @@ The system includes three SolidJS applications:
 | **Ops**      | Field execution                   | Operations crews |
 | **Customer** | Scheduling and status (read-only) | Customers        |
 
-All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Shared infrastructure
-lives in `source/ux/common/`.
+All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Shared infrastructure lives in `source/ux/common/`.
 
 ## 3. API Namespace Integration
 
@@ -50,9 +44,7 @@ const title = await api.createJobTitle(jobDefinition)
 await api.deepCloneJob.run({ jobId })
 ```
 
-The API namespace is composed once using client makers (Supabase SDK,
-IndexedDB, HTTP). Applications consume it directly without configuration or
-provider selection.
+The API namespace is composed once using client makers (Supabase SDK, IndexedDB, HTTP). Applications consume it directly without configuration or provider selection.
 
 ### 3.2 API Namespace Inventory
 
@@ -79,10 +71,7 @@ All entries in `source/ux/api/api.ts`:
 api.createJobTitle(job: JobDefinition): string
 ```
 
-Returns a display title derived from the job's current status and available
-phase data. This is a pure client-side computation — no network call. The
-derivation algorithm is status-driven and defined during jobs UI generation.
-For the scaffold phase, the method may be stubbed.
+Returns a display title derived from the job's current status and available phase data. This is a pure client-side computation — no network call. The derivation algorithm is status-driven and defined during jobs UI generation. For the scaffold phase, the method may be stubbed.
 
 `JobDefinition` is defined in `source/ux/common/views/job.ts`.
 
@@ -136,9 +125,7 @@ Violations detected by architectural guards are build failures.
 
 ### 4.2 Configuration Pattern
 
-All applications import `Config` from `@ux/config/ux-config.ts` — never
-directly from `@core/cfg/config.ts`. Direct core imports in app files are a
-guard violation.
+All applications import `Config` from `@ux/config/ux-config.ts` — never directly from `@core/cfg/config.ts`. Direct core imports in app files are a guard violation.
 
 - Update `ux-config.ts` keys and aliases as required env variables expand
 - Environment files: `local.env`, `stage.env`, `prod.env` at repo root
@@ -377,8 +364,7 @@ operations until the client maker is available.
 - `views/` — UX-local shared types consumed by two or more apps
 - `login` — designed brand experience, not a generic form instance
 - `auth-guard` — route-level session check
-- `form-panel` — general adaptive form container (full-screen mobile,
-  modal-centered desktop)
+- `form-panel` — general adaptive form container (full-screen mobile, modal-centered desktop)
 - `content` — main content frame
 - session store
 - app state store
@@ -400,6 +386,7 @@ and safety, large touch targets, minimal cognitive load.
 #### 6.7.4 Rule
 
 A component moves to `common/` when a second app needs it — not before.
+
 Premature generalization is a violation.
 
 ### 6.8 File Inventory
@@ -461,10 +448,8 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/config
 
 - Three Vite configs, one per app
 - Three Netlify sites, one per app
-- `ux/common/` and `ux/config/` are compile-time inclusions via path aliases —
-  not packages, not runtime imports
-- Build output is ephemeral — temp directory, zipped, deployed via Netlify CLI
-  in `devops/scripts/`
+- `ux/common/` and `ux/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
+- Build output is ephemeral — temp directory, zipped, deployed via Netlify CLI in `devops/scripts/`
 - No build artifacts are checked into the repository
 
 ## 7. Technology Stack
@@ -472,7 +457,7 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/config
 | Layer         | Technology                      |
 | ------------- | ------------------------------- |
 | Framework     | SolidJS (reactive, compiled)    |
-| Routing       | TanStack Router                 |
+| Routing       | TanStack Solid-Router           |
 | Data Fetching | TanStack Query                  |
 | UI Primitives | Kobalte (accessible components) |
 | Styling       | Vanilla CSS (no preprocessor)   |
@@ -481,13 +466,10 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/config
 
 ## 8. Key Principles
 
-1. **Apps consume, don't configure** — API namespace pre-composed, just import
-   and use
-2. **Types flow from domain** — All data structures defined in
-   `@domain/abstractions/`; UX view types in `@ux/common/views/`
+1. **Apps consume, don't configure** — API namespace pre-composed, just import and use
+2. **Types flow from domain** — All data structures defined in `@domain/abstractions/`; UX view types in `@ux/common/views/`
 3. **Storage is transparent** — Client makers handle Supabase, IndexedDB, HTTP
-4. **Import discipline enforced** — Architectural guards prevent boundary
-   violations
+4. **Import discipline enforced** — Architectural guards prevent boundary violations
 5. **UX patterns emerge** — Document architecture after iteration, not before
 
 _End of Architecture UX Document_

@@ -16,7 +16,7 @@ Authoritative source set, in order:
 
 Do not restate or fork these rules in this prompt. This prompt is orchestration only.
 
-## RUN BLOCKER -- EXECUTION DISABLED UNTIL SECTION IS ABSENT
+## DO NOT RUN IF CODE PRODUCED BY THIS PROMPT ALREADY EXISTS
 
 This prompt is genesis-only and must be run exactly once for UX scaffold
 bootstrap. Do not execute while this section exists. Execution is enabled only
