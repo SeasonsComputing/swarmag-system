@@ -1226,7 +1226,11 @@
   },
   "workspace": {
     "dependencies": [
-      "jsr:@std/assert@1"
+      "jsr:@std/assert@1",
+      "npm:@tanstack/solid-router@*",
+      "npm:solid-js@*",
+      "npm:vite-plugin-solid@*",
+      "npm:vite@*"
     ]
   }
 }
