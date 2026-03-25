@@ -26,8 +26,7 @@ All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Shared infrastructure l
 
 ### 3.1 Single Composed API
 
-All UX applications consume the **same API namespace** defined in
-`source/ux/api/api.ts`:
+All UX applications consume the **same API namespace** defined in `source/ux/api/api.ts`:
 
 ```typescript
 import { api } from '@ux/api'
@@ -130,6 +129,39 @@ All applications import `Config` from `@ux/config/ux-config.ts` — never direct
 - Update `ux-config.ts` keys and aliases as required env variables expand
 - Environment files: `local.env`, `stage.env`, `prod.env` at repo root
 
+### 4.3 Reactive Store Module Pattern
+
+The Reactive Store Module Pattern is the required architecture for UX reactive state modules. `session-store.ts` is a reference implementation of this pattern.
+
+- Export a **single namespace object** (for example `SessionStore`), not raw primitives.
+- Keep framework internals (`createStore`, setter functions, signals) **module-private**.
+- Expose:
+  - `store` for read access
+  - intent-based mutation methods (`setAuth`, `setUser`, `setReady`, `clear`)
+- Mutation methods must be **domain-intent names**, not framework/mechanical names.
+  - Use `setAuth`, not `setSessionStore`.
+- No module outside the store may call reactive setters directly.
+- Components and app shells consume state through `StoreNamespace.store` and mutate through `StoreNamespace.<intentMethod>()`.
+- Auth/session lifecycle writes are orchestrated in app shell boot flow (`app.tsx`) via `api.Auth.onAuthStateChange`, then forwarded to store intent methods.
+- Login/auth UI components do not mutate session state directly; they call `api.Auth` only.
+
+Reference shape:
+
+```typescript
+const [state, setState] = createStore<State>(initialState)
+
+const setX = (...) => setState(...)
+const clear = () => setState(initialState)
+
+const Store = {
+  store: state,
+  setX,
+  clear
+}
+
+export { Store }
+```
+
 ## 5. Application-Specific Notes
 
 | App          | Runtime                      | Storage                            | Deployment           |
@@ -152,21 +184,15 @@ app
 └── pages            # route-driven content panels
 ```
 
-The shell is app-specific. `login`, `auth-guard`, `content`, and all stores
-are shared via `source/ux/common/`.
+The shell is app-specific. `login`, `auth-guard`, `content`, and all stores are shared via `source/ux/common/`.
 
 #### 6.1.1 Auth Guard
 
-The shell root reads `sessionStore.isAuthenticated` before rendering any
-authenticated content. Unauthenticated users are redirected to login. This is
-the only authorization check in the UX layer — all data authorization is
-enforced by RLS at the database layer.
+The shell root reads `sessionStore.isAuthenticated` before rendering any authenticated content. Unauthenticated users are redirected to login. This is the only authorization check in the UX layer — all data authorization is enforced by RLS at the database layer.
 
 #### 6.1.2 Dashboard as Primary Navigation
 
-There is no navigation menu in any app. The dashboard is the primary interface
-and the primary navigation surface. Dashboard widgets and cards are the entry
-points into domain pages. Navigation is:
+There is no navigation menu in any app. The dashboard is the primary interface and the primary navigation surface. Dashboard widgets and cards are the entry points into domain pages. Navigation is:
 
 ```text
 dashboard → domain page → back to dashboard
@@ -174,8 +200,7 @@ dashboard → domain page → back to dashboard
 
 ### 6.2 Routing
 
-Each app defines its own route tree using TanStack Router declared in
-`app.tsx`. There is no shared route registry.
+Each app defines its own route tree using TanStack Router declared in `app.tsx`. There is no shared route registry.
 
 #### 6.2.1 Route Shape
 
@@ -188,14 +213,11 @@ Each app defines its own route tree using TanStack Router declared in
 
 #### 6.2.2 Protected Routes
 
-Protected routes wrap content in the auth guard component. The guard is a
-route-level concern, not a per-component concern.
+Protected routes wrap content in the auth guard component. The guard is a route-level concern, not a per-component concern.
 
 ### 6.3 Authentication
 
-Authentication is handled by `auth-supabase-client.ts` — a singleton module
-that directly implements `ApiAuthContract`. It is not a maker; there is exactly
-one auth implementation.
+Authentication is handled by `auth-supabase-client.ts` — a singleton module that directly implements `ApiAuthContract`. It is not a maker; there is exactly one auth implementation.
 
 ```text
 source/ux/common/lib/auth-supabase-client.ts
@@ -204,24 +226,19 @@ source/ux/common/lib/auth-supabase-client.ts
 It is composed into the API namespace as `api.Auth`:
 
 ```typescript
-import { authClient } from '@ux/common/lib/auth-supabase-client.ts'
+import { AuthSupabaseClient } from '@ux/common/lib/auth-supabase-client.ts'
 
 export const api = {
-  Auth: authClient,
+  Auth: AuthSupabaseClient,
   ...
 }
 ```
 
 #### 6.3.1 Auth State Binding
 
-`auth-supabase-client.ts` registers a Supabase `onAuthStateChange` listener at
-module load. On every auth event it writes the resolved session into
-`sessionStore`. This is the single binding point between Supabase Auth and
-SolidJS reactivity. No component touches Supabase Auth directly.
+`auth-supabase-client.ts` exposes Supabase `onAuthStateChange` through `api.Auth`. Each app shell registers the listener in `app.tsx` during `onMount`. On auth events, the shell writes to `SessionStore` via named methods (`setAuth`, `setUser`, `setReady`, `clear`). This keeps Supabase Auth isolated to the auth client and shell boot layer. No component touches Supabase Auth directly.
 
-Session termination events — token expiry, idle timeout, browser close — all
-flow through `onAuthStateChange`. The store reacts identically in every case:
-clear to unauthenticated, guard redirects to login.
+Session termination events — token expiry, idle timeout, browser close — all flow through `onAuthStateChange`. The shell callback calls `SessionStore.clear()`, and the auth guard redirects to login.
 
 #### 6.3.2 OTP Flow
 
@@ -233,13 +250,14 @@ user submits email
   → Supabase delivers one-time code to email address
   → user submits code
   → api.Auth.verifyOtp(email, code)
-  → returns Session { userId } // true when app is ready to render dashboard
+  → returns Session { userId }
   → onAuthStateChange fires
-  → sessionStore updated
+  → app shell calls SessionStore.setAuth(userId)
   → auth guard reacts → renders dashboard
-  → app shell calls api.Users.get(sessionStore.userId)
-  → result passed to setSessionUser(user)
-  → sessionStore.user populated
+  → app shell calls api.Users.get(userId)
+  → result passed to SessionStore.setUser(user)
+  → app marks ready via SessionStore.setReady() (Admin/Customer)
+  → Ops marks ready only after job manifest load completes
 ```
 
 #### 6.3.3 Logout Flow
@@ -249,14 +267,13 @@ user triggers logout
   → api.Auth.logout()
   → Supabase signOut
   → onAuthStateChange fires
-  → sessionStore cleared
+  → app shell calls SessionStore.clear()
   → auth guard reacts → renders login
 ```
 
 ### 6.4 Session Store
 
-The session store is a SolidJS store shared across all apps via
-`source/ux/common/stores/session-store.ts`.
+The session store is a SolidJS store shared across all apps via `source/ux/common/stores/session-store.ts`.
 
 ```typescript
 type SessionStore = {
@@ -280,11 +297,10 @@ type SessionStore = {
 
 #### 6.4.1 Session Store Write Interface
 
-`session-store.ts` exports both the reactive read store and named write
-helpers. No caller uses `setSessionStore` directly outside this module.
+`session-store.ts` keeps `setSessionStore` private and exports a singleton `SessionStore` interface. Callers read from `SessionStore.store` and mutate only through named methods.
 
 ```typescript
-export const [sessionStore, setSessionStore] = createStore<SessionStore>({
+const [sessionStore, setSessionStore] = createStore<SessionStore>({
   userId: null,
   user: null,
   isAuthenticated: false,
@@ -292,17 +308,35 @@ export const [sessionStore, setSessionStore] = createStore<SessionStore>({
   isDataReady: false
 })
 
-/** Set the hydrated domain User after successful authentication. */
-export const setSessionUser = (user: User): void => setSessionStore('user', user)
+const setSessionAuth = (userId: Id): void =>
+  setSessionStore({ userId, isAuthenticated: true, isLoading: false })
 
-/** Signal that all boot-time data is loaded and the app is ready to render. */
-export const setDataReady = (): void => setSessionStore('isDataReady', true)
+const clearSession = (): void =>
+  setSessionStore({
+    userId: null,
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    isDataReady: false
+  })
+
+const setSessionUser = (user: User): void => setSessionStore('user', user)
+const setDataReady = (): void => setSessionStore('isDataReady', true)
+
+const SessionStore = {
+  store: sessionStore,
+  setAuth: setSessionAuth,
+  setUser: setSessionUser,
+  setReady: setDataReady,
+  clear: clearSession
+}
+
+export { SessionStore }
 ```
 
 ### 6.5 IndexedDb Usage
 
-IndexedDb is the browser-side persistent store for all non-business-data
-concerns. It is used across all apps, not only Ops.
+IndexedDb is the browser-side persistent store for all non-business-data concerns. It is used across all apps, not only Ops.
 
 #### 6.5.1 IndexedDb Stores
 
@@ -316,15 +350,11 @@ Each app owns its own named IndexedDB store. Stores are not shared across apps.
 
 #### 6.5.2 Key Principle
 
-User metadata (preferences, layout, theme) lives in IndexedDB, not in the
-`users` table. It is device-specific and not business data. The `users` table
-has no metadata column.
+User metadata (preferences, layout, theme) lives in IndexedDB, not in the `users` table. It is device-specific and not business data. The `users` table has no metadata column.
 
 #### 6.5.3 App State Store
 
-`app-state-store.ts` manages per-app IndexedDB preferences using
-`makeCrudIndexedDbClient<AppState>` where `AppState = Dictionary`. The store
-name is the app's IndexedDB store name (§6.5.1).
+`app-state-store.ts` manages per-app IndexedDB preferences using `makeCrudIndexedDbClient<AppState>` where `AppState = Dictionary`. The store name is the app's IndexedDB store name (§6.5.1).
 
 Preference key usage by app:
 
@@ -334,8 +364,7 @@ Preference key usage by app:
 | `{storeName}:dashboard:layout` | ✓     | ✓   | ✓        |
 | `{storeName}:dashboard:panels` | ✓     | ✓   | —        |
 
-`makeCrudIndexedDbClient` is not yet implemented. App state store stubs IDB
-operations until the client maker is available.
+`makeCrudIndexedDbClient` is not yet implemented. App state store stubs IDB operations until the client maker is available.
 
 ### 6.6 State Management
 
@@ -356,8 +385,7 @@ operations until the client maker is available.
 
 ### 6.7 Common Component Boundaries
 
-`source/ux/common/` is the swarmAg design system foundation. All components in
-`common/` are reactive and adaptive by default.
+`source/ux/common/` is the swarmAg design system foundation. All components in `common/` are reactive and adaptive by default.
 
 #### 6.7.1 Belongs in `common/`
 
@@ -378,10 +406,7 @@ operations until the client maker is available.
 
 #### 6.7.3 Exception — Ops Crew Workflow Engine
 
-The ops crew workflow/task/checklist engine is a purpose-built UI mode, not
-derived from `form-panel` or standard shell components. It is launched from the
-ops dashboard. Design principles: app is invisible, crew stays focused on job
-and safety, large touch targets, minimal cognitive load.
+The ops crew workflow/task/checklist engine is a purpose-built UI mode, not derived from `form-panel` or standard shell components. It is launched from the ops dashboard. Design principles: app is invisible, crew stays focused on job and safety, large touch targets, minimal cognitive load.
 
 #### 6.7.4 Rule
 
