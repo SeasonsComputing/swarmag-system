@@ -116,7 +116,7 @@ The foundation provides:
 - `@domain/*` — Domain modules
 - `@ux/common/*` — Shared UX modules
 - `@ux/config/*` — Configuration module
-- `@ux/app-{admin|ops|customer}/*` — Deployment-specific UX modules
+- `@ux/app-{admin|ops|customer}/*` — Application modules
 
 #### 4.1.2 Violations
 
@@ -127,13 +127,13 @@ Violations detected by architectural guards are build failures.
 All applications import `Config` from `@ux/config/ux-config.ts` — never directly from `@core/cfg/config.ts`. Direct core imports in app files are a guard violation.
 
 - Update `ux-config.ts` keys and aliases as required env variables expand
-- Environment files: `local.env`, `stage.env`, `prod.env` at repo root
+- Environment file stored with deployment package.
 
 ### 4.3 Reactive Store Module Pattern
 
-The Reactive Store Module Pattern is the required architecture for UX reactive state modules. `session-store.ts` is a reference implementation of this pattern.
+The Reactive Store Module Pattern is the required architecture for UX reactive state modules.
 
-- Export a **single namespace object** (for example `SessionStore`), not raw primitives.
+- Export a **single namespace object** (for example `SessionState`), not raw primitives.
 - Keep framework internals (`createStore`, setter functions, signals) **module-private**.
 - Expose:
   - `store` for read access
@@ -142,24 +142,28 @@ The Reactive Store Module Pattern is the required architecture for UX reactive s
   - Use `setAuth`, not `setSessionStore`.
 - No module outside the store may call reactive setters directly.
 - Components and app shells consume state through `StoreNamespace.store` and mutate through `StoreNamespace.<intentMethod>()`.
-- Auth/session lifecycle writes are orchestrated in app shell boot flow (`app.tsx`) via `api.Auth.onAuthStateChange`, then forwarded to store intent methods.
-- Login/auth UI components do not mutate session state directly; they call `api.Auth` only.
 
-Reference shape:
+**Example Reactive Store Module:**
 
 ```typescript
-const [state, setState] = createStore<State>(initialState)
+// thing-state.ts
 
-const setX = (...) => setState(...)
-const clear = () => setState(initialState)
+export type ThingStore = {
+  field: number
+}
 
-const Store = {
-  store: state,
-  setX,
+const [thingStore, setThingStore] = createStore<ThingStore>({ field: 1971 })
+
+const setField = (field: number) => setThingStore({ field })
+const clear = () => setThingStore({ field: 1971 })
+
+const ThingState = {
+  store: thingStore,
+  setField,
   clear
 }
 
-export { Store }
+export { ThingState }
 ```
 
 ## 5. Application-Specific Notes
@@ -170,7 +174,7 @@ export { Store }
 | **Ops**      | Browser (mobile PWA)         | IndexedDB offline, Supabase online | Netlify CDN (PWA)    |
 | **Customer** | Browser (static site)        | Supabase SDK (read-only)           | Netlify CDN (static) |
 
-## 6. UX Architecture Patterns
+## 6. UX Application Patterns
 
 ### 6.1 Application Shell Structure
 
@@ -188,7 +192,7 @@ The shell is app-specific. `login`, `auth-guard`, `content`, and all stores are 
 
 #### 6.1.1 Auth Guard
 
-The shell root reads `sessionStore.isAuthenticated` before rendering any authenticated content. Unauthenticated users are redirected to login. This is the only authorization check in the UX layer — all data authorization is enforced by RLS at the database layer.
+The shell root reads `SessionState.store.isAuthenticated` before rendering any authenticated content. Unauthenticated users are redirected to login. This is the only authorization check in the UX layer — all data authorization is enforced by RLS at the database layer.
 
 #### 6.1.2 Dashboard as Primary Navigation
 
@@ -236,9 +240,9 @@ export const api = {
 
 #### 6.3.1 Auth State Binding
 
-`auth-supabase-client.ts` exposes Supabase `onAuthStateChange` through `api.Auth`. Each app shell registers the listener in `app.tsx` during `onMount`. On auth events, the shell writes to `SessionStore` via named methods (`setAuth`, `setUser`, `setReady`, `clear`). This keeps Supabase Auth isolated to the auth client and shell boot layer. No component touches Supabase Auth directly.
+`auth-supabase-client.ts` exposes Supabase `onAuthStateChange` through `api.Auth`. Each app shell registers the listener in `app.tsx` during `onMount`. On auth events, the shell writes to `SessionState` via named methods (`setAuth`, `setUser`, `setReady`, `clear`). This keeps Supabase Auth isolated to the auth client and shell boot layer. No component touches Supabase Auth directly.
 
-Session termination events — token expiry, idle timeout, browser close — all flow through `onAuthStateChange`. The shell callback calls `SessionStore.clear()`, and the auth guard redirects to login.
+Session termination events — token expiry, idle timeout, browser close — all flow through `onAuthStateChange`. The shell callback calls `SessionState.clear()`, and the auth guard redirects to login.
 
 #### 6.3.2 OTP Flow
 
@@ -252,12 +256,11 @@ user submits email
   → api.Auth.verifyOtp(email, code)
   → returns Session { userId }
   → onAuthStateChange fires
-  → app shell calls SessionStore.setAuth(userId)
+  → app shell calls SessionState.setAuth(userId)
   → auth guard reacts → renders dashboard
   → app shell calls api.Users.get(userId)
-  → result passed to SessionStore.setUser(user)
-  → app marks ready via SessionStore.setReady() (Admin/Customer)
-  → Ops marks ready only after job manifest load completes
+  → result passed to SessionState.setUser(user)
+  → app shell marks ready via SessionState.setReady()
 ```
 
 #### 6.3.3 Logout Flow
@@ -267,13 +270,13 @@ user triggers logout
   → api.Auth.logout()
   → Supabase signOut
   → onAuthStateChange fires
-  → app shell calls SessionStore.clear()
+  → app shell calls SessionState.clear()
   → auth guard reacts → renders login
 ```
 
-### 6.4 Session Store
+### 6.4 Session State Store
 
-The session store is a SolidJS store shared across all apps via `source/ux/common/stores/session-store.ts`.
+The session state store is a SolidJS store shared across all apps via `source/ux/common/lib/session-state.ts` and conforms to `4.3 Reactive Store Module Pattern`
 
 ```typescript
 type SessionStore = {
@@ -297,7 +300,7 @@ type SessionStore = {
 
 #### 6.4.1 Session Store Write Interface
 
-`session-store.ts` keeps `setSessionStore` private and exports a singleton `SessionStore` interface. Callers read from `SessionStore.store` and mutate only through named methods.
+`session-state.ts` keeps `setSessionStore` private and exports a singleton `SessionState` interface. Callers read from `SessionState.store` and mutate only through named methods.
 
 ```typescript
 const [sessionStore, setSessionStore] = createStore<SessionStore>({
@@ -323,7 +326,7 @@ const clearSession = (): void =>
 const setSessionUser = (user: User): void => setSessionStore('user', user)
 const setDataReady = (): void => setSessionStore('isDataReady', true)
 
-const SessionStore = {
+const SessionState = {
   store: sessionStore,
   setAuth: setSessionAuth,
   setUser: setSessionUser,
@@ -331,50 +334,53 @@ const SessionStore = {
   clear: clearSession
 }
 
-export { SessionStore }
+export { SessionState }
 ```
 
 ### 6.5 IndexedDb Usage
 
-IndexedDb is the browser-side persistent store for all non-business-data concerns. It is used across all apps, not only Ops.
+IndexedDb is the browser-side persistent store for all offline-data concerns.
 
-#### 6.5.1 IndexedDb Stores
+#### 6.5.1 IndexedDB Database Names
 
-Each app owns its own named IndexedDB store. Stores are not shared across apps.
+IndexedDB usage is split into two layers:
 
-| Store                  | App      | Content                                               |
+- Database namespace (physical DB name), `Config.get('LOCAL_DB_NAME')`, per deployment package.
+- Object Store names are not shared implicitly; they must be registered with `@core/db/indexeddb.ts` using `IndexedDb.registerStore('storeName')`
+  - Object Store's for domain abstractions are named for the abstraction, for example, `Job` or `Workflow`.
+- A CRUD/List maker is provided to standardize usage of the local database with `@core/api/make-indexeddb-client.ts` conforming to `ApiCrudContract` in `@core/api/api-contract.ts`
+
+**IndexedDB Database Names**
+
+| Database Name          | App      | Content                                               |
 | ---------------------- | -------- | ----------------------------------------------------- |
 | `swarmag-admin-app`    | Admin    | dashboard layout, panel config, theme                 |
 | `swarmag-ops-app`      | Ops      | dashboard layout, panel config, theme, job aggregates |
 | `swarmag-customer-app` | Customer | dashboard layout, theme                               |
 
-#### 6.5.2 Key Principle
+#### 6.5.2 Application Preferences
 
-User metadata (preferences, layout, theme) lives in IndexedDB, not in the `users` table. It is device-specific and not business data. The `users` table has no metadata column.
+Application preferences use a dedicated object store within the local DB.
 
-#### 6.5.3 App State Store
+`app-state.ts` (`@ux/common/lib/app-state.ts`) manages per-app preferences using `makeCrudIndexedDbClient<AppStore>` where `AppStore = Dictionary`.
 
-`app-state-store.ts` manages per-app IndexedDB preferences using `makeCrudIndexedDbClient<AppState>` where `AppState = Dictionary`. The store name is the app's IndexedDB store name (§6.5.1).
+Preference keys following a standard naming convention usage by app:
 
-Preference key usage by app:
-
-| Key                            | Admin | Ops | Customer |
-| ------------------------------ | ----- | --- | -------- |
-| `{storeName}:theme`            | ✓     | ✓   | ✓        |
-| `{storeName}:dashboard:layout` | ✓     | ✓   | ✓        |
-| `{storeName}:dashboard:panels` | ✓     | ✓   | —        |
-
-`makeCrudIndexedDbClient` is not yet implemented. App state store stubs IDB operations until the client maker is available.
+| Key                | Admin | Ops | Customer |
+| ------------------ | ----- | --- | -------- |
+| `theme`            | ✓     | ✓   | ✓        |
+| `dashboard:layout` | ✓     | ✓   | ✓        |
+| `dashboard:panels` | ✓     | ✓   | —        |
 
 ### 6.6 State Management
 
-| Concern         | Mechanism       | Location                           |
-| --------------- | --------------- | ---------------------------------- |
-| auth / session  | SolidJS store   | `common/stores/session-store.ts`   |
-| app preferences | IndexedDB       | `common/stores/app-state-store.ts` |
-| server data     | TanStack Query  | per-page query hooks               |
-| local ui state  | SolidJS signals | component-local                    |
-| ops field data  | IndexedDB       | `app-ops/stores/jobs-store.ts`     |
+| Concern         | Mechanism       | Location                       |
+| --------------- | --------------- | ------------------------------ |
+| auth / session  | SolidJS store   | `common/lib/session-state.ts`  |
+| app preferences | IndexedDB       | `common/lib/app-state.ts`      |
+| server data     | TanStack Query  | per-page query hooks           |
+| local ui state  | SolidJS signals | component-local                |
+| ops field data  | IndexedDB       | `app-ops/stores/jobs-store.ts` |
 
 #### 6.6.1 Rules
 
@@ -434,11 +440,10 @@ source/ux/
 │   │   └── shell/
 │   │       ├── auth-guard.tsx
 │   │       └── content.tsx
-│   ├── lib/
-│   │   └── auth-supabase-client.ts
-│   └── stores/
-│       ├── session-store.ts
-│       └── app-state-store.ts
+│   └── lib/
+│       ├── auth-supabase-client.ts
+│       ├── session-state.ts
+│       └── app-state.ts
 ├── app-admin/
 │   ├── index.html
 │   ├── vite.config.ts
