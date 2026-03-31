@@ -15,7 +15,7 @@ declare const Supabase:
  */
 export class SupabaseProvider implements RuntimeProvider {
   constructor() {
-    const isSupabase = Supabase !== undefined
+    const isSupabase = 'Supabase' in globalThis
     if (!isSupabase) this.fail('Supabase runtime not available')
   }
   get(key: string): string | undefined {
