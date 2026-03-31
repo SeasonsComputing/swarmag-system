@@ -114,8 +114,6 @@ The domain model is implemented as a TypeScript library under `source/domain`. I
 
 `architecture-core.md` documents how the system is organized to support this domain model; it does not define the domain itself.
 
-**Adapter naming convention:** Adapters use `Dictionary` (or `dict`) rather than `row` or `record` to represent serialized forms. Functions follow the pattern `to{Abstraction}(dict: Dictionary): Abstraction` and `from{Abstraction}(abstraction: Abstraction): Dictionary`. This emphasizes storage-agnostic serialization rather than database-specific terminology.
-
 ### 3.5 Core abstractions that define the domain
 
 These abstractions represent the primary concepts of the system and form the core of the domain model. They are expressed as TypeScript types under `source/domain` and define the vocabulary used throughout the system.
@@ -147,7 +145,7 @@ The following abstractions are shared across multiple domain concepts and repres
 | `Location`   | `common.ts` | Geographic coordinates with optional address information                                            |
 | `Note`       | `common.ts` | Freeform text with author and timestamp                                                             |
 | `Attachment` | `common.ts` | Metadata describing an uploaded file or artifact                                                    |
-| `Question`   | `common.ts` | Reusable prompt; Instantiable life-cycled; discriminated union of ScalarQuestion and SelectQuestion |
+  | `Question`   | `common.ts` | Reusable prompt; Instantiable life-cycled; discriminated union of InternalQuestion, ScalarQuestion and SelectQuestion |
 | `Answer`     | `common.ts` | Response to a question, with supporting notes                                                       |
 
 These abstractions are **composed into** higher-level domain objects, do not join with Instantiable and are not referenced independently.
