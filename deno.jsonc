@@ -22,18 +22,20 @@
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
-    "@std/assert": "jsr:@std/assert@1",
-    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2",
-    "solid-js": "npm:solid-js",
-    "solid-js/web": "npm:solid-js/web",
-    "solid-js/store": "npm:solid-js/store",
-    "@tanstack/solid-router": "npm:@tanstack/solid-router",
-    "vite": "npm:vite",
-    "vite-plugin-solid": "npm:vite-plugin-solid"
+    "@std/assert": "jsr:@std/assert@1.0.19",
+    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2.100.1",
+    "@idb": "npm:idb@^8.0.0",
+    "@solid-js": "npm:solid-js@1.9.12",
+    "@solid-js/jsx-runtime": "npm:solid-js@1.9.12/jsx-runtime",
+    "@solid-js/store": "npm:solid-js@1.9.12/store",
+    "@solid-js/web": "npm:solid-js@1.9.12/web",
+    "@tanstack/solid-router": "npm:@tanstack/solid-router@1.168.6",
+    "vite": "npm:vite@8.0.3",
+    "vite-plugin-solid": "npm:vite-plugin-solid@2.11.11"
   },
   "compilerOptions": {
     "jsx": "react-jsx",
-    "jsxImportSource": "solid-js",
+    "jsxImportSource": "@solid-js",
     "lib": ["dom", "dom.iterable", "esnext", "deno.ns"]
   },
   "tasks": {
@@ -42,7 +44,7 @@
     // ────────────────────────────────────────────────────────────────────────────
 
     "check": "deno task check:guards && deno task check:types && deno task check:lint",
-    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types",
+    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:ux-state",
     "check:types": "deno check source/**/*.ts source/**/*.tsx",
     "check:lint": "deno task lint",
     "genesis:domain": "deno task check:domain-genesis",
@@ -61,7 +63,9 @@
     "guard:leaf": "deno run --allow-read source/devops/guards/guard-leaf.ts",
     "guard:validation": "deno run --allow-read source/devops/guards/guard-validation.ts",
     "guard:domain-style": "deno run --allow-read source/devops/guards/guard-domain-style.ts",
-    "guard:core-std-types": "deno run --allow-read source/devops/guards/guard-core-std-types.ts"
+    "guard:core-std-types": "deno run --allow-read source/devops/guards/guard-core-std-types.ts",
+    "guard:ux-state": "deno run --allow-read source/devops/guards/guard-ux-state.ts",
+
     // ────────────────────────────────────────────────────────────────────────────
     // Deployment Packaging
     // ────────────────────────────────────────────────────────────────────────────
@@ -72,6 +76,7 @@
     //  - swarmag-ux-app-ops.zipTasks
     //  - swarmag-ux-app-admin.zip
     //  - swarmag-ux-app-customer.zip
+    "": ""
   },
   "fmt": { "exclude": ["**/*"] },
   "nodeModulesDir": "auto",
