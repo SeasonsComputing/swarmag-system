@@ -129,7 +129,16 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
     // Vendor Aliases
     // ────────────────────────────────────────────────────────────────────────────
 
-    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2"
+    "@std/assert": "jsr:@std/assert@1.0.19",
+    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2.100.1",
+    "@idb": "npm:idb@^8.0.0",
+    "@solid-js": "npm:solid-js@1.9.12",
+    "@solid-js/jsx-runtime": "npm:solid-js@1.9.12/jsx-runtime",
+    "@solid-js/store": "npm:solid-js@1.9.12/store",
+    "@solid-js/web": "npm:solid-js@1.9.12/web",
+    "@tanstack/solid-router": "npm:@tanstack/solid-router@1.168.6",
+    "vite": "npm:vite@8.0.3",
+    "vite-plugin-solid": "npm:vite-plugin-solid@2.11.11"
   }
 }
 ```
@@ -296,7 +305,7 @@ Each maker takes a specification object and returns a fully-typed client:
 
 ```typescript
 // CRUD maker
-const Users = makeCrudSupabaseClient<User, UserCreate, UserUpdate>({ table: 'users' })
+const Users = makeCrudSupabaseClient<User>({ table: 'users' })
 await Users.create({ displayName: 'Ada', email: 'ada@example.com' })
 
 // Business rule maker
@@ -324,7 +333,7 @@ const result = await api.deepCloneJob.run({ jobId })
 
 #### 5.4.1 Applications never
 
-- Import storage libraries directly (`@supabase/client`, IndexedDB APIs)
+- Import storage libraries directly (`@supabase/client`, `@core/db/indexeddb.ts`, `@core/db/supabase.ts`)
 - Branch on storage technology
 - Know implementation details of client makers
 
@@ -398,9 +407,9 @@ export interface RuntimeProvider {
 #### 6.2.1 Available Providers
 
 - `SupabaseProvider` — Supabase Edge Functions runtime (`@core/cfg/supabase-provider.ts`)
+- `NetlifyProvider` — Netlify Edge Functions runtime (`@core/cfg/netlify-provider.ts`)
 - `DenoProvider` — Deno development/testing runtime (`@core/cfg/deno-provider.ts`)
 - `SolidProvider` — Vite/SolidJS browser runtime (`@core/cfg/solid-provider.ts`)
-- `MockProvider` — Test contexts (`@core/cfg/mock-provider.ts`)
 
 ### 6.3 Package Configuration Pattern
 
@@ -420,7 +429,11 @@ Backend runtimes control their own key names — no platform prefix is imposed. 
 import { Config } from '@core/cfg/config.ts'
 import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
-Config.init(new SupabaseProvider(), ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET'])
+Config.init(new SupabaseProvider(), [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_KEY',
+  'JWT_SECRET'
+])
 
 export { Config }
 ```
@@ -438,12 +451,14 @@ Config.init(new SolidProvider(), [
   'VITE_SUPABASE_EDGE_URL',
   'VITE_SUPABASE_RDBMS_URL',
   'VITE_SUPABASE_SERVICE_KEY',
-  'VITE_JWT_SECRET'
+  'VITE_JWT_SECRET',
+  'VITE_LOCAL_DB_NAME'
 ], {
   'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
   'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
   'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
-  'JWT_SECRET': 'VITE_JWT_SECRET'
+  'JWT_SECRET': 'VITE_JWT_SECRET',
+  'LOCAL_DB_NAME': 'VITE_LOCAL_DB_NAME'
 })
 
 export { Config }
