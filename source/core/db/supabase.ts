@@ -1,5 +1,5 @@
 /**
- * Supabase client singleton for server-side operations.
+ * Supabase client singleton for server or client RDBMS operations.
  */
 
 import { Config } from '@core/cfg/config.ts'
@@ -31,7 +31,7 @@ export class Supabase {
       detectSessionInUrl: isBrowser
     }
 
-    // connect and cache client
+    // Connect and cache client
     Supabase.#cache = createClient(url, key, { auth })
     return Supabase.#cache
   }
