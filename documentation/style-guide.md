@@ -89,7 +89,6 @@ All TypeScript is formatted by `dprint` via `deno task fmt`. The formatter is au
 
 Prefer single-line statements for simple, non-loop control flow and import statements when readability is preserved.
 
-- Never use single-line loop bodies (`for`, `for...of`, `for await...of`, `while`, `do...while`); always use braces and multiline bodies.
 - Use multiline form when a statement exceeds max line length or when a single-line form reduces readability.
 - Single-line `if`/guard-return is allowed only for one simple action.
 
@@ -102,9 +101,7 @@ if (!input) return null
 
 let wingDings = { now: when() }
 
-for (const item of items) {
-  process(item)
-}
+for (const item of items) process(item)
 ```
 
 ## 6. Source Code File Format
@@ -181,13 +178,14 @@ Files with clear categories of declarations and functions divide the code body i
 // ────────────────────────────────────────────────────────────────────────────
 ```
 
-Examples:
+**Examples:**
 
-- PUBLIC
-- PRIVATE
-- PROTOCOLS
-- VALIDATORS
-- GUARDS
+- `PUBLIC`
+- `PRIVATE`
+- `INTERNALS`
+- `PROTOCOLS`
+- `VALIDATORS`
+- `GUARDS`
 
 ### 6.5 Comment conventions
 
@@ -398,7 +396,8 @@ Config.init(new SolidProvider(), [
   'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
   'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
   'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
-  'JWT_SECRET': 'VITE_JWT_SECRET'
+  'JWT_SECRET': 'VITE_JWT_SECRET',
+  'LOCAL_DB_NAME': 'VITE_LOCAL_DB_NAME'
 })
 
 export { Config }
@@ -411,15 +410,9 @@ export { Config }
 - `Config.fail(msg)` — throws `never`; use for invariant violations.
 - Never access `Deno.env` or `import.meta.env` directly. Always go through `Config.get()`.
 
-### 8.6 Makers vs. wrappers
+### 8.6 Makers
 
-These are architecturally distinct patterns — naming must reflect it.
-
-**Makers** (`make-*.ts`) produce configured API client instances. They are factory functions that accept a provider or configuration and return a ready-to-use client. Called once at composition root.
-
-**Wrappers** (`wrap-*.ts`) adapt a function's calling convention without changing its behavior. They accept a handler function and return a new function that normalizes life-cycle concerns (CORS, body parsing, error serialization) around it.
-
-Naming rule: `make` prefix for factories; `wrap` prefix for adapters. File name matches the prefix.
+Makers produce interface conformant implementations. They do not create instances of an object they create code. Makers are typically contained in `make-{concept}-{role}.ts`. Where concept is the concrete type of maker, for example  `indexeddb` or `supabase`. The role of the interface, for example, `client` or `provider`.
 
 ## 9. Error Handling
 
