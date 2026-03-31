@@ -41,7 +41,7 @@
     "quotes": "alwaysSingle"
   },
   "markup": {
-    "quotes": "alwaysSingle"
+    "quotes": "single"
   },
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.95.15.wasm",
