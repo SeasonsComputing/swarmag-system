@@ -203,17 +203,21 @@ A single API namespace, defined in `source/ux/api/api.ts`, is composed once for 
 import { makeBusRuleHttpClient } from '@core/api/make-http-client.ts'
 import { makeCrudIndexedDbClient } from '@core/api/make-indexeddb-client.ts'
 import { makeCrudSupabaseClient } from '@core/api/make-supabase-client.ts'
+import type { Customer } from '@domain/abstractions/customer.ts'
+import type { Job } from '@domain/abstractions/job.ts'
+import type { User } from '@domain/abstractions/user.ts'
+import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
+import { JobAdapter } from '@domain/adapters/job-adapter.ts'
+import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 
 // API namespace composed from client makers
 export const api = {
   // Domain abstractions using appropriate storage bindings
-  Users: makeCrudSupabaseClient<User, UserCreate, UserUpdate>({ table: 'users' }),
-  Customers: makeCrudSupabaseClient<Customer, CustomerCreate, CustomerUpdate>({
-    table: 'customers'
-  }),
+  Users: makeCrudSupabaseClient<User>({ table: 'users', adapter: UserAdapter }),
+  Customers: makeCrudSupabaseClient<Customer>({ table: 'customers', adapter: CustomerAdapter }),
 
   // Offline storage for field operations
-  JobsLocal: makeCrudIndexedDbClient<Job, JobCreate, JobUpdate>({ store: 'jobs' }),
+  JobsLocal: makeCrudIndexedDbClient<Job>({ store: 'jobs', adapter: JobAdapter }),
 
   // Orchestration operations
   deepCloneJob: makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
@@ -234,10 +238,10 @@ The system defines two client contracts (in `source/core/api/api-contract.ts`):
 #### 5.2.1 CRUD & List Contract
 
 ```typescript
-interface ApiCrudContract<T, TCreate, TUpdate> {
-  create(input: TCreate): Promise<T>
+interface ApiCrudContract<T extends Instantiable> {
+  create(input: CreateFromInstantiable<T>): Promise<T>
   get(id: Id): Promise<T>
-  update(input: TUpdate): Promise<T>
+  update(input: UpdateFromInstantiable<T>): Promise<T>
   delete(id: Id): Promise<DeleteResult>
   list?(options?: ListOptions): Promise<ListResult<T>>
 }
@@ -281,7 +285,7 @@ try {
 #### 5.2.4 Contract Properties
 
 - **Uniform interfaces** - Same method signatures regardless of underlying storage
-- **Type-safe** - Full TypeScript generics (`T`, `TCreate`, `TUpdate`) for domain typing
+- **Type-safe** - Full TypeScript generics (`T extends Instantiable`) for domain typing; protocol shapes derived via `CreateFromInstantiable<T>` and `UpdateFromInstantiable<T>`
 - **Consistent errors** - `ApiError` with status codes and optional details
 - **Domain-typed** - All inputs/outputs use domain abstractions, never storage primitives
 
@@ -305,8 +309,8 @@ Each maker takes a specification object and returns a fully-typed client:
 
 ```typescript
 // CRUD maker
-const Users = makeCrudSupabaseClient<User>({ table: 'users' })
-await Users.create({ displayName: 'Ada', email: 'ada@example.com' })
+const Users = makeCrudSupabaseClient<User>({ table: 'users', adapter: UserAdapter })
+await Users.create({ displayName: 'Ada', primaryEmail: 'ada@example.com' })
 
 // Business rule maker
 const cloneJob = makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
@@ -838,9 +842,7 @@ export const api = {
   // ... existing clients
 
   // New domain abstraction
-  Services: makeCrudSupabaseClient<Service, ServiceCreate, ServiceUpdate>({
-    table: 'services'
-  })
+  Services: makeCrudSupabaseClient<Service>({ table: 'services', adapter: ServiceAdapter })
 }
 ```
 

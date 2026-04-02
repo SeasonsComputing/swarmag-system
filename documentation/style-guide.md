@@ -325,25 +325,15 @@ export type Shape = CircleShape | RectShape
 - The discriminator field (`kind`) must be present in every constituent.
 - No anonymous union arms.
 
-**Adapter consumption** — switch on the discriminator, exhaustive, no fall-through default:
+**Type discrimination** — switch on the discriminator, exhaustive, no fall-through default:
 
 ```typescript
-export const toShape = (dict: Dictionary): Shape => {
-  const kind = dict.kind as ShapeKind
-  switch (kind) {
+export const volume = (shape: Shape): number => {
+  switch (shape.kind) {
     case 'circle':
-      return {
-        kind,
-        color: dict.color as string | undefined,
-        radius: dict.radius as number
-      } satisfies CircleShape
+      return Math.PI * shape.radius ** 2
     case 'rect':
-      return {
-        kind,
-        color: dict.color as string | undefined,
-        width: dict.width as number,
-        height: dict.height as number
-      } satisfies RectShape
+      return shape.width * shape.height
   }
 }
 ```
@@ -465,7 +455,7 @@ export const AnswerAdapter = makeAdapter<Answer>({
 
 ### 8.7 Makers
 
-Makers produce interface conformant implementations. They do not create instances of an object they create code. Makers are typically contained in `make-{concept}-{role}.ts`. Where concept is the concrete type of maker, for example  `indexeddb` or `supabase`. The role of the interface, for example, `client` or `provider`
+Makers produce interface conformant implementations. They do not create instances of an object they create code. Makers are typically contained in `make-{concept}-{role}.ts`. Where concept is the concrete type of maker, for example `indexeddb` or `supabase`. The role of the interface, for example, `client` or `provider`
 
 ## 9. Error Handling
 

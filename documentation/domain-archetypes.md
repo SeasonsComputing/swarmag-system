@@ -85,18 +85,24 @@ Every abstraction in the data dictionary has an explicit type classification. Th
 Extend `Instantiable` from `@core/std` via intersection. Never redeclare `id`, `createdAt`, `updatedAt`, or `deletedAt` inline.
 
 ```typescript
-import type { AssociationOne, CompositionMany, Instantiable } from '@core/std'
-import type { Note } from '@domain/abstractions/common.ts'
-import type { UserRole } from '@domain/abstractions/user.ts'
+import type { CompositionPositive, Instantiable } from '@core/std'
 
-/** System user identity and membership. */
+/** Allowed user role values. */
+export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
+export type UserRole = (typeof USER_ROLES)[number]
+
+/** Allowed user status values. */
+export const USER_STATUSES = ['active', 'inactive'] as const
+export type UserStatus = (typeof USER_STATUSES)[number]
+
+/** System user identity and membership abstraction. */
 export type User = Instantiable & {
   roles: CompositionPositive<UserRole>
   displayName: string
   primaryEmail: string
   phoneNumber: string
   avatarUrl?: string
-  status: 'active' | 'inactive'
+  status: UserStatus
 }
 ```
 
@@ -123,7 +129,7 @@ export type JobWorkLogEntry = InstantiableOnly & {
 Junction abstractions use `AssociationJunction<T>` for all foreign keys. No life-cycle fields — junctions are hard-deleted only.
 
 ```typescript
-import type { AssociationJunction, Id } from '@core/std'
+import type { AssociationJunction } from '@core/std'
 import type { Question } from '@domain/abstractions/common.ts'
 import type { Task } from '@domain/abstractions/workflow.ts'
 
@@ -183,7 +189,15 @@ export const QUESTION_TYPES = [
 ] as const
 export type QuestionType = (typeof QUESTION_TYPES)[number]
 
-/** Common shape shared by all Question constituents. */
+/** Scalar question discriminator values. */
+export const SCALAR_QUESTION_TYPES = ['text', 'number', 'boolean'] as const
+export type ScalarQuestionType = (typeof SCALAR_QUESTION_TYPES)[number]
+
+/** Select question discriminator values. */
+export const SELECT_QUESTION_TYPES = ['single-select', 'multi-select'] as const
+export type SelectQuestionType = (typeof SELECT_QUESTION_TYPES)[number]
+
+/** Common shape shared by all question constituents. */
 export type BaseQuestion = Instantiable & {
   type: QuestionType
   prompt: string
@@ -191,23 +205,30 @@ export type BaseQuestion = Instantiable & {
   required?: boolean
 }
 
-/** System-generated question. */
+/** System-generated question variant. */
 export type InternalQuestion = BaseQuestion & {
   type: 'internal'
 }
 
-/** Scalar input question; no options. */
+/** Scalar input question variant. */
 export type ScalarQuestion = BaseQuestion & {
-  type: 'text' | 'number' | 'boolean'
+  type: ScalarQuestionType
 }
 
-/** Select input question; options required and non-empty. */
+/** Selectable option metadata. */
+export type SelectOption = {
+  value: string
+  label?: string
+  requiresNote?: boolean
+}
+
+/** Select input question variant with required options. */
 export type SelectQuestion = BaseQuestion & {
-  type: 'single-select' | 'multi-select'
+  type: SelectQuestionType
   options: CompositionPositive<SelectOption>
 }
 
-/** Discriminated union — boundary type used throughout the system. */
+/** Discriminated union of all question variants. */
 export type Question = InternalQuestion | ScalarQuestion | SelectQuestion
 ```
 
@@ -316,15 +337,11 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
+  type ExpectResult,
   expectValid
-} from '@core/std/validators.ts'
-import type { ExpectGuard, ExpectResult } from '@core/std/validators.ts'
+} from '@core/std'
 import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/user.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
-
-// ────────────────────────────────────────────────────────────────────────────
-// VALIDATORS
-// ────────────────────────────────────────────────────────────────────────────
 
 /** Validate UserCreate payloads. */
 export const validateUserCreate = (input: UserCreate): ExpectResult =>
@@ -333,7 +350,8 @@ export const validateUserCreate = (input: UserCreate): ExpectResult =>
     expectNonEmptyString(input.displayName, 'displayName'),
     expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
-    expectConstEnum(input.status, 'status', USER_STATUSES, true)
+    expectNonEmptyString(input.avatarUrl, 'avatarUrl', true),
+    expectConstEnum(input.status, 'status', USER_STATUSES)
   )
 
 /** Validate UserUpdate payloads. */
@@ -344,6 +362,7 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
     expectNonEmptyString(input.displayName, 'displayName', true),
     expectNonEmptyString(input.primaryEmail, 'primaryEmail', true),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber', true),
+    expectNonEmptyString(input.avatarUrl, 'avatarUrl', true),
     expectConstEnum(input.status, 'status', USER_STATUSES, true)
   )
 
@@ -354,22 +373,22 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
 ```
 
-Validator formatting requirements:
+### 5.3 Union-Type Validators
 
-- File-header `PUBLIC` entries must have aligned description columns.
-- Every exported validator and exported guard has a single-line JSDoc comment immediately above its export.
-- Omit in-source `PUBLIC` divider banners when the validator file is export-only.
-- Keep section dividers when private helpers exist.
-
-### 5.3 Union-Type Validation
-
-Validate the discriminator first with `expectConstEnum`, then switch on the type for branch-specific field checks.
+Validate the discriminator first with `expectConstEnum`. Then validate shared base fields. Then switch on the discriminator for constituent-specific field checks. For update validators, guard against an absent discriminator before the switch.
 
 ```typescript
-import { expectCompositionPositive, expectConstEnum, ExpectResult } from '@core/std'
-import { QUESTION_TYPES } from '@domain/abstractions/common.ts'
-import type { QuestionType, SelectOption } from '@domain/abstractions/common.ts'
-import type { QuestionCreate } from '@domain/protocols/common-protocol.ts'
+import {
+  expectBoolean,
+  expectCompositionPositive,
+  expectConstEnum,
+  expectId,
+  expectNonEmptyString,
+  type ExpectResult,
+  expectValid
+} from '@core/std'
+import { QUESTION_TYPES, type SelectOption } from '@domain/abstractions/common.ts'
+import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/common-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -379,9 +398,14 @@ import type { QuestionCreate } from '@domain/protocols/common-protocol.ts'
 export const validateQuestionCreate = (input: QuestionCreate): ExpectResult => {
   const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES)
   if (typeError) return typeError
+  const baseError = expectValid(
+    expectNonEmptyString(input.prompt, 'prompt'),
+    expectNonEmptyString(input.helpText, 'helpText', true),
+    expectBoolean(input.required, 'required', true)
+  )
+  if (baseError) return baseError
   switch (input.type) {
     case 'internal':
-      return null
     case 'text':
     case 'number':
     case 'boolean':
@@ -392,14 +416,47 @@ export const validateQuestionCreate = (input: QuestionCreate): ExpectResult => {
   }
 }
 
+/** Validate QuestionUpdate payloads. */
+export const validateQuestionUpdate = (input: QuestionUpdate): ExpectResult => {
+  const typeError = expectConstEnum(input.type, 'type', QUESTION_TYPES, true)
+  if (typeError) return typeError
+  const baseError = expectValid(
+    expectId(input.id, 'id'),
+    expectNonEmptyString(input.prompt, 'prompt', true),
+    expectNonEmptyString(input.helpText, 'helpText', true),
+    expectBoolean(input.required, 'required', true)
+  )
+  if (baseError) return baseError
+  if (input.type === undefined) return null
+  switch (input.type) {
+    case 'internal':
+    case 'text':
+    case 'number':
+    case 'boolean':
+      return null
+    case 'single-select':
+    case 'multi-select':
+      return expectCompositionPositive(input.options, 'options', isSelectOption, true)
+  }
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // GUARDS
 // ────────────────────────────────────────────────────────────────────────────
 
-const isSelectOption = (v: unknown): v is SelectOption => v !== null && typeof v === 'object'
+/** Guard for SelectOption values. */
+export const isSelectOption = (v: unknown): v is SelectOption => {
+  if (v === null || typeof v !== 'object') return false
+  const option = v as SelectOption
+  return expectValid(
+    expectNonEmptyString(option.value, 'value'),
+    expectNonEmptyString(option.label, 'label', true),
+    expectBoolean(option.requiresNote, 'requiresNote', true)
+  ) === null
+}
 ```
 
-### 5.5 Update Validators
+### 5.4 Update Validators
 
 Update validators follow the same structure as create validators. Exports at top, guards in a GUARDS section below.
 
@@ -409,25 +466,33 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
-  ExpectResult,
+  type ExpectResult,
   expectValid
 } from '@core/std'
-import { USER_ROLES } from '@domain/abstractions/user.ts'
-import type { UserRole } from '@domain/abstractions/user.ts'
-import type { UserUpdate } from '@domain/protocols/user-protocol.ts'
+import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/user.ts'
+import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// VALIDATORS
-// ────────────────────────────────────────────────────────────────────────────
+/** Validate UserCreate payloads. */
+export const validateUserCreate = (input: UserCreate): ExpectResult =>
+  expectValid(
+    expectCompositionPositive(input.roles, 'roles', isUserRole),
+    expectNonEmptyString(input.displayName, 'displayName'),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
+    expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
+    expectNonEmptyString(input.avatarUrl, 'avatarUrl', true),
+    expectConstEnum(input.status, 'status', USER_STATUSES)
+  )
 
 /** Validate UserUpdate payloads. */
 export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
-    expectNonEmptyString(input.displayName, 'displayName'),
-    expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
-    expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
-    expectCompositionPositive(input.roles, 'roles', isUserRole)
+    expectCompositionPositive(input.roles, 'roles', isUserRole, true),
+    expectNonEmptyString(input.displayName, 'displayName', true),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail', true),
+    expectNonEmptyString(input.phoneNumber, 'phoneNumber', true),
+    expectNonEmptyString(input.avatarUrl, 'avatarUrl', true),
+    expectConstEnum(input.status, 'status', USER_STATUSES, true)
   )
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -437,16 +502,21 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
 const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USER_ROLES) === null
 ```
 
-### 5.6 Object Guards
+### 5.5 Object Guards
 
 Every object-type abstraction that appears as a `CompositionOne`, `CompositionMany`, or `CompositionPositive` member must have a named, exported type guard in its topic's validator file. Guards must be typed to the specific abstraction — never generic.
 
 ```typescript
-// common-validator.ts — exports guards for all common composable object types
-export const isNote = (v: unknown): v is Note => v !== null && typeof v === 'object'
-export const isLocation = (v: unknown): v is Location => v !== null && typeof v === 'object'
-export const isAttachment = (v: unknown): v is Attachment => v !== null && typeof v === 'object'
-export const isSelectOption = (v: unknown): v is SelectOption => v !== null && typeof v === 'object'
+// common-validator.ts — guards are full structural validators, not shallow object checks
+export const isSelectOption = (v: unknown): v is SelectOption => {
+  if (v === null || typeof v !== 'object') return false
+  const option = v as SelectOption
+  return expectValid(
+    expectNonEmptyString(option.value, 'value'),
+    expectNonEmptyString(option.label, 'label', true),
+    expectBoolean(option.requiresNote, 'requiresNote', true)
+  ) === null
+}
 ```
 
 Validators that compose object types from another topic import the typed guard — they do not define their own:
@@ -471,22 +541,22 @@ Each topic adapter file exports adapter instances built with `makeAdapter` from 
 Adapter contract:
 
 ```typescript
-type Adapter<T> = {
+interface Adapter<T> {
   toDomain(source: Dictionary): T
-  fromDomain(patch: Partial<T>): Dictionary
+  fromDomain(patch: AdapterPatch<T>): Dictionary
 }
 ```
 
-`toDomain` deserializes storage dictionaries into domain abstractions.\
-`fromDomain` accepts a wider input interface (`Partial<T>`), so both full abstractions and partial protocol/update payloads are valid inputs.
+- `toDomain` deserializes storage dictionaries into domain abstractions.
+- `fromDomain` accepts a patch of an Instantialble or object (`AdapterPatch<T>`), so both full abstractions and partial protocol/update payloads are valid inputs.
 
 ### 6.2 Metadata Mapping Model
 
 Adapters are declared with metadata that maps domain keys to storage columns and optional delegate adapters for nested abstractions.
 
 ```typescript
-type AdaptDelegate = [column: string, delegate?: Adapter<unknown>]
-type Adapt<T> = { [K in keyof T]: AdaptDelegate }
+export type AdaptDelegate = [string, Adapter<unknown>?]
+export type Adapt<T> = { [K in keyof T]: AdaptDelegate }
 ```
 
 `makeAdapter(meta)` is the canonical adapter maker for domain archetypes.
@@ -529,12 +599,9 @@ export const NoteAdapter = makeAdapter<Note>({
 })
 ```
 
-### 6.5 Instantiable and Union-Type Coverage
+### 6.5 Union-Type Adapters
 
-Instantiable adapters include lifecycle mappings where present (`id`, `createdAt`, `updatedAt`, `deletedAt`).\
-Composition-only adapters include only composition fields.
-
-Union-type adapters are still expressed as a single adapter per union abstraction, with metadata covering shared and variant fields. Discriminator semantics remain owned by the abstraction and protocol/validator layers.
+Union-type adapters use a single `makeAdapter` call typed to the full union — for example `makeAdapter<Question>` — with metadata covering the superset of all constituent fields. Union-type abstractions map to a single table whose columns are the union of all constituent columns; variant-only columns are nullable. No per-constituent adapter is needed.
 
 ### 6.6 Round-Trip Integrity
 

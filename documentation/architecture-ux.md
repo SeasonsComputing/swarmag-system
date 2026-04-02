@@ -31,6 +31,9 @@ All UX applications consume the **same API namespace** defined in `source/ux/api
 ```typescript
 import { api } from '@ux/api'
 
+// Auth
+await api.Auth.signInWithOtp({ email })
+
 // CRUD — direct to Supabase
 const user = await api.Users.get(userId)
 const jobs = await api.Jobs.list()
