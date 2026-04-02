@@ -28,14 +28,7 @@ import { Dashboard } from '@ux/app-admin/dashboard/dashboard.tsx'
 import { Login } from '@ux/common/components/login/login.tsx'
 import { AuthGuard } from '@ux/common/components/shell/auth-guard.tsx'
 import { Content } from '@ux/common/components/shell/content.tsx'
-import { makeAppStateStore } from '@ux/common/lib/app-state.ts'
 import { SessionState } from '@ux/common/lib/session-state.ts'
-
-// ────────────────────────────────────────────────────────────────────────────
-// APP STATE
-// ────────────────────────────────────────────────────────────────────────────
-
-const _appState = makeAppStateStore('swarmag-admin-app')
 
 // ────────────────────────────────────────────────────────────────────────────
 // ROUTES
@@ -71,11 +64,11 @@ const routeTree = rootRoute.addChildren([indexRoute, loginRoute, dashboardRoute]
 const router = createRouter({ routeTree })
 
 // ────────────────────────────────────────────────────────────────────────────
-// ROOT
+// APPLICATION ROOT
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Admin application root; wires auth state and mounts the router. */
-const App = () => {
+const Application = () => {
   onMount(() => {
     const unsubscribe = api.Auth.onAuthStateChange(async session => {
       if (session) {
@@ -95,4 +88,4 @@ const App = () => {
   return <RouterProvider router={router} />
 }
 
-render(() => <App />, document.getElementById('root')!)
+render(() => <Application />, document.getElementById('root')!)

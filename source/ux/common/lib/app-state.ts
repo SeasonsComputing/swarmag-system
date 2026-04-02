@@ -12,28 +12,66 @@ stubbed pending makeCrudIndexedDbClient implementation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppStateStore         Per-app preference store type.
-makeAppStateStore     Create a preference store for the given app store name.
+AppState  Singleton API for reading and writing persisted app state values.
 */
 
-import type { Dictionary } from '@core/std'
+import type { Dictionary, Instance } from '@core/std'
+import { type ApiErrorDetail, apiError, throwApiError } from '@core/api/api-contract.ts'
+import { IndexedDb } from '@core/db/indexeddb.ts'
 
-// TODO: replace stub with makeCrudIndexedDbClient<AppState> when implemented
+/** Persisted app-state record shape stored in IndexedDB. */
+type AppStateStore = Instance & { state: Dictionary }
 
-/** Preference value shape — opaque key/value dictionary. */
-type AppState = Dictionary
+/** IndexedDB-backed app-state provider. */
+class AppStateProvider {
+  /** */
+  #schema = 'AppStateStore'
+  #id = 'AppStateId'
 
-/** Per-app IndexedDB preference store contract. */
-export type AppStateStore = {
-  storeName: string
-  getPreference(key: string): Promise<AppState | undefined>
-  setPreference(key: string, value: AppState): Promise<void>
+  /** Registers the app-state object store schema. */
+  constructor() { IndexedDb.registerStore(this.#schema) }
+
+  /** Loads the persisted app-state dictionary. */
+  async #getAppState(): Promise<Dictionary> {
+    let state: Dictionary
+    try {
+      const db = await IndexedDb.connection()
+      const record = await db.get(this.#schema, this.#id)
+      state = record?.state ?? {}
+    } catch (error) {
+      if (apiError(error)) throw error
+      throwApiError(error as ApiErrorDetail, 'Read Failure', IndexedDb.errorToStatus(error))
+    }
+    return state
+  }
+
+  /** Persists the full app-state dictionary. */
+  async #setAppState(state: Dictionary): Promise<void> {
+    try {
+      const record: AppStateStore = { id: this.#id, state }
+      const db = await IndexedDb.connection()
+      await db.put(this.#schema, record)
+    } catch (error) {
+      if (apiError(error)) throw error
+      throwApiError(error as ApiErrorDetail, 'Read Failure', IndexedDb.errorToStatus(error))
+    }
+  }
+
+  /** */
+  async get(key: string): Promise<string | unknown> {
+    const state = await this.#getAppState()
+    return state[key]
+  }
+
+  /** */
+  async set(key: string, value: string): Promise<void> {
+    const state = await this.#getAppState()
+    state[key] = value
+    await this.#setAppState(state)
+  }
 }
 
-/** Create a preference store bound to the given app IndexedDB store name. */
-export const makeAppStateStore = (storeName: string): AppStateStore => ({
-  storeName,
-  // TODO: replace stub with makeCrudIndexedDbClient<AppState> when implemented
-  getPreference: (_key: string): Promise<AppState | undefined> => Promise.resolve(undefined),
-  setPreference: (_key: string, _value: AppState): Promise<void> => Promise.resolve()
-})
+// Singleton AppState
+const AppState = new AppStateProvider()
+
+export { AppState }
