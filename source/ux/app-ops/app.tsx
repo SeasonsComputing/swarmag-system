@@ -29,16 +29,9 @@ import { api } from '@ux/api'
 import { Login } from '@ux/common/components/login/login.tsx'
 import { AuthGuard } from '@ux/common/components/shell/auth-guard.tsx'
 import { Content } from '@ux/common/components/shell/content.tsx'
-import { makeAppStateStore } from '@ux/common/lib/app-state.ts'
 import { SessionState } from '@ux/common/lib/session-state.ts'
 import { Dashboard } from './dashboard/dashboard.tsx'
 import { jobsStore, loadJobs } from './stores/jobs-store.ts'
-
-// ────────────────────────────────────────────────────────────────────────────
-// APP STATE
-// ────────────────────────────────────────────────────────────────────────────
-
-const _appState = makeAppStateStore('swarmag-ops-app')
 
 // ────────────────────────────────────────────────────────────────────────────
 // ROUTES
@@ -76,11 +69,11 @@ const routeTree = rootRoute.addChildren([indexRoute, loginRoute, dashboardRoute]
 const router = createRouter({ routeTree })
 
 // ────────────────────────────────────────────────────────────────────────────
-// ROOT
+// APPLICATION ROOT
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Ops application root; wires auth state, job manifest, and mounts the router. */
-const App = () => {
+const Application = () => {
   onMount(() => {
     const unsubscribe = api.Auth.onAuthStateChange(async session => {
       if (session) {
@@ -106,4 +99,4 @@ const App = () => {
   return <RouterProvider router={router} />
 }
 
-render(() => <App />, document.getElementById('root')!)
+render(() => <Application />, document.getElementById('root')!)
