@@ -73,9 +73,9 @@ source/ux/common/
     shell/
       auth-guard.tsx
       content.tsx
-  stores/
-    session-store.ts
-    app-state-store.ts
+  lib/
+    session-state.ts
+    app-state.ts
 ```
 
 Pre-existing auth client integration remains unchanged and is out of scaffold
@@ -116,16 +116,16 @@ export type JobDefinition = {
 Imports: `Id` from `@core/std`; `JobStatus`, `Job`, `JobAssessment`,
 `JobPlan` from `@domain/abstractions/job.ts`.
 
-**`stores/session-store.ts`**
+**`lib/session-state.ts`**
 
-SolidJS store for auth/session state. Shared across all apps. Implements the
-contract defined in `architecture-ux.md` §6.4.
+SolidJS store module for auth/session state. Shared across all apps. Implements
+the contract defined in `architecture-ux.md` §6.4.
 
-Exports the reactive read store and named write helpers. No caller uses the raw
-setter outside this module:
+Exports a singleton namespace object. No caller uses the raw setter outside
+this module:
 
 ```typescript
-export const [sessionStore, setSessionStore] = createStore<SessionStore>({
+const [sessionStore, setSessionStore] = createStore<SessionStore>({
   userId: null,
   user: null,
   isAuthenticated: false,
@@ -133,36 +133,48 @@ export const [sessionStore, setSessionStore] = createStore<SessionStore>({
   isDataReady: false
 })
 
-/** Set the hydrated domain User after successful authentication. */
-export const setSessionUser = (user: User): void => setSessionStore('user', user)
+const setSessionAuth = (userId: Id): void =>
+  setSessionStore({ userId, isAuthenticated: true, isLoading: false })
 
-/** Signal that all boot-time data is loaded and the app is ready to render. */
-export const setDataReady = (): void => setSessionStore('isDataReady', true)
+const clearSession = (): void =>
+  setSessionStore({
+    userId: null,
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    isDataReady: false
+  })
+
+const setSessionUser = (user: User): void => setSessionStore('user', user)
+const setDataReady = (): void => setSessionStore('isDataReady', true)
+
+const SessionState = {
+  store: sessionStore,
+  setAuth: setSessionAuth,
+  setUser: setSessionUser,
+  setReady: setDataReady,
+  clear: clearSession
+}
+
+export { SessionState }
 ```
 
-`SessionStore` shape per `architecture-ux.md` §6.4.
+`SessionState` API shape per `architecture-ux.md` §6.4.
 
-**`stores/app-state-store.ts`**
+**`lib/app-state.ts`**
 
 Per-app IndexedDB preferences store. Takes the app's store name (per
 `architecture-ux.md` §6.5.1) and manages preference key reads/writes.
 
 Implemented using `makeCrudIndexedDbClient<AppState>` where
-`AppState = Dictionary`. `makeCrudIndexedDbClient` is not yet implemented.
-For the scaffold phase, stub all IDB operations and include:
-
-```typescript
-// TODO: replace stub with makeCrudIndexedDbClient<AppState> when implemented
-```
+`AppState = Dictionary`. Use real IndexedDB reads/writes through the client
+maker (no stubbed IDB operations).
 
 **`components/`**
 
 Common UX behavior is defined by architecture and is not restated here:
 
 - Authentication flow and auth-state binding: `architecture-ux.md` §6.3
-- Session store contract: `architecture-ux.md` §6.4
-- IndexedDB usage and app store naming: `architecture-ux.md` §6.5
-- State-management responsibilities: `architecture-ux.md` §6.6
 - Component boundaries and shell behavior: `architecture-ux.md` §6.7
 - File inventory baseline: `architecture-ux.md` §6.8
 
@@ -207,14 +219,14 @@ Application root.
 
 - Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
 - Import `Config` from `@ux/config/ux-config.ts` only.
-- Construct app state store by calling `app-state-store.ts` with store name
+- Construct app state store by calling `app-state.ts` with store name
   `'swarmag-admin-app'`. IDB preference keys for Admin:
   `{storeName}:theme`, `{storeName}:dashboard:layout`,
   `{storeName}:dashboard:panels`.
 - Boot sequence after authentication:
-  1. Call `api.Users.get(sessionStore.userId)` and pass result to
-     `setSessionUser(user)`.
-  2. Call `setDataReady()`. Admin has no IDB job load step.
+  1. Call `api.Users.get(SessionState.store.userId)` and pass result to
+     `SessionState.setUser(user)`.
+  2. Call `SessionState.setReady()`. Admin has no IDB job load step.
 
 **`dashboard/dashboard.tsx`**
 
@@ -273,12 +285,8 @@ type JobsStore = {
 - `isLoaded` starts `false`. Set `true` after the initial IDB read resolves.
 - Exports: `jobsStore` (read-only reactive), `loadJobs()` (async).
 - No Supabase calls. This store reads from IDB only.
-- `api.JobsLocal` is not yet implemented. For the scaffold phase, `loadJobs()`
-  sets `jobs: []` and `isLoaded: true` immediately. Include:
-
-```typescript
-// TODO: replace with api.JobsLocal read when client maker is implemented
-```
+- `loadJobs()` performs an IndexedDB read via the composed local client and sets
+  `isLoaded: true` after resolution.
 
 **`app.tsx`**
 
@@ -286,15 +294,15 @@ Application root.
 
 - Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
 - Import `Config` from `@ux/config/ux-config.ts` only.
-- Construct app state store by calling `app-state-store.ts` with store name
+- Construct app state store by calling `app-state.ts` with store name
   `'swarmag-ops-app'`. IDB preference keys for Ops:
   `{storeName}:theme`, `{storeName}:dashboard:layout`,
   `{storeName}:dashboard:panels`.
 - Boot sequence after authentication:
-  1. Call `api.Users.get(sessionStore.userId)` and pass result to
-     `setSessionUser(user)`.
+  1. Call `api.Users.get(SessionState.store.userId)` and pass result to
+     `SessionState.setUser(user)`.
   2. Call `loadJobs()` from `jobs-store.ts`.
-  3. When `jobsStore.isLoaded` becomes `true`, call `setDataReady()`.
+  3. When `jobsStore.isLoaded` becomes `true`, call `SessionState.setReady()`.
 - Dashboard renders only after `isDataReady` is `true`. While loading, render
   a loading indicator inside `<Content>`.
 
@@ -338,14 +346,14 @@ Application root.
 
 - Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
 - Import `Config` from `@ux/config/ux-config.ts` only.
-- Construct app state store by calling `app-state-store.ts` with store name
+- Construct app state store by calling `app-state.ts` with store name
   `'swarmag-customer-app'`. IDB preference keys for Customer:
   `{storeName}:theme`, `{storeName}:dashboard:layout`.
   Customer has no panels key.
 - Boot sequence after authentication:
-  1. Call `api.Users.get(sessionStore.userId)` and pass result to
-     `setSessionUser(user)`.
-  2. Call `setDataReady()`. Customer has no IDB job load step.
+  1. Call `api.Users.get(SessionState.store.userId)` and pass result to
+     `SessionState.setUser(user)`.
+  2. Call `SessionState.setReady()`. Customer has no IDB job load step.
 
 **`dashboard/dashboard.tsx`**
 
@@ -384,26 +392,26 @@ Before reporting `STYLE_AUDIT: PASS`:
 - `source/ux/common/views/job.ts` exists and exports `JobSummary` and
   `JobDefinition` as pure types with no infrastructure imports.
 - `auth-guard.tsx` is at `source/ux/common/components/shell/auth-guard.tsx`.
-- `session-store.ts` exports `sessionStore`, `setSessionUser`, and
-  `setDataReady`. No raw setter calls outside this module.
-- `app-state-store.ts` stubs IDB operations with TODO comment referencing
-  `makeCrudIndexedDbClient<AppState>`.
-- `app-admin/app.tsx`: calls `api.Users.get(sessionStore.userId)`, passes
-  result to `setSessionUser`; calls `setDataReady`; uses store name
+- `session-state.ts` exports `SessionState` with `store`, `setAuth`, `setUser`,
+  `setReady`, and `clear`. No raw setter calls outside this module.
+- `app-state.ts` uses `makeCrudIndexedDbClient<AppState>` for IDB persistence
+  (no stubbed operations).
+- `app-admin/app.tsx`: calls `api.Users.get(SessionState.store.userId)`, passes
+  result to `SessionState.setUser`; calls `SessionState.setReady`; uses store name
   `'swarmag-admin-app'`; imports `Config` from `@ux/config/ux-config.ts`.
-- `app-ops/app.tsx`: calls `api.Users.get(sessionStore.userId)`, passes result
-  to `setSessionUser`; calls `loadJobs()`; calls `setDataReady()` only after
-  `jobsStore.isLoaded` is `true`; uses store name `'swarmag-ops-app'`; imports
+- `app-ops/app.tsx`: calls `api.Users.get(SessionState.store.userId)`, passes result
+  to `SessionState.setUser`; calls `loadJobs()`; calls `SessionState.setReady()`
+  only after `jobsStore.isLoaded` is `true`; uses store name `'swarmag-ops-app'`; imports
   `Config` from `@ux/config/ux-config.ts`.
-- `app-customer/app.tsx`: calls `api.Users.get(sessionStore.userId)`, passes
-  result to `setSessionUser`; calls `setDataReady`; uses store name
+- `app-customer/app.tsx`: calls `api.Users.get(SessionState.store.userId)`, passes
+  result to `SessionState.setUser`; calls `SessionState.setReady`; uses store name
   `'swarmag-customer-app'`; imports `Config` from `@ux/config/ux-config.ts`;
   does not write `dashboard:panels` key.
 - `jobs-store.ts`: imports `JobSummary` from `@ux/common/views/job.ts`; shape
-  uses `JobSummary[]` and `isLoaded`; `loadJobs()` stub sets `jobs: []` and
-  `isLoaded: true` with TODO comment; no Supabase calls.
+  uses `JobSummary[]` and `isLoaded`; `loadJobs()` reads from IDB and sets
+  `isLoaded: true`; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from
-  `session-store.ts` directly.
+  `session-state.ts` directly.
 - All exported symbols have `/** */` JSDoc per `style-guide.md` §6.5.
 - All section headers use the canonical width per `style-guide.md` §6.4.
 - No `@back/*` imports anywhere in `source/ux/`.

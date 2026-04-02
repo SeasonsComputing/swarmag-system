@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Initialises the Admin application. Registers the auth state listener,
+Initializes the Admin application. Registers the auth state listener,
 performs the boot-time user fetch, and mounts the TanStack Router route tree.
 
 PUBLIC
@@ -14,7 +14,8 @@ PUBLIC
 (entry point — no exported symbols)
 */
 
-import '@ux/config/ux-config.ts'
+import { onCleanup, onMount } from '@solid-js'
+import { render } from '@solid-js/web'
 import {
   createRootRoute,
   createRoute,
@@ -23,14 +24,12 @@ import {
   RouterProvider
 } from '@tanstack/solid-router'
 import { api } from '@ux/api'
+import { Dashboard } from '@ux/app-admin/dashboard/dashboard.tsx'
 import { Login } from '@ux/common/components/login/login.tsx'
 import { AuthGuard } from '@ux/common/components/shell/auth-guard.tsx'
 import { Content } from '@ux/common/components/shell/content.tsx'
-import { makeAppStateStore } from '@ux/common/stores/app-state-store.ts'
-import { SessionStore } from '@ux/common/stores/session-store.ts'
-import { onCleanup, onMount } from 'solid-js'
-import { render } from 'solid-js/web'
-import { Dashboard } from './dashboard/dashboard.tsx'
+import { makeAppStateStore } from '@ux/common/lib/app-state.ts'
+import { SessionState } from '@ux/common/lib/session-state.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // APP STATE
@@ -80,14 +79,14 @@ const App = () => {
   onMount(() => {
     const unsubscribe = api.Auth.onAuthStateChange(async session => {
       if (session) {
-        SessionStore.setAuth(session.userId)
-        if (!SessionStore.store.user) {
+        SessionState.setAuth(session.userId)
+        if (!SessionState.store.user) {
           const user = await api.Users.get(session.userId)
-          SessionStore.setUser(user)
-          SessionStore.setReady()
+          SessionState.setUser(user)
+          SessionState.setReady()
         }
       } else {
-        SessionStore.clear()
+        SessionState.clear()
       }
     })
     onCleanup(unsubscribe)

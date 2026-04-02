@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Initialises the Ops application. Registers the auth state listener, performs
+Initializes the Ops application. Registers the auth state listener, performs
 the boot-time user fetch, loads the IDB job manifest, and mounts the TanStack
 Router route tree. setDataReady is called only after jobsStore.isLoaded.
 
@@ -16,6 +16,8 @@ PUBLIC
 */
 
 import '@ux/config/ux-config.ts'
+import { createEffect, onCleanup, onMount, Show } from '@solid-js'
+import { render } from '@solid-js/web'
 import {
   createRootRoute,
   createRoute,
@@ -27,10 +29,8 @@ import { api } from '@ux/api'
 import { Login } from '@ux/common/components/login/login.tsx'
 import { AuthGuard } from '@ux/common/components/shell/auth-guard.tsx'
 import { Content } from '@ux/common/components/shell/content.tsx'
-import { makeAppStateStore } from '@ux/common/stores/app-state-store.ts'
-import { SessionStore } from '@ux/common/stores/session-store.ts'
-import { createEffect, onCleanup, onMount, Show } from 'solid-js'
-import { render } from 'solid-js/web'
+import { makeAppStateStore } from '@ux/common/lib/app-state.ts'
+import { SessionState } from '@ux/common/lib/session-state.ts'
 import { Dashboard } from './dashboard/dashboard.tsx'
 import { jobsStore, loadJobs } from './stores/jobs-store.ts'
 
@@ -64,7 +64,7 @@ const dashboardRoute = createRoute({
   component: () => (
     <AuthGuard>
       <Content>
-        <Show when={SessionStore.store.isDataReady} fallback={<p>Loading...</p>}>
+        <Show when={SessionState.store.isDataReady} fallback={<p>Loading...</p>}>
           <Dashboard />
         </Show>
       </Content>
@@ -84,22 +84,22 @@ const App = () => {
   onMount(() => {
     const unsubscribe = api.Auth.onAuthStateChange(async session => {
       if (session) {
-        SessionStore.setAuth(session.userId)
-        if (!SessionStore.store.user) {
+        SessionState.setAuth(session.userId)
+        if (!SessionState.store.user) {
           const user = await api.Users.get(session.userId)
-          SessionStore.setUser(user)
+          SessionState.setUser(user)
           await loadJobs()
         }
       } else {
-        SessionStore.clear()
+        SessionState.clear()
       }
     })
     onCleanup(unsubscribe)
   })
 
   createEffect(() => {
-    if (jobsStore.isLoaded && SessionStore.store.isAuthenticated && !SessionStore.store.isDataReady) {
-      SessionStore.setReady()
+    if (jobsStore.isLoaded && SessionState.store.isAuthenticated && !SessionState.store.isDataReady) {
+      SessionState.setReady()
     }
   })
 

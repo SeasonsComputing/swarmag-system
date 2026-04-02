@@ -140,13 +140,13 @@ These abstractions describe **domain meaning**, not persistence, API shape, or u
 
 The following abstractions are shared across multiple domain concepts and represent pure value objects or embedded subordinate compositions. They do not have independent life-cycles.
 
-| Abstraction  | Module      | Description                                                                                         |
-| ------------ | ----------- | --------------------------------------------------------------------------------------------------- |
-| `Location`   | `common.ts` | Geographic coordinates with optional address information                                            |
-| `Note`       | `common.ts` | Freeform text with author and timestamp                                                             |
-| `Attachment` | `common.ts` | Metadata describing an uploaded file or artifact                                                    |
-  | `Question`   | `common.ts` | Reusable prompt; Instantiable life-cycled; discriminated union of InternalQuestion, ScalarQuestion and SelectQuestion |
-| `Answer`     | `common.ts` | Response to a question, with supporting notes                                                       |
+| Abstraction  | Module      | Description                                                                                                           |
+| ------------ | ----------- | --------------------------------------------------------------------------------------------------------------------- |
+| `Location`   | `common.ts` | Geographic coordinates with optional address information                                                              |
+| `Note`       | `common.ts` | Freeform text with author and timestamp                                                                               |
+| `Attachment` | `common.ts` | Metadata describing an uploaded file or artifact                                                                      |
+| `Question`   | `common.ts` | Reusable prompt; Instantiable life-cycled; discriminated union of InternalQuestion, ScalarQuestion and SelectQuestion |
+| `Answer`     | `common.ts` | Response to a question, with supporting notes                                                                         |
 
 These abstractions are **composed into** higher-level domain objects, do not join with Instantiable and are not referenced independently.
 

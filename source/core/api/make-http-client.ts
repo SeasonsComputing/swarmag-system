@@ -17,18 +17,22 @@ makeCrudHttpClient(spec)     Build CRUD/list client over HTTP.
 makeBusRuleHttpClient(spec)  Build business-rule runner over HTTP.
 */
 
-import type { Dictionary, Id, Instantiable } from '@core/std'
-import {
-  type ApiBusRuleContract,
-  type ApiCrudContract,
-  ApiError,
-  type ApiErrorDetail,
-  checkApiError,
-  type DeleteResult,
-  type ListOptions,
-  type ListResult,
-  throwApiError
+import type {
+  CreateFromInstantiable,
+  Dictionary,
+  Id,
+  Instantiable,
+  UpdateFromInstantiable
+} from '@core/std'
+import type {
+  ApiBusRuleContract,
+  ApiCrudContract,
+  ApiErrorDetail,
+  DeleteResult,
+  ListOptions,
+  ListResult
 } from './api-contract.ts'
+import { ApiError, checkApiError, throwApiError } from './api-contract.ts'
 
 /** Configuration for a business-rule HTTP API client. */
 export type HttpSpecification = { basePath: string }
@@ -38,77 +42,73 @@ export type HttpSpecification = { basePath: string }
  * @param spec - API specification with base path.
  * @returns API client object with CRUD methods.
  */
-export function makeCrudHttpClient<T extends Instantiable, TCreate, TUpdate>(
-  spec: HttpSpecification
-): ApiCrudContract<T, TCreate, TUpdate> {
-  const { basePath } = spec
-  return {
-    /* Create record over HTTP and unwrap API envelope. */
-    async create(input: TCreate): Promise<T> {
-      const res = await request(`${basePath}/create`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input)
-      })
-      return unwrap<T>(res)
-    },
+export const makeCrudHttpClient = <T extends Instantiable>(
+  { basePath }: HttpSpecification
+): ApiCrudContract<T> => ({
+  /* Create record over HTTP and unwrap API envelope. */
+  async create(input: CreateFromInstantiable<T>): Promise<T> {
+    const res = await request(`${basePath}/create`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input)
+    })
+    return unwrap<T>(res)
+  },
 
-    /* Get record by id over HTTP and unwrap API envelope. */
-    async get(id: Id): Promise<T> {
-      const res = await request(`${basePath}/get?id=${encodeURIComponent(id)}`)
-      return unwrap<T>(res)
-    },
+  /* Get record by id over HTTP and unwrap API envelope. */
+  async get(id: Id): Promise<T> {
+    const res = await request(`${basePath}/get?id=${encodeURIComponent(id)}`)
+    return unwrap<T>(res)
+  },
 
-    /* Update record over HTTP and unwrap API envelope. */
-    async update(input: TUpdate): Promise<T> {
-      const res = await request(`${basePath}/update`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(input)
-      })
-      return unwrap<T>(res)
-    },
+  /* Update record over HTTP and unwrap API envelope. */
+  async update(source: UpdateFromInstantiable<T>): Promise<T> {
+    const res = await request(`${basePath}/update`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(source)
+    })
+    return unwrap<T>(res)
+  },
 
-    /* Soft-delete record over HTTP and unwrap delete payload. */
-    async delete(id: Id): Promise<DeleteResult> {
-      const res = await request(`${basePath}/delete`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
-      })
-      return unwrap<DeleteResult>(res)
-    },
+  /* Soft-delete record over HTTP and unwrap delete payload. */
+  async delete(id: Id): Promise<DeleteResult> {
+    const res = await request(`${basePath}/delete`, {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
+    })
+    return unwrap<DeleteResult>(res)
+  },
 
-    /* List records over HTTP using list payload options. */
-    async list(options?: ListOptions): Promise<ListResult<T>> {
-      const res = await request(`${basePath}/list`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(options ?? {})
-      })
-      return unwrapList<T>(res, 'Failed to list items')
-    }
+  /* List records over HTTP using list payload options. */
+  async list(options?: ListOptions): Promise<ListResult<T>> {
+    const res = await request(`${basePath}/list`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(options ?? {})
+    })
+    return unwrapList<T>(res, 'Failed to list items')
   }
-}
+})
 
 /**
  * Factory to produce a business-rule API client over HTTP.
  * @param spec - API specification with base path.
  * @returns API client object with BusRule methods.
  */
-export function makeBusRuleHttpClient(spec: HttpSpecification): ApiBusRuleContract {
-  const { basePath } = spec
-  return {
-    async run(params: Dictionary): Promise<Dictionary> {
-      const res = await request(basePath, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(params)
-      })
-      return unwrap<Dictionary>(res)
-    }
+export const makeBusRuleHttpClient = (
+  { basePath }: HttpSpecification
+): ApiBusRuleContract => ({
+  async run(params: Dictionary): Promise<Dictionary> {
+    const res = await request(basePath, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params)
+    })
+    return unwrap<Dictionary>(res)
   }
-}
+})
 
 // ───────────────────────────────────────────────────────────────────────────────
 // INTERNALS

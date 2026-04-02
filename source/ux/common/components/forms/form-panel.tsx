@@ -14,7 +14,7 @@ PUBLIC
 FormPanel  Adaptive form container component.
 */
 
-import type { JSX } from 'solid-js'
+import type { JSX } from '@solid-js'
 
 /** FormPanel props. */
 type FormPanelProps = {

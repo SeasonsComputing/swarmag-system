@@ -410,9 +410,58 @@ export { Config }
 - `Config.fail(msg)` — throws `never`; use for invariant violations.
 - Never access `Deno.env` or `import.meta.env` directly. Always go through `Config.get()`.
 
-### 8.6 Makers
+### 8.6 Adapters
 
-Makers produce interface conformant implementations. They do not create instances of an object they create code. Makers are typically contained in `make-{concept}-{role}.ts`. Where concept is the concrete type of maker, for example  `indexeddb` or `supabase`. The role of the interface, for example, `client` or `provider`.
+Domain adapters use metadata-driven generation via `makeAdapter` from `@core/std`.
+
+Adapter contract:
+
+```typescript
+export type AdapterPatch<T> = Partial<T> & Dictionary
+export interface Adapter<T> {
+  toDomain: (source: Dictionary) => T
+  fromDomain: (patch: AdapterPatch<T>) => Dictionary
+}
+```
+
+Rules:
+
+- Use `makeAdapter(meta)` as the default pattern for domain adapters.
+- `fromDomain` accepts `AdapterPatch<T>` so both full abstractions and partial update payloads are valid inputs.
+- Use delegate adapters in metadata for nested composition object and array fields.
+- Adapters only serialize/deserialize shape; no business logic or validation.
+
+Example:
+
+```typescript
+/** Deserialize/Serialize SelectOption (Composition) */
+export const SelectOptionAdapter = makeAdapter<SelectOption>({
+  value: ['value'],
+  label: ['label'],
+  requiresNote: ['requires_note']
+})
+
+/** Deserialize/Serialize Question (Instantiable) */
+export const QuestionAdapter = makeAdapter<Question>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  type: ['type'],
+  prompt: ['prompt'],
+  helpText: ['help_text'],
+  required: ['required'],
+  options: ['options', SelectOptionAdapter]
+})
+
+/** Deserialize/Serialize Answer (Composition) */
+export const AnswerAdapter = makeAdapter<Answer>({
+  questionId: ['question_id'],
+  value: ['value'],
+  capturedAt: ['captured_at'],
+  notes: ['notes', NoteAdapter]
+})
+```
 
 ## 9. Error Handling
 

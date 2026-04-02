@@ -26,7 +26,14 @@ listPageLimitValue(string): number Parse/clamp list page size.
 listCursorValue(string): number    Parse/sanitize list cursor offset.
 */
 
-import type { Dictionary, Id, When } from '@core/std'
+import type {
+  CreateFromInstantiable,
+  Dictionary,
+  Id,
+  Instantiable,
+  UpdateFromInstantiable,
+  When
+} from '@core/std'
 
 // ────────────────────────────────────────────────────────────────────────────
 // Error Handling
@@ -47,9 +54,9 @@ export class ApiError extends Error {
 /** Normalized provider-error shape for ApiError mapping. */
 export type ApiErrorDetail = {
   message?: string
+  status?: number
   details?: string
   code?: string
-  status?: number
 }
 
 /**
@@ -98,10 +105,10 @@ export function apiError(error: unknown): boolean {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** CRUD API contract */
-export interface ApiCrudContract<T, TCreate, TUpdate> {
-  create(input: TCreate): Promise<T>
+export interface ApiCrudContract<T extends Instantiable> {
+  create(input: CreateFromInstantiable<T>): Promise<T>
   get(id: Id): Promise<T>
-  update(input: TUpdate): Promise<T>
+  update(input: UpdateFromInstantiable<T>): Promise<T>
   delete(id: Id): Promise<DeleteResult>
   list?(options?: ListOptions): Promise<ListResult<T>>
 }

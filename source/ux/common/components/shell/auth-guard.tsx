@@ -15,10 +15,10 @@ PUBLIC
 AuthGuard  Route-level auth guard component.
 */
 
+import { createEffect, Show } from '@solid-js'
+import type { JSX } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
-import { SessionStore } from '@ux/common/stores/session-store.ts'
-import { createEffect, Show } from 'solid-js'
-import type { JSX } from 'solid-js'
+import { SessionState } from '@ux/common/lib/session-state.ts'
 
 /** AuthGuard props. */
 type AuthGuardProps = {
@@ -28,15 +28,16 @@ type AuthGuardProps = {
 /** Route-level auth guard; redirects to /login when unauthenticated. */
 export const AuthGuard = (props: AuthGuardProps) => {
   const navigate = useNavigate()
+  const { store: session } = SessionState
 
   createEffect(() => {
-    if (!SessionStore.store.isLoading && !SessionStore.store.isAuthenticated) {
+    if (!session.isLoading && !session.isAuthenticated) {
       void navigate({ to: '/login', replace: true })
     }
   })
 
   return (
-    <Show when={!SessionStore.store.isLoading && SessionStore.store.isAuthenticated}>
+    <Show when={!session.isLoading && session.isAuthenticated}>
       {props.children}
     </Show>
   )
