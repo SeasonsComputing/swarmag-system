@@ -15,9 +15,9 @@ PUBLIC
 AppState  Singleton API for reading and writing persisted app state values.
 */
 
-import type { Dictionary, Instance } from '@core/std'
-import { type ApiErrorDetail, apiError, throwApiError } from '@core/api/api-contract.ts'
+import { apiError, type ApiErrorDetail, throwApiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
+import type { Dictionary, Instance } from '@core/std'
 
 /** Persisted app-state record shape stored in IndexedDB. */
 type AppStateStore = Instance & { state: Dictionary }
@@ -29,7 +29,9 @@ class AppStateProvider {
   #id = 'AppStateId'
 
   /** Registers the app-state object store schema. */
-  constructor() { IndexedDb.registerStore(this.#schema) }
+  constructor() {
+    IndexedDb.registerStore(this.#schema)
+  }
 
   /** Loads the persisted app-state dictionary. */
   async #getAppState(): Promise<Dictionary> {

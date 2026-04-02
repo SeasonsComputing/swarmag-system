@@ -7,8 +7,8 @@ import { Dictionary } from './adt.ts'
 /** Contract for domain serialization. */
 export type AdapterPatch<T> = Partial<T> & Dictionary
 export interface Adapter<T> {
-  toDomain: (source: Dictionary) => T
-  fromDomain: (patch: AdapterPatch<T>) => Dictionary
+  toDomain(source: Dictionary): T
+  fromDomain(patch: AdapterPatch<T>): Dictionary
 }
 
 /**

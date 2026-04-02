@@ -11,6 +11,7 @@ Defines shared domain value objects and reusable question abstractions.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 LOCATION_FIELDS         Canonical field keys for Location.
+LocationField           Location field derived from LOCATION_FIELDS.
 Location                Geographic position plus optional address metadata.
 ATTACHMENT_KINDS        Allowed attachment kind values.
 AttachmentKind          Attachment kind derived from ATTACHMENT_KINDS.
