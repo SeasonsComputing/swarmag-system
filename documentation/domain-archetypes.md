@@ -247,10 +247,6 @@ The create and update protocol contain only fields required to create or update 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 
-// ────────────────────────────────────────────────────────────────────────────
-// PROTOCOL
-// ────────────────────────────────────────────────────────────────────────────
-
 export type UserCreate = CreateFromInstantiable<User>
 export type UserUpdate = UpdateFromInstantiable<User>
 ```
@@ -284,16 +280,16 @@ When an abstraction is a `union-type` (discriminated union of concrete variants)
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { InternalQuestion, ScalarQuestion, SelectQuestion } from '@domain/abstractions/common.ts'
 
+/*  Question Create protocol */
 export type InternalQuestionCreate = CreateFromInstantiable<InternalQuestion>
 export type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
 export type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
-/** Union alias — discriminate before use. */
 export type QuestionCreate = InternalQuestionCreate | ScalarQuestionCreate | SelectQuestionCreate
 
+/* Question Update protocol */
 export type InternalQuestionUpdate = UpdateFromInstantiable<InternalQuestion>
 export type ScalarQuestionUpdate = UpdateFromInstantiable<ScalarQuestion>
 export type SelectQuestionUpdate = UpdateFromInstantiable<SelectQuestion>
-/** Union alias — discriminate before use. */
 export type QuestionUpdate = InternalQuestionUpdate | ScalarQuestionUpdate | SelectQuestionUpdate
 ```
 
@@ -466,61 +462,39 @@ Import direction follows domain dependency flow: common guards flow outward to t
 
 Source: `@domain/adapters/{topic}-adapter.ts`
 
-Adapters serialize between the storage representation (`Dictionary`) and domain abstractions. They contain no business logic and no validation.
+Adapters serialize between storage dictionaries and domain abstractions. They contain no business logic and no validation.
 
-### 6.1 Naming
+### 6.1 Structure
 
-| Adapter function | Name          |
-| ---------------- | ------------- |
-| Storage → domain | `to{Topic}`   |
-| Domain → storage | `from{Topic}` |
+Each topic adapter file exports adapter instances built with `makeAdapter` from `@core/std`.
 
-### 6.2 Structure
-
-Each adapter file exports a `to` function and a `from` function for each abstraction in the topic namespace that is persisted. Plain `object` types embedded as compositions are serialized inline within their parent's adapter — they do not get standalone adapter functions.
+Adapter contract:
 
 ```typescript
-import type { Dictionary } from '@core/std'
-import type { User } from '@domain/abstractions/user.ts'
-
-/** Deserialize User from storage dictionary. */
-export const toUser = (dict: Dictionary): User => ({
-  id: dict.id as Id,
-  createdAt: dict.created_at as When,
-  updatedAt: dict.updated_at as When,
-  deletedAt: dict.deleted_at as When | undefined,
-  roles: dict.roles as CompositionPositive<UserRole>,
-  displayName: dict.display_name as string,
-  primaryEmail: dict.primary_email as string,
-  phoneNumber: dict.phone_number as string,
-  avatarUrl: dict.avatar_url as string | undefined,
-  status: dict.status as 'active' | 'inactive' | undefined
-})
-
-/** Serialize User to storage dictionary. */
-export const fromUser = (user: User): Dictionary => ({
-  id: user.id,
-  created_at: user.createdAt,
-  updated_at: user.updatedAt,
-  deleted_at: user.deletedAt,
-  roles: user.roles,
-  display_name: user.displayName,
-  primary_email: user.primaryEmail,
-  phone_number: user.phoneNumber,
-  avatar_url: user.avatarUrl,
-  status: user.status
-})
+type Adapter<T> = {
+  toDomain(source: Dictionary): T
+  fromDomain(patch: Partial<T>): Dictionary
+}
 ```
 
-Adapter formatting requirements:
+`toDomain` deserializes storage dictionaries into domain abstractions.\
+`fromDomain` accepts a wider input interface (`Partial<T>`), so both full abstractions and partial protocol/update payloads are valid inputs.
 
-- File-header `PUBLIC` entries must have aligned description columns.
-- Every exported adapter function has a single-line JSDoc comment immediately above its export.
-- Omit in-source `PUBLIC` divider banners for export-only adapter files.
+### 6.2 Metadata Mapping Model
 
-### 6.3 Column Mapping
+Adapters are declared with metadata that maps domain keys to storage columns and optional delegate adapters for nested abstractions.
 
-Domain fields are `camelCase`. Storage columns are `snake_case`. Map every field explicitly — no spread, no payload passthrough.
+```typescript
+type AdaptDelegate = [column: string, delegate?: Adapter<unknown>]
+type Adapt<T> = { [K in keyof T]: AdaptDelegate }
+```
+
+`makeAdapter(meta)` is the canonical adapter maker for domain archetypes.
+
+### 6.3 Column and Key Conventions
+
+Domain fields use `camelCase`. Storage columns use `snake_case`.\
+Every mapped field is explicit through metadata.
 
 | Domain field   | Storage column   |
 | -------------- | ---------------- |
@@ -530,79 +504,46 @@ Domain fields are `camelCase`. Storage columns are `snake_case`. Map every field
 | `deletedAt`    | `deleted_at`     |
 | `{camelField}` | `{snake_column}` |
 
-### 6.4 Composition Serialization
+### 6.4 Composition and Delegation
 
-Composition fields (`CompositionOne`, `CompositionMany`, `CompositionPositive`) are stored as JSONB. Deserialize inline within the parent's `to` function.
+For nested composition values, metadata uses delegate adapters. Delegates apply recursively to both object and array values.
 
 ```typescript
-/** Deserialize Asset from storage dictionary. */
-export const toAsset = (dict: Dictionary): Asset => ({
-  id: dict.id as Id,
-  createdAt: dict.created_at as When,
-  updatedAt: dict.updated_at as When,
-  deletedAt: dict.deleted_at as When | undefined,
-  typeId: dict.type_id as AssociationOne<AssetType>,
-  notes: (dict.notes as Dictionary[]).map(toNote),
-  label: dict.label as string,
-  description: dict.description as string | undefined,
-  serialNumber: dict.serial_number as string | undefined,
-  status: dict.status as AssetStatus
+import { makeAdapter } from '@core/std'
+import type { Attachment, Note } from '@domain/abstractions/common.ts'
+
+export const AttachmentAdapter = makeAdapter<Attachment>({
+  filename: ['filename'],
+  url: ['url'],
+  contentType: ['content_type'],
+  kind: ['kind'],
+  uploadedAt: ['uploaded_at']
+})
+
+export const NoteAdapter = makeAdapter<Note>({
+  attachments: ['attachments', AttachmentAdapter],
+  createdAt: ['created_at'],
+  content: ['content'],
+  visibility: ['visibility'],
+  tags: ['tags']
 })
 ```
 
-### 6.5 Union-Type Adapters
+### 6.5 Instantiable and Union-Type Coverage
 
-```typescript
-/** Deserialize Question from storage dictionary. */
-export const toQuestion = (dict: Dictionary): Question => {
-  const type = dict.type as QuestionType
-  switch (type) {
-    case 'internal':
-      return {
-        id: dict.id as Id,
-        createdAt: dict.created_at as When,
-        updatedAt: dict.updated_at as When,
-        deletedAt: dict.deleted_at as When | undefined,
-        type,
-        prompt: dict.prompt as string,
-        helpText: dict.help_text as string | undefined,
-        required: dict.required as boolean | undefined
-      } satisfies InternalQuestion
-    case 'text':
-    case 'number':
-    case 'boolean':
-      return {
-        id: dict.id as Id,
-        createdAt: dict.created_at as When,
-        updatedAt: dict.updated_at as When,
-        deletedAt: dict.deleted_at as When | undefined,
-        type,
-        prompt: dict.prompt as string,
-        helpText: dict.help_text as string | undefined,
-        required: dict.required as boolean | undefined
-      } satisfies ScalarQuestion
-    case 'single-select':
-    case 'multi-select':
-      return {
-        id: dict.id as Id,
-        createdAt: dict.created_at as When,
-        updatedAt: dict.updated_at as When,
-        deletedAt: dict.deleted_at as When | undefined,
-        type,
-        prompt: dict.prompt as string,
-        helpText: dict.help_text as string | undefined,
-        required: dict.required as boolean | undefined,
-        options: (dict.options as Dictionary[]).map(toSelectOption) as CompositionPositive<
-          SelectOption
-        >
-      } satisfies SelectQuestion
-  }
-}
-```
+Instantiable adapters include lifecycle mappings where present (`id`, `createdAt`, `updatedAt`, `deletedAt`).\
+Composition-only adapters include only composition fields.
+
+Union-type adapters are still expressed as a single adapter per union abstraction, with metadata covering shared and variant fields. Discriminator semantics remain owned by the abstraction and protocol/validator layers.
 
 ### 6.6 Round-Trip Integrity
 
-Every adapter must support a clean round-trip: `toTopic(fromTopic(obj))` produces a structurally identical object. This is enforced by the fixture round-trip test in `source/tests/cases/fixtures-test.ts`.
+Every adapter must support clean round-trip behavior:
+
+- `toDomain(source)` returns a valid abstraction from storage form.
+- `fromDomain(patch)` emits a storage dictionary for the provided input shape.
+
+Round-trip integrity is enforced by fixture tests in `source/tests/cases/fixtures-test.ts`.
 
 ## 7. Schema
 

@@ -16,8 +16,8 @@ jobsStore  Reactive read store; exposes jobs array and isLoaded flag.
 loadJobs   Load the job manifest from local IndexedDB storage.
 */
 
+import { createStore } from '@solid-js/store'
 import type { JobSummary } from '@ux/common/views/job.ts'
-import { createStore } from 'solid-js/store'
 
 /** Ops job manifest store shape. */
 type JobsStore = {

@@ -13,11 +13,11 @@ sessionStore directly.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Login  Passwordless OTP login component.
+Login Passwordless OTP login component.
 */
 
+import { createSignal, Show } from '@solid-js'
 import { api } from '@ux/api'
-import { createSignal, Show } from 'solid-js'
 
 /** OTP flow step discriminator. */
 type LoginStep = 'email' | 'code'

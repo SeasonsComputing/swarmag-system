@@ -10,37 +10,22 @@ Maps storage dictionaries to user abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toUser(dict)    Deserialize User from dictionary.
-fromUser(user)  Serialize User to dictionary.
+UserAdapter  Deserialize/Serialize User.
 */
 
-import type { Dictionary } from '@core/std'
+import { makeAdapter } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 
-/** Deserialize User from dictionary. */
-export const toUser = (dict: Dictionary): User => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  roles: (dict.roles as User['roles']) ?? [],
-  displayName: dict.display_name as string,
-  primaryEmail: dict.primary_email as string,
-  phoneNumber: dict.phone_number as string,
-  avatarUrl: dict.avatar_url as string | undefined,
-  status: dict.status as User['status']
-})
-
-/** Serialize User to dictionary. */
-export const fromUser = (user: User): Dictionary => ({
-  id: user.id,
-  created_at: user.createdAt,
-  updated_at: user.updatedAt,
-  deleted_at: user.deletedAt,
-  roles: user.roles,
-  display_name: user.displayName,
-  primary_email: user.primaryEmail,
-  phone_number: user.phoneNumber,
-  avatar_url: user.avatarUrl,
-  status: user.status
+/** Deserialize/Serialize User. */
+export const UserAdapter = makeAdapter<User>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  roles: ['roles'],
+  displayName: ['display_name'],
+  primaryEmail: ['primary_email'],
+  phoneNumber: ['phone_number'],
+  avatarUrl: ['avatar_url'],
+  status: ['status']
 })

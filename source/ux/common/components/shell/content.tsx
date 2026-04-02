@@ -13,7 +13,7 @@ PUBLIC
 Content  Main content frame component.
 */
 
-import type { JSX } from 'solid-js'
+import type { JSX } from '@solid-js'
 
 /** Content props. */
 type ContentProps = {

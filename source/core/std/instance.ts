@@ -1,36 +1,34 @@
 /**
- * Specification and factory for Instances
- * Instances are cryptographically-unique-identified and life-cycle aware objects
+ * Specification and factory for Instances.
  */
 
 import { type When, when } from './datetime.ts'
 import { type Id, id } from './identifier.ts'
 
-/** Instance type specification */
-export type Instantiable = {
-  id: Id
-  createdAt: When
-  updatedAt: When
-  deletedAt?: When
-}
+/** Type instance specifications. */
+export type Instance = { id: Id }
+export type InstantiableOnly = Instance & { createdAt: When }
+export type Instantiable = InstantiableOnly & { updatedAt: When; deletedAt?: When }
 
-/** An Instance specialized to only allow creation. No update or delete. */
-export type InstantiableOnly = Pick<Instantiable, 'id' | 'createdAt'>
+/** Types with Instance specifications removed.  */
+export type FromInstance<T extends Instance> = Omit<T, keyof Instance>
+export type FromInstantiableOnly<T extends InstantiableOnly> = Omit<T, keyof InstantiableOnly>
+export type FromInstantiable<T extends Instantiable> = Omit<T, keyof Instantiable>
 
-/** Create shape for an Instantiable by excluding life-cycle-managed fields. */
-export type CreateFromInstantiable<T extends Instantiable> = Omit<T, keyof Instantiable>
+/** Instance factory. */
+export const instance = <T extends Instance>(
+  state: FromInstance<T>
+): T => ({ id: id(), ...state } as T)
 
-/** Update shape for an Instantiable: required id plus partial create fields. */
-export type UpdateFromInstantiable<T extends Instantiable> =
-  & Pick<T, 'id'>
-  & Partial<CreateFromInstantiable<T>>
+/** InstantiableOnly factory. */
+export const instantiableOnly = <T extends InstantiableOnly>(
+  state: FromInstantiableOnly<T>
+): T => ({ id: id(), ...state, createdAt: when() } as T)
 
-/**
- * Create an Instantiable conforming instance
- * Allow's id to be overridden; life-cycle state always reset
- */
-export const instance = <T extends Instantiable>(state: Partial<T> = {}): T => {
-  const { deletedAt: _, ...rest } = state
+/** Instantiable factory. */
+export const instantiable = <T extends Instantiable>(
+  state: FromInstantiable<T>
+): T => {
   const now = when()
-  return { id: id(), ...rest, createdAt: now, updatedAt: now } as T
+  return { id: id(), ...state, createdAt: now, updatedAt: now } as T
 }

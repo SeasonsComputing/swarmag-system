@@ -10,27 +10,18 @@ Maps storage dictionaries to job abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toJob(dict)                        Deserialize Job from dictionary.
-fromJob(job)                       Serialize Job to dictionary.
-toJobAssessment(dict)              Deserialize JobAssessment from dictionary.
-fromJobAssessment(assessment)      Serialize JobAssessment to dictionary.
-toJobWorkflow(dict)                Deserialize JobWorkflow from dictionary.
-fromJobWorkflow(record)            Serialize JobWorkflow to dictionary.
-toJobPlan(dict)                    Deserialize JobPlan from dictionary.
-fromJobPlan(plan)                  Serialize JobPlan to dictionary.
-toJobPlanAssignment(dict)          Deserialize JobPlanAssignment from dictionary.
-fromJobPlanAssignment(assignment)  Serialize JobPlanAssignment to dictionary.
-toJobPlanChemical(dict)            Deserialize JobPlanChemical from dictionary.
-fromJobPlanChemical(chemical)      Serialize JobPlanChemical to dictionary.
-toJobPlanAsset(dict)               Deserialize JobPlanAsset from dictionary.
-fromJobPlanAsset(record)           Serialize JobPlanAsset to dictionary.
-toJobWork(dict)                    Deserialize JobWork from dictionary.
-fromJobWork(work)                  Serialize JobWork to dictionary.
-toJobWorkLogEntry(dict)            Deserialize JobWorkLogEntry from dictionary.
-fromJobWorkLogEntry(entry)         Serialize JobWorkLogEntry to dictionary.
+JobAdapter                Deserialize/Serialize Job.
+JobAssessmentAdapter      Deserialize/Serialize JobAssessment.
+JobWorkflowAdapter        Deserialize/Serialize JobWorkflow.
+JobPlanAdapter            Deserialize/Serialize JobPlan.
+JobPlanAssignmentAdapter  Deserialize/Serialize JobPlanAssignment.
+JobPlanChemicalAdapter    Deserialize/Serialize JobPlanChemical.
+JobPlanAssetAdapter       Deserialize/Serialize JobPlanAsset.
+JobWorkAdapter            Deserialize/Serialize JobWork.
+JobWorkLogEntryAdapter    Deserialize/Serialize JobWorkLogEntry.
 */
 
-import type { Dictionary } from '@core/std'
+import { makeAdapter } from '@core/std'
 import type {
   Job,
   JobAssessment,
@@ -42,219 +33,108 @@ import type {
   JobWorkflow,
   JobWorkLogEntry
 } from '@domain/abstractions/job.ts'
-import {
-  fromAnswer,
-  fromLocation,
-  fromNote,
-  toAnswer,
-  toLocation,
-  toNote
-} from '@domain/adapters/common-adapter.ts'
+import { AnswerAdapter, LocationAdapter, NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
-/** Deserialize Job from dictionary. */
-export const toJob = (dict: Dictionary): Job => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  customerId: dict.customer_id as string,
-  status: dict.status as Job['status']
+/** Deserialize/Serialize Job. */
+export const JobAdapter = makeAdapter<Job>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  customerId: ['customer_id'],
+  status: ['status']
 })
 
-/** Serialize Job to dictionary. */
-export const fromJob = (job: Job): Dictionary => ({
-  id: job.id,
-  created_at: job.createdAt,
-  updated_at: job.updatedAt,
-  deleted_at: job.deletedAt,
-  customer_id: job.customerId,
-  status: job.status
+/** Deserialize/Serialize JobAssessment. */
+export const JobAssessmentAdapter = makeAdapter<JobAssessment>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  scheduledAt: ['scheduled_at'],
+  startedAt: ['started_at'],
+  completedAt: ['completed_at'],
+  jobId: ['job_id'],
+  assessorId: ['assessor_id'],
+  locations: ['locations', LocationAdapter],
+  risks: ['risks', NoteAdapter],
+  notes: ['notes', NoteAdapter]
 })
 
-/** Deserialize JobAssessment from dictionary. */
-export const toJobAssessment = (dict: Dictionary): JobAssessment => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  scheduledAt: dict.scheduled_at as string,
-  startedAt: dict.started_at as string | undefined,
-  completedAt: dict.completed_at as string | undefined,
-  jobId: dict.job_id as string,
-  assessorId: dict.assessor_id as string,
-  locations: (dict.locations as Dictionary[] | undefined ?? []).map(toLocation),
-  risks: (dict.risks as Dictionary[] | undefined ?? []).map(toNote),
-  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote)
+/** Deserialize/Serialize JobWorkflow. */
+export const JobWorkflowAdapter = makeAdapter<JobWorkflow>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  jobId: ['job_id'],
+  basisWorkflowId: ['basis_workflow_id'],
+  modifiedWorkflowId: ['modified_workflow_id']
 })
 
-/** Serialize JobAssessment to dictionary. */
-export const fromJobAssessment = (assessment: JobAssessment): Dictionary => ({
-  id: assessment.id,
-  created_at: assessment.createdAt,
-  updated_at: assessment.updatedAt,
-  deleted_at: assessment.deletedAt,
-  scheduled_at: assessment.scheduledAt,
-  started_at: assessment.startedAt,
-  completed_at: assessment.completedAt,
-  job_id: assessment.jobId,
-  assessor_id: assessment.assessorId,
-  locations: assessment.locations.map(fromLocation),
-  risks: assessment.risks.map(fromNote),
-  notes: assessment.notes.map(fromNote)
+/** Deserialize/Serialize JobPlan. */
+export const JobPlanAdapter = makeAdapter<JobPlan>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  jobId: ['job_id'],
+  plannerId: ['planner_id'],
+  notes: ['notes', NoteAdapter],
+  scheduledStart: ['scheduled_start'],
+  durationEstimate: ['duration_estimate']
 })
 
-/** Deserialize JobWorkflow from dictionary. */
-export const toJobWorkflow = (dict: Dictionary): JobWorkflow => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  jobId: dict.job_id as string,
-  basisWorkflowId: dict.basis_workflow_id as string,
-  modifiedWorkflowId: dict.modified_workflow_id as string | undefined
+/** Deserialize/Serialize JobPlanAssignment. */
+export const JobPlanAssignmentAdapter = makeAdapter<JobPlanAssignment>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  planId: ['plan_id'],
+  crewMemberId: ['crew_member_id'],
+  notes: ['notes', NoteAdapter],
+  role: ['role']
 })
 
-/** Serialize JobWorkflow to dictionary. */
-export const fromJobWorkflow = (record: JobWorkflow): Dictionary => ({
-  id: record.id,
-  created_at: record.createdAt,
-  updated_at: record.updatedAt,
-  deleted_at: record.deletedAt,
-  job_id: record.jobId,
-  basis_workflow_id: record.basisWorkflowId,
-  modified_workflow_id: record.modifiedWorkflowId
+/** Deserialize/Serialize JobPlanChemical. */
+export const JobPlanChemicalAdapter = makeAdapter<JobPlanChemical>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  planId: ['plan_id'],
+  chemicalId: ['chemical_id'],
+  amount: ['amount'],
+  unit: ['unit'],
+  targetArea: ['target_area'],
+  targetAreaUnit: ['target_area_unit']
 })
 
-/** Deserialize JobPlan from dictionary. */
-export const toJobPlan = (dict: Dictionary): JobPlan => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  jobId: dict.job_id as string,
-  plannerId: dict.planner_id as string,
-  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
-  scheduledStart: dict.scheduled_start as string,
-  durationEstimate: dict.duration_estimate as number
+/** Deserialize/Serialize JobPlanAsset. */
+export const JobPlanAssetAdapter = makeAdapter<JobPlanAsset>({
+  planId: ['plan_id'],
+  assetId: ['asset_id']
 })
 
-/** Serialize JobPlan to dictionary. */
-export const fromJobPlan = (plan: JobPlan): Dictionary => ({
-  id: plan.id,
-  created_at: plan.createdAt,
-  updated_at: plan.updatedAt,
-  deleted_at: plan.deletedAt,
-  job_id: plan.jobId,
-  planner_id: plan.plannerId,
-  notes: plan.notes.map(fromNote),
-  scheduled_start: plan.scheduledStart,
-  duration_estimate: plan.durationEstimate
+/** Deserialize/Serialize JobWork. */
+export const JobWorkAdapter = makeAdapter<JobWork>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  jobId: ['job_id'],
+  startedById: ['started_by_id'],
+  work: ['work'],
+  startedAt: ['started_at'],
+  completedAt: ['completed_at']
 })
 
-/** Deserialize JobPlanAssignment from dictionary. */
-export const toJobPlanAssignment = (dict: Dictionary): JobPlanAssignment => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  planId: dict.plan_id as string,
-  crewMemberId: dict.crew_member_id as string,
-  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
-  role: dict.role as JobPlanAssignment['role']
-})
-
-/** Serialize JobPlanAssignment to dictionary. */
-export const fromJobPlanAssignment = (assignment: JobPlanAssignment): Dictionary => ({
-  id: assignment.id,
-  created_at: assignment.createdAt,
-  updated_at: assignment.updatedAt,
-  deleted_at: assignment.deletedAt,
-  plan_id: assignment.planId,
-  crew_member_id: assignment.crewMemberId,
-  notes: assignment.notes.map(fromNote),
-  role: assignment.role
-})
-
-/** Deserialize JobPlanChemical from dictionary. */
-export const toJobPlanChemical = (dict: Dictionary): JobPlanChemical => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  planId: dict.plan_id as string,
-  chemicalId: dict.chemical_id as string,
-  amount: dict.amount as number,
-  unit: dict.unit as JobPlanChemical['unit'],
-  targetArea: dict.target_area as number | undefined,
-  targetAreaUnit: dict.target_area_unit as JobPlanChemical['targetAreaUnit']
-})
-
-/** Serialize JobPlanChemical to dictionary. */
-export const fromJobPlanChemical = (chemical: JobPlanChemical): Dictionary => ({
-  id: chemical.id,
-  created_at: chemical.createdAt,
-  updated_at: chemical.updatedAt,
-  deleted_at: chemical.deletedAt,
-  plan_id: chemical.planId,
-  chemical_id: chemical.chemicalId,
-  amount: chemical.amount,
-  unit: chemical.unit,
-  target_area: chemical.targetArea,
-  target_area_unit: chemical.targetAreaUnit
-})
-
-/** Deserialize JobPlanAsset from dictionary. */
-export const toJobPlanAsset = (dict: Dictionary): JobPlanAsset => ({
-  planId: dict.plan_id as string,
-  assetId: dict.asset_id as string
-})
-
-/** Serialize JobPlanAsset to dictionary. */
-export const fromJobPlanAsset = (record: JobPlanAsset): Dictionary => ({
-  plan_id: record.planId,
-  asset_id: record.assetId
-})
-
-/** Deserialize JobWork from dictionary. */
-export const toJobWork = (dict: Dictionary): JobWork => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  jobId: dict.job_id as string,
-  startedById: dict.started_by_id as string,
-  work: (dict.work as string[] | undefined) ?? [],
-  startedAt: dict.started_at as string,
-  completedAt: dict.completed_at as string | undefined
-})
-
-/** Serialize JobWork to dictionary. */
-export const fromJobWork = (work: JobWork): Dictionary => ({
-  id: work.id,
-  created_at: work.createdAt,
-  updated_at: work.updatedAt,
-  deleted_at: work.deletedAt,
-  job_id: work.jobId,
-  started_by_id: work.startedById,
-  work: work.work,
-  started_at: work.startedAt,
-  completed_at: work.completedAt
-})
-
-/** Deserialize JobWorkLogEntry from dictionary. */
-export const toJobWorkLogEntry = (dict: Dictionary): JobWorkLogEntry => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  jobId: dict.job_id as string,
-  userId: dict.user_id as string,
-  answer: [toAnswer(dict.answer as Dictionary)]
-})
-
-/** Serialize JobWorkLogEntry to dictionary. */
-export const fromJobWorkLogEntry = (entry: JobWorkLogEntry): Dictionary => ({
-  id: entry.id,
-  created_at: entry.createdAt,
-  job_id: entry.jobId,
-  user_id: entry.userId,
-  answer: fromAnswer(entry.answer[0] as never)
+/** Deserialize/Serialize JobWorkLogEntry. */
+export const JobWorkLogEntryAdapter = makeAdapter<JobWorkLogEntry>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  jobId: ['job_id'],
+  userId: ['user_id'],
+  answer: ['answer', AnswerAdapter]
 })

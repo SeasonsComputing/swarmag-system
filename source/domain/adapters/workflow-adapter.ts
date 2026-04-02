@@ -10,92 +10,50 @@ Maps storage dictionaries to workflow abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-toTask(dict)              Deserialize Task from dictionary.
-fromTask(task)            Serialize Task to dictionary.
-toTaskQuestion(dict)      Deserialize TaskQuestion from dictionary.
-fromTaskQuestion(record)  Serialize TaskQuestion to dictionary.
-toWorkflow(dict)          Deserialize Workflow from dictionary.
-fromWorkflow(workflow)    Serialize Workflow to dictionary.
-toWorkflowTask(dict)      Deserialize WorkflowTask from dictionary.
-fromWorkflowTask(record)  Serialize WorkflowTask to dictionary.
+TaskAdapter          Deserialize/Serialize Task.
+TaskQuestionAdapter  Deserialize/Serialize TaskQuestion.
+WorkflowAdapter      Deserialize/Serialize Workflow.
+WorkflowTaskAdapter  Deserialize/Serialize WorkflowTask.
 */
 
-import type { Dictionary } from '@core/std'
+import { makeAdapter } from '@core/std'
 import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
-import { fromNote, toNote } from '@domain/adapters/common-adapter.ts'
+import { NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
-/** Deserialize Task from dictionary. */
-export const toTask = (dict: Dictionary): Task => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
-  label: dict.label as string,
-  description: dict.description as string | undefined
+/** Deserialize/Serialize Task. */
+export const TaskAdapter = makeAdapter<Task>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  notes: ['notes', NoteAdapter],
+  label: ['label'],
+  description: ['description']
 })
 
-/** Serialize Task to dictionary. */
-export const fromTask = (task: Task): Dictionary => ({
-  id: task.id,
-  created_at: task.createdAt,
-  updated_at: task.updatedAt,
-  deleted_at: task.deletedAt,
-  notes: task.notes.map(fromNote),
-  label: task.label,
-  description: task.description
+/** Deserialize/Serialize TaskQuestion. */
+export const TaskQuestionAdapter = makeAdapter<TaskQuestion>({
+  taskId: ['task_id'],
+  questionId: ['question_id'],
+  sequence: ['sequence']
 })
 
-/** Deserialize TaskQuestion from dictionary. */
-export const toTaskQuestion = (dict: Dictionary): TaskQuestion => ({
-  taskId: dict.task_id as string,
-  questionId: dict.question_id as string,
-  sequence: dict.sequence as number
+/** Deserialize/Serialize Workflow. */
+export const WorkflowAdapter = makeAdapter<Workflow>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  notes: ['notes', NoteAdapter],
+  name: ['name'],
+  description: ['description'],
+  version: ['version'],
+  tags: ['tags']
 })
 
-/** Serialize TaskQuestion to dictionary. */
-export const fromTaskQuestion = (record: TaskQuestion): Dictionary => ({
-  task_id: record.taskId,
-  question_id: record.questionId,
-  sequence: record.sequence
-})
-
-/** Deserialize Workflow from dictionary. */
-export const toWorkflow = (dict: Dictionary): Workflow => ({
-  id: dict.id as string,
-  createdAt: dict.created_at as string,
-  updatedAt: dict.updated_at as string,
-  deletedAt: dict.deleted_at as string | undefined,
-  notes: (dict.notes as Dictionary[] | undefined ?? []).map(toNote),
-  name: dict.name as string,
-  description: dict.description as string | undefined,
-  version: dict.version as number,
-  tags: (dict.tags as string[] | undefined) ?? []
-})
-
-/** Serialize Workflow to dictionary. */
-export const fromWorkflow = (workflow: Workflow): Dictionary => ({
-  id: workflow.id,
-  created_at: workflow.createdAt,
-  updated_at: workflow.updatedAt,
-  deleted_at: workflow.deletedAt,
-  notes: workflow.notes.map(fromNote),
-  name: workflow.name,
-  description: workflow.description,
-  version: workflow.version,
-  tags: workflow.tags
-})
-
-/** Deserialize WorkflowTask from dictionary. */
-export const toWorkflowTask = (dict: Dictionary): WorkflowTask => ({
-  workflowId: dict.workflow_id as string,
-  taskId: dict.task_id as string,
-  sequence: dict.sequence as number
-})
-
-/** Serialize WorkflowTask to dictionary. */
-export const fromWorkflowTask = (record: WorkflowTask): Dictionary => ({
-  workflow_id: record.workflowId,
-  task_id: record.taskId,
-  sequence: record.sequence
+/** Deserialize/Serialize WorkflowTask. */
+export const WorkflowTaskAdapter = makeAdapter<WorkflowTask>({
+  workflowId: ['workflow_id'],
+  taskId: ['task_id'],
+  sequence: ['sequence']
 })
