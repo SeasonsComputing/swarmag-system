@@ -463,6 +463,10 @@ export const AnswerAdapter = makeAdapter<Answer>({
 })
 ```
 
+### 8.7 Makers
+
+Makers produce interface conformant implementations. They do not create instances of an object they create code. Makers are typically contained in `make-{concept}-{role}.ts`. Where concept is the concrete type of maker, for example  `indexeddb` or `supabase`. The role of the interface, for example, `client` or `provider`
+
 ## 9. Error Handling
 
 - Throw `Error` with actionable messages: `'Asset dictionary missing required field: id'`.
