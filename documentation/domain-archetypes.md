@@ -536,7 +536,7 @@ Adapters serialize between storage dictionaries and domain abstractions. They co
 
 ### 6.1 Structure
 
-Each topic adapter file exports adapter instances built with `makeAdapter` from `@core/std`.
+Each topic adapter file exports adapter instances built with `makeAdapter` from `@core/stdx`.
 
 Adapter contract:
 
@@ -579,7 +579,7 @@ Every mapped field is explicit through metadata.
 For nested composition values, metadata uses delegate adapters. Delegates apply recursively to both object and array values.
 
 ```typescript
-import { makeAdapter } from '@core/std'
+import { makeAdapter } from '@core/stdx'
 import type { Attachment, Note } from '@domain/abstractions/common.ts'
 
 export const AttachmentAdapter = makeAdapter<Attachment>({

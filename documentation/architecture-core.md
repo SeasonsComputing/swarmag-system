@@ -200,9 +200,9 @@ A single API namespace, defined in `source/ux/api/api.ts`, is composed once for 
 
 ```typescript
 // source/ux/api/api.ts
-import { makeBusRuleHttpClient } from '@core/api/make-http-client.ts'
-import { makeCrudIndexedDbClient } from '@core/api/make-indexeddb-client.ts'
-import { makeCrudSupabaseClient } from '@core/api/make-supabase-client.ts'
+import { makeBusRuleHttpClient } from '@core/client/make-http-client.ts'
+import { makeCrudIndexedDbClient } from '@core/client/make-indexeddb-client.ts'
+import { makeCrudSupabaseClient } from '@core/client/make-supabase-client.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import type { Job } from '@domain/abstractions/job.ts'
 import type { User } from '@domain/abstractions/user.ts'
@@ -836,7 +836,7 @@ New clients are added by composing makers in the `@ux/api` namespace:
 
 ```typescript
 // source/ux/api/api.ts
-import { makeCrudSupabaseClient } from '@core/api/make-supabase-client.ts'
+import { makeCrudSupabaseClient } from '@core/client/make-supabase-client.ts'
 
 export const api = {
   // ... existing clients

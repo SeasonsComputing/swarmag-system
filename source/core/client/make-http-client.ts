@@ -26,13 +26,8 @@ import type {
   ListResult
 } from '@core/api/api-contract.ts'
 import { ApiError, checkApiError, throwApiError } from '@core/api/api-contract.ts'
-import type {
-  CreateFromInstantiable,
-  Dictionary,
-  Id,
-  Instantiable,
-  UpdateFromInstantiable
-} from '@core/std'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
+import type { Dictionary, Id, Instantiable } from '@core/std'
 
 /** Configuration for a business-rule HTTP API client. */
 export type HttpSpecification = { basePath: string }

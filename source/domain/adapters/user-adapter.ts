@@ -13,7 +13,7 @@ PUBLIC
 UserAdapter  Deserialize/Serialize User.
 */
 
-import { makeAdapter } from '@core/std'
+import { makeAdapter } from '@core/stdx'
 import type { User } from '@domain/abstractions/user.ts'
 
 /** Deserialize/Serialize User. */

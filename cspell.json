@@ -108,6 +108,7 @@
     "smtp",
     "splitter",
     "sqs",
+    "stdx",
     "strapi",
     "supabase",
     "supersked",

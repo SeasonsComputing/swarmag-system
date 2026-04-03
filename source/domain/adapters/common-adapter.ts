@@ -18,7 +18,7 @@ QuestionAdapter      Deserialize/Serialize Question.
 AnswerAdapter        Deserialize/Serialize Answer.
 */
 
-import { makeAdapter } from '@core/std'
+import { makeAdapter } from '@core/stdx'
 import type {
   Answer,
   Attachment,
