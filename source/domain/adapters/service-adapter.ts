@@ -14,7 +14,7 @@ ServiceAdapter                   Deserialize/Serialize Service.
 ServiceRequiredAssetTypeAdapter  Deserialize/Serialize ServiceRequiredAssetType.
 */
 
-import { makeAdapter } from '@core/std'
+import { makeAdapter } from '@core/stdx'
 import type { Service, ServiceRequiredAssetType } from '@domain/abstractions/service.ts'
 import { NoteAdapter } from '@domain/adapters/common-adapter.ts'
 

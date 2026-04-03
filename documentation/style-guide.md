@@ -402,7 +402,7 @@ export { Config }
 
 ### 8.6 Adapters
 
-Domain adapters use metadata-driven generation via `makeAdapter` from `@core/std`.
+Domain adapters use metadata-driven generation via `makeAdapter` from `@core/stdx`.
 
 Adapter contract:
 

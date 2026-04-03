@@ -18,17 +18,17 @@ makeCrudSupabaseClient(spec)  Build CRUD/list client over Supabase.
 import type { ApiCrudContract, DeleteResult, ListOptions, ListResult } from '@core/api/api-contract.ts'
 import { checkApiError, listCursorValue, listPageLimitValue } from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
-import type {
-  Adapter,
-  AdapterPatch,
-  CreateFromInstantiable,
-  Dictionary,
-  Id,
-  Instantiable,
-  UpdateFromInstantiable,
-  When
+import {
+  type CreateFromInstantiable,
+  type Dictionary,
+  type Id,
+  type Instantiable,
+  instantiable,
+  type UpdateFromInstantiable,
+  type When,
+  when
 } from '@core/std'
-import { instantiable, when } from '@core/std'
+import type { Adapter, AdapterPatch } from '@core/stdx'
 
 /** Configuration for a CRUD Supabase API client. */
 export type CrudSupabaseSpecification<T> = {

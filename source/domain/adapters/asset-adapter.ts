@@ -14,7 +14,7 @@ AssetTypeAdapter  Deserialize/Serialize AssetType.
 AssetAdapter      Deserialize/Serialize Asset.
 */
 
-import { makeAdapter } from '@core/std'
+import { makeAdapter } from '@core/stdx'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import { NoteAdapter } from '@domain/adapters/common-adapter.ts'
 

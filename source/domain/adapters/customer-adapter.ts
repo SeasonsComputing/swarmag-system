@@ -15,7 +15,7 @@ CustomerSiteAdapter  Deserialize/Serialize CustomerSite.
 CustomerAdapter      Deserialize/Serialize Customer.
 */
 
-import { makeAdapter } from '@core/std'
+import { makeAdapter } from '@core/stdx'
 import type { Contact, Customer, CustomerSite } from '@domain/abstractions/customer.ts'
 import { LocationAdapter, NoteAdapter } from '@domain/adapters/common-adapter.ts'
 

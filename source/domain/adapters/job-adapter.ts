@@ -21,7 +21,7 @@ JobWorkAdapter            Deserialize/Serialize JobWork.
 JobWorkLogEntryAdapter    Deserialize/Serialize JobWorkLogEntry.
 */
 
-import { makeAdapter } from '@core/std'
+import { makeAdapter } from '@core/stdx'
 import type {
   Job,
   JobAssessment,

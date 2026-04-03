@@ -16,7 +16,7 @@ WorkflowAdapter      Deserialize/Serialize Workflow.
 WorkflowTaskAdapter  Deserialize/Serialize WorkflowTask.
 */
 
-import { makeAdapter } from '@core/std'
+import { makeAdapter } from '@core/stdx'
 import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
 import { NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
