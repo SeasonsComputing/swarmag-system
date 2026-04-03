@@ -77,7 +77,7 @@ export class Preferences {
     try {
       const db = await IndexedDb.connection()
       const tx = db.transaction(this.schema, 'readwrite')
-      const record =  await tx.store.get(this.id)
+      const record = await tx.store.get(this.id)
       const state: StringDictionary = record ? record.state : {}
       state[key] = value
       await tx.store.put({ id: this.id, state })
