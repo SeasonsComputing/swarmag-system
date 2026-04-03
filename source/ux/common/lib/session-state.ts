@@ -12,8 +12,19 @@ outside this module.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-SessionStore  Session data
-SessionState  Session data and mutation methods
+SessionStore - Session data
+├ userId           Authenticated user id or null.
+├ user             Hydrated domain user or null.
+├ isAuthenticated  True when a session is active.
+├ isLoading        True while boot-time auth resolution is pending.
+└ isDataReady      True when required post-auth data is loaded.
+
+SessionState - Session data and mutation methods
+├ store            Reactive session state snapshot.
+├ setAuth(userId)  Mark session active and clear loading.
+├ setUser(user)    Set hydrated domain user details.
+├ setReady()       Mark boot-time data load complete.
+└ clear()          Reset session state to signed-out defaults.
 */
 
 import type { Id } from '@core/std'

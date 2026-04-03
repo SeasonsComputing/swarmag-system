@@ -12,68 +12,47 @@ stubbed pending makeCrudIndexedDbClient implementation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppState  Singleton API for reading and writing persisted app state values.
+AppStateStore - Application state store structure (StringDictionary)
+AppState      - Singleton API for reading and writing persisted app state values.
+├ store            Reactive app-state preference snapshot.
+├ init()           Load all preferences from persistent storage.
+├ set(key, value)  Persist a preference and refresh reactive cache.
+└ clear()          Clear reactive app-state cache.
 */
 
-import { apiError, type ApiErrorDetail, throwApiError } from '@core/api/api-contract.ts'
-import { IndexedDb } from '@core/db/indexeddb.ts'
-import type { Dictionary, Instance } from '@core/std'
+import { Preferences } from '@core/client/preferences.ts'
+import type { StringDictionary } from '@core/std'
+import { createStore } from '@solid-js/store'
 
-/** Persisted app-state record shape stored in IndexedDB. */
-type AppStateStore = Instance & { state: Dictionary }
+/** Per application preferences state. */
+export type AppStateStore = StringDictionary
 
-/** IndexedDB-backed app-state provider. */
-class AppStateProvider {
-  /** */
-  #schema = 'AppStateStore'
-  #id = 'AppStateId'
+/** Reactive storage */
+const [appStateStore, setAppStateStore] = createStore<AppStateStore>({})
 
-  /** Registers the app-state object store schema. */
-  constructor() {
-    IndexedDb.registerStore(this.#schema)
-  }
+/** Persistent storage */
+const appStatePrefs = new Preferences('AppStateStore')
 
-  /** Loads the persisted app-state dictionary. */
-  async #getAppState(): Promise<Dictionary> {
-    let state: Dictionary
-    try {
-      const db = await IndexedDb.connection()
-      const record = await db.get(this.#schema, this.#id)
-      state = record?.state ?? {}
-    } catch (error) {
-      if (apiError(error)) throw error
-      throwApiError(error as ApiErrorDetail, 'Read Failure', IndexedDb.errorToStatus(error))
-    }
-    return state
-  }
-
-  /** Persists the full app-state dictionary. */
-  async #setAppState(state: Dictionary): Promise<void> {
-    try {
-      const record: AppStateStore = { id: this.#id, state }
-      const db = await IndexedDb.connection()
-      await db.put(this.#schema, record)
-    } catch (error) {
-      if (apiError(error)) throw error
-      throwApiError(error as ApiErrorDetail, 'Read Failure', IndexedDb.errorToStatus(error))
-    }
-  }
-
-  /** */
-  async get(key: string): Promise<string | unknown> {
-    const state = await this.#getAppState()
-    return state[key]
-  }
-
-  /** */
-  async set(key: string, value: string): Promise<void> {
-    const state = await this.#getAppState()
-    state[key] = value
-    await this.#setAppState(state)
-  }
+/** Load application state from preferences into store */
+async function initAppState() {
+  setAppStateStore(await appStatePrefs.state())
 }
 
-// Singleton AppState
-const AppState = new AppStateProvider()
+/** Set preference and persist */
+async function setAppStatePreference(key: string, value: string) {
+  setAppStateStore(key, value)
+  await appStatePrefs.set(key, value)
+}
+
+/** Reset cache */
+const clearAppState = () => setAppStateStore({})
+
+/** AppState store singleton */
+const AppState = {
+  store: appStateStore,
+  init: initAppState,
+  set: setAppStatePreference,
+  clear: clearAppState
+}
 
 export { AppState }
