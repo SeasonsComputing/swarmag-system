@@ -452,14 +452,24 @@ import { Config } from '@core/cfg/config.ts'
 import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
 Config.init(new SolidProvider(), [
+  'VITE_PACKAGE_APP_ID',
+  'VITE_PACKAGE_TARGET',
+  'VITE_PACKAGE_VERSION',
   'VITE_SUPABASE_EDGE_URL',
   'VITE_SUPABASE_RDBMS_URL',
+  'VITE_SUPABASE_ANON_KEY',
+  'VITE_SUPABASE_CLIENT_MODE',
   'VITE_SUPABASE_SERVICE_KEY',
   'VITE_JWT_SECRET',
   'VITE_LOCAL_DB_NAME'
 ], {
+  'PACKAGE_APP_ID': 'VITE_PACKAGE_APP_ID',
+  'PACKAGE_TARGET': 'VITE_PACKAGE_TARGET',
+  'PACKAGE_VERSION': 'VITE_PACKAGE_VERSION',
   'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
   'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
+  'SUPABASE_ANON_KEY': 'VITE_SUPABASE_ANON_KEY',
+  'SUPABASE_CLIENT_MODE': 'VITE_SUPABASE_CLIENT_MODE',
   'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
   'JWT_SECRET': 'VITE_JWT_SECRET',
   'LOCAL_DB_NAME': 'VITE_LOCAL_DB_NAME'
@@ -503,6 +513,10 @@ Each package maintains environment-specific configuration files:
 - `{package}-local.env` - Local development (gitignored)
 - `{package}-stage.env` - Staging environment (gitignored)
 - `{package}-prod.env` - Production environment (gitignored)
+- UX app packages use app-scoped files in `source/ux/config/`:
+  - `app-admin-{local|stage|prod}.env(.example)`
+  - `app-ops-{local|stage|prod}.env(.example)`
+  - `app-customer-{local|stage|prod}.env(.example)`
 
 #### 6.5.2 Example
 
