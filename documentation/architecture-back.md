@@ -80,13 +80,7 @@ Use when: simple Dictionary → Dictionary, no custom HTTP status codes, default
 // source/back/supabase-edge/functions/jobs-batch-update.ts
 import type { Dictionary } from '@core/std'
 import type { HttpRequest, HttpResponse } from '@core/stdx'
-import {
-  toBadRequest,
-  toMethodNotAllowed,
-  toOk,
-  toUnprocessable,
-  wrapHttpHandler
-} from '@core/stdx'
+import { toBadRequest, toMethodNotAllowed, toOk, toUnprocessable, wrapHttpHandler } from '@core/stdx'
 import { validateJobBatchUpdate } from '@domain/validators/job-validator.ts'
 
 const handler = async (req: HttpRequest): Promise<HttpResponse> => {
