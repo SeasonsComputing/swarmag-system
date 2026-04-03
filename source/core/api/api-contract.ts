@@ -12,16 +12,44 @@ and query-string pagination normalization.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-ApiError                           Standard API failure error shape.
-ApiErrorDetail                     Normalized error detail shape for mapping.
+ApiError - Standard API failure error shape.
+├ message  Error message.
+├ status   HTTP-like status code.
+└ details  Optional provider detail/code.
+
+ApiErrorDetail - Normalized error detail shape for mapping.
+├ message  Optional provider message.
+├ status   Optional provider status.
+├ details  Optional provider detail.
+└ code     Optional provider code.
+
 checkApiError(error, ...): void    Throw ApiError when provider error exists.
 throwApiError(error, ...): never   Always throw ApiError from provider error.
 apiError(error): boolean           Runtime type guard and logger for ApiError.
-ApiCrudContract                    Generic CRUD/list client contract.
-ApiBusRuleContract                 Generic business-rule execution contract.
-DeleteResult                       Uniform soft-delete response payload.
-ListOptions                        Pagination request options.
-ListResult<T>                      Pagination response payload.
+
+ApiCrudContract - Generic CRUD/list client contract.
+├ create(input)       Create one resource.
+├ get(id)             Read one resource.
+├ update(input)       Update one resource.
+├ delete(id)          Delete one resource and return DeleteResult.
+└ list?(options?)     List resources with pagination.
+
+ApiBusRuleContract - Generic business-rule execution contract.
+└ run(params)  Execute business rule with dictionary params.
+
+DeleteResult - Uniform soft-delete response payload.
+├ id         Deleted resource id.
+└ deletedAt  Soft-delete timestamp.
+
+ListOptions - Pagination request options.
+├ limit   Requested page size.
+└ cursor  Requested pagination cursor.
+
+ListResult<T> - Pagination response payload.
+├ data     Page data set.
+├ cursor   Cursor for next read position.
+└ hasMore  True when more rows remain.
+
 listPageLimitValue(string): number Parse/clamp list page size.
 listCursorValue(string): number    Parse/sanitize list cursor offset.
 */
