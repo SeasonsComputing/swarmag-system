@@ -29,6 +29,7 @@ import { Dashboard } from '@ux/app-customer/dashboard/dashboard.tsx'
 import { Login } from '@ux/common/components/login/login.tsx'
 import { AuthGuard } from '@ux/common/components/shell/auth-guard.tsx'
 import { Content } from '@ux/common/components/shell/content.tsx'
+import { AppState } from '@ux/common/lib/app-state.ts'
 import { SessionState } from '@ux/common/lib/session-state.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -89,4 +90,10 @@ const Application = () => {
   return <RouterProvider router={router} />
 }
 
-render(() => <Application />, document.getElementById('root')!)
+/** Initialize app state before mounting the Customer application. */
+async function bootstrap() {
+  await AppState.init()
+  render(() => <Application />, document.getElementById('root')!)
+}
+
+void bootstrap()
