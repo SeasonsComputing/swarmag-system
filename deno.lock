@@ -10,6 +10,7 @@
     "npm:markdownlint-cli2@0.13.0": "0.13.0",
     "npm:solid-js@1.9.12": "1.9.12",
     "npm:vite-plugin-solid@2.11.11": "2.11.11_solid-js@1.9.12_vite@8.0.3",
+    "npm:vite@*": "8.0.3",
     "npm:vite@8.0.3": "8.0.3"
   },
   "jsr": {

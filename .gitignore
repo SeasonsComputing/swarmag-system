@@ -8,6 +8,7 @@ build
 .branches
 .temp
 .env.keys
+secrets.jsonc
 .env.local
 .env.*.local
 .netlify
@@ -18,3 +19,4 @@ build
 **/*-local.env
 **/*-stage.env
 **/*-prod.env
+source/devops/genesis/seed-ids.txt

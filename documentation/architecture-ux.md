@@ -130,7 +130,8 @@ Violations detected by architectural guards are build failures.
 All applications import `Config` from `@ux/config/ux-config.ts` — never directly from `@core/cfg/config.ts`. Direct core imports in app files are a guard violation.
 
 - Update `ux-config.ts` keys and aliases as required env variables expand
-- Environment file stored with deployment package.
+- Environment files are app-specific per deployment package:
+  - `source/ux/config/app-{admin|ops|customer}-{local|stage|prod}.env(.example)`
 
 ### 4.3 Reactive Store Module Pattern
 
@@ -357,9 +358,9 @@ IndexedDB usage is split into two layers:
 
 | Database Name          | App      | Content                                               |
 | ---------------------- | -------- | ----------------------------------------------------- |
-| `swarmag-admin-app`    | Admin    | dashboard layout, panel config, theme                 |
-| `swarmag-ops-app`      | Ops      | dashboard layout, panel config, theme, job aggregates |
-| `swarmag-customer-app` | Customer | dashboard layout, theme                               |
+| `swarmag-app-admin`    | Admin    | dashboard layout, panel config, theme                 |
+| `swarmag-app-ops`      | Ops      | dashboard layout, panel config, theme, job aggregates |
+| `swarmag-app-customer` | Customer | dashboard layout, theme                               |
 
 #### 6.5.2 Application Preferences
 
@@ -482,7 +483,7 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/config
 - Three Vite configs, one per app
 - Three Netlify sites, one per app
 - `ux/common/` and `ux/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
-- Build output is ephemeral — temp directory, zipped, deployed via Netlify CLI in `devops/scripts/`
+- Build output is ephemeral — temp directory, zipped, deployed via Netlify CLI in `source/devops/scripts/`
 - No build artifacts are checked into the repository
 
 ## 7. Technology Stack

@@ -100,10 +100,17 @@ const Application = () => {
   return <RouterProvider router={router} />
 }
 
+/** Register the Ops service worker for shell caching and offline support. */
+function registerServiceWorker() {
+  if (!('serviceWorker' in navigator)) return
+  void navigator.serviceWorker.register('/sw.js')
+}
+
 /** Initialize app state before mounting the Ops application. */
 async function bootstrap() {
   await AppState.init()
   render(() => <Application />, document.getElementById('root')!)
+  registerServiceWorker()
 }
 
 void bootstrap()
