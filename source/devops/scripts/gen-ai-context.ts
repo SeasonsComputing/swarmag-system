@@ -25,6 +25,7 @@ type ContextArgs = {
   maxFiles: number
   maxLinesPerFile: number
   maxTotalLines: number
+  showHelp: boolean
 }
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
@@ -101,9 +102,14 @@ const parseArgs = (): ContextArgs => {
   let maxFiles = 120
   let maxLinesPerFile = 220
   let maxTotalLines = 4000
+  let showHelp = false
 
   for (let i = 0; i < Deno.args.length; i++) {
     const arg = Deno.args[i]
+    if (arg === '--help' || arg === '-h') {
+      showHelp = true
+      continue
+    }
     if (arg === '--topic' && Deno.args[i + 1]) {
       topics.push(Deno.args[i + 1].trim().toLowerCase())
       i++
@@ -135,7 +141,7 @@ const parseArgs = (): ContextArgs => {
     }
   }
 
-  return { topics, outPath, maxFiles, maxLinesPerFile, maxTotalLines }
+  return { topics, outPath, maxFiles, maxLinesPerFile, maxTotalLines, showHelp }
 }
 
 const run = async (cmd: string[]): Promise<string> => {
@@ -193,8 +199,38 @@ const detectFence = (path: string): string => {
   return 'text'
 }
 
+const printHelp = (): void => {
+  const topicList = TOPIC_RULES.map(rule => `  - ${rule.topic}`).join('\n')
+  const lines = [
+    'AI Context Generator',
+    '',
+    'Usage:',
+    '  deno run --allow-read --allow-write --allow-run source/devops/scripts/gen-ai-context.ts [options]',
+    '',
+    'Options:',
+    '  --topic <name>             Add topic filter (repeatable, required unless --help)',
+    '  --out <path>               Output markdown path (default: build/briefs/ai-context-<topics>.md)',
+    '  --max-files <number>       Max files included (default: 120)',
+    '  --max-lines-per-file <n>   Max lines per file (default: 220)',
+    '  --max-total-lines <n>      Max total lines across all files (default: 4000)',
+    '  -h, --help                 Show this help',
+    '',
+    'Topics:',
+    topicList,
+    '',
+    'Examples:',
+    '  deno task gen:ai-context -- --topic concept --topic devops',
+    '  deno task gen:ai-context -- --topic domain-archetypes --out build/briefs/archetypes.md'
+  ]
+  console.log(lines.join('\n'))
+}
+
 const main = async (): Promise<void> => {
   const args = parseArgs()
+  if (args.showHelp) {
+    printHelp()
+    return
+  }
   validateTopics(args.topics)
 
   await Deno.mkdir(BRIEF_DIR, { recursive: true })
@@ -264,9 +300,14 @@ const main = async (): Promise<void> => {
 
   const payload = lines.join('\n')
   await Deno.writeTextFile(outPath, payload)
-  console.log(`context=${outPath}`)
-  console.log(`files=${includedFileCount}`)
-  console.log(`content_lines=${totalContentLines}`)
+  const summary = [
+    'AI Context Generated',
+    `  output: ${outPath}`,
+    `  topics: ${args.topics.join(', ')}`,
+    `  files: ${includedFileCount}`,
+    `  content_lines: ${totalContentLines}`
+  ]
+  console.log(summary.join('\n'))
 }
 
 await main()
