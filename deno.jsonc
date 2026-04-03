@@ -67,6 +67,7 @@
     "genesis:domain": "deno task check:domain-genesis",
     "gen:jwt-secret": "deno run source/devops/scripts/gen-jwt-secret.ts",
     "gen:id-seeds": "deno run --allow-read --allow-write source/devops/scripts/gen-id-seeds.ts",
+    "gen:ai-context": "deno run --allow-read --allow-write --allow-run source/devops/scripts/gen-ai-context.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
     // Verification Guards
