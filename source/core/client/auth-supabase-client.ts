@@ -1,22 +1,42 @@
-/**
- * Supabase implementation of ApiAuthContract.
- * Registers onAuthStateChange at module load; writes session into sessionStore.
- */
+/*
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ Supabase client for OTP auth API contract                                   ║
+║ Passwordless auth operations and auth state subscription mapping            ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Implements `ApiAuthContract` using Supabase Auth with consistent API-error
+mapping and a normalized `Session` return shape.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+AuthSupabaseClient  Authentication singleton
+*/
+
+import type { ApiAuthContract, Session } from '@core/api/api-auth-contract.ts'
 import { checkApiError, throwApiError } from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import type { Id } from '@core/std'
-import type { ApiAuthContract, Session } from '@ux/api/api-auth-contract.ts'
 
 /** Supabase passwordless OTP auth client. Implements ApiAuthContract. */
 export const AuthSupabaseClient: ApiAuthContract = {
-  /** Sends a one-time code to the provided email address via Supabase Auth. */
+  /**
+   * Send a one-time passcode to the target email address.
+   * @param email Recipient email address for OTP delivery.
+   * @returns Resolves when Supabase accepts the OTP request.
+   */
   async sendOtp(email: string): Promise<void> {
     const { error } = await Supabase.client().auth.signInWithOtp({ email })
     checkApiError(error, 'Failed to send OTP', authErrorStatus, authErrorDetails)
   },
 
-  /** Verifies the one-time code and returns an authenticated session. */
+  /**
+   * Verify OTP and return a normalized authenticated session.
+   * @param email Email address used when requesting the OTP.
+   * @param code One-time passcode to verify.
+   * @returns Session containing authenticated user id.
+   */
   async verifyOtp(email: string, code: string): Promise<Session> {
     const { data, error } = await Supabase.client().auth.verifyOtp({
       email,
@@ -28,23 +48,29 @@ export const AuthSupabaseClient: ApiAuthContract = {
     return toSession(data.user.id)
   },
 
-  /** Signs out the current user. onAuthStateChange fires and clears sessionStore. */
+  /**
+   * Sign out the active user session.
+   * @returns Resolves when sign-out completes.
+   */
   async logout(): Promise<void> {
     const { error } = await Supabase.client().auth.signOut()
     checkApiError(error, 'Failed to sign out', authErrorStatus, authErrorDetails)
   },
 
-  /** Returns the current session on boot; null if unauthenticated. */
+  /**
+   * Read current auth session from Supabase.
+   * @returns Normalized Session when authenticated; otherwise null.
+   */
   async getSession(): Promise<Session | null> {
     const { data, error } = await Supabase.client().auth.getSession()
     checkApiError(error, 'Failed to fetch session', authErrorStatus, authErrorDetails)
-    return (!data.session?.user) ? null : toSession(data.session.user.id)
+    return data.session?.user ? toSession(data.session.user.id) : null
   },
 
   /**
-   * Registers a callback invoked on every auth state change.
-   * Returns an unsubscribe function.
-   * @param callback Receives the current Session or null on sign-out.
+   * Subscribe to Supabase auth-state changes.
+   * @param callback Invoked with Session on sign-in and null on sign-out.
+   * @returns Unsubscribe callback that removes the Supabase subscription.
    */
   onAuthStateChange(callback: (session: Session | null) => void): () => void {
     const { data } = Supabase.client().auth.onAuthStateChange(

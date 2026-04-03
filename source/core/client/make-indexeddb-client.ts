@@ -15,6 +15,8 @@ CrudIndexedDbSpecification     CRUD IndexedDB client configuration.
 makeCrudIndexedDbClient(spec)  Build CRUD/list client over IndexedDB.
 */
 
+import type { ApiCrudContract, ApiErrorDetail, DeleteResult } from '@core/api/api-contract.ts'
+import { apiError, throwApiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import type {
   Adapter,
@@ -27,8 +29,6 @@ import type {
   When
 } from '@core/std'
 import { instantiable, when } from '@core/std'
-import type { ApiCrudContract, ApiErrorDetail, DeleteResult } from './api-contract.ts'
-import { apiError, throwApiError } from './api-contract.ts'
 
 /** Configuration for a CRUD IndexedDB API client. */
 export type CrudIndexedDbSpecification<T extends Instantiable> = {
