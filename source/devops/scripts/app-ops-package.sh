@@ -70,7 +70,11 @@ if ! command -v zip >/dev/null 2>&1; then
   exit 1
 fi
 
-mapfile -t REQUIRED_KEYS < <(rg -o "VITE_[A-Z0-9_]+" "${UX_CONFIG_FILE}" | sort -u)
+REQUIRED_KEYS=()
+while IFS= read -r key; do
+  [[ -z "${key}" ]] && continue
+  REQUIRED_KEYS+=("${key}")
+done < <(rg -o "VITE_[A-Z0-9_]+" "${UX_CONFIG_FILE}" | sort -u)
 if [[ "${#REQUIRED_KEYS[@]}" -eq 0 ]]; then
   echo "Could not determine required VITE_ keys from ${UX_CONFIG_FILE}"
   exit 1
@@ -106,9 +110,11 @@ if [[ -n "${SECRETS_FILE}" ]]; then
     resolved_secret="$(
       deno run --allow-read source/devops/scripts/read-secret.ts "${SECRETS_FILE}" "${composed_key}"
     )"
-    if [[ -n "" ]]; then
-      export "="
+    if [[ -z "${resolved_secret}" ]]; then
+      echo "Missing secret for ${composed_key} in ${SECRETS_FILE}"
+      exit 1
     fi
+    export "${key}=${resolved_secret}"
   done
 fi
 
@@ -193,6 +199,13 @@ if unzip -Z -1 "${ARTIFACT_PATH}" | grep -Eq '(^|/)secrets\.jsonc$'; then
   exit 1
 fi
 
-CHECKSUM="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
+if command -v sha256sum >/dev/null 2>&1; then
+  CHECKSUM="$(sha256sum "${ARTIFACT_PATH}" | awk '{print $1}')"
+elif command -v shasum >/dev/null 2>&1; then
+  CHECKSUM="$(shasum -a 256 "${ARTIFACT_PATH}" | awk '{print $1}')"
+else
+  echo "Missing required command: sha256sum or shasum"
+  exit 1
+fi
 echo "PACKAGE_ARTIFACT=${ARTIFACT_PATH}"
 echo "PACKAGE_SHA256=${CHECKSUM}"
