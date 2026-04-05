@@ -1,0 +1,603 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ UX design tokens                                                             ║
+║ Shared design primitives, semantic tokens, and typography for all UX apps.  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Single source of truth for UX color, spacing, typography, and visual semantics.
+All UX apps consume these CSS variables through semantic tokens rather than
+hard-coded values to keep themes and visual language consistent.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+Token surfaces
+- Primitive palette  Raw OKLCH tuples (brand and neutral primitives).
+- Semantic tokens    Role-based tokens consumed by components.
+- Theme overrides    Light theme overrides via [data-theme='light'].
+- Typography         Self-hosted font faces and app typography tokens.
+*/
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Fonts — self-hosted woff2.
+ * Match asset paths to your pipeline.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+@font-face {
+  font-family: 'Lexend';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src:
+    url('../assets/Lexend-VariableFont_wght.woff2') format('woff2-variations'),
+    url('../assets/Lexend-VariableFont_wght.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../assets/inter-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../assets/inter-600.woff2') format('woff2');
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Primitive Palette
+ * 1. Bare L C H triplets — no oklch() wrapper.
+ * 2. Compose at point of use:
+ *    - oklch(var(--swa-p-green))
+ *    - oklch(var(--swa-p-green) / 0.5)
+ * 3. Components must not reference primitives directly — use semantic tokens only.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+  /* Brand gradient — logo extracted */
+  --swa-p-green: 76.849% 0.13454 123.993; /* #03b673 */
+  --swa-p-green-teal: 74.2% 0.122 158.432; /* #0db17a */
+  --swa-p-teal: 68.5% 0.103 184.216; /* #139d8d */
+  --swa-p-teal-blue: 60.8% 0.108 216.744; /* #028aa8 */
+  --swa-p-blue: 54.3% 0.110 236.182; /* #077db2 */
+  --swa-p-blue-deep: 38.7% 0.072 228.640; /* #1a5360 */
+
+  /* Brand accent — shared with brand site */
+  --swa-p-orange: 76.885% 0.1231 80.8277; /* sa-color-orange */
+
+  /* Neutrals */
+  --swa-p-white: 100% 0 0;
+  --swa-p-near-white: 93.5% 0.006 264.5;
+  --swa-p-silver: 87.2% 0.008 264.5;
+  --swa-p-muted: 66.4% 0.018 261.3;
+  --swa-p-faint: 50.8% 0.020 261.3;
+  --swa-p-dim: 40.2% 0.014 261.3;
+
+  /* Dark surfaces — from reference theme sampling */
+  --swa-p-surface-3: 27.4% 0.014 264.5; /* #33364a page chrome */
+  --swa-p-surface-2: 24.6% 0.016 264.5; /* #2c2f3e sidebars    */
+  --swa-p-surface-1: 22.1% 0.010 277.4; /* #29282f cards       */
+  --swa-p-base: 13.2% 0.012 264.5; /* #15181e             */
+  --swa-p-black: 7.8% 0 0; /* #0a0a0a             */
+
+  /* State primitives */
+  --swa-p-success: 72.2% 0.192 149.579; /* focus green — brand */
+  --swa-p-warning: 76.885% 0.1231 80.8277; /* orange — brand      */
+  --swa-p-danger: 62.8% 0.2577 29.234; /* red                 */
+  --swa-p-info: 60.8% 0.108 216.744; /* teal-blue           */
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Dark Theme (default).
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+:root,
+[data-theme='dark'] {
+  /* --- Fonts --- */
+  --swa-font-display: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --swa-font-ui: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --swa-font-mono: ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
+
+  /* --- Font Weights --- */
+  --swa-weight-thin: 300;
+  --swa-weight-normal: 400;
+  --swa-weight-medium: 500;
+  --swa-weight-semibold: 600;
+  --swa-weight-bold: 700;
+  --swa-weight-extrabold: 800;
+
+  /* --- Font Sizes — fluid --- */
+  --swa-font-xs: clamp(0.75rem, 0.72rem + 0.125vw, 0.8rem);
+  --swa-font-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9rem);
+  --swa-font-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+  --swa-font-md: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
+  --swa-font-lg: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  --swa-font-xl: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+  --swa-font-2xl: clamp(1.75rem, 1.5rem + 2vw, 3rem);
+  --swa-font-button: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+
+  /* --- Line Heights --- */
+  --swa-leading-tight: 1.25;
+  --swa-leading-snug: 1.375;
+  --swa-leading-normal: 1.5;
+  --swa-leading-relaxed: 1.625;
+
+  /* --- Letter Spacing --- */
+  --swa-tracking-tight: -0.025em;
+  --swa-tracking-normal: 0;
+  --swa-tracking-wide: 0.025em;
+  --swa-tracking-wider: 0.05em;
+  --swa-tracking-widest: 0.1em;
+
+  /* --- Brand Colors --- */
+  --swa-color-brand-start: oklch(var(--swa-p-green));
+  --swa-color-brand-mid: oklch(var(--swa-p-teal));
+  --swa-color-brand-end: oklch(var(--swa-p-blue));
+
+  /* Semantic brand aliases */
+  --swa-color-primary: oklch(var(--swa-p-green-teal));
+  --swa-color-primary-dim: oklch(var(--swa-p-blue-deep));
+  --swa-color-secondary: oklch(var(--swa-p-teal-blue));
+  --swa-color-accent: oklch(var(--swa-p-teal));
+
+  /* --- Backgrounds --- */
+  --swa-bg-page: oklch(var(--swa-p-base) / 0.95);
+  --swa-bg-base: oklch(var(--swa-p-black));
+  --swa-bg-surface-1: oklch(var(--swa-p-surface-1));
+  --swa-bg-surface-2: oklch(var(--swa-p-surface-2));
+  --swa-bg-surface-3: oklch(var(--swa-p-surface-3));
+  --swa-bg-overlay: oklch(var(--swa-p-black) / 0.20);
+  --swa-bg-table: oklch(var(--swa-p-white) / 0.03);
+  --swa-bg-hover: oklch(var(--swa-p-green-teal) / 0.08);
+  --swa-bg-selected: oklch(var(--swa-p-green-teal) / 0.15);
+  --swa-bg-input: oklch(17% 0.014 264.5);
+  --swa-bg-input-focus: oklch(19% 0.016 264.5);
+  --swa-bg-input-disabled: oklch(20% 0.010 264.5);
+
+  /* --- Text --- */
+  --swa-text-primary: oklch(var(--swa-p-near-white));
+  --swa-text-secondary: oklch(var(--swa-p-silver));
+  --swa-text-muted: oklch(var(--swa-p-muted));
+  --swa-text-faint: oklch(var(--swa-p-faint));
+  --swa-text-dim: oklch(var(--swa-p-dim));
+  --swa-text-on-brand: oklch(var(--swa-p-white));
+  --swa-text-on-surface: oklch(var(--swa-p-near-white));
+  --swa-text-disabled: oklch(var(--swa-p-faint));
+  --swa-text-placeholder: oklch(var(--swa-p-dim));
+
+  /* Heading hierarchy */
+  --swa-text-h1: oklch(var(--swa-p-white));
+  --swa-text-h2: oklch(var(--swa-p-green-teal));
+  --swa-text-h3: oklch(var(--swa-p-teal-blue));
+  --swa-text-h4: oklch(var(--swa-p-teal));
+  --swa-text-h5: oklch(var(--swa-p-muted));
+
+  /* --- Borders --- */
+  --swa-border-subtle: 1px solid oklch(var(--swa-p-near-white) / 0.05);
+  --swa-border-default: 1px solid oklch(var(--swa-p-near-white) / 0.10);
+  --swa-border-strong: 1px solid oklch(var(--swa-p-near-white) / 0.25);
+  --swa-border-brand: 1px solid oklch(var(--swa-p-green-teal));
+  --swa-border-table: oklch(var(--swa-p-surface-3));
+  --swa-border-input: oklch(var(--swa-p-surface-3));
+  --swa-border-input-focus: oklch(var(--swa-p-green-teal));
+  --swa-border-input-error: oklch(var(--swa-p-danger));
+
+  /* --- Border Radius --- */
+  --swa-radius-sm: 0.375rem;
+  --swa-radius-md: 0.555rem;
+  --swa-radius-lg: 0.750rem;
+  --swa-radius-xl: 1.555rem;
+  --swa-radius-full: 9999px;
+
+  /* --- Focus Ring --- */
+  --swa-focus-ring: 0 0 0 2px oklch(var(--swa-p-base)), 0 0 0 4px oklch(var(--swa-p-success) / 0.5);
+
+  /* --- Shadows / Elevation --- */
+  --swa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.30);
+  --swa-shadow: 0 4px 12px oklch(0% 0 0 / 0.35);
+  --swa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.40);
+  --swa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--swa-p-white) / 0.06);
+  --swa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.55), inset 0 1px 0 oklch(var(--swa-p-white) / 0.10);
+  --swa-shadow-glow-sm: 0 0 20px oklch(var(--swa-p-green-teal) / 0.30);
+  --swa-shadow-glow: 0 0 30px oklch(var(--swa-p-green-teal) / 0.30);
+  --swa-shadow-btn:
+    0 15px 40px oklch(var(--swa-p-teal) / 0.40),
+    0 0 40px oklch(var(--swa-p-blue) / 0.30),
+    inset 0 1px 0 oklch(var(--swa-p-white) / 0.20);
+  --swa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
+  --swa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.30), 0 3px 6px oklch(0% 0 0 / 0.20);
+
+  /* --- Gradients --- */
+  --swa-gradient-brand: linear-gradient(
+    135deg,
+    oklch(var(--swa-p-green)) 0%,
+    oklch(var(--swa-p-teal)) 50%,
+    oklch(var(--swa-p-blue)) 100%
+  );
+  --swa-gradient-brand-90: linear-gradient(
+    90deg,
+    oklch(var(--swa-p-green)),
+    oklch(var(--swa-p-teal)),
+    oklch(var(--swa-p-blue))
+  );
+  --swa-gradient-btn: linear-gradient(
+    135deg,
+    oklch(var(--swa-p-teal)) 0%,
+    oklch(var(--swa-p-teal-blue)) 50%,
+    oklch(var(--swa-p-blue)) 100%
+  );
+  --swa-gradient-card: linear-gradient(
+    135deg,
+    oklch(var(--swa-p-surface-2) / 0.80) 0%,
+    oklch(var(--swa-p-surface-3) / 0.60) 100%
+  );
+  --swa-gradient-hero: linear-gradient(
+    135deg,
+    oklch(var(--swa-p-teal) / 0.70) 0%,
+    oklch(var(--swa-p-teal) / 0.90) 30%,
+    oklch(var(--swa-p-teal-blue)) 70%,
+    oklch(var(--swa-p-blue) / 0.50) 100%
+  );
+  /* Stripe — 3px top-border accent on cards/panels */
+  --swa-gradient-stripe: var(--swa-gradient-brand-90);
+
+  /* --- State Colors --- */
+  --swa-color-success: oklch(var(--swa-p-success));
+  --swa-color-success-bg: oklch(var(--swa-p-success) / 0.12);
+  --swa-color-success-border: oklch(var(--swa-p-success) / 0.30);
+  --swa-color-warning: oklch(var(--swa-p-warning));
+  --swa-color-warning-bg: oklch(var(--swa-p-warning) / 0.12);
+  --swa-color-warning-border: oklch(var(--swa-p-warning) / 0.30);
+  --swa-color-danger: oklch(var(--swa-p-danger));
+  --swa-color-danger-bg: oklch(var(--swa-p-danger) / 0.12);
+  --swa-color-danger-border: oklch(var(--swa-p-danger) / 0.30);
+  --swa-color-info: oklch(var(--swa-p-info));
+  --swa-color-info-bg: oklch(var(--swa-p-info) / 0.12);
+  --swa-color-info-border: oklch(var(--swa-p-info) / 0.30);
+
+  /* --- Table --- */
+  --swa-table-cell-pad: 0.375rem;
+  --swa-table-first-pad-head: 0.5rem;
+  --swa-table-first-pad-section: 0.625rem;
+  --swa-table-first-pad-data: 0.75rem;
+  --swa-table-head-bg: oklch(var(--swa-p-surface-2));
+  --swa-table-head-color: oklch(var(--swa-p-near-white));
+  --swa-table-section-bg: oklch(var(--swa-p-green-teal) / 0.20);
+  --swa-table-section-color: oklch(var(--swa-p-near-white));
+  --swa-table-row-even: oklch(var(--swa-p-surface-1));
+  --swa-table-row-odd: oklch(var(--swa-p-surface-2) / 0.60);
+  --swa-table-row-hover: var(--swa-bg-hover);
+  --swa-table-border: var(--swa-border-table);
+
+  /* --- Spacing Scale --- */
+  --swa-space-xs: 0.25rem;
+  --swa-space-sm: 0.5rem;
+  --swa-space-md: 1rem;
+  --swa-space-lg: 1.5rem;
+  --swa-space-xl: 2rem;
+  --swa-space-2xl: 2.5rem;
+  --swa-space-3xl: 3rem;
+  --swa-space-4xl: 5rem;
+
+  /* Layout rhythm */
+  --swa-gap: var(--swa-space-xl);
+  --swa-gutter: var(--swa-space-xl);
+
+  /* --- Breakpoints (reference — use in media queries) --- */
+  --swa-size-xs: 425px;
+  --swa-size-sm: 768px;
+  --swa-size-md: 1024px;
+  --swa-size-lg: 1152px;
+
+  /* --- Transitions --- */
+  --swa-transition-fast: all 0.15s ease;
+  --swa-transition-base: all 0.3s ease;
+  --swa-transition-slow: all 0.6s ease-out;
+  --swa-transition-spring: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* --- Misc --- */
+  --swa-blur: blur(10px);
+  --swa-blur-sm: blur(4px);
+  --swa-filter-mono: brightness(0) invert(1);
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Light Theme.
+ * Only tokens that differ from dark are redeclared here.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+[data-theme='light'] {
+  /* --- Brand — same primitives, adjusted application --- */
+  --swa-color-primary: oklch(var(--swa-p-teal));
+  --swa-color-primary-dim: oklch(var(--swa-p-teal-blue));
+  --swa-color-secondary: oklch(var(--swa-p-blue));
+  --swa-color-accent: oklch(var(--swa-p-green));
+
+  /* --- Backgrounds --- */
+  --swa-bg-page: oklch(96% 0.004 264.5);
+  --swa-bg-base: oklch(93% 0.005 264.5);
+  --swa-bg-surface-1: oklch(100% 0 0);
+  --swa-bg-surface-2: oklch(97% 0.004 264.5);
+  --swa-bg-surface-3: oklch(93% 0.006 264.5);
+  --swa-bg-overlay: oklch(0% 0 0 / 0.06);
+  --swa-bg-table: oklch(0% 0 0 / 0.02);
+  --swa-bg-hover: oklch(var(--swa-p-teal) / 0.08);
+  --swa-bg-selected: oklch(var(--swa-p-teal) / 0.15);
+  --swa-bg-input: oklch(100% 0 0);
+  --swa-bg-input-focus: oklch(98% 0.010 155.8);
+  --swa-bg-input-disabled: oklch(96% 0.003 264.5);
+
+  /* --- Text --- */
+  --swa-text-primary: oklch(var(--swa-p-surface-1));
+  --swa-text-secondary: oklch(32% 0.012 264.5);
+  --swa-text-muted: oklch(50% 0.016 264.5);
+  --swa-text-faint: oklch(65% 0.012 264.5);
+  --swa-text-dim: oklch(80% 0.006 264.5);
+  --swa-text-on-brand: oklch(var(--swa-p-white));
+  --swa-text-on-surface: oklch(var(--swa-p-surface-1));
+  --swa-text-disabled: oklch(70% 0.010 264.5);
+  --swa-text-placeholder: oklch(65% 0.012 264.5);
+
+  --swa-text-h1: oklch(15% 0.010 264.5);
+  --swa-text-h2: oklch(var(--swa-p-teal));
+  --swa-text-h3: oklch(var(--swa-p-blue));
+  --swa-text-h4: oklch(var(--swa-p-teal-blue));
+  --swa-text-h5: oklch(var(--swa-p-faint));
+
+  /* --- Borders --- */
+  --swa-border-subtle: 1px solid oklch(0% 0 0 / 0.05);
+  --swa-border-default: 1px solid oklch(0% 0 0 / 0.12);
+  --swa-border-strong: 1px solid oklch(0% 0 0 / 0.22);
+  --swa-border-brand: 1px solid oklch(var(--swa-p-teal));
+  --swa-border-table: oklch(88% 0.006 264.5);
+  --swa-border-input: oklch(82% 0.008 264.5);
+  --swa-border-input-focus: oklch(var(--swa-p-teal));
+
+  /* --- Focus Ring --- */
+  --swa-focus-ring: 0 0 0 2px oklch(96% 0.004 264.5), 0 0 0 4px oklch(var(--swa-p-success) / 0.5);
+
+  /* --- Shadows --- */
+  --swa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.10);
+  --swa-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
+  --swa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.10);
+  --swa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.12), inset 0 1px 0 oklch(var(--swa-p-white) / 0.50);
+  --swa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.18), inset 0 1px 0 oklch(var(--swa-p-white) / 0.70);
+  --swa-shadow-glow-sm: 0 0 20px oklch(var(--swa-p-teal) / 0.20);
+  --swa-shadow-glow: 0 0 30px oklch(var(--swa-p-teal) / 0.20);
+  --swa-shadow-btn:
+    0 15px 40px oklch(var(--swa-p-teal) / 0.30),
+    0 0 40px oklch(var(--swa-p-blue) / 0.20),
+    inset 0 1px 0 oklch(var(--swa-p-white) / 0.50);
+
+  /* --- Gradients --- */
+  --swa-gradient-card: linear-gradient(
+    135deg,
+    oklch(100% 0 0 / 0.80) 0%,
+    oklch(97% 0.004 264.5 / 0.60) 100%
+  );
+  --swa-gradient-hero: linear-gradient(
+    135deg,
+    oklch(var(--swa-p-green) / 0.80) 0%,
+    oklch(var(--swa-p-teal) / 0.80) 50%,
+    oklch(var(--swa-p-blue) / 0.70) 100%
+  );
+
+  /* --- Table --- */
+  --swa-table-head-bg: oklch(var(--swa-p-surface-2));
+  --swa-table-section-bg: oklch(var(--swa-p-green-teal) / 0.12);
+  --swa-table-section-color: oklch(var(--swa-p-surface-1));
+  --swa-table-row-even: oklch(100% 0 0);
+  --swa-table-row-odd: oklch(96% 0.006 180);
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Global Reset & Base.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  color-scheme: dark light;
+}
+
+body {
+  background: var(--swa-bg-page);
+  color: var(--swa-text-primary);
+  font-family: var(--swa-font-display);
+  font-weight: var(--swa-weight-normal);
+  line-height: var(--swa-leading-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* UI chrome inherits Inter */
+input, select, textarea, label, th, td, button, [role='option'], [role='menuitem'] {
+  font-family: var(--swa-font-ui);
+}
+
+code, pre, kbd, samp {
+  font-family: var(--swa-font-mono);
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Focus Visible — global enforcement.
+ * Kobalte's accessible focus hooks into this. Override per-component only
+ * when geometry requires a different shape.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+:focus-visible {
+  outline: none;
+  box-shadow: var(--swa-focus-ring);
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Dashboard Layout Tokens.
+ *
+ * All values are starting points — tune by eyeball in the browser.
+ *
+ * --swa-dash-gap    between widgets, between rows
+ * --swa-dash-pad    outer edge of row to first/last widget
+ * --swa-widget-pad  inside a dashboard widget, border to content
+ * --swa-stat-pad    inside a KPI StatCard, border to content
+ * --swa-form-pad    inside the modal form container
+ * --swa-field-pad   inside a field group within a form
+ *
+ * Breakpoints match architecture-ux.md §7:
+ * ≥ 1024px  desktop
+ * ≥ 768px   tablet landscape
+ * ≥ 425px   tablet portrait / large mobile
+ * ≥ 380px   mobile
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+  /* Desktop ≥ 1024px */
+  --swa-dash-gap: 4rem;
+  --swa-dash-pad: 4rem;
+  --swa-widget-pad: 1.5rem;
+  --swa-stat-pad: 1rem;
+  --swa-form-pad: 2.5rem;
+  --swa-field-pad: 1rem;
+
+  /* StatCard fixed height — KPI row */
+  --swa-stat-height: 5rem;
+
+  /* Form card max-width — centered on tablet/desktop */
+  --swa-form-max-width: 640px;
+
+  /* Minimum touch target — safety-first for field use */
+  --swa-touch-target: 64px;
+  --swa-touch-target-sm: 44px;
+
+  /* Form backdrop */
+  --swa-bg-backdrop: oklch(0% 0 0 / 0.60);
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --swa-dash-gap: 3rem;
+    --swa-dash-pad: 2rem;
+    --swa-widget-pad: 1.25rem;
+    --swa-stat-pad: 0.875rem;
+    --swa-form-pad: 2rem;
+    --swa-field-pad: 0.875rem;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --swa-dash-gap: 1.5rem;
+    --swa-dash-pad: 1.5rem;
+    --swa-widget-pad: 1rem;
+    --swa-stat-pad: 0.75rem;
+    --swa-form-pad: 1.5rem;
+    --swa-field-pad: 0.75rem;
+  }
+}
+
+@media (max-width: 425px) {
+  :root {
+    --swa-dash-gap: 1.5rem;
+    --swa-dash-pad: 1.5rem;
+    --swa-widget-pad: 1rem;
+    --swa-stat-pad: 0.75rem;
+    --swa-form-pad: 1.25rem;
+    --swa-field-pad: 0.75rem;
+  }
+}
+
+@media (max-width: 380px) {
+  :root {
+    --swa-dash-gap: 1rem;
+    --swa-dash-pad: 1rem;
+    --swa-widget-pad: 0.875rem;
+    --swa-stat-pad: 0.625rem;
+    --swa-form-pad: 1rem;
+    --swa-field-pad: 0.625rem;
+  }
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Workflow Execution Tokens.
+ * Ops app / job-workflow only.
+ * Safety-first: large targets, maximum contrast, single decision per screen.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+:root {
+  /* Answer button minimum height — field safety */
+  --swa-wf-answer-height: 5rem;
+
+  /* Boolean answer buttons — full width pair */
+  --swa-wf-boolean-height: 6rem;
+  --swa-wf-boolean-radius: var(--swa-radius-lg);
+
+  /* Option tile — single/multi select */
+  --swa-wf-option-height: 4.5rem;
+  --swa-wf-option-radius: var(--swa-radius-md);
+
+  /* Progress bar height */
+  --swa-wf-progress-height: 0.5rem;
+
+  /* Screen padding — generous for glance-ability */
+  --swa-wf-screen-pad: 1.5rem;
+  --swa-wf-section-gap: 2rem;
+
+  /* Nav button height */
+  --swa-wf-nav-height: var(--swa-touch-target);
+
+  /* Boolean state colors */
+  --swa-wf-yes-bg: oklch(var(--swa-p-success));
+  --swa-wf-yes-bg-active: oklch(var(--swa-p-success) / 0.85);
+  --swa-wf-no-bg: oklch(var(--swa-p-danger));
+  --swa-wf-no-bg-active: oklch(var(--swa-p-danger) / 0.85);
+  --swa-wf-yes-text: oklch(var(--swa-p-white));
+  --swa-wf-no-text: oklch(var(--swa-p-white));
+
+  /* Prompt typography — large for field readability */
+  --swa-wf-prompt-size: var(--swa-font-xl);
+  --swa-wf-prompt-weight: var(--swa-weight-medium);
+  --swa-wf-help-size: var(--swa-font-md);
+  --swa-wf-help-color: oklch(var(--swa-p-muted));
+}
+
+/*
+ * ───────────────────────────────────────────────────────────────────────────
+ * Accessibility.
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
