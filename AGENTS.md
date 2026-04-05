@@ -21,7 +21,7 @@ Treat any style-guide violation as a correctness failure. Do not proceed while v
 
 1. Confirm Session Context ingestion is complete before work begins.
 2. For any production/regeneration task, execute the single authoritative production contract for that task (for example, `documentation/genesis-domain-archetypes.md` for domain archetype genesis).
-3. Run the matching verification task for that production contract before reporting completion (for example, `deno task genesis:domain` for domain archetype genesis; otherwise run the relevant guard/check task set).
+3. Run the matching verification task for that production contract before reporting completion (for example, `deno task check:domain-genesis` for domain archetype genesis; otherwise run the relevant guard/check task set).
 4. If any violation is found:
    - Report `STYLE_AUDIT: FAIL`
    - List violations with file and line
