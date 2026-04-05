@@ -179,11 +179,13 @@ The design language supports three primary viewport classes. Components MUST ada
 
 To maintain interface predictability, the following z-index scale MUST be used:
 
-- `z-below`: -1 (Decorations)
-- `z-base`: 0 (Content)
-- `z-docked`: 10 (Sticky headers/footers)
-- `z-overlay`: 100 (Modals, popovers, flyouts)
-- `z-toast`: 1000 (System notifications)
+| Token       | Value | Usage                     |
+|-------------|------:|---------------------------|
+| `z-below`   |    -1 | Decorations               |
+| `z-base`    |     0 | Content                   |
+| `z-docked`  |    10 | Sticky headers/footers    |
+| `z-overlay` |   100 | Modals, popovers, flyouts |
+| `z-toast`   |  1000 | System notifications      |
 
 ## 6. Dashboard
 
@@ -191,10 +193,10 @@ To maintain interface predictability, the following z-index scale MUST be used:
 
 ```
 Dashboard
-  └── HeaderRow (fixed height, KPI StatCards)
-  └── ScrollContainer (vertical scroll)
-        └── DashboardRow[] (horizontal swipe, no collapse)
-              └── Widget[] (square | landscape)
+  └─ HeaderRow (fixed height, KPI StatCards)
+  └─ ScrollContainer (vertical scroll)
+     └─ DashboardRow[] (horizontal swipe, no collapse)
+        └─ Widget[] (square | landscape)
 ```
 
 No row collapse on small viewports. Horizontal swipe per row. Vertical scroll
@@ -385,7 +387,7 @@ not belong in `common/`.
 
 ### 8.5 Chart Primitives
 
-Chart library TBD. Candidates: D3, Chart.js, echarts.
+Chart library. (Candidates: D3, Chart.js, echarts.)
 
 | Component   | Purpose                            |
 | ----------- | ---------------------------------- |
