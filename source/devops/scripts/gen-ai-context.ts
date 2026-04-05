@@ -21,15 +21,19 @@ type TopicRule = {
 
 type ContextArgs = {
   topics: string[]
+  outFile?: string
   outPath?: string
   maxFiles: number
   maxLinesPerFile: number
   maxTotalLines: number
+  maxLinesPerFileSet: boolean
+  maxTotalLinesSet: boolean
   showHelp: boolean
 }
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const BRIEF_DIR = `${ROOT}/build/briefs`
+const INVENTORY_TOPIC = 'inventory'
 
 const topicsSlug = (topics: string[]): string =>
   [...topics]
@@ -39,10 +43,20 @@ const topicsSlug = (topics: string[]): string =>
     .join('-')
 
 const defaultOutPath = (topics: string[]): string => `${BRIEF_DIR}/ai-context-${topicsSlug(topics)}.md`
+const toOutPathFromFile = (fileName: string): string => {
+  const trimmed = fileName.trim()
+  if (trimmed.length === 0) throw new Error('--file requires a non-empty file name')
+  if (trimmed.includes('/') || trimmed.includes('\\')) {
+    throw new Error('--file must be a file name, not a path')
+  }
+  const stem = trimmed.endsWith('.md') ? trimmed.slice(0, -3) : trimmed
+  if (stem.length === 0) throw new Error('--file requires a non-empty file name')
+  return `${BRIEF_DIR}/${stem}.md`
+}
 
 const TOPIC_RULES: TopicRule[] = [
   {
-    topic: 'concept',
+    topic: 'architecture',
     patterns: [/^AGENTS\.md$/, /^CONSTITUTION\.md$/, /^documentation\/.*\.md$/]
   },
   {
@@ -59,7 +73,11 @@ const TOPIC_RULES: TopicRule[] = [
   },
   {
     topic: 'domain-schema',
-    patterns: [/^source\/domain\/schema\/schema\.sql$/, /^documentation\/domain-data-dictionary\.md$/, /^documentation\/domain-model\.md$/]
+    patterns: [
+      /^source\/domain\/schema\/schema\.sql$/,
+      /^documentation\/domain-data-dictionary\.md$/,
+      /^documentation\/domain-model\.md$/
+    ]
   },
   {
     topic: 'core',
@@ -93,15 +111,22 @@ const TOPIC_RULES: TopicRule[] = [
   {
     topic: 'test',
     patterns: [/^source\/tests\/.*\.ts$/]
+  },
+  {
+    topic: INVENTORY_TOPIC,
+    patterns: []
   }
 ]
 
 const parseArgs = (): ContextArgs => {
   const topics: string[] = []
+  let outFile: string | undefined
   let outPath: string | undefined
   let maxFiles = 120
-  let maxLinesPerFile = 220
+  let maxLinesPerFile = 440
   let maxTotalLines = 4000
+  let maxLinesPerFileSet = false
+  let maxTotalLinesSet = false
   let showHelp = false
 
   for (let i = 0; i < Deno.args.length; i++) {
@@ -121,6 +146,12 @@ const parseArgs = (): ContextArgs => {
       i++
       continue
     }
+    if (arg === '--file' && Deno.args[i + 1]) {
+      const candidate = Deno.args[i + 1].trim()
+      if (candidate.length > 0) outFile = candidate
+      i++
+      continue
+    }
     if (arg === '--max-files' && Deno.args[i + 1]) {
       const parsed = Number.parseInt(Deno.args[i + 1], 10)
       if (Number.isInteger(parsed) && parsed > 0) maxFiles = parsed
@@ -129,19 +160,35 @@ const parseArgs = (): ContextArgs => {
     }
     if (arg === '--max-lines-per-file' && Deno.args[i + 1]) {
       const parsed = Number.parseInt(Deno.args[i + 1], 10)
-      if (Number.isInteger(parsed) && parsed > 20) maxLinesPerFile = parsed
+      if (Number.isInteger(parsed) && parsed > 20) {
+        maxLinesPerFile = parsed
+        maxLinesPerFileSet = true
+      }
       i++
       continue
     }
     if (arg === '--max-total-lines' && Deno.args[i + 1]) {
       const parsed = Number.parseInt(Deno.args[i + 1], 10)
-      if (Number.isInteger(parsed) && parsed > 200) maxTotalLines = parsed
+      if (Number.isInteger(parsed) && parsed > 200) {
+        maxTotalLines = parsed
+        maxTotalLinesSet = true
+      }
       i++
       continue
     }
   }
 
-  return { topics, outPath, maxFiles, maxLinesPerFile, maxTotalLines, showHelp }
+  return {
+    topics,
+    outFile,
+    outPath,
+    maxFiles,
+    maxLinesPerFile,
+    maxTotalLines,
+    maxLinesPerFileSet,
+    maxTotalLinesSet,
+    showHelp
+  }
 }
 
 const run = async (cmd: string[]): Promise<string> => {
@@ -165,7 +212,9 @@ const collectFiles = async (): Promise<string[]> => {
 
 const validateTopics = (topics: string[]): void => {
   if (topics.length === 0) {
-    throw new Error(`at least one --topic is required: ${TOPIC_RULES.map(rule => rule.topic).join(', ')}`)
+    throw new Error(
+      `at least one --topic is required: ${TOPIC_RULES.map(rule => rule.topic).join(', ')}`
+    )
   }
   const valid = new Set(TOPIC_RULES.map(rule => rule.topic))
   const unknown = topics.filter(topic => !valid.has(topic))
@@ -175,13 +224,64 @@ const validateTopics = (topics: string[]): void => {
 }
 
 const selectFiles = (allFiles: string[], topics: string[], maxFiles: number): string[] => {
-  const active = TOPIC_RULES.filter(rule => topics.includes(rule.topic))
+  const active = TOPIC_RULES.filter(rule =>
+    topics.includes(rule.topic) && rule.topic !== INVENTORY_TOPIC
+  )
   const selected: string[] = []
   for (const path of allFiles) {
     const include = active.some(rule => rule.patterns.some(pattern => pattern.test(path)))
     if (include) selected.push(path)
   }
   return selected.slice(0, maxFiles)
+}
+
+type TreeNode = {
+  kind: 'dir' | 'file'
+  children: Map<string, TreeNode>
+}
+
+const isGitignoreFile = (path: string): boolean => path.split('/').at(-1) === '.gitignore'
+
+const renderRepoTree = (allFiles: string[]): string[] => {
+  const root: TreeNode = { kind: 'dir', children: new Map() }
+  const paths = allFiles.filter(path => !isGitignoreFile(path)).sort((a, b) => a.localeCompare(b))
+
+  for (const path of paths) {
+    const parts = path.split('/').filter(part => part.length > 0)
+    if (parts.length === 0) continue
+
+    let cursor = root
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i]
+      const isFile = i === parts.length - 1
+      const existing = cursor.children.get(part)
+      if (!existing) {
+        const node: TreeNode = { kind: isFile ? 'file' : 'dir', children: new Map() }
+        cursor.children.set(part, node)
+        cursor = node
+        continue
+      }
+      cursor = existing
+    }
+  }
+
+  const lines: string[] = ['.']
+
+  const walk = (node: TreeNode, prefix: string): void => {
+    const entries = [...node.children.entries()].sort((a, b) => {
+      if (a[1].kind !== b[1].kind) return a[1].kind === 'dir' ? -1 : 1
+      return a[0].localeCompare(b[0])
+    })
+    for (let i = 0; i < entries.length; i++) {
+      const [name, child] = entries[i]
+      const isLast = i === entries.length - 1
+      lines.push(`${prefix}${isLast ? '└── ' : '├── '}${name}`)
+      if (child.kind === 'dir') walk(child, `${prefix}${isLast ? '    ' : '│   '}`)
+    }
+  }
+
+  walk(root, '')
+  return lines
 }
 
 const readText = async (relativePath: string): Promise<string> => {
@@ -209,9 +309,10 @@ const printHelp = (): void => {
     '',
     'Options:',
     '  --topic <name>             Add topic filter (repeatable, required unless --help)',
+    '  --file <name>              Output file name in build/briefs (without .md; .md auto-appended)',
     '  --out <path>               Output markdown path (default: build/briefs/ai-context-<topics>.md)',
     '  --max-files <number>       Max files included (default: 120)',
-    '  --max-lines-per-file <n>   Max lines per file (default: 220)',
+    '  --max-lines-per-file <n>   Max lines per file (default: 440)',
     '  --max-total-lines <n>      Max total lines across all files (default: 4000)',
     '  -h, --help                 Show this help',
     '',
@@ -219,7 +320,7 @@ const printHelp = (): void => {
     topicList,
     '',
     'Examples:',
-    '  deno task gen:ai-context -- --topic concept --topic devops',
+    '  deno task gen:ai-context -- --topic architecture --topic devops',
     '  deno task gen:ai-context -- --topic domain-archetypes --out build/briefs/archetypes.md'
   ]
   console.log(lines.join('\n'))
@@ -233,12 +334,18 @@ const main = async (): Promise<void> => {
   }
   validateTopics(args.topics)
 
+  if (args.maxLinesPerFileSet && !args.maxTotalLinesSet) {
+    args.maxTotalLines = Math.max(args.maxTotalLines, args.maxFiles * args.maxLinesPerFile)
+  }
+
   await Deno.mkdir(BRIEF_DIR, { recursive: true })
-  const outPath = args.outPath ?? defaultOutPath(args.topics)
+  const outPath = args.outPath
+    ?? (args.outFile ? toOutPathFromFile(args.outFile) : defaultOutPath(args.topics))
 
   const allFiles = await collectFiles()
+  const includeInventory = args.topics.includes(INVENTORY_TOPIC)
   const selectedFiles = selectFiles(allFiles, args.topics, args.maxFiles)
-  if (selectedFiles.length === 0) {
+  if (selectedFiles.length === 0 && !includeInventory) {
     throw new Error('no files matched provided topics')
   }
 
@@ -257,15 +364,28 @@ const main = async (): Promise<void> => {
   lines.push(`- max_lines_per_file: ${args.maxLinesPerFile}`)
   lines.push(`- max_total_lines: ${args.maxTotalLines}`)
   lines.push('')
-  lines.push('## File Index')
-  lines.push('')
-  for (const path of selectedFiles) lines.push(`- ${path}`)
-  lines.push('')
-  lines.push('## File Contents')
-  lines.push('')
+  if (includeInventory) {
+    lines.push('## Repository Inventory')
+    lines.push('')
+    lines.push('- scope: entire repository tree excluding `.gitignore` files')
+    lines.push('')
+    lines.push('```text')
+    lines.push(...renderRepoTree(allFiles))
+    lines.push('```')
+    lines.push('')
+  }
+  if (selectedFiles.length > 0) {
+    lines.push('## File Index')
+    lines.push('')
+    for (const path of selectedFiles) lines.push(`- ${path}`)
+    lines.push('')
+    lines.push('## File Contents')
+    lines.push('')
+  }
 
   let totalContentLines = 0
   let includedFileCount = 0
+  const croppedFiles: string[] = []
 
   for (const path of selectedFiles) {
     const source = await readText(path)
@@ -277,6 +397,7 @@ const main = async (): Promise<void> => {
 
     const keep = Math.min(sourceLines.length, args.maxLinesPerFile, remaining)
     const truncated = keep < sourceLines.length
+    if (truncated) croppedFiles.push(`${path} (${keep}/${sourceLines.length})`)
 
     lines.push(`### ${path}`)
     lines.push('')
@@ -294,7 +415,7 @@ const main = async (): Promise<void> => {
     includedFileCount += 1
   }
 
-  if (includedFileCount === 0) {
+  if (includedFileCount === 0 && !includeInventory) {
     throw new Error('line budgets prevented including any file content; increase limits')
   }
 
@@ -304,9 +425,15 @@ const main = async (): Promise<void> => {
     'AI Context Generated',
     `  output: ${outPath}`,
     `  topics: ${args.topics.join(', ')}`,
+    `  inventory: ${includeInventory ? 'enabled' : 'disabled'}`,
     `  files: ${includedFileCount}`,
-    `  content_lines: ${totalContentLines}`
+    `  content_lines: ${totalContentLines}`,
+    `  cropped_files: ${croppedFiles.length}`
   ]
+  if (croppedFiles.length > 0) {
+    summary.push('  cropped_file_list:')
+    summary.push(...croppedFiles.map(file => `    - ${file}`))
+  }
   console.log(summary.join('\n'))
 }
 
