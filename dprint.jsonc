@@ -3,7 +3,7 @@
   "lineWidth": 105,
   "indentWidth": 2,
   "useTabs": false,
-  "excludes": ["vendors/**"],
+  "excludes": ["vendors/**", "**/*.svg", "**/*.woff2"],
   "typescript": {
     "semiColons": "asi",
     "quoteStyle": "alwaysSingle",

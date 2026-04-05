@@ -89,7 +89,7 @@ Assignment order (contiguous):
 1. Ingest the authority set in §1.
 2. **Phase 1:** Generate abstractions archetype per §2.1 and the authority set.
 3. **Phase 2:** Generate protocol, adapter and validator archetypes per §2.2 and the authority set.
-4. Run `deno task genesis:domain`. Fix and re-run until all checks pass.
+4. Run `deno task check:domain-genesis`. Fix and re-run until all checks pass.
 5. **Phase 3:** Generate `schema.sql` per §2.3 and the authority set.
 6. Rotate and populate `source/devops/genesis/seed-ids.txt` per the Seed ID Protocol.
 7. Lint schema in a disposable database:
