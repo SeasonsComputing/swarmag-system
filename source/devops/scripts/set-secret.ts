@@ -22,8 +22,7 @@ if (!filePath || !composedKey || !secretValue) {
   Deno.exit(1)
 }
 
-const escapeRegex = (value: string): string =>
-  value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 const source = await Deno.readTextFile(filePath)
 const keyPattern = `"${escapeRegex(composedKey)}"\\s*:\\s*\\{[\\s\\S]*?"secret"\\s*:\\s*"([^"]*)"`
