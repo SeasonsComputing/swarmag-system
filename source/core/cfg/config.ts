@@ -43,9 +43,7 @@ class RuntimeConfig {
 
     this.#provider = provider
     const missing = keys.filter(k => !this.#provider.get(k))
-    if (missing.length > 0) {
-      this.#provider.fail(`Missing config keys: ${missing.join(', ')}`)
-    }
+    if (missing.length > 0) this.#provider.fail(`Missing config keys: ${missing.join(', ')}`)
 
     this.#cache = new StringSet([...keys])
     Object.assign(this.#aliases, aliases)
@@ -61,9 +59,7 @@ class RuntimeConfig {
     if (!this.#initialized) this.#provider.fail('Config not initialized')
 
     const key = this.#aliases[name] ?? name
-    if (!this.#cache.has(key)) {
-      this.#provider.fail(`Config property not registered: ${key}`)
-    }
+    if (!this.#cache.has(key)) this.#provider.fail(`Config property not registered: ${key}`)
 
     const value = this.#provider.get(key)
     if (value == undefined) this.#provider.fail(`Config ${key} missing at runtime`)

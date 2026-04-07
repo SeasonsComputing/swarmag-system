@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Provides a small persistence wrapper for app preference state in IndexedDB.
+Provides a small persistence wrapper for preferences store in IndexedDb.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -23,24 +23,26 @@ import type { Instance, StringDictionary } from '@core/std'
 /** Preference store must have an id for the db. */
 type PreferencesStore = Instance & { state: StringDictionary }
 
-/** IndexedDB-backed app-state provider. */
+/** IndexedDB-backed Preferences persistence. */
 export class Preferences {
-  /** Registers the app-state object store schema. */
-  constructor(
-    protected readonly schema: string,
-    protected readonly id: string = schema
-  ) {
-    IndexedDb.registerStore(schema)
+  #storeName: string
+  #id: string
+
+  /** Registers the store name. To make  */
+  constructor(storeName: string, id: string = storeName) {
+    this.#storeName = storeName
+    this.#id = id
+    IndexedDb.registerStore(this.#storeName)
   }
 
   /** Loads the persisted app-state StringDictionary. */
-  protected async getAppState(): Promise<StringDictionary> {
+  async #getAppState(): Promise<StringDictionary> {
     try {
       let state: StringDictionary = {}
       const db = await IndexedDb.connection()
-      const record = await db.get(this.schema, this.id) as PreferencesStore
+      const record = await db.get(this.#storeName, this.#id)
       record === undefined
-        ? await this.setAppState(state) // initial create
+        ? await this.#setAppState(state) // initial create
         : state = record.state
       return state
     } catch (error) {
@@ -50,11 +52,11 @@ export class Preferences {
   }
 
   /** Persists the full app-state StringDictionary. */
-  protected async setAppState(state: StringDictionary): Promise<void> {
+  async #setAppState(state: StringDictionary): Promise<void> {
     try {
-      const record: PreferencesStore = { id: this.id, state }
+      const record: PreferencesStore = { id: this.#id, state }
       const db = await IndexedDb.connection()
-      await db.put(this.schema, record)
+      await db.put(this.#storeName, record)
     } catch (error) {
       if (apiError(error)) throw error
       throwApiError(error as ApiErrorDetail, 'Update Failure', IndexedDb.errorToStatus(error))
@@ -63,12 +65,12 @@ export class Preferences {
 
   /** Fetch the full preference StringDictionary */
   async state(): Promise<StringDictionary> {
-    return await this.getAppState()
+    return await this.#getAppState()
   }
 
   /** Get a preference value. */
   async get(key: string): Promise<string | unknown> {
-    const state = await this.getAppState()
+    const state = await this.#getAppState()
     return state[key]
   }
 
@@ -76,11 +78,11 @@ export class Preferences {
   async set(key: string, value: string): Promise<void> {
     try {
       const db = await IndexedDb.connection()
-      const tx = db.transaction(this.schema, 'readwrite')
-      const record = await tx.store.get(this.id)
+      const tx = db.transaction(this.#storeName, 'readwrite')
+      const record = await tx.store.get(this.#id)
       const state: StringDictionary = record ? record.state : {}
       state[key] = value
-      await tx.store.put({ id: this.id, state })
+      await tx.store.put({ id: this.#id, state })
       await tx.done
     } catch (error) {
       if (apiError(error)) throw error
