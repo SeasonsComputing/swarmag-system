@@ -280,7 +280,7 @@ user triggers logout
 
 ### 6.4 Session State Store
 
-The session state store is a SolidJS store shared across all apps via `source/ux/common/lib/session-state.ts` and conforms to `4.3 Reactive Store Module Pattern`
+The session state store is a SolidJS store shared across all apps via `source/ux/common/stores/session-state.ts` and conforms to `4.3 Reactive Store Module Pattern`
 
 ```typescript
 type SessionStore = {
@@ -366,7 +366,7 @@ IndexedDB usage is split into two layers:
 
 Application preferences use a dedicated object store within the local DB.
 
-`app-state.ts` (`@ux/common/lib/app-state.ts`) manages per-app preferences using `makeCrudIndexedDbClient<AppStore>` where `AppStore = Dictionary`.
+`app-state.ts` (`@ux/common/stores/app-state.ts`) manages per-app preferences using `makeCrudIndexedDbClient<AppStore>` where `AppStore = Dictionary`.
 
 Preference keys following a standard naming convention usage by app:
 
@@ -380,8 +380,8 @@ Preference keys following a standard naming convention usage by app:
 
 | Concern         | Mechanism       | Location                       |
 | --------------- | --------------- | ------------------------------ |
-| auth / session  | SolidJS store   | `common/lib/session-state.ts`  |
-| app preferences | IndexedDB       | `common/lib/app-state.ts`      |
+| auth / session  | SolidJS store   | `common/stores/session-state.ts`  |
+| app preferences | IndexedDB       | `common/stores/app-state.ts`      |
 | server data     | TanStack Query  | per-page query hooks           |
 | local ui state  | SolidJS signals | component-local                |
 | ops field data  | IndexedDB       | `app-ops/stores/jobs-store.ts` |
