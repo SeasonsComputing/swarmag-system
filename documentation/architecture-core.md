@@ -14,26 +14,32 @@ This document defines the foundational architectural structure and principles fo
 
 ### 1.1 Authority Chain
 
-**Constitution** (`CONSTITUTION.md`) - governance, roles, philosophy
-→ **Architecture Core** (`architecture-core.md`) - system boundary and invariants
-→ **Domain Model** (`domain-model.md`) - problem space, solution space, domain meaning
-→ **Domain Data Dictionary** (`domain-data-dictionary.md`) - domain namespace and field inventory
-→ **Domain Archetypes** (`domain-archetypes.md`) - domain artifact implementation patterns
-→ **UX Design Language** (`ux-design-language.md`) - normative UX language and interaction patterns
-→ **Style Guide** (`style-guide.md`) - coding standards, conventions
-→ **Architecture Backend** (`architecture-back.md`) - backend implementation
-→ **Architecture UX** (`architecture-ux.md`) - UX implementation
+Authority decreases from top to bottom.
+
+| Document                       | File                        | Intent                                                          |
+| ------------------------------ | --------------------------- | --------------------------------------------------------------- |
+| **Constitution**               | `CONSTITUTION.md`           | Governance model, roles, and operating philosophy               |
+| --> **Architecture Core**      | `architecture-core.md`      | System boundary, platform constraints, and invariants           |
+| --> **Domain Model**           | `domain-model.md`           | Problem/solution semantics and domain meaning                   |
+| --> **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace inventory and field-level references        |
+| --> **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns                         |
+| --> **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction rules   |
+| --> **Style Guide**            | `style-guide.md`            | Coding standards, file formats, and implementation conventions  |
+| --> **Architecture Backend**   | `architecture-back.md`      | Backend integration architecture and runtime constraints        |
+| --> **Architecture UX**        | `architecture-ux.md`        | UX-layer integration architecture and app-specific UX contracts |
 
 ### 1.2 Scope Boundary of Governing Documents
 
-- `architecture-core.md` owns system boundary, platform constraints, dependency direction, and architectural invariants.
-- `domain-model.md` owns domain meaning and canonical business semantics.
-- `domain-data-dictionary.md` owns topic namespaces, abstraction inventory, and field-level reference tables.
-- `domain-archetypes.md` owns domain implementation patterns for archetype artifacts.
-- `ux-design-language.md` owns normative UX language and interaction patterns across applications.
-- `style-guide.md` owns implementation patterns, file layouts, and coding conventions.
-- `architecture-back.md` owns backend integration architecture and runtime constraints.
-- `architecture-ux.md` owns UX-layer integration architecture and application-specific UX architecture contracts.
+| Document                   | Scope Ownership                                                         |
+| -------------------------- | ----------------------------------------------------------------------- |
+| **Architecture Core**      | System boundary, platform constraints, dependency direction, invariants |
+| **Domain Model**           | Domain meaning and canonical business semantics                         |
+| **Domain Data Dictionary** | Topic namespaces, abstraction inventory, field-level references         |
+| **Domain Archetypes**      | Domain implementation patterns for archetype artifacts                  |
+| **UX Design Language**     | Normative UX language and interaction patterns across applications      |
+| **Style Guide**            | Implementation conventions, file formats, and coding standards          |
+| **Architecture Backend**   | Backend integration architecture and runtime constraints                |
+| **Architecture UX**        | UX-layer integration architecture and app-specific UX contracts         |
 
 All code, schemas, and infrastructure are derived artifacts. If code conflicts with these documents, the code is wrong.
 

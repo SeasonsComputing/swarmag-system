@@ -11,7 +11,23 @@ This document defines the backend architecture of the swarmAg system. The backen
 - **Storage Buckets** — File and image storage
 - **Migrations** — Forward-only schema deltas and RLS policy changes
 
-**Prerequisites:** Read `domain-model.md` and `architecture-core.md` first to understand the domain model and system boundary.
+### 1.1 Authority Chain
+
+| Document                      | File                        | Intent                                                   |
+| ----------------------------- | --------------------------- | -------------------------------------------------------- |
+| **Canonical Authority Chain** | `architecture-core.md §1.1` | Defines global documentation precedence for the system   |
+| --> **Architecture Backend**  | _(this file)_               | Backend integration architecture and runtime constraints |
+
+### 1.2 Scope Boundary of Governing Documents
+
+| Document                   | File                        | Scope Ownership                                                            |
+| -------------------------- | --------------------------- | -------------------------------------------------------------------------- |
+| **Architecture Core**      | `architecture-core.md`      | System boundary, platform constraints, and dependency direction            |
+| **Domain Model**           | `domain-model.md`           | Domain meaning consumed by backend integrations                            |
+| **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace and field references for backend contracts             |
+| **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns used by backend layer              |
+| **Style Guide**            | `style-guide.md`            | Implementation conventions and coding/file standards                       |
+| **Architecture Backend**   | _(this file)_               | Backend architecture, edge-function contracts, and operational constraints |
 
 ## 2. Backend Structure
 
