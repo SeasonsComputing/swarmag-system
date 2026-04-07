@@ -27,7 +27,7 @@
 1. **Workflow tailoring** — Add or remove additional workflows/tasks to match site-specific needs or hazards.
 2. **Data capture prep** — Note required artifacts (maps, photos, checklists) to collect during the assessment.
 
-### 2.3 Onsite Job Planning
+### 2.3 Job Planning
 
 1.
 2.
