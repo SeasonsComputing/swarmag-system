@@ -12,6 +12,31 @@ Quality is measured against: **safety**, **efficiency**, **repeatability**, and 
 
 This document defines the foundational architectural structure and principles for the entire system. It establishes the system boundary, core constraints, and governing rules that all other architectural decisions must respect.
 
+### 1.1 Authority Chain
+
+**Constitution** (`CONSTITUTION.md`) - governance, roles, philosophy
+→ **Architecture Core** (`architecture-core.md`) - system boundary and invariants
+→ **Domain Model** (`domain-model.md`) - problem space, solution space, domain meaning
+→ **Domain Data Dictionary** (`domain-data-dictionary.md`) - domain namespace and field inventory
+→ **Domain Archetypes** (`domain-archetypes.md`) - domain artifact implementation patterns
+→ **UX Design Language** (`ux-design-language.md`) - normative UX language and interaction patterns
+→ **Style Guide** (`style-guide.md`) - coding standards, conventions
+→ **Architecture Backend** (`architecture-back.md`) - backend implementation
+→ **Architecture UX** (`architecture-ux.md`) - UX implementation
+
+### 1.2 Scope Boundary of Governing Documents
+
+- `architecture-core.md` owns system boundary, platform constraints, dependency direction, and architectural invariants.
+- `domain-model.md` owns domain meaning and canonical business semantics.
+- `domain-data-dictionary.md` owns topic namespaces, abstraction inventory, and field-level reference tables.
+- `domain-archetypes.md` owns domain implementation patterns for archetype artifacts.
+- `ux-design-language.md` owns normative UX language and interaction patterns across applications.
+- `style-guide.md` owns implementation patterns, file layouts, and coding conventions.
+- `architecture-back.md` owns backend integration architecture and runtime constraints.
+- `architecture-ux.md` owns UX-layer integration architecture and application-specific UX architecture contracts.
+
+All code, schemas, and infrastructure are derived artifacts. If code conflicts with these documents, the code is wrong.
+
 ## 2. Core Platforms
 
 The system is built on the following technology stack:
@@ -557,22 +582,9 @@ Mock providers can be injected for testing without environment dependencies. Tes
 
 Configuration is declared in higher layers but accessible in lower layers through dependency injection, maintaining proper architectural boundaries throughout.
 
-## 7. Dependency Direction & Authority
+## 7. Dependency Direction
 
-### 7.1 Canonical Sources of Truth
-
-In order of authority:
-
-1. **Constitution** (`CONSTITUTION.md`) - governance, roles, philosophy
-2. **Domain Model** (`domain-model.md`) - problem space, solution space, domain meaning
-3. **Architecture Core** (`architecture-core.md`) - system boundary and invariants
-4. **Architecture Backend** (`architecture-back.md`) - backend implementation
-5. **Architecture UX** (`architecture-ux.md`) - UX implementation
-6. **Style Guide** (`style-guide.md`) - coding standards, conventions
-
-All code, schemas, and infrastructure are derived artifacts. If code conflicts with these documents, the code is wrong.
-
-### 7.2 Dependency Rules
+**Dependency Rules:**
 
 ```text
 tests/devops  ──> ux, back, domain, core
