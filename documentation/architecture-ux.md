@@ -719,7 +719,7 @@ Every question screen has an attachment zone below the answer, above navigation.
 Camera is the dominant affordance. `requiresNote` on `SelectOption` gates NEXT
 until an attachment or note is provided.
 
-### 10.7.4 Screen Layout
+### 10.7.5 Screen Layout
 
 ```
 ┌─────────────────────────────────┐
@@ -742,7 +742,7 @@ until an attachment or note is provided.
 │  └───────────────────────────┘  │
 │                                 │
 │  Progress                       │
-│  |<-    o o o o o o o o   ->|   │
+│  [<-]  o o o o o O o o  [===>]  │
 └─────────────────────────────────┘
 ```
 
