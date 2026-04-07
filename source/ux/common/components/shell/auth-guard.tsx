@@ -18,7 +18,7 @@ AuthGuard  Route-level auth guard component.
 import { createEffect, Show } from '@solid-js'
 import type { JSX } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
-import { SessionState } from '@ux/common/lib/session-state.ts'
+import { SessionState } from '@ux/common/stores/session-state.ts'
 
 /** AuthGuard props. */
 type AuthGuardProps = {
