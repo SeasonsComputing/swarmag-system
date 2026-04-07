@@ -469,28 +469,31 @@ source/
     │   └── api.ts
     ├── config/
     ├── common/
-    │   ├── assets/              — Static assets used by applications
-    │   │   ├── css/             — Style sheets & design tokens
-    │   │   ├── fonts/           — Font typography
-    │   │   └── icons/           — Icon library
-    │   ├── views/               — UX projection types (domain → display shape)
-    │   ├── stores/              — reactive stores
+    │   ├── assets/                  — static assets used by applications
+    │   │   ├── css/                 — style sheets & design tokens
+    │   │   ├── fonts/               — font typography
+    │   │   └── icons/               — icon library
+    │   ├── views/                   — UX projection types (domain → display shape)
+    │   ├── stores/                  — reactive stores
+    │   ├── features/                — shared features
+    │   │   ├── job-assessment/      — guided job assessment UX
+    │   │   └── customer-prospect    — guided new customer + initial job assessment UX
     │   └── components/
-    │       ├── shell/           — auth-guard, content
-    │       ├── login/           — login screen
-    │       ├── forms/           — form-panel (AppForm)
-    │       ├── controls/        — Kobalte-based UI primitives
-    │       ├── charts/          — PieChart, BarChart, LineChart, Sparkline
-    │       ├── dashboard/       — dashboard layout foundation
-    │       └── widgets/         — widget catalog
+    │       ├── shell/               — auth-guard, content
+    │       ├── login/               — login screen
+    │       ├── forms/               — form-panel (AppForm)
+    │       ├── controls/            — Kobalte-based UI primitives
+    │       ├── charts/              — PieChart, BarChart, LineChart, Sparkline
+    │       ├── dashboard/           — dashboard layout foundation
+    │       └── widgets/             — widget catalog
     ├── app-admin/
-    │   └── workflow/            — canonical workflow template UX
+    │   ├── workflow-builder/        — question, task, and workflow builder UX
+    │   └── job-planning/            — guided job planning UX
+    │       
     ├── app-customer/
     └── app-ops/
-        ├── job-assessment/      — guided onsite assessment UX
-        ├── job-planning/        — guided job planning UX
-        └── job-workflow/        — guided field execution UX
-```
+        └── job-work/                — guided field execution UX 
+```text
 
 Everything in `source/ux/common/` must be adaptive — usable across all three apps and all viewport sizes. Mobile-only or desktop-only components do not belong in `common/`.
 
@@ -532,7 +535,7 @@ Layout is data-driven via `dashboard.jsonc`. Not hardcoded. May be overridden pe
 {
   "header": {
     "widgets": {
-      "swarmag": { "type": "BrandWidget", "size": "landscape" }
+      "swarmag": { "type": "BrandWidget", "size": "landscape", "settings": {} }
     }
   },
   "rows": {
@@ -540,8 +543,8 @@ Layout is data-driven via `dashboard.jsonc`. Not hardcoded. May be overridden pe
       "type": "standard",
       "label": "Operations at-a-glance",
       "widgets": {
-        "upcoming-jobs": { "type": "UpcomingJobsWidget", "size": "landscape" },
-        "asset-status": { "type": "AssetStatusWidget", "size": "square" }
+        "upcoming-jobs": { "type": "UpcomingJobsWidget", "size": "landscape", "settings": {} },
+        "asset-status": { "type": "AssetStatusWidget", "size": "square", "settings": {} }
       }
     }
   }
@@ -607,26 +610,13 @@ Per `domain-model.md §2.5`:
 - Planning may further modify the assessment clone
 - At execution start, the manifest is finalized and immutable
 
-#### 10.2.4 Source Directories
-
-```text
-source/ux/app-ops/
-  job-assessment/    — guided onsite assessment UX
-  job-planning/      — guided job planning UX
-  job-workflow/      — guided field execution UX
-
-source/ux/app-admin/
-  workflow/          — canonical Workflow template CRUD (admin only)
-```
-
 ### 10.3 Dashboard Components
 
-| Component      | Location     | Purpose                                     |
-| -------------- | ------------ | ------------------------------------------- |
-| `Dashboard`    | `dashboard/` | Root layout, row renderer, scroll container |
-| `DashboardRow` | `dashboard/` | Horizontal swipe row                        |
-| `StatCard`     | `dashboard/` | KPI card primitive — fixed short height     |
-| `Widget`       | `dashboard/` | Square/landscape widget shell               |
+| Component      | Purpose                                     |
+| -------------- | ------------------------------------------- |
+| `Dashboard`    | Root layout, row renderer, scroll container |
+| `DashboardRow` | Horizontal swipe row (short\|standard)      |
+| `Widget`       | Widget container (square\|landscape)        |
 
 ### 10.4 Widget Catalog
 
@@ -728,5 +718,32 @@ Exhaustively known from the domain `QuestionType`:
 Every question screen has an attachment zone below the answer, above navigation.
 Camera is the dominant affordance. `requiresNote` on `SelectOption` gates NEXT
 until an attachment or note is provided.
+
+### 10.7.4 Screen Layout
+
+```
+┌─────────────────────────────────┐
+│  Workflow / Task / Question     │
+│─────────────────────────────────│
+│                                 │
+│  Question prompt                │
+│  Help text (if present)         │
+│                                 │
+│  [Question-specific widget   ]  │
+│                                 │
+│  ┌───────────────────────────┐  │
+│  │ Note                      │  │
+│  │                           │  │
+│  └───────────────────────────┘  │
+│  📎 Attach  📸 Picture  📍GEO   │
+│                                 │
+│  ┌───────────────────────────┐  │
+│  │          Save -->         │  │
+│  └───────────────────────────┘  │
+│                                 │
+│  Progress                       │
+│  |<-    o o o o o o o o   ->|   │
+└─────────────────────────────────┘
+```
 
 _End of Architecture UX Document_
