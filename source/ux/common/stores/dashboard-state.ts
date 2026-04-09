@@ -13,19 +13,18 @@ the IndexedDB CRUD clients.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 DashboardState - Dashboard state and mutation methods
-├ store   Reactive dashboard view snapshot.
-├ init()  Hydrate dashboard state from seed or IndexedDB.
-├
-└
+├ store          Reactive dashboard view snapshot.
+├ init(seed)     Hydrate dashboard state from seed or IndexedDB.
+├ headerWidgets  Header widget mutation contract.
+├ rows           Dashboard row mutation contract.
+└ rowWidgets     Row widget mutation contract.
 */
 
+import { ApiError, apiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import { createStore, produce } from '@solid-js/store'
-import type {
-  DashboardRow,
-  DashboardView,
-  DashboardWidget
-} from '@ux/common/views/dashboard-views.ts'
+import type { DashboardRow, DashboardView, DashboardWidget } from '@ux/common/views/dashboard-views.ts'
+import { Config } from '@ux/config/ux-config.ts'
 
 // ───────────────────────────────────────────────────────────────────────────────
 // DASHBOARD STATE CONTRACT
@@ -73,10 +72,11 @@ async function dashboardInit(seed: DashboardView): Promise<void> {
   try {
     const db = await IndexedDb.connection()
     const view = await db.get(DASHBOARD_STORE, DASHBOARD_STORE)
-    if (!view) db.put(DASHBOARD_STORE, seed)
+    if (!view) await db.put(DASHBOARD_STORE, seed)
     setDashboardStore(view ?? seed)
-  } catch (_error) {
-    // TODO
+  } catch (error) {
+    if (apiError(error)) Config.fail((error as ApiError).message)
+    else Config.fail(`Dashboard init failed: ${IndexedDb.errorToStatus(error)}`)
   }
 }
 
@@ -85,8 +85,9 @@ async function dashboardSave(): Promise<void> {
   try {
     const idb = await IndexedDb.connection()
     await idb.put(DASHBOARD_STORE, { ...dashboardStore, key: DASHBOARD_STORE })
-  } catch (_error) {
-    // TODO
+  } catch (error) {
+    if (apiError(error)) console.error((error as ApiError).message)
+    else console.error(`Dashboard init failed: ${IndexedDb.errorToStatus(error)}`)
   }
 }
 
@@ -104,7 +105,7 @@ const dashboardWidgets: DashboardWidgetsContract = {
         const widgets = rowId
           ? store.rows.find(row => row.key === rowId)?.widgets
           : store.header.widgets
-        if (!widgets) return // TODO
+        if (!widgets) return
 
         const index = widgets.findIndex(item => item.key === widget.key)
         if (index < 0) widgets.push(widget)
@@ -121,7 +122,7 @@ const dashboardWidgets: DashboardWidgetsContract = {
         const widgets = rowId
           ? store.rows.find(row => row.key === rowId)?.widgets
           : store.header.widgets
-        if (!widgets) return // TODO
+        if (!widgets) return
 
         const index = widgets.findIndex(widget => widget.key === key)
         if (index < 0) return
