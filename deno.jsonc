@@ -67,7 +67,7 @@
     "gen:jwt-secret": "deno run source/devops/scripts/gen-jwt-secret.ts",
     "gen:id-seeds": "deno run --allow-read --allow-write source/devops/scripts/gen-id-seeds.ts",
     "gen:ai-context": "deno run --allow-read --allow-write --allow-run source/devops/scripts/gen-ai-context.ts",
-    "gen:ai-context-foundation": "deno task gen:ai-context -- --file ai-context-foundation --topic architecture --topic inventory --max-lines-per-file 1000 --max-total-lines 200000 --max-files 1000",
+    "gen:ai-context-foundation": "deno task gen:ai-context -- --file ai-context-foundation --topic architecture --topic inventory --max-lines-per-file 1000 --max-total-lines 200000 --max-files 1000 --no-truncate",
 
     // ────────────────────────────────────────────────────────────────────────────
     // Verification Guards
