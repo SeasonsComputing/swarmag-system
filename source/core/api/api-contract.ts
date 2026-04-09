@@ -138,7 +138,7 @@ export interface ApiCrudContract<T extends Instantiable> {
   get(id: Id): Promise<T>
   update(input: UpdateFromInstantiable<T>): Promise<T>
   delete(id: Id): Promise<DeleteResult>
-  list?(options?: ListOptions): Promise<ListResult<T>>
+  list(options?: ListOptions): Promise<ListResult<T>>
 }
 
 /** Business rule API contract */
@@ -157,13 +157,13 @@ export type DeleteResult = {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Default pagination limit when not specified. */
-const DEFAULT_LIMIT = 25
+export const DEFAULT_LIMIT = 25
 
 /** Maximum allowed pagination limit. */
-const MAX_LIMIT = 100
+export const MAX_LIMIT = 100
 
 /** Default pagination cursor when not specified. */
-const DEFAULT_CURSOR = 0
+export const DEFAULT_CURSOR = 0
 
 /** Pagination options for list operations. */
 export type ListOptions = { limit?: number; cursor?: number }
