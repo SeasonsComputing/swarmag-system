@@ -15,8 +15,14 @@ CrudIndexedDbSpecification     CRUD IndexedDB client configuration.
 makeCrudIndexedDbClient(spec)  Build CRUD/list client over IndexedDB.
 */
 
-import type { ApiCrudContract, ApiErrorDetail, DeleteResult } from '@core/api/api-contract.ts'
-import { apiError, throwApiError } from '@core/api/api-contract.ts'
+import type {
+  ApiCrudContract,
+  ApiErrorDetail,
+  DeleteResult,
+  ListOptions,
+  ListResult
+} from '@core/api/api-contract.ts'
+import { apiError, listCursorValue, listPageLimitValue, throwApiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import {
   type CreateFromInstantiable,
@@ -103,6 +109,29 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
       } catch (error) {
         if (apiError(error)) throw error
         throwApiError(error as ApiErrorDetail, 'Read Failure', IndexedDb.errorToStatus(error))
+      }
+    },
+
+    /* List non-deleted records with cursor-based pagination. */
+    async list(options: ListOptions = {}): Promise<ListResult<T>> {
+      try {
+        const db = await IndexedDb.connection()
+        const records = await db.getAll(store)
+        const entities = records
+          .map(record => adapter.toDomain(record))
+          .filter(entity => entity.deletedAt === undefined)
+
+        const cursor = listCursorValue(String(options.cursor ?? ''))
+        const limit = listPageLimitValue(String(options.limit ?? ''))
+        const data = entities.slice(cursor, cursor + limit)
+        return {
+          data,
+          cursor: cursor + data.length,
+          hasMore: cursor + data.length < entities.length
+        }
+      } catch (error) {
+        if (apiError(error)) throw error
+        throwApiError(error as ApiErrorDetail, 'List Failure', IndexedDb.errorToStatus(error))
       }
     }
   }
