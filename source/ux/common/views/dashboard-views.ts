@@ -5,27 +5,28 @@
 import { Dictionary } from '@core/std'
 
 /** A single dashboard widget reference with display size and component type. */
-export type DashboardWidget =  {
+export type DashboardWidget = {
+  key: string
   size: 'square' | 'landscape'
   type: string
   settings: Dictionary
 }
 
-/** Map of id to widget */
-export type DashboardWidgetMap = { [key: string]: DashboardWidget }
-
 /** A dashboard row with display size, label, and widget map. */
-export type DashboardRow =  {
+export type DashboardRow = {
+  key: string
   size: 'standard' | 'short'
   label: string
-  widgets: DashboardWidgetMap
+  widgets: DashboardWidget[]
 }
 
-/** Map of id to row */
-export type DashboardRowMap = { [key: string]: DashboardRow }
+/** The dashboard header and its widgets */
+export type DashboardHeader = {
+  widgets: DashboardWidget[]
+}
 
 /** Default dashboard view — header widget strip and row collection. */
 export type DashboardView = {
-  header: DashboardWidgetMap
-  rows: DashboardRowMap
+  header: DashboardHeader
+  rows: DashboardRow[]
 }
