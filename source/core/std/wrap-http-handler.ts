@@ -461,7 +461,7 @@ export const wrapHttpHandler = <
 }
 
 // ───────────────────────────────────────────────────────────────────────────────
-// PRIVATE
+// INTERNALS
 // ───────────────────────────────────────────────────────────────────────────────
 
 type Message = { name: string; message: string; stack?: string }

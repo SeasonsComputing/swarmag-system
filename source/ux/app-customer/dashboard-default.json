@@ -1,0 +1,15 @@
+{
+  "header": {
+    "swarmag": { "type": "BrandWidget", "size": "landscape", "settings": {} }
+  },
+  "rows": {
+    "at-a-glance": {
+      "size": "standard",
+      "label": "Operations at-a-glance",
+      "widgets": {
+        "upcoming-jobs": { "type": "UpcomingJobsWidget", "size": "landscape", "settings": {} },
+        "assets-status": { "type": "AssetStatusWidget", "size": "square", "settings": {} }
+      }
+    }
+  }
+}

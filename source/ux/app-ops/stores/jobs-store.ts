@@ -17,7 +17,7 @@ loadJobs   Load the job manifest from local IndexedDB storage.
 */
 
 import { createStore } from '@solid-js/store'
-import type { JobSummary } from '@ux/common/views/job.ts'
+import type { JobSummary } from '@ux/common/views/job-views.ts'
 
 /** Ops job manifest store shape. */
 type JobsStore = {
