@@ -26,9 +26,11 @@ type ContextArgs = {
   maxFiles: number
   maxLinesPerFile: number
   maxTotalLines: number
+  noTruncate: boolean
   maxLinesPerFileSet: boolean
   maxTotalLinesSet: boolean
   showHelp: boolean
+  unexpectedArgs: string[]
 }
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
@@ -65,31 +67,22 @@ const TOPIC_RULES: TopicRule[] = [
   },
   {
     topic: 'domain-archetypes',
-    patterns: [
-      /^source\/domain\/(protocols|adapters|validators)\/.*\.ts$/,
-      /^documentation\/domain-archetypes\.md$/,
-      /^documentation\/genesis-domain-sdk\.md$/
-    ]
+    patterns: [/^source\/domain\/(protocols|adapters|validators)\/.*\.ts$/]
   },
   {
     topic: 'domain-schema',
-    patterns: [
-      /^source\/domain\/schema\/schema\.sql$/,
-      /^documentation\/domain-data-dictionary\.md$/,
-      /^documentation\/domain-model\.md$/
-    ]
+    patterns: [/^source\/domain\/schema\/schema\.sql$/]
   },
   {
     topic: 'core',
-    patterns: [/^source\/core\/.*\.ts$/, /^documentation\/architecture-core\.md$/]
+    patterns: [/^source\/core\/.*\.ts$/]
   },
   {
     topic: 'ux-shared',
     patterns: [
       /^source\/ux\/ai\/.*\.(ts|tsx|js|json|md)$/,
       /^source\/ux\/common\/.*\.(ts|tsx)$/,
-      /^source\/ux\/config\/.*\.(ts|env\.example)$/,
-      /^documentation\/architecture-ux\.md$/
+      /^source\/ux\/config\/.*\.(ts|env\.example)$/
     ]
   },
   {
@@ -106,7 +99,7 @@ const TOPIC_RULES: TopicRule[] = [
   },
   {
     topic: 'devops',
-    patterns: [/^source\/devops\/.*\.(ts|sh|txt)$/, /^AGENTS\.md$/, /^documentation\/style-guide\.md$/]
+    patterns: [/^source\/devops\/.*\.(ts|sh|txt)$/, /^AGENTS\.md$/]
   },
   {
     topic: 'test',
@@ -120,17 +113,20 @@ const TOPIC_RULES: TopicRule[] = [
 
 const parseArgs = (): ContextArgs => {
   const topics: string[] = []
+  const unexpectedArgs: string[] = []
   let outFile: string | undefined
   let outPath: string | undefined
   let maxFiles = 120
   let maxLinesPerFile = 440
   let maxTotalLines = 4000
+  let noTruncate = false
   let maxLinesPerFileSet = false
   let maxTotalLinesSet = false
   let showHelp = false
 
   for (let i = 0; i < Deno.args.length; i++) {
     const arg = Deno.args[i]
+    if (arg === '--') continue
     if (arg === '--help' || arg === '-h') {
       showHelp = true
       continue
@@ -176,6 +172,15 @@ const parseArgs = (): ContextArgs => {
       i++
       continue
     }
+    if (arg === '--no-truncate') {
+      noTruncate = true
+      continue
+    }
+    if (!arg.startsWith('--')) {
+      unexpectedArgs.push(arg)
+      continue
+    }
+    unexpectedArgs.push(arg)
   }
 
   return {
@@ -185,9 +190,11 @@ const parseArgs = (): ContextArgs => {
     maxFiles,
     maxLinesPerFile,
     maxTotalLines,
+    noTruncate,
     maxLinesPerFileSet,
     maxTotalLinesSet,
-    showHelp
+    showHelp,
+    unexpectedArgs
   }
 }
 
@@ -221,6 +228,14 @@ const validateTopics = (topics: string[]): void => {
   if (unknown.length > 0) {
     throw new Error(`unknown topics: ${unknown.join(', ')}; valid: ${[...valid].join(', ')}`)
   }
+}
+
+const validateUnexpectedArgs = (args: string[]): void => {
+  if (args.length === 0) return
+  throw new Error(
+    `unexpected arguments: ${args.join(', ')}. `
+      + 'Use repeated --topic <name> for multiple topics.'
+  )
 }
 
 const selectFiles = (allFiles: string[], topics: string[], maxFiles: number): string[] => {
@@ -299,6 +314,23 @@ const detectFence = (path: string): string => {
   return 'text'
 }
 
+const longestRun = (source: string, char: '`' | '~'): number => {
+  const pattern = char === '`' ? /`+/g : /~+/g
+  let max = 0
+  for (const match of source.matchAll(pattern)) {
+    const length = match[0].length
+    if (length > max) max = length
+  }
+  return max
+}
+
+const detectFenceMarker = (source: string): string => {
+  const backtickRun = longestRun(source, '`')
+  const tildeRun = longestRun(source, '~')
+  if (backtickRun <= tildeRun) return '`'.repeat(Math.max(3, backtickRun + 1))
+  return '~'.repeat(Math.max(3, tildeRun + 1))
+}
+
 const printHelp = (): void => {
   const topicList = TOPIC_RULES.map(rule => `  - ${rule.topic}`).join('\n')
   const lines = [
@@ -314,13 +346,14 @@ const printHelp = (): void => {
     '  --max-files <number>       Max files included (default: 120)',
     '  --max-lines-per-file <n>   Max lines per file (default: 440)',
     '  --max-total-lines <n>      Max total lines across all files (default: 4000)',
+    '  --no-truncate              Fail if any selected file would be cropped by line budgets',
     '  -h, --help                 Show this help',
     '',
     'Topics:',
     topicList,
     '',
     'Examples:',
-    '  deno task gen:ai-context -- --topic architecture --topic devops',
+    '  deno task gen:ai-context -- --topic devops --topic inventory',
     '  deno task gen:ai-context -- --topic domain-archetypes --out build/briefs/archetypes.md'
   ]
   console.log(lines.join('\n'))
@@ -332,6 +365,7 @@ const main = async (): Promise<void> => {
     printHelp()
     return
   }
+  validateUnexpectedArgs(args.unexpectedArgs)
   validateTopics(args.topics)
 
   if (args.maxLinesPerFileSet && !args.maxTotalLinesSet) {
@@ -363,6 +397,7 @@ const main = async (): Promise<void> => {
   lines.push(`- max_files: ${args.maxFiles}`)
   lines.push(`- max_lines_per_file: ${args.maxLinesPerFile}`)
   lines.push(`- max_total_lines: ${args.maxTotalLines}`)
+  lines.push(`- no_truncate: ${args.noTruncate}`)
   lines.push('')
   if (includeInventory) {
     lines.push('## Repository Inventory')
@@ -393,11 +428,26 @@ const main = async (): Promise<void> => {
     if (sourceLines.length === 0) continue
 
     const remaining = args.maxTotalLines - totalContentLines
-    if (remaining <= 0) break
+    if (remaining <= 0) {
+      if (args.noTruncate) {
+        throw new Error(
+          `truncation blocked: max-total-lines exceeded before including ${path}; `
+            + `increase --max-total-lines`
+        )
+      }
+      break
+    }
 
     const keep = Math.min(sourceLines.length, args.maxLinesPerFile, remaining)
     const truncated = keep < sourceLines.length
+    if (truncated && args.noTruncate) {
+      throw new Error(
+        `truncation blocked: ${path} would be cropped (${keep}/${sourceLines.length}); `
+          + `increase --max-lines-per-file and/or --max-total-lines`
+      )
+    }
     if (truncated) croppedFiles.push(`${path} (${keep}/${sourceLines.length})`)
+    const fenceMarker = detectFenceMarker(source)
 
     lines.push(`### ${path}`)
     lines.push('')
@@ -405,10 +455,10 @@ const main = async (): Promise<void> => {
     lines.push(`- lines_included: ${keep}`)
     lines.push(`- truncated: ${truncated ? 'yes' : 'no'}`)
     lines.push('')
-    lines.push(`\`\`\`${detectFence(path)}`)
+    lines.push(`${fenceMarker}${detectFence(path)}`)
     lines.push(...sourceLines.slice(0, keep))
     if (truncated) lines.push('... [truncated]')
-    lines.push('\`\`\`')
+    lines.push(fenceMarker)
     lines.push('')
 
     totalContentLines += keep
