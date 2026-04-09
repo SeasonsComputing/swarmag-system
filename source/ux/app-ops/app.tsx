@@ -3,6 +3,6 @@
  */
 
 import { bootstrap } from '@ux/common/components/shell/app.tsx'
-import dashboardDefault from './dashboard-default.json' with { type: 'json' }
+import seed from './dashboard-default.json' with { type: 'json' }
 
-void bootstrap(dashboardDefault)
+void bootstrap(seed)
