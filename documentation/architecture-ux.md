@@ -216,17 +216,18 @@ export { ThingState }
 
 ### 8.1 Application Shell Structure
 
-Each application follows a three-layer shell:
+Each app root (`source/ux/app-{admin|customer|ops}/app.tsx`) composes the same shell primitives from `common/`:
 
 ```text
-app
-├── shell            # auth guard + content frame
-│   ├── login        # unauthenticated entry point
-│   └── dashboard    # authenticated root; primary nav surface
-└── pages            # route-driven content panels
+app.tsx
+├── /login route       -> Login
+├── /dashboard route   -> AuthGuard -> Content -> Dashboard
+└── /{feature} or /{domain}/{operation}[/{id}] -> AuthGuard -> Content -> page feature
 ```
 
-The shell is app-specific. `login`, `auth-guard`, `content`, and all stores are shared via `source/ux/common/`.
+`login`, `auth-guard`, `content`, and shared stores live in `source/ux/common/`.
+
+Dashboard harness is shared and belongs in `source/ux/common/components/dashboard/`. App packages provide only dashboard configuration (`dashboard-default.json`) and app-specific widgets/features.
 
 #### 8.1.1 Auth Guard
 
@@ -250,8 +251,12 @@ Each app defines its own route tree using TanStack Router declared in `app.tsx`.
 /             → redirect to /dashboard or /login
 /login        → login (unauthenticated)
 /dashboard    → dashboard (auth-guarded)
-/[domain]     → domain pages (auth-guarded)
+/{feature}                 → specialized feature route (auth-guarded)
+/{domain}/{operation}      → abstraction route (auth-guarded)
+/{domain}/{operation}/{id} → item-scoped abstraction route (auth-guarded)
 ```
+
+Examples: `/user/list`, `/user/get/{id}`.
 
 #### 8.2.2 Protected Routes
 
@@ -442,17 +447,20 @@ Preference keys following a standard naming convention usage by app:
 - `content` — main content frame
 - session store
 - app state store
+- dashboard state store + dashboard harness
+- shared guided UX features in `common/features/{feature}` (for example `workflow-builder`)
 
 #### 9.1.2 Stays in the app
 
-- dashboard content and layout
+- dashboard default configuration and app-specific widget composition
 - domain pages
 - app-specific route tree
+- specialized features in `{app}/{feature}`
 - app-specific IndexedDB store instance
 
-#### 9.1.3 Exception — Ops Crew Workflow Engine
+#### 9.1.3 Specialized Feature — Ops Crew Job Work Engine
 
-The ops crew workflow/task/checklist engine is a purpose-built UI mode, not derived from `form-panel` or standard shell components. It is launched from the ops dashboard. Design principles: app is invisible, crew stays focused on job and safety, large touch targets, minimal cognitive load.
+The ops crew `job-work` engine is a purpose-built specialized feature in `source/ux/app-ops/{feature}/job-work/`, not derived from `form-panel` or standard shell components. It is launched from the ops dashboard. It renders `Workflow -> Task -> Question` traversal for execution. Design principles: app is invisible, crew stays focused on job and safety, large touch targets, minimal cognitive load.
 
 #### 9.1.4 Rule
 
@@ -475,25 +483,34 @@ source/
     │   │   └── icons/               — icon library
     │   ├── views/                   — UX projection types (domain → display shape)
     │   ├── stores/                  — reactive stores
-    │   ├── features/                — shared features
+    │   │   ├── app-state.ts
+    │   │   ├── session-state.ts
+    │   │   └── dashboard-state.ts
+    │   ├── features/                — shared features (`common/features/{feature}`)
+    │   │   ├── workflow-builder/    — shared workflow authoring/editing feature
     │   │   ├── job-assessment/      — guided job assessment UX
-    │   │   └── customer-prospect    — guided new customer + initial job assessment UX
+    │   │   └── customer-prospect/   — guided new customer + initial job assessment UX
     │   └── components/
     │       ├── shell/               — auth-guard, content
     │       ├── login/               — login screen
     │       ├── forms/               — form-panel (AppForm)
     │       ├── controls/            — Kobalte-based UI primitives
     │       ├── charts/              — PieChart, BarChart, LineChart, Sparkline
-    │       ├── dashboard/           — dashboard layout foundation
+    │       ├── dashboard/           — shared dashboard harness + layout foundation
     │       └── widgets/             — widget catalog
     ├── app-admin/
-    │   ├── workflow-builder/        — question, task, and workflow builder UX
-    │   └── job-planning/            — guided job planning UX
-    │       
+    │   ├── app.tsx
+    │   ├── dashboard-default.json   — default dashboard layout for app-admin
+    │   └── {feature}/               — specialized admin features (`{app}/{feature}`)
     ├── app-customer/
+    │   ├── app.tsx
+    │   ├── dashboard-default.json   — default dashboard layout for app-customer
+    │   └── {feature}/               — specialized customer features (`{app}/{feature}`)
     └── app-ops/
-        └── job-work/                — guided field execution UX 
-```text
+        ├── app.tsx
+        ├── dashboard-default.json   — default dashboard layout for app-ops
+        └── job-work/                — guided job work UX
+```
 
 Everything in `source/ux/common/` must be adaptive — usable across all three apps and all viewport sizes. Mobile-only or desktop-only components do not belong in `common/`.
 
@@ -527,11 +544,11 @@ Dashboard
 
 No row collapse on small viewport. Horizontal swipe per row. Vertical scroll on the outer column.
 
-**`source/ux/app-{admin|ops|customer}`**
+**`source/ux/app-{admin|ops|customer}/dashboard-default.json`**
 
-Layout is data-driven via `dashboard.jsonc`. Not hardcoded. May be overridden per user in future — for now a single default config per app.
+Layout is data-driven via app-local `dashboard-default.json`, rendered by the shared dashboard harness in `source/ux/common/components/dashboard/`, and hydrated into `DashboardState` (`source/ux/common/stores/dashboard-state.ts`). Not hardcoded. May be overridden per user in future — for now a single default config per app.
 
-```jsonc
+```json
 {
   "header": {
     "widgets": {
@@ -564,14 +581,14 @@ UX projection types are shapes that exist because the domain model does not surf
 
 ## 10. Specialized Application Features
 
-### 10.1 Job Workflow Execution Components (app-ops)
+### 10.1 Job Work Execution Components (app-ops)
 
-All in `source/ux/app-ops/job-workflow/`. Mobile-only — does not belong in `common/`.
+All in `source/ux/app-ops/{feature}/job-work/`. Mobile-only — does not belong in `common/`.
 
 | Component                          | Purpose                                 |
 | ---------------------------------- | --------------------------------------- |
-| `job-workflow-runner.tsx`          | Top-level runner, state machine         |
-| `job-workflow-progress.tsx`        | Route bar — tasks + questions remaining |
+| `job-work-runner.tsx`              | Top-level runner, state machine         |
+| `job-work-progress.tsx`            | Route bar — tasks + questions remaining |
 | `question-screen.tsx`              | Per-question renderer                   |
 | `answers/boolean-answer.tsx`       | Full-width YES/NO buttons               |
 | `answers/text-answer.tsx`          | Large text input                        |
@@ -579,11 +596,11 @@ All in `source/ux/app-ops/job-workflow/`. Mobile-only — does not belong in `co
 | `answers/single-select-answer.tsx` | Large tappable tiles                    |
 | `answers/multi-select-answer.tsx`  | Tappable tiles with checkmark           |
 | `answer-attachment.tsx`            | Camera-first attachment trigger         |
-| `job-workflow-nav.tsx`             | BACK + NEXT, forward-biased             |
+| `job-work-nav.tsx`                 | BACK + NEXT, forward-biased             |
 | `task-complete.tsx`                | Task arrival screen                     |
-| `job-workflow-complete.tsx`        | Final arrival screen                    |
+| `job-work-complete.tsx`            | Final arrival screen                    |
 
-### 10.2 Job Assessment & Planning (app-ops)
+### 10.2 Job Assessment & Plan (app-ops)
 
 #### 10.2.1 Device Target
 
@@ -591,18 +608,18 @@ All in `source/ux/app-ops/job-workflow/`. Mobile-only — does not belong in `co
 | --------------------------- | ----------- | --------------- |
 | Initial assessment (remote) | `app-admin` | Desktop, Tablet |
 | Onsite assessment           | `app-ops`   | Desktop, Tablet |
-| Job planning                | `app-ops`   | Desktop, Tablet |
-| Job execution               | `app-ops`   | Mobile          |
+| Job plan                    | `app-ops`   | Desktop, Tablet |
+| Job work                    | `app-ops`   | Mobile          |
 
 #### 10.2.2 Specialized UX
 
-Assessment and planning are purpose-built guided flows, not generic admin forms. Both involve structured data capture in semi-field conditions.
+Job assessment and job plan are purpose-built guided flows, not generic admin forms. Both involve structured data capture in semi-field conditions.
 
 Assessment involves: location capture, photos, risk notes, workflow selection, workflow modification. Tablet is a practical requirement for the onsite phase.
 
 #### 10.2.3 Workflow Editing in Context
 
-Assessment and planning may modify job-specific workflow clones. The editor operates on a cloned `Workflow` record (not the canonical template) scoped to the job context. The canonical `Workflow` editor lives in `app-admin/workflow/`.
+Job assessment and job plan may modify job-specific workflow clones. The editor operates on a cloned `Workflow` record (not the canonical template) scoped to the job context. The canonical `Workflow` builder feature lives in `source/ux/common/features/workflow-builder/` and is mounted by app routes where needed.
 
 Per `domain-model.md §2.5`:
 
@@ -663,9 +680,9 @@ Per `domain-model.md §2.5`:
 | `ServiceForm`       | Required asset types, workflow candidate tags                |
 | `ChemicalForm`      | Signal word severity, restricted use, SDS url                |
 
-### 10.7 Ops Workflow Interaction Contract (app-ops)
+### 10.7 Job Work Interaction Contract (app-ops)
 
-A job's work effort is assessed, planned and executed in a prescribed order. Services that swarmAg offer require the physical labor of several crew members, and sometimes multiple crews. Expensive and dangerous vehicles, equipment, tools, and chemicals are essential to those services. Prescribing the order of work, specifying specific tasks to perform, and ensuring protocols for safety and efficiency are followed, with consistent, repeatable results is the mandate of the swarmAg Operations Mobile Application.
+A job's work effort is assessed, planned, and executed in a prescribed order. Canonical model: `Job: [JobAssessment, JobPlan, JobWork]`. Colloquial UX hub: `job: [assessment, plan, work]`. Services that swarmAg offer require the physical labor of several crew members, and sometimes multiple crews. Expensive and dangerous vehicles, equipment, tools, and chemicals are essential to those services. Prescribing the order of work, specifying specific tasks to perform, and ensuring protocols for safety and efficiency are followed, with consistent, repeatable results is the mandate of the swarmAg Operations Mobile Application.
 
 To automate and measure as much of the effort as possible a job is subdivided into service workflows. For example, a customer requires pesticide spray service of 2 pastures. swarmAg assigns 2 pilots and 2 drones to the job. Each pilot is assigned job work with several workflows, 3 of those workflows are preflight, chemical-load, and spray. Each of those has steps unique to it. Preflight will check battery capacity for all batteries, connect drone communications, etc. Each of the tasks has a checklist to advise or collect information. Each item in the checklist is just a question. Order is essential of course. You don't want to spray before preflight. You can't connection communications until the drone has power.
 
@@ -719,7 +736,7 @@ Every question screen has an attachment zone below the answer, above navigation.
 Camera is the dominant affordance. `requiresNote` on `SelectOption` gates NEXT
 until an attachment or note is provided.
 
-### 10.7.5 Screen Layout
+#### 10.7.5 Screen Layout
 
 ```
 ┌─────────────────────────────────┐
@@ -733,6 +750,7 @@ until an attachment or note is provided.
 │                                 │
 │  ┌───────────────────────────┐  │
 │  │ Note                      │  │
+│  │                           │  │
 │  │                           │  │
 │  └───────────────────────────┘  │
 │  📎 Attach  📸 Picture  📍GEO   │
