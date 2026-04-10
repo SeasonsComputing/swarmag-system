@@ -26,11 +26,11 @@ This document defines UX-layer architecture for swarmAg applications. It governs
 
 ## 2. Application Runtime Profiles
 
-| App          | Runtime                      | Storage                            | Deployment           |
-| ------------ | ---------------------------- | ---------------------------------- | -------------------- |
-| **Admin**    | Browser (desktop/tablet PWA) | Supabase SDK                       | Netlify CDN (PWA)    |
-| **Ops**      | Browser (mobile PWA)         | IndexedDB offline, Supabase online | Netlify CDN (PWA)    |
-| **Customer** | Browser (static site)        | Supabase SDK (read-only)           | Netlify CDN (static) |
+| App          | Runtime                      | Storage                            | Deployment        |
+| ------------ | ---------------------------- | ---------------------------------- | ----------------- |
+| **Admin**    | Browser (desktop/tablet PWA) | Supabase SDK                       | Netlify CDN (PWA) |
+| **Ops**      | Browser (mobile PWA)         | IndexedDB offline, Supabase online | Netlify CDN (PWA) |
+| **Customer** | Browser (desktop/tablet PWA) | Supabase SDK                       | Netlify CDN (PWA) |
 
 ## 3. Technology Stack
 
@@ -220,14 +220,16 @@ Each app root (`source/ux/app-{admin|customer|ops}/app.tsx`) composes the same s
 
 ```text
 app.tsx
-├── /login route       -> Login
-├── /dashboard route   -> AuthGuard -> Content -> Dashboard
-└── /{feature} or /{domain}/{operation}[/{id}] -> AuthGuard -> Content -> page feature
+└── bootstrap()
+    ├── Login              — unauthenticated entry point
+    ├── AuthGuard          — session enforcement, redirect to /login
+    ├── Content            — authenticated page frame
+    └── Dashboard          — primary navigation surface
 ```
 
-`login`, `auth-guard`, `content`, and shared stores live in `source/ux/common/`.
+`Login`, `AuthGuard`, `Content`, and shared stores live in `source/ux/common/`. App packages provide only dashboard configuration (`dashboard-default.json`) and app-specific routes, widgets, and features.
 
-Dashboard harness is shared and belongs in `source/ux/common/components/dashboard/`. App packages provide only dashboard configuration (`dashboard-default.json`) and app-specific widgets/features.
+Dashboard harness is shared and belongs in `source/ux/common/components/dashboard/`.
 
 #### 8.1.1 Auth Guard
 
@@ -243,20 +245,25 @@ dashboard → domain page → back to dashboard
 
 ### 8.2 Routing
 
-Each app defines its own route tree using TanStack Router declared in `app.tsx`. There is no shared route registry.
+Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/ux/common/components/shell/app.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
+
+A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
 
 #### 8.2.1 Route Shape
 
 ```text
-/             → redirect to /dashboard or /login
-/login        → login (unauthenticated)
-/dashboard    → dashboard (auth-guarded)
-/{feature}                 → specialized feature route (auth-guarded)
-/{domain}/{operation}      → abstraction route (auth-guarded)
-/{domain}/{operation}/{id} → item-scoped abstraction route (auth-guarded)
+/                          → redirect to /dashboard or /login
+/login                     → login (unauthenticated)
+/dashboard                 → dashboard (auth-guarded)
+/{page}                    → page (auth-guarded)
+/{page}/{id}               → item-scoped page (auth-guarded)
+/{page}/{operation}        → operation-scoped page (auth-guarded)
+/{page}/{operation}/{id}   → item-scoped operation page (auth-guarded)
 ```
 
-Examples: `/user/list`, `/user/get/{id}`.
+The first three routes are provided by `bootstrap()` and are common to all apps. App-local `app.tsx` files extend the tree with app-specific pages as the application is built out.
+
+Examples: `/user/list`, `/user/get/{id}`, `/job-runner/{id}`.
 
 #### 8.2.2 Protected Routes
 
@@ -403,11 +410,7 @@ IndexedDB usage is split into two layers:
 
 #### 8.5.2 Application Preferences
 
-Application preferences use a dedicated object store within the local DB.
-
-`app-state.ts` (`@ux/common/stores/app-state.ts`) manages per-app preferences using `makeCrudIndexedDbClient<AppStore>` where `AppStore = Dictionary`.
-
-Preference keys following a standard naming convention usage by app:
+`AppState` (`@ux/common/stores/app-state.ts`) manages per-app preferences — persisted key/value pairs backed by a named IndexedDB object store. Conforms to the Reactive Store Module Pattern (§7.3).
 
 | Key                | Admin | Ops | Customer |
 | ------------------ | ----- | --- | -------- |
@@ -470,6 +473,8 @@ Premature generalization is a violation.
 
 ### 9.2 Source Directory Structure
 
+The following is the normative target structure. Directories not yet present are created as pages are built.
+
 ```text
 source/
 └── ux/
@@ -486,14 +491,8 @@ source/
     │   │   ├── app-state.ts
     │   │   ├── session-state.ts
     │   │   └── dashboard-state.ts
-    │   ├── features/                — shared features (`common/features/{feature}`)
-    │   │   ├── workflow-builder/    — shared workflow authoring/editing feature
-    │   │   ├── job-assessment/      — guided job assessment UX
-    │   │   └── customer-prospect/   — guided new customer + initial job assessment UX
     │   └── components/
     │       ├── shell/               — auth-guard, content
-    │       ├── login/               — login screen
-    │       ├── forms/               — form-panel (AppForm)
     │       ├── controls/            — Kobalte-based UI primitives
     │       ├── charts/              — PieChart, BarChart, LineChart, Sparkline
     │       ├── dashboard/           — shared dashboard harness + layout foundation
@@ -501,15 +500,18 @@ source/
     ├── app-admin/
     │   ├── app.tsx
     │   ├── dashboard-default.json   — default dashboard layout for app-admin
-    │   └── {feature}/               — specialized admin features (`{app}/{feature}`)
+    │   ├── workflow-builder/        — workflow authoring/editing
+    │   ├── job-assessment/          — guided onsite detailed assessment (maps, photos, workflow mods)
+    │   ├── job-planning/            — workflow mods + crew + equipment + chemical assignment
+    │   └── customer-prospect/       — guided new customer + new job + initial assessment
     ├── app-customer/
     │   ├── app.tsx
     │   ├── dashboard-default.json   — default dashboard layout for app-customer
-    │   └── {feature}/               — specialized customer features (`{app}/{feature}`)
+    │   └── customer-report          — specialized report for customer
     └── app-ops/
         ├── app.tsx
         ├── dashboard-default.json   — default dashboard layout for app-ops
-        └── job-work/                — guided job work UX
+        └── job-runner/              — guided job execution engine
 ```
 
 Everything in `source/ux/common/` must be adaptive — usable across all three apps and all viewport sizes. Mobile-only or desktop-only components do not belong in `common/`.
@@ -551,33 +553,34 @@ Layout is data-driven via app-local `dashboard-default.json`, rendered by the sh
 ```json
 {
   "header": {
-    "widgets": {
-      "swarmag": { "type": "BrandWidget", "size": "landscape", "settings": {} }
-    }
+    "widgets": [
+      { "key": "brand", "type": "BrandWidget", "size": "landscape", "settings": {} }
+    ]
   },
-  "rows": {
-    "at-a-glance": {
-      "type": "standard",
+  "rows": [
+    {
+      "key": "at-a-glance",
+      "size": "standard",
       "label": "Operations at-a-glance",
-      "widgets": {
-        "upcoming-jobs": { "type": "UpcomingJobsWidget", "size": "landscape", "settings": {} },
-        "asset-status": { "type": "AssetStatusWidget", "size": "square", "settings": {} }
-      }
+      "widgets": [
+        { "key": "upcoming-jobs", "type": "UpcomingJobsWidget", "size": "landscape", "settings": {} },
+        { "key": "asset-status", "type": "AssetStatusWidget", "size": "square", "settings": {} }
+      ]
     }
-  }
+  ]
 }
 ```
 
 ### 9.5 Views Catalog
 
-UX projection types are shapes that exist because the domain model does not surface cleanly to the UI as-is. No infrastructure imports, no SolidJS imports. Pure types only.
+UX projection types — shapes that exist because the domain model does not surface cleanly to the UI as-is. No infrastructure imports, no SolidJS imports. Pure types only. Files follow the `{domain}-views.ts` naming convention.
 
-| File                 | Types                                          | Purpose                                             |
-| -------------------- | ---------------------------------------------- | --------------------------------------------------- |
-| `views/job.ts`       | `JobSummary`, `JobDefinition`                  | Job display projections (exists)                    |
-| `views/workflow.ts`  | `WorkflowView`                                 | Ordered tasks + questions resolved for renderer     |
-| `views/dashboard.ts` | `DashboardConfig`, `DashboardRow`, `WidgetRef` | dashboard.jsonc schema types                        |
-| `views/question.ts`  | `QuestionView`                                 | Discriminated union flattened for workflow renderer |
+| File                 | Types                                                                 | Purpose                                             |
+| -------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
+| `job-views.ts`       | `JobSummary`, `JobDefinition`                                         | Job display projections                             |
+| `dashboard-views.ts` | `DashboardView`, `DashboardHeader`, `DashboardRow`, `DashboardWidget` | Dashboard layout schema types                       |
+| `workflow-views.ts`  | `WorkflowView`                                                        | Ordered tasks + questions resolved for renderer     |
+| `question-views.ts`  | `QuestionView`                                                        | Discriminated union flattened for workflow renderer |
 
 ## 10. Specialized Application Features
 
@@ -604,12 +607,12 @@ All in `source/ux/app-ops/{feature}/job-work/`. Mobile-only — does not belong 
 
 #### 10.2.1 Device Target
 
-| Phase                       | App         | Primary Device  |
-| --------------------------- | ----------- | --------------- |
-| Initial assessment (remote) | `app-admin` | Desktop, Tablet |
-| Onsite assessment           | `app-ops`   | Desktop, Tablet |
-| Job plan                    | `app-ops`   | Desktop, Tablet |
-| Job work                    | `app-ops`   | Mobile          |
+| Phase                       | App         | Feature Page        | Primary Device           |
+| --------------------------- | ----------- | ------------------- | ------------------------ |
+| Initial assessment (remote) | `app-admin` | `customer-prospect` | Desktop, Tablet          |
+| Onsite assessment           | `app-admin` | `job-assessment`    | Tablet (offline-capable) |
+| Job planning                | `app-admin` | `job-planning`      | Desktop, Tablet          |
+| Job runner                  | `app-ops`   | `job-runner`        | Mobile                   |
 
 #### 10.2.2 Specialized UX
 
@@ -666,19 +669,14 @@ Per `domain-model.md §2.5`:
 
 ### 10.6 Management Forms (app-admin)
 
-| Form                | Key complexity                                               |
-| ------------------- | ------------------------------------------------------------ |
-| `UserForm`          | Role multi-select, status                                    |
-| `CustomerForm`      | Nested contacts editor, sites editor, location picker        |
-| `QuestionForm`      | Type gates field visibility, options editor for select types |
-| `TaskForm`          | Reorderable question list                                    |
-| `WorkflowForm`      | Reorderable task list, version handling                      |
-| `JobForm`           | Customer association, status lifecycle                       |
-| `JobAssessmentForm` | Locations, risks, temporal fields                            |
-| `JobPlanForm`       | Assignments, chemicals, assets, schedule                     |
-| `AssetForm`         | Type association, status                                     |
-| `ServiceForm`       | Required asset types, workflow candidate tags                |
-| `ChemicalForm`      | Signal word severity, restricted use, SDS url                |
+Standard domain pages follow a list → form pattern. Each root abstraction not subsumed by a feature page gets a domain page in `app-admin`.
+
+| Domain Page | Form           | Key complexity                                |
+| ----------- | -------------- | --------------------------------------------- |
+| `/user`     | `UserForm`     | Role multi-select, status                     |
+| `/asset`    | `AssetForm`    | Type association, status                      |
+| `/service`  | `ServiceForm`  | Required asset types, workflow candidate tags |
+| `/chemical` | `ChemicalForm` | Signal word severity, restricted use, SDS url |
 
 ### 10.7 Job Work Interaction Contract (app-ops)
 
