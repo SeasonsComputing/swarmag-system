@@ -117,7 +117,7 @@ api.createJobTitle(job: JobDefinition): string
 
 Returns a display title derived from the job's current status and available phase data. This is a pure client-side computation — no network call. The derivation algorithm is status-driven and defined during jobs UI generation. For the scaffold phase, the method may be stubbed.
 
-`JobDefinition` is defined in `source/ux/common/views/job.ts`.
+`JobDefinition` is defined in `source/ux/common/views/job-views.ts`.
 
 ### 6.3 Provided Infrastructure
 
@@ -451,21 +451,15 @@ IndexedDB usage is split into two layers:
 - session store
 - app state store
 - dashboard state store + dashboard harness
-- shared guided UX features in `common/features/{feature}` (for example `workflow-builder`)
 
 #### 9.1.2 Stays in the app
 
 - dashboard default configuration and app-specific widget composition
-- domain pages
+- domain pages and feature pages
 - app-specific route tree
-- specialized features in `{app}/{feature}`
 - app-specific IndexedDB store instance
 
-#### 9.1.3 Specialized Feature — Ops Crew Job Work Engine
-
-The ops crew `job-work` engine is a purpose-built specialized feature in `source/ux/app-ops/{feature}/job-work/`, not derived from `form-panel` or standard shell components. It is launched from the ops dashboard. It renders `Workflow -> Task -> Question` traversal for execution. Design principles: app is invisible, crew stays focused on job and safety, large touch targets, minimal cognitive load.
-
-#### 9.1.4 Rule
+#### 9.1.3 Rule
 
 A component moves to `common/` when a second app needs it — not before.
 
@@ -507,7 +501,7 @@ source/
     ├── app-customer/
     │   ├── app.tsx
     │   ├── dashboard-default.json   — default dashboard layout for app-customer
-    │   └── customer-report          — specialized report for customer
+    │   └── customer-report/         — specialized report for customer
     └── app-ops/
         ├── app.tsx
         ├── dashboard-default.json   — default dashboard layout for app-ops
@@ -584,14 +578,16 @@ UX projection types — shapes that exist because the domain model does not surf
 
 ## 10. Specialized Application Features
 
-### 10.1 Job Work Execution Components (app-ops)
+The following catalogs describe the target feature set. Components not yet present are created as features are built.
 
-All in `source/ux/app-ops/{feature}/job-work/`. Mobile-only — does not belong in `common/`.
+### 10.1 Job Runner Components (app-ops)
+
+All in `source/ux/app-ops/job-runner/`. Mobile-only — does not belong in `common/`.
 
 | Component                          | Purpose                                 |
 | ---------------------------------- | --------------------------------------- |
-| `job-work-runner.tsx`              | Top-level runner, state machine         |
-| `job-work-progress.tsx`            | Route bar — tasks + questions remaining |
+| `runner.tsx`                       | Top-level runner, state machine         |
+| `progress.tsx`                     | Route bar — tasks + questions remaining |
 | `question-screen.tsx`              | Per-question renderer                   |
 | `answers/boolean-answer.tsx`       | Full-width YES/NO buttons               |
 | `answers/text-answer.tsx`          | Large text input                        |
@@ -599,11 +595,11 @@ All in `source/ux/app-ops/{feature}/job-work/`. Mobile-only — does not belong 
 | `answers/single-select-answer.tsx` | Large tappable tiles                    |
 | `answers/multi-select-answer.tsx`  | Tappable tiles with checkmark           |
 | `answer-attachment.tsx`            | Camera-first attachment trigger         |
-| `job-work-nav.tsx`                 | BACK + NEXT, forward-biased             |
+| `nav.tsx`                          | BACK + NEXT, forward-biased             |
 | `task-complete.tsx`                | Task arrival screen                     |
-| `job-work-complete.tsx`            | Final arrival screen                    |
+| `complete.tsx`                     | Final arrival screen                    |
 
-### 10.2 Job Assessment & Plan (app-ops)
+### 10.2 Job Lifecycle Feature Pages (app-admin)
 
 #### 10.2.1 Device Target
 
@@ -622,7 +618,7 @@ Assessment involves: location capture, photos, risk notes, workflow selection, w
 
 #### 10.2.3 Workflow Editing in Context
 
-Job assessment and job plan may modify job-specific workflow clones. The editor operates on a cloned `Workflow` record (not the canonical template) scoped to the job context. The canonical `Workflow` builder feature lives in `source/ux/common/features/workflow-builder/` and is mounted by app routes where needed.
+Job assessment and job planning may modify job-specific workflow clones. The editor operates on a cloned `Workflow` record (not the canonical template) scoped to the job context. The canonical workflow builder feature lives in `source/ux/app-admin/workflow-builder/` and is mounted by app routes where needed.
 
 Per `domain-model.md §2.5`:
 
@@ -632,11 +628,11 @@ Per `domain-model.md §2.5`:
 
 ### 10.3 Dashboard Components
 
-| Component      | Purpose                                     |
-| -------------- | ------------------------------------------- |
-| `Dashboard`    | Root layout, row renderer, scroll container |
-| `DashboardRow` | Horizontal swipe row (short\|standard)      |
-| `Widget`       | Widget container (square\|landscape)        |
+| Component         | Purpose                                     |
+| ----------------- | ------------------------------------------- |
+| `Dashboard`       | Root layout, row renderer, scroll container |
+| `DashboardRow`    | Horizontal swipe row (short\|standard)      |
+| `DashboardWidget` | Widget container (square\|landscape)        |
 
 ### 10.4 Widget Catalog
 
@@ -678,7 +674,7 @@ Standard domain pages follow a list → form pattern. Each root abstraction not 
 | `/service`  | `ServiceForm`  | Required asset types, workflow candidate tags |
 | `/chemical` | `ChemicalForm` | Signal word severity, restricted use, SDS url |
 
-### 10.7 Job Work Interaction Contract (app-ops)
+### 10.7 Job Runner Interaction Contract (app-ops)
 
 A job's work effort is assessed, planned, and executed in a prescribed order. Canonical model: `Job: [JobAssessment, JobPlan, JobWork]`. Colloquial UX hub: `job: [assessment, plan, work]`. Services that swarmAg offer require the physical labor of several crew members, and sometimes multiple crews. Expensive and dangerous vehicles, equipment, tools, and chemicals are essential to those services. Prescribing the order of work, specifying specific tasks to perform, and ensuring protocols for safety and efficiency are followed, with consistent, repeatable results is the mandate of the swarmAg Operations Mobile Application.
 
