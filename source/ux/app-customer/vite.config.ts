@@ -16,6 +16,7 @@ export default defineConfig({
       { find: /^@solid-js\/jsx-runtime$/, replacement: 'solid-js/jsx-runtime' },
       { find: /^@solid-js\/store$/, replacement: 'solid-js/store' },
       { find: /^@solid-js\/web$/, replacement: 'solid-js/web' },
+      { find: /^@chart-js$/, replacement: 'chart.js' },
       { find: /^@supabase\/client$/, replacement: '@supabase/supabase-js' },
       { find: /^@idb$/, replacement: 'idb' },
       { find: /^@core\/(.+)$/, replacement: `${resolve(root, 'source/core')}/$1` },

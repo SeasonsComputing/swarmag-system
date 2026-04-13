@@ -52,7 +52,7 @@ The system is built on the following technology stack:
 | **Netlify**  | Static hosting, DNS          | SPA delivery, SSL certificates, DNS management                  |
 | **Supabase** | Backend services, Data, Auth | Edge Functions, PostgreSQL, Storage buckets, JWT authentication |
 | **GitHub**   | Version control, CI/CD       | Source control, Build pipelines                                 |
-| **SolidJS**  | Application UX               | PWA, SPA, TanStack, Kobalte, Vanilla CSS                        |
+| **SolidJS**  | Application UX               | PWA, SPA, TanStack, Kobalte, Chart.js (via AppChart), Vanilla CSS |
 | **Deno**     | TypeScript runtime           | Development, testing, backend edge functions                    |
 
 ### 2.1 Platform Responsibilities

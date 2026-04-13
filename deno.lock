@@ -5,6 +5,7 @@
     "jsr:@std/internal@^1.0.12": "1.0.12",
     "npm:@supabase/supabase-js@2": "2.89.0",
     "npm:@tanstack/solid-router@1.168.6": "1.168.6_solid-js@1.9.12",
+    "npm:chart.js@^4.4.0": "4.5.1",
     "npm:dprint@*": "0.51.1",
     "npm:idb@8": "8.0.3",
     "npm:markdownlint-cli2@0.13.0": "0.13.0",
@@ -261,6 +262,9 @@
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
       ]
+    },
+    "@kurkle/color@0.3.4": {
+      "integrity": "sha512-M5UknZPHRu3DEDWoipU6sE8PdkZ6Z/S+v4dD+Ke8IaNlpdSQah50lz1KtcFBa2vsdOnwbbnxJwVM4wty6udA5w=="
     },
     "@napi-rs/wasm-runtime@1.1.1": {
       "integrity": "sha512-p64ah1M1ld8xjWv3qbvFwHiFVWrq1yFvV4f7w+mzaqiR4IlSgkqhcRdHwsGgomwzBH51sRY4NEowLxnaBjcW/A==",
@@ -677,6 +681,12 @@
     },
     "caniuse-lite@1.0.30001781": {
       "integrity": "sha512-RdwNCyMsNBftLjW6w01z8bKEvT6e/5tpPVEgtn22TiLGlstHOVecsX2KHFkD5e/vRnIE4EGzpuIODb3mtswtkw=="
+    },
+    "chart.js@4.5.1": {
+      "integrity": "sha512-GIjfiT9dbmHRiYi6Nl2yFCq7kkwdkp1W/lp2J99rX0yo9tgJGn3lKQATztIjb5tVtevcBtIdICNWqlq5+E8/Pw==",
+      "dependencies": [
+        "@kurkle/color"
+      ]
     },
     "convert-source-map@2.0.0": {
       "integrity": "sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg=="
@@ -1243,6 +1253,7 @@
     "dependencies": [
       "jsr:@std/assert@1.0.19",
       "npm:@tanstack/solid-router@1.168.6",
+      "npm:chart.js@^4.4.0",
       "npm:idb@8",
       "npm:solid-js@1.9.12",
       "npm:vite-plugin-solid@2.11.11",

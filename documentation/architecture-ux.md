@@ -40,6 +40,7 @@ This document defines UX-layer architecture for swarmAg applications. It governs
 | Routing       | TanStack Solid-Router           |
 | Data Fetching | TanStack Query                  |
 | UI Primitives | Kobalte (accessible components) |
+| Charting      | Chart.js (via AppChart adapter) |
 | Styling       | Vanilla CSS (no preprocessor)   |
 | Build         | Vite                            |
 | Runtime       | Modern browsers (ES2022+)       |
@@ -62,7 +63,7 @@ The system includes three SolidJS applications:
 | **Ops**      | Field execution                   | Operations crews |
 | **Customer** | Scheduling and status (read-only) | Customers        |
 
-All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Shared infrastructure lives in `source/ux/common/`.
+All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Chart rendering is provided through `AppChart` (design-system primitive) with Chart.js as an implementation detail behind `ChartWidget`. Shared infrastructure lives in `source/ux/common/`.
 
 ## 6. API Namespace Integration
 
@@ -152,16 +153,21 @@ The foundation provides:
 
 **Convenience Barrels**
 
-- `@core/std` — Standard types (Id, When, Dictionary)
-- `@ux/api` — Composed API namespace
+| Import       | Purpose                                                           |
+| ------------ | ----------------------------------------------------------------- |
+| `@core/std`  | Standard types (Id, When, Dictionary)                             |
+| `@core/stdx` | Makers and wrappers to runtime project code from standard types   |
+| `@ux/api`    | Composed API namespace                                            |
 
 **Aliases**
 
-- `@core/*` — Core modules
-- `@domain/*` — Domain modules
-- `@ux/common/*` — Shared UX modules
-- `@ux/config/*` — Configuration module
-- `@ux/app-{admin|ops|customer}/*` — Application modules
+| Alias                            | Purpose              |
+| -------------------------------- | -------------------- |
+| `@core/*`                        | Core modules         |
+| `@domain/*`                      | Domain modules       |
+| `@ux/common/*`                   | Shared UX modules    |
+| `@ux/config/*`                   | Configuration module |
+| `@ux/app-{admin|ops|customer}/*` | Application modules  |
 
 #### 7.1.2 Violations
 
