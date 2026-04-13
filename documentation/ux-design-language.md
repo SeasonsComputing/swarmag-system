@@ -111,23 +111,22 @@ toggling.
 
 All tokens use `--sa-` prefix. Sub-namespaces:
 
-| Prefix           | Scope                                     |
-| ---------------- | ----------------------------------------- |
-| `--sa-p-`        | Primitives (internal, not for components) |
-| `--sa-color-`    | Semantic colors                           |
-| `--sa-bg-`       | Background surfaces                       |
-| `--sa-text-`     | Text colors                               |
-| `--sa-border-`   | Borders                                   |
-| `--sa-shadow-`   | Shadows / elevation                       |
-| `--sa-gradient-` | Gradients                                 |
-| `--sa-font-`     | Typography                                |
-| `--sa-radius-`   | Border radius                             |
-| `--sa-space-`    | Spacing scale                             |
-| `--sa-dash-`     | Dashboard layout spacing                  |
-| `--sa-form-`     | Form container spacing                    |
-| `--sa-field-`    | Field group spacing                       |
-| `--sa-wf-`       | Workflow execution (app-ops only)         |
-| `--sa-touch-`    | Touch target sizing                       |
+| Prefix           | Scope                                               |
+| ---------------- | --------------------------------------------------- |
+| `--sa-p-`        | Primitives (internal, not for components)           |
+| `--sa-color-`    | Semantic colors                                     |
+| `--sa-bg-`       | Background surfaces                                 |
+| `--sa-text-`     | Text colors                                         |
+| `--sa-border-`   | Borders                                             |
+| `--sa-shadow-`   | Shadows / elevation                                 |
+| `--sa-gradient-` | Gradients                                           |
+| `--sa-font-`     | Typography                                          |
+| `--sa-radius-`   | Border radius                                       |
+| `--sa-space-`    | Spacing scale                                       |
+| `--sa-dash-`     | Dashboard layout spacing                            |
+| `--sa-form-`     | Form container spacing                              |
+| `--sa-field-`    | Field group spacing                                 |
+| `--sa-touch-`    | Touch target sizing                                 |
 
 ### 4.5 Design System Locations
 
@@ -307,13 +306,22 @@ backdrop and a rounded card container. Implemented with Kobalte `Dialog`.
 
 ### 8.3 Chart Primitives
 
-Chart library. (Candidates: D3, Chart.js, echarts.)
+Charting is standardized through `AppChart`. Chart.js is the selected internal
+engine and is not consumed directly by application views or widgets.
 
-| Component   | Purpose                            |
-| ----------- | ---------------------------------- |
-| `PieChart`  | Composition at a point in time     |
-| `BarChart`  | Frequency / volume over categories |
-| `LineChart` | Trend over rolling time period     |
-| `Sparkline` | Inline mini trend                  |
+Contract:
+
+- `ChartWidget` composes `AppChart`; it does not use Chart.js directly.
+- `AppChart` applies design-language tokens (color, typography, spacing, motion).
+- `AppChart` presents a component contract style consistent with Kobalte usage.
+- Chart.js remains replaceable without changing `ChartWidget` or page APIs.
+
+| Component   | Purpose                             |
+| ----------- | ----------------------------------- |
+| `AppChart`  | Token-aware chart primitive wrapper |
+| `PieChart`  | Composition at a point in time      |
+| `BarChart`  | Frequency / volume over categories  |
+| `LineChart` | Trend over rolling time period      |
+| `Sparkline` | Inline mini trend                   |
 
 _End of UX Design Language Document_

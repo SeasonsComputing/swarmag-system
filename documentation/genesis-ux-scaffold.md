@@ -40,6 +40,7 @@ Use Deno-native dependency resolution:
 deno cache --reload \
   npm:solid-js \
   npm:@tanstack/solid-router \
+  npm:chart.js \
   npm:vite \
   npm:vite-plugin-solid
 ```
@@ -47,7 +48,7 @@ deno cache --reload \
 Then verify imports resolve:
 
 ```bash
-deno eval "await import('npm:solid-js'); await import('npm:@tanstack/solid-router'); await import('npm:vite'); await import('npm:vite-plugin-solid')"
+deno eval "await import('npm:solid-js'); await import('npm:@tanstack/solid-router'); await import('npm:chart.js'); await import('npm:vite'); await import('npm:vite-plugin-solid')"
 ```
 
 If preflight fails, stop and fix dependency resolution before scaffold

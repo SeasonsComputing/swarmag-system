@@ -31,6 +31,7 @@
     "@solid-js/store": "npm:solid-js@1.9.12/store",
     "@solid-js/web": "npm:solid-js@1.9.12/web",
     "@tanstack/solid-router": "npm:@tanstack/solid-router@1.168.6",
+    "@chart-js": "npm:chart.js@^4.4.0",
     "vite": "npm:vite@8.0.3",
     "vite-plugin-solid": "npm:vite-plugin-solid@2.11.11"
   },
@@ -45,7 +46,7 @@
     // ────────────────────────────────────────────────────────────────────────────
 
     "check": "deno task check:guards && deno task check:types && deno task check:lint",
-    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:ux-state && deno task guard:secrets",
+    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:ux-state && deno task guard:chart && deno task guard:secrets",
     "check:types": "deno check --lock=deno.lock --frozen source/**/*.ts source/**/*.tsx",
     "check:lint": "deno task lint",
     "check:domain-genesis": "deno task guard:domain-style && deno task guard:core-std-types && deno check --lock=deno.lock --frozen source/domain/**/*.ts && deno lint source/domain/**/*.ts",
@@ -80,6 +81,7 @@
     "guard:domain-style": "deno run --allow-read source/devops/guards/guard-domain-style.ts",
     "guard:core-std-types": "deno run --allow-read source/devops/guards/guard-core-std-types.ts",
     "guard:ux-state": "deno run --allow-read source/devops/guards/guard-ux-state.ts",
+    "guard:chart": "deno run --allow-read source/devops/guards/guard-chart.ts",
     "guard:secrets": "deno run --allow-read source/devops/scripts/validate-secrets.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
