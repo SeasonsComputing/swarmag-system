@@ -7,7 +7,7 @@ import { Dictionary } from '@core/std'
 /** A single dashboard widget reference with display size and component type. */
 export type DashboardWidget = {
   key: string
-  size: 'square' | 'landscape'
+  shape: 'square' | 'landscape'
   type: string
   settings: Dictionary
 }
