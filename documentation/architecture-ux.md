@@ -153,21 +153,21 @@ The foundation provides:
 
 **Convenience Barrels**
 
-| Import       | Purpose                                                           |
-| ------------ | ----------------------------------------------------------------- |
-| `@core/std`  | Standard types (Id, When, Dictionary)                             |
-| `@core/stdx` | Makers and wrappers to runtime project code from standard types   |
-| `@ux/api`    | Composed API namespace                                            |
+| Import       | Purpose                                                         |
+| ------------ | --------------------------------------------------------------- |
+| `@core/std`  | Standard types (Id, When, Dictionary)                           |
+| `@core/stdx` | Makers and wrappers to runtime project code from standard types |
+| `@ux/api`    | Composed API namespace                                          |
 
 **Aliases**
 
-| Alias                            | Purpose              |
-| -------------------------------- | -------------------- |
-| `@core/*`                        | Core modules         |
-| `@domain/*`                      | Domain modules       |
-| `@ux/common/*`                   | Shared UX modules    |
-| `@ux/config/*`                   | Configuration module |
-| `@ux/app-{admin|ops|customer}/*` | Application modules  |
+| Alias           | Purpose              |
+| --------------- | -------------------- |
+| `@core/*`       | Core modules         |
+| `@domain/*`     | Domain modules       |
+| `@ux/common/*`  | Shared UX modules    |
+| `@ux/config/*`  | Configuration module |
+| `@ux/app-{admin | ops                  |
 
 #### 7.1.2 Violations
 
@@ -554,7 +554,7 @@ Layout is data-driven via app-local `dashboard-default.json`, rendered by the sh
 {
   "header": {
     "widgets": [
-      { "key": "brand", "type": "BrandWidget", "size": "landscape", "settings": {} }
+      { "key": "brand", "type": "BrandWidget", "shape": "landscape", "settings": {} }
     ]
   },
   "rows": [
@@ -563,8 +563,8 @@ Layout is data-driven via app-local `dashboard-default.json`, rendered by the sh
       "size": "standard",
       "label": "Operations at-a-glance",
       "widgets": [
-        { "key": "upcoming-jobs", "type": "UpcomingJobsWidget", "size": "landscape", "settings": {} },
-        { "key": "asset-status", "type": "AssetStatusWidget", "size": "square", "settings": {} }
+        { "key": "upcoming-jobs", "type": "UpcomingJobsWidget", "shape": "landscape", "settings": {} },
+        { "key": "asset-status", "type": "AssetStatusWidget", "shape": "square", "settings": {} }
       ]
     }
   ]

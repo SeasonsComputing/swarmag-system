@@ -111,22 +111,22 @@ toggling.
 
 All tokens use `--sa-` prefix. Sub-namespaces:
 
-| Prefix           | Scope                                               |
-| ---------------- | --------------------------------------------------- |
-| `--sa-p-`        | Primitives (internal, not for components)           |
-| `--sa-color-`    | Semantic colors                                     |
-| `--sa-bg-`       | Background surfaces                                 |
-| `--sa-text-`     | Text colors                                         |
-| `--sa-border-`   | Borders                                             |
-| `--sa-shadow-`   | Shadows / elevation                                 |
-| `--sa-gradient-` | Gradients                                           |
-| `--sa-font-`     | Typography                                          |
-| `--sa-radius-`   | Border radius                                       |
-| `--sa-space-`    | Spacing scale                                       |
-| `--sa-dash-`     | Dashboard layout spacing                            |
-| `--sa-form-`     | Form container spacing                              |
-| `--sa-field-`    | Field group spacing                                 |
-| `--sa-touch-`    | Touch target sizing                                 |
+| Prefix           | Scope                                     |
+| ---------------- | ----------------------------------------- |
+| `--sa-p-`        | Primitives (internal, not for components) |
+| `--sa-color-`    | Semantic colors                           |
+| `--sa-bg-`       | Background surfaces                       |
+| `--sa-text-`     | Text colors                               |
+| `--sa-border-`   | Borders                                   |
+| `--sa-shadow-`   | Shadows / elevation                       |
+| `--sa-gradient-` | Gradients                                 |
+| `--sa-font-`     | Typography                                |
+| `--sa-radius-`   | Border radius                             |
+| `--sa-space-`    | Spacing scale                             |
+| `--sa-dash-`     | Dashboard layout spacing                  |
+| `--sa-form-`     | Form container spacing                    |
+| `--sa-field-`    | Field group spacing                       |
+| `--sa-touch-`    | Touch target sizing                       |
 
 ### 4.5 Design System Locations
 

@@ -31,29 +31,29 @@ import { Config } from '@ux/config/ux-config.ts'
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** Movement of widgets in the layout */
-type MoveDirection = 'backward' | 'forward'
+export type MoveDirection = 'backward' | 'forward'
 
 /** Widget contract */
-interface DashboardWidgetsContract {
-  add(rowId: string | null, widget: DashboardWidget): Promise<void>
-  update(rowId: string | null, widget: DashboardWidget): Promise<void>
-  remove(rowId: string | null, key: string): Promise<void>
-  move(rowId: string | null, key: string, direction: MoveDirection): Promise<void>
+export interface DashboardWidgetsContract {
+  add(rowKey: string | null, widget: DashboardWidget): Promise<void>
+  update(rowKey: string | null, widget: DashboardWidget): Promise<void>
+  remove(rowKey: string | null, widgetKey: string): Promise<void>
+  move(rowKey: string | null, widgetKey: string, direction: MoveDirection): Promise<void>
 }
 
 /** Header contract */
-interface DashboardHeaderContract {
+export interface DashboardHeaderContract {
   add(widget: DashboardWidget): Promise<void>
   update(widget: DashboardWidget): Promise<void>
-  remove(key: string): Promise<void>
-  move(key: string, direction: MoveDirection): Promise<void>
+  remove(widgetKey: string): Promise<void>
+  move(widgetKey: string, direction: MoveDirection): Promise<void>
 }
 
 /** Row contract */
-interface DashboardRowContract {
+export interface DashboardRowsContract {
   add(row: DashboardRow): Promise<void>
-  remove(key: string): Promise<void>
-  move(key: string, direction: MoveDirection): Promise<void>
+  remove(rowKey: string): Promise<void>
+  move(rowKey: string, direction: MoveDirection): Promise<void>
 }
 
 // ───────────────────────────────────────────────────────────────────────────────
@@ -61,6 +61,7 @@ interface DashboardRowContract {
 // ───────────────────────────────────────────────────────────────────────────────
 
 const DASHBOARD_STORE = 'DashboardViewStore'
+const DASHBOARD_SINGLETON = '#dashboardSingleton'
 const NULL_VIEW: DashboardView = { header: { widgets: [] }, rows: [] }
 
 /** Dashboard in-memory store */
@@ -71,8 +72,8 @@ async function dashboardInit(seed: DashboardView): Promise<void> {
   IndexedDb.registerStore(DASHBOARD_STORE)
   try {
     const db = await IndexedDb.connection()
-    const view = await db.get(DASHBOARD_STORE, DASHBOARD_STORE)
-    if (!view) await db.put(DASHBOARD_STORE, seed)
+    const view = await db.get(DASHBOARD_STORE, DASHBOARD_SINGLETON)
+    if (!view) await db.put(DASHBOARD_STORE, seed, DASHBOARD_SINGLETON)
     setDashboardStore(view ?? seed)
   } catch (error) {
     if (apiError(error)) Config.fail((error as ApiError).message)
@@ -84,7 +85,7 @@ async function dashboardInit(seed: DashboardView): Promise<void> {
 async function dashboardSave(): Promise<void> {
   try {
     const idb = await IndexedDb.connection()
-    await idb.put(DASHBOARD_STORE, { ...dashboardStore, key: DASHBOARD_STORE })
+    await idb.put(DASHBOARD_STORE, { ...dashboardStore, key: DASHBOARD_SINGLETON })
   } catch (error) {
     if (apiError(error)) console.error((error as ApiError).message)
     else console.error(`Dashboard init failed: ${IndexedDb.errorToStatus(error)}`)
@@ -94,16 +95,16 @@ async function dashboardSave(): Promise<void> {
 /** Widgets contract provider */
 const dashboardWidgets: DashboardWidgetsContract = {
   /** Create and persist a widget, then reflect it in local store. */
-  add: async (rowId, widget): Promise<void> => {
-    await dashboardWidgets.update(rowId, widget)
+  add: async (rowKey, widget): Promise<void> => {
+    await dashboardWidgets.update(rowKey, widget)
   },
 
   /** Persist widget updates and keep store in sync. */
-  update: async (rowId, widget): Promise<void> => {
+  update: async (rowKey, widget): Promise<void> => {
     setDashboardStore(
       produce(store => {
-        const widgets = rowId
-          ? store.rows.find(row => row.key === rowId)?.widgets
+        const widgets = rowKey
+          ? store.rows.find(row => row.key === rowKey)?.widgets
           : store.header.widgets
         if (!widgets) return
 
@@ -116,11 +117,11 @@ const dashboardWidgets: DashboardWidgetsContract = {
   },
 
   /** Delete widget from store and persistence layer. */
-  remove: async (rowId, key): Promise<void> => {
+  remove: async (rowKey, key): Promise<void> => {
     setDashboardStore(
       produce(store => {
-        const widgets = rowId
-          ? store.rows.find(row => row.key === rowId)?.widgets
+        const widgets = rowKey
+          ? store.rows.find(row => row.key === rowKey)?.widgets
           : store.header.widgets
         if (!widgets) return
 
@@ -133,11 +134,11 @@ const dashboardWidgets: DashboardWidgetsContract = {
   },
 
   /** Reorder widgets by swapping positional/sort fields. */
-  move: async (rowId, key, direction): Promise<void> => {
+  move: async (rowKey, key, direction): Promise<void> => {
     setDashboardStore(
       produce(store => {
-        const widgets = rowId
-          ? store.rows.find(row => row.key === rowId)?.widgets
+        const widgets = rowKey
+          ? store.rows.find(row => row.key === rowKey)?.widgets
           : store.header.widgets
         if (!widgets) return
 
@@ -164,7 +165,7 @@ const dashboardHeader: DashboardHeaderContract = {
 }
 
 /** Row contract provider */
-const dashboardRows: DashboardRowContract = {
+const dashboardRows: DashboardRowsContract = {
   /** Create and persist a dashboard row, then append to local store. */
   add: async (state): Promise<void> => {
     setDashboardStore(
