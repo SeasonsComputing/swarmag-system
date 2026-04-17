@@ -98,17 +98,9 @@ function registerServiceWorker() {
 }
 
 /** Initialize app state before mounting the Admin appli*/
-export async function bootstrap(seed: unknown) {
-  // init application state
+export async function bootstrap(dashboardSeed: unknown) {
   await AppState.init()
-
-  // init dashboard state
-  const dashboard = seed as DashboardView  // TODO: real validation
-  await DashboardState.init(dashboard)
-
-  // render application root
+  await DashboardState.init(dashboardSeed)
   render(() => <Application />, document.getElementById('root')!)
-
-  // workers required of PWA
   registerServiceWorker()
 }
