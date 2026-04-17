@@ -23,6 +23,7 @@ DashboardState - Dashboard state and mutation methods
 import { ApiError, apiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import { createStore, produce } from '@solid-js/store'
+import type { Dictionary } from '@core/std'
 import type { DashboardRow, DashboardView, DashboardWidget } from '@ux/common/views/dashboard-views.ts'
 import { Config } from '@ux/config/ux-config.ts'
 
@@ -68,13 +69,14 @@ const NULL_VIEW: DashboardView = { header: { widgets: [] }, rows: [] }
 const [dashboardStore, setDashboardStore] = createStore<DashboardView>(NULL_VIEW)
 
 /** Initialize store from db or seed */
-async function dashboardInit(seed: DashboardView): Promise<void> {
+async function dashboardInit(seed: unknown): Promise<void> {
   IndexedDb.registerStore(DASHBOARD_STORE)
   try {
+    const dashboard: DashboardView = toDashboardView(seed)
     const db = await IndexedDb.connection()
     const view = await db.get(DASHBOARD_STORE, DASHBOARD_SINGLETON)
-    if (!view) await db.put(DASHBOARD_STORE, seed, DASHBOARD_SINGLETON)
-    setDashboardStore(view ?? seed)
+    if (!view) await db.put(DASHBOARD_STORE, dashboard, DASHBOARD_SINGLETON)
+    setDashboardStore(view ?? dashboard)
   } catch (error) {
     if (apiError(error)) Config.fail((error as ApiError).message)
     else Config.fail(`Dashboard init failed: ${IndexedDb.errorToStatus(error)}`)
@@ -156,7 +158,7 @@ const dashboardWidgets: DashboardWidgetsContract = {
   }
 }
 
-/** Widget contract provider */
+/** Header contract provider */
 const dashboardHeader: DashboardHeaderContract = {
   add: async (w): Promise<void> => await dashboardWidgets.add(null, w),
   update: async (w): Promise<void> => await dashboardWidgets.update(null, w),
@@ -220,3 +222,81 @@ const DashboardState = {
 }
 
 export { DashboardState }
+
+// ───────────────────────────────────────────────────────────────────────────────
+// INTERNALS
+// ───────────────────────────────────────────────────────────────────────────────
+
+/** Validate and convert input to DashboardView */
+function toDashboardView(input: unknown): DashboardView {
+  const view = toDictionary(input, 'Dashboard view')
+  const header = toDictionary(view['header'], 'Dashboard view.header')
+  const rows = toArray(view['rows'], 'Dashboard view.rows')
+  return {
+    header: { widgets: toDashboardWidgets(header['widgets'], 'Dashboard view.header.widgets') },
+    rows: rows.map((row, index) => toDashboardRow(row, `Dashboard view.rows[${index}]`))
+  }
+}
+
+/** Require an object dictionary. */
+function toDictionary(input: unknown, field: string): Dictionary {
+  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+    throw new ApiError(`${field} must be an object`, 400)
+  }
+  return input as Dictionary
+}
+
+/** Require an array value. */
+function toArray(input: unknown, field: string): unknown[] {
+  if (!Array.isArray(input)) throw new ApiError(`${field} must be an array`, 400)
+  return input
+}
+
+/** Require a non-empty string value. */
+function toString(input: unknown, field: string): string {
+  if (typeof input !== 'string' || input.trim().length === 0) {
+    throw new ApiError(`${field} must be a non-empty string`, 400)
+  }
+  return input
+}
+
+/** Validate one dashboard widget. */
+function toDashboardWidget(input: unknown, field: string): DashboardWidget {
+  const widget = toDictionary(input, field)
+  const shape = toString(widget['shape'], `${field}.shape`)
+  const type = toString(widget['type'], `${field}.type`)
+  const settings = toDictionary(widget['settings'], `${field}.settings`)
+  if (shape !== 'square' && shape !== 'landscape') {
+    throw new ApiError(`${field}.shape must be square or landscape`, 400)
+  }
+
+  return {
+    key: toString(widget['key'], `${field}.key`),
+    shape,
+    type,
+    settings
+  }
+}
+
+/** Validate a dashboard widget array. */
+function toDashboardWidgets(input: unknown, field: string): DashboardWidget[] {
+  return toArray(input, field).map((widget, index) =>
+    toDashboardWidget(widget, `${field}[${index}]`)
+  )
+}
+
+/** Validate one dashboard row. */
+function toDashboardRow(input: unknown, field: string): DashboardRow {
+  const row = toDictionary(input, field)
+  const size = toString(row['size'], `${field}.size`)
+  if (size !== 'standard' && size !== 'short') {
+    throw new ApiError(`${field}.size must be standard or short`, 400)
+  }
+
+  return {
+    key: toString(row['key'], `${field}.key`),
+    size,
+    label: toString(row['label'], `${field}.label`),
+    widgets: toDashboardWidgets(row['widgets'], `${field}.widgets`)
+  }
+}
