@@ -138,11 +138,13 @@ ux/
     │   ├── fonts/           — font typography
     │   ├── icons/           — icon library
     │   └── ...
-    └── components/          - shared design-system UI primitives and compositions
+    └── components/          — shared design-system UI primitives and compositions
         ├── controls/        — Kobalte-based UI primitives
-        ├── charts/          — PieChart, BarChart, LineChart, Sparkline
+        ├── charts/          — ChartJS-based charts (PieChart, BarChart, LineChart, Sparkline)
         ├── dashboard/       — dashboard layout foundation
-        ├── widgets/         — widget catalog
+        ├── widgets/         — catalog
+        ├── shell/           — application shell foundation
+        ├── forms/           — adaptive/responsive form foundation
         └── ...
 ```
 
@@ -259,9 +261,13 @@ backdrop and a rounded card container. Implemented with Kobalte `Dialog`.
 | Surface                    | `--sa-bg-surface-1`    |
 | Shadow                     | `--sa-shadow-xl`       |
 
-## 8. Component Vocabulary
+## 8. Component System
 
-### 8.1 Controls (Kobalte Primitives)
+### 8.1 Control Primitives
+
+Controls are based the Kobalte library and exposed via `App{Control}` component s facades.
+
+**Location:** `source/ux/common/components/controls`
 
 | Component        | Kobalte Primitive | Notes                                       |
 | ---------------- | ----------------- | ------------------------------------------- |
@@ -288,7 +294,149 @@ backdrop and a rounded card container. Implemented with Kobalte `Dialog`.
 | `AppSpinner`     | —                 | loading state                               |
 | `AppSkeleton`    | —                 | loading placeholder                         |
 
+### 8.1.1 Control Contract
+
+All primitive controls MUST adhere to this contract.
+
+#### 8.1.1.1 Semantic Identity
+
+All controls MUST emit:
+
+```
+data-ui="<control>"
+```
+
+Canonical values:
+
+```
+button
+input
+checkbox
+progress
+select
+dialog
+tabs
+accordion
+...
+```
+
+Mapping is derived from component name:
+
+- `AppButton` → `data-ui="button"`
+- `AppInput` → `data-ui="input"`
+
+**Rules:**
+
+- lowercase
+- singular
+- no prefixes (`app-`)
+
+#### 8.1.1.2 Variants
+
+Variants are ONLY valid where explicitly declared.
+
+**Example:**
+
+```
+data-ui="button"
+data-ui-variant="primary | secondary | ghost | danger"
+```
+
+**Rules:**
+
+- no undeclared variants
+- no implicit defaults beyond what is defined
+- controls must not invent new values
+
+#### 8.1.1.3 State
+
+**Controls may emit state:**
+
+```
+data-ui-state="<state>"
+```
+
+**Allowed values:**
+
+```
+error
+disabled
+loading
+```
+
+**Rules:**
+
+- explicit only
+- no free-form values
+- must reflect actual runtime condition
+
+#### 8.1.1.4 Styling
+
+**Controls do NOT:**
+
+- apply visual classes
+- define spacing, color, or layout
+- use inline styles
+- reference tokens directly
+
+**Controls MUST:**
+
+- emit semantic attributes only
+
+All styling is defined in `css/tokens.css`.
+Selectors:
+
+```
+[data-ui="..."]
+[data-ui-variant="..."]
+[data-ui-state="..."]
+```
+
+#### 8.1.1.5 Kobalte Binding
+
+- Each control binds to its declared Kobalte primitive
+- Kobalte provides behavior and accessibility
+- Controls attach semantic attributes at the root interactive element
+- Kobalte must not be exposed externally
+
+#### 8.1.1.6 Structural Boundary
+
+Controls are atomic in scope.
+
+**They do NOT:**
+
+- manage layout
+- coordinate other controls
+- implement workflows
+- perform validation orchestration
+
+#### 8.1.1.7 Attribute Discipline
+
+**Allowed attributes:**
+
+```
+data-ui
+data-ui-variant
+data-ui-state
+```
+
+No other `data-*` attributes are allowed.
+
+#### 8.1.1.8 Enforcement
+
+**Violations:**
+
+- missing `data-ui`
+- invalid or undeclared variant
+- invalid or undeclared state
+- styling inside control
+- bypassing control when one exists
+
+All violations must be detectable via guard scripts.
+
 ### 8.2 Form Controls
+
+**Location:** `source/ux/common/components/forms`
 
 | Component             | Purpose                                                |
 | --------------------- | ------------------------------------------------------ |
@@ -309,12 +457,14 @@ backdrop and a rounded card container. Implemented with Kobalte `Dialog`.
 Charting is standardized through `AppChart`. Chart.js is the selected internal
 engine and is not consumed directly by application views or widgets.
 
-Contract:
+**Contract:**
 
 - `ChartWidget` composes `AppChart`; it does not use Chart.js directly.
 - `AppChart` applies design-language tokens (color, typography, spacing, motion).
 - `AppChart` presents a component contract style consistent with Kobalte usage.
 - Chart.js remains replaceable without changing `ChartWidget` or page APIs.
+
+**Location:** `source/ux/common/components/charts`
 
 | Component   | Purpose                             |
 | ----------- | ----------------------------------- |

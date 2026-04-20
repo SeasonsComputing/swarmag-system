@@ -24,6 +24,7 @@
     // ────────────────────────────────────────────────────────────────────────────
 
     "@std/assert": "jsr:@std/assert@1.0.19",
+    "@std/walk": "jsr:@std/fs@1.0.19/walk",
     "@supabase/client": "https://esm.sh/@supabase/supabase-js@2.100.1",
     "@idb": "npm:idb@^8.0.0",
     "@solid-js": "npm:solid-js@1.9.12",
@@ -46,7 +47,7 @@
     // ────────────────────────────────────────────────────────────────────────────
 
     "check": "deno task check:guards && deno task check:types && deno task check:lint",
-    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:ux-state && deno task guard:chart && deno task guard:secrets",
+    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:ux-state && deno task guard:chart && deno task guard:secrets && deno task guard:imports",
     "check:types": "deno check --lock=deno.lock --frozen source/**/*.ts source/**/*.tsx",
     "check:lint": "deno task lint",
     "check:domain-genesis": "deno task guard:domain-style && deno task guard:core-std-types && deno check --lock=deno.lock --frozen source/domain/**/*.ts && deno lint source/domain/**/*.ts",
@@ -83,6 +84,7 @@
     "guard:ux-state": "deno run --allow-read source/devops/guards/guard-ux-state.ts",
     "guard:chart": "deno run --allow-read source/devops/guards/guard-chart.ts",
     "guard:secrets": "deno run --allow-read source/devops/scripts/validate-secrets.ts",
+    "guard:imports": "deno run -A source/devops/guards/guard-imports.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
     // Deployment Packaging

@@ -1,12 +1,12 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ops dashboard                                                                ║
+║ Shell dashboard                                                              ║
 ║ Stub — replaced during crew workflow engine generation.                      ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Placeholder dashboard for the Ops application.
+Placeholder dashboard for the applications.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────

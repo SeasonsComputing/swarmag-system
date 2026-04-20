@@ -2,7 +2,9 @@
   "version": "5",
   "specifiers": {
     "jsr:@std/assert@1.0.19": "1.0.19",
+    "jsr:@std/fs@1.0.19": "1.0.19",
     "jsr:@std/internal@^1.0.12": "1.0.12",
+    "jsr:@std/path@^1.1.1": "1.1.4",
     "npm:@supabase/supabase-js@2": "2.89.0",
     "npm:@tanstack/solid-router@1.168.6": "1.168.6_solid-js@1.9.12",
     "npm:chart.js@^4.4.0": "4.5.1",
@@ -21,8 +23,20 @@
         "jsr:@std/internal"
       ]
     },
+    "@std/fs@1.0.19": {
+      "integrity": "051968c2b1eae4d2ea9f79a08a3845740ef6af10356aff43d3e2ef11ed09fb06",
+      "dependencies": [
+        "jsr:@std/path"
+      ]
+    },
     "@std/internal@1.0.12": {
       "integrity": "972a634fd5bc34b242024402972cd5143eac68d8dffaca5eaa4dba30ce17b027"
+    },
+    "@std/path@1.1.4": {
+      "integrity": "1d2d43f39efb1b42f0b1882a25486647cb851481862dc7313390b2bb044314b5",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
     }
   },
   "npm": {
@@ -1252,6 +1266,7 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1.0.19",
+      "jsr:@std/fs@1.0.19",
       "npm:@tanstack/solid-router@1.168.6",
       "npm:chart.js@^4.4.0",
       "npm:idb@8",

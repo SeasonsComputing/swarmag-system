@@ -25,10 +25,6 @@ import {
 } from '@tanstack/solid-router'
 import { api } from '@ux/api'
 import { AuthGuard } from '@ux/common/components/shell/auth-guard.tsx'
-import { AppState } from '@ux/common/stores/app-state.ts'
-import { DashboardState } from '@ux/common/stores/dashboard-state.ts'
-import { SessionState } from '@ux/common/stores/session-state.ts'
-import { DashboardView } from '@ux/common/views/dashboard-views.ts'
 import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
@@ -75,14 +71,14 @@ const Application = () => {
   onMount(() => {
     const unsubscribe = api.Auth.onAuthStateChange(async session => {
       if (session) {
-        SessionState.setAuth(session.userId)
-        if (!SessionState.store.user) {
+        api.SessionState.setAuth(session.userId)
+        if (!api.SessionState.store.user) {
           const user = await api.Users.get(session.userId)
-          SessionState.setUser(user)
-          SessionState.setReady()
+          api.SessionState.setUser(user)
+          api.SessionState.setReady()
         }
       } else {
-        SessionState.clear()
+        api.SessionState.clear()
       }
     })
     onCleanup(unsubscribe)
@@ -97,10 +93,10 @@ function registerServiceWorker() {
   void navigator.serviceWorker.register('/sw.js')
 }
 
-/** Initialize app state before mounting the Admin appli*/
+/** Initialize app state before mounting the application */
 export async function bootstrap(dashboardSeed: unknown) {
-  await AppState.init()
-  await DashboardState.init(dashboardSeed)
+  await api.AppState.init()
+  await api.DashboardState.init(dashboardSeed)
   render(() => <Application />, document.getElementById('root')!)
   registerServiceWorker()
 }
