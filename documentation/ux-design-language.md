@@ -142,7 +142,7 @@ ux/
         ├── controls/        — Kobalte-based UI primitives
         ├── charts/          — ChartJS-based charts (PieChart, BarChart, LineChart, Sparkline)
         ├── dashboard/       — dashboard layout foundation
-        ├── widgets/         — catalog
+        ├── widgets/         — catalog of dashboard widgets
         ├── shell/           — application shell foundation
         ├── forms/           — adaptive/responsive form foundation
         └── ...
