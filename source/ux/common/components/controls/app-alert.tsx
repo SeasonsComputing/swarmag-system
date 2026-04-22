@@ -16,6 +16,9 @@ AppAlert  Alert control with declared states.
 import { type JSX, splitProps } from '@solid-js'
 import { controlState } from './controls-helpers.ts'
 
+/** Alert variants declared by the design language. */
+export type AppAlertVariant = 'success' | 'warning' | 'danger' | 'info'
+
 /** Alert control props. */
 export type AppAlertProps =
   & Omit<
@@ -23,6 +26,7 @@ export type AppAlertProps =
     'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
   >
   & {
+    variant?: AppAlertVariant
     error?: boolean
     loading?: boolean
     disabled?: boolean
@@ -36,6 +40,7 @@ export type AppAlertProps =
 /** Alert control with declared states. */
 export const AppAlert = (props: AppAlertProps): JSX.Element => {
   const [local, others] = splitProps(props, [
+    'variant',
     'error',
     'loading',
     'disabled',
@@ -46,5 +51,13 @@ export const AppAlert = (props: AppAlertProps): JSX.Element => {
     'data-ui-state'
   ])
 
-  return <div {...others} role='alert' data-ui='alert' data-ui-state={controlState(local)} />
+  return (
+    <div
+      {...others}
+      role='alert'
+      data-ui='alert'
+      data-ui-variant={local.variant}
+      data-ui-state={controlState(local)}
+    />
+  )
 }

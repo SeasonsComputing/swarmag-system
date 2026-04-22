@@ -11,6 +11,9 @@ Emits tabs control semantics without styling concerns.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AppTabs  Tabs control with declared states.
+AppTab   Tab trigger control for AppTabs.
+AppTabList   Tab list control for AppTabs.
+AppTabPanel  Tab panel control for AppTabs.
 */
 
 import { Tabs } from '@kobalte/core/tabs'
@@ -32,6 +35,58 @@ export type AppTabsProps = {
   'data-ui'?: never
   'data-ui-state'?: never
 }
+
+/** Tab list control props. */
+export type AppTabListProps = {
+  children?: JSX.Element
+  class?: never
+  classList?: never
+  style?: never
+  'data-ui'?: never
+}
+
+/** Tab trigger control props. */
+export type AppTabProps = {
+  children?: JSX.Element
+  value: string
+  disabled?: boolean
+  class?: never
+  classList?: never
+  style?: never
+  'data-ui'?: never
+}
+
+/** Tab panel control props. */
+export type AppTabPanelProps = {
+  children?: JSX.Element
+  value: string
+  class?: never
+  classList?: never
+  style?: never
+  'data-ui'?: never
+}
+
+type AppTabListRootProps = {
+  children?: JSX.Element
+  'data-ui': 'tab-list'
+}
+
+type AppTabRootProps = {
+  children?: JSX.Element
+  value: string
+  disabled?: boolean
+  'data-ui': 'tab'
+}
+
+type AppTabPanelRootProps = {
+  children?: JSX.Element
+  value: string
+  'data-ui': 'tab-panel'
+}
+
+const TabsList = Tabs.List as unknown as (props: AppTabListRootProps) => JSX.Element
+const TabsTrigger = Tabs.Trigger as unknown as (props: AppTabRootProps) => JSX.Element
+const TabsContent = Tabs.Content as unknown as (props: AppTabPanelRootProps) => JSX.Element
 
 /** Tabs control with declared states. */
 export const AppTabs = (props: AppTabsProps): JSX.Element => {
@@ -61,4 +116,35 @@ export const AppTabs = (props: AppTabsProps): JSX.Element => {
       {local.children}
     </Tabs>
   )
+}
+
+/** Tab list control for AppTabs. */
+export const AppTabList = (props: AppTabListProps): JSX.Element => {
+  const [local] = splitProps(props, ['children', 'class', 'classList', 'style', 'data-ui'])
+  return <TabsList data-ui='tab-list'>{local.children}</TabsList>
+}
+
+/** Tab trigger control for AppTabs. */
+export const AppTab = (props: AppTabProps): JSX.Element => {
+  const [local] = splitProps(props, [
+    'children',
+    'value',
+    'disabled',
+    'class',
+    'classList',
+    'style',
+    'data-ui'
+  ])
+
+  return (
+    <TabsTrigger data-ui='tab' value={local.value} disabled={local.disabled}>
+      {local.children}
+    </TabsTrigger>
+  )
+}
+
+/** Tab panel control for AppTabs. */
+export const AppTabPanel = (props: AppTabPanelProps): JSX.Element => {
+  const [local] = splitProps(props, ['children', 'value', 'class', 'classList', 'style', 'data-ui'])
+  return <TabsContent data-ui='tab-panel' value={local.value}>{local.children}</TabsContent>
 }

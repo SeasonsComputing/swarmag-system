@@ -16,6 +16,9 @@ AppBadge  Badge control with declared states.
 import { type JSX, splitProps } from '@solid-js'
 import { controlState } from './controls-helpers.ts'
 
+/** Badge variants declared by the design language. */
+export type AppBadgeVariant = 'success' | 'warning' | 'danger' | 'info'
+
 /** Badge control props. */
 export type AppBadgeProps =
   & Omit<
@@ -23,6 +26,7 @@ export type AppBadgeProps =
     'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
   >
   & {
+    variant?: AppBadgeVariant
     error?: boolean
     loading?: boolean
     disabled?: boolean
@@ -36,6 +40,7 @@ export type AppBadgeProps =
 /** Badge control with declared states. */
 export const AppBadge = (props: AppBadgeProps): JSX.Element => {
   const [local, others] = splitProps(props, [
+    'variant',
     'error',
     'loading',
     'disabled',
@@ -46,5 +51,12 @@ export const AppBadge = (props: AppBadgeProps): JSX.Element => {
     'data-ui-state'
   ])
 
-  return <span {...others} data-ui='badge' data-ui-state={controlState(local)} />
+  return (
+    <span
+      {...others}
+      data-ui='badge'
+      data-ui-variant={local.variant}
+      data-ui-state={controlState(local)}
+    />
+  )
 }
