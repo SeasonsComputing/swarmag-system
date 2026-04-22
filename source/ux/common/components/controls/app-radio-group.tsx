@@ -11,6 +11,7 @@ Emits radio-group control semantics without styling concerns.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AppRadioGroup  Radio-group control with declared states.
+AppRadioItem   Radio item control for AppRadioGroup.
 */
 
 import { RadioGroup } from '@kobalte/core/radio-group'
@@ -34,6 +35,28 @@ export type AppRadioGroupProps = {
   'data-ui'?: never
   'data-ui-state'?: never
 }
+
+/** Radio item control props. */
+export type AppRadioItemProps = {
+  children?: JSX.Element
+  value: string
+  disabled?: boolean
+  class?: never
+  classList?: never
+  style?: never
+  'data-ui'?: never
+}
+
+type AppRadioItemRootProps = {
+  children?: JSX.Element
+  value: string
+  disabled?: boolean
+  'data-ui': 'radio'
+}
+
+const RadioGroupItem = RadioGroup.Item as unknown as (
+  props: AppRadioItemRootProps
+) => JSX.Element
 
 /** Radio-group control with declared states. */
 export const AppRadioGroup = (props: AppRadioGroupProps): JSX.Element => {
@@ -68,5 +91,24 @@ export const AppRadioGroup = (props: AppRadioGroupProps): JSX.Element => {
     >
       {local.children}
     </RadioGroup>
+  )
+}
+
+/** Radio item control for AppRadioGroup. */
+export const AppRadioItem = (props: AppRadioItemProps): JSX.Element => {
+  const [local] = splitProps(props, [
+    'children',
+    'value',
+    'disabled',
+    'class',
+    'classList',
+    'style',
+    'data-ui'
+  ])
+
+  return (
+    <RadioGroupItem data-ui='radio' value={local.value} disabled={local.disabled}>
+      {local.children}
+    </RadioGroupItem>
   )
 }
