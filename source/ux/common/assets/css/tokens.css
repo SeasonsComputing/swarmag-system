@@ -195,7 +195,7 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-border-strong: 1px solid oklch(var(--sa-p-near-white) / 0.25);
   --sa-border-brand: 1px solid oklch(var(--sa-p-green-teal));
   --sa-border-table: oklch(var(--sa-p-surface-3));
-  --sa-border-input: oklch(var(--sa-p-surface-3));
+  --sa-border-input: 1px solid oklch(var(--sa-p-surface-3));
   --sa-border-input-focus: oklch(var(--sa-p-green-teal));
   --sa-border-input-error: oklch(var(--sa-p-danger));
 
@@ -272,6 +272,21 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-color-info: oklch(var(--sa-p-info));
   --sa-color-info-bg: oklch(var(--sa-p-info) / 0.12);
   --sa-color-info-border: oklch(var(--sa-p-info) / 0.30);
+
+  /* --- Control Tokens --- */
+  --sa-btn-primary-bg: oklch(var(--sa-p-green));
+  --sa-btn-primary-text: oklch(var(--sa-p-black));
+  --sa-btn-primary-bg-hover: oklch(80% 0.13 123.993);
+  --sa-btn-danger-bg: oklch(var(--sa-p-danger));
+  --sa-btn-danger-text: oklch(var(--sa-p-white));
+  --sa-control-bg-error: oklch(18% 0.015 25);
+  --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.22);
+  --sa-toggle-pressed-bg: oklch(var(--sa-p-green-teal) / 0.15);
+  --sa-toggle-pressed-border: oklch(var(--sa-p-green-teal) / 0.60);
+  --sa-toggle-pressed-text: oklch(var(--sa-p-green));
+  --sa-tab-pill-bg: oklch(var(--sa-p-surface-2));
+  --sa-tab-active-bg: oklch(var(--sa-p-surface-3));
+  --sa-tab-active-text: oklch(var(--sa-p-near-white));
 
   /* --- Table --- */
   --sa-table-cell-pad: 0.375rem;
@@ -369,7 +384,7 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-border-strong: 1px solid oklch(0% 0 0 / 0.22);
   --sa-border-brand: 1px solid oklch(var(--sa-p-teal));
   --sa-border-table: oklch(88% 0.006 264.5);
-  --sa-border-input: oklch(82% 0.008 264.5);
+  --sa-border-input: 1px solid oklch(82% 0.008 264.5);
   --sa-border-input-focus: oklch(var(--sa-p-teal));
 
   /* --- Focus Ring --- */
@@ -407,6 +422,21 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-table-section-color: oklch(var(--sa-p-surface-1));
   --sa-table-row-even: oklch(100% 0 0);
   --sa-table-row-odd: oklch(96% 0.006 180);
+
+  /* --- Control Tokens --- */
+  --sa-btn-primary-bg: oklch(var(--sa-p-teal));
+  --sa-btn-primary-text: oklch(var(--sa-p-white));
+  --sa-btn-primary-bg-hover: oklch(72% 0.11 184.216);
+  --sa-btn-danger-bg: oklch(var(--sa-p-danger));
+  --sa-btn-danger-text: oklch(var(--sa-p-white));
+  --sa-control-bg-error: oklch(98% 0.010 25);
+  --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.18);
+  --sa-toggle-pressed-bg: oklch(var(--sa-p-teal) / 0.12);
+  --sa-toggle-pressed-border: oklch(var(--sa-p-teal) / 0.50);
+  --sa-toggle-pressed-text: oklch(var(--sa-p-teal));
+  --sa-tab-pill-bg: oklch(88% 0.006 264.5);
+  --sa-tab-active-bg: oklch(100% 0 0);
+  --sa-tab-active-text: oklch(var(--sa-p-surface-1));
 }
 
 /*

@@ -5,6 +5,7 @@
     "jsr:@std/fs@1.0.19": "1.0.19",
     "jsr:@std/internal@^1.0.12": "1.0.12",
     "jsr:@std/path@^1.1.1": "1.1.4",
+    "npm:@kobalte/core@0.13.11": "0.13.11_solid-js@1.9.12",
     "npm:@supabase/supabase-js@2": "2.89.0",
     "npm:@tanstack/solid-router@1.168.6": "1.168.6_solid-js@1.9.12",
     "npm:chart.js@^4.4.0": "4.5.1",
@@ -176,6 +177,13 @@
         "@babel/helper-validator-identifier"
       ]
     },
+    "@corvu/utils@0.4.2_solid-js@1.9.12": {
+      "integrity": "sha512-Ox2kYyxy7NoXdKWdHeDEjZxClwzO4SKM8plAaVwmAJPxHMqA0rLOoAsa+hBDwRLpctf+ZRnAd/ykguuJidnaTA==",
+      "dependencies": [
+        "@floating-ui/dom",
+        "solid-js"
+      ]
+    },
     "@dprint/darwin-arm64@0.51.1": {
       "integrity": "sha512-C7fkaz0/NGf/X4G9Cq65izdJgerND5jWShOaPiOgGs4A0CyCMKMLRd45m3xKIttuO8x0IQiZVixD22qmVglXmQ==",
       "os": ["darwin"],
@@ -250,6 +258,34 @@
         "tslib"
       ]
     },
+    "@floating-ui/core@1.7.5": {
+      "integrity": "sha512-1Ih4WTWyw0+lKyFMcBHGbb5U5FtuHJuujoyyr5zTaWS5EYMeT6Jb2AuDeftsCsEuchO+mM2ij5+q9crhydzLhQ==",
+      "dependencies": [
+        "@floating-ui/utils"
+      ]
+    },
+    "@floating-ui/dom@1.7.6": {
+      "integrity": "sha512-9gZSAI5XM36880PPMm//9dfiEngYoC6Am2izES1FF406YFsjvyBMmeJ2g4SAju3xWwtuynNRFL2s9hgxpLI5SQ==",
+      "dependencies": [
+        "@floating-ui/core",
+        "@floating-ui/utils"
+      ]
+    },
+    "@floating-ui/utils@0.2.11": {
+      "integrity": "sha512-RiB/yIh78pcIxl6lLMG0CgBXAZ2Y0eVHqMPYugu+9U0AeT6YBeiJpf7lbdJNIugFP5SIjwNRgo4DhR1Qxi26Gg=="
+    },
+    "@internationalized/date@3.12.1": {
+      "integrity": "sha512-6IedsVWXyq4P9Tj+TxuU8WGWM70hYLl12nbYU8jkikVpa6WXapFazPUcHUMDMoWftIDE2ILDkFFte6W2nFCkRQ==",
+      "dependencies": [
+        "@swc/helpers"
+      ]
+    },
+    "@internationalized/number@3.6.6": {
+      "integrity": "sha512-iFgmQaXHE0vytNfpLZWOC2mEJCBRzcUxt53Xf/yCXG93lRvqas237i3r7X4RKMwO3txiyZD4mQjKAByFv6UGSQ==",
+      "dependencies": [
+        "@swc/helpers"
+      ]
+    },
     "@jridgewell/gen-mapping@0.3.13": {
       "integrity": "sha512-2kkt/7niJ6MgEPxF0bYdQ6etZaA+fQvDcLKckhy1yIQOzaoKjBBjSj63/aLVjYE3qhRt5dvM+uUyfCg6UKCBbA==",
       "dependencies": [
@@ -275,6 +311,33 @@
       "dependencies": [
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
+      ]
+    },
+    "@kobalte/core@0.13.11_solid-js@1.9.12": {
+      "integrity": "sha512-hK7TYpdib/XDb/r/4XDBFaO9O+3ZHz4ZWryV4/3BfES+tSQVgg2IJupDnztKXB0BqbSRy/aWlHKw1SPtNPYCFQ==",
+      "dependencies": [
+        "@floating-ui/dom",
+        "@internationalized/date",
+        "@internationalized/number",
+        "@kobalte/utils",
+        "@solid-primitives/props",
+        "@solid-primitives/resize-observer",
+        "solid-js",
+        "solid-presence",
+        "solid-prevent-scroll"
+      ]
+    },
+    "@kobalte/utils@0.9.1_solid-js@1.9.12": {
+      "integrity": "sha512-eeU60A3kprIiBDAfv9gUJX1tXGLuZiKMajUfSQURAF2pk4ZoMYiqIzmrMBvzcxP39xnYttgTyQEVLwiTZnrV4w==",
+      "dependencies": [
+        "@solid-primitives/event-listener",
+        "@solid-primitives/keyed",
+        "@solid-primitives/map",
+        "@solid-primitives/media",
+        "@solid-primitives/props",
+        "@solid-primitives/refs",
+        "@solid-primitives/utils",
+        "solid-js"
       ]
     },
     "@kurkle/color@0.3.4": {
@@ -460,12 +523,32 @@
         "solid-js"
       ]
     },
+    "@solid-primitives/keyed@1.5.3_solid-js@1.9.12": {
+      "integrity": "sha512-zNadtyYBhJSOjXtogkGHmRxjGdz9KHc8sGGVAGlUABkE8BED2tbIZoxkwSqzOwde8OcUEH0bb5DLZUWIMvyBSA==",
+      "dependencies": [
+        "solid-js"
+      ]
+    },
+    "@solid-primitives/map@0.4.13_solid-js@1.9.12": {
+      "integrity": "sha512-B1zyFbsiTQvqPr+cuPCXO72sRuczG9Swncqk5P74NCGw1VE8qa/Ry9GlfI1e/VdeQYHjan+XkbE3rO2GW/qKew==",
+      "dependencies": [
+        "@solid-primitives/trigger",
+        "solid-js"
+      ]
+    },
     "@solid-primitives/media@2.3.5_solid-js@1.9.12": {
       "integrity": "sha512-LX9fB5WDaK87FMDtUB1qokBOfT2et9Uobv/zZaKLH9caFSz4+P70MBKEIBHcZQy+9MV5M2XvGYLTbLskjkzMjA==",
       "dependencies": [
         "@solid-primitives/event-listener",
         "@solid-primitives/rootless",
         "@solid-primitives/static-store",
+        "@solid-primitives/utils",
+        "solid-js"
+      ]
+    },
+    "@solid-primitives/props@3.2.3_solid-js@1.9.12": {
+      "integrity": "sha512-XzG6en9gSFwmvbKcATm2BxL63HegZ+BAG5fmHi8jyBppQHcaths7ffz+6vYvwYy3nlgLa20ufJLj7tst+PcHFA==",
+      "dependencies": [
         "@solid-primitives/utils",
         "solid-js"
       ]
@@ -511,6 +594,13 @@
       "integrity": "sha512-7YdA21prMeCX+oOF/1RAn02+cGz/pG4dyPWtHBC2H8aZvnC7IfThBt80mP+TioejrdfE7Lc54Uh18f7Pig+gRQ==",
       "dependencies": [
         "@solid-primitives/rootless",
+        "@solid-primitives/utils",
+        "solid-js"
+      ]
+    },
+    "@solid-primitives/trigger@1.2.3_solid-js@1.9.12": {
+      "integrity": "sha512-Za2JebEiDyfamjmDwRaESYqBBYOlgYGzB8kHYH0QrkXyLf2qNADlKdGN+z3vWSLCTDcKxChS43Kssjuc0OZhng==",
+      "dependencies": [
         "@solid-primitives/utils",
         "solid-js"
       ]
@@ -569,6 +659,12 @@
         "@supabase/postgrest-js",
         "@supabase/realtime-js",
         "@supabase/storage-js"
+      ]
+    },
+    "@swc/helpers@0.5.21": {
+      "integrity": "sha512-jI/VAmtdjB/RnI8GTnokyX7Ug8c+g+ffD6QRLa6XQewtnGyukKkKSk3wLTM3b5cjt1jNh9x0jfVlagdN2gDKQg==",
+      "dependencies": [
+        "tslib"
       ]
     },
     "@tanstack/history@1.161.6": {
@@ -1109,6 +1205,20 @@
         "seroval-plugins"
       ]
     },
+    "solid-presence@0.1.8_solid-js@1.9.12": {
+      "integrity": "sha512-pWGtXUFWYYUZNbg5YpG5vkQJyOtzn2KXhxYaMx/4I+lylTLYkITOLevaCwMRN+liCVk0pqB6EayLWojNqBFECA==",
+      "dependencies": [
+        "@corvu/utils",
+        "solid-js"
+      ]
+    },
+    "solid-prevent-scroll@0.1.10_solid-js@1.9.12": {
+      "integrity": "sha512-KplGPX2GHiWJLZ6AXYRql4M127PdYzfwvLJJXMkO+CMb8Np4VxqDAg5S8jLdwlEuBis/ia9DKw2M8dFx5u8Mhw==",
+      "dependencies": [
+        "@corvu/utils",
+        "solid-js"
+      ]
+    },
     "solid-refresh@0.6.3_solid-js@1.9.12": {
       "integrity": "sha512-F3aPsX6hVw9ttm5LYlth8Q15x6MlI/J3Dn+o3EQyRTtTxidepSTwAYdozt01/YA+7ObcciagGEyXIopGZzQtbA==",
       "dependencies": [
@@ -1267,6 +1377,7 @@
     "dependencies": [
       "jsr:@std/assert@1.0.19",
       "jsr:@std/fs@1.0.19",
+      "npm:@kobalte/core@0.13.11",
       "npm:@tanstack/solid-router@1.168.6",
       "npm:chart.js@^4.4.0",
       "npm:idb@8",

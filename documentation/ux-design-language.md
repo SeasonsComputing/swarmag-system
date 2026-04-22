@@ -87,11 +87,15 @@ All font sizes use `clamp()` for fluid scaling. See `tokens.css` for the full `-
 
 ## 4. Token Architecture
 
-### 4.1 Token File
+### 4.1 CSS Files
 
-**`ux/common/assets/css/tokens.css`**
+Two files. Both live in `ux/common/assets/css/`. Both imported once at the app root. Never duplicated per-app.
 
-Single token file. Imported once at the app root. Never duplicated per-app.
+**`tokens.css`** — Custom properties only. No element or attribute selectors. Defines all primitive and semantic tokens consumed by the rest of the system.
+
+**`controls.css`** — Selector rules only. Targets `[data-ui]`, `[data-ui-variant]`, and `[data-ui-state]` attributes emitted by App{Control} components. Consumes tokens exclusively — never raw values, never primitives.
+
+Import order: `tokens.css` before `controls.css`.
 
 ### 4.2 Layer Structure
 
@@ -265,7 +269,7 @@ backdrop and a rounded card container. Implemented with Kobalte `Dialog`.
 
 ### 8.1 Control Primitives
 
-Controls are based the Kobalte library and exposed via `App{Control}` component s facades.
+Controls are based on Kobalte primitives and exposed as App{Control} components that bind behavior and emit design-language semantics.
 
 **Location:** `source/ux/common/components/controls`
 
@@ -396,7 +400,7 @@ Selectors:
 
 - Each control binds to its declared Kobalte primitive
 - Kobalte provides behavior and accessibility
-- Controls attach semantic attributes at the root interactive element
+- Controls MUST attach semantic attributes to the root interactive DOM element.
 - Kobalte must not be exposed externally
 
 #### 8.1.1.6 Structural Boundary
@@ -433,6 +437,187 @@ No other `data-*` attributes are allowed.
 - bypassing control when one exists
 
 All violations must be detectable via guard scripts.
+
+### 8.1.2 Control Tokens
+
+These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark values are in `:root`. Light overrides are in `[data-theme='light']`. Tokens with `—` in both value columns are defined elsewhere in `tokens.css`; they are listed here to document the full set of tokens `controls.css` depends on.
+
+#### Button
+
+| Token                       | Dark value                  | Light value                 |
+| --------------------------- | --------------------------- | --------------------------- |
+| `--sa-btn-primary-bg`       | `oklch(var(--sa-p-green))`  | `oklch(var(--sa-p-teal))`   |
+| `--sa-btn-primary-text`     | `oklch(var(--sa-p-black))`  | `oklch(var(--sa-p-white))`  |
+| `--sa-btn-primary-bg-hover` | `oklch(80% 0.13 123.993)`   | `oklch(72% 0.11 184.216)`   |
+| `--sa-btn-danger-bg`        | `oklch(var(--sa-p-danger))` | `oklch(var(--sa-p-danger))` |
+| `--sa-btn-danger-text`      | `oklch(var(--sa-p-white))`  | `oklch(var(--sa-p-white))`  |
+| `--sa-color-primary`        | —                           | —                           |
+| `--sa-color-danger`         | —                           | —                           |
+| `--sa-border-brand`         | —                           | —                           |
+| `--sa-text-disabled`        | —                           | —                           |
+
+#### Input / Textarea / Select
+
+| Token                     | Dark value                         | Light value                        |
+| ------------------------- | ---------------------------------- | ---------------------------------- |
+| `--sa-control-bg-error`   | `oklch(18% 0.015 25)`              | `oklch(98% 0.010 25)`              |
+| `--sa-control-ring-error` | `oklch(var(--sa-p-danger) / 0.22)` | `oklch(var(--sa-p-danger) / 0.18)` |
+| `--sa-bg-input`           | —                                  | —                                  |
+| `--sa-bg-input-focus`     | —                                  | —                                  |
+| `--sa-bg-input-disabled`  | —                                  | —                                  |
+| `--sa-border-input`       | —                                  | —                                  |
+| `--sa-border-input-focus` | —                                  | —                                  |
+| `--sa-border-input-error` | —                                  | —                                  |
+| `--sa-focus-ring`         | —                                  | —                                  |
+| `--sa-text-placeholder`   | —                                  | —                                  |
+
+#### Toggle / ToggleGroup
+
+| Token                        | Dark value                             | Light value                      |
+| ---------------------------- | -------------------------------------- | -------------------------------- |
+| `--sa-toggle-pressed-bg`     | `oklch(var(--sa-p-green-teal) / 0.15)` | `oklch(var(--sa-p-teal) / 0.12)` |
+| `--sa-toggle-pressed-border` | `oklch(var(--sa-p-green-teal) / 0.60)` | `oklch(var(--sa-p-teal) / 0.50)` |
+| `--sa-toggle-pressed-text`   | `oklch(var(--sa-p-green))`             | `oklch(var(--sa-p-teal))`        |
+| `--sa-bg-surface-2`          | —                                      | —                                |
+| `--sa-border-default`        | —                                      | —                                |
+| `--sa-text-muted`            | —                                      | —                                |
+
+#### Tabs (segmented pill)
+
+| Token                  | Dark value                      | Light value                    |
+| ---------------------- | ------------------------------- | ------------------------------ |
+| `--sa-tab-pill-bg`     | `oklch(var(--sa-p-surface-2))`  | `oklch(88% 0.006 264.5)`       |
+| `--sa-tab-active-bg`   | `oklch(var(--sa-p-surface-3))`  | `oklch(100% 0 0)`              |
+| `--sa-tab-active-text` | `oklch(var(--sa-p-near-white))` | `oklch(var(--sa-p-surface-1))` |
+| `--sa-text-muted`      | —                               | —                              |
+
+#### Skeleton / Spinner
+
+| Token                 | Dark value | Light value |
+| --------------------- | ---------- | ----------- |
+| `--sa-bg-surface-2`   | —          | —           |
+| `--sa-bg-surface-3`   | —          | —           |
+| `--sa-color-primary`  | —          | —           |
+| `--sa-border-default` | —          | —           |
+
+#### Badge / Alert
+
+| Token                       | Dark value | Light value |
+| --------------------------- | ---------- | ----------- |
+| `--sa-color-success`        | —          | —           |
+| `--sa-color-success-bg`     | —          | —           |
+| `--sa-color-success-border` | —          | —           |
+| `--sa-color-warning`        | —          | —           |
+| `--sa-color-warning-bg`     | —          | —           |
+| `--sa-color-warning-border` | —          | —           |
+| `--sa-color-danger`         | —          | —           |
+| `--sa-color-danger-bg`      | —          | —           |
+| `--sa-color-danger-border`  | —          | —           |
+| `--sa-color-info`           | —          | —           |
+| `--sa-color-info-bg`        | —          | —           |
+| `--sa-color-info-border`    | —          | —           |
+
+### 8.1.3 Control Selectors
+
+All component visual rules live in `controls.css`. This section defines the selector pattern and per-control intent. CE derives the CSS from these specifications and the token values in §8.1.2.
+
+#### Selector pattern
+
+```css
+[data-ui='<control>'] {
+  /* base state */
+}
+[data-ui='<control>'][data-ui-variant='<variant>'] {
+  /* variant */
+}
+[data-ui='<control>'][data-ui-state='<state>'] {
+  /* state */
+}
+[data-ui='<control>']:hover {
+  /* hover — only where interactive */
+}
+[data-ui='<control>']:focus-visible {
+  /* focus — defer to --sa-focus-ring where possible */
+}
+```
+
+#### Per-control intent
+
+**`[data-ui="button"]`**
+
+- Base (ghost): transparent background, `--sa-color-primary` border and text
+- `variant="primary"`: solid `--sa-btn-primary-bg`, `--sa-btn-primary-text`, hover lightens via `--sa-btn-primary-bg-hover`
+- `variant="secondary"`: `--sa-bg-surface-2` background, `--sa-border-default` border, `--sa-text-primary` text
+- `variant="danger"`: solid `--sa-btn-danger-bg`, `--sa-btn-danger-text`
+- `state="disabled"`: opacity 0.35, cursor not-allowed
+- `state="loading"`: opacity 0.65, cursor wait
+- Font: `--sa-font-display`, `--sa-weight-medium`; primary/danger use `--sa-weight-semibold`
+
+**`[data-ui="input"]`, `[data-ui="textarea"]`, `[data-ui="select"]`**
+
+- Base: `--sa-bg-input` background, `--sa-border-input` border, `--sa-radius-md`
+- Focus: `--sa-border-input-focus` border, `--sa-focus-ring` box-shadow, `--sa-bg-input-focus` background
+- `state="error"`: `--sa-border-input-error` border, `--sa-control-ring-error` box-shadow, `--sa-control-bg-error` background
+- `state="disabled"`: `--sa-bg-input-disabled`, opacity 0.38, cursor not-allowed
+- Placeholder: `--sa-text-placeholder`
+- Font: `--sa-font-ui`, `--sa-font-xs`
+
+**`[data-ui="checkbox"]`, `[data-ui="radio"]`**
+
+- Base: `--sa-bg-input` background, `--sa-border-input` border
+- Checked: `--sa-color-primary` fill and border
+- `state="error"`: `--sa-border-input-error` border
+- Font context (labels): `--sa-font-ui`, `--sa-font-xs`
+
+**`[data-ui="toggle"]`**
+
+- Base: `--sa-bg-surface-2` background, `--sa-border-default` border, `--sa-text-muted` text
+- `.pressed` / `[aria-pressed="true"]`: `--sa-toggle-pressed-bg`, `--sa-toggle-pressed-border`, `--sa-toggle-pressed-text`
+
+**`[data-ui="toggle-group"]`**
+
+- Flex container. Child `[data-ui="toggle"]` elements have their inner borders collapsed. First child: left radius only. Last child: right radius only, right border restored.
+
+**`[data-ui="tabs"]`**
+
+- Tab list: pill container, `--sa-tab-pill-bg` background, `--sa-radius-md`, tight internal padding
+- Inactive tab: `--sa-text-muted`, transparent background
+- Active tab (`[data-ui="tab"].active` / `[data-selected]`): `--sa-tab-active-bg`, `--sa-tab-active-text`, `--sa-weight-medium`
+- No underline separator. The pill pattern is the L&F.
+
+**`[data-ui="progress"]`**
+
+- Track: `--sa-bg-surface-3`, `--sa-radius-full`, fixed height `--sa-jr-progress-height` (job-runner) or 5px (general)
+- Fill: `--sa-gradient-brand`, same radius
+
+**`[data-ui="spinner"]`**
+
+- Ring: `--sa-border-default`; active arc: `--sa-color-primary`
+- Animation: rotate 0.8s linear infinite
+
+**`[data-ui="skeleton"]`**
+
+- Shimmer: gradient sweep between `--sa-bg-surface-2` and `--sa-bg-surface-3`
+- Animation: background-position sweep 1.4s ease-in-out infinite
+
+**`[data-ui="badge"]`**
+
+- Pill shape (`--sa-radius-full`), `--sa-font-xs`, `--sa-weight-medium`
+- Per semantic variant: consumes `--sa-color-{state}-bg` and `--sa-color-{state}` text pairs
+
+**`[data-ui="alert"]`**
+
+- Left border accent (2px), `--sa-radius-md`, `--sa-font-xs`
+- Per semantic variant: `--sa-color-{state}-bg` background, `--sa-color-{state}-border` left border, `--sa-color-{state}` text
+
+**`[data-ui="separator"]`**
+
+- 1px rule, `--sa-border-table` color, no border shorthand (height: 1px, background)
+
+**`[data-ui="avatar"]`**
+
+- Circle (`--sa-radius-full`), `--sa-gradient-brand` background, `--sa-text-on-brand` text
+- Font: `--sa-font-display`, `--sa-weight-semibold`
 
 ### 8.2 Form Controls
 
