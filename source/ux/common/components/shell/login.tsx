@@ -18,6 +18,7 @@ Login Passwordless OTP login component.
 
 import { createSignal, Show } from '@solid-js'
 import { api } from '@ux/api'
+import { AppButton, AppInput } from '@ux/common/components/controls'
 
 /** OTP flow step discriminator. */
 type LoginStep = 'email' | 'code'
@@ -69,17 +70,21 @@ export const Login = () => {
             <h1>swarmAg</h1>
             <p>Enter the code sent to {email()}</p>
             <label for='code'>Code</label>
-            <input
+            <AppInput
               id='code'
               type='text'
               inputMode='numeric'
               autocomplete='one-time-code'
               value={code()}
               onInput={e => setCode(e.currentTarget.value)}
+              error={error() !== null}
+              disabled={pending()}
               required
             />
-            <button type='submit' disabled={pending()}>Sign In</button>
-            <button type='button' onClick={() => setStep('email')}>Back</button>
+            <AppButton type='submit' variant='primary' loading={pending()}>Sign In</AppButton>
+            <AppButton type='button' variant='secondary' onClick={() => setStep('email')}>
+              Back
+            </AppButton>
             <Show when={error()}>
               <p class='login-error'>{error()}</p>
             </Show>
@@ -94,15 +99,17 @@ export const Login = () => {
         >
           <h1>swarmAg</h1>
           <label for='email'>Email</label>
-          <input
+          <AppInput
             id='email'
             type='email'
             autocomplete='email'
             value={email()}
             onInput={e => setEmail(e.currentTarget.value)}
+            error={error() !== null}
+            disabled={pending()}
             required
           />
-          <button type='submit' disabled={pending()}>Send Code</button>
+          <AppButton type='submit' variant='primary' loading={pending()}>Send Code</AppButton>
           <Show when={error()}>
             <p class='login-error'>{error()}</p>
           </Show>

@@ -8,7 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Single source of truth for dashboard header widgets and row/widget layout
 state. All dashboard mutations flow through this module and persist through
-the IndexedDB CRUD clients.
+@core/db/indexeddb.ts --> browser IndexedDB.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -22,7 +22,7 @@ DashboardState - Dashboard state and mutation methods
 
 import { ApiError, apiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
-import { type Dictionary, type Instance, id } from '@core/std'
+import { type Dictionary, id, type Instance } from '@core/std'
 import { createStore, produce } from '@solid-js/store'
 import type { DashboardRowHeader, DashboardWidget } from '@ux/common/views/dashboard-views.ts'
 import { Config } from '@ux/config/ux-config.ts'
@@ -46,7 +46,7 @@ export type MoveDirection = 'backward' | 'forward'
 
 /** Widget contract */
 export interface DashboardWidgetsContract {
-  add(rowId: string | null, widget: DashboardStoreWidget): Promise<void>
+  add(rowId: string | null, widget: DashboardWidget): Promise<DashboardStoreWidget>
   update(rowId: string | null, widget: DashboardStoreWidget): Promise<void>
   remove(rowId: string | null, widgetId: string): Promise<void>
   move(rowId: string | null, widgetId: string, direction: MoveDirection): Promise<void>
@@ -54,7 +54,7 @@ export interface DashboardWidgetsContract {
 
 /** Header contract */
 export interface DashboardHeaderContract {
-  add(widget: DashboardStoreWidget): Promise<void>
+  add(widget: DashboardWidget): Promise<DashboardStoreWidget>
   update(widget: DashboardStoreWidget): Promise<void>
   remove(widgetId: string): Promise<void>
   move(widgetId: string, direction: MoveDirection): Promise<void>
@@ -62,7 +62,7 @@ export interface DashboardHeaderContract {
 
 /** Row contract */
 export interface DashboardRowsContract {
-  add(row: DashboardStoreRow): Promise<void>
+  add(row: DashboardRowHeader): Promise<DashboardStoreRow>
   remove(rowId: string): Promise<void>
   move(rowId: string, direction: MoveDirection): Promise<void>
 }
@@ -74,15 +74,14 @@ export interface DashboardRowsContract {
 /** Dashboard store */
 const DASHBOARD_STORE = 'DashboardStore'
 const DASHBOARD_ID = '019daa39-2d7c-76fb-877f-495169374178'
-const NULL_VIEW: DashboardStoreView = {
-  id: '',
-  header: { widgets: [] },
-  rows: []
-}
 
 /** Initializa local and transient stores */
 IndexedDb.registerStore(DASHBOARD_STORE)
-const [dashboardStore, setDashboardStore] = createStore<DashboardStoreView>(NULL_VIEW)
+const [dashboardStore, setDashboardStore] = createStore<DashboardStoreView>({
+  id: '',
+  header: { widgets: [] },
+  rows: []
+})
 
 /** Initialize store from db or seed */
 async function dashboardInit(seed: unknown): Promise<void> {
@@ -90,7 +89,7 @@ async function dashboardInit(seed: unknown): Promise<void> {
     const db = await IndexedDb.connection()
     let dashboard = await db.get(DASHBOARD_STORE, DASHBOARD_ID)
     if (!dashboard) {
-      dashboard = toDashboardView(seed)
+      dashboard = toDashboardStoreView(seed)
       await db.put(DASHBOARD_STORE, dashboard)
     }
     setDashboardStore(dashboard)
@@ -113,9 +112,25 @@ async function dashboardSave(): Promise<void> {
 
 /** Widgets contract provider */
 const dashboardWidgets: DashboardWidgetsContract = {
-  /** Create and persist a widget, then reflect it in local store. */
-  add: async (rowId, widget): Promise<void> => {
-    await dashboardWidgets.update(rowId, widget)
+  /** Create and persist a widget, then append to local store. */
+  add: async (rowId, widget): Promise<DashboardStoreWidget> => {
+    if (rowId && !dashboardStore.rows.some(row => row.id === rowId)) {
+      throw new ApiError('Dashboard row not found', 404)
+    }
+
+    const storeWidget: DashboardStoreWidget = { id: id(), ...widget }
+    setDashboardStore(
+      produce(store => {
+        const widgets = rowId
+          ? store.rows.find(row => row.id === rowId)?.widgets
+          : store.header.widgets
+        if (!widgets) return
+
+        widgets.push(storeWidget)
+      })
+    )
+    await dashboardSave()
+    return storeWidget
   },
 
   /** Persist widget updates and keep store in sync. */
@@ -177,7 +192,7 @@ const dashboardWidgets: DashboardWidgetsContract = {
 
 /** Header contract provider */
 const dashboardHeader: DashboardHeaderContract = {
-  add: async (w): Promise<void> => await dashboardWidgets.add(null, w),
+  add: async (w): Promise<DashboardStoreWidget> => await dashboardWidgets.add(null, w),
   update: async (w): Promise<void> => await dashboardWidgets.update(null, w),
   remove: async (id): Promise<void> => await dashboardWidgets.remove(null, id),
   move: async (id, dir): Promise<void> => await dashboardWidgets.move(null, id, dir)
@@ -186,17 +201,11 @@ const dashboardHeader: DashboardHeaderContract = {
 /** Row contract provider */
 const dashboardRows: DashboardRowsContract = {
   /** Create and persist a dashboard row, then append to local store. */
-  add: async (state): Promise<void> => {
-    setDashboardStore(
-      'rows',
-      produce(rows => {
-        const row = { ...state, id: state.id }
-        const index = rows.findIndex(item => item.id === state.id)
-        if (index < 0) rows.push(row)
-        else rows[index] = row
-      })
-    )
+  add: async (row): Promise<DashboardStoreRow> => {
+    const storeRow: DashboardStoreRow = { id: id(), ...row, widgets: [] }
+    setDashboardStore('rows', produce(rows => rows.push(storeRow)))
     await dashboardSave()
+    return storeRow
   },
 
   /** Remove row from store and persistence; rely on cascading widget cleanup. */
@@ -235,14 +244,14 @@ const dashboardRows: DashboardRowsContract = {
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** Validate and convert input to DashboardView */
-function toDashboardView(input: unknown): DashboardStoreView {
+function toDashboardStoreView(input: unknown): DashboardStoreView {
   const view = toDictionary(input, 'Dashboard view')
   const header = toDictionary(view['header'], 'Dashboard view.header')
   const rows = toArray(view['rows'], 'Dashboard view.rows')
   return {
     id: DASHBOARD_ID,
-    header: { widgets: toDashboardWidgets(header['widgets'], 'Dashboard view.header.widgets') },
-    rows: rows.map((r, i) => toDashboardRow(r, `Dashboard view.rows[${i}]`))
+    header: { widgets: toDashboardStoreWidgets(header['widgets'], 'Dashboard view.header.widgets') },
+    rows: rows.map((r, i) => toDashboardStoreRow(r, `Dashboard view.rows[${i}]`))
   }
 }
 
@@ -269,7 +278,7 @@ function toString(input: unknown, field: string): string {
 }
 
 /** Validate one dashboard widget. */
-function toDashboardWidget(input: unknown, field: string): DashboardStoreWidget {
+function toDashboardStoreWidget(input: unknown, field: string): DashboardStoreWidget {
   const widget = toDictionary(input, field)
   const shape = toString(widget['shape'], `${field}.shape`)
   const type = toString(widget['type'], `${field}.type`)
@@ -281,19 +290,19 @@ function toDashboardWidget(input: unknown, field: string): DashboardStoreWidget 
 }
 
 /** Validate a dashboard widget array. */
-function toDashboardWidgets(input: unknown, field: string): DashboardStoreWidget[] {
-  return toArray(input, field).map((w, i) => toDashboardWidget(w, `${field}[${i}]`))
+function toDashboardStoreWidgets(input: unknown, field: string): DashboardStoreWidget[] {
+  return toArray(input, field).map((w, i) => toDashboardStoreWidget(w, `${field}[${i}]`))
 }
 
 /** Validate one dashboard row. */
-function toDashboardRow(input: unknown, field: string): DashboardStoreRow {
+function toDashboardStoreRow(input: unknown, field: string): DashboardStoreRow {
   const row = toDictionary(input, field)
   const size = toString(row['size'], `${field}.size`)
   if (size !== 'standard' && size !== 'short') {
     throw new ApiError(`${field}.size must be standard or short`, 400)
   }
   const label = toString(row['label'], `${field}.label`)
-  const widgets = toDashboardWidgets(row['widgets'], `${field}.widgets`)
+  const widgets = toDashboardStoreWidgets(row['widgets'], `${field}.widgets`)
   return { id: id(), size, label, widgets }
 }
 
