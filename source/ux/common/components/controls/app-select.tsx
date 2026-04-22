@@ -25,6 +25,7 @@ export type AppSelectProps = {
   disabled?: boolean
   error?: boolean
   loading?: boolean
+  options: ReadonlyArray<string>
   class?: never
   classList?: never
   style?: never
@@ -55,6 +56,7 @@ export type AppSelectItemProps = {
 type AppSelectRootProps = {
   children?: JSX.Element
   disabled?: boolean
+  options: ReadonlyArray<string>
   validationState?: 'valid' | 'invalid'
 }
 
@@ -83,6 +85,7 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
     'disabled',
     'error',
     'loading',
+    'options',
     'class',
     'classList',
     'style',
@@ -93,6 +96,7 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
   return (
     <SelectRoot
       disabled={local.disabled || local.loading}
+      options={local.options}
       validationState={local.error ? 'invalid' : undefined}
     >
       <Select.Trigger data-ui='select' data-ui-state={controlState(local)}>
