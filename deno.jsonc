@@ -111,8 +111,7 @@
     "app-customer-package-local-verify": "bash source/devops/scripts/app-customer-package-verify.sh local",
     "app-customer-package-stage-verify": "bash source/devops/scripts/app-customer-package-verify.sh stage",
     "app-customer-package-prod-verify": "bash source/devops/scripts/app-customer-package-verify.sh prod",
-    "app-style-guide-package-local": "bash source/devops/scripts/app-style-guide-package.sh local",
-    "app-style-guide-package-local-verify": "bash source/devops/scripts/app-style-guide-package-verify.sh local"
+    "app-style-guide-local": "bash source/devops/scripts/app-style-guide-local.sh"
   },
   "fmt": { "exclude": ["**/*"] },
   "nodeModulesDir": "auto",
