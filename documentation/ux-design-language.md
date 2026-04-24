@@ -18,14 +18,14 @@ This document defines the normative design language, component contracts, and us
 
 The swarmAg product family is governed by a single, unified design language. While application layouts diverge to meet specific operational contexts (e.g., data-dense Admin vs. high-contrast Ops), they share a common foundation of brand primitives, tokens, and component logic.
 
-| Property       | Specification                                         |
-| -------------- | ----------------------------------------------------- |
-| **Audience**   | Leadership, Operations Staff, and Field Crews         |
-| **Motif**      | Dark-mode, data-dense, precision-oriented             |
-| **Background** | Near-black oklch foundations                          |
-| **Typography** | Lexend (Headings) + Inter (UI/Body) + Cascadia (Mono) |
-| **Accent**     | Strategic brand gradient (Green → Teal → Blue)        |
-| **Feel**       | Professional, rugged, and purposeful                  |
+| Property       | Specification                                                  |
+| -------------- | -------------------------------------------------------------- |
+| **Audience**   | Leadership, Operations Staff, and Field Crews                  |
+| **Motif**      | Dark-mode, data-dense, precision-oriented                      |
+| **Background** | Near-black oklch foundation with restrained radial brand depth |
+| **Typography** | DM Serif Display + Lexend + Inter + Cascadia Mono              |
+| **Accent**     | Strategic brand gradient (Green → Teal → Blue)                 |
+| **Feel**       | Professional, rugged, and purposeful                           |
 
 ### 2.2 Brand Gradient
 
@@ -42,7 +42,11 @@ Extracted from the swarmAg Ops logo:
 
 ### 2.3 Dark Theme
 
-The default theme is dark mode:
+The default theme is dark mode. The global page background is part of the
+foundation, not an app-level decoration; app shells and style-guide/demo
+harnesses must leave the background visible unless a concrete content surface
+requires an opaque treatment. The radial background layer is static and biased
+dark on the left so card chrome and brand accents remain legible against it.
 
 | Token                | Value                                 |
 | -------------------- | ------------------------------------- |
@@ -63,7 +67,8 @@ oklch(var(--sa-p-green))         /* fully opaque */
 oklch(var(--sa-p-green) / 0.5)   /* 50% alpha */
 ```
 
-Semantic tokens resolve to full `oklch()` values. Components reference only semantic tokens — never primitives, never raw values.
+Semantic tokens resolve to full `oklch()` values. Components reference semantic
+or component tokens — never primitive palette tokens, never raw visual values.
 
 ## 3. Typography
 
@@ -73,13 +78,17 @@ Semantic tokens resolve to full `oklch()` values. Components reference only sema
 
 Fonts are **self-hosted woff2** assets.
 
-| Font                       | File                            | Role                                                       |
-| -------------------------- | ------------------------------- | ---------------------------------------------------------- |
-| Lexend (variable, 100–900) | Lexend-VariableFont_wght.woff2  | Headings, navigation, buttons, logo                        |
-| Inter (400, 600)           | inter-400.woff2 inter-600.woff2 | Form labels, inputs, table headers/cells, badges, metadata |
-| Cascadia Mono              | CascadiaMono-Light.woff2        | IDs, coordinates, numeric data fields                      |
+| Font                       | File                             | Role                                                       |
+| -------------------------- | -------------------------------- | ---------------------------------------------------------- |
+| DM Serif Display           | DMSerifDisplay-Regular.woff2     | Headings and large editorial display moments               |
+| Lexend (variable, 100–900) | Lexend-VariableFont_wght.woff2   | Body copy, navigation, brand lockups, readable app chrome  |
+| Inter (400, 600)           | inter-400.woff2, inter-600.woff2 | Form labels, inputs, table headers/cells, badges, metadata |
+| Cascadia Mono              | CascadiaMono-Light.woff2         | IDs, coordinates, numeric data fields                      |
 
-`body` inherits Lexend. `input`, `select`, `textarea`, `label`, `th`, `td`, `button`, `[role="option"]`, `[role="menuitem"]` inherit Inter automatically via the global base rule. No per-component font declarations needed for the common case.
+`body` inherits Lexend. Headings inherit DM Serif Display. `input`, `select`,
+`textarea`, `label`, `th`, `td`, `button`, `[role="option"]`, and
+`[role="menuitem"]` inherit Inter automatically through `base.css`. No
+per-component font declarations are needed for the common case.
 
 ### 3.2 Fluid Type Scale
 
@@ -89,13 +98,43 @@ All font sizes use `clamp()` for fluid scaling. See `tokens.css` for the full `-
 
 ### 4.1 CSS Files
 
-Two files. Both live in `ux/common/assets/css/`. Both imported once at the app root. Never duplicated per-app.
+Three files live in `ux/common/assets/css/`. They are imported once at each app
+root and never duplicated per app.
 
-**`tokens.css`** — Custom properties only. No element or attribute selectors. Defines all primitive and semantic tokens consumed by the rest of the system.
+**`tokens.css`** — Custom properties only. No element or attribute selectors.
+Defines primitive, semantic, typography, layout, motion, and component tokens
+consumed by the rest of the system.
 
-**`controls.css`** — Selector rules only. Targets `[data-ui]`, `[data-ui-variant]`, and `[data-ui-state]` attributes emitted by App{Control} components. Consumes tokens exclusively — never raw values, never primitives.
+**`base.css`** — Foundation selectors only. Owns `@font-face`, reset, `html`,
+`body`, global typography inheritance, global background treatment, shared
+keyframes, global focus, and accessibility media queries.
 
-Import order: `tokens.css` before `controls.css`.
+**`controls.css`** — App{Control} primitive selectors only. Targets declared
+`[data-ui]`, `[data-ui-variant]`, `[data-ui-state]`, Kobalte runtime state, and
+ARIA state attributes. Consumes tokens exclusively for color, size, shadow,
+motion, typography, and spacing.
+
+Import order:
+
+```typescript
+import '@ux/common/assets/css/tokens.css'
+import '@ux/common/assets/css/base.css'
+import '@ux/common/assets/css/controls.css'
+```
+
+### 4.1.1 File Ownership
+
+| File           | Owns                                                                 | Must not contain                                      |
+| -------------- | -------------------------------------------------------------------- | ----------------------------------------------------- |
+| `tokens.css`   | Custom properties, theme overrides, responsive token overrides       | Element selectors, control selectors, keyframes       |
+| `base.css`     | Browser foundation, global page background, fonts, resets, keyframes | Reusable control visuals, app/page layout rules       |
+| `controls.css` | Reusable primitive control visuals and declared control parts        | Primitive palette references, app/page-specific rules |
+
+Raw values are allowed in `tokens.css` because it defines the design
+vocabulary. Raw browser/platform values are allowed sparingly in `base.css`.
+`controls.css` must use tokens for meaningful visual values. CSS keywords such
+as `none`, `unset`, `inherit`, `auto`, and `transparent` may appear where
+tokenization would not add meaning.
 
 ### 4.2 Layer Structure
 
@@ -115,22 +154,37 @@ toggling.
 
 All tokens use `--sa-` prefix. Sub-namespaces:
 
-| Prefix           | Scope                                     |
-| ---------------- | ----------------------------------------- |
-| `--sa-p-`        | Primitives (internal, not for components) |
-| `--sa-color-`    | Semantic colors                           |
-| `--sa-bg-`       | Background surfaces                       |
-| `--sa-text-`     | Text colors                               |
-| `--sa-border-`   | Borders                                   |
-| `--sa-shadow-`   | Shadows / elevation                       |
-| `--sa-gradient-` | Gradients                                 |
-| `--sa-font-`     | Typography                                |
-| `--sa-radius-`   | Border radius                             |
-| `--sa-space-`    | Spacing scale                             |
-| `--sa-dash-`     | Dashboard layout spacing                  |
-| `--sa-form-`     | Form container spacing                    |
-| `--sa-field-`    | Field group spacing                       |
-| `--sa-touch-`    | Touch target sizing                       |
+| Prefix            | Scope                                     |
+| ----------------- | ----------------------------------------- |
+| `--sa-p-`         | Primitives (internal, not for components) |
+| `--sa-color-`     | Semantic colors                           |
+| `--sa-bg-`        | Background surfaces                       |
+| `--sa-text-`      | Text colors                               |
+| `--sa-border-`    | Borders                                   |
+| `--sa-shadow-`    | Shadows / elevation                       |
+| `--sa-gradient-`  | Gradients                                 |
+| `--sa-font-`      | Typography                                |
+| `--sa-weight-`    | Font weights                              |
+| `--sa-leading-`   | Line heights                              |
+| `--sa-radius-`    | Border radius                             |
+| `--sa-space-`     | Spacing scale                             |
+| `--sa-motion-`    | Motion durations and animation timing     |
+| `--sa-lift-`      | Reusable elevation transforms             |
+| `--sa-btn-`       | Button component tokens                   |
+| `--sa-control-`   | Shared control component tokens           |
+| `--sa-toggle-`    | Toggle component tokens                   |
+| `--sa-tab-`       | Tabs component tokens                     |
+| `--sa-separator-` | Separator component tokens                |
+| `--sa-card-`      | Card component tokens                     |
+| `--sa-dash-`      | Dashboard layout spacing                  |
+| `--sa-form-`      | Form container spacing                    |
+| `--sa-field-`     | Field group spacing                       |
+| `--sa-touch-`     | Touch target sizing                       |
+| `--sa-jr-`        | Job runner specialized tokens             |
+
+Primitive tokens (`--sa-p-*`) are internal vocabulary. `controls.css` consumes
+semantic tokens, component tokens, typography tokens, layout tokens, and motion
+tokens; it does not consume primitive palette tokens directly.
 
 ### 4.5 Design System Locations
 
@@ -138,17 +192,19 @@ All tokens use `--sa-` prefix. Sub-namespaces:
 ux/
 └── common/
     ├── assets/              — static shared visual assets and token definitions
-    │   ├── css/             — style sheets & design tokens
+    │   ├── css/             — tokens.css, base.css, controls.css
     │   ├── fonts/           — font typography
     │   ├── icons/           — icon library
     │   └── ...
+    ├── views/               — UX projection types
+    ├── stores/              — reactive session, app, and dashboard stores
     └── components/          — shared design-system UI primitives and compositions
+        ├── shell/           — application shell foundation
         ├── controls/        — Kobalte-based UI primitives
+        ├── forms/           — adaptive/responsive form foundation
         ├── charts/          — ChartJS-based charts (PieChart, BarChart, LineChart, Sparkline)
         ├── dashboard/       — dashboard layout foundation
         ├── widgets/         — catalog of dashboard widgets
-        ├── shell/           — application shell foundation
-        ├── forms/           — adaptive/responsive form foundation
         └── ...
 ```
 
@@ -183,8 +239,9 @@ To maintain interface predictability, the following z-index scale MUST be used:
 | `--sa-z-below`   |    -1 | Decorations               |
 | `--sa-z-base`    |     0 | Content                   |
 | `--sa-z-docked`  |    10 | Sticky headers/footers    |
-| `--as-z-overlay` |   100 | Modals, popovers, flyouts |
-| `--as-z-toast`   |  1000 | System notifications      |
+| `--sa-z-popover` |    20 | Menus, lists, popovers    |
+| `--sa-z-overlay` |   100 | Modals, overlays, flyouts |
+| `--sa-z-toast`   |  1000 | System notifications      |
 
 ## 6. Dashboard
 
@@ -276,6 +333,7 @@ Controls are based on Kobalte primitives and exposed as App{Control} components 
 | Component        | Kobalte Primitive | Notes                                       |
 | ---------------- | ----------------- | ------------------------------------------- |
 | `AppButton`      | `Button`          | variants: primary, secondary, ghost, danger |
+| `AppCard`        | —                 | reusable framed content surface             |
 | `AppIconButton`  | `Button`          | round, icon-only                            |
 | `AppInput`       | `TextField`       | text, number variants                       |
 | `AppTextarea`    | `TextField`       | multiline                                   |
@@ -313,15 +371,30 @@ data-ui="<control>"
 Canonical values:
 
 ```
-button
-input
-checkbox
-progress
-select
-dialog
-tabs
 accordion
-...
+alert
+avatar
+badge
+button
+card
+checkbox
+dialog
+icon-button
+input
+multi-select
+popover
+progress
+radio
+radio-group
+select
+separator
+skeleton
+spinner
+tabs
+textarea
+toggle
+toggle-group
+tooltip
 ```
 
 Mapping is derived from component name:
@@ -334,6 +407,23 @@ Mapping is derived from component name:
 - lowercase
 - singular
 - no prefixes (`app-`)
+- compound identities use kebab-case
+
+Controls may also declare semantic part identities when the underlying
+primitive has separately styled parts. Declared part values include:
+
+```
+progress-fill
+progress-track
+select-content
+select-item
+tab-list
+tab
+tab-panel
+```
+
+Part identities are `data-ui` values, not secondary attributes layered onto the
+root control identity.
 
 #### 8.1.1.2 Variants
 
@@ -379,7 +469,7 @@ loading
 **Controls do NOT:**
 
 - apply visual classes
-- define spacing, color, or layout
+- define color, shadow, typography, spacing, or motion in component code
 - use inline styles
 - reference tokens directly
 
@@ -387,7 +477,8 @@ loading
 
 - emit semantic attributes only
 
-All styling is defined in `css/tokens.css`.
+Reusable primitive styling is defined in `controls.css` and consumes variables
+declared in `tokens.css`. Global browser foundation styling lives in `base.css`.
 Selectors:
 
 ```
@@ -400,7 +491,7 @@ Selectors:
 
 - Each control binds to its declared Kobalte primitive
 - Kobalte provides behavior and accessibility
-- Controls MUST attach semantic attributes to the root interactive DOM element.
+- Controls MUST attach semantic attributes to the root interactive DOM element or to declared primitive parts.
 - Kobalte must not be exposed externally
 
 #### 8.1.1.6 Structural Boundary
@@ -416,7 +507,7 @@ Controls are atomic in scope.
 
 #### 8.1.1.7 Attribute Discipline
 
-**Allowed attributes:**
+App control wrappers manually emit only:
 
 ```
 data-ui
@@ -424,7 +515,20 @@ data-ui-variant
 data-ui-state
 ```
 
-No other `data-*` attributes are allowed.
+Kobalte and ARIA runtime attributes may be consumed by `controls.css` when they represent real primitive state. Examples:
+
+```
+[data-checked]
+[data-pressed]
+[data-selected]
+[aria-checked='true']
+[aria-pressed='true']
+[aria-selected='true']
+[role='tab']
+[role='progressbar']
+```
+
+Feature and app code must not invent styling attributes such as `data-card-mode`, `data-page-section`, or `data-feature-state`. Any additional `data-ui` value for a primitive or primitive part must be declared in this design language before use.
 
 #### 8.1.1.8 Enforcement
 
@@ -433,6 +537,7 @@ No other `data-*` attributes are allowed.
 - missing `data-ui`
 - invalid or undeclared variant
 - invalid or undeclared state
+- undeclared control or part identity
 - styling inside control
 - bypassing control when one exists
 
@@ -444,17 +549,21 @@ These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark v
 
 #### Button
 
-| Token                       | Dark value                  | Light value                 |
-| --------------------------- | --------------------------- | --------------------------- |
-| `--sa-btn-primary-bg`       | `oklch(var(--sa-p-green))`  | `oklch(var(--sa-p-teal))`   |
-| `--sa-btn-primary-text`     | `oklch(var(--sa-p-black))`  | `oklch(var(--sa-p-white))`  |
-| `--sa-btn-primary-bg-hover` | `oklch(80% 0.13 123.993)`   | `oklch(72% 0.11 184.216)`   |
-| `--sa-btn-danger-bg`        | `oklch(var(--sa-p-danger))` | `oklch(var(--sa-p-danger))` |
-| `--sa-btn-danger-text`      | `oklch(var(--sa-p-white))`  | `oklch(var(--sa-p-white))`  |
-| `--sa-color-primary`        | —                           | —                           |
-| `--sa-color-danger`         | —                           | —                           |
-| `--sa-border-brand`         | —                           | —                           |
-| `--sa-text-disabled`        | —                           | —                           |
+| Token                                 | Dark value                  | Light value                 |
+| ------------------------------------- | --------------------------- | --------------------------- |
+| `--sa-btn-primary-bg`                 | `oklch(var(--sa-p-green))`  | `oklch(var(--sa-p-teal))`   |
+| `--sa-btn-primary-text`               | `oklch(var(--sa-p-black))`  | `oklch(var(--sa-p-white))`  |
+| `--sa-btn-danger-bg`                  | `oklch(var(--sa-p-danger))` | `oklch(var(--sa-p-danger))` |
+| `--sa-btn-danger-text`                | `oklch(var(--sa-p-white))`  | `oklch(var(--sa-p-white))`  |
+| `--sa-color-primary`                  | —                           | —                           |
+| `--sa-color-transparent`              | —                           | —                           |
+| `--sa-color-danger`                   | —                           | —                           |
+| `--sa-border-brand`                   | —                           | —                           |
+| `--sa-gradient-btn`                   | —                           | —                           |
+| `--sa-shadow-btn`                     | —                           | —                           |
+| `--sa-shadow-glow`                    | —                           | —                           |
+| `--sa-button-primary-hover-transform` | —                           | —                           |
+| `--sa-text-disabled`                  | —                           | —                           |
 
 #### Input / Textarea / Select
 
@@ -493,12 +602,14 @@ These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark v
 
 #### Skeleton / Spinner
 
-| Token                 | Dark value | Light value |
-| --------------------- | ---------- | ----------- |
-| `--sa-bg-surface-2`   | —          | —           |
-| `--sa-bg-surface-3`   | —          | —           |
-| `--sa-color-primary`  | —          | —           |
-| `--sa-border-default` | —          | —           |
+| Token                  | Dark value | Light value |
+| ---------------------- | ---------- | ----------- |
+| `--sa-bg-surface-2`    | —          | —           |
+| `--sa-bg-surface-3`    | —          | —           |
+| `--sa-color-primary`   | —          | —           |
+| `--sa-border-default`  | —          | —           |
+| `--sa-motion-spinner`  | —          | —           |
+| `--sa-motion-skeleton` | —          | —           |
 
 #### Badge / Alert
 
@@ -516,6 +627,18 @@ These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark v
 | `--sa-color-info`           | —          | —           |
 | `--sa-color-info-bg`        | —          | —           |
 | `--sa-color-info-border`    | —          | —           |
+
+#### Card
+
+| Token                      | Dark value | Light value |
+| -------------------------- | ---------- | ----------- |
+| `--sa-bg-card`             | —          | —           |
+| `--sa-border-card`         | —          | —           |
+| `--sa-shadow-card`         | —          | —           |
+| `--sa-gradient-stripe`     | —          | —           |
+| `--sa-card-stripe-height`  | —          | —           |
+| `--sa-card-stripe-opacity` | —          | —           |
+| `--sa-widget-pad`          | —          | —           |
 
 ### 8.1.3 Control Selectors
 
@@ -541,17 +664,46 @@ All component visual rules live in `controls.css`. This section defines the sele
 }
 ```
 
+Primitive part selectors use distinct `data-ui` identities:
+
+```css
+[data-ui='tab-list'] [data-ui='tab'] {
+  /* tab trigger within tab list */
+}
+[data-ui='toggle-group'] [data-ui='toggle'] {
+  /* grouped toggle item */
+}
+[data-ui='progress'] [data-ui='progress-fill'] {
+  /* progress fill part */
+}
+```
+
+The following selector shape is invalid because one element cannot hold two
+different `data-ui` identities:
+
+```css
+[data-ui='tabs'][data-ui='tab']
+[data-ui='toggle-group'][data-ui='toggle']
+[data-ui='progress'][data-ui='progress-fill']
+```
+
+`controls.css` must not depend on app-specific structure, arbitrary descendant
+content (`h3`, `p`, etc.), or page-layout sibling relationships. When a repeated
+composition needs structural styling, it graduates to a named common component
+or remains in app-local CSS if it is app-specific.
+
 #### Per-control intent
 
 **`[data-ui="button"]`**
 
 - Base (ghost): transparent background, `--sa-color-primary` border and text
-- `variant="primary"`: solid `--sa-btn-primary-bg`, `--sa-btn-primary-text`, hover lightens via `--sa-btn-primary-bg-hover`
+- `variant="primary"`: `--sa-gradient-btn` background, transparent border, `--sa-btn-primary-text`, `--sa-shadow-btn`
+- Primary hover: preserves `--sa-gradient-btn`, adds `--sa-shadow-glow`, and applies `--sa-button-primary-hover-transform`
 - `variant="secondary"`: `--sa-bg-surface-2` background, `--sa-border-default` border, `--sa-text-primary` text
 - `variant="danger"`: solid `--sa-btn-danger-bg`, `--sa-btn-danger-text`
 - `state="disabled"`: opacity 0.35, cursor not-allowed
 - `state="loading"`: opacity 0.65, cursor wait
-- Font: `--sa-font-display`, `--sa-weight-medium`; primary/danger use `--sa-weight-semibold`
+- Font: `--sa-font-ui`, `--sa-weight-medium`; primary/danger use `--sa-weight-semibold`
 
 **`[data-ui="input"]`, `[data-ui="textarea"]`, `[data-ui="select"]`**
 
@@ -572,7 +724,7 @@ All component visual rules live in `controls.css`. This section defines the sele
 **`[data-ui="toggle"]`**
 
 - Base: `--sa-bg-surface-2` background, `--sa-border-default` border, `--sa-text-muted` text
-- `.pressed` / `[aria-pressed="true"]`: `--sa-toggle-pressed-bg`, `--sa-toggle-pressed-border`, `--sa-toggle-pressed-text`
+- `[data-pressed]` / `[aria-pressed="true"]`: `--sa-toggle-pressed-bg`, `--sa-toggle-pressed-border`, `--sa-toggle-pressed-text`
 
 **`[data-ui="toggle-group"]`**
 
@@ -580,25 +732,25 @@ All component visual rules live in `controls.css`. This section defines the sele
 
 **`[data-ui="tabs"]`**
 
-- Tab list: pill container, `--sa-tab-pill-bg` background, `--sa-radius-md`, tight internal padding
-- Inactive tab: `--sa-text-muted`, transparent background
-- Active tab (`[data-ui="tab"].active` / `[data-selected]`): `--sa-tab-active-bg`, `--sa-tab-active-text`, `--sa-weight-medium`
+- `tab-list`: pill container, `--sa-tab-pill-bg` background, `--sa-radius-md`, tight internal padding
+- `tab`: inactive tab, `--sa-text-muted`, transparent background
+- Active tab (`[data-ui="tab"][data-selected]` / `[aria-selected="true"]`): `--sa-tab-active-bg`, `--sa-tab-active-text`, `--sa-weight-medium`
 - No underline separator. The pill pattern is the L&F.
 
 **`[data-ui="progress"]`**
 
 - Track: `--sa-bg-surface-3`, `--sa-radius-full`, fixed height `--sa-jr-progress-height` (job-runner) or 5px (general)
-- Fill: `--sa-gradient-brand`, same radius
+- `progress-fill`: `--sa-gradient-brand`, same radius
 
 **`[data-ui="spinner"]`**
 
 - Ring: `--sa-border-default`; active arc: `--sa-color-primary`
-- Animation: rotate 0.8s linear infinite
+- Animation: rotate with `--sa-motion-spinner`
 
 **`[data-ui="skeleton"]`**
 
 - Shimmer: gradient sweep between `--sa-bg-surface-2` and `--sa-bg-surface-3`
-- Animation: background-position sweep 1.4s ease-in-out infinite
+- Animation: background-position sweep with `--sa-motion-skeleton`
 
 **`[data-ui="badge"]`**
 
@@ -612,12 +764,33 @@ All component visual rules live in `controls.css`. This section defines the sele
 
 **`[data-ui="separator"]`**
 
-- 1px rule, `--sa-border-table` color, no border shorthand (height: 1px, background)
+- `--sa-separator-size` rule, `--sa-border-table` color, no border shorthand
 
 **`[data-ui="avatar"]`**
 
 - Circle (`--sa-radius-full`), `--sa-gradient-brand` background, `--sa-text-on-brand` text
-- Font: `--sa-font-display`, `--sa-weight-semibold`
+- Font: `--sa-font-body`, `--sa-weight-semibold`
+
+**`[data-ui="card"]`**
+
+- Framed content surface with `--sa-bg-card`, `--sa-border-card`, `--sa-shadow-card`, `--sa-radius-lg`, and `--sa-widget-pad`
+- Top accent stripe uses `--sa-gradient-stripe`, `--sa-card-stripe-height`, and `--sa-card-stripe-opacity`
+- No hover lift or hover shadow treatment
+
+### 8.1.4 Style Guide Harness
+
+The style-guide application is a demonstration harness for the design system.
+It imports shared CSS in canonical order and may style specimen layout,
+inspection grids, and demo-only spacing. It must not redefine reusable App
+control visuals.
+
+Style-guide CSS must not target App primitive identities with `[data-ui]`
+selectors. Demo-only sizing and layout must be applied through wrapper classes.
+
+Style-guide app surfaces must preserve the global foundation background unless
+a specific specimen requires an opaque content surface. Repeated demo treatment
+that becomes product UI must move into `source/ux/common/components/` or the
+shared CSS foundation before application code consumes it.
 
 ### 8.2 Form Controls
 

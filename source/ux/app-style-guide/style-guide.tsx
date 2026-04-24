@@ -16,12 +16,18 @@ StyleGuide  Single-page living style guide application.
 
 import { createEffect, createSignal, For, type JSX } from '@solid-js'
 import {
+  AppAccordion,
   AppAlert,
   AppAvatar,
   AppBadge,
   AppButton,
+  AppCard,
   AppCheckbox,
+  AppDialog,
+  AppIconButton,
   AppInput,
+  AppMultiSelect,
+  AppPopover,
   AppProgress,
   AppRadioGroup,
   AppRadioItem,
@@ -96,9 +102,11 @@ const BUTTON_VARIANTS = [
 ] as const
 
 const STATUSES = ['Scheduled', 'Ready', 'Blocked', 'Complete'] as const
+const SERVICES = ['Aerial', 'Ground', 'Inspection', 'Followup'] as const
 
 type SectionProps = {
   children: JSX.Element
+  framed?: boolean
   title: string
 }
 
@@ -142,12 +150,10 @@ export const StyleGuide = (): JSX.Element => {
           Body copy should inherit the product typography without local component styling. Weather,
           acreage, crew availability, and service windows remain scannable.
         </p>
-        <label>Inter label text</label>
         <p>
           Inline code sample: <code>service.category === 'aerial-drone-services'</code>
         </p>
-        <pre>{`const acres = 142
-const service = 'Aerial - Fixed Wing'`}</pre>
+        <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
       </Section>
 
       <Section title='Color'>
@@ -192,6 +198,15 @@ const service = 'Aerial - Fixed Wing'`}</pre>
           <AppButton variant='primary' loading={loading()}>
             Loading
           </AppButton>
+        </div>
+      </Section>
+
+      <Section title='AppIconButton'>
+        <div class='sg-row'>
+          <AppIconButton aria-label='Add service note'>+</AppIconButton>
+          <AppIconButton aria-label='Refresh service status' disabled>
+            R
+          </AppIconButton>
         </div>
       </Section>
 
@@ -244,6 +259,16 @@ const service = 'Aerial - Fixed Wing'`}</pre>
             <AppSelect disabled options={STATUSES}>Ground - Sprayer</AppSelect>
           </label>
         </div>
+      </Section>
+
+      <Section title='AppMultiSelect'>
+        <AppMultiSelect>
+          <div class='sg-token-list'>
+            <For each={SERVICES}>
+              {service => <span>{service}</span>}
+            </For>
+          </div>
+        </AppMultiSelect>
       </Section>
 
       <Section title='AppCheckbox'>
@@ -324,8 +349,12 @@ const service = 'Aerial - Fixed Wing'`}</pre>
       <Section title='AppSkeleton'>
         <div class='sg-stack'>
           <AppSkeleton />
-          <AppSkeleton data-sg-width='75' />
-          <AppSkeleton data-sg-width='50' />
+          <div class='sg-skeleton-75'>
+            <AppSkeleton />
+          </div>
+          <div class='sg-skeleton-50'>
+            <AppSkeleton />
+          </div>
         </div>
       </Section>
 
@@ -353,8 +382,41 @@ const service = 'Aerial - Fixed Wing'`}</pre>
         </AppTooltip>
       </Section>
 
+      <Section title='AppDialog'>
+        <AppDialog trigger='Open dispatch dialog'>
+          <div class='sg-stack'>
+            <p>Confirm crew assignment before dispatch.</p>
+          </div>
+        </AppDialog>
+      </Section>
+
+      <Section title='AppPopover'>
+        <AppPopover trigger='Open field menu'>
+          <div class='sg-stack'>
+            <p>Field actions, notes, and service history.</p>
+          </div>
+        </AppPopover>
+      </Section>
+
+      <Section title='AppAccordion'>
+        <AppAccordion defaultValue={['weather']}>
+          <div class='sg-stack'>
+            <h3>Weather window</h3>
+            <p>Wind, precipitation, and visibility remain inside service thresholds.</p>
+          </div>
+        </AppAccordion>
+      </Section>
+
       <Section title='AppAvatar'>
         <AppAvatar>AG</AppAvatar>
+      </Section>
+
+      <Section title='AppCard' framed={false}>
+        <AppCard>
+          <h3>North Field readiness</h3>
+          <p>142 acres scheduled for aerial service after the morning wind check.</p>
+          <p>Primary crew has verified chemical labels, buffer zones, and asset readiness.</p>
+        </AppCard>
       </Section>
 
       <Section title='AppSeparator'>
@@ -403,11 +465,11 @@ const service = 'Aerial - Fixed Wing'`}</pre>
           <legend>Raw fieldset</legend>
           <label>
             Field contact
-            <input value='R. Alvarez' onInput={() => undefined} />
+            <AppInput id='nameId' value='R. Alvarez' onInput={() => undefined} />
           </label>
           <label>
             Gate code
-            <input value='4821' onInput={() => undefined} />
+            <AppInput id='codeId' value='4821' onInput={() => undefined} />
           </label>
         </fieldset>
       </Section>
@@ -416,18 +478,17 @@ const service = 'Aerial - Fixed Wing'`}</pre>
         {/* TODO: AppChart - pending chart primitive */}
         <AppSkeleton />
       </Section>
-
-      <Section title='Dashboard'>
-        <AppSkeleton />
-      </Section>
     </main>
   )
 }
 
 const Section = (props: SectionProps): JSX.Element => (
   <section class='sg-section'>
-    <h2>{props.title}</h2>
-    <div class='sg-section-body'>{props.children}</div>
-    <AppSeparator />
+    <AppCard>
+      <div class='sg-section-frame'>
+        <h2>{props.title}</h2>
+        <div class='sg-section-body'>{props.children}</div>
+      </div>
+    </AppCard>
   </section>
 )

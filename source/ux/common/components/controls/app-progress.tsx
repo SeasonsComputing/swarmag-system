@@ -33,6 +33,20 @@ export type AppProgressProps = {
   'data-ui-state'?: never
 }
 
+type AppProgressTrackProps = {
+  children?: JSX.Element
+  'data-ui': 'progress-track'
+}
+
+type AppProgressFillProps = {
+  'data-ui': 'progress-fill'
+}
+
+const ProgressTrack = Progress.Track as unknown as (
+  props: AppProgressTrackProps
+) => JSX.Element
+const ProgressFill = Progress.Fill as unknown as (props: AppProgressFillProps) => JSX.Element
+
 /** Progress control with declared states. */
 export const AppProgress = (props: AppProgressProps): JSX.Element => {
   const [local] = splitProps(props, [
@@ -58,6 +72,9 @@ export const AppProgress = (props: AppProgressProps): JSX.Element => {
       minValue={local.minValue}
       maxValue={local.maxValue}
     >
+      <ProgressTrack data-ui='progress-track'>
+        <ProgressFill data-ui='progress-fill' />
+      </ProgressTrack>
       {local.children}
     </Progress>
   )

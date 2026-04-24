@@ -10,53 +10,13 @@ Single source of truth for UX color, spacing, typography, and visual semantics.
 All UX apps consume these CSS variables through semantic tokens rather than
 hard-coded values to keep themes and visual language consistent.
 
-DESIGN FEATURES
+TOKEN FEATURES
 ───────────────────────────────────────────────────────────────────────────────
-Primitive palette -> Raw OKLCH tuples (brand and neutral primitives).
+Primitive palette -> Raw OKLCH tuples for brand and neutral primitives.
 Semantic tokens   -> Role-based tokens consumed by components.
 Theme overrides   -> Light theme overrides via [data-theme='light'].
-Typography        -> Self-hosted font faces and app typography tokens.
+Typography        -> App typography tokens consumed by base and controls.
 */
-
-/*
- * TYPOGRAPHY
- * ───────────────────────────────────────────────────────────────────────────
- * Self-hosted woff2 fonts.
- */
-
-@font-face {
-  font-family: 'Lexend';
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-  src:
-    url('../fonts/Lexend-VariableFont_wght.woff2') format('woff2-variations'),
-    url('../fonts/Lexend-VariableFont_wght.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../fonts/inter-400.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/inter-600.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Mono';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url('../fonts/CascadiaMono-Light.woff2') format('woff2');
-}
 
 /*
  * PRIMITIVE PALETTE
@@ -100,6 +60,11 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-p-warning: 76.885% 0.1231 80.8277; /* orange — brand      */
   --sa-p-danger: 62.8% 0.2577 29.234; /* red                 */
   --sa-p-info: 60.8% 0.108 216.744; /* teal-blue           */
+
+  /* Radial background accents */
+  --sa-p-radial-1: oklch(var(--sa-p-green-teal) / 0.30);
+  --sa-p-radial-2: oklch(var(--sa-p-blue-deep) / 0.15);
+  --sa-p-radial-3: oklch(var(--sa-p-teal-blue) / 0.10);
 }
 
 /*
@@ -111,7 +76,8 @@ Typography        -> Self-hosted font faces and app typography tokens.
 :root,
 [data-theme='dark'] {
   /* --- Fonts --- */
-  --sa-font-display: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --sa-font-heading: 'DM Serif Display', ui-sans-serif, system-ui, sans-serif;
+  --sa-font-body: 'Lexend', ui-sans-serif, system-ui, sans-serif;
   --sa-font-ui: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --sa-font-mono: 'Mono', ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
 
@@ -170,6 +136,11 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-bg-input: oklch(17% 0.014 264.5);
   --sa-bg-input-focus: oklch(19% 0.016 264.5);
   --sa-bg-input-disabled: oklch(20% 0.010 264.5);
+  --sa-bg-card: linear-gradient(
+    135deg,
+    oklch(var(--sa-p-surface-3) / 0.60) 0%,
+    oklch(var(--sa-p-surface-2) / 0.80) 100%
+  );
 
   /* --- Text --- */
   --sa-text-primary: oklch(var(--sa-p-near-white));
@@ -198,6 +169,7 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-border-input: 1px solid oklch(var(--sa-p-surface-3));
   --sa-border-input-focus: oklch(var(--sa-p-green-teal));
   --sa-border-input-error: oklch(var(--sa-p-danger));
+  --sa-border-card: 1px solid oklch(var(--sa-p-near-white) / 0.10);
 
   /* --- Border Radius --- */
   --sa-radius-sm: 0.375rem;
@@ -221,6 +193,7 @@ Typography        -> Self-hosted font faces and app typography tokens.
     0 15px 40px oklch(var(--sa-p-teal) / 0.40),
     0 0 40px oklch(var(--sa-p-blue) / 0.30),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.20);
+  --sa-shadow-card: 0 20px 40px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--sa-p-white) / 0.06);
   --sa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
   --sa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.30), 0 3px 6px oklch(0% 0 0 / 0.20);
 
@@ -272,6 +245,7 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-color-info: oklch(var(--sa-p-info));
   --sa-color-info-bg: oklch(var(--sa-p-info) / 0.12);
   --sa-color-info-border: oklch(var(--sa-p-info) / 0.30);
+  --sa-color-transparent: transparent;
 
   /* --- Control Tokens --- */
   --sa-btn-primary-bg: oklch(var(--sa-p-green));
@@ -287,6 +261,10 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-tab-pill-bg: oklch(var(--sa-p-surface-2));
   --sa-tab-active-bg: oklch(var(--sa-p-surface-3));
   --sa-tab-active-text: oklch(var(--sa-p-near-white));
+  --sa-separator-size: 1px;
+  --sa-card-stripe-height: 3px;
+  --sa-card-stripe-opacity: 0.8;
+  --sa-button-primary-hover-transform: translateY(-2px);
 
   /* --- Table --- */
   --sa-table-cell-pad: 0.375rem;
@@ -322,11 +300,22 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-size-md: 1024px;
   --sa-size-lg: 1152px;
 
+  /* --- Z-index Scale --- */
+  --sa-z-below: -1;
+  --sa-z-base: 0;
+  --sa-z-docked: 10;
+  --sa-z-popover: 20;
+  --sa-z-overlay: 100;
+  --sa-z-toast: 1000;
+
   /* --- Transitions --- */
   --sa-transition-fast: all 0.15s ease;
   --sa-transition-base: all 0.3s ease;
   --sa-transition-slow: all 0.6s ease-out;
   --sa-transition-spring: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --sa-motion-page-fade: 200ms;
+  --sa-motion-spinner: 0.8s;
+  --sa-motion-skeleton: 1.4s;
 
   /* --- Misc --- */
   --sa-blur: blur(10px);
@@ -360,6 +349,11 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-bg-input: oklch(100% 0 0);
   --sa-bg-input-focus: oklch(98% 0.010 155.8);
   --sa-bg-input-disabled: oklch(96% 0.003 264.5);
+  --sa-bg-card: linear-gradient(
+    135deg,
+    oklch(97% 0.004 264.5 / 0.60) 0%,
+    oklch(100% 0 0 / 0.80) 100%
+  );
 
   /* --- Text --- */
   --sa-text-primary: oklch(var(--sa-p-surface-1));
@@ -386,6 +380,7 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-border-table: oklch(88% 0.006 264.5);
   --sa-border-input: 1px solid oklch(82% 0.008 264.5);
   --sa-border-input-focus: oklch(var(--sa-p-teal));
+  --sa-border-card: 1px solid oklch(0% 0 0 / 0.08);
 
   /* --- Focus Ring --- */
   --sa-focus-ring: 0 0 0 2px oklch(96% 0.004 264.5), 0 0 0 4px oklch(var(--sa-p-success) / 0.5);
@@ -402,6 +397,7 @@ Typography        -> Self-hosted font faces and app typography tokens.
     0 15px 40px oklch(var(--sa-p-teal) / 0.30),
     0 0 40px oklch(var(--sa-p-blue) / 0.20),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.50);
+  --sa-shadow-card: 0 20px 40px oklch(0% 0 0 / 0.10), inset 0 1px 0 oklch(var(--sa-p-white) / 0.50);
 
   /* --- Gradients --- */
   --sa-gradient-card: linear-gradient(
@@ -437,54 +433,6 @@ Typography        -> Self-hosted font faces and app typography tokens.
   --sa-tab-pill-bg: oklch(88% 0.006 264.5);
   --sa-tab-active-bg: oklch(100% 0 0);
   --sa-tab-active-text: oklch(var(--sa-p-surface-1));
-}
-
-/*
- * GLOBAL RESET & BASE
- * ───────────────────────────────────────────────────────────────────────────
- */
-
-*, *::before, *::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-html {
-  font-size: 16px;
-  scroll-behavior: smooth;
-  color-scheme: dark light;
-}
-
-body {
-  background: var(--sa-bg-page);
-  color: var(--sa-text-primary);
-  font-family: var(--sa-font-display);
-  font-weight: var(--sa-weight-normal);
-  line-height: var(--sa-leading-normal);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-/* --- UI chrome inherits Inter --- */
-input, select, textarea, label, th, td, button, [role='option'], [role='menuitem'] {
-  font-family: var(--sa-font-ui);
-}
-
-code, pre, kbd, samp {
-  font-family: var(--sa-font-mono);
-}
-
-/*
- * FOCUS VISIBLE
- * ───────────────────────────────────────────────────────────────────────────
- * Global enforcement. Kobalte's accessible focus hooks into this.
- * Override per-component only when geometry requires a different shape.
- */
-
-:focus-visible {
-  outline: none;
-  box-shadow: var(--sa-focus-ring);
 }
 
 /*
@@ -615,18 +563,4 @@ code, pre, kbd, samp {
   --sa-jr-prompt-weight: var(--sa-weight-medium);
   --sa-jr-help-size: var(--sa-font-md);
   --sa-jr-help-color: oklch(var(--sa-p-muted));
-}
-
-/*
- * ACCESSABILITY
- * ───────────────────────────────────────────────────────────────────────────
- */
-
-@media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
 }

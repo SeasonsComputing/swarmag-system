@@ -233,7 +233,7 @@ app.tsx
     └── Dashboard          — primary navigation surface
 ```
 
-`Login`, `AuthGuard`, `Content`, and shared stores live in `source/ux/common/`. App packages provide only dashboard configuration (`dashboard-default.json`) and app-specific routes, widgets, and features.
+`Login`, `AuthGuard`, `Content`, and shared stores live in `source/ux/common/`. App packages provide only dashboard configuration (`app-{admin|ops|customer}-dashboard.json`) and app-specific routes, widgets, and features.
 
 Dashboard harness is shared and belongs in `source/ux/common/components/dashboard/`.
 
@@ -251,7 +251,7 @@ dashboard → domain page → back to dashboard
 
 ### 8.2 Routing
 
-Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/ux/common/components/shell/app.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
+Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/ux/common/components/shell/app-root.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
 
 A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
 
@@ -450,13 +450,14 @@ IndexedDB usage is split into two layers:
 #### 9.1.1 Belongs in `common/`
 
 - `views/` — UX-local shared types consumed by two or more apps
-- `login` — designed brand experience, not a generic form instance
-- `auth-guard` — route-level session check
-- `form-panel` — general adaptive form container (full-screen mobile, modal-centered desktop)
-- `content` — main content frame
-- session store
-- app state store
-- dashboard state store + dashboard harness
+- `assets/` — shared CSS foundation, fonts, icons, and static visual assets
+- `components/shell/` — `app-root`, `login`, `auth-guard`, `content`, shell dashboard stub, and form panel
+- `components/controls/` — Kobalte-backed App{Control} primitives
+- `components/forms/` — adaptive form primitives and domain-form composition foundations
+- `components/charts/` — chart primitives and chart compositions
+- `components/dashboard/` — dashboard layout foundation
+- `components/widgets/` — reusable dashboard widget catalog
+- `stores/` — session, app preference, and dashboard state stores
 
 #### 9.1.2 Stays in the app
 
@@ -483,7 +484,7 @@ source/
     ├── config/
     ├── common/
     │   ├── assets/                  — static assets used by applications
-    │   │   ├── css/                 — style sheets & design tokens
+    │   │   ├── css/                 — tokens.css, base.css, controls.css
     │   │   ├── fonts/               — font typography
     │   │   └── icons/               — icon library
     │   ├── views/                   — UX projection types (domain → display shape)
@@ -492,26 +493,42 @@ source/
     │   │   ├── session-state.ts
     │   │   └── dashboard-state.ts
     │   └── components/
-    │       ├── shell/               — auth-guard, content
+    │       ├── shell/               — app-root, auth-guard, content, login, form-panel
     │       ├── controls/            — Kobalte-based UI primitives
+    │       ├── forms/               — adaptive form primitives and compositions
     │       ├── charts/              — PieChart, BarChart, LineChart, Sparkline
     │       ├── dashboard/           — shared dashboard harness + layout foundation
     │       └── widgets/             — widget catalog
     ├── app-admin/
     │   ├── app.tsx
-    │   ├── dashboard-default.json   — default dashboard layout for app-admin
+    │   ├── app-admin-dashboard.json — default dashboard layout for app-admin
+    │   ├── index.html
+    │   ├── manifest.webmanifest
+    │   ├── sw.js
+    │   ├── vite.config.ts
     │   ├── workflow-builder/        — workflow authoring/editing
     │   ├── job-assessment/          — guided onsite detailed assessment (maps, photos, workflow mods)
     │   ├── job-planning/            — workflow mods + crew + equipment + chemical assignment
     │   └── customer-prospect/       — guided new customer + new job + initial assessment
     ├── app-customer/
     │   ├── app.tsx
-    │   ├── dashboard-default.json   — default dashboard layout for app-customer
+    │   ├── app-customer-dashboard.json — default dashboard layout for app-customer
+    │   ├── index.html
+    │   ├── manifest.webmanifest
+    │   ├── sw.js
+    │   ├── vite.config.ts
     │   └── customer-report/         — specialized report for customer
-    └── app-ops/
-        ├── app.tsx
-        ├── dashboard-default.json   — default dashboard layout for app-ops
-        └── job-runner/              — guided job execution engine
+    ├── app-ops/
+    │   ├── app.tsx
+    │   ├── app-ops-dashboard.json   — default dashboard layout for app-ops
+    │   ├── index.html
+    │   ├── manifest.webmanifest
+    │   ├── sw.js
+    │   ├── vite.config.ts
+    │   ├── stores/
+    │   │   └── jobs-store.ts        — local job manifest store
+    │   └── job-runner/              — guided job execution engine
+    └── app-style-guide/             — design-system demonstration harness
 ```
 
 Everything in `source/ux/common/` must be adaptive — usable across all three apps and all viewport sizes. Mobile-only or desktop-only components do not belong in `common/`.
@@ -531,6 +548,7 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/config
 - Three Vite configs, one per app
 - Three Netlify sites, one per app
 - `ux/common/` and `ux/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
+- App roots import shared CSS in this order: `tokens.css`, `base.css`, `controls.css`
 - Build output is ephemeral — temp directory, zipped, deployed via Netlify CLI in `source/devops/scripts/`
 - No build artifacts are checked into the repository
 
@@ -546,25 +564,30 @@ Dashboard
 
 No row collapse on small viewport. Horizontal swipe per row. Vertical scroll on the outer column.
 
-**`source/ux/app-{admin|ops|customer}/dashboard-default.json`**
+**`source/ux/app-{admin|ops|customer}/app-{admin|ops|customer}-dashboard.json`**
 
-Layout is data-driven via app-local `dashboard-default.json`, rendered by the shared dashboard harness in `source/ux/common/components/dashboard/`, and hydrated into `DashboardState` (`source/ux/common/stores/dashboard-state.ts`). Not hardcoded. May be overridden per user in future — for now a single default config per app.
+Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/ux/common/stores/dashboard-state.ts`). Not hardcoded. May be overridden per user in future — for now a single default config per app.
+
+The app-local dashboard JSON conforms to `DashboardView` from
+`source/ux/common/views/dashboard-views.ts`. `DashboardState.init(seed)`
+validates the seed and converts it into `DashboardStoreView` from
+`source/ux/common/stores/dashboard-state.ts` by assigning stable store identity
+to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
 ```json
 {
   "header": {
     "widgets": [
-      { "key": "brand", "type": "BrandWidget", "shape": "landscape", "settings": {} }
+      { "type": "BrandWidget", "shape": "landscape", "settings": {} }
     ]
   },
   "rows": [
     {
-      "key": "at-a-glance",
       "size": "standard",
       "label": "Operations at-a-glance",
       "widgets": [
-        { "key": "upcoming-jobs", "type": "UpcomingJobsWidget", "shape": "landscape", "settings": {} },
-        { "key": "asset-status", "type": "AssetStatusWidget", "shape": "square", "settings": {} }
+        { "type": "UpcomingJobsWidget", "shape": "landscape", "settings": {} },
+        { "type": "AssetStatusWidget", "shape": "square", "settings": {} }
       ]
     }
   ]
