@@ -7,6 +7,7 @@ export { AppAlert, type AppAlertProps, type AppAlertVariant } from './app-alert.
 export { AppAvatar, type AppAvatarProps } from './app-avatar.tsx'
 export { AppBadge, type AppBadgeProps, type AppBadgeVariant } from './app-badge.tsx'
 export { AppButton, type AppButtonProps, type AppButtonVariant } from './app-button.tsx'
+export { AppCard, type AppCardProps } from './app-card.tsx'
 export { AppCheckbox, type AppCheckboxProps } from './app-checkbox.tsx'
 export { AppDialog, type AppDialogProps } from './app-dialog.tsx'
 export { AppIconButton, type AppIconButtonProps } from './app-icon-button.tsx'

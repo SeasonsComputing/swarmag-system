@@ -1,0 +1,178 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ UX base styles                                                               ║
+║ Browser foundation, font faces, global background, and accessibility rules.  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Defines global browser-level style foundations consumed by all UX apps.
+*/
+
+/*
+ * TYPOGRAPHY
+ * ───────────────────────────────────────────────────────────────────────────
+ * Self-hosted woff2 fonts.
+ */
+
+@font-face {
+  font-family: 'DM Serif Display';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/DMSerifDisplay-Regular.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Lexend';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src:
+    url('../fonts/Lexend-VariableFont_wght.woff2') format('woff2-variations'),
+    url('../fonts/Lexend-VariableFont_wght.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/inter-400.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('../fonts/inter-600.woff2') format('woff2');
+}
+
+@font-face {
+  font-family: 'Mono';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('../fonts/CascadiaMono-Light.woff2') format('woff2');
+}
+
+/*
+ * GLOBAL RESET & BASE
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  color-scheme: dark light;
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--sa-bg-page);
+  color: var(--sa-text-primary);
+  font-family: var(--sa-font-body);
+  font-weight: var(--sa-weight-thin);
+  line-height: var(--sa-leading-normal);
+  opacity: 0;
+  position: relative;
+  transition: opacity var(--sa-motion-page-fade) ease-in;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  background:
+    radial-gradient(circle at 12% 18%, var(--sa-p-radial-2) 0%, transparent 52%),
+    radial-gradient(circle at 82% 76%, var(--sa-p-radial-1) 0%, transparent 50%),
+    radial-gradient(circle at 68% 34%, var(--sa-p-radial-3) 0%, transparent 48%);
+  content: '';
+  height: 100%;
+  left: 0;
+  pointer-events: none;
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: var(--sa-z-below);
+}
+
+@keyframes sa-spinner-rotate {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@keyframes sa-skeleton-sweep {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/*
+ * GLOBAL TYPOGRAPHY INHERITANCE
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--sa-font-heading);
+  font-weight: var(--sa-weight-normal);
+}
+
+p, td, li {
+  font-family: var(--sa-font-body);
+  font-weight: var(--sa-weight-thin);
+}
+
+th {
+  font-family: var(--sa-font-body);
+  font-weight: var(--sa-weight-semibold);
+}
+
+button,
+input,
+label,
+select,
+textarea,
+[role='menuitem'],
+[role='option'] {
+  font-family: var(--sa-font-ui);
+  font-weight: var(--sa-weight-normal);
+}
+
+label {
+  font-weight: var(--sa-weight-medium);
+}
+
+code, pre, kbd, samp {
+  font-family: var(--sa-font-mono);
+}
+
+/*
+ * FOCUS VISIBLE
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+:focus-visible {
+  box-shadow: var(--sa-focus-ring);
+  outline: none;
+}
+
+/*
+ * ACCESSIBILITY
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
