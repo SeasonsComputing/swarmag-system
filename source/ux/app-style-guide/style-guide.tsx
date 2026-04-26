@@ -106,7 +106,6 @@ const SERVICES = ['Aerial', 'Ground', 'Inspection', 'Followup'] as const
 
 type SectionProps = {
   children: JSX.Element
-  framed?: boolean
   title: string
 }
 
@@ -156,6 +155,57 @@ export const StyleGuide = (): JSX.Element => {
         <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
       </Section>
 
+      <Section title='HTML Semantics'>
+        <table>
+          <thead>
+            <tr>
+              <th>Field name</th>
+              <th>Acreage</th>
+              <th>Service type</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <For each={FIELDS}>
+              {field => (
+                <tr>
+                  <td>{field.name}</td>
+                  <td>{field.acres}</td>
+                  <td>{field.service}</td>
+                  <td>{field.status}</td>
+                  <td>{field.date}</td>
+                </tr>
+              )}
+            </For>
+          </tbody>
+        </table>
+        <ul>
+          <li>Confirm chemical inventory.</li>
+          <li>Verify crew certification.</li>
+          <li>Inspect required assets.</li>
+        </ul>
+        <ol>
+          <li>Assess site.</li>
+          <li>Plan service.</li>
+          <li>Execute work.</li>
+        </ol>
+        <blockquote>
+          Service logs are records of field reality and must remain clear, durable, and auditable.
+        </blockquote>
+        <fieldset>
+          <legend>Raw fieldset</legend>
+          <label>
+            Field contact
+            <AppInput id='nameId' value='R. Alvarez' onInput={() => undefined} />
+          </label>
+          <label>
+            Gate code
+            <AppInput id='codeId' value='4821' onInput={() => undefined} />
+          </label>
+        </fieldset>
+      </Section>
+
       <Section title='Color'>
         <div class='sg-swatch-grid'>
           <For each={COLOR_SWATCHES}>
@@ -176,9 +226,9 @@ export const StyleGuide = (): JSX.Element => {
         <div class='sg-gradient-stripe' />
         <div class='sg-gradient-block' />
         <div class='sg-token-list'>
-          <code>--sa-color-brand-start</code>
-          <code>--sa-color-brand-mid</code>
-          <code>--sa-color-brand-end</code>
+          <span>Bright blue start</span>
+          <span>Darker green center</span>
+          <span>Bright teal finish</span>
         </div>
       </Section>
 
@@ -411,67 +461,31 @@ export const StyleGuide = (): JSX.Element => {
         <AppAvatar>AG</AppAvatar>
       </Section>
 
-      <Section title='AppCard' framed={false}>
-        <AppCard>
-          <h3>North Field readiness</h3>
-          <p>142 acres scheduled for aerial service after the morning wind check.</p>
-          <p>Primary crew has verified chemical labels, buffer zones, and asset readiness.</p>
-        </AppCard>
+      <Section title='AppCard'>
+        <div class='sg-card-grid'>
+          <AppCard variant='widget'>
+            <div class='sg-card-copy'>
+              <h3>Widget card</h3>
+              <p>Dashboard-ready surface with stripe treatment and crisp separation from the page.</p>
+            </div>
+          </AppCard>
+          <AppCard variant='panel'>
+            <div class='sg-card-copy'>
+              <h3>Panel card</h3>
+              <p>Quiet interior surface for form sections and guided workflow sub-groups.</p>
+            </div>
+          </AppCard>
+          <AppCard variant='workflow'>
+            <div class='sg-card-copy'>
+              <h3>Workflow card</h3>
+              <p>Primary framed container for guided flows that need stronger focus and elevation.</p>
+            </div>
+          </AppCard>
+        </div>
       </Section>
 
       <Section title='AppSeparator'>
         <AppSeparator />
-      </Section>
-
-      <Section title='HTML Semantics'>
-        <table>
-          <thead>
-            <tr>
-              <th>Field name</th>
-              <th>Acreage</th>
-              <th>Service type</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <For each={FIELDS}>
-              {field => (
-                <tr>
-                  <td>{field.name}</td>
-                  <td>{field.acres}</td>
-                  <td>{field.service}</td>
-                  <td>{field.status}</td>
-                  <td>{field.date}</td>
-                </tr>
-              )}
-            </For>
-          </tbody>
-        </table>
-        <ul>
-          <li>Confirm chemical inventory.</li>
-          <li>Verify crew certification.</li>
-          <li>Inspect required assets.</li>
-        </ul>
-        <ol>
-          <li>Assess site.</li>
-          <li>Plan service.</li>
-          <li>Execute work.</li>
-        </ol>
-        <blockquote>
-          Service logs are records of field reality and must remain clear, durable, and auditable.
-        </blockquote>
-        <fieldset>
-          <legend>Raw fieldset</legend>
-          <label>
-            Field contact
-            <AppInput id='nameId' value='R. Alvarez' onInput={() => undefined} />
-          </label>
-          <label>
-            Gate code
-            <AppInput id='codeId' value='4821' onInput={() => undefined} />
-          </label>
-        </fieldset>
       </Section>
 
       <Section title='Charts'>
@@ -484,7 +498,7 @@ export const StyleGuide = (): JSX.Element => {
 
 const Section = (props: SectionProps): JSX.Element => (
   <section class='sg-section'>
-    <AppCard>
+    <AppCard variant='panel'>
       <div class='sg-section-frame'>
         <h2>{props.title}</h2>
         <div class='sg-section-body'>{props.children}</div>

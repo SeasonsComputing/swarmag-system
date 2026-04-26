@@ -62,9 +62,9 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-p-info: 60.8% 0.108 216.744; /* teal-blue           */
 
   /* Radial background accents */
-  --sa-p-radial-1: oklch(var(--sa-p-green-teal) / 0.30);
-  --sa-p-radial-2: oklch(var(--sa-p-blue-deep) / 0.15);
-  --sa-p-radial-3: oklch(var(--sa-p-teal-blue) / 0.10);
+  --sa-p-radial-1: oklch(var(--sa-p-green) / 0.22);
+  --sa-p-radial-2: oklch(var(--sa-p-blue-deep) / 0.22);
+  --sa-p-radial-3: oklch(var(--sa-p-teal-blue) / 0.16);
 }
 
 /*
@@ -113,33 +113,33 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-tracking-widest: 0.1em;
 
   /* --- Brand Colors --- */
-  --sa-color-brand-start: oklch(var(--sa-p-green));
-  --sa-color-brand-mid: oklch(var(--sa-p-teal));
-  --sa-color-brand-end: oklch(var(--sa-p-blue));
+  --sa-color-brand-start: oklch(66% 0.14 235);
+  --sa-color-brand-mid: oklch(50% 0.10 150);
+  --sa-color-brand-end: oklch(78% 0.12 185);
 
   /* --- Semantic brand aliases --- */
-  --sa-color-primary: oklch(var(--sa-p-green-teal));
-  --sa-color-primary-dim: oklch(var(--sa-p-blue-deep));
-  --sa-color-secondary: oklch(var(--sa-p-teal-blue));
-  --sa-color-accent: oklch(var(--sa-p-teal));
+  --sa-color-primary: var(--sa-color-brand-end);
+  --sa-color-primary-dim: var(--sa-color-brand-mid);
+  --sa-color-secondary: var(--sa-color-brand-start);
+  --sa-color-accent: oklch(60% 0.125 210);
 
   /* --- Backgrounds --- */
-  --sa-bg-page: oklch(var(--sa-p-base) / 0.95);
+  --sa-bg-page: rgb(21 24 30 / 0.95);
   --sa-bg-base: oklch(var(--sa-p-black));
-  --sa-bg-surface-1: oklch(var(--sa-p-surface-1));
-  --sa-bg-surface-2: oklch(var(--sa-p-surface-2));
-  --sa-bg-surface-3: oklch(var(--sa-p-surface-3));
+  --sa-bg-surface-1: oklch(21% 0.018 252 / 0.88);
+  --sa-bg-surface-2: oklch(18% 0.018 252 / 0.78);
+  --sa-bg-surface-3: oklch(25% 0.02 248 / 0.70);
   --sa-bg-overlay: oklch(var(--sa-p-black) / 0.20);
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
-  --sa-bg-hover: oklch(var(--sa-p-green-teal) / 0.08);
+  --sa-bg-hover: oklch(var(--sa-p-green-teal) / 0.10);
   --sa-bg-selected: oklch(var(--sa-p-green-teal) / 0.15);
   --sa-bg-input: oklch(17% 0.014 264.5);
   --sa-bg-input-focus: oklch(19% 0.016 264.5);
   --sa-bg-input-disabled: oklch(20% 0.010 264.5);
   --sa-bg-card: linear-gradient(
     135deg,
-    oklch(var(--sa-p-surface-3) / 0.60) 0%,
-    oklch(var(--sa-p-surface-2) / 0.80) 100%
+    rgb(30 41 59 / 0.80) 0%,
+    rgb(51 65 85 / 0.60) 100%
   );
 
   /* --- Text --- */
@@ -155,21 +155,21 @@ Typography        -> App typography tokens consumed by base and controls.
 
   /* --- Heading hierarchy --- */
   --sa-text-h1: oklch(var(--sa-p-white));
-  --sa-text-h2: oklch(var(--sa-p-green-teal));
-  --sa-text-h3: oklch(var(--sa-p-teal-blue));
-  --sa-text-h4: oklch(var(--sa-p-teal));
-  --sa-text-h5: oklch(var(--sa-p-muted));
+  --sa-text-h2: oklch(var(--sa-p-white));
+  --sa-text-h3: oklch(var(--sa-p-white));
+  --sa-text-h4: oklch(var(--sa-p-white));
+  --sa-text-h5: oklch(var(--sa-p-white));
 
   /* --- Borders --- */
   --sa-border-subtle: 1px solid oklch(var(--sa-p-near-white) / 0.05);
   --sa-border-default: 1px solid oklch(var(--sa-p-near-white) / 0.10);
   --sa-border-strong: 1px solid oklch(var(--sa-p-near-white) / 0.25);
-  --sa-border-brand: 1px solid oklch(var(--sa-p-green-teal));
+  --sa-border-brand: 1px solid var(--sa-color-brand-end);
   --sa-border-table: oklch(var(--sa-p-surface-3));
   --sa-border-input: 1px solid oklch(var(--sa-p-surface-3));
-  --sa-border-input-focus: oklch(var(--sa-p-green-teal));
+  --sa-border-input-focus: var(--sa-color-brand-end);
   --sa-border-input-error: oklch(var(--sa-p-danger));
-  --sa-border-card: 1px solid oklch(var(--sa-p-near-white) / 0.10);
+  --sa-border-card: 1px solid rgb(148 163 184 / 0.10);
 
   /* --- Border Radius --- */
   --sa-radius-sm: 0.375rem;
@@ -179,7 +179,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-radius-full: 9999px;
 
   /* --- Focus Ring --- */
-  --sa-focus-ring: 0 0 0 2px oklch(var(--sa-p-base)), 0 0 0 4px oklch(var(--sa-p-success) / 0.5);
+  --sa-focus-ring: 0 0 0 2px oklch(var(--sa-p-base)), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
 
   /* --- Shadows / Elevation --- */
   --sa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.30);
@@ -190,36 +190,41 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-green-teal) / 0.30);
   --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-green-teal) / 0.30);
   --sa-shadow-btn:
-    0 15px 40px oklch(var(--sa-p-teal) / 0.40),
-    0 0 40px oklch(var(--sa-p-blue) / 0.30),
+    0 15px 40px oklch(78% 0.12 185 / 0.32),
+    0 0 40px oklch(66% 0.14 235 / 0.24),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.20);
-  --sa-shadow-card: 0 20px 40px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--sa-p-white) / 0.06);
+  --sa-shadow-card: 0 20px 40px rgb(0 0 0 / 0.30), inset 0 1px 0 rgb(255 255 255 / 0.10);
   --sa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
   --sa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.30), 0 3px 6px oklch(0% 0 0 / 0.20);
 
   /* --- Gradients --- */
   --sa-gradient-brand: linear-gradient(
     135deg,
-    oklch(var(--sa-p-green)) 0%,
-    oklch(var(--sa-p-teal)) 50%,
-    oklch(var(--sa-p-blue)) 100%
+    var(--sa-color-brand-start) 0%,
+    oklch(60% 0.125 210) 24%,
+    var(--sa-color-brand-mid) 52%,
+    oklch(62% 0.11 168) 76%,
+    var(--sa-color-brand-end) 100%
   );
   --sa-gradient-brand-90: linear-gradient(
     90deg,
-    oklch(var(--sa-p-green)),
-    oklch(var(--sa-p-teal)),
-    oklch(var(--sa-p-blue))
+    var(--sa-color-brand-start) 0%,
+    oklch(60% 0.125 210) 24%,
+    var(--sa-color-brand-mid) 52%,
+    oklch(62% 0.11 168) 76%,
+    var(--sa-color-brand-end) 100%
   );
   --sa-gradient-btn: linear-gradient(
     135deg,
-    oklch(var(--sa-p-teal)) 0%,
-    oklch(var(--sa-p-teal-blue)) 50%,
-    oklch(var(--sa-p-blue)) 100%
+    var(--sa-color-brand-start) 0%,
+    oklch(58% 0.12 190) 28%,
+    var(--sa-color-brand-mid) 58%,
+    var(--sa-color-brand-end) 100%
   );
   --sa-gradient-card: linear-gradient(
     135deg,
-    oklch(var(--sa-p-surface-2) / 0.80) 0%,
-    oklch(var(--sa-p-surface-3) / 0.60) 100%
+    rgb(30 41 59 / 0.80) 0%,
+    rgb(51 65 85 / 0.60) 100%
   );
   --sa-gradient-hero: linear-gradient(
     135deg,
@@ -231,6 +236,26 @@ Typography        -> App typography tokens consumed by base and controls.
 
   /* --- Stripe: 3px top-border accent on cards/panels --- */
   --sa-gradient-stripe: var(--sa-gradient-brand-90);
+
+  --sa-card-radius: 1rem;
+
+  /* --- Card Variants --- */
+  --sa-card-widget-bg: oklch(17% 0.008 244 / 0.48);
+  --sa-card-widget-border: var(--sa-border-card);
+  --sa-card-widget-shadow:
+    0 10px 24px rgb(0 0 0 / 0.16),
+    inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --sa-card-widget-stripe-opacity: 0.8;
+  --sa-card-panel-bg: oklch(17% 0.008 244 / 0.48);
+  --sa-card-panel-border: var(--sa-border-card);
+  --sa-card-panel-shadow: none;
+  --sa-card-panel-stripe-opacity: 0;
+  --sa-card-workflow-bg: oklch(21% 0.02 226 / 0.42);
+  --sa-card-workflow-border: 1px solid rgb(148 163 184 / 0.20);
+  --sa-card-workflow-shadow:
+    0 22px 48px rgb(0 0 0 / 0.30),
+    inset 0 1px 0 rgb(255 255 255 / 0.10);
+  --sa-card-workflow-stripe-opacity: 0.8;
 
   /* --- State Colors --- */
   --sa-color-success: oklch(var(--sa-p-success));
@@ -248,16 +273,16 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-color-transparent: transparent;
 
   /* --- Control Tokens --- */
-  --sa-btn-primary-bg: oklch(var(--sa-p-green));
-  --sa-btn-primary-text: oklch(var(--sa-p-black));
+  --sa-btn-primary-bg: var(--sa-color-brand-end);
+  --sa-btn-primary-text: oklch(var(--sa-p-white));
   --sa-btn-primary-bg-hover: oklch(80% 0.13 123.993);
   --sa-btn-danger-bg: oklch(var(--sa-p-danger));
   --sa-btn-danger-text: oklch(var(--sa-p-white));
   --sa-control-bg-error: oklch(18% 0.015 25);
   --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.22);
-  --sa-toggle-pressed-bg: oklch(var(--sa-p-green-teal) / 0.15);
-  --sa-toggle-pressed-border: oklch(var(--sa-p-green-teal) / 0.60);
-  --sa-toggle-pressed-text: oklch(var(--sa-p-green));
+  --sa-toggle-pressed-bg: oklch(78% 0.12 185 / 0.16);
+  --sa-toggle-pressed-border: oklch(78% 0.12 185 / 0.55);
+  --sa-toggle-pressed-text: var(--sa-color-brand-end);
   --sa-tab-pill-bg: oklch(var(--sa-p-surface-2));
   --sa-tab-active-bg: oklch(var(--sa-p-surface-3));
   --sa-tab-active-text: oklch(var(--sa-p-near-white));
@@ -331,10 +356,10 @@ Typography        -> App typography tokens consumed by base and controls.
 
 [data-theme='light'] {
   /* --- Brand — same primitives, adjusted application --- */
-  --sa-color-primary: oklch(var(--sa-p-teal));
-  --sa-color-primary-dim: oklch(var(--sa-p-teal-blue));
-  --sa-color-secondary: oklch(var(--sa-p-blue));
-  --sa-color-accent: oklch(var(--sa-p-green));
+  --sa-color-primary: oklch(50% 0.10 150);
+  --sa-color-primary-dim: oklch(66% 0.14 235);
+  --sa-color-secondary: oklch(66% 0.14 235);
+  --sa-color-accent: oklch(78% 0.12 185);
 
   /* --- Backgrounds --- */
   --sa-bg-page: oklch(96% 0.004 264.5);
@@ -351,8 +376,8 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-input-disabled: oklch(96% 0.003 264.5);
   --sa-bg-card: linear-gradient(
     135deg,
-    oklch(97% 0.004 264.5 / 0.60) 0%,
-    oklch(100% 0 0 / 0.80) 100%
+    oklch(98% 0.003 220 / 0.88) 0%,
+    oklch(100% 0 0 / 0.94) 100%
   );
 
   /* --- Text --- */
@@ -367,23 +392,23 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-text-placeholder: oklch(65% 0.012 264.5);
 
   --sa-text-h1: oklch(15% 0.010 264.5);
-  --sa-text-h2: oklch(var(--sa-p-teal));
-  --sa-text-h3: oklch(var(--sa-p-blue));
-  --sa-text-h4: oklch(var(--sa-p-teal-blue));
-  --sa-text-h5: oklch(var(--sa-p-faint));
+  --sa-text-h2: oklch(50% 0.10 150);
+  --sa-text-h3: oklch(66% 0.14 235);
+  --sa-text-h4: oklch(58% 0.12 190);
+  --sa-text-h5: oklch(46% 0.08 200);
 
   /* --- Borders --- */
   --sa-border-subtle: 1px solid oklch(0% 0 0 / 0.05);
   --sa-border-default: 1px solid oklch(0% 0 0 / 0.12);
   --sa-border-strong: 1px solid oklch(0% 0 0 / 0.22);
-  --sa-border-brand: 1px solid oklch(var(--sa-p-teal));
+  --sa-border-brand: 1px solid oklch(50% 0.10 150);
   --sa-border-table: oklch(88% 0.006 264.5);
   --sa-border-input: 1px solid oklch(82% 0.008 264.5);
-  --sa-border-input-focus: oklch(var(--sa-p-teal));
+  --sa-border-input-focus: oklch(78% 0.12 185);
   --sa-border-card: 1px solid oklch(0% 0 0 / 0.08);
 
   /* --- Focus Ring --- */
-  --sa-focus-ring: 0 0 0 2px oklch(96% 0.004 264.5), 0 0 0 4px oklch(var(--sa-p-success) / 0.5);
+  --sa-focus-ring: 0 0 0 2px oklch(96% 0.004 264.5), 0 0 0 4px oklch(82% 0.13 185 / 0.26);
 
   /* --- Shadows --- */
   --sa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.10);
@@ -394,16 +419,16 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-teal) / 0.20);
   --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-teal) / 0.20);
   --sa-shadow-btn:
-    0 15px 40px oklch(var(--sa-p-teal) / 0.30),
-    0 0 40px oklch(var(--sa-p-blue) / 0.20),
+    0 15px 40px oklch(78% 0.12 185 / 0.24),
+    0 0 40px oklch(66% 0.14 235 / 0.18),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.50);
-  --sa-shadow-card: 0 20px 40px oklch(0% 0 0 / 0.10), inset 0 1px 0 oklch(var(--sa-p-white) / 0.50);
+  --sa-shadow-card: 0 16px 36px oklch(0% 0 0 / 0.10), inset 0 1px 0 oklch(var(--sa-p-white) / 0.50);
 
   /* --- Gradients --- */
   --sa-gradient-card: linear-gradient(
     135deg,
-    oklch(100% 0 0 / 0.80) 0%,
-    oklch(97% 0.004 264.5 / 0.60) 100%
+    oklch(100% 0 0 / 0.92) 0%,
+    oklch(97% 0.004 220 / 0.82) 100%
   );
   --sa-gradient-hero: linear-gradient(
     135deg,
@@ -411,6 +436,31 @@ Typography        -> App typography tokens consumed by base and controls.
     oklch(var(--sa-p-teal) / 0.80) 50%,
     oklch(var(--sa-p-blue) / 0.70) 100%
   );
+
+  /* --- Card Variants --- */
+  --sa-card-widget-bg: linear-gradient(
+    135deg,
+    oklch(99% 0.002 244 / 0.90) 0%,
+    oklch(99% 0.002 244 / 0.90) 100%
+  );
+  --sa-card-widget-border: 1px solid oklch(0% 0 0 / 0.08);
+  --sa-card-widget-shadow: 0 12px 28px oklch(0% 0 0 / 0.10), inset 0 1px 0 oklch(var(--sa-p-white) / 0.55);
+  --sa-card-widget-stripe-opacity: 0.9;
+  --sa-card-panel-bg: oklch(99% 0.002 244 / 0.90);
+  --sa-card-panel-border: 1px solid oklch(0% 0 0 / 0.06);
+  --sa-card-panel-shadow: 0 6px 16px oklch(0% 0 0 / 0.06);
+  --sa-card-panel-stripe-opacity: 0;
+  --sa-card-workflow-bg: linear-gradient(
+    135deg,
+    oklch(100% 0 0 / 0.98) 0%,
+    oklch(96.5% 0.006 210 / 0.92) 100%
+  );
+  --sa-card-workflow-border: 1px solid oklch(0% 0 0 / 0.10);
+  --sa-card-workflow-shadow:
+    0 22px 48px oklch(0% 0 0 / 0.16),
+    0 0 22px oklch(var(--sa-p-teal) / 0.10),
+    inset 0 1px 0 oklch(var(--sa-p-white) / 0.65);
+  --sa-card-workflow-stripe-opacity: 1;
 
   /* --- Table --- */
   --sa-table-head-bg: oklch(var(--sa-p-surface-2));
@@ -420,16 +470,16 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-table-row-odd: oklch(96% 0.006 180);
 
   /* --- Control Tokens --- */
-  --sa-btn-primary-bg: oklch(var(--sa-p-teal));
+  --sa-btn-primary-bg: oklch(50% 0.10 150);
   --sa-btn-primary-text: oklch(var(--sa-p-white));
   --sa-btn-primary-bg-hover: oklch(72% 0.11 184.216);
   --sa-btn-danger-bg: oklch(var(--sa-p-danger));
   --sa-btn-danger-text: oklch(var(--sa-p-white));
   --sa-control-bg-error: oklch(98% 0.010 25);
   --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.18);
-  --sa-toggle-pressed-bg: oklch(var(--sa-p-teal) / 0.12);
-  --sa-toggle-pressed-border: oklch(var(--sa-p-teal) / 0.50);
-  --sa-toggle-pressed-text: oklch(var(--sa-p-teal));
+  --sa-toggle-pressed-bg: oklch(50% 0.10 150 / 0.12);
+  --sa-toggle-pressed-border: oklch(50% 0.10 150 / 0.45);
+  --sa-toggle-pressed-text: oklch(50% 0.10 150);
   --sa-tab-pill-bg: oklch(88% 0.006 264.5);
   --sa-tab-active-bg: oklch(100% 0 0);
   --sa-tab-active-text: oklch(var(--sa-p-surface-1));

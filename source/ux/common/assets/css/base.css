@@ -34,6 +34,14 @@ Defines global browser-level style foundations consumed by all UX apps.
 }
 
 @font-face {
+  font-family: 'Comfortaa';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('../fonts/Comfortaa-Regular.woff2') format('woff2');
+}
+
+@font-face {
   font-family: 'Inter';
   font-style: normal;
   font-weight: 400;
@@ -88,13 +96,15 @@ body {
 }
 
 body::before {
+  filter: none;
   background:
-    radial-gradient(circle at 12% 18%, var(--sa-p-radial-2) 0%, transparent 52%),
-    radial-gradient(circle at 82% 76%, var(--sa-p-radial-1) 0%, transparent 50%),
-    radial-gradient(circle at 68% 34%, var(--sa-p-radial-3) 0%, transparent 48%);
+    radial-gradient(circle at 20% 80%, oklch(66% 0.14 235 / 0.24) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, oklch(50% 0.10 150 / 0.16) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, oklch(78% 0.12 185 / 0.12) 0%, transparent 50%);
   content: '';
   height: 100%;
   left: 0;
+  opacity: 1;
   pointer-events: none;
   position: fixed;
   top: 0;
@@ -119,12 +129,16 @@ body::before {
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-h1, h2, h3, h4, h5, h6 {
-  font-family: var(--sa-font-heading);
+h1, h2 {
+  color: var(--sa-text-h1);
+  font-family: var(--sa-font-body);
   font-weight: var(--sa-weight-normal);
 }
 
-p, td, li {
+h3, h4, h5, h6,
+p,
+td,
+li {
   font-family: var(--sa-font-body);
   font-weight: var(--sa-weight-thin);
 }
@@ -132,6 +146,22 @@ p, td, li {
 th {
   font-family: var(--sa-font-body);
   font-weight: var(--sa-weight-semibold);
+}
+
+h2 {
+  color: var(--sa-text-h2);
+}
+
+h3 {
+  color: var(--sa-text-h3);
+}
+
+h4 {
+  color: var(--sa-text-h4);
+}
+
+h5 {
+  color: var(--sa-text-h5);
 }
 
 button,

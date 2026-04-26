@@ -23,7 +23,7 @@ No raw values. No primitive references.
   color: var(--sa-color-primary);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--sa-font-ui);
+  font-family: 'Lexend', ui-sans-serif, system-ui, sans-serif;
   font-size: var(--sa-font-xs);
   font-weight: var(--sa-weight-medium);
   gap: var(--sa-space-sm);
@@ -35,10 +35,10 @@ No raw values. No primitive references.
 }
 
 [data-ui='button'][data-ui-variant='primary'] {
-  background: var(--sa-gradient-btn);
+  background: var(--sa-btn-primary-bg);
   border-color: var(--sa-color-transparent);
   color: var(--sa-btn-primary-text);
-  font-weight: var(--sa-weight-semibold);
+  font-weight: var(--sa-weight-medium);
   box-shadow: var(--sa-shadow-btn);
   transition: var(--sa-transition-spring);
 }
@@ -53,7 +53,7 @@ No raw values. No primitive references.
   background: var(--sa-btn-danger-bg);
   border-color: var(--sa-btn-danger-bg);
   color: var(--sa-btn-danger-text);
-  font-weight: var(--sa-weight-semibold);
+  font-weight: var(--sa-weight-medium);
 }
 
 [data-ui='button']:hover {
@@ -65,7 +65,7 @@ No raw values. No primitive references.
 }
 
 [data-ui='button'][data-ui-variant='primary']:hover {
-  background: var(--sa-gradient-btn);
+  background: var(--sa-btn-primary-bg);
   box-shadow: var(--sa-shadow-glow);
   transform: var(--sa-button-primary-hover-transform);
 }
@@ -205,8 +205,9 @@ No raw values. No primitive references.
   color: var(--sa-text-muted);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--sa-font-ui);
+  font-family: 'Lexend', ui-sans-serif, system-ui, sans-serif;
   font-size: var(--sa-font-xs);
+  font-weight: var(--sa-weight-medium);
   gap: var(--sa-space-sm);
   justify-content: center;
   min-height: var(--sa-touch-target-sm);
@@ -275,8 +276,9 @@ No raw values. No primitive references.
   border-radius: var(--sa-radius-sm);
   color: var(--sa-text-muted);
   cursor: pointer;
-  font-family: var(--sa-font-ui);
+  font-family: 'Lexend', ui-sans-serif, system-ui, sans-serif;
   font-size: var(--sa-font-xs);
+  font-weight: var(--sa-weight-medium);
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
 }
@@ -476,12 +478,11 @@ No raw values. No primitive references.
   background: var(--sa-bg-card);
   backdrop-filter: var(--sa-blur);
   border: var(--sa-border-card);
-  border-radius: var(--sa-radius-lg);
+  border-radius: var(--sa-card-radius);
   box-shadow: var(--sa-shadow-card);
   overflow: hidden;
   padding: var(--sa-widget-pad);
   position: relative;
-  transition: var(--sa-transition-spring);
 }
 
 [data-ui='card']::before {
@@ -493,6 +494,36 @@ No raw values. No primitive references.
   position: absolute;
   right: 0;
   top: 0;
+}
+
+[data-ui='card'][data-ui-variant='widget'] {
+  background: var(--sa-card-widget-bg);
+  border: var(--sa-card-widget-border);
+  box-shadow: var(--sa-card-widget-shadow);
+}
+
+[data-ui='card'][data-ui-variant='widget']::before {
+  opacity: var(--sa-card-widget-stripe-opacity);
+}
+
+[data-ui='card'][data-ui-variant='panel'] {
+  background: var(--sa-card-panel-bg);
+  border: var(--sa-card-panel-border);
+  box-shadow: var(--sa-card-panel-shadow);
+}
+
+[data-ui='card'][data-ui-variant='panel']::before {
+  opacity: var(--sa-card-panel-stripe-opacity);
+}
+
+[data-ui='card'][data-ui-variant='workflow'] {
+  background: var(--sa-card-workflow-bg);
+  border: var(--sa-card-workflow-border);
+  box-shadow: var(--sa-card-workflow-shadow);
+}
+
+[data-ui='card'][data-ui-variant='workflow']::before {
+  opacity: var(--sa-card-workflow-stripe-opacity);
 }
 
 [data-ui][data-ui-state='disabled'] {
