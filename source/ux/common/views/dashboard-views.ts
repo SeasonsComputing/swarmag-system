@@ -2,7 +2,7 @@
  * UX projection types for dashboard layout configuration and rendering.
  */
 
-import { Dictionary } from '@core/std'
+import type { Dictionary } from '@core/std'
 
 /** A single dashboard widget reference with display size and component type. */
 export type DashboardWidget = {
