@@ -237,6 +237,7 @@ Use types from `@core/std` instead of ad-hoc primitives and container generics.
 | `StringSet`               | `Set<string>`                                                              |
 | `Id`                      | raw `string` for identifiers                                               |
 | `When`                    | raw `string` for ISO datetime                                              |
+| `Instance`                | inline `{ id }` for objects needing stable identity only                   |
 | `Instantiable`            | inline `{ id, createdAt, updatedAt, deletedAt? }` life-cycle shape         |
 | `InstantiableOnly`        | inline `{ id, createdAt }` create-and-read-only life-cycle shape           |
 | `CompositionOne<T>`       | ad-hoc tuple/array for exactly-one embedded composition                    |
