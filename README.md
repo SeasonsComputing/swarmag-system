@@ -161,6 +161,6 @@ deno task fmt:check
 
 All software construction activity operates in conformance with the governing principles defined in `CONSTITUTION.md`.
 
-The constitution is designed to make most efficient and cost-effective use of AI reasoning and coding facilities across AI providers following the 3-role ["Model of Development w/ AI Coding"](https://seasonscomputing.com/tvk-mod-3rm.md).
+The constitution is designed to make most efficient and cost-effective use of AI reasoning and coding facilities across AI providers following the 3-role ["Model of Development w/ AI Coding"](https://seasonscomputing.com/markdown.html?documentation/CONSTITUTION.md).
 
 The human participates as the Chief Architect with AI Architect and AI Coding Engine roles provided by AI reasoning and AI coding platforms respectively.
