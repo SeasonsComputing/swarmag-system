@@ -27,7 +27,6 @@ import {
   AppCard,
   AppCheckbox,
   AppDialog,
-  AppIconButton,
   AppInput,
   AppMultiSelect,
   AppPopover,
@@ -205,15 +204,6 @@ export const StyleGuide = (): JSX.Element => {
             <AppButton variant='primary' loading={loading()}>
               Loading
             </AppButton>
-          </div>
-        </Section>
-
-        <Section title='AppIconButton'>
-          <div class='sg-row'>
-            <AppIconButton aria-label='Add service note'>+</AppIconButton>
-            <AppIconButton aria-label='Refresh service status' disabled>
-              R
-            </AppIconButton>
           </div>
         </Section>
 
