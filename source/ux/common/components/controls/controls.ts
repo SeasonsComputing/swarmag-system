@@ -19,7 +19,6 @@ export { AppButton, type AppButtonProps, type AppButtonVariant } from './app-but
 export { AppCard, type AppCardProps } from './app-card.tsx'
 export { AppCheckbox, type AppCheckboxProps } from './app-checkbox.tsx'
 export { AppDialog, type AppDialogProps } from './app-dialog.tsx'
-export { AppIconButton, type AppIconButtonProps } from './app-icon-button.tsx'
 export { AppInput, type AppInputProps } from './app-input.tsx'
 export { AppMultiSelect, type AppMultiSelectProps } from './app-multi-select.tsx'
 export { AppPopover, type AppPopoverProps } from './app-popover.tsx'

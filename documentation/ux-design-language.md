@@ -455,7 +455,6 @@ Controls are based on Kobalte primitives and exposed as App{Control} components 
 | ---------------- | ----------------- | ------------------------------------------- |
 | `AppButton`      | `Button`          | variants: primary, secondary, ghost, danger |
 | `AppCard`        | —                 | reusable framed content surface             |
-| `AppIconButton`  | `Button`          | round, icon-only                            |
 | `AppInput`       | `TextField`       | text, number variants                       |
 | `AppTextarea`    | `TextField`       | multiline                                   |
 | `AppSelect`      | `Select`          | single value                                |
@@ -501,7 +500,6 @@ card
 checkbox
 checkbox-field
 dialog
-icon-button
 input
 multi-select
 popover
