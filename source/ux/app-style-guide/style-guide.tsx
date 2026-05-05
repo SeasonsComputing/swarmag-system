@@ -28,6 +28,8 @@ import {
   AppCheckbox,
   AppDialog,
   AppInput,
+  AppList,
+  AppListItem,
   AppMultiSelect,
   AppPopover,
   AppProgress,
@@ -76,6 +78,11 @@ export const StyleGuide = (): JSX.Element => {
   const [viewMode, setViewMode] = createSignal('map')
   const [tab, setTab] = createSignal('assessment')
 
+  const setThemeMode = (value: string): void => {
+    if (value !== 'dark' && value !== 'light') return
+    setTheme(value)
+  }
+
   createEffect(() => {
     document.documentElement.dataset.theme = theme()
   })
@@ -87,13 +94,12 @@ export const StyleGuide = (): JSX.Element => {
           <h1>swarmAg Style Guide</h1>
           <p>Living visual validation for tokens, states, themes, and controls.</p>
         </div>
-        <AppToggle
-          pressed={theme() === 'light'}
-          onClick={() => setTheme(theme() === 'light' ? 'dark' : 'light')}
-        >
-          {theme() === 'light' ? 'Light' : 'Dark'}
-        </AppToggle>
+        <AppToggleGroup value={theme()} onChange={setThemeMode}>
+          <AppToggleItem value='dark'>Dark</AppToggleItem>
+          <AppToggleItem value='light'>Light</AppToggleItem>
+        </AppToggleGroup>
       </header>
+
       <main class='sg-page'>
         <Section title='Typography'>
           <h1>H1 Operations Command</h1>
@@ -136,16 +142,21 @@ export const StyleGuide = (): JSX.Element => {
               </For>
             </tbody>
           </table>
-          <ul>
-            <li>Confirm chemical inventory.</li>
-            <li>Verify crew certification.</li>
-            <li>Inspect required assets.</li>
-          </ul>
-          <ol>
-            <li>Assess site.</li>
-            <li>Plan service.</li>
-            <li>Execute work.</li>
-          </ol>
+          <AppList>
+            <AppListItem>Confirm chemical inventory.</AppListItem>
+            <AppListItem>Verify crew certification.</AppListItem>
+            <AppListItem>Inspect required assets.</AppListItem>
+          </AppList>
+          <AppList variant='bullet'>
+            <AppListItem>Confirm chemical inventory.</AppListItem>
+            <AppListItem>Verify crew certification.</AppListItem>
+            <AppListItem>Inspect required assets.</AppListItem>
+          </AppList>
+          <AppList variant='numbered'>
+            <AppListItem>Assess site.</AppListItem>
+            <AppListItem>Plan service.</AppListItem>
+            <AppListItem>Execute work.</AppListItem>
+          </AppList>
           <blockquote>
             Service logs are records of field reality and must remain clear, durable, and auditable.
           </blockquote>
@@ -397,6 +408,7 @@ export const StyleGuide = (): JSX.Element => {
 
         <Section title='AppBadge'>
           <div class='sg-row'>
+            <AppBadge>Pending</AppBadge>
             <AppBadge variant='success'>Field ready</AppBadge>
             <AppBadge variant='warning'>Wind watch</AppBadge>
             <AppBadge variant='danger'>Blocked</AppBadge>
@@ -406,6 +418,7 @@ export const StyleGuide = (): JSX.Element => {
 
         <Section title='AppAlert'>
           <div class='sg-stack'>
+            <AppAlert>Service record updated by dispatch.</AppAlert>
             <AppAlert variant='success'>North Field completed and ready for customer review.</AppAlert>
             <AppAlert variant='warning'>Wind speed approaching service threshold.</AppAlert>
             <AppAlert variant='danger'>Chemical label missing required re-entry interval.</AppAlert>
@@ -440,36 +453,62 @@ export const StyleGuide = (): JSX.Element => {
             <AppAccordionItem value='weather'>
               <AppAccordionTrigger>Weather window</AppAccordionTrigger>
               <AppAccordionContent>
-                <ul>
-                  <li>Wind speed 12 km/h — within threshold</li>
-                  <li>Precipitation 0% — clear</li>
-                  <li>Visibility 18 km — acceptable</li>
-                  <li>Temperature 21°C — nominal</li>
-                </ul>
+                <AppList variant='bullet'>
+                  <AppListItem>Wind speed 12 km/h — within threshold</AppListItem>
+                  <AppListItem>Precipitation 0% — clear</AppListItem>
+                  <AppListItem>Visibility 18 km — acceptable</AppListItem>
+                  <AppListItem>Temperature 21°C — nominal</AppListItem>
+                </AppList>
               </AppAccordionContent>
             </AppAccordionItem>
             <AppAccordionItem value='crew'>
               <AppAccordionTrigger>Crew status</AppAccordionTrigger>
               <AppAccordionContent>
-                <ol>
-                  <li>Lead operator certified and on-site</li>
-                  <li>Equipment pre-check complete</li>
-                  <li>Safety brief conducted</li>
-                  <li>Flight plan filed and acknowledged</li>
-                </ol>
+                <AppList variant='numbered'>
+                  <AppListItem>Lead operator certified and on-site</AppListItem>
+                  <AppListItem>Equipment pre-check complete</AppListItem>
+                  <AppListItem>Safety brief conducted</AppListItem>
+                  <AppListItem>Flight plan filed and acknowledged</AppListItem>
+                </AppList>
               </AppAccordionContent>
             </AppAccordionItem>
             <AppAccordionItem value='compliance'>
               <AppAccordionTrigger>Compliance notes</AppAccordionTrigger>
               <AppAccordionContent>
-                <ul>
-                  <li>Buffer zones confirmed</li>
-                  <li>No restricted area conflicts detected</li>
-                  <li>Chemical application rate within permit limits</li>
-                </ul>
+                <AppList variant='bullet'>
+                  <AppListItem>Buffer zones confirmed</AppListItem>
+                  <AppListItem>No restricted area conflicts detected</AppListItem>
+                  <AppListItem>Chemical application rate within permit limits</AppListItem>
+                </AppList>
               </AppAccordionContent>
             </AppAccordionItem>
           </AppAccordion>
+        </Section>
+
+        <Section title='AppList'>
+          <div class='sg-row' style={{ 'align-items': 'flex-start', gap: 'var(--sa-space-lg)' }}>
+            <div>
+              <AppList>
+                <AppListItem>Confirm chemical inventory</AppListItem>
+                <AppListItem>Verify crew certification</AppListItem>
+                <AppListItem>Inspect required assets</AppListItem>
+              </AppList>
+            </div>
+            <div>
+              <AppList variant='bullet'>
+                <AppListItem>Wind speed within threshold</AppListItem>
+                <AppListItem>Precipitation clear</AppListItem>
+                <AppListItem>Visibility acceptable</AppListItem>
+              </AppList>
+            </div>
+            <div>
+              <AppList variant='numbered'>
+                <AppListItem>Assess site</AppListItem>
+                <AppListItem>Plan service</AppListItem>
+                <AppListItem>Execute work</AppListItem>
+              </AppList>
+            </div>
+          </div>
         </Section>
 
         <Section title='AppAvatar'>
@@ -478,6 +517,12 @@ export const StyleGuide = (): JSX.Element => {
 
         <Section title='AppCard'>
           <div class='sg-card-grid'>
+            <AppCard>
+              <div class='sg-card-copy'>
+                <h3>Default card</h3>
+                <p>Base framed surface — no variant. Used for general content containment.</p>
+              </div>
+            </AppCard>
             <AppCard variant='widget'>
               <div class='sg-card-copy'>
                 <h3>Widget card</h3>
