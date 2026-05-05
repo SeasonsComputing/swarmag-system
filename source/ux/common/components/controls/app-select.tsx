@@ -97,8 +97,8 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
       )}
     >
       <Select.Trigger id={local.id} data-ui='select' data-ui-state={controlState(local)}>
-        <Select.Value<string>>
-          {state => (state.selectedOption() as unknown as CollectionItem)?.rawValue ?? local.placeholder ?? ''}
+        <Select.Value<string> placeholder={local.placeholder ?? ''}>
+          {state => state.selectedOption() ?? ''}
         </Select.Value>
       </Select.Trigger>
       <Select.Portal>

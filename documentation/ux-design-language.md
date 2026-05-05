@@ -123,7 +123,9 @@ multiple rules causes drift (the figcaption problem).
 | `p` | Content | `--sa-font-body` | inherited | thin |
 | `label`, `button`, `legend` | Label | `--sa-font-label` | `--sa-font-sm` | thin |
 | `figcaption`, `th` | Annotation / table header | `--sa-font-label` | `--sa-font-sm` | normal |
-| `li`, `td` | Data-adjacent label | `--sa-font-label` | `--sa-font-sm` | thin |
+| `li` (bare) | Data-adjacent label | `--sa-font-label` | `--sa-font-sm` | thin |
+| `[data-ui='list-item']` (`AppListItem`) | List content | `--sa-font-body` | `--sa-font-sm` | normal |
+| `td` | Data-adjacent label | `--sa-font-label` | `--sa-font-sm` | thin |
 | `input`, `textarea` | Data entry | `--sa-font-ui` (→ Lexend) | `--sa-font-xs` | thin |
 | `select`, `[role='option']`, `[role='menuitem']` | Data entry | `--sa-font-ui` (→ Lexend) | `--sa-font-sm` | normal |
 | `code`, `pre`, `kbd`, `samp` | Code / numeric | `--sa-font-mono` | inherited | — |
@@ -475,6 +477,8 @@ Controls are based on Kobalte primitives and exposed as App{Control} components 
 | `AppAlert`       | —                 | success / warning / danger / info           |
 | `AppSpinner`     | —                 | loading state                               |
 | `AppSkeleton`    | —                 | loading placeholder                         |
+| `AppList`        | —                 | variants: default (clean), bullet, numbered |
+| `AppListItem`    | —                 | child of AppList                            |
 
 ### 8.1.1 Control Contract
 
@@ -507,6 +511,8 @@ progress
 radio
 radio-group
 radio-item
+list
+list-item
 select
 separator
 skeleton
@@ -896,6 +902,13 @@ or remains in app-local CSS if it is app-specific.
 
 - Circle (`--sa-radius-full`), `--sa-gradient-brand` background, `--sa-text-on-brand` text
 - Font: `--sa-font-body`, `--sa-weight-semibold`
+
+**`[data-ui="list"]`**
+
+- Default (no variant): clean unstyled `<ul>` — `list-style: none`, no margin, no padding
+- `variant="bullet"`: disc bullets `<ul>`, `padding-inline-start: --sa-space-md`
+- `variant="numbered"`: decimal numbered `<ol>`, `padding-inline-start: --sa-space-md`
+- `list-item`: `--sa-font-body`, `--sa-font-sm`, `--sa-weight-normal` — content font, not label font
 
 **`[data-ui="card"]`**
 

@@ -540,9 +540,9 @@ Authentication and client makers are part of the core runtime and are sourced fr
 Each app is an independent Vite build producing a deployable PWA bundle:
 
 ```text
-swarmag-app-admin    = ux/app-admin    + ux/common + ux/config
-swarmag-app-ops      = ux/app-ops      + ux/common + ux/config
-swarmag-app-customer = ux/app-customer + ux/common + ux/config
+swarmag-app-admin    = ux/app-admin    + ux/common + ux/api + ux/config
+swarmag-app-ops      = ux/app-ops      + ux/common + ux/api + ux/config
+swarmag-app-customer = ux/app-customer + ux/common + ux/api + ux/config
 ```
 
 - Three Vite configs, one per app

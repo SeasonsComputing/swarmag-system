@@ -132,9 +132,10 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-surface-2: oklch(28% 0.018 252 / 0.78);
   --sa-bg-surface-3: oklch(25% 0.02 248 / 0.7);
   --sa-bg-overlay: oklch(var(--sa-p-black) / 0.2);
+  --sa-bg-popup: oklch(28% 0.018 252);
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
   --sa-bg-hover: oklch(var(--sa-p-green-teal) / 0.1);
-  --sa-bg-selected: oklch(var(--sa-p-green-teal) / 0.15);
+  --sa-bg-selected: oklch(var(--sa-p-green-teal) / 0.28);
   --sa-bg-input: oklch(25% 0.014 264.5);
   --sa-bg-input-focus: oklch(27% 0.016 264.5);
   --sa-bg-control: oklch(var(--sa-p-white) / 0.1);
@@ -369,6 +370,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-surface-2: oklch(97% 0.004 264.5);
   --sa-bg-surface-3: oklch(93% 0.006 264.5);
   --sa-bg-overlay: oklch(0% 0 0 / 0.06);
+  --sa-bg-popup: oklch(100% 0 0);
   --sa-bg-table: oklch(0% 0 0 / 0.02);
   --sa-bg-hover: oklch(var(--sa-p-teal) / 0.08);
   --sa-bg-selected: oklch(var(--sa-p-teal) / 0.15);
