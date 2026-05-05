@@ -1,0 +1,28 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ UX form layout                                                               ║
+║ Field wrapper, responsive grid, and actions row.                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+/** Label + control as siblings */
+.app-field {
+  display: grid;
+  gap: var(--sa-space-xs);
+}
+
+/** Responsive auto-fit grid for composing fields into a form layout. */
+.app-form-grid {
+  align-items: start;
+  display: grid;
+  gap: var(--sa-space-md);
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/** Action buttons at the end of a form, separate from the field grid. */
+.app-form-actions {
+  align-items: center;
+  display: flex;
+  gap: var(--sa-space-md);
+  justify-content: flex-end;
+}

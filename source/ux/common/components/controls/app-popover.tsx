@@ -54,14 +54,14 @@ export const AppPopover = (props: AppPopoverProps): JSX.Element => {
 
   return (
     <Popover open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
-      <Popover.Trigger
-        data-ui='popover'
-        data-ui-state={controlState(local)}
-        disabled={local.disabled || local.loading}
-      >
+      <Popover.Trigger as='span'>
         {local.trigger}
       </Popover.Trigger>
-      {local.children}
+      <Popover.Portal>
+        <Popover.Content data-ui='popover' data-ui-state={controlState(local)}>
+          {local.children}
+        </Popover.Content>
+      </Popover.Portal>
     </Popover>
   )
 }

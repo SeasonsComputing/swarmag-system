@@ -58,6 +58,7 @@ export const AppCheckbox = (props: AppCheckboxProps): JSX.Element => {
 
   return (
     <Checkbox
+      data-ui='checkbox-field'
       checked={local.checked}
       defaultChecked={local.defaultChecked}
       disabled={local.disabled || local.loading}
@@ -67,7 +68,10 @@ export const AppCheckbox = (props: AppCheckboxProps): JSX.Element => {
       onChange={local.onChange}
       validationState={local.error ? 'invalid' : undefined}
     >
-      <Checkbox.Input data-ui='checkbox' data-ui-state={controlState(local)} />
+      <Checkbox.Input />
+      <Checkbox.Control data-ui='checkbox' data-ui-state={controlState(local)}>
+        <Checkbox.Indicator />
+      </Checkbox.Control>
       {local.children}
     </Checkbox>
   )
