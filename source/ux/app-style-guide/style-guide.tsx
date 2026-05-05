@@ -17,6 +17,9 @@ StyleGuide  Single-page living style guide application.
 import { createEffect, createSignal, For, type JSX } from '@solid-js'
 import {
   AppAccordion,
+  AppAccordionContent,
+  AppAccordionItem,
+  AppAccordionTrigger,
   AppAlert,
   AppAvatar,
   AppBadge,
@@ -32,8 +35,6 @@ import {
   AppRadioGroup,
   AppRadioItem,
   AppSelect,
-  AppSelectContent,
-  AppSelectItem,
   AppSeparator,
   AppSkeleton,
   AppSpinner,
@@ -47,62 +48,16 @@ import {
   AppToggleItem,
   AppTooltip
 } from '@ux/common/components/controls'
-
-const FIELDS = [
-  {
-    name: 'North Field',
-    acres: 142,
-    service: 'Aerial - Fixed Wing',
-    status: 'Active',
-    date: '2025-04-18'
-  },
-  {
-    name: 'South Paddock',
-    acres: 89,
-    service: 'Ground - Sprayer',
-    status: 'Scheduled',
-    date: '2025-04-22'
-  },
-  {
-    name: 'East Block',
-    acres: 210,
-    service: 'Aerial - Rotary',
-    status: 'Pending',
-    date: '2025-04-25'
-  },
-  {
-    name: 'River Flat',
-    acres: 63,
-    service: 'Ground - Spreader',
-    status: 'Blocked',
-    date: '2025-04-30'
-  },
-  {
-    name: 'West Ridge',
-    acres: 175,
-    service: 'Aerial - Fixed Wing',
-    status: 'Active',
-    date: '2025-05-02'
-  }
-] as const
-
-const COLOR_SWATCHES = [
-  { label: 'primary', token: '--sa-color-primary', value: 'var(--sa-color-primary)' },
-  { label: 'success', token: '--sa-color-success', value: 'var(--sa-color-success)' },
-  { label: 'warning', token: '--sa-color-warning', value: 'var(--sa-color-warning)' },
-  { label: 'danger', token: '--sa-color-danger', value: 'var(--sa-color-danger)' },
-  { label: 'info', token: '--sa-color-info', value: 'var(--sa-color-info)' }
-] as const
-
-const BUTTON_VARIANTS = [
-  { label: 'Ghost', variant: 'ghost' },
-  { label: 'Primary', variant: 'primary' },
-  { label: 'Secondary', variant: 'secondary' },
-  { label: 'Danger', variant: 'danger' }
-] as const
-
-const STATUSES = ['Scheduled', 'Ready', 'Blocked', 'Complete'] as const
-const SERVICES = ['Aerial', 'Ground', 'Inspection', 'Followup'] as const
+import { AppField, AppFieldset, AppFormActions, AppFormGrid } from '@ux/common/components/forms'
+import {
+  ACCORDION_DEFAULT_VALUE,
+  BUTTON_VARIANTS,
+  COLOR_SWATCHES,
+  DEFAULT_SERVICES,
+  FIELDS,
+  SERVICES,
+  STATUSES
+} from './style-guide-fixtures.ts'
 
 type SectionProps = {
   children: JSX.Element
@@ -115,6 +70,8 @@ export const StyleGuide = (): JSX.Element => {
   const [loading, setLoading] = createSignal(false)
   const [inputError, setInputError] = createSignal(false)
   const [checkboxChecked, setCheckboxChecked] = createSignal(true)
+  const [checkboxDrift, setCheckboxDrift] = createSignal(false)
+  const [checkboxError, setCheckboxError] = createSignal(false)
   const [radioValue, setRadioValue] = createSignal('aerial')
   const [togglePressed, setTogglePressed] = createSignal(true)
   const [viewMode, setViewMode] = createSignal('map')
@@ -125,7 +82,7 @@ export const StyleGuide = (): JSX.Element => {
   })
 
   return (
-    <main class='sg-page'>
+    <>
       <header class='sg-header'>
         <div>
           <h1>swarmAg Style Guide</h1>
@@ -138,361 +95,433 @@ export const StyleGuide = (): JSX.Element => {
           {theme() === 'light' ? 'Light' : 'Dark'}
         </AppToggle>
       </header>
+      <main class='sg-page'>
+        <Section title='Typography'>
+          <h1>H1 Operations Command</h1>
+          <h2>H2 Field Service Planning</h2>
+          <h3>H3 Aerial Application Window</h3>
+          <h4>H4 Ground Crew Assignment</h4>
+          <h5>H5 Chemical Label Review</h5>
+          <p>
+            Body copy should inherit the product typography without local component styling. Weather,
+            acreage, crew availability, and service windows remain scannable.
+          </p>
+          <p>
+            Inline code sample: <code>service.category === 'aerial-drone-services'</code>
+          </p>
+          <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
+        </Section>
 
-      <Section title='Typography'>
-        <h1>H1 Operations Command</h1>
-        <h2>H2 Field Service Planning</h2>
-        <h3>H3 Aerial Application Window</h3>
-        <h4>H4 Ground Crew Assignment</h4>
-        <h5>H5 Chemical Label Review</h5>
-        <p>
-          Body copy should inherit the product typography without local component styling. Weather,
-          acreage, crew availability, and service windows remain scannable.
-        </p>
-        <p>
-          Inline code sample: <code>service.category === 'aerial-drone-services'</code>
-        </p>
-        <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
-      </Section>
+        <Section title='HTML Semantics'>
+          <table>
+            <thead>
+              <tr>
+                <th>Field name</th>
+                <th>Acreage</th>
+                <th>Service type</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <For each={FIELDS}>
+                {field => (
+                  <tr>
+                    <td>{field.name}</td>
+                    <td>{field.acres}</td>
+                    <td>{field.service}</td>
+                    <td>{field.status}</td>
+                    <td>{field.date}</td>
+                  </tr>
+                )}
+              </For>
+            </tbody>
+          </table>
+          <ul>
+            <li>Confirm chemical inventory.</li>
+            <li>Verify crew certification.</li>
+            <li>Inspect required assets.</li>
+          </ul>
+          <ol>
+            <li>Assess site.</li>
+            <li>Plan service.</li>
+            <li>Execute work.</li>
+          </ol>
+          <blockquote>
+            Service logs are records of field reality and must remain clear, durable, and auditable.
+          </blockquote>
+          <AppFieldset legend='Site access'>
+            <AppFormGrid>
+              <AppField label='Field contact' for='nameId'>
+                <AppInput id='nameId' value='R. Alvarez' onInput={() => undefined} />
+              </AppField>
+              <AppField label='Gate code' for='codeId'>
+                <AppInput id='codeId' value='4821' onInput={() => undefined} />
+              </AppField>
+            </AppFormGrid>
+          </AppFieldset>
+        </Section>
 
-      <Section title='HTML Semantics'>
-        <table>
-          <thead>
-            <tr>
-              <th>Field name</th>
-              <th>Acreage</th>
-              <th>Service type</th>
-              <th>Status</th>
-              <th>Date</th>
-            </tr>
-          </thead>
-          <tbody>
-            <For each={FIELDS}>
-              {field => (
-                <tr>
-                  <td>{field.name}</td>
-                  <td>{field.acres}</td>
-                  <td>{field.service}</td>
-                  <td>{field.status}</td>
-                  <td>{field.date}</td>
-                </tr>
+        <Section title='Color'>
+          <div class='sg-swatch-grid'>
+            <For each={COLOR_SWATCHES}>
+              {swatch => (
+                <figure class='sg-swatch'>
+                  <div class='sg-swatch-chip' style={{ background: swatch.value }} />
+                  <figcaption>
+                    <span>{swatch.label}</span>
+                    <code>{swatch.token}</code>
+                  </figcaption>
+                </figure>
               )}
             </For>
-          </tbody>
-        </table>
-        <ul>
-          <li>Confirm chemical inventory.</li>
-          <li>Verify crew certification.</li>
-          <li>Inspect required assets.</li>
-        </ul>
-        <ol>
-          <li>Assess site.</li>
-          <li>Plan service.</li>
-          <li>Execute work.</li>
-        </ol>
-        <blockquote>
-          Service logs are records of field reality and must remain clear, durable, and auditable.
-        </blockquote>
-        <fieldset>
-          <legend>Raw fieldset</legend>
-          <label>
-            Field contact
-            <AppInput id='nameId' value='R. Alvarez' onInput={() => undefined} />
-          </label>
-          <label>
-            Gate code
-            <AppInput id='codeId' value='4821' onInput={() => undefined} />
-          </label>
-        </fieldset>
-      </Section>
+          </div>
+        </Section>
 
-      <Section title='Color'>
-        <div class='sg-swatch-grid'>
-          <For each={COLOR_SWATCHES}>
-            {swatch => (
-              <figure class='sg-swatch'>
-                <div class='sg-swatch-chip' style={{ background: swatch.value }} />
-                <figcaption>
-                  <span>{swatch.label}</span>
-                  <code>{swatch.token}</code>
-                </figcaption>
-              </figure>
-            )}
-          </For>
-        </div>
-      </Section>
+        <Section title='Gradient'>
+          <figure>
+            <div class='sg-gradient-block' />
+            <figcaption>
+              <span>Bright blue start</span>
+              <span>Darker green center</span>
+              <span>Bright teal finish</span>
+            </figcaption>
+          </figure>
+        </Section>
 
-      <Section title='Gradient'>
-        <div class='sg-gradient-stripe' />
-        <div class='sg-gradient-block' />
-        <div class='sg-token-list'>
-          <span>Bright blue start</span>
-          <span>Darker green center</span>
-          <span>Bright teal finish</span>
-        </div>
-      </Section>
-
-      <Section title='AppButton'>
-        <div class='sg-row'>
-          <AppButton variant='secondary' onClick={() => setLoading(!loading())}>
-            Toggle loading
-          </AppButton>
-        </div>
-        <div class='sg-row'>
-          <For each={BUTTON_VARIANTS}>
-            {entry => <AppButton variant={entry.variant}>{entry.label}</AppButton>}
-          </For>
-        </div>
-        <div class='sg-row'>
-          <AppButton disabled>Disabled</AppButton>
-          <AppButton variant='primary' loading={loading()}>
-            Loading
-          </AppButton>
-        </div>
-      </Section>
-
-      <Section title='AppIconButton'>
-        <div class='sg-row'>
-          <AppIconButton aria-label='Add service note'>+</AppIconButton>
-          <AppIconButton aria-label='Refresh service status' disabled>
-            R
-          </AppIconButton>
-        </div>
-      </Section>
-
-      <Section title='AppInput / AppTextarea / AppSelect'>
-        <div class='sg-row'>
-          <AppButton variant='secondary' onClick={() => setInputError(!inputError())}>
-            Toggle error
-          </AppButton>
-        </div>
-        <div class='sg-form-grid'>
-          <label>
-            <span class='sg-label'>Field name</span>
-            <AppInput
-              value='North Field'
-              error={inputError()}
-              onInput={() => undefined}
-              placeholder='Enter service location'
-            />
-          </label>
-          <label>
-            <span class='sg-label'>Application notes</span>
-            <AppTextarea
-              error={inputError()}
-              onInput={() => undefined}
-              placeholder='Wind break along west ridge; verify drift boundary before launch.'
-              rows={4}
-            />
-          </label>
-          <label>
-            <span class='sg-label'>Service status</span>
-            <AppSelect error={inputError()} options={STATUSES}>
-              Select service status
-              <AppSelectContent>
-                <For each={STATUSES}>
-                  {status => <AppSelectItem item={status}>{status}</AppSelectItem>}
-                </For>
-              </AppSelectContent>
-            </AppSelect>
-          </label>
-          <label>
-            <span class='sg-label'>Disabled acreage</span>
-            <AppInput disabled value='142 acres' onInput={() => undefined} />
-          </label>
-          <label>
-            <span class='sg-label'>Disabled comments</span>
-            <AppTextarea disabled value='Locked after crew dispatch.' onInput={() => undefined} />
-          </label>
-          <label>
-            <span class='sg-label'>Disabled select</span>
-            <AppSelect disabled options={STATUSES}>Ground - Sprayer</AppSelect>
-          </label>
-        </div>
-      </Section>
-
-      <Section title='AppMultiSelect'>
-        <AppMultiSelect>
-          <div class='sg-token-list'>
-            <For each={SERVICES}>
-              {service => <span>{service}</span>}
+        <Section title='AppButton'>
+          <div class='sg-row'>
+            <AppButton variant='secondary' onClick={() => setLoading(!loading())}>
+              Toggle loading
+            </AppButton>
+          </div>
+          <div class='sg-row'>
+            <For each={BUTTON_VARIANTS}>
+              {entry => <AppButton variant={entry.variant}>{entry.label}</AppButton>}
             </For>
           </div>
-        </AppMultiSelect>
-      </Section>
+          <div class='sg-row'>
+            <AppButton disabled>Disabled</AppButton>
+            <AppButton variant='primary' loading={loading()}>
+              Loading
+            </AppButton>
+          </div>
+        </Section>
 
-      <Section title='AppCheckbox'>
-        <div class='sg-row'>
-          <AppCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
-            Label reviewed
-          </AppCheckbox>
-          <AppCheckbox checked={false} onChange={() => undefined}>Drift boundary verified</AppCheckbox>
-          <AppCheckbox error checked={false} onChange={() => undefined}>
-            Missing wind reading
-          </AppCheckbox>
-          <AppCheckbox disabled checked>Disabled complete</AppCheckbox>
-        </div>
-      </Section>
+        <Section title='AppIconButton'>
+          <div class='sg-row'>
+            <AppIconButton aria-label='Add service note'>+</AppIconButton>
+            <AppIconButton aria-label='Refresh service status' disabled>
+              R
+            </AppIconButton>
+          </div>
+        </Section>
 
-      <Section title='AppRadioGroup + AppRadioItem'>
-        <div class='sg-form-grid'>
-          <AppRadioGroup value={radioValue()} onChange={setRadioValue}>
-            <AppRadioItem value='aerial'>Aerial application</AppRadioItem>
-            <AppRadioItem value='ground'>Ground machinery</AppRadioItem>
-            <AppRadioItem value='inspection'>Site inspection</AppRadioItem>
-          </AppRadioGroup>
-          <AppRadioGroup error defaultValue='blocked'>
-            <AppRadioItem value='ready'>Ready</AppRadioItem>
-            <AppRadioItem value='blocked'>Blocked</AppRadioItem>
-            <AppRadioItem value='review'>Needs review</AppRadioItem>
-          </AppRadioGroup>
-          <AppRadioGroup disabled defaultValue='night'>
-            <AppRadioItem value='morning'>Morning</AppRadioItem>
-            <AppRadioItem value='afternoon'>Afternoon</AppRadioItem>
-            <AppRadioItem value='night'>Night</AppRadioItem>
-          </AppRadioGroup>
-        </div>
-      </Section>
+        <Section title='AppInput / AppTextarea'>
+          <div class='sg-row'>
+            <AppButton variant='secondary' onClick={() => setInputError(!inputError())}>
+              Toggle error
+            </AppButton>
+          </div>
+          <AppFormGrid>
+            <AppField label='Field name' for='field-name'>
+              <AppInput
+                id='field-name'
+                value='North Field'
+                error={inputError()}
+                onInput={() => undefined}
+                placeholder='Enter service location'
+              />
+            </AppField>
+            <AppField label='Application notes' for='application-notes'>
+              <AppTextarea
+                id='application-notes'
+                error={inputError()}
+                onInput={() => undefined}
+                value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
+                placeholder='Wind break along west ridge; verify drift boundary before launch.'
+                rows={4}
+              />
+            </AppField>
+            <AppField label='Disabled acreage' for='disabled-acreage'>
+              <AppInput id='disabled-acreage' disabled value='142 acres' onInput={() => undefined} />
+            </AppField>
+            <AppField label='Disabled comments' for='disabled-comments'>
+              <AppTextarea
+                id='disabled-comments'
+                disabled
+                value='Locked after crew dispatch.'
+                onInput={() => undefined}
+                rows={4}
+              />
+            </AppField>
+          </AppFormGrid>
+        </Section>
 
-      <Section title='AppToggle / AppToggleGroup + AppToggleItem'>
-        <div class='sg-row'>
-          <AppToggle pressed={togglePressed()} onClick={() => setTogglePressed(!togglePressed())}>
-            Active crews
-          </AppToggle>
-          <AppToggle pressed={false}>Offline jobs</AppToggle>
-        </div>
-        <AppToggleGroup value={viewMode()} onChange={setViewMode}>
-          <AppToggleItem value='map'>Map</AppToggleItem>
-          <AppToggleItem value='list'>List</AppToggleItem>
-          <AppToggleItem value='grid'>Grid</AppToggleItem>
-        </AppToggleGroup>
-      </Section>
+        <Section title='AppSelect / AppMultiSelect'>
+          <div class='sg-row'>
+            <AppButton variant='secondary' onClick={() => setInputError(!inputError())}>
+              Toggle error
+            </AppButton>
+          </div>
+          <AppFormGrid>
+            <AppField label='Service status' for='service-status'>
+              <AppSelect
+                id='service-status'
+                placeholder='Select service status'
+                error={inputError()}
+                options={STATUSES}
+              />
+            </AppField>
+            <AppField label='Disabled select' for='disabled-select'>
+              <AppSelect
+                id='disabled-select'
+                disabled
+                defaultValue='Ground - Sprayer'
+                options={STATUSES}
+              />
+            </AppField>
+          </AppFormGrid>
+          <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
+        </Section>
 
-      <Section title='AppTabs + AppTabList + AppTab + AppTabPanel'>
-        <AppTabs value={tab()} onChange={setTab}>
-          <AppTabList>
-            <AppTab value='assessment'>Assessment</AppTab>
-            <AppTab value='planning'>Planning</AppTab>
-            <AppTab value='execution'>Execution</AppTab>
-            <AppTab value='followup'>Followup</AppTab>
-          </AppTabList>
-          <AppTabPanel value='assessment'>Walk field edges and capture hazard notes.</AppTabPanel>
-          <AppTabPanel value='planning'>Assign crew, assets, chemicals, and service window.</AppTabPanel>
-          <AppTabPanel value='execution'>Record work logs and answer workflow questions.</AppTabPanel>
-          <AppTabPanel value='followup'>Prepare customer report and close service record.</AppTabPanel>
-        </AppTabs>
-      </Section>
+        <Section title='AppField / AppFieldset / AppFormGrid / AppFormActions'>
+          <AppFieldset legend='Service details'>
+            <AppFormGrid>
+              <AppField label='Field name' for='form-demo-name'>
+                <AppInput id='form-demo-name' value='North Field' onInput={() => undefined} />
+              </AppField>
+              <AppField label='Service type' for='form-demo-service'>
+                <AppSelect id='form-demo-service' options={STATUSES} placeholder='Select service type' />
+              </AppField>
+            </AppFormGrid>
+          </AppFieldset>
+          <AppFieldset legend='Application window'>
+            <AppFormGrid>
+              <AppField label='Application notes' for='form-demo-notes'>
+                <AppTextarea
+                  id='form-demo-notes'
+                  value='Spray window 06:00–09:00.'
+                  onInput={() => undefined}
+                  rows={3}
+                />
+              </AppField>
+            </AppFormGrid>
+          </AppFieldset>
+          <AppFormActions>
+            <AppButton variant='ghost'>Cancel</AppButton>
+            <AppButton variant='primary'>Save</AppButton>
+          </AppFormActions>
+        </Section>
 
-      <Section title='AppProgress'>
-        <div class='sg-stack'>
-          <AppProgress value={0} />
-          <AppProgress value={35} />
-          <AppProgress value={68} />
-          <AppProgress value={100} />
-        </div>
-      </Section>
+        <Section title='AppCheckbox'>
+          <div class='sg-row'>
+            <AppCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
+              Label reviewed
+            </AppCheckbox>
+            <AppCheckbox checked={checkboxDrift()} onChange={setCheckboxDrift}>
+              Drift boundary verified
+            </AppCheckbox>
+            <AppCheckbox error checked={checkboxError()} onChange={setCheckboxError}>
+              Missing wind reading
+            </AppCheckbox>
+            <AppCheckbox disabled checked>Disabled complete</AppCheckbox>
+          </div>
+        </Section>
 
-      <Section title='AppSpinner'>
-        <AppSpinner />
-      </Section>
+        <Section title='AppRadioGroup + AppRadioItem'>
+          <AppFormGrid>
+            <AppRadioGroup value={radioValue()} onChange={setRadioValue}>
+              <AppRadioItem value='aerial'>Aerial application</AppRadioItem>
+              <AppRadioItem value='ground'>Ground machinery</AppRadioItem>
+              <AppRadioItem value='inspection'>Site inspection</AppRadioItem>
+            </AppRadioGroup>
+            <AppRadioGroup error defaultValue='blocked'>
+              <AppRadioItem value='ready'>Ready</AppRadioItem>
+              <AppRadioItem value='blocked'>Blocked</AppRadioItem>
+              <AppRadioItem value='review'>Needs review</AppRadioItem>
+            </AppRadioGroup>
+            <AppRadioGroup disabled defaultValue='night'>
+              <AppRadioItem value='morning'>Morning</AppRadioItem>
+              <AppRadioItem value='afternoon'>Afternoon</AppRadioItem>
+              <AppRadioItem value='night'>Night</AppRadioItem>
+            </AppRadioGroup>
+          </AppFormGrid>
+        </Section>
 
-      <Section title='AppSkeleton'>
-        <div class='sg-stack'>
+        <Section title='AppToggle / AppToggleGroup + AppToggleItem'>
+          <div class='sg-row'>
+            <AppToggle pressed={togglePressed()} onClick={() => setTogglePressed(!togglePressed())}>
+              Active crews
+            </AppToggle>
+            <AppToggle pressed={false}>Offline jobs</AppToggle>
+          </div>
+          <AppToggleGroup value={viewMode()} onChange={setViewMode}>
+            <AppToggleItem value='map'>Map</AppToggleItem>
+            <AppToggleItem value='list'>List</AppToggleItem>
+            <AppToggleItem value='grid'>Grid</AppToggleItem>
+          </AppToggleGroup>
+        </Section>
+
+        <Section title='AppTabs + AppTabList + AppTab + AppTabPanel'>
+          <AppTabs value={tab()} onChange={setTab}>
+            <AppTabList>
+              <AppTab value='assessment'>Assessment</AppTab>
+              <AppTab value='planning'>Planning</AppTab>
+              <AppTab value='execution'>Execution</AppTab>
+              <AppTab value='followup'>Followup</AppTab>
+            </AppTabList>
+            <AppTabPanel value='assessment'>Walk field edges and capture hazard notes.</AppTabPanel>
+            <AppTabPanel value='planning'>
+              Assign crew, assets, chemicals, and service window.
+            </AppTabPanel>
+            <AppTabPanel value='execution'>Record work logs and answer workflow questions.</AppTabPanel>
+            <AppTabPanel value='followup'>Prepare customer report and close service record.</AppTabPanel>
+          </AppTabs>
+        </Section>
+
+        <Section title='AppProgress'>
+          <div class='sg-stack'>
+            <AppProgress value={0} />
+            <AppProgress value={35} />
+            <AppProgress value={68} />
+            <AppProgress value={100} />
+          </div>
+        </Section>
+
+        <Section title='AppSpinner'>
+          <AppSpinner />
+        </Section>
+
+        <Section title='AppSkeleton'>
+          <div class='sg-stack'>
+            <AppSkeleton />
+            <div class='sg-skeleton-75'>
+              <AppSkeleton />
+            </div>
+            <div class='sg-skeleton-50'>
+              <AppSkeleton />
+            </div>
+          </div>
+        </Section>
+
+        <Section title='AppBadge'>
+          <div class='sg-row'>
+            <AppBadge variant='success'>Field ready</AppBadge>
+            <AppBadge variant='warning'>Wind watch</AppBadge>
+            <AppBadge variant='danger'>Blocked</AppBadge>
+            <AppBadge variant='info'>Assessment</AppBadge>
+          </div>
+        </Section>
+
+        <Section title='AppAlert'>
+          <div class='sg-stack'>
+            <AppAlert variant='success'>North Field completed and ready for customer review.</AppAlert>
+            <AppAlert variant='warning'>Wind speed approaching service threshold.</AppAlert>
+            <AppAlert variant='danger'>Chemical label missing required re-entry interval.</AppAlert>
+            <AppAlert variant='info'>Crew assignment changed for the morning window.</AppAlert>
+          </div>
+        </Section>
+
+        <Section title='AppTooltip'>
+          <AppTooltip trigger={<AppButton variant='secondary'>Hover field note</AppButton>} defaultOpen>
+            Verify buffer zone before aerial application.
+          </AppTooltip>
+        </Section>
+
+        <Section title='AppDialog'>
+          <AppDialog trigger={<AppButton variant='secondary'>Open dispatch dialog</AppButton>}>
+            <div class='sg-stack'>
+              <p>Confirm crew assignment before dispatch.</p>
+            </div>
+          </AppDialog>
+        </Section>
+
+        <Section title='AppPopover'>
+          <AppPopover trigger={<AppButton variant='secondary'>Open field menu</AppButton>}>
+            <div class='sg-stack'>
+              <p>Field actions, notes, and service history.</p>
+            </div>
+          </AppPopover>
+        </Section>
+
+        <Section title='AppAccordion'>
+          <AppAccordion defaultValue={[...ACCORDION_DEFAULT_VALUE]}>
+            <AppAccordionItem value='weather'>
+              <AppAccordionTrigger>Weather window</AppAccordionTrigger>
+              <AppAccordionContent>
+                <ul>
+                  <li>Wind speed 12 km/h — within threshold</li>
+                  <li>Precipitation 0% — clear</li>
+                  <li>Visibility 18 km — acceptable</li>
+                  <li>Temperature 21°C — nominal</li>
+                </ul>
+              </AppAccordionContent>
+            </AppAccordionItem>
+            <AppAccordionItem value='crew'>
+              <AppAccordionTrigger>Crew status</AppAccordionTrigger>
+              <AppAccordionContent>
+                <ol>
+                  <li>Lead operator certified and on-site</li>
+                  <li>Equipment pre-check complete</li>
+                  <li>Safety brief conducted</li>
+                  <li>Flight plan filed and acknowledged</li>
+                </ol>
+              </AppAccordionContent>
+            </AppAccordionItem>
+            <AppAccordionItem value='compliance'>
+              <AppAccordionTrigger>Compliance notes</AppAccordionTrigger>
+              <AppAccordionContent>
+                <ul>
+                  <li>Buffer zones confirmed</li>
+                  <li>No restricted area conflicts detected</li>
+                  <li>Chemical application rate within permit limits</li>
+                </ul>
+              </AppAccordionContent>
+            </AppAccordionItem>
+          </AppAccordion>
+        </Section>
+
+        <Section title='AppAvatar'>
+          <AppAvatar>AG</AppAvatar>
+        </Section>
+
+        <Section title='AppCard'>
+          <div class='sg-card-grid'>
+            <AppCard variant='widget'>
+              <div class='sg-card-copy'>
+                <h3>Widget card</h3>
+                <p>Dashboard-ready surface with stripe treatment and crisp separation from the page.</p>
+              </div>
+            </AppCard>
+            <AppCard variant='panel'>
+              <div class='sg-card-copy'>
+                <h3>Panel card</h3>
+                <p>Quiet interior surface for form sections and guided workflow sub-groups.</p>
+              </div>
+            </AppCard>
+            <AppCard variant='workflow'>
+              <div class='sg-card-copy'>
+                <h3>Workflow card</h3>
+                <p>Primary framed container for guided flows that need stronger focus and elevation.</p>
+              </div>
+            </AppCard>
+          </div>
+        </Section>
+
+        <Section title='AppSeparator'>
+          <AppSeparator />
+        </Section>
+
+        <Section title='Charts'>
+          {/* TODO: AppChart - pending chart primitive */}
           <AppSkeleton />
-          <div class='sg-skeleton-75'>
-            <AppSkeleton />
-          </div>
-          <div class='sg-skeleton-50'>
-            <AppSkeleton />
-          </div>
-        </div>
-      </Section>
+        </Section>
+      </main>
 
-      <Section title='AppBadge'>
-        <div class='sg-row'>
-          <AppBadge variant='success'>Field ready</AppBadge>
-          <AppBadge variant='warning'>Wind watch</AppBadge>
-          <AppBadge variant='danger'>Blocked</AppBadge>
-          <AppBadge variant='info'>Assessment</AppBadge>
-        </div>
-      </Section>
-
-      <Section title='AppAlert'>
-        <div class='sg-stack'>
-          <AppAlert variant='success'>North Field completed and ready for customer review.</AppAlert>
-          <AppAlert variant='warning'>Wind speed approaching service threshold.</AppAlert>
-          <AppAlert variant='danger'>Chemical label missing required re-entry interval.</AppAlert>
-          <AppAlert variant='info'>Crew assignment changed for the morning window.</AppAlert>
-        </div>
-      </Section>
-
-      <Section title='AppTooltip'>
-        <AppTooltip trigger={<AppButton variant='secondary'>Hover field note</AppButton>} defaultOpen>
-          Verify buffer zone before aerial application.
-        </AppTooltip>
-      </Section>
-
-      <Section title='AppDialog'>
-        <AppDialog trigger='Open dispatch dialog'>
-          <div class='sg-stack'>
-            <p>Confirm crew assignment before dispatch.</p>
-          </div>
-        </AppDialog>
-      </Section>
-
-      <Section title='AppPopover'>
-        <AppPopover trigger='Open field menu'>
-          <div class='sg-stack'>
-            <p>Field actions, notes, and service history.</p>
-          </div>
-        </AppPopover>
-      </Section>
-
-      <Section title='AppAccordion'>
-        <AppAccordion defaultValue={['weather']}>
-          <div class='sg-stack'>
-            <h3>Weather window</h3>
-            <p>Wind, precipitation, and visibility remain inside service thresholds.</p>
-          </div>
-        </AppAccordion>
-      </Section>
-
-      <Section title='AppAvatar'>
-        <AppAvatar>AG</AppAvatar>
-      </Section>
-
-      <Section title='AppCard'>
-        <div class='sg-card-grid'>
-          <AppCard variant='widget'>
-            <div class='sg-card-copy'>
-              <h3>Widget card</h3>
-              <p>Dashboard-ready surface with stripe treatment and crisp separation from the page.</p>
-            </div>
-          </AppCard>
-          <AppCard variant='panel'>
-            <div class='sg-card-copy'>
-              <h3>Panel card</h3>
-              <p>Quiet interior surface for form sections and guided workflow sub-groups.</p>
-            </div>
-          </AppCard>
-          <AppCard variant='workflow'>
-            <div class='sg-card-copy'>
-              <h3>Workflow card</h3>
-              <p>Primary framed container for guided flows that need stronger focus and elevation.</p>
-            </div>
-          </AppCard>
-        </div>
-      </Section>
-
-      <Section title='AppSeparator'>
-        <AppSeparator />
-      </Section>
-
-      <Section title='Charts'>
-        {/* TODO: AppChart - pending chart primitive */}
-        <AppSkeleton />
-      </Section>
-    </main>
+      <footer class='sg-footer'>
+      </footer>
+    </>
   )
 }
 

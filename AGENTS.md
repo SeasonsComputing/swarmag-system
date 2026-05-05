@@ -5,9 +5,10 @@
 Every AI session begins by ingesting the following project assets. Ingest in order, then inform the Chief Architect and wait for tasks:
 
 1. `CONSTITUTION.md`
-2. `documentation/*.md`
-3. `source/core/**/*.ts`
-4. `source/domain/**/*.ts`
+2. `documentation/domain-model.md`
+3. `documentation/architecture-core.md`
+
+Remind the Chief Architect that the session has minimal context (constitution, domain model asbstractions and core architecture) and advise the Chief Architect to provide additional context prior to initiating any productions.
 
 ## 2. Mandatory Style-Guide Enforcement (Blocking)
 

@@ -25,6 +25,10 @@ export default defineConfig({
         find: /^@ux\/common\/components\/controls$/,
         replacement: resolve(root, 'source/ux/common/components/controls/controls.ts')
       },
+      {
+        find: /^@ux\/common\/components\/forms$/,
+        replacement: resolve(root, 'source/ux/common/components/forms/forms.ts')
+      },
       { find: /^@solid-js$/, replacement: 'solid-js' },
       { find: /^@solid-js\/jsx-runtime$/, replacement: 'solid-js/jsx-runtime' },
       { find: /^@solid-js\/store$/, replacement: 'solid-js/store' },

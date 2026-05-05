@@ -16,11 +16,11 @@ Defines global browser-level style foundations consumed by all UX apps.
  */
 
 @font-face {
-  font-family: 'DM Serif Display';
+  font-family: 'Comfortaa';
   font-style: normal;
   font-weight: 400;
   font-display: swap;
-  src: url('../fonts/DMSerifDisplay-Regular.woff2') format('woff2');
+  src: url('../fonts/Comfortaa-Regular.woff2') format('woff2');
 }
 
 @font-face {
@@ -33,29 +33,6 @@ Defines global browser-level style foundations consumed by all UX apps.
     url('../fonts/Lexend-VariableFont_wght.woff2') format('woff2');
 }
 
-@font-face {
-  font-family: 'Comfortaa';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../fonts/Comfortaa-Regular.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url('../fonts/inter-400.woff2') format('woff2');
-}
-
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url('../fonts/inter-600.woff2') format('woff2');
-}
 
 @font-face {
   font-family: 'Mono';
@@ -98,9 +75,10 @@ body {
 body::before {
   filter: none;
   background:
-    radial-gradient(circle at 20% 80%, oklch(66% 0.14 235 / 0.24) 0%, transparent 50%),
-    radial-gradient(circle at 80% 20%, oklch(50% 0.10 150 / 0.16) 0%, transparent 50%),
-    radial-gradient(circle at 40% 40%, oklch(78% 0.12 185 / 0.12) 0%, transparent 50%);
+    radial-gradient(circle at 20% 80%, oklch(66% 0.14 235 / 0.24) 0%, transparent 55%),
+    radial-gradient(circle at 85% 20%, oklch(50% 0.10 150 / 0.22) 0%, transparent 60%),
+    radial-gradient(circle at 40% 40%, oklch(78% 0.12 185 / 0.14) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, oklch(58% 0.12 220 / 0.18) 0%, transparent 55%);
   content: '';
   height: 100%;
   left: 0;
@@ -129,23 +107,13 @@ body::before {
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-h1, h2 {
-  color: var(--sa-text-h1);
-  font-family: var(--sa-font-body);
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--sa-font-heading);
   font-weight: var(--sa-weight-normal);
 }
 
-h3, h4, h5, h6,
-p,
-td,
-li {
-  font-family: var(--sa-font-body);
-  font-weight: var(--sa-weight-thin);
-}
-
-th {
-  font-family: var(--sa-font-body);
-  font-weight: var(--sa-weight-semibold);
+h1 {
+  color: var(--sa-text-h1);
 }
 
 h2 {
@@ -164,19 +132,44 @@ h5 {
   color: var(--sa-text-h5);
 }
 
-button,
-input,
+p {
+  font-family: var(--sa-font-body);
+  font-weight: var(--sa-weight-thin);
+}
+
 label,
+button,
+legend {
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-thin);
+}
+
+label {
+  color: var(--sa-text-secondary);
+}
+
+figcaption,
+th {
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-normal);
+}
+
+li,
+td {
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-thin);
+}
+
+input,
 select,
 textarea,
 [role='menuitem'],
 [role='option'] {
   font-family: var(--sa-font-ui);
   font-weight: var(--sa-weight-normal);
-}
-
-label {
-  font-weight: var(--sa-weight-medium);
 }
 
 code, pre, kbd, samp {
@@ -191,6 +184,121 @@ code, pre, kbd, samp {
 :focus-visible {
   box-shadow: var(--sa-focus-ring);
   outline: none;
+}
+
+/*
+ * PRE
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+pre {
+  background: var(--sa-bg-surface-1);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-md);
+  color: var(--sa-text-secondary);
+  margin: 0;
+  overflow: auto;
+  padding: var(--sa-space-md);
+}
+
+/*
+ * TABLE
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+table {
+  background: var(--sa-bg-table);
+  border-collapse: collapse;
+  border-radius: var(--sa-radius-lg);
+  margin-block: var(--sa-space-md);
+  overflow: hidden;
+  width: 100%;
+}
+
+thead {
+  background: var(--sa-gradient-brand);
+}
+
+th,
+td {
+  border-block-end: var(--sa-border-default);
+  padding: var(--sa-space-sm);
+  text-align: start;
+}
+
+th {
+  color: oklch(var(--sa-p-white));
+}
+
+td {
+  color: var(--sa-text-secondary);
+}
+
+tr:hover {
+  background: var(--sa-bg-hover);
+}
+
+thead tr:hover {
+  background: transparent;
+}
+
+/*
+ * LISTS
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+ol,
+ul {
+  color: var(--sa-text-secondary);
+  padding-inline-start: 1.75rem;
+}
+
+li {
+  margin-block: 0.25rem;
+  padding-inline-start: 0.375rem;
+}
+
+ul > li {
+  padding-inline-start: calc(0.375rem - 2px);
+}
+
+ul > li::marker {
+  color: var(--sa-color-brand-end);
+  font-size: 1.25rem;
+}
+
+ol > li::marker {
+  color: var(--sa-color-brand-start);
+}
+
+/*
+ * FIELDSET / LEGEND
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+fieldset {
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-md);
+  display: grid;
+  gap: var(--sa-space-md);
+  padding: var(--sa-space-md);
+}
+
+legend {
+  color: oklch(var(--sa-p-white));
+}
+
+/*
+ * FIGURE / FIGCAPTION
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+figure {
+  margin: 0;
+}
+
+figcaption {
+  color: var(--sa-text-secondary);
 }
 
 /*

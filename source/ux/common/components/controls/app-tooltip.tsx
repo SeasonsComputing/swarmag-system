@@ -53,15 +53,20 @@ export const AppTooltip = (props: AppTooltipProps): JSX.Element => {
   ])
 
   return (
-    <Tooltip open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
-      <Tooltip.Trigger
-        data-ui='tooltip'
-        data-ui-state={controlState(local)}
-        disabled={local.disabled || local.loading}
-      >
+    <Tooltip
+      open={local.open}
+      defaultOpen={local.defaultOpen}
+      onOpenChange={local.onOpenChange}
+      disabled={local.disabled || local.loading}
+    >
+      <Tooltip.Trigger as='span'>
         {local.trigger}
       </Tooltip.Trigger>
-      {local.children}
+      <Tooltip.Portal>
+        <Tooltip.Content data-ui='tooltip' data-ui-state={controlState(local)}>
+          {local.children}
+        </Tooltip.Content>
+      </Tooltip.Portal>
     </Tooltip>
   )
 }

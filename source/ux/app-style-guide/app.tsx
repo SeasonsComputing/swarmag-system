@@ -7,6 +7,7 @@ import { render } from '@solid-js/web'
 import '@ux/common/assets/css/tokens.css'
 import '@ux/common/assets/css/base.css'
 import '@ux/common/assets/css/controls.css'
+import '@ux/common/assets/css/forms.css'
 import { StyleGuide } from './style-guide.tsx'
 import './style-guide.css'
 

@@ -2,7 +2,16 @@
  * Explicit barrel for common control primitives.
  */
 
-export { AppAccordion, type AppAccordionProps } from './app-accordion.tsx'
+export {
+  AppAccordion,
+  AppAccordionContent,
+  type AppAccordionContentProps,
+  AppAccordionItem,
+  type AppAccordionItemProps,
+  type AppAccordionProps,
+  AppAccordionTrigger,
+  type AppAccordionTriggerProps
+} from './app-accordion.tsx'
 export { AppAlert, type AppAlertProps, type AppAlertVariant } from './app-alert.tsx'
 export { AppAvatar, type AppAvatarProps } from './app-avatar.tsx'
 export { AppBadge, type AppBadgeProps, type AppBadgeVariant } from './app-badge.tsx'
@@ -21,14 +30,7 @@ export {
   AppRadioItem,
   type AppRadioItemProps
 } from './app-radio-group.tsx'
-export {
-  AppSelect,
-  AppSelectContent,
-  type AppSelectContentProps,
-  AppSelectItem,
-  type AppSelectItemProps,
-  type AppSelectProps
-} from './app-select.tsx'
+export { AppSelect, type AppSelectProps } from './app-select.tsx'
 export { AppSeparator, type AppSeparatorProps } from './app-separator.tsx'
 export { AppSkeleton, type AppSkeletonProps } from './app-skeleton.tsx'
 export { AppSpinner, type AppSpinnerProps } from './app-spinner.tsx'

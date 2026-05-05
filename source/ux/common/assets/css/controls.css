@@ -3,11 +3,6 @@
 ║ UX control selectors                                                         ║
 ║ Visual rules for semantic App{Control} primitive attributes.                 ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-PURPOSE
-───────────────────────────────────────────────────────────────────────────────
-Selector rules for App{Control} primitives. Consumes tokens from tokens.css.
-No raw values. No primitive references.
 */
 
 /*
@@ -23,8 +18,8 @@ No raw values. No primitive references.
   color: var(--sa-color-primary);
   cursor: pointer;
   display: inline-flex;
-  font-family: 'Lexend', ui-sans-serif, system-ui, sans-serif;
-  font-size: var(--sa-font-xs);
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
   font-weight: var(--sa-weight-medium);
   gap: var(--sa-space-sm);
   justify-content: center;
@@ -38,7 +33,7 @@ No raw values. No primitive references.
   background: var(--sa-btn-primary-bg);
   border-color: var(--sa-color-transparent);
   color: var(--sa-btn-primary-text);
-  font-weight: var(--sa-weight-medium);
+  font-weight: var(--sa-weight-semibold);
   box-shadow: var(--sa-shadow-btn);
   transition: var(--sa-transition-spring);
 }
@@ -53,15 +48,23 @@ No raw values. No primitive references.
   background: var(--sa-btn-danger-bg);
   border-color: var(--sa-btn-danger-bg);
   color: var(--sa-btn-danger-text);
-  font-weight: var(--sa-weight-medium);
+  font-weight: var(--sa-weight-semibold);
 }
 
 [data-ui='button']:hover {
   background: var(--sa-bg-hover);
+  box-shadow: var(--sa-shadow-sm);
+  transform: translateY(-1px);
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out, background var(--sa-transition-fast);
+}
+
+[data-ui='button'][data-ui-state='disabled']:hover {
+  box-shadow: none;
+  transform: none;
 }
 
 [data-ui='button'][data-ui-variant='danger']:hover {
-  background: var(--sa-color-danger);
+  background: var(--sa-btn-danger-bg-hover);
 }
 
 [data-ui='button'][data-ui-variant='primary']:hover {
@@ -80,14 +83,28 @@ No raw values. No primitive references.
  */
 
 [data-ui='input'],
-[data-ui='textarea'],
-[data-ui='select'] {
+[data-ui='textarea'] {
   background: var(--sa-bg-input);
   border: var(--sa-border-input);
   border-radius: var(--sa-radius-md);
   color: var(--sa-text-primary);
   font-family: var(--sa-font-ui);
   font-size: var(--sa-font-xs);
+  font-weight: var(--sa-weight-thin);
+  min-height: var(--sa-touch-target-sm);
+  padding-block: var(--sa-space-sm);
+  padding-inline: var(--sa-space-md);
+  transition: var(--sa-transition-fast);
+}
+
+[data-ui='select'] {
+  background: var(--sa-bg-input);
+  border: var(--sa-border-input);
+  border-radius: var(--sa-radius-md);
+  color: var(--sa-text-primary);
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-normal);
   min-height: var(--sa-touch-target-sm);
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -100,8 +117,14 @@ No raw values. No primitive references.
 }
 
 [data-ui='input']:hover,
+[data-ui='textarea']:hover,
 [data-ui='select']:hover {
   background: var(--sa-bg-input-focus);
+}
+
+[data-ui='select'] [data-placeholder-shown]::before {
+  color: var(--sa-text-placeholder);
+  content: attr(placeholder);
 }
 
 [data-ui='input']:focus-visible,
@@ -142,8 +165,9 @@ No raw values. No primitive references.
   border-radius: var(--sa-radius-sm);
   color: var(--sa-text-primary);
   cursor: pointer;
-  font-family: var(--sa-font-ui);
-  font-size: var(--sa-font-xs);
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-normal);
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
 }
@@ -159,23 +183,106 @@ No raw values. No primitive references.
 }
 
 /*
+ * MULTI-SELECT
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+[data-ui='multi-select'] {
+  background: var(--sa-bg-input);
+  border: var(--sa-border-input);
+  border-radius: var(--sa-radius-md);
+  display: grid;
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-normal);
+  padding: var(--sa-space-xs);
+}
+
+[data-ui='multi-select-item'] {
+  border-radius: var(--sa-radius-sm);
+  color: var(--sa-text-primary);
+  cursor: pointer;
+  padding-block: var(--sa-space-sm);
+  padding-inline: var(--sa-space-md);
+}
+
+[data-ui='multi-select-item']:hover,
+[data-ui='multi-select-item'][data-highlighted] {
+  background: var(--sa-bg-hover);
+}
+
+[data-ui='multi-select-item'][data-selected] {
+  background: var(--sa-bg-selected);
+  color: var(--sa-color-primary);
+}
+
+[data-ui='multi-select-item'][data-disabled] {
+  color: var(--sa-text-disabled);
+  cursor: not-allowed;
+}
+
+/*
  * CHECKBOX / RADIO
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-[data-ui='checkbox'],
-[data-ui='radio'] {
-  background: var(--sa-bg-input);
-  border: var(--sa-border-input);
+[data-ui='checkbox-field'] {
+  align-items: center;
   color: var(--sa-text-primary);
-  font-family: var(--sa-font-ui);
-  font-size: var(--sa-font-xs);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-thin);
+  gap: var(--sa-space-sm);
 }
 
-[data-ui='checkbox'],
+[data-ui='radio-group'] {
+  display: grid;
+  gap: var(--sa-space-xs);
+}
+
+[data-ui='radio-item'] {
+  align-items: center;
+  color: var(--sa-text-primary);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-thin);
+  gap: var(--sa-space-sm);
+}
+
+[data-ui='checkbox'] {
+  align-items: center;
+  background: var(--sa-bg-control);
+  border: var(--sa-border-input);
+  border-radius: var(--sa-radius-sm);
+  display: inline-flex;
+  flex-shrink: 0;
+  height: var(--sa-space-md);
+  justify-content: center;
+  transition: var(--sa-transition-fast);
+  width: var(--sa-space-md);
+}
+
 [data-ui='radio'] {
-  min-height: var(--sa-space-md);
-  min-width: var(--sa-space-md);
+  align-items: center;
+  background: var(--sa-bg-control);
+  border: var(--sa-border-input);
+  border-radius: var(--sa-radius-full);
+  display: inline-flex;
+  flex-shrink: 0;
+  height: var(--sa-space-md);
+  justify-content: center;
+  transition: var(--sa-transition-fast);
+  width: var(--sa-space-md);
+}
+
+[data-ui='checkbox']:not([data-checked]):not([aria-checked='true']):hover,
+[data-ui='radio']:not([data-checked]):not([aria-checked='true']):hover {
+  background: var(--sa-bg-hover);
+  border-color: var(--sa-color-primary);
 }
 
 [data-ui='checkbox'][data-checked],
@@ -184,12 +291,105 @@ No raw values. No primitive references.
 [data-ui='radio'][aria-checked='true'] {
   background: var(--sa-color-primary);
   border-color: var(--sa-color-primary);
+  color: var(--sa-text-on-brand);
+}
+
+[data-ui='checkbox'][data-checked]::after,
+[data-ui='checkbox'][aria-checked='true']::after {
+  content: '✓';
+  line-height: 1;
+}
+
+[data-ui='radio'][data-checked]::after,
+[data-ui='radio'][aria-checked='true']::after {
+  background: var(--sa-text-on-brand);
+  border-radius: var(--sa-radius-full);
+  content: '';
+  display: block;
+  height: var(--sa-space-sm);
+  width: var(--sa-space-sm);
 }
 
 [data-ui='checkbox'][data-ui-state='error'],
-[data-ui='radio'][data-ui-state='error'],
-[data-ui='radio-group'][data-ui-state='error'] {
+[data-ui='radio'][data-ui-state='error'] {
   border-color: var(--sa-border-input-error);
+  box-shadow: var(--sa-control-ring-error);
+}
+
+[data-ui='radio-group'][data-ui-state='error'] [data-ui='radio'] {
+  border-color: var(--sa-border-input-error);
+}
+
+[data-ui='checkbox-field'][data-disabled],
+[data-ui='radio-item'][data-disabled] {
+  color: var(--sa-text-muted);
+  cursor: not-allowed;
+}
+
+[data-ui='checkbox-field'][data-disabled] [data-ui='checkbox'],
+[data-ui='radio-item'][data-disabled] [data-ui='radio'] {
+  opacity: 0.4;
+}
+
+/*
+ * ACCORDION
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+[data-ui='accordion'] {
+  display: grid;
+  gap: var(--sa-space-xs);
+}
+
+[data-ui='accordion-item'] {
+  background: var(--sa-bg-surface-2);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-md);
+  overflow: hidden;
+}
+
+[data-ui='accordion-trigger'] {
+  align-items: center;
+  background: transparent;
+  border: unset;
+  color: var(--sa-text-primary);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--sa-font-ui);
+  font-size: var(--sa-font-xs);
+  font-weight: var(--sa-weight-medium);
+  justify-content: space-between;
+  min-height: var(--sa-touch-target-sm);
+  padding-block: var(--sa-space-sm);
+  padding-inline: var(--sa-space-md);
+  transition: var(--sa-transition-fast);
+  width: 100%;
+}
+
+[data-ui='accordion-trigger']:hover {
+  background: var(--sa-bg-hover);
+}
+
+[data-ui='accordion-trigger']:focus-visible {
+  box-shadow: var(--sa-focus-ring);
+}
+
+[data-ui='accordion-trigger'][data-expanded] {
+  background: var(--sa-bg-hover);
+  color: var(--sa-color-primary);
+}
+
+[data-ui='accordion-content'] {
+  color: var(--sa-text-secondary);
+  font-family: var(--sa-font-ui);
+  font-size: var(--sa-font-xs);
+  padding-block-end: var(--sa-space-md);
+  padding-inline: var(--sa-space-md);
+}
+
+[data-ui='accordion-item'][data-disabled] [data-ui='accordion-trigger'] {
+  color: var(--sa-text-disabled);
+  cursor: not-allowed;
 }
 
 /*
@@ -205,7 +405,7 @@ No raw values. No primitive references.
   color: var(--sa-text-muted);
   cursor: pointer;
   display: inline-flex;
-  font-family: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--sa-font-label);
   font-size: var(--sa-font-xs);
   font-weight: var(--sa-weight-medium);
   gap: var(--sa-space-sm);
@@ -276,7 +476,7 @@ No raw values. No primitive references.
   border-radius: var(--sa-radius-sm);
   color: var(--sa-text-muted);
   cursor: pointer;
-  font-family: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  font-family: var(--sa-font-label);
   font-size: var(--sa-font-xs);
   font-weight: var(--sa-weight-medium);
   padding-block: var(--sa-space-sm);
@@ -442,8 +642,11 @@ No raw values. No primitive references.
  */
 
 [data-ui='separator'] {
-  background: var(--sa-border-table);
+  background: var(--sa-gradient-brand);
   block-size: var(--sa-separator-size);
+  border: none;
+  display: block;
+  margin: 0;
 }
 
 /*
@@ -526,6 +729,70 @@ No raw values. No primitive references.
   opacity: var(--sa-card-workflow-stripe-opacity);
 }
 
+/*
+ * DIALOG
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+[data-ui='dialog-overlay'] {
+  background: var(--sa-bg-backdrop);
+  inset: 0;
+  position: fixed;
+  z-index: var(--sa-z-overlay);
+}
+
+[data-ui='dialog'] {
+  background: var(--sa-bg-surface-1);
+  border: var(--sa-border-card);
+  border-radius: var(--sa-card-radius);
+  box-shadow: var(--sa-shadow-card);
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  max-inline-size: 32rem;
+  min-inline-size: 20rem;
+  padding: var(--sa-space-lg);
+  position: fixed;
+  transform: translate(-50%, -50%);
+  z-index: var(--sa-z-overlay);
+}
+
+/*
+ * POPOVER
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+[data-ui='popover'] {
+  background: var(--sa-bg-surface-2);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-md);
+  box-shadow: var(--sa-shadow-card);
+  color: var(--sa-text-primary);
+  font-family: var(--sa-font-ui);
+  font-size: var(--sa-font-xs);
+  max-inline-size: 20rem;
+  padding: var(--sa-space-md);
+  z-index: var(--sa-z-popover);
+}
+
+/*
+ * TOOLTIP
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+[data-ui='tooltip'] {
+  background: var(--sa-bg-surface-2);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-md);
+  box-shadow: var(--sa-shadow-card);
+  color: var(--sa-text-primary);
+  font-family: var(--sa-font-ui);
+  font-size: var(--sa-font-xs);
+  max-inline-size: 18rem;
+  padding-block: var(--sa-space-xs);
+  padding-inline: var(--sa-space-sm);
+  z-index: var(--sa-z-popover);
+}
+
 [data-ui][data-ui-state='disabled'] {
   cursor: not-allowed;
   opacity: 0.35;
@@ -534,4 +801,13 @@ No raw values. No primitive references.
 [data-ui][data-ui-state='loading'] {
   cursor: wait;
   opacity: 0.65;
+}
+
+[data-ui='radio-group'][data-ui-state='disabled'] {
+  cursor: not-allowed;
+  opacity: 1;
+}
+
+[data-ui='radio-group'][data-ui-state='disabled'] [data-ui='radio'] {
+  opacity: 0.4;
 }

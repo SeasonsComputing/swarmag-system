@@ -54,14 +54,15 @@ export const AppDialog = (props: AppDialogProps): JSX.Element => {
 
   return (
     <Dialog open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
-      <Dialog.Trigger
-        data-ui='dialog'
-        data-ui-state={controlState(local)}
-        disabled={local.disabled || local.loading}
-      >
+      <Dialog.Trigger as='span'>
         {local.trigger}
       </Dialog.Trigger>
-      {local.children}
+      <Dialog.Portal>
+        <Dialog.Overlay data-ui='dialog-overlay' />
+        <Dialog.Content data-ui='dialog' data-ui-state={controlState(local)}>
+          {local.children}
+        </Dialog.Content>
+      </Dialog.Portal>
     </Dialog>
   )
 }

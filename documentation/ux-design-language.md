@@ -23,7 +23,7 @@ The swarmAg product family is governed by a single, unified design language. Whi
 | **Audience**   | Leadership, Operations Staff, and Field Crews                  |
 | **Motif**      | Dark-mode, data-dense, precision-oriented                      |
 | **Background** | Near-black oklch foundation with restrained radial brand depth |
-| **Typography** | DM Serif Display + Lexend + Inter + Cascadia Mono              |
+| **Typography** | Comfortaa + Lexend + Cascadia Mono                             |
 | **Accent**     | Strategic brand gradient (Green → Teal → Blue)                 |
 | **Feel**       | Professional, rugged, and purposeful                           |
 
@@ -78,21 +78,59 @@ or component tokens — never primitive palette tokens, never raw visual values.
 
 Fonts are **self-hosted woff2** assets.
 
-| Font                       | File                             | Role                                                       |
-| -------------------------- | -------------------------------- | ---------------------------------------------------------- |
-| DM Serif Display           | DMSerifDisplay-Regular.woff2     | Headings and large editorial display moments               |
-| Lexend (variable, 100–900) | Lexend-VariableFont_wght.woff2   | Body copy, navigation, brand lockups, readable app chrome  |
-| Inter (400, 600)           | inter-400.woff2, inter-600.woff2 | Form labels, inputs, table headers/cells, badges, metadata |
-| Cascadia Mono              | CascadiaMono-Light.woff2         | IDs, coordinates, numeric data fields                      |
+| Font                       | File                           | Role                                                          |
+| -------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| Comfortaa                  | Comfortaa-Regular.woff2        | Content — headings, paragraphs, body                          |
+| Lexend (variable, 100–900) | Lexend-VariableFont_wght.woff2 | All UI text — labels, buttons, inputs, selects, nav, captions |
+| Cascadia Mono              | CascadiaMono-Light.woff2       | Code / numeric — IDs, coordinates, code                       |
 
-`body` inherits Lexend. Headings inherit DM Serif Display. `input`, `select`,
-`textarea`, `label`, `th`, `td`, `button`, `[role="option"]`, and
-`[role="menuitem"]` inherit Inter automatically through `base.css`. No
-per-component font declarations are needed for the common case.
+#### Token Architecture
+
+Font primitives (`--sa-p-font-*`) hold the raw font stack values and are internal — consumed
+only by role tokens, never directly by `base.css` or `controls.css`.
+
+| Primitive                | Value         |
+| ------------------------ | ------------- |
+| `--sa-p-font-content`    | Comfortaa     |
+| `--sa-p-font-label`      | Lexend        |
+| `--sa-p-font-mono`       | Cascadia Mono |
+
+Role tokens provide semantic indirection. If a role's typeface changes, one token value changes —
+no cascade of renames in consuming files.
+
+| Role token           | Resolves to                | Intent                                           |
+| -------------------- | -------------------------- | ------------------------------------------------ |
+| `--sa-font-heading`  | `var(--sa-p-font-content)` | Heading elements                                 |
+| `--sa-font-body`     | `var(--sa-p-font-content)` | Paragraph and body content                       |
+| `--sa-font-label`    | `var(--sa-p-font-label)`   | All label roles (see §3.3)                       |
+| `--sa-font-ui`       | `var(--sa-p-font-label)`   | Data entry controls — Lexend (same face as label)|
+| `--sa-font-mono`     | `var(--sa-p-font-mono)`    | Code and numeric fields                          |
 
 ### 3.2 Fluid Type Scale
 
 All font sizes use `clamp()` for fluid scaling. See `tokens.css` for the full `--sa-font-*` scale.
+
+### 3.3 Typography Role Map
+
+Each HTML element belongs to exactly one typographic role. `base.css` declares the complete
+type treatment — family, size, and weight — in a single selector group per role. Adding an
+element to a role means adding it to one selector list only. Splitting the treatment across
+multiple rules causes drift (the figcaption problem).
+
+| Element(s) | Role | Font token | Size | Weight |
+| --- | --- | --- | --- | --- |
+| `h1`–`h6` | Heading | `--sa-font-heading` | fluid scale | normal |
+| `p` | Content | `--sa-font-body` | inherited | thin |
+| `label`, `button`, `legend` | Label | `--sa-font-label` | `--sa-font-sm` | thin |
+| `figcaption`, `th` | Annotation / table header | `--sa-font-label` | `--sa-font-sm` | normal |
+| `li`, `td` | Data-adjacent label | `--sa-font-label` | `--sa-font-sm` | thin |
+| `input`, `textarea` | Data entry | `--sa-font-ui` (→ Lexend) | `--sa-font-xs` | thin |
+| `select`, `[role='option']`, `[role='menuitem']` | Data entry | `--sa-font-ui` (→ Lexend) | `--sa-font-sm` | normal |
+| `code`, `pre`, `kbd`, `samp` | Code / numeric | `--sa-font-mono` | inherited | — |
+
+`label` additionally carries `color: var(--sa-text-secondary)` — labels are subordinate to the content they describe. `legend` inherits primary text color as a group heading.
+
+`blockquote` is deferred — treatment depends on L&F decision for decorated vs plain variants.
 
 ## 4. Token Architecture
 
@@ -107,12 +145,19 @@ consumed by the rest of the system.
 
 **`base.css`** — Foundation selectors only. Owns `@font-face`, reset, `html`,
 `body`, global typography inheritance, global background treatment, shared
-keyframes, global focus, and accessibility media queries.
+keyframes, global focus, accessibility media queries, and global semantic HTML
+element styles (`pre`, `table`/`thead`/`th`/`td`/`tr`, `ol`/`ul`/`li`,
+`fieldset`/`legend`, `figure`/`figcaption`).
 
 **`controls.css`** — App{Control} primitive selectors only. Targets declared
 `[data-ui]`, `[data-ui-variant]`, `[data-ui-state]`, Kobalte runtime state, and
 ARIA state attributes. Consumes tokens exclusively for color, size, shadow,
 motion, typography, and spacing.
+
+**`forms.css`** — Form layout classes only. Defines `.field`, `.form-grid`, and
+`.form-actions` as implementation details consumed by `AppField`, `AppFormGrid`,
+and `AppFormActions`. These class names are not a public API — consumers use the
+App form components, never the classes directly.
 
 Import order:
 
@@ -120,15 +165,17 @@ Import order:
 import '@ux/common/assets/css/tokens.css'
 import '@ux/common/assets/css/base.css'
 import '@ux/common/assets/css/controls.css'
+import '@ux/common/assets/css/forms.css'
 ```
 
 ### 4.1.1 File Ownership
 
-| File           | Owns                                                                 | Must not contain                                      |
-| -------------- | -------------------------------------------------------------------- | ----------------------------------------------------- |
-| `tokens.css`   | Custom properties, theme overrides, responsive token overrides       | Element selectors, control selectors, keyframes       |
-| `base.css`     | Browser foundation, global page background, fonts, resets, keyframes | Reusable control visuals, app/page layout rules       |
-| `controls.css` | Reusable primitive control visuals and declared control parts        | Primitive palette references, app/page-specific rules |
+| File           | Owns                                                                                                       | Must not contain                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `tokens.css`   | Custom properties, theme overrides, responsive token overrides                                             | Element selectors, control selectors, keyframes       |
+| `base.css`     | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles  | Reusable control visuals, app/page layout rules       |
+| `controls.css` | Reusable primitive control visuals and declared control parts                                              | Primitive palette references, app/page-specific rules |
+| `forms.css`    | `.app-field`, `.app-form-grid`, `.app-form-actions` layout classes — implementation details of the App form components | Visual styles, token references beyond spacing        |
 
 Raw values are allowed in `tokens.css` because it defines the design
 vocabulary. Raw browser/platform values are allowed sparingly in `base.css`.
@@ -322,6 +369,80 @@ backdrop and a rounded card container. Implemented with Kobalte `Dialog`.
 | Surface                    | `--sa-bg-surface-1`    |
 | Shadow                     | `--sa-shadow-xl`       |
 
+### 7.4 Field Structure
+
+The canonical HTML structure for all form fields. Enforced via App form
+primitives — consumers use the components; the underlying class names are
+implementation details of `forms.css`.
+
+The complete structural hierarchy from outermost to innermost:
+
+```
+AppFieldset     semantic group boundary — AT announces legend on focus entry
+  legend        group name (names the group; never wraps controls or layout)
+  AppFormGrid   responsive field layout (always on inner div, never on fieldset)
+    AppField    label + control pair with explicit for/id
+      label     control name
+      control   interactive element (AppInput, AppSelect, etc.)
+AppFormActions  action buttons — always outside fieldsets, at form tail
+```
+
+```tsx
+{/* Grouped form with fieldsets */}
+<AppFieldset legend='Spray application window'>
+  <AppFormGrid>
+    <AppField label='Start time' for='start-time'>
+      <AppInput id='start-time' … />
+    </AppField>
+    <AppField label='End time' for='end-time'>
+      <AppInput id='end-time' … />
+    </AppField>
+  </AppFormGrid>
+</AppFieldset>
+
+<AppFieldset legend='Drift boundary'>
+  <AppFormGrid>
+    <AppField label='West ridge offset' for='west-ridge'>
+      <AppInput id='west-ridge' … />
+    </AppField>
+  </AppFormGrid>
+</AppFieldset>
+
+<AppFormActions>
+  <AppButton variant='ghost'>Cancel</AppButton>
+  <AppButton variant='primary' type='submit'>Save</AppButton>
+</AppFormActions>
+
+{/* Simple form — no grouping needed */}
+<AppFormGrid>
+  <AppField label='Field name' for='name'>
+    <AppInput id='name' … />
+  </AppField>
+</AppFormGrid>
+<AppFormActions>
+  <AppButton variant='primary' type='submit'>Save</AppButton>
+</AppFormActions>
+```
+
+**Rules:**
+
+- `AppField` always uses explicit `for`/`id` association — never wraps a control without it
+- `<label>` and control are siblings inside `AppField` — label never wraps a control
+- `AppFormGrid` is always the layout host — applied inside `AppFieldset` via a `<div>`, never on `<fieldset>` directly (browser grid/flex quirks)
+- `AppFieldset` is used when the form has logically distinct sections with meaningful group names — simple forms with no groupings do not need it
+- `<legend>` names the group — it is never a layout element, never wraps controls
+- `AppFormActions` is always separate from fieldsets, at the tail of the form
+- `ux/common/components/forms` owns all form layout primitives — no inline styles, no one-off layout on `<label>`
+
+**Location:** `source/ux/common/components/forms`
+
+| Component        | Purpose                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `AppField`       | Label + control wrapper with explicit for/id              |
+| `AppFieldset`    | Semantic group boundary with legend                       |
+| `AppFormGrid`    | Responsive auto-fit column layout — always on inner div   |
+| `AppFormActions` | Right-aligned row of action buttons, separate from fields |
+
 ## 8. Component System
 
 ### 8.1 Control Primitives
@@ -378,6 +499,7 @@ badge
 button
 card
 checkbox
+checkbox-field
 dialog
 icon-button
 input
@@ -386,6 +508,7 @@ popover
 progress
 radio
 radio-group
+radio-item
 select
 separator
 skeleton
@@ -413,6 +536,11 @@ Controls may also declare semantic part identities when the underlying
 primitive has separately styled parts. Declared part values include:
 
 ```
+accordion-content
+accordion-item
+accordion-trigger
+dialog-overlay
+multi-select-item
 progress-fill
 progress-track
 select-content
@@ -796,11 +924,21 @@ shared CSS foundation before application code consumes it.
 
 **Location:** `source/ux/common/components/forms`
 
+Layout primitives (implemented — see §7.4 for full spec and usage):
+
+| Component        | Purpose                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `AppField`       | Label + control wrapper with explicit for/id              |
+| `AppFieldset`    | Semantic group boundary with legend                       |
+| `AppFormGrid`    | Responsive auto-fit column layout — always on inner div   |
+| `AppFormActions` | Right-aligned row of action buttons, separate from fields |
+
+Higher-level form compositions (planned):
+
 | Component             | Purpose                                                |
 | --------------------- | ------------------------------------------------------ |
 | `AppForm`             | Dialog wrapper, full-screen mobile, card desktop       |
 | `AppFieldGroup`       | Labeled group of related fields                        |
-| `AppField`            | Label + input + error + help text                      |
 | `AppReorderList`      | Drag or up/down sequence — TaskQuestion, WorkflowTask  |
 | `AppOptionEditor`     | Dynamic SelectOption list with requiresNote toggle     |
 | `AppLocationPicker`   | GPS capture or manual address entry                    |
