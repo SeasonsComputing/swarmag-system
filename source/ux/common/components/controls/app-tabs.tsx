@@ -18,7 +18,7 @@ AppTabPanel  Tab panel control for AppTabs.
 
 import { Tabs } from '@kobalte/core/tabs'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { bindActiveAttribute, controlState } from './controls-helpers.ts'
 
 /** Tabs control props. */
 export type AppTabsProps = {
@@ -76,6 +76,7 @@ type AppTabRootProps = {
   value: string
   disabled?: boolean
   'data-ui': 'tab'
+  ref?: (element: HTMLButtonElement) => void
 }
 
 type AppTabPanelRootProps = {
@@ -137,19 +138,14 @@ export const AppTab = (props: AppTabProps): JSX.Element => {
   ])
 
   return (
-    <Tabs.Trigger
-      as={triggerProps => (
-        <button
-          {...triggerProps}
-          data-ui='tab'
-          data-active={triggerProps['data-selected'] !== undefined ? '' : undefined}
-        >
-          {local.children}
-        </button>
-      )}
+    <TabsTrigger
+      data-ui='tab'
       value={local.value}
       disabled={local.disabled}
-    />
+      ref={element => bindActiveAttribute(element, ['data-selected', 'aria-selected'])}
+    >
+      {local.children}
+    </TabsTrigger>
   )
 }
 

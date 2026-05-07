@@ -58,11 +58,21 @@ export const AppList = (props: AppListProps): JSX.Element => {
     'data-ui-variant'
   ])
 
-  const attrs = { ...others, 'data-ui': 'list', 'data-ui-variant': local.variant }
-
   return local.variant === 'numbered'
-    ? <ol {...attrs} />
-    : <ul {...attrs} />
+    ? (
+      <ol
+        {...others as JSX.OlHTMLAttributes<HTMLOListElement>}
+        data-ui='list'
+        data-ui-variant={local.variant}
+      />
+    )
+    : (
+      <ul
+        {...others as JSX.HTMLAttributes<HTMLUListElement>}
+        data-ui='list'
+        data-ui-variant={local.variant}
+      />
+    )
 }
 
 /** List item — child of AppList. */

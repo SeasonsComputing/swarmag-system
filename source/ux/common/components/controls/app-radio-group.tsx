@@ -16,7 +16,7 @@ AppRadioItem   Radio item control for AppRadioGroup.
 
 import { RadioGroup } from '@kobalte/core/radio-group'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { bindActiveAttribute, controlState } from './controls-helpers.ts'
 
 /** Radio-group control props. */
 export type AppRadioGroupProps = {
@@ -52,6 +52,7 @@ type AppRadioItemContainerProps = {
   value: string
   disabled?: boolean
   'data-ui': 'radio-item'
+  ref?: (element: HTMLDivElement) => void
 }
 
 type AppRadioItemControlProps = {
@@ -116,22 +117,17 @@ export const AppRadioItem = (props: AppRadioItemProps): JSX.Element => {
   ])
 
   return (
-    <RadioGroup.Item
-      as={itemProps => (
-        <div
-          {...itemProps}
-          data-ui='radio-item'
-          data-active={itemProps['data-checked'] !== undefined ? '' : undefined}
-        >
-          <RadioGroup.ItemInput />
-          <RadioItemControl data-ui='radio'>
-            <RadioGroup.ItemIndicator />
-          </RadioItemControl>
-          {local.children}
-        </div>
-      )}
+    <RadioItem
+      data-ui='radio-item'
       value={local.value}
       disabled={local.disabled}
-    />
+      ref={element => bindActiveAttribute(element, ['data-checked', 'aria-checked'])}
+    >
+      <RadioGroup.ItemInput />
+      <RadioItemControl data-ui='radio'>
+        <RadioGroup.ItemIndicator />
+      </RadioItemControl>
+      {local.children}
+    </RadioItem>
   )
 }

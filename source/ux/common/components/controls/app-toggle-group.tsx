@@ -16,7 +16,7 @@ AppToggleItem   Toggle item control for AppToggleGroup.
 
 import { ToggleGroup } from '@kobalte/core/toggle-group'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { bindActiveAttribute, controlState } from './controls-helpers.ts'
 
 /** Toggle-group control props. */
 export type AppToggleGroupProps = {
@@ -61,6 +61,7 @@ type AppToggleItemRootProps = {
   value: string
   disabled?: boolean
   'data-ui': 'toggle'
+  ref?: (element: HTMLButtonElement) => void
 }
 
 const ToggleGroupRoot = ToggleGroup as unknown as (props: AppToggleGroupRootProps) => JSX.Element
@@ -113,18 +114,13 @@ export const AppToggleItem = (props: AppToggleItemProps): JSX.Element => {
   ])
 
   return (
-    <ToggleGroup.Item
-      as={itemProps => (
-        <button
-          {...itemProps}
-          data-ui='toggle'
-          data-active={itemProps['data-checked'] !== undefined ? '' : undefined}
-        >
-          {local.children}
-        </button>
-      )}
+    <ToggleGroupItem
+      data-ui='toggle'
       value={local.value}
       disabled={local.disabled}
-    />
+      ref={element => bindActiveAttribute(element, ['data-checked', 'aria-pressed'])}
+    >
+      {local.children}
+    </ToggleGroupItem>
   )
 }
