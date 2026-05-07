@@ -8,7 +8,13 @@ Every AI session begins by ingesting the following project assets. Ingest in ord
 2. `documentation/domain-model.md`
 3. `documentation/architecture-core.md`
 
-Remind the Chief Architect that the session has minimal context (constitution, domain model asbstractions and core architecture) and advise the Chief Architect to provide additional context prior to initiating any productions.
+Remind the Chief Architect that the session has minimal context (constitution, domain model abstractions and core architecture) and advise the Chief Architect to provide additional context prior to initiating any productions.
+
+**For UX-focused sessions, additionally ingest in order:**
+
+1. `documentation/architecture-ux.md`
+2. `source/ux/common/assets/css/tokens.css`
+3. `source/ux/common/assets/css/controls.css`
 
 ## 2. Mandatory Style-Guide Enforcement (Blocking)
 

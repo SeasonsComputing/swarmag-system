@@ -22,10 +22,10 @@ export { AppDialog, type AppDialogProps } from './app-dialog.tsx'
 export { AppInput, type AppInputProps } from './app-input.tsx'
 export {
   AppList,
+  AppListItem,
   type AppListItemProps,
   type AppListProps,
-  type AppListVariant,
-  AppListItem
+  type AppListVariant
 } from './app-list.tsx'
 export { AppMultiSelect, type AppMultiSelectProps } from './app-multi-select.tsx'
 export { AppPopover, type AppPopoverProps } from './app-popover.tsx'
@@ -40,6 +40,18 @@ export { AppSelect, type AppSelectProps } from './app-select.tsx'
 export { AppSeparator, type AppSeparatorProps } from './app-separator.tsx'
 export { AppSkeleton, type AppSkeletonProps } from './app-skeleton.tsx'
 export { AppSpinner, type AppSpinnerProps } from './app-spinner.tsx'
+export {
+  AppTable,
+  AppTableBody,
+  type AppTableBodyProps,
+  AppTableCell,
+  type AppTableCellProps,
+  AppTableHeader,
+  type AppTableHeaderProps,
+  type AppTableProps,
+  AppTableRow,
+  type AppTableRowProps
+} from './app-table.tsx'
 export {
   AppTab,
   AppTabList,

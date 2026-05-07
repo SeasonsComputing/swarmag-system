@@ -136,9 +136,9 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
   --sa-bg-hover: oklch(var(--sa-p-green-teal) / 0.1);
   --sa-bg-selected: oklch(var(--sa-p-green-teal) / 0.28);
-  --sa-bg-input: oklch(25% 0.014 264.5);
-  --sa-bg-input-focus: oklch(27% 0.016 264.5);
-  --sa-bg-control: oklch(var(--sa-p-white) / 0.1);
+  --sa-bg-input: var(--sa-bg-control);
+  --sa-bg-input-focus: var(--sa-bg-hover);
+  --sa-bg-control: oklch(var(--sa-p-white) / 0.03);
   --sa-bg-input-disabled: oklch(22% 0.01 264.5);
   --sa-bg-card: linear-gradient(
     135deg,

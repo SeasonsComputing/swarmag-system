@@ -39,7 +39,7 @@
 }
 
 [data-ui='button'][data-ui-variant='secondary'] {
-  background: var(--sa-bg-surface-2);
+  background: var(--sa-bg-control);
   border: var(--sa-border-default);
   color: var(--sa-text-primary);
 }
@@ -190,6 +190,18 @@
 }
 
 /*
+ * TABLE
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+[data-ui='table-row'][data-ui-variant='section'] [data-ui='table-cell'] {
+  background: var(--sa-table-section-bg);
+  color: var(--sa-table-section-color);
+  font-weight: var(--sa-weight-medium);
+  padding-inline-start: var(--sa-table-first-pad-section);
+}
+
+/*
  * LIST
  * ───────────────────────────────────────────────────────────────────────────
  */
@@ -266,7 +278,8 @@
 }
 
 [data-ui='multi-select']:focus-within [data-ui='multi-select-item'][data-highlighted][data-selected],
-[data-ui='multi-select']:focus-within [data-ui='multi-select-item'][data-highlighted][aria-selected='true'] {
+[data-ui='multi-select']:focus-within
+  [data-ui='multi-select-item'][data-highlighted][aria-selected='true'] {
   background: oklch(var(--sa-p-green-teal) / 0.40);
 }
 
@@ -362,6 +375,11 @@
   display: block;
   height: var(--sa-space-sm);
   width: var(--sa-space-sm);
+}
+
+[data-ui='checkbox-field']:has(input:focus-visible) [data-ui='checkbox'],
+[data-ui='radio-item']:has(input:focus-visible) [data-ui='radio'] {
+  box-shadow: var(--sa-focus-ring);
 }
 
 [data-ui='checkbox'][data-ui-state='error'],

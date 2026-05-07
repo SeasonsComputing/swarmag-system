@@ -89,22 +89,22 @@ Fonts are **self-hosted woff2** assets.
 Font primitives (`--sa-p-font-*`) hold the raw font stack values and are internal — consumed
 only by role tokens, never directly by `base.css` or `controls.css`.
 
-| Primitive                | Value         |
-| ------------------------ | ------------- |
-| `--sa-p-font-content`    | Comfortaa     |
-| `--sa-p-font-label`      | Lexend        |
-| `--sa-p-font-mono`       | Cascadia Mono |
+| Primitive             | Value         |
+| --------------------- | ------------- |
+| `--sa-p-font-content` | Comfortaa     |
+| `--sa-p-font-label`   | Lexend        |
+| `--sa-p-font-mono`    | Cascadia Mono |
 
 Role tokens provide semantic indirection. If a role's typeface changes, one token value changes —
 no cascade of renames in consuming files.
 
-| Role token           | Resolves to                | Intent                                           |
-| -------------------- | -------------------------- | ------------------------------------------------ |
-| `--sa-font-heading`  | `var(--sa-p-font-content)` | Heading elements                                 |
-| `--sa-font-body`     | `var(--sa-p-font-content)` | Paragraph and body content                       |
-| `--sa-font-label`    | `var(--sa-p-font-label)`   | All label roles (see §3.3)                       |
-| `--sa-font-ui`       | `var(--sa-p-font-label)`   | Data entry controls — Lexend (same face as label)|
-| `--sa-font-mono`     | `var(--sa-p-font-mono)`    | Code and numeric fields                          |
+| Role token          | Resolves to                | Intent                                            |
+| ------------------- | -------------------------- | ------------------------------------------------- |
+| `--sa-font-heading` | `var(--sa-p-font-content)` | Heading elements                                  |
+| `--sa-font-body`    | `var(--sa-p-font-content)` | Paragraph and body content                        |
+| `--sa-font-label`   | `var(--sa-p-font-label)`   | All label roles (see §3.3)                        |
+| `--sa-font-ui`      | `var(--sa-p-font-label)`   | Data entry controls — Lexend (same face as label) |
+| `--sa-font-mono`    | `var(--sa-p-font-mono)`    | Code and numeric fields                           |
 
 ### 3.2 Fluid Type Scale
 
@@ -117,18 +117,18 @@ type treatment — family, size, and weight — in a single selector group per r
 element to a role means adding it to one selector list only. Splitting the treatment across
 multiple rules causes drift (the figcaption problem).
 
-| Element(s) | Role | Font token | Size | Weight |
-| --- | --- | --- | --- | --- |
-| `h1`–`h6` | Heading | `--sa-font-heading` | fluid scale | normal |
-| `p` | Content | `--sa-font-body` | inherited | thin |
-| `label`, `button`, `legend` | Label | `--sa-font-label` | `--sa-font-sm` | thin |
-| `figcaption`, `th` | Annotation / table header | `--sa-font-label` | `--sa-font-sm` | normal |
-| `li` (bare) | Data-adjacent label | `--sa-font-label` | `--sa-font-sm` | thin |
-| `[data-ui='list-item']` (`AppListItem`) | List content | `--sa-font-body` | `--sa-font-sm` | normal |
-| `td` | Data-adjacent label | `--sa-font-label` | `--sa-font-sm` | thin |
-| `input`, `textarea` | Data entry | `--sa-font-ui` (→ Lexend) | `--sa-font-xs` | thin |
-| `select`, `[role='option']`, `[role='menuitem']` | Data entry | `--sa-font-ui` (→ Lexend) | `--sa-font-sm` | normal |
-| `code`, `pre`, `kbd`, `samp` | Code / numeric | `--sa-font-mono` | inherited | — |
+| Element(s)                                       | Role                      | Font token                | Size           | Weight |
+| ------------------------------------------------ | ------------------------- | ------------------------- | -------------- | ------ |
+| `h1`–`h6`                                        | Heading                   | `--sa-font-heading`       | fluid scale    | normal |
+| `p`                                              | Content                   | `--sa-font-body`          | inherited      | thin   |
+| `label`, `button`, `legend`                      | Label                     | `--sa-font-label`         | `--sa-font-sm` | thin   |
+| `figcaption`, `th`                               | Annotation / table header | `--sa-font-label`         | `--sa-font-sm` | normal |
+| `li` (bare)                                      | Data-adjacent label       | `--sa-font-label`         | `--sa-font-sm` | thin   |
+| `[data-ui='list-item']` (`AppListItem`)          | List content              | `--sa-font-body`          | `--sa-font-sm` | normal |
+| `td`                                             | Data-adjacent label       | `--sa-font-label`         | `--sa-font-sm` | thin   |
+| `input`, `textarea`                              | Data entry                | `--sa-font-ui` (→ Lexend) | `--sa-font-xs` | thin   |
+| `select`, `[role='option']`, `[role='menuitem']` | Data entry                | `--sa-font-ui` (→ Lexend) | `--sa-font-sm` | normal |
+| `code`, `pre`, `kbd`, `samp`                     | Code / numeric            | `--sa-font-mono`          | inherited      | —      |
 
 `label` additionally carries `color: var(--sa-text-secondary)` — labels are subordinate to the content they describe. `legend` inherits primary text color as a group heading.
 
@@ -172,11 +172,11 @@ import '@ux/common/assets/css/forms.css'
 
 ### 4.1.1 File Ownership
 
-| File           | Owns                                                                                                       | Must not contain                                      |
-| -------------- | ---------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `tokens.css`   | Custom properties, theme overrides, responsive token overrides                                             | Element selectors, control selectors, keyframes       |
-| `base.css`     | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles  | Reusable control visuals, app/page layout rules       |
-| `controls.css` | Reusable primitive control visuals and declared control parts                                              | Primitive palette references, app/page-specific rules |
+| File           | Owns                                                                                                                   | Must not contain                                      |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `tokens.css`   | Custom properties, theme overrides, responsive token overrides                                                         | Element selectors, control selectors, keyframes       |
+| `base.css`     | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles              | Reusable control visuals, app/page layout rules       |
+| `controls.css` | Reusable primitive control visuals and declared control parts                                                          | Primitive palette references, app/page-specific rules |
 | `forms.css`    | `.app-field`, `.app-form-grid`, `.app-form-actions` layout classes — implementation details of the App form components | Visual styles, token references beyond spacing        |
 
 Raw values are allowed in `tokens.css` because it defines the design

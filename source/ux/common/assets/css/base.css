@@ -33,7 +33,6 @@ Defines global browser-level style foundations consumed by all UX apps.
     url('../fonts/Lexend-VariableFont_wght.woff2') format('woff2');
 }
 
-
 @font-face {
   font-family: 'Mono';
   font-style: normal;
