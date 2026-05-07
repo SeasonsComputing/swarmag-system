@@ -137,9 +137,19 @@ export const AppTab = (props: AppTabProps): JSX.Element => {
   ])
 
   return (
-    <TabsTrigger data-ui='tab' value={local.value} disabled={local.disabled}>
-      {local.children}
-    </TabsTrigger>
+    <Tabs.Trigger
+      as={triggerProps => (
+        <button
+          {...triggerProps}
+          data-ui='tab'
+          data-active={triggerProps['data-selected'] !== undefined ? '' : undefined}
+        >
+          {local.children}
+        </button>
+      )}
+      value={local.value}
+      disabled={local.disabled}
+    />
   )
 }
 

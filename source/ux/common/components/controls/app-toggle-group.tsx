@@ -113,8 +113,18 @@ export const AppToggleItem = (props: AppToggleItemProps): JSX.Element => {
   ])
 
   return (
-    <ToggleGroupItem data-ui='toggle' value={local.value} disabled={local.disabled}>
-      {local.children}
-    </ToggleGroupItem>
+    <ToggleGroup.Item
+      as={itemProps => (
+        <button
+          {...itemProps}
+          data-ui='toggle'
+          data-active={itemProps['data-checked'] !== undefined ? '' : undefined}
+        >
+          {local.children}
+        </button>
+      )}
+      value={local.value}
+      disabled={local.disabled}
+    />
   )
 }

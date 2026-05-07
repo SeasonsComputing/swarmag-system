@@ -590,6 +590,16 @@ disabled
 loading
 ```
 
+**Selection State:**
+
+Components representing persistent state (Toggle, Tab, Radio) emit a unified active marker:
+
+```
+[data-active]
+```
+
+This is a binary selection state, distinct from the operational `data-ui-state`.
+
 **Rules:**
 
 - explicit only
@@ -617,6 +627,7 @@ Selectors:
 [data-ui="..."]
 [data-ui-variant="..."]
 [data-ui-state="..."]
+[data-active]
 ```
 
 #### 8.1.1.5 Kobalte Binding
@@ -645,7 +656,14 @@ App control wrappers manually emit only:
 data-ui
 data-ui-variant
 data-ui-state
+data-active
 ```
+
+**The Normalization Principle**
+
+While underlying primitives emit various ARIA and library-specific state attributes (e.g., `[data-checked]`, `[data-pressed]`), the App control wrappers normalize these into the unified `[data-active]` attribute. 
+
+`controls.css` targets `[data-active]` for selection visuals to maintain a stable styling API that is independent of the underlying primitive's specific ARIA role.
 
 Kobalte and ARIA runtime attributes may be consumed by `controls.css` when they represent real primitive state. Examples:
 
@@ -856,7 +874,7 @@ or remains in app-local CSS if it is app-specific.
 **`[data-ui="toggle"]`**
 
 - Base: `--sa-bg-surface-2` background, `--sa-border-default` border, `--sa-text-muted` text
-- `[data-pressed]` / `[aria-pressed="true"]`: `--sa-toggle-pressed-bg`, `--sa-toggle-pressed-border`, `--sa-toggle-pressed-text`
+- Active state (`[data-active]`): `--sa-toggle-pressed-bg`, `--sa-toggle-pressed-border`, `--sa-toggle-pressed-text`
 
 **`[data-ui="toggle-group"]`**
 
@@ -866,7 +884,7 @@ or remains in app-local CSS if it is app-specific.
 
 - `tab-list`: pill container, `--sa-tab-pill-bg` background, `--sa-radius-md`, tight internal padding
 - `tab`: inactive tab, `--sa-text-muted`, transparent background
-- Active tab (`[data-ui="tab"][data-selected]` / `[aria-selected="true"]`): `--sa-tab-active-bg`, `--sa-tab-active-text`, `--sa-weight-medium`
+- Active tab (`[data-ui="tab"][data-active]`): `--sa-tab-active-bg`, `--sa-tab-active-text`, `--sa-weight-medium`
 - No underline separator. The pill pattern is the L&F.
 
 **`[data-ui="progress"]`**

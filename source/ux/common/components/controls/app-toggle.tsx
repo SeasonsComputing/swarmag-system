@@ -57,6 +57,7 @@ export const AppToggle = (props: AppToggleProps): JSX.Element => {
       {...others}
       data-ui='toggle'
       data-ui-state={controlState(local)}
+      data-active={local.pressed ? '' : undefined}
       disabled={local.disabled || local.loading}
       pressed={local.pressed}
       defaultPressed={local.defaultPressed}

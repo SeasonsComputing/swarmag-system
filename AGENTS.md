@@ -15,8 +15,11 @@ Every AI session begins by ingesting the following project assets. Ingest in ord
 
 1. `documentation/architecture-ux.md`
 2. `documentation/ux-design-language.md`
-3. `source/ux/common/**/*`
-4. `source/ux/api/**/*`
+3. `source/ux/common/assets/css/*`
+3. `source/ux/common/components/**/*`
+3. `source/ux/common/stores/*`
+3. `source/ux/common/views/*`
+4. `source/ux/api/*`
 
 **For all other sessions:**
 
@@ -30,7 +33,7 @@ For every code-generation or regeneration task in this repository, `documentatio
 
 Treat any style-guide violation as a correctness failure. Do not proceed while violations exist.
 
-### 2.2 Required workflow (every turn)
+### 2.2 Required workflow (Every turn)
 
 1. Confirm Session Context ingestion is complete before work begins.
 2. For any production/regeneration task, execute the single authoritative production contract for that task (for example, `documentation/genesis-domain-archetypes.md` for domain archetype genesis).
@@ -57,7 +60,7 @@ Treat any style-guide violation as a correctness failure. Do not proceed while v
 
 Do not request approval to continue when a generation phase fails checks. Fix and re-run to green first.
 
-### 2.5 Preproduction Approval
+### 2.5 Preproduction Approval (Mandatory)
 
 Before producing or modifying any artifact, identify the intended task scope and report it to the
 Chief Architect. Do not begin artifact production until the Chief Architect explicitly approves that
