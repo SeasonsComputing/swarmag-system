@@ -661,7 +661,7 @@ data-active
 
 **The Normalization Principle**
 
-While underlying primitives emit various ARIA and library-specific state attributes (e.g., `[data-checked]`, `[data-pressed]`), the App control wrappers normalize these into the unified `[data-active]` attribute. 
+While underlying primitives emit various ARIA and library-specific state attributes (e.g., `[data-checked]`, `[data-pressed]`), the App control wrappers normalize these into the unified `[data-active]` attribute.
 
 `controls.css` targets `[data-active]` for selection visuals to maintain a stable styling API that is independent of the underlying primitive's specific ARIA role.
 
