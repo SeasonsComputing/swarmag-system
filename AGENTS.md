@@ -7,12 +7,16 @@ Every AI session begins by ingesting the following project assets. Ingest in ord
 1. `CONSTITUTION.md`
 2. `documentation/domain-model.md`
 3. `documentation/architecture-core.md`
+3. `documentation/style-guide.md`
+4. `source/domain/abstractions/*`
+5. `source/core/**/*`
 
 **For UX-focused sessions, additionally ingest in order:**
 
 1. `documentation/architecture-ux.md`
-2. `source/ux/common/assets/css/tokens.css`
-3. `source/ux/common/assets/css/controls.css`
+1. `documentation/ux-design-language.md`
+2. `source/ux/common/**/*`
+3. `source/ux/api/**/*`
 
 **For all other sessions:**
 
