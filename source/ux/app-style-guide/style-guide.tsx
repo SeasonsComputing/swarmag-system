@@ -40,6 +40,11 @@ import {
   AppSkeleton,
   AppSpinner,
   AppTab,
+  AppTable,
+  AppTableBody,
+  AppTableCell,
+  AppTableHeader,
+  AppTableRow,
   AppTabList,
   AppTabPanel,
   AppTabs,
@@ -118,30 +123,28 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='HTML Semantics'>
-          <table>
-            <thead>
-              <tr>
-                <th>Field name</th>
-                <th>Acreage</th>
-                <th>Service type</th>
-                <th>Status</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
+          <AppTable>
+            <AppTableHeader>
+              <AppTableCell>Field name</AppTableCell>
+              <AppTableCell>Acreage</AppTableCell>
+              <AppTableCell>Service type</AppTableCell>
+              <AppTableCell>Status</AppTableCell>
+              <AppTableCell>Date</AppTableCell>
+            </AppTableHeader>
+            <AppTableBody>
               <For each={FIELDS}>
                 {field => (
-                  <tr>
-                    <td>{field.name}</td>
-                    <td>{field.acres}</td>
-                    <td>{field.service}</td>
-                    <td>{field.status}</td>
-                    <td>{field.date}</td>
-                  </tr>
+                  <AppTableRow>
+                    <AppTableCell>{field.name}</AppTableCell>
+                    <AppTableCell>{field.acres}</AppTableCell>
+                    <AppTableCell>{field.service}</AppTableCell>
+                    <AppTableCell>{field.status}</AppTableCell>
+                    <AppTableCell>{field.date}</AppTableCell>
+                  </AppTableRow>
                 )}
               </For>
-            </tbody>
-          </table>
+            </AppTableBody>
+          </AppTable>
           <AppList>
             <AppListItem>Confirm chemical inventory.</AppListItem>
             <AppListItem>Verify crew certification.</AppListItem>
@@ -486,7 +489,7 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppList'>
-          <div class='sg-row' style={{ 'align-items': 'flex-start', gap: 'var(--sa-space-lg)' }}>
+          <div class='sg-row'>
             <div>
               <AppList>
                 <AppListItem>Confirm chemical inventory</AppListItem>
