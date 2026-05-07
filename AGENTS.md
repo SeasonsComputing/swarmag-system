@@ -16,10 +16,10 @@ Every AI session begins by ingesting the following project assets. Ingest in ord
 1. `documentation/architecture-ux.md`
 2. `documentation/ux-design-language.md`
 3. `source/ux/common/assets/css/*`
-3. `source/ux/common/components/**/*`
-3. `source/ux/common/stores/*`
-3. `source/ux/common/views/*`
-4. `source/ux/api/*`
+4. `source/ux/common/components/**/*`
+5. `source/ux/common/stores/*`
+6. `source/ux/common/views/*`
+7. `source/ux/api/*`
 
 **For all other sessions:**
 
