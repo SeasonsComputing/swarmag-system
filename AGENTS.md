@@ -49,6 +49,10 @@ Treat any style-guide violation as a correctness failure. Do not proceed while v
 - If `FAIL`: violations list (`- path:line — rule — issue`)
 - If `PASS`: brief confirmation of audited files
 
-### 2.5 Sequenced generation rule
-
 Do not request approval to continue when a generation phase fails checks. Fix and re-run to green first.
+
+### 2.5 Preproduction Approval
+
+Before producing or modifying any artifact, identify the intended task scope and report it to the
+Chief Architect. Do not begin artifact production until the Chief Architect explicitly approves that
+scope.
