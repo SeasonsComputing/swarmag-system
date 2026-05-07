@@ -116,12 +116,22 @@ export const AppRadioItem = (props: AppRadioItemProps): JSX.Element => {
   ])
 
   return (
-    <RadioItem data-ui='radio-item' value={local.value} disabled={local.disabled}>
-      <RadioGroup.ItemInput />
-      <RadioItemControl data-ui='radio'>
-        <RadioGroup.ItemIndicator />
-      </RadioItemControl>
-      {local.children}
-    </RadioItem>
+    <RadioGroup.Item
+      as={itemProps => (
+        <div
+          {...itemProps}
+          data-ui='radio-item'
+          data-active={itemProps['data-checked'] !== undefined ? '' : undefined}
+        >
+          <RadioGroup.ItemInput />
+          <RadioItemControl data-ui='radio'>
+            <RadioGroup.ItemIndicator />
+          </RadioItemControl>
+          {local.children}
+        </div>
+      )}
+      value={local.value}
+      disabled={local.disabled}
+    />
   )
 }
