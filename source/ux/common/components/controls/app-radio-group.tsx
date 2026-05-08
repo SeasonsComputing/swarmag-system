@@ -19,16 +19,16 @@ import { type JSX, splitProps } from '@solid-js'
 import { bindActiveAttribute, controlState } from './controls-helpers.ts'
 
 /** Radio-group control props. */
-export type AppRadioGroupProps = {
+export type AppRadioGroupProps<Value extends string = string> = {
   children?: JSX.Element
   disabled?: boolean
   error?: boolean
   loading?: boolean
   name?: string
   required?: boolean
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string) => void
+  value?: Value
+  defaultValue?: Value
+  onChange?: (value: Value) => void
   class?: never
   classList?: never
   style?: never
@@ -37,9 +37,9 @@ export type AppRadioGroupProps = {
 }
 
 /** Radio item control props. */
-export type AppRadioItemProps = {
+export type AppRadioItemProps<Value extends string = string> = {
   children?: JSX.Element
-  value: string
+  value: Value
   disabled?: boolean
   class?: never
   classList?: never
@@ -47,12 +47,25 @@ export type AppRadioItemProps = {
   'data-ui'?: never
 }
 
-type AppRadioItemContainerProps = {
+type AppRadioItemContainerProps<Value extends string> = {
   children?: JSX.Element
-  value: string
+  value: Value
   disabled?: boolean
   'data-ui': 'radio-item'
   ref?: (element: HTMLDivElement) => void
+}
+
+type AppRadioGroupRootProps<Value extends string = string> = {
+  children?: JSX.Element
+  disabled?: boolean
+  name?: string
+  required?: boolean
+  value?: Value
+  defaultValue?: Value
+  onChange?: (value: Value) => void
+  validationState?: 'valid' | 'invalid'
+  'data-ui': 'radio-group'
+  'data-ui-state'?: 'error' | 'disabled' | 'loading'
 }
 
 type AppRadioItemControlProps = {
@@ -60,8 +73,11 @@ type AppRadioItemControlProps = {
   'data-ui': 'radio'
 }
 
-const RadioItem = RadioGroup.Item as unknown as (
-  props: AppRadioItemContainerProps
+const RadioGroupRoot = RadioGroup as unknown as <Value extends string = string>(
+  props: AppRadioGroupRootProps<Value>
+) => JSX.Element
+const RadioItem = RadioGroup.Item as unknown as <Value extends string = string>(
+  props: AppRadioItemContainerProps<Value>
 ) => JSX.Element
 
 const RadioItemControl = RadioGroup.ItemControl as unknown as (
@@ -69,7 +85,9 @@ const RadioItemControl = RadioGroup.ItemControl as unknown as (
 ) => JSX.Element
 
 /** Radio-group control with declared states. */
-export const AppRadioGroup = (props: AppRadioGroupProps): JSX.Element => {
+export const AppRadioGroup = <Value extends string = string>(
+  props: AppRadioGroupProps<Value>
+): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'disabled',
@@ -88,7 +106,7 @@ export const AppRadioGroup = (props: AppRadioGroupProps): JSX.Element => {
   ])
 
   return (
-    <RadioGroup
+    <RadioGroupRoot<Value>
       data-ui='radio-group'
       data-ui-state={controlState(local)}
       disabled={local.disabled || local.loading}
@@ -100,12 +118,14 @@ export const AppRadioGroup = (props: AppRadioGroupProps): JSX.Element => {
       validationState={local.error ? 'invalid' : undefined}
     >
       {local.children}
-    </RadioGroup>
+    </RadioGroupRoot>
   )
 }
 
 /** Radio item control for AppRadioGroup. */
-export const AppRadioItem = (props: AppRadioItemProps): JSX.Element => {
+export const AppRadioItem = <Value extends string = string>(
+  props: AppRadioItemProps<Value>
+): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'value',
@@ -117,7 +137,7 @@ export const AppRadioItem = (props: AppRadioItemProps): JSX.Element => {
   ])
 
   return (
-    <RadioItem
+    <RadioItem<Value>
       data-ui='radio-item'
       value={local.value}
       disabled={local.disabled}
