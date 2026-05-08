@@ -67,3 +67,7 @@ Do not request approval to continue when a generation phase fails checks. Fix an
 Before producing or modifying any artifact, identify the intended task scope and report it to the
 Chief Architect. Do not begin artifact production until the Chief Architect explicitly approves that
 scope.
+
+### 2.6 Token Usage Efficiency
+
+During reasoning operations an AI should delegate non-reasoning tasks to a free-subagent whenever possible.
