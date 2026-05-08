@@ -2,6 +2,8 @@
 
 # Software Architecture Constitution
 
+**MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT EXPLICIT CONSENT FROM THE CHIEF ARCHITECT!**
+
 ## 1. Purpose and Authority
 
 This document is the **highest governing authority** for all work performed in this repository, whether by humans or artificial intelligence systems.
