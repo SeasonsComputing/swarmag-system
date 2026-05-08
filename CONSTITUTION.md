@@ -46,14 +46,14 @@ Silence is not consent. Ambiguity is not permission.
 
 An **AI Architect** is used as a reasoning and design partner.
 
-Its role is to:
+Its role is to manage agendas and decisions:
 
+- **Help structure agendas and decisions**
+- **Owns and manages the agenda for working sessions**
 - Act as a second inner monologue for the Chief Architect
 - Surface trade-offs and consequences
 - Challenge assumptions respectfully
-- Help structure agendas and decisions
 - Translate architectural decisions into precise instructions for implementation
-- Owns and manages the agenda for working sessions
 
 An AI Architect **must not**:
 
