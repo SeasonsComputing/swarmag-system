@@ -72,25 +72,32 @@ type SectionProps = {
 
 /** Single-page living style guide application. */
 export const StyleGuide = (): JSX.Element => {
-  const [theme, setTheme] = createSignal<'dark' | 'light'>('dark')
+  type Theme = 'dark' | 'light'
+  type RadioValue =
+    | 'aerial'
+    | 'ground'
+    | 'inspection'
+    | 'ready'
+    | 'blocked'
+    | 'review'
+    | 'morning'
+    | 'afternoon'
+    | 'night'
+  type ViewMode = 'map' | 'list' | 'grid'
+  type Tab = 'assessment' | 'planning' | 'execution' | 'followup'
+
+  const [theme, setTheme] = createSignal<Theme>('dark')
   const [loading, setLoading] = createSignal(false)
   const [inputError, setInputError] = createSignal(false)
   const [checkboxChecked, setCheckboxChecked] = createSignal(true)
   const [checkboxDrift, setCheckboxDrift] = createSignal(false)
   const [checkboxError, setCheckboxError] = createSignal(false)
-  const [radioValue, setRadioValue] = createSignal('aerial')
+  const [radioValue, setRadioValue] = createSignal<RadioValue>('aerial')
   const [togglePressed, setTogglePressed] = createSignal(true)
-  const [viewMode, setViewMode] = createSignal('map')
-  const [tab, setTab] = createSignal('assessment')
+  const [viewMode, setViewMode] = createSignal<ViewMode>('map')
+  const [tab, setTab] = createSignal<Tab>('assessment')
 
-  const setThemeMode = (value: string): void => {
-    if (value !== 'dark' && value !== 'light') return
-    setTheme(value)
-  }
-
-  createEffect(() => {
-    document.documentElement.dataset.theme = theme()
-  })
+  createEffect(() => document.documentElement.dataset.theme = theme())
 
   return (
     <>
@@ -99,7 +106,7 @@ export const StyleGuide = (): JSX.Element => {
           <h1>swarmAg Style Guide</h1>
           <p>Living visual validation for tokens, states, themes, and controls.</p>
         </div>
-        <AppToggleGroup value={theme()} onChange={setThemeMode}>
+        <AppToggleGroup<Theme> value={theme()} onChange={setTheme}>
           <AppToggleItem value='dark'>Dark</AppToggleItem>
           <AppToggleItem value='light'>Light</AppToggleItem>
         </AppToggleGroup>

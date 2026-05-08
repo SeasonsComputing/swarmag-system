@@ -21,14 +21,14 @@ import { type JSX, splitProps } from '@solid-js'
 import { bindActiveAttribute, controlState } from './controls-helpers.ts'
 
 /** Tabs control props. */
-export type AppTabsProps = {
+export type AppTabsProps<Value extends string = string> = {
   children?: JSX.Element
   disabled?: boolean
   error?: boolean
   loading?: boolean
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string) => void
+  value?: Value
+  defaultValue?: Value
+  onChange?: (value: Value) => void
   class?: never
   classList?: never
   style?: never
@@ -46,9 +46,9 @@ export type AppTabListProps = {
 }
 
 /** Tab trigger control props. */
-export type AppTabProps = {
+export type AppTabProps<Value extends string = string> = {
   children?: JSX.Element
-  value: string
+  value: Value
   disabled?: boolean
   class?: never
   classList?: never
@@ -57,9 +57,9 @@ export type AppTabProps = {
 }
 
 /** Tab panel control props. */
-export type AppTabPanelProps = {
+export type AppTabPanelProps<Value extends string = string> = {
   children?: JSX.Element
-  value: string
+  value: Value
   class?: never
   classList?: never
   style?: never
@@ -71,26 +71,44 @@ type AppTabListRootProps = {
   'data-ui': 'tab-list'
 }
 
-type AppTabRootProps = {
+type AppTabsRootProps<Value extends string = string> = {
   children?: JSX.Element
-  value: string
+  value?: Value
+  defaultValue?: Value
+  onChange?: (value: Value) => void
+  'data-ui': 'tabs'
+  'data-ui-state'?: 'error' | 'disabled' | 'loading'
+}
+
+type AppTabRootProps<Value extends string> = {
+  children?: JSX.Element
+  value: Value
   disabled?: boolean
   'data-ui': 'tab'
   ref?: (element: HTMLButtonElement) => void
 }
 
-type AppTabPanelRootProps = {
+type AppTabPanelRootProps<Value extends string> = {
   children?: JSX.Element
-  value: string
+  value: Value
   'data-ui': 'tab-panel'
 }
 
+const TabsRoot = Tabs as unknown as <Value extends string = string>(
+  props: AppTabsRootProps<Value>
+) => JSX.Element
 const TabsList = Tabs.List as unknown as (props: AppTabListRootProps) => JSX.Element
-const TabsTrigger = Tabs.Trigger as unknown as (props: AppTabRootProps) => JSX.Element
-const TabsContent = Tabs.Content as unknown as (props: AppTabPanelRootProps) => JSX.Element
+const TabsTrigger = Tabs.Trigger as unknown as <Value extends string = string>(
+  props: AppTabRootProps<Value>
+) => JSX.Element
+const TabsContent = Tabs.Content as unknown as <Value extends string = string>(
+  props: AppTabPanelRootProps<Value>
+) => JSX.Element
 
 /** Tabs control with declared states. */
-export const AppTabs = (props: AppTabsProps): JSX.Element => {
+export const AppTabs = <Value extends string = string>(
+  props: AppTabsProps<Value>
+): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'disabled',
@@ -107,7 +125,7 @@ export const AppTabs = (props: AppTabsProps): JSX.Element => {
   ])
 
   return (
-    <Tabs
+    <TabsRoot<Value>
       data-ui='tabs'
       data-ui-state={controlState(local)}
       value={local.value}
@@ -115,7 +133,7 @@ export const AppTabs = (props: AppTabsProps): JSX.Element => {
       onChange={local.onChange}
     >
       {local.children}
-    </Tabs>
+    </TabsRoot>
   )
 }
 
@@ -126,7 +144,9 @@ export const AppTabList = (props: AppTabListProps): JSX.Element => {
 }
 
 /** Tab trigger control for AppTabs. */
-export const AppTab = (props: AppTabProps): JSX.Element => {
+export const AppTab = <Value extends string = string>(
+  props: AppTabProps<Value>
+): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'value',
@@ -138,7 +158,7 @@ export const AppTab = (props: AppTabProps): JSX.Element => {
   ])
 
   return (
-    <TabsTrigger
+    <TabsTrigger<Value>
       data-ui='tab'
       value={local.value}
       disabled={local.disabled}
@@ -150,7 +170,9 @@ export const AppTab = (props: AppTabProps): JSX.Element => {
 }
 
 /** Tab panel control for AppTabs. */
-export const AppTabPanel = (props: AppTabPanelProps): JSX.Element => {
+export const AppTabPanel = <Value extends string = string>(
+  props: AppTabPanelProps<Value>
+): JSX.Element => {
   const [local] = splitProps(props, ['children', 'value', 'class', 'classList', 'style', 'data-ui'])
-  return <TabsContent data-ui='tab-panel' value={local.value}>{local.children}</TabsContent>
+  return <TabsContent<Value> data-ui='tab-panel' value={local.value}>{local.children}</TabsContent>
 }

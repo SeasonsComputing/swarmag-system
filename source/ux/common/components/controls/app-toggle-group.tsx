@@ -19,14 +19,14 @@ import { type JSX, splitProps } from '@solid-js'
 import { bindActiveAttribute, controlState } from './controls-helpers.ts'
 
 /** Toggle-group control props. */
-export type AppToggleGroupProps = {
+export type AppToggleGroupProps<Value extends string = string> = {
   children?: JSX.Element
   disabled?: boolean
   error?: boolean
   loading?: boolean
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string) => void
+  value?: Value
+  defaultValue?: Value
+  onChange?: (value: Value) => void
   class?: never
   classList?: never
   style?: never
@@ -35,9 +35,9 @@ export type AppToggleGroupProps = {
 }
 
 /** Toggle item control props. */
-export type AppToggleItemProps = {
+export type AppToggleItemProps<Value extends string = string> = {
   children?: JSX.Element
-  value: string
+  value: Value
   disabled?: boolean
   class?: never
   classList?: never
@@ -45,32 +45,36 @@ export type AppToggleItemProps = {
   'data-ui'?: never
 }
 
-type AppToggleGroupRootProps = {
+type AppToggleGroupRootProps<Value extends string = string> = {
   children?: JSX.Element
   disabled?: boolean
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string) => void
+  value?: Value
+  defaultValue?: Value
+  onChange?: (value: Value) => void
   multiple?: false
   'data-ui': 'toggle-group'
   'data-ui-state'?: 'error' | 'disabled' | 'loading'
 }
 
-type AppToggleItemRootProps = {
+type AppToggleItemRootProps<Value extends string = string> = {
   children?: JSX.Element
-  value: string
+  value: Value
   disabled?: boolean
   'data-ui': 'toggle'
   ref?: (element: HTMLButtonElement) => void
 }
 
-const ToggleGroupRoot = ToggleGroup as unknown as (props: AppToggleGroupRootProps) => JSX.Element
-const ToggleGroupItem = ToggleGroup.Item as unknown as (
-  props: AppToggleItemRootProps
+const ToggleGroupRoot = ToggleGroup as unknown as <Value extends string = string>(
+  props: AppToggleGroupRootProps<Value>
+) => JSX.Element
+const ToggleGroupItem = ToggleGroup.Item as unknown as <Value extends string = string>(
+  props: AppToggleItemRootProps<Value>
 ) => JSX.Element
 
 /** Toggle-group control with declared states. */
-export const AppToggleGroup = (props: AppToggleGroupProps): JSX.Element => {
+export const AppToggleGroup = <Value extends string = string>(
+  props: AppToggleGroupProps<Value>
+): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'disabled',
@@ -87,7 +91,7 @@ export const AppToggleGroup = (props: AppToggleGroupProps): JSX.Element => {
   ])
 
   return (
-    <ToggleGroupRoot
+    <ToggleGroupRoot<Value>
       data-ui='toggle-group'
       data-ui-state={controlState(local)}
       disabled={local.disabled || local.loading}
@@ -102,7 +106,9 @@ export const AppToggleGroup = (props: AppToggleGroupProps): JSX.Element => {
 }
 
 /** Toggle item control for AppToggleGroup. */
-export const AppToggleItem = (props: AppToggleItemProps): JSX.Element => {
+export const AppToggleItem = <Value extends string = string>(
+  props: AppToggleItemProps<Value>
+): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'value',
@@ -114,7 +120,7 @@ export const AppToggleItem = (props: AppToggleItemProps): JSX.Element => {
   ])
 
   return (
-    <ToggleGroupItem
+    <ToggleGroupItem<Value>
       data-ui='toggle'
       value={local.value}
       disabled={local.disabled}
