@@ -12,12 +12,9 @@ import '@ux/common/assets/css/controls.css'
 import '@ux/common/assets/css/forms.css'
 import './style-guide.css'
 
-const root = document.getElementById('root')
-if (!root) throw new Error('Missing #root element')
-
 const App = () => {
   onMount(() => document.body.style.opacity = '1')
   return <StyleGuide />
 }
 
-render(() => <App />, root)
+render(() => <App />, document.getElementById('root'))
