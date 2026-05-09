@@ -15,11 +15,10 @@ AppInput  Text input control with declared states.
 
 import {
   TextField,
-  type TextFieldRootProps,
   type TextFieldInputProps
 } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState, withDataUI } from './controls-helpers.ts'
+import { controlState } from './controls-helpers.ts'
 
 /** Input control props. */
 export type AppInputProps =
@@ -37,8 +36,8 @@ export type AppInputProps =
     'data-ui-state'?: never
   }
 
-const TextFieldRoot = withDataUI<TextFieldRootProps>(TextField)
-const TextFieldInput = withDataUI<TextFieldInputProps>(TextField.Input)
+const TextFieldRoot = TextField as unknown as typeof TextField
+const TextFieldInput = TextField.Input as unknown as typeof TextField.Input
 
 /** Text input control with declared states. */
 export const AppInput = (props: AppInputProps): JSX.Element => {

@@ -19,12 +19,11 @@ AppAccordionContent  Accordion content control for AppAccordionItem.
 import {
   Accordion,
   type AccordionRootProps,
-  type AccordionItemProps,
   type AccordionTriggerProps,
   type AccordionContentProps
 } from '@kobalte/core/accordion'
 import { type Component, type JSX, splitProps } from '@solid-js'
-import { type WithDataUI, controlState, withDataUI } from './controls-helpers.ts'
+import { type WithDataUI, controlState } from './controls-helpers.ts'
 
 /** Accordion root props. */
 export type AppAccordionProps = {
@@ -72,7 +71,7 @@ export type AppAccordionContentProps = {
 }
 
 const AccordionRoot = Accordion as Component<WithDataUI<AccordionRootProps>>
-const AccordionItem = withDataUI<AccordionItemProps>(Accordion.Item)
+const AccordionItem = Accordion.Item as unknown as typeof Accordion.Item
 const AccordionTrigger = Accordion.Trigger as Component<WithDataUI<AccordionTriggerProps>>
 const AccordionContent = Accordion.Content as Component<WithDataUI<AccordionContentProps>>
 

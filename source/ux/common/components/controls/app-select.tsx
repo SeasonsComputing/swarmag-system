@@ -15,13 +15,10 @@ AppSelect  Single-value select control with declared states.
 
 import {
   Select,
-  type SelectRootProps,
-  type SelectContentProps,
-  type SelectItemProps,
   type SelectRootItemComponentProps
 } from '@kobalte/core/select'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppOption, appOptionLabel, controlState, withDataUI } from './controls-helpers.ts'
+import { type AppOption, appOptionLabel, controlState } from './controls-helpers.ts'
 
 type CollectionItem = { rawValue: AppOption; key: string }
 
@@ -43,9 +40,9 @@ export type AppSelectProps = {
   'data-ui-state'?: never
 }
 
-const SelectRoot = withDataUI<SelectRootProps<AppOption>>(Select)
-const SelectContent = withDataUI<SelectContentProps>(Select.Content)
-const SelectItem = withDataUI<SelectItemProps>(Select.Item)
+const SelectRoot = Select as unknown as typeof Select
+const SelectContent = Select.Content as unknown as typeof Select.Content
+const SelectItem = Select.Item as unknown as typeof Select.Item
 
 /** Single-value select control with declared states. */
 export const AppSelect = (props: AppSelectProps): JSX.Element => {

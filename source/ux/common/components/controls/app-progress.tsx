@@ -14,12 +14,10 @@ AppProgress  Progress control with declared states.
 */
 
 import {
-  Progress,
-  type ProgressTrackProps,
-  type ProgressFillProps
+  Progress
 } from '@kobalte/core/progress'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState, withDataUI } from './controls-helpers.ts'
+import { controlState } from './controls-helpers.ts'
 
 /** Progress control props. */
 export type AppProgressProps = {
@@ -38,8 +36,8 @@ export type AppProgressProps = {
   'data-ui-state'?: never
 }
 
-const ProgressTrack = withDataUI<ProgressTrackProps>(Progress.Track)
-const ProgressFill = withDataUI<ProgressFillProps>(Progress.Fill)
+const ProgressTrack = Progress.Track as unknown as typeof Progress.Track
+const ProgressFill = Progress.Fill as unknown as typeof Progress.Fill
 
 /** Progress control with declared states. */
 export const AppProgress = (props: AppProgressProps): JSX.Element => {

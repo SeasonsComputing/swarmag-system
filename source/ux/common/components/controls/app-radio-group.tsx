@@ -17,11 +17,10 @@ AppRadioItem   Radio item control for AppRadioGroup.
 import {
   RadioGroup,
   type RadioGroupRootProps,
-  type RadioGroupItemProps,
-  type RadioGroupItemControlProps
+  type RadioGroupItemProps
 } from '@kobalte/core/radio-group'
 import { type Component, type JSX, splitProps } from '@solid-js'
-import { type WithDataUI, controlState, withDataUI } from './controls-helpers.ts'
+import { type WithDataUI, controlState } from './controls-helpers.ts'
 
 /** Radio-group control props. */
 export type AppRadioGroupProps<Value extends string = string> = {
@@ -54,7 +53,7 @@ export type AppRadioItemProps<Value extends string = string> = {
 
 const RadioGroupRoot = RadioGroup as Component<WithDataUI<RadioGroupRootProps>>
 const RadioItem = RadioGroup.Item as Component<WithDataUI<RadioGroupItemProps>>
-const RadioItemControl = withDataUI<RadioGroupItemControlProps>(RadioGroup.ItemControl)
+const RadioItemControl = RadioGroup.ItemControl as unknown as typeof RadioGroup.ItemControl
 
 /** Radio-group control with declared states. */
 export const AppRadioGroup = <Value extends string = string>(

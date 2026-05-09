@@ -24,7 +24,7 @@ import {
   type TabsContentProps
 } from '@kobalte/core/tabs'
 import { type Component, type JSX, splitProps } from '@solid-js'
-import { type WithDataUI, controlState, withDataUI } from './controls-helpers.ts'
+import { type WithDataUI, controlState } from './controls-helpers.ts'
 
 /** Tabs control props. */
 export type AppTabsProps<Value extends string = string> = {
