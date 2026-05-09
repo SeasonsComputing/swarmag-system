@@ -44,17 +44,12 @@ export const AppDialog = (props: AppDialogProps): JSX.Element => {
     'error',
     'loading',
     'disabled',
-    'onOpenChange',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'onOpenChange'
   ])
 
   return (
     <Dialog open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
-      <Dialog.Trigger as='span'>
+      <Dialog.Trigger>
         {local.trigger}
       </Dialog.Trigger>
       <Dialog.Portal>

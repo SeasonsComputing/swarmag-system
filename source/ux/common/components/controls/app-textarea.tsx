@@ -13,9 +13,13 @@ PUBLIC
 AppTextarea  Multiline input control with declared states.
 */
 
-import { TextField } from '@kobalte/core/text-field'
+import {
+  TextField,
+  type TextFieldRootProps,
+  type TextFieldTextAreaProps
+} from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { controlState, withDataUI } from './controls-helpers.ts'
 
 /** Textarea control props. */
 export type AppTextareaProps =
@@ -33,27 +37,8 @@ export type AppTextareaProps =
     'data-ui-state'?: never
   }
 
-type AppTextareaRootProps = {
-  children?: JSX.Element
-  id?: string
-  name?: string
-  required?: boolean
-  disabled?: boolean
-  readOnly?: boolean
-  validationState?: 'valid' | 'invalid'
-}
-
-type AppTextareaFieldProps =
-  & JSX.TextareaHTMLAttributes<HTMLTextAreaElement>
-  & {
-    'data-ui': 'textarea'
-    'data-ui-state'?: 'error' | 'disabled' | 'loading'
-  }
-
-const TextFieldRoot = TextField as unknown as (props: AppTextareaRootProps) => JSX.Element
-const TextFieldTextArea = TextField.TextArea as unknown as (
-  props: AppTextareaFieldProps
-) => JSX.Element
+const TextFieldRoot = withDataUI<TextFieldRootProps>(TextField)
+const TextFieldTextArea = withDataUI<TextFieldTextAreaProps>(TextField.TextArea)
 
 /** Multiline input control with declared states. */
 export const AppTextarea = (props: AppTextareaProps): JSX.Element => {
@@ -64,12 +49,7 @@ export const AppTextarea = (props: AppTextareaProps): JSX.Element => {
     'id',
     'name',
     'required',
-    'readOnly',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'readOnly'
   ])
 
   return (
@@ -82,13 +62,9 @@ export const AppTextarea = (props: AppTextareaProps): JSX.Element => {
       validationState={local.error ? 'invalid' : undefined}
     >
       <TextFieldTextArea
-        {...others}
-        id={local.id}
+        {...others as unknown as TextFieldTextAreaProps}
         data-ui='textarea'
-        data-ui-state={controlState(local)}
-        disabled={local.disabled || local.loading}
-        required={local.required}
-        readOnly={local.readOnly}
+        data-ui-state={controlState(local) as string | undefined}
       />
     </TextFieldRoot>
   )

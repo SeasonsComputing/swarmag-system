@@ -13,9 +13,13 @@ PUBLIC
 AppInput  Text input control with declared states.
 */
 
-import { TextField } from '@kobalte/core/text-field'
+import {
+  TextField,
+  type TextFieldRootProps,
+  type TextFieldInputProps
+} from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { controlState, withDataUI } from './controls-helpers.ts'
 
 /** Input control props. */
 export type AppInputProps =
@@ -33,25 +37,8 @@ export type AppInputProps =
     'data-ui-state'?: never
   }
 
-type AppInputRootProps = {
-  children?: JSX.Element
-  id?: string
-  name?: string
-  required?: boolean
-  disabled?: boolean
-  readOnly?: boolean
-  validationState?: 'valid' | 'invalid'
-}
-
-type AppInputFieldProps =
-  & JSX.InputHTMLAttributes<HTMLInputElement>
-  & {
-    'data-ui': 'input'
-    'data-ui-state'?: 'error' | 'disabled' | 'loading'
-  }
-
-const TextFieldRoot = TextField as unknown as (props: AppInputRootProps) => JSX.Element
-const TextFieldInput = TextField.Input as unknown as (props: AppInputFieldProps) => JSX.Element
+const TextFieldRoot = withDataUI<TextFieldRootProps>(TextField)
+const TextFieldInput = withDataUI<TextFieldInputProps>(TextField.Input)
 
 /** Text input control with declared states. */
 export const AppInput = (props: AppInputProps): JSX.Element => {
@@ -62,12 +49,7 @@ export const AppInput = (props: AppInputProps): JSX.Element => {
     'id',
     'name',
     'required',
-    'readOnly',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'readOnly'
   ])
 
   return (
@@ -80,13 +62,9 @@ export const AppInput = (props: AppInputProps): JSX.Element => {
       validationState={local.error ? 'invalid' : undefined}
     >
       <TextFieldInput
-        {...others}
-        id={local.id}
+        {...others as unknown as TextFieldInputProps}
         data-ui='input'
-        data-ui-state={controlState(local)}
-        disabled={local.disabled || local.loading}
-        required={local.required}
-        readOnly={local.readOnly}
+        data-ui-state={controlState(local) as string | undefined}
       />
     </TextFieldRoot>
   )

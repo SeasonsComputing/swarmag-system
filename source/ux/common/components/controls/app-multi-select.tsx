@@ -13,18 +13,21 @@ PUBLIC
 AppMultiSelect  Inline multi-value select control with declared states.
 */
 
-import { Listbox } from '@kobalte/core/listbox'
+import {
+  Listbox,
+  type ListboxRootProps,
+  type ListboxItemProps,
+  type ListboxItemOptions
+} from '@kobalte/core/listbox'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
-
-type CollectionItem = { rawValue: string; key: string }
+import { type AppOption, appOptionLabel, controlState, withDataUI } from './controls-helpers.ts'
 
 /** Multi-select control props. */
 export type AppMultiSelectProps = {
   disabled?: boolean
   error?: boolean
   loading?: boolean
-  options: ReadonlyArray<string>
+  options: ReadonlyArray<AppOption>
   value?: string[]
   defaultValue?: string[]
   onChange?: (value: string[]) => void
@@ -35,26 +38,8 @@ export type AppMultiSelectProps = {
   'data-ui-state'?: never
 }
 
-type AppMultiSelectRootProps = {
-  options: ReadonlyArray<string>
-  disabled?: boolean
-  selectionMode?: 'multiple'
-  value?: string[]
-  defaultValue?: string[]
-  onChange?: (value: string[]) => void
-  renderItem?: (item: CollectionItem) => JSX.Element
-  'data-ui': 'multi-select'
-  'data-ui-state'?: string
-}
-
-type AppMultiSelectItemProps = {
-  item: CollectionItem
-  'data-ui': 'multi-select-item'
-  children?: JSX.Element
-}
-
-const ListboxRoot = Listbox as unknown as (props: AppMultiSelectRootProps) => JSX.Element
-const ListboxItem = Listbox.Item as unknown as (props: AppMultiSelectItemProps) => JSX.Element
+const ListboxRoot = withDataUI<ListboxRootProps<AppOption>>(Listbox)
+const ListboxItem = withDataUI<ListboxItemProps>(Listbox.Item)
 
 /** Inline multi-value select control with declared states. */
 export const AppMultiSelect = (props: AppMultiSelectProps): JSX.Element => {
@@ -65,27 +50,22 @@ export const AppMultiSelect = (props: AppMultiSelectProps): JSX.Element => {
     'options',
     'value',
     'defaultValue',
-    'onChange',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'onChange'
   ])
 
   return (
     <ListboxRoot
       data-ui='multi-select'
       data-ui-state={controlState(local)}
-      options={local.options}
-      disabled={local.disabled || local.loading}
+      options={local.options as AppOption[]}
+      optionValue='value'
       selectionMode='multiple'
       value={local.value}
       defaultValue={local.defaultValue}
-      onChange={local.onChange}
-      renderItem={item => (
+      onChange={(selected: Set<string>) => local.onChange?.([...selected])}
+      renderItem={(item: ListboxItemOptions['item']) => (
         <ListboxItem data-ui='multi-select-item' item={item}>
-          {item.rawValue}
+          {appOptionLabel((item as unknown as { rawValue: AppOption }).rawValue)}
         </ListboxItem>
       )}
     />

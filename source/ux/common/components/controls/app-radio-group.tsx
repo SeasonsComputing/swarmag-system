@@ -14,9 +14,14 @@ AppRadioGroup  Radio-group control with declared states.
 AppRadioItem   Radio item control for AppRadioGroup.
 */
 
-import { RadioGroup } from '@kobalte/core/radio-group'
-import { type JSX, splitProps } from '@solid-js'
-import { bindActiveAttribute, controlState } from './controls-helpers.ts'
+import {
+  RadioGroup,
+  type RadioGroupRootProps,
+  type RadioGroupItemProps,
+  type RadioGroupItemControlProps
+} from '@kobalte/core/radio-group'
+import { type Component, type JSX, splitProps } from '@solid-js'
+import { type WithDataUI, controlState, withDataUI } from './controls-helpers.ts'
 
 /** Radio-group control props. */
 export type AppRadioGroupProps<Value extends string = string> = {
@@ -47,42 +52,9 @@ export type AppRadioItemProps<Value extends string = string> = {
   'data-ui'?: never
 }
 
-type AppRadioItemContainerProps<Value extends string> = {
-  children?: JSX.Element
-  value: Value
-  disabled?: boolean
-  'data-ui': 'radio-item'
-  ref?: (element: HTMLDivElement) => void
-}
-
-type AppRadioGroupRootProps<Value extends string = string> = {
-  children?: JSX.Element
-  disabled?: boolean
-  name?: string
-  required?: boolean
-  value?: Value
-  defaultValue?: Value
-  onChange?: (value: Value) => void
-  validationState?: 'valid' | 'invalid'
-  'data-ui': 'radio-group'
-  'data-ui-state'?: 'error' | 'disabled' | 'loading'
-}
-
-type AppRadioItemControlProps = {
-  children?: JSX.Element
-  'data-ui': 'radio'
-}
-
-const RadioGroupRoot = RadioGroup as unknown as <Value extends string = string>(
-  props: AppRadioGroupRootProps<Value>
-) => JSX.Element
-const RadioItem = RadioGroup.Item as unknown as <Value extends string = string>(
-  props: AppRadioItemContainerProps<Value>
-) => JSX.Element
-
-const RadioItemControl = RadioGroup.ItemControl as unknown as (
-  props: AppRadioItemControlProps
-) => JSX.Element
+const RadioGroupRoot = RadioGroup as Component<WithDataUI<RadioGroupRootProps>>
+const RadioItem = RadioGroup.Item as Component<WithDataUI<RadioGroupItemProps>>
+const RadioItemControl = withDataUI<RadioGroupItemControlProps>(RadioGroup.ItemControl)
 
 /** Radio-group control with declared states. */
 export const AppRadioGroup = <Value extends string = string>(
@@ -97,16 +69,11 @@ export const AppRadioGroup = <Value extends string = string>(
     'required',
     'value',
     'defaultValue',
-    'onChange',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'onChange'
   ])
 
   return (
-    <RadioGroupRoot<Value>
+    <RadioGroupRoot
       data-ui='radio-group'
       data-ui-state={controlState(local)}
       disabled={local.disabled || local.loading}
@@ -114,7 +81,7 @@ export const AppRadioGroup = <Value extends string = string>(
       required={local.required}
       value={local.value}
       defaultValue={local.defaultValue}
-      onChange={local.onChange}
+      onChange={local.onChange as ((value: string) => void) | undefined}
       validationState={local.error ? 'invalid' : undefined}
     >
       {local.children}
@@ -129,19 +96,14 @@ export const AppRadioItem = <Value extends string = string>(
   const [local] = splitProps(props, [
     'children',
     'value',
-    'disabled',
-    'class',
-    'classList',
-    'style',
-    'data-ui'
+    'disabled'
   ])
 
   return (
-    <RadioItem<Value>
+    <RadioItem
       data-ui='radio-item'
       value={local.value}
       disabled={local.disabled}
-      ref={element => bindActiveAttribute(element, ['data-checked', 'aria-checked'])}
     >
       <RadioGroup.ItemInput />
       <RadioItemControl data-ui='radio'>

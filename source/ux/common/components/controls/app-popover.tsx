@@ -44,17 +44,12 @@ export const AppPopover = (props: AppPopoverProps): JSX.Element => {
     'error',
     'loading',
     'disabled',
-    'onOpenChange',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'onOpenChange'
   ])
 
   return (
     <Popover open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
-      <Popover.Trigger as='span'>
+      <Popover.Trigger>
         {local.trigger}
       </Popover.Trigger>
       <Popover.Portal>

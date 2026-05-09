@@ -15,7 +15,7 @@ AppCheckbox  Checkbox control with declared states.
 
 import { Checkbox } from '@kobalte/core/checkbox'
 import { type JSX, splitProps } from '@solid-js'
-import { bindActiveAttribute, controlState } from './controls-helpers.ts'
+import { controlState } from './controls-helpers.ts'
 
 /** Checkbox control props. */
 export type AppCheckboxProps = {
@@ -48,12 +48,7 @@ export const AppCheckbox = (props: AppCheckboxProps): JSX.Element => {
     'name',
     'required',
     'value',
-    'onChange',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'onChange'
   ])
 
   return (
@@ -72,7 +67,6 @@ export const AppCheckbox = (props: AppCheckboxProps): JSX.Element => {
       <Checkbox.Control
         data-ui='checkbox'
         data-ui-state={controlState(local)}
-        ref={element => bindActiveAttribute(element, ['data-checked', 'aria-checked'])}
       >
         <Checkbox.Indicator />
       </Checkbox.Control>
