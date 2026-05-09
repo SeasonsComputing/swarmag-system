@@ -16,17 +16,18 @@ This document defines the foundational architectural structure and principles fo
 
 Authority decreases from top to bottom.
 
-| Document                       | File                        | Intent                                                          |
-| ------------------------------ | --------------------------- | --------------------------------------------------------------- |
-| **Constitution**               | `CONSTITUTION.md`           | Governance model, roles, and operating philosophy               |
-| --> **Architecture Core**      | `architecture-core.md`      | System boundary, platform constraints, and invariants           |
-| --> **Domain Model**           | `domain-model.md`           | Problem/solution semantics and domain meaning                   |
-| --> **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace inventory and field-level references        |
-| --> **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns                         |
-| --> **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction rules   |
-| --> **Style Guide**            | `style-guide.md`            | Coding standards, file formats, and implementation conventions  |
-| --> **Architecture Backend**   | `architecture-back.md`      | Backend integration architecture and runtime constraints        |
-| --> **Architecture UX**        | `architecture-ux.md`        | UX-layer integration architecture and app-specific UX contracts |
+| Document                      | File                        | Intent                                                            |
+| ----------------------------- | --------------------------- | ----------------------------------------------------------------- |
+| **Constitution**              | `CONSTITUTION.md`           | Governance model, roles, and operating philosophy                 |
+| └→ **Architecture Core**      | `architecture-core.md`      | System boundary, platform constraints, and invariants             |
+| └→ **Domain Model**           | `domain-model.md`           | Problem/solution semantics and domain meaning                     |
+| └→ **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace inventory and field-level references          |
+| └→ **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns                           |
+| └→ **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction rules     |
+| └→ **Style Guide**            | `style-guide.md`            | Coding standards, file formats, and implementation conventions    |
+| └→ **Architecture Backend**   | `architecture-back.md`      | Backend integration architecture and runtime constraints          |
+| └→ **Architecture UX**        | `architecture-ux.md`        | UX-layer integration architecture and app-specific UX contracts   |
+| └→ **Architecture DevOps**    | `architecture-devops.md`    | Environment configuration, secret registry, packaging, and guards |
 
 ### 1.2 Scope Boundary of Governing Documents
 
@@ -40,6 +41,7 @@ Authority decreases from top to bottom.
 | **Style Guide**            | Implementation conventions, file formats, and coding standards          |
 | **Architecture Backend**   | Backend integration architecture and runtime constraints                |
 | **Architecture UX**        | UX-layer integration architecture and app-specific UX contracts         |
+| **Architecture DevOps**    | Environment configuration, secret registry, packaging, and guards       |
 
 All code, schemas, and infrastructure are derived artifacts. If code conflicts with these documents, the code is wrong.
 
@@ -245,10 +247,16 @@ import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 export const api = {
   // Domain abstractions using appropriate storage bindings
   Users: makeCrudSupabaseClient<User>({ table: 'users', adapter: UserAdapter }),
-  Customers: makeCrudSupabaseClient<Customer>({ table: 'customers', adapter: CustomerAdapter }),
+  Customers: makeCrudSupabaseClient<Customer>({
+    table: 'customers',
+    adapter: CustomerAdapter
+  }),
 
   // Offline storage for field operations
-  JobsLocal: makeCrudIndexedDbClient<Job>({ store: 'jobs', adapter: JobAdapter }),
+  JobsLocal: makeCrudIndexedDbClient<Job>({
+    store: 'jobs',
+    adapter: JobAdapter
+  }),
 
   // Orchestration operations
   deepCloneJob: makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
@@ -340,7 +348,10 @@ Each maker takes a specification object and returns a fully-typed client:
 
 ```typescript
 // CRUD maker
-const Users = makeCrudSupabaseClient<User>({ table: 'users', adapter: UserAdapter })
+const Users = makeCrudSupabaseClient<User>({
+  table: 'users',
+  adapter: UserAdapter
+})
 await Users.create({ displayName: 'Ada', primaryEmail: 'ada@example.com' })
 
 // Business rule maker
@@ -482,29 +493,33 @@ Vite requires client-side environment variables to carry a `VITE_` prefix. The a
 import { Config } from '@core/cfg/config.ts'
 import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
-Config.init(new SolidProvider(), [
-  'VITE_PACKAGE_APP_ID',
-  'VITE_PACKAGE_TARGET',
-  'VITE_PACKAGE_VERSION',
-  'VITE_SUPABASE_EDGE_URL',
-  'VITE_SUPABASE_RDBMS_URL',
-  'VITE_SUPABASE_ANON_KEY',
-  'VITE_SUPABASE_CLIENT_MODE',
-  'VITE_SUPABASE_SERVICE_KEY',
-  'VITE_JWT_SECRET',
-  'VITE_LOCAL_DB_NAME'
-], {
-  'PACKAGE_APP_ID': 'VITE_PACKAGE_APP_ID',
-  'PACKAGE_TARGET': 'VITE_PACKAGE_TARGET',
-  'PACKAGE_VERSION': 'VITE_PACKAGE_VERSION',
-  'SUPABASE_EDGE_URL': 'VITE_SUPABASE_EDGE_URL',
-  'SUPABASE_RDBMS_URL': 'VITE_SUPABASE_RDBMS_URL',
-  'SUPABASE_ANON_KEY': 'VITE_SUPABASE_ANON_KEY',
-  'SUPABASE_CLIENT_MODE': 'VITE_SUPABASE_CLIENT_MODE',
-  'SUPABASE_SERVICE_KEY': 'VITE_SUPABASE_SERVICE_KEY',
-  'JWT_SECRET': 'VITE_JWT_SECRET',
-  'LOCAL_DB_NAME': 'VITE_LOCAL_DB_NAME'
-})
+Config.init(
+  new SolidProvider(),
+  [
+    'VITE_PACKAGE_APP_ID',
+    'VITE_PACKAGE_TARGET',
+    'VITE_PACKAGE_VERSION',
+    'VITE_SUPABASE_EDGE_URL',
+    'VITE_SUPABASE_RDBMS_URL',
+    'VITE_SUPABASE_ANON_KEY',
+    'VITE_SUPABASE_CLIENT_MODE',
+    'VITE_SUPABASE_SERVICE_KEY',
+    'VITE_JWT_SECRET',
+    'VITE_LOCAL_DB_NAME'
+  ],
+  {
+    PACKAGE_APP_ID: 'VITE_PACKAGE_APP_ID',
+    PACKAGE_TARGET: 'VITE_PACKAGE_TARGET',
+    PACKAGE_VERSION: 'VITE_PACKAGE_VERSION',
+    SUPABASE_EDGE_URL: 'VITE_SUPABASE_EDGE_URL',
+    SUPABASE_RDBMS_URL: 'VITE_SUPABASE_RDBMS_URL',
+    SUPABASE_ANON_KEY: 'VITE_SUPABASE_ANON_KEY',
+    SUPABASE_CLIENT_MODE: 'VITE_SUPABASE_CLIENT_MODE',
+    SUPABASE_SERVICE_KEY: 'VITE_SUPABASE_SERVICE_KEY',
+    JWT_SECRET: 'VITE_JWT_SECRET',
+    LOCAL_DB_NAME: 'VITE_LOCAL_DB_NAME'
+  }
+)
 
 export { Config }
 ```
@@ -536,33 +551,7 @@ import { Config } from '@core/cfg/config.ts'
 
 ### 6.5 Environment Files
 
-Each package maintains environment-specific configuration files:
-
-#### 6.5.1 Naming Convention
-
-- `{package}-local.env.example` - Template with placeholder values
-- `{package}-local.env` - Local development (gitignored)
-- `{package}-stage.env` - Staging environment (gitignored)
-- `{package}-prod.env` - Production environment (gitignored)
-- UX app packages use app-scoped files in `source/ux/config/`:
-  - `app-admin-{local|stage|prod}.env(.example)`
-  - `app-ops-{local|stage|prod}.env(.example)`
-  - `app-customer-{local|stage|prod}.env(.example)`
-
-#### 6.5.2 Example
-
-```bash
-# back-local.env.example
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_SERVICE_KEY=your-service-key-here
-JWT_SECRET=your-jwt-secret-here
-```
-
-#### 6.5.3 Security
-
-- Never commit actual `.env` files (only `.env.example` templates)
-- Use platform-specific secret management in production
-- Rotate secrets regularly
+See `architecture-devops.md §4` for environment file naming conventions, the `__SECRET__` placeholder contract, and security rules.
 
 ### 6.6 Why This Works
 
@@ -874,7 +863,10 @@ export const api = {
   // ... existing clients
 
   // New domain abstraction
-  Services: makeCrudSupabaseClient<Service>({ table: 'services', adapter: ServiceAdapter })
+  Services: makeCrudSupabaseClient<Service>({
+    table: 'services',
+    adapter: ServiceAdapter
+  })
 }
 ```
 

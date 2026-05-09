@@ -23,6 +23,7 @@ Primary architectural context lives in `documentation/architecture-core.md`.
 | Architecture | `architecture-core.md`      | Core architecture principles and system-wide structure  |
 |              | `architecture-back.md`      | Backend architecture, boundaries, and runtime model     |
 |              | `architecture-ux.md`        | UX architecture and frontend layering                   |
+|              | `architecture-devops.md`    | Environment configuration, packaging, and guard suite   |
 | Domain       | `domain-model.md`           | Domain solution-space concepts and invariants           |
 |              | `domain-seed-data.md`       | Controlled vocabularies and canonical seed data         |
 |              | `domain-data-dictionary.md` | Normalized implementation-ready type and relation model |
