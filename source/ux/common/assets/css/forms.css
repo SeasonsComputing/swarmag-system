@@ -11,6 +11,10 @@
   gap: var(--sa-space-xs);
 }
 
+.app-field[data-variant='inline'] {
+  justify-items: start;
+}
+
 /** Responsive auto-fit grid for composing fields into a form layout. */
 .app-form-grid {
   align-items: start;

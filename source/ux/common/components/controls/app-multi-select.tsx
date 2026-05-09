@@ -58,6 +58,7 @@ export const AppMultiSelect = (props: AppMultiSelectProps): JSX.Element => {
       data-ui-state={controlState(local)}
       options={local.options as AppOption[]}
       optionValue='value'
+      optionTextValue={appOptionLabel}
       selectionMode='multiple'
       value={local.value}
       defaultValue={local.defaultValue}

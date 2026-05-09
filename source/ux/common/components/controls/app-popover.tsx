@@ -15,12 +15,14 @@ AppPopover  Popover control with declared states.
 
 import { Popover } from '@kobalte/core/popover'
 import { type JSX, splitProps } from '@solid-js'
+import { AppButton, type AppButtonVariant } from './app-button.tsx'
 import { controlState } from './controls-helpers.ts'
 
 /** Popover control props. */
 export type AppPopoverProps = {
   children?: JSX.Element
   trigger?: JSX.Element
+  triggerVariant?: AppButtonVariant
   open?: boolean
   defaultOpen?: boolean
   error?: boolean
@@ -39,6 +41,7 @@ export const AppPopover = (props: AppPopoverProps): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'trigger',
+    'triggerVariant',
     'open',
     'defaultOpen',
     'error',
@@ -49,7 +52,11 @@ export const AppPopover = (props: AppPopoverProps): JSX.Element => {
 
   return (
     <Popover open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
-      <Popover.Trigger>
+      <Popover.Trigger
+        as={AppButton}
+        disabled={local.disabled || local.loading}
+        variant={local.triggerVariant ?? 'secondary'}
+      >
         {local.trigger}
       </Popover.Trigger>
       <Popover.Portal>

@@ -23,12 +23,14 @@ export type AppFieldProps = {
   label: string
   /** ID of the associated control — wired to the label's `for` attribute. */
   for: string
+  /** Optional layout variant. `'inline'` places label and control side-by-side. */
+  variant?: 'inline'
   children: JSX.Element
 }
 
 /** Label + control field wrapper. Label and control are siblings, never nested. */
 export const AppField = (props: AppFieldProps): JSX.Element => (
-  <div class='app-field'>
+  <div class='app-field' data-variant={props.variant}>
     <label for={props.for}>{props.label}</label>
     {props.children}
   </div>
