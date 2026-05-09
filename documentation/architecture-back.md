@@ -16,7 +16,7 @@ This document defines the backend architecture of the swarmAg system. The backen
 | Document                      | File                        | Intent                                                   |
 | ----------------------------- | --------------------------- | -------------------------------------------------------- |
 | **Canonical Authority Chain** | `architecture-core.md §1.1` | Defines global documentation precedence for the system   |
-| --> **Architecture Backend**  | _(this file)_               | Backend integration architecture and runtime constraints |
+| └→ **Architecture Backend**   | _(this file)_               | Backend integration architecture and runtime constraints |
 
 ### 1.2 Scope Boundary of Governing Documents
 
@@ -29,11 +29,9 @@ This document defines the backend architecture of the swarmAg system. The backen
 | **Style Guide**            | `style-guide.md`            | Implementation conventions and coding/file standards                       |
 | **Architecture Backend**   | _(this file)_               | Backend architecture, edge-function contracts, and operational constraints |
 
-## 2. Backend Structure
+## 2. Directory Structure
 
-The backend is intentionally minimal. Most operations go **directly to the database** from UX applications via Supabase SDK. Edge functions exist only for orchestration that cannot be expressed as simple CRUD.
-
-### 2.1 Directory Structure
+The backend layer is intentionally minimal, consisting of forward-only migrations and flat orchestration functions.
 
 ```text
 back/
@@ -43,9 +41,11 @@ back/
     └── functions/       # Flat orchestration functions
 ```
 
-**Key Principle:** If it can be a direct database operation with RLS, it shouldn't be an edge function.
-
 ## 3. Supabase Edge Functions
+
+The backend is intentionally minimal. Most operations go **directly to the database** from UX applications via Supabase SDK. Edge functions exist only for orchestration that cannot be expressed as simple CRUD.
+
+**Key Principle: If it can be a direct database operation with RLS, it shouldn't be an edge function.**
 
 Edge functions handle **orchestration only** — complex multi-step operations that cannot be performed client-side.
 
@@ -108,7 +108,10 @@ const handler = async (req: HttpRequest): Promise<HttpResponse> => {
   return toOk({ updated: results.updated, failed: results.failed, dryRun })
 }
 
-export default wrapHttpHandler(handler, { cors: true, maxBodySize: 1024 * 1024 })
+export default wrapHttpHandler(handler, {
+  cors: true,
+  maxBodySize: 1024 * 1024
+})
 ```
 
 Use when: HTTP method routing, custom error codes (400/422), query parameters, or custom response structures needed.
@@ -198,16 +201,18 @@ Edge functions use the singleton `Config` pattern defined in `architecture-core.
 import { Config } from '@core/cfg/config.ts'
 import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
-Config.init(new SupabaseProvider(), ['SUPABASE_URL', 'SUPABASE_SERVICE_KEY', 'JWT_SECRET'])
+Config.init(new SupabaseProvider(), [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_KEY',
+  'JWT_SECRET'
+])
 
 export { Config }
 ```
 
 ### 5.2 Environment Files
 
-- `back-local.env.example` — Template for local development
-- `back-stage.env` — Staging environment (gitignored)
-- `back-prod.env` — Production environment (gitignored)
+See `architecture-devops.md §4` for naming conventions, placeholder contract, and security rules.
 
 ### 5.3 Usage in Edge Functions
 
