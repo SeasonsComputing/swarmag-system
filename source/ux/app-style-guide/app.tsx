@@ -17,4 +17,4 @@ const App = () => {
   return <StyleGuide />
 }
 
-render(() => <App />, document.getElementById('root'))
+render(() => <App />, document.getElementById('root')!)

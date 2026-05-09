@@ -13,11 +13,17 @@ PUBLIC
 AppSelect  Single-value select control with declared states.
 */
 
-import { Select } from '@kobalte/core/select'
+import {
+  Select,
+  type SelectRootProps,
+  type SelectContentProps,
+  type SelectItemProps,
+  type SelectRootItemComponentProps
+} from '@kobalte/core/select'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { type AppOption, appOptionLabel, controlState, withDataUI } from './controls-helpers.ts'
 
-type CollectionItem = { rawValue: string; key: string }
+type CollectionItem = { rawValue: AppOption; key: string }
 
 /** Select control props. */
 export type AppSelectProps = {
@@ -25,7 +31,7 @@ export type AppSelectProps = {
   error?: boolean
   id?: string
   loading?: boolean
-  options: ReadonlyArray<string>
+  options: ReadonlyArray<AppOption>
   value?: string
   defaultValue?: string
   onChange?: (value: string) => void
@@ -37,31 +43,9 @@ export type AppSelectProps = {
   'data-ui-state'?: never
 }
 
-type AppSelectRootProps = {
-  options: ReadonlyArray<string>
-  disabled?: boolean
-  validationState?: 'valid' | 'invalid'
-  value?: string
-  defaultValue?: string
-  onChange?: (value: string) => void
-  itemComponent?: (props: { item: CollectionItem }) => JSX.Element
-  children?: JSX.Element
-}
-
-type AppSelectContentProps = {
-  'data-ui': 'select-content'
-  children?: JSX.Element
-}
-
-type AppSelectItemProps = {
-  item: CollectionItem
-  'data-ui': 'select-item'
-  children?: JSX.Element
-}
-
-const SelectRoot = Select as unknown as (props: AppSelectRootProps) => JSX.Element
-const SelectContent = Select.Content as unknown as (props: AppSelectContentProps) => JSX.Element
-const SelectItem = Select.Item as unknown as (props: AppSelectItemProps) => JSX.Element
+const SelectRoot = withDataUI<SelectRootProps<AppOption>>(Select)
+const SelectContent = withDataUI<SelectContentProps>(Select.Content)
+const SelectItem = withDataUI<SelectItemProps>(Select.Item)
 
 /** Single-value select control with declared states. */
 export const AppSelect = (props: AppSelectProps): JSX.Element => {
@@ -74,31 +58,28 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
     'value',
     'defaultValue',
     'onChange',
-    'placeholder',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'placeholder'
   ])
 
   return (
     <SelectRoot
-      options={local.options}
+      options={local.options as AppOption[]}
+      optionValue='value'
+      optionTextValue={appOptionLabel}
       disabled={local.disabled || local.loading}
       validationState={local.error ? 'invalid' : undefined}
-      value={local.value}
-      defaultValue={local.defaultValue}
-      onChange={local.onChange}
-      itemComponent={item => (
+      value={local.options.find(o => o.value === local.value) ?? null}
+      defaultValue={local.options.find(o => o.value === local.defaultValue)}
+      onChange={(option: AppOption | null) => local.onChange?.(option?.value ?? '')}
+      itemComponent={(item: SelectRootItemComponentProps<AppOption>) => (
         <SelectItem data-ui='select-item' item={item.item}>
-          {item.item.rawValue}
+          {appOptionLabel(item.item.rawValue)}
         </SelectItem>
       )}
     >
       <Select.Trigger id={local.id} data-ui='select' data-ui-state={controlState(local)}>
-        <Select.Value<string>>
-          {state => state.selectedOption() ?? local.placeholder ?? ''}
+        <Select.Value<AppOption>>
+          {state => state.selectedOption() ? appOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
         </Select.Value>
       </Select.Trigger>
       <Select.Portal>

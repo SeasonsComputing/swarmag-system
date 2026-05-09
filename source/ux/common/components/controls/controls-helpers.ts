@@ -2,7 +2,19 @@
  * Namespace-local helpers for control primitive semantics.
  */
 
-import { onCleanup } from '@solid-js'
+import type { Component, JSX } from '@solid-js'
+
+/** Extends a Kobalte component's prop type to accept data-ui and data-ui-state attributes. */
+export type WithDataUI<T> = T & {
+  'data-ui'?: string
+  'data-ui-state'?: string
+  children?: JSX.Element
+}
+
+/** Cast a Kobalte component to accept data-ui and data-ui-state alongside its native props. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const withDataUI = <T extends Record<string, any>>(component: Component<T>): Component<WithDataUI<T>> =>
+  component as Component<WithDataUI<T>>
 
 /** Semantic control state values allowed by the design language. */
 export type AppControlState = 'error' | 'disabled' | 'loading'
@@ -24,22 +36,8 @@ export const controlState = (
   return undefined
 }
 
-/** Mirror primitive selection attributes into the normalized data-active marker. */
-export const bindActiveAttribute = (
-  element: Element,
-  attributes: readonly string[]
-): void => {
-  const sync = () => {
-    const active = attributes.some(attribute => {
-      const value = element.getAttribute(attribute)
-      return value !== null && value !== 'false'
-    })
-    if (active) element.setAttribute('data-active', '')
-    else element.removeAttribute('data-active')
-  }
+/** A selectable option for data-driven select controls. */
+export type AppOption = { value: string; label?: string }
 
-  sync()
-  const observer = new MutationObserver(sync)
-  observer.observe(element, { attributes: true, attributeFilter: [...attributes] })
-  onCleanup(() => observer.disconnect())
-}
+/** Derive display text from an AppOption — label if present, otherwise value. */
+export const appOptionLabel = (option: AppOption): string => option.label ?? option.value

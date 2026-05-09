@@ -44,12 +44,7 @@ export const AppTooltip = (props: AppTooltipProps): JSX.Element => {
     'error',
     'loading',
     'disabled',
-    'onOpenChange',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'onOpenChange'
   ])
 
   return (
@@ -59,7 +54,7 @@ export const AppTooltip = (props: AppTooltipProps): JSX.Element => {
       onOpenChange={local.onOpenChange}
       disabled={local.disabled || local.loading}
     >
-      <Tooltip.Trigger as='span'>
+      <Tooltip.Trigger>
         {local.trigger}
       </Tooltip.Trigger>
       <Tooltip.Portal>

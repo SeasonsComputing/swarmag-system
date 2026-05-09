@@ -16,15 +16,22 @@ AppAccordionTrigger  Accordion trigger control for AppAccordionItem.
 AppAccordionContent  Accordion content control for AppAccordionItem.
 */
 
-import { Accordion } from '@kobalte/core/accordion'
-import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import {
+  Accordion,
+  type AccordionRootProps,
+  type AccordionItemProps,
+  type AccordionTriggerProps,
+  type AccordionContentProps
+} from '@kobalte/core/accordion'
+import { type Component, type JSX, splitProps } from '@solid-js'
+import { type WithDataUI, controlState, withDataUI } from './controls-helpers.ts'
 
 /** Accordion root props. */
 export type AppAccordionProps = {
   children?: JSX.Element
   error?: boolean
   loading?: boolean
+  multiple?: boolean
   value?: string[]
   defaultValue?: string[]
   onValueChange?: (value: string[]) => void
@@ -64,42 +71,10 @@ export type AppAccordionContentProps = {
   'data-ui'?: never
 }
 
-type AppAccordionRootProps = {
-  children?: JSX.Element
-  value?: string[]
-  defaultValue?: string[]
-  onValueChange?: (value: string[]) => void
-  'data-ui': 'accordion'
-  'data-ui-state'?: 'error' | 'disabled' | 'loading'
-}
-
-type AppAccordionItemRootProps = {
-  children?: JSX.Element
-  value: string
-  disabled?: boolean
-  'data-ui': 'accordion-item'
-}
-
-type AppAccordionTriggerRootProps = {
-  children?: JSX.Element
-  'data-ui': 'accordion-trigger'
-}
-
-type AppAccordionContentRootProps = {
-  children?: JSX.Element
-  'data-ui': 'accordion-content'
-}
-
-const AccordionRoot = Accordion as unknown as (props: AppAccordionRootProps) => JSX.Element
-const AccordionItem = Accordion.Item as unknown as (
-  props: AppAccordionItemRootProps
-) => JSX.Element
-const AccordionTrigger = Accordion.Trigger as unknown as (
-  props: AppAccordionTriggerRootProps
-) => JSX.Element
-const AccordionContent = Accordion.Content as unknown as (
-  props: AppAccordionContentRootProps
-) => JSX.Element
+const AccordionRoot = Accordion as Component<WithDataUI<AccordionRootProps>>
+const AccordionItem = withDataUI<AccordionItemProps>(Accordion.Item)
+const AccordionTrigger = Accordion.Trigger as Component<WithDataUI<AccordionTriggerProps>>
+const AccordionContent = Accordion.Content as Component<WithDataUI<AccordionContentProps>>
 
 /** Accordion root with declared states. */
 export const AppAccordion = (props: AppAccordionProps): JSX.Element => {
@@ -107,23 +82,20 @@ export const AppAccordion = (props: AppAccordionProps): JSX.Element => {
     'children',
     'error',
     'loading',
+    'multiple',
     'value',
     'defaultValue',
-    'onValueChange',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'onValueChange'
   ])
 
   return (
     <AccordionRoot
       data-ui='accordion'
       data-ui-state={controlState(local)}
+      multiple={local.multiple}
       value={local.value}
       defaultValue={local.defaultValue}
-      onValueChange={local.onValueChange}
+      onChange={local.onValueChange}
     >
       {local.children}
     </AccordionRoot>
@@ -135,11 +107,7 @@ export const AppAccordionItem = (props: AppAccordionItemProps): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'value',
-    'disabled',
-    'class',
-    'classList',
-    'style',
-    'data-ui'
+    'disabled'
   ])
 
   return (
@@ -151,7 +119,7 @@ export const AppAccordionItem = (props: AppAccordionItemProps): JSX.Element => {
 
 /** Accordion trigger control for AppAccordionItem. */
 export const AppAccordionTrigger = (props: AppAccordionTriggerProps): JSX.Element => {
-  const [local] = splitProps(props, ['children', 'class', 'classList', 'style', 'data-ui'])
+  const [local] = splitProps(props, ['children'])
 
   return (
     <Accordion.Header>
@@ -162,7 +130,7 @@ export const AppAccordionTrigger = (props: AppAccordionTriggerProps): JSX.Elemen
 
 /** Accordion content control for AppAccordionItem. */
 export const AppAccordionContent = (props: AppAccordionContentProps): JSX.Element => {
-  const [local] = splitProps(props, ['children', 'class', 'classList', 'style', 'data-ui'])
+  const [local] = splitProps(props, ['children'])
 
   return <AccordionContent data-ui='accordion-content'>{local.children}</AccordionContent>
 }

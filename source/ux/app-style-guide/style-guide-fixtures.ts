@@ -72,9 +72,19 @@ export const BUTTON_VARIANTS = [
   { label: 'Danger', variant: 'danger' }
 ] as const
 
-export const STATUSES = ['Scheduled', 'Ready', 'Blocked', 'Complete'] as const
+export const STATUSES = [
+  { value: 'Scheduled' },
+  { value: 'Ready' },
+  { value: 'Blocked' },
+  { value: 'Complete' }
+] as const satisfies ReadonlyArray<{ value: string; label?: string }>
 
-export const SERVICES = ['Aerial', 'Ground', 'Inspection', 'Followup'] as const
+export const SERVICES = [
+  { value: 'Aerial' },
+  { value: 'Ground' },
+  { value: 'Inspection' },
+  { value: 'Followup' }
+] as const satisfies ReadonlyArray<{ value: string; label?: string }>
 
 export const DEFAULT_SERVICES = ['Aerial', 'Ground'] as const
 
