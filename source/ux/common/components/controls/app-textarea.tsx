@@ -15,11 +15,10 @@ AppTextarea  Multiline input control with declared states.
 
 import {
   TextField,
-  type TextFieldRootProps,
   type TextFieldTextAreaProps
 } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState, withDataUI } from './controls-helpers.ts'
+import { controlState } from './controls-helpers.ts'
 
 /** Textarea control props. */
 export type AppTextareaProps =
@@ -37,8 +36,8 @@ export type AppTextareaProps =
     'data-ui-state'?: never
   }
 
-const TextFieldRoot = withDataUI<TextFieldRootProps>(TextField)
-const TextFieldTextArea = withDataUI<TextFieldTextAreaProps>(TextField.TextArea)
+const TextFieldRoot = TextField as unknown as typeof TextField
+const TextFieldTextArea = TextField.TextArea as unknown as typeof TextField.TextArea
 
 /** Multiline input control with declared states. */
 export const AppTextarea = (props: AppTextareaProps): JSX.Element => {

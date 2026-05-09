@@ -2,7 +2,7 @@
  * Namespace-local helpers for control primitive semantics.
  */
 
-import type { Component, JSX } from '@solid-js'
+import type { JSX } from '@solid-js'
 
 /** Extends a Kobalte component's prop type to accept data-ui and data-ui-state attributes. */
 export type WithDataUI<T> = T & {
@@ -10,11 +10,6 @@ export type WithDataUI<T> = T & {
   'data-ui-state'?: string
   children?: JSX.Element
 }
-
-/** Cast a Kobalte component to accept data-ui and data-ui-state alongside its native props. */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const withDataUI = <T extends Record<string, any>>(component: Component<T>): Component<WithDataUI<T>> =>
-  component as Component<WithDataUI<T>>
 
 /** Semantic control state values allowed by the design language. */
 export type AppControlState = 'error' | 'disabled' | 'loading'

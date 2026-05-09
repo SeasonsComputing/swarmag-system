@@ -15,12 +15,11 @@ AppMultiSelect  Inline multi-value select control with declared states.
 
 import {
   Listbox,
-  type ListboxRootProps,
-  type ListboxItemProps,
   type ListboxItemOptions
 } from '@kobalte/core/listbox'
+import { type StringSet } from '@core/std'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppOption, appOptionLabel, controlState, withDataUI } from './controls-helpers.ts'
+import { type AppOption, appOptionLabel, controlState } from './controls-helpers.ts'
 
 /** Multi-select control props. */
 export type AppMultiSelectProps = {
@@ -38,8 +37,8 @@ export type AppMultiSelectProps = {
   'data-ui-state'?: never
 }
 
-const ListboxRoot = withDataUI<ListboxRootProps<AppOption>>(Listbox)
-const ListboxItem = withDataUI<ListboxItemProps>(Listbox.Item)
+const ListboxRoot = Listbox as unknown as typeof Listbox
+const ListboxItem = Listbox.Item as unknown as typeof Listbox.Item
 
 /** Inline multi-value select control with declared states. */
 export const AppMultiSelect = (props: AppMultiSelectProps): JSX.Element => {
@@ -62,7 +61,7 @@ export const AppMultiSelect = (props: AppMultiSelectProps): JSX.Element => {
       selectionMode='multiple'
       value={local.value}
       defaultValue={local.defaultValue}
-      onChange={(selected: Set<string>) => local.onChange?.([...selected])}
+      onChange={(selected: StringSet) => local.onChange?.([...selected])}
       renderItem={(item: ListboxItemOptions['item']) => (
         <ListboxItem data-ui='multi-select-item' item={item}>
           {appOptionLabel((item as unknown as { rawValue: AppOption }).rawValue)}
