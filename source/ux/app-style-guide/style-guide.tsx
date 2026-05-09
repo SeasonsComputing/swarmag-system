@@ -35,10 +35,12 @@ import {
   AppProgress,
   AppRadioGroup,
   AppRadioItem,
+  AppRow,
   AppSelect,
   AppSeparator,
   AppSkeleton,
   AppSpinner,
+  AppStack,
   AppTab,
   AppTable,
   AppTableBody,
@@ -212,26 +214,34 @@ export const StyleGuide = (): JSX.Element => {
 
         <Section title='AppButton'>
           <AppField label='Toggle loading state' for='button-loading-toggle' variant='inline'>
-            <AppToggle id='button-loading-toggle' pressed={loading()} onClick={() => setLoading(!loading())}>
+            <AppToggle
+              id='button-loading-toggle'
+              pressed={loading()}
+              onClick={() => setLoading(!loading())}
+            >
               Loading
             </AppToggle>
           </AppField>
-          <div class='sg-row'>
+          <AppRow>
             <For each={BUTTON_VARIANTS}>
               {entry => <AppButton variant={entry.variant}>{entry.label}</AppButton>}
             </For>
-          </div>
-          <div class='sg-row'>
+          </AppRow>
+          <AppRow>
             <AppButton disabled>Disabled</AppButton>
             <AppButton variant='primary' loading={loading()}>
               Loading
             </AppButton>
-          </div>
+          </AppRow>
         </Section>
 
         <Section title='AppInput / AppTextarea'>
           <AppField label='Toggle error state' for='input-error-toggle' variant='inline'>
-            <AppToggle id='input-error-toggle' pressed={inputError()} onClick={() => setInputError(!inputError())}>
+            <AppToggle
+              id='input-error-toggle'
+              pressed={inputError()}
+              onClick={() => setInputError(!inputError())}
+            >
               Error
             </AppToggle>
           </AppField>
@@ -272,7 +282,11 @@ export const StyleGuide = (): JSX.Element => {
 
         <Section title='AppSelect / AppMultiSelect'>
           <AppField label='Toggle error state' for='select-error-toggle' variant='inline'>
-            <AppToggle id='select-error-toggle' pressed={selectError()} onClick={() => setSelectError(!selectError())}>
+            <AppToggle
+              id='select-error-toggle'
+              pressed={selectError()}
+              onClick={() => setSelectError(!selectError())}
+            >
               Error
             </AppToggle>
           </AppField>
@@ -329,7 +343,7 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppCheckbox'>
-          <div class='sg-row'>
+          <AppRow>
             <AppCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
               Label reviewed
             </AppCheckbox>
@@ -340,7 +354,7 @@ export const StyleGuide = (): JSX.Element => {
               Missing wind reading
             </AppCheckbox>
             <AppCheckbox disabled checked>Disabled complete</AppCheckbox>
-          </div>
+          </AppRow>
         </Section>
 
         <Section title='AppRadioGroup + AppRadioItem'>
@@ -364,12 +378,12 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppToggle / AppToggleGroup + AppToggleItem'>
-          <div class='sg-row'>
+          <AppRow>
             <AppToggle pressed={togglePressed()} onClick={() => setTogglePressed(!togglePressed())}>
               Active crews
             </AppToggle>
             <AppToggle pressed={false}>Offline jobs</AppToggle>
-          </div>
+          </AppRow>
           <AppToggleGroup value={viewMode()} onChange={setViewMode}>
             <AppToggleItem value='map'>Map</AppToggleItem>
             <AppToggleItem value='list'>List</AppToggleItem>
@@ -395,12 +409,12 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppProgress'>
-          <div class='sg-stack'>
+          <AppStack>
             <AppProgress value={0} />
             <AppProgress value={35} />
             <AppProgress value={68} />
             <AppProgress value={100} />
-          </div>
+          </AppStack>
         </Section>
 
         <Section title='AppSpinner'>
@@ -408,7 +422,7 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppSkeleton'>
-          <div class='sg-stack'>
+          <AppStack>
             <AppSkeleton />
             <div class='sg-skeleton-75'>
               <AppSkeleton />
@@ -416,55 +430,55 @@ export const StyleGuide = (): JSX.Element => {
             <div class='sg-skeleton-50'>
               <AppSkeleton />
             </div>
-          </div>
+          </AppStack>
         </Section>
 
         <Section title='AppBadge'>
-          <div class='sg-row'>
+          <AppRow>
             <AppBadge>Pending</AppBadge>
             <AppBadge variant='success'>Field ready</AppBadge>
             <AppBadge variant='warning'>Wind watch</AppBadge>
             <AppBadge variant='danger'>Blocked</AppBadge>
             <AppBadge variant='info'>Assessment</AppBadge>
-          </div>
+          </AppRow>
         </Section>
 
         <Section title='AppAlert'>
-          <div class='sg-stack'>
+          <AppStack>
             <AppAlert>Service record updated by dispatch.</AppAlert>
             <AppAlert variant='success'>North Field completed and ready for customer review.</AppAlert>
             <AppAlert variant='warning'>Wind speed approaching service threshold.</AppAlert>
             <AppAlert variant='danger'>Chemical label missing required re-entry interval.</AppAlert>
             <AppAlert variant='info'>Crew assignment changed for the morning window.</AppAlert>
-          </div>
+          </AppStack>
         </Section>
 
         <Section title='AppTooltip'>
-          <div class='sg-row'>
+          <AppRow>
             <AppTooltip trigger='Hover field note' defaultOpen>
               Verify buffer zone before aerial application.
             </AppTooltip>
-          </div>
+          </AppRow>
         </Section>
 
         <Section title='AppDialog'>
-          <div class='sg-row'>
+          <AppRow>
             <AppDialog trigger='Open dispatch dialog'>
-              <div class='sg-stack'>
+              <AppStack>
                 <p>Confirm crew assignment before dispatch.</p>
-              </div>
+              </AppStack>
             </AppDialog>
-          </div>
+          </AppRow>
         </Section>
 
         <Section title='AppPopover'>
-          <div class='sg-row'>
+          <AppRow>
             <AppPopover trigger='Open field menu'>
-              <div class='sg-stack'>
+              <AppStack>
                 <p>Field actions, notes, and service history.</p>
-              </div>
+              </AppStack>
             </AppPopover>
-          </div>
+          </AppRow>
         </Section>
 
         <Section title='AppAccordion'>
@@ -505,7 +519,7 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppList'>
-          <div class='sg-row'>
+          <AppRow>
             <div>
               <AppList>
                 <AppListItem>Confirm chemical inventory</AppListItem>
@@ -527,7 +541,7 @@ export const StyleGuide = (): JSX.Element => {
                 <AppListItem>Execute work</AppListItem>
               </AppList>
             </div>
-          </div>
+          </AppRow>
         </Section>
 
         <Section title='AppAvatar'>

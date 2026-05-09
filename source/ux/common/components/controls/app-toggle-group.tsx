@@ -16,11 +16,11 @@ AppToggleItem   Toggle item control for AppToggleGroup.
 
 import {
   ToggleGroup,
-  type ToggleGroupRootProps,
-  type ToggleGroupItemProps
+  type ToggleGroupItemProps,
+  type ToggleGroupRootProps
 } from '@kobalte/core/toggle-group'
 import { type Component, type JSX, splitProps } from '@solid-js'
-import { type WithDataUI, controlState } from './controls-helpers.ts'
+import { controlState, type WithDataUI } from './controls-helpers.ts'
 
 /** Toggle-group control props. */
 export type AppToggleGroupProps<Value extends string = string> = {

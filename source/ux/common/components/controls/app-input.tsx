@@ -13,10 +13,7 @@ PUBLIC
 AppInput  Text input control with declared states.
 */
 
-import {
-  TextField,
-  type TextFieldInputProps
-} from '@kobalte/core/text-field'
+import { TextField, type TextFieldInputProps } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
 import { controlState } from './controls-helpers.ts'
 

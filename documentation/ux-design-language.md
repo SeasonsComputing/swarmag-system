@@ -479,6 +479,8 @@ Controls are based on Kobalte primitives and exposed as App{Control} components 
 | `AppSkeleton`    | —                 | loading placeholder                         |
 | `AppList`        | —                 | variants: default (clean), bullet, numbered |
 | `AppListItem`    | —                 | child of AppList                            |
+| `AppRow`         | —                 | horizontal flex layout primitive            |
+| `AppStack`       | —                 | vertical grid layout primitive              |
 
 ### 8.1.1 Control Contract
 
@@ -511,12 +513,14 @@ progress
 radio
 radio-group
 radio-item
+row
 list
 list-item
 select
 separator
 skeleton
 spinner
+stack
 tabs
 textarea
 toggle
@@ -699,11 +703,11 @@ These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark v
 
 #### Button
 
-| Token                                 | Dark value                    | Light value                   |
-| ------------------------------------- | ----------------------------- | ----------------------------- |
-| `--sa-btn-primary-bg`                 | `var(--sa-color-brand-end)`   | `oklch(var(--sa-p-teal))`     |
-| `--sa-btn-primary-bg-hover`           | `oklch(80% 0.13 185)`         | `oklch(72% 0.11 184.216)`     |
-| `--sa-btn-primary-text`               | `oklch(var(--sa-p-white))`    | `oklch(var(--sa-p-white))`    |
+| Token                                 | Dark value                  | Light value                 |
+| ------------------------------------- | --------------------------- | --------------------------- |
+| `--sa-btn-primary-bg`                 | `var(--sa-color-brand-end)` | `oklch(var(--sa-p-teal))`   |
+| `--sa-btn-primary-bg-hover`           | `oklch(80% 0.13 185)`       | `oklch(72% 0.11 184.216)`   |
+| `--sa-btn-primary-text`               | `oklch(var(--sa-p-white))`  | `oklch(var(--sa-p-white))`  |
 | `--sa-btn-danger-bg`                  | `oklch(var(--sa-p-danger))` | `oklch(var(--sa-p-danger))` |
 | `--sa-btn-danger-text`                | `oklch(var(--sa-p-white))`  | `oklch(var(--sa-p-white))`  |
 | `--sa-color-primary`                  | —                           | —                           |
@@ -733,26 +737,26 @@ These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark v
 
 #### Toggle / ToggleGroup
 
-| Token                        | Dark value                          | Light value                      |
-| ---------------------------- | ----------------------------------- | -------------------------------- |
-| `--sa-toggle-pressed-bg`     | `oklch(var(--sa-p-teal) / 0.15)`   | `oklch(var(--sa-p-teal) / 0.12)` |
-| `--sa-toggle-pressed-border` | `oklch(var(--sa-p-teal) / 0.60)`   | `oklch(var(--sa-p-teal) / 0.50)` |
-| `--sa-toggle-pressed-text`   | `oklch(var(--sa-p-teal))`          | `oklch(var(--sa-p-teal))`        |
-| `--sa-bg-surface-2`          | —                                   | —                                |
-| `--sa-border-default`        | —                                   | —                                |
-| `--sa-text-muted`            | —                                   | —                                |
+| Token                        | Dark value                       | Light value                      |
+| ---------------------------- | -------------------------------- | -------------------------------- |
+| `--sa-toggle-pressed-bg`     | `oklch(var(--sa-p-teal) / 0.15)` | `oklch(var(--sa-p-teal) / 0.12)` |
+| `--sa-toggle-pressed-border` | `oklch(var(--sa-p-teal) / 0.60)` | `oklch(var(--sa-p-teal) / 0.50)` |
+| `--sa-toggle-pressed-text`   | `oklch(var(--sa-p-teal))`        | `oklch(var(--sa-p-teal))`        |
+| `--sa-bg-surface-2`          | —                                | —                                |
+| `--sa-border-default`        | —                                | —                                |
+| `--sa-text-muted`            | —                                | —                                |
 
 #### Semantic / Interactive
 
 These tokens govern hover, selection, glow, and table row accent across all controls. All interactive states key off the teal primitive — green and green-teal must not appear here.
 
-| Token                  | Dark value                          | Light value                         |
-| ---------------------- | ----------------------------------- | ----------------------------------- |
-| `--sa-bg-hover`        | `oklch(var(--sa-p-teal) / 0.1)`    | `oklch(var(--sa-p-teal) / 0.08)`   |
-| `--sa-bg-selected`     | `oklch(var(--sa-p-teal) / 0.28)`   | `oklch(var(--sa-p-teal) / 0.15)`   |
-| `--sa-shadow-glow`     | `0 0 30px oklch(var(--sa-p-teal) / 0.3)` | `0 0 30px oklch(var(--sa-p-teal) / 0.2)` |
-| `--sa-shadow-glow-sm`  | `0 0 20px oklch(var(--sa-p-teal) / 0.3)` | `0 0 20px oklch(var(--sa-p-teal) / 0.2)` |
-| `--sa-table-section-bg`| `oklch(var(--sa-p-teal) / 0.2)`    | `oklch(var(--sa-p-teal) / 0.12)`   |
+| Token                   | Dark value                               | Light value                              |
+| ----------------------- | ---------------------------------------- | ---------------------------------------- |
+| `--sa-bg-hover`         | `oklch(var(--sa-p-teal) / 0.1)`          | `oklch(var(--sa-p-teal) / 0.08)`         |
+| `--sa-bg-selected`      | `oklch(var(--sa-p-teal) / 0.28)`         | `oklch(var(--sa-p-teal) / 0.15)`         |
+| `--sa-shadow-glow`      | `0 0 30px oklch(var(--sa-p-teal) / 0.3)` | `0 0 30px oklch(var(--sa-p-teal) / 0.2)` |
+| `--sa-shadow-glow-sm`   | `0 0 20px oklch(var(--sa-p-teal) / 0.3)` | `0 0 20px oklch(var(--sa-p-teal) / 0.2)` |
+| `--sa-table-section-bg` | `oklch(var(--sa-p-teal) / 0.2)`          | `oklch(var(--sa-p-teal) / 0.12)`         |
 
 #### Tabs (segmented pill)
 
@@ -902,7 +906,7 @@ or remains in app-local CSS if it is app-specific.
 
 **`[data-ui="progress"]`**
 
-- Track: `--sa-bg-surface-3`, `--sa-radius-full`, fixed height `--sa-jr-progress-height` (job-runner) or 5px (general)
+- Track: `--sa-bg-progress-track`, `--sa-radius-full`, fixed height `--sa-jr-progress-height` (job-runner, `1rem`) or `5px` (general)
 - `progress-fill`: `--sa-gradient-brand`, same radius
 
 **`[data-ui="spinner"]`**
@@ -946,6 +950,28 @@ or remains in app-local CSS if it is app-specific.
 - Framed content surface with `--sa-bg-card`, `--sa-border-card`, `--sa-shadow-card`, `--sa-radius-lg`, and `--sa-widget-pad`
 - Top accent stripe uses `--sa-gradient-stripe`, `--sa-card-stripe-height`, and `--sa-card-stripe-opacity`
 - No hover lift or hover shadow treatment
+
+**`[data-ui="row"]`**
+
+Horizontal flex layout primitive. Sizes to content by default.
+
+- Default: `display: inline-flex`, `flex-wrap: wrap`, gap `--sa-space-md`
+- `variant='fill'`: `display: flex`, `width: 100%`
+- Children: any `JSX.Element`
+- No state, no Kobalte binding
+
+Variants: `fill`
+
+**`[data-ui="stack"]`**
+
+Vertical grid layout primitive. Fills container width by default.
+
+- Default: `display: grid`, `gap: --sa-space-md`, `width: 100%`
+- `variant='inline'`: `justify-items: start`, `width: fit-content`
+- Children: any `JSX.Element`
+- No state, no Kobalte binding
+
+Variants: `inline`
 
 ### 8.1.4 Style Guide Harness
 

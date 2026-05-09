@@ -16,11 +16,11 @@ AppRadioItem   Radio item control for AppRadioGroup.
 
 import {
   RadioGroup,
-  type RadioGroupRootProps,
-  type RadioGroupItemProps
+  type RadioGroupItemProps,
+  type RadioGroupRootProps
 } from '@kobalte/core/radio-group'
 import { type Component, type JSX, splitProps } from '@solid-js'
-import { type WithDataUI, controlState } from './controls-helpers.ts'
+import { controlState, type WithDataUI } from './controls-helpers.ts'
 
 /** Radio-group control props. */
 export type AppRadioGroupProps<Value extends string = string> = {

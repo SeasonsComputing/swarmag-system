@@ -13,10 +13,7 @@ PUBLIC
 AppSelect  Single-value select control with declared states.
 */
 
-import {
-  Select,
-  type SelectRootItemComponentProps
-} from '@kobalte/core/select'
+import { Select, type SelectRootItemComponentProps } from '@kobalte/core/select'
 import { type JSX, splitProps } from '@solid-js'
 import { type AppOption, appOptionLabel, controlState } from './controls-helpers.ts'
 
@@ -66,7 +63,9 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
       disabled={local.disabled || local.loading}
       validationState={local.error ? 'invalid' : undefined}
       placeholder={local.placeholder}
-      {...(local.value === undefined ? {} : { value: local.options.find(o => o.value === local.value) ?? null })}
+      {...(local.value === undefined
+        ? {}
+        : { value: local.options.find(o => o.value === local.value) ?? null })}
       defaultValue={local.options.find(o => o.value === local.defaultValue)}
       onChange={(option: AppOption | null) => local.onChange?.(option?.value ?? '')}
       itemComponent={(item: SelectRootItemComponentProps<AppOption>) => (
@@ -77,7 +76,8 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
     >
       <Select.Trigger id={local.id} data-ui='select' data-ui-state={controlState(local)}>
         <Select.Value<AppOption>>
-          {state => state.selectedOption() ? appOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
+          {state =>
+            state.selectedOption() ? appOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
         </Select.Value>
         <Select.Icon data-ui='select-icon'>
           <span data-ui='select-icon-glyph' />
