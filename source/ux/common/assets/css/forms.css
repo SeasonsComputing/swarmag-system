@@ -6,7 +6,7 @@
 */
 
 /** Label + control as siblings */
-.app-form-field {
+.app-field {
   display: grid;
   gap: var(--sa-space-xs);
 }
