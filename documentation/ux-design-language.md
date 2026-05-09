@@ -699,10 +699,11 @@ These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark v
 
 #### Button
 
-| Token                                 | Dark value                  | Light value                 |
-| ------------------------------------- | --------------------------- | --------------------------- |
-| `--sa-btn-primary-bg`                 | `oklch(var(--sa-p-green))`  | `oklch(var(--sa-p-teal))`   |
-| `--sa-btn-primary-text`               | `oklch(var(--sa-p-black))`  | `oklch(var(--sa-p-white))`  |
+| Token                                 | Dark value                    | Light value                   |
+| ------------------------------------- | ----------------------------- | ----------------------------- |
+| `--sa-btn-primary-bg`                 | `var(--sa-color-brand-end)`   | `oklch(var(--sa-p-teal))`     |
+| `--sa-btn-primary-bg-hover`           | `oklch(80% 0.13 185)`         | `oklch(72% 0.11 184.216)`     |
+| `--sa-btn-primary-text`               | `oklch(var(--sa-p-white))`    | `oklch(var(--sa-p-white))`    |
 | `--sa-btn-danger-bg`                  | `oklch(var(--sa-p-danger))` | `oklch(var(--sa-p-danger))` |
 | `--sa-btn-danger-text`                | `oklch(var(--sa-p-white))`  | `oklch(var(--sa-p-white))`  |
 | `--sa-color-primary`                  | —                           | —                           |
@@ -732,14 +733,26 @@ These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark v
 
 #### Toggle / ToggleGroup
 
-| Token                        | Dark value                             | Light value                      |
-| ---------------------------- | -------------------------------------- | -------------------------------- |
-| `--sa-toggle-pressed-bg`     | `oklch(var(--sa-p-green-teal) / 0.15)` | `oklch(var(--sa-p-teal) / 0.12)` |
-| `--sa-toggle-pressed-border` | `oklch(var(--sa-p-green-teal) / 0.60)` | `oklch(var(--sa-p-teal) / 0.50)` |
-| `--sa-toggle-pressed-text`   | `oklch(var(--sa-p-green))`             | `oklch(var(--sa-p-teal))`        |
-| `--sa-bg-surface-2`          | —                                      | —                                |
-| `--sa-border-default`        | —                                      | —                                |
-| `--sa-text-muted`            | —                                      | —                                |
+| Token                        | Dark value                          | Light value                      |
+| ---------------------------- | ----------------------------------- | -------------------------------- |
+| `--sa-toggle-pressed-bg`     | `oklch(var(--sa-p-teal) / 0.15)`   | `oklch(var(--sa-p-teal) / 0.12)` |
+| `--sa-toggle-pressed-border` | `oklch(var(--sa-p-teal) / 0.60)`   | `oklch(var(--sa-p-teal) / 0.50)` |
+| `--sa-toggle-pressed-text`   | `oklch(var(--sa-p-teal))`          | `oklch(var(--sa-p-teal))`        |
+| `--sa-bg-surface-2`          | —                                   | —                                |
+| `--sa-border-default`        | —                                   | —                                |
+| `--sa-text-muted`            | —                                   | —                                |
+
+#### Semantic / Interactive
+
+These tokens govern hover, selection, glow, and table row accent across all controls. All interactive states key off the teal primitive — green and green-teal must not appear here.
+
+| Token                  | Dark value                          | Light value                         |
+| ---------------------- | ----------------------------------- | ----------------------------------- |
+| `--sa-bg-hover`        | `oklch(var(--sa-p-teal) / 0.1)`    | `oklch(var(--sa-p-teal) / 0.08)`   |
+| `--sa-bg-selected`     | `oklch(var(--sa-p-teal) / 0.28)`   | `oklch(var(--sa-p-teal) / 0.15)`   |
+| `--sa-shadow-glow`     | `0 0 30px oklch(var(--sa-p-teal) / 0.3)` | `0 0 30px oklch(var(--sa-p-teal) / 0.2)` |
+| `--sa-shadow-glow-sm`  | `0 0 20px oklch(var(--sa-p-teal) / 0.3)` | `0 0 20px oklch(var(--sa-p-teal) / 0.2)` |
+| `--sa-table-section-bg`| `oklch(var(--sa-p-teal) / 0.2)`    | `oklch(var(--sa-p-teal) / 0.12)`   |
 
 #### Tabs (segmented pill)
 

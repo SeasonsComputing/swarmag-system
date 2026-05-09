@@ -134,8 +134,8 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-overlay: oklch(var(--sa-p-black) / 0.2);
   --sa-bg-popup: oklch(28% 0.018 252);
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
-  --sa-bg-hover: oklch(var(--sa-p-green-teal) / 0.1);
-  --sa-bg-selected: oklch(var(--sa-p-green-teal) / 0.28);
+  --sa-bg-hover: oklch(var(--sa-p-teal) / 0.1);
+  --sa-bg-selected: oklch(var(--sa-p-teal) / 0.28);
   --sa-bg-input: var(--sa-bg-control);
   --sa-bg-input-focus: var(--sa-bg-hover);
   --sa-bg-control: oklch(var(--sa-p-white) / 0.03);
@@ -192,8 +192,8 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.4);
   --sa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--sa-p-white) / 0.06);
   --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.55), inset 0 1px 0 oklch(var(--sa-p-white) / 0.1);
-  --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-green-teal) / 0.3);
-  --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-green-teal) / 0.3);
+  --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-teal) / 0.3);
+  --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-teal) / 0.3);
   --sa-shadow-btn:
     0 15px 40px oklch(78% 0.12 185 / 0.32),
     0 0 40px oklch(66% 0.14 235 / 0.24),
@@ -276,15 +276,15 @@ Typography        -> App typography tokens consumed by base and controls.
   /* --- Control Tokens --- */
   --sa-btn-primary-bg: var(--sa-color-brand-end);
   --sa-btn-primary-text: oklch(var(--sa-p-white));
-  --sa-btn-primary-bg-hover: oklch(80% 0.13 123.993);
+  --sa-btn-primary-bg-hover: oklch(80% 0.13 185);
   --sa-btn-danger-bg: oklch(55% 0.18 29);
   --sa-btn-danger-bg-hover: oklch(var(--sa-p-danger));
   --sa-btn-danger-text: oklch(var(--sa-p-white));
   --sa-control-bg-error: oklch(18% 0.015 25);
   --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.22);
-  --sa-toggle-pressed-bg: oklch(var(--sa-p-green-teal) / 0.15);
-  --sa-toggle-pressed-border: oklch(var(--sa-p-green-teal) / 0.60);
-  --sa-toggle-pressed-text: oklch(var(--sa-p-green));
+  --sa-toggle-pressed-bg: oklch(var(--sa-p-teal) / 0.15);
+  --sa-toggle-pressed-border: oklch(var(--sa-p-teal) / 0.60);
+  --sa-toggle-pressed-text: oklch(var(--sa-p-teal));
   --sa-tab-pill-bg: oklch(var(--sa-p-surface-2));
   --sa-tab-active-bg: oklch(var(--sa-p-surface-3));
   --sa-tab-active-text: oklch(var(--sa-p-near-white));
@@ -300,7 +300,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-table-first-pad-data: 0.75rem;
   --sa-table-head-bg: oklch(var(--sa-p-surface-2));
   --sa-table-head-color: oklch(var(--sa-p-near-white));
-  --sa-table-section-bg: oklch(var(--sa-p-green-teal) / 0.2);
+  --sa-table-section-bg: oklch(var(--sa-p-teal) / 0.2);
   --sa-table-section-color: oklch(var(--sa-p-near-white));
   --sa-table-row-even: oklch(var(--sa-p-surface-1));
   --sa-table-row-odd: oklch(var(--sa-p-surface-2) / 0.6);
@@ -471,7 +471,7 @@ Typography        -> App typography tokens consumed by base and controls.
 
   /* --- Table --- */
   --sa-table-head-bg: oklch(var(--sa-p-surface-2));
-  --sa-table-section-bg: oklch(var(--sa-p-green-teal) / 0.12);
+  --sa-table-section-bg: oklch(var(--sa-p-teal) / 0.12);
   --sa-table-section-color: oklch(var(--sa-p-surface-1));
   --sa-table-row-even: oklch(100% 0 0);
   --sa-table-row-odd: oklch(96% 0.006 180);

@@ -280,7 +280,7 @@
 [data-ui='multi-select']:focus-within [data-ui='multi-select-item'][data-highlighted][data-selected],
 [data-ui='multi-select']:focus-within
   [data-ui='multi-select-item'][data-highlighted][aria-selected='true'] {
-  background: oklch(var(--sa-p-green-teal) / 0.4);
+  background: var(--sa-bg-selected);
 }
 
 [data-ui='multi-select-item'][data-disabled] {

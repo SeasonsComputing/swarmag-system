@@ -211,9 +211,9 @@ export const StyleGuide = (): JSX.Element => {
 
         <Section title='AppButton'>
           <div class='sg-row'>
-            <AppButton variant='secondary' onClick={() => setLoading(!loading())}>
-              Toggle loading
-            </AppButton>
+            <AppToggle pressed={loading()} onClick={() => setLoading(!loading())}>
+              Loading
+            </AppToggle>
           </div>
           <div class='sg-row'>
             <For each={BUTTON_VARIANTS}>
@@ -230,9 +230,9 @@ export const StyleGuide = (): JSX.Element => {
 
         <Section title='AppInput / AppTextarea'>
           <div class='sg-row'>
-            <AppButton variant='secondary' onClick={() => setInputError(!inputError())}>
-              Toggle error
-            </AppButton>
+            <AppToggle pressed={inputError()} onClick={() => setInputError(!inputError())}>
+              Error
+            </AppToggle>
           </div>
           <AppFormGrid>
             <AppField label='Field name' for='field-name'>
@@ -271,9 +271,9 @@ export const StyleGuide = (): JSX.Element => {
 
         <Section title='AppSelect / AppMultiSelect'>
           <div class='sg-row'>
-            <AppButton variant='secondary' onClick={() => setInputError(!inputError())}>
-              Toggle error
-            </AppButton>
+            <AppToggle pressed={inputError()} onClick={() => setInputError(!inputError())}>
+              Error
+            </AppToggle>
           </div>
           <AppFormGrid>
             <AppField label='Service status' for='service-status'>
