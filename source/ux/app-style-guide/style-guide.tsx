@@ -89,6 +89,7 @@ export const StyleGuide = (): JSX.Element => {
   const [theme, setTheme] = createSignal<Theme>('dark')
   const [loading, setLoading] = createSignal(false)
   const [inputError, setInputError] = createSignal(false)
+  const [selectError, setSelectError] = createSignal(false)
   const [checkboxChecked, setCheckboxChecked] = createSignal(true)
   const [checkboxDrift, setCheckboxDrift] = createSignal(false)
   const [checkboxError, setCheckboxError] = createSignal(false)
@@ -210,11 +211,11 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppButton'>
-          <div class='sg-row'>
-            <AppToggle pressed={loading()} onClick={() => setLoading(!loading())}>
+          <AppField label='Toggle loading state' for='button-loading-toggle' variant='inline'>
+            <AppToggle id='button-loading-toggle' pressed={loading()} onClick={() => setLoading(!loading())}>
               Loading
             </AppToggle>
-          </div>
+          </AppField>
           <div class='sg-row'>
             <For each={BUTTON_VARIANTS}>
               {entry => <AppButton variant={entry.variant}>{entry.label}</AppButton>}
@@ -229,11 +230,11 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppInput / AppTextarea'>
-          <div class='sg-row'>
-            <AppToggle pressed={inputError()} onClick={() => setInputError(!inputError())}>
+          <AppField label='Toggle error state' for='input-error-toggle' variant='inline'>
+            <AppToggle id='input-error-toggle' pressed={inputError()} onClick={() => setInputError(!inputError())}>
               Error
             </AppToggle>
-          </div>
+          </AppField>
           <AppFormGrid>
             <AppField label='Field name' for='field-name'>
               <AppInput
@@ -270,17 +271,17 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppSelect / AppMultiSelect'>
-          <div class='sg-row'>
-            <AppToggle pressed={inputError()} onClick={() => setInputError(!inputError())}>
+          <AppField label='Toggle error state' for='select-error-toggle' variant='inline'>
+            <AppToggle id='select-error-toggle' pressed={selectError()} onClick={() => setSelectError(!selectError())}>
               Error
             </AppToggle>
-          </div>
+          </AppField>
           <AppFormGrid>
-            <AppField label='Service status' for='service-status'>
+            <AppField label='Single-select' for='service-status'>
               <AppSelect
                 id='service-status'
                 placeholder='Select service status'
-                error={inputError()}
+                error={selectError()}
                 options={STATUSES}
               />
             </AppField>
@@ -288,12 +289,14 @@ export const StyleGuide = (): JSX.Element => {
               <AppSelect
                 id='disabled-select'
                 disabled
-                defaultValue='Ground - Sprayer'
+                defaultValue='Ready'
                 options={STATUSES}
               />
             </AppField>
           </AppFormGrid>
-          <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
+          <AppField label='Multi-select' for='multi-select-demo'>
+            <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
+          </AppField>
         </Section>
 
         <Section title='AppField / AppFieldset / AppFormGrid / AppFormActions'>
@@ -437,25 +440,31 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='AppTooltip'>
-          <AppTooltip trigger={<AppButton variant='secondary'>Hover field note</AppButton>} defaultOpen>
-            Verify buffer zone before aerial application.
-          </AppTooltip>
+          <div class='sg-row'>
+            <AppTooltip trigger='Hover field note' defaultOpen>
+              Verify buffer zone before aerial application.
+            </AppTooltip>
+          </div>
         </Section>
 
         <Section title='AppDialog'>
-          <AppDialog trigger={<AppButton variant='secondary'>Open dispatch dialog</AppButton>}>
-            <div class='sg-stack'>
-              <p>Confirm crew assignment before dispatch.</p>
-            </div>
-          </AppDialog>
+          <div class='sg-row'>
+            <AppDialog trigger='Open dispatch dialog'>
+              <div class='sg-stack'>
+                <p>Confirm crew assignment before dispatch.</p>
+              </div>
+            </AppDialog>
+          </div>
         </Section>
 
         <Section title='AppPopover'>
-          <AppPopover trigger={<AppButton variant='secondary'>Open field menu</AppButton>}>
-            <div class='sg-stack'>
-              <p>Field actions, notes, and service history.</p>
-            </div>
-          </AppPopover>
+          <div class='sg-row'>
+            <AppPopover trigger='Open field menu'>
+              <div class='sg-stack'>
+                <p>Field actions, notes, and service history.</p>
+              </div>
+            </AppPopover>
+          </div>
         </Section>
 
         <Section title='AppAccordion'>

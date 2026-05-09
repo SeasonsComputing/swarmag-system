@@ -15,12 +15,14 @@ AppTooltip  Tooltip control with declared states.
 
 import { Tooltip } from '@kobalte/core/tooltip'
 import { type JSX, splitProps } from '@solid-js'
+import { AppButton, type AppButtonVariant } from './app-button.tsx'
 import { controlState } from './controls-helpers.ts'
 
 /** Tooltip control props. */
 export type AppTooltipProps = {
   children?: JSX.Element
   trigger?: JSX.Element
+  triggerVariant?: AppButtonVariant
   open?: boolean
   defaultOpen?: boolean
   error?: boolean
@@ -39,6 +41,7 @@ export const AppTooltip = (props: AppTooltipProps): JSX.Element => {
   const [local] = splitProps(props, [
     'children',
     'trigger',
+    'triggerVariant',
     'open',
     'defaultOpen',
     'error',
@@ -54,7 +57,11 @@ export const AppTooltip = (props: AppTooltipProps): JSX.Element => {
       onOpenChange={local.onOpenChange}
       disabled={local.disabled || local.loading}
     >
-      <Tooltip.Trigger>
+      <Tooltip.Trigger
+        as={AppButton}
+        disabled={local.disabled || local.loading}
+        variant={local.triggerVariant ?? 'secondary'}
+      >
         {local.trigger}
       </Tooltip.Trigger>
       <Tooltip.Portal>

@@ -65,7 +65,8 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
       optionTextValue={appOptionLabel}
       disabled={local.disabled || local.loading}
       validationState={local.error ? 'invalid' : undefined}
-      value={local.options.find(o => o.value === local.value) ?? null}
+      placeholder={local.placeholder}
+      {...(local.value === undefined ? {} : { value: local.options.find(o => o.value === local.value) ?? null })}
       defaultValue={local.options.find(o => o.value === local.defaultValue)}
       onChange={(option: AppOption | null) => local.onChange?.(option?.value ?? '')}
       itemComponent={(item: SelectRootItemComponentProps<AppOption>) => (
@@ -78,6 +79,9 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
         <Select.Value<AppOption>>
           {state => state.selectedOption() ? appOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
         </Select.Value>
+        <Select.Icon data-ui='select-icon'>
+          <span data-ui='select-icon-glyph' />
+        </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
         <SelectContent data-ui='select-content'>

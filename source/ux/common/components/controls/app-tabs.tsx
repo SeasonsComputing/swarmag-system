@@ -27,6 +27,9 @@ import { type Component, type JSX, splitProps } from '@solid-js'
 import { type WithDataUI, controlState } from './controls-helpers.ts'
 
 /** Tabs control props. */
+export type AppTabsActivationMode = 'automatic' | 'manual'
+
+/** Tabs control props. */
 export type AppTabsProps<Value extends string = string> = {
   children?: JSX.Element
   disabled?: boolean
@@ -34,6 +37,7 @@ export type AppTabsProps<Value extends string = string> = {
   loading?: boolean
   value?: Value
   defaultValue?: Value
+  activationMode?: AppTabsActivationMode
   onChange?: (value: Value) => void
   class?: never
   classList?: never
@@ -88,6 +92,7 @@ export const AppTabs = <Value extends string = string>(
     'loading',
     'value',
     'defaultValue',
+    'activationMode',
     'onChange'
   ])
 
@@ -98,6 +103,7 @@ export const AppTabs = <Value extends string = string>(
       disabled={local.disabled}
       value={local.value}
       defaultValue={local.defaultValue}
+      activationMode={local.activationMode ?? 'manual'}
       onChange={local.onChange as ((value: string) => void) | undefined}
     >
       {local.children}

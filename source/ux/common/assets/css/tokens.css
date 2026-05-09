@@ -280,7 +280,6 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-btn-danger-bg: oklch(55% 0.18 29);
   --sa-btn-danger-bg-hover: oklch(var(--sa-p-danger));
   --sa-btn-danger-text: oklch(var(--sa-p-white));
-  --sa-control-bg-error: oklch(18% 0.015 25);
   --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.22);
   --sa-toggle-pressed-bg: oklch(var(--sa-p-teal) / 0.15);
   --sa-toggle-pressed-border: oklch(var(--sa-p-teal) / 0.60);
@@ -483,7 +482,6 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-btn-danger-bg: oklch(55% 0.18 29);
   --sa-btn-danger-bg-hover: oklch(var(--sa-p-danger));
   --sa-btn-danger-text: oklch(var(--sa-p-white));
-  --sa-control-bg-error: oklch(98% 0.01 25);
   --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.18);
   --sa-toggle-pressed-bg: oklch(50% 0.1 150 / 0.18);
   --sa-toggle-pressed-border: oklch(50% 0.1 150 / 0.75);

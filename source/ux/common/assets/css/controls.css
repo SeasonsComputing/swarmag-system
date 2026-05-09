@@ -98,18 +98,38 @@
 }
 
 [data-ui='select'] {
+  align-items: center;
   background: var(--sa-bg-input);
-  border: var(--sa-border-input);
+  border: var(--sa-border-strong);
   border-radius: var(--sa-radius-md);
   color: var(--sa-text-primary);
+  cursor: pointer;
+  display: inline-flex;
   font-family: var(--sa-font-label);
   font-size: var(--sa-font-sm);
   font-weight: var(--sa-weight-normal);
+  gap: var(--sa-space-sm);
+  justify-content: space-between;
   min-height: var(--sa-touch-target-sm);
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
   text-align: start;
   transition: var(--sa-transition-fast);
+  width: 100%;
+}
+
+[data-ui='select-icon'] {
+  color: var(--sa-color-primary);
+  flex: none;
+  height: 1rem;
+  width: 1rem;
+}
+
+[data-ui='select-icon-glyph'] {
+  background: currentcolor;
+  display: block;
+  height: 100%;
+  mask: url('../icons/chevron-down.svg') center / contain no-repeat;
   width: 100%;
 }
 
@@ -124,9 +144,8 @@
   background: var(--sa-bg-input-focus);
 }
 
-[data-ui='select'] [data-placeholder-shown]::before {
-  color: var(--sa-text-placeholder);
-  content: attr(placeholder);
+[data-ui='select'] [data-placeholder-shown] {
+  color: var(--sa-text-muted);
 }
 
 [data-ui='input']:focus-visible,
@@ -140,20 +159,35 @@
 [data-ui='input'][data-ui-state='error'],
 [data-ui='textarea'][data-ui-state='error'],
 [data-ui='select'][data-ui-state='error'] {
-  background: var(--sa-control-bg-error);
   border-color: var(--sa-border-input-error);
   box-shadow: var(--sa-control-ring-error);
+}
+
+[data-ui='input'][data-ui-state='error']:focus-visible,
+[data-ui='textarea'][data-ui-state='error']:focus-visible,
+[data-ui='select'][data-ui-state='error']:focus-visible {
+  box-shadow: var(--sa-focus-ring);
 }
 
 [data-ui='input'][data-ui-state='disabled'],
 [data-ui='textarea'][data-ui-state='disabled'],
 [data-ui='select'][data-ui-state='disabled'] {
   background: var(--sa-bg-input-disabled);
+  border: var(--sa-border-default);
+  color: var(--sa-text-disabled);
+  cursor: not-allowed;
 }
 
 [data-ui='select-content'] ul {
+  border-radius: var(--sa-radius-sm);
   list-style: none;
+  margin: 0;
   padding: 0;
+}
+
+[data-ui='select-content'] ul:focus-visible {
+  box-shadow: var(--sa-focus-ring);
+  outline: none;
 }
 
 [data-ui='select-content'] {
@@ -277,10 +311,12 @@
   font-size: var(--sa-font-xs);
 }
 
+[data-ui='multi-select-item'][data-selected]:hover,
+[data-ui='multi-select-item'][aria-selected='true']:hover,
 [data-ui='multi-select']:focus-within [data-ui='multi-select-item'][data-highlighted][data-selected],
 [data-ui='multi-select']:focus-within
   [data-ui='multi-select-item'][data-highlighted][aria-selected='true'] {
-  background: var(--sa-bg-selected);
+  background: color-mix(in oklch, var(--sa-bg-selected) 76%, var(--sa-color-primary) 24%);
 }
 
 [data-ui='multi-select-item'][data-disabled] {
@@ -533,17 +569,14 @@
 }
 
 [data-ui='tab-list'] {
-  background: var(--sa-tab-pill-bg);
-  border-radius: var(--sa-radius-md);
   display: inline-flex;
   gap: var(--sa-space-xs);
-  padding: var(--sa-space-xs);
 }
 
 [data-ui='tab-list'] [data-ui='tab'],
 [data-ui='tab-list'] [role='tab'] {
   background: transparent;
-  border: unset;
+  border: var(--sa-border-default);
   border-radius: var(--sa-radius-sm);
   color: var(--sa-text-muted);
   cursor: pointer;
@@ -565,8 +598,9 @@
 }
 
 [data-ui='tab-list'] [data-ui='tab'][data-selected] {
-  background: var(--sa-tab-active-bg);
-  color: var(--sa-tab-active-text);
+  background: var(--sa-toggle-pressed-bg);
+  border-color: var(--sa-toggle-pressed-border);
+  color: var(--sa-toggle-pressed-text);
   font-weight: var(--sa-weight-medium);
 }
 
