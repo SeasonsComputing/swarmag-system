@@ -13,11 +13,8 @@ PUBLIC
 AppMultiSelect  Inline multi-value select control with declared states.
 */
 
-import {
-  Listbox,
-  type ListboxItemOptions
-} from '@kobalte/core/listbox'
 import { type StringSet } from '@core/std'
+import { Listbox, type ListboxItemOptions } from '@kobalte/core/listbox'
 import { type JSX, splitProps } from '@solid-js'
 import { type AppOption, appOptionLabel, controlState } from './controls-helpers.ts'
 

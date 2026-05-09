@@ -36,10 +36,12 @@ export {
   AppRadioItem,
   type AppRadioItemProps
 } from './app-radio-group.tsx'
+export { AppRow, type AppRowProps, type AppRowVariant } from './app-row.tsx'
 export { AppSelect, type AppSelectProps } from './app-select.tsx'
 export { AppSeparator, type AppSeparatorProps } from './app-separator.tsx'
 export { AppSkeleton, type AppSkeletonProps } from './app-skeleton.tsx'
 export { AppSpinner, type AppSpinnerProps } from './app-spinner.tsx'
+export { AppStack, type AppStackProps, type AppStackVariant } from './app-stack.tsx'
 export {
   AppTable,
   AppTableBody,

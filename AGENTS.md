@@ -70,7 +70,7 @@ scope.
 
 ### 2.6 Token Usage Efficiency
 
-During reasoning operations an AI should delegate non-reasoning tasks to a free-of-cost subagent whenever possible. 
+During reasoning operations an AI should delegate non-reasoning tasks to a free-of-cost subagent whenever possible.
 When the reasoning agent delegates to a free-subagent, it should seek parallelism by employing multiple subagents simultaneously if appropriate.
 
 If no free-subagent is available, the AI should ask the Chief Architect for permission to perform the task itself.

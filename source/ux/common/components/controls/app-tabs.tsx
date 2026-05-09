@@ -18,13 +18,13 @@ AppTabPanel  Tab panel control for AppTabs.
 
 import {
   Tabs,
-  type TabsRootProps,
+  type TabsContentProps,
   type TabsListProps,
-  type TabsTriggerProps,
-  type TabsContentProps
+  type TabsRootProps,
+  type TabsTriggerProps
 } from '@kobalte/core/tabs'
 import { type Component, type JSX, splitProps } from '@solid-js'
-import { type WithDataUI, controlState } from './controls-helpers.ts'
+import { controlState, type WithDataUI } from './controls-helpers.ts'
 
 /** Tabs control props. */
 export type AppTabsActivationMode = 'automatic' | 'manual'

@@ -13,9 +13,7 @@ PUBLIC
 AppProgress  Progress control with declared states.
 */
 
-import {
-  Progress
-} from '@kobalte/core/progress'
+import { Progress } from '@kobalte/core/progress'
 import { type JSX, splitProps } from '@solid-js'
 import { controlState } from './controls-helpers.ts'
 

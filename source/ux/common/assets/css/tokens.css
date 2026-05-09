@@ -131,6 +131,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-surface-1: oklch(21% 0.018 252 / 0.88);
   --sa-bg-surface-2: oklch(28% 0.018 252 / 0.78);
   --sa-bg-surface-3: oklch(25% 0.02 248 / 0.7);
+  --sa-bg-progress-track: oklch(35% 0.02 252 / 0.6);
   --sa-bg-overlay: oklch(var(--sa-p-black) / 0.2);
   --sa-bg-popup: oklch(28% 0.018 252);
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
@@ -282,7 +283,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-btn-danger-text: oklch(var(--sa-p-white));
   --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.22);
   --sa-toggle-pressed-bg: oklch(var(--sa-p-teal) / 0.15);
-  --sa-toggle-pressed-border: oklch(var(--sa-p-teal) / 0.60);
+  --sa-toggle-pressed-border: oklch(var(--sa-p-teal) / 0.6);
   --sa-toggle-pressed-text: oklch(var(--sa-p-teal));
   --sa-tab-pill-bg: oklch(var(--sa-p-surface-2));
   --sa-tab-active-bg: oklch(var(--sa-p-surface-3));
@@ -342,6 +343,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-motion-page-fade: 200ms;
   --sa-motion-spinner: 0.8s;
   --sa-motion-skeleton: 1.4s;
+  --sa-skeleton-shimmer: oklch(42% 0.025 252 / 0.6);
 
   /* --- Misc --- */
   --sa-blur: blur(10px);
@@ -368,6 +370,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-surface-1: oklch(100% 0 0);
   --sa-bg-surface-2: oklch(97% 0.004 264.5);
   --sa-bg-surface-3: oklch(93% 0.006 264.5);
+  --sa-bg-progress-track: oklch(88% 0.008 264.5);
   --sa-bg-overlay: oklch(0% 0 0 / 0.06);
   --sa-bg-popup: oklch(100% 0 0);
   --sa-bg-table: oklch(0% 0 0 / 0.02);
@@ -382,6 +385,8 @@ Typography        -> App typography tokens consumed by base and controls.
     oklch(98% 0.003 220 / 0.88) 0%,
     oklch(100% 0 0 / 0.94) 100%
   );
+
+  --sa-skeleton-shimmer: oklch(85% 0.008 264.5);
 
   /* --- Text --- */
   --sa-text-primary: oklch(var(--sa-p-surface-1));
@@ -598,7 +603,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-jr-option-radius: var(--sa-radius-md);
 
   /* --- Progress bar height --- */
-  --sa-jr-progress-height: 0.5rem;
+  --sa-jr-progress-height: 1rem;
 
   /* --- Screen padding — generous for glance-ability --- */
   --sa-jr-screen-pad: 1.5rem;
