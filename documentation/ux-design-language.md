@@ -132,7 +132,7 @@ multiple rules causes drift (the figcaption problem).
 
 `label` additionally carries `color: var(--sa-text-secondary)` — labels are subordinate to the content they describe. `legend` inherits primary text color as a group heading.
 
-`blockquote` is deferred — treatment depends on L&F decision for decorated vs plain variants.
+`blockquote`: teal left border (`--sa-color-primary`, 3px), italic, `--sa-text-secondary`, `--sa-font-body`, no inline margin. Styled in `base.css`.
 
 ## 4. Token Architecture
 
@@ -426,6 +426,16 @@ AppFormActions  action buttons — always outside fieldsets, at form tail
 </AppFormActions>
 ```
 
+**`AppField variant='inline'`**
+
+Use when a label + control pair should size to content and sit inline with siblings (e.g., a toggle with a label above it inside an `AppRow`). Applies `justify-items: start` so the grid cell doesn't stretch the control to full width.
+
+```tsx
+<AppField label='Toggle error state' for='my-toggle' variant='inline'>
+  <AppToggle id='my-toggle' pressed={…} onClick={…}>Error</AppToggle>
+</AppField>
+```
+
 **Rules:**
 
 - `AppField` always uses explicit `for`/`id` association — never wraps a control without it
@@ -453,34 +463,39 @@ Controls are based on Kobalte primitives and exposed as App{Control} components 
 
 **Location:** `source/ux/common/components/controls`
 
-| Component        | Kobalte Primitive | Notes                                       |
-| ---------------- | ----------------- | ------------------------------------------- |
-| `AppButton`      | `Button`          | variants: primary, secondary, ghost, danger |
-| `AppCard`        | —                 | reusable framed content surface             |
-| `AppInput`       | `TextField`       | text, number variants                       |
-| `AppTextarea`    | `TextField`       | multiline                                   |
-| `AppSelect`      | `Select`          | single value                                |
-| `AppMultiSelect` | `Listbox`         | multi value                                 |
-| `AppCheckbox`    | `Checkbox`        |                                             |
-| `AppRadioGroup`  | `RadioGroup`      |                                             |
-| `AppToggle`      | `ToggleButton`    |                                             |
-| `AppToggleGroup` | `ToggleButton`    | e.g. calendar/list switcher                 |
-| `AppDialog`      | `Dialog`          | modal base                                  |
-| `AppPopover`     | `Popover`         | context menu, tooltips                      |
-| `AppTooltip`     | `Tooltip`         |                                             |
-| `AppTabs`        | `Tabs`            |                                             |
-| `AppAccordion`   | `Accordion`       |                                             |
-| `AppProgress`    | `Progress`        | linear, workflow progress                   |
-| `AppBadge`       | —                 | status pill, signal word severity           |
-| `AppAvatar`      | —                 | user avatar, initials fallback              |
-| `AppSeparator`   | `Separator`       |                                             |
-| `AppAlert`       | —                 | success / warning / danger / info           |
-| `AppSpinner`     | —                 | loading state                               |
-| `AppSkeleton`    | —                 | loading placeholder                         |
-| `AppList`        | —                 | variants: default (clean), bullet, numbered |
-| `AppListItem`    | —                 | child of AppList                            |
-| `AppRow`         | —                 | horizontal flex layout primitive            |
-| `AppStack`       | —                 | vertical grid layout primitive              |
+| Component        | Kobalte Primitive | Notes                                                  |
+| ---------------- | ----------------- | ------------------------------------------------------ |
+| `AppButton`      | `Button`          | variants: primary, secondary, ghost, danger            |
+| `AppCard`        | —                 | reusable framed content surface; panel look is default |
+| `AppInput`       | `TextField`       | text, number variants                                  |
+| `AppTextarea`    | `TextField`       | multiline                                              |
+| `AppSelect`      | `Select`          | single value                                           |
+| `AppMultiSelect` | `Listbox`         | multi value                                            |
+| `AppCheckbox`    | `Checkbox`        |                                                        |
+| `AppRadioGroup`  | `RadioGroup`      |                                                        |
+| `AppToggle`      | `ToggleButton`    |                                                        |
+| `AppToggleGroup` | `ToggleButton`    | e.g. calendar/list switcher                            |
+| `AppDialog`      | `Dialog`          | modal base                                             |
+| `AppPopover`     | `Popover`         | context menu, tooltips                                 |
+| `AppTooltip`     | `Tooltip`         |                                                        |
+| `AppTabs`        | `Tabs`            |                                                        |
+| `AppAccordion`   | `Accordion`       |                                                        |
+| `AppProgress`    | `Progress`        | linear, workflow progress                              |
+| `AppBadge`       | —                 | status pill, signal word severity                      |
+| `AppAvatar`      | —                 | user avatar, initials fallback                         |
+| `AppSeparator`   | `Separator`       |                                                        |
+| `AppAlert`       | —                 | success / warning / danger / info                      |
+| `AppSpinner`     | —                 | loading state                                          |
+| `AppSkeleton`    | —                 | loading placeholder                                    |
+| `AppList`        | —                 | variants: default (clean), bullet, numbered            |
+| `AppListItem`    | —                 | child of AppList                                       |
+| `AppTable`       | —                 | semantic table wrapper                                 |
+| `AppTableHeader` | —                 | `<thead><tr>` wrapper; cells render as `<th>`          |
+| `AppTableBody`   | —                 | `<tbody>` wrapper                                      |
+| `AppTableRow`    | —                 | `<tr>`; `variant='section'` for accent row             |
+| `AppTableCell`   | —                 | context-aware `<th>` or `<td>`                         |
+| `AppRow`         | —                 | horizontal flex layout primitive                       |
+| `AppStack`       | —                 | vertical grid layout primitive                         |
 
 ### 8.1.1 Control Contract
 
@@ -521,6 +536,11 @@ separator
 skeleton
 spinner
 stack
+table
+table-body
+table-cell
+table-header
+table-row
 tabs
 textarea
 toggle
@@ -724,7 +744,6 @@ These tokens are declared in `tokens.css` and consumed by `controls.css`. Dark v
 
 | Token                     | Dark value                         | Light value                        |
 | ------------------------- | ---------------------------------- | ---------------------------------- |
-| `--sa-control-bg-error`   | `oklch(18% 0.015 25)`              | `oklch(98% 0.010 25)`              |
 | `--sa-control-ring-error` | `oklch(var(--sa-p-danger) / 0.22)` | `oklch(var(--sa-p-danger) / 0.18)` |
 | `--sa-bg-input`           | —                                  | —                                  |
 | `--sa-bg-input-focus`     | —                                  | —                                  |
@@ -758,25 +777,29 @@ These tokens govern hover, selection, glow, and table row accent across all cont
 | `--sa-shadow-glow-sm`   | `0 0 20px oklch(var(--sa-p-teal) / 0.3)` | `0 0 20px oklch(var(--sa-p-teal) / 0.2)` |
 | `--sa-table-section-bg` | `oklch(var(--sa-p-teal) / 0.2)`          | `oklch(var(--sa-p-teal) / 0.12)`         |
 
-#### Tabs (segmented pill)
+#### Tabs
 
-| Token                  | Dark value                      | Light value                    |
-| ---------------------- | ------------------------------- | ------------------------------ |
-| `--sa-tab-pill-bg`     | `oklch(var(--sa-p-surface-2))`  | `oklch(88% 0.006 264.5)`       |
-| `--sa-tab-active-bg`   | `oklch(var(--sa-p-surface-3))`  | `oklch(100% 0 0)`              |
-| `--sa-tab-active-text` | `oklch(var(--sa-p-near-white))` | `oklch(var(--sa-p-surface-1))` |
-| `--sa-text-muted`      | —                               | —                              |
+Active tab state reuses toggle-pressed tokens — no separate tab active tokens.
+
+| Token                        | Dark value | Light value |
+| ---------------------------- | ---------- | ----------- |
+| `--sa-toggle-pressed-bg`     | —          | —           |
+| `--sa-toggle-pressed-border` | —          | —           |
+| `--sa-toggle-pressed-text`   | —          | —           |
+| `--sa-bg-hover`              | —          | —           |
+| `--sa-text-muted`            | —          | —           |
 
 #### Skeleton / Spinner
 
-| Token                  | Dark value | Light value |
-| ---------------------- | ---------- | ----------- |
-| `--sa-bg-surface-2`    | —          | —           |
-| `--sa-bg-surface-3`    | —          | —           |
-| `--sa-color-primary`   | —          | —           |
-| `--sa-border-default`  | —          | —           |
-| `--sa-motion-spinner`  | —          | —           |
-| `--sa-motion-skeleton` | —          | —           |
+| Token                   | Dark value                   | Light value              |
+| ----------------------- | ---------------------------- | ------------------------ |
+| `--sa-skeleton-shimmer` | `oklch(42% 0.025 252 / 0.6)` | `oklch(85% 0.008 264.5)` |
+| `--sa-bg-surface-2`     | —                            | —                        |
+| `--sa-bg-surface-3`     | —                            | —                        |
+| `--sa-color-primary`    | —                            | —                        |
+| `--sa-border-default`   | —                            | —                        |
+| `--sa-motion-spinner`   | —                            | —                        |
+| `--sa-motion-skeleton`  | —                            | —                        |
 
 #### Badge / Alert
 
@@ -876,7 +899,7 @@ or remains in app-local CSS if it is app-specific.
 
 - Base: `--sa-bg-input` background, `--sa-border-input` border, `--sa-radius-md`
 - Focus: `--sa-border-input-focus` border, `--sa-focus-ring` box-shadow, `--sa-bg-input-focus` background
-- `state="error"`: `--sa-border-input-error` border, `--sa-control-ring-error` box-shadow, `--sa-control-bg-error` background
+- `state="error"`: `--sa-border-input-error` border, `--sa-control-ring-error` box-shadow — no background change
 - `state="disabled"`: `--sa-bg-input-disabled`, opacity 0.38, cursor not-allowed
 - Placeholder: `--sa-text-placeholder`
 - Font: `--sa-font-ui`, `--sa-font-xs`
@@ -899,10 +922,10 @@ or remains in app-local CSS if it is app-specific.
 
 **`[data-ui="tabs"]`**
 
-- `tab-list`: pill container, `--sa-tab-pill-bg` background, `--sa-radius-md`, tight internal padding
-- `tab`: inactive tab, `--sa-text-muted`, transparent background
-- Active tab (`[data-ui="tab"][data-active]`): `--sa-tab-active-bg`, `--sa-tab-active-text`, `--sa-weight-medium`
-- No underline separator. The pill pattern is the L&F.
+- `tab-list`: `inline-flex` row, `gap: --sa-space-sm`, no container background — tabs are individual bordered pills
+- `tab`: `--sa-border-default` border, `--sa-radius-sm`, `--sa-text-muted`, transparent background
+- Active tab (`[data-selected]`): `--sa-toggle-pressed-bg`, `--sa-toggle-pressed-border`, `--sa-toggle-pressed-text`
+- Keyboard: `activationMode='manual'` (default) — arrow keys move focus, Enter/Space activates
 
 **`[data-ui="progress"]`**
 
@@ -916,7 +939,7 @@ or remains in app-local CSS if it is app-specific.
 
 **`[data-ui="skeleton"]`**
 
-- Shimmer: gradient sweep between `--sa-bg-surface-2` and `--sa-bg-surface-3`
+- Shimmer: 3-stop gradient — `--sa-bg-surface-2` → `--sa-skeleton-shimmer` → `--sa-bg-surface-3`
 - Animation: background-position sweep with `--sa-motion-skeleton`
 
 **`[data-ui="badge"]`**
@@ -947,9 +970,21 @@ or remains in app-local CSS if it is app-specific.
 
 **`[data-ui="card"]`**
 
-- Framed content surface with `--sa-bg-card`, `--sa-border-card`, `--sa-shadow-card`, `--sa-radius-lg`, and `--sa-widget-pad`
-- Top accent stripe uses `--sa-gradient-stripe`, `--sa-card-stripe-height`, and `--sa-card-stripe-opacity`
+- Default (panel): `--sa-card-panel-bg`, `--sa-card-panel-border`, `--sa-card-panel-shadow` — quiet interior surface, no stripe (`--sa-card-panel-stripe-opacity: 0`)
+- `variant='widget'`: dashboard surface with stripe and shadow
+- `variant='workflow'`: elevated form container with stronger shadow and stripe
+- Shared: `--sa-card-radius`, `--sa-widget-pad`, `overflow: hidden`
+- "Panel" is the prose name for the default look; `data-ui-variant` is absent on default cards
 - No hover lift or hover shadow treatment
+
+**`[data-ui="table"]`, `[data-ui="table-header"]`, `[data-ui="table-body"]`, `[data-ui="table-row"]`, `[data-ui="table-cell"]`**
+
+- `table`: full-width `<table>`, border-collapse, `--sa-border-table` row separators
+- `table-header`: `<thead><tr>`; cells render as `<th>` (context provided via Solid context)
+- `table-body`: `<tbody>`
+- `table-row`: `<tr>`; `variant='section'` applies `--sa-table-section-bg` accent row treatment
+- `table-cell`: context-aware — `<th>` inside header, `<td>` otherwise
+- No hover lift. Section row variant uses `--sa-table-section-bg` (teal, H=184) and indented start padding.
 
 **`[data-ui="row"]`**
 

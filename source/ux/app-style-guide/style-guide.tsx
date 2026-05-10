@@ -117,19 +117,77 @@ export const StyleGuide = (): JSX.Element => {
 
       <main class='sg-page'>
         <Section title='Typography'>
-          <h1>H1 Operations Command</h1>
-          <h2>H2 Field Service Planning</h2>
-          <h3>H3 Aerial Application Window</h3>
-          <h4>H4 Ground Crew Assignment</h4>
-          <h5>H5 Chemical Label Review</h5>
-          <p>
-            Body copy should inherit the product typography without local component styling. Weather,
-            acreage, crew availability, and service windows remain scannable.
-          </p>
-          <p>
-            Inline code sample: <code>service.category === 'aerial-drone-services'</code>
-          </p>
-          <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
+          <AppFieldset legend='h1 – h5'>
+            <h1>H1 Operations Command</h1>
+            <h2>H2 Field Service Planning</h2>
+            <h3>H3 Aerial Application Window</h3>
+            <h4>H4 Ground Crew Assignment</h4>
+            <h5>H5 Chemical Label Review</h5>
+          </AppFieldset>
+
+          <AppFieldset legend='Body & Paragraph'>
+            <p>
+              Body copy should inherit the product typography without local component styling. Weather,
+              acreage, crew availability, and service windows remain scannable.
+            </p>
+          </AppFieldset>
+
+          <AppFieldset legend='Code, Pre & Blockquote'>
+            <p>
+              Inline code sample: <code>service.category === 'aerial-drone-services'</code>
+            </p>
+            <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
+            <blockquote>
+              Service logs are records of field reality and must remain clear, durable, and auditable.
+            </blockquote>
+          </AppFieldset>
+
+          <AppFieldset legend='Typeface'>
+            <AppTable>
+              <AppTableHeader>
+                <AppTableCell>Target</AppTableCell>
+                <AppTableCell>Typeface</AppTableCell>
+                <AppTableCell>Example</AppTableCell>
+              </AppTableHeader>
+              <AppTableBody>
+                <AppTableRow>
+                  <AppTableCell>Heading</AppTableCell>
+                  <AppTableCell>Comfortaa</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-heading'>Operations briefing schedule confirmed</span>
+                  </AppTableCell>
+                </AppTableRow>
+                <AppTableRow>
+                  <AppTableCell>Body</AppTableCell>
+                  <AppTableCell>Comfortaa</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-body'>Inspect field boundaries and document hazard zones</span>
+                  </AppTableCell>
+                </AppTableRow>
+                <AppTableRow>
+                  <AppTableCell>Label</AppTableCell>
+                  <AppTableCell>Lexend</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-label'>Service window 06:00–09:00</span>
+                  </AppTableCell>
+                </AppTableRow>
+                <AppTableRow>
+                  <AppTableCell>UI</AppTableCell>
+                  <AppTableCell>Lexend</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-ui'>Assign crew and assets for spray mission</span>
+                  </AppTableCell>
+                </AppTableRow>
+                <AppTableRow>
+                  <AppTableCell>Mono</AppTableCell>
+                  <AppTableCell>Cascadia Mono</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-mono'>service.status = 'ready'; acres = 142</span>
+                  </AppTableCell>
+                </AppTableRow>
+              </AppTableBody>
+            </AppTable>
+          </AppFieldset>
         </Section>
 
         <Section title='HTML Semantics'>
@@ -155,24 +213,31 @@ export const StyleGuide = (): JSX.Element => {
               </For>
             </AppTableBody>
           </AppTable>
-          <AppList>
-            <AppListItem>Confirm chemical inventory.</AppListItem>
-            <AppListItem>Verify crew certification.</AppListItem>
-            <AppListItem>Inspect required assets.</AppListItem>
-          </AppList>
-          <AppList variant='bullet'>
-            <AppListItem>Confirm chemical inventory.</AppListItem>
-            <AppListItem>Verify crew certification.</AppListItem>
-            <AppListItem>Inspect required assets.</AppListItem>
-          </AppList>
-          <AppList variant='numbered'>
-            <AppListItem>Assess site.</AppListItem>
-            <AppListItem>Plan service.</AppListItem>
-            <AppListItem>Execute work.</AppListItem>
-          </AppList>
-          <blockquote>
-            Service logs are records of field reality and must remain clear, durable, and auditable.
-          </blockquote>
+          <AppFieldset legend='List variants'>
+            <AppRow>
+              <div>
+                <AppList>
+                  <AppListItem>Confirm chemical inventory.</AppListItem>
+                  <AppListItem>Verify crew certification.</AppListItem>
+                  <AppListItem>Inspect required assets.</AppListItem>
+                </AppList>
+              </div>
+              <div>
+                <AppList variant='bullet'>
+                  <AppListItem>Confirm chemical inventory.</AppListItem>
+                  <AppListItem>Verify crew certification.</AppListItem>
+                  <AppListItem>Inspect required assets.</AppListItem>
+                </AppList>
+              </div>
+              <div>
+                <AppList variant='numbered'>
+                  <AppListItem>Assess site.</AppListItem>
+                  <AppListItem>Plan service.</AppListItem>
+                  <AppListItem>Execute work.</AppListItem>
+                </AppList>
+              </div>
+            </AppRow>
+          </AppFieldset>
           <AppFieldset legend='Site access'>
             <AppFormGrid>
               <AppField label='Field contact' for='nameId'>
@@ -186,30 +251,31 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
 
         <Section title='Color'>
-          <div class='sg-swatch-grid'>
-            <For each={COLOR_SWATCHES}>
-              {swatch => (
-                <figure class='sg-swatch'>
-                  <div class='sg-swatch-chip' style={{ background: swatch.value }} />
-                  <figcaption>
-                    <span>{swatch.label}</span>
-                    <code>{swatch.token}</code>
-                  </figcaption>
-                </figure>
-              )}
-            </For>
-          </div>
-        </Section>
-
-        <Section title='Gradient'>
-          <figure>
-            <div class='sg-gradient-block' />
-            <figcaption>
-              <span>Bright blue start</span>
-              <span>Darker green center</span>
-              <span>Bright teal finish</span>
-            </figcaption>
-          </figure>
+          <AppFieldset legend='Swatches'>
+            <div class='sg-swatch-grid'>
+              <For each={COLOR_SWATCHES}>
+                {swatch => (
+                  <figure class='sg-swatch'>
+                    <div class='sg-swatch-chip' style={{ background: swatch.value }} />
+                    <figcaption>
+                      <span>{swatch.label}</span>
+                      <code>{swatch.token}</code>
+                    </figcaption>
+                  </figure>
+                )}
+              </For>
+            </div>
+          </AppFieldset>
+          <AppFieldset legend='Gradient'>
+            <figure>
+              <div class='sg-gradient-block' />
+              <figcaption>
+                <span>Bright blue start</span>
+                <span>Darker green center</span>
+                <span>Bright teal finish</span>
+              </figcaption>
+            </figure>
+          </AppFieldset>
         </Section>
 
         <Section title='AppButton'>
@@ -222,17 +288,21 @@ export const StyleGuide = (): JSX.Element => {
               Loading
             </AppToggle>
           </AppField>
-          <AppRow>
-            <For each={BUTTON_VARIANTS}>
-              {entry => <AppButton variant={entry.variant}>{entry.label}</AppButton>}
-            </For>
-          </AppRow>
-          <AppRow>
-            <AppButton disabled>Disabled</AppButton>
-            <AppButton variant='primary' loading={loading()}>
-              Loading
-            </AppButton>
-          </AppRow>
+          <AppFieldset legend='Variants'>
+            <AppRow>
+              <For each={BUTTON_VARIANTS}>
+                {entry => <AppButton variant={entry.variant}>{entry.label}</AppButton>}
+              </For>
+            </AppRow>
+          </AppFieldset>
+          <AppFieldset legend='Disabled and loading'>
+            <AppRow>
+              <AppButton disabled>Disabled</AppButton>
+              <AppButton variant='primary' loading={loading()}>
+                Loading
+              </AppButton>
+            </AppRow>
+          </AppFieldset>
         </Section>
 
         <Section title='AppInput / AppTextarea'>
@@ -245,39 +315,53 @@ export const StyleGuide = (): JSX.Element => {
               Error
             </AppToggle>
           </AppField>
-          <AppFormGrid>
-            <AppField label='Field name' for='field-name'>
-              <AppInput
-                id='field-name'
-                value='North Field'
-                error={inputError()}
-                onInput={() => undefined}
-                placeholder='Enter service location'
-              />
-            </AppField>
-            <AppField label='Application notes' for='application-notes'>
-              <AppTextarea
-                id='application-notes'
-                error={inputError()}
-                onInput={() => undefined}
-                value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
-                placeholder='Wind break along west ridge; verify drift boundary before launch.'
-                rows={4}
-              />
-            </AppField>
-            <AppField label='Disabled acreage' for='disabled-acreage'>
-              <AppInput id='disabled-acreage' disabled value='142 acres' onInput={() => undefined} />
-            </AppField>
-            <AppField label='Disabled comments' for='disabled-comments'>
-              <AppTextarea
-                id='disabled-comments'
-                disabled
-                value='Locked after crew dispatch.'
-                onInput={() => undefined}
-                rows={4}
-              />
-            </AppField>
-          </AppFormGrid>
+          <AppFieldset legend='Enabled'>
+            <AppRow variant='fill'>
+              <div style={{ flex: '2' }}>
+                <AppField label='Field name' for='field-name'>
+                  <AppInput
+                    id='field-name'
+                    value='North Field'
+                    error={inputError()}
+                    onInput={() => undefined}
+                    placeholder='Enter service location'
+                  />
+                </AppField>
+              </div>
+              <div style={{ flex: '3' }}>
+                <AppField label='Application notes' for='application-notes'>
+                  <AppTextarea
+                    id='application-notes'
+                    error={inputError()}
+                    onInput={() => undefined}
+                    value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
+                    placeholder='Wind break along west ridge; verify drift boundary before launch.'
+                    rows={6}
+                  />
+                </AppField>
+              </div>
+            </AppRow>
+          </AppFieldset>
+          <AppFieldset legend='Disabled'>
+            <AppRow variant='fill'>
+              <div style={{ flex: '2' }}>
+                <AppField label='Disabled acreage' for='disabled-acreage'>
+                  <AppInput id='disabled-acreage' disabled value='142 acres' onInput={() => undefined} />
+                </AppField>
+              </div>
+              <div style={{ flex: '3' }}>
+                <AppField label='Disabled comments' for='disabled-comments'>
+                  <AppTextarea
+                    id='disabled-comments'
+                    disabled
+                    value='Locked after crew dispatch.'
+                    onInput={() => undefined}
+                    rows={6}
+                  />
+                </AppField>
+              </div>
+            </AppRow>
+          </AppFieldset>
         </Section>
 
         <Section title='AppSelect / AppMultiSelect'>
@@ -518,32 +602,6 @@ export const StyleGuide = (): JSX.Element => {
           </AppAccordion>
         </Section>
 
-        <Section title='AppList'>
-          <AppRow>
-            <div>
-              <AppList>
-                <AppListItem>Confirm chemical inventory</AppListItem>
-                <AppListItem>Verify crew certification</AppListItem>
-                <AppListItem>Inspect required assets</AppListItem>
-              </AppList>
-            </div>
-            <div>
-              <AppList variant='bullet'>
-                <AppListItem>Wind speed within threshold</AppListItem>
-                <AppListItem>Precipitation clear</AppListItem>
-                <AppListItem>Visibility acceptable</AppListItem>
-              </AppList>
-            </div>
-            <div>
-              <AppList variant='numbered'>
-                <AppListItem>Assess site</AppListItem>
-                <AppListItem>Plan service</AppListItem>
-                <AppListItem>Execute work</AppListItem>
-              </AppList>
-            </div>
-          </AppRow>
-        </Section>
-
         <Section title='AppAvatar'>
           <AppAvatar>AG</AppAvatar>
         </Section>
@@ -553,19 +611,16 @@ export const StyleGuide = (): JSX.Element => {
             <AppCard>
               <div class='sg-card-copy'>
                 <h3>Default card</h3>
-                <p>Base framed surface — no variant. Used for general content containment.</p>
+                <p>
+                  Quiet interior surface — no variant. Used for form sections and guided workflow
+                  sub-groups.
+                </p>
               </div>
             </AppCard>
             <AppCard variant='widget'>
               <div class='sg-card-copy'>
                 <h3>Widget card</h3>
                 <p>Dashboard-ready surface with stripe treatment and crisp separation from the page.</p>
-              </div>
-            </AppCard>
-            <AppCard variant='panel'>
-              <div class='sg-card-copy'>
-                <h3>Panel card</h3>
-                <p>Quiet interior surface for form sections and guided workflow sub-groups.</p>
               </div>
             </AppCard>
             <AppCard variant='workflow'>
@@ -595,7 +650,7 @@ export const StyleGuide = (): JSX.Element => {
 
 const Section = (props: SectionProps): JSX.Element => (
   <section class='sg-section'>
-    <AppCard variant='panel'>
+    <AppCard>
       <div class='sg-section-frame'>
         <h2>{props.title}</h2>
         <div class='sg-section-body'>{props.children}</div>

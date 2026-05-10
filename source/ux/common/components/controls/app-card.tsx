@@ -16,7 +16,7 @@ AppCard  Card control.
 import { type JSX, splitProps } from '@solid-js'
 
 /** Card variants declared by the design language. */
-export type AppCardVariant = 'widget' | 'panel' | 'workflow'
+export type AppCardVariant = 'widget' | 'workflow'
 
 /** Card control props. */
 export type AppCardProps =
@@ -44,5 +44,5 @@ export const AppCard = (props: AppCardProps): JSX.Element => {
     'data-ui-variant'
   ])
 
-  return <div {...others} data-ui='card' data-ui-variant={local.variant ?? 'widget'} />
+  return <div {...others} data-ui='card' data-ui-variant={local.variant} />
 }

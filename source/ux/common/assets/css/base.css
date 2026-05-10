@@ -200,6 +200,16 @@ pre {
   padding: var(--sa-space-md);
 }
 
+blockquote {
+  border-inline-start: 3px solid var(--sa-color-primary);
+  color: var(--sa-text-secondary);
+  font-family: var(--sa-font-body);
+  font-style: italic;
+  margin-inline: 0;
+  padding-block: var(--sa-space-sm);
+  padding-inline: var(--sa-space-md);
+}
+
 /*
  * TABLE
  * ───────────────────────────────────────────────────────────────────────────

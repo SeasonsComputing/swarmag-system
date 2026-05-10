@@ -125,3 +125,19 @@
     padding: var(--sa-space-md);
   }
 }
+
+.sg-font-heading {
+  font-family: var(--sa-font-heading);
+}
+.sg-font-body {
+  font-family: var(--sa-font-body);
+}
+.sg-font-label {
+  font-family: var(--sa-font-label);
+}
+.sg-font-ui {
+  font-family: var(--sa-font-ui);
+}
+.sg-font-mono {
+  font-family: var(--sa-font-mono);
+}
