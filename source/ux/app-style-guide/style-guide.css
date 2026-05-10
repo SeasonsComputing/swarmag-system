@@ -134,6 +134,7 @@
 }
 .sg-font-label {
   font-family: var(--sa-font-label);
+  font-weight: var(--sa-weight-normal);
 }
 .sg-font-ui {
   font-family: var(--sa-font-ui);
