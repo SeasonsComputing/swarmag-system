@@ -145,10 +145,15 @@ legend {
 }
 
 label {
-  color: var(--sa-text-secondary);
+  color: var(--sa-text-muted);
 }
 
-figcaption,
+figcaption {
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-sm);
+  font-weight: var(--sa-weight-thin);
+}
+
 th {
   font-family: var(--sa-font-label);
   font-size: var(--sa-font-sm);
@@ -173,6 +178,7 @@ textarea,
 
 code, pre, kbd, samp {
   font-family: var(--sa-font-mono);
+  font-size: 1rem;
 }
 
 /*
@@ -294,7 +300,7 @@ fieldset {
 }
 
 legend {
-  color: oklch(var(--sa-p-white));
+  color: var(--sa-text-primary);
 }
 
 /*
@@ -307,7 +313,7 @@ figure {
 }
 
 figcaption {
-  color: var(--sa-text-secondary);
+  color: var(--sa-text-primary);
 }
 
 /*
