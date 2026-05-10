@@ -108,7 +108,7 @@ export const AppRadioItem = <Value extends string = string>(
       <RadioItemControl data-ui='radio'>
         <RadioGroup.ItemIndicator />
       </RadioItemControl>
-      {local.children}
+      <RadioGroup.ItemLabel>{local.children}</RadioGroup.ItemLabel>
     </RadioItem>
   )
 }

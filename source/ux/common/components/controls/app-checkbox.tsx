@@ -70,7 +70,7 @@ export const AppCheckbox = (props: AppCheckboxProps): JSX.Element => {
       >
         <Checkbox.Indicator />
       </Checkbox.Control>
-      {local.children}
+      <Checkbox.Label>{local.children}</Checkbox.Label>
     </Checkbox>
   )
 }
