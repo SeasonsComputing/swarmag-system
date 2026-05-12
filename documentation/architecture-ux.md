@@ -32,7 +32,7 @@ The following is the normative target structure. Directories not yet present are
 source/
 └── ux/
     ├── api/
-    │   └── api.ts
+    │   └── api.ts                   - API client and request/response types
     ├── config/
     ├── common/
     │   ├── assets/                  — static assets used by applications
@@ -44,16 +44,16 @@ source/
     │   │   ├── app-state.ts
     │   │   ├── session-state.ts
     │   │   └── dashboard-state.ts
+    │   ├── forms/                   — adaptive form primitives and compositions    
+    │   ├── widgets/                 — widget catalog    
     │   └── components/
-    │       ├── shell/               — app-root, auth-guard, content, login, form-panel
+    │       ├── shell/               — bootstrap, auth-guard, content, login, form-panel
     │       ├── controls/            — Kobalte-based UI primitives
-    │       ├── forms/               — adaptive form primitives and compositions
     │       ├── charts/              — PieChart, BarChart, LineChart, Sparkline
-    │       ├── dashboard/           — shared dashboard harness + layout foundation
-    │       └── widgets/             — widget catalog
+    │       └── dashboard/           — shared dashboard harness + layout foundation
     ├── app-admin/
     │   ├── app.tsx
-    │   ├── app-admin-dashboard.json — default dashboard layout for app-admin
+    │   ├── dashboard-admin.json     — default dashboard layout for app-admin
     │   ├── index.html
     │   ├── manifest.webmanifest
     │   ├── sw.js
@@ -64,7 +64,7 @@ source/
     │   └── customer-prospect/       — guided new customer + new job + initial assessment
     ├── app-customer/
     │   ├── app.tsx
-    │   ├── app-customer-dashboard.json — default dashboard layout for app-customer
+    │   ├── dashboard-customer.json  — default dashboard layout for app-customer
     │   ├── index.html
     │   ├── manifest.webmanifest
     │   ├── sw.js
@@ -72,7 +72,7 @@ source/
     │   └── customer-report/         — specialized report for customer
     ├── app-ops/
     │   ├── app.tsx
-    │   ├── app-ops-dashboard.json   — default dashboard layout for app-ops
+    │   ├── dashboard-ops.json       — default dashboard layout for app-ops
     │   ├── index.html
     │   ├── manifest.webmanifest
     │   ├── sw.js
@@ -313,7 +313,7 @@ dashboard → domain page → back to dashboard
 
 ### 9.2 Routing
 
-Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/ux/common/components/shell/app-root.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
+Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/ux/common/components/shell/bootstrap.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
 
 A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
 
@@ -488,18 +488,19 @@ IndexedDB usage is split into two layers:
 
 ### 9.6 State Management
 
-| Concern         | Mechanism       | Location                         |
-| --------------- | --------------- | -------------------------------- |
-| auth / session  | SolidJS store   | `common/stores/session-state.ts` |
-| app preferences | IndexedDB       | `common/stores/app-state.ts`     |
-| server data     | TanStack Query  | per-page query hooks             |
-| local ui state  | SolidJS signals | component-local                  |
-| ops field data  | IndexedDB       | `app-ops/stores/jobs-store.ts`   |
+| Concern          | Mechanism       | Location                           |
+| ---------------- | --------------- | ---------------------------------- |
+| auth / session   | SolidJS store   | `common/stores/session-state.ts`   |
+| app preferences  | IndexedDB       | `common/stores/app-state.ts`       |
+| dashboard config | IndexedDB       | `common/stores/dashboard-state.ts` |
+| server data      | TanStack Query  | per-page query hooks               |
+| local ui state   | SolidJS signals | component-local                    |
+| ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts`     |
 
 #### 9.6.1 Rules
 
 - Signals for local, transient UI state — inputs, open/close, hover
-- Stores for shared cross-component state — session, app preferences
+- Stores for shared cross-component state — session, app preferences, dashboard config
 - TanStack Query for all server data — caching, loading, error states
 - No prop-drilling of session or user — read from session store directly
 
@@ -511,15 +512,20 @@ IndexedDB usage is split into two layers:
 
 #### 10.1.1 Belongs in `common/`
 
-- `views/` — UX-local shared types consumed by two or more apps
+** Foundation common to all apps **
+
 - `assets/` — shared CSS foundation, fonts, icons, and static visual assets
-- `components/shell/` — `app-root`, `login`, `auth-guard`, `content`, shell dashboard stub, and form panel
-- `components/controls/` — Kobalte-backed App{Control} primitives
-- `components/forms/` — adaptive form primitives and domain-form composition foundations
+- `components/shell/` — `bootstrap`, `login`, `auth-guard`, `content`, shell dashboard stub, and form panel
+- `components/controls/` — HTML & Kobalte-backed App{Control} primitives
 - `components/charts/` — chart primitives and chart compositions
 - `components/dashboard/` — dashboard layout foundation
-- `components/widgets/` — reusable dashboard widget catalog
+
+** Domain features specific to swarmAg **
+
+- `forms/` — adaptive form primitives and domain-form composition foundations
+- `widgets/` — reusable dashboard widget catalog
 - `stores/` — session, app preference, and dashboard state stores
+- `views/` — UX-local shared types consumed by two or more apps
 
 #### 10.1.2 Stays in the app
 
