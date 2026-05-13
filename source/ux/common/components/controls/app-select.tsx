@@ -63,6 +63,7 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
       disabled={local.disabled || local.loading}
       validationState={local.error ? 'invalid' : undefined}
       placeholder={local.placeholder}
+      gutter={4}
       {...(local.value === undefined
         ? {}
         : { value: local.options.find(o => o.value === local.value) ?? null })}
@@ -84,7 +85,7 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <SelectContent data-ui='select-content'>
+        <SelectContent data-ui='select-content' onKeyDown={(e: KeyboardEvent) => { if (e.key === ' ') e.preventDefault() }}>
           <Select.Listbox />
         </SelectContent>
       </Select.Portal>

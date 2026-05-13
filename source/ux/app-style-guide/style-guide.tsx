@@ -15,48 +15,18 @@ StyleGuide  Single-page living style guide application.
 */
 
 import { createEffect, createSignal, For, type JSX } from '@solid-js'
+
+// dprint-ignore-start
 import {
-  AppAccordion,
-  AppAccordionContent,
-  AppAccordionItem,
-  AppAccordionTrigger,
-  AppAlert,
-  AppAvatar,
-  AppBadge,
-  AppButton,
-  AppCard,
-  AppCheckbox,
-  AppDialog,
-  AppInput,
-  AppList,
-  AppListItem,
-  AppMultiSelect,
-  AppPopover,
-  AppProgress,
-  AppRadioGroup,
-  AppRadioItem,
-  AppRow,
-  AppSelect,
-  AppSeparator,
-  AppSkeleton,
-  AppSpinner,
-  AppStack,
-  AppTab,
-  AppTable,
-  AppTableBody,
-  AppTableCell,
-  AppTableHeader,
-  AppTableRow,
-  AppTabList,
-  AppTabPanel,
-  AppTabs,
-  AppTextarea,
-  AppToggle,
-  AppToggleGroup,
-  AppToggleItem,
-  AppTooltip
+  AppAccordion, AppAccordionContent, AppAccordionItem, AppAccordionTrigger, AppAlert, AppAvatar,
+  AppBadge, AppButton, AppCard, AppCheckbox, AppDialog, AppField, AppFieldset, AppFormActions,
+  AppFormGrid, AppInput, AppList, AppListItem, AppMultiSelect, AppPopover, AppProgress, AppRadioGroup,
+  AppRadioItem, AppRow, AppSelect, AppSeparator, AppSkeleton, AppSpinner, AppStack, AppTab,
+  AppTable, AppTableBody, AppTableCell, AppTableHeader, AppTableRow, AppTabList, AppTabPanel,
+  AppTabs, AppTextarea, AppToggle, AppToggleGroup, AppToggleItem, AppTooltip
 } from '@ux/common/components/controls'
-import { AppField, AppFieldset, AppFormActions, AppFormGrid } from '@ux/common/components/forms'
+// dprint-ignore-end
+
 import {
   ACCORDION_DEFAULT_VALUE,
   BUTTON_VARIANTS,
@@ -213,31 +183,27 @@ export const StyleGuide = (): JSX.Element => {
               </For>
             </AppTableBody>
           </AppTable>
+
           <AppFieldset legend='List variants'>
-            <AppRow>
-              <div>
-                <AppList>
-                  <AppListItem>Confirm chemical inventory.</AppListItem>
-                  <AppListItem>Verify crew certification.</AppListItem>
-                  <AppListItem>Inspect required assets.</AppListItem>
-                </AppList>
-              </div>
-              <div>
-                <AppList variant='bullet'>
-                  <AppListItem>Confirm chemical inventory.</AppListItem>
-                  <AppListItem>Verify crew certification.</AppListItem>
-                  <AppListItem>Inspect required assets.</AppListItem>
-                </AppList>
-              </div>
-              <div>
-                <AppList variant='numbered'>
-                  <AppListItem>Assess site.</AppListItem>
-                  <AppListItem>Plan service.</AppListItem>
-                  <AppListItem>Execute work.</AppListItem>
-                </AppList>
-              </div>
+            <AppRow variant='fill'>
+              <AppList>
+                <AppListItem>Confirm chemical inventory.</AppListItem>
+                <AppListItem>Verify crew certification.</AppListItem>
+                <AppListItem>Inspect required assets.</AppListItem>
+              </AppList>
+              <AppList variant='bullet'>
+                <AppListItem>Confirm chemical inventory.</AppListItem>
+                <AppListItem>Verify crew certification.</AppListItem>
+                <AppListItem>Inspect required assets.</AppListItem>
+              </AppList>
+              <AppList variant='numbered'>
+                <AppListItem>Assess site.</AppListItem>
+                <AppListItem>Plan service.</AppListItem>
+                <AppListItem>Execute work.</AppListItem>
+              </AppList>
             </AppRow>
           </AppFieldset>
+
           <AppFieldset legend='Site access'>
             <AppFormGrid>
               <AppField label='Field contact' for='nameId'>

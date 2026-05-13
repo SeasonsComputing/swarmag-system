@@ -36,6 +36,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-p-teal-blue: 60.8% 0.108 216.744; /* #028aa8 */
   --sa-p-blue: 54.3% 0.11 236.182; /* #077db2 */
   --sa-p-blue-deep: 38.7% 0.072 228.64; /* #1a5360 */
+  --sa-p-popup: 28.5% 0.023 236; /* floating surface — select, popover, tooltip */
 
   /* Neutrals */
   --sa-p-white: 100% 0 0;
@@ -47,16 +48,16 @@ Typography        -> App typography tokens consumed by base and controls.
 
   /* Dark surfaces — from reference theme sampling */
   --sa-p-surface-3: 27.4% 0.014 264.5; /* #33364a page chrome */
-  --sa-p-surface-2: 24.6% 0.016 264.5; /* #2c2f3e sidebars    */
-  --sa-p-surface-1: 22.1% 0.01 277.4; /* #29282f cards       */
-  --sa-p-base: 13.2% 0.012 264.5; /* #15181e             */
-  --sa-p-black: 7.8% 0 0; /* #0a0a0a             */
+  --sa-p-surface-2: 24.6% 0.016 264.5; /* #2c2f3e sidebars */
+  --sa-p-surface-1: 22.1% 0.01 277.4; /* #29282f cards */
+  --sa-p-base: 13.2% 0.012 264.5; /* #15181e */
+  --sa-p-black: 7.8% 0 0; /* #0a0a0a */
 
   /* State primitives */
   --sa-p-success: 72.2% 0.192 149.579; /* focus green — brand */
-  --sa-p-warning: 76.885% 0.1231 80.8277; /* orange — brand      */
-  --sa-p-danger: 62.8% 0.2577 29.234; /* red                 */
-  --sa-p-info: 60.8% 0.108 216.744; /* teal-blue           */
+  --sa-p-warning: 76.885% 0.1231 80.8277; /* orange — brand */
+  --sa-p-danger: 62.8% 0.2577 29.234; /* red */
+  --sa-p-info: 60.8% 0.108 216.744; /* teal-blue */
 
   /* Radial background accents */
   --sa-p-radial-1: oklch(var(--sa-p-green) / 0.22);
@@ -133,7 +134,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-surface-3: oklch(25% 0.02 248 / 0.7);
   --sa-bg-progress-track: oklch(35% 0.02 252 / 0.6);
   --sa-bg-overlay: oklch(var(--sa-p-black) / 0.2);
-  --sa-bg-popup: oklch(28% 0.018 252);
+  --sa-bg-popup: oklch(var(--sa-p-popup));
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
   --sa-bg-hover: oklch(var(--sa-p-teal) / 0.1);
   --sa-bg-selected: oklch(var(--sa-p-teal) / 0.28);
@@ -348,6 +349,8 @@ Typography        -> App typography tokens consumed by base and controls.
   /* --- Misc --- */
   --sa-blur: blur(10px);
   --sa-blur-sm: blur(4px);
+  --sa-blur-md: blur(8px);
+  --sa-blur-lg: blur(12px);
   --sa-filter-mono: brightness(0) invert(1);
 }
 
