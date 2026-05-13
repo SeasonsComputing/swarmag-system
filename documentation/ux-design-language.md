@@ -923,7 +923,7 @@ or remains in app-local CSS if it is app-specific.
 **`[data-ui="tabs"]`**
 
 - `tab-list`: `inline-flex` row, `gap: --sa-space-sm`, no container background — tabs are individual bordered pills
-- `tab`: `--sa-border-default` border, `--sa-radius-sm`, `--sa-text-muted`, transparent background
+- `tab`: `--sa-border-default` border, `--sa-radius-sm`, `--sa-text-muted`, `--sa-bg-control` background
 - Active tab (`[data-selected]`): `--sa-toggle-pressed-bg`, `--sa-toggle-pressed-border`, `--sa-toggle-pressed-text`
 - Keyboard: `activationMode='manual'` (default) — arrow keys move focus, Enter/Space activates
 

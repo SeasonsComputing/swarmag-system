@@ -192,18 +192,27 @@ code, pre, kbd, samp {
 }
 
 /*
- * PRE
+ * PRE, BLOCKQUOTE and CODE
  * ───────────────────────────────────────────────────────────────────────────
  */
 
 pre {
-  background: var(--sa-bg-surface-1);
+  background: transparent;
+  backdrop-filter: var(--sa-blur-sm);
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-md);
   color: var(--sa-text-secondary);
   margin: 0;
   overflow: auto;
   padding: var(--sa-space-md);
+}
+
+code {
+  display: inline-block;
+  background: transparent;
+  backdrop-filter: var(--sa-blur-sm);
+  padding: var(--sa-space-xs) var(--sa-space-sm);
+  border-radius: var(--sa-radius-md);
 }
 
 blockquote {
