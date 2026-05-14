@@ -36,7 +36,7 @@ import '@ux/common/assets/css/forms.css'
 ### 2.2 File Ownership
 
 | File           | Owns                                                                                                      | Must not contain                                      |
-|----------------|-----------------------------------------------------------------------------------------------------------|-------------------------------------------------------|
+| -------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | `tokens.css`   | Custom properties, theme overrides, responsive token overrides                                            | Element selectors, control selectors, keyframes       |
 | `base.css`     | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles | Reusable control visuals, app/page layout rules       |
 | `controls.css` | Reusable primitive control visuals and declared control parts                                             | Primitive palette references, app/page-specific rules |
@@ -47,7 +47,7 @@ Raw values are allowed in `tokens.css` because it defines the design vocabulary.
 ### 2.3 Layer Structure
 
 | Layer           | Scope                          | Definition                             |
-|-----------------|--------------------------------|----------------------------------------|
+| --------------- | ------------------------------ | -------------------------------------- |
 | Primitive layer | `:root`                        | Bare L C H triplets, internal use only |
 | Semantic layer  | `:root`, `[data-theme='dark']` | Resolved `oklch()` values              |
 | Light theme     | `[data-theme='light']`         | Overrides only                         |
@@ -58,7 +58,7 @@ Raw values are allowed in `tokens.css` because it defines the design vocabulary.
 All tokens use `--sa-` prefix.
 
 | Prefix            | Scope                                      |
-|-------------------|--------------------------------------------|
+| ----------------- | ------------------------------------------ |
 | `--sa-p-`         | Primitives (internal — not for components) |
 | `--sa-color-`     | Semantic colors                            |
 | `--sa-bg-`        | Background surfaces                        |
@@ -318,7 +318,7 @@ Declared in `tokens.css`. Consumed by `controls.css`. Dark values are in `:root`
 ### 4.1 Button
 
 | Token                                 | Dark value                  | Light value                 |
-|---------------------------------------|-----------------------------|-----------------------------|
+| ------------------------------------- | --------------------------- | --------------------------- |
 | `--sa-btn-primary-bg`                 | `var(--sa-color-brand-end)` | `oklch(var(--sa-p-teal))`   |
 | `--sa-btn-primary-bg-hover`           | `oklch(80% 0.13 185)`       | `oklch(72% 0.11 184.216)`   |
 | `--sa-btn-primary-text`               | `oklch(var(--sa-p-white))`  | `oklch(var(--sa-p-white))`  |
@@ -337,7 +337,7 @@ Declared in `tokens.css`. Consumed by `controls.css`. Dark values are in `:root`
 ### 4.2 Input / Textarea / Select
 
 | Token                     | Dark value                         | Light value                        |
-|---------------------------|------------------------------------|------------------------------------|
+| ------------------------- | ---------------------------------- | ---------------------------------- |
 | `--sa-control-ring-error` | `oklch(var(--sa-p-danger) / 0.22)` | `oklch(var(--sa-p-danger) / 0.18)` |
 | `--sa-bg-input`           | —                                  | —                                  |
 | `--sa-bg-input-focus`     | —                                  | —                                  |
@@ -351,7 +351,7 @@ Declared in `tokens.css`. Consumed by `controls.css`. Dark values are in `:root`
 ### 4.3 Toggle / ToggleGroup
 
 | Token                        | Dark value                       | Light value                      |
-|------------------------------|----------------------------------|----------------------------------|
+| ---------------------------- | -------------------------------- | -------------------------------- |
 | `--sa-toggle-pressed-bg`     | `oklch(var(--sa-p-teal) / 0.15)` | `oklch(var(--sa-p-teal) / 0.12)` |
 | `--sa-toggle-pressed-border` | `oklch(var(--sa-p-teal) / 0.60)` | `oklch(var(--sa-p-teal) / 0.50)` |
 | `--sa-toggle-pressed-text`   | `oklch(var(--sa-p-teal))`        | `oklch(var(--sa-p-teal))`        |
@@ -364,7 +364,7 @@ Declared in `tokens.css`. Consumed by `controls.css`. Dark values are in `:root`
 All interactive states key off the teal primitive — green and green-teal must not appear here.
 
 | Token                   | Dark value                               | Light value                              |
-|-------------------------|------------------------------------------|------------------------------------------|
+| ----------------------- | ---------------------------------------- | ---------------------------------------- |
 | `--sa-bg-hover`         | `oklch(var(--sa-p-teal) / 0.1)`          | `oklch(var(--sa-p-teal) / 0.08)`         |
 | `--sa-bg-selected`      | `oklch(var(--sa-p-teal) / 0.28)`         | `oklch(var(--sa-p-teal) / 0.15)`         |
 | `--sa-shadow-glow`      | `0 0 30px oklch(var(--sa-p-teal) / 0.3)` | `0 0 30px oklch(var(--sa-p-teal) / 0.2)` |
@@ -376,7 +376,7 @@ All interactive states key off the teal primitive — green and green-teal must 
 Active tab state reuses toggle-pressed tokens — no separate tab active tokens.
 
 | Token                        | Dark value | Light value |
-|------------------------------|------------|-------------|
+| ---------------------------- | ---------- | ----------- |
 | `--sa-toggle-pressed-bg`     | —          | —           |
 | `--sa-toggle-pressed-border` | —          | —           |
 | `--sa-toggle-pressed-text`   | —          | —           |
@@ -386,7 +386,7 @@ Active tab state reuses toggle-pressed tokens — no separate tab active tokens.
 ### 4.6 Skeleton / Spinner
 
 | Token                   | Dark value                   | Light value              |
-|-------------------------|------------------------------|--------------------------|
+| ----------------------- | ---------------------------- | ------------------------ |
 | `--sa-skeleton-shimmer` | `oklch(42% 0.025 252 / 0.6)` | `oklch(85% 0.008 264.5)` |
 | `--sa-bg-surface-2`     | —                            | —                        |
 | `--sa-bg-surface-3`     | —                            | —                        |
@@ -398,7 +398,7 @@ Active tab state reuses toggle-pressed tokens — no separate tab active tokens.
 ### 4.7 Badge / Alert
 
 | Token                       | Dark value | Light value |
-|-----------------------------|------------|-------------|
+| --------------------------- | ---------- | ----------- |
 | `--sa-color-success`        | —          | —           |
 | `--sa-color-success-bg`     | —          | —           |
 | `--sa-color-success-border` | —          | —           |
@@ -415,7 +415,7 @@ Active tab state reuses toggle-pressed tokens — no separate tab active tokens.
 ### 4.8 Card
 
 | Token                      | Dark value | Light value |
-|----------------------------|------------|-------------|
+| -------------------------- | ---------- | ----------- |
 | `--sa-bg-card`             | —          | —           |
 | `--sa-border-card`         | —          | —           |
 | `--sa-shadow-card`         | —          | —           |

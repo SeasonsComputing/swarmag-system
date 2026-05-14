@@ -26,16 +26,16 @@ import { AppButton, AppCard, AppField, … } from '@ux/common/components/control
 
 Action trigger. The default (no variant) is ghost — transparent with brand border.
 
-**Variants:** `primary` · `secondary` · `ghost` (default) · `danger`  
-**Key props:** `variant`, `disabled`, `loading`, `type`, `onClick`, `children`  
-**Composition:** standalone; use inside `AppFormActions` for form submission  
+**Variants:** `primary` · `secondary` · `ghost` (default) · `danger`\
+**Key props:** `variant`, `disabled`, `loading`, `type`, `onClick`, `children`\
+**Composition:** standalone; use inside `AppFormActions` for form submission\
 **Notes:** `loading` disables the button and sets cursor to wait; min-width `7rem`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `button` |
+| Attribute         | Values                                       |
+| ----------------- | -------------------------------------------- |
+| `data-ui`         | `button`                                     |
 | `data-ui-variant` | `primary` · `secondary` · `ghost` · `danger` |
-| `data-ui-state` | `disabled` · `loading` |
+| `data-ui-state`   | `disabled` · `loading`                       |
 
 ### 2.1.1 Example
 
@@ -49,20 +49,26 @@ Action trigger. The default (no variant) is ghost — transparent with brand bor
 
 Single-line text entry.
 
-**Variants:** none  
-**Key props:** `id`, `name`, `type`, `placeholder`, `value`, `disabled`, `error`, `loading`, `required`, `readOnly`, `onChange`  
+**Variants:** none\
+**Key props:** `id`, `name`, `type`, `placeholder`, `value`, `disabled`, `error`, `loading`, `required`, `readOnly`, `onChange`\
 **Composition:** use inside `AppField` with matching `for`/`id`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `input` |
+| Attribute       | Values                           |
+| --------------- | -------------------------------- |
+| `data-ui`       | `input`                          |
 | `data-ui-state` | `disabled` · `error` · `loading` |
 
 ### 2.2.1 Example
 
 ```tsx
 <AppField label='Field name' for='field-name'>
-  <AppInput id='field-name' name='fieldName' placeholder='Enter value' value={value} onChange={setValue} />
+  <AppInput
+    id='field-name'
+    name='fieldName'
+    placeholder='Enter value'
+    value={value}
+    onChange={setValue}
+  />
 </AppField>
 ```
 
@@ -70,13 +76,13 @@ Single-line text entry.
 
 Multi-line text entry.
 
-**Variants:** none  
-**Key props:** `id`, `name`, `placeholder`, `value`, `disabled`, `error`, `rows`, `onChange`  
+**Variants:** none\
+**Key props:** `id`, `name`, `placeholder`, `value`, `disabled`, `error`, `rows`, `onChange`\
 **Composition:** use inside `AppField` with matching `for`/`id`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `textarea` |
+| Attribute       | Values               |
+| --------------- | -------------------- |
+| `data-ui`       | `textarea`           |
 | `data-ui-state` | `disabled` · `error` |
 
 ### 2.3.1 Example
@@ -91,15 +97,15 @@ Multi-line text entry.
 
 Dropdown single-value picker. Options are `AppOption` objects (`{ value: string; label?: string }`).
 
-**Variants:** none  
-**Key props:** `options`, `value`, `defaultValue`, `placeholder`, `id`, `name`, `disabled`, `error`, `onChange`  
-**Composition:** use inside `AppField` with matching `for`/`id`  
+**Variants:** none\
+**Key props:** `options`, `value`, `defaultValue`, `placeholder`, `id`, `name`, `disabled`, `error`, `onChange`\
+**Composition:** use inside `AppField` with matching `for`/`id`\
 **Notes:** `onChange` receives the selected `string` value, not the `AppOption` object
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `select` (trigger) · `select-item` · `select-content` · `select-icon` · `select-icon-glyph` |
-| `data-ui-state` | `disabled` · `error` |
+| Attribute       | Values                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------- |
+| `data-ui`       | `select` (trigger) · `select-item` · `select-content` · `select-icon` · `select-icon-glyph` |
+| `data-ui-state` | `disabled` · `error`                                                                        |
 
 ### 2.4.1 Example
 
@@ -125,15 +131,15 @@ const statusOptions = [
 
 Inline multi-value picker. Renders as an always-visible listbox — not a dropdown.
 
-**Variants:** none  
-**Key props:** `options`, `value`, `defaultValue`, `disabled`, `error`, `onChange`  
-**Composition:** use inside `AppField`  
+**Variants:** none\
+**Key props:** `options`, `value`, `defaultValue`, `disabled`, `error`, `onChange`\
+**Composition:** use inside `AppField`\
 **Notes:** `onChange` receives `string[]`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `multi-select` · `multi-select-item` |
-| `data-ui-state` | `disabled` · `error` |
+| Attribute       | Values                               |
+| --------------- | ------------------------------------ |
+| `data-ui`       | `multi-select` · `multi-select-item` |
+| `data-ui-state` | `disabled` · `error`                 |
 
 ### 2.5.1 Example
 
@@ -153,14 +159,14 @@ const cropOptions = [
 
 Checkbox with inline label.
 
-**Variants:** none  
-**Key props:** `checked`, `defaultChecked`, `disabled`, `error`, `name`, `required`, `value`, `onChange`, `children` (label text)  
+**Variants:** none\
+**Key props:** `checked`, `defaultChecked`, `disabled`, `error`, `name`, `required`, `value`, `onChange`, `children` (label text)\
 **Composition:** standalone or inside `AppField`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `checkbox-field` (outer wrapper) · `checkbox` (input element) |
-| `data-ui-state` | `disabled` · `error` |
+| Attribute       | Values                                                        |
+| --------------- | ------------------------------------------------------------- |
+| `data-ui`       | `checkbox-field` (outer wrapper) · `checkbox` (input element) |
+| `data-ui-state` | `disabled` · `error`                                          |
 
 ### 2.6.1 Example
 
@@ -174,14 +180,14 @@ Checkbox with inline label.
 
 Radio button group. `AppRadioItem` is the child element.
 
-**Key props (AppRadioGroup):** `value`, `defaultValue`, `disabled`, `error`, `onChange`  
-**Key props (AppRadioItem):** `value`, `disabled`, `children` (label)  
+**Key props (AppRadioGroup):** `value`, `defaultValue`, `disabled`, `error`, `onChange`\
+**Key props (AppRadioItem):** `value`, `disabled`, `children` (label)\
 **Composition:** `AppRadioGroup` wraps `AppRadioItem` children; use inside `AppField`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `radio-group` (group) · `radio-item` (item wrapper) · `radio` (input element) |
-| `data-ui-state` | `disabled` · `error` |
+| Attribute       | Values                                                                        |
+| --------------- | ----------------------------------------------------------------------------- |
+| `data-ui`       | `radio-group` (group) · `radio-item` (item wrapper) · `radio` (input element) |
+| `data-ui-state` | `disabled` · `error`                                                          |
 
 ### 2.7.1 Example
 
@@ -199,14 +205,14 @@ Radio button group. `AppRadioItem` is the child element.
 
 Standalone pressed/unpressed toggle button.
 
-**Variants:** none  
-**Key props:** `pressed`, `defaultPressed`, `disabled`, `loading`, `onChange`, `children` (label)  
-**Composition:** standalone; use inside `AppField variant='inline'` when a label is needed  
+**Variants:** none\
+**Key props:** `pressed`, `defaultPressed`, `disabled`, `loading`, `onChange`, `children` (label)\
+**Composition:** standalone; use inside `AppField variant='inline'` when a label is needed\
 **Notes:** min-width `7rem` standalone; unset inside `AppToggleGroup`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `toggle` |
+| Attribute       | Values                 |
+| --------------- | ---------------------- |
+| `data-ui`       | `toggle`               |
 | `data-ui-state` | `disabled` · `loading` |
 
 ### 2.8.1 Example
@@ -221,14 +227,14 @@ Standalone pressed/unpressed toggle button.
 
 Single-select toggle group. `AppToggleItem` is the child element.
 
-**Key props (AppToggleGroup):** `value`, `defaultValue`, `disabled`, `onChange`  
-**Key props (AppToggleItem):** `value`, `disabled`, `children`  
+**Key props (AppToggleGroup):** `value`, `defaultValue`, `disabled`, `onChange`\
+**Key props (AppToggleItem):** `value`, `disabled`, `children`\
 **Composition:** `AppToggleGroup` wraps `AppToggleItem` children
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `toggle-group` (group) · `toggle-item` (each item) |
-| `data-ui-state` | `disabled` (on group) |
+| Attribute       | Values                                             |
+| --------------- | -------------------------------------------------- |
+| `data-ui`       | `toggle-group` (group) · `toggle-item` (each item) |
+| `data-ui-state` | `disabled` (on group)                              |
 
 ### 2.9.1 Example
 
@@ -244,15 +250,15 @@ Single-select toggle group. `AppToggleItem` is the child element.
 
 Tabbed content panel. Keyboard: arrow keys move focus, Enter/Space activates.
 
-**Key props (AppTabs):** `value`, `defaultValue`, `activationMode` (`'manual'` default), `disabled`, `onChange`  
-**Key props (AppTab):** `value`, `disabled`, `children`  
-**Key props (AppTabPanel):** `value`, `children`  
+**Key props (AppTabs):** `value`, `defaultValue`, `activationMode` (`'manual'` default), `disabled`, `onChange`\
+**Key props (AppTab):** `value`, `disabled`, `children`\
+**Key props (AppTabPanel):** `value`, `children`\
 **Composition:** `AppTabs` > `AppTabList` > `AppTab`; `AppTabPanel` siblings to `AppTabList`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `tabs` · `tab-list` · `tab` · `tab-panel` |
-| `data-ui-state` | `disabled` (on `tabs`) |
+| Attribute       | Values                                    |
+| --------------- | ----------------------------------------- |
+| `data-ui`       | `tabs` · `tab-list` · `tab` · `tab-panel` |
+| `data-ui-state` | `disabled` (on `tabs`)                    |
 
 ### 2.10.1 Example
 
@@ -273,14 +279,14 @@ Tabbed content panel. Keyboard: arrow keys move focus, Enter/Space activates.
 
 Collapsible content sections.
 
-**Key props (AppAccordion):** `multiple`, `value`, `defaultValue`, `onValueChange`  
-**Key props (AppAccordionItem):** `value` (required), `disabled`  
+**Key props (AppAccordion):** `multiple`, `value`, `defaultValue`, `onValueChange`\
+**Key props (AppAccordionItem):** `value` (required), `disabled`\
 **Composition:** `AppAccordion` > `AppAccordionItem` > `AppAccordionTrigger` + `AppAccordionContent`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `accordion` · `accordion-item` · `accordion-trigger` · `accordion-content` |
-| `data-ui-state` | `disabled` (on `accordion-item`) |
+| Attribute       | Values                                                                     |
+| --------------- | -------------------------------------------------------------------------- |
+| `data-ui`       | `accordion` · `accordion-item` · `accordion-trigger` · `accordion-content` |
+| `data-ui-state` | `disabled` (on `accordion-item`)                                           |
 
 ### 2.11.1 Example
 
@@ -301,11 +307,11 @@ Collapsible content sections.
 
 Modal base. Full-screen on mobile, centered card on tablet/desktop.
 
-**Key props:** `open`, `onOpenChange`, `children`  
+**Key props:** `open`, `onOpenChange`, `children`\
 **Composition:** compose with `AppCard variant='workflow'` for the form surface
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values                      |
+| --------- | --------------------------- |
 | `data-ui` | `dialog` · `dialog-overlay` |
 
 ### 2.12.1 Example
@@ -331,11 +337,11 @@ Modal base. Full-screen on mobile, centered card on tablet/desktop.
 
 Floating content panel anchored to a trigger. Use for context menus and secondary actions.
 
-**Key props:** `open`, `onOpenChange`, `children`  
+**Key props:** `open`, `onOpenChange`, `children`\
 **Composition:** trigger and content are children
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values    |
+| --------- | --------- |
 | `data-ui` | `popover` |
 
 ### 2.13.1 Example
@@ -354,11 +360,11 @@ Floating content panel anchored to a trigger. Use for context menus and secondar
 
 Hover tooltip anchored to a trigger.
 
-**Key props:** `content`, `children` (trigger element)  
+**Key props:** `content`, `children` (trigger element)\
 **Composition:** wraps its trigger as a child
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values    |
+| --------- | --------- |
 | `data-ui` | `tooltip` |
 
 ### 2.14.1 Example
@@ -373,12 +379,12 @@ Hover tooltip anchored to a trigger.
 
 Linear progress bar.
 
-**Variants:** none  
-**Key props:** `value`, `min`, `max`  
+**Variants:** none\
+**Key props:** `value`, `min`, `max`\
 **Composition:** standalone
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values                                          |
+| --------- | ----------------------------------------------- |
 | `data-ui` | `progress` · `progress-track` · `progress-fill` |
 
 ### 2.15.1 Example
@@ -393,13 +399,13 @@ Linear progress bar.
 
 Status pill. Default (no variant) is ghost — transparent with border.
 
-**Variants:** `success` · `warning` · `danger` · `info`  
-**Key props:** `variant`, `children`  
+**Variants:** `success` · `warning` · `danger` · `info`\
+**Key props:** `variant`, `children`\
 **Composition:** inline; place inside table cells, card headers, or list items
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `badge` |
+| Attribute         | Values                                    |
+| ----------------- | ----------------------------------------- |
+| `data-ui`         | `badge`                                   |
 | `data-ui-variant` | `success` · `warning` · `danger` · `info` |
 
 ### 3.1.1 Example
@@ -415,13 +421,13 @@ Status pill. Default (no variant) is ghost — transparent with border.
 
 Inline feedback message with left-border accent.
 
-**Variants:** `success` · `warning` · `danger` · `info`  
-**Key props:** `variant`, `children`  
+**Variants:** `success` · `warning` · `danger` · `info`\
+**Key props:** `variant`, `children`\
 **Composition:** standalone block; do not nest inside `AppCard`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `alert` |
+| Attribute         | Values                                    |
+| ----------------- | ----------------------------------------- |
+| `data-ui`         | `alert`                                   |
 | `data-ui-variant` | `success` · `warning` · `danger` · `info` |
 
 ### 3.2.1 Example
@@ -436,12 +442,12 @@ Inline feedback message with left-border accent.
 
 User avatar. Renders initials when no image is available.
 
-**Variants:** none  
-**Key props:** `children` (initials or image)  
+**Variants:** none\
+**Key props:** `children` (initials or image)\
 **Composition:** standalone; use in nav headers, list rows, and comment threads
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values   |
+| --------- | -------- |
 | `data-ui` | `avatar` |
 
 ### 3.3.1 Example
@@ -454,13 +460,13 @@ User avatar. Renders initials when no image is available.
 
 Framed content surface. The default (no variant) is the panel look.
 
-**Variants:** `widget` · `workflow` (no prop = panel)  
-**Key props:** `variant`, `children`  
+**Variants:** `widget` · `workflow` (no prop = panel)\
+**Key props:** `variant`, `children`\
 **Composition:** panels are interior surfaces; widgets go in dashboard grids; workflow wraps forms inside `AppDialog`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `card` |
+| Attribute         | Values                |
+| ----------------- | --------------------- |
+| `data-ui`         | `card`                |
 | `data-ui-variant` | `widget` · `workflow` |
 
 ### 3.4.1 Example
@@ -480,12 +486,12 @@ Framed content surface. The default (no variant) is the panel look.
 
 Horizontal or vertical rule.
 
-**Variants:** none  
-**Key props:** `orientation` (`'horizontal'` default)  
+**Variants:** none\
+**Key props:** `orientation` (`'horizontal'` default)\
 **Composition:** standalone
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values      |
+| --------- | ----------- |
 | `data-ui` | `separator` |
 
 ### 3.5.1 Example
@@ -499,12 +505,12 @@ Horizontal or vertical rule.
 
 Indeterminate loading indicator.
 
-**Variants:** none  
-**Key props:** none beyond children  
+**Variants:** none\
+**Key props:** none beyond children\
 **Composition:** standalone; center inside loading containers
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values    |
+| --------- | --------- |
 | `data-ui` | `spinner` |
 
 ### 3.6.1 Example
@@ -517,18 +523,25 @@ Indeterminate loading indicator.
 
 Loading placeholder shimmer. Size it to match the content it replaces.
 
-**Variants:** none  
-**Key props:** `children` (or size via container)  
+**Variants:** none\
+**Key props:** `children` (or size via container)\
 **Composition:** replace content elements 1:1 during load
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values     |
+| --------- | ---------- |
 | `data-ui` | `skeleton` |
 
 ### 3.7.1 Example
 
 ```tsx
-<Show when={data()} fallback={<AppSkeleton><div style='height: 2rem' /></AppSkeleton>}>
+<Show
+  when={data()}
+  fallback={
+    <AppSkeleton>
+      <div style='height: 2rem' />
+    </AppSkeleton>
+  }
+>
   <h2>{data().title}</h2>
 </Show>
 ```
@@ -539,13 +552,13 @@ Loading placeholder shimmer. Size it to match the content it replaces.
 
 Horizontal flex container. Sizes to content by default.
 
-**Variants:** `fill` (full-width flex)  
-**Key props:** `variant`, `children`  
+**Variants:** `fill` (full-width flex)\
+**Key props:** `variant`, `children`\
 **Composition:** wraps any set of inline or inline-flex children; `variant='fill'` stretches to container
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `row` |
+| Attribute         | Values |
+| ----------------- | ------ |
+| `data-ui`         | `row`  |
 | `data-ui-variant` | `fill` |
 
 ### 4.1.1 Example
@@ -566,13 +579,13 @@ Horizontal flex container. Sizes to content by default.
 
 Vertical grid container. Fills container width by default.
 
-**Variants:** `inline` (content-fit width, items start-aligned)  
-**Key props:** `variant`, `children`  
+**Variants:** `inline` (content-fit width, items start-aligned)\
+**Key props:** `variant`, `children`\
 **Composition:** general-purpose vertical layout
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `stack` |
+| Attribute         | Values   |
+| ----------------- | -------- |
+| `data-ui`         | `stack`  |
 | `data-ui-variant` | `inline` |
 
 ### 4.2.1 Example
@@ -592,14 +605,14 @@ Vertical grid container. Fills container width by default.
 
 Semantic list with visual variants.
 
-**Variants (AppList):** default (clean, unstyled) · `bullet` · `numbered`  
-**Key props (AppList):** `variant`, `children`  
-**Key props (AppListItem):** `children`  
+**Variants (AppList):** default (clean, unstyled) · `bullet` · `numbered`\
+**Key props (AppList):** `variant`, `children`\
+**Key props (AppListItem):** `children`\
 **Composition:** `AppList` wraps `AppListItem` children
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `list` · `list-item` |
+| Attribute         | Values                |
+| ----------------- | --------------------- |
+| `data-ui`         | `list` · `list-item`  |
 | `data-ui-variant` | `bullet` · `numbered` |
 
 ### 4.3.1 Example
@@ -616,13 +629,13 @@ Semantic list with visual variants.
 
 Semantic table family. `AppTableCell` renders as `<th>` inside `AppTableHeader`, `<td>` elsewhere — no prop needed.
 
-**Key props (AppTableRow):** `section` (boolean) — renders an accent group-header row  
+**Key props (AppTableRow):** `section` (boolean) — renders an accent group-header row\
 **Composition:** `AppTable` > `AppTableHeader` + `AppTableBody` > `AppTableRow` > `AppTableCell`
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `table` · `table-head` · `table-body` · `table-row` · `table-cell` |
-| `data-ui-variant` | `section` (on `table-row` when `section={true}`) |
+| Attribute         | Values                                                             |
+| ----------------- | ------------------------------------------------------------------ |
+| `data-ui`         | `table` · `table-head` · `table-body` · `table-row` · `table-cell` |
+| `data-ui-variant` | `section` (on `table-row` when `section={true}`)                   |
 
 ### 4.4.1 Example
 
@@ -641,7 +654,9 @@ Semantic table family. `AppTableCell` renders as `<th>` inside `AppTableHeader`,
     </AppTableRow>
     <AppTableRow>
       <AppTableCell>SA-01</AppTableCell>
-      <AppTableCell><AppBadge variant='success'>Active</AppBadge></AppTableCell>
+      <AppTableCell>
+        <AppBadge variant='success'>Active</AppBadge>
+      </AppTableCell>
       <AppTableCell>92%</AppTableCell>
     </AppTableRow>
   </AppTableBody>
@@ -656,13 +671,13 @@ Form layout primitives are controls — imported from the same barrel as all oth
 
 Label + control wrapper. Always uses explicit `for`/`id` association.
 
-**Variants:** `inline` (content-fit; use when a toggle or control should sit inline with siblings)  
-**Key props:** `label` (required), `for` (required), `variant`, `children`  
+**Variants:** `inline` (content-fit; use when a toggle or control should sit inline with siblings)\
+**Key props:** `label` (required), `for` (required), `variant`, `children`\
 **Notes:** label and control are always siblings — the label never wraps a control
 
-| Attribute | Values |
-|---|---|
-| `data-ui` | `field` |
+| Attribute         | Values   |
+| ----------------- | -------- |
+| `data-ui`         | `field`  |
 | `data-ui-variant` | `inline` |
 
 ### 5.1.1 Example
@@ -681,11 +696,11 @@ Label + control wrapper. Always uses explicit `for`/`id` association.
 
 Semantic group boundary with a legend. Use when a form has logically distinct sections.
 
-**Key props:** `legend` (required), `children`  
+**Key props:** `legend` (required), `children`\
 **Notes:** always place `AppFormGrid` inside a `<div>` inside the fieldset — never apply grid directly to `<fieldset>`
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values     |
+| --------- | ---------- |
 | `data-ui` | `fieldset` |
 
 ### 5.2.1 Example
@@ -711,8 +726,8 @@ Responsive auto-fit column layout. The layout host for `AppField` children.
 
 **Key props:** `children`
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values      |
+| --------- | ----------- |
 | `data-ui` | `form-grid` |
 
 ### 5.3.1 Example
@@ -734,8 +749,8 @@ Right-aligned action row. Always at the tail of the form, outside any fieldsets.
 
 **Key props:** `children` (action `AppButton` elements)
 
-| Attribute | Values |
-|---|---|
+| Attribute | Values         |
+| --------- | -------------- |
 | `data-ui` | `form-actions` |
 
 ### 5.4.1 Example
@@ -771,7 +786,7 @@ Full form pattern — fieldset, grid, field, and actions working together.
 </AppFormActions>
 ```
 
-*Higher-level form compositions (dialog wrappers, pickers, reorder lists) are planned for the `forms/` layer — documentation to follow.*
+_Higher-level form compositions (dialog wrappers, pickers, reorder lists) are planned for the `forms/` layer — documentation to follow._
 
 ## 6. Charts
 
@@ -780,7 +795,7 @@ Charts are standardized through `AppChart`. Chart.js is the internal engine and 
 **Location:** `source/ux/common/components/charts`
 
 | Component   | Purpose                             |
-|-------------|-------------------------------------|
+| ----------- | ----------------------------------- |
 | `AppChart`  | Token-aware chart primitive wrapper |
 | `PieChart`  | Composition at a point in time      |
 | `BarChart`  | Frequency / volume over categories  |
