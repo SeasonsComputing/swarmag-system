@@ -495,10 +495,6 @@
   border-radius: var(--sa-radius-md);
 }
 
-[data-ui='accordion-item'][data-expanded] {
-  border-color: var(--sa-toggle-pressed-border);
-}
-
 [data-ui='accordion-trigger'] {
   align-items: center;
   background: transparent;
@@ -522,7 +518,11 @@
   background: var(--sa-bg-hover);
 }
 
-[data-ui='accordion-trigger']:focus-visible {
+[data-ui='accordion-trigger'][data-expanded]:focus-visible {
+  box-shadow: none;
+}
+
+[data-ui='accordion-item'][data-expanded]:has([data-ui='accordion-trigger']:focus-visible) {
   box-shadow: var(--sa-focus-ring);
 }
 
@@ -591,11 +591,11 @@
 
 [data-ui='toggle-group'] [data-ui='toggle'][data-pressed],
 [data-ui='toggle-group'] [data-ui='toggle']:hover {
-  z-index: 1;
+  z-index: var(--sa-z-raised);
 }
 
 [data-ui='toggle-group'] [data-ui='toggle']:focus-visible {
-  z-index: 2;
+  z-index: calc(var(--sa-z-raised) + 1);
 }
 
 [data-ui='toggle-group'] {

@@ -331,6 +331,7 @@ Typography        -> App typography tokens consumed by base and controls.
   /* --- Z-index Scale --- */
   --sa-z-below: -1;
   --sa-z-base: 0;
+  --sa-z-raised: 1;
   --sa-z-docked: 10;
   --sa-z-popover: 20;
   --sa-z-overlay: 100;
