@@ -557,7 +557,8 @@
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-[data-ui='toggle'] {
+[data-ui='toggle'],
+[data-ui='toggle-item'] {
   align-items: center;
   background: var(--sa-bg-surface-2);
   border: var(--sa-border-default);
@@ -577,26 +578,29 @@
   transition: var(--sa-transition-fast);
 }
 
-[data-ui='toggle']:hover {
+[data-ui='toggle']:hover,
+[data-ui='toggle-item']:hover {
   background: var(--sa-bg-hover);
 }
 
-[data-ui='toggle']:focus-visible {
+[data-ui='toggle']:focus-visible,
+[data-ui='toggle-item']:focus-visible {
   box-shadow: var(--sa-focus-ring);
 }
 
-[data-ui='toggle'][data-pressed] {
+[data-ui='toggle'][data-pressed],
+[data-ui='toggle-item'][data-pressed] {
   background: var(--sa-toggle-pressed-bg);
   border-color: var(--sa-toggle-pressed-border);
   color: var(--sa-toggle-pressed-text);
 }
 
-[data-ui='toggle-group'] [data-ui='toggle'][data-pressed],
-[data-ui='toggle-group'] [data-ui='toggle']:hover {
+[data-ui='toggle-group'] [data-ui='toggle-item'][data-pressed],
+[data-ui='toggle-group'] [data-ui='toggle-item']:hover {
   z-index: var(--sa-z-raised);
 }
 
-[data-ui='toggle-group'] [data-ui='toggle']:focus-visible {
+[data-ui='toggle-group'] [data-ui='toggle-item']:focus-visible {
   z-index: calc(var(--sa-z-raised) + 1);
 }
 
@@ -604,22 +608,22 @@
   display: inline-flex;
 }
 
-[data-ui='toggle-group'] [data-ui='toggle'] {
+[data-ui='toggle-group'] [data-ui='toggle-item'] {
   border-radius: unset;
   min-width: unset;
   position: relative;
 }
 
-[data-ui='toggle-group'] [data-ui='toggle']:not(:first-child) {
+[data-ui='toggle-group'] [data-ui='toggle-item']:not(:first-child) {
   margin-inline-start: -1px;
 }
 
-[data-ui='toggle-group'] [data-ui='toggle']:first-child {
+[data-ui='toggle-group'] [data-ui='toggle-item']:first-child {
   border-start-start-radius: var(--sa-radius-md);
   border-end-start-radius: var(--sa-radius-md);
 }
 
-[data-ui='toggle-group'] [data-ui='toggle']:last-child {
+[data-ui='toggle-group'] [data-ui='toggle-item']:last-child {
   border-start-end-radius: var(--sa-radius-md);
   border-end-end-radius: var(--sa-radius-md);
 }

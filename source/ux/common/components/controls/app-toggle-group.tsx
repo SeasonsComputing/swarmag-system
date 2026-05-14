@@ -92,7 +92,7 @@ export const AppToggleItem = <Value extends string = string>(
 
   return (
     <ToggleGroupItem
-      data-ui='toggle'
+      data-ui='toggle-item'
       value={local.value}
       disabled={local.disabled}
     >
