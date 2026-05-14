@@ -30,7 +30,7 @@ export type AppFieldProps = {
 
 /** Label + control field wrapper. Label and control are siblings, never nested. */
 export const AppField = (props: AppFieldProps): JSX.Element => (
-  <div class='app-field' data-variant={props.variant}>
+  <div data-ui='field' data-ui-variant={props.variant}>
     <label for={props.for}>{props.label}</label>
     {props.children}
   </div>

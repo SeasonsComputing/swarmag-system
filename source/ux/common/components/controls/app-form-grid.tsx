@@ -23,5 +23,5 @@ export type AppFormGridProps = {
 
 /** Responsive auto-fit column layout for form fields. */
 export const AppFormGrid = (props: AppFormGridProps): JSX.Element => (
-  <div class='app-form-grid'>{props.children}</div>
+  <div data-ui='form-grid'>{props.children}</div>
 )

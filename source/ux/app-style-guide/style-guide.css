@@ -106,7 +106,7 @@
 
 .sg-font-heading {
   font-family: var(--sa-font-heading);
-  font-size: var(--sa-font-base);
+  font-size: var(--sa-p-size-base);
 }
 
 .sg-font-body {
@@ -115,7 +115,7 @@
 
 .sg-font-label {
   font-family: var(--sa-font-label);
-  font-weight: var(--sa-weight-normal);
+  font-weight: var(--sa-p-weight-normal);
 }
 
 .sg-font-ui {
