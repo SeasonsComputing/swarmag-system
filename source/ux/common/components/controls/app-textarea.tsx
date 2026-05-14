@@ -50,7 +50,6 @@ export const AppTextarea = (props: AppTextareaProps): JSX.Element => {
 
   return (
     <TextFieldRoot
-      id={local.id}
       name={local.name}
       required={local.required}
       disabled={local.disabled || local.loading}
@@ -58,6 +57,7 @@ export const AppTextarea = (props: AppTextareaProps): JSX.Element => {
       validationState={local.error ? 'invalid' : undefined}
     >
       <TextFieldTextArea
+        id={local.id ?? local.name}
         {...others as unknown as TextFieldTextAreaProps}
         data-ui='textarea'
         data-ui-state={controlState(local) as string | undefined}

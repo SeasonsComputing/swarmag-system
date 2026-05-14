@@ -109,7 +109,7 @@
   display: inline-flex;
   font-family: var(--sa-font-label);
   font-size: var(--sa-font-sm);
-  font-weight: var(--sa-weight-thin);
+  font-weight: var(--sa-weight-normal);
   gap: var(--sa-space-sm);
   justify-content: space-between;
   min-height: var(--sa-touch-target-sm);
@@ -189,11 +189,6 @@
   padding: 0;
 }
 
-[data-ui='select-content'] ul:focus-visible:not(:has([data-ui='select-item'][data-highlighted])) {
-  box-shadow: var(--sa-focus-ring);
-  outline: none;
-}
-
 [data-ui='select-content'] {
   background: var(--sa-bg-popup);
   border: var(--sa-card-panel-border);
@@ -216,7 +211,7 @@
   display: flex;
   font-family: var(--sa-font-label);
   font-size: var(--sa-font-sm);
-  font-weight: var(--sa-weight-thin);
+  font-weight: var(--sa-weight-normal);
   justify-content: space-between;
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -226,10 +221,6 @@
 [data-ui='select-item']:not([data-selected]):hover,
 [data-ui='select-item'][data-highlighted]:not([data-selected]) {
   background: var(--sa-bg-hover);
-}
-
-[data-ui='select-content'] ul:not(:hover) [data-ui='select-item'][data-highlighted] {
-  box-shadow: var(--sa-focus-ring);
 }
 
 [data-ui='select-item'][data-disabled] {
@@ -282,7 +273,7 @@
   color: var(--sa-text-primary);
   cursor: pointer;
   display: flex;
-  font-weight: var(--sa-weight-thin);
+  font-weight: var(--sa-weight-normal);
   justify-content: space-between;
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -290,37 +281,24 @@
 }
 
 [data-ui='multi-select-item']:hover,
-[data-ui='multi-select']:focus-within [data-ui='multi-select-item'][data-highlighted] {
-  background: oklch(var(--sa-p-teal) / 0.14);
+[data-ui='multi-select-item'][data-highlighted] {
+  background: var(--sa-bg-hover);
 }
 
-[data-ui='multi-select']:focus-within [data-ui='multi-select-item'][data-highlighted] {
-  box-shadow: var(--sa-focus-ring);
-}
-
-[data-ui='multi-select-item'][data-selected],
-[data-ui='multi-select-item'][aria-selected='true'] {
+[data-ui='multi-select-item'][data-selected] {
   background: var(--sa-bg-selected);
   border-inline-start-color: var(--sa-color-primary);
   color: var(--sa-color-primary);
 }
 
-[data-ui='multi-select-item'][data-selected]::after,
-[data-ui='multi-select-item'][aria-selected='true']::after {
+[data-ui='multi-select-item'][data-selected]::after {
   content: '✓';
   font-size: var(--sa-font-xs);
 }
 
 [data-ui='multi-select-item'][data-selected]:hover,
-[data-ui='multi-select-item'][aria-selected='true']:hover,
-[data-ui='multi-select']:focus-within [data-ui='multi-select-item'][data-highlighted][data-selected],
-[data-ui='multi-select']:focus-within
-  [data-ui='multi-select-item'][data-highlighted][aria-selected='true'] {
-  background: color-mix(
-    in oklch,
-    var(--sa-bg-selected) 76%,
-    var(--sa-color-primary) 24%
-  );
+[data-ui='multi-select-item'][data-highlighted][data-selected] {
+  background: color-mix(in oklch, var(--sa-bg-selected) 76%, var(--sa-color-primary) 24%);
 }
 
 [data-ui='multi-select-item'][data-disabled] {
@@ -374,7 +352,7 @@
   font-family: var(--sa-font-body);
   padding-inline-start: 0.375rem;
   font-size: 1rem;
-  font-weight: var(--sa-weight-thin);
+  font-weight: var(--sa-weight-normal);
 }
 
 /*
@@ -476,7 +454,7 @@
 }
 
 [data-ui='checkbox-field']:has(input:focus-visible) [data-ui='checkbox'],
-[data-ui='radio-item']:has(input:focus) [data-ui='radio'] {
+[data-ui='radio-item']:has(input:focus-visible) [data-ui='radio'] {
   box-shadow: var(--sa-focus-ring);
 }
 
@@ -659,8 +637,7 @@
   gap: var(--sa-space-sm);
 }
 
-[data-ui='tab-list'] [data-ui='tab'],
-[data-ui='tab-list'] [role='tab'] {
+[data-ui='tab-list'] [data-ui='tab'] {
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-sm);
@@ -673,13 +650,11 @@
   padding-inline: var(--sa-space-md);
 }
 
-[data-ui='tab-list'] [data-ui='tab']:hover,
-[data-ui='tab-list'] [role='tab']:hover {
+[data-ui='tab-list'] [data-ui='tab']:hover {
   background: var(--sa-bg-hover);
 }
 
-[data-ui='tab-list'] [data-ui='tab']:focus-visible,
-[data-ui='tab-list'] [role='tab']:focus-visible {
+[data-ui='tab-list'] [data-ui='tab']:focus-visible {
   box-shadow: var(--sa-focus-ring);
 }
 

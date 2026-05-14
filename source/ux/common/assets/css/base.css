@@ -137,11 +137,10 @@ p {
 }
 
 label,
-button,
 legend {
   font-family: var(--sa-font-label);
   font-size: var(--sa-font-sm);
-  font-weight: var(--sa-weight-thin);
+  font-weight: var(--sa-weight-normal);
 }
 
 label {
@@ -234,7 +233,7 @@ table {
   background: var(--sa-bg-table);
   border-collapse: collapse;
   border-radius: var(--sa-radius-lg);
-  margin-block: var(--sa-space-md);
+  margin-block: var(--sa-space-xs);
   overflow: hidden;
   width: 100%;
 }
@@ -323,6 +322,7 @@ figure {
 
 figcaption {
   color: var(--sa-text-primary);
+  font-weight: var(--sa-weight-normal);
 }
 
 /*
