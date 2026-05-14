@@ -10,7 +10,7 @@ Emits select control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppSelect  Single-value select control with declared states.
+AppSingleSelect  Single-value select control with declared states.
 */
 
 import { Select, type SelectRootItemComponentProps } from '@kobalte/core/select'
@@ -20,10 +20,11 @@ import { type AppOption, appOptionLabel, controlState } from './controls-helpers
 type CollectionItem = { rawValue: AppOption; key: string }
 
 /** Select control props. */
-export type AppSelectProps = {
+export type AppSingleSelectProps = {
   disabled?: boolean
   error?: boolean
   id?: string
+  name?: string
   loading?: boolean
   options: ReadonlyArray<AppOption>
   value?: string
@@ -42,11 +43,12 @@ const SelectContent = Select.Content as unknown as typeof Select.Content
 const SelectItem = Select.Item as unknown as typeof Select.Item
 
 /** Single-value select control with declared states. */
-export const AppSelect = (props: AppSelectProps): JSX.Element => {
+export const AppSingleSelect = (props: AppSingleSelectProps): JSX.Element => {
   const [local] = splitProps(props, [
     'disabled',
     'error',
     'id',
+    'name',
     'loading',
     'options',
     'value',
@@ -57,6 +59,7 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
 
   return (
     <SelectRoot
+      name={local.name}
       options={local.options as AppOption[]}
       optionValue='value'
       optionTextValue={appOptionLabel}
@@ -64,6 +67,7 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
       validationState={local.error ? 'invalid' : undefined}
       placeholder={local.placeholder}
       gutter={4}
+      modal={false}
       {...(local.value === undefined
         ? {}
         : { value: local.options.find(o => o.value === local.value) ?? null })}
@@ -75,7 +79,7 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
         </SelectItem>
       )}
     >
-      <Select.Trigger id={local.id} data-ui='select' data-ui-state={controlState(local)}>
+      <Select.Trigger id={local.id ?? local.name} data-ui='select' data-ui-state={controlState(local)}>
         <Select.Value<AppOption>>
           {state =>
             state.selectedOption() ? appOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
@@ -85,8 +89,8 @@ export const AppSelect = (props: AppSelectProps): JSX.Element => {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <SelectContent data-ui='select-content' onKeyDown={(e: KeyboardEvent) => { if (e.key === ' ') e.preventDefault() }}>
-          <Select.Listbox />
+        <SelectContent data-ui='select-content'>
+          <Select.Listbox autofocus />
         </SelectContent>
       </Select.Portal>
     </SelectRoot>

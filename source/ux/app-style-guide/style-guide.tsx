@@ -21,7 +21,7 @@ import {
   AppAccordion, AppAccordionContent, AppAccordionItem, AppAccordionTrigger, AppAlert, AppAvatar,
   AppBadge, AppButton, AppCard, AppCheckbox, AppDialog, AppField, AppFieldset, AppFormActions,
   AppFormGrid, AppInput, AppList, AppListItem, AppMultiSelect, AppPopover, AppProgress, AppRadioGroup,
-  AppRadioItem, AppRow, AppSelect, AppSeparator, AppSkeleton, AppSpinner, AppStack, AppTab,
+  AppRadioItem, AppRow, AppSingleSelect, AppSeparator, AppSkeleton, AppSpinner, AppStack, AppTab,
   AppTable, AppTableBody, AppTableCell, AppTableHeader, AppTableRow, AppTabList, AppTabPanel,
   AppTabs, AppTextarea, AppToggle, AppToggleGroup, AppToggleItem, AppTooltip
 } from '@ux/common/components/controls'
@@ -45,16 +45,10 @@ type SectionProps = {
 /** Single-page living style guide application. */
 export const StyleGuide = (): JSX.Element => {
   type Theme = 'dark' | 'light'
-  type RadioValue =
-    | 'aerial'
-    | 'ground'
-    | 'inspection'
-    | 'ready'
-    | 'blocked'
-    | 'review'
-    | 'morning'
-    | 'afternoon'
-    | 'night'
+  type Services = 'aerial' | 'ground'
+  type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
+  type ServiceArrival = 'morning' | 'afternoon' | 'night'
+  type RadioValue = Services | ServiceStatus | ServiceArrival
   type ViewMode = 'map' | 'list' | 'grid'
   type Tab = 'assessment' | 'planning' | 'execution' | 'followup'
 
@@ -112,52 +106,50 @@ export const StyleGuide = (): JSX.Element => {
             </blockquote>
           </AppFieldset>
 
-          <AppFieldset legend='Typeface'>
-            <AppTable>
-              <AppTableHeader>
-                <AppTableCell>Target</AppTableCell>
-                <AppTableCell>Typeface</AppTableCell>
-                <AppTableCell>Example</AppTableCell>
-              </AppTableHeader>
-              <AppTableBody>
-                <AppTableRow>
-                  <AppTableCell>Heading</AppTableCell>
-                  <AppTableCell>Comfortaa</AppTableCell>
-                  <AppTableCell>
-                    <span class='sg-font-heading'>Operations briefing schedule confirmed</span>
-                  </AppTableCell>
-                </AppTableRow>
-                <AppTableRow>
-                  <AppTableCell>Body</AppTableCell>
-                  <AppTableCell>Comfortaa</AppTableCell>
-                  <AppTableCell>
-                    <span class='sg-font-body'>Inspect field boundaries and document hazard zones</span>
-                  </AppTableCell>
-                </AppTableRow>
-                <AppTableRow>
-                  <AppTableCell>Label</AppTableCell>
-                  <AppTableCell>Lexend</AppTableCell>
-                  <AppTableCell>
-                    <span class='sg-font-label'>Service window 06:00–09:00</span>
-                  </AppTableCell>
-                </AppTableRow>
-                <AppTableRow>
-                  <AppTableCell>UI</AppTableCell>
-                  <AppTableCell>Lexend</AppTableCell>
-                  <AppTableCell>
-                    <span class='sg-font-ui'>Assign crew and assets for spray mission</span>
-                  </AppTableCell>
-                </AppTableRow>
-                <AppTableRow>
-                  <AppTableCell>Mono</AppTableCell>
-                  <AppTableCell>Cascadia Mono</AppTableCell>
-                  <AppTableCell>
-                    <span class='sg-font-mono'>service.status = 'ready'; acres = 142</span>
-                  </AppTableCell>
-                </AppTableRow>
-              </AppTableBody>
-            </AppTable>
-          </AppFieldset>
+          <AppTable>
+            <AppTableHeader>
+              <AppTableCell>Typeface</AppTableCell>
+              <AppTableCell>Role</AppTableCell>
+              <AppTableCell>Example</AppTableCell>
+            </AppTableHeader>
+            <AppTableBody>
+              <AppTableRow>
+                <AppTableCell>Comfortaa</AppTableCell>
+                <AppTableCell>Heading</AppTableCell>
+                <AppTableCell>
+                  <span class='sg-font-heading'>Operations briefing schedule confirmed</span>
+                </AppTableCell>
+              </AppTableRow>
+              <AppTableRow>
+                <AppTableCell>Comfortaa</AppTableCell>
+                <AppTableCell>Body</AppTableCell>
+                <AppTableCell>
+                  <span class='sg-font-body'>Inspect field boundaries and document hazard zones</span>
+                </AppTableCell>
+              </AppTableRow>
+              <AppTableRow>
+                <AppTableCell>Lexend</AppTableCell>
+                <AppTableCell>Label</AppTableCell>
+                <AppTableCell>
+                  <span class='sg-font-label'>Service window 06:00–09:00</span>
+                </AppTableCell>
+              </AppTableRow>
+              <AppTableRow>
+                <AppTableCell>Lexend</AppTableCell>
+                <AppTableCell>UI</AppTableCell>
+                <AppTableCell>
+                  <span class='sg-font-ui'>Assign crew and assets for spray mission</span>
+                </AppTableCell>
+              </AppTableRow>
+              <AppTableRow>
+                <AppTableCell>Cascadia Mono</AppTableCell>
+                <AppTableCell>Mono</AppTableCell>
+                <AppTableCell>
+                  <span class='sg-font-mono'>service.status = 'ready'; acres = 142</span>
+                </AppTableCell>
+              </AppTableRow>
+            </AppTableBody>
+          </AppTable>
         </Section>
 
         <Section title='HTML Semantics'>
@@ -207,10 +199,10 @@ export const StyleGuide = (): JSX.Element => {
           <AppFieldset legend='Site access'>
             <AppFormGrid>
               <AppField label='Field contact' for='nameId'>
-                <AppInput id='nameId' value='R. Alvarez' onInput={() => undefined} />
+                <AppInput name='nameId' value='R. Alvarez' onInput={() => undefined} />
               </AppField>
               <AppField label='Gate code' for='codeId'>
-                <AppInput id='codeId' value='4821' onInput={() => undefined} />
+                <AppInput name='codeId' value='4821' onInput={() => undefined} />
               </AppField>
             </AppFormGrid>
           </AppFieldset>
@@ -241,6 +233,20 @@ export const StyleGuide = (): JSX.Element => {
                 <span>Bright teal finish</span>
               </figcaption>
             </figure>
+          </AppFieldset>
+        </Section>
+
+        <Section title='Decorations'>
+          <AppRow variant='fill'>
+            <AppFieldset legend='AppAvatar'>
+              <AppAvatar>AG</AppAvatar>
+            </AppFieldset>
+            <AppFieldset legend='AppSpinner'>
+              <AppSpinner />
+            </AppFieldset>
+          </AppRow>
+          <AppFieldset legend='AppSeparator'>
+            <AppSeparator />
           </AppFieldset>
         </Section>
 
@@ -283,49 +289,41 @@ export const StyleGuide = (): JSX.Element => {
           </AppField>
           <AppFieldset legend='Enabled'>
             <AppRow variant='fill'>
-              <div style={{ flex: '2' }}>
-                <AppField label='Field name' for='field-name'>
-                  <AppInput
-                    id='field-name'
-                    value='North Field'
-                    error={inputError()}
-                    onInput={() => undefined}
-                    placeholder='Enter service location'
-                  />
-                </AppField>
-              </div>
-              <div style={{ flex: '3' }}>
-                <AppField label='Application notes' for='application-notes'>
-                  <AppTextarea
-                    id='application-notes'
-                    error={inputError()}
-                    onInput={() => undefined}
-                    value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
-                    placeholder='Wind break along west ridge; verify drift boundary before launch.'
-                    rows={6}
-                  />
-                </AppField>
-              </div>
+              <AppField label='Field name' for='field-name'>
+                <AppInput
+                  name='field-name'
+                  value='North Field'
+                  error={inputError()}
+                  onInput={() => undefined}
+                  placeholder='Enter service location'
+                />
+              </AppField>
+              <AppField label='Application notes' for='application-notes'>
+                <AppTextarea
+                  name='application-notes'
+                  error={inputError()}
+                  onInput={() => undefined}
+                  value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
+                  placeholder='Wind break along west ridge; verify drift boundary before launch.'
+                  rows={6}
+                />
+              </AppField>
             </AppRow>
           </AppFieldset>
           <AppFieldset legend='Disabled'>
             <AppRow variant='fill'>
-              <div style={{ flex: '2' }}>
-                <AppField label='Disabled acreage' for='disabled-acreage'>
-                  <AppInput id='disabled-acreage' disabled value='142 acres' onInput={() => undefined} />
-                </AppField>
-              </div>
-              <div style={{ flex: '3' }}>
-                <AppField label='Disabled comments' for='disabled-comments'>
-                  <AppTextarea
-                    id='disabled-comments'
-                    disabled
-                    value='Locked after crew dispatch.'
-                    onInput={() => undefined}
-                    rows={6}
-                  />
-                </AppField>
-              </div>
+              <AppField label='Disabled acreage' for='disabled-acreage'>
+                <AppInput name='disabled-acreage' disabled value='142 acres' onInput={() => undefined} />
+              </AppField>
+              <AppField label='Disabled comments' for='disabled-comments'>
+                <AppTextarea
+                  name='disabled-comments'
+                  disabled
+                  value='Locked after crew dispatch.'
+                  onInput={() => undefined}
+                  rows={6}
+                />
+              </AppField>
             </AppRow>
           </AppFieldset>
         </Section>
@@ -340,37 +338,43 @@ export const StyleGuide = (): JSX.Element => {
               Error
             </AppToggle>
           </AppField>
-          <AppFormGrid>
-            <AppField label='Single-select' for='service-status'>
-              <AppSelect
-                id='service-status'
-                placeholder='Select service status'
-                error={selectError()}
-                options={STATUSES}
-              />
-            </AppField>
-            <AppField label='Disabled select' for='disabled-select'>
-              <AppSelect
-                id='disabled-select'
-                disabled
-                defaultValue='Ready'
-                options={STATUSES}
-              />
-            </AppField>
-          </AppFormGrid>
-          <AppField label='Multi-select' for='multi-select-demo'>
+          <AppFieldset legend='Single-select'>
+            <AppRow variant='fill'>
+              <AppField label='Enabled select' for='service-status'>
+                <AppSingleSelect
+                  name='service-status'
+                  placeholder='Select service status'
+                  error={selectError()}
+                  options={STATUSES}
+                />
+              </AppField>
+              <AppField label='Disabled select' for='disabled-select'>
+                <AppSingleSelect
+                  name='disabled-select'
+                  disabled
+                  defaultValue='Ready'
+                  options={STATUSES}
+                />
+              </AppField>
+            </AppRow>
+          </AppFieldset>
+          <AppFieldset legend='Multi-select'>
             <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
-          </AppField>
+          </AppFieldset>
         </Section>
 
         <Section title='AppField / AppFieldset / AppFormGrid / AppFormActions'>
           <AppFieldset legend='Service details'>
             <AppFormGrid>
               <AppField label='Field name' for='form-demo-name'>
-                <AppInput id='form-demo-name' value='North Field' onInput={() => undefined} />
+                <AppInput name='form-demo-name' value='North Field' onInput={() => undefined} />
               </AppField>
               <AppField label='Service type' for='form-demo-service'>
-                <AppSelect id='form-demo-service' options={STATUSES} placeholder='Select service type' />
+                <AppSingleSelect
+                  name='form-demo-service'
+                  options={STATUSES}
+                  placeholder='Select service type'
+                />
               </AppField>
             </AppFormGrid>
           </AppFieldset>
@@ -378,7 +382,7 @@ export const StyleGuide = (): JSX.Element => {
             <AppFormGrid>
               <AppField label='Application notes' for='form-demo-notes'>
                 <AppTextarea
-                  id='form-demo-notes'
+                  name='form-demo-notes'
                   value='Spray window 06:00–09:00.'
                   onInput={() => undefined}
                   rows={3}
@@ -467,10 +471,6 @@ export const StyleGuide = (): JSX.Element => {
           </AppStack>
         </Section>
 
-        <Section title='AppSpinner'>
-          <AppSpinner />
-        </Section>
-
         <Section title='AppSkeleton'>
           <AppStack>
             <AppSkeleton />
@@ -503,31 +503,33 @@ export const StyleGuide = (): JSX.Element => {
           </AppStack>
         </Section>
 
-        <Section title='AppTooltip'>
-          <AppRow>
-            <AppTooltip trigger='Hover field note' defaultOpen>
-              Verify buffer zone before aerial application.
-            </AppTooltip>
-          </AppRow>
-        </Section>
-
-        <Section title='AppDialog'>
-          <AppRow>
-            <AppDialog trigger='Open dispatch dialog'>
-              <AppStack>
-                <p>Confirm crew assignment before dispatch.</p>
-              </AppStack>
-            </AppDialog>
-          </AppRow>
-        </Section>
-
-        <Section title='AppPopover'>
-          <AppRow>
-            <AppPopover trigger='Open field menu'>
-              <AppStack>
-                <p>Field actions, notes, and service history.</p>
-              </AppStack>
-            </AppPopover>
+        <Section title='Secondary Windows'>
+          <AppRow variant='fill'>
+            <AppFieldset legend='AppTooltip'>
+              <AppRow>
+                <AppTooltip trigger='Hover field note' defaultOpen>
+                  Verify buffer zone before aerial application.
+                </AppTooltip>
+              </AppRow>
+            </AppFieldset>
+            <AppFieldset legend='AppDialog'>
+              <AppRow>
+                <AppDialog trigger='Open dispatch dialog'>
+                  <AppStack>
+                    <p>Confirm crew assignment before dispatch.</p>
+                  </AppStack>
+                </AppDialog>
+              </AppRow>
+            </AppFieldset>
+            <AppFieldset legend='AppPopover'>
+              <AppRow>
+                <AppPopover trigger='Open field menu'>
+                  <AppStack>
+                    <p>Field actions, notes, and service history.</p>
+                  </AppStack>
+                </AppPopover>
+              </AppRow>
+            </AppFieldset>
           </AppRow>
         </Section>
 
@@ -568,38 +570,30 @@ export const StyleGuide = (): JSX.Element => {
           </AppAccordion>
         </Section>
 
-        <Section title='AppAvatar'>
-          <AppAvatar>AG</AppAvatar>
-        </Section>
-
         <Section title='AppCard'>
           <div class='sg-card-grid'>
             <AppCard>
-              <div class='sg-card-copy'>
+              <AppStack>
                 <h3>Default card</h3>
                 <p>
                   Quiet interior surface — no variant. Used for form sections and guided workflow
                   sub-groups.
                 </p>
-              </div>
+              </AppStack>
             </AppCard>
             <AppCard variant='widget'>
-              <div class='sg-card-copy'>
+              <AppStack>
                 <h3>Widget card</h3>
                 <p>Dashboard-ready surface with stripe treatment and crisp separation from the page.</p>
-              </div>
+              </AppStack>
             </AppCard>
             <AppCard variant='workflow'>
-              <div class='sg-card-copy'>
+              <AppStack>
                 <h3>Workflow card</h3>
                 <p>Primary framed container for guided flows that need stronger focus and elevation.</p>
-              </div>
+              </AppStack>
             </AppCard>
           </div>
-        </Section>
-
-        <Section title='AppSeparator'>
-          <AppSeparator />
         </Section>
 
         <Section title='Charts'>
@@ -609,6 +603,7 @@ export const StyleGuide = (): JSX.Element => {
       </main>
 
       <footer class='sg-footer'>
+        <img src='@ux/common/assets/logos/swarmag-logo-wordmark.png' />
       </footer>
     </>
   )
@@ -616,11 +611,11 @@ export const StyleGuide = (): JSX.Element => {
 
 const Section = (props: SectionProps): JSX.Element => (
   <section class='sg-section'>
-    <AppCard>
-      <div class='sg-section-frame'>
+    <AppCard variant='widget'>
+      <AppStack>
         <h2>{props.title}</h2>
         <div class='sg-section-body'>{props.children}</div>
-      </div>
+      </AppStack>
     </AppCard>
   </section>
 )

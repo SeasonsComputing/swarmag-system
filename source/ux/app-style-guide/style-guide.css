@@ -13,7 +13,7 @@
   gap: var(--sa-space-lg);
   inset-block-start: 0;
   justify-content: space-between;
-  margin-inline: auto;
+  margin: 0;
   padding: var(--sa-space-md) var(--sa-space-xl);
   position: sticky;
   z-index: var(--sa-z-docked);
@@ -30,11 +30,6 @@
   padding: var(--sa-space-xl);
 }
 
-.sg-section-frame {
-  display: grid;
-  gap: var(--sa-space-md);
-}
-
 .sg-section-body {
   display: grid;
   gap: var(--sa-space-md);
@@ -49,18 +44,6 @@
 .sg-card-copy {
   display: grid;
   gap: var(--sa-space-sm);
-}
-
-.sg-row {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sa-space-md);
-}
-
-.sg-stack {
-  display: grid;
-  gap: var(--sa-space-md);
 }
 
 .sg-swatch-grid {
@@ -85,13 +68,8 @@
   margin-block-start: var(--sa-space-sm);
 }
 
-.sg-gradient-stripe,
 .sg-gradient-block {
   background: var(--sa-gradient-brand);
-}
-
-.sg-gradient-stripe {
-  min-height: 3px;
 }
 
 .sg-gradient-block {
