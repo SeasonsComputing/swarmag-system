@@ -74,22 +74,22 @@ export const AppSingleSelect = (props: AppSingleSelectProps): JSX.Element => {
       defaultValue={local.options.find(o => o.value === local.defaultValue)}
       onChange={(option: AppOption | null) => local.onChange?.(option?.value ?? '')}
       itemComponent={(item: SelectRootItemComponentProps<AppOption>) => (
-        <SelectItem data-ui='select-item' item={item.item}>
+        <SelectItem data-ui='single-select-item' item={item.item}>
           {appOptionLabel(item.item.rawValue)}
         </SelectItem>
       )}
     >
-      <Select.Trigger id={local.id ?? local.name} data-ui='select' data-ui-state={controlState(local)}>
+      <Select.Trigger id={local.id ?? local.name} data-ui='single-select' data-ui-state={controlState(local)}>
         <Select.Value<AppOption>>
           {state =>
             state.selectedOption() ? appOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
         </Select.Value>
-        <Select.Icon data-ui='select-icon'>
-          <span data-ui='select-icon-glyph' />
+        <Select.Icon data-ui='single-select-icon'>
+          <span data-ui='single-select-icon-glyph' />
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <SelectContent data-ui='select-content'>
+        <SelectContent data-ui='single-select-content'>
           <Select.Listbox autofocus />
         </SelectContent>
       </Select.Portal>
