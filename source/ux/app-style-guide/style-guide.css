@@ -26,7 +26,7 @@
 
 .sg-section {
   margin-inline: auto;
-  max-width: 1120px;
+  max-width: var(--sa-size-lg);
   padding: var(--sa-space-xl);
 }
 
@@ -70,9 +70,6 @@
 
 .sg-gradient-block {
   background: var(--sa-gradient-brand);
-}
-
-.sg-gradient-block {
   border-radius: var(--sa-radius-md);
   min-height: 120px;
 }
@@ -106,7 +103,7 @@
 
 .sg-font-heading {
   font-family: var(--sa-font-heading);
-  font-size: var(--sa-p-size-base);
+  font-size: var(--sa-font-label-size);
 }
 
 .sg-font-body {
@@ -115,7 +112,7 @@
 
 .sg-font-label {
   font-family: var(--sa-font-label);
-  font-weight: var(--sa-p-weight-normal);
+  font-weight: var(--sa-font-label-weight);
 }
 
 .sg-font-ui {
