@@ -27,8 +27,8 @@ import {
 } from '@ux/common/components/controls'
 // dprint-ignore-end
 
-import { AppFooter } from '@ux/common/components/shell/app-footer.tsx'
 import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
+import { AppFooter } from '@ux/common/components/shell/app-footer.tsx'
 
 import {
   ACCORDION_DEFAULT_VALUE,
