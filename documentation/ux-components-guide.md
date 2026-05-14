@@ -102,10 +102,10 @@ Dropdown single-value picker. Options are `AppOption` objects (`{ value: string;
 **Composition:** use inside `AppField` with matching `for`/`id`\
 **Notes:** `onChange` receives the selected `string` value, not the `AppOption` object
 
-| Attribute       | Values                                                                                      |
-| --------------- | ------------------------------------------------------------------------------------------- |
-| `data-ui`       | `select` (trigger) · `select-item` · `select-content` · `select-icon` · `select-icon-glyph` |
-| `data-ui-state` | `disabled` · `error`                                                                        |
+| Attribute       | Values                                                                                                                              |
+| --------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `data-ui`       | `single-select` (trigger) · `single-select-item` · `single-select-content` · `single-select-icon` · `single-select-icon-glyph`     |
+| `data-ui-state` | `disabled` · `error`                                                                                                                |
 
 ### 2.4.1 Example
 
@@ -163,10 +163,10 @@ Checkbox with inline label.
 **Key props:** `checked`, `defaultChecked`, `disabled`, `error`, `name`, `required`, `value`, `onChange`, `children` (label text)\
 **Composition:** standalone or inside `AppField`
 
-| Attribute       | Values                                                        |
-| --------------- | ------------------------------------------------------------- |
-| `data-ui`       | `checkbox-field` (outer wrapper) · `checkbox` (input element) |
-| `data-ui-state` | `disabled` · `error`                                          |
+| Attribute       | Values                 |
+| --------------- | ---------------------- |
+| `data-ui`       | `checkbox`             |
+| `data-ui-state` | `disabled` · `error`   |
 
 ### 2.6.1 Example
 
