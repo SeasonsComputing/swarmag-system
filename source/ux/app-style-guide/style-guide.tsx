@@ -27,6 +27,9 @@ import {
 } from '@ux/common/components/controls'
 // dprint-ignore-end
 
+import { AppFooter } from '@ux/common/components/shell/app-footer.tsx'
+import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
+
 import {
   ACCORDION_DEFAULT_VALUE,
   BUTTON_VARIANTS,
@@ -44,7 +47,7 @@ type SectionProps = {
 
 /** Single-page living style guide application. */
 export const StyleGuide = (): JSX.Element => {
-  type Theme = 'dark' | 'light'
+  type Theme = 'dark' | 'brand' | 'light'
   type Services = 'aerial' | 'ground'
   type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
   type ServiceArrival = 'morning' | 'afternoon' | 'night'
@@ -75,6 +78,7 @@ export const StyleGuide = (): JSX.Element => {
         </div>
         <AppToggleGroup<Theme> value={theme()} onChange={setTheme}>
           <AppToggleItem value='dark'>Dark</AppToggleItem>
+          <AppToggleItem value='brand'>Brand</AppToggleItem>
           <AppToggleItem value='light'>Light</AppToggleItem>
         </AppToggleGroup>
       </header>
@@ -602,9 +606,7 @@ export const StyleGuide = (): JSX.Element => {
         </Section>
       </main>
 
-      <footer class='sg-footer'>
-        <img src='@ux/common/assets/logos/swarmag-logo-wordmark.png' />
-      </footer>
+      <AppFooter logo={logo} alt='swarmAg' />
     </>
   )
 }
