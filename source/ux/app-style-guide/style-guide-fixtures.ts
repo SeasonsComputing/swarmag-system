@@ -17,6 +17,7 @@ STATUSES                Service status options.
 SERVICES                Service category options.
 DEFAULT_SERVICES        Default multi-select service values.
 ACCORDION_DEFAULT_VALUE Default open accordion value.
+EQUIPMENT               Grouped equipment records for section-row table rendering.
 */
 
 export const FIELDS = [
@@ -89,3 +90,21 @@ export const SERVICES = [
 export const DEFAULT_SERVICES = ['Aerial', 'Ground'] as const
 
 export const ACCORDION_DEFAULT_VALUE = ['weather'] as const
+
+export const EQUIPMENT = [
+  {
+    section: 'Ground Machinery',
+    items: [
+      { name: 'John Deere SkidSteer', application: 'Front-loaders & attachments for ground operations' },
+      { name: 'Bobcat Toolcat', application: 'Utility vehicles & attachments for specialized tasks' }
+    ]
+  },
+  {
+    section: 'Aerial Drones',
+    items: [
+      { name: 'XAG P150', application: 'Industrial drones for heavy payloads' },
+      { name: 'DJI T30', application: 'Agricultural drones for aerial applications' },
+      { name: 'DJI P4', application: 'Multispectral drones for detailed terrain analysis' }
+    ]
+  }
+] as const

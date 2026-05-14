@@ -35,6 +35,7 @@ import {
   BUTTON_VARIANTS,
   COLOR_SWATCHES,
   DEFAULT_SERVICES,
+  EQUIPMENT,
   FIELDS,
   SERVICES,
   STATUSES
@@ -175,6 +176,33 @@ export const StyleGuide = (): JSX.Element => {
                     <AppTableCell>{field.status}</AppTableCell>
                     <AppTableCell>{field.date}</AppTableCell>
                   </AppTableRow>
+                )}
+              </For>
+            </AppTableBody>
+          </AppTable>
+
+          <AppTable>
+            <AppTableHeader>
+              <AppTableCell>Equipment</AppTableCell>
+              <AppTableCell>Application</AppTableCell>
+            </AppTableHeader>
+            <AppTableBody>
+              <For each={EQUIPMENT}>
+                {group => (
+                  <>
+                    <AppTableRow section>
+                      <AppTableCell>{group.section}</AppTableCell>
+                      <AppTableCell />
+                    </AppTableRow>
+                    <For each={group.items}>
+                      {item => (
+                        <AppTableRow>
+                          <AppTableCell>{item.name}</AppTableCell>
+                          <AppTableCell>{item.application}</AppTableCell>
+                        </AppTableRow>
+                      )}
+                    </For>
+                  </>
                 )}
               </For>
             </AppTableBody>
