@@ -1,33 +1,14 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ UX form layout                                                               ║
-║ Field wrapper, responsive grid, and actions row.                             ║
+║ UX domain form styles                                                        ║
+║ CSS for domain-specific form compositions in ux/common/forms/.               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Home for CSS that supports domain form compositions. App{} form layout
+primitives (AppField, AppFormGrid, AppFormActions, AppFieldset) are controls
+and their CSS lives in controls.css.
+
+This file is consumed by domain form components in source/ux/common/forms/.
 */
-
-/** Label + control as siblings */
-.app-field {
-  align-content: start;
-  display: grid;
-  gap: var(--sa-space-xs);
-}
-
-.app-field[data-variant='inline'] {
-  justify-items: start;
-}
-
-/** Responsive auto-fit grid for composing fields into a form layout. */
-.app-form-grid {
-  align-items: start;
-  display: grid;
-  gap: var(--sa-space-md);
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-}
-
-/** Action buttons at the end of a form, separate from the field grid. */
-.app-form-actions {
-  align-items: center;
-  display: flex;
-  gap: var(--sa-space-md);
-  justify-content: flex-end;
-}

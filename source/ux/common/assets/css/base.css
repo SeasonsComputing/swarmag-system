@@ -62,8 +62,8 @@ body {
   background: var(--sa-bg-page);
   color: var(--sa-text-primary);
   font-family: var(--sa-font-body);
-  font-weight: var(--sa-weight-thin);
-  line-height: var(--sa-leading-normal);
+  font-weight: var(--sa-font-body-weight);
+  line-height: var(--sa-p-leading-normal);
   opacity: 0;
   position: relative;
   transition: opacity var(--sa-motion-page-fade) ease-in;
@@ -108,7 +108,7 @@ body::before {
 
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--sa-font-heading);
-  font-weight: var(--sa-weight-normal);
+  font-weight: var(--sa-font-heading-weight);
 }
 
 h1 {
@@ -133,46 +133,49 @@ h5 {
 
 p {
   font-family: var(--sa-font-body);
-  font-weight: var(--sa-weight-thin);
+  font-weight: var(--sa-font-body-weight);
 }
 
 label,
 legend {
   font-family: var(--sa-font-label);
-  font-size: var(--sa-font-sm);
-  font-weight: var(--sa-weight-normal);
+  font-size: var(--sa-font-label-size);
+  font-weight: var(--sa-font-label-weight);
 }
 
 label {
   color: var(--sa-text-muted);
 }
 
-figcaption {
-  font-family: var(--sa-font-label);
-  font-size: var(--sa-font-sm);
-  font-weight: var(--sa-weight-thin);
-}
-
 th {
   font-family: var(--sa-font-label);
-  font-size: var(--sa-font-sm);
-  font-weight: var(--sa-weight-normal);
+  font-size: var(--sa-font-label-size);
+  font-weight: var(--sa-font-label-weight);
 }
 
-li,
+li {
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-label-size);
+  font-weight: var(--sa-font-label-weight);
+}
+
 td {
   font-family: var(--sa-font-label);
-  font-size: var(--sa-font-sm);
-  font-weight: var(--sa-weight-thin);
+  font-size: var(--sa-font-label-size);
+  font-weight: var(--sa-font-body-weight);
 }
 
 input,
+textarea {
+  font-family: var(--sa-font-ui);
+  font-weight: var(--sa-font-body-weight);
+}
+
 select,
-textarea,
 [role='menuitem'],
 [role='option'] {
   font-family: var(--sa-font-ui);
-  font-weight: var(--sa-weight-normal);
+  font-weight: var(--sa-font-ui-weight);
 }
 
 code, pre, kbd, samp {
@@ -250,7 +253,7 @@ td {
 }
 
 th {
-  color: oklch(var(--sa-p-white));
+  color: var(--sa-text-on-brand);
 }
 
 td {
@@ -322,7 +325,9 @@ figure {
 
 figcaption {
   color: var(--sa-text-primary);
-  font-weight: var(--sa-weight-normal);
+  font-family: var(--sa-font-label);
+  font-size: var(--sa-font-label-size);
+  font-weight: var(--sa-font-label-weight);
 }
 
 /*

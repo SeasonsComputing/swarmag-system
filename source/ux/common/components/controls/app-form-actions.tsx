@@ -23,5 +23,5 @@ export type AppFormActionsProps = {
 
 /** Right-aligned action button row. Always separate from the field grid. */
 export const AppFormActions = (props: AppFormActionsProps): JSX.Element => (
-  <div class='app-form-actions'>{props.children}</div>
+  <div data-ui='form-actions'>{props.children}</div>
 )

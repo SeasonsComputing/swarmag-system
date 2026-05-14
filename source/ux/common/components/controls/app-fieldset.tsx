@@ -31,7 +31,7 @@ export type AppFieldsetProps = {
 
 /** Semantic field group with legend. Compose AppFormGrid inside for field layout. */
 export const AppFieldset = (props: AppFieldsetProps): JSX.Element => (
-  <fieldset>
+  <fieldset data-ui='fieldset'>
     <legend>{props.legend}</legend>
     {props.children}
   </fieldset>

@@ -86,34 +86,52 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-font-mono: var(--sa-p-font-mono);
 
   /* --- Font Weights --- */
-  --sa-weight-thin: 300;
-  --sa-weight-normal: 400;
-  --sa-weight-medium: 500;
-  --sa-weight-semibold: 600;
-  --sa-weight-bold: 700;
-  --sa-weight-extrabold: 800;
+  --sa-p-weight-thin: 300;
+  --sa-p-weight-normal: 400;
+  --sa-p-weight-medium: 500;
+  --sa-p-weight-semibold: 600;
+  --sa-p-weight-bold: 700;
+  --sa-p-weight-extrabold: 800;
+
+  /* --- Typography Role Tokens --- */
+  --sa-font-heading-weight: var(--sa-p-weight-normal);
+  --sa-font-body-weight: var(--sa-p-weight-thin);
+  --sa-font-label-size: var(--sa-p-size-sm);
+  --sa-font-label-weight: var(--sa-p-weight-normal);
+  --sa-font-ui-size: var(--sa-p-size-sm);
+  --sa-font-ui-compact-size: var(--sa-p-size-xs);
+  --sa-font-ui-weight: var(--sa-p-weight-normal);
+
+  /* --- Component Typography Tokens --- */
+  --sa-btn-font-size: var(--sa-p-size-xs);
+  --sa-btn-font-weight: var(--sa-p-weight-medium);
+  --sa-btn-primary-font-weight: var(--sa-p-weight-semibold);
+  --sa-toggle-font-weight: var(--sa-p-weight-medium);
+  --sa-tab-font-weight: var(--sa-p-weight-medium);
+  --sa-badge-font-weight: var(--sa-p-weight-thin);
+  --sa-avatar-font-weight: var(--sa-p-weight-semibold);
 
   /* --- Font Sizes — fluid --- */
-  --sa-font-xs: clamp(0.75rem, 0.72rem + 0.125vw, 0.8rem);
-  --sa-font-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9rem);
-  --sa-font-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
-  --sa-font-md: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
-  --sa-font-lg: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
-  --sa-font-xl: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
-  --sa-font-2xl: clamp(1.75rem, 1.5rem + 2vw, 3rem);
+  --sa-p-size-xs: clamp(0.75rem, 0.72rem + 0.125vw, 0.8rem);
+  --sa-p-size-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9rem);
+  --sa-p-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+  --sa-p-size-md: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
+  --sa-p-size-lg: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
+  --sa-p-size-xl: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+  --sa-p-size-2xl: clamp(1.75rem, 1.5rem + 2vw, 3rem);
 
   /* --- Line Heights --- */
-  --sa-leading-tight: 1.25;
-  --sa-leading-snug: 1.375;
-  --sa-leading-normal: 1.5;
-  --sa-leading-relaxed: 1.625;
+  --sa-p-leading-tight: 1.25;
+  --sa-p-leading-snug: 1.375;
+  --sa-p-leading-normal: 1.5;
+  --sa-p-leading-relaxed: 1.625;
 
   /* --- Letter Spacing --- */
-  --sa-tracking-tight: -0.025em;
-  --sa-tracking-normal: 0;
-  --sa-tracking-wide: 0.025em;
-  --sa-tracking-wider: 0.05em;
-  --sa-tracking-widest: 0.1em;
+  --sa-p-tracking-tight: -0.025em;
+  --sa-p-tracking-normal: 0;
+  --sa-p-tracking-wide: 0.025em;
+  --sa-p-tracking-wider: 0.05em;
+  --sa-p-tracking-widest: 0.1em;
 
   /* --- Brand Colors --- */
   --sa-color-brand-start: oklch(66% 0.14 235);
@@ -290,6 +308,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-tab-active-bg: oklch(var(--sa-p-surface-3));
   --sa-tab-active-text: oklch(var(--sa-p-near-white));
   --sa-separator-size: 1px;
+  --sa-progress-height: 1rem;
   --sa-card-stripe-height: 3px;
   --sa-card-stripe-opacity: 0.8;
   --sa-button-primary-hover-transform: translateY(-2px);
@@ -587,46 +606,3 @@ Typography        -> App typography tokens consumed by base and controls.
   }
 }
 
-/*
- * JOB RUNNER TOKENS
- * ───────────────────────────────────────────────────────────────────────────
- * Ops app / job runner only.
- * Safety-first: large targets, maximum contrast, single decision per screen.
- */
-
-:root {
-  /* --- Answer button minimum height — field safety --- */
-  --sa-jr-answer-height: 5rem;
-
-  /* --- Boolean answer buttons — full width pair --- */
-  --sa-jr-boolean-height: 6rem;
-  --sa-jr-boolean-radius: var(--sa-radius-lg);
-
-  /* --- Option tile — single/multi select --- */
-  --sa-jr-option-height: 4.5rem;
-  --sa-jr-option-radius: var(--sa-radius-md);
-
-  /* --- Progress bar height --- */
-  --sa-jr-progress-height: 1rem;
-
-  /* --- Screen padding — generous for glance-ability --- */
-  --sa-jr-screen-pad: 1.5rem;
-  --sa-jr-section-gap: 2rem;
-
-  /* --- Nav button height --- */
-  --sa-jr-nav-height: var(--sa-touch-target);
-
-  /* --- Boolean state colors --- */
-  --sa-jr-yes-bg: oklch(var(--sa-p-success));
-  --sa-jr-yes-bg-active: oklch(var(--sa-p-success) / 0.85);
-  --sa-jr-no-bg: oklch(var(--sa-p-danger));
-  --sa-jr-no-bg-active: oklch(var(--sa-p-danger) / 0.85);
-  --sa-jr-yes-text: oklch(var(--sa-p-white));
-  --sa-jr-no-text: oklch(var(--sa-p-white));
-
-  /* --- Prompt typography — large for field readability --- */
-  --sa-jr-prompt-size: var(--sa-font-xl);
-  --sa-jr-prompt-weight: var(--sa-weight-medium);
-  --sa-jr-help-size: var(--sa-font-md);
-  --sa-jr-help-color: oklch(var(--sa-p-muted));
-}
