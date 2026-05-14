@@ -1031,3 +1031,21 @@
   gap: var(--sa-space-md);
   justify-content: flex-end;
 }
+
+/* ─── Footer ─────────────────────────────────────────────────────────────── */
+
+[data-ui='footer'] {
+  align-items: center;
+  background: var(--sa-card-panel-bg);
+  border-block-start: var(--sa-card-panel-border);
+  display: flex;
+  justify-content: center;
+  padding-block: var(--sa-space-sm);
+  padding-block-end: max(var(--sa-space-sm), env(safe-area-inset-bottom));
+}
+
+[data-ui='footer-logo'] {
+  filter: var(--sa-filter-mono);
+  height: 2rem;
+  width: auto;
+}
