@@ -521,6 +521,143 @@ Typography        -> App typography tokens consumed by base and controls.
 }
 
 /*
+ * THEME: CUSTOMER
+ * ───────────────────────────────────────────────────────────────────────────
+ * swarmAg brand palette — light, eggshell ground, green primary, orange CTA.
+ * Only tokens that differ from dark are redeclared here.
+ */
+
+[data-theme='brand'] {
+  /* --- Fonts --- */
+  --sa-font-heading: 'Playfair Display', ui-serif, serif;
+  --sa-font-ui: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* --- Typography weights --- */
+  --sa-font-heading-weight: var(--sa-p-weight-bold);
+
+  /* --- Brand colors --- */
+  --sa-color-brand-start: oklch(76.849% 0.13454 123.993);
+  --sa-color-brand-mid: oklch(65.2070% 0.1322 81.5716);
+  --sa-color-brand-end: oklch(76.849% 0.13454 123.993);
+  --sa-color-primary: oklch(76.849% 0.13454 123.993);
+  --sa-color-primary-dim: oklch(65% 0.11 123.993);
+  --sa-color-secondary: oklch(76.885% 0.1231 80.8277);
+  --sa-color-accent: oklch(76.885% 0.1231 80.8277);
+
+  /* --- Backgrounds --- */
+  --sa-bg-page: oklch(99.0925% 0.0122 91.5145);
+  --sa-bg-base: oklch(99.1042% 0 0);
+  --sa-bg-surface-1: oklch(100% 0 0);
+  --sa-bg-surface-2: oklch(99.0925% 0.0122 91.5145);
+  --sa-bg-surface-3: oklch(92.758% 0.0058 264.5313);
+  --sa-bg-progress-track: oklch(88% 0.008 264.5);
+  --sa-bg-overlay: oklch(0% 0 0 / 0.06);
+  --sa-bg-popup: oklch(100% 0 0);
+  --sa-bg-table: oklch(0% 0 0 / 0.02);
+  --sa-bg-hover: oklch(76.849% 0.13454 123.993 / 0.08);
+  --sa-bg-selected: oklch(76.849% 0.13454 123.993 / 0.15);
+  --sa-bg-input: oklch(100% 0 0);
+  --sa-bg-input-focus: oklch(98.1943% 0.018 155.8257);
+  --sa-bg-control: oklch(0% 0 0 / 0.04);
+  --sa-bg-input-disabled: oklch(96.6936% 0.0029 264.5419);
+  --sa-bg-card: linear-gradient(135deg, oklch(100% 0 0 / 0.95) 0%, oklch(99.0925% 0.0122 91.5145 / 0.9) 100%);
+  --sa-skeleton-shimmer: oklch(88% 0.006 120 / 0.5);
+
+  /* --- Text --- */
+  --sa-text-primary: oklch(44.4385% 0.0096 73.6332);
+  --sa-text-secondary: oklch(35% 0.008 73.6332);
+  --sa-text-muted: oklch(55% 0.012 73.6332);
+  --sa-text-faint: oklch(65% 0.008 264.5);
+  --sa-text-dim: oklch(75% 0.005 264.5);
+  --sa-text-on-brand: oklch(100% 0 0);
+  --sa-text-on-surface: oklch(44.4385% 0.0096 73.6332);
+  --sa-text-label: oklch(44.4385% 0.0096 73.6332);
+  --sa-text-disabled: oklch(71.3651% 0.0192 261.3174);
+  --sa-text-placeholder: oklch(71.3651% 0.0192 261.3174);
+
+  /* --- Heading hierarchy --- */
+  --sa-text-h1: oklch(44.4385% 0.0096 73.6332);
+  --sa-text-h2: oklch(76.849% 0.13454 123.993);
+  --sa-text-h3: oklch(76.885% 0.1231 80.8277);
+  --sa-text-h4: oklch(65.2070% 0.1322 81.5716);
+  --sa-text-h5: oklch(44.4385% 0.0096 73.6332);
+
+  /* --- Borders --- */
+  --sa-border-subtle: 1px solid oklch(0% 0 0 / 0.05);
+  --sa-border-default: 1px solid oklch(92.758% 0.0058 264.5313);
+  --sa-border-strong: 1px solid oklch(0% 0 0 / 0.18);
+  --sa-border-brand: 1px solid oklch(76.849% 0.13454 123.993);
+  --sa-border-table: oklch(92.758% 0.0058 264.5313);
+  --sa-border-input: 1px solid oklch(92.758% 0.0058 264.5313);
+  --sa-border-input-focus: oklch(72.2746% 0.192 149.5793);
+  --sa-border-input-error: oklch(62.7955% 0.2577 29.2339);
+  --sa-border-card: 1px solid oklch(0% 0 0 / 0.07);
+
+  /* --- Focus Ring --- */
+  --sa-focus-ring: 0 0 0 2px oklch(100% 0 0), 0 0 0 4px oklch(72.2746% 0.192 149.5793 / 0.5);
+
+  /* --- Shadows --- */
+  --sa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.08);
+  --sa-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
+  --sa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.1);
+  --sa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.12), inset 0 1px 0 oklch(100% 0 0 / 0.5);
+  --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.15), inset 0 1px 0 oklch(100% 0 0 / 0.7);
+  --sa-shadow-glow-sm: 0 0 20px oklch(76.849% 0.13454 123.993 / 0.2);
+  --sa-shadow-glow: 0 0 30px oklch(76.849% 0.13454 123.993 / 0.2);
+  --sa-shadow-btn:
+    0 10px 15px -3px oklch(0% 0 0 / 0.1),
+    0 4px 6px -2px oklch(0% 0 0 / 0.35);
+  --sa-shadow-card: 0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -2px oklch(0% 0 0 / 0.05);
+
+  /* --- Gradients --- */
+  --sa-gradient-brand: linear-gradient(135deg, oklch(76.849% 0.13454 123.993) 0%, oklch(76.885% 0.1231 80.8277) 100%);
+  --sa-gradient-brand-90: linear-gradient(90deg, oklch(76.849% 0.13454 123.993) 0%, oklch(76.885% 0.1231 80.8277) 100%);
+  --sa-gradient-btn: linear-gradient(135deg, oklch(76.885% 0.1231 80.8277) 0%, oklch(80% 0.13 80) 100%);
+  --sa-gradient-card: linear-gradient(135deg, oklch(100% 0 0 / 0.95) 0%, oklch(99.0925% 0.0122 91.5145 / 0.9) 100%);
+  --sa-gradient-hero: linear-gradient(135deg, oklch(76.849% 0.13454 123.993 / 0.85) 0%, oklch(65.2070% 0.1322 81.5716 / 0.7) 100%);
+  --sa-gradient-stripe: var(--sa-gradient-brand-90);
+
+  /* --- Card Variants --- */
+  --sa-card-widget-bg: linear-gradient(135deg, oklch(100% 0 0 / 0.95) 0%, oklch(99.0925% 0.0122 91.5145 / 0.9) 100%);
+  --sa-card-widget-border: 1px solid oklch(0% 0 0 / 0.07);
+  --sa-card-widget-shadow: 0 10px 15px -3px oklch(0% 0 0 / 0.08), 0 4px 6px -2px oklch(0% 0 0 / 0.04);
+  --sa-card-widget-stripe-opacity: 0.9;
+  --sa-card-panel-bg: oklch(99.0925% 0.0122 91.5145 / 0.92);
+  --sa-card-panel-border: 1px solid oklch(0% 0 0 / 0.06);
+  --sa-card-panel-shadow: 0 4px 12px oklch(0% 0 0 / 0.07);
+  --sa-card-panel-stripe-opacity: 0;
+  --sa-card-workflow-bg: linear-gradient(135deg, oklch(100% 0 0 / 0.98) 0%, oklch(98.1943% 0.018 155.8257 / 0.9) 100%);
+  --sa-card-workflow-border: 1px solid oklch(0% 0 0 / 0.09);
+  --sa-card-workflow-shadow: 0 20px 40px oklch(0% 0 0 / 0.1), inset 0 1px 0 oklch(100% 0 0 / 0.6);
+  --sa-card-workflow-stripe-opacity: 1;
+
+  /* --- Table --- */
+  --sa-table-head-bg: oklch(44.4385% 0.0096 73.6332 / 0.85);
+  --sa-table-head-color: oklch(100% 0 0);
+  --sa-table-section-bg: oklch(76.849% 0.13454 123.993);
+  --sa-table-section-color: oklch(100% 0 0);
+  --sa-table-row-even: oklch(100% 0 0);
+  --sa-table-row-odd: oklch(92.2565% 0.0419 239.4217);
+  --sa-table-row-hover: var(--sa-bg-hover);
+  --sa-table-border: var(--sa-border-table);
+
+  /* --- Control Tokens --- */
+  --sa-btn-primary-bg: oklch(76.885% 0.1231 80.8277);
+  --sa-btn-primary-text: oklch(100% 0 0);
+  --sa-btn-primary-bg-hover: oklch(80% 0.13 80.8277);
+  --sa-btn-danger-bg: oklch(55% 0.18 29);
+  --sa-btn-danger-bg-hover: oklch(62.7955% 0.2577 29.2339);
+  --sa-btn-danger-text: oklch(100% 0 0);
+  --sa-control-ring-error: oklch(62.7955% 0.2577 29.2339 / 0.18);
+  --sa-toggle-pressed-bg: oklch(76.849% 0.13454 123.993 / 0.15);
+  --sa-toggle-pressed-border: oklch(76.849% 0.13454 123.993 / 0.6);
+  --sa-toggle-pressed-text: oklch(76.849% 0.13454 123.993);
+  --sa-tab-pill-bg: oklch(92.758% 0.0058 264.5313);
+  --sa-tab-active-bg: oklch(100% 0 0);
+  --sa-tab-active-text: oklch(44.4385% 0.0096 73.6332);
+}
+
+/*
  * LAYOUT TOKENS
  * ───────────────────────────────────────────────────────────────────────────
  * All values are starting points — tune by eyeball in the browser.
