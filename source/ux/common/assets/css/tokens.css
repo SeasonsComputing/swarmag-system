@@ -560,7 +560,11 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-input-focus: oklch(98.1943% 0.018 155.8257);
   --sa-bg-control: oklch(0% 0 0 / 0.04);
   --sa-bg-input-disabled: oklch(96.6936% 0.0029 264.5419);
-  --sa-bg-card: linear-gradient(135deg, oklch(100% 0 0 / 0.95) 0%, oklch(99.0925% 0.0122 91.5145 / 0.9) 100%);
+  --sa-bg-card: linear-gradient(
+    135deg,
+    oklch(100% 0 0 / 0.95) 0%,
+    oklch(99.0925% 0.0122 91.5145 / 0.9) 100%
+  );
   --sa-skeleton-shimmer: oklch(88% 0.006 120 / 0.5);
 
   /* --- Text --- */
@@ -604,21 +608,39 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.15), inset 0 1px 0 oklch(100% 0 0 / 0.7);
   --sa-shadow-glow-sm: 0 0 20px oklch(76.849% 0.13454 123.993 / 0.2);
   --sa-shadow-glow: 0 0 30px oklch(76.849% 0.13454 123.993 / 0.2);
-  --sa-shadow-btn:
-    0 10px 15px -3px oklch(0% 0 0 / 0.1),
-    0 4px 6px -2px oklch(0% 0 0 / 0.35);
+  --sa-shadow-btn: 0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -2px oklch(0% 0 0 / 0.35);
   --sa-shadow-card: 0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -2px oklch(0% 0 0 / 0.05);
 
   /* --- Gradients --- */
-  --sa-gradient-brand: linear-gradient(135deg, oklch(76.849% 0.13454 123.993) 0%, oklch(76.885% 0.1231 80.8277) 100%);
-  --sa-gradient-brand-90: linear-gradient(90deg, oklch(76.849% 0.13454 123.993) 0%, oklch(76.885% 0.1231 80.8277) 100%);
+  --sa-gradient-brand: linear-gradient(
+    135deg,
+    oklch(76.849% 0.13454 123.993) 0%,
+    oklch(76.885% 0.1231 80.8277) 100%
+  );
+  --sa-gradient-brand-90: linear-gradient(
+    90deg,
+    oklch(76.849% 0.13454 123.993) 0%,
+    oklch(76.885% 0.1231 80.8277) 100%
+  );
   --sa-gradient-btn: linear-gradient(135deg, oklch(76.885% 0.1231 80.8277) 0%, oklch(80% 0.13 80) 100%);
-  --sa-gradient-card: linear-gradient(135deg, oklch(100% 0 0 / 0.95) 0%, oklch(99.0925% 0.0122 91.5145 / 0.9) 100%);
-  --sa-gradient-hero: linear-gradient(135deg, oklch(76.849% 0.13454 123.993 / 0.85) 0%, oklch(65.2070% 0.1322 81.5716 / 0.7) 100%);
+  --sa-gradient-card: linear-gradient(
+    135deg,
+    oklch(100% 0 0 / 0.95) 0%,
+    oklch(99.0925% 0.0122 91.5145 / 0.9) 100%
+  );
+  --sa-gradient-hero: linear-gradient(
+    135deg,
+    oklch(76.849% 0.13454 123.993 / 0.85) 0%,
+    oklch(65.2070% 0.1322 81.5716 / 0.7) 100%
+  );
   --sa-gradient-stripe: var(--sa-gradient-brand-90);
 
   /* --- Card Variants --- */
-  --sa-card-widget-bg: linear-gradient(135deg, oklch(100% 0 0 / 0.95) 0%, oklch(99.0925% 0.0122 91.5145 / 0.9) 100%);
+  --sa-card-widget-bg: linear-gradient(
+    135deg,
+    oklch(100% 0 0 / 0.95) 0%,
+    oklch(99.0925% 0.0122 91.5145 / 0.9) 100%
+  );
   --sa-card-widget-border: 1px solid oklch(0% 0 0 / 0.07);
   --sa-card-widget-shadow: 0 10px 15px -3px oklch(0% 0 0 / 0.08), 0 4px 6px -2px oklch(0% 0 0 / 0.04);
   --sa-card-widget-stripe-opacity: 0.9;
@@ -626,7 +648,11 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-card-panel-border: 1px solid oklch(0% 0 0 / 0.06);
   --sa-card-panel-shadow: 0 4px 12px oklch(0% 0 0 / 0.07);
   --sa-card-panel-stripe-opacity: 0;
-  --sa-card-workflow-bg: linear-gradient(135deg, oklch(100% 0 0 / 0.98) 0%, oklch(98.1943% 0.018 155.8257 / 0.9) 100%);
+  --sa-card-workflow-bg: linear-gradient(
+    135deg,
+    oklch(100% 0 0 / 0.98) 0%,
+    oklch(98.1943% 0.018 155.8257 / 0.9) 100%
+  );
   --sa-card-workflow-border: 1px solid oklch(0% 0 0 / 0.09);
   --sa-card-workflow-shadow: 0 20px 40px oklch(0% 0 0 / 0.1), inset 0 1px 0 oklch(100% 0 0 / 0.6);
   --sa-card-workflow-stripe-opacity: 1;
@@ -742,4 +768,3 @@ Typography        -> App typography tokens consumed by base and controls.
     --sa-field-pad: 0.625rem;
   }
 }
-
