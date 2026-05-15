@@ -320,6 +320,18 @@
   padding-inline-start: var(--sa-table-first-pad-section);
 }
 
+[data-ui='table-cell'][data-ui-align='right'] {
+  text-align: right;
+}
+
+[data-ui='table-cell'][data-ui-align='center'] {
+  text-align: center;
+}
+
+[data-ui='table-cell']:last-child {
+  padding-inline-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
+}
+
 /*
  * LIST
  * ───────────────────────────────────────────────────────────────────────────

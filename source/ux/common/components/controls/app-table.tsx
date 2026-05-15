@@ -69,7 +69,7 @@ export type AppTableRowProps =
 export type AppTableCellProps =
   & Omit<
     JSX.HTMLAttributes<HTMLTableCellElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant' | 'align'
   >
   & {
     align?: 'left' | 'right' | 'center'
