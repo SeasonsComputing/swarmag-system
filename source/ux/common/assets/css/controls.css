@@ -447,6 +447,10 @@
   width: var(--sa-space-sm);
 }
 
+[data-ui='checkbox'][data-checked] {
+  color: var(--sa-color-primary);
+}
+
 [data-ui='radio-item'][data-checked] {
   color: var(--sa-color-primary);
 }
