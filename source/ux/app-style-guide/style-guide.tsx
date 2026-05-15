@@ -3,15 +3,6 @@
 ║ swarmAg living style guide                                                   ║
 ║ Browser validation page for design tokens and common controls.               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-PURPOSE
-───────────────────────────────────────────────────────────────────────────────
-Renders the swarmAg design language and shared App{Control} primitives as a
-real consuming application.
-
-PUBLIC
-───────────────────────────────────────────────────────────────────────────────
-StyleGuide  Single-page living style guide application.
 */
 
 import { createEffect, createSignal, For, type JSX } from '@solid-js'
@@ -25,10 +16,8 @@ import {
   AppTable, AppTableBody, AppTableCell, AppTableHeader, AppTableRow, AppTabList, AppTabPanel,
   AppTabs, AppTextarea, AppToggle, AppToggleGroup, AppToggleItem, AppTooltip
 } from '@ux/common/components/controls'
-// dprint-ignore-end
-
-import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
 import { AppFooter } from '@ux/common/components/shell/app-footer.tsx'
+// dprint-ignore-end
 
 import {
   ACCORDION_DEFAULT_VALUE,
@@ -36,10 +25,11 @@ import {
   COLOR_SWATCHES,
   DEFAULT_SERVICES,
   EQUIPMENT,
-  FIELDS,
   SERVICES,
   STATUSES
 } from './style-guide-fixtures.ts'
+
+import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
 
 type SectionProps = {
   children: JSX.Element
@@ -105,8 +95,12 @@ export const StyleGuide = (): JSX.Element => {
             <p>
               Inline code sample: <code>service.category === 'aerial-drone-services'</code>
             </p>
-            <p>Keyboard shortcut: Press <kbd>Ctrl+S</kbd> to save the job plan.</p>
-            <p>System output: <samp>asset.status = 'ready'</samp></p>
+            <p>
+              Keyboard shortcut: Press <kbd>Ctrl+S</kbd> to save the job plan.
+            </p>
+            <p>
+              System output: <samp>asset.status = 'ready'</samp>
+            </p>
             <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
             <blockquote>
               Service logs are records of field reality and must remain clear, durable, and auditable.
@@ -182,8 +176,12 @@ export const StyleGuide = (): JSX.Element => {
                         <AppTableRow>
                           <AppTableCell>{item.name}</AppTableCell>
                           <AppTableCell>{item.application}</AppTableCell>
-                          <AppTableCell align='right'><code>{item.price}</code></AppTableCell>
-                          <AppTableCell align='right'><code>{item.cost}</code></AppTableCell>
+                          <AppTableCell align='right'>
+                            <samp>{item.price}</samp>
+                          </AppTableCell>
+                          <AppTableCell align='right'>
+                            <samp>{item.cost}</samp>
+                          </AppTableCell>
                         </AppTableRow>
                       )}
                     </For>
