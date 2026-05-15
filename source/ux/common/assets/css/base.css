@@ -3,10 +3,6 @@
 ║ UX base styles                                                               ║
 ║ Browser foundation, font faces, global background, and accessibility rules.  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-PURPOSE
-───────────────────────────────────────────────────────────────────────────────
-Defines global browser-level style foundations consumed by all UX apps.
 */
 
 /*
@@ -239,14 +235,6 @@ pre {
   margin: 0;
   overflow: auto;
   padding: var(--sa-space-md);
-}
-
-code {
-  display: inline-block;
-  background: transparent;
-  backdrop-filter: var(--sa-blur-sm);
-  padding: var(--sa-space-xs) var(--sa-space-sm);
-  border-radius: var(--sa-radius-md);
 }
 
 blockquote {
