@@ -14,7 +14,7 @@ AppTable        Table root — renders <table>.
 AppTableHeader  Header row — renders <thead><tr>; children become <th>.
 AppTableBody    Body section — renders <tbody>.
 AppTableRow     Body row — renders <tr>. Accepts section prop.
-AppTableCell    Cell — renders <th> inside AppTableHeader, <td> elsewhere.
+AppTableCell    Cell — renders <th> inside AppTableHeader, <td> elsewhere. Accepts align prop.
 */
 
 import { createContext, type JSX, splitProps, useContext } from '@solid-js'
@@ -72,6 +72,7 @@ export type AppTableCellProps =
     'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
   >
   & {
+    align?: 'left' | 'right' | 'center'
     class?: never
     classList?: never
     style?: never
@@ -124,8 +125,8 @@ export const AppTableRow = (props: AppTableRowProps): JSX.Element => {
 /** Cell — <th> inside AppTableHeader, <td> elsewhere. */
 export const AppTableCell = (props: AppTableCellProps): JSX.Element => {
   const isHeader = useContext(TableHeaderCtx)
-  const [, others] = splitProps(props, ['class', 'classList', 'style', 'data-ui', 'data-ui-variant'])
+  const [local, others] = splitProps(props, ['align', 'class', 'classList', 'style', 'data-ui', 'data-ui-variant'])
   return isHeader
-    ? <th {...others} data-ui='table-cell' />
-    : <td {...others} data-ui='table-cell' />
+    ? <th {...others} data-ui='table-cell' data-ui-align={local.align} />
+    : <td {...others} data-ui='table-cell' data-ui-align={local.align} />
 }
