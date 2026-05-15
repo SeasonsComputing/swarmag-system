@@ -79,7 +79,11 @@ export const AppSingleSelect = (props: AppSingleSelectProps): JSX.Element => {
         </SelectItem>
       )}
     >
-      <Select.Trigger id={local.id ?? local.name} data-ui='single-select' data-ui-state={controlState(local)}>
+      <Select.Trigger
+        id={local.id ?? local.name}
+        data-ui='single-select'
+        data-ui-state={controlState(local)}
+      >
         <Select.Value<AppOption>>
           {state =>
             state.selectedOption() ? appOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
