@@ -125,7 +125,14 @@ export const AppTableRow = (props: AppTableRowProps): JSX.Element => {
 /** Cell — <th> inside AppTableHeader, <td> elsewhere. */
 export const AppTableCell = (props: AppTableCellProps): JSX.Element => {
   const isHeader = useContext(TableHeaderCtx)
-  const [local, others] = splitProps(props, ['align', 'class', 'classList', 'style', 'data-ui', 'data-ui-variant'])
+  const [local, others] = splitProps(props, [
+    'align',
+    'class',
+    'classList',
+    'style',
+    'data-ui',
+    'data-ui-variant'
+  ])
   return isHeader
     ? <th {...others} data-ui='table-cell' data-ui-align={local.align} />
     : <td {...others} data-ui='table-cell' data-ui-align={local.align} />
