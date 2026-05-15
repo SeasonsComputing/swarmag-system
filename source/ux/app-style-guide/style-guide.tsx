@@ -105,6 +105,8 @@ export const StyleGuide = (): JSX.Element => {
             <p>
               Inline code sample: <code>service.category === 'aerial-drone-services'</code>
             </p>
+            <p>Keyboard shortcut: Press <kbd>Ctrl+S</kbd> to save the job plan.</p>
+            <p>System output: <samp>asset.status = 'ready'</samp></p>
             <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
             <blockquote>
               Service logs are records of field reality and must remain clear, durable, and auditable.
@@ -150,7 +152,7 @@ export const StyleGuide = (): JSX.Element => {
                 <AppTableCell>Cascadia Mono</AppTableCell>
                 <AppTableCell>Mono</AppTableCell>
                 <AppTableCell>
-                  <span class='sg-font-mono'>service.status = 'ready'; acres = 142</span>
+                  <code>service.status = 'ready'; acres = 142</code>
                 </AppTableCell>
               </AppTableRow>
             </AppTableBody>
@@ -160,31 +162,10 @@ export const StyleGuide = (): JSX.Element => {
         <Section title='HTML Semantics'>
           <AppTable>
             <AppTableHeader>
-              <AppTableCell>Field name</AppTableCell>
-              <AppTableCell>Acreage</AppTableCell>
-              <AppTableCell>Service type</AppTableCell>
-              <AppTableCell>Status</AppTableCell>
-              <AppTableCell>Date</AppTableCell>
-            </AppTableHeader>
-            <AppTableBody>
-              <For each={FIELDS}>
-                {field => (
-                  <AppTableRow>
-                    <AppTableCell>{field.name}</AppTableCell>
-                    <AppTableCell>{field.acres}</AppTableCell>
-                    <AppTableCell>{field.service}</AppTableCell>
-                    <AppTableCell>{field.status}</AppTableCell>
-                    <AppTableCell>{field.date}</AppTableCell>
-                  </AppTableRow>
-                )}
-              </For>
-            </AppTableBody>
-          </AppTable>
-
-          <AppTable>
-            <AppTableHeader>
               <AppTableCell>Equipment</AppTableCell>
               <AppTableCell>Application</AppTableCell>
+              <AppTableCell align='right'>Price</AppTableCell>
+              <AppTableCell align='right'>Cost</AppTableCell>
             </AppTableHeader>
             <AppTableBody>
               <For each={EQUIPMENT}>
@@ -193,12 +174,16 @@ export const StyleGuide = (): JSX.Element => {
                     <AppTableRow section>
                       <AppTableCell>{group.section}</AppTableCell>
                       <AppTableCell />
+                      <AppTableCell />
+                      <AppTableCell />
                     </AppTableRow>
                     <For each={group.items}>
                       {item => (
                         <AppTableRow>
                           <AppTableCell>{item.name}</AppTableCell>
                           <AppTableCell>{item.application}</AppTableCell>
+                          <AppTableCell align='right'><code>{item.price}</code></AppTableCell>
+                          <AppTableCell align='right'><code>{item.cost}</code></AppTableCell>
                         </AppTableRow>
                       )}
                     </For>

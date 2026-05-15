@@ -95,16 +95,16 @@ export const EQUIPMENT = [
   {
     section: 'Ground Machinery',
     items: [
-      { name: 'John Deere SkidSteer', application: 'Front-loaders & attachments for ground operations' },
-      { name: 'Bobcat Toolcat', application: 'Utility vehicles & attachments for specialized tasks' }
+      { name: 'John Deere SkidSteer', application: 'Front-loaders & attachments for ground operations', price: '$145,000', cost: '$89/hr' },
+      { name: 'Bobcat Toolcat', application: 'Utility vehicles & attachments for specialized tasks', price: '$52,000', cost: '$42/hr' }
     ]
   },
   {
     section: 'Aerial Drones',
     items: [
-      { name: 'XAG P150', application: 'Industrial drones for heavy payloads' },
-      { name: 'DJI T30', application: 'Agricultural drones for aerial applications' },
-      { name: 'DJI P4', application: 'Multispectral drones for detailed terrain analysis' }
+      { name: 'XAG P150', application: 'Industrial drones for heavy payloads', price: '$28,500', cost: '$18/hr' },
+      { name: 'DJI T30', application: 'Agricultural drones for aerial applications', price: '$23,000', cost: '$15/hr' },
+      { name: 'DJI P4', application: 'Multispectral drones for detailed terrain analysis', price: '$9,500', cost: '$8/hr' }
     ]
   }
 ] as const
