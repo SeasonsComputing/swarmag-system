@@ -42,18 +42,18 @@ Background roles:
   --sa-bg-overlay
 
 Typography roles:
-  --sa-heading-font          --sa-h1-size              --sa-heading-weight
-  --sa-body-font             --sa-h2-size              --sa-body-weight
-  --sa-label-font            --sa-h3-size              --sa-label-weight
-  --sa-ui-font               --sa-h4-size              --sa-ui-weight
-  --sa-mono-font             --sa-h5-size
-  --sa-annotation-font       --sa-body-size            --sa-annotation-weight
-  --sa-data-font             --sa-label-size           --sa-data-weight
-  --sa-entry-font            --sa-ui-size              --sa-entry-weight
-                             --sa-ui-compact-size
-                             --sa-annotation-size
-                             --sa-data-size
-                             --sa-entry-size
+  --sa-heading-font-family          --sa-heading-font-size-h1              --sa-heading-font-weight
+  --sa-body-font-family             --sa-heading-font-size-h2              --sa-body-font-weight
+  --sa-label-font-family            --sa-heading-font-size-h3              --sa-label-font-weight
+  --sa-ui-font-family               --sa-heading-font-size-h4              --sa-ui-font-weight
+  --sa-mono-font-family             --sa-heading-font-size-h5
+  --sa-annotation-font-family       --sa-body-font-size            --sa-annotation-font-weight
+  --sa-data-font-family             --sa-label-font-size           --sa-data-font-weight
+  --sa-entry-font-family            --sa-ui-font-size              --sa-entry-font-weight
+                             --sa-ui-font-size-compact
+                             --sa-annotation-font-size
+                             --sa-data-font-size
+                             --sa-entry-font-size
 
 Text roles:
   --sa-text-primary           --sa-text-on-brand         --sa-text-h1
