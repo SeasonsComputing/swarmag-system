@@ -102,23 +102,23 @@
 }
 
 .sg-font-heading {
-  font-family: var(--sa-heading-font);
-  font-size: var(--sa-label-size);
+  font-family: var(--sa-heading-font-family);
+  font-size: var(--sa-label-font-size);
 }
 
 .sg-font-body {
-  font-family: var(--sa-body-font);
+  font-family: var(--sa-body-font-family);
 }
 
 .sg-font-label {
-  font-family: var(--sa-label-font);
-  font-weight: var(--sa-label-weight);
+  font-family: var(--sa-label-font-family);
+  font-weight: var(--sa-label-font-weight);
 }
 
 .sg-font-ui {
-  font-family: var(--sa-ui-font);
+  font-family: var(--sa-ui-font-family);
 }
 
 .sg-font-mono {
-  font-family: var(--sa-mono-font);
+  font-family: var(--sa-mono-font-family);
 }

@@ -18,7 +18,7 @@
   color: var(--sa-color-primary);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--sa-label-font);
+  font-family: var(--sa-label-font-family);
   font-size: var(--sa-button-font-size);
   font-weight: var(--sa-button-font-weight);
   gap: var(--sa-space-sm);
@@ -89,9 +89,9 @@
   border: var(--sa-border-input);
   border-radius: var(--sa-radius-md);
   color: var(--sa-text-primary);
-  font-family: var(--sa-ui-font);
-  font-size: var(--sa-ui-size);
-  font-weight: var(--sa-body-weight);
+  font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-ui-font-size);
+  font-weight: var(--sa-body-font-weight);
   min-height: var(--sa-touch-target-sm);
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -107,9 +107,9 @@
   color: var(--sa-text-primary);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-ui-size);
-  font-weight: var(--sa-ui-weight);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-ui-font-size);
+  font-weight: var(--sa-ui-font-weight);
   gap: var(--sa-space-sm);
   justify-content: space-between;
   min-height: var(--sa-touch-target-sm);
@@ -196,7 +196,7 @@
   box-shadow: var(--sa-shadow-sm);
   color: var(--sa-text-primary);
   display: grid;
-  font-size: var(--sa-label-size);
+  font-size: var(--sa-label-font-size);
   gap: var(--sa-space-xs);
   padding: var(--sa-space-sm);
   z-index: var(--sa-z-popover);
@@ -210,9 +210,9 @@
   color: var(--sa-text-primary);
   cursor: pointer;
   display: flex;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-label-size);
-  font-weight: var(--sa-label-weight);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
   justify-content: space-between;
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -237,7 +237,7 @@
 
 [data-ui='single-select-item'][data-selected]::after {
   content: '✓';
-  font-size: var(--sa-ui-compact-size);
+  font-size: var(--sa-ui-font-size-compact);
 }
 
 [data-ui='single-select-item'][data-selected]:hover,
@@ -259,9 +259,9 @@
   border: var(--sa-border-input);
   border-radius: var(--sa-radius-md);
   display: grid;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-ui-size);
-  font-weight: var(--sa-ui-weight);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-ui-font-size);
+  font-weight: var(--sa-ui-font-weight);
   list-style: none;
   padding: var(--sa-space-sm);
 }
@@ -274,9 +274,9 @@
   color: var(--sa-text-primary);
   cursor: pointer;
   display: flex;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-label-size);
-  font-weight: var(--sa-label-weight);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
   justify-content: space-between;
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -296,7 +296,7 @@
 
 [data-ui='multi-select-item'][data-selected]::after {
   content: '✓';
-  font-size: var(--sa-ui-compact-size);
+  font-size: var(--sa-ui-font-size-compact);
 }
 
 [data-ui='multi-select-item'][data-selected]:hover,
@@ -317,7 +317,7 @@
 [data-ui='table-row'][data-ui-variant='section'] [data-ui='table-cell'] {
   background: var(--sa-table-bg-section);
   color: var(--sa-table-color-section);
-  font-weight: var(--sa-label-weight);
+  font-weight: var(--sa-label-font-weight);
   padding-inline-start: var(--sa-table-padding-cell-section);
   white-space: nowrap;
   width: 100%;
@@ -371,9 +371,9 @@
   color: var(--sa-text-primary);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-label-size);
-  font-weight: var(--sa-label-weight);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
   gap: var(--sa-space-sm);
 }
 
@@ -392,9 +392,9 @@
   color: var(--sa-text-primary);
   cursor: pointer;
   display: flex;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-label-size);
-  font-weight: var(--sa-label-weight);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
   gap: var(--sa-space-sm);
 }
 
@@ -517,8 +517,8 @@
   color: var(--sa-text-primary);
   cursor: pointer;
   display: flex;
-  font-family: var(--sa-ui-font);
-  font-size: var(--sa-ui-compact-size);
+  font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-ui-font-size-compact);
   font-weight: var(--sa-button-font-weight);
   justify-content: space-between;
   min-height: var(--sa-touch-target-sm);
@@ -575,8 +575,8 @@
   color: var(--sa-text-muted);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-ui-compact-size);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-ui-font-size-compact);
   font-weight: var(--sa-toggle-font-weight);
   gap: var(--sa-space-sm);
   justify-content: center;
@@ -657,8 +657,8 @@
   border-radius: var(--sa-radius-sm);
   color: var(--sa-text-muted);
   cursor: pointer;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-ui-compact-size);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-ui-font-size-compact);
   font-weight: var(--sa-tab-font-weight);
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -750,8 +750,8 @@
   align-items: center;
   border-radius: var(--sa-radius-full);
   display: inline-flex;
-  font-family: var(--sa-ui-font);
-  font-size: var(--sa-ui-compact-size);
+  font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-ui-font-size-compact);
   font-weight: var(--sa-badge-font-weight);
   gap: var(--sa-space-xs);
   padding-block: var(--sa-space-xs);
@@ -789,8 +789,8 @@
   border-inline-start: var(--sa-alert-border-width) solid var(--sa-color-default-border);
   color: var(--sa-color-default);
   border-radius: var(--sa-radius-md);
-  font-family: var(--sa-ui-font);
-  font-size: var(--sa-ui-compact-size);
+  font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-ui-font-size-compact);
   padding: var(--sa-space-md);
 }
 
@@ -843,8 +843,8 @@
   border-radius: var(--sa-radius-full);
   color: var(--sa-text-on-brand);
   display: inline-flex;
-  font-family: var(--sa-label-font);
-  font-size: var(--sa-label-size);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
   font-weight: var(--sa-avatar-font-weight);
   inline-size: var(--sa-touch-target-sm);
   justify-content: center;
@@ -941,8 +941,8 @@
   border-radius: var(--sa-radius-md);
   box-shadow: var(--sa-shadow-card);
   color: var(--sa-text-primary);
-  font-family: var(--sa-ui-font);
-  font-size: var(--sa-ui-compact-size);
+  font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-ui-font-size-compact);
   max-inline-size: 20rem;
   padding: var(--sa-space-md);
   z-index: var(--sa-z-popover);
@@ -959,8 +959,8 @@
   border-radius: var(--sa-radius-md);
   box-shadow: var(--sa-shadow-card);
   color: var(--sa-text-primary);
-  font-family: var(--sa-ui-font);
-  font-size: var(--sa-ui-compact-size);
+  font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-ui-font-size-compact);
   max-inline-size: 18rem;
   padding-block: var(--sa-space-xs);
   padding-inline: var(--sa-space-sm);

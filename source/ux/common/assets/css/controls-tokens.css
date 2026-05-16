@@ -12,33 +12,33 @@
    */
 
   /* Typography */
-  --sa-heading-font: var(--sa-p-font-content);
-  --sa-body-font: var(--sa-p-font-content);
-  --sa-label-font: var(--sa-p-font-label);
-  --sa-ui-font: var(--sa-p-font-label);
-  --sa-mono-font: var(--sa-p-font-mono);
-  --sa-h1-size: var(--sa-p-size-xl);
-  --sa-h2-size: var(--sa-p-size-lg);
-  --sa-h3-size: var(--sa-p-size-md);
-  --sa-h4-size: var(--sa-p-size-base);
-  --sa-h5-size: 0.8125rem;
-  --sa-heading-weight: var(--sa-p-weight-normal);
-  --sa-body-weight: var(--sa-p-weight-thin);
-  --sa-body-size: var(--sa-p-size-base);
-  --sa-label-size: var(--sa-p-size-sm);
-  --sa-label-weight: var(--sa-p-weight-normal);
-  --sa-ui-size: var(--sa-p-size-sm);
-  --sa-ui-compact-size: var(--sa-p-size-xs);
-  --sa-ui-weight: var(--sa-p-weight-normal);
-  --sa-annotation-font: var(--sa-p-font-label);
-  --sa-annotation-size: var(--sa-p-size-sm);
-  --sa-annotation-weight: var(--sa-p-weight-normal);
-  --sa-data-font: var(--sa-p-font-label);
-  --sa-data-size: var(--sa-p-size-sm);
-  --sa-data-weight: var(--sa-p-weight-thin);
-  --sa-entry-font: var(--sa-p-font-label);
-  --sa-entry-size: var(--sa-p-size-sm);
-  --sa-entry-weight: var(--sa-p-weight-thin);
+  --sa-heading-font-family: var(--sa-p-font-content);
+  --sa-body-font-family: var(--sa-p-font-content);
+  --sa-label-font-family: var(--sa-p-font-label);
+  --sa-ui-font-family: var(--sa-p-font-label);
+  --sa-mono-font-family: var(--sa-p-font-mono);
+  --sa-heading-font-size-h1: var(--sa-p-size-xl);
+  --sa-heading-font-size-h2: var(--sa-p-size-lg);
+  --sa-heading-font-size-h3: var(--sa-p-size-md);
+  --sa-heading-font-size-h4: var(--sa-p-size-base);
+  --sa-heading-font-size-h5: 0.8125rem;
+  --sa-heading-font-weight: var(--sa-p-weight-normal);
+  --sa-body-font-weight: var(--sa-p-weight-thin);
+  --sa-body-font-size: var(--sa-p-size-base);
+  --sa-label-font-size: 14.4px;
+  --sa-label-font-weight: var(--sa-p-weight-normal);
+  --sa-ui-font-size: var(--sa-p-size-sm);
+  --sa-ui-font-size-compact: var(--sa-p-size-xs);
+  --sa-ui-font-weight: var(--sa-p-weight-normal);
+  --sa-annotation-font-family: var(--sa-p-font-label);
+  --sa-annotation-font-size: var(--sa-p-size-sm);
+  --sa-annotation-font-weight: var(--sa-p-weight-normal);
+  --sa-data-font-family: var(--sa-p-font-label);
+  --sa-data-font-size: var(--sa-p-size-sm);
+  --sa-data-font-weight: var(--sa-p-weight-thin);
+  --sa-entry-font-family: var(--sa-p-font-label);
+  --sa-entry-font-size: var(--sa-p-size-sm);
+  --sa-entry-font-weight: var(--sa-p-weight-thin);
 
   /* Brand */
   --sa-color-brand-start: oklch(var(--sa-p-brand-start));
@@ -294,33 +294,33 @@
    */
 
   /* Typography */
-  --sa-heading-font: var(--sa-p-font-content);
-  --sa-body-font: var(--sa-p-font-content);
-  --sa-label-font: var(--sa-p-font-label);
-  --sa-ui-font: var(--sa-p-font-label);
-  --sa-mono-font: var(--sa-p-font-mono);
-  --sa-h1-size: var(--sa-p-size-xl);
-  --sa-h2-size: var(--sa-p-size-lg);
-  --sa-h3-size: var(--sa-p-size-md);
-  --sa-h4-size: var(--sa-p-size-base);
-  --sa-h5-size: 0.8125rem;
-  --sa-heading-weight: var(--sa-p-weight-normal);
-  --sa-body-weight: var(--sa-p-weight-thin);
-  --sa-body-size: var(--sa-p-size-base);
-  --sa-label-size: var(--sa-p-size-sm);
-  --sa-label-weight: var(--sa-p-weight-normal);
-  --sa-ui-size: var(--sa-p-size-sm);
-  --sa-ui-compact-size: var(--sa-p-size-xs);
-  --sa-ui-weight: var(--sa-p-weight-normal);
-  --sa-annotation-font: var(--sa-p-font-label);
-  --sa-annotation-size: var(--sa-p-size-sm);
-  --sa-annotation-weight: var(--sa-p-weight-normal);
-  --sa-data-font: var(--sa-p-font-label);
-  --sa-data-size: var(--sa-p-size-sm);
-  --sa-data-weight: var(--sa-p-weight-thin);
-  --sa-entry-font: var(--sa-p-font-label);
-  --sa-entry-size: var(--sa-p-size-sm);
-  --sa-entry-weight: var(--sa-p-weight-thin);
+  --sa-heading-font-family: var(--sa-p-font-content);
+  --sa-body-font-family: var(--sa-p-font-content);
+  --sa-label-font-family: var(--sa-p-font-label);
+  --sa-ui-font-family: var(--sa-p-font-label);
+  --sa-mono-font-family: var(--sa-p-font-mono);
+  --sa-heading-font-size-h1: var(--sa-p-size-xl);
+  --sa-heading-font-size-h2: var(--sa-p-size-lg);
+  --sa-heading-font-size-h3: var(--sa-p-size-md);
+  --sa-heading-font-size-h4: var(--sa-p-size-base);
+  --sa-heading-font-size-h5: 0.8125rem;
+  --sa-heading-font-weight: var(--sa-p-weight-normal);
+  --sa-body-font-weight: var(--sa-p-weight-thin);
+  --sa-body-font-size: var(--sa-p-size-base);
+  --sa-label-font-size: 14.4px;
+  --sa-label-font-weight: var(--sa-p-weight-normal);
+  --sa-ui-font-size: var(--sa-p-size-sm);
+  --sa-ui-font-size-compact: var(--sa-p-size-xs);
+  --sa-ui-font-weight: var(--sa-p-weight-normal);
+  --sa-annotation-font-family: var(--sa-p-font-label);
+  --sa-annotation-font-size: var(--sa-p-size-sm);
+  --sa-annotation-font-weight: var(--sa-p-weight-normal);
+  --sa-data-font-family: var(--sa-p-font-label);
+  --sa-data-font-size: var(--sa-p-size-sm);
+  --sa-data-font-weight: var(--sa-p-weight-thin);
+  --sa-entry-font-family: var(--sa-p-font-label);
+  --sa-entry-font-size: var(--sa-p-size-sm);
+  --sa-entry-font-weight: var(--sa-p-weight-thin);
 
   /* Brand */
   --sa-p-brand-start: var(--sa-p-gradient-1-start);
@@ -538,33 +538,33 @@
    */
 
   /* Typography */
-  --sa-heading-font: 'Playfair Display', ui-serif, serif;
-  --sa-body-font: var(--sa-p-font-content);
-  --sa-label-font: var(--sa-p-font-label);
-  --sa-ui-font: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --sa-mono-font: var(--sa-p-font-mono);
-  --sa-h1-size: var(--sa-p-size-xl);
-  --sa-h2-size: var(--sa-p-size-lg);
-  --sa-h3-size: var(--sa-p-size-md);
-  --sa-h4-size: var(--sa-p-size-base);
-  --sa-h5-size: 0.8125rem;
-  --sa-heading-weight: var(--sa-p-weight-bold);
-  --sa-body-weight: var(--sa-p-weight-thin);
-  --sa-body-size: var(--sa-p-size-base);
-  --sa-label-size: var(--sa-p-size-sm);
-  --sa-label-weight: var(--sa-p-weight-normal);
-  --sa-ui-size: var(--sa-p-size-sm);
-  --sa-ui-compact-size: var(--sa-p-size-xs);
-  --sa-ui-weight: var(--sa-p-weight-normal);
-  --sa-annotation-font: var(--sa-p-font-label);
-  --sa-annotation-size: var(--sa-p-size-sm);
-  --sa-annotation-weight: var(--sa-p-weight-normal);
-  --sa-data-font: var(--sa-p-font-label);
-  --sa-data-size: var(--sa-p-size-sm);
-  --sa-data-weight: var(--sa-p-weight-thin);
-  --sa-entry-font: var(--sa-p-font-label);
-  --sa-entry-size: var(--sa-p-size-sm);
-  --sa-entry-weight: var(--sa-p-weight-thin);
+  --sa-heading-font-family: 'Playfair Display', ui-serif, serif;
+  --sa-body-font-family: var(--sa-p-font-content);
+  --sa-label-font-family: var(--sa-p-font-label);
+  --sa-ui-font-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --sa-mono-font-family: var(--sa-p-font-mono);
+  --sa-heading-font-size-h1: var(--sa-p-size-xl);
+  --sa-heading-font-size-h2: var(--sa-p-size-lg);
+  --sa-heading-font-size-h3: var(--sa-p-size-md);
+  --sa-heading-font-size-h4: var(--sa-p-size-base);
+  --sa-heading-font-size-h5: 0.8125rem;
+  --sa-heading-font-weight: var(--sa-p-weight-bold);
+  --sa-body-font-weight: var(--sa-p-weight-thin);
+  --sa-body-font-size: var(--sa-p-size-base);
+  --sa-label-font-size: 14.4px;
+  --sa-label-font-weight: var(--sa-p-weight-normal);
+  --sa-ui-font-size: var(--sa-p-size-sm);
+  --sa-ui-font-size-compact: var(--sa-p-size-xs);
+  --sa-ui-font-weight: var(--sa-p-weight-normal);
+  --sa-annotation-font-family: var(--sa-p-font-label);
+  --sa-annotation-font-size: var(--sa-p-size-sm);
+  --sa-annotation-font-weight: var(--sa-p-weight-normal);
+  --sa-data-font-family: var(--sa-p-font-label);
+  --sa-data-font-size: var(--sa-p-size-sm);
+  --sa-data-font-weight: var(--sa-p-weight-thin);
+  --sa-entry-font-family: var(--sa-p-font-label);
+  --sa-entry-font-size: var(--sa-p-size-sm);
+  --sa-entry-font-weight: var(--sa-p-weight-thin);
 
   /* Brand */
   --sa-p-brand-start: var(--sa-p-gradient-1-start);
