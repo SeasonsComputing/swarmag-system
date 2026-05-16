@@ -46,7 +46,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-p-faint: 50.8% 0.02 261.3;
   --sa-p-dim: 40.2% 0.014 261.3;
 
-  /* Dark surfaces — from reference theme sampling */
+  /* Dark surfaces */
   --sa-p-surface-3: 27.4% 0.014 264.5; /* #33364a page chrome */
   --sa-p-surface-2: 24.6% 0.016 264.5; /* #2c2f3e sidebars */
   --sa-p-surface-1: 22.1% 0.01 277.4; /* #29282f cards */
@@ -79,11 +79,11 @@ Typography        -> App typography tokens consumed by base and controls.
 :root,
 [data-theme='dark'] {
   /* --- Fonts --- */
-  --sa-font-heading: var(--sa-p-font-content);
-  --sa-font-body: var(--sa-p-font-content);
-  --sa-font-label: var(--sa-p-font-label);
-  --sa-font-ui: var(--sa-p-font-label);
-  --sa-font-mono: var(--sa-p-font-mono);
+  --sa-font-heading-family: var(--sa-p-font-content);
+  --sa-font-body-family: var(--sa-p-font-content);
+  --sa-font-label-family: var(--sa-p-font-label);
+  --sa-font-ui-family: var(--sa-p-font-label);
+  --sa-font-mono-family: var(--sa-p-font-mono);
 
   /* --- Font Weights --- */
   --sa-p-weight-thin: 300;
@@ -94,44 +94,39 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-p-weight-extrabold: 800;
 
   /* --- Typography Role Tokens --- */
+  --sa-font-h1-size: var(--sa-p-size-xl);
+  --sa-font-h2-size: var(--sa-p-size-lg);
+  --sa-font-h3-size: var(--sa-p-size-md);
+  --sa-font-h4-size: var(--sa-p-size-base);
+  --sa-font-h5-size: 0.8125rem;
   --sa-font-heading-weight: var(--sa-p-weight-normal);
   --sa-font-body-weight: var(--sa-p-weight-thin);
+  --sa-font-body-size: var(--sa-p-size-base);
   --sa-font-label-size: var(--sa-p-size-sm);
   --sa-font-label-weight: var(--sa-p-weight-normal);
   --sa-font-ui-size: var(--sa-p-size-sm);
   --sa-font-ui-compact-size: var(--sa-p-size-xs);
   --sa-font-ui-weight: var(--sa-p-weight-normal);
+  --sa-font-annotation-family: var(--sa-p-font-label);
+  --sa-font-annotation-size: var(--sa-p-size-sm);
+  --sa-font-annotation-weight: var(--sa-p-weight-normal);
+  --sa-font-data-family: var(--sa-p-font-label);
+  --sa-font-data-size: var(--sa-p-size-sm);
+  --sa-font-data-weight: var(--sa-p-weight-thin);
+  --sa-font-entry-family: var(--sa-p-font-label);
+  --sa-font-entry-size: var(--sa-p-size-sm);
+  --sa-font-entry-weight: var(--sa-p-weight-thin);
 
-  /* --- Component Typography Tokens --- */
-  --sa-btn-font-size: var(--sa-p-size-xs);
-  --sa-btn-font-weight: var(--sa-p-weight-medium);
-  --sa-btn-primary-font-weight: var(--sa-p-weight-semibold);
-  --sa-toggle-font-weight: var(--sa-p-weight-medium);
-  --sa-tab-font-weight: var(--sa-p-weight-medium);
-  --sa-badge-font-weight: var(--sa-p-weight-thin);
-  --sa-avatar-font-weight: var(--sa-p-weight-semibold);
-
-  /* --- Font Sizes — fluid --- */
-  --sa-p-size-xs: clamp(0.75rem, 0.72rem + 0.125vw, 0.8rem);
-  --sa-p-size-sm: clamp(0.875rem, 0.85rem + 0.125vw, 0.9rem);
-  --sa-p-size-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
-  --sa-p-size-md: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
-  --sa-p-size-lg: clamp(1.25rem, 1.1rem + 0.75vw, 1.5rem);
-  --sa-p-size-xl: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
-  --sa-p-size-2xl: clamp(1.75rem, 1.5rem + 2vw, 3rem);
+  /* --- Font Sizes --- */
+  --sa-p-size-xs: 0.8rem;
+  --sa-p-size-sm: 0.875rem;
+  --sa-p-size-base: 1rem;
+  --sa-p-size-md: 1.1875rem;
+  --sa-p-size-lg: 1.5rem;
+  --sa-p-size-xl: 1.8125rem;
 
   /* --- Line Heights --- */
-  --sa-p-leading-tight: 1.25;
-  --sa-p-leading-snug: 1.375;
   --sa-p-leading-normal: 1.5;
-  --sa-p-leading-relaxed: 1.625;
-
-  /* --- Letter Spacing --- */
-  --sa-p-tracking-tight: -0.025em;
-  --sa-p-tracking-normal: 0;
-  --sa-p-tracking-wide: 0.025em;
-  --sa-p-tracking-wider: 0.05em;
-  --sa-p-tracking-widest: 0.1em;
 
   /* --- Brand Colors --- */
   --sa-color-brand-start: oklch(66% 0.14 235);
@@ -156,10 +151,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
   --sa-bg-hover: oklch(var(--sa-p-teal) / 0.1);
   --sa-bg-selected: oklch(var(--sa-p-teal) / 0.28);
-  --sa-bg-input: var(--sa-bg-control);
-  --sa-bg-input-focus: var(--sa-bg-hover);
   --sa-bg-control: oklch(var(--sa-p-white) / 0.03);
-  --sa-bg-input-disabled: oklch(22% 0.01 264.5);
   --sa-bg-card: linear-gradient(
     135deg,
     rgb(30 41 59 / 0.8) 0%,
@@ -221,6 +213,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-shadow-card: 0 20px 40px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
   --sa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.3), 0 3px 6px oklch(0% 0 0 / 0.2);
+  --sa-shadow-kbd: 0 2px 0 oklch(var(--sa-p-near-white) / 0.15);
 
   /* --- Gradients --- */
   --sa-gradient-brand: linear-gradient(
@@ -262,23 +255,10 @@ Typography        -> App typography tokens consumed by base and controls.
   /* --- Stripe: 3px top-border accent on cards/panels --- */
   --sa-gradient-stripe: var(--sa-gradient-brand-90);
 
-  --sa-card-radius: 1rem;
-
-  /* --- Card Variants --- */
-  --sa-card-widget-bg: oklch(17% 0.008 244 / 0.48);
-  --sa-card-widget-border: var(--sa-border-card);
-  --sa-card-widget-shadow: 0 10px 24px rgb(0 0 0 / 0.16), inset 0 1px 0 rgb(255 255 255 / 0.06);
-  --sa-card-widget-stripe-opacity: 0.8;
-  --sa-card-panel-bg: oklch(17% 0.008 244 / 0.48);
-  --sa-card-panel-border: var(--sa-border-card);
-  --sa-card-panel-shadow: none;
-  --sa-card-panel-stripe-opacity: 0;
-  --sa-card-workflow-bg: oklch(21% 0.02 226 / 0.42);
-  --sa-card-workflow-border: 1px solid rgb(148 163 184 / 0.2);
-  --sa-card-workflow-shadow: 0 22px 48px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
-  --sa-card-workflow-stripe-opacity: 0.8;
-
   /* --- State Colors --- */
+  --sa-color-default: oklch(var(--sa-p-near-white));
+  --sa-color-default-bg: oklch(var(--sa-p-near-white) / 0.12);
+  --sa-color-default-border: oklch(var(--sa-p-near-white) / 0.3);
   --sa-color-success: oklch(var(--sa-p-success));
   --sa-color-success-bg: oklch(var(--sa-p-success) / 0.12);
   --sa-color-success-border: oklch(var(--sa-p-success) / 0.3);
@@ -292,40 +272,6 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-color-info-bg: oklch(var(--sa-p-info) / 0.12);
   --sa-color-info-border: oklch(var(--sa-p-info) / 0.3);
   --sa-color-transparent: transparent;
-
-  /* --- Control Tokens --- */
-  --sa-btn-primary-bg: var(--sa-color-brand-end);
-  --sa-btn-primary-text: oklch(var(--sa-p-white));
-  --sa-btn-primary-bg-hover: oklch(80% 0.13 185);
-  --sa-btn-danger-bg: oklch(55% 0.18 29);
-  --sa-btn-danger-bg-hover: oklch(var(--sa-p-danger));
-  --sa-btn-danger-text: oklch(var(--sa-p-white));
-  --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.22);
-  --sa-toggle-pressed-bg: oklch(var(--sa-p-teal) / 0.15);
-  --sa-toggle-pressed-border: oklch(var(--sa-p-teal) / 0.6);
-  --sa-toggle-pressed-text: oklch(var(--sa-p-teal));
-  --sa-tab-pill-bg: oklch(var(--sa-p-surface-2));
-  --sa-tab-active-bg: oklch(var(--sa-p-surface-3));
-  --sa-tab-active-text: oklch(var(--sa-p-near-white));
-  --sa-separator-size: 1px;
-  --sa-progress-height: 1rem;
-  --sa-card-stripe-height: 3px;
-  --sa-card-stripe-opacity: 0.8;
-  --sa-button-primary-hover-transform: translateY(-2px);
-
-  /* --- Table --- */
-  --sa-table-cell-pad: 0.375rem;
-  --sa-table-first-pad-head: 0.5rem;
-  --sa-table-first-pad-section: 0.625rem;
-  --sa-table-first-pad-data: 0.75rem;
-  --sa-table-head-bg: oklch(var(--sa-p-surface-2));
-  --sa-table-head-color: oklch(var(--sa-p-near-white));
-  --sa-table-section-bg: oklch(var(--sa-p-teal) / 0.2);
-  --sa-table-section-color: oklch(var(--sa-p-near-white));
-  --sa-table-row-even: oklch(var(--sa-p-surface-1));
-  --sa-table-row-odd: oklch(var(--sa-p-surface-2) / 0.6);
-  --sa-table-row-hover: var(--sa-bg-hover);
-  --sa-table-border: var(--sa-border-table);
 
   /* --- Spacing Scale --- */
   --sa-space-xs: 0.25rem;
@@ -364,13 +310,19 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-motion-page-fade: 200ms;
   --sa-motion-spinner: 0.8s;
   --sa-motion-skeleton: 1.4s;
-  --sa-skeleton-shimmer: oklch(42% 0.025 252 / 0.6);
+
+  /* --- Base Element Tokens --- */
+  --sa-font-base-size: 16px;
+  --sa-body-line-height: var(--sa-p-leading-normal);
+  --sa-transition-page: opacity var(--sa-motion-page-fade) ease-in;
+  --sa-blockquote-border: 3px solid var(--sa-color-primary);
+  --sa-list-indent: 1.75rem;
+  --sa-list-item-pad: 0.375rem;
+  --sa-list-item-pad-bullet: calc(0.375rem - 2px);
+  --sa-list-marker-size: 1.25rem;
 
   /* --- Misc --- */
   --sa-blur: blur(10px);
-  --sa-blur-sm: blur(4px);
-  --sa-blur-md: blur(8px);
-  --sa-blur-lg: blur(12px);
   --sa-filter-mono: brightness(0) invert(1);
 }
 
@@ -399,17 +351,12 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-table: oklch(0% 0 0 / 0.02);
   --sa-bg-hover: oklch(var(--sa-p-teal) / 0.08);
   --sa-bg-selected: oklch(var(--sa-p-teal) / 0.15);
-  --sa-bg-input: oklch(100% 0 0);
-  --sa-bg-input-focus: oklch(98% 0.01 155.8);
-  --sa-bg-input-disabled: oklch(96% 0.003 264.5);
   --sa-bg-control: oklch(0% 0 0 / 0.06);
   --sa-bg-card: linear-gradient(
     135deg,
     oklch(98% 0.003 220 / 0.88) 0%,
     oklch(100% 0 0 / 0.94) 100%
   );
-
-  --sa-skeleton-shimmer: oklch(85% 0.008 264.5);
 
   /* --- Text --- */
   --sa-text-primary: oklch(var(--sa-p-surface-1));
@@ -455,6 +402,7 @@ Typography        -> App typography tokens consumed by base and controls.
     0 0 40px oklch(66% 0.14 235 / 0.18),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.5);
   --sa-shadow-card: 0 16px 36px oklch(0% 0 0 / 0.1), inset 0 1px 0 oklch(var(--sa-p-white) / 0.5);
+  --sa-shadow-kbd: 0 2px 0 oklch(0% 0 0 / 0.2);
 
   /* --- Gradients --- */
   --sa-gradient-card: linear-gradient(
@@ -468,60 +416,10 @@ Typography        -> App typography tokens consumed by base and controls.
     oklch(var(--sa-p-teal) / 0.8) 50%,
     oklch(var(--sa-p-blue) / 0.7) 100%
   );
-
-  /* --- Card Variants --- */
-  --sa-card-widget-bg: linear-gradient(
-    135deg,
-    oklch(99% 0.002 244 / 0.9) 0%,
-    oklch(99% 0.002 244 / 0.9) 100%
-  );
-  --sa-card-widget-border: 1px solid oklch(0% 0 0 / 0.08);
-  --sa-card-widget-shadow:
-    0 12px 28px oklch(0% 0 0 / 0.1),
-    inset 0 1px 0 oklch(var(--sa-p-white) / 0.55);
-  --sa-card-widget-stripe-opacity: 0.9;
-  --sa-card-panel-bg: oklch(99% 0.002 244 / 0.9);
-  --sa-card-panel-border: 1px solid oklch(0% 0 0 / 0.06);
-  --sa-card-panel-shadow: 0 6px 16px oklch(0% 0 0 / 0.06);
-  --sa-card-panel-stripe-opacity: 0;
-  --sa-card-workflow-bg: linear-gradient(
-    135deg,
-    oklch(100% 0 0 / 0.98) 0%,
-    oklch(96.5% 0.006 210 / 0.92) 100%
-  );
-  --sa-card-workflow-border: 1px solid oklch(0% 0 0 / 0.1);
-  --sa-card-workflow-shadow:
-    0 22px 48px oklch(0% 0 0 / 0.16),
-    0 0 22px oklch(var(--sa-p-teal) / 0.1),
-    inset 0 1px 0 oklch(var(--sa-p-white) / 0.65);
-  --sa-card-workflow-stripe-opacity: 1;
-
-  /* --- Table --- */
-  --sa-table-head-bg: oklch(var(--sa-p-surface-2));
-  --sa-table-section-bg: oklch(var(--sa-p-teal) / 0.12);
-  --sa-table-section-color: oklch(var(--sa-p-surface-1));
-  --sa-table-row-even: oklch(100% 0 0);
-  --sa-table-row-odd: oklch(96% 0.006 180);
-
-  /* --- Control Tokens --- */
-  --sa-btn-primary-bg: oklch(50% 0.1 150);
-  --sa-btn-primary-text: oklch(var(--sa-p-white));
-  --sa-btn-primary-bg-hover: oklch(72% 0.11 184.216);
-  --sa-btn-danger-bg: oklch(55% 0.18 29);
-  --sa-btn-danger-bg-hover: oklch(var(--sa-p-danger));
-  --sa-btn-danger-text: oklch(var(--sa-p-white));
-  --sa-control-ring-error: oklch(var(--sa-p-danger) / 0.18);
-  --sa-toggle-pressed-bg: oklch(50% 0.1 150 / 0.18);
-  --sa-toggle-pressed-border: oklch(50% 0.1 150 / 0.75);
-  --sa-toggle-pressed-text: oklch(50% 0.1 150);
-  --sa-tab-pill-bg: oklch(88% 0.006 264.5);
-
-  --sa-tab-active-bg: oklch(100% 0 0);
-  --sa-tab-active-text: oklch(var(--sa-p-surface-1));
 }
 
 /*
- * THEME: CUSTOMER
+ * THEME: BRAND
  * ───────────────────────────────────────────────────────────────────────────
  * swarmAg brand palette — light, eggshell ground, green primary, orange CTA.
  * Only tokens that differ from dark are redeclared here.
@@ -529,8 +427,8 @@ Typography        -> App typography tokens consumed by base and controls.
 
 [data-theme='brand'] {
   /* --- Fonts --- */
-  --sa-font-heading: 'Playfair Display', ui-serif, serif;
-  --sa-font-ui: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --sa-font-heading-family: 'Playfair Display', ui-serif, serif;
+  --sa-font-ui-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
   /* --- Typography weights --- */
   --sa-font-heading-weight: var(--sa-p-weight-bold);
@@ -556,16 +454,12 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-bg-table: oklch(0% 0 0 / 0.02);
   --sa-bg-hover: oklch(76.849% 0.13454 123.993 / 0.08);
   --sa-bg-selected: oklch(76.849% 0.13454 123.993 / 0.15);
-  --sa-bg-input: oklch(100% 0 0);
-  --sa-bg-input-focus: oklch(98.1943% 0.018 155.8257);
   --sa-bg-control: oklch(0% 0 0 / 0.04);
-  --sa-bg-input-disabled: oklch(96.6936% 0.0029 264.5419);
   --sa-bg-card: linear-gradient(
     135deg,
     oklch(100% 0 0 / 0.95) 0%,
     oklch(99.0925% 0.0122 91.5145 / 0.9) 100%
   );
-  --sa-skeleton-shimmer: oklch(88% 0.006 120 / 0.5);
 
   /* --- Text --- */
   --sa-text-primary: oklch(44.4385% 0.0096 73.6332);
@@ -610,6 +504,7 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-shadow-glow: 0 0 30px oklch(76.849% 0.13454 123.993 / 0.2);
   --sa-shadow-btn: 0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -2px oklch(0% 0 0 / 0.35);
   --sa-shadow-card: 0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -2px oklch(0% 0 0 / 0.05);
+  --sa-shadow-kbd: 0 2px 0 oklch(0% 0 0 / 0.15);
 
   /* --- Gradients --- */
   --sa-gradient-brand: linear-gradient(
@@ -634,53 +529,6 @@ Typography        -> App typography tokens consumed by base and controls.
     oklch(65.2070% 0.1322 81.5716 / 0.7) 100%
   );
   --sa-gradient-stripe: var(--sa-gradient-brand-90);
-
-  /* --- Card Variants --- */
-  --sa-card-widget-bg: linear-gradient(
-    135deg,
-    oklch(100% 0 0 / 0.95) 0%,
-    oklch(99.0925% 0.0122 91.5145 / 0.9) 100%
-  );
-  --sa-card-widget-border: 1px solid oklch(0% 0 0 / 0.07);
-  --sa-card-widget-shadow: 0 10px 15px -3px oklch(0% 0 0 / 0.08), 0 4px 6px -2px oklch(0% 0 0 / 0.04);
-  --sa-card-widget-stripe-opacity: 0.9;
-  --sa-card-panel-bg: oklch(99.0925% 0.0122 91.5145 / 0.92);
-  --sa-card-panel-border: 1px solid oklch(0% 0 0 / 0.06);
-  --sa-card-panel-shadow: 0 4px 12px oklch(0% 0 0 / 0.07);
-  --sa-card-panel-stripe-opacity: 0;
-  --sa-card-workflow-bg: linear-gradient(
-    135deg,
-    oklch(100% 0 0 / 0.98) 0%,
-    oklch(98.1943% 0.018 155.8257 / 0.9) 100%
-  );
-  --sa-card-workflow-border: 1px solid oklch(0% 0 0 / 0.09);
-  --sa-card-workflow-shadow: 0 20px 40px oklch(0% 0 0 / 0.1), inset 0 1px 0 oklch(100% 0 0 / 0.6);
-  --sa-card-workflow-stripe-opacity: 1;
-
-  /* --- Table --- */
-  --sa-table-head-bg: oklch(44.4385% 0.0096 73.6332 / 0.85);
-  --sa-table-head-color: oklch(100% 0 0);
-  --sa-table-section-bg: oklch(76.849% 0.13454 123.993);
-  --sa-table-section-color: oklch(100% 0 0);
-  --sa-table-row-even: oklch(100% 0 0);
-  --sa-table-row-odd: oklch(92.2565% 0.0419 239.4217);
-  --sa-table-row-hover: var(--sa-bg-hover);
-  --sa-table-border: var(--sa-border-table);
-
-  /* --- Control Tokens --- */
-  --sa-btn-primary-bg: oklch(76.885% 0.1231 80.8277);
-  --sa-btn-primary-text: oklch(100% 0 0);
-  --sa-btn-primary-bg-hover: oklch(80% 0.13 80.8277);
-  --sa-btn-danger-bg: oklch(55% 0.18 29);
-  --sa-btn-danger-bg-hover: oklch(62.7955% 0.2577 29.2339);
-  --sa-btn-danger-text: oklch(100% 0 0);
-  --sa-control-ring-error: oklch(62.7955% 0.2577 29.2339 / 0.18);
-  --sa-toggle-pressed-bg: oklch(76.849% 0.13454 123.993 / 0.15);
-  --sa-toggle-pressed-border: oklch(76.849% 0.13454 123.993 / 0.6);
-  --sa-toggle-pressed-text: oklch(76.849% 0.13454 123.993);
-  --sa-tab-pill-bg: oklch(92.758% 0.0058 264.5313);
-  --sa-tab-active-bg: oklch(100% 0 0);
-  --sa-tab-active-text: oklch(44.4385% 0.0096 73.6332);
 }
 
 /*

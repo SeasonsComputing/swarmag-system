@@ -6,9 +6,9 @@
 .sg-header {
   align-items: center;
   backdrop-filter: var(--sa-blur);
-  background: var(--sa-card-panel-bg);
-  border-block-end: var(--sa-card-panel-border);
-  box-shadow: var(--sa-card-panel-shadow);
+  background: var(--sa-card-bg-panel);
+  border-block-end: var(--sa-card-border-panel);
+  box-shadow: var(--sa-card-shadow-panel);
   display: flex;
   gap: var(--sa-space-lg);
   inset-block-start: 0;
@@ -102,23 +102,23 @@
 }
 
 .sg-font-heading {
-  font-family: var(--sa-font-heading);
+  font-family: var(--sa-font-heading-family);
   font-size: var(--sa-font-label-size);
 }
 
 .sg-font-body {
-  font-family: var(--sa-font-body);
+  font-family: var(--sa-font-body-family);
 }
 
 .sg-font-label {
-  font-family: var(--sa-font-label);
+  font-family: var(--sa-font-label-family);
   font-weight: var(--sa-font-label-weight);
 }
 
 .sg-font-ui {
-  font-family: var(--sa-font-ui);
+  font-family: var(--sa-font-ui-family);
 }
 
 .sg-font-mono {
-  font-family: var(--sa-font-mono);
+  font-family: var(--sa-font-mono-family);
 }

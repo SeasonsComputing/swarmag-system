@@ -8,8 +8,8 @@ import { StyleGuide } from './style-guide.tsx'
 
 import '@ux/common/assets/css/tokens.css'
 import '@ux/common/assets/css/base.css'
+import '@ux/common/assets/css/controls-tokens.css'
 import '@ux/common/assets/css/controls.css'
-import '@ux/common/assets/css/forms.css'
 import './style-guide.css'
 
 const App = () => {

@@ -82,19 +82,19 @@
 
 html {
   color-scheme: dark light;
-  font-size: 16px;
+  font-size: var(--sa-font-base-size);
   scroll-behavior: smooth;
 }
 
 body {
   background: var(--sa-bg-page);
   color: var(--sa-text-primary);
-  font-family: var(--sa-font-body);
+  font-family: var(--sa-font-body-family);
   font-weight: var(--sa-font-body-weight);
-  line-height: var(--sa-p-leading-normal);
+  line-height: var(--sa-body-line-height);
   opacity: 0;
   position: relative;
-  transition: opacity var(--sa-motion-page-fade) ease-in;
+  transition: var(--sa-transition-page);
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
 }
@@ -135,38 +135,43 @@ body::before {
  */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--sa-font-heading);
+  font-family: var(--sa-font-heading-family);
   font-weight: var(--sa-font-heading-weight);
 }
 
 h1 {
   color: var(--sa-text-h1);
+  font-size: var(--sa-font-h1-size);
 }
 
 h2 {
   color: var(--sa-text-h2);
+  font-size: var(--sa-font-h2-size);
 }
 
 h3 {
   color: var(--sa-text-h3);
+  font-size: var(--sa-font-h3-size);
 }
 
 h4 {
   color: var(--sa-text-h4);
+  font-size: var(--sa-font-h4-size);
 }
 
 h5 {
   color: var(--sa-text-h5);
+  font-size: var(--sa-font-h5-size);
 }
 
 p {
-  font-family: var(--sa-font-body);
+  font-family: var(--sa-font-body-family);
   font-weight: var(--sa-font-body-weight);
 }
 
 label,
 legend {
-  font-family: var(--sa-font-label);
+  font-family: var(--sa-font-label-family);
   font-size: var(--sa-font-label-size);
   font-weight: var(--sa-font-label-weight);
 }
@@ -176,39 +181,36 @@ label {
 }
 
 th {
-  font-family: var(--sa-font-label);
+  font-family: var(--sa-font-label-family);
   font-size: var(--sa-font-label-size);
   font-weight: var(--sa-font-label-weight);
 }
 
 li {
-  font-family: var(--sa-font-label);
-  font-size: var(--sa-font-label-size);
-  font-weight: var(--sa-font-label-weight);
+  font-family: var(--sa-font-body-family);
+  font-size: var(--sa-font-body-size);
+  font-weight: var(--sa-font-body-weight);
 }
 
 td {
-  font-family: var(--sa-font-label);
+  font-family: var(--sa-font-label-family);
   font-size: var(--sa-font-label-size);
   font-weight: var(--sa-font-body-weight);
 }
 
 input,
 textarea {
-  font-family: var(--sa-font-ui);
+  font-family: var(--sa-font-ui-family);
   font-weight: var(--sa-font-body-weight);
 }
 
-select,
-[role='menuitem'],
-[role='option'] {
-  font-family: var(--sa-font-ui);
+select {
+  font-family: var(--sa-font-ui-family);
   font-weight: var(--sa-font-ui-weight);
 }
 
 code, pre, kbd, samp {
-  font-family: var(--sa-font-mono);
-  font-size: 1rem;
+  font-family: var(--sa-font-mono-family);
 }
 
 /*
@@ -227,8 +229,7 @@ code, pre, kbd, samp {
  */
 
 pre {
-  background: transparent;
-  backdrop-filter: var(--sa-blur-sm);
+  background: var(--sa-bg-control);
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-md);
   color: var(--sa-text-secondary);
@@ -237,10 +238,26 @@ pre {
   padding: var(--sa-space-md);
 }
 
-blockquote {
-  border-inline-start: 3px solid var(--sa-color-primary);
+code {
+  display: inline-block;
+  background: var(--sa-bg-control);
+  border-radius: var(--sa-radius-sm);
   color: var(--sa-text-secondary);
-  font-family: var(--sa-font-body);
+  padding: var(--sa-space-xs) var(--sa-space-sm);
+}
+
+kbd {
+  display: inline-block;
+  background: var(--sa-bg-control);
+  border-radius: var(--sa-radius-sm);
+  box-shadow: var(--sa-shadow-kbd);
+  padding: var(--sa-space-xs) var(--sa-space-sm);
+}
+
+blockquote {
+  border-inline-start: var(--sa-blockquote-border);
+  color: var(--sa-text-secondary);
+  font-family: var(--sa-font-body-family);
   font-style: italic;
   margin-inline: 0;
   padding-block: var(--sa-space-sm);
@@ -296,21 +313,21 @@ thead tr:hover {
 ol,
 ul {
   color: var(--sa-text-secondary);
-  padding-inline-start: 1.75rem;
+  padding-inline-start: var(--sa-list-indent);
 }
 
 li {
-  margin-block: 0.25rem;
-  padding-inline-start: 0.375rem;
+  margin-block: var(--sa-space-xs);
+  padding-inline-start: var(--sa-list-item-pad);
 }
 
 ul > li {
-  padding-inline-start: calc(0.375rem - 2px);
+  padding-inline-start: var(--sa-list-item-pad-bullet);
 }
 
 ul > li::marker {
   color: var(--sa-color-brand-end);
-  font-size: 1.25rem;
+  font-size: var(--sa-list-marker-size);
 }
 
 ol > li::marker {
@@ -345,7 +362,7 @@ figure {
 
 figcaption {
   color: var(--sa-text-primary);
-  font-family: var(--sa-font-label);
+  font-family: var(--sa-font-label-family);
   font-size: var(--sa-font-label-size);
   font-weight: var(--sa-font-label-weight);
 }
