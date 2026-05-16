@@ -19,7 +19,7 @@ import {
   type ToggleGroupItemProps,
   type ToggleGroupRootProps
 } from '@kobalte/core/toggle-group'
-import { type Component, createEffect, type JSX, splitProps, createSignal } from '@solid-js'
+import { type Component, createEffect, createSignal, type JSX, splitProps } from '@solid-js'
 import { controlState, type WithDataUI } from './controls-helpers.ts'
 
 /** Toggle-group control props. */
