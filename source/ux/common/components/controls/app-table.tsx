@@ -13,13 +13,14 @@ PUBLIC
 AppTable        Table root — renders <table>.
 AppTableHeader  Header row — renders <thead><tr>; children become <th>.
 AppTableBody    Body section — renders <tbody>.
-AppTableRow     Body row — renders <tr>. Accepts section prop.
+AppTableRow     Body row — renders <tr>. variant='section' for group-header rows.
 AppTableCell    Cell — renders <th> inside AppTableHeader, <td> elsewhere. Accepts align prop.
 */
 
 import { createContext, type JSX, splitProps, useContext } from '@solid-js'
 
 const TableHeaderCtx = createContext(false)
+const TableSectionCtx = createContext(false)
 
 export type AppTableProps =
   & Omit<
@@ -57,8 +58,7 @@ export type AppTableRowProps =
     'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
   >
   & {
-    /** Render as a section-header row (distinct bg, stronger padding). */
-    section?: boolean
+    variant?: 'section'
     class?: never
     classList?: never
     style?: never
@@ -103,10 +103,10 @@ export const AppTableBody = (props: AppTableBodyProps): JSX.Element => {
   return <tbody {...others} data-ui='table-body' />
 }
 
-/** Body row. Pass section for a group-header row. */
+/** Body row. Use variant='section' for a group-header row. */
 export const AppTableRow = (props: AppTableRowProps): JSX.Element => {
   const [local, others] = splitProps(props, [
-    'section',
+    'variant',
     'class',
     'classList',
     'style',
@@ -114,17 +114,20 @@ export const AppTableRow = (props: AppTableRowProps): JSX.Element => {
     'data-ui-variant'
   ])
   return (
-    <tr
-      {...others}
-      data-ui='table-row'
-      data-ui-variant={local.section ? 'section' : undefined}
-    />
+    <TableSectionCtx.Provider value={local.variant === 'section'}>
+      <tr
+        {...others}
+        data-ui='table-row'
+        data-ui-variant={local.variant}
+      />
+    </TableSectionCtx.Provider>
   )
 }
 
-/** Cell — <th> inside AppTableHeader, <td> elsewhere. */
+/** Cell — <th> inside AppTableHeader, <td> elsewhere. Spans all columns inside a section row. */
 export const AppTableCell = (props: AppTableCellProps): JSX.Element => {
   const isHeader = useContext(TableHeaderCtx)
+  const isSection = useContext(TableSectionCtx)
   const [local, others] = splitProps(props, [
     'align',
     'class',
@@ -135,5 +138,5 @@ export const AppTableCell = (props: AppTableCellProps): JSX.Element => {
   ])
   return isHeader
     ? <th {...others} data-ui='table-cell' data-ui-align={local.align} />
-    : <td {...others} data-ui='table-cell' data-ui-align={local.align} />
+    : <td {...others} colspan={isSection ? 9999 : undefined} data-ui='table-cell' data-ui-align={local.align} />
 }

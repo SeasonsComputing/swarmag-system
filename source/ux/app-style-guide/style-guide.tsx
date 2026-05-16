@@ -165,11 +165,8 @@ export const StyleGuide = (): JSX.Element => {
               <For each={EQUIPMENT}>
                 {group => (
                   <>
-                    <AppTableRow section>
+                    <AppTableRow variant='section'>
                       <AppTableCell>{group.section}</AppTableCell>
-                      <AppTableCell />
-                      <AppTableCell />
-                      <AppTableCell />
                     </AppTableRow>
                     <For each={group.items}>
                       {item => (
