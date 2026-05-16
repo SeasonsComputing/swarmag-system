@@ -221,7 +221,7 @@
 
 [data-ui='single-select-item']:not([data-selected]):hover,
 [data-ui='single-select-item'][data-highlighted]:not([data-selected]) {
-  background: var(--sa-bg-hover);
+  background: var(--sa-single-select-item-bg-hover);
 }
 
 [data-ui='single-select-item'][data-disabled] {
@@ -285,7 +285,7 @@
 
 [data-ui='multi-select-item']:hover,
 [data-ui='multi-select-item'][data-highlighted] {
-  background: var(--sa-bg-hover);
+  background: var(--sa-multi-select-item-bg-hover);
 }
 
 [data-ui='multi-select-item'][data-selected] {

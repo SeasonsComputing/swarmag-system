@@ -59,8 +59,8 @@
   --sa-bg-overlay: oklch(var(--sa-p-black) / 0.2);
   --sa-bg-popup: oklch(var(--sa-p-popup));
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
-  --sa-bg-hover: oklch(var(--sa-p-gradient-3-mid) / 0.1);
-  --sa-bg-selected: oklch(var(--sa-p-gradient-3-mid) / 0.28);
+  --sa-bg-hover: oklch(var(--sa-p-gradient-2-mid-start) / 0.1);
+  --sa-bg-selected: oklch(var(--sa-p-gradient-2-mid-start) / 0.28);
   --sa-bg-control: oklch(var(--sa-p-white) / 0.03);
   --sa-bg-card: linear-gradient(
     135deg,
@@ -205,10 +205,12 @@
   --sa-control-shadow-error: oklch(var(--sa-p-danger) / 0.22);
 
   /* Select item */
-  --sa-single-select-item-bg: oklch(var(--sa-p-gradient-3-mid) / 0.06);
+  --sa-single-select-item-bg: oklch(var(--sa-p-gradient-2-mid-start) / 0.1);
   --sa-single-select-item-border-start: 2px solid oklch(var(--sa-p-gradient-3-mid) / 0.25);
-  --sa-multi-select-item-bg: oklch(var(--sa-p-gradient-3-mid) / 0.06);
+  --sa-single-select-item-bg-hover: oklch(var(--sa-p-gradient-2-mid-start) / 0.17);
+  --sa-multi-select-item-bg: oklch(var(--sa-p-gradient-2-mid-start) / 0.1);
   --sa-multi-select-item-border-start: 2px solid oklch(var(--sa-p-gradient-3-mid) / 0.25);
+  --sa-multi-select-item-bg-hover: oklch(var(--sa-p-gradient-2-mid-start) / 0.17);
 
   /* Toggle */
   --sa-toggle-font-weight: var(--sa-p-weight-medium);
@@ -279,7 +281,7 @@
   --sa-table-padding-cell-data: 0.75rem;
   --sa-table-bg-head: oklch(var(--sa-p-surface-2));
   --sa-table-color-head: oklch(var(--sa-p-neutral-1));
-  --sa-table-bg-section: oklch(var(--sa-p-gradient-3-mid) / 0.2);
+  --sa-table-bg-section: oklch(var(--sa-p-gradient-2-mid-start) / 0.2);
   --sa-table-color-section: oklch(var(--sa-p-neutral-1));
   --sa-table-bg-row-even: oklch(var(--sa-p-surface-1));
   --sa-table-bg-row-odd: oklch(var(--sa-p-surface-2) / 0.6);
