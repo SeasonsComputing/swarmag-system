@@ -19,7 +19,7 @@ import {
   type ToggleGroupItemProps,
   type ToggleGroupRootProps
 } from '@kobalte/core/toggle-group'
-import { type Component, type JSX, splitProps } from '@solid-js'
+import { type Component, createEffect, type JSX, splitProps, createSignal } from '@solid-js'
 import { controlState, type WithDataUI } from './controls-helpers.ts'
 
 /** Toggle-group control props. */
@@ -65,15 +65,33 @@ export const AppToggleGroup = <Value extends string = string>(
     'defaultValue',
     'onChange'
   ])
+  const [selectedValue, setSelectedValue] = createSignal<Value | undefined>(
+    local.value ?? local.defaultValue
+  )
+
+  createEffect(() => {
+    if (local.value !== undefined) {
+      setSelectedValue(() => local.value)
+    }
+  })
+
+  const handleChange = (value: string | null): void => {
+    if (value === null) return
+
+    const nextValue = value as Value
+    if (local.value === undefined) {
+      setSelectedValue(() => nextValue)
+    }
+    local.onChange?.(nextValue)
+  }
 
   return (
     <ToggleGroupRoot
       data-ui='toggle-group'
       data-ui-state={controlState(local)}
       disabled={local.disabled || local.loading}
-      value={local.value}
-      defaultValue={local.defaultValue}
-      onChange={local.onChange as ((value: string | null) => void) | undefined}
+      value={selectedValue()}
+      onChange={handleChange}
     >
       {local.children}
     </ToggleGroupRoot>

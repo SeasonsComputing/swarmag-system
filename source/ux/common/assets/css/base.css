@@ -82,15 +82,15 @@
 
 html {
   color-scheme: dark light;
-  font-size: var(--sa-font-base-size);
+  font-size: var(--sa-base-size);
   scroll-behavior: smooth;
 }
 
 body {
   background: var(--sa-bg-page);
   color: var(--sa-text-primary);
-  font-family: var(--sa-font-body-family);
-  font-weight: var(--sa-font-body-weight);
+  font-family: var(--sa-body-font);
+  font-weight: var(--sa-body-weight);
   line-height: var(--sa-body-line-height);
   opacity: 0;
   position: relative;
@@ -103,7 +103,7 @@ body::before {
   filter: none;
   background:
     radial-gradient(circle at 20% 80%, oklch(66% 0.14 235 / 0.24) 0%, transparent 55%),
-    radial-gradient(circle at 85% 20%, oklch(50% 0.10 150 / 0.22) 0%, transparent 60%),
+    radial-gradient(circle at 85% 20%, var(--sa-p-radial-2) 0%, transparent 60%),
     radial-gradient(circle at 40% 40%, oklch(78% 0.12 185 / 0.14) 0%, transparent 60%),
     radial-gradient(circle at 80% 80%, oklch(58% 0.12 220 / 0.18) 0%, transparent 55%);
   content: '';
@@ -135,45 +135,45 @@ body::before {
  */
 
 h1, h2, h3, h4, h5, h6 {
-  font-family: var(--sa-font-heading-family);
-  font-weight: var(--sa-font-heading-weight);
+  font-family: var(--sa-heading-font);
+  font-weight: var(--sa-heading-weight);
 }
 
 h1 {
   color: var(--sa-text-h1);
-  font-size: var(--sa-font-h1-size);
+  font-size: var(--sa-h1-size);
 }
 
 h2 {
   color: var(--sa-text-h2);
-  font-size: var(--sa-font-h2-size);
+  font-size: var(--sa-h2-size);
 }
 
 h3 {
   color: var(--sa-text-h3);
-  font-size: var(--sa-font-h3-size);
+  font-size: var(--sa-h3-size);
 }
 
 h4 {
   color: var(--sa-text-h4);
-  font-size: var(--sa-font-h4-size);
+  font-size: var(--sa-h4-size);
 }
 
 h5 {
   color: var(--sa-text-h5);
-  font-size: var(--sa-font-h5-size);
+  font-size: var(--sa-h5-size);
 }
 
 p {
-  font-family: var(--sa-font-body-family);
-  font-weight: var(--sa-font-body-weight);
+  font-family: var(--sa-body-font);
+  font-weight: var(--sa-body-weight);
 }
 
 label,
 legend {
-  font-family: var(--sa-font-label-family);
-  font-size: var(--sa-font-label-size);
-  font-weight: var(--sa-font-label-weight);
+  font-family: var(--sa-label-font);
+  font-size: var(--sa-label-size);
+  font-weight: var(--sa-label-weight);
 }
 
 label {
@@ -181,36 +181,36 @@ label {
 }
 
 th {
-  font-family: var(--sa-font-label-family);
-  font-size: var(--sa-font-label-size);
-  font-weight: var(--sa-font-label-weight);
+  font-family: var(--sa-label-font);
+  font-size: var(--sa-label-size);
+  font-weight: var(--sa-label-weight);
 }
 
 li {
-  font-family: var(--sa-font-body-family);
-  font-size: var(--sa-font-body-size);
-  font-weight: var(--sa-font-body-weight);
+  font-family: var(--sa-body-font);
+  font-size: var(--sa-body-size);
+  font-weight: var(--sa-body-weight);
 }
 
 td {
-  font-family: var(--sa-font-label-family);
-  font-size: var(--sa-font-label-size);
-  font-weight: var(--sa-font-body-weight);
+  font-family: var(--sa-label-font);
+  font-size: var(--sa-label-size);
+  font-weight: var(--sa-body-weight);
 }
 
 input,
 textarea {
-  font-family: var(--sa-font-ui-family);
-  font-weight: var(--sa-font-body-weight);
+  font-family: var(--sa-ui-font);
+  font-weight: var(--sa-body-weight);
 }
 
 select {
-  font-family: var(--sa-font-ui-family);
-  font-weight: var(--sa-font-ui-weight);
+  font-family: var(--sa-ui-font);
+  font-weight: var(--sa-ui-weight);
 }
 
 code, pre, kbd, samp {
-  font-family: var(--sa-font-mono-family);
+  font-family: var(--sa-mono-font);
 }
 
 /*
@@ -257,7 +257,7 @@ kbd {
 blockquote {
   border-inline-start: var(--sa-blockquote-border);
   color: var(--sa-text-secondary);
-  font-family: var(--sa-font-body-family);
+  font-family: var(--sa-body-font);
   font-style: italic;
   margin-inline: 0;
   padding-block: var(--sa-space-sm);
@@ -362,9 +362,9 @@ figure {
 
 figcaption {
   color: var(--sa-text-primary);
-  font-family: var(--sa-font-label-family);
-  font-size: var(--sa-font-label-size);
-  font-weight: var(--sa-font-label-weight);
+  font-family: var(--sa-label-font);
+  font-size: var(--sa-label-size);
+  font-weight: var(--sa-label-weight);
 }
 
 /*
