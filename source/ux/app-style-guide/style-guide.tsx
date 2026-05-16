@@ -241,7 +241,7 @@ export const StyleGuide = (): JSX.Element => {
               <div class='sg-gradient-block' />
               <figcaption>
                 <span>Bright blue start</span>
-                <span>Darker green center</span>
+                <span>Teal midpoint</span>
                 <span>Bright teal finish</span>
               </figcaption>
             </figure>

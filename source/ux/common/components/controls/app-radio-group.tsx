@@ -80,7 +80,7 @@ export const AppRadioGroup = <Value extends string = string>(
       required={local.required}
       value={local.value}
       defaultValue={local.defaultValue}
-      onChange={local.onChange as ((value: string) => void) | undefined}
+      onChange={(value: string) => local.onChange?.(value as Value)}
       validationState={local.error ? 'invalid' : undefined}
     >
       {local.children}

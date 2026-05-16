@@ -1,3 +1,4 @@
+import type { StringDictionary } from '@core/std'
 import { walk } from '@std/walk'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
@@ -10,7 +11,7 @@ const SKIP_DIRS = [
 const BARE_HTML_REGEX = /<(button|input|textarea|select|ul|ol|li)[\s/>]/g
 const COMMENT_LINE_REGEX = /^\s*\/\//
 
-const REPLACEMENTS: Record<string, string> = {
+const REPLACEMENTS: StringDictionary = {
   'button': 'AppButton',
   'input': 'AppInput',
   'textarea': 'AppTextarea',

@@ -12,39 +12,122 @@ hard-coded values to keep themes and visual language consistent.
 
 TOKEN FEATURES
 ───────────────────────────────────────────────────────────────────────────────
-Primitive palette -> Raw OKLCH tuples for brand and neutral primitives.
-Semantic tokens   -> Role-based tokens consumed by components.
-Theme overrides   -> Light theme overrides via [data-theme='light'].
-Typography        -> App typography tokens consumed by base and controls.
-*/
+Primitive palette tokens are the basis layer. Color primitives are bare L C H
+triplets with no oklch() wrapper. Compose at point of use:
+  - oklch(var(--sa-p-gradient-1-start))
+  - oklch(var(--sa-p-gradient-1-start) / 0.5)
 
-/*
- * PRIMITIVE PALETTE
- * ───────────────────────────────────────────────────────────────────────────
- * 1. Bare L C H triplets — no oklch() wrapper.
- * 2. Compose at point of use:
- *    - oklch(var(--sa-p-green))
- *    - oklch(var(--sa-p-green) / 0.5)
- * 3. Components must not reference primitives directly — use semantic tokens only.
- */
+Components must not reference primitives directly. Themes resolve primitives
+into semantic role tokens, and controls consume component tokens derived from
+those roles.
+
+THEME ROLE TOKEN INVENTORY
+───────────────────────────────────────────────────────────────────────────────
+Each theme provides values for the semantic role-token inventory below. These
+names are defined by the foundation; values are supplied by theme blocks in
+controls-tokens.css.
+
+Brand roles:
+  --sa-p-brand-start          --sa-color-brand-start     --sa-color-primary
+  --sa-p-brand-mid            --sa-color-brand-mid       --sa-color-primary-dim
+  --sa-p-brand-end            --sa-color-brand-end       --sa-color-secondary
+                                                         --sa-color-accent
+
+Background roles:
+  --sa-bg-page                --sa-bg-popup              --sa-bg-control
+  --sa-bg-base                --sa-bg-table              --sa-bg-card
+  --sa-bg-surface-1           --sa-bg-hover              --sa-bg-backdrop
+  --sa-bg-surface-2           --sa-bg-selected
+  --sa-bg-surface-3           --sa-bg-progress-track
+  --sa-bg-overlay
+
+Typography roles:
+  --sa-heading-font          --sa-h1-size              --sa-heading-weight
+  --sa-body-font             --sa-h2-size              --sa-body-weight
+  --sa-label-font            --sa-h3-size              --sa-label-weight
+  --sa-ui-font               --sa-h4-size              --sa-ui-weight
+  --sa-mono-font             --sa-h5-size
+  --sa-annotation-font       --sa-body-size            --sa-annotation-weight
+  --sa-data-font             --sa-label-size           --sa-data-weight
+  --sa-entry-font            --sa-ui-size              --sa-entry-weight
+                             --sa-ui-compact-size
+                             --sa-annotation-size
+                             --sa-data-size
+                             --sa-entry-size
+
+Text roles:
+  --sa-text-primary           --sa-text-on-brand         --sa-text-h1
+  --sa-text-secondary         --sa-text-on-surface       --sa-text-h2
+  --sa-text-muted             --sa-text-label            --sa-text-h3
+  --sa-text-faint             --sa-text-disabled         --sa-text-h4
+  --sa-text-dim               --sa-text-placeholder      --sa-text-h5
+
+Border roles:
+  --sa-border-subtle          --sa-border-brand          --sa-border-input-focus
+  --sa-border-default         --sa-border-table          --sa-border-input-error
+  --sa-border-strong          --sa-border-input          --sa-border-card
+
+Shadow roles:
+  --sa-shadow-sm              --sa-shadow-xl             --sa-shadow-card
+  --sa-shadow                 --sa-shadow-glow-sm        --sa-shadow-text
+  --sa-shadow-md              --sa-shadow-glow           --sa-shadow-press
+  --sa-shadow-lg              --sa-shadow-btn            --sa-shadow-kbd
+
+Gradient roles:
+  --sa-gradient-brand         --sa-gradient-btn          --sa-gradient-hero
+  --sa-gradient-brand-90      --sa-gradient-card         --sa-gradient-stripe
+
+State roles:
+  --sa-color-default          --sa-color-success         --sa-color-danger
+  --sa-color-default-bg       --sa-color-success-bg      --sa-color-danger-bg
+  --sa-color-default-border   --sa-color-success-border  --sa-color-danger-border
+  --sa-color-warning          --sa-color-info            --sa-color-transparent
+  --sa-color-warning-bg       --sa-color-info-bg
+  --sa-color-warning-border   --sa-color-info-border
+
+Base element roles:
+  --sa-focus-ring             --sa-blockquote-border
+
+LAYOUT TOKENS
+───────────────────────────────────────────────────────────────────────────
+All values are starting points — tune by eyeball in the browser.
+  --sa-dash-gap    between widgets, between rows
+  --sa-dash-pad    outer edge of row to first/last widget
+  --sa-widget-pad  inside a dashboard widget, border to content
+  --sa-stat-pad    inside a KPI StatCard, border to content
+  --sa-form-pad    inside the modal form container
+  --sa-field-pad   inside a field group within a form
+
+Breakpoints match architecture-ux.md §7:
+  ≥ 1024px  desktop
+  ≥ 768px   tablet landscape
+  ≥ 425px   tablet portrait / large mobile
+  ≥ 380px   mobile
+*/
 
 :root {
   /* Brand gradient — logo extracted */
-  --sa-p-green: 76.849% 0.13454 123.993; /* #03b673 */
-  --sa-p-green-teal: 74.2% 0.122 158.432; /* #0db17a */
-  --sa-p-teal: 68.5% 0.103 184.216; /* #139d8d */
-  --sa-p-teal-blue: 60.8% 0.108 216.744; /* #028aa8 */
-  --sa-p-blue: 54.3% 0.11 236.182; /* #077db2 */
-  --sa-p-blue-deep: 38.7% 0.072 228.64; /* #1a5360 */
+  --sa-p-gradient-1-start: 54.3% 0.11 236.182;
+  --sa-p-gradient-2-mid-start: 61.4% 0.107 210.2;
+  --sa-p-gradient-3-mid: 68.5% 0.103 184.216;
+  --sa-p-gradient-4-mid-end: 74.25% 0.117 184.6;
+  --sa-p-gradient-5-end: 80% 0.13 185;
   --sa-p-popup: 28.5% 0.023 236; /* floating surface — select, popover, tooltip */
+
+  /* Brand role primitives — raw tuples, theme-overrideable */
+  --sa-p-brand-start: var(--sa-p-gradient-1-start);
+  --sa-p-brand-mid: var(--sa-p-gradient-3-mid);
+  --sa-p-brand-end: var(--sa-p-gradient-5-end);
+  --sa-p-primary: var(--sa-p-gradient-5-end);
+  --sa-p-accent: var(--sa-p-gradient-5-end);
 
   /* Neutrals */
   --sa-p-white: 100% 0 0;
-  --sa-p-near-white: 93.5% 0.006 264.5;
-  --sa-p-silver: 87.2% 0.008 264.5;
-  --sa-p-muted: 66.4% 0.018 261.3;
-  --sa-p-faint: 50.8% 0.02 261.3;
-  --sa-p-dim: 40.2% 0.014 261.3;
+  --sa-p-neutral-1: 93.5% 0.006 264.5;
+  --sa-p-neutral-2: 87.2% 0.008 264.5;
+  --sa-p-neutral-3: 66.4% 0.018 261.3;
+  --sa-p-neutral-4: 50.8% 0.02 261.3;
+  --sa-p-neutral-5: 40.2% 0.014 261.3;
 
   /* Dark surfaces */
   --sa-p-surface-3: 27.4% 0.014 264.5; /* #33364a page chrome */
@@ -60,30 +143,14 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-p-info: 60.8% 0.108 216.744; /* teal-blue */
 
   /* Radial background accents */
-  --sa-p-radial-1: oklch(var(--sa-p-green) / 0.22);
-  --sa-p-radial-2: oklch(var(--sa-p-blue-deep) / 0.22);
-  --sa-p-radial-3: oklch(var(--sa-p-teal-blue) / 0.16);
+  --sa-p-radial-1: oklch(var(--sa-p-gradient-2-mid-start) / 0.22);
+  --sa-p-radial-2: oklch(var(--sa-p-gradient-3-mid) / 0.22);
+  --sa-p-radial-3: oklch(var(--sa-p-gradient-4-mid-end) / 0.16);
 
   /* Font primitives — internal, consumed by role tokens only */
   --sa-p-font-content: 'Comfortaa', ui-sans-serif, system-ui, sans-serif;
   --sa-p-font-label: 'Lexend', ui-sans-serif, system-ui, sans-serif;
   --sa-p-font-mono: 'Mono', ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
-}
-
-/*
- * THEME: DARK
- * ───────────────────────────────────────────────────────────────────────────
- * Default (root) theme
- */
-
-:root,
-[data-theme='dark'] {
-  /* --- Fonts --- */
-  --sa-font-heading-family: var(--sa-p-font-content);
-  --sa-font-body-family: var(--sa-p-font-content);
-  --sa-font-label-family: var(--sa-p-font-label);
-  --sa-font-ui-family: var(--sa-p-font-label);
-  --sa-font-mono-family: var(--sa-p-font-mono);
 
   /* --- Font Weights --- */
   --sa-p-weight-thin: 300;
@@ -92,30 +159,6 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-p-weight-semibold: 600;
   --sa-p-weight-bold: 700;
   --sa-p-weight-extrabold: 800;
-
-  /* --- Typography Role Tokens --- */
-  --sa-font-h1-size: var(--sa-p-size-xl);
-  --sa-font-h2-size: var(--sa-p-size-lg);
-  --sa-font-h3-size: var(--sa-p-size-md);
-  --sa-font-h4-size: var(--sa-p-size-base);
-  --sa-font-h5-size: 0.8125rem;
-  --sa-font-heading-weight: var(--sa-p-weight-normal);
-  --sa-font-body-weight: var(--sa-p-weight-thin);
-  --sa-font-body-size: var(--sa-p-size-base);
-  --sa-font-label-size: var(--sa-p-size-sm);
-  --sa-font-label-weight: var(--sa-p-weight-normal);
-  --sa-font-ui-size: var(--sa-p-size-sm);
-  --sa-font-ui-compact-size: var(--sa-p-size-xs);
-  --sa-font-ui-weight: var(--sa-p-weight-normal);
-  --sa-font-annotation-family: var(--sa-p-font-label);
-  --sa-font-annotation-size: var(--sa-p-size-sm);
-  --sa-font-annotation-weight: var(--sa-p-weight-normal);
-  --sa-font-data-family: var(--sa-p-font-label);
-  --sa-font-data-size: var(--sa-p-size-sm);
-  --sa-font-data-weight: var(--sa-p-weight-thin);
-  --sa-font-entry-family: var(--sa-p-font-label);
-  --sa-font-entry-size: var(--sa-p-size-sm);
-  --sa-font-entry-weight: var(--sa-p-weight-thin);
 
   /* --- Font Sizes --- */
   --sa-p-size-xs: 0.8rem;
@@ -128,150 +171,12 @@ Typography        -> App typography tokens consumed by base and controls.
   /* --- Line Heights --- */
   --sa-p-leading-normal: 1.5;
 
-  /* --- Brand Colors --- */
-  --sa-color-brand-start: oklch(66% 0.14 235);
-  --sa-color-brand-mid: oklch(50% 0.1 150);
-  --sa-color-brand-end: oklch(78% 0.12 185);
-
-  /* --- Semantic brand aliases --- */
-  --sa-color-primary: var(--sa-color-brand-end);
-  --sa-color-primary-dim: var(--sa-color-brand-mid);
-  --sa-color-secondary: var(--sa-color-brand-start);
-  --sa-color-accent: oklch(60% 0.125 210);
-
-  /* --- Backgrounds --- */
-  --sa-bg-page: rgb(21 24 30 / 0.95);
-  --sa-bg-base: oklch(var(--sa-p-black));
-  --sa-bg-surface-1: oklch(21% 0.018 252 / 0.88);
-  --sa-bg-surface-2: oklch(28% 0.018 252 / 0.78);
-  --sa-bg-surface-3: oklch(25% 0.02 248 / 0.7);
-  --sa-bg-progress-track: oklch(35% 0.02 252 / 0.6);
-  --sa-bg-overlay: oklch(var(--sa-p-black) / 0.2);
-  --sa-bg-popup: oklch(var(--sa-p-popup));
-  --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
-  --sa-bg-hover: oklch(var(--sa-p-teal) / 0.1);
-  --sa-bg-selected: oklch(var(--sa-p-teal) / 0.28);
-  --sa-bg-control: oklch(var(--sa-p-white) / 0.03);
-  --sa-bg-card: linear-gradient(
-    135deg,
-    rgb(30 41 59 / 0.8) 0%,
-    rgb(51 65 85 / 0.6) 100%
-  );
-
-  /* --- Text --- */
-  --sa-text-primary: oklch(var(--sa-p-near-white));
-  --sa-text-secondary: oklch(var(--sa-p-silver));
-  --sa-text-muted: oklch(var(--sa-p-muted));
-  --sa-text-faint: oklch(var(--sa-p-faint));
-  --sa-text-dim: oklch(var(--sa-p-dim));
-  --sa-text-on-brand: oklch(var(--sa-p-white));
-  --sa-text-on-surface: oklch(var(--sa-p-near-white));
-  --sa-text-label: oklch(76% 0.012 264.5);
-  --sa-text-disabled: oklch(var(--sa-p-faint));
-  --sa-text-placeholder: oklch(var(--sa-p-dim));
-
-  /* --- Heading hierarchy --- */
-  --sa-text-h1: oklch(var(--sa-p-white));
-  --sa-text-h2: oklch(var(--sa-p-white));
-  --sa-text-h3: oklch(var(--sa-p-white));
-  --sa-text-h4: oklch(var(--sa-p-white));
-  --sa-text-h5: oklch(var(--sa-p-white));
-
-  /* --- Borders --- */
-  --sa-border-subtle: 1px solid oklch(var(--sa-p-near-white) / 0.05);
-  --sa-border-default: 1px solid oklch(var(--sa-p-near-white) / 0.1);
-  --sa-border-strong: 1px solid oklch(var(--sa-p-near-white) / 0.25);
-  --sa-border-brand: 1px solid var(--sa-color-brand-end);
-  --sa-border-table: oklch(var(--sa-p-surface-3));
-  --sa-border-input: 1px solid oklch(var(--sa-p-surface-3));
-  --sa-border-input-focus: var(--sa-color-brand-end);
-  --sa-border-input-error: oklch(var(--sa-p-danger));
-  --sa-border-card: 1px solid rgb(148 163 184 / 0.1);
-
   /* --- Border Radius --- */
   --sa-radius-sm: 0.375rem;
   --sa-radius-md: 0.555rem;
   --sa-radius-lg: 0.75rem;
   --sa-radius-xl: 1.555rem;
   --sa-radius-full: 9999px;
-
-  /* --- Focus Ring --- */
-  --sa-focus-ring: 0 0 0 2px oklch(var(--sa-p-base)), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
-
-  /* --- Shadows / Elevation --- */
-  --sa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.3);
-  --sa-shadow: 0 4px 12px oklch(0% 0 0 / 0.35);
-  --sa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.4);
-  --sa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--sa-p-white) / 0.06);
-  --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.55), inset 0 1px 0 oklch(var(--sa-p-white) / 0.1);
-  --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-teal) / 0.3);
-  --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-teal) / 0.3);
-  --sa-shadow-btn:
-    0 15px 40px oklch(78% 0.12 185 / 0.32),
-    0 0 40px oklch(66% 0.14 235 / 0.24),
-    inset 0 1px 0 oklch(var(--sa-p-white) / 0.2);
-  --sa-shadow-card: 0 20px 40px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
-  --sa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
-  --sa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.3), 0 3px 6px oklch(0% 0 0 / 0.2);
-  --sa-shadow-kbd: 0 2px 0 oklch(var(--sa-p-near-white) / 0.15);
-
-  /* --- Gradients --- */
-  --sa-gradient-brand: linear-gradient(
-    135deg,
-    var(--sa-color-brand-start) 0%,
-    oklch(60% 0.125 210) 24%,
-    var(--sa-color-brand-mid) 52%,
-    oklch(62% 0.11 168) 76%,
-    var(--sa-color-brand-end) 100%
-  );
-  --sa-gradient-brand-90: linear-gradient(
-    90deg,
-    var(--sa-color-brand-start) 0%,
-    oklch(60% 0.125 210) 24%,
-    var(--sa-color-brand-mid) 52%,
-    oklch(62% 0.11 168) 76%,
-    var(--sa-color-brand-end) 100%
-  );
-  --sa-gradient-btn: linear-gradient(
-    135deg,
-    var(--sa-color-brand-start) 0%,
-    oklch(58% 0.12 190) 28%,
-    var(--sa-color-brand-mid) 58%,
-    var(--sa-color-brand-end) 100%
-  );
-  --sa-gradient-card: linear-gradient(
-    135deg,
-    rgb(30 41 59 / 0.8) 0%,
-    rgb(51 65 85 / 0.6) 100%
-  );
-  --sa-gradient-hero: linear-gradient(
-    135deg,
-    oklch(var(--sa-p-teal) / 0.7) 0%,
-    oklch(var(--sa-p-teal) / 0.9) 30%,
-    oklch(var(--sa-p-teal-blue)) 70%,
-    oklch(var(--sa-p-blue) / 0.5) 100%
-  );
-
-  /* --- Stripe: 3px top-border accent on cards/panels --- */
-  --sa-gradient-stripe: var(--sa-gradient-brand-90);
-
-  /* --- State Colors --- */
-  --sa-color-default: oklch(var(--sa-p-near-white));
-  --sa-color-default-bg: oklch(var(--sa-p-near-white) / 0.12);
-  --sa-color-default-border: oklch(var(--sa-p-near-white) / 0.3);
-  --sa-color-success: oklch(var(--sa-p-success));
-  --sa-color-success-bg: oklch(var(--sa-p-success) / 0.12);
-  --sa-color-success-border: oklch(var(--sa-p-success) / 0.3);
-  --sa-color-warning: oklch(var(--sa-p-warning));
-  --sa-color-warning-bg: oklch(var(--sa-p-warning) / 0.12);
-  --sa-color-warning-border: oklch(var(--sa-p-warning) / 0.3);
-  --sa-color-danger: oklch(var(--sa-p-danger));
-  --sa-color-danger-bg: oklch(var(--sa-p-danger) / 0.12);
-  --sa-color-danger-border: oklch(var(--sa-p-danger) / 0.3);
-  --sa-color-info: oklch(var(--sa-p-info));
-  --sa-color-info-bg: oklch(var(--sa-p-info) / 0.12);
-  --sa-color-info-border: oklch(var(--sa-p-info) / 0.3);
-  --sa-color-transparent: transparent;
 
   /* --- Spacing Scale --- */
   --sa-space-xs: 0.25rem;
@@ -312,10 +217,9 @@ Typography        -> App typography tokens consumed by base and controls.
   --sa-motion-skeleton: 1.4s;
 
   /* --- Base Element Tokens --- */
-  --sa-font-base-size: 16px;
+  --sa-base-size: 16px;
   --sa-body-line-height: var(--sa-p-leading-normal);
   --sa-transition-page: opacity var(--sa-motion-page-fade) ease-in;
-  --sa-blockquote-border: 3px solid var(--sa-color-primary);
   --sa-list-indent: 1.75rem;
   --sa-list-item-pad: 0.375rem;
   --sa-list-item-pad-bullet: calc(0.375rem - 2px);
@@ -324,233 +228,7 @@ Typography        -> App typography tokens consumed by base and controls.
   /* --- Misc --- */
   --sa-blur: blur(10px);
   --sa-filter-mono: brightness(0) invert(1);
-}
 
-/*
- * THEME: LIGHT
- * ───────────────────────────────────────────────────────────────────────────
- * Only tokens that differ from dark are redeclared here.
- */
-
-[data-theme='light'] {
-  /* --- Brand — same primitives, adjusted application --- */
-  --sa-color-primary: oklch(50% 0.1 150);
-  --sa-color-primary-dim: oklch(66% 0.14 235);
-  --sa-color-secondary: oklch(66% 0.14 235);
-  --sa-color-accent: oklch(78% 0.12 185);
-
-  /* --- Backgrounds --- */
-  --sa-bg-page: oklch(96% 0.004 264.5);
-  --sa-bg-base: oklch(93% 0.005 264.5);
-  --sa-bg-surface-1: oklch(100% 0 0);
-  --sa-bg-surface-2: oklch(97% 0.004 264.5);
-  --sa-bg-surface-3: oklch(93% 0.006 264.5);
-  --sa-bg-progress-track: oklch(88% 0.008 264.5);
-  --sa-bg-overlay: oklch(0% 0 0 / 0.06);
-  --sa-bg-popup: oklch(100% 0 0);
-  --sa-bg-table: oklch(0% 0 0 / 0.02);
-  --sa-bg-hover: oklch(var(--sa-p-teal) / 0.08);
-  --sa-bg-selected: oklch(var(--sa-p-teal) / 0.15);
-  --sa-bg-control: oklch(0% 0 0 / 0.06);
-  --sa-bg-card: linear-gradient(
-    135deg,
-    oklch(98% 0.003 220 / 0.88) 0%,
-    oklch(100% 0 0 / 0.94) 100%
-  );
-
-  /* --- Text --- */
-  --sa-text-primary: oklch(var(--sa-p-surface-1));
-  --sa-text-secondary: oklch(32% 0.012 264.5);
-  --sa-text-muted: oklch(50% 0.016 264.5);
-  --sa-text-faint: oklch(65% 0.012 264.5);
-  --sa-text-dim: oklch(80% 0.006 264.5);
-  --sa-text-on-brand: oklch(var(--sa-p-white));
-  --sa-text-on-surface: oklch(var(--sa-p-surface-1));
-  --sa-text-label: oklch(38% 0.012 264.5);
-  --sa-text-disabled: oklch(70% 0.01 264.5);
-  --sa-text-placeholder: oklch(65% 0.012 264.5);
-
-  --sa-text-h1: oklch(15% 0.01 264.5);
-  --sa-text-h2: oklch(50% 0.1 150);
-  --sa-text-h3: oklch(66% 0.14 235);
-  --sa-text-h4: oklch(58% 0.12 190);
-  --sa-text-h5: oklch(46% 0.08 200);
-
-  /* --- Borders --- */
-  --sa-border-subtle: 1px solid oklch(0% 0 0 / 0.05);
-  --sa-border-default: 1px solid oklch(0% 0 0 / 0.12);
-  --sa-border-strong: 1px solid oklch(0% 0 0 / 0.22);
-  --sa-border-brand: 1px solid oklch(50% 0.1 150);
-  --sa-border-table: oklch(88% 0.006 264.5);
-  --sa-border-input: 1px solid oklch(82% 0.008 264.5);
-  --sa-border-input-focus: oklch(78% 0.12 185);
-  --sa-border-card: 1px solid oklch(0% 0 0 / 0.08);
-
-  /* --- Focus Ring --- */
-  --sa-focus-ring: 0 0 0 2px oklch(96% 0.004 264.5), 0 0 0 4px oklch(82% 0.13 185 / 0.26);
-
-  /* --- Shadows --- */
-  --sa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.1);
-  --sa-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
-  --sa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.1);
-  --sa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.12), inset 0 1px 0 oklch(var(--sa-p-white) / 0.5);
-  --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.18), inset 0 1px 0 oklch(var(--sa-p-white) / 0.7);
-  --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-teal) / 0.2);
-  --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-teal) / 0.2);
-  --sa-shadow-btn:
-    0 15px 40px oklch(78% 0.12 185 / 0.24),
-    0 0 40px oklch(66% 0.14 235 / 0.18),
-    inset 0 1px 0 oklch(var(--sa-p-white) / 0.5);
-  --sa-shadow-card: 0 16px 36px oklch(0% 0 0 / 0.1), inset 0 1px 0 oklch(var(--sa-p-white) / 0.5);
-  --sa-shadow-kbd: 0 2px 0 oklch(0% 0 0 / 0.2);
-
-  /* --- Gradients --- */
-  --sa-gradient-card: linear-gradient(
-    135deg,
-    oklch(100% 0 0 / 0.92) 0%,
-    oklch(97% 0.004 220 / 0.82) 100%
-  );
-  --sa-gradient-hero: linear-gradient(
-    135deg,
-    oklch(var(--sa-p-green) / 0.8) 0%,
-    oklch(var(--sa-p-teal) / 0.8) 50%,
-    oklch(var(--sa-p-blue) / 0.7) 100%
-  );
-}
-
-/*
- * THEME: BRAND
- * ───────────────────────────────────────────────────────────────────────────
- * swarmAg brand palette — light, eggshell ground, green primary, orange CTA.
- * Only tokens that differ from dark are redeclared here.
- */
-
-[data-theme='brand'] {
-  /* --- Fonts --- */
-  --sa-font-heading-family: 'Playfair Display', ui-serif, serif;
-  --sa-font-ui-family: 'Inter', ui-sans-serif, system-ui, sans-serif;
-
-  /* --- Typography weights --- */
-  --sa-font-heading-weight: var(--sa-p-weight-bold);
-
-  /* --- Brand colors --- */
-  --sa-color-brand-start: oklch(76.849% 0.13454 123.993);
-  --sa-color-brand-mid: oklch(65.2070% 0.1322 81.5716);
-  --sa-color-brand-end: oklch(76.849% 0.13454 123.993);
-  --sa-color-primary: oklch(76.849% 0.13454 123.993);
-  --sa-color-primary-dim: oklch(65% 0.11 123.993);
-  --sa-color-secondary: oklch(76.885% 0.1231 80.8277);
-  --sa-color-accent: oklch(76.885% 0.1231 80.8277);
-
-  /* --- Backgrounds --- */
-  --sa-bg-page: oklch(99.0925% 0.0122 91.5145);
-  --sa-bg-base: oklch(99.1042% 0 0);
-  --sa-bg-surface-1: oklch(100% 0 0);
-  --sa-bg-surface-2: oklch(99.0925% 0.0122 91.5145);
-  --sa-bg-surface-3: oklch(92.758% 0.0058 264.5313);
-  --sa-bg-progress-track: oklch(88% 0.008 264.5);
-  --sa-bg-overlay: oklch(0% 0 0 / 0.06);
-  --sa-bg-popup: oklch(100% 0 0);
-  --sa-bg-table: oklch(0% 0 0 / 0.02);
-  --sa-bg-hover: oklch(76.849% 0.13454 123.993 / 0.08);
-  --sa-bg-selected: oklch(76.849% 0.13454 123.993 / 0.15);
-  --sa-bg-control: oklch(0% 0 0 / 0.04);
-  --sa-bg-card: linear-gradient(
-    135deg,
-    oklch(100% 0 0 / 0.95) 0%,
-    oklch(99.0925% 0.0122 91.5145 / 0.9) 100%
-  );
-
-  /* --- Text --- */
-  --sa-text-primary: oklch(44.4385% 0.0096 73.6332);
-  --sa-text-secondary: oklch(35% 0.008 73.6332);
-  --sa-text-muted: oklch(55% 0.012 73.6332);
-  --sa-text-faint: oklch(65% 0.008 264.5);
-  --sa-text-dim: oklch(75% 0.005 264.5);
-  --sa-text-on-brand: oklch(100% 0 0);
-  --sa-text-on-surface: oklch(44.4385% 0.0096 73.6332);
-  --sa-text-label: oklch(44.4385% 0.0096 73.6332);
-  --sa-text-disabled: oklch(71.3651% 0.0192 261.3174);
-  --sa-text-placeholder: oklch(71.3651% 0.0192 261.3174);
-
-  /* --- Heading hierarchy --- */
-  --sa-text-h1: oklch(44.4385% 0.0096 73.6332);
-  --sa-text-h2: oklch(76.849% 0.13454 123.993);
-  --sa-text-h3: oklch(76.885% 0.1231 80.8277);
-  --sa-text-h4: oklch(65.2070% 0.1322 81.5716);
-  --sa-text-h5: oklch(44.4385% 0.0096 73.6332);
-
-  /* --- Borders --- */
-  --sa-border-subtle: 1px solid oklch(0% 0 0 / 0.05);
-  --sa-border-default: 1px solid oklch(92.758% 0.0058 264.5313);
-  --sa-border-strong: 1px solid oklch(0% 0 0 / 0.18);
-  --sa-border-brand: 1px solid oklch(76.849% 0.13454 123.993);
-  --sa-border-table: oklch(92.758% 0.0058 264.5313);
-  --sa-border-input: 1px solid oklch(92.758% 0.0058 264.5313);
-  --sa-border-input-focus: oklch(72.2746% 0.192 149.5793);
-  --sa-border-input-error: oklch(62.7955% 0.2577 29.2339);
-  --sa-border-card: 1px solid oklch(0% 0 0 / 0.07);
-
-  /* --- Focus Ring --- */
-  --sa-focus-ring: 0 0 0 2px oklch(100% 0 0), 0 0 0 4px oklch(72.2746% 0.192 149.5793 / 0.5);
-
-  /* --- Shadows --- */
-  --sa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.08);
-  --sa-shadow: 0 4px 12px oklch(0% 0 0 / 0.08);
-  --sa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.1);
-  --sa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.12), inset 0 1px 0 oklch(100% 0 0 / 0.5);
-  --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.15), inset 0 1px 0 oklch(100% 0 0 / 0.7);
-  --sa-shadow-glow-sm: 0 0 20px oklch(76.849% 0.13454 123.993 / 0.2);
-  --sa-shadow-glow: 0 0 30px oklch(76.849% 0.13454 123.993 / 0.2);
-  --sa-shadow-btn: 0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -2px oklch(0% 0 0 / 0.35);
-  --sa-shadow-card: 0 10px 15px -3px oklch(0% 0 0 / 0.1), 0 4px 6px -2px oklch(0% 0 0 / 0.05);
-  --sa-shadow-kbd: 0 2px 0 oklch(0% 0 0 / 0.15);
-
-  /* --- Gradients --- */
-  --sa-gradient-brand: linear-gradient(
-    135deg,
-    oklch(76.849% 0.13454 123.993) 0%,
-    oklch(76.885% 0.1231 80.8277) 100%
-  );
-  --sa-gradient-brand-90: linear-gradient(
-    90deg,
-    oklch(76.849% 0.13454 123.993) 0%,
-    oklch(76.885% 0.1231 80.8277) 100%
-  );
-  --sa-gradient-btn: linear-gradient(135deg, oklch(76.885% 0.1231 80.8277) 0%, oklch(80% 0.13 80) 100%);
-  --sa-gradient-card: linear-gradient(
-    135deg,
-    oklch(100% 0 0 / 0.95) 0%,
-    oklch(99.0925% 0.0122 91.5145 / 0.9) 100%
-  );
-  --sa-gradient-hero: linear-gradient(
-    135deg,
-    oklch(76.849% 0.13454 123.993 / 0.85) 0%,
-    oklch(65.2070% 0.1322 81.5716 / 0.7) 100%
-  );
-  --sa-gradient-stripe: var(--sa-gradient-brand-90);
-}
-
-/*
- * LAYOUT TOKENS
- * ───────────────────────────────────────────────────────────────────────────
- * All values are starting points — tune by eyeball in the browser.
- *
- * --sa-dash-gap    between widgets, between rows
- * --sa-dash-pad    outer edge of row to first/last widget
- * --sa-widget-pad  inside a dashboard widget, border to content
- * --sa-stat-pad    inside a KPI StatCard, border to content
- * --sa-form-pad    inside the modal form container
- * --sa-field-pad   inside a field group within a form
- *
- * Breakpoints match architecture-ux.md §7:
- * ≥ 1024px  desktop
- * ≥ 768px   tablet landscape
- * ≥ 425px   tablet portrait / large mobile
- * ≥ 380px   mobile
- */
-
-:root {
   /* --- Desktop ≥ 1024px --- */
   --sa-dash-gap: 4rem;
   --sa-dash-pad: 4rem;
@@ -568,9 +246,6 @@ Typography        -> App typography tokens consumed by base and controls.
   /* --- Minimum touch target — safety-first for field use --- */
   --sa-touch-target: 64px;
   --sa-touch-target-sm: 44px;
-
-  /* --- Form backdrop --- */
-  --sa-bg-backdrop: oklch(0% 0 0 / 0.6);
 }
 
 @media (max-width: 1024px) {

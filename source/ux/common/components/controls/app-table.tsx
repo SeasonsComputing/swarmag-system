@@ -138,5 +138,12 @@ export const AppTableCell = (props: AppTableCellProps): JSX.Element => {
   ])
   return isHeader
     ? <th {...others} data-ui='table-cell' data-ui-align={local.align} />
-    : <td {...others} colspan={isSection ? 9999 : undefined} data-ui='table-cell' data-ui-align={local.align} />
+    : (
+      <td
+        {...others}
+        colspan={isSection ? 9999 : undefined}
+        data-ui='table-cell'
+        data-ui-align={local.align}
+      />
+    )
 }

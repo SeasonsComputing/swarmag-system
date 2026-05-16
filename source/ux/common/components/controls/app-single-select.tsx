@@ -57,6 +57,12 @@ export const AppSingleSelect = (props: AppSingleSelectProps): JSX.Element => {
     'placeholder'
   ])
 
+  const handleChange = (option: AppOption | null): void => {
+    if (option === null) return
+
+    local.onChange?.(option.value)
+  }
+
   return (
     <SelectRoot
       name={local.name}
@@ -66,13 +72,14 @@ export const AppSingleSelect = (props: AppSingleSelectProps): JSX.Element => {
       disabled={local.disabled || local.loading}
       validationState={local.error ? 'invalid' : undefined}
       placeholder={local.placeholder}
+      disallowEmptySelection
       gutter={4}
       modal={false}
       {...(local.value === undefined
         ? {}
         : { value: local.options.find(o => o.value === local.value) ?? null })}
       defaultValue={local.options.find(o => o.value === local.defaultValue)}
-      onChange={(option: AppOption | null) => local.onChange?.(option?.value ?? '')}
+      onChange={handleChange}
       itemComponent={(item: SelectRootItemComponentProps<AppOption>) => (
         <SelectItem data-ui='single-select-item' item={item.item}>
           {appOptionLabel(item.item.rawValue)}

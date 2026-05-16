@@ -104,7 +104,7 @@ export const AppTabs = <Value extends string = string>(
       value={local.value}
       defaultValue={local.defaultValue}
       activationMode={local.activationMode ?? 'manual'}
-      onChange={local.onChange as ((value: string) => void) | undefined}
+      onChange={(value: string) => local.onChange?.(value as Value)}
     >
       {local.children}
     </TabsRoot>

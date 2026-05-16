@@ -1,5 +1,3 @@
-import { walk } from '@std/walk'
-
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const CSS_DIR = `${ROOT}/source/ux/common/assets/css`
 
@@ -52,7 +50,12 @@ const extractSelector = (line: string): string | null => {
 
 const isAtRule = (selector: string): boolean => selector.startsWith('@')
 
-const auditTokensCSS = (lines: CSSLine[], filePath: string): string[] => {
+const auditTokensCSS = (
+  lines: CSSLine[],
+  filePath: string,
+  allowRoot: boolean,
+  allowThemeSelectors: boolean
+): string[] => {
   const violations: string[] = []
 
   for (const { line, lineNumber, isComment } of lines) {
@@ -62,6 +65,20 @@ const auditTokensCSS = (lines: CSSLine[], filePath: string): string[] => {
     if (!selector) continue
 
     if (isAtRule(selector)) continue
+
+    if (!allowRoot && selector === ':root') {
+      violations.push(
+        `${filePath}:${lineNumber} — forbidden root selector — found: ${selector}`
+      )
+      continue
+    }
+
+    if (!allowThemeSelectors && selector.startsWith('[data-theme=')) {
+      violations.push(
+        `${filePath}:${lineNumber} — forbidden theme selector — found: ${selector}`
+      )
+      continue
+    }
 
     if (selector !== ':root' && !selector.startsWith('[data-theme=')) {
       violations.push(
@@ -281,15 +298,15 @@ const auditValueRules = (
     }
 
     // B13: border shorthand
-    const isBorderShorthand = propPart === 'border' ||
-      propPart.startsWith('border-') &&
-        (propPart === 'border-top' || propPart === 'border-right' ||
-          propPart === 'border-bottom' || propPart === 'border-left' ||
-          propPart === 'border-block' || propPart === 'border-inline' ||
-          propPart === 'border-block-start' ||
-          propPart === 'border-block-end' ||
-          propPart === 'border-inline-start' ||
-          propPart === 'border-inline-end')
+    const isBorderShorthand = propPart === 'border'
+      || propPart.startsWith('border-')
+        && (propPart === 'border-top' || propPart === 'border-right'
+          || propPart === 'border-bottom' || propPart === 'border-left'
+          || propPart === 'border-block' || propPart === 'border-inline'
+          || propPart === 'border-block-start'
+          || propPart === 'border-block-end'
+          || propPart === 'border-inline-start'
+          || propPart === 'border-inline-end')
 
     if (isBorderShorthand) {
       const isKeyword = /^(?:none|unset|initial|inherit)/.test(valuePart)
@@ -315,8 +332,11 @@ const main = async () => {
       const content = await Deno.readTextFile(filePath)
       const lines = parseLines(content)
 
-      if (fileName === 'tokens.css' || fileName === 'controls-tokens.css') {
-        violations.push(...auditTokensCSS(lines, relative))
+      if (fileName === 'tokens.css') {
+        violations.push(...auditTokensCSS(lines, relative, true, false))
+        violations.push(...auditValueRules(lines, relative, true))
+      } else if (fileName === 'controls-tokens.css') {
+        violations.push(...auditTokensCSS(lines, relative, false, true))
         violations.push(...auditValueRules(lines, relative, true))
       } else if (fileName === 'base.css') {
         violations.push(...auditBaseCSS(lines, relative))
