@@ -30,6 +30,7 @@
   --sa-ui-font-size: var(--sa-p-size-sm);
   --sa-ui-font-size-compact: var(--sa-p-size-xs);
   --sa-ui-font-weight: var(--sa-p-weight-normal);
+  --sa-ui-checkmark-weight: var(--sa-p-weight-extrabold);
   --sa-annotation-font-family: var(--sa-p-font-label);
   --sa-annotation-font-size: var(--sa-p-size-sm);
   --sa-annotation-font-weight: var(--sa-p-weight-medium);
@@ -278,9 +279,9 @@
   --sa-card-workflow-border: 1px solid rgb(148 163 184 / 0.2);
   --sa-card-workflow-shadow: 0 22px 48px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-card-workflow-stripe-opacity: 0.8;
-  --sa-card-panel-pad: var(--sa-widget-pad);
-  --sa-card-widget-pad: var(--sa-widget-pad);
-  --sa-card-workflow-pad: var(--sa-widget-pad);
+  --sa-card-panel-pad: var(--sa-card-pad);
+  --sa-card-widget-pad: var(--sa-card-pad);
+  --sa-card-workflow-pad: var(--sa-card-pad);
 
   /* Table */
   --sa-table-padding-cell: 0.375rem;
@@ -326,6 +327,7 @@
   --sa-ui-font-size: var(--sa-p-size-sm);
   --sa-ui-font-size-compact: var(--sa-p-size-xs);
   --sa-ui-font-weight: var(--sa-p-weight-normal);
+  --sa-ui-checkmark-weight: var(--sa-p-weight-extrabold);
   --sa-annotation-font-family: var(--sa-p-font-label);
   --sa-annotation-font-size: var(--sa-p-size-sm);
   --sa-annotation-font-weight: var(--sa-p-weight-medium);
@@ -587,9 +589,9 @@
     0 0 26px oklch(57% 0.13 186 / 0.12),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.78);
   --sa-card-workflow-stripe-opacity: 1;
-  --sa-card-panel-pad: var(--sa-widget-pad);
-  --sa-card-widget-pad: var(--sa-widget-pad);
-  --sa-card-workflow-pad: var(--sa-widget-pad);
+  --sa-card-panel-pad: var(--sa-card-pad);
+  --sa-card-widget-pad: var(--sa-card-pad);
+  --sa-card-workflow-pad: var(--sa-card-pad);
 
   /* Table */
   --sa-table-padding-cell: 0.375rem;
