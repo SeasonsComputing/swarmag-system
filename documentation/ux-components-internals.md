@@ -76,6 +76,7 @@ All tokens use the `--sa-` prefix.
 | `--sa-button-`    | Button component tokens               |
 | `--sa-control-`   | Shared control component tokens       |
 | `--sa-input-`     | Input, textarea, and select tokens    |
+| `--sa-shell-`     | App shell chrome tokens               |
 | `--sa-toggle-`    | Toggle component tokens               |
 | `--sa-tab-`       | Tabs component tokens                 |
 | `--sa-accordion-` | Accordion component tokens            |
@@ -396,16 +397,16 @@ This selector shape is invalid because one element cannot hold two different `da
 
 ### 5.3 Layout Controls
 
-| Control        | Intent                                                     |
-| -------------- | ---------------------------------------------------------- |
-| `layout`       | General block and inline child arrangement                 |
-| `list`         | Semantic list with clean, bullet, and numbered variants    |
-| `table`        | Semantic table family with header/body/row/cell parts      |
-| `footer`       | Branded footer primitive with safe-area support            |
-| `field`        | Label + control wrapper                                    |
-| `fieldset`     | Semantic group boundary with legend                        |
-| `form-grid`    | Responsive auto-fit column layout for form fields          |
-| `form-actions` | Right-aligned action row for form submission and dismissal |
+| Control        | Intent                                                            |
+| -------------- | ----------------------------------------------------------------- |
+| `layout`       | General block and inline child arrangement                        |
+| `list`         | Semantic list with clean, bullet, and numbered variants           |
+| `table`        | Semantic table family with header/body/row/cell parts             |
+| `footer`       | Branded footer primitive using shell chrome and safe-area support |
+| `field`        | Label + control wrapper                                           |
+| `fieldset`     | Semantic group boundary with legend                               |
+| `form-grid`    | Responsive auto-fit column layout for form fields                 |
+| `form-actions` | Right-aligned action row for form submission and dismissal        |
 
 ## 6. Chart Controls
 

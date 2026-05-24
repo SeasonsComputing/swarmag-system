@@ -1050,9 +1050,10 @@
 
 [data-ui='footer'] {
   align-items: center;
-  backdrop-filter: var(--sa-blur);
-  background: var(--sa-card-panel-bg);
-  border-block-start: var(--sa-card-panel-border);
+  backdrop-filter: var(--sa-shell-chrome-filter);
+  background: var(--sa-shell-chrome-bg);
+  border-block-start: var(--sa-shell-chrome-border);
+  box-shadow: var(--sa-shell-chrome-shadow);
   display: flex;
   justify-content: center;
   padding-block: var(--sa-space-md) max(var(--sa-space-md), env(safe-area-inset-bottom));

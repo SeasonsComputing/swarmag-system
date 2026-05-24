@@ -667,7 +667,7 @@ Semantic table family. `AppTableCell` renders as `<th>` inside `AppTableHeader`,
 
 ### 4.4 AppFooter
 
-Footer control with centered caller-supplied logo and mobile safe-area support.
+Footer control with centered caller-supplied logo, shell chrome styling, and mobile safe-area support.
 
 **Key props:** `logo`, `alt`\
 **Composition:** use at an app or harness boundary where a branded footer is needed
