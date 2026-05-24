@@ -174,11 +174,6 @@
   --sa-focus-ring: 0 0 0 2px oklch(var(--sa-p-base)), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
   --sa-blockquote-border: 3px solid var(--sa-color-primary);
 
-  /*
-   * COMPONENT TOKENS
-   * ─────────────────────────────────────────────────────────────────────────
-   */
-
   /* Shell chrome */
   --sa-shell-chrome-bg: var(--sa-card-panel-bg);
   --sa-shell-chrome-border: var(--sa-card-panel-border);
@@ -186,6 +181,11 @@
   --sa-shell-chrome-muted: var(--sa-text-muted);
   --sa-shell-chrome-shadow: var(--sa-card-panel-shadow);
   --sa-shell-chrome-text: var(--sa-text-h1);
+
+  /*
+   * COMPONENT TOKENS
+   * ─────────────────────────────────────────────────────────────────────────
+   */
 
   /* Button */
   --sa-button-font-size: var(--sa-p-size-xs);
@@ -427,9 +427,9 @@
   --sa-gradient-brand: linear-gradient(
     135deg,
     oklch(43% 0.115 222) 0%,
-    oklch(51% 0.12 205) 28%,
-    oklch(56% 0.13 184) 54%,
-    oklch(58% 0.13 156) 78%,
+    oklch(51% 0.12 205) 5%,
+    oklch(56% 0.13 184) 20%,
+    oklch(58% 0.13 156) 60%,
     oklch(72% 0.13 86) 100%
   );
   --sa-gradient-brand-90: linear-gradient(
@@ -470,11 +470,6 @@
   --sa-focus-ring: 0 0 0 2px oklch(99.4% 0.006 98), 0 0 0 4px oklch(57% 0.13 186 / 0.42);
   --sa-blockquote-border: 3px solid var(--sa-color-primary);
 
-  /*
-   * COMPONENT TOKENS
-   * ─────────────────────────────────────────────────────────────────────────
-   */
-
   /* Shell chrome */
   --sa-shell-chrome-bg: oklch(27% 0.045 224);
   --sa-shell-chrome-border: 1px solid oklch(18% 0.035 228 / 0.72);
@@ -482,6 +477,11 @@
   --sa-shell-chrome-muted: oklch(83% 0.026 112);
   --sa-shell-chrome-shadow: 0 12px 28px oklch(20% 0.04 230 / 0.18);
   --sa-shell-chrome-text: oklch(98% 0.006 98);
+
+  /*
+   * COMPONENT TOKENS
+   * ─────────────────────────────────────────────────────────────────────────
+   */
 
   /* Button */
   --sa-button-font-size: var(--sa-p-size-xs);
@@ -769,14 +769,6 @@
    * COMPONENT TOKENS
    * ─────────────────────────────────────────────────────────────────────────
    */
-
-  /* Shell chrome */
-  --sa-shell-chrome-bg: var(--sa-card-panel-bg);
-  --sa-shell-chrome-border: var(--sa-card-panel-border);
-  --sa-shell-chrome-filter: var(--sa-blur);
-  --sa-shell-chrome-muted: var(--sa-text-muted);
-  --sa-shell-chrome-shadow: var(--sa-card-panel-shadow);
-  --sa-shell-chrome-text: var(--sa-text-h1);
 
   /* Input */
   --sa-input-bg: var(--sa-bg-control);
