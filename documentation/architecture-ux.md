@@ -38,19 +38,18 @@ source/
     │   ├── assets/                  — static assets used by applications
     │   │   ├── css/                 — tokens.css, base.css, controls.css
     │   │   ├── fonts/               — font typography
-    │   │   └── icons/               — icon library
+    │   │   ├── icons/               — icon library
+    │   │   └── logos/               — brand/logos
     │   ├── views/                   — UX projection types (domain → display shape)
     │   ├── stores/                  — reactive stores
     │   │   ├── app-state.ts
     │   │   ├── session-state.ts
     │   │   └── dashboard-state.ts
-    │   ├── forms/                   — adaptive form primitives and compositions    
     │   ├── widgets/                 — widget catalog    
     │   └── components/
     │       ├── shell/               — bootstrap, auth-guard, content, login, form-panel
     │       ├── controls/            — Kobalte-based UI primitives
-    │       ├── charts/              — PieChart, BarChart, LineChart, Sparkline
-    │       └── dashboard/           — shared dashboard harness + layout foundation
+    │       └── charts/              — PieChart, BarChart, LineChart, Sparkline
     ├── app-admin/
     │   ├── app.tsx
     │   ├── dashboard-admin.json     — default dashboard layout for app-admin
