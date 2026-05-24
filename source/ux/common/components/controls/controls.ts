@@ -82,3 +82,4 @@ export {
 } from './app-toggle-group.tsx'
 export { AppToggle, type AppToggleProps } from './app-toggle.tsx'
 export { AppTooltip, type AppTooltipProps } from './app-tooltip.tsx'
+export { type AppComponent } from './controls-helpers.ts'

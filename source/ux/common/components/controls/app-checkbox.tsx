@@ -14,12 +14,12 @@ AppCheckbox  Checkbox control with declared states.
 */
 
 import { Checkbox } from '@kobalte/core/checkbox'
-import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { splitProps } from '@solid-js'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Checkbox control props. */
 export type AppCheckboxProps = {
-  children?: JSX.Element
+  children?: AppComponent
   checked?: boolean
   defaultChecked?: boolean
   disabled?: boolean
@@ -37,7 +37,7 @@ export type AppCheckboxProps = {
 }
 
 /** Checkbox control with declared states. */
-export const AppCheckbox = (props: AppCheckboxProps): JSX.Element => {
+export const AppCheckbox = (props: AppCheckboxProps): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'checked',

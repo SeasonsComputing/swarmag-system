@@ -14,12 +14,12 @@ AppProgress  Progress control with declared states.
 */
 
 import { Progress } from '@kobalte/core/progress'
-import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { splitProps } from '@solid-js'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Progress control props. */
 export type AppProgressProps = {
-  children?: JSX.Element
+  children?: AppComponent
   label?: string
   value?: number
   minValue?: number
@@ -38,7 +38,7 @@ const ProgressTrack = Progress.Track as unknown as typeof Progress.Track
 const ProgressFill = Progress.Fill as unknown as typeof Progress.Fill
 
 /** Progress control with declared states. */
-export const AppProgress = (props: AppProgressProps): JSX.Element => {
+export const AppProgress = (props: AppProgressProps): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'label',

@@ -14,14 +14,12 @@ PUBLIC
 AppFormGrid  Responsive field grid container.
 */
 
-import { type JSX } from '@solid-js'
+import { type AppComponent } from './controls-helpers.ts'
 
 /** AppFormGrid props. */
-export type AppFormGridProps = {
-  children: JSX.Element
-}
+export type AppFormGridProps = { children: AppComponent }
 
 /** Responsive auto-fit column layout for form fields. */
-export const AppFormGrid = (props: AppFormGridProps): JSX.Element => (
+export const AppFormGrid = (props: AppFormGridProps): AppComponent => (
   <div data-ui='form-grid'>{props.children}</div>
 )

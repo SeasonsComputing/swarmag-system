@@ -15,7 +15,7 @@ AppSeparator  Separator control with declared states.
 
 import { Separator } from '@kobalte/core/separator'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Separator control props. */
 export type AppSeparatorProps =
@@ -35,7 +35,7 @@ export type AppSeparatorProps =
   }
 
 /** Separator control with declared states. */
-export const AppSeparator = (props: AppSeparatorProps): JSX.Element => {
+export const AppSeparator = (props: AppSeparatorProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',

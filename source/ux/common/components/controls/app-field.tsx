@@ -15,7 +15,7 @@ PUBLIC
 AppField  Label + control field wrapper.
 */
 
-import { type JSX } from '@solid-js'
+import { type AppComponent } from './controls-helpers.ts'
 
 /** AppField props. */
 export type AppFieldProps = {
@@ -25,11 +25,11 @@ export type AppFieldProps = {
   for: string
   /** Optional layout variant. `'inline'` places label and control side-by-side. */
   variant?: 'inline'
-  children: JSX.Element
+  children: AppComponent
 }
 
 /** Label + control field wrapper. Label and control are siblings, never nested. */
-export const AppField = (props: AppFieldProps): JSX.Element => (
+export const AppField = (props: AppFieldProps): AppComponent => (
   <div data-ui='field' data-ui-variant={props.variant}>
     <label for={props.for}>{props.label}</label>
     {props.children}

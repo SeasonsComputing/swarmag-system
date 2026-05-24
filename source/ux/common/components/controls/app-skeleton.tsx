@@ -14,7 +14,7 @@ AppSkeleton  Skeleton control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Skeleton control props. */
 export type AppSkeletonProps =
@@ -34,7 +34,7 @@ export type AppSkeletonProps =
   }
 
 /** Skeleton control with declared states. */
-export const AppSkeleton = (props: AppSkeletonProps): JSX.Element => {
+export const AppSkeleton = (props: AppSkeletonProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',

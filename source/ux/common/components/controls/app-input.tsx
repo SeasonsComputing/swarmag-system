@@ -15,7 +15,7 @@ AppInput  Text input control with declared states.
 
 import { TextField, type TextFieldInputProps } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Input control props. */
 export type AppInputProps =
@@ -37,7 +37,7 @@ const TextFieldRoot = TextField as unknown as typeof TextField
 const TextFieldInput = TextField.Input as unknown as typeof TextField.Input
 
 /** Text input control with declared states. */
-export const AppInput = (props: AppInputProps): JSX.Element => {
+export const AppInput = (props: AppInputProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',

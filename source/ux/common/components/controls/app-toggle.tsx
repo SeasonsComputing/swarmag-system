@@ -15,7 +15,7 @@ AppToggle  Toggle control with declared states.
 
 import { ToggleButton } from '@kobalte/core/toggle-button'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Toggle control props. */
 export type AppToggleProps =
@@ -37,7 +37,7 @@ export type AppToggleProps =
   }
 
 /** Toggle control with declared states. */
-export const AppToggle = (props: AppToggleProps): JSX.Element => {
+export const AppToggle = (props: AppToggleProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',
