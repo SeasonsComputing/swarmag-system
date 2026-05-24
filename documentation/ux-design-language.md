@@ -51,12 +51,12 @@ Theme switching is a single attribute swap — no JS class toggling.
 
 ### 2.4 Layer Structure
 
-| Layer           | Scope                          | Purpose                             |
-| --------------- | ------------------------------ | ----------------------------------- |
-| Primitive layer | `:root`                        | Bare L C H triplets (internal only) |
-| Semantic layer  | `:root`, `[data-theme='dark']` | Resolved `oklch()` values           |
-| Light theme     | `[data-theme='light']`         | Semantic overrides                  |
-| Brand theme     | `[data-theme='brand']`         | Semantic overrides                  |
+| Layer           | File                  | Scope                  | Purpose                             |
+| --------------- | --------------------- | ---------------------- | ----------------------------------- |
+| Primitive layer | `tokens.css`          | `:root`                | Bare L C H triplets (internal only) |
+| Semantic layer  | `controls-tokens.css` | `[data-theme='dark']`  | Resolved `oklch()` values           |
+| Light theme     | `controls-tokens.css` | `[data-theme='light']` | Semantic overrides                  |
+| Brand theme     | `controls-tokens.css` | `[data-theme='brand']` | Semantic overrides                  |
 
 See `ux-components-internals.md §2.3–2.4` for the full prefix convention and token inventory.
 
@@ -82,7 +82,7 @@ Font primitives (`--sa-p-font-*`) hold raw font stack values and are internal �
 | `--sa-p-font-label`   | Lexend        |
 | `--sa-p-font-mono`    | Cascadia Mono |
 
-Role tokens provide semantic indirection. If a role's typeface changes, one token value changes — no cascade of renames in consuming files.
+Role tokens provide semantic indirection. A role typeface is changed by changing one token value, not by changing consuming selectors.
 
 | Role token          | Resolves to                | Intent                                       |
 | ------------------- | -------------------------- | -------------------------------------------- |
@@ -92,9 +92,9 @@ Role tokens provide semantic indirection. If a role's typeface changes, one toke
 | `--sa-font-ui`      | `var(--sa-p-font-label)`   | Data entry controls — Lexend (same as label) |
 | `--sa-font-mono`    | `var(--sa-p-font-mono)`    | Code and numeric fields                      |
 
-### 2.5.2 Fluid Type Scale
+### 2.5.2 Type Scale
 
-All font sizes use `clamp()` for fluid scaling. See `tokens.css` for the full `--sa-font-*` scale.
+Font sizes are fixed role tokens. `controls-tokens.css` defines the role-level font-size tokens consumed by `base.css` and `controls.css`.
 
 ### 2.5.3 Typography Role Map
 
@@ -102,7 +102,7 @@ Each HTML element belongs to exactly one typographic role. `base.css` declares t
 
 | Element(s)                                       | Role                      | Font token          | Size           | Weight |
 | ------------------------------------------------ | ------------------------- | ------------------- | -------------- | ------ |
-| `h1`–`h6`                                        | Heading                   | `--sa-font-heading` | fluid scale    | normal |
+| `h1`–`h6`                                        | Heading                   | `--sa-font-heading` | role scale     | normal |
 | `p`                                              | Content                   | `--sa-font-body`    | inherited      | thin   |
 | `label`, `button`, `legend`                      | Label                     | `--sa-font-label`   | `--sa-font-sm` | thin   |
 | `figcaption`, `th`                               | Annotation / table header | `--sa-font-label`   | `--sa-font-sm` | normal |
@@ -167,11 +167,10 @@ On mobile, landscape widgets fill the viewport width. Square widgets also fill t
 
 ### 2.7.2 Widget Taxonomy
 
-| Tier               | Height                           | Purpose                               |
-| ------------------ | -------------------------------- | ------------------------------------- |
-| `StatCard`         | Fixed short (`--sa-stat-height`) | KPI metric, tap to drill              |
-| `Widget` square    | Equal w/h                        | Self-contained domain or utility unit |
-| `Widget` landscape | Full row width                   | Data-dense domain view                |
+| Tier               | Height         | Purpose                               |
+| ------------------ | -------------- | ------------------------------------- |
+| `Widget` square    | Equal w/h      | Self-contained domain or utility unit |
+| `Widget` landscape | Full row width | Data-dense domain view                |
 
 A widget is a self-contained dashboard unit that owns its own state and rendering. It is not required to be domain-aware — a clock widget or upload progress widget are valid widgets.
 
@@ -311,7 +310,7 @@ Brand theme heading colors follow the logo palette — green and golden-green, n
 
 ### 5.3 Typography Overrides
 
-The brand theme substitutes the default font stack. These overrides are declared in `[data-theme='brand']` in `tokens.css`.
+The brand theme substitutes the default font stack. These overrides are declared in `[data-theme='brand']` in `controls-tokens.css`.
 
 | Role token          | Brand override                                  | Rationale                                        |
 | ------------------- | ----------------------------------------------- | ------------------------------------------------ |

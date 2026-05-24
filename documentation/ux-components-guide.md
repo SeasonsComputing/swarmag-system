@@ -4,15 +4,13 @@
 
 ## 1. Overview
 
-This document is the consumer reference for all shared UI primitives in `ux/common`. One entry per control: what it is, what variants and props matter, how it composes, and what `data-*` attributes it emits.
+This document is the consumer reference for all shared UI primitives in `ux/common/components`. One entry per control: what it is, what variants and props matter, how it composes, and what `data-*` attributes it emits.
 
-**Audience:** Feature developers and widget authors consuming controls to build views, widgets, or forms.
+**Audience:** Feature developers consuming controls to build views, widgets, or forms.
 
-**Source of truth:** `source/ux/common/components/controls/`. This document is derived from source; where they conflict, source wins.
+**Authority:** Control contracts are defined by this document and `ux-components-internals.md`. Source implements those contracts.
 
 **What this document is not:** It does not explain token values, CSS selectors, Kobalte binding details, or design rationale. See `ux-components-internals.md` for that.
-
-**One forward reference:** Higher-level form compositions (dialog wrappers, pickers, reorder lists) are planned for the `forms/` layer. Documentation will be linked here when available.
 
 All controls export from a single barrel:
 
@@ -349,10 +347,10 @@ Floating content panel anchored to a trigger. Use for context menus and secondar
 ```tsx
 <AppPopover open={open} onOpenChange={setOpen}>
   <AppButton variant='ghost'>Options</AppButton>
-  <AppStack>
+  <AppLayout>
     <AppButton variant='ghost' onClick={handleEdit}>Edit</AppButton>
     <AppButton variant='danger' onClick={handleDelete}>Delete</AppButton>
-  </AppStack>
+  </AppLayout>
 </AppPopover>
 ```
 
@@ -548,60 +546,64 @@ Loading placeholder shimmer. Size it to match the content it replaces.
 
 ## 4. Layout Controls
 
-### 4.1 AppRow
+### 4.1 AppLayout
 
-Horizontal flex container. Sizes to content by default.
+Unified layout primitive. Covers both block (vertical) and inline (horizontal) arrangements through
+variant, with optional gap density for tighter compositions.
 
-**Variants:** `fill` (full-width flex)\
-**Key props:** `variant`, `children`\
-**Composition:** wraps any set of inline or inline-flex children; `variant='fill'` stretches to container
+**Variants:** default/`block` · `block-fit` · `inline` · `inline-fill`\
+**Gap:** default · `tight` · `none`\
+**Key props:** `variant`, `gap`, `children`\
+**Composition:** general-purpose layout container for block and inline child arrangement
 
-| Attribute         | Values |
-| ----------------- | ------ |
-| `data-ui`         | `row`  |
-| `data-ui-variant` | `fill` |
+| Variant       | Behaviour                                              |
+| ------------- | ------------------------------------------------------ |
+| _(default)_   | Full-width vertical grid                               |
+| `block-fit`   | Content-fit vertical grid, items start-aligned         |
+| `inline`      | Content-fit horizontal flex, wraps                     |
+| `inline-fill` | Full-width horizontal flex, children equally stretched |
+
+| Gap       | Behaviour                       |
+| --------- | ------------------------------- |
+| _(unset)_ | Standard layout gap             |
+| `tight`   | Small layout gap for close text |
+| `none`    | No gap                          |
+
+| Attribute         | Values                                 |
+| ----------------- | -------------------------------------- |
+| `data-ui`         | `layout`                               |
+| `data-ui-variant` | `block-fit` · `inline` · `inline-fill` |
+| `data-ui-gap`     | `tight` · `none`                       |
 
 ### 4.1.1 Example
 
 ```tsx
-<AppRow>
-  <AppBadge variant='success'>Active</AppBadge>
-  <AppBadge variant='info'>Synced</AppBadge>
-</AppRow>
-
-<AppRow variant='fill'>
-  <AppButton variant='ghost'>Cancel</AppButton>
-  <AppButton variant='primary'>Save</AppButton>
-</AppRow>
-```
-
-### 4.2 AppStack
-
-Vertical grid container. Fills container width by default.
-
-**Variants:** `inline` (content-fit width, items start-aligned)\
-**Key props:** `variant`, `children`\
-**Composition:** general-purpose vertical layout
-
-| Attribute         | Values   |
-| ----------------- | -------- |
-| `data-ui`         | `stack`  |
-| `data-ui-variant` | `inline` |
-
-### 4.2.1 Example
-
-```tsx
-<AppStack>
+<AppLayout>
   <AppField label='Name' for='name'>
     <AppInput id='name' value={name} onChange={setName} />
   </AppField>
   <AppField label='Status' for='status'>
     <AppSingleSelect id='status' options={statusOptions} value={status} onChange={setStatus} />
   </AppField>
-</AppStack>
+</AppLayout>
+
+<AppLayout variant='inline'>
+  <AppBadge variant='success'>Active</AppBadge>
+  <AppBadge variant='info'>Synced</AppBadge>
+</AppLayout>
+
+<AppLayout variant='inline-fill'>
+  <AppButton variant='ghost'>Cancel</AppButton>
+  <AppButton variant='primary'>Save</AppButton>
+</AppLayout>
+
+<AppLayout gap='tight'>
+  <h1>swarmAg Style Guide</h1>
+  <p>Living visual validation for tokens, states, themes, and controls.</p>
+</AppLayout>
 ```
 
-### 4.3 AppList / AppListItem
+### 4.2 AppList / AppListItem
 
 Semantic list with visual variants.
 
@@ -615,7 +617,7 @@ Semantic list with visual variants.
 | `data-ui`         | `list` · `list-item`  |
 | `data-ui-variant` | `bullet` · `numbered` |
 
-### 4.3.1 Example
+### 4.2.1 Example
 
 ```tsx
 <AppList variant='bullet'>
@@ -625,7 +627,7 @@ Semantic list with visual variants.
 </AppList>
 ```
 
-### 4.4 AppTable / AppTableHeader / AppTableBody / AppTableRow / AppTableCell
+### 4.3 AppTable / AppTableHeader / AppTableBody / AppTableRow / AppTableCell
 
 Semantic table family. `AppTableCell` renders as `<th>` inside `AppTableHeader`, `<td>` elsewhere — no prop needed.
 
@@ -637,7 +639,7 @@ Semantic table family. `AppTableCell` renders as `<th>` inside `AppTableHeader`,
 | `data-ui`         | `table` · `table-head` · `table-body` · `table-row` · `table-cell` |
 | `data-ui-variant` | `section` (on `table-row` when `section={true}`)                   |
 
-### 4.4.1 Example
+### 4.3.1 Example
 
 ```tsx
 <AppTable>
@@ -661,6 +663,23 @@ Semantic table family. `AppTableCell` renders as `<th>` inside `AppTableHeader`,
     </AppTableRow>
   </AppTableBody>
 </AppTable>
+```
+
+### 4.4 AppFooter
+
+Footer control with centered caller-supplied logo and mobile safe-area support.
+
+**Key props:** `logo`, `alt`\
+**Composition:** use at an app or harness boundary where a branded footer is needed
+
+| Attribute | Values                   |
+| --------- | ------------------------ |
+| `data-ui` | `footer` · `footer-logo` |
+
+### 4.4.1 Example
+
+```tsx
+<AppFooter logo={logo} alt='swarmAg' />
 ```
 
 ## 5. Form Layout
@@ -707,16 +726,14 @@ Semantic group boundary with a legend. Use when a form has logically distinct se
 
 ```tsx
 <AppFieldset legend='Spray window'>
-  <div>
-    <AppFormGrid>
-      <AppField label='Start time' for='start'>
-        <AppInput id='start' type='time' />
-      </AppField>
-      <AppField label='End time' for='end'>
-        <AppInput id='end' type='time' />
-      </AppField>
-    </AppFormGrid>
-  </div>
+  <AppFormGrid>
+    <AppField label='Start time' for='start'>
+      <AppInput id='start' type='time' />
+    </AppField>
+    <AppField label='End time' for='end'>
+      <AppInput id='end' type='time' />
+    </AppField>
+  </AppFormGrid>
 </AppFieldset>
 ```
 
@@ -786,22 +803,15 @@ Full form pattern — fieldset, grid, field, and actions working together.
 </AppFormActions>
 ```
 
-_Higher-level form compositions (dialog wrappers, pickers, reorder lists) are planned for the `forms/` layer — documentation to follow._
-
 ## 6. Charts
 
-Charts are standardized through `AppChart`. Chart.js is the internal engine and must not be consumed directly by views or widgets.
+Charts are standardized through `AppChart`.
 
-**Location:** `source/ux/common/components/charts`
-
-| Component   | Purpose                             |
-| ----------- | ----------------------------------- |
-| `AppChart`  | Token-aware chart primitive wrapper |
-| `PieChart`  | Composition at a point in time      |
-| `BarChart`  | Frequency / volume over categories  |
-| `LineChart` | Trend over rolling time period      |
-| `Sparkline` | Inline mini trend                   |
-
-`ChartWidget` composes `AppChart` — widget authors use `ChartWidget`, not `AppChart` directly.
+| Variant      | Purpose                            |
+| ------------ | ---------------------------------- |
+| `pie`        | Composition at a point in time     |
+| `bar`        | Frequency / volume over categories |
+| `line`       | Trend over rolling time period     |
+| `spark-line` | Inline mini trend                  |
 
 _End of Component Guide Document_
