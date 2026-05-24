@@ -15,8 +15,8 @@ AppMultiSelect  Inline multi-value select control with declared states.
 
 import { type StringSet } from '@core/std'
 import { Listbox, type ListboxItemOptions } from '@kobalte/core/listbox'
-import { type JSX, splitProps } from '@solid-js'
-import { type AppOption, appOptionLabel, controlState } from './controls-helpers.ts'
+import { splitProps } from '@solid-js'
+import { type AppComponent, type AppOption, appOptionLabel, controlState } from './controls-helpers.ts'
 
 /** Multi-select control props. */
 export type AppMultiSelectProps = {
@@ -38,7 +38,7 @@ const ListboxRoot = Listbox as unknown as typeof Listbox
 const ListboxItem = Listbox.Item as unknown as typeof Listbox.Item
 
 /** Inline multi-value select control with declared states. */
-export const AppMultiSelect = (props: AppMultiSelectProps): JSX.Element => {
+export const AppMultiSelect = (props: AppMultiSelectProps): AppComponent => {
   const [local] = splitProps(props, [
     'disabled',
     'error',

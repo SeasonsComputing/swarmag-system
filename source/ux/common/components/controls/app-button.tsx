@@ -15,7 +15,7 @@ AppButton  Button control with declared variants and states.
 
 import { Button } from '@kobalte/core/button'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Button variants declared by the design language. */
 export type AppButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
@@ -39,7 +39,7 @@ export type AppButtonProps =
   }
 
 /** Button control with declared variants and states. */
-export const AppButton = (props: AppButtonProps): JSX.Element => {
+export const AppButton = (props: AppButtonProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'variant',
     'error',

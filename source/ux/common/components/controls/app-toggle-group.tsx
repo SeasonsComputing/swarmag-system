@@ -19,12 +19,12 @@ import {
   type ToggleGroupItemProps,
   type ToggleGroupRootProps
 } from '@kobalte/core/toggle-group'
-import { type Component, createEffect, createSignal, type JSX, splitProps } from '@solid-js'
-import { controlState, type WithDataUI } from './controls-helpers.ts'
+import { type Component, createEffect, createSignal, splitProps } from '@solid-js'
+import { type AppComponent, controlState, type WithDataUI } from './controls-helpers.ts'
 
 /** Toggle-group control props. */
 export type AppToggleGroupProps<Value extends string = string> = {
-  children?: JSX.Element
+  children?: AppComponent
   disabled?: boolean
   error?: boolean
   loading?: boolean
@@ -40,7 +40,7 @@ export type AppToggleGroupProps<Value extends string = string> = {
 
 /** Toggle item control props. */
 export type AppToggleItemProps<Value extends string = string> = {
-  children?: JSX.Element
+  children?: AppComponent
   value: Value
   disabled?: boolean
   class?: never
@@ -55,7 +55,7 @@ const ToggleGroupItem = ToggleGroup.Item as Component<WithDataUI<ToggleGroupItem
 /** Toggle-group control with declared states. */
 export const AppToggleGroup = <Value extends string = string>(
   props: AppToggleGroupProps<Value>
-): JSX.Element => {
+): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'disabled',
@@ -101,7 +101,7 @@ export const AppToggleGroup = <Value extends string = string>(
 /** Toggle item control for AppToggleGroup. */
 export const AppToggleItem = <Value extends string = string>(
   props: AppToggleItemProps<Value>
-): JSX.Element => {
+): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'value',

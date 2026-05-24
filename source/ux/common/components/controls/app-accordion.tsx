@@ -22,12 +22,12 @@ import {
   type AccordionRootProps,
   type AccordionTriggerProps
 } from '@kobalte/core/accordion'
-import { type Component, type JSX, splitProps } from '@solid-js'
-import { controlState, type WithDataUI } from './controls-helpers.ts'
+import { type Component, splitProps } from '@solid-js'
+import { type AppComponent, controlState, type WithDataUI } from './controls-helpers.ts'
 
 /** Accordion root props. */
 export type AppAccordionProps = {
-  children?: JSX.Element
+  children?: AppComponent
   error?: boolean
   loading?: boolean
   multiple?: boolean
@@ -43,7 +43,7 @@ export type AppAccordionProps = {
 
 /** Accordion item props. */
 export type AppAccordionItemProps = {
-  children?: JSX.Element
+  children?: AppComponent
   value: string
   disabled?: boolean
   class?: never
@@ -54,7 +54,7 @@ export type AppAccordionItemProps = {
 
 /** Accordion trigger props. */
 export type AppAccordionTriggerProps = {
-  children?: JSX.Element
+  children?: AppComponent
   class?: never
   classList?: never
   style?: never
@@ -63,7 +63,7 @@ export type AppAccordionTriggerProps = {
 
 /** Accordion content props. */
 export type AppAccordionContentProps = {
-  children?: JSX.Element
+  children?: AppComponent
   class?: never
   classList?: never
   style?: never
@@ -76,7 +76,7 @@ const AccordionTrigger = Accordion.Trigger as Component<WithDataUI<AccordionTrig
 const AccordionContent = Accordion.Content as Component<WithDataUI<AccordionContentProps>>
 
 /** Accordion root with declared states. */
-export const AppAccordion = (props: AppAccordionProps): JSX.Element => {
+export const AppAccordion = (props: AppAccordionProps): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'error',
@@ -102,7 +102,7 @@ export const AppAccordion = (props: AppAccordionProps): JSX.Element => {
 }
 
 /** Accordion item control for AppAccordion. */
-export const AppAccordionItem = (props: AppAccordionItemProps): JSX.Element => {
+export const AppAccordionItem = (props: AppAccordionItemProps): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'value',
@@ -117,7 +117,7 @@ export const AppAccordionItem = (props: AppAccordionItemProps): JSX.Element => {
 }
 
 /** Accordion trigger control for AppAccordionItem. */
-export const AppAccordionTrigger = (props: AppAccordionTriggerProps): JSX.Element => {
+export const AppAccordionTrigger = (props: AppAccordionTriggerProps): AppComponent => {
   const [local] = splitProps(props, ['children'])
 
   return (
@@ -128,7 +128,7 @@ export const AppAccordionTrigger = (props: AppAccordionTriggerProps): JSX.Elemen
 }
 
 /** Accordion content control for AppAccordionItem. */
-export const AppAccordionContent = (props: AppAccordionContentProps): JSX.Element => {
+export const AppAccordionContent = (props: AppAccordionContentProps): AppComponent => {
   const [local] = splitProps(props, ['children'])
 
   return <AccordionContent data-ui='accordion-content'>{local.children}</AccordionContent>

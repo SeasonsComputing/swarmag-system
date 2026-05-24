@@ -14,6 +14,7 @@ AppCard  Card control.
 */
 
 import { type JSX, splitProps } from '@solid-js'
+import { type AppComponent } from './controls-helpers.ts'
 
 /** Card variants declared by the design language. */
 export type AppCardVariant = 'widget' | 'workflow'
@@ -34,7 +35,7 @@ export type AppCardProps =
   }
 
 /** Card control. */
-export const AppCard = (props: AppCardProps): JSX.Element => {
+export const AppCard = (props: AppCardProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'variant',
     'class',

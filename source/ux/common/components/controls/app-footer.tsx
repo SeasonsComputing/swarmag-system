@@ -15,6 +15,8 @@ PUBLIC
 AppFooter  Footer control component.
 */
 
+import { type AppComponent } from './controls-helpers.ts'
+
 /** AppFooter props. */
 export type AppFooterProps = {
   /** Logo image URL. Caller supplies — keeps the control domain-free. */
@@ -24,7 +26,7 @@ export type AppFooterProps = {
 }
 
 /** Footer control with centered logo. */
-export const AppFooter = (props: AppFooterProps) => (
+export const AppFooter = (props: AppFooterProps): AppComponent => (
   <footer data-ui='footer'>
     <img data-ui='footer-logo' src={props.logo} alt={props.alt ?? ''} />
   </footer>

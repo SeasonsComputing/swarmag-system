@@ -15,6 +15,7 @@ AppListItem  List item — child of AppList.
 */
 
 import { type JSX, splitProps } from '@solid-js'
+import { type AppComponent } from './controls-helpers.ts'
 
 /** List variant. Omit for a clean unstyled list. */
 export type AppListVariant = 'bullet' | 'numbered'
@@ -48,7 +49,7 @@ export type AppListItemProps =
   }
 
 /** List with declared variant. Renders <ol> for numbered, <ul> otherwise. */
-export const AppList = (props: AppListProps): JSX.Element => {
+export const AppList = (props: AppListProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'variant',
     'class',
@@ -76,7 +77,7 @@ export const AppList = (props: AppListProps): JSX.Element => {
 }
 
 /** List item — child of AppList. */
-export const AppListItem = (props: AppListItemProps): JSX.Element => {
+export const AppListItem = (props: AppListItemProps): AppComponent => {
   const [, others] = splitProps(props, ['class', 'classList', 'style', 'data-ui'])
 
   return <li {...others} data-ui='list-item' />

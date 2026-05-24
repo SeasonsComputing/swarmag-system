@@ -14,14 +14,14 @@ AppDialog  Dialog control with declared states.
 */
 
 import { Dialog } from '@kobalte/core/dialog'
-import { type JSX, splitProps } from '@solid-js'
+import { splitProps } from '@solid-js'
 import { AppButton, type AppButtonVariant } from './app-button.tsx'
-import { controlState } from './controls-helpers.ts'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Dialog control props. */
 export type AppDialogProps = {
-  children?: JSX.Element
-  trigger?: JSX.Element
+  children?: AppComponent
+  trigger?: AppComponent
   triggerVariant?: AppButtonVariant
   open?: boolean
   defaultOpen?: boolean
@@ -37,7 +37,7 @@ export type AppDialogProps = {
 }
 
 /** Dialog control with declared states. */
-export const AppDialog = (props: AppDialogProps): JSX.Element => {
+export const AppDialog = (props: AppDialogProps): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'trigger',

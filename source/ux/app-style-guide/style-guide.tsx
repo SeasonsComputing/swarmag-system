@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { createEffect, createSignal, For, type JSX } from '@solid-js'
+import { createEffect, createSignal, For } from '@solid-js'
 
 // dprint-ignore
 import {
@@ -15,7 +15,7 @@ import {
   AppPopover, AppProgress, AppRadioGroup, AppRadioItem, AppSingleSelect, AppSeparator,
   AppSkeleton, AppSpinner, AppTab, AppTable, AppTableBody, AppTableCell, AppTableHeader,
   AppTableRow, AppTabList, AppTabPanel, AppTabs, AppTextarea, AppToggle, AppToggleGroup,
-  AppToggleItem, AppTooltip
+  AppToggleItem, AppTooltip, AppComponent
 } from '@ux/common/components/controls'
 
 // dprint-ignore
@@ -27,10 +27,7 @@ import {
 
 import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
 
-/** TODO */
-type AppComponent = JSX.Element
-type AppComponentProps = { children: AppComponent }
-type SgSectionProps = AppComponentProps & { title: string }
+type SgSectionProps = { children: AppComponent; title: string }
 type Theme = 'dark' | 'brand' | 'light'
 type Services = 'aerial' | 'ground'
 type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
@@ -39,7 +36,7 @@ type RadioValue = Services | ServiceStatus | ServiceArrival
 type ViewMode = 'map' | 'list' | 'grid'
 type Tab = 'assessment' | 'planning' | 'execution' | 'followup'
 
-/** TODO */
+/** Header with theme switching for validating controls across supported themes. */
 const SgHeader = (): AppComponent => {
   const [theme, setTheme] = createSignal<Theme>('dark')
   createEffect(() => document.documentElement.dataset.theme = theme())
@@ -61,7 +58,7 @@ const SgHeader = (): AppComponent => {
   )
 }
 
-/** TODO */
+/** Framed style-guide section used to group related control specimens. */
 const SgSection = (props: SgSectionProps): AppComponent => (
   <section class='sg-section'>
     <AppCard variant='widget'>

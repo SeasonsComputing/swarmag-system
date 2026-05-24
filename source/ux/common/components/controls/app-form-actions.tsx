@@ -14,14 +14,12 @@ PUBLIC
 AppFormActions  Right-aligned action row.
 */
 
-import { type JSX } from '@solid-js'
+import { type AppComponent } from './controls-helpers.ts'
 
 /** AppFormActions props. */
-export type AppFormActionsProps = {
-  children: JSX.Element
-}
+export type AppFormActionsProps = { children: AppComponent }
 
 /** Right-aligned action button row. Always separate from the field grid. */
-export const AppFormActions = (props: AppFormActionsProps): JSX.Element => (
+export const AppFormActions = (props: AppFormActionsProps): AppComponent => (
   <div data-ui='form-actions'>{props.children}</div>
 )

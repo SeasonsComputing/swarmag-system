@@ -14,7 +14,7 @@ AppAvatar  Avatar control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { controlState } from './controls-helpers.ts'
+import { type AppComponent, controlState } from './controls-helpers.ts'
 
 /** Avatar control props. */
 export type AppAvatarProps =
@@ -34,7 +34,7 @@ export type AppAvatarProps =
   }
 
 /** Avatar control with declared states. */
-export const AppAvatar = (props: AppAvatarProps): JSX.Element => {
+export const AppAvatar = (props: AppAvatarProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',

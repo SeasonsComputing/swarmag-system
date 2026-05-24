@@ -23,15 +23,15 @@ import {
   type TabsRootProps,
   type TabsTriggerProps
 } from '@kobalte/core/tabs'
-import { type Component, type JSX, splitProps } from '@solid-js'
-import { controlState, type WithDataUI } from './controls-helpers.ts'
+import { type Component, splitProps } from '@solid-js'
+import { type AppComponent, controlState, type WithDataUI } from './controls-helpers.ts'
 
 /** Tabs control props. */
 export type AppTabsActivationMode = 'automatic' | 'manual'
 
 /** Tabs control props. */
 export type AppTabsProps<Value extends string = string> = {
-  children?: JSX.Element
+  children?: AppComponent
   disabled?: boolean
   error?: boolean
   loading?: boolean
@@ -48,7 +48,7 @@ export type AppTabsProps<Value extends string = string> = {
 
 /** Tab list control props. */
 export type AppTabListProps = {
-  children?: JSX.Element
+  children?: AppComponent
   class?: never
   classList?: never
   style?: never
@@ -57,7 +57,7 @@ export type AppTabListProps = {
 
 /** Tab trigger control props. */
 export type AppTabProps<Value extends string = string> = {
-  children?: JSX.Element
+  children?: AppComponent
   value: Value
   disabled?: boolean
   class?: never
@@ -68,7 +68,7 @@ export type AppTabProps<Value extends string = string> = {
 
 /** Tab panel control props. */
 export type AppTabPanelProps<Value extends string = string> = {
-  children?: JSX.Element
+  children?: AppComponent
   value: Value
   class?: never
   classList?: never
@@ -84,7 +84,7 @@ const TabsContent = Tabs.Content as Component<WithDataUI<TabsContentProps>>
 /** Tabs control with declared states. */
 export const AppTabs = <Value extends string = string>(
   props: AppTabsProps<Value>
-): JSX.Element => {
+): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'disabled',
@@ -112,7 +112,7 @@ export const AppTabs = <Value extends string = string>(
 }
 
 /** Tab list control for AppTabs. */
-export const AppTabList = (props: AppTabListProps): JSX.Element => {
+export const AppTabList = (props: AppTabListProps): AppComponent => {
   const [local] = splitProps(props, ['children'])
   return <TabsList data-ui='tab-list'>{local.children}</TabsList>
 }
@@ -120,7 +120,7 @@ export const AppTabList = (props: AppTabListProps): JSX.Element => {
 /** Tab trigger control for AppTabs. */
 export const AppTab = <Value extends string = string>(
   props: AppTabProps<Value>
-): JSX.Element => {
+): AppComponent => {
   const [local] = splitProps(props, [
     'children',
     'value',
@@ -141,7 +141,7 @@ export const AppTab = <Value extends string = string>(
 /** Tab panel control for AppTabs. */
 export const AppTabPanel = <Value extends string = string>(
   props: AppTabPanelProps<Value>
-): JSX.Element => {
+): AppComponent => {
   const [local] = splitProps(props, ['children', 'value'])
   return <TabsContent data-ui='tab-panel' value={local.value}>{local.children}</TabsContent>
 }
