@@ -61,7 +61,7 @@ const SgHeader = (): AppComponent => {
 /** Framed style-guide section used to group related control specimens. */
 const SgSection = (props: SgSectionProps): AppComponent => (
   <section class='sg-section'>
-    <AppCard variant='widget'>
+    <AppCard>
       <AppLayout>
         <h2>{props.title}</h2>
         <div class='sg-section-body'>{props.children}</div>
