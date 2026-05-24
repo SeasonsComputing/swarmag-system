@@ -111,7 +111,7 @@
 [data-ui='single-select'] {
   align-items: center;
   background: var(--sa-input-bg);
-  border: var(--sa-border-strong);
+  border: var(--sa-border-default);
   border-radius: var(--sa-radius-md);
   color: var(--sa-text-primary);
   cursor: pointer;
@@ -1023,6 +1023,10 @@
 
 [data-ui='field'][data-ui-variant='inline'] {
   justify-items: start;
+}
+
+[data-ui='fieldset'] {
+  border: var(--sa-fieldset-border);
 }
 
 [data-ui='form-grid'] {
