@@ -28,65 +28,86 @@ names are defined by the foundation; values are supplied by theme blocks in
 controls-tokens.css.
 
 Brand roles:
-  --sa-p-brand-start          --sa-color-brand-start     --sa-color-primary
-  --sa-p-brand-mid            --sa-color-brand-mid       --sa-color-primary-dim
-  --sa-p-brand-end            --sa-color-brand-end       --sa-color-secondary
-                                                         --sa-color-accent
+  --sa-color-accent           --sa-p-brand-end
+  --sa-color-brand-end        --sa-p-brand-mid
+  --sa-color-brand-mid        --sa-p-brand-start
+  --sa-color-brand-start
+  --sa-color-primary
+  --sa-color-primary-dim
+  --sa-color-secondary
 
 Background roles:
-  --sa-bg-page                --sa-bg-popup              --sa-bg-control
-  --sa-bg-base                --sa-bg-table              --sa-bg-card
-  --sa-bg-surface-1           --sa-bg-hover              --sa-bg-backdrop
-  --sa-bg-surface-2           --sa-bg-selected
-  --sa-bg-surface-3           --sa-bg-progress-track
-  --sa-bg-overlay
+  --sa-bg-backdrop            --sa-bg-popup
+  --sa-bg-base                --sa-bg-progress-track
+  --sa-bg-card                --sa-bg-selected
+  --sa-bg-control             --sa-bg-surface-1
+  --sa-bg-hover               --sa-bg-surface-2
+  --sa-bg-overlay             --sa-bg-surface-3
+  --sa-bg-page                --sa-bg-table
 
 Typography roles:
-  --sa-heading-font-family          --sa-heading-font-size-h1              --sa-heading-font-weight
-  --sa-body-font-family             --sa-heading-font-size-h2              --sa-body-font-weight
-  --sa-label-font-family            --sa-heading-font-size-h3              --sa-label-font-weight
-  --sa-ui-font-family               --sa-heading-font-size-h4              --sa-ui-font-weight
-  --sa-mono-font-family             --sa-heading-font-size-h5
-  --sa-annotation-font-family       --sa-body-font-size                    --sa-annotation-font-weight
-  --sa-data-font-family             --sa-label-font-size                   --sa-data-font-weight
-  --sa-entry-font-family            --sa-ui-font-size                      --sa-entry-font-weight
-                                    --sa-ui-font-size-compact
-                                    --sa-annotation-font-size
-                                    --sa-data-font-size
-                                    --sa-entry-font-size
+  --sa-annotation-font-family --sa-data-font-size        --sa-heading-font-size-h2
+  --sa-annotation-font-size   --sa-data-font-weight      --sa-heading-font-size-h3
+  --sa-annotation-font-weight --sa-entry-font-family     --sa-heading-font-size-h4
+  --sa-body-font-family       --sa-entry-font-size       --sa-heading-font-size-h5
+  --sa-body-font-size         --sa-entry-font-weight     --sa-heading-font-weight
+  --sa-body-font-weight       --sa-heading-font-family   --sa-label-font-family
+  --sa-data-font-family       --sa-heading-font-size-h1  --sa-label-font-size
+
+  --sa-label-font-weight
+  --sa-mono-font-family
+  --sa-ui-font-family
+  --sa-ui-font-size
+  --sa-ui-font-size-compact
+  --sa-ui-font-weight
 
 Text roles:
-  --sa-text-primary           --sa-text-on-brand         --sa-text-h1
-  --sa-text-secondary         --sa-text-on-surface       --sa-text-h2
-  --sa-text-muted             --sa-text-label            --sa-text-h3
-  --sa-text-faint             --sa-text-disabled         --sa-text-h4
-  --sa-text-dim               --sa-text-placeholder      --sa-text-h5
+  --sa-text-dim               --sa-text-h5               --sa-text-secondary
+  --sa-text-disabled          --sa-text-label
+  --sa-text-faint             --sa-text-muted
+  --sa-text-h1                --sa-text-on-brand
+  --sa-text-h2                --sa-text-on-surface
+  --sa-text-h3                --sa-text-placeholder
+  --sa-text-h4                --sa-text-primary
 
 Border roles:
-  --sa-border-subtle          --sa-border-brand          --sa-border-input-focus
-  --sa-border-default         --sa-border-table          --sa-border-input-error
-  --sa-border-strong          --sa-border-input          --sa-border-card
+  --sa-border-brand           --sa-border-subtle
+  --sa-border-card            --sa-border-table
+  --sa-border-default
+  --sa-border-input
+  --sa-border-input-error
+  --sa-border-input-focus
+  --sa-border-strong
 
 Shadow roles:
-  --sa-shadow-sm              --sa-shadow-xl             --sa-shadow-card
-  --sa-shadow                 --sa-shadow-glow-sm        --sa-shadow-text
-  --sa-shadow-md              --sa-shadow-glow           --sa-shadow-press
-  --sa-shadow-lg              --sa-shadow-btn            --sa-shadow-kbd
+  --sa-shadow                 --sa-shadow-md
+  --sa-shadow-btn             --sa-shadow-press
+  --sa-shadow-card            --sa-shadow-sm
+  --sa-shadow-glow            --sa-shadow-text
+  --sa-shadow-glow-sm         --sa-shadow-xl
+  --sa-shadow-kbd
+  --sa-shadow-lg
 
 Gradient roles:
-  --sa-gradient-brand         --sa-gradient-btn          --sa-gradient-hero
-  --sa-gradient-brand-90      --sa-gradient-card         --sa-gradient-stripe
+  --sa-gradient-brand
+  --sa-gradient-brand-90
+  --sa-gradient-btn
+  --sa-gradient-card
+  --sa-gradient-hero
+  --sa-gradient-stripe
 
 State roles:
-  --sa-color-default          --sa-color-success         --sa-color-danger
-  --sa-color-default-bg       --sa-color-success-bg      --sa-color-danger-bg
-  --sa-color-default-border   --sa-color-success-border  --sa-color-danger-border
-  --sa-color-warning          --sa-color-info            --sa-color-transparent
-  --sa-color-warning-bg       --sa-color-info-bg
-  --sa-color-warning-border   --sa-color-info-border
+  --sa-color-danger           --sa-color-info-bg         --sa-color-warning-bg
+  --sa-color-danger-bg        --sa-color-info-border     --sa-color-warning-border
+  --sa-color-danger-border    --sa-color-success
+  --sa-color-default          --sa-color-success-bg
+  --sa-color-default-bg       --sa-color-success-border
+  --sa-color-default-border   --sa-color-transparent
+  --sa-color-info             --sa-color-warning
 
 Base element roles:
-  --sa-focus-ring             --sa-blockquote-border
+  --sa-blockquote-border
+  --sa-focus-ring
 
 LAYOUT TOKENS
 ───────────────────────────────────────────────────────────────────────────
