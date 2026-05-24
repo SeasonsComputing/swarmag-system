@@ -1,54 +1,62 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App stack control                                                            ║
-║ Semantic wrapper for grid vertical layout primitives.                        ║
+║ App layout control                                                           ║
+║ Unified API surface for block and inline layout primitives.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits stack layout semantics without styling concerns.
+Single layout primitive covering block and inline arrangements.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppStack  Stack container with declared variant. Renders <div> with data-ui='stack'.
+AppLayout  Layout container with declared variant and gap density.
 */
 
 import { type JSX, splitProps } from '@solid-js'
 
-/** Stack variant. Omit for a clean unstyled stack. */
-export type AppStackVariant = 'inline'
+/** Layout variant. Omit for block (default full-width grid). */
+export type AppLayoutVariant = 'block-fit' | 'inline' | 'inline-fill'
 
-/** Stack control props. */
-export type AppStackProps =
+/** Layout gap density. Omit for standard spacing. */
+export type AppLayoutGap = 'tight' | 'none'
+
+/** Layout control props. */
+export type AppLayoutProps =
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant' | 'data-ui-gap'
   >
   & {
     children?: JSX.Element
-    variant?: AppStackVariant
+    gap?: AppLayoutGap
+    variant?: AppLayoutVariant
     class?: never
     classList?: never
     style?: never
     'data-ui'?: never
     'data-ui-variant'?: never
+    'data-ui-gap'?: never
   }
 
-/** Stack container with declared variant. Renders <div> with data-ui='stack'. */
-export const AppStack = (props: AppStackProps): JSX.Element => {
+/** Layout container with declared variant and gap density. */
+export const AppLayout = (props: AppLayoutProps): JSX.Element => {
   const [local, others] = splitProps(props, [
+    'gap',
     'variant',
     'class',
     'classList',
     'style',
     'data-ui',
-    'data-ui-variant'
+    'data-ui-variant',
+    'data-ui-gap'
   ])
 
   return (
     <div
       {...others}
-      data-ui='stack'
+      data-ui='layout'
+      data-ui-gap={local.gap}
       data-ui-variant={local.variant}
     />
   )

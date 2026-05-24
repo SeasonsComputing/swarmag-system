@@ -102,10 +102,9 @@ body {
 body::before {
   filter: none;
   background:
-    radial-gradient(circle at 20% 80%, oklch(66% 0.14 235 / 0.24) 0%, transparent 55%),
+    radial-gradient(circle at 20% 80%, var(--sa-p-radial-1) 0%, transparent 55%),
     radial-gradient(circle at 85% 20%, var(--sa-p-radial-2) 0%, transparent 60%),
-    radial-gradient(circle at 40% 40%, oklch(78% 0.12 185 / 0.14) 0%, transparent 60%),
-    radial-gradient(circle at 80% 80%, oklch(58% 0.12 220 / 0.18) 0%, transparent 55%);
+    radial-gradient(circle at 80% 80%, var(--sa-p-radial-3) 0%, transparent 55%);
   content: '';
   height: 100%;
   left: 0;
@@ -183,7 +182,7 @@ label {
 th {
   font-family: var(--sa-label-font-family);
   font-size: var(--sa-label-font-size);
-  font-weight: var(--sa-label-font-weight);
+  font-weight: var(--sa-annotation-font-weight);
 }
 
 li {
