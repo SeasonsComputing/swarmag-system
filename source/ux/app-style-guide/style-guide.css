@@ -19,6 +19,16 @@
   justify-content: space-between;
 }
 
+/**
+ * Prevent toggle-group background from bleeding with dark header
+ * Override background to match shell chrome accountiung for rounded corners
+ */
+.sg-header [data-ui='toggle-group'] {
+  background: var(--sa-bg-control);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-md);
+}
+
 .sg-header h1 {
   color: var(--sa-shell-chrome-text);
 }

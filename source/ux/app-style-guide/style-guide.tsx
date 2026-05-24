@@ -253,9 +253,9 @@ export const StyleGuide = (): AppComponent => {
             <figure>
               <div class='sg-gradient-block' />
               <figcaption>
-                <span>Bright blue start</span>
-                <span>Blue/Teal midpoint</span>
-                <span>Bright teal finish</span>
+                <span>Gradient start</span>
+                <span>Gradient midpoint</span>
+                <span>Gradient finish</span>
               </figcaption>
             </figure>
           </AppFieldset>
