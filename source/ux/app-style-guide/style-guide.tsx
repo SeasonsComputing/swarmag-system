@@ -28,7 +28,7 @@ import {
 import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
 
 type SgSectionProps = { children: AppComponent; title: string }
-type Theme = 'dark' | 'brand' | 'light'
+type Theme = 'dark' | 'light'
 type Services = 'aerial' | 'ground'
 type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
 type ServiceArrival = 'morning' | 'afternoon' | 'night'
@@ -51,7 +51,6 @@ const SgHeader = (): AppComponent => {
       </AppLayout>
       <AppToggleGroup<Theme> value={theme()} onChange={setTheme}>
         <AppToggleItem value='dark'>Dark</AppToggleItem>
-        <AppToggleItem value='brand'>Brand</AppToggleItem>
         <AppToggleItem value='light'>Light</AppToggleItem>
       </AppToggleGroup>
     </header>
