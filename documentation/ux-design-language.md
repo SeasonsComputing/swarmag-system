@@ -60,6 +60,21 @@ Theme switching is a single attribute swap — no JS class toggling.
 
 See `ux-components-internals.md §2.3–2.4` for the full prefix convention and token inventory.
 
+### 2.4.1 Shell Chrome
+
+Header and footer chrome is a first-class component token family. Each theme defines
+`--sa-shell-chrome-*` tokens for app frame surfaces so chrome can diverge from card
+surfaces without changing generic panels.
+
+| Token                      | Intent                                 |
+| -------------------------- | -------------------------------------- |
+| `--sa-shell-chrome-bg`     | Header/footer background               |
+| `--sa-shell-chrome-border` | Header/footer boundary rule            |
+| `--sa-shell-chrome-filter` | Header/footer backdrop treatment       |
+| `--sa-shell-chrome-muted`  | Secondary text on header/footer chrome |
+| `--sa-shell-chrome-shadow` | Header/footer elevation                |
+| `--sa-shell-chrome-text`   | Primary text on header/footer chrome   |
+
 ### 2.5 Typography
 
 **`ux/common/assets/fonts`** — Fonts are self-hosted woff2 assets.
@@ -222,6 +237,7 @@ The global page background is part of the foundation, not an app-level decoratio
 | Surface 3         | `oklch(25% 0.02 248 / 0.7)`    |
 | Primary text      | `oklch(93.5% 0.006 264.5)`     |
 | Gradient stripe   | 3px top-border accent on cards |
+| Shell chrome      | Card-panel surface and border  |
 
 ### 3.3 Dark Theme Gradient
 
@@ -242,34 +258,36 @@ Clean and professional. Intended for office and web contexts where ambient light
 
 ### 4.1 Motif
 
-| Property       | Specification                                                       |
-| -------------- | ------------------------------------------------------------------- |
-| **Background** | Light gray `oklch(96% 0.004 264.5)`                                 |
-| **Surfaces**   | White and near-white — opaque, no glassmorphism                     |
-| **Primary**    | Darker green-teal `oklch(50% 0.1 150)` — shifted for light contrast |
-| **Text**       | Near-black primary; heading hierarchy introduces color (see §4.2)   |
+| Property       | Specification                                                     |
+| -------------- | ----------------------------------------------------------------- |
+| **Background** | Warm paper `oklch(96.8% 0.018 101)`                               |
+| **Surfaces**   | Warm near-white with restrained paper tint and crisp borders      |
+| **Primary**    | Deep ink-blue `oklch(43% 0.115 222)` with teal/green support      |
+| **Text**       | Near-black primary; heading hierarchy introduces color (see §4.2) |
+| **Shell**      | Solid deep ink-blue chrome for header and footer                  |
 
 ### 4.2 Page & Surfaces
 
-| Token             | Value                          |
-| ----------------- | ------------------------------ |
-| Page background   | `oklch(96% 0.004 264.5)`       |
-| Surface 1 (cards) | `oklch(100% 0 0)`              |
-| Surface 2         | `oklch(97% 0.004 264.5)`       |
-| Surface 3         | `oklch(93% 0.006 264.5)`       |
-| Primary text      | `oklch(var(--sa-p-surface-1))` |
+| Token             | Value                    |
+| ----------------- | ------------------------ |
+| Page background   | `oklch(96.8% 0.018 101)` |
+| Surface 1 (cards) | `oklch(99.4% 0.006 98)`  |
+| Surface 2         | `oklch(96.2% 0.014 104)` |
+| Surface 3         | `oklch(91.8% 0.018 112)` |
+| Primary text      | `oklch(22% 0.026 238)`   |
+| Shell chrome      | `oklch(27% 0.045 224)`   |
 
 ### 4.2.1 Heading Hierarchy
 
 Light theme introduces a color hierarchy across heading levels — headings are no longer uniformly white.
 
-| Level | Color                   | Character   |
-| ----- | ----------------------- | ----------- |
-| h1    | `oklch(15% 0.01 264.5)` | Near-black  |
-| h2    | `oklch(50% 0.1 150)`    | Green-teal  |
-| h3    | `oklch(66% 0.14 235)`   | Blue        |
-| h4    | `oklch(58% 0.12 190)`   | Teal        |
-| h5    | `oklch(46% 0.08 200)`   | Deeper teal |
+| Level | Color                  | Character  |
+| ----- | ---------------------- | ---------- |
+| h1    | `oklch(17% 0.03 238)`  | Ink        |
+| h2    | `oklch(42% 0.12 221)`  | Blue       |
+| h3    | `oklch(50% 0.13 186)`  | Teal       |
+| h4    | `oklch(44% 0.105 154)` | Green-teal |
+| h5    | `oklch(40% 0.055 105)` | Olive      |
 
 ## 5. Brand Theme
 
@@ -295,6 +313,7 @@ Editorial and brand-forward. Used for customer-facing surfaces (`app-customer`) 
 | Surface 2         | `oklch(99.09% 0.0122 91.51)`              |
 | Surface 3         | `oklch(92.76% 0.0058 264.53)`             |
 | Primary text      | `oklch(44.44% 0.0096 73.63)` (warm brown) |
+| Shell chrome      | Card-panel surface and border             |
 
 ### 5.2.1 Heading Hierarchy
 

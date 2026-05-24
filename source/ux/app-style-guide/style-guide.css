@@ -4,10 +4,10 @@
 }
 
 .sg-header {
-  backdrop-filter: var(--sa-blur);
-  background: var(--sa-card-panel-bg);
-  border-block-end: var(--sa-card-panel-border);
-  box-shadow: var(--sa-card-panel-shadow);
+  backdrop-filter: var(--sa-shell-chrome-filter);
+  background: var(--sa-shell-chrome-bg);
+  border-block-end: var(--sa-shell-chrome-border);
+  box-shadow: var(--sa-shell-chrome-shadow);
   margin: 0;
   padding: var(--sa-space-md) var(--sa-space-xl);
   position: sticky;
@@ -19,36 +19,18 @@
   justify-content: space-between;
 }
 
+.sg-header h1 {
+  color: var(--sa-shell-chrome-text);
+}
+
 .sg-header-subtitle {
-  color: var(--sa-text-muted);
+  color: var(--sa-shell-chrome-muted);
 }
 
 .sg-section {
   margin-inline: auto;
   max-width: var(--sa-size-md);
   padding: var(--sa-space-xl);
-}
-
-.sg-section-body {
-  display: grid;
-  gap: var(--sa-space-md);
-}
-
-.sg-card-grid {
-  display: grid;
-  gap: var(--sa-space-md);
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.sg-card-copy {
-  display: grid;
-  gap: var(--sa-space-sm);
-}
-
-.sg-swatch-grid {
-  display: grid;
-  gap: var(--sa-space-md);
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
 }
 
 .sg-swatch {

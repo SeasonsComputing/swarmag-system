@@ -64,7 +64,7 @@ const SgSection = (props: SgSectionProps): AppComponent => (
     <AppCard>
       <AppLayout>
         <h2>{props.title}</h2>
-        <div class='sg-section-body'>{props.children}</div>
+        <AppLayout>{props.children}</AppLayout>
       </AppLayout>
     </AppCard>
   </section>
