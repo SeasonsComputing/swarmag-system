@@ -21,9 +21,16 @@ export { AppCheckbox, type AppCheckboxProps } from './app-checkbox.tsx'
 export { AppDialog, type AppDialogProps } from './app-dialog.tsx'
 export { AppField, type AppFieldProps } from './app-field.tsx'
 export { AppFieldset, type AppFieldsetProps } from './app-fieldset.tsx'
+export { AppFooter, type AppFooterProps } from './app-footer.tsx'
 export { AppFormActions, type AppFormActionsProps } from './app-form-actions.tsx'
 export { AppFormGrid, type AppFormGridProps } from './app-form-grid.tsx'
 export { AppInput, type AppInputProps } from './app-input.tsx'
+export {
+  AppLayout,
+  type AppLayoutGap,
+  type AppLayoutProps,
+  type AppLayoutVariant
+} from './app-layout.tsx'
 export {
   AppList,
   AppListItem,
@@ -40,12 +47,10 @@ export {
   AppRadioItem,
   type AppRadioItemProps
 } from './app-radio-group.tsx'
-export { AppRow, type AppRowProps, type AppRowVariant } from './app-row.tsx'
 export { AppSeparator, type AppSeparatorProps } from './app-separator.tsx'
 export { AppSingleSelect, type AppSingleSelectProps } from './app-single-select.tsx'
 export { AppSkeleton, type AppSkeletonProps } from './app-skeleton.tsx'
 export { AppSpinner, type AppSpinnerProps } from './app-spinner.tsx'
-export { AppStack, type AppStackProps, type AppStackVariant } from './app-stack.tsx'
 export {
   AppTable,
   AppTableBody,

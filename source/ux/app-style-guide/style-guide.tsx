@@ -7,46 +7,74 @@
 
 import { createEffect, createSignal, For, type JSX } from '@solid-js'
 
-// dprint-ignore-start
+// dprint-ignore
 import {
   AppAccordion, AppAccordionContent, AppAccordionItem, AppAccordionTrigger, AppAlert, AppAvatar,
-  AppBadge, AppButton, AppCard, AppCheckbox, AppDialog, AppField, AppFieldset, AppFormActions,
-  AppFormGrid, AppInput, AppList, AppListItem, AppMultiSelect, AppPopover, AppProgress, AppRadioGroup,
-  AppRadioItem, AppRow, AppSingleSelect, AppSeparator, AppSkeleton, AppSpinner, AppStack, AppTab,
-  AppTable, AppTableBody, AppTableCell, AppTableHeader, AppTableRow, AppTabList, AppTabPanel,
-  AppTabs, AppTextarea, AppToggle, AppToggleGroup, AppToggleItem, AppTooltip
+  AppBadge, AppButton, AppCard, AppCheckbox, AppDialog, AppField, AppFieldset, AppFooter,
+  AppFormActions, AppFormGrid, AppInput, AppLayout, AppList, AppListItem, AppMultiSelect,
+  AppPopover, AppProgress, AppRadioGroup, AppRadioItem, AppSingleSelect, AppSeparator,
+  AppSkeleton, AppSpinner, AppTab, AppTable, AppTableBody, AppTableCell, AppTableHeader,
+  AppTableRow, AppTabList, AppTabPanel, AppTabs, AppTextarea, AppToggle, AppToggleGroup,
+  AppToggleItem, AppTooltip
 } from '@ux/common/components/controls'
-import { AppFooter } from '@ux/common/components/shell/app-footer.tsx'
-// dprint-ignore-end
 
+// dprint-ignore
 import {
   ACCORDION_DEFAULT_VALUE,
-  BUTTON_VARIANTS,
-  COLOR_SWATCHES,
-  DEFAULT_SERVICES,
-  EQUIPMENT,
-  SERVICES,
-  STATUSES
+  DEFAULT_SERVICES, BUTTON_VARIANTS, COLOR_SWATCHES,
+  EQUIPMENT, SERVICES, STATUSES
 } from './style-guide-fixtures.ts'
 
 import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
 
-type SectionProps = {
-  children: JSX.Element
-  title: string
+/** TODO */
+type AppComponent = JSX.Element
+type AppComponentProps = { children: AppComponent }
+type SgSectionProps = AppComponentProps & { title: string }
+type Theme = 'dark' | 'brand' | 'light'
+type Services = 'aerial' | 'ground'
+type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
+type ServiceArrival = 'morning' | 'afternoon' | 'night'
+type RadioValue = Services | ServiceStatus | ServiceArrival
+type ViewMode = 'map' | 'list' | 'grid'
+type Tab = 'assessment' | 'planning' | 'execution' | 'followup'
+
+/** TODO */
+const SgHeader = (): AppComponent => {
+  const [theme, setTheme] = createSignal<Theme>('dark')
+  createEffect(() => document.documentElement.dataset.theme = theme())
+
+  return (
+    <header class='sg-header'>
+      <AppLayout gap='tight'>
+        <h1>swarmAg Style Guide</h1>
+        <p class='sg-header-subtitle'>
+          Living visual validation for tokens, states, themes, and controls.
+        </p>
+      </AppLayout>
+      <AppToggleGroup<Theme> value={theme()} onChange={setTheme}>
+        <AppToggleItem value='dark'>Dark</AppToggleItem>
+        <AppToggleItem value='brand'>Brand</AppToggleItem>
+        <AppToggleItem value='light'>Light</AppToggleItem>
+      </AppToggleGroup>
+    </header>
+  )
 }
 
-/** Single-page living style guide application. */
-export const StyleGuide = (): JSX.Element => {
-  type Theme = 'dark' | 'brand' | 'light'
-  type Services = 'aerial' | 'ground'
-  type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
-  type ServiceArrival = 'morning' | 'afternoon' | 'night'
-  type RadioValue = Services | ServiceStatus | ServiceArrival
-  type ViewMode = 'map' | 'list' | 'grid'
-  type Tab = 'assessment' | 'planning' | 'execution' | 'followup'
+/** TODO */
+const SgSection = (props: SgSectionProps): AppComponent => (
+  <section class='sg-section'>
+    <AppCard variant='widget'>
+      <AppLayout>
+        <h2>{props.title}</h2>
+        <div class='sg-section-body'>{props.children}</div>
+      </AppLayout>
+    </AppCard>
+  </section>
+)
 
-  const [theme, setTheme] = createSignal<Theme>('dark')
+/** Single-page living style guide application. */
+export const StyleGuide = (): AppComponent => {
   const [loading, setLoading] = createSignal(false)
   const [inputError, setInputError] = createSignal(false)
   const [selectError, setSelectError] = createSignal(false)
@@ -58,24 +86,12 @@ export const StyleGuide = (): JSX.Element => {
   const [viewMode, setViewMode] = createSignal<ViewMode>('map')
   const [tab, setTab] = createSignal<Tab>('assessment')
 
-  createEffect(() => document.documentElement.dataset.theme = theme())
-
   return (
     <>
-      <header class='sg-header'>
-        <div>
-          <h1>swarmAg Style Guide</h1>
-          <p>Living visual validation for tokens, states, themes, and controls.</p>
-        </div>
-        <AppToggleGroup<Theme> value={theme()} onChange={setTheme}>
-          <AppToggleItem value='dark'>Dark</AppToggleItem>
-          <AppToggleItem value='brand'>Brand</AppToggleItem>
-          <AppToggleItem value='light'>Light</AppToggleItem>
-        </AppToggleGroup>
-      </header>
+      <SgHeader />
 
       <main class='sg-page'>
-        <Section title='Typography'>
+        <SgSection title='Typography'>
           <AppFieldset legend='h1 – h5'>
             <h1>H1 Operations Command</h1>
             <h2>H2 Field Service Planning</h2>
@@ -151,9 +167,9 @@ export const StyleGuide = (): JSX.Element => {
               </AppTableRow>
             </AppTableBody>
           </AppTable>
-        </Section>
+        </SgSection>
 
-        <Section title='HTML Semantics'>
+        <SgSection title='HTML Semantics'>
           <AppTable>
             <AppTableHeader>
               <AppTableCell>Equipment</AppTableCell>
@@ -189,7 +205,7 @@ export const StyleGuide = (): JSX.Element => {
           </AppTable>
 
           <AppFieldset legend='List variants'>
-            <AppRow variant='fill'>
+            <AppFormGrid>
               <AppList>
                 <AppListItem>Confirm chemical inventory.</AppListItem>
                 <AppListItem>Verify crew certification.</AppListItem>
@@ -205,7 +221,7 @@ export const StyleGuide = (): JSX.Element => {
                 <AppListItem>Plan service.</AppListItem>
                 <AppListItem>Execute work.</AppListItem>
               </AppList>
-            </AppRow>
+            </AppFormGrid>
           </AppFieldset>
 
           <AppFieldset legend='Site access'>
@@ -218,11 +234,11 @@ export const StyleGuide = (): JSX.Element => {
               </AppField>
             </AppFormGrid>
           </AppFieldset>
-        </Section>
+        </SgSection>
 
-        <Section title='Color'>
+        <SgSection title='Color'>
           <AppFieldset legend='Swatches'>
-            <div class='sg-swatch-grid'>
+            <AppLayout variant='inline-fill'>
               <For each={COLOR_SWATCHES}>
                 {swatch => (
                   <figure class='sg-swatch'>
@@ -234,35 +250,37 @@ export const StyleGuide = (): JSX.Element => {
                   </figure>
                 )}
               </For>
-            </div>
+            </AppLayout>
           </AppFieldset>
           <AppFieldset legend='Gradient'>
             <figure>
               <div class='sg-gradient-block' />
               <figcaption>
                 <span>Bright blue start</span>
-                <span>Teal midpoint</span>
+                <span>Blue/Teal midpoint</span>
                 <span>Bright teal finish</span>
               </figcaption>
             </figure>
           </AppFieldset>
-        </Section>
+        </SgSection>
 
-        <Section title='Decorations'>
-          <AppRow variant='fill'>
-            <AppFieldset legend='AppAvatar'>
-              <AppAvatar>AG</AppAvatar>
+        <SgSection title='Decorations'>
+          <AppLayout>
+            <AppLayout variant='inline-fill'>
+              <AppFieldset legend='AppAvatar'>
+                <AppAvatar>AG</AppAvatar>
+              </AppFieldset>
+              <AppFieldset legend='AppSpinner'>
+                <AppSpinner />
+              </AppFieldset>
+            </AppLayout>
+            <AppFieldset legend='AppSeparator'>
+              <AppSeparator />
             </AppFieldset>
-            <AppFieldset legend='AppSpinner'>
-              <AppSpinner />
-            </AppFieldset>
-          </AppRow>
-          <AppFieldset legend='AppSeparator'>
-            <AppSeparator />
-          </AppFieldset>
-        </Section>
+          </AppLayout>
+        </SgSection>
 
-        <Section title='AppButton'>
+        <SgSection title='AppButton'>
           <AppField label='Toggle loading state' for='button-loading-toggle' variant='inline'>
             <AppToggle
               id='button-loading-toggle'
@@ -273,23 +291,21 @@ export const StyleGuide = (): JSX.Element => {
             </AppToggle>
           </AppField>
           <AppFieldset legend='Variants'>
-            <AppRow>
+            <AppLayout variant='inline'>
               <For each={BUTTON_VARIANTS}>
                 {entry => <AppButton variant={entry.variant}>{entry.label}</AppButton>}
               </For>
-            </AppRow>
+            </AppLayout>
           </AppFieldset>
           <AppFieldset legend='Disabled and loading'>
-            <AppRow>
+            <AppLayout variant='inline'>
               <AppButton disabled>Disabled</AppButton>
-              <AppButton variant='primary' loading={loading()}>
-                Loading
-              </AppButton>
-            </AppRow>
+              <AppButton variant='primary' loading={loading()}>Loading</AppButton>
+            </AppLayout>
           </AppFieldset>
-        </Section>
+        </SgSection>
 
-        <Section title='AppInput / AppTextarea'>
+        <SgSection title='AppInput / AppTextarea'>
           <AppField label='Toggle error state' for='input-error-toggle' variant='inline'>
             <AppToggle
               id='input-error-toggle'
@@ -300,7 +316,7 @@ export const StyleGuide = (): JSX.Element => {
             </AppToggle>
           </AppField>
           <AppFieldset legend='Enabled'>
-            <AppRow variant='fill'>
+            <AppFormGrid>
               <AppField label='Field name' for='field-name'>
                 <AppInput
                   name='field-name'
@@ -320,10 +336,10 @@ export const StyleGuide = (): JSX.Element => {
                   rows={6}
                 />
               </AppField>
-            </AppRow>
+            </AppFormGrid>
           </AppFieldset>
           <AppFieldset legend='Disabled'>
-            <AppRow variant='fill'>
+            <AppFormGrid>
               <AppField label='Disabled acreage' for='disabled-acreage'>
                 <AppInput name='disabled-acreage' disabled value='142 acres' onInput={() => undefined} />
               </AppField>
@@ -336,11 +352,11 @@ export const StyleGuide = (): JSX.Element => {
                   rows={6}
                 />
               </AppField>
-            </AppRow>
+            </AppFormGrid>
           </AppFieldset>
-        </Section>
+        </SgSection>
 
-        <Section title='AppSelect / AppMultiSelect'>
+        <SgSection title='AppSelect / AppMultiSelect'>
           <AppField label='Toggle error state' for='select-error-toggle' variant='inline'>
             <AppToggle
               id='select-error-toggle'
@@ -351,7 +367,7 @@ export const StyleGuide = (): JSX.Element => {
             </AppToggle>
           </AppField>
           <AppFieldset legend='Single-select'>
-            <AppRow variant='fill'>
+            <AppFormGrid>
               <AppField label='Enabled select' for='service-status'>
                 <AppSingleSelect
                   name='service-status'
@@ -368,14 +384,14 @@ export const StyleGuide = (): JSX.Element => {
                   options={STATUSES}
                 />
               </AppField>
-            </AppRow>
+            </AppFormGrid>
           </AppFieldset>
           <AppFieldset legend='Multi-select'>
             <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
           </AppFieldset>
-        </Section>
+        </SgSection>
 
-        <Section title='AppField / AppFieldset / AppFormGrid / AppFormActions'>
+        <SgSection title='AppField / AppFieldset / AppFormGrid / AppFormActions'>
           <AppFieldset legend='Service details'>
             <AppFormGrid>
               <AppField label='Field name' for='form-demo-name'>
@@ -406,10 +422,10 @@ export const StyleGuide = (): JSX.Element => {
             <AppButton variant='ghost'>Cancel</AppButton>
             <AppButton variant='primary'>Save</AppButton>
           </AppFormActions>
-        </Section>
+        </SgSection>
 
-        <Section title='AppCheckbox'>
-          <AppRow>
+        <SgSection title='AppCheckbox'>
+          <AppLayout variant='inline'>
             <AppCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
               Label reviewed
             </AppCheckbox>
@@ -420,10 +436,10 @@ export const StyleGuide = (): JSX.Element => {
               Missing wind reading
             </AppCheckbox>
             <AppCheckbox disabled checked>Disabled complete</AppCheckbox>
-          </AppRow>
-        </Section>
+          </AppLayout>
+        </SgSection>
 
-        <Section title='AppRadioGroup + AppRadioItem'>
+        <SgSection title='AppRadioGroup + AppRadioItem'>
           <AppFormGrid>
             <AppRadioGroup value={radioValue()} onChange={setRadioValue}>
               <AppRadioItem value='aerial'>Aerial application</AppRadioItem>
@@ -441,23 +457,23 @@ export const StyleGuide = (): JSX.Element => {
               <AppRadioItem value='night'>Night</AppRadioItem>
             </AppRadioGroup>
           </AppFormGrid>
-        </Section>
+        </SgSection>
 
-        <Section title='AppToggle / AppToggleGroup + AppToggleItem'>
-          <AppRow>
+        <SgSection title='AppToggle / AppToggleGroup + AppToggleItem'>
+          <AppLayout variant='inline'>
             <AppToggle pressed={togglePressed()} onClick={() => setTogglePressed(!togglePressed())}>
               Active crews
             </AppToggle>
             <AppToggle pressed={false}>Offline jobs</AppToggle>
-          </AppRow>
+          </AppLayout>
           <AppToggleGroup value={viewMode()} onChange={setViewMode}>
             <AppToggleItem value='map'>Map</AppToggleItem>
             <AppToggleItem value='list'>List</AppToggleItem>
             <AppToggleItem value='grid'>Grid</AppToggleItem>
           </AppToggleGroup>
-        </Section>
+        </SgSection>
 
-        <Section title='AppTabs + AppTabList + AppTab + AppTabPanel'>
+        <SgSection title='AppTabs / AppTabList / AppTab / AppTabPanel'>
           <AppTabs value={tab()} onChange={setTab}>
             <AppTabList>
               <AppTab value='assessment'>Assessment</AppTab>
@@ -472,19 +488,19 @@ export const StyleGuide = (): JSX.Element => {
             <AppTabPanel value='execution'>Record work logs and answer workflow questions.</AppTabPanel>
             <AppTabPanel value='followup'>Prepare customer report and close service record.</AppTabPanel>
           </AppTabs>
-        </Section>
+        </SgSection>
 
-        <Section title='AppProgress'>
-          <AppStack>
+        <SgSection title='AppProgress'>
+          <AppLayout>
             <AppProgress value={0} />
             <AppProgress value={35} />
             <AppProgress value={68} />
             <AppProgress value={100} />
-          </AppStack>
-        </Section>
+          </AppLayout>
+        </SgSection>
 
-        <Section title='AppSkeleton'>
-          <AppStack>
+        <SgSection title='AppSkeleton'>
+          <AppLayout>
             <AppSkeleton />
             <div class='sg-skeleton-75'>
               <AppSkeleton />
@@ -492,60 +508,60 @@ export const StyleGuide = (): JSX.Element => {
             <div class='sg-skeleton-50'>
               <AppSkeleton />
             </div>
-          </AppStack>
-        </Section>
+          </AppLayout>
+        </SgSection>
 
-        <Section title='AppBadge'>
-          <AppRow>
+        <SgSection title='AppBadge'>
+          <AppLayout variant='inline'>
             <AppBadge>Pending</AppBadge>
             <AppBadge variant='success'>Field ready</AppBadge>
             <AppBadge variant='warning'>Wind watch</AppBadge>
             <AppBadge variant='danger'>Blocked</AppBadge>
             <AppBadge variant='info'>Assessment</AppBadge>
-          </AppRow>
-        </Section>
+          </AppLayout>
+        </SgSection>
 
-        <Section title='AppAlert'>
-          <AppStack>
+        <SgSection title='AppAlert'>
+          <AppLayout>
             <AppAlert>Service record updated by dispatch.</AppAlert>
             <AppAlert variant='success'>North Field completed and ready for customer review.</AppAlert>
             <AppAlert variant='warning'>Wind speed approaching service threshold.</AppAlert>
             <AppAlert variant='danger'>Chemical label missing required re-entry interval.</AppAlert>
             <AppAlert variant='info'>Crew assignment changed for the morning window.</AppAlert>
-          </AppStack>
-        </Section>
+          </AppLayout>
+        </SgSection>
 
-        <Section title='Secondary Windows'>
-          <AppRow variant='fill'>
+        <SgSection title='Secondary Windows'>
+          <AppFormGrid>
             <AppFieldset legend='AppTooltip'>
-              <AppRow>
+              <AppLayout variant='inline'>
                 <AppTooltip trigger='Hover field note' defaultOpen>
                   Verify buffer zone before aerial application.
                 </AppTooltip>
-              </AppRow>
+              </AppLayout>
             </AppFieldset>
             <AppFieldset legend='AppDialog'>
-              <AppRow>
+              <AppLayout variant='inline'>
                 <AppDialog trigger='Open dispatch dialog'>
-                  <AppStack>
+                  <AppLayout>
                     <p>Confirm crew assignment before dispatch.</p>
-                  </AppStack>
+                  </AppLayout>
                 </AppDialog>
-              </AppRow>
+              </AppLayout>
             </AppFieldset>
             <AppFieldset legend='AppPopover'>
-              <AppRow>
+              <AppLayout variant='inline'>
                 <AppPopover trigger='Open field menu'>
-                  <AppStack>
+                  <AppLayout>
                     <p>Field actions, notes, and service history.</p>
-                  </AppStack>
+                  </AppLayout>
                 </AppPopover>
-              </AppRow>
+              </AppLayout>
             </AppFieldset>
-          </AppRow>
-        </Section>
+          </AppFormGrid>
+        </SgSection>
 
-        <Section title='AppAccordion'>
+        <SgSection title='AppAccordion'>
           <AppAccordion defaultValue={[...ACCORDION_DEFAULT_VALUE]}>
             <AppAccordionItem value='weather'>
               <AppAccordionTrigger>Weather window</AppAccordionTrigger>
@@ -580,52 +596,74 @@ export const StyleGuide = (): JSX.Element => {
               </AppAccordionContent>
             </AppAccordionItem>
           </AppAccordion>
-        </Section>
+        </SgSection>
 
-        <Section title='AppCard'>
-          <div class='sg-card-grid'>
+        <SgSection title='AppCard'>
+          <AppLayout variant='inline-fill'>
             <AppCard>
-              <AppStack>
+              <AppLayout>
                 <h3>Default card</h3>
                 <p>
-                  Quiet interior surface — no variant. Used for form sections and guided workflow
+                  Quiet interior surface — no variant. Used for form SgSections and guided workflow
                   sub-groups.
                 </p>
-              </AppStack>
+              </AppLayout>
             </AppCard>
             <AppCard variant='widget'>
-              <AppStack>
+              <AppLayout>
                 <h3>Widget card</h3>
                 <p>Dashboard-ready surface with stripe treatment and crisp separation from the page.</p>
-              </AppStack>
+              </AppLayout>
             </AppCard>
             <AppCard variant='workflow'>
-              <AppStack>
+              <AppLayout>
                 <h3>Workflow card</h3>
                 <p>Primary framed container for guided flows that need stronger focus and elevation.</p>
-              </AppStack>
+              </AppLayout>
             </AppCard>
-          </div>
-        </Section>
+          </AppLayout>
+        </SgSection>
 
-        <Section title='Charts'>
+        <SgSection title='AppLayout'>
+          <AppFieldset legend='block (default)'>
+            <AppLayout>
+              <AppAlert>North Field spray window confirmed.</AppAlert>
+              <AppAlert variant='warning'>Wind speed approaching threshold.</AppAlert>
+              <AppAlert variant='success'>Crew pre-check complete.</AppAlert>
+            </AppLayout>
+          </AppFieldset>
+
+          <AppFieldset legend='block-fit'>
+            <AppLayout variant='block-fit'>
+              <AppBadge>Pending</AppBadge>
+              <AppBadge variant='success'>Field ready</AppBadge>
+              <AppBadge variant='warning'>Wind watch</AppBadge>
+            </AppLayout>
+          </AppFieldset>
+
+          <AppFieldset legend='inline'>
+            <AppLayout variant='inline'>
+              <AppButton>Cancel</AppButton>
+              <AppButton variant='primary'>Confirm dispatch</AppButton>
+            </AppLayout>
+          </AppFieldset>
+
+          <AppFieldset legend='inline-fill'>
+            <AppLayout variant='inline-fill'>
+              <AppButton>Aerial</AppButton>
+              <AppButton>Ground</AppButton>
+              <AppButton>Inspection</AppButton>
+            </AppLayout>
+          </AppFieldset>
+        </SgSection>
+
+        <SgSection title='Charts'>
           {/* TODO: AppChart - pending chart primitive */}
           <AppSkeleton />
-        </Section>
+        </SgSection>
       </main>
 
       <AppFooter logo={logo} alt='swarmAg' />
     </>
   )
 }
-
-const Section = (props: SectionProps): JSX.Element => (
-  <section class='sg-section'>
-    <AppCard variant='widget'>
-      <AppStack>
-        <h2>{props.title}</h2>
-        <div class='sg-section-body'>{props.children}</div>
-      </AppStack>
-    </AppCard>
-  </section>
-)

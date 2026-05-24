@@ -1,29 +1,29 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ AppFooter                                                                    ║
-║ Application shell footer — branding and mobile safe-area anchor.            ║
+║ Footer control with branding and mobile safe-area support.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Shell footer that renders a caller-supplied logo centered with the mono filter
-applied. Accounts for mobile browser chrome via safe-area-inset. Logo asset
-stays in the app layer — the shell remains domain-free.
+Footer primitive that renders a caller-supplied logo centered with the mono
+filter applied. Accounts for mobile browser chrome via safe-area-inset. Logo
+asset stays in the app layer — the control remains domain-free.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppFooter  Shell footer component.
+AppFooter  Footer control component.
 */
 
 /** AppFooter props. */
-type AppFooterProps = {
-  /** Logo image URL. Caller supplies — keeps shell domain-free. */
+export type AppFooterProps = {
+  /** Logo image URL. Caller supplies — keeps the control domain-free. */
   logo: string
   /** Accessible alt text for the logo image. */
   alt?: string
 }
 
-/** Application shell footer. */
+/** Footer control with centered logo. */
 export const AppFooter = (props: AppFooterProps) => (
   <footer data-ui='footer'>
     <img data-ui='footer-logo' src={props.logo} alt={props.alt ?? ''} />

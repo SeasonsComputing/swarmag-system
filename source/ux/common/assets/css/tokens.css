@@ -47,13 +47,13 @@ Typography roles:
   --sa-label-font-family            --sa-heading-font-size-h3              --sa-label-font-weight
   --sa-ui-font-family               --sa-heading-font-size-h4              --sa-ui-font-weight
   --sa-mono-font-family             --sa-heading-font-size-h5
-  --sa-annotation-font-family       --sa-body-font-size            --sa-annotation-font-weight
-  --sa-data-font-family             --sa-label-font-size           --sa-data-font-weight
-  --sa-entry-font-family            --sa-ui-font-size              --sa-entry-font-weight
-                             --sa-ui-font-size-compact
-                             --sa-annotation-font-size
-                             --sa-data-font-size
-                             --sa-entry-font-size
+  --sa-annotation-font-family       --sa-body-font-size                    --sa-annotation-font-weight
+  --sa-data-font-family             --sa-label-font-size                   --sa-data-font-weight
+  --sa-entry-font-family            --sa-ui-font-size                      --sa-entry-font-weight
+                                    --sa-ui-font-size-compact
+                                    --sa-annotation-font-size
+                                    --sa-data-font-size
+                                    --sa-entry-font-size
 
 Text roles:
   --sa-text-primary           --sa-text-on-brand         --sa-text-h1
@@ -137,15 +137,15 @@ Breakpoints match architecture-ux.md §7:
   --sa-p-black: 7.8% 0 0; /* #0a0a0a */
 
   /* State primitives */
-  --sa-p-success: 72.2% 0.192 149.579; /* focus green — brand */
-  --sa-p-warning: 76.885% 0.1231 80.8277; /* orange — brand */
+  --sa-p-success: 72.2% 0.192 149.579; /* green  */
+  --sa-p-warning: 76.885% 0.1231 80.8277; /* orange */
   --sa-p-danger: 62.8% 0.2577 29.234; /* red */
-  --sa-p-info: 60.8% 0.108 216.744; /* teal-blue */
+  --sa-p-info: 60.8% 0.108 216.744; /* light-blue */
 
   /* Radial background accents */
-  --sa-p-radial-1: oklch(var(--sa-p-gradient-2-mid-start) / 0.22);
-  --sa-p-radial-2: oklch(var(--sa-p-gradient-3-mid) / 0.22);
-  --sa-p-radial-3: oklch(var(--sa-p-gradient-4-mid-end) / 0.16);
+  --sa-p-radial-1: oklch(var(--sa-p-gradient-1-start) / 0.16);
+  --sa-p-radial-2: oklch(var(--sa-p-gradient-1-start) / 0.22);
+  --sa-p-radial-3: oklch(var(--sa-p-gradient-1-start)/ 0.16);
 
   /* Font primitives — internal, consumed by role tokens only */
   --sa-p-font-content: 'Comfortaa', ui-sans-serif, system-ui, sans-serif;
@@ -217,7 +217,7 @@ Breakpoints match architecture-ux.md §7:
   --sa-motion-skeleton: 1.4s;
 
   /* --- Base Element Tokens --- */
-  --sa-base-size: 16px;
+  --sa-base-size: var(--sa-p-size-base);
   --sa-body-line-height: var(--sa-p-leading-normal);
   --sa-transition-page: opacity var(--sa-motion-page-fade) ease-in;
   --sa-list-indent: 1.75rem;
@@ -226,19 +226,16 @@ Breakpoints match architecture-ux.md §7:
   --sa-list-marker-size: 1.25rem;
 
   /* --- Misc --- */
-  --sa-blur: blur(10px);
+  --sa-blur: blur(25px);
   --sa-filter-mono: brightness(0) invert(1);
 
   /* --- Desktop ≥ 1024px --- */
   --sa-dash-gap: 4rem;
   --sa-dash-pad: 4rem;
-  --sa-widget-pad: 1.5rem;
+  --sa-widget-pad: 2rem;
   --sa-stat-pad: 1rem;
   --sa-form-pad: 2.5rem;
   --sa-field-pad: 1rem;
-
-  /* --- StatCard fixed height — KPI row --- */
-  --sa-stat-height: 5rem;
 
   /* --- Form card max-width — centered on tablet/desktop --- */
   --sa-form-max-width: 640px;
