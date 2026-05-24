@@ -54,7 +54,7 @@ Typography roles:
   --sa-body-font-weight       --sa-heading-font-family   --sa-label-font-family
   --sa-data-font-family       --sa-heading-font-size-h1  --sa-label-font-size
 
-  --sa-label-font-weight
+  --sa-label-font-weight      --sa-ui-checkmark-weight
   --sa-mono-font-family
   --sa-ui-font-family
   --sa-ui-font-size
@@ -114,7 +114,7 @@ LAYOUT TOKENS
 All values are starting points — tune by eyeball in the browser.
   --sa-dash-gap    between widgets, between rows
   --sa-dash-pad    outer edge of row to first/last widget
-  --sa-widget-pad  inside a dashboard widget, border to content
+  --sa-card-pad    inside a dashboard widget, border to content
   --sa-stat-pad    inside a KPI StatCard, border to content
   --sa-form-pad    inside the modal form container
   --sa-field-pad   inside a field group within a form
@@ -253,7 +253,7 @@ Breakpoints match architecture-ux.md §7:
   /* --- Desktop ≥ 1024px --- */
   --sa-dash-gap: 4rem;
   --sa-dash-pad: 4rem;
-  --sa-widget-pad: 2rem;
+  --sa-card-pad: 1.5rem;
   --sa-stat-pad: 1rem;
   --sa-form-pad: 2.5rem;
   --sa-field-pad: 1rem;
@@ -270,7 +270,7 @@ Breakpoints match architecture-ux.md §7:
   :root {
     --sa-dash-gap: 3rem;
     --sa-dash-pad: 2rem;
-    --sa-widget-pad: 1.25rem;
+    --sa-card-pad: 1.25rem;
     --sa-stat-pad: 0.875rem;
     --sa-form-pad: 2rem;
     --sa-field-pad: 0.875rem;
@@ -281,7 +281,7 @@ Breakpoints match architecture-ux.md §7:
   :root {
     --sa-dash-gap: 1.5rem;
     --sa-dash-pad: 1.5rem;
-    --sa-widget-pad: 1rem;
+    --sa-card-pad: 1rem;
     --sa-stat-pad: 0.75rem;
     --sa-form-pad: 1.5rem;
     --sa-field-pad: 0.75rem;
@@ -292,7 +292,7 @@ Breakpoints match architecture-ux.md §7:
   :root {
     --sa-dash-gap: 1.5rem;
     --sa-dash-pad: 1.5rem;
-    --sa-widget-pad: 1rem;
+    --sa-card-pad: 1rem;
     --sa-stat-pad: 0.75rem;
     --sa-form-pad: 1.25rem;
     --sa-field-pad: 0.75rem;
@@ -303,7 +303,7 @@ Breakpoints match architecture-ux.md §7:
   :root {
     --sa-dash-gap: 1rem;
     --sa-dash-pad: 1rem;
-    --sa-widget-pad: 0.875rem;
+    --sa-card-pad: 0.875rem;
     --sa-stat-pad: 0.625rem;
     --sa-form-pad: 1rem;
     --sa-field-pad: 0.625rem;

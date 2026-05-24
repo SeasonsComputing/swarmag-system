@@ -191,25 +191,25 @@ A widget is a self-contained dashboard unit that owns its own state and renderin
 
 ### 2.7.3 Dashboard Spacing Tokens
 
-| Token             | Meaning                                     |
-| ----------------- | ------------------------------------------- |
-| `--sa-dash-gap`   | Between widgets, between rows               |
-| `--sa-dash-pad`   | Outer edge margin, row to first/last widget |
-| `--sa-widget-pad` | Inside a widget, border to content          |
-| `--sa-stat-pad`   | Inside a StatCard, border to content        |
-| `--sa-form-pad`   | Inside the modal form container             |
-| `--sa-field-pad`  | Inside a field group within a form          |
+| Token            | Meaning                                     |
+| ---------------- | ------------------------------------------- |
+| `--sa-dash-gap`  | Between widgets, between rows               |
+| `--sa-dash-pad`  | Outer edge margin, row to first/last widget |
+| `--sa-card-pad`  | Inside a widget, border to content          |
+| `--sa-stat-pad`  | Inside a StatCard, border to content        |
+| `--sa-form-pad`  | Inside the modal form container             |
+| `--sa-field-pad` | Inside a field group within a form          |
 
 Starting values (tune by eyeball):
 
-| Token             | ≥1024px | ≥768px   | ≥425px  | ≥380px   |
-| ----------------- | ------- | -------- | ------- | -------- |
-| `--sa-dash-gap`   | 4rem    | 3rem     | 1.5rem  | 1rem     |
-| `--sa-dash-pad`   | 4rem    | 2rem     | 1.5rem  | 1rem     |
-| `--sa-widget-pad` | 1.5rem  | 1.25rem  | 1rem    | 0.875rem |
-| `--sa-stat-pad`   | 1rem    | 0.875rem | 0.75rem | 0.625rem |
-| `--sa-form-pad`   | 2.5rem  | 2rem     | 1.5rem  | 1rem     |
-| `--sa-field-pad`  | 1rem    | 0.875rem | 0.75rem | 0.625rem |
+| Token            | ≥1024px | ≥768px   | ≥425px  | ≥380px   |
+| ---------------- | ------- | -------- | ------- | -------- |
+| `--sa-dash-gap`  | 4rem    | 3rem     | 1.5rem  | 1rem     |
+| `--sa-dash-pad`  | 4rem    | 2rem     | 1.5rem  | 1rem     |
+| `--sa-card-pad`  | 1.5rem  | 1.25rem  | 1rem    | 0.875rem |
+| `--sa-stat-pad`  | 1rem    | 0.875rem | 0.75rem | 0.625rem |
+| `--sa-form-pad`  | 2.5rem  | 2rem     | 1.5rem  | 1rem     |
+| `--sa-field-pad` | 1rem    | 0.875rem | 0.75rem | 0.625rem |
 
 ## 3. Dark Theme
 

@@ -247,6 +247,7 @@
 [data-ui='single-select-item'][data-selected]::after {
   content: '✓';
   font-size: var(--sa-ui-font-size-compact);
+  font-weight: var(--sa-ui-checkmark-weight);
 }
 
 [data-ui='single-select-item'][data-selected]:hover,
@@ -306,6 +307,7 @@
 [data-ui='multi-select-item'][data-selected]::after {
   content: '✓';
   font-size: var(--sa-ui-font-size-compact);
+  font-weight: var(--sa-ui-checkmark-weight);
 }
 
 [data-ui='multi-select-item'][data-selected]:hover,
