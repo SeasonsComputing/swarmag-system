@@ -39,12 +39,13 @@ Semantic tokens resolve to full `oklch()` values. Components reference semantic 
 
 ### 2.3 Theme Switching
 
-Set `data-theme` on `<html>`. Dark is the default — no attribute required.
+Set `data-theme` on `<html>`. All application HTML entry points set the theme
+explicitly.
 
-| Attribute            | Theme          |
-| -------------------- | -------------- |
-| _(absent)_           | Dark (default) |
-| `data-theme="light"` | Light          |
+| Attribute            | Theme |
+| -------------------- | ----- |
+| `data-theme="dark"`  | Dark  |
+| `data-theme="light"` | Light |
 
 Theme switching is a single attribute swap — no JS class toggling.
 

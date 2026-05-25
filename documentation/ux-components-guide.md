@@ -46,35 +46,41 @@ When this library provides an App control for an HTML element or interaction
 pattern, application code must use the App control instead of the native element.
 This is a design-system boundary, not a stylistic preference.
 
-| Use                                  | Do Not Use                           |
-| ------------------------------------ | ------------------------------------ |
-| `AppButton`                          | `<button>`                           |
-| `AppInput`                           | `<input>`                            |
-| `AppTextarea`                        | `<textarea>`                         |
-| `AppSingleSelect`                    | `<select>`                           |
-| `AppCheckbox`                        | `<input type='checkbox'>`            |
-| `AppRadioGroup` / `AppRadioItem`     | `<input type='radio'>`               |
-| `AppToggle` / `AppToggleGroup`       | ad hoc pressed button groups         |
-| `AppTabs` family                     | ad hoc tab markup                    |
-| `AppAccordion` family                | ad hoc disclosure markup             |
-| `AppDialog`, `AppPopover`, `AppTooltip` | ad hoc overlay primitives         |
-| `AppProgress`                        | raw progress markup                  |
-| `AppBadge`, `AppAlert`, `AppAvatar`  | ad hoc status display markup         |
-| `AppCard`                            | ad hoc panel wrappers                |
-| `AppList` / `AppListItem`            | raw `<ul>`, `<ol>`, `<li>`           |
-| `AppTable` family                    | raw table section and cell elements  |
-| `AppField` / `AppFieldset`           | ad hoc label or fieldset composition |
-| `AppFormGrid` / `AppFormActions`     | ad hoc form layout wrappers          |
+| Use                                     | Do Not Use                           |
+| --------------------------------------- | ------------------------------------ |
+| `AppButton`                             | `<button>`                           |
+| `AppInput`                              | `<input>`                            |
+| `AppTextarea`                           | `<textarea>`                         |
+| `AppSingleSelect`                       | `<select>`                           |
+| `AppCheckbox`                           | `<input type='checkbox'>`            |
+| `AppRadioGroup` / `AppRadioItem`        | `<input type='radio'>`               |
+| `AppToggle` / `AppToggleGroup`          | ad hoc pressed button groups         |
+| `AppTabs` family                        | ad hoc tab markup                    |
+| `AppAccordion` family                   | ad hoc disclosure markup             |
+| `AppDialog`, `AppPopover`, `AppTooltip` | ad hoc overlay primitives            |
+| `AppProgress`                           | raw progress markup                  |
+| `AppBadge`, `AppAlert`, `AppAvatar`     | ad hoc status display markup         |
+| `AppCard`                               | ad hoc panel wrappers                |
+| `AppList` / `AppListItem`               | raw `<ul>`, `<ol>`, `<li>`           |
+| `AppTable` family                       | raw table section and cell elements  |
+| `AppField` / `AppFieldset`              | ad hoc label or fieldset composition |
+| `AppFormGrid` / `AppFormActions`        | ad hoc form layout wrappers          |
 
 This rule keeps typography roles, semantic attributes, theme behavior, spacing,
 state rendering, and accessibility behavior aligned with the design language.
-`guard-bare-html` enforces this boundary.
+
+The architecture guard script `guard-bare-html` enforces the native-element subset 
+of this boundary for elements that have direct App control replacements, 
+currently `button`, `input`, `textarea`, `select`, `ul`, `ol`, and `li`. 
+
+Other component-first cases are consumer contract requirements even when they 
+are not yet mechanically enforced.
 
 Native content elements such as headings and paragraphs remain appropriate where
 the design language assigns them direct typographic roles and no App control
 exists for the same purpose.
 
-### 2.3 Controlled And Uncontrolled Props
+### 2.3 Controlled & Uncontrolled Props
 
 Selection controls generally support both controlled and uncontrolled modes:
 
@@ -344,7 +350,7 @@ Use for a single boolean choice.
 </AppCheckbox>
 ```
 
-### 3.7 AppRadioGroup And AppRadioItem
+### 3.7 AppRadioGroup & AppRadioItem
 
 Exclusive option group.
 
@@ -418,7 +424,7 @@ Extends native button attributes, excluding styling and semantic hook props.
 </AppField>
 ```
 
-### 3.9 AppToggleGroup And AppToggleItem
+### 3.9 AppToggleGroup & AppToggleItem
 
 Single-select segmented toggle group.
 
@@ -839,7 +845,7 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 </Show>
 ```
 
-## 5. Layout And Form Controls
+## 5. Layout & Form Controls
 
 ### 5.1 AppLayout
 
@@ -917,13 +923,13 @@ AppTable
 
 **Props**
 
-| Component        | Props                                   | Notes                          |
-| ---------------- | --------------------------------------- | ------------------------------ |
-| `AppTable`       | native table attrs                      | Renders `<table>`.             |
-| `AppTableHeader` | `children: AppComponent`                | Wraps children in header row.  |
-| `AppTableBody`   | native table-section attrs              | Renders `<tbody>`.             |
-| `AppTableRow`    | `variant?: 'section'` plus row attrs    | Section rows span all columns. |
-| `AppTableCell`   | `align?: 'left' \| 'right' \| 'center'` | Renders `<th>` in headers.     |
+| Component        | Props                                  | Notes                          |
+| ---------------- | -------------------------------------- | ------------------------------ |
+| `AppTable`       | native table attrs                     | Renders `<table>`.             |
+| `AppTableHeader` | `children: AppComponent`               | Wraps children in header row.  |
+| `AppTableBody`   | native table-section attrs             | Renders `<tbody>`.             |
+| `AppTableRow`    | `variant?: 'section'` plus row attrs   | Section rows span all columns. |
+| `AppTableCell`   | `align?: 'start' \| 'center' \| 'end'` | Renders `<th>` in headers.     |
 
 **Example**
 
@@ -931,7 +937,7 @@ AppTable
 <AppTable>
   <AppTableHeader>
     <AppTableCell>Drone</AppTableCell>
-    <AppTableCell align='right'>Battery</AppTableCell>
+    <AppTableCell align='end'>Battery</AppTableCell>
   </AppTableHeader>
   <AppTableBody>
     <AppTableRow variant='section'>
@@ -939,7 +945,7 @@ AppTable
     </AppTableRow>
     <AppTableRow>
       <AppTableCell>SA-01</AppTableCell>
-      <AppTableCell align='right'>92%</AppTableCell>
+      <AppTableCell align='end'>92%</AppTableCell>
     </AppTableRow>
   </AppTableBody>
 </AppTable>
@@ -1021,6 +1027,14 @@ Use when a form has a named group of related fields.
 ### 5.7 AppFormGrid
 
 Responsive field grid.
+
+Use `AppFormGrid` for groups of `AppField` children that should automatically
+flow into responsive form columns. It uses a field-oriented minimum column width,
+so fields wrap onto new rows as available width changes.
+
+Use `AppLayout` for general child arrangement, button rows, badges, compact
+inline groups, and non-form layouts. `AppLayout` can stack or wrap children, but
+it does not apply the form-specific auto-fit column behavior.
 
 **Props**
 

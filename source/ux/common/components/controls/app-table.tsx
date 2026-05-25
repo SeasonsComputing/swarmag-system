@@ -73,7 +73,7 @@ export type AppTableCellProps =
     'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant' | 'align'
   >
   & {
-    align?: 'left' | 'right' | 'center'
+    align?: 'start' | 'center' | 'end'
     class?: never
     classList?: never
     style?: never
