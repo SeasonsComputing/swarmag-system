@@ -25,7 +25,7 @@ THEME ROLE TOKEN INVENTORY
 ───────────────────────────────────────────────────────────────────────────────
 Each theme provides values for the semantic role-token inventory below. These
 names are defined by the foundation; values are supplied by theme blocks in
-controls-tokens.css.
+themes.css.
 
 Brand roles:
   --sa-color-accent           --sa-p-brand-end
