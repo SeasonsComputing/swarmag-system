@@ -192,7 +192,7 @@
   --sa-button-font-size: var(--sa-p-size-xs);
   --sa-button-font-weight: var(--sa-p-weight-medium);
   --sa-button-font-weight-primary: var(--sa-p-weight-semibold);
-  --sa-button-min-width: 9rem;
+  --sa-button-min-width: 7rem;
   --sa-button-bg-primary: var(--sa-color-brand-end);
   --sa-button-color-primary: var(--sa-bg-base);
   --sa-button-bg-primary-hover: oklch(80% 0.13 185);
@@ -489,7 +489,7 @@
   --sa-button-font-size: var(--sa-p-size-xs);
   --sa-button-font-weight: var(--sa-p-weight-medium);
   --sa-button-font-weight-primary: var(--sa-p-weight-semibold);
-  --sa-button-min-width: 9rem;
+  --sa-button-min-width: 7rem;
   --sa-button-bg-primary: var(--sa-color-primary);
   --sa-button-color-primary: var(--sa-text-on-brand);
   --sa-button-bg-primary-hover: oklch(48% 0.13 205);
