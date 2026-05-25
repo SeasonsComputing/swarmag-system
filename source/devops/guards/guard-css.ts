@@ -1,7 +1,7 @@
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const CSS_DIR = `${ROOT}/source/ux/common/assets/css`
 
-const CSS_FILES = ['tokens.css', 'base.css', 'controls.css', 'controls-tokens.css']
+const CSS_FILES = ['tokens.css', 'themes.css', 'base.css', 'controls.css']
 
 const SELECTOR_REGEX = /^([^/{\n]*)\{/
 const COMMENT_LINE_REGEX = /^\s*\/\//
@@ -328,28 +328,21 @@ const main = async () => {
     const filePath = `${CSS_DIR}/${fileName}`
     const relative = `source/ux/common/assets/css/${fileName}`
 
-    try {
-      const content = await Deno.readTextFile(filePath)
-      const lines = parseLines(content)
+    const content = await Deno.readTextFile(filePath)
+    const lines = parseLines(content)
 
-      if (fileName === 'tokens.css') {
-        violations.push(...auditTokensCSS(lines, relative, true, false))
-        violations.push(...auditValueRules(lines, relative, true))
-      } else if (fileName === 'controls-tokens.css') {
-        violations.push(...auditTokensCSS(lines, relative, false, true))
-        violations.push(...auditValueRules(lines, relative, true))
-      } else if (fileName === 'base.css') {
-        violations.push(...auditBaseCSS(lines, relative))
-        violations.push(...auditValueRules(lines, relative, false))
-      } else if (fileName === 'controls.css') {
-        violations.push(...auditControlsCSS(lines, relative))
-        violations.push(...auditValueRules(lines, relative, false))
-      }
-    } catch (e) {
-      if (fileName === 'controls-tokens.css' && e instanceof Deno.errors.NotFound) {
-        continue
-      }
-      throw e
+    if (fileName === 'tokens.css') {
+      violations.push(...auditTokensCSS(lines, relative, true, false))
+      violations.push(...auditValueRules(lines, relative, true))
+    } else if (fileName === 'themes.css') {
+      violations.push(...auditTokensCSS(lines, relative, false, true))
+      violations.push(...auditValueRules(lines, relative, true))
+    } else if (fileName === 'base.css') {
+      violations.push(...auditBaseCSS(lines, relative))
+      violations.push(...auditValueRules(lines, relative, false))
+    } else if (fileName === 'controls.css') {
+      violations.push(...auditControlsCSS(lines, relative))
+      violations.push(...auditValueRules(lines, relative, false))
     }
   }
 

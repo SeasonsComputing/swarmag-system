@@ -4,122 +4,268 @@
 
 ## 1. Overview
 
-This document is the consumer reference for all shared UI primitives in
-`ux/common/components`. One entry per control: what it is, what variants and
-props matter, how it composes, and what `data-*` attributes it emits.
+This document is the consumer guide for the shared SolidJS UI controls exported
+from `@ux/common/components/controls`. It describes the public TypeScript API:
+what each control is for, which props it accepts, how controlled and
+uncontrolled state work, and how compound controls are composed.
 
-**Audience:** Feature developers consuming controls to build views, widgets, or forms.
+The controls provide accessible interaction behavior and a consistent visual
+language. Their implementation details, CSS selector rules, token architecture,
+and internal primitive bindings are covered by `ux-components-internals.md`.
 
-**Authority:** Control contracts are defined by this document and
-`ux-components-internals.md`. Source implements those contracts.
+## 2. Using The Library
 
-**What this document is not:** It does not explain token values, CSS selectors,
-Kobalte binding details, or design rationale. See `ux-components-internals.md`
-for that.
-
-All controls export from a single barrel:
+Import controls from the barrel:
 
 ```typescript
-import { AppButton, AppCard, AppField } from '@ux/common/components/controls'
+import { AppButton, AppField, AppInput, AppSingleSelect } from '@ux/common/components/controls'
 ```
 
-## 2. Interactive Controls
+Most controls accept `children?: AppComponent`, where `AppComponent` is the
+library alias for `JSX.Element`.
 
-### 2.1 AppButton
+### 2.1 Consumer Boundaries
 
-Action trigger. The default (no variant) is ghost — transparent with brand border.
+Controls deliberately own their semantic attributes and visual hooks. Consumer
+code should not pass these props:
 
-**Notes:** `loading` disables the button and sets cursor to wait; min-width `7rem`
+- `class`
+- `classList`
+- `style`
+- `data-ui`
+- `data-ui-variant`
+- `data-ui-state`
 
-**Variant**
+Where the source type extends native JSX attributes, ordinary native attributes
+such as `id`, `name`, `type`, `aria-label`, `onClick`, or `children` may be
+used unless the prop table says otherwise.
 
-| Value                 | Use                                                            |
-| --------------------- | -------------------------------------------------------------- |
-| `primary`             | Filled gradient button — primary call to action.               |
-| `secondary`           | Filled neutral background — secondary action.                  |
-| `ghost` _(default)_   | Transparent with brand border — neutral or secondary action.   |
-| `danger`              | Red fill — destructive or irreversible action.                 |
+### 2.2 Component-First Rule
 
-| Attribute         | Values                                       |
-| ----------------- | -------------------------------------------- |
-| `data-ui`         | `button`                                     |
-| `data-ui-variant` | `primary` · `secondary` · `ghost` · `danger` |
-| `data-ui-state`   | `disabled` · `loading`                       |
+When this library provides an App control for an HTML element or interaction
+pattern, application code must use the App control instead of the native element.
+This is a design-system boundary, not a stylistic preference.
 
-### 2.1.1 Example
+| Use                                  | Do Not Use                           |
+| ------------------------------------ | ------------------------------------ |
+| `AppButton`                          | `<button>`                           |
+| `AppInput`                           | `<input>`                            |
+| `AppTextarea`                        | `<textarea>`                         |
+| `AppSingleSelect`                    | `<select>`                           |
+| `AppCheckbox`                        | `<input type='checkbox'>`            |
+| `AppRadioGroup` / `AppRadioItem`     | `<input type='radio'>`               |
+| `AppToggle` / `AppToggleGroup`       | ad hoc pressed button groups         |
+| `AppTabs` family                     | ad hoc tab markup                    |
+| `AppAccordion` family                | ad hoc disclosure markup             |
+| `AppDialog`, `AppPopover`, `AppTooltip` | ad hoc overlay primitives         |
+| `AppProgress`                        | raw progress markup                  |
+| `AppBadge`, `AppAlert`, `AppAvatar`  | ad hoc status display markup         |
+| `AppCard`                            | ad hoc panel wrappers                |
+| `AppList` / `AppListItem`            | raw `<ul>`, `<ol>`, `<li>`           |
+| `AppTable` family                    | raw table section and cell elements  |
+| `AppField` / `AppFieldset`           | ad hoc label or fieldset composition |
+| `AppFormGrid` / `AppFormActions`     | ad hoc form layout wrappers          |
+
+This rule keeps typography roles, semantic attributes, theme behavior, spacing,
+state rendering, and accessibility behavior aligned with the design language.
+`guard-bare-html` enforces this boundary.
+
+Native content elements such as headings and paragraphs remain appropriate where
+the design language assigns them direct typographic roles and no App control
+exists for the same purpose.
+
+### 2.3 Controlled And Uncontrolled Props
+
+Selection controls generally support both controlled and uncontrolled modes:
+
+| Pattern        | Use                                                  |
+| -------------- | ---------------------------------------------------- |
+| `value`        | Controlled current value supplied by the parent.     |
+| `defaultValue` | Initial value managed internally after first render. |
+| `onChange`     | Callback fired with the next value.                  |
+
+Boolean controls use the same pattern with `checked`, `defaultChecked`,
+`pressed`, or `defaultPressed`.
+
+Do not pass both controlled and uncontrolled props unless the component
+explicitly supports that combination.
+
+### 2.4 Common State Props
+
+Many controls accept these state props:
+
+| Prop       | Type      | Description                                                   |
+| ---------- | --------- | ------------------------------------------------------------- |
+| `disabled` | `boolean` | Disables the control when supported.                          |
+| `error`    | `boolean` | Marks the control as invalid or visually errored.             |
+| `loading`  | `boolean` | Marks the control as busy; many interactive controls disable. |
+
+State precedence is `loading`, then `error`, then `disabled`.
+
+### 2.5 Option Shape
+
+Select-like controls use `AppOption`:
+
+```typescript
+type AppOption = {
+  value: string
+  label?: string
+}
+```
+
+When `label` is omitted, the visible label falls back to `value`.
+
+### 2.6 Data Attributes
+
+Every control emits declared `data-ui` attributes. Consumers may use these for
+testing and diagnostics. App or feature code should not invent new styling
+attributes or override the emitted attributes.
+
+## 3. Interactive Controls
+
+### 3.1 AppButton
+
+Action trigger for commands, form actions, and lightweight navigation affordances.
+
+**Use When**
+
+Use `AppButton` for user-initiated actions. Use `variant='primary'` for the main
+action in a local context and `variant='danger'` for destructive actions.
+
+**Props**
+
+Extends native button attributes, excluding styling and semantic hook props.
+
+| Prop       | Type                                              | Default | Description               |
+| ---------- | ------------------------------------------------- | ------- | ------------------------- |
+| `variant`  | `'primary' \| 'secondary' \| 'ghost' \| 'danger'` | unset   | Visual/action priority.   |
+| `error`    | `boolean`                                         | `false` | Emits error state.        |
+| `loading`  | `boolean`                                         | `false` | Emits loading state.      |
+| `disabled` | `boolean`                                         | `false` | Native disabled behavior. |
+
+`loading` disables the rendered button.
+
+**Emitted Attributes**
+
+`data-ui='button'`, `data-ui-variant`, `data-ui-state`.
+
+**Example**
 
 ```tsx
-<AppButton variant='primary' onClick={handleSave}>Save</AppButton>
-<AppButton variant='ghost'>Cancel</AppButton>
+<AppButton variant='primary' type='submit'>Save</AppButton>
+<AppButton variant='ghost' onClick={onCancel}>Cancel</AppButton>
 <AppButton variant='danger' loading={isDeleting}>Delete</AppButton>
 ```
 
-### 2.2 AppInput
+### 3.2 AppInput
 
-Single-line text entry. Use inside `AppField` with matching `for`/`id`.
+Single-line text entry.
 
-| Attribute       | Values                           |
-| --------------- | -------------------------------- |
-| `data-ui`       | `input`                          |
-| `data-ui-state` | `disabled` · `error` · `loading` |
+**Use When**
 
-### 2.2.1 Example
+Use inside `AppField` when a form needs one line of typed input.
+
+**Props**
+
+Extends native input attributes, excluding styling and semantic hook props.
+
+| Prop       | Type      | Default | Description                       |
+| ---------- | --------- | ------- | --------------------------------- |
+| `error`    | `boolean` | `false` | Marks the field invalid.          |
+| `loading`  | `boolean` | `false` | Disables the field while busy.    |
+| `disabled` | `boolean` | `false` | Disables the field.               |
+| `id`       | `string`  | `name`  | Used by `AppField` label linkage. |
+| `name`     | `string`  | unset   | Native form field name.           |
+
+**Composition**
+
+Pair with `AppField`; pass the same value to `AppField for` and `AppInput id`.
+
+**Example**
 
 ```tsx
-<AppField label='Field name' for='field-name'>
+<AppField label='Service name' for='service-name'>
   <AppInput
-    id='field-name'
-    name='fieldName'
-    placeholder='Enter value'
-    value={value}
-    onChange={setValue}
+    id='service-name'
+    name='serviceName'
+    value={serviceName()}
+    onInput={event => setServiceName(event.currentTarget.value)}
   />
 </AppField>
 ```
 
-### 2.3 AppTextarea
+### 3.3 AppTextarea
 
-Multi-line text entry. Use inside `AppField` with matching `for`/`id`.
+Multi-line text entry.
 
-| Attribute       | Values               |
-| --------------- | -------------------- |
-| `data-ui`       | `textarea`           |
-| `data-ui-state` | `disabled` · `error` |
+**Use When**
 
-### 2.3.1 Example
+Use for notes, descriptions, instructions, or other longer text fields.
+
+**Props**
+
+Extends native textarea attributes, excluding styling and semantic hook props.
+
+| Prop       | Type      | Default | Description                       |
+| ---------- | --------- | ------- | --------------------------------- |
+| `error`    | `boolean` | `false` | Marks the field invalid.          |
+| `loading`  | `boolean` | `false` | Disables the field while busy.    |
+| `disabled` | `boolean` | `false` | Disables the field.               |
+| `id`       | `string`  | `name`  | Used by `AppField` label linkage. |
+| `name`     | `string`  | unset   | Native form field name.           |
+
+**Example**
 
 ```tsx
 <AppField label='Notes' for='notes'>
-  <AppTextarea id='notes' name='notes' rows={4} value={notes} onChange={setNotes} />
+  <AppTextarea
+    id='notes'
+    name='notes'
+    rows={4}
+    value={notes()}
+    onInput={event => setNotes(event.currentTarget.value)}
+  />
 </AppField>
 ```
 
-### 2.4 AppSingleSelect
+### 3.4 AppSingleSelect
 
-Dropdown single-value picker. Options are `AppOption` objects
-(`{ value: string; label?: string }`). Use inside `AppField` with matching
-`for`/`id`. `onChange` receives the selected `string` value, not the
-`AppOption` object.
+Dropdown single-value picker.
 
-| Attribute       | Values               |
-| --------------- | -------------------- |
-| `data-ui`       | See emitted values.   |
-| `data-ui-state` | `disabled` · `error` |
+**Use When**
 
-Emitted `data-ui` values:
+Use when the user must choose exactly one value from a known option list.
 
-- `single-select` (trigger)
-- `single-select-item`
-- `single-select-content`
-- `single-select-icon`
-- `single-select-icon-glyph`
+**Props**
 
-### 2.4.1 Example
+| Prop           | Type                       | Required | Default | Description                   |
+| -------------- | -------------------------- | -------- | ------- | ----------------------------- |
+| `options`      | `ReadonlyArray<AppOption>` | yes      | —       | Available choices.            |
+| `value`        | `string`                   | no       | unset   | Controlled selected value.    |
+| `defaultValue` | `string`                   | no       | unset   | Initial uncontrolled value.   |
+| `onChange`     | `(value: string) => void`  | no       | unset   | Receives selected value.      |
+| `placeholder`  | `string`                   | no       | unset   | Text shown before selection.  |
+| `id`           | `string`                   | no       | `name`  | Trigger id for label linkage. |
+| `name`         | `string`                   | no       | unset   | Native form field name.       |
+| `disabled`     | `boolean`                  | no       | `false` | Emits disabled state.         |
+| `error`        | `boolean`                  | no       | `false` | Emits error state.            |
+| `loading`      | `boolean`                  | no       | `false` | Disables the control as busy. |
+
+**Behavior**
+
+`onChange` receives the option `value`, not the full option object.
+
+**Emitted Attributes**
+
+`single-select`, `single-select-item`, `single-select-content`,
+`single-select-icon`, and `single-select-icon-glyph`.
+
+**Example**
 
 ```tsx
 const statusOptions = [
   { value: 'active', label: 'Active' },
-  { value: 'inactive', label: 'Inactive' },
+  { value: 'inactive', label: 'Inactive' }
 ]
 
 <AppField label='Status' for='status'>
@@ -127,69 +273,112 @@ const statusOptions = [
     id='status'
     name='status'
     options={statusOptions}
-    value={status}
-    placeholder='Select status…'
+    value={status()}
+    placeholder='Select status'
     onChange={setStatus}
   />
 </AppField>
 ```
 
-### 2.5 AppMultiSelect
+### 3.5 AppMultiSelect
 
-Inline multi-value picker. Renders as an always-visible listbox — not a
-dropdown. Use inside `AppField`. `onChange` receives `string[]`.
+Inline multi-value listbox.
 
-| Attribute       | Values                               |
-| --------------- | ------------------------------------ |
-| `data-ui`       | `multi-select` · `multi-select-item` |
-| `data-ui-state` | `disabled` · `error`                 |
+**Use When**
 
-### 2.5.1 Example
+Use when several values may be selected at the same time and the option set
+should remain visible.
+
+**Props**
+
+| Prop           | Type                        | Required | Default | Description                  |
+| -------------- | --------------------------- | -------- | ------- | ---------------------------- |
+| `options`      | `ReadonlyArray<AppOption>`  | yes      | —       | Available choices.           |
+| `value`        | `string[]`                  | no       | unset   | Controlled selected values.  |
+| `defaultValue` | `string[]`                  | no       | unset   | Initial uncontrolled values. |
+| `onChange`     | `(value: string[]) => void` | no       | unset   | Receives selected values.    |
+| `disabled`     | `boolean`                   | no       | `false` | Disables the control.        |
+| `error`        | `boolean`                   | no       | `false` | Marks the control invalid.   |
+| `loading`      | `boolean`                   | no       | `false` | Emits loading state.         |
+
+**Example**
 
 ```tsx
-const cropOptions = [
-  { value: 'wheat', label: 'Wheat' },
-  { value: 'corn', label: 'Corn' },
-  { value: 'soy', label: 'Soy' },
-]
-
 <AppField label='Crops' for='crops'>
-  <AppMultiSelect options={cropOptions} value={selected} onChange={setSelected} />
+  <AppMultiSelect
+    options={cropOptions}
+    value={selectedCrops()}
+    onChange={setSelectedCrops}
+  />
 </AppField>
 ```
 
-### 2.6 AppCheckbox
+### 3.6 AppCheckbox
 
-Checkbox with inline label. Standalone or inside `AppField`.
+Checkbox with inline label text.
 
-| Attribute       | Values               |
-| --------------- | -------------------- |
-| `data-ui`       | `checkbox`           |
-| `data-ui-state` | `disabled` · `error` |
+**Use When**
 
-### 2.6.1 Example
+Use for a single boolean choice.
+
+**Props**
+
+| Prop             | Type                         | Required | Default | Description                   |
+| ---------------- | ---------------------------- | -------- | ------- | ----------------------------- |
+| `children`       | `AppComponent`               | no       | unset   | Label content.                |
+| `checked`        | `boolean`                    | no       | unset   | Controlled checked state.     |
+| `defaultChecked` | `boolean`                    | no       | unset   | Initial checked state.        |
+| `onChange`       | `(checked: boolean) => void` | no       | unset   | Receives next checked state.  |
+| `name`           | `string`                     | no       | unset   | Native form field name.       |
+| `value`          | `string`                     | no       | unset   | Native form value.            |
+| `required`       | `boolean`                    | no       | `false` | Native required behavior.     |
+| `disabled`       | `boolean`                    | no       | `false` | Disables the control.         |
+| `error`          | `boolean`                    | no       | `false` | Marks the control invalid.    |
+| `loading`        | `boolean`                    | no       | `false` | Disables the control as busy. |
+
+**Example**
 
 ```tsx
-<AppCheckbox checked={notify} onChange={setNotify}>
+<AppCheckbox checked={notify()} onChange={setNotify}>
   Send notification on completion
 </AppCheckbox>
 ```
 
-### 2.7 AppRadioGroup / AppRadioItem
+### 3.7 AppRadioGroup And AppRadioItem
 
-Radio button group. `AppRadioItem` is the child element. `AppRadioGroup` wraps
-`AppRadioItem` children; use inside `AppField`.
+Exclusive option group.
 
-| Attribute       | Values                                                                        |
-| --------------- | ----------------------------------------------------------------------------- |
-| `data-ui`       | `radio-group` (group) · `radio-item` (item wrapper) · `radio` (input element) |
-| `data-ui-state` | `disabled` · `error`                                                          |
+**Use When**
 
-### 2.7.1 Example
+Use when all choices should be visible and only one choice may be selected.
+
+**AppRadioGroup Props**
+
+| Prop           | Type                     | Required | Default | Description                 |
+| -------------- | ------------------------ | -------- | ------- | --------------------------- |
+| `children`     | `AppComponent`           | no       | unset   | `AppRadioItem` children.    |
+| `value`        | `Value`                  | no       | unset   | Controlled selected value.  |
+| `defaultValue` | `Value`                  | no       | unset   | Initial uncontrolled value. |
+| `onChange`     | `(value: Value) => void` | no       | unset   | Receives selected value.    |
+| `name`         | `string`                 | no       | unset   | Native form group name.     |
+| `required`     | `boolean`                | no       | `false` | Native required behavior.   |
+| `disabled`     | `boolean`                | no       | `false` | Disables the group.         |
+| `error`        | `boolean`                | no       | `false` | Marks the group invalid.    |
+| `loading`      | `boolean`                | no       | `false` | Disables the group as busy. |
+
+**AppRadioItem Props**
+
+| Prop       | Type           | Required | Default | Description              |
+| ---------- | -------------- | -------- | ------- | ------------------------ |
+| `value`    | `Value`        | yes      | —       | Item value.              |
+| `children` | `AppComponent` | no       | unset   | Item label content.      |
+| `disabled` | `boolean`      | no       | `false` | Disables only this item. |
+
+**Example**
 
 ```tsx
 <AppField label='Spray mode' for='spray-mode'>
-  <AppRadioGroup value={mode} onChange={setMode}>
+  <AppRadioGroup name='sprayMode' value={mode()} onChange={setMode}>
     <AppRadioItem value='auto'>Automatic</AppRadioItem>
     <AppRadioItem value='manual'>Manual</AppRadioItem>
     <AppRadioItem value='off'>Off</AppRadioItem>
@@ -197,138 +386,235 @@ Radio button group. `AppRadioItem` is the child element. `AppRadioGroup` wraps
 </AppField>
 ```
 
-### 2.8 AppToggle
+### 3.8 AppToggle
 
-Standalone pressed/unpressed toggle button. Use inside
-`AppField variant='inline'` when a label is needed.
+Standalone pressed/unpressed button.
 
-**Notes:** min-width `7rem` standalone; unset inside `AppToggleGroup`
+**Use When**
 
-| Attribute       | Values                 |
-| --------------- | ---------------------- |
-| `data-ui`       | `toggle`               |
-| `data-ui-state` | `disabled` · `loading` |
+Use for one immediate boolean mode, especially when the control itself is the
+visible action.
 
-### 2.8.1 Example
+**Props**
+
+Extends native button attributes, excluding styling and semantic hook props.
+
+| Prop             | Type                         | Default | Description                   |
+| ---------------- | ---------------------------- | ------- | ----------------------------- |
+| `pressed`        | `boolean`                    | unset   | Controlled pressed state.     |
+| `defaultPressed` | `boolean`                    | unset   | Initial uncontrolled state.   |
+| `onChange`       | `(pressed: boolean) => void` | unset   | Receives next pressed state.  |
+| `disabled`       | `boolean`                    | `false` | Disables the control.         |
+| `error`          | `boolean`                    | `false` | Emits error state.            |
+| `loading`        | `boolean`                    | `false` | Disables the control as busy. |
+
+**Example**
 
 ```tsx
 <AppField label='Night mode' for='night-mode' variant='inline'>
-  <AppToggle pressed={nightMode} onChange={setNightMode}>Enable</AppToggle>
+  <AppToggle pressed={nightMode()} onChange={setNightMode}>
+    Enable
+  </AppToggle>
 </AppField>
 ```
 
-### 2.9 AppToggleGroup / AppToggleItem
+### 3.9 AppToggleGroup And AppToggleItem
 
-Single-select toggle group. `AppToggleItem` is the child element.
-`AppToggleGroup` wraps `AppToggleItem` children.
+Single-select segmented toggle group.
 
-| Attribute       | Values                                             |
-| --------------- | -------------------------------------------------- |
-| `data-ui`       | `toggle-group` (group) · `toggle-item` (each item) |
-| `data-ui-state` | `disabled` (on group)                              |
+**Use When**
 
-### 2.9.1 Example
+Use when a small set of mutually exclusive modes should appear as peer buttons.
+
+**AppToggleGroup Props**
+
+| Prop           | Type                     | Required | Default | Description                 |
+| -------------- | ------------------------ | -------- | ------- | --------------------------- |
+| `children`     | `AppComponent`           | no       | unset   | `AppToggleItem` children.   |
+| `value`        | `Value`                  | no       | unset   | Controlled selected value.  |
+| `defaultValue` | `Value`                  | no       | unset   | Initial uncontrolled value. |
+| `onChange`     | `(value: Value) => void` | no       | unset   | Receives selected value.    |
+| `disabled`     | `boolean`                | no       | `false` | Disables the group.         |
+| `error`        | `boolean`                | no       | `false` | Emits error state.          |
+| `loading`      | `boolean`                | no       | `false` | Disables the group as busy. |
+
+**AppToggleItem Props**
+
+| Prop       | Type           | Required | Default | Description              |
+| ---------- | -------------- | -------- | ------- | ------------------------ |
+| `value`    | `Value`        | yes      | —       | Item value.              |
+| `children` | `AppComponent` | no       | unset   | Item label content.      |
+| `disabled` | `boolean`      | no       | `false` | Disables only this item. |
+
+**Example**
 
 ```tsx
-<AppToggleGroup value={view} onChange={setView}>
+<AppToggleGroup value={view()} onChange={setView}>
   <AppToggleItem value='calendar'>Calendar</AppToggleItem>
   <AppToggleItem value='list'>List</AppToggleItem>
   <AppToggleItem value='map'>Map</AppToggleItem>
 </AppToggleGroup>
 ```
 
-### 2.10 AppTabs / AppTabList / AppTab / AppTabPanel
+### 3.10 AppTabs
 
-Tabbed content panel. Keyboard: arrow keys move focus, Enter/Space activates.
-`AppTabs` > `AppTabList` > `AppTab`; `AppTabPanel` siblings to `AppTabList`.
+Tabbed content primitive.
 
-| Attribute       | Values                                    |
-| --------------- | ----------------------------------------- |
-| `data-ui`       | `tabs` · `tab-list` · `tab` · `tab-panel` |
-| `data-ui-state` | `disabled` (on `tabs`)                    |
+**Use When**
 
-### 2.10.1 Example
+Use when multiple panels share the same screen region and only one panel should
+be visible at a time.
+
+**Required Composition**
+
+```text
+AppTabs
+├── AppTabList
+│   └── AppTab
+└── AppTabPanel
+```
+
+**AppTabs Props**
+
+| Prop             | Type                      | Required | Default    | Description              |
+| ---------------- | ------------------------- | -------- | ---------- | ------------------------ |
+| `children`       | `AppComponent`            | no       | unset      | List and panel children. |
+| `value`          | `Value`                   | no       | unset      | Controlled active tab.   |
+| `defaultValue`   | `Value`                   | no       | unset      | Initial active tab.      |
+| `activationMode` | `'automatic' \| 'manual'` | no       | `'manual'` | Activation mode.         |
+| `onChange`       | `(value: Value) => void`  | no       | unset      | Receives active tab.     |
+| `disabled`       | `boolean`                 | no       | `false`    | Disables the tabs root.  |
+| `error`          | `boolean`                 | no       | `false`    | Emits error state.       |
+| `loading`        | `boolean`                 | no       | `false`    | Emits loading state.     |
+
+**Child Props**
+
+| Component     | Required Props | Optional Props         |
+| ------------- | -------------- | ---------------------- |
+| `AppTabList`  | —              | `children`             |
+| `AppTab`      | `value`        | `children`, `disabled` |
+| `AppTabPanel` | `value`        | `children`             |
+
+**Example**
 
 ```tsx
-<AppTabs value={tab} onChange={setTab}>
+<AppTabs value={tab()} onChange={setTab}>
   <AppTabList>
     <AppTab value='details'>Details</AppTab>
     <AppTab value='history'>History</AppTab>
-    <AppTab value='alerts'>Alerts</AppTab>
   </AppTabList>
-  <AppTabPanel value='details'>…</AppTabPanel>
-  <AppTabPanel value='history'>…</AppTabPanel>
-  <AppTabPanel value='alerts'>…</AppTabPanel>
+  <AppTabPanel value='details'>Details content</AppTabPanel>
+  <AppTabPanel value='history'>History content</AppTabPanel>
 </AppTabs>
 ```
 
-### 2.11 AppAccordion / AppAccordionItem / AppAccordionTrigger / AppAccordionContent
+### 3.11 AppAccordion
 
-Collapsible content sections. `AppAccordion` > `AppAccordionItem` >
-`AppAccordionTrigger` + `AppAccordionContent`.
+Collapsible content sections.
 
-| Attribute       | Values                                                                     |
-| --------------- | -------------------------------------------------------------------------- |
-| `data-ui`       | `accordion` · `accordion-item` · `accordion-trigger` · `accordion-content` |
-| `data-ui-state` | `disabled` (on `accordion-item`)                                           |
+**Use When**
 
-### 2.11.1 Example
+Use to show and hide related sections while keeping section headings visible.
+
+**Required Composition**
+
+```text
+AppAccordion
+└── AppAccordionItem
+    ├── AppAccordionTrigger
+    └── AppAccordionContent
+```
+
+**AppAccordion Props**
+
+| Prop            | Type                        | Required | Default | Description                 |
+| --------------- | --------------------------- | -------- | ------- | --------------------------- |
+| `children`      | `AppComponent`              | no       | unset   | Accordion item children.    |
+| `multiple`      | `boolean`                   | no       | `false` | Allows multiple open items. |
+| `value`         | `string[]`                  | no       | unset   | Controlled open items.      |
+| `defaultValue`  | `string[]`                  | no       | unset   | Initially open items.       |
+| `onValueChange` | `(value: string[]) => void` | no       | unset   | Receives open item values.  |
+| `error`         | `boolean`                   | no       | `false` | Emits error state.          |
+| `loading`       | `boolean`                   | no       | `false` | Emits loading state.        |
+
+**Child Props**
+
+| Component             | Required Props | Optional Props         |
+| --------------------- | -------------- | ---------------------- |
+| `AppAccordionItem`    | `value`        | `children`, `disabled` |
+| `AppAccordionTrigger` | —              | `children`             |
+| `AppAccordionContent` | —              | `children`             |
+
+**Example**
 
 ```tsx
-<AppAccordion multiple>
+<AppAccordion multiple defaultValue={['spray']}>
   <AppAccordionItem value='spray'>
     <AppAccordionTrigger>Spray Settings</AppAccordionTrigger>
-    <AppAccordionContent>…</AppAccordionContent>
-  </AppAccordionItem>
-  <AppAccordionItem value='schedule'>
-    <AppAccordionTrigger>Schedule</AppAccordionTrigger>
-    <AppAccordionContent>…</AppAccordionContent>
+    <AppAccordionContent>Spray settings content</AppAccordionContent>
   </AppAccordionItem>
 </AppAccordion>
 ```
 
-### 2.12 AppDialog
+### 3.12 AppDialog
 
-Modal base. Full-screen on mobile, centered card on tablet/desktop. Compose with
-`AppCard variant='workflow'` for the form surface.
+Modal content primitive with overlay.
 
-| Attribute | Values                      |
-| --------- | --------------------------- |
-| `data-ui` | `dialog` · `dialog-overlay` |
+**Use When**
 
-### 2.12.1 Example
+Use for focused tasks that interrupt the current page, such as edit forms or
+confirmation flows.
+
+**Props**
+
+| Prop             | Type                      | Required | Default       | Description               |
+| ---------------- | ------------------------- | -------- | ------------- | ------------------------- |
+| `trigger`        | `AppComponent`            | no       | unset         | Trigger button content.   |
+| `triggerVariant` | `AppButtonVariant`        | no       | `'secondary'` | Trigger button variant.   |
+| `children`       | `AppComponent`            | no       | unset         | Dialog content.           |
+| `open`           | `boolean`                 | no       | unset         | Controlled open state.    |
+| `defaultOpen`    | `boolean`                 | no       | unset         | Initial open state.       |
+| `onOpenChange`   | `(open: boolean) => void` | no       | unset         | Receives open state.      |
+| `disabled`       | `boolean`                 | no       | `false`       | Disables the trigger.     |
+| `error`          | `boolean`                 | no       | `false`       | Emits error state.        |
+| `loading`        | `boolean`                 | no       | `false`       | Disables trigger as busy. |
+
+**Example**
 
 ```tsx
-<AppDialog open={open} onOpenChange={setOpen}>
+<AppDialog
+  trigger='Edit'
+  open={open()}
+  onOpenChange={setOpen}
+>
   <AppCard variant='workflow'>
     <h2>Edit Field</h2>
     <AppFormGrid>
       <AppField label='Name' for='name'>
-        <AppInput id='name' value={name} onChange={setName} />
+        <AppInput id='name' value={name()} onInput={onNameInput} />
       </AppField>
     </AppFormGrid>
-    <AppFormActions>
-      <AppButton variant='ghost' onClick={() => setOpen(false)}>Cancel</AppButton>
-      <AppButton variant='primary' type='submit'>Save</AppButton>
-    </AppFormActions>
   </AppCard>
 </AppDialog>
 ```
 
-### 2.13 AppPopover
+### 3.13 AppPopover
 
-Floating content panel anchored to a trigger. Use for context menus and
-secondary actions. Trigger and content are children.
+Floating panel anchored to a trigger button.
 
-| Attribute | Values    |
-| --------- | --------- |
-| `data-ui` | `popover` |
+**Use When**
 
-### 2.13.1 Example
+Use for compact secondary actions, filters, or controls that do not require a
+modal interruption.
+
+**Props**
+
+Same open-state and trigger props as `AppDialog`.
+
+**Example**
 
 ```tsx
-<AppPopover open={open} onOpenChange={setOpen}>
-  <AppButton variant='ghost'>Options</AppButton>
+<AppPopover trigger='Options' triggerVariant='ghost'>
   <AppLayout>
     <AppButton variant='ghost' onClick={handleEdit}>Edit</AppButton>
     <AppButton variant='danger' onClick={handleDelete}>Delete</AppButton>
@@ -336,425 +622,437 @@ secondary actions. Trigger and content are children.
 </AppPopover>
 ```
 
-### 2.14 AppTooltip
+### 3.14 AppTooltip
 
-Hover tooltip anchored to a trigger. Wraps its trigger as a child.
+Advisory content anchored to a trigger button.
 
-| Attribute | Values    |
-| --------- | --------- |
-| `data-ui` | `tooltip` |
+**Use When**
 
-### 2.14.1 Example
+Use for short helper text that clarifies an adjacent action or status.
+
+**Props**
+
+Same open-state and trigger props as `AppDialog`.
+
+**Example**
 
 ```tsx
-<AppTooltip content='Last synced 2 minutes ago'>
-  <AppBadge variant='info'>Synced</AppBadge>
+<AppTooltip trigger='Sync status' triggerVariant='ghost'>
+  Last synced 2 minutes ago
 </AppTooltip>
 ```
 
-### 2.15 AppProgress
+### 3.15 AppProgress
 
-Linear progress bar. Standalone.
+Linear progress indicator.
 
-| Attribute | Values                                          |
-| --------- | ----------------------------------------------- |
-| `data-ui` | `progress` · `progress-track` · `progress-fill` |
+**Use When**
 
-### 2.15.1 Example
+Use to show progress through a determinate operation such as upload, sync, or
+batch completion.
+
+**Props**
+
+| Prop       | Type           | Required | Default | Description                |
+| ---------- | -------------- | -------- | ------- | -------------------------- |
+| `label`    | `string`       | no       | unset   | Accessible label.          |
+| `value`    | `number`       | no       | unset   | Current progress value.    |
+| `minValue` | `number`       | no       | unset   | Minimum progress value.    |
+| `maxValue` | `number`       | no       | unset   | Maximum progress value.    |
+| `children` | `AppComponent` | no       | unset   | Optional adjacent content. |
+| `disabled` | `boolean`      | no       | `false` | Emits disabled state.      |
+| `error`    | `boolean`      | no       | `false` | Emits error state.         |
+| `loading`  | `boolean`      | no       | `false` | Emits loading state.       |
+
+**Example**
 
 ```tsx
-<AppProgress value={uploaded} min={0} max={totalFiles} />
+<AppProgress
+  label='Upload progress'
+  value={uploaded()}
+  minValue={0}
+  maxValue={totalFiles()}
+/>
 ```
 
-## 3. Display Controls
+## 4. Display Controls
 
-### 3.1 AppBadge
+### 4.1 AppBadge
 
-Status pill. Default (no variant) is ghost — transparent with border. Inline;
-place inside table cells, card headers, or list items.
+Inline status pill.
 
-**Variant**
+**Props**
 
-| Value              | Use                                                |
-| ------------------ | -------------------------------------------------- |
-| `success`          | Green background — positive or completed state.    |
-| `warning`          | Amber background — caution or pending state.       |
-| `danger`           | Red background — failure or error state.           |
-| `info` _(default)_ | Blue background — informational or neutral state.  |
+Extends native `span` attributes, excluding styling and semantic hook props.
 
-| Attribute         | Values                                    |
-| ----------------- | ----------------------------------------- |
-| `data-ui`         | `badge`                                   |
-| `data-ui-variant` | `success` · `warning` · `danger` · `info` |
+| Prop       | Type                                           | Default | Description           |
+| ---------- | ---------------------------------------------- | ------- | --------------------- |
+| `variant`  | `'success' \| 'warning' \| 'danger' \| 'info'` | unset   | Status tone.          |
+| `disabled` | `boolean`                                      | `false` | Emits disabled state. |
+| `error`    | `boolean`                                      | `false` | Emits error state.    |
+| `loading`  | `boolean`                                      | `false` | Emits loading state.  |
 
-### 3.1.1 Example
+**Example**
 
 ```tsx
 <AppBadge variant='success'>Active</AppBadge>
 <AppBadge variant='warning'>Pending</AppBadge>
-<AppBadge variant='danger'>Fault</AppBadge>
-<AppBadge>Unknown</AppBadge>
 ```
 
-### 3.2 AppAlert
+### 4.2 AppAlert
 
-Inline feedback message with left-border accent. Standalone block; do not nest inside `AppCard`.
+Inline feedback message.
 
-**Variant**
+**Props**
 
-| Value              | Use                                               |
-| ------------------ | ------------------------------------------------- |
-| `success`          | Green accent — positive or completed feedback.    |
-| `warning`          | Amber accent — caution or warning feedback.       |
-| `danger`           | Red accent — error or critical feedback.          |
-| `info` _(default)_ | Blue accent — informational feedback.             |
+Extends native `div` attributes, excluding styling and semantic hook props.
 
-| Attribute         | Values                                    |
-| ----------------- | ----------------------------------------- |
-| `data-ui`         | `alert`                                   |
-| `data-ui-variant` | `success` · `warning` · `danger` · `info` |
+| Prop       | Type                                           | Default | Description           |
+| ---------- | ---------------------------------------------- | ------- | --------------------- |
+| `variant`  | `'success' \| 'warning' \| 'danger' \| 'info'` | unset   | Feedback tone.        |
+| `disabled` | `boolean`                                      | `false` | Emits disabled state. |
+| `error`    | `boolean`                                      | `false` | Emits error state.    |
+| `loading`  | `boolean`                                      | `false` | Emits loading state.  |
 
-### 3.2.1 Example
+`AppAlert` renders with `role='alert'`.
+
+**Example**
 
 ```tsx
 <AppAlert variant='warning'>
-  Wind speed exceeds recommended spray threshold. Review conditions before proceeding.
+  Wind speed exceeds the recommended spray threshold.
 </AppAlert>
 ```
 
-### 3.3 AppAvatar
+### 4.3 AppAvatar
 
-User avatar. Renders initials when no image is available. Standalone; use in nav
-headers, list rows, and comment threads.
+Avatar marker for initials or compact identity content.
 
-| Attribute | Values   |
-| --------- | -------- |
-| `data-ui` | `avatar` |
+**Props**
 
-### 3.3.1 Example
+Extends native `span` attributes, excluding styling and semantic hook props.
+
+| Prop       | Type      | Default | Description           |
+| ---------- | --------- | ------- | --------------------- |
+| `disabled` | `boolean` | `false` | Emits disabled state. |
+| `error`    | `boolean` | `false` | Emits error state.    |
+| `loading`  | `boolean` | `false` | Emits loading state.  |
+
+**Example**
 
 ```tsx
 <AppAvatar>TK</AppAvatar>
 ```
 
-### 3.4 AppCard
+### 4.4 AppCard
 
-Framed content surface. Panels are interior surfaces; widgets go in dashboard
-grids; workflow wraps forms inside `AppDialog`.
+Framed content surface.
 
-**Variant**
+**Props**
 
-| Value       | Use                                            |
-| ----------- | ---------------------------------------------- |
-| _(default)_ | Panel card — standard framed interior surface. |
-| `widget`    | Compact dashboard grid card.                   |
-| `workflow`  | Spacious form surface for dialogs.             |
+Extends native `div` attributes, excluding styling and semantic hook props.
 
-| Attribute         | Values                |
-| ----------------- | --------------------- |
-| `data-ui`         | `card`                |
-| `data-ui-variant` | `widget` · `workflow` |
+| Prop      | Type                     | Default | Description                 |
+| --------- | ------------------------ | ------- | --------------------------- |
+| `variant` | `'widget' \| 'workflow'` | unset   | Specialized card treatment. |
 
-### 3.4.1 Example
+**Variants**
+
+| Variant    | Use                                |
+| ---------- | ---------------------------------- |
+| unset      | Standard panel surface.            |
+| `widget`   | Dashboard widget surface.          |
+| `workflow` | Spacious form or workflow surface. |
+
+**Example**
 
 ```tsx
-<AppCard>
-  <p>Panel content</p>
-</AppCard>
-
 <AppCard variant='widget'>
   <h3>Fleet Status</h3>
   <p>4 of 6 drones active</p>
 </AppCard>
 ```
 
-### 3.5 AppSeparator
+### 4.5 AppSeparator
 
-Horizontal or vertical rule. Standalone.
+Horizontal or vertical rule.
 
-| Attribute | Values      |
-| --------- | ----------- |
-| `data-ui` | `separator` |
+**Props**
 
-### 3.5.1 Example
+Extends native element attributes accepted by the underlying separator
+primitive, excluding styling and semantic hook props.
+
+| Prop       | Type      | Default | Description           |
+| ---------- | --------- | ------- | --------------------- |
+| `disabled` | `boolean` | `false` | Emits disabled state. |
+| `error`    | `boolean` | `false` | Emits error state.    |
+| `loading`  | `boolean` | `false` | Emits loading state.  |
+
+**Example**
 
 ```tsx
 <AppSeparator />
 <AppSeparator orientation='vertical' />
 ```
 
-### 3.6 AppSpinner
+### 4.6 AppSpinner
 
-Indeterminate loading indicator. Standalone; center inside loading containers.
+Indeterminate loading indicator.
 
-| Attribute | Values    |
-| --------- | --------- |
-| `data-ui` | `spinner` |
+**Props**
 
-### 3.6.1 Example
+Extends native `div` attributes, excluding styling and semantic hook props.
+
+| Prop       | Type      | Default | Description           |
+| ---------- | --------- | ------- | --------------------- |
+| `disabled` | `boolean` | `false` | Emits disabled state. |
+| `error`    | `boolean` | `false` | Emits error state.    |
+| `loading`  | `boolean` | `false` | Emits loading state.  |
+
+`AppSpinner` renders with `role='status'`.
+
+**Example**
 
 ```tsx
-<AppSpinner />
+<AppSpinner aria-label='Loading jobs' />
 ```
 
-### 3.7 AppSkeleton
+### 4.7 AppSkeleton
 
-Loading placeholder shimmer. Size it to match the content it replaces. Replace
-content elements 1:1 during load.
+Loading placeholder shimmer.
 
-| Attribute | Values     |
-| --------- | ---------- |
-| `data-ui` | `skeleton` |
+**Props**
 
-### 3.7.1 Example
+Extends native `div` attributes, excluding styling and semantic hook props.
+
+| Prop       | Type      | Default | Description           |
+| ---------- | --------- | ------- | --------------------- |
+| `disabled` | `boolean` | `false` | Emits disabled state. |
+| `error`    | `boolean` | `false` | Emits error state.    |
+| `loading`  | `boolean` | `false` | Emits loading state.  |
+
+**Example**
 
 ```tsx
-<Show
-  when={data()}
-  fallback={
-    <AppSkeleton>
-      <div style='height: 2rem' />
-    </AppSkeleton>
-  }
->
-  <h2>{data().title}</h2>
+<Show when={job()} fallback={<AppSkeleton aria-label='Loading job' />}>
+  <h2>{job().title}</h2>
 </Show>
 ```
 
-## 4. Layout Controls
+## 5. Layout And Form Controls
 
-### 4.1 AppLayout
+### 5.1 AppLayout
 
-Unified layout primitive. Covers both block (vertical) and inline (horizontal)
-arrangements through variant, with optional gap density for tighter
-compositions.
+General layout container for block and inline child arrangement.
 
-**Variant**
+**Props**
 
-| Value         | Use                                                                 |
-| ------------- | ------------------------------------------------------------------- |
-| _(default)_   | Full-width vertical grid — stacks children top to bottom.           |
-| `block-fit`   | Content-fit vertical grid — collapses to content width.             |
-| `inline`      | Content-fit horizontal flex — children flow left to right and wrap. |
-| `inline-fill` | Full-width horizontal flex — children stretch equally.              |
+Extends native `div` attributes, excluding styling and semantic hook props.
 
-**Gap**
+| Prop       | Type                                       | Default | Description       |
+| ---------- | ------------------------------------------ | ------- | ----------------- |
+| `variant`  | `'block-fit' \| 'inline' \| 'inline-fill'` | unset   | Layout direction. |
+| `gap`      | `'tight' \| 'none'`                        | unset   | Gap density.      |
+| `children` | `AppComponent`                             | unset   | Layout children.  |
 
-| Value     | Use                                  |
-| --------- | ------------------------------------ |
-| _(unset)_ | Standard layout gap.                 |
-| `tight`   | Reduced gap for dense compositions.  |
-| `none`    | No gap between children.             |
+**Variants**
 
-| Attribute         | Values                                 |
-| ----------------- | -------------------------------------- |
-| `data-ui`         | `layout`                               |
-| `data-ui-variant` | `block-fit` · `inline` · `inline-fill` |
-| `data-ui-gap`     | `tight` · `none`                       |
+| Variant       | Use                                               |
+| ------------- | ------------------------------------------------- |
+| unset         | Full-width vertical stack.                        |
+| `block-fit`   | Vertical stack that fits its content width.       |
+| `inline`      | Horizontal wrapping layout.                       |
+| `inline-fill` | Horizontal layout where children share the width. |
 
-### 4.1.1 Example
+**Example**
 
 ```tsx
-<AppLayout>
-  <AppField label='Name' for='name'>
-    <AppInput id='name' value={name} onChange={setName} />
-  </AppField>
-  <AppField label='Status' for='status'>
-    <AppSingleSelect
-      id='status'
-      options={statusOptions}
-      value={status}
-      onChange={setStatus}
-    />
-  </AppField>
-</AppLayout>
-
 <AppLayout variant='inline'>
   <AppBadge variant='success'>Active</AppBadge>
   <AppBadge variant='info'>Synced</AppBadge>
 </AppLayout>
-
-<AppLayout variant='inline-fill'>
-  <AppButton variant='ghost'>Cancel</AppButton>
-  <AppButton variant='primary'>Save</AppButton>
-</AppLayout>
-
-<AppLayout gap='tight'>
-  <h1>swarmAg Style Guide</h1>
-  <p>Living visual validation for tokens, states, themes, and controls.</p>
-</AppLayout>
 ```
 
-### 4.2 AppList / AppListItem
+### 5.2 AppList & AppListItem
 
-Semantic list with visual variants. `AppList` wraps `AppListItem` children.
+Semantic list of items.
 
-**Variant**
+**AppList Props**
 
-| Value      | Use                                      |
-| ---------- | ---------------------------------------- |
-| _(none)_   | Clean list without visual bullets.       |
-| `bullet`   | Disc bullets — standard bulleted list.   |
-| `numbered` | Decimal numbers — ordered list.          |
+Extends native list attributes, excluding styling and semantic hook props.
 
-| Attribute         | Values                |
-| ----------------- | --------------------- |
-| `data-ui`         | `list` · `list-item`  |
-| `data-ui-variant` | `bullet` · `numbered` |
+| Prop      | Type                     | Default | Description            |
+| --------- | ------------------------ | ------- | ---------------------- |
+| `variant` | `'bullet' \| 'numbered'` | unset   | List visual treatment. |
 
-### 4.2.1 Example
+`variant='numbered'` renders an `<ol>`. All other variants render a `<ul>`.
+
+**AppListItem Props**
+
+Extends native `li` attributes, excluding styling and semantic hook props.
+
+**Example**
 
 ```tsx
 <AppList variant='bullet'>
   <AppListItem>Pre-flight checklist complete</AppListItem>
   <AppListItem>Wind within operating limits</AppListItem>
-  <AppListItem>Battery charged above 80%</AppListItem>
 </AppList>
 ```
 
-### 4.3 AppTable / AppTableHeader / AppTableBody / AppTableRow / AppTableCell
+### 5.3 AppTable
 
-Semantic table family. `AppTableCell` renders as `<th>` inside
-`AppTableHeader`, `<td>` elsewhere — no prop needed. `AppTable` >
-`AppTableHeader` + `AppTableBody` > `AppTableRow` > `AppTableCell`.
+Semantic table wrappers.
 
-| Attribute         | Values                                                             |
-| ----------------- | ------------------------------------------------------------------ |
-| `data-ui`         | `table` · `table-head` · `table-body` · `table-row` · `table-cell` |
-| `data-ui-variant` | `section` (on `table-row` when `section={true}`)                   |
+**Required Composition**
 
-### 4.3.1 Example
+```text
+AppTable
+├── AppTableHeader
+│   └── AppTableCell
+└── AppTableBody
+    └── AppTableRow
+        └── AppTableCell
+```
+
+**Props**
+
+| Component        | Props                                   | Notes                          |
+| ---------------- | --------------------------------------- | ------------------------------ |
+| `AppTable`       | native table attrs                      | Renders `<table>`.             |
+| `AppTableHeader` | `children: AppComponent`                | Wraps children in header row.  |
+| `AppTableBody`   | native table-section attrs              | Renders `<tbody>`.             |
+| `AppTableRow`    | `variant?: 'section'` plus row attrs    | Section rows span all columns. |
+| `AppTableCell`   | `align?: 'left' \| 'right' \| 'center'` | Renders `<th>` in headers.     |
+
+**Example**
 
 ```tsx
 <AppTable>
   <AppTableHeader>
-    <AppTableRow>
-      <AppTableCell>Drone</AppTableCell>
-      <AppTableCell>Status</AppTableCell>
-      <AppTableCell>Battery</AppTableCell>
-    </AppTableRow>
+    <AppTableCell>Drone</AppTableCell>
+    <AppTableCell align='right'>Battery</AppTableCell>
   </AppTableHeader>
   <AppTableBody>
-    <AppTableRow section>
+    <AppTableRow variant='section'>
       <AppTableCell>Zone A</AppTableCell>
     </AppTableRow>
     <AppTableRow>
       <AppTableCell>SA-01</AppTableCell>
-      <AppTableCell>
-        <AppBadge variant='success'>Active</AppBadge>
-      </AppTableCell>
-      <AppTableCell>92%</AppTableCell>
+      <AppTableCell align='right'>92%</AppTableCell>
     </AppTableRow>
   </AppTableBody>
 </AppTable>
 ```
 
-### 4.4 AppFooter
+### 5.4 AppFooter
 
-Footer control with centered caller-supplied logo, shell chrome styling, and
-mobile safe-area support. Use at an app or harness boundary where a branded
-footer is needed.
+Branded footer with a centered caller-supplied logo.
 
-| Attribute | Values                   |
-| --------- | ------------------------ |
-| `data-ui` | `footer` · `footer-logo` |
+**Props**
 
-### 4.4.1 Example
+| Prop   | Type     | Required | Default | Description                    |
+| ------ | -------- | -------- | ------- | ------------------------------ |
+| `logo` | `string` | yes      | —       | Logo image URL.                |
+| `alt`  | `string` | no       | `''`    | Accessible alt text for image. |
+
+**Example**
 
 ```tsx
-<AppFooter logo={logo} alt='swarmAg' />
+<AppFooter logo={logoUrl} alt='swarmAg' />
 ```
 
-## 5. Form Layout
+### 5.5 AppField
 
-Form layout primitives are controls — imported from the same barrel as all other controls.
+Label and control wrapper.
 
-### 5.1 AppField
+**Use When**
 
-Label + control wrapper. Always uses explicit `for`/`id` association. Label and
-control are always siblings — the label never wraps a control.
+Use for one labeled form control. The label and control are siblings; the label
+does not wrap the control.
 
-**Variant**
+**Props**
 
-| Value    | Use                                             |
-| -------- | ----------------------------------------------- |
-| _(none)_ | Standard vertical layout — label above control. |
-| `inline` | Horizontal layout with control inline.          |
+| Prop       | Type           | Required | Default | Description                      |
+| ---------- | -------------- | -------- | ------- | -------------------------------- |
+| `label`    | `string`       | yes      | —       | Label text.                      |
+| `for`      | `string`       | yes      | —       | Associated control id.           |
+| `variant`  | `'inline'`     | no       | unset   | Places label and control inline. |
+| `children` | `AppComponent` | yes      | —       | The associated control.          |
 
-| Attribute         | Values   |
-| ----------------- | -------- |
-| `data-ui`         | `field`  |
-| `data-ui-variant` | `inline` |
-
-### 5.1.1 Example
+**Example**
 
 ```tsx
 <AppField label='Start time' for='start'>
-  <AppInput id='start' type='time' value={start} onChange={setStart} />
-</AppField>
-
-<AppField label='Active' for='active' variant='inline'>
-  <AppToggle pressed={active} onChange={setActive}>Enable</AppToggle>
+  <AppInput id='start' type='time' value={start()} onInput={onStartInput} />
 </AppField>
 ```
 
-### 5.2 AppFieldset
+### 5.6 AppFieldset
 
-Semantic group boundary with a legend. Use when a form has logically distinct
-sections. Always place `AppFormGrid` inside a `<div>` inside the fieldset —
-never apply grid directly to `<fieldset>`.
+Semantic group boundary with legend.
 
-| Attribute | Values     |
-| --------- | ---------- |
-| `data-ui` | `fieldset` |
+**Use When**
 
-### 5.2.1 Example
+Use when a form has a named group of related fields.
+
+**Props**
+
+| Prop       | Type           | Required | Default | Description     |
+| ---------- | -------------- | -------- | ------- | --------------- |
+| `legend`   | `string`       | yes      | —       | Group name.     |
+| `children` | `AppComponent` | yes      | —       | Group contents. |
+
+**Example**
 
 ```tsx
 <AppFieldset legend='Spray window'>
-  <div>
-    <AppFormGrid>
-      <AppField label='Start time' for='start'>
-        <AppInput id='start' type='time' />
-      </AppField>
-      <AppField label='End time' for='end'>
-        <AppInput id='end' type='time' />
-      </AppField>
-    </AppFormGrid>
-  </div>
+  <AppFormGrid>
+    <AppField label='Start time' for='start'>
+      <AppInput id='start' type='time' />
+    </AppField>
+    <AppField label='End time' for='end'>
+      <AppInput id='end' type='time' />
+    </AppField>
+  </AppFormGrid>
 </AppFieldset>
 ```
 
-### 5.3 AppFormGrid
+### 5.7 AppFormGrid
 
-Responsive auto-fit column layout. The layout host for `AppField` children.
+Responsive field grid.
 
-| Attribute | Values      |
-| --------- | ----------- |
-| `data-ui` | `form-grid` |
+**Props**
 
-### 5.3.1 Example
+| Prop       | Type           | Required | Default | Description     |
+| ---------- | -------------- | -------- | ------- | --------------- |
+| `children` | `AppComponent` | yes      | —       | Field children. |
+
+**Example**
 
 ```tsx
 <AppFormGrid>
   <AppField label='Name' for='name'>
-    <AppInput id='name' value={name} onChange={setName} />
-  </AppField>
-  <AppField label='Code' for='code'>
-    <AppInput id='code' value={code} onChange={setCode} />
+    <AppInput id='name' value={name()} onInput={onNameInput} />
   </AppField>
 </AppFormGrid>
 ```
 
-### 5.4 AppFormActions
+### 5.8 AppFormActions
 
-Right-aligned action row. Always at the tail of the form, outside any fieldsets.
+Right-aligned action row.
 
-| Attribute | Values         |
-| --------- | -------------- |
-| `data-ui` | `form-actions` |
+**Use When**
 
-### 5.4.1 Example
+Use at the end of a form or dialog surface for submit and dismissal buttons.
+
+**Props**
+
+| Prop       | Type           | Required | Default | Description     |
+| ---------- | -------------- | -------- | ------- | --------------- |
+| `children` | `AppComponent` | yes      | —       | Action buttons. |
+
+**Example**
 
 ```tsx
 <AppFormActions>
@@ -763,39 +1061,18 @@ Right-aligned action row. Always at the tail of the form, outside any fieldsets.
 </AppFormActions>
 ```
 
-### 5.5 Composition Example
-
-Full form pattern — fieldset, grid, field, and actions working together.
-
-```tsx
-<AppFieldset legend='Spray window'>
-  <div>
-    <AppFormGrid>
-      <AppField label='Start time' for='start'>
-        <AppInput id='start' type='time' />
-      </AppField>
-      <AppField label='End time' for='end'>
-        <AppInput id='end' type='time' />
-      </AppField>
-    </AppFormGrid>
-  </div>
-</AppFieldset>
-
-<AppFormActions>
-  <AppButton variant='ghost'>Cancel</AppButton>
-  <AppButton variant='primary' type='submit'>Save</AppButton>
-</AppFormActions>
-```
-
 ## 6. Charts
 
-Charts are standardized through `AppChart`.
+Chart controls are standardized through `AppChart` and chart wrappers in
+`source/ux/common/components/charts` when present. Chart implementation details
+belong to `ux-components-internals.md`; consumers should import chart controls
+from their chart barrel once that API is exposed.
 
-| Variant      | Purpose                            |
-| ------------ | ---------------------------------- |
-| `pie`        | Composition at a point in time     |
-| `bar`        | Frequency / volume over categories |
-| `line`       | Trend over rolling time period     |
-| `spark-line` | Inline mini trend                  |
+| Variant      | Purpose                          |
+| ------------ | -------------------------------- |
+| `pie`        | Composition at a point in time.  |
+| `bar`        | Frequency or volume by category. |
+| `line`       | Trend over a time period.        |
+| `spark-line` | Inline mini trend.               |
 
 _End of Component Guide Document_

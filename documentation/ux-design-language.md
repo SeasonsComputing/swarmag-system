@@ -45,18 +45,16 @@ Set `data-theme` on `<html>`. Dark is the default — no attribute required.
 | -------------------- | -------------- |
 | _(absent)_           | Dark (default) |
 | `data-theme="light"` | Light          |
-| `data-theme="brand"` | Brand          |
 
 Theme switching is a single attribute swap — no JS class toggling.
 
 ### 2.4 Layer Structure
 
-| Layer           | File                  | Scope                  | Purpose                             |
-| --------------- | --------------------- | ---------------------- | ----------------------------------- |
-| Primitive layer | `tokens.css`          | `:root`                | Bare L C H triplets (internal only) |
-| Semantic layer  | `controls-tokens.css` | `[data-theme='dark']`  | Resolved `oklch()` values           |
-| Light theme     | `controls-tokens.css` | `[data-theme='light']` | Semantic overrides                  |
-| Brand theme     | `controls-tokens.css` | `[data-theme='brand']` | Semantic overrides                  |
+| Layer           | File         | Scope                  | Purpose                             |
+| --------------- | ------------ | ---------------------- | ----------------------------------- |
+| Primitive layer | `tokens.css` | `:root`                | Bare L C H triplets (internal only) |
+| Semantic layer  | `themes.css` | `[data-theme='dark']`  | Resolved `oklch()` values           |
+| Light theme     | `themes.css` | `[data-theme='light']` | Semantic overrides                  |
 
 See `ux-components-internals.md §2.3–2.4` for the full prefix convention and token inventory.
 
@@ -109,30 +107,30 @@ Role tokens provide semantic indirection. A role typeface is changed by changing
 
 ### 2.5.2 Type Scale
 
-Font sizes are fixed role tokens. `controls-tokens.css` defines the role-level font-size tokens consumed by `base.css` and `controls.css`.
+Font sizes are fixed role tokens. `themes.css` defines the role-level font-size tokens consumed by `base.css` and `controls.css`.
 
 ### 2.5.3 Typography Role Map
 
 Each HTML element belongs to exactly one typographic role. `base.css` declares the complete type treatment — family, size, and weight — in a single selector group per role. Splitting the treatment across multiple rules causes drift.
 
-| Element(s)                                       | Role                      | Font token          | Size           | Weight |
-| ------------------------------------------------ | ------------------------- | ------------------- | -------------- | ------ |
-| `h1`–`h6`                                        | Heading                   | `--sa-font-heading` | role scale     | normal |
-| `p`                                              | Content                   | `--sa-font-body`    | inherited      | thin   |
-| `label`, `button`, `legend`                      | Label                     | `--sa-font-label`   | `--sa-font-sm` | thin   |
-| `figcaption`, `th`                               | Annotation / table header | `--sa-font-label`   | `--sa-font-sm` | normal |
-| `li` (bare)                                      | Data-adjacent label       | `--sa-font-label`   | `--sa-font-sm` | thin   |
-| `[data-ui='list-item']` (`AppListItem`)          | List content              | `--sa-font-body`    | `--sa-font-sm` | normal |
-| `td`                                             | Data-adjacent label       | `--sa-font-label`   | `--sa-font-sm` | thin   |
-| `input`, `textarea`                              | Data entry                | `--sa-font-ui`      | `--sa-font-xs` | thin   |
-| `select`, `[role='option']`, `[role='menuitem']` | Data entry                | `--sa-font-ui`      | `--sa-font-sm` | normal |
-| `code`, `pre`, `kbd`, `samp`                     | Code / numeric            | `--sa-font-mono`    | inherited      | —      |
+| Role                      | Element(s)                                       | Font token          | Size           | Weight |
+| ------------------------- | ------------------------------------------------ | ------------------- | -------------- | ------ |
+| Heading                   | `h1`–`h6`                                        | `--sa-font-heading` | role scale     | normal |
+| Content                   | `p`                                              | `--sa-font-body`    | inherited      | thin   |
+| Label                     | `label`, `button`, `legend`                      | `--sa-font-label`   | `--sa-font-sm` | thin   |
+| Annotation / table header | `figcaption`, `th`                               | `--sa-font-label`   | `--sa-font-sm` | normal |
+| Data-adjacent label       | `li` (bare)                                      | `--sa-font-label`   | `--sa-font-sm` | thin   |
+| List content              | `[data-ui='list-item']` (`AppListItem`)          | `--sa-font-body`    | `--sa-font-sm` | normal |
+| Data-adjacent label       | `td`                                             | `--sa-font-label`   | `--sa-font-sm` | thin   |
+| Data entry                | `input`, `textarea`                              | `--sa-font-ui`      | `--sa-font-xs` | thin   |
+| Data entry                | `select`, `[role='option']`, `[role='menuitem']` | `--sa-font-ui`      | `--sa-font-sm` | normal |
+| Code / numeric            | `code`, `pre`, `kbd`, `samp`                     | `--sa-font-mono`    | inherited      | —      |
 
 ### 2.5.4 Element Overrides
 
 `label` additionally carries `color: var(--sa-text-secondary)` — labels are subordinate to the content they describe. `legend` inherits primary text color as a group heading.
 
-`blockquote`: teal left border (`--sa-color-primary`, 3px), italic, `--sa-text-secondary`, `--sa-font-body`, no inline margin. Styled in `base.css`.
+`blockquote`: left border (`--sa-color-primary`, 3px), italic, `--sa-text-secondary`, `--sa-font-body`, no inline margin. Styled in `base.css`.
 
 ### 2.6 Layout & Viewport
 
@@ -141,12 +139,12 @@ Each HTML element belongs to exactly one typographic role. `base.css` declares t
 All layouts must align to a 4px base unit. This ensures visual rhythm across data-dense tables in Admin and large-format touch targets in Ops.
 
 | Token           | Value | Usage                             |
-| --------------- | -----:| --------------------------------- |
-| `--sa-space-xs` | 4px   | Internal component padding        |
-| `--sa-space-sm` | 8px   | Button/input grouping             |
-| `--sa-space-md` | 16px  | Standard gutter / section padding |
-| `--sa-space-lg` | 24px  | Page margins (mobile)             |
-| `--sa-space-xl` | 32px  | Page margins (desktop)            |
+| --------------- | ----: | --------------------------------- |
+| `--sa-space-xs` |   4px | Internal component padding        |
+| `--sa-space-sm` |   8px | Button/input grouping             |
+| `--sa-space-md` |  16px | Standard gutter / section padding |
+| `--sa-space-lg` |  24px | Page margins (mobile)             |
+| `--sa-space-xl` |  32px | Page margins (desktop)            |
 
 ### 2.6.2 Viewport Classes
 
@@ -159,13 +157,13 @@ All layouts must align to a 4px base unit. This ensures visual rhythm across dat
 ### 2.6.3 Z-Index Scale
 
 | Token            | Value | Usage                     |
-| ---------------- | -----:| ------------------------- |
-| `--sa-z-below`   | -1    | Decorations               |
-| `--sa-z-base`    | 0     | Content                   |
-| `--sa-z-docked`  | 10    | Sticky headers/footers    |
-| `--sa-z-popover` | 20    | Menus, lists, popovers    |
-| `--sa-z-overlay` | 100   | Modals, overlays, flyouts |
-| `--sa-z-toast`   | 1000  | System notifications      |
+| ---------------- | ----: | ------------------------- |
+| `--sa-z-below`   |    -1 | Decorations               |
+| `--sa-z-base`    |     0 | Content                   |
+| `--sa-z-docked`  |    10 | Sticky headers/footers    |
+| `--sa-z-popover` |    20 | Menus, lists, popovers    |
+| `--sa-z-overlay` |   100 | Modals, overlays, flyouts |
+| `--sa-z-toast`   |  1000 | System notifications      |
 
 ### 2.7 Dashboard
 
@@ -279,8 +277,6 @@ Clean and professional. Intended for office and web contexts where ambient light
 
 ### 4.2.1 Heading Hierarchy
 
-Light theme introduces a color hierarchy across heading levels — headings are no longer uniformly white.
-
 | Level | Color                  | Character  |
 | ----- | ---------------------- | ---------- |
 | h1    | `oklch(17% 0.03 238)`  | Ink        |
@@ -288,54 +284,5 @@ Light theme introduces a color hierarchy across heading levels — headings are 
 | h3    | `oklch(50% 0.13 186)`  | Teal       |
 | h4    | `oklch(44% 0.105 154)` | Green-teal |
 | h5    | `oklch(40% 0.055 105)` | Olive      |
-
-## 5. Brand Theme
-
-Editorial and brand-forward. Used for customer-facing surfaces (`app-customer`) where the swarmAg brand identity takes precedence over operational density.
-
-### 5.1 Motif
-
-| Property       | Specification                                                       |
-| -------------- | ------------------------------------------------------------------- |
-| **Background** | Warm near-white `oklch(99.09% 0.0122 91.51)` — subtle golden warmth |
-| **Surfaces**   | White with warm tint; clean, editorial                              |
-| **Primary**    | Logo green `oklch(76.849% 0.13454 123.993)`                         |
-| **Secondary**  | Golden-green `oklch(76.885% 0.1231 80.8277)`                        |
-| **Text**       | Warm dark brown `oklch(44.44% 0.0096 73.63)` — not neutral gray     |
-| **Gradient**   | Green → Golden (warm, brand-forward; no blue in the sweep)          |
-
-### 5.2 Page & Surfaces
-
-| Token             | Value                                     |
-| ----------------- | ----------------------------------------- |
-| Page background   | `oklch(99.09% 0.0122 91.51)`              |
-| Surface 1 (cards) | `oklch(100% 0 0)`                         |
-| Surface 2         | `oklch(99.09% 0.0122 91.51)`              |
-| Surface 3         | `oklch(92.76% 0.0058 264.53)`             |
-| Primary text      | `oklch(44.44% 0.0096 73.63)` (warm brown) |
-| Shell chrome      | Card-panel surface and border             |
-
-### 5.2.1 Heading Hierarchy
-
-Brand theme heading colors follow the logo palette — green and golden-green, not teal-blue.
-
-| Level | Color                            | Character    |
-| ----- | -------------------------------- | ------------ |
-| h1    | `oklch(44.44% 0.0096 73.63)`     | Warm brown   |
-| h2    | `oklch(76.849% 0.13454 123.993)` | Logo green   |
-| h3    | `oklch(76.885% 0.1231 80.8277)`  | Golden-green |
-| h4    | `oklch(65.207% 0.1322 81.5716)`  | Deep golden  |
-| h5    | `oklch(44.44% 0.0096 73.63)`     | Warm brown   |
-
-### 5.3 Typography Overrides
-
-The brand theme substitutes the default font stack. These overrides are declared in `[data-theme='brand']` in `controls-tokens.css`.
-
-| Role token          | Brand override                                  | Rationale                                        |
-| ------------------- | ----------------------------------------------- | ------------------------------------------------ |
-| `--sa-font-heading` | `'Playfair Display', ui-serif, serif`           | Editorial — serif headings signal brand presence |
-| `--sa-font-ui`      | `'Inter', ui-sans-serif, system-ui, sans-serif` | Neutral — clean UI in editorial context          |
-
-`--sa-font-body` and `--sa-font-mono` are not overridden in the brand theme.
 
 _End of UX Design Language Document_
