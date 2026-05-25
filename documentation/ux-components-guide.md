@@ -4,18 +4,23 @@
 
 ## 1. Overview
 
-This document is the consumer reference for all shared UI primitives in `ux/common/components`. One entry per control: what it is, what variants and props matter, how it composes, and what `data-*` attributes it emits.
+This document is the consumer reference for all shared UI primitives in
+`ux/common/components`. One entry per control: what it is, what variants and
+props matter, how it composes, and what `data-*` attributes it emits.
 
 **Audience:** Feature developers consuming controls to build views, widgets, or forms.
 
-**Authority:** Control contracts are defined by this document and `ux-components-internals.md`. Source implements those contracts.
+**Authority:** Control contracts are defined by this document and
+`ux-components-internals.md`. Source implements those contracts.
 
-**What this document is not:** It does not explain token values, CSS selectors, Kobalte binding details, or design rationale. See `ux-components-internals.md` for that.
+**What this document is not:** It does not explain token values, CSS selectors,
+Kobalte binding details, or design rationale. See `ux-components-internals.md`
+for that.
 
 All controls export from a single barrel:
 
 ```typescript
-import { AppButton, AppCard, AppField, … } from '@ux/common/components/controls'
+import { AppButton, AppCard, AppField } from '@ux/common/components/controls'
 ```
 
 ## 2. Interactive Controls
@@ -24,10 +29,16 @@ import { AppButton, AppCard, AppField, … } from '@ux/common/components/control
 
 Action trigger. The default (no variant) is ghost — transparent with brand border.
 
-**Variants:** `primary` · `secondary` · `ghost` (default) · `danger`\
-**Key props:** `variant`, `disabled`, `loading`, `type`, `onClick`, `children`\
-**Composition:** standalone; use inside `AppFormActions` for form submission\
 **Notes:** `loading` disables the button and sets cursor to wait; min-width `7rem`
+
+**Variant**
+
+| Value                 | Use                                                            |
+| --------------------- | -------------------------------------------------------------- |
+| `primary`             | Filled gradient button — primary call to action.               |
+| `secondary`           | Filled neutral background — secondary action.                  |
+| `ghost` _(default)_   | Transparent with brand border — neutral or secondary action.   |
+| `danger`              | Red fill — destructive or irreversible action.                 |
 
 | Attribute         | Values                                       |
 | ----------------- | -------------------------------------------- |
@@ -45,11 +56,7 @@ Action trigger. The default (no variant) is ghost — transparent with brand bor
 
 ### 2.2 AppInput
 
-Single-line text entry.
-
-**Variants:** none\
-**Key props:** `id`, `name`, `type`, `placeholder`, `value`, `disabled`, `error`, `loading`, `required`, `readOnly`, `onChange`\
-**Composition:** use inside `AppField` with matching `for`/`id`
+Single-line text entry. Use inside `AppField` with matching `for`/`id`.
 
 | Attribute       | Values                           |
 | --------------- | -------------------------------- |
@@ -72,11 +79,7 @@ Single-line text entry.
 
 ### 2.3 AppTextarea
 
-Multi-line text entry.
-
-**Variants:** none\
-**Key props:** `id`, `name`, `placeholder`, `value`, `disabled`, `error`, `rows`, `onChange`\
-**Composition:** use inside `AppField` with matching `for`/`id`
+Multi-line text entry. Use inside `AppField` with matching `for`/`id`.
 
 | Attribute       | Values               |
 | --------------- | -------------------- |
@@ -93,17 +96,23 @@ Multi-line text entry.
 
 ### 2.4 AppSingleSelect
 
-Dropdown single-value picker. Options are `AppOption` objects (`{ value: string; label?: string }`).
+Dropdown single-value picker. Options are `AppOption` objects
+(`{ value: string; label?: string }`). Use inside `AppField` with matching
+`for`/`id`. `onChange` receives the selected `string` value, not the
+`AppOption` object.
 
-**Variants:** none\
-**Key props:** `options`, `value`, `defaultValue`, `placeholder`, `id`, `name`, `disabled`, `error`, `onChange`\
-**Composition:** use inside `AppField` with matching `for`/`id`\
-**Notes:** `onChange` receives the selected `string` value, not the `AppOption` object
+| Attribute       | Values               |
+| --------------- | -------------------- |
+| `data-ui`       | See emitted values.   |
+| `data-ui-state` | `disabled` · `error` |
 
-| Attribute       | Values                                                                                                                         |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------ |
-| `data-ui`       | `single-select` (trigger) · `single-select-item` · `single-select-content` · `single-select-icon` · `single-select-icon-glyph` |
-| `data-ui-state` | `disabled` · `error`                                                                                                           |
+Emitted `data-ui` values:
+
+- `single-select` (trigger)
+- `single-select-item`
+- `single-select-content`
+- `single-select-icon`
+- `single-select-icon-glyph`
 
 ### 2.4.1 Example
 
@@ -127,12 +136,8 @@ const statusOptions = [
 
 ### 2.5 AppMultiSelect
 
-Inline multi-value picker. Renders as an always-visible listbox — not a dropdown.
-
-**Variants:** none\
-**Key props:** `options`, `value`, `defaultValue`, `disabled`, `error`, `onChange`\
-**Composition:** use inside `AppField`\
-**Notes:** `onChange` receives `string[]`
+Inline multi-value picker. Renders as an always-visible listbox — not a
+dropdown. Use inside `AppField`. `onChange` receives `string[]`.
 
 | Attribute       | Values                               |
 | --------------- | ------------------------------------ |
@@ -155,11 +160,7 @@ const cropOptions = [
 
 ### 2.6 AppCheckbox
 
-Checkbox with inline label.
-
-**Variants:** none\
-**Key props:** `checked`, `defaultChecked`, `disabled`, `error`, `name`, `required`, `value`, `onChange`, `children` (label text)\
-**Composition:** standalone or inside `AppField`
+Checkbox with inline label. Standalone or inside `AppField`.
 
 | Attribute       | Values               |
 | --------------- | -------------------- |
@@ -176,11 +177,8 @@ Checkbox with inline label.
 
 ### 2.7 AppRadioGroup / AppRadioItem
 
-Radio button group. `AppRadioItem` is the child element.
-
-**Key props (AppRadioGroup):** `value`, `defaultValue`, `disabled`, `error`, `onChange`\
-**Key props (AppRadioItem):** `value`, `disabled`, `children` (label)\
-**Composition:** `AppRadioGroup` wraps `AppRadioItem` children; use inside `AppField`
+Radio button group. `AppRadioItem` is the child element. `AppRadioGroup` wraps
+`AppRadioItem` children; use inside `AppField`.
 
 | Attribute       | Values                                                                        |
 | --------------- | ----------------------------------------------------------------------------- |
@@ -201,11 +199,9 @@ Radio button group. `AppRadioItem` is the child element.
 
 ### 2.8 AppToggle
 
-Standalone pressed/unpressed toggle button.
+Standalone pressed/unpressed toggle button. Use inside
+`AppField variant='inline'` when a label is needed.
 
-**Variants:** none\
-**Key props:** `pressed`, `defaultPressed`, `disabled`, `loading`, `onChange`, `children` (label)\
-**Composition:** standalone; use inside `AppField variant='inline'` when a label is needed\
 **Notes:** min-width `7rem` standalone; unset inside `AppToggleGroup`
 
 | Attribute       | Values                 |
@@ -224,10 +220,7 @@ Standalone pressed/unpressed toggle button.
 ### 2.9 AppToggleGroup / AppToggleItem
 
 Single-select toggle group. `AppToggleItem` is the child element.
-
-**Key props (AppToggleGroup):** `value`, `defaultValue`, `disabled`, `onChange`\
-**Key props (AppToggleItem):** `value`, `disabled`, `children`\
-**Composition:** `AppToggleGroup` wraps `AppToggleItem` children
+`AppToggleGroup` wraps `AppToggleItem` children.
 
 | Attribute       | Values                                             |
 | --------------- | -------------------------------------------------- |
@@ -247,11 +240,7 @@ Single-select toggle group. `AppToggleItem` is the child element.
 ### 2.10 AppTabs / AppTabList / AppTab / AppTabPanel
 
 Tabbed content panel. Keyboard: arrow keys move focus, Enter/Space activates.
-
-**Key props (AppTabs):** `value`, `defaultValue`, `activationMode` (`'manual'` default), `disabled`, `onChange`\
-**Key props (AppTab):** `value`, `disabled`, `children`\
-**Key props (AppTabPanel):** `value`, `children`\
-**Composition:** `AppTabs` > `AppTabList` > `AppTab`; `AppTabPanel` siblings to `AppTabList`
+`AppTabs` > `AppTabList` > `AppTab`; `AppTabPanel` siblings to `AppTabList`.
 
 | Attribute       | Values                                    |
 | --------------- | ----------------------------------------- |
@@ -275,11 +264,8 @@ Tabbed content panel. Keyboard: arrow keys move focus, Enter/Space activates.
 
 ### 2.11 AppAccordion / AppAccordionItem / AppAccordionTrigger / AppAccordionContent
 
-Collapsible content sections.
-
-**Key props (AppAccordion):** `multiple`, `value`, `defaultValue`, `onValueChange`\
-**Key props (AppAccordionItem):** `value` (required), `disabled`\
-**Composition:** `AppAccordion` > `AppAccordionItem` > `AppAccordionTrigger` + `AppAccordionContent`
+Collapsible content sections. `AppAccordion` > `AppAccordionItem` >
+`AppAccordionTrigger` + `AppAccordionContent`.
 
 | Attribute       | Values                                                                     |
 | --------------- | -------------------------------------------------------------------------- |
@@ -303,10 +289,8 @@ Collapsible content sections.
 
 ### 2.12 AppDialog
 
-Modal base. Full-screen on mobile, centered card on tablet/desktop.
-
-**Key props:** `open`, `onOpenChange`, `children`\
-**Composition:** compose with `AppCard variant='workflow'` for the form surface
+Modal base. Full-screen on mobile, centered card on tablet/desktop. Compose with
+`AppCard variant='workflow'` for the form surface.
 
 | Attribute | Values                      |
 | --------- | --------------------------- |
@@ -333,10 +317,8 @@ Modal base. Full-screen on mobile, centered card on tablet/desktop.
 
 ### 2.13 AppPopover
 
-Floating content panel anchored to a trigger. Use for context menus and secondary actions.
-
-**Key props:** `open`, `onOpenChange`, `children`\
-**Composition:** trigger and content are children
+Floating content panel anchored to a trigger. Use for context menus and
+secondary actions. Trigger and content are children.
 
 | Attribute | Values    |
 | --------- | --------- |
@@ -356,10 +338,7 @@ Floating content panel anchored to a trigger. Use for context menus and secondar
 
 ### 2.14 AppTooltip
 
-Hover tooltip anchored to a trigger.
-
-**Key props:** `content`, `children` (trigger element)\
-**Composition:** wraps its trigger as a child
+Hover tooltip anchored to a trigger. Wraps its trigger as a child.
 
 | Attribute | Values    |
 | --------- | --------- |
@@ -375,11 +354,7 @@ Hover tooltip anchored to a trigger.
 
 ### 2.15 AppProgress
 
-Linear progress bar.
-
-**Variants:** none\
-**Key props:** `value`, `min`, `max`\
-**Composition:** standalone
+Linear progress bar. Standalone.
 
 | Attribute | Values                                          |
 | --------- | ----------------------------------------------- |
@@ -395,11 +370,17 @@ Linear progress bar.
 
 ### 3.1 AppBadge
 
-Status pill. Default (no variant) is ghost — transparent with border.
+Status pill. Default (no variant) is ghost — transparent with border. Inline;
+place inside table cells, card headers, or list items.
 
-**Variants:** `success` · `warning` · `danger` · `info`\
-**Key props:** `variant`, `children`\
-**Composition:** inline; place inside table cells, card headers, or list items
+**Variant**
+
+| Value              | Use                                                |
+| ------------------ | -------------------------------------------------- |
+| `success`          | Green background — positive or completed state.    |
+| `warning`          | Amber background — caution or pending state.       |
+| `danger`           | Red background — failure or error state.           |
+| `info` _(default)_ | Blue background — informational or neutral state.  |
 
 | Attribute         | Values                                    |
 | ----------------- | ----------------------------------------- |
@@ -417,11 +398,16 @@ Status pill. Default (no variant) is ghost — transparent with border.
 
 ### 3.2 AppAlert
 
-Inline feedback message with left-border accent.
+Inline feedback message with left-border accent. Standalone block; do not nest inside `AppCard`.
 
-**Variants:** `success` · `warning` · `danger` · `info`\
-**Key props:** `variant`, `children`\
-**Composition:** standalone block; do not nest inside `AppCard`
+**Variant**
+
+| Value              | Use                                               |
+| ------------------ | ------------------------------------------------- |
+| `success`          | Green accent — positive or completed feedback.    |
+| `warning`          | Amber accent — caution or warning feedback.       |
+| `danger`           | Red accent — error or critical feedback.          |
+| `info` _(default)_ | Blue accent — informational feedback.             |
 
 | Attribute         | Values                                    |
 | ----------------- | ----------------------------------------- |
@@ -438,11 +424,8 @@ Inline feedback message with left-border accent.
 
 ### 3.3 AppAvatar
 
-User avatar. Renders initials when no image is available.
-
-**Variants:** none\
-**Key props:** `children` (initials or image)\
-**Composition:** standalone; use in nav headers, list rows, and comment threads
+User avatar. Renders initials when no image is available. Standalone; use in nav
+headers, list rows, and comment threads.
 
 | Attribute | Values   |
 | --------- | -------- |
@@ -456,11 +439,16 @@ User avatar. Renders initials when no image is available.
 
 ### 3.4 AppCard
 
-Framed content surface. The default (no variant) is the panel look.
+Framed content surface. Panels are interior surfaces; widgets go in dashboard
+grids; workflow wraps forms inside `AppDialog`.
 
-**Variants:** `widget` · `workflow` (no prop = panel)\
-**Key props:** `variant`, `children`\
-**Composition:** panels are interior surfaces; widgets go in dashboard grids; workflow wraps forms inside `AppDialog`
+**Variant**
+
+| Value       | Use                                            |
+| ----------- | ---------------------------------------------- |
+| _(default)_ | Panel card — standard framed interior surface. |
+| `widget`    | Compact dashboard grid card.                   |
+| `workflow`  | Spacious form surface for dialogs.             |
 
 | Attribute         | Values                |
 | ----------------- | --------------------- |
@@ -482,11 +470,7 @@ Framed content surface. The default (no variant) is the panel look.
 
 ### 3.5 AppSeparator
 
-Horizontal or vertical rule.
-
-**Variants:** none\
-**Key props:** `orientation` (`'horizontal'` default)\
-**Composition:** standalone
+Horizontal or vertical rule. Standalone.
 
 | Attribute | Values      |
 | --------- | ----------- |
@@ -501,11 +485,7 @@ Horizontal or vertical rule.
 
 ### 3.6 AppSpinner
 
-Indeterminate loading indicator.
-
-**Variants:** none\
-**Key props:** none beyond children\
-**Composition:** standalone; center inside loading containers
+Indeterminate loading indicator. Standalone; center inside loading containers.
 
 | Attribute | Values    |
 | --------- | --------- |
@@ -519,11 +499,8 @@ Indeterminate loading indicator.
 
 ### 3.7 AppSkeleton
 
-Loading placeholder shimmer. Size it to match the content it replaces.
-
-**Variants:** none\
-**Key props:** `children` (or size via container)\
-**Composition:** replace content elements 1:1 during load
+Loading placeholder shimmer. Size it to match the content it replaces. Replace
+content elements 1:1 during load.
 
 | Attribute | Values     |
 | --------- | ---------- |
@@ -548,26 +525,26 @@ Loading placeholder shimmer. Size it to match the content it replaces.
 
 ### 4.1 AppLayout
 
-Unified layout primitive. Covers both block (vertical) and inline (horizontal) arrangements through
-variant, with optional gap density for tighter compositions.
+Unified layout primitive. Covers both block (vertical) and inline (horizontal)
+arrangements through variant, with optional gap density for tighter
+compositions.
 
-**Variants:** default/`block` · `block-fit` · `inline` · `inline-fill`\
-**Gap:** default · `tight` · `none`\
-**Key props:** `variant`, `gap`, `children`\
-**Composition:** general-purpose layout container for block and inline child arrangement
+**Variant**
 
-| Variant       | Behaviour                                              |
-| ------------- | ------------------------------------------------------ |
-| _(default)_   | Full-width vertical grid                               |
-| `block-fit`   | Content-fit vertical grid, items start-aligned         |
-| `inline`      | Content-fit horizontal flex, wraps                     |
-| `inline-fill` | Full-width horizontal flex, children equally stretched |
+| Value         | Use                                                                 |
+| ------------- | ------------------------------------------------------------------- |
+| _(default)_   | Full-width vertical grid — stacks children top to bottom.           |
+| `block-fit`   | Content-fit vertical grid — collapses to content width.             |
+| `inline`      | Content-fit horizontal flex — children flow left to right and wrap. |
+| `inline-fill` | Full-width horizontal flex — children stretch equally.              |
 
-| Gap       | Behaviour                       |
-| --------- | ------------------------------- |
-| _(unset)_ | Standard layout gap             |
-| `tight`   | Small layout gap for close text |
-| `none`    | No gap                          |
+**Gap**
+
+| Value     | Use                                  |
+| --------- | ------------------------------------ |
+| _(unset)_ | Standard layout gap.                 |
+| `tight`   | Reduced gap for dense compositions.  |
+| `none`    | No gap between children.             |
 
 | Attribute         | Values                                 |
 | ----------------- | -------------------------------------- |
@@ -583,7 +560,12 @@ variant, with optional gap density for tighter compositions.
     <AppInput id='name' value={name} onChange={setName} />
   </AppField>
   <AppField label='Status' for='status'>
-    <AppSingleSelect id='status' options={statusOptions} value={status} onChange={setStatus} />
+    <AppSingleSelect
+      id='status'
+      options={statusOptions}
+      value={status}
+      onChange={setStatus}
+    />
   </AppField>
 </AppLayout>
 
@@ -605,12 +587,15 @@ variant, with optional gap density for tighter compositions.
 
 ### 4.2 AppList / AppListItem
 
-Semantic list with visual variants.
+Semantic list with visual variants. `AppList` wraps `AppListItem` children.
 
-**Variants (AppList):** default (clean, unstyled) · `bullet` · `numbered`\
-**Key props (AppList):** `variant`, `children`\
-**Key props (AppListItem):** `children`\
-**Composition:** `AppList` wraps `AppListItem` children
+**Variant**
+
+| Value      | Use                                      |
+| ---------- | ---------------------------------------- |
+| _(none)_   | Clean list without visual bullets.       |
+| `bullet`   | Disc bullets — standard bulleted list.   |
+| `numbered` | Decimal numbers — ordered list.          |
 
 | Attribute         | Values                |
 | ----------------- | --------------------- |
@@ -629,10 +614,9 @@ Semantic list with visual variants.
 
 ### 4.3 AppTable / AppTableHeader / AppTableBody / AppTableRow / AppTableCell
 
-Semantic table family. `AppTableCell` renders as `<th>` inside `AppTableHeader`, `<td>` elsewhere — no prop needed.
-
-**Key props (AppTableRow):** `section` (boolean) — renders an accent group-header row\
-**Composition:** `AppTable` > `AppTableHeader` + `AppTableBody` > `AppTableRow` > `AppTableCell`
+Semantic table family. `AppTableCell` renders as `<th>` inside
+`AppTableHeader`, `<td>` elsewhere — no prop needed. `AppTable` >
+`AppTableHeader` + `AppTableBody` > `AppTableRow` > `AppTableCell`.
 
 | Attribute         | Values                                                             |
 | ----------------- | ------------------------------------------------------------------ |
@@ -667,10 +651,9 @@ Semantic table family. `AppTableCell` renders as `<th>` inside `AppTableHeader`,
 
 ### 4.4 AppFooter
 
-Footer control with centered caller-supplied logo, shell chrome styling, and mobile safe-area support.
-
-**Key props:** `logo`, `alt`\
-**Composition:** use at an app or harness boundary where a branded footer is needed
+Footer control with centered caller-supplied logo, shell chrome styling, and
+mobile safe-area support. Use at an app or harness boundary where a branded
+footer is needed.
 
 | Attribute | Values                   |
 | --------- | ------------------------ |
@@ -688,11 +671,15 @@ Form layout primitives are controls — imported from the same barrel as all oth
 
 ### 5.1 AppField
 
-Label + control wrapper. Always uses explicit `for`/`id` association.
+Label + control wrapper. Always uses explicit `for`/`id` association. Label and
+control are always siblings — the label never wraps a control.
 
-**Variants:** `inline` (content-fit; use when a toggle or control should sit inline with siblings)\
-**Key props:** `label` (required), `for` (required), `variant`, `children`\
-**Notes:** label and control are always siblings — the label never wraps a control
+**Variant**
+
+| Value    | Use                                             |
+| -------- | ----------------------------------------------- |
+| _(none)_ | Standard vertical layout — label above control. |
+| `inline` | Horizontal layout with control inline.          |
 
 | Attribute         | Values   |
 | ----------------- | -------- |
@@ -713,10 +700,9 @@ Label + control wrapper. Always uses explicit `for`/`id` association.
 
 ### 5.2 AppFieldset
 
-Semantic group boundary with a legend. Use when a form has logically distinct sections.
-
-**Key props:** `legend` (required), `children`\
-**Notes:** always place `AppFormGrid` inside a `<div>` inside the fieldset — never apply grid directly to `<fieldset>`
+Semantic group boundary with a legend. Use when a form has logically distinct
+sections. Always place `AppFormGrid` inside a `<div>` inside the fieldset —
+never apply grid directly to `<fieldset>`.
 
 | Attribute | Values     |
 | --------- | ---------- |
@@ -726,22 +712,22 @@ Semantic group boundary with a legend. Use when a form has logically distinct se
 
 ```tsx
 <AppFieldset legend='Spray window'>
-  <AppFormGrid>
-    <AppField label='Start time' for='start'>
-      <AppInput id='start' type='time' />
-    </AppField>
-    <AppField label='End time' for='end'>
-      <AppInput id='end' type='time' />
-    </AppField>
-  </AppFormGrid>
+  <div>
+    <AppFormGrid>
+      <AppField label='Start time' for='start'>
+        <AppInput id='start' type='time' />
+      </AppField>
+      <AppField label='End time' for='end'>
+        <AppInput id='end' type='time' />
+      </AppField>
+    </AppFormGrid>
+  </div>
 </AppFieldset>
 ```
 
 ### 5.3 AppFormGrid
 
 Responsive auto-fit column layout. The layout host for `AppField` children.
-
-**Key props:** `children`
 
 | Attribute | Values      |
 | --------- | ----------- |
@@ -764,8 +750,6 @@ Responsive auto-fit column layout. The layout host for `AppField` children.
 
 Right-aligned action row. Always at the tail of the form, outside any fieldsets.
 
-**Key props:** `children` (action `AppButton` elements)
-
 | Attribute | Values         |
 | --------- | -------------- |
 | `data-ui` | `form-actions` |
@@ -779,20 +763,22 @@ Right-aligned action row. Always at the tail of the form, outside any fieldsets.
 </AppFormActions>
 ```
 
-### 5.5 Composition example
+### 5.5 Composition Example
 
 Full form pattern — fieldset, grid, field, and actions working together.
 
 ```tsx
 <AppFieldset legend='Spray window'>
-  <AppFormGrid>
-    <AppField label='Start time' for='start'>
-      <AppInput id='start' type='time' />
-    </AppField>
-    <AppField label='End time' for='end'>
-      <AppInput id='end' type='time' />
-    </AppField>
-  </AppFormGrid>
+  <div>
+    <AppFormGrid>
+      <AppField label='Start time' for='start'>
+        <AppInput id='start' type='time' />
+      </AppField>
+      <AppField label='End time' for='end'>
+        <AppInput id='end' type='time' />
+      </AppField>
+    </AppFormGrid>
+  </div>
 </AppFieldset>
 
 <AppFormActions>
