@@ -141,12 +141,12 @@ Each HTML element belongs to exactly one typographic role. `base.css` declares t
 All layouts must align to a 4px base unit. This ensures visual rhythm across data-dense tables in Admin and large-format touch targets in Ops.
 
 | Token           | Value | Usage                             |
-| --------------- | ----: | --------------------------------- |
-| `--sa-space-xs` |   4px | Internal component padding        |
-| `--sa-space-sm` |   8px | Button/input grouping             |
-| `--sa-space-md` |  16px | Standard gutter / section padding |
-| `--sa-space-lg` |  24px | Page margins (mobile)             |
-| `--sa-space-xl` |  32px | Page margins (desktop)            |
+| --------------- | -----:| --------------------------------- |
+| `--sa-space-xs` | 4px   | Internal component padding        |
+| `--sa-space-sm` | 8px   | Button/input grouping             |
+| `--sa-space-md` | 16px  | Standard gutter / section padding |
+| `--sa-space-lg` | 24px  | Page margins (mobile)             |
+| `--sa-space-xl` | 32px  | Page margins (desktop)            |
 
 ### 2.6.2 Viewport Classes
 
@@ -159,13 +159,13 @@ All layouts must align to a 4px base unit. This ensures visual rhythm across dat
 ### 2.6.3 Z-Index Scale
 
 | Token            | Value | Usage                     |
-| ---------------- | ----: | ------------------------- |
-| `--sa-z-below`   |    -1 | Decorations               |
-| `--sa-z-base`    |     0 | Content                   |
-| `--sa-z-docked`  |    10 | Sticky headers/footers    |
-| `--sa-z-popover` |    20 | Menus, lists, popovers    |
-| `--sa-z-overlay` |   100 | Modals, overlays, flyouts |
-| `--sa-z-toast`   |  1000 | System notifications      |
+| ---------------- | -----:| ------------------------- |
+| `--sa-z-below`   | -1    | Decorations               |
+| `--sa-z-base`    | 0     | Content                   |
+| `--sa-z-docked`  | 10    | Sticky headers/footers    |
+| `--sa-z-popover` | 20    | Menus, lists, popovers    |
+| `--sa-z-overlay` | 100   | Modals, overlays, flyouts |
+| `--sa-z-toast`   | 1000  | System notifications      |
 
 ### 2.7 Dashboard
 

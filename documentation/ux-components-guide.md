@@ -785,16 +785,14 @@ Full form pattern — fieldset, grid, field, and actions working together.
 
 ```tsx
 <AppFieldset legend='Spray window'>
-  <div>
-    <AppFormGrid>
-      <AppField label='Start time' for='start'>
-        <AppInput id='start' type='time' />
-      </AppField>
-      <AppField label='End time' for='end'>
-        <AppInput id='end' type='time' />
-      </AppField>
-    </AppFormGrid>
-  </div>
+  <AppFormGrid>
+    <AppField label='Start time' for='start'>
+      <AppInput id='start' type='time' />
+    </AppField>
+    <AppField label='End time' for='end'>
+      <AppInput id='end' type='time' />
+    </AppField>
+  </AppFormGrid>
 </AppFieldset>
 
 <AppFormActions>
