@@ -170,8 +170,8 @@ export const StyleGuide = (): AppComponent => {
             <AppTableHeader>
               <AppTableCell>Equipment</AppTableCell>
               <AppTableCell>Application</AppTableCell>
-              <AppTableCell align='right'>Price</AppTableCell>
-              <AppTableCell align='right'>Cost</AppTableCell>
+              <AppTableCell align='end'>Price</AppTableCell>
+              <AppTableCell align='end'>Cost</AppTableCell>
             </AppTableHeader>
             <AppTableBody>
               <For each={EQUIPMENT}>
@@ -185,10 +185,10 @@ export const StyleGuide = (): AppComponent => {
                         <AppTableRow>
                           <AppTableCell>{item.name}</AppTableCell>
                           <AppTableCell>{item.application}</AppTableCell>
-                          <AppTableCell align='right'>
+                          <AppTableCell align='end'>
                             <samp>{item.price}</samp>
                           </AppTableCell>
-                          <AppTableCell align='right'>
+                          <AppTableCell align='end'>
                             <samp>{item.cost}</samp>
                           </AppTableCell>
                         </AppTableRow>
@@ -352,7 +352,7 @@ export const StyleGuide = (): AppComponent => {
           </AppFieldset>
         </SgSection>
 
-        <SgSection title='AppSelect / AppMultiSelect'>
+        <SgSection title='AppSingleSelect / AppMultiSelect'>
           <AppField label='Toggle error state' for='select-error-toggle' variant='inline'>
             <AppToggle
               id='select-error-toggle'

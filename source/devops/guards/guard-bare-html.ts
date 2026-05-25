@@ -15,7 +15,7 @@ const REPLACEMENTS: StringDictionary = {
   'button': 'AppButton',
   'input': 'AppInput',
   'textarea': 'AppTextarea',
-  'select': 'AppSelect',
+  'select': 'AppSingleSelect',
   'ul': 'AppList',
   'ol': 'AppList',
   'li': 'AppListItem'
