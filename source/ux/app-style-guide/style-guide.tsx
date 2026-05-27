@@ -25,6 +25,7 @@ import {
   EQUIPMENT, SERVICES, STATUSES
 } from './style-guide-fixtures.ts'
 
+import './style-guide.css'
 import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
 
 type SgSectionProps = { children: AppComponent; title: string }
