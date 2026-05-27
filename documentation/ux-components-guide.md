@@ -46,39 +46,39 @@ When this library provides an App control for an HTML element or interaction
 pattern, application code must use the App control instead of the native element.
 This is a design-system boundary, not a stylistic preference.
 
-| Use                                     | Do Not Use                           |
-| --------------------------------------- | ------------------------------------ |
-| `AppButton`                             | `<button>`                           |
-| `AppInput`                              | `<input>`                            |
-| `AppTextarea`                           | `<textarea>`                         |
-| `AppSingleSelect`                       | `<select>`                           |
-| `AppCheckbox`                           | `<input type='checkbox'>`            |
-| `AppRadioGroup` / `AppRadioItem`        | `<input type='radio'>`               |
-| `AppToggle` / `AppToggleGroup`          | ad hoc pressed button groups         |
-| `AppTabs` family                        | ad hoc tab markup                    |
-| `AppAccordion` family                   | ad hoc disclosure markup             |
-| `AppDialog`, `AppPopover`, `AppTooltip` | ad hoc overlay primitives            |
-| `AppProgress`                           | raw progress markup                  |
-| `AppBadge`, `AppAlert`, `AppAvatar`     | ad hoc status display markup         |
-| `AppCard`                               | ad hoc panel wrappers                |
-| `AppList` / `AppListItem`               | raw `<ul>`, `<ol>`, `<li>`           |
-| `AppTable` family                       | raw table section and cell elements  |
-| `AppField` / `AppFieldset`              | ad hoc label or fieldset composition |
-| `AppFormGrid` / `AppFormActions`        | ad hoc form layout wrappers          |
+| Use                                          | Do Not Use                                              |
+| -------------------------------------------- | ------------------------------------------------------- |
+| `AppButton`                                  | `<button>`                                              |
+| `AppInput`                                   | `<input>`                                               |
+| `AppTextarea`                                | `<textarea>`                                            |
+| `AppSingleSelect`                            | `<select>`                                              |
+| `AppCheckbox`                                | `<input type='checkbox'>`                               |
+| `AppRadioGroup`, `AppRadioItem`              | `<input type='radio'>`                                  |
+| `AppToggle`, `AppToggleGroup`                | ad hoc pressed button groups                            |
+| `AppTabs`                                    | ad hoc tab markup                                       |
+| `AppAccordion`                               | ad hoc disclosure markup                                |
+| `AppDialog`, `AppPopover`, `AppTooltip`      | ad hoc overlay primitives                               |
+| `AppProgress`                                | raw progress markup                                     |
+| `AppBadge`, `AppAlert`, `AppAvatar`          | ad hoc status display markup                            |
+| `AppCard`                                    | ad hoc panel wrappers                                   |
+| `AppList`, `AppListItem`                     | `<ul>`, `<ol>`, `<li>`                                  |
+| `AppTable`                                   | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
+| `AppFieldset`                                | `<fieldset>` + `<legend>`                               |
+| `AppField`                                   | `<div>` + `<label>` + {control}                         |
+| `AppFormGrid`, `AppLayout`, `AppFormActions` | ad hoc form layout wrappers                             |
 
 This rule keeps typography roles, semantic attributes, theme behavior, spacing,
 state rendering, and accessibility behavior aligned with the design language.
 
-The architecture guard script `guard-bare-html` enforces the native-element subset 
-of this boundary for elements that have direct App control replacements, 
-currently `button`, `input`, `textarea`, `select`, `ul`, `ol`, and `li`. 
+The architecture guard script `guard-bare-html` enforces the native-element
+subset of this boundary for elements that have direct App control replacements
+currently `button`, `input`, `textarea`, `select`, `ul`, `ol`, and `li`.
 
-Other component-first cases are consumer contract requirements even when they 
+Other component-first cases are consumer contract requirements even when they
 are not yet mechanically enforced.
 
 Native content elements such as headings and paragraphs remain appropriate where
-the design language assigns them direct typographic roles and no App control
-exists for the same purpose.
+the design language assigns them direct typographic roles and no App control exists for the same purpose.
 
 ### 2.3 Controlled & Uncontrolled Props
 
