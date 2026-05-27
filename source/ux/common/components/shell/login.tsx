@@ -18,7 +18,17 @@ Login Passwordless OTP login component.
 
 import { createSignal, Show } from '@solid-js'
 import { api } from '@ux/api'
-import { AppButton, AppInput } from '@ux/common/components/controls'
+import {
+  AppAlert,
+  AppButton,
+  AppField,
+  AppFormActions,
+  AppInput,
+  AppLayout
+} from '@ux/common/components/controls'
+
+import '@ux/common/assets/css/login.css'
+import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
 
 /** OTP flow step discriminator. */
 type LoginStep = 'email' | 'code'
@@ -57,21 +67,43 @@ export const Login = () => {
   }
 
   return (
-    <div class='login'>
-      <Show
-        when={step() === 'email'}
-        fallback={
-          <form
-            onSubmit={e => {
-              e.preventDefault()
-              void submitCode()
-            }}
-          >
-            <h1>swarmAg</h1>
-            <p>Enter the code sent to {email()}</p>
-            <label for='code'>Code</label>
+    <div data-ui='login' data-theme='light'>
+      <div data-ui='login-hero'>
+        <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
+      </div>
+      <div data-ui='login-form'>
+        <Show when={step() === 'email'}>
+          <p>Enter your email to receive a one-time sign-in code.</p>
+          <AppField for='email' label='Email'>
             <AppInput
-              id='code'
+              name='email'
+              type='email'
+              autocomplete='email'
+              value={email()}
+              onInput={e => setEmail(e.currentTarget.value)}
+              error={error() !== null}
+              disabled={pending()}
+              required
+            />
+          </AppField>
+          <AppLayout variant='inline-fill'>
+            <AppButton
+              type='button'
+              variant='primary'
+              loading={pending()}
+              onClick={() => void submitEmail()}
+            >
+              Send Code
+            </AppButton>
+          </AppLayout>
+        </Show>
+        <Show when={step() === 'code'}>
+          <p>
+            Enter the 6-digit code sent to <strong>{email()}</strong>.
+          </p>
+          <AppField for='code' label='Code'>
+            <AppInput
+              name='code'
               type='text'
               inputMode='numeric'
               autocomplete='one-time-code'
@@ -81,40 +113,25 @@ export const Login = () => {
               disabled={pending()}
               required
             />
-            <AppButton type='submit' variant='primary' loading={pending()}>Sign In</AppButton>
-            <AppButton type='button' variant='secondary' onClick={() => setStep('email')}>
+          </AppField>
+          <AppFormActions>
+            <AppButton type='button' variant='ghost' onClick={() => setStep('email')}>
               Back
             </AppButton>
-            <Show when={error()}>
-              <p class='login-error'>{error()}</p>
-            </Show>
-          </form>
-        }
-      >
-        <form
-          onSubmit={e => {
-            e.preventDefault()
-            void submitEmail()
-          }}
-        >
-          <h1>swarmAg</h1>
-          <label for='email'>Email</label>
-          <AppInput
-            id='email'
-            type='email'
-            autocomplete='email'
-            value={email()}
-            onInput={e => setEmail(e.currentTarget.value)}
-            error={error() !== null}
-            disabled={pending()}
-            required
-          />
-          <AppButton type='submit' variant='primary' loading={pending()}>Send Code</AppButton>
-          <Show when={error()}>
-            <p class='login-error'>{error()}</p>
-          </Show>
-        </form>
-      </Show>
+            <AppButton
+              type='button'
+              variant='primary'
+              loading={pending()}
+              onClick={() => void submitCode()}
+            >
+              Sign In
+            </AppButton>
+          </AppFormActions>
+        </Show>
+        <Show when={!!error()}>
+          <AppAlert variant='danger'>{error()}</AppAlert>
+        </Show>
+      </div>
     </div>
   )
 }
