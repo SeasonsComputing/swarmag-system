@@ -390,7 +390,7 @@
   --sa-border-strong: 1px solid oklch(30% 0.04 220 / 0.28);
   --sa-border-brand: 1px solid var(--sa-color-primary);
   --sa-border-table: oklch(83% 0.02 120);
-  --sa-border-input: 1px solid oklch(78% 0.026 125);
+  --sa-border-input: 1px solid oklch(34% 0.03 220 / 0.16);
   --sa-border-input-focus: var(--sa-color-primary);
   --sa-border-input-error: oklch(var(--sa-p-danger));
   --sa-border-card: 1px solid oklch(32% 0.035 220 / 0.14);
@@ -503,8 +503,8 @@
   --sa-button-color-danger: var(--sa-text-on-brand);
 
   /* Input */
-  --sa-input-bg: var(--sa-bg-control);
-  --sa-input-bg-focus: oklch(98.6% 0.018 112);
+  --sa-input-bg: oklch(98.6% 0.018 112);
+  --sa-input-bg-focus: oklch(91.5% 0.042 170);
   --sa-input-bg-disabled: oklch(93.5% 0.01 108);
 
   /* Control (shared error state) */

@@ -111,7 +111,7 @@
 [data-ui='single-select'] {
   align-items: center;
   background: var(--sa-input-bg);
-  border: var(--sa-border-default);
+  border: var(--sa-border-input);
   border-radius: var(--sa-radius-md);
   color: var(--sa-text-primary);
   cursor: pointer;
@@ -203,7 +203,7 @@
   border: var(--sa-card-panel-border);
   border-radius: var(--sa-radius-sm);
   box-shadow: var(--sa-shadow-sm);
-  color: var(--sa-text-primary);
+  color: var(--sa-text-muted);
   display: grid;
   font-size: var(--sa-label-font-size);
   gap: var(--sa-space-xs);
@@ -216,7 +216,7 @@
   background: var(--sa-single-select-item-bg);
   border-inline-start: var(--sa-single-select-item-border-start);
   border-radius: var(--sa-radius-sm);
-  color: var(--sa-text-primary);
+  color: var(--sa-text-muted);
   cursor: pointer;
   display: flex;
   font-family: var(--sa-label-font-family);
@@ -231,6 +231,7 @@
 [data-ui='single-select-item']:not([data-selected]):hover,
 [data-ui='single-select-item'][data-highlighted]:not([data-selected]) {
   background: var(--sa-single-select-item-bg-hover);
+  color: var(--sa-text-primary);
 }
 
 [data-ui='single-select-item'][data-disabled] {
@@ -251,7 +252,7 @@
 }
 
 [data-ui='single-select-item'][data-selected]:hover,
-[data-ui='select-content'] [data-ui='single-select-item'][data-highlighted][data-selected] {
+[data-ui='single-select-content'] [data-ui='single-select-item'][data-highlighted][data-selected] {
   background: color-mix(
     in oklch,
     var(--sa-bg-selected) 76%,
@@ -281,7 +282,7 @@
   background: var(--sa-multi-select-item-bg);
   border-inline-start: var(--sa-multi-select-item-border-start);
   border-radius: var(--sa-radius-sm);
-  color: var(--sa-text-primary);
+  color: var(--sa-text-muted);
   cursor: pointer;
   display: flex;
   font-family: var(--sa-label-font-family);
@@ -293,9 +294,9 @@
   transition: var(--sa-transition-fast);
 }
 
-[data-ui='multi-select-item']:hover,
-[data-ui='multi-select-item'][data-highlighted] {
+[data-ui='multi-select-item']:hover {
   background: var(--sa-multi-select-item-bg-hover);
+  color: var(--sa-text-primary);
 }
 
 [data-ui='multi-select-item'][data-selected] {
@@ -310,8 +311,7 @@
   font-weight: var(--sa-ui-checkmark-weight);
 }
 
-[data-ui='multi-select-item'][data-selected]:hover,
-[data-ui='multi-select-item'][data-highlighted][data-selected] {
+[data-ui='multi-select-item'][data-selected]:hover {
   background: color-mix(in oklch, var(--sa-bg-selected) 76%, var(--sa-color-primary) 24%);
 }
 
@@ -394,7 +394,7 @@
 
 [data-ui='checkbox'] label,
 [data-ui='radio-item'] label {
-  color: var(--sa-text-primary);
+  color: var(--sa-text-muted);
   cursor: inherit;
 }
 
@@ -444,6 +444,11 @@
 [data-ui='radio-item']:not([data-disabled]):hover [data-ui='radio']:not([data-checked]) {
   background: var(--sa-bg-hover);
   border-color: var(--sa-color-primary);
+}
+
+[data-ui='checkbox']:not([data-ui-state='disabled']):hover label,
+[data-ui='radio-item']:not([data-disabled]):hover label {
+  color: var(--sa-text-primary);
 }
 
 [data-ui='checkbox'] > div[data-checked],
@@ -594,6 +599,7 @@
 [data-ui='toggle']:hover,
 [data-ui='toggle-item']:hover {
   background: var(--sa-bg-hover);
+  color: var(--sa-text-primary);
 }
 
 [data-ui='toggle']:focus-visible,
@@ -671,6 +677,7 @@
 
 [data-ui='tab-list'] [data-ui='tab']:hover {
   background: var(--sa-bg-hover);
+  color: var(--sa-text-primary);
 }
 
 [data-ui='tab-list'] [data-ui='tab']:focus-visible {
