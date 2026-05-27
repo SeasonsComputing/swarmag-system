@@ -1,0 +1,42 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Login shell styles                                                           ║
+║ Full-bleed login layout: hero zone (logo) + form zone (OTP fields).         ║
+║ Scoped to [data-ui='login'] and its children only.                           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-ui='login'] {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+[data-ui='login-hero'] {
+  flex: 0 0 50dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sa-space-xl);
+}
+
+[data-ui='login-logo'] {
+  width: 100%;
+  max-width: 320px;
+  height: auto;
+  display: block;
+}
+
+[data-ui='login-form'] {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--sa-space-xl);
+  gap: var(--sa-space-md);
+}
+
+[data-ui='login-form'] > * {
+  width: 100%;
+  max-width: 400px;
+}
