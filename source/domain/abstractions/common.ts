@@ -36,23 +36,6 @@ Answer                  Captured response to a question.
 
 import type { AssociationOne, CompositionMany, CompositionPositive, Instantiable, When } from '@core/std'
 
-/** Canonical field keys for Location. */
-export const LOCATION_FIELDS = [
-  'latitude',
-  'longitude',
-  'altitudeMeters',
-  'line1',
-  'line2',
-  'city',
-  'state',
-  'postalCode',
-  'country',
-  'recordedAt',
-  'accuracyMeters',
-  'description'
-] as const
-export type LocationField = (typeof LOCATION_FIELDS)[number]
-
 /** Geographic position plus optional address metadata. */
 export type Location = {
   latitude: number
