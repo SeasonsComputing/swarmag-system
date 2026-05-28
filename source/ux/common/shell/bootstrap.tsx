@@ -11,7 +11,7 @@ performs the boot-time user fetch, and mounts the TanStack Router route tree.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-(entry point — no exported symbols)
+bootstrap() - Boots the application
 */
 
 import { onCleanup, onMount } from '@solid-js'
@@ -24,7 +24,7 @@ import {
   RouterProvider
 } from '@tanstack/solid-router'
 import { api } from '@ux/api'
-import { AuthGuard } from '@ux/common/components/shell/auth-guard.tsx'
+import { AuthGuard } from './auth-guard.tsx'
 import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
@@ -66,7 +66,7 @@ const router = createRouter({ routeTree })
 // APPLICATION ROOT
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Admin application root; wires auth state and mounts the router. */
+/** Standard application root; wires auth state and mounts the router. */
 const Application = () => {
   onMount(() => {
     const unsubscribe = api.Auth.onAuthStateChange(async session => {

@@ -18,6 +18,8 @@ import {
   AppToggleItem, AppTooltip, AppComponent
 } from '@ux/common/components/controls'
 
+import '@ux/common/components/css/css.tsx'
+
 // dprint-ignore
 import {
   ACCORDION_DEFAULT_VALUE,

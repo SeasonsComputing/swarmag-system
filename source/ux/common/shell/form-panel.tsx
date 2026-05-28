@@ -14,15 +14,13 @@ PUBLIC
 FormPanel  Adaptive form container component.
 */
 
-import type { JSX } from '@solid-js'
+import type { AppComponent, AppContainerProps } from '@ux/common/components/controls'
 
 /** FormPanel props. */
-type FormPanelProps = {
-  children: JSX.Element
-}
+type FormPanelProps = AppContainerProps
 
 /** Adaptive form container — full-screen on mobile, modal-centred on desktop. */
-export const FormPanel = (props: FormPanelProps) => (
+export const FormPanel = (props: FormPanelProps): AppComponent => (
   <div class='form-panel'>
     {props.children}
   </div>

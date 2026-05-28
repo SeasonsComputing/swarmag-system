@@ -13,16 +13,14 @@ PUBLIC
 Content  Main content frame component.
 */
 
-import type { JSX } from '@solid-js'
+import type { AppComponent, AppContainerProps } from '@ux/common/components/controls'
 
-/** Content props. */
-type ContentProps = {
-  children: JSX.Element
-}
+/** Props for the Content component. */
+export type ContentProps = AppContainerProps
 
 /** Main content frame for authenticated app views. */
-export const Content = (props: ContentProps) => (
-  <main class='content'>
+export const Content = (props: AppContainerProps): AppComponent => (
+  <main>
     {props.children}
   </main>
 )

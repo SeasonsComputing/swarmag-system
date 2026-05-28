@@ -27,7 +27,7 @@ import {
   AppLayout
 } from '@ux/common/components/controls'
 
-import '@ux/common/assets/css/login.css'
+import './login.css'
 import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
 
 /** OTP flow step discriminator. */
