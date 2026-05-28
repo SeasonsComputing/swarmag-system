@@ -1,5 +1,5 @@
 const ROOT = Deno.cwd().replaceAll('\\', '/')
-const CSS_DIR = `${ROOT}/source/ux/common/assets/css`
+const CSS_DIR = `${ROOT}/source/ux/common/components/css`
 
 const CSS_FILES = ['tokens.css', 'themes.css', 'base.css', 'controls.css']
 
@@ -326,7 +326,7 @@ const main = async () => {
 
   for (const fileName of CSS_FILES) {
     const filePath = `${CSS_DIR}/${fileName}`
-    const relative = `source/ux/common/assets/css/${fileName}`
+    const relative = `source/ux/common/components/css/${fileName}`
 
     const content = await Deno.readTextFile(filePath)
     const lines = parseLines(content)

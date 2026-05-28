@@ -14,13 +14,10 @@ Consumers of controls use `ux-components-guide.md`.
 
 ### 2.1 Files
 
-Four files live in `source/ux/common/assets/css/`. App roots import them once, in this order:
+Four foundation files live in `source/ux/common/components/css/`. App roots import the shared CSS barrel once:
 
 ```typescript
-import '@ux/common/assets/css/tokens.css'
-import '@ux/common/assets/css/themes.css'
-import '@ux/common/assets/css/base.css'
-import '@ux/common/assets/css/controls.css'
+import '@ux/common/components/css/css.tsx'
 ```
 
 | File           | Owns                                                                                                      | Must not contain                                      |
@@ -30,17 +27,22 @@ import '@ux/common/assets/css/controls.css'
 | `base.css`     | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles | Reusable control visuals, app/page layout rules       |
 | `controls.css` | Reusable App control visuals and declared control parts                                                   | Primitive palette references, app/page-specific rules |
 
+Shell-specific styles live with the shell component that owns them. For example,
+`source/ux/common/shell/login.css` is imported by the login shell component
+rather than by app roots.
+
 Raw values are allowed in `tokens.css` and `themes.css` because they define the design vocabulary. Raw browser/platform values are allowed sparingly in `base.css`. `controls.css` uses tokens for meaningful visual values; CSS keywords (`none`, `unset`, `inherit`, `auto`, `transparent`) may appear where tokenization adds no meaning.
 
 ### 2.2 Token Layers
 
-| Layer          | File           | Scope                                     |
-| -------------- | -------------- | ----------------------------------------- |
-| Primitive      | `tokens.css`   | Bare L C H triplets and foundation scales |
-| Role / theme   | `themes.css`   | Resolved semantic roles per theme         |
-| Component      | `themes.css`   | App control tokens                        |
-| Foundation CSS | `base.css`     | Browser and semantic HTML element styling |
-| Control CSS    | `controls.css` | App control and declared part styling     |
+| Layer          | File            | Scope                                     |
+| -------------- | --------------- | ----------------------------------------- |
+| Primitive      | `tokens.css`    | Bare L C H triplets and foundation scales |
+| Role / theme   | `themes.css`    | Resolved semantic roles per theme         |
+| Component      | `themes.css`    | App control tokens                        |
+| Foundation CSS | `base.css`      | Browser and semantic HTML element styling |
+| Control CSS    | `controls.css`  | App control and declared part styling     |
+| Shell CSS      | Shell-local CSS | Shell component-specific styling          |
 
 Controls follow this dependency order:
 
@@ -94,12 +96,12 @@ All tokens use the `--sa-` prefix.
 ux/
 └── common/
     ├── assets/
-    │   ├── css/         — tokens.css, themes.css, base.css, controls.css
-    │   ├── fonts/       — self-hosted woff2 font assets
-    │   ├── icons/       — icon library
     │   └── logos/       — shared logo assets
+    ├── shell/           — application shell foundation and shell-local CSS
     └── components/
-        ├── shell/       — application shell foundation
+        ├── css/         — CSS barrel, tokens, themes, base, controls
+        ├── fonts/       — self-hosted woff2 font assets
+        ├── icons/       — icon library
         ├── controls/    — App control primitives
         └── charts/      — chart control primitives
 ```
