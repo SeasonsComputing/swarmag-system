@@ -14,13 +14,14 @@ AppSpinner  Spinner control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
 
 /** Spinner control props. */
 export type AppSpinnerProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
   >
   & {
     error?: boolean

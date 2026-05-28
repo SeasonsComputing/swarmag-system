@@ -14,10 +14,10 @@ PUBLIC
 AppFormActions  Right-aligned action row.
 */
 
-import { type AppComponent } from './controls-helpers.ts'
+import type { AppComponent, AppContainerProps } from './controls-helpers.ts'
 
 /** AppFormActions props. */
-export type AppFormActionsProps = { children: AppComponent }
+export type AppFormActionsProps = AppContainerProps
 
 /** Right-aligned action button row. Always separate from the field grid. */
 export const AppFormActions = (props: AppFormActionsProps): AppComponent => (

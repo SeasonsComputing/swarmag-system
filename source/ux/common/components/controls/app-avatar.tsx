@@ -14,13 +14,14 @@ AppAvatar  Avatar control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
 
 /** Avatar control props. */
 export type AppAvatarProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLSpanElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
   >
   & {
     error?: boolean

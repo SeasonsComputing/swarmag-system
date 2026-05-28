@@ -18,15 +18,17 @@ AppTableCell    Cell — renders <th> inside AppTableHeader, <td> elsewhere. Acc
 */
 
 import { createContext, type JSX, splitProps, useContext } from '@solid-js'
-import { type AppComponent } from './controls-helpers.ts'
+import type { AppComponent, AppComponentProps, AppContainerProps } from './controls-helpers.ts'
 
 const TableHeaderCtx = createContext(false)
 const TableSectionCtx = createContext(false)
 
+/** AppTable props. */
 export type AppTableProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
   >
   & {
     class?: never
@@ -36,14 +38,15 @@ export type AppTableProps =
     'data-ui-variant'?: never
   }
 
-export type AppTableHeaderProps = {
-  children: AppComponent
-}
+/** AppTableHeader props. */
+export type AppTableHeaderProps = AppContainerProps
 
+/** AppTableBody props. */
 export type AppTableBodyProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableSectionElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
   >
   & {
     class?: never
@@ -53,10 +56,12 @@ export type AppTableBodyProps =
     'data-ui-variant'?: never
   }
 
+/** AppTableRow props. */
 export type AppTableRowProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableRowElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
   >
   & {
     variant?: 'section'
@@ -67,10 +72,12 @@ export type AppTableRowProps =
     'data-ui-variant'?: never
   }
 
+/** AppTableCell props. */
 export type AppTableCellProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableCellElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant' | 'align'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant' | 'align'
   >
   & {
     align?: 'start' | 'center' | 'end'

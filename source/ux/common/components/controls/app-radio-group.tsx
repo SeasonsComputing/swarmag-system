@@ -20,11 +20,15 @@ import {
   type RadioGroupRootProps
 } from '@kobalte/core/radio-group'
 import { type Component, splitProps } from '@solid-js'
-import { type AppComponent, controlState, type WithDataUI } from './controls-helpers.ts'
+import {
+  type AppComponent,
+  type AppComponentProps,
+  controlState,
+  type WithDataUI
+} from './controls-helpers.ts'
 
 /** Radio-group control props. */
-export type AppRadioGroupProps<Value extends string = string> = {
-  children?: AppComponent
+export type AppRadioGroupProps<Value extends string = string> = AppComponentProps & {
   disabled?: boolean
   error?: boolean
   loading?: boolean
@@ -41,8 +45,7 @@ export type AppRadioGroupProps<Value extends string = string> = {
 }
 
 /** Radio item control props. */
-export type AppRadioItemProps<Value extends string = string> = {
-  children?: AppComponent
+export type AppRadioItemProps<Value extends string = string> = AppComponentProps & {
   value: Value
   disabled?: boolean
   class?: never

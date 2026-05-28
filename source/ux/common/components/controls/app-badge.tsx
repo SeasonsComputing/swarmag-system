@@ -14,16 +14,17 @@ AppBadge  Badge control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
 
 /** Badge variants declared by the design language. */
 export type AppBadgeVariant = 'success' | 'warning' | 'danger' | 'info'
 
 /** Badge control props. */
 export type AppBadgeProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLSpanElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
   >
   & {
     variant?: AppBadgeVariant

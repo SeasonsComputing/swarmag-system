@@ -23,11 +23,15 @@ import {
   type AccordionTriggerProps
 } from '@kobalte/core/accordion'
 import { type Component, splitProps } from '@solid-js'
-import { type AppComponent, controlState, type WithDataUI } from './controls-helpers.ts'
+import {
+  type AppComponent,
+  type AppComponentProps,
+  controlState,
+  type WithDataUI
+} from './controls-helpers.ts'
 
 /** Accordion root props. */
-export type AppAccordionProps = {
-  children?: AppComponent
+export type AppAccordionProps = AppComponentProps & {
   error?: boolean
   loading?: boolean
   multiple?: boolean
@@ -42,8 +46,7 @@ export type AppAccordionProps = {
 }
 
 /** Accordion item props. */
-export type AppAccordionItemProps = {
-  children?: AppComponent
+export type AppAccordionItemProps = AppComponentProps & {
   value: string
   disabled?: boolean
   class?: never
@@ -53,8 +56,7 @@ export type AppAccordionItemProps = {
 }
 
 /** Accordion trigger props. */
-export type AppAccordionTriggerProps = {
-  children?: AppComponent
+export type AppAccordionTriggerProps = AppComponentProps & {
   class?: never
   classList?: never
   style?: never
@@ -62,8 +64,7 @@ export type AppAccordionTriggerProps = {
 }
 
 /** Accordion content props. */
-export type AppAccordionContentProps = {
-  children?: AppComponent
+export type AppAccordionContentProps = AppComponentProps & {
   class?: never
   classList?: never
   style?: never

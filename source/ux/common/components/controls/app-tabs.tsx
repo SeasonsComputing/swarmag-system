@@ -24,14 +24,18 @@ import {
   type TabsTriggerProps
 } from '@kobalte/core/tabs'
 import { type Component, splitProps } from '@solid-js'
-import { type AppComponent, controlState, type WithDataUI } from './controls-helpers.ts'
+import {
+  type AppComponent,
+  type AppComponentProps,
+  controlState,
+  type WithDataUI
+} from './controls-helpers.ts'
 
 /** Tabs control props. */
 export type AppTabsActivationMode = 'automatic' | 'manual'
 
 /** Tabs control props. */
-export type AppTabsProps<Value extends string = string> = {
-  children?: AppComponent
+export type AppTabsProps<Value extends string = string> = AppComponentProps & {
   disabled?: boolean
   error?: boolean
   loading?: boolean
@@ -47,8 +51,7 @@ export type AppTabsProps<Value extends string = string> = {
 }
 
 /** Tab list control props. */
-export type AppTabListProps = {
-  children?: AppComponent
+export type AppTabListProps = AppComponentProps & {
   class?: never
   classList?: never
   style?: never
@@ -56,8 +59,7 @@ export type AppTabListProps = {
 }
 
 /** Tab trigger control props. */
-export type AppTabProps<Value extends string = string> = {
-  children?: AppComponent
+export type AppTabProps<Value extends string = string> = AppComponentProps & {
   value: Value
   disabled?: boolean
   class?: never
@@ -67,8 +69,7 @@ export type AppTabProps<Value extends string = string> = {
 }
 
 /** Tab panel control props. */
-export type AppTabPanelProps<Value extends string = string> = {
-  children?: AppComponent
+export type AppTabPanelProps<Value extends string = string> = AppComponentProps & {
   value: Value
   class?: never
   classList?: never

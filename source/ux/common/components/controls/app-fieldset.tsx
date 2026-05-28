@@ -15,13 +15,12 @@ PUBLIC
 AppFieldset  Semantic field group wrapper with named legend.
 */
 
-import { type AppComponent } from './controls-helpers.ts'
+import type { AppComponent, AppContainerProps } from './controls-helpers.ts'
 
 /** AppFieldset props. */
-export type AppFieldsetProps = {
+export type AppFieldsetProps = AppContainerProps & {
   /** Text content of the group legend — names the group, never wraps controls. */
   legend: string
-  children: AppComponent
 }
 
 /** Semantic field group with legend. Compose AppFormGrid inside for field layout. */

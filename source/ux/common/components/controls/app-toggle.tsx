@@ -15,13 +15,14 @@ AppToggle  Toggle control with declared states.
 
 import { ToggleButton } from '@kobalte/core/toggle-button'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
 
 /** Toggle control props. */
 export type AppToggleProps =
+  & AppComponentProps
   & Omit<
     JSX.ButtonHTMLAttributes<HTMLButtonElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
   >
   & {
     error?: boolean

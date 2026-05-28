@@ -14,16 +14,17 @@ AppAlert  Alert control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
 
 /** Alert variants declared by the design language. */
 export type AppAlertVariant = 'success' | 'warning' | 'danger' | 'info'
 
 /** Alert control props. */
 export type AppAlertProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
   >
   & {
     variant?: AppAlertVariant
