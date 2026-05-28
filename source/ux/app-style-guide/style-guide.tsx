@@ -15,22 +15,25 @@ import {
   AppPopover, AppProgress, AppRadioGroup, AppRadioItem, AppSingleSelect, AppSeparator,
   AppSkeleton, AppSpinner, AppTab, AppTable, AppTableBody, AppTableCell, AppTableHeader,
   AppTableRow, AppTabList, AppTabPanel, AppTabs, AppTextarea, AppToggle, AppToggleGroup,
-  AppToggleItem, AppTooltip, AppComponent
+  AppToggleItem, AppTooltip, type AppComponent, type AppContainerProps
 } from '@ux/common/components/controls'
 
 import '@ux/common/components/css/css.tsx'
-
-// dprint-ignore
-import {
-  ACCORDION_DEFAULT_VALUE,
-  DEFAULT_SERVICES, BUTTON_VARIANTS, COLOR_SWATCHES,
-  EQUIPMENT, SERVICES, STATUSES
-} from './style-guide-fixtures.ts'
-
 import './style-guide.css'
+
 import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
 
-type SgSectionProps = { children: AppComponent; title: string }
+import {
+  ACCORDION_DEFAULT_VALUE,
+  BUTTON_VARIANTS,
+  COLOR_SWATCHES,
+  DEFAULT_SERVICES,
+  EQUIPMENT,
+  SERVICES,
+  STATUSES
+} from './style-guide-fixtures.ts'
+
+/** Style-guide specimen enumerations */
 type Theme = 'dark' | 'light'
 type Services = 'aerial' | 'ground'
 type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
@@ -60,7 +63,19 @@ const SgHeader = (): AppComponent => {
   )
 }
 
+/** Footer for the style guide. */
+const SgFooter = (): AppComponent => (<AppFooter logo={logo} alt='swarmAg' />)
+
+/** Main content area for the style guide. */
+type SgMainProps = AppContainerProps
+const SgMain = (props: SgMainProps): AppComponent => (
+  <main class='sg-main'>
+    {props.children}
+  </main>
+)
+
 /** Framed style-guide section used to group related control specimens. */
+type SgSectionProps = AppContainerProps & { title: string }
 const SgSection = (props: SgSectionProps): AppComponent => (
   <section class='sg-section'>
     <AppCard>
@@ -70,6 +85,22 @@ const SgSection = (props: SgSectionProps): AppComponent => (
       </AppLayout>
     </AppCard>
   </section>
+)
+
+/** Color swatch used to display a color value and its token name. */
+type SgSwatchProps = {
+  value: string
+  label: string
+  token: string
+}
+const SgSwatch = (props: SgSwatchProps): AppComponent => (
+  <figure class='sg-swatch'>
+    <div class='sg-swatch-chip' style={{ background: props.value }} />
+    <figcaption>
+      <span>{props.label}</span>
+      <code>{props.token}</code>
+    </figcaption>
+  </figure>
 )
 
 /** Single-page living style guide application. */
@@ -89,7 +120,7 @@ export const StyleGuide = (): AppComponent => {
     <>
       <SgHeader />
 
-      <main class='sg-page'>
+      <SgMain>
         <SgSection title='Typography'>
           <AppFieldset legend='h1 – h5'>
             <h1>H1 Operations Command</h1>
@@ -178,21 +209,21 @@ export const StyleGuide = (): AppComponent => {
             </AppTableHeader>
             <AppTableBody>
               <For each={EQUIPMENT}>
-                {group => (
+                {e => (
                   <>
                     <AppTableRow variant='section'>
-                      <AppTableCell>{group.section}</AppTableCell>
+                      <AppTableCell>{e.section}</AppTableCell>
                     </AppTableRow>
-                    <For each={group.items}>
-                      {item => (
+                    <For each={e.items}>
+                      {i => (
                         <AppTableRow>
-                          <AppTableCell>{item.name}</AppTableCell>
-                          <AppTableCell>{item.application}</AppTableCell>
+                          <AppTableCell>{i.name}</AppTableCell>
+                          <AppTableCell>{i.application}</AppTableCell>
                           <AppTableCell align='end'>
-                            <samp>{item.price}</samp>
+                            <samp>{i.price}</samp>
                           </AppTableCell>
                           <AppTableCell align='end'>
-                            <samp>{item.cost}</samp>
+                            <samp>{i.cost}</samp>
                           </AppTableCell>
                         </AppTableRow>
                       )}
@@ -239,15 +270,7 @@ export const StyleGuide = (): AppComponent => {
           <AppFieldset legend='Swatches'>
             <AppLayout variant='inline-fill'>
               <For each={COLOR_SWATCHES}>
-                {swatch => (
-                  <figure class='sg-swatch'>
-                    <div class='sg-swatch-chip' style={{ background: swatch.value }} />
-                    <figcaption>
-                      <span>{swatch.label}</span>
-                      <code>{swatch.token}</code>
-                    </figcaption>
-                  </figure>
-                )}
+                {s => <SgSwatch value={s.value} label={s.label} token={s.token} />}
               </For>
             </AppLayout>
           </AppFieldset>
@@ -292,7 +315,7 @@ export const StyleGuide = (): AppComponent => {
           <AppFieldset legend='Variants'>
             <AppLayout variant='inline'>
               <For each={BUTTON_VARIANTS}>
-                {entry => <AppButton variant={entry.variant}>{entry.label}</AppButton>}
+                {b => <AppButton variant={b.variant}>{b.label}</AppButton>}
               </For>
             </AppLayout>
           </AppFieldset>
@@ -438,7 +461,7 @@ export const StyleGuide = (): AppComponent => {
           </AppLayout>
         </SgSection>
 
-        <SgSection title='AppRadioGroup + AppRadioItem'>
+        <SgSection title='AppRadioGroup / AppRadioItem'>
           <AppFormGrid>
             <AppRadioGroup value={radioValue()} onChange={setRadioValue}>
               <AppRadioItem value='aerial'>Aerial application</AppRadioItem>
@@ -458,7 +481,7 @@ export const StyleGuide = (): AppComponent => {
           </AppFormGrid>
         </SgSection>
 
-        <SgSection title='AppToggle / AppToggleGroup + AppToggleItem'>
+        <SgSection title='AppToggle / AppToggleGroup / AppToggleItem'>
           <AppLayout variant='inline'>
             <AppToggle pressed={togglePressed()} onClick={() => setTogglePressed(!togglePressed())}>
               Active crews
@@ -603,7 +626,7 @@ export const StyleGuide = (): AppComponent => {
               <AppLayout>
                 <h3>Default card</h3>
                 <p>
-                  Quiet interior surface — no variant. Used for form SgSections and guided workflow
+                  Quiet interior surface — no variant. Used for form sections and guided workflow
                   sub-groups.
                 </p>
               </AppLayout>
@@ -660,9 +683,9 @@ export const StyleGuide = (): AppComponent => {
           {/* TODO: AppChart - pending chart primitive */}
           <AppSkeleton />
         </SgSection>
-      </main>
+      </SgMain>
 
-      <AppFooter logo={logo} alt='swarmAg' />
+      <SgFooter />
     </>
   )
 }
