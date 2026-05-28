@@ -4,14 +4,15 @@
 
 import type { JSX } from '@solid-js'
 
-/** App control component return value. */
+/** App component abstractions. */
 export type AppComponent = JSX.Element
+export type AppContainerProps = { children: AppComponent }
+export type AppComponentProps = { children?: AppComponent }
 
 /** Extends a Kobalte component's prop type to accept data-ui and data-ui-state attributes. */
-export type WithDataUI<T> = T & {
+export type WithDataUI<T> = T & AppComponentProps & {
   'data-ui'?: string
   'data-ui-state'?: string
-  children?: AppComponent
 }
 
 /** Semantic control state values allowed by the design language. */

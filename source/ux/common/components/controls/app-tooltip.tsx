@@ -16,11 +16,10 @@ AppTooltip  Tooltip control with declared states.
 import { Tooltip } from '@kobalte/core/tooltip'
 import { splitProps } from '@solid-js'
 import { AppButton, type AppButtonVariant } from './app-button.tsx'
-import { type AppComponent, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
 
 /** Tooltip control props. */
-export type AppTooltipProps = {
-  children?: AppComponent
+export type AppTooltipProps = AppComponentProps & {
   trigger?: AppComponent
   triggerVariant?: AppButtonVariant
   open?: boolean

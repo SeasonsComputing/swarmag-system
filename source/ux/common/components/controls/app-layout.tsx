@@ -14,7 +14,7 @@ AppLayout  Layout container with declared variant and gap density.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps } from './controls-helpers.ts'
 
 /** Layout variant. Omit for block (default full-width grid). */
 export type AppLayoutVariant = 'block-fit' | 'inline' | 'inline-fill'
@@ -24,12 +24,18 @@ export type AppLayoutGap = 'tight' | 'none'
 
 /** Layout control props. */
 export type AppLayoutProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant' | 'data-ui-gap'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-variant'
+    | 'data-ui-gap'
   >
   & {
-    children?: AppComponent
     gap?: AppLayoutGap
     variant?: AppLayoutVariant
     class?: never

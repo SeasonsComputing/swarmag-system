@@ -20,11 +20,15 @@ import {
   type ToggleGroupRootProps
 } from '@kobalte/core/toggle-group'
 import { type Component, createEffect, createSignal, splitProps } from '@solid-js'
-import { type AppComponent, controlState, type WithDataUI } from './controls-helpers.ts'
+import {
+  type AppComponent,
+  type AppComponentProps,
+  controlState,
+  type WithDataUI
+} from './controls-helpers.ts'
 
 /** Toggle-group control props. */
-export type AppToggleGroupProps<Value extends string = string> = {
-  children?: AppComponent
+export type AppToggleGroupProps<Value extends string = string> = AppComponentProps & {
   disabled?: boolean
   error?: boolean
   loading?: boolean
@@ -39,8 +43,7 @@ export type AppToggleGroupProps<Value extends string = string> = {
 }
 
 /** Toggle item control props. */
-export type AppToggleItemProps<Value extends string = string> = {
-  children?: AppComponent
+export type AppToggleItemProps<Value extends string = string> = AppComponentProps & {
   value: Value
   disabled?: boolean
   class?: never

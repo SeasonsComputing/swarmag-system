@@ -15,17 +15,16 @@ PUBLIC
 AppField  Label + control field wrapper.
 */
 
-import { type AppComponent } from './controls-helpers.ts'
+import type { AppComponent, AppContainerProps } from './controls-helpers.ts'
 
 /** AppField props. */
-export type AppFieldProps = {
+export type AppFieldProps = AppContainerProps & {
   /** Text content of the field label. */
   label: string
   /** ID of the associated control — wired to the label's `for` attribute. */
   for: string
   /** Optional layout variant. `'inline'` places label and control side-by-side. */
   variant?: 'inline'
-  children: AppComponent
 }
 
 /** Label + control field wrapper. Label and control are siblings, never nested. */

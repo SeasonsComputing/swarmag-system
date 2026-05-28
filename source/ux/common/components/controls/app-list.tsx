@@ -15,16 +15,17 @@ AppListItem  List item — child of AppList.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps } from './controls-helpers.ts'
 
 /** List variant. Omit for a clean unstyled list. */
 export type AppListVariant = 'bullet' | 'numbered'
 
 /** List control props. */
 export type AppListProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLUListElement | HTMLOListElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
   >
   & {
     variant?: AppListVariant
@@ -37,9 +38,10 @@ export type AppListProps =
 
 /** List item props. */
 export type AppListItemProps =
+  & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLLIElement>,
-    'class' | 'classList' | 'style' | 'data-ui'
+    'children' | 'class' | 'classList' | 'style' | 'data-ui'
   >
   & {
     class?: never
