@@ -325,6 +325,11 @@
  * ───────────────────────────────────────────────────────────────────────────
  */
 
+[data-ui='table'] {
+  border: var(--sa-card-panel-border);
+  box-shadow: var(--sa-shadow-md);
+}
+
 [data-ui='table-row'][data-ui-variant='section'] [data-ui='table-cell'] {
   background: var(--sa-table-bg-section);
   color: var(--sa-table-color-section);
@@ -1040,6 +1045,12 @@
 
 [data-ui='fieldset'] {
   border: var(--sa-fieldset-border);
+  background: var(--sa-fieldset-bg);
+  box-shadow: var(--sa-fieldset-shadow);
+}
+
+[data-ui='fieldset'] > legend {
+  color: var(--sa-text-h3);
 }
 
 [data-ui='form-grid'] {
