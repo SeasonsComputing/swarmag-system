@@ -427,18 +427,14 @@ export const StyleGuide = (): AppComponent => {
                 />
               </AppField>
             </AppFormGrid>
-          </AppFieldset>
-          <AppFieldset legend='Application window'>
-            <AppFormGrid>
-              <AppField label='Application notes' for='form-demo-notes'>
-                <AppTextarea
-                  name='form-demo-notes'
-                  value='Spray window 06:00–09:00.'
-                  onInput={() => undefined}
-                  rows={3}
-                />
-              </AppField>
-            </AppFormGrid>
+            <AppField label='Application notes' for='form-demo-notes'>
+              <AppTextarea
+                name='form-demo-notes'
+                value='Spray window 06:00–09:00.'
+                onInput={() => undefined}
+                rows={3}
+              />
+            </AppField>
           </AppFieldset>
           <AppFormActions>
             <AppButton variant='ghost'>Cancel</AppButton>
@@ -647,22 +643,22 @@ export const StyleGuide = (): AppComponent => {
         </SgSection>
 
         <SgSection title='AppLayout'>
-          <AppFieldset legend='block (default)'>
-            <AppLayout>
-              <AppAlert>North Field spray window confirmed.</AppAlert>
-              <AppAlert variant='warning'>Wind speed approaching threshold.</AppAlert>
-              <AppAlert variant='success'>Crew pre-check complete.</AppAlert>
-            </AppLayout>
-          </AppFieldset>
-
-          <AppFieldset legend='block-fit'>
-            <AppLayout variant='block-fit'>
-              <AppBadge>Pending</AppBadge>
-              <AppBadge variant='success'>Field ready</AppBadge>
-              <AppBadge variant='warning'>Wind watch</AppBadge>
-            </AppLayout>
-          </AppFieldset>
-
+          <AppFormGrid>
+            <AppFieldset legend='block (default)'>
+              <AppLayout>
+                <AppAlert>North Field spray window confirmed.</AppAlert>
+                <AppAlert variant='warning'>Wind speed approaching threshold.</AppAlert>
+                <AppAlert variant='success'>Crew pre-check complete.</AppAlert>
+              </AppLayout>
+            </AppFieldset>
+            <AppFieldset legend='block-fit'>
+              <AppLayout variant='block-fit'>
+                <AppBadge>Pending</AppBadge>
+                <AppBadge variant='success'>Field ready</AppBadge>
+                <AppBadge variant='warning'>Wind watch</AppBadge>
+              </AppLayout>
+            </AppFieldset>
+          </AppFormGrid>
           <AppFieldset legend='inline'>
             <AppLayout variant='inline'>
               <AppButton>Cancel</AppButton>
