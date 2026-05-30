@@ -267,7 +267,7 @@
   --sa-card-stripe-opacity: 0.8;
   --sa-card-widget-bg: oklch(17% 0.008 244 / 0.48);
   --sa-card-widget-border: var(--sa-border-card);
-  --sa-card-widget-shadow: 0 10px 24px rgb(0 0 0 / 0.16), inset 0 1px 0 rgb(255 255 255 / 0.06);
+  --sa-card-widget-shadow: 0 15px 36px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-card-widget-stripe-opacity: 0.8;
   --sa-card-panel-bg: var(--sa-shell-chrome-border);
   --sa-card-panel-border: var(--sa-shell-chrome-border);
