@@ -152,7 +152,7 @@
 [data-ui='input']:hover,
 [data-ui='textarea']:hover,
 [data-ui='single-select']:hover {
-  background: var(--sa-input-bg-focus);
+  background: var(--sa-input-bg-hover);
 }
 
 [data-ui='single-select'] [data-placeholder-shown] {
@@ -529,7 +529,7 @@
   background: var(--sa-bg-control);
   border: unset;
   border-radius: var(--sa-radius-md);
-  color: var(--sa-text-primary);
+  color: var(--sa-text-muted);
   cursor: pointer;
   display: flex;
   font-family: var(--sa-ui-font-family);
@@ -545,6 +545,7 @@
 
 [data-ui='accordion-trigger']:hover {
   background: var(--sa-bg-hover);
+  color: var(--sa-text-primary);
 }
 
 [data-ui='accordion-trigger'][data-expanded]:focus-visible {
