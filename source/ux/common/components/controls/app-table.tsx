@@ -107,7 +107,13 @@ export const AppTableHeader = (props: AppTableHeaderProps): AppComponent => (
 
 /** Body section. */
 export const AppTableBody = (props: AppTableBodyProps): AppComponent => {
-  const [, others] = splitProps(props, ['class', 'classList', 'style', 'data-ui', 'data-ui-variant'])
+  const [, others] = splitProps(props, [
+    'class',
+    'classList',
+    'style',
+    'data-ui',
+    'data-ui-variant'
+  ])
   return <tbody {...others} data-ui='table-body' />
 }
 
