@@ -129,14 +129,12 @@ export const StyleGuide = (): AppComponent => {
             <h4>H4 Ground Crew Assignment</h4>
             <h5>H5 Chemical Label Review</h5>
           </AppFieldset>
-
           <AppFieldset legend='Body & Paragraph'>
             <p>
               Body copy should inherit the product typography without local component styling. Weather,
               acreage, crew availability, and service windows remain scannable.
             </p>
           </AppFieldset>
-
           <AppFieldset legend='Code, Pre & Blockquote'>
             <p>
               Inline code sample: <code>service.category === 'aerial-drone-services'</code>
@@ -152,7 +150,6 @@ export const StyleGuide = (): AppComponent => {
               Service logs are records of field reality and must remain clear, durable, and auditable.
             </blockquote>
           </AppFieldset>
-
           <AppTable>
             <AppTableHeader>
               <AppTableCell>Typeface</AppTableCell>
@@ -233,7 +230,6 @@ export const StyleGuide = (): AppComponent => {
               </For>
             </AppTableBody>
           </AppTable>
-
           <AppFieldset legend='List variants'>
             <AppFormGrid>
               <AppList>
@@ -253,7 +249,6 @@ export const StyleGuide = (): AppComponent => {
               </AppList>
             </AppFormGrid>
           </AppFieldset>
-
           <AppFieldset legend='Site access'>
             <AppFormGrid>
               <AppField label='Field contact' for='nameId'>
@@ -644,14 +639,14 @@ export const StyleGuide = (): AppComponent => {
 
         <SgSection title='AppLayout'>
           <AppFormGrid>
-            <AppFieldset legend='block (default)'>
+            <AppFieldset legend='Stack (block, default)'>
               <AppLayout>
                 <AppAlert>North Field spray window confirmed.</AppAlert>
                 <AppAlert variant='warning'>Wind speed approaching threshold.</AppAlert>
                 <AppAlert variant='success'>Crew pre-check complete.</AppAlert>
               </AppLayout>
             </AppFieldset>
-            <AppFieldset legend='block-fit'>
+            <AppFieldset legend='Stack (block-fit)'>
               <AppLayout variant='block-fit'>
                 <AppBadge>Pending</AppBadge>
                 <AppBadge variant='success'>Field ready</AppBadge>
@@ -659,14 +654,13 @@ export const StyleGuide = (): AppComponent => {
               </AppLayout>
             </AppFieldset>
           </AppFormGrid>
-          <AppFieldset legend='inline'>
+          <AppFieldset legend='Row (inline)'>
             <AppLayout variant='inline'>
               <AppButton>Cancel</AppButton>
               <AppButton variant='primary'>Confirm dispatch</AppButton>
             </AppLayout>
           </AppFieldset>
-
-          <AppFieldset legend='inline-fill'>
+          <AppFieldset legend='Row (inline-fill)'>
             <AppLayout variant='inline-fill'>
               <AppButton>Aerial</AppButton>
               <AppButton>Ground</AppButton>

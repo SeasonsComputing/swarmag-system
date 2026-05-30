@@ -39,7 +39,7 @@
 
 .sg-section {
   margin-inline: auto;
-  max-width: var(--sa-size-md);
+  max-width: var(--sa-size-lg);
   padding: var(--sa-space-xl);
 }
 
