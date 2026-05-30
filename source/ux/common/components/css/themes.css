@@ -106,9 +106,7 @@
   --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.55), inset 0 1px 0 oklch(var(--sa-p-white) / 0.1);
   --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-gradient-3-mid) / 0.3);
   --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-gradient-3-mid) / 0.3);
-  --sa-shadow-btn:
-    0 15px 40px oklch(78% 0.12 185 / 0.32),
-    0 0 40px oklch(66% 0.14 235 / 0.24);
+  --sa-shadow-btn: 0 15px 40px oklch(78% 0.12 185 / 0.32), 0 0 40px oklch(66% 0.14 235 / 0.24);
   --sa-shadow-card: 0 20px 40px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
   --sa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.3), 0 3px 6px oklch(0% 0 0 / 0.2);
@@ -404,9 +402,7 @@
   --sa-shadow-xl: 0 36px 78px oklch(28% 0.036 230 / 0.2), inset 0 1px 0 oklch(var(--sa-p-white) / 0.85);
   --sa-shadow-glow-sm: 0 0 20px oklch(60% 0.125 186 / 0.22);
   --sa-shadow-glow: 0 0 34px oklch(60% 0.125 186 / 0.24);
-  --sa-shadow-btn:
-    0 16px 34px oklch(43% 0.115 222 / 0.26),
-    0 4px 12px oklch(54% 0.13 151 / 0.2);
+  --sa-shadow-btn: 0 16px 34px oklch(43% 0.115 222 / 0.26), 0 4px 12px oklch(54% 0.13 151 / 0.2);
   --sa-shadow-card:
     0 18px 40px oklch(28% 0.036 230 / 0.13),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.65);
