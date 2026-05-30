@@ -37,7 +37,7 @@
   color: var(--sa-shell-chrome-muted);
 }
 
-ß .sg-section {
+.sg-section {
   margin-inline: auto;
   max-width: var(--sa-size-md);
   padding: var(--sa-space-xl);
