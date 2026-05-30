@@ -50,7 +50,9 @@ const SgHeader = (): AppComponent => {
   return (
     <header class='sg-header'>
       <AppLayout gap='tight'>
-        <h1>swarmAg Style Guide</h1>
+        <h1>
+          swarmAg <span class='nowrap'>Style Guide</span>
+        </h1>
         <p class='sg-header-subtitle'>
           Living visual validation for tokens, states, themes, and controls.
         </p>
@@ -196,41 +198,43 @@ export const StyleGuide = (): AppComponent => {
           </AppTable>
         </SgSection>
 
-        <SgSection title='HTML Semantics'>
-          <AppTable>
-            <AppTableHeader>
-              <AppTableCell>Equipment</AppTableCell>
-              <AppTableCell>Application</AppTableCell>
-              <AppTableCell align='end'>Price</AppTableCell>
-              <AppTableCell align='end'>Cost</AppTableCell>
-            </AppTableHeader>
-            <AppTableBody>
-              <For each={EQUIPMENT}>
-                {e => (
-                  <>
-                    <AppTableRow variant='section'>
-                      <AppTableCell>{e.section}</AppTableCell>
-                    </AppTableRow>
-                    <For each={e.items}>
-                      {i => (
-                        <AppTableRow>
-                          <AppTableCell>{i.name}</AppTableCell>
-                          <AppTableCell>{i.application}</AppTableCell>
-                          <AppTableCell align='end'>
-                            <samp>{i.price}</samp>
-                          </AppTableCell>
-                          <AppTableCell align='end'>
-                            <samp>{i.cost}</samp>
-                          </AppTableCell>
-                        </AppTableRow>
-                      )}
-                    </For>
-                  </>
-                )}
-              </For>
-            </AppTableBody>
-          </AppTable>
-          <AppFieldset legend='List variants'>
+        <SgSection title='HTML'>
+          <AppFieldset legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
+            <AppTable>
+              <AppTableHeader>
+                <AppTableCell>Equipment</AppTableCell>
+                <AppTableCell>Application</AppTableCell>
+                <AppTableCell align='end'>Price</AppTableCell>
+                <AppTableCell align='end'>Cost</AppTableCell>
+              </AppTableHeader>
+              <AppTableBody>
+                <For each={EQUIPMENT}>
+                  {e => (
+                    <>
+                      <AppTableRow variant='section'>
+                        <AppTableCell>{e.section}</AppTableCell>
+                      </AppTableRow>
+                      <For each={e.items}>
+                        {i => (
+                          <AppTableRow>
+                            <AppTableCell>{i.name}</AppTableCell>
+                            <AppTableCell>{i.application}</AppTableCell>
+                            <AppTableCell align='end'>
+                              <samp>{i.price}</samp>
+                            </AppTableCell>
+                            <AppTableCell align='end'>
+                              <samp>{i.cost}</samp>
+                            </AppTableCell>
+                          </AppTableRow>
+                        )}
+                      </For>
+                    </>
+                  )}
+                </For>
+              </AppTableBody>
+            </AppTable>
+          </AppFieldset>
+          <AppFieldset legend='<ul>, <ol>, <li>'>
             <AppFormGrid>
               <AppList>
                 <AppListItem>Confirm chemical inventory.</AppListItem>
@@ -249,13 +253,40 @@ export const StyleGuide = (): AppComponent => {
               </AppList>
             </AppFormGrid>
           </AppFieldset>
-          <AppFieldset legend='Site access'>
+          <AppFieldset legend='<input>, <textarea>, <select>, <option>'>
             <AppFormGrid>
-              <AppField label='Field contact' for='nameId'>
-                <AppInput name='nameId' value='R. Alvarez' onInput={() => undefined} />
+              <AppField label='Field name' for='field-name'>
+                <AppInput
+                  name='field-name'
+                  value='North Field'
+                  error={inputError()}
+                  onInput={() => undefined}
+                  placeholder='Enter service location'
+                />
               </AppField>
-              <AppField label='Gate code' for='codeId'>
-                <AppInput name='codeId' value='4821' onInput={() => undefined} />
+              <AppField label='Application notes' for='application-notes'>
+                <AppTextarea
+                  name='application-notes'
+                  error={inputError()}
+                  onInput={() => undefined}
+                  value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
+                  placeholder='Wind break along west ridge; verify drift boundary before launch.'
+                  rows={6}
+                />
+              </AppField>
+            </AppFormGrid>
+            <AppFormGrid>
+              <AppField label='single-select' for='service-status'>
+                <AppSingleSelect
+                  name='service-status'
+                  placeholder='Select service status'
+                  error={selectError()}
+                  options={STATUSES}
+                />
+              </AppField>
+              <AppField label='multi-select' for='service-options'>
+                {/*TODO: AppMultiSelect needs a name?*/}
+                <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
               </AppField>
             </AppFormGrid>
           </AppFieldset>
@@ -612,7 +643,7 @@ export const StyleGuide = (): AppComponent => {
         </SgSection>
 
         <SgSection title='AppCard'>
-          <AppLayout variant='inline-fill'>
+          <AppFormGrid>
             <AppCard>
               <AppLayout>
                 <h3>Default card</h3>
@@ -634,7 +665,7 @@ export const StyleGuide = (): AppComponent => {
                 <p>Primary framed container for guided flows that need stronger focus and elevation.</p>
               </AppLayout>
             </AppCard>
-          </AppLayout>
+          </AppFormGrid>
         </SgSection>
 
         <SgSection title='AppLayout'>
