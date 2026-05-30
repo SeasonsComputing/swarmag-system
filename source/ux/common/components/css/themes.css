@@ -173,11 +173,11 @@
   --sa-blockquote-border: 3px solid var(--sa-color-accent);
 
   /* Shell chrome */
-  --sa-shell-chrome-bg: var(--sa-card-panel-bg);
-  --sa-shell-chrome-border: var(--sa-card-panel-border);
+  --sa-shell-chrome-bg: oklch(17% 0.008 244 / 0.48);
+  --sa-shell-chrome-border: var(--sa-border-card);
   --sa-shell-chrome-filter: var(--sa-blur);
   --sa-shell-chrome-muted: var(--sa-text-muted);
-  --sa-shell-chrome-shadow: var(--sa-card-panel-shadow);
+  --sa-shell-chrome-shadow: var(--sa-shadow-sm);
   --sa-shell-chrome-text: var(--sa-text-h1);
 
   /*
@@ -269,9 +269,9 @@
   --sa-card-widget-border: var(--sa-border-card);
   --sa-card-widget-shadow: 0 10px 24px rgb(0 0 0 / 0.16), inset 0 1px 0 rgb(255 255 255 / 0.06);
   --sa-card-widget-stripe-opacity: 0.8;
-  --sa-card-panel-bg: oklch(17% 0.008 244 / 0.48);
-  --sa-card-panel-border: var(--sa-border-card);
-  --sa-card-panel-shadow: none;
+  --sa-card-panel-bg: var(--sa-shell-chrome-border);
+  --sa-card-panel-border: var(--sa-shell-chrome-border);
+  --sa-card-panel-shadow: 0 0 36px rgb(0 0 0 / 0.3);
   --sa-card-panel-stripe-opacity: 0;
   --sa-card-workflow-bg: oklch(21% 0.02 226 / 0.42);
   --sa-card-workflow-border: 1px solid rgb(148 163 184 / 0.2);
@@ -297,8 +297,8 @@
 
   /* Field */
   --sa-field-label-font-weight: var(--sa-p-weight-thin);
-  --sa-fieldset-border: var(--sa-border-input);
-  --sa-fieldset-shadow: var(--sa-shadow-md);
+  --sa-fieldset-border: var(--sa-shell-chrome-border);
+  --sa-fieldset-shadow: 0 12px 24px rgb(0 0 0 / 0.3);
   --sa-fieldset-bg: transparent;
 }
 
