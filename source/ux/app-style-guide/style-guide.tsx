@@ -135,7 +135,7 @@ export const StyleGuide = (): AppComponent => {
               acreage, crew availability, and service windows remain scannable.
             </p>
           </AppFieldset>
-          <AppFieldset legend='Code, Pre & Blockquote'>
+          <AppFieldset legend='Code / Kbd / Samp / Pre / Blockquote'>
             <p>
               Inline code sample: <code>service.category === 'aerial-drone-services'</code>
             </p>
