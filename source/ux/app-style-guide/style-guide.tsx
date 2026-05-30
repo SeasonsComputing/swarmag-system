@@ -124,20 +124,20 @@ export const StyleGuide = (): AppComponent => {
 
       <SgMain>
         <SgSection title='Typography'>
-          <AppFieldset legend='h1 – h5'>
+          <AppFieldset legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
             <h1>H1 Operations Command</h1>
             <h2>H2 Field Service Planning</h2>
             <h3>H3 Aerial Application Window</h3>
             <h4>H4 Ground Crew Assignment</h4>
             <h5>H5 Chemical Label Review</h5>
           </AppFieldset>
-          <AppFieldset legend='Body & Paragraph'>
+          <AppFieldset legend='<body>, <p>'>
             <p>
               Body copy should inherit the product typography without local component styling. Weather,
               acreage, crew availability, and service windows remain scannable.
             </p>
           </AppFieldset>
-          <AppFieldset legend='Code / Kbd / Samp / Pre / Blockquote'>
+          <AppFieldset legend='<code>, <kbd>, <samp>, <pre>, <blockquote>'>
             <p>
               Inline code sample: <code>service.category === 'aerial-drone-services'</code>
             </p>
@@ -152,50 +152,52 @@ export const StyleGuide = (): AppComponent => {
               Service logs are records of field reality and must remain clear, durable, and auditable.
             </blockquote>
           </AppFieldset>
-          <AppTable>
-            <AppTableHeader>
-              <AppTableCell>Typeface</AppTableCell>
-              <AppTableCell>Role</AppTableCell>
-              <AppTableCell>Example</AppTableCell>
-            </AppTableHeader>
-            <AppTableBody>
-              <AppTableRow>
-                <AppTableCell>Comfortaa</AppTableCell>
-                <AppTableCell>Heading</AppTableCell>
-                <AppTableCell>
-                  <span class='sg-font-heading'>Operations briefing schedule confirmed</span>
-                </AppTableCell>
-              </AppTableRow>
-              <AppTableRow>
-                <AppTableCell>Comfortaa</AppTableCell>
-                <AppTableCell>Body</AppTableCell>
-                <AppTableCell>
-                  <span class='sg-font-body'>Inspect field boundaries and document hazard zones</span>
-                </AppTableCell>
-              </AppTableRow>
-              <AppTableRow>
-                <AppTableCell>Lexend</AppTableCell>
-                <AppTableCell>Label</AppTableCell>
-                <AppTableCell>
-                  <span class='sg-font-label'>Service window 06:00–09:00</span>
-                </AppTableCell>
-              </AppTableRow>
-              <AppTableRow>
-                <AppTableCell>Lexend</AppTableCell>
-                <AppTableCell>UI</AppTableCell>
-                <AppTableCell>
-                  <span class='sg-font-ui'>Assign crew and assets for spray mission</span>
-                </AppTableCell>
-              </AppTableRow>
-              <AppTableRow>
-                <AppTableCell>Cascadia Mono</AppTableCell>
-                <AppTableCell>Mono</AppTableCell>
-                <AppTableCell>
-                  <code>service.status = 'ready'; acres = 142</code>
-                </AppTableCell>
-              </AppTableRow>
-            </AppTableBody>
-          </AppTable>
+          <AppFieldset legend='Typefaces'>
+            <AppTable>
+              <AppTableHeader>
+                <AppTableCell>Typeface</AppTableCell>
+                <AppTableCell>Role</AppTableCell>
+                <AppTableCell>Example</AppTableCell>
+              </AppTableHeader>
+              <AppTableBody>
+                <AppTableRow>
+                  <AppTableCell>Comfortaa</AppTableCell>
+                  <AppTableCell>Heading</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-heading'>Operations briefing schedule confirmed</span>
+                  </AppTableCell>
+                </AppTableRow>
+                <AppTableRow>
+                  <AppTableCell>Comfortaa</AppTableCell>
+                  <AppTableCell>Body</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-body'>Inspect field boundaries and document hazard zones</span>
+                  </AppTableCell>
+                </AppTableRow>
+                <AppTableRow>
+                  <AppTableCell>Lexend</AppTableCell>
+                  <AppTableCell>Label</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-label'>Service window 06:00–09:00</span>
+                  </AppTableCell>
+                </AppTableRow>
+                <AppTableRow>
+                  <AppTableCell>Lexend</AppTableCell>
+                  <AppTableCell>UI</AppTableCell>
+                  <AppTableCell>
+                    <span class='sg-font-ui'>Assign crew and assets for spray mission</span>
+                  </AppTableCell>
+                </AppTableRow>
+                <AppTableRow>
+                  <AppTableCell>Cascadia Mono</AppTableCell>
+                  <AppTableCell>Mono</AppTableCell>
+                  <AppTableCell>
+                    <code>service.status = 'ready'; acres = 142</code>
+                  </AppTableCell>
+                </AppTableRow>
+              </AppTableBody>
+            </AppTable>
+          </AppFieldset>
         </SgSection>
 
         <SgSection title='HTML'>
@@ -255,7 +257,7 @@ export const StyleGuide = (): AppComponent => {
           </AppFieldset>
           <AppFieldset legend='<input>, <textarea>, <select>, <option>'>
             <AppFormGrid>
-              <AppField label='Field name' for='field-name'>
+              <AppField label='Text-line' for='field-name'>
                 <AppInput
                   name='field-name'
                   value='North Field'
@@ -264,7 +266,7 @@ export const StyleGuide = (): AppComponent => {
                   placeholder='Enter service location'
                 />
               </AppField>
-              <AppField label='Application notes' for='application-notes'>
+              <AppField label='Text-box' for='application-notes'>
                 <AppTextarea
                   name='application-notes'
                   error={inputError()}
@@ -276,7 +278,7 @@ export const StyleGuide = (): AppComponent => {
               </AppField>
             </AppFormGrid>
             <AppFormGrid>
-              <AppField label='single-select' for='service-status'>
+              <AppField label='Combo-box' for='service-status'>
                 <AppSingleSelect
                   name='service-status'
                   placeholder='Select service status'
@@ -284,7 +286,7 @@ export const StyleGuide = (): AppComponent => {
                   options={STATUSES}
                 />
               </AppField>
-              <AppField label='multi-select' for='service-options'>
+              <AppField label='List-box' for='service-options'>
                 {/*TODO: AppMultiSelect needs a name?*/}
                 <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
               </AppField>
