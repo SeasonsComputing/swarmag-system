@@ -60,7 +60,7 @@
   --sa-bg-overlay: oklch(var(--sa-p-black) / 0.2);
   --sa-bg-popup: oklch(var(--sa-p-popup));
   --sa-bg-table: oklch(var(--sa-p-white) / 0.03);
-  --sa-bg-hover: oklch(var(--sa-p-gradient-2-mid-start) / 0.17);
+  --sa-bg-hover: oklch(var(--sa-p-gradient-2-mid-start) / 0.2);
   --sa-bg-selected: oklch(var(--sa-p-gradient-2-mid-start) / 0.28);
   --sa-bg-control: oklch(var(--sa-p-gradient-2-mid-start) / 0.1);
   --sa-bg-card: linear-gradient(
@@ -204,6 +204,7 @@
 
   /* Input */
   --sa-input-bg: var(--sa-bg-control);
+  --sa-input-bg-hover: var(--sa-bg-hover);
   --sa-input-bg-focus: var(--sa-bg-hover);
   --sa-input-bg-disabled: oklch(18% 0.01 264.5);
 
@@ -356,7 +357,7 @@
   --sa-bg-overlay: oklch(18% 0.022 236 / 0.08);
   --sa-bg-popup: oklch(99.2% 0.008 100);
   --sa-bg-table: oklch(90% 0.018 110 / 0.38);
-  --sa-bg-hover: oklch(86% 0.062 185 / 0.34);
+  --sa-bg-hover: oklch(86% 0.062 185 / 0.2);
   --sa-bg-selected: oklch(80% 0.09 184 / 0.28);
   --sa-bg-control: oklch(97% 0.012 112);
   --sa-bg-card: linear-gradient(
@@ -500,6 +501,7 @@
 
   /* Input */
   --sa-input-bg: oklch(98.6% 0.018 112);
+  --sa-input-bg-hover: var(--sa-bg-hover);
   --sa-input-bg-focus: oklch(91.5% 0.042 170);
   --sa-input-bg-disabled: oklch(93.5% 0.01 108);
 
