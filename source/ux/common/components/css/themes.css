@@ -170,7 +170,7 @@
 
   /* Focus / base element */
   --sa-focus-ring: 0 0 0 2px oklch(var(--sa-p-base)), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
-  --sa-blockquote-border: 3px solid var(--sa-color-primary);
+  --sa-blockquote-border: 3px solid var(--sa-color-accent);
 
   /* Shell chrome */
   --sa-shell-chrome-bg: var(--sa-card-panel-bg);
@@ -467,7 +467,7 @@
 
   /* Focus / base element */
   --sa-focus-ring: 0 0 0 2px oklch(99.4% 0.006 98), 0 0 0 4px oklch(57% 0.13 186 / 0.42);
-  --sa-blockquote-border: 3px solid var(--sa-color-primary);
+  --sa-blockquote-border: 3px solid var(--sa-color-accent);
 
   /* Shell chrome */
   --sa-shell-chrome-bg: oklch(27% 0.045 224);
