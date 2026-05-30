@@ -327,7 +327,6 @@
 
 [data-ui='table'] {
   border: var(--sa-card-panel-border);
-  box-shadow: var(--sa-shadow-md);
 }
 
 [data-ui='table-row'][data-ui-variant='section'] [data-ui='table-cell'] {
