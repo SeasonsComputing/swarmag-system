@@ -187,7 +187,7 @@ Breakpoints match architecture-ux.md §7:
   --sa-p-size-base: 1rem;
   --sa-p-size-md: 1.1875rem;
   --sa-p-size-lg: 1.5rem;
-  --sa-p-size-xl: 1.8125rem;
+  --sa-p-size-xl: 1.7125rem;
 
   /* --- Line Heights --- */
   --sa-p-leading-normal: 1.5;
@@ -253,7 +253,7 @@ Breakpoints match architecture-ux.md §7:
   /* --- Desktop ≥ 1024px --- */
   --sa-dash-gap: 4rem;
   --sa-dash-pad: 4rem;
-  --sa-card-pad: 1.75rem;
+  --sa-card-pad: 2rem;
   --sa-stat-pad: 1rem;
   --sa-form-pad: 2.5rem;
   --sa-field-pad: 1rem;
@@ -270,7 +270,7 @@ Breakpoints match architecture-ux.md §7:
   :root {
     --sa-dash-gap: 3rem;
     --sa-dash-pad: 2rem;
-    --sa-card-pad: 1.25rem;
+    --sa-card-pad: 1.75rem;
     --sa-stat-pad: 0.875rem;
     --sa-form-pad: 2rem;
     --sa-field-pad: 0.875rem;
