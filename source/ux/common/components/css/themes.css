@@ -297,7 +297,7 @@
 
   /* Field */
   --sa-field-label-font-weight: var(--sa-p-weight-thin);
-  --sa-fieldset-border: var(--sa-border-card);
+  --sa-fieldset-border: var(--sa-border-input);
   --sa-fieldset-shadow: var(--sa-shadow-md);
   --sa-fieldset-bg: transparent;
 }
