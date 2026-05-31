@@ -20,7 +20,7 @@ import { type AppComponent, type AppComponentProps } from './controls-helpers.ts
 export type AppLayoutVariant = 'block-fit' | 'inline' | 'inline-fill'
 
 /** Layout gap density. Omit for standard spacing. */
-export type AppLayoutGap = 'tight' | 'none'
+export type AppLayoutGap = 'loose' | 'tight' | 'none'
 
 /** Layout control props. */
 export type AppLayoutProps =
