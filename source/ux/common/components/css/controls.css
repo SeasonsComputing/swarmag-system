@@ -195,19 +195,20 @@
   border-radius: var(--sa-radius-sm);
   list-style: none;
   margin: 0;
-  padding: 0;
+  background: var(--sa-input-bg);
+  padding: var(--sa-space-sm);
 }
 
 [data-ui='single-select-content'] {
   background: var(--sa-bg-popup);
-  border: var(--sa-card-panel-border);
+  border: var(--sa-border-input);
   border-radius: var(--sa-radius-sm);
   box-shadow: var(--sa-shadow-sm);
   color: var(--sa-text-muted);
   display: grid;
   font-size: var(--sa-label-font-size);
   gap: var(--sa-space-xs);
-  padding: var(--sa-space-sm);
+  padding: 0;
   z-index: var(--sa-z-popover);
 }
 
