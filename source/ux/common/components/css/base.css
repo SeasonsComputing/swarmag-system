@@ -310,7 +310,7 @@ fieldset {
   border-radius: var(--sa-radius-md);
   display: grid;
   gap: var(--sa-space-md);
-  padding: var(--sa-space-md);
+  padding: var(--sa-space-lg);
 }
 
 legend {
