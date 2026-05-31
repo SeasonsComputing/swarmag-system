@@ -80,12 +80,14 @@ const SgMain = (props: SgMainProps): AppComponent => (
 type SgSectionProps = AppContainerProps & { title: string }
 const SgSection = (props: SgSectionProps): AppComponent => (
   <section class='sg-section'>
-    <AppCard>
-      <AppLayout>
-        <h2>{props.title}</h2>
-        <AppLayout>{props.children}</AppLayout>
-      </AppLayout>
-    </AppCard>
+    <AppLayout gap='tight'>
+      <h2>{props.title}</h2>
+      <AppCard>
+        <AppLayout>
+          {props.children}
+        </AppLayout>
+      </AppCard>
+    </AppLayout>
   </section>
 )
 
