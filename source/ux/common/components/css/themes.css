@@ -104,9 +104,9 @@
   --sa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.4);
   --sa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--sa-p-white) / 0.06);
   --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.55), inset 0 1px 0 oklch(var(--sa-p-white) / 0.1);
-  --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-gradient-3-mid) / 0.3);
-  --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-gradient-3-mid) / 0.3);
-  --sa-shadow-btn: 0 15px 40px oklch(78% 0.12 185 / 0.32), 0 0 40px oklch(66% 0.14 235 / 0.24);
+  --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-gradient-3-mid));
+  --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-gradient-3-mid));
+  --sa-shadow-btn: 0 0 40px oklch(78% 0.12 185 / 0.32), 0 0 40px oklch(66% 0.14 235 / 0.24);
   --sa-shadow-card: 0 20px 40px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
   --sa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.3), 0 3px 6px oklch(0% 0 0 / 0.2);
