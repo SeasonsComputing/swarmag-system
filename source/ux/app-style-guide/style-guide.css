@@ -1,8 +1,3 @@
-.sg-page {
-  min-height: 100vh;
-  padding-block-end: var(--sa-space-2xl);
-}
-
 .sg-header {
   backdrop-filter: var(--sa-shell-chrome-filter);
   background: var(--sa-shell-chrome-bg);
@@ -41,10 +36,14 @@
   color: var(--sa-shell-chrome-muted);
 }
 
+.sg-main {
+  padding: var(--sa-space-xl);
+}
+
 .sg-section {
   margin-inline: auto;
   max-width: var(--sa-size-md);
-  padding: var(--sa-space-xl);
+  width: 100%;
 }
 
 .sg-swatch {
