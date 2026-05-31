@@ -12,26 +12,24 @@ export class Supabase {
 
   /**
    * Return a singleton Supabase client configured from environment variables.
-   * Auth options are determined by SUPABASE_CLIENT_MODE: 'browser' | 'edge'.
+   * All contexts use the public key — user identity is carried by the JWT in
+   * the Authorization header. SUPABASE_CLIENT_MODE governs session persistence
+   * behavior only ('browser' | 'edge').
    * @returns Reusable Supabase client.
    * @throws When required credentials are missing.
    */
   static client(): SupabaseClient {
     if (Supabase.#cache) return Supabase.#cache
 
-    // Supabase client parameters
     const isBrowser = Config.get('SUPABASE_CLIENT_MODE') === 'browser'
-    const key = isBrowser
-      ? Config.get('SUPABASE_ANON_KEY')
-      : Config.get('SUPABASE_SERVICE_KEY')
-    const url = Config.get('SUPABASE_RDBMS_URL')
     const auth = {
       persistSession: isBrowser,
       autoRefreshToken: isBrowser,
       detectSessionInUrl: isBrowser
     }
+    const key = Config.get('SUPABASE_PUBLIC_KEY')
+    const url = Config.get('SUPABASE_RDBMS_URL')
 
-    // Connect and cache client
     Supabase.#cache = createClient(url, key, { auth })
     return Supabase.#cache
   }
