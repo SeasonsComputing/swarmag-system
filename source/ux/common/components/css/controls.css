@@ -200,7 +200,7 @@
 }
 
 [data-ui='single-select-content'] {
-  background: var(--sa-bg-popup);
+  background: var(--sa-shell-chrome-bg);
   border: var(--sa-border-input);
   border-radius: var(--sa-radius-sm);
   box-shadow: var(--sa-shadow-sm);
@@ -994,6 +994,10 @@
   display: grid;
   gap: var(--sa-space-md);
   width: 100%;
+}
+
+[data-ui='layout'][data-ui-gap='loose'] {
+  gap: var(--sa-space-xl);
 }
 
 [data-ui='layout'][data-ui-gap='tight'] {
