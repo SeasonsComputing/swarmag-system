@@ -7,8 +7,8 @@ import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
 Config.init(new SupabaseProvider(), [
   'SUPABASE_RDBMS_URL',
-  'SUPABASE_SERVICE_KEY',
-  'JWT_SECRET'
+  'SUPABASE_PUBLIC_KEY',
+  'SUPABASE_CLIENT_MODE'
 ])
 
 export { Config }

@@ -113,13 +113,6 @@ if [[ "${GENESIS_BUILD}" == "true" ]]; then
 
   rm -rf "${DIST_DIR}"
   rm -f "${PACKAGE_DIR}/swarmag-app-admin-${TARGET}-"*.zip
-
-  rotated_secret="$(deno run source/devops/scripts/gen-jwt-secret.ts)"
-  deno run --allow-read --allow-write source/devops/scripts/set-secret.ts \
-    "${SECRETS_FILE}" \
-    "app-admin.${TARGET}.VITE_JWT_SECRET" \
-    "${rotated_secret}"
-  echo "GENESIS: rotated app-admin.${TARGET}.VITE_JWT_SECRET in ${SECRETS_FILE}"
 fi
 
 if [[ -n "${SECRETS_FILE}" ]]; then
