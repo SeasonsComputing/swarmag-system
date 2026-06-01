@@ -309,7 +309,7 @@ ol > li::marker {
 fieldset {
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-md);
-  padding: var(--sa-gap);
+  padding: calc(var(--sa-gap) * 0.5);
 }
 
 legend {

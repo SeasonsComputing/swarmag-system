@@ -90,7 +90,7 @@ self-hosted font assets.
 ### 2.5.1 Token Architecture
 
 Font primitives (`--sa-p-font-*`) hold raw font stack values and are internal —
-consumed only by theme role tokens. `base.css` and `controls.css` consume role
+consumed only by theme role tokens. `base.css` and `ui.css` consume role
 tokens and component tokens.
 
 | Primitive             | Value         |
@@ -114,12 +114,12 @@ one token value, not by changing consuming selectors.
 
 Font sizes are fixed role tokens. `themes.css` defines heading, body, label, UI,
 annotation, data, and entry font-size tokens consumed by `base.css` and
-`controls.css`.
+`ui.css`.
 
 ### 2.5.3 Typography Role Map
 
 Each HTML element belongs to one typographic role. `base.css` declares the
-foundation treatment; `controls.css` declares App control treatment.
+foundation treatment; `ui.css` declares App control treatment.
 
 | Role                      | Element(s)                   | Family token               | Size token                     | Weight token                  |
 | ------------------------- | ---------------------------- | -------------------------- | ------------------------------ | ----------------------------- |
