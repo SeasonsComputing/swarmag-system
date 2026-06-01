@@ -25,7 +25,7 @@ import {
   AppFormActions,
   AppInput,
   AppLayout
-} from '@ux/common/components/controls'
+} from '@ux/common/components/ui'
 
 import './login.css'
 import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'

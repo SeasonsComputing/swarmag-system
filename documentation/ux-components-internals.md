@@ -6,7 +6,7 @@
 
 This document is the implementation reference for `ux/common` control primitives. It covers CSS architecture, control contracts, token layers, and selector discipline.
 
-**Audience:** Implementers building, modifying, or auditing controls in `source/ux/common/components/controls/`, chart controls in `source/ux/common/components/charts/`, or the shared CSS files.
+**Audience:** Implementers building, modifying, or auditing controls in `source/ux/common/components/ui/`, the reserved chart-control directory in `source/ux/common/components/charts/`, or the shared CSS files.
 
 Consumers of controls use `ux-components-guide.md`.
 
@@ -71,7 +71,7 @@ All tokens use the `--sa-` prefix.
 | `--sa-border-`    | Borders                               |
 | `--sa-shadow-`    | Shadows / elevation                   |
 | `--sa-gradient-`  | Gradients                             |
-| `--sa-font-`      | Typography                            |
+| `--sa-*-font-`    | Typography role and component tokens  |
 | `--sa-radius-`    | Border radius                         |
 | `--sa-space-`     | Spacing scale                         |
 | `--sa-motion-`    | Motion durations and animation timing |
@@ -103,12 +103,12 @@ ux/
         ├── fonts/       — self-hosted woff2 font assets
         ├── icons/       — icon library
         ├── controls/    — App control primitives
-        └── charts/      — chart control primitives
+        └── charts/      — reserved chart-control directory
 ```
 
 ## 3. Control Contract
 
-All primitives in `source/ux/common/components/controls/` emit semantic attributes and keep visual styling in `controls.css`.
+All primitives in `source/ux/common/components/ui/` emit semantic attributes and keep visual styling in `controls.css`.
 
 ### 3.1 Semantic Identity
 
@@ -201,7 +201,7 @@ data-ui-variant="success | warning | danger | info"       (badge, alert)
 Layout controls may additionally declare gap density:
 
 ```text
-data-ui-gap="tight | none"                                 (layout)
+data-ui-gap="loose | tight | none"                         (layout)
 ```
 
 Table cells may additionally declare alignment:
@@ -222,12 +222,6 @@ Controls may emit operational state:
 
 ```text
 data-ui-state="error | disabled | loading"
-```
-
-Selection state emits a unified active marker:
-
-```text
-[data-active]
 ```
 
 Rules:
@@ -255,7 +249,6 @@ Selectors:
 [data-ui-gap="..."]
 [data-ui-align="..."]
 [data-ui-state="..."]
-[data-active]
 ```
 
 ### 3.5 Behavior Binding
@@ -285,10 +278,11 @@ data-ui-variant
 data-ui-gap
 data-ui-align
 data-ui-state
-data-active
 ```
 
-Underlying primitives emit ARIA and library-specific state attributes (`[data-checked]`, `[data-pressed]`, `[data-selected]`). App control wrappers normalize selection visuals into `[data-active]` where the wrapper owns that state. `controls.css` may consume Kobalte and ARIA runtime attributes when they represent real primitive state:
+Underlying primitives emit ARIA and library-specific state attributes. `controls.css`
+may consume Kobalte and ARIA runtime attributes when they represent real primitive
+state:
 
 ```text
 [data-checked]
@@ -402,7 +396,7 @@ This selector shape is invalid because one element cannot hold two different `da
 | Control        | Intent                                                            |
 | -------------- | ----------------------------------------------------------------- |
 | `layout`       | General block and inline child arrangement                        |
-| `list`         | Semantic list with clean, bullet, and numbered variants           |
+| `list`         | Semantic list with unset, bullet, and numbered variants           |
 | `table`        | Semantic table family with header/body/row/cell parts             |
 | `footer`       | Branded footer primitive using shell chrome and safe-area support |
 | `field`        | Label + control wrapper                                           |

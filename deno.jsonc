@@ -18,7 +18,7 @@
     "@core/std": "./source/core/std/std.ts",
     "@core/stdx": "./source/core/std/stdx.ts",
     "@ux/api": "./source/ux/api/api.ts",
-    "@ux/common/components/controls": "./source/ux/common/components/controls/controls.ts",
+    "@ux/common/components/ui": "./source/ux/common/components/ui/controls.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
     // Vendor Aliases

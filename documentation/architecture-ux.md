@@ -515,7 +515,7 @@ IndexedDB usage is split into two layers:
 
 - `assets/` — shared CSS foundation, fonts, icons, and static visual assets
 - `components/shell/` — `bootstrap`, `login`, `auth-guard`, `content`, shell dashboard stub, and form panel
-- `components/controls/` — HTML & Kobalte-backed App{Control} primitives
+- `components/ui/` — HTML & Kobalte-backed App{Control} primitives
 - `components/charts/` — chart primitives and chart compositions
 - `components/dashboard/` — dashboard layout foundation
 
