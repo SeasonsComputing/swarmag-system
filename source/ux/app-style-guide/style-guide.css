@@ -37,7 +37,7 @@
 }
 
 .sg-main {
-  padding: var(--sa-space-xl);
+  padding: var(--sa-gutter);
 }
 
 .sg-section {
@@ -54,6 +54,7 @@
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-sm);
   min-height: 96px;
+  margin-block-end: var(--sa-space-xs);
 }
 
 .sg-gradient-block {
@@ -88,6 +89,12 @@
 .sg-font-label {
   font-family: var(--sa-label-font-family);
   font-weight: var(--sa-label-font-weight);
+  color: var(--sa-text-label);
+}
+
+.sg-font-annotation {
+  font-family: var(--sa-annotation-font-family);
+  font-weight: var(--sa-annotation-font-weight);
 }
 
 .sg-font-ui {

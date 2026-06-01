@@ -240,20 +240,20 @@ Breakpoints match architecture-ux.md §7:
   --sa-space-3xl: 3rem;
   --sa-space-4xl: 5rem;
 
-  /* Layout rhythm */
-  --sa-gap: var(--sa-space-lg);
-  --sa-gutter: var(--sa-space-xl);
-
   /* --- Breakpoints (reference — use in media queries) --- */
   --sa-size-xs: 425px;
   --sa-size-sm: 768px;
   --sa-size-md: 1024px;
   --sa-size-lg: 1152px;
 
+  /* Layout rhythm */
+  --sa-gap: var(--sa-space-md);
+  --sa-gutter: var(--sa-space-2xl);
+
   /* --- Desktop ≥ 1024px --- */
   --sa-dash-gap: calc(var(--sa-space-xl) * 2);
   --sa-dash-pad: calc(var(--sa-space-xl) * 2);
-  --sa-card-pad: var(--sa-gap);
+  --sa-card-pad: var(--sa-space-lg);
   --sa-stat-pad: var(--sa-space-md);
   --sa-form-pad: var(--sa-space-2xl);
   --sa-field-pad: var(--sa-space-md);
@@ -268,11 +268,11 @@ Breakpoints match architecture-ux.md §7:
 
 @media (max-width: 1024px) {
   :root {
-    --sa-gap: var(--sa-space-sm);
-    --sa-gutter: var(--sa-space-xl);
+    --sa-gap: var(--sa-space-md);
+    --sa-gutter: var(--sa-space-2xl);
     --sa-dash-gap: var(--sa-space-3xl);
     --sa-dash-pad: var(--sa-space-xl);
-    --sa-card-pad: var(--sa-gap);
+    --sa-card-pad: var(--sa-space-lg);
     --sa-stat-pad: calc(var(--sa-space-md) - var(--sa-space-xs) / 2);
     --sa-form-pad: var(--sa-space-xl);
     --sa-field-pad: calc(var(--sa-space-md) - var(--sa-space-xs) / 2);
@@ -281,11 +281,11 @@ Breakpoints match architecture-ux.md §7:
 
 @media (max-width: 768px) {
   :root {
-    --sa-gap: var(--sa-space-sm);
+    --sa-gap: var(--sa-space-md);
     --sa-gutter: var(--sa-space-lg);
     --sa-dash-gap: var(--sa-space-lg);
     --sa-dash-pad: var(--sa-space-lg);
-    --sa-card-pad: var(--sa-gap);
+    --sa-card-pad: var(--sa-space-md);
     --sa-stat-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
     --sa-form-pad: var(--sa-space-lg);
     --sa-field-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
@@ -294,11 +294,11 @@ Breakpoints match architecture-ux.md §7:
 
 @media (max-width: 425px) {
   :root {
-    --sa-gap: var(--sa-space-xs);
-    --sa-gutter: var(--sa-space-lg);
+    --sa-gap: var(--sa-space-sm);
+    --sa-gutter: var(--sa-space-md);
     --sa-dash-gap: var(--sa-space-lg);
     --sa-dash-pad: var(--sa-space-lg);
-    --sa-card-pad: var(--sa-gap);
+    --sa-card-pad: var(--sa-space-lg);
     --sa-stat-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
     --sa-form-pad: calc(var(--sa-space-md) + var(--sa-space-xs));
     --sa-field-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
@@ -307,11 +307,11 @@ Breakpoints match architecture-ux.md §7:
 
 @media (max-width: 380px) {
   :root {
-    --sa-gap: var(--sa-space-xs);
+    --sa-gap: var(--sa-space-sm);
     --sa-gutter: var(--sa-space-md);
     --sa-dash-gap: var(--sa-space-md);
     --sa-dash-pad: var(--sa-space-md);
-    --sa-card-pad: var(--sa-gap);
+    --sa-card-pad: var(--sa-space-md);
     --sa-stat-pad: calc(var(--sa-space-sm) + var(--sa-space-xs) / 2);
     --sa-form-pad: var(--sa-space-md);
     --sa-field-pad: calc(var(--sa-space-sm) + var(--sa-space-xs) / 2);

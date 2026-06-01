@@ -3,6 +3,19 @@
 ║ UX base styles                                                               ║
 ║ Browser foundation, font faces, global background, and accessibility rules.  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+DISALLOWED HTML CONTROLS
+───────────────────────────────────────────────────────────────────────────────
+Per guard-bare-html.ts, application JSX must use App controls instead of these
+bare HTML elements:
+
+button    → AppButton
+input     → AppInput
+textarea  → AppTextarea
+select    → AppSingleSelect
+ul        → AppList
+ol        → AppList
+li        → AppListItem
 */
 
 /*
@@ -97,11 +110,21 @@ body::before {
 }
 
 /*
- * GLOBAL TYPOGRAPHY INHERITANCE
+ * FOCUS VISIBLE
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-h1, h2, h3, h4, h5, h6 {
+:focus-visible {
+  box-shadow: var(--sa-focus-ring);
+  outline: none;
+}
+
+/*
+ * H1-H5
+ * ───────────────────────────────────────────────────────────────────────────
+ */
+
+h1, h2, h3, h4, h5 {
   font-family: var(--sa-heading-font-family);
   font-weight: var(--sa-heading-font-weight);
 }
@@ -131,70 +154,15 @@ h5 {
   font-size: var(--sa-heading-font-size-h5);
 }
 
-p {
-  font-family: var(--sa-body-font-family);
-  font-weight: var(--sa-body-font-weight);
-}
-
-label,
-legend {
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-label-font-size);
-  font-weight: var(--sa-label-font-weight);
-}
-
-label {
-  color: var(--sa-text-muted);
-}
-
-th {
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-label-font-size);
-  font-weight: var(--sa-annotation-font-weight);
-}
-
-li {
-  font-family: var(--sa-body-font-family);
-  font-size: var(--sa-body-font-size);
-  font-weight: var(--sa-body-font-weight);
-}
-
-td {
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-label-font-size);
-  font-weight: var(--sa-body-font-weight);
-}
-
-input,
-textarea {
-  font-family: var(--sa-ui-font-family);
-  font-weight: var(--sa-body-font-weight);
-}
-
-select {
-  font-family: var(--sa-ui-font-family);
-  font-weight: var(--sa-ui-font-weight);
-}
-
-code, pre, kbd, samp {
-  font-family: var(--sa-mono-font-family);
-  color: var(--sa-color-accent);
-}
-
-/*
- * FOCUS VISIBLE
- * ───────────────────────────────────────────────────────────────────────────
- */
-
-:focus-visible {
-  box-shadow: var(--sa-focus-ring);
-  outline: none;
-}
-
 /*
  * PRE, CODE, KBD, and BLOCKQUOTE
  * ───────────────────────────────────────────────────────────────────────────
  */
+
+pre, code, kbd, samp {
+  font-family: var(--sa-mono-font-family);
+  color: var(--sa-color-accent);
+}
 
 pre {
   background: var(--sa-bg-control);
@@ -202,7 +170,7 @@ pre {
   border-radius: var(--sa-radius-sm);
   margin: 0;
   overflow: auto;
-  padding: var(--sa-space-md);
+  padding: var(--sa-gap);
 }
 
 code {
@@ -249,19 +217,25 @@ thead {
   background: var(--sa-gradient-brand);
 }
 
+th {
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-annotation-font-weight);
+  color: var(--sa-text-on-brand);
+}
+
+td {
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-body-font-weight);
+  color: var(--sa-text-secondary);
+}
+
 th,
 td {
   border-block-end: var(--sa-border-default);
   padding: var(--sa-space-sm);
   text-align: start;
-}
-
-th {
-  color: var(--sa-text-on-brand);
-}
-
-td {
-  color: var(--sa-text-secondary);
 }
 
 tr:hover {
@@ -273,47 +247,33 @@ thead tr:hover {
 }
 
 /*
- * LISTS
+ * P / LABEL / LEGEND / FIELDSET
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-ol,
-ul {
-  color: var(--sa-text-secondary);
-  padding-inline-start: var(--sa-list-indent);
+p {
+  font-family: var(--sa-body-font-family);
+  font-weight: var(--sa-body-font-weight);
 }
 
-li {
-  margin-block: var(--sa-space-xs);
-  padding-inline-start: var(--sa-list-item-pad);
-}
-
-ul > li {
-  padding-inline-start: var(--sa-list-item-pad-bullet);
-}
-
-ul > li::marker {
-  color: var(--sa-color-brand-end);
-  font-size: var(--sa-list-marker-size);
-}
-
-ol > li::marker {
-  color: var(--sa-color-brand-start);
-}
-
-/*
- * FIELDSET / LEGEND
- * ───────────────────────────────────────────────────────────────────────────
- */
-
-fieldset {
-  border: var(--sa-border-default);
-  border-radius: var(--sa-radius-md);
-  padding: calc(var(--sa-gap) * 0.5);
+label {
+  color: var(--sa-text-label);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
 }
 
 legend {
   color: var(--sa-text-primary);
+  font-family: var(--sa-annotation-font-family);
+  font-size: var(--sa-annotation-font-size);
+  font-weight: var(--sa-annotation-font-weight);
+}
+
+fieldset {
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-md);
+  padding: var(--sa-gap);
 }
 
 /*
@@ -329,7 +289,7 @@ figcaption {
   color: var(--sa-text-primary);
   font-family: var(--sa-label-font-family);
   font-size: var(--sa-label-font-size);
-  font-weight: var(--sa-label-font-weight);
+  font-weight: var(--sa-annotation-font-weight);
 }
 
 /*

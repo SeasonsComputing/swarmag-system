@@ -25,15 +25,15 @@
   --sa-heading-font-weight: var(--sa-p-weight-thin);
   --sa-body-font-weight: var(--sa-p-weight-thin);
   --sa-body-font-size: var(--sa-p-size-base);
-  --sa-label-font-size: 14.4px;
-  --sa-label-font-weight: var(--sa-p-weight-normal);
+  --sa-label-font-size: var(--sa-p-size-sm);
+  --sa-label-font-weight: var(--sa-p-weight-thin);
   --sa-ui-font-size: var(--sa-p-size-sm);
   --sa-ui-font-size-compact: var(--sa-p-size-xs);
   --sa-ui-font-weight: var(--sa-p-weight-normal);
   --sa-ui-checkmark-weight: var(--sa-p-weight-extrabold);
   --sa-annotation-font-family: var(--sa-p-font-label);
   --sa-annotation-font-size: var(--sa-p-size-sm);
-  --sa-annotation-font-weight: var(--sa-p-weight-medium);
+  --sa-annotation-font-weight: var(--sa-p-weight-normal);
   --sa-data-font-family: var(--sa-p-font-label);
   --sa-data-font-size: var(--sa-p-size-sm);
   --sa-data-font-weight: var(--sa-p-weight-thin);
@@ -78,7 +78,7 @@
   --sa-text-dim: oklch(var(--sa-p-neutral-5));
   --sa-text-on-brand: oklch(var(--sa-p-white));
   --sa-text-on-surface: oklch(var(--sa-p-neutral-1));
-  --sa-text-label: oklch(76% 0.012 264.5);
+  --sa-text-label: var(--sa-text-muted);
   --sa-text-disabled: oklch(var(--sa-p-neutral-4));
   --sa-text-placeholder: oklch(var(--sa-p-neutral-5));
   --sa-text-h1: oklch(var(--sa-p-white));
@@ -296,7 +296,6 @@
   --sa-table-border: var(--sa-border-table);
 
   /* Field */
-  --sa-field-label-font-weight: var(--sa-p-weight-thin);
   --sa-fieldset-border: var(--sa-shell-chrome-border);
   --sa-fieldset-shadow: 0 12px 24px rgb(0 0 0 / 0.3);
   --sa-fieldset-bg: transparent;
@@ -322,15 +321,15 @@
   --sa-heading-font-weight: var(--sa-p-weight-medium);
   --sa-body-font-weight: var(--sa-p-weight-thin);
   --sa-body-font-size: var(--sa-p-size-base);
-  --sa-label-font-size: 14.4px;
-  --sa-label-font-weight: var(--sa-p-weight-normal);
+  --sa-label-font-size: var(--sa-p-size-sm);
+  --sa-label-font-weight: var(--sa-p-weight-thin);
   --sa-ui-font-size: var(--sa-p-size-sm);
   --sa-ui-font-size-compact: var(--sa-p-size-xs);
   --sa-ui-font-weight: var(--sa-p-weight-normal);
   --sa-ui-checkmark-weight: var(--sa-p-weight-extrabold);
   --sa-annotation-font-family: var(--sa-p-font-label);
   --sa-annotation-font-size: var(--sa-p-size-sm);
-  --sa-annotation-font-weight: var(--sa-p-weight-medium);
+  --sa-annotation-font-weight: var(--sa-p-weight-normal);
   --sa-data-font-family: var(--sa-p-font-label);
   --sa-data-font-size: var(--sa-p-size-sm);
   --sa-data-font-weight: var(--sa-p-weight-thin);
@@ -375,7 +374,7 @@
   --sa-text-dim: oklch(79% 0.014 120);
   --sa-text-on-brand: oklch(var(--sa-p-white));
   --sa-text-on-surface: oklch(22% 0.026 238);
-  --sa-text-label: oklch(39% 0.033 215);
+  --sa-text-label: var(--sa-text-muted);
   --sa-text-disabled: oklch(70% 0.014 120);
   --sa-text-placeholder: oklch(58% 0.022 210);
   --sa-text-h1: oklch(17% 0.03 238);
@@ -606,7 +605,6 @@
   --sa-table-border: var(--sa-border-table);
 
   /* Field */
-  --sa-field-label-font-weight: var(--sa-p-weight-thin);
   --sa-fieldset-border: var(--sa-border-card);
   --sa-fieldset-shadow: var(--sa-shadow-md);
   --sa-fieldset-bg: transparent;
