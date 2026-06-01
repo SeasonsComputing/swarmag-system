@@ -288,7 +288,7 @@
   --sa-table-padding-cell-data: 0.75rem;
   --sa-table-bg-head: oklch(var(--sa-p-surface-2));
   --sa-table-color-head: oklch(var(--sa-p-neutral-1));
-  --sa-table-bg-section: oklch(var(--sa-p-gradient-2-mid-start) / 0.2);
+  --sa-table-bg-section: oklch(var(--sa-p-gradient-2-mid-start) / 0.48);
   --sa-table-color-section: oklch(var(--sa-p-neutral-1));
   --sa-table-bg-row-even: oklch(var(--sa-p-surface-1));
   --sa-table-bg-row-odd: oklch(var(--sa-p-surface-2) / 0.6);
