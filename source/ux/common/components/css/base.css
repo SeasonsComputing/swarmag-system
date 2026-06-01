@@ -199,7 +199,7 @@ code, pre, kbd, samp {
 pre {
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
   margin: 0;
   overflow: auto;
   padding: var(--sa-space-md);
@@ -238,7 +238,8 @@ blockquote {
 table {
   background: var(--sa-bg-table);
   border-collapse: collapse;
-  border-radius: var(--sa-radius-lg);
+  border: 0;
+  border-radius: var(--sa-radius-md);
   margin-block: var(--sa-space-xs);
   overflow: hidden;
   width: 100%;
@@ -308,9 +309,7 @@ ol > li::marker {
 fieldset {
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-md);
-  display: grid;
-  gap: var(--sa-space-md);
-  padding: var(--sa-space-lg);
+  padding: var(--sa-gap);
 }
 
 legend {

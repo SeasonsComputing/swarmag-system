@@ -106,7 +106,7 @@
   --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.55), inset 0 1px 0 oklch(var(--sa-p-white) / 0.1);
   --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-gradient-3-mid));
   --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-gradient-3-mid));
-  --sa-shadow-btn: 0 0 40px oklch(78% 0.12 185 / 0.32), 0 0 40px oklch(66% 0.14 235 / 0.24);
+  --sa-shadow-btn: 0 0 30px oklch(78% 0.12 185 / 0.38), 0 0 10px oklch(66% 0.14 235 / 0.28);
   --sa-shadow-card: 0 20px 40px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
   --sa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.3), 0 3px 6px oklch(0% 0 0 / 0.2);
@@ -189,7 +189,7 @@
   --sa-button-font-size: var(--sa-p-size-xs);
   --sa-button-font-weight: var(--sa-p-weight-medium);
   --sa-button-font-weight-primary: var(--sa-p-weight-semibold);
-  --sa-button-min-width: 7rem;
+  --sa-button-min-width: 8rem;
   --sa-button-bg-primary: var(--sa-color-brand-end);
   --sa-button-color-primary: var(--sa-bg-base);
   --sa-button-bg-primary-hover: oklch(80% 0.13 185);
@@ -262,7 +262,7 @@
   --sa-skeleton-bg-shimmer: oklch(42% 0.025 252 / 0.6);
 
   /* Card */
-  --sa-card-border-radius: 1rem;
+  --sa-card-border-radius: var(--sa-radius-md);
   --sa-card-stripe-height: 3px;
   --sa-card-stripe-opacity: 0.8;
   --sa-card-widget-bg: oklch(17% 0.008 244 / 0.48);
@@ -357,7 +357,7 @@
   --sa-bg-overlay: oklch(18% 0.022 236 / 0.08);
   --sa-bg-popup: oklch(99.2% 0.008 100);
   --sa-bg-table: oklch(90% 0.018 110 / 0.38);
-  --sa-bg-hover: oklch(86% 0.062 185 / 0.2);
+  --sa-bg-hover: oklch(86% 0.062 185 / 0.38);
   --sa-bg-selected: oklch(80% 0.09 184 / 0.28);
   --sa-bg-control: oklch(97% 0.012 112);
   --sa-bg-card: linear-gradient(
@@ -401,9 +401,9 @@
   --sa-shadow-md: 0 14px 34px oklch(28% 0.036 230 / 0.13);
   --sa-shadow-lg: 0 24px 54px oklch(28% 0.036 230 / 0.16), inset 0 1px 0 oklch(var(--sa-p-white) / 0.75);
   --sa-shadow-xl: 0 36px 78px oklch(28% 0.036 230 / 0.2), inset 0 1px 0 oklch(var(--sa-p-white) / 0.85);
-  --sa-shadow-glow-sm: 0 0 20px oklch(60% 0.125 186 / 0.22);
-  --sa-shadow-glow: 0 0 34px oklch(60% 0.125 186 / 0.24);
-  --sa-shadow-btn: 0 16px 34px oklch(43% 0.115 222 / 0.26), 0 4px 12px oklch(54% 0.13 151 / 0.2);
+  --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-brand-start));
+  --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-brand-start));
+  --sa-shadow-btn: 0 0 30px oklch(86% 0.062 185 / 0.38), 0 0 30px oklch(86% 0.062 185 / 0.28);
   --sa-shadow-card:
     0 18px 40px oklch(28% 0.036 230 / 0.13),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.65);
@@ -486,10 +486,10 @@
   --sa-button-font-size: var(--sa-p-size-xs);
   --sa-button-font-weight: var(--sa-p-weight-medium);
   --sa-button-font-weight-primary: var(--sa-p-weight-semibold);
-  --sa-button-min-width: 7rem;
+  --sa-button-min-width: 8rem;
   --sa-button-bg-primary: var(--sa-color-primary);
   --sa-button-color-primary: var(--sa-text-on-brand);
-  --sa-button-bg-primary-hover: oklch(48% 0.13 205);
+  --sa-button-bg-primary-hover: var(--sa-color-primary);
   --sa-button-transform-hover: translateY(-2px);
   --sa-button-transition-hover:
     transform 0.08s ease-out,
@@ -559,7 +559,7 @@
   --sa-skeleton-bg-shimmer: oklch(86% 0.018 110);
 
   /* Card */
-  --sa-card-border-radius: 1rem;
+  --sa-card-border-radius: var(--sa-radius-md);
   --sa-card-stripe-height: 3px;
   --sa-card-stripe-opacity: 1;
   --sa-card-widget-bg: linear-gradient(
