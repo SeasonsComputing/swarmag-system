@@ -241,7 +241,7 @@ Breakpoints match architecture-ux.md §7:
   --sa-space-4xl: 5rem;
 
   /* Layout rhythm */
-  --sa-gap: var(--sa-space-md);
+  --sa-gap: var(--sa-space-lg);
   --sa-gutter: var(--sa-space-xl);
 
   /* --- Breakpoints (reference — use in media queries) --- */
@@ -251,12 +251,12 @@ Breakpoints match architecture-ux.md §7:
   --sa-size-lg: 1152px;
 
   /* --- Desktop ≥ 1024px --- */
-  --sa-dash-gap: 4rem;
-  --sa-dash-pad: 4rem;
+  --sa-dash-gap: calc(var(--sa-space-xl) * 2);
+  --sa-dash-pad: calc(var(--sa-space-xl) * 2);
   --sa-card-pad: var(--sa-gap);
-  --sa-stat-pad: 1rem;
-  --sa-form-pad: 2.5rem;
-  --sa-field-pad: 1rem;
+  --sa-stat-pad: var(--sa-space-md);
+  --sa-form-pad: var(--sa-space-2xl);
+  --sa-field-pad: var(--sa-space-md);
 
   /* --- Form card max-width — centered on tablet/desktop --- */
   --sa-form-max-width: 640px;
@@ -268,44 +268,52 @@ Breakpoints match architecture-ux.md §7:
 
 @media (max-width: 1024px) {
   :root {
-    --sa-dash-gap: 3rem;
-    --sa-dash-pad: 2rem;
-    --sa-card-pad: 1.75rem;
-    --sa-stat-pad: 0.875rem;
-    --sa-form-pad: 2rem;
-    --sa-field-pad: 0.875rem;
+    --sa-gap: var(--sa-space-sm);
+    --sa-gutter: var(--sa-space-xl);
+    --sa-dash-gap: var(--sa-space-3xl);
+    --sa-dash-pad: var(--sa-space-xl);
+    --sa-card-pad: var(--sa-gap);
+    --sa-stat-pad: calc(var(--sa-space-md) - var(--sa-space-xs) / 2);
+    --sa-form-pad: var(--sa-space-xl);
+    --sa-field-pad: calc(var(--sa-space-md) - var(--sa-space-xs) / 2);
   }
 }
 
 @media (max-width: 768px) {
   :root {
-    --sa-dash-gap: 1.5rem;
-    --sa-dash-pad: 1.5rem;
-    --sa-card-pad: 1rem;
-    --sa-stat-pad: 0.75rem;
-    --sa-form-pad: 1.5rem;
-    --sa-field-pad: 0.75rem;
+    --sa-gap: var(--sa-space-sm);
+    --sa-gutter: var(--sa-space-lg);
+    --sa-dash-gap: var(--sa-space-lg);
+    --sa-dash-pad: var(--sa-space-lg);
+    --sa-card-pad: var(--sa-gap);
+    --sa-stat-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
+    --sa-form-pad: var(--sa-space-lg);
+    --sa-field-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
 }
 
 @media (max-width: 425px) {
   :root {
-    --sa-dash-gap: 1.5rem;
-    --sa-dash-pad: 1.5rem;
-    --sa-card-pad: 1rem;
-    --sa-stat-pad: 0.75rem;
-    --sa-form-pad: 1.25rem;
-    --sa-field-pad: 0.75rem;
+    --sa-gap: var(--sa-space-xs);
+    --sa-gutter: var(--sa-space-lg);
+    --sa-dash-gap: var(--sa-space-lg);
+    --sa-dash-pad: var(--sa-space-lg);
+    --sa-card-pad: var(--sa-gap);
+    --sa-stat-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
+    --sa-form-pad: calc(var(--sa-space-md) + var(--sa-space-xs));
+    --sa-field-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
 }
 
 @media (max-width: 380px) {
   :root {
-    --sa-dash-gap: 1rem;
-    --sa-dash-pad: 1rem;
-    --sa-card-pad: 0.875rem;
-    --sa-stat-pad: 0.625rem;
-    --sa-form-pad: 1rem;
-    --sa-field-pad: 0.625rem;
+    --sa-gap: var(--sa-space-xs);
+    --sa-gutter: var(--sa-space-md);
+    --sa-dash-gap: var(--sa-space-md);
+    --sa-dash-pad: var(--sa-space-md);
+    --sa-card-pad: var(--sa-gap);
+    --sa-stat-pad: calc(var(--sa-space-sm) + var(--sa-space-xs) / 2);
+    --sa-form-pad: var(--sa-space-md);
+    --sa-field-pad: calc(var(--sa-space-sm) + var(--sa-space-xs) / 2);
   }
 }

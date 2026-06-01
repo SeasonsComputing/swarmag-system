@@ -1,7 +1,7 @@
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const CSS_DIR = `${ROOT}/source/ux/common/components/css`
 
-const CSS_FILES = ['tokens.css', 'themes.css', 'base.css', 'controls.css']
+const CSS_FILES = ['tokens.css', 'themes.css', 'base.css', 'ui.css']
 
 const SELECTOR_REGEX = /^([^/{\n]*)\{/
 const COMMENT_LINE_REGEX = /^\s*\/\//
@@ -340,7 +340,7 @@ const main = async () => {
     } else if (fileName === 'base.css') {
       violations.push(...auditBaseCSS(lines, relative))
       violations.push(...auditValueRules(lines, relative, false))
-    } else if (fileName === 'controls.css') {
+    } else if (fileName === 'ui.css') {
       violations.push(...auditControlsCSS(lines, relative))
       violations.push(...auditValueRules(lines, relative, false))
     }

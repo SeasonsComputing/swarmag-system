@@ -36,7 +36,7 @@ source/
     ├── config/
     ├── common/
     │   ├── assets/                  — static assets used by applications
-    │   │   ├── css/                 — tokens.css, base.css, controls.css
+    │   │   ├── css/                 — tokens.css, base.css, ui.css
     │   │   ├── fonts/               — font typography
     │   │   ├── icons/               — icon library
     │   │   └── logos/               — brand/logos
@@ -557,7 +557,7 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/api + ux/config
 - Three Vite configs, one per app
 - Three Netlify sites, one per app
 - `ux/common/` and `ux/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
-- App roots import shared CSS in this order: `tokens.css`, `base.css`, `controls.css`
+- App roots import shared CSS in this order: `tokens.css`, `base.css`, `ui.css`
 - Packaging, artifact format, and deployment workflow: see `architecture-devops.md §7`
 - No build artifacts are checked into the repository
 

@@ -20,18 +20,18 @@ Four foundation files live in `source/ux/common/components/css/`. App roots impo
 import '@ux/common/components/css/css.tsx'
 ```
 
-| File           | Owns                                                                                                      | Must not contain                                      |
-| -------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `tokens.css`   | Primitive tokens and shared foundation scales                                                             | Element selectors, control selectors, keyframes       |
-| `themes.css`   | Theme role tokens and App control component tokens                                                        | Element selectors, control selectors, keyframes       |
-| `base.css`     | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles | Reusable control visuals, app/page layout rules       |
-| `controls.css` | Reusable App control visuals and declared control parts                                                   | Primitive palette references, app/page-specific rules |
+| File         | Owns                                                                                                      | Must not contain                                      |
+| ------------ | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| `tokens.css` | Primitive tokens and shared foundation scales                                                             | Element selectors, control selectors, keyframes       |
+| `themes.css` | Theme role tokens and App control component tokens                                                        | Element selectors, control selectors, keyframes       |
+| `base.css`   | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles | Reusable control visuals, app/page layout rules       |
+| `ui.css`     | Reusable App control visuals and declared control parts                                                   | Primitive palette references, app/page-specific rules |
 
 Shell-specific styles live with the shell component that owns them. For example,
 `source/ux/common/shell/login.css` is imported by the login shell component
 rather than by app roots.
 
-Raw values are allowed in `tokens.css` and `themes.css` because they define the design vocabulary. Raw browser/platform values are allowed sparingly in `base.css`. `controls.css` uses tokens for meaningful visual values; CSS keywords (`none`, `unset`, `inherit`, `auto`, `transparent`) may appear where tokenization adds no meaning.
+Raw values are allowed in `tokens.css` and `themes.css` because they define the design vocabulary. Raw browser/platform values are allowed sparingly in `base.css`. `ui.css` uses tokens for meaningful visual values; CSS keywords (`none`, `unset`, `inherit`, `auto`, `transparent`) may appear where tokenization adds no meaning.
 
 ### 2.2 Token Layers
 
@@ -41,7 +41,7 @@ Raw values are allowed in `tokens.css` and `themes.css` because they define the 
 | Role / theme   | `themes.css`    | Resolved semantic roles per theme         |
 | Component      | `themes.css`    | App control tokens                        |
 | Foundation CSS | `base.css`      | Browser and semantic HTML element styling |
-| Control CSS    | `controls.css`  | App control and declared part styling     |
+| UI CSS         | `ui.css`        | App control and declared part styling     |
 | Shell CSS      | Shell-local CSS | Shell component-specific styling          |
 
 Controls follow this dependency order:
@@ -52,11 +52,11 @@ primitive tokens → role tokens → component tokens → selectors
 
 Rules:
 
-- `--sa-p-*` primitives are internal and are not consumed directly by `controls.css`.
+- `--sa-p-*` primitives are internal and are not consumed directly by `ui.css`.
 - Role tokens describe semantic meaning: color, background, text, border, shadow, gradient, typography, spacing, motion, and interaction state.
 - Component tokens describe App control concerns and use the `--sa-{control}-{attribute}` or `--sa-{control}-{variant}-{attribute}` shape.
 - Specialized component tokens append specialization last: `--sa-{control}-{variant}-{attribute}-{specialization}`.
-- Selectors in `controls.css` consume role and component tokens, not raw color or spacing decisions.
+- Selectors in `ui.css` consume role and component tokens, not raw color or spacing decisions.
 
 ### 2.3 Prefix Convention
 
@@ -108,7 +108,7 @@ ux/
 
 ## 3. Control Contract
 
-All primitives in `source/ux/common/components/ui/` emit semantic attributes and keep visual styling in `controls.css`.
+All primitives in `source/ux/common/components/ui/` emit semantic attributes and keep visual styling in `ui.css`.
 
 ### 3.1 Semantic Identity
 
@@ -239,7 +239,7 @@ Controls do not:
 - use inline styles
 - reference tokens directly
 
-Controls emit semantic attributes only. Reusable primitive styling lives in `controls.css` and consumes variables from `tokens.css` and `themes.css`.
+Controls emit semantic attributes only. Reusable primitive styling lives in `ui.css` and consumes variables from `tokens.css` and `themes.css`.
 
 Selectors:
 
@@ -280,7 +280,7 @@ data-ui-align
 data-ui-state
 ```
 
-Underlying primitives emit ARIA and library-specific state attributes. `controls.css`
+Underlying primitives emit ARIA and library-specific state attributes. `ui.css`
 may consume Kobalte and ARIA runtime attributes when they represent real primitive
 state:
 
@@ -314,7 +314,7 @@ All violations are detectable via guard scripts in `source/devops/guards/`.
 
 ## 4. Selector Pattern
 
-All component visual rules live in `controls.css`. This section defines the selector pattern and per-control intent.
+All component visual rules live in `ui.css`. This section defines the selector pattern and per-control intent.
 
 ```css
 [data-ui='<control>'] {
@@ -355,7 +355,7 @@ This selector shape is invalid because one element cannot hold two different `da
 [data-ui='progress'][data-ui='progress-fill']
 ```
 
-`controls.css` does not depend on app-specific structure, arbitrary descendant content (`h3`, `p`, etc.), or page-layout sibling relationships. Repeated structural styling belongs in a named common control or in app-local CSS when it is app-specific.
+`ui.css` does not depend on app-specific structure, arbitrary descendant content (`h3`, `p`, etc.), or page-layout sibling relationships. Repeated structural styling belongs in a named common control or in app-local CSS when it is app-specific.
 
 ## 5. Per-Control Intent
 
