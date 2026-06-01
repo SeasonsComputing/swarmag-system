@@ -25,7 +25,7 @@ import {
   type AppComponentProps,
   controlState,
   type WithDataUI
-} from './controls-helpers.ts'
+} from './ui-helpers.ts'
 
 /** Radio-group control props. */
 export type AppRadioGroupProps<Value extends string = string> = AppComponentProps & {

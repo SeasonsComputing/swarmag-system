@@ -15,7 +15,7 @@ AppTextarea  Multiline input control with declared states.
 
 import { TextField, type TextFieldTextAreaProps } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, controlState } from './controls-helpers.ts'
+import { type AppComponent, controlState } from './ui-helpers.ts'
 
 /** Textarea control props. */
 export type AppTextareaProps =

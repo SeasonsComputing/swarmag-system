@@ -15,7 +15,7 @@ PUBLIC
 AppFooter  Footer control component.
 */
 
-import { type AppComponent } from './controls-helpers.ts'
+import { type AppComponent } from './ui-helpers.ts'
 
 /** AppFooter props. */
 export type AppFooterProps = {

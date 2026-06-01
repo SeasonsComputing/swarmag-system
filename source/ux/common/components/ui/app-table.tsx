@@ -18,7 +18,7 @@ AppTableCell    Cell — renders <th> inside AppTableHeader, <td> elsewhere. Acc
 */
 
 import { createContext, type JSX, splitProps, useContext } from '@solid-js'
-import type { AppComponent, AppComponentProps, AppContainerProps } from './controls-helpers.ts'
+import type { AppComponent, AppComponentProps, AppContainerProps } from './ui-helpers.ts'
 
 const TableHeaderCtx = createContext(false)
 const TableSectionCtx = createContext(false)

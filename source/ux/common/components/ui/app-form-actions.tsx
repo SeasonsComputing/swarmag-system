@@ -14,7 +14,7 @@ PUBLIC
 AppFormActions  Right-aligned action row.
 */
 
-import type { AppComponent, AppContainerProps } from './controls-helpers.ts'
+import type { AppComponent, AppContainerProps } from './ui-helpers.ts'
 
 /** AppFormActions props. */
 export type AppFormActionsProps = AppContainerProps

@@ -15,7 +15,7 @@ PUBLIC
 AppFieldset  Semantic field group wrapper with named legend.
 */
 
-import type { AppComponent, AppContainerProps } from './controls-helpers.ts'
+import type { AppComponent, AppContainerProps } from './ui-helpers.ts'
 
 /** AppFieldset props. */
 export type AppFieldsetProps = AppContainerProps & {

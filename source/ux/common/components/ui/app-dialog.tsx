@@ -16,7 +16,7 @@ AppDialog  Dialog control with declared states.
 import { Dialog } from '@kobalte/core/dialog'
 import { splitProps } from '@solid-js'
 import { AppButton, type AppButtonVariant } from './app-button.tsx'
-import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
 
 /** Dialog control props. */
 export type AppDialogProps = AppComponentProps & {

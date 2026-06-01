@@ -25,7 +25,7 @@ import {
   type AppComponentProps,
   controlState,
   type WithDataUI
-} from './controls-helpers.ts'
+} from './ui-helpers.ts'
 
 /** Toggle-group control props. */
 export type AppToggleGroupProps<Value extends string = string> = AppComponentProps & {

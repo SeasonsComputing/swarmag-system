@@ -14,7 +14,7 @@ PUBLIC
 AppFormGrid  Responsive field grid container.
 */
 
-import type { AppComponent, AppContainerProps } from './controls-helpers.ts'
+import type { AppComponent, AppContainerProps } from './ui-helpers.ts'
 
 /** AppFormGrid props. */
 export type AppFormGridProps = AppContainerProps

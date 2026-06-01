@@ -15,7 +15,7 @@ PUBLIC
 AppField  Label + control field wrapper.
 */
 
-import type { AppComponent, AppContainerProps } from './controls-helpers.ts'
+import type { AppComponent, AppContainerProps } from './ui-helpers.ts'
 
 /** AppField props. */
 export type AppFieldProps = AppContainerProps & {
