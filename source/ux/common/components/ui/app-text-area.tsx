@@ -1,24 +1,24 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App textarea control                                                         ║
+║ App text area control                                                        ║
 ║ Semantic wrapper for the Kobalte TextField primitive.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits textarea control semantics without styling concerns.
+Emits text area control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppTextarea  Multiline input control with declared states.
+AppTextArea  Multiline input control with declared states.
 */
 
 import { TextField, type TextFieldTextAreaProps } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
 import { type AppComponent, controlState } from './ui-helpers.ts'
 
-/** Textarea control props. */
-export type AppTextareaProps =
+/** Text area control props. */
+export type AppTextAreaProps =
   & Omit<
     JSX.TextareaHTMLAttributes<HTMLTextAreaElement>,
     'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
@@ -37,7 +37,7 @@ const TextFieldRoot = TextField as unknown as typeof TextField
 const TextFieldTextArea = TextField.TextArea as unknown as typeof TextField.TextArea
 
 /** Multiline input control with declared states. */
-export const AppTextarea = (props: AppTextareaProps): AppComponent => {
+export const AppTextArea = (props: AppTextAreaProps): AppComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',

@@ -14,7 +14,7 @@ import {
   AppFormActions, AppFormGrid, AppInput, AppLayout, AppList, AppListItem, AppMultiSelect,
   AppPopover, AppProgress, AppRadioGroup, AppRadioItem, AppSingleSelect, AppSeparator,
   AppSkeleton, AppSpinner, AppTab, AppTable, AppTableBody, AppTableCell, AppTableHeader,
-  AppTableRow, AppTabList, AppTabPanel, AppTabs, AppTextarea, AppToggle, AppToggleGroup,
+  AppTableRow, AppTabList, AppTabPanel, AppTabs, AppTextArea, AppToggle, AppToggleGroup,
   AppToggleItem, AppTooltip, type AppComponent, type AppContainerProps
 } from '@ux/common/components/ui'
 
@@ -292,8 +292,8 @@ export const StyleGuide = (): AppComponent => {
                     placeholder='Enter service location'
                   />
                 </AppField>
-                <AppField label='AppTextarea' for='application-notes'>
-                  <AppTextarea
+                <AppField label='AppTextArea' for='application-notes'>
+                  <AppTextArea
                     name='application-notes'
                     error={inputError()}
                     onInput={() => undefined}
@@ -381,7 +381,7 @@ export const StyleGuide = (): AppComponent => {
             </AppFieldset>
           </SgSection>
 
-          <SgSection title='AppInput / AppTextarea'>
+          <SgSection title='AppInput / AppTextArea'>
             <AppField label='Toggle error state' for='input-error-toggle' variant='inline'>
               <AppToggle
                 id='input-error-toggle'
@@ -403,7 +403,7 @@ export const StyleGuide = (): AppComponent => {
                   />
                 </AppField>
                 <AppField label='Application notes' for='application-notes'>
-                  <AppTextarea
+                  <AppTextArea
                     name='application-notes'
                     error={inputError()}
                     onInput={() => undefined}
@@ -425,7 +425,7 @@ export const StyleGuide = (): AppComponent => {
                   />
                 </AppField>
                 <AppField label='Disabled comments' for='disabled-comments'>
-                  <AppTextarea
+                  <AppTextArea
                     name='disabled-comments'
                     disabled
                     value='Locked after crew dispatch.'
@@ -487,7 +487,7 @@ export const StyleGuide = (): AppComponent => {
                 </AppField>
               </AppFormGrid>
               <AppField label='Field notes' for='form-demo-notes'>
-                <AppTextarea
+                <AppTextArea
                   name='form-demo-notes'
                   value='Spray window 06:00–09:00.'
                   onInput={() => undefined}

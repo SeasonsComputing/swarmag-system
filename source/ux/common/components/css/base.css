@@ -11,7 +11,7 @@ bare HTML elements:
 
 button    → AppButton
 input     → AppInput
-textarea  → AppTextarea
+textarea  → AppTextArea
 select    → AppSingleSelect
 ul        → AppList
 ol        → AppList
