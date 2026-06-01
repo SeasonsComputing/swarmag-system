@@ -14,7 +14,7 @@ const COMMENT_LINE_REGEX = /^\s*\/\//
 const REPLACEMENTS: StringDictionary = {
   'button': 'AppButton',
   'input': 'AppInput',
-  'textarea': 'AppTextarea',
+  'textarea': 'AppTextArea',
   'select': 'AppSingleSelect',
   'ul': 'AppList',
   'ol': 'AppList',

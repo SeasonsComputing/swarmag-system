@@ -73,7 +73,7 @@ export {
   AppTabs,
   type AppTabsProps
 } from './app-tabs.tsx'
-export { AppTextarea, type AppTextareaProps } from './app-textarea.tsx'
+export { AppTextArea, type AppTextAreaProps } from './app-text-area.tsx'
 export {
   AppToggleGroup,
   type AppToggleGroupProps,

@@ -50,7 +50,7 @@ This is a design-system boundary, not a stylistic preference.
 | -------------------------------------------- | ------------------------------------------------------- |
 | `AppButton`                                  | `<button>`                                              |
 | `AppInput`                                   | `<input>`                                               |
-| `AppTextarea`                                | `<textarea>`                                            |
+| `AppTextArea`                                | `<textarea>`                                            |
 | `AppSingleSelect`                            | `<select>`                                              |
 | `AppCheckbox`                                | `<input type='checkbox'>`                               |
 | `AppRadioGroup`, `AppRadioItem`              | `<input type='radio'>`                                  |
@@ -200,7 +200,7 @@ Pair with `AppField`; pass the same value to `AppField for` and `AppInput id`.
 </AppField>
 ```
 
-### 3.3 AppTextarea
+### 3.3 AppTextArea
 
 Multi-line text entry.
 
@@ -221,7 +221,7 @@ Extends native textarea attributes, excluding styling and semantic hook props.
 | `name`     | `string`  | unset   | Native form field name.           |
 | `rows`     | `number`  | `2`     | Visible text row count.           |
 
-`rows` is interpreted by `AppTextarea` as the visual row count for the shared
+`rows` is interpreted by `AppTextArea` as the visual row count for the shared
 control treatment. The underlying textarea still receives the native `rows`
 attribute, but the component owns the rendered height.
 
@@ -229,7 +229,7 @@ attribute, but the component owns the rendered height.
 
 ```tsx
 <AppField label='Notes' for='notes'>
-  <AppTextarea
+  <AppTextArea
     id='notes'
     name='notes'
     rows={4}
