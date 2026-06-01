@@ -271,7 +271,7 @@ export const StyleGuide = (): AppComponent => {
                     placeholder='Enter service location'
                   />
                 </AppField>
-                <AppField label='Text-box' for='application-notes'>
+                <AppField label='Textbox' for='application-notes'>
                   <AppTextarea
                     name='application-notes'
                     error={inputError()}
@@ -283,7 +283,7 @@ export const StyleGuide = (): AppComponent => {
                 </AppField>
               </AppFormGrid>
               <AppFormGrid>
-                <AppField label='Combo-box' for='service-status'>
+                <AppField label='Dropdown single-select' for='service-status'>
                   <AppSingleSelect
                     name='service-status'
                     placeholder='Select service status'
@@ -291,7 +291,7 @@ export const StyleGuide = (): AppComponent => {
                     options={STATUSES}
                   />
                 </AppField>
-                <AppField label='List-box' for='service-options'>
+                <AppField label='Listbox multi-select' for='service-options'>
                   {/*TODO: AppMultiSelect needs a name?*/}
                   <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
                 </AppField>
