@@ -238,7 +238,7 @@ blockquote {
 table {
   background: var(--sa-bg-table);
   border-collapse: collapse;
-  border: 0;
+  border: unset;
   border-radius: var(--sa-radius-md);
   margin-block: var(--sa-space-xs);
   overflow: hidden;
