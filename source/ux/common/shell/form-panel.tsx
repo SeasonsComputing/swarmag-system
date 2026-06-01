@@ -14,7 +14,7 @@ PUBLIC
 FormPanel  Adaptive form container component.
 */
 
-import type { AppComponent, AppContainerProps } from '@ux/common/components/controls'
+import type { AppComponent, AppContainerProps } from '@ux/common/components/ui'
 
 /** FormPanel props. */
 type FormPanelProps = AppContainerProps

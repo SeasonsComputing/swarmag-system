@@ -13,7 +13,7 @@ PUBLIC
 Content  Main content frame component.
 */
 
-import type { AppComponent, AppContainerProps } from '@ux/common/components/controls'
+import type { AppComponent, AppContainerProps } from '@ux/common/components/ui'
 
 /** Props for the Content component. */
 export type ContentProps = AppContainerProps

@@ -22,8 +22,8 @@ export default defineConfig({
       { find: /^@core\/stdx$/, replacement: resolve(root, 'source/core/std/stdx.ts') },
       { find: /^@ux\/api$/, replacement: resolve(root, 'source/ux/api/api.ts') },
       {
-        find: /^@ux\/common\/components\/controls$/,
-        replacement: resolve(root, 'source/ux/common/components/controls/controls.ts')
+        find: /^@ux\/common\/components\/ui$/,
+        replacement: resolve(root, 'source/ux/common/components/ui/controls.ts')
       },
       {
         find: /^@ux\/common\/components\/forms$/,

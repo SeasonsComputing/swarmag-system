@@ -4,7 +4,7 @@ import { walk } from '@std/walk'
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const UX_DIR = `${ROOT}/source/ux`
 const SKIP_DIRS = [
-  'source/ux/common/components/controls',
+  'source/ux/common/components/ui',
   'source/ux/app-style-guide'
 ]
 

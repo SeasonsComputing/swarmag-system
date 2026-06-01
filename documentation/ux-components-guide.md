@@ -5,7 +5,7 @@
 ## 1. Overview
 
 This document is the consumer guide for the shared SolidJS UI controls exported
-from `@ux/common/components/controls`. It describes the public TypeScript API:
+from `@ux/common/components/ui`. It describes the public TypeScript API:
 what each control is for, which props it accepts, how controlled and
 uncontrolled state work, and how compound controls are composed.
 
@@ -18,7 +18,7 @@ and internal primitive bindings are covered by `ux-components-internals.md`.
 Import controls from the barrel:
 
 ```typescript
-import { AppButton, AppField, AppInput, AppSingleSelect } from '@ux/common/components/controls'
+import { AppButton, AppField, AppInput, AppSingleSelect } from '@ux/common/components/ui'
 ```
 
 Most controls accept `children?: AppComponent`, where `AppComponent` is the
@@ -858,7 +858,7 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 | Prop       | Type                                       | Default | Description       |
 | ---------- | ------------------------------------------ | ------- | ----------------- |
 | `variant`  | `'block-fit' \| 'inline' \| 'inline-fill'` | unset   | Layout direction. |
-| `gap`      | `'tight' \| 'none'`                        | unset   | Gap density.      |
+| `gap`      | `'loose' \| 'tight' \| 'none'`             | unset   | Gap density.      |
 | `children` | `AppComponent`                             | unset   | Layout children.  |
 
 **Variants**
@@ -1077,10 +1077,10 @@ Use at the end of a form or dialog surface for submit and dismissal buttons.
 
 ## 6. Charts
 
-Chart controls are standardized through `AppChart` and chart wrappers in
-`source/ux/common/components/charts` when present. Chart implementation details
-belong to `ux-components-internals.md`; consumers should import chart controls
-from their chart barrel once that API is exposed.
+The chart directory is reserved at `source/ux/common/components/charts`, but the
+current component library does not export public chart controls. Consumers should
+not import Chart.js directly; use App chart controls only after they are exposed
+through the shared chart barrel.
 
 | Variant      | Purpose                          |
 | ------------ | -------------------------------- |

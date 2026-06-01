@@ -16,7 +16,7 @@ import {
   AppSkeleton, AppSpinner, AppTab, AppTable, AppTableBody, AppTableCell, AppTableHeader,
   AppTableRow, AppTabList, AppTabPanel, AppTabs, AppTextarea, AppToggle, AppToggleGroup,
   AppToggleItem, AppTooltip, type AppComponent, type AppContainerProps
-} from '@ux/common/components/controls'
+} from '@ux/common/components/ui'
 
 import '@ux/common/components/css/css.tsx'
 import './style-guide.css'
