@@ -48,7 +48,7 @@
   --sa-color-primary: var(--sa-color-brand-end);
   --sa-color-primary-dim: var(--sa-color-brand-mid);
   --sa-color-secondary: var(--sa-color-brand-start);
-  --sa-color-accent: oklch(60% 0.125 210);
+  --sa-color-accent: oklch(var(--sa-p-gradient-3-mid));
 
   /* Background */
   --sa-bg-page: rgb(21 24 30 / 0.95);
