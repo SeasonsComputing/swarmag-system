@@ -294,9 +294,7 @@ app.tsx
     └── Dashboard          — primary navigation surface
 ```
 
-`Login`, `AuthGuard`, `Content`, and shared stores live in `source/ux/common/`. App packages provide only dashboard configuration (`app-{admin|ops|customer}-dashboard.json`) and app-specific routes, widgets, and features.
-
-Dashboard harness is shared and belongs in `source/ux/common/components/dashboard/`.
+`Login`, `AuthGuard`, `Content`, and shared stores live in `source/ux/common/shell`. App packages provide only dashboard configuration (`app-{admin|ops|customer}-dashboard.json`) and app-specific routes, widgets, and features.
 
 #### 9.1.1 Auth Guard
 
@@ -312,7 +310,7 @@ dashboard → domain page → back to dashboard
 
 ### 9.2 Routing
 
-Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/ux/common/components/shell/bootstrap.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
+Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/ux/common/shell/bootstrap.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
 
 A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
 
@@ -507,33 +505,40 @@ IndexedDB usage is split into two layers:
 
 ### 10.1 Common Component Boundaries
 
-`source/ux/common/` is the swarmAg design system foundation. All components in `common/` are reactive and adaptive by default.
+`source/ux/common/` is the swarmAg system user-experience foundation. All components in `common/` are reactive and adaptive by default.
 
-#### 10.1.1 Belongs in `common/`
+#### 10.1.1 General-purpose UI foundation
 
-** Foundation common to all apps **
+```text
+common/
+└── components/  — portable shared UI foundation
+    ├── charts/  — reserved chart primitive directory
+    ├── css/     — CSS barrel, tokens, themes, base styles, and control styles
+    ├── fonts/   — self-hosted font assets
+    ├── icons/   — shared icon assets
+    └── ui/      — HTML and Kobalte-backed App{Control} primitives
+```
 
-- `assets/` — shared CSS foundation, fonts, icons, and static visual assets
-- `components/shell/` — `bootstrap`, `login`, `auth-guard`, `content`, shell dashboard stub, and form panel
-- `components/ui/` — HTML & Kobalte-backed App{Control} primitives
-- `components/charts/` — chart primitives and chart compositions
-- `components/dashboard/` — dashboard layout foundation
+#### 10.1.2 swarmAg application foundation
 
-** Domain features specific to swarmAg **
+```text
+common/
+├── assets/     — static visual assets specific to swarmAg applications
+│   └── logos/  — shared swarmAg logo assets
+├── shell/      — bootstrap, login, auth guard, content frame, dashboard stub, and form panel
+├── stores/     — session, app preference, and dashboard state stores
+├── views/      — UX-local shared projection types consumed by two or more apps
+└── widgets/    — reusable dashboard widget catalog
+```
 
-- `forms/` — adaptive form primitives and domain-form composition foundations
-- `widgets/` — reusable dashboard widget catalog
-- `stores/` — session, app preference, and dashboard state stores
-- `views/` — UX-local shared types consumed by two or more apps
-
-#### 10.1.2 Stays in the app
+#### 10.1.3 Stays in the app
 
 - dashboard default configuration and app-specific widget composition
 - domain pages and feature pages
 - app-specific route tree
 - app-specific IndexedDB store instance
 
-#### 10.1.3 Rule
+#### 10.1.4 Rule
 
 A component moves to `common/` when a second app needs it — not before.
 
