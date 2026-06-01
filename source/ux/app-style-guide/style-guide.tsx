@@ -101,8 +101,10 @@ const SgSwatch = (props: SgSwatchProps): AppComponent => (
   <figure class='sg-swatch'>
     <div class='sg-swatch-chip' style={{ background: props.value }} />
     <figcaption>
-      <span>{props.label}</span>
-      <code>{props.token}</code>
+      <AppLayout gap='tight'>
+        <span>{props.label}</span>
+        <code>{props.token}</code>
+      </AppLayout>
     </figcaption>
   </figure>
 )
@@ -188,6 +190,13 @@ export const StyleGuide = (): AppComponent => {
                   </AppTableRow>
                   <AppTableRow>
                     <AppTableCell>Lexend</AppTableCell>
+                    <AppTableCell>Annotation</AppTableCell>
+                    <AppTableCell>
+                      <span class='sg-font-annotation'>Caption or Legend</span>
+                    </AppTableCell>
+                  </AppTableRow>
+                  <AppTableRow>
+                    <AppTableCell>Lexend</AppTableCell>
                     <AppTableCell>UI</AppTableCell>
                     <AppTableCell>
                       <span class='sg-font-ui'>Assign crew and assets for spray mission</span>
@@ -207,62 +216,74 @@ export const StyleGuide = (): AppComponent => {
 
           <SgSection title='HTML'>
             <AppFieldset legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
-              <AppTable>
-                <AppTableHeader>
-                  <AppTableCell>Equipment</AppTableCell>
-                  <AppTableCell>Application</AppTableCell>
-                  <AppTableCell align='end'>Price</AppTableCell>
-                  <AppTableCell align='end'>Cost</AppTableCell>
-                </AppTableHeader>
-                <AppTableBody>
-                  <For each={EQUIPMENT}>
-                    {e => (
-                      <>
-                        <AppTableRow variant='section'>
-                          <AppTableCell>{e.section}</AppTableCell>
-                        </AppTableRow>
-                        <For each={e.items}>
-                          {i => (
-                            <AppTableRow>
-                              <AppTableCell>{i.name}</AppTableCell>
-                              <AppTableCell>{i.application}</AppTableCell>
-                              <AppTableCell align='end'>
-                                <samp>{i.price}</samp>
-                              </AppTableCell>
-                              <AppTableCell align='end'>
-                                <samp>{i.cost}</samp>
-                              </AppTableCell>
-                            </AppTableRow>
-                          )}
-                        </For>
-                      </>
-                    )}
-                  </For>
-                </AppTableBody>
-              </AppTable>
+              <AppField
+                label='AppTable, AppTableHeader, AppTableBody, AppTableRow, AppTableCell, AppTableSection'
+                for='for-table'
+              >
+                {/*TODO: AppTable needs a name?*/}
+                <AppTable>
+                  <AppTableHeader>
+                    <AppTableCell>Equipment</AppTableCell>
+                    <AppTableCell>Application</AppTableCell>
+                    <AppTableCell align='end'>Price</AppTableCell>
+                    <AppTableCell align='end'>Cost</AppTableCell>
+                  </AppTableHeader>
+                  <AppTableBody>
+                    <For each={EQUIPMENT}>
+                      {e => (
+                        <>
+                          <AppTableRow variant='section'>
+                            <AppTableCell>{e.section}</AppTableCell>
+                          </AppTableRow>
+                          <For each={e.items}>
+                            {i => (
+                              <AppTableRow>
+                                <AppTableCell>{i.name}</AppTableCell>
+                                <AppTableCell>{i.application}</AppTableCell>
+                                <AppTableCell align='end'>
+                                  <samp>{i.price}</samp>
+                                </AppTableCell>
+                                <AppTableCell align='end'>
+                                  <samp>{i.cost}</samp>
+                                </AppTableCell>
+                              </AppTableRow>
+                            )}
+                          </For>
+                        </>
+                      )}
+                    </For>
+                  </AppTableBody>
+                </AppTable>
+              </AppField>
             </AppFieldset>
             <AppFieldset legend='<ul>, <ol>, <li>'>
               <AppFormGrid>
-                <AppList>
-                  <AppListItem>Confirm chemical inventory.</AppListItem>
-                  <AppListItem>Verify crew certification.</AppListItem>
-                  <AppListItem>Inspect required assets.</AppListItem>
-                </AppList>
-                <AppList variant='bullet'>
-                  <AppListItem>Confirm chemical inventory.</AppListItem>
-                  <AppListItem>Verify crew certification.</AppListItem>
-                  <AppListItem>Inspect required assets.</AppListItem>
-                </AppList>
-                <AppList variant='numbered'>
-                  <AppListItem>Assess site.</AppListItem>
-                  <AppListItem>Plan service.</AppListItem>
-                  <AppListItem>Execute work.</AppListItem>
-                </AppList>
+                <AppField label='AppList (default)' for='list-default'>
+                  <AppList id='list-default'>
+                    <AppListItem>Confirm chemical inventory.</AppListItem>
+                    <AppListItem>Verify crew certification.</AppListItem>
+                    <AppListItem>Inspect required assets.</AppListItem>
+                  </AppList>
+                </AppField>
+                <AppField label='AppList (bullet)' for='list-bullet'>
+                  <AppList id='list-bullet' variant='bullet'>
+                    <AppListItem>Confirm chemical inventory.</AppListItem>
+                    <AppListItem>Verify crew certification.</AppListItem>
+                    <AppListItem>Inspect required assets.</AppListItem>
+                  </AppList>
+                </AppField>
+                <AppField label='AppList (numbered)' for='list-numbered'>
+                  <AppList id='list-numbered' variant='numbered'>
+                    <AppListItem>Assess site.</AppListItem>
+                    <AppListItem>Plan service.</AppListItem>
+                    <AppListItem>Execute work.</AppListItem>
+                  </AppList>
+                </AppField>
               </AppFormGrid>
             </AppFieldset>
             <AppFieldset legend='<input>, <textarea>, <select>, <option>'>
               <AppFormGrid>
-                <AppField label='Text-line' for='field-name'>
+                <AppField label='AppInput' for='field-name'>
                   <AppInput
                     name='field-name'
                     value='North Field'
@@ -271,7 +292,7 @@ export const StyleGuide = (): AppComponent => {
                     placeholder='Enter service location'
                   />
                 </AppField>
-                <AppField label='Textbox' for='application-notes'>
+                <AppField label='AppTextarea' for='application-notes'>
                   <AppTextarea
                     name='application-notes'
                     error={inputError()}
@@ -283,7 +304,7 @@ export const StyleGuide = (): AppComponent => {
                 </AppField>
               </AppFormGrid>
               <AppFormGrid>
-                <AppField label='Dropdown single-select' for='service-status'>
+                <AppField label='AppSingleSelect' for='service-status'>
                   <AppSingleSelect
                     name='service-status'
                     placeholder='Select service status'
@@ -291,7 +312,7 @@ export const StyleGuide = (): AppComponent => {
                     options={STATUSES}
                   />
                 </AppField>
-                <AppField label='Listbox multi-select' for='service-options'>
+                <AppField label='AppMultiSelect' for='service-options'>
                   {/*TODO: AppMultiSelect needs a name?*/}
                   <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
                 </AppField>
@@ -465,7 +486,7 @@ export const StyleGuide = (): AppComponent => {
                   />
                 </AppField>
               </AppFormGrid>
-              <AppField label='Application notes' for='form-demo-notes'>
+              <AppField label='Field notes' for='form-demo-notes'>
                 <AppTextarea
                   name='form-demo-notes'
                   value='Spray window 06:00–09:00.'

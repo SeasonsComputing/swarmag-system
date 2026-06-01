@@ -219,6 +219,11 @@ Extends native textarea attributes, excluding styling and semantic hook props.
 | `disabled` | `boolean` | `false` | Disables the field.               |
 | `id`       | `string`  | `name`  | Used by `AppField` label linkage. |
 | `name`     | `string`  | unset   | Native form field name.           |
+| `rows`     | `number`  | `2`     | Visible text row count.           |
+
+`rows` is interpreted by `AppTextarea` as the visual row count for the shared
+control treatment. The underlying textarea still receives the native `rows`
+attribute, but the component owns the rendered height.
 
 **Example**
 
