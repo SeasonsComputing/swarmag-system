@@ -14,7 +14,7 @@ AppSpinner  Spinner control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
 
 /** Spinner control props. */
 export type AppSpinnerProps =

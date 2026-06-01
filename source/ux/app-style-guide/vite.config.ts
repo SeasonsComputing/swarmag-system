@@ -23,7 +23,7 @@ export default defineConfig({
       { find: /^@ux\/api$/, replacement: resolve(root, 'source/ux/api/api.ts') },
       {
         find: /^@ux\/common\/components\/ui$/,
-        replacement: resolve(root, 'source/ux/common/components/ui/controls.ts')
+        replacement: resolve(root, 'source/ux/common/components/ui/ui.ts')
       },
       {
         find: /^@ux\/common\/components\/forms$/,

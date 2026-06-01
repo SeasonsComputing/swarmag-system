@@ -14,7 +14,7 @@ AppCard  Card control.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps } from './ui-helpers.ts'
 
 /** Card variants declared by the design language. */
 export type AppCardVariant = 'widget' | 'workflow'

@@ -15,7 +15,7 @@ AppSingleSelect  Single-value select control with declared states.
 
 import { Select, type SelectRootItemComponentProps } from '@kobalte/core/select'
 import { splitProps } from '@solid-js'
-import { type AppComponent, type AppOption, appOptionLabel, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppOption, appOptionLabel, controlState } from './ui-helpers.ts'
 
 type CollectionItem = { rawValue: AppOption; key: string }
 

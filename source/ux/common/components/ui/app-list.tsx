@@ -15,7 +15,7 @@ AppListItem  List item — child of AppList.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps } from './ui-helpers.ts'
 
 /** List variant. Omit for a clean unstyled list. */
 export type AppListVariant = 'bullet' | 'numbered'

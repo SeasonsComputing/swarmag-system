@@ -29,7 +29,7 @@ import {
   type AppComponentProps,
   controlState,
   type WithDataUI
-} from './controls-helpers.ts'
+} from './ui-helpers.ts'
 
 /** Tabs control props. */
 export type AppTabsActivationMode = 'automatic' | 'manual'

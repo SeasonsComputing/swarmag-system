@@ -28,7 +28,7 @@ import {
   type AppComponentProps,
   controlState,
   type WithDataUI
-} from './controls-helpers.ts'
+} from './ui-helpers.ts'
 
 /** Accordion root props. */
 export type AppAccordionProps = AppComponentProps & {

@@ -14,7 +14,7 @@ AppBadge  Badge control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
 
 /** Badge variants declared by the design language. */
 export type AppBadgeVariant = 'success' | 'warning' | 'danger' | 'info'

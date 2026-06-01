@@ -16,7 +16,7 @@ AppPopover  Popover control with declared states.
 import { Popover } from '@kobalte/core/popover'
 import { splitProps } from '@solid-js'
 import { AppButton, type AppButtonVariant } from './app-button.tsx'
-import { type AppComponent, type AppComponentProps, controlState } from './controls-helpers.ts'
+import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
 
 /** Popover control props. */
 export type AppPopoverProps = AppComponentProps & {
