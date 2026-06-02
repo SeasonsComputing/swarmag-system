@@ -16,8 +16,8 @@ AppLayout  Layout container with declared variant and gap density.
 import { type JSX, splitProps } from '@solid-js'
 import { type AppComponent, type AppComponentProps } from './ui-helpers.ts'
 
-/** Layout variant. Omit for block (default full-width grid). */
-export type AppLayoutVariant = 'block-fit' | 'inline' | 'inline-fill'
+/** Layout variant. Omit for block-fill stack. */
+export type AppLayoutVariant = 'block-fit' | 'inline' | 'inline-fill' | 'inline-wrap'
 
 /** Layout gap density. Omit for standard spacing. */
 export type AppLayoutGap = 'loose' | 'tight' | 'none'

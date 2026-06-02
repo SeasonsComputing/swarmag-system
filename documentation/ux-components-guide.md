@@ -46,33 +46,34 @@ When this library provides an App control for an HTML element or interaction
 pattern, application code must use the App control instead of the native element.
 This is a design-system boundary, not a stylistic preference.
 
-| Use                                          | Do Not Use                                              |
-| -------------------------------------------- | ------------------------------------------------------- |
-| `AppButton`                                  | `<button>`                                              |
-| `AppInput`                                   | `<input>`                                               |
-| `AppTextArea`                                | `<textarea>`                                            |
-| `AppSingleSelect`                            | `<select>`                                              |
-| `AppCheckbox`                                | `<input type='checkbox'>`                               |
-| `AppRadioGroup`, `AppRadioItem`              | `<input type='radio'>`                                  |
-| `AppToggle`, `AppToggleGroup`                | ad hoc pressed button groups                            |
-| `AppTabs`                                    | ad hoc tab markup                                       |
-| `AppAccordion`                               | ad hoc disclosure markup                                |
-| `AppDialog`, `AppPopover`, `AppTooltip`      | ad hoc overlay primitives                               |
-| `AppProgress`                                | raw progress markup                                     |
-| `AppBadge`, `AppAlert`, `AppAvatar`          | ad hoc status display markup                            |
-| `AppCard`                                    | ad hoc panel wrappers                                   |
-| `AppList`, `AppListItem`                     | `<ul>`, `<ol>`, `<li>`                                  |
-| `AppTable`                                   | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
-| `AppFieldset`                                | `<fieldset>` + `<legend>`                               |
-| `AppField`                                   | `<div>` + `<label>` + {control}                         |
-| `AppFormGrid`, `AppLayout`, `AppFormActions` | ad hoc form layout wrappers                             |
+| Use                                     | Do Not Use                                              |
+| --------------------------------------- | ------------------------------------------------------- |
+| `AppButton`                             | `<button>`                                              |
+| `AppInput`                              | `<input>`                                               |
+| `AppTextArea`                           | `<textarea>`                                            |
+| `AppSingleSelect`                       | `<select>`                                              |
+| `AppCheckbox`                           | `<input type='checkbox'>`                               |
+| `AppRadioGroup`, `AppRadioItem`         | `<input type='radio'>`                                  |
+| `AppToggle`, `AppToggleGroup`           | ad hoc pressed button groups                            |
+| `AppTabs`                               | ad hoc tab markup                                       |
+| `AppAccordion`                          | ad hoc disclosure markup                                |
+| `AppDialog`, `AppPopover`, `AppTooltip` | ad hoc overlay primitives                               |
+| `AppProgress`                           | raw progress markup                                     |
+| `AppBadge`, `AppAlert`, `AppAvatar`     | ad hoc status display markup                            |
+| `AppCard`                               | ad hoc panel wrappers                                   |
+| `AppList`, `AppListItem`                | `<ul>`, `<ol>`, `<li>`                                  |
+| `AppTable`                              | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
+| `AppFieldset`                           | `<fieldset>` + `<legend>`                               |
+| `AppField`                              | `<div>` + `<label>` + {control}                         |
+| `AppLayout`, `AppFormActions`           | ad hoc layout wrappers                                  |
 
 This rule keeps typography roles, semantic attributes, theme behavior, spacing,
 state rendering, and accessibility behavior aligned with the design language.
 
 The architecture guard script `guard-bare-html` enforces the native-element
 subset of this boundary for elements that have direct App control replacements
-currently `button`, `input`, `textarea`, `select`, `ul`, `ol`, and `li`.
+currently `button`, `input`, `textarea`, `select`, `ul`, `ol`, `li`,
+`table`, `thead`, `tbody`, `tfoot`, `tr`, `td`, and `th`.
 
 Other component-first cases are consumer contract requirements even when they
 are not yet mechanically enforced.
@@ -600,11 +601,11 @@ confirmation flows.
 >
   <AppCard variant='workflow'>
     <h2>Edit Field</h2>
-    <AppFormGrid>
+    <AppLayout variant='inline-wrap'>
       <AppField label='Name' for='name'>
         <AppInput id='name' value={name()} onInput={onNameInput} />
       </AppField>
-    </AppFormGrid>
+    </AppLayout>
   </AppCard>
 </AppDialog>
 ```
@@ -860,20 +861,21 @@ General layout container for block and inline child arrangement.
 
 Extends native `div` attributes, excluding styling and semantic hook props.
 
-| Prop       | Type                                       | Default | Description       |
-| ---------- | ------------------------------------------ | ------- | ----------------- |
-| `variant`  | `'block-fit' \| 'inline' \| 'inline-fill'` | unset   | Layout direction. |
-| `gap`      | `'loose' \| 'tight' \| 'none'`             | unset   | Gap density.      |
-| `children` | `AppComponent`                             | unset   | Layout children.  |
+| Prop       | Type                                                        | Default | Description       |
+| ---------- | ----------------------------------------------------------- | ------- | ----------------- |
+| `variant`  | `'block-fit' \| 'inline' \| 'inline-fill' \| 'inline-wrap'` | unset   | Layout direction. |
+| `gap`      | `'loose' \| 'tight' \| 'none'`                              | unset   | Gap density.      |
+| `children` | `AppComponent`                                              | unset   | Layout children.  |
 
 **Variants**
 
-| Variant       | Use                                               |
-| ------------- | ------------------------------------------------- |
-| unset         | Full-width vertical stack.                        |
-| `block-fit`   | Vertical stack that fits its content width.       |
-| `inline`      | Horizontal wrapping layout.                       |
-| `inline-fill` | Horizontal layout where children share the width. |
+| Variant       | Use                                                |
+| ------------- | -------------------------------------------------- |
+| unset         | Full-width vertical stack.                         |
+| `block-fit`   | Vertical stack that fits its content width.        |
+| `inline`      | Horizontal wrapping layout.                        |
+| `inline-fill` | Horizontal layout where children share the width.  |
+| `inline-wrap` | Responsive row-oriented grid with column wrapping. |
 
 **Example**
 
@@ -913,7 +915,7 @@ Extends native `li` attributes, excluding styling and semantic hook props.
 
 ### 5.3 AppTable
 
-Semantic table wrappers.
+Semantic table wrappers. Horizontal overflow is opt-in through `AppTable`.
 
 **Required Composition**
 
@@ -928,13 +930,16 @@ AppTable
 
 **Props**
 
-| Component        | Props                                  | Notes                          |
-| ---------------- | -------------------------------------- | ------------------------------ |
-| `AppTable`       | native table attrs                     | Renders `<table>`.             |
-| `AppTableHeader` | `children: AppComponent`               | Wraps children in header row.  |
-| `AppTableBody`   | native table-section attrs             | Renders `<tbody>`.             |
-| `AppTableRow`    | `variant?: 'section'` plus row attrs   | Section rows span all columns. |
-| `AppTableCell`   | `align?: 'start' \| 'center' \| 'end'` | Renders `<th>` in headers.     |
+| Component        | Props                                     | Notes                                          |
+| ---------------- | ----------------------------------------- | ---------------------------------------------- |
+| `AppTable`       | native table attrs, `overflow?: Overflow` | Renders `<table>` or overflow wrapper + table. |
+| `AppTableHeader` | `children: AppComponent`                  | Wraps children in header row.                  |
+| `AppTableBody`   | native table-section attrs                | Renders `<tbody>`.                             |
+| `AppTableRow`    | `variant?: 'section'` plus row attrs      | Section rows span all columns.                 |
+| `AppTableCell`   | `align?: 'start' \| 'center' \| 'end'`    | Renders `<th>` in headers.                     |
+
+`Overflow` is `'scroll' | 'hidden'`. Omit `overflow` for a plain semantic table.
+Use `overflow='scroll'` for wide tables that should scroll horizontally.
 
 **Example**
 
@@ -1018,46 +1023,18 @@ Use when a form has a named group of related fields.
 
 ```tsx
 <AppFieldset legend='Spray window'>
-  <AppFormGrid>
+  <AppLayout variant='inline-wrap'>
     <AppField label='Start time' for='start'>
       <AppInput id='start' type='time' />
     </AppField>
     <AppField label='End time' for='end'>
       <AppInput id='end' type='time' />
     </AppField>
-  </AppFormGrid>
+  </AppLayout>
 </AppFieldset>
 ```
 
-### 5.7 AppFormGrid
-
-Responsive field grid.
-
-Use `AppFormGrid` for groups of `AppField` children that should automatically
-flow into responsive form columns. It uses a field-oriented minimum column width,
-so fields wrap onto new rows as available width changes.
-
-Use `AppLayout` for general child arrangement, button rows, badges, compact
-inline groups, and non-form layouts. `AppLayout` can stack or wrap children, but
-it does not apply the form-specific auto-fit column behavior.
-
-**Props**
-
-| Prop       | Type           | Required | Default | Description     |
-| ---------- | -------------- | -------- | ------- | --------------- |
-| `children` | `AppComponent` | yes      | —       | Field children. |
-
-**Example**
-
-```tsx
-<AppFormGrid>
-  <AppField label='Name' for='name'>
-    <AppInput id='name' value={name()} onInput={onNameInput} />
-  </AppField>
-</AppFormGrid>
-```
-
-### 5.8 AppFormActions
+### 5.7 AppFormActions
 
 Right-aligned action row.
 

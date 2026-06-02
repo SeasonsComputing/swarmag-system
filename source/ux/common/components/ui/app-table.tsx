@@ -10,7 +10,7 @@ Emits table semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppTable        Table root — renders <table>.
+AppTable        Table root — optionally wraps <table> in an overflow container.
 AppTableHeader  Header row — renders <thead><tr>; children become <th>.
 AppTableBody    Body section — renders <tbody>.
 AppTableRow     Body row — renders <tr>. variant='section' for group-header rows.
@@ -23,14 +23,24 @@ import type { AppComponent, AppComponentProps, AppContainerProps } from './ui-he
 const TableHeaderCtx = createContext(false)
 const TableSectionCtx = createContext(false)
 
+/** AppTable overflow behavior. */
+export type AppTableOverflow = 'hidden' | 'scroll'
+
 /** AppTable props. */
 export type AppTableProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-variant'
+    | 'overflow'
   >
   & {
+    overflow?: AppTableOverflow
     class?: never
     classList?: never
     style?: never
@@ -88,17 +98,32 @@ export type AppTableCellProps =
     'data-ui-variant'?: never
   }
 
-/** Table root. */
+/** Table root with optional horizontal overflow handling. */
 export const AppTable = (props: AppTableProps): AppComponent => {
-  const [, others] = splitProps(props, ['class', 'classList', 'style', 'data-ui', 'data-ui-variant'])
-  return <table {...others} data-ui='table' />
+  const [local, others] = splitProps(props, [
+    'overflow',
+    'class',
+    'classList',
+    'style',
+    'data-ui',
+    'data-ui-variant'
+  ])
+  const table = <table {...others} data-ui='table' />
+
+  return local.overflow
+    ? (
+      <div data-ui='table-container' data-ui-overflow={local.overflow}>
+        {table}
+      </div>
+    )
+    : table
 }
 
 /** Header row. Wraps children in <thead><tr>; cells render as <th>. */
 export const AppTableHeader = (props: AppTableHeaderProps): AppComponent => (
   <TableHeaderCtx.Provider value>
     <thead data-ui='table-head'>
-      <tr>
+      <tr data-ui='table-row'>
         {props.children}
       </tr>
     </thead>

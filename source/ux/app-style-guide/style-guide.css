@@ -4,14 +4,19 @@
   border-block-end: var(--sa-shell-chrome-border);
   box-shadow: var(--sa-shell-chrome-shadow);
   margin: 0;
-  padding: var(--sa-space-md) var(--sa-space-xl);
+  padding: var(--sa-card-panel-pad);
   position: sticky;
+  top: 0;
   z-index: var(--sa-z-docked);
   align-items: center;
   display: flex;
-  gap: var(--sa-space-lg);
-  inset-block-start: 0;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--sa-gap);
+}
+
+.sg-header > :first-child {
+  flex: 1 1 24rem;
+  min-width: 240px;
 }
 
 .sg-header .nowrap {
