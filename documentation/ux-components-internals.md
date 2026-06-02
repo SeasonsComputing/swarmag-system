@@ -132,7 +132,6 @@ fieldset
 footer
 footer-logo
 form-actions
-form-grid
 input
 layout
 list
@@ -160,6 +159,7 @@ tab-panel
 table
 table-body
 table-cell
+table-container
 table-head
 table-row
 tabs
@@ -266,7 +266,7 @@ Controls are atomic in scope. They do not:
 - implement workflows
 - perform validation orchestration
 
-Layout controls such as `AppLayout`, `AppFormGrid`, and `AppFormActions` manage local child arrangement only.
+Layout controls such as `AppLayout` and `AppFormActions` manage local child arrangement only.
 
 ### 3.7 Attribute Discipline
 
@@ -393,16 +393,16 @@ This selector shape is invalid because one element cannot hold two different `da
 
 ### 5.3 Layout Controls
 
-| Control        | Intent                                                            |
-| -------------- | ----------------------------------------------------------------- |
-| `layout`       | General block and inline child arrangement                        |
-| `list`         | Semantic list with unset, bullet, and numbered variants           |
-| `table`        | Semantic table family with header/body/row/cell parts             |
-| `footer`       | Branded footer primitive using shell chrome and safe-area support |
-| `field`        | Label + control wrapper                                           |
-| `fieldset`     | Semantic group boundary with legend                               |
-| `form-grid`    | Responsive auto-fit column layout for form fields                 |
-| `form-actions` | Right-aligned action row for form submission and dismissal        |
+| Control           | Intent                                                            |
+| ----------------- | ----------------------------------------------------------------- |
+| `layout`          | General block and inline child arrangement                        |
+| `list`            | Semantic list with unset, bullet, and numbered variants           |
+| `table`           | Semantic table family with header/body/row/cell parts             |
+| `table-container` | Optional overflow wrapper emitted by `AppTable`                   |
+| `footer`          | Branded footer primitive using shell chrome and safe-area support |
+| `field`           | Label + control wrapper                                           |
+| `fieldset`        | Semantic group boundary with legend                               |
+| `form-actions`    | Right-aligned action row for form submission and dismissal        |
 
 ## 6. Chart Controls
 

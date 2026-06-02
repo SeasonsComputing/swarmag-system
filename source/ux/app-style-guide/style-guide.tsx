@@ -11,7 +11,7 @@ import { createEffect, createSignal, For } from '@solid-js'
 import {
   AppAccordion, AppAccordionContent, AppAccordionItem, AppAccordionTrigger, AppAlert, AppAvatar,
   AppBadge, AppButton, AppCard, AppCheckbox, AppDialog, AppField, AppFieldset, AppFooter,
-  AppFormActions, AppFormGrid, AppInput, AppLayout, AppList, AppListItem, AppMultiSelect,
+  AppFormActions, AppInput, AppLayout, AppList, AppListItem, AppMultiSelect,
   AppPopover, AppProgress, AppRadioGroup, AppRadioItem, AppSingleSelect, AppSeparator,
   AppSkeleton, AppSpinner, AppTab, AppTable, AppTableBody, AppTableCell, AppTableHeader,
   AppTableRow, AppTabList, AppTabPanel, AppTabs, AppTextArea, AppToggle, AppToggleGroup,
@@ -46,10 +46,9 @@ type Tab = 'assessment' | 'planning' | 'execution' | 'followup'
 const SgHeader = (): AppComponent => {
   const [theme, setTheme] = createSignal<Theme>('dark')
   createEffect(() => document.documentElement.dataset.theme = theme())
-
   return (
     <header class='sg-header'>
-      <AppLayout gap='tight'>
+      <AppLayout gap='none'>
         <h1>
           swarmAg <span class='nowrap'>Style Guide</span>
         </h1>
@@ -160,20 +159,20 @@ export const StyleGuide = (): AppComponent => {
             <AppFieldset legend='Typefaces'>
               <AppTable>
                 <AppTableHeader>
-                  <AppTableCell>Typeface</AppTableCell>
                   <AppTableCell>Role</AppTableCell>
                   <AppTableCell>Example</AppTableCell>
                 </AppTableHeader>
                 <AppTableBody>
-                  <AppTableRow>
+                  <AppTableRow variant='section'>
                     <AppTableCell>Comfortaa</AppTableCell>
+                  </AppTableRow>
+                  <AppTableRow>
                     <AppTableCell>Heading</AppTableCell>
                     <AppTableCell>
                       <span class='sg-font-heading'>Operations briefing schedule confirmed</span>
                     </AppTableCell>
                   </AppTableRow>
                   <AppTableRow>
-                    <AppTableCell>Comfortaa</AppTableCell>
                     <AppTableCell>Body</AppTableCell>
                     <AppTableCell>
                       <span class='sg-font-body'>
@@ -181,29 +180,31 @@ export const StyleGuide = (): AppComponent => {
                       </span>
                     </AppTableCell>
                   </AppTableRow>
-                  <AppTableRow>
+                  <AppTableRow variant='section'>
                     <AppTableCell>Lexend</AppTableCell>
+                  </AppTableRow>
+                  <AppTableRow>
                     <AppTableCell>Label</AppTableCell>
                     <AppTableCell>
                       <span class='sg-font-label'>Service window 06:00–09:00</span>
                     </AppTableCell>
                   </AppTableRow>
                   <AppTableRow>
-                    <AppTableCell>Lexend</AppTableCell>
                     <AppTableCell>Annotation</AppTableCell>
                     <AppTableCell>
                       <span class='sg-font-annotation'>Caption or Legend</span>
                     </AppTableCell>
                   </AppTableRow>
                   <AppTableRow>
-                    <AppTableCell>Lexend</AppTableCell>
                     <AppTableCell>UI</AppTableCell>
                     <AppTableCell>
                       <span class='sg-font-ui'>Assign crew and assets for spray mission</span>
                     </AppTableCell>
                   </AppTableRow>
-                  <AppTableRow>
+                  <AppTableRow variant='section'>
                     <AppTableCell>Cascadia Mono</AppTableCell>
+                  </AppTableRow>
+                  <AppTableRow>
                     <AppTableCell>Mono</AppTableCell>
                     <AppTableCell>
                       <code>service.status = 'ready'; acres = 142</code>
@@ -221,7 +222,7 @@ export const StyleGuide = (): AppComponent => {
                 for='for-table'
               >
                 {/*TODO: AppTable needs a name?*/}
-                <AppTable>
+                <AppTable overflow='scroll'>
                   <AppTableHeader>
                     <AppTableCell>Equipment</AppTableCell>
                     <AppTableCell>Application</AppTableCell>
@@ -257,7 +258,7 @@ export const StyleGuide = (): AppComponent => {
               </AppField>
             </AppFieldset>
             <AppFieldset legend='<ul>, <ol>, <li>'>
-              <AppFormGrid>
+              <AppLayout variant='inline-wrap'>
                 <AppField label='AppList (default)' for='list-default'>
                   <AppList id='list-default'>
                     <AppListItem>Confirm chemical inventory.</AppListItem>
@@ -279,10 +280,10 @@ export const StyleGuide = (): AppComponent => {
                     <AppListItem>Execute work.</AppListItem>
                   </AppList>
                 </AppField>
-              </AppFormGrid>
+              </AppLayout>
             </AppFieldset>
             <AppFieldset legend='<input>, <textarea>, <select>, <option>'>
-              <AppFormGrid>
+              <AppLayout variant='inline-wrap'>
                 <AppField label='AppInput' for='field-name'>
                   <AppInput
                     name='field-name'
@@ -302,8 +303,8 @@ export const StyleGuide = (): AppComponent => {
                     rows={6}
                   />
                 </AppField>
-              </AppFormGrid>
-              <AppFormGrid>
+              </AppLayout>
+              <AppLayout variant='inline-wrap'>
                 <AppField label='AppSingleSelect' for='service-status'>
                   <AppSingleSelect
                     name='service-status'
@@ -316,7 +317,7 @@ export const StyleGuide = (): AppComponent => {
                   {/*TODO: AppMultiSelect needs a name?*/}
                   <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
                 </AppField>
-              </AppFormGrid>
+              </AppLayout>
             </AppFieldset>
           </SgSection>
 
@@ -392,7 +393,7 @@ export const StyleGuide = (): AppComponent => {
               </AppToggle>
             </AppField>
             <AppFieldset legend='Enabled'>
-              <AppFormGrid>
+              <AppLayout variant='inline-wrap'>
                 <AppField label='Field name' for='field-name'>
                   <AppInput
                     name='field-name'
@@ -412,10 +413,10 @@ export const StyleGuide = (): AppComponent => {
                     rows={6}
                   />
                 </AppField>
-              </AppFormGrid>
+              </AppLayout>
             </AppFieldset>
             <AppFieldset legend='Disabled'>
-              <AppFormGrid>
+              <AppLayout variant='inline-wrap'>
                 <AppField label='Disabled acreage' for='disabled-acreage'>
                   <AppInput
                     name='disabled-acreage'
@@ -433,7 +434,7 @@ export const StyleGuide = (): AppComponent => {
                     rows={6}
                   />
                 </AppField>
-              </AppFormGrid>
+              </AppLayout>
             </AppFieldset>
           </SgSection>
 
@@ -448,7 +449,7 @@ export const StyleGuide = (): AppComponent => {
               </AppToggle>
             </AppField>
             <AppFieldset legend='Single-select'>
-              <AppFormGrid>
+              <AppLayout variant='inline-wrap'>
                 <AppField label='Enabled select' for='service-status'>
                   <AppSingleSelect
                     name='service-status'
@@ -465,16 +466,16 @@ export const StyleGuide = (): AppComponent => {
                     options={STATUSES}
                   />
                 </AppField>
-              </AppFormGrid>
+              </AppLayout>
             </AppFieldset>
             <AppFieldset legend='Multi-select'>
               <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
             </AppFieldset>
           </SgSection>
 
-          <SgSection title='AppField / AppFieldset / AppFormGrid / AppFormActions'>
+          <SgSection title='AppField / AppFieldset / AppLayout / AppFormActions'>
             <AppFieldset legend='Service details'>
-              <AppFormGrid>
+              <AppLayout variant='inline-wrap'>
                 <AppField label='Field name' for='form-demo-name'>
                   <AppInput name='form-demo-name' value='North Field' onInput={() => undefined} />
                 </AppField>
@@ -485,7 +486,7 @@ export const StyleGuide = (): AppComponent => {
                     placeholder='Select service type'
                   />
                 </AppField>
-              </AppFormGrid>
+              </AppLayout>
               <AppField label='Field notes' for='form-demo-notes'>
                 <AppTextArea
                   name='form-demo-notes'
@@ -517,7 +518,7 @@ export const StyleGuide = (): AppComponent => {
           </SgSection>
 
           <SgSection title='AppRadioGroup / AppRadioItem'>
-            <AppFormGrid>
+            <AppLayout variant='inline-wrap'>
               <AppRadioGroup value={radioValue()} onChange={setRadioValue}>
                 <AppRadioItem value='aerial'>Aerial application</AppRadioItem>
                 <AppRadioItem value='ground'>Ground machinery</AppRadioItem>
@@ -533,7 +534,7 @@ export const StyleGuide = (): AppComponent => {
                 <AppRadioItem value='afternoon'>Afternoon</AppRadioItem>
                 <AppRadioItem value='night'>Night</AppRadioItem>
               </AppRadioGroup>
-            </AppFormGrid>
+            </AppLayout>
           </SgSection>
 
           <SgSection title='AppToggle / AppToggleGroup / AppToggleItem'>
@@ -613,7 +614,7 @@ export const StyleGuide = (): AppComponent => {
           </SgSection>
 
           <SgSection title='Secondary Windows'>
-            <AppFormGrid>
+            <AppLayout variant='inline-wrap'>
               <AppFieldset legend='AppTooltip'>
                 <AppLayout variant='inline'>
                   <AppTooltip trigger='Hover field note' defaultOpen>
@@ -639,7 +640,7 @@ export const StyleGuide = (): AppComponent => {
                   </AppPopover>
                 </AppLayout>
               </AppFieldset>
-            </AppFormGrid>
+            </AppLayout>
           </SgSection>
 
           <SgSection title='AppAccordion'>
@@ -680,7 +681,7 @@ export const StyleGuide = (): AppComponent => {
           </SgSection>
 
           <SgSection title='AppCard'>
-            <AppFormGrid>
+            <AppLayout variant='inline-wrap'>
               <AppCard>
                 <AppLayout>
                   <h3>Default card</h3>
@@ -706,11 +707,11 @@ export const StyleGuide = (): AppComponent => {
                   </p>
                 </AppLayout>
               </AppCard>
-            </AppFormGrid>
+            </AppLayout>
           </SgSection>
 
           <SgSection title='AppLayout'>
-            <AppFormGrid>
+            <AppLayout variant='inline-wrap'>
               <AppFieldset legend='Stack (block, default)'>
                 <AppLayout>
                   <AppAlert>North Field spray window confirmed.</AppAlert>
@@ -725,7 +726,7 @@ export const StyleGuide = (): AppComponent => {
                   <AppBadge variant='warning'>Wind watch</AppBadge>
                 </AppLayout>
               </AppFieldset>
-            </AppFormGrid>
+            </AppLayout>
             <AppFieldset legend='Row (inline)'>
               <AppLayout variant='inline'>
                 <AppButton>Cancel</AppButton>

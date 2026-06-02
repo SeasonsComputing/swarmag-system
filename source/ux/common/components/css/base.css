@@ -16,6 +16,13 @@ select    → AppSingleSelect
 ul        → AppList
 ol        → AppList
 li        → AppListItem
+table     → AppTable
+thead     → AppTableHeader
+tbody     → AppTableBody
+tfoot     → AppTableBody
+tr        → AppTableRow
+td        → AppTableCell
+th        → AppTableCell
 */
 
 /*
@@ -196,54 +203,6 @@ blockquote {
   margin-inline: 0;
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
-}
-
-/*
- * TABLE
- * ───────────────────────────────────────────────────────────────────────────
- */
-
-table {
-  background: var(--sa-bg-table);
-  border-collapse: collapse;
-  border: unset;
-  border-radius: var(--sa-radius-md);
-  margin-block: var(--sa-space-xs);
-  overflow: hidden;
-  width: 100%;
-}
-
-thead {
-  background: var(--sa-gradient-brand);
-}
-
-th {
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-label-font-size);
-  font-weight: var(--sa-annotation-font-weight);
-  color: var(--sa-text-on-brand);
-}
-
-td {
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-label-font-size);
-  font-weight: var(--sa-body-font-weight);
-  color: var(--sa-text-secondary);
-}
-
-th,
-td {
-  border-block-end: var(--sa-border-default);
-  padding: var(--sa-space-sm);
-  text-align: start;
-}
-
-tr:hover {
-  background: var(--sa-bg-hover);
-}
-
-thead tr:hover {
-  background: transparent;
 }
 
 /*

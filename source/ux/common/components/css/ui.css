@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ UX control selectors                                                         ║
+║ UI control selectors                                                         ║
 ║ Visual rules for semantic App{Control} primitive attributes.                 ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
@@ -338,8 +338,60 @@
  * ───────────────────────────────────────────────────────────────────────────
  */
 
+[data-ui='table-container'] {
+  border-radius: var(--sa-radius-md);
+  overflow-x: hidden;
+  width: 100%;
+}
+
+[data-ui='table-container'] > [data-ui='table'] {
+  background: var(--sa-bg-table);
+  border-collapse: collapse;
+  border-radius: var(--sa-radius-md);
+  min-width: 100%;
+  width: max-content;
+}
+
+[data-ui='table-container'][data-ui-overflow='scroll'] {
+  overflow-x: auto;
+}
+
 [data-ui='table'] {
-  border: var(--sa-card-panel-border);
+  background: var(--sa-bg-table);
+  border-collapse: collapse;
+  border-radius: var(--sa-radius-md);
+  overflow: hidden;
+  width: 100%;
+}
+
+[data-ui='table-head'] {
+  background: var(--sa-gradient-brand);
+}
+
+[data-ui='table-row']:hover {
+  background: var(--sa-bg-hover);
+}
+
+[data-ui='table-head'] [data-ui='table-row']:hover {
+  background: transparent;
+}
+
+[data-ui='table-head'] [data-ui='table-cell'] {
+  color: var(--sa-text-on-brand);
+  font-weight: var(--sa-annotation-font-weight);
+}
+
+[data-ui='table-body'] [data-ui='table-cell'] {
+  color: var(--sa-text-secondary);
+  font-weight: var(--sa-body-font-weight);
+}
+
+[data-ui='table-cell'] {
+  border-block-end: var(--sa-border-default);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  padding: var(--sa-space-sm);
+  text-align: start;
 }
 
 [data-ui='table-row'][data-ui-variant='section'] [data-ui='table-cell'] {
@@ -1064,8 +1116,15 @@
   flex: 1 1 0;
 }
 
+[data-ui='layout'][data-ui-variant='inline-wrap'] {
+  align-items: stretch;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  width: 100%;
+}
+
 /*
- * FIELD / FORM-GRID / FORM-ACTIONS / FIELDSET
+ * FIELD / FORM-ACTIONS / FIELDSET
  * ───────────────────────────────────────────────────────────────────────────
  */
 
@@ -1089,13 +1148,6 @@
 
 [data-ui='fieldset'] > legend {
   color: var(--sa-text-h3);
-}
-
-[data-ui='form-grid'] {
-  align-items: start;
-  display: grid;
-  gap: var(--sa-gap);
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 [data-ui='form-actions'] {

@@ -23,7 +23,7 @@ export type AppFieldsetProps = AppContainerProps & {
   legend: string
 }
 
-/** Semantic field group with legend. Compose AppFormGrid inside for field layout. */
+/** Semantic field group with legend. Compose AppLayout inside for child layout. */
 export const AppFieldset = (props: AppFieldsetProps): AppComponent => (
   <fieldset data-ui='fieldset'>
     <legend>{props.legend}</legend>

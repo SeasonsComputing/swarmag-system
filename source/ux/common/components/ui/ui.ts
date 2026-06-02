@@ -23,7 +23,6 @@ export { AppField, type AppFieldProps } from './app-field.tsx'
 export { AppFieldset, type AppFieldsetProps } from './app-fieldset.tsx'
 export { AppFooter, type AppFooterProps } from './app-footer.tsx'
 export { AppFormActions, type AppFormActionsProps } from './app-form-actions.tsx'
-export { AppFormGrid, type AppFormGridProps } from './app-form-grid.tsx'
 export { AppInput, type AppInputProps } from './app-input.tsx'
 export {
   AppLayout,
@@ -59,6 +58,7 @@ export {
   type AppTableCellProps,
   AppTableHeader,
   type AppTableHeaderProps,
+  type AppTableOverflow,
   type AppTableProps,
   AppTableRow,
   type AppTableRowProps

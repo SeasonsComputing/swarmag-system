@@ -8,7 +8,8 @@ const SKIP_DIRS = [
   'source/ux/app-style-guide'
 ]
 
-const BARE_HTML_REGEX = /<(button|input|textarea|select|ul|ol|li)[\s/>]/g
+const BARE_HTML_REGEX =
+  /<(button|input|textarea|select|ul|ol|li|table|thead|tbody|tfoot|tr|td|th)[\s/>]/g
 const COMMENT_LINE_REGEX = /^\s*\/\//
 
 const REPLACEMENTS: StringDictionary = {
@@ -18,7 +19,14 @@ const REPLACEMENTS: StringDictionary = {
   'select': 'AppSingleSelect',
   'ul': 'AppList',
   'ol': 'AppList',
-  'li': 'AppListItem'
+  'li': 'AppListItem',
+  'table': 'AppTable',
+  'thead': 'AppTableHeader',
+  'tbody': 'AppTableBody',
+  'tfoot': 'AppTableBody',
+  'tr': 'AppTableRow',
+  'td': 'AppTableCell',
+  'th': 'AppTableCell'
 }
 
 const shouldSkip = (filePath: string): boolean => {
