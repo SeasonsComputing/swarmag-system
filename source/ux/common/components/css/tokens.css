@@ -211,8 +211,8 @@ Breakpoints match architecture-ux.md §7:
 
   /* Desktop ≥ 1024px */
   --sa-gutter: var(--sa-space-2xl);
-  --sa-gap: var(--sa-space-md);
   --sa-pad: var(--sa-space-lg);
+  --sa-gap: var(--sa-space-md);
 
   /* Form card max-width — centered on tablet/desktop */
   --sa-form-max-width: 640px;
@@ -246,16 +246,16 @@ Breakpoints match architecture-ux.md §7:
 @media (max-width: 1024px) {
   :root {
     --sa-gutter: var(--sa-space-2xl);
-    --sa-gap: var(--sa-space-md);
     --sa-pad: calc(var(--sa-space-lg) - var(--sa-space-xs));
+    --sa-gap: var(--sa-space-md);
   }
 }
 
 @media (max-width: 768px) {
   :root {
     --sa-gutter: var(--sa-space-xl);
-    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
     --sa-pad: var(--sa-space-md);
+    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
   }
 }
 
@@ -264,8 +264,8 @@ Breakpoints match architecture-ux.md §7:
     --sa-heading-font-size-h4: var(--sa-p-font-size-sm);
     --sa-body-font-size: var(--sa-p-font-size-sm);
     --sa-gutter: var(--sa-space-lg);
-    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
     --sa-pad: var(--sa-space-md);
+    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
   }
 }
 
@@ -273,7 +273,7 @@ Breakpoints match architecture-ux.md §7:
   :root {
     --sa-base-size: var(--sa-p-font-size-sm);
     --sa-gutter: calc(var(--sa-space-lg) - var(--sa-space-xs));
-    --sa-gap: var(--sa-space-sm);
     --sa-pad: calc(var(--sa-space-md) - var(--sa-space-xs));
+    --sa-gap: var(--sa-space-sm);
   }
 }
