@@ -201,6 +201,8 @@ Controls and parts may additionally declare these extension attributes:
 | Control / Part    | Attribute          | Declared Values          |
 | ----------------- | ------------------ | ------------------------ |
 | `layout`          | `data-ui-gap`      | `loose`, `tight`, `none` |
+| `tab-list`        | `data-ui-drag`     | `enabled`, `active`      |
+| `tab-list`        | `data-ui-layout`   | `between`                |
 | `table-cell`      | `data-ui-align`    | `start`, `center`, `end` |
 | `table-container` | `data-ui-overflow` | `hidden`, `scroll`       |
 

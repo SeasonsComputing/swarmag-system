@@ -754,21 +754,25 @@
   scrollbar-gutter: stable;
 }
 
+[data-ui='tab-list'][data-ui-layout='between'] {
+  justify-content: space-between;
+}
+
 @media (hover: hover) and (pointer: fine) {
-  [data-ui='tab-list'][data-ui-overflow='scroll'] {
+  [data-ui='tab-list'][data-ui-drag='enabled'] {
     cursor: grab;
   }
 
-  [data-ui='tab-list'][data-ui-overflow='scroll'] [data-ui='tab'] {
+  [data-ui='tab-list'][data-ui-drag='enabled'] [data-ui='tab'] {
     cursor: grab;
   }
 
-  [data-ui='tab-list'][data-ui-state='dragging'] {
+  [data-ui='tab-list'][data-ui-drag='active'] {
     cursor: grabbing;
     user-select: none;
   }
 
-  [data-ui='tab-list'][data-ui-state='dragging'] [data-ui='tab'] {
+  [data-ui='tab-list'][data-ui-drag='active'] [data-ui='tab'] {
     cursor: grabbing;
   }
 }
