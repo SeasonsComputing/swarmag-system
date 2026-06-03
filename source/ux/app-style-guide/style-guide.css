@@ -16,7 +16,7 @@
 
 .sg-header > :first-child {
   flex: 1 1 24rem;
-  min-width: 240px;
+  min-width: var(--sa-size-wrap);
 }
 
 .sg-header .nowrap {
@@ -84,11 +84,12 @@
 
 .sg-font-heading {
   font-family: var(--sa-heading-font-family);
-  font-size: var(--sa-heading-font-size-h3);
+  font-size: var(--sa-heading-font-size-h4);
 }
 
 .sg-font-body {
   font-family: var(--sa-body-font-family);
+  font-weight: var(--sa-body-font-weight);
 }
 
 .sg-font-label {
@@ -104,8 +105,10 @@
 
 .sg-font-ui {
   font-family: var(--sa-ui-font-family);
+  font-weight: var(--sa-ui-font-weight);
 }
 
-.sg-font-mono {
-  font-family: var(--sa-mono-font-family);
+.sg-font-data {
+  font-family: var(--sa-data-font-family);
+  font-weight: var(--sa-data-font-weight);
 }

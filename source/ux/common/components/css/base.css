@@ -79,6 +79,7 @@ body {
   color: var(--sa-text-primary);
   font-family: var(--sa-body-font-family);
   font-weight: var(--sa-body-font-weight);
+  font-size: var(--sa-body-font-size);
   line-height: var(--sa-body-line-height);
   opacity: 0;
   position: relative;
@@ -162,12 +163,13 @@ h5 {
 }
 
 /*
- * PRE, CODE, KBD, and BLOCKQUOTE
+ * PRE / CODE / KBD / SAMP
  * ───────────────────────────────────────────────────────────────────────────
  */
 
 pre, code, kbd, samp {
-  font-family: var(--sa-mono-font-family);
+  font-family: var(--sa-data-font-family);
+  font-weight: var(--sa-data-font-weight);
   color: var(--sa-color-accent);
 }
 
@@ -177,7 +179,7 @@ pre {
   border-radius: var(--sa-radius-sm);
   margin: 0;
   overflow: auto;
-  padding: var(--sa-gap);
+  padding: var(--sa-space-sm);
 }
 
 code {
@@ -194,6 +196,11 @@ kbd {
   box-shadow: var(--sa-shadow-kbd);
   padding: var(--sa-space-xs) var(--sa-space-sm);
 }
+
+/*
+ * BLOCKQUOTE
+ * ───────────────────────────────────────────────────────────────────────────
+ */
 
 blockquote {
   border-inline-start: var(--sa-blockquote-border);

@@ -432,9 +432,6 @@
 }
 
 [data-ui='list-item'] {
-  font-family: var(--sa-body-font-family);
-  font-size: var(--sa-body-font-size);
-  font-weight: var(--sa-body-font-weight);
   margin-block: var(--sa-space-xs);
   padding-inline-start: var(--sa-list-item-pad);
 }
@@ -1119,7 +1116,7 @@
 [data-ui='layout'][data-ui-variant='inline-wrap'] {
   align-items: stretch;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(var(--sa-size-wrap), 1fr));
   width: 100%;
 }
 

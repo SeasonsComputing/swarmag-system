@@ -102,13 +102,14 @@ tokens and component tokens.
 Role tokens provide semantic indirection. A role typeface is changed by changing
 one token value, not by changing consuming selectors.
 
-| Role token                 | Resolves to                | Intent                       |
-| -------------------------- | -------------------------- | ---------------------------- |
-| `--sa-heading-font-family` | `var(--sa-p-font-content)` | Heading elements             |
-| `--sa-body-font-family`    | `var(--sa-p-font-content)` | Paragraph and body content   |
-| `--sa-label-font-family`   | `var(--sa-p-font-label)`   | Labels, legends, table heads |
-| `--sa-ui-font-family`      | `var(--sa-p-font-label)`   | Controls and data entry      |
-| `--sa-mono-font-family`    | `var(--sa-p-font-mono)`    | Code and numeric fields      |
+| Role token                    | Resolves to                | Intent                     |
+| ----------------------------- | -------------------------- | -------------------------- |
+| `--sa-heading-font-family`    | `var(--sa-p-font-content)` | Heading elements           |
+| `--sa-body-font-family`       | `var(--sa-p-font-content)` | Paragraph and body content |
+| `--sa-label-font-family`      | `var(--sa-p-font-label)`   | Labels                     |
+| `--sa-annotation-font-family` | `var(--sa-p-font-label)`   | Legends, table heads       |
+| `--sa-ui-font-family`         | `var(--sa-p-font-label)`   | Controls and data entry    |
+| `--sa-data-font-family`       | `var(--sa-p-font-mono)`    | Code and numeric fields    |
 
 ### 2.5.2 Type Scale
 
@@ -130,7 +131,7 @@ foundation treatment; `ui.css` declares App control treatment.
 | Data-adjacent label       | `td`                         | `--sa-label-font-family`   | `--sa-label-font-size`         | `--sa-body-font-weight`       |
 | Data entry                | `input`, `textarea`          | `--sa-ui-font-family`      | control-specific               | `--sa-body-font-weight`       |
 | Select / menu UI          | `select`, App select options | `--sa-ui-font-family`      | `--sa-ui-font-size` or compact | `--sa-ui-font-weight`         |
-| Code / numeric            | `code`, `pre`, `kbd`, `samp` | `--sa-mono-font-family`    | inherited                      | inherited                     |
+| Code / numeric            | `code`, `pre`, `kbd`, `samp` | `--sa-data-font-family`    | inherited                      | inherited                     |
 
 ### 2.5.4 Element Overrides
 

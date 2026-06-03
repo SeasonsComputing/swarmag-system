@@ -47,6 +47,34 @@
   --sa-p-radial-1: oklch(var(--sa-p-gradient-1-start) / 0.16);
   --sa-p-radial-2: oklch(var(--sa-p-gradient-1-start) / 0.22);
   --sa-p-radial-3: oklch(var(--sa-p-gradient-1-start)/ 0.16);
+
+  /* Cards */
+  --sa-card-panel-pad: var(--sa-pad);
+  --sa-card-widget-pad: var(--sa-pad);
+  --sa-card-workflow-pad: var(--sa-pad);
+
+  /* Progress */
+  --sa-progress-height: 1rem;
+  --sa-progress-transition: clip-path var(--sa-transition-fast);
+
+  /* List */
+  --sa-list-indent: 1.75rem;
+  --sa-list-item-pad: 0.375rem;
+  --sa-list-item-pad-bullet: calc(0.375rem - 2px);
+  --sa-list-marker-size: 1.25rem;
+  --sa-list-marker-font-size: 1rem;
+
+  /* Badge */
+  --sa-badge-font-weight: var(--sa-p-font-weight-thin);
+
+  /* Avatar */
+  --sa-avatar-font-weight: var(--sa-p-font-weight-medium);
+
+  /* Alert */
+  --sa-alert-border-width: 2px;
+
+  /* Separator */
+  --sa-separator-height: 1px;     
 }
 
 /*
@@ -197,8 +225,8 @@
 
   /* Button */
   --sa-button-font-size: var(--sa-p-font-size-xs);
-  --sa-button-font-weight: var(--sa-p-weight-medium);
-  --sa-button-font-weight-primary: var(--sa-p-weight-semibold);
+  --sa-button-font-weight: var(--sa-p-font-weight-medium);
+  --sa-button-font-weight-primary: var(--sa-p-font-weight-semibold);
   --sa-button-min-width: 8rem;
   --sa-button-bg-primary: var(--sa-color-brand-end);
   --sa-button-color-primary: var(--sa-bg-base);
@@ -230,7 +258,7 @@
   --sa-multi-select-item-bg-hover: oklch(var(--sa-p-gradient-2-mid-start) / 0.17);
 
   /* Toggle */
-  --sa-toggle-font-weight: var(--sa-p-weight-medium);
+  --sa-toggle-font-weight: var(--sa-p-font-weight-medium);
   --sa-toggle-pressed-bg-selected: var(--sa-bg-selected);
   --sa-toggle-pressed-border-primary: var(--sa-color-primary);
   --sa-toggle-pressed-color-primary: var(--sa-color-primary);
@@ -239,7 +267,7 @@
   --sa-toggle-group-margin-collapse: -1px;
 
   /* Tab */
-  --sa-tab-font-weight: var(--sa-p-weight-medium);
+  --sa-tab-font-weight: var(--sa-p-font-weight-medium);
   --sa-tab-selected-bg-selected: var(--sa-bg-selected);
   --sa-tab-selected-border-primary: var(--sa-color-primary);
   --sa-tab-selected-color-primary: var(--sa-color-primary);
@@ -268,9 +296,6 @@
   --sa-card-workflow-border: 1px solid rgb(148 163 184 / 0.2);
   --sa-card-workflow-shadow: 0 22px 48px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-card-workflow-stripe-opacity: 0.8;
-  --sa-card-panel-pad: var(--sa-card-pad);
-  --sa-card-widget-pad: var(--sa-card-pad);
-  --sa-card-workflow-pad: var(--sa-card-pad);
 
   /* Table */
   --sa-table-padding-cell: 0.375rem;
@@ -440,8 +465,8 @@
 
   /* Button */
   --sa-button-font-size: var(--sa-p-font-size-xs);
-  --sa-button-font-weight: var(--sa-p-weight-medium);
-  --sa-button-font-weight-primary: var(--sa-p-weight-semibold);
+  --sa-button-font-weight: var(--sa-p-font-weight-medium);
+  --sa-button-font-weight-primary: var(--sa-p-font-weight-semibold);
   --sa-button-min-width: 8rem;
   --sa-button-bg-primary: var(--sa-color-primary);
   --sa-button-color-primary: var(--sa-text-on-brand);
@@ -473,7 +498,7 @@
   --sa-multi-select-item-bg-hover: oklch(86% 0.06 184 / 0.52);
 
   /* Toggle */
-  --sa-toggle-font-weight: var(--sa-p-weight-medium);
+  --sa-toggle-font-weight: var(--sa-p-font-weight-medium);
   --sa-toggle-pressed-bg-selected: var(--sa-bg-selected);
   --sa-toggle-pressed-border-primary: var(--sa-color-primary);
   --sa-toggle-pressed-color-primary: var(--sa-color-primary);
@@ -482,7 +507,7 @@
   --sa-toggle-group-margin-collapse: -1px;
 
   /* Tab */
-  --sa-tab-font-weight: var(--sa-p-weight-medium);
+  --sa-tab-font-weight: var(--sa-p-font-weight-medium);
   --sa-tab-selected-bg-selected: var(--sa-toggle-pressed-bg-selected);
   --sa-tab-selected-border-primary: var(--sa-toggle-pressed-border-primary);
   --sa-tab-selected-color-primary: var(--sa-toggle-pressed-color-primary);
@@ -524,9 +549,6 @@
     0 0 26px oklch(57% 0.13 186 / 0.12),
     inset 0 1px 0 oklch(var(--sa-p-white) / 0.78);
   --sa-card-workflow-stripe-opacity: 1;
-  --sa-card-panel-pad: var(--sa-card-pad);
-  --sa-card-widget-pad: var(--sa-card-pad);
-  --sa-card-workflow-pad: var(--sa-card-pad);
 
   /* Table */
   --sa-table-padding-cell: 0.375rem;
