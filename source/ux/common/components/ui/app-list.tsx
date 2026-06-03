@@ -28,6 +28,7 @@ export type AppListProps =
     'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
   >
   & {
+    name?: string
     variant?: AppListVariant
     class?: never
     classList?: never
@@ -53,6 +54,8 @@ export type AppListItemProps =
 /** List with declared variant. Renders <ol> for numbered, <ul> otherwise. */
 export const AppList = (props: AppListProps): AppComponent => {
   const [local, others] = splitProps(props, [
+    'id',
+    'name',
     'variant',
     'class',
     'classList',
@@ -65,6 +68,7 @@ export const AppList = (props: AppListProps): AppComponent => {
     ? (
       <ol
         {...others as JSX.OlHTMLAttributes<HTMLOListElement>}
+        id={local.id ?? local.name}
         data-ui='list'
         data-ui-variant={local.variant}
       />
@@ -72,6 +76,7 @@ export const AppList = (props: AppListProps): AppComponent => {
     : (
       <ul
         {...others as JSX.HTMLAttributes<HTMLUListElement>}
+        id={local.id ?? local.name}
         data-ui='list'
         data-ui-variant={local.variant}
       />

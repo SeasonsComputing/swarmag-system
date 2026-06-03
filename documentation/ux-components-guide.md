@@ -34,13 +34,32 @@ code should not pass these props:
 - `style`
 - `data-ui`
 - `data-ui-variant`
+- `data-ui-gap`
+- `data-ui-align`
+- `data-ui-overflow`
 - `data-ui-state`
 
 Where the source type extends native JSX attributes, ordinary native attributes
 such as `id`, `name`, `type`, `aria-label`, `onClick`, or `children` may be
 used unless the prop table says otherwise.
 
-### 2.2 Component-First Rule
+### 2.2 Component Referencing
+
+App controls use `name` as their public reference identity:
+
+- Public App control identity prop is `name`.
+- Components derive DOM `id` internally from `name` when a rendered element needs a reference target.
+- Optional `id` exists only as an escape hatch where the prop table explicitly supports it.
+- Native `name` is forwarded only where it has actual form semantics; otherwise `name` is design-system identity input.
+- `AppField.for` is valid only when the target is a real labelable rendered element.
+- Use `AppField variant='caption'` for non-labelable controls such as `AppList`, `AppTable`, and Kobalte listbox roots.
+
+When a labelable control is used inside `AppField`, pass the same value to
+`AppField.for` and the control's `name`. Prefer `name` over `id` unless an
+explicit escape hatch is required. When a non-labelable control needs a field
+caption, omit `for` and set `variant='caption'`.
+
+### 2.3 Component-First Rule
 
 When this library provides an App control for an HTML element or interaction
 pattern, application code must use the App control instead of the native element.
@@ -81,7 +100,7 @@ are not yet mechanically enforced.
 Native content elements such as headings and paragraphs remain appropriate where
 the design language assigns them direct typographic roles and no App control exists for the same purpose.
 
-### 2.3 Controlled & Uncontrolled Props
+### 2.4 Controlled & Uncontrolled Props
 
 Selection controls generally support both controlled and uncontrolled modes:
 
@@ -97,7 +116,7 @@ Boolean controls use the same pattern with `checked`, `defaultChecked`,
 Do not pass both controlled and uncontrolled props unless the component
 explicitly supports that combination.
 
-### 2.4 Common State Props
+### 2.5 Common State Props
 
 Many controls accept these state props:
 
@@ -109,7 +128,7 @@ Many controls accept these state props:
 
 State precedence is `loading`, then `error`, then `disabled`.
 
-### 2.5 Option Shape
+### 2.6 Option Shape
 
 Select-like controls use `AppOption`:
 
@@ -122,7 +141,7 @@ type AppOption = {
 
 When `label` is omitted, the visible label falls back to `value`.
 
-### 2.6 Data Attributes
+### 2.7 Data Attributes
 
 Every control emits declared `data-ui` attributes. Consumers may use these for
 testing and diagnostics. App or feature code should not invent new styling
@@ -309,6 +328,8 @@ should remain visible.
 | `value`        | `string[]`                  | no       | unset   | Controlled selected values.  |
 | `defaultValue` | `string[]`                  | no       | unset   | Initial uncontrolled values. |
 | `onChange`     | `(value: string[]) => void` | no       | unset   | Receives selected values.    |
+| `name`         | `string`                    | no       | unset   | Reference identity.          |
+| `id`           | `string`                    | no       | `name`  | Escape-hatch DOM target.     |
 | `disabled`     | `boolean`                   | no       | `false` | Disables the control.        |
 | `error`        | `boolean`                   | no       | `false` | Marks the control invalid.   |
 | `loading`      | `boolean`                   | no       | `false` | Emits loading state.         |
@@ -316,7 +337,7 @@ should remain visible.
 **Example**
 
 ```tsx
-<AppField label='Crops' for='crops'>
+<AppField label='Crops' variant='caption'>
   <AppMultiSelect
     options={cropOptions}
     value={selectedCrops()}
@@ -894,10 +915,12 @@ Semantic list of items.
 
 Extends native list attributes, excluding styling and semantic hook props.
 
-| Prop      | Type                     | Default | Description            |
-| --------- | ------------------------ | ------- | ---------------------- |
-| `variant` | `'bullet' \| 'numbered'` | unset   | List visual treatment. |
+| Prop      | Type                     | Default | Description         |
+| --------- | ------------------------ | ------- | ------------------- |
+| `name`    | `string`                 | unset   | Reference identity. |
+| `variant` | `'bullet' \| 'numbered'` | unset   | List treatment.     |
 
+`name` derives the rendered list `id` when no explicit `id` is provided.
 `variant='numbered'` renders an `<ol>`. All other variants render a `<ul>`.
 
 **AppListItem Props**
@@ -907,10 +930,12 @@ Extends native `li` attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<AppList variant='bullet'>
-  <AppListItem>Pre-flight checklist complete</AppListItem>
-  <AppListItem>Wind within operating limits</AppListItem>
-</AppList>
+<AppField label='Pre-flight status' variant='caption'>
+  <AppList variant='bullet'>
+    <AppListItem>Pre-flight checklist complete</AppListItem>
+    <AppListItem>Wind within operating limits</AppListItem>
+  </AppList>
+</AppField>
 ```
 
 ### 5.3 AppTable
@@ -930,35 +955,38 @@ AppTable
 
 **Props**
 
-| Component        | Props                                     | Notes                                          |
-| ---------------- | ----------------------------------------- | ---------------------------------------------- |
-| `AppTable`       | native table attrs, `overflow?: Overflow` | Renders `<table>` or overflow wrapper + table. |
-| `AppTableHeader` | `children: AppComponent`                  | Wraps children in header row.                  |
-| `AppTableBody`   | native table-section attrs                | Renders `<tbody>`.                             |
-| `AppTableRow`    | `variant?: 'section'` plus row attrs      | Section rows span all columns.                 |
-| `AppTableCell`   | `align?: 'start' \| 'center' \| 'end'`    | Renders `<th>` in headers.                     |
+| Component        | Props                                                      | Notes                                          |
+| ---------------- | ---------------------------------------------------------- | ---------------------------------------------- |
+| `AppTable`       | native table attrs, `name?: string`, `overflow?: Overflow` | Renders `<table>` or overflow wrapper + table. |
+| `AppTableHeader` | `children: AppComponent`                                   | Wraps children in header row.                  |
+| `AppTableBody`   | native table-section attrs                                 | Renders `<tbody>`.                             |
+| `AppTableRow`    | `variant?: 'section'` plus row attrs                       | Section rows span all columns.                 |
+| `AppTableCell`   | `align?: 'start' \| 'center' \| 'end'`                     | Renders `<th>` in headers.                     |
 
+`name` derives the rendered table target `id` when no explicit `id` is provided.
 `Overflow` is `'scroll' | 'hidden'`. Omit `overflow` for a plain semantic table.
 Use `overflow='scroll'` for wide tables that should scroll horizontally.
 
 **Example**
 
 ```tsx
-<AppTable>
-  <AppTableHeader>
-    <AppTableCell>Drone</AppTableCell>
-    <AppTableCell align='end'>Battery</AppTableCell>
-  </AppTableHeader>
-  <AppTableBody>
-    <AppTableRow variant='section'>
-      <AppTableCell>Zone A</AppTableCell>
-    </AppTableRow>
-    <AppTableRow>
-      <AppTableCell>SA-01</AppTableCell>
-      <AppTableCell align='end'>92%</AppTableCell>
-    </AppTableRow>
-  </AppTableBody>
-</AppTable>
+<AppField label='Drone batteries' variant='caption'>
+  <AppTable>
+    <AppTableHeader>
+      <AppTableCell>Drone</AppTableCell>
+      <AppTableCell align='end'>Battery</AppTableCell>
+    </AppTableHeader>
+    <AppTableBody>
+      <AppTableRow variant='section'>
+        <AppTableCell>Zone A</AppTableCell>
+      </AppTableRow>
+      <AppTableRow>
+        <AppTableCell>SA-01</AppTableCell>
+        <AppTableCell align='end'>92%</AppTableCell>
+      </AppTableRow>
+    </AppTableBody>
+  </AppTable>
+</AppField>
 ```
 
 ### 5.4 AppFooter
@@ -989,12 +1017,16 @@ does not wrap the control.
 
 **Props**
 
-| Prop       | Type           | Required | Default | Description                      |
-| ---------- | -------------- | -------- | ------- | -------------------------------- |
-| `label`    | `string`       | yes      | —       | Label text.                      |
-| `for`      | `string`       | yes      | —       | Associated control id.           |
-| `variant`  | `'inline'`     | no       | unset   | Places label and control inline. |
-| `children` | `AppComponent` | yes      | —       | The associated control.          |
+| Prop       | Type                    | Required   | Default | Description                      |
+| ---------- | ----------------------- | ---------- | ------- | -------------------------------- |
+| `label`    | `string`                | yes        | —       | Label or caption text.           |
+| `for`      | `string`                | label mode | —       | Associated labelable control id. |
+| `variant`  | `'inline' \| 'caption'` | no         | unset   | Inline label or caption mode.    |
+| `children` | `AppComponent`          | yes        | —       | The associated control.          |
+
+Default and `variant='inline'` render a `<label for>`, so `for` must target a
+labelable rendered element. `variant='caption'` renders a `<figcaption>` and is
+for non-labelable controls such as lists, tables, and composite listboxes.
 
 **Example**
 

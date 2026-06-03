@@ -174,7 +174,7 @@ Mapping is derived from component name:
 
 - `AppButton` → `data-ui="button"`
 - `AppInput` → `data-ui="input"`
-- `AppSingleSelect` trigger → `data-ui="single-select"`
+- `AppSingleSelect` → `data-ui="single-select"`
 
 Rules:
 
@@ -188,27 +188,24 @@ Rules:
 
 Variants are only valid where explicitly declared.
 
-```text
-data-ui-variant="primary | secondary | ghost | danger"   (button)
-data-ui-variant="widget | workflow"                       (card)
-data-ui-variant="bullet | numbered"                       (list)
-data-ui-variant="block-fit | inline | inline-fill"         (layout)
-data-ui-variant="inline"                                  (field)
-data-ui-variant="section"                                 (table-row)
-data-ui-variant="success | warning | danger | info"       (badge, alert)
-```
+| Control / Part | Attribute         | Declared Values                                     |
+| -------------- | ----------------- | --------------------------------------------------- |
+| `alert`        | `data-ui-variant` | `success`, `warning`, `danger`, `info`              |
+| `badge`        | `data-ui-variant` | `success`, `warning`, `danger`, `info`              |
+| `button`       | `data-ui-variant` | `primary`, `secondary`, `ghost`, `danger`           |
+| `card`         | `data-ui-variant` | `widget`, `workflow`                                |
+| `field`        | `data-ui-variant` | `caption`, `inline`                                 |
+| `layout`       | `data-ui-variant` | `block-fit`, `inline`, `inline-fill`, `inline-wrap` |
+| `list`         | `data-ui-variant` | `bullet`, `numbered`                                |
+| `table-row`    | `data-ui-variant` | `section`                                           |
 
-Layout controls may additionally declare gap density:
+Controls and parts may additionally declare these extension attributes:
 
-```text
-data-ui-gap="loose | tight | none"                         (layout)
-```
-
-Table cells may additionally declare alignment:
-
-```text
-data-ui-align="start | center | end"                       (table-cell)
-```
+| Control / Part    | Attribute          | Declared Values          |
+| ----------------- | ------------------ | ------------------------ |
+| `layout`          | `data-ui-gap`      | `loose`, `tight`, `none` |
+| `table-cell`      | `data-ui-align`    | `start`, `center`, `end` |
+| `table-container` | `data-ui-overflow` | `hidden`, `scroll`       |
 
 Rules:
 
@@ -258,7 +255,30 @@ Selectors:
 - Controls attach semantic attributes to the root DOM element or declared primitive parts.
 - Kobalte is not exposed externally.
 
-### 3.6 Structural Boundary
+### 3.6 Reference Identity
+
+`data-ui` identifies the App control or App control part. It is not a consumer
+reference hook. Consumer reference identity is driven by `name`.
+
+Rules:
+
+- Public App control identity prop is `name`.
+- Components derive DOM `id` internally from `name` when a rendered element needs a reference target.
+- Optional `id` is an escape hatch only where the component public API explicitly declares it.
+- Native `name` is forwarded only where it has actual browser form semantics; otherwise `name` is design-system identity input.
+- When both `id` and `name` are supported and provided, `id` is the rendered DOM target and `name` remains the App reference identity or native form name according to the component contract.
+- `AppField.for` is used only in label mode and must target a real labelable rendered element.
+- `AppField variant='caption'` is used for non-labelable controls and renders caption semantics instead of `<label for>`.
+
+Labelable controls must derive the same DOM `id` from the same `name` value, so
+consumers can write `<AppField for='x'>` with `<AppInput name='x'>`.
+Non-labelable controls such as `AppList`, `AppTable`, and Kobalte listbox roots
+must use `AppField variant='caption'`.
+
+Caption mode is a semantic change only. `[data-ui='field'] > figcaption` renders
+with the same local field treatment as `[data-ui='field'] > label`.
+
+### 3.7 Structural Boundary
 
 Controls are atomic in scope. They do not:
 
@@ -268,7 +288,7 @@ Controls are atomic in scope. They do not:
 
 Layout controls such as `AppLayout` and `AppFormActions` manage local child arrangement only.
 
-### 3.7 Attribute Discipline
+### 3.8 Attribute Discipline
 
 App control wrappers manually emit only declared semantic attributes:
 
@@ -277,6 +297,7 @@ data-ui
 data-ui-variant
 data-ui-gap
 data-ui-align
+data-ui-overflow
 data-ui-state
 ```
 
@@ -299,7 +320,7 @@ state:
 
 Feature and app code do not invent styling attributes (`data-card-mode`, `data-page-section`, `data-feature-state`). New `data-ui` values for controls or control parts are declared in this document before use.
 
-### 3.8 Enforcement
+### 3.9 Enforcement
 
 Violations:
 
@@ -331,6 +352,10 @@ All component visual rules live in `ui.css`. This section defines the selector p
 
 [data-ui='<control>'][data-ui-gap='<gap>'] {
   /* layout gap density */
+}
+
+[data-ui='<control>'][data-ui-overflow='<overflow>'] {
+  /* overflow behavior */
 }
 
 [data-ui='<control>']:focus-visible {

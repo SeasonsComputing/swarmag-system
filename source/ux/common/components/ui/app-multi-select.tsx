@@ -22,7 +22,9 @@ import { type AppComponent, type AppOption, appOptionLabel, controlState } from 
 export type AppMultiSelectProps = {
   disabled?: boolean
   error?: boolean
+  id?: string
   loading?: boolean
+  name?: string
   options: ReadonlyArray<AppOption>
   value?: string[]
   defaultValue?: string[]
@@ -42,7 +44,9 @@ export const AppMultiSelect = (props: AppMultiSelectProps): AppComponent => {
   const [local] = splitProps(props, [
     'disabled',
     'error',
+    'id',
     'loading',
+    'name',
     'options',
     'value',
     'defaultValue',
@@ -51,6 +55,7 @@ export const AppMultiSelect = (props: AppMultiSelectProps): AppComponent => {
 
   return (
     <ListboxRoot
+      id={local.id ?? local.name}
       data-ui='multi-select'
       data-ui-state={controlState(local)}
       options={local.options as AppOption[]}

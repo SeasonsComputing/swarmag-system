@@ -219,9 +219,8 @@ export const StyleGuide = (): AppComponent => {
             <AppFieldset legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
               <AppField
                 label='AppTable, AppTableHeader, AppTableBody, AppTableRow, AppTableCell, AppTableSection'
-                for='for-table'
+                variant='caption'
               >
-                {/*TODO: AppTable needs a name?*/}
                 <AppTable overflow='scroll'>
                   <AppTableHeader>
                     <AppTableCell>Equipment</AppTableCell>
@@ -259,22 +258,22 @@ export const StyleGuide = (): AppComponent => {
             </AppFieldset>
             <AppFieldset legend='<ul>, <ol>, <li>'>
               <AppLayout variant='inline-wrap'>
-                <AppField label='AppList (default)' for='list-default'>
-                  <AppList id='list-default'>
+                <AppField label='AppList (default)' variant='caption'>
+                  <AppList>
                     <AppListItem>Confirm chemical inventory.</AppListItem>
                     <AppListItem>Verify crew certification.</AppListItem>
                     <AppListItem>Inspect required assets.</AppListItem>
                   </AppList>
                 </AppField>
-                <AppField label='AppList (bullet)' for='list-bullet'>
-                  <AppList id='list-bullet' variant='bullet'>
+                <AppField label='AppList (bullet)' variant='caption'>
+                  <AppList variant='bullet'>
                     <AppListItem>Confirm chemical inventory.</AppListItem>
                     <AppListItem>Verify crew certification.</AppListItem>
                     <AppListItem>Inspect required assets.</AppListItem>
                   </AppList>
                 </AppField>
-                <AppField label='AppList (numbered)' for='list-numbered'>
-                  <AppList id='list-numbered' variant='numbered'>
+                <AppField label='AppList (numbered)' variant='caption'>
+                  <AppList variant='numbered'>
                     <AppListItem>Assess site.</AppListItem>
                     <AppListItem>Plan service.</AppListItem>
                     <AppListItem>Execute work.</AppListItem>
@@ -284,18 +283,18 @@ export const StyleGuide = (): AppComponent => {
             </AppFieldset>
             <AppFieldset legend='<input>, <textarea>, <select>, <option>'>
               <AppLayout variant='inline-wrap'>
-                <AppField label='AppInput' for='field-name'>
+                <AppField label='AppInput' for='field-name-1'>
                   <AppInput
-                    name='field-name'
+                    name='field-name-1'
                     value='North Field'
                     error={inputError()}
                     onInput={() => undefined}
                     placeholder='Enter service location'
                   />
                 </AppField>
-                <AppField label='AppTextArea' for='application-notes'>
+                <AppField label='AppTextArea' for='application-notes-1'>
                   <AppTextArea
-                    name='application-notes'
+                    name='application-notes-1'
                     error={inputError()}
                     onInput={() => undefined}
                     value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'
@@ -313,9 +312,11 @@ export const StyleGuide = (): AppComponent => {
                     options={STATUSES}
                   />
                 </AppField>
-                <AppField label='AppMultiSelect' for='service-options'>
-                  {/*TODO: AppMultiSelect needs a name?*/}
-                  <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
+                <AppField label='AppMultiSelect' variant='caption'>
+                  <AppMultiSelect
+                    options={SERVICES}
+                    defaultValue={[...DEFAULT_SERVICES]}
+                  />
                 </AppField>
               </AppLayout>
             </AppFieldset>
@@ -394,18 +395,18 @@ export const StyleGuide = (): AppComponent => {
             </AppField>
             <AppFieldset legend='Enabled'>
               <AppLayout variant='inline-wrap'>
-                <AppField label='Field name' for='field-name'>
+                <AppField label='Field name' for='field-name-2'>
                   <AppInput
-                    name='field-name'
+                    name='field-name-2'
                     value='North Field'
                     error={inputError()}
                     onInput={() => undefined}
                     placeholder='Enter service location'
                   />
                 </AppField>
-                <AppField label='Application notes' for='application-notes'>
+                <AppField label='Application notes' for='application-notes-2'>
                   <AppTextArea
-                    name='application-notes'
+                    name='application-notes-2'
                     error={inputError()}
                     onInput={() => undefined}
                     value='Spray window 06:00–09:00. Wind break along west ridge; verify drift boundary before launch.'

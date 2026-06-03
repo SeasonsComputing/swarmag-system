@@ -37,15 +37,18 @@ export type AppTableProps =
     | 'style'
     | 'data-ui'
     | 'data-ui-variant'
+    | 'data-ui-overflow'
     | 'overflow'
   >
   & {
+    name?: string
     overflow?: AppTableOverflow
     class?: never
     classList?: never
     style?: never
     'data-ui'?: never
     'data-ui-variant'?: never
+    'data-ui-overflow'?: never
   }
 
 /** AppTableHeader props. */
@@ -56,7 +59,12 @@ export type AppTableBodyProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableSectionElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-variant'
   >
   & {
     class?: never
@@ -71,7 +79,13 @@ export type AppTableRowProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableRowElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'role'
+    | 'data-ui'
+    | 'data-ui-variant'
   >
   & {
     variant?: 'section'
@@ -87,7 +101,14 @@ export type AppTableCellProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableCellElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant' | 'align'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-variant'
+    | 'data-ui-align'
+    | 'align'
   >
   & {
     align?: 'start' | 'center' | 'end'
@@ -96,20 +117,23 @@ export type AppTableCellProps =
     style?: never
     'data-ui'?: never
     'data-ui-variant'?: never
+    'data-ui-align'?: never
   }
 
 /** Table root with optional horizontal overflow handling. */
 export const AppTable = (props: AppTableProps): AppComponent => {
   const [local, others] = splitProps(props, [
+    'id',
+    'name',
     'overflow',
     'class',
     'classList',
     'style',
     'data-ui',
-    'data-ui-variant'
+    'data-ui-variant',
+    'data-ui-overflow'
   ])
-  const table = <table {...others} data-ui='table' />
-
+  const table = <table {...others} id={local.id ?? local.name} data-ui='table' />
   return local.overflow
     ? (
       <div data-ui='table-container' data-ui-overflow={local.overflow}>
@@ -173,7 +197,8 @@ export const AppTableCell = (props: AppTableCellProps): AppComponent => {
     'classList',
     'style',
     'data-ui',
-    'data-ui-variant'
+    'data-ui-variant',
+    'data-ui-align'
   ])
   return isHeader
     ? <th {...others} data-ui='table-cell' data-ui-align={local.align} />
