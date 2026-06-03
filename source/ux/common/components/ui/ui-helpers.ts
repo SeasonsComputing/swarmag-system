@@ -12,7 +12,6 @@ export type UiComponentProps = { children?: UiComponent }
 /** Extends a Kobalte component's prop type to accept data-ui and data-ui-state attributes. */
 export type WithDataUi<T> = T & UiComponentProps & {
   'data-ui'?: string
-  'data-ui-overflow'?: string
   'data-ui-state'?: string
 }
 

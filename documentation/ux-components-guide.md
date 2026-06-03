@@ -522,15 +522,16 @@ UiTabs
 
 **Child Props**
 
-| Component    | Required Props | Optional Props         |
-| ------------ | -------------- | ---------------------- |
-| `UiTabList`  | —              | `children`             |
-| `UiTab`      | `value`        | `children`, `disabled` |
-| `UiTabPanel` | `value`        | `children`             |
+| Component    | Required Props | Optional Props                   |
+| ------------ | -------------- | -------------------------------- |
+| `UiTabList`  | —              | `children`, `layout?: 'between'` |
+| `UiTab`      | `value`        | `children`, `disabled`           |
+| `UiTabPanel` | `value`        | `children`                       |
 
 When tab triggers overflow the available inline space, `UiTabList` keeps native
 horizontal scroll behavior and supports mouse drag scrolling on fine-pointer
 devices.
+Use `layout='between'` to distribute visible tabs across the list width.
 
 **Example**
 

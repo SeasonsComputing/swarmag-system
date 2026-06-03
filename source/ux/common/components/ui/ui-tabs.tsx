@@ -47,11 +47,16 @@ export type UiTabsProps<Value extends string = string> = UiComponentProps & {
 
 /** Tab list control props. */
 export type UiTabListProps = UiComponentProps & {
+  layout?: UiTabListLayout
   class?: never
   classList?: never
   style?: never
   'data-ui'?: never
+  'data-ui-layout'?: never
 }
+
+/** Tab list layout modes. */
+export type UiTabListLayout = 'between'
 
 /** Tab trigger control props. */
 export type UiTabProps<Value extends string = string> = UiComponentProps & {
@@ -73,11 +78,16 @@ export type UiTabPanelProps<Value extends string = string> = UiComponentProps & 
 }
 
 const TabsRoot = Tabs as Component<WithDataUi<TabsRootProps>>
-const TabsList = Tabs.List as Component<WithDataUi<TabsListProps>>
+const TabsList = Tabs.List as Component<TabListDataProps>
 const TabsTrigger = Tabs.Trigger as Component<WithDataUi<TabsTriggerProps>>
 const TabsContent = Tabs.Content as Component<WithDataUi<TabsContentProps>>
 
 const TAB_DRAG_THRESHOLD_PX = 4
+
+type TabListDataProps = WithDataUi<TabsListProps> & {
+  'data-ui-drag'?: 'active' | 'enabled'
+  'data-ui-layout'?: UiTabListLayout
+}
 
 /** Tabs control with declared states. */
 export const UiTabs = <Value extends string = string>(
@@ -113,11 +123,10 @@ export const UiTabList = (props: UiTabListProps): UiComponent => {
   let tabListElement!: HTMLElement
   const [hasOverflow, setHasOverflow] = createSignal(false)
   const [isDragging, setIsDragging] = createSignal(false)
-  const [local] = splitProps(props, ['children'])
+  const [local] = splitProps(props, ['children', 'layout'])
   let dragStartX = 0
   let dragStartScrollLeft = 0
   let dragMoved = false
-  let targetTabElement: HTMLButtonElement | null = null
   let replayingTabClick = false
   let suppressNextClick = false
   let clearSuppressionId: number | undefined
@@ -126,9 +135,16 @@ export const UiTabList = (props: UiTabListProps): UiComponent => {
     setHasOverflow(tabListElement.scrollWidth > tabListElement.clientWidth)
   }
 
-  const findTargetTab = (event: Event): HTMLButtonElement | null => {
-    if (!(event.target instanceof Element)) return null
-    return event.target.closest('[data-ui=\'tab\']')
+  const dragState = (): 'active' | 'enabled' | undefined => {
+    if (isDragging()) return 'active'
+    if (hasOverflow()) return 'enabled'
+    return undefined
+  }
+
+  const findReleasedTab = (event: PointerEvent): HTMLButtonElement | null => {
+    const target = document.elementFromPoint(event.clientX, event.clientY)
+    if (!(target instanceof Element)) return null
+    return target.closest('[data-ui=\'tab\']')
   }
 
   const clearClickSuppressionSoon = (): void => {
@@ -147,7 +163,6 @@ export const UiTabList = (props: UiTabListProps): UiComponent => {
     dragStartScrollLeft = tabListElement.scrollLeft
     dragMoved = false
     suppressNextClick = true
-    targetTabElement = findTargetTab(event)
     setIsDragging(true)
     tabListElement.setPointerCapture(event.pointerId)
   }
@@ -169,10 +184,9 @@ export const UiTabList = (props: UiTabListProps): UiComponent => {
     tabListElement.releasePointerCapture(event.pointerId)
     if (!dragMoved) {
       replayingTabClick = true
-      targetTabElement?.click()
+      findReleasedTab(event)?.click()
       replayingTabClick = false
     }
-    targetTabElement = null
     dragMoved = false
     clearClickSuppressionSoon()
   }
@@ -183,7 +197,6 @@ export const UiTabList = (props: UiTabListProps): UiComponent => {
     event.stopPropagation()
     setIsDragging(false)
     tabListElement.releasePointerCapture(event.pointerId)
-    targetTabElement = null
     dragMoved = false
     clearClickSuppressionSoon()
   }
@@ -221,8 +234,8 @@ export const UiTabList = (props: UiTabListProps): UiComponent => {
     <TabsList
       ref={tabListElement}
       data-ui='tab-list'
-      data-ui-overflow={hasOverflow() ? 'scroll' : undefined}
-      data-ui-state={isDragging() ? 'dragging' : undefined}
+      data-ui-drag={dragState()}
+      data-ui-layout={local.layout}
     >
       {local.children}
     </TabsList>

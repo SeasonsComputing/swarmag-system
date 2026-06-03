@@ -554,7 +554,7 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='UiTabs / UiTabList / UiTab / UiTabPanel'>
             <UiTabs value={tab()} onChange={setTab}>
-              <UiTabList>
+              <UiTabList layout='between'>
                 <UiTab value='assessment'>Assessment</UiTab>
                 <UiTab value='planning'>Planning</UiTab>
                 <UiTab value='crew'>Crew Assignments</UiTab>
