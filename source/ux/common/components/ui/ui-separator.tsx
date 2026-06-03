@@ -1,39 +1,35 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App badge control                                                            ║
-║ Semantic badge primitive.                                                    ║
+║ Ui separator control                                                        ║
+║ Semantic wrapper for the Kobalte Separator primitive.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits badge control semantics without styling concerns.
+Emits separator control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppBadge  Badge control with declared states.
+UiSeparator  Separator control with declared states.
 */
 
+import { Separator } from '@kobalte/core/separator'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Badge variants declared by the design language. */
-export type AppBadgeVariant = 'success' | 'warning' | 'danger' | 'info'
-
-/** Badge control props. */
-export type AppBadgeProps =
-  & AppComponentProps
+/** Separator control props. */
+export type UiSeparatorProps =
+  & UiComponentProps
   & Omit<
-    JSX.HTMLAttributes<HTMLSpanElement>,
+    JSX.HTMLAttributes<HTMLElement>,
     | 'children'
     | 'class'
     | 'classList'
     | 'style'
     | 'data-ui'
-    | 'data-ui-variant'
     | 'data-ui-state'
   >
   & {
-    variant?: AppBadgeVariant
     error?: boolean
     loading?: boolean
     disabled?: boolean
@@ -41,14 +37,12 @@ export type AppBadgeProps =
     classList?: never
     style?: never
     'data-ui'?: never
-    'data-ui-variant'?: never
     'data-ui-state'?: never
   }
 
-/** Badge control with declared states. */
-export const AppBadge = (props: AppBadgeProps): AppComponent => {
+/** Separator control with declared states. */
+export const UiSeparator = (props: UiSeparatorProps): UiComponent => {
   const [local, others] = splitProps(props, [
-    'variant',
     'error',
     'loading',
     'disabled',
@@ -56,15 +50,7 @@ export const AppBadge = (props: AppBadgeProps): AppComponent => {
     'classList',
     'style',
     'data-ui',
-    'data-ui-variant',
     'data-ui-state'
   ])
-  return (
-    <span
-      {...others}
-      data-ui='badge'
-      data-ui-variant={local.variant}
-      data-ui-state={controlState(local)}
-    />
-  )
+  return <Separator {...others} data-ui='separator' data-ui-state={controlState(local)} />
 }

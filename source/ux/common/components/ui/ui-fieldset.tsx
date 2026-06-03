@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App fieldset                                                                 ║
+║ Ui fieldset                                                                 ║
 ║ Semantic group boundary for logically related form fields.                   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -12,19 +12,19 @@ when focus enters the group.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppFieldset  Semantic field group wrapper with named legend.
+UiFieldset  Semantic field group wrapper with named legend.
 */
 
-import type { AppComponent, AppContainerProps } from './ui-helpers.ts'
+import type { UiComponent, UiContainerProps } from './ui-helpers.ts'
 
-/** AppFieldset props. */
-export type AppFieldsetProps = AppContainerProps & {
+/** UiFieldset props. */
+export type UiFieldsetProps = UiContainerProps & {
   /** Text content of the group legend — names the group, never wraps controls. */
   legend: string
 }
 
-/** Semantic field group with legend. Compose AppLayout inside for child layout. */
-export const AppFieldset = (props: AppFieldsetProps): AppComponent => (
+/** Semantic field group with legend. Compose UiLayout inside for child layout. */
+export const UiFieldset = (props: UiFieldsetProps): UiComponent => (
   <fieldset data-ui='fieldset'>
     <legend>{props.legend}</legend>
     {props.children}

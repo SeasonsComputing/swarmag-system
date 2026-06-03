@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App select control                                                           ║
+║ Ui select control                                                           ║
 ║ Semantic wrapper for the Kobalte Select primitive.                           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,23 +10,23 @@ Emits select control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppSingleSelect  Single-value select control with declared states.
+UiSingleSelect  Single-value select control with declared states.
 */
 
 import { Select, type SelectRootItemComponentProps } from '@kobalte/core/select'
 import { splitProps } from '@solid-js'
-import { type AppComponent, type AppOption, appOptionLabel, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiOption, uiOptionLabel } from './ui-helpers.ts'
 
-type CollectionItem = { rawValue: AppOption; key: string }
+type CollectionItem = { rawValue: UiOption; key: string }
 
 /** Select control props. */
-export type AppSingleSelectProps = {
+export type UiSingleSelectProps = {
   disabled?: boolean
   error?: boolean
   id?: string
   name?: string
   loading?: boolean
-  options: ReadonlyArray<AppOption>
+  options: ReadonlyArray<UiOption>
   value?: string
   defaultValue?: string
   onChange?: (value: string) => void
@@ -43,7 +43,7 @@ const SelectContent = Select.Content as unknown as typeof Select.Content
 const SelectItem = Select.Item as unknown as typeof Select.Item
 
 /** Single-value select control with declared states. */
-export const AppSingleSelect = (props: AppSingleSelectProps): AppComponent => {
+export const UiSingleSelect = (props: UiSingleSelectProps): UiComponent => {
   const [local] = splitProps(props, [
     'disabled',
     'error',
@@ -57,7 +57,7 @@ export const AppSingleSelect = (props: AppSingleSelectProps): AppComponent => {
     'placeholder'
   ])
 
-  const handleChange = (option: AppOption | null): void => {
+  const handleChange = (option: UiOption | null): void => {
     if (option === null) return
     local.onChange?.(option.value)
   }
@@ -65,9 +65,9 @@ export const AppSingleSelect = (props: AppSingleSelectProps): AppComponent => {
   return (
     <SelectRoot
       name={local.name}
-      options={local.options as AppOption[]}
+      options={local.options as UiOption[]}
       optionValue='value'
-      optionTextValue={appOptionLabel}
+      optionTextValue={uiOptionLabel}
       disabled={local.disabled || local.loading}
       validationState={local.error ? 'invalid' : undefined}
       placeholder={local.placeholder}
@@ -79,9 +79,9 @@ export const AppSingleSelect = (props: AppSingleSelectProps): AppComponent => {
         : { value: local.options.find(o => o.value === local.value) ?? null })}
       defaultValue={local.options.find(o => o.value === local.defaultValue)}
       onChange={handleChange}
-      itemComponent={(item: SelectRootItemComponentProps<AppOption>) => (
+      itemComponent={(item: SelectRootItemComponentProps<UiOption>) => (
         <SelectItem data-ui='single-select-item' item={item.item}>
-          {appOptionLabel(item.item.rawValue)}
+          {uiOptionLabel(item.item.rawValue)}
         </SelectItem>
       )}
     >
@@ -90,9 +90,9 @@ export const AppSingleSelect = (props: AppSingleSelectProps): AppComponent => {
         data-ui='single-select'
         data-ui-state={controlState(local)}
       >
-        <Select.Value<AppOption>>
+        <Select.Value<UiOption>>
           {state =>
-            state.selectedOption() ? appOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
+            state.selectedOption() ? uiOptionLabel(state.selectedOption()!) : (local.placeholder ?? '')}
         </Select.Value>
         <Select.Icon data-ui='single-select-icon'>
           <span data-ui='single-select-icon-glyph' />

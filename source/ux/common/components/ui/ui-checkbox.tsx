@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App checkbox control                                                         ║
+║ Ui checkbox control                                                         ║
 ║ Semantic wrapper for the Kobalte Checkbox primitive.                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,15 +10,15 @@ Emits checkbox control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppCheckbox  Checkbox control with declared states.
+UiCheckbox  Checkbox control with declared states.
 */
 
 import { Checkbox } from '@kobalte/core/checkbox'
 import { splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
 /** Checkbox control props. */
-export type AppCheckboxProps = AppComponentProps & {
+export type UiCheckboxProps = UiComponentProps & {
   checked?: boolean
   defaultChecked?: boolean
   disabled?: boolean
@@ -36,7 +36,7 @@ export type AppCheckboxProps = AppComponentProps & {
 }
 
 /** Checkbox control with declared states. */
-export const AppCheckbox = (props: AppCheckboxProps): AppComponent => {
+export const UiCheckbox = (props: UiCheckboxProps): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'checked',

@@ -1,58 +1,69 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App spinner control                                                          ║
-║ Semantic spinner primitive.                                                  ║
+║ Ui layout control                                                           ║
+║ Unified API surface for block and inline layout primitives.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits spinner control semantics without styling concerns.
+Single layout primitive covering block and inline arrangements.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppSpinner  Spinner control with declared states.
+UiLayout  Layout container with declared variant and gap density.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Spinner control props. */
-export type AppSpinnerProps =
-  & AppComponentProps
+/** Layout variant. Omit for block-fill stack. */
+export type UiLayoutVariant = 'block-fit' | 'inline' | 'inline-fill' | 'inline-wrap'
+
+/** Layout gap density. Omit for standard spacing. */
+export type UiLayoutGap = 'loose' | 'tight' | 'none'
+
+/** Layout control props. */
+export type UiLayoutProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
     | 'children'
     | 'class'
     | 'classList'
     | 'style'
-    | 'role'
     | 'data-ui'
-    | 'data-ui-state'
+    | 'data-ui-variant'
+    | 'data-ui-gap'
   >
   & {
-    error?: boolean
-    loading?: boolean
-    disabled?: boolean
+    gap?: UiLayoutGap
+    variant?: UiLayoutVariant
     class?: never
     classList?: never
     style?: never
-    role?: never
     'data-ui'?: never
-    'data-ui-state'?: never
+    'data-ui-variant'?: never
+    'data-ui-gap'?: never
   }
 
-/** Spinner control with declared states. */
-export const AppSpinner = (props: AppSpinnerProps): AppComponent => {
+/** Layout container with declared variant and gap density. */
+export const UiLayout = (props: UiLayoutProps): UiComponent => {
   const [local, others] = splitProps(props, [
-    'error',
-    'loading',
-    'disabled',
+    'gap',
+    'variant',
     'class',
     'classList',
     'style',
-    'role',
     'data-ui',
-    'data-ui-state'
+    'data-ui-variant',
+    'data-ui-gap'
   ])
-  return <div {...others} role='status' data-ui='spinner' data-ui-state={controlState(local)} />
+  return (
+    <div
+      {...others}
+      data-ui='layout'
+      data-ui-gap={local.gap}
+      data-ui-variant={local.variant}
+    />
+  )
 }

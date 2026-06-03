@@ -1,24 +1,27 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App avatar control                                                           ║
-║ Semantic avatar primitive.                                                   ║
+║ Ui badge control                                                            ║
+║ Semantic badge primitive.                                                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits avatar control semantics without styling concerns.
+Emits badge control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppAvatar  Avatar control with declared states.
+UiBadge  Badge control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Avatar control props. */
-export type AppAvatarProps =
-  & AppComponentProps
+/** Badge variants declared by the design language. */
+export type UiBadgeVariant = 'success' | 'warning' | 'danger' | 'info'
+
+/** Badge control props. */
+export type UiBadgeProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLSpanElement>,
     | 'children'
@@ -26,9 +29,11 @@ export type AppAvatarProps =
     | 'classList'
     | 'style'
     | 'data-ui'
+    | 'data-ui-variant'
     | 'data-ui-state'
   >
   & {
+    variant?: UiBadgeVariant
     error?: boolean
     loading?: boolean
     disabled?: boolean
@@ -36,12 +41,14 @@ export type AppAvatarProps =
     classList?: never
     style?: never
     'data-ui'?: never
+    'data-ui-variant'?: never
     'data-ui-state'?: never
   }
 
-/** Avatar control with declared states. */
-export const AppAvatar = (props: AppAvatarProps): AppComponent => {
+/** Badge control with declared states. */
+export const UiBadge = (props: UiBadgeProps): UiComponent => {
   const [local, others] = splitProps(props, [
+    'variant',
     'error',
     'loading',
     'disabled',
@@ -49,7 +56,15 @@ export const AppAvatar = (props: AppAvatarProps): AppComponent => {
     'classList',
     'style',
     'data-ui',
+    'data-ui-variant',
     'data-ui-state'
   ])
-  return <span {...others} data-ui='avatar' data-ui-state={controlState(local)} />
+  return (
+    <span
+      {...others}
+      data-ui='badge'
+      data-ui-variant={local.variant}
+      data-ui-state={controlState(local)}
+    />
+  )
 }

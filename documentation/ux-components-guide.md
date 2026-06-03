@@ -18,10 +18,10 @@ and internal primitive bindings are covered by `ux-components-internals.md`.
 Import controls from the barrel:
 
 ```typescript
-import { AppButton, AppField, AppInput, AppSingleSelect } from '@ux/common/components/ui'
+import { UiButton, UiField, UiInput, UiSingleSelect } from '@ux/common/components/ui'
 ```
 
-Most controls accept `children?: AppComponent`, where `AppComponent` is the
+Most controls accept `children?: UiComponent`, where `UiComponent` is the
 library alias for `JSX.Element`.
 
 ### 2.1 Consumer Boundaries
@@ -45,52 +45,52 @@ used unless the prop table says otherwise.
 
 ### 2.2 Component Referencing
 
-App controls use `name` as their public reference identity:
+UI controls use `name` as their public reference identity:
 
-- Public App control identity prop is `name`.
+- Public UI control identity prop is `name`.
 - Components derive DOM `id` internally from `name` when a rendered element needs a reference target.
 - Optional `id` exists only as an escape hatch where the prop table explicitly supports it.
 - Native `name` is forwarded only where it has actual form semantics; otherwise `name` is design-system identity input.
-- `AppField.for` is valid only when the target is a real labelable rendered element.
-- Use `AppField variant='caption'` for non-labelable controls such as `AppList`, `AppTable`, and Kobalte listbox roots.
+- `UiField.for` is valid only when the target is a real labelable rendered element.
+- Use `UiField variant='caption'` for non-labelable controls such as `UiList`, `UiTable`, and Kobalte listbox roots.
 
-When a labelable control is used inside `AppField`, pass the same value to
-`AppField.for` and the control's `name`. Prefer `name` over `id` unless an
+When a labelable control is used inside `UiField`, pass the same value to
+`UiField.for` and the control's `name`. Prefer `name` over `id` unless an
 explicit escape hatch is required. When a non-labelable control needs a field
 caption, omit `for` and set `variant='caption'`.
 
 ### 2.3 Component-First Rule
 
-When this library provides an App control for an HTML element or interaction
-pattern, application code must use the App control instead of the native element.
+When this library provides a UI control for an HTML element or interaction
+pattern, application code must use the corresponding UI control instead of the native element.
 This is a design-system boundary, not a stylistic preference.
 
-| Use                                     | Do Not Use                                              |
-| --------------------------------------- | ------------------------------------------------------- |
-| `AppButton`                             | `<button>`                                              |
-| `AppInput`                              | `<input>`                                               |
-| `AppTextArea`                           | `<textarea>`                                            |
-| `AppSingleSelect`                       | `<select>`                                              |
-| `AppCheckbox`                           | `<input type='checkbox'>`                               |
-| `AppRadioGroup`, `AppRadioItem`         | `<input type='radio'>`                                  |
-| `AppToggle`, `AppToggleGroup`           | ad hoc pressed button groups                            |
-| `AppTabs`                               | ad hoc tab markup                                       |
-| `AppAccordion`                          | ad hoc disclosure markup                                |
-| `AppDialog`, `AppPopover`, `AppTooltip` | ad hoc overlay primitives                               |
-| `AppProgress`                           | raw progress markup                                     |
-| `AppBadge`, `AppAlert`, `AppAvatar`     | ad hoc status display markup                            |
-| `AppCard`                               | ad hoc panel wrappers                                   |
-| `AppList`, `AppListItem`                | `<ul>`, `<ol>`, `<li>`                                  |
-| `AppTable`                              | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
-| `AppFieldset`                           | `<fieldset>` + `<legend>`                               |
-| `AppField`                              | `<div>` + `<label>` + {control}                         |
-| `AppLayout`, `AppFormActions`           | ad hoc layout wrappers                                  |
+| Use                                  | Do Not Use                                              |
+| ------------------------------------ | ------------------------------------------------------- |
+| `UiButton`                           | `<button>`                                              |
+| `UiInput`                            | `<input>`                                               |
+| `UiTextArea`                         | `<textarea>`                                            |
+| `UiSingleSelect`                     | `<select>`                                              |
+| `UiCheckbox`                         | `<input type='checkbox'>`                               |
+| `UiRadioGroup`, `UiRadioItem`        | `<input type='radio'>`                                  |
+| `UiToggle`, `UiToggleGroup`          | ad hoc pressed button groups                            |
+| `UiTabs`                             | ad hoc tab markup                                       |
+| `UiAccordion`                        | ad hoc disclosure markup                                |
+| `UiDialog`, `UiPopover`, `UiTooltip` | ad hoc overlay primitives                               |
+| `UiProgress`                         | raw progress markup                                     |
+| `UiBadge`, `UiAlert`, `UiAvatar`     | ad hoc status display markup                            |
+| `UiCard`                             | ad hoc panel wrappers                                   |
+| `UiList`, `UiListItem`               | `<ul>`, `<ol>`, `<li>`                                  |
+| `UiTable`                            | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
+| `UiFieldset`                         | `<fieldset>` + `<legend>`                               |
+| `UiField`                            | `<div>` + `<label>` + {control}                         |
+| `UiLayout`, `UiFormActions`          | ad hoc layout wrappers                                  |
 
 This rule keeps typography roles, semantic attributes, theme behavior, spacing,
 state rendering, and accessibility behavior aligned with the design language.
 
 The architecture guard script `guard-bare-html` enforces the native-element
-subset of this boundary for elements that have direct App control replacements
+subset of this boundary for elements that have direct UI control replacements
 currently `button`, `input`, `textarea`, `select`, `ul`, `ol`, `li`,
 `table`, `thead`, `tbody`, `tfoot`, `tr`, `td`, and `th`.
 
@@ -98,7 +98,7 @@ Other component-first cases are consumer contract requirements even when they
 are not yet mechanically enforced.
 
 Native content elements such as headings and paragraphs remain appropriate where
-the design language assigns them direct typographic roles and no App control exists for the same purpose.
+the design language assigns them direct typographic roles and no UI control exists for the same purpose.
 
 ### 2.4 Controlled & Uncontrolled Props
 
@@ -130,10 +130,10 @@ State precedence is `loading`, then `error`, then `disabled`.
 
 ### 2.6 Option Shape
 
-Select-like controls use `AppOption`:
+Select-like controls use `UiOption`:
 
 ```typescript
-type AppOption = {
+type UiOption = {
   value: string
   label?: string
 }
@@ -149,13 +149,13 @@ attributes or override the emitted attributes.
 
 ## 3. Interactive Controls
 
-### 3.1 AppButton
+### 3.1 UiButton
 
 Action trigger for commands, form actions, and lightweight navigation affordances.
 
 **Use When**
 
-Use `AppButton` for user-initiated actions. Use `variant='primary'` for the main
+Use `UiButton` for user-initiated actions. Use `variant='primary'` for the main
 action in a local context and `variant='danger'` for destructive actions.
 
 **Props**
@@ -178,49 +178,49 @@ Extends native button attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<AppButton variant='primary' type='submit'>Save</AppButton>
-<AppButton variant='ghost' onClick={onCancel}>Cancel</AppButton>
-<AppButton variant='danger' loading={isDeleting}>Delete</AppButton>
+<UiButton variant='primary' type='submit'>Save</UiButton>
+<UiButton variant='ghost' onClick={onCancel}>Cancel</UiButton>
+<UiButton variant='danger' loading={isDeleting}>Delete</UiButton>
 ```
 
-### 3.2 AppInput
+### 3.2 UiInput
 
 Single-line text entry.
 
 **Use When**
 
-Use inside `AppField` when a form needs one line of typed input.
+Use inside `UiField` when a form needs one line of typed input.
 
 **Props**
 
 Extends native input attributes, excluding styling and semantic hook props.
 
-| Prop       | Type      | Default | Description                       |
-| ---------- | --------- | ------- | --------------------------------- |
-| `error`    | `boolean` | `false` | Marks the field invalid.          |
-| `loading`  | `boolean` | `false` | Disables the field while busy.    |
-| `disabled` | `boolean` | `false` | Disables the field.               |
-| `id`       | `string`  | `name`  | Used by `AppField` label linkage. |
-| `name`     | `string`  | unset   | Native form field name.           |
+| Prop       | Type      | Default | Description                      |
+| ---------- | --------- | ------- | -------------------------------- |
+| `error`    | `boolean` | `false` | Marks the field invalid.         |
+| `loading`  | `boolean` | `false` | Disables the field while busy.   |
+| `disabled` | `boolean` | `false` | Disables the field.              |
+| `id`       | `string`  | `name`  | Used by `UiField` label linkage. |
+| `name`     | `string`  | unset   | Native form field name.          |
 
 **Composition**
 
-Pair with `AppField`; pass the same value to `AppField for` and `AppInput id`.
+Pair with `UiField`; pass the same value to `UiField for` and `UiInput id`.
 
 **Example**
 
 ```tsx
-<AppField label='Service name' for='service-name'>
-  <AppInput
+<UiField label='Service name' for='service-name'>
+  <UiInput
     id='service-name'
     name='serviceName'
     value={serviceName()}
     onInput={event => setServiceName(event.currentTarget.value)}
   />
-</AppField>
+</UiField>
 ```
 
-### 3.3 AppTextArea
+### 3.3 UiTextArea
 
 Multi-line text entry.
 
@@ -232,34 +232,34 @@ Use for notes, descriptions, instructions, or other longer text fields.
 
 Extends native textarea attributes, excluding styling and semantic hook props.
 
-| Prop       | Type      | Default | Description                       |
-| ---------- | --------- | ------- | --------------------------------- |
-| `error`    | `boolean` | `false` | Marks the field invalid.          |
-| `loading`  | `boolean` | `false` | Disables the field while busy.    |
-| `disabled` | `boolean` | `false` | Disables the field.               |
-| `id`       | `string`  | `name`  | Used by `AppField` label linkage. |
-| `name`     | `string`  | unset   | Native form field name.           |
-| `rows`     | `number`  | `2`     | Visible text row count.           |
+| Prop       | Type      | Default | Description                      |
+| ---------- | --------- | ------- | -------------------------------- |
+| `error`    | `boolean` | `false` | Marks the field invalid.         |
+| `loading`  | `boolean` | `false` | Disables the field while busy.   |
+| `disabled` | `boolean` | `false` | Disables the field.              |
+| `id`       | `string`  | `name`  | Used by `UiField` label linkage. |
+| `name`     | `string`  | unset   | Native form field name.          |
+| `rows`     | `number`  | `2`     | Visible text row count.          |
 
-`rows` is interpreted by `AppTextArea` as the visual row count for the shared
+`rows` is interpreted by `UiTextArea` as the visual row count for the shared
 control treatment. The underlying textarea still receives the native `rows`
 attribute, but the component owns the rendered height.
 
 **Example**
 
 ```tsx
-<AppField label='Notes' for='notes'>
-  <AppTextArea
+<UiField label='Notes' for='notes'>
+  <UiTextArea
     id='notes'
     name='notes'
     rows={4}
     value={notes()}
     onInput={event => setNotes(event.currentTarget.value)}
   />
-</AppField>
+</UiField>
 ```
 
-### 3.4 AppSingleSelect
+### 3.4 UiSingleSelect
 
 Dropdown single-value picker.
 
@@ -269,18 +269,18 @@ Use when the user must choose exactly one value from a known option list.
 
 **Props**
 
-| Prop           | Type                       | Required | Default | Description                   |
-| -------------- | -------------------------- | -------- | ------- | ----------------------------- |
-| `options`      | `ReadonlyArray<AppOption>` | yes      | —       | Available choices.            |
-| `value`        | `string`                   | no       | unset   | Controlled selected value.    |
-| `defaultValue` | `string`                   | no       | unset   | Initial uncontrolled value.   |
-| `onChange`     | `(value: string) => void`  | no       | unset   | Receives selected value.      |
-| `placeholder`  | `string`                   | no       | unset   | Text shown before selection.  |
-| `id`           | `string`                   | no       | `name`  | Trigger id for label linkage. |
-| `name`         | `string`                   | no       | unset   | Native form field name.       |
-| `disabled`     | `boolean`                  | no       | `false` | Emits disabled state.         |
-| `error`        | `boolean`                  | no       | `false` | Emits error state.            |
-| `loading`      | `boolean`                  | no       | `false` | Disables the control as busy. |
+| Prop           | Type                      | Required | Default | Description                   |
+| -------------- | ------------------------- | -------- | ------- | ----------------------------- |
+| `options`      | `ReadonlyArray<UiOption>` | yes      | —       | Available choices.            |
+| `value`        | `string`                  | no       | unset   | Controlled selected value.    |
+| `defaultValue` | `string`                  | no       | unset   | Initial uncontrolled value.   |
+| `onChange`     | `(value: string) => void` | no       | unset   | Receives selected value.      |
+| `placeholder`  | `string`                  | no       | unset   | Text shown before selection.  |
+| `id`           | `string`                  | no       | `name`  | Trigger id for label linkage. |
+| `name`         | `string`                  | no       | unset   | Native form field name.       |
+| `disabled`     | `boolean`                 | no       | `false` | Emits disabled state.         |
+| `error`        | `boolean`                 | no       | `false` | Emits error state.            |
+| `loading`      | `boolean`                 | no       | `false` | Disables the control as busy. |
 
 **Behavior**
 
@@ -299,8 +299,8 @@ const statusOptions = [
   { value: 'inactive', label: 'Inactive' }
 ]
 
-<AppField label='Status' for='status'>
-  <AppSingleSelect
+<UiField label='Status' for='status'>
+  <UiSingleSelect
     id='status'
     name='status'
     options={statusOptions}
@@ -308,10 +308,10 @@ const statusOptions = [
     placeholder='Select status'
     onChange={setStatus}
   />
-</AppField>
+</UiField>
 ```
 
-### 3.5 AppMultiSelect
+### 3.5 UiMultiSelect
 
 Inline multi-value listbox.
 
@@ -324,7 +324,7 @@ should remain visible.
 
 | Prop           | Type                        | Required | Default | Description                  |
 | -------------- | --------------------------- | -------- | ------- | ---------------------------- |
-| `options`      | `ReadonlyArray<AppOption>`  | yes      | —       | Available choices.           |
+| `options`      | `ReadonlyArray<UiOption>`   | yes      | —       | Available choices.           |
 | `value`        | `string[]`                  | no       | unset   | Controlled selected values.  |
 | `defaultValue` | `string[]`                  | no       | unset   | Initial uncontrolled values. |
 | `onChange`     | `(value: string[]) => void` | no       | unset   | Receives selected values.    |
@@ -337,16 +337,16 @@ should remain visible.
 **Example**
 
 ```tsx
-<AppField label='Crops' variant='caption'>
-  <AppMultiSelect
+<UiField label='Crops' variant='caption'>
+  <UiMultiSelect
     options={cropOptions}
     value={selectedCrops()}
     onChange={setSelectedCrops}
   />
-</AppField>
+</UiField>
 ```
 
-### 3.6 AppCheckbox
+### 3.6 UiCheckbox
 
 Checkbox with inline label text.
 
@@ -358,7 +358,7 @@ Use for a single boolean choice.
 
 | Prop             | Type                         | Required | Default | Description                   |
 | ---------------- | ---------------------------- | -------- | ------- | ----------------------------- |
-| `children`       | `AppComponent`               | no       | unset   | Label content.                |
+| `children`       | `UiComponent`                | no       | unset   | Label content.                |
 | `checked`        | `boolean`                    | no       | unset   | Controlled checked state.     |
 | `defaultChecked` | `boolean`                    | no       | unset   | Initial checked state.        |
 | `onChange`       | `(checked: boolean) => void` | no       | unset   | Receives next checked state.  |
@@ -372,12 +372,12 @@ Use for a single boolean choice.
 **Example**
 
 ```tsx
-<AppCheckbox checked={notify()} onChange={setNotify}>
+<UiCheckbox checked={notify()} onChange={setNotify}>
   Send notification on completion
-</AppCheckbox>
+</UiCheckbox>
 ```
 
-### 3.7 AppRadioGroup & AppRadioItem
+### 3.7 UiRadioGroup & UiRadioItem
 
 Exclusive option group.
 
@@ -385,11 +385,11 @@ Exclusive option group.
 
 Use when all choices should be visible and only one choice may be selected.
 
-**AppRadioGroup Props**
+**UiRadioGroup Props**
 
 | Prop           | Type                     | Required | Default | Description                 |
 | -------------- | ------------------------ | -------- | ------- | --------------------------- |
-| `children`     | `AppComponent`           | no       | unset   | `AppRadioItem` children.    |
+| `children`     | `UiComponent`            | no       | unset   | `UiRadioItem` children.     |
 | `value`        | `Value`                  | no       | unset   | Controlled selected value.  |
 | `defaultValue` | `Value`                  | no       | unset   | Initial uncontrolled value. |
 | `onChange`     | `(value: Value) => void` | no       | unset   | Receives selected value.    |
@@ -399,27 +399,27 @@ Use when all choices should be visible and only one choice may be selected.
 | `error`        | `boolean`                | no       | `false` | Marks the group invalid.    |
 | `loading`      | `boolean`                | no       | `false` | Disables the group as busy. |
 
-**AppRadioItem Props**
+**UiRadioItem Props**
 
-| Prop       | Type           | Required | Default | Description              |
-| ---------- | -------------- | -------- | ------- | ------------------------ |
-| `value`    | `Value`        | yes      | —       | Item value.              |
-| `children` | `AppComponent` | no       | unset   | Item label content.      |
-| `disabled` | `boolean`      | no       | `false` | Disables only this item. |
+| Prop       | Type          | Required | Default | Description              |
+| ---------- | ------------- | -------- | ------- | ------------------------ |
+| `value`    | `Value`       | yes      | —       | Item value.              |
+| `children` | `UiComponent` | no       | unset   | Item label content.      |
+| `disabled` | `boolean`     | no       | `false` | Disables only this item. |
 
 **Example**
 
 ```tsx
-<AppField label='Spray mode' for='spray-mode'>
-  <AppRadioGroup name='sprayMode' value={mode()} onChange={setMode}>
-    <AppRadioItem value='auto'>Automatic</AppRadioItem>
-    <AppRadioItem value='manual'>Manual</AppRadioItem>
-    <AppRadioItem value='off'>Off</AppRadioItem>
-  </AppRadioGroup>
-</AppField>
+<UiField label='Spray mode' for='spray-mode'>
+  <UiRadioGroup name='sprayMode' value={mode()} onChange={setMode}>
+    <UiRadioItem value='auto'>Automatic</UiRadioItem>
+    <UiRadioItem value='manual'>Manual</UiRadioItem>
+    <UiRadioItem value='off'>Off</UiRadioItem>
+  </UiRadioGroup>
+</UiField>
 ```
 
-### 3.8 AppToggle
+### 3.8 UiToggle
 
 Standalone pressed/unpressed button.
 
@@ -444,14 +444,14 @@ Extends native button attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<AppField label='Night mode' for='night-mode' variant='inline'>
-  <AppToggle pressed={nightMode()} onChange={setNightMode}>
+<UiField label='Night mode' for='night-mode' variant='inline'>
+  <UiToggle pressed={nightMode()} onChange={setNightMode}>
     Enable
-  </AppToggle>
-</AppField>
+  </UiToggle>
+</UiField>
 ```
 
-### 3.9 AppToggleGroup & AppToggleItem
+### 3.9 UiToggleGroup & UiToggleItem
 
 Single-select segmented toggle group.
 
@@ -459,11 +459,11 @@ Single-select segmented toggle group.
 
 Use when a small set of mutually exclusive modes should appear as peer buttons.
 
-**AppToggleGroup Props**
+**UiToggleGroup Props**
 
 | Prop           | Type                     | Required | Default | Description                 |
 | -------------- | ------------------------ | -------- | ------- | --------------------------- |
-| `children`     | `AppComponent`           | no       | unset   | `AppToggleItem` children.   |
+| `children`     | `UiComponent`            | no       | unset   | `UiToggleItem` children.    |
 | `value`        | `Value`                  | no       | unset   | Controlled selected value.  |
 | `defaultValue` | `Value`                  | no       | unset   | Initial uncontrolled value. |
 | `onChange`     | `(value: Value) => void` | no       | unset   | Receives selected value.    |
@@ -471,25 +471,25 @@ Use when a small set of mutually exclusive modes should appear as peer buttons.
 | `error`        | `boolean`                | no       | `false` | Emits error state.          |
 | `loading`      | `boolean`                | no       | `false` | Disables the group as busy. |
 
-**AppToggleItem Props**
+**UiToggleItem Props**
 
-| Prop       | Type           | Required | Default | Description              |
-| ---------- | -------------- | -------- | ------- | ------------------------ |
-| `value`    | `Value`        | yes      | —       | Item value.              |
-| `children` | `AppComponent` | no       | unset   | Item label content.      |
-| `disabled` | `boolean`      | no       | `false` | Disables only this item. |
+| Prop       | Type          | Required | Default | Description              |
+| ---------- | ------------- | -------- | ------- | ------------------------ |
+| `value`    | `Value`       | yes      | —       | Item value.              |
+| `children` | `UiComponent` | no       | unset   | Item label content.      |
+| `disabled` | `boolean`     | no       | `false` | Disables only this item. |
 
 **Example**
 
 ```tsx
-<AppToggleGroup value={view()} onChange={setView}>
-  <AppToggleItem value='calendar'>Calendar</AppToggleItem>
-  <AppToggleItem value='list'>List</AppToggleItem>
-  <AppToggleItem value='map'>Map</AppToggleItem>
-</AppToggleGroup>
+<UiToggleGroup value={view()} onChange={setView}>
+  <UiToggleItem value='calendar'>Calendar</UiToggleItem>
+  <UiToggleItem value='list'>List</UiToggleItem>
+  <UiToggleItem value='map'>Map</UiToggleItem>
+</UiToggleGroup>
 ```
 
-### 3.10 AppTabs
+### 3.10 UiTabs
 
 Tabbed content primitive.
 
@@ -501,17 +501,17 @@ be visible at a time.
 **Required Composition**
 
 ```text
-AppTabs
-├── AppTabList
-│   └── AppTab
-└── AppTabPanel
+UiTabs
+├── UiTabList
+│   └── UiTab
+└── UiTabPanel
 ```
 
-**AppTabs Props**
+**UiTabs Props**
 
 | Prop             | Type                      | Required | Default    | Description              |
 | ---------------- | ------------------------- | -------- | ---------- | ------------------------ |
-| `children`       | `AppComponent`            | no       | unset      | List and panel children. |
+| `children`       | `UiComponent`             | no       | unset      | List and panel children. |
 | `value`          | `Value`                   | no       | unset      | Controlled active tab.   |
 | `defaultValue`   | `Value`                   | no       | unset      | Initial active tab.      |
 | `activationMode` | `'automatic' \| 'manual'` | no       | `'manual'` | Activation mode.         |
@@ -522,26 +522,26 @@ AppTabs
 
 **Child Props**
 
-| Component     | Required Props | Optional Props         |
-| ------------- | -------------- | ---------------------- |
-| `AppTabList`  | —              | `children`             |
-| `AppTab`      | `value`        | `children`, `disabled` |
-| `AppTabPanel` | `value`        | `children`             |
+| Component    | Required Props | Optional Props         |
+| ------------ | -------------- | ---------------------- |
+| `UiTabList`  | —              | `children`             |
+| `UiTab`      | `value`        | `children`, `disabled` |
+| `UiTabPanel` | `value`        | `children`             |
 
 **Example**
 
 ```tsx
-<AppTabs value={tab()} onChange={setTab}>
-  <AppTabList>
-    <AppTab value='details'>Details</AppTab>
-    <AppTab value='history'>History</AppTab>
-  </AppTabList>
-  <AppTabPanel value='details'>Details content</AppTabPanel>
-  <AppTabPanel value='history'>History content</AppTabPanel>
-</AppTabs>
+<UiTabs value={tab()} onChange={setTab}>
+  <UiTabList>
+    <UiTab value='details'>Details</UiTab>
+    <UiTab value='history'>History</UiTab>
+  </UiTabList>
+  <UiTabPanel value='details'>Details content</UiTabPanel>
+  <UiTabPanel value='history'>History content</UiTabPanel>
+</UiTabs>
 ```
 
-### 3.11 AppAccordion
+### 3.11 UiAccordion
 
 Collapsible content sections.
 
@@ -552,17 +552,17 @@ Use to show and hide related sections while keeping section headings visible.
 **Required Composition**
 
 ```text
-AppAccordion
-└── AppAccordionItem
-    ├── AppAccordionTrigger
-    └── AppAccordionContent
+UiAccordion
+└── UiAccordionItem
+    ├── UiAccordionTrigger
+    └── UiAccordionContent
 ```
 
-**AppAccordion Props**
+**UiAccordion Props**
 
 | Prop            | Type                        | Required | Default | Description                 |
 | --------------- | --------------------------- | -------- | ------- | --------------------------- |
-| `children`      | `AppComponent`              | no       | unset   | Accordion item children.    |
+| `children`      | `UiComponent`               | no       | unset   | Accordion item children.    |
 | `multiple`      | `boolean`                   | no       | `false` | Allows multiple open items. |
 | `value`         | `string[]`                  | no       | unset   | Controlled open items.      |
 | `defaultValue`  | `string[]`                  | no       | unset   | Initially open items.       |
@@ -572,24 +572,24 @@ AppAccordion
 
 **Child Props**
 
-| Component             | Required Props | Optional Props         |
-| --------------------- | -------------- | ---------------------- |
-| `AppAccordionItem`    | `value`        | `children`, `disabled` |
-| `AppAccordionTrigger` | —              | `children`             |
-| `AppAccordionContent` | —              | `children`             |
+| Component            | Required Props | Optional Props         |
+| -------------------- | -------------- | ---------------------- |
+| `UiAccordionItem`    | `value`        | `children`, `disabled` |
+| `UiAccordionTrigger` | —              | `children`             |
+| `UiAccordionContent` | —              | `children`             |
 
 **Example**
 
 ```tsx
-<AppAccordion multiple defaultValue={['spray']}>
-  <AppAccordionItem value='spray'>
-    <AppAccordionTrigger>Spray Settings</AppAccordionTrigger>
-    <AppAccordionContent>Spray settings content</AppAccordionContent>
-  </AppAccordionItem>
-</AppAccordion>
+<UiAccordion multiple defaultValue={['spray']}>
+  <UiAccordionItem value='spray'>
+    <UiAccordionTrigger>Spray Settings</UiAccordionTrigger>
+    <UiAccordionContent>Spray settings content</UiAccordionContent>
+  </UiAccordionItem>
+</UiAccordion>
 ```
 
-### 3.12 AppDialog
+### 3.12 UiDialog
 
 Modal content primitive with overlay.
 
@@ -602,9 +602,9 @@ confirmation flows.
 
 | Prop             | Type                      | Required | Default       | Description               |
 | ---------------- | ------------------------- | -------- | ------------- | ------------------------- |
-| `trigger`        | `AppComponent`            | no       | unset         | Trigger button content.   |
-| `triggerVariant` | `AppButtonVariant`        | no       | `'secondary'` | Trigger button variant.   |
-| `children`       | `AppComponent`            | no       | unset         | Dialog content.           |
+| `trigger`        | `UiComponent`             | no       | unset         | Trigger button content.   |
+| `triggerVariant` | `UiButtonVariant`         | no       | `'secondary'` | Trigger button variant.   |
+| `children`       | `UiComponent`             | no       | unset         | Dialog content.           |
 | `open`           | `boolean`                 | no       | unset         | Controlled open state.    |
 | `defaultOpen`    | `boolean`                 | no       | unset         | Initial open state.       |
 | `onOpenChange`   | `(open: boolean) => void` | no       | unset         | Receives open state.      |
@@ -615,23 +615,23 @@ confirmation flows.
 **Example**
 
 ```tsx
-<AppDialog
+<UiDialog
   trigger='Edit'
   open={open()}
   onOpenChange={setOpen}
 >
-  <AppCard variant='workflow'>
+  <UiCard variant='workflow'>
     <h2>Edit Field</h2>
-    <AppLayout variant='inline-wrap'>
-      <AppField label='Name' for='name'>
-        <AppInput id='name' value={name()} onInput={onNameInput} />
-      </AppField>
-    </AppLayout>
-  </AppCard>
-</AppDialog>
+    <UiLayout variant='inline-wrap'>
+      <UiField label='Name' for='name'>
+        <UiInput id='name' value={name()} onInput={onNameInput} />
+      </UiField>
+    </UiLayout>
+  </UiCard>
+</UiDialog>
 ```
 
-### 3.13 AppPopover
+### 3.13 UiPopover
 
 Floating panel anchored to a trigger button.
 
@@ -642,20 +642,20 @@ modal interruption.
 
 **Props**
 
-Same open-state and trigger props as `AppDialog`.
+Same open-state and trigger props as `UiDialog`.
 
 **Example**
 
 ```tsx
-<AppPopover trigger='Options' triggerVariant='ghost'>
-  <AppLayout>
-    <AppButton variant='ghost' onClick={handleEdit}>Edit</AppButton>
-    <AppButton variant='danger' onClick={handleDelete}>Delete</AppButton>
-  </AppLayout>
-</AppPopover>
+<UiPopover trigger='Options' triggerVariant='ghost'>
+  <UiLayout>
+    <UiButton variant='ghost' onClick={handleEdit}>Edit</UiButton>
+    <UiButton variant='danger' onClick={handleDelete}>Delete</UiButton>
+  </UiLayout>
+</UiPopover>
 ```
 
-### 3.14 AppTooltip
+### 3.14 UiTooltip
 
 Advisory content anchored to a trigger button.
 
@@ -665,17 +665,17 @@ Use for short helper text that clarifies an adjacent action or status.
 
 **Props**
 
-Same open-state and trigger props as `AppDialog`.
+Same open-state and trigger props as `UiDialog`.
 
 **Example**
 
 ```tsx
-<AppTooltip trigger='Sync status' triggerVariant='ghost'>
+<UiTooltip trigger='Sync status' triggerVariant='ghost'>
   Last synced 2 minutes ago
-</AppTooltip>
+</UiTooltip>
 ```
 
-### 3.15 AppProgress
+### 3.15 UiProgress
 
 Linear progress indicator.
 
@@ -686,21 +686,21 @@ batch completion.
 
 **Props**
 
-| Prop       | Type           | Required | Default | Description                |
-| ---------- | -------------- | -------- | ------- | -------------------------- |
-| `label`    | `string`       | no       | unset   | Accessible label.          |
-| `value`    | `number`       | no       | unset   | Current progress value.    |
-| `minValue` | `number`       | no       | unset   | Minimum progress value.    |
-| `maxValue` | `number`       | no       | unset   | Maximum progress value.    |
-| `children` | `AppComponent` | no       | unset   | Optional adjacent content. |
-| `disabled` | `boolean`      | no       | `false` | Emits disabled state.      |
-| `error`    | `boolean`      | no       | `false` | Emits error state.         |
-| `loading`  | `boolean`      | no       | `false` | Emits loading state.       |
+| Prop       | Type          | Required | Default | Description                |
+| ---------- | ------------- | -------- | ------- | -------------------------- |
+| `label`    | `string`      | no       | unset   | Accessible label.          |
+| `value`    | `number`      | no       | unset   | Current progress value.    |
+| `minValue` | `number`      | no       | unset   | Minimum progress value.    |
+| `maxValue` | `number`      | no       | unset   | Maximum progress value.    |
+| `children` | `UiComponent` | no       | unset   | Optional adjacent content. |
+| `disabled` | `boolean`     | no       | `false` | Emits disabled state.      |
+| `error`    | `boolean`     | no       | `false` | Emits error state.         |
+| `loading`  | `boolean`     | no       | `false` | Emits loading state.       |
 
 **Example**
 
 ```tsx
-<AppProgress
+<UiProgress
   label='Upload progress'
   value={uploaded()}
   minValue={0}
@@ -710,7 +710,7 @@ batch completion.
 
 ## 4. Display Controls
 
-### 4.1 AppBadge
+### 4.1 UiBadge
 
 Inline status pill.
 
@@ -728,11 +728,11 @@ Extends native `span` attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<AppBadge variant='success'>Active</AppBadge>
-<AppBadge variant='warning'>Pending</AppBadge>
+<UiBadge variant='success'>Active</UiBadge>
+<UiBadge variant='warning'>Pending</UiBadge>
 ```
 
-### 4.2 AppAlert
+### 4.2 UiAlert
 
 Inline feedback message.
 
@@ -747,17 +747,17 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 | `error`    | `boolean`                                      | `false` | Emits error state.    |
 | `loading`  | `boolean`                                      | `false` | Emits loading state.  |
 
-`AppAlert` renders with `role='alert'`.
+`UiAlert` renders with `role='alert'`.
 
 **Example**
 
 ```tsx
-<AppAlert variant='warning'>
+<UiAlert variant='warning'>
   Wind speed exceeds the recommended spray threshold.
-</AppAlert>
+</UiAlert>
 ```
 
-### 4.3 AppAvatar
+### 4.3 UiAvatar
 
 Avatar marker for initials or compact identity content.
 
@@ -774,10 +774,10 @@ Extends native `span` attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<AppAvatar>TK</AppAvatar>
+<UiAvatar>TK</UiAvatar>
 ```
 
-### 4.4 AppCard
+### 4.4 UiCard
 
 Framed content surface.
 
@@ -800,13 +800,13 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<AppCard variant='widget'>
+<UiCard variant='widget'>
   <h3>Fleet Status</h3>
   <p>4 of 6 drones active</p>
-</AppCard>
+</UiCard>
 ```
 
-### 4.5 AppSeparator
+### 4.5 UiSeparator
 
 Horizontal or vertical rule.
 
@@ -824,11 +824,11 @@ primitive, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<AppSeparator />
-<AppSeparator orientation='vertical' />
+<UiSeparator />
+<UiSeparator orientation='vertical' />
 ```
 
-### 4.6 AppSpinner
+### 4.6 UiSpinner
 
 Indeterminate loading indicator.
 
@@ -842,15 +842,15 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 | `error`    | `boolean` | `false` | Emits error state.    |
 | `loading`  | `boolean` | `false` | Emits loading state.  |
 
-`AppSpinner` renders with `role='status'`.
+`UiSpinner` renders with `role='status'`.
 
 **Example**
 
 ```tsx
-<AppSpinner aria-label='Loading jobs' />
+<UiSpinner aria-label='Loading jobs' />
 ```
 
-### 4.7 AppSkeleton
+### 4.7 UiSkeleton
 
 Loading placeholder shimmer.
 
@@ -867,14 +867,14 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<Show when={job()} fallback={<AppSkeleton aria-label='Loading job' />}>
+<Show when={job()} fallback={<UiSkeleton aria-label='Loading job' />}>
   <h2>{job().title}</h2>
 </Show>
 ```
 
 ## 5. Layout & Form Controls
 
-### 5.1 AppLayout
+### 5.1 UiLayout
 
 General layout container for block and inline child arrangement.
 
@@ -886,7 +886,7 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 | ---------- | ----------------------------------------------------------- | ------- | ----------------- |
 | `variant`  | `'block-fit' \| 'inline' \| 'inline-fill' \| 'inline-wrap'` | unset   | Layout direction. |
 | `gap`      | `'loose' \| 'tight' \| 'none'`                              | unset   | Gap density.      |
-| `children` | `AppComponent`                                              | unset   | Layout children.  |
+| `children` | `UiComponent`                                               | unset   | Layout children.  |
 
 **Variants**
 
@@ -901,17 +901,17 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<AppLayout variant='inline'>
-  <AppBadge variant='success'>Active</AppBadge>
-  <AppBadge variant='info'>Synced</AppBadge>
-</AppLayout>
+<UiLayout variant='inline'>
+  <UiBadge variant='success'>Active</UiBadge>
+  <UiBadge variant='info'>Synced</UiBadge>
+</UiLayout>
 ```
 
-### 5.2 AppList & AppListItem
+### 5.2 UiList & UiListItem
 
 Semantic list of items.
 
-**AppList Props**
+**UiList Props**
 
 Extends native list attributes, excluding styling and semantic hook props.
 
@@ -923,45 +923,45 @@ Extends native list attributes, excluding styling and semantic hook props.
 `name` derives the rendered list `id` when no explicit `id` is provided.
 `variant='numbered'` renders an `<ol>`. All other variants render a `<ul>`.
 
-**AppListItem Props**
+**UiListItem Props**
 
 Extends native `li` attributes, excluding styling and semantic hook props.
 
 **Example**
 
 ```tsx
-<AppField label='Pre-flight status' variant='caption'>
-  <AppList variant='bullet'>
-    <AppListItem>Pre-flight checklist complete</AppListItem>
-    <AppListItem>Wind within operating limits</AppListItem>
-  </AppList>
-</AppField>
+<UiField label='Pre-flight status' variant='caption'>
+  <UiList variant='bullet'>
+    <UiListItem>Pre-flight checklist complete</UiListItem>
+    <UiListItem>Wind within operating limits</UiListItem>
+  </UiList>
+</UiField>
 ```
 
-### 5.3 AppTable
+### 5.3 UiTable
 
-Semantic table wrappers. Horizontal overflow is opt-in through `AppTable`.
+Semantic table wrappers. Horizontal overflow is opt-in through `UiTable`.
 
 **Required Composition**
 
 ```text
-AppTable
-├── AppTableHeader
-│   └── AppTableCell
-└── AppTableBody
-    └── AppTableRow
-        └── AppTableCell
+UiTable
+├── UiTableHeader
+│   └── UiTableCell
+└── UiTableBody
+    └── UiTableRow
+        └── UiTableCell
 ```
 
 **Props**
 
-| Component        | Props                                                      | Notes                                          |
-| ---------------- | ---------------------------------------------------------- | ---------------------------------------------- |
-| `AppTable`       | native table attrs, `name?: string`, `overflow?: Overflow` | Renders `<table>` or overflow wrapper + table. |
-| `AppTableHeader` | `children: AppComponent`                                   | Wraps children in header row.                  |
-| `AppTableBody`   | native table-section attrs                                 | Renders `<tbody>`.                             |
-| `AppTableRow`    | `variant?: 'section'` plus row attrs                       | Section rows span all columns.                 |
-| `AppTableCell`   | `align?: 'start' \| 'center' \| 'end'`                     | Renders `<th>` in headers.                     |
+| Component       | Props                                                      | Notes                                          |
+| --------------- | ---------------------------------------------------------- | ---------------------------------------------- |
+| `UiTable`       | native table attrs, `name?: string`, `overflow?: Overflow` | Renders `<table>` or overflow wrapper + table. |
+| `UiTableHeader` | `children: UiComponent`                                    | Wraps children in header row.                  |
+| `UiTableBody`   | native table-section attrs                                 | Renders `<tbody>`.                             |
+| `UiTableRow`    | `variant?: 'section'` plus row attrs                       | Section rows span all columns.                 |
+| `UiTableCell`   | `align?: 'start' \| 'center' \| 'end'`                     | Renders `<th>` in headers.                     |
 
 `name` derives the rendered table target `id` when no explicit `id` is provided.
 `Overflow` is `'scroll' | 'hidden'`. Omit `overflow` for a plain semantic table.
@@ -970,26 +970,26 @@ Use `overflow='scroll'` for wide tables that should scroll horizontally.
 **Example**
 
 ```tsx
-<AppField label='Drone batteries' variant='caption'>
-  <AppTable>
-    <AppTableHeader>
-      <AppTableCell>Drone</AppTableCell>
-      <AppTableCell align='end'>Battery</AppTableCell>
-    </AppTableHeader>
-    <AppTableBody>
-      <AppTableRow variant='section'>
-        <AppTableCell>Zone A</AppTableCell>
-      </AppTableRow>
-      <AppTableRow>
-        <AppTableCell>SA-01</AppTableCell>
-        <AppTableCell align='end'>92%</AppTableCell>
-      </AppTableRow>
-    </AppTableBody>
-  </AppTable>
-</AppField>
+<UiField label='Drone batteries' variant='caption'>
+  <UiTable>
+    <UiTableHeader>
+      <UiTableCell>Drone</UiTableCell>
+      <UiTableCell align='end'>Battery</UiTableCell>
+    </UiTableHeader>
+    <UiTableBody>
+      <UiTableRow variant='section'>
+        <UiTableCell>Zone A</UiTableCell>
+      </UiTableRow>
+      <UiTableRow>
+        <UiTableCell>SA-01</UiTableCell>
+        <UiTableCell align='end'>92%</UiTableCell>
+      </UiTableRow>
+    </UiTableBody>
+  </UiTable>
+</UiField>
 ```
 
-### 5.4 AppFooter
+### 5.4 UiFooter
 
 Branded footer with a centered caller-supplied logo.
 
@@ -1003,10 +1003,10 @@ Branded footer with a centered caller-supplied logo.
 **Example**
 
 ```tsx
-<AppFooter logo={logoUrl} alt='swarmAg' />
+<UiFooter logo={logoUrl} alt='swarmAg' />
 ```
 
-### 5.5 AppField
+### 5.5 UiField
 
 Label and control wrapper.
 
@@ -1022,7 +1022,7 @@ does not wrap the control.
 | `label`    | `string`                | yes        | —       | Label or caption text.           |
 | `for`      | `string`                | label mode | —       | Associated labelable control id. |
 | `variant`  | `'inline' \| 'caption'` | no         | unset   | Inline label or caption mode.    |
-| `children` | `AppComponent`          | yes        | —       | The associated control.          |
+| `children` | `UiComponent`           | yes        | —       | The associated control.          |
 
 Default and `variant='inline'` render a `<label for>`, so `for` must target a
 labelable rendered element. `variant='caption'` renders a `<figcaption>` and is
@@ -1031,12 +1031,12 @@ for non-labelable controls such as lists, tables, and composite listboxes.
 **Example**
 
 ```tsx
-<AppField label='Start time' for='start'>
-  <AppInput id='start' type='time' value={start()} onInput={onStartInput} />
-</AppField>
+<UiField label='Start time' for='start'>
+  <UiInput id='start' type='time' value={start()} onInput={onStartInput} />
+</UiField>
 ```
 
-### 5.6 AppFieldset
+### 5.6 UiFieldset
 
 Semantic group boundary with legend.
 
@@ -1046,27 +1046,27 @@ Use when a form has a named group of related fields.
 
 **Props**
 
-| Prop       | Type           | Required | Default | Description     |
-| ---------- | -------------- | -------- | ------- | --------------- |
-| `legend`   | `string`       | yes      | —       | Group name.     |
-| `children` | `AppComponent` | yes      | —       | Group contents. |
+| Prop       | Type          | Required | Default | Description     |
+| ---------- | ------------- | -------- | ------- | --------------- |
+| `legend`   | `string`      | yes      | —       | Group name.     |
+| `children` | `UiComponent` | yes      | —       | Group contents. |
 
 **Example**
 
 ```tsx
-<AppFieldset legend='Spray window'>
-  <AppLayout variant='inline-wrap'>
-    <AppField label='Start time' for='start'>
-      <AppInput id='start' type='time' />
-    </AppField>
-    <AppField label='End time' for='end'>
-      <AppInput id='end' type='time' />
-    </AppField>
-  </AppLayout>
-</AppFieldset>
+<UiFieldset legend='Spray window'>
+  <UiLayout variant='inline-wrap'>
+    <UiField label='Start time' for='start'>
+      <UiInput id='start' type='time' />
+    </UiField>
+    <UiField label='End time' for='end'>
+      <UiInput id='end' type='time' />
+    </UiField>
+  </UiLayout>
+</UiFieldset>
 ```
 
-### 5.7 AppFormActions
+### 5.7 UiFormActions
 
 Right-aligned action row.
 
@@ -1076,25 +1076,25 @@ Use at the end of a form or dialog surface for submit and dismissal buttons.
 
 **Props**
 
-| Prop       | Type           | Required | Default | Description     |
-| ---------- | -------------- | -------- | ------- | --------------- |
-| `children` | `AppComponent` | yes      | —       | Action buttons. |
+| Prop       | Type          | Required | Default | Description     |
+| ---------- | ------------- | -------- | ------- | --------------- |
+| `children` | `UiComponent` | yes      | —       | Action buttons. |
 
 **Example**
 
 ```tsx
-<AppFormActions>
-  <AppButton variant='ghost' onClick={onCancel}>Cancel</AppButton>
-  <AppButton variant='primary' type='submit'>Save</AppButton>
-</AppFormActions>
+<UiFormActions>
+  <UiButton variant='ghost' onClick={onCancel}>Cancel</UiButton>
+  <UiButton variant='primary' type='submit'>Save</UiButton>
+</UiFormActions>
 ```
 
 ## 6. Charts
 
 The chart directory is reserved at `source/ux/common/components/charts`, but the
 current component library does not export public chart controls. Consumers should
-not import Chart.js directly; use App chart controls only after they are exposed
-through the shared chart barrel.
+not import Chart.js directly; use chart controls only after they are exposed through
+the shared chart barrel.
 
 | Variant      | Purpose                          |
 | ------------ | -------------------------------- |

@@ -74,7 +74,7 @@ const main = async () => {
     console.error('')
     for (const violation of violations) console.error(`  ${violation}`)
     console.error('')
-    console.error('Rule: Chart.js is an implementation detail of AppChart in chart primitives.')
+    console.error('Rule: Chart.js is an implementation detail of UiChart in chart primitives.')
     Deno.exit(1)
   }
 

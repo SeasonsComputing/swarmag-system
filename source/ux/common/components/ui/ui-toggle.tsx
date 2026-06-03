@@ -1,69 +1,66 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App layout control                                                           ║
-║ Unified API surface for block and inline layout primitives.                  ║
+║ Ui toggle control                                                           ║
+║ Semantic wrapper for the Kobalte ToggleButton primitive.                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Single layout primitive covering block and inline arrangements.
+Emits toggle control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppLayout  Layout container with declared variant and gap density.
+UiToggle  Toggle control with declared states.
 */
 
+import { ToggleButton } from '@kobalte/core/toggle-button'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Layout variant. Omit for block-fill stack. */
-export type AppLayoutVariant = 'block-fit' | 'inline' | 'inline-fill' | 'inline-wrap'
-
-/** Layout gap density. Omit for standard spacing. */
-export type AppLayoutGap = 'loose' | 'tight' | 'none'
-
-/** Layout control props. */
-export type AppLayoutProps =
-  & AppComponentProps
+/** Toggle control props. */
+export type UiToggleProps =
+  & UiComponentProps
   & Omit<
-    JSX.HTMLAttributes<HTMLDivElement>,
+    JSX.ButtonHTMLAttributes<HTMLButtonElement>,
     | 'children'
     | 'class'
     | 'classList'
     | 'style'
     | 'data-ui'
-    | 'data-ui-variant'
-    | 'data-ui-gap'
+    | 'data-ui-state'
   >
   & {
-    gap?: AppLayoutGap
-    variant?: AppLayoutVariant
+    error?: boolean
+    loading?: boolean
+    pressed?: boolean
+    defaultPressed?: boolean
+    onChange?: (pressed: boolean) => void
     class?: never
     classList?: never
     style?: never
     'data-ui'?: never
-    'data-ui-variant'?: never
-    'data-ui-gap'?: never
+    'data-ui-state'?: never
   }
 
-/** Layout container with declared variant and gap density. */
-export const AppLayout = (props: AppLayoutProps): AppComponent => {
+/** Toggle control with declared states. */
+export const UiToggle = (props: UiToggleProps): UiComponent => {
   const [local, others] = splitProps(props, [
-    'gap',
-    'variant',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-variant',
-    'data-ui-gap'
+    'error',
+    'loading',
+    'disabled',
+    'pressed',
+    'defaultPressed',
+    'onChange'
   ])
   return (
-    <div
+    <ToggleButton
       {...others}
-      data-ui='layout'
-      data-ui-gap={local.gap}
-      data-ui-variant={local.variant}
+      data-ui='toggle'
+      data-ui-state={controlState(local)}
+      disabled={local.disabled || local.loading}
+      pressed={local.pressed}
+      defaultPressed={local.defaultPressed}
+      onChange={local.onChange}
     />
   )
 }

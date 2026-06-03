@@ -1,33 +1,25 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ AppFooter                                                                    ║
-║ Footer control with branding and mobile safe-area support.                  ║
+║ Ui form actions                                                             ║
+║ Right-aligned action button row, separate from the field grid.               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Footer primitive that renders a caller-supplied logo centered with the mono
-filter applied. Accounts for mobile browser chrome via safe-area-inset. Logo
-asset stays in the app layer — the control remains domain-free.
+Groups action buttons at the end of a form. Always separate from the field
+grid — never nested inside an UiField.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppFooter  Footer control component.
+UiFormActions  Right-aligned action row.
 */
 
-import { type AppComponent } from './ui-helpers.ts'
+import type { UiComponent, UiContainerProps } from './ui-helpers.ts'
 
-/** AppFooter props. */
-export type AppFooterProps = {
-  /** Logo image URL. Caller supplies — keeps the control domain-free. */
-  logo: string
-  /** Accessible alt text for the logo image. */
-  alt?: string
-}
+/** UiFormActions props. */
+export type UiFormActionsProps = UiContainerProps
 
-/** Footer control with centered logo. */
-export const AppFooter = (props: AppFooterProps): AppComponent => (
-  <footer data-ui='footer'>
-    <img data-ui='footer-logo' src={props.logo} alt={props.alt ?? ''} />
-  </footer>
+/** Right-aligned action button row. Always separate from the field grid. */
+export const UiFormActions = (props: UiFormActionsProps): UiComponent => (
+  <div data-ui='form-actions'>{props.children}</div>
 )

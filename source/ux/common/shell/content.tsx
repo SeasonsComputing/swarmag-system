@@ -13,13 +13,13 @@ PUBLIC
 Content  Main content frame component.
 */
 
-import type { AppComponent, AppContainerProps } from '@ux/common/components/ui'
+import type { UiComponent, UiContainerProps } from '@ux/common/components/ui'
 
 /** Props for the Content component. */
-export type ContentProps = AppContainerProps
+export type ContentProps = UiContainerProps
 
 /** Main content frame for authenticated app views. */
-export const Content = (props: AppContainerProps): AppComponent => (
+export const Content = (props: UiContainerProps): UiComponent => (
   <main>
     {props.children}
   </main>

@@ -3,83 +3,78 @@
  */
 
 export {
-  AppAccordion,
-  AppAccordionContent,
-  type AppAccordionContentProps,
-  AppAccordionItem,
-  type AppAccordionItemProps,
-  type AppAccordionProps,
-  AppAccordionTrigger,
-  type AppAccordionTriggerProps
-} from './app-accordion.tsx'
-export { AppAlert, type AppAlertProps, type AppAlertVariant } from './app-alert.tsx'
-export { AppAvatar, type AppAvatarProps } from './app-avatar.tsx'
-export { AppBadge, type AppBadgeProps, type AppBadgeVariant } from './app-badge.tsx'
-export { AppButton, type AppButtonProps, type AppButtonVariant } from './app-button.tsx'
-export { AppCard, type AppCardProps } from './app-card.tsx'
-export { AppCheckbox, type AppCheckboxProps } from './app-checkbox.tsx'
-export { AppDialog, type AppDialogProps } from './app-dialog.tsx'
-export { AppField, type AppFieldProps } from './app-field.tsx'
-export { AppFieldset, type AppFieldsetProps } from './app-fieldset.tsx'
-export { AppFooter, type AppFooterProps } from './app-footer.tsx'
-export { AppFormActions, type AppFormActionsProps } from './app-form-actions.tsx'
-export { AppInput, type AppInputProps } from './app-input.tsx'
+  UiAccordion,
+  UiAccordionContent,
+  type UiAccordionContentProps,
+  UiAccordionItem,
+  type UiAccordionItemProps,
+  type UiAccordionProps,
+  UiAccordionTrigger,
+  type UiAccordionTriggerProps
+} from './ui-accordion.tsx'
+export { UiAlert, type UiAlertProps, type UiAlertVariant } from './ui-alert.tsx'
+export { UiAvatar, type UiAvatarProps } from './ui-avatar.tsx'
+export { UiBadge, type UiBadgeProps, type UiBadgeVariant } from './ui-badge.tsx'
+export { UiButton, type UiButtonProps, type UiButtonVariant } from './ui-button.tsx'
+export { UiCard, type UiCardProps } from './ui-card.tsx'
+export { UiCheckbox, type UiCheckboxProps } from './ui-checkbox.tsx'
+export { UiDialog, type UiDialogProps } from './ui-dialog.tsx'
+export { UiField, type UiFieldProps } from './ui-field.tsx'
+export { UiFieldset, type UiFieldsetProps } from './ui-fieldset.tsx'
+export { UiFooter, type UiFooterProps } from './ui-footer.tsx'
+export { UiFormActions, type UiFormActionsProps } from './ui-form-actions.tsx'
+export type { UiComponent, UiComponentProps, UiContainerProps } from './ui-helpers.ts'
+export { UiInput, type UiInputProps } from './ui-input.tsx'
+export { UiLayout, type UiLayoutGap, type UiLayoutProps, type UiLayoutVariant } from './ui-layout.tsx'
 export {
-  AppLayout,
-  type AppLayoutGap,
-  type AppLayoutProps,
-  type AppLayoutVariant
-} from './app-layout.tsx'
+  UiList,
+  UiListItem,
+  type UiListItemProps,
+  type UiListProps,
+  type UiListVariant
+} from './ui-list.tsx'
+export { UiMultiSelect, type UiMultiSelectProps } from './ui-multi-select.tsx'
+export { UiPopover, type UiPopoverProps } from './ui-popover.tsx'
+export { UiProgress, type UiProgressProps } from './ui-progress.tsx'
 export {
-  AppList,
-  AppListItem,
-  type AppListItemProps,
-  type AppListProps,
-  type AppListVariant
-} from './app-list.tsx'
-export { AppMultiSelect, type AppMultiSelectProps } from './app-multi-select.tsx'
-export { AppPopover, type AppPopoverProps } from './app-popover.tsx'
-export { AppProgress, type AppProgressProps } from './app-progress.tsx'
+  UiRadioGroup,
+  type UiRadioGroupProps,
+  UiRadioItem,
+  type UiRadioItemProps
+} from './ui-radio-group.tsx'
+export { UiSeparator, type UiSeparatorProps } from './ui-separator.tsx'
+export { UiSingleSelect, type UiSingleSelectProps } from './ui-single-select.tsx'
+export { UiSkeleton, type UiSkeletonProps } from './ui-skeleton.tsx'
+export { UiSpinner, type UiSpinnerProps } from './ui-spinner.tsx'
 export {
-  AppRadioGroup,
-  type AppRadioGroupProps,
-  AppRadioItem,
-  type AppRadioItemProps
-} from './app-radio-group.tsx'
-export { AppSeparator, type AppSeparatorProps } from './app-separator.tsx'
-export { AppSingleSelect, type AppSingleSelectProps } from './app-single-select.tsx'
-export { AppSkeleton, type AppSkeletonProps } from './app-skeleton.tsx'
-export { AppSpinner, type AppSpinnerProps } from './app-spinner.tsx'
+  UiTable,
+  UiTableBody,
+  type UiTableBodyProps,
+  UiTableCell,
+  type UiTableCellProps,
+  UiTableHeader,
+  type UiTableHeaderProps,
+  type UiTableOverflow,
+  type UiTableProps,
+  UiTableRow,
+  type UiTableRowProps
+} from './ui-table.tsx'
 export {
-  AppTable,
-  AppTableBody,
-  type AppTableBodyProps,
-  AppTableCell,
-  type AppTableCellProps,
-  AppTableHeader,
-  type AppTableHeaderProps,
-  type AppTableOverflow,
-  type AppTableProps,
-  AppTableRow,
-  type AppTableRowProps
-} from './app-table.tsx'
+  UiTab,
+  UiTabList,
+  type UiTabListProps,
+  UiTabPanel,
+  type UiTabPanelProps,
+  type UiTabProps,
+  UiTabs,
+  type UiTabsProps
+} from './ui-tabs.tsx'
+export { UiTextArea, type UiTextAreaProps } from './ui-text-area.tsx'
 export {
-  AppTab,
-  AppTabList,
-  type AppTabListProps,
-  AppTabPanel,
-  type AppTabPanelProps,
-  type AppTabProps,
-  AppTabs,
-  type AppTabsProps
-} from './app-tabs.tsx'
-export { AppTextArea, type AppTextAreaProps } from './app-text-area.tsx'
-export {
-  AppToggleGroup,
-  type AppToggleGroupProps,
-  AppToggleItem,
-  type AppToggleItemProps
-} from './app-toggle-group.tsx'
-export { AppToggle, type AppToggleProps } from './app-toggle.tsx'
-export { AppTooltip, type AppTooltipProps } from './app-tooltip.tsx'
-export type { AppComponent, AppComponentProps, AppContainerProps } from './ui-helpers.ts'
+  UiToggleGroup,
+  type UiToggleGroupProps,
+  UiToggleItem,
+  type UiToggleItemProps
+} from './ui-toggle-group.tsx'
+export { UiToggle, type UiToggleProps } from './ui-toggle.tsx'
+export { UiTooltip, type UiTooltipProps } from './ui-tooltip.tsx'

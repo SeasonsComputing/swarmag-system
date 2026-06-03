@@ -1,28 +1,26 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App separator control                                                        ║
-║ Semantic wrapper for the Kobalte Separator primitive.                        ║
+║ Ui input control                                                            ║
+║ Semantic wrapper for the Kobalte TextField primitive.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits separator control semantics without styling concerns.
+Emits input control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppSeparator  Separator control with declared states.
+UiInput  Text input control with declared states.
 */
 
-import { Separator } from '@kobalte/core/separator'
+import { TextField, type TextFieldInputProps } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent } from './ui-helpers.ts'
 
-/** Separator control props. */
-export type AppSeparatorProps =
-  & AppComponentProps
+/** Input control props. */
+export type UiInputProps =
   & Omit<
-    JSX.HTMLAttributes<HTMLElement>,
-    | 'children'
+    JSX.InputHTMLAttributes<HTMLInputElement>,
     | 'class'
     | 'classList'
     | 'style'
@@ -32,7 +30,6 @@ export type AppSeparatorProps =
   & {
     error?: boolean
     loading?: boolean
-    disabled?: boolean
     class?: never
     classList?: never
     style?: never
@@ -40,17 +37,34 @@ export type AppSeparatorProps =
     'data-ui-state'?: never
   }
 
-/** Separator control with declared states. */
-export const AppSeparator = (props: AppSeparatorProps): AppComponent => {
+const TextFieldRoot = TextField as unknown as typeof TextField
+const TextFieldInput = TextField.Input as unknown as typeof TextField.Input
+
+/** Text input control with declared states. */
+export const UiInput = (props: UiInputProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',
     'disabled',
-    'class',
-    'classList',
-    'style',
-    'data-ui',
-    'data-ui-state'
+    'id',
+    'name',
+    'required',
+    'readOnly'
   ])
-  return <Separator {...others} data-ui='separator' data-ui-state={controlState(local)} />
+  return (
+    <TextFieldRoot
+      name={local.name}
+      required={local.required}
+      disabled={local.disabled || local.loading}
+      readOnly={local.readOnly}
+      validationState={local.error ? 'invalid' : undefined}
+    >
+      <TextFieldInput
+        id={local.id ?? local.name}
+        {...others as unknown as TextFieldInputProps}
+        data-ui='input'
+        data-ui-state={controlState(local) as string | undefined}
+      />
+    </TextFieldRoot>
+  )
 }

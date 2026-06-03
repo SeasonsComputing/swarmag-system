@@ -14,13 +14,13 @@ PUBLIC
 FormPanel  Adaptive form container component.
 */
 
-import type { AppComponent, AppContainerProps } from '@ux/common/components/ui'
+import type { UiComponent, UiContainerProps } from '@ux/common/components/ui'
 
 /** FormPanel props. */
-type FormPanelProps = AppContainerProps
+type FormPanelProps = UiContainerProps
 
 /** Adaptive form container — full-screen on mobile, modal-centred on desktop. */
-export const FormPanel = (props: FormPanelProps): AppComponent => (
+export const FormPanel = (props: FormPanelProps): UiComponent => (
   <div class='form-panel'>
     {props.children}
   </div>

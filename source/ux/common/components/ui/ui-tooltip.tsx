@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App tooltip control                                                          ║
+║ Ui tooltip control                                                          ║
 ║ Semantic wrapper for the Kobalte Tooltip primitive.                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,18 +10,18 @@ Emits tooltip control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppTooltip  Tooltip control with declared states.
+UiTooltip  Tooltip control with declared states.
 */
 
 import { Tooltip } from '@kobalte/core/tooltip'
 import { splitProps } from '@solid-js'
-import { AppButton, type AppButtonVariant } from './app-button.tsx'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { UiButton, type UiButtonVariant } from './ui-button.tsx'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
 /** Tooltip control props. */
-export type AppTooltipProps = AppComponentProps & {
-  trigger?: AppComponent
-  triggerVariant?: AppButtonVariant
+export type UiTooltipProps = UiComponentProps & {
+  trigger?: UiComponent
+  triggerVariant?: UiButtonVariant
   open?: boolean
   defaultOpen?: boolean
   error?: boolean
@@ -36,7 +36,7 @@ export type AppTooltipProps = AppComponentProps & {
 }
 
 /** Tooltip control with declared states. */
-export const AppTooltip = (props: AppTooltipProps): AppComponent => {
+export const UiTooltip = (props: UiTooltipProps): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'trigger',
@@ -56,7 +56,7 @@ export const AppTooltip = (props: AppTooltipProps): AppComponent => {
       disabled={local.disabled || local.loading}
     >
       <Tooltip.Trigger
-        as={AppButton}
+        as={UiButton}
         disabled={local.disabled || local.loading}
         variant={local.triggerVariant ?? 'secondary'}
       >

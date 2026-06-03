@@ -1,26 +1,27 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App input control                                                            ║
-║ Semantic wrapper for the Kobalte TextField primitive.                        ║
+║ Ui avatar control                                                           ║
+║ Semantic avatar primitive.                                                   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits input control semantics without styling concerns.
+Emits avatar control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppInput  Text input control with declared states.
+UiAvatar  Avatar control with declared states.
 */
 
-import { TextField, type TextFieldInputProps } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Input control props. */
-export type AppInputProps =
+/** Avatar control props. */
+export type UiAvatarProps =
+  & UiComponentProps
   & Omit<
-    JSX.InputHTMLAttributes<HTMLInputElement>,
+    JSX.HTMLAttributes<HTMLSpanElement>,
+    | 'children'
     | 'class'
     | 'classList'
     | 'style'
@@ -30,6 +31,7 @@ export type AppInputProps =
   & {
     error?: boolean
     loading?: boolean
+    disabled?: boolean
     class?: never
     classList?: never
     style?: never
@@ -37,34 +39,17 @@ export type AppInputProps =
     'data-ui-state'?: never
   }
 
-const TextFieldRoot = TextField as unknown as typeof TextField
-const TextFieldInput = TextField.Input as unknown as typeof TextField.Input
-
-/** Text input control with declared states. */
-export const AppInput = (props: AppInputProps): AppComponent => {
+/** Avatar control with declared states. */
+export const UiAvatar = (props: UiAvatarProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',
     'disabled',
-    'id',
-    'name',
-    'required',
-    'readOnly'
+    'class',
+    'classList',
+    'style',
+    'data-ui',
+    'data-ui-state'
   ])
-  return (
-    <TextFieldRoot
-      name={local.name}
-      required={local.required}
-      disabled={local.disabled || local.loading}
-      readOnly={local.readOnly}
-      validationState={local.error ? 'invalid' : undefined}
-    >
-      <TextFieldInput
-        id={local.id ?? local.name}
-        {...others as unknown as TextFieldInputProps}
-        data-ui='input'
-        data-ui-state={controlState(local) as string | undefined}
-      />
-    </TextFieldRoot>
-  )
+  return <span {...others} data-ui='avatar' data-ui-state={controlState(local)} />
 }

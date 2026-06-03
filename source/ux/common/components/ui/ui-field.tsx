@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App field                                                                    ║
+║ Ui field                                                                    ║
 ║ Label or caption + control wrapper.                                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -12,13 +12,13 @@ for non-labelable controls.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppField  Label/caption + control field wrapper.
+UiField  Label/caption + control field wrapper.
 */
 
-import type { AppComponent, AppContainerProps } from './ui-helpers.ts'
+import type { UiComponent, UiContainerProps } from './ui-helpers.ts'
 
-/** AppField label-mode props. */
-export type AppFieldLabelProps = AppContainerProps & {
+/** UiField label-mode props. */
+export type UiFieldLabelProps = UiContainerProps & {
   /** Text content of the field label. */
   label: string
   /** ID of the associated control — wired to the label's `for` attribute. */
@@ -27,8 +27,8 @@ export type AppFieldLabelProps = AppContainerProps & {
   variant?: 'inline'
 }
 
-/** AppField caption-mode props. */
-export type AppFieldCaptionProps = AppContainerProps & {
+/** UiField caption-mode props. */
+export type UiFieldCaptionProps = UiContainerProps & {
   /** Text content of the field caption. */
   label: string
   /** Caption mode is for non-labelable controls. */
@@ -37,11 +37,11 @@ export type AppFieldCaptionProps = AppContainerProps & {
   for?: never
 }
 
-/** AppField props. */
-export type AppFieldProps = AppFieldLabelProps | AppFieldCaptionProps
+/** UiField props. */
+export type UiFieldProps = UiFieldLabelProps | UiFieldCaptionProps
 
 /** Label/caption + control field wrapper. Label and control are siblings, never nested. */
-export const AppField = (props: AppFieldProps): AppComponent =>
+export const UiField = (props: UiFieldProps): UiComponent =>
   props.variant === 'caption'
     ? (
       <figure data-ui='field' data-ui-variant='caption'>

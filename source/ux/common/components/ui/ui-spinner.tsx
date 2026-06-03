@@ -1,71 +1,58 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App button control                                                           ║
-║ Semantic wrapper for the Kobalte Button primitive.                           ║
+║ Ui spinner control                                                          ║
+║ Semantic spinner primitive.                                                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits button control semantics without styling concerns.
+Emits spinner control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppButton  Button control with declared variants and states.
+UiSpinner  Spinner control with declared states.
 */
 
-import { Button } from '@kobalte/core/button'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Button variants declared by the design language. */
-export type AppButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
-
-/** Button control props. */
-export type AppButtonProps =
-  & AppComponentProps
+/** Spinner control props. */
+export type UiSpinnerProps =
+  & UiComponentProps
   & Omit<
-    JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+    JSX.HTMLAttributes<HTMLDivElement>,
     | 'children'
     | 'class'
     | 'classList'
     | 'style'
+    | 'role'
     | 'data-ui'
-    | 'data-ui-variant'
     | 'data-ui-state'
   >
   & {
-    variant?: AppButtonVariant
     error?: boolean
     loading?: boolean
+    disabled?: boolean
     class?: never
     classList?: never
     style?: never
+    role?: never
     'data-ui'?: never
-    'data-ui-variant'?: never
     'data-ui-state'?: never
   }
 
-/** Button control with declared variants and states. */
-export const AppButton = (props: AppButtonProps): AppComponent => {
+/** Spinner control with declared states. */
+export const UiSpinner = (props: UiSpinnerProps): UiComponent => {
   const [local, others] = splitProps(props, [
-    'variant',
     'error',
     'loading',
     'disabled',
     'class',
     'classList',
     'style',
+    'role',
     'data-ui',
-    'data-ui-variant',
     'data-ui-state'
   ])
-  return (
-    <Button
-      {...others}
-      data-ui='button'
-      data-ui-variant={local.variant}
-      data-ui-state={controlState(local)}
-      disabled={local.disabled || local.loading}
-    />
-  )
+  return <div {...others} role='status' data-ui='spinner' data-ui-state={controlState(local)} />
 }
