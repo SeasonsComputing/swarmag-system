@@ -21,10 +21,10 @@ import { type AppComponent, controlState } from './ui-helpers.ts'
 export type AppInputProps =
   & Omit<
     JSX.InputHTMLAttributes<HTMLInputElement>,
-    | 'class' 
-    | 'classList' 
-    | 'style' 
-    | 'data-ui' 
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
     | 'data-ui-state'
   >
   & {

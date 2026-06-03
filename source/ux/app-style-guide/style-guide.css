@@ -4,7 +4,7 @@
   border-block-end: var(--sa-shell-chrome-border);
   box-shadow: var(--sa-shell-chrome-shadow);
   margin: 0;
-  padding: var(--sa-card-panel-pad);
+  padding: var(--sa-gutter);
   position: sticky;
   top: 0;
   z-index: var(--sa-z-docked);
