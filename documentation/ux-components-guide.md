@@ -528,6 +528,10 @@ UiTabs
 | `UiTab`      | `value`        | `children`, `disabled` |
 | `UiTabPanel` | `value`        | `children`             |
 
+When tab triggers overflow the available inline space, `UiTabList` keeps native
+horizontal scroll behavior and supports mouse drag scrolling on fine-pointer
+devices.
+
 **Example**
 
 ```tsx

@@ -754,6 +754,25 @@
   scrollbar-gutter: stable;
 }
 
+@media (hover: hover) and (pointer: fine) {
+  [data-ui='tab-list'][data-ui-overflow='scroll'] {
+    cursor: grab;
+  }
+
+  [data-ui='tab-list'][data-ui-overflow='scroll'] [data-ui='tab'] {
+    cursor: grab;
+  }
+
+  [data-ui='tab-list'][data-ui-state='dragging'] {
+    cursor: grabbing;
+    user-select: none;
+  }
+
+  [data-ui='tab-list'][data-ui-state='dragging'] [data-ui='tab'] {
+    cursor: grabbing;
+  }
+}
+
 [data-ui='tab-list'] [data-ui='tab'] {
   background: transparent;
   border: var(--sa-border-subtle);
