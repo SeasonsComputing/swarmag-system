@@ -48,18 +48,20 @@ const SgHeader = (): UiComponent => {
   createEffect(() => document.documentElement.dataset.theme = theme())
   return (
     <header class='sg-header'>
-      <UiLayout gap='none'>
-        <h1>
-          swarmAg <span class='nowrap'>Style Guide</span>
-        </h1>
-        <p class='sg-header-subtitle'>
-          Living visual validation for tokens, states, themes, and controls.
-        </p>
-      </UiLayout>
-      <UiToggleGroup<Theme> value={theme()} onChange={setTheme}>
-        <UiToggleItem value='dark'>Dark</UiToggleItem>
-        <UiToggleItem value='light'>Light</UiToggleItem>
-      </UiToggleGroup>
+      <div class='sg-header-contents'>
+        <UiLayout gap='none'>
+          <h1>
+            swarmAg <span class='nowrap'>Style Guide</span>
+          </h1>
+          <p class='sg-header-subtitle'>
+            Living visual validation for tokens, states, themes, and controls.
+          </p>
+        </UiLayout>
+        <UiToggleGroup<Theme> value={theme()} onChange={setTheme}>
+          <UiToggleItem value='dark'>Dark</UiToggleItem>
+          <UiToggleItem value='light'>Light</UiToggleItem>
+        </UiToggleGroup>
+      </div>
     </header>
   )
 }
