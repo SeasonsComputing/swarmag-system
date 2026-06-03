@@ -62,7 +62,6 @@ export const AppAlert = (props: AppAlertProps): AppComponent => {
     'data-ui-variant',
     'data-ui-state'
   ])
-
   return (
     <div
       {...others}

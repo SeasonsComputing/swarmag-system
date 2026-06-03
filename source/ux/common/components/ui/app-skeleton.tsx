@@ -21,7 +21,12 @@ export type AppSkeletonProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-state'
   >
   & {
     error?: boolean
@@ -46,6 +51,5 @@ export const AppSkeleton = (props: AppSkeletonProps): AppComponent => {
     'data-ui',
     'data-ui-state'
   ])
-
   return <div {...others} data-ui='skeleton' data-ui-state={controlState(local)} />
 }

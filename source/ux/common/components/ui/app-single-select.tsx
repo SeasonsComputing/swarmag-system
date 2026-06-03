@@ -59,7 +59,6 @@ export const AppSingleSelect = (props: AppSingleSelectProps): AppComponent => {
 
   const handleChange = (option: AppOption | null): void => {
     if (option === null) return
-
     local.onChange?.(option.value)
   }
 

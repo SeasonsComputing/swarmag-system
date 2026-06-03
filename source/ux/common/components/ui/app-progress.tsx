@@ -48,7 +48,6 @@ export const AppProgress = (props: AppProgressProps): AppComponent => {
     'loading',
     'disabled'
   ])
-
   return (
     <Progress
       data-ui='progress'

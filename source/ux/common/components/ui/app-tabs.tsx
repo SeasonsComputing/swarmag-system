@@ -96,7 +96,6 @@ export const AppTabs = <Value extends string = string>(
     'activationMode',
     'onChange'
   ])
-
   return (
     <TabsRoot
       data-ui='tabs'

@@ -22,7 +22,12 @@ export type AppSeparatorProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-state'
   >
   & {
     error?: boolean
@@ -47,6 +52,5 @@ export const AppSeparator = (props: AppSeparatorProps): AppComponent => {
     'data-ui',
     'data-ui-state'
   ])
-
   return <Separator {...others} data-ui='separator' data-ui-state={controlState(local)} />
 }

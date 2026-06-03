@@ -49,7 +49,6 @@ export const AppCheckbox = (props: AppCheckboxProps): AppComponent => {
     'value',
     'onChange'
   ])
-
   return (
     <Checkbox
       data-ui='checkbox'

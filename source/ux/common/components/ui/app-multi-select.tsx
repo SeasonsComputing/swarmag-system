@@ -52,7 +52,6 @@ export const AppMultiSelect = (props: AppMultiSelectProps): AppComponent => {
     'defaultValue',
     'onChange'
   ])
-
   return (
     <ListboxRoot
       id={local.id ?? local.name}

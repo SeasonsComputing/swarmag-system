@@ -48,7 +48,6 @@ export const AppTooltip = (props: AppTooltipProps): AppComponent => {
     'disabled',
     'onOpenChange'
   ])
-
   return (
     <Tooltip
       open={local.open}

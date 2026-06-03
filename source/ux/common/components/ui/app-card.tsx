@@ -24,7 +24,12 @@ export type AppCardProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-variant'
   >
   & {
     variant?: AppCardVariant
@@ -45,6 +50,5 @@ export const AppCard = (props: AppCardProps): AppComponent => {
     'data-ui',
     'data-ui-variant'
   ])
-
   return <div {...others} data-ui='card' data-ui-variant={local.variant} />
 }

@@ -58,7 +58,6 @@ export const AppLayout = (props: AppLayoutProps): AppComponent => {
     'data-ui-variant',
     'data-ui-gap'
   ])
-
   return (
     <div
       {...others}

@@ -22,7 +22,12 @@ export type AppToggleProps =
   & AppComponentProps
   & Omit<
     JSX.ButtonHTMLAttributes<HTMLButtonElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-state'
   >
   & {
     error?: boolean
@@ -47,7 +52,6 @@ export const AppToggle = (props: AppToggleProps): AppComponent => {
     'defaultPressed',
     'onChange'
   ])
-
   return (
     <ToggleButton
       {...others}

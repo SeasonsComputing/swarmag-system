@@ -21,7 +21,12 @@ export type AppAvatarProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLSpanElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-state'
   >
   & {
     error?: boolean
@@ -46,6 +51,5 @@ export const AppAvatar = (props: AppAvatarProps): AppComponent => {
     'data-ui',
     'data-ui-state'
   ])
-
   return <span {...others} data-ui='avatar' data-ui-state={controlState(local)} />
 }

@@ -21,7 +21,11 @@ import { type AppComponent, controlState } from './ui-helpers.ts'
 export type AppTextAreaProps =
   & Omit<
     JSX.TextareaHTMLAttributes<HTMLTextAreaElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-state'
   >
   & {
     error?: boolean
@@ -48,7 +52,6 @@ export const AppTextArea = (props: AppTextAreaProps): AppComponent => {
     'required',
     'readOnly'
   ])
-
   return (
     <TextFieldRoot
       name={local.name}
