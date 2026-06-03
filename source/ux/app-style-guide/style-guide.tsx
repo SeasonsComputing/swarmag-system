@@ -128,34 +128,6 @@ export const StyleGuide = (): AppComponent => {
       <SgMain>
         <AppLayout gap='loose'>
           <SgSection title='Typography'>
-            <AppFieldset legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
-              <h1>H1 Operations Command</h1>
-              <h2>H2 Field Service Planning</h2>
-              <h3>H3 Aerial Application Window</h3>
-              <h4>H4 Ground Crew Assignment</h4>
-              <h5>H5 Chemical Label Review</h5>
-            </AppFieldset>
-            <AppFieldset legend='<body>, <p>'>
-              <p>
-                Body copy should inherit the product typography without local component styling. Weather,
-                acreage, crew availability, and service windows remain scannable.
-              </p>
-            </AppFieldset>
-            <AppFieldset legend='<code>, <kbd>, <samp>, <pre>, <blockquote>'>
-              <p>
-                Inline code sample: <code>service.category === 'aerial-drone-services'</code>
-              </p>
-              <p>
-                Keyboard shortcut: Press <kbd>Ctrl+S</kbd> to save the job plan.
-              </p>
-              <p>
-                System output: <samp>asset.status = 'ready'</samp>
-              </p>
-              <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
-              <blockquote>
-                Service logs are records of field reality and must remain clear, durable, and auditable.
-              </blockquote>
-            </AppFieldset>
             <AppFieldset legend='Typefaces'>
               <AppTable>
                 <AppTableHeader>
@@ -205,13 +177,41 @@ export const StyleGuide = (): AppComponent => {
                     <AppTableCell>Cascadia Mono</AppTableCell>
                   </AppTableRow>
                   <AppTableRow>
-                    <AppTableCell>Mono</AppTableCell>
+                    <AppTableCell>Data</AppTableCell>
                     <AppTableCell>
-                      <code>service.status = 'ready'; acres = 142</code>
+                      <samp>service.status = 'ready'; acres = 142</samp>
                     </AppTableCell>
                   </AppTableRow>
                 </AppTableBody>
               </AppTable>
+            </AppFieldset>
+            <AppFieldset legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
+              <h1>H1 Operations Command</h1>
+              <h2>H2 Field Service Planning</h2>
+              <h3>H3 Aerial Application Window</h3>
+              <h4>H4 Ground Crew Assignment</h4>
+              <h5>H5 Chemical Label Review</h5>
+            </AppFieldset>
+            <AppFieldset legend='<body>, <p>, <blockquote>'>
+              <p>
+                Body copy should inherit the product typography without local component styling. Weather,
+                acreage, crew availability, and service windows remain scannable.
+              </p>
+              <blockquote>
+                Service logs are records of field reality and must remain clear, durable, and auditable.
+              </blockquote>
+            </AppFieldset>
+            <AppFieldset legend='<code>, <kbd>, <samp>, <pre>'>
+              <p>
+                Inline code sample: <code>service.category === 'aerial-drone-services'</code>
+              </p>
+              <p>
+                Keyboard shortcut: Press <kbd>Ctrl+S</kbd> to save the job plan.
+              </p>
+              <p>
+                System output: <samp>asset.status = 'ready'</samp>
+              </p>
+              <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
             </AppFieldset>
           </SgSection>
 
@@ -743,7 +743,7 @@ export const StyleGuide = (): AppComponent => {
           </SgSection>
 
           <SgSection title='Charts'>
-            {/* TODO: AppChart - pending chart primitive */}
+            {/* PARKING LOT: AppChart - pending chart primitive */}
             <AppSkeleton />
           </SgSection>
         </AppLayout>

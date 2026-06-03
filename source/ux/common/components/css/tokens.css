@@ -48,14 +48,12 @@ Background roles:
 Typography roles:
   --sa-annotation-font-family --sa-data-font-size        --sa-heading-font-size-h2
   --sa-annotation-font-size   --sa-data-font-weight      --sa-heading-font-size-h3
-  --sa-annotation-font-weight --sa-entry-font-family     --sa-heading-font-size-h4
-  --sa-body-font-family       --sa-entry-font-size       --sa-heading-font-size-h5
-  --sa-body-font-size         --sa-entry-font-weight     --sa-heading-font-weight
+  --sa-annotation-font-weight --sa-heading-font-size-h4
+  --sa-body-font-family       --sa-heading-font-size-h5
+  --sa-body-font-size         --sa-heading-font-weight
   --sa-body-font-weight       --sa-heading-font-family   --sa-label-font-family
   --sa-data-font-family       --sa-heading-font-size-h1  --sa-label-font-size
-
   --sa-label-font-weight      --sa-ui-checkmark-weight
-  --sa-mono-font-family
   --sa-ui-font-family
   --sa-ui-font-size
   --sa-ui-font-size-compact
@@ -112,9 +110,9 @@ Base element roles:
 LAYOUT TOKENS
 ───────────────────────────────────────────────────────────────────────────
 Layout tokens define the spacing and padding of elements:
-  --sa-gap         between widgets, between rows
-  --sa-gutter      page interior padding
-  --sa-card-pad    card interior padding
+  --sa-gutter page interior padding
+  --sa-gap    between widgets, between rows
+  --sa-pad    card interior padding
 
 Breakpoints match architecture-ux.md §7:
   ≥ 1024px  desktop
@@ -130,12 +128,12 @@ Breakpoints match architecture-ux.md §7:
   --sa-p-font-mono: 'Mono', ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
 
   /* Font Weights */
-  --sa-p-weight-thin: 300;
-  --sa-p-weight-normal: 400;
-  --sa-p-weight-medium: 500;
-  --sa-p-weight-semibold: 600;
-  --sa-p-weight-bold: 700;
-  --sa-p-weight-extrabold: 800;
+  --sa-p-font-weight-thin: 300;
+  --sa-p-font-weight-normal: 400;
+  --sa-p-font-weight-medium: 500;
+  --sa-p-font-weight-semibold: 600;
+  --sa-p-font-weight-bold: 700;
+  --sa-p-font-weight-extrabold: 800;
 
   /* Font Sizes */
   --sa-p-font-size-xs: 0.8rem;
@@ -148,81 +146,40 @@ Breakpoints match architecture-ux.md §7:
   /* Line Heights */
   --sa-p-leading-normal: 1.5;
 
-  /* Z-index Scale */
-  --sa-z-below: -1;
-  --sa-z-base: 0;
-  --sa-z-raised: 1;
-  --sa-z-docked: 10;
-  --sa-z-popover: 20;
-  --sa-z-overlay: 100;
-  --sa-z-toast: 1000;
-
-  /* Transitions */
-  --sa-transition-fast: all 0.15s ease;
-  --sa-transition-base: all 0.3s ease;
-  --sa-transition-slow: all 0.6s ease-out;
-  --sa-transition-spring: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --sa-motion-page-fade: 200ms;
-  --sa-motion-spinner: 0.8s;
-  --sa-motion-skeleton: 1.4s;
-
   /* Base Element Tokens */
   --sa-base-size: var(--sa-p-font-size-base);
-  --sa-body-line-height: var(--sa-p-leading-normal);
-  --sa-transition-page: opacity var(--sa-motion-page-fade) ease-in;
-  --sa-list-indent: 1.75rem;
-  --sa-list-item-pad: 0.375rem;
-  --sa-list-item-pad-bullet: calc(0.375rem - 2px);
-  --sa-list-marker-size: 1.25rem;
 
   /* Typography */
   --sa-heading-font-family: var(--sa-p-font-content);
-  --sa-body-font-family: var(--sa-p-font-content);
-  --sa-label-font-family: var(--sa-p-font-label);
-  --sa-ui-font-family: var(--sa-p-font-label);
-  --sa-mono-font-family: var(--sa-p-font-mono);
-  --sa-heading-font-size-h1: var(--sa-p-font-size-xl);
-  --sa-heading-font-size-h2: var(--sa-p-font-size-lg);
-  --sa-heading-font-size-h3: var(--sa-p-font-size-md);
+  --sa-heading-font-size-h1: clamp(1.3rem, calc(1.0074rem + 1.1018vw), 1.7125rem);
+  --sa-heading-font-size-h2: clamp(1.1875rem, calc(0.9658rem + 0.8347vw), 1.5rem);
+  --sa-heading-font-size-h3: clamp(0.9875rem, calc(0.8456rem + 0.5342vw), 1.1875rem);
   --sa-heading-font-size-h4: var(--sa-p-font-size-base);
   --sa-heading-font-size-h5: var(--sa-p-font-size-sm);
-  --sa-heading-font-weight: var(--sa-p-weight-thin);
-  --sa-body-font-weight: var(--sa-p-weight-thin);
+  --sa-heading-font-weight: var(--sa-p-font-weight-thin);
+
+  --sa-body-font-family: var(--sa-p-font-content);
+  --sa-body-font-weight: var(--sa-p-font-weight-thin);
   --sa-body-font-size: var(--sa-p-font-size-base);
+  --sa-body-line-height: var(--sa-p-leading-normal);
+
+  --sa-label-font-family: var(--sa-p-font-label);
   --sa-label-font-size: var(--sa-p-font-size-sm);
-  --sa-label-font-weight: var(--sa-p-weight-thin);
+  --sa-label-font-weight: var(--sa-p-font-weight-thin);
+
+  --sa-ui-font-family: var(--sa-p-font-label);
   --sa-ui-font-size: var(--sa-p-font-size-sm);
   --sa-ui-font-size-compact: var(--sa-p-font-size-xs);
-  --sa-ui-font-weight: var(--sa-p-weight-normal);
-  --sa-ui-checkmark-weight: var(--sa-p-weight-extrabold);
+  --sa-ui-font-weight: var(--sa-p-font-weight-thin);
+  --sa-ui-checkmark-weight: var(--sa-p-font-weight-extrabold);
+
   --sa-annotation-font-family: var(--sa-p-font-label);
   --sa-annotation-font-size: var(--sa-p-font-size-sm);
-  --sa-annotation-font-weight: var(--sa-p-weight-normal);
-  --sa-data-font-family: var(--sa-p-font-label);
+  --sa-annotation-font-weight: var(--sa-p-font-weight-normal);
+
+  --sa-data-font-family: var(--sa-p-font-mono);
   --sa-data-font-size: var(--sa-p-font-size-sm);
-  --sa-data-font-weight: var(--sa-p-weight-thin);
-  --sa-entry-font-family: var(--sa-p-font-label);
-  --sa-entry-font-size: var(--sa-p-font-size-sm);
-  --sa-entry-font-weight: var(--sa-p-weight-thin);
-
-  /* Progress */
-  --sa-progress-height: 1rem;
-  --sa-progress-transition: clip-path var(--sa-transition-fast);
-
-  /* List */
-  --sa-list-marker-font-size: 1rem;
-
-  /* Badge */
-  --sa-badge-font-weight: var(--sa-p-weight-thin);
-
-  /* Avatar */
-  --sa-avatar-font-weight: var(--sa-p-weight-medium);
-
-  /* Alert */
-  --sa-alert-border-width: 2px;
-
-  /* Separator */
-  --sa-separator-height: 1px;
+  --sa-data-font-weight: var(--sa-p-font-weight-thin);
 
   /* Misc */
   --sa-blur: blur(25px);
@@ -246,15 +203,16 @@ Breakpoints match architecture-ux.md §7:
   --sa-space-4xl: 5rem;
 
   /* Breakpoints (reference — use in media queries) */
+  --sa-size-wrap: 270px;
   --sa-size-xs: 425px;
   --sa-size-sm: 768px;
   --sa-size-md: 1024px;
   --sa-size-lg: 1152px;
 
   /* Desktop ≥ 1024px */
+  --sa-gutter: var(--sa-space-2xl);
   --sa-gap: var(--sa-space-md);
-  --sa-gutter: var(--sa-space-3xl);
-  --sa-card-pad: var(--sa-space-lg);
+  --sa-pad: var(--sa-space-lg);
 
   /* Form card max-width — centered on tablet/desktop */
   --sa-form-max-width: 640px;
@@ -262,36 +220,60 @@ Breakpoints match architecture-ux.md §7:
   /* Minimum touch target — safety-first for field use */
   --sa-touch-target: 64px;
   --sa-touch-target-sm: 44px;
+
+  /* Z-index Scale */
+  --sa-z-below: -1;
+  --sa-z-base: 0;
+  --sa-z-raised: 1;
+  --sa-z-docked: 10;
+  --sa-z-popover: 20;
+  --sa-z-overlay: 100;
+  --sa-z-toast: 1000;
+
+  /* Motion */
+  --sa-motion-page-fade: 200ms;
+  --sa-motion-spinner: 0.8s;
+  --sa-motion-skeleton: 1.4s;
+
+  /* Transitions */
+  --sa-transition-fast: all 0.15s ease;
+  --sa-transition-base: all 0.3s ease;
+  --sa-transition-slow: all 0.6s ease-out;
+  --sa-transition-spring: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --sa-transition-page: opacity var(--sa-motion-page-fade) ease-in;
 }
 
 @media (max-width: 1024px) {
   :root {
-    --sa-gap: var(--sa-space-lg);
     --sa-gutter: var(--sa-space-2xl);
-    --sa-card-pad: var(--sa-space-lg);
+    --sa-gap: var(--sa-space-md);
+    --sa-pad: calc(var(--sa-space-lg) - var(--sa-space-xs));
   }
 }
 
 @media (max-width: 768px) {
   :root {
-    --sa-gap: var(--sa-space-md);
-    --sa-gutter: var(--sa-space-xl);
-    --sa-card-pad: var(--sa-space-lg);
+    --sa-gutter: var(--sa-space-lg);
+    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
+    --sa-pad: var(--sa-space-md);
   }
 }
 
 @media (max-width: 425px) {
   :root {
-    --sa-gap: var(--sa-space-md);
+    --sa-heading-font-size-h4: var(--sa-p-font-size-sm);
+    --sa-body-font-size: var(--sa-p-font-size-sm);
     --sa-gutter: var(--sa-space-lg);
-    --sa-card-pad: var(--sa-space-md);
+    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
+    --sa-pad: var(--sa-space-md);
   }
 }
 
 @media (max-width: 380px) {
   :root {
+    --sa-base-size: var(--sa-p-font-size-sm);
+    --sa-gutter: calc(var(--sa-space-lg) - var(--sa-space-xs));
     --sa-gap: var(--sa-space-sm);
-    --sa-gutter: var(--sa-space-md);
-    --sa-card-pad: var(--sa-space-md);
+    --sa-pad: calc(var(--sa-space-md) - var(--sa-space-xs));
   }
 }
