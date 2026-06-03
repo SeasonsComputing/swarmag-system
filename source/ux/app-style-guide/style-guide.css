@@ -4,22 +4,26 @@
   border-block-end: var(--sa-shell-chrome-border);
   box-shadow: var(--sa-shell-chrome-shadow);
   margin: 0;
-  padding: var(--sa-gutter);
+  padding: var(--sa-pad) var(--sa-gutter);
   position: sticky;
   top: 0;
   z-index: var(--sa-z-docked);
+}
+
+.sg-header-contents {
+  max-width: var(--sa-size-lg);
   align-items: center;
   display: flex;
   flex-wrap: wrap;
   gap: var(--sa-gap);
 }
 
-.sg-header > :first-child {
+.sg-header-contents > :first-child {
   flex: 1 1 24rem;
   min-width: var(--sa-size-wrap);
 }
 
-.sg-header .nowrap {
+.sg-header-contents .nowrap {
   white-space: nowrap;
 }
 
