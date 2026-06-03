@@ -59,7 +59,6 @@ export const AppButton = (props: AppButtonProps): AppComponent => {
     'data-ui-variant',
     'data-ui-state'
   ])
-
   return (
     <Button
       {...others}

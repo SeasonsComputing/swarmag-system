@@ -25,7 +25,12 @@ export type AppListProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLUListElement | HTMLOListElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-variant'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-variant'
   >
   & {
     name?: string
@@ -42,7 +47,11 @@ export type AppListItemProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLLIElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
   >
   & {
     class?: never
@@ -63,7 +72,6 @@ export const AppList = (props: AppListProps): AppComponent => {
     'data-ui',
     'data-ui-variant'
   ])
-
   return local.variant === 'numbered'
     ? (
       <ol

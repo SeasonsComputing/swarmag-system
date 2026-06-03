@@ -59,7 +59,6 @@ export const AppBadge = (props: AppBadgeProps): AppComponent => {
     'data-ui-variant',
     'data-ui-state'
   ])
-
   return (
     <span
       {...others}

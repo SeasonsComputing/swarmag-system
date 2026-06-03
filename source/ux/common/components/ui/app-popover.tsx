@@ -48,7 +48,6 @@ export const AppPopover = (props: AppPopoverProps): AppComponent => {
     'disabled',
     'onOpenChange'
   ])
-
   return (
     <Popover open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
       <Popover.Trigger

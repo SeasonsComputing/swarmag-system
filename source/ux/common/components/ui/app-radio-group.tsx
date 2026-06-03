@@ -73,7 +73,6 @@ export const AppRadioGroup = <Value extends string = string>(
     'defaultValue',
     'onChange'
   ])
-
   return (
     <RadioGroupRoot
       data-ui='radio-group'
@@ -100,7 +99,6 @@ export const AppRadioItem = <Value extends string = string>(
     'value',
     'disabled'
   ])
-
   return (
     <RadioItem
       data-ui='radio-item'

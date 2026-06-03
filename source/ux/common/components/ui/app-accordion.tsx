@@ -87,7 +87,6 @@ export const AppAccordion = (props: AppAccordionProps): AppComponent => {
     'defaultValue',
     'onValueChange'
   ])
-
   return (
     <AccordionRoot
       data-ui='accordion'
@@ -109,7 +108,6 @@ export const AppAccordionItem = (props: AppAccordionItemProps): AppComponent => 
     'value',
     'disabled'
   ])
-
   return (
     <AccordionItem data-ui='accordion-item' value={local.value} disabled={local.disabled}>
       {local.children}
@@ -120,7 +118,6 @@ export const AppAccordionItem = (props: AppAccordionItemProps): AppComponent => 
 /** Accordion trigger control for AppAccordionItem. */
 export const AppAccordionTrigger = (props: AppAccordionTriggerProps): AppComponent => {
   const [local] = splitProps(props, ['children'])
-
   return (
     <Accordion.Header>
       <AccordionTrigger data-ui='accordion-trigger'>{local.children}</AccordionTrigger>
@@ -131,6 +128,5 @@ export const AppAccordionTrigger = (props: AppAccordionTriggerProps): AppCompone
 /** Accordion content control for AppAccordionItem. */
 export const AppAccordionContent = (props: AppAccordionContentProps): AppComponent => {
   const [local] = splitProps(props, ['children'])
-
   return <AccordionContent data-ui='accordion-content'>{local.children}</AccordionContent>
 }

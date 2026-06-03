@@ -21,7 +21,11 @@ import { type AppComponent, controlState } from './ui-helpers.ts'
 export type AppInputProps =
   & Omit<
     JSX.InputHTMLAttributes<HTMLInputElement>,
-    'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'class' 
+    | 'classList' 
+    | 'style' 
+    | 'data-ui' 
+    | 'data-ui-state'
   >
   & {
     error?: boolean
@@ -47,7 +51,6 @@ export const AppInput = (props: AppInputProps): AppComponent => {
     'required',
     'readOnly'
   ])
-
   return (
     <TextFieldRoot
       name={local.name}

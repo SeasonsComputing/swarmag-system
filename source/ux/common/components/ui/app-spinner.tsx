@@ -54,6 +54,5 @@ export const AppSpinner = (props: AppSpinnerProps): AppComponent => {
     'data-ui',
     'data-ui-state'
   ])
-
   return <div {...others} role='status' data-ui='spinner' data-ui-state={controlState(local)} />
 }

@@ -48,7 +48,6 @@ export const AppDialog = (props: AppDialogProps): AppComponent => {
     'disabled',
     'onOpenChange'
   ])
-
   return (
     <Dialog open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
       <Dialog.Trigger
