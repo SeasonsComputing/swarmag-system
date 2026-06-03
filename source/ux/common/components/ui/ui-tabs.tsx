@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App tabs control                                                             ║
+║ Ui tabs control                                                             ║
 ║ Semantic wrapper for the Kobalte Tabs primitive.                             ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,10 +10,10 @@ Emits tabs control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppTabs  Tabs control with declared states.
-AppTab   Tab trigger control for AppTabs.
-AppTabList   Tab list control for AppTabs.
-AppTabPanel  Tab panel control for AppTabs.
+UiTabs  Tabs control with declared states.
+UiTab   Tab trigger control for UiTabs.
+UiTabList   Tab list control for UiTabs.
+UiTabPanel  Tab panel control for UiTabs.
 */
 
 import {
@@ -24,24 +24,19 @@ import {
   type TabsTriggerProps
 } from '@kobalte/core/tabs'
 import { type Component, splitProps } from '@solid-js'
-import {
-  type AppComponent,
-  type AppComponentProps,
-  controlState,
-  type WithDataUI
-} from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
 
 /** Tabs control props. */
-export type AppTabsActivationMode = 'automatic' | 'manual'
+export type UiTabsActivationMode = 'automatic' | 'manual'
 
 /** Tabs control props. */
-export type AppTabsProps<Value extends string = string> = AppComponentProps & {
+export type UiTabsProps<Value extends string = string> = UiComponentProps & {
   disabled?: boolean
   error?: boolean
   loading?: boolean
   value?: Value
   defaultValue?: Value
-  activationMode?: AppTabsActivationMode
+  activationMode?: UiTabsActivationMode
   onChange?: (value: Value) => void
   class?: never
   classList?: never
@@ -51,7 +46,7 @@ export type AppTabsProps<Value extends string = string> = AppComponentProps & {
 }
 
 /** Tab list control props. */
-export type AppTabListProps = AppComponentProps & {
+export type UiTabListProps = UiComponentProps & {
   class?: never
   classList?: never
   style?: never
@@ -59,7 +54,7 @@ export type AppTabListProps = AppComponentProps & {
 }
 
 /** Tab trigger control props. */
-export type AppTabProps<Value extends string = string> = AppComponentProps & {
+export type UiTabProps<Value extends string = string> = UiComponentProps & {
   value: Value
   disabled?: boolean
   class?: never
@@ -69,7 +64,7 @@ export type AppTabProps<Value extends string = string> = AppComponentProps & {
 }
 
 /** Tab panel control props. */
-export type AppTabPanelProps<Value extends string = string> = AppComponentProps & {
+export type UiTabPanelProps<Value extends string = string> = UiComponentProps & {
   value: Value
   class?: never
   classList?: never
@@ -77,15 +72,15 @@ export type AppTabPanelProps<Value extends string = string> = AppComponentProps 
   'data-ui'?: never
 }
 
-const TabsRoot = Tabs as Component<WithDataUI<TabsRootProps>>
-const TabsList = Tabs.List as Component<WithDataUI<TabsListProps>>
-const TabsTrigger = Tabs.Trigger as Component<WithDataUI<TabsTriggerProps>>
-const TabsContent = Tabs.Content as Component<WithDataUI<TabsContentProps>>
+const TabsRoot = Tabs as Component<WithDataUi<TabsRootProps>>
+const TabsList = Tabs.List as Component<WithDataUi<TabsListProps>>
+const TabsTrigger = Tabs.Trigger as Component<WithDataUi<TabsTriggerProps>>
+const TabsContent = Tabs.Content as Component<WithDataUi<TabsContentProps>>
 
 /** Tabs control with declared states. */
-export const AppTabs = <Value extends string = string>(
-  props: AppTabsProps<Value>
-): AppComponent => {
+export const UiTabs = <Value extends string = string>(
+  props: UiTabsProps<Value>
+): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'disabled',
@@ -111,16 +106,16 @@ export const AppTabs = <Value extends string = string>(
   )
 }
 
-/** Tab list control for AppTabs. */
-export const AppTabList = (props: AppTabListProps): AppComponent => {
+/** Tab list control for UiTabs. */
+export const UiTabList = (props: UiTabListProps): UiComponent => {
   const [local] = splitProps(props, ['children'])
   return <TabsList data-ui='tab-list'>{local.children}</TabsList>
 }
 
-/** Tab trigger control for AppTabs. */
-export const AppTab = <Value extends string = string>(
-  props: AppTabProps<Value>
-): AppComponent => {
+/** Tab trigger control for UiTabs. */
+export const UiTab = <Value extends string = string>(
+  props: UiTabProps<Value>
+): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'value',
@@ -138,10 +133,10 @@ export const AppTab = <Value extends string = string>(
   )
 }
 
-/** Tab panel control for AppTabs. */
-export const AppTabPanel = <Value extends string = string>(
-  props: AppTabPanelProps<Value>
-): AppComponent => {
+/** Tab panel control for UiTabs. */
+export const UiTabPanel = <Value extends string = string>(
+  props: UiTabPanelProps<Value>
+): UiComponent => {
   const [local] = splitProps(props, ['children', 'value'])
   return <TabsContent data-ui='tab-panel' value={local.value}>{local.children}</TabsContent>
 }

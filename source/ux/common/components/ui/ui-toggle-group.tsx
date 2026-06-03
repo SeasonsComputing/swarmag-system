@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App toggle group control                                                     ║
+║ Ui toggle group control                                                     ║
 ║ Semantic wrapper for the Kobalte ToggleGroup primitive.                      ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,8 +10,8 @@ Emits toggle-group control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppToggleGroup  Toggle-group control with declared states.
-AppToggleItem   Toggle item control for AppToggleGroup.
+UiToggleGroup  Toggle-group control with declared states.
+UiToggleItem   Toggle item control for UiToggleGroup.
 */
 
 import {
@@ -20,15 +20,10 @@ import {
   type ToggleGroupRootProps
 } from '@kobalte/core/toggle-group'
 import { type Component, createEffect, createSignal, splitProps } from '@solid-js'
-import {
-  type AppComponent,
-  type AppComponentProps,
-  controlState,
-  type WithDataUI
-} from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
 
 /** Toggle-group control props. */
-export type AppToggleGroupProps<Value extends string = string> = AppComponentProps & {
+export type UiToggleGroupProps<Value extends string = string> = UiComponentProps & {
   disabled?: boolean
   error?: boolean
   loading?: boolean
@@ -43,7 +38,7 @@ export type AppToggleGroupProps<Value extends string = string> = AppComponentPro
 }
 
 /** Toggle item control props. */
-export type AppToggleItemProps<Value extends string = string> = AppComponentProps & {
+export type UiToggleItemProps<Value extends string = string> = UiComponentProps & {
   value: Value
   disabled?: boolean
   class?: never
@@ -52,13 +47,13 @@ export type AppToggleItemProps<Value extends string = string> = AppComponentProp
   'data-ui'?: never
 }
 
-const ToggleGroupRoot = ToggleGroup as Component<WithDataUI<ToggleGroupRootProps>>
-const ToggleGroupItem = ToggleGroup.Item as Component<WithDataUI<ToggleGroupItemProps>>
+const ToggleGroupRoot = ToggleGroup as Component<WithDataUi<ToggleGroupRootProps>>
+const ToggleGroupItem = ToggleGroup.Item as Component<WithDataUi<ToggleGroupItemProps>>
 
 /** Toggle-group control with declared states. */
-export const AppToggleGroup = <Value extends string = string>(
-  props: AppToggleGroupProps<Value>
-): AppComponent => {
+export const UiToggleGroup = <Value extends string = string>(
+  props: UiToggleGroupProps<Value>
+): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'disabled',
@@ -101,10 +96,10 @@ export const AppToggleGroup = <Value extends string = string>(
   )
 }
 
-/** Toggle item control for AppToggleGroup. */
-export const AppToggleItem = <Value extends string = string>(
-  props: AppToggleItemProps<Value>
-): AppComponent => {
+/** Toggle item control for UiToggleGroup. */
+export const UiToggleItem = <Value extends string = string>(
+  props: UiToggleItemProps<Value>
+): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'value',

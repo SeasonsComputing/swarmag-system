@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App radio group control                                                      ║
+║ Ui radio group control                                                      ║
 ║ Semantic wrapper for the Kobalte RadioGroup primitive.                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,8 +10,8 @@ Emits radio-group control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppRadioGroup  Radio-group control with declared states.
-AppRadioItem   Radio item control for AppRadioGroup.
+UiRadioGroup  Radio-group control with declared states.
+UiRadioItem   Radio item control for UiRadioGroup.
 */
 
 import {
@@ -20,15 +20,10 @@ import {
   type RadioGroupRootProps
 } from '@kobalte/core/radio-group'
 import { type Component, splitProps } from '@solid-js'
-import {
-  type AppComponent,
-  type AppComponentProps,
-  controlState,
-  type WithDataUI
-} from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
 
 /** Radio-group control props. */
-export type AppRadioGroupProps<Value extends string = string> = AppComponentProps & {
+export type UiRadioGroupProps<Value extends string = string> = UiComponentProps & {
   disabled?: boolean
   error?: boolean
   loading?: boolean
@@ -45,7 +40,7 @@ export type AppRadioGroupProps<Value extends string = string> = AppComponentProp
 }
 
 /** Radio item control props. */
-export type AppRadioItemProps<Value extends string = string> = AppComponentProps & {
+export type UiRadioItemProps<Value extends string = string> = UiComponentProps & {
   value: Value
   disabled?: boolean
   class?: never
@@ -54,14 +49,14 @@ export type AppRadioItemProps<Value extends string = string> = AppComponentProps
   'data-ui'?: never
 }
 
-const RadioGroupRoot = RadioGroup as Component<WithDataUI<RadioGroupRootProps>>
-const RadioItem = RadioGroup.Item as Component<WithDataUI<RadioGroupItemProps>>
+const RadioGroupRoot = RadioGroup as Component<WithDataUi<RadioGroupRootProps>>
+const RadioItem = RadioGroup.Item as Component<WithDataUi<RadioGroupItemProps>>
 const RadioItemControl = RadioGroup.ItemControl as unknown as typeof RadioGroup.ItemControl
 
 /** Radio-group control with declared states. */
-export const AppRadioGroup = <Value extends string = string>(
-  props: AppRadioGroupProps<Value>
-): AppComponent => {
+export const UiRadioGroup = <Value extends string = string>(
+  props: UiRadioGroupProps<Value>
+): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'disabled',
@@ -90,10 +85,10 @@ export const AppRadioGroup = <Value extends string = string>(
   )
 }
 
-/** Radio item control for AppRadioGroup. */
-export const AppRadioItem = <Value extends string = string>(
-  props: AppRadioItemProps<Value>
-): AppComponent => {
+/** Radio item control for UiRadioGroup. */
+export const UiRadioItem = <Value extends string = string>(
+  props: UiRadioItemProps<Value>
+): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'value',

@@ -23,9 +23,9 @@ import '@ux/common/components/css/css.tsx'
 | File         | Owns                                                                                                      | Must not contain                                      |
 | ------------ | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
 | `tokens.css` | Primitive tokens and shared foundation scales                                                             | Element selectors, control selectors, keyframes       |
-| `themes.css` | Theme role tokens and App control component tokens                                                        | Element selectors, control selectors, keyframes       |
+| `themes.css` | Theme role tokens and UI control component tokens                                                         | Element selectors, control selectors, keyframes       |
 | `base.css`   | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles | Reusable control visuals, app/page layout rules       |
-| `ui.css`     | Reusable App control visuals and declared control parts                                                   | Primitive palette references, app/page-specific rules |
+| `ui.css`     | Reusable UI control visuals and declared control parts                                                    | Primitive palette references, app/page-specific rules |
 
 Shell-specific styles live with the shell component that owns them. For example,
 `source/ux/common/shell/login.css` is imported by the login shell component
@@ -39,9 +39,9 @@ Raw values are allowed in `tokens.css` and `themes.css` because they define the 
 | -------------- | --------------- | ----------------------------------------- |
 | Primitive      | `tokens.css`    | Bare L C H triplets and foundation scales |
 | Role / theme   | `themes.css`    | Resolved semantic roles per theme         |
-| Component      | `themes.css`    | App control tokens                        |
+| Component      | `themes.css`    | UI control tokens                         |
 | Foundation CSS | `base.css`      | Browser and semantic HTML element styling |
-| UI CSS         | `ui.css`        | App control and declared part styling     |
+| UI CSS         | `ui.css`        | UI control and declared part styling      |
 | Shell CSS      | Shell-local CSS | Shell component-specific styling          |
 
 Controls follow this dependency order:
@@ -54,7 +54,7 @@ Rules:
 
 - `--sa-p-*` primitives are internal and are not consumed directly by `ui.css`.
 - Role tokens describe semantic meaning: color, background, text, border, shadow, gradient, typography, spacing, motion, and interaction state.
-- Component tokens describe App control concerns and use the `--sa-{control}-{attribute}` or `--sa-{control}-{variant}-{attribute}` shape.
+- Component tokens describe UI control concerns and use the `--sa-{control}-{attribute}` or `--sa-{control}-{variant}-{attribute}` shape.
 - Specialized component tokens append specialization last: `--sa-{control}-{variant}-{attribute}-{specialization}`.
 - Selectors in `ui.css` consume role and component tokens, not raw color or spacing decisions.
 
@@ -95,15 +95,12 @@ All tokens use the `--sa-` prefix.
 ```text
 ux/
 └── common/
-    ├── assets/
-    │   └── logos/       — shared logo assets
-    ├── shell/           — application shell foundation and shell-local CSS
     └── components/
+        ├── charts/      — reserved chart-control directory        
         ├── css/         — CSS barrel, tokens, themes, base, controls
         ├── fonts/       — self-hosted woff2 font assets
         ├── icons/       — icon library
-        ├── controls/    — App control primitives
-        └── charts/      — reserved chart-control directory
+        └── ui/          — UI control primitives
 ```
 
 ## 3. Control Contract
@@ -172,9 +169,9 @@ tooltip
 
 Mapping is derived from component name:
 
-- `AppButton` → `data-ui="button"`
-- `AppInput` → `data-ui="input"`
-- `AppSingleSelect` → `data-ui="single-select"`
+- `UiButton` → `data-ui="button"`
+- `UiInput` → `data-ui="input"`
+- `UiSingleSelect` → `data-ui="single-select"`
 
 Rules:
 
@@ -257,23 +254,23 @@ Selectors:
 
 ### 3.6 Reference Identity
 
-`data-ui` identifies the App control or App control part. It is not a consumer
+`data-ui` identifies the UI control or UI control part. It is not a consumer
 reference hook. Consumer reference identity is driven by `name`.
 
 Rules:
 
-- Public App control identity prop is `name`.
+- Public UI control identity prop is `name`.
 - Components derive DOM `id` internally from `name` when a rendered element needs a reference target.
 - Optional `id` is an escape hatch only where the component public API explicitly declares it.
 - Native `name` is forwarded only where it has actual browser form semantics; otherwise `name` is design-system identity input.
-- When both `id` and `name` are supported and provided, `id` is the rendered DOM target and `name` remains the App reference identity or native form name according to the component contract.
-- `AppField.for` is used only in label mode and must target a real labelable rendered element.
-- `AppField variant='caption'` is used for non-labelable controls and renders caption semantics instead of `<label for>`.
+- When both `id` and `name` are supported and provided, `id` is the rendered DOM target and `name` remains the Ui reference identity or native form name according to the component contract.
+- `UiField.for` is used only in label mode and must target a real labelable rendered element.
+- `UiField variant='caption'` is used for non-labelable controls and renders caption semantics instead of `<label for>`.
 
 Labelable controls must derive the same DOM `id` from the same `name` value, so
-consumers can write `<AppField for='x'>` with `<AppInput name='x'>`.
-Non-labelable controls such as `AppList`, `AppTable`, and Kobalte listbox roots
-must use `AppField variant='caption'`.
+consumers can write `<UiField for='x'>` with `<UiInput name='x'>`.
+Non-labelable controls such as `UiList`, `UiTable`, and Kobalte listbox roots
+must use `UiField variant='caption'`.
 
 Caption mode is a semantic change only. `[data-ui='field'] > figcaption` renders
 with the same local field treatment as `[data-ui='field'] > label`.
@@ -286,11 +283,11 @@ Controls are atomic in scope. They do not:
 - implement workflows
 - perform validation orchestration
 
-Layout controls such as `AppLayout` and `AppFormActions` manage local child arrangement only.
+Layout controls such as `UiLayout` and `UiFormActions` manage local child arrangement only.
 
 ### 3.8 Attribute Discipline
 
-App control wrappers manually emit only declared semantic attributes:
+UI control wrappers manually emit only declared semantic attributes:
 
 ```text
 data-ui
@@ -423,7 +420,7 @@ This selector shape is invalid because one element cannot hold two different `da
 | `layout`          | General block and inline child arrangement                        |
 | `list`            | Semantic list with unset, bullet, and numbered variants           |
 | `table`           | Semantic table family with header/body/row/cell parts             |
-| `table-container` | Optional overflow wrapper emitted by `AppTable`                   |
+| `table-container` | Optional overflow wrapper emitted by `UiTable`                    |
 | `footer`          | Branded footer primitive using shell chrome and safe-area support |
 | `field`           | Label + control wrapper                                           |
 | `fieldset`        | Semantic group boundary with legend                               |
@@ -431,13 +428,13 @@ This selector shape is invalid because one element cannot hold two different `da
 
 ## 6. Chart Controls
 
-Charts are standardized through `AppChart`. Chart.js is the internal engine and must not be consumed directly by views or widgets.
+Charts are standardized through `UiChart`. Chart.js is the internal engine and must not be consumed directly by views or widgets.
 
 **Location:** `source/ux/common/components/charts`
 
 | Component   | Purpose                             |
 | ----------- | ----------------------------------- |
-| `AppChart`  | Token-aware chart primitive wrapper |
+| `UiChart`   | Token-aware chart primitive wrapper |
 | `PieChart`  | Composition at a point in time      |
 | `BarChart`  | Frequency / volume over categories  |
 | `LineChart` | Trend over rolling time period      |
@@ -445,9 +442,9 @@ Charts are standardized through `AppChart`. Chart.js is the internal engine and 
 
 ## 7. Style Guide Harness
 
-The style-guide application is a demonstration harness for the design system. It imports shared CSS in canonical order and may style specimen layout, inspection grids, and demo-only spacing. It does not redefine reusable App control visuals.
+The style-guide application is a demonstration harness for the design system. It imports shared CSS in canonical order and may style specimen layout, inspection grids, and demo-only spacing. It does not redefine reusable UI control visuals.
 
-Style-guide CSS does not target App primitive identities with `[data-ui]` selectors. Demo-only sizing and layout uses wrapper classes.
+Style-guide CSS does not target Ui primitive identities with `[data-ui]` selectors. Demo-only sizing and layout uses wrapper classes.
 
 Style-guide app surfaces preserve the global foundation background unless a specific specimen requires an opaque content surface. Repeated demo treatment that becomes product UI belongs in `source/ux/common/components/` or the shared CSS foundation before application code consumes it.
 

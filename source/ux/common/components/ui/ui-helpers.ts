@@ -4,22 +4,22 @@
 
 import type { JSX } from '@solid-js'
 
-/** App component abstractions. */
-export type AppComponent = JSX.Element
-export type AppContainerProps = { children: AppComponent }
-export type AppComponentProps = { children?: AppComponent }
+/** Ui component abstractions. */
+export type UiComponent = JSX.Element
+export type UiContainerProps = { children: UiComponent }
+export type UiComponentProps = { children?: UiComponent }
 
 /** Extends a Kobalte component's prop type to accept data-ui and data-ui-state attributes. */
-export type WithDataUI<T> = T & AppComponentProps & {
+export type WithDataUi<T> = T & UiComponentProps & {
   'data-ui'?: string
   'data-ui-state'?: string
 }
 
 /** Semantic control state values allowed by the design language. */
-export type AppControlState = 'error' | 'disabled' | 'loading'
+export type UiControlState = 'error' | 'disabled' | 'loading'
 
 /** Props used to derive semantic control state. */
-export type AppControlStateProps = {
+export type UiControlStateProps = {
   error?: boolean
   loading?: boolean
   disabled?: boolean
@@ -27,8 +27,8 @@ export type AppControlStateProps = {
 
 /** Derive the semantic control state from runtime control props. */
 export const controlState = (
-  props: AppControlStateProps
-): AppControlState | undefined => {
+  props: UiControlStateProps
+): UiControlState | undefined => {
   if (props.loading) return 'loading'
   if (props.error) return 'error'
   if (props.disabled) return 'disabled'
@@ -36,7 +36,7 @@ export const controlState = (
 }
 
 /** A selectable option for data-driven select controls. */
-export type AppOption = { value: string; label?: string }
+export type UiOption = { value: string; label?: string }
 
-/** Derive display text from an AppOption — label if present, otherwise value. */
-export const appOptionLabel = (option: AppOption): string => option.label ?? option.value
+/** Derive display text from a UiOption — label if present, otherwise value. */
+export const uiOptionLabel = (option: UiOption): string => option.label ?? option.value

@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App card control                                                             ║
+║ Ui card control                                                             ║
 ║ Semantic card primitive.                                                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,18 +10,18 @@ Emits card control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppCard  Card control.
+UiCard  Card control.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps } from './ui-helpers.ts'
+import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
 /** Card variants declared by the design language. */
-export type AppCardVariant = 'widget' | 'workflow'
+export type UiCardVariant = 'widget' | 'workflow'
 
 /** Card control props. */
-export type AppCardProps =
-  & AppComponentProps
+export type UiCardProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
     | 'children'
@@ -32,7 +32,7 @@ export type AppCardProps =
     | 'data-ui-variant'
   >
   & {
-    variant?: AppCardVariant
+    variant?: UiCardVariant
     class?: never
     classList?: never
     style?: never
@@ -41,7 +41,7 @@ export type AppCardProps =
   }
 
 /** Card control. */
-export const AppCard = (props: AppCardProps): AppComponent => {
+export const UiCard = (props: UiCardProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'variant',
     'class',

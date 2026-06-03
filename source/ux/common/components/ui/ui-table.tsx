@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App table control                                                            ║
+║ Ui table control                                                            ║
 ║ Semantic wrappers for HTML table primitives.                                 ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,25 +10,25 @@ Emits table semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppTable        Table root — optionally wraps <table> in an overflow container.
-AppTableHeader  Header row — renders <thead><tr>; children become <th>.
-AppTableBody    Body section — renders <tbody>.
-AppTableRow     Body row — renders <tr>. variant='section' for group-header rows.
-AppTableCell    Cell — renders <th> inside AppTableHeader, <td> elsewhere. Accepts align prop.
+UiTable        Table root — optionally wraps <table> in an overflow container.
+UiTableHeader  Header row — renders <thead><tr>; children become <th>.
+UiTableBody    Body section — renders <tbody>.
+UiTableRow     Body row — renders <tr>. variant='section' for group-header rows.
+UiTableCell    Cell — renders <th> inside UiTableHeader, <td> elsewhere. Accepts align prop.
 */
 
 import { createContext, type JSX, splitProps, useContext } from '@solid-js'
-import type { AppComponent, AppComponentProps, AppContainerProps } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps, UiContainerProps } from './ui-helpers.ts'
 
 const TableHeaderCtx = createContext(false)
 const TableSectionCtx = createContext(false)
 
-/** AppTable overflow behavior. */
-export type AppTableOverflow = 'hidden' | 'scroll'
+/** UiTable overflow behavior. */
+export type UiTableOverflow = 'hidden' | 'scroll'
 
-/** AppTable props. */
-export type AppTableProps =
-  & AppComponentProps
+/** UiTable props. */
+export type UiTableProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableElement>,
     | 'children'
@@ -42,7 +42,7 @@ export type AppTableProps =
   >
   & {
     name?: string
-    overflow?: AppTableOverflow
+    overflow?: UiTableOverflow
     class?: never
     classList?: never
     style?: never
@@ -51,12 +51,12 @@ export type AppTableProps =
     'data-ui-overflow'?: never
   }
 
-/** AppTableHeader props. */
-export type AppTableHeaderProps = AppContainerProps
+/** UiTableHeader props. */
+export type UiTableHeaderProps = UiContainerProps
 
-/** AppTableBody props. */
-export type AppTableBodyProps =
-  & AppComponentProps
+/** UiTableBody props. */
+export type UiTableBodyProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableSectionElement>,
     | 'children'
@@ -74,9 +74,9 @@ export type AppTableBodyProps =
     'data-ui-variant'?: never
   }
 
-/** AppTableRow props. */
-export type AppTableRowProps =
-  & AppComponentProps
+/** UiTableRow props. */
+export type UiTableRowProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableRowElement>,
     | 'children'
@@ -96,9 +96,9 @@ export type AppTableRowProps =
     'data-ui-variant'?: never
   }
 
-/** AppTableCell props. */
-export type AppTableCellProps =
-  & AppComponentProps
+/** UiTableCell props. */
+export type UiTableCellProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLTableCellElement>,
     | 'children'
@@ -121,7 +121,7 @@ export type AppTableCellProps =
   }
 
 /** Table root with optional horizontal overflow handling. */
-export const AppTable = (props: AppTableProps): AppComponent => {
+export const UiTable = (props: UiTableProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'id',
     'name',
@@ -144,7 +144,7 @@ export const AppTable = (props: AppTableProps): AppComponent => {
 }
 
 /** Header row. Wraps children in <thead><tr>; cells render as <th>. */
-export const AppTableHeader = (props: AppTableHeaderProps): AppComponent => (
+export const UiTableHeader = (props: UiTableHeaderProps): UiComponent => (
   <TableHeaderCtx.Provider value>
     <thead data-ui='table-head'>
       <tr data-ui='table-row'>
@@ -155,7 +155,7 @@ export const AppTableHeader = (props: AppTableHeaderProps): AppComponent => (
 )
 
 /** Body section. */
-export const AppTableBody = (props: AppTableBodyProps): AppComponent => {
+export const UiTableBody = (props: UiTableBodyProps): UiComponent => {
   const [, others] = splitProps(props, [
     'class',
     'classList',
@@ -167,7 +167,7 @@ export const AppTableBody = (props: AppTableBodyProps): AppComponent => {
 }
 
 /** Body row. Use variant='section' for a group-header row. */
-export const AppTableRow = (props: AppTableRowProps): AppComponent => {
+export const UiTableRow = (props: UiTableRowProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'variant',
     'class',
@@ -187,8 +187,8 @@ export const AppTableRow = (props: AppTableRowProps): AppComponent => {
   )
 }
 
-/** Cell — <th> inside AppTableHeader, <td> elsewhere. Spans all columns inside a section row. */
-export const AppTableCell = (props: AppTableCellProps): AppComponent => {
+/** Cell — <th> inside UiTableHeader, <td> elsewhere. Spans all columns inside a section row. */
+export const UiTableCell = (props: UiTableCellProps): UiComponent => {
   const isHeader = useContext(TableHeaderCtx)
   const isSection = useContext(TableSectionCtx)
   const [local, others] = splitProps(props, [

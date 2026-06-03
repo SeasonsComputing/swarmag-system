@@ -9,13 +9,13 @@ import { createEffect, createSignal, For } from '@solid-js'
 
 // dprint-ignore
 import {
-  AppAccordion, AppAccordionContent, AppAccordionItem, AppAccordionTrigger, AppAlert, AppAvatar,
-  AppBadge, AppButton, AppCard, AppCheckbox, AppDialog, AppField, AppFieldset, AppFooter,
-  AppFormActions, AppInput, AppLayout, AppList, AppListItem, AppMultiSelect,
-  AppPopover, AppProgress, AppRadioGroup, AppRadioItem, AppSingleSelect, AppSeparator,
-  AppSkeleton, AppSpinner, AppTab, AppTable, AppTableBody, AppTableCell, AppTableHeader,
-  AppTableRow, AppTabList, AppTabPanel, AppTabs, AppTextArea, AppToggle, AppToggleGroup,
-  AppToggleItem, AppTooltip, type AppComponent, type AppContainerProps
+  UiAccordion, UiAccordionContent, UiAccordionItem, UiAccordionTrigger, UiAlert, UiAvatar,
+  UiBadge, UiButton, UiCard, UiCheckbox, UiDialog, UiField, UiFieldset, UiFooter,
+  UiFormActions, UiInput, UiLayout, UiList, UiListItem, UiMultiSelect,
+  UiPopover, UiProgress, UiRadioGroup, UiRadioItem, UiSingleSelect, UiSeparator,
+  UiSkeleton, UiSpinner, UiTab, UiTable, UiTableBody, UiTableCell, UiTableHeader,
+  UiTableRow, UiTabList, UiTabPanel, UiTabs, UiTextArea, UiToggle, UiToggleGroup,
+  UiToggleItem, UiTooltip, type UiComponent, type UiContainerProps
 } from '@ux/common/components/ui'
 
 import '@ux/common/components/css/css.tsx'
@@ -43,50 +43,50 @@ type ViewMode = 'map' | 'list' | 'grid'
 type Tab = 'assessment' | 'planning' | 'execution' | 'followup'
 
 /** Header with theme switching for validating controls across supported themes. */
-const SgHeader = (): AppComponent => {
+const SgHeader = (): UiComponent => {
   const [theme, setTheme] = createSignal<Theme>('dark')
   createEffect(() => document.documentElement.dataset.theme = theme())
   return (
     <header class='sg-header'>
-      <AppLayout gap='none'>
+      <UiLayout gap='none'>
         <h1>
           swarmAg <span class='nowrap'>Style Guide</span>
         </h1>
         <p class='sg-header-subtitle'>
           Living visual validation for tokens, states, themes, and controls.
         </p>
-      </AppLayout>
-      <AppToggleGroup<Theme> value={theme()} onChange={setTheme}>
-        <AppToggleItem value='dark'>Dark</AppToggleItem>
-        <AppToggleItem value='light'>Light</AppToggleItem>
-      </AppToggleGroup>
+      </UiLayout>
+      <UiToggleGroup<Theme> value={theme()} onChange={setTheme}>
+        <UiToggleItem value='dark'>Dark</UiToggleItem>
+        <UiToggleItem value='light'>Light</UiToggleItem>
+      </UiToggleGroup>
     </header>
   )
 }
 
 /** Footer for the style guide. */
-const SgFooter = (): AppComponent => (<AppFooter logo={logo} alt='swarmAg' />)
+const SgFooter = (): UiComponent => (<UiFooter logo={logo} alt='swarmAg' />)
 
 /** Main content area for the style guide. */
-type SgMainProps = AppContainerProps
-const SgMain = (props: SgMainProps): AppComponent => (
+type SgMainProps = UiContainerProps
+const SgMain = (props: SgMainProps): UiComponent => (
   <main class='sg-main'>
     {props.children}
   </main>
 )
 
 /** Framed style-guide section used to group related control specimens. */
-type SgSectionProps = AppContainerProps & { title: string }
-const SgSection = (props: SgSectionProps): AppComponent => (
+type SgSectionProps = UiContainerProps & { title: string }
+const SgSection = (props: SgSectionProps): UiComponent => (
   <section class='sg-section'>
-    <AppLayout gap='tight'>
+    <UiLayout gap='tight'>
       <h2>{props.title}</h2>
-      <AppCard>
-        <AppLayout>
+      <UiCard>
+        <UiLayout>
           {props.children}
-        </AppLayout>
-      </AppCard>
-    </AppLayout>
+        </UiLayout>
+      </UiCard>
+    </UiLayout>
   </section>
 )
 
@@ -96,20 +96,20 @@ type SgSwatchProps = {
   label: string
   token: string
 }
-const SgSwatch = (props: SgSwatchProps): AppComponent => (
+const SgSwatch = (props: SgSwatchProps): UiComponent => (
   <figure class='sg-swatch'>
     <div class='sg-swatch-chip' style={{ background: props.value }} />
     <figcaption>
-      <AppLayout gap='tight'>
+      <UiLayout gap='tight'>
         <span>{props.label}</span>
         <code>{props.token}</code>
-      </AppLayout>
+      </UiLayout>
     </figcaption>
   </figure>
 )
 
 /** Single-page living style guide application. */
-export const StyleGuide = (): AppComponent => {
+export const StyleGuide = (): UiComponent => {
   const [loading, setLoading] = createSignal(false)
   const [inputError, setInputError] = createSignal(false)
   const [selectError, setSelectError] = createSignal(false)
@@ -126,73 +126,73 @@ export const StyleGuide = (): AppComponent => {
       <SgHeader />
 
       <SgMain>
-        <AppLayout gap='loose'>
+        <UiLayout gap='loose'>
           <SgSection title='Typography'>
-            <AppFieldset legend='Typefaces'>
-              <AppTable>
-                <AppTableHeader>
-                  <AppTableCell>Role</AppTableCell>
-                  <AppTableCell>Example</AppTableCell>
-                </AppTableHeader>
-                <AppTableBody>
-                  <AppTableRow variant='section'>
-                    <AppTableCell>Comfortaa</AppTableCell>
-                  </AppTableRow>
-                  <AppTableRow>
-                    <AppTableCell>Heading</AppTableCell>
-                    <AppTableCell>
+            <UiFieldset legend='Typefaces'>
+              <UiTable>
+                <UiTableHeader>
+                  <UiTableCell>Role</UiTableCell>
+                  <UiTableCell>Example</UiTableCell>
+                </UiTableHeader>
+                <UiTableBody>
+                  <UiTableRow variant='section'>
+                    <UiTableCell>Comfortaa</UiTableCell>
+                  </UiTableRow>
+                  <UiTableRow>
+                    <UiTableCell>Heading</UiTableCell>
+                    <UiTableCell>
                       <span class='sg-font-heading'>Operations briefing schedule confirmed</span>
-                    </AppTableCell>
-                  </AppTableRow>
-                  <AppTableRow>
-                    <AppTableCell>Body</AppTableCell>
-                    <AppTableCell>
+                    </UiTableCell>
+                  </UiTableRow>
+                  <UiTableRow>
+                    <UiTableCell>Body</UiTableCell>
+                    <UiTableCell>
                       <span class='sg-font-body'>
                         Inspect field boundaries and document hazard zones
                       </span>
-                    </AppTableCell>
-                  </AppTableRow>
-                  <AppTableRow variant='section'>
-                    <AppTableCell>Lexend</AppTableCell>
-                  </AppTableRow>
-                  <AppTableRow>
-                    <AppTableCell>Label</AppTableCell>
-                    <AppTableCell>
+                    </UiTableCell>
+                  </UiTableRow>
+                  <UiTableRow variant='section'>
+                    <UiTableCell>Lexend</UiTableCell>
+                  </UiTableRow>
+                  <UiTableRow>
+                    <UiTableCell>Label</UiTableCell>
+                    <UiTableCell>
                       <span class='sg-font-label'>Service window 06:00–09:00</span>
-                    </AppTableCell>
-                  </AppTableRow>
-                  <AppTableRow>
-                    <AppTableCell>Annotation</AppTableCell>
-                    <AppTableCell>
+                    </UiTableCell>
+                  </UiTableRow>
+                  <UiTableRow>
+                    <UiTableCell>Annotation</UiTableCell>
+                    <UiTableCell>
                       <span class='sg-font-annotation'>Caption or Legend</span>
-                    </AppTableCell>
-                  </AppTableRow>
-                  <AppTableRow>
-                    <AppTableCell>UI</AppTableCell>
-                    <AppTableCell>
+                    </UiTableCell>
+                  </UiTableRow>
+                  <UiTableRow>
+                    <UiTableCell>UI</UiTableCell>
+                    <UiTableCell>
                       <span class='sg-font-ui'>Assign crew and assets for spray mission</span>
-                    </AppTableCell>
-                  </AppTableRow>
-                  <AppTableRow variant='section'>
-                    <AppTableCell>Cascadia Mono</AppTableCell>
-                  </AppTableRow>
-                  <AppTableRow>
-                    <AppTableCell>Data</AppTableCell>
-                    <AppTableCell>
+                    </UiTableCell>
+                  </UiTableRow>
+                  <UiTableRow variant='section'>
+                    <UiTableCell>Cascadia Mono</UiTableCell>
+                  </UiTableRow>
+                  <UiTableRow>
+                    <UiTableCell>Data</UiTableCell>
+                    <UiTableCell>
                       <samp>service.status = 'ready'; acres = 142</samp>
-                    </AppTableCell>
-                  </AppTableRow>
-                </AppTableBody>
-              </AppTable>
-            </AppFieldset>
-            <AppFieldset legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
+                    </UiTableCell>
+                  </UiTableRow>
+                </UiTableBody>
+              </UiTable>
+            </UiFieldset>
+            <UiFieldset legend='<h1>, <h2>, <h3>, <h4>, <h5>'>
               <h1>H1 Operations Command</h1>
               <h2>H2 Field Service Planning</h2>
               <h3>H3 Aerial Application Window</h3>
               <h4>H4 Ground Crew Assignment</h4>
               <h5>H5 Chemical Label Review</h5>
-            </AppFieldset>
-            <AppFieldset legend='<body>, <p>, <blockquote>'>
+            </UiFieldset>
+            <UiFieldset legend='<body>, <p>, <blockquote>'>
               <p>
                 Body copy should inherit the product typography without local component styling. Weather,
                 acreage, crew availability, and service windows remain scannable.
@@ -200,8 +200,8 @@ export const StyleGuide = (): AppComponent => {
               <blockquote>
                 Service logs are records of field reality and must remain clear, durable, and auditable.
               </blockquote>
-            </AppFieldset>
-            <AppFieldset legend='<code>, <kbd>, <samp>, <pre>'>
+            </UiFieldset>
+            <UiFieldset legend='<code>, <kbd>, <samp>, <pre>'>
               <p>
                 Inline code sample: <code>service.category === 'aerial-drone-services'</code>
               </p>
@@ -212,88 +212,88 @@ export const StyleGuide = (): AppComponent => {
                 System output: <samp>asset.status = 'ready'</samp>
               </p>
               <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
-            </AppFieldset>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='HTML'>
-            <AppFieldset legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
-              <AppField
-                label='AppTable, AppTableHeader, AppTableBody, AppTableRow, AppTableCell, AppTableSection'
+            <UiFieldset legend='<table>, <thead>, <tbody>, <tr>, <th>, <td>'>
+              <UiField
+                label='UiTable, UiTableHeader, UiTableBody, UiTableRow, UiTableCell, UiTableSection'
                 variant='caption'
               >
-                <AppTable overflow='scroll'>
-                  <AppTableHeader>
-                    <AppTableCell>Equipment</AppTableCell>
-                    <AppTableCell>Application</AppTableCell>
-                    <AppTableCell align='end'>Price</AppTableCell>
-                    <AppTableCell align='end'>Cost</AppTableCell>
-                  </AppTableHeader>
-                  <AppTableBody>
+                <UiTable overflow='scroll'>
+                  <UiTableHeader>
+                    <UiTableCell>Equipment</UiTableCell>
+                    <UiTableCell>Application</UiTableCell>
+                    <UiTableCell align='end'>Price</UiTableCell>
+                    <UiTableCell align='end'>Cost</UiTableCell>
+                  </UiTableHeader>
+                  <UiTableBody>
                     <For each={EQUIPMENT}>
                       {e => (
                         <>
-                          <AppTableRow variant='section'>
-                            <AppTableCell>{e.section}</AppTableCell>
-                          </AppTableRow>
+                          <UiTableRow variant='section'>
+                            <UiTableCell>{e.section}</UiTableCell>
+                          </UiTableRow>
                           <For each={e.items}>
                             {i => (
-                              <AppTableRow>
-                                <AppTableCell>{i.name}</AppTableCell>
-                                <AppTableCell>{i.application}</AppTableCell>
-                                <AppTableCell align='end'>
+                              <UiTableRow>
+                                <UiTableCell>{i.name}</UiTableCell>
+                                <UiTableCell>{i.application}</UiTableCell>
+                                <UiTableCell align='end'>
                                   <samp>{i.price}</samp>
-                                </AppTableCell>
-                                <AppTableCell align='end'>
+                                </UiTableCell>
+                                <UiTableCell align='end'>
                                   <samp>{i.cost}</samp>
-                                </AppTableCell>
-                              </AppTableRow>
+                                </UiTableCell>
+                              </UiTableRow>
                             )}
                           </For>
                         </>
                       )}
                     </For>
-                  </AppTableBody>
-                </AppTable>
-              </AppField>
-            </AppFieldset>
-            <AppFieldset legend='<ul>, <ol>, <li>'>
-              <AppLayout variant='inline-wrap'>
-                <AppField label='AppList (default)' variant='caption'>
-                  <AppList>
-                    <AppListItem>Confirm chemical inventory.</AppListItem>
-                    <AppListItem>Verify crew certification.</AppListItem>
-                    <AppListItem>Inspect required assets.</AppListItem>
-                  </AppList>
-                </AppField>
-                <AppField label='AppList (bullet)' variant='caption'>
-                  <AppList variant='bullet'>
-                    <AppListItem>Confirm chemical inventory.</AppListItem>
-                    <AppListItem>Verify crew certification.</AppListItem>
-                    <AppListItem>Inspect required assets.</AppListItem>
-                  </AppList>
-                </AppField>
-                <AppField label='AppList (numbered)' variant='caption'>
-                  <AppList variant='numbered'>
-                    <AppListItem>Assess site.</AppListItem>
-                    <AppListItem>Plan service.</AppListItem>
-                    <AppListItem>Execute work.</AppListItem>
-                  </AppList>
-                </AppField>
-              </AppLayout>
-            </AppFieldset>
-            <AppFieldset legend='<input>, <textarea>, <select>, <option>'>
-              <AppLayout variant='inline-wrap'>
-                <AppField label='AppInput' for='field-name-1'>
-                  <AppInput
+                  </UiTableBody>
+                </UiTable>
+              </UiField>
+            </UiFieldset>
+            <UiFieldset legend='<ul>, <ol>, <li>'>
+              <UiLayout variant='inline-wrap'>
+                <UiField label='UiList (default)' variant='caption'>
+                  <UiList>
+                    <UiListItem>Confirm chemical inventory.</UiListItem>
+                    <UiListItem>Verify crew certification.</UiListItem>
+                    <UiListItem>Inspect required assets.</UiListItem>
+                  </UiList>
+                </UiField>
+                <UiField label='UiList (bullet)' variant='caption'>
+                  <UiList variant='bullet'>
+                    <UiListItem>Confirm chemical inventory.</UiListItem>
+                    <UiListItem>Verify crew certification.</UiListItem>
+                    <UiListItem>Inspect required assets.</UiListItem>
+                  </UiList>
+                </UiField>
+                <UiField label='UiList (numbered)' variant='caption'>
+                  <UiList variant='numbered'>
+                    <UiListItem>Assess site.</UiListItem>
+                    <UiListItem>Plan service.</UiListItem>
+                    <UiListItem>Execute work.</UiListItem>
+                  </UiList>
+                </UiField>
+              </UiLayout>
+            </UiFieldset>
+            <UiFieldset legend='<input>, <textarea>, <select>, <option>'>
+              <UiLayout variant='inline-wrap'>
+                <UiField label='UiInput' for='field-name-1'>
+                  <UiInput
                     name='field-name-1'
                     value='North Field'
                     error={inputError()}
                     onInput={() => undefined}
                     placeholder='Enter service location'
                   />
-                </AppField>
-                <AppField label='AppTextArea' for='application-notes-1'>
-                  <AppTextArea
+                </UiField>
+                <UiField label='UiTextArea' for='application-notes-1'>
+                  <UiTextArea
                     name='application-notes-1'
                     error={inputError()}
                     onInput={() => undefined}
@@ -301,36 +301,36 @@ export const StyleGuide = (): AppComponent => {
                     placeholder='Wind break along west ridge; verify drift boundary before launch.'
                     rows={6}
                   />
-                </AppField>
-              </AppLayout>
-              <AppLayout variant='inline-wrap'>
-                <AppField label='AppSingleSelect' for='service-status'>
-                  <AppSingleSelect
+                </UiField>
+              </UiLayout>
+              <UiLayout variant='inline-wrap'>
+                <UiField label='UiSingleSelect' for='service-status'>
+                  <UiSingleSelect
                     name='service-status'
                     placeholder='Select service status'
                     error={selectError()}
                     options={STATUSES}
                   />
-                </AppField>
-                <AppField label='AppMultiSelect' variant='caption'>
-                  <AppMultiSelect
+                </UiField>
+                <UiField label='UiMultiSelect' variant='caption'>
+                  <UiMultiSelect
                     options={SERVICES}
                     defaultValue={[...DEFAULT_SERVICES]}
                   />
-                </AppField>
-              </AppLayout>
-            </AppFieldset>
+                </UiField>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='Color'>
-            <AppFieldset legend='Swatches'>
-              <AppLayout variant='inline-fill'>
+            <UiFieldset legend='Swatches'>
+              <UiLayout variant='inline-fill'>
                 <For each={COLOR_SWATCHES}>
                   {s => <SgSwatch value={s.value} label={s.label} token={s.token} />}
                 </For>
-              </AppLayout>
-            </AppFieldset>
-            <AppFieldset legend='Gradient'>
+              </UiLayout>
+            </UiFieldset>
+            <UiFieldset legend='Gradient'>
               <figure>
                 <div class='sg-gradient-block' />
                 <figcaption>
@@ -339,73 +339,73 @@ export const StyleGuide = (): AppComponent => {
                   <span>end</span>
                 </figcaption>
               </figure>
-            </AppFieldset>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='Decorations'>
-            <AppLayout>
-              <AppLayout variant='inline-fill'>
-                <AppFieldset legend='AppAvatar'>
-                  <AppAvatar>AG</AppAvatar>
-                </AppFieldset>
-                <AppFieldset legend='AppSpinner'>
-                  <AppSpinner />
-                </AppFieldset>
-              </AppLayout>
-              <AppFieldset legend='AppSeparator'>
-                <AppSeparator />
-              </AppFieldset>
-            </AppLayout>
+            <UiLayout>
+              <UiLayout variant='inline-fill'>
+                <UiFieldset legend='UiAvatar'>
+                  <UiAvatar>AG</UiAvatar>
+                </UiFieldset>
+                <UiFieldset legend='UiSpinner'>
+                  <UiSpinner />
+                </UiFieldset>
+              </UiLayout>
+              <UiFieldset legend='UiSeparator'>
+                <UiSeparator />
+              </UiFieldset>
+            </UiLayout>
           </SgSection>
 
-          <SgSection title='AppButton'>
-            <AppField label='Toggle loading state' for='button-loading-toggle' variant='inline'>
-              <AppToggle
+          <SgSection title='UiButton'>
+            <UiField label='Toggle loading state' for='button-loading-toggle' variant='inline'>
+              <UiToggle
                 id='button-loading-toggle'
                 pressed={loading()}
                 onClick={() => setLoading(!loading())}
               >
                 Loading
-              </AppToggle>
-            </AppField>
-            <AppFieldset legend='Variants'>
-              <AppLayout variant='inline'>
+              </UiToggle>
+            </UiField>
+            <UiFieldset legend='Variants'>
+              <UiLayout variant='inline'>
                 <For each={BUTTON_VARIANTS}>
-                  {b => <AppButton variant={b.variant}>{b.label}</AppButton>}
+                  {b => <UiButton variant={b.variant}>{b.label}</UiButton>}
                 </For>
-              </AppLayout>
-            </AppFieldset>
-            <AppFieldset legend='Disabled and loading'>
-              <AppLayout variant='inline'>
-                <AppButton disabled>Disabled</AppButton>
-                <AppButton variant='primary' loading={loading()}>Loading</AppButton>
-              </AppLayout>
-            </AppFieldset>
+              </UiLayout>
+            </UiFieldset>
+            <UiFieldset legend='Disabled and loading'>
+              <UiLayout variant='inline'>
+                <UiButton disabled>Disabled</UiButton>
+                <UiButton variant='primary' loading={loading()}>Loading</UiButton>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
-          <SgSection title='AppInput / AppTextArea'>
-            <AppField label='Toggle error state' for='input-error-toggle' variant='inline'>
-              <AppToggle
+          <SgSection title='UiInput / UiTextArea'>
+            <UiField label='Toggle error state' for='input-error-toggle' variant='inline'>
+              <UiToggle
                 id='input-error-toggle'
                 pressed={inputError()}
                 onClick={() => setInputError(!inputError())}
               >
                 Error
-              </AppToggle>
-            </AppField>
-            <AppFieldset legend='Enabled'>
-              <AppLayout variant='inline-wrap'>
-                <AppField label='Field name' for='field-name-2'>
-                  <AppInput
+              </UiToggle>
+            </UiField>
+            <UiFieldset legend='Enabled'>
+              <UiLayout variant='inline-wrap'>
+                <UiField label='Field name' for='field-name-2'>
+                  <UiInput
                     name='field-name-2'
                     value='North Field'
                     error={inputError()}
                     onInput={() => undefined}
                     placeholder='Enter service location'
                   />
-                </AppField>
-                <AppField label='Application notes' for='application-notes-2'>
-                  <AppTextArea
+                </UiField>
+                <UiField label='Application notes' for='application-notes-2'>
+                  <UiTextArea
                     name='application-notes-2'
                     error={inputError()}
                     onInput={() => undefined}
@@ -413,341 +413,341 @@ export const StyleGuide = (): AppComponent => {
                     placeholder='Wind break along west ridge; verify drift boundary before launch.'
                     rows={6}
                   />
-                </AppField>
-              </AppLayout>
-            </AppFieldset>
-            <AppFieldset legend='Disabled'>
-              <AppLayout variant='inline-wrap'>
-                <AppField label='Disabled acreage' for='disabled-acreage'>
-                  <AppInput
+                </UiField>
+              </UiLayout>
+            </UiFieldset>
+            <UiFieldset legend='Disabled'>
+              <UiLayout variant='inline-wrap'>
+                <UiField label='Disabled acreage' for='disabled-acreage'>
+                  <UiInput
                     name='disabled-acreage'
                     disabled
                     value='142 acres'
                     onInput={() => undefined}
                   />
-                </AppField>
-                <AppField label='Disabled comments' for='disabled-comments'>
-                  <AppTextArea
+                </UiField>
+                <UiField label='Disabled comments' for='disabled-comments'>
+                  <UiTextArea
                     name='disabled-comments'
                     disabled
                     value='Locked after crew dispatch.'
                     onInput={() => undefined}
                     rows={6}
                   />
-                </AppField>
-              </AppLayout>
-            </AppFieldset>
+                </UiField>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
-          <SgSection title='AppSingleSelect / AppMultiSelect'>
-            <AppField label='Toggle error state' for='select-error-toggle' variant='inline'>
-              <AppToggle
+          <SgSection title='UiSingleSelect / UiMultiSelect'>
+            <UiField label='Toggle error state' for='select-error-toggle' variant='inline'>
+              <UiToggle
                 id='select-error-toggle'
                 pressed={selectError()}
                 onClick={() => setSelectError(!selectError())}
               >
                 Error
-              </AppToggle>
-            </AppField>
-            <AppFieldset legend='Single-select'>
-              <AppLayout variant='inline-wrap'>
-                <AppField label='Enabled select' for='service-status'>
-                  <AppSingleSelect
+              </UiToggle>
+            </UiField>
+            <UiFieldset legend='Single-select'>
+              <UiLayout variant='inline-wrap'>
+                <UiField label='Enabled select' for='service-status'>
+                  <UiSingleSelect
                     name='service-status'
                     placeholder='Select service status'
                     error={selectError()}
                     options={STATUSES}
                   />
-                </AppField>
-                <AppField label='Disabled select' for='disabled-select'>
-                  <AppSingleSelect
+                </UiField>
+                <UiField label='Disabled select' for='disabled-select'>
+                  <UiSingleSelect
                     name='disabled-select'
                     disabled
                     defaultValue='Ready'
                     options={STATUSES}
                   />
-                </AppField>
-              </AppLayout>
-            </AppFieldset>
-            <AppFieldset legend='Multi-select'>
-              <AppMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
-            </AppFieldset>
+                </UiField>
+              </UiLayout>
+            </UiFieldset>
+            <UiFieldset legend='Multi-select'>
+              <UiMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
+            </UiFieldset>
           </SgSection>
 
-          <SgSection title='AppField / AppFieldset / AppLayout / AppFormActions'>
-            <AppFieldset legend='Service details'>
-              <AppLayout variant='inline-wrap'>
-                <AppField label='Field name' for='form-demo-name'>
-                  <AppInput name='form-demo-name' value='North Field' onInput={() => undefined} />
-                </AppField>
-                <AppField label='Service type' for='form-demo-service'>
-                  <AppSingleSelect
+          <SgSection title='UiField / UiFieldset / UiLayout / UiFormActions'>
+            <UiFieldset legend='Service details'>
+              <UiLayout variant='inline-wrap'>
+                <UiField label='Field name' for='form-demo-name'>
+                  <UiInput name='form-demo-name' value='North Field' onInput={() => undefined} />
+                </UiField>
+                <UiField label='Service type' for='form-demo-service'>
+                  <UiSingleSelect
                     name='form-demo-service'
                     options={STATUSES}
                     placeholder='Select service type'
                   />
-                </AppField>
-              </AppLayout>
-              <AppField label='Field notes' for='form-demo-notes'>
-                <AppTextArea
+                </UiField>
+              </UiLayout>
+              <UiField label='Field notes' for='form-demo-notes'>
+                <UiTextArea
                   name='form-demo-notes'
                   value='Spray window 06:00–09:00.'
                   onInput={() => undefined}
                   rows={3}
                 />
-              </AppField>
-            </AppFieldset>
-            <AppFormActions>
-              <AppButton variant='ghost'>Cancel</AppButton>
-              <AppButton variant='primary'>Save</AppButton>
-            </AppFormActions>
+              </UiField>
+            </UiFieldset>
+            <UiFormActions>
+              <UiButton variant='ghost'>Cancel</UiButton>
+              <UiButton variant='primary'>Save</UiButton>
+            </UiFormActions>
           </SgSection>
 
-          <SgSection title='AppCheckbox'>
-            <AppLayout variant='inline'>
-              <AppCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
+          <SgSection title='UiCheckbox'>
+            <UiLayout variant='inline'>
+              <UiCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
                 Label reviewed
-              </AppCheckbox>
-              <AppCheckbox checked={checkboxDrift()} onChange={setCheckboxDrift}>
+              </UiCheckbox>
+              <UiCheckbox checked={checkboxDrift()} onChange={setCheckboxDrift}>
                 Drift boundary verified
-              </AppCheckbox>
-              <AppCheckbox error checked={checkboxError()} onChange={setCheckboxError}>
+              </UiCheckbox>
+              <UiCheckbox error checked={checkboxError()} onChange={setCheckboxError}>
                 Missing wind reading
-              </AppCheckbox>
-              <AppCheckbox disabled checked>Disabled complete</AppCheckbox>
-            </AppLayout>
+              </UiCheckbox>
+              <UiCheckbox disabled checked>Disabled complete</UiCheckbox>
+            </UiLayout>
           </SgSection>
 
-          <SgSection title='AppRadioGroup / AppRadioItem'>
-            <AppLayout variant='inline-wrap'>
-              <AppRadioGroup value={radioValue()} onChange={setRadioValue}>
-                <AppRadioItem value='aerial'>Aerial application</AppRadioItem>
-                <AppRadioItem value='ground'>Ground machinery</AppRadioItem>
-                <AppRadioItem value='inspection'>Site inspection</AppRadioItem>
-              </AppRadioGroup>
-              <AppRadioGroup error defaultValue='blocked'>
-                <AppRadioItem value='ready'>Ready</AppRadioItem>
-                <AppRadioItem value='blocked'>Blocked</AppRadioItem>
-                <AppRadioItem value='review'>Needs review</AppRadioItem>
-              </AppRadioGroup>
-              <AppRadioGroup disabled defaultValue='night'>
-                <AppRadioItem value='morning'>Morning</AppRadioItem>
-                <AppRadioItem value='afternoon'>Afternoon</AppRadioItem>
-                <AppRadioItem value='night'>Night</AppRadioItem>
-              </AppRadioGroup>
-            </AppLayout>
+          <SgSection title='UiRadioGroup / UiRadioItem'>
+            <UiLayout variant='inline-wrap'>
+              <UiRadioGroup value={radioValue()} onChange={setRadioValue}>
+                <UiRadioItem value='aerial'>Aerial application</UiRadioItem>
+                <UiRadioItem value='ground'>Ground machinery</UiRadioItem>
+                <UiRadioItem value='inspection'>Site inspection</UiRadioItem>
+              </UiRadioGroup>
+              <UiRadioGroup error defaultValue='blocked'>
+                <UiRadioItem value='ready'>Ready</UiRadioItem>
+                <UiRadioItem value='blocked'>Blocked</UiRadioItem>
+                <UiRadioItem value='review'>Needs review</UiRadioItem>
+              </UiRadioGroup>
+              <UiRadioGroup disabled defaultValue='night'>
+                <UiRadioItem value='morning'>Morning</UiRadioItem>
+                <UiRadioItem value='afternoon'>Afternoon</UiRadioItem>
+                <UiRadioItem value='night'>Night</UiRadioItem>
+              </UiRadioGroup>
+            </UiLayout>
           </SgSection>
 
-          <SgSection title='AppToggle / AppToggleGroup / AppToggleItem'>
-            <AppLayout variant='inline'>
-              <AppToggle pressed={togglePressed()} onClick={() => setTogglePressed(!togglePressed())}>
+          <SgSection title='UiToggle / UiToggleGroup / UiToggleItem'>
+            <UiLayout variant='inline'>
+              <UiToggle pressed={togglePressed()} onClick={() => setTogglePressed(!togglePressed())}>
                 Active crews
-              </AppToggle>
-              <AppToggle pressed={false}>Offline jobs</AppToggle>
-            </AppLayout>
-            <AppToggleGroup value={viewMode()} onChange={setViewMode}>
-              <AppToggleItem value='map'>Map</AppToggleItem>
-              <AppToggleItem value='list'>List</AppToggleItem>
-              <AppToggleItem value='grid'>Grid</AppToggleItem>
-            </AppToggleGroup>
+              </UiToggle>
+              <UiToggle pressed={false}>Offline jobs</UiToggle>
+            </UiLayout>
+            <UiToggleGroup value={viewMode()} onChange={setViewMode}>
+              <UiToggleItem value='map'>Map</UiToggleItem>
+              <UiToggleItem value='list'>List</UiToggleItem>
+              <UiToggleItem value='grid'>Grid</UiToggleItem>
+            </UiToggleGroup>
           </SgSection>
 
-          <SgSection title='AppTabs / AppTabList / AppTab / AppTabPanel'>
-            <AppTabs value={tab()} onChange={setTab}>
-              <AppTabList>
-                <AppTab value='assessment'>Assessment</AppTab>
-                <AppTab value='planning'>Planning</AppTab>
-                <AppTab value='execution'>Execution</AppTab>
-                <AppTab value='followup'>Followup</AppTab>
-              </AppTabList>
-              <AppTabPanel value='assessment'>Walk field edges and capture hazard notes.</AppTabPanel>
-              <AppTabPanel value='planning'>
+          <SgSection title='UiTabs / UiTabList / UiTab / UiTabPanel'>
+            <UiTabs value={tab()} onChange={setTab}>
+              <UiTabList>
+                <UiTab value='assessment'>Assessment</UiTab>
+                <UiTab value='planning'>Planning</UiTab>
+                <UiTab value='execution'>Execution</UiTab>
+                <UiTab value='followup'>Followup</UiTab>
+              </UiTabList>
+              <UiTabPanel value='assessment'>Walk field edges and capture hazard notes.</UiTabPanel>
+              <UiTabPanel value='planning'>
                 Assign crew, assets, chemicals, and service window.
-              </AppTabPanel>
-              <AppTabPanel value='execution'>
+              </UiTabPanel>
+              <UiTabPanel value='execution'>
                 Record work logs and answer workflow questions.
-              </AppTabPanel>
-              <AppTabPanel value='followup'>
+              </UiTabPanel>
+              <UiTabPanel value='followup'>
                 Prepare customer report and close service record.
-              </AppTabPanel>
-            </AppTabs>
+              </UiTabPanel>
+            </UiTabs>
           </SgSection>
 
-          <SgSection title='AppProgress'>
-            <AppLayout>
-              <AppProgress value={0} />
-              <AppProgress value={35} />
-              <AppProgress value={68} />
-              <AppProgress value={100} />
-            </AppLayout>
+          <SgSection title='UiProgress'>
+            <UiLayout>
+              <UiProgress value={0} />
+              <UiProgress value={35} />
+              <UiProgress value={68} />
+              <UiProgress value={100} />
+            </UiLayout>
           </SgSection>
 
-          <SgSection title='AppSkeleton'>
-            <AppLayout>
-              <AppSkeleton />
+          <SgSection title='UiSkeleton'>
+            <UiLayout>
+              <UiSkeleton />
               <div class='sg-skeleton-75'>
-                <AppSkeleton />
+                <UiSkeleton />
               </div>
               <div class='sg-skeleton-50'>
-                <AppSkeleton />
+                <UiSkeleton />
               </div>
-            </AppLayout>
+            </UiLayout>
           </SgSection>
 
-          <SgSection title='AppBadge'>
-            <AppLayout variant='inline'>
-              <AppBadge>Pending</AppBadge>
-              <AppBadge variant='success'>Field ready</AppBadge>
-              <AppBadge variant='warning'>Wind watch</AppBadge>
-              <AppBadge variant='danger'>Blocked</AppBadge>
-              <AppBadge variant='info'>Assessment</AppBadge>
-            </AppLayout>
+          <SgSection title='UiBadge'>
+            <UiLayout variant='inline'>
+              <UiBadge>Pending</UiBadge>
+              <UiBadge variant='success'>Field ready</UiBadge>
+              <UiBadge variant='warning'>Wind watch</UiBadge>
+              <UiBadge variant='danger'>Blocked</UiBadge>
+              <UiBadge variant='info'>Assessment</UiBadge>
+            </UiLayout>
           </SgSection>
 
-          <SgSection title='AppAlert'>
-            <AppLayout>
-              <AppAlert>Service record updated by dispatch.</AppAlert>
-              <AppAlert variant='success'>North Field completed and ready for customer review.</AppAlert>
-              <AppAlert variant='warning'>Wind speed approaching service threshold.</AppAlert>
-              <AppAlert variant='danger'>Chemical label missing required re-entry interval.</AppAlert>
-              <AppAlert variant='info'>Crew assignment changed for the morning window.</AppAlert>
-            </AppLayout>
+          <SgSection title='UiAlert'>
+            <UiLayout>
+              <UiAlert>Service record updated by dispatch.</UiAlert>
+              <UiAlert variant='success'>North Field completed and ready for customer review.</UiAlert>
+              <UiAlert variant='warning'>Wind speed approaching service threshold.</UiAlert>
+              <UiAlert variant='danger'>Chemical label missing required re-entry interval.</UiAlert>
+              <UiAlert variant='info'>Crew assignment changed for the morning window.</UiAlert>
+            </UiLayout>
           </SgSection>
 
           <SgSection title='Secondary Windows'>
-            <AppLayout variant='inline-wrap'>
-              <AppFieldset legend='AppTooltip'>
-                <AppLayout variant='inline'>
-                  <AppTooltip trigger='Hover field note' defaultOpen>
+            <UiLayout variant='inline-wrap'>
+              <UiFieldset legend='UiTooltip'>
+                <UiLayout variant='inline'>
+                  <UiTooltip trigger='Hover field note' defaultOpen>
                     Verify buffer zone before aerial application.
-                  </AppTooltip>
-                </AppLayout>
-              </AppFieldset>
-              <AppFieldset legend='AppDialog'>
-                <AppLayout variant='inline'>
-                  <AppDialog trigger='Open dispatch dialog'>
-                    <AppLayout>
+                  </UiTooltip>
+                </UiLayout>
+              </UiFieldset>
+              <UiFieldset legend='UiDialog'>
+                <UiLayout variant='inline'>
+                  <UiDialog trigger='Open dispatch dialog'>
+                    <UiLayout>
                       <p>Confirm crew assignment before dispatch.</p>
-                    </AppLayout>
-                  </AppDialog>
-                </AppLayout>
-              </AppFieldset>
-              <AppFieldset legend='AppPopover'>
-                <AppLayout variant='inline'>
-                  <AppPopover trigger='Open field menu'>
-                    <AppLayout>
+                    </UiLayout>
+                  </UiDialog>
+                </UiLayout>
+              </UiFieldset>
+              <UiFieldset legend='UiPopover'>
+                <UiLayout variant='inline'>
+                  <UiPopover trigger='Open field menu'>
+                    <UiLayout>
                       <p>Field actions, notes, and service history.</p>
-                    </AppLayout>
-                  </AppPopover>
-                </AppLayout>
-              </AppFieldset>
-            </AppLayout>
+                    </UiLayout>
+                  </UiPopover>
+                </UiLayout>
+              </UiFieldset>
+            </UiLayout>
           </SgSection>
 
-          <SgSection title='AppAccordion'>
-            <AppAccordion defaultValue={[...ACCORDION_DEFAULT_VALUE]}>
-              <AppAccordionItem value='weather'>
-                <AppAccordionTrigger>Weather window</AppAccordionTrigger>
-                <AppAccordionContent>
-                  <AppList variant='bullet'>
-                    <AppListItem>Wind speed 12 km/h — within threshold</AppListItem>
-                    <AppListItem>Precipitation 0% — clear</AppListItem>
-                    <AppListItem>Visibility 18 km — acceptable</AppListItem>
-                    <AppListItem>Temperature 21°C — nominal</AppListItem>
-                  </AppList>
-                </AppAccordionContent>
-              </AppAccordionItem>
-              <AppAccordionItem value='crew'>
-                <AppAccordionTrigger>Crew status</AppAccordionTrigger>
-                <AppAccordionContent>
-                  <AppList variant='numbered'>
-                    <AppListItem>Lead operator certified and on-site</AppListItem>
-                    <AppListItem>Equipment pre-check complete</AppListItem>
-                    <AppListItem>Safety brief conducted</AppListItem>
-                    <AppListItem>Flight plan filed and acknowledged</AppListItem>
-                  </AppList>
-                </AppAccordionContent>
-              </AppAccordionItem>
-              <AppAccordionItem value='compliance'>
-                <AppAccordionTrigger>Compliance notes</AppAccordionTrigger>
-                <AppAccordionContent>
-                  <AppList variant='bullet'>
-                    <AppListItem>Buffer zones confirmed</AppListItem>
-                    <AppListItem>No restricted area conflicts detected</AppListItem>
-                    <AppListItem>Chemical application rate within permit limits</AppListItem>
-                  </AppList>
-                </AppAccordionContent>
-              </AppAccordionItem>
-            </AppAccordion>
+          <SgSection title='UiAccordion'>
+            <UiAccordion defaultValue={[...ACCORDION_DEFAULT_VALUE]}>
+              <UiAccordionItem value='weather'>
+                <UiAccordionTrigger>Weather window</UiAccordionTrigger>
+                <UiAccordionContent>
+                  <UiList variant='bullet'>
+                    <UiListItem>Wind speed 12 km/h — within threshold</UiListItem>
+                    <UiListItem>Precipitation 0% — clear</UiListItem>
+                    <UiListItem>Visibility 18 km — acceptable</UiListItem>
+                    <UiListItem>Temperature 21°C — nominal</UiListItem>
+                  </UiList>
+                </UiAccordionContent>
+              </UiAccordionItem>
+              <UiAccordionItem value='crew'>
+                <UiAccordionTrigger>Crew status</UiAccordionTrigger>
+                <UiAccordionContent>
+                  <UiList variant='numbered'>
+                    <UiListItem>Lead operator certified and on-site</UiListItem>
+                    <UiListItem>Equipment pre-check complete</UiListItem>
+                    <UiListItem>Safety brief conducted</UiListItem>
+                    <UiListItem>Flight plan filed and acknowledged</UiListItem>
+                  </UiList>
+                </UiAccordionContent>
+              </UiAccordionItem>
+              <UiAccordionItem value='compliance'>
+                <UiAccordionTrigger>Compliance notes</UiAccordionTrigger>
+                <UiAccordionContent>
+                  <UiList variant='bullet'>
+                    <UiListItem>Buffer zones confirmed</UiListItem>
+                    <UiListItem>No restricted area conflicts detected</UiListItem>
+                    <UiListItem>Chemical application rate within permit limits</UiListItem>
+                  </UiList>
+                </UiAccordionContent>
+              </UiAccordionItem>
+            </UiAccordion>
           </SgSection>
 
-          <SgSection title='AppCard'>
-            <AppLayout variant='inline-wrap'>
-              <AppCard>
-                <AppLayout>
+          <SgSection title='UiCard'>
+            <UiLayout variant='inline-wrap'>
+              <UiCard>
+                <UiLayout>
                   <h3>Default card</h3>
                   <p>
                     Quiet interior surface — no variant. Used for form sections and guided workflow
                     sub-groups.
                   </p>
-                </AppLayout>
-              </AppCard>
-              <AppCard variant='widget'>
-                <AppLayout>
+                </UiLayout>
+              </UiCard>
+              <UiCard variant='widget'>
+                <UiLayout>
                   <h3>Widget card</h3>
                   <p>
                     Dashboard-ready surface with stripe treatment and crisp separation from the page.
                   </p>
-                </AppLayout>
-              </AppCard>
-              <AppCard variant='workflow'>
-                <AppLayout>
+                </UiLayout>
+              </UiCard>
+              <UiCard variant='workflow'>
+                <UiLayout>
                   <h3>Workflow card</h3>
                   <p>
                     Primary framed container for guided flows that need stronger focus and elevation.
                   </p>
-                </AppLayout>
-              </AppCard>
-            </AppLayout>
+                </UiLayout>
+              </UiCard>
+            </UiLayout>
           </SgSection>
 
-          <SgSection title='AppLayout'>
-            <AppLayout variant='inline-wrap'>
-              <AppFieldset legend='Stack (block, default)'>
-                <AppLayout>
-                  <AppAlert>North Field spray window confirmed.</AppAlert>
-                  <AppAlert variant='warning'>Wind speed approaching threshold.</AppAlert>
-                  <AppAlert variant='success'>Crew pre-check complete.</AppAlert>
-                </AppLayout>
-              </AppFieldset>
-              <AppFieldset legend='Stack (block-fit)'>
-                <AppLayout variant='block-fit'>
-                  <AppBadge>Pending</AppBadge>
-                  <AppBadge variant='success'>Field ready</AppBadge>
-                  <AppBadge variant='warning'>Wind watch</AppBadge>
-                </AppLayout>
-              </AppFieldset>
-            </AppLayout>
-            <AppFieldset legend='Row (inline)'>
-              <AppLayout variant='inline'>
-                <AppButton>Cancel</AppButton>
-                <AppButton variant='primary'>Confirm dispatch</AppButton>
-              </AppLayout>
-            </AppFieldset>
-            <AppFieldset legend='Row (inline-fill)'>
-              <AppLayout variant='inline-fill'>
-                <AppButton>Aerial</AppButton>
-                <AppButton>Ground</AppButton>
-                <AppButton>Inspection</AppButton>
-              </AppLayout>
-            </AppFieldset>
+          <SgSection title='UiLayout'>
+            <UiLayout variant='inline-wrap'>
+              <UiFieldset legend='Stack (block, default)'>
+                <UiLayout>
+                  <UiAlert>North Field spray window confirmed.</UiAlert>
+                  <UiAlert variant='warning'>Wind speed approaching threshold.</UiAlert>
+                  <UiAlert variant='success'>Crew pre-check complete.</UiAlert>
+                </UiLayout>
+              </UiFieldset>
+              <UiFieldset legend='Stack (block-fit)'>
+                <UiLayout variant='block-fit'>
+                  <UiBadge>Pending</UiBadge>
+                  <UiBadge variant='success'>Field ready</UiBadge>
+                  <UiBadge variant='warning'>Wind watch</UiBadge>
+                </UiLayout>
+              </UiFieldset>
+            </UiLayout>
+            <UiFieldset legend='Row (inline)'>
+              <UiLayout variant='inline'>
+                <UiButton>Cancel</UiButton>
+                <UiButton variant='primary'>Confirm dispatch</UiButton>
+              </UiLayout>
+            </UiFieldset>
+            <UiFieldset legend='Row (inline-fill)'>
+              <UiLayout variant='inline-fill'>
+                <UiButton>Aerial</UiButton>
+                <UiButton>Ground</UiButton>
+                <UiButton>Inspection</UiButton>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='Charts'>
-            {/* PARKING LOT: AppChart - pending chart primitive */}
-            <AppSkeleton />
+            {/* PARKING LOT: UiChart - pending chart primitive */}
+            <UiSkeleton />
           </SgSection>
-        </AppLayout>
+        </UiLayout>
       </SgMain>
 
       <SgFooter />

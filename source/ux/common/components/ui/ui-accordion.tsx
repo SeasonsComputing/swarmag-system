@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App accordion control                                                        ║
+║ Ui accordion control                                                        ║
 ║ Semantic wrapper for the Kobalte Accordion primitive.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,10 +10,10 @@ Emits accordion control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppAccordion         Accordion root with declared states.
-AppAccordionItem     Accordion item control for AppAccordion.
-AppAccordionTrigger  Accordion trigger control for AppAccordionItem.
-AppAccordionContent  Accordion content control for AppAccordionItem.
+UiAccordion         Accordion root with declared states.
+UiAccordionItem     Accordion item control for UiAccordion.
+UiAccordionTrigger  Accordion trigger control for UiAccordionItem.
+UiAccordionContent  Accordion content control for UiAccordionItem.
 */
 
 import {
@@ -23,15 +23,10 @@ import {
   type AccordionTriggerProps
 } from '@kobalte/core/accordion'
 import { type Component, splitProps } from '@solid-js'
-import {
-  type AppComponent,
-  type AppComponentProps,
-  controlState,
-  type WithDataUI
-} from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
 
 /** Accordion root props. */
-export type AppAccordionProps = AppComponentProps & {
+export type UiAccordionProps = UiComponentProps & {
   error?: boolean
   loading?: boolean
   multiple?: boolean
@@ -46,7 +41,7 @@ export type AppAccordionProps = AppComponentProps & {
 }
 
 /** Accordion item props. */
-export type AppAccordionItemProps = AppComponentProps & {
+export type UiAccordionItemProps = UiComponentProps & {
   value: string
   disabled?: boolean
   class?: never
@@ -56,7 +51,7 @@ export type AppAccordionItemProps = AppComponentProps & {
 }
 
 /** Accordion trigger props. */
-export type AppAccordionTriggerProps = AppComponentProps & {
+export type UiAccordionTriggerProps = UiComponentProps & {
   class?: never
   classList?: never
   style?: never
@@ -64,20 +59,20 @@ export type AppAccordionTriggerProps = AppComponentProps & {
 }
 
 /** Accordion content props. */
-export type AppAccordionContentProps = AppComponentProps & {
+export type UiAccordionContentProps = UiComponentProps & {
   class?: never
   classList?: never
   style?: never
   'data-ui'?: never
 }
 
-const AccordionRoot = Accordion as Component<WithDataUI<AccordionRootProps>>
+const AccordionRoot = Accordion as Component<WithDataUi<AccordionRootProps>>
 const AccordionItem = Accordion.Item as unknown as typeof Accordion.Item
-const AccordionTrigger = Accordion.Trigger as Component<WithDataUI<AccordionTriggerProps>>
-const AccordionContent = Accordion.Content as Component<WithDataUI<AccordionContentProps>>
+const AccordionTrigger = Accordion.Trigger as Component<WithDataUi<AccordionTriggerProps>>
+const AccordionContent = Accordion.Content as Component<WithDataUi<AccordionContentProps>>
 
 /** Accordion root with declared states. */
-export const AppAccordion = (props: AppAccordionProps): AppComponent => {
+export const UiAccordion = (props: UiAccordionProps): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'error',
@@ -101,8 +96,8 @@ export const AppAccordion = (props: AppAccordionProps): AppComponent => {
   )
 }
 
-/** Accordion item control for AppAccordion. */
-export const AppAccordionItem = (props: AppAccordionItemProps): AppComponent => {
+/** Accordion item control for UiAccordion. */
+export const UiAccordionItem = (props: UiAccordionItemProps): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'value',
@@ -115,8 +110,8 @@ export const AppAccordionItem = (props: AppAccordionItemProps): AppComponent => 
   )
 }
 
-/** Accordion trigger control for AppAccordionItem. */
-export const AppAccordionTrigger = (props: AppAccordionTriggerProps): AppComponent => {
+/** Accordion trigger control for UiAccordionItem. */
+export const UiAccordionTrigger = (props: UiAccordionTriggerProps): UiComponent => {
   const [local] = splitProps(props, ['children'])
   return (
     <Accordion.Header>
@@ -125,8 +120,8 @@ export const AppAccordionTrigger = (props: AppAccordionTriggerProps): AppCompone
   )
 }
 
-/** Accordion content control for AppAccordionItem. */
-export const AppAccordionContent = (props: AppAccordionContentProps): AppComponent => {
+/** Accordion content control for UiAccordionItem. */
+export const UiAccordionContent = (props: UiAccordionContentProps): UiComponent => {
   const [local] = splitProps(props, ['children'])
   return <AccordionContent data-ui='accordion-content'>{local.children}</AccordionContent>
 }

@@ -1,72 +1,71 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App text area control                                                        ║
-║ Semantic wrapper for the Kobalte TextField primitive.                        ║
+║ Ui button control                                                           ║
+║ Semantic wrapper for the Kobalte Button primitive.                           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits text area control semantics without styling concerns.
+Emits button control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppTextArea  Multiline input control with declared states.
+UiButton  Button control with declared variants and states.
 */
 
-import { TextField, type TextFieldTextAreaProps } from '@kobalte/core/text-field'
+import { Button } from '@kobalte/core/button'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Text area control props. */
-export type AppTextAreaProps =
+/** Button variants declared by the design language. */
+export type UiButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'
+
+/** Button control props. */
+export type UiButtonProps =
+  & UiComponentProps
   & Omit<
-    JSX.TextareaHTMLAttributes<HTMLTextAreaElement>,
+    JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+    | 'children'
     | 'class'
     | 'classList'
     | 'style'
     | 'data-ui'
+    | 'data-ui-variant'
     | 'data-ui-state'
   >
   & {
+    variant?: UiButtonVariant
     error?: boolean
     loading?: boolean
     class?: never
     classList?: never
     style?: never
     'data-ui'?: never
+    'data-ui-variant'?: never
     'data-ui-state'?: never
   }
 
-const TextFieldRoot = TextField as unknown as typeof TextField
-const TextFieldTextArea = TextField.TextArea as unknown as typeof TextField.TextArea
-
-/** Multiline input control with declared states. */
-export const AppTextArea = (props: AppTextAreaProps): AppComponent => {
+/** Button control with declared variants and states. */
+export const UiButton = (props: UiButtonProps): UiComponent => {
   const [local, others] = splitProps(props, [
+    'variant',
     'error',
     'loading',
     'disabled',
-    'id',
-    'name',
-    'rows',
-    'required',
-    'readOnly'
+    'class',
+    'classList',
+    'style',
+    'data-ui',
+    'data-ui-variant',
+    'data-ui-state'
   ])
   return (
-    <TextFieldRoot
-      name={local.name}
-      required={local.required}
+    <Button
+      {...others}
+      data-ui='button'
+      data-ui-variant={local.variant}
+      data-ui-state={controlState(local)}
       disabled={local.disabled || local.loading}
-      readOnly={local.readOnly}
-      validationState={local.error ? 'invalid' : undefined}
-    >
-      <TextFieldTextArea
-        id={local.id ?? local.name}
-        rows={local.rows}
-        {...others as unknown as TextFieldTextAreaProps}
-        data-ui='textarea'
-        data-ui-state={controlState(local) as string | undefined}
-      />
-    </TextFieldRoot>
+    />
   )
 }

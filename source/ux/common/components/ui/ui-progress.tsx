@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App progress control                                                         ║
+║ Ui progress control                                                         ║
 ║ Semantic wrapper for the Kobalte Progress primitive.                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,15 +10,15 @@ Emits progress control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppProgress  Progress control with declared states.
+UiProgress  Progress control with declared states.
 */
 
 import { Progress } from '@kobalte/core/progress'
 import { splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
 /** Progress control props. */
-export type AppProgressProps = AppComponentProps & {
+export type UiProgressProps = UiComponentProps & {
   label?: string
   value?: number
   minValue?: number
@@ -37,7 +37,7 @@ const ProgressTrack = Progress.Track as unknown as typeof Progress.Track
 const ProgressFill = Progress.Fill as unknown as typeof Progress.Fill
 
 /** Progress control with declared states. */
-export const AppProgress = (props: AppProgressProps): AppComponent => {
+export const UiProgress = (props: UiProgressProps): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'label',

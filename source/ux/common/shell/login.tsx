@@ -18,14 +18,7 @@ Login Passwordless OTP login component.
 
 import { createSignal, Show } from '@solid-js'
 import { api } from '@ux/api'
-import {
-  AppAlert,
-  AppButton,
-  AppField,
-  AppFormActions,
-  AppInput,
-  AppLayout
-} from '@ux/common/components/ui'
+import { UiAlert, UiButton, UiField, UiFormActions, UiInput, UiLayout } from '@ux/common/components/ui'
 
 import './login.css'
 import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
@@ -74,8 +67,8 @@ export const Login = () => {
       <div data-ui='login-form'>
         <Show when={step() === 'email'}>
           <p>Enter your email to receive a one-time sign-in code.</p>
-          <AppField for='email' label='Email'>
-            <AppInput
+          <UiField for='email' label='Email'>
+            <UiInput
               name='email'
               type='email'
               autocomplete='email'
@@ -85,24 +78,24 @@ export const Login = () => {
               disabled={pending()}
               required
             />
-          </AppField>
-          <AppLayout variant='inline-fill'>
-            <AppButton
+          </UiField>
+          <UiLayout variant='inline-fill'>
+            <UiButton
               type='button'
               variant='primary'
               loading={pending()}
               onClick={() => void submitEmail()}
             >
               Send Code
-            </AppButton>
-          </AppLayout>
+            </UiButton>
+          </UiLayout>
         </Show>
         <Show when={step() === 'code'}>
           <p>
             Enter the 6-digit code sent to <strong>{email()}</strong>.
           </p>
-          <AppField for='code' label='Code'>
-            <AppInput
+          <UiField for='code' label='Code'>
+            <UiInput
               name='code'
               type='text'
               inputMode='numeric'
@@ -113,23 +106,23 @@ export const Login = () => {
               disabled={pending()}
               required
             />
-          </AppField>
-          <AppFormActions>
-            <AppButton type='button' variant='ghost' onClick={() => setStep('email')}>
+          </UiField>
+          <UiFormActions>
+            <UiButton type='button' variant='ghost' onClick={() => setStep('email')}>
               Back
-            </AppButton>
-            <AppButton
+            </UiButton>
+            <UiButton
               type='button'
               variant='primary'
               loading={pending()}
               onClick={() => void submitCode()}
             >
               Sign In
-            </AppButton>
-          </AppFormActions>
+            </UiButton>
+          </UiFormActions>
         </Show>
         <Show when={!!error()}>
-          <AppAlert variant='danger'>{error()}</AppAlert>
+          <UiAlert variant='danger'>{error()}</UiAlert>
         </Show>
       </div>
     </div>

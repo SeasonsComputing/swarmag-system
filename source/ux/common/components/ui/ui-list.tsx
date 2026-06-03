@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App list control                                                             ║
+║ Ui list control                                                             ║
 ║ Semantic wrapper for HTML ul/ol/li primitives.                               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,19 +10,19 @@ Emits list semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppList      List with declared variant. Renders <ol> for numbered, <ul> otherwise.
-AppListItem  List item — child of AppList.
+UiList      List with declared variant. Renders <ol> for numbered, <ul> otherwise.
+UiListItem  List item — child of UiList.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps } from './ui-helpers.ts'
+import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
 /** List variant. Omit for a clean unstyled list. */
-export type AppListVariant = 'bullet' | 'numbered'
+export type UiListVariant = 'bullet' | 'numbered'
 
 /** List control props. */
-export type AppListProps =
-  & AppComponentProps
+export type UiListProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLUListElement | HTMLOListElement>,
     | 'children'
@@ -34,7 +34,7 @@ export type AppListProps =
   >
   & {
     name?: string
-    variant?: AppListVariant
+    variant?: UiListVariant
     class?: never
     classList?: never
     style?: never
@@ -43,8 +43,8 @@ export type AppListProps =
   }
 
 /** List item props. */
-export type AppListItemProps =
-  & AppComponentProps
+export type UiListItemProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLLIElement>,
     | 'children'
@@ -61,7 +61,7 @@ export type AppListItemProps =
   }
 
 /** List with declared variant. Renders <ol> for numbered, <ul> otherwise. */
-export const AppList = (props: AppListProps): AppComponent => {
+export const UiList = (props: UiListProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'id',
     'name',
@@ -91,8 +91,8 @@ export const AppList = (props: AppListProps): AppComponent => {
     )
 }
 
-/** List item — child of AppList. */
-export const AppListItem = (props: AppListItemProps): AppComponent => {
+/** List item — child of UiList. */
+export const UiListItem = (props: UiListItemProps): UiComponent => {
   const [, others] = splitProps(props, ['class', 'classList', 'style', 'data-ui'])
 
   return <li {...others} data-ui='list-item' />

@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App skeleton control                                                         ║
+║ Ui skeleton control                                                         ║
 ║ Semantic skeleton primitive.                                                 ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,15 +10,15 @@ Emits skeleton control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppSkeleton  Skeleton control with declared states.
+UiSkeleton  Skeleton control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
 /** Skeleton control props. */
-export type AppSkeletonProps =
-  & AppComponentProps
+export type UiSkeletonProps =
+  & UiComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
     | 'children'
@@ -40,7 +40,7 @@ export type AppSkeletonProps =
   }
 
 /** Skeleton control with declared states. */
-export const AppSkeleton = (props: AppSkeletonProps): AppComponent => {
+export const UiSkeleton = (props: UiSkeletonProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'error',
     'loading',

@@ -1,66 +1,74 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App toggle control                                                           ║
-║ Semantic wrapper for the Kobalte ToggleButton primitive.                     ║
+║ Ui alert control                                                            ║
+║ Semantic alert primitive.                                                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits toggle control semantics without styling concerns.
+Emits alert control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppToggle  Toggle control with declared states.
+UiAlert  Alert control with declared states.
 */
 
-import { ToggleButton } from '@kobalte/core/toggle-button'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Toggle control props. */
-export type AppToggleProps =
-  & AppComponentProps
+/** Alert variants declared by the design language. */
+export type UiAlertVariant = 'success' | 'warning' | 'danger' | 'info'
+
+/** Alert control props. */
+export type UiAlertProps =
+  & UiComponentProps
   & Omit<
-    JSX.ButtonHTMLAttributes<HTMLButtonElement>,
+    JSX.HTMLAttributes<HTMLDivElement>,
     | 'children'
     | 'class'
     | 'classList'
     | 'style'
+    | 'role'
     | 'data-ui'
+    | 'data-ui-variant'
     | 'data-ui-state'
   >
   & {
+    variant?: UiAlertVariant
     error?: boolean
     loading?: boolean
-    pressed?: boolean
-    defaultPressed?: boolean
-    onChange?: (pressed: boolean) => void
+    disabled?: boolean
     class?: never
     classList?: never
     style?: never
+    role?: never
     'data-ui'?: never
+    'data-ui-variant'?: never
     'data-ui-state'?: never
   }
 
-/** Toggle control with declared states. */
-export const AppToggle = (props: AppToggleProps): AppComponent => {
+/** Alert control with declared states. */
+export const UiAlert = (props: UiAlertProps): UiComponent => {
   const [local, others] = splitProps(props, [
+    'variant',
     'error',
     'loading',
     'disabled',
-    'pressed',
-    'defaultPressed',
-    'onChange'
+    'class',
+    'classList',
+    'style',
+    'role',
+    'data-ui',
+    'data-ui-variant',
+    'data-ui-state'
   ])
   return (
-    <ToggleButton
+    <div
       {...others}
-      data-ui='toggle'
+      role='alert'
+      data-ui='alert'
+      data-ui-variant={local.variant}
       data-ui-state={controlState(local)}
-      disabled={local.disabled || local.loading}
-      pressed={local.pressed}
-      defaultPressed={local.defaultPressed}
-      onChange={local.onChange}
     />
   )
 }

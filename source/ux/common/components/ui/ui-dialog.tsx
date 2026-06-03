@@ -1,27 +1,27 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App popover control                                                          ║
-║ Semantic wrapper for the Kobalte Popover primitive.                          ║
+║ Ui dialog control                                                           ║
+║ Semantic wrapper for the Kobalte Dialog primitive.                           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits popover control semantics without styling concerns.
+Emits dialog control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppPopover  Popover control with declared states.
+UiDialog  Dialog control with declared states.
 */
 
-import { Popover } from '@kobalte/core/popover'
+import { Dialog } from '@kobalte/core/dialog'
 import { splitProps } from '@solid-js'
-import { AppButton, type AppButtonVariant } from './app-button.tsx'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { UiButton, type UiButtonVariant } from './ui-button.tsx'
+import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Popover control props. */
-export type AppPopoverProps = AppComponentProps & {
-  trigger?: AppComponent
-  triggerVariant?: AppButtonVariant
+/** Dialog control props. */
+export type UiDialogProps = UiComponentProps & {
+  trigger?: UiComponent
+  triggerVariant?: UiButtonVariant
   open?: boolean
   defaultOpen?: boolean
   error?: boolean
@@ -35,8 +35,8 @@ export type AppPopoverProps = AppComponentProps & {
   'data-ui-state'?: never
 }
 
-/** Popover control with declared states. */
-export const AppPopover = (props: AppPopoverProps): AppComponent => {
+/** Dialog control with declared states. */
+export const UiDialog = (props: UiDialogProps): UiComponent => {
   const [local] = splitProps(props, [
     'children',
     'trigger',
@@ -49,19 +49,20 @@ export const AppPopover = (props: AppPopoverProps): AppComponent => {
     'onOpenChange'
   ])
   return (
-    <Popover open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
-      <Popover.Trigger
-        as={AppButton}
+    <Dialog open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
+      <Dialog.Trigger
+        as={UiButton}
         disabled={local.disabled || local.loading}
         variant={local.triggerVariant ?? 'secondary'}
       >
         {local.trigger}
-      </Popover.Trigger>
-      <Popover.Portal>
-        <Popover.Content data-ui='popover' data-ui-state={controlState(local)}>
+      </Dialog.Trigger>
+      <Dialog.Portal>
+        <Dialog.Overlay data-ui='dialog-overlay' />
+        <Dialog.Content data-ui='dialog' data-ui-state={controlState(local)}>
           {local.children}
-        </Popover.Content>
-      </Popover.Portal>
-    </Popover>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog>
   )
 }

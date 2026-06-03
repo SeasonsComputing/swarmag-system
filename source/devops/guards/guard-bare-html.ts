@@ -13,20 +13,20 @@ const BARE_HTML_REGEX =
 const COMMENT_LINE_REGEX = /^\s*\/\//
 
 const REPLACEMENTS: StringDictionary = {
-  'button': 'AppButton',
-  'input': 'AppInput',
-  'textarea': 'AppTextArea',
-  'select': 'AppSingleSelect',
-  'ul': 'AppList',
-  'ol': 'AppList',
-  'li': 'AppListItem',
-  'table': 'AppTable',
-  'thead': 'AppTableHeader',
-  'tbody': 'AppTableBody',
-  'tfoot': 'AppTableBody',
-  'tr': 'AppTableRow',
-  'td': 'AppTableCell',
-  'th': 'AppTableCell'
+  'button': 'UiButton',
+  'input': 'UiInput',
+  'textarea': 'UiTextArea',
+  'select': 'UiSingleSelect',
+  'ul': 'UiList',
+  'ol': 'UiList',
+  'li': 'UiListItem',
+  'table': 'UiTable',
+  'thead': 'UiTableHeader',
+  'tbody': 'UiTableBody',
+  'tfoot': 'UiTableBody',
+  'tr': 'UiTableRow',
+  'td': 'UiTableCell',
+  'th': 'UiTableCell'
 }
 
 const shouldSkip = (filePath: string): boolean => {

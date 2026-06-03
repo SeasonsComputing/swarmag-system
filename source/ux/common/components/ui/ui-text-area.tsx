@@ -1,74 +1,72 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ App alert control                                                            ║
-║ Semantic alert primitive.                                                    ║
+║ Ui text area control                                                        ║
+║ Semantic wrapper for the Kobalte TextField primitive.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Emits alert control semantics without styling concerns.
+Emits text area control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppAlert  Alert control with declared states.
+UiTextArea  Multiline input control with declared states.
 */
 
+import { TextField, type TextFieldTextAreaProps } from '@kobalte/core/text-field'
 import { type JSX, splitProps } from '@solid-js'
-import { type AppComponent, type AppComponentProps, controlState } from './ui-helpers.ts'
+import { controlState, type UiComponent } from './ui-helpers.ts'
 
-/** Alert variants declared by the design language. */
-export type AppAlertVariant = 'success' | 'warning' | 'danger' | 'info'
-
-/** Alert control props. */
-export type AppAlertProps =
-  & AppComponentProps
+/** Text area control props. */
+export type UiTextAreaProps =
   & Omit<
-    JSX.HTMLAttributes<HTMLDivElement>,
-    | 'children'
+    JSX.TextareaHTMLAttributes<HTMLTextAreaElement>,
     | 'class'
     | 'classList'
     | 'style'
-    | 'role'
     | 'data-ui'
-    | 'data-ui-variant'
     | 'data-ui-state'
   >
   & {
-    variant?: AppAlertVariant
     error?: boolean
     loading?: boolean
-    disabled?: boolean
     class?: never
     classList?: never
     style?: never
-    role?: never
     'data-ui'?: never
-    'data-ui-variant'?: never
     'data-ui-state'?: never
   }
 
-/** Alert control with declared states. */
-export const AppAlert = (props: AppAlertProps): AppComponent => {
+const TextFieldRoot = TextField as unknown as typeof TextField
+const TextFieldTextArea = TextField.TextArea as unknown as typeof TextField.TextArea
+
+/** Multiline input control with declared states. */
+export const UiTextArea = (props: UiTextAreaProps): UiComponent => {
   const [local, others] = splitProps(props, [
-    'variant',
     'error',
     'loading',
     'disabled',
-    'class',
-    'classList',
-    'style',
-    'role',
-    'data-ui',
-    'data-ui-variant',
-    'data-ui-state'
+    'id',
+    'name',
+    'rows',
+    'required',
+    'readOnly'
   ])
   return (
-    <div
-      {...others}
-      role='alert'
-      data-ui='alert'
-      data-ui-variant={local.variant}
-      data-ui-state={controlState(local)}
-    />
+    <TextFieldRoot
+      name={local.name}
+      required={local.required}
+      disabled={local.disabled || local.loading}
+      readOnly={local.readOnly}
+      validationState={local.error ? 'invalid' : undefined}
+    >
+      <TextFieldTextArea
+        id={local.id ?? local.name}
+        rows={local.rows}
+        {...others as unknown as TextFieldTextAreaProps}
+        data-ui='textarea'
+        data-ui-state={controlState(local) as string | undefined}
+      />
+    </TextFieldRoot>
   )
 }

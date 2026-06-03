@@ -102,7 +102,7 @@ Authentication and client makers are part of the core runtime and are sourced fr
 | Routing       | TanStack Solid-Router           |
 | Data Fetching | TanStack Query                  |
 | UI Primitives | Kobalte (accessible components) |
-| Charting      | Chart.js (via AppChart adapter) |
+| Charting      | Chart.js (via UiChart adapter)  |
 | Styling       | Vanilla CSS (no preprocessor)   |
 | Build         | Vite                            |
 | Runtime       | Modern browsers (ES2022+)       |
@@ -125,7 +125,7 @@ The system includes three SolidJS applications:
 | **Ops**      | Field execution                   | Operations crews |
 | **Customer** | Scheduling and status (read-only) | Customers        |
 
-All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Chart rendering is provided through `AppChart` (design-system primitive) with Chart.js as an implementation detail behind `ChartWidget`. Shared infrastructure lives in `source/ux/common/`.
+All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Chart rendering is provided through `UiChart` (design-system primitive) with Chart.js as an implementation detail behind `ChartWidget`. Shared infrastructure lives in `source/ux/common/`.
 
 ## 7. API Namespace Integration
 
@@ -516,7 +516,7 @@ common/
     ├── css/     — CSS barrel, tokens, themes, base styles, and control styles
     ├── fonts/   — self-hosted font assets
     ├── icons/   — shared icon assets
-    └── ui/      — HTML and Kobalte-backed App{Control} primitives
+    └── ui/      — HTML and Kobalte-backed Ui{Control} primitives
 ```
 
 #### 10.1.2 swarmAg application foundation
