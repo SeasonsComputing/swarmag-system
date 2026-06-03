@@ -23,7 +23,7 @@ import {
   type TabsRootProps,
   type TabsTriggerProps
 } from '@kobalte/core/tabs'
-import { type Component, onCleanup, onMount, splitProps } from '@solid-js'
+import { type Component, createSignal, onCleanup, onMount, splitProps } from '@solid-js'
 import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
 
 /** Tabs control props. */
@@ -77,6 +77,8 @@ const TabsList = Tabs.List as Component<WithDataUi<TabsListProps>>
 const TabsTrigger = Tabs.Trigger as Component<WithDataUi<TabsTriggerProps>>
 const TabsContent = Tabs.Content as Component<WithDataUi<TabsContentProps>>
 
+const TAB_DRAG_THRESHOLD_PX = 4
+
 /** Tabs control with declared states. */
 export const UiTabs = <Value extends string = string>(
   props: UiTabsProps<Value>
@@ -108,8 +110,123 @@ export const UiTabs = <Value extends string = string>(
 
 /** Tab list control for UiTabs. */
 export const UiTabList = (props: UiTabListProps): UiComponent => {
+  let tabListElement!: HTMLElement
+  const [hasOverflow, setHasOverflow] = createSignal(false)
+  const [isDragging, setIsDragging] = createSignal(false)
   const [local] = splitProps(props, ['children'])
-  return <TabsList data-ui='tab-list'>{local.children}</TabsList>
+  let dragStartX = 0
+  let dragStartScrollLeft = 0
+  let dragMoved = false
+  let targetTabElement: HTMLButtonElement | null = null
+  let replayingTabClick = false
+  let suppressNextClick = false
+  let clearSuppressionId: number | undefined
+
+  const updateOverflow = (): void => {
+    setHasOverflow(tabListElement.scrollWidth > tabListElement.clientWidth)
+  }
+
+  const findTargetTab = (event: Event): HTMLButtonElement | null => {
+    if (!(event.target instanceof Element)) return null
+    return event.target.closest('[data-ui=\'tab\']')
+  }
+
+  const clearClickSuppressionSoon = (): void => {
+    if (clearSuppressionId !== undefined) clearTimeout(clearSuppressionId)
+    clearSuppressionId = setTimeout(() => {
+      suppressNextClick = false
+      clearSuppressionId = undefined
+    })
+  }
+
+  const startDrag = (event: PointerEvent): void => {
+    if (!hasOverflow() || event.pointerType !== 'mouse') return
+    event.preventDefault()
+    event.stopPropagation()
+    dragStartX = event.clientX
+    dragStartScrollLeft = tabListElement.scrollLeft
+    dragMoved = false
+    suppressNextClick = true
+    targetTabElement = findTargetTab(event)
+    setIsDragging(true)
+    tabListElement.setPointerCapture(event.pointerId)
+  }
+
+  const dragTabs = (event: PointerEvent): void => {
+    if (!isDragging()) return
+    event.preventDefault()
+    event.stopPropagation()
+    const dragDistance = event.clientX - dragStartX
+    if (Math.abs(dragDistance) > TAB_DRAG_THRESHOLD_PX) dragMoved = true
+    tabListElement.scrollLeft = dragStartScrollLeft - dragDistance
+  }
+
+  const stopDrag = (event: PointerEvent): void => {
+    if (!isDragging()) return
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDragging(false)
+    tabListElement.releasePointerCapture(event.pointerId)
+    if (!dragMoved) {
+      replayingTabClick = true
+      targetTabElement?.click()
+      replayingTabClick = false
+    }
+    targetTabElement = null
+    dragMoved = false
+    clearClickSuppressionSoon()
+  }
+
+  const cancelDrag = (event: PointerEvent): void => {
+    if (!isDragging()) return
+    event.preventDefault()
+    event.stopPropagation()
+    setIsDragging(false)
+    tabListElement.releasePointerCapture(event.pointerId)
+    targetTabElement = null
+    dragMoved = false
+    clearClickSuppressionSoon()
+  }
+
+  const suppressCapturedTabClick = (event: MouseEvent): void => {
+    if (replayingTabClick || !suppressNextClick) return
+    event.preventDefault()
+    event.stopPropagation()
+    suppressNextClick = false
+    if (clearSuppressionId !== undefined) clearTimeout(clearSuppressionId)
+    clearSuppressionId = undefined
+  }
+
+  onMount(() => {
+    updateOverflow()
+    const observer = new ResizeObserver(updateOverflow)
+    observer.observe(tabListElement)
+    tabListElement.addEventListener('pointerdown', startDrag, true)
+    tabListElement.addEventListener('pointermove', dragTabs, true)
+    tabListElement.addEventListener('pointerup', stopDrag, true)
+    tabListElement.addEventListener('pointercancel', cancelDrag, true)
+    tabListElement.addEventListener('click', suppressCapturedTabClick, true)
+    onCleanup(() => {
+      observer.disconnect()
+      tabListElement.removeEventListener('pointerdown', startDrag, true)
+      tabListElement.removeEventListener('pointermove', dragTabs, true)
+      tabListElement.removeEventListener('pointerup', stopDrag, true)
+      tabListElement.removeEventListener('pointercancel', cancelDrag, true)
+      tabListElement.removeEventListener('click', suppressCapturedTabClick, true)
+      if (clearSuppressionId !== undefined) clearTimeout(clearSuppressionId)
+    })
+  })
+
+  return (
+    <TabsList
+      ref={tabListElement}
+      data-ui='tab-list'
+      data-ui-overflow={hasOverflow() ? 'scroll' : undefined}
+      data-ui-state={isDragging() ? 'dragging' : undefined}
+    >
+      {local.children}
+    </TabsList>
+  )
 }
 
 /** Tab trigger control for UiTabs. */
