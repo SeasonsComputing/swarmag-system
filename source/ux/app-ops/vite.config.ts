@@ -12,7 +12,10 @@ export default defineConfig({
       { find: /^@core\/std$/, replacement: resolve(root, 'source/core/std/std.ts') },
       { find: /^@core\/stdx$/, replacement: resolve(root, 'source/core/std/stdx.ts') },
       { find: /^@ux\/api$/, replacement: resolve(root, 'source/ux/api/api.ts') },
-      { find: /^@ux\/common\/components\/ui$/, replacement: resolve(root, 'source/ux/common/components/ui/ui.ts') },
+      {
+        find: /^@ux\/common\/components\/ui$/,
+        replacement: resolve(root, 'source/ux/common/components/ui/ui.ts')
+      },
       { find: /^@solid-js$/, replacement: 'solid-js' },
       { find: /^@solid-js\/jsx-runtime$/, replacement: 'solid-js/jsx-runtime' },
       { find: /^@solid-js\/store$/, replacement: 'solid-js/store' },

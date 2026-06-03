@@ -95,21 +95,24 @@ tokens and component tokens.
 
 | Primitive             | Value         |
 | --------------------- | ------------- |
-| `--sa-p-font-content` | Comfortaa     |
-| `--sa-p-font-label`   | Lexend        |
-| `--sa-p-font-mono`    | Cascadia Mono |
+| `--sa-p-font-content-heading` | Comfortaa     |
+| `--sa-p-font-content-body` | Comfortaa     |
+| `--sa-p-font-app-label`     | Lexend        |
+| `--sa-p-font-app-annotation`     | Lexend        |
+| `--sa-p-font-app-ui`     | Lexend        |
+| `--sa-p-font-info-data`    | Cascadia Mono |
 
 Role tokens provide semantic indirection. A role typeface is changed by changing
 one token value, not by changing consuming selectors.
 
 | Role token                    | Resolves to                | Intent                     |
 | ----------------------------- | -------------------------- | -------------------------- |
-| `--sa-heading-font-family`    | `var(--sa-p-font-content)` | Heading elements           |
-| `--sa-body-font-family`       | `var(--sa-p-font-content)` | Paragraph and body content |
-| `--sa-label-font-family`      | `var(--sa-p-font-label)`   | Labels                     |
-| `--sa-annotation-font-family` | `var(--sa-p-font-label)`   | Legends, table heads       |
-| `--sa-ui-font-family`         | `var(--sa-p-font-label)`   | Controls and data entry    |
-| `--sa-data-font-family`       | `var(--sa-p-font-mono)`    | Code and numeric fields    |
+| `--sa-heading-font-family`    | `var(--sa-p-font-content-heading)` | Heading elements           |
+| `--sa-body-font-family`       | `var(--sa-p-font-content-body)` | Paragraph and body content |
+| `--sa-label-font-family`      | `var(--sa-p-font-app-label)`     | Labels                     |
+| `--sa-annotation-font-family` | `var(--sa-p-font-app-annotation)`     | Legends, table heads       |
+| `--sa-ui-font-family`         | `var(--sa-p-font-app-ui)`     | Controls and data entry    |
+| `--sa-data-font-family`       | `var(--sa-p-font-info-data)`    | Code and numeric fields    |
 
 ### 2.5.2 Type Scale
 
