@@ -21,10 +21,10 @@ EQUIPMENT               Grouped equipment records for section-row table renderin
 
 export const COLOR_SWATCHES = [
   { label: 'primary', token: '--sa-color-primary', value: 'var(--sa-color-primary)' },
-  { label: 'success', token: '--sa-color-success', value: 'var(--sa-color-success)' },
-  { label: 'warning', token: '--sa-color-warning', value: 'var(--sa-color-warning)' },
-  { label: 'danger', token: '--sa-color-danger', value: 'var(--sa-color-danger)' },
-  { label: 'info', token: '--sa-color-info', value: 'var(--sa-color-info)' }
+  { label: 'success', token: '--sa-state-success', value: 'var(--sa-state-success)' },
+  { label: 'warning', token: '--sa-state-warning', value: 'var(--sa-state-warning)' },
+  { label: 'danger', token: '--sa-state-danger', value: 'var(--sa-state-danger)' },
+  { label: 'info', token: '--sa-state-info', value: 'var(--sa-state-info)' }
 ] as const
 
 export const BUTTON_VARIANTS = [

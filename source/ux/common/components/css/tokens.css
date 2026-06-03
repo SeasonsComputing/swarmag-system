@@ -95,13 +95,13 @@ Gradient roles:
   --sa-gradient-stripe
 
 State roles:
-  --sa-color-danger           --sa-color-info-bg         --sa-color-warning-bg
-  --sa-color-danger-bg        --sa-color-info-border     --sa-color-warning-border
-  --sa-color-danger-border    --sa-color-success
-  --sa-color-default          --sa-color-success-bg
-  --sa-color-default-bg       --sa-color-success-border
-  --sa-color-default-border   --sa-color-transparent
-  --sa-color-info             --sa-color-warning
+  --sa-state-danger           --sa-state-info-bg         --sa-state-warning-bg
+  --sa-state-danger-bg        --sa-state-info-border     --sa-state-warning-border
+  --sa-state-danger-border    --sa-state-success
+  --sa-state-default          --sa-state-success-bg
+  --sa-state-default-bg       --sa-state-success-border
+  --sa-state-default-border   
+  --sa-state-info             --sa-state-warning
 
 Base element roles:
   --sa-blockquote-border

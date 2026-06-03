@@ -65,12 +65,11 @@
   --sa-gradient-stripe: var(--sa-gradient-brand-90);
 
   /* State */
-  --sa-color-success: oklch(var(--sa-p-success));
-  --sa-color-warning: oklch(var(--sa-p-warning));
-  --sa-color-danger: oklch(var(--sa-p-danger));
-  --sa-color-danger-bg: oklch(var(--sa-p-danger) / 0.12);
-  --sa-color-info: oklch(var(--sa-p-info));
-  --sa-color-transparent: transparent;
+  --sa-state-success: oklch(var(--sa-p-success));
+  --sa-state-warning: oklch(var(--sa-p-warning));
+  --sa-state-danger: oklch(var(--sa-p-danger));
+  --sa-state-danger-bg: oklch(var(--sa-p-danger) / 0.12);
+  --sa-state-info: oklch(var(--sa-p-info));
 
   /* Focus / base element */
   --sa-blockquote-border: 3px solid var(--sa-color-accent);
@@ -260,16 +259,16 @@
   );
 
   /* State */
-  --sa-color-default: oklch(var(--sa-p-neutral-1));
-  --sa-color-default-bg: oklch(var(--sa-p-neutral-1) / 0.12);
-  --sa-color-default-border: oklch(var(--sa-p-neutral-1) / 0.3);
-  --sa-color-success-bg: oklch(var(--sa-p-success) / 0.12);
-  --sa-color-success-border: oklch(var(--sa-p-success) / 0.3);
-  --sa-color-warning-bg: oklch(var(--sa-p-warning) / 0.12);
-  --sa-color-warning-border: oklch(var(--sa-p-warning) / 0.3);
-  --sa-color-danger-border: oklch(var(--sa-p-danger) / 0.3);
-  --sa-color-info-bg: oklch(var(--sa-p-info) / 0.12);
-  --sa-color-info-border: oklch(var(--sa-p-info) / 0.3);
+  --sa-state-default: oklch(var(--sa-p-neutral-1));
+  --sa-state-default-bg: oklch(var(--sa-p-neutral-1) / 0.12);
+  --sa-state-default-border: oklch(var(--sa-p-neutral-1) / 0.3);
+  --sa-state-success-bg: oklch(var(--sa-p-success) / 0.12);
+  --sa-state-success-border: oklch(var(--sa-p-success) / 0.3);
+  --sa-state-warning-bg: oklch(var(--sa-p-warning) / 0.12);
+  --sa-state-warning-border: oklch(var(--sa-p-warning) / 0.3);
+  --sa-state-danger-border: oklch(var(--sa-p-danger) / 0.3);
+  --sa-state-info-bg: oklch(var(--sa-p-info) / 0.12);
+  --sa-state-info-border: oklch(var(--sa-p-info) / 0.3);
 
   /* Focus / base element */
   --sa-focus-ring: 0 0 0 2px oklch(var(--sa-p-base)), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
@@ -456,16 +455,16 @@
   );
 
   /* State */
-  --sa-color-default: oklch(32% 0.026 230);
-  --sa-color-default-bg: oklch(32% 0.026 230 / 0.08);
-  --sa-color-default-border: oklch(32% 0.026 230 / 0.22);
-  --sa-color-success-bg: oklch(var(--sa-p-success) / 0.16);
-  --sa-color-success-border: oklch(var(--sa-p-success) / 0.36);
-  --sa-color-warning-bg: oklch(var(--sa-p-warning) / 0.18);
-  --sa-color-warning-border: oklch(var(--sa-p-warning) / 0.38);
-  --sa-color-danger-border: oklch(var(--sa-p-danger) / 0.36);
-  --sa-color-info-bg: oklch(var(--sa-p-info) / 0.14);
-  --sa-color-info-border: oklch(var(--sa-p-info) / 0.34);
+  --sa-state-default: oklch(32% 0.026 230);
+  --sa-state-default-bg: oklch(32% 0.026 230 / 0.08);
+  --sa-state-default-border: oklch(32% 0.026 230 / 0.22);
+  --sa-state-success-bg: oklch(var(--sa-p-success) / 0.16);
+  --sa-state-success-border: oklch(var(--sa-p-success) / 0.36);
+  --sa-state-warning-bg: oklch(var(--sa-p-warning) / 0.18);
+  --sa-state-warning-border: oklch(var(--sa-p-warning) / 0.38);
+  --sa-state-danger-border: oklch(var(--sa-p-danger) / 0.36);
+  --sa-state-info-bg: oklch(var(--sa-p-info) / 0.14);
+  --sa-state-info-border: oklch(var(--sa-p-info) / 0.34);
 
   /* Focus / base element */
   --sa-focus-ring: 0 0 0 2px oklch(99.4% 0.006 98), 0 0 0 4px oklch(57% 0.13 186 / 0.42);
