@@ -424,41 +424,42 @@
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-[data-ui='list'] {
-  color: var(--sa-text-secondary);
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
+ [data-ui='list'] {
+   color: var(--sa-text-secondary);
+   list-style: none;
+   margin: 0;
+   padding: 0;
+ }
 
-[data-ui='list-item'] {
-  margin-block: var(--sa-space-xs);
-  padding-inline-start: var(--sa-list-item-pad);
-}
+ [data-ui='list-item'] {
+   margin-block: var(--sa-space-xs);
+   padding-inline-start: var(--sa-list-item-pad);
+ }
 
-[data-ui='list'][data-ui-variant='bullet'] {
-  list-style: disc;
-  padding-inline-start: var(--sa-space-sm);
-}
+ [data-ui='list'][data-ui-variant] {
+   padding-inline-start: var(--sa-list-indent);
+ }
 
-[data-ui='list'][data-ui-variant='bullet'] [data-ui='list-item'],
-[data-ui='list']:not([data-ui-variant='numbered']) [data-ui='list-item'] {
-  padding-inline-start: var(--sa-list-item-pad-bullet);
-}
+ [data-ui='list'][data-ui-variant='bullet'] {
+   list-style: disc;
+ }
 
-[data-ui='list'][data-ui-variant='bullet'] [data-ui='list-item']::marker {
-  color: var(--sa-color-brand-end);
-  font-size: var(--sa-list-marker-font-size);
-}
+ [data-ui='list'][data-ui-variant='bullet'] [data-ui='list-item'] {
+   padding-inline-start: var(--sa-list-item-pad-bullet);
+ }
 
-[data-ui='list'][data-ui-variant='numbered'] {
-  list-style: decimal;
-  padding-inline-start: var(--sa-space-md);
-}
+ [data-ui='list'][data-ui-variant='bullet'] [data-ui='list-item']::marker {
+   color: var(--sa-color-brand-end);
+   font-size: var(--sa-list-marker-font-size);
+ }
 
-[data-ui='list'][data-ui-variant='numbered'] [data-ui='list-item']::marker {
-  color: var(--sa-color-brand-start);
-}
+ [data-ui='list'][data-ui-variant='numbered'] {
+   list-style: decimal;
+ }
+
+ [data-ui='list'][data-ui-variant='numbered'] [data-ui='list-item']::marker {
+   color: var(--sa-color-brand-start);
+ }
 
 /*
  * CHECKBOX / RADIO
