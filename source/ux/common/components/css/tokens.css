@@ -100,7 +100,7 @@ State roles:
   --sa-state-danger-border    --sa-state-success
   --sa-state-default          --sa-state-success-bg
   --sa-state-default-bg       --sa-state-success-border
-  --sa-state-default-border   
+  --sa-state-default-border
   --sa-state-info             --sa-state-warning
 
 Base element roles:
@@ -253,7 +253,7 @@ Breakpoints match architecture-ux.md §7:
 
 @media (max-width: 768px) {
   :root {
-    --sa-gutter: var(--sa-space-lg);
+    --sa-gutter: var(--sa-space-xl);
     --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
     --sa-pad: var(--sa-space-md);
   }
