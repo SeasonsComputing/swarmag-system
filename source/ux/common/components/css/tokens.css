@@ -27,7 +27,9 @@ Each theme provides values for the semantic role-token inventory below. These
 names are defined by the foundation; values are supplied by theme blocks in
 themes.css.
 
-Brand roles:
+COLOR TOKENS
+───────────────────────────────────────────────────────────────────────────
+Brand colors:
   --sa-color-accent           --sa-p-brand-end
   --sa-color-brand-end        --sa-p-brand-mid
   --sa-color-brand-mid        --sa-p-brand-start
@@ -36,30 +38,7 @@ Brand roles:
   --sa-color-primary-dim
   --sa-color-secondary
 
-Background roles:
-  --sa-bg-backdrop            --sa-bg-popup
-  --sa-bg-base                --sa-bg-progress-track
-  --sa-bg-card                --sa-bg-selected
-  --sa-bg-control             --sa-bg-surface-1
-  --sa-bg-hover               --sa-bg-surface-2
-  --sa-bg-overlay             --sa-bg-surface-3
-  --sa-bg-page                --sa-bg-table
-
-Typography roles:
-  --sa-annotation-font-family --sa-data-font-size        --sa-heading-font-size-h2
-  --sa-annotation-font-size   --sa-data-font-weight      --sa-heading-font-size-h3
-  --sa-annotation-font-weight --sa-heading-font-size-h4
-  --sa-body-font-family       --sa-heading-font-size-h5
-  --sa-body-font-size         --sa-heading-font-weight
-  --sa-body-font-weight       --sa-heading-font-family   --sa-label-font-family
-  --sa-data-font-family       --sa-heading-font-size-h1  --sa-label-font-size
-  --sa-label-font-weight      --sa-ui-checkmark-weight
-  --sa-ui-font-family
-  --sa-ui-font-size
-  --sa-ui-font-size-compact
-  --sa-ui-font-weight
-
-Text roles:
+Forground colors:
   --sa-text-dim               --sa-text-h5               --sa-text-secondary
   --sa-text-disabled          --sa-text-label
   --sa-text-faint             --sa-text-muted
@@ -68,7 +47,34 @@ Text roles:
   --sa-text-h3                --sa-text-placeholder
   --sa-text-h4                --sa-text-primary
 
-Border roles:
+Background colors:
+  --sa-bg-backdrop            --sa-bg-popup
+  --sa-bg-base                --sa-bg-progress-track
+  --sa-bg-card                --sa-bg-selected
+  --sa-bg-control             --sa-bg-surface-1
+  --sa-bg-hover               --sa-bg-surface-2
+  --sa-bg-overlay             --sa-bg-surface-3
+  --sa-bg-page                --sa-bg-table
+
+FONT TOKENS
+───────────────────────────────────────────────────────────────────────────
+Typography roles:
+ Content:                    App:                         Info:
+  --sa-body-font-family       --sa-annotation-font-family  --sa-data-font-family
+  --sa-body-font-size         --sa-annotation-font-size    --sa-data-font-size
+  --sa-body-font-weight       --sa-annotation-font-weight  --sa-data-font-weight
+  --sa-body-line-height       --sa-label-font-family
+  --sa-heading-font-family    --sa-label-font-size
+  --sa-heading-font-size-h1   --sa-label-font-weight
+  --sa-heading-font-size-h2   --sa-ui-checkmark-weight
+  --sa-heading-font-size-h3   --sa-ui-font-family
+  --sa-heading-font-size-h4   --sa-ui-font-size
+  --sa-heading-font-size-h5   --sa-ui-font-size-compact
+  --sa-heading-font-weight    --sa-ui-font-weight
+
+DECORATIVE TOKENS
+───────────────────────────────────────────────────────────────────────────
+Border decorations:
   --sa-border-brand           --sa-border-subtle
   --sa-border-card            --sa-border-table
   --sa-border-default
@@ -77,7 +83,7 @@ Border roles:
   --sa-border-input-focus
   --sa-border-strong
 
-Shadow roles:
+Shadow decorations:
   --sa-shadow                 --sa-shadow-md
   --sa-shadow-btn             --sa-shadow-press
   --sa-shadow-card            --sa-shadow-sm
@@ -86,7 +92,7 @@ Shadow roles:
   --sa-shadow-kbd
   --sa-shadow-lg
 
-Gradient roles:
+Gradient decorations:
   --sa-gradient-brand
   --sa-gradient-brand-90
   --sa-gradient-btn
@@ -94,15 +100,16 @@ Gradient roles:
   --sa-gradient-hero
   --sa-gradient-stripe
 
+ROLE TOKENS
+───────────────────────────────────────────────────────────────────────────
 State roles:
-  --sa-state-danger           --sa-state-info-bg         --sa-state-warning-bg
-  --sa-state-danger-bg        --sa-state-info-border     --sa-state-warning-border
-  --sa-state-danger-border    --sa-state-success
-  --sa-state-default          --sa-state-success-bg
-  --sa-state-default-bg       --sa-state-success-border
-  --sa-state-default-border
-  --sa-state-info             --sa-state-warning
-
+  --sa-state-danger           --sa-state-info            --sa-state-warning
+  --sa-state-danger-bg        --sa-state-info-bg         --sa-state-warning-bg
+  --sa-state-danger-border    --sa-state-info-border     --sa-state-warning-border
+  --sa-state-default          --sa-state-success
+  --sa-state-default-bg       --sa-state-success-bg
+  --sa-state-default-border   --sa-state-success-border
+       
 Base element roles:
   --sa-blockquote-border
   --sa-focus-ring
@@ -122,10 +129,13 @@ Breakpoints match architecture-ux.md §7:
 */
 
 :root {
-  /* Font primitives — internal, consumed by role tokens only */
-  --sa-p-font-content: 'Comfortaa', ui-sans-serif, system-ui, sans-serif;
-  --sa-p-font-label: 'Lexend', ui-sans-serif, system-ui, sans-serif;
-  --sa-p-font-mono: 'Mono', ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
+  /* Font Family by Role */
+  --sa-p-font-content-heading: 'Comfortaa', ui-sans-serif, system-ui, sans-serif;
+  --sa-p-font-content-body: 'Comfortaa', ui-sans-serif, system-ui, sans-serif;
+  --sa-p-font-app-label: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --sa-p-font-app-ui: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --sa-p-font-app-annotation: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --sa-p-font-info-data: 'Mono', ui-monospace, 'Cascadia Code', 'SF Mono', monospace;
 
   /* Font Weights */
   --sa-p-font-weight-thin: 300;
@@ -150,7 +160,7 @@ Breakpoints match architecture-ux.md §7:
   --sa-base-size: var(--sa-p-font-size-base);
 
   /* Typography */
-  --sa-heading-font-family: var(--sa-p-font-content);
+  --sa-heading-font-family: var(--sa-p-font-content-heading);
   --sa-heading-font-size-h1: clamp(1.3rem, calc(1.0074rem + 1.1018vw), 1.7125rem);
   --sa-heading-font-size-h2: clamp(1.1875rem, calc(0.9658rem + 0.8347vw), 1.5rem);
   --sa-heading-font-size-h3: clamp(0.9875rem, calc(0.8456rem + 0.5342vw), 1.1875rem);
@@ -158,26 +168,26 @@ Breakpoints match architecture-ux.md §7:
   --sa-heading-font-size-h5: var(--sa-p-font-size-sm);
   --sa-heading-font-weight: var(--sa-p-font-weight-thin);
 
-  --sa-body-font-family: var(--sa-p-font-content);
+  --sa-body-font-family: var(--sa-p-font-content-body);
   --sa-body-font-weight: var(--sa-p-font-weight-thin);
   --sa-body-font-size: var(--sa-p-font-size-base);
   --sa-body-line-height: var(--sa-p-leading-normal);
 
-  --sa-label-font-family: var(--sa-p-font-label);
+  --sa-label-font-family: var(--sa-p-font-app-label);
   --sa-label-font-size: var(--sa-p-font-size-sm);
   --sa-label-font-weight: var(--sa-p-font-weight-thin);
 
-  --sa-ui-font-family: var(--sa-p-font-label);
+  --sa-ui-font-family: var(--sa-p-font-app-ui);
   --sa-ui-font-size: var(--sa-p-font-size-sm);
   --sa-ui-font-size-compact: var(--sa-p-font-size-xs);
   --sa-ui-font-weight: var(--sa-p-font-weight-thin);
   --sa-ui-checkmark-weight: var(--sa-p-font-weight-extrabold);
 
-  --sa-annotation-font-family: var(--sa-p-font-label);
+  --sa-annotation-font-family: var(--sa-p-font-app-annotation);
   --sa-annotation-font-size: var(--sa-p-font-size-sm);
   --sa-annotation-font-weight: var(--sa-p-font-weight-normal);
 
-  --sa-data-font-family: var(--sa-p-font-mono);
+  --sa-data-font-family: var(--sa-p-font-info-data);
   --sa-data-font-size: var(--sa-p-font-size-sm);
   --sa-data-font-weight: var(--sa-p-font-weight-thin);
 
