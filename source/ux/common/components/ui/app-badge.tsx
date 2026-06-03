@@ -24,7 +24,13 @@ export type AppBadgeProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLSpanElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'data-ui'
+    | 'data-ui-variant'
+    | 'data-ui-state'
   >
   & {
     variant?: AppBadgeVariant
@@ -35,6 +41,7 @@ export type AppBadgeProps =
     classList?: never
     style?: never
     'data-ui'?: never
+    'data-ui-variant'?: never
     'data-ui-state'?: never
   }
 
@@ -49,6 +56,7 @@ export const AppBadge = (props: AppBadgeProps): AppComponent => {
     'classList',
     'style',
     'data-ui',
+    'data-ui-variant',
     'data-ui-state'
   ])
 

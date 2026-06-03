@@ -24,7 +24,14 @@ export type AppAlertProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'role'
+    | 'data-ui'
+    | 'data-ui-variant'
+    | 'data-ui-state'
   >
   & {
     variant?: AppAlertVariant
@@ -34,7 +41,9 @@ export type AppAlertProps =
     class?: never
     classList?: never
     style?: never
+    role?: never
     'data-ui'?: never
+    'data-ui-variant'?: never
     'data-ui-state'?: never
   }
 
@@ -48,7 +57,9 @@ export const AppAlert = (props: AppAlertProps): AppComponent => {
     'class',
     'classList',
     'style',
+    'role',
     'data-ui',
+    'data-ui-variant',
     'data-ui-state'
   ])
 

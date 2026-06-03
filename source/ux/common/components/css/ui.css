@@ -111,11 +111,6 @@
 }
 
 [data-ui='textarea'] {
-  --sa-textarea-rows: 2;
-  height: max(
-    var(--sa-touch-target-sm),
-    calc(1em * var(--sa-body-line-height) * var(--sa-textarea-rows) + var(--sa-space-sm) * 2 + 2px)
-  );
   resize: vertical;
 }
 
@@ -1134,6 +1129,14 @@
 
 [data-ui='field'][data-ui-variant='inline'] {
   justify-items: start;
+}
+
+[data-ui='field'] > label,
+[data-ui='field'] > figcaption {
+  color: var(--sa-text-label);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
 }
 
 [data-ui='fieldset'] {

@@ -49,10 +49,6 @@ export const AppTextArea = (props: AppTextAreaProps): AppComponent => {
     'readOnly'
   ])
 
-  const rowStyle = (): JSX.CSSProperties => ({
-    '--sa-textarea-rows': `${local.rows ?? 2}`
-  } as JSX.CSSProperties)
-
   return (
     <TextFieldRoot
       name={local.name}
@@ -65,7 +61,6 @@ export const AppTextArea = (props: AppTextAreaProps): AppComponent => {
         id={local.id ?? local.name}
         rows={local.rows}
         {...others as unknown as TextFieldTextAreaProps}
-        style={rowStyle()}
         data-ui='textarea'
         data-ui-state={controlState(local) as string | undefined}
       />

@@ -21,7 +21,13 @@ export type AppSpinnerProps =
   & AppComponentProps
   & Omit<
     JSX.HTMLAttributes<HTMLDivElement>,
-    'children' | 'class' | 'classList' | 'style' | 'data-ui' | 'data-ui-state'
+    | 'children'
+    | 'class'
+    | 'classList'
+    | 'style'
+    | 'role'
+    | 'data-ui'
+    | 'data-ui-state'
   >
   & {
     error?: boolean
@@ -30,6 +36,7 @@ export type AppSpinnerProps =
     class?: never
     classList?: never
     style?: never
+    role?: never
     'data-ui'?: never
     'data-ui-state'?: never
   }
@@ -43,6 +50,7 @@ export const AppSpinner = (props: AppSpinnerProps): AppComponent => {
     'class',
     'classList',
     'style',
+    'role',
     'data-ui',
     'data-ui-state'
   ])
