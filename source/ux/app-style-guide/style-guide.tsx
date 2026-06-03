@@ -40,7 +40,7 @@ type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
 type ServiceArrival = 'morning' | 'afternoon' | 'night'
 type RadioValue = Services | ServiceStatus | ServiceArrival
 type ViewMode = 'map' | 'list' | 'grid'
-type Tab = 'assessment' | 'planning' | 'execution' | 'followup'
+type Tab = 'assessment' | 'planning' | 'crew' | 'chemicals' | 'execution' | 'reporting' | 'followup'
 
 /** Header with theme switching for validating controls across supported themes. */
 const SgHeader = (): UiComponent => {
@@ -557,15 +557,25 @@ export const StyleGuide = (): UiComponent => {
               <UiTabList>
                 <UiTab value='assessment'>Assessment</UiTab>
                 <UiTab value='planning'>Planning</UiTab>
+                <UiTab value='crew'>Crew Assignments</UiTab>
+                <UiTab value='chemicals'>Chemical Readiness</UiTab>
                 <UiTab value='execution'>Execution</UiTab>
+                <UiTab value='reporting'>Customer Reporting</UiTab>
                 <UiTab value='followup'>Followup</UiTab>
               </UiTabList>
               <UiTabPanel value='assessment'>Walk field edges and capture hazard notes.</UiTabPanel>
               <UiTabPanel value='planning'>
                 Assign crew, assets, chemicals, and service window.
               </UiTabPanel>
+              <UiTabPanel value='crew'>Confirm operator roles and crew availability.</UiTabPanel>
+              <UiTabPanel value='chemicals'>
+                Review inventory, labels, and restricted-use status.
+              </UiTabPanel>
               <UiTabPanel value='execution'>
                 Record work logs and answer workflow questions.
+              </UiTabPanel>
+              <UiTabPanel value='reporting'>
+                Assemble maps, photos, notes, and service summary.
               </UiTabPanel>
               <UiTabPanel value='followup'>
                 Prepare customer report and close service record.

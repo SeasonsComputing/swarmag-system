@@ -23,7 +23,7 @@ import {
   type TabsRootProps,
   type TabsTriggerProps
 } from '@kobalte/core/tabs'
-import { type Component, splitProps } from '@solid-js'
+import { type Component, onCleanup, onMount, splitProps } from '@solid-js'
 import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
 
 /** Tabs control props. */
@@ -116,14 +116,24 @@ export const UiTabList = (props: UiTabListProps): UiComponent => {
 export const UiTab = <Value extends string = string>(
   props: UiTabProps<Value>
 ): UiComponent => {
+  let tabElement!: HTMLButtonElement
   const [local] = splitProps(props, [
     'children',
     'value',
     'disabled'
   ])
-
+  onMount(() => {
+    scrollSelectedTabIntoView(tabElement)
+    const observer = new MutationObserver(() => scrollSelectedTabIntoView(tabElement))
+    observer.observe(tabElement, {
+      attributes: true,
+      attributeFilter: ['data-selected']
+    })
+    onCleanup(() => observer.disconnect())
+  })
   return (
     <TabsTrigger
+      ref={tabElement}
       data-ui='tab'
       value={local.value}
       disabled={local.disabled}
@@ -139,4 +149,14 @@ export const UiTabPanel = <Value extends string = string>(
 ): UiComponent => {
   const [local] = splitProps(props, ['children', 'value'])
   return <TabsContent data-ui='tab-panel' value={local.value}>{local.children}</TabsContent>
+}
+
+/** Scroll the selected tab trigger into view within its tab list. */
+const scrollSelectedTabIntoView = (tabElement: HTMLElement): void => {
+  if (!tabElement.hasAttribute('data-selected')) return
+  tabElement.scrollIntoView({
+    block: 'nearest',
+    inline: 'nearest',
+    behavior: 'smooth'
+  })
 }
