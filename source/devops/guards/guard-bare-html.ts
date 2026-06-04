@@ -9,7 +9,7 @@ const SKIP_DIRS = [
 ]
 
 const BARE_HTML_REGEX =
-  /<(button|input|textarea|select|ul|ol|li|table|thead|tbody|tfoot|tr|td|th)[\s/>]/g
+  /<(button|input|textarea|select|ul|ol|li|table|thead|tbody|tfoot|tr|td|th|fieldset|legend)[\s/>]/g
 const COMMENT_LINE_REGEX = /^\s*\/\//
 
 const REPLACEMENTS: StringDictionary = {
@@ -26,7 +26,9 @@ const REPLACEMENTS: StringDictionary = {
   'tfoot': 'UiTableBody',
   'tr': 'UiTableRow',
   'td': 'UiTableCell',
-  'th': 'UiTableCell'
+  'th': 'UiTableCell',
+  'fieldset': 'UiFieldset',
+  'legend': 'UiFieldset'
 }
 
 const shouldSkip = (filePath: string): boolean => {
