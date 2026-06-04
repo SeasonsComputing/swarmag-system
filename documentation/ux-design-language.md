@@ -78,57 +78,57 @@ surfaces without changing generic panels.
 
 **`source/ux/common/components/fonts`** — Fonts are self-hosted woff2 assets.
 
-| Font                       | File                           | Role                                                          |
-| -------------------------- | ------------------------------ | ------------------------------------------------------------- |
-| Comfortaa                  | Comfortaa-Regular.woff2        | Content — used for both headings and body paragraphs.         |
-| Lexend (variable, 100–900) | Lexend-VariableFont_wght.woff2 | App UI — labels, buttons, inputs, selects, nav, captions.     |
-| Mono (Cascadia Mono Light) | CascadiaMono-Light.woff2       | Info / Data — IDs, coordinates, numeric fields (weight 300).  |
+| Font                       | File                           | Role                                                         |
+| -------------------------- | ------------------------------ | ------------------------------------------------------------ |
+| Comfortaa                  | Comfortaa-Regular.woff2        | Content — used for both headings and body paragraphs.        |
+| Lexend (variable, 100–900) | Lexend-VariableFont_wght.woff2 | App UI — labels, buttons, inputs, selects, nav, captions.    |
+| Mono (Cascadia Mono Light) | CascadiaMono-Light.woff2       | Info / Data — IDs, coordinates, numeric fields (weight 300). |
 
 ### 2.5.1 Token Architecture
 
-Typography tokens are organized into three categories: **Content**, **App**, and **Info**. 
+Typography tokens are organized into three categories: **Content**, **App**, and **Info**.
 
-| Category | Primitive Token(s) | Role Token Prefix | Intent |
-| :--- | :--- | :--- | :--- |
-| **Content** | `--sa-p-font-content-*` | `--sa-heading-`, `--sa-body-` | Long-form reading and headings |
-| **App** | `--sa-p-font-app-*` | `--sa-label-`, `--sa-ui-`, `--sa-annotation-` | Interface chrome and controls |
-| **Info** | `--sa-p-font-info-*` | `--sa-data-` | Technical data and code |
+| Category    | Primitive Token(s)      | Role Token Prefix                             | Intent                         |
+| :---------- | :---------------------- | :-------------------------------------------- | :----------------------------- |
+| **Content** | `--sa-p-font-content-*` | `--sa-heading-`, `--sa-body-`                 | Long-form reading and headings |
+| **App**     | `--sa-p-font-app-*`     | `--sa-label-`, `--sa-ui-`, `--sa-annotation-` | Interface chrome and controls  |
+| **Info**    | `--sa-p-font-info-*`    | `--sa-data-`                                  | Technical data and code        |
 
 ### 2.5.2 Type Scale
 
 Font sizes are responsive role tokens. `tokens.css` uses `clamp()` for headings and viewport-based overrides for the `--sa-base-size` to ensure readability across devices.
 
-*   **Fluid Headings:** H1–H3 use fluid scaling via `clamp()`.
-*   **Breakpoint Logic:** 
-    *   **< 425px:** `--sa-body-font-size` and `--sa-heading-font-size-h4` drop to `sm` (0.875rem).
-    *   **< 380px:** The root `--sa-base-size` drops to `sm`, scaling the entire UI down.
+- **Fluid Headings:** H1–H3 use fluid scaling via `clamp()`.
+- **Breakpoint Logic:**
+  - **< 425px:** `--sa-body-font-size` and `--sa-heading-font-size-h4` drop to `sm` (0.875rem).
+  - **< 380px:** The root `--sa-base-size` drops to `sm`, scaling the entire UI down.
 
-| Role | Token(s) | Treatment |
-| :--- | :--- | :--- |
-| **Heading** | `--sa-heading-font-size-h1`–`h5` | Fluid (clamp) scale |
-| **Body** | `--sa-body-font-size` | Responsive base (16px desktop, 14px mobile) |
-| **UI** | `--sa-ui-font-size`, `-compact` | Fixed scale for interface density |
+| Role        | Token(s)                         | Treatment                                   |
+| :---------- | :------------------------------- | :------------------------------------------ |
+| **Heading** | `--sa-heading-font-size-h1`–`h5` | Fluid (clamp) scale                         |
+| **Body**    | `--sa-body-font-size`            | Responsive base (16px desktop, 14px mobile) |
+| **UI**      | `--sa-ui-font-size`, `-compact`  | Fixed scale for interface density           |
 
 ### 2.5.3 Typography Role Map
 
-| Role | Element(s) / Component | Family token | Size token | Weight token |
-| :--- | :--- | :--- | :--- | :--- |
-| **Heading** | `h1`–`h6`, `UiFieldset` Legend | `--sa-heading-font-family` | `--sa-heading-font-size-*` | `--sa-heading-font-weight` |
-| **Body** | `p`, `blockquote`, `UiList` | `--sa-body-font-family` | `--sa-body-font-size` | `--sa-body-font-weight` |
-| **Label** | `label`, `UiButton`, `UiCheckbox`, `UiTable` | `--sa-label-font-family` | `--sa-label-font-size` | `--sa-label-font-weight` |
-| **Annotation** | `figcaption`, `legend`, `UiSelect` items | `--sa-annotation-font-family` | `--sa-annotation-font-size` | `--sa-annotation-font-weight` |
-| **UI Control** | `input`, `textarea`, `UiSingleSelect` | `--sa-ui-font-family` | `--sa-ui-font-size` | `--sa-body-font-weight` |
-| **Compact UI** | `UiTab`, `UiBadge`, `UiAlert`, `UiAccordion` | `--sa-ui-font-family` | `--sa-ui-font-size-compact` | `--sa-ui-font-weight` |
-| **Data** | `code`, `pre`, `kbd`, `samp` | `--sa-data-font-family` | inherited | `--sa-data-font-weight` |
+| Role           | Element(s) / Component                       | Family token                  | Size token                  | Weight token                  |
+| :------------- | :------------------------------------------- | :---------------------------- | :-------------------------- | :---------------------------- |
+| **Heading**    | `h1`–`h6`, `UiFieldset` Legend               | `--sa-heading-font-family`    | `--sa-heading-font-size-*`  | `--sa-heading-font-weight`    |
+| **Body**       | `p`, `blockquote`, `UiList`                  | `--sa-body-font-family`       | `--sa-body-font-size`       | `--sa-body-font-weight`       |
+| **Label**      | `label`, `UiButton`, `UiCheckbox`, `UiTable` | `--sa-label-font-family`      | `--sa-label-font-size`      | `--sa-label-font-weight`      |
+| **Annotation** | `figcaption`, `legend`, `UiSelect` items     | `--sa-annotation-font-family` | `--sa-annotation-font-size` | `--sa-annotation-font-weight` |
+| **UI Control** | `input`, `textarea`, `UiSingleSelect`        | `--sa-ui-font-family`         | `--sa-ui-font-size`         | `--sa-body-font-weight`       |
+| **Compact UI** | `UiTab`, `UiBadge`, `UiAlert`, `UiAccordion` | `--sa-ui-font-family`         | `--sa-ui-font-size-compact` | `--sa-ui-font-weight`         |
+| **Data**       | `code`, `pre`, `kbd`, `samp`                 | `--sa-data-font-family`       | inherited                   | `--sa-data-font-weight`       |
 
 ### 2.5.4 Visual Semantics
 
-*   **Heading Colors:** H1 uses primary text; H2–H5 are tied to brand gradient colors (`--sa-text-h2`–`h5`) for content flow.
-*   **Labels:** Carry `color: var(--sa-text-label)` (resolves to muted) to remain subordinate to data.
-*   **Legends:** Standard `legend` uses primary text; however, `UiFieldset` legends are elevated to `var(--sa-text-h3)` for clearer section grouping.
-*   **Data Highlights:** Mono elements (`code`, `kbd`, etc.) use `color: var(--sa-color-accent)` to pop from body text.
-*   **Interactive Weights:** Most text uses weight `300` (thin); however, interactive elements use `500` (medium), primary buttons use `600` (semibold), and checkmarks use `800` (extrabold).
-*   **Blockquotes:** Styled in `base.css` with a left border (`--sa-blockquote-border`), italic style, and `--sa-text-secondary` color.
+- **Heading Colors:** H1 uses primary text; H2–H5 are tied to brand gradient colors (`--sa-text-h2`–`h5`) for content flow.
+- **Labels:** Carry `color: var(--sa-text-label)` (resolves to muted) to remain subordinate to data.
+- **Legends:** Standard `legend` uses primary text; however, `UiFieldset` legends are elevated to `var(--sa-text-h3)` for clearer section grouping.
+- **Data Highlights:** Mono elements (`code`, `kbd`, etc.) use `color: var(--sa-color-accent)` to pop from body text.
+- **Interactive Weights:** Most text uses weight `300` (thin); however, interactive elements use `500` (medium), primary buttons use `600` (semibold), and checkmarks use `800` (extrabold).
+- **Blockquotes:** Styled in `base.css` with a left border (`--sa-blockquote-border`), italic style, and `--sa-text-secondary` color.
 
 ### 2.6 Layout & Viewport
 
