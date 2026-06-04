@@ -506,38 +506,42 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiCheckbox'>
-            <UiLayout variant='inline'>
-              <UiCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
-                Label reviewed
-              </UiCheckbox>
-              <UiCheckbox checked={checkboxDrift()} onChange={setCheckboxDrift}>
-                Drift boundary verified
-              </UiCheckbox>
-              <UiCheckbox error checked={checkboxError()} onChange={setCheckboxError}>
-                Missing wind reading
-              </UiCheckbox>
-              <UiCheckbox disabled checked>Disabled complete</UiCheckbox>
-            </UiLayout>
+            <UiFieldset legend='Checkbox States'>
+              <UiLayout variant='inline'>
+                <UiCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
+                  Label reviewed
+                </UiCheckbox>
+                <UiCheckbox checked={checkboxDrift()} onChange={setCheckboxDrift}>
+                  Drift boundary verified
+                </UiCheckbox>
+                <UiCheckbox error checked={checkboxError()} onChange={setCheckboxError}>
+                  Missing wind reading
+                </UiCheckbox>
+                <UiCheckbox disabled checked>Disabled complete</UiCheckbox>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='UiRadioGroup / UiRadioItem'>
-            <UiLayout variant='inline-wrap'>
-              <UiRadioGroup value={radioValue()} onChange={setRadioValue}>
-                <UiRadioItem value='aerial'>Aerial application</UiRadioItem>
-                <UiRadioItem value='ground'>Ground machinery</UiRadioItem>
-                <UiRadioItem value='inspection'>Site inspection</UiRadioItem>
-              </UiRadioGroup>
-              <UiRadioGroup error defaultValue='blocked'>
-                <UiRadioItem value='ready'>Ready</UiRadioItem>
-                <UiRadioItem value='blocked'>Blocked</UiRadioItem>
-                <UiRadioItem value='review'>Needs review</UiRadioItem>
-              </UiRadioGroup>
-              <UiRadioGroup disabled defaultValue='night'>
-                <UiRadioItem value='morning'>Morning</UiRadioItem>
-                <UiRadioItem value='afternoon'>Afternoon</UiRadioItem>
-                <UiRadioItem value='night'>Night</UiRadioItem>
-              </UiRadioGroup>
-            </UiLayout>
+            <UiFieldset legend='Radio States'>
+              <UiLayout variant='inline-wrap'>
+                <UiRadioGroup value={radioValue()} onChange={setRadioValue}>
+                  <UiRadioItem value='aerial'>Aerial application</UiRadioItem>
+                  <UiRadioItem value='ground'>Ground machinery</UiRadioItem>
+                  <UiRadioItem value='inspection'>Site inspection</UiRadioItem>
+                </UiRadioGroup>
+                <UiRadioGroup error defaultValue='blocked'>
+                  <UiRadioItem value='ready'>Ready</UiRadioItem>
+                  <UiRadioItem value='blocked'>Blocked</UiRadioItem>
+                  <UiRadioItem value='review'>Needs review</UiRadioItem>
+                </UiRadioGroup>
+                <UiRadioGroup disabled defaultValue='night'>
+                  <UiRadioItem value='morning'>Morning</UiRadioItem>
+                  <UiRadioItem value='afternoon'>Afternoon</UiRadioItem>
+                  <UiRadioItem value='night'>Night</UiRadioItem>
+                </UiRadioGroup>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='UiToggle / UiToggleGroup / UiToggleItem'>
@@ -586,44 +590,52 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiProgress'>
-            <UiLayout>
-              <UiProgress value={0} />
-              <UiProgress value={35} />
-              <UiProgress value={68} />
-              <UiProgress value={100} />
-            </UiLayout>
+            <UiFieldset legend='Progress Indicators'>
+              <UiLayout>
+                <UiProgress value={0} />
+                <UiProgress value={35} />
+                <UiProgress value={68} />
+                <UiProgress value={100} />
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='UiSkeleton'>
-            <UiLayout>
-              <UiSkeleton />
-              <div class='sg-skeleton-75'>
+            <UiFieldset legend='Loading Indicators'>
+              <UiLayout>
                 <UiSkeleton />
-              </div>
-              <div class='sg-skeleton-50'>
-                <UiSkeleton />
-              </div>
-            </UiLayout>
+                <div class='sg-skeleton-75'>
+                  <UiSkeleton />
+                </div>
+                <div class='sg-skeleton-50'>
+                  <UiSkeleton />
+                </div>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='UiBadge'>
-            <UiLayout variant='inline'>
-              <UiBadge>Pending</UiBadge>
-              <UiBadge variant='success'>Field ready</UiBadge>
-              <UiBadge variant='warning'>Wind watch</UiBadge>
-              <UiBadge variant='danger'>Blocked</UiBadge>
-              <UiBadge variant='info'>Assessment</UiBadge>
-            </UiLayout>
+            <UiFieldset legend='Variants'>
+              <UiLayout variant='inline'>
+                <UiBadge>Pending</UiBadge>
+                <UiBadge variant='success'>Field ready</UiBadge>
+                <UiBadge variant='warning'>Wind watch</UiBadge>
+                <UiBadge variant='danger'>Blocked</UiBadge>
+                <UiBadge variant='info'>Assessment</UiBadge>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='UiAlert'>
-            <UiLayout>
-              <UiAlert>Service record updated by dispatch.</UiAlert>
-              <UiAlert variant='success'>North Field completed and ready for customer review.</UiAlert>
-              <UiAlert variant='warning'>Wind speed approaching service threshold.</UiAlert>
-              <UiAlert variant='danger'>Chemical label missing required re-entry interval.</UiAlert>
-              <UiAlert variant='info'>Crew assignment changed for the morning window.</UiAlert>
-            </UiLayout>
+            <UiFieldset legend='Variants'>
+              <UiLayout>
+                <UiAlert>Service record updated by dispatch.</UiAlert>
+                <UiAlert variant='success'>North Field completed and ready for customer review.</UiAlert>
+                <UiAlert variant='warning'>Wind speed approaching service threshold.</UiAlert>
+                <UiAlert variant='danger'>Chemical label missing required re-entry interval.</UiAlert>
+                <UiAlert variant='info'>Crew assignment changed for the morning window.</UiAlert>
+              </UiLayout>
+            </UiFieldset>
           </SgSection>
 
           <SgSection title='Secondary Windows'>
@@ -756,8 +768,9 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='Charts'>
-            {/* PARKING LOT: UiChart - pending chart primitive */}
-            <UiSkeleton />
+            <UiFieldset legend='UiChart (pending chart primitive)'>
+              <UiSkeleton />
+            </UiFieldset>
           </SgSection>
         </UiLayout>
       </SgMain>
