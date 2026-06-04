@@ -744,7 +744,7 @@ INSERT INTO users (
   '0195b5b0-3c09-79f0-8d7c-0a1b2c3d4e5f',
   '["administrator"]'::jsonb,
   'DevOps Admin',
-  'devops-admin@swarmag.com',
+  'tedvkremer@gmail.com',
   '+1-000-000-0000',
   NULL,
   'active',
