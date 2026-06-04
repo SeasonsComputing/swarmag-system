@@ -15,7 +15,7 @@
 [data-ui='login-hero'] {
   flex: 0 0 50dvh;
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   padding: var(--sa-space-xl);
 }
