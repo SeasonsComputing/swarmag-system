@@ -1175,14 +1175,19 @@
 
 [data-ui='fieldset'] {
   border: var(--sa-fieldset-border);
+  border-radius: var(--sa-radius-md);
   background: var(--sa-fieldset-bg);
   box-shadow: var(--sa-fieldset-shadow);
   display: grid;
   gap: var(--sa-gap);
+  padding: var(--sa-gap);
 }
 
 [data-ui='fieldset'] > legend {
   color: var(--sa-text-h3);
+  font-family: var(--sa-annotation-font-family);
+  font-size: var(--sa-annotation-font-size);
+  font-weight: var(--sa-annotation-font-weight);
 }
 
 [data-ui='form-actions'] {

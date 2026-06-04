@@ -23,6 +23,8 @@ tfoot     → UiTableBody
 tr        → UiTableRow
 td        → UiTableCell
 th        → UiTableCell
+fieldset  → UiFieldset
+legend    → UiFieldset
 */
 
 /*
@@ -213,7 +215,7 @@ blockquote {
 }
 
 /*
- * P / LABEL / LEGEND / FIELDSET
+ * P / LABEL / FIGURE / FIGCAPTION
  * ───────────────────────────────────────────────────────────────────────────
  */
 
@@ -228,24 +230,6 @@ label {
   font-size: var(--sa-label-font-size);
   font-weight: var(--sa-label-font-weight);
 }
-
-legend {
-  color: var(--sa-text-primary);
-  font-family: var(--sa-annotation-font-family);
-  font-size: var(--sa-annotation-font-size);
-  font-weight: var(--sa-annotation-font-weight);
-}
-
-fieldset {
-  border: var(--sa-border-default);
-  border-radius: var(--sa-radius-md);
-  padding: var(--sa-gap);
-}
-
-/*
- * FIGURE / FIGCAPTION
- * ───────────────────────────────────────────────────────────────────────────
- */
 
 figure {
   margin: 0;
