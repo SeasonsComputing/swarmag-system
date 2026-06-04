@@ -16,6 +16,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--sa-gap);
+  margin-inline: auto
 }
 
 .sg-header-contents > :first-child {
