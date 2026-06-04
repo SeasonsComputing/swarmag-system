@@ -60,7 +60,7 @@ export const Login = () => {
   }
 
   return (
-    <div data-ui='login' data-theme='light'>
+    <div data-ui='login'>
       <div data-ui='login-hero'>
         <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
       </div>

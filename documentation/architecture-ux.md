@@ -557,7 +557,8 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/api + ux/config
 - Three Vite configs, one per app
 - Three Netlify sites, one per app
 - `ux/common/` and `ux/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
-- App roots import shared CSS in this order: `tokens.css`, `base.css`, `ui.css`
+- `ux/config/` contains two files when packaged: `ux-config.ts` and the target env file
+- `bootstrap()` owns boot-time initializations — CSS barrel (`css.tsx`) and config (`ux-config.ts`). App roots (`app.tsx`) are minimal — `bootstrap(dashboardSeed)` call and app-specific route extensions only
 - Packaging, artifact format, and deployment workflow: see `architecture-devops.md §7`
 - No build artifacts are checked into the repository
 
