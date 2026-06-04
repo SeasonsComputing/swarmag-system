@@ -204,7 +204,7 @@
   --sa-border-strong: 1px solid oklch(var(--sa-p-neutral-1) / 0.25);
   --sa-border-brand: 1px solid var(--sa-color-brand-end);
   --sa-border-table: oklch(var(--sa-p-surface-3));
-  --sa-border-input: 1px solid oklch(var(--sa-p-surface-3));
+  --sa-border-input: var(--sa-border-default);
   --sa-border-input-focus: var(--sa-color-brand-end);
   --sa-border-card: 1px solid rgb(148 163 184 / 0.1);
 
