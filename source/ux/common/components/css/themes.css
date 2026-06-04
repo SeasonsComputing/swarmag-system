@@ -11,8 +11,7 @@
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-[data-theme='dark'],
-[data-theme='light'] {
+[data-theme] {
   /* Brand gradient — logo extracted */
   --sa-p-gradient-1-start: 54.3% 0.11 236.182;
   --sa-p-gradient-2-mid-start: 61.4% 0.107 210.2;
@@ -119,8 +118,10 @@
   --sa-table-bg-row-hover: var(--sa-bg-hover);
   --sa-table-border: var(--sa-border-table);
 
-  /* Field */
+  /* Fieldset */
   --sa-fieldset-bg: transparent;
+  --sa-fieldset-border: var(--sa-border-card);
+  --sa-fieldset-shadow: var(--sa-shadow-md);
 
   /* Progress */
   --sa-progress-height: 1rem;
@@ -336,10 +337,6 @@
   --sa-table-color-section: oklch(var(--sa-p-neutral-1));
   --sa-table-bg-row-even: oklch(var(--sa-p-surface-1));
   --sa-table-bg-row-odd: oklch(var(--sa-p-surface-2) / 0.6);
-
-  /* Field */
-  --sa-fieldset-border: var(--sa-shell-chrome-border);
-  --sa-fieldset-shadow: 0 12px 24px rgb(0 0 0 / 0.3);
 }
 
 /*
@@ -545,8 +542,4 @@
   --sa-table-color-section: oklch(24% 0.035 218);
   --sa-table-bg-row-even: oklch(99.2% 0.006 98);
   --sa-table-bg-row-odd: oklch(95.4% 0.016 112);
-
-  /* Field */
-  --sa-fieldset-border: var(--sa-border-card);
-  --sa-fieldset-shadow: var(--sa-shadow-md);
 }
