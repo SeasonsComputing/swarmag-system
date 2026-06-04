@@ -1,5 +1,5 @@
-const CACHE_NAME = 'swarmag-app-admin-shell-v1'
-const APP_SHELL = ['/', '/index.html', '/manifest.webmanifest', '/icon.png']
+const CACHE_NAME = 'swarmag-app-admin-shell-v2'
+const APP_SHELL = ['/manifest.webmanifest', '/icon.png']
 
 self.addEventListener('install', event => {
   event.waitUntil(

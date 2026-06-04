@@ -14,6 +14,16 @@ PUBLIC
 bootstrap() - Boots the application
 */
 
+// ────────────────────────────────────────────────────────────────────────────
+// 1. CONFIGURE APPLICATION (FAST FAILS)
+// ────────────────────────────────────────────────────────────────────────────
+
+import '@ux/config/ux-config.ts'
+
+// ────────────────────────────────────────────────────────────────────────────
+// 2. INSTALL COMMON SHELL
+// ────────────────────────────────────────────────────────────────────────────
+
 import { onCleanup, onMount } from '@solid-js'
 import { render } from '@solid-js/web'
 import {
@@ -30,13 +40,13 @@ import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
 
 // ────────────────────────────────────────────────────────────────────────────
-// LOOK & FEEL
+// 3. INSTALL LOOK & FEEL
 // ────────────────────────────────────────────────────────────────────────────
 
 import '@ux/common/components/css/css.tsx'
 
 // ────────────────────────────────────────────────────────────────────────────
-// ROUTES
+// 4. DEFINE ROUTES
 // ────────────────────────────────────────────────────────────────────────────
 
 const rootRoute = createRootRoute()
@@ -69,12 +79,13 @@ const routeTree = rootRoute.addChildren([indexRoute, loginRoute, dashboardRoute]
 const router = createRouter({ routeTree })
 
 // ────────────────────────────────────────────────────────────────────────────
-// APPLICATION ROOT
+// 5. BOOTSTRAP APPLICATION
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Standard application root; wires auth state and mounts the router. */
 const Application = () => {
   onMount(() => {
+    document.body.style.opacity = '1'
     const unsubscribe = api.Auth.onAuthStateChange(async session => {
       if (session) {
         api.SessionState.setAuth(session.userId)
@@ -89,7 +100,6 @@ const Application = () => {
     })
     onCleanup(unsubscribe)
   })
-
   return <RouterProvider router={router} />
 }
 
@@ -101,8 +111,14 @@ function registerServiceWorker() {
 
 /** Initialize app state before mounting the application */
 export async function bootstrap(dashboardSeed: unknown) {
-  await api.AppState.init()
-  await api.DashboardState.init(dashboardSeed)
-  render(() => <Application />, document.getElementById('root')!)
-  registerServiceWorker()
+  try {
+    await api.AppState.init()
+    await api.DashboardState.init(dashboardSeed)
+    render(() => <Application />, document.getElementById('root')!)
+    registerServiceWorker()
+  } catch (e) {
+    document.body.style.opacity = '1'
+    console.error('[bootstrap] startup failed', e)
+    throw e
+  }
 }
