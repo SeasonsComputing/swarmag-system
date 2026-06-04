@@ -73,14 +73,14 @@ const auditTokensCSS = (
       continue
     }
 
-    if (!allowThemeSelectors && selector.startsWith('[data-theme=')) {
+    if (!allowThemeSelectors && (selector === '[data-theme]' || selector.startsWith('[data-theme='))) {
       violations.push(
         `${filePath}:${lineNumber} — forbidden theme selector — found: ${selector}`
       )
       continue
     }
 
-    if (selector !== ':root' && !selector.startsWith('[data-theme=')) {
+    if (selector !== ':root' && selector !== '[data-theme]' && !selector.startsWith('[data-theme=')) {
       violations.push(
         `${filePath}:${lineNumber} — forbidden selector — found: ${selector}`
       )
