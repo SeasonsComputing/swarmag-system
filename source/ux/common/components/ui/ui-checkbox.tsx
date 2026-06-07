@@ -37,6 +37,7 @@ export type UiCheckboxProps = UiComponentProps & {
 
 /** Checkbox control with declared states. */
 export const UiCheckbox = (props: UiCheckboxProps): UiComponent => {
+  let checkboxInputElement!: HTMLInputElement
   const [local] = splitProps(props, [
     'children',
     'checked',
@@ -60,9 +61,10 @@ export const UiCheckbox = (props: UiCheckboxProps): UiComponent => {
       required={local.required}
       value={local.value}
       onChange={local.onChange}
+      onClick={() => checkboxInputElement.focus()}
       validationState={local.error ? 'invalid' : undefined}
     >
-      <Checkbox.Input />
+      <Checkbox.Input ref={checkboxInputElement} />
       <Checkbox.Control>
         <Checkbox.Indicator />
       </Checkbox.Control>

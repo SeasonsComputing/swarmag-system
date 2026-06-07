@@ -100,6 +100,7 @@ export const UiToggleGroup = <Value extends string = string>(
 export const UiToggleItem = <Value extends string = string>(
   props: UiToggleItemProps<Value>
 ): UiComponent => {
+  let toggleItemElement!: HTMLButtonElement
   const [local] = splitProps(props, [
     'children',
     'value',
@@ -108,9 +109,11 @@ export const UiToggleItem = <Value extends string = string>(
 
   return (
     <ToggleGroupItem
+      ref={toggleItemElement}
       data-ui='toggle-item'
       value={local.value}
       disabled={local.disabled}
+      onClick={() => toggleItemElement.focus()}
     >
       {local.children}
     </ToggleGroupItem>

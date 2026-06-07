@@ -39,7 +39,6 @@
   --sa-p-surface-3: 27.4% 0.014 264.5; /* #33364a page chrome */
   --sa-p-surface-2: 24.6% 0.016 264.5; /* #2c2f3e sidebars */
   --sa-p-surface-1: 22.1% 0.01 277.4; /* #29282f cards */
-  --sa-p-base: 13.2% 0.012 264.5; /* #15181e */
   --sa-p-black: 7.8% 0 0; /* #0a0a0a */
 
   /* State primitives */
@@ -55,7 +54,7 @@
 
   /* Text */
   --sa-text-on-brand: oklch(var(--sa-p-white));
-  --sa-text-label: var(--sa-text-muted);
+  --sa-text-label: var(--sa-text-secondary);
 
   /* Border */
   --sa-border-input-error: oklch(var(--sa-p-danger));
@@ -111,10 +110,6 @@
   --sa-card-workflow-pad: var(--sa-pad);
 
   /* Table */
-  --sa-table-padding-cell: 0.375rem;
-  --sa-table-padding-cell-head: 0.5rem;
-  --sa-table-padding-cell-section: 0.625rem;
-  --sa-table-padding-cell-data: 0.75rem;
   --sa-table-bg-row-hover: var(--sa-bg-hover);
   --sa-table-border: var(--sa-border-table);
 
@@ -155,17 +150,12 @@
 
 [data-theme='dark'] {
   /* Brand */
-  --sa-color-brand-start: oklch(var(--sa-p-brand-start));
-  --sa-color-brand-mid: oklch(var(--sa-p-brand-mid));
-  --sa-color-brand-end: oklch(var(--sa-p-brand-end));
-  --sa-color-primary: var(--sa-color-brand-end);
-  --sa-color-primary-dim: var(--sa-color-brand-mid);
-  --sa-color-secondary: var(--sa-color-brand-start);
-  --sa-color-accent: oklch(var(--sa-p-gradient-3-mid));
+  --sa-color-primary: oklch(var(--sa-p-brand-end));
+  --sa-color-secondary: oklch(var(--sa-p-brand-start));
+  --sa-color-accent: oklch(var(--sa-p-brand-mid));
 
   /* Background */
   --sa-bg-page: rgb(21 24 30 / 0.95);
-  --sa-bg-base: oklch(var(--sa-p-black) / 0.78);
   --sa-bg-surface-1: oklch(21% 0.018 252 / 0.88);
   --sa-bg-surface-2: oklch(28% 0.018 252 / 0.78);
   --sa-bg-surface-3: oklch(25% 0.02 248 / 0.7);
@@ -185,10 +175,8 @@
 
   /* Text */
   --sa-text-primary: oklch(var(--sa-p-neutral-1));
-  --sa-text-secondary: oklch(var(--sa-p-neutral-2));
-  --sa-text-muted: oklch(var(--sa-p-neutral-3));
-  --sa-text-faint: oklch(var(--sa-p-neutral-4));
-  --sa-text-dim: oklch(var(--sa-p-neutral-5));
+  --sa-text-secondary: oklch(var(--sa-p-neutral-3));
+  --sa-text-dim: oklch(var(--sa-p-neutral-4));
   --sa-text-on-surface: oklch(var(--sa-p-neutral-1));
   --sa-text-disabled: oklch(var(--sa-p-neutral-4));
   --sa-text-placeholder: oklch(var(--sa-p-neutral-5));
@@ -202,10 +190,10 @@
   --sa-border-subtle: 1px solid oklch(var(--sa-p-neutral-1) / 0.05);
   --sa-border-default: 1px solid oklch(var(--sa-p-neutral-1) / 0.1);
   --sa-border-strong: 1px solid oklch(var(--sa-p-neutral-1) / 0.25);
-  --sa-border-brand: 1px solid var(--sa-color-brand-end);
+  --sa-border-brand: 1px solid var(--sa-color-primary);
   --sa-border-table: oklch(var(--sa-p-surface-3));
   --sa-border-input: var(--sa-border-default);
-  --sa-border-input-focus: var(--sa-color-brand-end);
+  --sa-border-input-focus: var(--sa-color-primary);
   --sa-border-card: 1px solid rgb(148 163 184 / 0.1);
 
   /* Shadow */
@@ -241,10 +229,10 @@
   );
   --sa-gradient-btn: linear-gradient(
     135deg,
-    var(--sa-color-brand-start) 0%,
+    var(--sa-color-secondary) 0%,
     oklch(58% 0.12 190) 28%,
-    var(--sa-color-brand-mid) 58%,
-    var(--sa-color-brand-end) 100%
+    var(--sa-color-accent) 58%,
+    var(--sa-color-primary) 100%
   );
   --sa-gradient-card: linear-gradient(
     135deg,
@@ -272,19 +260,19 @@
   --sa-state-info-border: oklch(var(--sa-p-info) / 0.3);
 
   /* Focus / base element */
-  --sa-focus-ring: 0 0 0 2px oklch(var(--sa-p-base)), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
+  --sa-focus-ring: 0 0 0 2px oklch(13.2% 0.012 264.5), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
 
   /* Shell chrome */
   --sa-shell-chrome-bg: oklch(17% 0.008 244 / 0.7);
   --sa-shell-chrome-border: var(--sa-border-card);
   --sa-shell-chrome-filter: var(--sa-blur);
-  --sa-shell-chrome-muted: var(--sa-text-muted);
   --sa-shell-chrome-shadow: var(--sa-shadow-sm);
   --sa-shell-chrome-text: var(--sa-text-h1);
+  --sa-shell-chrome-secondary: var(--sa-text-secondary);
 
   /* Button */
-  --sa-button-bg-primary: var(--sa-color-brand-end);
-  --sa-button-color-primary: var(--sa-bg-base);
+  --sa-button-bg-primary: var(--sa-color-primary);
+  --sa-button-color-primary: var(--sa-shell-chrome-bg);
   --sa-button-bg-primary-hover: oklch(80% 0.13 185);
 
   /* Input */
@@ -347,17 +335,12 @@
 
 [data-theme='light'] {
   /* Brand */
-  --sa-color-brand-start: oklch(47% 0.118 232);
-  --sa-color-brand-mid: oklch(57% 0.122 196);
-  --sa-color-brand-end: oklch(63% 0.12 160);
-  --sa-color-primary: oklch(43% 0.115 222);
-  --sa-color-primary-dim: oklch(56% 0.095 196);
-  --sa-color-secondary: oklch(54% 0.13 151);
+  --sa-color-primary: oklch(47% 0.118 232);
+  --sa-color-secondary: oklch(63% 0.12 160);
   --sa-color-accent: oklch(72% 0.13 86);
 
   /* Background */
   --sa-bg-page: oklch(96.8% 0.018 101);
-  --sa-bg-base: oklch(94.5% 0.016 102);
   --sa-bg-surface-1: oklch(99.4% 0.006 98);
   --sa-bg-surface-2: oklch(96.2% 0.014 104);
   --sa-bg-surface-3: oklch(91.8% 0.018 112);
@@ -377,9 +360,7 @@
 
   /* Text */
   --sa-text-primary: oklch(22% 0.026 238);
-  --sa-text-secondary: oklch(34% 0.028 226);
-  --sa-text-muted: oklch(49% 0.026 220);
-  --sa-text-faint: oklch(64% 0.02 210);
+  --sa-text-secondary: oklch(15% 0.018 236 / 0.6);
   --sa-text-dim: oklch(79% 0.014 120);
   --sa-text-on-surface: oklch(22% 0.026 238);
   --sa-text-disabled: oklch(70% 0.014 120);
@@ -470,9 +451,9 @@
   --sa-shell-chrome-bg: oklch(27% 0.045 224);
   --sa-shell-chrome-border: 1px solid oklch(18% 0.035 228 / 0.72);
   --sa-shell-chrome-filter: none;
-  --sa-shell-chrome-muted: oklch(83% 0.026 112);
   --sa-shell-chrome-shadow: 0 12px 28px oklch(20% 0.04 230 / 0.18);
   --sa-shell-chrome-text: oklch(98% 0.006 98);
+  --sa-shell-chrome-secondary: oklch(83% 0.026 112);
 
   /* Button */
   --sa-button-bg-primary: var(--sa-color-primary);

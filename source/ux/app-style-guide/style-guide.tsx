@@ -30,7 +30,8 @@ import {
   DEFAULT_SERVICES,
   EQUIPMENT,
   SERVICES,
-  STATUSES
+  STATUSES,
+  TEXT_TOKENS
 } from './style-guide-fixtures.ts'
 
 /** Style-guide specimen enumerations */
@@ -40,7 +41,8 @@ type ServiceStatus = 'inspection' | 'ready' | 'blocked' | 'review'
 type ServiceArrival = 'morning' | 'afternoon' | 'night'
 type RadioValue = Services | ServiceStatus | ServiceArrival
 type ViewMode = 'map' | 'list' | 'grid'
-type Tab = 'assessment' | 'planning' | 'crew' | 'chemicals' | 'execution' | 'reporting' | 'followup'
+type Tab = 'assessment' | 'planning' | 'crew'
+type TabScroll = Tab | 'chemicals' | 'execution' | 'reporting' | 'followup'
 
 /** Header with theme switching for validating controls across supported themes. */
 const SgHeader = (): UiComponent => {
@@ -122,6 +124,7 @@ export const StyleGuide = (): UiComponent => {
   const [togglePressed, setTogglePressed] = createSignal(true)
   const [viewMode, setViewMode] = createSignal<ViewMode>('map')
   const [tab, setTab] = createSignal<Tab>('assessment')
+  const [tabScroll, setTabScroll] = createSignal<TabScroll>('assessment')
 
   return (
     <>
@@ -325,14 +328,20 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='Color'>
-            <UiFieldset legend='Swatches'>
-              <UiLayout variant='inline-fill'>
-                <For each={COLOR_SWATCHES}>
-                  {s => <SgSwatch value={s.value} label={s.label} token={s.token} />}
-                </For>
-              </UiLayout>
-            </UiFieldset>
-            <UiFieldset legend='Gradient'>
+            <UiLayout variant='inline-wrap'>
+              <For each={COLOR_SWATCHES}>
+                {s => (
+                  <UiFieldset legend={s.legend}>
+                    <UiLayout variant='inline-fill'>
+                      <For each={s.colors}>
+                        {c => <SgSwatch value={c.value} label={c.label} token={c.token} />}
+                      </For>
+                    </UiLayout>
+                  </UiFieldset>
+                )}
+              </For>
+            </UiLayout>
+            <UiFieldset legend='Gradient/Brand'>
               <figure>
                 <div class='sg-gradient-block' />
                 <figcaption>
@@ -341,6 +350,13 @@ export const StyleGuide = (): UiComponent => {
                   <span>end</span>
                 </figcaption>
               </figure>
+            </UiFieldset>
+            <UiFieldset legend='Text'>
+              <UiLayout variant='inline-wrap'>
+                <For each={TEXT_TOKENS}>
+                  {t => (<span style={{ color: `var(${t})` }}>{t}</span>)}
+                </For>
+              </UiLayout>
             </UiFieldset>
           </SgSection>
 
@@ -564,6 +580,18 @@ export const StyleGuide = (): UiComponent => {
                 <UiTab value='assessment'>Assessment</UiTab>
                 <UiTab value='planning'>Planning</UiTab>
                 <UiTab value='crew'>Crew Assignments</UiTab>
+              </UiTabList>
+              <UiTabPanel value='assessment'>Walk field edges and capture hazard notes.</UiTabPanel>
+              <UiTabPanel value='planning'>
+                Assign crew, assets, chemicals, and service window.
+              </UiTabPanel>
+              <UiTabPanel value='crew'>Confirm operator roles and crew availability.</UiTabPanel>
+            </UiTabs>
+            <UiTabs value={tabScroll()} onChange={setTabScroll} activationMode='automatic'>
+              <UiTabList>
+                <UiTab value='assessment'>Assessment</UiTab>
+                <UiTab value='planning'>Planning</UiTab>
+                <UiTab value='crew'>Crew Assignments</UiTab>
                 <UiTab value='chemicals'>Chemical Readiness</UiTab>
                 <UiTab value='execution'>Execution</UiTab>
                 <UiTab value='reporting'>Customer Reporting</UiTab>
@@ -767,9 +795,20 @@ export const StyleGuide = (): UiComponent => {
             </UiFieldset>
           </SgSection>
 
-          <SgSection title='Charts'>
-            <UiFieldset legend='UiChart (pending chart primitive)'>
-              <UiSkeleton />
+          <SgSection title='UiChart'>
+            <UiFieldset legend='Variants'>
+              <UiField label='pie' variant='caption'>
+                <UiSkeleton />
+              </UiField>
+              <UiField label='bar' variant='caption'>
+                <UiSkeleton />
+              </UiField>
+              <UiField label='line' variant='caption'>
+                <UiSkeleton />
+              </UiField>
+              <UiField label='spark-line' variant='caption'>
+                <UiSkeleton />
+              </UiField>
             </UiFieldset>
           </SgSection>
         </UiLayout>

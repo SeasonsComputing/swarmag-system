@@ -21,6 +21,25 @@ Components must not reference primitives directly. Themes resolve primitives
 into semantic role tokens, and controls consume component tokens derived from
 those roles.
 
+PRIMITIVE TOKEN INVENTORY
+───────────────────────────────────────────────────────────────────────────────
+Color primitives:             Gradient primitives:
+--sa-p-brand-start            --sa-p-gradient-1-start
+--sa-p-brand-mid
+--sa-p-brand-end
+
+Font primitives:
+Family                        Weight                         Size
+--sa-p-font-content-heading   --sa-p-font-weight-thin        --sa-p-font-size-xs
+--sa-p-font-content-body      --sa-p-font-weight-normal      --sa-p-font-size-sm
+--sa-p-font-app-label         --sa-p-font-weight-medium      --sa-p-font-size-base
+--sa-p-font-app-ui            --sa-p-font-weight-semibold    --sa-p-font-size-md
+--sa-p-font-app-annotation    --sa-p-font-weight-bold        --sa-p-font-size-lg
+--sa-p-font-info-data         --sa-p-font-weight-extrabold   --sa-p-font-size-xl
+
+Line height primitives:
+--sa-p-leading-normal
+
 THEME ROLE TOKEN INVENTORY
 ───────────────────────────────────────────────────────────────────────────────
 Each theme provides values for the semantic role-token inventory below. These
@@ -29,37 +48,31 @@ themes.css.
 
 COLOR TOKENS
 ───────────────────────────────────────────────────────────────────────────
-Brand colors:
-  --sa-color-accent           --sa-p-brand-end
-  --sa-color-brand-end        --sa-p-brand-mid
-  --sa-color-brand-mid        --sa-p-brand-start
-  --sa-color-brand-start
+Theme colors:
+  --sa-color-accent
   --sa-color-primary
-  --sa-color-primary-dim
   --sa-color-secondary
 
-Forground colors:
-  --sa-text-dim               --sa-text-h5               --sa-text-secondary
-  --sa-text-disabled          --sa-text-label
-  --sa-text-faint             --sa-text-muted
+Text colors:
   --sa-text-h1                --sa-text-on-brand
-  --sa-text-h2                --sa-text-on-surface
-  --sa-text-h3                --sa-text-placeholder
+  --sa-text-h2                --sa-text-on-surface         --sa-text-dim
+  --sa-text-h3                --sa-text-placeholder        --sa-text-disabled
   --sa-text-h4                --sa-text-primary
+  --sa-text-h5                --sa-text-secondary
 
 Background colors:
   --sa-bg-backdrop            --sa-bg-popup
-  --sa-bg-base                --sa-bg-progress-track
+  --sa-bg-page                --sa-bg-progress-track
   --sa-bg-card                --sa-bg-selected
   --sa-bg-control             --sa-bg-surface-1
   --sa-bg-hover               --sa-bg-surface-2
   --sa-bg-overlay             --sa-bg-surface-3
-  --sa-bg-page                --sa-bg-table
+  --sa-bg-table
 
 FONT TOKENS
 ───────────────────────────────────────────────────────────────────────────
 Typography roles:
- Content:                    App:                         Info:
+  Content:                    App:                         Info:
   --sa-body-font-family       --sa-annotation-font-family  --sa-data-font-family
   --sa-body-font-size         --sa-annotation-font-size    --sa-data-font-size
   --sa-body-font-weight       --sa-annotation-font-weight  --sa-data-font-weight
@@ -103,13 +116,13 @@ Gradient decorations:
 ROLE TOKENS
 ───────────────────────────────────────────────────────────────────────────
 State roles:
-  --sa-state-danger           --sa-state-info            --sa-state-warning
-  --sa-state-danger-bg        --sa-state-info-bg         --sa-state-warning-bg
-  --sa-state-danger-border    --sa-state-info-border     --sa-state-warning-border
+  --sa-state-danger           --sa-state-info              --sa-state-warning
+  --sa-state-danger-bg        --sa-state-info-bg           --sa-state-warning-bg
+  --sa-state-danger-border    --sa-state-info-border       --sa-state-warning-border
   --sa-state-default          --sa-state-success
   --sa-state-default-bg       --sa-state-success-bg
   --sa-state-default-border   --sa-state-success-border
-       
+
 Base element roles:
   --sa-blockquote-border
   --sa-focus-ring
@@ -161,12 +174,12 @@ Breakpoints match architecture-ux.md §7:
 
   /* Typography */
   --sa-heading-font-family: var(--sa-p-font-content-heading);
+  --sa-heading-font-weight: var(--sa-p-font-weight-thin);
   --sa-heading-font-size-h1: clamp(1.3rem, calc(1.0074rem + 1.1018vw), 1.7125rem);
   --sa-heading-font-size-h2: clamp(1.1875rem, calc(0.9658rem + 0.8347vw), 1.5rem);
   --sa-heading-font-size-h3: clamp(0.9875rem, calc(0.8456rem + 0.5342vw), 1.1875rem);
   --sa-heading-font-size-h4: var(--sa-p-font-size-base);
   --sa-heading-font-size-h5: var(--sa-p-font-size-sm);
-  --sa-heading-font-weight: var(--sa-p-font-weight-thin);
 
   --sa-body-font-family: var(--sa-p-font-content-body);
   --sa-body-font-weight: var(--sa-p-font-weight-thin);
@@ -185,7 +198,7 @@ Breakpoints match architecture-ux.md §7:
 
   --sa-annotation-font-family: var(--sa-p-font-app-annotation);
   --sa-annotation-font-size: var(--sa-p-font-size-sm);
-  --sa-annotation-font-weight: var(--sa-p-font-weight-normal);
+  --sa-annotation-font-weight: var(--sa-p-font-weight-medium);
 
   --sa-data-font-family: var(--sa-p-font-info-data);
   --sa-data-font-size: var(--sa-p-font-size-sm);
@@ -256,8 +269,8 @@ Breakpoints match architecture-ux.md §7:
 @media (max-width: 1024px) {
   :root {
     --sa-gutter: var(--sa-space-2xl);
-    --sa-pad: calc(var(--sa-space-lg) - var(--sa-space-xs));
-    --sa-gap: var(--sa-space-md);
+    --sa-pad: var(--sa-space-md);
+    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
   }
 }
 
@@ -274,8 +287,8 @@ Breakpoints match architecture-ux.md §7:
     --sa-heading-font-size-h4: var(--sa-p-font-size-sm);
     --sa-body-font-size: var(--sa-p-font-size-sm);
     --sa-gutter: var(--sa-space-lg);
-    --sa-pad: var(--sa-space-md);
-    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
+    --sa-pad: calc(var(--sa-space-md) - var(--sa-space-xs));
+    --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
 }
 
@@ -283,7 +296,7 @@ Breakpoints match architecture-ux.md §7:
   :root {
     --sa-base-size: var(--sa-p-font-size-sm);
     --sa-gutter: calc(var(--sa-space-lg) - var(--sa-space-xs));
-    --sa-pad: calc(var(--sa-space-md) - var(--sa-space-xs));
-    --sa-gap: var(--sa-space-sm);
+    --sa-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
+    --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
 }

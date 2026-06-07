@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui radio group control                                                      ║
+║ Ui radio group control                                                       ║
 ║ Semantic wrapper for the Kobalte RadioGroup primitive.                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -19,7 +19,7 @@ import {
   type RadioGroupItemProps,
   type RadioGroupRootProps
 } from '@kobalte/core/radio-group'
-import { type Component, splitProps } from '@solid-js'
+import { type Component, onCleanup, onMount, splitProps } from '@solid-js'
 import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
 
 /** Radio-group control props. */
@@ -89,18 +89,28 @@ export const UiRadioGroup = <Value extends string = string>(
 export const UiRadioItem = <Value extends string = string>(
   props: UiRadioItemProps<Value>
 ): UiComponent => {
+  let radioItemElement!: HTMLElement
+  let radioInputElement!: HTMLInputElement
   const [local] = splitProps(props, [
     'children',
     'value',
     'disabled'
   ])
+
+  onMount(() => {
+    const focusRadioInput = (): void => radioInputElement.focus()
+    radioItemElement.addEventListener('click', focusRadioInput)
+    onCleanup(() => radioItemElement.removeEventListener('click', focusRadioInput))
+  })
+
   return (
     <RadioItem
+      ref={radioItemElement}
       data-ui='radio-item'
       value={local.value}
       disabled={local.disabled}
     >
-      <RadioGroup.ItemInput />
+      <RadioGroup.ItemInput ref={radioInputElement} />
       <RadioItemControl data-ui='radio'>
         <RadioGroup.ItemIndicator />
       </RadioItemControl>

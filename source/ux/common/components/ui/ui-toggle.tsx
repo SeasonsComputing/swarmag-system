@@ -44,23 +44,30 @@ export type UiToggleProps =
 
 /** Toggle control with declared states. */
 export const UiToggle = (props: UiToggleProps): UiComponent => {
+  let toggleElement!: HTMLButtonElement
   const [local, others] = splitProps(props, [
     'error',
     'loading',
     'disabled',
     'pressed',
     'defaultPressed',
-    'onChange'
+    'onChange',
+    'onClick'
   ])
   return (
     <ToggleButton
       {...others}
+      ref={toggleElement}
       data-ui='toggle'
       data-ui-state={controlState(local)}
       disabled={local.disabled || local.loading}
       pressed={local.pressed}
       defaultPressed={local.defaultPressed}
       onChange={local.onChange}
+      onClick={event => {
+        toggleElement.focus()
+        if (typeof local.onClick === 'function') local.onClick(event)
+      }}
     />
   )
 }
