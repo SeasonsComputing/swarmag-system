@@ -354,7 +354,7 @@ export const StyleGuide = (): UiComponent => {
             <UiFieldset legend='Text'>
               <UiLayout variant='inline-wrap'>
                 <For each={TEXT_TOKENS}>
-                  {t => (<span style={{ color: `var(${t})` }}>{t}</span>)}
+                  {t => <span style={{ color: `var(${t})` }}>{t}</span>}
                 </For>
               </UiLayout>
             </UiFieldset>
