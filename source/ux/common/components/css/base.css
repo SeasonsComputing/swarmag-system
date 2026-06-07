@@ -210,8 +210,7 @@ blockquote {
   font-family: var(--sa-body-font-family);
   font-style: italic;
   margin-inline: 0;
-  padding-block: var(--sa-space-sm);
-  padding-inline: var(--sa-space-md);
+  padding: var(--sa-gap);
 }
 
 /*
