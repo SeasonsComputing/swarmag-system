@@ -11,6 +11,8 @@ Provides fixture data used to render static style-guide examples.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 COLOR_SWATCHES          Design token swatches for color validation.
+TEXT_TOKENS             Design token text colors.
+COLOR_TOKENS            Design token colors.
 BUTTON_VARIANTS         Button variant examples.
 STATUSES                Service status options.
 SERVICES                Service category options.
@@ -20,11 +22,36 @@ EQUIPMENT               Grouped equipment records for section-row table renderin
 */
 
 export const COLOR_SWATCHES = [
-  { label: 'primary', token: '--sa-color-primary', value: 'var(--sa-color-primary)' },
-  { label: 'success', token: '--sa-state-success', value: 'var(--sa-state-success)' },
-  { label: 'warning', token: '--sa-state-warning', value: 'var(--sa-state-warning)' },
-  { label: 'danger', token: '--sa-state-danger', value: 'var(--sa-state-danger)' },
-  { label: 'info', token: '--sa-state-info', value: 'var(--sa-state-info)' }
+  {
+    legend: 'Color',
+    colors: [
+      { label: 'primary', token: '--sa-color-primary', value: 'var(--sa-color-primary)' },
+      { label: 'secondary', token: '--sa-color-secondary', value: 'var(--sa-color-secondary)' },
+      { label: 'accent', token: '--sa-color-accent', value: 'var(--sa-color-accent)' }
+    ]
+  },
+  {
+    legend: 'State',
+    colors: [
+      { label: 'success', token: '--sa-state-success', value: 'var(--sa-state-success)' },
+      { label: 'warning', token: '--sa-state-warning', value: 'var(--sa-state-warning)' },
+      { label: 'danger', token: '--sa-state-danger', value: 'var(--sa-state-danger)' },
+      { label: 'info', token: '--sa-state-info', value: 'var(--sa-state-info)' }
+    ]
+  }
+] as const
+
+export const TEXT_TOKENS = [
+  '--sa-text-primary',
+  '--sa-text-h1',
+  '--sa-text-secondary',
+  '--sa-text-h2',
+  '--sa-text-dim',
+  '--sa-text-h3',
+  '--sa-text-disabled',
+  '--sa-text-h4',
+  '--sa-text-placeholder',
+  '--sa-text-h5'
 ] as const
 
 export const BUTTON_VARIANTS = [

@@ -43,7 +43,7 @@
 }
 
 .sg-header-subtitle {
-  color: var(--sa-shell-chrome-muted);
+  color: var(--sa-shell-chrome-secondary);
 }
 
 .sg-main {
@@ -52,7 +52,7 @@
 
 .sg-section {
   margin-inline: auto;
-  max-width: var(--sa-size-md);
+  max-width: calc(var(--sa-size-sm) + var(--sa-space-4xl));
   width: 100%;
 }
 
@@ -90,30 +90,36 @@
 .sg-font-heading {
   font-family: var(--sa-heading-font-family);
   font-size: var(--sa-heading-font-size-h4);
+  font-weight: var(--sa-heading-font-weight);
 }
 
 .sg-font-body {
   font-family: var(--sa-body-font-family);
+  font-size: var(--sa-body-font-size);
   font-weight: var(--sa-body-font-weight);
 }
 
 .sg-font-label {
-  font-family: var(--sa-label-font-family);
-  font-weight: var(--sa-label-font-weight);
   color: var(--sa-text-label);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
 }
 
 .sg-font-annotation {
   font-family: var(--sa-annotation-font-family);
+  font-size: var(--sa-annotation-font-size);
   font-weight: var(--sa-annotation-font-weight);
 }
 
 .sg-font-ui {
   font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-ui-font-size);
   font-weight: var(--sa-ui-font-weight);
 }
 
 .sg-font-data {
   font-family: var(--sa-data-font-family);
+  font-size: var(--sa-data-font-size);
   font-weight: var(--sa-data-font-weight);
 }
