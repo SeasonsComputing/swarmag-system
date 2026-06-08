@@ -150,18 +150,18 @@ deno task fmt:check
 
 ## 4. Working Rules
 
-| Rule              | Description                                                                                                                                                           |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `CONSTITUTION.md` | Governing authority for all human and AI contributions. Apply conservative changes, respect architecture guards, and escalate when intent or constraints are unclear. |
-| `README.md`       | Starting point for understanding the project. Keep it up-to-date and accurate.                                                                                        |
-| `cspell.json`     | Spell checker configuration. Keep it up-to-date and accurate.                                                                                                         |
-| `dprint.json`     | Code formatter configuration. Keep it up-to-date and accurate.                                                                                                        |
-| `deno.jsonc`      | Deno project configuration. Keep it up-to-date and accurate.                                                                                                          |
+| Rule                               | Description                                                                                                                                                           |
+| ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [CONSTITUTION.md](CONSTITUTION.md) | Governing authority for all human and AI contributions. Apply conservative changes, respect architecture guards, and escalate when intent or constraints are unclear. |
+| [README.md](README.md)             | Starting point for understanding the project. Keep it up-to-date and accurate.                                                                                        |
+| [cspell.json](cspell.json)         | Spell checker configuration. Keep it up-to-date and accurate.                                                                                                         |
+| [dprint.json](dprint.json)         | Code formatter configuration. Keep it up-to-date and accurate.                                                                                                        |
+| [deno.jsonc](deno.jsonc)           | Deno project configuration. Keep it up-to-date and accurate.                                                                                                          |
 
 ## 5. Working Sessions
 
-All software construction activity operates in conformance with the governing principles defined in `CONSTITUTION.md`.
+All software construction activity operates in conformance with the governing principles defined in [CONSTITUTION.md](CONSTITUTION.md).
 
-The constitution is designed to make most efficient and cost-effective use of AI reasoning and coding facilities across AI providers following the 3-role ["Model of Development w/ AI Coding"](https://seasonscomputing.com/markdown.html?documentation/CONSTITUTION.md).
+The constitution is designed to make most efficient and cost-effective use of AI reasoning and coding facilities across AI providers following the 3-role ["Model of Development w/ AI Coding"](https://seasonscomputing.com/markdown.html?documentation/tvk-mod-3rm.md).
 
 The human participates as the Chief Architect with AI Architect and AI Coding Engine roles provided by AI reasoning and AI coding platforms respectively.
