@@ -616,11 +616,11 @@
   color: var(--sa-text-primary);
 }
 
-[data-ui='accordion-trigger'][data-expanded]:focus-visible {
+[data-ui='accordion-trigger']:focus-visible {
   box-shadow: none;
 }
 
-[data-ui='accordion-item'][data-expanded]:has([data-ui='accordion-trigger']:focus-visible) {
+[data-ui='accordion-item']:has([data-ui='accordion-trigger']:focus-visible) {
   box-shadow: var(--sa-focus-ring);
 }
 
