@@ -37,6 +37,10 @@
   transition: var(--sa-transition-fast);
 }
 
+[data-ui='button'][data-ui-state='disabled'] {
+  cursor: not-allowed;
+}
+
 [data-ui='button'][data-ui-variant='primary'] {
   background: var(--sa-button-bg-primary);
   border-color: transparent;
@@ -59,7 +63,7 @@
   font-weight: var(--sa-button-font-weight-primary);
 }
 
-[data-ui='button']:hover {
+[data-ui='button']:not([data-ui-state='disabled']):hover {
   background: var(--sa-bg-hover);
   box-shadow: var(--sa-shadow-sm);
   transform: translateY(-1px);
@@ -67,16 +71,11 @@
   box-shadow: var(--sa-shadow-btn);
 }
 
-[data-ui='button'][data-ui-state='disabled']:hover {
-  box-shadow: none;
-  transform: none;
-}
-
-[data-ui='button'][data-ui-variant='danger']:hover {
+[data-ui='button'][data-ui-variant='danger']:not([data-ui-state='disabled']):hover {
   background: var(--sa-button-bg-danger-hover);
 }
 
-[data-ui='button'][data-ui-variant='primary']:hover {
+[data-ui='button'][data-ui-variant='primary']:not([data-ui-state='disabled']):hover {
   background: var(--sa-button-bg-primary-hover);
   box-shadow: var(--sa-shadow-glow);
   transform: var(--sa-button-transform-hover);
