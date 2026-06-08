@@ -172,10 +172,10 @@ h5 {
 pre, code, kbd, samp {
   font-family: var(--sa-data-font-family);
   font-weight: var(--sa-data-font-weight);
-  color: var(--sa-color-accent);
 }
 
 pre {
+  color: var(--sa-text-secondary);
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-sm);
@@ -186,6 +186,7 @@ pre {
 
 code {
   display: inline-block;
+  color: var(--sa-text-secondary);
   background: var(--sa-bg-control);
   border-radius: var(--sa-radius-sm);
   padding: var(--sa-space-xs) var(--sa-space-sm);
@@ -193,10 +194,15 @@ code {
 
 kbd {
   display: inline-block;
+  color: var(--sa-color-accent);
   background: var(--sa-bg-control);
   border-radius: var(--sa-radius-sm);
   box-shadow: var(--sa-shadow-kbd);
   padding: var(--sa-space-xs) var(--sa-space-sm);
+}
+
+samp {
+  color: var(--sa-color-accent);
 }
 
 /*
