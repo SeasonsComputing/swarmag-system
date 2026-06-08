@@ -24,8 +24,11 @@
   --sa-p-brand-start: var(--sa-p-gradient-1-start);
   --sa-p-brand-mid: var(--sa-p-gradient-3-mid);
   --sa-p-brand-end: var(--sa-p-gradient-5-end);
-  --sa-p-primary: var(--sa-p-gradient-5-end);
-  --sa-p-accent: var(--sa-p-gradient-5-end);
+
+  /* Radial background accents */
+  --sa-p-radial-1: oklch(var(--sa-p-gradient-1-start) / 0.16);
+  --sa-p-radial-2: oklch(var(--sa-p-gradient-1-start) / 0.22);
+  --sa-p-radial-3: oklch(var(--sa-p-gradient-1-start)/ 0.16);
 
   /* Neutrals */
   --sa-p-white: 100% 0 0;
@@ -46,15 +49,6 @@
   --sa-p-warning: 76.885% 0.1231 80.8277; /* orange */
   --sa-p-danger: 62.8% 0.2577 29.234; /* red */
   --sa-p-info: 60.8% 0.108 216.744; /* light-blue */
-
-  /* Radial background accents */
-  --sa-p-radial-1: oklch(var(--sa-p-gradient-1-start) / 0.16);
-  --sa-p-radial-2: oklch(var(--sa-p-gradient-1-start) / 0.22);
-  --sa-p-radial-3: oklch(var(--sa-p-gradient-1-start)/ 0.16);
-
-  /* Text */
-  --sa-text-on-brand: oklch(var(--sa-p-white));
-  --sa-text-label: var(--sa-text-secondary);
 
   /* Border */
   --sa-border-input-error: oklch(var(--sa-p-danger));
@@ -152,7 +146,7 @@
   /* Brand */
   --sa-color-primary: oklch(var(--sa-p-brand-end));
   --sa-color-secondary: oklch(var(--sa-p-brand-start));
-  --sa-color-accent: oklch(var(--sa-p-brand-mid));
+  --sa-color-accent: oklch(80% 0.095 60.83);
 
   /* Background */
   --sa-bg-page: rgb(21 24 30 / 0.95);
@@ -177,7 +171,6 @@
   --sa-text-primary: oklch(var(--sa-p-neutral-1));
   --sa-text-secondary: oklch(var(--sa-p-neutral-3));
   --sa-text-dim: oklch(var(--sa-p-neutral-4));
-  --sa-text-on-surface: oklch(var(--sa-p-neutral-1));
   --sa-text-disabled: oklch(var(--sa-p-neutral-4));
   --sa-text-placeholder: oklch(var(--sa-p-neutral-5));
   --sa-text-h1: oklch(var(--sa-p-white));
@@ -185,6 +178,8 @@
   --sa-text-h3: oklch(var(--sa-p-gradient-2-mid-start));
   --sa-text-h4: oklch(var(--sa-p-gradient-3-mid));
   --sa-text-h5: oklch(var(--sa-p-gradient-1-start));
+  --sa-text-on-brand: oklch(var(--sa-p-white));
+  --sa-text-label: var(--sa-text-secondary);
 
   /* Border */
   --sa-border-subtle: 1px solid oklch(var(--sa-p-neutral-1) / 0.05);
@@ -273,7 +268,7 @@
   /* Button */
   --sa-button-bg-primary: var(--sa-color-primary);
   --sa-button-color-primary: var(--sa-shell-chrome-bg);
-  --sa-button-bg-primary-hover: oklch(80% 0.13 185);
+  --sa-button-bg-primary-hover: var(--sa-color-primary);
 
   /* Input */
   --sa-input-bg: var(--sa-bg-control);
@@ -362,7 +357,6 @@
   --sa-text-primary: oklch(22% 0.026 238);
   --sa-text-secondary: oklch(15% 0.018 236 / 0.6);
   --sa-text-dim: oklch(79% 0.014 120);
-  --sa-text-on-surface: oklch(22% 0.026 238);
   --sa-text-disabled: oklch(70% 0.014 120);
   --sa-text-placeholder: oklch(58% 0.022 210);
   --sa-text-h1: oklch(17% 0.03 238);
@@ -370,6 +364,8 @@
   --sa-text-h3: oklch(50% 0.13 186);
   --sa-text-h4: oklch(44% 0.105 154);
   --sa-text-h5: oklch(40% 0.055 105);
+  --sa-text-on-brand: oklch(var(--sa-p-white));
+  --sa-text-label: var(--sa-text-secondary);
 
   /* Border */
   --sa-border-subtle: 1px solid oklch(34% 0.03 220 / 0.08);
