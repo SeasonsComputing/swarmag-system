@@ -59,13 +59,15 @@ export const UiButton = (props: UiButtonProps): UiComponent => {
     'data-ui-variant',
     'data-ui-state'
   ])
+  const isDisabled = () => local.disabled || local.loading
   return (
     <Button
       {...others}
       data-ui='button'
       data-ui-variant={local.variant}
       data-ui-state={controlState(local)}
-      disabled={local.disabled || local.loading}
+      disabled={isDisabled()}
+      tabIndex={isDisabled() ? -1 : others.tabIndex}
     />
   )
 }

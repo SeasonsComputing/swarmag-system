@@ -266,16 +266,18 @@ export const StyleGuide = (): UiComponent => {
               <UiLayout variant='inline-wrap'>
                 <UiField label='UiList (default)' variant='caption'>
                   <UiList>
-                    <UiListItem>Confirm chemical inventory.</UiListItem>
-                    <UiListItem>Verify crew certification.</UiListItem>
-                    <UiListItem>Inspect required assets.</UiListItem>
+                    <UiListItem>Wind speed 12 km/h</UiListItem>
+                    <UiListItem>Precipitation 0%</UiListItem>
+                    <UiListItem>Visibility 18 km</UiListItem>
+                    <UiListItem>Temperature 21°C</UiListItem>
                   </UiList>
                 </UiField>
                 <UiField label='UiList (bullet)' variant='caption'>
                   <UiList variant='bullet'>
-                    <UiListItem>Confirm chemical inventory.</UiListItem>
-                    <UiListItem>Verify crew certification.</UiListItem>
-                    <UiListItem>Inspect required assets.</UiListItem>
+                    <UiListItem>Lead operator certified.</UiListItem>
+                    <UiListItem>Equipment pre-check.</UiListItem>
+                    <UiListItem>Safety brief conducted.</UiListItem>
+                    <UiListItem>Flight plan filed.</UiListItem>
                   </UiList>
                 </UiField>
                 <UiField label='UiList (numbered)' variant='caption'>
@@ -702,7 +704,7 @@ export const StyleGuide = (): UiComponent => {
               <UiAccordionItem value='weather'>
                 <UiAccordionTrigger>Weather window</UiAccordionTrigger>
                 <UiAccordionContent>
-                  <UiList variant='bullet'>
+                  <UiList>
                     <UiListItem>Wind speed 12 km/h — within threshold</UiListItem>
                     <UiListItem>Precipitation 0% — clear</UiListItem>
                     <UiListItem>Visibility 18 km — acceptable</UiListItem>
