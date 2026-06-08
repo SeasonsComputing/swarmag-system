@@ -6,7 +6,7 @@
 
 Every AI session begins by ingesting the following project assets. Ingest in order, then inform the Chief Architect and wait for tasks:
 
-1. `CONSTITUTION.md`
+1. `CONSTITUTION.md` **(NEW VERSION 2.0)**
 2. `documentation/domain-model.md`
 3. `documentation/architecture-core.md`
 4. `documentation/style-guide.md`
