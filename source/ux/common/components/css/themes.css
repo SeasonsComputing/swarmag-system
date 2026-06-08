@@ -317,7 +317,7 @@
   --sa-table-bg-head: oklch(var(--sa-p-surface-2));
   --sa-table-color-head: oklch(var(--sa-p-neutral-1));
   --sa-table-bg-section: oklch(var(--sa-p-gradient-2-mid-start) / 0.48);
-  --sa-table-color-section: oklch(var(--sa-p-neutral-1));
+  --sa-table-color-section: oklch(var(--sa-p-neutral-2));
   --sa-table-bg-row-even: oklch(var(--sa-p-surface-1));
   --sa-table-bg-row-odd: oklch(var(--sa-p-surface-2) / 0.6);
 }
@@ -354,8 +354,8 @@
   --sa-bg-backdrop: oklch(15% 0.018 236 / 0.42);
 
   /* Text */
-  --sa-text-primary: oklch(22% 0.026 238);
-  --sa-text-secondary: oklch(15% 0.018 236 / 0.6);
+  --sa-text-primary: oklch(40% 0.026 238);
+  --sa-text-secondary: oklch(20% 0.018 236 / 0.6);
   --sa-text-dim: oklch(79% 0.014 120);
   --sa-text-disabled: oklch(70% 0.014 120);
   --sa-text-placeholder: oklch(58% 0.022 210);
@@ -516,7 +516,7 @@
   --sa-table-bg-head: oklch(31% 0.04 224);
   --sa-table-color-head: oklch(98% 0.006 98);
   --sa-table-bg-section: oklch(84% 0.07 104 / 0.62);
-  --sa-table-color-section: oklch(24% 0.035 218);
+  --sa-table-color-section: oklch(50% 0.035 218);
   --sa-table-bg-row-even: oklch(99.2% 0.006 98);
   --sa-table-bg-row-odd: oklch(95.4% 0.016 112);
 }

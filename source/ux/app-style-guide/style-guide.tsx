@@ -214,8 +214,9 @@ export const StyleGuide = (): UiComponent => {
                 Keyboard shortcut: Press <kbd>Ctrl+S</kbd> to save the job plan.
               </p>
               <p>
-                System output: <samp>asset.status = 'ready'</samp>
+                Job assessment bid: <samp>$14,000.00</samp>
               </p>
+              <span>Block code sample:</span>
               <pre>{`const acres = 142\nconst service = 'Aerial - Fixed Wing'`}</pre>
             </UiFieldset>
           </SgSection>
