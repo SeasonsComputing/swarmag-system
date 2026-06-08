@@ -52,7 +52,7 @@
 
 .sg-section {
   margin-inline: auto;
-  max-width: calc(var(--sa-size-sm) + var(--sa-space-4xl));
+  max-width: calc(var(--sa-size-md) - var(--sa-space-4xl));
   width: 100%;
 }
 
