@@ -214,7 +214,7 @@ blockquote {
 }
 
 /*
- * P / LABEL / FIGURE / FIGCAPTION
+ * P / LABEL / STRONG / FIGURE / FIGCAPTION
  * ───────────────────────────────────────────────────────────────────────────
  */
 
@@ -228,6 +228,10 @@ label {
   font-family: var(--sa-label-font-family);
   font-size: var(--sa-label-font-size);
   font-weight: var(--sa-label-font-weight);
+}
+
+strong {
+  font-weight: var(--sa-font-weight-medium);
 }
 
 figure {
