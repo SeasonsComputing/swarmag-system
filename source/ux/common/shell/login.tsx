@@ -18,7 +18,15 @@ Login Passwordless OTP login component.
 
 import { createSignal, Show } from '@solid-js'
 import { api } from '@ux/api'
-import { UiAlert, UiButton, UiField, UiFormActions, UiInput, UiLayout } from '@ux/common/components/ui'
+import {
+  UiAlert,
+  UiButton,
+  UiCard,
+  UiField,
+  UiFormActions,
+  UiInput,
+  UiLayout
+} from '@ux/common/components/ui'
 
 import './login.css'
 import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
@@ -122,7 +130,9 @@ export const Login = () => {
           </UiFormActions>
         </Show>
         <Show when={!!error()}>
-          <UiAlert variant='danger'>{error()}</UiAlert>
+          <UiCard>
+            <UiAlert variant='danger'>{error()}</UiAlert>
+          </UiCard>
         </Show>
       </div>
     </div>
