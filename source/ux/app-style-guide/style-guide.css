@@ -30,7 +30,7 @@
 
 /**
  * Prevent toggle-group background from bleeding with dark header
- * Override background to match shell chrome accountiung for rounded corners
+ * Override background to match shell chrome accounting for rounded corners
  */
 .sg-header [data-ui='toggle-group'] {
   background: var(--sa-bg-control);
