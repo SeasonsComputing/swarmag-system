@@ -18,6 +18,25 @@ DashboardState - Dashboard state and mutation methods
 ├ headerWidgets  Header widget mutation contract.
 ├ rows           Dashboard row mutation contract.
 └ rowWidgets     Row widget mutation contract.
+
+dir: MoveDirection = 'backward' | 'forward'
+
+headerWidgets: DashboardHeaderContract - Header widget mutation contract
+├ add(widget)           Create and persist a header widget.
+├ update(widget)        Persist header widget updates.
+├ remove(id)            Delete header widget.
+└ move(id, dir)         Reorder header widgets.
+
+rows: DashboardRowsContract - Dashboard row mutation contract
+├ add(row)              Create and persist a dashboard row.
+├ remove(id)            Remove row from store and persistence.
+└ move(id, dir)         Reorder rows.
+
+rowWidgets: DashboardWidgetsContract - Widget mutation contract
+├ add(row, widget)      Create and persist a widget.
+├ update(row, widget)   Persist widget updates.
+├ remove(row, id)       Delete widget from store and persistence.
+└ move(row, id, dir)    Reorder widgets.
 */
 
 import { ApiError, apiError } from '@core/api/api-contract.ts'
