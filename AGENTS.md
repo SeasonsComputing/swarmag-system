@@ -17,11 +17,11 @@ Every AI session begins by ingesting the following project assets. Ingest in ord
 2. `documentation/ux-design-language.md`
 3. `documentation/ux-components-guide.md`
 
-**For application sessions, additionally ingest in order:**
+**For application/feature sessions, additionally ingest in order:**
 
 1. `documentation/architecture-ux.md`
 2. `documentation/architecture-devops.md`
-3. `documentation/ux-components-guide.md`
+3. `documentation/ux-components-guide-lite.md`
 4. `documentation/user-stories.md`
 
 **For all other sessions:**
