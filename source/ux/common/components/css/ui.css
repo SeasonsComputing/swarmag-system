@@ -463,7 +463,7 @@
   font-family: var(--sa-label-font-family);
   font-size: var(--sa-label-font-size);
   font-weight: var(--sa-label-font-weight);
-  gap: var(--sa-space-sm);
+  gap: var(--sa-space-xx);
 }
 
 [data-ui='checkbox'] label,
@@ -474,7 +474,7 @@
 
 [data-ui='radio-group'] {
   display: grid;
-  gap: var(--sa-space-xs);
+  gap: var(--sa-space-xx);
 }
 
 [data-ui='radio-item'] {
@@ -550,8 +550,9 @@
   color: var(--sa-color-primary);
 }
 
+[data-ui='checkbox'][data-checked] label,
 [data-ui='radio-item'][data-checked] label {
-  color: inherit;
+  color: var(--sa-color-primary);
 }
 
 [data-ui='checkbox']:has(input:focus) > div,
@@ -580,7 +581,7 @@
 
 [data-ui='accordion'] {
   display: grid;
-  gap: var(--sa-space-xs);
+  gap: var(--sa-space-xx);
 }
 
 [data-ui='accordion-item'] {
@@ -616,10 +617,12 @@
   color: var(--sa-text-primary);
 }
 
+[data-ui='accordion-trigger']:focus,
 [data-ui='accordion-trigger']:focus-visible {
   box-shadow: none;
 }
 
+[data-ui='accordion-item']:has([data-ui='accordion-trigger']:focus),
 [data-ui='accordion-item']:has([data-ui='accordion-trigger']:focus-visible) {
   box-shadow: var(--sa-focus-ring);
 }
@@ -738,7 +741,7 @@
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-md);
   display: inline-flex;
-  gap: var(--sa-space-sm);
+  gap: var(--sa-space-xx);
   max-width: 100%;
   overflow-x: auto;
   padding: var(--sa-space-xs);
