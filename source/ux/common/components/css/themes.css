@@ -12,7 +12,7 @@
  */
 
 [data-theme] {
-  /* Brand gradient — logo extracted */
+  /* Gradient range */
   --sa-p-gradient-1-start: 54.3% 0.11 236.182;
   --sa-p-gradient-2-mid-start: 61.4% 0.107 210.2;
   --sa-p-gradient-3-mid: 68.5% 0.103 184.216;
@@ -20,7 +20,7 @@
   --sa-p-gradient-5-end: 80% 0.13 185;
   --sa-p-popup: 28.5% 0.023 236; /* floating surface — select, popover, tooltip */
 
-  /* Brand role primitives — raw tuples, theme-overrideable */
+  /* Brand primitives  */
   --sa-p-brand-start: var(--sa-p-gradient-1-start);
   --sa-p-brand-mid: var(--sa-p-gradient-3-mid);
   --sa-p-brand-end: var(--sa-p-gradient-5-end);
@@ -28,7 +28,7 @@
   /* Radial background accents */
   --sa-p-radial-1: oklch(var(--sa-p-gradient-1-start) / 0.16);
   --sa-p-radial-2: oklch(var(--sa-p-gradient-1-start) / 0.22);
-  --sa-p-radial-3: oklch(var(--sa-p-gradient-1-start)/ 0.16);
+  --sa-p-radial-3: oklch(var(--sa-p-gradient-1-start) / 0.16);
 
   /* Neutrals */
   --sa-p-white: 100% 0 0;
@@ -110,7 +110,7 @@
   /* Fieldset */
   --sa-fieldset-bg: transparent;
   --sa-fieldset-border: var(--sa-border-card);
-  --sa-fieldset-shadow: var(--sa-shadow-md);
+  --sa-fieldset-shadow: var(--sa-shadow);
 
   /* Progress */
   --sa-progress-height: 1rem;
@@ -192,17 +192,19 @@
   --sa-border-card: 1px solid rgb(148 163 184 / 0.1);
 
   /* Shadow */
-  --sa-shadow-sm: 0 1px 3px oklch(0% 0 0 / 0.3);
-  --sa-shadow: 0 4px 12px oklch(0% 0 0 / 0.35);
-  --sa-shadow-md: 0 8px 24px oklch(0% 0 0 / 0.4);
-  --sa-shadow-lg: 0 20px 40px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--sa-p-white) / 0.06);
-  --sa-shadow-xl: 0 30px 60px oklch(0% 0 0 / 0.55), inset 0 1px 0 oklch(var(--sa-p-white) / 0.1);
+  --sa-shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.3);
+  --sa-shadow: 0 6px 16px oklch(0% 0 0 / 0.35);
+  --sa-shadow-md: 0 14px 34px oklch(0% 0 0 / 0.4);
+  --sa-shadow-lg: 0 24px 54px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--sa-p-white) / 0.06);
+  --sa-shadow-xl: 0 36px 78px oklch(0% 0 0 / 0.55), inset 0 1px 0 oklch(var(--sa-p-white) / 0.1);
   --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-p-gradient-3-mid));
   --sa-shadow-glow: 0 0 30px oklch(var(--sa-p-gradient-3-mid));
   --sa-shadow-btn: 0 0 30px oklch(78% 0.12 185 / 0.38), 0 0 10px oklch(66% 0.14 235 / 0.28);
-  --sa-shadow-card: 0 20px 40px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
+  --sa-shadow-card:
+    0 18px 40px rgb(0 0 0 / 0.3),
+    inset 0 1px 0 rgb(255 255 255 / 0.13);
   --sa-shadow-text: 0 0 1px oklch(100% 0 0 / 0.15);
-  --sa-shadow-press: 0 6px 12px oklch(0% 0 0 / 0.3), 0 3px 6px oklch(0% 0 0 / 0.2);
+  --sa-shadow-press: 0 4px 8px oklch(0% 0 0 / 0.3), 0 3px 6px oklch(0% 0 0 / 0.2);
   --sa-shadow-kbd: 0 2px 0 oklch(var(--sa-p-neutral-1) / 0.15);
 
   /* Gradient */
