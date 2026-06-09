@@ -250,8 +250,9 @@ Breakpoints match architecture-ux.md §7:
   --sa-space-3xl: 3rem;
   --sa-space-4xl: 5rem;
 
-  /* Breakpoints (reference — use in media queries) */
+  /* Breakpoints */
   --sa-size-wrap: 270px;
+  --sa-size-min: 320px;
   --sa-size-xs: 425px;
   --sa-size-sm: 768px;
   --sa-size-md: 1024px;
@@ -261,9 +262,6 @@ Breakpoints match architecture-ux.md §7:
   --sa-gutter: var(--sa-space-4xl);
   --sa-pad: var(--sa-space-lg);
   --sa-gap: calc(var(--sa-space-md) + var(--sa-space-xx));
-
-  /* Form card max-width — centered on tablet/desktop */
-  --sa-form-max-width: 640px;
 
   /* Minimum touch target — safety-first for field use */
   --sa-touch-target: 64px;
