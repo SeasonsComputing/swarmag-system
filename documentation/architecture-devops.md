@@ -71,9 +71,27 @@ Non-deployable packages are explicitly exempt from packaging guards, the secret 
 
 ## 4. Environment Files
 
+For UX applications, environment files define the backend binding target for a
+static bundle. They do not describe the static host from which that bundle is
+served. The meaningful UX build matrix is:
+
+```text
+application × backend binding target
+```
+
+For example, an `app-admin` bundle built with the stage endpoint, stage public
+key, and browser client mode is stage-bound even when served locally during
+development.
+
+Backend packages still use environment files for their own runtime deployment
+environment.
+
 ### 4.1 Naming Convention
 
-Each deployable package maintains per-environment configuration files at the locations below. All actual env files are gitignored; only `.env.example` templates are committed.
+Each deployable package maintains configuration files at the locations below. For
+UX apps, the target token (`local`, `stage`, `prod`) names the backend binding
+target. All actual env files are gitignored; only `.env.example` templates are
+committed.
 
 **UX apps** — `source/ux/config/`
 
@@ -102,13 +120,11 @@ Any env value that must be resolved from the secret registry at package time is 
 VITE_PACKAGE_APP_ID=swarmag-app-admin
 VITE_PACKAGE_TARGET=local
 VITE_PACKAGE_VERSION=0.0.0
-VITE_SUPABASE_EDGE_URL=http://localhost:54321/functions/v1
-VITE_SUPABASE_RDBMS_URL=postgresql://postgres:postgres@localhost:54322/postgres
-VITE_SUPABASE_ANON_KEY=__SECRET__
-VITE_SUPABASE_CLIENT_MODE=online
-VITE_SUPABASE_SERVICE_KEY=__SECRET__
-VITE_JWT_SECRET=__SECRET__
-VITE_LOCAL_DB_NAME=swarmag-app-admin-local
+VITE_SUPABASE_EDGE_URL=http://localhost:54321
+VITE_SUPABASE_RDBMS_URL=http://localhost:54321
+VITE_SUPABASE_PUBLIC_KEY=__SECRET__
+VITE_SUPABASE_CLIENT_MODE=browser
+VITE_LOCAL_DB_NAME=swarmag-app-admin
 ```
 
 The packaging script resolves `__SECRET__` values from `secrets.jsonc` before invoking the Vite build. The secret value is never written to disk — it is injected into the build process environment only.
@@ -118,13 +134,16 @@ The packaging script resolves `__SECRET__` values from `secrets.jsonc` before in
 - Never commit actual `.env` files — only `.env.example` templates
 - `__SECRET__` must never appear in a production build artifact
 - Use platform-managed secrets (Netlify environment variables, Supabase secrets) for stage and prod targets
-- Rotate secrets regularly; use `--genesis` to rotate the JWT secret for a deployable package
+- Rotate secrets regularly; use genesis workflows only for packages that define
+  a JWT secret
 
 ## 5. Secret Registry
 
 ### 5.1 Purpose
 
-The secret registry is a local developer file that stores the actual secret values for local and stage environments. It is never committed to the repository and never included in a build artifact.
+The secret registry is a local developer file that stores the actual resolved
+values for local and stage targets. It is never committed to the repository and
+never included in a build artifact.
 
 ### 5.2 File Location and Format
 
@@ -142,7 +161,8 @@ Every entry's JSON key **must equal** the composed identity derived from its own
 <app>.<env>.<config>
 ```
 
-For example, the entry for `VITE_JWT_SECRET` in the `app-admin` local environment has key `app-admin.local.VITE_JWT_SECRET`.
+For example, the entry for `VITE_SUPABASE_PUBLIC_KEY` in the `app-admin` local
+target has key `app-admin.local.VITE_SUPABASE_PUBLIC_KEY`.
 
 ### 5.4 Schema
 
@@ -158,12 +178,12 @@ Each entry is an object with these fields:
 
 ```jsonc
 {
-  // JWT secret for app-admin local environment
-  "app-admin.local.VITE_JWT_SECRET": {
+  // Public Supabase client key for app-admin local backend binding target
+  "app-admin.local.VITE_SUPABASE_PUBLIC_KEY": {
     "app": "app-admin",
     "env": "local",
-    "config": "VITE_JWT_SECRET",
-    "tags": ["jwt", "auth"],
+    "config": "VITE_SUPABASE_PUBLIC_KEY",
+    "tags": ["supabase", "public-key"],
     "secret": "<hex-value>"
   }
 }
@@ -179,7 +199,8 @@ A new developer provisions `secrets.jsonc` as follows:
 4. Run `deno task guard:secrets` to validate the file structure.
 5. Run `deno task app-{name}-package-local` to confirm the packaging workflow resolves all secrets.
 
-For local JWT secrets: `deno task gen:jwt-secret` prints a secure value ready to paste into `secrets.jsonc`.
+For local JWT secrets in packages that require them: `deno task gen:jwt-secret`
+prints a secure value ready to paste into `secrets.jsonc`.
 
 ## 6. Secret Management Scripts
 
@@ -202,10 +223,10 @@ deno task guard:secrets
 deno task gen:jwt-secret
 
 # Read one secret
-deno run --allow-read source/devops/scripts/read-secret.ts secrets.jsonc "app-admin.local.VITE_JWT_SECRET"
+deno run --allow-read source/devops/scripts/read-secret.ts secrets.jsonc "app-admin.local.VITE_SUPABASE_PUBLIC_KEY"
 
 # Set one secret
-deno run --allow-read --allow-write source/devops/scripts/set-secret.ts secrets.jsonc "app-admin.local.VITE_JWT_SECRET" "<value>"
+deno run --allow-read --allow-write source/devops/scripts/set-secret.ts secrets.jsonc "app-admin.local.VITE_SUPABASE_PUBLIC_KEY" "<value>"
 ```
 
 ## 7. Packaging Workflow

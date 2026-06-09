@@ -94,6 +94,15 @@ Authentication and client makers are part of the core runtime and are sourced fr
 | **Ops**      | Browser (mobile PWA)         | IndexedDB offline, Supabase online | Netlify CDN (PWA) |
 | **Customer** | Browser (desktop/tablet PWA) | Supabase SDK                       | Netlify CDN (PWA) |
 
+UX applications are static bundles. Their remote backend is selected by the
+configuration embedded at package/build time, not by the static host that serves
+the files. For Supabase-backed UX apps, the concrete binding is the Supabase
+endpoint, public key, and browser client mode embedded in the bundle.
+
+Serving a stage-bound `app-admin` bundle locally is therefore still a stage-bound
+Admin client. Local serving is a tooling concern; it is not a separate remote
+backend environment axis.
+
 ## 4. Technology Stack
 
 | Layer         | Technology                      |
@@ -558,6 +567,8 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/api + ux/config
 - Three Netlify sites, one per app
 - `ux/common/` and `ux/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
 - `ux/config/` contains two files when packaged: `ux-config.ts` and the target env file
+- The target env file binds the static bundle to one backend target; the same
+  bundle may be served locally or remotely without changing that binding
 - `bootstrap()` owns boot-time initializations — CSS barrel (`css.tsx`) and config (`ux-config.ts`). App roots (`app.tsx`) are minimal — `bootstrap(dashboardSeed)` call and app-specific route extensions only
 - Packaging, artifact format, and deployment workflow: see `architecture-devops.md §7`
 - No build artifacts are checked into the repository

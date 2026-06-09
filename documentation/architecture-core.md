@@ -484,7 +484,28 @@ Config.init(new SupabaseProvider(), [
 export { Config }
 ```
 
-#### 6.3.2 UX example (aliases required)
+#### 6.3.2 UX backend binding
+
+UX applications are static browser bundles. Their concrete backend binding is
+selected at package/build time and embedded into the bundle. The location from
+which the bundle is later served does not select the backend.
+
+A UX bundle is bound to a Supabase backend by three required configuration
+properties:
+
+- `VITE_SUPABASE_RDBMS_URL` — Supabase project endpoint for direct RDBMS access
+- `VITE_SUPABASE_PUBLIC_KEY` — public client key for that Supabase project
+- `VITE_SUPABASE_CLIENT_MODE` — browser session behavior (`browser` for UX apps)
+
+`VITE_SUPABASE_EDGE_URL` is also embedded when orchestration edge functions are
+used. Application metadata and local browser database names may vary by package,
+but they do not choose the remote backend.
+
+This means the meaningful UX package matrix is application × backend binding
+target. A stage-bound `app-admin` bundle remains stage-bound whether served from
+Netlify, a local static file server, or any other static host.
+
+#### 6.3.3 UX example (aliases required)
 
 Vite requires client-side environment variables to carry a `VITE_` prefix. The alias map declares the mapping once at bootstrap so consuming code uses clean logical names throughout:
 
@@ -501,10 +522,8 @@ Config.init(
     'VITE_PACKAGE_VERSION',
     'VITE_SUPABASE_EDGE_URL',
     'VITE_SUPABASE_RDBMS_URL',
-    'VITE_SUPABASE_ANON_KEY',
+    'VITE_SUPABASE_PUBLIC_KEY',
     'VITE_SUPABASE_CLIENT_MODE',
-    'VITE_SUPABASE_SERVICE_KEY',
-    'VITE_JWT_SECRET',
     'VITE_LOCAL_DB_NAME'
   ],
   {
@@ -513,10 +532,8 @@ Config.init(
     PACKAGE_VERSION: 'VITE_PACKAGE_VERSION',
     SUPABASE_EDGE_URL: 'VITE_SUPABASE_EDGE_URL',
     SUPABASE_RDBMS_URL: 'VITE_SUPABASE_RDBMS_URL',
-    SUPABASE_ANON_KEY: 'VITE_SUPABASE_ANON_KEY',
+    SUPABASE_PUBLIC_KEY: 'VITE_SUPABASE_PUBLIC_KEY',
     SUPABASE_CLIENT_MODE: 'VITE_SUPABASE_CLIENT_MODE',
-    SUPABASE_SERVICE_KEY: 'VITE_SUPABASE_SERVICE_KEY',
-    JWT_SECRET: 'VITE_JWT_SECRET',
     LOCAL_DB_NAME: 'VITE_LOCAL_DB_NAME'
   }
 )
@@ -810,7 +827,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 - Infrastructure code derivable from domain, schema, and contracts
 - If deleting infrastructure loses meaning, something upstream is wrong
-- Adapters, clients, providers are all mechanically generateable
+- Adapters, clients, providers are all mechanically regenerable
 - Meaning lives in `domain/`, not implementation
 
 #### 10.1.10 Conservative interpretation
