@@ -241,6 +241,7 @@ Breakpoints match architecture-ux.md §7:
 
   /* Spacing Scale */
   --sa-space-xs: 0.25rem;
+  --sa-space-xx: 0.375rem;
   --sa-space-sm: 0.5rem;
   --sa-space-md: 1rem;
   --sa-space-lg: 1.5rem;
@@ -257,9 +258,9 @@ Breakpoints match architecture-ux.md §7:
   --sa-size-lg: 1152px;
 
   /* Desktop ≥ 1024px */
-  --sa-gutter: var(--sa-space-2xl);
+  --sa-gutter: var(--sa-space-4xl);
   --sa-pad: var(--sa-space-lg);
-  --sa-gap: var(--sa-space-md);
+  --sa-gap: calc(var(--sa-space-md) + var(--sa-space-xx));
 
   /* Form card max-width — centered on tablet/desktop */
   --sa-form-max-width: 640px;
@@ -298,19 +299,27 @@ Breakpoints match architecture-ux.md §7:
 /* DEVICE BREAKPOINTS                                                          */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
+@media (max-width: 1440px) {
+  :root {
+    --sa-gutter: var(--sa-space-3xl);
+    --sa-pad: calc(var(--sa-space-md) + var(--sa-space-xx));
+    --sa-gap: calc(var(--sa-space-md) + var(--sa-space-xs));
+  }
+}
+
 @media (max-width: 1024px) {
   :root {
-    --sa-gutter: var(--sa-space-2xl);
-    --sa-pad: var(--sa-space-md);
-    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
+    --sa-gutter: var(--sa-space-3xl);
+    --sa-pad: calc(var(--sa-space-md) + var(--sa-space-xs));
+    --sa-gap: var(--sa-space-md);
   }
 }
 
 @media (max-width: 768px) {
   :root {
-    --sa-gutter: var(--sa-space-xl);
+    --sa-gutter: calc(var(--sa-space-xl) + var(--sa-space-xx));
     --sa-pad: var(--sa-space-md);
-    --sa-gap: calc(var(--sa-space-md) - var(--sa-space-xs));
+    --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
 }
 
@@ -319,7 +328,7 @@ Breakpoints match architecture-ux.md §7:
     --sa-heading-font-size-h4: var(--sa-p-font-size-sm);
     --sa-body-font-size: var(--sa-p-font-size-sm);
     --sa-gutter: var(--sa-space-lg);
-    --sa-pad: calc(var(--sa-space-md) - var(--sa-space-xs));
+    --sa-pad: calc(var(--sa-space-sm) + var(--sa-space-xx));
     --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
 }

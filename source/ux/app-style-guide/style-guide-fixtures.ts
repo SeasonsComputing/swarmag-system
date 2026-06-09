@@ -43,14 +43,14 @@ export const COLOR_SWATCHES = [
 
 export const TEXT_TOKENS = [
   '--sa-text-primary',
-  '--sa-text-h1',
   '--sa-text-secondary',
-  '--sa-text-h2',
   '--sa-text-dim',
-  '--sa-text-h3',
   '--sa-text-disabled',
-  '--sa-text-h4',
   '--sa-text-placeholder',
+  '--sa-text-h1',
+  '--sa-text-h2',
+  '--sa-text-h3',
+  '--sa-text-h4',
   '--sa-text-h5'
 ] as const
 
