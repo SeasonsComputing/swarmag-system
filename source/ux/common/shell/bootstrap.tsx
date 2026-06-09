@@ -9,19 +9,27 @@ PURPOSE
 App root features. Registers the auth state listener,
 performs the boot-time user fetch, and mounts the TanStack Router route tree.
 
+1.  CONFIGURE APPLICATION
+2.  INSTALL SHELL
+3.  INSTALL LOOK & FEEL
+4.  DEFINE ROUTES
+5.  BOOTSTRAP APPLICATION
+5.1  SYNCHRONIZE SESSION
+5.2  REGISTER SERVICE WORKER
+
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 bootstrap() - Boots the application
 */
 
 // ────────────────────────────────────────────────────────────────────────────
-// 1. CONFIGURE APPLICATION (FAST FAILS)
+// 1. CONFIGURE APPLICATION
 // ────────────────────────────────────────────────────────────────────────────
 
 import { Config } from '@ux/config/ux-config.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// 2. INSTALL COMMON SHELL
+// 2. INSTALL SHELL
 // ────────────────────────────────────────────────────────────────────────────
 
 import type { Session } from '@core/api/api-auth-contract.ts'
@@ -94,6 +102,24 @@ const Application = () => {
   return <RouterProvider router={router} />
 }
 
+/** Initialize app state before mounting the application */
+export async function bootstrap(dashboardSeed: unknown) {
+  try {
+    await api.AppState.init()
+    await api.DashboardState.init(dashboardSeed)
+    render(() => <Application />, document.getElementById('root')!)
+    registerServiceWorker()
+  } catch (e) {
+    document.body.style.opacity = '1'
+    console.error('[bootstrap] startup failed', e)
+    throw e
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 5.1 SYNCHRONIZE SESSION
+// ────────────────────────────────────────────────────────────────────────────
+
 /** Resolve the persisted browser session at boot before route guards decide. */
 async function syncSession(): Promise<void> {
   await applySession(await api.Auth.getSession())
@@ -117,6 +143,10 @@ async function applySession(session: Session | null): Promise<void> {
   api.SessionState.setReady()
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// 5.2 REGISTER SERVICE WORKER
+// ────────────────────────────────────────────────────────────────────────────
+
 /** Register the Admin service worker for shell caching offline support. */
 function registerServiceWorker() {
   if (!('serviceWorker' in navigator)) {
@@ -139,18 +169,4 @@ function shouldRegisterServiceWorker(): boolean {
 async function unregisterServiceWorkers(): Promise<void> {
   const registrations = await navigator.serviceWorker.getRegistrations()
   await Promise.all(registrations.map(registration => registration.unregister()))
-}
-
-/** Initialize app state before mounting the application */
-export async function bootstrap(dashboardSeed: unknown) {
-  try {
-    await api.AppState.init()
-    await api.DashboardState.init(dashboardSeed)
-    render(() => <Application />, document.getElementById('root')!)
-    registerServiceWorker()
-  } catch (e) {
-    document.body.style.opacity = '1'
-    console.error('[bootstrap] startup failed', e)
-    throw e
-  }
 }
