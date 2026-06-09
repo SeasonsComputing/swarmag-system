@@ -16,7 +16,8 @@ PUBLIC
 Login Passwordless OTP login component.
 */
 
-import { createSignal, Show } from '@solid-js'
+import { createEffect, createSignal, Show } from '@solid-js'
+import { useNavigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
 import {
   UiAlert,
@@ -36,11 +37,19 @@ type LoginStep = 'email' | 'code'
 
 /** Passwordless OTP login component. */
 export const Login = () => {
+  const navigate = useNavigate()
   const [step, setStep] = createSignal<LoginStep>('email')
   const [email, setEmail] = createSignal('')
   const [code, setCode] = createSignal('')
   const [error, setError] = createSignal<string | null>(null)
   const [pending, setPending] = createSignal(false)
+
+  createEffect(() => {
+    const session = api.SessionState.store
+    if (!session.isLoading && session.isAuthenticated) {
+      void navigate({ to: '/dashboard', replace: true })
+    }
+  })
 
   const submitEmail = async () => {
     setPending(true)

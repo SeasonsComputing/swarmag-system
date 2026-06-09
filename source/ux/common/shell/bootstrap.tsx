@@ -18,12 +18,13 @@ bootstrap() - Boots the application
 // 1. CONFIGURE APPLICATION (FAST FAILS)
 // ────────────────────────────────────────────────────────────────────────────
 
-import '@ux/config/ux-config.ts'
+import { Config } from '@ux/config/ux-config.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 2. INSTALL COMMON SHELL
 // ────────────────────────────────────────────────────────────────────────────
 
+import type { Session } from '@core/api/api-auth-contract.ts'
 import { onCleanup, onMount } from '@solid-js'
 import { render } from '@solid-js/web'
 import {
@@ -86,27 +87,58 @@ const router = createRouter({ routeTree })
 const Application = () => {
   onMount(() => {
     document.body.style.opacity = '1'
-    const unsubscribe = api.Auth.onAuthStateChange(async session => {
-      if (session) {
-        api.SessionState.setAuth(session.userId)
-        if (!api.SessionState.store.user) {
-          const user = await api.Users.get(session.userId)
-          api.SessionState.setUser(user)
-          api.SessionState.setReady()
-        }
-      } else {
-        api.SessionState.clear()
-      }
-    })
+    void syncSession()
+    const unsubscribe = api.Auth.onAuthStateChange(session => void applySession(session))
     onCleanup(unsubscribe)
   })
   return <RouterProvider router={router} />
 }
 
+/** Resolve the persisted browser session at boot before route guards decide. */
+async function syncSession(): Promise<void> {
+  await applySession(await api.Auth.getSession())
+}
+
+/** Apply an auth session snapshot to shared UX session state. */
+async function applySession(session: Session | null): Promise<void> {
+  if (!session) {
+    api.SessionState.clear()
+    return
+  }
+
+  // authenticated, preserve id in session store
+  api.SessionState.setAuth(session.userId)
+  if (api.SessionState.store.user) return // user already loaded
+
+  // authenticated, load user and preserve in session store,
+  // then transition session to ready state.
+  const user = await api.Users.get(session.userId)
+  api.SessionState.setUser(user)
+  api.SessionState.setReady()
+}
+
 /** Register the Admin service worker for shell caching offline support. */
 function registerServiceWorker() {
-  if (!('serviceWorker' in navigator)) return
+  if (!('serviceWorker' in navigator)) {
+    console.warn('ServiceWorker is not supported in this browser.')
+    return
+  }
+  if (!shouldRegisterServiceWorker()) {
+    void unregisterServiceWorkers()
+    return
+  }
   void navigator.serviceWorker.register('/sw.js')
+}
+
+/** Check package-level service-worker registration policy. */
+function shouldRegisterServiceWorker(): boolean {
+  return Config.get('SERVICE_WORKER_ENABLED') === 'true'
+}
+
+/** Remove stale app workers when registration is disabled. */
+async function unregisterServiceWorkers(): Promise<void> {
+  const registrations = await navigator.serviceWorker.getRegistrations()
+  await Promise.all(registrations.map(registration => registration.unregister()))
 }
 
 /** Initialize app state before mounting the application */
