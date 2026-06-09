@@ -15,14 +15,33 @@
 [data-ui='login-hero'] {
   flex: 0 0 50dvh;
   display: flex;
+  position: relative;
   align-items: flex-end;
   justify-content: center;
   padding: var(--sa-space-xl);
 }
 
+[data-theme='dark'] [data-ui='login-hero']::before {
+  content: '';
+  position: absolute;
+  inset-block-end: var(--sa-space-xl);
+  inline-size: min(70vw, var(--sa-size-wrap));
+  aspect-ratio: 1;
+  border-radius: var(--sa-radius-full);
+  background: radial-gradient(
+    ellipse,
+    oklch(var(--sa-p-neutral-1) / 0.72),
+    transparent 70%
+  );
+  filter: blur(var(--sa-space-xl));
+  opacity: 0.78;
+}
+
 [data-ui='login-logo'] {
+  position: relative;
+  z-index: var(--sa-z-raised);
   width: 100%;
-  max-width: 320px;
+  max-width: var(--sa-login-logo-max-width);
   height: auto;
   display: block;
 }
