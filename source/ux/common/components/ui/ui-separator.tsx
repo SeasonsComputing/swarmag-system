@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui separator control                                                        ║
+║ Ui separator control                                                         ║
 ║ Semantic wrapper for the Kobalte Separator primitive.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 

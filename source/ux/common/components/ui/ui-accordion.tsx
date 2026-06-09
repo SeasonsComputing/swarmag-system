@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui accordion control                                                        ║
+║ Ui accordion control                                                         ║
 ║ Semantic wrapper for the Kobalte Accordion primitive.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 

@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui multi-select control                                                     ║
+║ Ui multi-select control                                                      ║
 ║ Semantic wrapper for the Kobalte Listbox primitive.                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 

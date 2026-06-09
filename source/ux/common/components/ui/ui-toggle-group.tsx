@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui toggle group control                                                     ║
+║ Ui toggle group control                                                      ║
 ║ Semantic wrapper for the Kobalte ToggleGroup primitive.                      ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 

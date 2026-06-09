@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui checkbox control                                                         ║
+║ Ui checkbox control                                                          ║
 ║ Semantic wrapper for the Kobalte Checkbox primitive.                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
