@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui text area control                                                        ║
+║ Ui text area control                                                         ║
 ║ Semantic wrapper for the Kobalte TextField primitive.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 

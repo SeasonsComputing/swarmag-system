@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui toggle control                                                           ║
+║ Ui toggle control                                                            ║
 ║ Semantic wrapper for the Kobalte ToggleButton primitive.                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 

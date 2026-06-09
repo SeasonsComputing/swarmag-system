@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ UiFooter                                                                    ║
-║ Footer control with branding and mobile safe-area support.                  ║
+║ UiFooter                                                                     ║
+║ Footer control with branding and mobile safe-area support.                   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

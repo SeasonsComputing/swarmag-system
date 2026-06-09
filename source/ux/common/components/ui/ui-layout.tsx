@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui layout control                                                           ║
+║ Ui layout control                                                            ║
 ║ Unified API surface for block and inline layout primitives.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 

@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Ui progress control                                                         ║
+║ Ui progress control                                                          ║
 ║ Semantic wrapper for the Kobalte Progress primitive.                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
