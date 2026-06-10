@@ -57,6 +57,7 @@ function buildShellConfig(): ShellConfig {
   const shellValue = (datum: ShellDatum): string => {
     const value = Config.get(datum.config)
     switch (datum.config) {
+      case 'SUPABASE_EDGE_URL':
       case 'SUPABASE_RDBMS_URL':
         return extractServerId(value) ?? value
       default:
