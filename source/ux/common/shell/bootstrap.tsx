@@ -47,7 +47,6 @@ import { AuthGuard } from './auth-guard.tsx'
 import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
-import { getShellMetadata } from './shell-metadata.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 3. INSTALL LOOK & FEEL
@@ -67,16 +66,11 @@ const indexRoute = createRoute({
   component: () => <Navigate to='/dashboard' />
 })
 
-const createLoginRoute = () => {
-  const shell = getShellMetadata()
-  return createRoute({
-    getParentRoute: () => rootRoute,
-    path: '/login',
-    component: () => <Login shell={shell} />
-  })
-}
-
-const loginRoute = createLoginRoute()
+const loginRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/login',
+  component: () => <Login />
+})
 
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,

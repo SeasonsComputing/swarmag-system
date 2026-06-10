@@ -22,21 +22,27 @@ import { createEffect, createSignal, For, Show } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
 import { UiAlert, UiButton, UiField, UiFormActions, UiInput, UiLayout } from '@ux/common/components/ui'
-import { type ShellMetadata } from './shell-metadata.ts'
+import { getShellMetadata, type ShellMetadata } from './shell-metadata.ts'
 
 import './login.css'
 import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
+
+/** Passwordless OTP login component. */
+export const Login = () => {
+  const shell = getShellMetadata()
+  return <LoginClient shell={shell} />
+}
 
 /** OTP flow step discriminator. */
 type LoginStep = 'email' | 'code'
 
 /** Login shell component props. */
-type LoginProps = {
+type LoginClientProps = {
   shell: ShellMetadata
 }
 
-/** Passwordless OTP login component. */
-export const Login = (props: LoginProps) => {
+/** Login client component. */
+const LoginClient = (props: LoginClientProps) => {
   const navigate = useNavigate()
   const [step, setStep] = createSignal<LoginStep>('email')
   const [email, setEmail] = createSignal('')
