@@ -209,7 +209,7 @@ Breakpoints match architecture-ux.md §7:
   /* App/Label */
   --sa-label-font-family: var(--sa-p-font-app-label);
   --sa-label-font-size: var(--sa-p-font-size-sm);
-  --sa-label-font-weight: var(--sa-p-font-weight-thin);
+  --sa-label-font-weight: var(--sa-p-font-weight-normal);
 
   /* App/UI */
   --sa-ui-font-family: var(--sa-p-font-app-ui);
