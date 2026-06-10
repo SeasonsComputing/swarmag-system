@@ -6,10 +6,12 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Two-step login form. Step 1 collects email and sends an OTP via api.Auth.
-Step 2 collects the code and verifies it. Auth state flows through
-onAuthStateChange in the app shell — this component does not write to
-sessionStore directly.
+Two-step login form:
+  Step 1 collects email and sends an OTP via api.Auth.
+  Step 2 collects the code and verifies it. 
+
+Auth state flows through onAuthStateChange in the app shell — 
+this component does not write to sessionStore directly.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
