@@ -17,7 +17,6 @@
 [data-ui='login-layout'] {
   height: 100%;
   display: grid;
-  grid-template-rows: 0.78fr auto;
   align-items: end;
   gap: var(--sa-space-xl);
   max-width: var(--sa-size-min);
