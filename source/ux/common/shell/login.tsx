@@ -20,7 +20,7 @@ import { createEffect, createSignal, For, Show } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
 import { UiAlert, UiButton, UiField, UiFormActions, UiInput, UiLayout } from '@ux/common/components/ui'
-import { ShellContext } from './shell-config.ts'
+import { type ShellContext } from './shell-config.ts'
 
 import './login.css'
 import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
