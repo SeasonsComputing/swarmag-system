@@ -22,7 +22,7 @@ import { createEffect, createSignal, For, Show } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
 import { UiAlert, UiButton, UiField, UiFormActions, UiInput, UiLayout } from '@ux/common/components/ui'
-import { type ShellContext } from './shell-config.ts'
+import { type ShellMetadata } from './shell-metadata.ts'
 
 import './login.css'
 import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
@@ -32,7 +32,7 @@ type LoginStep = 'email' | 'code'
 
 /** Login shell component props. */
 type LoginProps = {
-  shell: ShellContext
+  shell: ShellMetadata
 }
 
 /** Passwordless OTP login component. */

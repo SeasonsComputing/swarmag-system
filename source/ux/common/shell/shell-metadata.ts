@@ -24,14 +24,14 @@ export type ShellDatumValue = ShellDatum & {
 /** Shell configuration. */
 export type ShellConfig = readonly ShellDatumValue[]
 
-/** Shell context state. */
-export type ShellContext = {
+/** Shell identity and config data. */
+export type ShellMetadata = {
   identity: ShellIdentity
   config: ShellConfig
 }
 
 /** Build shell identity and config values. */
-export function buildShellContext(): ShellContext {
+export function getShellMetadata(): ShellMetadata {
   return {
     identity: {
       productName: Config.get('PRODUCT_NAME'),
