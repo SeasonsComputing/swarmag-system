@@ -26,6 +26,12 @@ Every AI session begins by ingesting essential specifications and designs. Once 
 3. `documentation/ux-components-guide-lite.md`
 4. `documentation/user-stories.md`
 
+**For "devops" sessions, additionally ingest in order:**
+
+1. `documentation/architecture-backend.md`
+2. `documentation/architecture-ux.md`
+3. `documentation/architecture-devops.md`
+
 **For all other sessions:**
 
 Report that the session has minimal context (constitution, domain model, core architecture and coding style-guide) and advise the Chief Architect to provide additional context prior to initiating any productions.
