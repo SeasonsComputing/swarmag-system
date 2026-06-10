@@ -9,13 +9,13 @@ PURPOSE
 App root features. Registers the auth state listener,
 performs the boot-time user fetch, and mounts the TanStack Router route tree.
 
-1.  CONFIGURE APPLICATION
-2.  INSTALL SHELL
-3.  INSTALL LOOK & FEEL
-4.  DEFINE ROUTES
-5.  BOOTSTRAP APPLICATION
-5.1  SYNCHRONIZE SESSION
-5.2  REGISTER SERVICE WORKER
+1. CONFIGURE APPLICATION
+2. INSTALL SHELL
+3. INSTALL LOOK & FEEL
+4. DEFINE ROUTES
+5. BOOTSTRAP APPLICATION
+5.1 SYNCHRONIZE SESSION
+5.2 REGISTER SERVICE WORKER
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -47,6 +47,7 @@ import { AuthGuard } from './auth-guard.tsx'
 import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
+import { buildShellContext } from './shell-config.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 3. INSTALL LOOK & FEEL
@@ -66,10 +67,16 @@ const indexRoute = createRoute({
   component: () => <Navigate to='/dashboard' />
 })
 
+// TODO: this feels wrong, useShellContext() perhaps or <ShellContextProvider>?
+const loginWithContext = () => {
+  const shell = buildShellContext()
+  return () => <Login shell={shell} />
+}
+
 const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
-  component: Login
+  component: loginWithContext
 })
 
 const dashboardRoute = createRoute({

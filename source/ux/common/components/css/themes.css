@@ -132,10 +132,6 @@
 
   /* Separator */
   --sa-separator-height: 1px;
-
-  /* Component max-widths */
-  --sa-form-max-width: 640px;
-  --sa-login-logo-max-width: var(--sa-size-min);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

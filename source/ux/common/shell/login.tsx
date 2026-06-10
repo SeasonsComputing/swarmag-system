@@ -16,18 +16,11 @@ PUBLIC
 Login Passwordless OTP login component.
 */
 
-import { createEffect, createSignal, Show } from '@solid-js'
+import { createEffect, createSignal, For, Show } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
-import {
-  UiAlert,
-  UiButton,
-  UiCard,
-  UiField,
-  UiFormActions,
-  UiInput,
-  UiLayout
-} from '@ux/common/components/ui'
+import { UiAlert, UiButton, UiField, UiFormActions, UiInput, UiLayout } from '@ux/common/components/ui'
+import { ShellContext } from './shell-config.ts'
 
 import './login.css'
 import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
@@ -35,8 +28,13 @@ import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
 /** OTP flow step discriminator. */
 type LoginStep = 'email' | 'code'
 
+/** Login shell component props. */
+type LoginProps = {
+  shell: ShellContext
+}
+
 /** Passwordless OTP login component. */
-export const Login = () => {
+export const Login = (props: LoginProps) => {
   const navigate = useNavigate()
   const [step, setStep] = createSignal<LoginStep>('email')
   const [email, setEmail] = createSignal('')
@@ -78,71 +76,91 @@ export const Login = () => {
 
   return (
     <div data-ui='login'>
-      <div data-ui='login-hero'>
-        <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
-      </div>
-      <div data-ui='login-form'>
-        <Show when={step() === 'email'}>
-          <p>Enter your email to receive a one-time sign-in code.</p>
-          <UiField for='email' label='Email'>
-            <UiInput
-              name='email'
-              type='email'
-              autocomplete='email'
-              value={email()}
-              onInput={e => setEmail(e.currentTarget.value)}
-              error={error() !== null}
-              disabled={pending()}
-              required
-            />
-          </UiField>
-          <UiLayout variant='inline-fill'>
-            <UiButton
-              type='button'
-              variant='primary'
-              loading={pending()}
-              onClick={() => void submitEmail()}
-            >
-              Send Code
-            </UiButton>
-          </UiLayout>
-        </Show>
-        <Show when={step() === 'code'}>
-          <p>
-            Enter the 6-digit code sent to <strong>{email()}</strong>.
-          </p>
-          <UiField for='code' label='Code'>
-            <UiInput
-              name='code'
-              type='text'
-              inputMode='numeric'
-              autocomplete='one-time-code'
-              value={code()}
-              onInput={e => setCode(e.currentTarget.value)}
-              error={error() !== null}
-              disabled={pending()}
-              required
-            />
-          </UiField>
-          <UiFormActions>
-            <UiButton type='button' variant='ghost' onClick={() => setStep('email')}>
-              Back
-            </UiButton>
-            <UiButton
-              type='button'
-              variant='primary'
-              loading={pending()}
-              onClick={() => void submitCode()}
-            >
-              Sign In
-            </UiButton>
-          </UiFormActions>
-        </Show>
-        <Show when={!!error()}>
-          <UiCard>
-            <UiAlert variant='danger'>{error()}</UiAlert>
-          </UiCard>
-        </Show>
+      <div data-ui='login-layout'>
+        <UiLayout gap='loose'>
+          <div data-ui='login-hero'>
+            <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
+            <UiLayout gap='tight'>
+              <span data-ui='login-product'>{props.shell.identity.productName}</span>
+              <span data-ui='login-application'>{props.shell.identity.applicationName}</span>
+            </UiLayout>
+          </div>
+          <div data-ui='login-form'>
+            <Show when={step() === 'email'}>
+              <UiLayout>
+                <p>Enter your email to receive a one-time sign-in code.</p>
+                <UiField for='email' label='Email'>
+                  <UiInput
+                    name='email'
+                    type='email'
+                    autocomplete='email'
+                    value={email()}
+                    onInput={e => setEmail(e.currentTarget.value)}
+                    error={error() !== null}
+                    disabled={pending()}
+                    required
+                  />
+                </UiField>
+                <UiButton
+                  type='button'
+                  variant='primary'
+                  loading={pending()}
+                  onClick={() => void submitEmail()}
+                >
+                  Send Code
+                </UiButton>
+              </UiLayout>
+            </Show>
+            <Show when={step() === 'code'}>
+              <UiLayout>
+                <p>
+                  Enter the 6-digit code sent to <strong>{email()}</strong>.
+                </p>
+                <UiField for='code' label='Code'>
+                  <UiInput
+                    name='code'
+                    type='text'
+                    inputMode='numeric'
+                    autocomplete='one-time-code'
+                    value={code()}
+                    onInput={e => setCode(e.currentTarget.value)}
+                    error={error() !== null}
+                    disabled={pending()}
+                    required
+                  />
+                </UiField>
+                <UiFormActions>
+                  <UiButton type='button' variant='ghost' onClick={() => setStep('email')}>
+                    Back
+                  </UiButton>
+                  <UiButton
+                    type='button'
+                    variant='primary'
+                    loading={pending()}
+                    onClick={() => void submitCode()}
+                  >
+                    Sign In
+                  </UiButton>
+                </UiFormActions>
+              </UiLayout>
+            </Show>
+            <Show when={!!error()}>
+              <UiAlert variant='danger'>{error()}</UiAlert>
+            </Show>
+          </div>
+        </UiLayout>
+        <div>
+          <dl data-ui='login-config'>
+            <For each={props.shell.config}>
+              {datum => (
+                <div>
+                  <dt>{datum.label}</dt>
+                  <dd>{datum.value}</dd>
+                </div>
+              )}
+            </For>
+          </dl>
+        </div>
       </div>
     </div>
   )
