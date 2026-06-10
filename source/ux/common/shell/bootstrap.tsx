@@ -14,8 +14,8 @@ performs the boot-time user fetch, and mounts the TanStack Router route tree.
 3. INSTALL LOOK & FEEL
 4. DEFINE ROUTES
 5. BOOTSTRAP APPLICATION
-5.1 SYNCHRONIZE SESSION
-5.2 REGISTER SERVICE WORKER
+6. SYNCHRONIZE SESSION
+7. REGISTER SERVICE WORKER
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -67,17 +67,16 @@ const indexRoute = createRoute({
   component: () => <Navigate to='/dashboard' />
 })
 
-// TODO: this feels wrong, useShellContext() perhaps or <ShellContextProvider>?
-const loginWithContext = () => {
+const createLoginRoute = () => {
   const shell = buildShellContext()
-  return () => <Login shell={shell} />
+  return createRoute({
+    getParentRoute: () => rootRoute,
+    path: '/login',
+    component: () => <Login shell={shell} />
+  })
 }
 
-const loginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/login',
-  component: loginWithContext
-})
+const loginRoute = createLoginRoute()
 
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -98,10 +97,12 @@ const router = createRouter({ routeTree })
 // 5. BOOTSTRAP APPLICATION
 // ────────────────────────────────────────────────────────────────────────────
 
+const showApplication = () => document.body.style.opacity = '1'
+
 /** Standard application root; wires auth state and mounts the router. */
 const Application = () => {
   onMount(() => {
-    document.body.style.opacity = '1'
+    showApplication()
     void syncSession()
     const unsubscribe = api.Auth.onAuthStateChange(session => void applySession(session))
     onCleanup(unsubscribe)
@@ -117,14 +118,14 @@ export async function bootstrap(dashboardSeed: unknown) {
     render(() => <Application />, document.getElementById('root')!)
     registerServiceWorker()
   } catch (e) {
-    document.body.style.opacity = '1'
+    showApplication()
     console.error('[bootstrap] startup failed', e)
     throw e
   }
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// 5.1 SYNCHRONIZE SESSION
+// 6. SYNCHRONIZE SESSION
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Resolve the persisted browser session at boot before route guards decide. */
@@ -151,7 +152,7 @@ async function applySession(session: Session | null): Promise<void> {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// 5.2 REGISTER SERVICE WORKER
+// 7. REGISTER SERVICE WORKER
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Register the Admin service worker for shell caching offline support. */
