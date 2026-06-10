@@ -88,10 +88,14 @@ environment.
 
 ### 4.1 Naming Convention
 
-Each deployable package maintains configuration files at the locations below. For
-UX apps, the target token (`local`, `stage`, `prod`) names the backend binding
-target. All actual env files are gitignored; only `.env.example` templates are
-committed.
+Each deployable package maintains configuration templates and generated
+configuration files at the locations below. For UX apps, the target token
+(`local`, `stage`, `prod`) names the backend binding target.
+
+The `.env.example` file is the committed package-environment template. The
+corresponding `.env` file is a generated, gitignored package input. It is
+disposable and may be recreated from the template by the package script when
+`--init-env` is used.
 
 **UX apps** — `source/ux/config/`
 
@@ -113,22 +117,46 @@ supabase-prod.env             ← gitignored
 
 ### 4.2 Placeholder Convention
 
-Any env value that must be resolved from the secret registry at package time is set to the literal string `__SECRET__` in the env file:
+Any env value that must be resolved from the secret registry at package time is
+set to the literal string `__SECRET__` in the env template:
 
 ```bash
 # app-admin-local.env.example
 VITE_PACKAGE_APP_ID=swarmag-app-admin
 VITE_PACKAGE_TARGET=local
-VITE_PACKAGE_VERSION=0.0.0
-VITE_SUPABASE_EDGE_URL=http://localhost:54321
-VITE_SUPABASE_RDBMS_URL=http://localhost:54321
+VITE_PACKAGE_VERSION=__SECRET__
+VITE_PRODUCT_NAME="swarmAg Operations System"
+VITE_APPLICATION_NAME="Administrative Portal"
+VITE_SUPABASE_EDGE_URL=__SECRET__
+VITE_SUPABASE_RDBMS_URL=__SECRET__
 VITE_SUPABASE_PUBLIC_KEY=__SECRET__
 VITE_SUPABASE_CLIENT_MODE=browser
 VITE_SERVICE_WORKER_ENABLED=false
 VITE_LOCAL_DB_NAME=swarmag-app-admin
 ```
 
-The packaging script resolves `__SECRET__` values from `secrets.jsonc` before invoking the Vite build. The secret value is never written to disk — it is injected into the build process environment only.
+The packaging script resolves `__SECRET__` values from `secrets.jsonc` before
+invoking the Vite build. The resolved value is never written to disk — it is
+injected into the build process environment only.
+
+For UX package templates, target-specific package values use `__SECRET__` when
+they vary by binding target or deployment cycle. This includes:
+
+- `VITE_PACKAGE_VERSION`
+- `VITE_SUPABASE_EDGE_URL`
+- `VITE_SUPABASE_RDBMS_URL`
+- `VITE_SUPABASE_PUBLIC_KEY`
+
+Stable non-secret package identity values remain literal in the template. This
+includes:
+
+- `VITE_PACKAGE_APP_ID`
+- `VITE_PACKAGE_TARGET`
+- `VITE_PRODUCT_NAME`
+- `VITE_APPLICATION_NAME`
+- `VITE_SUPABASE_CLIENT_MODE`
+- `VITE_SERVICE_WORKER_ENABLED`
+- `VITE_LOCAL_DB_NAME`
 
 ### 4.3 Security Rules
 
@@ -185,20 +213,22 @@ Each entry is an object with these fields:
     "env": "local",
     "config": "VITE_SUPABASE_PUBLIC_KEY",
     "tags": ["supabase", "public-key"],
-    "secret": "<hex-value>"
+    "secret": "<value>"
   }
 }
 ```
 
 ### 5.5 Bootstrap Workflow
 
-A new developer provisions `secrets.jsonc` as follows:
+A developer provisions `secrets.jsonc` as follows:
 
-1. Copy a `.env.example` for each deployable package to its `.env` counterpart.
-2. Create `secrets.jsonc` at the repository root as an empty object `{}`.
-3. For each `__SECRET__` placeholder in the env files, add an entry to `secrets.jsonc` with the correct composite key and a real or development-safe value.
-4. Run `deno task guard:secrets` to validate the file structure.
-5. Run `deno task app-{name}-package-local` to confirm the packaging workflow resolves all secrets.
+1. Create `secrets.jsonc` at the repository root as an empty object `{}`.
+2. For each `__SECRET__` placeholder in the env templates, add an entry to
+   `secrets.jsonc` with the correct composite key and a real or
+   development-safe value.
+3. Run `deno task guard:secrets` to validate the file structure.
+4. Run the package script with `--init-env` to recreate the target `.env` from
+   its template and confirm the packaging workflow resolves all secrets.
 
 For local JWT secrets in packages that require them: `deno task gen:jwt-secret`
 prints a secure value ready to paste into `secrets.jsonc`.
@@ -246,17 +276,27 @@ Each deployable UX app has a pair of scripts:
 The `app-{name}-package.sh` script performs these steps in order:
 
 1. Validate the target (`local`, `stage`, `prod`)
-2. Load the env file for the target
-3. Validate `VITE_PACKAGE_APP_ID` and `VITE_PACKAGE_TARGET` match expectations
-4. Resolve all `__SECRET__` placeholders from `secrets.jsonc` into the process environment
-5. Fail if any required env var is empty or unresolved after secret resolution
-6. Build the Vite PWA into a temp dist directory
-7. Copy required static files (`manifest.webmanifest`, `sw.js`, `icon.png`)
-8. **Secrets leak guard** — scan for and remove any `secrets.jsonc` files in the dist output
-9. Write `build-meta.json` (app, target, UTC timestamp, git SHA)
-10. Zip the dist directory into `build/packages/{artifact-basename}.zip`
-11. **Post-zip secrets guard** — inspect the zip contents; delete artifact and exit 1 if `secrets.jsonc` is found
-12. Print `PACKAGE_ARTIFACT` and `PACKAGE_SHA256`
+2. When `--init-env` is present, remove the target `.env` and recreate it from
+   the committed `.
+3. When `--init-env` is absent, require the target `.env` to exist
+4. Load the env file for the target
+5. Validate `VITE_PACKAGE_APP_ID` and `VITE_PACKAGE_TARGET` match expectations
+6. Resolve all `__SECRET__` placeholders from `secrets.jsonc` into the process
+   environment
+7. Fail if any required env var is empty or unresolved after secret resolution
+8. Build the Vite PWA into a temp dist directory
+9. Copy required static files (`manifest.webmanifest`, `sw.js`, `icon.png`)
+10. **Secrets leak guard** — scan for and remove any `secrets.jsonc` files in
+    the dist output
+11. Write `build-meta.json` (app, target, UTC timestamp, git SHA)
+12. Zip the dist directory into `build/packages/{artifact-basename}.zip`
+13. **Post-zip secrets guard** — inspect the zip contents; delete artifact and
+    exit 1 if `secrets.jsonc` is found
+14. Print `PACKAGE_ARTIFACT` and `PACKAGE_SHA256`
+
+Normal packaging does not mutate `.env`. Packaging with `--init-env` recreates
+the target `.env` from the committed template before loading it. The package
+script never writes resolved secret values into `.env`.
 
 ### 7.3 Artifact Naming
 

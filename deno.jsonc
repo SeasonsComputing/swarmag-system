@@ -113,6 +113,11 @@
     "app-customer-package-local-verify": "bash source/devops/scripts/app-customer-package-verify.sh local",
     "app-customer-package-stage-verify": "bash source/devops/scripts/app-customer-package-verify.sh stage",
     "app-customer-package-prod-verify": "bash source/devops/scripts/app-customer-package-verify.sh prod",
+
+    // ────────────────────────────────────────────────────────────────────────────
+    // Local Development Servers
+    // ────────────────────────────────────────────────────────────────────────────
+
     "app-admin-stage-local": "bash source/devops/scripts/app-admin-stage-local.sh",
     "app-style-guide-local": "bash source/devops/scripts/app-style-guide-local.sh"
   },
