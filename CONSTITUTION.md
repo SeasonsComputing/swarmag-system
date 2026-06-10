@@ -1,4 +1,4 @@
-![Seasons Computing logo](../seasonscomputing-logo.png)
+![Seasons Computing logo](seasonscomputing-logo.png)
 
 # Software Architecture Constitution (2.0)
 
