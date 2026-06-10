@@ -1,5 +1,5 @@
 /**
- * swarmAg Administrative Application
+ * swarmAg Administration Application
  */
 
 import { bootstrap } from '@ux/common/shell/bootstrap.tsx'
