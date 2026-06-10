@@ -19,7 +19,7 @@ import type { UiComponent, UiContainerProps } from '@ux/common/components/ui'
 export type ContentProps = UiContainerProps
 
 /** Main content frame for authenticated app views. */
-export const Content = (props: UiContainerProps): UiComponent => (
+export const Content = (props: ContentProps): UiComponent => (
   <main>
     {props.children}
   </main>
