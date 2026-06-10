@@ -66,15 +66,16 @@
 [data-ui='login-application'] {
   text-align: center;
   color: var(--sa-text-primary);
-  font-family: var(--sa-annotation-font-family);
-  font-size: var(--sa-annotation-font-size);
-  font-weight: var(--sa-annotation-font-weight);
+  font-family: var(--sa-heading-font-family);
+  font-size: var(--sa-heading-font-size-h4);
+  font-weight: var(--sa-heading-font-weight);
 }
 
 [data-ui='login-config'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-data-font-family);
-  font-size: var(--sa-ui-font-size-compact);
+  font-size: var(--sa-p-font-size-xs);
+  text-transform: lowercase;
 }
 
 [data-ui='login-config'] > * {

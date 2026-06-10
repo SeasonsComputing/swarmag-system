@@ -25,7 +25,7 @@
   color: var(--sa-color-primary);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--sa-label-font-family);
+  font-family: var(--sa-button-font-family);
   font-size: var(--sa-button-font-size);
   font-weight: var(--sa-button-font-weight);
   gap: var(--sa-space-sm);
@@ -97,7 +97,7 @@
   color: var(--sa-text-primary);
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size);
-  font-weight: var(--sa-body-font-weight);
+  font-weight: var(--sa-ui-font-weight);
   line-height: var(--sa-body-line-height);
   min-height: var(--sa-touch-target-sm);
   padding-block: var(--sa-space-sm);
@@ -222,9 +222,9 @@
   color: var(--sa-text-secondary);
   cursor: pointer;
   display: flex;
-  font-family: var(--sa-annotation-font-family);
-  font-size: var(--sa-annotation-font-size);
-  font-weight: var(--sa-annotation-font-weight);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
   justify-content: space-between;
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -273,9 +273,6 @@
   border-radius: var(--sa-radius-sm);
   display: grid;
   gap: var(--sa-space-sm);
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-ui-font-size);
-  font-weight: var(--sa-ui-font-weight);
   list-style: none;
   padding: var(--sa-space-sm);
 }
@@ -288,9 +285,9 @@
   color: var(--sa-text-secondary);
   cursor: pointer;
   display: flex;
-  font-family: var(--sa-annotation-font-family);
-  font-size: var(--sa-annotation-font-size);
-  font-weight: var(--sa-annotation-font-weight);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
   justify-content: space-between;
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-md);
@@ -601,8 +598,8 @@
   color: var(--sa-text-secondary);
   cursor: pointer;
   display: flex;
-  font-family: var(--sa-ui-font-family);
-  font-size: var(--sa-ui-font-size-compact);
+  font-family: var(--sa-button-font-family);
+  font-size: var(--sa-button-font-size);
   font-weight: var(--sa-button-font-weight);
   justify-content: space-between;
   min-height: var(--sa-touch-target-sm);
@@ -658,9 +655,9 @@
   color: var(--sa-text-secondary);
   cursor: pointer;
   display: inline-flex;
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-ui-font-size-compact);
-  font-weight: var(--sa-toggle-font-weight);
+  font-family: var(--sa-button-font-family);
+  font-size: var(--sa-button-font-size);
+  font-weight: var(--sa-button-font-weight);
   gap: var(--sa-space-sm);
   justify-content: center;
   min-height: var(--sa-touch-target-sm);
@@ -759,9 +756,9 @@
   border-radius: var(--sa-radius-sm);
   color: var(--sa-text-secondary);
   cursor: pointer;
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-ui-font-size-compact);
-  font-weight: var(--sa-tab-font-weight);
+  font-family: var(--sa-button-font-family);
+  font-size: var(--sa-button-font-size);
+  font-weight: var(--sa-button-font-weight);
   padding-block: var(--sa-space-sm);
   padding-inline: var(--sa-space-sm);
   transition: var(--sa-transition-fast);
@@ -777,7 +774,6 @@
   background: var(--sa-tab-selected-bg-selected);
   border-color: var(--sa-tab-selected-border-primary);
   color: var(--sa-tab-selected-color-primary);
-  font-weight: var(--sa-tab-font-weight);
   box-shadow: var(--sa-shadow-sm);
 }
 
@@ -855,7 +851,7 @@
   display: inline-flex;
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
-  font-weight: var(--sa-badge-font-weight);
+  font-weight: var(--sa-ui-font-weight);
   gap: var(--sa-space-xs);
   padding-block: var(--sa-space-xs);
   padding-inline: var(--sa-space-md);
@@ -893,6 +889,7 @@
   border-radius: var(--sa-radius-sm);
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
+  font-weight: var(--sa-ui-font-weight);
   padding: var(--sa-space-sm);
 }
 
@@ -1040,6 +1037,7 @@
   color: var(--sa-text-primary);
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
+  font-weight: var(--sa-ui-font-weight);
   max-inline-size: 20rem;
   padding: var(--sa-space-md);
   z-index: var(--sa-z-popover);
@@ -1057,6 +1055,7 @@
   color: var(--sa-text-primary);
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
+  font-weight: var(--sa-ui-font-weight);
   max-inline-size: 18rem;
   padding-block: var(--sa-space-xs);
   padding-inline: var(--sa-space-sm);
