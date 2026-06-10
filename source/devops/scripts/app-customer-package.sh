@@ -48,15 +48,14 @@ BUILD_ROOT="${BUILD_ROOT:-${ROOT}/build}"
 DIST_DIR="${BUILD_ROOT}/dist/app-customer"
 PACKAGE_DIR="${BUILD_ROOT}/packages"
 
-if [[ ! -f "${ENV_FILE}" ]]; then
-  if [[ "${INIT_ENV}" == "true" ]]; then
-    if [[ ! -f "${ENV_EXAMPLE_FILE}" ]]; then
-      echo "Missing environment example file: ${ENV_EXAMPLE_FILE}"
-      exit 1
-    fi
-    cp "${ENV_EXAMPLE_FILE}" "${ENV_FILE}"
-    echo "Initialized environment file: ${ENV_FILE}"
+if [[ "${INIT_ENV}" == "true" ]]; then
+  if [[ ! -f "${ENV_EXAMPLE_FILE}" ]]; then
+    echo "Missing environment example file: ${ENV_EXAMPLE_FILE}"
+    exit 1
   fi
+  rm -f "${ENV_FILE}"
+  cp "${ENV_EXAMPLE_FILE}" "${ENV_FILE}"
+  echo "Initialized environment file: ${ENV_FILE}"
 fi
 
 if [[ ! -f "${ENV_FILE}" ]]; then
@@ -125,7 +124,7 @@ for key in "${REQUIRED_KEYS[@]}"; do
     MISSING_KEYS+=("${key}")
     continue
   fi
-  if [[ "${TARGET}" == "prod" && "${value}" == "__SECRET__" ]]; then
+  if [[ "${value}" == "__SECRET__" ]]; then
     MISSING_KEYS+=("${key}")
   fi
 done
