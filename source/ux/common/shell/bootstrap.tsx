@@ -47,7 +47,7 @@ import { AuthGuard } from './auth-guard.tsx'
 import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
-import { buildShellContext } from './shell-config.ts'
+import { getShellMetadata } from './shell-metadata.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 3. INSTALL LOOK & FEEL
@@ -68,7 +68,7 @@ const indexRoute = createRoute({
 })
 
 const createLoginRoute = () => {
-  const shell = buildShellContext()
+  const shell = getShellMetadata()
   return createRoute({
     getParentRoute: () => rootRoute,
     path: '/login',
