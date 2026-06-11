@@ -32,7 +32,7 @@ fi
 
 REQUIRED_PATHS=(
   "index.html"
-  "build-meta.json"
+  "build-meta.jsonc"
   "manifest.webmanifest"
 )
 

@@ -114,8 +114,9 @@ Committed env templates live under `source/ux/config/` and
 
 Package scripts recreate generated UX `.env` files from templates when
 `--init-env` is passed. Template values set to `__SECRET__` are resolved from
-the local, gitignored `secrets.jsonc` registry during packaging and are not
-written back into generated `.env` files.
+the local, gitignored `secrets.jsonc` registry during packaging, and
+`__PACKAGE_VERSION__` is computed from `VERSION`, Git build count, and target.
+Resolved values are not written back into generated `.env` files.
 
 ### 2.3 Configuration Pattern
 

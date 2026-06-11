@@ -121,7 +121,7 @@ set to the literal string `__SECRET__` in the env template:
 # app-admin-stage.env.example
 VITE_PACKAGE_APP_ID=swarmag-app-admin
 VITE_PACKAGE_TARGET=stage
-VITE_PACKAGE_VERSION=__SECRET__
+VITE_PACKAGE_VERSION=__PACKAGE_VERSION__
 VITE_PRODUCT_NAME="swarmAg Operations System"
 VITE_APPLICATION_NAME="Administration Portal"
 VITE_SUPABASE_EDGE_URL=__SECRET__
@@ -137,18 +137,22 @@ invoking the Vite build. The resolved value is never written to disk — it is
 injected into the build process environment only.
 
 For UX package templates, target-specific package values use `__SECRET__` when
-they vary by binding target or deployment cycle. This includes:
+they vary by binding target and are secret material. This includes:
 
-- `VITE_PACKAGE_VERSION`
 - `VITE_SUPABASE_EDGE_URL`
 - `VITE_SUPABASE_RDBMS_URL`
 - `VITE_SUPABASE_PUBLIC_KEY`
+
+`VITE_PACKAGE_VERSION` is operational metadata, not a secret. UX package
+templates set it to `__PACKAGE_VERSION__`, and the packaging workflow computes
+the concrete value.
 
 Stable non-secret package identity values remain literal in the template. This
 includes:
 
 - `VITE_PACKAGE_APP_ID`
 - `VITE_PACKAGE_TARGET`
+- `VITE_PACKAGE_VERSION`
 - `VITE_PRODUCT_NAME`
 - `VITE_APPLICATION_NAME`
 - `VITE_SUPABASE_CLIENT_MODE`
@@ -259,7 +263,30 @@ deno run --allow-read --allow-write source/devops/scripts/set-secret.ts secrets.
 
 ## 7. Packaging Workflow
 
-### 7.1 Package Scripts
+### 7.1 Package Versioning
+
+UX package versions use this format:
+
+```text
+{major}.{minor}.{build}-{target}
+```
+
+Version parts are sourced as follows:
+
+| Part          | Source                         | Purpose                        |
+| ------------- | ------------------------------ | ------------------------------ |
+| `major.minor` | Committed root `VERSION` file  | Product release line           |
+| `build`       | `git rev-list --count HEAD`    | Repository-derived build trace |
+| `target`      | Package script target argument | Backend binding target         |
+
+For example, a stage package built from release line `0.1` at Git build count
+`247` has version `0.1.247-stage`.
+
+The package script exports the computed value as `VITE_PACKAGE_VERSION` for the
+Vite build. It does not write the computed value to generated `.env` files or
+store it in `secrets.jsonc`.
+
+### 7.2 Package Scripts
 
 Each deployable UX app has a pair of scripts:
 
@@ -268,7 +295,7 @@ Each deployable UX app has a pair of scripts:
 | `app-{name}-package.sh`        | Build, resolve secrets, zip artifact, guard output |
 | `app-{name}-package-verify.sh` | Post-package verification of the artifact          |
 
-### 7.2 Packaging Steps
+### 7.3 Packaging Steps
 
 The `app-{name}-package.sh` script performs these steps in order:
 
@@ -278,24 +305,27 @@ The `app-{name}-package.sh` script performs these steps in order:
 3. When `--init-env` is absent, require the target `.env` to exist
 4. Load the env file for the target
 5. Validate `VITE_PACKAGE_APP_ID` and `VITE_PACKAGE_TARGET` match expectations
-6. Resolve all `__SECRET__` placeholders from `secrets.jsonc` into the process
+6. Compute `VITE_PACKAGE_VERSION` from `VERSION`, Git build count, and target
+7. Resolve all `__SECRET__` placeholders from `secrets.jsonc` into the process
    environment
-7. Fail if any required env var is empty or unresolved after secret resolution
-8. Build the Vite PWA into a temp dist directory
-9. Copy required static files (`manifest.webmanifest`, `sw.js`, `icon.png`)
-10. **Secrets leak guard** — scan for and remove any `secrets.jsonc` files in
+8. Fail if any required env var is empty or unresolved after package version
+   and secret resolution
+9. Build the Vite PWA into a temp dist directory
+10. Copy required static files (`manifest.webmanifest`, `sw.js`, `icon.png`)
+11. **Secrets leak guard** — scan for and remove any `secrets.jsonc` files in
     the dist output
-11. Write `build-meta.json` (app, target, UTC timestamp, git SHA)
-12. Zip the dist directory into `build/packages/{artifact-basename}.zip`
-13. **Post-zip secrets guard** — inspect the zip contents; delete artifact and
+12. Write `build-meta.jsonc` (app, target, version, build number, UTC
+    timestamp, git SHA)
+13. Zip the dist directory into `build/packages/{artifact-basename}.zip`
+14. **Post-zip secrets guard** — inspect the zip contents; delete artifact and
     exit 1 if `secrets.jsonc` is found
-14. Print `PACKAGE_ARTIFACT` and `PACKAGE_SHA256`
+15. Print `PACKAGE_ARTIFACT` and `PACKAGE_SHA256`
 
 Normal packaging does not mutate `.env`. Packaging with `--init-env` recreates
 the target `.env` from the committed template before loading it. The package
 script never writes resolved secret values into `.env`.
 
-### 7.3 Artifact Naming
+### 7.4 Artifact Naming
 
 ```
 swarmag-{app-name}-{target}-{YYYYMMDDTHHMMSSZ}-{git-sha}.zip
@@ -303,13 +333,13 @@ swarmag-{app-name}-{target}-{YYYYMMDDTHHMMSSZ}-{git-sha}.zip
 
 Artifacts land in `build/packages/`. No build artifacts are committed to the repository.
 
-### 7.4 JWT Secret Generation
+### 7.5 JWT Secret Generation
 
 `deno task gen:jwt-secret` prints a secure JWT secret for packages that require
 one. The generated value is copied into the appropriate `secrets.jsonc` entry
 and resolved by the normal packaging workflow.
 
-### 7.5 deno.jsonc Task Reference
+### 7.6 deno.jsonc Task Reference
 
 ```
 app-{name}-package-dev                Build dev artifact
