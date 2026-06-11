@@ -3,14 +3,14 @@ set -euo pipefail
 
 TARGET="${1:-}"
 if [[ -z "${TARGET}" ]]; then
-  echo "Usage: $0 <local|stage|prod> [artifact-path]"
+  echo "Usage: $0 <dev|stage|prod> [artifact-path]"
   exit 1
 fi
 
 case "${TARGET}" in
-  local|stage|prod) ;;
+  dev|stage|prod) ;;
   *)
-    echo "Invalid target '${TARGET}'. Expected one of: local, stage, prod"
+    echo "Invalid target '${TARGET}'. Expected one of: dev, stage, prod"
     exit 1
     ;;
 esac

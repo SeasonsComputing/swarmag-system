@@ -3,7 +3,7 @@ set -euo pipefail
 
 TARGET="${1:-}"
 if [[ -z "${TARGET}" ]]; then
-  echo "Usage: $0 <local|stage|prod> [--init-env] [--secrets-file <path>]"
+  echo "Usage: $0 <dev|stage|prod> [--init-env] [--secrets-file <path>]"
   exit 1
 fi
 shift
@@ -32,9 +32,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 case "${TARGET}" in
-  local|stage|prod) ;;
+  dev|stage|prod) ;;
   *)
-    echo "Invalid target '${TARGET}'. Expected one of: local, stage, prod"
+    echo "Invalid target '${TARGET}'. Expected one of: dev, stage, prod"
     exit 1
     ;;
 esac
@@ -144,9 +144,6 @@ mkdir -p "${DIST_DIR}"
 (
   cd "${APP_ROOT}"
   VITE_MODE="${TARGET}"
-  if [[ "${TARGET}" == "local" ]]; then
-    VITE_MODE="development"
-  fi
   deno run -A npm:vite build --config vite.config.ts --mode "${VITE_MODE}" --outDir "${DIST_DIR}" --emptyOutDir
 )
 

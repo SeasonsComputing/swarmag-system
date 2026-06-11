@@ -27,7 +27,7 @@ type SecretRecord = {
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const SECRETS_FILE = `${ROOT}/secrets.jsonc`
-const VALID_ENVS = new Set(['local', 'stage', 'prod'])
+const VALID_ENVS = new Set(['dev', 'stage', 'prod'])
 
 const parseSecretsJsonc = (source: string): Dictionary<SecretRecord> => {
   const withoutBlockComments = source.replace(/\/\*[\s\S]*?\*\//g, '')
@@ -71,7 +71,7 @@ const main = async () => {
       violations.push(`${key} has invalid app`)
     }
     if (typeof record.env !== 'string' || !VALID_ENVS.has(record.env)) {
-      violations.push(`${key} has invalid env (expected local|stage|prod)`)
+      violations.push(`${key} has invalid env (expected dev|stage|prod)`)
     }
     if (typeof record.config !== 'string' || record.config.length === 0) {
       violations.push(`${key} has invalid config`)
