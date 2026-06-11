@@ -163,7 +163,7 @@ mkdir -p "${DIST_DIR}"
   deno run -A npm:vite build --config vite.config.ts --mode "${VITE_MODE}" --outDir "${DIST_DIR}" --emptyOutDir
 )
 
-REQUIRED_STATIC_FILES=("manifest.webmanifest" "sw.js" "icon.png")
+REQUIRED_STATIC_FILES=("manifest.webmanifest" "sw.js" "icon.png" "netlify.toml" "_redirects")
 for file in "${REQUIRED_STATIC_FILES[@]}"; do
   SOURCE_FILE="${APP_ROOT}/${file}"
   if [[ ! -f "${SOURCE_FILE}" ]]; then
