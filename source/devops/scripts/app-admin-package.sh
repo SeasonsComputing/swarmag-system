@@ -3,22 +3,17 @@ set -euo pipefail
 
 TARGET="${1:-}"
 if [[ -z "${TARGET}" ]]; then
-  echo "Usage: $0 <local|stage|prod> [--init-env] [--genesis] [--secrets-file <path>]"
+  echo "Usage: $0 <dev|stage|prod> [--init-env] [--secrets-file <path>]"
   exit 1
 fi
 shift
 INIT_ENV="false"
-GENESIS_BUILD="false"
 SECRETS_FILE=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --init-env)
       INIT_ENV="true"
-      shift
-      ;;
-    --genesis)
-      GENESIS_BUILD="true"
       shift
       ;;
     --secrets-file)
@@ -37,9 +32,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 case "${TARGET}" in
-  local|stage|prod) ;;
+  dev|stage|prod) ;;
   *)
-    echo "Invalid target '${TARGET}'. Expected one of: local, stage, prod"
+    echo "Invalid target '${TARGET}'. Expected one of: dev, stage, prod"
     exit 1
     ;;
 esac
@@ -104,16 +99,6 @@ if [[ -n "${SECRETS_FILE}" && ! -f "${SECRETS_FILE}" ]]; then
   exit 1
 fi
 
-if [[ "${GENESIS_BUILD}" == "true" ]]; then
-  if [[ -z "${SECRETS_FILE}" ]]; then
-    echo "Genesis build requires --secrets-file <path>"
-    exit 1
-  fi
-
-  rm -rf "${DIST_DIR}"
-  rm -f "${PACKAGE_DIR}/swarmag-app-admin-${TARGET}-"*.zip
-fi
-
 if [[ -n "${SECRETS_FILE}" ]]; then
   for key in "${REQUIRED_KEYS[@]}"; do
     current="${!key:-}"
@@ -159,9 +144,6 @@ mkdir -p "${DIST_DIR}"
 (
   cd "${APP_ROOT}"
   VITE_MODE="${TARGET}"
-  if [[ "${TARGET}" == "local" ]]; then
-    VITE_MODE="development"
-  fi
   deno run -A npm:vite build --config vite.config.ts --mode "${VITE_MODE}" --outDir "${DIST_DIR}" --emptyOutDir
 )
 

@@ -7,7 +7,7 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Prints a 64-byte random value encoded as hex for JWT_SECRET values used by
-local, stage, or production environment files.
+dev, stage, or production environment files.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
