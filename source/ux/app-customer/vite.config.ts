@@ -7,6 +7,15 @@ const root = resolve(fileURLToPath(new URL('.', import.meta.url)), '../../..')
 
 export default defineConfig({
   plugins: [solidPlugin()],
+  cacheDir: resolve(root, 'build/cache/app-customer-vite'),
+  optimizeDeps: {
+    noDiscovery: true
+  },
+  server: {
+    fs: {
+      allow: ['..']
+    }
+  },
   resolve: {
     alias: [
       { find: /^@core\/std$/, replacement: resolve(root, 'source/core/std/std.ts') },
