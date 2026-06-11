@@ -587,7 +587,7 @@ No row collapse on small viewport. Horizontal swipe per row. Vertical scroll on 
 
 **`source/ux/app-{admin|ops|customer}/app-{admin|ops|customer}-dashboard.json`**
 
-Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/ux/common/stores/dashboard-state.ts`). Not hardcoded. May be overridden per user in future — for now a single default config per app.
+Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/ux/common/stores/dashboard-state.ts`). Not hardcoded. The current contract uses one default config per app.
 
 The app-local dashboard JSON conforms to `DashboardView` from
 `source/ux/common/views/dashboard-views.ts`. `DashboardState.init(seed)`
