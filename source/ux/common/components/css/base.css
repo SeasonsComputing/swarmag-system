@@ -207,6 +207,7 @@ blockquote {
   border-inline-start: var(--sa-blockquote-border);
   color: var(--sa-text-secondary);
   font-family: var(--sa-body-font-family);
+  font-weight: var(--sa-body-font-weight);
   font-style: italic;
   margin-inline: 0;
   padding: var(--sa-gap);
