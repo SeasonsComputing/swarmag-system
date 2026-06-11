@@ -108,8 +108,8 @@ app-{admin|ops|customer}-{dev|stage|prod}.env          ← gitignored
 **Backend (Supabase edge)** — `source/back/supabase-edge/config/`
 
 ```
-back-supabase-edge-{dev|stage|prod}-env.example        ← committed template
-back-supabase-edge-{dev|stage|prod}-env                ← gitignored
+supabase-{dev|stage|prod}.env.example                  ← committed template
+supabase-{dev|stage|prod}.env                          ← gitignored
 ```
 
 ### 4.2 Placeholder Convention
@@ -123,7 +123,7 @@ VITE_PACKAGE_APP_ID=swarmag-app-admin
 VITE_PACKAGE_TARGET=stage
 VITE_PACKAGE_VERSION=__SECRET__
 VITE_PRODUCT_NAME="swarmAg Operations System"
-VITE_APPLICATION_NAME="Administrative Portal"
+VITE_APPLICATION_NAME="Administration Portal"
 VITE_SUPABASE_EDGE_URL=__SECRET__
 VITE_SUPABASE_RDBMS_URL=__SECRET__
 VITE_SUPABASE_PUBLIC_KEY=__SECRET__
@@ -160,8 +160,8 @@ includes:
 - Never commit actual `.env` files — only `.env.example` templates
 - `__SECRET__` must never appear in a production build artifact
 - Use platform-managed secrets (Netlify environment variables, Supabase secrets) for dev, stage, and prod targets
-- Rotate secrets regularly; use genesis workflows only for packages that define
-  a JWT secret
+- Rotate secrets regularly; use `deno task gen:jwt-secret` for packages that
+  define a JWT secret
 
 ## 5. Secret Registry
 
@@ -303,15 +303,11 @@ swarmag-{app-name}-{target}-{YYYYMMDDTHHMMSSZ}-{git-sha}.zip
 
 Artifacts land in `build/packages/`. No build artifacts are committed to the repository.
 
-### 7.4 Genesis Build
+### 7.4 JWT Secret Generation
 
-The `--genesis` flag rotates the JWT secret before building. It:
-
-1. Generates a new secret via `gen-jwt-secret.ts`
-2. Writes it to `secrets.jsonc` using `set-secret.ts`
-3. Proceeds with the normal packaging workflow
-
-Genesis builds require `--secrets-file`. Attempting a genesis build without a secrets file is a hard failure.
+`deno task gen:jwt-secret` prints a secure JWT secret for packages that require
+one. The generated value is copied into the appropriate `secrets.jsonc` entry
+and resolved by the normal packaging workflow.
 
 ### 7.5 deno.jsonc Task Reference
 
