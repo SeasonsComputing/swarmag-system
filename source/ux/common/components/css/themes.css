@@ -105,7 +105,6 @@
   /* Fieldset */
   --sa-fieldset-bg: transparent;
   --sa-fieldset-border: var(--sa-border-card);
-  --sa-fieldset-shadow: var(--sa-shadow);
 
   /* Progress */
   --sa-progress-height: 1rem;
@@ -182,7 +181,7 @@
   --sa-border-card: 1px solid rgb(148 163 184 / 0.1);
 
   /* Shadow */
-  --sa-shadow-sm: 0 1px 2px oklch(0% 0 0 / 0.3);
+  --sa-shadow-sm: 0 2px 8px oklch(0% 0 0 / 0.15);
   --sa-shadow: 0 6px 16px oklch(0% 0 0 / 0.35);
   --sa-shadow-md: 0 14px 34px oklch(0% 0 0 / 0.4);
   --sa-shadow-lg: 0 24px 54px oklch(0% 0 0 / 0.45), inset 0 1px 0 oklch(var(--sa-p-white) / 0.06);
@@ -310,6 +309,9 @@
   --sa-table-color-section: oklch(var(--sa-p-neutral-2));
   --sa-table-bg-row-even: oklch(var(--sa-p-surface-1));
   --sa-table-bg-row-odd: oklch(var(--sa-p-surface-2) / 0.6);
+
+  /** Fieldset */
+  --sa-fieldset-shadow: var(--sa-shadow-sm);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -507,4 +509,7 @@
   --sa-table-color-section: oklch(50% 0.035 218);
   --sa-table-bg-row-even: oklch(99.2% 0.006 98);
   --sa-table-bg-row-odd: oklch(95.4% 0.016 112);
+
+  /** Fieldset */
+  --sa-fieldset-shadow: var(--sa-shadow);
 }
