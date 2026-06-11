@@ -59,13 +59,13 @@ source/devops/
 
 Not all packages in the repository are deployed. Guards, tooling, and workflows that exist to protect deployment artifacts apply only to **deployable packages**.
 
-| Package           | Deployable | Platform        | App ID                 |
-| ----------------- | ---------- | --------------- | ---------------------- |
-| `app-admin`       | yes        | Netlify CDN     | `swarmag-app-admin`    |
-| `app-ops`         | yes        | Netlify CDN     | `swarmag-app-ops`      |
-| `app-customer`    | yes        | Netlify CDN     | `swarmag-app-customer` |
-| `supabase-edge`   | yes        | Supabase        | _(edge functions)_     |
-| `app-style-guide` | **no**     | dev server only | n/a                    |
+| Package              | Deployable | Platform        | App ID                       |
+| -------------------- | ---------- | --------------- | ---------------------------- |
+| `app-admin`          | yes        | Netlify CDN     | `swarmag-app-admin`          |
+| `app-ops`            | yes        | Netlify CDN     | `swarmag-app-ops`            |
+| `app-customer`       | yes        | Netlify CDN     | `swarmag-app-customer`       |
+| `back-supabase-edge` | yes        | Supabase        | `swarmag-back-supabase-edge` |
+| `app-style-guide`    | **no**     | dev server only | n/a                          |
 
 Non-deployable packages are explicitly exempt from packaging guards, the secret registry, and environment file requirements.
 
@@ -83,14 +83,15 @@ For example, an `app-admin` bundle built with the stage endpoint, stage public
 key, and browser client mode is stage-bound even when served locally during
 development.
 
-Backend packages still use environment files for their own runtime deployment
-environment.
+Local UX hosting is development tooling. It serves a bundle that is bound to a real backend target, normally dev or stage. The system does not define a local Supabase backend target for UX packages.
+
+Backend packages still use environment files for their own runtime deployment environment.
 
 ### 4.1 Naming Convention
 
 Each deployable package maintains configuration templates and generated
 configuration files at the locations below. For UX apps, the target token
-(`local`, `stage`, `prod`) names the backend binding target.
+(`dev`, `stage`, `prod`) names the backend binding target.
 
 The `.env.example` file is the committed package-environment template. The
 corresponding `.env` file is a generated, gitignored package input. It is
@@ -100,19 +101,15 @@ disposable and may be recreated from the template by the package script when
 **UX apps** — `source/ux/config/`
 
 ```
-app-{admin|ops|customer}-local.env.example    ← committed template
-app-{admin|ops|customer}-local.env            ← gitignored
-app-{admin|ops|customer}-stage.env            ← gitignored
-app-{admin|ops|customer}-prod.env             ← gitignored
+app-{admin|ops|customer}-{dev|stage|prod}.env.example  ← committed template
+app-{admin|ops|customer}-{dev|stage|prod}.env          ← gitignored
 ```
 
 **Backend (Supabase edge)** — `source/back/supabase-edge/config/`
 
 ```
-supabase-local.env.example    ← committed template
-supabase-local.env            ← gitignored
-supabase-stage.env            ← gitignored
-supabase-prod.env             ← gitignored
+back-supabase-edge-{dev|stage|prod}-env.example        ← committed template
+back-supabase-edge-{dev|stage|prod}-env                ← gitignored
 ```
 
 ### 4.2 Placeholder Convention
@@ -121,9 +118,9 @@ Any env value that must be resolved from the secret registry at package time is
 set to the literal string `__SECRET__` in the env template:
 
 ```bash
-# app-admin-local.env.example
+# app-admin-stage.env.example
 VITE_PACKAGE_APP_ID=swarmag-app-admin
-VITE_PACKAGE_TARGET=local
+VITE_PACKAGE_TARGET=stage
 VITE_PACKAGE_VERSION=__SECRET__
 VITE_PRODUCT_NAME="swarmAg Operations System"
 VITE_APPLICATION_NAME="Administrative Portal"
@@ -131,7 +128,7 @@ VITE_SUPABASE_EDGE_URL=__SECRET__
 VITE_SUPABASE_RDBMS_URL=__SECRET__
 VITE_SUPABASE_PUBLIC_KEY=__SECRET__
 VITE_SUPABASE_CLIENT_MODE=browser
-VITE_SERVICE_WORKER_ENABLED=false
+VITE_SERVICE_WORKER_ENABLED=true
 VITE_LOCAL_DB_NAME=swarmag-app-admin
 ```
 
@@ -162,7 +159,7 @@ includes:
 
 - Never commit actual `.env` files — only `.env.example` templates
 - `__SECRET__` must never appear in a production build artifact
-- Use platform-managed secrets (Netlify environment variables, Supabase secrets) for stage and prod targets
+- Use platform-managed secrets (Netlify environment variables, Supabase secrets) for dev, stage, and prod targets
 - Rotate secrets regularly; use genesis workflows only for packages that define
   a JWT secret
 
@@ -171,8 +168,8 @@ includes:
 ### 5.1 Purpose
 
 The secret registry is a local developer file that stores the actual resolved
-values for local and stage targets. It is never committed to the repository and
-never included in a build artifact.
+values for package targets. It is never committed to the repository and never
+included in a build artifact.
 
 ### 5.2 File Location and Format
 
@@ -190,8 +187,8 @@ Every entry's JSON key **must equal** the composed identity derived from its own
 <app>.<env>.<config>
 ```
 
-For example, the entry for `VITE_SUPABASE_PUBLIC_KEY` in the `app-admin` local
-target has key `app-admin.local.VITE_SUPABASE_PUBLIC_KEY`.
+For example, the entry for `VITE_SUPABASE_PUBLIC_KEY` in the `app-admin` stage
+target has key `app-admin.stage.VITE_SUPABASE_PUBLIC_KEY`.
 
 ### 5.4 Schema
 
@@ -200,17 +197,17 @@ Each entry is an object with these fields:
 | Field    | Type       | Constraint                                                                   |
 | -------- | ---------- | ---------------------------------------------------------------------------- |
 | `app`    | `string`   | Non-empty; matches a deployable package App ID without the `swarmag-` prefix |
-| `env`    | `string`   | One of `local`, `stage`, `prod`                                              |
+| `env`    | `string`   | One of `dev`, `stage`, `prod`                                                |
 | `config` | `string`   | Non-empty; matches the env var name                                          |
 | `tags`   | `string[]` | Zero or more descriptive tags                                                |
 | `secret` | `string`   | The resolved secret value                                                    |
 
 ```jsonc
 {
-  // Public Supabase client key for app-admin local backend binding target
-  "app-admin.local.VITE_SUPABASE_PUBLIC_KEY": {
+  // Public Supabase client key for app-admin stage backend binding target
+  "app-admin.stage.VITE_SUPABASE_PUBLIC_KEY": {
     "app": "app-admin",
-    "env": "local",
+    "env": "stage",
     "config": "VITE_SUPABASE_PUBLIC_KEY",
     "tags": ["supabase", "public-key"],
     "secret": "<value>"
@@ -230,8 +227,8 @@ A developer provisions `secrets.jsonc` as follows:
 4. Run the package script with `--init-env` to recreate the target `.env` from
    its template and confirm the packaging workflow resolves all secrets.
 
-For local JWT secrets in packages that require them: `deno task gen:jwt-secret`
-prints a secure value ready to paste into `secrets.jsonc`.
+For JWT secrets in packages that require them: `deno task gen:jwt-secret` prints
+a secure value ready to paste into `secrets.jsonc`.
 
 ## 6. Secret Management Scripts
 
@@ -254,10 +251,10 @@ deno task guard:secrets
 deno task gen:jwt-secret
 
 # Read one secret
-deno run --allow-read source/devops/scripts/read-secret.ts secrets.jsonc "app-admin.local.VITE_SUPABASE_PUBLIC_KEY"
+deno run --allow-read source/devops/scripts/read-secret.ts secrets.jsonc "app-admin.stage.VITE_SUPABASE_PUBLIC_KEY"
 
 # Set one secret
-deno run --allow-read --allow-write source/devops/scripts/set-secret.ts secrets.jsonc "app-admin.local.VITE_SUPABASE_PUBLIC_KEY" "<value>"
+deno run --allow-read --allow-write source/devops/scripts/set-secret.ts secrets.jsonc "app-admin.stage.VITE_SUPABASE_PUBLIC_KEY" "<value>"
 ```
 
 ## 7. Packaging Workflow
@@ -275,9 +272,9 @@ Each deployable UX app has a pair of scripts:
 
 The `app-{name}-package.sh` script performs these steps in order:
 
-1. Validate the target (`local`, `stage`, `prod`)
+1. Validate the target (`dev`, `stage`, `prod`)
 2. When `--init-env` is present, remove the target `.env` and recreate it from
-   the committed `.
+   the committed `.env.example` template
 3. When `--init-env` is absent, require the target `.env` to exist
 4. Load the env file for the target
 5. Validate `VITE_PACKAGE_APP_ID` and `VITE_PACKAGE_TARGET` match expectations
@@ -316,18 +313,16 @@ The `--genesis` flag rotates the JWT secret before building. It:
 
 Genesis builds require `--secrets-file`. Attempting a genesis build without a secrets file is a hard failure.
 
-```bash
-deno task app-admin-package-local-genesis
-```
-
 ### 7.5 deno.jsonc Task Reference
 
 ```
-app-{name}-package-local              Build local artifact
-app-{name}-package-local-genesis      Rotate JWT secret, then build local artifact
+app-{name}-package-dev                Build dev artifact
 app-{name}-package-stage              Build stage artifact
 app-{name}-package-prod               Build prod artifact
 app-{name}-package-{target}-verify    Verify artifact for target
+app-dev-local {admin|ops|customer}    Serve a dev-bound UX app locally
+app-stage-local {admin|ops|customer}  Serve a stage-bound UX app locally
+app-style-guide-local                 Serve the style guide locally
 ```
 
 ## 8. Architectural Guards

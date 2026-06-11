@@ -236,7 +236,7 @@ See `architecture-core.md` section 6 for the complete configuration pattern and 
 
 ### 6.1 Integration Tests
 
-- Test edge functions against local Supabase instance
+- Test edge functions against the hosted dev or stage Supabase project
 - Verify RLS policies enforce authorization correctly
 - Test multi-user scenarios
 - Located in `source/tests/`
@@ -267,7 +267,7 @@ supabase db push
 
 Migration Safety:
 
-- Always test migrations locally first (`supabase db reset`)
+- Verify migrations against the hosted Supabase project as a production release prerequisite. e.g. dev -> stage -> validate -> prod -> validate -> live
 - Verify RLS policies in staging environment
 - Never modify deployed migrations — create new ones
 
