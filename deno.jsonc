@@ -55,6 +55,7 @@
     "check:domain-genesis": "deno task guard:domain-style && deno task guard:core-std-types && deno check --lock=deno.lock --frozen source/domain/**/*.ts && deno lint source/domain/**/*.ts",
     "lock:update": "deno check --lock=deno.lock source/**/*.ts source/**/*.tsx",
     "test": "deno test --allow-env --allow-net --allow-read \"source/tests/**/*-test.ts\"",
+    "ux-stage-smoke": "deno run --allow-net --allow-read --allow-run --allow-write source/devops/scripts/smoke-ux-stage.ts",
     "lint": "deno lint",
 
     // ────────────────────────────────────────────────────────────────────────────

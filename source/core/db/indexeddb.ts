@@ -44,21 +44,32 @@ export class IndexedDb {
 
     // 2. Initialize the Promise and store it in the Dictionary.
     // This "locks" the slot so concurrent calls await the same instance.
-    const connectionPromise = openDB(name, 1, {
-      upgrade(db) {
-        const stores = IndexedDb.#registry[name]
-        if (!stores) return
-        stores.forEach(storeName => {
-          if (!db.objectStoreNames.contains(storeName)) {
-            db.createObjectStore(storeName, { keyPath: 'id' })
-          }
-        })
-      }
-    })
+    const stores = this.#registry[name] ?? new StringSet()
+    const connectionPromise = this.#openConnection(name, stores)
 
     // Cache connection
     this.#cache[name] = connectionPromise
     return connectionPromise
+  }
+
+  /** Open the database and upgrade when registered stores are missing. */
+  static async #openConnection(name: string, stores: StringSet): Promise<IDBPDatabase> {
+    const db = await openDB(name)
+    const missing = [...stores].filter(storeName => !db.objectStoreNames.contains(storeName))
+    if (missing.length === 0) return db
+
+    const nextVersion = db.version + 1
+    db.close()
+
+    return await openDB(name, nextVersion, {
+      upgrade(upgradeDb) {
+        stores.forEach(storeName => {
+          if (!upgradeDb.objectStoreNames.contains(storeName)) {
+            upgradeDb.createObjectStore(storeName, { keyPath: 'id' })
+          }
+        })
+      }
+    })
   }
 
   /** Utility to map standard DOMExceptions to HTTP-style status codes.  */

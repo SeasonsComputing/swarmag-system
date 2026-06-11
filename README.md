@@ -112,10 +112,8 @@ Committed env templates live under `source/ux/config/` and
 | `source/back/supabase-edge/config/back-supabase-edge-{target}.env.example` | Committed backend template |
 | `source/back/supabase-edge/config/back-supabase-edge-{target}.env`         | Generated backend input    |
 
-Package scripts recreate generated UX `.env` files from templates when
-`--init-env` is passed. Template values set to `__SECRET__` are resolved from
-the local, gitignored `secrets.jsonc` registry during packaging, and
-`__PACKAGE_VERSION__` is computed from `VERSION`, Git build count, and target.
+Package scripts recreate generated UX `.env` files from templates when `--init-env` is passed. Template values set to `__SECRET__` are resolved from the local, gitignored `secrets.jsonc` registry during packaging, and `__PACKAGE_VERSION__` is computed from `VERSION`, Git build count, and target.
+
 Resolved values are not written back into generated `.env` files.
 
 ### 2.3 Configuration Pattern
@@ -142,16 +140,17 @@ The examples below use `dot` as a local shell alias for `deno task`.
 
 ### 3.1 Validation
 
-| Task                | Script / action                             | Purpose                               |
-| ------------------- | ------------------------------------------- | ------------------------------------- |
-| `dot check`         | `check:guards`, `check:types`, `check:lint` | Full repository validation            |
-| `dot check:guards`  | `source/devops/guards/guard-*.ts`           | Architecture and style guard suite    |
-| `dot check:types`   | `deno check --lock=deno.lock --frozen`      | Type-check all source files           |
-| `dot check:lint`    | `dot lint`                                  | Run Deno lint                         |
-| `dot fmt`           | `dprint fmt`                                | Format configured assets              |
-| `dot fmt:check`     | `dprint check`                              | Check formatting                      |
-| `dot test`          | `deno test source/tests/**/*-test.ts`       | Run test suites                       |
-| `dot guard:secrets` | `source/devops/scripts/validate-secrets.ts` | Validate `secrets.jsonc` when present |
+| Task                 | Script / action                             | Purpose                                                               |
+| -------------------- | ------------------------------------------- | --------------------------------------------------------------------- |
+| `dot check`          | `check:guards`, `check:types`, `check:lint` | Full repository validation                                            |
+| `dot check:guards`   | `source/devops/guards/guard-*.ts`           | Architecture and style guard suite                                    |
+| `dot check:types`    | `deno check --lock=deno.lock --frozen`      | Type-check all source files                                           |
+| `dot check:lint`     | `dot lint`                                  | Run Deno lint                                                         |
+| `dot fmt`            | `dprint fmt`                                | Format configured assets                                              |
+| `dot fmt:check`      | `dprint check`                              | Check formatting                                                      |
+| `dot test`           | `deno test source/tests/**/*-test.ts`       | Run test suites                                                       |
+| `dot ux-stage-smoke` | `source/devops/scripts/smoke-ux-stage.ts`   | Browser smoke test stage UX deploys; accepts `chrome=/path/to/chrome` |
+| `dot guard:secrets`  | `source/devops/scripts/validate-secrets.ts` | Validate `secrets.jsonc` when present                                 |
 
 ### 3.2 Guard Tasks
 
