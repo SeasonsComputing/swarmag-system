@@ -44,6 +44,7 @@ APP_ROOT="${ROOT}/source/ux/app-customer"
 ENV_FILE="${ROOT}/source/ux/config/app-customer-${TARGET}.env"
 ENV_EXAMPLE_FILE="${ROOT}/source/ux/config/app-customer-${TARGET}.env.example"
 UX_CONFIG_FILE="${ROOT}/source/ux/config/ux-config.ts"
+VERSION_FILE="${ROOT}/VERSION"
 BUILD_ROOT="${BUILD_ROOT:-${ROOT}/build}"
 DIST_DIR="${BUILD_ROOT}/dist/app-customer"
 PACKAGE_DIR="${BUILD_ROOT}/packages"
@@ -94,6 +95,21 @@ if [[ "${VITE_PACKAGE_TARGET:-}" != "${TARGET}" ]]; then
   exit 1
 fi
 
+if [[ ! -f "${VERSION_FILE}" ]]; then
+  echo "Missing version file: ${VERSION_FILE}"
+  exit 1
+fi
+
+MAJOR_MINOR_VERSION="$(tr -d '[:space:]' < "${VERSION_FILE}")"
+if [[ ! "${MAJOR_MINOR_VERSION}" =~ ^[0-9]+[.][0-9]+$ ]]; then
+  echo "Invalid VERSION='${MAJOR_MINOR_VERSION}'. Expected major.minor"
+  exit 1
+fi
+
+BUILD_NUMBER="$(git -C "${ROOT}" rev-list --count HEAD)"
+PACKAGE_VERSION="${MAJOR_MINOR_VERSION}.${BUILD_NUMBER}-${TARGET}"
+export VITE_PACKAGE_VERSION="${PACKAGE_VERSION}"
+
 if [[ -n "${SECRETS_FILE}" && ! -f "${SECRETS_FILE}" ]]; then
   echo "Missing secrets file: ${SECRETS_FILE}"
   exit 1
@@ -124,7 +140,7 @@ for key in "${REQUIRED_KEYS[@]}"; do
     MISSING_KEYS+=("${key}")
     continue
   fi
-  if [[ "${value}" == "__SECRET__" ]]; then
+  if [[ "${value}" == "__SECRET__" || "${value}" == "__PACKAGE_VERSION__" ]]; then
     MISSING_KEYS+=("${key}")
   fi
 done
@@ -173,12 +189,14 @@ TIMESTAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 GIT_SHA="$(git -C "${ROOT}" rev-parse --short HEAD)"
 ARTIFACT_BASENAME="swarmag-app-customer-${TARGET}-${TIMESTAMP}-${GIT_SHA}"
 ARTIFACT_PATH="${PACKAGE_DIR}/${ARTIFACT_BASENAME}.zip"
-BUILD_META_PATH="${DIST_DIR}/build-meta.json"
+BUILD_META_PATH="${DIST_DIR}/build-meta.jsonc"
 
 cat > "${BUILD_META_PATH}" <<META
 {
   "app": "${VITE_PACKAGE_APP_ID}",
   "target": "${TARGET}",
+  "version": "${PACKAGE_VERSION}",
+  "buildNumber": "${BUILD_NUMBER}",
   "builtAtUtc": "${TIMESTAMP}",
   "gitSha": "${GIT_SHA}"
 }

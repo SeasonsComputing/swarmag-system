@@ -31,6 +31,7 @@ APP_ROOT="${ROOT}/source/ux/app-${APP_NAME}"
 ENV_FILE="${ROOT}/source/ux/config/app-${APP_NAME}-${TARGET}.env"
 ENV_EXAMPLE_FILE="${ROOT}/source/ux/config/app-${APP_NAME}-${TARGET}.env.example"
 UX_CONFIG_FILE="${ROOT}/source/ux/config/ux-config.ts"
+VERSION_FILE="${ROOT}/VERSION"
 SECRETS_FILE="${SECRETS_FILE:-${ROOT}/secrets.jsonc}"
 PORT="${PORT:-5173}"
 
@@ -61,6 +62,20 @@ if [[ "${VITE_PACKAGE_TARGET:-}" != "${TARGET}" ]]; then
   exit 1
 fi
 
+if [[ ! -f "${VERSION_FILE}" ]]; then
+  echo "Missing version file: ${VERSION_FILE}"
+  exit 1
+fi
+
+MAJOR_MINOR_VERSION="$(tr -d '[:space:]' < "${VERSION_FILE}")"
+if [[ ! "${MAJOR_MINOR_VERSION}" =~ ^[0-9]+[.][0-9]+$ ]]; then
+  echo "Invalid VERSION='${MAJOR_MINOR_VERSION}'. Expected major.minor"
+  exit 1
+fi
+
+BUILD_NUMBER="$(git -C "${ROOT}" rev-list --count HEAD)"
+export VITE_PACKAGE_VERSION="${MAJOR_MINOR_VERSION}.${BUILD_NUMBER}-${TARGET}"
+
 if [[ ! -f "${SECRETS_FILE}" ]]; then
   echo "Missing secrets file: ${SECRETS_FILE}"
   exit 1
@@ -87,7 +102,7 @@ done
 MISSING_KEYS=()
 for key in "${REQUIRED_KEYS[@]}"; do
   value="${!key:-}"
-  if [[ -z "${value}" || "${value}" == "__SECRET__" ]]; then
+  if [[ -z "${value}" || "${value}" == "__SECRET__" || "${value}" == "__PACKAGE_VERSION__" ]]; then
     MISSING_KEYS+=("${key}")
   fi
 done
