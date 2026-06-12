@@ -11,7 +11,8 @@
   display: grid;
   align-items: center;
   justify-content: center;
-  padding-block: var(--sa-pad);
+  padding-inline: var(--sa-gap);
+  padding-block: var(--sa-gap) var(--sa-pad);
 }
 
 [data-ui='login-layout'] {
