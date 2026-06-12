@@ -140,92 +140,48 @@ See `architecture-core.md` section 6 for complete configuration management detai
 ## 3. DevOps Commands
 
 The examples below use `dot` as a local shell alias for `deno task`.
+`deno.jsonc` is the authoritative task registry. Detailed workflow contracts live
+in `documentation/architecture-devops.md`.
 
 ### 3.1 Validation
 
-| Task                 | Script / action                             | Purpose                                                               |
-| -------------------- | ------------------------------------------- | --------------------------------------------------------------------- |
-| `dot check`          | `check:guards`, `check:types`, `check:lint` | Full repository validation                                            |
-| `dot check:guards`   | `source/devops/guards/guard-*.ts`           | Architecture and style guard suite                                    |
-| `dot check:types`    | `deno check --lock=deno.lock --frozen`      | Type-check all source files                                           |
-| `dot check:lint`     | `dot lint`                                  | Run Deno lint                                                         |
-| `dot fmt`            | `dprint fmt`                                | Format configured assets                                              |
-| `dot fmt:check`      | `dprint check`                              | Check formatting                                                      |
-| `dot test`           | `deno test source/tests/**/*-test.ts`       | Run test suites                                                       |
-| `dot ux-stage-smoke` | `source/devops/scripts/smoke-ux-stage.ts`   | Browser smoke test stage UX deploys; accepts `chrome=/path/to/chrome` |
-| `dot guard:secrets`  | `source/devops/scripts/validate-secrets.ts` | Validate `secrets.jsonc` when present                                 |
+| Command     | Purpose                           |
+| ----------- | --------------------------------- |
+| `dot check` | Run guards, type checks, and lint |
+| `dot fmt`   | Format configured assets          |
+| `dot test`  | Run repository tests              |
 
-### 3.2 Guard Tasks
+Individual `guard:*` tasks are documented in `architecture-devops.md`.
 
-| Task                       | Script                                         | Purpose                       |
-| -------------------------- | ---------------------------------------------- | ----------------------------- |
-| `dot guard:architecture`   | `source/devops/guards/guard-architecture.ts`   | Dependency direction          |
-| `dot guard:env`            | `source/devops/guards/guard-env.ts`            | Runtime env access discipline |
-| `dot guard:leaf`           | `source/devops/guards/guard-leaf.ts`           | Leaf module export discipline |
-| `dot guard:validation`     | `source/devops/guards/guard-validation.ts`     | Validator shape conventions   |
-| `dot guard:domain-style`   | `source/devops/guards/guard-domain-style.ts`   | Domain style conventions      |
-| `dot guard:core-std-types` | `source/devops/guards/guard-core-std-types.ts` | Core std type usage           |
-| `dot guard:ux-state`       | `source/devops/guards/guard-ux-state.ts`       | UX state readiness discipline |
-| `dot guard:chart`          | `source/devops/guards/guard-chart.ts`          | Chart component conventions   |
-| `dot guard:imports`        | `source/devops/guards/guard-imports.ts`        | Import discipline             |
-| `dot guard:css`            | `source/devops/guards/guard-css.ts`            | CSS architecture conventions  |
-| `dot guard:bare-html`      | `source/devops/guards/guard-bare-html.ts`      | HTML shell constraints        |
+### 3.2 Local Servers
 
-### 3.3 Local Development Servers
-
-| Task                        | Script                                           | Purpose                            |
-| --------------------------- | ------------------------------------------------ | ---------------------------------- |
-| `dot app-dev-local {app}`   | `source/devops/scripts/app-local.sh dev`         | Serve a dev-bound UX app locally   |
-| `dot app-stage-local {app}` | `source/devops/scripts/app-local.sh stage`       | Serve a stage-bound UX app locally |
-| `dot app-style-guide-local` | `source/devops/scripts/app-style-guide-local.sh` | Serve the style guide locally      |
+| Command                     | Purpose                            |
+| --------------------------- | ---------------------------------- |
+| `dot app-dev-local {app}`   | Serve a dev-bound UX app locally   |
+| `dot app-stage-local {app}` | Serve a stage-bound UX app locally |
+| `dot app-style-guide-local` | Serve the style-guide harness      |
 
 `{app}` is one of `admin`, `ops`, or `customer`.
 
-### 3.4 Packaging
+### 3.3 Packaging And Deployment
 
-| Task pattern                               | Script                                                 | Purpose                            |
-| ------------------------------------------ | ------------------------------------------------------ | ---------------------------------- |
-| `dot app-admin-package-{target}`           | `source/devops/scripts/app-admin-package.sh`           | Package Admin app artifact         |
-| `dot app-ops-package-{target}`             | `source/devops/scripts/app-ops-package.sh`             | Package Operations app artifact    |
-| `dot app-customer-package-{target}`        | `source/devops/scripts/app-customer-package.sh`        | Package Customer app artifact      |
-| `dot app-admin-package-{target}-verify`    | `source/devops/scripts/app-admin-package-verify.sh`    | Verify Admin package artifact      |
-| `dot app-ops-package-{target}-verify`      | `source/devops/scripts/app-ops-package-verify.sh`      | Verify Operations package artifact |
-| `dot app-customer-package-{target}-verify` | `source/devops/scripts/app-customer-package-verify.sh` | Verify Customer package artifact   |
+- `dot app-{name}-package-{target}` — package one UX app artifact
+- `dot app-{name}-package-{target}-verify` — verify one packaged UX artifact
+- `dot deploy --app {name} [name ...] --target {target}` — check, package,
+  deploy, and smoke-test UX apps
+- `dot ux-smoke --target {target} {app}={url} ...` — smoke-test deployed UX apps
+- `dot ux-stage-smoke` — smoke-test stage UX apps at default URLs
 
-Pass `--init-env` after a package task to recreate the generated `.env` file
-from its committed template before building.
+`{name}` is one of `admin`, `ops`, or `customer`; `{target}` is one of `dev`,
+`stage`, or `prod`. Pass `--init-env` after a package task to recreate the
+generated `.env` file from its committed template before building.
 
-`{target}` is one of `dev`, `stage`, or `prod`.
+Backend deployment uses the Supabase CLI:
 
-### 3.5 Secret and Context Utilities
-
-| Task / command                                                                                        | Script                                    | Purpose                         |
-| ----------------------------------------------------------------------------------------------------- | ----------------------------------------- | ------------------------------- |
-| `dot gen:jwt-secret`                                                                                  | `source/devops/scripts/gen-jwt-secret.ts` | Generate a JWT secret value     |
-| `dot gen:id-seeds`                                                                                    | `source/devops/scripts/gen-id-seeds.ts`   | Generate deterministic ID seeds |
-| `dot gen:ai-context`                                                                                  | `source/devops/scripts/gen-ai-context.ts` | Generate AI context bundles     |
-| `dot gen:ai-context-foundation`                                                                       | `source/devops/scripts/gen-ai-context.ts` | Generate foundation AI context  |
-| `deno run --allow-read source/devops/scripts/read-secret.ts secrets.jsonc <key>`                      | `read-secret.ts`                          | Read one secret registry value  |
-| `deno run --allow-read --allow-write source/devops/scripts/set-secret.ts secrets.jsonc <key> <value>` | `set-secret.ts`                           | Set one secret registry value   |
-
-### 3.6 Deployment
-
-**UX Deployment**
-
-| Command                                              | Script / tool     | Purpose                                           |
-| ---------------------------------------------------- | ----------------- | ------------------------------------------------- |
-| `dot deploy --app {name} [name…] --target {target}`  | `app-deploy.sh`   | Check, package, deploy, and smoke-test UX apps    |
-| `dot ux-smoke --target {target} {app}={url} …`       | `smoke-ux.ts`     | Smoke-test deployed UX apps (standalone)          |
-| `dot ux-stage-smoke`                                 | `smoke-ux.ts`     | Smoke-test stage apps at default swarmag.com URLs |
-| `dot app-{name}-package-{target}`                    | UX package script | Produce deployable zip artifact (manual)          |
-| `dot app-{name}-package-{target}-verify`             | UX verify script  | Validate deployable zip artifact (manual)         |
-
-**Backend Deployment**
-
-| Command                                  | Script / tool     | Purpose                          |
-| ---------------------------------------- | ----------------- | -------------------------------- |
-| `supabase functions deploy <function>`   | Supabase CLI      | Deploy backend edge function     |
-| `supabase db push`                       | Supabase CLI      | Apply database migrations        |
+```bash
+supabase functions deploy <function>
+supabase db push
+```
 
 ## 4. Working Rules
 
@@ -246,3 +202,19 @@ All software construction activity operates in conformance with the governing pr
 The constitution is designed to make most efficient and cost-effective use of AI reasoning and coding facilities across AI providers following the 3-role ["Model of Development w/ AI Coding"](https://seasonscomputing.com/markdown.html?documentation/tvk-mod-3rm.md).
 
 The human participates as the Chief Architect with AI Architect and AI Coding Engine roles provided by AI reasoning and AI coding platforms respectively.
+
+### 5.1 Session Context
+
+Sessions are governed by `AGENTS.md` which is bound by `CONSTITUTION.md`.
+
+| Context              | Prompt                                                                                       |
+| -------------------- | -------------------------------------------------------------------------------------------- |
+| Product foundation   | Ingest AGENTS.md. You are {Agent-Role}. We're working on Product Foundation. {Work-Agenda}   |
+| UX internals         | Ingest AGENTS.md. You are {Agent-Role}. We're working on UX internals. {Work-Agenda}         |
+| Application features | Ingest AGENTS.md. You are {Agent-Role}. We're working on Application features. {Work-Agenda} |
+| DevOps operations    | Ingest AGENTS.md. You are {Agent-Role}. We're working on DevOps operations. {Work-Agenda}    |
+
+Where:
+
+- Agent-Role: 'AI Architect' | 'AI Coding Engine'
+- Work-Agenda: The tasks to be completed

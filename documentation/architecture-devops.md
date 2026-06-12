@@ -31,8 +31,10 @@ The devops layer contains two subdirectories: guards that enforce architectural 
 source/devops/
 ├── guards/
 │   ├── guard-architecture.ts
+│   ├── guard-bare-html.ts
 │   ├── guard-chart.ts
 │   ├── guard-core-std-types.ts
+│   ├── guard-css.ts
 │   ├── guard-domain-style.ts
 │   ├── guard-env.ts
 │   ├── guard-imports.ts
@@ -44,6 +46,8 @@ source/devops/
     ├── app-admin-package-verify.sh
     ├── app-customer-package.sh
     ├── app-customer-package-verify.sh
+    ├── app-deploy.sh
+    ├── app-local.sh
     ├── app-ops-package.sh
     ├── app-ops-package-verify.sh
     ├── app-style-guide-local.sh
@@ -52,6 +56,7 @@ source/devops/
     ├── gen-jwt-secret.ts
     ├── read-secret.ts
     ├── set-secret.ts
+    ├── smoke-ux.ts
     └── validate-secrets.ts
 ```
 
@@ -108,8 +113,8 @@ app-{admin|ops|customer}-{dev|stage|prod}.env          ← gitignored
 **Backend (Supabase edge)** — `source/back/supabase-edge/config/`
 
 ```
-supabase-{dev|stage|prod}.env.example                  ← committed template
-supabase-{dev|stage|prod}.env                          ← gitignored
+back-supabase-edge-{dev|stage|prod}.env.example         ← committed template
+back-supabase-edge-{dev|stage|prod}.env                 ← gitignored
 ```
 
 ### 4.2 Placeholder Convention
@@ -339,23 +344,127 @@ Artifacts land in `build/packages/`. No build artifacts are committed to the rep
 one. The generated value is copied into the appropriate `secrets.jsonc` entry
 and resolved by the normal packaging workflow.
 
-### 7.6 deno.jsonc Task Reference
+### 7.6 Packaging Task Reference
 
 ```
 app-{name}-package-dev                Build dev artifact
 app-{name}-package-stage              Build stage artifact
 app-{name}-package-prod               Build prod artifact
 app-{name}-package-{target}-verify    Verify artifact for target
-app-dev-local {admin|ops|customer}    Serve a dev-bound UX app locally
-app-stage-local {admin|ops|customer}  Serve a stage-bound UX app locally
-app-style-guide-local                 Serve the style guide locally
 ```
 
-## 8. Architectural Guards
+## 8. Deployment Workflow
+
+The UX deployment script is `source/devops/scripts/app-deploy.sh`, exposed as
+`deno task deploy`.
+
+### 8.1 UX Deploy Command
+
+```bash
+deno task deploy --app {admin|ops|customer} [app ...] --target {dev|stage|prod}
+```
+
+The command deploys one or more UX apps for a single backend binding target.
+
+### 8.2 UX Deploy Steps
+
+`app-deploy.sh` performs these steps in order:
+
+1. Run `deno task check`
+2. Verify the git working tree is clean
+3. Resolve Netlify site IDs by name
+4. Package each requested app with the app package script
+5. Verify each package artifact with the app verify script
+6. Deploy each unzipped artifact to Netlify
+7. Smoke-test deployed URLs with `smoke-ux.ts`
+
+The script fails immediately on any failed check, package, verification, deploy,
+or smoke-test step.
+
+### 8.3 Netlify Site Naming
+
+Netlify sites are resolved from this naming convention:
+
+```text
+swarmag-app-{admin|ops|customer}-{dev|stage|prod}
+```
+
+The deploy script uses `netlify sites:list --json` to resolve site IDs and
+`netlify deploy --prod` to publish the artifact to the resolved site. A local
+operator must already be authenticated with the Netlify CLI.
+
+### 8.4 UX Smoke Tests
+
+The UX smoke script is `source/devops/scripts/smoke-ux.ts`, exposed as:
+
+```bash
+deno task ux-smoke --target {dev|stage|prod} {app}={url} ...
+deno task ux-stage-smoke
+```
+
+Stage smoke tests have default targets:
+
+```text
+admin    https://admin-stage.swarmag.com
+ops      https://ops-stage.swarmag.com
+customer https://customer-stage.swarmag.com
+```
+
+Non-stage targets require explicit `{app}={url}` arguments.
+
+The smoke script verifies:
+
+- Root HTML responds successfully
+- `build-meta.jsonc` exists and has the expected target
+- `sw.js` responds successfully
+- Built CSS and referenced font assets respond successfully
+- The login screen becomes browser-ready in headless Chrome
+- Protected `/dashboard` routes redirect to `/login`
+- Protected routes do not render dashboard content before authentication
+- Protected routes do not contact the target backend before authentication
+- Browser runtime errors fail the smoke test
+
+Chrome is auto-detected from common local paths and executable names. Operators
+may pass `chrome=/path/to/chrome` when auto-detection is insufficient.
+
+## 9. Local Development Servers
+
+Local UX hosting is development tooling. It serves a bundle bound to a real
+backend target.
+
+```bash
+deno task app-dev-local {admin|ops|customer}
+deno task app-stage-local {admin|ops|customer}
+deno task app-style-guide-local
+```
+
+`app-local.sh` serves a dev-bound or stage-bound UX app locally and appends
+`-local` to `VITE_PACKAGE_VERSION` in the Vite process environment. It does not
+mutate the generated target `.env` file.
+
+`app-style-guide-local` serves the non-deployable style-guide harness and has no
+package env or secret-registry dependency.
+
+## 10. deno.jsonc Task Surface
+
+`deno.jsonc` is the authoritative task registry. This section describes the
+supported task groups; individual task bodies remain in `deno.jsonc`.
+
+| Group         | Tasks                                                                |
+| ------------- | -------------------------------------------------------------------- |
+| Validation    | `check`, `check:guards`, `check:types`, `check:lint`, `test`, `lint` |
+| Formatting    | `fmt`, `fmt:check`                                                   |
+| Generators    | `gen:jwt-secret`, `gen:id-seeds`, `gen:ai-context`                   |
+| Guards        | `guard:*` tasks listed in Guard Inventory                            |
+| Packaging     | `app-{name}-package-{target}`, `app-{name}-package-{target}-verify`  |
+| Deployment    | `deploy`, `ux-smoke`, `ux-stage-smoke`                               |
+| Local servers | `app-dev-local`, `app-stage-local`, `app-style-guide-local`          |
+
+## 11. Architectural Guards
 
 Guards are Deno scripts that enforce structural and operational invariants. They run as part of the CI check suite and can be run individually.
 
-### 8.1 Guard Inventory
+### 11.1 Guard Inventory
 
 | Task                   | Script                    | What it enforces                                     |
 | ---------------------- | ------------------------- | ---------------------------------------------------- |
@@ -368,9 +477,11 @@ Guards are Deno scripts that enforce structural and operational invariants. They
 | `guard:ux-state`       | `guard-ux-state.ts`       | UX state management conventions                      |
 | `guard:chart`          | `guard-chart.ts`          | Chart component conventions                          |
 | `guard:imports`        | `guard-imports.ts`        | Import discipline across all layers                  |
+| `guard:css`            | `guard-css.ts`            | CSS architecture conventions                         |
+| `guard:bare-html`      | `guard-bare-html.ts`      | HTML shell constraints                               |
 | `guard:secrets`        | `validate-secrets.ts`     | `secrets.jsonc` structure and composite key identity |
 
-### 8.2 Guard Scope
+### 11.2 Guard Scope
 
 `check:guards` runs all guards in the suite. Guards in the suite must pass without a `secrets.jsonc` present, because:
 
@@ -385,7 +496,7 @@ The correct placement of `guard:secrets` is:
 - **In**: `app-{name}-package.sh` (already enforced implicitly via script logic)
 - **Not in**: `check:guards`
 
-### 8.3 Non-Deployable Package Exemptions
+### 11.3 Non-Deployable Package Exemptions
 
 `app-style-guide` is a development tool with no deployment target. It is exempt from:
 

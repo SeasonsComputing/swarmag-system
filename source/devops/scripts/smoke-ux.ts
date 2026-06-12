@@ -135,8 +135,8 @@ const parseArgs = (): SmokeArgs => {
 
   const targets = targetArgs.map(arg => {
     const [app, url] = arg.includes('=') ? arg.split('=', 2) : ['', arg]
-    const inferredApp =
-      app || new URL(url).hostname.split(`-${deployTarget}`)[0].split('--').pop() || 'app'
+    const inferredApp = app || new URL(url).hostname.split(`-${deployTarget}`)[0].split('--').pop()
+      || 'app'
     return { app: inferredApp, url }
   })
   return { chromePath, deployTarget, targets }
@@ -428,7 +428,9 @@ const assertStaticAssets = async (target: SmokeTarget, deployTarget: string): Pr
   const metadataValue = await metadata.json() as Dictionary
   if (metadataValue.target !== deployTarget) {
     throw new Error(
-      `${target.app} build metadata target is '${String(metadataValue.target)}', expected '${deployTarget}'`
+      `${target.app} build metadata target is '${
+        String(metadataValue.target)
+      }', expected '${deployTarget}'`
     )
   }
 
