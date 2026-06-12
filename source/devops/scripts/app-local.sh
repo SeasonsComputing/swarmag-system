@@ -74,7 +74,7 @@ if [[ ! "${MAJOR_MINOR_VERSION}" =~ ^[0-9]+[.][0-9]+$ ]]; then
 fi
 
 BUILD_NUMBER="$(git -C "${ROOT}" rev-list --count HEAD)"
-export VITE_PACKAGE_VERSION="${MAJOR_MINOR_VERSION}.${BUILD_NUMBER}-${TARGET}"
+PACKAGE_VERSION="${MAJOR_MINOR_VERSION}.${BUILD_NUMBER}-${TARGET}"
 
 if [[ ! -f "${SECRETS_FILE}" ]]; then
   echo "Missing secrets file: ${SECRETS_FILE}"
@@ -98,6 +98,8 @@ for key in "${REQUIRED_KEYS[@]}"; do
   fi
   export "${key}=${resolved_secret}"
 done
+
+export VITE_PACKAGE_VERSION="${PACKAGE_VERSION}-local"
 
 MISSING_KEYS=()
 for key in "${REQUIRED_KEYS[@]}"; do

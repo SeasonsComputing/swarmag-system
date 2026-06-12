@@ -98,7 +98,10 @@ Deployable UX packages bind to a remote backend target at build time:
 | `prod`  | Hosted Supabase project for production            |
 
 Local UX hosting is development tooling. A locally served app is still bound to
-the backend target embedded in its package env file.
+the backend target embedded in its package env file. The local runner appends
+`-local` to the package version in the Vite process environment so login
+diagnostics identify local hosting without changing package identity or the
+generated `.env` file.
 
 ### 2.2 Environment Files
 
