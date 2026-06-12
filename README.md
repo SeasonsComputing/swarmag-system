@@ -161,22 +161,22 @@ Individual `guard:*` tasks are documented in `architecture-devops.md`.
 | `dot app-stage-local {app}` | Serve a stage-bound UX app locally |
 | `dot app-style-guide-local` | Serve the style-guide harness      |
 
-`{app}` is one of `admin`, `ops`, or `customer`.
+Where:
+- `{app}`: `admin` | `ops` | `customer`.
 
 ### 3.3 Packaging And Deployment
 
-- `dot app-{name}-package-{target}` — package one UX app artifact
-- `dot app-{name}-package-{target}-verify` — verify one packaged UX artifact
-- `dot deploy --app {name} [name ...] --target {target}` — check, package,
-  deploy, and smoke-test UX apps
-- `dot ux-smoke --target {target} {app}={url} ...` — smoke-test deployed UX apps
-- `dot ux-stage-smoke` — smoke-test stage UX apps at default URLs
+**Frontend deployment:**
 
-`{name}` is one of `admin`, `ops`, or `customer`; `{target}` is one of `dev`,
-`stage`, or `prod`. Pass `--init-env` after a package task to recreate the
-generated `.env` file from its committed template before building.
+| Command                                                | Purpose                                        |
+| ------------------------------------------------------ | ---------------------------------------------- |
+| `dot deploy --app {name} [name ...] --target {target}` | Check, package, deploy, and smoke-test UX apps |
 
-Backend deployment uses the Supabase CLI:
+Where:
+- `{name}`: `admin` | `ops` | `customer`.
+- `{target}`: `dev` | `stage` | `prod`.
+
+**Backend deployment:**
 
 ```bash
 supabase functions deploy <function>
@@ -207,14 +207,13 @@ The human participates as the Chief Architect with AI Architect and AI Coding En
 
 Sessions are governed by `AGENTS.md` which is bound by `CONSTITUTION.md`.
 
-| Context              | Prompt                                                                                       |
-| -------------------- | -------------------------------------------------------------------------------------------- |
-| Product foundation   | Ingest AGENTS.md. You are {Agent-Role}. We're working on Product Foundation. {Work-Agenda}   |
-| UX internals         | Ingest AGENTS.md. You are {Agent-Role}. We're working on UX internals. {Work-Agenda}         |
-| Application features | Ingest AGENTS.md. You are {Agent-Role}. We're working on Application features. {Work-Agenda} |
-| DevOps operations    | Ingest AGENTS.md. You are {Agent-Role}. We're working on DevOps operations. {Work-Agenda}    |
+| Context              | Prompt                                                                            |
+| -------------------- | --------------------------------------------------------------------------------- |
+| Product foundation   | Ingest AGENTS.md. You are {role}. We're working on Product Foundation. {agenda}   |
+| UX internals         | Ingest AGENTS.md. You are {role}. We're working on UX internals. {agenda}         |
+| Application features | Ingest AGENTS.md. You are {role}. We're working on Application features. {agenda} |
+| DevOps operations    | Ingest AGENTS.md. You are {role}. We're working on DevOps operations. {agenda}    |
 
 Where:
-
-- Agent-Role: 'AI Architect' | 'AI Coding Engine'
-- Work-Agenda: The tasks to be completed
+- `{role}`: `AI Architect` | `AI Coding Engine`
+- `{agenda}`: tasks to be completed
