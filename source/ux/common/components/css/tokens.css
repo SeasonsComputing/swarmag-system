@@ -258,7 +258,7 @@ Breakpoints match architecture-ux.md §7:
   --sa-size-md: 1024px;
   --sa-size-lg: 1152px;
 
-  /* Desktop ≥ 1024px */
+  /* Negative space rhythm — Desktop ≥ 1024px */
   --sa-gutter: var(--sa-space-4xl);
   --sa-pad: var(--sa-space-lg);
   --sa-gap: calc(var(--sa-space-md) + var(--sa-space-xx));
