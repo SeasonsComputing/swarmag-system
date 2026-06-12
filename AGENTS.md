@@ -19,14 +19,14 @@ Every AI session begins by ingesting essential specifications and designs. Once 
 2. `documentation/ux-design-language.md`
 3. `documentation/ux-components-guide.md`
 
-**For "application feature" sessions, additionally ingest in order:**
+**For "Application features" sessions, additionally ingest in order:**
 
 1. `documentation/architecture-ux.md`
 2. `documentation/architecture-devops.md`
 3. `documentation/ux-components-guide-lite.md`
 4. `documentation/user-stories.md`
 
-**For "devops" sessions, additionally ingest in order:**
+**For "DevOps operations" sessions, additionally ingest in order:**
 
 1. `documentation/architecture-back.md`
 2. `documentation/architecture-ux.md`
