@@ -24,6 +24,7 @@ Primary architectural context lives in `documentation/architecture-core.md`.
 |              | `architecture-back.md`        | Backend architecture, boundaries, and runtime model     |
 |              | `architecture-ux.md`          | UX architecture and frontend layering                   |
 |              | `architecture-devops.md`      | Environment configuration, packaging, and guard suite   |
+| Convention   | `style-guide.md`              | Code and content style conventions                      |
 | Domain       | `domain-model.md`             | Domain solution-space concepts and invariants           |
 |              | `domain-seed-data.md`         | Controlled vocabularies and canonical seed data         |
 |              | `domain-data-dictionary.md`   | Normalized implementation-ready type and relation model |
@@ -34,7 +35,6 @@ Primary architectural context lives in `documentation/architecture-core.md`.
 |              | `ux-components-internals.md`  | UX component implementation internals                   |
 | AI Prompt    | `genesis-domain-sdk.md`       | Prompt contract for domain sdk genesis                  |
 |              | `genesis-ux-scaffold.md`      | Prompt contract for UX applications scaffolding         |
-| Convention   | `style-guide.md`              | Code and content style conventions                      |
 | Application  | `user-stories.md`             | Cross-application user stories and scenario narratives  |
 
 ### 1.3 Source Layers (`source/`)
@@ -212,11 +212,13 @@ from its committed template before building.
 
 **UX Deployment**
 
-| Command                                  | Script / tool     | Purpose                          |
-| ---------------------------------------- | ----------------- | -------------------------------- |
-| `dot app-{name}-package-{target}`        | UX package script | Produce deployable zip artifact  |
-| `dot app-{name}-package-{target}-verify` | UX verify script  | Validate deployable zip artifact |
-| Netlify deploy command                   | Netlify CLI       | Deploy verified UX artifact      |
+| Command                                              | Script / tool     | Purpose                                           |
+| ---------------------------------------------------- | ----------------- | ------------------------------------------------- |
+| `dot deploy --app {name} [name…] --target {target}`  | `app-deploy.sh`   | Check, package, deploy, and smoke-test UX apps    |
+| `dot ux-smoke --target {target} {app}={url} …`       | `smoke-ux.ts`     | Smoke-test deployed UX apps (standalone)          |
+| `dot ux-stage-smoke`                                 | `smoke-ux.ts`     | Smoke-test stage apps at default swarmag.com URLs |
+| `dot app-{name}-package-{target}`                    | UX package script | Produce deployable zip artifact (manual)          |
+| `dot app-{name}-package-{target}-verify`             | UX verify script  | Validate deployable zip artifact (manual)         |
 
 **Backend Deployment**
 
