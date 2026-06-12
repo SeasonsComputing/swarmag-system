@@ -210,11 +210,18 @@ from its committed template before building.
 
 ### 3.6 Deployment
 
+**UX Deployment**
+
 | Command                                  | Script / tool     | Purpose                          |
 | ---------------------------------------- | ----------------- | -------------------------------- |
 | `dot app-{name}-package-{target}`        | UX package script | Produce deployable zip artifact  |
 | `dot app-{name}-package-{target}-verify` | UX verify script  | Validate deployable zip artifact |
 | Netlify deploy command                   | Netlify CLI       | Deploy verified UX artifact      |
+
+**Backend Deployment**
+
+| Command                                  | Script / tool     | Purpose                          |
+| ---------------------------------------- | ----------------- | -------------------------------- |
 | `supabase functions deploy <function>`   | Supabase CLI      | Deploy backend edge function     |
 | `supabase db push`                       | Supabase CLI      | Apply database migrations        |
 
