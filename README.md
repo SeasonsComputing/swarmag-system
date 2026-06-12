@@ -162,6 +162,7 @@ Individual `guard:*` tasks are documented in `architecture-devops.md`.
 | `dot app-style-guide-local` | Serve the style-guide harness      |
 
 Where:
+
 - `{app}`: `admin` | `ops` | `customer`.
 
 ### 3.3 Packaging And Deployment
@@ -173,6 +174,7 @@ Where:
 | `dot deploy --app {name} [name ...] --target {target}` | Check, package, deploy, and smoke-test UX apps |
 
 Where:
+
 - `{name}`: `admin` | `ops` | `customer`.
 - `{target}`: `dev` | `stage` | `prod`.
 
@@ -215,5 +217,6 @@ Sessions are governed by `AGENTS.md` which is bound by `CONSTITUTION.md`.
 | DevOps operations    | Ingest AGENTS.md. You are {role}. We're working on DevOps operations. {agenda}    |
 
 Where:
+
 - `{role}`: `AI Architect` | `AI Coding Engine`
 - `{agenda}`: tasks to be completed
