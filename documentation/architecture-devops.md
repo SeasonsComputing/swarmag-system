@@ -83,7 +83,7 @@ For example, an `app-admin` bundle built with the stage endpoint, stage public
 key, and browser client mode is stage-bound even when served locally during
 development.
 
-Local UX hosting is development tooling. It serves a bundle that is bound to a real backend target, normally dev or stage. The system does not define a local Supabase backend target for UX packages.
+Local UX hosting is development tooling. It serves a bundle that is bound to a real backend target, normally dev or stage. The system does not define a local Supabase backend target for UX packages. The local runner preserves the generated target `.env` file and applies a process-local package metadata override by appending `-local` to `VITE_PACKAGE_VERSION` before Vite starts.
 
 Backend packages still use environment files for their own runtime deployment environment.
 
