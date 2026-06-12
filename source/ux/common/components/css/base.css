@@ -104,6 +104,10 @@ body::before {
   z-index: var(--sa-z-below);
 }
 
+#root {
+  min-width: var(--sa-size-min);
+}
+
 @keyframes sa-spinner-rotate {
   to {
     transform: rotate(1turn);
