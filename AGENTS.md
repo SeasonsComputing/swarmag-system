@@ -28,7 +28,7 @@ Every AI session begins by ingesting essential specifications and designs. Once 
 
 **For "devops" sessions, additionally ingest in order:**
 
-1. `documentation/architecture-backend.md`
+1. `documentation/architecture-back.md`
 2. `documentation/architecture-ux.md`
 3. `documentation/architecture-devops.md`
 
