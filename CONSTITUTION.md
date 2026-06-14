@@ -63,7 +63,10 @@ Reasoning may be shared. Authority is not shared.
 
 - System architecture
 - Domain meaning and invariants
-- Technology stack, programming conventions and boundaries
+- Technology stack
+- Programming conventions
+- Boundaries and constraints
+- 3rd-party dependencies
 - Product intent
 - Persistence model
 - Database migrations
