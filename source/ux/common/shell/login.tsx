@@ -50,6 +50,7 @@ const LoginClient = (props: LoginClientProps) => {
   const [error, setError] = createSignal<string | null>(null)
   const [pending, setPending] = createSignal(false)
 
+  /** Redirects to the dashboard if the user is already authenticated. */
   createEffect(() => {
     const session = api.SessionState.store
     if (!session.isLoading && session.isAuthenticated) {
@@ -57,6 +58,7 @@ const LoginClient = (props: LoginClientProps) => {
     }
   })
 
+  /** Sends the OTP code to the user's email. */
   const submitEmail = async () => {
     setPending(true)
     setError(null)
@@ -70,6 +72,7 @@ const LoginClient = (props: LoginClientProps) => {
     }
   }
 
+  /** Verifies the OTP code and logs the user in if valid. */
   const submitCode = async () => {
     setPending(true)
     setError(null)
@@ -86,6 +89,8 @@ const LoginClient = (props: LoginClientProps) => {
     <div data-ui='login'>
       <div data-ui='login-layout'>
         <UiLayout gap='loose'>
+          
+          {/* Login hero block */}
           <div data-ui='login-hero'>
             <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
             <UiLayout gap='tight'>
@@ -93,6 +98,8 @@ const LoginClient = (props: LoginClientProps) => {
               <span data-ui='login-application'>{props.shell.identity.applicationName}</span>
             </UiLayout>
           </div>
+
+          {/* STEP 1: validate email and send OTP code */}
           <div data-ui='login-form'>
             <Show when={step() === 'email'}>
               <UiLayout>
@@ -119,6 +126,8 @@ const LoginClient = (props: LoginClientProps) => {
                 </UiButton>
               </UiLayout>
             </Show>
+
+            {/* STEP 2: OTP code delivered now validate */}
             <Show when={step() === 'code'}>
               <UiLayout>
                 <p>
@@ -152,11 +161,15 @@ const LoginClient = (props: LoginClientProps) => {
                 </UiFormActions>
               </UiLayout>
             </Show>
+
+            {/* Display alert message if error */}
             <Show when={!!error()}>
               <UiAlert variant='danger'>{error()}</UiAlert>
             </Show>
           </div>
         </UiLayout>
+
+        {/* Shell configuration metadata */}
         <div>
           <dl data-ui='login-config'>
             <For each={props.shell.config}>
