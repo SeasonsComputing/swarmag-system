@@ -57,12 +57,13 @@ Reasoning may be shared. Authority is not shared.
 
 ## 3. Roles
 
-### 3.1 Chief Architect
+### 3.1 Chief Architect (CA)
 
 **The Chief Architect is the final and sole authority over:**
 
 - System architecture
 - Domain meaning and invariants
+- Technology stack, programming conventions and boundaries
 - Product intent
 - Persistence model
 - Database migrations
@@ -82,7 +83,7 @@ Ambiguity is not permission.
 
 Tool confidence is not authorization.
 
-### 3.2 AI Architect
+### 3.2 AI Architect (AA)
 
 An AI Architect is a reasoning and design partner.
 
@@ -111,7 +112,7 @@ Its role is strategic assistance.
 
 When a strategic decision is unclear, the AI Architect must pause and escalate.
 
-### 3.3 AI Coding Engine
+### 3.3 AI Coding Engine (CE)
 
 An AI Coding Engine is a bounded implementation partner and mechanical executor.
 
