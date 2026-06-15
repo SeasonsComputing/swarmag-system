@@ -89,7 +89,6 @@ const LoginClient = (props: LoginClientProps) => {
     <div data-ui='login'>
       <div data-ui='login-layout'>
         <UiLayout gap='loose'>
-          
           {/* Login hero block */}
           <div data-ui='login-hero'>
             <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
