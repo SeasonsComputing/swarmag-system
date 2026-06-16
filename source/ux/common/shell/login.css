@@ -75,7 +75,7 @@
 [data-ui='login-config'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-data-font-family);
-  font-size: calc(var(--sa-p-font-size-xs) * 0.85);
+  font-size: calc(var(--sa-font-size-xs) * 0.85);
   text-transform: lowercase;
 }
 

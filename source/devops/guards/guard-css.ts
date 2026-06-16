@@ -4,9 +4,35 @@ const CSS_DIR = `${ROOT}/source/ux/common/components/css`
 const CSS_FILES = ['tokens.css', 'themes.css', 'base.css', 'ui.css']
 
 const SELECTOR_REGEX = /^([^/{\n]*)\{/
+const TOKEN_DECLARATION_REGEX = /^\s*(--sa-[^:]+)\s*:/
 const COMMENT_LINE_REGEX = /^\s*\/\//
 const BLOCK_COMMENT_START = /\/\*/
 const BLOCK_COMMENT_END = /\*\//
+
+const IMMUTABLE_TOKEN_NAMES = new Set([
+  '--sa-base-size',
+  '--sa-blur',
+  '--sa-filter-mono',
+  '--sa-gap',
+  '--sa-gutter',
+  '--sa-pad'
+])
+
+const IMMUTABLE_TOKEN_PREFIXES = [
+  '--sa-font-app-',
+  '--sa-font-content-',
+  '--sa-font-info-',
+  '--sa-font-size-',
+  '--sa-font-weight-',
+  '--sa-line-',
+  '--sa-motion-',
+  '--sa-radius-',
+  '--sa-size-',
+  '--sa-space-',
+  '--sa-touch-',
+  '--sa-transition-',
+  '--sa-z-'
+]
 
 interface CSSLine {
   line: string
@@ -50,6 +76,53 @@ const extractSelector = (line: string): string | null => {
 
 const isAtRule = (selector: string): boolean => selector.startsWith('@')
 
+const isImmutableToken = (name: string): boolean =>
+  IMMUTABLE_TOKEN_NAMES.has(name)
+  || IMMUTABLE_TOKEN_PREFIXES.some(prefix => name.startsWith(prefix))
+
+const auditTokenDeclarations = (
+  lines: CSSLine[],
+  filePath: string,
+  fileName: string
+): string[] => {
+  const violations: string[] = []
+
+  for (const { line, lineNumber, isComment } of lines) {
+    if (isComment) continue
+
+    const match = line.match(TOKEN_DECLARATION_REGEX)
+    if (!match) continue
+
+    const name = match[1]
+
+    if (name.startsWith('--sa-p-')) {
+      violations.push(
+        `${filePath}:${lineNumber} — legacy token prefix — ${name}`
+      )
+    }
+
+    if (name.startsWith('--sa-lch-') && fileName !== 'themes.css') {
+      violations.push(
+        `${filePath}:${lineNumber} — lch token declared outside themes.css — ${name}`
+      )
+    }
+
+    if (fileName === 'tokens.css' && !isImmutableToken(name)) {
+      violations.push(
+        `${filePath}:${lineNumber} — mutable token declared in tokens.css — ${name}`
+      )
+    }
+
+    if (fileName !== 'tokens.css' && isImmutableToken(name)) {
+      violations.push(
+        `${filePath}:${lineNumber} — immutable token redeclared outside tokens.css — ${name}`
+      )
+    }
+  }
+
+  return violations
+}
+
 const auditTokensCSS = (
   lines: CSSLine[],
   filePath: string,
@@ -73,7 +146,10 @@ const auditTokensCSS = (
       continue
     }
 
-    if (!allowThemeSelectors && (selector === '[data-theme]' || selector.startsWith('[data-theme='))) {
+    if (
+      !allowThemeSelectors
+      && (selector === '[data-theme]' || selector.startsWith('[data-theme='))
+    ) {
       violations.push(
         `${filePath}:${lineNumber} — forbidden theme selector — found: ${selector}`
       )
@@ -186,10 +262,10 @@ const auditValueRules = (
     // Skip B1, B2 rules and remaining rules if in tokens.css
     if (skipTokensFile) continue
 
-    // B1: primitive token ref (skip in tokens.css)
-    if (valuePart.includes('var(--sa-p-')) {
+    // B1: LCH tuple token ref (skip in tokens.css)
+    if (valuePart.includes('var(--sa-lch-')) {
       violations.push(
-        `${filePath}:${lineNumber} — primitive token ref outside tokens.css — ${valuePart}`
+        `${filePath}:${lineNumber} — lch token ref outside themes.css — ${valuePart}`
       )
     }
 
@@ -332,15 +408,19 @@ const main = async () => {
     const lines = parseLines(content)
 
     if (fileName === 'tokens.css') {
+      violations.push(...auditTokenDeclarations(lines, relative, fileName))
       violations.push(...auditTokensCSS(lines, relative, true, false))
       violations.push(...auditValueRules(lines, relative, true))
     } else if (fileName === 'themes.css') {
+      violations.push(...auditTokenDeclarations(lines, relative, fileName))
       violations.push(...auditTokensCSS(lines, relative, false, true))
       violations.push(...auditValueRules(lines, relative, true))
     } else if (fileName === 'base.css') {
+      violations.push(...auditTokenDeclarations(lines, relative, fileName))
       violations.push(...auditBaseCSS(lines, relative))
       violations.push(...auditValueRules(lines, relative, false))
     } else if (fileName === 'ui.css') {
+      violations.push(...auditTokenDeclarations(lines, relative, fileName))
       violations.push(...auditControlsCSS(lines, relative))
       violations.push(...auditValueRules(lines, relative, false))
     }

@@ -4,15 +4,13 @@
 
 ## 1. Overview
 
-This document is the implementation reference for `ux/common` control primitives. It covers CSS architecture, control contracts, token layers, and selector discipline.
+This document is the implementation reference for `ux/common/components` control primitives. It covers the design and specification of the shared foundation for the entire suite of products, including CSS, control contracts, token layers, and selector discipline.
 
-**Audience:** Implementers building, modifying, or auditing controls in `source/ux/common/components/ui/`, the reserved chart-control directory in `source/ux/common/components/charts/`, or the shared CSS files.
+**Audience:** Implementers building, modifying, or auditing the shared foundation of `ux/common/components`.
 
-Consumers of controls use `ux-components-guide.md`.
+Consumers of controls use `ux-components-guide.md` or the abbreviated `ux-components-guide-lite.md`.
 
 ## 2. CSS Architecture
-
-### 2.1 Files
 
 Four foundation files live in `source/ux/common/components/css/`. App roots import the shared CSS barrel once:
 
@@ -20,77 +18,59 @@ Four foundation files live in `source/ux/common/components/css/`. App roots impo
 import '@ux/common/components/css/css.tsx'
 ```
 
-| File         | Owns                                                                                                      | Must not contain                                      |
-| ------------ | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| `tokens.css` | Primitive tokens and shared foundation scales                                                             | Element selectors, control selectors, keyframes       |
-| `themes.css` | Theme role tokens and UI control component tokens                                                         | Element selectors, control selectors, keyframes       |
-| `base.css`   | Browser foundation, global page background, fonts, resets, keyframes, global semantic HTML element styles | Reusable control visuals, app/page layout rules       |
-| `ui.css`     | Reusable UI control visuals and declared control parts                                                    | Primitive palette references, app/page-specific rules |
+`ux-design-language.md` defines the normative layer model, immutable foundation tokens,
+and semantic/role tokens. This document covers the component implementation contract.
 
-Shell-specific styles live with the shell component that owns them. For example,
-`source/ux/common/shell/login.css` is imported by the login shell component
-rather than by app roots.
+| Layer      | File         | Selector boundary          | Owns                                      | Consumes                         | Must not contain                                      |
+| ---------- | ------------ | -------------------------- | ----------------------------------------- | -------------------------------- | ----------------------------------------------------- |
+| Foundation | `tokens.css` | `:root`, `:root` media     | Immutable foundation tokens               | Nothing                          | Theme values, role tokens, component tokens           |
+| Theme      | `themes.css` | `[data-theme]`             | Component-specified tokens                | Foundation and semantic tokens   | Element selectors, component selectors, keyframes     |
+| HTML       | `base.css`   | HTML and global elements   | Browser and semantic HTML element styling | Foundation and semantic tokens   | Reusable control visuals, app/page layout rules       |
+| Component  | `ui.css`     | `[data-ui]`                | Reusable control visuals and parts        | Semantic and component tokens    | LCH tuple references, app/page-specific rules         |
+| Feature    | Shell CSS    | Owning shell component     | Shell component-specific styling          | Semantic and component tokens    | Shared control visuals, foundation token declarations |
 
-Raw values are allowed in `tokens.css` and `themes.css` because they define the design vocabulary. Raw browser/platform values are allowed sparingly in `base.css`. `ui.css` uses tokens for meaningful visual values; CSS keywords (`none`, `unset`, `inherit`, `auto`, `transparent`) may appear where tokenization adds no meaning.
+Shell-specific styles live with the shell component that owns them. For example, `source/ux/common/shell/login.css` is imported by the login shell component rather than by app roots.
 
-### 2.2 Token Layers
-
-| Layer          | File            | Scope                                     |
-| -------------- | --------------- | ----------------------------------------- |
-| Primitive      | `tokens.css`    | Bare L C H triplets and foundation scales |
-| Role / theme   | `themes.css`    | Resolved semantic roles per theme         |
-| Component      | `themes.css`    | UI control tokens                         |
-| Foundation CSS | `base.css`      | Browser and semantic HTML element styling |
-| UI CSS         | `ui.css`        | UI control and declared part styling      |
-| Shell CSS      | Shell-local CSS | Shell component-specific styling          |
-
-Controls follow this dependency order:
-
-```text
-primitive tokens → role tokens → component tokens → selectors
-```
+Raw values are allowed in `themes.css` where they define theme values and component-specific
+decisions. Raw browser/platform values are allowed sparingly in `base.css`. `ui.css` uses
+tokens for meaningful visual values; CSS keywords (`none`, `unset`, `inherit`, `auto`,
+`transparent`) may appear where tokenization adds no meaning.
 
 Rules:
 
-- `--sa-p-*` primitives are internal and are not consumed directly by `ui.css`.
-- Role tokens describe semantic meaning: color, background, text, border, shadow, gradient, typography, spacing, motion, and interaction state.
-- Component tokens describe UI control concerns and use the `--sa-{control}-{attribute}` or `--sa-{control}-{variant}-{attribute}` shape.
-- Specialized component tokens append specialization last: `--sa-{control}-{variant}-{attribute}-{specialization}`.
+- Component tokens describe UI control requirements and use the `--sa-{component}-{variant}-{attribute}-{specialization}` shape.
 - Selectors in `ui.css` consume role and component tokens, not raw color or spacing decisions.
+- `ui.css` does not consume `--sa-lch-*` tokens directly.
 
-### 2.3 Prefix Convention
+### 2.1 Component Token Catalog
 
-All tokens use the `--sa-` prefix.
+Component-specified tokens live in `themes.css` and are consumed by `ui.css`, shell CSS, or
+component-local CSS.
 
-| Prefix            | Scope                                 |
-| ----------------- | ------------------------------------- |
-| `--sa-p-`         | Primitives                            |
-| `--sa-color-`     | Semantic colors                       |
-| `--sa-bg-`        | Background surfaces                   |
-| `--sa-text-`      | Text colors                           |
-| `--sa-border-`    | Borders                               |
-| `--sa-shadow-`    | Shadows / elevation                   |
-| `--sa-gradient-`  | Gradients                             |
-| `--sa-*-font-`    | Typography role and component tokens  |
-| `--sa-radius-`    | Border radius                         |
-| `--sa-space-`     | Spacing scale                         |
-| `--sa-motion-`    | Motion durations and animation timing |
-| `--sa-button-`    | Button component tokens               |
-| `--sa-control-`   | Shared control component tokens       |
-| `--sa-input-`     | Input, textarea, and select tokens    |
-| `--sa-shell-`     | App shell chrome tokens               |
-| `--sa-toggle-`    | Toggle component tokens               |
-| `--sa-tab-`       | Tabs component tokens                 |
-| `--sa-accordion-` | Accordion component tokens            |
-| `--sa-separator-` | Separator component tokens            |
-| `--sa-card-`      | Card component tokens                 |
-| `--sa-table-`     | Table component tokens                |
-| `--sa-dash-`      | Dashboard layout spacing              |
-| `--sa-form-`      | Form container spacing                |
-| `--sa-field-`     | Field group spacing                   |
-| `--sa-touch-`     | Touch target sizing                   |
+| Family          | Tokens                                                                                     | Consumer                     |
+| --------------- | ------------------------------------------------------------------------------------------ | ---------------------------- |
+| Button          | `--sa-button-*`                                                                            | `UiButton`                   |
+| Shared control  | `--sa-control-shadow-error`                                                                | Input-like error treatments  |
+| Input/select    | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*`                              | Text inputs and select parts |
+| Toggle          | `--sa-toggle-*`, `--sa-toggle-group-*`                                                     | Toggle controls              |
+| Tabs            | `--sa-tab-*`                                                                               | Tab triggers and panels      |
+| Accordion       | `--sa-accordion-*`                                                                         | Accordion triggers/content   |
+| Skeleton        | `--sa-skeleton-*`                                                                          | Loading placeholders         |
+| Card            | `--sa-card-*`                                                                              | Card variants                |
+| Table           | `--sa-table-*`                                                                             | Table parts                  |
+| Fieldset        | `--sa-fieldset-*`                                                                          | Fieldset group boundaries    |
+| Progress        | `--sa-progress-*`                                                                          | Progress track and fill      |
+| List            | `--sa-list-*`                                                                              | List and list item parts     |
+| Avatar          | `--sa-avatar-*`                                                                            | Avatar marker                |
+| Alert           | `--sa-alert-*`                                                                             | Alert treatment              |
+| Separator       | `--sa-separator-*`                                                                         | Separator primitive          |
+| Shell chrome    | `--sa-shell-chrome-bg`, `--sa-shell-chrome-border`, `--sa-shell-chrome-filter`             | Header and footer chrome     |
+| Shell chrome    | `--sa-shell-chrome-secondary`, `--sa-shell-chrome-shadow`, `--sa-shell-chrome-text`         | Header and footer chrome     |
 
-### 2.4 Common Component Structure
+Shell chrome is a first-class component token family. It lets app frame surfaces diverge from
+card surfaces without changing generic panel or card roles.
+
+### 2.2 Common Component Structure
 
 ```text
 ux/
@@ -103,7 +83,7 @@ ux/
         └── ui/          — UI control primitives
 ```
 
-## 3. Control Contract
+## 3. Component Contract
 
 All primitives in `source/ux/common/components/ui/` emit semantic attributes and keep visual styling in `ui.css`.
 
