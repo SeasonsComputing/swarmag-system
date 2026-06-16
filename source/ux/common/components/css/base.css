@@ -90,9 +90,9 @@ body {
 body::before {
   filter: none;
   background:
-    radial-gradient(circle at 20% 80%, var(--sa-p-radial-1) 0%, transparent 55%),
-    radial-gradient(circle at 85% 20%, var(--sa-p-radial-2) 0%, transparent 60%),
-    radial-gradient(circle at 80% 80%, var(--sa-p-radial-3) 0%, transparent 55%);
+    radial-gradient(circle at 20% 80%, var(--sa-radial-1) 0%, transparent 55%),
+    radial-gradient(circle at 85% 20%, var(--sa-radial-2) 0%, transparent 60%),
+    radial-gradient(circle at 80% 80%, var(--sa-radial-3) 0%, transparent 55%);
   content: '';
   height: 100%;
   left: 0;
