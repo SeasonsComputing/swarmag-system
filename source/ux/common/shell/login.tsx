@@ -108,6 +108,7 @@ const LoginClient = (props: LoginClientProps) => {
                     name='email'
                     type='email'
                     autocomplete='email'
+                    placeholder='Enter your registered email'
                     value={email()}
                     onInput={e => setEmail(e.currentTarget.value)}
                     error={error() !== null}
