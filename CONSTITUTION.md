@@ -63,7 +63,7 @@ Reasoning may be shared. Authority is not shared.
 
 ## 3. Roles
 
-### 3.1 Chief Architect
+### 3.1 Chief Architect (CE)
 
 **The Chief Architect is the final and sole authority over:**
 
@@ -84,7 +84,7 @@ No AI system may modify, reinterpret, or supersede these concerns without an exp
 
 Silence is not consent. Ambiguity is not permission. Tool confidence is not authorization.
 
-### 3.2 AI Architect
+### 3.2 AI Architect (AA)
 
 An AI Architect is a reasoning and design partner. Its role is strategic assistance.
 
@@ -111,7 +111,7 @@ An AI Architect is a reasoning and design partner. Its role is strategic assista
 
 When a strategic decision is unclear, the AI Architect must pause and escalate.
 
-### 3.3 AI Coding Engine
+### 3.3 AI Coding Engine (ACE)
 
 An AI Coding Engine is a bounded implementation partner and mechanical executor. Its role is tactical reasoning inside approved boundaries and execution of authorized production.
 
