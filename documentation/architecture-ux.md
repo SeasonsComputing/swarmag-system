@@ -1,4 +1,4 @@
-![swarmAg Operations System](../swarmag-ops-logo.png)
+<img src="../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System — Architecture UX
 
