@@ -416,8 +416,12 @@
   --sa-shadow-sm: 0 1px 2px oklch(28% 0.036 230 / 0.1);
   --sa-shadow: 0 6px 16px oklch(28% 0.036 230 / 0.1);
   --sa-shadow-md: 0 14px 34px oklch(28% 0.036 230 / 0.13);
-  --sa-shadow-lg: 0 24px 54px oklch(28% 0.036 230 / 0.16), inset 0 1px 0 oklch(var(--sa-lch-white) / 0.75);
-  --sa-shadow-xl: 0 36px 78px oklch(28% 0.036 230 / 0.2), inset 0 1px 0 oklch(var(--sa-lch-white) / 0.85);
+  --sa-shadow-lg:
+    0 24px 54px oklch(28% 0.036 230 / 0.16),
+    inset 0 1px 0 oklch(var(--sa-lch-white) / 0.75);
+  --sa-shadow-xl:
+    0 36px 78px oklch(28% 0.036 230 / 0.2),
+    inset 0 1px 0 oklch(var(--sa-lch-white) / 0.85);
   --sa-shadow-glow-sm: 0 0 20px oklch(var(--sa-lch-brand-start));
   --sa-shadow-glow: 0 0 30px oklch(var(--sa-lch-brand-start));
   --sa-shadow-btn: 0 0 30px oklch(86% 0.062 185 / 0.38), 0 0 30px oklch(86% 0.062 185 / 0.28);
