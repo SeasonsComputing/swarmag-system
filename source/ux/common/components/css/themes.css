@@ -193,16 +193,16 @@
   --sa-focus-ring: 0 0 0 2px oklch(13.2% 0.012 264.5), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
 
   /* Shell chrome */
-  --sa-shell-chrome-bg: oklch(17% 0.008 244 / 0.7);
-  --sa-shell-chrome-border: var(--sa-border-card);
-  --sa-shell-chrome-filter: var(--sa-blur);
-  --sa-shell-chrome-shadow: var(--sa-shadow-sm);
-  --sa-shell-chrome-text: var(--sa-text-h1);
-  --sa-shell-chrome-secondary: var(--sa-text-secondary);
+  --sa-shell-bg: oklch(17% 0.008 244 / 0.7);
+  --sa-shell-border: var(--sa-border-card);
+  --sa-shell-filter: var(--sa-blur);
+  --sa-shell-shadow: var(--sa-shadow-sm);
+  --sa-shell-text: var(--sa-text-h1);
+  --sa-shell-secondary: var(--sa-text-secondary);
 
   /* Button */
   --sa-button-bg-primary: var(--sa-color-primary);
-  --sa-button-color-primary: var(--sa-shell-chrome-bg);
+  --sa-button-color-primary: var(--sa-shell-bg);
   --sa-button-bg-primary-hover: var(--sa-color-primary);
 
   /* Input */
@@ -240,8 +240,8 @@
   --sa-card-widget-border: var(--sa-border-card);
   --sa-card-widget-shadow: 0 15px 36px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-card-widget-stripe-opacity: 0.8;
-  --sa-card-panel-bg: var(--sa-shell-chrome-bg);
-  --sa-card-panel-border: var(--sa-shell-chrome-border);
+  --sa-card-panel-bg: var(--sa-shell-bg);
+  --sa-card-panel-border: var(--sa-shell-border);
   --sa-card-panel-shadow: 0 0 36px rgb(0 0 0 / 0.3);
   --sa-card-workflow-bg: oklch(21% 0.02 226 / 0.42);
   --sa-card-workflow-border: 1px solid rgb(148 163 184 / 0.2);
@@ -384,12 +384,12 @@
   --sa-focus-ring: 0 0 0 2px oklch(99.4% 0.006 98), 0 0 0 4px oklch(57% 0.13 186 / 0.42);
 
   /* Shell chrome */
-  --sa-shell-chrome-bg: oklch(27% 0.045 224);
-  --sa-shell-chrome-border: 1px solid oklch(18% 0.035 228 / 0.72);
-  --sa-shell-chrome-filter: none;
-  --sa-shell-chrome-shadow: 0 12px 28px oklch(20% 0.04 230 / 0.18);
-  --sa-shell-chrome-text: oklch(98% 0.006 98);
-  --sa-shell-chrome-secondary: oklch(83% 0.026 112);
+  --sa-shell-bg: oklch(27% 0.045 224);
+  --sa-shell-border: 1px solid oklch(18% 0.035 228 / 0.72);
+  --sa-shell-filter: none;
+  --sa-shell-shadow: 0 12px 28px oklch(20% 0.04 230 / 0.18);
+  --sa-shell-text: oklch(98% 0.006 98);
+  --sa-shell-secondary: oklch(83% 0.026 112);
 
   /* Button */
   --sa-button-bg-primary: var(--sa-color-primary);

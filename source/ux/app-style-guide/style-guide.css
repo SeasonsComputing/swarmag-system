@@ -1,8 +1,8 @@
 .sg-header {
-  backdrop-filter: var(--sa-shell-chrome-filter);
-  background: var(--sa-shell-chrome-bg);
-  border-block-end: var(--sa-shell-chrome-border);
-  box-shadow: var(--sa-shell-chrome-shadow);
+  backdrop-filter: var(--sa-shell-filter);
+  background: var(--sa-shell-bg);
+  border-block-end: var(--sa-shell-border);
+  box-shadow: var(--sa-shell-shadow);
   margin: 0;
   padding: var(--sa-pad) var(--sa-gutter);
   position: sticky;
@@ -39,11 +39,11 @@
 }
 
 .sg-header h1 {
-  color: var(--sa-shell-chrome-text);
+  color: var(--sa-shell-text);
 }
 
 .sg-header-subtitle {
-  color: var(--sa-shell-chrome-secondary);
+  color: var(--sa-shell-secondary);
 }
 
 .sg-main {
