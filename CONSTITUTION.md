@@ -28,7 +28,7 @@ Correctness
   → This Constitution 
   → Domain and Architecture Documents 
   → Style Guides & Conventions
-  → Agent Instructions 
+  → Agent Instructions
 ```
 
 No tool, human, or AI may override this ordering.
@@ -53,11 +53,11 @@ No tool, human, or AI may override this ordering.
 
 All work operates under the Three-Role Model defined in [Model of Development with AI Coding](markdown.html?documentation/tvk-mod-3rm.md).
 
-| Reasoning             | Role                                 |
-|-----------------------|--------------------------------------|
-| Strategic reasoning   | Chief Architect + AI Architect       |
-| Tactical reasoning    | Chief Architect + AI Coding Engine   |
-| Mechanical execution  | AI Coding Engine                     |
+| Reasoning            | Role                               |
+| -------------------- | ---------------------------------- |
+| Strategic reasoning  | Chief Architect + AI Architect     |
+| Tactical reasoning   | Chief Architect + AI Coding Engine |
+| Mechanical execution | AI Coding Engine                   |
 
 Reasoning may be shared. Authority is not shared.
 
