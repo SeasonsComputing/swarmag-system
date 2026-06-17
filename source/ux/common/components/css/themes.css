@@ -107,7 +107,7 @@
   --sa-text-secondary: oklch(var(--sa-lch-neutral-3));
   --sa-text-dim: oklch(var(--sa-lch-neutral-4));
   --sa-text-disabled: oklch(var(--sa-lch-neutral-4));
-  --sa-text-placeholder: oklch(var(--sa-lch-neutral-5));
+  --sa-text-placeholder: oklch(var(--sa-lch-neutral-3));
   --sa-text-h1: oklch(var(--sa-lch-white));
   --sa-text-h2: oklch(var(--sa-lch-gradient-4-mid-end));
   --sa-text-h3: oklch(var(--sa-lch-gradient-2-mid-start));
