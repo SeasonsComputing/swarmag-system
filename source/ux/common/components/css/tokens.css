@@ -114,29 +114,25 @@
 
 :root {
   --sa-gutter: var(--sa-space-4xl);
-  --sa-pad: var(--sa-space-lg);
-  --sa-gap: calc(var(--sa-space-md) + var(--sa-space-xx));
+  --sa-pad: calc(var(--sa-space-md) + var(--sa-space-xs));
+  --sa-gap: var(--sa-space-md);
 }
 
 @media (max-width: 1440px) {
   :root {
     --sa-gutter: var(--sa-space-3xl);
-    --sa-pad: calc(var(--sa-space-md) + var(--sa-space-xx));
-    --sa-gap: calc(var(--sa-space-md) + var(--sa-space-xs));
   }
 }
 
 @media (max-width: 1024px) {
   :root {
-    --sa-gutter: var(--sa-space-3xl);
-    --sa-pad: calc(var(--sa-space-md) + var(--sa-space-xs));
-    --sa-gap: var(--sa-space-md);
+    --sa-gutter: var(--sa-space-2xl);
   }
 }
 
 @media (max-width: 768px) {
   :root {
-    --sa-gutter: calc(var(--sa-space-xl) + var(--sa-space-xx));
+    --sa-gutter: var(--sa-space-xl);
     --sa-pad: var(--sa-space-md);
     --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
