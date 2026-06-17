@@ -114,7 +114,7 @@
   align-items: center;
   background: var(--sa-input-bg);
   border: var(--sa-border-input);
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
   color: var(--sa-text-primary);
   cursor: pointer;
   display: inline-flex;
