@@ -93,7 +93,7 @@
 [data-ui='textarea'] {
   background: var(--sa-input-bg);
   border: var(--sa-border-input);
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
   color: var(--sa-text-primary);
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size);
@@ -114,7 +114,7 @@
   align-items: center;
   background: var(--sa-input-bg);
   border: var(--sa-border-input);
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
   color: var(--sa-text-primary);
   cursor: pointer;
   display: inline-flex;
@@ -325,7 +325,7 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 [data-ui='table-container'] {
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
   overflow-x: hidden;
   width: 100%;
 }
@@ -333,7 +333,7 @@
 [data-ui='table-container'] > [data-ui='table'] {
   background: var(--sa-bg-table);
   border-collapse: collapse;
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
   min-width: 100%;
   width: max-content;
 }
@@ -345,7 +345,7 @@
 [data-ui='table'] {
   background: var(--sa-bg-table);
   border-collapse: collapse;
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
   overflow: hidden;
   width: 100%;
 }
@@ -583,7 +583,7 @@
 
 [data-ui='accordion-item'] {
   border: var(--sa-border-default);
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
 }
 
 [data-ui='accordion-item'][data-expanded] {
@@ -594,7 +594,7 @@
   align-items: center;
   background: var(--sa-bg-control);
   border: unset;
-  border-radius: var(--sa-radius-md);
+  border-radius: var(--sa-radius-sm);
   color: var(--sa-text-secondary);
   cursor: pointer;
   display: flex;
@@ -630,7 +630,7 @@
 }
 
 [data-ui='accordion-item'][data-expanded] [data-ui='accordion-trigger'] {
-  border-radius: var(--sa-radius-md) var(--sa-radius-md) 0 0;
+  border-radius: var(--sa-radius-sm) var(--sa-radius-sm) 0 0;
 }
 
 [data-ui='accordion-content'] {
@@ -1136,7 +1136,7 @@
 
 [data-ui='fieldset'] {
   border: var(--sa-fieldset-border);
-  border-radius: var(--sa-card-border-radius);
+  border-radius: var(--sa-radius-sm);
   background: var(--sa-fieldset-bg);
   box-shadow: var(--sa-fieldset-shadow);
   display: grid;
