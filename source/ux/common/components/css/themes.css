@@ -1,106 +1,15 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ UX themes                                                                    ║
-║ Theme role and component tokens.                                             ║
+║ Theme specializations and component tokens.                                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
 /* ─────────────────────────────────────────────────────────────────────────── */
-/* COMMON THEME TOKENS WITH DEFAULT VALUES                                     */
+/* COMMON COMPONENT TOKENS WITH DEFAULT VALUES                                 */
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 [data-theme] {
-  /* Content/Heading */
-  --sa-heading-font-family: var(--sa-font-content-heading);
-  --sa-heading-font-weight: var(--sa-font-weight-thin);
-  --sa-heading-font-size-h1: clamp(1.3rem, calc(1.0074rem + 1.1018vw), 1.7125rem);
-  --sa-heading-font-size-h2: clamp(1.1875rem, calc(0.9658rem + 0.8347vw), 1.5rem);
-  --sa-heading-font-size-h3: clamp(0.9875rem, calc(0.8456rem + 0.5342vw), 1.1875rem);
-  --sa-heading-font-size-h4: var(--sa-font-size-base);
-  --sa-heading-font-size-h5: var(--sa-font-size-sm);
-
-  /* Content/Body */
-  --sa-body-font-family: var(--sa-font-content-body);
-  --sa-body-font-weight: var(--sa-font-weight-thin);
-  --sa-body-font-size: var(--sa-font-size-base);
-  --sa-body-line-height: var(--sa-line-leading-normal);
-
-  /* App/Label */
-  --sa-label-font-family: var(--sa-font-app-label);
-  --sa-label-font-size: var(--sa-font-size-sm);
-  --sa-label-font-weight: var(--sa-font-weight-normal);
-
-  /* App/UI */
-  --sa-ui-font-family: var(--sa-font-app-ui);
-  --sa-ui-font-size: var(--sa-font-size-sm);
-  --sa-ui-font-size-compact: var(--sa-font-size-xs);
-  --sa-ui-font-weight: var(--sa-font-weight-thin);
-  --sa-ui-checkmark-weight: var(--sa-font-weight-extrabold);
-
-  /* App/Annotation */
-  --sa-annotation-font-family: var(--sa-font-app-annotation);
-  --sa-annotation-font-size: var(--sa-font-size-sm);
-  --sa-annotation-font-weight: var(--sa-font-weight-medium);
-
-  /* Info/Data */
-  --sa-data-font-family: var(--sa-font-info-data);
-  --sa-data-font-size: var(--sa-font-size-sm);
-  --sa-data-font-weight: var(--sa-font-weight-thin);
-
-  /* Gradient range */
-  --sa-lch-gradient-1-start: 54.3% 0.11 236.182;
-  --sa-lch-gradient-2-mid-start: 61.4% 0.107 210.2;
-  --sa-lch-gradient-3-mid: 68.5% 0.103 184.216;
-  --sa-lch-gradient-4-mid-end: 74.25% 0.117 184.6;
-  --sa-lch-gradient-5-end: 80% 0.13 185;
-  --sa-lch-popup: 28.5% 0.023 236; /* floating surface — select, popover, tooltip */
-
-  /* Brand primitives  */
-  --sa-lch-brand-start: var(--sa-lch-gradient-1-start);
-  --sa-lch-brand-mid: var(--sa-lch-gradient-3-mid);
-  --sa-lch-brand-end: var(--sa-lch-gradient-5-end);
-
-  /* Neutrals */
-  --sa-lch-white: 100% 0 0;
-  --sa-lch-neutral-1: 93.5% 0.006 264.5;
-  --sa-lch-neutral-2: 87.2% 0.008 264.5;
-  --sa-lch-neutral-3: 66.4% 0.018 261.3;
-  --sa-lch-neutral-4: 50.8% 0.02 261.3;
-  --sa-lch-neutral-5: 40.2% 0.014 261.3;
-
-  /* Dark surfaces */
-  --sa-lch-surface-3: 27.4% 0.014 264.5; /* #33364a page chrome */
-  --sa-lch-surface-2: 24.6% 0.016 264.5; /* #2c2f3e sidebars */
-  --sa-lch-surface-1: 22.1% 0.01 277.4; /* #29282f cards */
-  --sa-lch-black: 7.8% 0 0; /* #0a0a0a */
-
-  /* State primitives */
-  --sa-lch-success: 72.2% 0.192 149.579; /* green  */
-  --sa-lch-warning: 76.885% 0.1231 80.8277; /* orange */
-  --sa-lch-danger: 62.8% 0.2577 29.234; /* red */
-  --sa-lch-info: 60.8% 0.108 216.744; /* light-blue */
-
-  /* Radial background accents */
-  --sa-radial-1: oklch(var(--sa-lch-gradient-2-mid-start) / 0.416);
-  --sa-radial-2: oklch(var(--sa-lch-gradient-1-start) / 0.222);
-  --sa-radial-3: oklch(var(--sa-lch-gradient-5-end) / 0.216);
-
-  /* Border */
-  --sa-border-input-error: oklch(var(--sa-lch-danger));
-
-  /* Gradient */
-  --sa-gradient-stripe: var(--sa-gradient-brand-90);
-
-  /* State */
-  --sa-state-success: oklch(var(--sa-lch-success));
-  --sa-state-warning: oklch(var(--sa-lch-warning));
-  --sa-state-danger: oklch(var(--sa-lch-danger));
-  --sa-state-danger-bg: oklch(var(--sa-lch-danger) / 0.12);
-  --sa-state-info: oklch(var(--sa-lch-info));
-
-  /* Focus / base element */
-  --sa-blockquote-border: 3px solid var(--sa-color-accent);
-
   /* Button */
   --sa-button-font-family: var(--sa-font-app-ui);
   --sa-button-font-size: var(--sa-font-size-xs);
@@ -162,14 +71,6 @@
 
   /* Separator */
   --sa-separator-height: 1px;
-}
-
-@media (max-width: 425px) {
-  [data-theme] {
-    /* h1-h3 are clamped */
-    --sa-heading-font-size-h4: var(--sa-font-size-sm);
-    --sa-body-font-size: var(--sa-font-size-sm);
-  }
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
