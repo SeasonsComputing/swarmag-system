@@ -1,105 +1,143 @@
-![swarmAg Operations System](../swarmag-ops-logo.png)
+<img src="../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System — UX Design Language
 
 ## 1. Overview
 
-This document defines the brand application layer for the swarmAg ecosystem. It is organized into common foundations shared by all themes, followed by a section per theme that defines its distinct visual character.
+This document defines the branded look and feel for the swarmAg ecosystem. It covers the design foundation, token catalog, typography, geometry, layout, motion, and theme mechanism shared by all applications.
 
 **Document Organization:**
 
 | Document                     | Scope                                                                           |
 | ---------------------------- | ------------------------------------------------------------------------------- |
-| _This document_              | Brand identity: motif, typography, color, themes, layout, dashboard             |
+| _This document_              | Design foundation, tokens, typography, geometry, layout, motion                 |
 | `ux-components-guide.md`     | Consumer reference: what controls exist, how to use them                        |
 | `ux-components-internals.md` | Implementation reference: CSS architecture, control contract, tokens, selectors |
 
-## 2. Common
+## 2. Design Foundation
 
-### 2.1 Layer Structure
+The swarmAg product family is governed by a single, layered, multi-theme, unified design language. All applications share this foundation including look and feel, shell, component catalog, conventions, and guards.
 
-The swarmAg product family is governed by a single, unified design language. All applications share a common foundation of brand primitives, tokens, and component logic. Layouts diverge to meet specific operational contexts — data-dense Admin, high-contrast Ops — but the brand character is constant across all of them.
+### 2.1 Design Characteristics
 
-CSS layers are imported once through the shared barrel:
-
-```ts
-import '@ux/common/components/css/css.tsx'
-```
-
-| Layer            | File         | Scope                    | Owns                                                       |
-| ---------------- | ------------ | ------------------------ | ---------------------------------------------------------- |
-| Foundation layer | `tokens.css` | `:root`, `:root` media   | Immutable typography, geometry, motion, and rhythm tokens  |
-| Theme layer      | `themes.css` | `[data-theme]`           | Semantic roles, theme values, LCH tuples, component tokens |
-| Base layer       | `base.css`   | HTML and global elements | Browser reset, fonts, global background, semantic HTML     |
-| Component layer  | `ui.css`     | `[data-ui]`              | Reusable component selectors and declared component parts  |
-
-Dependency direction is one-way:
-
-```text
-tokens.css → themes.css → base.css / ui.css → app and shell-local CSS
-```
-
-Rules:
-
-- `tokens.css` declarations are **immutable**. They are stable foundation tokens and are not
-  redeclared by themes, components, shell CSS, or app CSS.
-- `themes.css` converts immutable foundation tokens and theme-specific values into semantic
-  roles. It also owns component-specified tokens consumed by `ui.css`.
-- `base.css`, `ui.css`, shell CSS, and app CSS consume tokens; they do not introduce foundation
-  or semantic token systems.
-- `ui.css` must not reference `--sa-lch-*` tokens directly. Component selectors consume semantic
-  or component-specified tokens.
-
-### 2.2 Unified Design Language
-
-| Property        | Specification                                                                                                                              |
+| Characteristic  | Specification                                                                                                                              |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | **Audience**    | Leadership, Operations Staff, Field Crews                                                                                                  |
 | **Feel**        | Professional, rugged, and purposeful                                                                                                       |
 | **Decorations** | Gradient accent common to all themes, applied to interactive elements, button fills, card stripes, and surfaces — values defined per theme |
 
-### 2.3 Token Catalog
+### 2.2 Namespaces
 
-#### 2.3.1 Immutable Foundation Tokens
+The design language definition is organized into namespaces. Each namespace is composed primarily of style tokens, component selectors, or CSS attributes. Namespaces themselves are defined using CSS selectors that scope CSS custom properties (variables).
 
-Immutable foundation tokens live in `tokens.css`.
+| Namespace                 | Members                                                          |
+| ------------------------- | ---------------------------------------------------------------- |
+| `:root`                   | Foundation tokens and default role tokens                        |
+| `[data-theme]`            | Shared theme and component-token specializations                 |
+| `[data-theme='{theme}']`  | Namespace per theme instance with theme-specific specializations |
+| `[data-ui='{component}']` | Component namespace for reusable Ui controls and control parts   |
+| `[data-ui='{feature}']`   | Namespace for feature-specific tokens                            |
 
-| Family       | Tokens                                                                                  | Intent                             |
-| ------------ | --------------------------------------------------------------------------------------- | ---------------------------------- |
-| Font family  | `--sa-font-content-*`, `--sa-font-app-*`, `--sa-font-info-*`                            | Self-hosted font stacks by role    |
-| Font weight  | `--sa-font-weight-*`                                                                    | Shared weight scale                |
-| Font size    | `--sa-font-size-*`, `--sa-base-size`                                                    | Shared size scale and root size    |
-| Line height  | `--sa-line-leading-normal`                                                              | Shared content line height         |
-| Radius       | `--sa-radius-*`                                                                         | Shared corner scale                |
-| Spacing      | `--sa-space-*`, `--sa-gutter`, `--sa-pad`, `--sa-gap`                                   | 4px grid and responsive rhythm     |
-| Viewport     | `--sa-size-*`                                                                           | Shared viewport and wrap sizes     |
-| Touch target | `--sa-touch-target`, `--sa-touch-target-sm`                                             | Field-safe and compact target size |
-| Z-index      | `--sa-z-*`                                                                              | Shared elevation ordering          |
-| Effects      | `--sa-blur`, `--sa-filter-mono`                                                         | Shared filter values               |
-| Motion       | `--sa-motion-*`, `--sa-transition-*`                                                    | Motion duration and transition     |
+### 2.3 Layers
 
-#### 2.3.2 Semantic And Role Tokens
+Namespaces of the design language are organized into layers with each layer codified as a CSS file named for the layer. Each layer owns one category of design responsibility, declares or consumes only those tokens allowed for that layer, and is encapsulated within its namespace. A layer may consume tokens from earlier layers, and shall not redefine upstream ownership or introduce selector kinds outside its namespace.
 
-Semantic and role tokens live in `themes.css`.
+| Layer            | Namespace                                | File            | Members                                                         |
+| ---------------- | ---------------------------------------- | --------------- | --------------------------------------------------------------- |
+| **PROVIDERS**    |                                          |                 |                                                                 |
+| Foundation Layer | `:root`                                  | `tokens.css`    | Typography, geometry, motion, and rhythm tokens (**immutable**) |
+| Role Layer       | `:root`                                  | `roles.css`     | Required role tokens with default values                        |
+| Theme Layer      | `data-theme`,<br/>`data-theme='{theme}'` | `themes.css`    | Per-theme role overrides and component-specified tokens         |
+| **CONSUMERS**    |                                          |                 |                                                                 |
+| Base Layer       | `html`                                   | `base.css`      | Browser reset, fonts, page base, semantic HTML                  |
+| Component Layer  | `data-ui='{component}'`                  | `ui.css`        | Reusable component selectors and declared component parts       |
+| Feature Layer    | `data-ui='{feature}'`                    | `{feature}.css` | Application feature styling and layout                          |
 
-| Family         | Tokens                                                                                | Intent                                 |
-| -------------- | ------------------------------------------------------------------------------------- | -------------------------------------- |
-| LCH tuples     | `--sa-lch-*`                                                                          | Theme color tuples for composition     |
-| Brand color    | `--sa-color-primary`, `--sa-color-secondary`, `--sa-color-accent`                     | Brand and accent roles                 |
-| Background     | `--sa-bg-*`                                                                           | Page, surface, overlay, and state fill |
-| Text           | `--sa-text-*`                                                                         | Primary, secondary, heading, label     |
-| Border         | `--sa-border-*`                                                                       | Semantic border treatments             |
-| Shadow         | `--sa-shadow-*`                                                                       | Semantic elevation and glow            |
-| Gradient       | `--sa-gradient-*`                                                                     | Brand, button, card, and stripe fills  |
-| State          | `--sa-state-*`                                                                        | Success, warning, danger, info states  |
-| Typography     | `--sa-heading-*`, `--sa-body-*`, `--sa-label-*`, `--sa-ui-*`, `--sa-annotation-*`     | Role typography consumed by selectors  |
-| Data           | `--sa-data-*`                                                                         | Technical data typography              |
-| Base elements  | `--sa-focus-ring`, `--sa-blockquote-border`, `--sa-radial-*`                          | Global focus, quote, and page depth    |
+CSS files live in `source/ux/common/components/css/`. A shared CSS barrel,
+`source/ux/common/components/css/css.tsx`, imports them in prescribed dependency order during application bootstrap.
+
+**Layer Boundaries**
+
+- Token provider files are `tokens.css`, `roles.css`, and `themes.css`. They may contain only CSS
+  custom-property declarations inside their namespace containers. They do not contain element
+  or component selectors.
+
+- `tokens.css` declarations are immutable foundation tokens. They are stable values and may not
+  be redeclared by roles, themes, components, shell CSS, or app CSS.
+- `roles.css` defines the required role-token contract for applications conforming to the
+  design language. Role tokens have defaults so a conforming application has a complete style
+  vocabulary before a named theme specializes it.
+- `themes.css` provides named theme overrides for role tokens and owns component-specified
+  tokens consumed by `ui.css`.
+- `base.css`, `ui.css`, feature CSS consume tokens; they do not introduce foundation,
+  role, or theme token systems.
+- `ui.css` must not reference `--sa-lch-*` tokens directly. Component selectors consume role or
+  component-specified tokens.
+
+## 3. Token Catalog
+
+### 3.1 Token Design
+
+All design-language custom properties use the `--sa-` prefix. Token names describe ownership
+and design purpose; they do not encode implementation selectors or application-specific
+context.
+
+| Token class                | Naming convention                                         | Owner        | Notes                                                                     |
+| -------------------------- | --------------------------------------------------------- | ------------ | ------------------------------------------------------------------------- |
+| Foundation tokens          | `--sa-{primitive-family}-{attribute}-{specialization}`    | `tokens.css` | Immutable primitive values such as font, spacing, radius, motion          |
+| Layout rhythm tokens       | `--sa-gutter`,<br/> `--sa-pad`,<br/> `--sa-gap`           | `tokens.css` | Responsive aliases over the immutable spacing scale                       |
+| Role tokens                | `--sa-{role-family}-{attribute}-{specialization}`         | `roles.css`  | Semantic visual roles such as background, text, border, state, shadow     |
+| LCH tuple tokens           | `--sa-lch-{name}`                                         | `roles.css`  | Bare `L C H` triplets used for `oklch()` composition                      |
+| Theme specializations      | Existing role-token names                                 | `themes.css` | Per-theme overrides of the role-token contract                            |
+| Component-specified tokens | `--sa-{component}-{variant}-{attribute}-{specialization}` | `themes.css` | Component implementation tokens cataloged in `ux-components-internals.md` |
+
+Rules:
+
+- Foundation token names are reserved to `tokens.css` and may not be redeclared downstream.
+- LCH tuple tokens store tuples only; role tokens realize tuples into usable color values including opacity.
+- Component-specified tokens are implementation contracts for `ui.css`; they are cataloged
+  in `ux-component-internals.md`.
+
+### 3.2 Foundation Tokens
+
+Foundation tokens live in `tokens.css`. Foundation tokens are immutable and shall not be overridden.
+
+| Family        | Tokens                                                       | Intent                             |
+| ------------- | ------------------------------------------------------------ | ---------------------------------- |
+| Font family   | `--sa-font-content-*`, `--sa-font-app-*`, `--sa-font-info-*` | Self-hosted font stacks by role    |
+| Font weight   | `--sa-font-weight-*`                                         | Weight scale                       |
+| Font size     | `--sa-font-size-*`, `--sa-base-size`                         | Size scale and root size           |
+| Line height   | `--sa-line-leading-normal`                                   | Content line height                |
+| Radius        | `--sa-radius-*`                                              | Corner scale                       |
+| Spacing       | `--sa-space-*`                                               | 4px grid                           |
+| Layout rhythm | `--sa-gutter`, `--sa-pad`, `--sa-gap`                        | Responsive layout rhythm           |
+| Viewport      | `--sa-size-*`                                                | Viewport and wrap sizes            |
+| Touch target  | `--sa-touch-target`, `--sa-touch-target-sm`                  | Field-safe and compact target size |
+| Z-index       | `--sa-z-*`                                                   | Elevation ordering                 |
+| Effects       | `--sa-blur`, `--sa-filter-mono`                              | Filter values                      |
+| Motion        | `--sa-motion-*`, `--sa-transition-*`                         | Motion duration and transition     |
+
+### 3.3 Role Tokens
+
+Role tokens live in `roles.css`.
+
+| Family          | Tokens                                                                                                                     | Intent                                 |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| LCH tuples      | `--sa-lch-*`                                                                                                               | Theme color tuples for composition     |
+| Brand color     | `--sa-color-primary`, <br/>`--sa-color-secondary`,<br/> `--sa-color-accent`                                                | Brand and accent roles                 |
+| Background      | `--sa-bg-*`                                                                                                                | Page, surface, overlay, and state fill |
+| Text            | `--sa-text-*`                                                                                                              | Primary, secondary, heading, label     |
+| Border          | `--sa-border-*`                                                                                                            | Semantic border treatments             |
+| Shadow          | `--sa-shadow-*`                                                                                                            | Semantic elevation and glow            |
+| Gradient        | `--sa-gradient-*`                                                                                                          | Brand, button, card, and stripe fills  |
+| State           | `--sa-state-*`                                                                                                             | Success, warning, danger, info states  |
+| Role typography | `--sa-heading-*`,<br/> `--sa-body-*`,<br/> `--sa-label-*`,<br/> `--sa-ui-*`,<br/> `--sa-annotation-*` ,<br/> `--sa-data-*` | Role typography consumed by selectors  |
+| Base elements   | `--sa-focus-ring`, <br/>`--sa-blockquote-border`,<br/> `--sa-radial-*`                                                     | Global focus, quote, and page depth    |
 
 Component-specified tokens also live in `themes.css`, but their catalog is maintained in
 `ux-components-internals.md` because they are implementation contracts for `ui.css`.
 
-#### 2.3.3 Color Space
+### 3.4 Color Space
 
 Theme color tuples use **oklch** and are prefixed with `--sa-lch-`. Values are bare
 `L C H` triplets enabling alpha composition at point of use:
@@ -109,44 +147,50 @@ oklch(var(--sa-lch-brand-end))         /* fully opaque */
 oklch(var(--sa-lch-brand-end) / 0.5)   /* 50% alpha */
 ```
 
-Semantic tokens resolve to full `oklch()` values. Components reference semantic or
+Role tokens resolve to full `oklch()` values. Components reference role or
 component-specified tokens — never LCH tuple tokens, never raw visual values.
 
-### 2.4 Theme Switching
+### 3.5 Theme Switching
 
 Set `data-theme` on `<html>`. All application HTML entry points set the theme
 explicitly.
 
-| Attribute            | Theme |
-| -------------------- | ----- |
-| `data-theme="dark"`  | Dark  |
-| `data-theme="light"` | Light |
+| Theme | Attribute            |
+| ----- | -------------------- |
+| Dark  | `data-theme="dark"`  |
+| Light | `data-theme="light"` |
 
 Theme switching is a single attribute swap — no JS class toggling.
 
-### 2.5 Typography
+Theme value specializations live in `themes.css` under `[data-theme]` namespaces. The
+design-language contract defines required role tokens and namespace structure; concrete theme
+values are implementation data in CSS.
+
+## 4. Typography
 
 **`source/ux/common/components/fonts`** — Fonts are self-hosted woff2 assets.
 
-| Font                       | File                           | Role                                                         |
-| -------------------------- | ------------------------------ | ------------------------------------------------------------ |
-| Comfortaa                  | Comfortaa-Regular.woff2        | Content — used for both headings and body paragraphs.        |
-| Lexend (variable, 100–900) | Lexend-VariableFont_wght.woff2 | App UI — labels, buttons, inputs, selects, nav, captions.    |
-| Mono (Cascadia Mono Light) | CascadiaMono-Light.woff2       | Info / Data — IDs, coordinates, numeric fields (weight 300). |
+### 4.1 Font Families
 
-### 2.5.1 Token Architecture
+| Token(s)                                                                        | Font                       | Role                                                   |
+| ------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------ |
+| `--sa-font-content-heading`,<br/> `--sa-font-content-body`                      | Comfortaa                  | Content — headings and body paragraphs.                |
+| `--sa-font-app-label`,<br/> `--sa-font-app-ui`,<br/> `--sa-font-app-annotation` | Lexend (variable, 100–900) | App — labels, buttons, inputs, selects, nav, captions. |
+| `--sa-font-info-data`                                                           | Mono (Cascadia Mono Light) | Info — IDs, coordinates, numeric fields (weight 300).  |
+
+### 4.2 Token Architecture
 
 Typography tokens are organized into three categories: **Content**, **App**, and **Info**.
 
-| Category    | Immutable Token(s)    | Role Token Prefix                             | Intent                         |
-| :---------- | :-------------------- | :-------------------------------------------- | :----------------------------- |
-| **Content** | `--sa-font-content-*` | `--sa-heading-`, `--sa-body-`                 | Long-form reading and headings |
-| **App**     | `--sa-font-app-*`     | `--sa-label-`, `--sa-ui-`, `--sa-annotation-` | Interface chrome and controls  |
-| **Info**    | `--sa-font-info-*`    | `--sa-data-`                                  | Technical data and code        |
+| Category | Role Token Prefix                                       | Default Value                                                                 | Intent                         |
+| :------- | :------------------------------------------------------ | :---------------------------------------------------------------------------- | :----------------------------- |
+| Content  | `--sa-heading-`, <br/>`--sa-body-`                      | `--sa-font-content-*`                                                         | Long-form reading and headings |
+| App      | `--sa-label-`,<br/> `--sa-ui-`,<br/> `--sa-annotation-` | `--sa-font-app-label`,<br/>`--sa-font-app-ui`,<br/>`--sa-font-app-annotation` | Interface chrome and controls  |
+| Info     | `--sa-data-`                                            | `--sa-font-info-*`                                                            | Technical data and code        |
 
-### 2.5.2 Type Scale
+### 4.3 Type Scale
 
-Font sizes are responsive role tokens. `themes.css` uses `clamp()` for headings and
+Font sizes are responsive role tokens. `roles.css` uses `clamp()` for headings and
 responsive overrides for body text. `tokens.css` owns only the immutable size scale and
 `--sa-base-size`.
 
@@ -155,25 +199,25 @@ responsive overrides for body text. `tokens.css` owns only the immutable size sc
   - **< 425px:** `--sa-body-font-size` and `--sa-heading-font-size-h4` drop to `sm` (0.875rem).
   - **< 380px:** The root `--sa-base-size` drops to `sm`, scaling the entire UI down.
 
-| Role        | Token(s)                         | Treatment                                   |
-| :---------- | :------------------------------- | :------------------------------------------ |
-| **Heading** | `--sa-heading-font-size-h1`–`h5` | Fluid (clamp) scale                         |
-| **Body**    | `--sa-body-font-size`            | Responsive base (16px desktop, 14px mobile) |
-| **UI**      | `--sa-ui-font-size`, `-compact`  | Fixed scale for interface density           |
+| Role    | Token(s)                         | Treatment                                   |
+| :------ | :------------------------------- | :------------------------------------------ |
+| Heading | `--sa-heading-font-size-h1`–`h5` | Fluid (clamp) scale                         |
+| Body    | `--sa-body-font-size`            | Responsive base (16px desktop, 14px mobile) |
+| UI      | `--sa-ui-font-size`, `-compact`  | Fixed scale for interface density           |
 
-### 2.5.3 Typography Role Map
+### 4.4 Typography Role Map
 
-| Role           | Element(s) / Component                       | Family token                  | Size token                  | Weight token                  |
-| :------------- | :------------------------------------------- | :---------------------------- | :-------------------------- | :---------------------------- |
-| **Heading**    | `h1`–`h6`, `UiFieldset` Legend               | `--sa-heading-font-family`    | `--sa-heading-font-size-*`  | `--sa-heading-font-weight`    |
-| **Body**       | `p`, `blockquote`, `UiList`                  | `--sa-body-font-family`       | `--sa-body-font-size`       | `--sa-body-font-weight`       |
-| **Label**      | `label`, `UiButton`, `UiCheckbox`, `UiTable` | `--sa-label-font-family`      | `--sa-label-font-size`      | `--sa-label-font-weight`      |
-| **Annotation** | `figcaption`, `legend`, `UiSelect` items     | `--sa-annotation-font-family` | `--sa-annotation-font-size` | `--sa-annotation-font-weight` |
-| **UI Control** | `input`, `textarea`, `UiSingleSelect`        | `--sa-ui-font-family`         | `--sa-ui-font-size`         | `--sa-body-font-weight`       |
-| **Compact UI** | `UiTab`, `UiBadge`, `UiAlert`, `UiAccordion` | `--sa-ui-font-family`         | `--sa-ui-font-size-compact` | `--sa-ui-font-weight`         |
-| **Data**       | `code`, `pre`, `kbd`, `samp`                 | `--sa-data-font-family`       | inherited                   | `--sa-data-font-weight`       |
+| Role       | Element(s) / Component                                                                       | Family token                  | Size token                  | Weight token                  |
+| :--------- | :------------------------------------------------------------------------------------------- | :---------------------------- | :-------------------------- | :---------------------------- |
+| Heading    | `h1`–`h6`,<br/> `UiFieldset`,<br/>`Legend`                                                   | `--sa-heading-font-family`    | `--sa-heading-font-size-*`  | `--sa-heading-font-weight`    |
+| Body       | `p`,<br/> `blockquote`,<br/> `UiList`                                                        | `--sa-body-font-family`       | `--sa-body-font-size`       | `--sa-body-font-weight`       |
+| Label      | `label`,<br/> `UiButton`,<br/> `UiCheckbox`,<br/> `UiTable`                                  | `--sa-label-font-family`      | `--sa-label-font-size`      | `--sa-label-font-weight`      |
+| Annotation | `figcaption`, <br/>`legend`,<br/>`UiTableHeader`,<br/> `UiSingleSelect`,<br/>`UiMiltiSelect` | `--sa-annotation-font-family` | `--sa-annotation-font-size` | `--sa-annotation-font-weight` |
+| UI Control | `input`, <br/>`textarea`,<br/> `UiSingleSelect`                                              | `--sa-ui-font-family`         | `--sa-ui-font-size`         | `--sa-body-font-weight`       |
+| Compact UI | `UiTab`, <br/>`UiBadge`,<br/> `UiAlert`,<br/> `UiAccordion`                                  | `--sa-ui-font-family`         | `--sa-ui-font-size-compact` | `--sa-ui-font-weight`         |
+| Data       | `code`,<br/> `pre`,<br/> `kbd`,<br/> `samp`                                                  | `--sa-data-font-family`       | inherited                   | `--sa-data-font-weight`       |
 
-### 2.5.4 Visual Semantics
+### 4.5 Visual Semantics
 
 - **Heading Colors:** H1 uses primary text; H2–H5 are tied to brand gradient colors (`--sa-text-h2`–`h5`) for content flow.
 - **Labels:** Carry `color: var(--sa-text-label)` (resolves to muted) to remain subordinate to data.
@@ -182,149 +226,92 @@ responsive overrides for body text. `tokens.css` owns only the immutable size sc
 - **Interactive Weights:** Most text uses weight `300` (thin); however, interactive elements use `500` (medium), primary buttons use `600` (semibold), and checkmarks use `800` (extrabold).
 - **Blockquotes:** Styled in `base.css` with a left border (`--sa-blockquote-border`), italic style, and `--sa-text-secondary` color.
 
-### 2.6 Layout & Viewport
+## 5. Geometry, Layout, And Motion
 
-### 2.6.1 Grid & Spacing System
+### 5.1 Spacing Scale
 
 All layouts must align to a 4px base unit. This ensures visual rhythm across data-dense tables in Admin and large-format touch targets in Ops.
 
-| Token           | Value | Usage                             |
-| --------------- | ----: | --------------------------------- |
-| `--sa-space-xs` |   4px | Internal component padding        |
-| `--sa-space-sm` |   8px | Button/input grouping             |
-| `--sa-space-md` |  16px | Standard gutter / section padding |
-| `--sa-space-lg` |  24px | Page margins (mobile)             |
-| `--sa-space-xl` |  32px | Page margins (desktop)            |
+| Token            |    Value | Intent                        |
+| ---------------- | -------: | ----------------------------- |
+| `--sa-space-xs`  |  0.25rem | 4px base unit                 |
+| `--sa-space-xx`  | 0.375rem | In-between compact adjustment |
+| `--sa-space-sm`  |   0.5rem | Compact grouping              |
+| `--sa-space-md`  |     1rem | Standard grouping             |
+| `--sa-space-lg`  |   1.5rem | Page and surface padding      |
+| `--sa-space-xl`  |     2rem | Large layout rhythm           |
+| `--sa-space-2xl` |   2.5rem | Large surface rhythm          |
+| `--sa-space-3xl` |     3rem | Desktop layout rhythm         |
+| `--sa-space-4xl` |     5rem | Wide desktop layout rhythm    |
 
-### 2.6.2 Viewport Classes
+### 5.2 Layout Rhythm
 
-| Class                     | Primary app | Behavior                                              |
-| ------------------------- | ----------- | ----------------------------------------------------- |
-| Compact (Mobile/Handheld) | App-Ops     | Single-column focus. Minimum touch target 44×44px.    |
-| Medium (Tablet)           | Both        | Hybrid density. Sidebar navigation, split-pane views. |
-| Wide (Desktop)            | App-Admin   | Maximum data density. Multi-column, persistent nav.   |
+Layout rhythm tokens are responsive aliases over the spacing scale.
 
-### 2.6.3 Z-Index Scale
+| Token         | Default desktop                 | ≤1440px                         | ≤1024px                         | ≤768px                          | ≤425px                          | ≤380px                          |
+| ------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- |
+| `--sa-gutter` | `--sa-space-4xl`                | `--sa-space-3xl`                | `--sa-space-3xl`                | `--sa-space-xl + --sa-space-xx` | `--sa-space-lg`                 | `--sa-space-lg - --sa-space-xs` |
+| `--sa-pad`    | `--sa-space-lg`                 | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md`                 | `--sa-space-sm + --sa-space-xx` | `--sa-space-sm + --sa-space-xs` |
+| `--sa-gap`    | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md`                 | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` |
 
-| Token            | Value | Usage                     |
+### 5.3 Radius Scale
+
+| Token              |    Value | Intent                   |
+| ------------------ | -------: | ------------------------ |
+| `--sa-radius-sm`   | 0.375rem | Compact control corners  |
+| `--sa-radius-md`   | 0.555rem | Standard control corners |
+| `--sa-radius-lg`   |  0.75rem | Large surface corners    |
+| `--sa-radius-xl`   | 1.555rem | Pill-like large corners  |
+| `--sa-radius-full` |   9999px | Fully rounded shape      |
+
+### 5.4 Viewport Tokens
+
+| Token            |  Value | Intent                    |
+| ---------------- | -----: | ------------------------- |
+| `--sa-size-wrap` |  270px | Minimum wrap reference    |
+| `--sa-size-min`  |  320px | Minimum application width |
+| `--sa-size-xs`   |  425px | Small/mobile breakpoint   |
+| `--sa-size-sm`   |  768px | Tablet breakpoint         |
+| `--sa-size-md`   | 1024px | Desktop breakpoint        |
+| `--sa-size-lg`   | 1152px | Wide layout breakpoint    |
+
+### 5.5 Touch Targets
+
+| Token                  | Value | Intent                        |
+| ---------------------- | ----: | ----------------------------- |
+| `--sa-touch-target`    |  64px | Field-safe large touch target |
+| `--sa-touch-target-sm` |  44px | Compact minimum touch target  |
+
+### 5.6 Z-Index Scale
+
+| Token            | Value | Intent                    |
 | ---------------- | ----: | ------------------------- |
-| `--sa-z-below`   |    -1 | Decorations               |
-| `--sa-z-base`    |     0 | Content                   |
+| `--sa-z-below`   |    -1 | Background decorations    |
+| `--sa-z-base`    |     0 | Normal content            |
+| `--sa-z-raised`  |     1 | Locally raised content    |
 | `--sa-z-docked`  |    10 | Sticky headers/footers    |
 | `--sa-z-popover` |    20 | Menus, lists, popovers    |
 | `--sa-z-overlay` |   100 | Modals, overlays, flyouts |
 | `--sa-z-toast`   |  1000 | System notifications      |
 
-### 2.7 Dashboard
+### 5.7 Effects
 
-The dashboard is the primary view for all applications. Layout, spacing, and widget sizing are governed by shared responsive rhythm tokens.
+| Token              | Value                     | Intent                         |
+| ------------------ | ------------------------- | ------------------------------ |
+| `--sa-blur`        | `blur(25px)`              | Shared backdrop blur treatment |
+| `--sa-filter-mono` | `brightness(0) invert(1)` | Monochrome asset filter        |
 
-### 2.7.1 Widget Sizing
+### 5.8 Motion And Transitions
 
-| Size        | Mobile behavior                                 | Desktop behavior       |
-| ----------- | ----------------------------------------------- | ---------------------- |
-| `landscape` | Full row width                                  | Full row width         |
-| `square`    | Full row width, 2rem inline gap between squares | Fixed square dimension |
-
-On mobile, landscape widgets fill the viewport width. Square widgets also fill the viewport width — horizontal swipe reveals adjacent squares.
-
-### 2.7.2 Widget Taxonomy
-
-| Tier               | Height         | Purpose                               |
-| ------------------ | -------------- | ------------------------------------- |
-| `Widget` square    | Equal w/h      | Self-contained domain or utility unit |
-| `Widget` landscape | Full row width | Data-dense domain view                |
-
-A widget is a self-contained dashboard unit that owns its own state and rendering. It is not required to be domain-aware — a clock widget or upload progress widget are valid widgets.
-
-### 2.7.3 Dashboard Spacing Tokens
-
-| Token         | Meaning                                             |
-| ------------- | --------------------------------------------------- |
-| `--sa-gutter` | Page and dashboard outer rhythm                     |
-| `--sa-pad`    | Reusable content-surface interior rhythm            |
-| `--sa-gap`    | Reusable gap between widgets, controls, and regions |
-
-Implemented values in `tokens.css`:
-
-| Token         | Default desktop | ≤1440px        | ≤1024px        | ≤768px         | ≤425px        | ≤380px        |
-| ------------- | --------------- | -------------- | -------------- | --------------- | -------------- | -------------- |
-| `--sa-gutter` | `--sa-space-4xl` | `--sa-space-3xl` | `--sa-space-3xl` | `--sa-space-xl + --sa-space-xx` | `--sa-space-lg` | `--sa-space-lg - --sa-space-xs` |
-| `--sa-pad`    | `--sa-space-lg`  | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md` | `--sa-space-sm + --sa-space-xx` | `--sa-space-sm + --sa-space-xs` |
-| `--sa-gap`    | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md` | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` |
-
-## 3. Dark Theme
-
-The default theme. Precision-oriented and data-dense — built for operations staff working under low-light conditions and field crews who need high-contrast readability.
-
-### 3.1 Motif
-
-| Property       | Specification                                                        |
-| -------------- | -------------------------------------------------------------------- |
-| **Background** | Near-black `rgb(21 24 30 / 0.95)` with restrained radial brand depth |
-| **Surfaces**   | Dark blue-gray glassmorphism — semi-transparent layered surfaces     |
-| **Gradient**   | Multi-stop blue → cyan-teal sweep                                    |
-| **Accent**     | Teal (H=184) — all interactive states key off this hue               |
-| **Text**       | Near-white primary; all heading levels render white                  |
-
-The global page background is part of the foundation, not an app-level decoration. App shells and style-guide harnesses must leave the background visible unless a concrete content surface requires an opaque treatment. The radial layer is static and biased dark on the left so card chrome and brand accents remain legible.
-
-### 3.2 Page & Surfaces
-
-| Role              | Token                  | Value / Source                  |
-| ----------------- | ---------------------- | ------------------------------- |
-| Page background   | `--sa-bg-page`         | `rgb(21 24 30 / 0.95)`          |
-| Surface 1         | `--sa-bg-surface-1`    | `oklch(21% 0.018 252 / 0.88)`   |
-| Surface 2         | `--sa-bg-surface-2`    | `oklch(28% 0.018 252 / 0.78)`   |
-| Surface 3         | `--sa-bg-surface-3`    | `oklch(25% 0.02 248 / 0.7)`     |
-| Primary text      | `--sa-text-primary`    | `oklch(var(--sa-lch-neutral-1))` |
-| Gradient stripe   | `--sa-gradient-stripe` | `--sa-gradient-brand-90`         |
-
-### 3.3 Dark Theme Gradient
-
-Implemented in `themes.css` and used for brand gradients, semantic colors, and
-theme-specific component tokens.
-
-| Stop                | LCH token                       | oklch tuple           |
-| ------------------- | ------------------------------- | --------------------- |
-| Blue start          | `--sa-lch-gradient-1-start`     | `54.3% 0.11 236.182`  |
-| Blue-cyan mid-start | `--sa-lch-gradient-2-mid-start` | `61.4% 0.107 210.2`   |
-| Teal mid            | `--sa-lch-gradient-3-mid`       | `68.5% 0.103 184.216` |
-| Cyan mid-end        | `--sa-lch-gradient-4-mid-end`   | `74.25% 0.117 184.6`  |
-| Cyan-teal end       | `--sa-lch-gradient-5-end`       | `80% 0.13 185`        |
-
-## 4. Light Theme
-
-Clean and professional. Intended for office and web contexts where ambient light is high and a dark background would feel heavy.
-
-### 4.1 Motif
-
-| Property       | Specification                                                     |
-| -------------- | ----------------------------------------------------------------- |
-| **Background** | Warm paper `oklch(96.8% 0.018 101)`                               |
-| **Surfaces**   | Warm near-white with restrained paper tint and crisp borders      |
-| **Primary**    | Deep ink-blue `oklch(43% 0.115 222)` with teal/green support      |
-| **Text**       | Near-black primary; heading hierarchy introduces color (see §4.2) |
-| **Shell**      | Solid deep ink-blue chrome for header and footer                  |
-
-### 4.2 Page & Surfaces
-
-| Role              | Token                  | Value                    |
-| ----------------- | ---------------------- | ------------------------ |
-| Page background   | `--sa-bg-page`         | `oklch(96.8% 0.018 101)` |
-| Surface 1         | `--sa-bg-surface-1`    | `oklch(99.4% 0.006 98)`  |
-| Surface 2         | `--sa-bg-surface-2`    | `oklch(96.2% 0.014 104)` |
-| Surface 3         | `--sa-bg-surface-3`    | `oklch(91.8% 0.018 112)` |
-| Primary text      | `--sa-text-primary`    | `oklch(40% 0.026 238)`   |
-
-### 4.2.1 Heading Hierarchy
-
-| Level | Token          | Color                  | Character  |
-| ----- | -------------- | ---------------------- | ---------- |
-| h1    | `--sa-text-h1` | `oklch(17% 0.03 238)`  | Ink        |
-| h2    | `--sa-text-h2` | `oklch(42% 0.12 221)`  | Blue       |
-| h3    | `--sa-text-h3` | `oklch(50% 0.13 186)`  | Teal       |
-| h4    | `--sa-text-h4` | `oklch(44% 0.105 154)` | Green-teal |
-| h5    | `--sa-text-h5` | `oklch(40% 0.055 105)` | Olive      |
+| Token                    | Value                                        | Intent                      |
+| ------------------------ | -------------------------------------------- | --------------------------- |
+| `--sa-motion-page-fade`  | 200ms                                        | Page fade duration          |
+| `--sa-motion-spinner`    | 0.8s                                         | Spinner cycle duration      |
+| `--sa-motion-skeleton`   | 1.4s                                         | Skeleton shimmer duration   |
+| `--sa-transition-fast`   | `all 0.15s ease`                             | Fast interaction transition |
+| `--sa-transition-base`   | `all 0.3s ease`                              | Standard transition         |
+| `--sa-transition-slow`   | `all 0.6s ease-out`                          | Slow entrance/exit motion   |
+| `--sa-transition-spring` | `all 0.4s cubic-bezier(0.4, 0, 0.2, 1)`      | Spring-like transition      |
+| `--sa-transition-page`   | `opacity var(--sa-motion-page-fade) ease-in` | Page opacity transition     |
 
 _End of UX Design Language Document_
