@@ -1,7 +1,8 @@
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const CSS_DIR = `${ROOT}/source/ux/common/components/css`
 
-const CSS_FILES = ['tokens.css', 'themes.css', 'base.css', 'ui.css']
+const CSS_FILES = ['tokens.css', 'roles.css', 'themes.css', 'base.css', 'ui.css']
+const TOKEN_ONLY_FILES = new Set(['tokens.css', 'roles.css', 'themes.css'])
 
 const SELECTOR_REGEX = /^([^/{\n]*)\{/
 const TOKEN_DECLARATION_REGEX = /^\s*(--sa-[^:]+)\s*:/
@@ -101,9 +102,13 @@ const auditTokenDeclarations = (
       )
     }
 
-    if (name.startsWith('--sa-lch-') && fileName !== 'themes.css') {
+    if (
+      name.startsWith('--sa-lch-')
+      && fileName !== 'roles.css'
+      && fileName !== 'themes.css'
+    ) {
       violations.push(
-        `${filePath}:${lineNumber} — lch token declared outside themes.css — ${name}`
+        `${filePath}:${lineNumber} — lch token declared outside roles.css/themes.css — ${name}`
       )
     }
 
@@ -116,6 +121,36 @@ const auditTokenDeclarations = (
     if (fileName !== 'tokens.css' && isImmutableToken(name)) {
       violations.push(
         `${filePath}:${lineNumber} — immutable token redeclared outside tokens.css — ${name}`
+      )
+    }
+  }
+
+  return violations
+}
+
+const auditTokenOnlyDeclarations = (
+  lines: CSSLine[],
+  filePath: string
+): string[] => {
+  const violations: string[] = []
+
+  for (const { line, lineNumber, isComment } of lines) {
+    if (isComment) continue
+
+    const trimmed = line.trim()
+    if (
+      trimmed === ''
+      || trimmed === '}'
+      || trimmed.startsWith('@')
+      || trimmed.endsWith('{')
+      || !trimmed.includes(':')
+    ) {
+      continue
+    }
+
+    if (!trimmed.startsWith('--sa-')) {
+      violations.push(
+        `${filePath}:${lineNumber} — non-token declaration in token-only file — ${trimmed}`
       )
     }
   }
@@ -259,17 +294,17 @@ const auditValueRules = (
     )
     if (isExempt) continue
 
-    // Skip B1, B2 rules and remaining rules if in tokens.css
+    // Skip value rules for token-only files.
     if (skipTokensFile) continue
 
-    // B1: LCH tuple token ref (skip in tokens.css)
+    // B1: LCH tuple token ref (skip in token-only files)
     if (valuePart.includes('var(--sa-lch-')) {
       violations.push(
-        `${filePath}:${lineNumber} — lch token ref outside themes.css — ${valuePart}`
+        `${filePath}:${lineNumber} — lch token ref outside token layer — ${valuePart}`
       )
     }
 
-    // B2: raw oklch() (skip in tokens.css)
+    // B2: raw oklch() (skip in token-only files)
     if (valuePart.includes('oklch(')) {
       violations.push(
         `${filePath}:${lineNumber} — raw oklch() value — ${valuePart}`
@@ -407,12 +442,18 @@ const main = async () => {
     const content = await Deno.readTextFile(filePath)
     const lines = parseLines(content)
 
-    if (fileName === 'tokens.css') {
+    if (TOKEN_ONLY_FILES.has(fileName)) {
       violations.push(...auditTokenDeclarations(lines, relative, fileName))
+      violations.push(...auditTokenOnlyDeclarations(lines, relative))
+    }
+
+    if (fileName === 'tokens.css') {
+      violations.push(...auditTokensCSS(lines, relative, true, false))
+      violations.push(...auditValueRules(lines, relative, true))
+    } else if (fileName === 'roles.css') {
       violations.push(...auditTokensCSS(lines, relative, true, false))
       violations.push(...auditValueRules(lines, relative, true))
     } else if (fileName === 'themes.css') {
-      violations.push(...auditTokenDeclarations(lines, relative, fileName))
       violations.push(...auditTokensCSS(lines, relative, false, true))
       violations.push(...auditValueRules(lines, relative, true))
     } else if (fileName === 'base.css') {
