@@ -157,7 +157,7 @@
 }
 
 [data-ui='single-select'] [data-placeholder-shown] {
-  color: var(--sa-text-secondary);
+  color: var(--sa-text-placeholder);
 }
 
 [data-ui='input']:focus-visible,
