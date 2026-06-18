@@ -1090,15 +1090,22 @@
 }
 
 [data-ui='layout'][data-ui-variant='inline'] {
+  align-items: center;
   display: inline-flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   width: fit-content;
 }
 
 [data-ui='layout'][data-ui-variant='inline-fill'] {
+  align-items: center;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   width: 100%;
+}
+
+[data-ui='layout'][data-ui-variant='inline'] > [data-ui='layout'],
+[data-ui='layout'][data-ui-variant='inline-fill'] > [data-ui='layout'] {
+  min-width: 0;
 }
 
 [data-ui='layout'][data-ui-variant='inline-fill'] > * {
