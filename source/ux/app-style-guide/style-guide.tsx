@@ -22,6 +22,7 @@ import '@ux/common/components/css/css.tsx'
 import './style-guide.css'
 
 import logo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
+import icon from './favicon.ico'
 
 import {
   ACCORDION_DEFAULT_VALUE,
@@ -51,14 +52,19 @@ const SgHeader = (): UiComponent => {
   return (
     <header class='sg-header'>
       <div class='sg-header-contents'>
-        <UiLayout gap='none'>
-          <h1>
-            swarmAg <span class='nowrap'>Style Guide</span>
-          </h1>
-          <p class='sg-header-subtitle'>
-            Living visual validation for tokens, states, themes, and controls.
-          </p>
-        </UiLayout>
+        <div class='sg-header-brand'>
+          <UiLayout variant='inline'>
+            <img class='sg-header-icon' src={icon} alt='' width={64} height={64} />
+            <UiLayout gap='none'>
+              <h1>
+                swarmAg <span class='nowrap'>Style Guide</span>
+              </h1>
+              <p class='sg-header-subtitle'>
+                Living visual validation for tokens, states, themes, and controls.
+              </p>
+            </UiLayout>
+          </UiLayout>
+        </div>
         <UiToggleGroup<Theme> value={theme()} onChange={setTheme}>
           <UiToggleItem value='dark'>Dark</UiToggleItem>
           <UiToggleItem value='light'>Light</UiToggleItem>
