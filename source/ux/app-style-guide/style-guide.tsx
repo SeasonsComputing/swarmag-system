@@ -55,7 +55,7 @@ const SgHeader = (): UiComponent => {
         <div class='sg-header-brand'>
           <UiLayout variant='inline'>
             <img class='sg-header-icon' src={icon} alt='' width={64} height={64} />
-            <UiLayout gap='none'>
+            <UiLayout gap='tight'>
               <h1>
                 swarmAg <span class='nowrap'>Style Guide</span>
               </h1>
