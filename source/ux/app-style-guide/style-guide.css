@@ -35,7 +35,7 @@
 .sg-header [data-ui='toggle-group'] {
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
-  border-radius: var(--sa-radius-lg);
+  border-radius: var(--sa-toggle-border-radius);
 }
 
 .sg-header h1 {

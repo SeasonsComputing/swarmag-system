@@ -29,6 +29,9 @@
   --sa-input-bg-hover: var(--sa-bg-hover);
 
   /* Toggle */
+  --sa-toggle-bg: var(--sa-bg-control);
+  --sa-toggle-border: var(--sa-border-default);
+  --sa-toggle-border-radius: var(--sa-radius-md);
   --sa-toggle-pressed-bg-selected: var(--sa-bg-selected);
   --sa-toggle-pressed-border-primary: var(--sa-color-primary);
   --sa-toggle-pressed-color-primary: var(--sa-color-primary);
