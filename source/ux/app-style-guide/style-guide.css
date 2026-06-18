@@ -45,6 +45,7 @@
 
 .sg-header h1 {
   color: var(--sa-shell-text);
+  line-height: 1;
 }
 
 .sg-header-subtitle {
