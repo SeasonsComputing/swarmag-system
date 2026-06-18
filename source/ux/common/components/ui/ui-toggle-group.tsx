@@ -68,18 +68,13 @@ export const UiToggleGroup = <Value extends string = string>(
   )
 
   createEffect(() => {
-    if (local.value !== undefined) {
-      setSelectedValue(() => local.value)
-    }
+    if (local.value !== undefined) setSelectedValue(() => local.value)
   })
 
   const handleChange = (value: string | null): void => {
     if (value === null) return
-
     const nextValue = value as Value
-    if (local.value === undefined) {
-      setSelectedValue(() => nextValue)
-    }
+    if (local.value === undefined) setSelectedValue(() => nextValue)
     local.onChange?.(nextValue)
   }
 
@@ -100,20 +95,17 @@ export const UiToggleGroup = <Value extends string = string>(
 export const UiToggleItem = <Value extends string = string>(
   props: UiToggleItemProps<Value>
 ): UiComponent => {
-  let toggleItemElement!: HTMLButtonElement
   const [local] = splitProps(props, [
     'children',
     'value',
     'disabled'
   ])
-
   return (
     <ToggleGroupItem
-      ref={toggleItemElement}
       data-ui='toggle-item'
       value={local.value}
       disabled={local.disabled}
-      onClick={() => toggleItemElement.focus()}
+      onClick={e => e.currentTarget.focus()}
     >
       {local.children}
     </ToggleGroupItem>

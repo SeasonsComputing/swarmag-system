@@ -115,7 +115,12 @@ export const UiAccordionTrigger = (props: UiAccordionTriggerProps): UiComponent 
   const [local] = splitProps(props, ['children'])
   return (
     <Accordion.Header>
-      <AccordionTrigger data-ui='accordion-trigger'>{local.children}</AccordionTrigger>
+      <AccordionTrigger
+        data-ui='accordion-trigger'
+        onClick={e => e.currentTarget.focus()}
+      >
+        {local.children}
+      </AccordionTrigger>
     </Accordion.Header>
   )
 }
