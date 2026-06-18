@@ -2,6 +2,8 @@
  * Guard against files living in non-leaf directories.
  */
 
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 /** Absolute path to the repo root. */
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
@@ -52,13 +54,9 @@ const collectViolations = async (dir: string): Promise<string[]> => {
 const main = async () => {
   const violations = (await Promise.all(TARGET_DIRS.map(collectViolations))).flat()
 
-  if (violations.length > 0) {
-    console.error('Leaf guard failed:')
-    for (const violation of violations) {
-      console.error(`- ${violation}`)
-    }
-    Deno.exit(1)
-  }
+  if (violations.length > 0) guardFail('Leaf', violations)
+
+  guardPass('Leaf')
 }
 
 await main()

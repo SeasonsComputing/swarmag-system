@@ -2,6 +2,8 @@
  * Guard against re-implementing domain invariants outside the domain layer.
  */
 
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 const TARGET_DIRS = [
@@ -59,13 +61,9 @@ const main = async () => {
     }
   }
 
-  if (violations.length > 0) {
-    console.error('Validation guard failed:')
-    for (const violation of violations) {
-      console.error(`- ${violation}`)
-    }
-    Deno.exit(1)
-  }
+  if (violations.length > 0) guardFail('Validation', violations)
+
+  guardPass('Validation')
 }
 
 await main()

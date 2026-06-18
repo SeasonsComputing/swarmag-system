@@ -3,6 +3,8 @@
  * Enforces dependency rules: tests/devops -> ux -> back -> domain -> core
  */
 
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 /** Namespace to directory mapping */
@@ -231,17 +233,10 @@ const main = async () => {
   }
 
   if (violations.length > 0) {
-    console.error('Architecture guard failed:')
-    console.error('')
-    for (const violation of violations) {
-      console.error(`  ${violation}`)
-    }
-    console.error('')
-    console.error('See documentation/architecture-core.md for dependency rules')
-    Deno.exit(1)
+    guardFail('Architecture', violations, 'See documentation/architecture-core.md for dependency rules')
   }
 
-  console.log('✓ Architecture guard passed')
+  guardPass('Architecture')
 }
 
 await main()

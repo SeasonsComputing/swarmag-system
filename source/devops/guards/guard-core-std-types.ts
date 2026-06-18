@@ -2,6 +2,8 @@
  * Guard against bypassing @core/std container primitives.
  */
 
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const TARGET_DIRS = [`${ROOT}/source`]
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
@@ -72,15 +74,9 @@ const main = async () => {
     }
   }
 
-  if (violations.length > 0) {
-    console.error('Core std types guard failed:')
-    for (const violation of violations) {
-      console.error(`- ${violation}`)
-    }
-    Deno.exit(1)
-  }
+  if (violations.length > 0) guardFail('Core std types', violations)
 
-  console.log('✓ Core std types guard passed')
+  guardPass('Core std types')
 }
 
 await main()

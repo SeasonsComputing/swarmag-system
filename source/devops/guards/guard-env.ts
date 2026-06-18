@@ -2,6 +2,8 @@
  * Guard against direct Deno.env usage outside config providers.
  */
 
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 /** Absolute path to the repo root. */
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
@@ -73,13 +75,9 @@ const main = async () => {
     }
   }
 
-  if (violations.length > 0) {
-    console.error('Env guard failed:')
-    for (const violation of violations) {
-      console.error(`- ${violation}`)
-    }
-    Deno.exit(1)
-  }
+  if (violations.length > 0) guardFail('Env', violations)
+
+  guardPass('Env')
 }
 
 await main()

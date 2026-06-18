@@ -1,5 +1,6 @@
 import type { StringDictionary } from '@core/std'
 import { walk } from '@std/walk'
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const UX_DIR = `${ROOT}/source/ux`
@@ -76,16 +77,9 @@ const main = async () => {
     }
   }
 
-  if (violations.length > 0) {
-    console.error('STYLE_AUDIT: FAIL')
-    for (const violation of violations) {
-      console.error(violation)
-    }
-    console.log(`\nViolations: ${violations.length}`)
-    Deno.exit(1)
-  }
+  if (violations.length > 0) guardFail('Bare HTML', violations)
 
-  console.log('STYLE_AUDIT: PASS')
+  guardPass('Bare HTML')
 }
 
 await main()

@@ -3,6 +3,8 @@
  * Enforces Chart.js imports only within UX chart primitives.
  */
 
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const TARGET_DIR = `${ROOT}/source/ux`
 const ALLOWED_DIR = '/source/ux/common/components/charts/'
@@ -70,15 +72,10 @@ const main = async () => {
   }
 
   if (violations.length > 0) {
-    console.error('Chart guard failed:')
-    console.error('')
-    for (const violation of violations) console.error(`  ${violation}`)
-    console.error('')
-    console.error('Rule: Chart.js is an implementation detail of UiChart in chart primitives.')
-    Deno.exit(1)
+    guardFail('Chart', violations, 'Rule: Chart.js is an implementation detail of UiChart in chart primitives.')
   }
 
-  console.log('✓ Chart guard passed')
+  guardPass('Chart')
 }
 
 await main()
