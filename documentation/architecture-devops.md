@@ -496,7 +496,16 @@ The correct placement of `guard:secrets` is:
 - **In**: `app-{name}-package.sh` (already enforced implicitly via script logic)
 - **Not in**: `check:guards`
 
-### 11.3 Non-Deployable Package Exemptions
+### 11.3 Guard Output Contract
+
+All guards report results using the shared `guard-utils.ts` utility. The contract is:
+
+- **Pass:** `✓ {Name} guard passed` — written to stdout
+- **Fail:** `✗ {Name} guard failed:` followed by an indented violation list — written to stderr, then `Deno.exit(1)`
+
+Guards that enforce a specific rule may append a hint line after the violation list. Guards must use `guardPass` and `guardFail` from `@devops/guards/guard-utils.ts` — inline `console.log`/`console.error` at the result boundary is a violation of this contract.
+
+### 11.4 Non-Deployable Package Exemptions
 
 `app-style-guide` is a development tool with no deployment target. It is exempt from:
 

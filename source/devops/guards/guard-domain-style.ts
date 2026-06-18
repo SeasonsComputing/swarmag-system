@@ -8,6 +8,8 @@
  * - Disallows inline multi-literal unions in abstraction files when const-enum is required
  */
 
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const DOMAIN_DIR = `${ROOT}/source/domain`
 const DOMAIN_ABSTRACTIONS_DIR = `${DOMAIN_DIR}/abstractions`
@@ -255,15 +257,9 @@ const main = async () => {
     }
   }
 
-  if (violations.length > 0) {
-    console.error('Domain style guard failed:')
-    for (const violation of violations) {
-      console.error(`- ${violation}`)
-    }
-    Deno.exit(1)
-  }
+  if (violations.length > 0) guardFail('Domain style', violations)
 
-  console.log('✓ Domain style guard passed')
+  guardPass('Domain style')
 }
 
 await main()

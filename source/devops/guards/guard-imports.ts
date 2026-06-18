@@ -3,6 +3,7 @@
  */
 
 import { walk } from '@std/walk'
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const SOURCE_DIR = `${ROOT}/source`
@@ -32,15 +33,9 @@ const main = async () => {
     }
   }
 
-  if (violations.length > 0) {
-    console.error('Namespace import guard failed:')
-    for (const violation of violations) {
-      console.error(violation)
-    }
-    Deno.exit(1)
-  }
+  if (violations.length > 0) guardFail('Namespace import', violations)
 
-  console.log('PASS')
+  guardPass('Namespace import')
 }
 
 await main()

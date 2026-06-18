@@ -1,3 +1,5 @@
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const CSS_DIR = `${ROOT}/source/ux/common/components/css`
 
@@ -467,16 +469,9 @@ const main = async () => {
     }
   }
 
-  if (violations.length > 0) {
-    console.error('STYLE_AUDIT: FAIL')
-    for (const violation of violations) {
-      console.error(violation)
-    }
-    console.log(`\nViolations: ${violations.length}`)
-    Deno.exit(1)
-  }
+  if (violations.length > 0) guardFail('CSS', violations)
 
-  console.log('STYLE_AUDIT: PASS')
+  guardPass('CSS')
 }
 
 await main()

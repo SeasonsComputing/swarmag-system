@@ -4,6 +4,8 @@
  * reference the isDataReady flag to handle the hydration gap.
  */
 
+import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const TARGET_DIRS = [
   `${ROOT}/source/ux/app-admin`,
@@ -61,13 +63,14 @@ const main = async () => {
   }
 
   if (violations.length > 0) {
-    console.error('UX State guard failed:')
-    console.error('')
-    for (const v of violations) console.error(`  ${v}`)
-    console.error('')
-    console.error('Rule: You must guard User access with isDataReady to prevent hydration-gap crashes.')
-    Deno.exit(1)
+    guardFail(
+      'UX state',
+      violations,
+      'Rule: You must guard User access with isDataReady to prevent hydration-gap crashes.'
+    )
   }
+
+  guardPass('UX state')
 }
 
 await main()
