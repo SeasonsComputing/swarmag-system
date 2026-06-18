@@ -649,9 +649,9 @@
 [data-ui='toggle'],
 [data-ui='toggle-item'] {
   align-items: center;
-  background: var(--sa-bg-control);
-  border: var(--sa-border-default);
-  border-radius: var(--sa-radius-lg);
+  background: var(--sa-toggle-bg);
+  border: var(--sa-toggle-border);
+  border-radius: var(--sa-toggle-border-radius);
   color: var(--sa-text-secondary);
   cursor: pointer;
   display: inline-flex;
@@ -715,13 +715,13 @@
 }
 
 [data-ui='toggle-group'] [data-ui='toggle-item']:first-child {
-  border-start-start-radius: var(--sa-radius-lg);
-  border-end-start-radius: var(--sa-radius-lg);
+  border-start-start-radius: var(--sa-toggle-border-radius);
+  border-end-start-radius: var(--sa-toggle-border-radius);
 }
 
 [data-ui='toggle-group'] [data-ui='toggle-item']:last-child {
-  border-start-end-radius: var(--sa-radius-lg);
-  border-end-end-radius: var(--sa-radius-lg);
+  border-start-end-radius: var(--sa-toggle-border-radius);
+  border-end-end-radius: var(--sa-toggle-border-radius);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
