@@ -77,6 +77,7 @@
     // DATABASE OPERATIONS
     // ────────────────────────────────────────────────────────────────────────────
 
+    "db-reset": "sh -c 'deno task db-genesis \"$@\" && deno task db-genesis-verify \"$@\"' --",
     "db-genesis": "deno run --allow-read --allow-run --allow-env source/devops/scripts/db-genesis.ts",
     "db-genesis-verify": "deno run --allow-read --allow-run --allow-env source/devops/scripts/db-genesis-verify.ts",
 
