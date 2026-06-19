@@ -103,6 +103,8 @@ Serving a stage-bound `app-admin` bundle locally is therefore still a stage-boun
 Admin client. Local serving is a tooling concern; it is not a separate remote
 backend environment axis.
 
+`documentation/architecture-devops.md` specifies the devops architecture including deployment strategy.
+
 ## 4. Technology Stack
 
 | Layer         | Technology                      |
@@ -166,22 +168,72 @@ The API namespace is composed once using client makers (Supabase SDK, IndexedDB,
 
 All entries in `source/ux/api/api.ts`:
 
-| Entry                | Kind                 | Purpose                                              |
-| -------------------- | -------------------- | ---------------------------------------------------- |
-| `api.Auth`           | `ApiAuthContract`    | Passwordless OTP auth; session management            |
-| `api.Users`          | `ApiCrudContract`    | User CRUD via Supabase                               |
-| `api.Assets`         | `ApiCrudContract`    | Asset CRUD via Supabase                              |
-| `api.Chemicals`      | `ApiCrudContract`    | Chemical CRUD via Supabase                           |
-| `api.Customers`      | `ApiCrudContract`    | Customer CRUD via Supabase                           |
-| `api.Services`       | `ApiCrudContract`    | Service CRUD via Supabase                            |
-| `api.Workflows`      | `ApiCrudContract`    | Workflow CRUD via Supabase                           |
-| `api.Jobs`           | `ApiCrudContract`    | Job CRUD via Supabase                                |
-| `api.JobsLocal`      | `ApiCrudContract`    | Job aggregate CRUD via IndexedDB (field execution)   |
-| `api.deepCloneJob`   | `ApiBusRuleContract` | Clone job aggregate to IndexedDB for field execution |
-| `api.uploadJobLogs`  | `ApiBusRuleContract` | Bulk append field logs to remote                     |
-| `api.createJobTitle` | method               | Derive display title string from a `JobDefinition`   |
+#### 7.2.1 Session Management
 
-#### 7.2.1 `api.createJobTitle`
+| Singleton  | Purpose                                                           |
+| ---------- | ----------------------------------------------------------------- |
+| `api.Auth` | Passwordless OTP auth; session lifecycle and post-auth validation |
+
+#### 7.2.2 Domain Persistence Singletons
+
+| Singleton       | Purpose                                            |
+| --------------- | -------------------------------------------------- |
+| `api.Users`     | User CRUD via Supabase                             |
+| `api.Assets`    | Asset CRUD via Supabase                            |
+| `api.Chemicals` | Chemical CRUD via Supabase                         |
+| `api.Customers` | Customer CRUD via Supabase                         |
+| `api.Services`  | Service CRUD via Supabase                          |
+| `api.Workflows` | Workflow CRUD via Supabase                         |
+| `api.Jobs`      | Job CRUD via Supabase                              |
+| `api.JobsLocal` | Job aggregate CRUD via IndexedDB (field execution) |
+
+#### 7.2.3 Domain Operations
+
+| Operation            | Purpose                                                             |
+| -------------------- | ------------------------------------------------------------------- |
+| `api.userHasAccess`  | Check whether an email belongs to a registered, active swarmAg user |
+| `api.deepCloneJob`   | Clone job aggregate to IndexedDB for field execution                |
+| `api.uploadJobLogs`  | Bulk append field logs to remote                                    |
+| `api.createJobTitle` | Derive display title string from a `JobDefinition`                  |
+
+**`api.userHasAccess`**
+
+```typescript
+api.userHasAccess.run({ email: string }): Promise<boolean>
+```
+
+Returns whether the submitted email belongs to a registered, active swarmAg user.
+This is a lightweight Supabase RPC business rule used before OTP delivery so the
+login flow does not send one-time codes to unknown or inactive users.
+
+The operation surfaces through `ApiBusRuleContract<{ email: string }, boolean>`.
+
+**`api.deepCloneJob`**
+
+```typescript
+api.deepCloneJob.run({ jobId: Id }): Promise<JobDefinition>
+```
+
+Creates a complete field-execution copy of a job aggregate for local IndexedDB
+storage. The clone includes the job, phase records, finalized or preparatory
+workflow context, and referenced operational data required for offline execution.
+
+The returned `JobDefinition` is defined in `source/ux/common/views/job-views.ts`.
+
+**`api.uploadJobLogs`**
+
+```typescript
+api.uploadJobLogs.run({ jobId: Id, logs: JobWorkLogEntry[] }): Promise<void>
+```
+
+Bulk appends locally captured field-execution log entries to the remote job log
+after connectivity returns. This is a one-way append operation, not a sync or
+merge operation; uploaded entries preserve their captured timestamps, user
+identity, answers, notes, attachments, and operational metadata.
+
+`JobWorkLogEntry` is defined in `source/domain/abstractions/job.ts`.
+
+**`api.createJobTitle`**
 
 ```typescript
 api.createJobTitle(job: JobDefinition): string
@@ -374,20 +426,57 @@ All apps use passwordless email OTP. No passwords are stored or transmitted.
 
 ```text
 user submits email
+  → api.userHasAccess.run({ email })
+  → if false: login displays 'Email address not registered' — OTP flow does not proceed
   → api.Auth.sendOtp(email)
   → Supabase delivers one-time code to email address
   → user submits code
   → api.Auth.verifyOtp(email, code)
   → returns Session { userId }
   → onAuthStateChange fires
-  → app shell calls SessionState.setAuth(userId)
+  → app shell calls applySession(session)
+  → applySession calls SessionState.setAuth(userId)
+  → applySession calls api.Users.get(userId) to hydrate domain user
+  → applySession calls api.Auth.validateUser(user)
+  → if user.status !== 'active':
+      api.Auth.logout()
+      SessionState.clear()
+      redirect to /login
+  → SessionState.setUser(user)
+  → SessionState.setReady()
   → auth guard reacts → renders dashboard
-  → app shell calls api.Users.get(userId)
-  → result passed to SessionState.setUser(user)
-  → app shell marks ready via SessionState.setReady()
 ```
 
-#### 9.3.3 Logout Flow
+#### 9.3.3 Post-Authentication Validation
+
+Authentication confirms that the caller possesses a valid OTP token. It does not confirm that the caller is an eligible swarmAg application user. Post-authentication validation is a required boot-sequence step that runs immediately after the domain user is hydrated.
+
+**Invariant:** `SessionState.store.isAuthenticated` is set to `true` only for users whose domain record exists and whose `status` is `'active'`. No session may proceed to the dashboard for a user who fails this check.
+
+**`ApiAuthContract.validateUser(user: User): void`**
+
+`validateUser` is a synchronous guard declared on `ApiAuthContract` and implemented in `auth-supabase-client.ts`. It receives the hydrated domain `User` and throws `ApiError` (status 403) when the user is not eligible. The shell boot sequence calls it between `api.Users.get()` and `SessionState.setUser()`.
+
+Validation rules enforced by `validateUser`:
+
+- `user.status === 'active'` — inactive users are rejected
+
+When `validateUser` throws, the boot sequence must:
+
+1. Call `api.Auth.logout()` to end the Supabase session
+2. Call `SessionState.clear()` to reset all UX session state
+3. Redirect to `/login`
+
+**Failure modes:**
+
+| Condition                     | Cause                                            | Response                                 |
+| ----------------------------- | ------------------------------------------------ | ---------------------------------------- |
+| `api.Users.get()` returns 404 | Auth identity has no matching domain user record | Hard failure — log and surface error     |
+| `user.status === 'inactive'`  | User account has been deactivated                | Logout, clear session, redirect to login |
+
+A 404 on user hydration is a system integrity violation — an auth identity exists with no corresponding domain user. This condition must not be silently swallowed; it warrants a visible error.
+
+#### 9.3.4 Logout Flow
 
 ```text
 user triggers logout
@@ -797,7 +886,7 @@ until an attachment or note is provided.
 │  │                           │  │
 │  │                           │  │
 │  └───────────────────────────┘  │
-│  📎 Attach  📸 Picture  📍GEO   │
+│  📎 Attach  📸 Picture  📍GEO  │
 │                                 │
 │  ┌───────────────────────────┐  │
 │  │          Save -->         │  │

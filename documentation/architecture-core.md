@@ -272,7 +272,7 @@ export const api = {
 
 ### 5.2 Client Contracts
 
-The system defines two client contracts (in `source/core/api/api-contract.ts`):
+The system defines three client contracts (in `source/core/api/api-contract.ts`):
 
 #### 5.2.1 CRUD & List Contract
 
@@ -298,7 +298,32 @@ interface ApiBusRuleContract {
 }
 ```
 
-#### 5.2.3 Error Propagation
+#### 5.2.3 Generic Contract Typing
+
+`ApiBusRuleContract` accepts optional type parameters for callers that require typed inputs and outputs beyond `Dictionary`:
+
+```typescript
+interface ApiBusRuleContract<
+  TParams extends Dictionary = Dictionary,
+  TResult = Dictionary
+> {
+  run(params: TParams): Promise<TResult>
+}
+```
+
+Default type parameters preserve backward compatibility. Makers and compositions that do not require typed results continue to use the unparameterized form. Makers that target specific operations — such as RPC functions returning scalar values — supply explicit type parameters.
+
+```typescript
+// Untyped — backward compatible
+const cloneJob: ApiBusRuleContract = makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
+
+// Typed — explicit params and result
+const userExists: ApiBusRuleContract<{ email: string }, boolean> = makeBusRuleSupabaseRpcClient({
+  fn: 'user_exists'
+})
+```
+
+#### 5.2.4 Error Propagation
 
 ```typescript
 class ApiError extends Error {
@@ -321,7 +346,7 @@ try {
 }
 ```
 
-#### 5.2.4 Contract Properties
+#### 5.2.5 Contract Properties
 
 - **Uniform interfaces** - Same method signatures regardless of underlying storage
 - **Type-safe** - Full TypeScript generics (`T extends Instantiable`) for domain typing; protocol shapes derived via `CreateFromInstantiable<T>` and `UpdateFromInstantiable<T>`
@@ -334,13 +359,14 @@ These contracts ensure **uniform interfaces** regardless of underlying storage o
 
 Client makers are factory functions that produce clients conforming to contracts:
 
-| Maker                            | Contract             | Purpose                          | Implementation     |
-| -------------------------------- | -------------------- | -------------------------------- | ------------------ |
-| `makeCrudSupabaseClient<T>()`    | `ApiCrudContract`    | Direct Supabase RDBMS SDK access | PostgreSQL via RLS |
-| `makeBusRuleSupabaseClient<T>()` | `ApiBusRuleContract` | Direct Supabase Edge SDK access  | Edge functions     |
-| `makeCrudIndexedDbClient<T>()`   | `ApiCrudContract`    | Offline local storage            | Browser IndexedDB  |
-| `makeCrudHttpClient<T>()`        | `ApiCrudContract`    | HTTP calls to edge functions     | Fetch API          |
-| `makeBusRuleHttpClient()`        | `ApiBusRuleContract` | Orchestration via edge functions | Fetch API          |
+| Maker                                   | Contract             | Purpose                              | Implementation     |
+| --------------------------------------- | -------------------- | ------------------------------------ | ------------------ |
+| `makeCrudSupabaseClient<T>()`           | `ApiCrudContract`    | Direct Supabase RDBMS SDK access     | PostgreSQL via RLS |
+| `makeBusRuleSupabaseEdgeClient<P, R>()` | `ApiBusRuleContract` | Supabase Edge Function invocation    | Edge functions     |
+| `makeBusRuleSupabaseRpcClient<P, R>()`  | `ApiBusRuleContract` | Supabase RPC function invocation     | PostgreSQL via RPC |
+| `makeCrudIndexedDbClient<T>()`          | `ApiCrudContract`    | Offline local storage                | Browser IndexedDB  |
+| `makeCrudHttpClient<T>()`               | `ApiCrudContract`    | HTTP calls to edge functions         | Fetch API          |
+| `makeBusRuleHttpClient()`               | `ApiBusRuleContract` | Orchestration via HTTP edge endpoint | Fetch API          |
 
 #### 5.3.1 Maker Pattern
 
@@ -354,9 +380,15 @@ const Users = makeCrudSupabaseClient<User>({
 })
 await Users.create({ displayName: 'Ada', primaryEmail: 'ada@example.com' })
 
-// Business rule maker
+// Business rule maker — HTTP edge endpoint
 const cloneJob = makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
 await cloneJob.run({ jobId: 'job-123' })
+
+// Business rule maker — Supabase RPC function
+const userExists = makeBusRuleSupabaseRpcClient<{ email: string }, boolean>({
+  fn: 'user_exists'
+})
+const exists = await userExists.run({ email: 'ada@example.com' })
 ```
 
 ### 5.4 Application Usage
@@ -423,6 +455,60 @@ Supabase Edge Functions handle **complex orchestration** that cannot be expresse
 - Read-only queries (use direct Supabase SDK client)
 
 Edge functions are **thin orchestration wrappers** implemented using provider makers (covered in `architecture-back.md`).
+
+### 5.7 Supabase RPC Functions
+
+Supabase RPC functions are PostgreSQL functions invoked via the Supabase client's `rpc()` method. They are a distinct API surface from direct table access (CRUD via RLS) and edge functions (orchestration).
+
+#### 5.7.1 When to use
+
+- Server-side operations that do not require orchestration complexity
+- Operations where the caller is unauthenticated and access must be granted selectively via `SECURITY DEFINER`
+- Lightweight computations or existence checks that cannot be expressed as table selects within the caller's RLS context
+
+#### 5.7.2 When NOT to use
+
+- Simple CRUD operations (use `makeCrudSupabaseClient`)
+- Multi-step orchestration (use `makeBusRuleSupabaseEdgeClient` or `makeBusRuleHttpClient`)
+- Operations expressible as table selects within the authenticated caller's RLS context
+
+#### 5.7.3 Naming Convention
+
+| Artifact       | Convention                 | Example       |
+| -------------- | -------------------------- | ------------- |
+| Function name  | `{verb}_{noun}` snake_case | `user_exists` |
+| Parameter name | snake_case                 | `p_email`     |
+| Return columns | snake_case                 | `exists`      |
+
+#### 5.7.4 Security Model
+
+RPC functions declare one of two execution security modes:
+
+**`SECURITY INVOKER`** (default) — the function executes with the calling user's permissions and RLS context. Use for authenticated callers where RLS governs access.
+
+**`SECURITY DEFINER`** — the function executes with the defining role's permissions, bypassing the caller's RLS context. Use only when:
+
+- The caller is unauthenticated and the operation is intentionally accessible without a session
+- The function returns the minimum necessary data — a boolean, a count, or an opaque token; never full records
+- The exposure is explicitly documented and the function's scope is tightly constrained
+
+Every `SECURITY DEFINER` function must include a `SET search_path = public` clause to prevent search path injection.
+
+#### 5.7.5 Parameter and Return Conventions
+
+- Parameters are named and passed as a keyed object: `supabase.rpc('user_exists', { p_email: value })`
+- Scalar return values (`boolean`, `integer`, `text`) are returned directly as `TResult`
+- Record return values are returned as objects and map to `TResult`
+- All return values surface through `ApiBusRuleContract<TParams, TResult>` at the client layer
+
+#### 5.7.6 Where Functions Live
+
+| Timing                     | Location                                                       |
+| -------------------------- | -------------------------------------------------------------- |
+| Defined at schema origin   | `source/domain/schema/schema.sql` under `-- functions` section |
+| Added after initial schema | `source/back/migrations/` as a forward-only migration          |
+
+RPC functions are not deployed as separate files. They are PostgreSQL DDL and are managed alongside schema migrations.
 
 ## 6. Configuration Management
 

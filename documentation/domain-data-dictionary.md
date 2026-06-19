@@ -536,13 +536,13 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**  | **Type**                                         |
-| -------------- | ------------------------------------------------ |
-| `displayName`  | string                                           |
-| `primaryEmail` | string                                           |
-| `phoneNumber`  | string                                           |
-| `avatarUrl?`   | string                                           |
-| `status`       | `'active'` \| `'inactive'` (default: `'active'`) |
+| **Attribute**  | **Type**                                         | **Constraints** |
+| -------------- | ------------------------------------------------ | --------------- |
+| `displayName`  | string                                           |                 |
+| `primaryEmail` | string                                           | unique          |
+| `phoneNumber`  | string                                           |                 |
+| `avatarUrl?`   | string                                           |                 |
+| `status`       | `'active'` \| `'inactive'` (default: `'active'`) |                 |
 
 ## 10. Workflow
 
