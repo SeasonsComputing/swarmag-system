@@ -2,8 +2,8 @@
  * Guard against namespace imports across the source tree.
  */
 
-import { walk } from '@std/walk'
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+import { walk } from '@std/walk'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const SOURCE_DIR = `${ROOT}/source`

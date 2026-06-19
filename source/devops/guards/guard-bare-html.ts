@@ -1,6 +1,6 @@
 import type { StringDictionary } from '@core/std'
-import { walk } from '@std/walk'
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+import { walk } from '@std/walk'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const UX_DIR = `${ROOT}/source/ux`

@@ -72,7 +72,11 @@ const main = async () => {
   }
 
   if (violations.length > 0) {
-    guardFail('Chart', violations, 'Rule: Chart.js is an implementation detail of UiChart in chart primitives.')
+    guardFail(
+      'Chart',
+      violations,
+      'Rule: Chart.js is an implementation detail of UiChart in chart primitives.'
+    )
   }
 
   guardPass('Chart')
