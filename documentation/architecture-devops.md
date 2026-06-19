@@ -578,16 +578,54 @@ If the Supabase CLI is unavailable or the task is blocked, execute the full cont
 All `auth.users` seed rows in `schema.sql` must use the upsert form:
 
 ```sql
-INSERT INTO auth.users (id, aud, role, email, confirmation_token, email_confirmed_at, ...)
-VALUES (...)
+INSERT INTO auth.users (
+  id,
+  aud,
+  role,
+  email,
+  confirmation_token,
+  recovery_token,
+  email_change,
+  email_change_token_new,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at
+) VALUES (
+  '{devops-generated-UUID}',
+  'authenticated',
+  'authenticated',
+  '{email}',
+  '',
+  '',
+  '',
+  '',
+  now(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{}'::jsonb,
+  now(),
+  now()
+)
 ON CONFLICT (id) DO UPDATE SET
   confirmation_token = EXCLUDED.confirmation_token,
+  recovery_token = EXCLUDED.recovery_token,
+  email_change = EXCLUDED.email_change,
+  email_change_token_new = EXCLUDED.email_change_token_new,
   email_confirmed_at = EXCLUDED.email_confirmed_at,
   updated_at = now();
 ```
 
 This ensures genesis runs are safe to execute against instances where the auth user already exists (e.g. created via the Supabase dashboard).
 
-`confirmation_token` must be set to `''` (empty string) and `email_confirmed_at` must be set to a non-null timestamp for OTP delivery to succeed. A `NULL` confirmation_token causes a 500 error on the Supabase OTP endpoint.
+The Supabase Go auth server scans several `auth.users` string columns as non-nullable. Any column seeded as `NULL` instead of `''` causes a `500: Database error finding user` on the OTP endpoint. The following fields must be explicitly set to `''` in every seed row:
+
+| Field                    | Reason                                                               |
+| ------------------------ | -------------------------------------------------------------------- |
+| `confirmation_token`     | Required non-null for OTP flow                                       |
+| `recovery_token`         | Scanned as string on every user lookup                               |
+| `email_change`           | Scanned as string on every user lookup                               |
+| `email_change_token_new` | Scanned as string on every user lookup                               |
+| `email_confirmed_at`     | Required non-null timestamp for the user to be treated as confirmed. |
 
 _End of Architecture DevOps Document_
