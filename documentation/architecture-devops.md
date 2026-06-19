@@ -55,6 +55,7 @@ source/devops/
     ├── gen-id-seeds.ts
     ├── gen-jwt-secret.ts
     ├── read-secret.ts
+    ├── db-genesis.ts
     ├── set-secret.ts
     ├── smoke-ux.ts
     └── validate-secrets.ts
@@ -456,6 +457,7 @@ supported task groups; individual task bodies remain in `deno.jsonc`.
 | Formatting    | `fmt`, `fmt:check`                                                   |
 | Generators    | `gen:jwt-secret`, `gen:id-seeds`, `gen:ai-context`                   |
 | Guards        | `guard:*` tasks listed in Guard Inventory                            |
+| Database      | `db-genesis`                                                         |
 | Packaging     | `app-{name}-package-{target}`, `app-{name}-package-{target}-verify`  |
 | Deployment    | `deploy`, `ux-smoke`, `ux-stage-smoke`                               |
 | Local servers | `app-dev-local`, `app-stage-local`, `app-style-guide-local`          |
@@ -514,5 +516,74 @@ Guards that enforce a specific rule may append a hint line after the violation l
 - All packaging tasks
 
 Its development server is started via `deno task app-style-guide-local`, which has no secrets or env file dependency.
+
+## 12. Supabase Schema Management
+
+### 12.1 Overview
+
+The canonical Supabase schema is `source/domain/schema/schema.sql`. It is the authoritative DDL for the stage and production Supabase instances. All table definitions, RLS policies, indexes, seed data, and RPC functions are owned by this file.
+
+Migrations in `source/back/migrations/` express deltas from the schema baseline and are applied after a genesis run to advance the schema forward.
+
+### 12.2 Genesis Run
+
+A **genesis run** is a full reset of the Supabase instance from `schema.sql`. It drops all public-schema tables and recreates the entire schema, including seed data and RPC functions, in a single execution.
+
+**When to perform a genesis run:**
+
+- Provisioning a new Supabase environment (dev, stage, prod)
+- Resetting a broken or inconsistent stage environment
+- Schema changes that require full recreation (e.g. structural constraint additions)
+- Any situation where incremental migration is not feasible or trusted
+
+**Supabase auth schema constraint:**
+
+Supabase manages the `auth` schema internally — `auth.users` cannot be dropped or recreated. `schema.sql` handles this by using `INSERT ... ON CONFLICT (id) DO UPDATE SET ...` for all `auth.users` seed rows. This makes the genesis run idempotent with respect to existing auth users: existing rows are updated to the correct seed state, and new rows are inserted.
+
+**Primary run path:**
+
+Genesis runs are performed through the Supabase CLI using the repository task:
+
+```bash
+deno task db-genesis --target {dev|stage|prod}
+```
+
+The task applies the full contents of `source/domain/schema/schema.sql` to the selected Supabase target. It does not run migrations.
+
+The selected target must exist and must print the resolved target identity before applying SQL. The operator must confirm the target before the schema is applied.
+
+`dev` and `stage` genesis runs are authorized development operations after interactive target confirmation. `prod` database maintenance of any kind requires explicit typed production confirmation in addition to the normal target confirmation.
+
+**Migration visibility:**
+
+`db-genesis` counts migration files in `source/back/migrations/` and when one or more migrations exist, the task must print a loud warning:
+
+```text
+WARNING: MIGRATIONS FOUND (###)
+Genesis applies schema.sql only. Run required migrations after genesis.
+```
+
+Migration execution is intentionally outside the genesis task. A future migration runner may be added when incremental schema advancement becomes operationally necessary.
+
+**Manual fallback:**
+
+If the Supabase CLI is unavailable or the task is blocked, execute the full contents of `schema.sql` against the target Supabase instance via the Supabase MCP `execute_sql` tool or the Supabase dashboard SQL editor.
+
+### 12.3 auth.users Seed Convention
+
+All `auth.users` seed rows in `schema.sql` must use the upsert form:
+
+```sql
+INSERT INTO auth.users (id, aud, role, email, confirmation_token, email_confirmed_at, ...)
+VALUES (...)
+ON CONFLICT (id) DO UPDATE SET
+  confirmation_token = EXCLUDED.confirmation_token,
+  email_confirmed_at = EXCLUDED.email_confirmed_at,
+  updated_at = now();
+```
+
+This ensures genesis runs are safe to execute against instances where the auth user already exists (e.g. created via the Supabase dashboard).
+
+`confirmation_token` must be set to `''` (empty string) and `email_confirmed_at` must be set to a non-null timestamp for OTP delivery to succeed. A `NULL` confirmation_token causes a 500 error on the Supabase OTP endpoint.
 
 _End of Architecture DevOps Document_

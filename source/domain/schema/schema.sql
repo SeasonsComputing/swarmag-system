@@ -752,7 +752,11 @@ INSERT INTO auth.users (
   '{}'::jsonb,
   now(),
   now()
-);
+)
+ON CONFLICT (id) DO UPDATE SET
+  confirmation_token = EXCLUDED.confirmation_token,
+  email_confirmed_at = EXCLUDED.email_confirmed_at,
+  updated_at = now();
 
 INSERT INTO users (
   id,
