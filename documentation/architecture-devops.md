@@ -318,7 +318,8 @@ The `app-{name}-package.sh` script performs these steps in order:
 8. Fail if any required env var is empty or unresolved after package version
    and secret resolution
 9. Build the Vite PWA into a temp dist directory
-10. Copy required static files (`manifest.webmanifest`, `sw.js`, `icon.png`)
+10. Copy required static and deploy files (`manifest.webmanifest`, `sw.js`,
+    `icon.png`, `netlify.toml`, `_redirects`)
 11. **Secrets leak guard** — scan for and remove any `secrets.jsonc` files in
     the dist output
 12. Write `build-meta.jsonc` (app, target, version, build number, UTC
@@ -335,7 +336,7 @@ script never writes resolved secret values into `.env`.
 ### 7.4 Artifact Naming
 
 ```
-swarmag-{app-name}-{target}-{YYYYMMDDTHHMMSSZ}-{git-sha}.zip
+swarmag-app-{admin|ops|customer}-{target}-{YYYYMMDDTHHMMSSZ}-{git-sha}.zip
 ```
 
 Artifacts land in `build/packages/`. No build artifacts are committed to the repository.
@@ -637,11 +638,15 @@ All Supabase auth configuration is owned by this repository. The Supabase dashbo
 
 ### 13.2 Email Templates
 
-Email templates live under `supabase/templates/` and are referenced from `supabase/config.toml`. They are applied to a Supabase project via `supabase db push` or the Supabase CLI link/push workflow.
+Email templates live under `supabase/templates/` and are referenced from `supabase/config.toml`. Template edits are expected operational changes, but the repository files remain authoritative. They are applied to a Supabase project via `supabase db push` or the Supabase CLI link/push workflow.
 
-| Template file                        | Config key                          | Trigger                          |
-| ------------------------------------ | ----------------------------------- | -------------------------------- |
-| `supabase/templates/magic-link.html` | `[auth.email.template.magic_link]`  | `signInWithOtp({ email })` call  |
+Supabase email templates are not UX application shell assets. They are exempt
+from repository HTML/CSS formatting and architecture guard expectations because
+they must conform to Supabase Auth and email-client rendering constraints.
+
+| Template file                        | Config key                         | Trigger                         |
+| ------------------------------------ | ---------------------------------- | ------------------------------- |
+| `supabase/templates/magic-link.html` | `[auth.email.template.magic_link]` | `signInWithOtp({ email })` call |
 
 ### 13.3 OTP Flow
 
@@ -664,5 +669,123 @@ supabase db push
 ```
 
 This applies `config.toml` settings — including email templates — to the linked project. Run for each environment (dev, stage, prod) against its respective project ref.
+
+## 14. Platform Target Listings
+
+### 14.1 Overview
+
+Two scripts provide canonical platform topology queries. They are the single source of truth for target metadata across the devops layer. Other scripts consume their output rather than resolving platform topology independently.
+
+| Script                     | Platform | Output shape                               |
+| -------------------------- | -------- | ------------------------------------------ |
+| `list-netlify-targets.ts`  | Netlify  | `{ [app]: { [target]: { siteId, url } } }` |
+| `list-supabase-targets.ts` | Supabase | `{ [target]: { projectRef, url } }`        |
+
+Both scripts write structured JSON to stdout and errors to stderr, then exit 1 on failure.
+
+### 14.2 Netlify Target Listing
+
+**Task:**
+
+```bash
+deno task list-netlify-targets [--app {admin|ops|customer}] --target {dev|stage|prod}
+```
+
+**Params:**
+
+| Flag       | Values                         | Required | Description                                |
+| ---------- | ------------------------------ | -------- | ------------------------------------------ |
+| `--app`    | `admin` \| `ops` \| `customer` | no       | Filter to one app; omit to return all apps |
+| `--target` | `dev` \| `stage` \| `prod`     | yes      | Select the target to list                  |
+
+**Output (stdout, JSON):**
+
+```json
+{
+  "admin": {
+    "dev":   { "siteId": "abc123", "url": "https://swarmag-app-admin-dev.netlify.app" },
+    "stage": { "siteId": "def456", "url": "https://admin-stage.swarmag.com" },
+    "prod":  { "siteId": "ghi789", "url": "https://admin.swarmag.com" }
+  },
+  "ops": { ... },
+  "customer": { ... }
+}
+```
+
+When `--app` is applied, the output is scoped to that app but preserves the same shape.
+
+**Errors (stderr + exit 1):**
+
+| Condition                          | Message prefix       |
+| ---------------------------------- | -------------------- |
+| Netlify CLI unavailable            | `LIST_NETLIFY_FAIL:` |
+| Not authenticated                  | `LIST_NETLIFY_FAIL:` |
+| Site not found for app/target pair | `LIST_NETLIFY_FAIL:` |
+
+**Site naming convention:**
+
+Netlify sites are matched by name using the pattern:
+
+```
+swarmag-app-{app}-{target}
+```
+
+A site missing from the Netlify account for any requested app/target pair is a hard failure.
+
+### 14.3 Supabase Target Listing
+
+**Task:**
+
+```bash
+deno task list-supabase-targets --target {dev|stage|prod}
+```
+
+**Params:**
+
+| Flag       | Values                     | Required | Description               |
+| ---------- | -------------------------- | -------- | ------------------------- |
+| `--target` | `dev` \| `stage` \| `prod` | yes      | Select the target to list |
+
+**Output (stdout, JSON):**
+
+```json
+{
+  "dev": { "projectRef": "abcdefgh", "url": "https://abcdefgh.supabase.co" },
+  "stage": { "projectRef": "ijklmnop", "url": "https://ijklmnop.supabase.co" },
+  "prod": { "projectRef": "qrstuvwx", "url": "https://qrstuvwx.supabase.co" }
+}
+```
+
+The output is scoped to the requested target but preserves the same shape.
+
+**Errors (stderr + exit 1):**
+
+| Condition                                  | Message prefix        |
+| ------------------------------------------ | --------------------- |
+| Supabase CLI unavailable                   | `LIST_SUPABASE_FAIL:` |
+| Not authenticated                          | `LIST_SUPABASE_FAIL:` |
+| No project found for target                | `LIST_SUPABASE_FAIL:` |
+| Multiple projects match target (ambiguous) | `LIST_SUPABASE_FAIL:` |
+
+**Project naming convention:**
+
+Supabase projects are matched by name. A project matches a target when its name (case-insensitive) contains `swarmag` and one of the target keywords:
+
+| Target  | Accepted name keywords |
+| ------- | ---------------------- |
+| `dev`   | `dev`, `development`   |
+| `stage` | `stage`, `staging`     |
+| `prod`  | `prod`, `production`   |
+
+Exactly one project must match per target. Zero matches and multiple matches are both hard failures.
+
+### 14.4 Deno Task Group
+
+Both scripts are registered under the `PLATFORM LISTINGS` task group in `deno.jsonc`:
+
+```
+list-netlify-targets    Query Netlify site topology for all or filtered apps/targets
+list-supabase-targets   Query Supabase project topology for all or filtered targets
+```
 
 _End of Architecture DevOps Document_
