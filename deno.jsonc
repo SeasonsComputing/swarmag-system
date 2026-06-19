@@ -122,6 +122,13 @@
     "app-customer-package-prod-verify": "bash source/devops/scripts/app-customer-package-verify.sh prod",
 
     // ────────────────────────────────────────────────────────────────────────────
+    // PLATFORM LISTINGS
+    // ────────────────────────────────────────────────────────────────────────────
+
+    "list-netlify-targets": "deno run --allow-run --allow-env source/devops/scripts/list-netlify-targets.ts",
+    "list-supabase-targets": "deno run --allow-run --allow-env source/devops/scripts/list-supabase-targets.ts",
+
+    // ────────────────────────────────────────────────────────────────────────────
     // DEPLOYMENT
     // ────────────────────────────────────────────────────────────────────────────
 
