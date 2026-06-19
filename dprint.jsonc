@@ -3,7 +3,7 @@
   "lineWidth": 105,
   "indentWidth": 2,
   "useTabs": false,
-  "excludes": ["vendors/**", "**/*.svg", "**/*.woff2"],
+  "excludes": ["vendors/**", "**/*.svg", "**/*.woff2", "supabase/templates/magic-link.html"],
   "typescript": {
     "semiColons": "asi",
     "quoteStyle": "alwaysSingle",
