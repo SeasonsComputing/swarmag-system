@@ -53,7 +53,7 @@
 }
 
 .sg-main {
-  padding: var(--sa-gutter);
+  padding: var(--sa-gutter) calc(var(--sa-gutter) * 2);
 }
 
 .sg-section {
