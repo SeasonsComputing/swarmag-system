@@ -1,7 +1,7 @@
 {
   "imports": {
     // ────────────────────────────────────────────────────────────────────────────
-    // Primary Top-level Aliases
+    // PRIMARY TOP-LEVEL ALIASES
     // ────────────────────────────────────────────────────────────────────────────
 
     "@core/": "./source/core/",
@@ -12,7 +12,7 @@
     "@tests/": "./source/tests/",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Convenience Barrel Aliases
+    // CONVENIENCE BARREL ALIASES
     // ────────────────────────────────────────────────────────────────────────────
 
     "@core/std": "./source/core/std/std.ts",
@@ -21,7 +21,7 @@
     "@ux/common/components/ui": "./source/ux/common/components/ui/ui.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Vendor Aliases
+    // VENDOR ALIASES
     // ────────────────────────────────────────────────────────────────────────────
 
     "@kobalte/core": "npm:@kobalte/core@0.13.11",
@@ -45,7 +45,7 @@
   },
   "tasks": {
     // ────────────────────────────────────────────────────────────────────────────
-    // Validation Checks
+    // VALIDATION CHECKS
     // ────────────────────────────────────────────────────────────────────────────
 
     "check": "deno task check:guards && deno task check:types && deno task check:lint",
@@ -58,14 +58,14 @@
     "lint": "deno lint",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Asset Modifiers
+    // ASSET MODIFIERS
     // ────────────────────────────────────────────────────────────────────────────
 
     "fmt": "DPRINT_CACHE_DIR=$PWD/build/cache/dprint dprint fmt",
     "fmt:check": "DPRINT_CACHE_DIR=$PWD/build/cache/dprint dprint check",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Asset Productions
+    // ASSET PRODUCTIONS
     // ────────────────────────────────────────────────────────────────────────────
 
     "gen:jwt-secret": "deno run source/devops/scripts/gen-jwt-secret.ts",
@@ -74,7 +74,13 @@
     "gen:ai-context-foundation": "deno task gen:ai-context -- --file ai-context-foundation --topic architecture --topic inventory --max-lines-per-file 1000 --max-total-lines 200000 --max-files 1000 --no-truncate",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Verification Guards
+    // DATABASE OPERATIONS
+    // ────────────────────────────────────────────────────────────────────────────
+
+    "db-genesis": "deno run --allow-read --allow-run --allow-env source/devops/scripts/db-genesis.ts",
+
+    // ────────────────────────────────────────────────────────────────────────────
+    // VERIFICATION GUARDS
     // ────────────────────────────────────────────────────────────────────────────
 
     "guard:architecture": "deno run --allow-read source/devops/guards/guard-architecture.ts",
@@ -91,7 +97,7 @@
     "guard:bare-html": "deno run --allow-read source/devops/guards/guard-bare-html.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Deployment Packaging
+    // DEPLOYMENT PACKAGING
     // ────────────────────────────────────────────────────────────────────────────
 
     "app-admin-package-dev": "bash source/devops/scripts/app-admin-package.sh dev --secrets-file secrets.jsonc",
@@ -114,7 +120,7 @@
     "app-customer-package-prod-verify": "bash source/devops/scripts/app-customer-package-verify.sh prod",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Deployment
+    // DEPLOYMENT
     // ────────────────────────────────────────────────────────────────────────────
 
     "deploy": "bash source/devops/scripts/app-deploy.sh",
@@ -122,7 +128,7 @@
     "ux-stage-smoke": "deno run --allow-net --allow-read --allow-run --allow-write source/devops/scripts/smoke-ux.ts --target stage",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Local Development Servers
+    // LOCAL DEVELOPMENT SERVERS
     // ────────────────────────────────────────────────────────────────────────────
 
     "app-dev-local": "bash source/devops/scripts/app-local.sh dev",
