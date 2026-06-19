@@ -17,15 +17,15 @@ AuthGuard  Route-level auth guard component.
 
 import { Match, Show, Switch } from '@solid-js'
 import { Navigate } from '@tanstack/solid-router'
-import type { UiComponent, UiContainerProps } from '@ux/common/components/ui'
+import { type UiComponent, type UiContainerProps } from '@ux/common/components/ui'
 import { SessionState } from '@ux/common/stores/session-state.ts'
 
+/* Authorization guard properties */
 export type AuthGuardProps = UiContainerProps
 
 /** Route-level auth guard; redirects to /login when unauthenticated. */
 export const AuthGuard = (props: AuthGuardProps): UiComponent => {
   const { store: session } = SessionState
-
   return (
     <Switch>
       <Match when={!session.isLoading && !session.isAuthenticated}>
