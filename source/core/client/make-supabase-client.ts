@@ -11,11 +11,19 @@ with domain-layer serialization hooks and uniform ApiError mapping.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CrudSupabaseSpecification     CRUD Supabase client configuration.
-makeCrudSupabaseClient(spec)  Build CRUD/list client over Supabase.
+CrudSupabaseSpecification          CRUD Supabase client configuration.
+makeCrudSupabaseClient(spec)       Build CRUD/list client over Supabase.
+RpcSupabaseSpecification           RPC Supabase client configuration.
+makeBusRuleSupabaseRpcClient(spec) Build business-rule client over Supabase RPC.
 */
 
-import type { ApiCrudContract, DeleteResult, ListOptions, ListResult } from '@core/api/api-contract.ts'
+import type {
+  ApiBusRuleContract,
+  ApiCrudContract,
+  DeleteResult,
+  ListOptions,
+  ListResult
+} from '@core/api/api-contract.ts'
 import { checkApiError, listCursorValue, listPageLimitValue } from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import {
@@ -30,11 +38,24 @@ import {
 } from '@core/std'
 import type { Adapter, AdapterPatch } from '@core/stdx'
 
+// ───────────────────────────────────────────────────────────────────────────────
+// SPECIFICATIONS
+// ───────────────────────────────────────────────────────────────────────────────
+
 /** Configuration for a CRUD Supabase API client. */
 export type CrudSupabaseSpecification<T> = {
   table: string
   adapter: Adapter<T>
 }
+
+/** Configuration for a Supabase RPC business-rule client. */
+export type RpcSupabaseSpecification = {
+  fn: string
+}
+
+// ───────────────────────────────────────────────────────────────────────────────
+// MAKERS
+// ───────────────────────────────────────────────────────────────────────────────
 
 /**
  * Maker to produce a CRUD/list API client over Supabase.
@@ -119,5 +140,21 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
       cursor: cursor + page.length,
       hasMore
     }
+  }
+})
+
+/**
+ * Maker to produce a business-rule client over a Supabase RPC function.
+ * @param spec RPC specification with the Postgres function name.
+ * @returns Business-rule client with typed params and result.
+ */
+export const makeBusRuleSupabaseRpcClient = <
+  TParams extends Dictionary = Dictionary,
+  TResult = Dictionary
+>({ fn }: RpcSupabaseSpecification): ApiBusRuleContract<TParams, TResult> => ({
+  async run(params: TParams): Promise<TResult> {
+    const { data, error } = await Supabase.client().rpc(fn, params)
+    checkApiError(error, `RPC '${fn}' failed`, Supabase.errorToStatus)
+    return data as TResult
   }
 })
