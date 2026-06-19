@@ -50,6 +50,7 @@ CREATE TABLE users (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ,
   CONSTRAINT users_status_check CHECK (status IN ('active', 'inactive')),
+  CONSTRAINT users_primary_email_unique UNIQUE (primary_email),
   CONSTRAINT users_roles_array_check CHECK (jsonb_typeof(roles) = 'array'),
   CONSTRAINT users_roles_non_empty_check CHECK (jsonb_array_length(roles) > 0)
 );
@@ -729,6 +730,30 @@ CREATE INDEX job_work_log_entries_user_id_idx ON job_work_log_entries (user_id);
 -- seed_data
 -- ──────────────────────────────────────────────────────────────────────────────────────
 
+INSERT INTO auth.users (
+  id,
+  aud,
+  role,
+  email,
+  confirmation_token,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at
+) VALUES (
+  '0195b5b0-3c09-79f0-8d7c-0a1b2c3d4e5f',
+  'authenticated',
+  'authenticated',
+  'tedvkremer@gmail.com',
+  '',
+  now(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{}'::jsonb,
+  now(),
+  now()
+);
+
 INSERT INTO users (
   id,
   roles,
@@ -946,3 +971,25 @@ INSERT INTO questions (
   ('0195b5b0-3c30-7c21-8ed6-1728394a5b78', 'execution.crewCount', 'internal', 'number', true, '[]'::jsonb, now(), now(), NULL),
   ('0195b5b0-3c31-7d32-9fe7-28394a5b6c89', 'response.skipped', 'internal', 'boolean', true, '[]'::jsonb, now(), now(), NULL),
   ('0195b5b0-3c32-7e43-a0f8-394a5b6c7d9a', 'response.skipReason', 'internal', 'text', true, '[]'::jsonb, now(), now(), NULL);
+
+-- ──────────────────────────────────────────────────────────────────────────────────────
+-- rpc_functions
+-- ──────────────────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE FUNCTION user_has_access(email text)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+BEGIN
+  RETURN EXISTS (
+    SELECT 1 FROM users
+    WHERE primary_email = email
+      AND status = 'active'
+      AND deleted_at IS NULL
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION user_has_access(text) TO anon;
