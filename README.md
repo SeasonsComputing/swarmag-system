@@ -178,12 +178,41 @@ Where:
 - `{name}`: `admin` | `ops` | `customer`.
 - `{target}`: `dev` | `stage` | `prod`.
 
-**Backend deployment:**
+**Backend edge deployment:**
+
+Edge functions are Supabase orchestration handlers under
+`source/back/supabase-edge/functions/`. Deploy the changed function by name after
+linking the intended Supabase project.
 
 ```bash
 supabase functions deploy <function>
+```
+
+**Backend OTP sign-in email deployment:**
+
+Auth email templates are repository-owned. The OTP sign-in email is
+`supabase/templates/magic-link.html`, wired through `supabase/config.toml`, and
+applied to the linked Supabase project.
+
+```bash
 supabase db push
 ```
+
+### 3.4 Platform Listings
+
+Query live platform topology. Both scripts write JSON to stdout.
+
+| Command                                                    | Purpose                                       |
+| ---------------------------------------------------------- | --------------------------------------------- |
+| `dot list-netlify-targets [--app {app}] --target {target}` | List Netlify site IDs and URLs by app/target  |
+| `dot list-supabase-targets --target {target}`              | List Supabase project refs and URLs by target |
+
+Where:
+
+- `{app}`: `admin` | `ops` | `customer` (optional — omit to return all apps).
+- `{target}`: `dev` | `stage` | `prod` (required).
+
+See `architecture-devops.md §14` for output shape, error conditions, and naming conventions.
 
 ## 4. Working Rules
 
