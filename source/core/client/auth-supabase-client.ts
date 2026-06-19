@@ -12,6 +12,7 @@ mapping and a normalized `Session` return shape.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AuthSupabaseClient  Authentication singleton
+└ onAuthStateChange(callback)  Subscribe to Supabase auth-state changes
 */
 
 import type { ApiAuthContract, Session } from '@core/api/api-auth-contract.ts'
