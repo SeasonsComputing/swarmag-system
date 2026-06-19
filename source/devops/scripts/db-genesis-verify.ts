@@ -1,14 +1,13 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Supabase database genesis runner                                            ║
-║ Applies the canonical schema to the linked Supabase target after approval.  ║
+║ Supabase database seed verification                                         ║
+║ Verifies seed data integrity without modifying the database schema.         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Runs the canonical schema genesis operation through the Supabase CLI. The
-requested target must exist, be the currently linked project, and be confirmed
-by the operator before schema SQL is applied.
+Verifies seed data integrity of a Supabase target after a genesis run.
+Non-destructive — does not modify the database.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -31,17 +30,15 @@ type SupabaseProjectsResponse = {
 }
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
-const SCHEMA_PATH = `${ROOT}/source/domain/schema/schema.sql`
-const MIGRATIONS_DIR = `${ROOT}/source/back/migrations`
 const PROJECT_REF_PATH = `${ROOT}/supabase/.temp/project-ref`
 
 const usage = (): never => {
-  console.error('Usage: deno task db-genesis --target {dev|stage|prod}')
+  console.error('Usage: deno task db-genesis-verify --target {dev|stage|prod}')
   Deno.exit(1)
 }
 
 const fail = (message: string): never => {
-  console.error(`DB_GENESIS_FAIL: ${message}`)
+  console.error(`DB_GENESIS_VERIFY_FAIL: ${message}`)
   Deno.exit(1)
 }
 
@@ -68,27 +65,6 @@ const parseTarget = (): Target => {
   }
 
   return parsedTarget
-}
-
-const requireFile = async (path: string): Promise<void> => {
-  try {
-    const stat = await Deno.stat(path)
-    if (!stat.isFile) fail(`expected file: ${path}`)
-  } catch {
-    fail(`missing file: ${path}`)
-  }
-}
-
-const migrationCount = async (): Promise<number> => {
-  try {
-    let count = 0
-    for await (const entry of Deno.readDir(MIGRATIONS_DIR)) {
-      if (entry.isFile && entry.name.endsWith('.sql')) count += 1
-    }
-    return count
-  } catch {
-    return 0
-  }
 }
 
 const projectMatchesTarget = (project: SupabaseProject, target: Target): boolean => {
@@ -120,29 +96,6 @@ const linkedProjectRef = async (): Promise<string> => {
     return (await Deno.readTextFile(PROJECT_REF_PATH)).trim()
   } catch {
     return fail('Supabase project is not linked. Run supabase link for the target first.')
-  }
-}
-
-const readConfirmation = (prompt: string): string => {
-  const response = globalThis.prompt(prompt)
-  return response?.trim() ?? ''
-}
-
-const confirmTarget = (target: Target, project: SupabaseProject): void => {
-  console.log('')
-  console.log('DB_GENESIS_TARGET')
-  console.log(`TARGET=${target}`)
-  console.log(`PROJECT_NAME=${project.name}`)
-  console.log(`PROJECT_REF=${project.ref}`)
-  console.log(`PROJECT_STATUS=${project.status}`)
-  console.log(`SCHEMA=${SCHEMA_PATH}`)
-
-  const response = readConfirmation(`Type '${target}' to apply schema.sql to this target:`)
-  if (response !== target) fail('target confirmation did not match')
-
-  if (target === 'prod') {
-    const prodResponse = readConfirmation('Type \'PROD\' to confirm production database maintenance:')
-    if (prodResponse !== 'PROD') fail('production confirmation did not match')
   }
 }
 
@@ -214,29 +167,15 @@ const verify = async (_target: Target): Promise<void> => {
 const main = async (): Promise<void> => {
   const target = parseTarget()
 
-  await requireFile(SCHEMA_PATH)
-
   const project = await findTargetProject(target)
   const linkedRef = await linkedProjectRef()
   if (linkedRef !== project.ref) {
-    fail(`linked Supabase project is ${linkedRef}; expected ${project.ref} for target ${target}`)
+    fail(
+      `linked Supabase project is ${linkedRef}; expected ${project.ref} for target ${target}`
+    )
   }
-
-  const migrations = await migrationCount()
-  if (migrations > 0) {
-    console.warn(`WARNING: MIGRATIONS FOUND (${migrations})`)
-    console.warn('Genesis applies schema.sql only. Run required migrations after genesis.')
-  }
-
-  confirmTarget(target, project)
-
-  console.log('')
-  console.log('Applying schema.sql through Supabase CLI...')
-  await commandText('supabase', ['db', 'query', '--linked', '--file', SCHEMA_PATH])
 
   await verify(target)
-
-  console.log('DB_GENESIS=PASS')
 }
 
 await main()
