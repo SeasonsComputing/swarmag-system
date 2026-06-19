@@ -736,6 +736,9 @@ INSERT INTO auth.users (
   role,
   email,
   confirmation_token,
+  recovery_token,
+  email_change,
+  email_change_token_new,
   email_confirmed_at,
   raw_app_meta_data,
   raw_user_meta_data,
@@ -747,6 +750,9 @@ INSERT INTO auth.users (
   'authenticated',
   'tedvkremer@gmail.com',
   '',
+  '',
+  '',
+  '',
   now(),
   '{"provider":"email","providers":["email"]}'::jsonb,
   '{}'::jsonb,
@@ -755,6 +761,9 @@ INSERT INTO auth.users (
 )
 ON CONFLICT (id) DO UPDATE SET
   confirmation_token = EXCLUDED.confirmation_token,
+  recovery_token = EXCLUDED.recovery_token,
+  email_change = EXCLUDED.email_change,
+  email_change_token_new = EXCLUDED.email_change_token_new,
   email_confirmed_at = EXCLUDED.email_confirmed_at,
   updated_at = now();
 
