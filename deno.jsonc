@@ -78,6 +78,7 @@
     // ────────────────────────────────────────────────────────────────────────────
 
     "db-genesis": "deno run --allow-read --allow-run --allow-env source/devops/scripts/db-genesis.ts",
+    "db-genesis-verify": "deno run --allow-read --allow-run --allow-env source/devops/scripts/db-genesis-verify.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
     // VERIFICATION GUARDS

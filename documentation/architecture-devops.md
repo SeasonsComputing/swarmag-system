@@ -56,6 +56,7 @@ source/devops/
     ├── gen-jwt-secret.ts
     ├── read-secret.ts
     ├── db-genesis.ts
+    ├── db-genesis-verify.ts
     ├── set-secret.ts
     ├── smoke-ux.ts
     └── validate-secrets.ts
@@ -457,7 +458,7 @@ supported task groups; individual task bodies remain in `deno.jsonc`.
 | Formatting    | `fmt`, `fmt:check`                                                   |
 | Generators    | `gen:jwt-secret`, `gen:id-seeds`, `gen:ai-context`                   |
 | Guards        | `guard:*` tasks listed in Guard Inventory                            |
-| Database      | `db-genesis`                                                         |
+| Database      | `db-genesis`, `db-genesis-verify`                                    |
 | Packaging     | `app-{name}-package-{target}`, `app-{name}-package-{target}-verify`  |
 | Deployment    | `deploy`, `ux-smoke`, `ux-stage-smoke`                               |
 | Local servers | `app-dev-local`, `app-stage-local`, `app-style-guide-local`          |
@@ -546,9 +547,12 @@ Genesis runs are performed through the Supabase CLI using the repository task:
 
 ```bash
 deno task db-genesis --target {dev|stage|prod}
+deno task db-genesis-verify --target {dev|stage|prod}
 ```
 
 The task applies the full contents of `source/domain/schema/schema.sql` to the selected Supabase target. It does not run migrations.
+The verification task checks the seeded auth user, public user row, seed table
+counts, and `user_has_access` RPC behavior without modifying schema or data.
 
 The selected target must exist and must print the resolved target identity before applying SQL. The operator must confirm the target before the schema is applied.
 
