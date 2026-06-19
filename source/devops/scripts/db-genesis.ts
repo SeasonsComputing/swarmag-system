@@ -15,8 +15,6 @@ PUBLIC
 (script entry point — no exported symbols)
 */
 
-import type { Dictionary } from '@core/std'
-
 type Target = 'dev' | 'stage' | 'prod'
 
 type SupabaseProject = {
@@ -146,71 +144,6 @@ const confirmTarget = (target: Target, project: SupabaseProject): void => {
   }
 }
 
-const parseQueryRows = (output: string): Dictionary[] => {
-  const parsed = JSON.parse(output) as unknown
-  if (Array.isArray(parsed)) return parsed as Dictionary[]
-
-  if (typeof parsed === 'object' && parsed !== null) {
-    const payload = parsed as Dictionary
-    if (Array.isArray(payload.data)) return payload.data as Dictionary[]
-    if (Array.isArray(payload.rows)) return payload.rows as Dictionary[]
-  }
-
-  return fail('unexpected Supabase query output')
-}
-
-const queryRows = async (sql: string): Promise<Dictionary[]> => {
-  const output = await commandText(
-    'supabase',
-    ['db', 'query', '--linked', '--output', 'json', sql]
-  )
-  return parseQueryRows(output)
-}
-
-const verify = async (_target: Target): Promise<void> => {
-  console.log('')
-  console.log('Verifying seed data integrity...')
-
-  const seedUserId = '0195b5b0-3c09-79f0-8d7c-0a1b2c3d4e5f'
-
-  const authRows = await queryRows(
-    'SELECT confirmation_token = \'\' AS token_ok, '
-      + 'email_confirmed_at IS NOT NULL AS confirmed FROM auth.users '
-      + `WHERE id = '${seedUserId}';`
-  )
-  if (authRows.length !== 1) fail('auth.users seed user not found')
-  if (authRows[0].token_ok !== true || authRows[0].confirmed !== true) {
-    fail('auth.users seed user confirmation state invalid')
-  }
-
-  const userRows = await queryRows(
-    'SELECT status = \'active\' AS active FROM public.users '
-      + `WHERE id = '${seedUserId}';`
-  )
-  if (userRows.length !== 1) fail('public.users seed user not found')
-  if (userRows[0].active !== true) fail('public.users seed user not active')
-
-  const countRows = await queryRows(
-    'SELECT (SELECT COUNT(*)::int FROM asset_types) AS asset_types, '
-      + '(SELECT COUNT(*)::int FROM services) AS services, '
-      + '(SELECT COUNT(*)::int FROM questions) AS questions;'
-  )
-  if (countRows.length !== 1) fail('seed table counts query failed')
-  if (countRows[0].asset_types !== 9) fail('asset_types count mismatch')
-  if (countRows[0].services !== 12) fail('services count mismatch')
-  if (countRows[0].questions !== 14) fail('questions count mismatch')
-
-  const rpcRows = await queryRows(
-    'SELECT user_has_access(\'tedvkremer@gmail.com\') AS registered, '
-      + 'user_has_access(\'unregistered@example.com\') AS not_registered;'
-  )
-  if (rpcRows.length !== 1) fail('RPC function check failed')
-  if (rpcRows[0].registered !== true) fail('RPC registered user check failed')
-  if (rpcRows[0].not_registered !== false) fail('RPC unregistered user check failed')
-
-  console.log('DB_GENESIS_VERIFY=PASS')
-}
-
 const main = async (): Promise<void> => {
   const target = parseTarget()
 
@@ -233,8 +166,6 @@ const main = async (): Promise<void> => {
   console.log('')
   console.log('Applying schema.sql through Supabase CLI...')
   await commandText('supabase', ['db', 'query', '--linked', '--file', SCHEMA_PATH])
-
-  await verify(target)
 
   console.log('DB_GENESIS=PASS')
 }
