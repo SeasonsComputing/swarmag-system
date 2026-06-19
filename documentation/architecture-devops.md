@@ -551,11 +551,9 @@ deno task db-genesis-verify --target {dev|stage|prod}
 deno task db-reset --target {dev|stage|prod}
 ```
 
-The task applies the full contents of `source/domain/schema/schema.sql` to the selected Supabase target. It does not run migrations.
-The verification task checks the seeded auth user, public user row, seed table
-counts, and `user_has_access` RPC behavior without modifying schema or data.
-The reset task runs genesis first, then runs genesis verification for the same
-target.
+`db-genesis` applies the full contents of `source/domain/schema/schema.sql` to the selected Supabase target. It does not run migrations.
+`db-genesis-verify` checks the seeded auth user, public user row, seed table counts, and `user_has_access` RPC behavior without modifying schema or data.
+`db-reset` runs genesis first, then runs genesis verification for the same target.
 
 The selected target must exist and must print the resolved target identity before applying SQL. The operator must confirm the target before the schema is applied.
 
@@ -630,5 +628,41 @@ The Supabase Go auth server scans several `auth.users` string columns as non-nul
 | `email_change`           | Scanned as string on every user lookup                               |
 | `email_change_token_new` | Scanned as string on every user lookup                               |
 | `email_confirmed_at`     | Required non-null timestamp for the user to be treated as confirmed. |
+
+## 13. Supabase Auth Configuration
+
+### 13.1 Ownership
+
+All Supabase auth configuration is owned by this repository. The Supabase dashboard is not an authoritative source for auth settings. Changes made in the dashboard are not tracked and will be lost on the next `supabase db push` or environment reset.
+
+### 13.2 Email Templates
+
+Email templates live under `supabase/templates/` and are referenced from `supabase/config.toml`. They are applied to a Supabase project via `supabase db push` or the Supabase CLI link/push workflow.
+
+| Template file                        | Config key                          | Trigger                          |
+| ------------------------------------ | ----------------------------------- | -------------------------------- |
+| `supabase/templates/magic-link.html` | `[auth.email.template.magic_link]`  | `signInWithOtp({ email })` call  |
+
+### 13.3 OTP Flow
+
+The system uses passwordless email OTP. `signInWithOtp({ email })` triggers the `magic_link` template. The template surfaces `{{ .Token }}` — the 6-digit code — which the user enters in the login screen. The `{{ .ConfirmationURL }}` magic link is intentionally omitted from the template; the code-entry flow is the only supported path.
+
+OTP expiry is configured in `config.toml` under `[auth.email]`:
+
+```toml
+otp_length = 6
+otp_expiry = 3600
+```
+
+### 13.4 Applying Auth Configuration
+
+To apply auth configuration changes to a hosted Supabase project:
+
+```bash
+supabase link --project-ref <project-ref>
+supabase db push
+```
+
+This applies `config.toml` settings — including email templates — to the linked project. Run for each environment (dev, stage, prod) against its respective project ref.
 
 _End of Architecture DevOps Document_
