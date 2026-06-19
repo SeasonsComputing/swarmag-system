@@ -102,50 +102,33 @@
   --sa-transition-slow: all 0.6s ease-out;
   --sa-transition-spring: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --sa-transition-page: opacity var(--sa-motion-page-fade) ease-in;
+
+  /* ─────────────────────────────────────────────────────────────────────── */
+  /* LAYOUT RHYTHM TOKENS                                                    */
+  /* ─────────────────────────────────────────────────────────────────────── */
+
+  --sa-gutter: clamp(
+    var(--sa-space-md),
+    calc(-0.156rem + 4.934vw),
+    var(--sa-space-3xl)
+  );
+  --sa-pad: clamp(
+    calc(var(--sa-space-sm) + var(--sa-space-xs)),
+    calc(-0.156rem + 4.934vw),
+    calc(var(--sa-space-md) + var(--sa-space-xs))
+  );
+  --sa-gap: clamp(
+    calc(var(--sa-space-sm) + var(--sa-space-xs)),
+    calc(-0.156rem + 4.934vw),
+    var(--sa-space-md)
+  );
 }
 
-/* ───────────────────────────────────────────────────────────────────────── */
-/* LAYOUT RHYTHM TOKENS                                                      */
-/* ───────────────────────────────────────────────────────────────────────── */
-
-:root {
-  --sa-gutter: var(--sa-space-4xl);
-  --sa-pad: calc(var(--sa-space-md) + var(--sa-space-xs));
-  --sa-gap: var(--sa-space-md);
-}
-
-@media (max-width: 1440px) {
-  :root {
-    --sa-gutter: var(--sa-space-3xl);
-  }
-}
-
-@media (max-width: 1024px) {
-  :root {
-    --sa-gutter: var(--sa-space-2xl);
-  }
-}
-
-@media (max-width: 768px) {
-  :root {
-    --sa-gutter: var(--sa-space-xl);
-    --sa-pad: var(--sa-space-md);
-    --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
-  }
-}
-
-@media (max-width: 425px) {
-  :root {
-    --sa-gutter: var(--sa-space-lg);
-    --sa-pad: calc(var(--sa-space-sm) + var(--sa-space-xx));
-    --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
-  }
-}
-
-@media (max-width: 380px) {
+/* Minimum width breakpoint for devices */
+@media (max-width: 350px) {
   :root {
     --sa-base-size: var(--sa-font-size-sm);
-    --sa-gutter: calc(var(--sa-space-lg) - var(--sa-space-xs));
+    --sa-gutter: var(--sa-space-sm);
     --sa-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
     --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
