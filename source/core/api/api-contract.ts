@@ -34,8 +34,8 @@ ApiCrudContract - Generic CRUD/list client contract.
 ├ delete(id)          Delete one resource and return DeleteResult.
 └ list?(options?)     List resources with pagination.
 
-ApiBusRuleContract - Generic business-rule execution contract.
-└ run(params)  Execute business rule with dictionary params.
+ApiBusRuleContract<TParams, TResult> - Generic business-rule execution contract.
+└ run(params)  Execute business rule and return typed result.
 
 DeleteResult - Uniform soft-delete response payload.
 ├ id         Deleted resource id.
@@ -64,7 +64,7 @@ import type {
 } from '@core/std'
 
 // ────────────────────────────────────────────────────────────────────────────
-// Error Handling
+// ERROR HANDLING
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Error thrown when an API call fails. */
@@ -129,7 +129,7 @@ export function apiError(error: unknown): boolean {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// CRUD & Business Rule API Contracts
+// CRUD & BUSINESS RULE API CONTRACTS
 // ────────────────────────────────────────────────────────────────────────────
 
 /** CRUD API contract */
@@ -141,9 +141,12 @@ export interface ApiCrudContract<T extends Instantiable> {
   list(options?: ListOptions): Promise<ListResult<T>>
 }
 
-/** Business rule API contract */
-export interface ApiBusRuleContract {
-  run(params: Dictionary): Promise<Dictionary>
+/** Business rule API contract. Type parameters default to Dictionary for backward compatibility. */
+export interface ApiBusRuleContract<
+  TParams extends Dictionary = Dictionary,
+  TResult = Dictionary
+> {
+  run(params: TParams): Promise<TResult>
 }
 
 /** Deletion result with timestamp. */
@@ -153,7 +156,7 @@ export type DeleteResult = {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// List API contracts
+// LIST API CONTRACTS
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Default pagination limit when not specified. */
