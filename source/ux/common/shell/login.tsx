@@ -7,7 +7,7 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Two-step login form:
-  Step 1 collects email and sends an OTP via api.Auth.
+  Step 1 collects email, validates user access and sends an OTP.
   Step 2 collects the code and verifies it.
 
 Auth state flows through onAuthStateChange in the app shell —
@@ -63,6 +63,11 @@ const LoginClient = (props: LoginClientProps) => {
     setPending(true)
     setError(null)
     try {
+      const hasAccess = await api.userHasAccess.run({ email: email() })
+      if (!hasAccess) {
+        setError('Email address not registered.')
+        return
+      }
       await api.Auth.sendOtp(email())
       setStep('code')
     } catch (_e) {

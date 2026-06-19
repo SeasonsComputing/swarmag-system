@@ -138,9 +138,13 @@ async function applySession(session: Session | null): Promise<void> {
   api.SessionState.setAuth(session.userId)
   if (api.SessionState.store.user) return // user already loaded
 
-  // authenticated, load user and preserve in session store,
+  // authenticated, now load user, validate and preserve in session store,
   // then transition session to ready state.
   const user = await api.Users.get(session.userId)
+  if (user.status !== 'active') {
+    await api.Auth.logout()
+    return
+  }
   api.SessionState.setUser(user)
   api.SessionState.setReady()
 }
