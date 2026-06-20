@@ -102,7 +102,7 @@ Do not request approval to continue when a production fails checks that can be f
 
 ## 4. Subagent Delegation
 
-For every task AI should decompose and delegate to a free-of-cost subagent whenever possible.
+For every task AI should decompose and delegate to a free-of-cost subagent where appropriate. Agent is authorized to delegate to a free subagent.
 
 When the reasoning agent delegates to a free subagent, it should seek parallelism by employing multiple subagents simultaneously if appropriate.
 
