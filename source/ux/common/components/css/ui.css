@@ -890,7 +890,7 @@
   border-radius: var(--sa-radius-sm);
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
-  font-weight: var(--sa-ui-font-weight);
+  font-weight: var(--sa-font-weight-normal);
   padding: var(--sa-space-sm);
 }
 
