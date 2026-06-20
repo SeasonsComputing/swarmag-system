@@ -21,7 +21,7 @@ Login Passwordless OTP login component.
 import { createEffect, createSignal, For, Show } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
-import { UiAlert, UiButton, UiField, UiFormActions, UiInput, UiLayout } from '@ux/common/components/ui'
+import { UiAlert, UiButton, UiField, UiInput, UiLayout } from '@ux/common/components/ui'
 import { getShellMetadata, type ShellMetadata } from './shell-metadata.ts'
 
 import './login.css'
@@ -151,7 +151,7 @@ const LoginClient = (props: LoginClientProps) => {
                     required
                   />
                 </UiField>
-                <UiFormActions>
+                <UiLayout variant='inline-fill'>
                   <UiButton type='button' variant='ghost' onClick={() => setStep('email')}>
                     Back
                   </UiButton>
@@ -163,15 +163,17 @@ const LoginClient = (props: LoginClientProps) => {
                   >
                     Sign In
                   </UiButton>
-                </UiFormActions>
+                </UiLayout>
               </UiLayout>
             </Show>
-
-            {/* Display alert message if error */}
-            <Show when={!!error()}>
-              <UiAlert variant='danger'>{error()}</UiAlert>
-            </Show>
           </div>
+
+          {/* Display alert message if error */}
+          <Show when={!!error()}>
+            <div data-ui='login-error'>
+              <UiAlert variant='danger'>{error()}</UiAlert>
+            </div>
+          </Show>
         </UiLayout>
 
         {/* Shell configuration metadata */}
