@@ -845,7 +845,7 @@
 [data-ui='badge'] {
   background: var(--sa-state-default-bg);
   border: var(--sa-state-default-border);
-  color: var(--sa-state-default);
+  color: var(--sa-state-default-text);
   align-items: center;
   border-radius: var(--sa-radius-full);
   display: inline-flex;
@@ -855,26 +855,27 @@
   gap: var(--sa-space-xs);
   padding-block: var(--sa-space-xs);
   padding-inline: var(--sa-space-md);
+  white-space: nowrap;
 }
 
 [data-ui='badge'][data-ui-variant='success'] {
   background: var(--sa-state-success-bg);
-  color: var(--sa-state-success);
+  color: var(--sa-state-success-text);
 }
 
 [data-ui='badge'][data-ui-variant='warning'] {
   background: var(--sa-state-warning-bg);
-  color: var(--sa-state-warning);
+  color: var(--sa-state-warning-text);
 }
 
 [data-ui='badge'][data-ui-variant='danger'] {
   background: var(--sa-state-danger-bg);
-  color: var(--sa-state-danger);
+  color: var(--sa-state-danger-text);
 }
 
 [data-ui='badge'][data-ui-variant='info'] {
   background: var(--sa-state-info-bg);
-  color: var(--sa-state-info);
+  color: var(--sa-state-info-text);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -885,7 +886,7 @@
   background: var(--sa-state-default-bg);
   border: var(--sa-state-default-border);
   border-inline-start: var(--sa-alert-border-width) solid var(--sa-state-default-border);
-  color: var(--sa-state-default);
+  color: var(--sa-state-default-text);
   border-radius: var(--sa-radius-sm);
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
@@ -896,25 +897,25 @@
 [data-ui='alert'][data-ui-variant='success'] {
   background: var(--sa-state-success-bg);
   border-inline-start-color: var(--sa-state-success-border);
-  color: var(--sa-state-success);
+  color: var(--sa-state-success-text);
 }
 
 [data-ui='alert'][data-ui-variant='warning'] {
   background: var(--sa-state-warning-bg);
   border-inline-start-color: var(--sa-state-warning-border);
-  color: var(--sa-state-warning);
+  color: var(--sa-state-warning-text);
 }
 
 [data-ui='alert'][data-ui-variant='danger'] {
   background: var(--sa-state-danger-bg);
   border-inline-start-color: var(--sa-state-danger-border);
-  color: var(--sa-state-danger);
+  color: var(--sa-state-danger-text);
 }
 
 [data-ui='alert'][data-ui-variant='info'] {
   background: var(--sa-state-info-bg);
   border-inline-start-color: var(--sa-state-info-border);
-  color: var(--sa-state-info);
+  color: var(--sa-state-info-text);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
