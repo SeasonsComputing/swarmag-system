@@ -4,25 +4,25 @@
 
 ## 1. Overview
 
-This document defines the foundational abstractions, contracts, and APIs of the `swarmAg System`. The domain model captures the solution space expressed as types, attributes, enums, unions and relations declaratively using TypeScript.
+This document defines the foundational abstractions, contracts, and APIs of the swarmAg Operations System (`swarmAg System`). The domain model captures the solution space expressed as types, attributes, enums, unions and relations declaratively using TypeScript.
 
 ## 2. Solution Space
 
 ### 2.1 Service
 
-A Service is a listed product representing work we sell, identified by an SKU. Services belong to a category (for example, aerial or ground), have a description, and define the kinds of assets required to execute the work (equipment, tools, supplies).
+A Service is a listed product representing work swarmAg sells, identified by an SKU. Services belong to a category (for example, aerial or ground), have a description, and define the kinds of assets required to execute the work (equipment, tools, supplies).
 
 Many services require the use of regulated chemicals. The acquisition, storage, mixing, and application of chemicals must be managed to maintain licensing and regulatory compliance.
 
-A Service Category represents a class of service we offer (e.g., aerial-drone-service, ground-machinery-service). Each Service Category has one or more Workflows suitable for performing services within that category.
+A Service Category represents a class of service swarmAg offers (e.g., aerial-drone-service, ground-machinery-service). Each Service Category has Workflows suitable for performing services within that category.
 
 ### 2.2 Workflow, Tasks & Questions
 
 A Workflow describes how work is generally performed. Examples of workflows include "Drone Chemical Preparation", "Mesquite Chemical Preparation", "Mesquite Mitigation Procedure", and "Drone Obstacle Preflight".
 
-A Workflow is structured as an ordered sequence of Tasks. Tasks are Instantiable life-cycled and reusable across Workflows. For example, a "Prepare Chemicals" task appears in both aerial and ground chemical workflows. The sequence of Tasks within a Workflow is defined by the WorkflowTask junction, which carries the ordering.
+A Workflow is structured as an ordered sequence of Tasks. Tasks are Instantiable life-cycled and reusable across Workflows. For example, a "Prepare Chemicals" task appears in both aerial and ground chemical workflows. 
 
-Each Task is a named grouping of an ordered sequence of Questions. Questions are Instantiable life-cycled and reusable across Tasks. The sequence of Questions within a Task is defined by the TaskQuestion junction, which carries the ordering.
+Each Task is a named, ordered, sequence of Questions. Questions are Instantiable life-cycled and reusable across Tasks. 
 
 Questions are expressed using a small set of fundamental response formats: text, number, yes/no, single-select, multi-select. A special `internal` question type is reserved for system-generated log entries such as telemetry, GPS coordinates, and operational metadata. Internal questions exist as seed records in the question library and are referenced directly by log entries — no wrapper workflow is required.
 
@@ -36,9 +36,9 @@ A Job represents a work agreement with a customer and serves as the hub of the m
 
 ### 2.4 Job Assessment, Job Plan, & Job Work Log
 
-A Job Assessment evaluates the work to be completed on behalf of a customer. Assessments define the locations involved and gather the information required to determine scope, feasibility, and approach. Job Assessments scope the Job using Workflow definitions that direct the Job. A Job Assessment must exist before a Job Plan may be created.
+A Job Assessment evaluates the work to be completed on behalf of a customer. Assessments define the locations involved and gather the information required to determine scope, feasibility, approach, cost and price. Job Assessments scope the Job using Workflow definitions that direct the Job. A Job Assessment must exist before a Job Plan may be created.
 
-We use multispectral mapping drones for both aerial and ground services. A Job Assessment may include one or more annotations, Notes, which in turn may include attachments which may include maps or images.
+Multispectral mapping drones, employed during Onsite Assessment, increase precison of Job parameters during assessment and planning. A Job Assessment contains one or more annotations, Notes, which in turn may include Attachments which may include maps or images.
 
 A Job Plan defines how a specific Job will be executed. Plans are created after assessment and translate intent into concrete, job-specific instruction. Job Plans are the primary means by which field crews are informed of the work to be performed and are prepared prior to execution to support guided field operation.
 
@@ -57,7 +57,7 @@ To facilitate the role a Workflow plays in orchestrating a Job, two abstractions
 
 Job Workflows are prepared prior to Job Work. The Job Assessment phase includes selecting the Workflows to be used on a Job. As each job is different, the Job Assessment may edit the workflows to capture the specialization. Creating, editing, and deleting Workflows are an administration authorization and so are read-only for Job Assessment and Job Plan. A Job Workflow is therefore associated with a basis Workflow (read-only reference) and an optional modified Workflow — which is always a clone of the basis Workflow, including its WorkflowTask and TaskQuestion junction records. The Job Plan phase may add additional basis Workflows and optionally modify them. The Job Plan may also further modify Job Workflows that were already modified during assessment; in that case the assessment-modified Workflow becomes the basis for the Job Plan's modification.
 
-Starting Job Work involves transitioning the Job's status to `executing`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks and their questions, logging the Answers as Job Work Log entries.
+Starting Job Work involves transitioning the Job's status to `executing`. At that point the set of Workflows to be executed is finalized: Job Work holds an ordered collection of resolved Workflow IDs — the basis Workflow where no modification exists, or the modified Workflow where one does. This is the execution manifest. Job Work is then the process of executing these Workflows in sequence. A specialized UX within the operations application walks a crew member through the workflow tasks and their questions, preserving the Answers as Job Work Log entries.
 
 Job Workflows are assigned to crew staff during the planning phase.
 
@@ -138,30 +138,40 @@ These abstractions describe **domain meaning**, not persistence, API shape, or u
 
 ### 3.6 Common abstractions shared within the model
 
-The following abstractions are shared across multiple domain concepts and represent pure value objects or embedded subordinate compositions. They do not have independent life-cycles.
+The following abstractions are shared across multiple domain topics.
 
-| Abstraction  | Module      | Description                                                                                                           |
-| ------------ | ----------- | --------------------------------------------------------------------------------------------------------------------- |
-| `Location`   | `common.ts` | Geographic coordinates with optional address information                                                              |
-| `Note`       | `common.ts` | Freeform text with author and timestamp                                                                               |
-| `Attachment` | `common.ts` | Metadata describing an uploaded file or artifact                                                                      |
-| `Question`   | `common.ts` | Reusable prompt; Instantiable life-cycled; discriminated union of InternalQuestion, ScalarQuestion and SelectQuestion |
-| `Answer`     | `common.ts` | Response to a question, with supporting notes                                                                         |
+| Abstraction  | Description                                              |
+| ------------ | -------------------------------------------------------- |
+| `Location`   | Geographic coordinates with optional address information |
+| `Note`       | Freeform text with author and timestamp                  |
+| `Attachment` | Metadata describing an uploaded file or artifact         |
+| `Answer`     | Response to a question, with supporting notes            |
 
-These abstractions are **composed into** higher-level domain objects, do not join with Instantiable and are not referenced independently.
+These abstractions are **composed into** higher-level domain objects
+
+- Do not join with Instantiable
+
+- Are not referenced independently
+
+- Represented as pure value objects or embedded subordinate-compositions
+
+- Do not have independent life-cycles
 
 ### 3.7 Supporting domain relationships and junctions
 
 In addition to the core abstractions, the domain includes supporting structures that express relationships between concepts without embedding or ownership.
 
-| Area          | Structures / Notes                                                                |
-| ------------- | --------------------------------------------------------------------------------- |
-| Services      | Asset requirements expressed as m:m associations between services and asset types |
-| Workflows     | Versioned workflows with sequenced task associations via WorkflowTask junction    |
-| Tasks         | Reusable tasks with sequenced question associations via TaskQuestion junction     |
-| Job Workflows | Basis and modified workflow references per job; order defined by `JobWork.work`   |
-| Planning      | Associations between plans and assigned users, assets, and chemicals              |
-| Customers     | Embedded subordinate data such as sites and contacts                              |
+
+
+| Topic         | Structures / Notes                                                                                                    |
+| ------------- | --------------------------------------------------------------------------------------------------------------------- |
+| Services      | Asset requirements expressed as m:m associations between services and asset types                                     |
+| Workflows     | Versioned workflows with sequenced task associations via WorkflowTask junction                                        |
+| Tasks         | Reusable tasks with sequenced question associations via TaskQuestion junction                                         |
+| Question      | Reusable prompt; Instantiable life-cycled; discriminated union of InternalQuestion, ScalarQuestion and SelectQuestion |
+| Job Workflows | Basis and modified workflow references per job; order defined by `JobWork.work`                                       |
+| Planning      | Associations between plans and assigned users, assets, and chemicals                                                  |
+| Customers     | Embedded subordinate data such as sites and contacts                                                                  |
 
 These structures exist to model **relationships**, not to redefine the core abstractions themselves.
 
