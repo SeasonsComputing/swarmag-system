@@ -170,9 +170,7 @@ const LoginClient = (props: LoginClientProps) => {
 
           {/* Display alert message if error */}
           <Show when={!!error()}>
-            <div data-ui='login-error'>
-              <UiAlert variant='danger'>{error()}</UiAlert>
-            </div>
+            <UiAlert variant='danger'>{error()}</UiAlert>
           </Show>
         </UiLayout>
 
