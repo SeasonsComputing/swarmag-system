@@ -234,18 +234,6 @@ The constitution is designed to make most efficient and cost-effective use of AI
 
 The human participates as the Chief Architect with AI Architect and AI Coding Engine roles provided by AI reasoning and AI coding platforms respectively.
 
-### 5.1 Session Context
-
 Sessions are governed by `AGENTS.md` which is bound by `CONSTITUTION.md`.
 
-| Context              | Prompt                                                                            |
-| -------------------- | --------------------------------------------------------------------------------- |
-| Product foundation   | Ingest AGENTS.md. You are {role}. We're working on Product Foundation. {agenda}   |
-| UX internals         | Ingest AGENTS.md. You are {role}. We're working on UX internals. {agenda}         |
-| Application features | Ingest AGENTS.md. You are {role}. We're working on Application features. {agenda} |
-| DevOps operations    | Ingest AGENTS.md. You are {role}. We're working on DevOps operations. {agenda}    |
-
-Where:
-
-- `{role}`: `AI Architect` | `AI Coding Engine`
-- `{agenda}`: tasks to be completed
+_End of README Document_
