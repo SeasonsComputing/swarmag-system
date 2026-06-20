@@ -234,7 +234,7 @@ label {
 }
 
 strong {
-  font-weight: var(--sa-font-weight-medium);
+  font-weight: var(--sa-font-weight-semibold);
 }
 
 figure {
