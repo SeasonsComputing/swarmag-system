@@ -66,6 +66,9 @@
 
   /* Avatar */
   --sa-avatar-font-weight: var(--sa-font-weight-medium);
+
+  /* Separator */
+  --sa-separator-height: 2px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

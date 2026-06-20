@@ -182,9 +182,6 @@
   );
   --sa-gradient-stripe: var(--sa-gradient-brand-90);
 
-  /* Separator */
-  --sa-separator-height: 1px;
-
   /* State */
   --sa-state-border-width: 1px;
   --sa-state-border-width-strong: 3px;
