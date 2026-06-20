@@ -21,12 +21,9 @@
     transform 0.08s ease-out,
     box-shadow 0.08s ease-out,
     background var(--sa-transition-fast);
-  --sa-button-bg-danger: oklch(55% 0.18 29);
+  --sa-button-bg-danger: oklch(var(--sa-lch-danger) / 0.8);
   --sa-button-bg-danger-hover: oklch(var(--sa-lch-danger));
   --sa-button-color-danger: var(--sa-text-on-brand);
-
-  /* Input */
-  --sa-input-bg-hover: var(--sa-bg-hover);
 
   /* Toggle */
   --sa-toggle-bg: var(--sa-bg-control);
@@ -47,13 +44,14 @@
   --sa-card-widget-pad: var(--sa-pad);
   --sa-card-workflow-pad: var(--sa-pad);
 
-  /* Table */
-  --sa-table-bg-row-hover: var(--sa-bg-hover);
-  --sa-table-border: var(--sa-border-table);
-
   /* Fieldset */
   --sa-fieldset-bg: transparent;
   --sa-fieldset-border: var(--sa-border-card);
+  --sa-fieldset-shadow: var(--sa-shadow-sm);
+
+  /* Table */
+  --sa-table-bg-row-hover: var(--sa-bg-hover);
+  --sa-table-border: var(--sa-border-table);
 
   /* Progress */
   --sa-progress-height: 1rem;
@@ -68,12 +66,6 @@
 
   /* Avatar */
   --sa-avatar-font-weight: var(--sa-font-weight-medium);
-
-  /* Alert */
-  --sa-alert-border-width: 2px;
-
-  /* Separator */
-  --sa-separator-height: 1px;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -210,6 +202,7 @@
 
   /* Input */
   --sa-input-bg: var(--sa-bg-control);
+  --sa-input-bg-hover: var(--sa-bg-hover);
   --sa-input-bg-focus: var(--sa-bg-hover);
   --sa-input-bg-disabled: oklch(18% 0.01 264.5);
 
@@ -258,9 +251,6 @@
   --sa-table-color-section: oklch(var(--sa-lch-neutral-2));
   --sa-table-bg-row-even: oklch(var(--sa-lch-surface-1));
   --sa-table-bg-row-odd: oklch(var(--sa-lch-surface-2) / 0.6);
-
-  /** Fieldset */
-  --sa-fieldset-shadow: var(--sa-shadow-sm);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
@@ -401,6 +391,7 @@
 
   /* Input */
   --sa-input-bg: oklch(98.6% 0.018 112);
+  --sa-input-bg-hover: var(--sa-bg-hover);
   --sa-input-bg-focus: oklch(91.5% 0.042 170);
   --sa-input-bg-disabled: oklch(93.5% 0.01 108);
 

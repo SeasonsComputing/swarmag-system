@@ -22,7 +22,7 @@
   background: transparent;
   border: var(--sa-border-brand);
   border-radius: var(--sa-radius-xl);
-  color: var(--sa-color-primary);
+  color: var(--sa-text-primary);
   cursor: pointer;
   display: inline-flex;
   font-family: var(--sa-button-font-family);
@@ -844,37 +844,41 @@
 
 [data-ui='badge'] {
   background: var(--sa-state-default-bg);
-  border: var(--sa-state-default-border);
+  border: var(--sa-state-default-border) solid var(--sa-state-border-width);
   color: var(--sa-state-default-text);
   align-items: center;
   border-radius: var(--sa-radius-full);
   display: inline-flex;
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
-  font-weight: var(--sa-ui-font-weight-strong);
+  font-weight: var(--sa-ui-font-weight);
   gap: var(--sa-space-xs);
   padding-block: var(--sa-space-xs);
-  padding-inline: var(--sa-space-md);
+  padding-inline: var(--sa-space-sm);
   white-space: nowrap;
 }
 
 [data-ui='badge'][data-ui-variant='success'] {
   background: var(--sa-state-success-bg);
+  border-color: var(--sa-state-success-border);
   color: var(--sa-state-success-text);
 }
 
 [data-ui='badge'][data-ui-variant='warning'] {
   background: var(--sa-state-warning-bg);
+  border-color: var(--sa-state-warning-border);
   color: var(--sa-state-warning-text);
 }
 
 [data-ui='badge'][data-ui-variant='danger'] {
   background: var(--sa-state-danger-bg);
+  border-color: var(--sa-state-danger-border);
   color: var(--sa-state-danger-text);
 }
 
 [data-ui='badge'][data-ui-variant='info'] {
   background: var(--sa-state-info-bg);
+  border-color: var(--sa-state-info-border);
   color: var(--sa-state-info-text);
 }
 
@@ -884,8 +888,7 @@
 
 [data-ui='alert'] {
   background: var(--sa-state-default-bg);
-  border: var(--sa-state-default-border);
-  border-inline-start: var(--sa-alert-border-width) solid var(--sa-state-default-border);
+  border-inline: var(--sa-state-border-width-strong) solid var(--sa-state-default-border);
   color: var(--sa-state-default-text);
   border-radius: var(--sa-radius-sm);
   font-family: var(--sa-ui-font-family);
@@ -896,25 +899,25 @@
 
 [data-ui='alert'][data-ui-variant='success'] {
   background: var(--sa-state-success-bg);
-  border-inline-start-color: var(--sa-state-success-border);
+  border-color: var(--sa-state-success-border);
   color: var(--sa-state-success-text);
 }
 
 [data-ui='alert'][data-ui-variant='warning'] {
   background: var(--sa-state-warning-bg);
-  border-inline-start-color: var(--sa-state-warning-border);
+  border-color: var(--sa-state-warning-border);
   color: var(--sa-state-warning-text);
 }
 
 [data-ui='alert'][data-ui-variant='danger'] {
   background: var(--sa-state-danger-bg);
-  border-inline-start-color: var(--sa-state-danger-border);
+  border-color: var(--sa-state-danger-border);
   color: var(--sa-state-danger-text);
 }
 
 [data-ui='alert'][data-ui-variant='info'] {
   background: var(--sa-state-info-bg);
-  border-inline-start-color: var(--sa-state-info-border);
+  border-color: var(--sa-state-info-border);
   color: var(--sa-state-info-text);
 }
 
