@@ -20,9 +20,9 @@ A Service Category represents a class of service swarmAg offers (e.g., aerial-dr
 
 A Workflow describes how work is generally performed. Examples of workflows include "Drone Chemical Preparation", "Mesquite Chemical Preparation", "Mesquite Mitigation Procedure", and "Drone Obstacle Preflight".
 
-A Workflow is structured as an ordered sequence of Tasks. Tasks are Instantiable life-cycled and reusable across Workflows. For example, a "Prepare Chemicals" task appears in both aerial and ground chemical workflows. 
+A Workflow is structured as an ordered sequence of Tasks. Tasks are Instantiable life-cycled and reusable across Workflows. For example, a "Prepare Chemicals" task appears in both aerial and ground chemical workflows.
 
-Each Task is a named, ordered, sequence of Questions. Questions are Instantiable life-cycled and reusable across Tasks. 
+Each Task is a named, ordered, sequence of Questions. Questions are Instantiable life-cycled and reusable across Tasks.
 
 Questions are expressed using a small set of fundamental response formats: text, number, yes/no, single-select, multi-select. A special `internal` question type is reserved for system-generated log entries such as telemetry, GPS coordinates, and operational metadata. Internal questions exist as seed records in the question library and are referenced directly by log entries — no wrapper workflow is required.
 
@@ -160,8 +160,6 @@ These abstractions are **composed into** higher-level domain objects
 ### 3.7 Supporting domain relationships and junctions
 
 In addition to the core abstractions, the domain includes supporting structures that express relationships between concepts without embedding or ownership.
-
-
 
 | Topic         | Structures / Notes                                                                                                    |
 | ------------- | --------------------------------------------------------------------------------------------------------------------- |
