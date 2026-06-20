@@ -398,7 +398,7 @@ operator must already be authenticated with the Netlify CLI.
 
 ### 8.4 UX Smoke Tests
 
-The UX smoke script is `source/devops/scripts/smoke-ux.ts`, exposed as:
+UX smoke tests apply to remotely deployed applications only (not `-local` local deployments). The UX smoke script is `source/devops/scripts/smoke-ux.ts`, exposed as:
 
 ```bash
 deno task ux-smoke --target {dev|stage|prod} {app}={url} ...
