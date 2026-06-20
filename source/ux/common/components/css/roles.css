@@ -35,6 +35,7 @@
   --sa-ui-font-size: var(--sa-font-size-sm);
   --sa-ui-font-size-compact: var(--sa-font-size-xs);
   --sa-ui-font-weight: var(--sa-font-weight-thin);
+  --sa-ui-font-weight-strong: var(--sa-font-weight-normal);
   --sa-ui-checkmark-weight: var(--sa-font-weight-extrabold);
   /* App/Annotation */
   --sa-annotation-font-family: var(--sa-font-app-annotation);
