@@ -120,6 +120,7 @@
     "app-customer-package-dev-verify": "bash source/devops/scripts/app-customer-package-verify.sh dev",
     "app-customer-package-stage-verify": "bash source/devops/scripts/app-customer-package-verify.sh stage",
     "app-customer-package-prod-verify": "bash source/devops/scripts/app-customer-package-verify.sh prod",
+    "app-deploy-auth-template": "bash source/devops/scripts/app-deploy-auth-template.sh",
 
     // ────────────────────────────────────────────────────────────────────────────
     // PLATFORM LISTINGS
