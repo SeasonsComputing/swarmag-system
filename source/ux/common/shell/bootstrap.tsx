@@ -72,6 +72,15 @@ const loginRoute = createRoute({
   component: () => <Login />
 })
 
+const logoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/logout',
+  component: () => {
+    void api.Auth.logout()
+    return <Navigate to='/' />
+  }
+})
+
 const dashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/dashboard',
@@ -84,7 +93,12 @@ const dashboardRoute = createRoute({
   )
 })
 
-const routeTree = rootRoute.addChildren([indexRoute, loginRoute, dashboardRoute])
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  loginRoute,
+  logoutRoute,
+  dashboardRoute
+])
 const router = createRouter({ routeTree })
 
 // ────────────────────────────────────────────────────────────────────────────
