@@ -4,7 +4,7 @@
   border-block-end: var(--sa-shell-border);
   box-shadow: var(--sa-shell-shadow);
   margin: 0;
-  padding: var(--sa-pad) var(--sa-gutter);
+  padding: var(--sa-rhythm-pad) var(--sa-rhythm-gutter);
   position: sticky;
   top: 0;
   z-index: var(--sa-z-docked);
@@ -15,7 +15,7 @@
   align-items: center;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sa-gap);
+  gap: var(--sa-rhythm-gap);
   margin-inline: auto;
 }
 
@@ -53,7 +53,7 @@
 }
 
 .sg-main {
-  padding: var(--sa-gutter) calc(var(--sa-gutter) * 2);
+  padding: var(--sa-rhythm-gutter) calc(var(--sa-rhythm-gutter) * 2);
 }
 
 .sg-section {

@@ -13,23 +13,17 @@ const BLOCK_COMMENT_START = /\/\*/
 const BLOCK_COMMENT_END = /\*\//
 
 const IMMUTABLE_TOKEN_NAMES = new Set([
-  '--sa-base-size',
-  '--sa-blur',
-  '--sa-filter-mono',
-  '--sa-gap',
-  '--sa-gutter',
-  '--sa-pad'
+  '--sa-base-size'
 ])
 
 const IMMUTABLE_TOKEN_PREFIXES = [
-  '--sa-font-app-',
-  '--sa-font-content-',
-  '--sa-font-info-',
+  '--sa-filter-',
   '--sa-font-size-',
   '--sa-font-weight-',
   '--sa-line-',
   '--sa-motion-',
   '--sa-radius-',
+  '--sa-rhythm-',
   '--sa-size-',
   '--sa-space-',
   '--sa-touch-',
