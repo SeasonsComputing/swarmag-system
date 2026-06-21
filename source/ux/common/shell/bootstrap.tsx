@@ -47,6 +47,7 @@ import { AuthGuard } from './auth-guard.tsx'
 import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
+import { Logout } from './logout.tsx'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 3. INSTALL LOOK & FEEL
@@ -75,10 +76,7 @@ const loginRoute = createRoute({
 const logoutRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/logout',
-  component: () => {
-    void api.Auth.logout()
-    return <Navigate to='/' />
-  }
+  component: () => <Logout />
 })
 
 const dashboardRoute = createRoute({
