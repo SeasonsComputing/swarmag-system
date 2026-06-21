@@ -64,19 +64,23 @@ CSS files live in `source/ux/common/components/css/`. A shared CSS barrel,
 
 - `tokens.css` declarations are immutable foundation tokens. They are stable values and may not
   be redeclared by roles, themes, components, shell CSS, or app CSS.
+
 - `roles.css` defines the required role-token contract for applications conforming to the
   design language. Role tokens have defaults so a conforming application has a complete style
   vocabulary before a named theme specializes it.
+
 - `themes.css` provides named theme overrides for role tokens and owns component-specified
   tokens consumed by `ui.css`.
+
 - `base.css`, `ui.css`, feature CSS consume tokens; they do not introduce foundation,
   role, or theme token systems.
+
 - `ui.css` must not reference `--sa-lch-*` tokens directly. Component selectors consume role or
   component-specified tokens.
 
-## 3. Token Catalog
+## 3. Tokens
 
-### 3.1 Token Design
+### 3.1 Name Structure
 
 All design-language custom properties use the `--sa-` prefix. Token names describe ownership
 and design purpose; they do not encode implementation selectors or application-specific
@@ -84,11 +88,10 @@ context.
 
 | Token class                | Naming convention                                         | Owner        | Notes                                                                     |
 | -------------------------- | --------------------------------------------------------- | ------------ | ------------------------------------------------------------------------- |
-| Foundation tokens          | `--sa-{primitive-family}-{attribute}-{specialization}`    | `tokens.css` | Immutable primitive values such as font, spacing, radius, motion          |
-| Layout rhythm tokens       | `--sa-gutter`,<br/> `--sa-pad`,<br/> `--sa-gap`           | `tokens.css` | Responsive aliases over the immutable spacing scale                       |
-| Role tokens                | `--sa-{role-family}-{attribute}-{specialization}`         | `roles.css`  | Semantic visual roles such as background, text, border, state, shadow     |
+| Foundation tokens          | `--sa-{foundation}-{attribute}-{specialization}`          | `tokens.css` | Immutable primitive values such as font, spacing, radius, motion          |
+| Role tokens                | `--sa-{role}-{attribute}-{specialization}`                | `roles.css`  | Semantic visual roles such as background, text, border, state, shadow     |
 | LCH tuple tokens           | `--sa-lch-{name}`                                         | `roles.css`  | Bare `L C H` triplets used for `oklch()` composition                      |
-| Theme specializations      | Existing role-token names                                 | `themes.css` | Per-theme overrides of the role-token contract                            |
+| Theme specializations      | `--sa-{role}-{attribute}-{specialization}`                | `themes.css` | Per-theme overrides of the role-token contract                            |
 | Component-specified tokens | `--sa-{component}-{variant}-{attribute}-{specialization}` | `themes.css` | Component implementation tokens cataloged in `ux-components-internals.md` |
 
 Rules:
@@ -96,46 +99,59 @@ Rules:
 - Foundation token names are reserved to `tokens.css` and may not be redeclared downstream.
 - LCH tuple tokens store tuples only; role tokens realize tuples into usable color values including opacity.
 - Component-specified tokens are implementation contracts for `ui.css`; they are cataloged
-  in `ux-component-internals.md`.
+  in `ux-components-internals.md`.
 
 ### 3.2 Foundation Tokens
 
 Foundation tokens live in `tokens.css`. Foundation tokens are immutable and shall not be overridden.
 
-| Family        | Tokens                                                       | Intent                             |
-| ------------- | ------------------------------------------------------------ | ---------------------------------- |
-| Font family   | `--sa-font-content-*`, `--sa-font-app-*`, `--sa-font-info-*` | Self-hosted font stacks by role    |
-| Font weight   | `--sa-font-weight-*`                                         | Weight scale                       |
-| Font size     | `--sa-font-size-*`, `--sa-base-size`                         | Size scale and root size           |
-| Line height   | `--sa-line-leading-normal`                                   | Content line height                |
-| Radius        | `--sa-radius-*`                                              | Corner scale                       |
-| Spacing       | `--sa-space-*`                                               | 4px grid                           |
-| Layout rhythm | `--sa-gutter`, `--sa-pad`, `--sa-gap`                        | Responsive layout rhythm           |
-| Viewport      | `--sa-size-*`                                                | Viewport and wrap sizes            |
-| Touch target  | `--sa-touch-target`, `--sa-touch-target-sm`                  | Field-safe and compact target size |
-| Z-index       | `--sa-z-*`                                                   | Elevation ordering                 |
-| Effects       | `--sa-blur`, `--sa-filter-mono`                              | Filter values                      |
-| Motion        | `--sa-motion-*`, `--sa-transition-*`                         | Motion duration and transition     |
+Foundation tokens are organized into categories: Font weight, Font size, Line height, Radius, Spacing, Layout rhythm, Viewport, Touch target, Z-index, Effects, Motion.
+
+| Foundation           | Purpose                            | Tokens                                                                                                                                                            |
+| -------------------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--sa-font-weight-`  | Weight scale                       | `--sa-font-weight-thin`, `--sa-font-weight-normal`, `--sa-font-weight-medium`, `--sa-font-weight-semibold`, `--sa-font-weight-bold`, `--sa-font-weight-extrabold` |
+| `--sa-font-size-`    | Size scale                         | `--sa-font-size-xs`, `--sa-font-size-sm`, `--sa-font-size-base`, `--sa-font-size-md`, `--sa-font-size-lg`, `--sa-font-size-xl`                                    |
+| `--sa-line-leading-` | Content line height                | `--sa-line-leading-normal`                                                                                                                                        |
+| `--sa-radius-`       | Corner scale                       | `--sa-radius-sm`, `--sa-radius-md`, `--sa-radius-lg`, `--sa-radius-xl`, `--sa-radius-full`                                                                        |
+| `--sa-space-`        | 4px grid                           | `--sa-space-xs`, `--sa-space-xx`, `--sa-space-sm`, `--sa-space-md`, `--sa-space-lg`, `--sa-space-xl`, `--sa-space-2xl`, `--sa-space-3xl`, `--sa-space-4xl`        |
+| `--sa-rhythm-`       | Responsive layout rhythm           | `--sa-rhythm-gutter`, `--sa-rhythm-pad`, `--sa-rhythm-gap`                                                                                                        |
+| `--sa-size-`         | Viewport and wrap sizes            | `--sa-size-wrap`, `--sa-size-min`, `--sa-size-xs`, `--sa-size-sm`, `--sa-size-md`, `--sa-size-lg`                                                                 |
+| `--sa-touch-`        | Field-safe and compact target size | `--sa-touch-target`, `--sa-touch-target-sm`                                                                                                                       |
+| `--sa-z-`            | Elevation ordering                 | `--sa-z-below`, `--sa-z-base`, `--sa-z-raised`, `--sa-z-docked`, `--sa-z-popover`, `--sa-z-overlay`, `--sa-z-toast`                                               |
+| `--sa-filter-`       | Filter values                      | `--sa-filter-blur`, `--sa-filter-mono`                                                                                                                            |
+| `--sa-motion-`       | Motion duration                    | `--sa-motion-page-fade`, `--sa-motion-spinner`, `--sa-motion-skeleton`                                                                                            |
+| `--sa-transition-`   | Transition behavior                | `--sa-transition-fast`, `--sa-transition-base`, `--sa-transition-slow`, `--sa-transition-spring`, `--sa-transition-page`                                          |
+
+`--sa-base-size` is the root font size for the design system.
 
 ### 3.3 Role Tokens
 
-Role tokens live in `roles.css`.
+Role tokens live in `roles.css`. Components use these tokens to define their appearance. Themes can override these tokens to customize the appearance of the design language.
 
-| Family          | Tokens                                                                                                                     | Intent                                 |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| LCH tuples      | `--sa-lch-*`                                                                                                               | Theme color tuples for composition     |
-| Brand color     | `--sa-color-primary`, <br/>`--sa-color-secondary`,<br/> `--sa-color-accent`                                                | Brand and accent roles                 |
-| Background      | `--sa-bg-*`                                                                                                                | Page, surface, overlay, and state fill |
-| Text            | `--sa-text-*`                                                                                                              | Primary, secondary, heading, label     |
-| Border          | `--sa-border-*`                                                                                                            | Semantic border treatments             |
-| Shadow          | `--sa-shadow-*`                                                                                                            | Semantic elevation and glow            |
-| Gradient        | `--sa-gradient-*`                                                                                                          | Brand, button, card, and stripe fills  |
-| State           | `--sa-state-*`                                                                                                             | Success, warning, danger, info states  |
-| Role typography | `--sa-heading-*`,<br/> `--sa-body-*`,<br/> `--sa-label-*`,<br/> `--sa-ui-*`,<br/> `--sa-annotation-*` ,<br/> `--sa-data-*` | Role typography consumed by selectors  |
-| Base elements   | `--sa-focus-ring`, <br/>`--sa-blockquote-border`,<br/> `--sa-radial-*`                                                     | Global focus, quote, and page depth    |
+Role tokens are organized into categories: Font family, LCH tuples, Brand colors, Background colors, Text colors, Border styles, State range colors, Shadow styles, Motion.
 
-Component-specified tokens also live in `themes.css`, but their catalog is maintained in
-`ux-components-internals.md` because they are implementation contracts for `ui.css`.
+| Role                 | Purpose                               | Tokens                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| -------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `--sa-lch-`          | Theme color tuples for composition    | `--sa-lch-gradient-1-start`, `--sa-lch-gradient-2-mid-start`, `--sa-lch-gradient-3-mid`, `--sa-lch-gradient-4-mid-end`, `--sa-lch-gradient-5-end`, `--sa-lch-popup`, `--sa-lch-brand-start`, `--sa-lch-brand-mid`, `--sa-lch-brand-end`, `--sa-lch-brand-accent`, `--sa-lch-white`, `--sa-lch-neutral-1`, `--sa-lch-neutral-2`, `--sa-lch-neutral-3`, `--sa-lch-neutral-4`, `--sa-lch-neutral-5`, `--sa-lch-surface-3`, `--sa-lch-surface-2`, `--sa-lch-surface-1`, `--sa-lch-black`, `--sa-lch-success`, `--sa-lch-warning`, `--sa-lch-danger`, `--sa-lch-info`               |
+| `--sa-color-`        | Brand and accent colors               | `--sa-color-primary`, `--sa-color-secondary`, `--sa-color-accent`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `--sa-bg-`           | Background colors                     | `--sa-bg-page`, `--sa-bg-surface-1`, `--sa-bg-surface-2`, `--sa-bg-surface-3`, `--sa-bg-progress-track`, `--sa-bg-overlay`, `--sa-bg-popup`, `--sa-bg-table`, `--sa-bg-hover`, `--sa-bg-selected`, `--sa-bg-control`, `--sa-bg-card`, `--sa-bg-backdrop`                                                                                                                                                                                                                                                                                                                       |
+| `--sa-text-`         | Text colors                           | `--sa-text-primary`, `--sa-text-secondary`, `--sa-text-dim`, `--sa-text-disabled`, `--sa-text-placeholder`, `--sa-text-h1`, `--sa-text-h2`, `--sa-text-h3`, `--sa-text-h4`, `--sa-text-h5`, `--sa-text-on-brand`, `--sa-text-label`                                                                                                                                                                                                                                                                                                                                            |
+| `--sa-border-`       | Border style                          | `--sa-border-subtle`, `--sa-border-default`, `--sa-border-strong`, `--sa-border-brand`, `--sa-border-table`, `--sa-border-input`, `--sa-border-input-error`, `--sa-border-input-focus`, `--sa-border-card`                                                                                                                                                                                                                                                                                                                                                                     |
+| `--sa-shadow`        | Shadow styles                         | `--sa-shadow`, `--sa-shadow-sm`, `--sa-shadow-md`, `--sa-shadow-lg`, `--sa-shadow-xl`, `--sa-shadow-glow-sm`, `--sa-shadow-glow`, `--sa-shadow-btn`, `--sa-shadow-card`, `--sa-shadow-text`, `--sa-shadow-press`, `--sa-shadow-kbd`                                                                                                                                                                                                                                                                                                                                            |
+| `--sa-gradient-`     | Gradient color styles                 | `--sa-gradient-brand`, `--sa-gradient-brand-90`, `--sa-gradient-btn`, `--sa-gradient-card`, `--sa-gradient-hero`, `--sa-gradient-stripe`                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `--sa-state-`        | Success, warning, danger, info states | `--sa-state-border-width`, `--sa-state-border-width-strong`, `--sa-state-default`, `--sa-state-default-text`, `--sa-state-default-bg`, `--sa-state-default-border`, `--sa-state-success`, `--sa-state-success-text`, `--sa-state-success-bg`, `--sa-state-success-border`, `--sa-state-warning`, `--sa-state-warning-text`, `--sa-state-warning-bg`, `--sa-state-warning-border`, `--sa-state-danger`, `--sa-state-danger-text`, `--sa-state-danger-bg`, `--sa-state-danger-border`, `--sa-state-info`, `--sa-state-info-text`, `--sa-state-info-bg`, `--sa-state-info-border` |
+| `--sa-font-content-` | Content text font family              | `--sa-font-content-heading`, `--sa-font-content-body`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `--sa-font-app-`     | Application text font families        | `--sa-font-app-label`, `--sa-font-app-ui`, `--sa-font-app-annotation`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `--sa-font-info-`    | Information text font family          | `--sa-font-info-data`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `--sa-heading-`      | Heading typography                    | `--sa-heading-font-family`, `--sa-heading-font-weight`, `--sa-heading-font-size-h1`, `--sa-heading-font-size-h2`, `--sa-heading-font-size-h3`, `--sa-heading-font-size-h4`, `--sa-heading-font-size-h5`                                                                                                                                                                                                                                                                                                                                                                        |
+| `--sa-body-`         | Body typography                       | `--sa-body-font-family`, `--sa-body-font-weight`, `--sa-body-font-size`, `--sa-body-line-height`                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `--sa-label-`        | Label typography                      | `--sa-label-font-family`, `--sa-label-font-size`, `--sa-label-font-weight`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `--sa-ui-`           | Interface typography                  | `--sa-ui-font-family`, `--sa-ui-font-size`, `--sa-ui-font-size-compact`, `--sa-ui-font-weight`, `--sa-ui-font-weight-strong`, `--sa-ui-checkmark-weight`                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `--sa-annotation-`   | Annotation typography                 | `--sa-annotation-font-family`, `--sa-annotation-font-size`, `--sa-annotation-font-weight`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| `--sa-data-`         | Data typography                       | `--sa-data-font-family`, `--sa-data-font-size`, `--sa-data-font-weight`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
+| `--sa-focus-`        | Global focus                          | `--sa-focus-ring`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `--sa-blockquote-`   | Quote styling                         | `--sa-blockquote-border`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `--sa-radial-`       | Page depth                            | `--sa-radial-1`, `--sa-radial-2`, `--sa-radial-3`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 ### 3.4 Color Space
 
@@ -182,7 +198,7 @@ values are implementation data in CSS.
 
 Typography tokens are organized into three categories: **Content**, **App**, and **Info**.
 
-| Category | Role Token Prefix                                       | Default Value                                                                 | Intent                         |
+| Category | Role Token Prefix                                       | Default Value                                                                 | Purpose                        |
 | :------- | :------------------------------------------------------ | :---------------------------------------------------------------------------- | :----------------------------- |
 | Content  | `--sa-heading-`, <br/>`--sa-body-`                      | `--sa-font-content-*`                                                         | Long-form reading and headings |
 | App      | `--sa-label-`,<br/> `--sa-ui-`,<br/> `--sa-annotation-` | `--sa-font-app-label`,<br/>`--sa-font-app-ui`,<br/>`--sa-font-app-annotation` | Interface chrome and controls  |
@@ -201,7 +217,7 @@ responsive overrides for body text. `tokens.css` owns only the immutable size sc
 
 | Role    | Token(s)                         | Treatment                                   |
 | :------ | :------------------------------- | :------------------------------------------ |
-| Heading | `--sa-heading-font-size-h1`–`h5` | Fluid (clamp) scale                         |
+| Heading | `--sa-heading-font-size-h1`–`h3` | Fluid (clamp) scale                         |
 | Body    | `--sa-body-font-size`            | Responsive base (16px desktop, 14px mobile) |
 | UI      | `--sa-ui-font-size`, `-compact`  | Fixed scale for interface density           |
 
@@ -223,8 +239,9 @@ responsive overrides for body text. `tokens.css` owns only the immutable size sc
 - **Labels:** Carry `color: var(--sa-text-label)` (resolves to muted) to remain subordinate to data.
 - **Legends:** Standard `legend` uses primary text; however, `UiFieldset` legends are elevated to `var(--sa-text-h3)` for clearer section grouping.
 - **Data Highlights:** Mono elements (`code`, `kbd`, etc.) use `color: var(--sa-color-accent)` to pop from body text.
-- **Interactive Weights:** Most text uses weight `300` (thin); however, interactive elements use `500` (medium), primary buttons use `600` (semibold), and checkmarks use `800` (extrabold).
-- **Blockquotes:** Styled in `base.css` with a left border (`--sa-blockquote-border`), italic style, and `--sa-text-secondary` color.
+- **Interactive Weights:** Most text uses weight `300` (thin) for normal text and `400` (`normal`); however, interactive elements use `500` (medium), primary buttons use `600` (semibold), and checkmark's use `800` (extrabold).
+- **Blockquote:** Styled in `base.css` with a left border (`--sa-blockquote-border`), italic style, and `--sa-text-secondary` color.
+- **Strong Text:** Styled in `base.css` with `font-weight: 600` (semibold).
 
 ## 5. Geometry, Layout, And Motion
 
@@ -232,7 +249,7 @@ responsive overrides for body text. `tokens.css` owns only the immutable size sc
 
 All layouts must align to a 4px base unit. This ensures visual rhythm across data-dense tables in Admin and large-format touch targets in Ops.
 
-| Token            |    Value | Intent                        |
+| Token            |    Value | Purpose                       |
 | ---------------- | -------: | ----------------------------- |
 | `--sa-space-xs`  |  0.25rem | 4px base unit                 |
 | `--sa-space-xx`  | 0.375rem | In-between compact adjustment |
@@ -248,15 +265,15 @@ All layouts must align to a 4px base unit. This ensures visual rhythm across dat
 
 Layout rhythm tokens are responsive aliases over the spacing scale.
 
-| Token         | Default desktop                 | ≤1440px                         | ≤1024px                         | ≤768px                          | ≤425px                          | ≤380px                          |
-| ------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- |
-| `--sa-gutter` | `--sa-space-4xl`                | `--sa-space-3xl`                | `--sa-space-3xl`                | `--sa-space-xl + --sa-space-xx` | `--sa-space-lg`                 | `--sa-space-lg - --sa-space-xs` |
-| `--sa-pad`    | `--sa-space-lg`                 | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md`                 | `--sa-space-sm + --sa-space-xx` | `--sa-space-sm + --sa-space-xs` |
-| `--sa-gap`    | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md`                 | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` |
+| Token                | Default desktop                 | ≤1440px                         | ≤1024px                         | ≤768px                          | ≤425px                          | ≤380px                          |
+| -------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- |
+| `--sa-rhythm-gutter` | `--sa-space-4xl`                | `--sa-space-3xl`                | `--sa-space-3xl`                | `--sa-space-xl + --sa-space-xx` | `--sa-space-lg`                 | `--sa-space-lg - --sa-space-xs` |
+| `--sa-rhythm-pad`    | `--sa-space-lg`                 | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md`                 | `--sa-space-sm + --sa-space-xx` | `--sa-space-sm + --sa-space-xs` |
+| `--sa-rhythm-gap`    | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md`                 | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` |
 
 ### 5.3 Radius Scale
 
-| Token              |    Value | Intent                   |
+| Token              |    Value | Purpose                  |
 | ------------------ | -------: | ------------------------ |
 | `--sa-radius-sm`   | 0.375rem | Compact control corners  |
 | `--sa-radius-md`   | 0.555rem | Standard control corners |
@@ -266,7 +283,7 @@ Layout rhythm tokens are responsive aliases over the spacing scale.
 
 ### 5.4 Viewport Tokens
 
-| Token            |  Value | Intent                    |
+| Token            |  Value | Purpose                   |
 | ---------------- | -----: | ------------------------- |
 | `--sa-size-wrap` |  270px | Minimum wrap reference    |
 | `--sa-size-min`  |  320px | Minimum application width |
@@ -277,14 +294,14 @@ Layout rhythm tokens are responsive aliases over the spacing scale.
 
 ### 5.5 Touch Targets
 
-| Token                  | Value | Intent                        |
+| Token                  | Value | Purpose                       |
 | ---------------------- | ----: | ----------------------------- |
 | `--sa-touch-target`    |  64px | Field-safe large touch target |
 | `--sa-touch-target-sm` |  44px | Compact minimum touch target  |
 
 ### 5.6 Z-Index Scale
 
-| Token            | Value | Intent                    |
+| Token            | Value | Purpose                   |
 | ---------------- | ----: | ------------------------- |
 | `--sa-z-below`   |    -1 | Background decorations    |
 | `--sa-z-base`    |     0 | Normal content            |
@@ -296,14 +313,14 @@ Layout rhythm tokens are responsive aliases over the spacing scale.
 
 ### 5.7 Effects
 
-| Token              | Value                     | Intent                         |
+| Token              | Value                     | Purpose                        |
 | ------------------ | ------------------------- | ------------------------------ |
-| `--sa-blur`        | `blur(25px)`              | Shared backdrop blur treatment |
+| `--sa-filter-blur` | `blur(25px)`              | Shared backdrop blur treatment |
 | `--sa-filter-mono` | `brightness(0) invert(1)` | Monochrome asset filter        |
 
 ### 5.8 Motion And Transitions
 
-| Token                    | Value                                        | Intent                      |
+| Token                    | Value                                        | Purpose                     |
 | ------------------------ | -------------------------------------------- | --------------------------- |
 | `--sa-motion-page-fade`  | 200ms                                        | Page fade duration          |
 | `--sa-motion-spinner`    | 0.8s                                         | Spinner cycle duration      |
