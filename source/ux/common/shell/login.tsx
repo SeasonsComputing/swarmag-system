@@ -18,8 +18,8 @@ PUBLIC
 Login Passwordless OTP login component.
 */
 
-import { createEffect, createSignal, For, onMount, Show } from '@solid-js'
-import { useNavigate } from '@tanstack/solid-router'
+import { createSignal, For, onMount, Show } from '@solid-js'
+import { Navigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
 import { UiAlert, UiButton, UiField, UiInput, UiLayout } from '@ux/common/components/ui'
 import { getShellMetadata, type ShellMetadata } from './shell-metadata.ts'
@@ -41,9 +41,12 @@ type LoginClientProps = {
   shell: ShellMetadata
 }
 
+/** Focus a login input based on the current step. */
+const focusLoginInput = (id: LoginStep): void => document.getElementById(id)?.focus()
+
 /** Login client component. */
 const LoginClient = (props: LoginClientProps) => {
-  const navigate = useNavigate()
+  const session = api.SessionState.store
   const [step, setStep] = createSignal<LoginStep>('email')
   const [email, setEmail] = createSignal('')
   const [code, setCode] = createSignal('')
@@ -52,13 +55,8 @@ const LoginClient = (props: LoginClientProps) => {
 
   onMount(() => focusLoginInput('email'))
 
-  /** Redirects to the dashboard if the user is already authenticated. */
-  createEffect(() => {
-    const session = api.SessionState.store
-    if (!session.isLoading && session.isAuthenticated) {
-      void navigate({ to: '/dashboard', replace: true })
-    }
-  })
+  /** Keep login visible while auth is unresolved or unauthenticated. */
+  const loginRequired = () => session.isLoading || !session.isAuthenticated
 
   /** Sends the OTP code to the user's email. */
   const submitEmail = async () => {
@@ -114,102 +112,104 @@ const LoginClient = (props: LoginClientProps) => {
   }
 
   return (
-    <div data-ui='login'>
-      <div data-ui='login-layout'>
-        <UiLayout gap='loose'>
-          {/* Login hero block */}
-          <div data-ui='login-hero'>
-            <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
-            <UiLayout gap='tight'>
-              <span data-ui='login-product'>{props.shell.identity.productName}</span>
-              <span data-ui='login-application'>{props.shell.identity.applicationName}</span>
-            </UiLayout>
-          </div>
+    <Show
+      when={loginRequired()}
+      fallback={<Navigate to='/dashboard' replace />}
+    >
+      <div data-ui='login'>
+        <div data-ui='login-layout'>
+          <UiLayout gap='loose'>
+            {/* Login hero block */}
+            <div data-ui='login-hero'>
+              <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
+              <UiLayout gap='tight'>
+                <span data-ui='login-product'>{props.shell.identity.productName}</span>
+                <span data-ui='login-application'>{props.shell.identity.applicationName}</span>
+              </UiLayout>
+            </div>
 
-          {/* STEP 1: validate email and send OTP code */}
-          <div data-ui='login-form'>
-            <Show when={step() === 'email'}>
-              <form onSubmit={submitEmailForm}>
-                <UiLayout>
-                  <p>Enter your email to receive a one-time sign-in code.</p>
-                  <UiField for='email' label='Email'>
-                    <UiInput
-                      name='email'
-                      type='email'
-                      autocomplete='email'
-                      placeholder='Enter your registered email'
-                      value={email()}
-                      onInput={e => setEmail(e.currentTarget.value)}
-                      error={error() !== null}
-                      disabled={pending()}
-                      required
-                    />
-                  </UiField>
-                  <UiButton type='submit' variant='primary' loading={pending()}>
-                    Send Code
-                  </UiButton>
-                </UiLayout>
-              </form>
+            <Show when={!session.isLoading}>
+              {/* STEP 1: validate email and send OTP code */}
+              <div data-ui='login-form'>
+                <Show when={step() === 'email'}>
+                  <form onSubmit={submitEmailForm}>
+                    <UiLayout>
+                      <p>Enter your email to receive a one-time sign-in code.</p>
+                      <UiField for='email' label='Email'>
+                        <UiInput
+                          name='email'
+                          type='email'
+                          autocomplete='email'
+                          placeholder='Enter your registered email'
+                          value={email()}
+                          onInput={e => setEmail(e.currentTarget.value)}
+                          error={error() !== null}
+                          disabled={pending()}
+                          required
+                        />
+                      </UiField>
+                      <UiButton type='submit' variant='primary' loading={pending()}>
+                        Send Code
+                      </UiButton>
+                    </UiLayout>
+                  </form>
+                </Show>
+
+                {/* STEP 2: OTP code delivered now validate */}
+                <Show when={step() === 'code'}>
+                  <form onSubmit={submitCodeForm}>
+                    <UiLayout>
+                      <p>
+                        Enter the 6-digit code sent to <strong>{email()}</strong>.
+                      </p>
+                      <UiField for='code' label='Code'>
+                        <UiInput
+                          name='code'
+                          type='text'
+                          inputMode='numeric'
+                          autocomplete='one-time-code'
+                          value={code()}
+                          onInput={e => setCode(e.currentTarget.value)}
+                          error={error() !== null}
+                          disabled={pending()}
+                          required
+                        />
+                      </UiField>
+                      <UiLayout variant='inline-fill'>
+                        <UiButton type='button' variant='ghost' onClick={returnToEmail}>
+                          Back
+                        </UiButton>
+                        <UiButton type='submit' variant='primary' loading={pending()}>
+                          Sign In
+                        </UiButton>
+                      </UiLayout>
+                    </UiLayout>
+                  </form>
+                </Show>
+              </div>
+
+              {/* Display alert message if error */}
+              <Show when={!!error()}>
+                <UiAlert variant='danger'>{error()}</UiAlert>
+              </Show>
             </Show>
+          </UiLayout>
 
-            {/* STEP 2: OTP code delivered now validate */}
-            <Show when={step() === 'code'}>
-              <form onSubmit={submitCodeForm}>
-                <UiLayout>
-                  <p>
-                    Enter the 6-digit code sent to <strong>{email()}</strong>.
-                  </p>
-                  <UiField for='code' label='Code'>
-                    <UiInput
-                      name='code'
-                      type='text'
-                      inputMode='numeric'
-                      autocomplete='one-time-code'
-                      value={code()}
-                      onInput={e => setCode(e.currentTarget.value)}
-                      error={error() !== null}
-                      disabled={pending()}
-                      required
-                    />
-                  </UiField>
-                  <UiLayout variant='inline-fill'>
-                    <UiButton type='button' variant='ghost' onClick={returnToEmail}>
-                      Back
-                    </UiButton>
-                    <UiButton type='submit' variant='primary' loading={pending()}>
-                      Sign In
-                    </UiButton>
-                  </UiLayout>
-                </UiLayout>
-              </form>
-            </Show>
+          {/* Shell configuration metadata */}
+          <div>
+            <dl data-ui='login-config'>
+              <For each={props.shell.config}>
+                {datum => (
+                  <div>
+                    <dt>{datum.label}</dt>
+                    <dd>{datum.value}</dd>
+                  </div>
+                )}
+              </For>
+            </dl>
           </div>
-
-          {/* Display alert message if error */}
-          <Show when={!!error()}>
-            <UiAlert variant='danger'>{error()}</UiAlert>
-          </Show>
-        </UiLayout>
-
-        {/* Shell configuration metadata */}
-        <div>
-          <dl data-ui='login-config'>
-            <For each={props.shell.config}>
-              {datum => (
-                <div>
-                  <dt>{datum.label}</dt>
-                  <dd>{datum.value}</dd>
-                </div>
-              )}
-            </For>
-          </dl>
         </div>
       </div>
-    </div>
+    </Show>
   )
-}
-
-/** Focus a login input after its active step has rendered. */
-function focusLoginInput(id: 'email' | 'code'): void {
-  document.getElementById(id)?.focus()
 }
