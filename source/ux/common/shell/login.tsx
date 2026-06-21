@@ -18,7 +18,7 @@ PUBLIC
 Login Passwordless OTP login component.
 */
 
-import { createEffect, createSignal, For, Show } from '@solid-js'
+import { createEffect, createSignal, For, onMount, Show } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
 import { UiAlert, UiButton, UiField, UiInput, UiLayout } from '@ux/common/components/ui'
@@ -50,6 +50,8 @@ const LoginClient = (props: LoginClientProps) => {
   const [error, setError] = createSignal<string | null>(null)
   const [pending, setPending] = createSignal(false)
 
+  onMount(() => focusLoginInput('email'))
+
   /** Redirects to the dashboard if the user is already authenticated. */
   createEffect(() => {
     const session = api.SessionState.store
@@ -60,6 +62,7 @@ const LoginClient = (props: LoginClientProps) => {
 
   /** Sends the OTP code to the user's email. */
   const submitEmail = async () => {
+    if (pending()) return
     setPending(true)
     setError(null)
     try {
@@ -70,6 +73,7 @@ const LoginClient = (props: LoginClientProps) => {
       }
       await api.Auth.sendOtp(email())
       setStep('code')
+      queueMicrotask(() => focusLoginInput('code'))
     } catch (_e) {
       setError('Could not send code. Please try again.')
     } finally {
@@ -79,6 +83,7 @@ const LoginClient = (props: LoginClientProps) => {
 
   /** Verifies the OTP code and logs the user in if valid. */
   const submitCode = async () => {
+    if (pending()) return
     setPending(true)
     setError(null)
     try {
@@ -88,6 +93,24 @@ const LoginClient = (props: LoginClientProps) => {
     } finally {
       setPending(false)
     }
+  }
+
+  /** Handle email form submission. */
+  const submitEmailForm = (event: SubmitEvent) => {
+    event.preventDefault()
+    void submitEmail()
+  }
+
+  /** Handle code form submission. */
+  const submitCodeForm = (event: SubmitEvent) => {
+    event.preventDefault()
+    void submitCode()
+  }
+
+  /** Return to the email step and restore focus. */
+  const returnToEmail = () => {
+    setStep('email')
+    queueMicrotask(() => focusLoginInput('email'))
   }
 
   return (
@@ -106,65 +129,59 @@ const LoginClient = (props: LoginClientProps) => {
           {/* STEP 1: validate email and send OTP code */}
           <div data-ui='login-form'>
             <Show when={step() === 'email'}>
-              <UiLayout>
-                <p>Enter your email to receive a one-time sign-in code.</p>
-                <UiField for='email' label='Email'>
-                  <UiInput
-                    name='email'
-                    type='email'
-                    autocomplete='email'
-                    placeholder='Enter your registered email'
-                    value={email()}
-                    onInput={e => setEmail(e.currentTarget.value)}
-                    error={error() !== null}
-                    disabled={pending()}
-                    required
-                  />
-                </UiField>
-                <UiButton
-                  type='button'
-                  variant='primary'
-                  loading={pending()}
-                  onClick={() => void submitEmail()}
-                >
-                  Send Code
-                </UiButton>
-              </UiLayout>
+              <form onSubmit={submitEmailForm}>
+                <UiLayout>
+                  <p>Enter your email to receive a one-time sign-in code.</p>
+                  <UiField for='email' label='Email'>
+                    <UiInput
+                      name='email'
+                      type='email'
+                      autocomplete='email'
+                      placeholder='Enter your registered email'
+                      value={email()}
+                      onInput={e => setEmail(e.currentTarget.value)}
+                      error={error() !== null}
+                      disabled={pending()}
+                      required
+                    />
+                  </UiField>
+                  <UiButton type='submit' variant='primary' loading={pending()}>
+                    Send Code
+                  </UiButton>
+                </UiLayout>
+              </form>
             </Show>
 
             {/* STEP 2: OTP code delivered now validate */}
             <Show when={step() === 'code'}>
-              <UiLayout>
-                <p>
-                  Enter the 6-digit code sent to <strong>{email()}</strong>.
-                </p>
-                <UiField for='code' label='Code'>
-                  <UiInput
-                    name='code'
-                    type='text'
-                    inputMode='numeric'
-                    autocomplete='one-time-code'
-                    value={code()}
-                    onInput={e => setCode(e.currentTarget.value)}
-                    error={error() !== null}
-                    disabled={pending()}
-                    required
-                  />
-                </UiField>
-                <UiLayout variant='inline-fill'>
-                  <UiButton type='button' variant='ghost' onClick={() => setStep('email')}>
-                    Back
-                  </UiButton>
-                  <UiButton
-                    type='button'
-                    variant='primary'
-                    loading={pending()}
-                    onClick={() => void submitCode()}
-                  >
-                    Sign In
-                  </UiButton>
+              <form onSubmit={submitCodeForm}>
+                <UiLayout>
+                  <p>
+                    Enter the 6-digit code sent to <strong>{email()}</strong>.
+                  </p>
+                  <UiField for='code' label='Code'>
+                    <UiInput
+                      name='code'
+                      type='text'
+                      inputMode='numeric'
+                      autocomplete='one-time-code'
+                      value={code()}
+                      onInput={e => setCode(e.currentTarget.value)}
+                      error={error() !== null}
+                      disabled={pending()}
+                      required
+                    />
+                  </UiField>
+                  <UiLayout variant='inline-fill'>
+                    <UiButton type='button' variant='ghost' onClick={returnToEmail}>
+                      Back
+                    </UiButton>
+                    <UiButton type='submit' variant='primary' loading={pending()}>
+                      Sign In
+                    </UiButton>
+                  </UiLayout>
                 </UiLayout>
-              </UiLayout>
+              </form>
             </Show>
           </div>
 
@@ -190,4 +207,9 @@ const LoginClient = (props: LoginClientProps) => {
       </div>
     </div>
   )
+}
+
+/** Focus a login input after its active step has rendered. */
+function focusLoginInput(id: 'email' | 'code'): void {
+  document.getElementById(id)?.focus()
 }
