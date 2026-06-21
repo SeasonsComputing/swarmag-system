@@ -90,7 +90,7 @@ context.
 | -------------------------- | --------------------------------------------------------- | ------------ | ------------------------------------------------------------------------- |
 | Foundation tokens          | `--sa-{foundation}-{attribute}-{specialization}`          | `tokens.css` | Immutable primitive values such as font, spacing, radius, motion          |
 | Role tokens                | `--sa-{role}-{attribute}-{specialization}`                | `roles.css`  | Semantic visual roles such as background, text, border, state, shadow     |
-| LCH tuple tokens           | `--sa-lch-{name}`                                         | `roles.css`  | Bare `L C H` triplets used for `oklch()` composition                      |
+| LCH tuple tokens           | `--sa-lch-{role}`                                         | `roles.css`  | Bare `L C H` triplets used for `oklch()` composition                      |
 | Theme specializations      | `--sa-{role}-{attribute}-{specialization}`                | `themes.css` | Per-theme overrides of the role-token contract                            |
 | Component-specified tokens | `--sa-{component}-{variant}-{attribute}-{specialization}` | `themes.css` | Component implementation tokens cataloged in `ux-components-internals.md` |
 
@@ -166,82 +166,115 @@ oklch(var(--sa-lch-brand-end) / 0.5)   /* 50% alpha */
 Role tokens resolve to full `oklch()` values. Components reference role or
 component-specified tokens — never LCH tuple tokens, never raw visual values.
 
-### 3.5 Theme Switching
+### 3.5 Font Scale
 
-Set `data-theme` on `<html>`. All application HTML entry points set the theme
-explicitly.
+Font scale is part of the token contract.
+
+`--sa-base-size` is the root font size for visual scaling of the design language. A step down at narrow-device breakpoints shrinks the visual scale globally.
+
+**Foundation: `tokens.css`**
+
+| Attribute | Tokens                                                                                                                                                            | Purpose                |
+| --------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| Size      | `--sa-font-size-xs`, `--sa-font-size-sm`, `--sa-font-size-base`, `--sa-font-size-md`, `--sa-font-size-lg`, `--sa-font-size-xl`                                    | Immutable size scale   |
+| Weight    | `--sa-font-weight-thin`, `--sa-font-weight-normal`, `--sa-font-weight-medium`, `--sa-font-weight-semibold`, `--sa-font-weight-bold`, `--sa-font-weight-extrabold` | Immutable weight scale |
+
+**Roles: `roles.css`**
+
+| Role       | Tokens                                                                                                                                                                                                  | Purpose                                          |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| Heading    | `--sa-heading-font-family`, `--sa-heading-font-weight`, `--sa-heading-font-size-h1`, `--sa-heading-font-size-h2`, `--sa-heading-font-size-h3`, `--sa-heading-font-size-h4`, `--sa-heading-font-size-h5` | Heading typography. H1-H3 are fluid via clamp(). |
+| Body       | `--sa-body-font-family`, `--sa-body-font-weight`, `--sa-body-font-size`, `--sa-body-line-height`                                                                                                        | Body typography                                  |
+| Label      | `--sa-label-font-family`, `--sa-label-font-size`, `--sa-label-font-weight`                                                                                                                              | Label typography                                 |
+| UI         | `--sa-ui-font-family`, `--sa-ui-font-size`, `--sa-ui-font-size-compact`, `--sa-ui-font-weight`, `--sa-ui-font-weight-strong`, `--sa-ui-checkmark-weight`                                                | Interface typography                             |
+| Annotation | `--sa-annotation-font-family`, `--sa-annotation-font-size`, `--sa-annotation-font-weight`                                                                                                               | Annotation typography                            |
+| Data       | `--sa-data-font-family`, `--sa-data-font-size`, `--sa-data-font-weight`                                                                                                                                 | Data typography                                  |
+
+## 4. Theme Design
+
+Themes specialize the role-token contract without changing the component model. A theme selects
+the concrete visual values for color, surface, shadow, typography defaults, and component
+treatments while consumers continue to reference stable role and component-specified tokens.
+
+### 4.1 Theme Activation
+
+Set `data-theme` on `<html>`. All application HTML entry points set the theme explicitly.
 
 | Theme | Attribute            |
 | ----- | -------------------- |
 | Dark  | `data-theme="dark"`  |
 | Light | `data-theme="light"` |
 
-Theme switching is a single attribute swap — no JS class toggling.
+Theme switching is a single attribute swap. JavaScript may change the attribute, but it must not
+toggle styling classes or bypass the token layers.
 
-Theme value specializations live in `themes.css` under `[data-theme]` namespaces. The
-design-language contract defines required role tokens and namespace structure; concrete theme
-values are implementation data in CSS.
+### 4.2 Theme Specialization
 
-## 4. Typography
+Theme values live in `themes.css`.
 
-**`source/ux/common/components/fonts`** — Fonts are self-hosted woff2 assets.
+| Namespace              | Purpose                                                           |
+| ---------------------- | ----------------------------------------------------------------- |
+| `[data-theme]`         | Common component-token defaults shared by all named themes        |
+| `[data-theme='dark']`  | Dark role-token values and dark component-token specializations   |
+| `[data-theme='light']` | Light role-token values and light component-token specializations |
 
-### 4.1 Font Families
+Named themes specialize existing role tokens such as `--sa-color-*`, `--sa-bg-*`,
+`--sa-text-*`, `--sa-border-*`, `--sa-shadow`, `--sa-gradient-*`, `--sa-state-*`,
+and `--sa-focus-*`. They may also specialize component-specified tokens owned by
+`themes.css`. Themes do not define foundation tokens and do not introduce app-local selectors.
 
-| Token(s)                                                                        | Font                       | Role                                                   |
-| ------------------------------------------------------------------------------- | -------------------------- | ------------------------------------------------------ |
-| `--sa-font-content-heading`,<br/> `--sa-font-content-body`                      | Comfortaa                  | Content — headings and body paragraphs.                |
-| `--sa-font-app-label`,<br/> `--sa-font-app-ui`,<br/> `--sa-font-app-annotation` | Lexend (variable, 100–900) | App — labels, buttons, inputs, selects, nav, captions. |
-| `--sa-font-info-data`                                                           | Mono (Cascadia Mono Light) | Info — IDs, coordinates, numeric fields (weight 300).  |
+### 4.3 Theme Typography
 
-### 4.2 Token Architecture
+Font files are self-hosted in `source/ux/common/components/fonts`. Theme typography is expressed
+through role tokens, not component code.
 
-Typography tokens are organized into three categories: **Content**, **App**, and **Info**.
+| Role family         | Default font token(s)                                                 | Theme purpose                          |
+| ------------------- | --------------------------------------------------------------------- | -------------------------------------- |
+| Content typography  | `--sa-font-content-heading`, `--sa-font-content-body`                 | Headings and reading text              |
+| Application chrome  | `--sa-font-app-label`, `--sa-font-app-ui`, `--sa-font-app-annotation` | Labels, controls, captions, and chrome |
+| Information display | `--sa-font-info-data`                                                 | Code, IDs, coordinates, and data text  |
 
-| Category | Role Token Prefix                                       | Default Value                                                                 | Purpose                        |
-| :------- | :------------------------------------------------------ | :---------------------------------------------------------------------------- | :----------------------------- |
-| Content  | `--sa-heading-`, <br/>`--sa-body-`                      | `--sa-font-content-*`                                                         | Long-form reading and headings |
-| App      | `--sa-label-`,<br/> `--sa-ui-`,<br/> `--sa-annotation-` | `--sa-font-app-label`,<br/>`--sa-font-app-ui`,<br/>`--sa-font-app-annotation` | Interface chrome and controls  |
-| Info     | `--sa-data-`                                            | `--sa-font-info-*`                                                            | Technical data and code        |
+Theme typography is consumed through role families: `--sa-heading-*`, `--sa-body-*`,
+`--sa-label-*`, `--sa-ui-*`, `--sa-annotation-*`, and `--sa-data-*`. The design language
+defines those roles; component internals define which controls consume them.
 
-### 4.3 Type Scale
+### 4.4 Visual Semantics
 
-Font sizes are responsive role tokens. `roles.css` uses `clamp()` for headings and
-responsive overrides for body text. `tokens.css` owns only the immutable size scale and
-`--sa-base-size`.
+Themes preserve semantic meaning while changing visual value.
 
-- **Fluid Headings:** H1–H3 use fluid scaling via `clamp()`.
-- **Breakpoint Logic:**
-  - **< 425px:** `--sa-body-font-size` and `--sa-heading-font-size-h4` drop to `sm` (0.875rem).
-  - **< 380px:** The root `--sa-base-size` drops to `sm`, scaling the entire UI down.
+- H1 uses primary text; H2-H5 use heading role tokens tied to the brand range.
+- Labels use `--sa-text-label` so labels remain subordinate to data.
+- Data highlights use `--sa-color-accent` to distinguish technical text.
+- Interactive text uses stronger weight roles than body text; primary actions use semibold.
+- Blockquotes use `--sa-blockquote-border`, italic body styling, and secondary text.
+- Strong text uses the semibold foundation weight.
 
-| Role    | Token(s)                         | Treatment                                   |
-| :------ | :------------------------------- | :------------------------------------------ |
-| Heading | `--sa-heading-font-size-h1`–`h3` | Fluid (clamp) scale                         |
-| Body    | `--sa-body-font-size`            | Responsive base (16px desktop, 14px mobile) |
-| UI      | `--sa-ui-font-size`, `-compact`  | Fixed scale for interface density           |
+### 4.5 Component-Specified Tokens
 
-### 4.4 Typography Role Map
+Component-specified tokens live in `themes.css` and are cataloged in
+`ux-components-internals.md`. They let themes tune reusable UI controls without changing
+component code or selector structure.
 
-| Role       | Element(s) / Component                                                                       | Family token                  | Size token                  | Weight token                  |
-| :--------- | :------------------------------------------------------------------------------------------- | :---------------------------- | :-------------------------- | :---------------------------- |
-| Heading    | `h1`–`h6`,<br/> `UiFieldset`,<br/>`Legend`                                                   | `--sa-heading-font-family`    | `--sa-heading-font-size-*`  | `--sa-heading-font-weight`    |
-| Body       | `p`,<br/> `blockquote`,<br/> `UiList`                                                        | `--sa-body-font-family`       | `--sa-body-font-size`       | `--sa-body-font-weight`       |
-| Label      | `label`,<br/> `UiButton`,<br/> `UiCheckbox`,<br/> `UiTable`                                  | `--sa-label-font-family`      | `--sa-label-font-size`      | `--sa-label-font-weight`      |
-| Annotation | `figcaption`, <br/>`legend`,<br/>`UiTableHeader`,<br/> `UiSingleSelect`,<br/>`UiMiltiSelect` | `--sa-annotation-font-family` | `--sa-annotation-font-size` | `--sa-annotation-font-weight` |
-| UI Control | `input`, <br/>`textarea`,<br/> `UiSingleSelect`                                              | `--sa-ui-font-family`         | `--sa-ui-font-size`         | `--sa-body-font-weight`       |
-| Compact UI | `UiTab`, <br/>`UiBadge`,<br/> `UiAlert`,<br/> `UiAccordion`                                  | `--sa-ui-font-family`         | `--sa-ui-font-size-compact` | `--sa-ui-font-weight`         |
-| Data       | `code`,<br/> `pre`,<br/> `kbd`,<br/> `samp`                                                  | `--sa-data-font-family`       | inherited                   | `--sa-data-font-weight`       |
+| Family         | Token prefix / token                                          | Consumer                     |
+| -------------- | ------------------------------------------------------------- | ---------------------------- |
+| Button         | `--sa-button-*`                                               | Buttons                      |
+| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments  |
+| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts |
+| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls              |
+| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels      |
+| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content   |
+| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders         |
+| Card           | `--sa-card-*`                                                 | Card variants                |
+| Table          | `--sa-table-*`                                                | Table parts                  |
+| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries    |
+| Progress       | `--sa-progress-*`                                             | Progress track and fill      |
+| List           | `--sa-list-*`                                                 | List and list item parts     |
+| Avatar         | `--sa-avatar-*`                                               | Avatar marker                |
+| Separator      | `--sa-separator-*`                                            | Separator primitive          |
+| Shell          | `--sa-shell-*`                                                | Header and footer chrome     |
 
-### 4.5 Visual Semantics
-
-- **Heading Colors:** H1 uses primary text; H2–H5 are tied to brand gradient colors (`--sa-text-h2`–`h5`) for content flow.
-- **Labels:** Carry `color: var(--sa-text-label)` (resolves to muted) to remain subordinate to data.
-- **Legends:** Standard `legend` uses primary text; however, `UiFieldset` legends are elevated to `var(--sa-text-h3)` for clearer section grouping.
-- **Data Highlights:** Mono elements (`code`, `kbd`, etc.) use `color: var(--sa-color-accent)` to pop from body text.
-- **Interactive Weights:** Most text uses weight `300` (thin) for normal text and `400` (`normal`); however, interactive elements use `500` (medium), primary buttons use `600` (semibold), and checkmark's use `800` (extrabold).
-- **Blockquote:** Styled in `base.css` with a left border (`--sa-blockquote-border`), italic style, and `--sa-text-secondary` color.
-- **Strong Text:** Styled in `base.css` with `font-weight: 600` (semibold).
+Shell chrome is intentionally theme-owned. It allows app frame surfaces to diverge from generic
+card and panel surfaces while still using the same design-language token contract.
 
 ## 5. Geometry, Layout, And Motion
 
