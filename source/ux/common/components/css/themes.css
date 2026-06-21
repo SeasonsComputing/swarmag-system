@@ -38,11 +38,11 @@
 
   /* Cards */
   --sa-card-border-radius: var(--sa-radius-md);
-  --sa-card-panel-pad: var(--sa-pad);
+  --sa-card-panel-pad: var(--sa-rhythm-pad);
   --sa-card-panel-stripe-opacity: 0;
   --sa-card-stripe-height: 3px;
-  --sa-card-widget-pad: var(--sa-pad);
-  --sa-card-workflow-pad: var(--sa-pad);
+  --sa-card-widget-pad: var(--sa-rhythm-pad);
+  --sa-card-workflow-pad: var(--sa-rhythm-pad);
 
   /* Fieldset */
   --sa-fieldset-bg: transparent;
@@ -193,7 +193,7 @@
   /* Shell chrome */
   --sa-shell-bg: oklch(17% 0.008 244 / 0.7);
   --sa-shell-border: var(--sa-border-card);
-  --sa-shell-filter: var(--sa-blur);
+  --sa-shell-filter: var(--sa-filter-blur);
   --sa-shell-shadow: var(--sa-shadow-sm);
   --sa-shell-text: var(--sa-text-h1);
   --sa-shell-secondary: var(--sa-text-secondary);

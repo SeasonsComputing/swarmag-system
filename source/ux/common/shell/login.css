@@ -11,8 +11,8 @@
   display: grid;
   align-items: center;
   justify-content: center;
-  padding-inline: var(--sa-gap);
-  padding-block: var(--sa-gap) var(--sa-pad);
+  padding-inline: var(--sa-rhythm-gap);
+  padding-block: var(--sa-rhythm-gap) var(--sa-rhythm-pad);
 }
 
 [data-ui='login-layout'] {
@@ -29,7 +29,7 @@
   position: relative;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--sa-gap);
+  gap: var(--sa-rhythm-gap);
 }
 
 [data-ui='login-hero']::before {

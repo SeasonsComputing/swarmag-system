@@ -214,7 +214,7 @@ blockquote {
   font-weight: var(--sa-body-font-weight);
   font-style: italic;
   margin-inline: 0;
-  padding: var(--sa-gap);
+  padding: var(--sa-rhythm-gap);
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

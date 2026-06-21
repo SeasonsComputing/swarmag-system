@@ -730,7 +730,7 @@
 
 [data-ui='tabs'] {
   display: grid;
-  gap: var(--sa-gap);
+  gap: var(--sa-rhythm-gap);
 }
 
 [data-ui='tab-list'] {
@@ -960,7 +960,7 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 [data-ui='card'] {
-  backdrop-filter: var(--sa-blur);
+  backdrop-filter: var(--sa-filter-blur);
   background: var(--sa-card-panel-bg);
   border: var(--sa-card-panel-border);
   border-radius: var(--sa-card-border-radius);
@@ -1072,7 +1072,7 @@
 
 [data-ui='layout'] {
   display: grid;
-  gap: var(--sa-gap);
+  gap: var(--sa-rhythm-gap);
   width: 100%;
 }
 
@@ -1151,8 +1151,8 @@
   background: var(--sa-fieldset-bg);
   box-shadow: var(--sa-fieldset-shadow);
   display: grid;
-  gap: var(--sa-gap);
-  padding: var(--sa-gap);
+  gap: var(--sa-rhythm-gap);
+  padding: var(--sa-rhythm-gap);
 }
 
 [data-ui='fieldset'] > legend {
@@ -1165,7 +1165,7 @@
 [data-ui='form-actions'] {
   align-items: center;
   display: flex;
-  gap: var(--sa-gap);
+  gap: var(--sa-rhythm-gap);
   justify-content: flex-end;
 }
 

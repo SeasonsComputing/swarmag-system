@@ -76,7 +76,7 @@
   --sa-z-toast: 1000;
 
   /* Misc */
-  --sa-blur: blur(25px);
+  --sa-filter-blur: blur(25px);
   --sa-filter-mono: brightness(0) invert(1);
 
   /* ─────────────────────────────────────────────────────────────────────── */
@@ -99,17 +99,17 @@
   /* LAYOUT RHYTHM TOKENS                                                    */
   /* ─────────────────────────────────────────────────────────────────────── */
 
-  --sa-gutter: clamp(
+  --sa-rhythm-gutter: clamp(
     var(--sa-space-md),
     calc(-0.156rem + 4.934vw),
     var(--sa-space-3xl)
   );
-  --sa-pad: clamp(
+  --sa-rhythm-pad: clamp(
     calc(var(--sa-space-sm) + var(--sa-space-xs)),
     calc(-0.156rem + 4.934vw),
     calc(var(--sa-space-md) + var(--sa-space-xs))
   );
-  --sa-gap: clamp(
+  --sa-rhythm-gap: clamp(
     calc(var(--sa-space-sm) + var(--sa-space-xs)),
     calc(-0.156rem + 4.934vw),
     var(--sa-space-md)
@@ -120,8 +120,8 @@
 @media (max-width: 350px) {
   :root {
     --sa-base-size: var(--sa-font-size-sm);
-    --sa-gutter: var(--sa-space-sm);
-    --sa-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
-    --sa-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
+    --sa-rhythm-gutter: var(--sa-space-sm);
+    --sa-rhythm-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
+    --sa-rhythm-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
   }
 }
