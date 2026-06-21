@@ -1,15 +1,23 @@
 /*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ UX role tokens                                                               ║
-║ Default style-token contract for conforming applications.                    ║
-╚══════════════════════════════════════════════════════════════════════════════╝
+╔═════════════════════════════════════════════════════════════════════════════╗
+║ UX role tokens                                                              ║
+║ Default style-token contract for conforming applications.                   ║
+╚═════════════════════════════════════════════════════════════════════════════╝
 */
 
-/* ─────────────────────────────────────────────────────────────────────────── */
-/* ROLE TOKENS WITH DEFAULT VALUES                                             */
-/* ─────────────────────────────────────────────────────────────────────────── */
-
 :root {
+  /* ─────────────────────────────────────────────────────────────────────── */
+  /* TYPOGRAPHY TOKENS                                                       */
+  /* ─────────────────────────────────────────────────────────────────────── */
+
+  /* Font Family by Role */
+  --sa-font-content-heading: 'Comfortaa', ui-sans-serif, system-ui, sans-serif;
+  --sa-font-content-body: 'Comfortaa', ui-sans-serif, system-ui, sans-serif;
+  --sa-font-app-label: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --sa-font-app-ui: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --sa-font-app-annotation: 'Lexend', ui-sans-serif, system-ui, sans-serif;
+  --sa-font-info-data: 'Cascadia Code', 'SF Mono', ui-monospace, monospace;
+
   /* Content/Heading */
   --sa-heading-font-family: var(--sa-font-content-heading);
   --sa-heading-font-weight: var(--sa-font-weight-thin);
@@ -46,6 +54,10 @@
   --sa-data-font-family: var(--sa-font-info-data);
   --sa-data-font-size: var(--sa-font-size-sm);
   --sa-data-font-weight: var(--sa-font-weight-thin);
+
+  /* ─────────────────────────────────────────────────────────────────────── */
+  /* COLOR & STYLE TOKENS                                                    */
+  /* ─────────────────────────────────────────────────────────────────────── */
 
   /* Gradient range */
   --sa-lch-gradient-1-start: 54.3% 0.11 236.182;
