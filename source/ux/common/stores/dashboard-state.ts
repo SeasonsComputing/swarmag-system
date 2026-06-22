@@ -112,16 +112,35 @@ const [dashboardStore, setDashboardStore] = createStore<DashboardStoreView>({
   rows: []
 })
 
+/** Stored record type — includes seed fingerprint for staleness detection. */
+type DashboardRecord = DashboardStoreView & { seedHash: string }
+
+/** Compute a djb2 fingerprint of the seed for change detection. */
+function seedFingerprint(seed: unknown): string {
+  const str = JSON.stringify(seed)
+  let hash = 5381
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) ^ str.charCodeAt(i)
+    hash = hash & hash
+  }
+  return hash.toString(36)
+}
+
 /** Initialize store from db or seed */
 async function dashboardInit(seed: unknown): Promise<void> {
   try {
     const db = await IndexedDb.connection()
-    let dashboard = await db.get(DASHBOARD_STORE, DASHBOARD_ID)
-    if (!dashboard) {
-      dashboard = toDashboardStoreView(seed)
-      await db.put(DASHBOARD_STORE, dashboard)
+    const fingerprint = seedFingerprint(seed)
+    let record = await db.get(DASHBOARD_STORE, DASHBOARD_ID) as DashboardRecord | undefined
+    if (record !== undefined && record.seedHash !== fingerprint) {
+      await db.delete(DASHBOARD_STORE, DASHBOARD_ID)
+      record = undefined
     }
-    setDashboardStore(dashboard)
+    if (record === undefined) {
+      record = { ...toDashboardStoreView(seed), seedHash: fingerprint }
+      await db.put(DASHBOARD_STORE, record)
+    }
+    setDashboardStore(record)
   } catch (error) {
     if (apiError(error)) Config.fail((error as ApiError).message)
     else Config.fail(`Dashboard init failed: ${IndexedDb.errorToStatus(error)}`)
@@ -319,8 +338,8 @@ function toDashboardStoreWidget(input: unknown, field: string): DashboardStoreWi
 function toDashboardWidgetSettings(input: unknown, field: string): DashboardWidgetSettings {
   const settings = toDictionary(input, field)
   const shape = toString(settings['shape'], `${field}.shape`)
-  if (shape !== 'square' && shape !== 'landscape') {
-    throw new ApiError(`${field}.shape must be square or landscape`, 400)
+  if (shape !== 'compact' && shape !== 'landscape') {
+    throw new ApiError(`${field}.shape must be compact or landscape`, 400)
   }
   return { ...settings, shape }
 }

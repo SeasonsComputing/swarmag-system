@@ -669,7 +669,7 @@ Dashboard
   └─ HeaderRow (fixed height, KPI StatCards)
   └─ ScrollContainer (vertical scroll)
      └─ DashboardRow[] (horizontal swipe, no collapse)
-        └─ Widget[] (square | landscape)
+        └─ Widget[] (compact | landscape)
 ```
 
 No row collapse on small viewport. Horizontal swipe per row. Vertical scroll on the outer column.
@@ -697,7 +697,7 @@ to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
       "label": "Operations at-a-glance",
       "widgets": [
         { "type": "UpcomingJobsWidget", "settings": { "shape": "landscape" } },
-        { "type": "AssetStatusWidget", "settings": { "shape": "square" } }
+        { "type": "AssetStatusWidget", "settings": { "shape": "compact" } }
       ]
     }
   ]
@@ -771,7 +771,7 @@ Per `domain-model.md §2.5`:
 | ----------------- | ------------------------------------------- |
 | `Dashboard`       | Root layout, row renderer, scroll container |
 | `DashboardRow`    | Horizontal swipe row (short\|standard)      |
-| `DashboardWidget` | Widget container (square\|landscape)        |
+| `DashboardWidget` | Widget container (compact\|landscape)        |
 
 ### 11.4 Widget Catalog
 
@@ -780,14 +780,14 @@ Per `domain-model.md §2.5`:
 | `UpcomingJobsWidget`      | landscape | Job list, status badges               |
 | `JobCalendarWidget`       | landscape | Calendar view of scheduled jobs       |
 | `CustomersWidget`         | landscape | Customer table, action buttons        |
-| `CrewWidget`              | square    | Active crew, availability             |
-| `AssetStatusWidget`       | square    | Asset list, status indicators         |
+| `CrewWidget`              | compact    | Active crew, availability             |
+| `AssetStatusWidget`       | compact    | Asset list, status indicators         |
 | `ChemicalInventoryWidget` | landscape | Chemical table, signal word badges    |
-| `ServicesWidget`          | square    | Service catalog summary               |
-| `JobStatusWidget`         | square    | Pie chart — job status distribution   |
+| `ServicesWidget`          | compact    | Service catalog summary               |
+| `JobStatusWidget`         | compact    | Pie chart — job status distribution   |
 | `JobTrendWidget`          | landscape | Line chart — job throughput over time |
-| `ChemicalUsageWidget`     | square    | Pie chart — usage by type             |
-| `AssetUtilizationWidget`  | square    | Bar chart — utilization rate          |
+| `ChemicalUsageWidget`     | compact    | Pie chart — usage by type             |
+| `AssetUtilizationWidget`  | compact    | Bar chart — utilization rate          |
 | `WorkflowLibraryWidget`   | landscape | Workflow + task catalog               |
 | `RecentActivityWidget`    | landscape | Append-only activity feed             |
 

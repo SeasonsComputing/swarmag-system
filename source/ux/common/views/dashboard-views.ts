@@ -6,7 +6,7 @@ import type { Dictionary } from '@core/std'
 
 /** Dashboard widget layout and component settings. */
 export type DashboardWidgetSettings = Dictionary & {
-  shape: 'square' | 'landscape'
+  shape: 'compact' | 'landscape'
 }
 
 /** A single dashboard widget reference with component type and settings. */
