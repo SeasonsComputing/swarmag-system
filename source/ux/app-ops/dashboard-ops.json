@@ -21,7 +21,7 @@
         {
           "key": "assets-status",
           "type": "AssetStatusWidget",
-          "settings": { "shape": "square" }
+          "settings": { "shape": "compact" }
         }
       ]
     }

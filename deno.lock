@@ -7,6 +7,7 @@
     "jsr:@std/path@^1.1.1": "1.1.4",
     "npm:@kobalte/core@0.13.11": "0.13.11_solid-js@1.9.12",
     "npm:@supabase/supabase-js@2": "2.89.0",
+    "npm:@tanstack/solid-query@5.100.14": "5.100.14_solid-js@1.9.12",
     "npm:@tanstack/solid-router@1.168.6": "1.168.6_solid-js@1.9.12",
     "npm:chart.js@^4.4.0": "4.5.1",
     "npm:dprint@*": "0.51.1",
@@ -671,6 +672,9 @@
     "@tanstack/history@1.161.6": {
       "integrity": "sha512-NaOGLRrddszbQj9upGat6HG/4TKvXLvu+osAIgfxPYA+eIvYKv8GKDJOrY2D3/U9MRnKfMWD7bU4jeD4xmqyIg=="
     },
+    "@tanstack/query-core@5.100.14": {
+      "integrity": "sha512-5X41dGpxgeaHISCRW2oYwcSycZeULZzAunaudXT9ov1KOTj9xwt0CH6hbwqP1/z74ZWF7rYFnDpyYH07XFcZew=="
+    },
     "@tanstack/router-core@1.168.6": {
       "integrity": "sha512-okCno3pImpLFQMJ/4zqEIGjIV5yhxLGj0JByrzQDQehORN1y1q6lJUezT0KPK5qCQiKUApeWaboLPjgBVx1kaQ==",
       "dependencies": [
@@ -680,6 +684,13 @@
         "seroval-plugins"
       ],
       "bin": true
+    },
+    "@tanstack/solid-query@5.100.14_solid-js@1.9.12": {
+      "integrity": "sha512-eKW5fPWuNjGBjK9To/DNNS2b3HwTvD58T6CZbN6H0HyCjDrBOlH8q4qyJQS9gR9EXflSiivgQK+DUzg3KIHNDw==",
+      "dependencies": [
+        "@tanstack/query-core",
+        "solid-js"
+      ]
     },
     "@tanstack/solid-router@1.168.6_solid-js@1.9.12": {
       "integrity": "sha512-PNPOU42nC3WG7iOq5ZHuTEkJ9luIK1uzszmJLHfoELNA7W+EIFKN5P1WHzLt2bXcW6iDY4/KW/PjNVJqij0zCw==",
@@ -1399,6 +1410,7 @@
       "jsr:@std/assert@1.0.19",
       "jsr:@std/fs@1.0.19",
       "npm:@kobalte/core@0.13.11",
+      "npm:@tanstack/solid-query@5.100.14",
       "npm:@tanstack/solid-router@1.168.6",
       "npm:chart.js@^4.4.0",
       "npm:idb@8",

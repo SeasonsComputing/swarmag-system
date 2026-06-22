@@ -35,7 +35,9 @@ import { Config } from '@ux/config/ux-config.ts'
 import type { Session } from '@core/api/api-auth-contract.ts'
 import { onCleanup, onMount } from '@solid-js'
 import { render } from '@solid-js/web'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 import {
+  type AnyRoute,
   createRootRoute,
   createRoute,
   createRouter,
@@ -48,6 +50,8 @@ import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
 import { Logout } from './logout.tsx'
+import { WidgetProvider } from './widget-provider.tsx'
+import { WidgetCatalog } from './widgets-catalog.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 3. INSTALL LOOK & FEEL
@@ -59,7 +63,7 @@ import '@ux/common/components/css/css.tsx'
 // 4. DEFINE ROUTES
 // ────────────────────────────────────────────────────────────────────────────
 
-const rootRoute = createRootRoute()
+export const rootRoute = createRootRoute()
 
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
@@ -91,34 +95,40 @@ const dashboardRoute = createRoute({
   )
 })
 
-const routeTree = rootRoute.addChildren([
-  indexRoute,
-  loginRoute,
-  logoutRoute,
-  dashboardRoute
-])
-const router = createRouter({ routeTree })
-
 // ────────────────────────────────────────────────────────────────────────────
 // 5. BOOTSTRAP APPLICATION
 // ────────────────────────────────────────────────────────────────────────────
 
 const showApplication = () => document.body.style.opacity = '1'
 
-/** Standard application root; wires auth state and mounts the router. */
-const Application = () => {
-  onMount(() => {
-    showApplication()
-    void syncSession()
-    const unsubscribe = api.Auth.onAuthStateChange(session => void applySession(session))
-    onCleanup(unsubscribe)
-  })
-  return <RouterProvider router={router} />
-}
-
 /** Initialize app state before mounting the application */
-export async function bootstrap(dashboardSeed: unknown) {
+export async function bootstrap(dashboardSeed: unknown, routes: AnyRoute[] = []) {
   try {
+    const routeTree = rootRoute.addChildren([
+      indexRoute,
+      loginRoute,
+      logoutRoute,
+      dashboardRoute,
+      ...routes
+    ])
+    const router = createRouter({ routeTree })
+    const queryClient = new QueryClient()
+    const Application = () => {
+      onMount(() => {
+        showApplication()
+        void syncSession()
+        const unsubscribe = api.Auth.onAuthStateChange(session => void applySession(session))
+        onCleanup(unsubscribe)
+      })
+      return (
+        <QueryClientProvider client={queryClient}>
+          <WidgetProvider registry={WidgetCatalog}>
+            <RouterProvider router={router} />
+          </WidgetProvider>
+        </QueryClientProvider>
+      )
+    }
+
     await api.AppState.init()
     await api.DashboardState.init(dashboardSeed)
     render(() => <Application />, document.getElementById('root')!)

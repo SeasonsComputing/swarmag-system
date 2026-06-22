@@ -1,0 +1,9 @@
+[data-type='ActionWidget'] a {
+  color: var(--sa-text-primary);
+  font-size: var(--sa-ui-font-size-compact);
+  text-decoration: none;
+}
+
+[data-type='ActionWidget'] a:hover {
+  color: var(--sa-color-primary);
+}
