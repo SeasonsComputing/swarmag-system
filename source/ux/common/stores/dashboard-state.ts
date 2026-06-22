@@ -14,6 +14,9 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 DashboardState - Dashboard state and mutation methods
 ├ store          Reactive dashboard view snapshot.
+│ ├ settings     Dashboard layout and display settings.
+│ ├ header       Header widget strip.
+│ └ rows         Dashboard row collection.
 ├ init(seed)     Hydrate dashboard state from seed or IndexedDB.
 ├ headerWidgets  Header widget mutation contract.
 ├ rows           Dashboard row mutation contract.
@@ -43,7 +46,12 @@ import { ApiError, apiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import { type Dictionary, id, type Instance } from '@core/std'
 import { createStore, produce } from '@solid-js/store'
-import type { DashboardRowHeader, DashboardWidget } from '@ux/common/views/dashboard-views.ts'
+import type {
+  DashboardRowHeader,
+  DashboardSettings,
+  DashboardWidget,
+  DashboardWidgetSettings
+} from '@ux/common/views/dashboard-views.ts'
 import { Config } from '@ux/config/ux-config.ts'
 
 // ───────────────────────────────────────────────────────────────────────────────
@@ -56,6 +64,7 @@ export type DashboardStoreWidgets = { widgets: DashboardStoreWidget[] }
 export type DashboardStoreHeader = DashboardStoreWidgets
 export type DashboardStoreRow = Instance & DashboardRowHeader & DashboardStoreWidgets
 export type DashboardStoreView = Instance & {
+  settings: DashboardSettings
   header: DashboardStoreHeader
   rows: DashboardStoreRow[]
 }
@@ -98,6 +107,7 @@ const DASHBOARD_ID = '019daa39-2d7c-76fb-877f-495169374178'
 IndexedDb.registerStore(DASHBOARD_STORE)
 const [dashboardStore, setDashboardStore] = createStore<DashboardStoreView>({
   id: '',
+  settings: { layout: 'rows' },
   header: { widgets: [] },
   rows: []
 })
@@ -136,7 +146,6 @@ const dashboardWidgets: DashboardWidgetsContract = {
     if (rowId && !dashboardStore.rows.some(row => row.id === rowId)) {
       throw new ApiError('Dashboard row not found', 404)
     }
-
     const storeWidget: DashboardStoreWidget = { id: id(), ...widget }
     setDashboardStore(
       produce(store => {
@@ -265,10 +274,12 @@ const dashboardRows: DashboardRowsContract = {
 /** Validate and convert input to DashboardView */
 function toDashboardStoreView(input: unknown): DashboardStoreView {
   const view = toDictionary(input, 'Dashboard view')
+  const settings = toDashboardSettings(view['settings'], 'Dashboard view.settings')
   const header = toDictionary(view['header'], 'Dashboard view.header')
   const rows = toArray(view['rows'], 'Dashboard view.rows')
   return {
     id: DASHBOARD_ID,
+    settings,
     header: { widgets: toDashboardStoreWidgets(header['widgets'], 'Dashboard view.header.widgets') },
     rows: rows.map((r, i) => toDashboardStoreRow(r, `Dashboard view.rows[${i}]`))
   }
@@ -299,18 +310,34 @@ function toString(input: unknown, field: string): string {
 /** Validate one dashboard widget. */
 function toDashboardStoreWidget(input: unknown, field: string): DashboardStoreWidget {
   const widget = toDictionary(input, field)
-  const shape = toString(widget['shape'], `${field}.shape`)
   const type = toString(widget['type'], `${field}.type`)
-  const settings = toDictionary(widget['settings'], `${field}.settings`)
+  const settings = toDashboardWidgetSettings(widget['settings'], `${field}.settings`)
+  return { id: id(), type, settings }
+}
+
+/** Validate dashboard widget settings. */
+function toDashboardWidgetSettings(input: unknown, field: string): DashboardWidgetSettings {
+  const settings = toDictionary(input, field)
+  const shape = toString(settings['shape'], `${field}.shape`)
   if (shape !== 'square' && shape !== 'landscape') {
     throw new ApiError(`${field}.shape must be square or landscape`, 400)
   }
-  return { id: id(), shape, type, settings }
+  return { ...settings, shape }
 }
 
 /** Validate a dashboard widget array. */
 function toDashboardStoreWidgets(input: unknown, field: string): DashboardStoreWidget[] {
   return toArray(input, field).map((w, i) => toDashboardStoreWidget(w, `${field}[${i}]`))
+}
+
+/** Validate dashboard settings. */
+function toDashboardSettings(input: unknown, field: string): DashboardSettings {
+  const settings = toDictionary(input, field)
+  const layout = toString(settings['layout'], `${field}.layout`)
+  if (layout !== 'rows' && layout !== 'masonry') {
+    throw new ApiError(`${field}.layout must be rows or masonry`, 400)
+  }
+  return { ...settings, layout }
 }
 
 /** Validate one dashboard row. */
