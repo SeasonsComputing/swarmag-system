@@ -1,14 +1,17 @@
 {
+  "settings": {
+    "layout": "rows"
+  },
   "header": {
-    "widgets": [{ "type": "BrandWidget", "shape": "landscape", "settings": {} }]
+    "widgets": [{ "type": "BrandWidget", "settings": { "shape": "landscape" } }]
   },
   "rows": [
     {
       "size": "standard",
       "label": "Operations at-a-glance",
       "widgets": [
-        { "type": "UpcomingJobsWidget", "shape": "landscape", "settings": {} },
-        { "type": "AssetStatusWidget", "shape": "square", "settings": {} }
+        { "type": "UpcomingJobsWidget", "settings": { "shape": "landscape" } },
+        { "type": "AssetStatusWidget", "settings": { "shape": "square" } }
       ]
     }
   ]
