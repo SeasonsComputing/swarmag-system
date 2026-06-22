@@ -16,7 +16,7 @@ Deliver the dashboard foundation and user management page for `app-admin`. This 
 
 | File                                                  | Purpose                                   |
 | ----------------------------------------------------- | ----------------------------------------- |
-| `source/ux/common/shell/abstraction-form-contract.ts` | Strategy interface                        |
+| `source/ux/common/shell/abstraction-form-contract.ts` | Provider interface                        |
 | `source/ux/common/shell/abstraction-form.tsx`         | Generic list+dialog form component        |
 | `source/ux/common/shell/widget-provider.tsx`          | WidgetProvider context + useWidgets hook  |
 | `source/ux/common/shell/widgets-header-catalog.ts`    | Header widget sub-catalog                 |
@@ -30,11 +30,11 @@ Deliver the dashboard foundation and user management page for `app-admin`. This 
 
 ### 3.2 Modify
 
-| File                                         | Change                                                                               |
-| -------------------------------------------- | ------------------------------------------------------------------------------------ |
-| `source/ux/common/shell/bootstrap.tsx`       | Wrap app in WidgetProvider; add dashboard + users routes to tree; export `rootRoute` |
-| `source/ux/app-admin/app.tsx`                | Add usersRoute; call `bootstrap(dashboardSeed, [usersRoute])`                        |
-| `source/ux/app-admin/dashboard-admin.json`   | Add `settings`; add BrandWidget + ActionWidget to header                             |
+| File                                       | Change                                                                               |
+| ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `source/ux/common/shell/bootstrap.tsx`     | Wrap app in WidgetProvider; add dashboard + users routes to tree; export `rootRoute` |
+| `source/ux/app-admin/app.tsx`              | Add usersRoute; call `bootstrap(dashboardSeed, [usersRoute])`                        |
+| `source/ux/app-admin/dashboard-admin.json` | Add `settings`; add BrandWidget + ActionWidget to header                             |
 
 ## 4. Architectural Decisions
 
@@ -74,7 +74,7 @@ widgets-catalog.ts               ← barrel, merges sub-catalogs → WidgetCatal
 
 ### 4.4 AbstractionForm Pattern
 
-`AbstractionForm` is a generic component that takes a strategy implementing `AbstractionFormContract<T>`. All forms must be reactive from side-by-side to panel-to-panel.
+`AbstractionForm` is a generic component that takes a provider implementing `AbstractionFormContract<T>`. All forms must be reactive from side-by-side to panel-to-panel.
 
 ## 5. Code Contracts
 
@@ -259,11 +259,11 @@ Add `settings` at the top level. Add BrandWidget and ActionWidget to header:
 }
 ```
 
-### 5.11 UsersForm Strategy
+### 5.11 UsersForm Provider
 
 ```typescript
 // app-admin/users/users-form.tsx
-const strategy: AbstractionFormContract<User> = {
+const provider: AbstractionFormContract<User> = {
   entityLabel: 'User',
   listColumns: ['Name', 'Email', 'Roles', 'Status'],
   list: () => usersQuery.data ?? [],
