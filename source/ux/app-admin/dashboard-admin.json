@@ -3,16 +3,17 @@
     "layout": "rows"
   },
   "header": {
-    "widgets": [{ "type": "BrandWidget", "settings": { "shape": "landscape" } }]
+    "widgets": [
+      { "type": "BrandWidget", "settings": { "shape": "landscape" } },
+      {
+        "type": "ActionWidget",
+        "settings": {
+          "shape": "landscape",
+          "actions": ["/users", "/logout"],
+          "labels": ["User Management", "Logout"]
+        }
+      }
+    ]
   },
-  "rows": [
-    {
-      "size": "standard",
-      "label": "Operations at-a-glance",
-      "widgets": [
-        { "type": "UpcomingJobsWidget", "settings": { "shape": "landscape" } },
-        { "type": "AssetStatusWidget", "settings": { "shape": "square" } }
-      ]
-    }
-  ]
+  "rows": []
 }

@@ -1,7 +1,10 @@
 {
+  "settings": {
+    "layout": "rows"
+  },
   "header": {
     "widgets": [
-      { "key": "swarmag", "type": "BrandWidget", "shape": "landscape", "settings": {} }
+      { "key": "swarmag", "type": "BrandWidget", "settings": { "shape": "landscape" } }
     ]
   },
   "rows": [
@@ -10,8 +13,16 @@
       "size": "standard",
       "label": "Operations at-a-glance",
       "widgets": [
-        { "key": "upcoming-jobs", "type": "UpcomingJobsWidget", "shape": "landscape", "settings": {} },
-        { "key": "assets-status", "type": "AssetStatusWidget", "shape": "square", "settings": {} }
+        {
+          "key": "upcoming-jobs",
+          "type": "UpcomingJobsWidget",
+          "settings": { "shape": "landscape" }
+        },
+        {
+          "key": "assets-status",
+          "type": "AssetStatusWidget",
+          "settings": { "shape": "square" }
+        }
       ]
     }
   ]
