@@ -771,7 +771,7 @@ Per `domain-model.md §2.5`:
 | ----------------- | ------------------------------------------- |
 | `Dashboard`       | Root layout, row renderer, scroll container |
 | `DashboardRow`    | Horizontal swipe row (short\|standard)      |
-| `DashboardWidget` | Widget container (compact\|landscape)        |
+| `DashboardWidget` | Widget container (compact\|landscape)       |
 
 ### 11.4 Widget Catalog
 
@@ -780,14 +780,14 @@ Per `domain-model.md §2.5`:
 | `UpcomingJobsWidget`      | landscape | Job list, status badges               |
 | `JobCalendarWidget`       | landscape | Calendar view of scheduled jobs       |
 | `CustomersWidget`         | landscape | Customer table, action buttons        |
-| `CrewWidget`              | compact    | Active crew, availability             |
-| `AssetStatusWidget`       | compact    | Asset list, status indicators         |
+| `CrewWidget`              | compact   | Active crew, availability             |
+| `AssetStatusWidget`       | compact   | Asset list, status indicators         |
 | `ChemicalInventoryWidget` | landscape | Chemical table, signal word badges    |
-| `ServicesWidget`          | compact    | Service catalog summary               |
-| `JobStatusWidget`         | compact    | Pie chart — job status distribution   |
+| `ServicesWidget`          | compact   | Service catalog summary               |
+| `JobStatusWidget`         | compact   | Pie chart — job status distribution   |
 | `JobTrendWidget`          | landscape | Line chart — job throughput over time |
-| `ChemicalUsageWidget`     | compact    | Pie chart — usage by type             |
-| `AssetUtilizationWidget`  | compact    | Bar chart — utilization rate          |
+| `ChemicalUsageWidget`     | compact   | Pie chart — usage by type             |
+| `AssetUtilizationWidget`  | compact   | Bar chart — utilization rate          |
 | `WorkflowLibraryWidget`   | landscape | Workflow + task catalog               |
 | `RecentActivityWidget`    | landscape | Append-only activity feed             |
 

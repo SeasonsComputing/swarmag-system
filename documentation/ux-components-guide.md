@@ -145,7 +145,9 @@ When `label` is omitted, the visible label falls back to `value`.
 
 Every control emits declared `data-ui` attributes. Consumers may use these for
 testing and diagnostics. App or feature code should not invent new styling
-attributes or override the emitted attributes.
+attributes or override the emitted attributes. Feature, shell, widget, and
+app-local styling uses `data-feat` and `data-feat-*` attributes, rooted in
+feature CSS rather than passed into shared Ui controls.
 
 ## 3. Interactive Controls
 

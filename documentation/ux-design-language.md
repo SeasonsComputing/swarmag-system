@@ -36,7 +36,7 @@ The design language definition is organized into namespaces. Each namespace is c
 | `[data-theme]`            | Shared theme and component-token specializations                 |
 | `[data-theme='{theme}']`  | Namespace per theme instance with theme-specific specializations |
 | `[data-ui='{component}']` | Component namespace for reusable Ui controls and control parts   |
-| `[data-ui='{feature}']`   | Namespace for feature-specific tokens                            |
+| `[data-feat='{feature}']` | Namespace for feature, shell, widget, and app-local styling      |
 
 ### 2.3 Layers
 
@@ -51,12 +51,20 @@ Namespaces of the design language are organized into layers with each layer codi
 | **CONSUMERS**    |                                          |                 |                                                                 |
 | Base Layer       | `html`                                   | `base.css`      | Browser reset, fonts, page base, semantic HTML                  |
 | Component Layer  | `data-ui='{component}'`                  | `ui.css`        | Reusable component selectors and declared component parts       |
-| Feature Layer    | `data-ui='{feature}'`                    | `{feature}.css` | Application feature styling and layout                          |
+| Feature Layer    | `data-feat='{feature}'`                  | `{feature}.css` | Application feature styling and layout                          |
 
 CSS files live in `source/ux/common/components/css/`. A shared CSS barrel,
 `source/ux/common/components/css/css.tsx`, imports them in prescribed dependency order during application bootstrap.
 
 **Layer Boundaries**
+
+- `data-ui` and `data-ui-*` are reserved for reusable Ui controls and their declared
+  control parts, variants, states, and extensions.
+
+- `data-feat` and `data-feat-*` are reserved for feature, shell, widget, and app-local
+  styling. Feature identities and modifier values must use lowercase kebab-case.
+  Feature CSS selectors root at `[data-feat='...']` and may descend into `[data-ui='...']`
+  controls when styling a feature-owned composition.
 
 - Token provider files are `tokens.css`, `roles.css`, and `themes.css`. They may contain only CSS
   custom-property declarations inside their namespace containers. They do not contain element
