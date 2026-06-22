@@ -86,4 +86,32 @@
 
 ## 9. User Management
 
+### 9.1 View Users
+
+1. Admin opens the Users page and sees a list of all active staff.
+2. Admin scans the list to find a user by name, email, role, or status.
+
+### 9.2 Edit User
+
+1. Admin selects a user to review or update their details.
+2. Admin updates the user's name, phone number, or role assignments.
+3. Admin saves the changes.
+
+### 9.3 Deactivate / Activate User
+
+1. Admin deactivates a user who no longer requires system access — the user cannot log in.
+2. Admin reactivates a previously deactivated user to restore their access.
+
+### 9.4 Remove User
+
+1. Admin removes a user who has permanently left — the user no longer appears in the system.
+
+### 9.5 Create User
+
+1. Admin creates a new user by providing their name, email, and role.
+
+### 9.6 Eject User
+
+1. Admin ejects a user who is no longer authorized to access the system.
+
 _End of User Stories Document_
