@@ -8,9 +8,9 @@
       {
         "type": "ActionWidget",
         "settings": {
-          "shape": "landscape",
+          "shape": "compact",
           "actions": ["/users", "/logout"],
-          "labels": ["User Management", "Logout"]
+          "labels": ["Users", "Logout"]
         }
       }
     ]

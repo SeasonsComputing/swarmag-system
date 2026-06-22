@@ -22,9 +22,11 @@ import './brand-widget.css'
 export const BrandWidget = (): UiComponent => {
   const identity = getShellIdentity()
   return (
-    <UiLayout variant='block-fit' gap='tight'>
-      <span data-ui='brand-widget-product'>{identity.productName}</span>
-      <span data-ui='brand-widget-application'>{identity.applicationName}</span>
-    </UiLayout>
+    <div data-feat='brand-widget'>
+      <UiLayout gap='tight'>
+        <span data-feat='brand-widget-product'>{identity.productName}</span>
+        <span data-feat='brand-widget-application'>{identity.applicationName}</span>
+      </UiLayout>
+    </div>
   )
 }

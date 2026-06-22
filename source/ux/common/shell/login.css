@@ -2,11 +2,11 @@
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Login shell styles                                                           ║
 ║ Full-bleed login layout: hero zone (logo) + form zone (OTP fields).          ║
-║ Scoped to [data-ui='login'] and its children only.                           ║
+║ Scoped to [data-feat='login'] and its children only.                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-ui='login'] {
+[data-feat='login'] {
   min-height: 100dvh;
   display: grid;
   align-items: center;
@@ -15,7 +15,7 @@
   padding-block: var(--sa-rhythm-gap) var(--sa-rhythm-pad);
 }
 
-[data-ui='login-layout'] {
+[data-feat='login-layout'] {
   height: 100%;
   display: grid;
   align-items: end;
@@ -23,7 +23,7 @@
   max-width: var(--sa-size-min);
 }
 
-[data-ui='login-hero'] {
+[data-feat='login-hero'] {
   display: flex;
   flex-direction: column;
   position: relative;
@@ -32,7 +32,7 @@
   gap: var(--sa-rhythm-gap);
 }
 
-[data-ui='login-hero']::before {
+[data-feat='login-hero']::before {
   content: '';
   position: absolute;
   inset-block-end: var(--sa-space-4xl);
@@ -48,7 +48,7 @@
   opacity: 0.68;
 }
 
-[data-ui='login-logo'] {
+[data-feat='login-logo'] {
   position: relative;
   z-index: var(--sa-z-raised);
   width: 100%;
@@ -56,7 +56,7 @@
   display: block;
 }
 
-[data-ui='login-product'] {
+[data-feat='login-product'] {
   text-align: center;
   color: var(--sa-text-secondary);
   font-family: var(--sa-label-font-family);
@@ -64,7 +64,7 @@
   font-weight: var(--sa-label-font-weight);
 }
 
-[data-ui='login-application'] {
+[data-feat='login-application'] {
   text-align: center;
   color: var(--sa-color-accent);
   font-family: var(--sa-heading-font-family);
@@ -72,26 +72,26 @@
   font-weight: var(--sa-heading-font-weight);
 }
 
-[data-ui='login-config'] {
+[data-feat='login-config'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-data-font-family);
   font-size: calc(var(--sa-font-size-xs) * 0.85);
   text-transform: lowercase;
 }
 
-[data-ui='login-config'] > * {
+[data-feat='login-config'] > * {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
   gap: var(--sa-space-sm);
   align-items: baseline;
 }
 
-[data-ui='login-config'] dd,
-[data-ui='login-config'] dt {
+[data-feat='login-config'] dd,
+[data-feat='login-config'] dt {
   margin: 0;
 }
 
-[data-ui='login-config'] dd {
+[data-feat='login-config'] dd {
   min-width: 0;
   overflow-wrap: anywhere;
   text-align: end;

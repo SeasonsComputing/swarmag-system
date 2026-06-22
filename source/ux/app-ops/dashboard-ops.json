@@ -4,26 +4,16 @@
   },
   "header": {
     "widgets": [
-      { "key": "swarmag", "type": "BrandWidget", "settings": { "shape": "landscape" } }
+      { "type": "BrandWidget", "settings": { "shape": "landscape" } },
+      {
+        "type": "ActionWidget",
+        "settings": {
+          "shape": "landscape",
+          "actions": ["/logout"],
+          "labels": ["Logout"]
+        }
+      }
     ]
   },
-  "rows": [
-    {
-      "key": "at-a-glance",
-      "size": "standard",
-      "label": "Operations at-a-glance",
-      "widgets": [
-        {
-          "key": "upcoming-jobs",
-          "type": "UpcomingJobsWidget",
-          "settings": { "shape": "landscape" }
-        },
-        {
-          "key": "assets-status",
-          "type": "AssetStatusWidget",
-          "settings": { "shape": "compact" }
-        }
-      ]
-    }
-  ]
+  "rows": []
 }

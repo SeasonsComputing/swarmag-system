@@ -68,7 +68,7 @@ export const UsersForm = (): UiComponent => {
   }
 
   return (
-    <div data-ui='users-page'>
+    <div data-feat='users-page'>
       <UiLayout>
         <Show when={usersQuery.error}>
           <UiAlert variant='danger'>{errorMessage(usersQuery.error)}</UiAlert>
@@ -95,7 +95,7 @@ function UserListRow(props: { user: User }): UiComponent {
       <UiTableCell>{props.user.displayName}</UiTableCell>
       <UiTableCell>{props.user.primaryEmail}</UiTableCell>
       <UiTableCell>
-        <div data-ui='user-role-list'>
+        <div data-feat='user-role-list'>
           <For each={props.user.roles}>
             {role => <UiBadge variant='info'>{role}</UiBadge>}
           </For>

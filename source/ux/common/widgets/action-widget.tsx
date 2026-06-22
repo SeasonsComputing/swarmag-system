@@ -36,11 +36,13 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
     }))
 
   return (
-    <UiLayout variant='inline-wrap' gap='tight'>
-      <For each={pairs()}>
-        {pair => <Link to={pair.action}>{pair.label}</Link>}
-      </For>
-    </UiLayout>
+    <nav data-feat='action-widget'>
+      <UiLayout gap='tight'>
+        <For each={pairs()}>
+          {pair => <Link to={pair.action}>{pair.label}</Link>}
+        </For>
+      </UiLayout>
+    </nav>
   )
 }
 

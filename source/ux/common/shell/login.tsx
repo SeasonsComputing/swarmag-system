@@ -116,21 +116,21 @@ const LoginClient = (props: LoginClientProps) => {
       when={loginRequired()}
       fallback={<Navigate to='/dashboard' replace />}
     >
-      <div data-ui='login'>
-        <div data-ui='login-layout'>
+      <div data-feat='login'>
+        <div data-feat='login-layout'>
           <UiLayout gap='loose'>
             {/* Login hero block */}
-            <div data-ui='login-hero'>
-              <img data-ui='login-logo' src={logoArt} alt='swarmAg' />
+            <div data-feat='login-hero'>
+              <img data-feat='login-logo' src={logoArt} alt='swarmAg' />
               <UiLayout gap='tight'>
-                <span data-ui='login-product'>{props.shell.identity.productName}</span>
-                <span data-ui='login-application'>{props.shell.identity.applicationName}</span>
+                <span data-feat='login-product'>{props.shell.identity.productName}</span>
+                <span data-feat='login-application'>{props.shell.identity.applicationName}</span>
               </UiLayout>
             </div>
 
             <Show when={!session.isLoading}>
               {/* STEP 1: validate email and send OTP code */}
-              <div data-ui='login-form'>
+              <div data-feat='login-form'>
                 <Show when={step() === 'email'}>
                   <form onSubmit={submitEmailForm}>
                     <UiLayout>
@@ -197,7 +197,7 @@ const LoginClient = (props: LoginClientProps) => {
 
           {/* Shell configuration metadata */}
           <div>
-            <dl data-ui='login-config'>
+            <dl data-feat='login-config'>
               <For each={props.shell.config}>
                 {datum => (
                   <div>

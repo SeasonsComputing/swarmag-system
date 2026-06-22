@@ -1,9 +1,27 @@
-[data-type='ActionWidget'] a {
+[data-feat='action-widget'] a {
+  align-items: center;
   color: var(--sa-text-primary);
-  font-size: var(--sa-ui-font-size-compact);
+  display: inline-flex;
+  font-family: var(--sa-ui-font-family);
+  font-size: var(--sa-ui-font-size);
+  font-weight: var(--sa-ui-font-weight);
+  gap: var(--sa-space-xs);
   text-decoration: none;
+  white-space: nowrap;
 }
 
-[data-type='ActionWidget'] a:hover {
+[data-feat='action-widget'] a::before {
+  --sa-action-widget-bullet-size: 10px;
+  background: currentColor;
+  content: '';
+  flex: 0 0 auto;
+  height: var(--sa-action-widget-bullet-size);
+  mask: url('../components/icons/link-2.svg') center / contain no-repeat;
+  width: var(--sa-action-widget-bullet-size);
+}
+
+[data-feat='action-widget'] a:hover {
   color: var(--sa-color-primary);
+  text-decoration: underline dotted 1px var(--sa-text-secondary);
+  text-underline-offset: 3px;
 }
