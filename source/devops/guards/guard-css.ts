@@ -1,18 +1,28 @@
+import { StringSet } from '@core/std'
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+import { walk } from '@std/walk'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
+const COMMON_DIR = `${ROOT}/source/ux/common`
 const CSS_DIR = `${ROOT}/source/ux/common/components/css`
+const APP_DIRS = [
+  `${ROOT}/source/ux/app-admin`,
+  `${ROOT}/source/ux/app-customer`,
+  `${ROOT}/source/ux/app-ops`,
+  `${ROOT}/source/ux/app-style-guide`
+]
 
 const CSS_FILES = ['tokens.css', 'roles.css', 'themes.css', 'base.css', 'ui.css']
-const TOKEN_ONLY_FILES = new Set(['tokens.css', 'roles.css', 'themes.css'])
+const TOKEN_ONLY_FILES = new StringSet(['tokens.css', 'roles.css', 'themes.css'])
 
 const SELECTOR_REGEX = /^([^/{\n]*)\{/
+const DATA_ATTRIBUTE_REGEX = /\[(data-[a-zA-Z0-9_-]+)(?:=(['"]?)([^'"\]\s]+)\2)?\]/g
 const TOKEN_DECLARATION_REGEX = /^\s*(--sa-[^:]+)\s*:/
 const COMMENT_LINE_REGEX = /^\s*\/\//
 const BLOCK_COMMENT_START = /\/\*/
 const BLOCK_COMMENT_END = /\*\//
 
-const IMMUTABLE_TOKEN_NAMES = new Set([
+const IMMUTABLE_TOKEN_NAMES = new StringSet([
   '--sa-base-size'
 ])
 
@@ -30,6 +40,27 @@ const IMMUTABLE_TOKEN_PREFIXES = [
   '--sa-transition-',
   '--sa-z-'
 ]
+
+const ALLOWED_DATA_ATTRIBUTES = new StringSet([
+  'data-ui',
+  'data-ui-align',
+  'data-ui-drag',
+  'data-ui-gap',
+  'data-ui-layout',
+  'data-ui-overflow',
+  'data-ui-state',
+  'data-ui-variant',
+  'data-checked',
+  'data-disabled',
+  'data-expanded',
+  'data-highlighted',
+  'data-placeholder-shown',
+  'data-pressed',
+  'data-selected'
+])
+
+const DATA_ATTRIBUTE_VALUE_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+const FEATURE_ATTRIBUTE_REGEX = /^data-feat(?:-[a-z0-9]+)*$/
 
 interface CSSLine {
   line: string
@@ -239,6 +270,55 @@ const auditControlsCSS = (lines: CSSLine[], filePath: string): string[] => {
   return violations
 }
 
+const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
+  const violations: string[] = []
+
+  for (const { line, lineNumber, isComment } of lines) {
+    if (isComment || !line.includes('{')) continue
+
+    const selector = extractSelector(line)
+    if (!selector) continue
+
+    if (isAtRule(selector)) continue
+
+    if (!selector.startsWith('[data-feat')) {
+      violations.push(
+        `${filePath}:${lineNumber} — selector not rooted at [data-feat — found: ${selector}`
+      )
+    }
+
+    DATA_ATTRIBUTE_REGEX.lastIndex = 0
+    let match: RegExpExecArray | null
+    while ((match = DATA_ATTRIBUTE_REGEX.exec(selector)) !== null) {
+      const attribute = match[1]
+      const value = match[3]
+
+      if (!ALLOWED_DATA_ATTRIBUTES.has(attribute) && !FEATURE_ATTRIBUTE_REGEX.test(attribute)) {
+        violations.push(
+          `${filePath}:${lineNumber} — forbidden data attribute selector — found: ${attribute}`
+        )
+      }
+
+      if (
+        value
+        && (
+          attribute === 'data-ui'
+          || attribute.startsWith('data-ui-')
+          || attribute === 'data-feat'
+          || attribute.startsWith('data-feat-')
+        )
+        && !DATA_ATTRIBUTE_VALUE_REGEX.test(value)
+      ) {
+        violations.push(
+          `${filePath}:${lineNumber} — data attribute value not kebab-case — ${attribute}='${value}'`
+        )
+      }
+    }
+  }
+
+  return violations
+}
+
 const isInFontFaceBlock = (lines: CSSLine[], currentIndex: number): boolean => {
   for (let i = currentIndex - 1; i >= 0; i--) {
     const line = lines[i].line.trim()
@@ -430,10 +510,12 @@ const auditValueRules = (
 
 const main = async () => {
   const violations: string[] = []
+  const designSystemFiles = new StringSet()
 
   for (const fileName of CSS_FILES) {
     const filePath = `${CSS_DIR}/${fileName}`
     const relative = `source/ux/common/components/css/${fileName}`
+    designSystemFiles.add(filePath)
 
     const content = await Deno.readTextFile(filePath)
     const lines = parseLines(content)
@@ -463,9 +545,37 @@ const main = async () => {
     }
   }
 
+  await auditFeatureCSSDirectory(COMMON_DIR, designSystemFiles, violations)
+  for (const appDir of APP_DIRS) await auditFeatureCSSDirectory(appDir, designSystemFiles, violations)
+
   if (violations.length > 0) guardFail('CSS', violations)
 
   guardPass('CSS')
 }
 
 await main()
+
+async function auditFeatureCSSDirectory(
+  directory: string,
+  skippedFiles: StringSet,
+  violations: string[]
+): Promise<void> {
+  for await (
+    const entry of walk(directory, {
+      includeDirs: false,
+      exts: ['.css'],
+      skip: [/[/\\]dist[/\\]?/, /[/\\]node_modules[/\\]?/]
+    })
+  ) {
+    const filePath = entry.path.replaceAll('\\', '/')
+    if (skippedFiles.has(filePath)) continue
+
+    const relative = filePath.replace(`${ROOT}/`, '')
+    const content = await Deno.readTextFile(filePath)
+    const lines = parseLines(content)
+
+    violations.push(...auditTokenDeclarations(lines, relative, relative.split('/').at(-1) ?? ''))
+    violations.push(...auditFeatureCSS(lines, relative))
+    violations.push(...auditValueRules(lines, relative, false))
+  }
+}

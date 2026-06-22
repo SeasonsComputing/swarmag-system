@@ -274,6 +274,11 @@ state:
 
 Feature and app code do not invent styling attributes (`data-card-mode`, `data-page-section`, `data-feature-state`). New `data-ui` values for controls or control parts are declared in this document before use.
 
+Feature, shell, widget, and app-local styling uses `data-feat` and `data-feat-*`
+attributes instead of `data-ui`. Feature identities and modifier values use
+lowercase kebab-case. Feature CSS roots selectors at `[data-feat='...']`; it may
+descend into `[data-ui='...']` controls only from a feature root.
+
 ### 3.9 Enforcement
 
 Violations:
