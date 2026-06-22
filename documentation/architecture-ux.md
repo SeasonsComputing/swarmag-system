@@ -688,7 +688,7 @@ to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 {
   "header": {
     "widgets": [
-      { "type": "BrandWidget", "shape": "landscape", "settings": {} }
+      { "type": "BrandWidget", "settings": { "shape": "landscape" } }
     ]
   },
   "rows": [
@@ -696,8 +696,8 @@ to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
       "size": "standard",
       "label": "Operations at-a-glance",
       "widgets": [
-        { "type": "UpcomingJobsWidget", "shape": "landscape", "settings": {} },
-        { "type": "AssetStatusWidget", "shape": "square", "settings": {} }
+        { "type": "UpcomingJobsWidget", "settings": { "shape": "landscape" } },
+        { "type": "AssetStatusWidget", "settings": { "shape": "square" } }
       ]
     }
   ]

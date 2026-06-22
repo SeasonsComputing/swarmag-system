@@ -188,8 +188,8 @@ export const WidgetCatalog: WidgetRegistry = { BrandWidget, ActionWidget }
 ```json
 {
   "type": "ActionWidget",
-  "shape": "landscape",
   "settings": {
+    "shape": "landscape",
     "actions": ["/users", "/logout"],
     "labels": ["User Management", "Logout"]
   }
@@ -244,11 +244,11 @@ Add `settings` at the top level. Add BrandWidget and ActionWidget to header:
   "settings": { "layout": "rows" },
   "header": {
     "widgets": [
-      { "type": "BrandWidget", "shape": "landscape", "settings": {} },
+      { "type": "BrandWidget", "settings": { "shape": "landscape" } },
       {
         "type": "ActionWidget",
-        "shape": "landscape",
         "settings": {
+          "shape": "landscape",
           "actions": ["/users", "/logout"],
           "labels": ["User Management", "Logout"]
         }
