@@ -5,16 +5,16 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-ui='users-page'] {
+[data-feat='users-page'] {
   min-block-size: 100dvh;
   padding: var(--sa-rhythm-pad);
 }
 
-[data-ui='abstraction-form'] {
+[data-feat='abstraction-form'] {
   display: block;
 }
 
-[data-ui='user-role-list'] {
+[data-feat='user-role-list'] {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sa-space-xx);

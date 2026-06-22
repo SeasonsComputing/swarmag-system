@@ -42,7 +42,7 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
   }
 
   return (
-    <section data-ui='abstraction-form'>
+    <section data-feat='abstraction-form'>
       <UiLayout>
         <UiLayout variant='inline-fill'>
           <h1>{props.provider.entityLabel}s</h1>

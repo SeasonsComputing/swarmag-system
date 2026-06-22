@@ -30,22 +30,22 @@ export const Dashboard = (): UiComponent => {
   const bodyWidgets = () => dashboard.rows.flatMap(row => row.widgets)
 
   return (
-    <section data-ui='dashboard' data-layout={dashboard.settings.layout}>
-      <header data-ui='dashboard-header'>
+    <section data-feat='dashboard' data-feat-layout={dashboard.settings.layout}>
+      <header data-feat='dashboard-header'>
         <For each={dashboard.header.widgets}>
           {widget => <DashboardWidget widget={widget} />}
         </For>
       </header>
 
-      <div data-ui='dashboard-body'>
+      <div data-feat='dashboard-body'>
         <Show
           when={dashboard.settings.layout === 'masonry'}
           fallback={
             <For each={dashboard.rows}>
               {row => (
-                <section data-ui='dashboard-row' data-size={row.size}>
-                  <h2 data-ui='dashboard-row-label'>{row.label}</h2>
-                  <div data-ui='dashboard-row-widgets'>
+                <section data-feat='dashboard-row' data-feat-size={row.size}>
+                  <h2 data-feat='dashboard-row-label'>{row.label}</h2>
+                  <div data-feat='dashboard-row-widgets'>
                     <For each={row.widgets}>
                       {widget => <DashboardWidget widget={widget} />}
                     </For>
@@ -68,7 +68,11 @@ export const Dashboard = (): UiComponent => {
   function DashboardWidget(props: { widget: DashboardStoreWidget }): UiComponent {
     const Widget = widgets[props.widget.type] as WidgetComponent | undefined
     return (
-      <div data-ui='dashboard-widget' data-type={props.widget.type} data-shape={props.widget.settings.shape}>
+      <div
+        data-feat='dashboard-widget'
+        data-feat-type={props.widget.type}
+        data-feat-shape={props.widget.settings.shape}
+      >
         <UiCard variant='widget'>
           <Show when={Widget} fallback={<MissingWidget type={props.widget.type} />}>
             {component => {
@@ -84,5 +88,5 @@ export const Dashboard = (): UiComponent => {
 
 /** Missing widget marker for dashboard seed/catalog drift. */
 const MissingWidget = (props: { type: string }): UiComponent => (
-  <span data-ui='dashboard-missing-widget'>Missing widget: {props.type}</span>
+  <span data-feat='dashboard-missing-widget'>Missing widget: {props.type}</span>
 )

@@ -1,11 +1,15 @@
-[data-ui='brand-widget-product'] {
+[data-feat='brand-widget'] {
+  text-align: center;
+}
+
+[data-feat='brand-widget-product'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-label-font-family);
   font-size: var(--sa-label-font-size);
   font-weight: var(--sa-label-font-weight);
 }
 
-[data-ui='brand-widget-application'] {
+[data-feat='brand-widget-application'] {
   color: var(--sa-color-accent);
   font-family: var(--sa-heading-font-family);
   font-size: var(--sa-heading-font-size-h4);
