@@ -1,21 +1,16 @@
-/*
-╔══════════════════════════════════════════════════════════════════════════════╗
-║ Users page styles                                                            ║
-║ Feature-layer layout for app-admin user management.                          ║
-╚══════════════════════════════════════════════════════════════════════════════╝
-*/
-
-[data-feat='users-page'] {
-  min-block-size: 100dvh;
-  padding: var(--sa-rhythm-pad);
-}
-
-[data-feat='abstraction-form'] {
-  display: block;
-}
 
 [data-feat='user-role-list'] {
   display: flex;
   flex-wrap: wrap;
   gap: var(--sa-space-xx);
+}
+
+[data-feat='user-option-row'] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-xs);
+}
+
+[data-feat='user-option-label'] {
+  text-transform: capitalize;
 }

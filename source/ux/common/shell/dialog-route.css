@@ -1,0 +1,34 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Dialog route styles                                                          ║
+║ Shell-owned modal route layering over the active dashboard surface.          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-feat='shell-dialog-layer'] {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sa-z-overlay);
+  display: grid;
+  place-items: center;
+  min-block-size: 100dvh;
+  padding: var(--sa-rhythm-pad);
+}
+
+[data-feat='shell-dialog-backdrop'] {
+  position: absolute;
+  inset: 0;
+  background: rgb(0 0 0 / 36%);
+}
+
+[data-feat='shell-dialog-container'] {
+  position: relative;
+  max-inline-size: calc(100vw - var(--sa-rhythm-pad) * 2);
+  max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 2);
+  padding: var(--sa-rhythm-pad);
+  background: var(--sa-bg-surface-1);
+  border: var(--sa-border-card);
+  border-radius: var(--sa-card-border-radius);
+  box-shadow: var(--sa-shadow-card);
+  overflow: auto;
+}
