@@ -42,9 +42,11 @@ import {
   createRoute,
   createRouter,
   Navigate,
-  RouterProvider
+  RouterProvider,
+  useNavigate
 } from '@tanstack/solid-router'
 import { api } from '@ux/api'
+import type { UiComponent } from '@ux/common/components/ui'
 import { AuthGuard } from './auth-guard.tsx'
 import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
@@ -58,6 +60,7 @@ import { WidgetCatalog } from './widgets-catalog.ts'
 // ────────────────────────────────────────────────────────────────────────────
 
 import '@ux/common/components/css/css.tsx'
+import './dialog-route.css'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 4. DEFINE ROUTES
@@ -83,17 +86,20 @@ const logoutRoute = createRoute({
   component: () => <Logout />
 })
 
-const dashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/dashboard',
-  component: () => (
-    <AuthGuard>
-      <Content>
-        <Dashboard />
-      </Content>
-    </AuthGuard>
-  )
-})
+/** Bootstrap options for app-specific shell composition. */
+export type BootstrapOptions = {
+  dialogs?: ShellDialogRoute[]
+  routes?: AnyRoute[]
+}
+
+/** Component contract for shell-owned dialog routes. */
+export type ShellDialogComponent = (props: { onCancel: () => void }) => UiComponent
+
+/** Dialog route registered by an app and layered by the shell. */
+export type ShellDialogRoute = {
+  path: string
+  component: ShellDialogComponent
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // 5. BOOTSTRAP APPLICATION
@@ -102,14 +108,27 @@ const dashboardRoute = createRoute({
 const showApplication = () => document.body.style.opacity = '1'
 
 /** Initialize app state before mounting the application */
-export async function bootstrap(dashboardSeed: unknown, routes: AnyRoute[] = []) {
+export async function bootstrap(dashboardSeed: unknown, options: BootstrapOptions | AnyRoute[] = {}) {
   try {
+    const bootstrapOptions = Array.isArray(options) ? { routes: options } : options
+    const dashboardRoute = createRoute({
+      getParentRoute: () => rootRoute,
+      path: '/dashboard',
+      component: () => (
+        <AuthGuard>
+          <Content>
+            <Dashboard />
+          </Content>
+        </AuthGuard>
+      )
+    })
     const routeTree = rootRoute.addChildren([
       indexRoute,
       loginRoute,
       logoutRoute,
       dashboardRoute,
-      ...routes
+      ...(bootstrapOptions.dialogs ?? []).map(makeDialogRoute),
+      ...(bootstrapOptions.routes ?? [])
     ])
     const router = createRouter({ routeTree })
     const queryClient = new QueryClient()
@@ -138,6 +157,34 @@ export async function bootstrap(dashboardSeed: unknown, routes: AnyRoute[] = [])
     console.error('[bootstrap] startup failed', e)
     throw e
   }
+}
+
+function makeDialogRoute(dialog: ShellDialogRoute): AnyRoute {
+  const DialogComponent = dialog.component
+  return createRoute({
+    getParentRoute: () => rootRoute,
+    path: dialog.path,
+    component: () => {
+      const navigate = useNavigate()
+      const close = (): void => {
+        void navigate({ to: '/dashboard' })
+      }
+
+      return (
+        <AuthGuard>
+          <Content>
+            <Dashboard />
+            <div data-feat='shell-dialog-layer'>
+              <div data-feat='shell-dialog-backdrop' />
+              <section data-feat='shell-dialog-container'>
+                <DialogComponent onCancel={close} />
+              </section>
+            </div>
+          </Content>
+        </AuthGuard>
+      )
+    }
+  })
 }
 
 // ────────────────────────────────────────────────────────────────────────────

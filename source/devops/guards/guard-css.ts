@@ -46,6 +46,7 @@ const ALLOWED_DATA_ATTRIBUTES = new StringSet([
   'data-ui-align',
   'data-ui-drag',
   'data-ui-gap',
+  'data-ui-icon',
   'data-ui-layout',
   'data-ui-overflow',
   'data-ui-state',

@@ -1,17 +1,17 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Abstraction form                                                             ║
-║ Generic list and dialog form shell driven by a provider contract.            ║
+║ Generic list and panel form shell driven by a provider contract.             ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Renders an abstraction list and create dialog while delegating row and form
+Renders an abstraction list and editor panel while delegating row and form
 content to an abstraction-specific provider.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AbstractionForm  Generic list+dialog form component.
+AbstractionForm  Generic list+panel form component.
 */
 
 import type { Instance } from '@core/std'
@@ -19,8 +19,6 @@ import { createSignal, For, Show } from '@solid-js'
 import {
   UiCard,
   type UiComponent,
-  UiDialog,
-  UiLayout,
   UiTable,
   UiTableBody,
   UiTableCell,
@@ -29,33 +27,27 @@ import {
 } from '@ux/common/components/ui'
 import type { AbstractionFormContract } from './abstraction-form-contract.ts'
 
+import './abstraction-form.css'
+
 /** Props for a generic abstraction form. */
 export type AbstractionFormProps<T extends Instance> = {
   provider: AbstractionFormContract<T>
 }
 
-/** Generic abstraction list and create-dialog component. */
+/** Generic abstraction list and editor-panel component. */
 export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<T>): UiComponent => {
-  const [open, setOpen] = createSignal(false)
-  const close = (): void => {
-    setOpen(false)
+  const [selected, setSelected] = createSignal<T | null>(null)
+  const onSelect = (item: T): void => {
+    setSelected(() => item)
+  }
+  const clearSelection = (): void => {
+    setSelected(null)
   }
 
   return (
     <section data-feat='abstraction-form'>
-      <UiLayout>
-        <UiLayout variant='inline-fill'>
-          <h1>{props.provider.entityLabel}s</h1>
-          <UiDialog
-            trigger={`Add ${props.provider.entityLabel}`}
-            triggerVariant='primary'
-            open={open()}
-            onOpenChange={setOpen}
-          >
-            {props.provider.renderForm(null, close)}
-          </UiDialog>
-        </UiLayout>
-
+      <h2 data-feat='abstraction-form-title'>{props.provider.entityLabel}s</h2>
+      <div data-feat='abstraction-form-list'>
         <UiCard variant='workflow'>
           <Show
             when={!props.provider.isListLoading()}
@@ -79,14 +71,18 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
                   }
                 >
                   <For each={props.provider.list()}>
-                    {item => props.provider.renderListRow(item)}
+                    {item => props.provider.renderListRow(item, onSelect)}
                   </For>
                 </Show>
               </UiTableBody>
             </UiTable>
           </Show>
         </UiCard>
-      </UiLayout>
+      </div>
+
+      <div data-feat='abstraction-form-panel'>
+        {props.provider.renderForm(selected(), clearSelection)}
+      </div>
     </section>
   )
 }

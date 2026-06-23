@@ -1,0 +1,35 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Abstraction form styles                                                      ║
+║ Shell-owned layout for list and editor panel abstraction forms.              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-feat='abstraction-form'] {
+  display: grid;
+  grid-template-columns: var(--sa-size-sm) var(--sa-size-xs);
+  grid-template-rows: auto minmax(0, 1fr);
+  max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 2);
+  inline-size: calc(var(--sa-size-sm) + var(--sa-size-xs) + var(--sa-rhythm-gap));
+  min-inline-size: calc(var(--sa-size-sm) + var(--sa-size-xs) + var(--sa-rhythm-gap));
+  gap: var(--sa-rhythm-gap);
+  overflow-x: auto;
+}
+
+[data-feat='abstraction-form-title'] {
+  grid-column: 1 / -1;
+}
+
+[data-feat='abstraction-form-list'] {
+  display: flex;
+  flex-direction: column;
+  inline-size: var(--sa-size-sm);
+  overflow-y: auto;
+  min-block-size: 0;
+}
+
+[data-feat='abstraction-form-panel'] {
+  inline-size: var(--sa-size-xs);
+  overflow-y: auto;
+  min-block-size: 0;
+}

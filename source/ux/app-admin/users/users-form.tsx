@@ -14,7 +14,6 @@ PUBLIC
 UsersForm  User management form component.
 */
 
-import type { Id } from '@core/std'
 import {
   type User,
   USER_ROLES,
@@ -23,48 +22,73 @@ import {
   type UserStatus
 } from '@domain/abstractions/user.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
-import { createSignal, For, Show } from '@solid-js'
+import { createEffect, createSignal, For, Show } from '@solid-js'
 import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
 import { api } from '@ux/api'
 import {
+  UiActionButton,
   UiAlert,
   UiBadge,
   UiButton,
   UiCard,
+  UiCheckbox,
   type UiComponent,
-  UiDialog,
   UiField,
   UiFormActions,
   UiInput,
   UiLayout,
-  UiMultiSelect,
-  UiSingleSelect,
   UiTableCell,
-  UiTableRow
+  UiTableRow,
+  UiToggleGroup,
+  UiToggleItem
 } from '@ux/common/components/ui'
 import type { AbstractionFormContract } from '@ux/common/shell/abstraction-form-contract.ts'
 import { AbstractionForm } from '@ux/common/shell/abstraction-form.tsx'
 
 import './users.css'
 
-const roleOptions = USER_ROLES.map(value => ({ value }))
-const statusOptions = USER_STATUSES.map(value => ({ value }))
 const USERS_QUERY_KEY = ['users'] as const
 
+/** Props for the user management form route modal. */
+export type UsersFormProps = {
+  onCancel: () => void
+}
+
 /** User management form component. */
-export const UsersForm = (): UiComponent => {
+export const UsersForm = (props: UsersFormProps): UiComponent => {
+  const queryClient = useQueryClient()
   const usersQuery = createQuery(() => ({
     queryKey: USERS_QUERY_KEY,
     queryFn: loadUsers
   }))
+  const deleteUserMutation = createMutation(() => ({
+    mutationFn: (id: User['id']) => api.Users.delete(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
+    }
+  }))
+  const ejectUser = async (user: User): Promise<void> => {
+    await deleteUserMutation.mutateAsync(user.id)
+  }
 
   const provider: AbstractionFormContract<User> = {
     entityLabel: 'User',
     listColumns: ['Name', 'Email', 'Roles', 'Status', 'Actions'],
     list: () => usersQuery.data ?? [],
     isListLoading: () => usersQuery.isPending,
-    renderListRow: user => <UserListRow user={user} />,
-    renderForm: (user, onClose) => <UserEditor user={user} onClose={onClose} />
+    renderListRow: (user, onSelect) => (
+      <UserListRow
+        user={user}
+        onEject={ejectUser}
+        onSelect={onSelect}
+      />
+    ),
+    renderForm: (user, onClose) => (
+      <UserEditor
+        user={user}
+        onClose={user === null ? props.onCancel : onClose}
+      />
+    )
   }
 
   return (
@@ -84,14 +108,13 @@ async function loadUsers(): Promise<User[]> {
   return result.data
 }
 
-function UserListRow(props: { user: User }): UiComponent {
-  const [open, setOpen] = createSignal(false)
-  const close = (): void => {
-    setOpen(false)
-  }
-
+function UserListRow(props: {
+  user: User
+  onEject: (user: User) => Promise<void>
+  onSelect: (user: User) => void
+}): UiComponent {
   return (
-    <UiTableRow>
+    <UiTableRow onClick={() => props.onSelect(props.user)}>
       <UiTableCell>{props.user.displayName}</UiTableCell>
       <UiTableCell>{props.user.primaryEmail}</UiTableCell>
       <UiTableCell>
@@ -107,14 +130,13 @@ function UserListRow(props: { user: User }): UiComponent {
         </UiBadge>
       </UiTableCell>
       <UiTableCell align='end'>
-        <UiDialog
-          trigger='Edit'
-          triggerVariant='secondary'
-          open={open()}
-          onOpenChange={setOpen}
-        >
-          <UserEditor user={props.user} onClose={close} />
-        </UiDialog>
+        <UiActionButton
+          icon='eject'
+          label='Eject'
+          variant='danger'
+          onClick={() => void props.onEject(props.user)}
+        />
+        <UiActionButton icon='edit' label='Edit' onClick={() => props.onSelect(props.user)} />
       </UiTableCell>
     </UiTableRow>
   )
@@ -128,28 +150,37 @@ function UserEditor(props: {
   const [displayName, setDisplayName] = createSignal(props.user?.displayName ?? '')
   const [primaryEmail, setPrimaryEmail] = createSignal(props.user?.primaryEmail ?? '')
   const [phoneNumber, setPhoneNumber] = createSignal(props.user?.phoneNumber ?? '')
-  const [roles, setRoles] = createSignal<string[]>(props.user ? [...props.user.roles] : [])
+  const [roles, setRoles] = createSignal<UserRole[]>(props.user ? [...props.user.roles] : [])
   const [status, setStatus] = createSignal<UserStatus>(props.user?.status ?? 'active')
   const [pending, setPending] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
 
+  createEffect(() => {
+    setDisplayName(props.user?.displayName ?? '')
+    setPrimaryEmail(props.user?.primaryEmail ?? '')
+    setPhoneNumber(props.user?.phoneNumber ?? '')
+    setRoles(props.user ? [...props.user.roles] : [])
+    setStatus(props.user?.status ?? 'active')
+    setError(null)
+  })
+
   const existing = (): boolean => props.user !== null
-  const modeLabel = (): string => existing() ? 'Edit User' : 'Add User'
-  const statusActionLabel = (): string => status() === 'active' ? 'Deactivate' : 'Activate'
+  const toggleRole = (role: UserRole, pressed: boolean): void => {
+    if (pressed) {
+      if (!roles().includes(role)) setRoles([...roles(), role])
+      return
+    }
+
+    setRoles(roles().filter(value => value !== role))
+  }
   const createUserMutation = createMutation(() => ({
-    mutationFn: (input: UserCreate) => api.userCreateSynchAuth.run(input),
+    mutationFn: (input: UserCreate) => api.Users.create(input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
     }
   }))
   const updateUserMutation = createMutation(() => ({
-    mutationFn: (input: UserUpdate) => api.userUpdateSynchAuth.run(input),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
-    }
-  }))
-  const revokeUserMutation = createMutation(() => ({
-    mutationFn: (input: { id: Id }) => api.userRevokeAuth.run(input),
+    mutationFn: (input: UserUpdate) => api.Users.update(input),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
     }
@@ -180,7 +211,7 @@ function UserEditor(props: {
       id: user.id,
       displayName: displayName(),
       phoneNumber: phoneNumber(),
-      roles: roles() as UserRole[],
+      roles: roles(),
       status: nextStatus
     }
     await updateUserMutation.mutateAsync(update)
@@ -191,40 +222,10 @@ function UserEditor(props: {
       displayName: displayName(),
       primaryEmail: primaryEmail(),
       phoneNumber: phoneNumber(),
-      roles: roles() as UserRole[],
+      roles: roles(),
       status: status()
     }
     await createUserMutation.mutateAsync(create)
-  }
-
-  const toggleStatus = async (): Promise<void> => {
-    if (!props.user || pending()) return
-    const nextStatus = status() === 'active' ? 'inactive' : 'active'
-    setStatus(nextStatus)
-    setPending(true)
-    setError(null)
-    try {
-      await updateUser(props.user, nextStatus)
-      props.onClose()
-    } catch (e) {
-      setError(errorMessage(e))
-    } finally {
-      setPending(false)
-    }
-  }
-
-  const remove = async (): Promise<void> => {
-    if (!props.user || pending()) return
-    setPending(true)
-    setError(null)
-    try {
-      await revokeUserMutation.mutateAsync({ id: props.user.id })
-      props.onClose()
-    } catch (e) {
-      setError(errorMessage(e))
-    } finally {
-      setPending(false)
-    }
   }
 
   const submit = (event: SubmitEvent): void => {
@@ -236,8 +237,6 @@ function UserEditor(props: {
     <UiCard variant='workflow'>
       <form onSubmit={submit}>
         <UiLayout>
-          <h2>{modeLabel()}</h2>
-
           <Show when={error() !== null}>
             <UiAlert variant='danger'>{error()}</UiAlert>
           </Show>
@@ -287,46 +286,48 @@ function UserEditor(props: {
           </UiField>
 
           <UiField variant='caption' label='Roles'>
-            <UiMultiSelect
-              name='roles'
-              options={roleOptions}
-              value={roles()}
-              onChange={setRoles}
-              disabled={pending()}
-              error={roles().length === 0}
-            />
+            <div data-feat='user-option-row'>
+              <For each={USER_ROLES}>
+                {role => (
+                  <UiCheckbox
+                    name='roles'
+                    value={role}
+                    checked={roles().includes(role)}
+                    onChange={checked => toggleRole(role, checked)}
+                    disabled={pending()}
+                  >
+                    <span data-feat='user-option-label'>{role}</span>
+                  </UiCheckbox>
+                )}
+              </For>
+            </div>
           </UiField>
 
-          <UiField for='status' label='Status'>
-            <UiSingleSelect
-              name='status'
-              options={statusOptions}
-              value={status()}
-              onChange={value => setStatus(value as UserStatus)}
-              disabled={pending()}
-            />
+          <UiField variant='caption' label='Status'>
+            <div data-feat='user-option-row'>
+              <UiToggleGroup<UserStatus>
+                value={status()}
+                onChange={setStatus}
+                disabled={pending()}
+              >
+                <For each={USER_STATUSES}>
+                  {value => (
+                    <UiToggleItem value={value}>
+                      <span data-feat='user-option-label'>{value}</span>
+                    </UiToggleItem>
+                  )}
+                </For>
+              </UiToggleGroup>
+            </div>
           </UiField>
 
           <UiFormActions>
-            <UiButton type='submit' variant='primary' loading={pending()}>
-              Save
-            </UiButton>
             <UiButton type='button' variant='ghost' onClick={props.onClose} disabled={pending()}>
               Cancel
             </UiButton>
-            <Show when={existing()}>
-              <UiButton
-                type='button'
-                variant='secondary'
-                onClick={() => void toggleStatus()}
-                loading={pending()}
-              >
-                {statusActionLabel()}
-              </UiButton>
-              <UiButton type='button' variant='danger' onClick={() => void remove()} loading={pending()}>
-                Delete
-              </UiButton>
-            </Show>
+            <UiButton type='submit' variant='primary' loading={pending()}>
+              Save
+            </UiButton>
           </UiFormActions>
         </UiLayout>
       </form>

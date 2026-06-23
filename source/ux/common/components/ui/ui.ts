@@ -12,6 +12,12 @@ export {
   UiAccordionTrigger,
   type UiAccordionTriggerProps
 } from './ui-accordion.tsx'
+export {
+  UiActionButton,
+  type UiActionButtonIcon,
+  type UiActionButtonProps,
+  type UiActionButtonVariant
+} from './ui-action-button.tsx'
 export { UiAlert, type UiAlertProps, type UiAlertVariant } from './ui-alert.tsx'
 export { UiAvatar, type UiAvatarProps } from './ui-avatar.tsx'
 export { UiBadge, type UiBadgeProps, type UiBadgeVariant } from './ui-badge.tsx'
