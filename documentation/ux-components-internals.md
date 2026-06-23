@@ -70,6 +70,9 @@ accordion
 accordion-content
 accordion-item
 accordion-trigger
+action-button
+action-button-icon
+action-button-label
 alert
 avatar
 badge
@@ -139,26 +142,28 @@ Rules:
 
 Variants are only valid where explicitly declared.
 
-| Control / Part | Attribute         | Declared Values                                     |
-| -------------- | ----------------- | --------------------------------------------------- |
-| `alert`        | `data-ui-variant` | `success`, `warning`, `danger`, `info`              |
-| `badge`        | `data-ui-variant` | `success`, `warning`, `danger`, `info`              |
-| `button`       | `data-ui-variant` | `primary`, `secondary`, `ghost`, `danger`           |
-| `card`         | `data-ui-variant` | `widget`, `workflow`                                |
-| `field`        | `data-ui-variant` | `caption`, `inline`                                 |
-| `layout`       | `data-ui-variant` | `block-fit`, `inline`, `inline-fill`, `inline-wrap` |
-| `list`         | `data-ui-variant` | `bullet`, `numbered`                                |
-| `table-row`    | `data-ui-variant` | `section`                                           |
+| Control / Part  | Attribute         | Declared Values                                     |
+| --------------- | ----------------- | --------------------------------------------------- |
+| `action-button` | `data-ui-variant` | `default`, `danger`                                 |
+| `alert`         | `data-ui-variant` | `success`, `warning`, `danger`, `info`              |
+| `badge`         | `data-ui-variant` | `success`, `warning`, `danger`, `info`              |
+| `button`        | `data-ui-variant` | `primary`, `secondary`, `ghost`, `danger`           |
+| `card`          | `data-ui-variant` | `widget`, `workflow`                                |
+| `field`         | `data-ui-variant` | `caption`, `inline`                                 |
+| `layout`        | `data-ui-variant` | `block-fit`, `inline`, `inline-fill`, `inline-wrap` |
+| `list`          | `data-ui-variant` | `bullet`, `numbered`                                |
+| `table-row`     | `data-ui-variant` | `section`                                           |
 
 Controls and parts may additionally declare these extension attributes:
 
-| Control / Part    | Attribute          | Declared Values          |
-| ----------------- | ------------------ | ------------------------ |
-| `layout`          | `data-ui-gap`      | `loose`, `tight`, `none` |
-| `tab-list`        | `data-ui-drag`     | `enabled`, `active`      |
-| `tab-list`        | `data-ui-layout`   | `between`                |
-| `table-cell`      | `data-ui-align`    | `start`, `center`, `end` |
-| `table-container` | `data-ui-overflow` | `hidden`, `scroll`       |
+| Control / Part    | Attribute          | Declared Values           |
+| ----------------- | ------------------ | ------------------------- |
+| `action-button`   | `data-ui-icon`     | `edit`, `eject`, `delete` |
+| `layout`          | `data-ui-gap`      | `loose`, `tight`, `none`  |
+| `tab-list`        | `data-ui-drag`     | `enabled`, `active`       |
+| `tab-list`        | `data-ui-layout`   | `between`                 |
+| `table-cell`      | `data-ui-align`    | `start`, `center`, `end`  |
+| `table-container` | `data-ui-overflow` | `hidden`, `scroll`        |
 
 Rules:
 
@@ -250,6 +255,7 @@ UI control wrappers manually emit only declared semantic attributes:
 data-ui
 data-ui-variant
 data-ui-gap
+data-ui-icon
 data-ui-align
 data-ui-overflow
 data-ui-state
@@ -348,6 +354,7 @@ This selector shape is invalid because one element cannot hold two different `da
 | Control         | Intent                                                                 |
 | --------------- | ---------------------------------------------------------------------- |
 | `button`        | Action trigger with primary, secondary, ghost, and danger variants     |
+| `action-button` | Compact icon action button for dense surfaces; icon via `data-ui-icon` |
 | `input`         | Single-line text entry                                                 |
 | `textarea`      | Multi-line text entry                                                  |
 | `single-select` | Dropdown single-value picker                                           |

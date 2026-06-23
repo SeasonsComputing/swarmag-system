@@ -63,6 +63,7 @@ Consumer code must not pass visual hook props to shared controls:
 - `data-ui`
 - `data-ui-variant`
 - `data-ui-gap`
+- `data-ui-icon`
 - `data-ui-align`
 - `data-ui-overflow`
 - `data-ui-state`
@@ -285,6 +286,18 @@ Use for determinate progress such as upload, sync, or batch completion.
 
 Key props: `label`, `value`, `minValue`, `maxValue`, children, `loading`,
 `error`, `disabled`.
+
+### 3.16 UiActionButton
+
+Use for compact icon actions on dense surfaces such as table rows.
+
+Required props: `icon`, `label`.
+Icon values: `edit`, `eject`, `delete`.
+Variants: `default`, `danger`.
+Other key props: `loading`, `error`, `disabled`.
+
+`label` is the accessible `aria-label` and is revealed on hover and focus.
+`loading` and `disabled` both disable the button and suppress tab focus.
 
 ## 4. Display Controls
 
