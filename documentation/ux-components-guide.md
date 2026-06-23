@@ -599,43 +599,49 @@ UiAccordion
 
 ### 3.12 UiDialog
 
-Modal content primitive with overlay.
+Modal content primitive with overlay. The dialog surface provides the card
+frame — never nest a `UiCard` inside a `UiDialog`.
 
-**Use When**
+**Two modes**
 
-Use for focused tasks that interrupt the current page, such as edit forms or
-confirmation flows.
+| Mode       | When to use                                                  |
+| ---------- | ------------------------------------------------------------ |
+| Triggered  | Provide `trigger`; `UiDialog` renders a `UiButton` to open.  |
+| Controlled | Omit `trigger`; manage `open` externally (e.g. route-based). |
 
 **Props**
 
-| Prop             | Type                      | Required | Default       | Description               |
-| ---------------- | ------------------------- | -------- | ------------- | ------------------------- |
-| `trigger`        | `UiComponent`             | no       | unset         | Trigger button content.   |
-| `triggerVariant` | `UiButtonVariant`         | no       | `'secondary'` | Trigger button variant.   |
-| `children`       | `UiComponent`             | no       | unset         | Dialog content.           |
-| `open`           | `boolean`                 | no       | unset         | Controlled open state.    |
-| `defaultOpen`    | `boolean`                 | no       | unset         | Initial open state.       |
-| `onOpenChange`   | `(open: boolean) => void` | no       | unset         | Receives open state.      |
-| `disabled`       | `boolean`                 | no       | `false`       | Disables the trigger.     |
-| `error`          | `boolean`                 | no       | `false`       | Emits error state.        |
-| `loading`        | `boolean`                 | no       | `false`       | Disables trigger as busy. |
+| Prop             | Type                      | Required | Default       | Description                                       |
+| ---------------- | ------------------------- | -------- | ------------- | ------------------------------------------------- |
+| `trigger`        | `UiComponent`             | no       | unset         | Trigger button content. Omit for controlled mode. |
+| `triggerVariant` | `UiButtonVariant`         | no       | `'secondary'` | Trigger button variant.                           |
+| `children`       | `UiComponent`             | no       | unset         | Dialog content.                                   |
+| `open`           | `boolean`                 | no       | unset         | Controlled open state.                            |
+| `defaultOpen`    | `boolean`                 | no       | unset         | Initial open state.                               |
+| `onOpenChange`   | `(open: boolean) => void` | no       | unset         | Receives open state.                              |
+| `disabled`       | `boolean`                 | no       | `false`       | Disables the trigger.                             |
+| `error`          | `boolean`                 | no       | `false`       | Emits error state.                                |
+| `loading`        | `boolean`                 | no       | `false`       | Disables trigger as busy.                         |
 
-**Example**
+**Triggered mode**
 
 ```tsx
-<UiDialog
-  trigger='Edit'
-  open={open()}
-  onOpenChange={setOpen}
->
-  <UiCard variant='workflow'>
-    <h2>Edit Field</h2>
-    <UiLayout variant='inline-wrap'>
-      <UiField label='Name' for='name'>
-        <UiInput id='name' value={name()} onInput={onNameInput} />
-      </UiField>
-    </UiLayout>
-  </UiCard>
+<UiDialog trigger='Edit' onOpenChange={setOpen}>
+  <UiLayout variant='inline-wrap'>
+    <UiField label='Name' for='name'>
+      <UiInput id='name' value={name()} onInput={onNameInput} />
+    </UiField>
+  </UiLayout>
+</UiDialog>
+```
+
+**Controlled mode** (route-based or externally managed)
+
+```tsx
+<UiDialog open={isOpen()} onOpenChange={setOpen}>
+  <UiLayout>
+    <MyForm onClose={() => setOpen(false)} />
+  </UiLayout>
 </UiDialog>
 ```
 
@@ -831,22 +837,30 @@ Framed content surface.
 
 Extends native `div` attributes, excluding styling and semantic hook props.
 
-| Prop      | Type                     | Default | Description                 |
-| --------- | ------------------------ | ------- | --------------------------- |
-| `variant` | `'widget' \| 'workflow'` | unset   | Specialized card treatment. |
+| Prop         | Type                               | Default  | Description                       |
+| ------------ | ---------------------------------- | -------- | --------------------------------- |
+| `decoration` | `'gradient' \| 'none'`             | `'none'` | Gradient stripe on the card edge. |
+| `elevation`  | `'none' \| 'raised' \| 'floating'` | `'none'` | Shadow depth of the card surface. |
 
-**Variants**
+**Decoration**
 
-| Variant    | Use                                |
-| ---------- | ---------------------------------- |
-| unset      | Standard panel surface.            |
-| `widget`   | Dashboard widget surface.          |
-| `workflow` | Spacious form or workflow surface. |
+| Value        | Effect                              |
+| ------------ | ----------------------------------- |
+| `'none'`     | Flat surface, no decoration.        |
+| `'gradient'` | Gradient stripe accent on the edge. |
+
+**Elevation**
+
+| Value        | Effect                           |
+| ------------ | -------------------------------- |
+| `'none'`     | No shadow. Flat surface.         |
+| `'raised'`   | Standard card shadow.            |
+| `'floating'` | Larger shadow. Elevated surface. |
 
 **Example**
 
 ```tsx
-<UiCard variant='widget'>
+<UiCard decoration='gradient' elevation='raised'>
   <h3>Fleet Status</h3>
   <p>4 of 6 drones active</p>
 </UiCard>

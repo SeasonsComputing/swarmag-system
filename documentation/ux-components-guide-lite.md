@@ -327,11 +327,9 @@ Key props: children, `loading`, `error`, `disabled`.
 
 Use for framed content surfaces.
 
-Key prop: `variant`.
-Variants: `widget`, `workflow`, or unset standard panel surface.
+Key props: `decoration`, `elevation`.
 
-Use `variant='widget'` for dashboard widget content and `variant='workflow'`
-for spacious form or workflow surfaces.
+`decoration='gradient'` adds a gradient stripe accent. `elevation='raised'` applies a standard card shadow; `elevation='floating'` applies a larger shadow for elevated surfaces. Both default to `'none'`.
 
 ### 4.5 UiSeparator
 

@@ -16,8 +16,11 @@ UiCard  Card control.
 import { type JSX, splitProps } from '@solid-js'
 import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Card variants declared by the design language. */
-export type UiCardVariant = 'widget' | 'workflow'
+/** Card decoration values declared by the design language. */
+export type UiCardDecoration = 'gradient' | 'none'
+
+/** Card elevation values declared by the design language. */
+export type UiCardElevation = 'none' | 'raised' | 'floating'
 
 /** Card control props. */
 export type UiCardProps =
@@ -29,26 +32,38 @@ export type UiCardProps =
     | 'classList'
     | 'style'
     | 'data-ui'
-    | 'data-ui-variant'
+    | 'data-ui-decoration'
+    | 'data-ui-elevation'
   >
   & {
-    variant?: UiCardVariant
+    decoration?: UiCardDecoration
+    elevation?: UiCardElevation
     class?: never
     classList?: never
     style?: never
     'data-ui'?: never
-    'data-ui-variant'?: never
+    'data-ui-decoration'?: never
+    'data-ui-elevation'?: never
   }
 
 /** Card control. */
 export const UiCard = (props: UiCardProps): UiComponent => {
   const [local, others] = splitProps(props, [
-    'variant',
+    'decoration',
+    'elevation',
     'class',
     'classList',
     'style',
     'data-ui',
-    'data-ui-variant'
+    'data-ui-decoration',
+    'data-ui-elevation'
   ])
-  return <div {...others} data-ui='card' data-ui-variant={local.variant} />
+  return (
+    <div
+      {...others}
+      data-ui='card'
+      data-ui-decoration={local.decoration === 'gradient' ? 'gradient' : undefined}
+      data-ui-elevation={local.elevation && local.elevation !== 'none' ? local.elevation : undefined}
+    />
+  )
 }
