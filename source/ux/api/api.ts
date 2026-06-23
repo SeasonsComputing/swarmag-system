@@ -3,12 +3,7 @@
  */
 
 import { AuthSupabaseClient } from '@core/client/auth-supabase-client.ts'
-import {
-  makeBusRuleSupabaseRpcClient,
-  makeCrudSupabaseClient
-} from '@core/client/make-supabase-client.ts'
-import { type User } from '@domain/abstractions/user.ts'
-import { UserAdapter } from '@domain/adapters/user-adapter.ts'
+import { makeBusRuleSupabaseRpcClient } from '@core/client/make-supabase-client.ts'
 import { AppState } from '@ux/common/stores/app-state.ts'
 import { DashboardState } from '@ux/common/stores/dashboard-state.ts'
 import { SessionState } from '@ux/common/stores/session-state.ts'
@@ -33,6 +28,6 @@ export const api = {
   // USER MANAGEMENT
   // ──────────────────────────────────────────────────────────────────────────
 
-  Users: makeAuthUsers(makeCrudSupabaseClient<User>({ table: 'users', adapter: UserAdapter })),
+  Users: makeAuthUsers(),
   userHasAccess: makeBusRuleSupabaseRpcClient<{ email: string }, boolean>({ fn: 'user_has_access' })
 }
