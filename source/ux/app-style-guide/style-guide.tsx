@@ -757,19 +757,19 @@ export const StyleGuide = (): UiComponent => {
                   </p>
                 </UiLayout>
               </UiCard>
-              <UiCard variant='widget'>
+              <UiCard decoration='gradient' elevation='raised'>
                 <UiLayout>
-                  <h3>Widget card</h3>
+                  <h3>Raised card</h3>
                   <p>
-                    Dashboard-ready surface with stripe treatment and crisp separation from the page.
+                    Dashboard-ready surface with gradient stripe and standard shadow elevation.
                   </p>
                 </UiLayout>
               </UiCard>
-              <UiCard variant='workflow'>
+              <UiCard decoration='gradient' elevation='floating'>
                 <UiLayout>
-                  <h3>Workflow card</h3>
+                  <h3>Floating card</h3>
                   <p>
-                    Primary framed container for guided flows that need stronger focus and elevation.
+                    Primary framed container for guided flows with stronger shadow elevation.
                   </p>
                 </UiLayout>
               </UiCard>

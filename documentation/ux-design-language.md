@@ -263,23 +263,23 @@ Component-specified tokens live in `themes.css` and are cataloged in
 `ux-components-internals.md`. They let themes tune reusable UI controls without changing
 component code or selector structure.
 
-| Family         | Token prefix / token                                          | Consumer                     |
-| -------------- | ------------------------------------------------------------- | ---------------------------- |
-| Button         | `--sa-button-*`                                               | Buttons                      |
-| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments  |
-| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts |
-| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls              |
-| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels      |
-| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content   |
-| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders         |
-| Card           | `--sa-card-*`                                                 | Card variants                |
-| Table          | `--sa-table-*`                                                | Table parts                  |
-| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries    |
-| Progress       | `--sa-progress-*`                                             | Progress track and fill      |
-| List           | `--sa-list-*`                                                 | List and list item parts     |
-| Avatar         | `--sa-avatar-*`                                               | Avatar marker                |
-| Separator      | `--sa-separator-*`                                            | Separator primitive          |
-| Shell          | `--sa-shell-*`                                                | Header and footer chrome     |
+| Family         | Token prefix / token                                          | Consumer                      |
+| -------------- | ------------------------------------------------------------- | ----------------------------- |
+| Button         | `--sa-button-*`                                               | Buttons                       |
+| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments   |
+| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts  |
+| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls               |
+| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels       |
+| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content    |
+| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders          |
+| Card           | `--sa-card-*`                                                 | Card decoration and elevation |
+| Table          | `--sa-table-*`                                                | Table parts                   |
+| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries     |
+| Progress       | `--sa-progress-*`                                             | Progress track and fill       |
+| List           | `--sa-list-*`                                                 | List and list item parts      |
+| Avatar         | `--sa-avatar-*`                                               | Avatar marker                 |
+| Separator      | `--sa-separator-*`                                            | Separator primitive           |
+| Shell          | `--sa-shell-*`                                                | Header and footer chrome      |
 
 Shell chrome is intentionally theme-owned. It allows app frame surfaces to diverge from generic
 card and panel surfaces while still using the same design-language token contract.

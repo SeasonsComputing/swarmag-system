@@ -22,24 +22,24 @@ only specifies the component implementation boundary:
 Component-specified tokens live in `themes.css` and are consumed by `ui.css`, shell CSS, or
 component-local CSS.
 
-| Family         | Tokens                                                        | Consumer                     |
-| -------------- | ------------------------------------------------------------- | ---------------------------- |
-| Button         | `--sa-button-*`                                               | `UiButton`                   |
-| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments  |
-| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts |
-| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls              |
-| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels      |
-| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content   |
-| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders         |
-| Card           | `--sa-card-*`                                                 | Card variants                |
-| Table          | `--sa-table-*`                                                | Table parts                  |
-| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries    |
-| Progress       | `--sa-progress-*`                                             | Progress track and fill      |
-| List           | `--sa-list-*`                                                 | List and list item parts     |
-| Avatar         | `--sa-avatar-*`                                               | Avatar marker                |
-| Alert          | `--sa-alert-*`                                                | Alert treatment              |
-| Separator      | `--sa-separator-*`                                            | Separator primitive          |
-| Shell          | `--sa-shell-*`                                                | Header and footer chrome     |
+| Family         | Tokens                                                        | Consumer                      |
+| -------------- | ------------------------------------------------------------- | ----------------------------- |
+| Button         | `--sa-button-*`                                               | `UiButton`                    |
+| Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments   |
+| Input/select   | `--sa-input-*`, `--sa-single-select-*`, `--sa-multi-select-*` | Text inputs and select parts  |
+| Toggle         | `--sa-toggle-*`, `--sa-toggle-group-*`                        | Toggle controls               |
+| Tabs           | `--sa-tab-*`                                                  | Tab triggers and panels       |
+| Accordion      | `--sa-accordion-*`                                            | Accordion triggers/content    |
+| Skeleton       | `--sa-skeleton-*`                                             | Loading placeholders          |
+| Card           | `--sa-card-*`                                                 | Card decoration and elevation |
+| Table          | `--sa-table-*`                                                | Table parts                   |
+| Fieldset       | `--sa-fieldset-*`                                             | Fieldset group boundaries     |
+| Progress       | `--sa-progress-*`                                             | Progress track and fill       |
+| List           | `--sa-list-*`                                                 | List and list item parts      |
+| Avatar         | `--sa-avatar-*`                                               | Avatar marker                 |
+| Alert          | `--sa-alert-*`                                                | Alert treatment               |
+| Separator      | `--sa-separator-*`                                            | Separator primitive           |
+| Shell          | `--sa-shell-*`                                                | Header and footer chrome      |
 
 Shell chrome is a first-class component token family. It lets app frame surfaces diverge from
 card surfaces without changing generic panel or card roles.
@@ -142,17 +142,18 @@ Rules:
 
 Variants are only valid where explicitly declared.
 
-| Control / Part  | Attribute         | Declared Values                                     |
-| --------------- | ----------------- | --------------------------------------------------- |
-| `action-button` | `data-ui-variant` | `default`, `danger`                                 |
-| `alert`         | `data-ui-variant` | `success`, `warning`, `danger`, `info`              |
-| `badge`         | `data-ui-variant` | `success`, `warning`, `danger`, `info`              |
-| `button`        | `data-ui-variant` | `primary`, `secondary`, `ghost`, `danger`           |
-| `card`          | `data-ui-variant` | `widget`, `workflow`                                |
-| `field`         | `data-ui-variant` | `caption`, `inline`                                 |
-| `layout`        | `data-ui-variant` | `block-fit`, `inline`, `inline-fill`, `inline-wrap` |
-| `list`          | `data-ui-variant` | `bullet`, `numbered`                                |
-| `table-row`     | `data-ui-variant` | `section`                                           |
+| Control / Part  | Attribute            | Declared Values                                     |
+| --------------- | -------------------- | --------------------------------------------------- |
+| `action-button` | `data-ui-variant`    | `default`, `danger`                                 |
+| `alert`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`              |
+| `badge`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`              |
+| `button`        | `data-ui-variant`    | `primary`, `secondary`, `ghost`, `danger`           |
+| `card`          | `data-ui-decoration` | `gradient`                                          |
+| `card`          | `data-ui-elevation`  | `raised`, `floating`                                |
+| `field`         | `data-ui-variant`    | `caption`, `inline`                                 |
+| `layout`        | `data-ui-variant`    | `block-fit`, `inline`, `inline-fill`, `inline-wrap` |
+| `list`          | `data-ui-variant`    | `bullet`, `numbered`                                |
+| `table-row`     | `data-ui-variant`    | `section`                                           |
 
 Controls and parts may additionally declare these extension attributes:
 
@@ -372,15 +373,15 @@ This selector shape is invalid because one element cannot hold two different `da
 
 ### 5.2 Display Controls
 
-| Control     | Intent                                                        |
-| ----------- | ------------------------------------------------------------- |
-| `badge`     | Inline status pill                                            |
-| `alert`     | Inline feedback message with left-border accent               |
-| `avatar`    | User or entity initials/avatar marker                         |
-| `card`      | Framed content surface with panel, widget, and workflow looks |
-| `separator` | Horizontal or vertical visual rule                            |
-| `spinner`   | Indeterminate loading indicator                               |
-| `skeleton`  | Loading placeholder shimmer                                   |
+| Control     | Intent                                                       |
+| ----------- | ------------------------------------------------------------ |
+| `badge`     | Inline status pill                                           |
+| `alert`     | Inline feedback message with left-border accent              |
+| `avatar`    | User or entity initials/avatar marker                        |
+| `card`      | Framed content surface with decoration and elevation control |
+| `separator` | Horizontal or vertical visual rule                           |
+| `spinner`   | Indeterminate loading indicator                              |
+| `skeleton`  | Loading placeholder shimmer                                  |
 
 ### 5.3 Layout Controls
 

@@ -39,10 +39,7 @@
   /* Cards */
   --sa-card-border-radius: var(--sa-radius-md);
   --sa-card-panel-pad: var(--sa-rhythm-pad);
-  --sa-card-panel-stripe-opacity: 0;
   --sa-card-stripe-height: 3px;
-  --sa-card-widget-pad: var(--sa-rhythm-pad);
-  --sa-card-workflow-pad: var(--sa-rhythm-pad);
 
   /* Fieldset */
   --sa-fieldset-bg: transparent;
@@ -242,18 +239,14 @@
   --sa-skeleton-bg-shimmer: oklch(42% 0.025 252 / 0.6);
 
   /* Card */
-  --sa-card-stripe-opacity: 0.8;
-  --sa-card-widget-bg: oklch(17% 0.008 244 / 0.48);
-  --sa-card-widget-border: var(--sa-border-card);
-  --sa-card-widget-shadow: 0 15px 36px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
-  --sa-card-widget-stripe-opacity: 0.8;
   --sa-card-panel-bg: var(--sa-shell-bg);
   --sa-card-panel-border: var(--sa-shell-border);
-  --sa-card-panel-shadow: 0 0 36px rgb(0 0 0 / 0.3);
-  --sa-card-workflow-bg: oklch(21% 0.02 226 / 0.42);
-  --sa-card-workflow-border: 1px solid rgb(148 163 184 / 0.2);
-  --sa-card-workflow-shadow: 0 22px 48px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
-  --sa-card-workflow-stripe-opacity: 0.8;
+  --sa-card-panel-shadow: none;
+  --sa-card-decoration-stripe-opacity: 0.8;
+  --sa-card-elevation-raised-shadow: 0 15px 36px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
+  --sa-card-elevation-floating-shadow:
+    0 22px 48px rgb(0 0 0 / 0.3),
+    inset 0 1px 0 rgb(255 255 255 / 0.1);
 
   /* Table */
   --sa-table-bg-head: oklch(var(--sa-lch-surface-2));
@@ -431,31 +424,17 @@
   --sa-skeleton-bg-shimmer: oklch(86% 0.018 110);
 
   /* Card */
-  --sa-card-stripe-opacity: 1;
-  --sa-card-widget-bg: linear-gradient(
-    135deg,
-    oklch(99.6% 0.006 98 / 0.98) 0%,
-    oklch(96.2% 0.018 116 / 0.94) 100%
-  );
-  --sa-card-widget-border: 1px solid oklch(34% 0.035 220 / 0.14);
-  --sa-card-widget-shadow:
-    0 14px 34px oklch(28% 0.036 230 / 0.12),
-    inset 0 1px 0 oklch(var(--sa-lch-white) / 0.7);
-  --sa-card-widget-stripe-opacity: 1;
   --sa-card-panel-bg: oklch(99% 0.007 100 / 0.94);
   --sa-card-panel-border: 1px solid oklch(34% 0.035 220 / 0.1);
-  --sa-card-panel-shadow: 0 8px 18px oklch(28% 0.036 230 / 0.07);
-  --sa-card-workflow-bg: linear-gradient(
-    135deg,
-    oklch(99.8% 0.006 98 / 0.99) 0%,
-    oklch(93.5% 0.032 128 / 0.94) 100%
-  );
-  --sa-card-workflow-border: 1px solid oklch(34% 0.035 220 / 0.18);
-  --sa-card-workflow-shadow:
+  --sa-card-panel-shadow: none;
+  --sa-card-decoration-stripe-opacity: 1;
+  --sa-card-elevation-raised-shadow:
+    0 14px 34px oklch(28% 0.036 230 / 0.12),
+    inset 0 1px 0 oklch(var(--sa-lch-white) / 0.7);
+  --sa-card-elevation-floating-shadow:
     0 24px 54px oklch(28% 0.036 230 / 0.16),
     0 0 26px oklch(57% 0.13 186 / 0.12),
     inset 0 1px 0 oklch(var(--sa-lch-white) / 0.78);
-  --sa-card-workflow-stripe-opacity: 1;
 
   /* Table */
   --sa-table-bg-head: oklch(31% 0.04 224);
