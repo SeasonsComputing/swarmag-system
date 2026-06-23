@@ -87,6 +87,9 @@
   --sa-lch-surface-1: 22.1% 0.01 277.4;
   --sa-lch-black: 7.8% 0 0;
 
+  /* Popup */
+  --sa-lch-popup: 28.5% 0.023 236;
+
   /* State primitives */
   --sa-lch-success: 72.2% 0.192 149.579;
   --sa-lch-warning: 76.885% 0.1231 80.8277;
