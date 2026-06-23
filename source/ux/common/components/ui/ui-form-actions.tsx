@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Ui form actions                                                              ║
-║ Right-aligned action button row, separate from the field grid.               ║
+║ Action button row, separate from the field grid.                             ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -11,15 +11,21 @@ grid — never nested inside an UiField.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiFormActions  Right-aligned action row.
+UiFormActions  Action button row. Defaults to end-aligned; justify='split'
+               pushes buttons to opposite ends.
 */
 
 import type { UiComponent, UiContainerProps } from './ui-helpers.ts'
 
-/** UiFormActions props. */
-export type UiFormActionsProps = UiContainerProps
+/** UiFormActions justify options. */
+export type UiFormActionsJustify = 'end' | 'split'
 
-/** Right-aligned action button row. Always separate from the field grid. */
+/** UiFormActions props. */
+export type UiFormActionsProps = UiContainerProps & {
+  justify?: UiFormActionsJustify
+}
+
+/** Action button row. Always separate from the field grid. */
 export const UiFormActions = (props: UiFormActionsProps): UiComponent => (
-  <div data-ui='form-actions'>{props.children}</div>
+  <div data-ui='form-actions' data-ui-justify={props.justify}>{props.children}</div>
 )
