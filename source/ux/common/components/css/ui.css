@@ -440,7 +440,7 @@
 }
 
 [data-ui='table-head'] {
-  background: var(--sa-gradient-brand);
+  background: var(--sa-gradient-brand-inverse);
 }
 
 [data-ui='table-row']:hover {
@@ -1027,7 +1027,7 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 [data-ui='separator'] {
-  background: var(--sa-gradient-brand);
+  background: var(--sa-gradient-brand-inverse);
   block-size: var(--sa-separator-height);
   border: none;
   display: block;
@@ -1268,6 +1268,10 @@
   display: flex;
   gap: var(--sa-rhythm-gap);
   justify-content: flex-end;
+}
+
+[data-ui='form-actions'][data-ui-justify='split'] {
+  justify-content: space-between;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */
