@@ -35,6 +35,7 @@ code should not pass these props:
 - `data-ui`
 - `data-ui-variant`
 - `data-ui-gap`
+- `data-ui-icon`
 - `data-ui-align`
 - `data-ui-overflow`
 - `data-ui-state`
@@ -713,6 +714,44 @@ batch completion.
   minValue={0}
   maxValue={totalFiles()}
 />
+```
+
+### 3.16 UiActionButton
+
+Compact icon action button for dense surfaces such as tables and toolbars.
+
+**Use When**
+
+Use for row-level or surface-level actions where space is constrained and an
+icon communicates intent. Always provide a `label` — it is used as `aria-label`
+and is revealed on hover and focus. Use `variant='danger'` for destructive
+actions.
+
+**Props**
+
+Extends native button attributes, excluding styling and semantic hook props.
+
+| Prop       | Type                            | Default | Description                                |
+| ---------- | ------------------------------- | ------- | ------------------------------------------ |
+| `icon`     | `'delete' \| 'edit' \| 'eject'` | —       | Icon to display.                           |
+| `label`    | `string`                        | —       | Accessible label; revealed on hover/focus. |
+| `variant`  | `'default' \| 'danger'`         | unset   | Visual/action priority.                    |
+| `error`    | `boolean`                       | `false` | Emits error state.                         |
+| `loading`  | `boolean`                       | `false` | Emits loading state; disables button.      |
+| `disabled` | `boolean`                       | `false` | Native disabled behavior.                  |
+
+`loading` and `disabled` both disable the rendered button and suppress tab focus.
+
+**Emitted Attributes**
+
+`data-ui='action-button'`, `data-ui-icon`, `data-ui-state`, `data-ui-variant`.
+
+**Example**
+
+```tsx
+<UiActionButton icon='edit' label='Edit user' onClick={onEdit} />
+<UiActionButton icon='eject' label='Eject user' onClick={onEject} />
+<UiActionButton icon='delete' label='Delete record' variant='danger' onClick={onDelete} />
 ```
 
 ## 4. Display Controls
