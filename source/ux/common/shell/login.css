@@ -1,8 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Login shell styles                                                           ║
-║ Full-bleed login layout: hero zone (logo) + form zone (OTP fields).          ║
-║ Scoped to [data-feat='login'] and its children only.                         ║
+║ Full-bleed login layout and OTP form styles.                                 ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
@@ -21,78 +20,4 @@
   align-items: end;
   gap: var(--sa-space-xl);
   max-width: var(--sa-size-min);
-}
-
-[data-feat='login-hero'] {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--sa-rhythm-gap);
-}
-
-[data-feat='login-hero']::before {
-  content: '';
-  position: absolute;
-  inset-block-end: var(--sa-space-4xl);
-  inline-size: var(--sa-size-wrap);
-  aspect-ratio: 1;
-  border-radius: var(--sa-radius-full);
-  background: radial-gradient(
-    ellipse,
-    var(--sa-color-primary),
-    transparent 70%
-  );
-  filter: blur(var(--sa-space-2xl));
-  opacity: 0.68;
-}
-
-[data-feat='login-logo'] {
-  position: relative;
-  z-index: var(--sa-z-raised);
-  width: 100%;
-  height: auto;
-  display: block;
-}
-
-[data-feat='login-product'] {
-  text-align: center;
-  color: var(--sa-text-secondary);
-  font-family: var(--sa-label-font-family);
-  font-size: var(--sa-label-font-size);
-  font-weight: var(--sa-label-font-weight);
-}
-
-[data-feat='login-application'] {
-  text-align: center;
-  color: var(--sa-color-accent);
-  font-family: var(--sa-heading-font-family);
-  font-size: var(--sa-heading-font-size-h4);
-  font-weight: var(--sa-heading-font-weight);
-}
-
-[data-feat='login-config'] {
-  color: var(--sa-text-secondary);
-  font-family: var(--sa-data-font-family);
-  font-size: calc(var(--sa-font-size-xs) * 0.85);
-  text-transform: lowercase;
-}
-
-[data-feat='login-config'] > * {
-  display: grid;
-  grid-template-columns: max-content minmax(0, 1fr);
-  gap: var(--sa-space-sm);
-  align-items: baseline;
-}
-
-[data-feat='login-config'] dd,
-[data-feat='login-config'] dt {
-  margin: 0;
-}
-
-[data-feat='login-config'] dd {
-  min-width: 0;
-  overflow-wrap: anywhere;
-  text-align: end;
 }

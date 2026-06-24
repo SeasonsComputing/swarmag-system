@@ -1,32 +1,35 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ About box                                                                    ║
-║ Shell application identity and configuration dialog.                         ║
+║ BrandHero                                                                    ║
+║ Shared product and application identity hero block.                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Displays shell identity and approved runtime configuration metadata.
+Renders the swarmAg logo, product name, and application name as a branded
+hero block. Shared by login and about surfaces.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AboutBox  Shell about dialog content.
+BrandHero  Logo, product name, and application name hero block.
 */
 
-import { type UiComponent } from '@ux/common/components/ui'
-import { BrandHero } from './brand-hero.tsx'
-import { ConfigTable } from './config-table.tsx'
+import { type UiComponent, UiLayout } from '@ux/common/components/ui'
 import { getShellMetadata } from './shell-metadata.ts'
 
-import './about-box.css'
+import './brand-hero.css'
+import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
 
-/** Shell about dialog content. */
-export const AboutBox = (): UiComponent => {
+/** Logo, product name, and application name hero block. */
+export const BrandHero = (): UiComponent => {
   const shell = getShellMetadata()
   return (
-    <div data-feat='about-box'>
-      <BrandHero />
-      <ConfigTable shell={shell} showAuthor />
+    <div data-feat='brand-hero'>
+      <img data-feat='brand-hero-logo' src={logoArt} alt='swarmAg' />
+      <UiLayout gap='tight'>
+        <span data-feat='brand-hero-product'>{shell.identity.productName}</span>
+        <span data-feat='brand-hero-application'>{shell.identity.applicationName}</span>
+      </UiLayout>
     </div>
   )
 }
