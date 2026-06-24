@@ -306,7 +306,7 @@
 [data-ui='single-select-item'] {
   align-items: center;
   background: var(--sa-single-select-item-bg);
-  border-inline-start: var(--sa-single-select-item-border-start);
+  border-inline-start: var(--sa-single-select-item-border);
   border-radius: var(--sa-radius-sm);
   color: var(--sa-text-secondary);
   cursor: pointer;
@@ -369,7 +369,7 @@
 [data-ui='multi-select-item'] {
   align-items: center;
   background: var(--sa-multi-select-item-bg);
-  border-inline-start: var(--sa-multi-select-item-border-start);
+  border-inline-start: var(--sa-multi-select-item-border);
   border-radius: var(--sa-radius-sm);
   color: var(--sa-text-secondary);
   cursor: pointer;
