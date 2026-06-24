@@ -200,7 +200,7 @@
   --sa-card-decoration-stripe-opacity: 0.8;
   --sa-card-elevation-raised-shadow: 0 15px 36px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
   --sa-card-elevation-floating-shadow:
-    0 22px 48px rgb(0 0 0 / 0.3),
+    0 22px 48px rgb(0 0 0 / 0.5),
     inset 0 1px 0 rgb(255 255 255 / 0.1);
 
   /* Table */
