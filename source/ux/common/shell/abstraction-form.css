@@ -18,18 +18,19 @@
 
 [data-feat='abstraction-form-title'] {
   grid-column: 1 / -1;
+  line-height: 1;
 }
 
 [data-feat='abstraction-form-list'] {
   display: flex;
   flex-direction: column;
-  inline-size: var(--sa-size-sm);
+  inline-size: var(--sa-size-xs);
   overflow-y: auto;
   min-block-size: 0;
 }
 
 [data-feat='abstraction-form-panel'] {
-  inline-size: var(--sa-size-xs);
+  inline-size: var(--sa-size-min);
   overflow-y: auto;
   min-block-size: 0;
 }

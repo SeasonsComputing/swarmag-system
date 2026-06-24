@@ -17,8 +17,9 @@ AbstractionForm  Generic list+panel form component.
 import type { Instance } from '@core/std'
 import { createSignal, For, Show } from '@solid-js'
 import {
-  UiCard,
+  UiActionButton,
   type UiComponent,
+  UiFieldset,
   UiTable,
   UiTableBody,
   UiTableCell,
@@ -45,44 +46,63 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
   }
 
   return (
-    <section data-feat='abstraction-form'>
-      <h2 data-feat='abstraction-form-title'>{props.provider.entityLabel}s</h2>
-      <div data-feat='abstraction-form-list'>
-        <UiCard variant='workflow'>
-          <Show
-            when={!props.provider.isListLoading()}
-            fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
-          >
-            <UiTable overflow='scroll'>
-              <UiTableHeader>
-                <For each={props.provider.listColumns}>
-                  {column => <UiTableCell>{column}</UiTableCell>}
-                </For>
-              </UiTableHeader>
-              <UiTableBody>
-                <Show
-                  when={props.provider.list().length > 0}
-                  fallback={
-                    <UiTableRow variant='section'>
-                      <UiTableCell>
-                        No {props.provider.entityLabel.toLowerCase()}s found.
+    <div data-feat='abstraction-form'>
+      <h2 data-feat='abstraction-form-title'>{props.provider.formTitle}</h2>
+      <UiFieldset legend={`${props.provider.entityLabel}s`}>
+        <Show
+          when={!props.provider.isListLoading()}
+          fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
+        >
+          <UiTable overflow='scroll'>
+            <UiTableHeader>
+              <For each={props.provider.listColumns}>
+                {column => <UiTableCell>{column}</UiTableCell>}
+              </For>
+              <UiTableCell align='end'>Actions</UiTableCell>
+            </UiTableHeader>
+            <UiTableBody>
+              <Show
+                when={props.provider.list().length > 0}
+                fallback={
+                  <UiTableRow variant='section'>
+                    <UiTableCell>
+                      No {props.provider.entityLabel.toLowerCase()}s found.
+                    </UiTableCell>
+                  </UiTableRow>
+                }
+              >
+                <For each={props.provider.list()}>
+                  {item => (
+                    <UiTableRow onClick={() => onSelect(item)}>
+                      {props.provider.renderListCells(item)}
+                      <UiTableCell align='end'>
+                        <For each={props.provider.actions}>
+                          {action => (
+                            <UiActionButton
+                              icon={action.icon}
+                              label={action.label}
+                              variant={action.variant}
+                              onClick={() => void action.handler(item)}
+                            />
+                          )}
+                        </For>
+                        <UiActionButton icon='edit' label='Edit' onClick={() => onSelect(item)} />
                       </UiTableCell>
                     </UiTableRow>
-                  }
-                >
-                  <For each={props.provider.list()}>
-                    {item => props.provider.renderListRow(item, onSelect)}
-                  </For>
-                </Show>
-              </UiTableBody>
-            </UiTable>
-          </Show>
-        </UiCard>
-      </div>
-
-      <div data-feat='abstraction-form-panel'>
+                  )}
+                </For>
+              </Show>
+            </UiTableBody>
+          </UiTable>
+        </Show>
+      </UiFieldset>
+      <UiFieldset
+        legend={selected()
+          ? `Edit ${props.provider.entityLabel}`
+          : `New ${props.provider.entityLabel}`}
+      >
         {props.provider.renderForm(selected(), clearSelection)}
-      </div>
-    </section>
+      </UiFieldset>
+    </div>
   )
 }
