@@ -15,18 +15,18 @@ Dashboard  Shared shell dashboard component.
 */
 
 import { For, Show } from '@solid-js'
-import { api } from '@ux/api'
 import { UiCard, type UiComponent, UiFooter } from '@ux/common/components/ui'
 import type { DashboardStoreWidget } from '@ux/common/stores/dashboard-state.ts'
-import { useWidgets, type WidgetComponent } from './widget-provider.tsx'
+import { useDashboard, type WidgetComponent } from './dashboard-provider.tsx'
 
 import './dashboard.css'
 import footerLogo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
 
 /** Shared shell dashboard component. */
 export const Dashboard = (): UiComponent => {
-  const dashboard = api.DashboardState.store
-  const widgets = useWidgets()
+  const dashboardContext = useDashboard()
+  const dashboard = dashboardContext.state.store
+  const widgets = dashboardContext.widgets
   const bodyWidgets = () => dashboard.rows.flatMap(row => row.widgets)
 
   return (

@@ -50,14 +50,15 @@ import {
   RouterProvider
 } from '@tanstack/solid-router'
 import { api } from '@ux/api'
+import { DashboardState } from '@ux/common/stores/dashboard-state.ts'
 import { AboutBox } from './about-box.tsx'
 import { AuthGuard } from './auth-guard.tsx'
 import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
+import { DashboardProvider } from './dashboard-provider.tsx'
 import { Login } from './login.tsx'
 import { Logout } from './logout.tsx'
 import { makeDialogRoute, type ShellDialogRoute } from './shell-dialog.tsx'
-import { WidgetProvider } from './widget-provider.tsx'
 import { WidgetCatalog } from './widgets-catalog.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -148,15 +149,15 @@ export async function bootstrap(dashboardSeed: unknown, options: BootstrapOption
       })
       return (
         <QueryClientProvider client={queryClient}>
-          <WidgetProvider registry={WidgetCatalog}>
+          <DashboardProvider state={DashboardState} widgets={WidgetCatalog}>
             <RouterProvider router={router} />
-          </WidgetProvider>
+          </DashboardProvider>
         </QueryClientProvider>
       )
     }
 
     await api.AppState.init()
-    await api.DashboardState.init(dashboardSeed)
+    await DashboardState.init(dashboardSeed)
     render(() => <Application />, document.getElementById('root')!)
     registerServiceWorker()
   } catch (e) {
