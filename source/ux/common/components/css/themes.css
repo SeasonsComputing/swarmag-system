@@ -381,7 +381,11 @@
   --sa-skeleton-bg-shimmer: oklch(86% 0.018 110);
 
   /* Card */
-  --sa-card-panel-bg: oklch(99% 0.007 100 / 0.94);
+  --sa-card-panel-bg: linear-gradient(
+    135deg,
+    oklch(99.6% 0.006 98 / 0.98) 0%,
+    oklch(96.2% 0.018 116 / 0.94) 100%
+  );
   --sa-card-panel-border: 1px solid oklch(34% 0.035 220 / 0.1);
   --sa-card-panel-shadow: none;
   --sa-card-decoration-stripe-opacity: 1;
