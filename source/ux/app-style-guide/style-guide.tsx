@@ -119,6 +119,7 @@ const SgSwatch = (props: SgSwatchProps): UiComponent => (
   </figure>
 )
 
+/** Displays a gradient value and its token name. */
 type SgGradientProps = {
   value: string
   label: string
@@ -359,7 +360,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='Color'>
-            <UiLayout variant='inline-wrap'>
+            <UiLayout>
               <For each={COLOR_SWATCHES}>
                 {s => (
                   <UiFieldset legend={s.legend}>
