@@ -38,7 +38,7 @@
 
 [data-feat='abstraction-form-list'] > [data-ui='fieldset'],
 [data-feat='abstraction-form-panel'] > [data-ui='fieldset'] {
-    height: 100%;
+  height: 100%;
 }
 
 [data-feat='abstraction-form-list-actions'],
