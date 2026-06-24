@@ -259,7 +259,10 @@ Key props: `multiple`, `value`, `defaultValue`, `onValueChange`, `loading`,
 
 ### 3.12 UiDialog
 
-Use for focused modal tasks such as edit forms or confirmations.
+Use as the general modal primitive for focused tasks such as edit forms or
+confirmations. Provide `trigger` only when `UiDialog` owns the opener control.
+Omit `trigger` for controlled mode and manage `open`/`onOpenChange`
+externally, including route-based shell dialogs.
 
 Key props: `trigger`, `triggerVariant`, `open`, `defaultOpen`,
 `onOpenChange`, `loading`, `error`, `disabled`.
