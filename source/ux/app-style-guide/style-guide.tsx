@@ -27,6 +27,7 @@ import icon from './favicon.ico'
 import {
   ACCORDION_DEFAULT_VALUE,
   BUTTON_VARIANTS,
+  COLOR_GRADIENTS,
   COLOR_SWATCHES,
   DEFAULT_SERVICES,
   EQUIPMENT,
@@ -91,7 +92,7 @@ const SgSection = (props: SgSectionProps): UiComponent => (
   <section data-feat='style-guide-section'>
     <UiLayout gap='tight'>
       <h2>{props.title}</h2>
-      <UiCard>
+      <UiCard elevation='raised'>
         <UiLayout>
           {props.children}
         </UiLayout>
@@ -109,6 +110,23 @@ type SgSwatchProps = {
 const SgSwatch = (props: SgSwatchProps): UiComponent => (
   <figure data-feat='style-guide-swatch'>
     <div data-feat='style-guide-swatch-chip' style={{ background: props.value }} />
+    <figcaption>
+      <UiLayout gap='tight'>
+        <span>{props.label}</span>
+        <code>{props.token}</code>
+      </UiLayout>
+    </figcaption>
+  </figure>
+)
+
+type SgGradientProps = {
+  value: string
+  label: string
+  token: string
+}
+const SgGradient = (props: SgGradientProps): UiComponent => (
+  <figure data-feat='style-guide-gradient'>
+    <div data-feat='style-guide-gradient-chip' style={{ background: props.value }} />
     <figcaption>
       <UiLayout gap='tight'>
         <span>{props.label}</span>
@@ -354,15 +372,12 @@ export const StyleGuide = (): UiComponent => {
                 )}
               </For>
             </UiLayout>
-            <UiFieldset legend='Gradient/Brand'>
-              <figure>
-                <div data-feat='style-guide-gradient-block' />
-                <figcaption>
-                  <span>start</span>
-                  <span>mid</span>
-                  <span>end</span>
-                </figcaption>
-              </figure>
+            <UiFieldset legend='Gradients'>
+              <UiLayout>
+                <For each={COLOR_GRADIENTS}>
+                  {g => <SgGradient value={g.value} label={g.label} token={g.token} />}
+                </For>
+              </UiLayout>
             </UiFieldset>
             <UiFieldset legend='Text'>
               <UiLayout variant='inline-wrap'>

@@ -1,17 +1,8 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Users form                                                                   ║
-║ User management provider for the generic abstraction form shell.             ║
+║ User management provider.                                                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-PURPOSE
-───────────────────────────────────────────────────────────────────────────────
-Lists users and provides edit, deactivate, activate, delete, and staged create
-form behavior for the Administration application.
-
-PUBLIC
-───────────────────────────────────────────────────────────────────────────────
-UsersForm  User management form component.
 */
 
 import {
@@ -26,19 +17,17 @@ import { createEffect, createSignal, For, Show } from '@solid-js'
 import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
 import { api } from '@ux/api'
 import {
-  UiActionButton,
   UiAlert,
   UiBadge,
   UiButton,
-  UiCard,
   UiCheckbox,
   type UiComponent,
   UiField,
   UiFormActions,
   UiInput,
   UiLayout,
+  UiSeparator,
   UiTableCell,
-  UiTableRow,
   UiToggleGroup,
   UiToggleItem
 } from '@ux/common/components/ui'
@@ -47,14 +36,13 @@ import { AbstractionForm } from '@ux/common/shell/abstraction-form.tsx'
 
 import './users.css'
 
-const USERS_QUERY_KEY = ['users'] as const
-
 /** Props for the user management form route modal. */
 export type UsersFormProps = {
   onCancel: () => void
 }
 
 /** User management form component. */
+const USERS_QUERY_KEY = ['users'] as const
 export const UsersForm = (props: UsersFormProps): UiComponent => {
   const queryClient = useQueryClient()
   const usersQuery = createQuery(() => ({
@@ -71,18 +59,16 @@ export const UsersForm = (props: UsersFormProps): UiComponent => {
     await deleteUserMutation.mutateAsync(user.id)
   }
 
-  const provider: AbstractionFormContract<User> = {
+  const usersForm: AbstractionFormContract<User> = {
+    formTitle: 'User Manager',
     entityLabel: 'User',
-    listColumns: ['Name', 'Email', 'Roles', 'Status', 'Actions'],
+    listColumns: ['Name', 'Email', 'Roles', 'Status'],
     list: () => usersQuery.data ?? [],
     isListLoading: () => usersQuery.isPending,
-    renderListRow: (user, onSelect) => (
-      <UserListRow
-        user={user}
-        onEject={ejectUser}
-        onSelect={onSelect}
-      />
-    ),
+    actions: [
+      { name: 'eject', label: 'Eject', icon: 'eject', variant: 'danger', handler: ejectUser }
+    ],
+    renderListCells: user => <UserListCells user={user} />,
     renderForm: (user, onClose) => (
       <UserEditor
         user={user}
@@ -97,7 +83,7 @@ export const UsersForm = (props: UsersFormProps): UiComponent => {
         <Show when={usersQuery.error}>
           <UiAlert variant='danger'>{errorMessage(usersQuery.error)}</UiAlert>
         </Show>
-        <AbstractionForm provider={provider} />
+        <AbstractionForm provider={usersForm} />
       </UiLayout>
     </div>
   )
@@ -108,13 +94,9 @@ async function loadUsers(): Promise<User[]> {
   return result.data
 }
 
-function UserListRow(props: {
-  user: User
-  onEject: (user: User) => Promise<void>
-  onSelect: (user: User) => void
-}): UiComponent {
+function UserListCells(props: { user: User }): UiComponent {
   return (
-    <UiTableRow onClick={() => props.onSelect(props.user)}>
+    <>
       <UiTableCell>{props.user.displayName}</UiTableCell>
       <UiTableCell>{props.user.primaryEmail}</UiTableCell>
       <UiTableCell>
@@ -129,16 +111,7 @@ function UserListRow(props: {
           {props.user.status}
         </UiBadge>
       </UiTableCell>
-      <UiTableCell align='end'>
-        <UiActionButton
-          icon='eject'
-          label='Eject'
-          variant='danger'
-          onClick={() => void props.onEject(props.user)}
-        />
-        <UiActionButton icon='edit' label='Edit' onClick={() => props.onSelect(props.user)} />
-      </UiTableCell>
-    </UiTableRow>
+    </>
   )
 }
 
@@ -234,104 +207,104 @@ function UserEditor(props: {
   }
 
   return (
-    <UiCard variant='workflow'>
-      <form onSubmit={submit}>
-        <UiLayout>
-          <Show when={error() !== null}>
-            <UiAlert variant='danger'>{error()}</UiAlert>
-          </Show>
+    <form onSubmit={submit}>
+      <UiLayout>
+        <Show when={error() !== null}>
+          <UiAlert variant='danger'>{error()}</UiAlert>
+        </Show>
 
-          <UiField for='displayName' label='Name'>
-            <UiInput
-              name='displayName'
-              value={displayName()}
-              onInput={event => setDisplayName(event.currentTarget.value)}
-              disabled={pending()}
-              required
-            />
-          </UiField>
+        <UiField for='displayName' label='Name'>
+          <UiInput
+            name='displayName'
+            value={displayName()}
+            onInput={event => setDisplayName(event.currentTarget.value)}
+            disabled={pending()}
+            required
+          />
+        </UiField>
 
-          <UiField for='primaryEmail' label='Email'>
-            <Show
-              when={!existing()}
-              fallback={
-                <UiInput
-                  name='primaryEmail'
-                  type='email'
-                  value={props.user?.primaryEmail ?? ''}
-                  readOnly
-                />
-              }
-            >
+        <UiField for='primaryEmail' label='Email'>
+          <Show
+            when={!existing()}
+            fallback={
               <UiInput
                 name='primaryEmail'
                 type='email'
-                value={primaryEmail()}
-                onInput={event => setPrimaryEmail(event.currentTarget.value)}
-                disabled={pending()}
-                required
+                value={props.user?.primaryEmail ?? ''}
+                readOnly
               />
-            </Show>
-          </UiField>
-
-          <UiField for='phoneNumber' label='Phone'>
+            }
+          >
             <UiInput
-              name='phoneNumber'
-              type='tel'
-              value={phoneNumber()}
-              onInput={event => setPhoneNumber(event.currentTarget.value)}
+              name='primaryEmail'
+              type='email'
+              value={primaryEmail()}
+              onInput={event => setPrimaryEmail(event.currentTarget.value)}
               disabled={pending()}
               required
             />
-          </UiField>
+          </Show>
+        </UiField>
 
-          <UiField variant='caption' label='Roles'>
-            <div data-feat='user-option-row'>
-              <For each={USER_ROLES}>
-                {role => (
-                  <UiCheckbox
-                    name='roles'
-                    value={role}
-                    checked={roles().includes(role)}
-                    onChange={checked => toggleRole(role, checked)}
-                    disabled={pending()}
-                  >
-                    <span data-feat='user-option-label'>{role}</span>
-                  </UiCheckbox>
+        <UiField for='phoneNumber' label='Phone'>
+          <UiInput
+            name='phoneNumber'
+            type='tel'
+            value={phoneNumber()}
+            onInput={event => setPhoneNumber(event.currentTarget.value)}
+            disabled={pending()}
+            required
+          />
+        </UiField>
+
+        <UiField variant='caption' label='Roles'>
+          <div data-feat='user-option-row'>
+            <For each={USER_ROLES}>
+              {role => (
+                <UiCheckbox
+                  name='roles'
+                  value={role}
+                  checked={roles().includes(role)}
+                  onChange={checked => toggleRole(role, checked)}
+                  disabled={pending()}
+                >
+                  <span data-feat='user-option-label'>{role}</span>
+                </UiCheckbox>
+              )}
+            </For>
+          </div>
+        </UiField>
+
+        <UiField variant='caption' label='Status'>
+          <div data-feat='user-option-row'>
+            <UiToggleGroup<UserStatus>
+              value={status()}
+              onChange={setStatus}
+              disabled={pending()}
+            >
+              <For each={USER_STATUSES}>
+                {value => (
+                  <UiToggleItem value={value}>
+                    <span data-feat='user-option-label'>{value}</span>
+                  </UiToggleItem>
                 )}
               </For>
-            </div>
-          </UiField>
+            </UiToggleGroup>
+          </div>
+        </UiField>
 
-          <UiField variant='caption' label='Status'>
-            <div data-feat='user-option-row'>
-              <UiToggleGroup<UserStatus>
-                value={status()}
-                onChange={setStatus}
-                disabled={pending()}
-              >
-                <For each={USER_STATUSES}>
-                  {value => (
-                    <UiToggleItem value={value}>
-                      <span data-feat='user-option-label'>{value}</span>
-                    </UiToggleItem>
-                  )}
-                </For>
-              </UiToggleGroup>
-            </div>
-          </UiField>
+        <UiSeparator />
 
-          <UiFormActions>
-            <UiButton type='button' variant='ghost' onClick={props.onClose} disabled={pending()}>
-              Cancel
-            </UiButton>
-            <UiButton type='submit' variant='primary' loading={pending()}>
-              Save
-            </UiButton>
-          </UiFormActions>
-        </UiLayout>
-      </form>
-    </UiCard>
+        <UiFormActions justify='split'>
+          <UiButton type='button' variant='ghost' onClick={props.onClose} disabled={pending()}>
+            Cancel
+          </UiButton>
+          <UiButton type='submit' variant='primary' loading={pending()}>
+            Save
+          </UiButton>
+        </UiFormActions>
+      </UiLayout>
+    </form>
   )
 }
 

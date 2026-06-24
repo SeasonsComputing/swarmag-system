@@ -168,6 +168,14 @@
     oklch(var(--sa-lch-gradient-4-mid-end)) 75%,
     oklch(var(--sa-lch-gradient-5-end)) 100%
   );
+  --sa-gradient-brand-inverse: linear-gradient(
+    135deg,
+    oklch(var(--sa-lch-gradient-5-end)) 0%,
+    oklch(var(--sa-lch-gradient-4-mid-end)) 25%,
+    oklch(var(--sa-lch-gradient-3-mid)) 50%,
+    oklch(var(--sa-lch-gradient-2-mid-start)) 75%,
+    oklch(var(--sa-lch-gradient-1-start)) 100%
+  );
   --sa-gradient-brand-90: linear-gradient(
     90deg,
     oklch(var(--sa-lch-gradient-1-start)) 0%,
@@ -187,7 +195,7 @@
     oklch(var(--sa-lch-gradient-3-mid) / 0.9) 30%,
     oklch(var(--sa-lch-gradient-4-mid-end)) 70%,
     oklch(var(--sa-lch-gradient-5-end) / 0.5) 100%
-  );
+  );  
   --sa-gradient-stripe: var(--sa-gradient-brand-90);
 
   /* State */

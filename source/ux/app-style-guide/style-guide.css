@@ -67,22 +67,19 @@
 }
 
 [data-feat='style-guide-swatch-chip'] {
-  border: var(--sa-border-default);
   border-radius: var(--sa-radius-sm);
   min-height: 96px;
   margin-block-end: var(--sa-space-xs);
 }
 
-[data-feat='style-guide-gradient-block'] {
-  background: var(--sa-gradient-brand);
-  border-radius: var(--sa-radius-sm);
-  min-height: 120px;
+[data-feat='style-guide-gradient'] {
+  margin: 0;
 }
 
-[data-feat='style-guide-gradient-block'] + figcaption {
-  display: flex;
-  justify-content: space-between;
-  margin-block-start: var(--sa-space-sm);
+[data-feat='style-guide-gradient-chip'] {
+  border-radius: var(--sa-radius-sm);
+  min-height: 96px;
+  margin-block-end: var(--sa-space-xs);
 }
 
 [data-feat='style-guide-skeleton-75'] {
