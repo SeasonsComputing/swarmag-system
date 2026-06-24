@@ -599,29 +599,30 @@ UiAccordion
 
 ### 3.12 UiDialog
 
-Modal content primitive with overlay. The dialog surface provides the card
-frame — never nest a `UiCard` inside a `UiDialog`.
+General modal primitive with overlay for focused tasks such as edit forms and
+confirmations. Use triggered mode when the dialog owns its opener control; use
+controlled mode when open state is owned externally.
 
 **Two modes**
 
 | Mode       | When to use                                                  |
 | ---------- | ------------------------------------------------------------ |
-| Triggered  | Provide `trigger`; `UiDialog` renders a `UiButton` to open.  |
-| Controlled | Omit `trigger`; manage `open` externally (e.g. route-based). |
+| Triggered  | Provide `trigger`; `UiDialog` renders a `UiButton` opener.   |
+| Controlled | Omit `trigger`; manage `open` and `onOpenChange` externally. |
 
 **Props**
 
-| Prop             | Type                      | Required | Default       | Description                                       |
-| ---------------- | ------------------------- | -------- | ------------- | ------------------------------------------------- |
-| `trigger`        | `UiComponent`             | no       | unset         | Trigger button content. Omit for controlled mode. |
-| `triggerVariant` | `UiButtonVariant`         | no       | `'secondary'` | Trigger button variant.                           |
-| `children`       | `UiComponent`             | no       | unset         | Dialog content.                                   |
-| `open`           | `boolean`                 | no       | unset         | Controlled open state.                            |
-| `defaultOpen`    | `boolean`                 | no       | unset         | Initial open state.                               |
-| `onOpenChange`   | `(open: boolean) => void` | no       | unset         | Receives open state.                              |
-| `disabled`       | `boolean`                 | no       | `false`       | Disables the trigger.                             |
-| `error`          | `boolean`                 | no       | `false`       | Emits error state.                                |
-| `loading`        | `boolean`                 | no       | `false`       | Disables trigger as busy.                         |
+| Prop             | Type                      | Required | Default       | Description                                      |
+| ---------------- | ------------------------- | -------- | ------------- | ------------------------------------------------ |
+| `trigger`        | `UiComponent`             | no       | unset         | Opener button content. Omit for controlled mode. |
+| `triggerVariant` | `UiButtonVariant`         | no       | `'secondary'` | Trigger button variant.                          |
+| `children`       | `UiComponent`             | no       | unset         | Dialog content.                                  |
+| `open`           | `boolean`                 | no       | unset         | Controlled open state.                           |
+| `defaultOpen`    | `boolean`                 | no       | unset         | Initial open state.                              |
+| `onOpenChange`   | `(open: boolean) => void` | no       | unset         | Receives open state.                             |
+| `disabled`       | `boolean`                 | no       | `false`       | Disables the trigger.                            |
+| `error`          | `boolean`                 | no       | `false`       | Emits error state.                               |
+| `loading`        | `boolean`                 | no       | `false`       | Disables trigger as busy.                        |
 
 **Triggered mode**
 
@@ -635,7 +636,7 @@ frame — never nest a `UiCard` inside a `UiDialog`.
 </UiDialog>
 ```
 
-**Controlled mode** (route-based or externally managed)
+**Controlled mode** (route-based, shell, or externally managed)
 
 ```tsx
 <UiDialog open={isOpen()} onOpenChange={setOpen}>
