@@ -60,11 +60,11 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
       <h2 data-feat='abstraction-form-title'>{props.provider.formTitle}</h2>
       <section data-feat='abstraction-form-list'>
         <UiFieldset legend={`${props.provider.entityLabel}s`}>
-          {/*<div data-feat='abstraction-form-list-actions'>
+          <div data-feat='abstraction-form-list-actions'>
             <UiButton type='button' variant='secondary' onClick={onNew}>
               New {props.provider.entityLabel}
             </UiButton>
-          </div>*/}
+          </div>
           <Show
             when={!props.provider.isListLoading()}
             fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
