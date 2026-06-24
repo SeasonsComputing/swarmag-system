@@ -440,14 +440,15 @@
 }
 
 [data-ui='table-head'] {
-  background: var(--sa-gradient-brand-inverse);
+  background: var(--sa-table-bg-head);
 }
 
 [data-ui='table-row']:hover {
   background: var(--sa-bg-hover);
 }
 
-[data-ui='table-head'] [data-ui='table-row']:hover {
+[data-ui='table-head'] [data-ui='table-row']:hover,
+[data-ui='table-row'][data-ui-variant='section']:hover {
   background: transparent;
 }
 
@@ -1027,7 +1028,7 @@
 /* ─────────────────────────────────────────────────────────────────────────── */
 
 [data-ui='separator'] {
-  background: var(--sa-gradient-brand-inverse);
+  background: var(--sa-gradient-stripe);
   block-size: var(--sa-separator-height);
   border: none;
   display: block;
