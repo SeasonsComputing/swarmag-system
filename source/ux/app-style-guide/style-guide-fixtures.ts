@@ -44,7 +44,11 @@ export const COLOR_SWATCHES = [
 export const COLOR_GRADIENTS = [
   { label: 'brand', token: '--sa-gradient-brand', value: 'var(--sa-gradient-brand)' },
   { label: 'brand-90', token: '--sa-gradient-brand-90', value: 'var(--sa-gradient-brand-90)' },
-  { label: 'brand-inverse', token: '--sa-gradient-brand-inverse', value: 'var(--sa-gradient-brand-inverse)' },
+  {
+    label: 'brand-inverse',
+    token: '--sa-gradient-brand-inverse',
+    value: 'var(--sa-gradient-brand-inverse)'
+  },
   { label: 'card', token: '--sa-gradient-card', value: 'var(--sa-gradient-card)' },
   { label: 'hero', token: '--sa-gradient-hero', value: 'var(--sa-gradient-hero)' },
   { label: 'stripe', token: '--sa-gradient-stripe', value: 'var(--sa-gradient-stripe)' }
