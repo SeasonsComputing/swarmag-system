@@ -373,7 +373,7 @@ export const StyleGuide = (): UiComponent => {
               </For>
             </UiLayout>
             <UiFieldset legend='Gradients'>
-              <UiLayout>
+              <UiLayout variant='inline-wrap'>
                 <For each={COLOR_GRADIENTS}>
                   {g => <SgGradient value={g.value} label={g.label} token={g.token} />}
                 </For>
