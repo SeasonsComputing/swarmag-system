@@ -26,15 +26,12 @@ import {
   UiFormActions,
   UiInput,
   UiLayout,
-  UiSeparator,
   UiTableCell,
   UiToggleGroup,
   UiToggleItem
 } from '@ux/common/components/ui'
 import type { AbstractionFormContract } from '@ux/common/shell/abstraction-form-contract.ts'
 import { AbstractionForm } from '@ux/common/shell/abstraction-form.tsx'
-
-import './users.css'
 
 /** Props for the user management form route modal. */
 export type UsersFormProps = {
@@ -45,10 +42,7 @@ export type UsersFormProps = {
 const USERS_QUERY_KEY = ['users'] as const
 export const UsersForm = (props: UsersFormProps): UiComponent => {
   const queryClient = useQueryClient()
-  const usersQuery = createQuery(() => ({
-    queryKey: USERS_QUERY_KEY,
-    queryFn: loadUsers
-  }))
+  const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY,  queryFn: loadUsers }))
   const deleteUserMutation = createMutation(() => ({
     mutationFn: (id: User['id']) => api.Users.delete(id),
     onSuccess: async () => {
@@ -66,7 +60,13 @@ export const UsersForm = (props: UsersFormProps): UiComponent => {
     list: () => usersQuery.data ?? [],
     isListLoading: () => usersQuery.isPending,
     actions: [
-      { name: 'eject', label: 'Eject', icon: 'eject', variant: 'danger', handler: ejectUser }
+      {
+        name: 'eject',
+        label: 'Eject',
+        icon: 'eject',
+        variant: 'danger',
+        handler: ejectUser
+      }
     ],
     renderListCells: user => <UserListCells user={user} />,
     renderForm: (user, onClose) => (
@@ -79,32 +79,32 @@ export const UsersForm = (props: UsersFormProps): UiComponent => {
 
   return (
     <div data-feat='users-page'>
-      <UiLayout>
-        <Show when={usersQuery.error}>
-          <UiAlert variant='danger'>{errorMessage(usersQuery.error)}</UiAlert>
-        </Show>
-        <AbstractionForm provider={usersForm} />
-      </UiLayout>
+      <Show when={usersQuery.error}>
+        <UiAlert variant='danger'>{errorMessage(usersQuery.error)}</UiAlert>
+      </Show>
+      <AbstractionForm provider={usersForm} />
     </div>
   )
 }
 
+/** Loads the user list for the management form. */
 async function loadUsers(): Promise<User[]> {
   const result = await api.Users.list({ limit: 100 })
   return result.data
 }
 
+/** Renders table cells for one user. */
 function UserListCells(props: { user: User }): UiComponent {
   return (
     <>
       <UiTableCell>{props.user.displayName}</UiTableCell>
       <UiTableCell>{props.user.primaryEmail}</UiTableCell>
       <UiTableCell>
-        <div data-feat='user-role-list'>
+        <UiLayout variant='inline' gap='tight'>
           <For each={props.user.roles}>
             {role => <UiBadge variant='info'>{role}</UiBadge>}
           </For>
-        </div>
+        </UiLayout>
       </UiTableCell>
       <UiTableCell>
         <UiBadge variant={props.user.status === 'active' ? 'success' : 'warning'}>
@@ -115,6 +115,7 @@ function UserListCells(props: { user: User }): UiComponent {
   )
 }
 
+/** Renders the create or edit form for one user. */
 function UserEditor(props: {
   user: User | null
   onClose: () => void
@@ -137,15 +138,12 @@ function UserEditor(props: {
     setError(null)
   })
 
-  const existing = (): boolean => props.user !== null
-  const toggleRole = (role: UserRole, pressed: boolean): void => {
-    if (pressed) {
-      if (!roles().includes(role)) setRoles([...roles(), role])
-      return
-    }
+  //
+  // Mutations:
+  // - `createUserMutation`: Creates a new user.
+  // - `updateUserMutation`: Updates the user.
+  //
 
-    setRoles(roles().filter(value => value !== role))
-  }
   const createUserMutation = createMutation(() => ({
     mutationFn: (input: UserCreate) => api.Users.create(input),
     onSuccess: async () => {
@@ -159,13 +157,27 @@ function UserEditor(props: {
     }
   }))
 
-  const save = async (): Promise<void> => {
+  //
+  // Handlers:
+  // - `toggleRole`: Toggles a role for the user.
+  // - `saveUser`: Saves the user.
+  // - `updateUser`: Updates the user.
+  // - `createUser`: Creates a new user.
+  //
+
+  const toggleRole = (role: UserRole, pressed: boolean): void => {
+    if (pressed) {
+      if (!roles().includes(role)) setRoles([...roles(), role])
+      return
+    }
+    setRoles(roles().filter(value => value !== role))
+  }
+  const saveUser = async (): Promise<void> => {
     if (pending()) return
     if (roles().length === 0) {
       setError('Select at least one role.')
       return
     }
-
     setPending(true)
     setError(null)
     try {
@@ -178,7 +190,6 @@ function UserEditor(props: {
       setPending(false)
     }
   }
-
   const updateUser = async (user: User, nextStatus: UserStatus): Promise<void> => {
     const update: UserUpdate = {
       id: user.id,
@@ -189,7 +200,6 @@ function UserEditor(props: {
     }
     await updateUserMutation.mutateAsync(update)
   }
-
   const createUser = async (): Promise<void> => {
     const create: UserCreate = {
       displayName: displayName(),
@@ -200,12 +210,12 @@ function UserEditor(props: {
     }
     await createUserMutation.mutateAsync(create)
   }
-
   const submit = (event: SubmitEvent): void => {
     event.preventDefault()
-    void save()
+    void saveUser()
   }
 
+  const existing = (): boolean => props.user !== null
   return (
     <form onSubmit={submit}>
       <UiLayout>
@@ -258,7 +268,7 @@ function UserEditor(props: {
         </UiField>
 
         <UiField variant='caption' label='Roles'>
-          <div data-feat='user-option-row'>
+          <UiLayout variant='inline'>
             <For each={USER_ROLES}>
               {role => (
                 <UiCheckbox
@@ -268,32 +278,28 @@ function UserEditor(props: {
                   onChange={checked => toggleRole(role, checked)}
                   disabled={pending()}
                 >
-                  <span data-feat='user-option-label'>{role}</span>
+                  {role}
                 </UiCheckbox>
               )}
             </For>
-          </div>
+          </UiLayout>
         </UiField>
 
         <UiField variant='caption' label='Status'>
-          <div data-feat='user-option-row'>
-            <UiToggleGroup<UserStatus>
-              value={status()}
-              onChange={setStatus}
-              disabled={pending()}
-            >
-              <For each={USER_STATUSES}>
-                {value => (
-                  <UiToggleItem value={value}>
-                    <span data-feat='user-option-label'>{value}</span>
-                  </UiToggleItem>
-                )}
-              </For>
-            </UiToggleGroup>
-          </div>
+          <UiToggleGroup<UserStatus>
+            value={status()}
+            onChange={setStatus}
+            disabled={pending()}
+          >
+            <For each={USER_STATUSES}>
+              {value => (
+                <UiToggleItem value={value}>
+                  <span data-feat='user-option-label'>{value}</span>
+                </UiToggleItem>
+              )}
+            </For>
+          </UiToggleGroup>
         </UiField>
-
-        <UiSeparator />
 
         <UiFormActions justify='split'>
           <UiButton type='button' variant='ghost' onClick={props.onClose} disabled={pending()}>
