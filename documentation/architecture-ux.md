@@ -678,7 +678,7 @@ No row collapse on small viewport. Horizontal swipe per row. Vertical scroll on 
 
 Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/ux/common/stores/dashboard-state.ts`). Not hardcoded. The current contract uses one default config per app.
 
-The app-local dashboard JSON conforms to `DashboardView` from `source/ux/common/views/dashboard-views.ts`. `DashboardState.init(seed) `validates the seed and converts it into `DashboardStoreView` from `source/ux/common/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
+The app-local dashboard JSON conforms to `DashboardView` from `source/ux/common/views/dashboard-views.ts`. `DashboardState.init(seed)`validates the seed and converts it into `DashboardStoreView` from `source/ux/common/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
 `bootstrap()` initializes `DashboardState`, then provides it with the shared widget registry through `DashboardProvider` (`source/ux/common/shell/dashboard-provider.tsx`). Dashboard renderers consume the combined runtime contract through `useDashboard()`. Dashboard state remains a Reactive Store Module; the context injects its namespace contract and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@ux/api` namespace.
 
