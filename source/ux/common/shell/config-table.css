@@ -1,0 +1,35 @@
+[data-feat='config-table'] {
+  color: var(--sa-text-secondary);
+  font-family: var(--sa-data-font-family);
+  font-size: calc(var(--sa-font-size-xs) * 0.85);
+  text-transform: lowercase;
+}
+
+[data-feat='config-table'] > * {
+  align-items: baseline;
+  display: grid;
+  gap: var(--sa-space-sm);
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+[data-feat='config-table'] dd,
+[data-feat='config-table'] dt {
+  margin: 0;
+}
+
+[data-feat='config-table'] dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: end;
+}
+
+[data-feat='config-table'] a {
+  color: var(--sa-text-primary);
+  text-decoration: none;
+}
+
+[data-feat='config-table'] a:hover {
+  color: var(--sa-color-primary);
+  text-decoration: underline dotted 1px var(--sa-text-secondary);
+  text-underline-offset: 3px;
+}

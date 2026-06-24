@@ -18,14 +18,15 @@ PUBLIC
 Login Passwordless OTP login component.
 */
 
-import { createSignal, For, onMount, Show } from '@solid-js'
+import { createSignal, onMount, Show } from '@solid-js'
 import { Navigate } from '@tanstack/solid-router'
 import { api } from '@ux/api'
 import { UiAlert, UiButton, UiField, UiInput, UiLayout } from '@ux/common/components/ui'
+import { BrandHero } from './brand-hero.tsx'
+import { ConfigTable } from './config-table.tsx'
 import { getShellMetadata, type ShellMetadata } from './shell-metadata.ts'
 
 import './login.css'
-import logoArt from '@ux/common/assets/logos/swarmag-ops-logo-art.png'
 
 /** Passwordless OTP login component. */
 export const Login = () => {
@@ -119,14 +120,7 @@ const LoginClient = (props: LoginClientProps) => {
       <div data-feat='login'>
         <div data-feat='login-layout'>
           <UiLayout gap='loose'>
-            {/* Login hero block */}
-            <div data-feat='login-hero'>
-              <img data-feat='login-logo' src={logoArt} alt='swarmAg' />
-              <UiLayout gap='tight'>
-                <span data-feat='login-product'>{props.shell.identity.productName}</span>
-                <span data-feat='login-application'>{props.shell.identity.applicationName}</span>
-              </UiLayout>
-            </div>
+            <BrandHero />
 
             <Show when={!session.isLoading}>
               {/* STEP 1: validate email and send OTP code */}
@@ -196,18 +190,7 @@ const LoginClient = (props: LoginClientProps) => {
           </UiLayout>
 
           {/* Shell configuration metadata */}
-          <div>
-            <dl data-feat='login-config'>
-              <For each={props.shell.config}>
-                {datum => (
-                  <div>
-                    <dt>{datum.label}</dt>
-                    <dd>{datum.value}</dd>
-                  </div>
-                )}
-              </For>
-            </dl>
-          </div>
+          <ConfigTable shell={props.shell} showAuthor={false} />
         </div>
       </div>
     </Show>
