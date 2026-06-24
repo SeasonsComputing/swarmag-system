@@ -95,6 +95,15 @@ export interface DashboardRowsContract {
   move(rowId: string, direction: MoveDirection): Promise<void>
 }
 
+/** Dashboard reactive state and mutation contract. */
+export interface DashboardStateContract {
+  store: DashboardStoreView
+  init(seed: unknown): Promise<void>
+  headerWidgets: DashboardHeaderContract
+  rows: DashboardRowsContract
+  rowWidgets: DashboardWidgetsContract
+}
+
 // ───────────────────────────────────────────────────────────────────────────────
 // DASHBOARD STATE IMPLEMENTATION
 // ───────────────────────────────────────────────────────────────────────────────
@@ -375,7 +384,7 @@ function toDashboardStoreRow(input: unknown, field: string): DashboardStoreRow {
 // DASHBOARD STATE
 // ───────────────────────────────────────────────────────────────────────────────
 
-const DashboardState = {
+const DashboardState: DashboardStateContract = {
   store: dashboardStore,
   init: dashboardInit,
   headerWidgets: dashboardHeader,
