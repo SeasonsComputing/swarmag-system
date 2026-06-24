@@ -42,7 +42,7 @@ export type UsersFormProps = {
 const USERS_QUERY_KEY = ['users'] as const
 export const UsersForm = (props: UsersFormProps): UiComponent => {
   const queryClient = useQueryClient()
-  const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY,  queryFn: loadUsers }))
+  const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY, queryFn: loadUsers }))
   const deleteUserMutation = createMutation(() => ({
     mutationFn: (id: User['id']) => api.Users.delete(id),
     onSuccess: async () => {
