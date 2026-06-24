@@ -174,10 +174,10 @@
 
   /* Select item */
   --sa-single-select-item-bg: oklch(var(--sa-lch-gradient-2-mid-start) / 0.1);
-  --sa-single-select-item-border-start: 2px solid oklch(var(--sa-lch-gradient-3-mid) / 0.25);
+  --sa-single-select-item-border: 3px solid oklch(var(--sa-lch-gradient-3-mid) / 0.25);
   --sa-single-select-item-bg-hover: oklch(var(--sa-lch-gradient-2-mid-start) / 0.17);
   --sa-multi-select-item-bg: oklch(var(--sa-lch-gradient-2-mid-start) / 0.1);
-  --sa-multi-select-item-border-start: 2px solid oklch(var(--sa-lch-gradient-3-mid) / 0.25);
+  --sa-multi-select-item-border: 3px solid oklch(var(--sa-lch-gradient-3-mid) / 0.25);
   --sa-multi-select-item-bg-hover: oklch(var(--sa-lch-gradient-2-mid-start) / 0.17);
 
   /* Tab */
@@ -234,11 +234,7 @@
   --sa-bg-hover: oklch(86% 0.062 185 / 0.38);
   --sa-bg-selected: oklch(80% 0.09 184 / 0.28);
   --sa-bg-control: oklch(97% 0.012 112);
-  --sa-bg-card: linear-gradient(
-    135deg,
-    oklch(99.6% 0.006 98 / 0.96) 0%,
-    oklch(94.8% 0.024 116 / 0.9) 100%
-  );
+  --sa-bg-card: var(--sa-gradient-card);
   --sa-bg-backdrop: oklch(15% 0.018 236 / 0.42);
 
   /* Text */
@@ -361,10 +357,10 @@
 
   /* Select item */
   --sa-single-select-item-bg: oklch(92% 0.04 170 / 0.56);
-  --sa-single-select-item-border-start: 2px solid oklch(55% 0.13 184 / 0.48);
+  --sa-single-select-item-border: 3px solid oklch(55% 0.13 184 / 0.48);
   --sa-single-select-item-bg-hover: oklch(86% 0.06 184 / 0.52);
   --sa-multi-select-item-bg: oklch(92% 0.04 170 / 0.56);
-  --sa-multi-select-item-border-start: 2px solid oklch(55% 0.13 184 / 0.48);
+  --sa-multi-select-item-border: 3px solid oklch(55% 0.13 184 / 0.48);
   --sa-multi-select-item-bg-hover: oklch(86% 0.06 184 / 0.52);
 
   /* Tab */
@@ -381,11 +377,7 @@
   --sa-skeleton-bg-shimmer: oklch(86% 0.018 110);
 
   /* Card */
-  --sa-card-panel-bg: linear-gradient(
-    135deg,
-    oklch(99.6% 0.006 98 / 0.98) 0%,
-    oklch(96.2% 0.018 116 / 0.94) 100%
-  );
+  --sa-card-panel-bg: var(--sa-bg-card);
   --sa-card-panel-border: 1px solid oklch(34% 0.035 220 / 0.1);
   --sa-card-panel-shadow: none;
   --sa-card-decoration-stripe-opacity: 1;
