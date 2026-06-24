@@ -13,7 +13,8 @@ void bootstrap(dashboardSeed, {
   dialogs: [
     {
       path: '/users',
-      component: UsersForm
+      component: UsersForm,
+      dialog: { size: 'workbench' }
     }
   ]
 })

@@ -18,10 +18,14 @@ import { splitProps } from '@solid-js'
 import { UiButton, type UiButtonVariant } from './ui-button.tsx'
 import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
+/** Dialog size treatments declared by the design language. */
+export type UiDialogSize = 'content' | 'panel' | 'workbench'
+
 /** Dialog control props. */
 export type UiDialogProps = UiComponentProps & {
   trigger?: UiComponent
   triggerVariant?: UiButtonVariant
+  size?: UiDialogSize
   open?: boolean
   defaultOpen?: boolean
   error?: boolean
@@ -41,6 +45,7 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
     'children',
     'trigger',
     'triggerVariant',
+    'size',
     'open',
     'defaultOpen',
     'error',
@@ -50,16 +55,22 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
   ])
   return (
     <Dialog open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
-      <Dialog.Trigger
-        as={UiButton}
-        disabled={local.disabled || local.loading}
-        variant={local.triggerVariant ?? 'secondary'}
-      >
-        {local.trigger}
-      </Dialog.Trigger>
+      {local.trigger && (
+        <Dialog.Trigger
+          as={UiButton}
+          disabled={local.disabled || local.loading}
+          variant={local.triggerVariant ?? 'secondary'}
+        >
+          {local.trigger}
+        </Dialog.Trigger>
+      )}
       <Dialog.Portal>
         <Dialog.Overlay data-ui='dialog-overlay' />
-        <Dialog.Content data-ui='dialog' data-ui-state={controlState(local)}>
+        <Dialog.Content
+          data-ui='dialog'
+          data-ui-size={local.size ?? 'panel'}
+          data-ui-state={controlState(local)}
+        >
           {local.children}
         </Dialog.Content>
       </Dialog.Portal>

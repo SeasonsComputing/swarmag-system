@@ -16,7 +16,7 @@ ActionWidget  Dashboard header action widget.
 import type { Dictionary } from '@core/std'
 import { For } from '@solid-js'
 import { Link } from '@tanstack/solid-router'
-import { type UiComponent, UiLayout } from '@ux/common/components/ui'
+import type { UiComponent } from '@ux/common/components/ui'
 
 import './action-widget.css'
 
@@ -37,11 +37,9 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
 
   return (
     <nav data-feat='action-widget'>
-      <UiLayout gap='tight'>
-        <For each={pairs()}>
-          {pair => <Link to={pair.action}>{pair.label}</Link>}
-        </For>
-      </UiLayout>
+      <For each={pairs()}>
+        {pair => <Link to={pair.action}>{pair.label}</Link>}
+      </For>
     </nav>
   )
 }

@@ -1,3 +1,9 @@
+[data-feat='action-widget'] {
+  display: grid;
+  gap: var(--sa-space-sm) var(--sa-rhythm-gap);
+  grid-template-columns: repeat(2, max-content);
+}
+
 [data-feat='action-widget'] a {
   align-items: center;
   color: var(--sa-text-primary);

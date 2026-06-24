@@ -1,0 +1,86 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ About box styles                                                             ║
+║ Shell application identity and configuration dialog styles.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-feat='about-box'] {
+  display: grid;
+  gap: var(--sa-space-xl);
+  inline-size: min(100%, var(--sa-size-min));
+}
+
+[data-feat='about-box-hero'] {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-rhythm-gap);
+  justify-content: flex-end;
+  position: relative;
+}
+
+[data-feat='about-box-hero']::before {
+  aspect-ratio: 1;
+  background: radial-gradient(
+    ellipse,
+    var(--sa-color-primary),
+    transparent 70%
+  );
+  border-radius: var(--sa-radius-full);
+  content: '';
+  filter: blur(var(--sa-space-2xl));
+  inline-size: var(--sa-size-wrap);
+  inset-block-end: var(--sa-space-4xl);
+  opacity: 0.68;
+  position: absolute;
+}
+
+[data-feat='about-box-logo'] {
+  display: block;
+  height: auto;
+  position: relative;
+  width: 100%;
+  z-index: var(--sa-z-raised);
+}
+
+[data-feat='about-box-product'] {
+  color: var(--sa-text-secondary);
+  font-family: var(--sa-label-font-family);
+  font-size: var(--sa-label-font-size);
+  font-weight: var(--sa-label-font-weight);
+  text-align: center;
+}
+
+[data-feat='about-box-application'] {
+  color: var(--sa-color-accent);
+  font-family: var(--sa-heading-font-family);
+  font-size: var(--sa-heading-font-size-h4);
+  font-weight: var(--sa-heading-font-weight);
+  text-align: center;
+}
+
+[data-feat='about-box-config'] {
+  color: var(--sa-text-secondary);
+  font-family: var(--sa-data-font-family);
+  font-size: calc(var(--sa-font-size-xs) * 0.85);
+  text-transform: lowercase;
+}
+
+[data-feat='about-box-config'] > * {
+  align-items: baseline;
+  display: grid;
+  gap: var(--sa-space-sm);
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+[data-feat='about-box-config'] dd,
+[data-feat='about-box-config'] dt {
+  margin: 0;
+}
+
+[data-feat='about-box-config'] dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  text-align: end;
+}

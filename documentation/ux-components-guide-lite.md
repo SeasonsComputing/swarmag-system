@@ -264,8 +264,11 @@ confirmations. Provide `trigger` only when `UiDialog` owns the opener control.
 Omit `trigger` for controlled mode and manage `open`/`onOpenChange`
 externally, including route-based shell dialogs.
 
-Key props: `trigger`, `triggerVariant`, `open`, `defaultOpen`,
+Key props: `trigger`, `triggerVariant`, `size`, `open`, `defaultOpen`,
 `onOpenChange`, `loading`, `error`, `disabled`.
+
+Sizes: `content` for compact content, `panel` for standard forms, and
+`workbench` for management surfaces such as list/edit flows.
 
 Dialog content should compose shared controls and use `UiFormActions` for
 form-level actions.

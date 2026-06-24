@@ -1111,14 +1111,27 @@
   border: var(--sa-border-card);
   border-radius: var(--sa-card-border-radius);
   box-shadow: var(--sa-shadow-card);
+  container-type: inline-size;
+  inline-size: fit-content;
   inset-block-start: 50%;
   inset-inline-start: 50%;
-  max-inline-size: 32rem;
-  min-inline-size: 20rem;
+  max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 2);
+  max-inline-size: min(48rem, calc(100vw - var(--sa-rhythm-pad) * 2));
+  min-inline-size: min(24rem, calc(100vw - var(--sa-rhythm-pad) * 2));
+  overflow: auto;
   padding: var(--sa-space-lg);
   position: fixed;
   transform: translate(-50%, -50%);
   z-index: var(--sa-z-overlay);
+}
+
+[data-ui='dialog'][data-ui-size='content'] {
+  max-inline-size: min(32rem, calc(100vw - var(--sa-rhythm-pad) * 2));
+  min-inline-size: min(20rem, calc(100vw - var(--sa-rhythm-pad) * 2));
+}
+
+[data-ui='dialog'][data-ui-size='workbench'] {
+  max-inline-size: min(var(--sa-size-lg), calc(100vw - var(--sa-rhythm-pad) * 2));
 }
 
 /* ─────────────────────────────────────────────────────────────────────────── */

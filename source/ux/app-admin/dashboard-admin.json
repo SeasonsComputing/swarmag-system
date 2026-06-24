@@ -9,8 +9,8 @@
         "type": "ActionWidget",
         "settings": {
           "shape": "compact",
-          "actions": ["/users", "/logout"],
-          "labels": ["Users", "Logout"]
+          "actions": ["/users", "/about", "/logout"],
+          "labels": ["Users", "About", "Logout"]
         }
       }
     ]
