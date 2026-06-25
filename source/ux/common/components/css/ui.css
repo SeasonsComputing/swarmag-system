@@ -93,7 +93,7 @@
   align-items: center;
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
-  border-radius: var(--sa-radius-xl);
+  border-radius: var(--sa-radius-full);
   color: var(--sa-text-secondary);
   cursor: pointer;
   display: inline-flex;
@@ -110,6 +110,14 @@
   position: relative;
   transition: var(--sa-transition-fast);
   white-space: nowrap;
+}
+
+[data-ui='action-button']::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  backdrop-filter: var(--sa-filter-blur);
+  border-radius: var(--sa-radius-full);
 }
 
 [data-ui='action-button'][data-ui-state='disabled'] {
@@ -150,8 +158,20 @@
   mask: url('../icons/pencil-1.svg') center / contain no-repeat;
 }
 
+[data-ui='action-button'][data-ui-icon='check'] [data-ui='action-button-icon'] {
+  mask: url('../icons/check.svg') center / contain no-repeat;
+}
+
+[data-ui='action-button'][data-ui-icon='cross'] [data-ui='action-button-icon'] {
+  mask: url('../icons/cross-1.svg') center / contain no-repeat;
+}
+
 [data-ui='action-button'][data-ui-icon='eject'] [data-ui='action-button-icon'] {
   mask: url('../icons/exit.svg') center / contain no-repeat;
+}
+
+[data-ui='action-button'][data-ui-icon='plus'] [data-ui='action-button-icon'] {
+  mask: url('../icons/plus.svg') center / contain no-repeat;
 }
 
 [data-ui='action-button-label'] {
@@ -166,6 +186,7 @@
   padding-block: var(--sa-space-xx);
   padding-inline: var(--sa-space-xs);
   position: absolute;
+  white-space: nowrap;
   z-index: var(--sa-z-popover);
 }
 

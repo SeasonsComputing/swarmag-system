@@ -18,7 +18,7 @@ import { type JSX, splitProps } from '@solid-js'
 import { controlState, type UiComponent } from './ui-helpers.ts'
 
 /** Action button icon names. */
-export type UiActionButtonIcon = 'delete' | 'edit' | 'eject'
+export type UiActionButtonIcon = 'check' | 'cross' | 'delete' | 'edit' | 'eject' | 'plus'
 
 /** Action button variants. */
 export type UiActionButtonVariant = 'default' | 'danger'
