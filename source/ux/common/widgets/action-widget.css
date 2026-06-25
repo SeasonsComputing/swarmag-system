@@ -1,3 +1,10 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Action widget styles                                                         ║
+║ Two-column link grid with icon bullet for contextual action lists.           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
 [data-feat='action-widget'] {
   display: grid;
   gap: var(--sa-space-sm) var(--sa-rhythm-gap);

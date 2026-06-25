@@ -1,3 +1,10 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Config table styles                                                          ║
+║ Key-value definition list layout for compact configuration display.          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
 [data-feat='config-table'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-data-font-family);
