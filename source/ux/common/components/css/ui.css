@@ -51,8 +51,8 @@
 }
 
 [data-ui='button'][data-ui-variant='secondary'] {
-  background: var(--sa-bg-control);
-  border: var(--sa-border-default);
+  background: var(--sa-bg-hover);
+  border: var(--sa-border-brand);
   color: var(--sa-text-primary);
 }
 
@@ -94,7 +94,7 @@
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-full);
-  color: var(--sa-text-secondary);
+  color: var(--sa-color-primary);
   cursor: pointer;
   display: inline-flex;
   font-family: var(--sa-button-font-family);
@@ -131,7 +131,8 @@
 [data-ui='action-button']:not([data-ui-state='disabled']):hover,
 [data-ui='action-button']:focus-visible {
   background: var(--sa-bg-hover);
-  color: var(--sa-text-primary);
+  border-color: var(--sa-color-primary);
+  color: var(--sa-color-primary);
 }
 
 [data-ui='action-button'][data-ui-variant='danger']:not([data-ui-state='disabled']):hover,

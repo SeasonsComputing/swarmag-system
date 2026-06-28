@@ -18,9 +18,8 @@ import type { Instance } from '@core/std'
 import { createSignal, For, Show } from '@solid-js'
 import {
   UiActionButton,
-  UiButton,
+  UiCard,
   type UiComponent,
-  UiFieldset,
   UiTable,
   UiTableBody,
   UiTableCell,
@@ -54,81 +53,95 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
     setSelected(null)
     setMode('list')
   }
+  const editorTitle = (): string =>
+    selected() ? `Edit ${props.provider.entityLabel}` : `New ${props.provider.entityLabel}`
 
   return (
     <div data-feat='abstraction-form' data-feat-mode={mode()}>
       <h2 data-feat='abstraction-form-title'>{props.provider.formTitle}</h2>
       <section data-feat='abstraction-form-list'>
-        <UiFieldset legend={`${props.provider.entityLabel}s`}>
-          <div data-feat='abstraction-form-list-actions'>
-            <UiButton type='button' variant='secondary' onClick={onNew}>
-              New {props.provider.entityLabel}
-            </UiButton>
-          </div>
-          <Show
-            when={!props.provider.isListLoading()}
-            fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
-          >
-            <UiTable overflow='scroll'>
-              <UiTableHeader>
-                <For each={props.provider.listColumns}>
-                  {column => <UiTableCell>{column}</UiTableCell>}
-                </For>
-                <UiTableCell align='end'>Actions</UiTableCell>
-              </UiTableHeader>
-              <UiTableBody>
-                <Show
-                  when={props.provider.list().length > 0}
-                  fallback={
-                    <UiTableRow variant='section'>
-                      <UiTableCell>
-                        No {props.provider.entityLabel.toLowerCase()}s found.
-                      </UiTableCell>
-                    </UiTableRow>
-                  }
-                >
-                  <For each={props.provider.list()}>
-                    {item => (
-                      <UiTableRow onClick={() => onSelect(item)}>
-                        {props.provider.renderListCells(item)}
-                        <UiTableCell align='end'>
-                          <For each={props.provider.actions}>
-                            {action => (
-                              <UiActionButton
-                                icon={action.icon}
-                                label={action.label}
-                                variant={action.variant}
-                                onClick={event => {
-                                  event.stopPropagation()
-                                  void action.handler(item)
-                                }}
-                              />
-                            )}
-                          </For>
-                          <UiActionButton icon='edit' label='Edit' onClick={() => onSelect(item)} />
+        <UiCard elevation='raised'>
+          <header data-feat='abstraction-form-card-header'>
+            <h3 data-feat='abstraction-form-card-title'>{props.provider.entityLabel}s</h3>
+            <div data-feat='abstraction-form-card-actions'>
+              <UiActionButton icon='plus' label={`New ${props.provider.entityLabel}`} onClick={onNew} />
+            </div>
+          </header>
+          <div data-feat='abstraction-form-card-body'>
+            <Show
+              when={!props.provider.isListLoading()}
+              fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
+            >
+              <UiTable overflow='scroll'>
+                <UiTableHeader>
+                  <For each={props.provider.listColumns}>
+                    {column => <UiTableCell>{column}</UiTableCell>}
+                  </For>
+                  <UiTableCell align='end'>Actions</UiTableCell>
+                </UiTableHeader>
+                <UiTableBody>
+                  <Show
+                    when={props.provider.list().length > 0}
+                    fallback={
+                      <UiTableRow variant='section'>
+                        <UiTableCell>
+                          No {props.provider.entityLabel.toLowerCase()}s found.
                         </UiTableCell>
                       </UiTableRow>
-                    )}
-                  </For>
-                </Show>
-              </UiTableBody>
-            </UiTable>
-          </Show>
-        </UiFieldset>
+                    }
+                  >
+                    <For each={props.provider.list()}>
+                      {item => (
+                        <UiTableRow onClick={() => onSelect(item)}>
+                          {props.provider.renderListCells(item)}
+                          <UiTableCell align='end'>
+                            <For each={props.provider.actions}>
+                              {action => (
+                                <UiActionButton
+                                  icon={action.icon}
+                                  label={action.label}
+                                  variant={action.variant}
+                                  onClick={event => {
+                                    event.stopPropagation()
+                                    void action.handler(item)
+                                  }}
+                                />
+                              )}
+                            </For>
+                            <UiActionButton icon='edit' label='Edit' onClick={() => onSelect(item)} />
+                          </UiTableCell>
+                        </UiTableRow>
+                      )}
+                    </For>
+                  </Show>
+                </UiTableBody>
+              </UiTable>
+            </Show>
+          </div>
+        </UiCard>
       </section>
       <section data-feat='abstraction-form-panel'>
-        <div data-feat='abstraction-form-panel-actions'>
-          <UiButton type='button' variant='ghost' onClick={() => setMode('list')}>
-            {'<-'} {props.provider.entityLabel}s
-          </UiButton>
-        </div>
-        <UiFieldset
-          legend={selected()
-            ? `Edit ${props.provider.entityLabel}`
-            : `New ${props.provider.entityLabel}`}
-        >
-          {props.provider.renderForm(selected(), clearSelection)}
-        </UiFieldset>
+        <UiCard elevation='raised'>
+          <header data-feat='abstraction-form-card-header'>
+            <div data-feat='abstraction-form-card-title-group'>
+              <div data-feat='abstraction-form-collapse-action'>
+                <UiActionButton
+                  icon='back'
+                  label={`${props.provider.entityLabel}s`}
+                  onClick={() => setMode('list')}
+                />
+              </div>
+              <h3 data-feat='abstraction-form-card-title'>{editorTitle()}</h3>
+            </div>
+            <div data-feat='abstraction-form-card-actions'>
+              <UiActionButton icon='cross' label='Cancel' onClick={clearSelection} />
+              <UiActionButton icon='check' label='Save' type='submit' form='abstraction-panel-form' />
+            </div>
+          </header>
+          <div data-feat='abstraction-form-card-body'>
+            {props.provider.renderForm(selected(), clearSelection)}
+          </div>
+        </UiCard>
       </section>
     </div>
   )
