@@ -154,6 +154,10 @@
   mask: url('../icons/trash.svg') center / contain no-repeat;
 }
 
+[data-ui='action-button'][data-ui-icon='back'] [data-ui='action-button-icon'] {
+  mask: url('../icons/arrow-left.svg') center / contain no-repeat;
+}
+
 [data-ui='action-button'][data-ui-icon='edit'] [data-ui='action-button-icon'] {
   mask: url('../icons/pencil-1.svg') center / contain no-repeat;
 }

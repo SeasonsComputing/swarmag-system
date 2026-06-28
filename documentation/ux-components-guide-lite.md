@@ -181,7 +181,7 @@ Key props: `checked`, `defaultChecked`, `onChange`, `name`, `value`,
 
 `onChange` receives the next boolean state.
 
-### 3.7 UiRadioGroup and UiRadioItem
+### 3.7 UiRadioGroup & UiRadioItem
 
 Use for visible mutually exclusive choices.
 
@@ -206,7 +206,7 @@ Key props: `pressed`, `defaultPressed`, `onChange`, `loading`, `error`,
 
 `onChange` receives the next boolean pressed state.
 
-### 3.9 UiToggleGroup and UiToggleItem
+### 3.9 UiToggleGroup & UiToggleItem
 
 Use for a small mutually exclusive mode set shown as peer buttons.
 
@@ -298,7 +298,7 @@ Key props: `label`, `value`, `minValue`, `maxValue`, children, `loading`,
 Use for compact icon actions on dense surfaces such as table rows.
 
 Required props: `icon`, `label`.
-Icon values: `edit`, `eject`, `delete`.
+Icon values: `back`, `check`, `cross`, `delete`, `edit`, `eject`, `plus`.
 Variants: `default`, `danger`.
 Other key props: `loading`, `error`, `disabled`.
 
@@ -353,7 +353,7 @@ Renders with `role='status'`.
 
 Use for loading placeholders while content is unavailable.
 
-## 5. Layout And Form Controls
+## 5. Layout & Form Controls
 
 ### 5.1 UiLayout
 
@@ -373,7 +373,7 @@ Variants:
 
 Gap values: `loose`, `tight`, `none`.
 
-### 5.2 UiList and UiListItem
+### 5.2 UiList & UiListItem
 
 Use for semantic item lists.
 

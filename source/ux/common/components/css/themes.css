@@ -42,7 +42,7 @@
   --sa-card-stripe-height: 3px;
 
   /* Fieldset */
-  --sa-fieldset-bg: transparent;
+  --sa-fieldset-bg: var(--sa-gradient-card);
   --sa-fieldset-border: var(--sa-border-card);
   --sa-fieldset-shadow: var(--sa-shadow-sm);
 
@@ -396,7 +396,4 @@
   --sa-table-color-section: oklch(50% 0.035 218);
   --sa-table-bg-row-even: oklch(99.2% 0.006 98);
   --sa-table-bg-row-odd: oklch(95.4% 0.016 112);
-
-  /** Fieldset */
-  --sa-fieldset-shadow: var(--sa-shadow);
 }
