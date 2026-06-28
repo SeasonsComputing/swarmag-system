@@ -42,7 +42,7 @@
   --sa-card-stripe-height: 3px;
 
   /* Fieldset */
-  --sa-fieldset-bg: var(--sa-gradient-card);
+  --sa-fieldset-bg: var(--sa-bg-control);
   --sa-fieldset-border: var(--sa-border-card);
   --sa-fieldset-shadow: var(--sa-shadow-sm);
 
