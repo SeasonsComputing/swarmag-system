@@ -10,9 +10,7 @@
   gap: var(--sa-rhythm-gap);
   grid-template-columns: minmax(var(--sa-size-xs), 2fr) minmax(var(--sa-size-min), 1fr);
   grid-template-rows: auto minmax(0, 1fr);
-  /*inline-size: min(100%, var(--sa-size-md));
-  max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 2);
-  min-inline-size: min(100%, var(--sa-size-min));*/
+  max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
 }
 
 [data-feat='abstraction-form-title'] {
@@ -23,31 +21,67 @@
 [data-feat='abstraction-form-list'] {
   display: flex;
   flex-direction: column;
-  min-block-size: 100%;
+  min-block-size: min(calc(var(--sa-touch-target) * 6), calc(100dvh - var(--sa-rhythm-pad) * 4));
   min-inline-size: min(var(--sa-size-xs), 100%);
-  overflow: auto;
+  position: relative;
 }
 
 [data-feat='abstraction-form-panel'] {
   display: flex;
   flex-direction: column;
-  min-block-size: 100%;
+  min-block-size: min(calc(var(--sa-touch-target) * 6), calc(100dvh - var(--sa-rhythm-pad) * 4));
   min-inline-size: min(var(--sa-size-min), 100%);
-  overflow: auto;
+  position: relative;
 }
 
-[data-feat='abstraction-form-list'] > [data-ui='fieldset'],
-[data-feat='abstraction-form-panel'] > [data-ui='fieldset'] {
-  height: 100%;
-}
-
-[data-feat='abstraction-form-list-actions'],
-[data-feat='abstraction-form-panel-actions'] {
+[data-feat='abstraction-form-list'] > [data-ui='card'],
+[data-feat='abstraction-form-panel'] > [data-ui='card'] {
   display: flex;
-  margin-block-end: var(--sa-space-sm);
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: visible;
 }
 
-[data-feat='abstraction-form-panel-actions'] {
+[data-feat='abstraction-form-card-header'] {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--sa-space-xs);
+  justify-content: space-between;
+  padding-block-end: var(--sa-space-sm);
+}
+
+[data-feat='abstraction-form-card-title'],
+[data-feat='abstraction-form-card-title-group'] {
+  align-items: center;
+  display: flex;
+  gap: var(--sa-space-xs);
+  min-inline-size: 0;
+}
+
+[data-feat='abstraction-form-card-title'] {
+  line-height: 1;
+  margin: 0;
+}
+
+[data-feat='abstraction-form-card-actions'] {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--sa-space-xs);
+}
+
+[data-feat='abstraction-form-card-body'] {
+  flex: 1 1 auto;
+  margin: calc(var(--sa-space-xs) * -1);
+  min-block-size: 0;
+  overflow-y: auto;
+  padding: var(--sa-space-xs);
+  scroll-padding: var(--sa-space-xs);
+}
+
+[data-feat='abstraction-form-collapse-action'] {
   display: none;
 }
 
@@ -56,12 +90,30 @@
     grid-template-columns: 1fr;
   }
 
-  [data-feat='abstraction-form'][data-feat-mode='list'] [data-feat='abstraction-form-panel'],
-  [data-feat='abstraction-form'][data-feat-mode='editor'] [data-feat='abstraction-form-list'] {
-    display: none;
+  [data-feat='abstraction-form-list'],
+  [data-feat='abstraction-form-panel'] {
+    grid-column: 1;
+    grid-row: 2;
+    transition: var(--sa-transition-fast);
   }
 
-  [data-feat='abstraction-form-panel-actions'] {
-    display: flex;
+  [data-feat='abstraction-form'][data-feat-mode='list'] [data-feat='abstraction-form-list'],
+  [data-feat='abstraction-form'][data-feat-mode='editor'] [data-feat='abstraction-form-panel'] {
+    opacity: 1;
+    pointer-events: auto;
+    visibility: visible;
+    z-index: var(--sa-z-base);
+  }
+
+  [data-feat='abstraction-form'][data-feat-mode='list'] [data-feat='abstraction-form-panel'],
+  [data-feat='abstraction-form'][data-feat-mode='editor'] [data-feat='abstraction-form-list'] {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+    z-index: var(--sa-z-below);
+  }
+
+  [data-feat='abstraction-form-collapse-action'] {
+    display: block;
   }
 }

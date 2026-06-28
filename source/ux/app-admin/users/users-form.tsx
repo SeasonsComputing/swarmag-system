@@ -19,11 +19,9 @@ import { api } from '@ux/api'
 import {
   UiAlert,
   UiBadge,
-  UiButton,
   UiCheckbox,
   type UiComponent,
   UiField,
-  UiFormActions,
   UiInput,
   UiLayout,
   UiTableCell,
@@ -32,6 +30,12 @@ import {
 } from '@ux/common/components/ui'
 import type { AbstractionFormContract } from '@ux/common/shell/abstraction-form-contract.ts'
 import { AbstractionForm } from '@ux/common/shell/abstraction-form.tsx'
+
+/** Loads the user list for the management form. */
+async function loadUsers(): Promise<User[]> {
+  const result = await api.Users.list({ limit: 100 })
+  return result.data
+}
 
 /** Props for the user management form route modal. */
 export type UsersFormProps = {
@@ -87,12 +91,6 @@ export const UsersForm = (props: UsersFormProps): UiComponent => {
   )
 }
 
-/** Loads the user list for the management form. */
-async function loadUsers(): Promise<User[]> {
-  const result = await api.Users.list({ limit: 100 })
-  return result.data
-}
-
 /** Renders table cells for one user. */
 function UserListCells(props: { user: User }): UiComponent {
   return (
@@ -102,13 +100,13 @@ function UserListCells(props: { user: User }): UiComponent {
       <UiTableCell>
         <UiLayout variant='inline' gap='tight'>
           <For each={props.user.roles}>
-            {role => <UiBadge variant='info'>{role}</UiBadge>}
+            {role => <UiBadge variant='info'>{enumDisplayLabel(role)}</UiBadge>}
           </For>
         </UiLayout>
       </UiTableCell>
       <UiTableCell>
         <UiBadge variant={props.user.status === 'active' ? 'success' : 'warning'}>
-          {props.user.status}
+          {enumDisplayLabel(props.user.status)}
         </UiBadge>
       </UiTableCell>
     </>
@@ -217,7 +215,7 @@ function UserEditor(props: {
 
   const existing = (): boolean => props.user !== null
   return (
-    <form onSubmit={submit}>
+    <form id='abstraction-panel-form' onSubmit={submit}>
       <UiLayout>
         <Show when={error() !== null}>
           <UiAlert variant='danger'>{error()}</UiAlert>
@@ -278,7 +276,7 @@ function UserEditor(props: {
                   onChange={checked => toggleRole(role, checked)}
                   disabled={pending()}
                 >
-                  {role}
+                  {enumDisplayLabel(role)}
                 </UiCheckbox>
               )}
             </For>
@@ -294,21 +292,12 @@ function UserEditor(props: {
             <For each={USER_STATUSES}>
               {value => (
                 <UiToggleItem value={value}>
-                  <span data-feat='user-option-label'>{value}</span>
+                  <span data-feat='user-option-label'>{enumDisplayLabel(value)}</span>
                 </UiToggleItem>
               )}
             </For>
           </UiToggleGroup>
         </UiField>
-
-        <UiFormActions justify='split'>
-          <UiButton type='button' variant='ghost' onClick={props.onClose} disabled={pending()}>
-            Cancel
-          </UiButton>
-          <UiButton type='submit' variant='primary' loading={pending()}>
-            Save
-          </UiButton>
-        </UiFormActions>
       </UiLayout>
     </form>
   )
@@ -316,4 +305,11 @@ function UserEditor(props: {
 
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'User operation failed.'
+}
+
+function enumDisplayLabel(value: string): string {
+  return value
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
