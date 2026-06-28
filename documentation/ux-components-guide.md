@@ -747,14 +747,14 @@ actions.
 
 Extends native button attributes, excluding styling and semantic hook props.
 
-| Prop       | Type                            | Default | Description                                |
-| ---------- | ------------------------------- | ------- | ------------------------------------------ |
-| `icon`     | `'delete' \| 'edit' \| 'eject'` | —       | Icon to display.                           |
-| `label`    | `string`                        | —       | Accessible label; revealed on hover/focus. |
-| `variant`  | `'default' \| 'danger'`         | unset   | Visual/action priority.                    |
-| `error`    | `boolean`                       | `false` | Emits error state.                         |
-| `loading`  | `boolean`                       | `false` | Emits loading state; disables button.      |
-| `disabled` | `boolean`                       | `false` | Native disabled behavior.                  |
+| Prop       | Type                                                                      | Default | Description                                |
+| ---------- | ------------------------------------------------------------------------- | ------- | ------------------------------------------ |
+| `icon`     | `'back' \| 'check' \| 'cross' \| 'delete' \| 'edit' \| 'eject' \| 'plus'` | —       | Icon to display.                           |
+| `label`    | `string`                                                                  | —       | Accessible label; revealed on hover/focus. |
+| `variant`  | `'default' \| 'danger'`                                                   | unset   | Visual/action priority.                    |
+| `error`    | `boolean`                                                                 | `false` | Emits error state.                         |
+| `loading`  | `boolean`                                                                 | `false` | Emits loading state; disables button.      |
+| `disabled` | `boolean`                                                                 | `false` | Native disabled behavior.                  |
 
 `loading` and `disabled` both disable the rendered button and suppress tab focus.
 
