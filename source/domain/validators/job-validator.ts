@@ -41,11 +41,11 @@ import {
   isId
 } from '@core/std'
 import {
+  JOB_PLAN_ASSIGNMENT_ROLES,
   JOB_PLAN_CHEMICAL_UNITS,
   JOB_PLAN_TARGET_AREA_UNITS,
   JOB_STATUSES
 } from '@domain/abstractions/job.ts'
-import { USER_ROLES } from '@domain/abstractions/user.ts'
 import type {
   JobAssessmentCreate,
   JobAssessmentUpdate,
@@ -154,7 +154,7 @@ export const validateJobPlanAssignmentCreate = (
     expectId(input.planId, 'planId'),
     expectId(input.crewMemberId, 'crewMemberId'),
     expectCompositionMany(input.notes, 'notes', isNote),
-    expectConstEnum(input.role, 'role', USER_ROLES)
+    expectConstEnum(input.role, 'role', JOB_PLAN_ASSIGNMENT_ROLES)
   )
 
 /** Validate JobPlanAssignmentUpdate payloads. */
@@ -166,7 +166,7 @@ export const validateJobPlanAssignmentUpdate = (
     expectId(input.planId, 'planId', true),
     expectId(input.crewMemberId, 'crewMemberId', true),
     expectCompositionMany(input.notes, 'notes', isNote, true),
-    expectConstEnum(input.role, 'role', USER_ROLES, true)
+    expectConstEnum(input.role, 'role', JOB_PLAN_ASSIGNMENT_ROLES, true)
   )
 
 /** Validate JobPlanChemicalCreate payloads. */

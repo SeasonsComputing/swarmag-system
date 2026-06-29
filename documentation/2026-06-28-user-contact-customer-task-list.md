@@ -3,7 +3,7 @@
 **Date:** 2026-06-28
 **Mode:** Foundation
 **Status:** Planning checklist
-**Source design:** `docs/superpowers/specs/2026-06-28-user-contact-customer-design.md`
+**Source design:** `documentation/2026-06-28-user-contact-customer-design.md`
 
 This task list decomposes the approved design into implementation workstreams.
 It is a planning aid, not a replacement for the approved design or governing
@@ -11,38 +11,38 @@ domain documentation.
 
 ## 1. Docs
 
-- [ ] Update `documentation/domain-model.md`
-  - [ ] Update User semantics for customer access, preferred channel, and notes.
-  - [ ] Update Customer semantics from embedded contacts to primary contact FK.
-  - [ ] Replace Contact with CustomerContact as a pure-key Junction.
-- [ ] Update `documentation/architecture-back.md`
-  - [ ] Add Auth / Domain User Boundary section.
-  - [ ] State that there is one domain `User`.
-  - [ ] Explain that `auth.users` is the authentication principal and Supabase security anchor.
-  - [ ] Explain that `public.users` is the domain user record queried and related by the application.
-  - [ ] State that `auth.users.id` and `public.users.id` intentionally share the same application-supplied UUID v7.
-  - [ ] Explain that the parallel structure avoids a translation layer while preserving auth/RLS alignment.
-  - [ ] State that backend user create, update, delete, and eject paths must maintain the invariant.
-  - [ ] State that the database must not generate the domain user ID.
-- [ ] Update `documentation/domain-data-dictionary.md`
-  - [ ] Move `ContactPreferredChannel` into Users.
-  - [ ] Add `preferredChannel` and `notes` to User.
-  - [ ] Add `'customer'` to `UserRole`.
-  - [ ] Document `public.users.id` as the domain user identifier.
-  - [ ] Document synchronization with `auth.users.id` as a solution-space invariant.
-  - [ ] Document that the shared UUID is application-supplied UUID v7.
-  - [ ] Remove Contact from Customers.
-  - [ ] Add `Customer.primaryContactId`.
-  - [ ] Add `CustomerContact` Junction.
-  - [ ] Split job plan assignment roles from `UserRole` if approved.
-- [ ] Update `documentation/user-stories.md`
-  - [ ] Replace embedded contact capture wording.
-  - [ ] Align primary-contact language with `Customer.primaryContactId`.
-- [ ] Decide whether to update `documentation/domain-archetypes.md`
-  - [ ] Refresh `USER_ROLES` examples if examples must stay canonical.
-- [ ] Correct or supersede the implementation note in the source design
-  - [ ] Clarify that `UserCreate` changes shape because it derives from `User`.
-  - [ ] Add missing affected files found during verification.
+- [x] Update `documentation/domain-model.md`
+  - [x] Update User semantics for customer access, preferred channel, and notes.
+  - [x] Update Customer semantics from embedded contacts to primary contact FK.
+  - [x] Replace Contact with CustomerContact as a pure-key Junction.
+- [x] Update `documentation/architecture-back.md`
+  - [x] Add Auth / Domain User Boundary section.
+  - [x] State that there is one domain `User`.
+  - [x] Explain that `auth.users` is the authentication principal and Supabase security anchor.
+  - [x] Explain that `public.users` is the domain user record queried and related by the application.
+  - [x] State that `auth.users.id` and `public.users.id` intentionally share the same application-supplied UUID v7.
+  - [x] Explain that the parallel structure avoids a translation layer while preserving auth/RLS alignment.
+  - [x] State that backend user create, update, delete, and eject paths must maintain the invariant.
+  - [x] State that the database must not generate the domain user ID.
+- [x] Update `documentation/domain-data-dictionary.md`
+  - [x] Move `ContactPreferredChannel` into Users.
+  - [x] Add `preferredChannel` and `notes` to User.
+  - [x] Add `'customer'` to `UserRole`.
+  - [x] Document `public.users.id` as the domain user identifier.
+  - [x] Document synchronization with `auth.users.id` as a solution-space invariant.
+  - [x] Document that the shared UUID is application-supplied UUID v7.
+  - [x] Remove Contact from Customers.
+  - [x] Add `Customer.primaryContactId`.
+  - [x] Add `CustomerContact` Junction.
+  - [x] Split crew assignment roles from `UserRole`.
+- [x] Update `documentation/user-stories.md`
+  - [x] Replace embedded contact capture wording.
+  - [x] Align primary-contact language with `Customer.primaryContactId`.
+- [x] Decide whether to update `documentation/domain-archetypes.md`
+  - [x] Refresh `USER_ROLES` examples because examples should stay canonical.
+- [x] Correct or supersede the implementation note in the source design
+  - [x] Clarify that `UserCreate` changes shape because it derives from `User`.
+  - [x] Add missing affected documentation files found during verification.
 
 ## 2. Domain Internals — Model and Schema
 
@@ -61,10 +61,11 @@ domain documentation.
   - [ ] Add `CustomerContact` as pure-key Junction.
   - [ ] Update file header and PUBLIC list.
 - [ ] Update job assignment role modeling
-  - [ ] Add a job-plan assignment role const-enum excluding `'customer'`.
+  - [ ] Update `JobPlanAssignmentRole` const-enum for planned job crew functions.
+  - [ ] Use exactly: `'crew-lead'`, `'pilot'`, `'visual-observer'`, `'applicator'`, `'equipment-operator'`, and `'technician'`.
   - [ ] Change `JobPlanAssignment.role` away from widened `UserRole`.
-  - [ ] Update `source/domain/validators/job-validator.ts` to validate against the narrowed role set.
-  - [ ] Confirm `job_plan_assignments.role` schema CHECK remains excluding `'customer'`.
+  - [ ] Update `source/domain/validators/job-validator.ts` to validate against `JobPlanAssignmentRole`.
+  - [ ] Update `job_plan_assignments.role` schema CHECK to use crew assignment values.
 - [ ] Update `source/domain/protocols/customer-protocol.ts`
   - [ ] Add `CustomerContactCreate`.
   - [ ] Do not add update protocol for pure-key CustomerContact.
@@ -161,7 +162,8 @@ domain documentation.
   - [ ] CustomerContact adapter if included.
 - [ ] Add role guard coverage if available
   - [ ] User accepts `'customer'`.
-  - [ ] JobPlanAssignment rejects `'customer'`.
+  - [ ] JobPlanAssignment accepts valid crew assignment roles.
+  - [ ] JobPlanAssignment rejects user authorization roles.
 
 ## 5. UX
 
@@ -196,6 +198,5 @@ domain documentation.
 
 ## 7. Open Decisions
 
-- [ ] Confirm exact name for the narrowed job assignment role type.
 - [ ] Confirm whether `Customer.primaryContactId` must also have a matching row in `customer_contacts`.
 - [ ] Confirm whether `CustomerContact` needs an API client in this milestone.
