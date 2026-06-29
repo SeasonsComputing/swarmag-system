@@ -190,6 +190,23 @@ Canonical seed data known at schema time is part of `schema.sql` — not a migra
 
 All seed record IDs are stable UUID v7 values drawn from `source/devops/genesis/seed-ids.txt`. No seed record uses a database-generated ID.
 
+### 4.5 Auth / Domain User Boundary
+
+There is one domain `User`.
+
+Supabase represents that single user across two backend structures with different responsibilities.
+`auth.users` is the authentication principal and Supabase security anchor. `public.users` is the
+domain user record queried, validated, adapted, and related by the application.
+
+The two records intentionally share the same application-supplied UUID v7. This keeps
+authentication, RLS, and domain relationships aligned without introducing a translation layer
+between auth identity and domain identity.
+
+Backend user creation, update, delete, and eject paths must preserve this boundary. User creation
+supplies the UUID v7 from application code, and every backend path that creates or synchronizes
+auth/domain user state must reuse that UUID for both `auth.users.id` and `public.users.id`.
+The database must not generate the domain user ID.
+
 ## 5. Configuration Management
 
 Edge functions use the singleton `Config` pattern defined in `architecture-core.md` section 6.
