@@ -16,6 +16,8 @@ Job                         Work agreement life-cycle anchor.
 JobAssessment               Pre-planning job assessment abstraction.
 JobWorkflow                 Workflows required of a job.
 JobPlan                     Planning record for a job.
+JOB_PLAN_ASSIGNMENT_ROLES   Allowed planned crew assignment role values.
+JobPlanAssignmentRole       Planned crew assignment role derived from tuple.
 JobPlanAssignment           Planned user assignment for a job.
 JOB_PLAN_CHEMICAL_UNITS     Allowed units for planned chemical amount.
 JobPlanChemicalUnit         Planned chemical amount unit derived from tuple.
@@ -43,7 +45,7 @@ import type { Asset } from '@domain/abstractions/asset.ts'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Answer, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
-import type { User, UserRole } from '@domain/abstractions/user.ts'
+import type { User } from '@domain/abstractions/user.ts'
 import type { Workflow } from '@domain/abstractions/workflow.ts'
 
 /** Allowed job status values. */
@@ -93,12 +95,23 @@ export type JobPlan = Instantiable & {
   durationEstimate: number
 }
 
+/** Allowed planned crew assignment role values. */
+export const JOB_PLAN_ASSIGNMENT_ROLES = [
+  'crew-lead',
+  'pilot',
+  'visual-observer',
+  'applicator',
+  'equipment-operator',
+  'technician'
+] as const
+export type JobPlanAssignmentRole = (typeof JOB_PLAN_ASSIGNMENT_ROLES)[number]
+
 /** Planned user assignment for a job. */
 export type JobPlanAssignment = Instantiable & {
   planId: AssociationOne<JobPlan>
   crewMemberId: AssociationOne<User>
   notes: CompositionMany<Note>
-  role: UserRole
+  role: JobPlanAssignmentRole
 }
 
 /** Allowed units for planned chemical amount. */

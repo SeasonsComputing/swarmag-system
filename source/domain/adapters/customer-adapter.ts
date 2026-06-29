@@ -10,24 +10,14 @@ Maps storage dictionaries to customer abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-ContactAdapter       Deserialize/Serialize Contact.
-CustomerSiteAdapter  Deserialize/Serialize CustomerSite.
-CustomerAdapter      Deserialize/Serialize Customer.
+CustomerSiteAdapter     Deserialize/Serialize CustomerSite.
+CustomerContactAdapter  Deserialize/Serialize CustomerContact.
+CustomerAdapter         Deserialize/Serialize Customer.
 */
 
 import { makeAdapter } from '@core/stdx'
-import type { Contact, Customer, CustomerSite } from '@domain/abstractions/customer.ts'
+import type { Customer, CustomerContact, CustomerSite } from '@domain/abstractions/customer.ts'
 import { LocationAdapter, NoteAdapter } from '@domain/adapters/common-adapter.ts'
-
-/** Deserialize/Serialize Contact. */
-export const ContactAdapter = makeAdapter<Contact>({
-  notes: ['notes', NoteAdapter],
-  name: ['name'],
-  email: ['email'],
-  phone: ['phone'],
-  isPrimary: ['is_primary'],
-  preferredChannel: ['preferred_channel']
-})
 
 /** Deserialize/Serialize CustomerSite. */
 export const CustomerSiteAdapter = makeAdapter<CustomerSite>({
@@ -38,6 +28,12 @@ export const CustomerSiteAdapter = makeAdapter<CustomerSite>({
   acreage: ['acreage']
 })
 
+/** Deserialize/Serialize CustomerContact. */
+export const CustomerContactAdapter = makeAdapter<CustomerContact>({
+  customerId: ['customer_id'],
+  userId: ['user_id']
+})
+
 /** Deserialize/Serialize Customer. */
 export const CustomerAdapter = makeAdapter<Customer>({
   id: ['id'],
@@ -45,8 +41,8 @@ export const CustomerAdapter = makeAdapter<Customer>({
   updatedAt: ['updated_at'],
   deletedAt: ['deleted_at'],
   accountManagerId: ['account_manager_id'],
+  primaryContactId: ['primary_contact_id'],
   sites: ['sites', CustomerSiteAdapter],
-  contacts: ['contacts', ContactAdapter],
   notes: ['notes', NoteAdapter],
   name: ['name'],
   status: ['status'],

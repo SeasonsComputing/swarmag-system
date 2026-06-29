@@ -16,9 +16,13 @@ Additionally, `Customer` is semantically an **Account** (a business entity), and
 
 ## 2. Design Decisions
 
-### 2.1 `public.users.id = auth.users.id` (Invariant)
+### 2.1 Auth / Domain User Boundary
 
-This invariant is by design (WoST pattern). When a User is created, the same UUID is inserted into both `auth.users` and `public.users`. `auth.users` is the authentication principal; `public.users` extends it with domain fields. No separate abstraction is needed — the invariant must be stated explicitly in `domain-model.md`.
+There is one domain `User`. Supabase represents that User across two backend structures:
+`auth.users` is the authentication principal and security anchor; `public.users` is the domain user
+record queried and related by the application. They intentionally share the same
+application-supplied UUID v7. This boundary belongs in `architecture-back.md`, while the
+solution-space field inventory belongs in `domain-data-dictionary.md`.
 
 ### 2.2 `Contact` is an Association Class
 
@@ -48,7 +52,9 @@ With all attributes relocated, `Contact` as a named domain abstraction with its 
 
 ### 2.8 `USER_ROLES` Gains `'customer'`
 
-A user who accesses the customer-facing application has the `customer` role. This role is not valid for job plan crew assignment — `job_plan_assignments.role` CHECK constraint intentionally excludes `'customer'` and remains unchanged.
+A user who accesses the customer-facing application has the `customer` role. User roles model
+application access and membership; crew assignment roles model the planned function a user performs
+on a job crew. `job_plan_assignments.role` therefore uses `JobPlanAssignmentRole`, not `UserRole`.
 
 ---
 
@@ -118,59 +124,60 @@ Each step has what it needs. No circular dependency.
 
 ### 5.1 Domain Abstractions
 
-| File | Change |
-|---|---|
-| `source/domain/abstractions/user.ts` | Add `'customer'` to `USER_ROLES`; migrate `CONTACT_PREFERRED_CHANNELS` / `ContactPreferredChannel` here; add `preferredChannel` and `notes` to `User` |
+| File                                     | Change                                                                                                                                                                                          |
+| ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source/domain/abstractions/user.ts`     | Add `'customer'` to `USER_ROLES`; migrate `CONTACT_PREFERRED_CHANNELS` / `ContactPreferredChannel` here; add `preferredChannel` and `notes` to `User`                                           |
 | `source/domain/abstractions/customer.ts` | Remove `Contact`, `CONTACT_PREFERRED_CHANNELS`, `ContactPreferredChannel`; remove `contacts` from `Customer`; add `primaryContactId: AssociationOne<User>`; add `CustomerContact` Junction type |
 
 ### 5.2 Domain Protocols
 
-| File | Change |
-|---|---|
-| `source/domain/protocols/user-protocol.ts` | No shape change — helpers derive from updated `User` |
-| `source/domain/protocols/customer-protocol.ts` | Reflect `Customer` field changes; add `CustomerContactCreate` |
+| File                                           | Change                                                               |
+| ---------------------------------------------- | -------------------------------------------------------------------- |
+| `source/domain/protocols/user-protocol.ts`     | Derived `UserCreate` / `UserUpdate` reflect the updated `User` shape |
+| `source/domain/protocols/customer-protocol.ts` | Reflect `Customer` field changes; add `CustomerContactCreate`        |
 
 ### 5.3 Domain Validators
 
-| File | Change |
-|---|---|
-| `source/domain/validators/user-validator.ts` | Add `preferredChannel` and `notes` validation |
+| File                                             | Change                                                                                                                                                              |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `source/domain/validators/user-validator.ts`     | Add `preferredChannel` and `notes` validation                                                                                                                       |
 | `source/domain/validators/customer-validator.ts` | Remove `isContact` guard and contact validation; remove `CONTACT_PREFERRED_CHANNELS` import; add `primaryContactId` validation; add `validateCustomerContactCreate` |
 
 ### 5.4 Domain Adapters
 
-| File | Change |
-|---|---|
-| `source/domain/adapters/user-adapter.ts` | Add `preferredChannel` and `notes` mappings |
+| File                                         | Change                                                                                                          |
+| -------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| `source/domain/adapters/user-adapter.ts`     | Add `preferredChannel` and `notes` mappings                                                                     |
 | `source/domain/adapters/customer-adapter.ts` | Remove `ContactAdapter` and delegation; remove `contacts`; add `primaryContactId`; add `CustomerContactAdapter` |
 
 ### 5.5 Documentation
 
-| File | Change |
-|---|---|
-| `documentation/domain-model.md` | Document `public.users.id = auth.users.id` invariant; update User and Customer descriptions; replace Contact with CustomerContact Junction |
+| File                                      | Change                                                                                                                                                                                                        |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `documentation/domain-model.md`           | Update User and Customer descriptions; replace Contact with CustomerContact Junction                                                                                                                          |
+| `documentation/architecture-back.md`      | Document the Auth / Domain User Boundary and shared app-supplied UUID v7 invariant                                                                                                                            |
 | `documentation/domain-data-dictionary.md` | Update §9 Users (new fields, new role, ContactPreferredChannel migrated here); update §7 Customers (remove Contact entry, add CustomerContact Junction, update Customer relations); remove §7.1 Contact entry |
 
 ### 5.6 Schema
 
-| File | Change |
-|---|---|
+| File                              | Change                                                                                                                                                                                                                                                                                    |
+| --------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `source/domain/schema/schema.sql` | Genesis rewrite: `users` gains `preferred_channel`, `notes` columns; `customers` drops `contacts` JSONB column and constraints, gains `primary_contact_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT`; new `customer_contacts` junction table added; `DROP TABLE` list updated |
 
 ### 5.7 Tests and Fixtures
 
-| File | Change |
-|---|---|
-| `source/tests/fixtures/user-samples.ts` | Add `preferredChannel` and `notes` to User samples |
+| File                                        | Change                                                                        |
+| ------------------------------------------- | ----------------------------------------------------------------------------- |
+| `source/tests/fixtures/user-samples.ts`     | Add `preferredChannel` and `notes` to User samples                            |
 | `source/tests/fixtures/customer-samples.ts` | Remove contact samples; add `primaryContactId`; add `CustomerContact` samples |
-| `source/tests/fixtures/samples.ts` | Update if contact fixtures referenced here |
+| `source/tests/fixtures/samples.ts`          | Update if contact fixtures referenced here                                    |
 
 ---
 
 ## 6. Constraints and Invariants
 
-- `job_plan_assignments.role` CHECK constraint remains `('administrator', 'sales', 'operations')` — `'customer'` is intentionally excluded. A User with the `customer` role is never a job plan crew member.
-- `public.users.id = auth.users.id` is enforced by the genesis seed pattern, not by a FK constraint in `schema.sql`.
+- `job_plan_assignments.role` uses `JobPlanAssignmentRole`: `'crew-lead'`, `'pilot'`, `'visual-observer'`, `'applicator'`, `'equipment-operator'`, and `'technician'`.
+- `public.users.id = auth.users.id` is a backend auth/domain boundary invariant, not a domain-model abstraction.
 - `Customer.primaryContactId NOT NULL` replaces `customers_contacts_non_empty_check` as the structural guarantee that every Customer has a reachable, app-accessible contact.
 - `CustomerContact` has no soft-delete — a contact relationship is hard-deleted when removed.
 

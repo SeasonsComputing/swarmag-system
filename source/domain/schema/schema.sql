@@ -28,6 +28,7 @@ DROP TABLE IF EXISTS questions CASCADE;
 DROP TABLE IF EXISTS tasks CASCADE;
 DROP TABLE IF EXISTS workflows CASCADE;
 DROP TABLE IF EXISTS services CASCADE;
+DROP TABLE IF EXISTS customer_contacts CASCADE;
 DROP TABLE IF EXISTS customers CASCADE;
 DROP TABLE IF EXISTS chemicals CASCADE;
 DROP TABLE IF EXISTS assets CASCADE;
@@ -41,18 +42,25 @@ DROP TABLE IF EXISTS users CASCADE;
 CREATE TABLE users (
   id UUID PRIMARY KEY,
   roles JSONB NOT NULL DEFAULT '[]'::jsonb,
+  notes JSONB NOT NULL DEFAULT '[]'::jsonb,
   display_name TEXT NOT NULL,
   primary_email TEXT NOT NULL,
   phone_number TEXT NOT NULL,
+  preferred_channel TEXT NOT NULL,
   avatar_url TEXT,
   status TEXT NOT NULL,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ,
+  CONSTRAINT users_preferred_channel_check CHECK (preferred_channel IN ('email', 'text', 'phone')),
   CONSTRAINT users_status_check CHECK (status IN ('active', 'inactive')),
   CONSTRAINT users_primary_email_unique UNIQUE (primary_email),
   CONSTRAINT users_roles_array_check CHECK (jsonb_typeof(roles) = 'array'),
-  CONSTRAINT users_roles_non_empty_check CHECK (jsonb_array_length(roles) > 0)
+  CONSTRAINT users_roles_non_empty_check CHECK (jsonb_array_length(roles) > 0),
+  CONSTRAINT users_roles_values_check CHECK (
+    roles <@ '["administrator", "sales", "operations", "customer"]'::jsonb
+  ),
+  CONSTRAINT users_notes_array_check CHECK (jsonb_typeof(notes) = 'array')
 );
 
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
@@ -187,8 +195,8 @@ CREATE INDEX chemicals_deleted_at_idx ON chemicals (deleted_at);
 CREATE TABLE customers (
   id UUID PRIMARY KEY,
   account_manager_id UUID REFERENCES users(id) ON DELETE RESTRICT,
+  primary_contact_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   sites JSONB NOT NULL DEFAULT '[]'::jsonb,
-  contacts JSONB NOT NULL DEFAULT '[]'::jsonb,
   notes JSONB NOT NULL DEFAULT '[]'::jsonb,
   name TEXT NOT NULL,
   status TEXT NOT NULL,
@@ -203,8 +211,6 @@ CREATE TABLE customers (
   deleted_at TIMESTAMPTZ,
   CONSTRAINT customers_status_check CHECK (status IN ('active', 'inactive', 'prospect')),
   CONSTRAINT customers_sites_array_check CHECK (jsonb_typeof(sites) = 'array'),
-  CONSTRAINT customers_contacts_array_check CHECK (jsonb_typeof(contacts) = 'array'),
-  CONSTRAINT customers_contacts_non_empty_check CHECK (jsonb_array_length(contacts) > 0),
   CONSTRAINT customers_notes_array_check CHECK (jsonb_typeof(notes) = 'array')
 );
 
@@ -224,7 +230,30 @@ CREATE POLICY "customers_delete_all" ON customers
 
 CREATE INDEX customers_account_manager_id_idx ON customers (account_manager_id);
 
+CREATE INDEX customers_primary_contact_id_idx ON customers (primary_contact_id);
+
 CREATE INDEX customers_deleted_at_idx ON customers (deleted_at);
+
+CREATE TABLE customer_contacts (
+  customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+  user_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  PRIMARY KEY (customer_id, user_id)
+);
+
+ALTER TABLE customer_contacts ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "customer_contacts_select_all" ON customer_contacts
+  FOR SELECT USING (true);
+
+CREATE POLICY "customer_contacts_insert_all" ON customer_contacts
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "customer_contacts_delete_all" ON customer_contacts
+  FOR DELETE USING (true);
+
+CREATE INDEX customer_contacts_customer_id_idx ON customer_contacts (customer_id);
+
+CREATE INDEX customer_contacts_user_id_idx ON customer_contacts (user_id);
 
 -- ──────────────────────────────────────────────────────────────────────────────────────
 -- services
@@ -589,7 +618,14 @@ CREATE TABLE job_plan_assignments (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ,
   CONSTRAINT job_plan_assignments_role_check CHECK (
-    role IN ('administrator', 'sales', 'operations')
+    role IN (
+      'crew-lead',
+      'pilot',
+      'visual-observer',
+      'applicator',
+      'equipment-operator',
+      'technician'
+    )
   ),
   CONSTRAINT job_plan_assignments_notes_array_check CHECK (jsonb_typeof(notes) = 'array')
 );
@@ -770,9 +806,11 @@ ON CONFLICT (id) DO UPDATE SET
 INSERT INTO users (
   id,
   roles,
+  notes,
   display_name,
   primary_email,
   phone_number,
+  preferred_channel,
   avatar_url,
   status,
   created_at,
@@ -781,9 +819,11 @@ INSERT INTO users (
 ) VALUES (
   '0195b5b0-3c09-79f0-8d7c-0a1b2c3d4e5f',
   '["administrator"]'::jsonb,
+  '[]'::jsonb,
   'DevOps Admin',
   'tedvkremer@gmail.com',
   '+1-000-000-0000',
+  'email',
   NULL,
   'active',
   now(),
