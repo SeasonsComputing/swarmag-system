@@ -49,7 +49,7 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 |           |                                    | JobAssessment            |
 |           |                                    | JobWorkflow              |
 |           |                                    | JobPlan                  |
-|           |                                    | JobPlanAssignmentRole     |
+|           |                                    | JobPlanAssignmentRole    |
 |           |                                    | JobPlanAssignment        |
 |           |                                    | JobPlanChemical          |
 |           |                                    | JobPlanAsset             |
