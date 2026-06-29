@@ -6,13 +6,14 @@
 
 ### 1.1 Customer Prospect
 
-1. **Inbound inquiry** — A call or email arrives at the company from a new prospect; capture contact details and service interest.
+1. **Inbound inquiry** — A call or email arrives at the company from a new prospect; capture person details and service interest.
 2. **Sales follow-up** — Sales rep responds to qualify needs, timeline, and service category (aerial vs. ground).
 3. **Customer creation** — Create a new customer record with:
    - Name and primary account details.
    - Address (billing/mailing).
    - Locations/sites to service (each with label, coordinates/address, acreage/notes).
-4. **Contact capture** — Add one or more contacts (phone/email), note preferred channel, and designate a primary contact.
+4. **Primary contact assignment** — Select or create the User who will be the Customer primary contact.
+5. **Additional contact assignment** — Add any additional customer contact Users as account relationships.
 
 ## 2. Job Definition
 
@@ -88,13 +89,13 @@
 
 ### 9.1 View Users
 
-1. Admin opens the Users page and sees a list of all active staff.
+1. Admin opens the Users page and sees a list of all active users.
 2. Admin scans the list to find a user by name, email, role, or status.
 
 ### 9.2 Edit User
 
 1. Admin selects a user to review or update their details.
-2. Admin updates the user's name, phone number, or role assignments.
+2. Admin updates the user's name, phone number, preferred channel, notes, or role assignments.
 3. Admin saves the changes.
 
 ### 9.3 Deactivate / Activate User
@@ -108,7 +109,7 @@
 
 ### 9.5 Create User
 
-1. Admin creates a new user by providing their name, email, and role.
+1. Admin creates a new user by providing their name, email, phone, preferred channel, notes, and role.
 
 ### 9.6 Eject User
 
