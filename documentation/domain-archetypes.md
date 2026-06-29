@@ -89,7 +89,7 @@ Extend `Instantiable` from `@core/std` via intersection. Never redeclare `id`, `
 import type { CompositionPositive, Instantiable } from '@core/std'
 
 /** Allowed user role values. */
-export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
+export const USER_ROLES = ['administrator', 'sales', 'operations', 'customer'] as const
 export type UserRole = (typeof USER_ROLES)[number]
 
 /** Allowed user status values. */
@@ -170,7 +170,7 @@ Any value set requiring runtime validation. Defined as a `const` tuple paired wi
 
 ```typescript
 /** Canonical role set. */
-export const USER_ROLES = ['administrator', 'sales', 'operations'] as const
+export const USER_ROLES = ['administrator', 'sales', 'operations', 'customer'] as const
 export type UserRole = (typeof USER_ROLES)[number]
 ```
 

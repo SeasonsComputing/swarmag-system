@@ -132,7 +132,8 @@ These abstractions represent the primary concepts of the system and form the cor
 | `JobPlan`       | Job-specific execution plan                                                          |
 | `JobWork`       | Execution record; finalizes the workflow manifest and gates field execution          |
 | `JobWorkLog`    | Append-only record of execution events and observations                              |
-| `Customer`      | Organization purchasing services                                                     |
+| `Customer`      | Account purchasing services                                                          |
+| `User`          | Person identity, role membership, and application access                             |
 
 These abstractions describe **domain meaning**, not persistence, API shape, or user interface concerns.
 
@@ -169,7 +170,11 @@ In addition to the core abstractions, the domain includes supporting structures 
 | Question      | Reusable prompt; Instantiable life-cycled; discriminated union of InternalQuestion, ScalarQuestion and SelectQuestion |
 | Job Workflows | Basis and modified workflow references per job; order defined by `JobWork.work`                                       |
 | Planning      | Associations between plans and assigned users, assets, and chemicals                                                  |
-| Customers     | Embedded subordinate data such as sites and contacts                                                                  |
+| Customers     | Sites composed into customer accounts; CustomerContact junctions relate accounts to Users                             |
+
+Customers represent accounts. People associated with customer accounts are Users. The relationship
+between a Customer and a User is expressed by CustomerContact; the primary customer contact is a
+required User association on Customer.
 
 These structures exist to model **relationships**, not to redefine the core abstractions themselves.
 
