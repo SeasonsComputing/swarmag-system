@@ -31,13 +31,14 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 | Chemicals | `@domain/abstractions/chemical.ts` | ChemicalUsage            |
 |           |                                    | ChemicalLabel            |
 |           |                                    | Chemical                 |
-| Customers | `@domain/abstractions/customer.ts` | Contact                  |
-|           |                                    | CustomerSite             |
+| Customers | `@domain/abstractions/customer.ts` | CustomerSite             |
+|           |                                    | CustomerContact          |
 |           |                                    | Customer                 |
 | Services  | `@domain/abstractions/service.ts`  | ServiceCategory          |
 |           |                                    | Service                  |
 |           |                                    | ServiceRequiredAssetType |
 | Users     | `@domain/abstractions/user.ts`     | UserRole                 |
+|           |                                    | ContactPreferredChannel  |
 |           |                                    | User                     |
 | Workflows | `@domain/abstractions/workflow.ts` | Task                     |
 |           |                                    | TaskQuestion             |
@@ -48,6 +49,7 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 |           |                                    | JobAssessment            |
 |           |                                    | JobWorkflow              |
 |           |                                    | JobPlan                  |
+|           |                                    | JobPlanAssignmentRole     |
 |           |                                    | JobPlanAssignment        |
 |           |                                    | JobPlanChemical          |
 |           |                                    | JobPlanAsset             |
@@ -385,29 +387,7 @@ Attributes: **State**
 
 Source: `@domain/abstractions/customer.ts`
 
-### 7.1 Contact
-
-Purpose: **Embedded customer contact; `isPrimary` flags the primary contact**
-
-Type: **object**
-
-Attributes: **Relations**
-
-| **Attribute** | **Relation**    | **Abstraction** |
-| ------------- | --------------- | --------------- |
-| `notes`       | CompositionMany | Note            |
-
-Attributes: **State**
-
-| **Attribute**      | **Type**                                               |
-| ------------------ | ------------------------------------------------------ |
-| `name`             | string                                                 |
-| `email?`           | string                                                 |
-| `phone?`           | string                                                 |
-| `isPrimary`        | boolean                                                |
-| `preferredChannel` | `'email'` \| `'text'` \| `'phone'` (default: `'text'`) |
-
-### 7.2 CustomerSite
+### 7.1 CustomerSite
 
 Purpose: **Serviceable customer location**
 
@@ -428,9 +408,22 @@ Attributes: **State**
 | `label`       | string   |
 | `acreage?`    | number   |
 
+### 7.2 CustomerContact
+
+Purpose: **Pure-key relationship between a customer account and a user contact**
+
+Type: **Junction**
+
+Attributes: **Relations**
+
+| **Attribute** | **Relation**        | **Abstraction** |
+| ------------- | ------------------- | --------------- |
+| `customerId`  | AssociationJunction | Customer        |
+| `userId`      | AssociationJunction | User            |
+
 ### 7.3 Customer
 
-Purpose: **Customer account aggregate; contacts must be non-empty**
+Purpose: **Customer account aggregate with a required primary contact user**
 
 Type: **Instantiable**
 
@@ -439,8 +432,8 @@ Attributes: **Relations**
 | **Attribute**      | **Relation**        | **Abstraction** |
 | ------------------ | ------------------- | --------------- |
 | `accountManagerId` | AssociationOptional | User            |
+| `primaryContactId` | AssociationOne      | User            |
 | `sites`            | CompositionMany     | CustomerSite    |
-| `contacts`         | CompositionPositive | Contact         |
 | `notes`            | CompositionMany     | Note            |
 
 Attributes: **State**
@@ -521,10 +514,23 @@ Type: **const-enum**
 | `administrator` |
 | `sales`         |
 | `operations`    |
+| `customer`      |
 
-### 9.2 User
+### 9.2 ContactPreferredChannel
 
-Purpose: **System user identity and membership**
+Purpose: **Preferred communication channel for a person**
+
+Type: **const-enum**
+
+| Values  |
+| ------- |
+| `email` |
+| `text`  |
+| `phone` |
+
+### 9.3 User
+
+Purpose: **System user identity, membership, contact preference, and person notes**
 
 Type: **Instantiable**
 
@@ -533,16 +539,22 @@ Attributes: **Relations**
 | **Attribute** | **Relation**        | **Abstraction** |
 | ------------- | ------------------- | --------------- |
 | `roles`       | CompositionPositive | UserRole        |
+| `notes`       | CompositionMany     | Note            |
 
 Attributes: **State**
 
-| **Attribute**  | **Type**                                         | **Constraints** |
-| -------------- | ------------------------------------------------ | --------------- |
-| `displayName`  | string                                           |                 |
-| `primaryEmail` | string                                           | unique          |
-| `phoneNumber`  | string                                           |                 |
-| `avatarUrl?`   | string                                           |                 |
-| `status`       | `'active'` \| `'inactive'` (default: `'active'`) |                 |
+| **Attribute**      | **Type**                                         | **Constraints** |
+| ------------------ | ------------------------------------------------ | --------------- |
+| `displayName`      | string                                           |                 |
+| `primaryEmail`     | string                                           | unique          |
+| `phoneNumber`      | string                                           |                 |
+| `preferredChannel` | ContactPreferredChannel                          |                 |
+| `avatarUrl?`       | string                                           |                 |
+| `status`           | `'active'` \| `'inactive'` (default: `'active'`) |                 |
+
+`public.users.id` is the domain user identifier. Backend auth synchronization keeps it equal to
+`auth.users.id` as a solution-space invariant. The shared UUID is supplied by application code
+using the system UUID v7 strategy; the database does not generate domain user IDs.
 
 ## 10. Workflow
 
@@ -724,7 +736,22 @@ Attributes: **State**
 | `scheduledStart`   | When     |
 | `durationEstimate` | number   |
 
-### 11.6 JobPlanAssignment
+### 11.6 JobPlanAssignmentRole
+
+Purpose: **Planned function a user performs as a member of a job crew**
+
+Type: **const-enum**
+
+| Values               |
+| -------------------- |
+| `crew-lead`          |
+| `pilot`              |
+| `visual-observer`    |
+| `applicator`         |
+| `equipment-operator` |
+| `technician`         |
+
+### 11.7 JobPlanAssignment
 
 Purpose: **Planned user assignments required for a job**
 
@@ -740,11 +767,11 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute** | **Type** |
-| ------------- | -------- |
-| `role`        | UserRole |
+| **Attribute** | **Type**              |
+| ------------- | --------------------- |
+| `role`        | JobPlanAssignmentRole |
 
-### 11.7 JobPlanChemical
+### 11.8 JobPlanChemical
 
 Purpose: **Planned chemical usage required for a job**
 
@@ -766,7 +793,7 @@ Attributes: **State**
 | `targetArea?`    | number                                                                     |
 | `targetAreaUnit` | `'acre'` \| `'hectare'` (default: `'acre'`)                                |
 
-### 11.8 JobPlanAsset
+### 11.9 JobPlanAsset
 
 Purpose: **Planned assets required for a job**
 
@@ -779,7 +806,7 @@ Attributes: **Relations**
 | `planId`      | AssociationJunction | JobPlan         |
 | `assetId`     | AssociationJunction | Asset           |
 
-### 11.9 JobWork
+### 11.10 JobWork
 
 Purpose: **Execution record; creation transitions job to executing; `work` is an ordered array of resolved workflow IDs — the immutable execution manifest**
 
@@ -800,7 +827,7 @@ Attributes: **State**
 | `startedAt`    | When                      |
 | `completedAt?` | When                      |
 
-### 11.10 JobWorkLogEntry
+### 11.11 JobWorkLogEntry
 
 Purpose: **Work execution event; append-only log; event details as Answer to Question**
 
