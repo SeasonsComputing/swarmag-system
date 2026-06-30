@@ -157,6 +157,7 @@
   --sa-shell-shadow: var(--sa-shadow-sm);
   --sa-shell-text: var(--sa-text-h1);
   --sa-shell-secondary: var(--sa-text-secondary);
+  --sa-footer-logo-filter: brightness(0) invert(1) opacity(0.74);
 
   /* Button */
   --sa-button-bg-primary: var(--sa-color-primary);
@@ -334,12 +335,22 @@
   --sa-focus-ring: 0 0 0 2px oklch(99.4% 0.006 98), 0 0 0 4px oklch(57% 0.13 186 / 0.42);
 
   /* Shell chrome */
-  --sa-shell-bg: oklch(27% 0.045 224);
-  --sa-shell-border: 1px solid oklch(18% 0.035 228 / 0.72);
+  --sa-shell-bg: oklch(98.6% 0.018 112);
+  --sa-shell-border: 1px solid oklch(76% 0.035 118 / 0.42);
   --sa-shell-filter: none;
-  --sa-shell-shadow: 0 12px 28px oklch(20% 0.04 230 / 0.18);
-  --sa-shell-text: oklch(98% 0.006 98);
-  --sa-shell-secondary: oklch(83% 0.026 112);
+  --sa-shell-shadow: 0 10px 24px oklch(28% 0.036 230 / 0.1);
+  --sa-shell-text: var(--sa-text-h1);
+  --sa-shell-secondary: var(--sa-text-secondary);
+  --sa-footer-logo-filter:
+    brightness(0)
+    saturate(100%)
+    invert(32%)
+    sepia(36%)
+    saturate(1122%)
+    hue-rotate(169deg)
+    brightness(92%)
+    contrast(94%)
+    opacity(0.78);
 
   /* Button */
   --sa-button-bg-primary: var(--sa-color-primary);
