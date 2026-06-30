@@ -54,7 +54,13 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
     'onOpenChange'
   ])
   return (
-    <Dialog open={local.open} defaultOpen={local.defaultOpen} onOpenChange={local.onOpenChange}>
+    <Dialog
+      open={local.open}
+      defaultOpen={local.defaultOpen}
+      onOpenChange={local.onOpenChange}
+      modal
+      preventScroll
+    >
       {local.trigger && (
         <Dialog.Trigger
           as={UiButton}
@@ -70,6 +76,7 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
           data-ui='dialog'
           data-ui-size={local.size ?? 'panel'}
           data-ui-state={controlState(local)}
+          onPointerDownOutside={event => event.preventDefault()}
         >
           {local.children}
         </Dialog.Content>

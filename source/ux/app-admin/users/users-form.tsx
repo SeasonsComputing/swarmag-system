@@ -5,7 +5,10 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
+import type { Note } from '@domain/abstractions/common.ts'
 import {
+  CONTACT_PREFERRED_CHANNELS,
+  type ContactPreferredChannel,
   type User,
   USER_ROLES,
   USER_STATUSES,
@@ -19,12 +22,15 @@ import { api } from '@ux/api'
 import {
   UiAlert,
   UiBadge,
-  UiCheckbox,
   type UiComponent,
   UiField,
+  UiFieldset,
   UiInput,
   UiLayout,
+  UiMultiSelect,
+  UiSingleSelect,
   UiTableCell,
+  UiTextArea,
   UiToggleGroup,
   UiToggleItem
 } from '@ux/common/components/ui'
@@ -63,6 +69,7 @@ export const UsersForm = (props: UsersFormProps): UiComponent => {
     listColumns: ['Name', 'Email', 'Roles', 'Status'],
     list: () => usersQuery.data ?? [],
     isListLoading: () => usersQuery.isPending,
+    cancel: props.onCancel,
     actions: [
       {
         name: 'eject',
@@ -122,6 +129,10 @@ function UserEditor(props: {
   const [displayName, setDisplayName] = createSignal(props.user?.displayName ?? '')
   const [primaryEmail, setPrimaryEmail] = createSignal(props.user?.primaryEmail ?? '')
   const [phoneNumber, setPhoneNumber] = createSignal(props.user?.phoneNumber ?? '')
+  const [preferredChannel, setPreferredChannel] = createSignal<ContactPreferredChannel>(
+    props.user?.preferredChannel ?? 'email'
+  )
+  const [notesText, setNotesText] = createSignal(noteContent(props.user?.notes ?? []))
   const [roles, setRoles] = createSignal<UserRole[]>(props.user ? [...props.user.roles] : [])
   const [status, setStatus] = createSignal<UserStatus>(props.user?.status ?? 'active')
   const [pending, setPending] = createSignal(false)
@@ -131,6 +142,8 @@ function UserEditor(props: {
     setDisplayName(props.user?.displayName ?? '')
     setPrimaryEmail(props.user?.primaryEmail ?? '')
     setPhoneNumber(props.user?.phoneNumber ?? '')
+    setPreferredChannel(props.user?.preferredChannel ?? 'email')
+    setNotesText(noteContent(props.user?.notes ?? []))
     setRoles(props.user ? [...props.user.roles] : [])
     setStatus(props.user?.status ?? 'active')
     setError(null)
@@ -163,13 +176,6 @@ function UserEditor(props: {
   // - `createUser`: Creates a new user.
   //
 
-  const toggleRole = (role: UserRole, pressed: boolean): void => {
-    if (pressed) {
-      if (!roles().includes(role)) setRoles([...roles(), role])
-      return
-    }
-    setRoles(roles().filter(value => value !== role))
-  }
   const saveUser = async (): Promise<void> => {
     if (pending()) return
     if (roles().length === 0) {
@@ -193,6 +199,8 @@ function UserEditor(props: {
       id: user.id,
       displayName: displayName(),
       phoneNumber: phoneNumber(),
+      preferredChannel: preferredChannel(),
+      notes: nextNotes(user.notes),
       roles: roles(),
       status: nextStatus
     }
@@ -203,6 +211,8 @@ function UserEditor(props: {
       displayName: displayName(),
       primaryEmail: primaryEmail(),
       phoneNumber: phoneNumber(),
+      preferredChannel: preferredChannel(),
+      notes: nextNotes([]),
       roles: roles(),
       status: status()
     }
@@ -214,6 +224,25 @@ function UserEditor(props: {
   }
 
   const existing = (): boolean => props.user !== null
+  const preferredChannelOptions = CONTACT_PREFERRED_CHANNELS.map(value => ({
+    value,
+    label: enumDisplayLabel(value)
+  }))
+  const roleOptions = USER_ROLES.map(value => ({
+    value,
+    label: enumDisplayLabel(value)
+  }))
+  const nextNotes = (existingNotes: readonly Note[]): Note[] => {
+    const content = notesText().trim()
+    if (content.length === 0) return []
+    return [{
+      attachments: [],
+      createdAt: existingNotes[0]?.createdAt ?? new Date().toISOString(),
+      content,
+      visibility: 'internal',
+      tags: []
+    }]
+  }
   return (
     <form id='abstraction-panel-form' onSubmit={submit}>
       <UiLayout>
@@ -221,86 +250,121 @@ function UserEditor(props: {
           <UiAlert variant='danger'>{error()}</UiAlert>
         </Show>
 
-        <UiField for='displayName' label='Name'>
-          <UiInput
-            name='displayName'
-            value={displayName()}
-            onInput={event => setDisplayName(event.currentTarget.value)}
-            disabled={pending()}
-            required
-          />
-        </UiField>
-
-        <UiField for='primaryEmail' label='Email'>
-          <Show
-            when={!existing()}
-            fallback={
+        <UiFieldset legend='Identity'>
+          <UiLayout>
+            <UiField for='displayName' label='Name'>
               <UiInput
-                name='primaryEmail'
-                type='email'
-                value={props.user?.primaryEmail ?? ''}
-                readOnly
+                name='displayName'
+                value={displayName()}
+                onInput={event => setDisplayName(event.currentTarget.value)}
+                disabled={pending()}
+                required
               />
-            }
-          >
-            <UiInput
-              name='primaryEmail'
-              type='email'
-              value={primaryEmail()}
-              onInput={event => setPrimaryEmail(event.currentTarget.value)}
-              disabled={pending()}
-              required
-            />
-          </Show>
-        </UiField>
+            </UiField>
 
-        <UiField for='phoneNumber' label='Phone'>
-          <UiInput
-            name='phoneNumber'
-            type='tel'
-            value={phoneNumber()}
-            onInput={event => setPhoneNumber(event.currentTarget.value)}
-            disabled={pending()}
-            required
-          />
-        </UiField>
-
-        <UiField variant='caption' label='Roles'>
-          <UiLayout variant='inline'>
-            <For each={USER_ROLES}>
-              {role => (
-                <UiCheckbox
-                  name='roles'
-                  value={role}
-                  checked={roles().includes(role)}
-                  onChange={checked => toggleRole(role, checked)}
+            <UiField for='primaryEmail' label='Email'>
+              <Show
+                when={!existing()}
+                fallback={
+                  <UiInput
+                    name='primaryEmail'
+                    type='email'
+                    value={props.user?.primaryEmail ?? ''}
+                    readOnly
+                  />
+                }
+              >
+                <UiInput
+                  name='primaryEmail'
+                  type='email'
+                  value={primaryEmail()}
+                  onInput={event => setPrimaryEmail(event.currentTarget.value)}
                   disabled={pending()}
-                >
-                  {enumDisplayLabel(role)}
-                </UiCheckbox>
-              )}
-            </For>
-          </UiLayout>
-        </UiField>
+                  required
+                />
+              </Show>
+            </UiField>
 
-        <UiField variant='caption' label='Status'>
-          <UiToggleGroup<UserStatus>
-            value={status()}
-            onChange={setStatus}
-            disabled={pending()}
-          >
-            <For each={USER_STATUSES}>
-              {value => (
-                <UiToggleItem value={value}>
-                  <span data-feat='user-option-label'>{enumDisplayLabel(value)}</span>
-                </UiToggleItem>
-              )}
-            </For>
-          </UiToggleGroup>
-        </UiField>
+            <UiField for='phoneNumber' label='Phone'>
+              <UiInput
+                name='phoneNumber'
+                type='tel'
+                value={phoneNumber()}
+                onInput={event => setPhoneNumber(event.currentTarget.value)}
+                disabled={pending()}
+                required
+              />
+            </UiField>
+          </UiLayout>
+        </UiFieldset>
+
+        <UiFieldset legend='Contact Preferences'>
+          <UiLayout>
+            <UiField for='preferredChannel' label='Preferred Channel'>
+              <UiSingleSelect
+                name='preferredChannel'
+                options={preferredChannelOptions}
+                value={preferredChannel()}
+                onChange={value => setPreferredChannel(value as ContactPreferredChannel)}
+                disabled={pending()}
+              />
+            </UiField>
+          </UiLayout>
+        </UiFieldset>
+
+        <UiFieldset legend='Notes'>
+          <UiLayout>
+            <UiField for='notes' label='Notes'>
+              <UiTextArea
+                name='notes'
+                rows={5}
+                value={notesText()}
+                onInput={event => setNotesText(event.currentTarget.value)}
+                disabled={pending()}
+              />
+            </UiField>
+          </UiLayout>
+        </UiFieldset>
+
+        <UiFieldset legend='Access'>
+          <UiLayout>
+            <UiField variant='caption' label='Roles'>
+              <UiMultiSelect
+                name='roles'
+                options={roleOptions}
+                value={roles()}
+                onChange={value => setRoles(value as UserRole[])}
+                disabled={pending()}
+              />
+            </UiField>
+
+            <UiField variant='caption' label='Status'>
+              <UiToggleGroup<UserStatus>
+                value={status()}
+                onChange={setStatus}
+                disabled={pending()}
+              >
+                <For each={USER_STATUSES}>
+                  {value => (
+                    <UiToggleItem value={value}>
+                      <span data-feat='user-option-label'>{enumDisplayLabel(value)}</span>
+                    </UiToggleItem>
+                  )}
+                </For>
+              </UiToggleGroup>
+            </UiField>
+          </UiLayout>
+        </UiFieldset>
       </UiLayout>
     </form>
   )
+}
+
+function noteContent(notes: readonly Note[]): string {
+  return notes
+    .map(note => note.content)
+    .filter(content => content.length > 0)
+    .join('\n\n')
 }
 
 function errorMessage(error: unknown): string {

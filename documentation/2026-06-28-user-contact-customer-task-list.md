@@ -46,75 +46,75 @@ domain documentation.
 
 ## 2. Domain Internals — Model and Schema
 
-- [ ] Update `source/domain/abstractions/user.ts`
-  - [ ] Add `'customer'` to `USER_ROLES`.
-  - [ ] Move `CONTACT_PREFERRED_CHANNELS` and `ContactPreferredChannel` here.
-  - [ ] Add `preferredChannel`.
-  - [ ] Add `notes: CompositionMany<Note>`.
-  - [ ] Update file header and PUBLIC list.
-- [ ] Update `source/domain/abstractions/customer.ts`
-  - [ ] Remove `CONTACT_PREFERRED_CHANNELS`.
-  - [ ] Remove `ContactPreferredChannel`.
-  - [ ] Remove `Contact`.
-  - [ ] Remove `Customer.contacts`.
-  - [ ] Add `Customer.primaryContactId: AssociationOne<User>`.
-  - [ ] Add `CustomerContact` as pure-key Junction.
-  - [ ] Update file header and PUBLIC list.
-- [ ] Update job assignment role modeling
-  - [ ] Update `JobPlanAssignmentRole` const-enum for planned job crew functions.
-  - [ ] Use exactly: `'crew-lead'`, `'pilot'`, `'visual-observer'`, `'applicator'`, `'equipment-operator'`, and `'technician'`.
-  - [ ] Change `JobPlanAssignment.role` away from widened `UserRole`.
-  - [ ] Update `source/domain/validators/job-validator.ts` to validate against `JobPlanAssignmentRole`.
-  - [ ] Update `job_plan_assignments.role` schema CHECK to use crew assignment values.
-- [ ] Update `source/domain/protocols/customer-protocol.ts`
-  - [ ] Add `CustomerContactCreate`.
-  - [ ] Do not add update protocol for pure-key CustomerContact.
-  - [ ] Update file header and PUBLIC list.
-- [ ] Review `source/domain/protocols/user-protocol.ts`
-  - [ ] Confirm derived `UserCreate` and `UserUpdate` compile with new User shape.
-  - [ ] Update wording if header or comments imply no shape impact.
-- [ ] Update `source/domain/validators/user-validator.ts`
-  - [ ] Validate `preferredChannel`.
-  - [ ] Validate `notes`.
-  - [ ] Import `isNote`.
-  - [ ] Add or update preferred-channel guard.
-- [ ] Update `source/domain/validators/customer-validator.ts`
-  - [ ] Remove `isContact`.
-  - [ ] Remove contact validation.
-  - [ ] Validate `primaryContactId`.
-  - [ ] Add `validateCustomerContactCreate`.
-  - [ ] Update file header and PUBLIC list.
-- [ ] Update `source/domain/adapters/user-adapter.ts`
-  - [ ] Map `preferredChannel` to `preferred_channel`.
-  - [ ] Map `notes` through `NoteAdapter`.
-- [ ] Update `source/domain/adapters/customer-adapter.ts`
-  - [ ] Remove `ContactAdapter`.
-  - [ ] Remove `contacts` mapping.
-  - [ ] Map `primaryContactId` to `primary_contact_id`.
-  - [ ] Add `CustomerContactAdapter`.
-  - [ ] Update file header and PUBLIC list.
-- [ ] Update `source/domain/schema/schema.sql`
-  - [ ] Add `users.preferred_channel`.
-  - [ ] Add `users.notes`.
-  - [ ] Add preferred-channel CHECK constraint.
-  - [ ] Keep user roles CHECK or JSONB role validation aligned with role model.
-  - [ ] Drop `customers.contacts`.
-  - [ ] Drop contacts JSONB constraints.
-  - [ ] Add `customers.primary_contact_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT`.
-  - [ ] Add `customers_primary_contact_id_idx`.
-  - [ ] Add `customer_contacts` pure-key junction table.
-  - [ ] Enable RLS on `customer_contacts`.
-  - [ ] Add select, insert, and delete policies only.
-  - [ ] Add FK indexes for `customer_contacts`.
-  - [ ] Update drop order.
-- [ ] Preserve application-supplied UUID v7 identity creation
-  - [ ] Ensure user creation supplies the UUID v7 from application code.
-  - [ ] Ensure the same UUID is used for both `auth.users.id` and `public.users.id`.
-  - [ ] Ensure any RDBMS trigger or RPC path receives the application-supplied UUID, not a database-generated UUID.
-  - [ ] Keep schema aligned with the invariant that the database does not generate domain IDs.
-- [ ] Decide API/client posture for `CustomerContact`
-  - [ ] No API exposure in this milestone, or
-  - [ ] Add an explicit junction client/API pattern under approved Foundation scope.
+- [x] Update `source/domain/abstractions/user.ts`
+  - [x] Add `'customer'` to `USER_ROLES`.
+  - [x] Move `CONTACT_PREFERRED_CHANNELS` and `ContactPreferredChannel` here.
+  - [x] Add `preferredChannel`.
+  - [x] Add `notes: CompositionMany<Note>`.
+  - [x] Update file header and PUBLIC list.
+- [x] Update `source/domain/abstractions/customer.ts`
+  - [x] Remove `CONTACT_PREFERRED_CHANNELS`.
+  - [x] Remove `ContactPreferredChannel`.
+  - [x] Remove `Contact`.
+  - [x] Remove `Customer.contacts`.
+  - [x] Add `Customer.primaryContactId: AssociationOne<User>`.
+  - [x] Add `CustomerContact` as pure-key Junction.
+  - [x] Update file header and PUBLIC list.
+- [x] Update job assignment role modeling
+  - [x] Update `JobPlanAssignmentRole` const-enum for planned job crew functions.
+  - [x] Use exactly: `'crew-lead'`, `'pilot'`, `'visual-observer'`, `'applicator'`, `'equipment-operator'`, and `'technician'`.
+  - [x] Change `JobPlanAssignment.role` away from widened `UserRole`.
+  - [x] Update `source/domain/validators/job-validator.ts` to validate against `JobPlanAssignmentRole`.
+  - [x] Update `job_plan_assignments.role` schema CHECK to use crew assignment values.
+- [x] Update `source/domain/protocols/customer-protocol.ts`
+  - [x] Add `CustomerContactCreate`.
+  - [x] Do not add update protocol for pure-key CustomerContact.
+  - [x] Update file header and PUBLIC list.
+- [x] Review `source/domain/protocols/user-protocol.ts`
+  - [x] Confirm derived `UserCreate` and `UserUpdate` compile with new User shape.
+  - [x] No wording update required.
+- [x] Update `source/domain/validators/user-validator.ts`
+  - [x] Validate `preferredChannel`.
+  - [x] Validate `notes`.
+  - [x] Import `isNote`.
+  - [x] Add or update preferred-channel guard.
+- [x] Update `source/domain/validators/customer-validator.ts`
+  - [x] Remove `isContact`.
+  - [x] Remove contact validation.
+  - [x] Validate `primaryContactId`.
+  - [x] Add `validateCustomerContactCreate`.
+  - [x] Update file header and PUBLIC list.
+- [x] Update `source/domain/adapters/user-adapter.ts`
+  - [x] Map `preferredChannel` to `preferred_channel`.
+  - [x] Map `notes` through `NoteAdapter`.
+- [x] Update `source/domain/adapters/customer-adapter.ts`
+  - [x] Remove `ContactAdapter`.
+  - [x] Remove `contacts` mapping.
+  - [x] Map `primaryContactId` to `primary_contact_id`.
+  - [x] Add `CustomerContactAdapter`.
+  - [x] Update file header and PUBLIC list.
+- [x] Update `source/domain/schema/schema.sql`
+  - [x] Add `users.preferred_channel`.
+  - [x] Add `users.notes`.
+  - [x] Add preferred-channel CHECK constraint.
+  - [x] Keep user roles CHECK or JSONB role validation aligned with role model.
+  - [x] Drop `customers.contacts`.
+  - [x] Drop contacts JSONB constraints.
+  - [x] Add `customers.primary_contact_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT`.
+  - [x] Add `customers_primary_contact_id_idx`.
+  - [x] Add `customer_contacts` pure-key junction table.
+  - [x] Enable RLS on `customer_contacts`.
+  - [x] Add select, insert, and delete policies only.
+  - [x] Add FK indexes for `customer_contacts`.
+  - [x] Update drop order.
+- [x] Preserve application-supplied UUID v7 identity creation
+  - [x] Ensure user creation supplies the UUID v7 from application code.
+  - [x] Ensure the same UUID is used for both `auth.users.id` and `public.users.id`.
+  - [x] Ensure any RDBMS trigger or RPC path receives the application-supplied UUID, not a database-generated UUID.
+  - [x] Keep schema aligned with the invariant that the database does not generate domain IDs.
+- [x] Decide API/client posture for `CustomerContact`
+  - [x] Domain abstractions, protocols, validators, adapters, schema, and archetypes exist in this milestone.
+  - [x] API/client exposure is deferred to Customer Onboarding.
 
 ## 3. Domain Internals — User Edge Functions
 
@@ -167,26 +167,42 @@ domain documentation.
 
 ## 5. UX
 
-- [ ] Update AbstractionForm overflow behavior
-  - [ ] Support editor panels whose fields exceed the available viewport height.
-  - [ ] Use a vertically scrollable form content region as the default overflow pattern.
-  - [ ] Keep form actions outside the scrolling region.
-  - [ ] Add optional field groups or fieldsets for visual breakpoints in long forms.
-  - [ ] Prefer grouped vertical scroll over tabs for the default long-form pattern.
-  - [ ] Avoid artificial tab segmentation unless a form has true conceptual sections.
-  - [ ] Ensure the pattern ports cleanly to mobile.
-  - [ ] Ensure validation and error states remain discoverable inside the scroll region.
-- [ ] Update `source/ux/app-admin/users/users-form.tsx`
-  - [ ] Add state for `preferredChannel`.
-  - [ ] Add editable state for `notes`.
-  - [ ] Include `preferredChannel` in create and update payloads.
-  - [ ] Include `notes` in create and update payloads.
-  - [ ] Expose `'customer'` in role checkboxes because this is User Management.
-  - [ ] Group fields for long-form scanning, likely Identity, Contact Preferences, Notes, Roles, and Status.
-- [ ] Keep customer app UX out of scope
-  - [ ] No onboarding wizard changes.
-  - [ ] No customer dashboard access workflow changes.
-  - [ ] No RLS/customer portal policy work.
+- [x] Update AbstractionForm overflow behavior
+  - [x] Support editor panels whose fields exceed the available viewport height.
+  - [x] Use a vertically scrollable form content region as the default overflow pattern.
+  - [x] Keep form actions outside the scrolling region.
+  - [x] Add optional field groups or fieldsets for visual breakpoints in long forms.
+  - [x] Prefer grouped vertical scroll over tabs for the default long-form pattern.
+  - [x] Avoid artificial tab segmentation unless a form has true conceptual sections.
+  - [x] Ensure the pattern ports cleanly to mobile.
+  - [x] Ensure validation and error states remain discoverable inside the scroll region.
+- [x] Update `source/ux/app-admin/users/users-form.tsx`
+  - [x] Add state for `preferredChannel`.
+  - [x] Add editable state for `notes`.
+  - [x] Include `preferredChannel` in create and update payloads.
+  - [x] Include `notes` in create and update payloads.
+  - [x] Expose `'customer'` in role selection because this is User Management.
+  - [x] Group fields for long-form scanning, likely Identity, Contact Preferences, Notes, Roles, and Status.
+- [x] Complete UX verification repairs
+  - [x] Use `UiMultiSelect` for User roles.
+  - [x] Add form-contained `UiSingleSelect` style-guide regression coverage for controlled and default values.
+  - [x] Prevent `UiSingleSelect` trigger clicks from submitting parent forms.
+  - [x] Layer `UiSingleSelect` content above dialogs.
+  - [x] Make `UiDialog` explicitly modal.
+  - [x] Prevent click-away close while preserving Escape and close-button behavior.
+  - [x] Wire `AbstractionForm` Cancel to provider cancel behavior.
+  - [x] Preserve the mobile back arrow as list navigation.
+  - [x] Keep workbench dialog overflow visible so action labels and popups are not clipped.
+  - [x] Add `UiActionButton labelMode='visible'` for labeled command chrome.
+  - [x] Use visible-label `UiActionButton` for AbstractionForm Cancel, New, and Save actions.
+  - [x] Update UX component documentation for `UiActionButton labelMode`.
+  - [x] Keep AbstractionForm command styling on shared UI primitives instead of shell-local icon masks.
+  - [x] Make fieldset backgrounds transparent for long-form grouping.
+  - [x] Add app icon links to Admin, Ops, and Customer HTML entrypoints.
+- [x] Keep customer app UX out of scope
+  - [x] No onboarding wizard changes.
+  - [x] No customer dashboard access workflow changes.
+  - [x] No RLS/customer portal policy work.
 
 ## 6. Verification
 
@@ -199,4 +215,5 @@ domain documentation.
 ## 7. Open Decisions
 
 - [ ] Confirm whether `Customer.primaryContactId` must also have a matching row in `customer_contacts`.
-- [ ] Confirm whether `CustomerContact` needs an API client in this milestone.
+- [x] Confirm whether `CustomerContact` needs an API client in this milestone.
+  - Deferred to Customer Onboarding.

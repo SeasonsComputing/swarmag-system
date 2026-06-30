@@ -87,6 +87,7 @@ export const UiSingleSelect = (props: UiSingleSelectProps): UiComponent => {
     >
       <Select.Trigger
         id={local.id ?? local.name}
+        type='button'
         data-ui='single-select'
         data-ui-state={controlState(local)}
       >
