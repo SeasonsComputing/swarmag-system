@@ -1,4 +1,4 @@
-<img src="../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
+<img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System — Architecture Core
 
@@ -24,7 +24,7 @@ Authority decreases from top to bottom.
 | └→ **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace inventory and field-level references          |
 | └→ **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns                           |
 | └→ **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction rules     |
-| └→ **Style Guide**            | `style-guide.md`            | Coding standards, file formats, and implementation conventions    |
+| └→ **Style Guide**            | `STYLE-GUIDE.md`            | Coding standards, file formats, and implementation conventions    |
 | └→ **Architecture Backend**   | `architecture-back.md`      | Backend integration architecture and runtime constraints          |
 | └→ **Architecture UX**        | `architecture-ux.md`        | UX-layer integration architecture and app-specific UX contracts   |
 | └→ **Architecture DevOps**    | `architecture-devops.md`    | Environment configuration, secret registry, packaging, and guards |

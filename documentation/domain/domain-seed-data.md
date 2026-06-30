@@ -1,4 +1,4 @@
-<img src="../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
+<img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System — Domain Seed Data
 

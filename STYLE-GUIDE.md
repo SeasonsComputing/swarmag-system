@@ -1,4 +1,4 @@
-![Seasons Computing logo](../seasonscomputing-logo.png)
+![Seasons Computing logo](seasonscomputing-logo.png)
 
 # Coding Style Guide, Standards & Conventions
 

@@ -9,10 +9,10 @@ abstractions, reinterpret intent, or cross architectural boundaries.
 Authoritative source set, in order:
 
 1. `CONSTITUTION.md`
-2. `documentation/architecture-core.md`
-3. `documentation/architecture-ux.md`
-4. `documentation/domain-model.md`
-5. `documentation/style-guide.md`
+2. `documentation/architecture/architecture-core.md`
+3. `documentation/architecture/architecture-ux.md`
+4. `documentation/domain/domain-model.md`
+5. `STYLE-GUIDE.md`
 
 Do not restate or fork these rules in this prompt. This prompt is orchestration only.
 
@@ -413,8 +413,8 @@ Before reporting `STYLE_AUDIT: PASS`:
   `isLoaded: true`; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from
   `session-state.ts` directly.
-- All exported symbols have `/** */` JSDoc per `style-guide.md` §6.5.
-- All section headers use the canonical width per `style-guide.md` §6.4.
+- All exported symbols have `/** */` JSDoc per `STYLE-GUIDE.md` §6.5.
+- All section headers use the canonical width per `STYLE-GUIDE.md` §6.4.
 - No `@back/*` imports anywhere in `source/ux/`.
 - No direct `@core/cfg` imports in any `app.tsx` — config flows through
   `@ux/config/ux-config.ts`.

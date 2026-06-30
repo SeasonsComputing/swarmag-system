@@ -1,4 +1,4 @@
-<img src="../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
+<img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System — Architecture UX
 
@@ -103,7 +103,7 @@ Serving a stage-bound `app-admin` bundle locally is therefore still a stage-boun
 Admin client. Local serving is a tooling concern; it is not a separate remote
 backend environment axis.
 
-`documentation/architecture-devops.md` specifies the devops architecture including deployment strategy.
+`documentation/architecture/architecture-devops.md` specifies the devops architecture including deployment strategy.
 
 ## 4. Technology Stack
 

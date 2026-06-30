@@ -8,8 +8,8 @@
 
 - Invariants: `AGENTS.md`
 - Required session context: Domain Internals
-- Approved design: `documentation/2026-06-28-user-contact-customer-design.md`
-- Working checklist: `documentation/2026-06-28-user-contact-customer-task-list.md`
+- Approved design: `documentation/project/2026-06-28-user-contact-customer-design.md`
+- Working checklist: `documentation/project/2026-06-28-user-contact-customer-tasks.md`
 
 The core refactor is Foundation work. It changes domain meaning, shared contracts, schema,
 backend auth/domain boundaries, and downstream test/UX expectations.
@@ -43,15 +43,15 @@ backend auth/domain boundaries, and downstream test/UX expectations.
 
 Updated documentation to align domain/solution/backend authority boundaries:
 
-- `documentation/domain-model.md`
-- `documentation/architecture-back.md`
-- `documentation/domain-data-dictionary.md`
-- `documentation/domain-archetypes.md`
-- `documentation/user-stories.md`
-- `documentation/2026-06-28-user-contact-customer-design.md`
-- `documentation/2026-06-28-user-contact-customer-task-list.md`
+- `documentation/domain/domain-model.md`
+- `documentation/architecture/architecture-back.md`
+- `documentation/domain/domain-data-dictionary.md`
+- `documentation/domain/domain-archetypes.md`
+- `documentation/ux/user-stories.md`
+- `documentation/project/2026-06-28-user-contact-customer-design.md`
+- `documentation/project/2026-06-28-user-contact-customer-tasks.md`
 
-Important note: `documentation/domain-data-dictionary.md` currently remains unstaged at handoff time.
+Important note: `documentation/domain/domain-data-dictionary.md` currently remains unstaged at handoff time.
 
 ### Domain Internals — Model and Schema
 
@@ -111,8 +111,8 @@ Failures were in downstream tests/fixtures/UX:
 
 At handoff time, the following files were staged:
 
-- `documentation/2026-06-28-user-contact-customer-design.md`
-- `documentation/2026-06-28-user-contact-customer-task-list.md`
+- `documentation/project/2026-06-28-user-contact-customer-design.md`
+- `documentation/project/2026-06-28-user-contact-customer-tasks.md`
 - `source/domain/abstractions/customer.ts`
 - `source/domain/abstractions/job.ts`
 - `source/domain/abstractions/user.ts`
@@ -126,7 +126,7 @@ At handoff time, the following files were staged:
 
 Unstaged known file:
 
-- `documentation/domain-data-dictionary.md`
+- `documentation/domain/domain-data-dictionary.md`
 
 This handoff file is newly created and may need staging.
 

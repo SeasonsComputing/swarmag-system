@@ -1,11 +1,11 @@
-<img src="../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
+<img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System - Component Guide Lite
 
 ## 1. Purpose
 
 This document is a compact AI-ingestion companion to
-`documentation/ux-components-guide.md`.
+`documentation/ux/ux-components-guide.md`.
 
 The full guide remains authoritative. Use this lite guide when an AI coding
 session needs the shared UI component contract quickly and can consult the full

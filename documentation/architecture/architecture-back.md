@@ -1,4 +1,4 @@
-<img src="../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
+<img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System — Architecture Backend
 
@@ -26,7 +26,7 @@ This document defines the backend architecture of the swarmAg system. The backen
 | **Domain Model**           | `domain-model.md`           | Domain meaning consumed by backend integrations                            |
 | **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace and field references for backend contracts             |
 | **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns used by backend layer              |
-| **Style Guide**            | `style-guide.md`            | Implementation conventions and coding/file standards                       |
+| **Style Guide**            | `STYLE-GUIDE.md`            | Implementation conventions and coding/file standards                       |
 | **Architecture Backend**   | _(this file)_               | Backend architecture, edge-function contracts, and operational constraints |
 
 ## 2. Directory Structure
@@ -264,7 +264,7 @@ See `architecture-core.md` section 6 for the complete configuration pattern and 
 - Test RLS policies with different user contexts
 - Automated via `supabase test db`
 
-See `style-guide.md` section 11 for general testing conventions.
+See `STYLE-GUIDE.md` section 11 for general testing conventions.
 
 ## 7. Deployment
 
