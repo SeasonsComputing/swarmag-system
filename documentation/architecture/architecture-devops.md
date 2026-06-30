@@ -1,4 +1,4 @@
-<img src="../swarmag-ops-logo.png" title
+<img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System — Architecture DevOps
 
@@ -18,7 +18,7 @@ This document defines the operational architecture for building, packaging, and 
 | Document                 | File                   | Scope Ownership                                                            |
 | ------------------------ | ---------------------- | -------------------------------------------------------------------------- |
 | **Architecture Core**    | `architecture-core.md` | System boundary, platform constraints, and dependency direction            |
-| **Style Guide**          | `style-guide.md`       | Implementation conventions and coding/file standards                       |
+| **Style Guide**          | `STYLE-GUIDE.md`       | Implementation conventions and coding/file standards                       |
 | **Architecture Backend** | `architecture-back.md` | Backend integration architecture and runtime constraints                   |
 | **Architecture UX**      | `architecture-ux.md`   | UX-layer boundaries, composition contracts, and app-specific architecture  |
 | **Architecture DevOps**  | _(this file)_          | Environment configuration, secret registry, packaging workflow, and guards |

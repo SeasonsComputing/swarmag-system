@@ -152,11 +152,11 @@ Each step has what it needs. No circular dependency.
 
 ### 5.5 Documentation
 
-| File                                      | Change                                                                                                                                                                                                        |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `documentation/domain-model.md`           | Update User and Customer descriptions; replace Contact with CustomerContact Junction                                                                                                                          |
-| `documentation/architecture-back.md`      | Document the Auth / Domain User Boundary and shared app-supplied UUID v7 invariant                                                                                                                            |
-| `documentation/domain-data-dictionary.md` | Update §9 Users (new fields, new role, ContactPreferredChannel migrated here); update §7 Customers (remove Contact entry, add CustomerContact Junction, update Customer relations); remove §7.1 Contact entry |
+| File                                              | Change                                                                                                                                                                                                        |
+| ------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `documentation/domain/domain-model.md`            | Update User and Customer descriptions; replace Contact with CustomerContact Junction                                                                                                                          |
+| `documentation/architecture/architecture-back.md` | Document the Auth / Domain User Boundary and shared app-supplied UUID v7 invariant                                                                                                                            |
+| `documentation/domain/domain-data-dictionary.md`  | Update §9 Users (new fields, new role, ContactPreferredChannel migrated here); update §7 Customers (remove Contact entry, add CustomerContact Junction, update Customer relations); remove §7.1 Contact entry |
 
 ### 5.6 Schema
 

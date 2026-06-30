@@ -1,4 +1,4 @@
-<img src="../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
+<img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
 # swarmAg Operations System — Domain Model Archetypes
 
@@ -19,7 +19,7 @@ Implementation patterns for the `source/domain/` package. This document governs 
 | -------------------------- | --------------------------- | ----------------------------------------------------------------------- |
 | **Domain Model**           | `domain-model.md`           | Domain meaning and canonical semantics                                  |
 | **Domain Data Dictionary** | `domain-data-dictionary.md` | Topic namespaces, abstraction inventory, field-level references         |
-| **Style Guide**            | `style-guide.md`            | Implementation/file conventions and coding standards                    |
+| **Style Guide**            | `STYLE-GUIDE.md`            | Implementation/file conventions and coding standards                    |
 | **Domain Archetypes**      | `domain-archetypes.md`      | Archetype-specific production patterns derived from the data dictionary |
 
 ## 2. File Organization
@@ -36,7 +36,7 @@ The domain layer follows a file-per-topic-namespace pattern, where each file con
 
 ### 2.1 File Format
 
-All domain files conform to `style-guide.md` Functional files format.
+All domain files conform to `STYLE-GUIDE.md` Functional files format.
 
 ### 2.2 Header Public Formatting
 
@@ -176,7 +176,7 @@ export type UserRole = (typeof USER_ROLES)[number]
 
 ### 3.7 Union-Type
 
-Discriminated union of named intersection-type constituents sharing a discriminator field. Follow `style-guide.md` `union-type` pattern exactly.
+Discriminated union of named intersection-type constituents sharing a discriminator field. Follow `STYLE-GUIDE.md` `union-type` pattern exactly.
 
 ```typescript
 /** Supported question input modes. */
@@ -617,7 +617,7 @@ Round-trip integrity is enforced by fixture tests in `source/tests/cases/fixture
 
 Source: `@domain/schema/schema.sql`
 
-DDL is derived from domain abstractions per `style-guide.md` sections 10–11. This section covers archetype-to-table mappings and shapes that require explicit specification.
+DDL is derived from domain abstractions per `STYLE-GUIDE.md` sections 10–11. This section covers archetype-to-table mappings and shapes that require explicit specification.
 
 ### 7.1 Archetype-to-table mapping
 

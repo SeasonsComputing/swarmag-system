@@ -3,7 +3,7 @@
 **Date:** 2026-06-28
 **Mode:** Foundation
 **Status:** Planning checklist
-**Source design:** `documentation/2026-06-28-user-contact-customer-design.md`
+**Source design:** `documentation/project/2026-06-28-user-contact-customer-design.md`
 
 This task list decomposes the approved design into implementation workstreams.
 It is a planning aid, not a replacement for the approved design or governing
@@ -11,11 +11,11 @@ domain documentation.
 
 ## 1. Docs
 
-- [x] Update `documentation/domain-model.md`
+- [x] Update `documentation/domain/domain-model.md`
   - [x] Update User semantics for customer access, preferred channel, and notes.
   - [x] Update Customer semantics from embedded contacts to primary contact FK.
   - [x] Replace Contact with CustomerContact as a pure-key Junction.
-- [x] Update `documentation/architecture-back.md`
+- [x] Update `documentation/architecture/architecture-back.md`
   - [x] Add Auth / Domain User Boundary section.
   - [x] State that there is one domain `User`.
   - [x] Explain that `auth.users` is the authentication principal and Supabase security anchor.
@@ -24,7 +24,7 @@ domain documentation.
   - [x] Explain that the parallel structure avoids a translation layer while preserving auth/RLS alignment.
   - [x] State that backend user create, update, delete, and eject paths must maintain the invariant.
   - [x] State that the database must not generate the domain user ID.
-- [x] Update `documentation/domain-data-dictionary.md`
+- [x] Update `documentation/domain/domain-data-dictionary.md`
   - [x] Move `ContactPreferredChannel` into Users.
   - [x] Add `preferredChannel` and `notes` to User.
   - [x] Add `'customer'` to `UserRole`.
@@ -35,10 +35,10 @@ domain documentation.
   - [x] Add `Customer.primaryContactId`.
   - [x] Add `CustomerContact` Junction.
   - [x] Split crew assignment roles from `UserRole`.
-- [x] Update `documentation/user-stories.md`
+- [x] Update `documentation/ux/user-stories.md`
   - [x] Replace embedded contact capture wording.
   - [x] Align primary-contact language with `Customer.primaryContactId`.
-- [x] Decide whether to update `documentation/domain-archetypes.md`
+- [x] Decide whether to update `documentation/domain/domain-archetypes.md`
   - [x] Refresh `USER_ROLES` examples because examples should stay canonical.
 - [x] Correct or supersede the implementation note in the source design
   - [x] Clarify that `UserCreate` changes shape because it derives from `User`.
@@ -138,24 +138,24 @@ domain documentation.
 
 ## 4. Tests
 
-- [ ] Update `source/tests/fixtures/user-samples.ts`
-  - [ ] Add `preferredChannel`.
-  - [ ] Add `notes`.
-  - [ ] Add or avoid a customer-role sample by explicit decision.
-- [ ] Update `source/tests/fixtures/customer-samples.ts`
-  - [ ] Remove embedded contact sample data.
-  - [ ] Add `primaryContactId`.
-  - [ ] Add CustomerContact sample data if fixtures cover junctions.
-- [ ] Update `source/tests/fixtures/samples.ts`
-  - [ ] Export CustomerContact samples if added.
-- [ ] Update `source/tests/fixtures/fixtures-test.ts`
-  - [ ] Remove embedded contact assertions.
-  - [ ] Assert `primaryContactId` is a valid Id.
-  - [ ] Assert CustomerContact linkage if samples are added.
-- [ ] Update `source/tests/cases/users-api-test.ts`
-  - [ ] Add `preferredChannel` to `UserCreate`.
-  - [ ] Add `notes` to `UserCreate`.
-  - [ ] Assert returned user includes new fields.
+- [x] Update `source/tests/fixtures/user-samples.ts`
+  - [x] Add `preferredChannel`.
+  - [x] Add `notes`.
+  - [x] Avoid adding a customer-role sample until a test needs one.
+- [x] Update `source/tests/fixtures/customer-samples.ts`
+  - [x] Remove embedded contact sample data.
+  - [x] Add `primaryContactId`.
+  - [x] Add CustomerContact sample data for junction fixture coverage.
+- [x] Update `source/tests/fixtures/samples.ts`
+  - [x] Confirm wildcard exports already expose CustomerContact samples.
+- [x] Update `source/tests/fixtures/fixtures-test.ts`
+  - [x] Remove embedded contact assertions.
+  - [x] Assert `primaryContactId` is a valid Id.
+  - [x] Assert CustomerContact linkage without encoding the open primary-contact membership decision.
+- [x] Update `source/tests/cases/users-api-test.ts`
+  - [x] Add `preferredChannel` to `UserCreate`.
+  - [x] Add `notes` to `UserCreate`.
+  - [x] Assert returned user includes new fields.
 - [ ] Add or update adapter round-trip coverage as needed
   - [ ] User new fields.
   - [ ] Customer `primaryContactId`.
@@ -206,11 +206,14 @@ domain documentation.
 
 ## 6. Verification
 
-- [ ] Run `deno task check:domain-genesis`.
+- [x] Run `deno task check:domain-genesis`.
 - [ ] Run `deno task test`.
-- [ ] Run `deno task check`.
+  - [x] Fixture integrity tests passed.
+  - [ ] Full task remains blocked by missing Supabase test config:
+        `SUPABASE_RDBMS_URL`, `SUPABASE_PUBLIC_KEY`, `SUPABASE_CLIENT_MODE`.
+- [x] Run `deno task check`.
 - [ ] Run `deno task db-genesis-verify --target {target}` when an environment is available.
-- [ ] Report all checks, failures fixed, failures remaining, and explicit out-of-scope work.
+- [x] Report all checks, failures fixed, failures remaining, and explicit out-of-scope work.
 
 ## 7. Open Decisions
 
