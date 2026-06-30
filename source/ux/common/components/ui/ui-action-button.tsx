@@ -23,6 +23,9 @@ export type UiActionButtonIcon = 'back' | 'check' | 'cross' | 'delete' | 'edit' 
 /** Action button variants. */
 export type UiActionButtonVariant = 'default' | 'danger'
 
+/** Action button label presentation. */
+export type UiActionButtonLabelMode = 'reveal' | 'visible'
+
 /** Action button control props. */
 export type UiActionButtonProps =
   & Omit<
@@ -34,6 +37,7 @@ export type UiActionButtonProps =
     | 'aria-label'
     | 'data-ui'
     | 'data-ui-icon'
+    | 'data-ui-label-mode'
     | 'data-ui-state'
     | 'data-ui-variant'
   >
@@ -42,6 +46,7 @@ export type UiActionButtonProps =
     error?: boolean
     icon: UiActionButtonIcon
     label: string
+    labelMode?: UiActionButtonLabelMode
     loading?: boolean
     variant?: UiActionButtonVariant
     class?: never
@@ -49,6 +54,7 @@ export type UiActionButtonProps =
     style?: never
     'data-ui'?: never
     'data-ui-icon'?: never
+    'data-ui-label-mode'?: never
     'data-ui-state'?: never
     'data-ui-variant'?: never
   }
@@ -60,6 +66,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
     'error',
     'icon',
     'label',
+    'labelMode',
     'loading',
     'variant',
     'class',
@@ -67,6 +74,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
     'style',
     'data-ui',
     'data-ui-icon',
+    'data-ui-label-mode',
     'data-ui-state',
     'data-ui-variant'
   ])
@@ -77,6 +85,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
       aria-label={local.label}
       data-ui='action-button'
       data-ui-icon={local.icon}
+      data-ui-label-mode={local.labelMode ?? 'reveal'}
       data-ui-state={controlState(local)}
       data-ui-variant={local.variant}
       disabled={isDisabled()}
