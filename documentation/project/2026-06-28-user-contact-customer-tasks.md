@@ -167,7 +167,7 @@ domain documentation.
 
 ## 5. UX
 
-- [x] Update AbstractionForm overflow behavior
+- [x] Update AbstractionManager overflow behavior
   - [x] Support editor panels whose fields exceed the available viewport height.
   - [x] Use a vertically scrollable form content region as the default overflow pattern.
   - [x] Keep form actions outside the scrolling region.
@@ -176,7 +176,7 @@ domain documentation.
   - [x] Avoid artificial tab segmentation unless a form has true conceptual sections.
   - [x] Ensure the pattern ports cleanly to mobile.
   - [x] Ensure validation and error states remain discoverable inside the scroll region.
-- [x] Update `source/ux/app-admin/users/users-form.tsx`
+- [x] Update `source/ux/app-admin/users/user-manager.tsx`
   - [x] Add state for `preferredChannel`.
   - [x] Add editable state for `notes`.
   - [x] Include `preferredChannel` in create and update payloads.
@@ -190,13 +190,13 @@ domain documentation.
   - [x] Layer `UiSingleSelect` content above dialogs.
   - [x] Make `UiDialog` explicitly modal.
   - [x] Prevent click-away close while preserving Escape and close-button behavior.
-  - [x] Wire `AbstractionForm` Cancel to provider cancel behavior.
+  - [x] Wire `AbstractionManager` Cancel to provider cancel behavior.
   - [x] Preserve the mobile back arrow as list navigation.
   - [x] Keep workbench dialog overflow visible so action labels and popups are not clipped.
   - [x] Add `UiActionButton labelMode='visible'` for labeled command chrome.
-  - [x] Use visible-label `UiActionButton` for AbstractionForm Cancel, New, and Save actions.
+  - [x] Use visible-label `UiActionButton` for AbstractionManager Cancel, New, and Save actions.
   - [x] Update UX component documentation for `UiActionButton labelMode`.
-  - [x] Keep AbstractionForm command styling on shared UI primitives instead of shell-local icon masks.
+  - [x] Keep AbstractionManager command styling on shared UI primitives instead of shell-local icon masks.
   - [x] Make fieldset backgrounds transparent for long-form grouping.
   - [x] Add app icon links to Admin, Ops, and Customer HTML entrypoints.
 - [x] Keep customer app UX out of scope

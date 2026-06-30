@@ -36,7 +36,7 @@ blocked by the domain-model change.
 - The mobile back arrow remains list navigation.
 - Dialog click-away close is disabled. Escape and explicit close controls remain normal close paths.
 - `UiActionButton` owns visible command-label presentation through `labelMode='visible'`.
-- AbstractionForm uses `UiActionButton labelMode='visible'` for Cancel, New, and Save.
+- AbstractionManager uses `UiActionButton labelMode='visible'` for Cancel, New, and Save.
 
 ## 3. Completed Work In This Session
 
@@ -60,7 +60,7 @@ Recorded:
 
 Updated:
 
-- `source/ux/app-admin/users/users-form.tsx`
+- `source/ux/app-admin/users/user-manager.tsx`
 
 Implemented:
 
@@ -77,9 +77,9 @@ Implemented:
 
 Updated:
 
-- `source/ux/common/shell/abstraction-form-contract.ts`
-- `source/ux/common/shell/abstraction-form.tsx`
-- `source/ux/common/shell/abstraction-form.css`
+- `source/ux/common/shell/abstraction-manager-contract.ts`
+- `source/ux/common/shell/abstraction-manager.tsx`
+- `source/ux/common/shell/abstraction-manager.css`
 
 Implemented:
 
@@ -89,7 +89,7 @@ Implemented:
 - Restored a desktop-sized workbench with bounded height.
 - Preserved full-height collapsed/mobile behavior.
 - Kept popover clipping clear by allowing the outer form card to overflow visibly.
-- Moved Cancel to the top AbstractionForm title row.
+- Moved Cancel to the top AbstractionManager title row.
 - Kept Save in the editor panel header.
 - Used visible-label `UiActionButton` for Cancel, New, and Save command chrome.
 - Preserved the mobile back-to-list action as icon button plus divider.
@@ -212,7 +212,7 @@ Modified files from this UX session:
 - `documentation/ux/ux-components-guide.md`
 - `documentation/ux/ux-components-guide-lite.md`
 - `source/ux/app-admin/index.html`
-- `source/ux/app-admin/users/users-form.tsx`
+- `source/ux/app-admin/users/user-manager.tsx`
 - `source/ux/app-customer/index.html`
 - `source/ux/app-ops/index.html`
 - `source/ux/app-style-guide/style-guide.tsx`
@@ -221,9 +221,9 @@ Modified files from this UX session:
 - `source/ux/common/components/ui/ui-action-button.tsx`
 - `source/ux/common/components/ui/ui-dialog.tsx`
 - `source/ux/common/components/ui/ui-single-select.tsx`
-- `source/ux/common/shell/abstraction-form-contract.ts`
-- `source/ux/common/shell/abstraction-form.css`
-- `source/ux/common/shell/abstraction-form.tsx`
+- `source/ux/common/shell/abstraction-manager-contract.ts`
+- `source/ux/common/shell/abstraction-manager.css`
+- `source/ux/common/shell/abstraction-manager.tsx`
 
 New file from this handoff:
 

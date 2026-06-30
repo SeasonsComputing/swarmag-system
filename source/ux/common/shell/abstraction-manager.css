@@ -1,11 +1,11 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Abstraction form styles                                                      ║
-║ Shell-owned layout for list and editor panel abstraction forms.              ║
+║ Abstraction manager styles                                                   ║
+║ Shell-owned layout for list and editor panel abstraction managers.           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-feat='abstraction-form'] {
+[data-feat='abstraction-manager'] {
   block-size: clamp(32rem, 72dvh, 42rem);
   display: grid;
   gap: var(--sa-rhythm-gap);
@@ -14,7 +14,7 @@
   max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
 }
 
-[data-feat='abstraction-form-title-row'] {
+[data-feat='abstraction-manager-title-row'] {
   align-items: center;
   display: flex;
   grid-column: 1 / -1;
@@ -22,13 +22,13 @@
   min-inline-size: 0;
 }
 
-[data-feat='abstraction-form-title'] {
+[data-feat='abstraction-manager-title'] {
   line-height: 1;
   margin: 0;
   min-inline-size: 0;
 }
 
-[data-feat='abstraction-form-list'] {
+[data-feat='abstraction-manager-list'] {
   display: flex;
   flex-direction: column;
   min-block-size: min(calc(var(--sa-touch-target) * 4), calc(100dvh - var(--sa-rhythm-pad) * 4));
@@ -36,7 +36,7 @@
   position: relative;
 }
 
-[data-feat='abstraction-form-panel'] {
+[data-feat='abstraction-manager-panel'] {
   display: flex;
   flex-direction: column;
   min-block-size: min(calc(var(--sa-touch-target) * 4), calc(100dvh - var(--sa-rhythm-pad) * 4));
@@ -44,8 +44,8 @@
   position: relative;
 }
 
-[data-feat='abstraction-form-list'] > [data-ui='card'],
-[data-feat='abstraction-form-panel'] > [data-ui='card'] {
+[data-feat='abstraction-manager-list'] > [data-ui='card'],
+[data-feat='abstraction-manager-panel'] > [data-ui='card'] {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -53,7 +53,7 @@
   overflow: visible;
 }
 
-[data-feat='abstraction-form-card-header'] {
+[data-feat='abstraction-manager-card-header'] {
   align-items: center;
   display: flex;
   flex: 0 0 auto;
@@ -62,39 +62,39 @@
   padding-block-end: var(--sa-space-sm);
 }
 
-[data-feat='abstraction-form-card-title'],
-[data-feat='abstraction-form-card-title-group'] {
+[data-feat='abstraction-manager-card-title'],
+[data-feat='abstraction-manager-card-title-group'] {
   align-items: center;
   display: flex;
   gap: var(--sa-space-xs);
   min-inline-size: 0;
 }
 
-[data-feat='abstraction-form-card-title'] {
+[data-feat='abstraction-manager-card-title'] {
   line-height: 1;
   margin: 0;
 }
 
-[data-feat='abstraction-form-card-actions'] {
+[data-feat='abstraction-manager-card-actions'] {
   align-items: center;
   display: flex;
   flex: 0 0 auto;
   gap: var(--sa-space-xs);
 }
 
-[data-feat='abstraction-form-back-command'] {
+[data-feat='abstraction-manager-back-command'] {
   align-items: center;
   display: inline-flex;
   gap: var(--sa-space-xs);
 }
 
-[data-feat='abstraction-form-command-divider'] {
+[data-feat='abstraction-manager-command-divider'] {
   align-self: stretch;
   border-inline-start: var(--sa-border-default);
   min-block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
 }
 
-[data-feat='abstraction-form-card-body'] {
+[data-feat='abstraction-manager-card-body'] {
   flex: 1 1 auto;
   margin: calc(var(--sa-space-xs) * -1);
   min-block-size: 0;
@@ -103,26 +103,26 @@
   scroll-padding: var(--sa-space-xs);
 }
 
-[data-feat='abstraction-form-card-body'][data-feat-region='editor-body'] {
+[data-feat='abstraction-manager-card-body'][data-feat-region='editor-body'] {
   overscroll-behavior: contain;
 }
 
-[data-feat='abstraction-form-card-body'][data-feat-region='editor-body'] > form {
+[data-feat='abstraction-manager-card-body'][data-feat-region='editor-body'] > form {
   min-block-size: 0;
 }
 
-[data-feat='abstraction-form-collapse-action'] {
+[data-feat='abstraction-manager-collapse-action'] {
   display: none;
 }
 
 @container (max-width: 768px) {
-  [data-feat='abstraction-form'] {
+  [data-feat='abstraction-manager'] {
     block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
     grid-template-columns: 1fr;
   }
 
-  [data-feat='abstraction-form-list'],
-  [data-feat='abstraction-form-panel'] {
+  [data-feat='abstraction-manager-list'],
+  [data-feat='abstraction-manager-panel'] {
     block-size: 100%;
     grid-column: 1;
     grid-row: 2;
@@ -130,23 +130,23 @@
     transition: var(--sa-transition-fast);
   }
 
-  [data-feat='abstraction-form'][data-feat-mode='list'] [data-feat='abstraction-form-list'],
-  [data-feat='abstraction-form'][data-feat-mode='editor'] [data-feat='abstraction-form-panel'] {
+  [data-feat='abstraction-manager'][data-feat-mode='list'] [data-feat='abstraction-manager-list'],
+  [data-feat='abstraction-manager'][data-feat-mode='editor'] [data-feat='abstraction-manager-panel'] {
     opacity: 1;
     pointer-events: auto;
     visibility: visible;
     z-index: var(--sa-z-base);
   }
 
-  [data-feat='abstraction-form'][data-feat-mode='list'] [data-feat='abstraction-form-panel'],
-  [data-feat='abstraction-form'][data-feat-mode='editor'] [data-feat='abstraction-form-list'] {
+  [data-feat='abstraction-manager'][data-feat-mode='list'] [data-feat='abstraction-manager-panel'],
+  [data-feat='abstraction-manager'][data-feat-mode='editor'] [data-feat='abstraction-manager-list'] {
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
     z-index: var(--sa-z-below);
   }
 
-  [data-feat='abstraction-form-collapse-action'] {
+  [data-feat='abstraction-manager-collapse-action'] {
     display: block;
   }
 }

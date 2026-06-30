@@ -6,14 +6,14 @@
 import { bootstrap } from '@ux/common/shell/bootstrap.tsx'
 
 // shell bindings
-import { UsersForm } from '@ux/app-admin/users/users-form.tsx'
+import { UserManager } from '@ux/app-admin/users/user-manager.tsx'
 import dashboardSeed from './dashboard-admin.json' with { type: 'json' }
 
 void bootstrap(dashboardSeed, {
   dialogs: [
     {
       path: '/users',
-      component: UsersForm,
+      component: UserManager,
       dialog: { size: 'workbench' }
     }
   ]

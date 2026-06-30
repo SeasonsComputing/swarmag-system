@@ -151,7 +151,7 @@
   --sa-focus-ring: 0 0 0 2px oklch(13.2% 0.012 264.5), 0 0 0 4px oklch(82% 0.13 185 / 0.42);
 
   /* Shell chrome */
-  --sa-shell-bg: oklch(17% 0.008 244 / 0.7);
+  --sa-shell-bg: var(--sa-bg-control);
   --sa-shell-border: var(--sa-border-card);
   --sa-shell-filter: var(--sa-filter-blur);
   --sa-shell-shadow: var(--sa-shadow-sm);
@@ -194,8 +194,8 @@
   --sa-skeleton-bg-shimmer: oklch(42% 0.025 252 / 0.6);
 
   /* Card */
-  --sa-card-panel-bg: var(--sa-shell-bg);
-  --sa-card-panel-border: var(--sa-shell-border);
+  --sa-card-panel-bg: oklch(17% 0.008 244 / 0.7);
+  --sa-card-panel-border:  1px solid rgb(148 163 184 / 0.1);
   --sa-card-panel-shadow: none;
   --sa-card-decoration-stripe-opacity: 0.8;
   --sa-card-elevation-raised-shadow: 0 15px 36px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);

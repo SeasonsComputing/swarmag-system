@@ -1,5 +1,5 @@
 /**
- * Generic abstraction form provider contract.
+ * Generic abstraction manager provider contract.
  */
 
 import type { Instance } from '@core/std'
@@ -14,8 +14,8 @@ export type AbstractionAction<T extends Instance> = {
   handler: (item: T) => void | Promise<void>
 }
 
-/** Provider contract for list-and-panel abstraction forms. */
-export interface AbstractionFormContract<T extends Instance> {
+/** Provider contract for list-and-panel abstraction managers. */
+export interface AbstractionManagerContract<T extends Instance> {
   formTitle: string
   entityLabel: string
   listColumns: string[]

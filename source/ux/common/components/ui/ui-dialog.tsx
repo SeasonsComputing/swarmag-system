@@ -28,6 +28,7 @@ export type UiDialogProps = UiComponentProps & {
   size?: UiDialogSize
   open?: boolean
   defaultOpen?: boolean
+  dismissible?: boolean
   error?: boolean
   loading?: boolean
   disabled?: boolean
@@ -48,6 +49,7 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
     'size',
     'open',
     'defaultOpen',
+    'dismissible',
     'error',
     'loading',
     'disabled',
@@ -76,7 +78,9 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
           data-ui='dialog'
           data-ui-size={local.size ?? 'panel'}
           data-ui-state={controlState(local)}
-          onPointerDownOutside={event => event.preventDefault()}
+          onPointerDownOutside={event => {
+            if (!local.dismissible) event.preventDefault()
+          }}
         >
           {local.children}
         </Dialog.Content>

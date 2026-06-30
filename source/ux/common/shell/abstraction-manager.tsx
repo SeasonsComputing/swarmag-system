@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Abstraction form                                                             ║
-║ Generic list and panel form shell driven by a provider contract.             ║
+║ Abstraction manager                                                          ║
+║ Generic list and panel manager shell driven by a provider contract.          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -11,7 +11,7 @@ content to an abstraction-specific provider.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AbstractionForm  Generic list+panel form component.
+AbstractionManager  Generic list+panel manager component.
 */
 
 import type { Instance } from '@core/std'
@@ -26,21 +26,21 @@ import {
   UiTableHeader,
   UiTableRow
 } from '@ux/common/components/ui'
-import type { AbstractionFormContract } from './abstraction-form-contract.ts'
+import type { AbstractionManagerContract } from './abstraction-manager-contract.ts'
 
-import './abstraction-form.css'
+import './abstraction-manager.css'
 
-/** Props for a generic abstraction form. */
-export type AbstractionFormProps<T extends Instance> = {
-  provider: AbstractionFormContract<T>
+/** Props for a generic abstraction manager. */
+export type AbstractionManagerProps<T extends Instance> = {
+  provider: AbstractionManagerContract<T>
 }
 
-type AbstractionFormMode = 'list' | 'editor'
+type AbstractionManagerMode = 'list' | 'editor'
 
-/** Generic abstraction list and editor-panel component. */
-export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<T>): UiComponent => {
+/** Generic abstraction list and editor-panel manager. */
+export const AbstractionManager = <T extends Instance>(props: AbstractionManagerProps<T>): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
-  const [mode, setMode] = createSignal<AbstractionFormMode>('list')
+  const [mode, setMode] = createSignal<AbstractionManagerMode>('list')
   const onSelect = (item: T): void => {
     setSelected(() => item)
     setMode('editor')
@@ -61,16 +61,16 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
       : `New ${props.provider.entityLabel}`
 
   return (
-    <div data-feat='abstraction-form' data-feat-mode={mode()}>
-      <header data-feat='abstraction-form-title-row'>
-        <h1 data-feat='abstraction-form-title'>{props.provider.formTitle}</h1>
+    <div data-feat='abstraction-manager' data-feat-mode={mode()}>
+      <header data-feat='abstraction-manager-title-row'>
+        <h1 data-feat='abstraction-manager-title'>{props.provider.formTitle}</h1>
         <UiActionButton icon='cross' label='Cancel' labelMode='visible' onClick={cancelDialog} />
       </header>
-      <section data-feat='abstraction-form-list'>
+      <section data-feat='abstraction-manager-list'>
         <UiCard elevation='raised'>
-          <header data-feat='abstraction-form-card-header'>
-            <h2 data-feat='abstraction-form-card-title'>{props.provider.entityLabel}s</h2>
-            <div data-feat='abstraction-form-card-actions'>
+          <header data-feat='abstraction-manager-card-header'>
+            <h2 data-feat='abstraction-manager-card-title'>{props.provider.entityLabel}s</h2>
+            <div data-feat='abstraction-manager-card-actions'>
               <UiActionButton
                 icon='plus'
                 label={`New ${props.provider.entityLabel}`}
@@ -79,7 +79,7 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
               />
             </div>
           </header>
-          <div data-feat='abstraction-form-card-body' data-feat-region='list-body'>
+          <div data-feat='abstraction-manager-card-body' data-feat-region='list-body'>
             <Show
               when={!props.provider.isListLoading()}
               fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
@@ -132,27 +132,33 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
           </div>
         </UiCard>
       </section>
-      <section data-feat='abstraction-form-panel'>
+      <section data-feat='abstraction-manager-panel'>
         <UiCard elevation='raised'>
-          <header data-feat='abstraction-form-card-header'>
-            <div data-feat='abstraction-form-card-title-group'>
-              <div data-feat='abstraction-form-collapse-action'>
-                <span data-feat='abstraction-form-back-command'>
+          <header data-feat='abstraction-manager-card-header'>
+            <div data-feat='abstraction-manager-card-title-group'>
+              <div data-feat='abstraction-manager-collapse-action'>
+                <span data-feat='abstraction-manager-back-command'>
                   <UiActionButton
                     icon='back'
                     label={`${props.provider.entityLabel}s`}
                     onClick={() => setMode('list')}
                   />
-                  <span aria-hidden='true' data-feat='abstraction-form-command-divider' />
+                  <span aria-hidden='true' data-feat='abstraction-manager-command-divider' />
                 </span>
               </div>
-              <h2 data-feat='abstraction-form-card-title'>{editorTitle()}</h2>
+              <h2 data-feat='abstraction-manager-card-title'>{editorTitle()}</h2>
             </div>
-            <div data-feat='abstraction-form-card-actions'>
-              <UiActionButton icon='check' label='Save' labelMode='visible' type='submit' form='abstraction-panel-form' />
+            <div data-feat='abstraction-manager-card-actions'>
+              <UiActionButton
+                icon='check'
+                label='Save'
+                labelMode='visible'
+                type='submit'
+                form='abstraction-panel-form'
+              />
             </div>
           </header>
-          <div data-feat='abstraction-form-card-body' data-feat-region='editor-body'>
+          <div data-feat='abstraction-manager-card-body' data-feat-region='editor-body'>
             {props.provider.renderForm(selected(), closeEditor)}
           </div>
         </UiCard>

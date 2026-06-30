@@ -14,19 +14,19 @@ Deliver the dashboard foundation and user management page for `app-admin`. This 
 
 ### 3.1 Create
 
-| File                                                  | Purpose                                   |
-| ----------------------------------------------------- | ----------------------------------------- |
-| `source/ux/common/shell/abstraction-form-contract.ts` | Provider interface                        |
-| `source/ux/common/shell/abstraction-form.tsx`         | Generic list+dialog form component        |
-| `source/ux/common/shell/widget-provider.tsx`          | WidgetProvider context + useWidgets hook  |
-| `source/ux/common/shell/widgets-header-catalog.ts`    | Header widget sub-catalog                 |
-| `source/ux/common/shell/widgets-catalog.ts`           | Widget catalog barrel                     |
-| `source/ux/common/shell/dashboard.tsx`                | Dashboard root component                  |
-| `source/ux/common/shell/dashboard.css`                | Feature-layer CSS for dashboard           |
-| `source/ux/common/widgets/brand-widget.tsx`           | BrandWidget                               |
-| `source/ux/common/widgets/action-widget.tsx`          | ActionWidget                              |
-| `source/ux/app-admin/users/users-form.tsx`            | UsersForm — AbstractionFormContract<User> |
-| `source/ux/app-admin/users/users.css`                 | Feature-layer CSS for users page          |
+| File                                                     | Purpose                                        |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| `source/ux/common/shell/abstraction-manager-contract.ts` | Provider interface                             |
+| `source/ux/common/shell/abstraction-manager.tsx`         | Generic list+dialog manager component          |
+| `source/ux/common/shell/widget-provider.tsx`             | WidgetProvider context + useWidgets hook       |
+| `source/ux/common/shell/widgets-header-catalog.ts`       | Header widget sub-catalog                      |
+| `source/ux/common/shell/widgets-catalog.ts`              | Widget catalog barrel                          |
+| `source/ux/common/shell/dashboard.tsx`                   | Dashboard root component                       |
+| `source/ux/common/shell/dashboard.css`                   | Feature-layer CSS for dashboard                |
+| `source/ux/common/widgets/brand-widget.tsx`              | BrandWidget                                    |
+| `source/ux/common/widgets/action-widget.tsx`             | ActionWidget                                   |
+| `source/ux/app-admin/users/user-manager.tsx`             | UserManager — AbstractionManagerContract<User> |
+| `source/ux/app-admin/users/users.css`                    | Feature-layer CSS for users page               |
 
 ### 3.2 Modify
 
@@ -72,9 +72,9 @@ widgets-catalog-{category}.ts    ← future
 widgets-catalog.ts               ← barrel, merges sub-catalogs → WidgetCatalog
 ```
 
-### 4.4 AbstractionForm Pattern
+### 4.4 AbstractionManager Pattern
 
-`AbstractionForm` is a generic component that takes a provider implementing `AbstractionFormContract<T>`. All forms must be reactive from side-by-side to panel-to-panel.
+`AbstractionManager` is a generic component that takes a provider implementing `AbstractionManagerContract<T>`. All forms must be reactive from side-by-side to panel-to-panel.
 
 ## 5. Code Contracts
 
@@ -86,14 +86,14 @@ export type WidgetComponent = (props: { settings: Dictionary }) => UiComponent
 export type WidgetRegistry = Dictionary<WidgetComponent>
 ```
 
-### 5.2 AbstractionFormContract
+### 5.2 AbstractionManagerContract
 
 ```typescript
-// common/shell/abstraction-form-contract.ts
+// common/shell/abstraction-manager-contract.ts
 import type { Instance } from '@core/std'
 import type { UiComponent } from '@ux/common/components/ui'
 
-export interface AbstractionFormContract<T extends Instance> {
+export interface AbstractionManagerContract<T extends Instance> {
   entityLabel: string
   listColumns: string[]
   list: () => T[]
@@ -214,7 +214,7 @@ No props. Calls `getShellIdentity()` from `@ux/common/shell/shell-metadata.ts`. 
 
 ```typescript
 import { createRoute } from '@tanstack/solid-router'
-import { UsersForm } from '@ux/app-admin/users/users-form.tsx'
+import { UserManager } from '@ux/app-admin/users/user-manager.tsx'
 import { AuthGuard } from '@ux/common/shell/auth-guard.tsx'
 import { bootstrap, rootRoute } from '@ux/common/shell/bootstrap.tsx'
 import { Content } from '@ux/common/shell/content.tsx'
@@ -226,7 +226,7 @@ const usersRoute = createRoute({
   component: () => (
     <AuthGuard>
       <Content>
-        <UsersForm />
+        <UserManager />
       </Content>
     </AuthGuard>
   )
@@ -259,11 +259,11 @@ Add `settings` at the top level. Add BrandWidget and ActionWidget to header:
 }
 ```
 
-### 5.11 UsersForm Provider
+### 5.11 UserManager Provider
 
 ```typescript
-// app-admin/users/users-form.tsx
-const provider: AbstractionFormContract<User> = {
+// app-admin/users/user-manager.tsx
+const provider: AbstractionManagerContract<User> = {
   entityLabel: 'User',
   listColumns: ['Name', 'Email', 'Roles', 'Status'],
   list: () => usersQuery.data ?? [],

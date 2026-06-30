@@ -120,7 +120,6 @@
   gap: 0;
   min-height: auto;
   min-width: auto;
-  padding: 0;
 }
 
 [data-ui='action-button'][data-ui-label-mode='visible']::before {
@@ -263,31 +262,38 @@
   width: 1rem;
 }
 
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='delete'] [data-ui='action-button-icon']::before {
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='delete']
+  [data-ui='action-button-icon']::before {
   mask: url('../icons/trash.svg') center / contain no-repeat;
 }
 
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='back'] [data-ui='action-button-icon']::before {
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='back']
+  [data-ui='action-button-icon']::before {
   mask: url('../icons/arrow-left.svg') center / contain no-repeat;
 }
 
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='edit'] [data-ui='action-button-icon']::before {
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='edit']
+  [data-ui='action-button-icon']::before {
   mask: url('../icons/pencil-1.svg') center / contain no-repeat;
 }
 
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='check'] [data-ui='action-button-icon']::before {
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='check']
+  [data-ui='action-button-icon']::before {
   mask: url('../icons/check.svg') center / contain no-repeat;
 }
 
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='cross'] [data-ui='action-button-icon']::before {
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='cross']
+  [data-ui='action-button-icon']::before {
   mask: url('../icons/cross-1.svg') center / contain no-repeat;
 }
 
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='eject'] [data-ui='action-button-icon']::before {
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='eject']
+  [data-ui='action-button-icon']::before {
   mask: url('../icons/exit.svg') center / contain no-repeat;
 }
 
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='plus'] [data-ui='action-button-icon']::before {
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='plus']
+  [data-ui='action-button-icon']::before {
   mask: url('../icons/plus.svg') center / contain no-repeat;
 }
 

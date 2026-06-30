@@ -18,9 +18,9 @@
 
 [data-feat='dashboard-header'] {
   align-items: center;
-  background: var(--sa-card-panel-bg);
-  border-block-end: var(--sa-card-panel-border);
-  box-shadow: var(--sa-card-panel-shadow);
+  background: var(--sa-shell-bg);
+  border-block-end: var(--sa-shell-border);
+  box-shadow: var(--sa-shell-shadow);
   display: flex;
   flex-shrink: 0;
   gap: var(--sa-rhythm-gap);

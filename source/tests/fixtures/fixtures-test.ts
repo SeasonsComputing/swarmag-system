@@ -8,6 +8,7 @@ import { assert, assertEquals } from '@std/assert'
 import {
   assetSamples,
   assetTypeSamples,
+  customerContactSamples,
   customerSamples,
   jobSamples,
   sharedQuestionSamples
@@ -54,14 +55,23 @@ Deno.test('fixture integrity: job assessment fixture always carries locations an
   assert(isWhen(assessment.updatedAt))
 })
 
-Deno.test('fixture integrity: customer fixtures keep contact linkage intact', () => {
+Deno.test('fixture integrity: customer fixtures keep primary contact references intact', () => {
   for (const customer of customerSamples) {
     assert(isId(customer.id))
-    assert(customer.contacts.length > 0)
-    assert(customer.contacts.some(contact => contact.isPrimary))
+    assert(isId(customer.primaryContactId))
     assert(customer.sites.filter(Boolean).every(site => site!.customerId === customer.id))
     assert(isWhen(customer.createdAt))
     assert(isWhen(customer.updatedAt))
+  }
+})
+
+Deno.test('fixture integrity: customer contact junction fixtures carry valid keys', () => {
+  const customerIds = new StringSet(customerSamples.map(customer => customer.id))
+
+  for (const contact of customerContactSamples) {
+    assert(isId(contact.customerId))
+    assert(isId(contact.userId))
+    assert(customerIds.has(contact.customerId))
   }
 })
 
