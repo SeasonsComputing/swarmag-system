@@ -351,17 +351,32 @@ app.tsx
 └── bootstrap()
     ├── Login              — unauthenticated entry point
     ├── AuthGuard          — session enforcement, redirect to /login
-    ├── Content            — authenticated page frame
     └── Dashboard          — primary navigation surface
 ```
 
-`Login`, `AuthGuard`, `Content`, and shared stores live in `source/ux/common/shell`. App packages provide only dashboard configuration (`app-{admin|ops|customer}-dashboard.json`) and app-specific routes, widgets, and features.
+Authenticated routes render their primary application surface inside a semantic
+`main` landmark. `main` is required accessibility plumbing, not a UX metaphor or
+shared shell primitive.
 
-#### 9.1.1 Auth Guard
+`Login`, `AuthGuard`, `Dashboard`, and shared stores live in `source/ux/common/shell`. App packages provide only dashboard configuration (`app-{admin|ops|customer}-dashboard.json`) and app-specific routes, widgets, and features.
+
+#### 9.1.1 UX Metaphors
+
+All feature work should use an existing UX metaphor when one fits:
+
+| Metaphor                | Purpose                                                                |
+| ----------------------- | ---------------------------------------------------------------------- |
+| **Dashboard**           | Authenticated hub and primary navigation surface                       |
+| **Widget**              | Dashboard surface unit for status, data, and action entry points       |
+| **Abstraction Manager** | Standard domain list/detail management experience                      |
+| **Workflow Manager**    | Guided, sequenced task surface for operational work                    |
+| **Custom Full Device**  | Purpose-built UX when no existing metaphor fits the feature's workflow |
+
+#### 9.1.2 Auth Guard
 
 The shell root reads `SessionState.store.isAuthenticated` before rendering any authenticated content. Unauthenticated users are redirected to login. This is the only authorization check in the UX layer — all data authorization is enforced by RLS at the database layer.
 
-#### 9.1.2 Dashboard as Primary Navigation
+#### 9.1.3 Dashboard as Primary Navigation
 
 There is no navigation menu in any app. The dashboard is the primary interface and the primary navigation surface. Dashboard widgets and cards are the entry points into domain pages. Navigation is:
 
