@@ -51,7 +51,7 @@ No tool, human, or AI may override this ordering.
 3. Correct output does not imply correct authority.
 4. Passing tests does not imply architectural permission.
 
-All work operates under the Three-Role Model defined in [Model of Development with AI Coding](markdown.html?documentation/tvk-mod-3rm.md).
+All work operates under the Three-Role Model defined in [Model of Development with AI Coding](https://seasoncomputing/markdown.html?documentation/tvk-mod-3rm.md).
 
 | Reasoning            | Role                               |
 | -------------------- | ---------------------------------- |

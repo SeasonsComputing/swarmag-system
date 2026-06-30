@@ -4,7 +4,7 @@
 
 The swarmAg Operations System (`swarmAg System`) supports operations across aerial and ground agricultural services. The monorepo is organized around a typed domain core, backend/runtime infrastructure, and user experience applications.
 
-Primary architectural context lives in `documentation/architecture-core.md`.
+Primary architectural context lives in `documentation/architecture/architecture-core.md`.
 
 ## 1. Repository Structure
 
@@ -16,26 +16,32 @@ Primary architectural context lives in `documentation/architecture-core.md`.
 | `source/`        | Source code organized into layers                 |
 | `supabase/`      | Supabase project configuration and local metadata |
 
-### 1.2 Documentation (`documentation/`)
+### 1.2 Governance and Documentation
 
-| Category     | File                          | Description                                             |
-| ------------ | ----------------------------- | ------------------------------------------------------- |
-| Architecture | `architecture-core.md`        | Core architecture principles and system-wide structure  |
-|              | `architecture-back.md`        | Backend architecture, boundaries, and runtime model     |
-|              | `architecture-ux.md`          | UX architecture and frontend layering                   |
-|              | `architecture-devops.md`      | Environment configuration, packaging, and guard suite   |
-| Convention   | `style-guide.md`              | Code and content style conventions                      |
-| Domain       | `domain-model.md`             | Domain solution-space concepts and invariants           |
-|              | `domain-seed-data.md`         | Controlled vocabularies and canonical seed data         |
-|              | `domain-data-dictionary.md`   | Normalized implementation-ready type and relation model |
-|              | `domain-archetypes.md`        | Domain implementation patterns for archetype artifacts  |
-| UX           | `ux-design-language.md`       | Visual language, interaction grammar, and layout rules  |
-|              | `ux-components-guide.md`      | Full UX component guide and usage contracts             |
-|              | `ux-components-guide-lite.md` | Lightweight UX component reference                      |
-|              | `ux-components-internals.md`  | UX component implementation internals                   |
-| AI Prompt    | `genesis-domain-sdk.md`       | Prompt contract for domain sdk genesis                  |
-|              | `genesis-ux-scaffold.md`      | Prompt contract for UX applications scaffolding         |
-| Application  | `user-stories.md`             | Cross-application user stories and scenario narratives  |
+| Category     | File                          | Description                                               |
+| ------------ | ----------------------------- | --------------------------------------------------------- |
+| Governance   | `AGENTS.md`                   | AI agent protocol, operating modes, and production gates  |
+|              | `CONSTITUTION.md`             | Highest architectural authority and role boundaries       |
+|              | `STYLE-GUIDE.md`              | Binding code and content style conventions                |
+| Architecture | `architecture-core.md`        | Core architecture principles and system-wide structure    |
+|              | `architecture-back.md`        | Backend architecture, boundaries, and runtime model       |
+|              | `architecture-ux.md`          | UX architecture and frontend layering                     |
+|              | `architecture-devops.md`      | Environment configuration, packaging, and guard suite     |
+| Domain       | `domain-model.md`             | Domain solution-space concepts and invariants             |
+|              | `domain-seed-data.md`         | Controlled vocabularies and canonical seed data           |
+|              | `domain-data-dictionary.md`   | Normalized implementation-ready type and relation model   |
+|              | `domain-archetypes.md`        | Domain implementation patterns for archetype artifacts    |
+| UX           | `ux-design-language.md`       | Visual language, interaction grammar, and layout rules    |
+|              | `ux-components-guide.md`      | Full UX component guide and usage contracts               |
+|              | `ux-components-guide-lite.md` | Lightweight UX component reference                        |
+|              | `ux-components-internals.md`  | UX component implementation internals                     |
+|              | `user-stories.md`             | Cross-application user stories and scenario narratives    |
+| Agent        | `genesis-domain-sdk.md`       | Prompt contract for domain sdk genesis                    |
+|              | `genesis-ux-scaffold.md`      | Prompt contract for UX applications scaffolding           |
+|              | `genesis-ux-dashboard.md`     | Prompt contract for UX applications dashboard scaffolding |
+| Project      | `{yymmdd}-{topic}-design.md`  | Approved or proposed project design decisions             |
+|              | `{yymmdd}-{topic}-handoff.md` | Session transition notes and remaining work context       |
+|              | `{yymmdd}-{topic}-tasks.md`   | Project implementation checklist and verification status  |
 
 ### 1.3 Source Layers (`source/`)
 
@@ -141,7 +147,7 @@ See `architecture-core.md` section 6 for complete configuration management detai
 
 The examples below use `dot` as a local shell alias for `deno task`.
 `deno.jsonc` is the authoritative task registry. Detailed workflow contracts live
-in `documentation/architecture-devops.md`.
+in `documentation/architecture/architecture-devops.md`.
 
 ### 3.1 Validation
 
@@ -224,7 +230,7 @@ See `architecture-devops.md §14` for output shape, error conditions, and naming
 | Keep `deno.jsonc` authoritative           | Task tables in this README reflect the task surface in `deno.jsonc`.       |
 | Run checks before handoff                 | Use `dot check`; add package verification when packaging is touched.       |
 | Respect generated artifacts               | Do not commit `.env` files, build outputs, package zips, or local secrets. |
-| Use architecture docs for depth           | Keep detailed rationale in `documentation/architecture-*.md`.              |
+| Use architecture docs for depth           | Keep detailed rationale in `documentation/architecture/architecture-*.md`. |
 
 ## 5. Working Sessions
 

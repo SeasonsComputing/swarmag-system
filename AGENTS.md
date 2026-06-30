@@ -18,13 +18,13 @@ Every session begins with `CONSTITUTION.md` (v2.0). All dialog and production mu
 
 Topic context combines the base context with any declared or observed topic context. Ingest applicable documents in the listed order before production.
 
-| Context              | Documents                                                                                                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Base                 | 1. `documentation/domain-model.md`<br>2. `documentation/architecture-core.md`<br>3. `documentation/style-guide.md`                                                         |
-| Domain internals     | 1. `documentation/domain-seed-data.md`<br>2. `documentation/domain-data-dictionary.md`<br>3. `documentation/domain-archetypes.md`                                          |
-| UX internals         | 1. `documentation/architecture-ux.md`<br>2. `documentation/ux-design-language.md`<br>3. `documentation/ux-components-guide.md`                                             |
-| Application features | 1. `documentation/architecture-ux.md`<br>2. `documentation/architecture-devops.md`<br>3. `documentation/ux-components-guide-lite.md`<br>4. `documentation/user-stories.md` |
-| DevOps               | 1. `documentation/architecture-back.md`<br>2. `documentation/architecture-ux.md`<br>3. `documentation/architecture-devops.md`                                              |
+| Context              | Documents                                                                                                                                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base                 | 1. `documentation/domain/domain-model.md`<br>2. `documentation/architecture/architecture-core.md`<br>3. `STYLE-GUIDE.md`                                                                                   |
+| Domain internals     | 1. `documentation/domain/domain-seed-data.md`<br>2. `documentation/domain/domain-data-dictionary.md`<br>3. `documentation/domain/domain-archetypes.md`                                                     |
+| UX internals         | 1. `documentation/architecture/architecture-ux.md`<br>2. `documentation/ux/ux-design-language.md`<br>3. `documentation/ux/ux-components-guide.md`                                                          |
+| Application features | 1. `documentation/architecture/architecture-ux.md`<br>2. `documentation/architecture/architecture-devops.md`<br>3. `documentation/ux/ux-components-guide-lite.md`<br>4. `documentation/ux/user-stories.md` |
+| DevOps               | 1. `documentation/architecture/architecture-back.md`<br>2. `documentation/architecture/architecture-ux.md`<br>3. `documentation/architecture/architecture-devops.md`                                       |
 
 **For all other sessions:**
 
@@ -86,7 +86,7 @@ For code-generation or regeneration tasks, include:
 
 ## 3. Style-guide Conformance
 
-For every production task in this repository, `documentation/style-guide.md` is a hard gate.
+For every production task in this repository, `STYLE-GUIDE.md` is a hard gate.
 
 ### 3.1 Non-negotiable Rule
 
@@ -94,7 +94,7 @@ Treat any style-guide violation as a correctness failure. Do not proceed while v
 
 ### 3.2 Block checks
 
-- Enforce `documentation/style-guide.md` exactly as written.
+- Enforce `STYLE-GUIDE.md` exactly as written.
 - Treat `source/devops/guards/*.ts` as the executable enforcement layer for style and architecture checks.
 - If foundation rules change, update guards/tasks; do not fork rules into operational prompt docs.
 
