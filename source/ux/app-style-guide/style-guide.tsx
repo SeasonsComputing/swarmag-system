@@ -148,6 +148,7 @@ export const StyleGuide = (): UiComponent => {
   const [radioValue, setRadioValue] = createSignal<RadioValue>('aerial')
   const [togglePressed, setTogglePressed] = createSignal(true)
   const [viewMode, setViewMode] = createSignal<ViewMode>('map')
+  const [serviceStatus, setServiceStatus] = createSignal<ServiceStatus>('ready')
   const [tab, setTab] = createSignal<Tab>('assessment')
   const [tabScroll, setTabScroll] = createSignal<TabScroll>('assessment')
 
@@ -515,6 +516,34 @@ export const StyleGuide = (): UiComponent => {
                   />
                 </UiField>
               </UiLayout>
+              <form onSubmit={event => event.preventDefault()}>
+                <UiFieldset legend='Controlled form select'>
+                  <UiLayout>
+                    <UiField label='Controlled select' for='controlled-service-status'>
+                      <UiSingleSelect
+                        name='controlled-service-status'
+                        placeholder='Select service status'
+                        value={serviceStatus()}
+                        onChange={value => setServiceStatus(value as ServiceStatus)}
+                        error={selectError()}
+                        options={STATUSES}
+                      />
+                    </UiField>
+                    <UiField label='Default select' for='default-service-status'>
+                      <UiSingleSelect
+                        name='default-service-status'
+                        placeholder='Select service status'
+                        defaultValue='Ready'
+                        error={selectError()}
+                        options={STATUSES}
+                      />
+                    </UiField>
+                    <UiFormActions>
+                      <UiButton type='submit'>Submit</UiButton>
+                    </UiFormActions>
+                  </UiLayout>
+                </UiFieldset>
+              </form>
             </UiFieldset>
             <UiFieldset legend='Multi-select'>
               <UiMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />

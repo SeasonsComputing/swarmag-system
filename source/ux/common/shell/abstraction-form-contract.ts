@@ -21,6 +21,7 @@ export interface AbstractionFormContract<T extends Instance> {
   listColumns: string[]
   list: () => T[]
   isListLoading: () => boolean
+  cancel?: () => void
   actions: AbstractionAction<T>[]
   renderListCells: (item: T) => UiComponent
   renderForm: (item: T | null, onClose: () => void) => UiComponent

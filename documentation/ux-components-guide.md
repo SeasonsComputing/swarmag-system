@@ -740,27 +740,30 @@ Compact icon action button for dense surfaces such as tables and toolbars.
 
 Use for row-level or surface-level actions where space is constrained and an
 icon communicates intent. Always provide a `label` — it is used as `aria-label`
-and is revealed on hover and focus. Use `variant='danger'` for destructive
-actions.
+and is revealed on hover and focus by default. Use `labelMode='visible'` when
+the action sits in sparse command chrome and the label should be part of the
+hit target. Use `variant='danger'` for destructive actions.
 
 **Props**
 
 Extends native button attributes, excluding styling and semantic hook props.
 
-| Prop       | Type                                                                      | Default | Description                                |
-| ---------- | ------------------------------------------------------------------------- | ------- | ------------------------------------------ |
-| `icon`     | `'back' \| 'check' \| 'cross' \| 'delete' \| 'edit' \| 'eject' \| 'plus'` | —       | Icon to display.                           |
-| `label`    | `string`                                                                  | —       | Accessible label; revealed on hover/focus. |
-| `variant`  | `'default' \| 'danger'`                                                   | unset   | Visual/action priority.                    |
-| `error`    | `boolean`                                                                 | `false` | Emits error state.                         |
-| `loading`  | `boolean`                                                                 | `false` | Emits loading state; disables button.      |
-| `disabled` | `boolean`                                                                 | `false` | Native disabled behavior.                  |
+| Prop        | Type                                                                      | Default    | Description                                       |
+| ----------- | ------------------------------------------------------------------------- | ---------- | ------------------------------------------------- |
+| `icon`      | `'back' \| 'check' \| 'cross' \| 'delete' \| 'edit' \| 'eject' \| 'plus'` | —          | Icon to display.                                  |
+| `label`     | `string`                                                                  | —          | Accessible label and optional visible label text. |
+| `labelMode` | `'reveal' \| 'visible'`                                                   | `'reveal'` | Label presentation.                               |
+| `variant`   | `'default' \| 'danger'`                                                   | unset      | Visual/action priority.                           |
+| `error`     | `boolean`                                                                 | `false`    | Emits error state.                                |
+| `loading`   | `boolean`                                                                 | `false`    | Emits loading state; disables button.             |
+| `disabled`  | `boolean`                                                                 | `false`    | Native disabled behavior.                         |
 
 `loading` and `disabled` both disable the rendered button and suppress tab focus.
 
 **Emitted Attributes**
 
-`data-ui='action-button'`, `data-ui-icon`, `data-ui-state`, `data-ui-variant`.
+`data-ui='action-button'`, `data-ui-icon`, `data-ui-label-mode`,
+`data-ui-state`, `data-ui-variant`.
 
 **Example**
 
@@ -768,6 +771,7 @@ Extends native button attributes, excluding styling and semantic hook props.
 <UiActionButton icon='edit' label='Edit user' onClick={onEdit} />
 <UiActionButton icon='eject' label='Eject user' onClick={onEject} />
 <UiActionButton icon='delete' label='Delete record' variant='danger' onClick={onDelete} />
+<UiActionButton icon='check' label='Save' labelMode='visible' type='submit' />
 ```
 
 ## 4. Display Controls

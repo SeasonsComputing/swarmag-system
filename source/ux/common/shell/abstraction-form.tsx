@@ -53,21 +53,33 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
     setSelected(null)
     setMode('list')
   }
+  const closeEditor = (): void => clearSelection()
+  const cancelDialog = (): void => props.provider.cancel?.() ?? closeEditor()
   const editorTitle = (): string =>
-    selected() ? `Edit ${props.provider.entityLabel}` : `New ${props.provider.entityLabel}`
+    selected()
+      ? `Edit ${props.provider.entityLabel}`
+      : `New ${props.provider.entityLabel}`
 
   return (
     <div data-feat='abstraction-form' data-feat-mode={mode()}>
-      <h2 data-feat='abstraction-form-title'>{props.provider.formTitle}</h2>
+      <header data-feat='abstraction-form-title-row'>
+        <h1 data-feat='abstraction-form-title'>{props.provider.formTitle}</h1>
+        <UiActionButton icon='cross' label='Cancel' labelMode='visible' onClick={cancelDialog} />
+      </header>
       <section data-feat='abstraction-form-list'>
         <UiCard elevation='raised'>
           <header data-feat='abstraction-form-card-header'>
-            <h3 data-feat='abstraction-form-card-title'>{props.provider.entityLabel}s</h3>
+            <h2 data-feat='abstraction-form-card-title'>{props.provider.entityLabel}s</h2>
             <div data-feat='abstraction-form-card-actions'>
-              <UiActionButton icon='plus' label={`New ${props.provider.entityLabel}`} onClick={onNew} />
+              <UiActionButton
+                icon='plus'
+                label={`New ${props.provider.entityLabel}`}
+                labelMode='visible'
+                onClick={onNew}
+              />
             </div>
           </header>
-          <div data-feat='abstraction-form-card-body'>
+          <div data-feat='abstraction-form-card-body' data-feat-region='list-body'>
             <Show
               when={!props.provider.isListLoading()}
               fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
@@ -125,21 +137,23 @@ export const AbstractionForm = <T extends Instance>(props: AbstractionFormProps<
           <header data-feat='abstraction-form-card-header'>
             <div data-feat='abstraction-form-card-title-group'>
               <div data-feat='abstraction-form-collapse-action'>
-                <UiActionButton
-                  icon='back'
-                  label={`${props.provider.entityLabel}s`}
-                  onClick={() => setMode('list')}
-                />
+                <span data-feat='abstraction-form-back-command'>
+                  <UiActionButton
+                    icon='back'
+                    label={`${props.provider.entityLabel}s`}
+                    onClick={() => setMode('list')}
+                  />
+                  <span aria-hidden='true' data-feat='abstraction-form-command-divider' />
+                </span>
               </div>
-              <h3 data-feat='abstraction-form-card-title'>{editorTitle()}</h3>
+              <h2 data-feat='abstraction-form-card-title'>{editorTitle()}</h2>
             </div>
             <div data-feat='abstraction-form-card-actions'>
-              <UiActionButton icon='cross' label='Cancel' onClick={clearSelection} />
-              <UiActionButton icon='check' label='Save' type='submit' form='abstraction-panel-form' />
+              <UiActionButton icon='check' label='Save' labelMode='visible' type='submit' form='abstraction-panel-form' />
             </div>
           </header>
-          <div data-feat='abstraction-form-card-body'>
-            {props.provider.renderForm(selected(), clearSelection)}
+          <div data-feat='abstraction-form-card-body' data-feat-region='editor-body'>
+            {props.provider.renderForm(selected(), closeEditor)}
           </div>
         </UiCard>
       </section>
