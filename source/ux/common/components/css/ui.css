@@ -1442,7 +1442,7 @@
 }
 
 [data-ui='footer-logo'] {
-  filter: var(--sa-filter-mono);
+  filter: var(--sa-footer-logo-filter);
   height: 2rem;
   width: auto;
 }

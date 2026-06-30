@@ -21,6 +21,7 @@ import { useDashboard, type WidgetComponent } from './dashboard-provider.tsx'
 
 import './dashboard.css'
 import footerLogo from '@ux/common/assets/logos/swarmag-logo-wordmark.png'
+import headerLogo from '@ux/common/assets/logos/swarmag-ops-logo-flat.png'
 
 /** Shared shell dashboard component. */
 export const Dashboard = (): UiComponent => {
@@ -32,9 +33,16 @@ export const Dashboard = (): UiComponent => {
   return (
     <section data-feat='dashboard' data-feat-layout={dashboard.settings.layout}>
       <header data-feat='dashboard-header'>
-        <For each={dashboard.header.widgets}>
-          {widget => <DashboardWidget widget={widget} />}
-        </For>
+        <div data-feat='dashboard-header-contents'>
+          <div data-feat='dashboard-header-brand'>
+            <img data-feat='dashboard-header-logo' src={headerLogo} alt='swarmAg' width={64} height={64} />
+          </div>
+          <div data-feat='dashboard-header-widgets'>
+            <For each={dashboard.header.widgets}>
+              {widget => <DashboardWidget widget={widget} />}
+            </For>
+          </div>
+        </div>
       </header>
 
       <div data-feat='dashboard-body'>

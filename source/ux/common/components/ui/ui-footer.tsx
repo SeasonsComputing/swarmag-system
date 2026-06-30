@@ -6,9 +6,9 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Footer primitive that renders a caller-supplied logo centered with the mono
-filter applied. Accounts for mobile browser chrome via safe-area-inset. Logo
-asset stays in the app layer — the control remains domain-free.
+Footer primitive that renders a caller-supplied logo centered with theme chrome.
+Accounts for mobile browser chrome via safe-area-inset. Logo asset stays in the
+app layer — the control remains domain-free.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
