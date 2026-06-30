@@ -22,7 +22,7 @@ only specifies the component implementation boundary:
 Component-specified tokens live in `themes.css` and are consumed by `ui.css`, shell CSS, or
 component-local CSS.
 
-| Family         | Tokens                                                        | Consumer                      |
+| Component      | Tokens                                                        | Consumer                      |
 | -------------- | ------------------------------------------------------------- | ----------------------------- |
 | Button         | `--sa-button-*`                                               | `UiButton`                    |
 | Shared control | `--sa-control-shadow-error`                                   | Input-like error treatments   |
@@ -40,6 +40,7 @@ component-local CSS.
 | Alert          | `--sa-alert-*`                                                | Alert treatment               |
 | Separator      | `--sa-separator-*`                                            | Separator primitive           |
 | Shell          | `--sa-shell-*`                                                | Header and footer chrome      |
+| Footer         | `--sa-footer-*`                                               | Footer logo treatment         |
 
 Shell chrome is a first-class component token family. It lets app frame surfaces diverge from
 card surfaces without changing generic panel or card roles.

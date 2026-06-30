@@ -280,6 +280,7 @@ component code or selector structure.
 | Avatar         | `--sa-avatar-*`                                               | Avatar marker                 |
 | Separator      | `--sa-separator-*`                                            | Separator primitive           |
 | Shell          | `--sa-shell-*`                                                | Header and footer chrome      |
+| Footer         | `--sa-footer-*`                                               | Footer logo treatment         |
 
 Shell chrome is intentionally theme-owned. It allows app frame surfaces to diverge from generic
 card and panel surfaces while still using the same design-language token contract.
