@@ -94,7 +94,7 @@ const logoutRoute = createRoute({
 const aboutRoute = makeDialogRoute(rootRoute, {
   path: '/about',
   component: AboutBox,
-  dialog: { size: 'content' }
+  dialog: { size: 'content', dismissible: true }
 })
 
 const dashboardRoute = createRoute({

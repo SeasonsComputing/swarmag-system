@@ -34,6 +34,7 @@ export type ShellDialogRoute = {
 /** Shell dialog presentation options. */
 export type ShellDialogOptions = {
   size?: UiDialogSize
+  dismissible?: boolean
 }
 
 /**
@@ -61,7 +62,12 @@ export function makeDialogRoute(rootRoute: AnyRoute, dialog: ShellDialogRoute): 
         <AuthGuard>
           <Content>
             <Dashboard />
-            <UiDialog open size={dialog.dialog?.size} onOpenChange={onOpenChange}>
+            <UiDialog
+              open
+              size={dialog.dialog?.size}
+              dismissible={dialog.dialog?.dismissible}
+              onOpenChange={onOpenChange}
+            >
               <DialogComponent onCancel={close} />
             </UiDialog>
           </Content>

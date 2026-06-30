@@ -620,6 +620,7 @@ controlled mode when open state is owned externally.
 | `children`       | `UiComponent`                         | no       | unset         | Dialog content.                                  |
 | `open`           | `boolean`                             | no       | unset         | Controlled open state.                           |
 | `defaultOpen`    | `boolean`                             | no       | unset         | Initial open state.                              |
+| `dismissible`    | `boolean`                             | no       | `false`       | Allows outside clicks to close the dialog.       |
 | `onOpenChange`   | `(open: boolean) => void`             | no       | unset         | Receives open state.                             |
 | `disabled`       | `boolean`                             | no       | `false`       | Disables the trigger.                            |
 | `error`          | `boolean`                             | no       | `false`       | Emits error state.                               |

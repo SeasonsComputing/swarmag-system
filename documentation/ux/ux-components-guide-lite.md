@@ -265,7 +265,7 @@ Omit `trigger` for controlled mode and manage `open`/`onOpenChange`
 externally, including route-based shell dialogs.
 
 Key props: `trigger`, `triggerVariant`, `size`, `open`, `defaultOpen`,
-`onOpenChange`, `loading`, `error`, `disabled`.
+`dismissible`, `onOpenChange`, `loading`, `error`, `disabled`.
 
 Sizes: `content` for compact content, `panel` for standard forms, and
 `workbench` for management surfaces such as list/edit flows.

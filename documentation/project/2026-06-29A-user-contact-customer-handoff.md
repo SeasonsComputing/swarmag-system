@@ -105,7 +105,7 @@ Failures were in downstream tests/fixtures/UX:
 - `source/tests/fixtures/user-samples.ts` needs `notes` and `preferredChannel`.
 - `source/tests/fixtures/customer-samples.ts` still uses removed `contacts`.
 - `source/tests/fixtures/fixtures-test.ts` still asserts embedded contacts and primary contact flags.
-- `source/ux/app-admin/users/users-form.tsx` creates `UserCreate` without `notes` and `preferredChannel`.
+- `source/ux/app-admin/users/user-manager.tsx` creates `UserCreate` without `notes` and `preferredChannel`.
 
 ## 5. Current Git State
 
@@ -153,15 +153,15 @@ Expected work:
 
 Update:
 
-- `source/ux/app-admin/users/users-form.tsx`
-- likely `source/ux/common/shell/abstraction-form.tsx` for overflow behavior
+- `source/ux/app-admin/users/user-manager.tsx`
+- likely `source/ux/common/shell/abstraction-manager.tsx` for overflow behavior
 
 Expected work:
 
-- Users form exposes `'customer'` role.
-- Users form supports editable notes.
-- Users form includes preferred channel.
-- `AbstractionForm` supports long-form overflow with grouped vertical scroll and stable actions.
+- User manager exposes `'customer'` role.
+- User manager supports editable notes.
+- User manager includes preferred channel.
+- `AbstractionManager` supports long-form overflow with grouped vertical scroll and stable actions.
 
 ### Domain Internals — User Edge Functions
 

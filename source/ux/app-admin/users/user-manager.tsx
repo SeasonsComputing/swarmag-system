@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Users form                                                                   ║
+║ User manager                                                                 ║
 ║ User management provider.                                                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
@@ -34,23 +34,23 @@ import {
   UiToggleGroup,
   UiToggleItem
 } from '@ux/common/components/ui'
-import type { AbstractionFormContract } from '@ux/common/shell/abstraction-form-contract.ts'
-import { AbstractionForm } from '@ux/common/shell/abstraction-form.tsx'
+import type { AbstractionManagerContract } from '@ux/common/shell/abstraction-manager-contract.ts'
+import { AbstractionManager } from '@ux/common/shell/abstraction-manager.tsx'
 
-/** Loads the user list for the management form. */
+/** Loads the user list for the user manager. */
 async function loadUsers(): Promise<User[]> {
   const result = await api.Users.list({ limit: 100 })
   return result.data
 }
 
-/** Props for the user management form route modal. */
-export type UsersFormProps = {
+/** Props for the user manager route modal. */
+export type UserManagerProps = {
   onCancel: () => void
 }
 
-/** User management form component. */
+/** User manager component. */
 const USERS_QUERY_KEY = ['users'] as const
-export const UsersForm = (props: UsersFormProps): UiComponent => {
+export const UserManager = (props: UserManagerProps): UiComponent => {
   const queryClient = useQueryClient()
   const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY, queryFn: loadUsers }))
   const deleteUserMutation = createMutation(() => ({
@@ -63,7 +63,7 @@ export const UsersForm = (props: UsersFormProps): UiComponent => {
     await deleteUserMutation.mutateAsync(user.id)
   }
 
-  const usersForm: AbstractionFormContract<User> = {
+  const userManager: AbstractionManagerContract<User> = {
     formTitle: 'User Manager',
     entityLabel: 'User',
     listColumns: ['Name', 'Email', 'Roles', 'Status'],
@@ -93,7 +93,7 @@ export const UsersForm = (props: UsersFormProps): UiComponent => {
       <Show when={usersQuery.error}>
         <UiAlert variant='danger'>{errorMessage(usersQuery.error)}</UiAlert>
       </Show>
-      <AbstractionForm provider={usersForm} />
+      <AbstractionManager provider={userManager} />
     </div>
   )
 }
