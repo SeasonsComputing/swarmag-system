@@ -53,7 +53,6 @@ import { api } from '@ux/api'
 import { DashboardState } from '@ux/common/stores/dashboard-state.ts'
 import { AboutBox } from './about-box.tsx'
 import { AuthGuard } from './auth-guard.tsx'
-import { Content } from './content.tsx'
 import { DashboardProvider } from './dashboard-provider.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
@@ -102,9 +101,9 @@ const dashboardRoute = createRoute({
   path: '/dashboard',
   component: () => (
     <AuthGuard>
-      <Content>
+      <main>
         <Dashboard />
-      </Content>
+      </main>
     </AuthGuard>
   )
 })

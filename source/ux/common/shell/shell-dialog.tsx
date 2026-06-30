@@ -18,7 +18,6 @@ makeDialogRoute       Create an authenticated dialog route.
 import { type AnyRoute, createRoute, useNavigate } from '@tanstack/solid-router'
 import { type UiComponent, UiDialog, type UiDialogSize } from '@ux/common/components/ui'
 import { AuthGuard } from './auth-guard.tsx'
-import { Content } from './content.tsx'
 import { Dashboard } from './dashboard.tsx'
 
 /** Component contract for shell-owned dialog routes. */
@@ -60,7 +59,7 @@ export function makeDialogRoute(rootRoute: AnyRoute, dialog: ShellDialogRoute): 
 
       return (
         <AuthGuard>
-          <Content>
+          <main>
             <Dashboard />
             <UiDialog
               open
@@ -70,7 +69,7 @@ export function makeDialogRoute(rootRoute: AnyRoute, dialog: ShellDialogRoute): 
             >
               <DialogComponent onCancel={close} />
             </UiDialog>
-          </Content>
+          </main>
         </AuthGuard>
       )
     }
