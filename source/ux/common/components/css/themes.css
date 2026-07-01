@@ -42,7 +42,7 @@
   --sa-card-stripe-height: 3px;
 
   /* Fieldset */
-  --sa-fieldset-bg: transparent;
+  --sa-fieldset-bg: var(--sa-bg-control);
   --sa-fieldset-border: var(--sa-border-card);
   --sa-fieldset-shadow: var(--sa-shadow-sm);
 
@@ -169,6 +169,9 @@
   --sa-input-bg-hover: var(--sa-bg-hover);
   --sa-input-bg-focus: var(--sa-bg-hover);
   --sa-input-bg-disabled: oklch(18% 0.01 264.5);
+
+  /** Fieldset */
+  --sa-fieldset-bg: transparent;
 
   /* Control (shared error state) */
   --sa-control-shadow-error: oklch(var(--sa-lch-danger) / 0.22);
