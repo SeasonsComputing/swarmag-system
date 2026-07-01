@@ -26,6 +26,7 @@
   line-height: 1;
   margin: 0;
   min-inline-size: 0;
+  font-size: var(--sa-font-size-lg);
 }
 
 [data-feat='abstraction-manager-list'] {
@@ -73,6 +74,7 @@
 [data-feat='abstraction-manager-card-title'] {
   line-height: 1;
   margin: 0;
+  font-size: var(--sa-font-size-md);
 }
 
 [data-feat='abstraction-manager-card-actions'] {

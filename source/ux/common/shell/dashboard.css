@@ -44,9 +44,9 @@
 }
 
 [data-feat='dashboard-header-logo'] {
-  block-size: calc(var(--widget-height-short) - var(--sa-space-xs));
+  block-size: calc(var(--widget-height-short) - var(--sa-rhythm-gap));
+  inline-size: calc(var(--widget-height-short) - var(--sa-rhythm-gap));
   border-radius: var(--sa-radius-sm);
-  inline-size: calc(var(--widget-height-short) - var(--sa-space-xs));
 }
 
 [data-feat='dashboard-header-widgets'] {

@@ -161,7 +161,7 @@
 
   /* Button */
   --sa-button-bg-primary: var(--sa-color-primary);
-  --sa-button-color-primary: var(--sa-shell-bg);
+  --sa-button-color-primary: oklch(0.19 0.01 186.65 / 0.65);
   --sa-button-bg-primary-hover: var(--sa-color-primary);
 
   /* Input */
