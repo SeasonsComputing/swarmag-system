@@ -150,8 +150,11 @@ import { api } from '@ux/api'
 // Auth
 await api.Auth.signInWithOtp({ email })
 
-// CRUD — direct to Supabase
+// Users API
 const user = await api.Users.get(userId)
+const canLogin = await api.Users.hasAccess({ email })
+
+// CRUD — direct to Supabase where no orchestration is required
 const jobs = await api.Jobs.list()
 
 // Offline — IndexedDB
@@ -176,37 +179,48 @@ All entries in `source/ux/api/api.ts`:
 
 #### 7.2.2 Domain Persistence Singletons
 
-| Singleton       | Purpose                                            |
-| --------------- | -------------------------------------------------- |
-| `api.Users`     | User CRUD via Supabase                             |
-| `api.Assets`    | Asset CRUD via Supabase                            |
-| `api.Chemicals` | Chemical CRUD via Supabase                         |
-| `api.Customers` | Customer CRUD via Supabase                         |
-| `api.Services`  | Service CRUD via Supabase                          |
-| `api.Workflows` | Workflow CRUD via Supabase                         |
-| `api.Jobs`      | Job CRUD via Supabase                              |
-| `api.JobsLocal` | Job aggregate CRUD via IndexedDB (field execution) |
+| Singleton       | Purpose                                                   |
+| --------------- | --------------------------------------------------------- |
+| `api.Users`     | User API; read/list direct, privileged mutations via edge |
+| `api.Assets`    | Asset CRUD via Supabase                                   |
+| `api.Chemicals` | Chemical CRUD via Supabase                                |
+| `api.Customers` | Customer CRUD via Supabase                                |
+| `api.Services`  | Service CRUD via Supabase                                 |
+| `api.Workflows` | Workflow CRUD via Supabase                                |
+| `api.Jobs`      | Job CRUD via Supabase                                     |
+| `api.JobsLocal` | Job aggregate CRUD via IndexedDB (field execution)        |
 
 #### 7.2.3 Domain Operations
 
-| Operation            | Purpose                                                             |
-| -------------------- | ------------------------------------------------------------------- |
-| `api.userHasAccess`  | Check whether an email belongs to a registered, active swarmAg user |
-| `api.deepCloneJob`   | Clone job aggregate to IndexedDB for field execution                |
-| `api.uploadJobLogs`  | Bulk append field logs to remote                                    |
-| `api.createJobTitle` | Derive display title string from a `JobDefinition`                  |
+| Operation            | Purpose                                              |
+| -------------------- | ---------------------------------------------------- |
+| `api.deepCloneJob`   | Clone job aggregate to IndexedDB for field execution |
+| `api.uploadJobLogs`  | Bulk append field logs to remote                     |
+| `api.createJobTitle` | Derive display title string from a `JobDefinition`   |
 
-**`api.userHasAccess`**
+**`api.Users`**
 
 ```typescript
-api.userHasAccess.run({ email: string }): Promise<boolean>
+api.Users.get(id: Id): Promise<User>
+api.Users.list(options?: ListOptions): Promise<ListResult<User>>
+api.Users.create(input: UserCreate): Promise<User>
+api.Users.update(input: UserUpdate): Promise<User>
+api.Users.delete(id: Id): Promise<DeleteResult>
+api.Users.eject(id: Id): Promise<User>
+api.Users.hasAccess(input: { email: string }): Promise<boolean>
 ```
 
-Returns whether the submitted email belongs to a registered, active swarmAg user.
-This is a lightweight Supabase RPC business rule used before OTP delivery so the
-login flow does not send one-time codes to unknown or inactive users.
+`api.Users` is the user topic boundary. Callers do not know whether an operation
+uses direct Supabase CRUD, an RPC, or a Supabase Edge function.
 
-The operation surfaces through `ApiBusRuleContract<{ email: string }, boolean>`.
+`get` and `list` use the direct Supabase table client. `hasAccess` hides the
+existing `user_has_access` RPC behind the Users topic API. `create`, `update`,
+`delete`, and `eject` invoke authenticated Supabase Edge functions because they
+must synchronize `public.users` with Supabase Auth.
+
+`hasAccess` returns whether the submitted email belongs to a registered, active
+swarmAg user. It is used before OTP delivery so the login flow does not send
+one-time codes to unknown or inactive users.
 
 **`api.deepCloneJob`**
 
@@ -441,7 +455,7 @@ All apps use passwordless email OTP. No passwords are stored or transmitted.
 
 ```text
 user submits email
-  → api.userHasAccess.run({ email })
+  → api.Users.hasAccess({ email })
   → if false: login displays 'Email address not registered' — OTP flow does not proceed
   → api.Auth.sendOtp(email)
   → Supabase delivers one-time code to email address
