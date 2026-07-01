@@ -63,7 +63,13 @@ Edge functions handle **orchestration only** — complex multi-step operations t
 - Simple CRUD operations (use direct Supabase SDK client)
 - Read-only queries (use direct Supabase SDK client)
 - Client-side validation (use domain validators)
-- Authorization (use RLS policies)
+- General application authorization that belongs in RLS policies
+
+Privileged orchestration is the exception to the final rule. When an edge
+function uses elevated credentials, the function must verify the authenticated
+caller and perform the required domain authorization check before privileged
+work begins. RLS remains authoritative for direct database access; service-role
+orchestration must not become an open bypass.
 
 ### 3.2 Edge Function Patterns
 
@@ -124,12 +130,14 @@ Edge functions **do**:
 - Use `Supabase.client()` for database access
 - Use domain adapters for serialization
 - Use domain validators for input validation
+- Verify the caller and check required authorization before privileged work
 
 Edge functions **do not**:
 
 - Contain business logic (that lives in domain)
-- Implement authorization (use RLS policies)
+- Replace RLS for ordinary database authorization
 - Duplicate CRUD operations (use direct SDK)
+- Expose open endpoints for authenticated user-management operations
 
 ### 3.4 Platform Requirements
 
@@ -207,6 +215,58 @@ supplies the UUID v7 from application code, and every backend path that creates 
 auth/domain user state must reuse that UUID for both `auth.users.id` and `public.users.id`.
 The database must not generate the domain user ID.
 
+The settled synchronization problem for user edge functions is attribute
+synchronization, not UUID synchronization. The UUID invariant already exists:
+`auth.users.id = public.users.id`. User edge functions preserve that invariant
+while synchronizing mutable authentication attributes when domain user
+attributes change.
+
+The primary attribute synchronization case is email. When
+`public.users.primary_email` changes through the user-management API,
+`auth.users.email` must be updated so passwordless OTP continues to target the
+same domain user.
+
+### 4.6 User Management Edge Functions
+
+User creation, update, delete, and eject require Supabase Auth admin operations
+and therefore run through authenticated Supabase Edge functions. They are
+user-invoked privileged operations, not open endpoints.
+
+Every user-management edge function must:
+
+1. Require an authenticated caller JWT.
+2. Resolve the caller's domain `User`.
+3. Require the caller to be active and have the `administrator` role.
+4. Validate the request payload with the domain validator for the requested
+   operation.
+5. Use the caller-scoped client for ordinary domain reads where RLS should
+   apply.
+6. Use the service-role client only for privileged orchestration such as
+   `auth.admin.*`.
+7. Return a typed API response without exposing internal error details.
+
+The required edge functions are:
+
+| Function      | Request      | Response       | Semantics                                                        |
+| ------------- | ------------ | -------------- | ---------------------------------------------------------------- |
+| `user-create` | `UserCreate` | `User`         | Create Auth user, then create `public.users`; compensate on fail |
+| `user-update` | `UserUpdate` | `User`         | Update `public.users`, then sync Auth email when it changes      |
+| `user-delete` | `{ id: Id }` | `DeleteResult` | Soft-delete domain user and revoke or delete Auth access         |
+| `user-eject`  | `{ id: Id }` | `User`         | Revoke Auth access, preserve history, set status to `inactive`   |
+
+`user-create` must use the application-supplied UUID v7 from `UserCreate.id`
+for both `auth.users.id` and `public.users.id`. If Auth user creation succeeds
+and domain row creation fails, the function must delete the Auth user as
+compensation before returning an error.
+
+`user-delete` is domain removal. It soft-deletes `public.users` and revokes or
+deletes the matching Auth identity. It returns the standard `DeleteResult`
+contract.
+
+`user-eject` is access revocation without domain-history destruction. It
+revokes or deletes the matching Auth identity, keeps the domain user row, sets
+`public.users.status = 'inactive'`, and returns the updated `User`.
+
 ## 5. Configuration Management
 
 Edge functions use the singleton `Config` pattern defined in `architecture-core.md` section 6.
@@ -220,8 +280,9 @@ import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
 Config.init(new SupabaseProvider(), [
   'SUPABASE_URL',
+  'SUPABASE_PUBLIC_KEY',
   'SUPABASE_SERVICE_KEY',
-  'JWT_SECRET'
+  'SUPABASE_CLIENT_MODE'
 ])
 
 export { Config }
@@ -240,6 +301,8 @@ import { wrapHttpHandler } from '@core/stdx'
 
 const runBusRule = async (input: Dictionary): Promise<Dictionary> => {
   const supabaseUrl = Config.get('SUPABASE_URL')
+  const publicKey = Config.get('SUPABASE_PUBLIC_KEY')
+  const serviceKey = Config.get('SUPABASE_SERVICE_KEY')
   // ... orchestration logic
   return result
 }
@@ -298,9 +361,11 @@ Migration Safety:
 
 ### 8.2 Authorization
 
-- **Primary:** RLS policies enforce all access control
+- **Primary:** RLS policies enforce ordinary database access control
 - **Secondary:** Edge functions validate inputs via domain validators
-- **Never:** Application-level authorization checks — RLS is authoritative
+- **Privileged orchestration:** Edge functions using elevated credentials must
+  verify the caller and enforce the required administrator authorization check
+- **Never:** UX-layer authorization or open service-role endpoints
 
 ### 8.3 Input Validation
 
@@ -317,10 +382,12 @@ const handler = async (input: Dictionary): Promise<Dictionary> => {
 ## 9. Key Principles
 
 1. **Orchestration only** — Edge functions coordinate; they do not implement business logic
-2. **RLS is authoritative** — Authorization lives in the database, not the application
-3. **Direct-to-DB preferred** — Only use edge functions when SDK client can't suffice
-4. **Schema lives in domain** — `source/domain/schema/schema.sql` is the canonical current state
-5. **Migrations are forward-only** — Express deltas only; never modify deployed migrations
-6. **Functions stay flat** — No subdirectories (platform requirement)
+2. **RLS is authoritative** — Ordinary database authorization lives in RLS
+3. **Privileged edge checks are mandatory** — Elevated orchestration verifies
+   the caller and administrator authorization before service-role work
+4. **Direct-to-DB preferred** — Only use edge functions when SDK client can't suffice
+5. **Schema lives in domain** — `source/domain/schema/schema.sql` is the canonical current state
+6. **Migrations are forward-only** — Express deltas only; never modify deployed migrations
+7. **Functions stay flat** — No subdirectories (platform requirement)
 
 _End of Architecture Backend Document_

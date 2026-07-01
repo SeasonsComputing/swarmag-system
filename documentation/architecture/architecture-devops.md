@@ -174,6 +174,50 @@ includes:
 - Rotate secrets regularly; use `deno task gen:jwt-secret` for packages that
   define a JWT secret
 
+### 4.4 Supabase Edge Runtime Configuration
+
+Supabase Edge is a server-side execution dimension. It is not a browser bundle
+and does not consume `VITE_*` variables.
+
+Browser-to-edge invocation and edge-to-Supabase access are separate concerns:
+
+| Direction                 | Caller                       | Credentials                                                  |
+| ------------------------- | ---------------------------- | ------------------------------------------------------------ |
+| Browser to Supabase Edge  | UX Supabase browser client   | Public client key plus the current user's JWT                |
+| Supabase Edge to database | Edge function caller client  | Public client key plus forwarded caller Authorization header |
+| Supabase Edge to Auth     | Edge function service client | Service-role key from Supabase Edge secrets                  |
+
+The browser invokes edge functions through the Supabase SDK, for example
+`Supabase.client().functions.invoke(...)`. UX code must not hand-roll browser
+fetch plumbing for edge calls unless the SDK fails a concrete requirement.
+
+Supabase Edge functions read runtime configuration from Supabase-managed
+secrets through `Deno.env.get(key)`. `SupabaseProvider` is the repository adapter
+for that runtime and must use `Deno.env.get` for Supabase Edge. It must not
+depend on UX `VITE_*` names or browser configuration providers.
+
+Backend edge env templates use these canonical names:
+
+| Name                   | Purpose                                                        |
+| ---------------------- | -------------------------------------------------------------- |
+| `SUPABASE_URL`         | Supabase project URL in the Supabase Edge runtime              |
+| `SUPABASE_PUBLIC_KEY`  | Public/anon key for caller-scoped Supabase clients             |
+| `SUPABASE_SERVICE_KEY` | Service-role key for privileged server-side orchestration only |
+| `SUPABASE_CLIENT_MODE` | Supabase client runtime mode; backend edge uses `edge`         |
+
+`SUPABASE_RDBMS_URL` is the UX logical name for direct browser database access.
+It is not the canonical Supabase Edge runtime endpoint name.
+
+The service-role key boundary is strict:
+
+- It is owned by Supabase Edge runtime secrets.
+- It is never present in UX env templates, UX config aliases, browser bundles,
+  Netlify env for UX apps, or client-visible metadata.
+- It is used only for privileged orchestration that cannot be performed with the
+  caller-scoped client, such as Supabase Auth admin operations.
+- It does not replace caller verification or administrator authorization checks
+  inside privileged edge functions.
+
 ## 5. Secret Registry
 
 ### 5.1 Purpose
