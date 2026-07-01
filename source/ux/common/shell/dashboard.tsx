@@ -81,7 +81,7 @@ export const Dashboard = (): UiComponent => {
         data-feat-type={props.widget.type}
         data-feat-shape={props.widget.settings.shape}
       >
-        <UiCard decoration='gradient' elevation='raised'>
+        <UiCard>
           <Show when={Widget} fallback={<MissingWidget type={props.widget.type} />}>
             {component => {
               const Component = component()
