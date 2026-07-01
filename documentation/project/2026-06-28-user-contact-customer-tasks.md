@@ -118,17 +118,17 @@ domain documentation.
 
 ## 3. Domain Internals — User Edge Functions
 
-- [ ] Update architecture before implementation
-  - [ ] Update `documentation/architecture/architecture-devops.md` for Supabase Edge as a server-side execution dimension.
-  - [ ] Document browser-to-edge invocation separately from edge-to-Supabase access.
-  - [ ] Document Supabase Edge runtime configuration and secret ownership.
-  - [ ] Confirm the concrete Supabase Edge config provider behavior before relying on it in user functions.
-  - [ ] Document service-key boundary: edge-only, never UX, only for privileged orchestration.
-  - [ ] Update `documentation/architecture/architecture-back.md` for user auth attribute synchronization.
-  - [ ] Clarify that the new work is attribute synchronization, not UUID synchronization.
-  - [ ] Clarify that user edge functions are authenticated user-invoked operations, not open endpoints.
+- [x] Update architecture before implementation
+  - [x] Update `documentation/architecture/architecture-devops.md` for Supabase Edge as a server-side execution dimension.
+  - [x] Document browser-to-edge invocation separately from edge-to-Supabase access.
+  - [x] Document Supabase Edge runtime configuration and secret ownership.
+  - [x] Confirm the concrete Supabase Edge config provider behavior before relying on it in user functions.
+  - [x] Document service-key boundary: edge-only, never UX, only for privileged orchestration.
+  - [x] Update `documentation/architecture/architecture-back.md` for user auth attribute synchronization.
+  - [x] Clarify that the new work is attribute synchronization, not UUID synchronization.
+  - [x] Clarify that user edge functions are authenticated user-invoked operations, not open endpoints.
 - [ ] Validate Supabase Edge runtime configuration path
-  - [ ] Confirm whether Supabase Edge config should read through `Deno.env.get` or another runtime API.
+  - [x] Confirm whether Supabase Edge config should read through `Deno.env.get` or another runtime API.
   - [ ] Reconcile backend edge env examples with the confirmed runtime names.
   - [ ] Add `SUPABASE_SERVICE_KEY` or the approved service-key name only to backend edge configuration.
   - [ ] Keep UX env/config free of service-role secrets.
@@ -140,14 +140,14 @@ domain documentation.
   - [ ] Add `user-eject` edge function.
   - [ ] Keep edge functions flat under `source/back/supabase-edge/functions/`.
   - [ ] Preserve the standard user-management API surface from UX.
-- [ ] Define user edge function contracts
-  - [ ] Confirm `user-create` creates `auth.users` and `public.users` consistently.
-  - [ ] Confirm `user-update` synchronizes Auth attributes with `public.users`.
-  - [ ] Confirm `user-delete` handles domain soft-delete behavior.
-  - [ ] Confirm `user-eject` revokes authentication access without silently destroying domain history.
-  - [ ] Confirm all user edge functions respect `public.users.id = auth.users.id`.
-  - [ ] Confirm all create/update paths preserve application-supplied UUID v7 identity without treating UUID sync as the new work.
-  - [ ] Confirm each function verifies the authenticated caller and checks administrator authorization before privileged work.
+- [x] Define user edge function contracts
+  - [x] Confirm `user-create` creates `auth.users` and `public.users` consistently.
+  - [x] Confirm `user-update` synchronizes Auth attributes with `public.users`.
+  - [x] Confirm `user-delete` handles domain soft-delete behavior.
+  - [x] Confirm `user-eject` revokes authentication access without silently destroying domain history.
+  - [x] Confirm all user edge functions respect `public.users.id = auth.users.id`.
+  - [x] Confirm all create/update paths preserve application-supplied UUID v7 identity without treating UUID sync as the new work.
+  - [x] Confirm each function verifies the authenticated caller and checks administrator authorization before privileged work.
 - [ ] Update supporting backend artifacts as needed
   - [ ] Add request/response protocol types if the existing contract is insufficient.
   - [ ] Add validation at the edge-function boundary.
