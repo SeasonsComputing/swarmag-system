@@ -1,25 +1,28 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ User management orchestration                                                ║
-║ Shared orchestration for privileged user-management edge functions.          ║
+║ User orchestra                                                               ║
+║ Shared orchestration for privileged user edge functions.                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Provides Config-backed Supabase clients, caller verification, administrator
-authorization, validation, and user row operations for user edge functions.
+Provides administrator authorization over the shared edge caller handshake and
+synchronizes Supabase Auth identities with domain user rows. Auth access is
+revoked before domain mutation, and domain user writes use the service-role
+client because users-table RLS grants no direct writes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UserIdRequest             Request payload containing a User id.
-UserEdgeContext           Authorized edge invocation context.
-UserManagementContract    User-management orchestration contract.
-UserManagement            User-management orchestration singleton.
+UserIdRequest           Request payload containing a User id.
+UserEdgeContext         Authorized edge invocation context.
+UserOrchestraContract   User orchestration contract.
+UserOrchestra           User orchestration singleton.
 */
 
 import { Config } from '@back/supabase-edge/config/supabase-config.ts'
 import { type DeleteResult } from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
+import { type EdgeClients, makeSupabaseEdgeAuth } from '@core/service/make-supabase-edge-auth.ts'
 import { HttpServiceError } from '@core/service/wrap-busrule-http-handler.ts'
 import {
   type CreateFromInstantiable,
@@ -32,12 +35,12 @@ import {
   type When,
   when
 } from '@core/std'
-import { AdapterPatch, HEADER_AUTHORIZATION, HttpCodes, type HttpRequest } from '@core/stdx'
+import { AdapterPatch, HttpCodes, type HttpRequest } from '@core/stdx'
 import { type User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 import { validateUserCreate, validateUserUpdate } from '@domain/validators/user-validator.ts'
-import { createClient, type SupabaseClient } from '@supabase/client'
+import { type SupabaseClient } from '@supabase/client'
 
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC TYPES
@@ -47,14 +50,10 @@ import { createClient, type SupabaseClient } from '@supabase/client'
 export type UserIdRequest = Instance
 
 /** Authorized edge invocation context. */
-export type UserEdgeContext = {
-  caller: User
-  callerClient: SupabaseClient
-  serviceClient: SupabaseClient
-}
+export type UserEdgeContext = EdgeClients & { caller: User }
 
-/** User-management orchestration contract. */
-export interface UserManagementContract {
+/** User orchestration contract. */
+export interface UserOrchestraContract {
   authorizeAdmin(request: HttpRequest): Promise<UserEdgeContext>
   create(input: UserCreate, context: UserEdgeContext): Promise<User>
   update(input: UserUpdate, context: UserEdgeContext): Promise<User>
@@ -66,24 +65,16 @@ export interface UserManagementContract {
 // PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
-/** User-management orchestration singleton. */
-export const UserManagement: UserManagementContract = {
+/** User orchestration singleton. */
+export const UserOrchestra: UserOrchestraContract = {
   async authorizeAdmin(request: HttpRequest): Promise<UserEdgeContext> {
-    const authorization = request.headers[HEADER_AUTHORIZATION]
-    const token = bearerToken(authorization)
-    if (!token) throw new HttpServiceError(HTTP_UNAUTHORIZED, 'Authentication required')
-
-    const serviceClient = serviceSupabaseClient()
-    const { data, error } = await serviceClient.auth.getUser(token)
-    if (error || !data.user) throw new HttpServiceError(HTTP_UNAUTHORIZED, 'Authentication required')
-
-    const callerClient = callerSupabaseClient(authorization)
-    const caller = await getUserRow(callerClient, data.user.id as Id)
+    const { authUserId, ...clients } = await EdgeAuth.verifyCaller(request)
+    const caller = await callerUserRow(clients.callerClient, authUserId)
     if (caller.status !== 'active' || !caller.roles.includes('administrator')) {
-      throw new HttpServiceError(HTTP_FORBIDDEN, 'Administrator authorization required')
+      throw new HttpServiceError(HttpCodes.forbidden, 'Administrator authorization required')
     }
 
-    return { caller, callerClient, serviceClient }
+    return { caller, ...clients }
   },
 
   async create(input: UserCreate, context: UserEdgeContext): Promise<User> {
@@ -91,31 +82,31 @@ export const UserManagement: UserManagementContract = {
     await createAuthUser(context, user)
 
     try {
-      return await insertUserRow(context.callerClient, user)
+      return await insertUserRow(context.serviceClient, user)
     } catch (error) {
-      await deleteAuthUser(context, user.id)
+      await compensateAuthUser(context, user.id)
       throw error
     }
   },
 
   async update(input: UserUpdate, context: UserEdgeContext): Promise<User> {
-    const user = await updateUserRow(context.callerClient, input)
+    const user = await updateUserRow(context.serviceClient, input)
     if (input.primaryEmail !== undefined) await updateAuthEmail(context, user)
     return user
   },
 
   async delete(input: UserIdRequest, context: UserEdgeContext): Promise<DeleteResult> {
     const id = requireId(input)
-    const result = await deleteUserRow(context.callerClient, id)
+    await getUserRow(context.serviceClient, id)
     await deleteAuthUser(context, id)
-    return result
+    return deleteUserRow(context.serviceClient, id)
   },
 
   async eject(input: UserIdRequest, context: UserEdgeContext): Promise<User> {
     const id = requireId(input)
-    const user = await ejectUserRow(context.callerClient, id)
+    await getUserRow(context.serviceClient, id)
     await deleteAuthUser(context, id)
-    return user
+    return ejectUserRow(context.serviceClient, id)
   }
 }
 
@@ -133,12 +124,21 @@ const createAuthUser = async (context: UserEdgeContext, user: User): Promise<voi
   const { error } = await context.serviceClient.auth.admin.createUser(
     payload as Parameters<typeof context.serviceClient.auth.admin.createUser>[0]
   )
-  if (error) throw new HttpServiceError(HTTP_CONFLICT, 'Failed to create auth user')
+  if (error) throw new HttpServiceError(statusFromAuth(error), 'Failed to create auth user')
 }
 
+// an already-revoked identity is not an error: eject precedes delete in normal flows
 const deleteAuthUser = async (context: UserEdgeContext, id: Id): Promise<void> => {
   const { error } = await context.serviceClient.auth.admin.deleteUser(id)
-  if (error) throw new HttpServiceError(HTTP_CONFLICT, 'Failed to delete auth user')
+  if (error && statusFromAuth(error) !== HttpCodes.notFound) {
+    throw new HttpServiceError(statusFromAuth(error), 'Failed to delete auth user')
+  }
+}
+
+// compensation must never mask the original failure
+const compensateAuthUser = async (context: UserEdgeContext, id: Id): Promise<void> => {
+  const { error } = await context.serviceClient.auth.admin.deleteUser(id)
+  if (error) console.error('Auth user compensation failed:', id, error)
 }
 
 const updateAuthEmail = async (context: UserEdgeContext, user: User): Promise<void> => {
@@ -150,7 +150,7 @@ const updateAuthEmail = async (context: UserEdgeContext, user: User): Promise<vo
     user.id,
     payload as Parameters<typeof context.serviceClient.auth.admin.updateUserById>[1]
   )
-  if (error) throw new HttpServiceError(HTTP_CONFLICT, 'Failed to update auth user')
+  if (error) throw new HttpServiceError(statusFromAuth(error), 'Failed to update auth user')
 }
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -203,7 +203,9 @@ const updateUserRow = async (
     .is('deleted_at', null)
     .select()
     .single()
-  if (updateError) throw new HttpServiceError(statusFromSupabase(updateError), 'Failed to update user')
+  if (updateError) {
+    throw new HttpServiceError(statusFromSupabase(updateError), 'Failed to update user')
+  }
   return UserAdapter.toDomain(data as Dictionary)
 }
 
@@ -233,6 +235,25 @@ const ejectUserRow = async (client: SupabaseClient, id: Id): Promise<User> => {
   return UserAdapter.toDomain(data as Dictionary)
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// PRIVATE
+// ────────────────────────────────────────────────────────────────────────────
+
+const EdgeAuth = makeSupabaseEdgeAuth({
+  url: Config.get('SUPABASE_URL'),
+  publicKey: Config.get('SUPABASE_PUBLIC_KEY'),
+  serviceKey: Config.get('SUPABASE_SERVICE_KEY')
+})
+
+// an authenticated identity without an active domain row is not an administrator
+const callerUserRow = async (client: SupabaseClient, id: Id): Promise<User> => {
+  try {
+    return await getUserRow(client, id)
+  } catch {
+    throw new HttpServiceError(HttpCodes.forbidden, 'Administrator authorization required')
+  }
+}
+
 const requireId = (input: unknown): Id => {
   const body = input as Dictionary
   const error = expectId(body['id'], 'id')
@@ -240,32 +261,9 @@ const requireId = (input: unknown): Id => {
   return body['id'] as Id
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// PRIVATE
-// ────────────────────────────────────────────────────────────────────────────
-
-const HTTP_UNAUTHORIZED = 401
-const HTTP_FORBIDDEN = 403
-const HTTP_CONFLICT = 409
-
-const bearerToken = (authorization: string | undefined): string | null => {
-  if (!authorization?.startsWith('Bearer ')) return null
-  const token = authorization.slice('Bearer '.length).trim()
-  return token.length > 0 ? token : null
-}
-
-const callerSupabaseClient = (authorization: string): SupabaseClient =>
-  createClient(Config.get('SUPABASE_URL'), Config.get('SUPABASE_PUBLIC_KEY'), {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-    global: { headers: { Authorization: authorization } }
-  })
-
-const serviceSupabaseClient = (): SupabaseClient =>
-  createClient(Config.get('SUPABASE_URL'), Config.get('SUPABASE_SERVICE_KEY'), {
-    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-  })
-
 const statusFromSupabase = (error: { code?: string; status?: number }): number => {
   if (error.status) return error.status
   return Supabase.errorToStatus(error as Parameters<typeof Supabase.errorToStatus>[0])
 }
+
+const statusFromAuth = (error: { status?: number }): number => error.status ?? HttpCodes.conflict

@@ -23,12 +23,15 @@ import type { Id } from '@core/std'
 /** Supabase passwordless OTP auth client. Implements ApiAuthContract. */
 export const AuthSupabaseClient: ApiAuthContract = {
   /**
-   * Send a one-time passcode to the target email address.
+   * Send a one-time passcode to the target email address. Never provisions a new Auth identity.
    * @param email Recipient email address for OTP delivery.
    * @returns Resolves when Supabase accepts the OTP request.
    */
   async sendOtp(email: string): Promise<void> {
-    const { error } = await Supabase.client().auth.signInWithOtp({ email })
+    const { error } = await Supabase.client().auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false }
+    })
     checkApiError(error, 'Failed to send OTP', authErrorStatus, authErrorDetails)
   },
 

@@ -14,15 +14,12 @@ PUBLIC
 default  Wrapped Supabase Edge HTTP handler.
 */
 
-import {
-  type UserEdgeContext,
-  UserManagement
-} from '@back/supabase-edge/orchestration/user-management.ts'
+import { type UserEdgeContext, UserOrchestra } from '@back/supabase-edge/orchestration/user-orchestra.ts'
 import { wrapBusRuleHttpHandler } from '@core/service/wrap-busrule-http-handler.ts'
 import type { User } from '@domain/abstractions/user.ts'
 import type { UserCreate } from '@domain/protocols/user-protocol.ts'
 
 export default wrapBusRuleHttpHandler<UserCreate, User, UserEdgeContext>({
-  context: UserManagement.authorizeAdmin,
-  handle: (input, context) => UserManagement.create(input, context)
+  context: UserOrchestra.authorizeAdmin,
+  handle: (input, context) => UserOrchestra.create(input, context)
 })

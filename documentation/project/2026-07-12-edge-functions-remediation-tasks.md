@@ -2,7 +2,7 @@
 
 **Date:** 2026-07-12
 **Mode:** Foundation
-**Status:** Phase 1 complete; Phases 2–6 pending
+**Status:** Phases 0–2 complete; Phases 3–6 pending
 **Source design:** `documentation/project/2026-07-12-edge-functions-remediation-design.md`
 
 This task list decomposes the approved design (D1–D9) into gated phases. Each
@@ -49,27 +49,30 @@ phase is one authorized production with its own checks.
 - [x] Unit tests: `source/tests/cases/make-adapter-test.ts`,
       `source/tests/cases/validators-test.ts` (7/7 passing)
 
-## Phase 2 — Shared Edge Foundation
+## Phase 2 — Shared Edge Foundation _(complete 2026-07-12)_
 
-- [ ] `core/std/wrap-http-handler.ts` — `HttpCodes` gains `unauthorized: 401`,
+- [x] `core/std/wrap-http-handler.ts` — `HttpCodes` gains `unauthorized: 401`,
       `forbidden: 403`, `conflict: 409`; orchestration local constants removed
-- [ ] `core/client/make-supabase-client.ts` — edge client reads error
+- [x] `core/client/make-supabase-client.ts` — edge client reads error
       `Response` body (`await error.context.json()`) so server messages reach UX
-- [ ] `core/client/auth-supabase-client.ts` — `sendOtp` passes
+- [x] `core/client/auth-supabase-client.ts` — `sendOtp` passes
       `shouldCreateUser: false` (D6)
-- [ ] `back/supabase-edge/config/supabase-config.ts` — alias form per D3
-- [ ] NEW `core/service/edge-auth.ts` — `makeEdgeAuth(spec)` / `verifyCaller`
+- [x] `back/supabase-edge/config/supabase-config.ts` — alias form per D3
+- [x] NEW `core/service/make-supabase-edge-auth.ts` — `makeSupabaseEdgeAuth(spec)` / `verifyCaller`
       per D9
-- [ ] Import path consistency: `@core/stdx` barrel in `core/service`
+- [x] Import path consistency: `@core/stdx` barrel in `core/service`
+- [x] Unit tests: `source/tests/cases/make-supabase-edge-auth-test.ts` (401 paths, 3/3 passing)
 
 ## Phase 3 — Orchestration Fixes and Deployment Seam
 
-- [ ] `orchestration/user-management.ts`
-  - [ ] Auth-first ordering for delete/eject (D4)
-  - [ ] Domain writes via `serviceClient` (D7)
-  - [ ] Compensation failure logs and rethrows original error
-  - [ ] `authorizeAdmin` uses `makeEdgeAuth.verifyCaller`; missing caller row → 403
-  - [ ] Honest auth-admin status mapping (422 input, 409 only for conflicts)
+- [x] `orchestration/user-orchestra.ts` _(complete 2026-07-12)_
+  - [x] Auth-first ordering for delete/eject (D4), with existence check before
+        revocation and 404-tolerant revoke (supports eject → delete)
+  - [x] Domain writes via `serviceClient` (D7); caller client retained for
+        RLS-scoped caller resolution
+  - [x] Compensation failure logs and rethrows original error
+  - [x] `authorizeAdmin` uses `makeSupabaseEdgeAuth.verifyCaller`; missing caller row → 403
+  - [x] Honest auth-admin status mapping (`statusFromAuth` passes provider status)
 - [ ] Committed shims: `supabase/functions/{user-create,user-update,user-delete,user-eject}/index.ts`
 - [ ] `supabase-import-map.json` at repository root, synced with `deno.jsonc`
 - [ ] `supabase/config.toml` — `[functions.*]` blocks (`import_map`,

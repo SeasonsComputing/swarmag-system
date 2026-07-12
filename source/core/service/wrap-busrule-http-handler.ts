@@ -27,7 +27,7 @@ import {
   toMethodNotAllowed,
   toOk,
   wrapHttpHandler
-} from '@core/std/wrap-http-handler.ts'
+} from '@core/stdx'
 
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC TYPES
