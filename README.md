@@ -56,12 +56,13 @@ Primary architectural context lives in `documentation/architecture/architecture-
 
 #### 1.3.1 Core (`source/core/`)
 
-| Path   | Description                                                      |
-| ------ | ---------------------------------------------------------------- |
-| `api/` | Client makers and provider adapters (CRUD, HTTP, business rules) |
-| `cfg/` | Configuration management (Config singleton, runtime providers)   |
-| `db/`  | Cached database client (`supabase.ts`)                           |
-| `std/` | Standard types (Id, When, Dictionary, Instantiable)              |
+| Path       | Description                                                      |
+| ---------- | ---------------------------------------------------------------- |
+| `api/`     | Client makers and provider adapters (CRUD, HTTP, business rules) |
+| `cfg/`     | Configuration management (Config singleton, runtime providers)   |
+| `db/`      | Cached database client (`supabase.ts`)                           |
+| `service/` | Inbound service handler wrappers (BusRule HTTP handler)          |
+| `std/`     | Standard types (Id, When, Dictionary, Instantiable)              |
 
 #### 1.3.2 Domain (`source/domain/`)
 
@@ -75,10 +76,10 @@ Primary architectural context lives in `documentation/architecture/architecture-
 
 #### 1.3.3 Backend (`source/back/`)
 
-| Path             | Description                                  |
-| ---------------- | -------------------------------------------- |
-| `migrations/`    | Forward-only SQL deltas and RLS policies     |
-| `supabase-edge/` | Supabase Edge Functions (orchestration only) |
+| Path             | Description                                                       |
+| ---------------- | ----------------------------------------------------------------- |
+| `migrations/`    | Forward-only SQL deltas and RLS policies                          |
+| `supabase-edge/` | Supabase Edge Functions (config, functions, shared orchestration) |
 
 #### 1.3.4 Frontend (`source/ux/`)
 
