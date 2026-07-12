@@ -3,7 +3,7 @@
  * Accesses environment variables via Deno.env and exits process on error.
  */
 
-import type { RuntimeProvider } from './runtime-provider.ts'
+import { type RuntimeProvider } from './runtime-provider.ts'
 
 /**
  * Configuration provider for Deno.

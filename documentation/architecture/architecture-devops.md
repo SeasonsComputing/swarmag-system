@@ -191,22 +191,29 @@ The browser invokes edge functions through the Supabase SDK, for example
 `Supabase.client().functions.invoke(...)`. UX code must not hand-roll browser
 fetch plumbing for edge calls unless the SDK fails a concrete requirement.
 
-Supabase Edge functions read runtime configuration from Supabase-managed
-secrets through `Deno.env.get(key)`. `SupabaseProvider` is the repository adapter
-for that runtime and must use `Deno.env.get` for Supabase Edge. It must not
-depend on UX `VITE_*` names or browser configuration providers.
+Supabase Edge functions read runtime configuration only through `Config`.
+`SupabaseProvider` is the repository adapter for that runtime and encapsulates
+the concrete Supabase Edge environment API behind the `RuntimeProvider`
+contract. Edge function code must not call runtime environment APIs directly.
+It must not depend on UX `VITE_*` names or browser configuration providers.
 
-Backend edge env templates use these canonical names:
+The Supabase Edge runtime injects its own configuration and reserves the
+`SUPABASE_` prefix — custom secrets must not use it. The three values the edge
+package needs are all platform-injected; the configuration bootstrap binds the
+repository's logical names to the platform-injected names through the `Config`
+alias map (`architecture-back.md §5.1`):
 
-| Name                   | Purpose                                                        |
-| ---------------------- | -------------------------------------------------------------- |
-| `SUPABASE_URL`         | Supabase project URL in the Supabase Edge runtime              |
-| `SUPABASE_PUBLIC_KEY`  | Public/anon key for caller-scoped Supabase clients             |
-| `SUPABASE_SERVICE_KEY` | Service-role key for privileged server-side orchestration only |
-| `SUPABASE_CLIENT_MODE` | Supabase client runtime mode; backend edge uses `edge`         |
+| Logical name (repository) | Platform-injected name      | Purpose                                            |
+| ------------------------- | --------------------------- | -------------------------------------------------- |
+| `SUPABASE_URL`            | `SUPABASE_URL`              | Supabase project URL in the Supabase Edge runtime  |
+| `SUPABASE_PUBLIC_KEY`     | `SUPABASE_ANON_KEY`         | Public/anon key for caller-scoped Supabase clients |
+| `SUPABASE_SERVICE_KEY`    | `SUPABASE_SERVICE_ROLE_KEY` | Service-role key for privileged orchestration only |
+
+No custom Supabase secrets are set for these values. `supabase secrets set`
+is reserved for future keys that do not carry the `SUPABASE_` prefix.
 
 `SUPABASE_RDBMS_URL` is the UX logical name for direct browser database access.
-It is not the canonical Supabase Edge runtime endpoint name.
+It is not a Supabase Edge runtime name.
 
 The service-role key boundary is strict:
 
@@ -695,6 +702,15 @@ they must conform to Supabase Auth and email-client rendering constraints.
 ### 13.3 OTP Flow
 
 The system uses passwordless email OTP. `signInWithOtp({ email })` triggers the `magic_link` template. The template surfaces `{{ .Token }}` — the 6-digit code — which the user enters in the login screen. The `{{ .ConfirmationURL }}` magic link is intentionally omitted from the template; the code-entry flow is the only supported path.
+
+OTP login never provisions users. `sendOtp` passes `shouldCreateUser: false`
+and auth signups are disabled in `config.toml` (`enable_signup = false`), so an
+email without an existing Auth identity cannot mint one through the login flow.
+User provisioning happens only through the `user-create` edge function, whose
+service-role Auth admin operations are exempt from the signup switch. This
+protects the auth/domain UUID invariant (`architecture-back.md §4.5`): a
+login-path signup would create an Auth identity with an ID that matches no
+domain user.
 
 OTP expiry is configured in `config.toml` under `[auth.email]`:
 

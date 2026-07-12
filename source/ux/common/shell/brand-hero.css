@@ -9,11 +9,12 @@
   align-items: center;
   display: flex;
   flex-direction: column;
-  gap: var(--sa-rhythm-gap);
+  gap: 0;
   position: relative;
 }
 
 [data-feat='brand-hero']::before {
+  top: -60px;
   aspect-ratio: 1;
   background: radial-gradient(
     ellipse,

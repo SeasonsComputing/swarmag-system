@@ -199,7 +199,7 @@
 
   /* Card */
   --sa-card-panel-bg: oklch(17% 0.008 244 / 0.7);
-  --sa-card-panel-border:  1px solid rgb(148 163 184 / 0.1);
+  --sa-card-panel-border: 1px solid rgb(148 163 184 / 0.1);
   --sa-card-panel-shadow: none;
   --sa-card-decoration-stripe-opacity: 0.8;
   --sa-card-elevation-raised-shadow: 0 15px 36px rgb(0 0 0 / 0.3), inset 0 1px 0 rgb(255 255 255 / 0.1);
@@ -344,16 +344,8 @@
   --sa-shell-shadow: 0 10px 24px oklch(28% 0.036 230 / 0.1);
   --sa-shell-text: var(--sa-text-h1);
   --sa-shell-secondary: var(--sa-text-secondary);
-  --sa-footer-logo-filter:
-    brightness(0)
-    saturate(100%)
-    invert(32%)
-    sepia(36%)
-    saturate(1122%)
-    hue-rotate(169deg)
-    brightness(92%)
-    contrast(94%)
-    opacity(0.78);
+  --sa-footer-logo-filter: brightness(0) saturate(100%) invert(32%) sepia(36%) saturate(1122%)
+    hue-rotate(169deg) brightness(92%) contrast(94%) opacity(0.78);
 
   /* Button */
   --sa-button-bg-primary: var(--sa-color-primary);

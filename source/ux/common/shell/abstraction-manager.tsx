@@ -35,10 +35,13 @@ export type AbstractionManagerProps<T extends Instance> = {
   provider: AbstractionManagerContract<T>
 }
 
+/** Mode of the abstraction manager: 'list' or 'editor'. */
 type AbstractionManagerMode = 'list' | 'editor'
 
 /** Generic abstraction list and editor-panel manager. */
-export const AbstractionManager = <T extends Instance>(props: AbstractionManagerProps<T>): UiComponent => {
+export const AbstractionManager = <T extends Instance>(
+  props: AbstractionManagerProps<T>
+): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
   const [mode, setMode] = createSignal<AbstractionManagerMode>('list')
   const onSelect = (item: T): void => {

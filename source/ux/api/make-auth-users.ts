@@ -11,38 +11,56 @@ synchronization behind the topic API implementation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+AuthUsersContract  Users API contract with auth synchronization operations.
 makeAuthUsers  Build the auth-synchronized Users CRUD client.
 */
 
 import type { ApiCrudContract, DeleteResult, ListOptions, ListResult } from '@core/api/api-contract.ts'
-import { makeCrudSupabaseClient } from '@core/client/make-supabase-client.ts'
-import type { CreateFromInstantiable, Id, UpdateFromInstantiable } from '@core/std'
+import {
+  makeBusRuleSupabaseEdgeClient,
+  makeBusRuleSupabaseRpcClient,
+  makeCrudSupabaseClient
+} from '@core/client/make-supabase-client.ts'
+import type { CreateFromInstantiable, Dictionary, Id, UpdateFromInstantiable } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 
+/** Users API contract with auth synchronization operations. */
+export type AuthUsersContract = ApiCrudContract<User> & {
+  eject(id: Id): Promise<User>
+  hasAccess(email: string): Promise<boolean>
+}
+
 /** Build the auth-synchronized Users CRUD client. */
-export const makeAuthUsers = (): ApiCrudContract<User> => {
+export const makeAuthUsers = (): AuthUsersContract => {
   const users = makeCrudSupabaseClient<User>({ table: 'users', adapter: UserAdapter })
+  const create = makeBusRuleSupabaseEdgeClient<Dictionary, User>({ fn: 'user-create' })
+  const update = makeBusRuleSupabaseEdgeClient<Dictionary, User>({ fn: 'user-update' })
+  const remove = makeBusRuleSupabaseEdgeClient<Dictionary, DeleteResult>({ fn: 'user-delete' })
+  const eject = makeBusRuleSupabaseEdgeClient<Dictionary, User>({ fn: 'user-eject' })
+  const hasAccess = makeBusRuleSupabaseRpcClient<{ email: string }, boolean>({ fn: 'user_has_access' })
+
   return {
     /**
      * Create a domain user and provision a Supabase Auth identity.
      * @param input User creation payload.
      * @returns The newly created domain user.
      */
-    create: async (input: CreateFromInstantiable<User>): Promise<User> => {
-      await syncAuthCreate(input)
-      return users.create(input)
-    },
+    create: (input: CreateFromInstantiable<User>): Promise<User> => create.run(input as Dictionary),
 
     /**
      * Delete a domain user and revoke the Supabase Auth identity.
      * @param id Id of the user to delete.
      * @returns Deletion result.
      */
-    delete: async (id: Id): Promise<DeleteResult> => {
-      await syncAuthDelete(id)
-      return users.delete(id)
-    },
+    delete: (id: Id): Promise<DeleteResult> => remove.run({ id }),
+
+    /**
+     * Eject a user by revoking Auth access while preserving domain history.
+     * @param id Id of the user to eject.
+     * @returns The updated inactive domain user.
+     */
+    eject: (id: Id): Promise<User> => eject.run({ id }),
 
     /**
      * Retrieve a domain user by id.
@@ -59,27 +77,17 @@ export const makeAuthUsers = (): ApiCrudContract<User> => {
     list: (options?: ListOptions): Promise<ListResult<User>> => users.list(options),
 
     /**
+     * Check whether an email belongs to an active registered user.
+     * @param input Email access-check payload.
+     * @returns True when the email may start OTP login.
+     */
+    hasAccess: (email: string): Promise<boolean> => hasAccess.run({ email }),
+
+    /**
      * Update a domain user and synchronize the Supabase Auth identity.
      * @param input User update payload.
      * @returns The updated domain user.
      */
-    update: async (input: UpdateFromInstantiable<User>): Promise<User> => {
-      const user = await users.update(input)
-      await syncAuthUpdate(user)
-      return user
-    }
+    update: (input: UpdateFromInstantiable<User>): Promise<User> => update.run(input as Dictionary)
   }
 }
-
-// ────────────────────────────────────────────────────────────────────────────
-// INTERNALS
-// ────────────────────────────────────────────────────────────────────────────
-
-/** Provision a Supabase Auth identity for a newly created domain user. */
-async function syncAuthCreate(_input: CreateFromInstantiable<User>): Promise<void> {}
-
-/** Revoke the Supabase Auth identity for a deleted domain user. */
-async function syncAuthDelete(_id: Id): Promise<void> {}
-
-/** Synchronize auth identity metadata after a domain user update. */
-async function syncAuthUpdate(_user: User): Promise<void> {}

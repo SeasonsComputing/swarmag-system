@@ -127,11 +127,14 @@ Execution logs are immutable records of reality. They are never updated or delet
 
 #### 3.2.3 Supabase Edge Functions
 
-Edge functions must remain flat in a single directory due to platform discovery requirements:
+Edge functions are authored flat in a single directory:
 
 - `source/back/supabase-edge/functions/`
 
-No subdirectories under `functions/`. Each function is a single file.
+No subdirectories under `functions/`. Each function is a single file. The
+Supabase platform's own discovery layout (`supabase/functions/{name}/index.ts`
+served via `Deno.serve`) is satisfied by committed entrypoint shims — see
+`architecture-back.md` section 3.4.
 
 #### 3.2.4 Import Maps
 
@@ -141,7 +144,7 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
 {
   "imports": {
     // ────────────────────────────────────────────────────────────────────────────
-    // Primary Top-level Aliases
+    // PRIMARY TOP-LEVEL ALIASES
     // ────────────────────────────────────────────────────────────────────────────
 
     "@core/": "./source/core/",
@@ -152,24 +155,30 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
     "@tests/": "./source/tests/",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Convenience Barrel Aliases
+    // CONVENIENCE BARREL ALIASES
     // ────────────────────────────────────────────────────────────────────────────
 
     "@core/std": "./source/core/std/std.ts",
+    "@core/stdx": "./source/core/std/stdx.ts",
     "@ux/api": "./source/ux/api/api.ts",
+    "@ux/common/components/ui": "./source/ux/common/components/ui/ui.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
-    // Vendor Aliases
+    // VENDOR ALIASES
     // ────────────────────────────────────────────────────────────────────────────
 
+    "@kobalte/core": "npm:@kobalte/core@0.13.11",
     "@std/assert": "jsr:@std/assert@1.0.19",
-    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2.100.1",
+    "@std/walk": "jsr:@std/fs@1.0.19/walk",
+    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2.108.1",
     "@idb": "npm:idb@^8.0.0",
     "@solid-js": "npm:solid-js@1.9.12",
     "@solid-js/jsx-runtime": "npm:solid-js@1.9.12/jsx-runtime",
     "@solid-js/store": "npm:solid-js@1.9.12/store",
     "@solid-js/web": "npm:solid-js@1.9.12/web",
+    "@tanstack/solid-query": "npm:@tanstack/solid-query@5.100.14",
     "@tanstack/solid-router": "npm:@tanstack/solid-router@1.168.6",
+    "@chart-js": "npm:chart.js@^4.4.0",
     "vite": "npm:vite@8.0.3",
     "vite-plugin-solid": "npm:vite-plugin-solid@2.11.11"
   }
@@ -180,7 +189,9 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
 
 Development and local execution use `deno.jsonc` import map. Platform edge functions require platform-specific import maps:
 
-- Supabase Edge Functions: `supabase-import-map.json` (synchronized with `deno.jsonc`)
+- Supabase Edge Functions: `supabase-import-map.json` at the repository root,
+  referenced per function from `supabase/config.toml` (synchronized with
+  `deno.jsonc`)
 
 Import maps must be kept in sync manually. Path aliases use root-relative paths for consistency across environments.
 
@@ -368,6 +379,13 @@ Client makers are factory functions that produce clients conforming to contracts
 | `makeCrudHttpClient<T>()`               | `ApiCrudContract`    | HTTP calls to edge functions         | Fetch API          |
 | `makeBusRuleHttpClient()`               | `ApiBusRuleContract` | Orchestration via HTTP edge endpoint | Fetch API          |
 
+Service wrappers mirror client makers at the inbound boundary.
+`source/core/service/wrap-busrule-http-handler.ts` provides
+`wrapBusRuleHttpHandler()` for exposing BusRule-shaped service handlers over
+HTTP while preserving the standard response envelopes used by HTTP clients.
+Provider-specific orchestration, such as Supabase Auth administration, remains
+outside the service wrapper in backend orchestration modules.
+
 #### 5.3.1 Maker Pattern
 
 Each maker takes a specification object and returns a fully-typed client:
@@ -552,20 +570,26 @@ Each deployment package creates a configuration module that:
 3. Initializes with required environment variables and optional aliases
 4. Re-exports the configured singleton
 
-#### 6.3.1 Backend example (no aliases needed)
+#### 6.3.1 Backend example (aliases bind platform-injected names)
 
-Backend runtimes control their own key names — no platform prefix is imposed. The two-argument form is sufficient:
+The Supabase Edge runtime injects reserved `SUPABASE_*` variables and forbids
+custom secrets under that prefix. The alias map binds the repository's logical
+names to the platform-injected names, exactly as the UX alias map binds
+logical names to `VITE_*` names:
 
 ```typescript
 // source/back/supabase-edge/config/supabase-config.ts
 import { Config } from '@core/cfg/config.ts'
 import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
-Config.init(new SupabaseProvider(), [
-  'SUPABASE_URL',
-  'SUPABASE_SERVICE_KEY',
-  'JWT_SECRET'
-])
+Config.init(
+  new SupabaseProvider(),
+  ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'],
+  {
+    SUPABASE_PUBLIC_KEY: 'SUPABASE_ANON_KEY',
+    SUPABASE_SERVICE_KEY: 'SUPABASE_SERVICE_ROLE_KEY'
+  }
+)
 
 export { Config }
 ```
@@ -637,13 +661,13 @@ Code within a package always imports from the package-local configuration module
 
 ```typescript
 // Import from package config using alias (CORRECT)
-import { Config } from '@back/supabase-edge/config/config.ts'
+import { Config } from '@back/supabase-edge/config/supabase-config.ts'
 const url = Config.get('SUPABASE_RDBMS_URL')
 
 // It's ok for configs to be shared across packages
 // This same config is bundled with each deployment package
 //
-import { Config } from '@ux/config/config.ts'
+import { Config } from '@ux/config/ux-config.ts'
 const url = Config.get('SUPABASE_RDBMS_URL')
 
 // Never use relative paths climbing namespace tree (INCORRECT)
@@ -712,6 +736,7 @@ swarmag-system/
 │   │   ├── api/
 │   │   ├── cfg/
 │   │   ├── db/
+│   │   ├── service/
 │   │   └── std/
 │   ├── domain/
 │   │   ├── abstractions/
@@ -723,7 +748,8 @@ swarmag-system/
 │   │   ├── migrations/
 │   │   ├── supabase-edge/
 │   │   │   ├── config/
-│   │   │   └── functions/
+│   │   │   ├── functions/
+│   │   │   └── orchestration/
 │   ├── ux/
 │   │   ├── api/
 │   │   ├── app-admin/
@@ -899,9 +925,10 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.7 Edge functions stay flat
 
-- Supabase Edge Functions in `source/back/supabase-edge/functions/`
-- No subdirectories (platform discovery requirement)
-- Each function is a single file
+- Supabase Edge Functions authored in `source/back/supabase-edge/functions/`
+- No subdirectories; each function is a single file
+- Platform discovery satisfied by committed entrypoint shims in
+  `supabase/functions/` (`architecture-back.md` section 3.4)
 - Functions are thin orchestration wrappers, not business logic
 
 #### 10.1.8 Import maps only

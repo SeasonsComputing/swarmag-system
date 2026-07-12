@@ -17,8 +17,7 @@ const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 const ALLOWED_NON_LEAF_DIRS = new Set([
   `${ROOT}/source/ux/app-admin`,
   `${ROOT}/source/ux/app-ops`,
-  `${ROOT}/source/ux/app-customer`,
-  `${ROOT}/source/back/supabase-edge`
+  `${ROOT}/source/ux/app-customer`
 ])
 
 /** Normalize path separators for stable comparisons across platforms. */

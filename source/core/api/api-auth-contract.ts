@@ -22,7 +22,7 @@ ApiAuthContract - Passwordless OTP auth API contract.
 └ onAuthStateChange(callback)  Subscribe to auth-session changes.
 */
 
-import type { Id } from '@core/std'
+import { type Id } from '@core/std'
 
 /** Authenticated session returned on successful OTP verification. */
 export type Session = { userId: Id }

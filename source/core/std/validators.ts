@@ -1,8 +1,10 @@
 /**
  * Provides reusable validators (`is*`) and validator helpers (`expect*`) used
- * throughout the system.
+ * throughout the system. Optional guard fields admit undefined (absent) and
+ * null (clear marker); required fields reject both.
  */
 
+import { isNullish } from './adt.ts'
 import { isWhen } from './datetime.ts'
 import { isId } from './identifier.ts'
 import {
@@ -70,7 +72,7 @@ export const expectId = (
   field: string,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isId(value)) return null
+  if ((isNullish(value) && optional) || isId(value)) return null
   return `${field} must be a valid Id`
 }
 
@@ -80,7 +82,7 @@ export const expectWhen = (
   field: string,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isWhen(value)) return null
+  if ((isNullish(value) && optional) || isWhen(value)) return null
   return `${field} must be a valid When`
 }
 
@@ -90,7 +92,7 @@ export const expectNonEmptyString = (
   field: string,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isNonEmptyString(value)) return null
+  if ((isNullish(value) && optional) || isNonEmptyString(value)) return null
   return `${field} must be a non-empty string`
 }
 
@@ -100,7 +102,7 @@ export const expectPositiveNumber = (
   field: string,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isPositiveNumber(value)) return null
+  if ((isNullish(value) && optional) || isPositiveNumber(value)) return null
   return `${field} must be a positive number`
 }
 
@@ -110,7 +112,7 @@ export const expectBoolean = (
   field: string,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isBoolean(value)) return null
+  if ((isNullish(value) && optional) || isBoolean(value)) return null
   return `${field} must be a boolean`
 }
 
@@ -121,7 +123,7 @@ export const expectConstEnum = <T extends readonly string[]>(
   values: T,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isConstEnum(value, values)) return null
+  if ((isNullish(value) && optional) || isConstEnum(value, values)) return null
   return `${field} must be a valid value`
 }
 
@@ -132,7 +134,7 @@ export const expectCompositionOne = <T>(
   guard: ExpectGuard<T>,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isCompositionOne(value, guard)) return null
+  if ((isNullish(value) && optional) || isCompositionOne(value, guard)) return null
   return `${field} must be a single-element composition`
 }
 
@@ -143,7 +145,7 @@ export const expectCompositionOptional = <T>(
   guard: ExpectGuard<T>,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isCompositionOptional(value, guard)) return null
+  if ((isNullish(value) && optional) || isCompositionOptional(value, guard)) return null
   return `${field} must be an optional composition`
 }
 
@@ -154,7 +156,7 @@ export const expectCompositionMany = <T>(
   guard: ExpectGuard<T>,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isCompositionMany(value, guard)) return null
+  if ((isNullish(value) && optional) || isCompositionMany(value, guard)) return null
   return `${field} must be an array composition`
 }
 
@@ -165,6 +167,6 @@ export const expectCompositionPositive = <T>(
   guard: ExpectGuard<T>,
   optional = false
 ): ExpectResult => {
-  if ((value === undefined && optional) || isCompositionPositive(value, guard)) return null
+  if ((isNullish(value) && optional) || isCompositionPositive(value, guard)) return null
   return `${field} must be a non-empty array composition`
 }

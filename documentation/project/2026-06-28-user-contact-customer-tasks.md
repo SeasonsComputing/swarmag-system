@@ -127,19 +127,19 @@ domain documentation.
   - [x] Update `documentation/architecture/architecture-back.md` for user auth attribute synchronization.
   - [x] Clarify that the new work is attribute synchronization, not UUID synchronization.
   - [x] Clarify that user edge functions are authenticated user-invoked operations, not open endpoints.
-- [ ] Validate Supabase Edge runtime configuration path
-  - [x] Confirm whether Supabase Edge config should read through `Deno.env.get` or another runtime API.
-  - [ ] Reconcile backend edge env examples with the confirmed runtime names.
-  - [ ] Add `SUPABASE_SERVICE_KEY` or the approved service-key name only to backend edge configuration.
-  - [ ] Keep UX env/config free of service-role secrets.
-  - [ ] Run `deno task guard:env`.
+- [x] Validate Supabase Edge runtime configuration path
+  - [x] Confirm Supabase Edge functions read config through `Config` and `SupabaseProvider`.
+  - [x] Reconcile backend edge env examples with the confirmed runtime names.
+  - [x] Add `SUPABASE_SERVICE_KEY` or the approved service-key name only to backend edge configuration.
+  - [x] Keep UX env/config free of service-role secrets.
+  - [x] Run `deno task guard:env`.
 - [ ] Add or update user mutation edge functions
-  - [ ] Add `user-create` edge function.
-  - [ ] Add `user-update` edge function.
-  - [ ] Add `user-delete` edge function.
-  - [ ] Add `user-eject` edge function.
-  - [ ] Keep edge functions flat under `source/back/supabase-edge/functions/`.
-  - [ ] Preserve the standard user-management API surface from UX.
+  - [x] Add `user-create` edge function.
+  - [x] Add `user-update` edge function.
+  - [x] Add `user-delete` edge function.
+  - [x] Add `user-eject` edge function.
+  - [x] Keep edge functions flat under `source/back/supabase-edge/functions/`.
+  - [x] Preserve the standard user-management API surface from UX.
 - [x] Define user edge function contracts
   - [x] Confirm `user-create` creates `auth.users` and `public.users` consistently.
   - [x] Confirm `user-update` synchronizes Auth attributes with `public.users`.
@@ -150,11 +150,11 @@ domain documentation.
   - [x] Confirm each function verifies the authenticated caller and checks administrator authorization before privileged work.
 - [ ] Update supporting backend artifacts as needed
   - [ ] Add request/response protocol types if the existing contract is insufficient.
-  - [ ] Add validation at the edge-function boundary.
-  - [ ] Keep shared edge support code outside the flat `functions/` deployable directory if support code is needed.
-  - [ ] Update `makeAuthUsers()` so `api.Users` hides auth/domain synchronization details.
-  - [ ] Move login access check under `api.Users.hasAccess()`.
-  - [ ] Add `api.Users.eject()` to the returned user API contract.
+  - [x] Add validation at the edge-function boundary.
+  - [x] Keep shared edge orchestration code outside the flat `functions/` deployable directory if needed.
+  - [x] Update `makeAuthUsers()` so `api.Users` hides auth/domain synchronization details.
+  - [x] Move login access check under `api.Users.hasAccess()`.
+  - [x] Add `api.Users.eject()` to the returned user API contract.
   - [ ] Add focused tests for auth/domain consistency if test infrastructure exists.
 
 ## 4. Tests
