@@ -1,0 +1,100 @@
+# Edge Functions Remediation — Session Handoff
+
+**Date:** 2026-07-12
+**Mode:** Foundation
+**Purpose:** New-session handoff to continue the edge-functions remediation at
+Phase 3 (deployment seam). Written for an AI session with no prior context.
+**Supersedes:** `documentation/project/2026-06-30B-user-edge-functions-handoff.md`
+
+## 1. Governing Context — Ingest Before Production
+
+- Invariants: `AGENTS.md`, then `CONSTITUTION.md` (production is gated; the
+  Chief Architect approves every scope before files change)
+- Required session context (DevOps): `documentation/domain/domain-model.md`,
+  `documentation/architecture/architecture-core.md`, `STYLE-GUIDE.md`,
+  `documentation/architecture/architecture-back.md`,
+  `documentation/architecture/architecture-devops.md`
+- Approved decisions D1–D9:
+  `documentation/project/2026-07-12-edge-functions-remediation-design.md`
+- Working checklist (authoritative status):
+  `documentation/project/2026-07-12-edge-functions-remediation-tasks.md`
+
+The architecture documents were updated in Phase 1 and now correctly describe
+the target state — trust them; they lead the code.
+
+## 2. What Is Complete (do not redo)
+
+- **Phase 1** — architecture doc deltas encoding D1–D7 (committed in the CA's
+  checkpoint).
+- **Adapter null semantics (D8)** — `core/std/make-adapter.ts`,
+  `protocols.ts`, `validators.ts`, `adt.ts` (`isNullish`); unit tests in
+  `source/tests/cases/make-adapter-test.ts` and `validators-test.ts`.
+- **Phase 2** — shared edge foundation: `HttpCodes` 401/403/409;
+  `makeBusRuleSupabaseEdgeClient` reads the error `Response` body; `sendOtp`
+  passes `shouldCreateUser: false`; `supabase-config.ts` uses the D3 alias
+  form; NEW `core/service/make-supabase-edge-auth.ts` (`makeSupabaseEdgeAuth`
+  → `verifyCaller` → `EdgeCallerContext`); tests in
+  `make-supabase-edge-auth-test.ts`.
+- **Phase 3, orchestration item** — `back/supabase-edge/orchestration/user-orchestra.ts`
+  rewritten: verifyCaller handshake, auth-revocation-before-domain-mutation
+  (D4) with existence check first and 404-tolerant revoke (eject → delete is a
+  legal flow), domain writes via `serviceClient` (D7), compensation that logs
+  and rethrows the original error, honest status mapping (`statusFromAuth`).
+- **Renames (CA-directed):** the orchestration module is `user-orchestra.ts`
+  (symbols `UserOrchestra`/`UserOrchestraContract`); the auth maker file is
+  `make-supabase-edge-auth.ts`; the service exports `EdgeClients` and
+  `EdgeCallerContext = EdgeClients & { authUserId }`, and
+  `UserEdgeContext = EdgeClients & { caller: User }` — pure extension, no
+  `Omit`. Do not reintroduce old names.
+
+Current state: all of the above is uncommitted in the working tree on `main`
+(post the CA's checkpoint commit). `deno task check` (11 guards + types +
+lint) is green; 10/10 unit tests pass via
+`deno test --allow-read source/tests/cases/{make-adapter,validators,make-supabase-edge-auth}-test.ts`.
+
+## 3. What Remains — Phase 3 Deployment Seam (next production)
+
+Each item is specified in the tasks doc; the platform mechanics that were
+previously misunderstood, now settled:
+
+- Supabase discovers functions ONLY as `supabase/functions/{name}/index.ts`
+  served via `Deno.serve(handler)` — a default export does nothing. Create four
+  committed three-line shims, e.g.:
+  `import handler from '@back/supabase-edge/functions/user-create.ts'` then
+  `Deno.serve(handler)`.
+- Create `supabase-import-map.json` at the repository root — the `@core/`,
+  `@domain/`, `@back/` aliases plus vendor pins, synchronized manually with
+  `deno.jsonc` (see architecture-core §3.2.4).
+- Register functions in `supabase/config.toml`: one `[functions.{name}]` block
+  each with `import_map = "../supabase-import-map.json"` (paths are relative to
+  the `supabase/` directory) and `verify_jwt = true`. Also set
+  `enable_signup = false` under `[auth]` (D6).
+- Trim `source/back/supabase-edge/config/back-supabase-edge-{dev,stage,prod}.env.example`:
+  the platform injects `SUPABASE_URL`/`SUPABASE_ANON_KEY`/`SUPABASE_SERVICE_ROLE_KEY`
+  automatically; custom secrets must NOT begin with `SUPABASE_` (platform
+  rejects them). `SUPABASE_CLIENT_MODE` is retired for edge.
+
+Then **Phase 4** (schema/RLS per D7: drop the three open write policies on
+`users`, scope select `TO authenticated`; genesis via
+`deno task db-reset --target {dev,stage}`) and **Phase 5**
+(local `supabase functions serve` proof, deploy to dev, scripted round-trip
+integration test using `auth.admin.generateLink` for a non-interactive admin
+JWT, promote to stage, manual app-admin User Manager pass). **Phase 6** is
+backlog close-out; items are listed in the tasks doc.
+
+## 4. Working Rules for the Incoming Session
+
+- Operating modes and production gates per `AGENTS.md` — state scope, wait for
+  CA approval, report after production with `STYLE_AUDIT`.
+- The CA expects **analysis + proposal first** on design questions; execute
+  only on explicit go. Do not launch token-heavy work unprompted.
+- Delegation: decompose to free subagents for mechanical, exactly-specified
+  edits (parallel where files are disjoint); keep design-bearing modules with
+  the reasoning agent.
+- `STYLE-GUIDE.md` is a hard gate: no semicolons, single quotes, box headers
+  on functional files, `PUBLIC`/`PRIVATE` section rules, `@core/std` types
+  (e.g. `StringDictionary`, not `Record<string, string>` — a guard enforces
+  this, including in tests).
+- Run `deno task fmt` and `deno task check` before claiming completion.
+
+_End of Handoff Document_

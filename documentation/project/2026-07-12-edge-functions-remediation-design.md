@@ -105,7 +105,7 @@ tests in `source/tests/cases/`.
 
 ### D9 — Shared edge caller handshake in core
 
-`core/service/edge-auth.ts` provides `makeEdgeAuth({ url, publicKey,
+`core/service/make-supabase-edge-auth.ts` provides `makeSupabaseEdgeAuth({ url, publicKey,
 serviceKey })` returning `verifyCaller(request) → EdgeCallerContext
 { authUserId, callerClient, serviceClient }`, throwing 401 on failure. The
 platform handshake is core; the administrator predicate is domain policy and

@@ -179,7 +179,7 @@ export const makeBusRuleSupabaseEdgeClient = <
     const { data, error } = await Supabase.client().functions.invoke(fn, { body: params })
     if (error) {
       throwApiError(
-        edgeErrorDetail(error),
+        await edgeErrorDetail(error),
         `Edge Function '${fn}' failed`,
         edgeErrorStatus(error)
       )
@@ -207,18 +207,27 @@ const unwrapEdgeData = <TResult>(data: unknown): TResult => {
   return body['data'] as TResult
 }
 
-const edgeErrorDetail = (error: unknown): ApiErrorDetail => {
+const edgeErrorDetail = async (error: unknown): Promise<ApiErrorDetail> => {
   const detail = error as Dictionary
-  const context = detail['context'] as Dictionary | undefined
+  const body = await edgeErrorBody(detail['context'])
   return {
-    message: detail['message'] as string | undefined,
-    status: context?.['status'] as number | undefined,
-    details: detail['details'] as string | undefined
+    message: body?.['error'] as string | undefined ?? detail['message'] as string | undefined,
+    status: edgeErrorStatus(error),
+    details: body?.['details'] as string | undefined
+  }
+}
+
+// non-2xx edge responses carry `{ error, details? }`; gateway failures may not be JSON
+const edgeErrorBody = async (context: unknown): Promise<Dictionary | undefined> => {
+  if (!(context instanceof Response)) return undefined
+  try {
+    return await context.json() as Dictionary
+  } catch {
+    return undefined
   }
 }
 
 const edgeErrorStatus = (error: unknown): number => {
-  const detail = error as Dictionary
-  const context = detail['context'] as Dictionary | undefined
-  return context?.['status'] as number | undefined ?? 500
+  const context = (error as Dictionary)['context']
+  return context instanceof Response ? context.status : 500
 }

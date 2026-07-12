@@ -5,11 +5,13 @@
 import { Config } from '@core/cfg/config.ts'
 import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
 
-Config.init(new SupabaseProvider(), [
-  'SUPABASE_URL',
-  'SUPABASE_PUBLIC_KEY',
-  'SUPABASE_SERVICE_KEY',
-  'SUPABASE_CLIENT_MODE'
-])
+Config.init(
+  new SupabaseProvider(),
+  ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'],
+  {
+    SUPABASE_PUBLIC_KEY: 'SUPABASE_ANON_KEY',
+    SUPABASE_SERVICE_KEY: 'SUPABASE_SERVICE_ROLE_KEY'
+  }
+)
 
 export { Config }
