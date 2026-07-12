@@ -1253,8 +1253,8 @@
 }
 
 [data-ui='dialog'] {
-  background: var(--sa-shell-bg);
-  backdrop-filter:var(--sa-shell-filter);
+  background: var(--sa-bg-control);
+  backdrop-filter: var(--sa-shell-filter);
   border: var(--sa-border-card);
   border-radius: var(--sa-card-border-radius);
   box-shadow: var(--sa-shadow-card);

@@ -1,11 +1,14 @@
 /**
  * Use metadata of domain keys to storage columns to make adapters.
  * Supports recursive decomposition for Compositions and Instantiables.
+ * Patch semantics: an absent/undefined key leaves its column untouched,
+ * null clears the column, and any defined value — including falsy — is
+ * written. Storage NULL maps to domain absence.
  */
-import { Dictionary } from './adt.ts'
+import { Dictionary, isNullish } from './adt.ts'
 
-/** Contract for domain serialization. */
-export type AdapterPatch<T> = Partial<T> & Dictionary
+/** Contract for domain serialization. Null on any attribute clears its column. */
+export type AdapterPatch<T> = { [K in keyof T]?: T[K] | null } & Dictionary
 export interface Adapter<T> {
   toDomain(source: Dictionary): T
   fromDomain(patch: AdapterPatch<T>): Dictionary
@@ -28,7 +31,7 @@ export function makeAdapter<T>(meta: Adapt<T>): Adapter<T> {
       for (const [key, adapt] of metadata) {
         const [col, delegate] = adapt
         const value = source[col]
-        if (value === undefined) continue
+        if (isNullish(value)) continue
 
         // dictionary -> domain
         if (delegate) {
@@ -53,7 +56,13 @@ export function makeAdapter<T>(meta: Adapt<T>): Adapter<T> {
 
         const [col, delegate] = adapt
         const value = source[key]
-        if (!value) continue
+        if (value === undefined) continue
+
+        // null clears the stored column; falsy values write through
+        if (value === null) {
+          target[col] = null
+          continue
+        }
 
         // domain -> dictionary
         if (delegate) {

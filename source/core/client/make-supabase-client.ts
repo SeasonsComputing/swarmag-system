@@ -1,7 +1,7 @@
 /*
 ╔═════════════════════════════════════════════════════════════════════════════╗
 ║ Make client implementation for API contracts over Supabase                  ║
-║ Supabase transport bindings for CRUD API contracts                          ║
+║ Supabase transport bindings for CRUD, list & business-rule API contracts    ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -15,16 +15,24 @@ CrudSupabaseSpecification          CRUD Supabase client configuration.
 makeCrudSupabaseClient(spec)       Build CRUD/list client over Supabase.
 RpcSupabaseSpecification           RPC Supabase client configuration.
 makeBusRuleSupabaseRpcClient(spec) Build business-rule client over Supabase RPC.
+EdgeSupabaseSpecification          Edge Function client configuration.
+makeBusRuleSupabaseEdgeClient(spec) Build business-rule client over Supabase Edge Functions.
 */
 
 import type {
   ApiBusRuleContract,
   ApiCrudContract,
+  ApiErrorDetail,
   DeleteResult,
   ListOptions,
   ListResult
 } from '@core/api/api-contract.ts'
-import { checkApiError, listCursorValue, listPageLimitValue } from '@core/api/api-contract.ts'
+import {
+  checkApiError,
+  listCursorValue,
+  listPageLimitValue,
+  throwApiError
+} from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import {
   type CreateFromInstantiable,
@@ -48,8 +56,8 @@ export type CrudSupabaseSpecification<T> = {
   adapter: Adapter<T>
 }
 
-/** Configuration for a Supabase RPC business-rule client. */
-export type RpcSupabaseSpecification = {
+/** Configuration for a Supabase business-rule client. */
+export type BusRuleSupabaseSpecification = {
   fn: string
 }
 
@@ -131,7 +139,6 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
       .order('created_at', { ascending: true })
       .range(cursor, cursor + limit)
     checkApiError(error, 'Failed to list records', Supabase.errorToStatus)
-
     const rows = (data ?? []) as Dictionary[]
     const hasMore = rows.length > limit
     const page = hasMore ? rows.slice(0, limit) : rows
@@ -151,10 +158,67 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
 export const makeBusRuleSupabaseRpcClient = <
   TParams extends Dictionary = Dictionary,
   TResult = Dictionary
->({ fn }: RpcSupabaseSpecification): ApiBusRuleContract<TParams, TResult> => ({
+>({ fn }: BusRuleSupabaseSpecification): ApiBusRuleContract<TParams, TResult> => ({
   async run(params: TParams): Promise<TResult> {
     const { data, error } = await Supabase.client().rpc(fn, params)
     checkApiError(error, `RPC '${fn}' failed`, Supabase.errorToStatus)
     return data as TResult
   }
 })
+
+/**
+ * Maker to produce a business-rule client over a Supabase Edge Function.
+ * @param spec Edge Function specification with the function name.
+ * @returns Business-rule client with typed params and result.
+ */
+export const makeBusRuleSupabaseEdgeClient = <
+  TParams extends Dictionary = Dictionary,
+  TResult = Dictionary
+>({ fn }: BusRuleSupabaseSpecification): ApiBusRuleContract<TParams, TResult> => ({
+  async run(params: TParams): Promise<TResult> {
+    const { data, error } = await Supabase.client().functions.invoke(fn, { body: params })
+    if (error) {
+      throwApiError(
+        edgeErrorDetail(error),
+        `Edge Function '${fn}' failed`,
+        edgeErrorStatus(error)
+      )
+    }
+    return unwrapEdgeData<TResult>(data)
+  }
+})
+
+// ───────────────────────────────────────────────────────────────────────────────
+// INTERNALS
+// ───────────────────────────────────────────────────────────────────────────────
+
+const unwrapEdgeData = <TResult>(data: unknown): TResult => {
+  const body = data as Dictionary
+  if (body['error']) {
+    throwApiError(
+      {
+        message: body['error'] as string,
+        details: body['details'] as string | undefined
+      },
+      'Edge Function failed',
+      500
+    )
+  }
+  return body['data'] as TResult
+}
+
+const edgeErrorDetail = (error: unknown): ApiErrorDetail => {
+  const detail = error as Dictionary
+  const context = detail['context'] as Dictionary | undefined
+  return {
+    message: detail['message'] as string | undefined,
+    status: context?.['status'] as number | undefined,
+    details: detail['details'] as string | undefined
+  }
+}
+
+const edgeErrorStatus = (error: unknown): number => {
+  const detail = error as Dictionary
+  const context = detail['context'] as Dictionary | undefined
+  return context?.['status'] as number | undefined ?? 500
+}

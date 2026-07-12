@@ -15,7 +15,7 @@ import {
   type UserRole,
   type UserStatus
 } from '@domain/abstractions/user.ts'
-import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
+import { type UserCreate, type UserUpdate } from '@domain/protocols/user-protocol.ts'
 import { createEffect, createSignal, For, Show } from '@solid-js'
 import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
 import { api } from '@ux/api'
@@ -59,8 +59,17 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
     }
   }))
-  const ejectUser = async (user: User): Promise<void> => {
+  const ejectUserMutation = createMutation(() => ({
+    mutationFn: (id: User['id']) => api.Users.eject(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
+    }
+  }))
+  const deleteUser = async (user: User): Promise<void> => {
     await deleteUserMutation.mutateAsync(user.id)
+  }
+  const ejectUser = async (user: User): Promise<void> => {
+    await ejectUserMutation.mutateAsync(user.id)
   }
 
   const userManager: AbstractionManagerContract<User> = {
@@ -71,6 +80,13 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     isListLoading: () => usersQuery.isPending,
     cancel: props.onCancel,
     actions: [
+      {
+        name: 'delete',
+        label: 'Delete',
+        icon: 'delete',
+        variant: 'danger',
+        handler: deleteUser
+      },
       {
         name: 'eject',
         label: 'Eject',
@@ -87,7 +103,6 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       />
     )
   }
-
   return (
     <div data-feat='users-page'>
       <Show when={usersQuery.error}>
@@ -243,13 +258,13 @@ function UserEditor(props: {
       tags: []
     }]
   }
+
   return (
     <form id='abstraction-panel-form' onSubmit={submit}>
       <UiLayout>
         <Show when={error() !== null}>
           <UiAlert variant='danger'>{error()}</UiAlert>
         </Show>
-
         <UiFieldset legend='Identity'>
           <UiLayout>
             <UiField for='displayName' label='Name'>
@@ -261,7 +276,6 @@ function UserEditor(props: {
                 required
               />
             </UiField>
-
             <UiField for='primaryEmail' label='Email'>
               <Show
                 when={!existing()}
@@ -284,7 +298,6 @@ function UserEditor(props: {
                 />
               </Show>
             </UiField>
-
             <UiField for='phoneNumber' label='Phone'>
               <UiInput
                 name='phoneNumber'
@@ -297,7 +310,6 @@ function UserEditor(props: {
             </UiField>
           </UiLayout>
         </UiFieldset>
-
         <UiFieldset legend='Contact Preferences'>
           <UiLayout>
             <UiField for='preferredChannel' label='Preferred Channel'>
@@ -311,7 +323,6 @@ function UserEditor(props: {
             </UiField>
           </UiLayout>
         </UiFieldset>
-
         <UiFieldset legend='Notes'>
           <UiLayout>
             <UiField for='notes' label='Notes'>
@@ -325,7 +336,6 @@ function UserEditor(props: {
             </UiField>
           </UiLayout>
         </UiFieldset>
-
         <UiFieldset legend='Access'>
           <UiLayout>
             <UiField variant='caption' label='Roles'>
@@ -337,7 +347,6 @@ function UserEditor(props: {
                 disabled={pending()}
               />
             </UiField>
-
             <UiField variant='caption' label='Status'>
               <UiToggleGroup<UserStatus>
                 value={status()}

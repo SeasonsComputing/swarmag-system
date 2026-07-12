@@ -35,7 +35,13 @@ export const Dashboard = (): UiComponent => {
       <header data-feat='dashboard-header'>
         <div data-feat='dashboard-header-contents'>
           <div data-feat='dashboard-header-brand'>
-            <img data-feat='dashboard-header-logo' src={headerLogo} alt='swarmAg' width={64} height={64} />
+            <img
+              data-feat='dashboard-header-logo'
+              src={headerLogo}
+              alt='swarmAg'
+              width={64}
+              height={64}
+            />
           </div>
           <div data-feat='dashboard-header-widgets'>
             <For each={dashboard.header.widgets}>

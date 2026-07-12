@@ -12,10 +12,15 @@ import type {
 /** Contract to create an Instantiable. */
 export type CreateFromInstantiable<T extends Instantiable> = FromInstantiable<T>
 
-/** Contract to update an Instantiable. */
+/** Contract to update an Instantiable. Optional attributes admit null to clear the stored value. */
 export type UpdateFromInstantiable<T extends Instantiable> =
   & Pick<T, 'id'>
-  & Partial<FromInstantiable<T>>
+  & Clearable<FromInstantiable<T>>
+
+/** Patch shape where optional attributes additionally admit null as a clear marker. */
+type Clearable<T> = {
+  [K in keyof T]?: undefined extends T[K] ? T[K] | null : T[K]
+}
 
 /** Contract to create an InstantiableOnly. */
 export type CreateFromInstantiableOnly<T extends InstantiableOnly> = FromInstantiableOnly<T>

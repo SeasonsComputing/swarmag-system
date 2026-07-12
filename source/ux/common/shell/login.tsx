@@ -65,7 +65,7 @@ const LoginClient = (props: LoginClientProps) => {
     setPending(true)
     setError(null)
     try {
-      const hasAccess = await api.userHasAccess.run({ email: email() })
+      const hasAccess = await api.Users.hasAccess(email())
       if (!hasAccess) {
         setError('Email address not registered.')
         return

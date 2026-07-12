@@ -32,6 +32,7 @@ export type DashboardContextContract = {
   widgets: WidgetRegistry
 }
 
+/** Context for the dashboard runtime contract supplied to the shell subtree. */
 const DashboardContext = createContext<DashboardContextContract>()
 
 /** Provides dashboard state and widget resolution to the shell subtree. */
