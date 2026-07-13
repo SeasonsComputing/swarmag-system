@@ -159,9 +159,12 @@ Edge functions **do not**:
 
 **Deployment layout** (Supabase platform requirement):
 
-The Supabase platform discovers functions as `supabase/functions/{name}/index.ts`
-and serves them via `Deno.serve`. Each function has a committed entrypoint shim
-that bridges the authoring layout to the platform:
+Supabase edge tooling mounts only `supabase/functions/` into its runtime
+container — function imports cannot reach `source/`. The platform discovers
+functions as `supabase/functions/{name}/index.ts` served via `Deno.serve`.
+Each function therefore has:
+
+- A committed entrypoint shim bridging the authoring layout to the platform:
 
 ```typescript
 // supabase/functions/user-create/index.ts
@@ -170,8 +173,17 @@ import handler from '@back/supabase-edge/functions/user-create.ts'
 Deno.serve(handler)
 ```
 
-Shims contain no logic. All behavior lives in the authored function file. Shim
-imports resolve through `supabase-import-map.json` (see section 7.1).
+- A generated per-function `deno.json` declaring the alias imports into
+  `_shared/` — the Deno 2 edge runtime resolves function dependencies from
+  this file (the `config.toml` `import_map` key is not honored by `serve`).
+  `edge-sync` derives it for every function directory from the committed
+  `supabase/functions/import_map.json`, the single source of truth.
+
+Shims contain no logic. All behavior lives in the authored function files,
+which reach the runtime through `supabase/functions/_shared/` — a generated,
+gitignored copy of the `source/core`, `source/domain`, and
+`source/back/supabase-edge` trees produced by `deno task edge-sync`. Deleting
+`_shared` loses nothing; it is regenerable infrastructure (see section 7.1).
 
 ## 4. Database Layer
 
@@ -393,19 +405,21 @@ See `STYLE-GUIDE.md` section 11 for general testing conventions.
 
 ### 7.1 Supabase Edge Functions
 
-Each function deploys from its committed entrypoint shim under
-`supabase/functions/{name}/index.ts` (see section 3.4):
+Serve and deploy always run through the repository tasks, which refresh
+`supabase/functions/_shared/` (`edge-sync`) and pin `TMPDIR` to a
+Docker-VM-shared path before invoking the Supabase CLI:
 
 ```bash
-supabase link --project-ref <project-ref>
-supabase functions deploy user-create
+deno task edge-serve                # sync, clean stale container, serve locally
+deno task edge-deploy user-create   # sync, deploy one function (linked project)
 ```
 
 Function registration lives in `supabase/config.toml`, one block per function:
 
 ```toml
 [functions.user-create]
-import_map = "../supabase-import-map.json"
+entrypoint = "./functions/user-create/index.ts"
+import_map = "./functions/import_map.json"
 verify_jwt = true
 ```
 
@@ -413,15 +427,25 @@ verify_jwt = true
   user-management function. The gateway check is transport authentication
   only — it never replaces caller verification and administrator authorization
   inside the function (section 4.6).
-- `supabase-import-map.json` lives at the repository root and carries the
-  `@core/`, `@domain/`, and `@back/` path aliases plus vendor pins,
-  synchronized manually with `deno.jsonc`.
+- Runtime alias resolution comes from each function's committed `deno.json`
+  (section 3.4). `supabase/functions/import_map.json` carries the same map for
+  CLI compatibility. Both are synchronized manually with `deno.jsonc`,
+  restricted to what the edge function graph needs.
 
-Local verification before deploying to a hosted target:
+Local platform constraints, learned empirically and enforced by the tasks:
 
-```bash
-supabase functions serve
-```
+- The Supabase CLI stages runtime artifacts in `$TMPDIR` and bind-mounts them;
+  Docker VMs that do not share `/var/folders` (e.g. Colima's defaults) see a
+  phantom empty directory and the main worker fails to boot. The tasks pin
+  `TMPDIR` to `build/tmp` under the repository, which is home-shared.
+- A crashed `serve` leaves a stale `supabase_edge_runtime_*` container that
+  blocks the next boot; `edge-serve` removes it before starting.
+
+Every deployed function is its own platform application — its own worker,
+module graph, and manifest. Build traceability therefore travels with the
+bundle: `edge-sync` stamps `_shared` build metadata (`VERSION` line, git build
+count, short SHA), and every function reply carries it in the
+`x-swarmag-build` response header via the BusRule wrapper's static headers.
 
 ### 7.2 Database Migrations
 

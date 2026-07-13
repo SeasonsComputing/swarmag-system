@@ -51,6 +51,7 @@ source/devops/
     ├── app-ops-package.sh
     ├── app-ops-package-verify.sh
     ├── app-style-guide-local.sh
+    ├── edge-sync.ts
     ├── gen-ai-context.ts
     ├── gen-id-seeds.ts
     ├── gen-jwt-secret.ts
@@ -511,6 +512,7 @@ supported task groups; individual task bodies remain in `deno.jsonc`.
 | Generators    | `gen:jwt-secret`, `gen:id-seeds`, `gen:ai-context`                   |
 | Guards        | `guard:*` tasks listed in Guard Inventory                            |
 | Database      | `db-reset`, `db-genesis`, `db-genesis-verify`                        |
+| Edge          | `edge-sync`, `edge-serve`, `edge-deploy`                             |
 | Packaging     | `app-{name}-package-{target}`, `app-{name}-package-{target}-verify`  |
 | Deployment    | `deploy`, `ux-smoke`, `ux-stage-smoke`                               |
 | Local servers | `app-dev-local`, `app-stage-local`, `app-style-guide-local`          |

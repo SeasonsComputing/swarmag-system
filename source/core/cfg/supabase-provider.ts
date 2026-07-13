@@ -1,25 +1,22 @@
 /**
  * Supabase Edge Functions configuration provider.
- * Accesses environment variables via Supabase.env and throws HTTP Response errors.
+ * Accesses environment variables via Deno.env — the Supabase Edge runtime
+ * exposes configuration through the standard Deno API — and throws HTTP
+ * Response errors on failure.
  */
 
-import type { RuntimeProvider } from './runtime-provider.ts'
-
-/** Supabase.env ambient declaration */
-declare const Supabase:
-  | { env: { get(key: string): string | undefined } }
-  | undefined
+import { type RuntimeProvider } from './runtime-provider.ts'
 
 /**
  * Configuration provider for Supabase edge functions.
  */
 export class SupabaseProvider implements RuntimeProvider {
   constructor() {
-    const isSupabase = 'Supabase' in globalThis
-    if (!isSupabase) this.fail('Supabase runtime not available')
+    const isDeno = 'Deno' in globalThis
+    if (!isDeno) this.fail('Deno runtime not available')
   }
   get(key: string): string | undefined {
-    return Supabase?.env.get(key)
+    return Deno.env.get(key)
   }
   fail(msg: string): never {
     throw new Response(msg, { status: 500 })

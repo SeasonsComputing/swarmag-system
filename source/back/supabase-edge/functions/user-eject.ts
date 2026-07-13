@@ -14,6 +14,7 @@ PUBLIC
 default  Wrapped Supabase Edge HTTP handler.
 */
 
+import { BUILD_META, HEADER_BUILD } from '@back/supabase-edge/config/build-meta.ts'
 import {
   type UserEdgeContext,
   type UserIdRequest,
@@ -24,5 +25,6 @@ import type { User } from '@domain/abstractions/user.ts'
 
 export default wrapBusRuleHttpHandler<UserIdRequest, User, UserEdgeContext>({
   context: UserOrchestra.authorizeAdmin,
-  handle: (input, context) => UserOrchestra.eject(input, context)
+  handle: (input, context) => UserOrchestra.eject(input, context),
+  headers: { [HEADER_BUILD]: BUILD_META }
 })

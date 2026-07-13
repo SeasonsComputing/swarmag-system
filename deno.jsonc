@@ -81,6 +81,11 @@
     "db-reset": "sh -c 'deno task db-genesis \"$@\" && deno task db-genesis-verify \"$@\"' --",
     "db-genesis": "deno run --allow-read --allow-run --allow-env source/devops/scripts/db-genesis.ts",
     "db-genesis-verify": "deno run --allow-read --allow-run --allow-env source/devops/scripts/db-genesis-verify.ts",
+    "edge-sync": "deno run --allow-read --allow-write --allow-run=git source/devops/scripts/edge-sync.ts",
+    // TMPDIR must be a Docker-VM-shared path (Colima shares $HOME, not /var/folders);
+    // stale edge-runtime containers from crashed serves are removed first
+    "edge-serve": "sh -c 'ROOT=\"$(git rev-parse --show-toplevel)\" && cd \"$ROOT\" && deno task edge-sync && mkdir -p build/tmp && docker rm -f supabase_edge_runtime_swarmag-system 2>/dev/null; TMPDIR=\"$ROOT/build/tmp\" supabase functions serve'",
+    "edge-deploy": "sh -c 'ROOT=\"$(git rev-parse --show-toplevel)\" && cd \"$ROOT\" && deno task edge-sync && mkdir -p build/tmp && TMPDIR=\"$ROOT/build/tmp\" supabase functions deploy \"$@\"' --",
 
     // ────────────────────────────────────────────────────────────────────────────
     // VERIFICATION GUARDS

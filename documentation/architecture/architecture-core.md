@@ -189,9 +189,11 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
 
 Development and local execution use `deno.jsonc` import map. Platform edge functions require platform-specific import maps:
 
-- Supabase Edge Functions: `supabase-import-map.json` at the repository root,
-  referenced per function from `supabase/config.toml` (synchronized with
-  `deno.jsonc`)
+- Supabase Edge Functions: a committed `deno.json` per function directory
+  (runtime resolution) plus `supabase/functions/import_map.json` (CLI
+  compatibility), both mapping aliases into the generated
+  `supabase/functions/_shared/` tree and synchronized with `deno.jsonc` —
+  see `architecture-back.md` sections 3.4 and 7.1
 
 Import maps must be kept in sync manually. Path aliases use root-relative paths for consistency across environments.
 

@@ -195,7 +195,7 @@ web3 = 30
 
 [auth.email]
 # Allow/disallow new user signups via email to your project.
-enable_signup = true
+enable_signup = false
 # If enabled, a user will be required to confirm any email change on both the old, and new email
 # addresses. If disabled, only the new email is required to confirm.
 double_confirm_changes = true
@@ -367,19 +367,23 @@ deno_version = 2
 # secret_key = "env(SECRET_VALUE)"
 
 [functions.user-create]
-import_map = "../supabase-import-map.json"
+entrypoint = "./functions/user-create/index.ts"
+import_map = "./functions/import_map.json"
 verify_jwt = true
 
 [functions.user-update]
-import_map = "../supabase-import-map.json"
+entrypoint = "./functions/user-update/index.ts"
+import_map = "./functions/import_map.json"
 verify_jwt = true
 
 [functions.user-delete]
-import_map = "../supabase-import-map.json"
+entrypoint = "./functions/user-delete/index.ts"
+import_map = "./functions/import_map.json"
 verify_jwt = true
 
 [functions.user-eject]
-import_map = "../supabase-import-map.json"
+entrypoint = "./functions/user-eject/index.ts"
+import_map = "./functions/import_map.json"
 verify_jwt = true
 
 [analytics]
