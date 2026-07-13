@@ -34,10 +34,11 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 
 ### 3.2 Convenience barrel aliases
 
-| Alias       | Resolves to              |
-| ----------- | ------------------------ |
-| `@core/std` | `source/core/std/std.ts` |
-| `@ux/api`   | `source/ux/api/api.ts`   |
+| Alias        | Resolves to               |
+| ------------ | ------------------------- |
+| `@core/std`  | `source/core/std/std.ts`  |
+| `@core/stdx` | `source/core/std/stdx.ts` |
+| `@ux/api`    | `source/ux/api/api.ts`    |
 
 ### 3.3 Import Rules
 
