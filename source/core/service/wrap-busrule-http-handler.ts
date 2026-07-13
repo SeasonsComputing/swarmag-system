@@ -21,6 +21,7 @@ wrapBusRuleHttpHandler(spec) Wrap a BusRule-shaped service as an HTTP handler.
 */
 
 import {
+  type HttpHeaders,
   type HttpRequest,
   type HttpResponse,
   toInternalError,
@@ -49,6 +50,8 @@ export type BusRuleHttpHandler<TParams, TResult, TContext> = (
 export type BusRuleHttpSpecification<TParams, TResult, TContext> = {
   context: BusRuleHttpContext<TContext>
   handle: BusRuleHttpHandler<TParams, TResult, TContext>
+  /** Static response headers merged into every reply (e.g. build stamp). */
+  headers?: HttpHeaders
 }
 
 /** Expected service error carrying an HTTP status. */
@@ -73,18 +76,27 @@ export const wrapBusRuleHttpHandler = <TParams, TResult, TContext>(
   wrapHttpHandler<TParams>(async (
     request: HttpRequest<TParams>
   ): Promise<HttpResponse<{ data: TResult } | { error: string; details?: string }>> => {
-    try {
-      if (request.method !== 'POST') return toMethodNotAllowed()
-      const context = await spec.context(request)
-      return toOk(await spec.handle(request.body, context, request))
-    } catch (error) {
-      return toServiceError(error)
-    }
+    const response = await toServiceResponse(spec, request)
+    if (!spec.headers) return response
+    return { ...response, headers: { ...spec.headers, ...response.headers } }
   }, { cors: true })
 
 // ────────────────────────────────────────────────────────────────────────────
 // PRIVATE
 // ────────────────────────────────────────────────────────────────────────────
+
+const toServiceResponse = async <TParams, TResult, TContext>(
+  spec: BusRuleHttpSpecification<TParams, TResult, TContext>,
+  request: HttpRequest<TParams>
+): Promise<HttpResponse<{ data: TResult } | { error: string; details?: string }>> => {
+  try {
+    if (request.method !== 'POST') return toMethodNotAllowed()
+    const context = await spec.context(request)
+    return toOk(await spec.handle(request.body, context, request))
+  } catch (error) {
+    return toServiceError(error)
+  }
+}
 
 const toServiceError = (error: unknown): HttpResponse<{ error: string; details?: string }> => {
   if (error instanceof HttpServiceError) return toError(error.statusCode, error.message)

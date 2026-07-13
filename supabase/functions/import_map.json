@@ -1,0 +1,10 @@
+{
+  "imports": {
+    "@core/": "./_shared/core/",
+    "@domain/": "./_shared/domain/",
+    "@back/": "./_shared/back/",
+    "@core/std": "./_shared/core/std/std.ts",
+    "@core/stdx": "./_shared/core/std/stdx.ts",
+    "@supabase/client": "https://esm.sh/@supabase/supabase-js@2.108.1"
+  }
+}

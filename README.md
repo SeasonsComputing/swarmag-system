@@ -185,14 +185,16 @@ Where:
 - `{name}`: `admin` | `ops` | `customer`.
 - `{target}`: `dev` | `stage` | `prod`.
 
-**Backend edge deployment:**
+**Backend edge serve and deployment:**
 
-Edge functions are Supabase orchestration handlers under
-`source/back/supabase-edge/functions/`. Deploy the changed function by name after
-linking the intended Supabase project.
+Edge functions are Supabase orchestration handlers authored under
+`source/back/supabase-edge/functions/` and deployed via committed shims under
+`supabase/functions/`. Always use the repository tasks — they refresh the
+generated `_shared` tree and pin `TMPDIR` to a Docker-VM-shared path:
 
 ```bash
-supabase functions deploy <function>
+dot edge-serve               # serve all functions against the local stack
+dot edge-deploy <function>   # deploy one function to the linked project
 ```
 
 **Backend OTP sign-in email deployment:**

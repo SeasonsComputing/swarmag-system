@@ -20,3 +20,5 @@ secrets.jsonc
 **/*-stage.env
 **/*-prod.env
 source/devops/genesis/seed-ids.txt
+supabase/functions/_shared/
+supabase/functions/*/deno.json

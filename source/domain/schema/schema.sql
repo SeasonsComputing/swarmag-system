@@ -66,16 +66,7 @@ CREATE TABLE users (
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "users_select_active" ON users
-  FOR SELECT USING (deleted_at IS NULL);
-
-CREATE POLICY "users_insert_all" ON users
-  FOR INSERT WITH CHECK (true);
-
-CREATE POLICY "users_update_all" ON users
-  FOR UPDATE USING (deleted_at IS NULL) WITH CHECK (true);
-
-CREATE POLICY "users_delete_all" ON users
-  FOR DELETE USING (deleted_at IS NULL);
+  FOR SELECT TO authenticated USING (deleted_at IS NULL);
 
 CREATE INDEX users_deleted_at_idx ON users (deleted_at);
 

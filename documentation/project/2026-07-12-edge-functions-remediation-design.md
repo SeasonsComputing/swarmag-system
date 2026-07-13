@@ -2,7 +2,9 @@
 
 **Date:** 2026-07-12
 **Mode:** Foundation
-**Status:** Approved — Phase 1 (documentation) complete; implementation phases pending
+**Status:** Approved — D1–D10 executed; see
+`documentation/project/2026-07-12-edge-functions-remediation-tasks.md` for
+current phase status
 **Supersedes:** UUID language in `documentation/project/2026-06-30B-user-edge-functions-handoff.md` (see D1)
 
 ---
@@ -110,6 +112,40 @@ serviceKey })` returning `verifyCaller(request) → EdgeCallerContext
 { authUserId, callerClient, serviceClient }`, throwing 401 on failure. The
 platform handshake is core; the administrator predicate is domain policy and
 stays in `back/supabase-edge/orchestration`.
+
+### D10 — Functions are self-contained under `supabase/functions/` _(approved and executed 2026-07-13)_
+
+Supabase edge tooling mounts only `supabase/functions/` into its runtime
+container; imports cannot reach `source/`, and symlinks dangle across the
+mount. Therefore:
+
+- **Committed:** the four shims; `supabase/functions/import_map.json` — the
+  single source of truth for edge alias resolution; `config.toml`
+  `[functions.*]` blocks with explicit `entrypoint`.
+- **Generated, gitignored:** `supabase/functions/_shared/{core,domain,back}`
+  copied from `source/` by `deno task edge-sync`, plus a per-function
+  `deno.json` derived from the committed import map (the Deno 2 runtime
+  resolves dependencies from it — `config.toml` `import_map` is not honored
+  by `serve`), plus stamped build metadata
+  (`_shared/back/supabase-edge/config/build-meta.ts`).
+- **Each function is a platform application** (own worker, graph, manifest,
+  lifecycle): manifests are derived not hand-written, and every reply carries
+  the build id in the `x-swarmag-build` header via the BusRule wrapper's
+  static `headers` spec option; the committed `build-meta.ts` placeholder is
+  `'dev'` and `edge-sync` stamps the deployed copy.
+- **Deleted:** the root `supabase-import-map.json` (aimed at the wrong
+  boundary and carried UX-only vendor pins).
+- **Operational tasks:** `edge-serve` and `edge-deploy` wrap the CLI — they
+  run `edge-sync`, pin `TMPDIR` to the repo-local `build/tmp` (Docker VMs
+  such as Colima do not share `/var/folders`, which breaks the CLI's mounted
+  runtime artifacts), and `edge-serve` removes the stale edge-runtime
+  container a crashed serve leaves behind.
+
+**Repair executed with D10:** `core/cfg/supabase-provider.ts` read env from a
+nonexistent `Supabase.env` global (the runtime's `Supabase` global exists but
+carries no `env`); the Supabase Edge runtime exposes configuration via
+standard `Deno.env.get()`. The provider was corrected accordingly — the edge
+config bootstrap could never have worked before this fix.
 
 ---
 
