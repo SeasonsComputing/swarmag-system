@@ -234,9 +234,21 @@ Canonical seed data known at schema time is part of `schema.sql` — not a migra
 - **Asset types** — canonical `asset_types` records from `domain-seed-data.md §4`
 - **Services** — canonical `services` records from `domain-seed-data.md §2` and `§3`
 - **Internal questions** — canonical `questions` seed records with `QuestionType = 'internal'` from `domain-seed-data.md §5`
-- **Bootstrap admin user** — `devops-admin@swarmag.com` with `administrator` role and stable UUID; password reset via Supabase Auth dashboard post-deploy
+- **Bootstrap admin user** — `devops-admin@swarmag.com` with `administrator` role and stable UUID; authenticates via the same passwordless OTP flow as every other user. No password is ever set for this or any account: Supabase provides no config toggle to disable password-grant login, so the passwordless invariant is enforced entirely by the absence of any password-setting code path in this system. Never set a password for any user via the Supabase dashboard or Auth admin API — doing so creates a login path that bypasses `sendOtp`, `shouldCreateUser: false`, and every edge-function authorization check, and is indistinguishable from an OTP-issued session at the RLS layer.
 
 All seed record IDs are stable UUID v7 values drawn from `source/devops/genesis/seed-ids.txt`. No seed record uses a database-generated ID.
+
+**Seed email edits do not propagate to an existing `auth.users` row.** The
+`auth.users` seed statement's `ON CONFLICT (id) DO UPDATE SET` clause
+deliberately excludes `email` — this protects a real, already-changed login
+email from being silently reverted by an unrelated future genesis run. The
+consequence: editing the bootstrap admin's seed email in this file has no
+effect on a target where genesis has already run before; `auth.users.email`
+and `public.users.primary_email` will disagree until explicitly reconciled
+(SQL, dashboard, or `user-update` once deployed). `db-genesis-verify` asserts
+the two never disagree and fails loudly if they do — it does not attempt to
+auto-resolve the direction, since either direction can silently discard a
+legitimate change.
 
 ### 4.5 Auth / Domain User Boundary
 

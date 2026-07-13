@@ -90,9 +90,20 @@ export const UserOrchestra: UserOrchestraContract = {
   },
 
   async update(input: UserUpdate, context: UserEdgeContext): Promise<User> {
+    const previousEmail = input.primaryEmail !== undefined
+      ? (await getUserRow(context.serviceClient, input.id)).primaryEmail
+      : undefined
+
     const user = await updateUserRow(context.serviceClient, input)
-    if (input.primaryEmail !== undefined) await updateAuthEmail(context, user)
-    return user
+    if (previousEmail === undefined) return user
+
+    try {
+      await updateAuthEmail(context, user)
+      return user
+    } catch (error) {
+      await compensateEmailUpdate(context.serviceClient, input.id, previousEmail)
+      throw error
+    }
   },
 
   async delete(input: UserIdRequest, context: UserEdgeContext): Promise<DeleteResult> {
@@ -139,6 +150,20 @@ const deleteAuthUser = async (context: UserEdgeContext, id: Id): Promise<void> =
 const compensateAuthUser = async (context: UserEdgeContext, id: Id): Promise<void> => {
   const { error } = await context.serviceClient.auth.admin.deleteUser(id)
   if (error) console.error('Auth user compensation failed:', id, error)
+}
+
+// compensation must never mask the original failure
+const compensateEmailUpdate = async (
+  client: SupabaseClient,
+  id: Id,
+  previousEmail: string
+): Promise<void> => {
+  const { error } = await client
+    .from('users')
+    .update({ primary_email: previousEmail, updated_at: when() })
+    .eq('id', id)
+    .is('deleted_at', null)
+  if (error) console.error('Domain email compensation failed:', id, error)
 }
 
 const updateAuthEmail = async (context: UserEdgeContext, user: User): Promise<void> => {
