@@ -2,8 +2,9 @@
 
 **Date:** 2026-07-12
 **Mode:** Foundation
-**Status:** Phases 0–3b complete (uncommitted); Phase 4 schema edit made
-locally, db-reset runs pending; Phases 5–6 pending
+**Status:** Phases 0–4 complete. No hosted dev project exists (solo,
+pre-release team) — decisions and phases below run against **stage only**
+until a second target is ever needed. Phases 5–6 pending.
 **Source design:** `documentation/project/2026-07-12-edge-functions-remediation-design.md`
 
 This task list decomposes the approved design (D1–D9) into gated phases. Each
@@ -102,23 +103,40 @@ phase is one authorized production with its own checks.
       spec option; all four functions reply with `x-swarmag-build`
       (verified live: `x-swarmag-build: 0.1.750+aeb7e7e` on a 401)
 
-## Phase 4 — Schema / RLS
+## Phase 4 — Schema / RLS _(complete 2026-07-13, stage only)_
 
 - [x] `source/domain/schema/schema.sql` — drop `users_insert_all`,
       `users_update_all`, `users_delete_all`; scope select `TO authenticated` (D7)
-      _(edited locally, uncommitted; not yet applied to any target)_
-- [ ] `deno task db-reset --target dev` + verify (blocked: Supabase CLI auth
-      resolved 2026-07-13; run pending)
-- [ ] `deno task db-reset --target stage` + verify
+- [x] Seed email corrected to match `architecture-back.md` §4.4:
+      `devops-admin@swarmag.com` (was a temporary `tedvkremer@gmail.com` hack)
+- [x] Supabase CLI auth resolved (stale PAT regenerated)
+- [x] Topology confirmed via `list-supabase-targets`: no hosted dev project
+      exists — solo pre-release team, stage is the only real target
+- [x] `deno task db-reset --target stage` run (interactive confirmation;
+      CA ran directly — `globalThis.prompt()` requires a real TTY, cannot be
+      satisfied non-interactively, by design)
+- [x] REPAIR `source/devops/scripts/db-genesis-verify.ts:157` — hardcoded
+      stale `tedvkremer@gmail.com` in the `user_has_access` RPC check;
+      corrected to `devops-admin@swarmag.com`
+- [x] Independently verified live against `vpntxhqnwyudhiadsmtn` via Supabase
+      MCP `execute_sql`: seed counts (asset_types=9, services=12,
+      questions=14) correct; `user_has_access` RPC correct; exactly one
+      policy on `users` (`users_select_active`, SELECT, `TO authenticated`) —
+      the three open write policies are confirmed gone from the live database
 
-## Phase 5 — Validate, Deploy, Verify
+## Phase 5 — Deploy and Verify (Stage)
 
-- [ ] `deno task check` green
-- [ ] `supabase functions serve` — local runtime proof of the seam
-- [ ] Deploy 4 functions to dev; scripted round-trip integration test
-      (admin JWT via `auth.admin.generateLink`; create → update(email) →
-      eject → delete; assert UUID invariant each step) added to `source/tests/`
-- [ ] Deploy to stage; re-run round-trip; manual app-admin User Manager pass
+- [x] `deno task check` green
+- [x] `supabase functions serve` — local runtime proof of the seam
+- [ ] Deploy 4 functions to stage (`deno task edge-deploy`); scripted
+      round-trip integration test (admin JWT via `auth.admin.generateLink`;
+      create → update(email) → eject → delete; assert UUID invariant each
+      step) added to `source/tests/`
+- [ ] Manual app-admin User Manager pass against stage
+
+Local `edge-serve` remains available as an optional fast-iteration tool, not
+the primary workflow — for a solo pre-release team, deploy-to-stage-and-read-
+logs is the cheaper loop once the deployment seam itself is proven (it is).
 
 ## Phase 6 — Close-out
 
