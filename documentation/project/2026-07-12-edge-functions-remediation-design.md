@@ -147,6 +147,41 @@ carries no `env`); the Supabase Edge runtime exposes configuration via
 standard `Deno.env.get()`. The provider was corrected accordingly — the edge
 config bootstrap could never have worked before this fix.
 
+### D11 — Auth/domain email drift: detect, never auto-resolve _(executed 2026-07-13)_
+
+**Incident:** the seed email was corrected from a temporary
+`tedvkremer@gmail.com` hack to `devops-admin@swarmag.com` (matching D1's
+architecture-back §4.4). The `auth.users` seed statement's
+`ON CONFLICT (id) DO UPDATE SET` clause deliberately excludes `email` — this
+protects a real, already-changed login email from being silently reverted by
+an unrelated future genesis run. Consequence: the seed edit never propagated
+to the stage row that already existed from before this session, so
+`auth.users.email` (`tedvkremer@gmail.com`) and `public.users.primary_email`
+(`devops-admin@swarmag.com`) disagreed after genesis ran. This locked the CA
+out of the admin app after logout — `hasAccess` and `sendOtp` check opposite
+tables and neither email alone satisfied both.
+
+**Fixed live:** one-off `UPDATE auth.users SET email = 'devops-admin@swarmag.com'
+WHERE id = ...` against stage, reconciling the two records.
+
+**Fixed structurally, two places, same philosophy as D10's genesis/`ON CONFLICT`
+tension — never silently pick a direction, because either direction can
+discard a legitimate change:**
+
+- `db-genesis-verify.ts` gained a join-based assertion
+  (`auth.users.email IS DISTINCT FROM public.users.primary_email` → hard
+  fail) so any future drift, from any cause, is caught at verify time instead
+  of surfacing as a confusing runtime login failure.
+- `user-orchestra.ts`'s `update()` gained compensation symmetric to
+  `create()`'s: this exact class of drift was already separately reachable
+  through the _real_ application path via a plain transient failure —
+  `updateUserRow` could succeed while the subsequent `updateAuthEmail` call
+  failed, with no rollback. `update()` now captures the prior email before
+  writing, and on an auth-sync failure reverts the domain row and rethrows
+  the original error (never masking it, per D4).
+- `architecture-back.md` §4.4 documents the `ON CONFLICT` exclusion and why,
+  so a future seed-email edit doesn't reproduce this surprise.
+
 ---
 
 ## 3. Plan of Record

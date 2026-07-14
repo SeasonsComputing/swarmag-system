@@ -938,7 +938,9 @@ These rules must never be violated. Code that violates these invariants is wrong
 - All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@ux/api`)
 - No relative imports across top-level namespaces
 - Import maps defined in `deno.jsonc`
-- Platform-specific maps (e.g., `supabase-import-map.json`) synchronized manually
+- Platform-specific maps (per-function `deno.json` plus
+  `supabase/functions/import_map.json`, generated/synced by
+  `deno task edge-sync` — see `architecture-back.md` §3.4/§7.1)
 
 #### 10.1.9 Regenerable infrastructure
 

@@ -7,7 +7,7 @@ pre-release team) — decisions and phases below run against **stage only**
 until a second target is ever needed. Phases 5–6 pending.
 **Source design:** `documentation/project/2026-07-12-edge-functions-remediation-design.md`
 
-This task list decomposes the approved design (D1–D9) into gated phases. Each
+This task list decomposes the approved design (D1–D11) into gated phases. Each
 phase is one authorized production with its own checks.
 
 ## Phase 0 — Decisions
@@ -28,7 +28,8 @@ phase is one authorized production with its own checks.
         compensation rethrow, eject reactivation-unsupported (D5)
   - [x] §5.1 alias-map config sample; `SUPABASE_CLIENT_MODE` dropped (D3)
   - [x] §7.1 real deploy workflow (`config.toml [functions.*]`, `verify_jwt`,
-        root import map, `functions serve`)
+        root import map, `functions serve`) — import-map detail superseded by
+        D10, see Phase 3b
 - [x] `architecture-core.md`
   - [x] §3.2.3 flat authoring decoupled from platform discovery
   - [x] §3.2.4 import-map wiring via `config.toml`; snippet synced to `deno.jsonc`
@@ -123,6 +124,25 @@ phase is one authorized production with its own checks.
       questions=14) correct; `user_has_access` RPC correct; exactly one
       policy on `users` (`users_select_active`, SELECT, `TO authenticated`) —
       the three open write policies are confirmed gone from the live database
+
+## Phase 4 Addendum — Auth/Domain Email Drift (D11, complete 2026-07-13)
+
+- [x] Incident found: seed email correction (`tedvkremer@gmail.com` →
+      `devops-admin@swarmag.com`) never propagated to the pre-existing stage
+      `auth.users` row — `ON CONFLICT` deliberately excludes `email`. Locked
+      CA out of the admin app after logout.
+- [x] Fixed live: one-off `UPDATE auth.users SET email = ...` against stage
+- [x] `db-genesis-verify.ts` — join-based drift assertion between
+      `auth.users.email` and `public.users.primary_email`; hard fail on any
+      mismatch, no auto-resolution in either direction
+- [x] `orchestration/user-orchestra.ts` `update()` — compensation symmetric
+      to `create()`'s: reverts the domain email and rethrows the original
+      error if `updateAuthEmail` fails after `updateUserRow` succeeds (this
+      exact drift was independently reachable via a plain transient failure
+      in the real application path, not just via genesis)
+- [x] `architecture-back.md` §4.4 documents the `ON CONFLICT` exclusion and
+      why it's intentional despite the surprise
+- [x] `deno task check` green after all of the above; committed by CA
 
 ## Phase 5 — Deploy and Verify (Stage)
 
