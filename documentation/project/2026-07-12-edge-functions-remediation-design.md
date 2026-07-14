@@ -2,9 +2,13 @@
 
 **Date:** 2026-07-12
 **Mode:** Foundation
-**Status:** Approved — D1–D10 executed; see
+**Status:** CLOSED — D1–D12 executed. All six phases complete; all four
+functions (`user-create`, `user-update`, `user-delete`, `user-eject`) verified
+live on stage via real browser round-trips (create, update, delete, eject all
+confirmed working end-to-end 2026-07-14). See
 `documentation/project/2026-07-12-edge-functions-remediation-tasks.md` for
-current phase status
+phase-by-phase status and `documentation/project/2026-07-14-user-create-hang-handoff.md`
+for the D12 incident this status line refers to.
 **Supersedes:** UUID language in `documentation/project/2026-06-30B-user-edge-functions-handoff.md` (see D1)
 
 ---
@@ -181,6 +185,46 @@ discard a legitimate change:**
   the original error (never masking it, per D4).
 - `architecture-back.md` §4.4 documents the `ON CONFLICT` exclusion and why,
   so a future seed-email edit doesn't reproduce this surprise.
+
+### D12 — CORS `Access-Control-Allow-Headers` default must list every header the real client sends _(found and fixed 2026-07-14)_
+
+**Incident:** after D1–D11 landed and Phase 5's manual pass was checked off,
+"Add User" (and, latent, update/delete/eject) still failed for the CA's real
+browser session with `"Failed to send a request to the Edge Function"`. This
+was misdiagnosed at length as a server-side hang — Supabase's `Boot`/
+`Shutdown` lifecycle logs showed a ~75s gap with negligible CPU use, which
+looked like an invocation stuck on an `await`. That gap turned out to be
+normal isolate idle-timeout behavior, unrelated to the request outcome
+(confirmed by observing the identical gap on a fast, successful OPTIONS
+preflight). The actual defect: `wrap-http-handler.ts`'s `makeCorsHeaders`
+defaulted `Access-Control-Allow-Headers` to `Content-Type, Authorization` —
+never including `apikey`, which `supabase-js`'s `functions.invoke()` always
+sends. A real browser enforces that every header the actual request uses
+must appear in the preflight's allowlist, so it silently blocked the POST
+client-side, after the OPTIONS preflight itself returned a "successful" 204.
+`curl` does not enforce CORS at all, which is why every curl-based
+verification in Phase 5 (and this incident's early diagnosis) passed
+regardless of this bug — curl was structurally incapable of revealing it.
+
+**Fixed:** default is now `Content-Type, Authorization, apikey, x-client-info`.
+`makeCorsHeaders` is exported (was previously an unexported internal despite
+already being documented as public in the file's own header) so it has a
+single source of truth reusable outside `wrap-http-handler.ts`.
+
+**Also added:** `core/service/wrap-supabase-shim.ts` — wraps
+`Deno.serve(handler)` for all four functions with slow/failure-only logging
+(silent on the happy path) and a 30s timeout that fails loud with a
+CORS-correct response instead of an unexplained platform idle shutdown; a
+timed-out handler is still watched so its eventual outcome is logged too. Not
+to be confused with D2's per-function `index.ts` entrypoint shims (the
+"deployment seam" shims) — this is a distinct, orthogonal wrapper composed
+inside them (`Deno.serve(wrapSupabaseShim(handler))`).
+
+**Lesson recorded for future incidents:** when a failure presents as "browser
+says request failed," check the browser's own Network tab / request
+classification first. A fast, successful `curl` response is not evidence a
+browser client will succeed — CORS enforcement is entirely a browser-side
+behavior invisible to `curl`.
 
 ---
 
