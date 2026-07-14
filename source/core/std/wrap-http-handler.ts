@@ -247,7 +247,8 @@ export const HttpCodes = {
   conflict: 409,
   payloadTooLarge: 413,
   unprocessableEntity: 422,
-  internalError: 500
+  internalError: 500,
+  gatewayTimeout: 504
 } as const
 
 /** Common HTTP header keys. */
@@ -381,6 +382,27 @@ export interface HttpHandlerConfig {
   validateContentType?: boolean
   /** Support multi-value query parameters (e.g., ?tag=red&tag=blue). Default: false */
   multiValueQueryParams?: boolean
+}
+
+/**
+ * Make CORS headers based on configuration.
+ * @param config CORS configuration.
+ * @returns Headers object with CORS headers.
+ */
+export const makeCorsHeaders = (
+  config: boolean | NonNullable<HttpHandlerConfig['cors']>
+): HttpHeaders => {
+  if (config === false) return {}
+  const corsConfig = config === true ? {} : config
+  return {
+    [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
+    [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ')
+      ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ')
+      ?? 'Content-Type, Authorization, apikey, x-client-info',
+    [HEADER_VARY]: 'Origin',
+    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {})
+  }
 }
 
 /**
@@ -543,26 +565,6 @@ const normalizeHeaderMap = (headers: HttpHeaders): HttpHeaders => {
 }
 
 /**
- * Make CORS headers based on configuration.
- * @param config CORS configuration.
- * @returns Headers object with CORS headers.
- */
-const makeCorsHeaders = (
-  config: boolean | NonNullable<HttpHandlerConfig['cors']>
-): HttpHeaders => {
-  if (config === false) return {}
-  const corsConfig = config === true ? {} : config
-  return {
-    [HEADER_ALLOW_ORIGIN]: corsConfig.origin ?? '*',
-    [HEADER_ALLOW_METHODS]: corsConfig.methods?.join(', ')
-      ?? 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
-    [HEADER_ALLOW_HEADERS]: corsConfig.headers?.join(', ') ?? 'Content-Type, Authorization',
-    [HEADER_VARY]: 'Origin',
-    ...(corsConfig.credentials ? { [HEADER_ALLOW_CREDENTIALS]: 'true' } : {})
-  }
-}
-
-/**
  * Convert a header map into a Headers object.
  * @param headers Header map.
  * @returns Headers instance.
@@ -721,7 +723,10 @@ const makeResponse = (
   const normalizedResponseHeaders = normalizeHeaderMap(additionalHeaders)
 
   if (NO_BODY_STATUS_CODES.has(statusCode)) {
-    return new Response('', {
+    // a null-body status (204/304) must carry body: null, not '' — an empty
+    // string throws on runtimes that enforce the Fetch spec strictly (the
+    // hosted Supabase edge runtime does; local Deno's Response is lenient)
+    return new Response(null, {
       status: statusCode,
       headers: toHeaders({ ...corsHeaders, ...normalizedResponseHeaders })
     })
