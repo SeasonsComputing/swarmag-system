@@ -44,9 +44,9 @@ integrity no longer requires it.
 ## Equipment/Asset naming convention review
 
 **Identified:** ~2026-05-08, during UX foundational work (session
-`2a7c772d-99ba-45e3-b6bb-c7909ba5a1f3`). *Stale — re-verify current state of
+`2a7c772d-99ba-45e3-b6bb-c7909ba5a1f3`). _Stale — re-verify current state of
 `source/domain/abstractions/` before acting; this note is over two months
-old.*
+old._
 
 **What it is:** Audit `Asset` (and equipment-adjacent abstractions — drone,
 vehicle, battery, attachment) in `source/domain/abstractions/` for whether

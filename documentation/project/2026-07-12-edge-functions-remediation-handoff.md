@@ -1,5 +1,12 @@
 # Edge Functions Remediation — Session Handoff
 
+> **COMPLETED.** Final resolution, including a real defect (D12) that this
+> handoff's Phase 5 verification did not catch, is in
+> `documentation/project/2026-07-12-edge-functions-remediation-design.md` and
+> `documentation/project/2026-07-14-user-create-hang-handoff.md`.
+
+---
+
 > **SUPERSEDED.** This handoff's "What Remains" section (§3) prescribes the
 > deployment-seam plan as understood _before_ D10 — a root
 > `supabase-import-map.json` and `config.toml` pointing at it. That plan was

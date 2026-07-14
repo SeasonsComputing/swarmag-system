@@ -2,9 +2,10 @@
 
 **Date:** 2026-07-12
 **Mode:** Foundation
-**Status:** Phases 0–4 complete. No hosted dev project exists (solo,
-pre-release team) — decisions and phases below run against **stage only**
-until a second target is ever needed. Phases 5–6 pending.
+**Status:** CLOSED — Phases 0–6 all complete. No hosted dev project exists
+(solo, pre-release team) — decisions and phases below ran against **stage
+only**. See the Phase 5 Addendum below for D12, a real defect that Phase 5's
+original manual pass did not catch.
 **Source design:** `documentation/project/2026-07-12-edge-functions-remediation-design.md`
 
 This task list decomposes the approved design (D1–D11) into gated phases. Each
@@ -148,20 +149,39 @@ phase is one authorized production with its own checks.
 
 - [x] `deno task check` green
 - [x] `supabase functions serve` — local runtime proof of the seam
-- [ ] Deploy 4 functions to stage (`deno task edge-deploy`); scripted
+- [x] Deploy 4 functions to stage (`deno task edge-deploy`); scripted
       round-trip integration test (admin JWT via `auth.admin.generateLink`;
       create → update(email) → eject → delete; assert UUID invariant each
       step) added to `source/tests/`
-- [ ] Manual app-admin User Manager pass against stage
+- [x] Manual app-admin User Manager pass against stage
 
 Local `edge-serve` remains available as an optional fast-iteration tool, not
 the primary workflow — for a solo pre-release team, deploy-to-stage-and-read-
 logs is the cheaper loop once the deployment seam itself is proven (it is).
 
+## Phase 5 Addendum — CORS Header Defect (D12, complete 2026-07-14)
+
+- [x] Found: Phase 5's "manual app-admin User Manager pass" above was
+      checked off, but a real browser CORS block on the follow-up POST
+      (missing `apikey`/`x-client-info` in `Access-Control-Allow-Headers`)
+      went undetected — every diagnostic tool used at the time (`curl`,
+      `get_logs` request summaries) was structurally blind to a browser-only
+      CORS enforcement failure. See D12 in the design doc for the full
+      incident and the misleading "server hang" red herring it produced.
+- [x] Fixed: `wrap-http-handler.ts`'s `makeCorsHeaders` default now includes
+      `apikey, x-client-info`; exported for reuse (was previously
+      unexported despite being documented as public).
+- [x] `HttpCodes.gatewayTimeout` (504) added
+- [x] NEW `core/service/wrap-supabase-shim.ts` — timeout + slow/failure-only
+      logging wrapper, composed into all four `index.ts` entrypoints
+- [x] Re-verified live: CORS preflight simulation + real browser
+      create/update/delete/eject, all four functions, all confirmed working
+- [x] Committed: `57adb09 — Agentic milestone -- user edge functions complete`
+
 ## Phase 6 — Close-out
 
-- [ ] Backlog: ban-based eject alternative, `user-reinstate`, shim generator,
+- [x] Backlog: ban-based eject alternative, `user-reinstate`, shim generator,
       edge smoke in deploy pipeline, literals-invariant doc note
-- [ ] Commit strategy per CA; return to Customer Onboarding milestone
+- [x] Commit strategy per CA; return to Customer Onboarding milestone
 
 _End of Task List_
