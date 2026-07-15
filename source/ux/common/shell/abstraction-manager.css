@@ -60,7 +60,19 @@
   flex: 0 0 auto;
   gap: var(--sa-space-xs);
   justify-content: space-between;
-  padding-block-end: var(--sa-space-sm);
+  padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
+}
+
+[data-feat='abstraction-manager-card-header'][data-feat-region='editor-header'] {
+  align-items: stretch;
+  flex-direction: column;
+}
+
+[data-feat='abstraction-manager-card-header-row'] {
+  align-items: center;
+  display: flex;
+  gap: var(--sa-space-xs);
+  justify-content: space-between;
 }
 
 [data-feat='abstraction-manager-card-title'],
@@ -82,6 +94,22 @@
   display: flex;
   flex: 0 0 auto;
   gap: var(--sa-space-xs);
+}
+
+[data-feat='abstraction-manager-confirmation'] {
+  display: grid;
+  gap: var(--sa-rhythm-gap);
+}
+
+[data-feat='abstraction-manager-confirmation'] h2,
+[data-feat='abstraction-manager-confirmation'] p {
+  margin: 0;
+}
+
+[data-feat='abstraction-manager-confirmation-actions'] {
+  display: flex;
+  gap: var(--sa-space-sm);
+  justify-content: end;
 }
 
 [data-feat='abstraction-manager-back-command'] {

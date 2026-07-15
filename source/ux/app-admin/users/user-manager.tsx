@@ -5,6 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
+import type { StringDictionary } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import {
   CONTACT_PREFERRED_CHANNELS,
@@ -34,8 +35,13 @@ import {
   UiToggleGroup,
   UiToggleItem
 } from '@ux/common/components/ui'
-import type { AbstractionManagerContract } from '@ux/common/shell/abstraction-manager-contract.ts'
+import type {
+  AbstractionManagerContract,
+  AbstractionManagerFeedback
+} from '@ux/common/shell/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/common/shell/abstraction-manager.tsx'
+
+import './user-manager.css'
 
 /** Loads the user list for the user manager. */
 async function loadUsers(): Promise<User[]> {
@@ -50,8 +56,15 @@ export type UserManagerProps = {
 
 /** User manager component. */
 const USERS_QUERY_KEY = ['users'] as const
+const USER_ROLE_LABELS: StringDictionary = {
+  administrator: 'Admin',
+  customer: 'Cust',
+  operations: 'Ops',
+  sales: 'Sales'
+}
 export const UserManager = (props: UserManagerProps): UiComponent => {
   const queryClient = useQueryClient()
+  const [editorFeedback, setEditorFeedback] = createSignal<AbstractionManagerFeedback | null>(null)
   const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY, queryFn: loadUsers }))
   const deleteUserMutation = createMutation(() => ({
     mutationFn: (id: User['id']) => api.Users.delete(id),
@@ -71,13 +84,17 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
   const ejectUser = async (user: User): Promise<void> => {
     await ejectUserMutation.mutateAsync(user.id)
   }
+  const reportEditorFeedback = (feedback: AbstractionManagerFeedback | null): void => {
+    setEditorFeedback(feedback)
+  }
 
   const userManager: AbstractionManagerContract<User> = {
     formTitle: 'User Manager',
     entityLabel: 'User',
-    listColumns: ['Name', 'Email', 'Roles', 'Status'],
+    listColumns: ['User', 'Roles', 'Active'],
     list: () => usersQuery.data ?? [],
     isListLoading: () => usersQuery.isPending,
+    editorFeedback,
     cancel: props.onCancel,
     actions: [
       {
@@ -85,6 +102,11 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
         label: 'Delete',
         icon: 'delete',
         variant: 'danger',
+        confirmation: {
+          title: 'Delete user?',
+          message: user =>
+            `Delete ${user.displayName} and remove their application access? This cannot be undone.`
+        },
         handler: deleteUser
       },
       {
@@ -92,6 +114,11 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
         label: 'Eject',
         icon: 'eject',
         variant: 'danger',
+        confirmation: {
+          title: 'Eject user?',
+          message: user =>
+            `Eject ${user.displayName}? This removes their sign-in identity and marks the user inactive.`
+        },
         handler: ejectUser
       }
     ],
@@ -100,6 +127,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       <UserEditor
         user={user}
         onClose={user === null ? props.onCancel : onClose}
+        onFeedback={reportEditorFeedback}
       />
     )
   }
@@ -117,19 +145,34 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
 function UserListCells(props: { user: User }): UiComponent {
   return (
     <>
-      <UiTableCell>{props.user.displayName}</UiTableCell>
-      <UiTableCell>{props.user.primaryEmail}</UiTableCell>
+      <UiTableCell>
+        <UiLayout variant='block-fit' gap='none'>
+          <span>{props.user.displayName}</span>
+          <span data-feat='user-list-email'>{props.user.primaryEmail}</span>
+        </UiLayout>
+      </UiTableCell>
       <UiTableCell>
         <UiLayout variant='inline' gap='tight'>
           <For each={props.user.roles}>
-            {role => <UiBadge variant='info'>{enumDisplayLabel(role)}</UiBadge>}
+            {role => (
+              <UiBadge variant='info'>
+                <span aria-label={enumDisplayLabel(role)} role='img' title={enumDisplayLabel(role)}>
+                  {roleAbbreviation(role)}
+                </span>
+              </UiBadge>
+            )}
           </For>
         </UiLayout>
       </UiTableCell>
       <UiTableCell>
-        <UiBadge variant={props.user.status === 'active' ? 'success' : 'warning'}>
-          {enumDisplayLabel(props.user.status)}
-        </UiBadge>
+        <span data-feat='user-status-pill' data-feat-status={props.user.status}>
+          <span
+            aria-label={enumDisplayLabel(props.user.status)}
+            data-feat='user-status'
+            role='img'
+            title={enumDisplayLabel(props.user.status)}
+          />
+        </span>
       </UiTableCell>
     </>
   )
@@ -139,6 +182,7 @@ function UserListCells(props: { user: User }): UiComponent {
 function UserEditor(props: {
   user: User | null
   onClose: () => void
+  onFeedback: (feedback: AbstractionManagerFeedback | null) => void
 }): UiComponent {
   const queryClient = useQueryClient()
   const [displayName, setDisplayName] = createSignal(props.user?.displayName ?? '')
@@ -151,7 +195,6 @@ function UserEditor(props: {
   const [roles, setRoles] = createSignal<UserRole[]>(props.user ? [...props.user.roles] : [])
   const [status, setStatus] = createSignal<UserStatus>(props.user?.status ?? 'active')
   const [pending, setPending] = createSignal(false)
-  const [error, setError] = createSignal<string | null>(null)
 
   createEffect(() => {
     setDisplayName(props.user?.displayName ?? '')
@@ -161,7 +204,7 @@ function UserEditor(props: {
     setNotesText(noteContent(props.user?.notes ?? []))
     setRoles(props.user ? [...props.user.roles] : [])
     setStatus(props.user?.status ?? 'active')
-    setError(null)
+    props.onFeedback(null)
   })
 
   //
@@ -185,7 +228,6 @@ function UserEditor(props: {
 
   //
   // Handlers:
-  // - `toggleRole`: Toggles a role for the user.
   // - `saveUser`: Saves the user.
   // - `updateUser`: Updates the user.
   // - `createUser`: Creates a new user.
@@ -194,17 +236,17 @@ function UserEditor(props: {
   const saveUser = async (): Promise<void> => {
     if (pending()) return
     if (roles().length === 0) {
-      setError('Select at least one role.')
+      props.onFeedback({ message: 'Select at least one role.', variant: 'danger' })
       return
     }
     setPending(true)
-    setError(null)
+    props.onFeedback(null)
     try {
       if (props.user) await updateUser(props.user, status())
       else await createUser()
       props.onClose()
     } catch (e) {
-      setError(errorMessage(e))
+      props.onFeedback({ message: errorMessage(e), variant: 'danger' })
     } finally {
       setPending(false)
     }
@@ -213,6 +255,7 @@ function UserEditor(props: {
     const update: UserUpdate = {
       id: user.id,
       displayName: displayName(),
+      primaryEmail: primaryEmail(),
       phoneNumber: phoneNumber(),
       preferredChannel: preferredChannel(),
       notes: nextNotes(user.notes),
@@ -238,7 +281,13 @@ function UserEditor(props: {
     void saveUser()
   }
 
-  const existing = (): boolean => props.user !== null
+  //
+  // Value Projections:
+  // - preferredChannelOptions: Preferred channel options -> enumDisplayLabel
+  // - roleOptions: Role options -> enumDisplayLabel
+  // - nextNotes: Flattened into text
+  //
+
   const preferredChannelOptions = CONTACT_PREFERRED_CHANNELS.map(value => ({
     value,
     label: enumDisplayLabel(value)
@@ -260,11 +309,12 @@ function UserEditor(props: {
   }
 
   return (
-    <form id='abstraction-panel-form' onSubmit={submit}>
+    <form
+      id='abstraction-panel-form'
+      onInvalid={() => props.onFeedback({ message: 'Review the required fields.', variant: 'danger' })}
+      onSubmit={submit}
+    >
       <UiLayout>
-        <Show when={error() !== null}>
-          <UiAlert variant='danger'>{error()}</UiAlert>
-        </Show>
         <UiFieldset legend='Identity'>
           <UiLayout>
             <UiField for='displayName' label='Name'>
@@ -277,26 +327,14 @@ function UserEditor(props: {
               />
             </UiField>
             <UiField for='primaryEmail' label='Email'>
-              <Show
-                when={!existing()}
-                fallback={
-                  <UiInput
-                    name='primaryEmail'
-                    type='email'
-                    value={props.user?.primaryEmail ?? ''}
-                    readOnly
-                  />
-                }
-              >
-                <UiInput
-                  name='primaryEmail'
-                  type='email'
-                  value={primaryEmail()}
-                  onInput={event => setPrimaryEmail(event.currentTarget.value)}
-                  disabled={pending()}
-                  required
-                />
-              </Show>
+              <UiInput
+                name='primaryEmail'
+                type='email'
+                value={primaryEmail()}
+                onInput={event => setPrimaryEmail(event.currentTarget.value)}
+                disabled={pending()}
+                required
+              />
             </UiField>
             <UiField for='phoneNumber' label='Phone'>
               <UiInput
@@ -385,4 +423,8 @@ function enumDisplayLabel(value: string): string {
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
+}
+
+function roleAbbreviation(role: UserRole): string {
+  return USER_ROLE_LABELS[role]
 }

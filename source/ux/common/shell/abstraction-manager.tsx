@@ -18,8 +18,11 @@ import type { Instance } from '@core/std'
 import { createSignal, For, Show } from '@solid-js'
 import {
   UiActionButton,
+  UiAlert,
+  UiButton,
   UiCard,
   type UiComponent,
+  UiDialog,
   UiTable,
   UiTableBody,
   UiTableCell,
@@ -38,12 +41,21 @@ export type AbstractionManagerProps<T extends Instance> = {
 /** Mode of the abstraction manager: 'list' or 'editor'. */
 type AbstractionManagerMode = 'list' | 'editor'
 
+/** An action and instance awaiting confirmation. */
+type PendingAction<T extends Instance> = {
+  action: AbstractionManagerContract<T>['actions'][number]
+  item: T
+}
+
 /** Generic abstraction list and editor-panel manager. */
 export const AbstractionManager = <T extends Instance>(
   props: AbstractionManagerProps<T>
 ): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
   const [mode, setMode] = createSignal<AbstractionManagerMode>('list')
+  const [pendingAction, setPendingAction] = createSignal<PendingAction<T> | null>(null)
+  const [actionError, setActionError] = createSignal<string | null>(null)
+  const [actionPending, setActionPending] = createSignal(false)
   const onSelect = (item: T): void => {
     setSelected(() => item)
     setMode('editor')
@@ -58,6 +70,32 @@ export const AbstractionManager = <T extends Instance>(
   }
   const closeEditor = (): void => clearSelection()
   const cancelDialog = (): void => props.provider.cancel?.() ?? closeEditor()
+  const runAction = async (action: PendingAction<T>['action'], item: T): Promise<void> => {
+    await action.handler(item)
+    if (selected()?.id === item.id) clearSelection()
+  }
+  const requestAction = (action: PendingAction<T>['action'], item: T): void => {
+    if (!action.confirmation) {
+      void runAction(action, item)
+      return
+    }
+    setActionError(null)
+    setPendingAction({ action, item })
+  }
+  const confirmAction = async (): Promise<void> => {
+    const target = pendingAction()
+    if (!target || actionPending()) return
+    setActionPending(true)
+    setActionError(null)
+    try {
+      await runAction(target.action, target.item)
+      setPendingAction(null)
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : `${target.action.label} failed.`)
+    } finally {
+      setActionPending(false)
+    }
+  }
   const editorTitle = (): string =>
     selected()
       ? `Edit ${props.provider.entityLabel}`
@@ -118,7 +156,7 @@ export const AbstractionManager = <T extends Instance>(
                                   variant={action.variant}
                                   onClick={event => {
                                     event.stopPropagation()
-                                    void action.handler(item)
+                                    requestAction(action, item)
                                   }}
                                 />
                               )}
@@ -137,35 +175,72 @@ export const AbstractionManager = <T extends Instance>(
       </section>
       <section data-feat='abstraction-manager-panel'>
         <UiCard elevation='raised'>
-          <header data-feat='abstraction-manager-card-header'>
-            <div data-feat='abstraction-manager-card-title-group'>
-              <div data-feat='abstraction-manager-collapse-action'>
-                <span data-feat='abstraction-manager-back-command'>
-                  <UiActionButton
-                    icon='back'
-                    label={`${props.provider.entityLabel}s`}
-                    onClick={() => setMode('list')}
-                  />
-                  <span aria-hidden='true' data-feat='abstraction-manager-command-divider' />
-                </span>
+          <header data-feat='abstraction-manager-card-header' data-feat-region='editor-header'>
+            <div data-feat='abstraction-manager-card-header-row'>
+              <div data-feat='abstraction-manager-card-title-group'>
+                <div data-feat='abstraction-manager-collapse-action'>
+                  <span data-feat='abstraction-manager-back-command'>
+                    <UiActionButton
+                      icon='back'
+                      label={`${props.provider.entityLabel}s`}
+                      onClick={() => setMode('list')}
+                    />
+                    <span aria-hidden='true' data-feat='abstraction-manager-command-divider' />
+                  </span>
+                </div>
+                <h2 data-feat='abstraction-manager-card-title'>{editorTitle()}</h2>
               </div>
-              <h2 data-feat='abstraction-manager-card-title'>{editorTitle()}</h2>
+              <div data-feat='abstraction-manager-card-actions'>
+                <UiActionButton
+                  icon='check'
+                  label='Save'
+                  labelMode='visible'
+                  type='submit'
+                  form='abstraction-panel-form'
+                />
+              </div>
             </div>
-            <div data-feat='abstraction-manager-card-actions'>
-              <UiActionButton
-                icon='check'
-                label='Save'
-                labelMode='visible'
-                type='submit'
-                form='abstraction-panel-form'
-              />
-            </div>
+            <Show when={props.provider.editorFeedback?.()}>
+              {feedback => <UiAlert variant={feedback().variant}>{feedback().message}</UiAlert>}
+            </Show>
           </header>
           <div data-feat='abstraction-manager-card-body' data-feat-region='editor-body'>
             {props.provider.renderForm(selected(), closeEditor)}
           </div>
         </UiCard>
       </section>
+      <Show when={pendingAction()}>
+        {target => (
+          <UiDialog
+            open
+            size='content'
+            onOpenChange={open => {
+              if (!open && !actionPending()) setPendingAction(null)
+            }}
+          >
+            <div data-feat='abstraction-manager-confirmation'>
+              <h2>{target().action.confirmation?.title}</h2>
+              <p>{target().action.confirmation?.message(target().item)}</p>
+              <Show when={actionError()}>
+                {message => <UiAlert variant='danger'>{message()}</UiAlert>}
+              </Show>
+              <div data-feat='abstraction-manager-confirmation-actions'>
+                <UiButton disabled={actionPending()} onClick={() => setPendingAction(null)}>
+                  Cancel
+                </UiButton>
+                <UiButton
+                  disabled={actionPending()}
+                  loading={actionPending()}
+                  variant='danger'
+                  onClick={() => void confirmAction()}
+                >
+                  {target().action.label}
+                </UiButton>
+              </div>
+            </div>
+          </UiDialog>
+        )}
+      </Show>
     </div>
   )
 }
