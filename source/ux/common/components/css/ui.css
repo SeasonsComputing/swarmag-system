@@ -1278,7 +1278,7 @@
 }
 
 [data-ui='dialog'][data-ui-size='workbench'] {
-  inline-size: min(var(--sa-size-lg), calc(100vw - var(--sa-rhythm-pad) * 2));
+  inline-size: min(var(--sa-size-md), calc(100vw - var(--sa-rhythm-pad) * 2));
   max-inline-size: min(var(--sa-size-lg), calc(100vw - var(--sa-rhythm-pad) * 2));
   overflow: visible;
 }
