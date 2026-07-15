@@ -95,7 +95,7 @@ export const UserOrchestra: UserOrchestraContract = {
       : undefined
 
     const user = await updateUserRow(context.serviceClient, input)
-    if (previousEmail === undefined) return user
+    if (previousEmail === undefined || previousEmail === user.primaryEmail) return user
 
     try {
       await updateAuthEmail(context, user)
