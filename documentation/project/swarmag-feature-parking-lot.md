@@ -65,3 +65,35 @@ state under operational load.
 **Picking this up should look like:** An audit producing proposed domain
 model changes for CA review. Do not modify domain abstractions directly
 without an explicit go — this is Foundation Mode territory (domain meaning).
+
+---
+
+## Eject should ban, not delete, the Auth identity
+
+**Identified:** 2026-07-16, during the User Manager UX rework
+(`documentation/project/2026-07-16-user-manager-ux-rework.md`).
+
+**What it is:** `UserOrchestra.eject()`
+(`source/back/supabase-edge/orchestration/user-orchestra.ts`) currently calls
+the same `deleteAuthUser` (`auth.admin.deleteUser`) as `delete()` — fully
+removing the Supabase Auth identity. Per D5 in the edge-functions
+remediation design doc, this makes reactivation genuinely impossible: setting
+the domain row's `status` back to `active` doesn't restore an Auth identity,
+because there's nothing left to restore. The correct model is closer to a
+ban: `auth.admin.updateUserById(id, { ban_duration: '<long>' })` blocks future
+logins/token refreshes while preserving the identity, so reinstatement is
+just unbanning — no need to ever recreate an Auth user or worry about the
+`auth.users.id = public.users.id` invariant.
+
+**Why parked:** This changes eject's actual mechanism, not just a bug fix —
+it reopens D4/D5's reasoning. One real unknown needs verifying before
+committing to the design: whether an already-issued, not-yet-expired access
+token stops working immediately on ban, or only fails on its next refresh —
+that determines whether "log the user out" needs anything beyond the ban
+itself (e.g. an explicit session-revocation call).
+
+**Picking this up should look like:** Foundation Mode (reopens D4/D5).
+Verify Supabase's current ban-vs-active-token behavior first, then decide
+whether eject and a future explicit reinstate both live in `user-orchestra.ts`
+as symmetric operations, and whether the editor's status toggle should be
+disabled/warned against for ejected users until reinstatement is real.

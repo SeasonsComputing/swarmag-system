@@ -29,7 +29,7 @@ import {
   UiTableHeader,
   UiTableRow
 } from '@ux/common/components/ui'
-import type { AbstractionManagerContract } from './abstraction-manager-contract.ts'
+import type { AbstractionAction, AbstractionManagerContract } from './abstraction-manager-contract.ts'
 
 import './abstraction-manager.css'
 
@@ -43,7 +43,7 @@ type AbstractionManagerMode = 'list' | 'editor'
 
 /** An action and instance awaiting confirmation. */
 type PendingAction<T extends Instance> = {
-  action: AbstractionManagerContract<T>['actions'][number]
+  action: AbstractionAction<T>
   item: T
 }
 

@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import type { StringDictionary } from '@core/std'
+import { type Id } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import {
   CONTACT_PREFERRED_CHANNELS,
@@ -18,7 +18,7 @@ import {
 } from '@domain/abstractions/user.ts'
 import { type UserCreate, type UserUpdate } from '@domain/protocols/user-protocol.ts'
 import { createEffect, createSignal, For, Show } from '@solid-js'
-import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
+import { createQuery } from '@tanstack/solid-query'
 import { api } from '@ux/api'
 import {
   UiAlert,
@@ -40,6 +40,8 @@ import type {
   AbstractionManagerFeedback
 } from '@ux/common/shell/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/common/shell/abstraction-manager.tsx'
+import { useAbstractionFormFeedback } from '@ux/common/shell/use-abstraction-form-feedback.ts'
+import { useAbstractionMutation } from '@ux/common/shell/use-abstraction-mutation.ts'
 
 import './user-manager.css'
 
@@ -49,44 +51,26 @@ async function loadUsers(): Promise<User[]> {
   return result.data
 }
 
+/** Query key for the users list. */
+const USERS_QUERY_KEY = ['users'] as const
+
 /** Props for the user manager route modal. */
 export type UserManagerProps = {
   onCancel: () => void
 }
 
 /** User manager component. */
-const USERS_QUERY_KEY = ['users'] as const
-const USER_ROLE_LABELS: StringDictionary = {
+const USER_ROLE_LABELS: Record<UserRole, string> = {
   administrator: 'Admin',
   customer: 'Cust',
   operations: 'Ops',
   sales: 'Sales'
 }
 export const UserManager = (props: UserManagerProps): UiComponent => {
-  const queryClient = useQueryClient()
   const [editorFeedback, setEditorFeedback] = createSignal<AbstractionManagerFeedback | null>(null)
   const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY, queryFn: loadUsers }))
-  const deleteUserMutation = createMutation(() => ({
-    mutationFn: (id: User['id']) => api.Users.delete(id),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
-    }
-  }))
-  const ejectUserMutation = createMutation(() => ({
-    mutationFn: (id: User['id']) => api.Users.eject(id),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
-    }
-  }))
-  const deleteUser = async (user: User): Promise<void> => {
-    await deleteUserMutation.mutateAsync(user.id)
-  }
-  const ejectUser = async (user: User): Promise<void> => {
-    await ejectUserMutation.mutateAsync(user.id)
-  }
-  const reportEditorFeedback = (feedback: AbstractionManagerFeedback | null): void => {
-    setEditorFeedback(feedback)
-  }
+  const deleteUserMutation = useAbstractionMutation(USERS_QUERY_KEY, (id: Id) => api.Users.delete(id))
+  const ejectUserMutation = useAbstractionMutation(USERS_QUERY_KEY, (id: Id) => api.Users.eject(id))
 
   const userManager: AbstractionManagerContract<User> = {
     formTitle: 'User Manager',
@@ -107,7 +91,9 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
           message: user =>
             `Delete ${user.displayName} and remove their application access? This cannot be undone.`
         },
-        handler: deleteUser
+        handler: async user => {
+          await deleteUserMutation.mutateAsync(user.id)
+        }
       },
       {
         name: 'eject',
@@ -119,7 +105,9 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
           message: user =>
             `Eject ${user.displayName}? This removes their sign-in identity and marks the user inactive.`
         },
-        handler: ejectUser
+        handler: async user => {
+          await ejectUserMutation.mutateAsync(user.id)
+        }
       }
     ],
     renderListCells: user => <UserListCells user={user} />,
@@ -127,7 +115,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       <UserEditor
         user={user}
         onClose={user === null ? props.onCancel : onClose}
-        onFeedback={reportEditorFeedback}
+        onFeedback={setEditorFeedback}
       />
     )
   }
@@ -184,7 +172,6 @@ function UserEditor(props: {
   onClose: () => void
   onFeedback: (feedback: AbstractionManagerFeedback | null) => void
 }): UiComponent {
-  const queryClient = useQueryClient()
   const [displayName, setDisplayName] = createSignal(props.user?.displayName ?? '')
   const [primaryEmail, setPrimaryEmail] = createSignal(props.user?.primaryEmail ?? '')
   const [phoneNumber, setPhoneNumber] = createSignal(props.user?.phoneNumber ?? '')
@@ -195,6 +182,8 @@ function UserEditor(props: {
   const [roles, setRoles] = createSignal<UserRole[]>(props.user ? [...props.user.roles] : [])
   const [status, setStatus] = createSignal<UserStatus>(props.user?.status ?? 'active')
   const [pending, setPending] = createSignal(false)
+  let formRef: HTMLFormElement | undefined
+  useAbstractionFormFeedback(() => formRef, props.onFeedback)
 
   createEffect(() => {
     setDisplayName(props.user?.displayName ?? '')
@@ -213,18 +202,14 @@ function UserEditor(props: {
   // - `updateUserMutation`: Updates the user.
   //
 
-  const createUserMutation = createMutation(() => ({
-    mutationFn: (input: UserCreate) => api.Users.create(input),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
-    }
-  }))
-  const updateUserMutation = createMutation(() => ({
-    mutationFn: (input: UserUpdate) => api.Users.update(input),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: USERS_QUERY_KEY })
-    }
-  }))
+  const createUserMutation = useAbstractionMutation(
+    USERS_QUERY_KEY,
+    (input: UserCreate) => api.Users.create(input)
+  )
+  const updateUserMutation = useAbstractionMutation(
+    USERS_QUERY_KEY,
+    (input: UserUpdate) => api.Users.update(input)
+  )
 
   //
   // Handlers:
@@ -309,11 +294,7 @@ function UserEditor(props: {
   }
 
   return (
-    <form
-      id='abstraction-panel-form'
-      onInvalid={() => props.onFeedback({ message: 'Review the required fields.', variant: 'danger' })}
-      onSubmit={submit}
-    >
+    <form id='abstraction-panel-form' ref={formRef} onSubmit={submit}>
       <UiLayout>
         <UiFieldset legend='Identity'>
           <UiLayout>

@@ -13,9 +13,11 @@ not answers.
 The User domain (auth/domain sync, edge functions, RLS) is now complete and
 verified end-to-end (see
 `documentation/project/2026-07-14-user-create-hang-handoff.md` and the
-edge-functions remediation series). The next milestone is **Customer
-Onboarding**: a serialized, wizard-like flow that walks an admin or sales rep
-through:
+edge-functions remediation series). User Manager's UX (confirmations, editor
+feedback, generalized shell primitives) is also now complete — see
+`documentation/project/2026-07-16-user-manager-ux-rework.md`. The next
+milestone is **Customer Onboarding**: a serialized, wizard-like flow that
+walks an admin or sales rep through:
 
 1. Create User (customer contact — gets an Auth identity)
 2. Create Customer (account)
@@ -57,6 +59,30 @@ before relying on them):
 - `ux/api` is the composed API namespace with dual storage (Supabase +
   IndexedDB) behind one contract — the onboarding flow's data operations
   should go through this, not bespoke fetch calls.
+
+**Already-built reusable primitives, ready to use (from the User Manager UX
+rework — see `2026-07-16-user-manager-ux-rework.md` for full detail):**
+
+- `useAbstractionFormFeedback(formRef, onFeedback)`
+  (`source/ux/common/shell/use-abstraction-form-feedback.ts`) — bridges native
+  form validation into an `AbstractionManagerFeedback` banner. One line per
+  entity editor form; don't re-derive the capture-phase `invalid`-listener
+  logic.
+- `useAbstractionMutation(queryKey, mutationFn)`
+  (`source/ux/common/shell/use-abstraction-mutation.ts`) — `createMutation`
+  wrapper that invalidates its query key on success. One line per
+  create/update/delete mutation instead of hand-writing
+  `onSuccess: () => queryClient.invalidateQueries(...)` each time.
+- `AbstractionManagerContract`'s `confirmation` (on actions) and
+  `editorFeedback` fields (`source/ux/common/shell/abstraction-manager-contract.ts`)
+  — if onboarding's steps present as list+editor panels anywhere, this
+  contract already handles consequential-action confirmation and in-editor
+  feedback; if onboarding is a genuinely different UI shape (a linear wizard,
+  not list+editor), these may not apply and that's fine — don't force the fit.
+
+This is also the concrete precedent for open question 4 below: this session's
+default was "refactor into `common/shell/` now, while there's one consumer,
+not later" — worth knowing before re-litigating that question from scratch.
 
 ---
 
