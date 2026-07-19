@@ -29,7 +29,7 @@
   content: '';
   flex: 0 0 auto;
   height: var(--sa-action-widget-bullet-size);
-  mask: url('../components/icons/link-2.svg') center / contain no-repeat;
+  mask: url('@front/ux/ui/icons/link-2.svg') center / contain no-repeat;
   width: var(--sa-action-widget-bullet-size);
 }
 

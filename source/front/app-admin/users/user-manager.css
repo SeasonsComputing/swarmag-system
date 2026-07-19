@@ -37,11 +37,13 @@
   width: 8%;
 }
 
-/* 3 action buttons, each with an inline-start margin, plus cell padding. */
+/* 3 action buttons, each with an inline-start rhythm margin, plus cell
+   padding — the margin and the width MUST share the same token. */
 [data-feat='users-page'] [data-ui='table-cell']:last-child {
   white-space: nowrap;
   width: calc(
-    (var(--sa-touch-target-sm) - var(--sa-space-sm)) * 3 + var(--sa-space-xx) * 3 + var(--sa-space-xs) +
+    (var(--sa-touch-target-sm) - var(--sa-space-sm)) * 3 + var(--sa-rhythm-gap-tight) * 3 +
+      var(--sa-space-xs) +
       var(--sa-space-sm)
   );
 }
@@ -53,7 +55,7 @@
 }
 
 [data-feat='users-page'] table [data-ui='action-button'] {
-  margin-inline-start: var(--sa-space-xx);
+  margin-inline-start: var(--sa-rhythm-gap-tight);
 }
 
 [data-feat='users-page'] [data-feat='user-status-pill'] {

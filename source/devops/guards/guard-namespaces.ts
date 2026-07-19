@@ -116,7 +116,8 @@ const main = async () => {
     const isUxFile = isUnder(file, `${frontDir}/ux`)
     const isApiFile = isUnder(file, `${frontDir}/api`)
     const isAppFile = isUnder(file, `${frontDir}/app-`)
-    const _isWidgetsFile = isUnder(file, `${frontDir}/ux/widgets`)
+    const isWidgetsFile = isUnder(file, `${frontDir}/ux/widgets`)
+    const isShellFile = isUnder(file, `${frontDir}/ux/shell`)
     const fileAppName = extractAppName(file)
 
     for (const spec of imports) {
@@ -138,11 +139,21 @@ const main = async () => {
         }
       }
 
-      // TODO(CA): Rule 4 disabled — current tree has widgets importing shell
-      // (brand-widget.tsx needs shell-metadata). Enforce after refactoring.
-      // if (isWidgetsFile && spec.startsWith('@front/ux/shell')) {
-      //   violations.push(`${relative} — ${spec} — Rule 4`)
-      // }
+      // Rule 4: Widgets are the shell's plugins — they never import the
+      // shell. Host context flows down through the widget SPI (widget.tsx).
+      if (isWidgetsFile && spec.startsWith('@front/ux/shell')) {
+        violations.push(`${relative} — ${spec} — Rule 4`)
+      }
+
+      // Rule 5: The shell hosts widgets through the SPI contract only —
+      // never by importing concrete widgets. Apps bind concretes at
+      // bootstrap (the composition root).
+      if (
+        isShellFile && spec.startsWith('@front/ux/widgets/')
+        && spec !== '@front/ux/widgets/widget.tsx'
+      ) {
+        violations.push(`${relative} — ${spec} — Rule 5`)
+      }
     }
   }
 

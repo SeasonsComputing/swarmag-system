@@ -7,7 +7,9 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Provides the dashboard state contract and widget registry through one explicit
-shell runtime boundary.
+shell runtime boundary. Hosts widgets per the widget SPI: the registry is
+app-supplied (composition root at bootstrap), and widget runtime context —
+application identity — flows down through WidgetProvider.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -15,16 +17,11 @@ DashboardProvider  Provides the dashboard runtime contract.
 useDashboard       Reads the active dashboard runtime contract.
 */
 
-import type { Dictionary } from '@core/std'
 import type { DashboardStateContract } from '@front/ux/stores/dashboard-state.ts'
 import type { UiComponent } from '@front/ux/ui'
+import { WidgetProvider, type WidgetRegistry } from '@front/ux/widgets/widget.tsx'
 import { createContext, useContext } from '@solid-js'
-
-/** Dashboard widget component contract. */
-export type WidgetComponent = (props: { settings: Dictionary }) => UiComponent
-
-/** Dashboard widget registry keyed by dashboard widget type string. */
-export type WidgetRegistry = Dictionary<WidgetComponent>
+import { getShellIdentity } from './shell-metadata.ts'
 
 /** Dashboard runtime contract supplied to the shell subtree. */
 export type DashboardContextContract = {
@@ -42,7 +39,9 @@ export const DashboardProvider = (props: {
   children: UiComponent
 }): UiComponent => (
   <DashboardContext.Provider value={{ state: props.state, widgets: props.widgets }}>
-    {props.children}
+    <WidgetProvider identity={getShellIdentity()}>
+      {props.children}
+    </WidgetProvider>
   </DashboardContext.Provider>
 )
 

@@ -16,8 +16,9 @@ Dashboard  Shared shell dashboard component.
 
 import type { DashboardStoreWidget } from '@front/ux/stores/dashboard-state.ts'
 import { UiCard, type UiComponent, UiFooter } from '@front/ux/ui'
+import type { WidgetComponent } from '@front/ux/widgets/widget.tsx'
 import { For, Show } from '@solid-js'
-import { useDashboard, type WidgetComponent } from './dashboard-provider.tsx'
+import { useDashboard } from './dashboard-provider.tsx'
 
 import './dashboard.css'
 import footerLogo from '@front/ux/assets/logos/swarmag-logo-wordmark.png'

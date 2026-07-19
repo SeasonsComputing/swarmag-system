@@ -22,7 +22,8 @@ PUBLIC
 bootstrap()       Boots the application.
 BootstrapOptions  App-specific shell composition options.
 ├ dialogs         Shell-owned dialog route registrations.
-└ routes          App-specific route registrations.
+├ routes          App-specific route registrations.
+└ widgets         App-bound widget registry (the composition root).
 
 rootRoute         Common route tree root.
 */
@@ -40,6 +41,7 @@ import { Config } from '@front/config/ux-config.ts'
 import type { Session } from '@core/api/api-auth-contract.ts'
 import { api } from '@front/api'
 import { DashboardState } from '@front/ux/stores/dashboard-state.ts'
+import type { WidgetRegistry } from '@front/ux/widgets/widget.tsx'
 import { onCleanup, onMount } from '@solid-js'
 import { render } from '@solid-js/web'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
@@ -58,7 +60,6 @@ import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
 import { Logout } from './logout.tsx'
 import { makeDialogRoute, type ShellDialogRoute } from './shell-dialog.tsx'
-import { WidgetCatalog } from './widgets-catalog.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 3. INSTALL LOOK & FEEL
@@ -116,6 +117,7 @@ const dashboardRoute = createRoute({
 export type BootstrapOptions = {
   dialogs?: ShellDialogRoute[]
   routes?: AnyRoute[]
+  widgets?: WidgetRegistry
 }
 
 /**
@@ -148,7 +150,7 @@ export async function bootstrap(dashboardSeed: unknown, options: BootstrapOption
       })
       return (
         <QueryClientProvider client={queryClient}>
-          <DashboardProvider state={DashboardState} widgets={WidgetCatalog}>
+          <DashboardProvider state={DashboardState} widgets={bootstrapOptions.widgets ?? {}}>
             <RouterProvider router={router} />
           </DashboardProvider>
         </QueryClientProvider>
