@@ -372,7 +372,7 @@ Authenticated routes render their primary application surface inside a semantic
 `main` landmark. `main` is required accessibility plumbing, not a UX metaphor or
 shared shell primitive.
 
-`Login`, `AuthGuard`, `Dashboard`, and shared stores live in `source/front/ux/shell`. App packages provide only dashboard configuration (`app-{admin|ops|customer}-dashboard.json`) and app-specific routes, widgets, and features.
+`Login`, `AuthGuard`, `Dashboard`, and shared stores live in `source/front/ux/shell`. App packages provide dashboard configuration (`app-{admin|ops|customer}-dashboard.json`), the widget registry (`BootstrapOptions.widgets` — the composition root binding concrete widgets to the shell), and app-specific routes, dialogs, and features.
 
 #### 9.1.1 UX Metaphors
 
@@ -709,7 +709,7 @@ Layout is data-driven via app-local dashboard JSON, rendered by the shared dashb
 
 The app-local dashboard JSON conforms to `DashboardView` from `source/front/ux/views/dashboard-views.ts`. `DashboardState.init(seed)`validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
-`bootstrap()` initializes `DashboardState`, then provides it with the shared widget registry through `DashboardProvider` (`source/front/ux/shell/dashboard-provider.tsx`). Dashboard renderers consume the combined runtime contract through `useDashboard()`. Dashboard state remains a Reactive Store Module; the context injects its namespace contract and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@front/api` namespace.
+`bootstrap()` initializes `DashboardState`, then provides it with the app-supplied widget registry through `DashboardProvider` (`source/front/ux/shell/dashboard-provider.tsx`). The registry is composition data: each app package binds concrete widgets to the shell at bootstrap (`BootstrapOptions.widgets`) alongside its dashboard JSON — the two halves of one composition statement. The shell knows widgets only through the widget SPI (`source/front/ux/widgets/widget.tsx`: `WidgetComponent`, `WidgetRegistry`, `WidgetProvider`/`useWidget`); widgets never import the shell — host context (application identity) flows down through `WidgetProvider`. Both directions are guard-enforced (`guard-namespaces` rules 4 and 5). Dashboard renderers consume the combined runtime contract through `useDashboard()`. Dashboard state remains a Reactive Store Module; the context injects its namespace contract and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@front/api` namespace.
 
 ```json
 {

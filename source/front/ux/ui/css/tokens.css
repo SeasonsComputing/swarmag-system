@@ -122,6 +122,11 @@
     calc(-0.156rem + 4.934vw),
     var(--sa-space-md)
   );
+  --sa-rhythm-gap-tight: clamp(
+    calc(var(--sa-space-xx) / 2),
+    calc(0.093rem + 0.353vw),
+    var(--sa-space-xx)
+  );
 }
 
 /* Minimum width breakpoint for devices */
@@ -131,5 +136,6 @@
     --sa-rhythm-gutter: var(--sa-space-sm);
     --sa-rhythm-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
     --sa-rhythm-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
+    --sa-rhythm-gap-tight: calc(var(--sa-space-xx) / 2);
   }
 }

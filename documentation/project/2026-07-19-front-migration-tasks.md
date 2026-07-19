@@ -2,7 +2,10 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation
-**Status:** ENUMERATED — awaiting CA Phase 0 decisions and production go.
+**Status:** COMPLETE (uncommitted) — all groups verified 2026-07-19 incl.
+live smoke; extended same day by the Widget SPI production (addendum
+below). Working tree holds: migration + widget SPI + rhythm gap-tight fix.
+CA commits on return.
 **Source design:** `documentation/project/2026-07-18-foundation-game-plan-design.md` (§2)
 
 One mechanical Foundation migration, no functional changes, landing as a
@@ -114,10 +117,46 @@ Lesson recorded: delegate prompts must forbid git write commands.
       console errors — full Phase 1 feature set verified on migrated tree
 - [ ] Stage deploy at CA discretion (not required for the migration commit)
 
+## Addendum — Widget SPI + Composition Root (same day, CA-approved)
+
+First-principles discussion (CA): dependency *type* matters — hard concrete
+bindings vs interface knowledge bound at a composition root. Audit found
+the contract half already implemented (registry interface, injected,
+concrete-blind host) but the factory (`widgets-catalog.ts`) misplaced
+inside shell. CA rejected `config/identity.ts` (config is fixed-function)
+and chose per-app registries. Executed:
+
+- [x] `front/ux/widgets/widget.tsx` — the widget SPI, owned by the plugin
+      layer (like a driver SDK ships its headers): `WidgetComponent`,
+      `WidgetRegistry`, `WidgetIdentity`, `WidgetProvider`, `useWidget`
+- [x] `dashboard-provider` imports the SPI downward, wraps children in
+      `WidgetProvider` with identity from `shell-metadata` (which stays in
+      shell, intact — only its consumption by widgets was wrong)
+- [x] `brand-widget` consumes identity via `useWidget()` — upward import
+      gone
+- [x] `widgets-catalog.ts` deleted from shell; `BootstrapOptions.widgets`
+      added; all three apps bind `{ BrandWidget, ActionWidget }` at
+      bootstrap alongside their dashboard JSON — the composition root at
+      packaging level, per CA's principle
+- [x] Guard rules enabled: Rule 4 (widgets never import shell) AND new
+      Rule 5 (shell imports widgets only via the SPI file) — zero
+      exceptions, every arrow points down
+- [x] `architecture-front.md` packaging contract updated (registry + JSON
+      as the two halves of one composition statement)
+- [x] Verified: guards + types + lint green (185 files); tests baseline;
+      live: BrandWidget renders "swarmAg Operations System /
+      Administration Portal" via context, 2 widgets, 0 missing markers
+
 ## Post-close
 
-- [ ] Agent memory files updated to `front/` paths
-- [ ] This ledger closed with the migration commit hash
+- [x] Agent memory files updated to `front/` paths
+- [ ] This ledger closed with the migration commit hash (CA commits on
+      return)
+- [ ] **CA directive 2026-07-19:** Phase 3 (`wizard` + Customer
+      Onboarding) opens as its OWN new milestone with fresh design/tasks
+      docs — it genuinely starts a new thing. Standing question to answer
+      at its kickoff: does the onboarding wizard need inline note capture
+      (if yes, Notes swaps ahead)
 
 ---
 
