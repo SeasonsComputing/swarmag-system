@@ -3,9 +3,12 @@
 **Date:** 2026-07-18
 **Mode:** Foundation
 **Status:** APPROVED — four-phase plan ratified by Chief Architect
-2026-07-18. Phase 1 CLOSED (committed 2026-07-19, `03a7214` — User Manager
-exit gate met). Phase 2 active: task decomposition in
-`documentation/project/2026-07-19-front-migration-tasks.md`
+2026-07-18. Phase 1 CLOSED (`03a7214`). Phase 2 CLOSED (`cdc6ebb` +
+`6c10d3b`, incl. the Widget SPI extension; ledger:
+`2026-07-19-front-migration-tasks.md`). **Phase 3 opens as its own new
+milestone** (CA directive 2026-07-19) with fresh design/tasks docs — the
+wizard genuinely starts a new thing. Answer at its kickoff: does onboarding
+need inline note capture (if yes, Notes swaps ahead).
 **Related:** documentation/project/2026-07-16-user-manager-ux-rework.md,
 documentation/project/2026-07-14-customer-onboarding-design.md
 

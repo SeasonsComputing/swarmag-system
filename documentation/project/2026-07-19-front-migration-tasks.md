@@ -2,10 +2,10 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation
-**Status:** COMPLETE (uncommitted) — all groups verified 2026-07-19 incl.
-live smoke; extended same day by the Widget SPI production (addendum
-below). Working tree holds: migration + widget SPI + rhythm gap-tight fix.
-CA commits on return.
+**Status:** CLOSED — committed 2026-07-19: `cdc6ebb` ("front/ux structure
+clean-up" — the migration + rhythm gap-tight fix) and `6c10d3b` ("Move
+widget registry to app bootstrap" — the Widget SPI addendum below). All
+groups verified incl. live smoke.
 **Source design:** `documentation/project/2026-07-18-foundation-game-plan-design.md` (§2)
 
 One mechanical Foundation migration, no functional changes, landing as a
@@ -87,10 +87,10 @@ Reference-surface survey (2026-07-19, at `03a7214`): 3 alias lines in
 - [x] Rule 2: shared layers + `front/api` never import `@front/app-*` —
       enforced
 - [x] Rule 3: no app-to-app imports — enforced
-- [ ] Rule 4 (widgets must not import shell): **disabled with TODO(CA)** —
-      current tree violates it: `front/ux/widgets/brand-widget.tsx` imports
-      `@front/ux/shell/shell-metadata.ts`. CA decision needed: relocate
-      shell-metadata (config?), accept the edge, or refactor the widget
+- [x] Rule 4 (widgets must not import shell): initially disabled with
+      TODO(CA) — `brand-widget.tsx` imported `shell-metadata.ts`. Resolved
+      same day by the Widget SPI production (addendum below): rules 4 AND 5
+      now enabled, zero exceptions
 
 ## Incident — delegate git-restore collateral (recovered)
 
@@ -119,7 +119,7 @@ Lesson recorded: delegate prompts must forbid git write commands.
 
 ## Addendum — Widget SPI + Composition Root (same day, CA-approved)
 
-First-principles discussion (CA): dependency *type* matters — hard concrete
+First-principles discussion (CA): dependency _type_ matters — hard concrete
 bindings vs interface knowledge bound at a composition root. Audit found
 the contract half already implemented (registry interface, injected,
 concrete-blind host) but the factory (`widgets-catalog.ts`) misplaced
@@ -150,8 +150,7 @@ and chose per-app registries. Executed:
 ## Post-close
 
 - [x] Agent memory files updated to `front/` paths
-- [ ] This ledger closed with the migration commit hash (CA commits on
-      return)
+- [x] Ledger closed: `cdc6ebb` + `6c10d3b` (2026-07-19)
 - [ ] **CA directive 2026-07-19:** Phase 3 (`wizard` + Customer
       Onboarding) opens as its OWN new milestone with fresh design/tasks
       docs — it genuinely starts a new thing. Standing question to answer
