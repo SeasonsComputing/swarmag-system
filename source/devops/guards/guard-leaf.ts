@@ -15,9 +15,9 @@ const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
 /** Non-leaf package roots that may contain both files and subdirectories. */
 const ALLOWED_NON_LEAF_DIRS = new Set([
-  `${ROOT}/source/ux/app-admin`,
-  `${ROOT}/source/ux/app-ops`,
-  `${ROOT}/source/ux/app-customer`
+  `${ROOT}/source/front/app-admin`,
+  `${ROOT}/source/front/app-ops`,
+  `${ROOT}/source/front/app-customer`
 ])
 
 /** Normalize path separators for stable comparisons across platforms. */

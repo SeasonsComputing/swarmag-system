@@ -1,6 +1,6 @@
 /**
  * Guard against architectural boundary violations.
- * Enforces dependency rules: tests/devops -> ux -> back -> domain -> core
+ * Enforces dependency rules: tests/devops -> front -> back -> domain -> core
  */
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
@@ -12,7 +12,7 @@ const NAMESPACE_DIRS = {
   core: '/source/core',
   domain: '/source/domain',
   back: '/source/back',
-  ux: '/source/ux',
+  front: '/source/front',
   devops: '/source/devops',
   tests: '/source/tests'
 } as const
@@ -23,9 +23,9 @@ type Namespace =
 
 /** Allowed dependencies per namespace (downward dependency flow) */
 const ALLOWED_DEPS: Record<Namespace, Set<Namespace>> = {
-  tests: new Set(['tests', 'ux', 'back', 'domain', 'core', 'external']),
-  devops: new Set(['devops', 'ux', 'back', 'domain', 'core', 'external']),
-  ux: new Set(['ux', 'domain', 'core', 'external']),
+  tests: new Set(['tests', 'front', 'back', 'domain', 'core', 'external']),
+  devops: new Set(['devops', 'front', 'back', 'domain', 'core', 'external']),
+  front: new Set(['front', 'domain', 'core', 'external']),
   back: new Set(['back', 'domain', 'core', 'external']),
   domain: new Set(['domain', 'core', 'external']),
   core: new Set(['core', 'external']),
@@ -74,9 +74,9 @@ const namespaceForSpecifier = (specifier: string, fromFile: string): Namespace =
 
   // UX
   if (
-    specifier.startsWith('@ux/') || specifier === '@ux/api' || specifier.startsWith('@ux/app-')
+    specifier.startsWith('@front/') || specifier === '@front/api' || specifier.startsWith('@front/app-')
   ) {
-    return 'ux'
+    return 'front'
   }
 
   // DevOps
@@ -127,9 +127,9 @@ const lineNumber = (source: string, index: number): number => source.slice(0, in
 
 const isUxAppFile = (file: string): boolean => {
   const normalized = normalizePath(file)
-  return normalized.includes('/source/ux/app-admin/')
-    || normalized.includes('/source/ux/app-ops/')
-    || normalized.includes('/source/ux/app-customer/')
+  return normalized.includes('/source/front/app-admin/')
+    || normalized.includes('/source/front/app-ops/')
+    || normalized.includes('/source/front/app-customer/')
 }
 
 const isConfigModule = (file: string): boolean => {
@@ -137,7 +137,7 @@ const isConfigModule = (file: string): boolean => {
   return normalized.includes('/config/') && normalized.endsWith('config.ts')
 }
 
-const checkUxImports = (file: string, imports: Array<{ specifier: string }>): string[] => {
+const checkFrontImports = (file: string, imports: Array<{ specifier: string }>): string[] => {
   if (!isUxAppFile(file)) return []
 
   const violations: string[] = []
@@ -145,7 +145,7 @@ const checkUxImports = (file: string, imports: Array<{ specifier: string }>): st
     for (const forbidden of UX_FORBIDDEN_IMPORTS) {
       if (specifier.startsWith(forbidden)) {
         violations.push(
-          `Forbidden import: ${specifier} (use @ux-api, @domain, or @core-std instead)`
+          `Forbidden import: ${specifier} (use @front/api, @domain, or @core-std instead)`
         )
       }
     }
@@ -165,7 +165,7 @@ const checkConfigImports = (file: string, imports: Array<{ specifier: string }>)
     // Direct Config import only in config modules
     if (specifier === '@core/cfg/config.ts' && !configModule) {
       violations.push(
-        'Direct Config import (use package config module: @back-supabase-edge/config/... or @ux-app-*/config/...)'
+        'Direct Config import (use package config module: @back-supabase-edge/config/... or @front/app-*/config/...)'
       )
     }
 
@@ -220,8 +220,8 @@ const main = async () => {
     }
 
     // UX-specific rules
-    const uxViolations = checkUxImports(file, imports)
-    for (const violation of uxViolations) {
+    const frontViolations = checkFrontImports(file, imports)
+    for (const violation of frontViolations) {
       violations.push(`${relative} - ${violation}`)
     }
 

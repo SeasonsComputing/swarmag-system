@@ -3,13 +3,13 @@ import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 import { walk } from '@std/walk'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
-const COMMON_DIR = `${ROOT}/source/ux/common`
-const CSS_DIR = `${ROOT}/source/ux/common/components/css`
+const COMMON_DIR = `${ROOT}/source/front/ux`
+const CSS_DIR = `${ROOT}/source/front/ux/ui/css`
 const APP_DIRS = [
-  `${ROOT}/source/ux/app-admin`,
-  `${ROOT}/source/ux/app-customer`,
-  `${ROOT}/source/ux/app-ops`,
-  `${ROOT}/source/ux/app-style-guide`
+  `${ROOT}/source/front/app-admin`,
+  `${ROOT}/source/front/app-customer`,
+  `${ROOT}/source/front/app-ops`,
+  `${ROOT}/source/front/app-style-guide`
 ]
 
 const CSS_FILES = ['tokens.css', 'roles.css', 'themes.css', 'base.css', 'ui.css']
@@ -517,7 +517,7 @@ const main = async () => {
 
   for (const fileName of CSS_FILES) {
     const filePath = `${CSS_DIR}/${fileName}`
-    const relative = `source/ux/common/components/css/${fileName}`
+    const relative = `source/front/ux/ui/css/${fileName}`
     designSystemFiles.add(filePath)
 
     const content = await Deno.readTextFile(filePath)

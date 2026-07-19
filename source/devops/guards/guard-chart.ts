@@ -6,8 +6,8 @@
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
-const TARGET_DIR = `${ROOT}/source/ux`
-const ALLOWED_DIR = '/source/ux/common/components/charts/'
+const TARGET_DIR = `${ROOT}/source/front`
+const ALLOWED_DIR = '/source/front/ux/ui/charts/'
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
 const CHART_SPECIFIERS = [

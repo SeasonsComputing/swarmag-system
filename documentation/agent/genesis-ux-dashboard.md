@@ -14,27 +14,27 @@ Deliver the dashboard foundation and user management page for `app-admin`. This 
 
 ### 3.1 Create
 
-| File                                                     | Purpose                                        |
-| -------------------------------------------------------- | ---------------------------------------------- |
-| `source/ux/common/shell/abstraction-manager-contract.ts` | Provider interface                             |
-| `source/ux/common/shell/abstraction-manager.tsx`         | Generic list+dialog manager component          |
-| `source/ux/common/shell/widget-provider.tsx`             | WidgetProvider context + useWidgets hook       |
-| `source/ux/common/shell/widgets-header-catalog.ts`       | Header widget sub-catalog                      |
-| `source/ux/common/shell/widgets-catalog.ts`              | Widget catalog barrel                          |
-| `source/ux/common/shell/dashboard.tsx`                   | Dashboard root component                       |
-| `source/ux/common/shell/dashboard.css`                   | Feature-layer CSS for dashboard                |
-| `source/ux/common/widgets/brand-widget.tsx`              | BrandWidget                                    |
-| `source/ux/common/widgets/action-widget.tsx`             | ActionWidget                                   |
-| `source/ux/app-admin/users/user-manager.tsx`             | UserManager — AbstractionManagerContract<User> |
-| `source/ux/app-admin/users/users.css`                    | Feature-layer CSS for users page               |
+| File                                                    | Purpose                                        |
+| ------------------------------------------------------- | ---------------------------------------------- |
+| `source/front/ux/shell/abstraction-manager-contract.ts` | Provider interface                             |
+| `source/front/ux/shell/abstraction-manager.tsx`         | Generic list+dialog manager component          |
+| `source/front/ux/shell/widget-provider.tsx`             | WidgetProvider context + useWidgets hook       |
+| `source/front/ux/shell/widgets-header-catalog.ts`       | Header widget sub-catalog                      |
+| `source/front/ux/shell/widgets-catalog.ts`              | Widget catalog barrel                          |
+| `source/front/ux/shell/dashboard.tsx`                   | Dashboard root component                       |
+| `source/front/ux/shell/dashboard.css`                   | Feature-layer CSS for dashboard                |
+| `source/front/ux/widgets/brand-widget.tsx`              | BrandWidget                                    |
+| `source/front/ux/widgets/action-widget.tsx`             | ActionWidget                                   |
+| `source/front/app-admin/users/user-manager.tsx`         | UserManager — AbstractionManagerContract<User> |
+| `source/front/app-admin/users/users.css`                | Feature-layer CSS for users page               |
 
 ### 3.2 Modify
 
-| File                                       | Change                                                                               |
-| ------------------------------------------ | ------------------------------------------------------------------------------------ |
-| `source/ux/common/shell/bootstrap.tsx`     | Wrap app in WidgetProvider; add dashboard + users routes to tree; export `rootRoute` |
-| `source/ux/app-admin/app.tsx`              | Add usersRoute; call `bootstrap(dashboardSeed, [usersRoute])`                        |
-| `source/ux/app-admin/dashboard-admin.json` | Add `settings`; add BrandWidget + ActionWidget to header                             |
+| File                                          | Change                                                                               |
+| --------------------------------------------- | ------------------------------------------------------------------------------------ |
+| `source/front/ux/shell/bootstrap.tsx`         | Wrap app in WidgetProvider; add dashboard + users routes to tree; export `rootRoute` |
+| `source/front/app-admin/app.tsx`              | Add usersRoute; call `bootstrap(dashboardSeed, [usersRoute])`                        |
+| `source/front/app-admin/dashboard-admin.json` | Add `settings`; add BrandWidget + ActionWidget to header                             |
 
 ## 4. Architectural Decisions
 
@@ -91,7 +91,7 @@ export type WidgetRegistry = Dictionary<WidgetComponent>
 ```typescript
 // common/shell/abstraction-manager-contract.ts
 import type { Instance } from '@core/std'
-import type { UiComponent } from '@ux/common/components/ui'
+import type { UiComponent } from '@front/ux/ui'
 
 export interface AbstractionManagerContract<T extends Instance> {
   entityLabel: string
@@ -120,8 +120,8 @@ export const useWidgets = (): WidgetRegistry => useContext(WidgetContext)
 
 ```typescript
 // widgets-catalog.ts
-import { ActionWidget } from '@ux/common/widgets/action-widget.tsx'
-import { BrandWidget } from '@ux/common/widgets/brand-widget.tsx'
+import { ActionWidget } from '@front/ux/widgets/action-widget.tsx'
+import { BrandWidget } from '@front/ux/widgets/brand-widget.tsx'
 
 export const WidgetCatalog: WidgetRegistry = { BrandWidget, ActionWidget }
 ```
@@ -200,7 +200,7 @@ ActionWidget zips `settings.actions` and `settings.labels`, renders one `UiButto
 
 ### 5.7 BrandWidget
 
-No props. Calls `getShellIdentity()` from `@ux/common/shell/shell-metadata.ts`. Renders `productName` and `applicationName`. No `UiCard` wrapper — header surface is already card-panel. `UiLayout variant='block-fit'` for internal stacking.
+No props. Calls `getShellIdentity()` from `@front/ux/shell/shell-metadata.ts`. Renders `productName` and `applicationName`. No `UiCard` wrapper — header surface is already card-panel. `UiLayout variant='block-fit'` for internal stacking.
 
 ### 5.8 bootstrap.tsx Changes
 
@@ -213,11 +213,11 @@ No props. Calls `getShellIdentity()` from `@ux/common/shell/shell-metadata.ts`. 
 ### 5.9 app.tsx (app-admin)
 
 ```typescript
+import { UserManager } from '@front/app-admin/users/user-manager.tsx'
+import { AuthGuard } from '@front/ux/shell/auth-guard.tsx'
+import { bootstrap, rootRoute } from '@front/ux/shell/bootstrap.tsx'
+import { Content } from '@front/ux/shell/content.tsx'
 import { createRoute } from '@tanstack/solid-router'
-import { UserManager } from '@ux/app-admin/users/user-manager.tsx'
-import { AuthGuard } from '@ux/common/shell/auth-guard.tsx'
-import { bootstrap, rootRoute } from '@ux/common/shell/bootstrap.tsx'
-import { Content } from '@ux/common/shell/content.tsx'
 import dashboardSeed from './dashboard-admin.json' with { type: 'json' }
 
 const usersRoute = createRoute({

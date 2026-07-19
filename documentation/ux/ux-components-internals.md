@@ -60,7 +60,7 @@ ux/
 
 ## 3. Component Contract
 
-All primitives in `source/ux/common/components/ui/` emit semantic attributes and keep visual styling in `ui.css`.
+All primitives in `source/front/ux/ui/components/` emit semantic attributes and keep visual styling in `ui.css`.
 
 ### 3.1 Semantic Identity
 
@@ -401,7 +401,7 @@ This selector shape is invalid because one element cannot hold two different `da
 
 Charts are standardized through `UiChart`. Chart.js is the internal engine and must not be consumed directly by views or widgets.
 
-**Location:** `source/ux/common/components/charts`
+**Location:** `source/front/ux/ui/charts`
 
 | Component   | Purpose                             |
 | ----------- | ----------------------------------- |
@@ -417,6 +417,6 @@ The style-guide application is a demonstration harness for the design system. It
 
 Style-guide CSS does not target Ui primitive identities with `[data-ui]` selectors. Demo-only sizing and layout uses wrapper classes.
 
-Style-guide app surfaces preserve the global foundation background unless a specific specimen requires an opaque content surface. Repeated demo treatment that becomes product UI belongs in `source/ux/common/components/` or the shared CSS foundation before application code consumes it.
+Style-guide app surfaces preserve the global foundation background unless a specific specimen requires an opaque content surface. Repeated demo treatment that becomes product UI belongs in `source/front/ux/ui/` or the shared CSS foundation before application code consumes it.
 
 _End of Component Internals Document_

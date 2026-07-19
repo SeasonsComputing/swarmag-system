@@ -1,0 +1,927 @@
+<img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
+
+# swarmAg Operations System — Architecture Front
+
+## 1. Overview
+
+This document defines UX-layer architecture for swarmAg applications. It governs UX integration boundaries, architectural composition, and application-specific UX architecture contracts.
+
+### 1.1 Authority Chain
+
+| Document                      | File                        | Intent                                                                                       |
+| ----------------------------- | --------------------------- | -------------------------------------------------------------------------------------------- |
+| **Canonical Authority Chain** | `architecture-core.md §1.1` | Defines global documentation precedence for the system                                       |
+| └→ **Architecture Front**     | _(this file)_               | Front-layer architecture contracts, integration boundaries, and app-specific UX architecture |
+
+### 1.2 Scope Boundary of Governing Documents
+
+| Document                   | File                        | Scope Ownership                                                              |
+| -------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
+| **Architecture Core**      | `architecture-core.md`      | System boundary, platform constraints, dependency direction                  |
+| **Domain Model**           | `domain-model.md`           | Domain meaning consumed by UX architecture                                   |
+| **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace and field-level references used by UX contracts          |
+| **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns consumed by UX integrations          |
+| **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction patterns             |
+| **Architecture Front**     | _(this file)_               | Front-layer boundaries, composition contracts, and app-specific architecture |
+
+## 2. Directory Structure
+
+The following is the normative target structure. Directories not yet present are created as pages are built.
+
+```text
+source/
+└── front/
+    ├── api/
+    │   └── api.ts                   - API client and request/response types
+    ├── config/
+    ├── ux/
+    │   ├── assets/                  — static assets used by applications
+    │   │   ├── logos/               — brand/logos
+    │   ├── views/                   — UX projection types (domain → display shape)
+    │   ├── stores/                  — reactive stores
+    │   │   ├── app-state.ts
+    │   │   ├── session-state.ts
+    │   │   └── dashboard-state.ts
+    │   ├── widgets/                 — widget catalog
+    │   ├── shell/                   — bootstrap, auth-guard, content, login, form-panel
+    │   └── ui/
+    │       ├── components/          — portable shared UI foundation
+    │       │   ├── css/             — CSS barrel, tokens, themes, base styles, control styles
+    │       │   ├── charts/          — PieChart, BarChart, LineChart, Sparkline
+    │       │   ├── fonts/           — self-hosted font assets
+    │       │   └── icons/           — shared icon assets
+    ├── app-admin/
+    │   ├── app.tsx
+    │   ├── dashboard-admin.json     — default dashboard layout for app-admin
+    │   ├── index.html
+    │   ├── manifest.webmanifest
+    │   ├── sw.js
+    │   ├── vite.config.ts
+    │   ├── workflow-builder/        — workflow authoring/editing
+    │   ├── job-assessment/          — guided onsite detailed assessment (maps, photos, workflow mods)
+    │   ├── job-planning/            — workflow mods + crew + equipment + chemical assignment
+    │   └── customer-prospect/       — guided new customer + new job + initial assessment
+    ├── app-customer/
+    │   ├── app.tsx
+    │   ├── dashboard-customer.json  — default dashboard layout for app-customer
+    │   ├── index.html
+    │   ├── manifest.webmanifest
+    │   ├── sw.js
+    │   ├── vite.config.ts
+    │   └── customer-report/         — specialized report for customer
+    ├── app-ops/
+    │   ├── app.tsx
+    │   ├── dashboard-ops.json       — default dashboard layout for app-ops
+    │   ├── index.html
+    │   ├── manifest.webmanifest
+    │   ├── sw.js
+    │   ├── vite.config.ts
+    │   ├── stores/
+    │   │   └── jobs-store.ts        — local job manifest store
+    │   └── job-runner/              — guided job execution engine
+    └── app-style-guide/             — design-system demonstration harness
+```
+
+Everything in `source/front/ux/` must be adaptive — usable across all three apps and all viewport sizes. Mobile-only or desktop-only components do not belong in the shared ux layer.
+
+Authentication and client makers are part of the core runtime and are sourced from `source/core/client/`.
+
+## 3. Application Runtime Profiles
+
+| App          | Runtime                      | Storage                            | Deployment        |
+| ------------ | ---------------------------- | ---------------------------------- | ----------------- |
+| **Admin**    | Browser (desktop/tablet PWA) | Supabase SDK                       | Netlify CDN (PWA) |
+| **Ops**      | Browser (mobile PWA)         | IndexedDB offline, Supabase online | Netlify CDN (PWA) |
+| **Customer** | Browser (desktop/tablet PWA) | Supabase SDK                       | Netlify CDN (PWA) |
+
+UX applications are static bundles. Their remote backend is selected by the
+configuration embedded at package/build time, not by the static host that serves
+the files. For Supabase-backed UX apps, the concrete binding is the Supabase
+endpoint, public key, and browser client mode embedded in the bundle.
+
+Serving a stage-bound `app-admin` bundle locally is therefore still a stage-bound
+Admin client. Local serving is a tooling concern; it is not a separate remote
+backend environment axis.
+
+`documentation/architecture/architecture-devops.md` specifies the devops architecture including deployment strategy.
+
+## 4. Technology Stack
+
+| Layer         | Technology                      |
+| ------------- | ------------------------------- |
+| Framework     | SolidJS (reactive, compiled)    |
+| Routing       | TanStack Solid-Router           |
+| Data Fetching | TanStack Query                  |
+| UI Primitives | Kobalte (accessible components) |
+| Charting      | Chart.js (via UiChart adapter)  |
+| Styling       | Vanilla CSS (no preprocessor)   |
+| Build         | Vite                            |
+| Runtime       | Modern browsers (ES2022+)       |
+
+## 5. Key Principles
+
+1. **Apps consume, don't configure** — API namespace pre-composed, just import and use
+2. **Types flow from domain** — All data structures defined in `@domain/abstractions/`; UX view types in `@front/ux/views/`
+3. **Storage is transparent** — Client makers handle Supabase, IndexedDB, HTTP
+4. **Import discipline enforced** — Architectural guards prevent boundary violations
+5. **UX design language** — All applications conform to a unified design-language
+
+## 6. Application Suite
+
+The system includes three SolidJS applications:
+
+| Application  | Purpose                           | Primary Users    |
+| ------------ | --------------------------------- | ---------------- |
+| **Admin**    | Management and configuration      | Leadership staff |
+| **Ops**      | Field execution                   | Operations crews |
+| **Customer** | Scheduling and status (read-only) | Customers        |
+
+All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Chart rendering is provided through `UiChart` (design-system primitive) with Chart.js as an implementation detail behind `ChartWidget`. Shared infrastructure lives in `source/front/ux/`.
+
+## 7. API Namespace Integration
+
+### 7.1 Single Composed API
+
+All UX applications consume the **same API namespace** defined in `source/front/api/api.ts`:
+
+```typescript
+import { api } from '@front/api'
+
+// Auth
+await api.Auth.signInWithOtp({ email })
+
+// Users API
+const user = await api.Users.get(userId)
+const canLogin = await api.Users.hasAccess({ email })
+
+// CRUD — direct to Supabase where no orchestration is required
+const jobs = await api.Jobs.list()
+
+// Offline — IndexedDB
+const localJob = await api.JobsLocal.get(jobId)
+
+// Business rules
+const title = await api.createJobTitle(jobDefinition)
+await api.deepCloneJob.run({ jobId })
+```
+
+The API namespace is composed once using client makers (Supabase SDK, IndexedDB, HTTP). Applications consume it directly without configuration or provider selection.
+
+### 7.2 API Namespace Inventory
+
+All entries in `source/front/api/api.ts`:
+
+#### 7.2.1 Session Management
+
+| Singleton  | Purpose                                                           |
+| ---------- | ----------------------------------------------------------------- |
+| `api.Auth` | Passwordless OTP auth; session lifecycle and post-auth validation |
+
+#### 7.2.2 Domain Persistence Singletons
+
+| Singleton       | Purpose                                                   |
+| --------------- | --------------------------------------------------------- |
+| `api.Users`     | User API; read/list direct, privileged mutations via edge |
+| `api.Assets`    | Asset CRUD via Supabase                                   |
+| `api.Chemicals` | Chemical CRUD via Supabase                                |
+| `api.Customers` | Customer CRUD via Supabase                                |
+| `api.Services`  | Service CRUD via Supabase                                 |
+| `api.Workflows` | Workflow CRUD via Supabase                                |
+| `api.Jobs`      | Job CRUD via Supabase                                     |
+| `api.JobsLocal` | Job aggregate CRUD via IndexedDB (field execution)        |
+
+#### 7.2.3 Domain Operations
+
+| Operation            | Purpose                                              |
+| -------------------- | ---------------------------------------------------- |
+| `api.deepCloneJob`   | Clone job aggregate to IndexedDB for field execution |
+| `api.uploadJobLogs`  | Bulk append field logs to remote                     |
+| `api.createJobTitle` | Derive display title string from a `JobDefinition`   |
+
+**`api.Users`**
+
+```typescript
+api.Users.get(id: Id): Promise<User>
+api.Users.list(options?: ListOptions): Promise<ListResult<User>>
+api.Users.create(input: UserCreate): Promise<User>
+api.Users.update(input: UserUpdate): Promise<User>
+api.Users.delete(id: Id): Promise<DeleteResult>
+api.Users.eject(id: Id): Promise<User>
+api.Users.hasAccess(input: { email: string }): Promise<boolean>
+```
+
+`api.Users` is the user topic boundary. Callers do not know whether an operation
+uses direct Supabase CRUD, an RPC, or a Supabase Edge function.
+
+`get` and `list` use the direct Supabase table client. `hasAccess` hides the
+existing `user_has_access` RPC behind the Users topic API. `create`, `update`,
+`delete`, and `eject` invoke authenticated Supabase Edge functions because they
+must synchronize `public.users` with Supabase Auth.
+
+`hasAccess` returns whether the submitted email belongs to a registered, active
+swarmAg user. It is used before OTP delivery so the login flow does not send
+one-time codes to unknown or inactive users.
+
+**`api.deepCloneJob`**
+
+```typescript
+api.deepCloneJob.run({ jobId: Id }): Promise<JobDefinition>
+```
+
+Creates a complete field-execution copy of a job aggregate for local IndexedDB
+storage. The clone includes the job, phase records, finalized or preparatory
+workflow context, and referenced operational data required for offline execution.
+
+The returned `JobDefinition` is defined in `source/front/ux/views/job-views.ts`.
+
+**`api.uploadJobLogs`**
+
+```typescript
+api.uploadJobLogs.run({ jobId: Id, logs: JobWorkLogEntry[] }): Promise<void>
+```
+
+Bulk appends locally captured field-execution log entries to the remote job log
+after connectivity returns. This is a one-way append operation, not a sync or
+merge operation; uploaded entries preserve their captured timestamps, user
+identity, answers, notes, attachments, and operational metadata.
+
+`JobWorkLogEntry` is defined in `source/domain/abstractions/job.ts`.
+
+**`api.createJobTitle`**
+
+```typescript
+api.createJobTitle(job: JobDefinition): string
+```
+
+Returns a display title derived from the job's current status and available phase data. This is a pure client-side computation — no network call. The derivation algorithm is status-driven and defined during jobs UI generation. For the scaffold phase, the method may be stubbed.
+
+`JobDefinition` is defined in `source/front/ux/views/job-views.ts`.
+
+### 7.3 Provided Infrastructure
+
+The foundation provides:
+
+#### 7.3.1 Type Safety
+
+- Import domain archetypes from `@domain` — abstractions, protocols, adapters,
+  validators
+- All API operations return typed domain objects
+- TypeScript strict mode enforced
+
+#### 7.3.2 Storage Abstraction
+
+- Direct database access via RLS (no HTTP for CRUD)
+- Offline storage via IndexedDB (Ops app)
+- Orchestration via edge functions (complex operations)
+- Client makers handle all serialization
+
+#### 7.3.3 Offline Capability
+
+- `api.JobsLocal` (IndexedDB client) available to all apps
+- Ops app uses for field execution
+- Deep clone via `api.deepCloneJob` business rule
+- Log upload via `api.uploadJobLogs` business rule
+
+## 8. Architectural Boundaries
+
+### 8.1 Import Discipline
+
+#### 8.1.1 UX applications MAY import
+
+**Convenience Barrels**
+
+| Import       | Purpose                                                         |
+| ------------ | --------------------------------------------------------------- |
+| `@core/std`  | Standard types (Id, When, Dictionary)                           |
+| `@core/stdx` | Makers and wrappers to runtime project code from standard types |
+| `@front/api` | Composed API namespace                                          |
+
+**Aliases**
+
+| Alias                                 | Purpose                          |
+| ------------------------------------- | -------------------------------- |
+| `@core/*`                             | Core modules                     |
+| `@domain/*`                           | Domain modules                   |
+| `@front/ux/*`                         | Shared UX modules                |
+| `@front/config/*`                     | Configuration module             |
+| `@front/app-{admin\|ops\|customer}/*` | App-local modules (own app only) |
+
+#### 8.1.2 Violations
+
+Violations detected by architectural guards are build failures.
+
+### 8.2 Configuration Pattern
+
+All applications import `Config` from `@front/config/ux-config.ts` — never directly from `@core/cfg/config.ts`. Direct core imports in app files are a guard violation.
+
+- Update `ux-config.ts` keys and aliases as required env variables expand
+- Environment file naming and placeholder conventions: see `architecture-devops.md §4`
+
+### 8.3 Reactive Store Module Pattern
+
+The Reactive Store Module Pattern is the required architecture for UX reactive state modules.
+
+- Export a **single namespace object** (for example `SessionState`), not raw primitives.
+- Keep framework internals (`createStore`, setter functions, signals) **module-private**.
+- Expose:
+  - `store` for read access
+  - intent-based mutation methods (`setAuth`, `setUser`, `setReady`, `clear`)
+- Mutation methods must be **domain-intent names**, not framework/mechanical names.
+  - Use `setAuth`, not `setSessionStore`.
+- No module outside the store may call reactive setters directly.
+- Components and app shells consume state through `StoreNamespace.store` and mutate through `StoreNamespace.<intentMethod>()`.
+
+**Example Reactive Store Module:**
+
+```typescript
+// thing-state.ts
+
+export type ThingStore = {
+  field: number
+}
+
+const [thingStore, setThingStore] = createStore<ThingStore>({ field: 1971 })
+
+const setField = (field: number) => setThingStore({ field })
+const clear = () => setThingStore({ field: 1971 })
+
+const ThingState = {
+  store: thingStore,
+  setField,
+  clear
+}
+
+export { ThingState }
+```
+
+## 9. Application Runtime Patterns
+
+### 9.1 Application Shell Structure
+
+Each app root (`source/front/app-{admin|customer|ops}/app.tsx`) composes the same shell primitives from `common/`:
+
+```text
+app.tsx
+└── bootstrap()
+    ├── Login              — unauthenticated entry point
+    ├── AuthGuard          — session enforcement, redirect to /login
+    └── Dashboard          — primary navigation surface
+```
+
+Authenticated routes render their primary application surface inside a semantic
+`main` landmark. `main` is required accessibility plumbing, not a UX metaphor or
+shared shell primitive.
+
+`Login`, `AuthGuard`, `Dashboard`, and shared stores live in `source/front/ux/shell`. App packages provide only dashboard configuration (`app-{admin|ops|customer}-dashboard.json`) and app-specific routes, widgets, and features.
+
+#### 9.1.1 UX Metaphors
+
+All feature work should use an existing UX metaphor when one fits:
+
+| Metaphor                | Purpose                                                                |
+| ----------------------- | ---------------------------------------------------------------------- |
+| **Dashboard**           | Authenticated hub and primary navigation surface                       |
+| **Widget**              | Dashboard surface unit for status, data, and action entry points       |
+| **Abstraction Manager** | Standard domain list/detail management experience                      |
+| **Workflow Manager**    | Guided, sequenced task surface for operational work                    |
+| **Custom Full Device**  | Purpose-built UX when no existing metaphor fits the feature's workflow |
+
+#### 9.1.2 Auth Guard
+
+The shell root reads `SessionState.store.isAuthenticated` before rendering any authenticated content. Unauthenticated users are redirected to login. This is the only authorization check in the UX layer — all data authorization is enforced by RLS at the database layer.
+
+#### 9.1.3 Dashboard as Primary Navigation
+
+There is no navigation menu in any app. The dashboard is the primary interface and the primary navigation surface. Dashboard widgets and cards are the entry points into domain pages. Navigation is:
+
+```text
+dashboard → domain page → back to dashboard
+```
+
+### 9.2 Routing
+
+Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/front/ux/shell/bootstrap.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
+
+A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
+
+#### 9.2.1 Route Shape
+
+```text
+/                          → redirect to /dashboard or /login
+/login                     → login (unauthenticated)
+/dashboard                 → dashboard (auth-guarded)
+/{page}                    → page (auth-guarded)
+/{page}/{id}               → item-scoped page (auth-guarded)
+/{page}/{operation}        → operation-scoped page (auth-guarded)
+/{page}/{operation}/{id}   → item-scoped operation page (auth-guarded)
+```
+
+The first three routes are provided by `bootstrap()` and are common to all apps. App-local `app.tsx` files extend the tree with app-specific pages as the application is built out.
+
+Examples: `/user/list`, `/user/get/{id}`, `/job-runner/{id}`.
+
+#### 9.2.2 Protected Routes
+
+Protected routes wrap content in the auth guard component. The guard is a route-level concern, not a per-component concern.
+
+### 9.3 Authentication
+
+Authentication is handled by `auth-supabase-client.ts` — a singleton module that directly implements `ApiAuthContract`. It is not a maker; there is exactly one auth implementation.
+
+```text
+source/core/client/auth-supabase-client.ts
+```
+
+It is composed into the API namespace as `api.Auth`:
+
+```typescript
+import { AuthSupabaseClient } from '@core/client/auth-supabase-client.ts'
+
+export const api = {
+  Auth: AuthSupabaseClient,
+  ...
+}
+```
+
+#### 9.3.1 Auth State Binding
+
+`auth-supabase-client.ts` exposes Supabase `onAuthStateChange` through `api.Auth`. Each app shell registers the listener in `app.tsx` during `onMount`. On auth events, the shell writes to `SessionState` via named methods (`setAuth`, `setUser`, `setReady`, `clear`). This keeps Supabase Auth isolated to the auth client and shell boot layer. No component touches Supabase Auth directly.
+
+Session termination events — token expiry, idle timeout, browser close — all flow through `onAuthStateChange`. The shell callback calls `SessionState.clear()`, and the auth guard redirects to login.
+
+#### 9.3.2 OTP Flow
+
+All apps use passwordless email OTP. No passwords are stored or transmitted.
+
+```text
+user submits email
+  → api.Users.hasAccess({ email })
+  → if false: login displays 'Email address not registered' — OTP flow does not proceed
+  → api.Auth.sendOtp(email)
+  → Supabase delivers one-time code to email address
+  → user submits code
+  → api.Auth.verifyOtp(email, code)
+  → returns Session { userId }
+  → onAuthStateChange fires
+  → app shell calls applySession(session)
+  → applySession calls SessionState.setAuth(userId)
+  → applySession calls api.Users.get(userId) to hydrate domain user
+  → applySession calls api.Auth.validateUser(user)
+  → if user.status !== 'active':
+      api.Auth.logout()
+      SessionState.clear()
+      redirect to /login
+  → SessionState.setUser(user)
+  → SessionState.setReady()
+  → auth guard reacts → renders dashboard
+```
+
+#### 9.3.3 Post-Authentication Validation
+
+Authentication confirms that the caller possesses a valid OTP token. It does not confirm that the caller is an eligible swarmAg application user. Post-authentication validation is a required boot-sequence step that runs immediately after the domain user is hydrated.
+
+**Invariant:** `SessionState.store.isAuthenticated` is set to `true` only for users whose domain record exists and whose `status` is `'active'`. No session may proceed to the dashboard for a user who fails this check.
+
+**`ApiAuthContract.validateUser(user: User): void`**
+
+`validateUser` is a synchronous guard declared on `ApiAuthContract` and implemented in `auth-supabase-client.ts`. It receives the hydrated domain `User` and throws `ApiError` (status 403) when the user is not eligible. The shell boot sequence calls it between `api.Users.get()` and `SessionState.setUser()`.
+
+Validation rules enforced by `validateUser`:
+
+- `user.status === 'active'` — inactive users are rejected
+
+When `validateUser` throws, the boot sequence must:
+
+1. Call `api.Auth.logout()` to end the Supabase session
+2. Call `SessionState.clear()` to reset all UX session state
+3. Redirect to `/login`
+
+**Failure modes:**
+
+| Condition                     | Cause                                            | Response                                 |
+| ----------------------------- | ------------------------------------------------ | ---------------------------------------- |
+| `api.Users.get()` returns 404 | Auth identity has no matching domain user record | Hard failure — log and surface error     |
+| `user.status === 'inactive'`  | User account has been deactivated                | Logout, clear session, redirect to login |
+
+A 404 on user hydration is a system integrity violation — an auth identity exists with no corresponding domain user. This condition must not be silently swallowed; it warrants a visible error.
+
+#### 9.3.4 Logout Flow
+
+```text
+user triggers logout
+  → api.Auth.logout()
+  → Supabase signOut
+  → onAuthStateChange fires
+  → app shell calls SessionState.clear()
+  → auth guard reacts → renders login
+```
+
+### 9.4 Session State Store
+
+The session state store is a SolidJS store shared across all apps via `source/front/ux/stores/session-state.ts` and conforms to `8.3 Reactive Store Module Pattern`
+
+```typescript
+type SessionStore = {
+  userId: Id | null
+  user: User | null
+  isAuthenticated: boolean
+  isLoading: boolean
+  isDataReady: boolean
+}
+```
+
+- `isLoading` prevents a flash of the login screen for already-authenticated
+  users on page load — the shell renders nothing until the boot check resolves
+- `userId` is set immediately from `Session` on auth; `user` is populated after
+  `api.Users.get(userId)` resolves
+- `isDataReady` is set `true` by Admin and Customer immediately on session
+  establishment; set `true` by Ops only after the IndexedDB job manifest load
+  completes
+- No component reads from Supabase Auth directly — all session state is
+  consumed from this store
+
+#### 9.4.1 Session Store Write Interface
+
+`session-state.ts` keeps `setSessionStore` private and exports a singleton `SessionState` interface. Callers read from `SessionState.store` and mutate only through named methods.
+
+```typescript
+const [sessionStore, setSessionStore] = createStore<SessionStore>({
+  userId: null,
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  isDataReady: false
+})
+
+const setSessionAuth = (userId: Id): void =>
+  setSessionStore({ userId, isAuthenticated: true, isLoading: false })
+
+const clearSession = (): void =>
+  setSessionStore({
+    userId: null,
+    user: null,
+    isAuthenticated: false,
+    isLoading: false,
+    isDataReady: false
+  })
+
+const setSessionUser = (user: User): void => setSessionStore('user', user)
+const setDataReady = (): void => setSessionStore('isDataReady', true)
+
+const SessionState = {
+  store: sessionStore,
+  setAuth: setSessionAuth,
+  setUser: setSessionUser,
+  setReady: setDataReady,
+  clear: clearSession
+}
+
+export { SessionState }
+```
+
+### 9.5 IndexedDb Usage
+
+IndexedDb is the browser-side persistent store for all offline-data concerns.
+
+#### 9.5.1 IndexedDB Database Names
+
+IndexedDB usage is split into two layers:
+
+- Database namespace (physical DB name), `Config.get('LOCAL_DB_NAME')`, per deployment package.
+- Object Store names are not shared implicitly; they must be registered with `@core/db/indexeddb.ts` using `IndexedDb.registerStore('storeName')`
+  - Object Store's for domain abstractions are named for the abstraction, for example, `Job` or `Workflow`.
+- A CRUD/List maker is provided to standardize usage of the local database with `@core/client/make-indexeddb-client.ts` conforming to `ApiCrudContract` in `@core/api/api-contract.ts`
+
+**IndexedDB Database Names**
+
+| Database Name          | App      | Content                                               |
+| ---------------------- | -------- | ----------------------------------------------------- |
+| `swarmag-app-admin`    | Admin    | dashboard layout, panel config, theme                 |
+| `swarmag-app-ops`      | Ops      | dashboard layout, panel config, theme, job aggregates |
+| `swarmag-app-customer` | Customer | dashboard layout, theme                               |
+
+#### 9.5.2 Application Preferences
+
+`AppState` (`@front/ux/stores/app-state.ts`) manages per-app preferences — persisted key/value pairs backed by a named IndexedDB object store. Conforms to the Reactive Store Module Pattern (§8.3).
+
+| Key                | Admin | Ops | Customer |
+| ------------------ | ----- | --- | -------- |
+| `theme`            | ✓     | ✓   | ✓        |
+| `dashboard:layout` | ✓     | ✓   | ✓        |
+| `dashboard:panels` | ✓     | ✓   | —        |
+
+### 9.6 State Management
+
+| Concern          | Mechanism       | Location                           |
+| ---------------- | --------------- | ---------------------------------- |
+| auth / session   | SolidJS store   | `common/stores/session-state.ts`   |
+| app preferences  | IndexedDB       | `common/stores/app-state.ts`       |
+| dashboard config | IndexedDB       | `common/stores/dashboard-state.ts` |
+| server data      | TanStack Query  | per-page query hooks               |
+| local ui state   | SolidJS signals | component-local                    |
+| ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts`     |
+
+#### 9.6.1 Rules
+
+- Signals for local, transient UI state — inputs, open/close, hover
+- Stores for shared cross-component state — session, app preferences, dashboard config
+- TanStack Query for all server data — caching, loading, error states
+- No prop-drilling of session or user — read from session store directly
+
+## 10. Shared Application Features
+
+### 10.1 Common Component Boundaries
+
+`source/front/ux/` is the swarmAg system user-experience foundation. All components in `common/` are reactive and adaptive by default.
+
+#### 10.1.1 General-purpose UI foundation
+
+```text
+common/
+└── components/  — portable shared UI foundation
+    ├── charts/  — reserved chart primitive directory
+    ├── css/     — CSS barrel, tokens, themes, base styles, and control styles
+    ├── fonts/   — self-hosted font assets
+    ├── icons/   — shared icon assets
+    └── ui/      — HTML and Kobalte-backed Ui{Control} primitives
+```
+
+#### 10.1.2 swarmAg application foundation
+
+```text
+common/
+├── assets/     — static visual assets specific to swarmAg applications
+│   └── logos/  — shared swarmAg logo assets
+├── shell/      — bootstrap, login, auth guard, content frame, dashboard stub, and form panel
+├── stores/     — session, app preference, and dashboard state stores
+├── views/      — UX-local shared projection types consumed by two or more apps
+└── widgets/    — reusable dashboard widget catalog
+```
+
+#### 10.1.3 Stays in the app
+
+- dashboard default configuration and app-specific widget composition
+- domain pages and feature pages
+- app-specific route tree
+- app-specific IndexedDB store instance
+
+#### 10.1.4 Rule
+
+A component moves to `common/` when a second app needs it — not before.
+
+Premature generalization is a violation.
+
+### 10.2 Build Composition
+
+Each app is an independent Vite build producing a deployable PWA bundle:
+
+```text
+swarmag-app-admin    = ux/app-admin    + ux/common + ux/api + ux/config
+swarmag-app-ops      = ux/app-ops      + ux/common + ux/api + ux/config
+swarmag-app-customer = ux/app-customer + ux/common + ux/api + ux/config
+```
+
+- Three Vite configs, one per app
+- Three Netlify sites, one per app
+- `ux/common/` and `ux/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
+- `ux/config/` contains two files when packaged: `ux-config.ts` and the target env file
+- The target env file binds the static bundle to one backend target; the same
+  bundle may be served locally or remotely without changing that binding
+- `bootstrap()` owns boot-time initializations — CSS barrel (`css.tsx`) and config (`ux-config.ts`). App roots (`app.tsx`) are minimal — `bootstrap(dashboardSeed)` call and app-specific route extensions only
+- Packaging, artifact format, and deployment workflow: see `architecture-devops.md §7`
+- No build artifacts are checked into the repository
+
+### 10.3 Dashboard Layout Contract
+
+```text
+Dashboard
+  └─ HeaderRow (fixed height, KPI StatCards)
+  └─ ScrollContainer (vertical scroll)
+     └─ DashboardRow[] (horizontal swipe, no collapse)
+        └─ Widget[] (compact | landscape)
+```
+
+No row collapse on small viewport. Horizontal swipe per row. Vertical scroll on the outer column.
+
+**`source/front/app-{admin|ops|customer}/app-{admin|ops|customer}-dashboard.json`**
+
+Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/front/ux/stores/dashboard-state.ts`). Not hardcoded. The current contract uses one default config per app.
+
+The app-local dashboard JSON conforms to `DashboardView` from `source/front/ux/views/dashboard-views.ts`. `DashboardState.init(seed)`validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
+
+`bootstrap()` initializes `DashboardState`, then provides it with the shared widget registry through `DashboardProvider` (`source/front/ux/shell/dashboard-provider.tsx`). Dashboard renderers consume the combined runtime contract through `useDashboard()`. Dashboard state remains a Reactive Store Module; the context injects its namespace contract and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@front/api` namespace.
+
+```json
+{
+  "header": {
+    "widgets": [
+      { "type": "BrandWidget", "settings": { "shape": "landscape" } }
+    ]
+  },
+  "rows": [
+    {
+      "size": "standard",
+      "label": "Operations at-a-glance",
+      "widgets": [
+        { "type": "UpcomingJobsWidget", "settings": { "shape": "landscape" } },
+        { "type": "AssetStatusWidget", "settings": { "shape": "compact" } }
+      ]
+    }
+  ]
+}
+```
+
+### 10.4 Views Catalog
+
+UX projection types — shapes that exist because the domain model does not surface cleanly to the UI as-is. No infrastructure imports, no SolidJS imports. Pure types only. Files follow the `{domain}-views.ts` naming convention.
+
+| File                 | Types                                                                 | Purpose                                             |
+| -------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
+| `job-views.ts`       | `JobSummary`, `JobDefinition`                                         | Job display projections                             |
+| `dashboard-views.ts` | `DashboardView`, `DashboardHeader`, `DashboardRow`, `DashboardWidget` | Dashboard layout schema types                       |
+| `workflow-views.ts`  | `WorkflowView`                                                        | Ordered tasks + questions resolved for renderer     |
+| `question-views.ts`  | `QuestionView`                                                        | Discriminated union flattened for workflow renderer |
+
+## 11. Specialized Application Features
+
+The following catalogs describe the target feature set. Components not yet present are created as features are built.
+
+### 11.1 Job Runner Components (app-ops)
+
+All in `source/front/app-ops/job-runner/`. Mobile-only — does not belong in `common/`.
+
+| Component                          | Purpose                                 |
+| ---------------------------------- | --------------------------------------- |
+| `runner.tsx`                       | Top-level runner, state machine         |
+| `progress.tsx`                     | Route bar — tasks + questions remaining |
+| `question-screen.tsx`              | Per-question renderer                   |
+| `answers/boolean-answer.tsx`       | Full-width YES/NO buttons               |
+| `answers/text-answer.tsx`          | Large text input                        |
+| `answers/number-answer.tsx`        | Large stepper / keypad                  |
+| `answers/single-select-answer.tsx` | Large tappable tiles                    |
+| `answers/multi-select-answer.tsx`  | Tappable tiles with checkmark           |
+| `answer-attachment.tsx`            | Camera-first attachment trigger         |
+| `nav.tsx`                          | BACK + NEXT, forward-biased             |
+| `task-complete.tsx`                | Task arrival screen                     |
+| `complete.tsx`                     | Final arrival screen                    |
+
+### 11.2 Job Lifecycle Feature Pages (app-admin)
+
+#### 11.2.1 Device Target
+
+| Phase                       | App         | Feature Page        | Primary Device           |
+| --------------------------- | ----------- | ------------------- | ------------------------ |
+| Initial assessment (remote) | `app-admin` | `customer-prospect` | Desktop, Tablet          |
+| Onsite assessment           | `app-admin` | `job-assessment`    | Tablet (offline-capable) |
+| Job planning                | `app-admin` | `job-planning`      | Desktop, Tablet          |
+| Job runner                  | `app-ops`   | `job-runner`        | Mobile                   |
+
+#### 11.2.2 Specialized UX
+
+Job assessment and job plan are purpose-built guided flows, not generic admin forms. Both involve structured data capture in semi-field conditions.
+
+Assessment involves: location capture, photos, risk notes, workflow selection, workflow modification. Tablet is a practical requirement for the onsite phase.
+
+#### 11.2.3 Workflow Editing in Context
+
+Job assessment and job planning may modify job-specific workflow clones. The editor operates on a cloned `Workflow` record (not the canonical template) scoped to the job context. The canonical workflow builder feature lives in `source/front/app-admin/workflow-builder/` and is mounted by app routes where needed.
+
+Per `domain-model.md §2.5`:
+
+- Assessment clones the basis workflow → `JobWorkflow.modifiedWorkflowId`
+- Planning may further modify the assessment clone
+- At execution start, the manifest is finalized and immutable
+
+### 11.3 Dashboard Components
+
+| Component         | Purpose                                     |
+| ----------------- | ------------------------------------------- |
+| `Dashboard`       | Root layout, row renderer, scroll container |
+| `DashboardRow`    | Horizontal swipe row (short\|standard)      |
+| `DashboardWidget` | Widget container (compact\|landscape)       |
+
+### 11.4 Widget Catalog
+
+| Widget                    | Size      | Contents                              |
+| ------------------------- | --------- | ------------------------------------- |
+| `UpcomingJobsWidget`      | landscape | Job list, status badges               |
+| `JobCalendarWidget`       | landscape | Calendar view of scheduled jobs       |
+| `CustomersWidget`         | landscape | Customer table, action buttons        |
+| `CrewWidget`              | compact   | Active crew, availability             |
+| `AssetStatusWidget`       | compact   | Asset list, status indicators         |
+| `ChemicalInventoryWidget` | landscape | Chemical table, signal word badges    |
+| `ServicesWidget`          | compact   | Service catalog summary               |
+| `JobStatusWidget`         | compact   | Pie chart — job status distribution   |
+| `JobTrendWidget`          | landscape | Line chart — job throughput over time |
+| `ChemicalUsageWidget`     | compact   | Pie chart — usage by type             |
+| `AssetUtilizationWidget`  | compact   | Bar chart — utilization rate          |
+| `WorkflowLibraryWidget`   | landscape | Workflow + task catalog               |
+| `RecentActivityWidget`    | landscape | Append-only activity feed             |
+
+### 11.5 StatCard Catalog
+
+| StatCard                    | Metric                         | Drills to            |
+| --------------------------- | ------------------------------ | -------------------- |
+| `JobsActiveStatCard`        | Open/executing job count       | Upcoming Jobs widget |
+| `JobsUpcomingStatCard`      | Planned jobs this week         | Job Calendar         |
+| `AssetsMaintenanceStatCard` | Assets in maintenance/reserved | Asset Status widget  |
+| `ChemicalAlertStatCard`     | Low stock / expiring chemicals | Chemical Inventory   |
+| `CrewActiveStatCard`        | Active crew today              | Crew widget          |
+| `RevenueStatCard`           | Rolling period revenue         | Job Trend widget     |
+
+### 11.6 Management Forms (app-admin)
+
+Standard domain pages follow a list → form pattern. Each root abstraction not subsumed by a feature page gets a domain page in `app-admin`.
+
+| Domain Page | Form           | Key complexity                                |
+| ----------- | -------------- | --------------------------------------------- |
+| `/user`     | `UserForm`     | Role multi-select, status                     |
+| `/asset`    | `AssetForm`    | Type association, status                      |
+| `/service`  | `ServiceForm`  | Required asset types, workflow candidate tags |
+| `/chemical` | `ChemicalForm` | Signal word severity, restricted use, SDS url |
+
+### 11.7 Job Runner Interaction Contract (app-ops)
+
+A job's work effort is assessed, planned, and executed in a prescribed order. Canonical model: `Job: [JobAssessment, JobPlan, JobWork]`. Colloquial UX hub: `job: [assessment, plan, work]`. Services that swarmAg offer require the physical labor of several crew members, and sometimes multiple crews. Expensive and dangerous vehicles, equipment, tools, and chemicals are essential to those services. Prescribing the order of work, specifying specific tasks to perform, and ensuring protocols for safety and efficiency are followed, with consistent, repeatable results is the mandate of the swarmAg Operations Mobile Application.
+
+To automate and measure as much of the effort as possible a job is subdivided into service workflows. For example, a customer requires pesticide spray service of 2 pastures. swarmAg assigns 2 pilots and 2 drones to the job. Each pilot is assigned job work with several workflows, 3 of those workflows are preflight, chemical-load, and spray. Each of those has steps unique to it. Preflight will check battery capacity for all batteries, connect drone communications, etc. Each of the tasks has a checklist to advise or collect information. Each item in the checklist is just a question. Order is essential of course. You don't want to spray before preflight. You can't connection communications until the drone has power.
+
+#### 11.7.1 Interaction Model Contract
+
+The workflow execution UX follows the **turn-by-turn navigation** mental model
+(Google Maps / Apple Maps). The analogy:
+
+| Maps                      | Workflow                    |
+| ------------------------- | --------------------------- |
+| Current maneuver          | Current question            |
+| Street name / instruction | Question prompt             |
+| Distance to next turn     | Questions remaining in task |
+| Overall ETA               | Tasks remaining in workflow |
+| Arrived                   | Task complete               |
+
+#### 11.7.2 Operational Safety Interaction Constraints
+
+The crew member is physically operating dangerous equipment while using this UI.
+
+**Design constraints:**
+
+- **One question per screen** — no scrolling mid-task
+- **Large touch targets** — minimum `--sa-touch-target` (64px) for interactive elements
+- **Maximum contrast** — answers must be unambiguous at a glance
+- **Boolean = two full-width buttons** — YES (green) / NO (red), not a toggle
+- **Single-select = large tappable option tiles** — not a dropdown
+- **Multi-select = same, with checkmark state**
+- **Number = large stepper or numeric keypad** — not a free text field
+- **Text = last resort** — large input, minimal keyboard friction
+- **Progress always visible** — current task, current question, total remaining
+- **Forward momentum** — NEXT is the dominant action, BACK is available but not prominent
+- **Camera-first attachment** — one tap to camera, returns directly to question
+
+#### 11.7.3 QuestionType-to-UI Mapping Contract
+
+Exhaustively known from the domain `QuestionType`:
+
+| Type            | UI Treatment                               |
+| --------------- | ------------------------------------------ |
+| `boolean`       | Two full-width buttons — YES/green, NO/red |
+| `single-select` | Large tappable option tiles                |
+| `multi-select`  | Same, with checkmark state                 |
+| `number`        | Large stepper or numeric keypad            |
+| `text`          | Large textarea, soft keyboard              |
+| `internal`      | System-generated — no UI rendered          |
+
+#### 11.7.4 Attachment Gate Contract
+
+Every question screen has an attachment zone below the answer, above navigation.
+Camera is the dominant affordance. `requiresNote` on `SelectOption` gates NEXT
+until an attachment or note is provided.
+
+#### 11.7.5 Screen Layout
+
+```
+┌─────────────────────────────────┐
+│  Workflow / Task / Question     │
+│─────────────────────────────────│
+│                                 │
+│  Question prompt                │
+│  Help text (if present)         │
+│                                 │
+│  [Question-specific widget   ]  │
+│                                 │
+│  ┌───────────────────────────┐  │
+│  │ Note                      │  │
+│  │                           │  │
+│  │                           │  │
+│  └───────────────────────────┘  │
+│  📎 Attach  📸 Picture  📍GEO  │
+│                                 │
+│  ┌───────────────────────────┐  │
+│  │          Save -->         │  │
+│  └───────────────────────────┘  │
+│                                 │
+│  Progress                       │
+│  [<-]  o o o o o O o o  [===>]  │
+└─────────────────────────────────┘
+```
+
+_End of Architecture UX Document_
