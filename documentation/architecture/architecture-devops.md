@@ -714,14 +714,40 @@ protects the auth/domain UUID invariant (`architecture-back.md §4.5`): a
 login-path signup would create an Auth identity with an ID that matches no
 domain user.
 
-OTP expiry is configured in `config.toml` under `[auth.email]`:
+OTP parameters are ratified system values (CA, 2026-07-19), declared in
+`config.toml` under `[auth.email]` for local and in the hosted Auth
+contract for deployed environments — one decision, two enforcement
+surfaces, and the deployment tooling GET-verifies the hosted values after
+applying them:
 
 ```toml
 otp_length = 6
-otp_expiry = 3600
+otp_expiry = 600
+max_frequency = "60s"
 ```
 
-### 13.4 Applying Auth Configuration
+Rationale — none of these are inherited defaults:
+
+- **`otp_length = 6`** — standard code entropy for a 600-second lifetime.
+- **`otp_expiry = 600`** — ten minutes tolerates ordinary email delivery
+  delay and user context-switching while staying well inside Supabase's
+  production-checklist guidance (≤ 1 hour). The platform default (3600)
+  was rejected as an undecided inheritance.
+- **`max_frequency = "60s"`** — the per-address resend cooldown is the
+  abuse control; the project-wide email rate ceiling (60/hour) is a
+  blast-radius cap, not a substitute. The two are separate layers.
+
+### 13.4 Configuration Posture
+
+Stage exercises the security posture intended for production. Divergence
+requires a concrete testing reason, stated in this document — never a
+quietly loosened value. A platform default is not a decision: every value
+in a deployed configuration contract either traces to a recorded rationale
+or is replaced by a chosen value. If test workflows ever need rapid auth
+cycling, the correct mechanism is a scoped test affordance with a written
+reason, not a global relaxation of these parameters.
+
+### 13.5 Applying Auth Configuration
 
 To apply auth configuration changes to a hosted Supabase project:
 
