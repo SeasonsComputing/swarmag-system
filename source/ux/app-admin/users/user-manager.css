@@ -5,9 +5,15 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-feat='users-page'] [data-feat='user-list-email'] {
+[data-feat='users-page'] [data-feat='user-list-email'],
+[data-feat='users-page'] [data-feat='user-list-roles'] {
   color: var(--sa-text-secondary);
   font-size: var(--sa-ui-font-size-compact);
+}
+
+/* Role labels carry the accent; the separating commas stay secondary. */
+[data-feat='users-page'] [data-feat='user-list-role'] {
+  color: var(--sa-color-accent);
 }
 
 [data-feat='users-page'] [data-ui='table-cell']:first-child > [data-ui='layout'] > span:first-child {
@@ -15,7 +21,7 @@
 }
 
 [data-feat='users-page'] [data-ui='table-container'][data-ui-overflow='scroll'] {
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 [data-feat='users-page'] [data-ui='table-row'] {
@@ -27,21 +33,17 @@
   width: 100%;
 }
 
-[data-feat='users-page'] [data-ui='table-cell']:first-child {
-  width: 48%;
-}
-
 [data-feat='users-page'] [data-ui='table-cell']:nth-child(2) {
-  width: 18%;
-}
-
-[data-feat='users-page'] [data-ui='table-cell']:nth-child(3) {
   width: 8%;
 }
 
+/* 3 action buttons, each with an inline-start margin, plus cell padding. */
 [data-feat='users-page'] [data-ui='table-cell']:last-child {
   white-space: nowrap;
-  width: calc((var(--sa-touch-target-sm) - var(--sa-space-sm)) * 3 + var(--sa-space-xx) * 2);
+  width: calc(
+    (var(--sa-touch-target-sm) - var(--sa-space-sm)) * 3 + var(--sa-space-xx) * 3 + var(--sa-space-xs) +
+      var(--sa-space-sm)
+  );
 }
 
 [data-feat='users-page'] [data-ui='table-cell'][data-ui-align='end']:has([data-ui='action-button']) {

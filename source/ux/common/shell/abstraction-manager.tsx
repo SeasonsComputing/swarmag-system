@@ -15,7 +15,7 @@ AbstractionManager  Generic list+panel manager component.
 */
 
 import type { Instance } from '@core/std'
-import { createSignal, For, Show } from '@solid-js'
+import { createEffect, createSignal, For, Show } from '@solid-js'
 import {
   UiActionButton,
   UiAlert,
@@ -30,6 +30,7 @@ import {
   UiTableRow
 } from '@ux/common/components/ui'
 import type { AbstractionAction, AbstractionManagerContract } from './abstraction-manager-contract.ts'
+import { focusFirstField } from './use-abstraction-form-keyboard.ts'
 
 import './abstraction-manager.css'
 
@@ -53,6 +54,11 @@ export const AbstractionManager = <T extends Instance>(
 ): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
   const [mode, setMode] = createSignal<AbstractionManagerMode>('list')
+  let panelRef: HTMLElement | undefined
+  createEffect(() => {
+    selected()
+    if (mode() === 'editor') focusFirstField(() => panelRef)
+  })
   const [pendingAction, setPendingAction] = createSignal<PendingAction<T> | null>(null)
   const [actionError, setActionError] = createSignal<string | null>(null)
   const [actionPending, setActionPending] = createSignal(false)
@@ -173,7 +179,7 @@ export const AbstractionManager = <T extends Instance>(
           </div>
         </UiCard>
       </section>
-      <section data-feat='abstraction-manager-panel'>
+      <section data-feat='abstraction-manager-panel' ref={panelRef}>
         <UiCard elevation='raised'>
           <header data-feat='abstraction-manager-card-header' data-feat-region='editor-header'>
             <div data-feat='abstraction-manager-card-header-row'>

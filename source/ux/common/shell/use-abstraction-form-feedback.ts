@@ -15,6 +15,7 @@ instead of re-wiring the capture listener by hand.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+FORM_FEEDBACK_MESSAGE                                      Standard failure copy.
 useAbstractionFormFeedback(formRef, onFeedback, message?)  Wire the bridge.
 */
 
@@ -25,6 +26,9 @@ import type { AbstractionManagerFeedback } from '@ux/common/shell/abstraction-ma
 // PUBLIC
 // ────────────────────────────────────────────────────────────────────────────
 
+/** Standard form-level validation failure copy. */
+export const FORM_FEEDBACK_MESSAGE = 'Correct the highlighted fields.'
+
 /**
  * Wire a form's native validation failures into an AbstractionManagerFeedback banner.
  * @param formRef Getter returning the form element once mounted.
@@ -34,7 +38,7 @@ import type { AbstractionManagerFeedback } from '@ux/common/shell/abstraction-ma
 export const useAbstractionFormFeedback = (
   formRef: () => HTMLFormElement | undefined,
   onFeedback: (feedback: AbstractionManagerFeedback | null) => void,
-  message = 'Review the required fields.'
+  message = FORM_FEEDBACK_MESSAGE
 ): void => {
   onMount(() => {
     const form = formRef()

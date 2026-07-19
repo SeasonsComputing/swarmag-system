@@ -94,6 +94,14 @@
   --sa-transition-slow: all 0.6s ease-out;
   --sa-transition-spring: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   --sa-transition-page: opacity var(--sa-motion-page-fade) ease-in;
+  --sa-transition-panel:
+    opacity var(--sa-motion-page-fade) ease,
+    transform var(--sa-motion-page-fade) ease,
+    visibility 0s linear var(--sa-motion-page-fade);
+  --sa-transition-panel-active:
+    opacity var(--sa-motion-page-fade) ease,
+    transform var(--sa-motion-page-fade) ease,
+    visibility 0s;
 
   /* ─────────────────────────────────────────────────────────────────────── */
   /* LAYOUT RHYTHM TOKENS                                                    */

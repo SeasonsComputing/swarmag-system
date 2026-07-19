@@ -1,7 +1,7 @@
 /**
- * Provides reusable validators (`is*`) and validator helpers (`expect*`) used
- * throughout the system. Optional guard fields admit undefined (absent) and
- * null (clear marker); required fields reject both.
+ * Provides reusable validators (`is*`), validator helpers (`expect*`), and
+ * normalizers (`to*`) used throughout the system. Optional guard fields admit
+ * undefined (absent) and null (clear marker); required fields reject both.
  */
 
 import { isNullish } from './adt.ts'
@@ -13,6 +13,11 @@ import {
   isCompositionOptional,
   isCompositionPositive
 } from './relations.ts'
+
+// WHATWG HTML standard email regex — the exact rule browsers apply to
+// input[type=email]
+const WHATWG_EMAIL =
+  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATOR CONSUMERS
@@ -51,6 +56,10 @@ export const isConstEnum = <T extends readonly string[]>(
   value: unknown,
   values: T
 ): value is T[number] => typeof value === 'string' && values.includes(value as T[number])
+
+/** Check whether value is an email per the WHATWG `input[type=email]` rule. */
+export const isEmail = (value: unknown): value is string =>
+  typeof value === 'string' && WHATWG_EMAIL.test(value)
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATOR GAURDS (expect*)
@@ -127,6 +136,16 @@ export const expectConstEnum = <T extends readonly string[]>(
   return `${field} must be a valid value`
 }
 
+/** Validate a required or optional email value. */
+export const expectEmail = (
+  value: unknown,
+  field: string,
+  optional = false
+): ExpectResult => {
+  if ((isNullish(value) && optional) || isEmail(value)) return null
+  return `${field} must be a valid email address`
+}
+
 /** Validate a required or optional CompositionOne value. */
 export const expectCompositionOne = <T>(
   value: unknown,
@@ -170,3 +189,13 @@ export const expectCompositionPositive = <T>(
   if ((isNullish(value) && optional) || isCompositionPositive(value, guard)) return null
   return `${field} must be a non-empty array composition`
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// NORMALIZERS (to*)
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Normalize a string by trimming leading and trailing whitespace. */
+export const toTrimmed = (value: string): string => value.trim()
+
+/** Normalize an email address: trim and lowercase. */
+export const toEmail = (value: string): string => value.trim().toLowerCase()

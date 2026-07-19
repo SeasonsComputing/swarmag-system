@@ -17,7 +17,7 @@ import { type JSX, splitProps } from '@solid-js'
 import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
 /** Layout variant. Omit for block-fill stack. */
-export type UiLayoutVariant = 'block-fit' | 'inline' | 'inline-fill' | 'inline-wrap'
+export type UiLayoutVariant = 'block-fit' | 'cluster' | 'inline' | 'inline-fill' | 'inline-wrap'
 
 /** Layout gap density. Omit for standard spacing. */
 export type UiLayoutGap = 'loose' | 'tight' | 'none'

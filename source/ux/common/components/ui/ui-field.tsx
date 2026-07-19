@@ -23,6 +23,8 @@ export type UiFieldLabelProps = UiContainerProps & {
   label: string
   /** ID of the associated control — wired to the label's `for` attribute. */
   for: string
+  /** Marks the field as required — renders a visible required mark. */
+  required?: boolean
   /** Optional layout variant. `'inline'` places label and control side-by-side. */
   variant?: 'inline'
 }
@@ -31,6 +33,8 @@ export type UiFieldLabelProps = UiContainerProps & {
 export type UiFieldCaptionProps = UiContainerProps & {
   /** Text content of the field caption. */
   label: string
+  /** Marks the field as required — renders a visible required mark. */
+  required?: boolean
   /** Caption mode is for non-labelable controls. */
   variant: 'caption'
   /** Caption mode does not emit a `label for` association. */
@@ -44,13 +48,21 @@ export type UiFieldProps = UiFieldLabelProps | UiFieldCaptionProps
 export const UiField = (props: UiFieldProps): UiComponent =>
   props.variant === 'caption'
     ? (
-      <figure data-ui='field' data-ui-variant='caption'>
+      <figure
+        data-ui='field'
+        data-ui-variant='caption'
+        data-ui-required={props.required ? '' : undefined}
+      >
         <figcaption>{props.label}</figcaption>
         {props.children}
       </figure>
     )
     : (
-      <div data-ui='field' data-ui-variant={props.variant}>
+      <div
+        data-ui='field'
+        data-ui-variant={props.variant}
+        data-ui-required={props.required ? '' : undefined}
+      >
         <label for={props.for}>{props.label}</label>
         {props.children}
       </div>
