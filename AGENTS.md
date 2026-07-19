@@ -18,13 +18,13 @@ Every session begins with `CONSTITUTION.md` (v2.0). All dialog and production mu
 
 Topic context combines the base context with any declared or observed topic context. Ingest applicable documents in the listed order before production.
 
-| Context              | Documents                                                                                                                                                                                                  |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Base                 | 1. `documentation/domain/domain-model.md`<br>2. `documentation/architecture/architecture-core.md`<br>3. `STYLE-GUIDE.md`                                                                                   |
-| Domain internals     | 1. `documentation/domain/domain-seed-data.md`<br>2. `documentation/domain/domain-data-dictionary.md`<br>3. `documentation/domain/domain-archetypes.md`                                                     |
-| UX internals         | 1. `documentation/architecture/architecture-ux.md`<br>2. `documentation/ux/ux-design-language.md`<br>3. `documentation/ux/ux-components-guide.md`                                                          |
-| Application features | 1. `documentation/architecture/architecture-ux.md`<br>2. `documentation/architecture/architecture-devops.md`<br>3. `documentation/ux/ux-components-guide-lite.md`<br>4. `documentation/ux/user-stories.md` |
-| DevOps               | 1. `documentation/architecture/architecture-back.md`<br>2. `documentation/architecture/architecture-ux.md`<br>3. `documentation/architecture/architecture-devops.md`                                       |
+| Context              | Documents                                                                                                                                                                                                     |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Base                 | 1. `documentation/domain/domain-model.md`<br>2. `documentation/architecture/architecture-core.md`<br>3. `STYLE-GUIDE.md`                                                                                      |
+| Domain internals     | 1. `documentation/domain/domain-seed-data.md`<br>2. `documentation/domain/domain-data-dictionary.md`<br>3. `documentation/domain/domain-archetypes.md`                                                        |
+| UX internals         | 1. `documentation/architecture/architecture-front.md`<br>2. `documentation/ux/ux-design-language.md`<br>3. `documentation/ux/ux-components-guide.md`                                                          |
+| Application features | 1. `documentation/architecture/architecture-front.md`<br>2. `documentation/architecture/architecture-devops.md`<br>3. `documentation/ux/ux-components-guide-lite.md`<br>4. `documentation/ux/user-stories.md` |
+| DevOps               | 1. `documentation/architecture/architecture-back.md`<br>2. `documentation/architecture/architecture-front.md`<br>3. `documentation/architecture/architecture-devops.md`                                       |
 
 **For all other sessions:**
 

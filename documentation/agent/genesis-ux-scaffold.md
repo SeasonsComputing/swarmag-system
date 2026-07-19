@@ -10,7 +10,7 @@ Authoritative source set, in order:
 
 1. `CONSTITUTION.md`
 2. `documentation/architecture/architecture-core.md`
-3. `documentation/architecture/architecture-ux.md`
+3. `documentation/architecture/architecture-front.md`
 4. `documentation/domain/domain-model.md`
 5. `STYLE-GUIDE.md`
 
@@ -63,7 +63,7 @@ Generate the shared UX infrastructure consumed by all three apps.
 #### 2.2.1 Files
 
 ```text
-source/ux/common/
+source/front/ux/
   views/
     job.ts
   components/
@@ -120,7 +120,7 @@ Imports: `Id` from `@core/std`; `JobStatus`, `Job`, `JobAssessment`,
 **`lib/session-state.ts`**
 
 SolidJS store module for auth/session state. Shared across all apps. Implements
-the contract defined in `architecture-ux.md` §6.4.
+the contract defined in `architecture-front.md` §6.4.
 
 Exports a singleton namespace object. No caller uses the raw setter outside
 this module:
@@ -160,12 +160,12 @@ const SessionState = {
 export { SessionState }
 ```
 
-`SessionState` API shape per `architecture-ux.md` §6.4.
+`SessionState` API shape per `architecture-front.md` §6.4.
 
 **`lib/app-state.ts`**
 
 Per-app IndexedDB preferences store. Takes the app's store name (per
-`architecture-ux.md` §6.5.1) and manages preference key reads/writes.
+`architecture-front.md` §6.5.1) and manages preference key reads/writes.
 
 Implemented using `makeCrudIndexedDbClient<AppState>` where
 `AppState = Dictionary`. Use real IndexedDB reads/writes through the client
@@ -175,12 +175,12 @@ maker (no stubbed IDB operations).
 
 Common UX behavior is defined by architecture and is not restated here:
 
-- Authentication flow and auth-state binding: `architecture-ux.md` §6.3
-- Component boundaries and shell behavior: `architecture-ux.md` §6.7
-- File inventory baseline: `architecture-ux.md` §6.8
+- Authentication flow and auth-state binding: `architecture-front.md` §6.3
+- Component boundaries and shell behavior: `architecture-front.md` §6.7
+- File inventory baseline: `architecture-front.md` §6.8
 
 Path note: `auth-guard.tsx` is at
-`source/ux/common/components/shell/auth-guard.tsx`.
+`source/front/ux/ui/shell/auth-guard.tsx`.
 
 ### 2.3 Phase II — App Admin Shell
 
@@ -189,7 +189,7 @@ Generate the `app-admin` application shell.
 #### 2.3.1 Files
 
 ```text
-source/ux/app-admin/
+source/front/app-admin/
   index.html
   vite.config.ts
   app.tsx
@@ -218,8 +218,8 @@ Vite config for `app-admin`.
 
 Application root.
 
-- Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
-- Import `Config` from `@ux/config/ux-config.ts` only.
+- Follow route shape and guard pattern from `architecture-front.md` §6.2 and §6.7.
+- Import `Config` from `@front/config/ux-config.ts` only.
 - Construct app state store by calling `app-state.ts` with store name
   `'swarmag-admin-app'`. IDB preference keys for Admin:
   `{storeName}:theme`, `{storeName}:dashboard:layout`,
@@ -244,7 +244,7 @@ sequence.
 #### 2.4.1 Files
 
 ```text
-source/ux/app-ops/
+source/front/app-ops/
   index.html
   vite.config.ts
   app.tsx
@@ -273,7 +273,7 @@ this device — not full aggregates. Full job trees are read from IDB on demand
 by the workflow engine only.
 
 - Backed by SolidJS `createStore`.
-- Import `JobSummary` from `@ux/common/views/job.ts`.
+- Import `JobSummary` from `@front/ux/views/job.ts`.
 - Shape:
 
 ```typescript
@@ -293,8 +293,8 @@ type JobsStore = {
 
 Application root.
 
-- Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
-- Import `Config` from `@ux/config/ux-config.ts` only.
+- Follow route shape and guard pattern from `architecture-front.md` §6.2 and §6.7.
+- Import `Config` from `@front/config/ux-config.ts` only.
 - Construct app state store by calling `app-state.ts` with store name
   `'swarmag-ops-app'`. IDB preference keys for Ops:
   `{storeName}:theme`, `{storeName}:dashboard:layout`,
@@ -321,7 +321,7 @@ Generate the `app-customer` application shell.
 #### 2.5.1 Files
 
 ```text
-source/ux/app-customer/
+source/front/app-customer/
   index.html
   vite.config.ts
   app.tsx
@@ -345,8 +345,8 @@ Vite config for `app-customer`. Same structure as `app-admin`; output dir
 
 Application root.
 
-- Follow route shape and guard pattern from `architecture-ux.md` §6.2 and §6.7.
-- Import `Config` from `@ux/config/ux-config.ts` only.
+- Follow route shape and guard pattern from `architecture-front.md` §6.2 and §6.7.
+- Import `Config` from `@front/config/ux-config.ts` only.
 - Construct app state store by calling `app-state.ts` with store name
   `'swarmag-customer-app'`. IDB preference keys for Customer:
   `{storeName}:theme`, `{storeName}:dashboard:layout`.
@@ -389,35 +389,35 @@ Responses that include code changes must include:
 
 Before reporting `STYLE_AUDIT: PASS`:
 
-- All Common UX artifacts conform to `architecture-ux.md` §6.3-§6.8.
-- `source/ux/common/views/job.ts` exists and exports `JobSummary` and
+- All Common UX artifacts conform to `architecture-front.md` §6.3-§6.8.
+- `source/front/ux/views/job.ts` exists and exports `JobSummary` and
   `JobDefinition` as pure types with no infrastructure imports.
-- `auth-guard.tsx` is at `source/ux/common/components/shell/auth-guard.tsx`.
+- `auth-guard.tsx` is at `source/front/ux/ui/shell/auth-guard.tsx`.
 - `session-state.ts` exports `SessionState` with `store`, `setAuth`, `setUser`,
   `setReady`, and `clear`. No raw setter calls outside this module.
 - `app-state.ts` uses `makeCrudIndexedDbClient<AppState>` for IDB persistence
   (no stubbed operations).
 - `app-admin/app.tsx`: calls `api.Users.get(SessionState.store.userId)`, passes
   result to `SessionState.setUser`; calls `SessionState.setReady`; uses store name
-  `'swarmag-admin-app'`; imports `Config` from `@ux/config/ux-config.ts`.
+  `'swarmag-admin-app'`; imports `Config` from `@front/config/ux-config.ts`.
 - `app-ops/app.tsx`: calls `api.Users.get(SessionState.store.userId)`, passes result
   to `SessionState.setUser`; calls `loadJobs()`; calls `SessionState.setReady()`
   only after `jobsStore.isLoaded` is `true`; uses store name `'swarmag-ops-app'`; imports
-  `Config` from `@ux/config/ux-config.ts`.
+  `Config` from `@front/config/ux-config.ts`.
 - `app-customer/app.tsx`: calls `api.Users.get(SessionState.store.userId)`, passes
   result to `SessionState.setUser`; calls `SessionState.setReady`; uses store name
-  `'swarmag-customer-app'`; imports `Config` from `@ux/config/ux-config.ts`;
+  `'swarmag-customer-app'`; imports `Config` from `@front/config/ux-config.ts`;
   does not write `dashboard:panels` key.
-- `jobs-store.ts`: imports `JobSummary` from `@ux/common/views/job.ts`; shape
+- `jobs-store.ts`: imports `JobSummary` from `@front/ux/views/job.ts`; shape
   uses `JobSummary[]` and `isLoaded`; `loadJobs()` reads from IDB and sets
   `isLoaded: true`; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from
   `session-state.ts` directly.
 - All exported symbols have `/** */` JSDoc per `STYLE-GUIDE.md` §6.5.
 - All section headers use the canonical width per `STYLE-GUIDE.md` §6.4.
-- No `@back/*` imports anywhere in `source/ux/`.
+- No `@back/*` imports anywhere in `source/front/`.
 - No direct `@core/cfg` imports in any `app.tsx` — config flows through
-  `@ux/config/ux-config.ts`.
+  `@front/config/ux-config.ts`.
 - `deno.jsonc` `check:types` glob covers `source/**/*.{ts,tsx}`.
 - `deno task check` exits clean.
 

@@ -8,9 +8,9 @@ const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 const TARGET_DIRS = [
   `${ROOT}/source/back/supabase-edge/functions`,
-  `${ROOT}/source/ux/app-admin`,
-  `${ROOT}/source/ux/app-ops`,
-  `${ROOT}/source/ux/app-customer`
+  `${ROOT}/source/front/app-admin`,
+  `${ROOT}/source/front/app-ops`,
+  `${ROOT}/source/front/app-customer`
 ]
 
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])

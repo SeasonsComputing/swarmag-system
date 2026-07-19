@@ -28,17 +28,18 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | `@core/`   | `source/core/`   |
 | `@domain/` | `source/domain/` |
 | `@back/`   | `source/back/`   |
-| `@ux/`     | `source/ux/`     |
+| `@front/`  | `source/front/`  |
 | `@devops/` | `source/devops/` |
 | `@tests/`  | `source/tests/`  |
 
 ### 3.2 Convenience barrel aliases
 
-| Alias        | Resolves to               |
-| ------------ | ------------------------- |
-| `@core/std`  | `source/core/std/std.ts`  |
-| `@core/stdx` | `source/core/std/stdx.ts` |
-| `@ux/api`    | `source/ux/api/api.ts`    |
+| Alias          | Resolves to                           |
+| -------------- | ------------------------------------- |
+| `@core/std`    | `source/core/std/std.ts`              |
+| `@core/stdx`   | `source/core/std/stdx.ts`             |
+| `@front/api`   | `source/front/api/api.ts`             |
+| `@front/ux/ui` | `source/front/ux/ui/components/ui.ts` |
 
 ### 3.3 Import Rules
 
@@ -375,7 +376,7 @@ Config.init(provider, keys, aliases?)
 Vite requires client-side variables to carry a `VITE_` prefix. Aliases declare the mapping once at bootstrap; all consuming code uses the clean logical name:
 
 ```typescript
-// source/ux/config/ux-config.ts
+// source/front/config/ux-config.ts
 import { Config } from '@core/cfg/config.ts'
 import { SolidProvider } from '@core/cfg/solid-provider.ts'
 

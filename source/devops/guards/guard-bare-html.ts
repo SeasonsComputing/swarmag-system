@@ -3,10 +3,10 @@ import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 import { walk } from '@std/walk'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
-const UX_DIR = `${ROOT}/source/ux`
+const UX_DIR = `${ROOT}/source/front`
 const SKIP_DIRS = [
-  'source/ux/common/components/ui',
-  'source/ux/app-style-guide'
+  'source/front/ux/ui/components',
+  'source/front/app-style-guide'
 ]
 
 const BARE_HTML_REGEX =

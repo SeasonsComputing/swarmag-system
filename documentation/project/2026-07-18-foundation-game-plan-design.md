@@ -3,7 +3,9 @@
 **Date:** 2026-07-18
 **Mode:** Foundation
 **Status:** APPROVED — four-phase plan ratified by Chief Architect
-2026-07-18; Phase 1 production authorized same day
+2026-07-18. Phase 1 CLOSED (committed 2026-07-19, `03a7214` — User Manager
+exit gate met). Phase 2 active: task decomposition in
+`documentation/project/2026-07-19-front-migration-tasks.md`
 **Related:** documentation/project/2026-07-16-user-manager-ux-rework.md,
 documentation/project/2026-07-14-customer-onboarding-design.md
 

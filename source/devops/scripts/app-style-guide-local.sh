@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-APP_ROOT="${ROOT}/source/ux/app-style-guide"
+APP_ROOT="${ROOT}/source/front/app-style-guide"
 PORT="${PORT:-5174}"
 
 cd "${APP_ROOT}"

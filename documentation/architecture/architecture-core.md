@@ -26,7 +26,7 @@ Authority decreases from top to bottom.
 | └→ **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction rules     |
 | └→ **Style Guide**            | `STYLE-GUIDE.md`            | Coding standards, file formats, and implementation conventions    |
 | └→ **Architecture Backend**   | `architecture-back.md`      | Backend integration architecture and runtime constraints          |
-| └→ **Architecture UX**        | `architecture-ux.md`        | UX-layer integration architecture and app-specific UX contracts   |
+| └→ **Architecture UX**        | `architecture-front.md`     | UX-layer integration architecture and app-specific UX contracts   |
 | └→ **Architecture DevOps**    | `architecture-devops.md`    | Environment configuration, secret registry, packaging, and guards |
 
 ### 1.2 Scope Boundary of Governing Documents
@@ -150,7 +150,7 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
     "@core/": "./source/core/",
     "@domain/": "./source/domain/",
     "@back/": "./source/back/",
-    "@ux/": "./source/ux/",
+    "@front/": "./source/front/",
     "@devops/": "./source/devops/",
     "@tests/": "./source/tests/",
 
@@ -160,8 +160,8 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
 
     "@core/std": "./source/core/std/std.ts",
     "@core/stdx": "./source/core/std/stdx.ts",
-    "@ux/api": "./source/ux/api/api.ts",
-    "@ux/common/components/ui": "./source/ux/common/components/ui/ui.ts",
+    "@front/api": "./source/front/api/api.ts",
+    "@front/ux/ui": "./source/front/ux/ui/components/ui.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
     // VENDOR ALIASES
@@ -230,11 +230,11 @@ The system consists of five primary components:
 | **Backend Orchestration** | Edge Functions for complex operations             | Supabase Edge      |
 | **Persistent Storage**    | PostgreSQL with Row Level Security                | Supabase           |
 
-UX applications compose their API namespace (`@ux/api`) using client makers that connect directly to Supabase or IndexedDB.
+UX applications compose their API namespace (`@front/api`) using client makers that connect directly to Supabase or IndexedDB.
 
 ## 5. System Boundary
 
-The system boundary is the **API namespace** (`source/ux/api/`), not a transport layer or provider abstraction.
+The system boundary is the **API namespace** (`source/front/api/`), not a transport layer or provider abstraction.
 
 ### 5.1 The API Pattern
 
@@ -242,10 +242,10 @@ The API namespace is a **composed interface** built from domain abstractions usi
 
 #### 5.1.1 Core Principle
 
-A single API namespace, defined in `source/ux/api/api.ts`, is composed once for the entire solution space using client makers. All UX applications consume this shared namespace — there is no per-application namespace. The composition selects the appropriate maker for each domain abstraction based on storage mechanism.
+A single API namespace, defined in `source/front/api/api.ts`, is composed once for the entire solution space using client makers. All UX applications consume this shared namespace — there is no per-application namespace. The composition selects the appropriate maker for each domain abstraction based on storage mechanism.
 
 ```typescript
-// source/ux/api/api.ts
+// source/front/api/api.ts
 import { makeBusRuleHttpClient } from '@core/client/make-http-client.ts'
 import { makeCrudIndexedDbClient } from '@core/client/make-indexeddb-client.ts'
 import { makeCrudSupabaseClient } from '@core/client/make-supabase-client.ts'
@@ -416,7 +416,7 @@ const exists = await userExists.run({ email: 'ada@example.com' })
 UX applications import the composed API namespace:
 
 ```typescript
-import { api } from '@ux/api'
+import { api } from '@front/api'
 
 // CRUD operations - direct to database
 const user = await api.Users.get(userId)
@@ -437,7 +437,7 @@ const result = await api.deepCloneJob.run({ jobId })
 
 #### 5.4.2 Applications always
 
-- Import from `@ux/api` namespace
+- Import from `@front/api` namespace
 - Work with domain types
 - Handle `ApiError` for failures
 
@@ -622,7 +622,7 @@ Netlify, a local static file server, or any other static host.
 Vite requires client-side environment variables to carry a `VITE_` prefix. The alias map declares the mapping once at bootstrap so consuming code uses clean logical names throughout:
 
 ```typescript
-// source/ux/config/ux-config.ts
+// source/front/config/ux-config.ts
 import { Config } from '@core/cfg/config.ts'
 import { SolidProvider } from '@core/cfg/solid-provider.ts'
 
@@ -669,7 +669,7 @@ const url = Config.get('SUPABASE_RDBMS_URL')
 // It's ok for configs to be shared across packages
 // This same config is bundled with each deployment package
 //
-import { Config } from '@ux/config/ux-config.ts'
+import { Config } from '@front/config/ux-config.ts'
 const url = Config.get('SUPABASE_RDBMS_URL')
 
 // Never use relative paths climbing namespace tree (INCORRECT)
@@ -807,7 +807,7 @@ Field crews execute Jobs entirely from local storage:
 #### 9.2.1 Execution Pattern
 
 ```typescript
-import { api } from '@ux/api'
+import { api } from '@front/api'
 
 // All operations against IndexedDB clients
 const job = await api.JobsLocal.get(jobId)
@@ -892,7 +892,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.2 API namespace is the boundary
 
-- UX applications import from `@ux/api`, never from backend or storage libraries
+- UX applications import from `@front/api`, never from backend or storage libraries
 - Applications never import `@supabase/client`, IndexedDB APIs, or edge functions directly
 - The API namespace composes clients using maker factories, not runtime provider selection
 
@@ -935,7 +935,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.8 Import maps only
 
-- All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@ux/api`)
+- All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@front/api`)
 - No relative imports across top-level namespaces
 - Import maps defined in `deno.jsonc`
 - Platform-specific maps (per-function `deno.json` plus
@@ -982,17 +982,17 @@ Domain changes flow unidirectionally through the system.
 
 ### 11.2 Adding New API Clients
 
-New clients are added by composing makers in the `@ux/api` namespace:
+New clients are added by composing makers in the `@front/api` namespace:
 
 1. **Identify storage mechanism** - Determine appropriate client maker (Supabase SDK, IndexedDB, HTTP)
-2. **Compose into API namespace** - Add to `source/ux/api/api.ts` using appropriate maker
+2. **Compose into API namespace** - Add to `source/front/api/api.ts` using appropriate maker
 3. **Configure specification** - Provide table name, store name, or endpoint path
 4. **Test full life-cycle** - Verify create, read, update, delete, list operations
 
 #### 11.2.1 Example
 
 ```typescript
-// source/ux/api/api.ts
+// source/front/api/api.ts
 import { makeCrudSupabaseClient } from '@core/client/make-supabase-client.ts'
 
 export const api = {

@@ -40,10 +40,10 @@ case "${TARGET}" in
 esac
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-APP_ROOT="${ROOT}/source/ux/app-ops"
-ENV_FILE="${ROOT}/source/ux/config/app-ops-${TARGET}.env"
-ENV_EXAMPLE_FILE="${ROOT}/source/ux/config/app-ops-${TARGET}.env.example"
-UX_CONFIG_FILE="${ROOT}/source/ux/config/ux-config.ts"
+APP_ROOT="${ROOT}/source/front/app-ops"
+ENV_FILE="${ROOT}/source/front/config/app-ops-${TARGET}.env"
+ENV_EXAMPLE_FILE="${ROOT}/source/front/config/app-ops-${TARGET}.env.example"
+UX_CONFIG_FILE="${ROOT}/source/front/config/ux-config.ts"
 VERSION_FILE="${ROOT}/VERSION"
 BUILD_ROOT="${BUILD_ROOT:-${ROOT}/build}"
 DIST_DIR="${BUILD_ROOT}/dist/app-ops"

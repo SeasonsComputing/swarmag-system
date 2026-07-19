@@ -18,7 +18,7 @@ guide only when exact prop details, examples, or edge cases are needed.
 Import shared controls from the public barrel:
 
 ```typescript
-import { UiButton, UiField, UiInput } from '@ux/common/components/ui'
+import { UiButton, UiField, UiInput } from '@front/ux/ui'
 ```
 
 Do not import implementation internals, Kobalte primitives, or Chart.js
@@ -436,7 +436,7 @@ Key prop: children.
 
 ## 6. Charts
 
-The chart directory is reserved at `source/ux/common/components/charts`, but
+The chart directory is reserved at `source/front/ux/ui/charts`, but
 the current public component library does not export chart controls.
 
 Application code must not import Chart.js directly. Use shared chart controls

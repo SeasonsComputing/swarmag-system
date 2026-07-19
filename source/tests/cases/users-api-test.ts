@@ -6,7 +6,7 @@ import { ApiError } from '@core/api/api-contract.ts'
 import { assert, assertEquals } from '@std/assert'
 import '@tests/config/test-config.ts'
 import type { UserCreate } from '@domain/protocols/user-protocol.ts'
-import { api } from '@ux/api'
+import { api } from '@front/api'
 
 Deno.test('users API supports full CRUD lifecycle with soft delete', async () => {
   if (!api.Users.list) throw new Error('Users API list contract is required for this test')

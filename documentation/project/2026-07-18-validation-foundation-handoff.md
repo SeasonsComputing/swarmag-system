@@ -2,9 +2,11 @@
 
 **Date:** 2026-07-18
 **Mode:** Foundation
-**Status:** Phase 1 complete + two CA review-refinement rounds applied. All
-`deno task check` green (184 files). **Everything uncommitted** — CA commits
-after hands-on feel test.
+**Status:** CLOSED — committed 2026-07-19 as `03a7214` after CA feel test
+and acceptance. Post-handoff work folded into the same commit: Enter gate,
+collapse push animation, manager-owned autofocus, roles-as-accent-text,
+actions-width fix, sticky table headers, `AbstractionFormValidation`
+interface correction. See the task ledger for details.
 **Source design:** `documentation/project/2026-07-18-foundation-game-plan-design.md`
 **Task ledger:** `documentation/project/2026-07-18-validation-foundation-tasks.md`
 

@@ -53,8 +53,8 @@ Namespaces of the design language are organized into layers with each layer codi
 | Component Layer  | `data-ui='{component}'`                  | `ui.css`        | Reusable component selectors and declared component parts       |
 | Feature Layer    | `data-feat='{feature}'`                  | `{feature}.css` | Application feature styling and layout                          |
 
-CSS files live in `source/ux/common/components/css/`. A shared CSS barrel,
-`source/ux/common/components/css/css.tsx`, imports them in prescribed dependency order during application bootstrap.
+CSS files live in `source/front/ux/ui/css/`. A shared CSS barrel,
+`source/front/ux/ui/css/css.tsx`, imports them in prescribed dependency order during application bootstrap.
 
 **Layer Boundaries**
 
@@ -233,7 +233,7 @@ and `--sa-focus-*`. They may also specialize component-specified tokens owned by
 
 ### 4.3 Theme Typography
 
-Font files are self-hosted in `source/ux/common/components/fonts`. Theme typography is expressed
+Font files are self-hosted in `source/front/ux/ui/fonts`. Theme typography is expressed
 through role tokens, not component code.
 
 | Role family         | Default font token(s)                                                 | Theme purpose                          |

@@ -2,10 +2,10 @@
 
 **Date:** 2026-07-18
 **Mode:** Foundation
-**Status:** COMPLETE — production authorized and executed 2026-07-18. All
-task groups verified same day, including the live pass driven through the
-CA's authenticated browser session. Uncommitted; CA's call on when to commit
-and on final acceptance.
+**Status:** CLOSED — committed 2026-07-19 as `03a7214` ("Agentic
+feature-complete of User Manager and its foundation") after CA acceptance.
+Includes both review-refinement addenda, roles-as-text, sticky table
+headers, and the interface correction.
 **Source design:** `documentation/project/2026-07-18-foundation-game-plan-design.md`
 
 This task list decomposes the approved design (D1–D11) into task groups.
