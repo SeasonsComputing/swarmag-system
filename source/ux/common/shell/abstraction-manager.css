@@ -133,6 +133,14 @@
   scroll-padding: var(--sa-space-xs);
 }
 
+/* The list scroller keeps the inline/bottom inset trick but drops it at the
+   block start: any top inset is a band the sticky head travels through
+   before pinning (a visible hop) and that scrolled rows peek out through. */
+[data-feat='abstraction-manager-card-body'][data-feat-region='list-body'] {
+  margin-block-start: 0;
+  padding-block-start: 0;
+}
+
 [data-feat='abstraction-manager-card-body'][data-feat-region='editor-body'] {
   overscroll-behavior: contain;
 }
@@ -157,13 +165,15 @@
     grid-column: 1;
     grid-row: 2;
     min-block-size: 0;
-    transition: var(--sa-transition-fast);
+    transition: var(--sa-transition-panel);
   }
 
   [data-feat='abstraction-manager'][data-feat-mode='list'] [data-feat='abstraction-manager-list'],
   [data-feat='abstraction-manager'][data-feat-mode='editor'] [data-feat='abstraction-manager-panel'] {
     opacity: 1;
     pointer-events: auto;
+    transform: translateX(0);
+    transition: var(--sa-transition-panel-active);
     visibility: visible;
     z-index: var(--sa-z-base);
   }
@@ -174,6 +184,22 @@
     pointer-events: none;
     visibility: hidden;
     z-index: var(--sa-z-below);
+  }
+
+  /* Spatial push: the list lives left of the editor. */
+  [data-feat='abstraction-manager'][data-feat-mode='editor'] [data-feat='abstraction-manager-list'] {
+    transform: translateX(calc(var(--sa-space-xl) * -1));
+  }
+
+  [data-feat='abstraction-manager'][data-feat-mode='list'] [data-feat='abstraction-manager-panel'] {
+    transform: translateX(var(--sa-space-xl));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    [data-feat='abstraction-manager-list'],
+    [data-feat='abstraction-manager-panel'] {
+      transition: none;
+    }
   }
 
   [data-feat='abstraction-manager-collapse-action'] {

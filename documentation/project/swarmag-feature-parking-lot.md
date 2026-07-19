@@ -97,3 +97,19 @@ Verify Supabase's current ban-vs-active-token behavior first, then decide
 whether eject and a future explicit reinstate both live in `user-orchestra.ts`
 as symmetric operations, and whether the editor's status toggle should be
 disabled/warned against for ejected users until reinstatement is real.
+
+## AbstractionManager list/editor collapse animation
+
+**Parked:** 2026-07-18 (CA, during Phase 1 validation review)
+
+On narrow screens the manager collapses between the entity list and the
+editor form, and the CA judged the interaction model itself correct for both
+"New User" and back-to-list. The transition is currently an instant swap; the
+CA has repeatedly noted it wants a real animation (list slides/fades to
+editor and back) so the mode change reads as movement rather than a repaint.
+
+**Picking this up should look like:** small Feature/Foundation pass on
+`abstraction-manager.css` (+ possibly a `data-ui-state` hook in
+`abstraction-manager.tsx`) adding a reduced-motion-respecting transition
+between list and editor presentation. Any future wizard step transitions
+should share the same motion language.

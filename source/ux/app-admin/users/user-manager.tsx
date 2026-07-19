@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { type Id } from '@core/std'
+import { expectEmail, expectNonEmptyString, type Id, toEmail, toTrimmed } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import {
   CONTACT_PREFERRED_CHANNELS,
@@ -22,7 +22,6 @@ import { createQuery } from '@tanstack/solid-query'
 import { api } from '@ux/api'
 import {
   UiAlert,
-  UiBadge,
   type UiComponent,
   UiField,
   UiFieldset,
@@ -40,7 +39,12 @@ import type {
   AbstractionManagerFeedback
 } from '@ux/common/shell/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/common/shell/abstraction-manager.tsx'
-import { useAbstractionFormFeedback } from '@ux/common/shell/use-abstraction-form-feedback.ts'
+import {
+  FORM_FEEDBACK_MESSAGE,
+  useAbstractionFormFeedback
+} from '@ux/common/shell/use-abstraction-form-feedback.ts'
+import { useAbstractionFormKeyboard } from '@ux/common/shell/use-abstraction-form-keyboard.ts'
+import { useAbstractionFormValidation } from '@ux/common/shell/use-abstraction-form-validation.ts'
 import { useAbstractionMutation } from '@ux/common/shell/use-abstraction-mutation.ts'
 
 import './user-manager.css'
@@ -60,12 +64,6 @@ export type UserManagerProps = {
 }
 
 /** User manager component. */
-const USER_ROLE_LABELS: Record<UserRole, string> = {
-  administrator: 'Admin',
-  customer: 'Cust',
-  operations: 'Ops',
-  sales: 'Sales'
-}
 export const UserManager = (props: UserManagerProps): UiComponent => {
   const [editorFeedback, setEditorFeedback] = createSignal<AbstractionManagerFeedback | null>(null)
   const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY, queryFn: loadUsers }))
@@ -75,7 +73,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
   const userManager: AbstractionManagerContract<User> = {
     formTitle: 'User Manager',
     entityLabel: 'User',
-    listColumns: ['User', 'Roles', 'Active'],
+    listColumns: ['User', 'Active'],
     list: () => usersQuery.data ?? [],
     isListLoading: () => usersQuery.isPending,
     editorFeedback,
@@ -137,19 +135,16 @@ function UserListCells(props: { user: User }): UiComponent {
         <UiLayout variant='block-fit' gap='none'>
           <span>{props.user.displayName}</span>
           <span data-feat='user-list-email'>{props.user.primaryEmail}</span>
-        </UiLayout>
-      </UiTableCell>
-      <UiTableCell>
-        <UiLayout variant='inline' gap='tight'>
-          <For each={props.user.roles}>
-            {role => (
-              <UiBadge variant='info'>
-                <span aria-label={enumDisplayLabel(role)} role='img' title={enumDisplayLabel(role)}>
-                  {roleAbbreviation(role)}
-                </span>
-              </UiBadge>
-            )}
-          </For>
+          <span data-feat='user-list-roles'>
+            <For each={props.user.roles}>
+              {(role, index) => (
+                <>
+                  <Show when={index() > 0}>{', '}</Show>
+                  <span data-feat='user-list-role'>{enumDisplayLabel(role)}</span>
+                </>
+              )}
+            </For>
+          </span>
         </UiLayout>
       </UiTableCell>
       <UiTableCell>
@@ -184,6 +179,13 @@ function UserEditor(props: {
   const [pending, setPending] = createSignal(false)
   let formRef: HTMLFormElement | undefined
   useAbstractionFormFeedback(() => formRef, props.onFeedback)
+  const validation = useAbstractionFormValidation(() => formRef, {
+    displayName: () => expectNonEmptyString(displayName(), 'Name'),
+    primaryEmail: () => expectEmail(toEmail(primaryEmail()), 'Email'),
+    phoneNumber: () => expectNonEmptyString(phoneNumber(), 'Phone'),
+    roles: () => roles().length > 0 ? null : 'Select at least one role.'
+  })
+  useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
 
   createEffect(() => {
     setDisplayName(props.user?.displayName ?? '')
@@ -193,6 +195,7 @@ function UserEditor(props: {
     setNotesText(noteContent(props.user?.notes ?? []))
     setRoles(props.user ? [...props.user.roles] : [])
     setStatus(props.user?.status ?? 'active')
+    validation.reset()
     props.onFeedback(null)
   })
 
@@ -220,8 +223,8 @@ function UserEditor(props: {
 
   const saveUser = async (): Promise<void> => {
     if (pending()) return
-    if (roles().length === 0) {
-      props.onFeedback({ message: 'Select at least one role.', variant: 'danger' })
+    if (!validation.validateForm()) {
+      props.onFeedback({ message: FORM_FEEDBACK_MESSAGE, variant: 'danger' })
       return
     }
     setPending(true)
@@ -239,9 +242,9 @@ function UserEditor(props: {
   const updateUser = async (user: User, nextStatus: UserStatus): Promise<void> => {
     const update: UserUpdate = {
       id: user.id,
-      displayName: displayName(),
-      primaryEmail: primaryEmail(),
-      phoneNumber: phoneNumber(),
+      displayName: toTrimmed(displayName()),
+      primaryEmail: toEmail(primaryEmail()),
+      phoneNumber: toTrimmed(phoneNumber()),
       preferredChannel: preferredChannel(),
       notes: nextNotes(user.notes),
       roles: roles(),
@@ -251,9 +254,9 @@ function UserEditor(props: {
   }
   const createUser = async (): Promise<void> => {
     const create: UserCreate = {
-      displayName: displayName(),
-      primaryEmail: primaryEmail(),
-      phoneNumber: phoneNumber(),
+      displayName: toTrimmed(displayName()),
+      primaryEmail: toEmail(primaryEmail()),
+      phoneNumber: toTrimmed(phoneNumber()),
       preferredChannel: preferredChannel(),
       notes: nextNotes([]),
       roles: roles(),
@@ -298,31 +301,46 @@ function UserEditor(props: {
       <UiLayout>
         <UiFieldset legend='Identity'>
           <UiLayout>
-            <UiField for='displayName' label='Name'>
+            <UiField for='displayName' label='Name' required>
               <UiInput
                 name='displayName'
                 value={displayName()}
-                onInput={event => setDisplayName(event.currentTarget.value)}
+                onInput={event => {
+                  setDisplayName(event.currentTarget.value)
+                  validation.inputField('displayName')
+                }}
+                onBlur={() => validation.blurField('displayName')}
+                error={validation.isInvalid('displayName')}
                 disabled={pending()}
                 required
               />
             </UiField>
-            <UiField for='primaryEmail' label='Email'>
+            <UiField for='primaryEmail' label='Email' required>
               <UiInput
                 name='primaryEmail'
                 type='email'
                 value={primaryEmail()}
-                onInput={event => setPrimaryEmail(event.currentTarget.value)}
+                onInput={event => {
+                  setPrimaryEmail(event.currentTarget.value)
+                  validation.inputField('primaryEmail')
+                }}
+                onBlur={() => validation.blurField('primaryEmail')}
+                error={validation.isInvalid('primaryEmail')}
                 disabled={pending()}
                 required
               />
             </UiField>
-            <UiField for='phoneNumber' label='Phone'>
+            <UiField for='phoneNumber' label='Phone' required>
               <UiInput
                 name='phoneNumber'
                 type='tel'
                 value={phoneNumber()}
-                onInput={event => setPhoneNumber(event.currentTarget.value)}
+                onInput={event => {
+                  setPhoneNumber(event.currentTarget.value)
+                  validation.inputField('phoneNumber')
+                }}
+                onBlur={() => validation.blurField('phoneNumber')}
+                error={validation.isInvalid('phoneNumber')}
                 disabled={pending()}
                 required
               />
@@ -357,12 +375,16 @@ function UserEditor(props: {
         </UiFieldset>
         <UiFieldset legend='Access'>
           <UiLayout>
-            <UiField variant='caption' label='Roles'>
+            <UiField variant='caption' label='Roles' required>
               <UiMultiSelect
                 name='roles'
                 options={roleOptions}
                 value={roles()}
-                onChange={value => setRoles(value as UserRole[])}
+                onChange={value => {
+                  setRoles(value as UserRole[])
+                  validation.changeField('roles')
+                }}
+                error={validation.isInvalid('roles')}
                 disabled={pending()}
               />
             </UiField>
@@ -404,8 +426,4 @@ function enumDisplayLabel(value: string): string {
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ')
-}
-
-function roleAbbreviation(role: UserRole): string {
-  return USER_ROLE_LABELS[role]
 }

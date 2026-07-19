@@ -41,6 +41,9 @@
   --sa-card-panel-pad: var(--sa-rhythm-pad);
   --sa-card-stripe-height: 3px;
 
+  /* Dialog */
+  --sa-dialog-pad: var(--sa-rhythm-pad);
+
   /* Fieldset */
   --sa-fieldset-bg: var(--sa-bg-control);
   --sa-fieldset-border: var(--sa-border-card);
@@ -175,6 +178,7 @@
 
   /* Control (shared error state) */
   --sa-control-shadow-error: oklch(var(--sa-lch-danger) / 0.22);
+  --sa-field-required-mark: oklch(var(--sa-lch-danger) / 0.9);
 
   /* Select item */
   --sa-single-select-item-bg: oklch(var(--sa-lch-gradient-2-mid-start) / 0.1);
@@ -360,6 +364,7 @@
 
   /* Control (shared error state) */
   --sa-control-shadow-error: oklch(var(--sa-lch-danger) / 0.2);
+  --sa-field-required-mark: oklch(var(--sa-lch-danger) / 0.9);
 
   /* Select item */
   --sa-single-select-item-bg: oklch(92% 0.04 170 / 0.56);

@@ -236,7 +236,7 @@
   --sa-radial-3: oklch(var(--sa-lch-gradient-5-end) / 0.216);
 }
 
-@media (max-width: 425px) {
+@media (max-width: 480px) {
   :root {
     /* h1-h3 are clamped */
     --sa-heading-font-size-h4: var(--sa-font-size-sm);
