@@ -27,6 +27,13 @@ type SecretRecord = {
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const SECRETS_FILE = `${ROOT}/secrets.jsonc`
+const VALID_SECRET_SCOPES = new Set([
+  'swarmag-system',
+  'swarmag-app-admin',
+  'swarmag-app-ops',
+  'swarmag-app-customer',
+  'swarmag-back-supabase-edge'
+])
 const VALID_ENVS = new Set(['dev', 'stage', 'prod'])
 
 const parseSecretsJsonc = (source: string): Dictionary<SecretRecord> => {
@@ -67,8 +74,8 @@ const main = async () => {
       continue
     }
 
-    if (typeof record.app !== 'string' || record.app.length === 0) {
-      violations.push(`${key} has invalid app`)
+    if (typeof record.app !== 'string' || !VALID_SECRET_SCOPES.has(record.app)) {
+      violations.push(`${key} has invalid app (expected canonical secret scope)`)
     }
     if (typeof record.env !== 'string' || !VALID_ENVS.has(record.env)) {
       violations.push(`${key} has invalid env (expected dev|stage|prod)`)

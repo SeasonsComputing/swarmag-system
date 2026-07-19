@@ -34,6 +34,8 @@ REQUIRED_PATHS=(
   "index.html"
   "build-meta.jsonc"
   "manifest.webmanifest"
+  "netlify.toml"
+  "_redirects"
 )
 
 ZIP_LIST="$(unzip -Z -1 "${ARTIFACT_PATH}")"

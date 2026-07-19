@@ -37,9 +37,10 @@ source/devops/
 │   ├── guard-css.ts
 │   ├── guard-domain-style.ts
 │   ├── guard-env.ts
+│   ├── guard-front-state.ts
 │   ├── guard-imports.ts
 │   ├── guard-leaf.ts
-│   ├── guard-ux-state.ts
+│   ├── guard-namespaces.ts
 │   └── guard-validation.ts
 └── scripts/
     ├── app-admin-package.sh
@@ -47,6 +48,7 @@ source/devops/
     ├── app-customer-package.sh
     ├── app-customer-package-verify.sh
     ├── app-deploy.sh
+    ├── app-deploy-auth-config.sh
     ├── app-local.sh
     ├── app-ops-package.sh
     ├── app-ops-package-verify.sh
@@ -231,8 +233,8 @@ The service-role key boundary is strict:
 ### 5.1 Purpose
 
 The secret registry is a local developer file that stores the actual resolved
-values for package targets. It is never committed to the repository and never
-included in a build artifact.
+values for package targets and repository-level platform operations. It is
+never committed to the repository and never included in a build artifact.
 
 ### 5.2 File Location and Format
 
@@ -251,25 +253,29 @@ Every entry's JSON key **must equal** the composed identity derived from its own
 ```
 
 For example, the entry for `VITE_SUPABASE_PUBLIC_KEY` in the `app-admin` stage
-target has key `app-admin.stage.VITE_SUPABASE_PUBLIC_KEY`.
+target has key `swarmag-app-admin.stage.VITE_SUPABASE_PUBLIC_KEY`.
+
+The canonical secret scopes are the four deployable package App IDs from §3
+plus `swarmag-system` for repository-level platform operations such as database
+administration. Prefixless aliases such as `app-admin` are invalid.
 
 ### 5.4 Schema
 
 Each entry is an object with these fields:
 
-| Field    | Type       | Constraint                                                                   |
-| -------- | ---------- | ---------------------------------------------------------------------------- |
-| `app`    | `string`   | Non-empty; matches a deployable package App ID without the `swarmag-` prefix |
-| `env`    | `string`   | One of `dev`, `stage`, `prod`                                                |
-| `config` | `string`   | Non-empty; matches the env var name                                          |
-| `tags`   | `string[]` | Zero or more descriptive tags                                                |
-| `secret` | `string`   | The resolved secret value                                                    |
+| Field    | Type       | Constraint                                 |
+| -------- | ---------- | ------------------------------------------ |
+| `app`    | `string`   | Matches one of the canonical secret scopes |
+| `env`    | `string`   | One of `dev`, `stage`, `prod`              |
+| `config` | `string`   | Non-empty; matches the env var name        |
+| `tags`   | `string[]` | Zero or more descriptive tags              |
+| `secret` | `string`   | The resolved secret value                  |
 
 ```jsonc
 {
   // Public Supabase client key for app-admin stage backend binding target
-  "app-admin.stage.VITE_SUPABASE_PUBLIC_KEY": {
-    "app": "app-admin",
+  "swarmag-app-admin.stage.VITE_SUPABASE_PUBLIC_KEY": {
+    "app": "swarmag-app-admin",
     "env": "stage",
     "config": "VITE_SUPABASE_PUBLIC_KEY",
     "tags": ["supabase", "public-key"],
@@ -314,10 +320,10 @@ deno task guard:secrets
 deno task gen:jwt-secret
 
 # Read one secret
-deno run --allow-read source/devops/scripts/read-secret.ts secrets.jsonc "app-admin.stage.VITE_SUPABASE_PUBLIC_KEY"
+deno run --allow-read source/devops/scripts/read-secret.ts secrets.jsonc "swarmag-app-admin.stage.VITE_SUPABASE_PUBLIC_KEY"
 
 # Set one secret
-deno run --allow-read --allow-write source/devops/scripts/set-secret.ts secrets.jsonc "app-admin.stage.VITE_SUPABASE_PUBLIC_KEY" "<value>"
+deno run --allow-read --allow-write source/devops/scripts/set-secret.ts secrets.jsonc "swarmag-app-admin.stage.VITE_SUPABASE_PUBLIC_KEY" "<value>"
 ```
 
 ## 7. Packaging Workflow
@@ -430,7 +436,8 @@ The command deploys one or more UX apps for a single backend binding target.
 3. Resolve Netlify site IDs by name
 4. Package each requested app with the app package script
 5. Verify each package artifact with the app verify script
-6. Deploy each unzipped artifact to Netlify
+6. Require `netlify.toml` and `_redirects` in each artifact, then deploy from
+   the unzipped artifact root so Netlify discovers the packaged configuration
 7. Smoke-test deployed URLs with `smoke-ux.ts`
 
 The script fails immediately on any failed check, package, verification, deploy,
@@ -444,9 +451,11 @@ Netlify sites are resolved from this naming convention:
 swarmag-app-{admin|ops|customer}-{dev|stage|prod}
 ```
 
-The deploy script uses `netlify sites:list --json` to resolve site IDs and
-`netlify deploy --prod` to publish the artifact to the resolved site. A local
-operator must already be authenticated with the Netlify CLI.
+The deploy script uses `netlify sites:list --json` to resolve site IDs and runs
+`netlify deploy --dir . --prod` with the unzipped artifact as its working
+directory. This makes the packaged `netlify.toml` the configuration Netlify
+discovers for the deployment. A local operator must already be authenticated
+with the Netlify CLI.
 
 ### 8.4 UX Smoke Tests
 
@@ -469,10 +478,11 @@ Non-stage targets require explicit `{app}={url}` arguments.
 
 The smoke script verifies:
 
-- Root HTML responds successfully
+- Root HTML responds successfully and `/index.html` has `Cache-Control: no-store`
 - `build-meta.jsonc` exists and has the expected target
-- `sw.js` responds successfully
-- Built CSS and referenced font assets respond successfully
+- `sw.js` responds successfully and has `Cache-Control: no-store`
+- Built CSS responds successfully and has the immutable one-year cache policy
+- Referenced font assets respond successfully
 - The login screen becomes browser-ready in headless Chrome
 - Protected `/dashboard` routes redirect to `/login`
 - Protected routes do not render dashboard content before authentication
@@ -514,7 +524,7 @@ supported task groups; individual task bodies remain in `deno.jsonc`.
 | Database      | `db-reset`, `db-genesis`, `db-genesis-verify`                        |
 | Edge          | `edge-sync`, `edge-serve`, `edge-deploy`                             |
 | Packaging     | `app-{name}-package-{target}`, `app-{name}-package-{target}-verify`  |
-| Deployment    | `deploy`, `ux-smoke`, `ux-stage-smoke`                               |
+| Deployment    | `deploy`, `app-deploy-auth-config`, `ux-smoke`, `ux-stage-smoke`     |
 | Local servers | `app-dev-local`, `app-stage-local`, `app-style-guide-local`          |
 
 ## 11. Architectural Guards
@@ -523,20 +533,21 @@ Guards are Deno scripts that enforce structural and operational invariants. They
 
 ### 11.1 Guard Inventory
 
-| Task                   | Script                    | What it enforces                                     |
-| ---------------------- | ------------------------- | ---------------------------------------------------- |
-| `guard:architecture`   | `guard-architecture.ts`   | Dependency direction across layers                   |
-| `guard:env`            | `guard-env.ts`            | Env file structure and required keys                 |
-| `guard:leaf`           | `guard-leaf.ts`           | Leaf-module export discipline                        |
-| `guard:validation`     | `guard-validation.ts`     | Validator shape conventions                          |
-| `guard:domain-style`   | `guard-domain-style.ts`   | Domain layer code style conventions                  |
-| `guard:core-std-types` | `guard-core-std-types.ts` | Core std type usage                                  |
-| `guard:ux-state`       | `guard-ux-state.ts`       | UX state management conventions                      |
-| `guard:chart`          | `guard-chart.ts`          | Chart component conventions                          |
-| `guard:imports`        | `guard-imports.ts`        | Import discipline across all layers                  |
-| `guard:css`            | `guard-css.ts`            | CSS architecture conventions                         |
-| `guard:bare-html`      | `guard-bare-html.ts`      | HTML shell constraints                               |
-| `guard:secrets`        | `validate-secrets.ts`     | `secrets.jsonc` structure and composite key identity |
+| Task                   | Script                    | What it enforces                                               |
+| ---------------------- | ------------------------- | -------------------------------------------------------------- |
+| `guard:architecture`   | `guard-architecture.ts`   | Dependency direction across layers                             |
+| `guard:env`            | `guard-env.ts`            | Env file structure and required keys                           |
+| `guard:leaf`           | `guard-leaf.ts`           | Leaf-module export discipline                                  |
+| `guard:validation`     | `guard-validation.ts`     | Validator shape conventions                                    |
+| `guard:domain-style`   | `guard-domain-style.ts`   | Domain layer code style conventions                            |
+| `guard:core-std-types` | `guard-core-std-types.ts` | Core std type usage                                            |
+| `guard:front-state`    | `guard-front-state.ts`    | Front state management conventions                             |
+| `guard:chart`          | `guard-chart.ts`          | Chart component conventions                                    |
+| `guard:imports`        | `guard-imports.ts`        | Import discipline across all layers                            |
+| `guard:namespaces`     | `guard-namespaces.ts`     | Front namespace boundaries: ui seam, widget SPI, app isolation |
+| `guard:css`            | `guard-css.ts`            | CSS architecture conventions                                   |
+| `guard:bare-html`      | `guard-bare-html.ts`      | HTML shell constraints                                         |
+| `guard:secrets`        | `validate-secrets.ts`     | `secrets.jsonc` structure and composite key identity           |
 
 ### 11.2 Guard Scope
 
@@ -687,11 +698,21 @@ The Supabase Go auth server scans several `auth.users` string columns as non-nul
 
 ### 13.1 Ownership
 
-All Supabase auth configuration is owned by this repository. The Supabase dashboard is not an authoritative source for auth settings. Changes made in the dashboard are not tracked and will be lost on the next `supabase db push` or environment reset.
+All Supabase auth configuration is owned by this repository. The Supabase
+dashboard is not an authoritative source for auth settings.
+
+`supabase/config.toml` owns local Supabase Auth behavior. Hosted Auth behavior
+is declared separately in `supabase/auth/{target}.jsonc` and applied through
+the Supabase Management API. Database pushes and resets do not apply hosted
+Auth configuration.
 
 ### 13.2 Email Templates
 
-Email templates live under `supabase/templates/` and are referenced from `supabase/config.toml`. Template edits are expected operational changes, but the repository files remain authoritative. They are applied to a Supabase project via `supabase db push` or the Supabase CLI link/push workflow.
+Email templates live under `supabase/templates/` and are referenced from
+`supabase/config.toml` for local Supabase. Template edits are expected
+operational changes, but the repository files remain authoritative. For hosted
+targets, `app-deploy-auth-config.sh` injects the same template into the
+Management API payload and GET-verifies the readable value after applying it.
 
 Supabase email templates are not UX application shell assets. They are exempt
 from repository HTML/CSS formatting and architecture guard expectations because
@@ -749,14 +770,20 @@ reason, not a global relaxation of these parameters.
 
 ### 13.5 Applying Auth Configuration
 
-To apply auth configuration changes to a hosted Supabase project:
+To apply and verify the repository-owned Auth configuration for a provisioned
+hosted target:
 
 ```bash
-supabase link --project-ref <project-ref>
-supabase db push
+deno task app-deploy-auth-config --target {dev|stage|prod}
 ```
 
-This applies `config.toml` settings — including email templates — to the linked project. Run for each environment (dev, stage, prod) against its respective project ref.
+The task resolves the canonical project target, requires
+`SUPABASE_ACCESS_TOKEN` and `BREVO_SMTP_KEY`, PATCHes the Management API, then
+GET-verifies every readable repository-owned value. The SMTP password is
+injected at runtime, is never committed or printed, and cannot be GET-verified
+because the API does not return plaintext credentials. A target without
+`supabase/auth/{target}.jsonc` is intentionally not provisioned and fails
+without mutating hosted state.
 
 ## 14. Platform Target Listings
 

@@ -1,0 +1,17 @@
+{
+  "site_url": "https://admin-stage.swarmag.com",
+  "uri_allow_list": "https://admin-stage.swarmag.com,https://ops-stage.swarmag.com,https://customer-stage.swarmag.com",
+  "disable_signup": true,
+  "external_email_enabled": true,
+  "external_anonymous_users_enabled": false,
+  "mailer_otp_length": 6,
+  "mailer_otp_exp": 600,
+  "mailer_subjects_magic_link": "Your swarmAg sign-in code",
+  "smtp_admin_email": "devops@swarmag.com",
+  "smtp_host": "smtp-relay.brevo.com",
+  "smtp_port": "587",
+  "smtp_user": "af6f46001@smtp-brevo.com",
+  "smtp_sender_name": "swarmAg",
+  "smtp_max_frequency": 60,
+  "rate_limit_email_sent": 60
+}

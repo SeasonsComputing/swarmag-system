@@ -143,7 +143,7 @@ for app in "${APPS[@]}"; do
   echo "  [deploy] → ${SITE_URLS[${app}]}"
   DEPLOY_TMP="$(mktemp -d)"
   unzip -q "${ARTIFACT}" -d "${DEPLOY_TMP}"
-  netlify deploy --dir "${DEPLOY_TMP}" --site "${SITE_IDS[${app}]}" --prod || {
+  (cd "${DEPLOY_TMP}" && netlify deploy --dir . --site "${SITE_IDS[${app}]}" --prod) || {
     rm -rf "${DEPLOY_TMP}"
     fail "${app} deploy failed"
   }

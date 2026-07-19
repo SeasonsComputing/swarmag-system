@@ -2,9 +2,9 @@
 set -euo pipefail
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Deploy the repository-owned Supabase Auth magic-link email template.
+# Deploy the repository-owned hosted Supabase Auth configuration.
 #
-# Usage: app-deploy-auth-template.sh --target {dev|stage|prod}
+# Usage: app-deploy-auth-config.sh --target {dev|stage|prod}
 # ──────────────────────────────────────────────────────────────────────────────
 
 TARGET=""
@@ -36,10 +36,14 @@ case "${TARGET}" in
     ;;
 esac
 
-fail() { echo "APP_DEPLOY_AUTH_TEMPLATE_FAIL: $1"; exit 1; }
+fail() { echo "APP_DEPLOY_AUTH_CONFIG_FAIL: $1"; exit 1; }
 
 if [[ -z "${SUPABASE_ACCESS_TOKEN:-}" ]]; then
   fail "missing SUPABASE_ACCESS_TOKEN"
+fi
+
+if [[ -z "${BREVO_SMTP_KEY:-}" ]]; then
+  fail "missing BREVO_SMTP_KEY"
 fi
 
 if ! command -v curl >/dev/null 2>&1; then
@@ -51,11 +55,19 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
+CONFIG_FILE="${ROOT}/supabase/auth/${TARGET}.jsonc"
 TEMPLATE_FILE="${ROOT}/supabase/templates/magic-link.html"
-SUBJECT="Your swarmAg sign-in code"
+
+if [[ ! -f "${CONFIG_FILE}" ]]; then
+  fail "hosted Auth target not provisioned: ${TARGET}"
+fi
 
 if [[ ! -f "${TEMPLATE_FILE}" ]]; then
   fail "missing template file: ${TEMPLATE_FILE}"
+fi
+
+if ! jq -e 'type == "object"' "${CONFIG_FILE}" >/dev/null; then
+  fail "invalid hosted Auth configuration: ${CONFIG_FILE}"
 fi
 
 TARGETS_JSON="$(
@@ -72,11 +84,11 @@ fi
 
 if [[ "${TARGET}" == "prod" ]]; then
   echo ""
-  echo "APP_DEPLOY_AUTH_TEMPLATE_TARGET"
+  echo "APP_DEPLOY_AUTH_CONFIG_TARGET"
   echo "TARGET=${TARGET}"
   echo "PROJECT_REF=${PROJECT_REF}"
-  echo "TEMPLATE=${TEMPLATE_FILE}"
-  read -r -p "Type 'PROD' to deploy auth template to production: " RESPONSE
+  echo "CONFIG=${CONFIG_FILE}"
+  read -r -p "Type 'PROD' to deploy hosted Auth configuration to production: " RESPONSE
   if [[ "${RESPONSE}" != "PROD" ]]; then
     fail "production confirmation did not match"
   fi
@@ -84,13 +96,13 @@ fi
 
 AUTH_CONFIG_URL="https://api.supabase.com/v1/projects/${PROJECT_REF}/config/auth"
 PAYLOAD="$(
-  jq -n \
-    --arg subject "${SUBJECT}" \
+  jq \
     --rawfile html "${TEMPLATE_FILE}" \
-    '{
-      mailer_subjects_magic_link: $subject,
-      mailer_templates_magic_link_content: $html
-    }'
+    '. + {
+      mailer_templates_magic_link_content: $html,
+      smtp_pass: env.BREVO_SMTP_KEY
+    }' \
+    "${CONFIG_FILE}"
 )"
 
 api_request() {
@@ -100,10 +112,10 @@ api_request() {
 
   if [[ -n "${data}" ]]; then
     response="$(
-      curl -sS -w $'\n%{http_code}' -X "${method}" "${AUTH_CONFIG_URL}" \
+      printf '%s' "${data}" | curl -sS -w $'\n%{http_code}' -X "${method}" "${AUTH_CONFIG_URL}" \
         -H "Authorization: Bearer ${SUPABASE_ACCESS_TOKEN}" \
         -H "Content-Type: application/json" \
-        -d "${data}"
+        --data-binary @-
     )" || fail "Supabase auth config ${method} request failed"
   else
     response="$(
@@ -126,16 +138,23 @@ api_request() {
 api_request PATCH "${PAYLOAD}" >/dev/null
 
 VERIFY_BODY="$(api_request GET)"
-VERIFY_SUBJECT="$(printf '%s' "${VERIFY_BODY}" | jq -r '.mailer_subjects_magic_link // empty')"
-VERIFY_TEMPLATE_JSON="$(printf '%s' "${VERIFY_BODY}" | jq -c '.mailer_templates_magic_link_content // empty')"
-EXPECTED_TEMPLATE_JSON="$(jq -Rs . < "${TEMPLATE_FILE}")"
+EXPECTED_BODY="$(
+  jq \
+    --rawfile html "${TEMPLATE_FILE}" \
+    '. + {mailer_templates_magic_link_content: $html}' \
+    "${CONFIG_FILE}"
+)"
 
-if [[ "${VERIFY_SUBJECT}" != "${SUBJECT}" ]]; then
-  fail "remote magic-link subject did not match expected value"
-fi
+while IFS= read -r key; do
+  EXPECTED_VALUE="$(printf '%s' "${EXPECTED_BODY}" | jq -c --arg key "${key}" '.[$key]')"
+  VERIFY_VALUE="$(printf '%s' "${VERIFY_BODY}" | jq -c --arg key "${key}" '.[$key]')"
+  if [[ "${key}" == "smtp_port" ]]; then
+    EXPECTED_VALUE="$(printf '%s' "${EXPECTED_VALUE}" | jq -r 'tostring')"
+    VERIFY_VALUE="$(printf '%s' "${VERIFY_VALUE}" | jq -r 'tostring')"
+  fi
+  if [[ "${VERIFY_VALUE}" != "${EXPECTED_VALUE}" ]]; then
+    fail "remote hosted Auth configuration mismatch: ${key}"
+  fi
+done < <(printf '%s' "${EXPECTED_BODY}" | jq -r 'keys[]')
 
-if [[ "${VERIFY_TEMPLATE_JSON}" != "${EXPECTED_TEMPLATE_JSON}" ]]; then
-  fail "remote magic-link template content did not match expected value"
-fi
-
-echo "APP_DEPLOY_AUTH_TEMPLATE=PASS target=${TARGET} projectRef=${PROJECT_REF}"
+echo "APP_DEPLOY_AUTH_CONFIG=PASS target=${TARGET} projectRef=${PROJECT_REF}"
