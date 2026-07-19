@@ -141,6 +141,8 @@ max_indexes = 5
 # Vector Buckets is available to Supabase Pro plan.
 # [storage.vector.buckets.documents-openai]
 
+# Local Supabase Auth configuration. Hosted targets are governed by supabase/auth/{target}.jsonc
+# and applied through deno task app-deploy-auth-config.
 [auth]
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
@@ -204,11 +206,11 @@ enable_confirmations = false
 # If enabled, users will need to reauthenticate or have logged in recently to change their password.
 secure_password_change = false
 # Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.
-max_frequency = "1s"
+max_frequency = "60s"
 # Number of characters used in the email OTP.
 otp_length = 6
-# Number of seconds before the email OTP expires (defaults to 1 hour).
-otp_expiry = 3600
+# Number of seconds before the email OTP expires.
+otp_expiry = 600
 
 [auth.email.smtp]
 enabled = true
@@ -224,7 +226,7 @@ sender_name = "swarmAg"
 # subject = "You have been invited"
 # content_path = "./supabase/templates/invite.html"
 
-# local dev server
+# Local Supabase email template.
 [auth.email.template.magic_link]
 subject = "Your swarmAg sign-in code"
 content_path = "./supabase/templates/magic-link.html"

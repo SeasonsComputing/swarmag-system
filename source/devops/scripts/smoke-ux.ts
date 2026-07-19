@@ -416,10 +416,30 @@ const assertHttpOk = async (url: string, label: string): Promise<Response> => {
   return response
 }
 
+const assertCacheControl = (
+  response: Response,
+  label: string,
+  requiredDirectives: string[]
+): void => {
+  const cacheControl = response.headers.get('cache-control')?.toLowerCase() ?? ''
+  const missing = requiredDirectives.filter(directive => !cacheControl.includes(directive))
+  if (missing.length > 0) {
+    throw new Error(
+      `${label} Cache-Control missing ${missing.join(', ')}: ${cacheControl || '(empty)'}`
+    )
+  }
+}
+
 const assertStaticAssets = async (target: SmokeTarget, deployTarget: string): Promise<void> => {
   const baseUrl = rootUrl(target)
   const root = await assertHttpOk(baseUrl, `${target.app} index`)
   const html = await root.text()
+
+  const index = await assertHttpOk(
+    new URL('/index.html', baseUrl).href,
+    `${target.app} index cache policy`
+  )
+  assertCacheControl(index, `${target.app} index`, ['no-store'])
 
   const metadata = await assertHttpOk(
     new URL('/build-meta.jsonc', baseUrl).href,
@@ -434,11 +454,21 @@ const assertStaticAssets = async (target: SmokeTarget, deployTarget: string): Pr
     )
   }
 
-  await assertHttpOk(new URL('/sw.js', baseUrl).href, `${target.app} service worker`)
+  const serviceWorker = await assertHttpOk(
+    new URL('/sw.js', baseUrl).href,
+    `${target.app} service worker`
+  )
+  assertCacheControl(serviceWorker, `${target.app} service worker`, ['no-store'])
 
   const cssPath = html.match(/href="([^"]+index-[^"]+[.]css)"/)?.[1]
   if (!cssPath) throw new Error(`${target.app} index did not reference a CSS asset`)
-  const css = await (await assertHttpOk(new URL(cssPath, baseUrl).href, `${target.app} css`)).text()
+  const cssResponse = await assertHttpOk(new URL(cssPath, baseUrl).href, `${target.app} css`)
+  assertCacheControl(
+    cssResponse,
+    `${target.app} css`,
+    ['public', 'max-age=31536000', 'immutable']
+  )
+  const css = await cssResponse.text()
   const fontPaths = [...css.matchAll(/url\(([^)]*?[.]woff2)\)/g)]
     .map(match => match[1].replaceAll('"', '').replaceAll('\'', ''))
   if (fontPaths.length === 0) throw new Error(`${target.app} CSS did not reference font assets`)
