@@ -1,22 +1,23 @@
-# Dashboard Presentation Field — Design Notes
+# Dashboard Presentation Field — Foundation Decision
 
 **Date:** 2026-07-19
 **Mode:** Foundation
-**Status:** DRAFT — captures Chief Architect / AI exploration; not implementation authorization.
+**Status:** DECIDED — establishes architectural intent; not implementation authorization.
 **Related:** `documentation/architecture/architecture-front.md` §10.3,
 `documentation/ux/ux-design-language.md`,
 `documentation/project/2026-07-18-foundation-game-plan-design.md`
 
 ---
 
-## 1. Framing
+## 1. Decision
 
 The Dashboard is a responsive presentation field, not a fixed header followed
 by unrelated widget rows. The header is its densest, highest-priority region;
 the body continues the same placement and presentation model at larger scale.
 
-This direction exists to make dashboard composition durable as the widget
-catalog grows. It must not prescribe a catalog of widget visualizations.
+This direction makes dashboard composition durable as the widget catalog grows.
+It does not prescribe a catalog of widget visualizations or an implementation
+contract for allocations.
 
 ## 2. Design Direction
 
@@ -43,6 +44,12 @@ to its data.
 The shell must not encode a finite vocabulary of widget transformations. A
 widget may adapt creatively within its field, subject to the shell's
 accessibility and containment constraints.
+
+`compact` and `landscape` remain useful widget presentation shapes. They express
+how a widget intends to present its data, such as a compact pie or machinery list,
+or a landscape chart with a legend. Shape is not a shell width or height command:
+the presentation field allocates space and the widget expresses its configured
+shape within that allocation.
 
 ### D3 — Identity is the intentional exception
 
@@ -99,23 +106,20 @@ and expression presented.
 - Reuse existing design-language tokens and feature-layer ownership before
   proposing new foundation tokens or shared controls.
 
-## 5. Open Design Questions
+## 5. Remaining Foundation Questions
 
 1. What is the smallest durable widget footprint contract: intrinsic sizing
    only, declared presentation allocations, or explicit metadata?
-2. How should existing `compact` and `landscape` shape settings relate to
-   header placement without conflating footprint and presentation capability?
-3. Which header composition can express the field using the current dashboard
+2. Which header composition can express the field using the current dashboard
    structure without coupling the shell to concrete widget identities?
-4. When a widget contains multiple measures, should it manage its own internal
+3. When a widget contains multiple measures, should it manage its own internal
    sequence or expose measures as separate widgets?
-5. What manual visual, zoom, keyboard, and reduced-motion checks become the
+4. What manual visual, zoom, keyboard, and reduced-motion checks become the
    enduring verification standard for dashboard widgets?
 
 ## 6. Explicitly Out Of Scope
 
 - Any Dashboard, widget, CSS, token, seed, or Widget SPI implementation.
-- Amendments to `architecture-front.md` or UX governing documents.
 - A final widget footprint, metadata, or placement contract.
 - A prescribed KPI, chyron, chart, or animation design.
 - New shared Ui controls.
