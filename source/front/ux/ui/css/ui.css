@@ -1299,6 +1299,23 @@
   overflow: visible;
 }
 
+@media (max-width: 480px) {
+  [data-ui='dialog'][data-ui-size='workbench'] {
+    block-size: 100dvh;
+    border: none;
+    border-radius: 0;
+    box-shadow: none;
+    inline-size: 100vw;
+    inset: 0;
+    max-block-size: none;
+    max-inline-size: none;
+    min-inline-size: 0;
+    overflow: hidden;
+    padding: 0;
+    transform: none;
+  }
+}
+
 /* ─────────────────────────────────────────────────────────────────────────── */
 /* POPOVER                                                                     */
 /* ─────────────────────────────────────────────────────────────────────────── */
