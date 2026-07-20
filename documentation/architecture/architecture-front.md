@@ -695,13 +695,29 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/api + ux/config
 
 ```text
 Dashboard
-  └─ HeaderRow (fixed height, KPI StatCards)
+  ├─ ShellIdentityAnchor (logo + brand)
+  ├─ HeaderPresentationRegion (ordered short/tall allocations)
   └─ ScrollContainer (vertical scroll)
-     └─ DashboardRow[] (horizontal swipe, no collapse)
-        └─ Widget[] (compact | landscape)
+     └─ DashboardRow[] (ordered body presentation regions)
+        └─ Widget[] (presentation shape: compact | landscape)
 ```
 
-No row collapse on small viewport. Horizontal swipe per row. Vertical scroll on the outer column.
+The Dashboard is a responsive presentation field. The shell owns ordered placement,
+row rhythm, available footprint, containment, and responsive expansion. It preserves
+visual and keyboard order together. As available space contracts, widgets may adapt
+their presentation; when the field needs more space, it adds rows while retaining
+ordered placement. The shell does not require horizontal scrolling.
+
+`compact` and `landscape` are widget presentation shapes, not shell geometry. A
+widget uses its configured shape to express its data within the footprint allocated
+by the presentation field; the shell does not impose a fixed width or height from
+that shape, or define a finite vocabulary of visual transformations. The exact
+allocation contract remains a Widget SPI and dashboard-schema decision.
+
+Shell identity is the intentional exception to ordinary dashboard content. The logo
+and brand anchor the highest-priority region, remain legible and non-wrapping, and
+do not participate in content-driven transformation. The header and body use the
+same placement principles at their respective scales.
 
 **`source/front/app-{admin|ops|customer}/app-{admin|ops|customer}-dashboard.json`**
 
@@ -797,8 +813,8 @@ Per `domain-model.md §2.5`:
 | Component         | Purpose                                     |
 | ----------------- | ------------------------------------------- |
 | `Dashboard`       | Root layout, row renderer, scroll container |
-| `DashboardRow`    | Horizontal swipe row (short\|standard)      |
-| `DashboardWidget` | Widget container (compact\|landscape)       |
+| `DashboardRow`    | Ordered body presentation region             |
+| `DashboardWidget` | Widget host and allocated presentation field |
 
 ### 11.4 Widget Catalog
 
