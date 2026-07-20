@@ -334,6 +334,11 @@ Layout rhythm tokens are responsive aliases over the spacing scale.
 | `--sa-size-md`   | 1024px | Desktop breakpoint        |
 | `--sa-size-lg`   | 1152px | Wide layout breakpoint    |
 
+Viewport tokens are reusable CSS length references. They are not Dashboard
+allocated-field contracts, global widget measures, or universal presentation
+thresholds. A feature may use them locally, while a widget's actual allocated
+field remains the authoritative presentation context.
+
 ### 5.5 Touch Targets
 
 | Token                  | Value | Purpose                       |
