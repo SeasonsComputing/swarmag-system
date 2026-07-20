@@ -1,6 +1,4 @@
 [data-feat='brand-widget'] {
-  flex: 0 0 auto;
-  justify-self: center;
   text-align: start;
   white-space: nowrap;
 }

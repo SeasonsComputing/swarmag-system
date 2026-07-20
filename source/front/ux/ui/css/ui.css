@@ -1359,7 +1359,7 @@
 
 [data-ui='layout'] {
   display: grid;
-  gap: var(--sa-rhythm-gap);
+  gap: var(--sa-rhythm-gap-tight);
   width: 100%;
 }
 

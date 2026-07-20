@@ -28,16 +28,17 @@ export type ActionWidgetProps = {
 /** Dashboard header action widget. */
 export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   const navigate = useNavigate()
-  const actions = (): string[] => toStringArray(props.settings['actions'])
-  const labels = (): string[] => toStringArray(props.settings['labels'])
-  const pairs = () =>
-    actions().map((action, index) => ({
+  const pairs = () => {
+    const actions = toStringArray(props.settings['actions'])
+    const labels = toStringArray(props.settings['labels'])
+    return actions.map((action, index) => ({
       action,
-      label: labels()[index] ?? action
+      label: labels[index] ?? action
     }))
+  }
 
   return (
-    <nav data-feat='action-widget'>
+    <nav aria-label='Dashboard actions' data-feat='action-widget'>
       <UiLayout variant='cluster'>
         <For each={pairs()}>
           {pair => (

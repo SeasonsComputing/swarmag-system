@@ -134,8 +134,8 @@
   :root {
     --sa-base-size: var(--sa-font-size-sm);
     --sa-rhythm-gutter: var(--sa-space-sm);
-    --sa-rhythm-pad: calc(var(--sa-space-sm) + var(--sa-space-xs));
-    --sa-rhythm-gap: calc(var(--sa-space-sm) + var(--sa-space-xs));
+    --sa-rhythm-pad: var(--sa-space-sm);
+    --sa-rhythm-gap: var(--sa-space-sm);
     --sa-rhythm-gap-tight: calc(var(--sa-space-xx) / 2);
   }
 }

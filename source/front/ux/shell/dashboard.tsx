@@ -34,7 +34,7 @@ export const Dashboard = (): UiComponent => {
   const headerFields = () => dashboard.header.widgets.slice(1, -1)
   const headerTerminal = () => {
     const headerWidgets = dashboard.header.widgets
-    return headerWidgets.length > 1 ? headerWidgets[headerWidgets.length - 1] : undefined
+    return headerWidgets.length > 1 ? headerWidgets.at(-1) : undefined
   }
   let headerContents: HTMLDivElement | undefined
   let terminalField: HTMLDivElement | undefined
@@ -66,7 +66,7 @@ export const Dashboard = (): UiComponent => {
   })
 
   return (
-    <section data-feat='dashboard' data-feat-layout={dashboard.settings.layout}>
+    <div data-feat='dashboard' data-feat-layout={dashboard.settings.layout}>
       <header data-feat='dashboard-header'>
         <div
           data-feat='dashboard-header-contents'
@@ -80,7 +80,7 @@ export const Dashboard = (): UiComponent => {
               <img
                 data-feat='dashboard-header-logo'
                 src={headerLogo}
-                alt='swarmAg'
+                alt=''
                 width={64}
                 height={64}
               />
@@ -134,7 +134,7 @@ export const Dashboard = (): UiComponent => {
       </div>
 
       <UiFooter logo={footerLogo} alt='swarmAg' />
-    </section>
+    </div>
   )
 
   function DashboardWidget(props: { widget: DashboardStoreWidget }): UiComponent {
