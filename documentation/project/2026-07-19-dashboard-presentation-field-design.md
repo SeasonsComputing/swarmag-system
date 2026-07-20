@@ -2,7 +2,8 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation
-**Status:** DECIDED — establishes architectural intent; not implementation authorization.
+**Status:** DECIDED — establishes the field-allocation direction; header
+implementation is authorized by its task ledger.
 **Related:** `documentation/architecture/architecture-front.md` §10.3,
 `documentation/ux/ux-design-language.md`,
 `documentation/project/2026-07-18-foundation-game-plan-design.md`
@@ -16,8 +17,8 @@ by unrelated widget rows. The header is its densest, highest-priority region;
 the body continues the same placement and presentation model at larger scale.
 
 This direction makes dashboard composition durable as the widget catalog grows.
-It does not prescribe a catalog of widget visualizations or an implementation
-contract for allocations.
+It establishes a thin field-allocation guarantee, not a catalog of widget
+visualizations or numerical allocation metadata.
 
 ## 2. Design Direction
 
@@ -26,7 +27,8 @@ contract for allocations.
 The shell owns spatial responsibility only:
 
 - placement and ordered reading/focus order;
-- row rhythm, available footprint, containment, and expansion;
+- allocated fields: their row context, available footprint, containment, and
+  expansion;
 - accessibility boundaries, including motion, focus visibility, contrast, and
   touch-target requirements; and
 - responsive behavior that adds rows rather than requiring shell-level
@@ -45,6 +47,11 @@ The shell must not encode a finite vocabulary of widget transformations. A
 widget may adapt creatively within its field, subject to the shell's
 accessibility and containment constraints.
 
+A widget's intrinsic minimum, optimal, and maximum useful measures remain
+implementation-local. They are not Dashboard schema, seed, registry, state, or
+Widget SPI metadata. The shell provides the allocated field; the widget decides
+how to use it meaningfully.
+
 `compact` and `landscape` remain useful widget presentation shapes. They express
 how a widget intends to present its data, such as a compact pie or machinery list,
 or a landscape chart with a legend. Shape is not a shell width or height command:
@@ -58,16 +65,25 @@ content. They remain legible, stable, and non-wrapping. They anchor the
 highest-priority part of the presentation field rather than participating in
 content-driven visual transformation.
 
+The identity field is the leading header bookend: shell logo plus BrandWidget.
+
 ### D4 — Row rhythm is compositional, not a viewport metaphor
 
-The header can provide short and tall allocations. Wide presentations may use
-both heights without wrapping. As available space contracts, widgets may first
-change their own presentation; when that is insufficient, the field adds short
-rows while retaining ordered placement.
+The header provides two paired allocated-field contexts:
 
-Literal dimensions are implementation details. The architectural concept is a
-small set of meaningful presentation allocations, not a collection of device
-breakpoints.
+- `normal/tall` — the primary inner row; and
+- `wrapped/short` — a following inner row when the primary row cannot contain
+  the next ordered field.
+
+`normal|wrapped` names row context; `tall|short` names block allocation. This
+header deliberately pairs normal with tall and wrapped with short. They are not
+device modes or Widget SPI metadata. The current header derives short usable
+inner height from one compact touch-target lane and tall usable inner height
+from two such lanes. Shell chrome sits outside that allocation. The shell
+provides the context; a widget adapts within it and never places itself.
+
+As available inline space contracts, the field retains ordered placement and
+adds wrapped/short rows rather than requiring shell-level horizontal scrolling.
 
 ### D5 — Motion communicates only when it remains optional
 
@@ -76,14 +92,29 @@ meaning. A dynamic visualization must retain a comprehensible static or
 reduced-motion presentation, preserve keyboard focus behavior, and avoid
 repeated unsolicited assistive-technology announcements.
 
+### D6 — Allocated fields preserve header bookends
+
+Every ordered header widget receives an allocated field: its available inline
+and block footprint together with its row context. The field guarantees
+containment, order, and context; it does not prescribe a widget's numerical
+measures or visual transformation.
+
+The terminal ActionWidget is the trailing header bookend. In `normal/tall`, it
+occupies the terminal field. In `wrapped/short`, its allocated field is the
+entire post-gutter inner row (`inline-size: 100%`); the ActionWidget owns how
+its controls use that field. Ordered header widgets remain between the leading
+identity and terminal action bookends.
+
 ## 3. Intended Boundary
 
 ```text
 Dashboard presentation field
-├─ Shell identity anchor
-│  └─ Logo + BrandWidget
 ├─ Header presentation region
-│  └─ Short/tall widget allocations; grows by rows when needed
+│  ├─ Leading identity field
+│  │  └─ Shell logo + BrandWidget
+│  ├─ Ordered allocated header fields
+│  └─ Terminal ActionWidget field
+│     └─ normal/tall or wrapped/short; full inner row when wrapped
 └─ Dashboard body presentation region
    └─ Larger widget-row allocations using the same placement principles
 ```
@@ -105,22 +136,24 @@ and expression presented.
   not import the shell.
 - Reuse existing design-language tokens and feature-layer ownership before
   proposing new foundation tokens or shared controls.
+- Preserve the leading identity and terminal ActionWidget bookends.
+- Give a wrapped ActionWidget its entire post-gutter inner field. The shell
+  must not infer whether that field is normal/tall or wrapped/short from a
+  viewport or inline-width threshold alone; the ActionWidget may adapt within
+  its actual allocated field.
 
 ## 5. Remaining Foundation Questions
 
-1. What is the smallest durable widget footprint contract: intrinsic sizing
-   only, declared presentation allocations, or explicit metadata?
-2. Which header composition can express the field using the current dashboard
-   structure without coupling the shell to concrete widget identities?
-3. When a widget contains multiple measures, should it manage its own internal
+1. When a widget contains multiple measures, should it manage its own internal
    sequence or expose measures as separate widgets?
-4. What manual visual, zoom, keyboard, and reduced-motion checks become the
+2. What manual visual, zoom, keyboard, and reduced-motion checks become the
    enduring verification standard for dashboard widgets?
 
 ## 6. Explicitly Out Of Scope
 
-- Any Dashboard, widget, CSS, token, seed, or Widget SPI implementation.
-- A final widget footprint, metadata, or placement contract.
+- Dashboard body presentation implementation and widget-catalog expansion.
+- Numerical allocation metadata in a Widget SPI, registry, seed, state, or
+  Dashboard schema.
 - A prescribed KPI, chyron, chart, or animation design.
 - New shared Ui controls.
 
