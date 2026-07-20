@@ -24,7 +24,12 @@
   border-block-end: var(--sa-shell-border);
   box-shadow: var(--sa-shell-shadow);
   flex-shrink: 0;
-  padding: var(--sa-space-sm) var(--sa-rhythm-gutter);
+  padding-block: var(--sa-space-sm);
+  padding-inline: clamp(
+    var(--sa-rhythm-gutter),
+    calc(-2.514rem + 12.793vw),
+    calc(var(--sa-rhythm-gutter) * 3)
+  );
   z-index: var(--sa-z-docked);
 }
 

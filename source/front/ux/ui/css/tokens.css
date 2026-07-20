@@ -130,7 +130,7 @@
 }
 
 /* Minimum width breakpoint for devices */
-@media (max-width: 350px) {
+@media (max-width: 380px) {
   :root {
     --sa-base-size: var(--sa-font-size-sm);
     --sa-rhythm-gutter: var(--sa-space-sm);

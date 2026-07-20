@@ -9,7 +9,7 @@
   block-size: clamp(32rem, 72dvh, 42rem);
   display: grid;
   gap: var(--sa-rhythm-gap);
-  grid-template-columns: minmax(var(--sa-size-xs), 2fr) minmax(var(--sa-size-min), 1fr);
+  grid-template-columns: minmax(var(--sa-size-xs), 2fr) minmax(var(--sa-size-xs), 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
 }
