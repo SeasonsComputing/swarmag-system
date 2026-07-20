@@ -78,7 +78,7 @@ Implemented:
 
 - Renamed root style guide to `STYLE-GUIDE.md`.
 - Moved documentation into flat category directories:
-  - `documentation/agent/`
+  - `documentation/genesis/`
   - `documentation/architecture/`
   - `documentation/domain/`
   - `documentation/project/`

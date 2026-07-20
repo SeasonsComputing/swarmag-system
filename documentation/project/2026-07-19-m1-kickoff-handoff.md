@@ -10,7 +10,7 @@ Uncommitted (CA commits at will — all documentation, no source):
 `2026-07-19-wizard-onboarding-design.md` (D1–D16 + §6 audit),
 `2026-07-19-wizard-onboarding-tasks.md` (M1 ledger, groups A0/A/B0/B/C/D),
 `user-stories.md` (1.1 pipeline enrichment, 1.2 stub, renumbering 1–6,
-§6 User Management marked complete), `swarmag-feature-parking-lot.md`
+§6 User Management marked complete), `project-feature-parking-lot.md`
 (Lead abstraction entry), this file. Last commit: `6ad111c` (ACE devops,
 deployed + AA-verified on stage).
 

@@ -3,7 +3,7 @@
 **Date:** 2026-07-16
 **Mode:** Feature (with one Repair-mode backend fix, see §3)
 **Status:** Complete, `deno task check` green, uncommitted at time of writing (CA's call on when to commit)
-**Related:** `documentation/project/2026-07-12-edge-functions-remediation-design.md` (D12 — the CORS fix that unblocked User Manager entirely, closed same week); `documentation/project/swarmag-feature-parking-lot.md` (eject semantics, deferred here)
+**Related:** `documentation/project/2026-07-12-edge-functions-remediation-design.md` (D12 — the CORS fix that unblocked User Manager entirely, closed same week); `documentation/project/project-feature-parking-lot.md` (eject semantics, deferred here)
 
 ---
 
@@ -48,7 +48,7 @@ Separate from the UX work, a real bug surfaced through it: editing _any_ field (
 ## 3. Known Remaining Gaps (not fixed, not forgotten)
 
 - **`requestAction`'s no-confirmation branch in `abstraction-manager.tsx` still fire-and-forgets** (`void runAction(action, item)`) with no error handling. Doesn't affect Delete/Eject today (both declare `confirmation`), but the next action added _without_ one will fail silently. Fix whenever that next action is added — route it through the same error-surfacing path confirmed actions use.
-- **Eject's actual mechanism (full Auth-identity deletion) makes reactivation impossible**, and the editor currently lets you flip a user's `status` back to `active` with no indication that it won't restore access. Reframing eject as a ban (`auth.admin.updateUserById(id, { ban_duration })`, identity-preserving) instead of a delete is the fix, but it reopens D4/D5 and deserves its own scoped conversation — see `swarmag-feature-parking-lot.md`.
+- **Eject's actual mechanism (full Auth-identity deletion) makes reactivation impossible**, and the editor currently lets you flip a user's `status` back to `active` with no indication that it won't restore access. Reframing eject as a ban (`auth.admin.updateUserById(id, { ban_duration })`, identity-preserving) instead of a delete is the fix, but it reopens D4/D5 and deserves its own scoped conversation — see `project-feature-parking-lot.md`.
 
 ## 4. For Customer Onboarding
 

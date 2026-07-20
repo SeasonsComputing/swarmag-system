@@ -47,7 +47,7 @@ Updated documentation to align domain/solution/backend authority boundaries:
 - `documentation/architecture/architecture-back.md`
 - `documentation/domain/domain-data-dictionary.md`
 - `documentation/domain/domain-archetypes.md`
-- `documentation/ux/user-stories.md`
+- `documentation/project/project-user-stories.md`
 - `documentation/project/2026-06-28-user-contact-customer-design.md`
 - `documentation/project/2026-06-28-user-contact-customer-tasks.md`
 
