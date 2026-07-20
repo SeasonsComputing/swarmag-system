@@ -113,3 +113,26 @@ editor and back) so the mode change reads as movement rather than a repaint.
 `abstraction-manager.tsx`) adding a reduced-motion-respecting transition
 between list and editor presentation. Any future wizard step transitions
 should share the same motion language.
+
+## Lead abstraction — inbound pipeline automation
+
+**Parked:** 2026-07-19 (CA executive decision during Phase 3 design)
+
+The sales pipeline truly begins before the prospect: leads arrive via
+voicemail, text, and email, and a rep transforms them into prospects for
+return calls. The domain has no Lead entity — today this is deliberately
+manual: the rep checks the three inboxes three times a day and runs the
+onboarding wizard when a lead has enough substance (an email address,
+since User requires one and provisions auth).
+
+**CA verdict:** love the idea — automate it, measure it, track it — all
+excellent features. Not now.
+
+**Picking this up should look like:** Foundation domain addition — `Lead`
+(source: voicemail|text|email, captured contact fragments, service
+interest, status: new|contacted|converted|dead), auth-free, cheap to
+create, converting into User + prospect Customer via the onboarding
+wizard's stage 1 ("from lead"). Then the features the entity unlocks:
+inbox integration/automation, pipeline measurement (lead→prospect
+conversion, response latency), a Leads widget on the sales dashboard, and
+retiring the auth-identity-at-genesis wrinkle (leads carry no login).
