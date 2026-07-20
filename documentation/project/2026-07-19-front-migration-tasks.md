@@ -151,7 +151,7 @@ and chose per-app registries. Executed:
 
 - [x] Agent memory files updated to `front/` paths
 - [x] Ledger closed: `cdc6ebb` + `6c10d3b` (2026-07-19)
-- [X] **CA directive 2026-07-19:** Phase 3 (`wizard` + Customer
+- [x] **CA directive 2026-07-19:** Phase 3 (`wizard` + Customer
       Onboarding) opens as its OWN new milestone with fresh design/tasks
       docs — it genuinely starts a new thing. Standing question to answer
       at its kickoff: does the onboarding wizard need inline note capture
