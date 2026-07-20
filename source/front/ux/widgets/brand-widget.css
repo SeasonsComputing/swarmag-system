@@ -1,5 +1,8 @@
 [data-feat='brand-widget'] {
-  text-align: center;
+  flex: 0 0 auto;
+  justify-self: center;
+  text-align: start;
+  white-space: nowrap;
 }
 
 [data-feat='brand-widget-product'] {
@@ -14,4 +17,5 @@
   font-family: var(--sa-heading-font-family);
   font-size: var(--sa-heading-font-size-h4);
   font-weight: var(--sa-heading-font-weight);
+  text-align: center;
 }
