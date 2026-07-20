@@ -28,53 +28,53 @@ body presentation regions follow as a separately authorized scope.
 
 ## Group A — Header Presentation Field (Foundation)
 
-- [X] `source/front/ux/shell/dashboard.tsx` — render the shell identity anchor
+- [x] `source/front/ux/shell/dashboard.tsx` — render the shell identity anchor
       and ordered allocated header fields as semantic dashboard structure. DOM
       order, keyboard order, and visual order remain aligned.
-- [X] `source/front/ux/shell/dashboard.css` — compose the header as a
+- [x] `source/front/ux/shell/dashboard.css` — compose the header as a
       responsive field using the design-language rhythm, touch-target, focus,
       and motion contracts. It provides `normal/tall` primary and
       `wrapped/short` following fields, with no shell-level horizontal
       scrolling. Short provides one compact touch-target lane of usable inner
       height; tall provides two, excluding shell chrome.
-- [X] Header containment preserves meaningful content and visible focus.
+- [x] Header containment preserves meaningful content and visible focus.
       Widgets receive their available fields without a shell-imposed fixed
       compact or landscape width or height.
-- [X] The header remains the densest, highest-priority Dashboard region; the
+- [x] The header remains the densest, highest-priority Dashboard region; the
       identity and ActionWidget remain leading and terminal bookends.
 
 ## Group B — Header Widget Presentation (Foundation)
 
-- [X] `source/front/ux/widgets/brand-widget.tsx` and
+- [x] `source/front/ux/widgets/brand-widget.tsx` and
       `source/front/ux/widgets/brand-widget.css` — express product and
       application identity within the ratified header composition.
-- [X] `source/front/ux/widgets/action-widget.tsx` and
+- [x] `source/front/ux/widgets/action-widget.tsx` and
       `source/front/ux/widgets/action-widget.css` — express ordered route
       actions within their allocated field while preserving meaningful labels,
       compact touch targets, visible focus, and wrap-safe content. Actions are
       compact and trailing in `normal/tall`; they own the full inner field in
       `wrapped/short`.
-- [X] `compact` and `landscape` remain widget presentation shapes. Each widget
+- [x] `compact` and `landscape` remain widget presentation shapes. Each widget
       owns how its configured shape expresses meaning within its footprint;
       neither shape encodes shell geometry.
-- [X] No widget imports the shell; no shell file imports a concrete widget.
+- [x] No widget imports the shell; no shell file imports a concrete widget.
 
 ## Group C — Verification And Close
 
-- [X] `deno task fmt`, `deno task check`, and applicable dashboard tests pass.
-- [X] Manual visual checks at narrow and wide application widths, including
+- [x] `deno task fmt`, `deno task check`, and applicable dashboard tests pass.
+- [x] Manual visual checks at narrow and wide application widths, including
       browser zoom and long product, application, and action labels.
 - [?] At every normal/tall fit boundary, Actions remains an intact trailing
-      group; immediately below it, the entire ActionWidget receives a
-      wrapped/short, full-width inner field. Neither state distributes Actions
-      through a partial remainder or leaves gratuitous negative space.
+  group; immediately below it, the entire ActionWidget receives a
+  wrapped/short, full-width inner field. Neither state distributes Actions
+  through a partial remainder or leaves gratuitous negative space.
 - [?] Keyboard check confirms ordered Tab traversal and visible focus across
-      identity and header widgets.
+  identity and header widgets.
 - [?] Reduced-motion check confirms the header and its widgets retain a
-      comprehensible static presentation.
-- [X] Header has no shell-level horizontal scroll and does not hide meaningful
+  comprehensible static presentation.
+- [x] Header has no shell-level horizontal scroll and does not hide meaningful
       information when it flows.
-- [X] Chief Architect visual review; ledger records files, checks, and commit.
+- [x] Chief Architect visual review; ledger records files, checks, and commit.
 
 ## Explicitly Out Of Scope
 
