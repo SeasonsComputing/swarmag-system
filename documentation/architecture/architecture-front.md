@@ -695,24 +695,38 @@ swarmag-app-customer = ux/app-customer + ux/common + ux/api + ux/config
 
 ```text
 Dashboard
-  ├─ ShellIdentityAnchor (logo + brand)
-  ├─ HeaderPresentationRegion (ordered short/tall allocations)
-  └─ ScrollContainer (vertical scroll)
+  ├─ HeaderPresentationRegion
+  │  ├─ LeadingIdentityField (shell logo + BrandWidget)
+  │  ├─ OrderedHeaderField[]
+  │  └─ TerminalActionField
+  │     └─ normal/tall or wrapped/short; full inner field when wrapped
+  └─ BodyPresentationRegion (vertical scroll)
      └─ DashboardRow[] (ordered body presentation regions)
         └─ Widget[] (presentation shape: compact | landscape)
 ```
 
 The Dashboard is a responsive presentation field. The shell owns ordered placement,
-row rhythm, available footprint, containment, and responsive expansion. It preserves
-visual and keyboard order together. As available space contracts, widgets may adapt
-their presentation; when the field needs more space, it adds rows while retaining
-ordered placement. The shell does not require horizontal scrolling.
+row rhythm, allocated fields, containment, and responsive expansion. It preserves
+visual and keyboard order together. Each allocated field provides a widget's available
+inline and block footprint together with its row context. As available space contracts,
+widgets may adapt their presentation; when the field needs more space, it adds rows
+while retaining ordered placement. The shell does not require horizontal scrolling.
+
+The header provides paired contexts: `normal/tall` for its primary inner row and
+`wrapped/short` for a following inner row. `normal|wrapped` names row context;
+`tall|short` names block allocation. This header deliberately pairs them. They are
+container-provided contexts, not viewport modes or literal fixed dimensions. The
+leading identity field (shell logo + BrandWidget) and terminal ActionWidget are header
+bookends. When ActionWidget receives a wrapped/short field, that field spans the
+entire post-gutter inner row; ActionWidget owns how its controls use the field.
 
 `compact` and `landscape` are widget presentation shapes, not shell geometry. A
 widget uses its configured shape to express its data within the footprint allocated
 by the presentation field; the shell does not impose a fixed width or height from
-that shape, or define a finite vocabulary of visual transformations. The exact
-allocation contract remains a Widget SPI and dashboard-schema decision.
+that shape, or define a finite vocabulary of visual transformations. Widget intrinsic
+minimum, optimal, and maximum useful measures remain implementation-local behavior:
+no Widget SPI, registry, seed, state, or Dashboard-schema allocation metadata is
+introduced.
 
 Shell identity is the intentional exception to ordinary dashboard content. The logo
 and brand anchor the highest-priority region, remain legible and non-wrapping, and
@@ -731,7 +745,15 @@ The app-local dashboard JSON conforms to `DashboardView` from `source/front/ux/v
 {
   "header": {
     "widgets": [
-      { "type": "BrandWidget", "settings": { "shape": "landscape" } }
+      { "type": "BrandWidget", "settings": { "shape": "landscape" } },
+      {
+        "type": "ActionWidget",
+        "settings": {
+          "shape": "compact",
+          "actions": ["/about", "/logout"],
+          "labels": ["About", "Logout"]
+        }
+      }
     ]
   },
   "rows": [
@@ -810,9 +832,9 @@ Per `domain-model.md §2.5`:
 
 ### 11.3 Dashboard Components
 
-| Component         | Purpose                                     |
-| ----------------- | ------------------------------------------- |
-| `Dashboard`       | Root layout, row renderer, scroll container |
+| Component         | Purpose                                      |
+| ----------------- | -------------------------------------------- |
+| `Dashboard`       | Root layout, row renderer, scroll container  |
 | `DashboardRow`    | Ordered body presentation region             |
 | `DashboardWidget` | Widget host and allocated presentation field |
 
