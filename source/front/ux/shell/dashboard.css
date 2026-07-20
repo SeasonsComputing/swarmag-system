@@ -30,15 +30,14 @@
 
 [data-feat='dashboard-header-contents'] {
   align-items: stretch;
+  column-gap: var(--sa-rhythm-gap);
   display: flex;
   flex-wrap: wrap;
-  gap: var(--sa-rhythm-gap);
   inline-size: 100%;
   justify-content: flex-start;
   margin-inline: auto;
   max-inline-size: var(--sa-size-lg);
   min-inline-size: 0;
-  row-gap: 0;
 }
 
 [data-feat='dashboard-header-identity'] {
@@ -60,7 +59,6 @@
 [data-feat='dashboard-header-logo-field'] {
   align-items: center;
   display: flex;
-  flex: 0 0 auto;
 }
 
 [data-feat='dashboard-header-brand-field'] {
