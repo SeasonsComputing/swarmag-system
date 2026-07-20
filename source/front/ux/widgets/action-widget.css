@@ -1,40 +1,26 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Action widget styles                                                         ║
-║ Two-column link grid with icon bullet for contextual action lists.           ║
+║ Terminal route action presentation for the dashboard field.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
 [data-feat='action-widget'] {
-  display: grid;
-  gap: var(--sa-space-sm) var(--sa-rhythm-gap);
-  grid-template-columns: repeat(2, max-content);
+  container: action-widget / size;
+  flex: 1 1 auto;
+  min-block-size: 100%;
+  min-inline-size: 100%;
 }
 
-[data-feat='action-widget'] a {
+[data-feat='action-widget'] [data-ui='layout'] {
   align-items: center;
-  color: var(--sa-text-primary);
-  display: inline-flex;
-  font-family: var(--sa-ui-font-family);
-  font-size: var(--sa-ui-font-size);
-  font-weight: var(--sa-ui-font-weight);
-  gap: var(--sa-space-xs);
-  text-decoration: none;
-  white-space: nowrap;
+  block-size: 100%;
+  justify-content: space-between;
+  row-gap: 0;
 }
 
-[data-feat='action-widget'] a::before {
-  --sa-action-widget-bullet-size: 10px;
-  background: currentColor;
-  content: '';
-  flex: 0 0 auto;
-  height: var(--sa-action-widget-bullet-size);
-  mask: url('@front/ux/ui/icons/link-2.svg') center / contain no-repeat;
-  width: var(--sa-action-widget-bullet-size);
-}
-
-[data-feat='action-widget'] a:hover {
-  color: var(--sa-color-primary);
-  text-decoration: underline dotted 1px var(--sa-text-secondary);
-  text-underline-offset: 3px;
+@container action-widget (min-height: 64px) {
+  [data-feat='action-widget'] [data-ui='layout'] {
+    justify-content: flex-end;
+  }
 }

@@ -17,7 +17,7 @@ Dashboard  Shared shell dashboard component.
 import type { DashboardStoreWidget } from '@front/ux/stores/dashboard-state.ts'
 import { UiCard, type UiComponent, UiFooter } from '@front/ux/ui'
 import type { WidgetComponent } from '@front/ux/widgets/widget.tsx'
-import { For, Show } from '@solid-js'
+import { For, onCleanup, onMount, Show } from '@solid-js'
 import { useDashboard } from './dashboard-provider.tsx'
 
 import './dashboard.css'
@@ -30,25 +30,82 @@ export const Dashboard = (): UiComponent => {
   const dashboard = dashboardContext.state.store
   const widgets = dashboardContext.widgets
   const bodyWidgets = () => dashboard.rows.flatMap(row => row.widgets)
+  const headerIdentity = () => dashboard.header.widgets[0]
+  const headerFields = () => dashboard.header.widgets.slice(1, -1)
+  const headerTerminal = () => {
+    const headerWidgets = dashboard.header.widgets
+    return headerWidgets.length > 1 ? headerWidgets[headerWidgets.length - 1] : undefined
+  }
+  let headerContents: HTMLDivElement | undefined
+  let terminalField: HTMLDivElement | undefined
+
+  onMount(() => {
+    if (!headerContents || !terminalField) return
+    let inlineSize = -1
+    const updateHeaderContext = () => {
+      if (!headerContents || !terminalField) return
+      headerContents.dataset.featContext = 'normal'
+      const identity = headerContents.querySelector<HTMLElement>(
+        '[data-feat=\'dashboard-header-identity\']'
+      )
+      if (!identity) return
+      headerContents.dataset.featContext = terminalField.offsetTop > identity.offsetTop
+        ? 'wrapped'
+        : 'normal'
+    }
+    const observer = new ResizeObserver(entries => {
+      const nextInlineSize = entries[0]?.contentRect.width ?? 0
+      if (nextInlineSize === inlineSize) return
+      inlineSize = nextInlineSize
+      updateHeaderContext()
+    })
+
+    observer.observe(headerContents)
+    updateHeaderContext()
+    onCleanup(() => observer.disconnect())
+  })
 
   return (
     <section data-feat='dashboard' data-feat-layout={dashboard.settings.layout}>
       <header data-feat='dashboard-header'>
-        <div data-feat='dashboard-header-contents'>
-          <div data-feat='dashboard-header-brand'>
-            <img
-              data-feat='dashboard-header-logo'
-              src={headerLogo}
-              alt='swarmAg'
-              width={64}
-              height={64}
-            />
+        <div
+          data-feat='dashboard-header-contents'
+          data-feat-context='normal'
+          ref={element => {
+            headerContents = element
+          }}
+        >
+          <div data-feat='dashboard-header-identity'>
+            <div data-feat='dashboard-header-logo-field'>
+              <img
+                data-feat='dashboard-header-logo'
+                src={headerLogo}
+                alt='swarmAg'
+                width={64}
+                height={64}
+              />
+            </div>
+            <div data-feat='dashboard-header-brand-field'>
+              <Show when={headerIdentity()}>
+                {widget => <DashboardWidgetContent widget={widget()} />}
+              </Show>
+            </div>
           </div>
-          <div data-feat='dashboard-header-widgets'>
-            <For each={dashboard.header.widgets}>
-              {widget => <DashboardWidget widget={widget} />}
-            </For>
-          </div>
+          <For each={headerFields()}>
+            {widget => <DashboardWidgetContent widget={widget} />}
+          </For>
+          <Show when={headerTerminal()}>
+            {widget => (
+              <div
+                data-feat='dashboard-header-terminal-field'
+                ref={element => {
+                  terminalField = element
+                }}
+              >
+                <DashboardWidgetContent widget={widget()} />
+              </div>
+            )}
+          </Show>
         </div>
       </header>
 
@@ -81,7 +138,6 @@ export const Dashboard = (): UiComponent => {
   )
 
   function DashboardWidget(props: { widget: DashboardStoreWidget }): UiComponent {
-    const Widget = widgets[props.widget.type] as WidgetComponent | undefined
     return (
       <div
         data-feat='dashboard-widget'
@@ -89,14 +145,21 @@ export const Dashboard = (): UiComponent => {
         data-feat-shape={props.widget.settings.shape}
       >
         <UiCard>
-          <Show when={Widget} fallback={<MissingWidget type={props.widget.type} />}>
-            {component => {
-              const Component = component()
-              return <Component settings={props.widget.settings} />
-            }}
-          </Show>
+          <DashboardWidgetContent widget={props.widget} />
         </UiCard>
       </div>
+    )
+  }
+
+  function DashboardWidgetContent(props: { widget: DashboardStoreWidget }): UiComponent {
+    const Widget = widgets[props.widget.type] as WidgetComponent | undefined
+    return (
+      <Show when={Widget} fallback={<MissingWidget type={props.widget.type} />}>
+        {component => {
+          const Component = component()
+          return <Component settings={props.widget.settings} />
+        }}
+      </Show>
     )
   }
 }

@@ -14,9 +14,9 @@ ActionWidget  Dashboard header action widget.
 */
 
 import type { Dictionary } from '@core/std'
-import type { UiComponent } from '@front/ux/ui'
+import { UiActionButton, type UiActionButtonIcon, type UiComponent, UiLayout } from '@front/ux/ui'
 import { For } from '@solid-js'
-import { Link } from '@tanstack/solid-router'
+import { useNavigate } from '@tanstack/solid-router'
 
 import './action-widget.css'
 
@@ -27,6 +27,7 @@ export type ActionWidgetProps = {
 
 /** Dashboard header action widget. */
 export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
+  const navigate = useNavigate()
   const actions = (): string[] => toStringArray(props.settings['actions'])
   const labels = (): string[] => toStringArray(props.settings['labels'])
   const pairs = () =>
@@ -37,11 +38,26 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
 
   return (
     <nav data-feat='action-widget'>
-      <For each={pairs()}>
-        {pair => <Link to={pair.action}>{pair.label}</Link>}
-      </For>
+      <UiLayout variant='cluster'>
+        <For each={pairs()}>
+          {pair => (
+            <UiActionButton
+              icon={actionIcon(pair.action)}
+              label={pair.label}
+              labelMode='visible'
+              onClick={() => void navigate({ to: pair.action })}
+            />
+          )}
+        </For>
+      </UiLayout>
     </nav>
   )
+}
+
+const actionIcon = (action: string): UiActionButtonIcon => {
+  if (action === '/logout') return 'eject'
+  if (action === '/users') return 'edit'
+  return 'check'
 }
 
 const toStringArray = (value: unknown): string[] =>
