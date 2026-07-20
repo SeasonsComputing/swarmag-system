@@ -10,11 +10,11 @@ Defines customer aggregates with site structures and user contact relationships.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CustomerSite                Serviceable customer location abstraction.
-CustomerContact             Junction between customer accounts and users.
-CUSTOMER_STATUSES           Allowed customer status values.
-CustomerStatus              Customer status derived from CUSTOMER_STATUSES.
-Customer                    Customer account aggregate abstraction.
+CustomerSite       Serviceable customer location abstraction.
+CustomerContact    Junction between customer accounts and users.
+CUSTOMER_STATUSES  Allowed customer status values.
+CustomerStatus     Customer status derived from CUSTOMER_STATUSES.
+Customer           Customer account aggregate abstraction.
 */
 
 import type {
