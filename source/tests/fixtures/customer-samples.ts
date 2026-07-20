@@ -22,6 +22,15 @@ const headquartersLocation: Location = {
   description: 'Corporate HQ and main equipment depot'
 }
 
+const southFortyLocation: Location = {
+  line1: '4400 County Road 2100',
+  city: 'Slaton',
+  state: 'TX',
+  postalCode: '79364',
+  country: 'US',
+  description: 'Leased pasture pending onsite GPS capture'
+}
+
 export const blueMesaRanchCustomer: Customer = {
   id: customerId,
   name: 'Blue Mesa Ranch Co.',
@@ -38,6 +47,11 @@ export const blueMesaRanchCustomer: Customer = {
     label: 'North Pasture HQ',
     location: [headquartersLocation],
     acreage: 2400,
+    notes: []
+  }, {
+    customerId,
+    label: 'South Forty',
+    location: [southFortyLocation],
     notes: []
   }],
   notes: [],

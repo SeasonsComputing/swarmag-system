@@ -12,17 +12,23 @@ results reported. Delegation per budget discipline (haiku, git read-only).
 
 - [x] D14 (Lead parking-lotted) — CA executive decision 2026-07-19
 - [x] D15 (COW direct-genesis entry) — CA ratified 2026-07-19
-- [ ] D1–D13, D16 ratified by CA
+- [x] D1–D13, D16 ratified by CA 2026-07-20
 - [ ] Group-by-group production go orders
 
-## Group A0 — Location Relaxation (Foundation, small)
+## Group A0 — Location Relaxation (Foundation, small) — COMPLETE 2026-07-20
 
-- [ ] `common.ts`: `Location.latitude`/`longitude` become optional
-- [ ] `isLocation`: valid with EITHER coordinate substance (lat+lon
-      together) OR address substance (line1 + city minimum)
-- [ ] Ripple audit: every `Location` consumer (assessment locations,
-      adapters, fixtures, tests) — verify none assume coordinates
-- [ ] Fixture + validator tests updated; full check suite green
+- [x] `common.ts`: `Location.latitude`/`longitude` become optional
+- [x] `isLocation`: valid with EITHER coordinate substance (lat+lon
+      together) OR address substance (line1 + city minimum); a present
+      coordinate must be numeric and paired (half/mistyped = invalid)
+- [x] Ripple audit: every `Location` consumer (assessment locations,
+      adapters, fixtures, tests) — verify none assume coordinates.
+      Result clean: customer/job validators delegate to `isLocation`;
+      `common-adapter` maps field names only; no front/back/schema reach
+      (subordinate composition — JSONB, no columns)
+- [x] Fixture (address-only South Forty site) + direct `isLocation` tests
+      added (9 cases); checks + tests green (pre-existing users-api env
+      failure unrelated, fails identically on clean HEAD)
 
 ## Group A — Wizard Framework (Foundation)
 

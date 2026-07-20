@@ -12,7 +12,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 LOCATION_FIELDS         Canonical field keys for Location.
 LocationField           Location field derived from LOCATION_FIELDS.
-Location                Geographic position plus optional address metadata.
+Location                Place with coordinate and/or address substance.
 ATTACHMENT_KINDS        Allowed attachment kind values.
 AttachmentKind          Attachment kind derived from ATTACHMENT_KINDS.
 Attachment              Uploaded artifact metadata.
@@ -36,10 +36,10 @@ Answer                  Captured response to a question.
 
 import type { AssociationOne, CompositionMany, CompositionPositive, Instantiable, When } from '@core/std'
 
-/** Geographic position plus optional address metadata. */
+/** Place carrying coordinate substance (latitude+longitude) or address substance (line1+city), or both; a present coordinate must be paired. */
 export type Location = {
-  latitude: number
-  longitude: number
+  latitude?: number
+  longitude?: number
   altitudeMeters?: number
   line1?: string
   line2?: string

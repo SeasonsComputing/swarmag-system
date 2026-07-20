@@ -94,7 +94,7 @@ Source: `@domain/abstractions/common.ts`
 
 ### 4.1 Location
 
-Purpose: **Geographic position plus optional address metadata**
+Purpose: **Place carrying coordinate substance (latitude+longitude) or address substance (line1+city), or both; a present coordinate must be paired**
 
 Type: **object**
 
@@ -102,8 +102,8 @@ Attributes: **State**
 
 | **Attribute**     | **Type** |
 | ----------------- | -------- |
-| `latitude`        | number   |
-| `longitude`       | number   |
+| `latitude?`       | number   |
+| `longitude?`      | number   |
 | `altitudeMeters?` | number   |
 | `line1?`          | string   |
 | `line2?`          | string   |
