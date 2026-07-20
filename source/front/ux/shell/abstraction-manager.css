@@ -206,3 +206,20 @@
     display: block;
   }
 }
+
+@media (max-width: 480px) {
+  [data-feat='abstraction-manager'] {
+    block-size: 100dvh;
+    max-block-size: none;
+  }
+
+  [data-feat='abstraction-manager-title-row'] {
+    padding-block-start: var(--sa-rhythm-pad);
+    padding-inline: var(--sa-rhythm-pad);
+  }
+
+  [data-feat='abstraction-manager-list'] > [data-ui='card'],
+  [data-feat='abstraction-manager-panel'] > [data-ui='card'] {
+    border-radius: 0;
+  }
+}

@@ -34,17 +34,17 @@
 }
 
 [data-feat='users-page'] [data-ui='table-cell']:nth-child(2) {
-  width: 8%;
+  width: calc(var(--sa-touch-target-sm) + var(--sa-space-sm));
 }
 
-/* 3 action buttons, each with an inline-start rhythm margin, plus cell
-   padding — the margin and the width MUST share the same token. */
+/* 3 action buttons, 2 inter-button rhythm gaps, plus cell padding — the gaps
+   and the width MUST share the same token. */
 [data-feat='users-page'] [data-ui='table-cell']:last-child {
   white-space: nowrap;
   width: calc(
-    (var(--sa-touch-target-sm) - var(--sa-space-sm)) * 3 + var(--sa-rhythm-gap-tight) * 3 +
-      var(--sa-space-xs) +
-      var(--sa-space-sm)
+    (var(--sa-touch-target-sm) - var(--sa-space-sm)) * 3 + var(--sa-rhythm-gap-tight) * 2 +
+      var(--sa-space-sm) * 2 +
+      var(--sa-space-xs)
   );
 }
 
@@ -54,7 +54,7 @@
   vertical-align: middle;
 }
 
-[data-feat='users-page'] table [data-ui='action-button'] {
+[data-feat='users-page'] table [data-ui='action-button'] + [data-ui='action-button'] {
   margin-inline-start: var(--sa-rhythm-gap-tight);
 }
 
