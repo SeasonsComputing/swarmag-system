@@ -2,18 +2,37 @@
 
 # swarmAg Operations System – User Stories
 
-## 1 Customer Relationship Management
+## 1. Customer Relationship Management
 
 ### 1.1 Customer Prospect
 
-1. **Inbound inquiry** — A call or email arrives at the company from a new prospect; capture person details and service interest.
-2. **Sales follow-up** — Sales rep responds to qualify needs, timeline, and service category (aerial vs. ground).
-3. **Customer creation** — Create a new customer record with:
-   - Name and primary account details.
-   - Address (billing/mailing).
-   - Locations/sites to service (each with label, coordinates/address, acreage/notes).
-4. **Primary contact assignment** — Select or create the User who will be the Customer primary contact.
-5. **Additional contact assignment** — Add any additional customer contact Users as account relationships.
+1. **Lead intake** — Leads arrive via voicemail, text, or email. A sales
+   rep checks the three inboxes several times daily and transforms leads
+   with substance into prospects. (Manual and managed for now; a tracked
+   `Lead` abstraction with automation and measurement is parking-lotted.)
+2. **Prospect genesis** — The rep runs the onboarding wizard from the lead
+   artifact, before any live conversation:
+   - Primary contact — select or create the User who will be the Customer
+     primary contact.
+   - Customer record — name, primary account details, address
+     (billing/mailing), status `prospect`.
+   - Locations/sites to service (each with label, coordinates/address,
+     acreage/notes) — as known; zero sites is legal at genesis.
+3. **Return call** — Outbound call to the prospect: verify captured
+   details, select potential services, draft scope of effort (acreage,
+   ...), and schedule the onsite assessment. (This is the assessment
+   flow's entry — see 2.1.)
+4. **Additional contact assignment** — Add any additional customer contact Users as account relationships.
+
+### 1.2 Prospect Pipeline Visibility _(future feature — stub)_
+
+1. **Prospects widget** — An admin dashboard widget listing current
+   prospects with time-since-creation, so aging leads surface before they
+   go cold.
+2. **Aging charts** — Time-since-creation distribution charts (the charts
+   archetype's likely first consumer). Buildable against the current
+   domain (`Customer.status = 'prospect'` + `createdAt`); enriched later
+   by the parked `Lead` abstraction's conversion metrics.
 
 ## 2. Job Definition
 
@@ -58,7 +77,7 @@
 1.
 2.
 
-### 2.7 Job Followup
+### 2.9 Job Followup
 
 1.
 2.
@@ -75,43 +94,43 @@
 1.
 2.
 
-## 7. Chemical Maintenance
+## 4. Chemical Maintenance
 
 1.
 2.
 
-## 8. Workflow Development
+## 5. Workflow Development
 
 1.
 2.
 
-## 9. User Management
+## 6. User Management _(complete — User Manager shipped, Phase 1)_
 
-### 9.1 View Users
+### 6.1 View Users
 
 1. Admin opens the Users page and sees a list of all active users.
 2. Admin scans the list to find a user by name, email, role, or status.
 
-### 9.2 Edit User
+### 6.2 Edit User
 
 1. Admin selects a user to review or update their details.
 2. Admin updates the user's name, phone number, preferred channel, notes, or role assignments.
 3. Admin saves the changes.
 
-### 9.3 Deactivate / Activate User
+### 6.3 Deactivate / Activate User
 
 1. Admin deactivates a user who no longer requires system access — the user cannot log in.
 2. Admin reactivates a previously deactivated user to restore their access.
 
-### 9.4 Remove User
+### 6.4 Remove User
 
 1. Admin removes a user who has permanently left — the user no longer appears in the system.
 
-### 9.5 Create User
+### 6.5 Create User
 
 1. Admin creates a new user by providing their name, email, phone, preferred channel, notes, and role.
 
-### 9.6 Eject User
+### 6.6 Eject User
 
 1. Admin ejects a user who is no longer authorized to access the system.
 
