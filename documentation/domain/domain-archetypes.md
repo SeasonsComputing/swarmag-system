@@ -520,6 +520,8 @@ export const isSelectOption = (v: unknown): v is SelectOption => {
 }
 ```
 
+Where the data dictionary declares a substance rule — validity requiring one of several named field groups rather than any single field — the guard expresses it as named boolean predicates over the cast value with a single disjunctive return (`isLocation` is canonical). Per-field shape checks still precede the substance evaluation.
+
 Validators that compose object types from another topic import the typed guard — they do not define their own:
 
 ```typescript

@@ -1,7 +1,7 @@
 /**
  * Unit tests for validator guard null/undefined semantics: optional fields
  * admit undefined (absent) and null (clear marker); required fields reject
- * both.
+ * both. Also covers domain guards with substance rules (isLocation).
  */
 
 import {
@@ -13,6 +13,7 @@ import {
   toEmail,
   toTrimmed
 } from '@core/std'
+import { isLocation } from '@domain/validators/common-validator.ts'
 import { assertEquals, assertNotEquals } from '@std/assert'
 
 Deno.test('optional fields admit undefined and null', () => {
@@ -82,4 +83,68 @@ Deno.test('toEmail trims and lowercases', () => {
 
 Deno.test('toEmail preserves plus-addressing', () => {
   assertEquals(toEmail('A+Tag@X.com'), 'a+tag@x.com')
+})
+
+Deno.test('isLocation accepts coordinate substance alone', () => {
+  assertEquals(isLocation({ latitude: 31.9686, longitude: -99.9018 }), true)
+})
+
+Deno.test('isLocation accepts address substance alone', () => {
+  assertEquals(isLocation({ line1: '1200 AgriTech Way', city: 'Lubbock' }), true)
+})
+
+Deno.test('isLocation accepts both substances together', () => {
+  assertEquals(
+    isLocation({
+      latitude: 33.5779,
+      longitude: -101.8552,
+      line1: '1200 AgriTech Way',
+      city: 'Lubbock',
+      state: 'TX',
+      postalCode: '79401',
+      country: 'US'
+    }),
+    true
+  )
+})
+
+Deno.test('isLocation rejects absence of both substances', () => {
+  assertEquals(isLocation({}), false)
+  assertEquals(isLocation({ description: 'somewhere out west' }), false)
+})
+
+Deno.test('isLocation rejects a half coordinate even with address substance', () => {
+  assertEquals(isLocation({ latitude: 31.9686 }), false)
+  assertEquals(isLocation({ longitude: -99.9018 }), false)
+  assertEquals(isLocation({ latitude: 31.9686, line1: '1200 AgriTech Way', city: 'Lubbock' }), false)
+})
+
+Deno.test('isLocation rejects partial address substance', () => {
+  assertEquals(isLocation({ city: 'Lubbock' }), false)
+  assertEquals(isLocation({ line1: '1200 AgriTech Way' }), false)
+})
+
+Deno.test('isLocation rejects empty-string address fields', () => {
+  assertEquals(isLocation({ line1: '', city: 'Lubbock' }), false)
+  assertEquals(isLocation({ latitude: 31.9686, longitude: -99.9018, line1: '' }), false)
+})
+
+Deno.test('isLocation rejects mistyped coordinates', () => {
+  assertEquals(isLocation({ latitude: '31.9686', longitude: -99.9018 }), false)
+  assertEquals(
+    isLocation({
+      latitude: '31.9686',
+      longitude: '-99.9018',
+      line1: '1200 AgriTech Way',
+      city: 'Lubbock'
+    }),
+    false
+  )
+})
+
+Deno.test('isLocation rejects non-objects', () => {
+  assertEquals(isLocation(null), false)
+  assertEquals(isLocation(undefined), false)
+  assertEquals(isLocation(42), false)
+  assertEquals(isLocation('Lubbock'), false)
 })

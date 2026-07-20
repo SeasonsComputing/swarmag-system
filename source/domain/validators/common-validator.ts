@@ -93,19 +93,25 @@ export const validateQuestionUpdate = (input: QuestionUpdate): ExpectResult => {
   }
 }
 
-/** Guard for Location values. */
+/** Guard for Location values: coordinate substance (latitude+longitude) or address substance (line1+city). */
 export const isLocation = (v: unknown): v is Location => {
   if (v === null || typeof v !== 'object') return false
   const location = v as Location
-  return expectValid(
-        expectNonEmptyString(location.line1, 'line1', true),
-        expectNonEmptyString(location.line2, 'line2', true),
-        expectNonEmptyString(location.city, 'city', true),
-        expectNonEmptyString(location.state, 'state', true),
-        expectNonEmptyString(location.postalCode, 'postalCode', true),
-        expectNonEmptyString(location.country, 'country', true),
-        expectWhen(location.recordedAt, 'recordedAt', true)
-      ) === null && typeof location.latitude === 'number' && typeof location.longitude === 'number'
+  if (
+    expectValid(
+      expectNonEmptyString(location.line1, 'line1', true),
+      expectNonEmptyString(location.line2, 'line2', true),
+      expectNonEmptyString(location.city, 'city', true),
+      expectNonEmptyString(location.state, 'state', true),
+      expectNonEmptyString(location.postalCode, 'postalCode', true),
+      expectNonEmptyString(location.country, 'country', true),
+      expectWhen(location.recordedAt, 'recordedAt', true)
+    ) !== null
+  ) return false
+  const hasCoordinates = typeof location.latitude === 'number' && typeof location.longitude === 'number'
+  const coordinatesAbsent = location.latitude == null && location.longitude == null
+  const hasAddress = isNonEmptyString(location.line1) && isNonEmptyString(location.city)
+  return hasCoordinates || (coordinatesAbsent && hasAddress)
 }
 
 /** Guard for Attachment values. */
