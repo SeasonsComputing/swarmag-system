@@ -119,7 +119,7 @@ CA rulings after hands-on review of the completed Phase 1 build:
       (`--sa-size-xs: 425px` is a layout width token, untouched)
 - [x] Narrow-screen manager model: CA judged the existing list/editor
       collapse correct; transition animation parked in
-      `swarmag-feature-parking-lot.md`
+      `project-feature-parking-lot.md`
 - [ ] CA hands-on pass of Enter-advance feel
 
 ## Addendum 2 — CA Review Refinements, Round 2 (same day)

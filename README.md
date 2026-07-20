@@ -35,13 +35,13 @@ Primary architectural context lives in `documentation/architecture/architecture-
 |              | `ux-components-guide.md`      | Full UX component guide and usage contracts               |
 |              | `ux-components-guide-lite.md` | Lightweight UX component reference                        |
 |              | `ux-components-internals.md`  | UX component implementation internals                     |
-|              | `user-stories.md`             | Cross-application user stories and scenario narratives    |
-| Agent        | `genesis-domain-sdk.md`       | Prompt contract for domain sdk genesis                    |
+| Genesis      | `genesis-domain-sdk.md`       | Prompt contract for domain sdk genesis                    |
 |              | `genesis-ux-scaffold.md`      | Prompt contract for UX applications scaffolding           |
 |              | `genesis-ux-dashboard.md`     | Prompt contract for UX applications dashboard scaffolding |
 | Project      | `{yymmdd}-{topic}-design.md`  | Approved or proposed project design decisions             |
 |              | `{yymmdd}-{topic}-handoff.md` | Session transition notes and remaining work context       |
 |              | `{yymmdd}-{topic}-tasks.md`   | Project implementation checklist and verification status  |
+|              | `project-user-stories.md`     | Cross-application user stories and scenario narratives    |
 
 ### 1.3 Source Layers (`source/`)
 
