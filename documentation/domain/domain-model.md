@@ -172,9 +172,12 @@ In addition to the core abstractions, the domain includes supporting structures 
 | Planning      | Associations between plans and assigned users, assets, and chemicals                                                  |
 | Customers     | Sites composed into customer accounts; CustomerContact junctions relate accounts to Users                             |
 
-Customers represent accounts. People associated with customer accounts are Users. The relationship
-between a Customer and a User is expressed by CustomerContact; the primary customer contact is a
-required User association on Customer.
+Customers represent accounts. Every Customer carries a required primary contact — a Contact
+composition holding account reachability data (how to reach the party behind the account), not a
+person identity. Users with access to a customer account are relationships expressed by the
+CustomerContact junction, wired at activation when portal access is granted. The same human may
+appear as both the account's contact and a portal User; one is an account attribute, the other is
+an identity.
 
 These structures exist to model **relationships**, not to redefine the core abstractions themselves.
 

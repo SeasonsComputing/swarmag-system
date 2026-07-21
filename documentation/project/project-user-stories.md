@@ -12,8 +12,8 @@
    `Lead` abstraction with automation and measurement is parking-lotted.)
 2. **Prospect genesis** — The rep runs the onboarding wizard from the lead
    artifact, before any live conversation:
-   - Primary contact — select or create the User who will be the Customer
-     primary contact.
+   - Primary contact — capture account reachability (name, phone,
+     preferred channel, email if known); no User is created at genesis.
    - Customer record — name, primary account details, address
      (billing/mailing), status `prospect`.
    - Locations/sites to service (each with label, coordinates/address,

@@ -6,10 +6,12 @@
 */
 
 import { expectEmail, expectNonEmptyString, type Id, toEmail, toTrimmed } from '@core/std'
-import type { Note } from '@domain/abstractions/common.ts'
 import {
   CONTACT_PREFERRED_CHANNELS,
   type ContactPreferredChannel,
+  type Note
+} from '@domain/abstractions/common.ts'
+import {
   type User,
   USER_ROLES,
   USER_STATUSES,

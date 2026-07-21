@@ -51,20 +51,32 @@ results reported. Delegation per budget discipline (haiku, git read-only).
 
 ## Group A1 — Contact Composition (Foundation, D17, A0×2)
 
-- [ ] `common.ts`: `Contact` object (`displayName`, `phoneNumber`,
-      `preferredChannel`, `email?`); `CONTACT_PREFERRED_CHANNELS` +
-      `ContactPreferredChannel` migrate here from `user.ts` (common flows
-      outward); `user.ts` imports from common
-- [ ] `customer.ts`: `primaryContact: CompositionOne<Contact>` (required,
-      all statuses); `primaryContactId` dropped outright
-- [ ] `common-validator.ts`: `isContact` guard (§5.5 house form);
-      `customer-validator.ts` reworked (composition check in, FK check out)
-- [ ] `domain-data-dictionary.md`: `Contact` topic added with
-      regeneration-safe Purpose; `Customer` topic updated (the A0 lesson)
+- [x] `customer.ts`: `Contact` object (`displayName`, `phoneNumber`,
+      `preferredChannel`, `email?`) — customer topic per the consumer rule
+      (CA ruling; migrates to common at a second consumer);
+      `primaryContact: CompositionOne<Contact>` (required, all statuses);
+      `primaryContactId` dropped outright
+- [x] `common.ts`: `CONTACT_PREFERRED_CHANNELS` + `ContactPreferredChannel`
+      migrated here from `user.ts` (two consumers: User + Contact;
+      dependency direction forbids user→customer); `user.ts`,
+      `user-validator.ts`, `user-manager.tsx` import from common
+- [x] Adapters: `ContactAdapter` in `customer-adapter.ts` (§5.5 topic
+      locality); maps `primary_contact` composition; protocols derive
+      unchanged
+- [x] `customer-validator.ts`: `isContact` guard (§5.5 house form, email
+      shape-checked when present); create/update reworked (composition
+      check in, FK check out)
+- [x] Docs: `domain-data-dictionary.md` — `Contact` + channel enum topics
+      relocated to Common with regeneration-safe Purposes, `Customer`
+      topic updated; `domain-model.md` §Customers prose rewritten to D17;
+      `project-user-stories.md` 1.1 step 2 contact line corrected
+- [ ] **CA REVIEW GATE** — steps below run only on CA go
 - [ ] `schema.sql`: `customers` drops `primary_contact_id`, gains
       `primary_contact JSONB NOT NULL` + named check; genesis lint + apply
-- [ ] Fixtures + tests updated; ripple audit re-verified (2026-07-20 scan:
-      domain SDK + fixtures only, no front/back reach); full checks green
+      (local, then stage)
+- [x] Fixtures + tests updated (direct `isContact` cases added; 37/37
+      green); ripple audit re-verified (domain SDK + fixtures only, no
+      front/back reach); full checks green
 
 ## Group B0 — Customers API Surface (Foundation, discovered in planning)
 
