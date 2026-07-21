@@ -2,8 +2,8 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation (Exploration → this proposal; production on ratification)
-**Status:** PROPOSAL — D1–D15 below await CA ratification (D14 already
-ruled by CA executive decision). Supersedes the open
+**Status:** RATIFIED — D1–D16 ratified by CA 2026-07-20. D17 added and
+ratified 2026-07-20 (amends D2/D3/D9/D12/D14 — see D17). Supersedes the open
 questions in `2026-07-14-customer-onboarding-design.md` (the scaffold); its
 context sections remain valid with paths mapped to the post-migration tree.
 **Related:** `2026-07-18-foundation-game-plan-design.md` (Phase 3),
@@ -63,7 +63,7 @@ Generic-first is justified by the CA's foundation framing and the known
 second consumer family: the ops workflow runner (§11.7) is wizard-shaped;
 the contract must not preclude it, though ops work is out of scope.
 
-### D2 — Steps commit durable entities; no rollback
+### D2 — Steps commit durable entities; no rollback _(relaxed by D17)_
 
 Each step's product is an independently valid domain state: a User with no
 Customer is normal (User Manager makes them daily); a Customer with no Job
@@ -73,7 +73,7 @@ cancel); an abandoned wizard leaves valid entities, not corruption. No
 compensation machinery — answers scaffold Q3 by domain construction rather
 than infrastructure.
 
-### D3 — Step 1 is select-or-create
+### D3 — Step 1 is select-or-create _(superseded by D17)_
 
 The contact step offers "select existing User or create new." This makes
 re-entry trivial (resume = run the wizard again, select the User that
@@ -129,7 +129,7 @@ scheduling (story 2.1) out of this milestone, and the consumer evaporated.
 The consumer rule cuts both ways: they land with the assessment flow, not
 here.
 
-### D9 — Stage field coverage (from the §6 audit)
+### D9 — Stage field coverage (from the §6 audit) _(stage 1 reshaped by D17)_
 
 - **Stage 1 (contact)**: capture roles (≥1 — `CompositionPositive`),
   displayName, primaryEmail, phoneNumber, preferredChannel, status —
@@ -163,7 +163,7 @@ optional manual coordinates, plus a browser-geolocation fill button
 belongs to Phase 4's geo affordance. No datetime control this milestone
 (see D8).
 
-### D12 — Onboarding defaults
+### D12 — Onboarding defaults _(junction confirm-item dissolved by D17)_
 
 Ratify: Customer.status defaults to `'prospect'` (the wizard's very end
 state), User status `'active'`, contact's default role `['customer']`.
@@ -184,7 +184,7 @@ schema untouched (JSONB composite); GPS truth is filled onsite during
 assessment (story 2.2, the ops 📍 world). Ripple audit across existing
 Location consumers rides in the same production.
 
-### D14 — Pipeline vision ratified; Lead entity parking-lotted (CA executive)
+### D14 — Pipeline vision ratified; Lead entity parking-lotted (CA executive) _(accepted consequences retired by D17)_
 
 The pipeline: leads arrive (voicemail/text/email) → a rep transforms them
 into prospects (genesis — the wizard) → an outbound return call verifies
@@ -217,6 +217,59 @@ outline-preserving enrichment). Talk, design, document — lather, rinse,
 repeat. This milestone exercises the practice: story 1.1 gets enriched
 with the ratified wizard shape when this doc closes.
 
+### D17 — Contact re-alived as subordinate composition (CA-ratified 2026-07-20)
+
+Lived experience overruled the June collapse of person into identity — while
+every ruling in `2026-06-28-user-contact-customer-design.md` remains true.
+The resolution: `Contact` returns as a **subordinate composition** (object
+type, `common.ts`, beside `Location` and `Note`), not as an entity. A contact
+is account data — "how to reach this account" — not person identity: it makes
+no identity claims, anchors no access, and needs no auth. Fields:
+`displayName`, `phoneNumber`, `preferredChannel`, `email?`.
+`CONTACT_PREFERRED_CHANNELS`/`ContactPreferredChannel` migrate from `user.ts`
+home to `common.ts` (dependency direction: common flows outward).
+
+The June FK (`Customer.primaryContactId: AssociationOne<User>`) did two jobs;
+they split and each lands where it belongs:
+
+- **Reachability** → `Customer.primaryContact: CompositionOne<Contact>`,
+  required for ALL statuses. The June §2.6 structural guarantee survives and
+  extends to prospects — every Customer is contactable from birth.
+- **Portal access** → the existing `CustomerContact` junction, wired at
+  activation (story 2.x) when access is actually granted. The FK is dropped
+  outright; keeping a redundant binding is how the June defect started.
+
+Where the same human is both account contact and portal User, their name
+appears in both the composition and their User row, and that's fine: one is
+an account attribute, the other is an identity — same as a Customer's billing
+address coinciding with someone's home address. Duplication is only a defect
+when two structures claim authority over the same concern; the June defect
+was structural (Contact-as-access-mechanism with `isPrimary` flags), this is
+incidental coincidence between different concerns.
+
+Amendments to earlier decisions:
+
+- **D3 superseded** — stage 1 is pure contact capture; no users search, no
+  select-or-create, no User creation at genesis.
+- **D2 relaxed** — stages that commit, commit durably; a stage whose product
+  is subordinate data is gate-and-carry: `commit?` becomes optional in
+  `WizardContract` (the ops runner's one-question-per-screen stages want
+  gate-only stages anyway).
+- **D9 stage 1** — field set becomes the Contact fields.
+- **D12** — the `CustomerContact` junction confirm-item dissolves: junction
+  rows are an activation concern, not a genesis concern. Defaults otherwise
+  stand as ratified.
+- **D14** — the accepted consequences (required email, auth identities at
+  genesis) retire now rather than when Lead lands. When Lead lands it
+  composes this same `Contact` object — the pipeline shapes converge.
+
+Schema: `customers` drops `primary_contact_id`, gains
+`primary_contact JSONB NOT NULL` with named check. Ripple audit (run
+2026-07-20): `primaryContactId` consumers are domain SDK + fixtures only —
+no front/back reach (B0 not yet built). Cost class A0×2; User, auth-sync,
+User Manager, and edge functions untouched. Production: **Group A1**,
+sequenced between A and B0.
+
 ## 4. Explicitly Out of Scope
 
 Attachments, buckets, the affordance row (Phase 4); ops workflow runner
@@ -225,7 +278,9 @@ app-customer/app-ops; **assessment scheduling (story 2.1)** — Service SKU
 selection and workflow seeding make it its own flow, arriving as the
 wizard framework's second consumer with its own domain audit
 (Service/Workflow reaches). `UiDatetime` + `isDate`/`isTime` arrive with
-it.
+it. **Promotion/activation flow** (minting a User from a Customer's contact,
+wiring `CustomerContact` junction rows, portal access grant) — an activation
+concern arriving with story 2.x (see D17).
 
 ## 5. Production Sequencing (on ratification; order per CA 2026-07-19)
 
@@ -233,6 +288,10 @@ it.
   ripple audit (Foundation, small)
 - **A** — Wizard framework: contract + host + chrome, incl. any
   manager-aspect extraction demonstrated by overlap (Foundation)
+- **A1** — Contact composition (D17): `Contact` object + channel enum
+  migration to `common.ts`, `Customer.primaryContact` composition replacing
+  the dropped FK, validators, dictionary, schema genesis, fixtures
+  (Foundation, A0×2)
 - **B0** — Customers API surface (Foundation; discovered in planning —
   `@front/api` composes no Customers today): maker + `api.Customers` +
   dual-storage + live RLS verification
