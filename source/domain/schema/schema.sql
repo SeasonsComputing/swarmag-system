@@ -186,7 +186,7 @@ CREATE INDEX chemicals_deleted_at_idx ON chemicals (deleted_at);
 CREATE TABLE customers (
   id UUID PRIMARY KEY,
   account_manager_id UUID REFERENCES users(id) ON DELETE RESTRICT,
-  primary_contact_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
+  primary_contact JSONB NOT NULL DEFAULT '[]'::jsonb,
   sites JSONB NOT NULL DEFAULT '[]'::jsonb,
   notes JSONB NOT NULL DEFAULT '[]'::jsonb,
   name TEXT NOT NULL,
@@ -201,6 +201,8 @@ CREATE TABLE customers (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ,
   CONSTRAINT customers_status_check CHECK (status IN ('active', 'inactive', 'prospect')),
+  CONSTRAINT customers_primary_contact_array_check CHECK (jsonb_typeof(primary_contact) = 'array'),
+  CONSTRAINT customers_primary_contact_one_check CHECK (jsonb_array_length(primary_contact) = 1),
   CONSTRAINT customers_sites_array_check CHECK (jsonb_typeof(sites) = 'array'),
   CONSTRAINT customers_notes_array_check CHECK (jsonb_typeof(notes) = 'array')
 );
@@ -220,8 +222,6 @@ CREATE POLICY "customers_delete_all" ON customers
   FOR DELETE USING (deleted_at IS NULL);
 
 CREATE INDEX customers_account_manager_id_idx ON customers (account_manager_id);
-
-CREATE INDEX customers_primary_contact_id_idx ON customers (primary_contact_id);
 
 CREATE INDEX customers_deleted_at_idx ON customers (deleted_at);
 
