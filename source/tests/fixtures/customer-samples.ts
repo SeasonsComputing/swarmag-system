@@ -71,4 +71,4 @@ export const blueMesaRanchContact: CustomerUser = {
 }
 
 export const customerSamples = [blueMesaRanchCustomer]
-export const CustomerUserSamples = [blueMesaRanchContact]
+export const customerUserSamples = [blueMesaRanchContact]
