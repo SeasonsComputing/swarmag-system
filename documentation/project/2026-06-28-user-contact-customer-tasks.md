@@ -14,7 +14,7 @@ domain documentation.
 - [x] Update `documentation/domain/domain-model.md`
   - [x] Update User semantics for customer access, preferred channel, and notes.
   - [x] Update Customer semantics from embedded contacts to primary contact FK.
-  - [x] Replace Contact with CustomerContact as a pure-key Junction.
+  - [x] Replace Contact with CustomerUser as a pure-key Junction.
 - [x] Update `documentation/architecture/architecture-back.md`
   - [x] Add Auth / Domain User Boundary section.
   - [x] State that there is one domain `User`.
@@ -33,7 +33,7 @@ domain documentation.
   - [x] Document that the shared UUID is application-supplied UUID v7.
   - [x] Remove Contact from Customers.
   - [x] Add `Customer.primaryContactId`.
-  - [x] Add `CustomerContact` Junction.
+  - [x] Add `CustomerUser` Junction.
   - [x] Split crew assignment roles from `UserRole`.
 - [x] Update `documentation/project/project-user-stories.md`
   - [x] Replace embedded contact capture wording.
@@ -58,7 +58,7 @@ domain documentation.
   - [x] Remove `Contact`.
   - [x] Remove `Customer.contacts`.
   - [x] Add `Customer.primaryContactId: AssociationOne<User>`.
-  - [x] Add `CustomerContact` as pure-key Junction.
+  - [x] Add `CustomerUser` as pure-key Junction.
   - [x] Update file header and PUBLIC list.
 - [x] Update job assignment role modeling
   - [x] Update `JobPlanAssignmentRole` const-enum for planned job crew functions.
@@ -67,8 +67,8 @@ domain documentation.
   - [x] Update `source/domain/validators/job-validator.ts` to validate against `JobPlanAssignmentRole`.
   - [x] Update `job_plan_assignments.role` schema CHECK to use crew assignment values.
 - [x] Update `source/domain/protocols/customer-protocol.ts`
-  - [x] Add `CustomerContactCreate`.
-  - [x] Do not add update protocol for pure-key CustomerContact.
+  - [x] Add `CustomerUserCreate`.
+  - [x] Do not add update protocol for pure-key CustomerUser.
   - [x] Update file header and PUBLIC list.
 - [x] Review `source/domain/protocols/user-protocol.ts`
   - [x] Confirm derived `UserCreate` and `UserUpdate` compile with new User shape.
@@ -82,7 +82,7 @@ domain documentation.
   - [x] Remove `isContact`.
   - [x] Remove contact validation.
   - [x] Validate `primaryContactId`.
-  - [x] Add `validateCustomerContactCreate`.
+  - [x] Add `validateCustomerUserCreate`.
   - [x] Update file header and PUBLIC list.
 - [x] Update `source/domain/adapters/user-adapter.ts`
   - [x] Map `preferredChannel` to `preferred_channel`.
@@ -91,7 +91,7 @@ domain documentation.
   - [x] Remove `ContactAdapter`.
   - [x] Remove `contacts` mapping.
   - [x] Map `primaryContactId` to `primary_contact_id`.
-  - [x] Add `CustomerContactAdapter`.
+  - [x] Add `CustomerUserAdapter`.
   - [x] Update file header and PUBLIC list.
 - [x] Update `source/domain/schema/schema.sql`
   - [x] Add `users.preferred_channel`.
@@ -112,7 +112,7 @@ domain documentation.
   - [x] Ensure the same UUID is used for both `auth.users.id` and `public.users.id`.
   - [x] Ensure any RDBMS trigger or RPC path receives the application-supplied UUID, not a database-generated UUID.
   - [x] Keep schema aligned with the invariant that the database does not generate domain IDs.
-- [x] Decide API/client posture for `CustomerContact`
+- [x] Decide API/client posture for `CustomerUser`
   - [x] Domain abstractions, protocols, validators, adapters, schema, and archetypes exist in this milestone.
   - [x] API/client exposure is deferred to Customer Onboarding.
 
@@ -166,13 +166,13 @@ domain documentation.
 - [x] Update `source/tests/fixtures/customer-samples.ts`
   - [x] Remove embedded contact sample data.
   - [x] Add `primaryContactId`.
-  - [x] Add CustomerContact sample data for junction fixture coverage.
+  - [x] Add CustomerUser sample data for junction fixture coverage.
 - [x] Update `source/tests/fixtures/samples.ts`
-  - [x] Confirm wildcard exports already expose CustomerContact samples.
+  - [x] Confirm wildcard exports already expose CustomerUser samples.
 - [x] Update `source/tests/fixtures/fixtures-test.ts`
   - [x] Remove embedded contact assertions.
   - [x] Assert `primaryContactId` is a valid Id.
-  - [x] Assert CustomerContact linkage without encoding the open primary-contact membership decision.
+  - [x] Assert CustomerUser linkage without encoding the open primary-contact membership decision.
 - [x] Update `source/tests/cases/users-api-test.ts`
   - [x] Add `preferredChannel` to `UserCreate`.
   - [x] Add `notes` to `UserCreate`.
@@ -180,7 +180,7 @@ domain documentation.
 - [ ] Add or update adapter round-trip coverage as needed
   - [ ] User new fields.
   - [ ] Customer `primaryContactId`.
-  - [ ] CustomerContact adapter if included.
+  - [ ] CustomerUser adapter if included.
 - [ ] Add role guard coverage if available
   - [ ] User accepts `'customer'`.
   - [ ] JobPlanAssignment accepts valid crew assignment roles.
@@ -262,5 +262,5 @@ domain documentation.
 ## 7. Open Decisions
 
 - [ ] Confirm whether `Customer.primaryContactId` must also have a matching row in `customer_contacts`.
-- [x] Confirm whether `CustomerContact` needs an API client in this milestone.
+- [x] Confirm whether `CustomerUser` needs an API client in this milestone.
   - Deferred to Customer Onboarding.

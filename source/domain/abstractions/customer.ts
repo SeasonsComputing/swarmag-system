@@ -12,7 +12,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Contact            Account reachability data, not a person identity.
 CustomerSite       Serviceable customer location abstraction.
-CustomerContact    Junction between customer accounts and users.
+CustomerUser       Junction between customer accounts and users.
 CUSTOMER_STATUSES  Allowed customer status values.
 CustomerStatus     Customer status derived from CUSTOMER_STATUSES.
 Customer           Customer account aggregate abstraction.
@@ -47,7 +47,7 @@ export type CustomerSite = {
 }
 
 /** Junction between customer accounts and users. */
-export type CustomerContact = {
+export type CustomerUser = {
   customerId: AssociationJunction<Customer>
   userId: AssociationJunction<User>
 }

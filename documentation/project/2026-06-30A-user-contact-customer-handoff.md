@@ -62,7 +62,7 @@ Implemented:
 - Added `preferredChannel` and `notes` to User samples and API create payloads.
 - Removed embedded Customer contact fixture expectations.
 - Added `primaryContactId` fixture coverage.
-- Added CustomerContact junction fixture coverage without encoding the open membership decision.
+- Added CustomerUser junction fixture coverage without encoding the open membership decision.
 - Restored full repo typecheck by repairing downstream tests/fixtures.
 
 ### Documentation Organization
@@ -203,7 +203,7 @@ Still deferred:
 - `user-delete`
 - `user-eject`
 
-Do not expand into Customer Onboarding or CustomerContact API/client exposure inside this scope.
+Do not expand into Customer Onboarding or CustomerUser API/client exposure inside this scope.
 
 ### Optional Test Expansion
 
@@ -213,14 +213,14 @@ Remaining optional coverage:
 
 - Adapter round-trip tests for User new fields.
 - Adapter round-trip tests for `Customer.primaryContactId`.
-- Adapter coverage for CustomerContact if junction fixtures are expanded.
+- Adapter coverage for CustomerUser if junction fixtures are expanded.
 - Role guard coverage for user roles and job assignment roles.
 
 ## 7. Cautions For Next Agent
 
 - Do not rename `JobPlanAssignmentRole`.
 - Do not reintroduce embedded `Contact`.
-- Do not expose CustomerContact through API/client before Customer Onboarding scope.
+- Do not expose CustomerUser through API/client before Customer Onboarding scope.
 - Do not encode the open `Customer.primaryContactId` plus `customer_contacts` membership decision in tests.
 - Preserve `UiSingleSelect` trigger `type='button'`.
 - Preserve default non-dismissible dialog behavior; use `dismissible` only where intended.

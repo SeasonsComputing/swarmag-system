@@ -28,8 +28,8 @@ blocked by the domain-model change.
   - `user-delete`
   - `user-eject`
 - Customer app onboarding is out of this UX scope.
-- `CustomerContact` domain artifacts exist in this milestone.
-- `CustomerContact` API/client exposure is deferred to Customer Onboarding.
+- `CustomerUser` domain artifacts exist in this milestone.
+- `CustomerUser` API/client exposure is deferred to Customer Onboarding.
 - `Customer.primaryContactId` membership in `customer_contacts` remains an open decision.
 - User role selection in User Management is multi-select.
 - User Management Cancel closes the edit/create dialog.
@@ -51,7 +51,7 @@ Updated:
 Recorded:
 
 - Domain Internals #2 as complete.
-- `CustomerContact` API/client exposure as deferred to Customer Onboarding.
+- `CustomerUser` API/client exposure as deferred to Customer Onboarding.
 - UX #5 as complete.
 - Additional UX verification repairs completed during implementation.
 - `UiActionButton labelMode='visible'` as a shared UI primitive capability.
@@ -173,8 +173,8 @@ Expected fixes:
 - Add `notes` and `preferredChannel` to user samples and user API create payloads.
 - Remove embedded customer contact fixture data.
 - Add `primaryContactId` to customer fixture data.
-- Add CustomerContact fixture coverage if junction fixtures are included.
-- Replace embedded-contact assertions with `primaryContactId` and optional CustomerContact linkage assertions.
+- Add CustomerUser fixture coverage if junction fixtures are included.
+- Replace embedded-contact assertions with `primaryContactId` and optional CustomerUser linkage assertions.
 
 ## 5. Subagent Notes For Tests Scope #4
 
@@ -186,13 +186,13 @@ A read-only subagent review produced this recommended test scope:
 - `source/tests/fixtures/customer-samples.ts`
   - Remove embedded `contacts`.
   - Add required `primaryContactId`.
-  - Add standalone `customerContactSamples` if junction fixture coverage is desired.
+  - Add standalone `CustomerUserSamples` if junction fixture coverage is desired.
 - `source/tests/fixtures/samples.ts`
   - No change is required if wildcard exports already carry added samples.
 - `source/tests/fixtures/fixtures-test.ts`
   - Remove `customer.contacts` assertions.
   - Assert `customer.primaryContactId` is a valid Id.
-  - Assert CustomerContact sample keys are valid if samples are added.
+  - Assert CustomerUser sample keys are valid if samples are added.
   - Do not assert `primaryContactId` must also appear in `customer_contacts`.
 - `source/tests/cases/users-api-test.ts`
   - Add `notes` and `preferredChannel` to `UserCreate`.
@@ -242,7 +242,7 @@ Update:
 
 - `source/tests/fixtures/user-samples.ts`
 - `source/tests/fixtures/customer-samples.ts`
-- `source/tests/fixtures/samples.ts` if CustomerContact samples are added explicitly.
+- `source/tests/fixtures/samples.ts` if CustomerUser samples are added explicitly.
 - `source/tests/fixtures/fixtures-test.ts`
 - `source/tests/cases/users-api-test.ts`
 
@@ -254,7 +254,7 @@ Do not expand into user edge functions or Customer Onboarding inside this scope.
 - `user-delete`
 - `user-eject`
 - Customer app onboarding
-- CustomerContact API/client exposure
+- CustomerUser API/client exposure
 - RLS/customer portal policy work
 
 ## 8. Cautions For Next Agent
@@ -262,7 +262,7 @@ Do not expand into user edge functions or Customer Onboarding inside this scope.
 - Do not rename `JobPlanAssignmentRole`.
 - Do not reintroduce embedded `Contact`.
 - Do not move auth/public user synchronization mechanics into `domain-model.md`.
-- Do not add CustomerContact API/client exposure before Customer Onboarding scope.
+- Do not add CustomerUser API/client exposure before Customer Onboarding scope.
 - Do not encode the open `Customer.primaryContactId` plus `customer_contacts` membership decision in tests.
 - Preserve `UiSingleSelect` trigger `type='button'`; the default button type submits parent forms.
 - Preserve dialog modal behavior and disabled click-away close.

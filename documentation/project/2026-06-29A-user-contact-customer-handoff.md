@@ -23,7 +23,7 @@ backend auth/domain boundaries, and downstream test/UX expectations.
 - Auth/domain synchronization belongs in backend architecture and solution-space documentation, not in `domain-model.md`.
 - `Customer` is an account.
 - `Contact` is removed as an embedded Customer value object.
-- `CustomerContact` is a pure-key Junction between `Customer` and `User`.
+- `CustomerUser` is a pure-key Junction between `Customer` and `User`.
 - `Customer.primaryContactId` is a required `AssociationOne<User>`.
 - `ContactPreferredChannel` belongs on `User`.
 - `User.notes` is editable in canonical User Management.
@@ -75,8 +75,8 @@ Implemented:
 - `User` gained `preferredChannel` and `notes`.
 - Embedded `Contact` and `Customer.contacts` were removed.
 - `Customer.primaryContactId` was added.
-- `CustomerContact` pure-key Junction was added.
-- `CustomerContactCreate` was added.
+- `CustomerUser` pure-key Junction was added.
+- `CustomerUserCreate` was added.
 - `JobPlanAssignment.role` now uses `JobPlanAssignmentRole`, not `UserRole`.
 - Schema added `users.preferred_channel`, `users.notes`, `customers.primary_contact_id`, and `customer_contacts`.
 - Schema updated `job_plan_assignments.role` CHECK to the six crew assignment values.
@@ -138,7 +138,7 @@ Update:
 
 - `source/tests/fixtures/user-samples.ts`
 - `source/tests/fixtures/customer-samples.ts`
-- `source/tests/fixtures/samples.ts` if CustomerContact samples are added
+- `source/tests/fixtures/samples.ts` if CustomerUser samples are added
 - `source/tests/fixtures/fixtures-test.ts`
 - `source/tests/cases/users-api-test.ts`
 
@@ -146,8 +146,8 @@ Expected work:
 
 - Add `preferredChannel` and `notes` to user samples and user API create payload.
 - Replace embedded customer contact fixture data with `primaryContactId`.
-- Add CustomerContact samples if fixture coverage includes the junction.
-- Replace fixture integrity contact checks with `primaryContactId` and optional CustomerContact linkage checks.
+- Add CustomerUser samples if fixture coverage includes the junction.
+- Replace fixture integrity contact checks with `primaryContactId` and optional CustomerUser linkage checks.
 
 ### UX
 
@@ -176,7 +176,7 @@ These must preserve the auth/domain user boundary and application-supplied UUID 
 ## 7. Open Decisions
 
 - Whether `Customer.primaryContactId` must also have a matching row in `customer_contacts`.
-- Whether `CustomerContact` needs API/client exposure in this milestone.
+- Whether `CustomerUser` needs API/client exposure in this milestone.
 
 ## 8. Cautions For Next Agent
 

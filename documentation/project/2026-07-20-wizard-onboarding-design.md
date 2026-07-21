@@ -169,7 +169,7 @@ Ratify: Customer.status defaults to `'prospect'` (the wizard's very end
 state), User status `'active'`, contact's default role `['customer']`.
 Job/assessment defaults move to the assessment-flow design (story 2.1).
 One invariant to confirm during implementation: whether
-`primaryContactId` implies a `CustomerContact` junction row (the docs
+`primaryContactId` implies a `CustomerUser` junction row (the docs
 don't say — confirm against backend behavior and record the answer in
 `domain-model.md`).
 
@@ -240,7 +240,7 @@ they split and each lands where it belongs:
 - **Reachability** → `Customer.primaryContact: CompositionOne<Contact>`,
   required for ALL statuses. The June §2.6 structural guarantee survives and
   extends to prospects — every Customer is contactable from birth.
-- **Portal access** → the existing `CustomerContact` junction, wired at
+- **Portal access** → the existing `CustomerUser` junction, wired at
   activation (story 2.x) when access is actually granted. The FK is dropped
   outright; keeping a redundant binding is how the June defect started.
 
@@ -261,7 +261,7 @@ Amendments to earlier decisions:
   `WizardContract` (the ops runner's one-question-per-screen stages want
   gate-only stages anyway).
 - **D9 stage 1** — field set becomes the Contact fields.
-- **D12** — the `CustomerContact` junction confirm-item dissolves: junction
+- **D12** — the `CustomerUser` junction confirm-item dissolves: junction
   rows are an activation concern, not a genesis concern. Defaults otherwise
   stand as ratified.
 - **D14** — the accepted consequences (required email, auth identities at
@@ -284,7 +284,7 @@ selection and workflow seeding make it its own flow, arriving as the
 wizard framework's second consumer with its own domain audit
 (Service/Workflow reaches). `UiDatetime` + `isDate`/`isTime` arrive with
 it. **Promotion/activation flow** (minting a User from a Customer's contact,
-wiring `CustomerContact` junction rows, portal access grant) — an activation
+wiring `CustomerUser` junction rows, portal access grant) — an activation
 concern arriving with story 2.x (see D17).
 
 ## 5. Production Sequencing (on ratification; order per CA 2026-07-19)
@@ -330,7 +330,7 @@ Key findings feeding D8–D12:
 - Each `CustomerSite` needs exactly one `Location` (`CompositionOne`) —
   drove the D10 deferral.
 - `User.roles` is `CompositionPositive` — stage 1 cannot allow zero roles.
-- Undocumented invariant: `primaryContactId` vs the `CustomerContact`
+- Undocumented invariant: `primaryContactId` vs the `CustomerUser`
   junction — confirm-and-record item in D12.
 - Validator soft spots noted for the backlog (not Phase 3 scope): lat/lon
   are unbounded numbers; `When` format is presence-checked, not

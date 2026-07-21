@@ -34,7 +34,7 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 |           |                                    | Chemical                 |
 | Customers | `@domain/abstractions/customer.ts` | Contact                  |
 |           |                                    | CustomerSite             |
-|           |                                    | CustomerContact          |
+|           |                                    | CustomerUser             |
 |           |                                    | Customer                 |
 | Services  | `@domain/abstractions/service.ts`  | ServiceCategory          |
 |           |                                    | Service                  |
@@ -436,7 +436,7 @@ Attributes: **State**
 | `label`       | string   |
 | `acreage?`    | number   |
 
-### 7.3 CustomerContact
+### 7.3 CustomerUser
 
 Purpose: **Pure-key relationship between a customer account and a user contact**
 
@@ -451,7 +451,7 @@ Attributes: **Relations**
 
 ### 7.4 Customer
 
-Purpose: **Customer account aggregate with a required primary contact composition; portal access is the CustomerContact junction's concern, wired at activation**
+Purpose: **Customer account aggregate with a required primary contact composition; portal access is the CustomerUser junction's concern, wired at activation**
 
 Type: **Instantiable**
 

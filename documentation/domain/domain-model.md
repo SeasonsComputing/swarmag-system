@@ -170,12 +170,12 @@ In addition to the core abstractions, the domain includes supporting structures 
 | Question      | Reusable prompt; Instantiable life-cycled; discriminated union of InternalQuestion, ScalarQuestion and SelectQuestion |
 | Job Workflows | Basis and modified workflow references per job; order defined by `JobWork.work`                                       |
 | Planning      | Associations between plans and assigned users, assets, and chemicals                                                  |
-| Customers     | Sites composed into customer accounts; CustomerContact junctions relate accounts to Users                             |
+| Customers     | Sites composed into customer accounts; CustomerUser junctions relate accounts to Users                                |
 
 Customers represent accounts. Every Customer carries a required primary contact — a Contact
 composition holding account reachability data (how to reach the party behind the account), not a
 person identity. Users with access to a customer account are relationships expressed by the
-CustomerContact junction, wired at activation when portal access is granted. The same human may
+CustomerUser junction, wired at activation when portal access is granted. The same human may
 appear as both the account's contact and a portal User; one is an account attribute, the other is
 an identity.
 

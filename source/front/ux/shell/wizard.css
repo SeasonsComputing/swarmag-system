@@ -1,0 +1,141 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Wizard styles                                                                ║
+║ Chrome layout for multi-step guided wizard flows.                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-feat='wizard'] {
+  block-size: clamp(32rem, 72dvh, 44rem);
+  display: grid;
+  gap: var(--sa-rhythm-gap);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
+}
+
+[data-feat='wizard-title-row'] {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  min-inline-size: 0;
+}
+
+[data-feat='wizard-title'] {
+  font-size: var(--sa-font-size-md);
+  line-height: 1;
+  margin: 0;
+}
+
+[data-feat='wizard-indicator'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-sm);
+}
+
+[data-feat='wizard-steps'] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-sm);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+[data-feat='wizard-step'] {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--sa-space-xs);
+  min-inline-size: 0;
+}
+
+/* Neutralize the list-item primitive's content-list spacing for a flush pip row.
+   Compound selector (0,2,0) deterministically wins over [data-ui='list-item']. */
+[data-feat='wizard-steps'] [data-feat='wizard-step'] {
+  margin-block: 0;
+  padding-inline-start: 0;
+}
+
+[data-feat='wizard-step-ordinal'] {
+  align-items: center;
+  aspect-ratio: 1;
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-full);
+  display: inline-flex;
+  justify-content: center;
+  min-inline-size: var(--sa-touch-target-sm);
+}
+
+[data-feat='wizard-step'][data-feat-state='upcoming'] [data-feat='wizard-step-ordinal'] {
+  color: var(--sa-text-dim);
+}
+
+[data-feat='wizard-step'][data-feat-state='current'] [data-feat='wizard-step-ordinal'] {
+  border-color: var(--sa-color-accent);
+  color: var(--sa-color-accent);
+}
+
+[data-feat='wizard-step'][data-feat-state='done'] [data-feat='wizard-step-ordinal'] {
+  color: var(--sa-text-secondary);
+}
+
+[data-feat='wizard-step-title'] {
+  min-inline-size: 0;
+}
+
+[data-feat='wizard-step-caption'] {
+  color: var(--sa-text-secondary);
+  font-size: var(--sa-font-size-sm);
+  margin: 0;
+}
+
+[data-feat='wizard'] > [data-ui='card'] {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: visible;
+}
+
+[data-feat='wizard-card-body'] {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: var(--sa-rhythm-gap);
+  margin: calc(var(--sa-space-xs) * -1);
+  min-block-size: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--sa-space-xs);
+}
+
+[data-feat='wizard-stage'] {
+  animation: sa-fade-in var(--sa-motion-page-fade) ease;
+}
+
+[data-feat='wizard-footer'] {
+  display: flex;
+  flex: 0 0 auto;
+  gap: var(--sa-space-sm);
+  justify-content: space-between;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-feat='wizard-stage'] {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  [data-feat='wizard'] {
+    block-size: 100dvh;
+    max-block-size: none;
+  }
+
+  [data-feat='wizard-title-row'] {
+    padding-block-start: var(--sa-rhythm-pad);
+    padding-inline: var(--sa-rhythm-pad);
+  }
+
+  [data-feat='wizard'] > [data-ui='card'] {
+    border-radius: 0;
+  }
+}

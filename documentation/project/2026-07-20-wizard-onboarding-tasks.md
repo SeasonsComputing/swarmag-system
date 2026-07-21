@@ -2,8 +2,9 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation (A0/A/C) + Feature (B)
-**Status:** IN PROGRESS — D1–D17 ratified 2026-07-20; A0 complete;
-per-group go orders remain the gate.
+**Status:** IN PROGRESS — D1–D17 ratified 2026-07-20; A0, A1, A complete
+(A1 schema live on stage; A = wizard framework, contract+host+chrome).
+B0 (Customers API surface) next. Per-group go orders remain the gate.
 **Source design:** `documentation/project/2026-07-20-wizard-onboarding-design.md`
 
 Each group is a gated production: scope declared, go received, checks run,
@@ -35,19 +36,46 @@ results reported. Delegation per budget discipline (haiku, git read-only).
 
 ## Group A — Wizard Framework (Foundation)
 
-- [ ] `front/ux/shell/wizard-contract.ts` — `WizardContract`: ordered
-      stage strategies (name, title, render, validity gate, optional
-      commit — gate-and-carry stages per D17's D2 relaxation);
-      early-finish support NOT in contract (D15: linear flow)
-- [ ] `front/ux/shell/wizard.tsx` — IoC host: stage indicator, Back /
-      Next / Finish, feedback surface, dialog-route presentation
-- [ ] `front/ux/shell/wizard.css` — chrome styles on rhythm tokens;
-      collapse-era motion language reused where stages transition
-- [ ] Manager-aspect extraction ONLY on demonstrated overlap (card
-      header/body regions, feedback plumbing) — refactor, not rewrite;
-      manager behavior provably unchanged (checks + live manager pass)
-- [ ] Ops-compatibility sanity: contract shape reviewed against §11.7
-      (one-question-per-screen fits a stage; no ops code)
+- [x] `front/ux/shell/wizard-contract.ts` — `WizardContract` (interface,
+      meta-type/role) with `WizardStage`/`WizardFeedback` (type, data):
+      ordered stage strategies (name, title, render, `canAdvance` gate,
+      optional `commit` — gate-and-carry per D17's D2 relaxation); linear,
+      no branching (D15). Typechecks clean. Ratified 2026-07-20 (drove the
+      STYLE-GUIDE §2 meta-type-vs-data refinement; manager already conforms)
+- [x] `front/ux/shell/wizard.tsx` — IoC host: stage indicator, Back /
+      Next→Finish, feedback surface (local commit error over provider
+      feedback), gate→commit→hold-on-throw advance, Back re-enters live.
+      Host holds no domain state (consumers own via closures); no
+      `@front/api`. Delegated (haiku) against frozen contract; AA review +
+      cascade fix applied (see below)
+- [x] `front/ux/shell/wizard.css` — chrome on rhythm tokens; grid rows
+      title/indicator/body/footer; card-body scroll inset; stage mount
+      fade + reduced-motion guard; ≤480 edge-to-edge full-screen (pairs
+      with UiDialog full-screen). Two AA corrections:
+      (1) cascade — `UiList` bare-html-guard substitution for `<ol>/<li>`
+      dragged in `[data-ui-variant='numbered']` `list-style:decimal` +
+      list-indent at (0,2,0); dropped the variant (→`<ul>`, my ordinals)
+      and zeroed list-item spacing via a (0,2,0) compound selector.
+      (2) motion — the mount fade was a local `@keyframes`, but its `from`/
+      `to` steps fail `guard:css` for feature files (must root at
+      `[data-feat`) once dprint expands them; the single-line form wasn't
+      fmt-stable. Per CA: promoted the fade to base.css as the reusable
+      `@keyframes sa-fade-in` (beside `sa-spinner-rotate`/`sa-skeleton-sweep`);
+      `wizard.css` now only references `animation: sa-fade-in …` (guard-clean).
+      Verified fmt-then-check green (dprint-stable)
+- [x] Manager-aspect extraction — NOT done: `WizardFeedback` is
+      structurally identical to `AbstractionManagerFeedback` but there is
+      no proven second consumer until B (COW). Flagged candidate, not a
+      speculative refactor of committed manager code (extraction discipline)
+- [x] Ops-compatibility sanity (D7) — reviewed against §11.7: PASSES. The
+      ops job-runner's turn-by-turn model is LINEAR, so its
+      Workflow→Task→Question hierarchy flattens into `WizardStage[]`
+      (each question = a stage; hierarchy is progress/label presentation,
+      not branching). `requiresNote`-style NEXT gating maps to
+      `canAdvance`; per-question widget to `render`; answer capture to
+      `commit`; Back(secondary)/Next(primary) matches forward-momentum.
+      Richer task-grouped progress would want an optional `WizardStage`
+      field later — additive, not precluded. No ops code written
 
 ## Group A1 — Contact Composition (Foundation, D17, A0×2)
 
@@ -70,10 +98,14 @@ results reported. Delegation per budget discipline (haiku, git read-only).
       relocated to Common with regeneration-safe Purposes, `Customer`
       topic updated; `domain-model.md` §Customers prose rewritten to D17;
       `project-user-stories.md` 1.1 step 2 contact line corrected
-- [ ] **CA REVIEW GATE** — steps below run only on CA go
-- [ ] `schema.sql`: `customers` drops `primary_contact_id`, gains
-      `primary_contact JSONB NOT NULL` + named check; genesis lint + apply
-      (local, then stage)
+- [x] **CA REVIEW GATE** — passed 2026-07-20
+- [x] `schema.sql`: `customers` drops `primary_contact_id`, gains
+      `primary_contact JSONB NOT NULL DEFAULT '[]'` + two named checks
+      (`_array_check`, `_one_check` = exactly one); `primary_contact_id`
+      column + index removed. Genesis applied to stage
+      (greenfield — no local docker; CA directive). Verified live: 22
+      public tables, seeds 1/9/12/14, `primary_contact` jsonb NOT NULL
+      present, `primary_contact_id` gone, both checks present
 - [x] Fixtures + tests updated (direct `isContact` cases added; 37/37
       green); ripple audit re-verified (domain SDK + fixtures only, no
       front/back reach); full checks green

@@ -8,8 +8,8 @@ import { assert, assertEquals } from '@std/assert'
 import {
   assetSamples,
   assetTypeSamples,
-  customerContactSamples,
   customerSamples,
+  CustomerUserSamples,
   jobSamples,
   sharedQuestionSamples
 } from './samples.ts'
@@ -68,7 +68,7 @@ Deno.test('fixture integrity: customer fixtures keep primary contact composition
 Deno.test('fixture integrity: customer contact junction fixtures carry valid keys', () => {
   const customerIds = new StringSet(customerSamples.map(customer => customer.id))
 
-  for (const contact of customerContactSamples) {
+  for (const contact of CustomerUserSamples) {
     assert(isId(contact.customerId))
     assert(isId(contact.userId))
     assert(customerIds.has(contact.customerId))

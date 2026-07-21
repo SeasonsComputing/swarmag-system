@@ -235,7 +235,7 @@ Later environment checks:
 ## 10. Out Of Scope
 
 - Customer Onboarding.
-- CustomerContact API/client exposure.
+- CustomerUser API/client exposure.
 - RLS redesign.
 - From-scratch genesis deployment.
 - Netlify app deployment.
