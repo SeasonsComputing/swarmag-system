@@ -189,8 +189,16 @@
   mask: url('../icons/exit.svg') center / contain no-repeat;
 }
 
+[data-ui='action-button'][data-ui-icon='info'] [data-ui='action-button-icon'] {
+  mask: url('../icons/info-circled.svg') center / contain no-repeat;
+}
+
 [data-ui='action-button'][data-ui-icon='plus'] [data-ui='action-button-icon'] {
   mask: url('../icons/plus.svg') center / contain no-repeat;
+}
+
+[data-ui='action-button'][data-ui-icon='user'] [data-ui='action-button-icon'] {
+  mask: url('../icons/person.svg') center / contain no-repeat;
 }
 
 [data-ui='action-button-label'] {
@@ -292,9 +300,19 @@
   mask: url('../icons/exit.svg') center / contain no-repeat;
 }
 
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='info']
+  [data-ui='action-button-icon']::before {
+  mask: url('../icons/info-circled.svg') center / contain no-repeat;
+}
+
 [data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='plus']
   [data-ui='action-button-icon']::before {
   mask: url('../icons/plus.svg') center / contain no-repeat;
+}
+
+[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='user']
+  [data-ui='action-button-icon']::before {
+  mask: url('../icons/person.svg') center / contain no-repeat;
 }
 
 [data-ui='action-button']:hover [data-ui='action-button-label'],

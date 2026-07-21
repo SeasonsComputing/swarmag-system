@@ -298,7 +298,7 @@ Key props: `label`, `value`, `minValue`, `maxValue`, children, `loading`,
 Use for compact icon actions on dense surfaces such as table rows.
 
 Required props: `icon`, `label`.
-Icon values: `back`, `check`, `cross`, `delete`, `edit`, `eject`, `plus`.
+Icon values: `back`, `check`, `cross`, `delete`, `edit`, `eject`, `info`, `plus`, `user`.
 Variants: `default`, `danger`.
 Other key props: `labelMode`, `loading`, `error`, `disabled`.
 

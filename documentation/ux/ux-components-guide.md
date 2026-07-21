@@ -749,15 +749,15 @@ hit target. Use `variant='danger'` for destructive actions.
 
 Extends native button attributes, excluding styling and semantic hook props.
 
-| Prop        | Type                                                                      | Default    | Description                                       |
-| ----------- | ------------------------------------------------------------------------- | ---------- | ------------------------------------------------- |
-| `icon`      | `'back' \| 'check' \| 'cross' \| 'delete' \| 'edit' \| 'eject' \| 'plus'` | —          | Icon to display.                                  |
-| `label`     | `string`                                                                  | —          | Accessible label and optional visible label text. |
-| `labelMode` | `'reveal' \| 'visible'`                                                   | `'reveal'` | Label presentation.                               |
-| `variant`   | `'default' \| 'danger'`                                                   | unset      | Visual/action priority.                           |
-| `error`     | `boolean`                                                                 | `false`    | Emits error state.                                |
-| `loading`   | `boolean`                                                                 | `false`    | Emits loading state; disables button.             |
-| `disabled`  | `boolean`                                                                 | `false`    | Native disabled behavior.                         |
+| Prop        | Type                                                                                          | Default    | Description                                       |
+| ----------- | --------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------- |
+| `icon`      | `'back' \| 'check' \| 'cross' \| 'delete' \| 'edit' \| 'eject' \| 'info' \| 'plus' \| 'user'` | —          | Icon to display.                                  |
+| `label`     | `string`                                                                                      | —          | Accessible label and optional visible label text. |
+| `labelMode` | `'reveal' \| 'visible'`                                                                       | `'reveal'` | Label presentation.                               |
+| `variant`   | `'default' \| 'danger'`                                                                       | unset      | Visual/action priority.                           |
+| `error`     | `boolean`                                                                                     | `false`    | Emits error state.                                |
+| `loading`   | `boolean`                                                                                     | `false`    | Emits loading state; disables button.             |
+| `disabled`  | `boolean`                                                                                     | `false`    | Native disabled behavior.                         |
 
 `loading` and `disabled` both disable the rendered button and suppress tab focus.
 
@@ -770,6 +770,8 @@ Extends native button attributes, excluding styling and semantic hook props.
 
 ```tsx
 <UiActionButton icon='edit' label='Edit user' onClick={onEdit} />
+<UiActionButton icon='info' label='About' onClick={onAbout} />
+<UiActionButton icon='user' label='Users' onClick={onUsers} />
 <UiActionButton icon='eject' label='Eject user' onClick={onEject} />
 <UiActionButton icon='delete' label='Delete record' variant='danger' onClick={onDelete} />
 <UiActionButton icon='check' label='Save' labelMode='visible' type='submit' />

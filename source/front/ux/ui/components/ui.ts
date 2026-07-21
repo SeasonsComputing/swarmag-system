@@ -13,6 +13,7 @@ export {
   type UiAccordionTriggerProps
 } from './ui-accordion.tsx'
 export {
+  UI_ACTION_BUTTON_ICONS,
   UiActionButton,
   type UiActionButtonIcon,
   type UiActionButtonProps,
