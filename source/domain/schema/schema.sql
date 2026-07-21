@@ -28,7 +28,7 @@ DROP TABLE IF EXISTS questions CASCADE;
 DROP TABLE IF EXISTS tasks CASCADE;
 DROP TABLE IF EXISTS workflows CASCADE;
 DROP TABLE IF EXISTS services CASCADE;
-DROP TABLE IF EXISTS customer_contacts CASCADE;
+DROP TABLE IF EXISTS customer_users CASCADE;
 DROP TABLE IF EXISTS customers CASCADE;
 DROP TABLE IF EXISTS chemicals CASCADE;
 DROP TABLE IF EXISTS assets CASCADE;
@@ -225,26 +225,26 @@ CREATE INDEX customers_account_manager_id_idx ON customers (account_manager_id);
 
 CREATE INDEX customers_deleted_at_idx ON customers (deleted_at);
 
-CREATE TABLE customer_contacts (
+CREATE TABLE customer_users (
   customer_id UUID NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE RESTRICT,
   PRIMARY KEY (customer_id, user_id)
 );
 
-ALTER TABLE customer_contacts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE customer_users ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "customer_contacts_select_all" ON customer_contacts
+CREATE POLICY "customer_users_select_all" ON customer_users
   FOR SELECT USING (true);
 
-CREATE POLICY "customer_contacts_insert_all" ON customer_contacts
+CREATE POLICY "customer_users_insert_all" ON customer_users
   FOR INSERT WITH CHECK (true);
 
-CREATE POLICY "customer_contacts_delete_all" ON customer_contacts
+CREATE POLICY "customer_users_delete_all" ON customer_users
   FOR DELETE USING (true);
 
-CREATE INDEX customer_contacts_customer_id_idx ON customer_contacts (customer_id);
+CREATE INDEX customer_users_customer_id_idx ON customer_users (customer_id);
 
-CREATE INDEX customer_contacts_user_id_idx ON customer_contacts (user_id);
+CREATE INDEX customer_users_user_id_idx ON customer_users (user_id);
 
 -- ──────────────────────────────────────────────────────────────────────────────────────
 -- services

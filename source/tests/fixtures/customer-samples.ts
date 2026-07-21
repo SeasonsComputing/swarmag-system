@@ -4,7 +4,7 @@
 
 import { id } from '@core/std'
 import type { Location } from '@domain/abstractions/common.ts'
-import type { Contact, Customer, CustomerContact } from '@domain/abstractions/customer.ts'
+import type { Contact, Customer, CustomerUser } from '@domain/abstractions/customer.ts'
 
 const customerId = id()
 const accountManagerId = id()
@@ -65,10 +65,10 @@ export const blueMesaRanchCustomer: Customer = {
   updatedAt: '2025-01-15T12:00:00Z'
 }
 
-export const blueMesaRanchContact: CustomerContact = {
+export const blueMesaRanchContact: CustomerUser = {
   customerId,
   userId: relatedContactId
 }
 
 export const customerSamples = [blueMesaRanchCustomer]
-export const customerContactSamples = [blueMesaRanchContact]
+export const CustomerUserSamples = [blueMesaRanchContact]

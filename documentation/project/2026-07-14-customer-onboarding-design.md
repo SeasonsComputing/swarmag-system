@@ -23,7 +23,7 @@ walks an admin or sales rep through:
 2. Create Customer (account)
 3. Create initial Job Assessment
 
-The creation-order dependency (User → Customer → CustomerContact →
+The creation-order dependency (User → Customer → CustomerUser →
 `primaryContactId`, then the first Job Assessment) maps naturally onto a
 multi-step wizard, where each step produces the id the next step needs.
 

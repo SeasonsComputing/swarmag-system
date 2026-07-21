@@ -12,7 +12,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 validateCustomerCreate(input)         Validate CustomerCreate payloads.
 validateCustomerUpdate(input)         Validate CustomerUpdate payloads.
-validateCustomerContactCreate(input)  Validate CustomerContactCreate payloads.
+validateCustomerUserCreate(input)  Validate CustomerUserCreate payloads.
 isContact(v)                          Guard for Contact object values.
 isCustomerSite(v)                     Guard for CustomerSite object values.
 */
@@ -31,9 +31,9 @@ import {
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
 import { type Contact, CUSTOMER_STATUSES, type CustomerSite } from '@domain/abstractions/customer.ts'
 import type {
-  CustomerContactCreate,
   CustomerCreate,
-  CustomerUpdate
+  CustomerUpdate,
+  CustomerUserCreate
 } from '@domain/protocols/customer-protocol.ts'
 import { isLocation, isNote } from '@domain/validators/common-validator.ts'
 
@@ -72,8 +72,8 @@ export const validateCustomerUpdate = (input: CustomerUpdate): ExpectResult =>
     expectNonEmptyString(input.country, 'country', true)
   )
 
-/** Validate CustomerContactCreate payloads. */
-export const validateCustomerContactCreate = (input: CustomerContactCreate): ExpectResult =>
+/** Validate CustomerUserCreate payloads. */
+export const validateCustomerUserCreate = (input: CustomerUserCreate): ExpectResult =>
   expectValid(
     expectId(input.customerId, 'customerId'),
     expectId(input.userId, 'userId')

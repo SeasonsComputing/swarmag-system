@@ -10,14 +10,14 @@ Maps storage dictionaries to customer abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-ContactAdapter          Deserialize/Serialize Contact.
-CustomerSiteAdapter     Deserialize/Serialize CustomerSite.
-CustomerContactAdapter  Deserialize/Serialize CustomerContact.
-CustomerAdapter         Deserialize/Serialize Customer.
+ContactAdapter       Deserialize/Serialize Contact.
+CustomerSiteAdapter  Deserialize/Serialize CustomerSite.
+CustomerUserAdapter  Deserialize/Serialize CustomerUser.
+CustomerAdapter      Deserialize/Serialize Customer.
 */
 
 import { makeAdapter } from '@core/stdx'
-import type { Contact, Customer, CustomerContact, CustomerSite } from '@domain/abstractions/customer.ts'
+import type { Contact, Customer, CustomerSite, CustomerUser } from '@domain/abstractions/customer.ts'
 import { LocationAdapter, NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
 /** Deserialize/Serialize Contact. */
@@ -37,8 +37,8 @@ export const CustomerSiteAdapter = makeAdapter<CustomerSite>({
   acreage: ['acreage']
 })
 
-/** Deserialize/Serialize CustomerContact. */
-export const CustomerContactAdapter = makeAdapter<CustomerContact>({
+/** Deserialize/Serialize CustomerUser. */
+export const CustomerUserAdapter = makeAdapter<CustomerUser>({
   customerId: ['customer_id'],
   userId: ['user_id']
 })
