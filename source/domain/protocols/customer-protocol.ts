@@ -10,8 +10,8 @@ Defines create and update protocol payload shapes for customer abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CustomerCreate         Create payload for Customer.
-CustomerUpdate         Update payload for Customer.
+CustomerCreate      Create payload for Customer.
+CustomerUpdate      Update payload for Customer.
 CustomerUserCreate  Create payload for CustomerUser junction.
 */
 

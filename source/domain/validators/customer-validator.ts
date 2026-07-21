@@ -10,11 +10,11 @@ Validates create and update protocol payloads for customer abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-validateCustomerCreate(input)         Validate CustomerCreate payloads.
-validateCustomerUpdate(input)         Validate CustomerUpdate payloads.
+validateCustomerCreate(input)      Validate CustomerCreate payloads.
+validateCustomerUpdate(input)      Validate CustomerUpdate payloads.
 validateCustomerUserCreate(input)  Validate CustomerUserCreate payloads.
-isContact(v)                          Guard for Contact object values.
-isCustomerSite(v)                     Guard for CustomerSite object values.
+isContact(v)                       Guard for Contact object values.
+isCustomerSite(v)                  Guard for CustomerSite object values.
 */
 
 import {
