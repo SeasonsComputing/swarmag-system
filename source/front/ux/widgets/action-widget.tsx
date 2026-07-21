@@ -14,7 +14,13 @@ ActionWidget  Dashboard header action widget.
 */
 
 import type { Dictionary } from '@core/std'
-import { UiActionButton, type UiActionButtonIcon, type UiComponent, UiLayout } from '@front/ux/ui'
+import {
+  UI_ACTION_BUTTON_ICONS,
+  UiActionButton,
+  type UiActionButtonIcon,
+  type UiComponent,
+  UiLayout
+} from '@front/ux/ui'
 import { For } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 
@@ -29,11 +35,16 @@ export type ActionWidgetProps = {
 export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   const navigate = useNavigate()
   const pairs = () => {
-    const actions = toStringArray(props.settings['actions'])
-    const labels = toStringArray(props.settings['labels'])
+    const actions = toStringArray(props.settings['actions'], 'ActionWidget settings.actions')
+    const labels = toStringArray(props.settings['labels'], 'ActionWidget settings.labels')
+    const icons = toIconArray(props.settings['icons'], 'ActionWidget settings.icons')
+    if (actions.length !== labels.length || actions.length !== icons.length) {
+      throw new Error('ActionWidget settings actions, labels, and icons must have equal lengths')
+    }
     return actions.map((action, index) => ({
       action,
-      label: labels[index] ?? action
+      icon: icons[index],
+      label: labels[index]
     }))
   }
 
@@ -43,7 +54,7 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
         <For each={pairs()}>
           {pair => (
             <UiActionButton
-              icon={actionIcon(pair.action)}
+              icon={pair.icon}
               label={pair.label}
               labelMode='visible'
               onClick={() => void navigate({ to: pair.action })}
@@ -55,11 +66,20 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   )
 }
 
-const actionIcon = (action: string): UiActionButtonIcon => {
-  if (action === '/logout') return 'eject'
-  if (action === '/users') return 'edit'
-  return 'check'
-}
+const toIconArray = (value: unknown, field: string): UiActionButtonIcon[] =>
+  toStringArray(value, field).map((icon, index) => {
+    if (!UI_ACTION_BUTTON_ICONS.includes(icon as UiActionButtonIcon)) {
+      throw new Error(`${field}[${index}] must be a supported action button icon name`)
+    }
+    return icon as UiActionButtonIcon
+  })
 
-const toStringArray = (value: unknown): string[] =>
-  Array.isArray(value) ? value.filter((item): item is string => typeof item === 'string') : []
+const toStringArray = (value: unknown, field: string): string[] => {
+  if (!Array.isArray(value)) throw new Error(`${field} must be an array`)
+  return value.map((item, index) => {
+    if (typeof item !== 'string' || item.trim().length === 0) {
+      throw new Error(`${field}[${index}] must be a non-empty string`)
+    }
+    return item
+  })
+}

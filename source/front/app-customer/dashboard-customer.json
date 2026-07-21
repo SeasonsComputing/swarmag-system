@@ -10,7 +10,8 @@
         "settings": {
           "shape": "landscape",
           "actions": ["/logout"],
-          "labels": ["Logout"]
+          "labels": ["Logout"],
+          "icons": ["eject"]
         }
       }
     ]

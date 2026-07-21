@@ -158,14 +158,14 @@ Variants are only valid where explicitly declared.
 
 Controls and parts may additionally declare these extension attributes:
 
-| Control / Part    | Attribute          | Declared Values           |
-| ----------------- | ------------------ | ------------------------- |
-| `action-button`   | `data-ui-icon`     | `edit`, `eject`, `delete` |
-| `layout`          | `data-ui-gap`      | `loose`, `tight`, `none`  |
-| `tab-list`        | `data-ui-drag`     | `enabled`, `active`       |
-| `tab-list`        | `data-ui-layout`   | `between`                 |
-| `table-cell`      | `data-ui-align`    | `start`, `center`, `end`  |
-| `table-container` | `data-ui-overflow` | `hidden`, `scroll`        |
+| Control / Part    | Attribute          | Declared Values                                                             |
+| ----------------- | ------------------ | --------------------------------------------------------------------------- |
+| `action-button`   | `data-ui-icon`     | `back`, `check`, `cross`, `delete`, `edit`, `eject`, `info`, `plus`, `user` |
+| `layout`          | `data-ui-gap`      | `loose`, `tight`, `none`                                                    |
+| `tab-list`        | `data-ui-drag`     | `enabled`, `active`                                                         |
+| `tab-list`        | `data-ui-layout`   | `between`                                                                   |
+| `table-cell`      | `data-ui-align`    | `start`, `center`, `end`                                                    |
+| `table-container` | `data-ui-overflow` | `hidden`, `scroll`                                                          |
 
 Rules:
 

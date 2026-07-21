@@ -10,7 +10,8 @@
         "settings": {
           "shape": "compact",
           "actions": ["/users", "/about", "/logout"],
-          "labels": ["Users", "About", "Logout"]
+          "labels": ["Users", "About", "Logout"],
+          "icons": ["user", "info", "eject"]
         }
       }
     ]
