@@ -14,7 +14,7 @@ Code that conflicts with this guide is wrong — not the guide.
 | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Runtime         | Deno with strict TypeScript (`deno task check`)                                                                                                         |
 | Encoding        | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint.                                                  |
-| Types           | Use `type` for data shapes, abstractions, aliases, and unions; use `interface` only for encapsulated API contracts that something explicitly implements |
+| Types           | Use `type` for data shapes, abstractions, aliases, and unions; use `interface` only for encapsulated API contracts that something explicitly implements. In the ambiguous case, decide on meta-type vs. data: an `interface` is a meta-type whose attributes are immutable specification metadata; a record stays a `type` even when a field is function-typed — a functor/method attribute is data, not behavior, and never by itself makes a shape an `interface`. |
 | Primitives/ADTs | Use `Id` (UUID v7 string), `When` (ISO 8601 UTC string), `StringSet`, `Dictionary` and `StringDictionary` from `@core/std`                              |
 
 ## 3. Import Aliases
