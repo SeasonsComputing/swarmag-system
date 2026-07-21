@@ -1,6 +1,21 @@
-/**
- * Generic abstraction manager provider contract.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Abstraction manager contract                                                 ║
+║ Provider contract for list-and-panel abstraction managers.                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Declares the provider contract a manager consumes: list projection, row and
+form rendering, editor feedback, and named instance actions.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+AbstractionManagerFeedback     Feedback shown in a manager editor header.
+AbstractionActionConfirmation  Confirmation copy for a consequential action.
+AbstractionAction              A named action executable on an abstraction instance.
+AbstractionManagerContract     Provider contract for list-and-panel managers.
+*/
 
 import type { Instance } from '@core/std'
 import type {
