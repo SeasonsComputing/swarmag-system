@@ -10,6 +10,7 @@ Defines customer aggregates with site structures and user contact relationships.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+Contact            Account reachability data, not a person identity.
 CustomerSite       Serviceable customer location abstraction.
 CustomerContact    Junction between customer accounts and users.
 CUSTOMER_STATUSES  Allowed customer status values.
@@ -25,8 +26,16 @@ import type {
   CompositionOne,
   Instantiable
 } from '@core/std'
-import type { Location, Note } from '@domain/abstractions/common.ts'
+import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
 import type { User } from '@domain/abstractions/user.ts'
+
+/** Account reachability data — how to reach the party behind a record; not a person identity. */
+export type Contact = {
+  displayName: string
+  phoneNumber: string
+  preferredChannel: ContactPreferredChannel
+  email?: string
+}
 
 /** Serviceable customer location abstraction. */
 export type CustomerSite = {
@@ -50,7 +59,7 @@ export type CustomerStatus = (typeof CUSTOMER_STATUSES)[number]
 /** Customer account aggregate abstraction. */
 export type Customer = Instantiable & {
   accountManagerId: AssociationOptional<User>
-  primaryContactId: AssociationOne<User>
+  primaryContact: CompositionOne<Contact>
   sites: CompositionMany<CustomerSite>
   notes: CompositionMany<Note>
   name: string

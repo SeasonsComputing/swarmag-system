@@ -222,12 +222,17 @@ with the ratified wizard shape when this doc closes.
 Lived experience overruled the June collapse of person into identity — while
 every ruling in `2026-06-28-user-contact-customer-design.md` remains true.
 The resolution: `Contact` returns as a **subordinate composition** (object
-type, `common.ts`, beside `Location` and `Note`), not as an entity. A contact
-is account data — "how to reach this account" — not person identity: it makes
-no identity claims, anchors no access, and needs no auth. Fields:
-`displayName`, `phoneNumber`, `preferredChannel`, `email?`.
-`CONTACT_PREFERRED_CHANNELS`/`ContactPreferredChannel` migrate from `user.ts`
-home to `common.ts` (dependency direction: common flows outward).
+type, `customer.ts` — its topic home by the consumer rule: Customer is its
+only consumer today; it migrates to `common.ts` if/when a second topic such
+as Lead consumes it), not as an entity. A contact is account data — "how to
+reach this account" — not person identity: it makes no identity claims,
+anchors no access, and needs no auth. Fields: `displayName`, `phoneNumber`,
+`preferredChannel`, `email?`. `CONTACT_PREFERRED_CHANNELS`/
+`ContactPreferredChannel` migrate from `user.ts` to `common.ts` — the enum
+has TWO consumers (`User.preferredChannel`, `Contact.preferredChannel`) and
+dependency direction forbids user→customer imports. Per §5.5 topic locality,
+`isContact` lives in `customer-validator.ts` and `ContactAdapter` in
+`customer-adapter.ts`.
 
 The June FK (`Customer.primaryContactId: AssociationOne<User>`) did two jobs;
 they split and each lands where it belongs:

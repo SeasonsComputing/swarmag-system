@@ -14,6 +14,7 @@ import {
   toTrimmed
 } from '@core/std'
 import { isLocation } from '@domain/validators/common-validator.ts'
+import { isContact } from '@domain/validators/customer-validator.ts'
 import { assertEquals, assertNotEquals } from '@std/assert'
 
 Deno.test('optional fields admit undefined and null', () => {
@@ -147,4 +148,54 @@ Deno.test('isLocation rejects non-objects', () => {
   assertEquals(isLocation(undefined), false)
   assertEquals(isLocation(42), false)
   assertEquals(isLocation('Lubbock'), false)
+})
+
+Deno.test('isContact accepts a full contact', () => {
+  assertEquals(
+    isContact({
+      displayName: 'Marta Reyes',
+      phoneNumber: '806-555-0142',
+      preferredChannel: 'phone',
+      email: 'marta@bluemesaranch.com'
+    }),
+    true
+  )
+})
+
+Deno.test('isContact accepts an email-less contact', () => {
+  assertEquals(
+    isContact({ displayName: 'Dale Whitfield', phoneNumber: '325-555-0187', preferredChannel: 'text' }),
+    true
+  )
+})
+
+Deno.test('isContact rejects missing required fields', () => {
+  assertEquals(isContact({ phoneNumber: '806-555-0142', preferredChannel: 'phone' }), false)
+  assertEquals(isContact({ displayName: 'Marta Reyes', preferredChannel: 'phone' }), false)
+  assertEquals(isContact({ displayName: 'Marta Reyes', phoneNumber: '806-555-0142' }), false)
+})
+
+Deno.test('isContact rejects an unknown preferred channel', () => {
+  assertEquals(
+    isContact({ displayName: 'Marta Reyes', phoneNumber: '806-555-0142', preferredChannel: 'fax' }),
+    false
+  )
+})
+
+Deno.test('isContact rejects a malformed email', () => {
+  assertEquals(
+    isContact({
+      displayName: 'Marta Reyes',
+      phoneNumber: '806-555-0142',
+      preferredChannel: 'email',
+      email: 'not-an-email'
+    }),
+    false
+  )
+})
+
+Deno.test('isContact rejects non-objects', () => {
+  assertEquals(isContact(null), false)
+  assertEquals(isContact(undefined), false)
+  assertEquals(isContact('Marta Reyes'), false)
 })

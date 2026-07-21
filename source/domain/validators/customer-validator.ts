@@ -13,6 +13,7 @@ PUBLIC
 validateCustomerCreate(input)         Validate CustomerCreate payloads.
 validateCustomerUpdate(input)         Validate CustomerUpdate payloads.
 validateCustomerContactCreate(input)  Validate CustomerContactCreate payloads.
+isContact(v)                          Guard for Contact object values.
 isCustomerSite(v)                     Guard for CustomerSite object values.
 */
 
@@ -20,13 +21,15 @@ import {
   expectCompositionMany,
   expectCompositionOne,
   expectConstEnum,
+  expectEmail,
   expectId,
   expectNonEmptyString,
   expectPositiveNumber,
   type ExpectResult,
   expectValid
 } from '@core/std'
-import { CUSTOMER_STATUSES, type CustomerSite } from '@domain/abstractions/customer.ts'
+import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
+import { type Contact, CUSTOMER_STATUSES, type CustomerSite } from '@domain/abstractions/customer.ts'
 import type {
   CustomerContactCreate,
   CustomerCreate,
@@ -38,7 +41,7 @@ import { isLocation, isNote } from '@domain/validators/common-validator.ts'
 export const validateCustomerCreate = (input: CustomerCreate): ExpectResult =>
   expectValid(
     expectId(input.accountManagerId, 'accountManagerId', true),
-    expectId(input.primaryContactId, 'primaryContactId'),
+    expectCompositionOne(input.primaryContact, 'primaryContact', isContact),
     expectCompositionMany(input.sites, 'sites', isCustomerSite),
     expectCompositionMany(input.notes, 'notes', isNote),
     expectNonEmptyString(input.name, 'name'),
@@ -56,7 +59,7 @@ export const validateCustomerUpdate = (input: CustomerUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
     expectId(input.accountManagerId, 'accountManagerId', true),
-    expectId(input.primaryContactId, 'primaryContactId', true),
+    expectCompositionOne(input.primaryContact, 'primaryContact', isContact, true),
     expectCompositionMany(input.sites, 'sites', isCustomerSite, true),
     expectCompositionMany(input.notes, 'notes', isNote, true),
     expectNonEmptyString(input.name, 'name', true),
@@ -75,6 +78,18 @@ export const validateCustomerContactCreate = (input: CustomerContactCreate): Exp
     expectId(input.customerId, 'customerId'),
     expectId(input.userId, 'userId')
   )
+
+/** Guard for Contact values. */
+export const isContact = (v: unknown): v is Contact => {
+  if (v === null || typeof v !== 'object') return false
+  const contact = v as Contact
+  return expectValid(
+    expectNonEmptyString(contact.displayName, 'displayName'),
+    expectNonEmptyString(contact.phoneNumber, 'phoneNumber'),
+    expectConstEnum(contact.preferredChannel, 'preferredChannel', CONTACT_PREFERRED_CHANNELS),
+    expectEmail(contact.email, 'email', true)
+  ) === null
+}
 
 /** Guard for CustomerSite values. */
 export const isCustomerSite = (v: unknown): v is CustomerSite => {

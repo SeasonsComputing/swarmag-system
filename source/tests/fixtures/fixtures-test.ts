@@ -55,10 +55,10 @@ Deno.test('fixture integrity: job assessment fixture always carries locations an
   assert(isWhen(assessment.updatedAt))
 })
 
-Deno.test('fixture integrity: customer fixtures keep primary contact references intact', () => {
+Deno.test('fixture integrity: customer fixtures keep primary contact composition intact', () => {
   for (const customer of customerSamples) {
     assert(isId(customer.id))
-    assert(isId(customer.primaryContactId))
+    assert(customer.primaryContact.filter(Boolean).length === 1)
     assert(customer.sites.filter(Boolean).every(site => site!.customerId === customer.id))
     assert(isWhen(customer.createdAt))
     assert(isWhen(customer.updatedAt))

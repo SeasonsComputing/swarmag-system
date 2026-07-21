@@ -15,6 +15,7 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 | Topic     | Source                             | Contents                 |
 | --------- | ---------------------------------- | ------------------------ |
 | Common    | `@domain/abstractions/common.ts`   | Location                 |
+|           |                                    | ContactPreferredChannel  |
 |           |                                    | Attachment               |
 |           |                                    | Note                     |
 |           |                                    | QuestionType             |
@@ -31,14 +32,14 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 | Chemicals | `@domain/abstractions/chemical.ts` | ChemicalUsage            |
 |           |                                    | ChemicalLabel            |
 |           |                                    | Chemical                 |
-| Customers | `@domain/abstractions/customer.ts` | CustomerSite             |
+| Customers | `@domain/abstractions/customer.ts` | Contact                  |
+|           |                                    | CustomerSite             |
 |           |                                    | CustomerContact          |
 |           |                                    | Customer                 |
 | Services  | `@domain/abstractions/service.ts`  | ServiceCategory          |
 |           |                                    | Service                  |
 |           |                                    | ServiceRequiredAssetType |
 | Users     | `@domain/abstractions/user.ts`     | UserRole                 |
-|           |                                    | ContactPreferredChannel  |
 |           |                                    | User                     |
 | Workflows | `@domain/abstractions/workflow.ts` | Task                     |
 |           |                                    | TaskQuestion             |
@@ -115,7 +116,19 @@ Attributes: **State**
 | `accuracyMeters?` | number   |
 | `description?`    | string   |
 
-### 4.2 Attachment
+### 4.2 ContactPreferredChannel
+
+Purpose: **Preferred communication channel for a reachable party**
+
+Type: **const-enum**
+
+| Values  |
+| ------- |
+| `email` |
+| `text`  |
+| `phone` |
+
+### 4.3 Attachment
 
 Purpose: **Uploaded artifact metadata**
 
@@ -131,7 +144,7 @@ Attributes: **State**
 | `kind`        | `'photo'` \| `'video'` \| `'map'` \| `'document'` (default: `'photo'`) |
 | `uploadedAt`  | When                                                                   |
 
-### 4.3 Note
+### 4.4 Note
 
 Purpose: **Freeform note with visibility and taxonomy**
 
@@ -152,7 +165,7 @@ Attributes: **State**
 | `visibility`  | `'internal'` \| `'shared'` (default: `'internal'`) |
 | `tags`        | CompositionMany\<string\>                          |
 
-### 4.4 QuestionType
+### 4.5 QuestionType
 
 Purpose: **Supported question input modes; `internal` is reserved for system-generated log entries such as telemetry, GPS, and operational metadata**
 
@@ -167,7 +180,7 @@ Type: **const-enum**
 | `single-select` |
 | `multi-select`  |
 
-### 4.5 BaseQuestion
+### 4.6 BaseQuestion
 
 Purpose: **Common shape shared by all Question constituents**
 
@@ -182,7 +195,7 @@ Attributes: **State**
 | `helpText?`   | string       |
 | `required?`   | boolean      |
 
-### 4.6 InternalQuestion
+### 4.7 InternalQuestion
 
 Purpose: **System-generated question; seed records referenced directly by log entries**
 
@@ -196,7 +209,7 @@ Attributes: **State**
 | ------------- | ------------ |
 | `type`        | `'internal'` |
 
-### 4.7 ScalarQuestion
+### 4.8 ScalarQuestion
 
 Purpose: **Scalar input question; no options**
 
@@ -210,7 +223,7 @@ Attributes: **State**
 | ------------- | ------------------------------------- |
 | `type`        | `'text'` \| `'number'` \| `'boolean'` |
 
-### 4.8 SelectOption
+### 4.9 SelectOption
 
 Purpose: **Selectable option metadata; only valid on SelectQuestion**
 
@@ -224,7 +237,7 @@ Attributes: **State**
 | `label?`        | string   |
 | `requiresNote?` | boolean  |
 
-### 4.9 SelectQuestion
+### 4.10 SelectQuestion
 
 Purpose: **Select input question; options required and non-empty**
 
@@ -244,7 +257,7 @@ Attributes: **State**
 | ------------- | ------------------------------------- |
 | `type`        | `'single-select'` \| `'multi-select'` |
 
-### 4.10 Question
+### 4.11 Question
 
 Purpose: **General purpose reusable prompt; shared across tasks**
 
@@ -254,7 +267,7 @@ Constituents: `ScalarQuestion | SelectQuestion | InternalQuestion`
 
 Discriminator: `type`
 
-### 4.11 Answer
+### 4.12 Answer
 
 Purpose: **Captured response to a question; notes carry crew annotations and attachments**
 
@@ -387,7 +400,22 @@ Attributes: **State**
 
 Source: `@domain/abstractions/customer.ts`
 
-### 7.1 CustomerSite
+### 7.1 Contact
+
+Purpose: **Account reachability data — how to reach the party behind a record; not a person identity**
+
+Type: **object**
+
+Attributes: **State**
+
+| **Attribute**      | **Type**                |
+| ------------------ | ----------------------- |
+| `displayName`      | string                  |
+| `phoneNumber`      | string                  |
+| `preferredChannel` | ContactPreferredChannel |
+| `email?`           | string                  |
+
+### 7.2 CustomerSite
 
 Purpose: **Serviceable customer location**
 
@@ -408,7 +436,7 @@ Attributes: **State**
 | `label`       | string   |
 | `acreage?`    | number   |
 
-### 7.2 CustomerContact
+### 7.3 CustomerContact
 
 Purpose: **Pure-key relationship between a customer account and a user contact**
 
@@ -421,9 +449,9 @@ Attributes: **Relations**
 | `customerId`  | AssociationJunction | Customer        |
 | `userId`      | AssociationJunction | User            |
 
-### 7.3 Customer
+### 7.4 Customer
 
-Purpose: **Customer account aggregate with a required primary contact user**
+Purpose: **Customer account aggregate with a required primary contact composition; portal access is the CustomerContact junction's concern, wired at activation**
 
 Type: **Instantiable**
 
@@ -432,7 +460,7 @@ Attributes: **Relations**
 | **Attribute**      | **Relation**        | **Abstraction** |
 | ------------------ | ------------------- | --------------- |
 | `accountManagerId` | AssociationOptional | User            |
-| `primaryContactId` | AssociationOne      | User            |
+| `primaryContact`   | CompositionOne      | Contact         |
 | `sites`            | CompositionMany     | CustomerSite    |
 | `notes`            | CompositionMany     | Note            |
 
@@ -516,19 +544,7 @@ Type: **const-enum**
 | `operations`    |
 | `customer`      |
 
-### 9.2 ContactPreferredChannel
-
-Purpose: **Preferred communication channel for a person**
-
-Type: **const-enum**
-
-| Values  |
-| ------- |
-| `email` |
-| `text`  |
-| `phone` |
-
-### 9.3 User
+### 9.2 User
 
 Purpose: **System user identity, membership, contact preference, and person notes**
 

@@ -1,34 +1,28 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ User domain abstractions                                                     ║
-║ Canonical types for user identity, membership, and contact preference.       ║
+║ Canonical types for user identity and membership.                            ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines user role catalog, contact channel catalog, and user abstractions.
+Defines user role catalog, status catalog, and user abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-USER_ROLES                  Allowed user role values.
-UserRole                    User role derived from USER_ROLES.
-CONTACT_PREFERRED_CHANNELS  Allowed contact communication channels.
-ContactPreferredChannel     Channel type derived from CONTACT_PREFERRED_CHANNELS.
-USER_STATUSES               Allowed user status values.
-UserStatus                  User status derived from USER_STATUSES.
-User                        System user identity and membership abstraction.
+USER_ROLES     Allowed user role values.
+UserRole       User role derived from USER_ROLES.
+USER_STATUSES  Allowed user status values.
+UserStatus     User status derived from USER_STATUSES.
+User           System user identity and membership abstraction.
 */
 
 import type { CompositionMany, CompositionPositive, Instantiable } from '@core/std'
-import type { Note } from '@domain/abstractions/common.ts'
+import type { ContactPreferredChannel, Note } from '@domain/abstractions/common.ts'
 
 /** Allowed user role values. */
 export const USER_ROLES = ['administrator', 'sales', 'operations', 'customer'] as const
 export type UserRole = (typeof USER_ROLES)[number]
-
-/** Allowed contact communication channels. */
-export const CONTACT_PREFERRED_CHANNELS = ['email', 'text', 'phone'] as const
-export type ContactPreferredChannel = (typeof CONTACT_PREFERRED_CHANNELS)[number]
 
 /** Allowed user status values. */
 export const USER_STATUSES = ['active', 'inactive'] as const

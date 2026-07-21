@@ -4,12 +4,18 @@
 
 import { id } from '@core/std'
 import type { Location } from '@domain/abstractions/common.ts'
-import type { Customer, CustomerContact } from '@domain/abstractions/customer.ts'
+import type { Contact, Customer, CustomerContact } from '@domain/abstractions/customer.ts'
 
 const customerId = id()
 const accountManagerId = id()
-const primaryContactId = id()
 const relatedContactId = id()
+
+const ranchOfficeContact: Contact = {
+  displayName: 'Marta Reyes',
+  phoneNumber: '806-555-0142',
+  preferredChannel: 'phone',
+  email: 'marta@bluemesaranch.com'
+}
 
 const headquartersLocation: Location = {
   latitude: 33.5779,
@@ -41,7 +47,7 @@ export const blueMesaRanchCustomer: Customer = {
   postalCode: '76902',
   country: 'US',
   accountManagerId,
-  primaryContactId,
+  primaryContact: [ranchOfficeContact],
   sites: [{
     customerId,
     label: 'North Pasture HQ',
