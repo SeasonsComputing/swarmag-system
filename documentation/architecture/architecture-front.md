@@ -906,7 +906,7 @@ The crew member is physically operating dangerous equipment while using this UI.
 **Design constraints:**
 
 - **One question per screen** — no scrolling mid-task
-- **Large touch targets** — minimum `--sa-touch-target` (64px) for interactive elements
+- **Large touch targets** — minimum `--sa-touch-target` for interactive elements
 - **Maximum contrast** — answers must be unambiguous at a glance
 - **Boolean = two full-width buttons** — YES (green) / NO (red), not a toggle
 - **Single-select = large tappable option tiles** — not a dropdown

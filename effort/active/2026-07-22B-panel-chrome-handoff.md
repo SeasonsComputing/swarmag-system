@@ -24,7 +24,7 @@ Unbuilt directories were deliberately left in place: §2 is a **normative target
 tree and forward declarations are not drift.
 
 **Two inline-rhythm bugs in the wizard.** `[data-feat='wizard-content']` carried
-`padding-inline`, giving the wizard a *second* inline origin on top of the
+`padding-inline`, giving the wizard a _second_ inline origin on top of the
 dialog's own `--sa-dialog-pad` — that is why its title sat left of its progress
 rail. Deleted; the host owns the gutter above 480. Separately the root declared
 three grid rows against two rendered children, so the content sat in an `auto`
@@ -32,7 +32,7 @@ row while an empty `1fr` row absorbed the remaining height (which also defeated
 `block-fill`, whose `100%` had nothing definite to resolve against).
 
 **Manager two-column dead band eliminated.** Its grid declared
-`minmax(--sa-size-xs, …)` on *both* tracks — a 866px minimum — while collapse
+`minmax(--sa-size-xs, …)` on _both_ tracks — a 866px minimum — while collapse
 fired at a 768px container, so viewports 851–947 rendered a manager too wide for
 its dialog. The panel rule already declared a 320px minimum that the track was
 silently overriding; honoring it (`minmax(--sa-size-min, 1fr)`) drops the
@@ -70,7 +70,7 @@ this session improved every surface simultaneously.
 **Wizard and manager share one CHROME; their contracts stay separate.**
 `WizardFeedback` and `AbstractionManagerFeedback` are byte-identical and both
 contracts open with `formTitle` — the chrome is already duplicated, in places
-character-for-character. What does *not* merge is the selector: a manager's list
+character-for-character. What does _not_ merge is the selector: a manager's list
 carries sort key, direction, page index, page size and a search query; a
 wizard's rail carries one integer. Merging them yields a contract whose members
 are inert for every wizard ever written.
@@ -79,14 +79,14 @@ are inert for every wizard ever written.
 `renderForm: (item: T | null, onClose) => UiComponent` already takes `null` to
 mean create, and `Wizard` returns a `UiComponent`. The only blocker is that the
 wizard renders its own dialog chrome, so nesting double-chromes it. Extracting
-the chrome is therefore the *enabler*, not hygiene — and it closes the
+the chrome is therefore the _enabler_, not hygiene — and it closes the
 create-only/no-readback gap structurally, since Finish returns to the list
 containing what was just made. This supersedes D15 "prospect hub" as a separate
 surface.
 
 **Responsive behavior is a 2×2, not three states.** Layout axis
-(wide | collapsed) is a *container* question — does my box have room for two
-panes. Device axis (normal | full-screen) is a *device* question — should this
+(wide | collapsed) is a _container_ question — does my box have room for two
+panes. Device axis (normal | full-screen) is a _device_ question — should this
 stop being a window. The mixed instruments are load-bearing: two queries of the
 same type could not express the off-diagonal.
 
@@ -112,7 +112,7 @@ the manager's selector becomes a **mode**, the wizard's becomes a **strip**.
 
 **Orientation: portrait-first as a design rule, never a lock.** Every surface is
 designed portrait-first; no surface is designed landscape-first; landscape
-remains operable and unoptimized. Landscape is hostile to *forms* specifically —
+remains operable and unoptimized. Landscape is hostile to _forms_ specifically —
 the software keyboard takes 45–60% of a landscape viewport. Locking was
 considered and rejected: it would blank the mounted-cab map, which is a genuine
 use case; it is unenforceable on iOS (manifest `orientation` ignored,
@@ -135,17 +135,17 @@ orientation is essential, which the portrait-idiom argument itself denies.
 
 ## Open / parked
 
-| Item | State |
-|---|---|
-| Action-bar slot ownership — chrome owns the *slot* (contract fills it) or the *buttons*? | **Blocks Phase A** |
-| wide + full-screen cell (landscape phone) | **Parked.** Unreachable today; candidate fix is `@media (max-width: 480px), (max-height: 480px)` |
-| §5.x doc for the 2×2 | Held until the timeline shape settles |
-| `interactive-widget=resizes-content` on the four `index.html` | Raised, undecided |
-| Dialog width literals (`48rem`/`32rem`/`24rem`/`20rem`) vs `--sa-size-*` in workbench | Raised, undecided |
-| Stage 3 (sites) form | CA rejects it wholesale; redesign with the layout rework, do not patch |
-| `var(--sa-radius-default)` in `onboarding.css:33` | Undefined token, renders square. Fix is `--sa-card-border-radius`. Deferred into the stage-3 redesign |
-| Undefined-token guard | `guard:css` prohibits raw literals but has no notion of an undeclared token. Not built |
-| Single-select chevron + the two user-manager masks → icon catalog | Fast-follow |
+| Item                                                                                     | State                                                                                                 |
+| ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- |
+| Action-bar slot ownership — chrome owns the _slot_ (contract fills it) or the _buttons_? | **Blocks Phase A**                                                                                    |
+| wide + full-screen cell (landscape phone)                                                | **Parked.** Unreachable today; candidate fix is `@media (max-width: 480px), (max-height: 480px)`      |
+| §5.x doc for the 2×2                                                                     | Held until the timeline shape settles                                                                 |
+| `interactive-widget=resizes-content` on the four `index.html`                            | Raised, undecided                                                                                     |
+| Dialog width literals (`48rem`/`32rem`/`24rem`/`20rem`) vs `--sa-size-*` in workbench    | Raised, undecided                                                                                     |
+| Stage 3 (sites) form                                                                     | CA rejects it wholesale; redesign with the layout rework, do not patch                                |
+| `var(--sa-radius-default)` in `onboarding.css:33`                                        | Undefined token, renders square. Fix is `--sa-card-border-radius`. Deferred into the stage-3 redesign |
+| Undefined-token guard                                                                    | `guard:css` prohibits raw literals but has no notion of an undeclared token. Not built                |
+| Single-select chevron + the two user-manager masks → icon catalog                        | Fast-follow                                                                                           |
 
 ## Resume agenda
 
@@ -166,7 +166,7 @@ orientation is essential, which the portrait-idiom argument itself denies.
 ## Known blocker for the timeline
 
 `wizard.tsx` writes `style={{ 'inline-size': barFill() }}` on the bar fill — the
-host names the *axis*, so CSS cannot flip the rail vertical. The host should
+host names the _axis_, so CSS cannot flip the rail vertical. The host should
 publish the scalar (`--sa-wizard-progress`) and let CSS choose `inline-size` or
 `block-size` per state. Host supplies data, CSS supplies presentation.
 

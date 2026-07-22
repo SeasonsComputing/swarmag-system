@@ -1,0 +1,41 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Panel header styles                                                          ║
+║ Two-zone leading and trailing layout shared by container and panels.         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+/* Two zones only. A header is a grid item at container level and a flex item
+   inside a card, so item-level sizing belongs to whichever context places it —
+   never here. */
+[data-feat-panel='header'] {
+  align-items: center;
+  display: flex;
+  gap: var(--sa-space-xs);
+  justify-content: space-between;
+  min-inline-size: 0;
+}
+
+[data-feat-panel='header-leading'],
+[data-feat-panel='header-trailing'] {
+  align-items: center;
+  display: flex;
+  gap: var(--sa-space-xs);
+  min-inline-size: 0;
+}
+
+[data-feat-panel='header-leading'] {
+  flex: 1 1 auto;
+}
+
+[data-feat-panel='header-trailing'] {
+  flex: 0 0 auto;
+}
+
+[data-feat-panel='header-leading'] > h1,
+[data-feat-panel='header-leading'] > h2 {
+  font-size: var(--sa-font-size-md);
+  line-height: 1;
+  margin: 0;
+  min-inline-size: 0;
+}

@@ -1,0 +1,49 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Panel container styles                                                       ║
+║ Shared geometry for the container, its panel roles, and device-edge chrome.  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+/* The container fills the dialog's content box, which already excludes
+--sa-dialog-pad under the global border-box. Do not subtract it again.
+Containment lives on [data-ui='dialog']: this element carries the surface's
+own feature hook, and an element is never its own query container — declaring
+container-type here silently kills every @container rule a surface writes
+against itself. */
+[data-feat-panel='container'] {
+  block-size: 100%;
+  display: grid;
+  gap: var(--sa-rhythm-gap);
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+[data-feat-panel='container'] > [data-feat-panel='header'],
+[data-feat-panel='container'] > [data-feat-panel='accessory'] {
+  grid-column: 1 / -1;
+}
+
+[data-feat-panel='container'] > [data-feat-panel='index'],
+[data-feat-panel='container'] > [data-feat-panel='subject'] {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+  position: relative;
+}
+
+@media (max-width: 480px) {
+  [data-feat-panel='container'] {
+    block-size: 100%;
+  }
+
+  [data-feat-panel='container'] > [data-feat-panel='header'],
+  [data-feat-panel='container'] > [data-feat-panel='accessory'] {
+    padding-inline: var(--sa-rhythm-pad);
+  }
+
+  [data-feat-panel='container'] > [data-feat-panel='header'] {
+    padding-block-start: var(--sa-rhythm-pad);
+  }
+}

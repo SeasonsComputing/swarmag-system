@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Use abstraction form feedback                                                ║
-║ Bridges native form validation into AbstractionManagerFeedback.              ║
+║ Bridges native form validation into PanelFeedback.                           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -19,7 +19,7 @@ FORM_FEEDBACK_MESSAGE                                      Standard failure copy
 useAbstractionFormFeedback(formRef, onFeedback, message?)  Wire the bridge.
 */
 
-import type { AbstractionManagerFeedback } from '@front/ux/shell/abstraction-manager-contract.ts'
+import type { PanelFeedback } from '@front/ux/shell/panel-contract.ts'
 import { onCleanup, onMount } from '@solid-js'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -30,14 +30,14 @@ import { onCleanup, onMount } from '@solid-js'
 export const FORM_FEEDBACK_MESSAGE = 'Correct the highlighted fields.'
 
 /**
- * Wire a form's native validation failures into an AbstractionManagerFeedback banner.
+ * Wire a form's native validation failures into a PanelFeedback banner.
  * @param formRef Getter returning the form element once mounted.
  * @param onFeedback Feedback reporter, typically the editor's onFeedback prop.
  * @param message Feedback message shown on validation failure.
  */
 export const useAbstractionFormFeedback = (
   formRef: () => HTMLFormElement | undefined,
-  onFeedback: (feedback: AbstractionManagerFeedback | null) => void,
+  onFeedback: (feedback: PanelFeedback | null) => void,
   message = FORM_FEEDBACK_MESSAGE
 ): void => {
   onMount(() => {
