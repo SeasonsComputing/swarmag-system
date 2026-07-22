@@ -21,6 +21,7 @@ import { controlState, type UiComponent } from './ui-helpers.ts'
 /** Supported action button icon names. */
 export const UI_ACTION_BUTTON_ICONS = [
   'back',
+  'building',
   'check',
   'cross',
   'delete',

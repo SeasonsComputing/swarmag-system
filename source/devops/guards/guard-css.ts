@@ -12,7 +12,7 @@ const APP_DIRS = [
   `${ROOT}/source/front/app-style-guide`
 ]
 
-const CSS_FILES = ['tokens.css', 'roles.css', 'themes.css', 'base.css', 'ui.css']
+const CSS_FILES = ['tokens.css', 'roles.css', 'themes.css', 'base.css', 'ui.css', 'icon-catalog.css']
 const TOKEN_ONLY_FILES = new StringSet(['tokens.css', 'roles.css', 'themes.css'])
 
 const SELECTOR_REGEX = /^([^/{\n]*)\{/
@@ -267,6 +267,39 @@ const auditControlsCSS = (lines: CSSLine[], filePath: string): string[] => {
       violations.push(
         `${filePath}:${lineNumber} — selector not rooted at [data-ui — found: ${selector}`
       )
+    }
+  }
+
+  return violations
+}
+
+const auditIconCatalogCSS = (lines: CSSLine[], filePath: string): string[] => {
+  const violations: string[] = []
+
+  for (const { line, lineNumber, isComment } of lines) {
+    if (isComment) continue
+
+    const trimmed = line.trim()
+    if (trimmed === '' || trimmed === '}') continue
+
+    if (line.includes('{')) {
+      const selector = extractSelector(line)
+      if (!selector || isAtRule(selector)) continue
+      if (!selector.startsWith('[data-ui-icon')) {
+        violations.push(
+          `${filePath}:${lineNumber} — icon catalog selector not rooted at [data-ui-icon — found: ${selector}`
+        )
+      }
+      continue
+    }
+
+    if (trimmed.includes(':')) {
+      const property = trimmed.substring(0, trimmed.indexOf(':')).trim()
+      if (property !== '--sa-icon') {
+        violations.push(
+          `${filePath}:${lineNumber} — icon catalog declares non --sa-icon property — ${property}`
+        )
+      }
     }
   }
 
@@ -544,6 +577,10 @@ const main = async () => {
     } else if (fileName === 'ui.css') {
       violations.push(...auditTokenDeclarations(lines, relative, fileName))
       violations.push(...auditControlsCSS(lines, relative))
+      violations.push(...auditValueRules(lines, relative, false))
+    } else if (fileName === 'icon-catalog.css') {
+      violations.push(...auditTokenDeclarations(lines, relative, fileName))
+      violations.push(...auditIconCatalogCSS(lines, relative))
       violations.push(...auditValueRules(lines, relative, false))
     }
   }

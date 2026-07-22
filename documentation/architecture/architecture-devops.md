@@ -414,6 +414,26 @@ app-{name}-package-prod               Build prod artifact
 app-{name}-package-{target}-verify    Verify artifact for target
 ```
 
+### 7.7 Bundle Asset Strategy
+
+The Vite build (step 9) inlines small assets as data URIs by default. Icon
+glyphs are the deliberate exception. `source/front/ux/ui/css/icon-catalog.css`
+maps the full icon library to `data-ui-icon` names, so inlining every glyph
+would ship the entire catalog inside the CSS bundle regardless of use — and CSS
+rules are not tree-shaken. Each app's `vite.config.ts` therefore sets
+`assetsInlineLimit` to a predicate that emits any `/icons/` SVG as a hashed file
+instead of a data URI, while all other assets keep Vite's default threshold:
+
+```ts
+assetsInlineLimit: ;
+;((path: string) => path.includes('/icons/') ? false : undefined)
+```
+
+The catalog ships as CSS rules only; the browser fetches a glyph file the first
+time an element applies its `mask`, so first-load payload scales with the icons
+actually rendered, not with catalog size. Extending the catalog carries no
+bundle cost for glyphs that are never used.
+
 ## 8. Deployment Workflow
 
 The UX deployment script is `source/devops/scripts/app-deploy.sh`, exposed as
