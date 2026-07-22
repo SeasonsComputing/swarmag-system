@@ -767,7 +767,7 @@ Extends native button attributes, excluding styling and semantic hook props.
 `data-ui-state`, `data-ui-variant`.
 
 The `icon` values are the curated subset exposed on action buttons; the full
-glyph set is the icon catalog (`icon-catalog.css`).
+glyph set is the icon catalog (`icons.css`).
 
 **Example**
 

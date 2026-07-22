@@ -47,7 +47,7 @@ export default defineConfig({
   },
   build: {
     // Icon SVGs are emitted as hashed files, never inlined, so the full
-    // icon-catalog.css ships as rules only and the browser fetches just the
+    // icons.css ships as rules only and the browser fetches just the
     // glyphs actually rendered. All other assets keep Vite's default threshold.
     assetsInlineLimit: (path: string) => path.includes('/icons/') ? false : undefined,
     outDir: resolve(root, 'dist/app-style-guide')

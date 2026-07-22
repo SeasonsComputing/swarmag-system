@@ -43,17 +43,17 @@ The design language definition is organized into namespaces. Each namespace is c
 
 Namespaces of the design language are organized into layers with each layer codified as a CSS file named for the layer. Each layer owns one category of design responsibility, declares or consumes only those tokens allowed for that layer, and is encapsulated within its namespace. A layer may consume tokens from earlier layers, and shall not redefine upstream ownership or introduce selector kinds outside its namespace.
 
-| Layer            | Namespace                                | File               | Members                                                         |
-| ---------------- | ---------------------------------------- | ------------------ | --------------------------------------------------------------- |
-| **PROVIDERS**    |                                          |                    |                                                                 |
-| Foundation Layer | `:root`                                  | `tokens.css`       | Typography, geometry, motion, and rhythm tokens (**immutable**) |
-| Role Layer       | `:root`                                  | `roles.css`        | Required role tokens with default values                        |
-| Theme Layer      | `data-theme`,<br/>`data-theme='{theme}'` | `themes.css`       | Per-theme role overrides and component-specified tokens         |
-| **CONSUMERS**    |                                          |                    |                                                                 |
-| Base Layer       | `html`                                   | `base.css`         | Browser reset, fonts, page base, semantic HTML                  |
-| Component Layer  | `data-ui='{component}'`                  | `ui.css`           | Reusable component selectors and declared component parts       |
-| Icon Catalog     | `data-ui-icon='{name}'`                  | `icon-catalog.css` | Glyph bindings mapping icon names to asset URLs via `--sa-icon` |
-| Feature Layer    | `data-feat='{feature}'`                  | `{feature}.css`    | Application feature styling and layout                          |
+| Layer            | Namespace                                | File            | Members                                                         |
+| ---------------- | ---------------------------------------- | --------------- | --------------------------------------------------------------- |
+| **PROVIDERS**    |                                          |                 |                                                                 |
+| Foundation Layer | `:root`                                  | `tokens.css`    | Typography, geometry, motion, and rhythm tokens (**immutable**) |
+| Role Layer       | `:root`                                  | `roles.css`     | Required role tokens with default values                        |
+| Theme Layer      | `data-theme`,<br/>`data-theme='{theme}'` | `themes.css`    | Per-theme role overrides and component-specified tokens         |
+| **CONSUMERS**    |                                          |                 |                                                                 |
+| Base Layer       | `html`                                   | `base.css`      | Browser reset, fonts, page base, semantic HTML                  |
+| Component Layer  | `data-ui='{component}'`                  | `ui.css`        | Reusable component selectors and declared component parts       |
+| Icon Catalog     | `data-ui-icon='{name}'`                  | `icons.css`     | Glyph bindings mapping icon names to asset URLs via `--sa-icon` |
+| Feature Layer    | `data-feat='{feature}'`                  | `{feature}.css` | Application feature styling and layout                          |
 
 CSS files live in `source/front/ux/ui/css/`. A shared CSS barrel,
 `source/front/ux/ui/css/css.tsx`, imports them in prescribed dependency order during application bootstrap.
@@ -88,7 +88,7 @@ CSS files live in `source/front/ux/ui/css/`. A shared CSS barrel,
 - `ui.css` must not reference `--sa-lch-*` tokens directly. Component selectors consume role or
   component-specified tokens.
 
-- `icon-catalog.css` is the single glyph binding layer. Each rule roots at
+- `icons.css` is the single glyph binding layer. Each rule roots at
   `[data-ui-icon='{name}']` and declares only `--sa-icon`, an inheriting custom property bound
   to a glyph asset URL. Component selectors in `ui.css` consume `var(--sa-icon)` — for example
   as a `mask` — so a glyph inherits into a control's icon part. Icon names are semantic; each
@@ -116,7 +116,7 @@ Rules:
 - LCH tuple tokens store tuples only; role tokens realize tuples into usable color values including opacity.
 - Component-specified tokens are implementation contracts for `ui.css`; they are cataloged
   in `ux-components-internals.md`.
-- `--sa-icon` is a glyph binding custom property owned by `icon-catalog.css`, not a provider
+- `--sa-icon` is a glyph binding custom property owned by `icons.css`, not a provider
   token. It carries an icon asset URL for component `mask` consumption and inherits from
   `[data-ui-icon='{name}']` into the control's icon part.
 

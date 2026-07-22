@@ -173,7 +173,7 @@ Rules:
 - no implicit defaults beyond what is defined
 - controls do not invent free-form values
 
-The `data-ui-icon` glyph set is defined in `icon-catalog.css`, which maps the
+The `data-ui-icon` glyph set is defined in `icons.css`, which maps the
 full icon library: each entry binds a name to an SVG via the inherited
 `--sa-icon` custom property, which the generic mask rules in `ui.css` consume on
 the icon span and its `::before`. A control exposes a glyph by listing its name

@@ -417,7 +417,7 @@ app-{name}-package-{target}-verify    Verify artifact for target
 ### 7.7 Bundle Asset Strategy
 
 The Vite build (step 9) inlines small assets as data URIs by default. Icon
-glyphs are the deliberate exception. `source/front/ux/ui/css/icon-catalog.css`
+glyphs are the deliberate exception. `source/front/ux/ui/css/icons.css`
 maps the full icon library to `data-ui-icon` names, so inlining every glyph
 would ship the entire catalog inside the CSS bundle regardless of use — and CSS
 rules are not tree-shaken. Each app's `vite.config.ts` therefore sets

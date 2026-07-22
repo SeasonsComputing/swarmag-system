@@ -12,7 +12,7 @@ const APP_DIRS = [
   `${ROOT}/source/front/app-style-guide`
 ]
 
-const CSS_FILES = ['tokens.css', 'roles.css', 'themes.css', 'base.css', 'ui.css', 'icon-catalog.css']
+const CSS_FILES = ['tokens.css', 'roles.css', 'themes.css', 'base.css', 'ui.css', 'icons.css']
 const TOKEN_ONLY_FILES = new StringSet(['tokens.css', 'roles.css', 'themes.css'])
 
 const SELECTOR_REGEX = /^([^/{\n]*)\{/
@@ -578,7 +578,7 @@ const main = async () => {
       violations.push(...auditTokenDeclarations(lines, relative, fileName))
       violations.push(...auditControlsCSS(lines, relative))
       violations.push(...auditValueRules(lines, relative, false))
-    } else if (fileName === 'icon-catalog.css') {
+    } else if (fileName === 'icons.css') {
       violations.push(...auditTokenDeclarations(lines, relative, fileName))
       violations.push(...auditIconCatalogCSS(lines, relative))
       violations.push(...auditValueRules(lines, relative, false))
