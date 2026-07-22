@@ -11,7 +11,7 @@ Emits compact action semantics for dense surfaces such as tables and toolbars.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 UI_ACTION_BUTTON_ICONS  Supported action button icon names.
-UiActionButton           Compact icon button with hover/focus label affordance.
+UiActionButton          Compact icon button with hover/focus label affordance.
 */
 
 import { Button } from '@kobalte/core/button'
