@@ -21,3 +21,7 @@
   gap: var(--sa-space-xl);
   max-width: var(--sa-size-min);
 }
+
+[data-feat='login'] [data-ui='action-button'] {
+  flex: 0 0 auto;
+}

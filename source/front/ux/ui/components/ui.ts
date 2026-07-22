@@ -14,6 +14,8 @@ export {
 } from './ui-accordion.tsx'
 export {
   UiActionButton,
+  type UiActionButtonAlign,
+  type UiActionButtonLabelMode,
   type UiActionButtonProps,
   type UiActionButtonVariant
 } from './ui-action-button.tsx'

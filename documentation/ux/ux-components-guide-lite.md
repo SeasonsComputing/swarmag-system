@@ -300,11 +300,12 @@ Use for compact icon actions on dense surfaces such as table rows.
 Required props: `icon`, `label`.
 Icon value: any icon catalog name defined in `icons.css`.
 Variants: `default`, `danger`.
-Other key props: `labelMode`, `loading`, `error`, `disabled`.
+Other key props: `align`, `labelMode`, `loading`, `error`, `disabled`.
 
 `label` is the accessible `aria-label` and is revealed on hover and focus.
 Use `labelMode='visible'` when the label should be visible and part of the
-action hit target.
+action hit target. With a visible label, `align='start'` places the icon before
+the label; `align='end'` is the default.
 `loading` and `disabled` both disable the button and suppress tab focus.
 
 ## 4. Display Controls

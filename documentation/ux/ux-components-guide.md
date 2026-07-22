@@ -754,6 +754,7 @@ Extends native button attributes, excluding styling and semantic hook props.
 | `icon`      | `string`                | —          | Icon catalog name to display.                     |
 | `label`     | `string`                | —          | Accessible label and optional visible label text. |
 | `labelMode` | `'reveal' \| 'visible'` | `'reveal'` | Label presentation.                               |
+| `align`     | `'start' \| 'end'`      | `'end'`    | Icon position when the label is visible.          |
 | `variant`   | `'default' \| 'danger'` | unset      | Visual/action priority.                           |
 | `error`     | `boolean`               | `false`    | Emits error state.                                |
 | `loading`   | `boolean`               | `false`    | Emits loading state; disables button.             |
@@ -763,7 +764,7 @@ Extends native button attributes, excluding styling and semantic hook props.
 
 **Emitted Attributes**
 
-`data-ui='action-button'`, `data-ui-icon`, `data-ui-label-mode`,
+`data-ui='action-button'`, `data-ui-align`, `data-ui-icon`, `data-ui-label-mode`,
 `data-ui-state`, `data-ui-variant`.
 
 The `icon` value passes directly to the icon catalog (`icons.css`). Every
@@ -778,6 +779,7 @@ catalog name is valid for an action button.
 <UiActionButton icon='exit' label='Eject user' onClick={onEject} />
 <UiActionButton icon='trash' label='Delete record' variant='danger' onClick={onDelete} />
 <UiActionButton icon='check' label='Save' labelMode='visible' type='submit' />
+<UiActionButton icon='arrow-left' label='Back' labelMode='visible' align='start' onClick={onBack} />
 ```
 
 ## 4. Display Controls
