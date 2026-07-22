@@ -319,6 +319,32 @@ All layouts must align to a 4px base unit. This ensures visual rhythm across dat
 
 Layout rhythm tokens are responsive aliases over the spacing scale.
 
+Each rhythm token owns exactly one spatial role. The role is normative: a token
+is selected by what kind of space is being created, never by which value happens
+to look right.
+
+| Token                   | Role                  | Applies to                                                                 |
+| ----------------------- | --------------------- | -------------------------------------------------------------------------- |
+| `--sa-rhythm-gutter`    | **Page padding**      | Page-level surfaces only — the dashboard and the style guide                |
+| `--sa-rhythm-pad`       | **Box interior**      | Padding inside a bounded surface — resolves to `--sa-card-panel-pad` and `--sa-dialog-pad` |
+| `--sa-rhythm-gap`       | **Space between**     | Separation between siblings — fieldsets, fields, grid tracks                |
+| `--sa-rhythm-gap-tight` | **Space between, compact** | Same role as `gap` where a dense control cluster requires less air     |
+
+Three consequences follow from the role assignment:
+
+- **`gutter` is page padding and nothing else.** Its sparse use is correct — the
+  system has only two page-level surfaces. Its wide responsive range is also
+  correct: page margins are expected to scale hard across viewports, while box
+  interiors are not. Do not reach for `gutter` because a value looks right, and
+  do not repurpose it for an inline axis; a surface needing an inline measure
+  distinct from its block measure requires a new token.
+- **`pad` is a box-interior measure, not an edge measure.** Raising it widens
+  every card and dialog interior in the system simultaneously. That reach is the
+  intended behavior, not a side effect.
+- **`pad` additionally participates in dialog sizing math** (for example
+  `max-inline-size: min(48rem, calc(100vw - var(--sa-rhythm-pad) * 2))`), so a
+  change to it can affect surface dimensions as well as interior spacing.
+
 | Token                | Default desktop                 | ≤1440px                         | ≤1024px                         | ≤768px                          | ≤425px                          | ≤380px                          |
 | -------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- |
 | `--sa-rhythm-gutter` | `--sa-space-4xl`                | `--sa-space-3xl`                | `--sa-space-3xl`                | `--sa-space-xl + --sa-space-xx` | `--sa-space-lg`                 | `--sa-space-lg - --sa-space-xs` |

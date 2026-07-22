@@ -21,6 +21,7 @@ import {
   UiButton,
   UiCard,
   type UiComponent,
+  UiLayout,
   UiList,
   UiListItem
 } from '@front/ux/ui'
@@ -100,67 +101,73 @@ export const Wizard = (props: WizardProps): UiComponent => {
           onClick={() => props.onCancel()}
         />
       </header>
-      <div data-feat='wizard-indicator'>
-        <div aria-hidden='true' data-feat='wizard-bar'>
-          <div data-feat='wizard-bar-fill' style={{ 'inline-size': barFill() }} />
-        </div>
-        <UiList data-feat='wizard-steps'>
-          <For each={props.contract.stages}>
-            {(item, index) => (
-              <UiListItem data-feat='wizard-step' data-feat-state={stepState(index())}>
-                <span data-feat='wizard-step-ordinal'>({index() + 1})</span>
-                <span data-feat='wizard-step-title'>{item.title}</span>
-              </UiListItem>
-            )}
-          </For>
-        </UiList>
+      <div data-feat='wizard-content'>
+        <UiLayout variant='block-fill'>
+          <div data-feat='wizard-indicator'>
+            <div aria-hidden='true' data-feat='wizard-bar'>
+              <div data-feat='wizard-bar-fill' style={{ 'inline-size': barFill() }} />
+            </div>
+            <UiList data-feat='wizard-steps'>
+              <For each={props.contract.stages}>
+                {(item, index) => (
+                  <UiListItem data-feat='wizard-step' data-feat-state={stepState(index())}>
+                    <span data-feat='wizard-step-ordinal'>{index() + 1}</span>
+                    <span data-feat='wizard-step-title'>{item.title}</span>
+                  </UiListItem>
+                )}
+              </For>
+            </UiList>
+          </div>
+          <UiCard elevation='raised'>
+            <header data-feat='wizard-card-header'>
+              <nav aria-label='Wizard navigation' data-feat='wizard-navigation'>
+                <UiActionButton
+                  align='start'
+                  icon='arrow-left'
+                  label='Back'
+                  labelMode='visible'
+                  disabled={isFirst() || committing()}
+                  onClick={back}
+                />
+                <Show
+                  when={isLast()}
+                  fallback={
+                    <UiActionButton
+                      icon='arrow-right'
+                      label='Next'
+                      labelMode='visible'
+                      disabled={!canAdvance() || committing()}
+                      loading={committing()}
+                      onClick={() => void advance()}
+                    />
+                  }
+                >
+                  <UiButton
+                    variant='primary'
+                    disabled={!canAdvance() || committing()}
+                    loading={committing()}
+                    onClick={() => void advance()}
+                  >
+                    Finish
+                  </UiButton>
+                </Show>
+              </nav>
+            </header>
+            <div data-feat='wizard-card-body'>
+              <Show when={banner()}>
+                {feedback => <UiAlert variant={feedback().variant}>{feedback().message}</UiAlert>}
+              </Show>
+              <Show when={stage()} keyed>
+                {current => (
+                  <div data-feat='wizard-stage' data-feat-step={current.name}>
+                    {current.render()}
+                  </div>
+                )}
+              </Show>
+            </div>
+          </UiCard>
+        </UiLayout>
       </div>
-      <UiCard elevation='raised'>
-        <div data-feat='wizard-card-body'>
-          <Show when={banner()}>
-            {feedback => <UiAlert variant={feedback().variant}>{feedback().message}</UiAlert>}
-          </Show>
-          <Show when={stage()} keyed>
-            {current => (
-              <div data-feat='wizard-stage' data-feat-step={current.name}>
-                {current.render()}
-              </div>
-            )}
-          </Show>
-        </div>
-      </UiCard>
-      <footer data-feat='wizard-footer'>
-        <UiActionButton
-          align='start'
-          icon='arrow-left'
-          label='Back'
-          labelMode='visible'
-          disabled={isFirst() || committing()}
-          onClick={back}
-        />
-        <Show
-          when={isLast()}
-          fallback={
-            <UiActionButton
-              icon='arrow-right'
-              label='Next'
-              labelMode='visible'
-              disabled={!canAdvance() || committing()}
-              loading={committing()}
-              onClick={() => void advance()}
-            />
-          }
-        >
-          <UiButton
-            variant='primary'
-            disabled={!canAdvance() || committing()}
-            loading={committing()}
-            onClick={() => void advance()}
-          >
-            Finish
-          </UiButton>
-        </Show>
-      </footer>
     </div>
   )
 }

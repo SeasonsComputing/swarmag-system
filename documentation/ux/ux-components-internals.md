@@ -143,18 +143,18 @@ Rules:
 
 Variants are only valid where explicitly declared.
 
-| Control / Part  | Attribute            | Declared Values                                     |
-| --------------- | -------------------- | --------------------------------------------------- |
-| `action-button` | `data-ui-variant`    | `default`, `danger`                                 |
-| `alert`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`              |
-| `badge`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`              |
-| `button`        | `data-ui-variant`    | `primary`, `secondary`, `ghost`, `danger`           |
-| `card`          | `data-ui-decoration` | `gradient`                                          |
-| `card`          | `data-ui-elevation`  | `raised`, `floating`                                |
-| `field`         | `data-ui-variant`    | `caption`, `inline`                                 |
-| `layout`        | `data-ui-variant`    | `block-fit`, `inline`, `inline-fill`, `inline-wrap` |
-| `list`          | `data-ui-variant`    | `bullet`, `numbered`                                |
-| `table-row`     | `data-ui-variant`    | `section`                                           |
+| Control / Part  | Attribute            | Declared Values                                                              |
+| --------------- | -------------------- | ---------------------------------------------------------------------------- |
+| `action-button` | `data-ui-variant`    | `default`, `danger`                                                          |
+| `alert`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`                                       |
+| `badge`         | `data-ui-variant`    | `success`, `warning`, `danger`, `info`                                       |
+| `button`        | `data-ui-variant`    | `primary`, `secondary`, `ghost`, `danger`                                    |
+| `card`          | `data-ui-decoration` | `gradient`                                                                   |
+| `card`          | `data-ui-elevation`  | `raised`, `floating`                                                         |
+| `field`         | `data-ui-variant`    | `caption`, `inline`                                                          |
+| `layout`        | `data-ui-variant`    | `block-fill`, `block-fit`, `cluster`, `inline`, `inline-fill`, `inline-wrap` |
+| `list`          | `data-ui-variant`    | `bullet`, `numbered`                                                         |
+| `table-row`     | `data-ui-variant`    | `section`                                                                    |
 
 Controls and parts may additionally declare these extension attributes:
 
