@@ -44,12 +44,12 @@ source/
     │   │   └── dashboard-state.ts
     │   ├── widgets/                 — widget catalog
     │   ├── shell/                   — bootstrap, auth-guard, content, login, form-panel
-    │   └── ui/
-    │       ├── components/          — portable shared UI foundation
-    │       │   ├── css/             — CSS barrel, tokens, themes, base styles, control styles
-    │       │   ├── charts/          — PieChart, BarChart, LineChart, Sparkline
-    │       │   ├── fonts/           — self-hosted font assets
-    │       │   └── icons/           — shared icon assets
+    │   └── ui/                      — portable shared UI foundation
+    │       ├── components/          — Ui{Control} primitives (ui-{name}.tsx, barreled by ui.ts)
+    │       ├── charts/              — PieChart, BarChart, LineChart, Sparkline
+    │       ├── css/                 — CSS barrel, tokens, roles, themes, base, ui, icons
+    │       ├── fonts/               — self-hosted font assets
+    │       └── icons/               — shared icon assets
     ├── app-admin/
     │   ├── app.tsx
     │   ├── dashboard-admin.json     — default dashboard layout for app-admin
@@ -57,10 +57,11 @@ source/
     │   ├── manifest.webmanifest
     │   ├── sw.js
     │   ├── vite.config.ts
+    │   ├── users/                   — user manager
+    │   ├── onboarding/              — guided new customer intake (COW)
     │   ├── workflow-builder/        — workflow authoring/editing
     │   ├── job-assessment/          — guided onsite detailed assessment (maps, photos, workflow mods)
-    │   ├── job-planning/            — workflow mods + crew + equipment + chemical assignment
-    │   └── customer-prospect/       — guided new customer + new job + initial assessment
+    │   └── job-planning/            — workflow mods + crew + equipment + chemical assignment
     ├── app-customer/
     │   ├── app.tsx
     │   ├── dashboard-customer.json  — default dashboard layout for app-customer
@@ -358,7 +359,7 @@ export { ThingState }
 
 ### 9.1 Application Shell Structure
 
-Each app root (`source/front/app-{admin|customer|ops}/app.tsx`) composes the same shell primitives from `common/`:
+Each app root (`source/front/app-{admin|customer|ops}/app.tsx`) composes the same shell primitives from `ux/`:
 
 ```text
 app.tsx
@@ -614,9 +615,9 @@ IndexedDB usage is split into two layers:
 
 | Concern          | Mechanism       | Location                           |
 | ---------------- | --------------- | ---------------------------------- |
-| auth / session   | SolidJS store   | `common/stores/session-state.ts`   |
-| app preferences  | IndexedDB       | `common/stores/app-state.ts`       |
-| dashboard config | IndexedDB       | `common/stores/dashboard-state.ts` |
+| auth / session   | SolidJS store   | `ux/stores/session-state.ts`     |
+| app preferences  | IndexedDB       | `ux/stores/app-state.ts`         |
+| dashboard config | IndexedDB       | `ux/stores/dashboard-state.ts`   |
 | server data      | TanStack Query  | per-page query hooks               |
 | local ui state   | SolidJS signals | component-local                    |
 | ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts`     |
@@ -632,27 +633,27 @@ IndexedDB usage is split into two layers:
 
 ### 10.1 Common Component Boundaries
 
-`source/front/ux/` is the swarmAg system user-experience foundation. All components in `common/` are reactive and adaptive by default.
+`source/front/ux/` is the swarmAg system user-experience foundation. All components in `ux/` are reactive and adaptive by default.
 
 #### 10.1.1 General-purpose UI foundation
 
 ```text
-common/
-└── components/  — portable shared UI foundation
-    ├── charts/  — reserved chart primitive directory
-    ├── css/     — CSS barrel, tokens, themes, base styles, and control styles
-    ├── fonts/   — self-hosted font assets
-    ├── icons/   — shared icon assets
-    └── ui/      — HTML and Kobalte-backed Ui{Control} primitives
+ux/
+└── ui/            — portable shared UI foundation
+    ├── components/ — HTML and Kobalte-backed Ui{Control} primitives
+    ├── charts/    — reserved chart primitive directory
+    ├── css/       — CSS barrel, tokens, roles, themes, base, ui, and icon styles
+    ├── fonts/     — self-hosted font assets
+    └── icons/     — shared icon assets
 ```
 
 #### 10.1.2 swarmAg application foundation
 
 ```text
-common/
+ux/
 ├── assets/     — static visual assets specific to swarmAg applications
 │   └── logos/  — shared swarmAg logo assets
-├── shell/      — bootstrap, login, auth guard, content frame, dashboard stub, and form panel
+├── shell/      — bootstrap, login, auth guard, content frame, dashboard host, wizard, and form panel
 ├── stores/     — session, app preference, and dashboard state stores
 ├── views/      — UX-local shared projection types consumed by two or more apps
 └── widgets/    — reusable dashboard widget catalog
@@ -667,7 +668,7 @@ common/
 
 #### 10.1.4 Rule
 
-A component moves to `common/` when a second app needs it — not before.
+A component moves to `ux/` when a second app needs it — not before.
 
 Premature generalization is a violation.
 
@@ -676,14 +677,14 @@ Premature generalization is a violation.
 Each app is an independent Vite build producing a deployable PWA bundle:
 
 ```text
-swarmag-app-admin    = ux/app-admin    + ux/common + ux/api + ux/config
-swarmag-app-ops      = ux/app-ops      + ux/common + ux/api + ux/config
-swarmag-app-customer = ux/app-customer + ux/common + ux/api + ux/config
+swarmag-app-admin    = front/app-admin    + front/ux + front/api + front/config
+swarmag-app-ops      = front/app-ops      + front/ux + front/api + front/config
+swarmag-app-customer = front/app-customer + front/ux + front/api + front/config
 ```
 
 - Three Vite configs, one per app
 - Three Netlify sites, one per app
-- `ux/common/` and `ux/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
+- `front/ux/` and `front/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
 - `ux/config/` contains two files when packaged: `ux-config.ts` and the target env file
 - The target env file binds the static bundle to one backend target; the same
   bundle may be served locally or remotely without changing that binding
@@ -787,7 +788,7 @@ The following catalogs describe the target feature set. Components not yet prese
 
 ### 11.1 Job Runner Components (app-ops)
 
-All in `source/front/app-ops/job-runner/`. Mobile-only — does not belong in `common/`.
+All in `source/front/app-ops/job-runner/`. Mobile-only — does not belong in `ux/`.
 
 | Component                          | Purpose                                 |
 | ---------------------------------- | --------------------------------------- |
@@ -810,7 +811,7 @@ All in `source/front/app-ops/job-runner/`. Mobile-only — does not belong in `c
 
 | Phase                       | App         | Feature Page        | Primary Device           |
 | --------------------------- | ----------- | ------------------- | ------------------------ |
-| Initial assessment (remote) | `app-admin` | `customer-prospect` | Desktop, Tablet          |
+| Initial assessment (remote) | `app-admin` | `onboarding`        | Desktop, Tablet          |
 | Onsite assessment           | `app-admin` | `job-assessment`    | Tablet (offline-capable) |
 | Job planning                | `app-admin` | `job-planning`      | Desktop, Tablet          |
 | Job runner                  | `app-ops`   | `job-runner`        | Mobile                   |

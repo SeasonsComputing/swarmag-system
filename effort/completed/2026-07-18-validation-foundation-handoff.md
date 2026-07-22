@@ -7,8 +7,8 @@ and acceptance. Post-handoff work folded into the same commit: Enter gate,
 collapse push animation, manager-owned autofocus, roles-as-accent-text,
 actions-width fix, sticky table headers, `AbstractionFormValidation`
 interface correction. See the task ledger for details.
-**Source design:** `documentation/project/2026-07-18-foundation-game-plan-design.md`
-**Task ledger:** `documentation/project/2026-07-18-validation-foundation-tasks.md`
+**Source design:** `effort/completed/2026-07-18-foundation-game-plan-design.md`
+**Task ledger:** `effort/completed/2026-07-18-validation-foundation-tasks.md`
 
 ---
 
@@ -52,7 +52,8 @@ shell: `use-abstraction-form-validation.ts` (new),
 (autofocus effect + panelRef), `abstraction-manager.css` (push animation).
 app-admin: `users/user-manager.tsx` (rules, wiring, normalization, cluster
 cells). Also `.claude/launch.json` (+app-admin-stage-local entry),
-`documentation/project/*` (design, tasks, this handoff, parking lot entry).
+`effort/completed/` (design, tasks, this handoff) and
+`documentation/project/project-feature-parking-lot.md` (parking lot entry).
 
 ## 3. Verification state
 

@@ -3,7 +3,7 @@
 **Date:** 2026-07-16
 **Mode:** Feature (with one Repair-mode backend fix, see §3)
 **Status:** Complete, `deno task check` green, uncommitted at time of writing (CA's call on when to commit)
-**Related:** `documentation/project/2026-07-12-edge-functions-remediation-design.md` (D12 — the CORS fix that unblocked User Manager entirely, closed same week); `documentation/project/project-feature-parking-lot.md` (eject semantics, deferred here)
+**Related:** `effort/completed/2026-07-12-edge-functions-remediation-design.md` (D12 — the CORS fix that unblocked User Manager entirely, closed same week); `documentation/project/project-feature-parking-lot.md` (eject semantics, deferred here)
 
 ---
 

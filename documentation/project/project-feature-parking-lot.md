@@ -14,7 +14,7 @@ what "picking it up" should look like.
 ## PII retention on soft-deleted users
 
 **Identified:** 2026-07-14, during Edge Functions Remediation verification
-(`documentation/project/2026-07-14-user-create-hang-handoff.md` session).
+(`effort/completed/2026-07-14-user-create-hang-handoff.md` session).
 
 **What it is:** `UserOrchestra.delete()`
 (`source/back/supabase-edge/orchestration/user-orchestra.ts`) soft-deletes a
@@ -71,7 +71,7 @@ without an explicit go — this is Foundation Mode territory (domain meaning).
 ## Eject should ban, not delete, the Auth identity
 
 **Identified:** 2026-07-16, during the User Manager UX rework
-(`documentation/project/2026-07-16-user-manager-ux-rework.md`).
+(`effort/completed/2026-07-16-user-manager-ux-rework.md`).
 
 **What it is:** `UserOrchestra.eject()`
 (`source/back/supabase-edge/orchestration/user-orchestra.ts`) currently calls

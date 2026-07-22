@@ -4,7 +4,7 @@
 **Mode:** Foundation
 **Status:** IN PROGRESS — Foundation decisions ratified and Groups A–B
 authorized by the Chief Architect.
-**Source design:** `documentation/project/2026-07-19-dashboard-presentation-field-design.md`,
+**Source design:** `effort/completed/2026-07-19-dashboard-presentation-field-design.md`,
 `documentation/architecture/architecture-front.md` (§10.3)
 
 The Dashboard header is the highest-priority presentation region. It presents

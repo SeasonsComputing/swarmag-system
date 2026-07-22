@@ -12,9 +12,9 @@
   - Domain Internals
   - UX Internals
   - Application Features
-- Approved design: `documentation/project/2026-06-28-user-contact-customer-design.md`
-- Working checklist: `documentation/project/2026-06-28-user-contact-customer-tasks.md`
-- Prior handoff: `documentation/project/2026-06-29B-user-contact-customer-handoff.md`
+- Approved design: `effort/completed/2026-06-28-user-contact-customer-design.md`
+- Working checklist: `effort/completed/2026-06-28-user-contact-customer-tasks.md`
+- Prior handoff: `effort/completed/2026-06-29B-user-contact-customer-handoff.md`
 
 The active work remained Foundation work because it touched shared UX architecture,
 theme token behavior, shared shell composition, and foundational documentation.
@@ -55,7 +55,7 @@ Updated:
 - `source/tests/fixtures/customer-samples.ts`
 - `source/tests/fixtures/fixtures-test.ts`
 - `source/tests/cases/users-api-test.ts`
-- `documentation/project/2026-06-28-user-contact-customer-tasks.md`
+- `effort/completed/2026-06-28-user-contact-customer-tasks.md`
 
 Implemented:
 

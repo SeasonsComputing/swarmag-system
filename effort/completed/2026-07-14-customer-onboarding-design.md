@@ -12,10 +12,10 @@ not answers.
 
 The User domain (auth/domain sync, edge functions, RLS) is now complete and
 verified end-to-end (see
-`documentation/project/2026-07-14-user-create-hang-handoff.md` and the
+`effort/completed/2026-07-14-user-create-hang-handoff.md` and the
 edge-functions remediation series). User Manager's UX (confirmations, editor
 feedback, generalized shell primitives) is also now complete — see
-`documentation/project/2026-07-16-user-manager-ux-rework.md`. The next
+`effort/completed/2026-07-16-user-manager-ux-rework.md`. The next
 milestone is **Customer Onboarding**: a serialized, wizard-like flow that
 walks an admin or sales rep through:
 

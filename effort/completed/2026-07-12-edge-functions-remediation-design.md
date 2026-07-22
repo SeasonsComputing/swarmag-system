@@ -6,10 +6,10 @@
 functions (`user-create`, `user-update`, `user-delete`, `user-eject`) verified
 live on stage via real browser round-trips (create, update, delete, eject all
 confirmed working end-to-end 2026-07-14). See
-`documentation/project/2026-07-12-edge-functions-remediation-tasks.md` for
-phase-by-phase status and `documentation/project/2026-07-14-user-create-hang-handoff.md`
+`effort/completed/2026-07-12-edge-functions-remediation-tasks.md` for
+phase-by-phase status and `effort/completed/2026-07-14-user-create-hang-handoff.md`
 for the D12 incident this status line refers to.
-**Supersedes:** UUID language in `documentation/project/2026-06-30B-user-edge-functions-handoff.md` (see D1)
+**Supersedes:** UUID language in `effort/completed/2026-06-30B-user-edge-functions-handoff.md` (see D1)
 
 ---
 
@@ -231,7 +231,7 @@ behavior invisible to `curl`.
 ## 3. Plan of Record
 
 Six gated phases; each is an authorized Foundation-mode production. See
-`documentation/project/2026-07-12-edge-functions-remediation-tasks.md` for the
+`effort/completed/2026-07-12-edge-functions-remediation-tasks.md` for the
 working checklist and status.
 
 _End of Design Document_

@@ -9,8 +9,8 @@
 milestone** (CA directive 2026-07-19) with fresh design/tasks docs — the
 wizard genuinely starts a new thing. Answer at its kickoff: does onboarding
 need inline note capture (if yes, Notes swaps ahead).
-**Related:** documentation/project/2026-07-16-user-manager-ux-rework.md,
-documentation/project/2026-07-14-customer-onboarding-design.md
+**Related:** effort/completed/2026-07-16-user-manager-ux-rework.md,
+effort/completed/2026-07-14-customer-onboarding-design.md
 
 ---
 

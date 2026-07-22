@@ -3,7 +3,7 @@
 **Date:** 2026-06-28
 **Mode:** Foundation
 **Status:** Planning checklist
-**Source design:** `documentation/project/2026-06-28-user-contact-customer-design.md`
+**Source design:** `effort/completed/2026-06-28-user-contact-customer-design.md`
 
 This task list decomposes the approved design into implementation workstreams.
 It is a planning aid, not a replacement for the approved design or governing

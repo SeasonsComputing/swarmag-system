@@ -12,9 +12,9 @@
   - Domain Internals
   - UX Internals
   - Application Features
-- Approved design: `documentation/project/2026-06-28-user-contact-customer-design.md`
-- Working checklist: `documentation/project/2026-06-28-user-contact-customer-tasks.md`
-- Prior handoff: `documentation/project/2026-06-29A-user-contact-customer-handoff.md`
+- Approved design: `effort/completed/2026-06-28-user-contact-customer-design.md`
+- Working checklist: `effort/completed/2026-06-28-user-contact-customer-tasks.md`
+- Prior handoff: `effort/completed/2026-06-29A-user-contact-customer-handoff.md`
 
 The active work remained Foundation work because it touched shared UX form behavior,
 domain-backed User contracts, common UI primitives, and verification fixtures still
@@ -44,7 +44,7 @@ blocked by the domain-model change.
 
 Updated:
 
-- `documentation/project/2026-06-28-user-contact-customer-tasks.md`
+- `effort/completed/2026-06-28-user-contact-customer-tasks.md`
 - `documentation/ux/ux-components-guide.md`
 - `documentation/ux/ux-components-guide-lite.md`
 
@@ -153,7 +153,7 @@ Passed:
 - `deno task guard:css`
 - `deno task guard:env`
 - `dprint fmt documentation/ux/ux-components-guide.md documentation/ux/ux-components-guide-lite.md`
-- `dprint fmt documentation/project/2026-06-28-user-contact-customer-tasks.md documentation/project/2026-06-29A-user-contact-customer-handoff.md`
+- `dprint fmt effort/completed/2026-06-28-user-contact-customer-tasks.md effort/completed/2026-06-29A-user-contact-customer-handoff.md`
 - Targeted `deno check` for changed UX TypeScript/TSX files.
 - Targeted `deno lint` for changed UX TypeScript/TSX files.
 
@@ -208,7 +208,7 @@ Recommended checks after Tests scope #4:
 
 Modified files from this UX session:
 
-- `documentation/project/2026-06-28-user-contact-customer-tasks.md`
+- `effort/completed/2026-06-28-user-contact-customer-tasks.md`
 - `documentation/ux/ux-components-guide.md`
 - `documentation/ux/ux-components-guide-lite.md`
 - `source/ux/app-admin/index.html`
@@ -227,7 +227,7 @@ Modified files from this UX session:
 
 New file from this handoff:
 
-- `documentation/project/2026-06-29A-user-contact-customer-handoff.md`
+- `effort/completed/2026-06-29A-user-contact-customer-handoff.md`
 
 There may also be staged files from the earlier Domain Internals scope. Inspect
 `git status --short` before committing or staging.
