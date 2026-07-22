@@ -103,9 +103,28 @@
     transform var(--sa-motion-page-fade) ease,
     visibility 0s;
 
-  /* ─────────────────────────────────────────────────────────────────────── */
-  /* LAYOUT RHYTHM TOKENS                                                    */
-  /* ─────────────────────────────────────────────────────────────────────── */
+  /* ──────────────────────────────────────────────────────────────────────── */
+  /* LAYOUT RHYTHM TOKENS                                                     */
+  /* ──────────────────────────────────────────────────────────────────────── */
+  /* Each token owns exactly one spatial role. Select by the KIND of space    */
+  /* being created, never by which value happens to look right.               */
+  /*                                                                          */
+  /*   gutter     — PAGE padding, and only page padding. Page-level surfaces  */
+  /*                only (dashboard, style guide). Sparse use is correct use. */
+  /*                Its wide range is deliberate: page margins scale hard,    */
+  /*                box interiors must not. NOT an inline-axis token — a      */
+  /*                surface needing an inline measure distinct from its block */
+  /*                measure requires a NEW token, not this one.               */
+  /*   pad        — BOX INTERIOR. Resolves to --sa-card-panel-pad and         */
+  /*                --sa-dialog-pad. Raising it widens every card and dialog  */
+  /*                interior at once; that reach is intended. Also            */
+  /*                participates in dialog SIZING math, so it can move        */
+  /*                surface dimensions as well as interior spacing.           */
+  /*   gap        — SPACE BETWEEN siblings: fieldsets, fields, grid tracks.   */
+  /*   gap-tight  — same role as gap, for dense control clusters.             */
+  /*                                                                          */
+  /* Normative definition: ux-design-language.md §5.2.                        */
+  /* ──────────────────────────────────────────────────────────────────────── */
 
   --sa-rhythm-gutter: clamp(
     var(--sa-space-md),
@@ -134,7 +153,7 @@
   :root {
     --sa-base-size: var(--sa-font-size-sm);
     --sa-rhythm-gutter: var(--sa-space-sm);
-    --sa-rhythm-pad: var(--sa-space-sm);
+    --sa-rhythm-pad: calc(var(--sa-space-md) - var(--sa-space-xs));
     --sa-rhythm-gap: var(--sa-space-sm);
     --sa-rhythm-gap-tight: calc(var(--sa-space-xx) / 2);
   }

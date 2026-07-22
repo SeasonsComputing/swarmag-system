@@ -6,7 +6,7 @@
 */
 
 [data-feat='abstraction-manager'] {
-  block-size: clamp(32rem, 72dvh, 42rem);
+  block-size: clamp(32rem, 72dvh, 44rem);
   display: grid;
   gap: var(--sa-rhythm-gap);
   grid-template-columns: minmax(var(--sa-size-xs), 2fr) minmax(var(--sa-size-xs), 1fr);

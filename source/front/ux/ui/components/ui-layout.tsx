@@ -16,8 +16,14 @@ UiLayout  Layout container with declared variant and gap density.
 import { type JSX, splitProps } from '@solid-js'
 import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 
-/** Layout variant. Omit for block-fill stack. */
-export type UiLayoutVariant = 'block-fit' | 'cluster' | 'inline' | 'inline-fill' | 'inline-wrap'
+/** Layout variant. Omit for a full-width vertical stack. */
+export type UiLayoutVariant =
+  | 'block-fill'
+  | 'block-fit'
+  | 'cluster'
+  | 'inline'
+  | 'inline-fill'
+  | 'inline-wrap'
 
 /** Layout gap density. Omit for standard spacing. */
 export type UiLayoutGap = 'loose' | 'tight' | 'none'

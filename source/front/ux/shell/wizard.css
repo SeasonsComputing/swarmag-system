@@ -9,7 +9,7 @@
   block-size: clamp(32rem, 72dvh, 44rem);
   display: grid;
   gap: var(--sa-rhythm-gap);
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr);
   max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
 }
 
@@ -17,6 +17,11 @@
   align-items: center;
   display: flex;
   justify-content: space-between;
+  min-inline-size: 0;
+}
+
+[data-feat='wizard-content'] {
+  min-block-size: 0;
   min-inline-size: 0;
 }
 
@@ -37,20 +42,20 @@
 [data-feat='wizard-bar'] {
   background: var(--sa-bg-progress-track);
   border-radius: var(--sa-radius-full);
-  min-block-size: var(--sa-progress-height);
+  min-block-size: calc(var(--sa-progress-height) / 2);
   overflow: hidden;
 }
 
 [data-feat='wizard-bar-fill'] {
   background: var(--sa-gradient-brand);
-  block-size: var(--sa-progress-height);
+  block-size: calc(var(--sa-progress-height) / 2);
   border-radius: var(--sa-radius-full);
   transition: var(--sa-transition-base);
 }
 
 [data-feat='wizard-steps'] {
   display: flex;
-  gap: var(--sa-space-sm);
+  gap: 0;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -64,14 +69,16 @@
 
 /* Labels sit beneath the rail, one per segment; upcoming is the dim default. */
 [data-feat='wizard-step'] {
+  align-items: flex-start;
   color: var(--sa-text-dim);
   display: flex;
   flex: 1 1 0;
-  font-size: var(--sa-font-size-sm);
+  font-size: var(--sa-ui-font-size-compact);
   gap: var(--sa-space-xs);
   justify-content: center;
   min-inline-size: 0;
   text-align: center;
+  align-items: center;
 }
 
 [data-feat='wizard-step']:first-child {
@@ -94,14 +101,36 @@
 }
 
 [data-feat='wizard-step-title'] {
+  line-height: 1.1;
   min-inline-size: 0;
 }
 
-[data-feat='wizard'] > [data-ui='card'] {
+[data-feat='wizard-step-ordinal'] {
+  align-items: center;
+  background: transparent;
+  block-size: var(--sa-space-lg);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-full);
+  color: inherit;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: var(--sa-data-font-family);
+  inline-size: var(--sa-space-lg);
+  justify-content: center;
+}
+
+[data-feat='wizard-content'] [data-ui='layout'][data-ui-variant='block-fill'] > [data-ui='card'] {
   display: flex;
   flex-direction: column;
   min-block-size: 0;
   overflow: visible;
+}
+
+[data-feat='wizard-card-header'] {
+  align-items: center;
+  display: flex;
+  flex: 0 0 auto;
+  padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
 }
 
 [data-feat='wizard-card-body'] {
@@ -120,9 +149,9 @@
   animation: sa-fade-in var(--sa-motion-page-fade) ease;
 }
 
-[data-feat='wizard-footer'] {
+[data-feat='wizard-navigation'] {
   display: flex;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   gap: var(--sa-space-sm);
   justify-content: space-between;
 }
@@ -144,7 +173,7 @@
     padding-inline: var(--sa-rhythm-pad);
   }
 
-  [data-feat='wizard'] > [data-ui='card'] {
+  [data-feat='wizard-content'] [data-ui='layout'][data-ui-variant='block-fill'] > [data-ui='card'] {
     border-radius: 0;
   }
 }
