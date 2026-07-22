@@ -18,11 +18,7 @@ AbstractionManagerContract     Provider contract for list-and-panel managers.
 */
 
 import type { Instance } from '@core/std'
-import type {
-  UiActionButtonVariant,
-  UiAlertVariant,
-  UiComponent
-} from '@front/ux/ui'
+import type { UiActionButtonVariant, UiAlertVariant, UiComponent } from '@front/ux/ui'
 
 /** Feedback displayed in an abstraction manager editor header. */
 export type AbstractionManagerFeedback = {
