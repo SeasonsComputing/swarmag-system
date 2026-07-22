@@ -19,7 +19,7 @@ Login Passwordless OTP login component.
 */
 
 import { api } from '@front/api'
-import { UiAlert, UiButton, UiField, UiInput, UiLayout } from '@front/ux/ui'
+import { UiActionButton, UiAlert, UiButton, UiField, UiInput, UiLayout } from '@front/ux/ui'
 import { createSignal, onMount, Show } from '@solid-js'
 import { Navigate } from '@tanstack/solid-router'
 import { BrandHero } from './brand-hero.tsx'
@@ -170,9 +170,13 @@ const LoginClient = (props: LoginClientProps) => {
                         />
                       </UiField>
                       <UiLayout variant='inline-fill'>
-                        <UiButton type='button' variant='ghost' onClick={returnToEmail}>
-                          Back
-                        </UiButton>
+                        <UiActionButton
+                          align='start'
+                          icon='arrow-left'
+                          label='Back'
+                          labelMode='visible'
+                          onClick={returnToEmail}
+                        />
                         <UiButton type='submit' variant='primary' loading={pending()}>
                           Sign In
                         </UiButton>

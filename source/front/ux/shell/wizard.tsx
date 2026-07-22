@@ -130,17 +130,36 @@ export const Wizard = (props: WizardProps): UiComponent => {
         </div>
       </UiCard>
       <footer data-feat='wizard-footer'>
-        <UiButton variant='secondary' disabled={isFirst() || committing()} onClick={back}>
-          Back
-        </UiButton>
-        <UiButton
-          variant='primary'
-          disabled={!canAdvance() || committing()}
-          loading={committing()}
-          onClick={() => void advance()}
+        <UiActionButton
+          align='start'
+          icon='arrow-left'
+          label='Back'
+          labelMode='visible'
+          disabled={isFirst() || committing()}
+          onClick={back}
+        />
+        <Show
+          when={isLast()}
+          fallback={
+            <UiActionButton
+              icon='arrow-right'
+              label='Next'
+              labelMode='visible'
+              disabled={!canAdvance() || committing()}
+              loading={committing()}
+              onClick={() => void advance()}
+            />
+          }
         >
-          {isLast() ? 'Finish' : 'Next'}
-        </UiButton>
+          <UiButton
+            variant='primary'
+            disabled={!canAdvance() || committing()}
+            loading={committing()}
+            onClick={() => void advance()}
+          >
+            Finish
+          </UiButton>
+        </Show>
       </footer>
     </div>
   )

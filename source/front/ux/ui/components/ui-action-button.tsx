@@ -23,6 +23,9 @@ export type UiActionButtonVariant = 'default' | 'danger'
 /** Action button label presentation. */
 export type UiActionButtonLabelMode = 'reveal' | 'visible'
 
+/** Action button icon alignment when the label is visible. */
+export type UiActionButtonAlign = 'start' | 'end'
+
 /** Action button control props. */
 export type UiActionButtonProps =
   & Omit<
@@ -33,12 +36,14 @@ export type UiActionButtonProps =
     | 'style'
     | 'aria-label'
     | 'data-ui'
+    | 'data-ui-align'
     | 'data-ui-icon'
     | 'data-ui-label-mode'
     | 'data-ui-state'
     | 'data-ui-variant'
   >
   & {
+    align?: UiActionButtonAlign
     disabled?: boolean
     error?: boolean
     icon: string
@@ -50,6 +55,7 @@ export type UiActionButtonProps =
     classList?: never
     style?: never
     'data-ui'?: never
+    'data-ui-align'?: never
     'data-ui-icon'?: never
     'data-ui-label-mode'?: never
     'data-ui-state'?: never
@@ -59,6 +65,7 @@ export type UiActionButtonProps =
 /** Compact icon button with hover/focus label affordance. */
 export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
   const [local, others] = splitProps(props, [
+    'align',
     'disabled',
     'error',
     'icon',
@@ -81,6 +88,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
       {...others}
       aria-label={local.label}
       data-ui='action-button'
+      data-ui-align={local.align ?? 'end'}
       data-ui-icon={local.icon}
       data-ui-label-mode={local.labelMode ?? 'reveal'}
       data-ui-state={controlState(local)}

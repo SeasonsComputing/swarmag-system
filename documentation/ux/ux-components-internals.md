@@ -160,6 +160,7 @@ Controls and parts may additionally declare these extension attributes:
 
 | Control / Part    | Attribute          | Declared Values              |
 | ----------------- | ------------------ | ---------------------------- |
+| `action-button`   | `data-ui-align`    | `start`, `end`               |
 | `action-button`   | `data-ui-icon`     | Any `icons.css` catalog name |
 | `layout`          | `data-ui-gap`      | `loose`, `tight`, `none`     |
 | `tab-list`        | `data-ui-drag`     | `enabled`, `active`          |
