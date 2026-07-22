@@ -613,14 +613,14 @@ IndexedDB usage is split into two layers:
 
 ### 9.6 State Management
 
-| Concern          | Mechanism       | Location                           |
-| ---------------- | --------------- | ---------------------------------- |
-| auth / session   | SolidJS store   | `ux/stores/session-state.ts`     |
-| app preferences  | IndexedDB       | `ux/stores/app-state.ts`         |
-| dashboard config | IndexedDB       | `ux/stores/dashboard-state.ts`   |
-| server data      | TanStack Query  | per-page query hooks               |
-| local ui state   | SolidJS signals | component-local                    |
-| ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts`     |
+| Concern          | Mechanism       | Location                       |
+| ---------------- | --------------- | ------------------------------ |
+| auth / session   | SolidJS store   | `ux/stores/session-state.ts`   |
+| app preferences  | IndexedDB       | `ux/stores/app-state.ts`       |
+| dashboard config | IndexedDB       | `ux/stores/dashboard-state.ts` |
+| server data      | TanStack Query  | per-page query hooks           |
+| local ui state   | SolidJS signals | component-local                |
+| ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts` |
 
 #### 9.6.1 Rules
 
@@ -809,12 +809,12 @@ All in `source/front/app-ops/job-runner/`. Mobile-only — does not belong in `u
 
 #### 11.2.1 Device Target
 
-| Phase                       | App         | Feature Page        | Primary Device           |
-| --------------------------- | ----------- | ------------------- | ------------------------ |
-| Initial assessment (remote) | `app-admin` | `onboarding`        | Desktop, Tablet          |
-| Onsite assessment           | `app-admin` | `job-assessment`    | Tablet (offline-capable) |
-| Job planning                | `app-admin` | `job-planning`      | Desktop, Tablet          |
-| Job runner                  | `app-ops`   | `job-runner`        | Mobile                   |
+| Phase                       | App         | Feature Page     | Primary Device           |
+| --------------------------- | ----------- | ---------------- | ------------------------ |
+| Initial assessment (remote) | `app-admin` | `onboarding`     | Desktop, Tablet          |
+| Onsite assessment           | `app-admin` | `job-assessment` | Tablet (offline-capable) |
+| Job planning                | `app-admin` | `job-planning`   | Desktop, Tablet          |
+| Job runner                  | `app-ops`   | `job-runner`     | Mobile                   |
 
 #### 11.2.2 Specialized UX
 

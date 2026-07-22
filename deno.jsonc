@@ -49,6 +49,7 @@
     // VALIDATION CHECKS
     // ────────────────────────────────────────────────────────────────────────────
 
+    "chk": "deno task check",
     "check": "deno task check:guards && deno task check:types && deno task check:lint",
     "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:front-state && deno task guard:chart && deno task guard:imports && deno task guard:css && deno task guard:bare-html && deno task guard:namespaces",
     "check:types": "deno check --lock=deno.lock --frozen source/**/*.ts source/**/*.tsx",

@@ -167,7 +167,11 @@ export const AbstractionManager = <T extends Instance>(
                                 />
                               )}
                             </For>
-                            <UiActionButton icon='pencil-1' label='Edit' onClick={() => onSelect(item)} />
+                            <UiActionButton
+                              icon='pencil-1'
+                              label='Edit'
+                              onClick={() => onSelect(item)}
+                            />
                           </UiTableCell>
                         </UiTableRow>
                       )}

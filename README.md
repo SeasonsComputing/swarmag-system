@@ -84,15 +84,15 @@ Primary architectural context lives in `documentation/architecture/architecture-
 
 #### 1.3.4 Frontend (`source/front/`)
 
-| Path            | Description                                          |
-| --------------- | ---------------------------------------------------- |
-| `api/`          | Composed API namespace (`@front/api` barrel export)  |
-| `app-admin/`    | Admin PWA application (desktop/tablet)               |
-| `app-ops/`      | Operations PWA application (mobile, field execution) |
-| `app-customer/` | Customer portal application (static, read-only)      |
-| `app-style-guide/` | Style-guide harness application                    |
-| `config/`       | Configuration bootstrap for UX applications          |
-| `ux/`           | Shared UX components, state, views, and UI libraries |
+| Path               | Description                                          |
+| ------------------ | ---------------------------------------------------- |
+| `api/`             | Composed API namespace (`@front/api` barrel export)  |
+| `app-admin/`       | Admin PWA application (desktop/tablet)               |
+| `app-ops/`         | Operations PWA application (mobile, field execution) |
+| `app-customer/`    | Customer portal application (static, read-only)      |
+| `app-style-guide/` | Style-guide harness application                      |
+| `config/`          | Configuration bootstrap for UX applications          |
+| `ux/`              | Shared UX components, state, views, and UI libraries |
 
 ## 2. Local Configuration
 
