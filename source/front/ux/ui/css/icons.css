@@ -116,7 +116,7 @@
   --sa-icon: url('../icons/avatar.svg');
 }
 
-[data-ui-icon='back'] {
+[data-ui-icon='arrow-left'] {
   --sa-icon: url('../icons/arrow-left.svg');
 }
 
@@ -202,10 +202,6 @@
 
 [data-ui-icon='box-model'] {
   --sa-icon: url('../icons/box-model.svg');
-}
-
-[data-ui-icon='building'] {
-  --sa-icon: url('../icons/home.svg');
 }
 
 [data-ui-icon='button'] {
@@ -392,7 +388,7 @@
   --sa-icon: url('../icons/crop.svg');
 }
 
-[data-ui-icon='cross'] {
+[data-ui-icon='cross-1'] {
   --sa-icon: url('../icons/cross-1.svg');
 }
 
@@ -440,7 +436,7 @@
   --sa-icon: url('../icons/database.svg');
 }
 
-[data-ui-icon='delete'] {
+[data-ui-icon='trash'] {
   --sa-icon: url('../icons/trash.svg');
 }
 
@@ -536,11 +532,11 @@
   --sa-icon: url('../icons/dropdown-menu.svg');
 }
 
-[data-ui-icon='edit'] {
+[data-ui-icon='pencil-1'] {
   --sa-icon: url('../icons/pencil-1.svg');
 }
 
-[data-ui-icon='eject'] {
+[data-ui-icon='exit'] {
   --sa-icon: url('../icons/exit.svg');
 }
 
@@ -704,6 +700,10 @@
   --sa-icon: url('../icons/hobby-knife.svg');
 }
 
+[data-ui-icon='home'] {
+  --sa-icon: url('../icons/home.svg');
+}
+
 [data-ui-icon='id-card'] {
   --sa-icon: url('../icons/id-card.svg');
 }
@@ -712,7 +712,7 @@
   --sa-icon: url('../icons/image.svg');
 }
 
-[data-ui-icon='info'] {
+[data-ui-icon='info-circled'] {
   --sa-icon: url('../icons/info-circled.svg');
 }
 
@@ -1296,7 +1296,7 @@
   --sa-icon: url('../icons/upload.svg');
 }
 
-[data-ui-icon='user'] {
+[data-ui-icon='person'] {
   --sa-icon: url('../icons/person.svg');
 }
 

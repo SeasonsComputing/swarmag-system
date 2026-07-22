@@ -751,7 +751,7 @@ Extends native button attributes, excluding styling and semantic hook props.
 
 | Prop        | Type                                                                                                        | Default    | Description                                       |
 | ----------- | ----------------------------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------- |
-| `icon`      | `'back' \| 'building' \| 'check' \| 'cross' \| 'delete' \| 'edit' \| 'eject' \| 'info' \| 'plus' \| 'user'` | —          | Icon to display.                                  |
+| `icon`      | `string`                                                                                                      | —          | Icon catalog name to display.                     |
 | `label`     | `string`                                                                                                    | —          | Accessible label and optional visible label text. |
 | `labelMode` | `'reveal' \| 'visible'`                                                                                     | `'reveal'` | Label presentation.                               |
 | `variant`   | `'default' \| 'danger'`                                                                                     | unset      | Visual/action priority.                           |
@@ -766,17 +766,17 @@ Extends native button attributes, excluding styling and semantic hook props.
 `data-ui='action-button'`, `data-ui-icon`, `data-ui-label-mode`,
 `data-ui-state`, `data-ui-variant`.
 
-The `icon` values are the curated subset exposed on action buttons; the full
-glyph set is the icon catalog (`icons.css`).
+The `icon` value passes directly to the icon catalog (`icons.css`). Every
+catalog name is valid for an action button.
 
 **Example**
 
 ```tsx
-<UiActionButton icon='edit' label='Edit user' onClick={onEdit} />
-<UiActionButton icon='info' label='About' onClick={onAbout} />
-<UiActionButton icon='user' label='Users' onClick={onUsers} />
-<UiActionButton icon='eject' label='Eject user' onClick={onEject} />
-<UiActionButton icon='delete' label='Delete record' variant='danger' onClick={onDelete} />
+<UiActionButton icon='pencil-1' label='Edit user' onClick={onEdit} />
+<UiActionButton icon='info-circled' label='About' onClick={onAbout} />
+<UiActionButton icon='person' label='Users' onClick={onUsers} />
+<UiActionButton icon='exit' label='Eject user' onClick={onEject} />
+<UiActionButton icon='trash' label='Delete record' variant='danger' onClick={onDelete} />
 <UiActionButton icon='check' label='Save' labelMode='visible' type='submit' />
 ```
 

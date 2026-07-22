@@ -19,7 +19,6 @@ AbstractionManagerContract     Provider contract for list-and-panel managers.
 
 import type { Instance } from '@core/std'
 import type {
-  UiActionButtonIcon,
   UiActionButtonVariant,
   UiAlertVariant,
   UiComponent
@@ -41,7 +40,7 @@ export type AbstractionActionConfirmation<T extends Instance> = {
 export type AbstractionAction<T extends Instance> = {
   name: string
   label: string
-  icon: UiActionButtonIcon
+  icon: string
   variant?: UiActionButtonVariant
   confirmation?: AbstractionActionConfirmation<T>
   handler: (item: T) => void | Promise<void>

@@ -14,13 +14,7 @@ ActionWidget  Dashboard header action widget.
 */
 
 import type { Dictionary } from '@core/std'
-import {
-  UI_ACTION_BUTTON_ICONS,
-  UiActionButton,
-  type UiActionButtonIcon,
-  type UiComponent,
-  UiLayout
-} from '@front/ux/ui'
+import { UiActionButton, type UiComponent, UiLayout } from '@front/ux/ui'
 import { For } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 
@@ -37,7 +31,7 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   const pairs = () => {
     const actions = toStringArray(props.settings['actions'], 'ActionWidget settings.actions')
     const labels = toStringArray(props.settings['labels'], 'ActionWidget settings.labels')
-    const icons = toIconArray(props.settings['icons'], 'ActionWidget settings.icons')
+    const icons = toStringArray(props.settings['icons'], 'ActionWidget settings.icons')
     if (actions.length !== labels.length || actions.length !== icons.length) {
       throw new Error('ActionWidget settings actions, labels, and icons must have equal lengths')
     }
@@ -65,14 +59,6 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
     </nav>
   )
 }
-
-const toIconArray = (value: unknown, field: string): UiActionButtonIcon[] =>
-  toStringArray(value, field).map((icon, index) => {
-    if (!UI_ACTION_BUTTON_ICONS.includes(icon as UiActionButtonIcon)) {
-      throw new Error(`${field}[${index}] must be a supported action button icon name`)
-    }
-    return icon as UiActionButtonIcon
-  })
 
 const toStringArray = (value: unknown, field: string): string[] => {
   if (!Array.isArray(value)) throw new Error(`${field} must be an array`)

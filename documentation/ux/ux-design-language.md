@@ -91,8 +91,9 @@ CSS files live in `source/front/ux/ui/css/`. A shared CSS barrel,
 - `icons.css` is the single glyph binding layer. Each rule roots at
   `[data-ui-icon='{name}']` and declares only `--sa-icon`, an inheriting custom property bound
   to a glyph asset URL. Component selectors in `ui.css` consume `var(--sa-icon)` — for example
-  as a `mask` — so a glyph inherits into a control's icon part. Icon names are semantic; each
-  control's API allowlists the subset it exposes.
+  as a `mask` — so a glyph inherits into a control's icon part. Every catalog selector and
+  glyph asset share the same name: `[data-ui-icon='{name}']` binds `{name}.svg`. Each control's
+  API allowlists the subset it exposes.
 
 ## 3. Tokens
 

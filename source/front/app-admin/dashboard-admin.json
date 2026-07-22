@@ -9,9 +9,9 @@
         "type": "ActionWidget",
         "settings": {
           "shape": "compact",
-          "actions": ["/users", "/about", "/logout"],
-          "labels": ["Users", "About", "Logout"],
-          "icons": ["user", "info", "eject"]
+          "actions": ["/users", "/onboarding", "/about", "/logout"],
+          "labels": ["Users", "Onboarding", "About", "Logout"],
+          "icons": ["person", "id-card", "info-circled", "exit"]
         }
       }
     ]

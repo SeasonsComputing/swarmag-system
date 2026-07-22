@@ -50,6 +50,9 @@ export const Wizard = (props: WizardProps): UiComponent => {
   const stepState = (index: number) =>
     index < stepIndex() ? 'done' : index === stepIndex() ? 'current' : 'upcoming'
 
+  const barFill = (): string =>
+    `${(((stepIndex() + 0.5) / props.contract.stages.length) * 100).toFixed(3)}%`
+
   const banner = createMemo<WizardFeedback | null>(() => {
     const e = error()
     if (e) return { message: e, variant: 'danger' }
@@ -91,26 +94,26 @@ export const Wizard = (props: WizardProps): UiComponent => {
       <header data-feat='wizard-title-row'>
         <h1 data-feat='wizard-title'>{props.contract.formTitle}</h1>
         <UiActionButton
-          icon='cross'
+          icon='cross-1'
           label='Cancel'
           labelMode='visible'
           onClick={() => props.onCancel()}
         />
       </header>
       <div data-feat='wizard-indicator'>
+        <div aria-hidden='true' data-feat='wizard-bar'>
+          <div data-feat='wizard-bar-fill' style={{ 'inline-size': barFill() }} />
+        </div>
         <UiList data-feat='wizard-steps'>
           <For each={props.contract.stages}>
             {(item, index) => (
               <UiListItem data-feat='wizard-step' data-feat-state={stepState(index())}>
-                <span data-feat='wizard-step-ordinal'>{index() + 1}</span>
+                <span data-feat='wizard-step-ordinal'>({index() + 1})</span>
                 <span data-feat='wizard-step-title'>{item.title}</span>
               </UiListItem>
             )}
           </For>
         </UiList>
-        <p data-feat='wizard-step-caption'>
-          Step {stepIndex() + 1} of {props.contract.stages.length} — {stage().title}
-        </p>
       </div>
       <UiCard elevation='raised'>
         <div data-feat='wizard-card-body'>
