@@ -1,0 +1,44 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Panel form styles                                                            ║
+║ Card and body geometry for a subject form panel.                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-feat-panel='form'] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+}
+
+[data-feat-panel='form'] > [data-ui='card'] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: visible;
+}
+
+[data-feat-panel='form-header'] {
+  align-items: stretch;
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: var(--sa-space-xs);
+  padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
+}
+
+[data-feat-panel='form'] [data-feat-panel='body'] {
+  overscroll-behavior: contain;
+}
+
+[data-feat-panel='form'] [data-feat-panel='body'] > form {
+  min-block-size: 0;
+}
+
+@media (max-width: 480px) {
+  [data-feat-panel='form'] > [data-ui='card'] {
+    border-radius: 0;
+  }
+}

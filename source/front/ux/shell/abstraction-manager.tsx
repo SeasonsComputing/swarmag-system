@@ -19,7 +19,6 @@ import {
   UiActionButton,
   UiAlert,
   UiButton,
-  UiCard,
   type UiComponent,
   UiDialog,
   UiTable,
@@ -30,6 +29,10 @@ import {
 } from '@front/ux/ui'
 import { createEffect, createSignal, For, Show } from '@solid-js'
 import type { AbstractionAction, AbstractionManagerContract } from './abstraction-manager-contract.ts'
+import { PanelContainer } from './panel-container.tsx'
+import { PanelForm } from './panel-form.tsx'
+import { PanelHeader } from './panel-header.tsx'
+import { PanelList } from './panel-list.tsx'
 import { focusFirstField } from './use-abstraction-form-keyboard.ts'
 
 import './abstraction-manager.css'
@@ -108,25 +111,32 @@ export const AbstractionManager = <T extends Instance>(
       : `New ${props.provider.entityLabel}`
 
   return (
-    <div data-feat='abstraction-manager' data-feat-mode={mode()}>
-      <header data-feat='abstraction-manager-title-row'>
-        <h1 data-feat='abstraction-manager-title'>{props.provider.formTitle}</h1>
-        <UiActionButton icon='cross-1' label='Cancel' labelMode='visible' onClick={cancelDialog} />
-      </header>
-      <section data-feat='abstraction-manager-list'>
-        <UiCard elevation='raised'>
-          <header data-feat='abstraction-manager-card-header'>
-            <h2 data-feat='abstraction-manager-card-title'>{props.provider.entityLabel}s</h2>
-            <div data-feat='abstraction-manager-card-actions'>
-              <UiActionButton
-                icon='plus'
-                label={`New ${props.provider.entityLabel}`}
-                labelMode='visible'
-                onClick={onNew}
-              />
-            </div>
-          </header>
-          <div data-feat='abstraction-manager-card-body' data-feat-region='list-body'>
+    <>
+      <PanelContainer
+        feature='abstraction-manager'
+        mode={mode()}
+        header={
+          <PanelHeader
+            leading={<h1>{props.provider.formTitle}</h1>}
+            trailing={
+              <UiActionButton icon='cross-1' label='Cancel' labelMode='visible' onClick={cancelDialog} />
+            }
+          />
+        }
+        index={
+          <PanelList
+            header={{
+              leading: <h2>{props.provider.entityLabel}s</h2>,
+              trailing: (
+                <UiActionButton
+                  icon='plus'
+                  label={`New ${props.provider.entityLabel}`}
+                  labelMode='visible'
+                  onClick={onNew}
+                />
+              )
+            }}
+          >
             <Show
               when={!props.provider.isListLoading()}
               fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
@@ -180,27 +190,29 @@ export const AbstractionManager = <T extends Instance>(
                 </UiTableBody>
               </UiTable>
             </Show>
-          </div>
-        </UiCard>
-      </section>
-      <section data-feat='abstraction-manager-panel' ref={panelRef}>
-        <UiCard elevation='raised'>
-          <header data-feat='abstraction-manager-card-header' data-feat-region='editor-header'>
-            <div data-feat='abstraction-manager-card-header-row'>
-              <div data-feat='abstraction-manager-card-title-group'>
-                <div data-feat='abstraction-manager-collapse-action'>
-                  <span data-feat='abstraction-manager-back-command'>
-                    <UiActionButton
-                      icon='arrow-left'
-                      label={`${props.provider.entityLabel}s`}
-                      onClick={() => setMode('list')}
-                    />
-                    <span aria-hidden='true' data-feat='abstraction-manager-command-divider' />
-                  </span>
-                </div>
-                <h2 data-feat='abstraction-manager-card-title'>{editorTitle()}</h2>
-              </div>
-              <div data-feat='abstraction-manager-card-actions'>
+          </PanelList>
+        }
+        subjectRef={element => panelRef = element}
+        subject={
+          <PanelForm
+            feedback={props.provider.editorFeedback?.()}
+            header={{
+              leading: (
+                <>
+                  <div data-feat='abstraction-manager-collapse-action'>
+                    <span data-feat='abstraction-manager-back-command'>
+                      <UiActionButton
+                        icon='arrow-left'
+                        label={`${props.provider.entityLabel}s`}
+                        onClick={() => setMode('list')}
+                      />
+                      <span aria-hidden='true' data-feat='abstraction-manager-command-divider' />
+                    </span>
+                  </div>
+                  <h2>{editorTitle()}</h2>
+                </>
+              ),
+              trailing: (
                 <UiActionButton
                   icon='check'
                   label='Save'
@@ -208,17 +220,13 @@ export const AbstractionManager = <T extends Instance>(
                   type='submit'
                   form='abstraction-panel-form'
                 />
-              </div>
-            </div>
-            <Show when={props.provider.editorFeedback?.()}>
-              {feedback => <UiAlert variant={feedback().variant}>{feedback().message}</UiAlert>}
-            </Show>
-          </header>
-          <div data-feat='abstraction-manager-card-body' data-feat-region='editor-body'>
+              )
+            }}
+          >
             {props.provider.renderForm(selected(), closeEditor)}
-          </div>
-        </UiCard>
-      </section>
+          </PanelForm>
+        }
+      />
       <Show when={pendingAction()}>
         {target => (
           <UiDialog
@@ -251,6 +259,6 @@ export const AbstractionManager = <T extends Instance>(
           </UiDialog>
         )}
       </Show>
-    </div>
+    </>
   )
 }

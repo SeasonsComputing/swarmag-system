@@ -1252,10 +1252,23 @@
   min-inline-size: min(20rem, calc(100vw - var(--sa-rhythm-pad) * 2));
 }
 
+/* A workbench owns the block axis for the surface it hosts, so its content must
+   fill it rather than size to content. The single row stretches the child, which
+   keeps a page-level wrapper transparent to sizing — without it a wrapper with
+   auto height breaks the surface's percentage chain silently. */
 [data-ui='dialog'][data-ui-size='workbench'] {
+  block-size: clamp(32rem, 88dvh, 42rem);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
   inline-size: min(var(--sa-size-md), calc(100vw - var(--sa-rhythm-pad) * 2));
   max-inline-size: min(var(--sa-size-lg), calc(100vw - var(--sa-rhythm-pad) * 2));
   overflow: visible;
+}
+
+/* Grid items default to min-block-size: auto, which lets content floor them
+   above a bounded row. Release it so the row governs. */
+[data-ui='dialog'][data-ui-size='workbench'] > * {
+  min-block-size: 0;
 }
 
 @media (max-width: 480px) {

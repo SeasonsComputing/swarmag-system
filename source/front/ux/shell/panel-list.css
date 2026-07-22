@@ -1,0 +1,50 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Panel list styles                                                            ║
+║ Card and body geometry for an index list panel.                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-feat-panel='list'] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+}
+
+[data-feat-panel='list'] > [data-ui='card'] {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: visible;
+}
+
+[data-feat-panel='list'] [data-feat-panel='header'] {
+  flex: 0 0 auto;
+  padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
+}
+
+[data-feat-panel='toolbar'] {
+  flex: 0 0 auto;
+}
+
+[data-feat-panel='body'] {
+  flex: 1 1 auto;
+  margin: calc(var(--sa-space-xs) * -1);
+  min-block-size: 0;
+  overflow-y: auto;
+  padding: var(--sa-space-xs);
+  scroll-padding: var(--sa-space-xs);
+}
+
+[data-feat-panel='body'][data-feat-panel-kind='list'] {
+  margin-block-start: 0;
+  padding-block-start: 0;
+}
+
+@media (max-width: 480px) {
+  [data-feat-panel='list'] > [data-ui='card'] {
+    border-radius: 0;
+  }
+}

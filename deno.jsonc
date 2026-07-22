@@ -51,7 +51,7 @@
 
     "chk": "deno task check",
     "check": "deno task check:guards && deno task check:types && deno task check:lint",
-    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:front-state && deno task guard:chart && deno task guard:imports && deno task guard:css && deno task guard:bare-html && deno task guard:namespaces",
+    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:front-state && deno task guard:chart && deno task guard:imports && deno task guard:css && deno task guard:bare-html && deno task guard:namespaces && deno task guard:tokens",
     "check:types": "deno check --lock=deno.lock --frozen source/**/*.ts source/**/*.tsx",
     "check:lint": "deno task lint",
     "check:domain-genesis": "deno task guard:domain-style && deno task guard:core-std-types && deno check --lock=deno.lock --frozen source/domain/**/*.ts && deno lint source/domain/**/*.ts",
@@ -104,6 +104,7 @@
     "guard:imports": "deno run -A source/devops/guards/guard-imports.ts",
     "guard:namespaces": "deno run --allow-read source/devops/guards/guard-namespaces.ts",
     "guard:css": "deno run --allow-read source/devops/guards/guard-css.ts",
+    "guard:tokens": "deno run --allow-read source/devops/guards/guard-tokens.ts",
     "guard:bare-html": "deno run --allow-read source/devops/guards/guard-bare-html.ts",
 
     // ────────────────────────────────────────────────────────────────────────────

@@ -20,11 +20,9 @@ import {
 } from '@domain/abstractions/user.ts'
 import { type UserCreate, type UserUpdate } from '@domain/protocols/user-protocol.ts'
 import { api } from '@front/api'
-import type {
-  AbstractionManagerContract,
-  AbstractionManagerFeedback
-} from '@front/ux/shell/abstraction-manager-contract.ts'
+import type { AbstractionManagerContract } from '@front/ux/shell/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@front/ux/shell/abstraction-manager.tsx'
+import type { PanelFeedback } from '@front/ux/shell/panel-contract.ts'
 import {
   FORM_FEEDBACK_MESSAGE,
   useAbstractionFormFeedback
@@ -67,7 +65,7 @@ export type UserManagerProps = {
 
 /** User manager component. */
 export const UserManager = (props: UserManagerProps): UiComponent => {
-  const [editorFeedback, setEditorFeedback] = createSignal<AbstractionManagerFeedback | null>(null)
+  const [editorFeedback, setEditorFeedback] = createSignal<PanelFeedback | null>(null)
   const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY, queryFn: loadUsers }))
   const deleteUserMutation = useAbstractionMutation(USERS_QUERY_KEY, (id: Id) => api.Users.delete(id))
   const ejectUserMutation = useAbstractionMutation(USERS_QUERY_KEY, (id: Id) => api.Users.eject(id))
@@ -167,7 +165,7 @@ function UserListCells(props: { user: User }): UiComponent {
 function UserEditor(props: {
   user: User | null
   onClose: () => void
-  onFeedback: (feedback: AbstractionManagerFeedback | null) => void
+  onFeedback: (feedback: PanelFeedback | null) => void
 }): UiComponent {
   const [displayName, setDisplayName] = createSignal(props.user?.displayName ?? '')
   const [primaryEmail, setPrimaryEmail] = createSignal(props.user?.primaryEmail ?? '')

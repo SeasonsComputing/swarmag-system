@@ -97,6 +97,16 @@ CSS files live in `source/front/ux/ui/css/`. A shared CSS barrel,
 
 ## 3. Tokens
 
+**This document names tokens and states their purpose. It never restates their
+values.** A token's value lives in `tokens.css`, `roles.css`, or `themes.css` and
+nowhere else. Documentation that carries a value forks the design system: it is
+higher in the precedence chain than the stylesheet, so when the two drift the
+document is formally authoritative while the stylesheet is actually in effect,
+and nothing detects the disagreement.
+
+Enforced by `deno task guard:tokens`. Read a value from the stylesheet; read what
+a value is _for_ from here.
+
 ### 3.1 Name Structure
 
 All design-language custom properties use the `--sa-` prefix. Token names describe ownership
@@ -133,7 +143,7 @@ Foundation tokens are organized into categories: Font weight, Font size, Line he
 | `--sa-font-size-`    | Size scale                         | `--sa-font-size-xs`, `--sa-font-size-sm`, `--sa-font-size-base`, `--sa-font-size-md`, `--sa-font-size-lg`, `--sa-font-size-xl`                                    |
 | `--sa-line-leading-` | Content line height                | `--sa-line-leading-normal`                                                                                                                                        |
 | `--sa-radius-`       | Corner scale                       | `--sa-radius-sm`, `--sa-radius-md`, `--sa-radius-lg`, `--sa-radius-xl`, `--sa-radius-full`                                                                        |
-| `--sa-space-`        | 4px grid                           | `--sa-space-xs`, `--sa-space-xx`, `--sa-space-sm`, `--sa-space-md`, `--sa-space-lg`, `--sa-space-xl`, `--sa-space-2xl`, `--sa-space-3xl`, `--sa-space-4xl`        |
+| `--sa-space-`        | Base spacing grid                  | `--sa-space-xs`, `--sa-space-xx`, `--sa-space-sm`, `--sa-space-md`, `--sa-space-lg`, `--sa-space-xl`, `--sa-space-2xl`, `--sa-space-3xl`, `--sa-space-4xl`        |
 | `--sa-rhythm-`       | Responsive layout rhythm           | `--sa-rhythm-gutter`, `--sa-rhythm-pad`, `--sa-rhythm-gap`                                                                                                        |
 | `--sa-size-`         | Viewport and wrap sizes            | `--sa-size-wrap`, `--sa-size-min`, `--sa-size-xs`, `--sa-size-sm`, `--sa-size-md`, `--sa-size-lg`                                                                 |
 | `--sa-touch-`        | Field-safe and compact target size | `--sa-touch-target`, `--sa-touch-target-sm`                                                                                                                       |
@@ -303,17 +313,17 @@ card and panel surfaces while still using the same design-language token contrac
 
 All layouts must align to a 4px base unit. This ensures visual rhythm across data-dense tables in Admin and large-format touch targets in Ops.
 
-| Token            |    Value | Purpose                       |
-| ---------------- | -------: | ----------------------------- |
-| `--sa-space-xs`  |  0.25rem | 4px base unit                 |
-| `--sa-space-xx`  | 0.375rem | In-between compact adjustment |
-| `--sa-space-sm`  |   0.5rem | Compact grouping              |
-| `--sa-space-md`  |     1rem | Standard grouping             |
-| `--sa-space-lg`  |   1.5rem | Page and surface padding      |
-| `--sa-space-xl`  |     2rem | Large layout rhythm           |
-| `--sa-space-2xl` |   2.5rem | Large surface rhythm          |
-| `--sa-space-3xl` |     3rem | Desktop layout rhythm         |
-| `--sa-space-4xl` |     5rem | Wide desktop layout rhythm    |
+| Token            | Purpose                       |
+| ---------------- | ----------------------------- |
+| `--sa-space-xs`  | Base unit                     |
+| `--sa-space-xx`  | In-between compact adjustment |
+| `--sa-space-sm`  | Compact grouping              |
+| `--sa-space-md`  | Standard grouping             |
+| `--sa-space-lg`  | Page and surface padding      |
+| `--sa-space-xl`  | Large layout rhythm           |
+| `--sa-space-2xl` | Large surface rhythm          |
+| `--sa-space-3xl` | Desktop layout rhythm         |
+| `--sa-space-4xl` | Wide desktop layout rhythm    |
 
 ### 5.2 Layout Rhythm
 
@@ -323,12 +333,12 @@ Each rhythm token owns exactly one spatial role. The role is normative: a token
 is selected by what kind of space is being created, never by which value happens
 to look right.
 
-| Token                   | Role                  | Applies to                                                                 |
-| ----------------------- | --------------------- | -------------------------------------------------------------------------- |
-| `--sa-rhythm-gutter`    | **Page padding**      | Page-level surfaces only — the dashboard and the style guide                |
-| `--sa-rhythm-pad`       | **Box interior**      | Padding inside a bounded surface — resolves to `--sa-card-panel-pad` and `--sa-dialog-pad` |
-| `--sa-rhythm-gap`       | **Space between**     | Separation between siblings — fieldsets, fields, grid tracks                |
-| `--sa-rhythm-gap-tight` | **Space between, compact** | Same role as `gap` where a dense control cluster requires less air     |
+| Token                   | Role                       | Applies to                                                                                 |
+| ----------------------- | -------------------------- | ------------------------------------------------------------------------------------------ |
+| `--sa-rhythm-gutter`    | **Page padding**           | Page-level surfaces only — the dashboard and the style guide                               |
+| `--sa-rhythm-pad`       | **Box interior**           | Padding inside a bounded surface — resolves to `--sa-card-panel-pad` and `--sa-dialog-pad` |
+| `--sa-rhythm-gap`       | **Space between**          | Separation between siblings — fieldsets, fields, grid tracks                               |
+| `--sa-rhythm-gap-tight` | **Space between, compact** | Same role as `gap` where a dense control cluster requires less air                         |
 
 Three consequences follow from the role assignment:
 
@@ -341,36 +351,35 @@ Three consequences follow from the role assignment:
 - **`pad` is a box-interior measure, not an edge measure.** Raising it widens
   every card and dialog interior in the system simultaneously. That reach is the
   intended behavior, not a side effect.
-- **`pad` additionally participates in dialog sizing math** (for example
-  `max-inline-size: min(48rem, calc(100vw - var(--sa-rhythm-pad) * 2))`), so a
-  change to it can affect surface dimensions as well as interior spacing.
+- **`pad` additionally participates in dialog sizing math** — the dialog's
+  inline measure subtracts it from the viewport — so a change to it can affect
+  surface dimensions as well as interior spacing. See `[data-ui='dialog']` in
+  `ui.css` for the current expression.
 
-| Token                | Default desktop                 | ≤1440px                         | ≤1024px                         | ≤768px                          | ≤425px                          | ≤380px                          |
-| -------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- | ------------------------------- |
-| `--sa-rhythm-gutter` | `--sa-space-4xl`                | `--sa-space-3xl`                | `--sa-space-3xl`                | `--sa-space-xl + --sa-space-xx` | `--sa-space-lg`                 | `--sa-space-lg - --sa-space-xs` |
-| `--sa-rhythm-pad`    | `--sa-space-lg`                 | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md`                 | `--sa-space-sm + --sa-space-xx` | `--sa-space-sm + --sa-space-xs` |
-| `--sa-rhythm-gap`    | `--sa-space-md + --sa-space-xx` | `--sa-space-md + --sa-space-xs` | `--sa-space-md`                 | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` | `--sa-space-sm + --sa-space-xs` |
+Each rhythm token narrows as the viewport narrows, composed from the spacing
+scale at each breakpoint. `gutter` narrows hardest, `gap` least. The per-
+breakpoint composition is declared in `tokens.css`.
 
 ### 5.3 Radius Scale
 
-| Token              |    Value | Purpose                  |
-| ------------------ | -------: | ------------------------ |
-| `--sa-radius-sm`   | 0.375rem | Compact control corners  |
-| `--sa-radius-md`   | 0.555rem | Standard control corners |
-| `--sa-radius-lg`   |  0.75rem | Large surface corners    |
-| `--sa-radius-xl`   | 1.555rem | Pill-like large corners  |
-| `--sa-radius-full` |   9999px | Fully rounded shape      |
+| Token              | Purpose                  |
+| ------------------ | ------------------------ |
+| `--sa-radius-sm`   | Compact control corners  |
+| `--sa-radius-md`   | Standard control corners |
+| `--sa-radius-lg`   | Large surface corners    |
+| `--sa-radius-xl`   | Pill-like large corners  |
+| `--sa-radius-full` | Fully rounded shape      |
 
 ### 5.4 Viewport Tokens
 
-| Token            |  Value | Purpose                   |
-| ---------------- | -----: | ------------------------- |
-| `--sa-size-wrap` |  270px | Minimum wrap reference    |
-| `--sa-size-min`  |  320px | Minimum application width |
-| `--sa-size-xs`   |  425px | Small/mobile breakpoint   |
-| `--sa-size-sm`   |  768px | Tablet breakpoint         |
-| `--sa-size-md`   | 1024px | Desktop breakpoint        |
-| `--sa-size-lg`   | 1152px | Wide layout breakpoint    |
+| Token            | Purpose                   |
+| ---------------- | ------------------------- |
+| `--sa-size-wrap` | Minimum wrap reference    |
+| `--sa-size-min`  | Minimum application width |
+| `--sa-size-xs`   | Small/mobile breakpoint   |
+| `--sa-size-sm`   | Tablet breakpoint         |
+| `--sa-size-md`   | Desktop breakpoint        |
+| `--sa-size-lg`   | Wide layout breakpoint    |
 
 Viewport tokens are reusable CSS length references. They are not Dashboard
 allocated-field contracts, global widget measures, or universal presentation
@@ -379,41 +388,44 @@ field remains the authoritative presentation context.
 
 ### 5.5 Touch Targets
 
-| Token                  | Value | Purpose                       |
-| ---------------------- | ----: | ----------------------------- |
-| `--sa-touch-target`    |  64px | Field-safe large touch target |
-| `--sa-touch-target-sm` |  44px | Compact minimum touch target  |
+| Token                  | Purpose                                                   |
+| ---------------------- | --------------------------------------------------------- |
+| `--sa-touch-target`    | Field-safe large touch target, sized for gloved field use |
+| `--sa-touch-target-sm` | Compact target at the platform accessibility floor        |
 
 ### 5.6 Z-Index Scale
 
-| Token            | Value | Purpose                   |
-| ---------------- | ----: | ------------------------- |
-| `--sa-z-below`   |    -1 | Background decorations    |
-| `--sa-z-base`    |     0 | Normal content            |
-| `--sa-z-raised`  |     1 | Locally raised content    |
-| `--sa-z-docked`  |    10 | Sticky headers/footers    |
-| `--sa-z-popover` |    20 | Menus, lists, popovers    |
-| `--sa-z-overlay` |   100 | Modals, overlays, flyouts |
-| `--sa-z-toast`   |  1000 | System notifications      |
+Listed low to high. The ordering is normative; the numbers are an implementation
+detail of that ordering.
+
+| Token            | Purpose                   |
+| ---------------- | ------------------------- |
+| `--sa-z-below`   | Background decorations    |
+| `--sa-z-base`    | Normal content            |
+| `--sa-z-raised`  | Locally raised content    |
+| `--sa-z-docked`  | Sticky headers/footers    |
+| `--sa-z-popover` | Menus, lists, popovers    |
+| `--sa-z-overlay` | Modals, overlays, flyouts |
+| `--sa-z-toast`   | System notifications      |
 
 ### 5.7 Effects
 
-| Token              | Value                     | Purpose                        |
-| ------------------ | ------------------------- | ------------------------------ |
-| `--sa-filter-blur` | `blur(25px)`              | Shared backdrop blur treatment |
-| `--sa-filter-mono` | `brightness(0) invert(1)` | Monochrome asset filter        |
+| Token              | Purpose                        |
+| ------------------ | ------------------------------ |
+| `--sa-filter-blur` | Shared backdrop blur treatment |
+| `--sa-filter-mono` | Monochrome asset filter        |
 
 ### 5.8 Motion And Transitions
 
-| Token                    | Value                                        | Purpose                     |
-| ------------------------ | -------------------------------------------- | --------------------------- |
-| `--sa-motion-page-fade`  | 200ms                                        | Page fade duration          |
-| `--sa-motion-spinner`    | 0.8s                                         | Spinner cycle duration      |
-| `--sa-motion-skeleton`   | 1.4s                                         | Skeleton shimmer duration   |
-| `--sa-transition-fast`   | `all 0.15s ease`                             | Fast interaction transition |
-| `--sa-transition-base`   | `all 0.3s ease`                              | Standard transition         |
-| `--sa-transition-slow`   | `all 0.6s ease-out`                          | Slow entrance/exit motion   |
-| `--sa-transition-spring` | `all 0.4s cubic-bezier(0.4, 0, 0.2, 1)`      | Spring-like transition      |
-| `--sa-transition-page`   | `opacity var(--sa-motion-page-fade) ease-in` | Page opacity transition     |
+| Token                    | Purpose                     |
+| ------------------------ | --------------------------- |
+| `--sa-motion-page-fade`  | Page fade duration          |
+| `--sa-motion-spinner`    | Spinner cycle duration      |
+| `--sa-motion-skeleton`   | Skeleton shimmer duration   |
+| `--sa-transition-fast`   | Fast interaction transition |
+| `--sa-transition-base`   | Standard transition         |
+| `--sa-transition-slow`   | Slow entrance/exit motion   |
+| `--sa-transition-spring` | Spring-like transition      |
+| `--sa-transition-page`   | Page opacity transition     |
 
 _End of UX Design Language Document_

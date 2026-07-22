@@ -11,20 +11,14 @@ form rendering, editor feedback, and named instance actions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AbstractionManagerFeedback     Feedback shown in a manager editor header.
 AbstractionActionConfirmation  Confirmation copy for a consequential action.
 AbstractionAction              A named action executable on an abstraction instance.
 AbstractionManagerContract     Provider contract for list-and-panel managers.
 */
 
 import type { Instance } from '@core/std'
-import type { UiActionButtonVariant, UiAlertVariant, UiComponent } from '@front/ux/ui'
-
-/** Feedback displayed in an abstraction manager editor header. */
-export type AbstractionManagerFeedback = {
-  message: string
-  variant: UiAlertVariant
-}
+import type { UiActionButtonVariant, UiComponent } from '@front/ux/ui'
+import type { PanelFeedback } from './panel-contract.ts'
 
 /** Confirmation copy for a consequential abstraction action. */
 export type AbstractionActionConfirmation<T extends Instance> = {
@@ -49,7 +43,7 @@ export interface AbstractionManagerContract<T extends Instance> {
   listColumns: string[]
   list: () => T[]
   isListLoading: () => boolean
-  editorFeedback?: () => AbstractionManagerFeedback | null
+  editorFeedback?: () => PanelFeedback | null
   cancel?: () => void
   actions: AbstractionAction<T>[]
   renderListCells: (item: T) => UiComponent

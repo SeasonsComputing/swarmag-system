@@ -6,92 +6,7 @@
 */
 
 [data-feat='abstraction-manager'] {
-  block-size: clamp(32rem, 72dvh, 44rem);
-  display: grid;
-  gap: var(--sa-rhythm-gap);
   grid-template-columns: minmax(var(--sa-size-xs), 2fr) minmax(var(--sa-size-min), 1fr);
-  grid-template-rows: auto minmax(0, 1fr);
-  max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
-}
-
-[data-feat='abstraction-manager-title-row'] {
-  align-items: center;
-  display: flex;
-  grid-column: 1 / -1;
-  justify-content: space-between;
-  min-inline-size: 0;
-}
-
-[data-feat='abstraction-manager-title'] {
-  line-height: 1;
-  margin: 0;
-  min-inline-size: 0;
-  font-size: var(--sa-font-size-md);
-}
-
-[data-feat='abstraction-manager-list'] {
-  display: flex;
-  flex-direction: column;
-  min-block-size: min(calc(var(--sa-touch-target) * 4), calc(100dvh - var(--sa-rhythm-pad) * 4));
-  position: relative;
-}
-
-[data-feat='abstraction-manager-panel'] {
-  display: flex;
-  flex-direction: column;
-  min-block-size: min(calc(var(--sa-touch-target) * 4), calc(100dvh - var(--sa-rhythm-pad) * 4));
-  position: relative;
-}
-
-[data-feat='abstraction-manager-list'] > [data-ui='card'],
-[data-feat='abstraction-manager-panel'] > [data-ui='card'] {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-block-size: 0;
-  overflow: visible;
-}
-
-[data-feat='abstraction-manager-card-header'] {
-  align-items: center;
-  display: flex;
-  flex: 0 0 auto;
-  gap: var(--sa-space-xs);
-  justify-content: space-between;
-  padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
-}
-
-[data-feat='abstraction-manager-card-header'][data-feat-region='editor-header'] {
-  align-items: stretch;
-  flex-direction: column;
-}
-
-[data-feat='abstraction-manager-card-header-row'] {
-  align-items: center;
-  display: flex;
-  gap: var(--sa-space-xs);
-  justify-content: space-between;
-}
-
-[data-feat='abstraction-manager-card-title'],
-[data-feat='abstraction-manager-card-title-group'] {
-  align-items: center;
-  display: flex;
-  gap: var(--sa-space-xs);
-  min-inline-size: 0;
-}
-
-[data-feat='abstraction-manager-card-title'] {
-  line-height: 1;
-  margin: 0;
-  font-size: var(--sa-font-size-md);
-}
-
-[data-feat='abstraction-manager-card-actions'] {
-  align-items: center;
-  display: flex;
-  flex: 0 0 auto;
-  gap: var(--sa-space-xs);
 }
 
 [data-feat='abstraction-manager-confirmation'] {
@@ -122,43 +37,17 @@
   min-block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
 }
 
-[data-feat='abstraction-manager-card-body'] {
-  flex: 1 1 auto;
-  margin: calc(var(--sa-space-xs) * -1);
-  min-block-size: 0;
-  overflow-y: auto;
-  padding: var(--sa-space-xs);
-  scroll-padding: var(--sa-space-xs);
-}
-
-/* The list scroller keeps the inline/bottom inset trick but drops it at the
-   block start: any top inset is a band the sticky head travels through
-   before pinning (a visible hop) and that scrolled rows peek out through. */
-[data-feat='abstraction-manager-card-body'][data-feat-region='list-body'] {
-  margin-block-start: 0;
-  padding-block-start: 0;
-}
-
-[data-feat='abstraction-manager-card-body'][data-feat-region='editor-body'] {
-  overscroll-behavior: contain;
-}
-
-[data-feat='abstraction-manager-card-body'][data-feat-region='editor-body'] > form {
-  min-block-size: 0;
-}
-
 [data-feat='abstraction-manager-collapse-action'] {
   display: none;
 }
 
 @container (max-width: 768px) {
   [data-feat='abstraction-manager'] {
-    block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
     grid-template-columns: 1fr;
   }
 
-  [data-feat='abstraction-manager-list'],
-  [data-feat='abstraction-manager-panel'] {
+  [data-feat='abstraction-manager'] > [data-feat-panel='index'],
+  [data-feat='abstraction-manager'] > [data-feat-panel='subject'] {
     block-size: 100%;
     grid-column: 1;
     grid-row: 2;
@@ -166,8 +55,8 @@
     transition: var(--sa-transition-panel);
   }
 
-  [data-feat='abstraction-manager'][data-feat-mode='list'] [data-feat='abstraction-manager-list'],
-  [data-feat='abstraction-manager'][data-feat-mode='editor'] [data-feat='abstraction-manager-panel'] {
+  [data-feat='abstraction-manager'][data-feat-mode='list'] > [data-feat-panel='index'],
+  [data-feat='abstraction-manager'][data-feat-mode='editor'] > [data-feat-panel='subject'] {
     opacity: 1;
     pointer-events: auto;
     transform: translateX(0);
@@ -176,8 +65,8 @@
     z-index: var(--sa-z-base);
   }
 
-  [data-feat='abstraction-manager'][data-feat-mode='list'] [data-feat='abstraction-manager-panel'],
-  [data-feat='abstraction-manager'][data-feat-mode='editor'] [data-feat='abstraction-manager-list'] {
+  [data-feat='abstraction-manager'][data-feat-mode='list'] > [data-feat-panel='subject'],
+  [data-feat='abstraction-manager'][data-feat-mode='editor'] > [data-feat-panel='index'] {
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
@@ -185,39 +74,22 @@
   }
 
   /* Spatial push: the list lives left of the editor. */
-  [data-feat='abstraction-manager'][data-feat-mode='editor'] [data-feat='abstraction-manager-list'] {
+  [data-feat='abstraction-manager'][data-feat-mode='editor'] > [data-feat-panel='index'] {
     transform: translateX(calc(var(--sa-space-xl) * -1));
   }
 
-  [data-feat='abstraction-manager'][data-feat-mode='list'] [data-feat='abstraction-manager-panel'] {
+  [data-feat='abstraction-manager'][data-feat-mode='list'] > [data-feat-panel='subject'] {
     transform: translateX(var(--sa-space-xl));
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-feat='abstraction-manager-list'],
-    [data-feat='abstraction-manager-panel'] {
+    [data-feat='abstraction-manager'] > [data-feat-panel='index'],
+    [data-feat='abstraction-manager'] > [data-feat-panel='subject'] {
       transition: none;
     }
   }
 
   [data-feat='abstraction-manager-collapse-action'] {
     display: block;
-  }
-}
-
-@media (max-width: 480px) {
-  [data-feat='abstraction-manager'] {
-    block-size: 100dvh;
-    max-block-size: none;
-  }
-
-  [data-feat='abstraction-manager-title-row'] {
-    padding-block-start: var(--sa-rhythm-pad);
-    padding-inline: var(--sa-rhythm-pad);
-  }
-
-  [data-feat='abstraction-manager-list'] > [data-ui='card'],
-  [data-feat='abstraction-manager-panel'] > [data-ui='card'] {
-    border-radius: 0;
   }
 }
