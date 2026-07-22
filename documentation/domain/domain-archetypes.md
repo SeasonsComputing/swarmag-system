@@ -613,7 +613,7 @@ Every adapter must support clean round-trip behavior:
 - `toDomain(source)` returns a valid abstraction from storage form.
 - `fromDomain(patch)` emits a storage dictionary for the provided input shape.
 
-Round-trip integrity is enforced by fixture tests in `source/tests/cases/fixtures-test.ts`.
+Round-trip integrity is enforced by fixture tests in `source/tests/fixtures/fixtures-test.ts`.
 
 ## 7. Schema
 

@@ -6,7 +6,7 @@
 (solo, pre-release team) — decisions and phases below ran against **stage
 only**. See the Phase 5 Addendum below for D12, a real defect that Phase 5's
 original manual pass did not catch.
-**Source design:** `documentation/project/2026-07-12-edge-functions-remediation-design.md`
+**Source design:** `effort/completed/2026-07-12-edge-functions-remediation-design.md`
 
 This task list decomposes the approved design (D1–D11) into gated phases. Each
 phase is one authorized production with its own checks.

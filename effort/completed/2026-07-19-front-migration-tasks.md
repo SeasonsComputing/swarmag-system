@@ -6,7 +6,7 @@
 clean-up" — the migration + rhythm gap-tight fix) and `6c10d3b` ("Move
 widget registry to app bootstrap" — the Widget SPI addendum below). All
 groups verified incl. live smoke.
-**Source design:** `documentation/project/2026-07-18-foundation-game-plan-design.md` (§2)
+**Source design:** `effort/completed/2026-07-18-foundation-game-plan-design.md` (§2)
 
 One mechanical Foundation migration, no functional changes, landing as a
 single commit. Mapping (CA-authored): `source/ux` → `source/front`;

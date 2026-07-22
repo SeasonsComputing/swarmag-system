@@ -8,8 +8,8 @@
 
 - Invariants: `AGENTS.md`
 - Required session context: Domain Internals
-- Approved design: `documentation/project/2026-06-28-user-contact-customer-design.md`
-- Working checklist: `documentation/project/2026-06-28-user-contact-customer-tasks.md`
+- Approved design: `effort/completed/2026-06-28-user-contact-customer-design.md`
+- Working checklist: `effort/completed/2026-06-28-user-contact-customer-tasks.md`
 
 The core refactor is Foundation work. It changes domain meaning, shared contracts, schema,
 backend auth/domain boundaries, and downstream test/UX expectations.
@@ -48,8 +48,8 @@ Updated documentation to align domain/solution/backend authority boundaries:
 - `documentation/domain/domain-data-dictionary.md`
 - `documentation/domain/domain-archetypes.md`
 - `documentation/project/project-user-stories.md`
-- `documentation/project/2026-06-28-user-contact-customer-design.md`
-- `documentation/project/2026-06-28-user-contact-customer-tasks.md`
+- `effort/completed/2026-06-28-user-contact-customer-design.md`
+- `effort/completed/2026-06-28-user-contact-customer-tasks.md`
 
 Important note: `documentation/domain/domain-data-dictionary.md` currently remains unstaged at handoff time.
 
@@ -111,8 +111,8 @@ Failures were in downstream tests/fixtures/UX:
 
 At handoff time, the following files were staged:
 
-- `documentation/project/2026-06-28-user-contact-customer-design.md`
-- `documentation/project/2026-06-28-user-contact-customer-tasks.md`
+- `effort/completed/2026-06-28-user-contact-customer-design.md`
+- `effort/completed/2026-06-28-user-contact-customer-tasks.md`
 - `source/domain/abstractions/customer.ts`
 - `source/domain/abstractions/job.ts`
 - `source/domain/abstractions/user.ts`

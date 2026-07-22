@@ -6,7 +6,7 @@
 implementation is authorized by its task ledger.
 **Related:** `documentation/architecture/architecture-front.md` §10.3,
 `documentation/ux/ux-design-language.md`,
-`documentation/project/2026-07-18-foundation-game-plan-design.md`
+`effort/completed/2026-07-18-foundation-game-plan-design.md`
 
 ---
 

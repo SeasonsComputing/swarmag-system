@@ -12,8 +12,8 @@
   - Domain Internals
   - DevOps
   - Application Features
-- Working checklist: `documentation/project/2026-06-28-user-contact-customer-tasks.md`
-- Prior broad handoff: `documentation/project/2026-06-30A-user-contact-customer-handoff.md`
+- Working checklist: `effort/completed/2026-06-28-user-contact-customer-tasks.md`
+- Prior broad handoff: `effort/completed/2026-06-30A-user-contact-customer-handoff.md`
 
 This scope is Foundation work. It touches shared backend architecture, DevOps
 configuration, Supabase Edge runtime assumptions, auth/domain synchronization,

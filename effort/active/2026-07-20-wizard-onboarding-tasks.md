@@ -4,9 +4,11 @@
 **Mode:** Foundation (A0/A/C) + Feature (B)
 **Status:** IN PROGRESS — D1–D17 ratified 2026-07-20; A0, A1, A, B0 complete
 (A1 schema live on stage; A = wizard framework, contract+host+chrome;
-B0 = `api.Customers` inline, RLS-verified). B (COW feature) next. Per-group
-go orders remain the gate.
-**Source design:** `documentation/project/2026-07-20-wizard-onboarding-design.md`
+B0 = `api.Customers` inline, RLS-verified). **B built 2026-07-22 — wired and
+launching, but its stage layout is NOT accepted; layout rework is the open
+thread and the next session opens there.** C (Notes-lite) and D (verification)
+pending. Per-group go orders remain the gate.
+**Source design:** `effort/active/2026-07-20-wizard-onboarding-design.md`
 
 Each group is a gated production: scope declared, go received, checks run,
 results reported. Delegation per budget discipline (haiku, git read-only).
@@ -77,6 +79,14 @@ results reported. Delegation per budget discipline (haiku, git read-only).
       `commit`; Back(secondary)/Next(primary) matches forward-momentum.
       Richer task-grouped progress would want an optional `WizardStage`
       field later — additive, not precluded. No ops code written
+- [x] Chrome refinement 2026-07-22 (CA locus-of-attention principle): the
+      step indicator is ONE contiguous progress rail directly under the
+      dialog title — track `--sa-bg-progress-track`, fill
+      `--sa-gradient-brand`, host-driven inline-size
+      `(stepIndex + 0.5) / stageCount`, animated via `--sa-transition-base`.
+      Numbered `(N) Title` labels sit beneath, one per stage, distributed
+      under the rail; current stage renders in `--sa-color-accent`. The old
+      pip-circle row and the "Step X of N" caption are retired
 
 ## Group A1 — Contact Composition (Foundation, D17, A0×2)
 
@@ -141,27 +151,39 @@ end-to-end:
       contract evolution whose shape the CA intends to design directly —
       parked 2026-07-21 (see `project-feature-parking-lot.md`)
 
-## Group B — COW Feature (Feature Mode)
+## Group B — COW Feature (Feature Mode) — BUILT 2026-07-22, layout OPEN
 
-- [ ] `front/app-admin/onboarding/onboarding.tsx` + `.css`; dialog route
+- [x] `front/app-admin/onboarding/onboarding.tsx` + `.css`; dialog route
       `/onboarding` (workbench) beside `/users`; dashboard action-widget
-      launch entry
-- [ ] Stage 1 contact (per D17): pure contact capture — `Contact` fields
+      launch entry (`building` glyph). Wired and launching
+- [x] Stage 1 contact (per D17): pure contact capture — `Contact` fields
       (`displayName`, `phoneNumber`, `preferredChannel`, `email?`); no
       users search, no User creation; gate-and-carry stage (no commit),
       product rides in-memory into stage 2's create payload
-- [ ] Stage 2 customer: name, status (default `'prospect'`), required
-      address, optional line2/accountManagerId; payload sends explicit
-      `sites: []`, `notes: []`; `primaryContact` composition carried from
-      stage 1
-- [ ] Stage 3 sites: rapid repeated capture (label, address-or-coords
-      fieldset per D11 with `navigator.geolocation` fill, optional
-      acreage, plain-text note) — Enter-advance adds next site; zero
-      sites legal; commits as Customer full-record update
-- [ ] Stages that commit, commit durably (D2 as relaxed by D17);
+- [x] Stage 2 customer: name, status (default `'prospect'`), required
+      address, optional line2; `primaryContact` composition carried from
+      stage 1. Commit is **create-or-update, not create-only**: the host
+      runs `commit` on every Next, so Back→Next was minting a duplicate
+      customer (AA review catch). `sites` is threaded through the payload
+      so a re-commit cannot wipe sites already added
+- [x] Stage 3 sites: repeated capture (label, address-or-coords fieldset
+      per D11 with `navigator.geolocation` fill, optional acreage,
+      plain-text note); zero sites legal; commits as Customer full-record
+      update
+- [x] Stages that commit, commit durably (D2 as relaxed by D17);
       Escape/cancel discards only uncommitted stage forms
-- [ ] Customers API surface confirmed: `api.Customers.create/update`
-      exist and are exercised (first consumer!)
+- [x] Customers API surface exercised: `api.Customers.create/update`
+      (first consumer!)
+- [x] Checks: 188 files — types + 12 guards + lint green; fmt clean; app
+      boots with zero console errors
+- [ ] **OPEN — general stage layout not accepted (CA, 2026-07-22).** The
+      flow wires and launches; the layout needs rework. Design
+      conversation pending — the next session opens here
+- [ ] DEFERRED (recorded, not lost): `accountManagerId` capture (no user
+      picker, commits `undefined`); per-field inline error text (the gate
+      is the disabled Next plus `required` markers); geolocation-denied
+      feedback (currently silent); post-Finish success confirmation — the
+      create-only / no-readback gap, resolved by the prospect hub (D15)
 
 ## Group C — Notes-lite (Foundation)
 

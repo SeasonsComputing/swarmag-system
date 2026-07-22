@@ -9,7 +9,7 @@ context.
 ## 1. Governing Context — Ingest Before Production
 
 - Invariants: `AGENTS.md`, then `CONSTITUTION.md`
-- Prior work this traces from: `documentation/project/2026-07-12-edge-functions-remediation-{design,tasks}.md`
+- Prior work this traces from: `effort/completed/2026-07-12-edge-functions-remediation-{design,tasks}.md`
   (D1–D11, Phases 0–5). Phase 5's stage deploy already happened (functions are
   live and `ACTIVE` on project `vpntxhqnwyudhiadsmtn`) — do not redo it.
 - Symptom that started this session: "Save is not working" in `app-stage-local

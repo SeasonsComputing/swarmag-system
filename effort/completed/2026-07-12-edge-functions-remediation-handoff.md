@@ -2,8 +2,8 @@
 
 > **COMPLETED.** Final resolution, including a real defect (D12) that this
 > handoff's Phase 5 verification did not catch, is in
-> `documentation/project/2026-07-12-edge-functions-remediation-design.md` and
-> `documentation/project/2026-07-14-user-create-hang-handoff.md`.
+> `effort/completed/2026-07-12-edge-functions-remediation-design.md` and
+> `effort/completed/2026-07-14-user-create-hang-handoff.md`.
 
 ---
 
@@ -22,7 +22,7 @@
 **Mode:** Foundation
 **Purpose:** New-session handoff to continue the edge-functions remediation at
 Phase 3 (deployment seam). Written for an AI session with no prior context.
-**Supersedes:** `documentation/project/2026-06-30B-user-edge-functions-handoff.md`
+**Supersedes:** `effort/completed/2026-06-30B-user-edge-functions-handoff.md`
 
 ## 1. Governing Context — Ingest Before Production
 
@@ -33,9 +33,9 @@ Phase 3 (deployment seam). Written for an AI session with no prior context.
   `documentation/architecture/architecture-back.md`,
   `documentation/architecture/architecture-devops.md`
 - Approved decisions D1–D9:
-  `documentation/project/2026-07-12-edge-functions-remediation-design.md`
+  `effort/completed/2026-07-12-edge-functions-remediation-design.md`
 - Working checklist (authoritative status):
-  `documentation/project/2026-07-12-edge-functions-remediation-tasks.md`
+  `effort/completed/2026-07-12-edge-functions-remediation-tasks.md`
 
 The architecture documents were updated in Phase 1 and now correctly describe
 the target state — trust them; they lead the code.

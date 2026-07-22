@@ -6,7 +6,7 @@
 feature-complete of User Manager and its foundation") after CA acceptance.
 Includes both review-refinement addenda, roles-as-text, sticky table
 headers, and the interface correction.
-**Source design:** `documentation/project/2026-07-18-foundation-game-plan-design.md`
+**Source design:** `effort/completed/2026-07-18-foundation-game-plan-design.md`
 
 This task list decomposes the approved design (D1–D11) into task groups.
 Each group is a logical component of Phase 1.

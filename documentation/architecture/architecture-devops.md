@@ -41,6 +41,7 @@ source/devops/
 │   ├── guard-imports.ts
 │   ├── guard-leaf.ts
 │   ├── guard-namespaces.ts
+│   ├── guard-utils.ts
 │   └── guard-validation.ts
 └── scripts/
     ├── app-admin-package.sh
@@ -57,6 +58,8 @@ source/devops/
     ├── gen-ai-context.ts
     ├── gen-id-seeds.ts
     ├── gen-jwt-secret.ts
+    ├── list-netlify-targets.ts
+    ├── list-supabase-targets.ts
     ├── read-secret.ts
     ├── db-genesis.ts
     ├── db-genesis-verify.ts
