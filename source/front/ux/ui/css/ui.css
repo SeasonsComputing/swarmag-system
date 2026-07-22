@@ -162,43 +162,8 @@
   background: currentColor;
   flex: 0 0 auto;
   height: 1rem;
+  mask: var(--sa-icon) center / contain no-repeat;
   width: 1rem;
-}
-
-[data-ui='action-button'][data-ui-icon='delete'] [data-ui='action-button-icon'] {
-  mask: url('../icons/trash.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-icon='back'] [data-ui='action-button-icon'] {
-  mask: url('../icons/arrow-left.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-icon='edit'] [data-ui='action-button-icon'] {
-  mask: url('../icons/pencil-1.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-icon='check'] [data-ui='action-button-icon'] {
-  mask: url('../icons/check.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-icon='cross'] [data-ui='action-button-icon'] {
-  mask: url('../icons/cross-1.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-icon='eject'] [data-ui='action-button-icon'] {
-  mask: url('../icons/exit.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-icon='info'] [data-ui='action-button-icon'] {
-  mask: url('../icons/info-circled.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-icon='plus'] [data-ui='action-button-icon'] {
-  mask: url('../icons/plus.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-icon='user'] [data-ui='action-button-icon'] {
-  mask: url('../icons/person.svg') center / contain no-repeat;
 }
 
 [data-ui='action-button-label'] {
@@ -267,52 +232,8 @@
   content: '';
   display: block;
   height: 1rem;
+  mask: var(--sa-icon) center / contain no-repeat;
   width: 1rem;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='delete']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/trash.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='back']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/arrow-left.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='edit']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/pencil-1.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='check']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/check.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='cross']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/cross-1.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='eject']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/exit.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='info']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/info-circled.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='plus']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/plus.svg') center / contain no-repeat;
-}
-
-[data-ui='action-button'][data-ui-label-mode='visible'][data-ui-icon='user']
-  [data-ui='action-button-icon']::before {
-  mask: url('../icons/person.svg') center / contain no-repeat;
 }
 
 [data-ui='action-button']:hover [data-ui='action-button-label'],

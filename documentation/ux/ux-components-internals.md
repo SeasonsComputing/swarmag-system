@@ -52,7 +52,7 @@ ux/
 └── common/
     └── components/
         ├── charts/      — reserved chart-control directory        
-        ├── css/         — CSS barrel, tokens, roles, themes, base, controls
+        ├── css/         — CSS barrel, tokens, roles, themes, base, controls, icon catalog
         ├── fonts/       — self-hosted woff2 font assets
         ├── icons/       — icon library
         └── ui/          — UI control primitives
@@ -158,20 +158,28 @@ Variants are only valid where explicitly declared.
 
 Controls and parts may additionally declare these extension attributes:
 
-| Control / Part    | Attribute          | Declared Values                                                             |
-| ----------------- | ------------------ | --------------------------------------------------------------------------- |
-| `action-button`   | `data-ui-icon`     | `back`, `check`, `cross`, `delete`, `edit`, `eject`, `info`, `plus`, `user` |
-| `layout`          | `data-ui-gap`      | `loose`, `tight`, `none`                                                    |
-| `tab-list`        | `data-ui-drag`     | `enabled`, `active`                                                         |
-| `tab-list`        | `data-ui-layout`   | `between`                                                                   |
-| `table-cell`      | `data-ui-align`    | `start`, `center`, `end`                                                    |
-| `table-container` | `data-ui-overflow` | `hidden`, `scroll`                                                          |
+| Control / Part    | Attribute          | Declared Values                                                                         |
+| ----------------- | ------------------ | --------------------------------------------------------------------------------------- |
+| `action-button`   | `data-ui-icon`     | `back`, `building`, `check`, `cross`, `delete`, `edit`, `eject`, `info`, `plus`, `user` |
+| `layout`          | `data-ui-gap`      | `loose`, `tight`, `none`                                                                |
+| `tab-list`        | `data-ui-drag`     | `enabled`, `active`                                                                     |
+| `tab-list`        | `data-ui-layout`   | `between`                                                                               |
+| `table-cell`      | `data-ui-align`    | `start`, `center`, `end`                                                                |
+| `table-container` | `data-ui-overflow` | `hidden`, `scroll`                                                                      |
 
 Rules:
 
 - no undeclared variants
 - no implicit defaults beyond what is defined
 - controls do not invent free-form values
+
+The `data-ui-icon` glyph set is defined in `icon-catalog.css`, which maps the
+full icon library: each entry binds a name to an SVG via the inherited
+`--sa-icon` custom property, which the generic mask rules in `ui.css` consume on
+the icon span and its `::before`. A control exposes a glyph by listing its name
+in an allowlist such as `UI_ACTION_BUTTON_ICONS`; the `data-ui-icon` values above
+are that curated subset. Extending the system is a name in the allowlist (and,
+for a brand-new SVG, one catalog line) — never per-icon CSS.
 
 ### 3.3 State
 

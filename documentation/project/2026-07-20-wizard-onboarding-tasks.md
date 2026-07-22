@@ -2,9 +2,10 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation (A0/A/C) + Feature (B)
-**Status:** IN PROGRESS — D1–D17 ratified 2026-07-20; A0, A1, A complete
-(A1 schema live on stage; A = wizard framework, contract+host+chrome).
-B0 (Customers API surface) next. Per-group go orders remain the gate.
+**Status:** IN PROGRESS — D1–D17 ratified 2026-07-20; A0, A1, A, B0 complete
+(A1 schema live on stage; A = wizard framework, contract+host+chrome;
+B0 = `api.Customers` inline, RLS-verified). B (COW feature) next. Per-group
+go orders remain the gate.
 **Source design:** `documentation/project/2026-07-20-wizard-onboarding-design.md`
 
 Each group is a gated production: scope declared, go received, checks run,
@@ -110,22 +111,35 @@ results reported. Delegation per budget discipline (haiku, git read-only).
       green); ripple audit re-verified (domain SDK + fixtures only, no
       front/back reach); full checks green
 
-## Group B0 — Customers API Surface (Foundation, discovered in planning)
+## Group B0 — Customers API Surface (Foundation) — COMPLETE 2026-07-21
 
-The composed `@front/api` namespace has NO Customers surface — nothing
+The composed `@front/api` namespace had NO Customers surface — nothing
 consumed it before the COW. First real exercise of the customer domain
 end-to-end:
 
-- [ ] `front/api/make-customers.ts` per the maker pattern (`makeAuthUsers`
-      precedent); plain client CRUD through the customer adapter — no
-      auth-sync coupling (customers are not identities)
-- [ ] `api.Customers` composed into `api.ts`: `create`, `update`, `get`,
-      `list` (list filtered by status serves both COW select paths and the
-      future prospect hub / story 1.2 widget)
-- [ ] Dual-storage contract honored per architecture (Supabase +
-      IndexedDB same contract)
-- [ ] `customers` table RLS verified live before first write (genesis
-      schema claims vs. hosted reality — the User Manager lesson)
+- [x] ~~`front/api/make-customers.ts` maker~~ — NOT created (CA ruling
+      2026-07-21). A maker is specialization: `makeAuthUsers` swaps
+      create/update/delete to edge clients and adds `eject`/`hasAccess`.
+      Customers are plain CRUD with nothing to encapsulate; a passthrough
+      maker aliasing `makeCrudSupabaseClient<Customer>` is ceremony, not
+      composition. Composed inline in `api.ts` instead
+- [x] `api.Customers` composed into `api.ts`:
+      `makeCrudSupabaseClient<Customer>` → `ApiCrudContract<Customer>`
+      (create/get/update/delete/list). Typecheck clean
+- [x] Dual-storage contract honored — `makeCrudSupabaseClient` is
+      transport-agnostic (the same contract a local/IndexedDB maker
+      implements); no local client wired, customers need no offline
+      (selective application per architecture, not a universal mandate)
+- [x] `customers` RLS verified live on stage before first write: RLS
+      enabled; INSERT (with_check true), UPDATE (`deleted_at IS NULL`/true),
+      SELECT (`deleted_at IS NULL`), DELETE — the COW's create/update writes
+      are permitted
+- [ ] DEFERRED — status-filtered / ordered `list`: no M1 consumer (COW never
+      lists customers, D17 stage 1 is pure contact capture); the real
+      consumers (prospect hub D15, story 1.2 widget) arrive with the
+      assessment flow. It is a core-layer `ListOptions`/`ApiCrudContract`
+      contract evolution whose shape the CA intends to design directly —
+      parked 2026-07-21 (see `project-feature-parking-lot.md`)
 
 ## Group B — COW Feature (Feature Mode)
 
