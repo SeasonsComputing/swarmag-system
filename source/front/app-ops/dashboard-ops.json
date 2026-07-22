@@ -11,7 +11,7 @@
           "shape": "landscape",
           "actions": ["/logout"],
           "labels": ["Logout"],
-          "icons": ["eject"]
+          "icons": ["exit"]
         }
       }
     ]

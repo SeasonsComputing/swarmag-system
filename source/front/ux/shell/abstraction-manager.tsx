@@ -111,7 +111,7 @@ export const AbstractionManager = <T extends Instance>(
     <div data-feat='abstraction-manager' data-feat-mode={mode()}>
       <header data-feat='abstraction-manager-title-row'>
         <h1 data-feat='abstraction-manager-title'>{props.provider.formTitle}</h1>
-        <UiActionButton icon='cross' label='Cancel' labelMode='visible' onClick={cancelDialog} />
+        <UiActionButton icon='cross-1' label='Cancel' labelMode='visible' onClick={cancelDialog} />
       </header>
       <section data-feat='abstraction-manager-list'>
         <UiCard elevation='raised'>
@@ -167,7 +167,7 @@ export const AbstractionManager = <T extends Instance>(
                                 />
                               )}
                             </For>
-                            <UiActionButton icon='edit' label='Edit' onClick={() => onSelect(item)} />
+                            <UiActionButton icon='pencil-1' label='Edit' onClick={() => onSelect(item)} />
                           </UiTableCell>
                         </UiTableRow>
                       )}
@@ -187,7 +187,7 @@ export const AbstractionManager = <T extends Instance>(
                 <div data-feat='abstraction-manager-collapse-action'>
                   <span data-feat='abstraction-manager-back-command'>
                     <UiActionButton
-                      icon='back'
+                      icon='arrow-left'
                       label={`${props.provider.entityLabel}s`}
                       onClick={() => setMode('list')}
                     />

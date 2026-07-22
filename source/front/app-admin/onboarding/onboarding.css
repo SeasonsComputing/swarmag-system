@@ -1,0 +1,63 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Customer onboarding wizard styles                                            ║
+║ Layout and presentation for the multi-stage onboarding flow.                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-feat='onboarding-page'] {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+/* Coordinate input group laid out horizontally */
+[data-feat='onboarding-coords-group'] {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: var(--sa-rhythm-gap);
+  align-items: flex-end;
+}
+
+/* Sites list presentation */
+[data-feat='onboarding-sites-list'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-rhythm-gap);
+}
+
+[data-feat='onboarding-site-item'] {
+  padding: var(--sa-space-md);
+  background: var(--sa-state-default-bg);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-default);
+}
+
+[data-feat='onboarding-site-label'] {
+  color: var(--sa-text-primary);
+  margin-bottom: var(--sa-space-sm);
+}
+
+[data-feat='onboarding-site-details'] {
+  color: var(--sa-text-secondary);
+  font-size: var(--sa-ui-font-size-compact);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-xs);
+}
+
+[data-feat='onboarding-site-coords'] {
+  margin-top: var(--sa-space-xs);
+}
+
+/* Add site button container */
+[data-feat='onboarding-add-site-actions'] {
+  display: flex;
+  gap: var(--sa-rhythm-gap);
+  margin-top: var(--sa-space-md);
+}
+
+/* Option labels within toggle groups */
+[data-feat='onboarding-option-label'] {
+  color: var(--sa-text-primary);
+}

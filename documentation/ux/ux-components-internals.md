@@ -160,7 +160,7 @@ Controls and parts may additionally declare these extension attributes:
 
 | Control / Part    | Attribute          | Declared Values                                                                         |
 | ----------------- | ------------------ | --------------------------------------------------------------------------------------- |
-| `action-button`   | `data-ui-icon`     | `back`, `building`, `check`, `cross`, `delete`, `edit`, `eject`, `info`, `plus`, `user` |
+| `action-button`   | `data-ui-icon`     | Any `icons.css` catalog name                                                      |
 | `layout`          | `data-ui-gap`      | `loose`, `tight`, `none`                                                                |
 | `tab-list`        | `data-ui-drag`     | `enabled`, `active`                                                                     |
 | `tab-list`        | `data-ui-layout`   | `between`                                                                               |
@@ -174,12 +174,12 @@ Rules:
 - controls do not invent free-form values
 
 The `data-ui-icon` glyph set is defined in `icons.css`, which maps the
-full icon library: each entry binds a name to an SVG via the inherited
+full icon library: each entry binds its asset filename to the matching SVG via the inherited
 `--sa-icon` custom property, which the generic mask rules in `ui.css` consume on
 the icon span and its `::before`. A control exposes a glyph by listing its name
-in an allowlist such as `UI_ACTION_BUTTON_ICONS`; the `data-ui-icon` values above
-are that curated subset. Extending the system is a name in the allowlist (and,
-for a brand-new SVG, one catalog line) — never per-icon CSS.
+directly to `data-ui-icon`; every catalog name is valid. Every catalog entry follows
+`{name} == {name}.svg`. Extending the system is a filename and, for a brand-new SVG,
+one matching catalog line — never per-icon CSS.
 
 ### 3.3 State
 

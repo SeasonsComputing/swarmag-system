@@ -52,7 +52,7 @@ Primary architectural context lives in `documentation/architecture/architecture-
 | `devops/` | Architecture and environment `guard-*` scripts                    |
 | `domain/` | Domain model and domain-layer contracts                           |
 | `tests/`  | Test suites and supporting fixtures                               |
-| `ux/`     | Client-facing user experiences, apps, contracts, and UI libraries |
+| `front/`  | Client-facing user experiences, apps, contracts, and UI libraries |
 
 #### 1.3.1 Core (`source/core/`)
 
@@ -60,6 +60,7 @@ Primary architectural context lives in `documentation/architecture/architecture-
 | ---------- | ---------------------------------------------------------------- |
 | `api/`     | Client makers and provider adapters (CRUD, HTTP, business rules) |
 | `cfg/`     | Configuration management (Config singleton, runtime providers)   |
+| `client/`  | API client implementations and makers                            |
 | `db/`      | Cached database client (`supabase.ts`)                           |
 | `service/` | Inbound service handler wrappers (BusRule HTTP handler)          |
 | `std/`     | Standard types (Id, When, Dictionary, Instantiable)              |
@@ -81,16 +82,17 @@ Primary architectural context lives in `documentation/architecture/architecture-
 | `migrations/`    | Forward-only SQL deltas and RLS policies                          |
 | `supabase-edge/` | Supabase Edge Functions (config, functions, shared orchestration) |
 
-#### 1.3.4 Frontend (`source/ux/`)
+#### 1.3.4 Frontend (`source/front/`)
 
 | Path            | Description                                          |
 | --------------- | ---------------------------------------------------- |
-| `api/`          | Composed API namespace (@ux/api barrel export)       |
+| `api/`          | Composed API namespace (`@front/api` barrel export)  |
 | `app-admin/`    | Admin PWA application (desktop/tablet)               |
 | `app-ops/`      | Operations PWA application (mobile, field execution) |
 | `app-customer/` | Customer portal application (static, read-only)      |
-| `common/`       | Shared UX components and utilities                   |
+| `app-style-guide/` | Style-guide harness application                    |
 | `config/`       | Configuration bootstrap for UX applications          |
+| `ux/`           | Shared UX components, state, views, and UI libraries |
 
 ## 2. Local Configuration
 
@@ -112,13 +114,13 @@ generated `.env` file.
 
 ### 2.2 Environment Files
 
-Committed env templates live under `source/ux/config/` and
+Committed env templates live under `source/front/config/` and
 `source/back/supabase-edge/config/`.
 
 | File pattern                                                               | Role                       |
 | -------------------------------------------------------------------------- | -------------------------- |
-| `source/ux/config/app-{app}-{target}.env.example`                          | Committed UX template      |
-| `source/ux/config/app-{app}-{target}.env`                                  | Generated UX package input |
+| `source/front/config/app-{app}-{target}.env.example`                       | Committed UX template      |
+| `source/front/config/app-{app}-{target}.env`                               | Generated UX package input |
 | `source/back/supabase-edge/config/back-supabase-edge-{target}.env.example` | Committed backend template |
 | `source/back/supabase-edge/config/back-supabase-edge-{target}.env`         | Generated backend input    |
 

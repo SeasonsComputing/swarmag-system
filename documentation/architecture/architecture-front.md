@@ -753,7 +753,7 @@ The app-local dashboard JSON conforms to `DashboardView` from `source/front/ux/v
           "shape": "compact",
           "actions": ["/about", "/logout"],
           "labels": ["About", "Logout"],
-          "icons": ["info", "eject"]
+          "icons": ["info-circled", "exit"]
         }
       }
     ]

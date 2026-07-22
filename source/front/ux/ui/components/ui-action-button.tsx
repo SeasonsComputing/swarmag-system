@@ -10,30 +10,12 @@ Emits compact action semantics for dense surfaces such as tables and toolbars.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UI_ACTION_BUTTON_ICONS  Supported action button icon names.
-UiActionButton          Compact icon button with hover/focus label affordance.
+UiActionButton  Compact icon button with hover/focus label affordance.
 */
 
 import { Button } from '@kobalte/core/button'
 import { type JSX, splitProps } from '@solid-js'
 import { controlState, type UiComponent } from './ui-helpers.ts'
-
-/** Supported action button icon names. */
-export const UI_ACTION_BUTTON_ICONS = [
-  'back',
-  'building',
-  'check',
-  'cross',
-  'delete',
-  'edit',
-  'eject',
-  'info',
-  'plus',
-  'user'
-] as const
-
-/** Action button icon name. */
-export type UiActionButtonIcon = (typeof UI_ACTION_BUTTON_ICONS)[number]
 
 /** Action button variants. */
 export type UiActionButtonVariant = 'default' | 'danger'
@@ -59,7 +41,7 @@ export type UiActionButtonProps =
   & {
     disabled?: boolean
     error?: boolean
-    icon: UiActionButtonIcon
+    icon: string
     label: string
     labelMode?: UiActionButtonLabelMode
     loading?: boolean

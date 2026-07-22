@@ -32,60 +32,69 @@
   gap: var(--sa-space-sm);
 }
 
+/* One contiguous progress rail, echoing the progress-bar language;
+   the fill inline-size is driven by the host per step. */
+[data-feat='wizard-bar'] {
+  background: var(--sa-bg-progress-track);
+  border-radius: var(--sa-radius-full);
+  min-block-size: var(--sa-progress-height);
+  overflow: hidden;
+}
+
+[data-feat='wizard-bar-fill'] {
+  background: var(--sa-gradient-brand);
+  block-size: var(--sa-progress-height);
+  border-radius: var(--sa-radius-full);
+  transition: var(--sa-transition-base);
+}
+
 [data-feat='wizard-steps'] {
   display: flex;
-  flex-wrap: wrap;
   gap: var(--sa-space-sm);
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-[data-feat='wizard-step'] {
-  align-items: center;
-  display: inline-flex;
-  gap: var(--sa-space-xs);
-  min-inline-size: 0;
-}
-
-/* Neutralize the list-item primitive's content-list spacing for a flush pip row.
-   Compound selector (0,2,0) deterministically wins over [data-ui='list-item']. */
+/* Neutralize the list-item primitive's content-list spacing. */
 [data-feat='wizard-steps'] [data-feat='wizard-step'] {
   margin-block: 0;
   padding-inline-start: 0;
 }
 
-[data-feat='wizard-step-ordinal'] {
-  align-items: center;
-  aspect-ratio: 1;
-  border: var(--sa-border-default);
-  border-radius: var(--sa-radius-full);
-  display: inline-flex;
-  justify-content: center;
-  min-inline-size: var(--sa-touch-target-sm);
-}
-
-[data-feat='wizard-step'][data-feat-state='upcoming'] [data-feat='wizard-step-ordinal'] {
+/* Labels sit beneath the rail, one per segment; upcoming is the dim default. */
+[data-feat='wizard-step'] {
   color: var(--sa-text-dim);
+  display: flex;
+  flex: 1 1 0;
+  font-size: var(--sa-font-size-sm);
+  gap: var(--sa-space-xs);
+  justify-content: center;
+  min-inline-size: 0;
+  text-align: center;
 }
 
-[data-feat='wizard-step'][data-feat-state='current'] [data-feat='wizard-step-ordinal'] {
-  border-color: var(--sa-color-accent);
-  color: var(--sa-color-accent);
+[data-feat='wizard-step']:first-child {
+  justify-content: flex-start;
+  text-align: start;
 }
 
-[data-feat='wizard-step'][data-feat-state='done'] [data-feat='wizard-step-ordinal'] {
+[data-feat='wizard-step']:last-child {
+  justify-content: flex-end;
+  text-align: end;
+}
+
+[data-feat='wizard-step'][data-feat-state='done'] {
   color: var(--sa-text-secondary);
+}
+
+[data-feat='wizard-step'][data-feat-state='current'] {
+  color: var(--sa-color-accent);
+  font-weight: var(--sa-ui-font-weight-strong);
 }
 
 [data-feat='wizard-step-title'] {
   min-inline-size: 0;
-}
-
-[data-feat='wizard-step-caption'] {
-  color: var(--sa-text-secondary);
-  font-size: var(--sa-font-size-sm);
-  margin: 0;
 }
 
 [data-feat='wizard'] > [data-ui='card'] {

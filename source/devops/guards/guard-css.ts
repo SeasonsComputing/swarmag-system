@@ -275,21 +275,45 @@ const auditControlsCSS = (lines: CSSLine[], filePath: string): string[] => {
 
 const auditIconCatalogCSS = (lines: CSSLine[], filePath: string): string[] => {
   const violations: string[] = []
+  const iconNames = new StringSet()
+  let iconName: string | undefined
+  let iconLineNumber = 0
+  let hasIconDeclaration = false
 
   for (const { line, lineNumber, isComment } of lines) {
     if (isComment) continue
 
     const trimmed = line.trim()
-    if (trimmed === '' || trimmed === '}') continue
+    if (trimmed === '') continue
+
+    if (trimmed === '}') {
+      if (iconName && !hasIconDeclaration) {
+        violations.push(
+          `${filePath}:${iconLineNumber} — icon catalog entry missing --sa-icon declaration — ${iconName}`
+        )
+      }
+      iconName = undefined
+      hasIconDeclaration = false
+      continue
+    }
 
     if (line.includes('{')) {
       const selector = extractSelector(line)
       if (!selector || isAtRule(selector)) continue
-      if (!selector.startsWith('[data-ui-icon')) {
+      const iconMatch = selector.match(/^\[data-ui-icon='([^']+)'\]$/)
+      if (!iconMatch) {
         violations.push(
-          `${filePath}:${lineNumber} — icon catalog selector not rooted at [data-ui-icon — found: ${selector}`
+          `${filePath}:${lineNumber} — icon catalog selector must be [data-ui-icon='{name}'] — found: ${selector}`
         )
+        continue
       }
+      iconName = iconMatch[1]
+      if (iconNames.has(iconName)) {
+        violations.push(`${filePath}:${lineNumber} — duplicate icon catalog name — ${iconName}`)
+      }
+      iconNames.add(iconName)
+      iconLineNumber = lineNumber
+      hasIconDeclaration = false
       continue
     }
 
@@ -299,6 +323,14 @@ const auditIconCatalogCSS = (lines: CSSLine[], filePath: string): string[] => {
         violations.push(
           `${filePath}:${lineNumber} — icon catalog declares non --sa-icon property — ${property}`
         )
+      } else if (iconName) {
+        hasIconDeclaration = true
+        const expected = `--sa-icon: url('../icons/${iconName}.svg');`
+        if (trimmed !== expected) {
+          violations.push(
+            `${filePath}:${lineNumber} — icon catalog name must match SVG asset — expected: ${expected}`
+          )
+        }
       }
     }
   }
