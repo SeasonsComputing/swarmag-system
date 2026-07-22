@@ -9,7 +9,7 @@
   block-size: clamp(32rem, 72dvh, 44rem);
   display: grid;
   gap: var(--sa-rhythm-gap);
-  grid-template-columns: minmax(var(--sa-size-xs), 2fr) minmax(var(--sa-size-xs), 1fr);
+  grid-template-columns: minmax(var(--sa-size-xs), 2fr) minmax(var(--sa-size-min), 1fr);
   grid-template-rows: auto minmax(0, 1fr);
   max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
 }
@@ -33,7 +33,6 @@
   display: flex;
   flex-direction: column;
   min-block-size: min(calc(var(--sa-touch-target) * 4), calc(100dvh - var(--sa-rhythm-pad) * 4));
-  min-inline-size: min(var(--sa-size-xs), 100%);
   position: relative;
 }
 
@@ -41,7 +40,6 @@
   display: flex;
   flex-direction: column;
   min-block-size: min(calc(var(--sa-touch-target) * 4), calc(100dvh - var(--sa-rhythm-pad) * 4));
-  min-inline-size: min(var(--sa-size-min), 100%);
   position: relative;
 }
 
