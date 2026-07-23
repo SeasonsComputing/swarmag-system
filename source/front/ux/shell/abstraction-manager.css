@@ -6,7 +6,7 @@
 */
 
 [data-feat='abstraction-manager'] {
-  grid-template-columns: minmax(var(--sa-size-xs), 2fr) minmax(var(--sa-size-min), 1fr);
+  grid-template-columns: minmax(var(--sa-size-xs), 1.7fr) minmax(var(--sa-size-min), 1.3fr);
 }
 
 [data-feat='abstraction-manager-confirmation'] {

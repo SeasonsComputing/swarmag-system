@@ -13,7 +13,7 @@ import './panel-container.css'
 export const PanelContainer = (props: PanelContainerProps) => (
   <div data-feat={props.feature} data-feat-mode={props.mode} data-feat-panel='container'>
     {props.header}
-    {props.accessory}
+    {props.accessory && <div data-feat-panel='accessory'>{props.accessory}</div>}
     {props.index && <aside data-feat-panel='index'>{props.index}</aside>}
     <main data-feat-panel='subject' ref={props.subjectRef}>{props.subject}</main>
   </div>

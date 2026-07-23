@@ -51,9 +51,12 @@ scrolled content, and was never chrome.
   governing principle is locus of attention and the ergonomics of head shifting:
   controls belong where the eye already is, and title / progress / stage /
   controls are one cluster.
-- The Accessory (progress) is **container level and spanning**, read-only — one
-  bar plus one text line for the current stage. Not clickable, ever. Its width
-  is correct because progress governs the whole flow, not one panel.
+- The Accessory (progress) is **container level and spanning**, read-only, and
+  **horizontal in every state**. It houses the contiguous progress rail **plus a
+  numbered label for every stage** distributed beneath it, current stage in
+  `--sa-color-accent` — as built in `wizard.tsx:110–119` per the Group A chrome
+  refinement. Not "one line for the current stage"; not clickable, ever. Its
+  width is correct because progress governs the whole flow, not one panel.
 - The Accessory **serves as the stage's header**, so the wizard's Form panel
   carries no title of its own.
 - Panels **span vertically until content is 100% visible; leftover negative
@@ -252,7 +255,7 @@ offset disappears where it was most confusing.
 
 Gated. Scope declared, go received, checks run, results reported.
 
-### P1 — Panel family + manager migration
+### P1 — Panel family + manager migration — COMPLETE, verified 2026-07-22
 
 1. Create `panel-contract.ts`, `panel-container.tsx`, `panel-header.tsx`,
    `panel-list.tsx`, `panel-form.tsx` and their CSS.
@@ -261,23 +264,92 @@ Gated. Scope declared, go received, checks run, results reported.
 3. Apply the `UiDialog` seam fixes.
 4. `<aside>` / `<main>` correction.
 
-The manager goes first deliberately — two panels, both header shapes, the
-collapse mode. If `PanelHeader`'s zones survive it, the wizard is a formality.
-Doing it in the other order tests nothing.
+Verified live by the CA across wide, collapsed and full-screen. Three defects
+were found and fixed after the delegate's pass; all three are written into the
+seam section above and must not be reintroduced:
 
-**Gate: CA revalidates User Manager closely before P2 starts.** This is a
-regression-sensitive migration of committed, working code.
+- `container-type` on the container killed every `@container` rule a surface
+  writes against itself.
+- The container double-subtracted `--sa-dialog-pad` from a percentage that had
+  already excluded it.
+- `grid-template-rows: 1fr` on the dialog resolved to `minmax(auto, 1fr)`, whose
+  auto minimum floored the row at content height.
 
 ### P2 — Wizard migration + Timeline
 
-5. Migrate `Wizard` onto the family; feedback moves under the header bar; the
-   `wizard-content` wrapper and its `UiLayout block-fill` disappear as panels
-   become direct grid children.
-6. Build `PanelTimeline` and wire it into the wizard's Index.
-7. Fix the known blocker: `wizard.tsx:108` writes
-   `style={{ 'inline-size': barFill() }}`, so the host names the _axis_ and CSS
-   cannot flip the rail. The host must publish the scalar
-   (`--sa-wizard-progress`); CSS chooses `inline-size` or `block-size` per state.
+5. Migrate `Wizard` onto the family. Feedback moves out of the card body to under
+   the header bar. The `wizard-content` wrapper and its `UiLayout block-fill`
+   disappear — panels become direct grid children of the container.
+6. Build `PanelTimeline` and wire it into the wizard's Index. Header is `(0..1)`
+   and the working assumption is **none** — the container header names the flow
+   and the accessory names the stage, so a third label is redundant.
+
+   **Shape: a classic timeline — node, connector, node.** Not a rotated progress
+   bar and not a bulleted list.
+
+   ```
+   o  Contact
+   |
+   o  Customer
+   |
+   o  Sites
+   ```
+
+   Body carries `done | current | upcoming` per stage. **Read-only — neither the
+   timeline nor the progress rail is ever clickable.**
+
+   **Both components enumerate the stages, and that redundancy is deliberate.**
+   The progress accessory already houses the rail _plus_ a numbered label per
+   stage (`wizard.tsx:110–119`, the Group A chrome refinement) and **keeps them
+   unchanged**. In wide, the timeline enumerates the same stages a second time.
+
+   The CA is aware and has authorized building it this way while he settles the
+   idea (2026-07-22). **Do not "fix" this by dropping the accessory's labels, and
+   do not treat it as an oversight** — it is a provisional arrangement pending a
+   CA decision, not drift.
+
+7. **The progress accessory stays horizontal. Do not flip it.** (CA, 2026-07-22.)
+
+   Earlier notes recorded `wizard.tsx:108`'s `style={{ 'inline-size': barFill() }}`
+   as a "known blocker for the timeline," on the premise that the rail would
+   become the vertical timeline when wide. **That premise is void** — the rail and
+   the timeline are two independent components that coexist (see the rail-vs-
+   timeline correction below). The rail is horizontal in every state.
+
+   So the `--sa-wizard-progress` scalar change is **not** in scope. With no axis to
+   choose, publishing a scalar is a refactor with no consumer, which this project
+   rejects on extraction discipline. Leave `wizard.tsx:108` alone.
+
+**Three things P1 proved that P2 walks straight into.** None are optional.
+
+**8. The accessory row.** `PanelContainer` declares
+`grid-template-rows: auto minmax(0, 1fr)` and renders `{props.accessory}`
+unconditionally. The manager passes none, so P1 never exercised it. The moment
+the wizard passes a progress comp it takes the `1fr` row and the panels fall into
+an implicit `auto` row — the same failure mode the 2026-07-22B session already
+fixed once. Fix without an API change:
+
+```
+[data-feat-panel='container']:has(> [data-feat-panel='accessory']) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+```
+
+`:has()` is already in house use (`user-manager.css`). Keep every `1fr` row as
+`minmax(0, 1fr)` — see defect three above.
+
+**9. `onboarding-page` is now load-bearing.** The workbench dialog stretches
+exactly **one** wrapper level, and for the wizard that wrapper is
+`[data-feat='onboarding-page']`. Its existing `min-height: 100%` and flex column
+should now be redundant rather than harmful — **verify by measurement, do not
+assume.** If a second nesting level ever appears between dialog and container,
+the percentage chain breaks silently; see the fragility note in the seam section.
+
+**10. Re-verify the wizard's own `@container` threshold.** The wizard has never
+had one. Its two-column minimum is far below the manager's, so it must declare
+its own literal rather than inherit 768 — a shared threshold would collapse it
+roughly 170px early. The query resolves against `[data-ui='dialog']`, not against
+`PanelContainer`.
 
 ### P3 — Customer sites
 
