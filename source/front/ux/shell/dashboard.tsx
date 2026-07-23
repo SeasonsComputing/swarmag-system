@@ -29,7 +29,6 @@ export const Dashboard = (): UiComponent => {
   const dashboardContext = useDashboard()
   const dashboard = dashboardContext.state.store
   const widgets = dashboardContext.widgets
-  const bodyWidgets = () => dashboard.rows.flatMap(row => row.widgets)
   const headerIdentity = () => dashboard.header.widgets[0]
   const headerFields = () => dashboard.header.widgets.slice(1, -1)
   const headerTerminal = () => {
@@ -66,7 +65,7 @@ export const Dashboard = (): UiComponent => {
   })
 
   return (
-    <div data-feat='dashboard' data-feat-layout={dashboard.settings.layout}>
+    <div data-feat='dashboard'>
       <header data-feat='dashboard-header'>
         <div
           data-feat='dashboard-header-contents'
@@ -110,27 +109,18 @@ export const Dashboard = (): UiComponent => {
       </header>
 
       <div data-feat='dashboard-body'>
-        <Show
-          when={dashboard.settings.layout === 'masonry'}
-          fallback={
-            <For each={dashboard.rows}>
-              {row => (
-                <section data-feat='dashboard-row' data-feat-size={row.size}>
-                  <h2 data-feat='dashboard-row-label'>{row.label}</h2>
-                  <div data-feat='dashboard-row-widgets'>
-                    <For each={row.widgets}>
-                      {widget => <DashboardWidget widget={widget} />}
-                    </For>
-                  </div>
-                </section>
-              )}
-            </For>
-          }
-        >
-          <For each={bodyWidgets()}>
-            {widget => <DashboardWidget widget={widget} />}
-          </For>
-        </Show>
+        <For each={dashboard.rows}>
+          {row => (
+            <section data-feat='dashboard-row' data-feat-size={row.size}>
+              <h2 data-feat='dashboard-row-label'>{row.label}</h2>
+              <div data-feat='dashboard-row-widgets'>
+                <For each={row.widgets}>
+                  {widget => <DashboardWidget widget={widget} />}
+                </For>
+              </div>
+            </section>
+          )}
+        </For>
       </div>
 
       <UiFooter logo={footerLogo} alt='swarmAg' />

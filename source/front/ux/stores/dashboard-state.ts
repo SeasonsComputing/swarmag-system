@@ -360,12 +360,7 @@ function toDashboardStoreWidgets(input: unknown, field: string): DashboardStoreW
 
 /** Validate dashboard settings. */
 function toDashboardSettings(input: unknown, field: string): DashboardSettings {
-  const settings = toDictionary(input, field)
-  const layout = toString(settings['layout'], `${field}.layout`)
-  if (layout !== 'rows' && layout !== 'masonry') {
-    throw new ApiError(`${field}.layout must be rows or masonry`, 400)
-  }
-  return { ...settings, layout }
+  return toDictionary(input, field)
 }
 
 /** Validate one dashboard row. */

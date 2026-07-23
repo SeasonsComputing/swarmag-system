@@ -222,8 +222,7 @@ Application root.
 - Import `Config` from `@front/config/ux-config.ts` only.
 - Construct app state store by calling `app-state.ts` with store name
   `'swarmag-admin-app'`. IDB preference keys for Admin:
-  `{storeName}:theme`, `{storeName}:dashboard:layout`,
-  `{storeName}:dashboard:panels`.
+  `{storeName}:theme`, `{storeName}:dashboard:panels`.
 - Boot sequence after authentication:
   1. Call `api.Users.get(SessionState.store.userId)` and pass result to
      `SessionState.setUser(user)`.
@@ -297,8 +296,7 @@ Application root.
 - Import `Config` from `@front/config/ux-config.ts` only.
 - Construct app state store by calling `app-state.ts` with store name
   `'swarmag-ops-app'`. IDB preference keys for Ops:
-  `{storeName}:theme`, `{storeName}:dashboard:layout`,
-  `{storeName}:dashboard:panels`.
+  `{storeName}:theme`, `{storeName}:dashboard:panels`.
 - Boot sequence after authentication:
   1. Call `api.Users.get(SessionState.store.userId)` and pass result to
      `SessionState.setUser(user)`.
@@ -348,9 +346,8 @@ Application root.
 - Follow route shape and guard pattern from `architecture-front.md` §6.2 and §6.7.
 - Import `Config` from `@front/config/ux-config.ts` only.
 - Construct app state store by calling `app-state.ts` with store name
-  `'swarmag-customer-app'`. IDB preference keys for Customer:
-  `{storeName}:theme`, `{storeName}:dashboard:layout`.
-  Customer has no panels key.
+  `'swarmag-customer-app'`. IDB preference key for Customer:
+  `{storeName}:theme`. Customer has no panels key.
 - Boot sequence after authentication:
   1. Call `api.Users.get(SessionState.store.userId)` and pass result to
      `SessionState.setUser(user)`.

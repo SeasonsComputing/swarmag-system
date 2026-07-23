@@ -40,7 +40,8 @@ Deliver the dashboard foundation and user management page for `app-admin`. This 
 
 ### 4.1 Dashboard Layout
 
-Dashboard supports two layout modes, toggled via `Dashboard.settings.layout`.
+Dashboard renders its rows in order. `Dashboard.settings` remains available for
+dashboard-specific configuration that does not alter this presentation structure.
 
 **Row layout (default):**
 
@@ -51,8 +52,6 @@ Dashboard supports two layout modes, toggled via `Dashboard.settings.layout`.
   │     └── [data-ui='dashboard-row'] ← per row: labeled header + X-scrolling widget strip (tall)
   └── UiFooter
 ```
-
-**Masonry alternate** (`settings.layout='masonry'`): rows are flatMapped to a single widget list. layout uses masonry grid
 
 ### 4.2 WidgetProvider
 
@@ -176,11 +175,6 @@ export const WidgetCatalog: WidgetRegistry = { BrandWidget, ActionWidget }
   gap: var(--sa-rhythm-gap);
   overflow-x: auto;
 }
-
-/* Masonry alternate */
-[data-ui='dashboard'][data-layout='masonry'] [data-ui='dashboard-body'] {
-  ...
-}
 ```
 
 ### 5.6 ActionWidget Settings
@@ -191,7 +185,8 @@ export const WidgetCatalog: WidgetRegistry = { BrandWidget, ActionWidget }
   "settings": {
     "shape": "landscape",
     "actions": ["/users", "/logout"],
-    "labels": ["User Management", "Logout"]
+    "labels": ["User Management", "Logout"],
+    "icons": ["person", "exit"]
   }
 }
 ```
@@ -241,7 +236,7 @@ Add `settings` at the top level. Add BrandWidget and ActionWidget to header:
 
 ```json
 {
-  "settings": { "layout": "rows" },
+  "settings": {},
   "header": {
     "widgets": [
       { "type": "BrandWidget", "settings": { "shape": "landscape" } },

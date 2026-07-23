@@ -32,10 +32,8 @@ export type DashboardRow = DashboardRowHeader & DashboardWidgets
 /** The dashboard header is a special row of widgets */
 export type DashboardHeader = DashboardWidgets
 
-/** Dashboard layout and display settings. */
-export type DashboardSettings = Dictionary & {
-  layout: 'rows' | 'masonry'
-}
+/** Dashboard feature settings. */
+export type DashboardSettings = Dictionary
 
 /** Dashboard — settings, header widget strip, and row collection. */
 export type Dashboard = {

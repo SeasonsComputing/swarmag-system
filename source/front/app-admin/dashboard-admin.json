@@ -1,7 +1,5 @@
 {
-  "settings": {
-    "layout": "rows"
-  },
+  "settings": {},
   "header": {
     "widgets": [
       { "type": "BrandWidget", "settings": { "shape": "landscape" } },

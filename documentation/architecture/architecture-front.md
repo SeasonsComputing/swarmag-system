@@ -595,11 +595,11 @@ IndexedDB usage is split into two layers:
 
 **IndexedDB Database Names**
 
-| Database Name          | App      | Content                                               |
-| ---------------------- | -------- | ----------------------------------------------------- |
-| `swarmag-app-admin`    | Admin    | dashboard layout, panel config, theme                 |
-| `swarmag-app-ops`      | Ops      | dashboard layout, panel config, theme, job aggregates |
-| `swarmag-app-customer` | Customer | dashboard layout, theme                               |
+| Database Name          | App      | Content                                                      |
+| ---------------------- | -------- | ------------------------------------------------------------ |
+| `swarmag-app-admin`    | Admin    | dashboard configuration, panel config, theme                 |
+| `swarmag-app-ops`      | Ops      | dashboard configuration, panel config, theme, job aggregates |
+| `swarmag-app-customer` | Customer | dashboard configuration, theme                               |
 
 #### 9.5.2 Application Preferences
 
@@ -608,7 +608,6 @@ IndexedDB usage is split into two layers:
 | Key                | Admin | Ops | Customer |
 | ------------------ | ----- | --- | -------- |
 | `theme`            | ✓     | ✓   | ✓        |
-| `dashboard:layout` | ✓     | ✓   | ✓        |
 | `dashboard:panels` | ✓     | ✓   | —        |
 
 ### 9.6 State Management
@@ -719,7 +718,9 @@ The header provides paired contexts: `normal/tall` for its primary inner row and
 container-provided contexts, not viewport modes or literal fixed dimensions. The
 leading identity field (shell logo + BrandWidget) and terminal ActionWidget are header
 bookends. When ActionWidget receives a wrapped/short field, that field spans the
-entire post-gutter inner row; ActionWidget owns how its controls use the field.
+entire post-gutter inner row.
+
+ActionWidget owns how its controls use the field.
 
 `compact` and `landscape` are widget presentation shapes, not shell geometry. A
 widget uses its configured shape to express its data within the footprint allocated
