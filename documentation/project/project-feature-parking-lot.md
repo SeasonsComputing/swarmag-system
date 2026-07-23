@@ -158,3 +158,37 @@ until the hub milestone provides a real consumer to pin requirements.
 **Picking this up should look like:** a Foundation pass on the core query
 contract, designed against the hub as first consumer — not an ad-hoc filter
 bolted onto the topic client.
+
+## Table header gradient seams at fractional column widths
+
+**Parked:** 2026-07-22 (CA, during the panel decomposition)
+
+Vertical lines appear between columns in a table's header row at certain widths.
+They are not borders — no table cell declares an inline border anywhere, verified
+by inspection. `[data-ui='table-head']` carries `background: var(--sa-table-bg-head)`
+(`--sa-gradient-brand`, a 135° gradient), and that gradient is painted **per
+cell** rather than once across the row group. When a column boundary lands on a
+whole pixel the seam is invisible; when it lands mid-pixel it renders as a line.
+Reproduced in the style guide by forcing fractional cell widths — boundaries at
+`.797`, `.5`, `.609` all seam; integer boundaries do not.
+
+Surfaced when the manager's columns moved from `2fr 1fr` to `1.7fr 1.3fr`, which
+was the CA's requested 30% wider editor. That change did not cause the defect —
+`2fr 1fr` happened to produce integer cell widths at common viewport sizes, so
+the artifact was latent, not new.
+
+**Why parked:** every obvious fix collides with a deliberate decision already
+documented at `ui.css:554–558`. `border-collapse: separate` is load-bearing for
+the sticky header (in the collapsed model, cell borders belong to the table and
+stay behind when the head sticks), and the head's `clip-path` exists because
+neither `overflow: clip` on the table nor `border-radius` rounds a row group.
+Moving the gradient to the table, to the row, or to the cells each breaks one of
+those. It is cosmetic, width-dependent, and predates this session.
+
+**Picking this up should look like:** Foundation Mode — it is `ui.css`, the
+design-language layer. Start from the sticky-header construction as a whole
+rather than patching the gradient onto the current one; the constraint set
+(sticky head + rounded top corners + continuous gradient + separate borders) may
+want a different structure rather than a fix. Do not "solve" it by choosing `fr`
+values that happen to yield integer widths — that is luck, not a fix, and it
+silently breaks at the next container size.
