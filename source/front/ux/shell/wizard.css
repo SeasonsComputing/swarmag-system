@@ -5,30 +5,13 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
+/* The timeline column is content-bounded, but bare max-content makes its width a
+   function of stage-title text — which would make the collapse threshold below
+   correct for one flow and silently wrong for the next. Capping it bounds the
+   two-column minimum for EVERY wizard: cap + gap + subject minimum. A stage
+   title longer than the cap wraps rather than widening the column. */
 [data-feat='wizard'] {
-  block-size: clamp(32rem, 72dvh, 44rem);
-  display: grid;
-  gap: var(--sa-rhythm-gap);
-  grid-template-rows: auto minmax(0, 1fr);
-  max-block-size: calc(100dvh - var(--sa-rhythm-pad) * 4);
-}
-
-[data-feat='wizard-title-row'] {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  min-inline-size: 0;
-}
-
-[data-feat='wizard-content'] {
-  min-block-size: 0;
-  min-inline-size: 0;
-}
-
-[data-feat='wizard-title'] {
-  font-size: var(--sa-font-size-md);
-  line-height: 1;
-  margin: 0;
+  grid-template-columns: fit-content(var(--sa-size-min)) minmax(var(--sa-size-min), 1fr);
 }
 
 [data-feat='wizard-indicator'] {
@@ -119,41 +102,8 @@
   justify-content: center;
 }
 
-[data-feat='wizard-content'] [data-ui='layout'][data-ui-variant='block-fill'] > [data-ui='card'] {
-  display: flex;
-  flex-direction: column;
-  min-block-size: 0;
-  overflow: visible;
-}
-
-[data-feat='wizard-card-header'] {
-  align-items: center;
-  display: flex;
-  flex: 0 0 auto;
-  padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
-}
-
-[data-feat='wizard-card-body'] {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  gap: var(--sa-rhythm-gap);
-  margin: calc(var(--sa-space-xs) * -1);
-  min-block-size: 0;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--sa-space-xs);
-}
-
 [data-feat='wizard-stage'] {
   animation: sa-fade-in var(--sa-motion-page-fade) ease;
-}
-
-[data-feat='wizard-navigation'] {
-  display: flex;
-  flex: 1 1 auto;
-  gap: var(--sa-space-sm);
-  justify-content: space-between;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -162,18 +112,18 @@
   }
 }
 
-@media (max-width: 480px) {
+/* Derived from this surface's own track minimums, not inherited: the capped
+   timeline column plus --sa-rhythm-gap plus the subject's --sa-size-min floor is
+   roughly 660, so 680 is the nearest literal that clears it in every viewport
+   band. Below this the two tracks cannot both be satisfied and the subject would
+   be squeezed under its floor. A @container condition cannot take var(), which
+   is why this is a literal and why the cap above exists to keep it stable. */
+@container (max-width: 680px) {
   [data-feat='wizard'] {
-    block-size: 100dvh;
-    max-block-size: none;
+    grid-template-columns: 1fr;
   }
 
-  [data-feat='wizard-title-row'] {
-    padding-block-start: var(--sa-rhythm-pad);
-    padding-inline: var(--sa-rhythm-pad);
-  }
-
-  [data-feat='wizard-content'] [data-ui='layout'][data-ui-variant='block-fill'] > [data-ui='card'] {
-    border-radius: 0;
+  [data-feat='wizard'] > [data-feat-panel='index'] {
+    display: none;
   }
 }

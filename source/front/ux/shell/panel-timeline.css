@@ -1,0 +1,81 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Panel timeline styles                                                        ║
+║ Read-only node-and-connector stage index styling.                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-feat-panel='timeline'] {
+  flex: 0 0 auto;
+  inline-size: max-content;
+}
+
+[data-feat-panel='timeline'] > [data-ui='card'] {
+  block-size: 100%;
+}
+
+[data-feat-panel='timeline'] [data-feat-panel='header'] {
+  padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
+}
+
+[data-feat-panel='timeline-list'] {
+  display: grid;
+  gap: var(--sa-space-sm);
+}
+
+[data-feat-panel='timeline-item'] {
+  align-items: center;
+  color: var(--sa-text-dim);
+  display: grid;
+  gap: var(--sa-space-sm);
+  grid-template-columns: var(--sa-space-lg) max-content;
+  margin: 0;
+  min-block-size: var(--sa-space-lg);
+  padding: 0;
+  position: relative;
+}
+
+[data-feat-panel='timeline-node'] {
+  background: var(--sa-bg-control);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-full);
+  block-size: var(--sa-space-sm);
+  inline-size: var(--sa-space-sm);
+  justify-self: center;
+  z-index: var(--sa-z-base);
+}
+
+[data-feat-panel='timeline-item']:not(:last-child)::after {
+  block-size: calc(100% + var(--sa-space-sm));
+  border-inline-start: var(--sa-border-default);
+  content: '';
+  inline-size: 0;
+  inset-block-start: calc(50% + var(--sa-space-sm) / 2);
+  inset-inline-start: calc(var(--sa-space-lg) / 2);
+  position: absolute;
+}
+
+[data-feat-panel='timeline-item'][data-feat-state='done'] {
+  color: var(--sa-text-secondary);
+}
+
+[data-feat-panel='timeline-item'][data-feat-state='done'] [data-feat-panel='timeline-node'] {
+  background: var(--sa-color-primary);
+  border-color: var(--sa-color-primary);
+}
+
+[data-feat-panel='timeline-item'][data-feat-state='current'] {
+  color: var(--sa-color-accent);
+  font-weight: var(--sa-ui-font-weight-strong);
+}
+
+[data-feat-panel='timeline-item'][data-feat-state='current'] [data-feat-panel='timeline-node'] {
+  background: var(--sa-color-accent);
+  border-color: var(--sa-color-accent);
+}
+
+@media (max-width: 480px) {
+  [data-feat-panel='timeline'] > [data-ui='card'] {
+    border-radius: 0;
+  }
+}

@@ -19,6 +19,10 @@ against itself. */
   min-block-size: 0;
 }
 
+[data-feat-panel='container']:has(> [data-feat-panel='accessory']) {
+  grid-template-rows: auto auto minmax(0, 1fr);
+}
+
 [data-feat-panel='container'] > [data-feat-panel='header'],
 [data-feat-panel='container'] > [data-feat-panel='accessory'] {
   grid-column: 1 / -1;

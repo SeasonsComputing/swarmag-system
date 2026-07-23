@@ -15,18 +15,14 @@ Wizard                  The wizard host component.
 WizardProps             Props for the wizard host.
 */
 
-import {
-  UiActionButton,
-  UiAlert,
-  UiButton,
-  UiCard,
-  type UiComponent,
-  UiLayout,
-  UiList,
-  UiListItem
-} from '@front/ux/ui'
+import { UiActionButton, UiButton, type UiComponent, UiList, UiListItem } from '@front/ux/ui'
 import { createMemo, createSignal, For, Show } from '@solid-js'
-import type { WizardContract, WizardFeedback } from './wizard-contract.ts'
+import { PanelContainer } from './panel-container.tsx'
+import type { PanelFeedback } from './panel-contract.ts'
+import { PanelForm } from './panel-form.tsx'
+import { PanelHeader } from './panel-header.tsx'
+import { PanelTimeline } from './panel-timeline.tsx'
+import type { WizardContract } from './wizard-contract.ts'
 
 import './wizard.css'
 
@@ -54,7 +50,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
   const barFill = (): string =>
     `${(((stepIndex() + 0.5) / props.contract.stages.length) * 100).toFixed(3)}%`
 
-  const banner = createMemo<WizardFeedback | null>(() => {
+  const banner = createMemo<PanelFeedback | null>(() => {
     const e = error()
     if (e) return { message: e, variant: 'danger' }
     return props.contract.feedback?.() ?? null
@@ -91,83 +87,95 @@ export const Wizard = (props: WizardProps): UiComponent => {
   }
 
   return (
-    <div data-feat='wizard' data-feat-step={stage().name}>
-      <header data-feat='wizard-title-row'>
-        <h1 data-feat='wizard-title'>{props.contract.formTitle}</h1>
-        <UiActionButton
-          icon='cross-1'
-          label='Cancel'
-          labelMode='visible'
-          onClick={() => props.onCancel()}
+    <PanelContainer
+      feature='wizard'
+      header={
+        <PanelHeader
+          leading={<h1>{props.contract.formTitle}</h1>}
+          trailing={
+            <UiActionButton
+              icon='cross-1'
+              label='Cancel'
+              labelMode='visible'
+              onClick={() => props.onCancel()}
+            />
+          }
         />
-      </header>
-      <div data-feat='wizard-content'>
-        <UiLayout variant='block-fill'>
-          <div data-feat='wizard-indicator'>
-            <div aria-hidden='true' data-feat='wizard-bar'>
-              <div data-feat='wizard-bar-fill' style={{ 'inline-size': barFill() }} />
-            </div>
-            <UiList data-feat='wizard-steps'>
-              <For each={props.contract.stages}>
-                {(item, index) => (
-                  <UiListItem data-feat='wizard-step' data-feat-state={stepState(index())}>
-                    <span data-feat='wizard-step-ordinal'>{index() + 1}</span>
-                    <span data-feat='wizard-step-title'>{item.title}</span>
-                  </UiListItem>
-                )}
-              </For>
-            </UiList>
+      }
+      accessory={
+        <div data-feat='wizard-indicator'>
+          <div aria-hidden='true' data-feat='wizard-bar'>
+            <div data-feat='wizard-bar-fill' style={{ 'inline-size': barFill() }} />
           </div>
-          <UiCard elevation='raised'>
-            <header data-feat='wizard-card-header'>
-              <nav aria-label='Wizard navigation' data-feat='wizard-navigation'>
-                <UiActionButton
-                  align='start'
-                  icon='arrow-left'
-                  label='Back'
-                  labelMode='visible'
-                  disabled={isFirst() || committing()}
-                  onClick={back}
-                />
-                <Show
-                  when={isLast()}
-                  fallback={
-                    <UiActionButton
-                      icon='arrow-right'
-                      label='Next'
-                      labelMode='visible'
-                      disabled={!canAdvance() || committing()}
-                      loading={committing()}
-                      onClick={() => void advance()}
-                    />
-                  }
-                >
-                  <UiButton
-                    variant='primary'
+          <UiList data-feat='wizard-steps'>
+            <For each={props.contract.stages}>
+              {(item, index) => (
+                <UiListItem data-feat='wizard-step' data-feat-state={stepState(index())}>
+                  <span data-feat='wizard-step-ordinal'>{index() + 1}</span>
+                  <span data-feat='wizard-step-title'>{item.title}</span>
+                </UiListItem>
+              )}
+            </For>
+          </UiList>
+        </div>
+      }
+      index={
+        <PanelTimeline
+          items={props.contract.stages.map((item, index) => ({
+            state: stepState(index),
+            title: item.title
+          }))}
+        />
+      }
+      subject={
+        <PanelForm
+          feedback={banner()}
+          header={{
+            leading: (
+              <UiActionButton
+                align='start'
+                icon='arrow-left'
+                label='Back'
+                labelMode='visible'
+                disabled={isFirst() || committing()}
+                onClick={back}
+              />
+            ),
+            trailing: (
+              <Show
+                when={isLast()}
+                fallback={
+                  <UiActionButton
+                    icon='arrow-right'
+                    label='Next'
+                    labelMode='visible'
                     disabled={!canAdvance() || committing()}
                     loading={committing()}
                     onClick={() => void advance()}
-                  >
-                    Finish
-                  </UiButton>
-                </Show>
-              </nav>
-            </header>
-            <div data-feat='wizard-card-body'>
-              <Show when={banner()}>
-                {feedback => <UiAlert variant={feedback().variant}>{feedback().message}</UiAlert>}
+                  />
+                }
+              >
+                <UiButton
+                  variant='primary'
+                  disabled={!canAdvance() || committing()}
+                  loading={committing()}
+                  onClick={() => void advance()}
+                >
+                  Finish
+                </UiButton>
               </Show>
-              <Show when={stage()} keyed>
-                {current => (
-                  <div data-feat='wizard-stage' data-feat-step={current.name}>
-                    {current.render()}
-                  </div>
-                )}
-              </Show>
-            </div>
-          </UiCard>
-        </UiLayout>
-      </div>
-    </div>
+            )
+          }}
+        >
+          <Show when={stage()} keyed>
+            {current => (
+              <div data-feat='wizard-stage' data-feat-step={current.name}>
+                {current.render()}
+              </div>
+            )}
+          </Show>
+        </PanelForm>
+      }
+    />
   )
 }
