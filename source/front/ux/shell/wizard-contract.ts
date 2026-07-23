@@ -24,6 +24,12 @@ export type WizardStage = {
   title: string
   render: () => UiComponent
   canAdvance: () => boolean
+  /**
+   * Show the stage's own field-level errors and report validity. Called when the
+   * user presses Next, so an incomplete stage explains itself rather than
+   * presenting a dead control. Omit it and Next simply gates on `canAdvance`.
+   */
+  validate?: () => boolean
   commit?: () => void | Promise<void>
 }
 
