@@ -22,6 +22,7 @@ import type { PanelFeedback } from './panel-contract.ts'
 import { PanelForm } from './panel-form.tsx'
 import { PanelHeader } from './panel-header.tsx'
 import { PanelTimeline } from './panel-timeline.tsx'
+import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import type { WizardContract } from './wizard-contract.ts'
 
 import './wizard.css'
@@ -63,9 +64,15 @@ export const Wizard = (props: WizardProps): UiComponent => {
   }
 
   const advance = async (): Promise<void> => {
-    if (!canAdvance() || committing()) return
-    setError(null)
+    if (committing()) return
     const current = stage()
+    // Next stays live on an incomplete stage. Asking the stage to validate makes
+    // it show its own field errors and say why, which a disabled button cannot.
+    if (!(current.validate?.() ?? true) || !canAdvance()) {
+      setError(FORM_FEEDBACK_MESSAGE)
+      return
+    }
+    setError(null)
     if (current.commit) {
       setCommitting(true)
       try {
@@ -149,7 +156,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
                     icon='arrow-right'
                     label='Next'
                     labelMode='visible'
-                    disabled={!canAdvance() || committing()}
+                    disabled={committing()}
                     loading={committing()}
                     onClick={() => void advance()}
                   />
@@ -157,7 +164,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
               >
                 <UiButton
                   variant='primary'
-                  disabled={!canAdvance() || committing()}
+                  disabled={committing()}
                   loading={committing()}
                   onClick={() => void advance()}
                 >

@@ -16,13 +16,15 @@ OnboardingProps  Props for the onboarding wizard component.
 Onboarding       The onboarding wizard composition root.
 */
 
-import { toTrimmed } from '@core/std'
+import { expectEmail, expectNonEmptyString, toEmail, toTrimmed } from '@core/std'
 import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
 import type { Customer, CustomerSite } from '@domain/abstractions/customer.ts'
 import { CUSTOMER_STATUSES, type CustomerStatus } from '@domain/abstractions/customer.ts'
 import type { CustomerCreate, CustomerUpdate } from '@domain/protocols/customer-protocol.ts'
 import { api } from '@front/api'
+import { useAbstractionFormKeyboard } from '@front/ux/shell/use-abstraction-form-keyboard.ts'
+import { useAbstractionFormValidation } from '@front/ux/shell/use-abstraction-form-validation.ts'
 import type { WizardContract, WizardStage } from '@front/ux/shell/wizard-contract.ts'
 import { Wizard } from '@front/ux/shell/wizard.tsx'
 import {
@@ -86,53 +88,89 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   // Stage 1: Contact Details
   //
 
+  // Each stage is its own component so that its form element, validation surface
+  // and keyboard contract mount WITH the stage. Calling the hooks in the wizard
+  // body instead would run their onMount while later stages are unrendered,
+  // leaving those stages with a dead form ref and no listeners.
+  let contactFormRef: HTMLFormElement | undefined
+  const contactValidation = useAbstractionFormValidation(() => contactFormRef, {
+    displayName: () => expectNonEmptyString(displayName(), 'Name'),
+    phoneNumber: () => expectNonEmptyString(phoneNumber(), 'Phone'),
+    email: () => email().trim() ? expectEmail(toEmail(email()), 'Email') : null
+  })
+
+  const ContactStage = (): UiComponent => {
+    const validation = contactValidation
+    useAbstractionFormKeyboard(() => contactFormRef, field => validation.blurField(field))
+
+    return (
+      <form ref={contactFormRef} onSubmit={event => event.preventDefault()}>
+        <UiLayout data-feat='onboarding-stage-contact'>
+          <UiFieldset legend='Primary Contact'>
+            <UiLayout>
+              <UiField for='displayName' label='Name' required>
+                <UiInput
+                  name='displayName'
+                  value={displayName()}
+                  onInput={event => {
+                    setDisplayName(event.currentTarget.value)
+                    validation.inputField('displayName')
+                  }}
+                  onBlur={() => validation.blurField('displayName')}
+                  error={validation.isInvalid('displayName')}
+                  required
+                />
+              </UiField>
+              <UiField for='phoneNumber' label='Phone' required>
+                <UiInput
+                  name='phoneNumber'
+                  type='tel'
+                  value={phoneNumber()}
+                  onInput={event => {
+                    setPhoneNumber(event.currentTarget.value)
+                    validation.inputField('phoneNumber')
+                  }}
+                  onBlur={() => validation.blurField('phoneNumber')}
+                  error={validation.isInvalid('phoneNumber')}
+                  required
+                />
+              </UiField>
+              <UiField for='preferredChannel' label='Preferred Channel'>
+                <UiSingleSelect
+                  name='preferredChannel'
+                  options={CONTACT_PREFERRED_CHANNELS.map(value => ({
+                    value,
+                    label: enumDisplayLabel(value)
+                  }))}
+                  value={preferredChannel()}
+                  onChange={value => setPreferredChannel(value as ContactPreferredChannel)}
+                />
+              </UiField>
+              <UiField for='email' label='Email'>
+                <UiInput
+                  name='email'
+                  type='email'
+                  value={email()}
+                  onInput={event => {
+                    setEmail(event.currentTarget.value)
+                    validation.inputField('email')
+                  }}
+                  onBlur={() => validation.blurField('email')}
+                  error={validation.isInvalid('email')}
+                />
+              </UiField>
+            </UiLayout>
+          </UiFieldset>
+        </UiLayout>
+      </form>
+    )
+  }
+
   const stageContact: WizardStage = {
     name: 'contact',
     title: 'Customer contact details',
-    render: () => (
-      <UiLayout data-feat='onboarding-stage-contact'>
-        <UiFieldset legend='Primary Contact'>
-          <UiLayout>
-            <UiField for='displayName' label='Name' required>
-              <UiInput
-                name='displayName'
-                value={displayName()}
-                onInput={event => setDisplayName(event.currentTarget.value)}
-                required
-              />
-            </UiField>
-            <UiField for='phoneNumber' label='Phone' required>
-              <UiInput
-                name='phoneNumber'
-                type='tel'
-                value={phoneNumber()}
-                onInput={event => setPhoneNumber(event.currentTarget.value)}
-                required
-              />
-            </UiField>
-            <UiField for='preferredChannel' label='Preferred Channel'>
-              <UiSingleSelect
-                name='preferredChannel'
-                options={CONTACT_PREFERRED_CHANNELS.map(value => ({
-                  value,
-                  label: enumDisplayLabel(value)
-                }))}
-                value={preferredChannel()}
-                onChange={value => setPreferredChannel(value as ContactPreferredChannel)}
-              />
-            </UiField>
-            <UiField for='email' label='Email'>
-              <UiInput
-                name='email'
-                type='email'
-                value={email()}
-                onInput={event => setEmail(event.currentTarget.value)}
-              />
-            </UiField>
-          </UiLayout>
-        </UiFieldset>
-      </UiLayout>
-    ),
+    render: () => <ContactStage />,
+    validate: () => contactValidation.validateForm(),
     canAdvance: () => {
       const trimmedName = displayName().trim()
       const trimmedPhone = phoneNumber().trim()
@@ -148,90 +186,140 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   // Stage 2: Customer and Billing Address
   //
 
+  let customerFormRef: HTMLFormElement | undefined
+  const customerValidation = useAbstractionFormValidation(() => customerFormRef, {
+    name: () => expectNonEmptyString(name(), 'Name'),
+    line1: () => expectNonEmptyString(line1(), 'Address'),
+    city: () => expectNonEmptyString(city(), 'City'),
+    state: () => expectNonEmptyString(state(), 'State / Province'),
+    postalCode: () => expectNonEmptyString(postalCode(), 'ZIP / Postal Code'),
+    country: () => expectNonEmptyString(country(), 'Country')
+  })
+
+  const CustomerStage = (): UiComponent => {
+    const validation = customerValidation
+    useAbstractionFormKeyboard(() => customerFormRef, field => validation.blurField(field))
+
+    return (
+      <form ref={customerFormRef} onSubmit={event => event.preventDefault()}>
+        <UiLayout data-feat='onboarding-stage-customer'>
+          <UiFieldset legend='Customer Information'>
+            <UiLayout>
+              <UiField for='name' label='Name' required>
+                <UiInput
+                  name='name'
+                  value={name()}
+                  onInput={event => {
+                    setName(event.currentTarget.value)
+                    validation.inputField('name')
+                  }}
+                  onBlur={() => validation.blurField('name')}
+                  error={validation.isInvalid('name')}
+                  required
+                />
+              </UiField>
+              <UiField variant='caption' label='Status'>
+                <UiToggleGroup<CustomerStatus>
+                  value={status()}
+                  onChange={setStatus}
+                >
+                  <For each={CUSTOMER_STATUSES}>
+                    {value => (
+                      <UiToggleItem value={value}>
+                        <span data-feat='onboarding-option-label'>{enumDisplayLabel(value)}</span>
+                      </UiToggleItem>
+                    )}
+                  </For>
+                </UiToggleGroup>
+              </UiField>
+            </UiLayout>
+          </UiFieldset>
+          <UiFieldset legend='Billing Address'>
+            <UiLayout>
+              <UiField for='line1' label='Address' required>
+                <UiInput
+                  name='line1'
+                  value={line1()}
+                  onInput={event => {
+                    setLine1(event.currentTarget.value)
+                    validation.inputField('line1')
+                  }}
+                  onBlur={() => validation.blurField('line1')}
+                  error={validation.isInvalid('line1')}
+                  required
+                />
+              </UiField>
+              <UiField for='line2' label='Unit / Suite (optional)'>
+                <UiInput
+                  name='line2'
+                  value={line2()}
+                  onInput={event => setLine2(event.currentTarget.value)}
+                />
+              </UiField>
+              <UiField for='city' label='City' required>
+                <UiInput
+                  name='city'
+                  value={city()}
+                  onInput={event => {
+                    setCity(event.currentTarget.value)
+                    validation.inputField('city')
+                  }}
+                  onBlur={() => validation.blurField('city')}
+                  error={validation.isInvalid('city')}
+                  required
+                />
+              </UiField>
+              <UiField for='state' label='State / Province' required>
+                <UiInput
+                  name='state'
+                  value={state()}
+                  onInput={event => {
+                    setState(event.currentTarget.value)
+                    validation.inputField('state')
+                  }}
+                  onBlur={() => validation.blurField('state')}
+                  error={validation.isInvalid('state')}
+                  required
+                />
+              </UiField>
+              <UiField for='postalCode' label='ZIP / Postal Code' required>
+                <UiInput
+                  name='postalCode'
+                  value={postalCode()}
+                  onInput={event => {
+                    setPostalCode(event.currentTarget.value)
+                    validation.inputField('postalCode')
+                  }}
+                  onBlur={() => validation.blurField('postalCode')}
+                  error={validation.isInvalid('postalCode')}
+                  required
+                />
+              </UiField>
+              <UiField for='country' label='Country' required>
+                <UiInput
+                  name='country'
+                  value={country()}
+                  onInput={event => {
+                    setCountry(event.currentTarget.value)
+                    validation.inputField('country')
+                  }}
+                  onBlur={() => validation.blurField('country')}
+                  error={validation.isInvalid('country')}
+                  required
+                />
+              </UiField>
+            </UiLayout>
+          </UiFieldset>
+        </UiLayout>
+      </form>
+    )
+  }
+
   const stageCustomer: WizardStage = {
     name: 'customer',
     title: 'Customer\'s address',
-    render: () => (
-      <UiLayout data-feat='onboarding-stage-customer'>
-        <UiFieldset legend='Customer Information'>
-          <UiLayout>
-            <UiField for='name' label='Name' required>
-              <UiInput
-                name='name'
-                value={name()}
-                onInput={event => setName(event.currentTarget.value)}
-                required
-              />
-            </UiField>
-            <UiField variant='caption' label='Status'>
-              <UiToggleGroup<CustomerStatus>
-                value={status()}
-                onChange={setStatus}
-              >
-                <For each={CUSTOMER_STATUSES}>
-                  {value => (
-                    <UiToggleItem value={value}>
-                      <span data-feat='onboarding-option-label'>{enumDisplayLabel(value)}</span>
-                    </UiToggleItem>
-                  )}
-                </For>
-              </UiToggleGroup>
-            </UiField>
-          </UiLayout>
-        </UiFieldset>
-        <UiFieldset legend='Billing Address'>
-          <UiLayout>
-            <UiField for='line1' label='Address' required>
-              <UiInput
-                name='line1'
-                value={line1()}
-                onInput={event => setLine1(event.currentTarget.value)}
-                required
-              />
-            </UiField>
-            <UiField for='line2' label='Unit / Suite (optional)'>
-              <UiInput
-                name='line2'
-                value={line2()}
-                onInput={event => setLine2(event.currentTarget.value)}
-              />
-            </UiField>
-            <UiField for='city' label='City' required>
-              <UiInput
-                name='city'
-                value={city()}
-                onInput={event => setCity(event.currentTarget.value)}
-                required
-              />
-            </UiField>
-            <UiField for='state' label='State / Province' required>
-              <UiInput
-                name='state'
-                value={state()}
-                onInput={event => setState(event.currentTarget.value)}
-                required
-              />
-            </UiField>
-            <UiField for='postalCode' label='ZIP / Postal Code' required>
-              <UiInput
-                name='postalCode'
-                value={postalCode()}
-                onInput={event => setPostalCode(event.currentTarget.value)}
-                required
-              />
-            </UiField>
-            <UiField for='country' label='Country' required>
-              <UiInput
-                name='country'
-                value={country()}
-                onInput={event => setCountry(event.currentTarget.value)}
-                required
-              />
-            </UiField>
-          </UiLayout>
-        </UiFieldset>
-      </UiLayout>
-    ),
+    render: () => <CustomerStage />,
+    validate: () => customerValidation.validateForm(),
     canAdvance: () => {
       const trimmed = {
         name: name().trim(),
@@ -509,7 +597,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   }
 
   const contract: WizardContract = {
-    formTitle: 'New prospect',
+    formTitle: 'Customer Onboarding',
     stages: [stageContact, stageCustomer, stageSites]
   }
 

@@ -57,22 +57,26 @@ export const AbstractionManager = <T extends Instance>(
 ): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
   const [mode, setMode] = createSignal<AbstractionManagerMode>('list')
+  // Opening the editor is an event, not a state. Selection alone cannot express
+  // it: New-then-New leaves `selected` null both times, so nothing downstream
+  // re-runs and the previous attempt's error rings and focus survive into what
+  // the user reads as a fresh form. This epoch makes every open observable.
+  const [editorEpoch, setEditorEpoch] = createSignal(1)
   let panelRef: HTMLElement | undefined
   createEffect(() => {
-    selected()
+    editorEpoch()
     if (mode() === 'editor') focusFirstField(() => panelRef)
   })
   const [pendingAction, setPendingAction] = createSignal<PendingAction<T> | null>(null)
   const [actionError, setActionError] = createSignal<string | null>(null)
   const [actionPending, setActionPending] = createSignal(false)
-  const onSelect = (item: T): void => {
+  const openEditor = (item: T | null): void => {
     setSelected(() => item)
     setMode('editor')
+    setEditorEpoch(epoch => epoch + 1)
   }
-  const onNew = (): void => {
-    setSelected(null)
-    setMode('editor')
-  }
+  const onSelect = (item: T): void => openEditor(item)
+  const onNew = (): void => openEditor(null)
   const clearSelection = (): void => {
     setSelected(null)
     setMode('list')
@@ -223,7 +227,9 @@ export const AbstractionManager = <T extends Instance>(
               )
             }}
           >
-            {props.provider.renderForm(selected(), closeEditor)}
+            <Show when={editorEpoch()} keyed>
+              {props.provider.renderForm(selected(), closeEditor)}
+            </Show>
           </PanelForm>
         }
       />
