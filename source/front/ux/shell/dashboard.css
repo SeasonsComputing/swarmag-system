@@ -153,8 +153,3 @@
   font-family: var(--sa-label-font-family);
   font-size: var(--sa-label-font-size);
 }
-
-[data-feat='dashboard'][data-feat-layout='masonry'] [data-feat='dashboard-body'] {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, var(--sa-size-sm)), 1fr));
-}
