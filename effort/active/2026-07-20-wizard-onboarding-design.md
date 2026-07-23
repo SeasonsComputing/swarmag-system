@@ -203,7 +203,7 @@ parking lot).
 The Customer Onboarding Wizard (COW) launches directly into genesis stage
 1 this milestone — no chooser panel, because "Initial Assessment" would be
 a dead button until the return-call flow exists (honest-UI rule). The hub
-entry (prospect list with time-since-creation + "New Prospect" + select →
+entry (prospect list with time-since-creation + "Customer Onboarding" + select →
 "Initial Assessment") arrives WITH the assessment flow; it is
 manager-family, not a wizard stage, and its query seeds story 1.2's
 widget. The wizard contract stays pure sequencing — no branching entry.
