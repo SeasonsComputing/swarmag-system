@@ -23,3 +23,7 @@
     justify-content: flex-end;
   }
 }
+
+[data-feat='action-widget'][data-feat-context='wrapped'] [data-ui='layout'] {
+  flex-wrap: nowrap;
+}

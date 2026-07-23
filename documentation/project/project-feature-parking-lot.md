@@ -192,3 +192,28 @@ rather than patching the gradient onto the current one; the constraint set
 want a different structure rather than a fix. Do not "solve" it by choosing `fr`
 values that happen to yield integer widths — that is luck, not a fix, and it
 silently breaks at the next container size.
+
+## ActionWidget header/body variants
+
+**Parked:** 2026-07-22 (CA, during dashboard action-widget responsive work)
+
+The header ActionWidget should eventually contain only universal application
+commands — for example Support, About, and Logout. This keeps the shared header
+compact and makes its existing wrapped-lane icon treatment appropriate across
+all applications.
+
+Application-specific navigation should instead use a separate ActionWidget
+instance in the dashboard body, with a body-oriented variant and visible labels.
+Admin would move links such as Users and Onboarding there; Ops would use its own
+app-specific instance when it has applicable links. Customer deliberately has no
+such body widget when it has no app-specific navigation.
+
+**Why parked:** The current header behavior is stable enough, while the body
+variant needs an intentional shared-widget contract and seed-composition design.
+It should not be introduced as an incidental rearrangement of current links.
+
+**Picking this up should look like:** Foundation Mode. Define the ActionWidget
+header/body variant contract, each variant's responsive presentation, and the
+app dashboard seed compositions together. Then move Admin-only header actions
+to the body instance and add the corresponding Ops composition only when it has
+real app-specific destinations.

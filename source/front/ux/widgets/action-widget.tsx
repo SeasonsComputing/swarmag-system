@@ -15,7 +15,7 @@ ActionWidget  Dashboard header action widget.
 
 import type { Dictionary } from '@core/std'
 import { UiActionButton, type UiComponent, UiLayout } from '@front/ux/ui'
-import { For } from '@solid-js'
+import { createSignal, For, onCleanup, onMount } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 
 import './action-widget.css'
@@ -28,6 +28,17 @@ export type ActionWidgetProps = {
 /** Dashboard header action widget. */
 export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   const navigate = useNavigate()
+  const [isWrapped, setIsWrapped] = createSignal(false)
+  let widgetElement: HTMLElement | undefined
+  onMount(() => {
+    const header = widgetElement?.closest<HTMLElement>('[data-feat=\'dashboard-header-contents\']')
+    if (!header) return
+    const updateContext = () => setIsWrapped(header.dataset.featContext === 'wrapped')
+    const observer = new MutationObserver(updateContext)
+    observer.observe(header, { attributeFilter: ['data-feat-context'], attributes: true })
+    updateContext()
+    onCleanup(() => observer.disconnect())
+  })
   const pairs = () => {
     const actions = toStringArray(props.settings['actions'], 'ActionWidget settings.actions')
     const labels = toStringArray(props.settings['labels'], 'ActionWidget settings.labels')
@@ -43,14 +54,21 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   }
 
   return (
-    <nav aria-label='Dashboard actions' data-feat='action-widget'>
+    <nav
+      aria-label='Dashboard actions'
+      data-feat='action-widget'
+      data-feat-context={isWrapped() ? 'wrapped' : 'normal'}
+      ref={element => {
+        widgetElement = element
+      }}
+    >
       <UiLayout variant='cluster'>
         <For each={pairs()}>
           {pair => (
             <UiActionButton
               icon={pair.icon}
               label={pair.label}
-              labelMode='visible'
+              labelMode={isWrapped() ? 'reveal' : 'visible'}
               onClick={() => void navigate({ to: pair.action })}
             />
           )}
