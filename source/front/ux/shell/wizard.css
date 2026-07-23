@@ -5,13 +5,15 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-/* The timeline column is content-bounded, but bare max-content makes its width a
-   function of stage-title text — which would make the collapse threshold below
-   correct for one flow and silently wrong for the next. Capping it bounds the
-   two-column minimum for EVERY wizard: cap + gap + subject minimum. A stage
-   title longer than the cap wraps rather than widening the column. */
+/* The timeline column is FIXED, not content-sized. Bare max-content made its
+   width a function of stage-title text, which would make the collapse threshold
+   below correct for one flow and silently wrong for the next. A fixed track
+   bounds the two-column minimum for EVERY wizard — track + gap + subject
+   minimum — and gives short-labelled flows the same column as long ones. A stage
+   title wider than the track wraps rather than widening the column.
+   Changing this value REQUIRES changing the threshold below with it. */
 [data-feat='wizard'] {
-  grid-template-columns: fit-content(var(--sa-size-min)) minmax(var(--sa-size-min), 1fr);
+  grid-template-columns: calc(var(--sa-size-min) * 1.1) minmax(var(--sa-size-min), 1fr);
 }
 
 [data-feat='wizard-indicator'] {
@@ -112,13 +114,14 @@
   }
 }
 
-/* Derived from this surface's own track minimums, not inherited: the capped
-   timeline column plus --sa-rhythm-gap plus the subject's --sa-size-min floor is
-   roughly 660, so 680 is the nearest literal that clears it in every viewport
-   band. Below this the two tracks cannot both be satisfied and the subject would
-   be squeezed under its floor. A @container condition cannot take var(), which
-   is why this is a literal and why the cap above exists to keep it stable. */
-@container (max-width: 680px) {
+/* Derived from this surface's own track sizes, not inherited: the fixed timeline
+   column plus --sa-rhythm-gap plus the subject's --sa-size-min floor is roughly
+   690, so 720 is the nearest literal that clears it in every viewport band.
+   Below this the two tracks cannot both be satisfied and the subject would be
+   squeezed under its floor. A @container condition cannot take var(), which is
+   why this is a literal and why the timeline track above is fixed rather than
+   content-sized — widen that track and this number must rise with it. */
+@container (max-width: 720px) {
   [data-feat='wizard'] {
     grid-template-columns: 1fr;
   }
