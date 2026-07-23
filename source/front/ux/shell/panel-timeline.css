@@ -5,13 +5,21 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
+/* Fills its cell in both axes, exactly as list and form panels do. Sizing the
+   panel to its own content instead makes the container's track width inert. */
 [data-feat-panel='timeline'] {
-  flex: 0 0 auto;
-  inline-size: max-content;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
 }
 
 [data-feat-panel='timeline'] > [data-ui='card'] {
-  block-size: 100%;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-block-size: 0;
+  overflow: visible;
 }
 
 [data-feat-panel='timeline'] [data-feat-panel='header'] {
@@ -28,7 +36,7 @@
   color: var(--sa-text-dim);
   display: grid;
   gap: var(--sa-space-sm);
-  grid-template-columns: var(--sa-space-lg) max-content;
+  grid-template-columns: var(--sa-space-lg) minmax(0, 1fr);
   margin: 0;
   min-block-size: var(--sa-space-lg);
   padding: 0;
