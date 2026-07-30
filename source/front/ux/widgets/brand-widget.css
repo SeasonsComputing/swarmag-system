@@ -1,3 +1,10 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Brand widget styles                                                          ║
+║ Dashboard identity row specialized branding widget.                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
 [data-feat='brand-widget'] {
   text-align: start;
   white-space: nowrap;

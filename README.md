@@ -17,7 +17,7 @@ Primary architectural context lives in `documentation/architecture/architecture-
 | `source/`        | Source code organized into layers                    |
 | `supabase/`      | Supabase project configuration and local metadata    |
 
-### 1.2 Governance and Documentation
+### 1.2 Documentation
 
 | Category     | File                             | Description                                               |
 | ------------ | -------------------------------- | --------------------------------------------------------- |
