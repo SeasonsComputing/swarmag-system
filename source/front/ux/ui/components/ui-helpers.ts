@@ -40,3 +40,10 @@ export type UiOption = { value: string; label?: string }
 
 /** Derive display text from a UiOption — label if present, otherwise value. */
 export const uiOptionLabel = (option: UiOption): string => option.label ?? option.value
+
+/** Converts a kebab-case value into a display label. */
+export const labelFromKebabCase = (value: string): string =>
+  value
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')

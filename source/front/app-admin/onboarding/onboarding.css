@@ -56,8 +56,3 @@
   gap: var(--sa-rhythm-gap);
   margin-top: var(--sa-space-md);
 }
-
-/* Option labels within toggle groups */
-[data-feat='onboarding-option-label'] {
-  color: var(--sa-text-primary);
-}
