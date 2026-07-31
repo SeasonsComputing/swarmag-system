@@ -30,14 +30,16 @@ The swarmAg product family is governed by a single, layered, multi-theme, unifie
 
 The design language definition is organized into namespaces. Each namespace is composed primarily of style tokens, component selectors, or CSS attributes. Namespaces themselves are defined using CSS selectors that scope CSS custom properties (variables).
 
-| Namespace                 | Members                                                          |
-| ------------------------- | ---------------------------------------------------------------- |
-| `:root`                   | Foundation tokens and default role tokens                        |
-| `[data-theme]`            | Shared theme and component-token specializations                 |
-| `[data-theme='{theme}']`  | Namespace per theme instance with theme-specific specializations |
-| `[data-ui='{component}']` | Component namespace for reusable Ui controls and control parts   |
-| `[data-ui-icon='{name}']` | Icon-glyph binding namespace mapping icon names to glyph assets  |
-| `[data-feat='{feature}']` | Namespace for feature, shell, widget, and app-local styling      |
+| Namespace                  | Members                                                          |
+| -------------------------- | ---------------------------------------------------------------- |
+| `:root`                    | Foundation tokens and default role tokens                        |
+| `[data-theme]`             | Shared theme and component-token specializations                 |
+| `[data-theme='{theme}']`   | Namespace per theme instance with theme-specific specializations |
+| `[data-ui='{component}']`  | Component namespace for reusable Ui controls and control parts   |
+| `[data-ui-icon='{name}']`  | Icon-glyph binding namespace mapping icon names to glyph assets  |
+| `[data-shell='{shell}']`   | Namespace for shared shell styling                               |
+| `[data-widget='{widget}']` | Namespace for shared widget styling                              |
+| `[data-app='{feature}']`   | Namespace for application-local styling                          |
 
 ### 2.3 Layers
 
@@ -53,7 +55,9 @@ Namespaces of the design language are organized into layers with each layer codi
 | Base Layer       | `html`                                   | `base.css`      | Browser reset, fonts, page base, semantic HTML                  |
 | Component Layer  | `data-ui='{component}'`                  | `ui.css`        | Reusable component selectors and declared component parts       |
 | Icon Catalog     | `data-ui-icon='{name}'`                  | `icons.css`     | Glyph bindings mapping icon names to asset URLs via `--sa-icon` |
-| Feature Layer    | `data-feat='{feature}'`                  | `{feature}.css` | Application feature styling and layout                          |
+| Shell Layer      | `data-shell='{shell}'`                   | `{shell}.css`   | Shared shell styling and layout                                 |
+| Widget Layer     | `data-widget='{widget}'`                 | `{widget}.css`  | Shared widget styling and layout                                |
+| App Layer        | `data-app='{feature}'`                   | `{feature}.css` | Application-local feature styling and layout                    |
 
 CSS files live in `source/front/ux/ui/css/`. A shared CSS barrel,
 `source/front/ux/ui/css/css.tsx`, imports them in prescribed dependency order during application bootstrap.
@@ -63,10 +67,11 @@ CSS files live in `source/front/ux/ui/css/`. A shared CSS barrel,
 - `data-ui` and `data-ui-*` are reserved for reusable Ui controls and their declared
   control parts, variants, states, and extensions.
 
-- `data-feat` and `data-feat-*` are reserved for feature, shell, widget, and app-local
-  styling. Feature identities and modifier values must use lowercase kebab-case.
-  Feature CSS selectors root at `[data-feat='...']` and may descend into `[data-ui='...']`
-  controls when styling a feature-owned composition.
+- `data-shell` and `data-shell-*` are reserved for shared shell styling,
+  `data-widget` and `data-widget-*` for shared widgets, and `data-app` and
+  `data-app-*` for application-local styling. Identities and modifier values must use
+  lowercase kebab-case. Their CSS selectors root in their corresponding namespace and may
+  descend into `[data-ui='...']` controls when styling an owned composition.
 
 - Token provider files are `tokens.css`, `roles.css`, and `themes.css`. They may contain only CSS
   custom-property declarations inside their namespace containers. They do not contain element

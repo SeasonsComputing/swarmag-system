@@ -19,13 +19,13 @@ type PanelFormProps = {
 
 /** Renders a card-backed form panel. */
 export const PanelForm = (props: PanelFormProps) => (
-  <section data-feat-panel='form'>
+  <section data-shell-panel='form'>
     <UiCard elevation='raised'>
-      <div data-feat-panel='form-header'>
+      <div data-shell-panel='form-header'>
         <PanelHeader {...props.header} />
         {props.feedback && <UiAlert variant={props.feedback.variant}>{props.feedback.message}</UiAlert>}
       </div>
-      <div data-feat-panel='body' data-feat-panel-kind='form'>{props.children}</div>
+      <div data-shell-panel='body' data-shell-panel-kind='form'>{props.children}</div>
     </UiCard>
   </section>
 )

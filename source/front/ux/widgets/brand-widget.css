@@ -5,19 +5,19 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-feat='brand-widget'] {
+[data-widget='brand-widget'] {
   text-align: start;
   white-space: nowrap;
 }
 
-[data-feat='brand-widget-product'] {
+[data-widget='brand-widget-product'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-label-font-family);
   font-size: var(--sa-label-font-size);
   font-weight: var(--sa-label-font-weight);
 }
 
-[data-feat='brand-widget-application'] {
+[data-widget='brand-widget-application'] {
   color: var(--sa-color-accent);
   font-family: var(--sa-heading-font-family);
   font-size: var(--sa-heading-font-size-h4);

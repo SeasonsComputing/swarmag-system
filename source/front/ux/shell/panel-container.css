@@ -11,7 +11,7 @@ Containment lives on [data-ui='dialog']: this element carries the surface's
 own feature hook, and an element is never its own query container — declaring
 container-type here silently kills every @container rule a surface writes
 against itself. */
-[data-feat-panel='container'] {
+[data-shell-panel='container'] {
   block-size: 100%;
   display: grid;
   gap: var(--sa-rhythm-gap);
@@ -19,17 +19,17 @@ against itself. */
   min-block-size: 0;
 }
 
-[data-feat-panel='container']:has(> [data-feat-panel='accessory']) {
+[data-shell-panel='container']:has(> [data-shell-panel='accessory']) {
   grid-template-rows: auto auto minmax(0, 1fr);
 }
 
-[data-feat-panel='container'] > [data-feat-panel='header'],
-[data-feat-panel='container'] > [data-feat-panel='accessory'] {
+[data-shell-panel='container'] > [data-shell-panel='header'],
+[data-shell-panel='container'] > [data-shell-panel='accessory'] {
   grid-column: 1 / -1;
 }
 
-[data-feat-panel='container'] > [data-feat-panel='index'],
-[data-feat-panel='container'] > [data-feat-panel='subject'] {
+[data-shell-panel='container'] > [data-shell-panel='index'],
+[data-shell-panel='container'] > [data-shell-panel='subject'] {
   display: flex;
   flex-direction: column;
   min-block-size: 0;
@@ -38,16 +38,16 @@ against itself. */
 }
 
 @media (max-width: 480px) {
-  [data-feat-panel='container'] {
+  [data-shell-panel='container'] {
     block-size: 100%;
   }
 
-  [data-feat-panel='container'] > [data-feat-panel='header'],
-  [data-feat-panel='container'] > [data-feat-panel='accessory'] {
+  [data-shell-panel='container'] > [data-shell-panel='header'],
+  [data-shell-panel='container'] > [data-shell-panel='accessory'] {
     padding-inline: var(--sa-rhythm-pad);
   }
 
-  [data-feat-panel='container'] > [data-feat-panel='header'] {
+  [data-shell-panel='container'] > [data-shell-panel='header'] {
     padding-block-start: var(--sa-rhythm-pad);
   }
 }

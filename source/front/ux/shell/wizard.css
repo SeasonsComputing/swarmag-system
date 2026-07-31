@@ -12,11 +12,11 @@
    minimum — and gives short-labelled flows the same column as long ones. A stage
    title wider than the track wraps rather than widening the column.
    Changing this value REQUIRES changing the threshold below with it. */
-[data-feat='wizard'] {
+[data-shell='wizard'] {
   grid-template-columns: calc(var(--sa-size-min) * 1.1) minmax(var(--sa-size-min), 1fr);
 }
 
-[data-feat='wizard-indicator'] {
+[data-shell='wizard-indicator'] {
   display: flex;
   flex-direction: column;
   gap: var(--sa-space-sm);
@@ -24,21 +24,21 @@
 
 /* One contiguous progress rail, echoing the progress-bar language;
    the fill inline-size is driven by the host per step. */
-[data-feat='wizard-bar'] {
+[data-shell='wizard-bar'] {
   background: var(--sa-bg-progress-track);
   border-radius: var(--sa-radius-full);
   min-block-size: calc(var(--sa-progress-height) / 2);
   overflow: hidden;
 }
 
-[data-feat='wizard-bar-fill'] {
+[data-shell='wizard-bar-fill'] {
   background: var(--sa-gradient-brand);
   block-size: calc(var(--sa-progress-height) / 2);
   border-radius: var(--sa-radius-full);
   transition: var(--sa-transition-base);
 }
 
-[data-feat='wizard-steps'] {
+[data-shell='wizard-steps'] {
   display: flex;
   gap: 0;
   list-style: none;
@@ -47,13 +47,13 @@
 }
 
 /* Neutralize the list-item primitive's content-list spacing. */
-[data-feat='wizard-steps'] [data-feat='wizard-step'] {
+[data-shell='wizard-steps'] [data-shell='wizard-step'] {
   margin-block: 0;
   padding-inline-start: 0;
 }
 
 /* Labels sit beneath the rail, one per segment; upcoming is the dim default. */
-[data-feat='wizard-step'] {
+[data-shell='wizard-step'] {
   align-items: flex-start;
   color: var(--sa-text-dim);
   display: flex;
@@ -66,31 +66,31 @@
   align-items: center;
 }
 
-[data-feat='wizard-step']:first-child {
+[data-shell='wizard-step']:first-child {
   justify-content: flex-start;
   text-align: start;
 }
 
-[data-feat='wizard-step']:last-child {
+[data-shell='wizard-step']:last-child {
   justify-content: flex-end;
   text-align: end;
 }
 
-[data-feat='wizard-step'][data-feat-state='done'] {
+[data-shell='wizard-step'][data-shell-state='done'] {
   color: var(--sa-text-secondary);
 }
 
-[data-feat='wizard-step'][data-feat-state='current'] {
+[data-shell='wizard-step'][data-shell-state='current'] {
   color: var(--sa-color-accent);
   font-weight: var(--sa-ui-font-weight-strong);
 }
 
-[data-feat='wizard-step-title'] {
+[data-shell='wizard-step-title'] {
   line-height: 1.1;
   min-inline-size: 0;
 }
 
-[data-feat='wizard-step-ordinal'] {
+[data-shell='wizard-step-ordinal'] {
   align-items: center;
   background: transparent;
   block-size: var(--sa-space-lg);
@@ -104,12 +104,12 @@
   justify-content: center;
 }
 
-[data-feat='wizard-stage'] {
+[data-shell='wizard-stage'] {
   animation: sa-fade-in var(--sa-motion-page-fade) ease;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-feat='wizard-stage'] {
+  [data-shell='wizard-stage'] {
     animation: none;
   }
 }
@@ -122,11 +122,11 @@
    why this is a literal and why the stepflow track above is fixed rather than
    content-sized — widen that track and this number must rise with it. */
 @container (max-width: 720px) {
-  [data-feat='wizard'] {
+  [data-shell='wizard'] {
     grid-template-columns: 1fr;
   }
 
-  [data-feat='wizard'] > [data-feat-panel='index'] {
+  [data-shell='wizard'] > [data-shell-panel='index'] {
     display: none;
   }
 }

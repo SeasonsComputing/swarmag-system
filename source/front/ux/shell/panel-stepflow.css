@@ -7,14 +7,14 @@
 
 /* Fills its cell in both axes, exactly as list and form panels do. Sizing the
    panel to its own content instead makes the container's track width inert. */
-[data-feat-panel='stepflow'] {
+[data-shell-panel='stepflow'] {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
   min-block-size: 0;
 }
 
-[data-feat-panel='stepflow'] > [data-ui='card'] {
+[data-shell-panel='stepflow'] > [data-ui='card'] {
   display: flex;
   flex: 1 1 auto;
   flex-direction: column;
@@ -22,16 +22,16 @@
   overflow: visible;
 }
 
-[data-feat-panel='stepflow'] [data-feat-panel='header'] {
+[data-shell-panel='stepflow'] [data-shell-panel='header'] {
   padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
 }
 
-[data-feat-panel='stepflow-list'] {
+[data-shell-panel='stepflow-list'] {
   display: grid;
   gap: var(--sa-space-sm);
 }
 
-[data-feat-panel='stepflow-item'] {
+[data-shell-panel='stepflow-item'] {
   align-items: center;
   color: var(--sa-text-dim);
   display: grid;
@@ -43,7 +43,7 @@
   position: relative;
 }
 
-[data-feat-panel='stepflow-node'] {
+[data-shell-panel='stepflow-node'] {
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
   border-radius: var(--sa-radius-full);
@@ -53,7 +53,7 @@
   z-index: var(--sa-z-base);
 }
 
-[data-feat-panel='stepflow-item']:not(:last-child)::after {
+[data-shell-panel='stepflow-item']:not(:last-child)::after {
   block-size: calc(100% + var(--sa-space-sm));
   border-inline-start: var(--sa-border-default);
   content: '';
@@ -63,27 +63,27 @@
   position: absolute;
 }
 
-[data-feat-panel='stepflow-item'][data-feat-state='done'] {
+[data-shell-panel='stepflow-item'][data-shell-state='done'] {
   color: var(--sa-text-secondary);
 }
 
-[data-feat-panel='stepflow-item'][data-feat-state='done'] [data-feat-panel='stepflow-node'] {
+[data-shell-panel='stepflow-item'][data-shell-state='done'] [data-shell-panel='stepflow-node'] {
   background: var(--sa-color-primary);
   border-color: var(--sa-color-primary);
 }
 
-[data-feat-panel='stepflow-item'][data-feat-state='current'] {
+[data-shell-panel='stepflow-item'][data-shell-state='current'] {
   color: var(--sa-color-accent);
   font-weight: var(--sa-ui-font-weight-strong);
 }
 
-[data-feat-panel='stepflow-item'][data-feat-state='current'] [data-feat-panel='stepflow-node'] {
+[data-shell-panel='stepflow-item'][data-shell-state='current'] [data-shell-panel='stepflow-node'] {
   background: var(--sa-color-accent);
   border-color: var(--sa-color-accent);
 }
 
 @media (max-width: 480px) {
-  [data-feat-panel='stepflow'] > [data-ui='card'] {
+  [data-shell-panel='stepflow'] > [data-ui='card'] {
     border-radius: 0;
   }
 }

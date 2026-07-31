@@ -43,12 +43,12 @@ export const Dashboard = (): UiComponent => {
     let inlineSize = -1
     const updateHeaderContext = () => {
       if (!headerContents || !terminalField) return
-      headerContents.dataset.featContext = 'normal'
+      headerContents.dataset.shellContext = 'normal'
       const identity = headerContents.querySelector<HTMLElement>(
-        '[data-feat=\'dashboard-header-identity\']'
+        '[data-shell=\'dashboard-header-identity\']'
       )
       if (!identity) return
-      headerContents.dataset.featContext = terminalField.offsetTop > identity.offsetTop
+      headerContents.dataset.shellContext = terminalField.offsetTop > identity.offsetTop
         ? 'wrapped'
         : 'normal'
     }
@@ -65,26 +65,26 @@ export const Dashboard = (): UiComponent => {
   })
 
   return (
-    <div data-feat='dashboard'>
-      <header data-feat='dashboard-header'>
+    <div data-shell='dashboard'>
+      <header data-shell='dashboard-header'>
         <div
-          data-feat='dashboard-header-contents'
-          data-feat-context='normal'
+          data-shell='dashboard-header-contents'
+          data-shell-context='normal'
           ref={element => {
             headerContents = element
           }}
         >
-          <div data-feat='dashboard-header-identity'>
-            <div data-feat='dashboard-header-logo-field'>
+          <div data-shell='dashboard-header-identity'>
+            <div data-shell='dashboard-header-logo-field'>
               <img
-                data-feat='dashboard-header-logo'
+                data-shell='dashboard-header-logo'
                 src={headerLogo}
                 alt=''
                 width={64}
                 height={64}
               />
             </div>
-            <div data-feat='dashboard-header-brand-field'>
+            <div data-shell='dashboard-header-brand-field'>
               <Show when={headerIdentity()}>
                 {widget => <DashboardWidgetContent widget={widget()} />}
               </Show>
@@ -96,7 +96,7 @@ export const Dashboard = (): UiComponent => {
           <Show when={headerTerminal()}>
             {widget => (
               <div
-                data-feat='dashboard-header-terminal-field'
+                data-shell='dashboard-header-terminal-field'
                 ref={element => {
                   terminalField = element
                 }}
@@ -108,12 +108,12 @@ export const Dashboard = (): UiComponent => {
         </div>
       </header>
 
-      <div data-feat='dashboard-body'>
+      <div data-shell='dashboard-body'>
         <For each={dashboard.rows}>
           {row => (
-            <section data-feat='dashboard-row' data-feat-size={row.size}>
-              <h2 data-feat='dashboard-row-label'>{row.label}</h2>
-              <div data-feat='dashboard-row-widgets'>
+            <section data-shell='dashboard-row' data-shell-size={row.size}>
+              <h2 data-shell='dashboard-row-label'>{row.label}</h2>
+              <div data-shell='dashboard-row-widgets'>
                 <For each={row.widgets}>
                   {widget => <DashboardWidget widget={widget} />}
                 </For>
@@ -130,9 +130,9 @@ export const Dashboard = (): UiComponent => {
   function DashboardWidget(props: { widget: DashboardStoreWidget }): UiComponent {
     return (
       <div
-        data-feat='dashboard-widget'
-        data-feat-type={props.widget.type}
-        data-feat-shape={props.widget.settings.shape}
+        data-shell='dashboard-widget'
+        data-shell-type={props.widget.type}
+        data-shell-shape={props.widget.settings.shape}
       >
         <UiCard>
           <DashboardWidgetContent widget={props.widget} />
@@ -156,5 +156,5 @@ export const Dashboard = (): UiComponent => {
 
 /** Missing widget marker for dashboard seed/catalog drift. */
 const MissingWidget = (props: { type: string }): UiComponent => (
-  <span data-feat='dashboard-missing-widget'>Missing widget: {props.type}</span>
+  <span data-shell='dashboard-missing-widget'>Missing widget: {props.type}</span>
 )

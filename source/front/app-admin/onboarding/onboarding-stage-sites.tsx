@@ -78,10 +78,10 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
   }
 
   return (
-    <UiLayout data-feat='onboarding-stage-sites'>
+    <UiLayout data-app='onboarding-stage-sites'>
       <Show when={state.sites().length > 0}>
         <UiFieldset legend='Added Sites'>
-          <div data-feat='onboarding-sites-list'>
+          <div data-app='onboarding-sites-list'>
             <For each={state.sites()}>
               {(site, index) => <SiteSummary site={site} index={index()} />}
             </For>
@@ -108,7 +108,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
             </UiLayout>
           </UiFieldset>
           <UiFieldset legend='Coordinates (optional)'>
-            <UiLayout data-feat='onboarding-coords-group'>
+            <UiLayout data-app='onboarding-coords-group'>
               <SiteInput
                 state={state}
                 name='siteLatitude'
@@ -135,7 +135,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
               onInput={event => state.setSiteNote(event.currentTarget.value)}
             />
           </UiField>
-          <div data-feat='onboarding-add-site-actions'>
+          <div data-app='onboarding-add-site-actions'>
             <UiButton variant='secondary' disabled={!canAddSite()} onClick={addSite}>Add Site</UiButton>
           </div>
         </UiLayout>
@@ -205,9 +205,9 @@ const siteInput = (state: OnboardingState, name: SiteInputProps['name']) => {
 }
 
 const SiteSummary = (props: { site: CustomerSite; index: number }): UiComponent => (
-  <div data-feat='onboarding-site-item' data-feat-index={props.index}>
-    <div data-feat='onboarding-site-label'>{props.site.label}</div>
-    <div data-feat='onboarding-site-details'>
+  <div data-app='onboarding-site-item' data-app-index={props.index}>
+    <div data-app='onboarding-site-label'>{props.site.label}</div>
+    <div data-app='onboarding-site-details'>
       {props.site.location[0]?.line1 && <div>{props.site.location[0].line1}</div>}
       {props.site.location[0]?.city && (
         <div>
@@ -218,7 +218,7 @@ const SiteSummary = (props: { site: CustomerSite; index: number }): UiComponent 
       )}
       {props.site.location[0]?.latitude !== undefined && props.site.location[0]?.longitude !== undefined
         && (
-          <div data-feat='onboarding-site-coords'>
+          <div data-app='onboarding-site-coords'>
             {props.site.location[0].latitude.toFixed(4)}, {props.site.location[0].longitude.toFixed(4)}
           </div>
         )}

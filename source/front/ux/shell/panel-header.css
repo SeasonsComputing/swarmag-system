@@ -8,7 +8,7 @@
 /* Two zones only. A header is a grid item at container level and a flex item
    inside a card, so item-level sizing belongs to whichever context places it —
    never here. */
-[data-feat-panel='header'] {
+[data-shell-panel='header'] {
   align-items: center;
   display: flex;
   gap: var(--sa-space-xs);
@@ -16,24 +16,24 @@
   min-inline-size: 0;
 }
 
-[data-feat-panel='header-leading'],
-[data-feat-panel='header-trailing'] {
+[data-shell-panel='header-leading'],
+[data-shell-panel='header-trailing'] {
   align-items: center;
   display: flex;
   gap: var(--sa-space-xs);
   min-inline-size: 0;
 }
 
-[data-feat-panel='header-leading'] {
+[data-shell-panel='header-leading'] {
   flex: 1 1 auto;
 }
 
-[data-feat-panel='header-trailing'] {
+[data-shell-panel='header-trailing'] {
   flex: 0 0 auto;
 }
 
-[data-feat-panel='header-leading'] > h1,
-[data-feat-panel='header-leading'] > h2 {
+[data-shell-panel='header-leading'] > h1,
+[data-shell-panel='header-leading'] > h2 {
   font-size: var(--sa-font-size-md);
   line-height: 1;
   margin: 0;

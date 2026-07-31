@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-[data-feat='brand-hero'] {
+[data-shell='brand-hero'] {
   align-items: center;
   display: flex;
   flex-direction: column;
@@ -13,7 +13,7 @@
   position: relative;
 }
 
-[data-feat='brand-hero']::before {
+[data-shell='brand-hero']::before {
   top: -60px;
   aspect-ratio: 1;
   background: radial-gradient(
@@ -30,7 +30,7 @@
   position: absolute;
 }
 
-[data-feat='brand-hero-logo'] {
+[data-shell='brand-hero-logo'] {
   display: block;
   height: auto;
   position: relative;
@@ -38,7 +38,7 @@
   z-index: var(--sa-z-raised);
 }
 
-[data-feat='brand-hero-product'] {
+[data-shell='brand-hero-product'] {
   color: var(--sa-text-secondary);
   font-family: var(--sa-label-font-family);
   font-size: var(--sa-label-font-size);
@@ -46,7 +46,7 @@
   text-align: center;
 }
 
-[data-feat='brand-hero-application'] {
+[data-shell='brand-hero-application'] {
   color: var(--sa-color-accent);
   font-family: var(--sa-heading-font-family);
   font-size: var(--sa-heading-font-size-h4);

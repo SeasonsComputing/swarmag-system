@@ -11,8 +11,8 @@ import './panel-header.css'
 
 /** Renders leading and trailing header zones. */
 export const PanelHeader = (props: PanelHeaderProps) => (
-  <header data-feat-panel='header'>
-    <div data-feat-panel='header-leading'>{props.leading}</div>
-    <div data-feat-panel='header-trailing'>{props.trailing}</div>
+  <header data-shell-panel='header'>
+    <div data-shell-panel='header-leading'>{props.leading}</div>
+    <div data-shell-panel='header-trailing'>{props.trailing}</div>
   </header>
 )

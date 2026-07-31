@@ -31,11 +31,11 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   const [isWrapped, setIsWrapped] = createSignal(false)
   let widgetElement: HTMLElement | undefined
   onMount(() => {
-    const header = widgetElement?.closest<HTMLElement>('[data-feat=\'dashboard-header-contents\']')
+    const header = widgetElement?.closest<HTMLElement>('[data-shell=\'dashboard-header-contents\']')
     if (!header) return
-    const updateContext = () => setIsWrapped(header.dataset.featContext === 'wrapped')
+    const updateContext = () => setIsWrapped(header.dataset.shellContext === 'wrapped')
     const observer = new MutationObserver(updateContext)
-    observer.observe(header, { attributeFilter: ['data-feat-context'], attributes: true })
+    observer.observe(header, { attributeFilter: ['data-shell-context'], attributes: true })
     updateContext()
     onCleanup(() => observer.disconnect())
   })
@@ -56,8 +56,8 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   return (
     <nav
       aria-label='Dashboard actions'
-      data-feat='action-widget'
-      data-feat-context={isWrapped() ? 'wrapped' : 'normal'}
+      data-widget='action-widget'
+      data-widget-context={isWrapped() ? 'wrapped' : 'normal'}
       ref={element => {
         widgetElement = element
       }}

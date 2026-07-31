@@ -117,14 +117,14 @@ const LoginClient = (props: LoginClientProps) => {
       when={loginRequired()}
       fallback={<Navigate to='/dashboard' replace />}
     >
-      <div data-feat='login'>
-        <div data-feat='login-layout'>
+      <div data-shell='login'>
+        <div data-shell='login-layout'>
           <UiLayout gap='loose'>
             <BrandHero />
 
             <Show when={!session.isLoading}>
               {/* STEP 1: validate email and send OTP code */}
-              <div data-feat='login-form'>
+              <div data-shell='login-form'>
                 <Show when={step() === 'email'}>
                   <form onSubmit={submitEmailForm}>
                     <UiLayout>
