@@ -33,7 +33,8 @@ import type {
   JobWorkflow,
   JobWorkLogEntry
 } from '@domain/abstractions/job.ts'
-import { AnswerAdapter, LocationAdapter, NoteAdapter } from '@domain/adapters/common-adapter.ts'
+import { LocationAdapter, NoteAdapter } from '@domain/adapters/common-adapter.ts'
+import { AnswerAdapter } from '@domain/adapters/workflow-adapter.ts'
 
 /** Deserialize/Serialize Job. */
 export const JobAdapter = makeAdapter<Job>({

@@ -146,7 +146,6 @@ The following abstractions are shared across multiple domain topics.
 | `Location`   | Geographic coordinates with optional address information |
 | `Note`       | Freeform text with author and timestamp                  |
 | `Attachment` | Metadata describing an uploaded file or artifact         |
-| `Answer`     | Response to a question, with supporting notes            |
 
 These abstractions are **composed into** higher-level domain objects
 
@@ -162,15 +161,13 @@ These abstractions are **composed into** higher-level domain objects
 
 In addition to the core abstractions, the domain includes supporting structures that express relationships between concepts without embedding or ownership.
 
-| Topic         | Structures / Notes                                                                                                    |
-| ------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Services      | Asset requirements expressed as m:m associations between services and asset types                                     |
-| Workflows     | Versioned workflows with sequenced task associations via WorkflowTask junction                                        |
-| Tasks         | Reusable tasks with sequenced question associations via TaskQuestion junction                                         |
-| Question      | Reusable prompt; Instantiable life-cycled; discriminated union of InternalQuestion, ScalarQuestion and SelectQuestion |
-| Job Workflows | Basis and modified workflow references per job; order defined by `JobWork.work`                                       |
-| Planning      | Associations between plans and assigned users, assets, and chemicals                                                  |
-| Customers     | Sites composed into customer accounts; CustomerUser junctions relate accounts to Users                                |
+| Topic         | Structures / Notes                                                                                          |
+| ------------- | ----------------------------------------------------------------------------------------------------------- |
+| Services      | Asset requirements expressed as m:m associations between services and asset types                           |
+| Workflows     | Reusable questions, tasks, and versioned workflows; ordered through TaskQuestion and WorkflowTask junctions |
+| Job Workflows | Basis and modified workflow references per job; order defined by `JobWork.work`                             |
+| Planning      | Associations between plans and assigned users, assets, and chemicals                                        |
+| Customers     | Sites composed into customer accounts; CustomerUser junctions relate accounts to Users                      |
 
 Customers represent accounts. Every Customer carries a required primary contact — a Contact
 composition holding account reachability data (how to reach the party behind the account), not a

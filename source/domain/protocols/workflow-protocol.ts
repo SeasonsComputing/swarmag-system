@@ -12,6 +12,8 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 TaskCreate          Create payload for Task.
 TaskUpdate          Update payload for Task.
+QuestionCreate      Union create payload for Question variants.
+QuestionUpdate      Union update payload for Question variants.
 TaskQuestionCreate  Create payload for TaskQuestion junction.
 TaskQuestionUpdate  Update payload for TaskQuestion junction.
 WorkflowCreate      Create payload for Workflow.
@@ -21,11 +23,35 @@ WorkflowTaskUpdate  Update payload for WorkflowTask junction.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
-import type { Task, TaskQuestion, Workflow, WorkflowTask } from '@domain/abstractions/workflow.ts'
+import type {
+  InternalQuestion,
+  ScalarQuestion,
+  SelectQuestion,
+  Task,
+  TaskQuestion,
+  Workflow,
+  WorkflowTask
+} from '@domain/abstractions/workflow.ts'
 
 /* Task protocol */
 export type TaskCreate = CreateFromInstantiable<Task>
 export type TaskUpdate = UpdateFromInstantiable<Task>
+
+/* Question protocol */
+export type InternalQuestionCreate = CreateFromInstantiable<InternalQuestion>
+export type ScalarQuestionCreate = CreateFromInstantiable<ScalarQuestion>
+export type SelectQuestionCreate = CreateFromInstantiable<SelectQuestion>
+export type QuestionCreate =
+  | InternalQuestionCreate
+  | ScalarQuestionCreate
+  | SelectQuestionCreate
+export type InternalQuestionUpdate = UpdateFromInstantiable<InternalQuestion>
+export type ScalarQuestionUpdate = UpdateFromInstantiable<ScalarQuestion>
+export type SelectQuestionUpdate = UpdateFromInstantiable<SelectQuestion>
+export type QuestionUpdate =
+  | InternalQuestionUpdate
+  | ScalarQuestionUpdate
+  | SelectQuestionUpdate
 
 /* TaskQuestion protocol */
 export type TaskQuestionCreate = TaskQuestion

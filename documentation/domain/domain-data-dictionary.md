@@ -18,14 +18,6 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 |           |                                    | ContactPreferredChannel  |
 |           |                                    | Attachment               |
 |           |                                    | Note                     |
-|           |                                    | QuestionType             |
-|           |                                    | BaseQuestion             |
-|           |                                    | InternalQuestion         |
-|           |                                    | ScalarQuestion           |
-|           |                                    | SelectOption             |
-|           |                                    | SelectQuestion           |
-|           |                                    | Question                 |
-|           |                                    | Answer                   |
 | Assets    | `@domain/abstractions/asset.ts`    | AssetType                |
 |           |                                    | AssetStatus              |
 |           |                                    | Asset                    |
@@ -41,7 +33,15 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 |           |                                    | ServiceRequiredAssetType |
 | Users     | `@domain/abstractions/user.ts`     | UserRole                 |
 |           |                                    | User                     |
-| Workflows | `@domain/abstractions/workflow.ts` | Task                     |
+| Workflows | `@domain/abstractions/workflow.ts` | QuestionType             |
+|           |                                    | BaseQuestion             |
+|           |                                    | InternalQuestion         |
+|           |                                    | ScalarQuestion           |
+|           |                                    | SelectOption             |
+|           |                                    | SelectQuestion           |
+|           |                                    | Question                 |
+|           |                                    | Answer                   |
+|           |                                    | Task                     |
 |           |                                    | TaskQuestion             |
 |           |                                    | Workflow                 |
 |           |                                    | WorkflowTask             |
@@ -164,128 +164,6 @@ Attributes: **State**
 | `content`     | string                                             |
 | `visibility`  | `'internal'` \| `'shared'` (default: `'internal'`) |
 | `tags`        | CompositionMany\<string\>                          |
-
-### 4.5 QuestionType
-
-Purpose: **Supported question input modes; `internal` is reserved for system-generated log entries such as telemetry, GPS, and operational metadata**
-
-Type: **const-enum**
-
-| Values          |
-| --------------- |
-| `internal`      |
-| `text`          |
-| `number`        |
-| `boolean`       |
-| `single-select` |
-| `multi-select`  |
-
-### 4.6 BaseQuestion
-
-Purpose: **Common shape shared by all Question constituents**
-
-Type: **Instantiable**
-
-Attributes: **State**
-
-| **Attribute** | **Type**     |
-| ------------- | ------------ |
-| `type`        | QuestionType |
-| `prompt`      | string       |
-| `helpText?`   | string       |
-| `required?`   | boolean      |
-
-### 4.7 InternalQuestion
-
-Purpose: **System-generated question; seed records referenced directly by log entries**
-
-Type: **intersection-type**
-
-Constituents: `BaseQuestion`
-
-Attributes: **State**
-
-| **Attribute** | **Type**     |
-| ------------- | ------------ |
-| `type`        | `'internal'` |
-
-### 4.8 ScalarQuestion
-
-Purpose: **Scalar input question; no options**
-
-Type: **intersection-type**
-
-Constituents: `BaseQuestion`
-
-Attributes: **State**
-
-| **Attribute** | **Type**                              |
-| ------------- | ------------------------------------- |
-| `type`        | `'text'` \| `'number'` \| `'boolean'` |
-
-### 4.9 SelectOption
-
-Purpose: **Selectable option metadata; only valid on SelectQuestion**
-
-Type: **object**
-
-Attributes: **State**
-
-| **Attribute**   | **Type** |
-| --------------- | -------- |
-| `value`         | string   |
-| `label?`        | string   |
-| `requiresNote?` | boolean  |
-
-### 4.10 SelectQuestion
-
-Purpose: **Select input question; options required and non-empty**
-
-Type: **intersection-type**
-
-Constituents: `BaseQuestion`
-
-Attributes: **Relations**
-
-| **Attribute** | **Relation**        | **Abstraction** |
-| ------------- | ------------------- | --------------- |
-| `options`     | CompositionPositive | SelectOption    |
-
-Attributes: **State**
-
-| **Attribute** | **Type**                              |
-| ------------- | ------------------------------------- |
-| `type`        | `'single-select'` \| `'multi-select'` |
-
-### 4.11 Question
-
-Purpose: **General purpose reusable prompt; shared across tasks**
-
-Type: **union-type**
-
-Constituents: `ScalarQuestion | SelectQuestion | InternalQuestion`
-
-Discriminator: `type`
-
-### 4.12 Answer
-
-Purpose: **Captured response to a question; notes carry crew annotations and attachments**
-
-Type: **object**
-
-Attributes: **Relations**
-
-| **Attribute** | **Relation**    | **Abstraction** |
-| ------------- | --------------- | --------------- |
-| `questionId`  | AssociationOne  | Question        |
-| `notes`       | CompositionMany | Note            |
-
-Attributes: **State**
-
-| **Attribute** | **Type**                                        |
-| ------------- | ----------------------------------------------- |
-| `value`       | `string` \| `number` \| `boolean` \| `string[]` |
-| `capturedAt`  | When                                            |
 
 ## 5. Assets
 
@@ -576,7 +454,129 @@ using the system UUID v7 strategy; the database does not generate domain user ID
 
 Source: `@domain/abstractions/workflow.ts`
 
-### 10.1 Task
+### 10.1 QuestionType
+
+Purpose: **Supported question input modes; `internal` is reserved for system-generated log entries such as telemetry, GPS, and operational metadata**
+
+Type: **const-enum**
+
+| Values          |
+| --------------- |
+| `internal`      |
+| `text`          |
+| `number`        |
+| `boolean`       |
+| `single-select` |
+| `multi-select`  |
+
+### 10.2 BaseQuestion
+
+Purpose: **Common shape shared by all Question constituents**
+
+Type: **Instantiable**
+
+Attributes: **State**
+
+| **Attribute** | **Type**     |
+| ------------- | ------------ |
+| `type`        | QuestionType |
+| `prompt`      | string       |
+| `helpText?`   | string       |
+| `required?`   | boolean      |
+
+### 10.3 InternalQuestion
+
+Purpose: **System-generated question; seed records referenced directly by log entries**
+
+Type: **intersection-type**
+
+Constituents: `BaseQuestion`
+
+Attributes: **State**
+
+| **Attribute** | **Type**     |
+| ------------- | ------------ |
+| `type`        | `'internal'` |
+
+### 10.4 ScalarQuestion
+
+Purpose: **Scalar input question; no options**
+
+Type: **intersection-type**
+
+Constituents: `BaseQuestion`
+
+Attributes: **State**
+
+| **Attribute** | **Type**                              |
+| ------------- | ------------------------------------- |
+| `type`        | `'text'` \| `'number'` \| `'boolean'` |
+
+### 10.5 SelectOption
+
+Purpose: **Selectable option metadata; only valid on SelectQuestion**
+
+Type: **object**
+
+Attributes: **State**
+
+| **Attribute**   | **Type** |
+| --------------- | -------- |
+| `value`         | string   |
+| `label?`        | string   |
+| `requiresNote?` | boolean  |
+
+### 10.6 SelectQuestion
+
+Purpose: **Select input question; options required and non-empty**
+
+Type: **intersection-type**
+
+Constituents: `BaseQuestion`
+
+Attributes: **Relations**
+
+| **Attribute** | **Relation**        | **Abstraction** |
+| ------------- | ------------------- | --------------- |
+| `options`     | CompositionPositive | SelectOption    |
+
+Attributes: **State**
+
+| **Attribute** | **Type**                              |
+| ------------- | ------------------------------------- |
+| `type`        | `'single-select'` \| `'multi-select'` |
+
+### 10.7 Question
+
+Purpose: **General purpose reusable prompt; shared across tasks**
+
+Type: **union-type**
+
+Constituents: `ScalarQuestion | SelectQuestion | InternalQuestion`
+
+Discriminator: `type`
+
+### 10.8 Answer
+
+Purpose: **Captured response to a question; notes carry crew annotations and attachments**
+
+Type: **object**
+
+Attributes: **Relations**
+
+| **Attribute** | **Relation**    | **Abstraction** |
+| ------------- | --------------- | --------------- |
+| `questionId`  | AssociationOne  | Question        |
+| `notes`       | CompositionMany | Note            |
+
+Attributes: **State**
+
+| **Attribute** | **Type**                                        |
+| ------------- | ----------------------------------------------- |
+| `value`       | `string` \| `number` \| `boolean` \| `string[]` |
+| `capturedAt`  | When                                            |
+
+### 10.9 Task
 
 Purpose: **Reusable named grouping of ordered questions**
 
@@ -595,7 +595,7 @@ Attributes: **State**
 | `label`        | string   |
 | `description?` | string   |
 
-### 10.2 TaskQuestion
+### 10.10 TaskQuestion
 
 Purpose: **m:m junction — tasks to questions with explicit ordering; hard delete only**
 
@@ -614,7 +614,7 @@ Attributes: **State**
 | ------------- | -------- |
 | `sequence`    | number   |
 
-### 10.3 Workflow
+### 10.11 Workflow
 
 Purpose: **Versioned template of ordered tasks; read-only except for administrator role**
 
@@ -635,7 +635,7 @@ Attributes: **State**
 | `version`      | number                    |
 | `tags`         | CompositionMany\<string\> |
 
-### 10.4 WorkflowTask
+### 10.12 WorkflowTask
 
 Purpose: **Ordered tasks that define a workflow**
 

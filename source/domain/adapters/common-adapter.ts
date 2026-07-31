@@ -1,32 +1,22 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Common domain adapters                                                       ║
-║ Dictionary serialization for common topic abstractions.                      ║
+║ Dictionary serialization for shared value objects.                           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Maps storage dictionaries to common abstractions and back.
+Maps storage dictionaries to shared value objects and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 LocationAdapter      Deserialize/Serialize Location.
 AttachmentAdapter    Deserialize/Serialize Attachment.
 NoteAdapter          Deserialize/Serialize Note.
-SelectOptionAdapter  Deserialize/Serialize SelectOption.
-QuestionAdapter      Deserialize/Serialize Question.
-AnswerAdapter        Deserialize/Serialize Answer.
 */
 
 import { makeAdapter } from '@core/stdx'
-import type {
-  Answer,
-  Attachment,
-  Location,
-  Note,
-  Question,
-  SelectOption
-} from '@domain/abstractions/common.ts'
+import type { Attachment, Location, Note } from '@domain/abstractions/common.ts'
 
 /** Deserialize/Serialize Location. */
 export const LocationAdapter = makeAdapter<Location>({
@@ -60,32 +50,4 @@ export const NoteAdapter = makeAdapter<Note>({
   content: ['content'],
   visibility: ['visibility'],
   tags: ['tags']
-})
-
-/** Deserialize/Serialize SelectOption. */
-export const SelectOptionAdapter = makeAdapter<SelectOption>({
-  value: ['value'],
-  label: ['label'],
-  requiresNote: ['requires_note']
-})
-
-/** Deserialize/Serialize Question. */
-export const QuestionAdapter = makeAdapter<Question>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
-  type: ['type'],
-  prompt: ['prompt'],
-  helpText: ['help_text'],
-  required: ['required'],
-  options: ['options', SelectOptionAdapter]
-})
-
-/** Deserialize/Serialize Answer. */
-export const AnswerAdapter = makeAdapter<Answer>({
-  questionId: ['question_id'],
-  notes: ['notes', NoteAdapter],
-  value: ['value'],
-  capturedAt: ['captured_at']
 })

@@ -43,10 +43,10 @@ import type {
 } from '@core/std'
 import type { Asset } from '@domain/abstractions/asset.ts'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
-import type { Answer, Location, Note } from '@domain/abstractions/common.ts'
+import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import type { User } from '@domain/abstractions/user.ts'
-import type { Workflow } from '@domain/abstractions/workflow.ts'
+import type { Answer, Workflow } from '@domain/abstractions/workflow.ts'
 
 /** Allowed job status values. */
 export const JOB_STATUSES = [

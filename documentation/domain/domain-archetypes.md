@@ -113,9 +113,9 @@ Extend `InstantiableOnly` from `@core/std` can neither be updated nor deleted. U
 
 ```typescript
 import type { AssociationOne, CompositionOne, InstantiableOnly } from '@core/std'
-import type { Answer } from '@domain/abstractions/common.ts'
 import type { Job } from '@domain/abstractions/job.ts'
 import type { User } from '@domain/abstractions/user.ts'
+import type { Answer } from '@domain/abstractions/workflow.ts'
 
 /** Work execution event; append-only log. */
 export type JobWorkLogEntry = InstantiableOnly & {
@@ -131,8 +131,7 @@ Junction abstractions use `AssociationJunction<T>` for all foreign keys. No life
 
 ```typescript
 import type { AssociationJunction } from '@core/std'
-import type { Question } from '@domain/abstractions/common.ts'
-import type { Task } from '@domain/abstractions/workflow.ts'
+import type { Question, Task } from '@domain/abstractions/workflow.ts'
 
 /** m:m junction — tasks to questions with explicit ordering. */
 export type TaskQuestion = {
@@ -300,7 +299,7 @@ When an abstraction is a `union-type` (discriminated union of concrete variants)
 
 ```typescript
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
-import type { InternalQuestion, ScalarQuestion, SelectQuestion } from '@domain/abstractions/common.ts'
+import type { InternalQuestion, ScalarQuestion, SelectQuestion } from '@domain/abstractions/workflow.ts'
 
 /*  Question Create protocol */
 export type InternalQuestionCreate = CreateFromInstantiable<InternalQuestion>
@@ -388,8 +387,8 @@ import {
   type ExpectResult,
   expectValid
 } from '@core/std'
-import { QUESTION_TYPES, type SelectOption } from '@domain/abstractions/common.ts'
-import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/common-protocol.ts'
+import { QUESTION_TYPES, type SelectOption } from '@domain/abstractions/workflow.ts'
+import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/workflow-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATORS
@@ -508,7 +507,7 @@ const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USE
 Every object-type abstraction that appears as a `CompositionOne`, `CompositionMany`, or `CompositionPositive` member must have a named, exported type guard in its topic's validator file. Guards must be typed to the specific abstraction — never generic.
 
 ```typescript
-// common-validator.ts — guards are full structural validators, not shallow object checks
+// workflow-validator.ts — guards are full structural validators, not shallow object checks
 export const isSelectOption = (v: unknown): v is SelectOption => {
   if (v === null || typeof v !== 'object') return false
   const option = v as SelectOption
