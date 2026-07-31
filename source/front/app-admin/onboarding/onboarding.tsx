@@ -32,7 +32,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
 
   const stageContact: WizardStage = {
     name: 'contact',
-    title: 'Customer contact details',
+    title: 'Primary contact',
     render: () => (
       <OnboardingStageContact
         state={state}
@@ -48,7 +48,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   }
   const stageCustomer: WizardStage = {
     name: 'customer',
-    title: 'Customer\'s address',
+    title: 'Customer address',
     render: () => (
       <OnboardingStageCustomer
         state={state}
@@ -90,7 +90,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   }
   const stageSites: WizardStage = {
     name: 'sites',
-    title: 'Customer job sites',
+    title: 'Job sites',
     render: () => <OnboardingStageSites state={state} />,
     canAdvance: () => true,
     commit: async () => {
