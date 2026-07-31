@@ -62,7 +62,6 @@ export type OnboardingState = {
   setSiteAcreage: Setter<string>
   siteNote: Accessor<string>
   setSiteNote: Setter<string>
-  geoSupported: Accessor<boolean>
 }
 
 /** Creates the feature-local state for a single onboarding flow. */
@@ -92,8 +91,6 @@ export const createOnboardingState = (): OnboardingState => {
   const [siteLongitude, setSiteLongitude] = createSignal('')
   const [siteAcreage, setSiteAcreage] = createSignal('')
   const [siteNote, setSiteNote] = createSignal('')
-  const [geoSupported] = createSignal(typeof navigator !== 'undefined' && 'geolocation' in navigator)
-
   return {
     displayName,
     setDisplayName,
@@ -144,7 +141,6 @@ export const createOnboardingState = (): OnboardingState => {
     siteAcreage,
     setSiteAcreage,
     siteNote,
-    setSiteNote,
-    geoSupported
+    setSiteNote
   }
 }
