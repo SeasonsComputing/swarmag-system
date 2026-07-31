@@ -82,7 +82,7 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
               state={state}
               validation={validation}
               name='line2'
-              label='Unit / Suite (optional)'
+              label='Unit / Suite'
             />
             <CustomerInput state={state} validation={validation} name='city' label='City' required />
             <CustomerInput

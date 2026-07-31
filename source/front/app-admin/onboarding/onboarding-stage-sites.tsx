@@ -88,7 +88,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
           </div>
         </UiFieldset>
       </Show>
-      <UiFieldset legend='Add Job Site (optional)'>
+      <UiFieldset legend='Add Job Site'>
         <UiLayout>
           <SiteInput
             state={state}
@@ -97,7 +97,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
             required
             placeholder='e.g., "Main Office" or "Project Alpha"'
           />
-          <UiFieldset legend='Address (optional)'>
+          <UiFieldset legend='Address'>
             <UiLayout>
               <SiteInput state={state} name='siteLine1' label='Address' />
               <SiteInput state={state} name='siteLine2' label='Unit / Suite' />
@@ -107,7 +107,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
               <SiteInput state={state} name='siteCountry' label='Country' />
             </UiLayout>
           </UiFieldset>
-          <UiFieldset legend='Coordinates (optional)'>
+          <UiFieldset legend='Coordinates'>
             <UiLayout data-app='onboarding-coords-group'>
               <SiteInput
                 state={state}
@@ -126,8 +126,8 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
               </Show>
             </UiLayout>
           </UiFieldset>
-          <SiteInput state={state} name='siteAcreage' label='Acreage (optional)' type='number' />
-          <UiField for='siteNote' label='Note (optional)'>
+          <SiteInput state={state} name='siteAcreage' label='Acreage' type='number' />
+          <UiField for='siteNote' label='Note'>
             <UiTextArea
               name='siteNote'
               rows={4}
