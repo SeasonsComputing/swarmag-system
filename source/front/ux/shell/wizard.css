@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-/* The timeline column is FIXED, not content-sized. Bare max-content made its
+/* The stepflow column is FIXED, not content-sized. Bare max-content made its
    width a function of stage-title text, which would make the collapse threshold
    below correct for one flow and silently wrong for the next. A fixed track
    bounds the two-column minimum for EVERY wizard — track + gap + subject
@@ -114,12 +114,12 @@
   }
 }
 
-/* Derived from this surface's own track sizes, not inherited: the fixed timeline
+/* Derived from this surface's own track sizes, not inherited: the fixed stepflow
    column plus --sa-rhythm-gap plus the subject's --sa-size-min floor is roughly
    690, so 720 is the nearest literal that clears it in every viewport band.
    Below this the two tracks cannot both be satisfied and the subject would be
    squeezed under its floor. A @container condition cannot take var(), which is
-   why this is a literal and why the timeline track above is fixed rather than
+   why this is a literal and why the stepflow track above is fixed rather than
    content-sized — widen that track and this number must rise with it. */
 @container (max-width: 720px) {
   [data-feat='wizard'] {
