@@ -28,7 +28,7 @@
 
 [data-shell-panel='stepflow-list'] {
   display: grid;
-  gap: var(--sa-space-sm);
+  gap: var(--sa-space-md);
 }
 
 [data-shell-panel='stepflow-item'] {
@@ -44,32 +44,42 @@
 }
 
 [data-shell-panel='stepflow-node'] {
-  background: var(--sa-bg-control);
+  align-items: center;
+  background: var(--sa-color-secondary);
   border: var(--sa-border-default);
+  border-color: var(--sa-color-secondary);
   border-radius: var(--sa-radius-full);
-  block-size: var(--sa-space-sm);
-  inline-size: var(--sa-space-sm);
+  block-size: var(--sa-space-lg);
+  color: var(--sa-text-on-brand);
+  display: inline-flex;
+  font-family: var(--sa-data-font-family);
+  font-size: var(--sa-ui-font-size-compact);
+  inline-size: var(--sa-space-lg);
+  justify-content: center;
   justify-self: center;
-  z-index: var(--sa-z-base);
+  position: relative;
+  z-index: var(--sa-z-raised);
 }
 
 [data-shell-panel='stepflow-item']:not(:last-child)::after {
-  block-size: calc(100% + var(--sa-space-sm));
+  block-size: calc(100% + var(--sa-space-md));
   border-inline-start: var(--sa-border-default);
   content: '';
   inline-size: 0;
-  inset-block-start: calc(50% + var(--sa-space-sm) / 2);
+  inset-block-start: calc(50% + var(--sa-space-md) / 2);
   inset-inline-start: calc(var(--sa-space-lg) / 2);
   position: absolute;
+  z-index: var(--sa-z-base);
 }
 
 [data-shell-panel='stepflow-item'][data-shell-state='done'] {
-  color: var(--sa-text-secondary);
+  color: var(--sa-text-dim);
 }
 
 [data-shell-panel='stepflow-item'][data-shell-state='done'] [data-shell-panel='stepflow-node'] {
-  background: var(--sa-color-primary);
-  border-color: var(--sa-color-primary);
+  background: var(--sa-text-dim);
+  border-color: var(--sa-text-dim);
+  color: var(--sa-text-on-brand);
 }
 
 [data-shell-panel='stepflow-item'][data-shell-state='current'] {
@@ -77,9 +87,14 @@
   font-weight: var(--sa-ui-font-weight-strong);
 }
 
+[data-shell-panel='stepflow-item'][data-shell-state='upcoming'] {
+  color: var(--sa-text-secondary);
+}
+
 [data-shell-panel='stepflow-item'][data-shell-state='current'] [data-shell-panel='stepflow-node'] {
   background: var(--sa-color-accent);
   border-color: var(--sa-color-accent);
+  color: var(--sa-text-on-brand);
 }
 
 @media (max-width: 480px) {

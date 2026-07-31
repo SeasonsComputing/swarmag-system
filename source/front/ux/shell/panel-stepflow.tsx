@@ -37,9 +37,9 @@ export const PanelStepflow = (props: PanelStepflowProps): UiComponent => (
       <div data-shell-panel='body' data-shell-panel-kind='stepflow'>
         <UiList data-shell-panel='stepflow-list'>
           <For each={props.items}>
-            {item => (
+            {(item, index) => (
               <UiListItem data-shell-panel='stepflow-item' data-shell-state={item.state}>
-                <span aria-hidden='true' data-shell-panel='stepflow-node' />
+                <span aria-hidden='true' data-shell-panel='stepflow-node'>{index() + 1}</span>
                 <span data-shell-panel='stepflow-title'>{item.title}</span>
               </UiListItem>
             )}
