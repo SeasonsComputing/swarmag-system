@@ -19,11 +19,11 @@ type PanelListProps = {
 
 /** Renders a card-backed list panel. */
 export const PanelList = (props: PanelListProps) => (
-  <section data-feat-panel='list'>
+  <section data-shell-panel='list'>
     <UiCard elevation='raised'>
       <PanelHeader {...props.header} />
-      {props.toolbar && <div data-feat-panel='toolbar'>{props.toolbar}</div>}
-      <div data-feat-panel='body' data-feat-panel-kind='list'>{props.children}</div>
+      {props.toolbar && <div data-shell-panel='toolbar'>{props.toolbar}</div>}
+      <div data-shell-panel='body' data-shell-panel-kind='list'>{props.children}</div>
     </UiCard>
   </section>
 )

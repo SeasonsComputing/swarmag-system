@@ -31,16 +31,16 @@ type PanelStepflowProps = {
 
 /** Renders a card-backed, read-only stepflow panel. */
 export const PanelStepflow = (props: PanelStepflowProps): UiComponent => (
-  <section data-feat-panel='stepflow'>
+  <section data-shell-panel='stepflow'>
     <UiCard elevation='raised'>
       {props.header && <PanelHeader {...props.header} />}
-      <div data-feat-panel='body' data-feat-panel-kind='stepflow'>
-        <UiList data-feat-panel='stepflow-list'>
+      <div data-shell-panel='body' data-shell-panel-kind='stepflow'>
+        <UiList data-shell-panel='stepflow-list'>
           <For each={props.items}>
             {item => (
-              <UiListItem data-feat-panel='stepflow-item' data-feat-state={item.state}>
-                <span aria-hidden='true' data-feat-panel='stepflow-node' />
-                <span data-feat-panel='stepflow-title'>{item.title}</span>
+              <UiListItem data-shell-panel='stepflow-item' data-shell-state={item.state}>
+                <span aria-hidden='true' data-shell-panel='stepflow-node' />
+                <span data-shell-panel='stepflow-title'>{item.title}</span>
               </UiListItem>
             )}
           </For>

@@ -46,7 +46,7 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
 
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
-      <UiLayout data-feat='onboarding-stage-customer'>
+      <UiLayout data-app='onboarding-stage-customer'>
         <UiFieldset legend='Customer Information'>
           <UiLayout>
             <UiField for='name' label='Name' required>

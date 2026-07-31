@@ -11,10 +11,10 @@ import './panel-container.css'
 
 /** Renders shared chrome and semantic panel roles. */
 export const PanelContainer = (props: PanelContainerProps) => (
-  <div data-feat={props.feature} data-feat-mode={props.mode} data-feat-panel='container'>
+  <div data-shell={props.feature} data-shell-mode={props.mode} data-shell-panel='container'>
     {props.header}
-    {props.accessory && <div data-feat-panel='accessory'>{props.accessory}</div>}
-    {props.index && <aside data-feat-panel='index'>{props.index}</aside>}
-    <main data-feat-panel='subject' ref={props.subjectRef}>{props.subject}</main>
+    {props.accessory && <div data-shell-panel='accessory'>{props.accessory}</div>}
+    {props.index && <aside data-shell-panel='index'>{props.index}</aside>}
+    <main data-shell-panel='subject' ref={props.subjectRef}>{props.subject}</main>
   </div>
 )

@@ -63,7 +63,7 @@ const ALLOWED_DATA_ATTRIBUTES = new StringSet([
 ])
 
 const DATA_ATTRIBUTE_VALUE_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-const FEATURE_ATTRIBUTE_REGEX = /^data-feat(?:-[a-z0-9]+)*$/
+const FEATURE_ATTRIBUTE_REGEX = /^data-(?:shell|widget|app)(?:-[a-z0-9]+)*$/
 
 interface CSSLine {
   line: string
@@ -340,6 +340,7 @@ const auditIconCatalogCSS = (lines: CSSLine[], filePath: string): string[] => {
 
 const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
   const violations: string[] = []
+  const namespace = featureNamespace(filePath)
 
   for (const { line, lineNumber, isComment } of lines) {
     if (isComment || !line.includes('{')) continue
@@ -349,9 +350,9 @@ const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
 
     if (isAtRule(selector)) continue
 
-    if (!selector.startsWith('[data-feat')) {
+    if (!selector.startsWith(`[${namespace}`)) {
       violations.push(
-        `${filePath}:${lineNumber} — selector not rooted at [data-feat — found: ${selector}`
+        `${filePath}:${lineNumber} — selector not rooted at [${namespace} — found: ${selector}`
       )
     }
 
@@ -372,8 +373,8 @@ const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
         && (
           attribute === 'data-ui'
           || attribute.startsWith('data-ui-')
-          || attribute === 'data-feat'
-          || attribute.startsWith('data-feat-')
+          || attribute === namespace
+          || attribute.startsWith(`${namespace}-`)
         )
         && !DATA_ATTRIBUTE_VALUE_REGEX.test(value)
       ) {
@@ -385,6 +386,12 @@ const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
   }
 
   return violations
+}
+
+const featureNamespace = (filePath: string): string => {
+  if (filePath.startsWith('source/front/ux/shell/')) return 'data-shell'
+  if (filePath.startsWith('source/front/ux/widgets/')) return 'data-widget'
+  return 'data-app'
 }
 
 const isInFontFaceBlock = (lines: CSSLine[], currentIndex: number): boolean => {

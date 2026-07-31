@@ -23,10 +23,10 @@ import './brand-widget.css'
 export const BrandWidget = (): UiComponent => {
   const { identity } = useWidget()
   return (
-    <div data-feat='brand-widget'>
+    <div data-widget='brand-widget'>
       <UiLayout gap='tight'>
-        <span data-feat='brand-widget-product'>{identity.productName}</span>
-        <span data-feat='brand-widget-application'>{identity.applicationName}</span>
+        <span data-widget='brand-widget-product'>{identity.productName}</span>
+        <span data-widget='brand-widget-application'>{identity.applicationName}</span>
       </UiLayout>
     </div>
   )

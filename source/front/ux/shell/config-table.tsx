@@ -45,7 +45,7 @@ export type ConfigTableProps = {
 
 /** Renders a table of configuration data. */
 export const ConfigTable = (props: ConfigTableProps) => (
-  <dl data-feat='config-table'>
+  <dl data-shell='config-table'>
     <Show when={props.showAuthor}>
       <ConfigRow
         datum={{

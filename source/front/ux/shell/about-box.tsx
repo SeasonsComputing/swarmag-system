@@ -24,7 +24,7 @@ import './about-box.css'
 export const AboutBox = (): UiComponent => {
   const shell = getShellMetadata()
   return (
-    <div data-feat='about-box'>
+    <div data-shell='about-box'>
       <BrandHero />
       <ConfigTable shell={shell} showAuthor />
     </div>

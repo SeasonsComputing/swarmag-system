@@ -35,7 +35,7 @@ export const OnboardingStageContact = (props: OnboardingStageContactProps): UiCo
 
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
-      <UiLayout data-feat='onboarding-stage-contact'>
+      <UiLayout data-app='onboarding-stage-contact'>
         <UiFieldset legend='Primary Contact'>
           <UiLayout>
             <UiField for='displayName' label='Name' required>

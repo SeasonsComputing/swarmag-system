@@ -106,7 +106,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   }
 
   return (
-    <div data-feat='onboarding-page'>
+    <div data-app='onboarding-page'>
       <Wizard contract={contract} onFinish={props.onCancel} onCancel={props.onCancel} />
     </div>
   )

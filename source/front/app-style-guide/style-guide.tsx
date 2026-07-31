@@ -51,16 +51,16 @@ const SgHeader = (): UiComponent => {
   const [theme, setTheme] = createSignal<Theme>('dark')
   createEffect(() => document.documentElement.dataset.theme = theme())
   return (
-    <header data-feat='style-guide-header'>
-      <div data-feat='style-guide-header-contents'>
-        <div data-feat='style-guide-header-brand'>
+    <header data-app='style-guide-header'>
+      <div data-app='style-guide-header-contents'>
+        <div data-app='style-guide-header-brand'>
           <UiLayout variant='inline'>
-            <img data-feat='style-guide-header-icon' src={icon} alt='' width={64} height={64} />
+            <img data-app='style-guide-header-icon' src={icon} alt='' width={64} height={64} />
             <UiLayout gap='tight'>
               <h1>
-                swarmAg <span data-feat='style-guide-nowrap'>Style Guide</span>
+                swarmAg <span data-app='style-guide-nowrap'>Style Guide</span>
               </h1>
-              <p data-feat='style-guide-header-subtitle'>
+              <p data-app='style-guide-header-subtitle'>
                 Living visual validation for tokens, states, themes, and controls.
               </p>
             </UiLayout>
@@ -81,7 +81,7 @@ const SgFooter = (): UiComponent => (<UiFooter logo={logo} alt='swarmAg' />)
 /** Main content area for the style guide. */
 type SgMainProps = UiContainerProps
 const SgMain = (props: SgMainProps): UiComponent => (
-  <main data-feat='style-guide-main'>
+  <main data-app='style-guide-main'>
     {props.children}
   </main>
 )
@@ -89,7 +89,7 @@ const SgMain = (props: SgMainProps): UiComponent => (
 /** Framed style-guide section used to group related control specimens. */
 type SgSectionProps = UiContainerProps & { title: string }
 const SgSection = (props: SgSectionProps): UiComponent => (
-  <section data-feat='style-guide-section'>
+  <section data-app='style-guide-section'>
     <UiLayout gap='tight'>
       <h2>{props.title}</h2>
       <UiCard elevation='raised'>
@@ -108,8 +108,8 @@ type SgSwatchProps = {
   token: string
 }
 const SgSwatch = (props: SgSwatchProps): UiComponent => (
-  <figure data-feat='style-guide-swatch'>
-    <div data-feat='style-guide-swatch-chip' style={{ background: props.value }} />
+  <figure data-app='style-guide-swatch'>
+    <div data-app='style-guide-swatch-chip' style={{ background: props.value }} />
     <figcaption>
       <UiLayout gap='tight'>
         <span>{props.label}</span>
@@ -126,8 +126,8 @@ type SgGradientProps = {
   token: string
 }
 const SgGradient = (props: SgGradientProps): UiComponent => (
-  <figure data-feat='style-guide-gradient'>
-    <div data-feat='style-guide-gradient-chip' style={{ background: props.value }} />
+  <figure data-app='style-guide-gradient'>
+    <div data-app='style-guide-gradient-chip' style={{ background: props.value }} />
     <figcaption>
       <UiLayout gap='tight'>
         <span>{props.label}</span>
@@ -172,7 +172,7 @@ export const StyleGuide = (): UiComponent => {
                   <UiTableRow>
                     <UiTableCell>Heading</UiTableCell>
                     <UiTableCell>
-                      <span data-feat='style-guide-font-heading'>
+                      <span data-app='style-guide-font-heading'>
                         Operations briefing schedule confirmed
                       </span>
                     </UiTableCell>
@@ -180,7 +180,7 @@ export const StyleGuide = (): UiComponent => {
                   <UiTableRow>
                     <UiTableCell>Body</UiTableCell>
                     <UiTableCell>
-                      <span data-feat='style-guide-font-body'>
+                      <span data-app='style-guide-font-body'>
                         Inspect field boundaries and document hazard zones
                       </span>
                     </UiTableCell>
@@ -191,19 +191,19 @@ export const StyleGuide = (): UiComponent => {
                   <UiTableRow>
                     <UiTableCell>Label</UiTableCell>
                     <UiTableCell>
-                      <span data-feat='style-guide-font-label'>Service window 06:00–09:00</span>
+                      <span data-app='style-guide-font-label'>Service window 06:00–09:00</span>
                     </UiTableCell>
                   </UiTableRow>
                   <UiTableRow>
                     <UiTableCell>Annotation</UiTableCell>
                     <UiTableCell>
-                      <span data-feat='style-guide-font-annotation'>Caption or Legend</span>
+                      <span data-app='style-guide-font-annotation'>Caption or Legend</span>
                     </UiTableCell>
                   </UiTableRow>
                   <UiTableRow>
                     <UiTableCell>UI</UiTableCell>
                     <UiTableCell>
-                      <span data-feat='style-guide-font-ui'>
+                      <span data-app='style-guide-font-ui'>
                         Assign crew and assets for spray mission
                       </span>
                     </UiTableCell>
@@ -690,10 +690,10 @@ export const StyleGuide = (): UiComponent => {
             <UiFieldset legend='Loading Indicators'>
               <UiLayout>
                 <UiSkeleton />
-                <div data-feat='style-guide-skeleton-75'>
+                <div data-app='style-guide-skeleton-75'>
                   <UiSkeleton />
                 </div>
-                <div data-feat='style-guide-skeleton-50'>
+                <div data-app='style-guide-skeleton-50'>
                   <UiSkeleton />
                 </div>
               </UiLayout>

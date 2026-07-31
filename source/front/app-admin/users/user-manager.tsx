@@ -118,7 +118,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     )
   }
   return (
-    <div data-feat='users-page'>
+    <div data-app='users-page'>
       <Show when={usersQuery.error}>
         <UiAlert variant='danger'>{errorMessage(usersQuery.error)}</UiAlert>
       </Show>
@@ -134,13 +134,13 @@ function UserListCells(props: { user: User }): UiComponent {
       <UiTableCell>
         <UiLayout variant='block-fit' gap='none'>
           <span>{props.user.displayName}</span>
-          <span data-feat='user-list-email'>{props.user.primaryEmail}</span>
-          <span data-feat='user-list-roles'>
+          <span data-app='user-list-email'>{props.user.primaryEmail}</span>
+          <span data-app='user-list-roles'>
             <For each={props.user.roles}>
               {(role, index) => (
                 <>
                   {index() > 0 ? ', ' : ''}
-                  <span data-feat='user-list-role'>{enumDisplayLabel(role)}</span>
+                  <span data-app='user-list-role'>{enumDisplayLabel(role)}</span>
                 </>
               )}
             </For>
@@ -148,10 +148,10 @@ function UserListCells(props: { user: User }): UiComponent {
         </UiLayout>
       </UiTableCell>
       <UiTableCell>
-        <span data-feat='user-status-pill' data-feat-status={props.user.status}>
+        <span data-app='user-status-pill' data-app-status={props.user.status}>
           <span
             aria-label={enumDisplayLabel(props.user.status)}
-            data-feat='user-status'
+            data-app='user-status'
             role='img'
             title={enumDisplayLabel(props.user.status)}
           />
@@ -397,7 +397,7 @@ function UserEditor(props: {
                 <For each={USER_STATUSES}>
                   {value => (
                     <UiToggleItem value={value}>
-                      <span data-feat='user-option-label'>{enumDisplayLabel(value)}</span>
+                      <span data-app='user-option-label'>{enumDisplayLabel(value)}</span>
                     </UiToggleItem>
                   )}
                 </For>

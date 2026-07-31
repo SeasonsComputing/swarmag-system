@@ -203,14 +203,14 @@ export const AbstractionManager = <T extends Instance>(
             header={{
               leading: (
                 <>
-                  <div data-feat='abstraction-manager-collapse-action'>
-                    <span data-feat='abstraction-manager-back-command'>
+                  <div data-shell='abstraction-manager-collapse-action'>
+                    <span data-shell='abstraction-manager-back-command'>
                       <UiActionButton
                         icon='arrow-left'
                         label={`${props.provider.entityLabel}s`}
                         onClick={() => setMode('list')}
                       />
-                      <span aria-hidden='true' data-feat='abstraction-manager-command-divider' />
+                      <span aria-hidden='true' data-shell='abstraction-manager-command-divider' />
                     </span>
                   </div>
                   <h2>{editorTitle()}</h2>
@@ -242,13 +242,13 @@ export const AbstractionManager = <T extends Instance>(
               if (!open && !actionPending()) setPendingAction(null)
             }}
           >
-            <div data-feat='abstraction-manager-confirmation'>
+            <div data-shell='abstraction-manager-confirmation'>
               <h2>{target().action.confirmation?.title}</h2>
               <p>{target().action.confirmation?.message(target().item)}</p>
               <Show when={actionError()}>
                 {message => <UiAlert variant='danger'>{message()}</UiAlert>}
               </Show>
-              <div data-feat='abstraction-manager-confirmation-actions'>
+              <div data-shell='abstraction-manager-confirmation-actions'>
                 <UiButton disabled={actionPending()} onClick={() => setPendingAction(null)}>
                   Cancel
                 </UiButton>

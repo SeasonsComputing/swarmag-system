@@ -110,16 +110,16 @@ export const Wizard = (props: WizardProps): UiComponent => {
         />
       }
       accessory={
-        <div data-feat='wizard-indicator'>
-          <div aria-hidden='true' data-feat='wizard-bar'>
-            <div data-feat='wizard-bar-fill' style={{ 'inline-size': barFill() }} />
+        <div data-shell='wizard-indicator'>
+          <div aria-hidden='true' data-shell='wizard-bar'>
+            <div data-shell='wizard-bar-fill' style={{ 'inline-size': barFill() }} />
           </div>
-          <UiList data-feat='wizard-steps'>
+          <UiList data-shell='wizard-steps'>
             <For each={props.contract.stages}>
               {(item, index) => (
-                <UiListItem data-feat='wizard-step' data-feat-state={stepState(index())}>
-                  <span data-feat='wizard-step-ordinal'>{index() + 1}</span>
-                  <span data-feat='wizard-step-title'>{item.title}</span>
+                <UiListItem data-shell='wizard-step' data-shell-state={stepState(index())}>
+                  <span data-shell='wizard-step-ordinal'>{index() + 1}</span>
+                  <span data-shell='wizard-step-title'>{item.title}</span>
                 </UiListItem>
               )}
             </For>
@@ -176,7 +176,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
         >
           <Show when={stage()} keyed>
             {current => (
-              <div data-feat='wizard-stage' data-feat-step={current.name}>
+              <div data-shell='wizard-stage' data-shell-step={current.name}>
                 {current.render()}
               </div>
             )}

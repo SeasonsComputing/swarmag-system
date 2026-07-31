@@ -71,8 +71,9 @@ Consumer code must not pass visual hook props to shared controls:
 Controls own their semantic attributes, data hooks, typography treatment,
 spacing, state rendering, accessibility behavior, and theme behavior.
 
-Feature, shell, widget, and app-local styling uses `data-feat` and `data-feat-*`
-attributes. Do not use feature styling attributes as props on shared Ui controls.
+Shell styling uses `data-shell` and `data-shell-*`; widget styling uses `data-widget` and
+`data-widget-*`; and app-local styling uses `data-app` and `data-app-*`. Do not use these
+styling attributes as props on shared Ui controls.
 
 ### 2.4 Public Reference Identity
 
