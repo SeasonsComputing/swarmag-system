@@ -28,6 +28,7 @@ export type OnboardingStageSitesProps = {
 /** Renders the optional job-sites stage. */
 export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiComponent => {
   const { state } = props
+  const hasGeo = typeof navigator !== 'undefined' && 'geolocation' in navigator
   const addSite = (): void => {
     const customer = state.customer()
     if (!customer) return
@@ -69,7 +70,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
     return state.siteLabel().trim().length > 0 && (hasAddress || hasCoordinates)
   }
   const useMyLocation = (): void => {
-    if (!state.geoSupported()) return
+    if (!hasGeo) return
     navigator.geolocation.getCurrentPosition(position => {
       state.setSiteLatitude(position.coords.latitude.toString())
       state.setSiteLongitude(position.coords.longitude.toString())
@@ -120,7 +121,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
                 label='Longitude'
                 placeholder='e.g., -74.0060'
               />
-              <Show when={state.geoSupported()}>
+              <Show when={hasGeo}>
                 <UiButton variant='secondary' onClick={useMyLocation}>Use my location</UiButton>
               </Show>
             </UiLayout>
