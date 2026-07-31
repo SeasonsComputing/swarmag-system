@@ -64,7 +64,8 @@ import type {
   JobWorkLogEntryCreate,
   JobWorkUpdate
 } from '@domain/protocols/job-protocol.ts'
-import { isAnswer, isLocation, isNote } from '@domain/validators/common-validator.ts'
+import { isLocation, isNote } from '@domain/validators/common-validator.ts'
+import { isAnswer } from '@domain/validators/workflow-validator.ts'
 
 /** Validate JobCreate payloads. */
 export const validateJobCreate = (input: JobCreate): ExpectResult =>

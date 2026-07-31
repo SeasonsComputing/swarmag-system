@@ -7,7 +7,7 @@ import type { Id } from '@core/std'
 import type { Job, JobAssessment, JobPlan, JobStatus } from '@domain/abstractions/job.ts'
 
 /** Lightweight job manifest entry — device-local display projection. */
-export type JobSummary = {
+export type JobManifest = {
   id: Id
   status: JobStatus
   title: string
@@ -17,9 +17,9 @@ export type JobSummary = {
  * UX composite for job display and navigation across all lifecycle phases.
  * All phase fields are optional — availability depends on job status.
  */
-export type JobDefinition = {
+export type JobHub = {
+  manifest: JobManifest
   job: Job
   assessment?: JobAssessment
   plan?: JobPlan
-  summary?: JobSummary
 }
