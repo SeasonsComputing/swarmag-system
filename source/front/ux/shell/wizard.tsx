@@ -21,7 +21,7 @@ import { PanelContainer } from './panel-container.tsx'
 import type { PanelFeedback } from './panel-contract.ts'
 import { PanelForm } from './panel-form.tsx'
 import { PanelHeader } from './panel-header.tsx'
-import { PanelTimeline } from './panel-timeline.tsx'
+import { PanelStepflow } from './panel-stepflow.tsx'
 import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import type { WizardContract } from './wizard-contract.ts'
 
@@ -127,7 +127,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
         </div>
       }
       index={
-        <PanelTimeline
+        <PanelStepflow
           items={props.contract.stages.map((item, index) => ({
             state: stepState(index),
             title: item.title
