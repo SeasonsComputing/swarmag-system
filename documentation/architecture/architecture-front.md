@@ -712,24 +712,33 @@ inline and block footprint together with its row context. As available space con
 widgets may adapt their presentation; when the field needs more space, it adds rows
 while retaining ordered placement. The shell does not require horizontal scrolling.
 
-The header provides two deterministic responsive contexts. Above `560px`, the leading
-identity field (shell logo + BrandWidget) and terminal HelmWidget share the primary
-row. At or below `560px`, the identity field occupies its own row and the terminal
-field spans the following short action row. CSS selects the context before layout;
-the shell does not measure rendered positions or mutate context after mount.
+The header provides two deterministic responsive contexts, selected by container
+query against the header's own inline size — not the viewport. Above the shell's
+**stacked-header threshold**, the leading identity field (shell logo + BrandWidget)
+and the terminal HelmWidget share a single non-wrapping row, and the terminal field
+is anchored to the header's inline end. At or below that threshold, the identity
+field occupies its own row and the terminal field spans the following short action
+row. CSS selects the context before layout; the shell does not measure rendered
+positions or mutate context after mount.
 
-From `561px` through `1023px`, the header remains a single non-wrapping row. This
-keeps the icon-only HelmWidget beside identity until the shell's short-row
-breakpoint applies. Above the short-row breakpoint, the terminal field and
-HelmWidget shrink-wrap their action content and remain anchored to the
-header's inline end. The terminal field expands to the full following row only at or
-below `560px`.
+The terminal field is sized by the shell, not by its contents, so it is a valid
+query container. HelmWidget shrink-wraps its action cluster inside that field and
+stays anchored to the inline end; the field's own measure is what the widget
+queries.
 
-HelmWidget owns action placement within its field. At or above `1024px`,
-it presents labeled controls in the shared row. Below `1024px`, it presents dense icon
-controls; the `560px` shell breakpoint still determines only the stacked header layout.
-Each control retains its accessible label, and its circle and glyph scale together with
-density. Below `380px`, the shared base scale provides the remaining reduction.
+HelmWidget owns action placement within its field, and adapts to that field rather
+than to the window. Above the widget's **labeled-action threshold** it presents
+labeled controls; at or below it, dense icon controls. The stacked-header threshold
+governs only the header's row structure — when the field spans its own row,
+HelmWidget distributes its actions across that row. Each control retains its
+accessible label, and its circle and glyph scale together with density. A single
+viewport-level step in the shared base scale provides the remaining reduction on the
+narrowest devices.
+
+Threshold values are stylesheet-owned and are not restated here: the stacked-header
+threshold lives in `dashboard.css`, the labeled-action threshold in
+`helm-widget.css`, and the base-scale step in `tokens.css`. Each is expressed as the
+intrinsic width it protects, so the number can be re-derived rather than inherited.
 
 `compact` and `landscape` are widget presentation shapes, not shell geometry. A
 widget uses its configured shape to express its data within the footprint allocated
