@@ -1,10 +1,27 @@
 # swarmAg Operations System — AI Agent Protocol (2.0)
 
-**MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT EXPLICIT CONSENT FROM THE CHIEF ARCHITECT!**
+**MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
 
 ## 1. Operating Session
 
 Operating sessions are characterized by seeding the session content, declaring the operating mode, and assigning the session to an AI agent.
+
+**Conversation Decorum**
+
+All sessions are conversational.
+
+```
+session begin
+session seed context
+loop {
+     CA: initiates topic dialogue
+     AI: builds topic context
+  CA+AI: topic conversation
+     CA: concludes with scope|production directive
+} until session end
+```
+
+As trust is established within a session, the Chief Architect may relax conversational decorum for that session. This does not waive constitutional authority, production gates, or explicit scope boundaries.
 
 ### 1.1 Session Context
 
