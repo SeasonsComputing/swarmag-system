@@ -4,7 +4,7 @@
     "widgets": [
       { "type": "BrandWidget", "settings": { "shape": "landscape" } },
       {
-        "type": "ActionWidget",
+        "type": "HelmWidget",
         "settings": {
           "shape": "landscape",
           "actions": ["/logout"],

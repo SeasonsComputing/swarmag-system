@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Action widget                                                                ║
+║ Helm widget                                                                           ║
 ║ Header widget for route navigation actions.                                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -10,41 +10,30 @@ Renders configured route actions as secondary buttons in the dashboard header.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-ActionWidget  Dashboard header action widget.
+HelmWidget  Dashboard header navigation control cluster.
 */
 
 import type { Dictionary } from '@core/std'
 import { UiActionButton, type UiComponent, UiLayout } from '@front/ux/ui'
-import { createSignal, For, onCleanup, onMount } from '@solid-js'
+import { For } from '@solid-js'
 import { useNavigate } from '@tanstack/solid-router'
 
-import './action-widget.css'
+import './helm-widget.css'
 
-/** Dashboard action widget props. */
-export type ActionWidgetProps = {
+/** Dashboard helm widget props. */
+export type HelmWidgetProps = {
   settings: Dictionary
 }
 
-/** Dashboard header action widget. */
-export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
+/** Dashboard header navigation control cluster. */
+export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
   const navigate = useNavigate()
-  const [isWrapped, setIsWrapped] = createSignal(false)
-  let widgetElement: HTMLElement | undefined
-  onMount(() => {
-    const header = widgetElement?.closest<HTMLElement>('[data-shell=\'dashboard-header-contents\']')
-    if (!header) return
-    const updateContext = () => setIsWrapped(header.dataset.shellContext === 'wrapped')
-    const observer = new MutationObserver(updateContext)
-    observer.observe(header, { attributeFilter: ['data-shell-context'], attributes: true })
-    updateContext()
-    onCleanup(() => observer.disconnect())
-  })
   const pairs = () => {
-    const actions = toStringArray(props.settings['actions'], 'ActionWidget settings.actions')
-    const labels = toStringArray(props.settings['labels'], 'ActionWidget settings.labels')
-    const icons = toStringArray(props.settings['icons'], 'ActionWidget settings.icons')
+    const actions = toStringArray(props.settings['actions'], 'HelmWidget settings.actions')
+    const labels = toStringArray(props.settings['labels'], 'HelmWidget settings.labels')
+    const icons = toStringArray(props.settings['icons'], 'HelmWidget settings.icons')
     if (actions.length !== labels.length || actions.length !== icons.length) {
-      throw new Error('ActionWidget settings actions, labels, and icons must have equal lengths')
+      throw new Error('HelmWidget settings actions, labels, and icons must have equal lengths')
     }
     return actions.map((action, index) => ({
       action,
@@ -54,21 +43,15 @@ export const ActionWidget = (props: ActionWidgetProps): UiComponent => {
   }
 
   return (
-    <nav
-      aria-label='Dashboard actions'
-      data-widget='action-widget'
-      data-widget-context={isWrapped() ? 'wrapped' : 'normal'}
-      ref={element => {
-        widgetElement = element
-      }}
-    >
+    <nav aria-label='Primary actions' data-widget='helm-widget'>
       <UiLayout variant='cluster'>
         <For each={pairs()}>
           {pair => (
             <UiActionButton
               icon={pair.icon}
               label={pair.label}
-              labelMode={isWrapped() ? 'reveal' : 'visible'}
+              density='dense'
+              labelMode='visible'
               onClick={() => void navigate({ to: pair.action })}
             />
           )}

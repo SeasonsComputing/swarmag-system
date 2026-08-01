@@ -154,7 +154,7 @@ end-to-end:
 ## Group B — COW Feature (Feature Mode) — BUILT 2026-07-22, layout OPEN
 
 - [x] `front/app-admin/onboarding/onboarding.tsx` + `.css`; dialog route
-      `/onboarding` (workbench) beside `/users`; dashboard action-widget
+      `/onboarding` (workbench) beside `/users`; dashboard HelmWidget
       launch entry (`building` glyph). Wired and launching
 - [x] Stage 1 contact (per D17): pure contact capture — `Contact` fields
       (`displayName`, `phoneNumber`, `preferredChannel`, `email?`); no

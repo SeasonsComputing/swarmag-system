@@ -17,7 +17,7 @@ Dashboard  Shared shell dashboard component.
 import type { DashboardStoreWidget } from '@front/ux/stores/dashboard-state.ts'
 import { UiCard, type UiComponent, UiFooter } from '@front/ux/ui'
 import type { WidgetComponent } from '@front/ux/widgets/widget.tsx'
-import { For, onCleanup, onMount, Show } from '@solid-js'
+import { For, Show } from '@solid-js'
 import { useDashboard } from './dashboard-provider.tsx'
 
 import './dashboard.css'
@@ -35,45 +35,10 @@ export const Dashboard = (): UiComponent => {
     const headerWidgets = dashboard.header.widgets
     return headerWidgets.length > 1 ? headerWidgets.at(-1) : undefined
   }
-  let headerContents: HTMLDivElement | undefined
-  let terminalField: HTMLDivElement | undefined
-
-  onMount(() => {
-    if (!headerContents || !terminalField) return
-    let inlineSize = -1
-    const updateHeaderContext = () => {
-      if (!headerContents || !terminalField) return
-      headerContents.dataset.shellContext = 'normal'
-      const identity = headerContents.querySelector<HTMLElement>(
-        '[data-shell=\'dashboard-header-identity\']'
-      )
-      if (!identity) return
-      headerContents.dataset.shellContext = terminalField.offsetTop > identity.offsetTop
-        ? 'wrapped'
-        : 'normal'
-    }
-    const observer = new ResizeObserver(entries => {
-      const nextInlineSize = entries[0]?.contentRect.width ?? 0
-      if (nextInlineSize === inlineSize) return
-      inlineSize = nextInlineSize
-      updateHeaderContext()
-    })
-
-    observer.observe(headerContents)
-    updateHeaderContext()
-    onCleanup(() => observer.disconnect())
-  })
-
   return (
     <div data-shell='dashboard'>
       <header data-shell='dashboard-header'>
-        <div
-          data-shell='dashboard-header-contents'
-          data-shell-context='normal'
-          ref={element => {
-            headerContents = element
-          }}
-        >
+        <div data-shell='dashboard-header-contents'>
           <div data-shell='dashboard-header-identity'>
             <div data-shell='dashboard-header-logo-field'>
               <img
@@ -95,12 +60,7 @@ export const Dashboard = (): UiComponent => {
           </For>
           <Show when={headerTerminal()}>
             {widget => (
-              <div
-                data-shell='dashboard-header-terminal-field'
-                ref={element => {
-                  terminalField = element
-                }}
-              >
+              <div data-shell='dashboard-header-terminal-field'>
                 <DashboardWidgetContent widget={widget()} />
               </div>
             )}
