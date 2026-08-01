@@ -20,6 +20,7 @@
   --dashboard-header-field-short: var(--sa-touch-target-sm);
   --dashboard-header-field-tall: calc(var(--sa-touch-target-sm) * 2);
   backdrop-filter: var(--sa-shell-filter);
+  container: dashboard-header / inline-size;
   background: var(--sa-shell-bg);
   border-block-end: var(--sa-shell-border);
   box-shadow: var(--sa-shell-shadow);
@@ -37,7 +38,7 @@
   align-items: stretch;
   column-gap: var(--sa-rhythm-gap);
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   inline-size: 100%;
   justify-content: flex-start;
   margin-inline: auto;
@@ -68,8 +69,10 @@
 
 [data-shell='dashboard-header-terminal-field'] {
   align-items: stretch;
+  container: dashboard-helm-field / inline-size;
   display: flex;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
+  justify-content: flex-end;
   min-block-size: var(--dashboard-header-field-short);
   min-inline-size: 0;
 }
@@ -80,19 +83,13 @@
   border-radius: var(--sa-radius-sm);
 }
 
-@media (min-width: 561px) and (max-width: 1023px) {
+/* Stacked header: identity field and terminal field no longer share a row. */
+/* Threshold is the width below which identity + gap + dense actions stop fitting. */
+@container dashboard-header (max-width: 464px) {
   [data-shell='dashboard-header-contents'] {
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
   }
-}
 
-@media (min-width: 561px) {
-  [data-shell='dashboard-header-terminal-field'] {
-    margin-inline-start: auto;
-  }
-}
-
-@media (max-width: 560px) {
   [data-shell='dashboard-header-identity'] {
     flex: 1 0 100%;
     grid-template-columns: var(--sa-touch-target) max-content;
@@ -101,7 +98,6 @@
 
   [data-shell='dashboard-header-terminal-field'] {
     flex-basis: 100%;
-    margin-inline-start: 0;
   }
 }
 
