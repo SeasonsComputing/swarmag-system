@@ -57,7 +57,7 @@ const SgHeader = (): UiComponent => {
           <UiLayout variant='inline'>
             <img data-app='style-guide-header-icon' src={icon} alt='' width={64} height={64} />
             <UiLayout gap='tight'>
-              <h1>
+              <h1 data-app='style-guide-header-title'>
                 swarmAg <span data-app='style-guide-nowrap'>Style Guide</span>
               </h1>
               <p data-app='style-guide-header-subtitle'>
@@ -66,7 +66,11 @@ const SgHeader = (): UiComponent => {
             </UiLayout>
           </UiLayout>
         </div>
-        <UiToggleGroup<Theme> value={theme()} onChange={setTheme}>
+        <UiToggleGroup<Theme>
+          data-app='style-guide-theme-switcher'
+          value={theme()}
+          onChange={setTheme}
+        >
           <UiToggleItem value='dark'>Dark</UiToggleItem>
           <UiToggleItem value='light'>Light</UiToggleItem>
         </UiToggleGroup>
@@ -365,7 +369,7 @@ export const StyleGuide = (): UiComponent => {
               <For each={COLOR_SWATCHES}>
                 {s => (
                   <UiFieldset legend={s.legend}>
-                    <UiLayout variant='inline-fill'>
+                    <UiLayout variant='inline-wrap' data-app='style-guide-color-swatches'>
                       <For each={s.colors}>
                         {c => <SgSwatch value={c.value} label={c.label} token={c.token} />}
                       </For>
@@ -375,16 +379,20 @@ export const StyleGuide = (): UiComponent => {
               </For>
             </UiLayout>
             <UiFieldset legend='Gradients'>
-              <UiLayout variant='inline-wrap'>
+              <UiLayout variant='inline-wrap' data-app='style-guide-color-gradients'>
                 <For each={COLOR_GRADIENTS}>
                   {g => <SgGradient value={g.value} label={g.label} token={g.token} />}
                 </For>
               </UiLayout>
             </UiFieldset>
             <UiFieldset legend='Text'>
-              <UiLayout variant='inline-wrap'>
+              <UiLayout variant='inline-wrap' data-app='style-guide-color-text'>
                 <For each={TEXT_TOKENS}>
-                  {t => <span style={{ color: `var(${t})` }}>{t}</span>}
+                  {t => (
+                    <span data-app='style-guide-color-text-token' style={{ color: `var(${t})` }}>
+                      {t}
+                    </span>
+                  )}
                 </For>
               </UiLayout>
             </UiFieldset>
@@ -690,10 +698,10 @@ export const StyleGuide = (): UiComponent => {
             <UiFieldset legend='Loading Indicators'>
               <UiLayout>
                 <UiSkeleton />
-                <div data-app='style-guide-skeleton-75'>
+                <div data-app='style-guide-skeleton' data-app-width='three-quarters'>
                   <UiSkeleton />
                 </div>
-                <div data-app='style-guide-skeleton-50'>
+                <div data-app='style-guide-skeleton' data-app-width='half'>
                   <UiSkeleton />
                 </div>
               </UiLayout>
