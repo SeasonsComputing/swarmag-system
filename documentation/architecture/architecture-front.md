@@ -712,15 +712,24 @@ inline and block footprint together with its row context. As available space con
 widgets may adapt their presentation; when the field needs more space, it adds rows
 while retaining ordered placement. The shell does not require horizontal scrolling.
 
-The header provides paired contexts: `normal/tall` for its primary inner row and
-`wrapped/short` for a following inner row. `normal|wrapped` names row context;
-`tall|short` names block allocation. This header deliberately pairs them. They are
-container-provided contexts, not viewport modes or literal fixed dimensions. The
-leading identity field (shell logo + BrandWidget) and terminal ActionWidget are header
-bookends. When ActionWidget receives a wrapped/short field, that field spans the
-entire post-gutter inner row.
+The header provides two deterministic responsive contexts. Above `560px`, the leading
+identity field (shell logo + BrandWidget) and terminal HelmWidget share the primary
+row. At or below `560px`, the identity field occupies its own row and the terminal
+field spans the following short action row. CSS selects the context before layout;
+the shell does not measure rendered positions or mutate context after mount.
 
-ActionWidget owns how its controls use the field.
+From `561px` through `1023px`, the header remains a single non-wrapping row. This
+keeps the icon-only HelmWidget beside identity until the shell's short-row
+breakpoint applies. Above the short-row breakpoint, the terminal field and
+HelmWidget shrink-wrap their action content and remain anchored to the
+header's inline end. The terminal field expands to the full following row only at or
+below `560px`.
+
+HelmWidget owns action placement within its field. At or above `1024px`,
+it presents labeled controls in the shared row. Below `1024px`, it presents dense icon
+controls; the `560px` shell breakpoint still determines only the stacked header layout.
+Each control retains its accessible label, and its circle and glyph scale together with
+density. Below `380px`, the shared base scale provides the remaining reduction.
 
 `compact` and `landscape` are widget presentation shapes, not shell geometry. A
 widget uses its configured shape to express its data within the footprint allocated
@@ -749,7 +758,7 @@ The app-local dashboard JSON conforms to `DashboardView` from `source/front/ux/v
     "widgets": [
       { "type": "BrandWidget", "settings": { "shape": "landscape" } },
       {
-        "type": "ActionWidget",
+        "type": "HelmWidget",
         "settings": {
           "shape": "compact",
           "actions": ["/about", "/logout"],

@@ -65,8 +65,8 @@
   border-radius: var(--sa-radius-full);
   display: inline-flex;
   justify-content: center;
-  min-block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
-  min-inline-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
+  block-size: calc(var(--sa-space-xl) - var(--sa-space-xs));
+  inline-size: calc(var(--sa-space-xl) - var(--sa-space-xs));
 }
 
 [data-app='users-page'] [data-app='user-status-pill'][data-app-status='active'] {
@@ -81,9 +81,9 @@
 
 [data-app='users-page'] [data-app='user-status'] {
   background: currentColor;
-  block-size: 1rem;
+  block-size: var(--sa-space-md);
   display: inline-block;
-  inline-size: 1rem;
+  inline-size: var(--sa-space-md);
 }
 
 [data-app='users-page']

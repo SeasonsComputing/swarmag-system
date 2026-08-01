@@ -23,6 +23,9 @@ export type UiActionButtonVariant = 'default' | 'danger'
 /** Action button label presentation. */
 export type UiActionButtonLabelMode = 'reveal' | 'visible'
 
+/** Action button visual density. */
+export type UiActionButtonDensity = 'standard' | 'dense'
+
 /** Action button icon alignment when the label is visible. */
 export type UiActionButtonAlign = 'start' | 'end'
 
@@ -37,6 +40,7 @@ export type UiActionButtonProps =
     | 'aria-label'
     | 'data-ui'
     | 'data-ui-align'
+    | 'data-ui-density'
     | 'data-ui-icon'
     | 'data-ui-label-mode'
     | 'data-ui-state'
@@ -45,6 +49,7 @@ export type UiActionButtonProps =
   & {
     align?: UiActionButtonAlign
     disabled?: boolean
+    density?: UiActionButtonDensity
     error?: boolean
     icon: string
     label: string
@@ -56,6 +61,7 @@ export type UiActionButtonProps =
     style?: never
     'data-ui'?: never
     'data-ui-align'?: never
+    'data-ui-density'?: never
     'data-ui-icon'?: never
     'data-ui-label-mode'?: never
     'data-ui-state'?: never
@@ -67,6 +73,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'align',
     'disabled',
+    'density',
     'error',
     'icon',
     'label',
@@ -77,6 +84,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
     'classList',
     'style',
     'data-ui',
+    'data-ui-density',
     'data-ui-icon',
     'data-ui-label-mode',
     'data-ui-state',
@@ -89,6 +97,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
       aria-label={local.label}
       data-ui='action-button'
       data-ui-align={local.align ?? 'end'}
+      data-ui-density={local.density ?? 'standard'}
       data-ui-icon={local.icon}
       data-ui-label-mode={local.labelMode ?? 'reveal'}
       data-ui-state={controlState(local)}
@@ -97,7 +106,9 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
       tabIndex={isDisabled() ? -1 : others.tabIndex}
       type={others.type ?? 'button'}
     >
-      <span aria-hidden='true' data-ui='action-button-icon' />
+      <span aria-hidden='true' data-ui='action-button-frame'>
+        <span data-ui='action-button-icon' />
+      </span>
       <span aria-hidden='true' data-ui='action-button-label'>{local.label}</span>
     </Button>
   )

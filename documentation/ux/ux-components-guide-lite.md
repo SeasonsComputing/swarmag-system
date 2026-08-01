@@ -301,7 +301,8 @@ Use for compact icon actions on dense surfaces such as table rows.
 Required props: `icon`, `label`.
 Icon value: any icon catalog name defined in `icons.css`.
 Variants: `default`, `danger`.
-Other key props: `align`, `labelMode`, `loading`, `error`, `disabled`.
+Other key props: `align`, `density` (`standard` or `dense`), `labelMode`, `loading`,
+`error`, `disabled`.
 
 `label` is the accessible `aria-label` and is revealed on hover and focus.
 Use `labelMode='visible'` when the label should be visible and part of the

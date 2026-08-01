@@ -22,7 +22,7 @@ Last commit: `a6f9fdb` (icon catalog work, committed during this session).
 ## What shipped
 
 **Icon catalog generalization (committed).** Completed the interrupted ACE work.
-The ActionWidget config layer was already general; the `UiActionButton` glyph
+The HelmWidget config layer was already general; the `UiActionButton` glyph
 binding was not — it was 18 hand-written per-icon CSS rules. Now `icons.css`
 maps `[data-ui-icon='name'] { --sa-icon: url(...) }`; the custom property
 inherits into the icon span and its `::before`, where two generic

@@ -174,6 +174,7 @@ export const AbstractionManager = <T extends Instance>(
                                   icon={action.icon}
                                   label={action.label}
                                   variant={action.variant}
+                                  density='standard'
                                   onClick={event => {
                                     event.stopPropagation()
                                     requestAction(action, item)
@@ -184,6 +185,7 @@ export const AbstractionManager = <T extends Instance>(
                             <UiActionButton
                               icon='pencil-1'
                               label='Edit'
+                              density='standard'
                               onClick={() => onSelect(item)}
                             />
                           </UiTableCell>

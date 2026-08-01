@@ -6,8 +6,8 @@
 import { bootstrap } from '@front/ux/shell/bootstrap.tsx'
 
 // shell bindings
-import { ActionWidget } from '@front/ux/widgets/action-widget.tsx'
 import { BrandWidget } from '@front/ux/widgets/brand-widget.tsx'
+import { HelmWidget } from '@front/ux/widgets/helm-widget.tsx'
 import dashboardSeed from './dashboard-ops.json' with { type: 'json' }
 
-void bootstrap(dashboardSeed, { widgets: { BrandWidget, ActionWidget } })
+void bootstrap(dashboardSeed, { widgets: { BrandWidget, HelmWidget } })

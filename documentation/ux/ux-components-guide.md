@@ -750,23 +750,27 @@ hit target. Use `variant='danger'` for destructive actions.
 
 Extends native button attributes, excluding styling and semantic hook props.
 
-| Prop        | Type                    | Default    | Description                                       |
-| ----------- | ----------------------- | ---------- | ------------------------------------------------- |
-| `icon`      | `string`                | —          | Icon catalog name to display.                     |
-| `label`     | `string`                | —          | Accessible label and optional visible label text. |
-| `labelMode` | `'reveal' \| 'visible'` | `'reveal'` | Label presentation.                               |
-| `align`     | `'start' \| 'end'`      | `'end'`    | Icon position when the label is visible.          |
-| `variant`   | `'default' \| 'danger'` | unset      | Visual/action priority.                           |
-| `error`     | `boolean`               | `false`    | Emits error state.                                |
-| `loading`   | `boolean`               | `false`    | Emits loading state; disables button.             |
-| `disabled`  | `boolean`               | `false`    | Native disabled behavior.                         |
+| Prop        | Type                    | Default      | Description                                       |
+| ----------- | ----------------------- | ------------ | ------------------------------------------------- |
+| `icon`      | `string`                | —            | Icon catalog name to display.                     |
+| `label`     | `string`                | —            | Accessible label and optional visible label text. |
+| `labelMode` | `'reveal' \| 'visible'` | `'reveal'`   | Label presentation.                               |
+| `density`   | `'standard' \| 'dense'` | `'standard'` | Visual ring and glyph density.                    |
+| `align`     | `'start' \| 'end'`      | `'end'`      | Icon position when the label is visible.          |
+| `variant`   | `'default' \| 'danger'` | unset        | Visual/action priority.                           |
+| `error`     | `boolean`               | `false`      | Emits error state.                                |
+| `loading`   | `boolean`               | `false`      | Emits loading state; disables button.             |
+| `disabled`  | `boolean`               | `false`      | Native disabled behavior.                         |
 
 `loading` and `disabled` both disable the rendered button and suppress tab focus.
 
 **Emitted Attributes**
 
-`data-ui='action-button'`, `data-ui-align`, `data-ui-icon`, `data-ui-label-mode`,
-`data-ui-state`, `data-ui-variant`.
+`data-ui='action-button'`, `data-ui-align`, `data-ui-density`, `data-ui-icon`,
+`data-ui-label-mode`, `data-ui-state`, `data-ui-variant`.
+
+`density` scales the circular button and glyph together. Use `standard` for ordinary
+actions and `dense` for constrained action rows.
 
 The `icon` value passes directly to the icon catalog (`icons.css`). Every
 catalog name is valid for an action button.

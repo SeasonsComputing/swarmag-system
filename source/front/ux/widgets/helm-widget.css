@@ -1,0 +1,43 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Helm widget styles                                                             ║
+║ Terminal route action presentation for the dashboard field.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-widget='helm-widget'] {
+  flex: 0 1 auto;
+  min-block-size: 100%;
+  min-inline-size: 0;
+}
+
+[data-widget='helm-widget'] [data-ui='layout'] {
+  block-size: 100%;
+  gap: var(--sa-rhythm-pad);
+  justify-content: flex-end;
+  row-gap: 0;
+  width: fit-content;
+}
+
+@media (max-width: 1023px) {
+  [data-widget='helm-widget'] [data-ui='action-button'] {
+    color: var(--sa-color-primary);
+  }
+
+  [data-widget='helm-widget'] [data-ui='action-button'] [data-ui='action-button-label'] {
+    display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  [data-widget='helm-widget'] {
+    flex: 1 1 auto;
+    min-inline-size: 100%;
+  }
+
+  [data-widget='helm-widget'] [data-ui='layout'] {
+    flex-wrap: nowrap;
+    justify-content: space-around;
+    width: 100%;
+  }
+}
