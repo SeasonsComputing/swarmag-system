@@ -197,7 +197,7 @@ All entries in `source/front/api/api.ts`:
 | -------------------- | ---------------------------------------------------- |
 | `api.deepCloneJob`   | Clone job aggregate to IndexedDB for field execution |
 | `api.uploadJobLogs`  | Bulk append field logs to remote                     |
-| `api.createJobTitle` | Derive display title string from a `JobDefinition`   |
+| `api.createJobTitle` | Derive display title string from a `JobHub`          |
 
 **`api.Users`**
 
@@ -226,14 +226,14 @@ one-time codes to unknown or inactive users.
 **`api.deepCloneJob`**
 
 ```typescript
-api.deepCloneJob.run({ jobId: Id }): Promise<JobDefinition>
+api.deepCloneJob.run({ jobId: Id }): Promise<JobHub>
 ```
 
 Creates a complete field-execution copy of a job aggregate for local IndexedDB
 storage. The clone includes the job, phase records, finalized or preparatory
 workflow context, and referenced operational data required for offline execution.
 
-The returned `JobDefinition` is defined in `source/front/ux/views/job-views.ts`.
+The returned `JobHub` is defined in `source/front/ux/views/job-views.ts`.
 
 **`api.uploadJobLogs`**
 
@@ -251,12 +251,12 @@ identity, answers, notes, attachments, and operational metadata.
 **`api.createJobTitle`**
 
 ```typescript
-api.createJobTitle(job: JobDefinition): string
+api.createJobTitle(job: JobHub): string
 ```
 
 Returns a display title derived from the job's current status and available phase data. This is a pure client-side computation — no network call. The derivation algorithm is status-driven and defined during jobs UI generation. For the scaffold phase, the method may be stubbed.
 
-`JobDefinition` is defined in `source/front/ux/views/job-views.ts`.
+`JobHub` is defined in `source/front/ux/views/job-views.ts`.
 
 ### 7.3 Provided Infrastructure
 
@@ -787,7 +787,7 @@ UX projection types — shapes that exist because the domain model does not surf
 
 | File                 | Types                                                                 | Purpose                                             |
 | -------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
-| `job-views.ts`       | `JobSummary`, `JobDefinition`                                         | Job display projections                             |
+| `job-views.ts`       | `JobManifest`, `JobHub`                                               | Job display projections                             |
 | `dashboard-views.ts` | `DashboardView`, `DashboardHeader`, `DashboardRow`, `DashboardWidget` | Dashboard layout schema types                       |
 | `workflow-views.ts`  | `WorkflowView`                                                        | Ordered tasks + questions resolved for renderer     |
 | `question-views.ts`  | `QuestionView`                                                        | Discriminated union flattened for workflow renderer |

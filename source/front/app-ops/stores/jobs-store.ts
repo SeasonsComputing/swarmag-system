@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Holds lightweight JobSummary entries for jobs cloned to this device. Backed
+Holds lightweight JobManifest entries for jobs cloned to this device. Backed
 by SolidJS createStore. Reads from IDB only — no Supabase calls. Full job
 aggregates are read from IDB on demand by the workflow engine only.
 
@@ -16,12 +16,12 @@ jobsStore  Reactive read store; exposes jobs array and isLoaded flag.
 loadJobs   Load the job manifest from local IndexedDB storage.
 */
 
-import type { JobSummary } from '@front/ux/views/job-views.ts'
+import type { JobManifest } from '@front/ux/views/job-views.ts'
 import { createStore } from '@solid-js/store'
 
 /** Ops job manifest store shape. */
 type JobsStore = {
-  jobs: JobSummary[]
+  jobs: JobManifest[]
   isLoaded: boolean
 }
 

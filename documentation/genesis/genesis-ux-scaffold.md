@@ -88,7 +88,7 @@ source/core/client/auth-supabase-client.ts
 
 #### 2.2.2 Specifications
 
-**`views/job.ts`**
+**`views/job-views.ts`**
 
 UX-local shared view types for job display. Consumed by both `app-admin` and
 `app-ops`. Not domain types — these are display projections only. No
@@ -96,7 +96,7 @@ infrastructure imports. No SolidJS imports. Pure types only.
 
 ```typescript
 /** Lightweight job manifest entry — device-local display projection. */
-export type JobSummary = {
+export type JobManifest = {
   id: Id
   status: JobStatus
   title: string // derived via api.createJobTitle; populated at IDB clone time
@@ -106,11 +106,11 @@ export type JobSummary = {
  * UX composite for job display and navigation across all lifecycle phases.
  * All phase fields are optional — availability depends on job status.
  */
-export type JobDefinition = {
+export type JobHub = {
+  manifest: JobManifest
   job: Job
   assessment?: JobAssessment
   plan?: JobPlan
-  summary?: JobSummary
 }
 ```
 
@@ -272,12 +272,12 @@ this device — not full aggregates. Full job trees are read from IDB on demand
 by the workflow engine only.
 
 - Backed by SolidJS `createStore`.
-- Import `JobSummary` from `@front/ux/views/job.ts`.
+- Import `JobManifest` from `@front/ux/views/job-views.ts`.
 - Shape:
 
 ```typescript
 type JobsStore = {
-  jobs: JobSummary[]
+  jobs: JobManifest[]
   isLoaded: boolean
 }
 ```
@@ -387,8 +387,8 @@ Responses that include code changes must include:
 Before reporting `STYLE_AUDIT: PASS`:
 
 - All Common UX artifacts conform to `architecture-front.md` §6.3-§6.8.
-- `source/front/ux/views/job.ts` exists and exports `JobSummary` and
-  `JobDefinition` as pure types with no infrastructure imports.
+- `source/front/ux/views/job-views.ts` exists and exports `JobManifest` and
+  `JobHub` as pure types with no infrastructure imports.
 - `auth-guard.tsx` is at `source/front/ux/ui/shell/auth-guard.tsx`.
 - `session-state.ts` exports `SessionState` with `store`, `setAuth`, `setUser`,
   `setReady`, and `clear`. No raw setter calls outside this module.
@@ -405,8 +405,8 @@ Before reporting `STYLE_AUDIT: PASS`:
   result to `SessionState.setUser`; calls `SessionState.setReady`; uses store name
   `'swarmag-customer-app'`; imports `Config` from `@front/config/ux-config.ts`;
   does not write `dashboard:panels` key.
-- `jobs-store.ts`: imports `JobSummary` from `@front/ux/views/job.ts`; shape
-  uses `JobSummary[]` and `isLoaded`; `loadJobs()` reads from IDB and sets
+- `jobs-store.ts`: imports `JobManifest` from `@front/ux/views/job-views.ts`; shape
+  uses `JobManifest[]` and `isLoaded`; `loadJobs()` reads from IDB and sets
   `isLoaded: true`; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from
   `session-state.ts` directly.
