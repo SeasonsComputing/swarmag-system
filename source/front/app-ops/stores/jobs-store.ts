@@ -14,6 +14,9 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 jobsStore  Reactive read store; exposes jobs array and isLoaded flag.
 loadJobs   Load the job manifest from local IndexedDB storage.
+
+CA NOTE -- THIS MUST BE REFACTORED TO FOLLOW THE CONVENTIONS OF THE REST OF THE CODEBASE.
+           SEE ux/stores
 */
 
 import type { JobManifest } from '@front/ux/views/job-views.ts'
