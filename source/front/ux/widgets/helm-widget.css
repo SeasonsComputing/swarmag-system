@@ -19,7 +19,9 @@
   width: fit-content;
 }
 
-@media (max-width: 1023px) {
+/* Dense controls: the allocated field can no longer carry labeled actions. */
+/* Threshold is the labeled cluster's intrinsic width plus the header gap. */
+@container dashboard-helm-field (max-width: 464px) {
   [data-widget='helm-widget'] [data-ui='action-button'] {
     color: var(--sa-color-primary);
   }
@@ -29,7 +31,8 @@
   }
 }
 
-@media (max-width: 560px) {
+/* Stacked header: the field spans its own row, so actions distribute across it. */
+@container dashboard-header (max-width: 464px) {
   [data-widget='helm-widget'] {
     flex: 1 1 auto;
     min-inline-size: 100%;
