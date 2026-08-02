@@ -212,7 +212,6 @@ async function applySession(session: Session | null): Promise<void> {
 
   // authenticated, preserve id in session store
   api.SessionState.setAuth(session.userId)
-  // TODO: should we compare user ID's as well as non-null???
   if (api.SessionState.store.user) return // user already loaded
 
   // authenticated, now load user, validate and preserve in session store,
