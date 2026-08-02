@@ -408,7 +408,6 @@ const waitForLoginReady = async (cdp: CdpClient): Promise<void> => {
 
 const rootUrl = (target: SmokeTarget): string => new URL('/', target.url).href
 const loginUrl = (target: SmokeTarget): string => new URL('/login', target.url).href
-const dashboardUrl = (target: SmokeTarget): string => new URL('/dashboard', target.url).href
 
 const assertHttpOk = async (url: string, label: string): Promise<Response> => {
   const response = await fetch(url, { signal: AbortSignal.timeout(HTTP_TIMEOUT_MS) })
@@ -497,7 +496,7 @@ const smokeProtectedRoute = async (
 ): Promise<void> => {
   const cdp = await createBrowserPage(port)
   try {
-    await cdp.send('Page.navigate', { url: dashboardUrl(target) })
+    await cdp.send('Page.navigate', { url: rootUrl(target) })
     await waitForLoginReady(cdp)
     const state = await evaluate(
       cdp,

@@ -116,7 +116,7 @@ const ShellWorkbenchRoute = (props: { workbench: ShellWorkbench }) => {
   const navigate = useNavigate()
   const WorkbenchComponent = props.workbench.component
   const close = (): void => {
-    void navigate({ to: '/dashboard' })
+    void navigate({ to: '/' })
   }
   const onOpenChange = (open: boolean): void => {
     if (!open) close()
