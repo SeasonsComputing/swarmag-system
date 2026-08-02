@@ -15,7 +15,7 @@ Wizard                  The wizard host component.
 WizardProps             Props for the wizard host.
 */
 
-import { UiActionButton, UiButton, type UiComponent, UiList, UiListItem } from '@front/ux/ui'
+import { UiActionButton, type UiComponent, UiList, UiListItem } from '@front/ux/ui'
 import { createMemo, createSignal, For, Show } from '@solid-js'
 import { PanelContainer } from './panel-container.tsx'
 import type { PanelFeedback } from './panel-contract.ts'
@@ -139,14 +139,17 @@ export const Wizard = (props: WizardProps): UiComponent => {
           feedback={banner()}
           header={{
             leading: (
-              <UiActionButton
-                align='start'
-                icon='arrow-left'
-                label='Back'
-                labelMode='visible'
-                disabled={isFirst() || committing()}
-                onClick={back}
-              />
+              <>
+                <UiActionButton
+                  align='start'
+                  icon='arrow-left'
+                  label='Back'
+                  labelMode='visible'
+                  disabled={isFirst() || committing()}
+                  onClick={back}
+                />
+                <h2 data-shell='wizard-form-stage-title'>{stage().title}</h2>
+              </>
             ),
             trailing: (
               <Show
@@ -162,14 +165,14 @@ export const Wizard = (props: WizardProps): UiComponent => {
                   />
                 }
               >
-                <UiButton
-                  variant='primary'
+                <UiActionButton
+                  icon='check'
+                  label='Finish'
+                  labelMode='visible'
                   disabled={committing()}
                   loading={committing()}
                   onClick={() => void advance()}
-                >
-                  Finish
-                </UiButton>
+                />
               </Show>
             )
           }}

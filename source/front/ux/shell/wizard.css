@@ -108,6 +108,15 @@
   animation: sa-fade-in var(--sa-motion-page-fade) ease;
 }
 
+[data-shell='wizard-form-stage-title'] {
+  color: var(--sa-color-primary);
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-shell='wizard-stage'] {
     animation: none;
