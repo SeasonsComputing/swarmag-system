@@ -21,3 +21,27 @@
   gap: var(--sa-space-xl);
   max-width: var(--sa-size-min);
 }
+
+[data-shell='login-feedback'] {
+  block-size: var(--sa-touch-target-sm);
+  position: relative;
+}
+
+[data-shell='login-feedback'] > [data-ui='alert'] {
+  inset-block-start: 0;
+  inset-inline: 0;
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+  transform: translateY(var(--sa-space-sm));
+  transition: var(--sa-transition-panel);
+  visibility: hidden;
+}
+
+[data-shell='login-feedback'][data-shell-state='visible'] > [data-ui='alert'] {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+  transition: var(--sa-transition-panel-active);
+  visibility: visible;
+}
