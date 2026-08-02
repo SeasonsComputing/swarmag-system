@@ -25,7 +25,6 @@ import {
   dashboard,
   dialog,
   page,
-  redirect,
   type Shell,
   type ShellDialog,
   type ShellRoute,
@@ -37,7 +36,6 @@ export const anonymousShell = (): Shell => ({
   component: () => <Outlet />,
   initializers: [],
   routes: [
-    redirect('/', '/dashboard'),
     page('/login', Login),
     transition('/logout', logout, '/login')
   ]
@@ -80,7 +78,7 @@ export function dialogRoute(parentRoute: AnyRoute, dialog: ShellDialog): AnyRout
     component: () => {
       const navigate = useNavigate()
       const close = (): void => {
-        void navigate({ to: '/dashboard' })
+        void navigate({ to: '/' })
       }
       const onOpenChange = (open: boolean): void => {
         if (!open) close()

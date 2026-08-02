@@ -17,7 +17,7 @@ import dashboardSeed from './dashboard-admin.json' with { type: 'json' }
 void bootstrap(
   application([
     anonymousShell(),
-    dashboardShell('/dashboard', dashboardSeed, widgetRegistry(), [
+    dashboardShell('/', dashboardSeed, widgetRegistry(), [
       workbench('/onboarding', Onboarding),
       workbench('/users', UserManager)
     ])

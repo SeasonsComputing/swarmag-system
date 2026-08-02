@@ -115,7 +115,7 @@ const LoginClient = (props: LoginClientProps) => {
   return (
     <Show
       when={loginRequired()}
-      fallback={<Navigate to='/dashboard' replace />}
+      fallback={<Navigate to='/' replace />}
     >
       <div data-shell='login'>
         <div data-shell='login-layout'>

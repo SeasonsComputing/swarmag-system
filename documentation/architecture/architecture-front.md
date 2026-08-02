@@ -373,7 +373,7 @@ Authenticated routes render their primary application surface inside a semantic
 `main` landmark. `main` is required accessibility plumbing, not a UX metaphor or
 shared shell primitive.
 
-`Login`, `AuthGuard`, `Dashboard`, and shared stores live in `source/front/ux/shell`. App packages provide dashboard configuration (`app-{admin|ops|customer}-dashboard.json`), the widget registry (`BootstrapOptions.widgets` — the composition root binding concrete widgets to the shell), and app-specific routes, dialogs, and features.
+`Login`, `AuthGuard`, `Dashboard` live in `source/front/ux/shell`. Each app package declares a complete `Application`: a common anonymous shell plus a dashboard shell. The dashboard shell receives its app-local dashboard configuration (`app-{admin|ops|customer}-dashboard.json`), explicit widget registry, and app-specific route presentations before shared bootstrap mounts it.
 
 #### 9.1.1 UX Metaphors
 
@@ -401,23 +401,22 @@ dashboard → domain page → back to dashboard
 
 ### 9.2 Routing
 
-Common routes (`/`, `/login`, `/dashboard`) are provided by `bootstrap()` in `source/front/ux/shell/bootstrap.tsx`. Each app root extends the route tree in its own `app.tsx` as pages are added. There is no shared route registry.
+Common routes are supplied by the anonymous and dashboard shell makers in `source/front/ux/shell`. Each app root declares its complete shell collection in `app.tsx`, including app-specific dashboard presentations. `bootstrap()` compiles that collection; it does not accept raw route extensions or optional composition fragments.
 
 A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
 
 #### 9.2.1 Route Shape
 
 ```text
-/                          → redirect to /dashboard or /login
+/                          → dashboard (auth-guarded)
 /login                     → login (unauthenticated)
-/dashboard                 → dashboard (auth-guarded)
 /{page}                    → page (auth-guarded)
 /{page}/{id}               → item-scoped page (auth-guarded)
 /{page}/{operation}        → operation-scoped page (auth-guarded)
 /{page}/{operation}/{id}   → item-scoped operation page (auth-guarded)
 ```
 
-The first three routes are provided by `bootstrap()` and are common to all apps. App-local `app.tsx` files extend the tree with app-specific pages as the application is built out.
+The first two routes are provided by the shared shell makers and are common to all apps. App-local `app.tsx` files extend the tree with app-specific pages as the application is built out.
 
 Examples: `/user/list`, `/user/get/{id}`, `/job-runner/{id}`.
 
@@ -687,7 +686,7 @@ swarmag-app-customer = front/app-customer + front/ux + front/api + front/config
 - `ux/config/` contains two files when packaged: `ux-config.ts` and the target env file
 - The target env file binds the static bundle to one backend target; the same
   bundle may be served locally or remotely without changing that binding
-- `bootstrap()` owns boot-time initializations — CSS barrel (`css.tsx`) and config (`ux-config.ts`). App roots (`app.tsx`) are minimal — `bootstrap(dashboardSeed)` call and app-specific route extensions only
+- `bootstrap()` owns global boot-time initialization — CSS barrel (`css.tsx`), config (`ux-config.ts`), session synchronization, and router mounting. App roots (`app.tsx`) declare a complete `Application` and pass it to `bootstrap(application)`
 - Packaging, artifact format, and deployment workflow: see `architecture-devops.md §7`
 - No build artifacts are checked into the repository
 
@@ -759,7 +758,7 @@ Layout is data-driven via app-local dashboard JSON, rendered by the shared dashb
 
 The app-local dashboard JSON conforms to `DashboardView` from `source/front/ux/views/dashboard-views.ts`. `DashboardState.init(seed)`validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
-`bootstrap()` initializes `DashboardState`, then provides it with the app-supplied widget registry through `DashboardProvider` (`source/front/ux/shell/dashboard-provider.tsx`). The registry is composition data: each app package binds concrete widgets to the shell at bootstrap (`BootstrapOptions.widgets`) alongside its dashboard JSON — the two halves of one composition statement. The shell knows widgets only through the widget SPI (`source/front/ux/widgets/widget.tsx`: `WidgetComponent`, `WidgetRegistry`, `WidgetProvider`/`useWidget`); widgets never import the shell — host context (application identity) flows down through `WidgetProvider`. Both directions are guard-enforced (`guard-namespaces` rules 4 and 5). Dashboard renderers consume the combined runtime contract through `useDashboard()`. Dashboard state remains a Reactive Store Module; the context injects its namespace contract and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@front/api` namespace.
+`dashboardShell()` initializes `DashboardState`, then provides it with the app-supplied widget registry through `DashboardProvider` (`source/front/ux/shell/dashboard-provider.tsx`). The registry is composition data: each app package binds explicit dashboard widget type keys to concrete widgets alongside its dashboard JSON — the two halves of one dashboard-shell declaration. The shell knows widgets only through the widget SPI (`source/front/ux/widgets/widget.tsx`: `WidgetComponent`, `WidgetRegistry`, `WidgetProvider`/`useWidget`); widgets never import the shell — host context (application identity) flows down through `WidgetProvider`. Both directions are guard-enforced (`guard-namespaces` rules 4 and 5). Dashboard renderers consume the combined runtime contract through `useDashboard()`. Dashboard state remains a Reactive Store Module; the context injects its namespace contract and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@front/api` namespace.
 
 ```json
 {

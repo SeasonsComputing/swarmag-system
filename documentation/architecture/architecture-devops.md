@@ -507,7 +507,7 @@ The smoke script verifies:
 - Built CSS responds successfully and has the immutable one-year cache policy
 - Referenced font assets respond successfully
 - The login screen becomes browser-ready in headless Chrome
-- Protected `/dashboard` routes redirect to `/login`
+- Protected `/` routes redirect to `/login`
 - Protected routes do not render dashboard content before authentication
 - Protected routes do not contact the target backend before authentication
 - Browser runtime errors fail the smoke test
