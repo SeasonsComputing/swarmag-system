@@ -6,22 +6,22 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Renders the product and application names in the dashboard header, read from
-the host-supplied widget context — never from the shell directly.
+Renders the product and application names in the dashboard header from the
+shared shell identity service.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 BrandWidget  Dashboard header brand widget.
 */
 
+import { getShellIdentity } from '@front/ux/shell/shell-metadata.ts'
 import { type UiComponent, UiLayout } from '@front/ux/ui'
-import { useWidget } from './widget.tsx'
 
 import './brand-widget.css'
 
 /** Dashboard header brand widget. */
 export const BrandWidget = (): UiComponent => {
-  const { identity } = useWidget()
+  const identity = getShellIdentity()
   return (
     <div data-widget='brand-widget'>
       <UiLayout gap='tight'>

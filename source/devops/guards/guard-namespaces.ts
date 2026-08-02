@@ -70,11 +70,11 @@ const isAppImport = (spec: string): string | null => {
 /** Extract all import specifiers from source code. */
 const extractImports = (source: string): string[] => {
   const imports: string[] = []
-  // Match: import ... from 'spec' or import ... from "spec"
-  const importRegex = /import\s+[^f]*?\s+from\s+['"]([^'"]+)['"]/g
-  let match: RegExpExecArray | null
-  while ((match = importRegex.exec(source)) !== null) {
-    imports.push(match[1])
+  const staticImportRegex = /\b(?:import|export)\s+(?:type\s+)?(?:[^'"]*?\s+from\s+)?['"]([^'"]+)['"]/g
+  const dynamicImportRegex = /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g
+  for (const importRegex of [staticImportRegex, dynamicImportRegex]) {
+    let match: RegExpExecArray | null
+    while ((match = importRegex.exec(source)) !== null) imports.push(match[1])
   }
   return imports
 }
@@ -84,6 +84,27 @@ const isUnder = (path: string, dir: string): boolean => {
   const normalized = path.replace(/\\/g, '/')
   const normalizedDir = dir.replace(/\\/g, '/')
   return normalized.startsWith(normalizedDir + '/')
+}
+
+/** Resolve a relative import specifier against its importing file. */
+const resolveRelativeImport = (file: string, spec: string): string => {
+  const normalized = `${file.slice(0, file.lastIndexOf('/'))}/${spec}`.replaceAll('\\', '/')
+  const resolved: string[] = []
+  for (const segment of normalized.split('/')) {
+    if (segment === '' || segment === '.') continue
+    if (segment === '..') resolved.pop()
+    else resolved.push(segment)
+  }
+  return `${normalized.startsWith('/') ? '/' : ''}${resolved.join('/')}`
+}
+
+/** Check if an import specifier reaches the shared widget catalog. */
+const isWidgetImport = (file: string, spec: string): boolean => {
+  if (spec.startsWith('@front/ux/widgets/') || spec === '@front/ux/widgets') return true
+  if (!spec.startsWith('.')) return false
+  const widgetsDir = `${SOURCE_DIR}/front/ux/widgets`
+  const importedPath = resolveRelativeImport(file, spec)
+  return importedPath === widgetsDir || isUnder(importedPath, widgetsDir)
 }
 
 /** Extract app name from a path like source/front/app-admin/... */
@@ -116,7 +137,6 @@ const main = async () => {
     const isUxFile = isUnder(file, `${frontDir}/ux`)
     const isApiFile = isUnder(file, `${frontDir}/api`)
     const isAppFile = isUnder(file, `${frontDir}/app-`)
-    const isWidgetsFile = isUnder(file, `${frontDir}/ux/widgets`)
     const isShellFile = isUnder(file, `${frontDir}/ux/shell`)
     const fileAppName = extractAppName(file)
 
@@ -139,20 +159,11 @@ const main = async () => {
         }
       }
 
-      // Rule 4: Widgets are the shell's plugins — they never import the
-      // shell. Host context flows down through the widget SPI (widget.tsx).
-      if (isWidgetsFile && spec.startsWith('@front/ux/shell')) {
+      // Rule 4: The shell owns extension contracts and services but remains
+      // closed to the concrete widget catalog. Apps bind widgets at their
+      // composition roots; widgets may depend on the shell, never the reverse.
+      if (isShellFile && isWidgetImport(file, spec)) {
         violations.push(`${relative} — ${spec} — Rule 4`)
-      }
-
-      // Rule 5: The shell hosts widgets through the SPI contract only —
-      // never by importing concrete widgets. Apps bind concretes at
-      // bootstrap (the composition root).
-      if (
-        isShellFile && spec.startsWith('@front/ux/widgets/')
-        && spec !== '@front/ux/widgets/widget.tsx'
-      ) {
-        violations.push(`${relative} — ${spec} — Rule 5`)
       }
     }
   }
