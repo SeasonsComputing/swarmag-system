@@ -1,38 +1,28 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Logout                                                                       ║
-║ Route component for terminating the active auth session.                     ║
+║ Transition work for terminating the active auth session.                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Runs the logout sequence once on route mount, clears local session state, and
-redirects to the login route.
+Terminates the remote auth session when possible and always clears local session
+state. Route navigation is owned by the shell transition that invokes this work.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Logout  Route component for logout.
+logout  Ends the active session and clears local session state.
 */
 
 import { api } from '@front/api'
-import { onMount } from '@solid-js'
-import { useNavigate } from '@tanstack/solid-router'
 
-/** Route component for logout. */
-export const Logout = () => {
-  const navigate = useNavigate()
-  onMount(() => void logoutAndRedirect(navigate))
-  return null
-}
-
-/** Complete logout sequencing before leaving the route. */
-async function logoutAndRedirect(navigate: ReturnType<typeof useNavigate>): Promise<void> {
+/** End the active session and always clear local session state. */
+export async function logout(): Promise<void> {
   try {
     await api.Auth.logout()
   } catch (e) {
     console.error('[logout] logout failed', e)
   } finally {
     api.SessionState.clear()
-    await navigate({ to: '/login', replace: true })
   }
 }

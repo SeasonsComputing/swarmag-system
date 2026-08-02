@@ -21,7 +21,3 @@
   gap: var(--sa-space-xl);
   max-width: var(--sa-size-min);
 }
-
-[data-shell='login'] [data-ui='action-button'] {
-  flex: 0 0 auto;
-}

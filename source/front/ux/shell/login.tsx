@@ -129,7 +129,7 @@ const LoginClient = (props: LoginClientProps) => {
                   <form onSubmit={submitEmailForm}>
                     <UiLayout>
                       <p>Enter your email to receive a one-time sign-in code.</p>
-                      <UiField for='email' label='Email'>
+                      <UiField for='email' label='Email' required>
                         <UiInput
                           name='email'
                           type='email'
@@ -169,14 +169,17 @@ const LoginClient = (props: LoginClientProps) => {
                           required
                         />
                       </UiField>
+                      {/* TODO: fix back,save layout. it's tacky and not obvious. */}
                       <UiLayout variant='inline-fill'>
-                        <UiActionButton
-                          align='start'
-                          icon='arrow-left'
-                          label='Back'
-                          labelMode='visible'
-                          onClick={returnToEmail}
-                        />
+                        <div>
+                          <UiActionButton
+                            align='start'
+                            icon='arrow-left'
+                            label='Back'
+                            labelMode='visible'
+                            onClick={returnToEmail}
+                          />
+                        </div>
                         <UiButton type='submit' variant='primary' loading={pending()}>
                           Sign In
                         </UiButton>
@@ -187,6 +190,7 @@ const LoginClient = (props: LoginClientProps) => {
               </div>
 
               {/* Display alert message if error */}
+              {/* TODO: reserve space for alert so it doesn't push content down */}
               <Show when={!!error()}>
                 <UiAlert variant='danger'>{error()}</UiAlert>
               </Show>
