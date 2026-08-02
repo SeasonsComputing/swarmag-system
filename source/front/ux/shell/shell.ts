@@ -11,6 +11,7 @@ presents content, redirects immediately, or runs a transition before redirecting
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+Application
 ShellPath         Shared path and behavior discriminator for shell routes.
 ShellRoute        A specialized route instance owned by a shell.
 ShellDashboard    A shell route that presents its owning dashboard.
@@ -19,6 +20,9 @@ ShellWorkbench   A shell route that presents workbench content.
 ShellDialog      A shell route that presents dialog content.
 ShellRedirect     A shell route that redirects immediately.
 ShellTransition   A shell route that runs work before redirecting.
+ShellDialogComponent  Component contract for shell-owned dialog routes.
+ShellDialog           Dialog route behavior compiled by the shared shell.
+makeDialogRoute       Create an authenticated dialog route.
 dashboard         Create a dashboard route.
 page              Create a direct page route.
 workbench         Create a workbench route.
@@ -27,9 +31,7 @@ redirect          Create an immediate redirect route.
 transition        Create a work-then-redirect route.
 */
 
-import type { Dictionary } from '@core/std'
-import type { UiComponent } from '@front/ux/ui'
-import type { ShellDialogComponent, ShellDialogOptions } from './shell-dialog.tsx'
+import type { UiComponent, UiDialogSize } from '@front/ux/ui'
 
 /** Shared route path and behavior discriminator. */
 export type ShellPath = {
@@ -102,8 +104,14 @@ export type Shell = {
   routes: ShellRoute[]
 }
 
-/**  */
-export type ShellRegistry = Dictionary<Shell>
+/** Component contract for shell-owned dialog routes. */
+export type ShellDialogComponent = (props: { onCancel: () => void }) => UiComponent
+
+/** Shell dialog presentation options. */
+export type ShellDialogOptions = {
+  size: UiDialogSize
+  dismissible: boolean
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // MAKERS

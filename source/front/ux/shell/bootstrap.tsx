@@ -40,14 +40,8 @@ import {
   RouterProvider,
   useNavigate
 } from '@tanstack/solid-router'
-import { makeDialogRoute } from './shell-dialog.tsx'
-import type {
-  Application,
-  Shell,
-  ShellRoute,
-  ShellTransition,
-  ShellWorkbench
-} from './shell.ts'
+import { dialogRoute } from './shell-registry.tsx'
+import type { Application, Shell, ShellRoute, ShellTransition, ShellWorkbench } from './shell.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 3. INSTALL LOOK & FEEL
@@ -75,12 +69,13 @@ const compileShell = (shell: Shell, index: number): AnyRoute => {
 /** Compile one declared route beneath its owning shell layout route. */
 const compileRoute = (parentRoute: AnyRoute, route: ShellRoute): AnyRoute => {
   switch (route.kind) {
-    case 'dashboard':
+    case 'dashboard': {
       return createRoute({
         getParentRoute: () => parentRoute,
         path: route.path,
         component: () => null
       })
+    }
     case 'page': {
       const PageComponent = route.component
       return createRoute({
@@ -89,26 +84,30 @@ const compileRoute = (parentRoute: AnyRoute, route: ShellRoute): AnyRoute => {
         component: () => <PageComponent />
       })
     }
-    case 'workbench':
+    case 'workbench': {
       return createRoute({
         getParentRoute: () => parentRoute,
         path: route.path,
         component: () => <ShellWorkbenchRoute workbench={route} />
       })
-    case 'dialog':
-      return makeDialogRoute(parentRoute, route)
-    case 'redirect':
+    }
+    case 'dialog': {
+      return dialogRoute(parentRoute, route)
+    }
+    case 'redirect': {
       return createRoute({
         getParentRoute: () => parentRoute,
         path: route.path,
         component: () => <Navigate to={route.destination} />
       })
-    case 'transition':
+    }
+    case 'transition': {
       return createRoute({
         getParentRoute: () => parentRoute,
         path: route.path,
         component: () => <ShellTransitionRoute transition={route} />
       })
+    }
   }
 }
 

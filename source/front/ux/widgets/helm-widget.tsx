@@ -60,7 +60,7 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
     </nav>
   )
 }
-
+/** validates and returns a string array */
 const toStringArray = (value: unknown, field: string): string[] => {
   if (!Array.isArray(value)) throw new Error(`${field} must be an array`)
   return value.map((item, index) => {
