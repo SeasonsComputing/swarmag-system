@@ -19,7 +19,15 @@ Login Passwordless OTP login component.
 */
 
 import { api } from '@front/api'
-import { UiActionButton, UiAlert, UiButton, UiField, UiInput, UiLayout } from '@front/ux/ui'
+import {
+  UiActionButton,
+  UiAlert,
+  UiButton,
+  UiField,
+  UiFormActions,
+  UiInput,
+  UiLayout
+} from '@front/ux/ui'
 import { createSignal, onMount, Show } from '@solid-js'
 import { Navigate } from '@tanstack/solid-router'
 import { BrandHero } from './brand-hero.tsx'
@@ -169,31 +177,34 @@ const LoginClient = (props: LoginClientProps) => {
                           required
                         />
                       </UiField>
-                      {/* TODO: fix back,save layout. it's tacky and not obvious. */}
-                      <UiLayout variant='inline-fill'>
-                        <div>
-                          <UiActionButton
-                            align='start'
-                            icon='arrow-left'
-                            label='Back'
-                            labelMode='visible'
-                            onClick={returnToEmail}
-                          />
-                        </div>
-                        <UiButton type='submit' variant='primary' loading={pending()}>
-                          Sign In
-                        </UiButton>
-                      </UiLayout>
+                      <UiFormActions justify='split'>
+                        <UiActionButton
+                          align='start'
+                          icon='arrow-left'
+                          label='Back'
+                          labelMode='visible'
+                          onClick={returnToEmail}
+                        />
+                        <UiActionButton
+                          icon='arrow-right'
+                          label='Login'
+                          labelMode='visible'
+                          loading={pending()}
+                          type='submit'
+                        />
+                      </UiFormActions>
                     </UiLayout>
                   </form>
                 </Show>
               </div>
 
-              {/* Display alert message if error */}
-              {/* TODO: reserve space for alert so it doesn't push content down */}
-              <Show when={!!error()}>
-                <UiAlert variant='danger'>{error()}</UiAlert>
-              </Show>
+              <div
+                aria-hidden={error() === null}
+                data-shell='login-feedback'
+                data-shell-state={error() === null ? 'hidden' : 'visible'}
+              >
+                <UiAlert variant='danger'>{error() ?? ''}</UiAlert>
+              </div>
             </Show>
           </UiLayout>
 
