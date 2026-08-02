@@ -1,23 +1,27 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Shell                                                                        ║
-║ Application shell makers.                                                    ║
+║ Shell makers                                                                 ║
+║ Application shell and route factories.                                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Creates the shared shell implementations and compiles shell dialog declarations
+into router routes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-anonymousShell   Creates a shell with no authentication required.
-dashboardShell   Creates a dashboard shell with authentication required.
+makeAnonymousShell  Creates a shell with no authentication required.
+makeDashboardShell  Creates a dashboard shell with authentication required.
+makeDialogRoute     Creates a router route for a shell dialog declaration.
 */
 
 import { DashboardState } from '@front/ux/stores/dashboard-state.ts'
 import { type UiComponent, UiDialog } from '@front/ux/ui'
-import type { WidgetRegistry } from '@front/ux/widgets/widget.tsx'
 import { Outlet } from '@tanstack/solid-router'
 import { type AnyRoute, createRoute, useNavigate } from '@tanstack/solid-router'
 import { AboutBox } from './about-box.tsx'
 import { AuthGuard } from './auth-guard.tsx'
-import { DashboardProvider } from './dashboard-provider.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
 import { logout } from './logout.ts'
@@ -30,9 +34,10 @@ import {
   type ShellRoute,
   transition
 } from './shell.ts'
+import type { WidgetRegistry } from './widget-contract.ts'
 
 /** Create the lightweight shell and its common non-dashboard routes. */
-export const anonymousShell = (): Shell => ({
+export const makeAnonymousShell = (): Shell => ({
   component: () => <Outlet />,
   initializers: [],
   routes: [
@@ -42,7 +47,7 @@ export const anonymousShell = (): Shell => ({
 })
 
 /** Create the authenticated dashboard shell from its entry path and runtime data. */
-export const dashboardShell = (
+export const makeDashboardShell = (
   path: string,
   seed: unknown,
   widgets: WidgetRegistry,
@@ -50,12 +55,10 @@ export const dashboardShell = (
 ): Shell => {
   const DashboardShell = (): UiComponent => (
     <AuthGuard>
-      <DashboardProvider state={DashboardState} widgets={widgets}>
-        <main>
-          <Dashboard />
-          <Outlet />
-        </main>
-      </DashboardProvider>
+      <main>
+        <Dashboard state={DashboardState} widgets={widgets} />
+        <Outlet />
+      </main>
     </AuthGuard>
   )
   return {
@@ -70,7 +73,7 @@ export const dashboardShell = (
 }
 
 /** Create a dialog route layered over the shell layout route. */
-export function dialogRoute(parentRoute: AnyRoute, dialog: ShellDialog): AnyRoute {
+export function makeDialogRoute(parentRoute: AnyRoute, dialog: ShellDialog): AnyRoute {
   const DialogComponent = dialog.component
   return createRoute({
     getParentRoute: () => parentRoute,

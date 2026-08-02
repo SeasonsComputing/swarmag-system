@@ -40,7 +40,7 @@ import {
   RouterProvider,
   useNavigate
 } from '@tanstack/solid-router'
-import { dialogRoute } from './shell-registry.tsx'
+import { makeDialogRoute } from './shell-makers.tsx'
 import type { Application, Shell, ShellRoute, ShellTransition, ShellWorkbench } from './shell.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -92,7 +92,7 @@ const compileRoute = (parentRoute: AnyRoute, route: ShellRoute): AnyRoute => {
       })
     }
     case 'dialog': {
-      return dialogRoute(parentRoute, route)
+      return makeDialogRoute(parentRoute, route)
     }
     case 'redirect': {
       return createRoute({

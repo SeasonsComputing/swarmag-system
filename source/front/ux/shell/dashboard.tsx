@@ -7,28 +7,29 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Renders the dashboard layout hydrated in DashboardState and resolves widget
-type names through the active WidgetProvider registry.
+type names through the supplied widget registry.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Dashboard  Shared shell dashboard component.
 */
 
-import type { DashboardStoreWidget } from '@front/ux/stores/dashboard-state.ts'
+import type { DashboardStateContract, DashboardStoreWidget } from '@front/ux/stores/dashboard-state.ts'
 import { UiCard, type UiComponent, UiFooter } from '@front/ux/ui'
-import type { WidgetComponent } from '@front/ux/widgets/widget.tsx'
 import { For, Show } from '@solid-js'
-import { useDashboard } from './dashboard-provider.tsx'
+import type { WidgetComponent, WidgetRegistry } from './widget-contract.ts'
 
 import './dashboard.css'
 import footerLogo from '@front/ux/assets/logos/swarmag-logo-wordmark.png'
 import headerLogo from '@front/ux/assets/logos/swarmag-ops-logo-flat.png'
 
 /** Shared shell dashboard component. */
-export const Dashboard = (): UiComponent => {
-  const dashboardContext = useDashboard()
-  const dashboard = dashboardContext.state.store
-  const widgets = dashboardContext.widgets
+export const Dashboard = (props: {
+  state: DashboardStateContract
+  widgets: WidgetRegistry
+}): UiComponent => {
+  const dashboard = props.state.store
+  const widgets = props.widgets
   const headerIdentity = () => dashboard.header.widgets[0]
   const headerFields = () => dashboard.header.widgets.slice(1, -1)
   const headerTerminal = () => {

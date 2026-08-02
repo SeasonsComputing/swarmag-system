@@ -401,7 +401,7 @@ dashboard → domain page → back to dashboard
 
 ### 9.2 Routing
 
-Common routes are supplied by the anonymous and dashboard shell makers in `source/front/ux/shell`. Each app root declares its complete shell collection in `app.tsx`, including app-specific dashboard presentations. `bootstrap()` compiles that collection; it does not accept raw route extensions or optional composition fragments.
+Common routes are supplied by `makeAnonymousShell()` and `makeDashboardShell()` from `source/front/ux/shell/shell-makers.tsx`. Each app root declares its complete shell collection in `app.tsx`, including app-specific dashboard presentations. `bootstrap()` compiles that collection; it does not accept raw route extensions or optional composition fragments.
 
 A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
 
@@ -758,7 +758,12 @@ Layout is data-driven via app-local dashboard JSON, rendered by the shared dashb
 
 The app-local dashboard JSON conforms to `DashboardView` from `source/front/ux/views/dashboard-views.ts`. `DashboardState.init(seed)`validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
-`dashboardShell()` initializes `DashboardState`, then provides it with the app-supplied widget registry through `DashboardProvider` (`source/front/ux/shell/dashboard-provider.tsx`). The registry is composition data: each app package binds explicit dashboard widget type keys to concrete widgets alongside its dashboard JSON — the two halves of one dashboard-shell declaration. The shell knows widgets only through the widget SPI (`source/front/ux/widgets/widget.tsx`: `WidgetComponent`, `WidgetRegistry`, `WidgetProvider`/`useWidget`); widgets never import the shell — host context (application identity) flows down through `WidgetProvider`. Both directions are guard-enforced (`guard-namespaces` rules 4 and 5). Dashboard renderers consume the combined runtime contract through `useDashboard()`. Dashboard state remains a Reactive Store Module; the context injects its namespace contract and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@front/api` namespace.
+`makeDashboardShell()` initializes `DashboardState`, then constructs `Dashboard` with the state contract and app-supplied widget registry as explicit inputs. The registry is composition data: each app package binds explicit dashboard widget type keys to concrete widgets alongside its dashboard JSON — the two halves of one dashboard-shell declaration.
+
+The shell is the closed IoC application framework. It owns the widget extension contracts in `source/front/ux/shell/widget-contract.ts` and shared shell services such as `getShellIdentity()`. Concrete widgets implement those contracts and may consume public shell services. The shell never imports the widget catalog or any concrete widget; applications bind concrete widgets at their composition roots. This direction keeps the shell closed when features are added and prevents a shell/widget dependency cycle. `guard:namespaces` enforces the shell-to-widget
+prohibition.
+
+Dashboard state remains a Reactive Store Module. The dashboard receives its namespace contract directly and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@front/api` namespace.
 
 ```json
 {
