@@ -1,31 +1,18 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ bootstrap                                                                    ║
-║ Boot sequence, auth binding, and route tree applications.                    ║
+║ Bootstrap                                                                    ║
+║ Application mounting, shell route compilation, and session synchronization.  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-App root features. Registers the auth state listener,
-performs the boot-time user fetch, and mounts the TanStack Router route tree.
-
-1. CONFIGURE APPLICATION
-2. INSTALL SHELL
-3. INSTALL LOOK & FEEL
-4. DEFINE ROUTES
-5. BOOTSTRAP APPLICATION
-6. SYNCHRONIZE SESSION
-7. REGISTER SERVICE WORKER
+Boots a complete application composition. Shared bootstrap initializes global
+runtime state, compiles declared shells into TanStack routes, mounts Solid, and
+synchronizes the browser session. Applications own shell composition.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-bootstrap()       Boots the application.
-BootstrapOptions  App-specific shell composition options.
-├ dialogs         Shell-owned dialog route registrations.
-├ routes          App-specific route registrations.
-└ widgets         App-bound widget registry (the composition root).
-
-rootRoute         Common route tree root.
+bootstrap  Mount a complete application.
 */
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -40,8 +27,7 @@ import { Config } from '@front/config/ux-config.ts'
 
 import type { Session } from '@core/api/api-auth-contract.ts'
 import { api } from '@front/api'
-import { DashboardState } from '@front/ux/stores/dashboard-state.ts'
-import type { WidgetRegistry } from '@front/ux/widgets/widget.tsx'
+import { UiDialog } from '@front/ux/ui'
 import { onCleanup, onMount } from '@solid-js'
 import { render } from '@solid-js/web'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
@@ -51,15 +37,17 @@ import {
   createRoute,
   createRouter,
   Navigate,
-  RouterProvider
+  RouterProvider,
+  useNavigate
 } from '@tanstack/solid-router'
-import { AboutBox } from './about-box.tsx'
-import { AuthGuard } from './auth-guard.tsx'
-import { DashboardProvider } from './dashboard-provider.tsx'
-import { Dashboard } from './dashboard.tsx'
-import { Login } from './login.tsx'
-import { Logout } from './logout.tsx'
-import { makeDialogRoute, type ShellDialogRoute } from './shell-dialog.tsx'
+import { makeDialogRoute } from './shell-dialog.tsx'
+import type {
+  Application,
+  Shell,
+  ShellRoute,
+  ShellTransition,
+  ShellWorkbench
+} from './shell.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // 3. INSTALL LOOK & FEEL
@@ -68,80 +56,116 @@ import { makeDialogRoute, type ShellDialogRoute } from './shell-dialog.tsx'
 import '@front/ux/ui/css/css.tsx'
 
 // ────────────────────────────────────────────────────────────────────────────
-// 4. DEFINE ROUTES
+// 4. COMPILE ROUTES
 // ────────────────────────────────────────────────────────────────────────────
 
-export const rootRoute = createRootRoute()
+const rootRoute = createRootRoute()
 
-const indexRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: () => <Navigate to='/dashboard' />
-})
-
-const loginRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/login',
-  component: () => <Login />
-})
-
-const logoutRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/logout',
-  component: () => <Logout />
-})
-
-const aboutRoute = makeDialogRoute(rootRoute, {
-  path: '/about',
-  component: AboutBox,
-  dialog: { size: 'content', dismissible: true }
-})
-
-const dashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/dashboard',
-  component: () => (
-    <AuthGuard>
-      <main>
-        <Dashboard />
-      </main>
-    </AuthGuard>
-  )
-})
-
-// ────────────────────────────────────────────────────────────────────────────
-// 5. BOOTSTRAP APPLICATION
-// ────────────────────────────────────────────────────────────────────────────
-
-/** Bootstrap options for app-specific shell composition. */
-export type BootstrapOptions = {
-  dialogs?: ShellDialogRoute[]
-  routes?: AnyRoute[]
-  widgets?: WidgetRegistry
+/** Compile one shell instance as a pathless TanStack layout route. */
+const compileShell = (shell: Shell, index: number): AnyRoute => {
+  const ShellComponent = shell.component
+  const shellRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    id: `shell-${index}`,
+    component: () => <ShellComponent />
+  })
+  return shellRoute.addChildren(shell.routes.map(route => compileRoute(shellRoute, route)))
 }
 
-/**
- * Initialize shell state, compose app routes, and mount the application.
- *
- * @param dashboardSeed Dashboard configuration seed for the app package.
- * @param options App-specific route and dialog registrations.
- */
-export async function bootstrap(dashboardSeed: unknown, options: BootstrapOptions | AnyRoute[] = {}) {
+/** Compile one declared route beneath its owning shell layout route. */
+const compileRoute = (parentRoute: AnyRoute, route: ShellRoute): AnyRoute => {
+  switch (route.kind) {
+    case 'dashboard':
+      return createRoute({
+        getParentRoute: () => parentRoute,
+        path: route.path,
+        component: () => null
+      })
+    case 'page': {
+      const PageComponent = route.component
+      return createRoute({
+        getParentRoute: () => parentRoute,
+        path: route.path,
+        component: () => <PageComponent />
+      })
+    }
+    case 'workbench':
+      return createRoute({
+        getParentRoute: () => parentRoute,
+        path: route.path,
+        component: () => <ShellWorkbenchRoute workbench={route} />
+      })
+    case 'dialog':
+      return makeDialogRoute(parentRoute, route)
+    case 'redirect':
+      return createRoute({
+        getParentRoute: () => parentRoute,
+        path: route.path,
+        component: () => <Navigate to={route.destination} />
+      })
+    case 'transition':
+      return createRoute({
+        getParentRoute: () => parentRoute,
+        path: route.path,
+        component: () => <ShellTransitionRoute transition={route} />
+      })
+  }
+}
+
+/** Route component that supplies close navigation to a workbench. */
+const ShellWorkbenchRoute = (props: { workbench: ShellWorkbench }) => {
+  const navigate = useNavigate()
+  const WorkbenchComponent = props.workbench.component
+  const close = (): void => {
+    void navigate({ to: '/dashboard' })
+  }
+  const onOpenChange = (open: boolean): void => {
+    if (!open) close()
+  }
+  return (
+    <UiDialog open size='workbench' onOpenChange={onOpenChange}>
+      <WorkbenchComponent onCancel={close} />
+    </UiDialog>
+  )
+}
+
+/** Headless route component that runs a transition before navigating to its destination. */
+const ShellTransitionRoute = (props: { transition: ShellTransition }) => {
+  const navigate = useNavigate()
+  onMount(() => void runShellTransition(props.transition, navigate))
+  return null
+}
+
+/** Run transition work and always navigate to its declared destination. */
+async function runShellTransition(
+  transition: ShellTransition,
+  navigate: ReturnType<typeof useNavigate>
+): Promise<void> {
+  try {
+    await transition.run()
+  } catch (e) {
+    console.error('[shell-transition] transition failed', e)
+  } finally {
+    await navigate({ to: transition.destination, replace: true })
+  }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// 5. BOOTSTRAP APPLICATION RUNTIME
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Initialize a complete application composition and mount its router. */
+export async function bootstrap(application: Application): Promise<void> {
   const showApplication = () => document.body.style.opacity = '1'
   try {
-    const bootstrapOptions = Array.isArray(options) ? { routes: options } : options
-    const routeTree = rootRoute.addChildren([
-      indexRoute,
-      loginRoute,
-      logoutRoute,
-      aboutRoute,
-      dashboardRoute,
-      ...(bootstrapOptions.dialogs ?? []).map(dialog => makeDialogRoute(rootRoute, dialog)),
-      ...(bootstrapOptions.routes ?? [])
-    ])
+    const routeTree = rootRoute.addChildren(
+      application.shells.map((shell, index) => compileShell(shell, index))
+    )
     const router = createRouter({ routeTree })
     const queryClient = new QueryClient()
-    const Application = () => {
+
+    // application runtime singleton
+    const ApplicationRuntime = () => {
       onMount(() => {
         showApplication()
         void syncSession()
@@ -150,16 +174,19 @@ export async function bootstrap(dashboardSeed: unknown, options: BootstrapOption
       })
       return (
         <QueryClientProvider client={queryClient}>
-          <DashboardProvider state={DashboardState} widgets={bootstrapOptions.widgets ?? {}}>
-            <RouterProvider router={router} />
-          </DashboardProvider>
+          <RouterProvider router={router} />
         </QueryClientProvider>
       )
     }
 
+    // initialize and render the application
     await api.AppState.init()
-    await DashboardState.init(dashboardSeed)
-    render(() => <Application />, document.getElementById('root')!)
+    await Promise.all(
+      application.shells.flatMap(
+        shell => shell.initializers.map(initialize => initialize())
+      )
+    )
+    render(() => <ApplicationRuntime />, document.getElementById('root')!)
     registerServiceWorker()
   } catch (e) {
     showApplication()
@@ -186,6 +213,7 @@ async function applySession(session: Session | null): Promise<void> {
 
   // authenticated, preserve id in session store
   api.SessionState.setAuth(session.userId)
+  // TODO: should we compare user ID's as well as non-null???
   if (api.SessionState.store.user) return // user already loaded
 
   // authenticated, now load user, validate and preserve in session store,

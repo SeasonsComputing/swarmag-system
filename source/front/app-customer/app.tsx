@@ -6,8 +6,14 @@
 import { bootstrap } from '@front/ux/shell/bootstrap.tsx'
 
 // shell bindings
-import { BrandWidget } from '@front/ux/widgets/brand-widget.tsx'
-import { HelmWidget } from '@front/ux/widgets/helm-widget.tsx'
+import { anonymousShell, application, dashboardShell } from '@front/ux/shell/shell.tsx'
+import { widgetRegistry } from '@front/ux/widgets/widget-registry.ts'
 import dashboardSeed from './dashboard-customer.json' with { type: 'json' }
 
-void bootstrap(dashboardSeed, { widgets: { BrandWidget, HelmWidget } })
+// bootstrap application
+void bootstrap(
+  application([
+    anonymousShell(),
+    dashboardShell('/dashboard', dashboardSeed, widgetRegistry(), [])
+  ])
+)
