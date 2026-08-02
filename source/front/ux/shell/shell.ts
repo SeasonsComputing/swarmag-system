@@ -1,34 +1,43 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Shell route                                                                  ║
-║ Declarative route behavior for shared application shells.                    ║
+║ Application shell composition                                                ║
+║ Contracts and makers for application, shell, and route declarations.         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines the small route grammar used by every application shell. A route either
-presents content, redirects immediately, or runs a transition before redirecting.
+Defines the complete application composition compiled by shared bootstrap:
+ordered shells, their initialization and root components, and the route grammar
+each shell owns. Routes present content, redirect immediately, or run work before
+redirecting.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Application
-ShellPath         Shared path and behavior discriminator for shell routes.
-ShellRoute        A specialized route instance owned by a shell.
-ShellDashboard    A shell route that presents its owning dashboard.
-ShellPage         A shell route that presents direct page content.
-ShellWorkbench   A shell route that presents workbench content.
-ShellDialog      A shell route that presents dialog content.
-ShellRedirect     A shell route that redirects immediately.
-ShellTransition   A shell route that runs work before redirecting.
-ShellDialogComponent  Component contract for shell-owned dialog routes.
-ShellDialog           Dialog route behavior compiled by the shared shell.
-makeDialogRoute       Create an authenticated dialog route.
-dashboard         Create a dashboard route.
-page              Create a direct page route.
-workbench         Create a workbench route.
-dialog            Create a dialog route.
-redirect          Create an immediate redirect route.
-transition        Create a work-then-redirect route.
+Application               Complete application shell composition.
+ShellPath                 Shared path and behavior discriminator.
+ShellDashboard            Dashboard presentation owned by its shell.
+ShellPageComponent        Component contract for direct page routes.
+ShellPage                 Direct page content owned by its shell.
+ShellWorkbenchComponent   Component contract for workbench routes.
+ShellWorkbench            Workbench content owned by its shell.
+ShellDialog               Dialog content presented over its shell.
+ShellRedirect             Immediate navigation to a destination.
+ShellTransition           Work followed by navigation to a destination.
+ShellRoute                Route behavior supported by an application shell.
+ShellInitializer          Initializer contract for a shell.
+Shell                     Component, initializers, and routes for one shell.
+ShellDialogComponent      Component contract for dialog routes.
+ShellDialogOptions        Dialog presentation options.
+
+MAKERS
+───────────────────────────────────────────────────────────────────────────────
+application               Create a complete application composition.
+dashboard                 Create a dashboard route.
+page                      Create a direct page route.
+workbench                 Create a workbench route.
+dialog                    Create a dialog route.
+redirect                  Create an immediate redirect route.
+transition                Create a work-then-redirect route.
 */
 
 import type { UiComponent, UiDialogSize } from '@front/ux/ui'
