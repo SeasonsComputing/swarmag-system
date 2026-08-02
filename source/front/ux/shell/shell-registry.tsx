@@ -11,9 +11,10 @@ dashboardShell   Creates a dashboard shell with authentication required.
 */
 
 import { DashboardState } from '@front/ux/stores/dashboard-state.ts'
-import type { UiComponent } from '@front/ux/ui'
+import { type UiComponent, UiDialog } from '@front/ux/ui'
 import type { WidgetRegistry } from '@front/ux/widgets/widget.tsx'
 import { Outlet } from '@tanstack/solid-router'
+import { type AnyRoute, createRoute, useNavigate } from '@tanstack/solid-router'
 import { AboutBox } from './about-box.tsx'
 import { AuthGuard } from './auth-guard.tsx'
 import { DashboardProvider } from './dashboard-provider.tsx'
@@ -26,9 +27,10 @@ import {
   page,
   redirect,
   type Shell,
+  type ShellDialog,
   type ShellRoute,
   transition
-} from './shell-route.ts'
+} from './shell.ts'
 
 /** Create the lightweight shell and its common non-dashboard routes. */
 export const anonymousShell = (): Shell => ({
@@ -67,4 +69,32 @@ export const dashboardShell = (
       ...routes
     ]
   }
+}
+
+/** Create a dialog route layered over the shell layout route. */
+export function dialogRoute(parentRoute: AnyRoute, dialog: ShellDialog): AnyRoute {
+  const DialogComponent = dialog.component
+  return createRoute({
+    getParentRoute: () => parentRoute,
+    path: dialog.path,
+    component: () => {
+      const navigate = useNavigate()
+      const close = (): void => {
+        void navigate({ to: '/dashboard' })
+      }
+      const onOpenChange = (open: boolean): void => {
+        if (!open) close()
+      }
+      return (
+        <UiDialog
+          open
+          size={dialog.options.size}
+          dismissible={dialog.options.dismissible}
+          onOpenChange={onOpenChange}
+        >
+          <DialogComponent onCancel={close} />
+        </UiDialog>
+      )
+    }
+  })
 }
