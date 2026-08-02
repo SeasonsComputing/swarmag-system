@@ -34,8 +34,15 @@
 
 [data-shell-panel='header-leading'] > h1,
 [data-shell-panel='header-leading'] > h2 {
-  font-size: var(--sa-font-size-md);
   line-height: 1;
   margin: 0;
   min-inline-size: 0;
+}
+
+[data-shell-panel='header-leading'] > h1 {
+  font-size: var(--sa-font-size-md);
+}
+
+[data-shell-panel='header-leading'] > h2 {
+  font-size: calc(var(--sa-font-size-md) * 0.85);
 }

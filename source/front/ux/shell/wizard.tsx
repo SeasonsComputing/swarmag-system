@@ -140,15 +140,22 @@ export const Wizard = (props: WizardProps): UiComponent => {
           header={{
             leading: (
               <>
-                <UiActionButton
-                  align='start'
-                  icon='arrow-left'
-                  label='Back'
-                  labelMode='visible'
-                  disabled={isFirst() || committing()}
-                  onClick={back}
-                />
-                <h2 data-shell='wizard-form-stage-title'>{stage().title}</h2>
+                <Show when={!isFirst()}>
+                  <UiActionButton
+                    align='start'
+                    icon='arrow-left'
+                    label='Back'
+                    labelMode='visible'
+                    disabled={committing()}
+                    onClick={back}
+                  />
+                </Show>
+                <h2
+                  data-shell='wizard-form-stage-title'
+                  data-shell-align={isFirst() ? 'start' : 'center'}
+                >
+                  {stage().title}
+                </h2>
               </>
             ),
             trailing: (

@@ -117,6 +117,10 @@
   white-space: nowrap;
 }
 
+[data-shell='wizard-form-stage-title'][data-shell-align='start'] {
+  text-align: start;
+}
+
 @media (prefers-reduced-motion: reduce) {
   [data-shell='wizard-stage'] {
     animation: none;
