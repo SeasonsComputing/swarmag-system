@@ -15,7 +15,7 @@ PUBLIC
 compileApplicationRoutes  Compile an application declaration into a route tree.
 */
 
-import { UiDialog } from '@front/ux/ui'
+import { UiDialog, type UiDialogSize } from '@front/ux/ui'
 import { onMount } from '@solid-js'
 import {
   type AnyRoute,
@@ -24,17 +24,10 @@ import {
   Navigate,
   useNavigate
 } from '@tanstack/solid-router'
-import type {
-  Application,
-  Shell,
-  ShellDialog,
-  ShellRoute,
-  ShellTransition,
-  ShellWorkbench
-} from './shell.ts'
+import type { Shell, ShellApplication, ShellOverlayView, ShellRoute, ShellTransition } from './shell.ts'
 
 /** Compile an application declaration into a TanStack route tree. */
-export const compileApplicationRoutes = (application: Application): AnyRoute => {
+export const compileApplicationRoutes = (application: ShellApplication): AnyRoute => {
   const rootRoute = createRootRoute()
   return rootRoute.addChildren(
     application.shells.map((shell, index) => compileShell(rootRoute, shell, index))
@@ -54,81 +47,49 @@ const compileShell = (rootRoute: AnyRoute, shell: Shell, index: number): AnyRout
 
 /** Compile one declared route beneath its owning shell layout route. */
 const compileRoute = (parentRoute: AnyRoute, route: ShellRoute): AnyRoute => {
+  return createRoute({
+    getParentRoute: () => parentRoute,
+    path: route.path,
+    component: routeComponent(route)
+  })
+}
+
+/** Compile one declared route to its route component. */
+const routeComponent = (route: ShellRoute) => {
   switch (route.kind) {
-    case 'dashboard': {
-      return createRoute({
-        getParentRoute: () => parentRoute,
-        path: route.path,
-        component: () => null
-      })
+    case 'index': {
+      return () => null
     }
     case 'page': {
       const PageComponent = route.component
-      return createRoute({
-        getParentRoute: () => parentRoute,
-        path: route.path,
-        component: () => <PageComponent />
-      })
+      return () => <PageComponent />
     }
-    case 'workbench': {
-      return createRoute({
-        getParentRoute: () => parentRoute,
-        path: route.path,
-        component: () => <ShellWorkbenchRoute workbench={route} />
-      })
-    }
-    case 'dialog': {
-      return createDialogRoute(parentRoute, route)
+    case 'overlay': {
+      return () => (
+        <ShellOverlayRoute
+          component={route.component}
+          dismissible={route.options.dismissible}
+          size={route.options.size}
+        />
+      )
     }
     case 'redirect': {
-      return createRoute({
-        getParentRoute: () => parentRoute,
-        path: route.path,
-        component: () => <Navigate to={route.destination} />
-      })
+      return () => <Navigate to={route.destination} />
     }
     case 'transition': {
-      return createRoute({
-        getParentRoute: () => parentRoute,
-        path: route.path,
-        component: () => <ShellTransitionRoute transition={route} />
-      })
+      return () => <ShellTransitionRoute transition={route} />
     }
   }
 }
 
-/** Create a dialog route layered over the shell layout route. */
-const createDialogRoute = (parentRoute: AnyRoute, dialog: ShellDialog): AnyRoute => {
-  const DialogComponent = dialog.component
-  return createRoute({
-    getParentRoute: () => parentRoute,
-    path: dialog.path,
-    component: () => {
-      const navigate = useNavigate()
-      const close = (): void => {
-        void navigate({ to: '/' })
-      }
-      const onOpenChange = (open: boolean): void => {
-        if (!open) close()
-      }
-      return (
-        <UiDialog
-          open
-          size={dialog.options.size}
-          dismissible={dialog.options.dismissible}
-          onOpenChange={onOpenChange}
-        >
-          <DialogComponent onCancel={close} />
-        </UiDialog>
-      )
-    }
-  })
-}
-
-/** Route component that supplies close navigation to a workbench. */
-const ShellWorkbenchRoute = (props: { workbench: ShellWorkbench }) => {
+/** Route component that supplies shared close navigation to shell overlays. */
+const ShellOverlayRoute = (props: {
+  component: ShellOverlayView
+  dismissible: boolean
+  size: UiDialogSize
+}) => {
   const navigate = useNavigate()
-  const WorkbenchComponent = props.workbench.component
+  const OverlayComponent = props.component
   const close = (): void => {
     void navigate({ to: '/' })
   }
@@ -136,8 +97,13 @@ const ShellWorkbenchRoute = (props: { workbench: ShellWorkbench }) => {
     if (!open) close()
   }
   return (
-    <UiDialog open size='workbench' onOpenChange={onOpenChange}>
-      <WorkbenchComponent onCancel={close} />
+    <UiDialog
+      open
+      size={props.size}
+      dismissible={props.dismissible}
+      onOpenChange={onOpenChange}
+    >
+      <OverlayComponent onCancel={close} />
     </UiDialog>
   )
 }
