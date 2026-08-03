@@ -1227,7 +1227,7 @@
    keeps a page-level wrapper transparent to sizing — without it a wrapper with
    auto height breaks the surface's percentage chain silently. */
 [data-ui='dialog'][data-ui-size='workbench'] {
-  block-size: clamp(32rem, 88dvh, 42rem);
+  block-size: clamp(32rem, 85dvh, 42rem);
   display: grid;
   grid-template-rows: minmax(0, 1fr);
   inline-size: min(var(--sa-size-md), calc(100vw - var(--sa-rhythm-pad) * 2));
