@@ -78,8 +78,9 @@
 }
 
 [data-shell='dashboard-header-logo'] {
-  block-size: var(--sa-touch-target);
-  inline-size: var(--sa-touch-target);
+  --size: calc(var(--sa-space-3xl) + var(--sa-space-xs));
+  block-size: var(--size);
+  inline-size: var(--size);
   border-radius: var(--sa-radius-sm);
 }
 
