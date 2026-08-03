@@ -122,10 +122,6 @@ export type ShellDialogOptions = {
   dismissible: boolean
 }
 
-// ────────────────────────────────────────────────────────────────────────────
-// MAKERS
-// ────────────────────────────────────────────────────────────────────────────
-
 /** Create a complete application composition. */
 export const application = (shells: Shell[]): Application => ({ shells })
 
@@ -133,11 +129,10 @@ export const application = (shells: Shell[]): Application => ({ shells })
 export const dashboard = (path: string): ShellDashboard => ({ kind: 'dashboard', path })
 
 /** Create a route that presents direct page content. */
-export const page = (path: string, component: ShellPageComponent): ShellPage => ({
-  kind: 'page',
-  path,
-  component
-})
+export const page = (
+  path: string,
+  component: ShellPageComponent
+): ShellPage => ({ kind: 'page', path, component })
 
 /** Create a route that presents workbench content. */
 export const workbench = (
@@ -153,11 +148,10 @@ export const dialog = (
 ): ShellDialog => ({ kind: 'dialog', path, component, options })
 
 /** Create a route that redirects immediately. */
-export const redirect = (path: string, destination: string): ShellRedirect => ({
-  kind: 'redirect',
-  path,
-  destination
-})
+export const redirect = (
+  path: string,
+  destination: string
+): ShellRedirect => ({ kind: 'redirect', path, destination })
 
 /** Create a route that runs work before redirecting. */
 export const transition = (
