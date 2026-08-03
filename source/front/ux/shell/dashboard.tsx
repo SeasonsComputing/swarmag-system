@@ -21,7 +21,6 @@ import type { WidgetComponent, WidgetRegistry } from './widget-contract.ts'
 
 import './dashboard.css'
 import footerLogo from '@front/ux/assets/logos/swarmag-logo-wordmark.png'
-import headerLogo from '@front/ux/assets/logos/swarmag-ops-logo-flat.png'
 
 /** Shared shell dashboard component. */
 export const Dashboard = (props: {
@@ -40,22 +39,9 @@ export const Dashboard = (props: {
     <div data-shell='dashboard'>
       <header data-shell='dashboard-header'>
         <div data-shell='dashboard-header-contents'>
-          <div data-shell='dashboard-header-identity'>
-            <div data-shell='dashboard-header-logo-field'>
-              <img
-                data-shell='dashboard-header-logo'
-                src={headerLogo}
-                alt=''
-                width={64}
-                height={64}
-              />
-            </div>
-            <div data-shell='dashboard-header-brand-field'>
-              <Show when={headerIdentity()}>
-                {widget => <DashboardWidgetContent widget={widget()} />}
-              </Show>
-            </div>
-          </div>
+          <Show when={headerIdentity()}>
+            {widget => <DashboardWidgetContent widget={widget()} />}
+          </Show>
           <For each={headerFields()}>
             {widget => <DashboardWidgetContent widget={widget} />}
           </For>

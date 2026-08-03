@@ -6,7 +6,10 @@
 */
 
 [data-widget='helm-widget'] {
+  align-items: center;
+  display: flex;
   flex: 0 1 auto;
+  justify-content: flex-end;
   min-block-size: 100%;
   min-inline-size: 0;
 }
@@ -14,7 +17,6 @@
 [data-widget='helm-widget'] [data-ui='layout'] {
   block-size: 100%;
   gap: var(--sa-rhythm-gap);
-  justify-content: flex-end;
   row-gap: 0;
   width: fit-content;
 }
@@ -36,16 +38,16 @@
 }
 
 /* Stacked header: the field spans its own row, so actions center within it. */
-@container dashboard-header (max-width: 464px) {
+@container dashboard-header (max-width: 610px) {
   [data-widget='helm-widget'] {
     flex: 1 1 auto;
+    justify-content: center;
     min-inline-size: 100%;
   }
 
   [data-widget='helm-widget'] [data-ui='layout'] {
     flex-wrap: nowrap;
-    justify-content: center;
-    width: 100%;
+    width: fit-content;
   }
 
   [data-widget='helm-widget'] [data-ui-density='dense']:hover [data-ui='action-button-label'] {
