@@ -127,9 +127,11 @@ const LoginClient = (props: LoginClientProps) => {
     >
       <div data-shell='login'>
         <div data-shell='login-layout'>
-          <UiLayout gap='loose'>
-            <BrandHero />
+          {/* Hero imagery */}
+          <BrandHero />
 
+          {/* Login form */}
+          <div data-shell='login-center'>
             <Show when={!session.isLoading}>
               {/* STEP 1: validate email and send OTP code */}
               <div data-shell='login-form'>
@@ -198,6 +200,7 @@ const LoginClient = (props: LoginClientProps) => {
                 </Show>
               </div>
 
+              {/* ERROR: display error message if present */}
               <div
                 aria-hidden={error() === null}
                 data-shell='login-feedback'
@@ -206,7 +209,7 @@ const LoginClient = (props: LoginClientProps) => {
                 <UiAlert variant='danger'>{error() ?? ''}</UiAlert>
               </div>
             </Show>
-          </UiLayout>
+          </div>
 
           {/* Shell configuration metadata */}
           <ConfigTable shell={props.shell} showAuthor={false} />
