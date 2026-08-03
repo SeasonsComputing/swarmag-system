@@ -13,7 +13,7 @@
 
 [data-widget='helm-widget'] [data-ui='layout'] {
   block-size: 100%;
-  gap: var(--sa-rhythm-pad);
+  gap: var(--sa-rhythm-gap);
   justify-content: flex-end;
   row-gap: 0;
   width: fit-content;
@@ -23,7 +23,7 @@
 /* Threshold is the labeled cluster's intrinsic width plus the header gap. */
 @container dashboard-helm-field (max-width: 464px) {
   [data-widget='helm-widget'] [data-ui='layout'] {
-    column-gap: var(--sa-rhythm-pad);
+    column-gap: var(--sa-rhythm-gap);
   }
 
   [data-widget='helm-widget'] [data-ui='action-button'] {
