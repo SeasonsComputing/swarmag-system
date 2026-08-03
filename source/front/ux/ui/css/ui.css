@@ -215,8 +215,7 @@
   align-self: stretch;
   border-inline-start: var(--sa-border-default);
   content: '';
-  margin-inline-start: var(--sa-space-sm);
-  margin-inline-end: var(--sa-space-sm);
+  margin-inline: var(--sa-space-xx);
   min-block-size: var(--sa-action-button-ring-size);
 }
 
@@ -235,8 +234,7 @@
   align-self: stretch;
   border-inline-start: var(--sa-border-default);
   content: '';
-  margin-inline-start: var(--sa-space-sm);
-  margin-inline-end: var(--sa-space-sm);
+  margin-inline: var(--sa-space-xx);
   min-block-size: var(--sa-action-button-ring-size);
 }
 

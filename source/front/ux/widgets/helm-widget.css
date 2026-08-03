@@ -22,6 +22,10 @@
 /* Dense controls: the allocated field can no longer carry labeled actions. */
 /* Threshold is the labeled cluster's intrinsic width plus the header gap. */
 @container dashboard-helm-field (max-width: 464px) {
+  [data-widget='helm-widget'] [data-ui='layout'] {
+    column-gap: var(--sa-rhythm-pad);
+  }
+
   [data-widget='helm-widget'] [data-ui='action-button'] {
     color: var(--sa-color-primary);
   }
@@ -31,7 +35,7 @@
   }
 }
 
-/* Stacked header: the field spans its own row, so actions distribute across it. */
+/* Stacked header: the field spans its own row, so actions center within it. */
 @container dashboard-header (max-width: 464px) {
   [data-widget='helm-widget'] {
     flex: 1 1 auto;
@@ -40,7 +44,15 @@
 
   [data-widget='helm-widget'] [data-ui='layout'] {
     flex-wrap: nowrap;
-    justify-content: space-around;
+    justify-content: center;
     width: 100%;
+  }
+
+  [data-widget='helm-widget'] [data-ui-density='dense']:hover [data-ui='action-button-label'] {
+    display: none;
+  }
+
+  [data-widget='helm-widget'] [data-ui-density='dense']:focus-visible [data-ui='action-button-label'] {
+    display: none;
   }
 }
