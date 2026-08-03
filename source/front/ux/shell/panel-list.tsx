@@ -11,6 +11,7 @@ import { PanelHeader } from './panel-header.tsx'
 
 import './panel-list.css'
 
+/** Represents the props for the PanelList component. */
 type PanelListProps = {
   children: UiComponent
   header: PanelHeaderProps

@@ -11,6 +11,7 @@ import { PanelHeader } from './panel-header.tsx'
 
 import './panel-form.css'
 
+/** Represents the props for the PanelForm component. */
 type PanelFormProps = {
   children: UiComponent
   feedback?: PanelFeedback | null
