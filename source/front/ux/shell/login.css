@@ -6,20 +6,31 @@
 */
 
 [data-shell='login'] {
+  --login-layout-max-block-size: 44rem;
   min-height: 100dvh;
   display: grid;
-  align-items: center;
-  justify-content: center;
+  place-items: center;
   padding-inline: var(--sa-rhythm-gap);
   padding-block: var(--sa-rhythm-gap) var(--sa-rhythm-pad);
 }
 
 [data-shell='login-layout'] {
-  height: 100%;
+  block-size: min(
+    calc(100dvh - var(--sa-rhythm-gap) - var(--sa-rhythm-pad)),
+    var(--login-layout-max-block-size)
+  );
   display: grid;
-  align-items: end;
-  gap: var(--sa-space-xl);
+  gap: 0;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  inline-size: min(100%, var(--sa-size-min));
   max-width: var(--sa-size-min);
+}
+
+[data-shell='login-center'] {
+  align-content: center;
+  display: grid;
+  gap: var(--sa-rhythm-pad);
+  min-block-size: 0;
 }
 
 [data-shell='login-feedback'] {
