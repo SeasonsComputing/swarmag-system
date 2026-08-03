@@ -16,7 +16,7 @@ makeDashboardShell  Creates a dashboard shell with authentication required.
 makeDialogRoute     Creates a router route for a shell dialog declaration.
 */
 
-import { DashboardState } from '@front/ux/stores/dashboard-state.ts'
+import { DashboardState, DashboardStateSeed } from '@front/ux/stores/dashboard-state.ts'
 import { type UiComponent, UiDialog } from '@front/ux/ui'
 import { Outlet } from '@tanstack/solid-router'
 import { type AnyRoute, createRoute, useNavigate } from '@tanstack/solid-router'
@@ -48,8 +48,7 @@ export const makeAnonymousShell = (): Shell => ({
 
 /** Create the authenticated dashboard shell from its entry path and runtime data. */
 export const makeDashboardShell = (
-  path: string,
-  seed: unknown,
+  seed: DashboardStateSeed,
   widgets: WidgetRegistry,
   routes: ShellRoute[]
 ): Shell => {
@@ -65,7 +64,7 @@ export const makeDashboardShell = (
     component: DashboardShell,
     initializers: [() => DashboardState.init(seed)],
     routes: [
-      dashboard(path),
+      dashboard('/'),
       dialog('/about', AboutBox, { size: 'content', dismissible: true }),
       ...routes
     ]
