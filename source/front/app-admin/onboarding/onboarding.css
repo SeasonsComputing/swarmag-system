@@ -30,7 +30,7 @@
   padding: var(--sa-space-md);
   background: var(--sa-state-default-bg);
   border: var(--sa-border-default);
-  border-radius: var(--sa-radius-default);
+  border-radius: var(--sa-radius-sm);
 }
 
 [data-app='onboarding-site-label'] {
