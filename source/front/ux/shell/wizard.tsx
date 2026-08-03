@@ -118,8 +118,10 @@ export const Wizard = (props: WizardProps): UiComponent => {
             <For each={props.contract.stages}>
               {(item, index) => (
                 <UiListItem data-shell='wizard-step' data-shell-state={stepState(index())}>
-                  <span data-shell='wizard-step-ordinal'>{index() + 1}</span>
-                  <span data-shell='wizard-step-title'>{item.title}</span>
+                  <span data-shell='wizard-step-label'>
+                    <span data-shell='wizard-step-ordinal'>{index() + 1}</span>
+                    <span data-shell='wizard-step-title'>{item.title}</span>
+                  </span>
                 </UiListItem>
               )}
             </For>
