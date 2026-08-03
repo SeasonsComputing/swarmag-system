@@ -17,13 +17,16 @@ import { PanelHeader } from './panel-header.tsx'
 
 import './panel-stepflow.css'
 
+/** Represents the state of a panel stepflow item. */
 type PanelStepflowState = 'done' | 'current' | 'upcoming'
 
+/** Represents an item in the panel stepflow. */
 type PanelStepflowItem = {
   state: PanelStepflowState
   title: string
 }
 
+/** Represents the props for the PanelStepflow component. */
 type PanelStepflowProps = {
   header?: PanelHeaderProps
   items: PanelStepflowItem[]
