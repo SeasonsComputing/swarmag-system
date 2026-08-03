@@ -95,10 +95,13 @@ export interface DashboardRowsContract {
   move(rowId: string, direction: MoveDirection): Promise<void>
 }
 
+/** Dashboard configuration seed data (from json) */
+export type DashboardStateSeed = unknown
+
 /** Dashboard reactive state and mutation contract. */
 export interface DashboardStateContract {
   store: DashboardStoreView
-  init(seed: unknown): Promise<void>
+  init(seed: DashboardStateSeed): Promise<void>
   headerWidgets: DashboardHeaderContract
   rows: DashboardRowsContract
   rowWidgets: DashboardWidgetsContract
@@ -125,7 +128,7 @@ const [dashboardStore, setDashboardStore] = createStore<DashboardStoreView>({
 type DashboardRecord = DashboardStoreView & { seedHash: string }
 
 /** Compute a djb2 fingerprint of the seed for change detection. */
-function seedFingerprint(seed: unknown): string {
+function seedFingerprint(seed: DashboardStateSeed): string {
   const str = JSON.stringify(seed)
   let hash = 5381
   for (let i = 0; i < str.length; i++) {
@@ -136,7 +139,7 @@ function seedFingerprint(seed: unknown): string {
 }
 
 /** Initialize store from db or seed */
-async function dashboardInit(seed: unknown): Promise<void> {
+async function dashboardInit(seed: DashboardStateSeed): Promise<void> {
   try {
     const db = await IndexedDb.connection()
     const fingerprint = seedFingerprint(seed)
@@ -300,8 +303,8 @@ const dashboardRows: DashboardRowsContract = {
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** Validate and convert input to DashboardView */
-function toDashboardStoreView(input: unknown): DashboardStoreView {
-  const view = toDictionary(input, 'Dashboard view')
+function toDashboardStoreView(seed: DashboardStateSeed): DashboardStoreView {
+  const view = toDictionary(seed, 'Dashboard view')
   const settings = toDashboardSettings(view['settings'], 'Dashboard view.settings')
   const header = toDictionary(view['header'], 'Dashboard view.header')
   const rows = toArray(view['rows'], 'Dashboard view.rows')
