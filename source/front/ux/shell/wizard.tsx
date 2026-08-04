@@ -77,9 +77,9 @@ export const Wizard = (props: WizardProps): UiComponent => {
       setCommitting(true)
       try {
         await current.commit()
-      } catch (cause) {
+      } catch (error) {
         setError(
-          cause instanceof Error ? cause.message : `${current.title} could not be saved.`
+          error instanceof Error ? error.message : `${current.title} could not be saved.`
         )
         return
       } finally {
