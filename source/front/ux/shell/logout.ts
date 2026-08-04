@@ -20,8 +20,8 @@ import { api } from '@front/api'
 export async function logout(): Promise<void> {
   try {
     await api.Auth.logout()
-  } catch (e) {
-    console.error('[logout] logout failed', e)
+  } catch (error) {
+    console.error('[logout] logout failed', error)
   } finally {
     api.SessionState.clear()
   }

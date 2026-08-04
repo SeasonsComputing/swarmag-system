@@ -81,8 +81,9 @@ const LoginClient = (props: LoginClientProps) => {
       await api.Auth.sendOtp(email())
       setStep('code')
       queueMicrotask(() => focusLoginInput('code'))
-    } catch (_) {
+    } catch (error) {
       setError('Could not send code. Please try again.')
+      console.error('[submit-email] failed', error)
     } finally {
       setPending(false)
     }
@@ -95,8 +96,9 @@ const LoginClient = (props: LoginClientProps) => {
     setError(null)
     try {
       await api.Auth.verifyOtp(email(), code())
-    } catch (_) {
+    } catch (error) {
       setError('Invalid or expired code. Please try again.')
+      console.error('[submit-code] failed', error)
     } finally {
       setPending(false)
     }
