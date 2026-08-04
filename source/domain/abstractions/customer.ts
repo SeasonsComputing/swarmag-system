@@ -20,7 +20,6 @@ Customer           Customer account aggregate abstraction.
 
 import type {
   AssociationJunction,
-  AssociationOne,
   AssociationOptional,
   CompositionMany,
   CompositionOne,
@@ -39,7 +38,6 @@ export type Contact = {
 
 /** Serviceable customer location abstraction. */
 export type CustomerSite = {
-  customerId: AssociationOne<Customer>
   location: CompositionOne<Location>
   notes: CompositionMany<Note>
   label: string

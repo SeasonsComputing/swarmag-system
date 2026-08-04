@@ -30,7 +30,6 @@ export const ContactAdapter = makeAdapter<Contact>({
 
 /** Deserialize/Serialize CustomerSite. */
 export const CustomerSiteAdapter = makeAdapter<CustomerSite>({
-  customerId: ['customer_id'],
   location: ['location', LocationAdapter],
   notes: ['notes', NoteAdapter],
   label: ['label'],

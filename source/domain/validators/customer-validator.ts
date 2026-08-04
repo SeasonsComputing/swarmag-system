@@ -96,7 +96,6 @@ export const isCustomerSite = (v: unknown): v is CustomerSite => {
   if (v === null || typeof v !== 'object') return false
   const site = v as CustomerSite
   return expectValid(
-    expectId(site.customerId, 'customerId'),
     expectCompositionOne(site.location, 'location', isLocation),
     expectCompositionMany(site.notes, 'notes', isNote),
     expectNonEmptyString(site.label, 'label'),
