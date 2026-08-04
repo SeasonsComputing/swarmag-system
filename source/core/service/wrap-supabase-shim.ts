@@ -15,7 +15,7 @@ timeout response is sent — so its eventual outcome is watched and logged too.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-WrapSupabaseShimConfig    Shim configuration (timeout, CORS).
+WrapSupabaseShimConfig             Shim configuration (timeout, CORS).
 wrapSupabaseShim(handler, config)  Wrap a Deno.serve handler with timeout + logging.
 */
 

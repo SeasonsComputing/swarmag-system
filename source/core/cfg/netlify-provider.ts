@@ -3,7 +3,7 @@
  * Accesses environment variables via Netlify.env and throws HTTP Response errors.
  */
 
-import type { RuntimeProvider } from '@core/cfg/runtime-provider.ts'
+import type { RuntimeContract } from './runtime-contract.ts'
 
 /** Netlify.env ambient declaration */
 declare const Netlify:
@@ -13,7 +13,7 @@ declare const Netlify:
 /**
  * Configuration provider for Netlify Edge Functions.
  */
-export class ProviderNetlify implements RuntimeProvider {
+export class ProviderNetlify implements RuntimeContract {
   constructor() {
     const isNetlify = 'Netlify' in globalThis
     if (!isNetlify) this.fail('Netlify runtime not available')

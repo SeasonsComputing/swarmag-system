@@ -369,7 +369,7 @@ The system uses a singleton `Config` with injected runtime providers. Defined in
 Config.init(provider, keys, aliases?)
 ```
 
-- `provider` — runtime-specific `RuntimeProvider` instance (`SolidProvider`, `SupabaseProvider`, `DenoProvider`)
+- `provider` — runtime-specific `RuntimeContract` instance (`SolidProvider`, `SupabaseProvider`, `DenoProvider`)
 - `keys` — required environment variable names; fails fast at bootstrap if any are missing
 - `aliases` — optional map of logical name to environment key; allows consuming code to use stable names regardless of platform-specific key prefixes
 

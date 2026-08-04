@@ -546,11 +546,11 @@ The configuration pattern is built on three invariants:
 
 ### 6.2 Configuration Provider Interface
 
-Runtime providers implement the `RuntimeProvider` interface:
+Runtime providers implement the `RuntimeContract` interface:
 
 ```typescript
-// source/core/cfg/runtime-provider.ts
-export interface RuntimeProvider {
+// source/core/cfg/runtime-contract.ts
+export interface RuntimeContract {
   get(key: string): string | undefined
   fail(key: string): never
 }

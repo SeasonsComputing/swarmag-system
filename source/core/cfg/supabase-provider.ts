@@ -5,12 +5,12 @@
  * Response errors on failure.
  */
 
-import { type RuntimeProvider } from './runtime-provider.ts'
+import { type RuntimeContract } from './runtime-contract.ts'
 
 /**
  * Configuration provider for Supabase edge functions.
  */
-export class SupabaseProvider implements RuntimeProvider {
+export class SupabaseProvider implements RuntimeContract {
   constructor() {
     const isDeno = 'Deno' in globalThis
     if (!isDeno) this.fail('Deno runtime not available')

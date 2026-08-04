@@ -92,7 +92,7 @@ export default wrapHttpHandler(async (req) => {
   maxBodySize: 1024 * 1024 // 1MB limit
 })
 
-DESIGN PRINCIPLES:
+DESIGN PRINCIPLES
 ───────────────────────────────────────────────────────────────────────────────
 1. Platform Agnostic
    Uses only Web Standards (Fetch API) - no platform-specific imports
@@ -107,7 +107,7 @@ DESIGN PRINCIPLES:
 6. Zero Runtime Dependencies
    Pure TypeScript with no external packages
 
-FETCH REQUEST-RESPONSE FLOW:
+FETCH REQUEST-RESPONSE FLOW
 ───────────────────────────────────────────────────────────────────────────────
 ┌─────────────────┐
 |  Fetch Request  |         (Raw HTTP from client)
