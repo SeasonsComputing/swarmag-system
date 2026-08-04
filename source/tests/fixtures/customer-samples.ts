@@ -49,13 +49,11 @@ export const blueMesaRanchCustomer: Customer = {
   accountManagerId,
   primaryContact: [ranchOfficeContact],
   sites: [{
-    customerId,
     label: 'North Pasture HQ',
     location: [headquartersLocation],
     acreage: 2400,
     notes: []
   }, {
-    customerId,
     label: 'South Forty',
     location: [southFortyLocation],
     notes: []

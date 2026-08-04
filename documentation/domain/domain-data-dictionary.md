@@ -303,7 +303,6 @@ Attributes: **Relations**
 
 | **Attribute** | **Relation**    | **Abstraction** |
 | ------------- | --------------- | --------------- |
-| `customerId`  | AssociationOne  | Customer        |
 | `location`    | CompositionOne  | Location        |
 | `notes`       | CompositionMany | Note            |
 

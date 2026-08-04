@@ -54,7 +54,6 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
       }]
       : []
     const site: CustomerSite = {
-      customerId: customer.id,
       label: toTrimmed(state.siteLabel()),
       location: [location],
       notes,

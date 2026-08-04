@@ -12,6 +12,11 @@
 -- drop_tables
 -- ──────────────────────────────────────────────────────────────────────────────────────
 
+-- Genesis is total. Auth identities are not a domain table and survive DROP, so they
+-- are cleared explicitly; auth.identities, auth.sessions and auth.refresh_tokens
+-- cascade from this delete. The seed identity is recreated in seed_data.
+DELETE FROM auth.users;
+
 DROP TABLE IF EXISTS job_plan_assets CASCADE;
 DROP TABLE IF EXISTS service_required_asset_types CASCADE;
 DROP TABLE IF EXISTS task_questions CASCADE;
@@ -785,14 +790,7 @@ INSERT INTO auth.users (
   '{}'::jsonb,
   now(),
   now()
-)
-ON CONFLICT (id) DO UPDATE SET
-  confirmation_token = EXCLUDED.confirmation_token,
-  recovery_token = EXCLUDED.recovery_token,
-  email_change = EXCLUDED.email_change,
-  email_change_token_new = EXCLUDED.email_change_token_new,
-  email_confirmed_at = EXCLUDED.email_confirmed_at,
-  updated_at = now();
+);
 
 INSERT INTO users (
   id,
