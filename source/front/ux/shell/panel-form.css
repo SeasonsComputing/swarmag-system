@@ -25,7 +25,7 @@
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
-  gap: var(--sa-space-xs);
+  gap: var(--sa-space-sm);
   padding-block-end: calc(var(--sa-space-sm) + var(--sa-space-xs));
 }
 
