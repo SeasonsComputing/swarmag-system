@@ -762,7 +762,10 @@ CREATE INDEX job_work_log_entries_user_id_idx ON job_work_log_entries (user_id);
 -- seed_data
 -- ──────────────────────────────────────────────────────────────────────────────────────
 
+-- instance_id is the zero UUID for single-instance projects. GoTrue filters every user
+-- lookup on it, so a NULL here makes the seed user invisible to sign-in.
 INSERT INTO auth.users (
+  instance_id,
   id,
   aud,
   role,
@@ -777,6 +780,7 @@ INSERT INTO auth.users (
   created_at,
   updated_at
 ) VALUES (
+  '00000000-0000-0000-0000-000000000000',
   '0195b5b0-3c09-79f0-8d7c-0a1b2c3d4e5f',
   'authenticated',
   'authenticated',
@@ -788,6 +792,27 @@ INSERT INTO auth.users (
   now(),
   '{"provider":"email","providers":["email"]}'::jsonb,
   '{}'::jsonb,
+  now(),
+  now()
+);
+
+-- GoTrue resolves an email sign-in through auth.identities, not auth.users alone. Without
+-- this row the seed user is invisible to the OTP flow and sign-in fails with "Signups not
+-- allowed for otp" because the client requests shouldCreateUser: false.
+INSERT INTO auth.identities (
+  provider_id,
+  user_id,
+  identity_data,
+  provider,
+  last_sign_in_at,
+  created_at,
+  updated_at
+) VALUES (
+  '0195b5b0-3c09-79f0-8d7c-0a1b2c3d4e5f',
+  '0195b5b0-3c09-79f0-8d7c-0a1b2c3d4e5f',
+  '{"sub":"0195b5b0-3c09-79f0-8d7c-0a1b2c3d4e5f","email":"devops-admin@swarmag.com","email_verified":true,"phone_verified":false}'::jsonb,
+  'email',
+  now(),
   now(),
   now()
 );
