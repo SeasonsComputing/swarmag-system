@@ -11,7 +11,7 @@ mapping and a normalized `Session` return shape.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AuthSupabaseClient  Authentication singleton
+AuthSupabaseClient             Authentication singleton
 └ onAuthStateChange(callback)  Subscribe to Supabase auth-state changes
 */
 

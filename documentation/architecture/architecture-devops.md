@@ -199,7 +199,7 @@ fetch plumbing for edge calls unless the SDK fails a concrete requirement.
 
 Supabase Edge functions read runtime configuration only through `Config`.
 `SupabaseProvider` is the repository adapter for that runtime and encapsulates
-the concrete Supabase Edge environment API behind the `RuntimeProvider`
+the concrete Supabase Edge environment API behind the `RuntimeContract`
 contract. Edge function code must not call runtime environment APIs directly.
 It must not depend on UX `VITE_*` names or browser configuration providers.
 

@@ -3,7 +3,7 @@
  * Accesses environment variables via import.meta.env and throws Error.
  */
 
-import type { RuntimeProvider } from '@core/cfg/runtime-provider.ts'
+import type { RuntimeContract } from './runtime-contract.ts'
 
 /** Solid: env forward declaration */
 declare global {
@@ -15,7 +15,7 @@ declare global {
 /**
  * Configuration provider for Solid app.
  */
-export class SolidProvider implements RuntimeProvider {
+export class SolidProvider implements RuntimeContract {
   constructor() {
     const env = import.meta.env
     if (!env) this.fail('Solid runtime not available')

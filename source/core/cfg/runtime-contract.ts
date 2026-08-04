@@ -1,7 +1,7 @@
 /**
  * Runtime provider -- specialized provider for runtime configuration.
  */
-export interface RuntimeProvider {
+export interface RuntimeContract {
   /**
    * Retrieve an environment variable value.
    * @param key - Environment variable name to read.

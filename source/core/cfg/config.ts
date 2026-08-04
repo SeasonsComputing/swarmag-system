@@ -3,13 +3,13 @@
  */
 
 import { type StringDictionary, StringSet } from '@core/std'
-import { RuntimeProvider } from './runtime-provider.ts'
+import { RuntimeContract } from './runtime-contract.ts'
 
 /** Config Aliases */
 type RuntimeAliases = StringDictionary
 
 /** Provider used until initialized */
-export const nullProvider: RuntimeProvider = {
+const nullProvider: RuntimeContract = {
   get: (_key: string): string | undefined => undefined,
   fail: (msg: string): never => {
     throw new Error(msg)
@@ -26,7 +26,7 @@ class RuntimeConfig {
 
   /** Runtime environment provider. */
   #initialized: boolean = false
-  #provider: RuntimeProvider = nullProvider
+  #provider: RuntimeContract = nullProvider
   #aliases: RuntimeAliases = {}
 
   /**
@@ -35,7 +35,7 @@ class RuntimeConfig {
    * @param keys - Environment variable names to validate and register.
    */
   init(
-    provider: RuntimeProvider,
+    provider: RuntimeContract,
     keys: readonly string[],
     aliases: RuntimeAliases = {}
   ): void {
