@@ -122,8 +122,8 @@ async function runShellTransition(
 ): Promise<void> {
   try {
     await transition.run()
-  } catch (e) {
-    console.error('[shell-transition] transition failed', e)
+  } catch (error) {
+    console.error('[shell-transition] transition failed', error)
   } finally {
     await navigate({ to: transition.destination, replace: true })
   }

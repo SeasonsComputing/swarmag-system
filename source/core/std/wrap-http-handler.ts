@@ -446,8 +446,8 @@ export const wrapHttpHandler = <
       let body: unknown
       try {
         body = await parseRequestBody(request, method, headers['content-type'], config)
-      } catch (err) {
-        const { name, message } = serializeError(err)
+      } catch (error) {
+        const { name, message } = serializeError(error)
         const statusCode = name === 'PayloadTooLarge'
           ? HttpCodes.payloadTooLarge
           : HttpCodes.badRequest
@@ -477,9 +477,9 @@ export const wrapHttpHandler = <
 
       const statusCode = validateStatusCode(result.statusCode)
       return makeResponse(statusCode, result.body, result.headers, config)
-    } catch (err) {
-      const { name, message } = serializeError(err)
-      console.error('Unhandled error in HTTP handler:', { name, message, err })
+    } catch (error) {
+      const { name, message } = serializeError(error)
+      console.error('Unhandled error in HTTP handler:', { name, message, error })
       return makeErrorResponse(HttpCodes.internalError, name, message, config)
     }
   }
@@ -507,13 +507,13 @@ const NO_BODY_STATUS_CODES = new Set([204, 304])
 
 /**
  * Extract error message from unknown error value.
- * @param err Unknown error value.
+ * @param error Unknown error value.
  * @returns Error message string.
  */
-const extractErrorMessage = (err: unknown): string => {
-  if (err instanceof Error) return err.message
-  if (typeof err === 'string') return err
-  return String(err)
+const extractErrorMessage = (error: unknown): string => {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  return String(error)
 }
 
 /**
@@ -592,16 +592,16 @@ const validateStatusCode = (statusCode: number): number => {
 
 /**
  * Safely serialize an error for JSON response.
- * @param err Unknown error value.
+ * @param error Unknown error value.
  * @returns Error object with name and message.
  */
-const serializeError = (err: unknown): Message => {
+const serializeError = (error: unknown): Message => {
   // 1. Force everything into an Error-like shape immediately
-  const normalized = err instanceof Error
-    ? err
-    : (typeof err === 'object' && err !== null && 'message' in err)
-    ? err as Error // It looks like an error, treat it like one
-    : new Error(typeof err === 'string' ? err : JSON.stringify(err) || String(err))
+  const normalized = error instanceof Error
+    ? error
+    : (typeof error === 'object' && error !== null && 'message' in error)
+    ? error as Error // It looks like an error, treat it like one
+    : new Error(typeof error === 'string' ? error : JSON.stringify(error) || String(error))
 
   // 2. Extract properties manually (because stringify skips non-enumerable Error props)
   const result: { name: string; message: string; stack?: string } = {
@@ -611,10 +611,10 @@ const serializeError = (err: unknown): Message => {
   }
 
   // 3. Handle additional custom metadata (e.g., status codes, "cause")
-  if (err && typeof err === 'object') {
+  if (error && typeof error === 'object') {
     try {
       // Pick up extra custom properties that aren't name/message/stack
-      const extraData = JSON.parse(JSON.stringify(err, getCircularReplacer()))
+      const extraData = JSON.parse(JSON.stringify(error, getCircularReplacer()))
       return { ...extraData, ...result }
     } catch {
       // If circular, we still have the name/message/stack from step 2
@@ -700,8 +700,8 @@ const parseRequestBody = async (
   // Parse JSON
   try {
     return JSON.parse(decodedBody)
-  } catch (err) {
-    throw new NamedError('InvalidJSON', `Invalid JSON: ${(err as Error).message}`)
+  } catch (error) {
+    throw new NamedError('InvalidJSON', `Invalid JSON: ${(error as Error).message}`)
   }
 }
 
@@ -740,12 +740,12 @@ const makeResponse = (
   if (isJsonResponse) {
     try {
       bodyString = JSON.stringify(body === undefined ? null : body)
-    } catch (err) {
+    } catch (error) {
       console.error('Handler returned non-serializable response body:', body)
       return makeErrorResponse(
         HttpCodes.internalError,
         'InvalidResponse',
-        `Response body is not JSON-serializable: ${(err as Error).message}`,
+        `Response body is not JSON-serializable: ${(error as Error).message}`,
         config
       )
     }
