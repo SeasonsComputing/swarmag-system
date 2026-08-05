@@ -20,7 +20,7 @@ Container ─┬─ Header      (1)    title · cancel
            │     ├─ List ─────┬─ Header  (1)    title · new (0..1)
            │     │            ├─ Toolbar (0..1) search · paging
            │     │            └─ Body    (1)
-           │     └─ Timeline ─┬─ Header  (0..1)
+           │     └─ Stepflow ─┬─ Header  (0..1)
            │                  └─ Body    (1)
            └─ Subject     (1)    ← right · main
                  └─ Form ─────┬─ Header   (1)
@@ -29,7 +29,7 @@ Container ─┬─ Header      (1)    title · cancel
 ```
 
 **Index and Subject are roles, not positions.** Manager fills Index with a List,
-wizard fills it with a Timeline. Collapse policy attaches to the role: the
+wizard fills it with a Stepflow. Collapse policy attaches to the role: the
 manager turns Index into a _mode_, the wizard _drops_ it. Same role, two
 policies, one place to declare each.
 
@@ -65,7 +65,7 @@ scrolled content, and was never chrome.
   wizard moves its feedback out of the card body to match.
 - Index is `<aside>`, Subject is `<main>`. `abstraction-manager.tsx` currently
   uses `<section>` for both, which wrongly states they are peers.
-- `PanelTimeline` is **hand-built** — Kobalte 0.13.11 has no timeline or stepper,
+- `PanelStepflow` is **hand-built** — Kobalte 0.13.11 has no timeline or stepper,
   and this adds **no new `Ui{Control}`**; the Ui layer stays closed. Compose from
   `UiList` + `data-feat`, as the current step list already does.
 
@@ -76,7 +76,7 @@ scrolled content, and was never chrome.
 | Container            | `PanelContainer` | `ux/shell/panel-container.tsx` |
 | Header (both levels) | `PanelHeader`    | `ux/shell/panel-header.tsx`    |
 | List kind            | `PanelList`      | `ux/shell/panel-list.tsx`      |
-| Timeline kind        | `PanelTimeline`  | `ux/shell/panel-timeline.tsx`  |
+| Stepflow kind        | `PanelStepflow`  | `ux/shell/panel-stepflow.tsx`  |
 | Form kind            | `PanelForm`      | `ux/shell/panel-form.tsx`      |
 | Shared types         | —                | `ux/shell/panel-contract.ts`   |
 
@@ -101,7 +101,7 @@ app-admin/users        UserManager    supplies AbstractionManagerContract
                               ↓
 ux/shell    Wizard  |  AbstractionManager      sequencing · selection · own contracts
                               ↓
-ux/shell    PanelContainer + List/Timeline/Form   geometry · chrome · roles · collapse
+ux/shell    PanelContainer + List/Stepflow/Form   geometry · chrome · roles · collapse
                               ↓
 ux/ui       UiCard · UiDialog · UiTable · UiActionButton
 ```
@@ -275,12 +275,22 @@ seam section above and must not be reintroduced:
 - `grid-template-rows: 1fr` on the dialog resolved to `minmax(auto, 1fr)`, whose
   auto minimum floored the row at content height.
 
-### P2 — Wizard migration + Timeline
+### P2 — Wizard migration + Stepflow — COMPLETE, shipped 2026-07-30 → 08-02
+
+As built: `wizard.tsx` renders `PanelContainer` with the progress rail as the
+accessory, `PanelStepflow` as the Index, and `PanelForm` as the Subject. The
+stage title sits in the Subject header beside Back, and Back is hidden on the
+first step. `PanelTimeline` was renamed **`PanelStepflow`** during the build
+(`89ba3f9`) — the name below is updated throughout; the shape is unchanged.
+
+The accessory keeps its numbered per-stage labels alongside the stepflow's own
+enumeration. That duplication remains the provisional arrangement the CA
+authorized on 2026-07-22, not an oversight.
 
 5. Migrate `Wizard` onto the family. Feedback moves out of the card body to under
    the header bar. The `wizard-content` wrapper and its `UiLayout block-fill`
    disappear — panels become direct grid children of the container.
-6. Build `PanelTimeline` and wire it into the wizard's Index. Header is `(0..1)`
+6. Build `PanelStepflow` and wire it into the wizard's Index. Header is `(0..1)`
    and the working assumption is **none** — the container header names the flow
    and the accessory names the stage, so a third label is redundant.
 
@@ -296,12 +306,12 @@ seam section above and must not be reintroduced:
    ```
 
    Body carries `done | current | upcoming` per stage. **Read-only — neither the
-   timeline nor the progress rail is ever clickable.**
+   stepflow nor the progress rail is ever clickable.**
 
    **Both components enumerate the stages, and that redundancy is deliberate.**
    The progress accessory already houses the rail _plus_ a numbered label per
    stage (`wizard.tsx:110–119`, the Group A chrome refinement) and **keeps them
-   unchanged**. In wide, the timeline enumerates the same stages a second time.
+   unchanged**. In wide, the stepflow enumerates the same stages a second time.
 
    The CA is aware and has authorized building it this way while he settles the
    idea (2026-07-22). **Do not "fix" this by dropping the accessory's labels, and
@@ -351,14 +361,16 @@ its own literal rather than inherit 768 — a shared threshold would collapse it
 roughly 170px early. The query resolves against `[data-ui='dialog']`, not against
 `PanelContainer`.
 
-### P3 — Customer sites
+### P3 — Customer sites — DESIGN SUPPLIED 2026-08-04, build open
 
-**Design pending — the CA is holding his own thinking and will supply it.** He
-has stated only that it follows the same principles as the rest of this session.
-Do not design it, and do not infer it from the analysis below.
+The CA supplied it: `effort/active/2026-08-04-composition-editor-design.md`. A
+paged composition editor in `ux/shell/`, generic over `T[]` with a cursor. Stage 3
+is a **rehost** onto that control — the field set does not change.
 
-What is recorded so far, as defects observed in the built stage 3, not as a
-proposed fix:
+Of the defects listed below, `--sa-radius-default` is fixed (`3bb1386`, now
+`--sa-radius-sm`) and the false "(optional)" labels are gone. The remaining four
+are verified as still present at 2026-08-04, and the design addresses all four
+structurally rather than by patching:
 
 - The added-sites list renders _above_ the capture form (`onboarding.tsx:363`),
   so every successful add grows the list and pushes the form further down. The
@@ -386,7 +398,7 @@ proposed fix:
   `data-feat` strings stay. The `use-abstraction-form-*` hooks keep their names.
 - **Toolbar contents.** Search, sort and paging do not exist in
   `abstraction-manager.tsx` today. Build the _slot_; do not invent the controls.
-- **Timeline header contents.** Probably none — the container header names the
+- **Stepflow header contents.** Probably none — the container header names the
   flow and the accessory names the stage, so a third label is the redundancy this
   session has been cutting. Decide when the geometry is visible.
 - **COW stage layout rework.** Separate thread.
@@ -405,7 +417,7 @@ proposed fix:
 - Rhythm tokens: `gutter` = page padding only and is **taken**; `pad` = box
   interiors; `gap` = space between siblings. A surface needing an inline measure
   distinct from its block measure requires a **new** token — do not repurpose.
-- Do not propose the guards as future work; twelve already ship.
+- Do not propose the guards as future work; thirteen already ship.
 
 ## Verification
 
@@ -415,7 +427,7 @@ deno task check
 deno task test
 ```
 
-`check` runs twelve guards, then types, then lint. Run `fmt` first — dprint
+`check` runs thirteen guards, then types, then lint. Run `fmt` first — dprint
 stability has bitten this work before. Report results verbatim; do not
 characterize a run as green without the output.
 

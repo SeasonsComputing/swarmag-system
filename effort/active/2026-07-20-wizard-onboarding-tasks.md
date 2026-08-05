@@ -2,13 +2,18 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation (A0/A/C) + Feature (B)
-**Status:** IN PROGRESS — D1–D17 ratified 2026-07-20; A0, A1, A, B0 complete
-(A1 schema live on stage; A = wizard framework, contract+host+chrome;
-B0 = `api.Customers` inline, RLS-verified). **B built 2026-07-22 — wired and
-launching, but its stage layout is NOT accepted; layout rework is the open
-thread and the next session opens there.** C (Notes-lite) and D (verification)
-pending. Per-group go orders remain the gate.
+**Status:** IN PROGRESS — D1–D17 ratified 2026-07-20; **A0, A1, A, B0 and B all
+complete.** CA accepted the stage layout on 2026-08-04 after the rework shipped
+2026-07-30 → 08-02. **C (Notes-lite) and D (verification) remain.** Per-group go
+orders remain the gate.
+
+**Group B closes with one question outstanding against it** — fieldset
+redundancy, recorded in `documentation/project/project-backlog.md`. It reaches
+stages 1 and 2, which are otherwise finished, so B is not final-final until that
+rule is settled. See `effort/active/2026-08-04-composition-editor-design.md` §4.3.
+
 **Source design:** `effort/active/2026-07-20-wizard-onboarding-design.md`
+**Composition editor:** `effort/active/2026-08-04-composition-editor-design.md`
 
 Each group is a gated production: scope declared, go received, checks run,
 results reported. Delegation per budget discipline (haiku, git read-only).
@@ -151,7 +156,7 @@ end-to-end:
       contract evolution whose shape the CA intends to design directly —
       parked 2026-07-21 (see `project-feature-parking-lot.md`)
 
-## Group B — COW Feature (Feature Mode) — BUILT 2026-07-22, layout OPEN
+## Group B — COW Feature (Feature Mode) — COMPLETE 2026-08-04
 
 - [x] `front/app-admin/onboarding/onboarding.tsx` + `.css`; dialog route
       `/onboarding` (workbench) beside `/users`; dashboard HelmWidget
@@ -176,23 +181,50 @@ end-to-end:
       (first consumer!)
 - [x] Checks: 188 files — types + 12 guards + lint green; fmt clean; app
       boots with zero console errors
-- [ ] **OPEN — general stage layout not accepted (CA, 2026-07-22).** The
-      flow wires and launches; the layout needs rework. Design
-      conversation pending — the next session opens here
+- [x] **Layout rework — ACCEPTED 2026-08-04.** Shipped 2026-07-30 → 08-02:
+      stages split into `onboarding-stage-{contact,customer,sites}.tsx` +
+      `onboarding-state.ts`; stage titles clarified; the false "(optional)"
+      labels removed; the wizard migrated onto the panel family with the
+      stage title in the Subject header and Back hidden on the first step
+- [x] Per-field error text — SUPERSEDES the deferral below. `WizardStage`
+      gained `validate?()`: Next stays live on an incomplete stage and asks
+      the stage to validate, so the stage shows its own field errors and
+      says why. A disabled button could not. See `wizard.tsx` `advance()`
+- [x] `CustomerSite.customerId` removed (`ba494f7`) — a back-pointer left
+      from when sites were their own table. A subordinate composition does
+      not reference its parent
+- [ ] **Stage 3 (sites) — rehost onto the composition editor.** Four defects
+      survive and are verified as of 2026-08-04: added-sites list renders
+      above the capture form; three nested legends; four-row textarea buried
+      mid-form; `clearSite` hand-resets eleven signals. Design:
+      `effort/active/2026-08-04-composition-editor-design.md`. The field set
+      does not change — this is a rehost, not a redesign
+- [ ] **Fieldset redundancy** — a panel with exactly one fieldset whose legend
+      repeats the panel title (stage 1 is the live example). Recorded in
+      `documentation/project/project-backlog.md`; reaches stages 1 and 2
 - [ ] DEFERRED (recorded, not lost): `accountManagerId` capture (no user
-      picker, commits `undefined`); per-field inline error text (the gate
-      is the disabled Next plus `required` markers); geolocation-denied
-      feedback (currently silent); post-Finish success confirmation — the
-      create-only / no-readback gap, resolved by the prospect hub (D15)
+      picker, commits `undefined`); geolocation-denied feedback (currently
+      silent); post-Finish success confirmation — the create-only /
+      no-readback gap, resolved by the prospect hub (D15)
 
 ## Group C — Notes-lite (Foundation)
 
+Notes rides the composition editor rather than inventing a second
+list-plus-form. `Note` is already a universal composition — twelve declared
+mount points, three needed now: **User, Customer, Site.** Design:
+`effort/active/2026-08-04-composition-editor-design.md`.
+
+- [ ] Composition editor in `front/ux/shell/` — generic over `T[]` + cursor,
+      not typed to `Composition*`. First consumer is stage 3 (Group B), which
+      is what proves the shape before Notes reuses it
 - [ ] `front/ux/shell/notes.tsx` — value-in/value-out over
       `CompositionMany<Note>`: content, visibility, tags (`cluster`);
-      capabilities prop reserved for Phase 4 affordances
+      capabilities prop reserved for Phase 4 affordances. No attachments —
+      `Note.attachments` is Phase 4 and blocks nothing here
 - [ ] Migrate User Manager notes textarea onto it (regression: live
       manager pass unchanged)
-- [ ] Migrate COW site notes onto it
+- [ ] Migrate COW site notes onto it — the second consumer, and the proof
+      the control is genuinely generic rather than site-shaped
 - [ ] Style: no new tokens unless demanded; guard suite green
 
 ## Group D — Verification & Close
