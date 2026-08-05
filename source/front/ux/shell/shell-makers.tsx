@@ -22,16 +22,16 @@ import { AuthGuard } from './auth-guard.tsx'
 import { Dashboard } from './dashboard.tsx'
 import { Login } from './login.tsx'
 import { logout } from './logout.ts'
-import { dialog, index, page, type Shell, type ShellRoute, transition } from './shell.ts'
-import type { WidgetRegistry } from './widget-contract.ts'
+import { Routes, type Shell, type ShellRoute } from './shell.ts'
+import { type WidgetRegistry } from './widget-contract.ts'
 
 /** Create the lightweight shell and its common non-dashboard routes. */
 export const makeAnonymousShell = (): Shell => ({
   component: () => <Outlet />,
   initializers: [],
   routes: [
-    page('/login', Login),
-    transition('/logout', logout, '/login')
+    Routes.page('/login', Login),
+    Routes.transition('/logout', logout, '/login')
   ]
 })
 
@@ -53,8 +53,8 @@ export const makeDashboardShell = (
     component: DashboardShell,
     initializers: [() => DashboardState.init(seed)],
     routes: [
-      index(),
-      dialog('/about', AboutBox, { size: 'content', dismissible: true }),
+      Routes.index(),
+      Routes.dialog('/about', AboutBox, { size: 'content', dismissible: true }),
       ...routes
     ]
   }

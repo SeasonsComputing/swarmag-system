@@ -35,14 +35,15 @@ ShellOverlayOptions       Overlay presentation options.
 
 ROUTE FACTORY
 ───────────────────────────────────────────────────────────────────────────────
-application               Create a complete application composition.
-index                     Create a default shell child route.
-page                      Create a direct page route.
-workbench                 Create a workbench route.
-dialog                    Create a dialog route.
-redirect                  Create an immediate redirect route.
-transition                Create a work-then-redirect route.
-Factory                   Route factory convenience container.
+Routes                    Route factory convenience container.
+├ application             Create a complete application composition.
+├ index                   Create a default shell child route.
+├ page                    Create a direct page route.
+├ workbench               Create a workbench route.
+├ dialog                  Create a dialog route.
+├ redirect                Create an immediate redirect route.
+└ transition              Create a work-then-redirect route.
+
 */
 
 import type { UiComponent, UiDialogSize } from '@front/ux/ui'
@@ -134,19 +135,19 @@ export type ShellOverlayOptions = {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Create a complete application composition. */
-export const application = (shells: Shell[]): ShellApplication => ({ shells })
+const application = (shells: Shell[]): ShellApplication => ({ shells })
 
 /** Create a default shell child route. */
-export const index = (): ShellIndex => ({ kind: 'index', path: '/' })
+const index = (): ShellIndex => ({ kind: 'index', path: '/' })
 
 /** Create a route that presents direct page content. */
-export const page = (
+const page = (
   path: string,
   component: ShellPageView
 ): ShellPage => ({ kind: 'page', path, component })
 
 /** Create a route that presents workbench content. */
-export const workbench = (
+const workbench = (
   path: string,
   component: ShellOverlayView
 ): ShellOverlay => ({
@@ -157,27 +158,27 @@ export const workbench = (
 })
 
 /** Create a route that presents dialog content over its owning shell. */
-export const dialog = (
+const dialog = (
   path: string,
   component: ShellOverlayView,
   options: ShellOverlayOptions
 ): ShellOverlay => ({ kind: 'overlay', path, component, options })
 
 /** Create a route that redirects immediately. */
-export const redirect = (
+const redirect = (
   path: string,
   destination: string
 ): ShellRedirect => ({ kind: 'redirect', path, destination })
 
 /** Create a route that runs work before redirecting. */
-export const transition = (
+const transition = (
   path: string,
   run: () => Promise<void>,
   destination: string
 ): ShellTransition => ({ kind: 'transition', path, run, destination })
 
 /** Route factory convenience container. */
-export const Factory = {
+export const Routes = {
   application,
   index,
   page,
