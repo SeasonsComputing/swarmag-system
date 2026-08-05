@@ -302,7 +302,7 @@ const dashboardRows: DashboardRowsContract = {
 // DASHBOARD JSON -> VIEW CONVERSION
 // ───────────────────────────────────────────────────────────────────────────────
 
-/** Validate and convert input to DashboardView */
+/** Validate and convert input to dashboard store */
 function toDashboardStoreView(seed: DashboardStateSeed): DashboardStoreView {
   const view = toDictionary(seed, 'Dashboard view')
   const settings = toDashboardSettings(view['settings'], 'Dashboard view.settings')

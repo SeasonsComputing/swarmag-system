@@ -756,7 +756,7 @@ same placement principles at their respective scales.
 
 Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/front/ux/stores/dashboard-state.ts`). Not hardcoded. The current contract uses one default config per app.
 
-The app-local dashboard JSON conforms to `DashboardView` from `source/front/ux/views/dashboard-views.ts`. `DashboardState.init(seed)`validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
+The app-local dashboard JSON conforms to `DashboardStoreView` from `source/front/ux/views/dashboard-views.ts`. `DashboardState.init(seed)`validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
 `makeDashboardShell()` initializes `DashboardState`, then constructs `Dashboard` with the state contract and app-supplied widget registry as explicit inputs. The registry is composition data: each app package binds explicit dashboard widget type keys to concrete widgets alongside its dashboard JSON — the two halves of one dashboard-shell declaration.
 
@@ -801,7 +801,7 @@ UX projection types — shapes that exist because the domain model does not surf
 | File                 | Types                                                                 | Purpose                                             |
 | -------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
 | `job-views.ts`       | `JobManifest`, `JobHub`                                               | Job display projections                             |
-| `dashboard-views.ts` | `DashboardView`, `DashboardHeader`, `DashboardRow`, `DashboardWidget` | Dashboard layout schema types                       |
+| `dashboard-views.ts` | `DashboardStoreView`, `DashboardHeader`, `DashboardRow`, `DashboardWidget` | Dashboard layout schema types                       |
 | `workflow-views.ts`  | `WorkflowView`                                                        | Ordered tasks + questions resolved for renderer     |
 | `question-views.ts`  | `QuestionView`                                                        | Discriminated union flattened for workflow renderer |
 
