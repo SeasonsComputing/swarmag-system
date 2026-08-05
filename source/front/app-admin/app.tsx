@@ -9,7 +9,7 @@ import { bootstrap } from '@front/ux/shell/bootstrap.tsx'
 import { Onboarding } from '@front/app-admin/onboarding/onboarding.tsx'
 import { UserManager } from '@front/app-admin/users/user-manager.tsx'
 import { makeAnonymousShell, makeDashboardShell } from '@front/ux/shell/shell-makers.tsx'
-import { application, workbench } from '@front/ux/shell/shell.ts'
+import { Routes } from '@front/ux/shell/shell.ts'
 import { widgetRegistry } from '@front/ux/widgets/widget-registry.ts'
 
 // application specialalized dashboard
@@ -17,11 +17,11 @@ import dashboardSeed from './dashboard-admin.json' with { type: 'json' }
 
 // bootstrap application
 void bootstrap(
-  application([
+  Routes.application([
     makeAnonymousShell(),
     makeDashboardShell(dashboardSeed, widgetRegistry(), [
-      workbench('/onboarding', Onboarding),
-      workbench('/users', UserManager)
+      Routes.workbench('/onboarding', Onboarding),
+      Routes.workbench('/users', UserManager)
     ])
   ])
 )

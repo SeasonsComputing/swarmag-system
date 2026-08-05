@@ -7,7 +7,7 @@ import { bootstrap } from '@front/ux/shell/bootstrap.tsx'
 
 // shell bindings
 import { makeAnonymousShell, makeDashboardShell } from '@front/ux/shell/shell-makers.tsx'
-import { application } from '@front/ux/shell/shell.ts'
+import { Routes } from '@front/ux/shell/shell.ts'
 import { widgetRegistry } from '@front/ux/widgets/widget-registry.ts'
 
 // application specialalized dashboard
@@ -15,7 +15,7 @@ import dashboardSeed from './dashboard-customer.json' with { type: 'json' }
 
 // bootstrap application
 void bootstrap(
-  application([
+  Routes.application([
     makeAnonymousShell(),
     makeDashboardShell(dashboardSeed, widgetRegistry(), [])
   ])
