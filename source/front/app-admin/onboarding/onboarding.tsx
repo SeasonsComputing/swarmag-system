@@ -32,7 +32,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
 
   const stageContact: WizardStage = {
     name: 'contact',
-    title: 'Primary contact',
+    title: 'Contact details',
     render: () => (
       <OnboardingStageContact
         state={state}
