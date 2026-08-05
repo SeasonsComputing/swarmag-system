@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Groups action buttons at the end of a form. Always separate from the field
+Groups action buttons, always separate from the field
 grid — never nested inside an UiField.
 
 PUBLIC
