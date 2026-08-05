@@ -51,7 +51,7 @@ import type {
   DashboardSettings,
   DashboardWidget,
   DashboardWidgetSettings
-} from '@front/ux/views/dashboard-views.ts'
+} from '@front/ux/shell/dashboard-contract.ts'
 import { createStore, produce } from '@solid-js/store'
 
 // ───────────────────────────────────────────────────────────────────────────────

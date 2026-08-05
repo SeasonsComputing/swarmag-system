@@ -798,12 +798,12 @@ Dashboard state remains a Reactive Store Module. The dashboard receives its name
 
 UX projection types — shapes that exist because the domain model does not surface cleanly to the UI as-is. No infrastructure imports, no SolidJS imports. Pure types only. Files follow the `{domain}-views.ts` naming convention.
 
-| File                 | Types                                                                 | Purpose                                             |
-| -------------------- | --------------------------------------------------------------------- | --------------------------------------------------- |
-| `job-views.ts`       | `JobManifest`, `JobHub`                                               | Job display projections                             |
+| File                 | Types                                                                      | Purpose                                             |
+| -------------------- | -------------------------------------------------------------------------- | --------------------------------------------------- |
+| `job-views.ts`       | `JobManifest`, `JobHub`                                                    | Job display projections                             |
 | `dashboard-views.ts` | `DashboardStoreView`, `DashboardHeader`, `DashboardRow`, `DashboardWidget` | Dashboard layout schema types                       |
-| `workflow-views.ts`  | `WorkflowView`                                                        | Ordered tasks + questions resolved for renderer     |
-| `question-views.ts`  | `QuestionView`                                                        | Discriminated union flattened for workflow renderer |
+| `workflow-views.ts`  | `WorkflowView`                                                             | Ordered tasks + questions resolved for renderer     |
+| `question-views.ts`  | `QuestionView`                                                             | Discriminated union flattened for workflow renderer |
 
 ## 11. Specialized Application Features
 
