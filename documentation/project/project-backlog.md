@@ -34,23 +34,27 @@ on the principal being unresolvable rather than on token validity. Related: gene
 total on 2026-08-04, so this state is now reachable every time the database is regenerated
 rather than only when auth happened to be cleared by hand.
 
-## Design questions
+## Guards
 
-### When does a fieldset earn its legend
+### `guard:css` does not verify that a referenced token resolves
 
-**Raised:** 2026-08-04 (CA) — to be discussed alongside the effort-doc reconciliation.
+**Observed:** 2026-08-06 — second occurrence.
 
-The case in question is narrow: **a form panel containing exactly one fieldset, whose
-legend repeats the panel title.** A panel titled "Primary contact" wrapping a lone fieldset
-titled "Primary Contact" states the same thing twice, one line apart.
+`guard:css` forbids raw literals but never checks that a `var(--sa-*)` reference is
+actually declared. An unresolvable custom property is not an error: the browser drops
+the whole declaration silently, so the rule simply does not apply and nothing reports it.
+Thirteen guards and a passing `deno task check` see nothing.
 
-Not in question: multiple fieldsets partitioning a panel, or a single fieldset whose legend
-names something the panel title does not.
+Two specimens so far. The first produced square site tiles for weeks. The second was
+found by hand on 2026-08-06 and fixed the same day: `ui.css` referenced
+`--sa-control-ring-error` where the declared token is `--sa-control-shadow-error`, so
+checkbox and radio error states rendered their border with no ring.
 
-What to settle is what that case should collapse to, and whether it generalizes into a
-rule. It also bears on the no-nested-fieldsets position taken the same day.
+The check is mechanical: collect every `var(--sa-*)` reference across the CSS files and
+assert each is declared in `tokens.css`, `roles.css`, `themes.css` or `icons.css`.
 
-Bears on the composition-editor design, which proposes a fieldset specialization as its
-frame.
+One trap for whoever builds it: `--sa-icon` is declared in `icons.css` and is a glyph
+binding rather than a provider token, so a guard that scans only the three provider files
+reports it as undefined. It is legitimate and must be included.
 
 _End of Backlog_
