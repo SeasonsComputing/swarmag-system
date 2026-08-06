@@ -10,8 +10,8 @@ import { createEffect, createSignal, For } from '@solid-js'
 // dprint-ignore
 import {
   UiAccordion, UiAccordionContent, UiAccordionItem, UiAccordionTrigger, UiAlert, UiAvatar,
-  UiBadge, UiButton, UiCard, UiCheckbox, UiDialog, UiField, UiFieldset, UiFooter,
-  UiFormActions, UiInput, UiLayout, UiList, UiListItem, UiMultiSelect,
+  UiBadge, UiButton, UiCard, UiCheckbox, UiCollectionCursor, UiDialog, UiField,
+  UiFieldset, UiFooter, UiFormActions, UiInput, UiLayout, UiList, UiListItem, UiMultiSelect,
   UiPopover, UiProgress, UiRadioGroup, UiRadioItem, UiSingleSelect, UiSeparator,
   UiSkeleton, UiSpinner, UiTab, UiTable, UiTableBody, UiTableCell, UiTableHeader,
   UiTableRow, UiTabList, UiTabPanel, UiTabs, UiTextArea, UiToggle, UiToggleGroup,
@@ -27,12 +27,15 @@ import icon from './favicon.ico'
 import {
   ACCORDION_DEFAULT_VALUE,
   BUTTON_VARIANTS,
+  COLLECTION_CURSOR_ITEMS,
+  COLLECTION_CURSOR_MANY,
   COLOR_GRADIENTS,
   COLOR_SWATCHES,
   DEFAULT_SERVICES,
   EQUIPMENT,
   SERVICES,
   STATUSES,
+  type StyleGuideCollectionItem,
   TEXT_TOKENS
 } from './style-guide-fixtures.ts'
 
@@ -54,7 +57,7 @@ const SgHeader = (): UiComponent => {
     <header data-app='style-guide-header'>
       <div data-app='style-guide-header-contents'>
         <div data-app='style-guide-header-brand'>
-          <UiLayout variant='inline'>
+          <UiLayout variant='inline-fit'>
             <img data-app='style-guide-header-icon' src={icon} alt='' width={64} height={64} />
             <UiLayout gap='tight'>
               <h1 data-app='style-guide-header-title'>
@@ -155,6 +158,25 @@ export const StyleGuide = (): UiComponent => {
   const [serviceStatus, setServiceStatus] = createSignal<ServiceStatus>('ready')
   const [tab, setTab] = createSignal<Tab>('assessment')
   const [tabScroll, setTabScroll] = createSignal<TabScroll>('assessment')
+  const [collectionItems, setCollectionItems] = createSignal<StyleGuideCollectionItem[]>([
+    ...COLLECTION_CURSOR_ITEMS
+  ])
+  const [collectionMany, setCollectionMany] = createSignal<StyleGuideCollectionItem[]>([
+    ...COLLECTION_CURSOR_MANY
+  ])
+  const newCollectionItem = (): StyleGuideCollectionItem => ({
+    label: 'New service block',
+    acreage: '',
+    note: ''
+  })
+  const updateCollectionItem = (
+    index: number,
+    patch: Partial<StyleGuideCollectionItem>
+  ): void => {
+    setCollectionItems(
+      collectionItems().map((item, itemIndex) => itemIndex === index ? { ...item, ...patch } : item)
+    )
+  }
 
   return (
     <>
@@ -425,14 +447,14 @@ export const StyleGuide = (): UiComponent => {
               </UiToggle>
             </UiField>
             <UiFieldset legend='Variants'>
-              <UiLayout variant='inline'>
+              <UiLayout variant='cluster'>
                 <For each={BUTTON_VARIANTS}>
                   {b => <UiButton variant={b.variant}>{b.label}</UiButton>}
                 </For>
               </UiLayout>
             </UiFieldset>
             <UiFieldset legend='Disabled and loading'>
-              <UiLayout variant='inline'>
+              <UiLayout variant='inline-fit'>
                 <UiButton disabled>Disabled</UiButton>
                 <UiButton variant='primary' loading={loading()}>Loading</UiButton>
               </UiLayout>
@@ -558,38 +580,98 @@ export const StyleGuide = (): UiComponent => {
             </UiFieldset>
           </SgSection>
 
-          <SgSection title='UiField / UiFieldset / UiLayout / UiFormActions'>
-            <UiFieldset legend='Service details'>
-              <UiLayout variant='inline-wrap'>
-                <UiField label='Field name' for='form-demo-name'>
-                  <UiInput name='form-demo-name' value='North Field' onInput={() => undefined} />
-                </UiField>
-                <UiField label='Service type' for='form-demo-service'>
-                  <UiSingleSelect
-                    name='form-demo-service'
-                    options={STATUSES}
-                    placeholder='Select service type'
+          <SgSection title='UiField / UiFieldset / UiFormActions'>
+            <UiLayout>
+              <UiFieldset legend='Service details'>
+                <UiLayout variant='inline-wrap'>
+                  <UiField label='Field name' for='form-demo-name'>
+                    <UiInput name='form-demo-name' value='North Field' onInput={() => undefined} />
+                  </UiField>
+                  <UiField label='Service type' for='form-demo-service'>
+                    <UiSingleSelect
+                      name='form-demo-service'
+                      options={STATUSES}
+                      placeholder='Select service type'
+                    />
+                  </UiField>
+                </UiLayout>
+                <UiField label='Field notes' for='form-demo-notes'>
+                  <UiTextArea
+                    name='form-demo-notes'
+                    value='Spray window 06:00–09:00.'
+                    onInput={() => undefined}
+                    rows={3}
                   />
                 </UiField>
-              </UiLayout>
-              <UiField label='Field notes' for='form-demo-notes'>
-                <UiTextArea
-                  name='form-demo-notes'
-                  value='Spray window 06:00–09:00.'
-                  onInput={() => undefined}
-                  rows={3}
-                />
-              </UiField>
+              </UiFieldset>
+              <UiFormActions>
+                <UiButton variant='ghost'>Cancel</UiButton>
+                <UiButton variant='primary'>Save</UiButton>
+              </UiFormActions>
+            </UiLayout>
+          </SgSection>
+
+          <SgSection title='UiCollectionCursor'>
+            <UiCollectionCursor
+              items={collectionItems()}
+              onItemsChange={setCollectionItems}
+              newItem={newCollectionItem}
+              empty={{ icon: 'home', message: 'No service blocks in this sample.' }}
+              confirmDelete={item => ({
+                title: item.label.trim() ? `Delete ${item.label}?` : 'Delete this item?',
+                message: 'This item will be removed from the local style-guide sample.'
+              })}
+              renderItem={(item, index) => (
+                <UiLayout variant='inline-wrap'>
+                  <UiField label='Block name' for={`collection-cursor-label-${index}`}>
+                    <UiInput
+                      name={`collection-cursor-label-${index}`}
+                      value={item.label}
+                      onInput={event =>
+                        updateCollectionItem(index, { label: event.currentTarget.value })}
+                    />
+                  </UiField>
+                  <UiField label='Acres' for={`collection-cursor-acreage-${index}`}>
+                    <UiInput
+                      name={`collection-cursor-acreage-${index}`}
+                      value={item.acreage}
+                      onInput={event =>
+                        updateCollectionItem(index, { acreage: event.currentTarget.value })}
+                    />
+                  </UiField>
+                  <UiField label='Note' for={`collection-cursor-note-${index}`}>
+                    <UiInput
+                      name={`collection-cursor-note-${index}`}
+                      value={item.note}
+                      onInput={event => updateCollectionItem(index, { note: event.currentTarget.value })}
+                    />
+                  </UiField>
+                </UiLayout>
+              )}
+            />
+            <UiFieldset legend='UiCollectionCursor count readout'>
+              <UiCollectionCursor
+                items={collectionMany()}
+                onItemsChange={setCollectionMany}
+                newItem={newCollectionItem}
+                empty={{ icon: 'home', message: 'No readout items in this sample.' }}
+                confirmDelete={item => ({
+                  title: item.label.trim() ? `Delete ${item.label}?` : 'Delete this item?',
+                  message: 'This item will be removed from the local style-guide sample.'
+                })}
+                renderItem={(item, index) => (
+                  <UiLayout gap='tight'>
+                    <h3>{item.label}</h3>
+                    <p>{item.acreage} acres. Item {index + 1} demonstrates the count readout.</p>
+                  </UiLayout>
+                )}
+              />
             </UiFieldset>
-            <UiFormActions>
-              <UiButton variant='ghost'>Cancel</UiButton>
-              <UiButton variant='primary'>Save</UiButton>
-            </UiFormActions>
           </SgSection>
 
           <SgSection title='UiCheckbox'>
             <UiFieldset legend='Checkbox States'>
-              <UiLayout variant='inline'>
+              <UiLayout variant='inline-fit'>
                 <UiCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
                   Label reviewed
                 </UiCheckbox>
@@ -627,7 +709,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiToggle / UiToggleGroup / UiToggleItem'>
-            <UiLayout variant='inline'>
+            <UiLayout variant='inline-fit'>
               <UiToggle pressed={togglePressed()} onClick={() => setTogglePressed(!togglePressed())}>
                 Active crews
               </UiToggle>
@@ -710,7 +792,7 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='UiBadge'>
             <UiFieldset legend='Variants'>
-              <UiLayout variant='inline'>
+              <UiLayout variant='cluster'>
                 <UiBadge>Pending</UiBadge>
                 <UiBadge variant='success'>Field ready</UiBadge>
                 <UiBadge variant='warning'>Wind watch</UiBadge>
@@ -735,14 +817,14 @@ export const StyleGuide = (): UiComponent => {
           <SgSection title='Secondary Windows'>
             <UiLayout variant='inline-wrap'>
               <UiFieldset legend='UiTooltip'>
-                <UiLayout variant='inline'>
+                <UiLayout variant='inline-fit'>
                   <UiTooltip trigger='Hover field note' defaultOpen>
                     Verify buffer zone before aerial application.
                   </UiTooltip>
                 </UiLayout>
               </UiFieldset>
               <UiFieldset legend='UiDialog'>
-                <UiLayout variant='inline'>
+                <UiLayout variant='inline-fit'>
                   <UiDialog trigger='Open dispatch dialog'>
                     <UiLayout>
                       <p>Confirm crew assignment before dispatch.</p>
@@ -751,7 +833,7 @@ export const StyleGuide = (): UiComponent => {
                 </UiLayout>
               </UiFieldset>
               <UiFieldset legend='UiPopover'>
-                <UiLayout variant='inline'>
+                <UiLayout variant='inline-fit'>
                   <UiPopover trigger='Open field menu'>
                     <UiLayout>
                       <p>Field actions, notes, and service history.</p>
@@ -831,7 +913,7 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='UiLayout'>
             <UiLayout variant='inline-wrap'>
-              <UiFieldset legend='Stack (block, default)'>
+              <UiFieldset legend='Stack (block-fill, default)'>
                 <UiLayout>
                   <UiAlert>North Field spray window confirmed.</UiAlert>
                   <UiAlert variant='warning'>Wind speed approaching threshold.</UiAlert>
@@ -847,7 +929,7 @@ export const StyleGuide = (): UiComponent => {
               </UiFieldset>
             </UiLayout>
             <UiFieldset legend='Row (inline)'>
-              <UiLayout variant='inline'>
+              <UiLayout variant='inline-fit'>
                 <UiButton>Cancel</UiButton>
                 <UiButton variant='primary'>Confirm dispatch</UiButton>
               </UiLayout>
@@ -856,7 +938,6 @@ export const StyleGuide = (): UiComponent => {
               <UiLayout variant='inline-fill'>
                 <UiButton>Aerial</UiButton>
                 <UiButton>Ground</UiButton>
-                <UiButton>Inspection</UiButton>
               </UiLayout>
             </UiFieldset>
           </SgSection>

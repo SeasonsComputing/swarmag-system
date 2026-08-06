@@ -20,6 +20,7 @@ import { UiButton } from './ui-button.tsx'
 import { UiDialog } from './ui-dialog.tsx'
 import { UiFormActions } from './ui-form-actions.tsx'
 import type { UiComponent } from './ui-helpers.ts'
+import { UiLayout } from './ui-layout.tsx'
 
 /** Cursor surface over a bounded collection: position and lifecycle. */
 export type UiCollectionCursorProps<T> = {
@@ -30,12 +31,15 @@ export type UiCollectionCursorProps<T> = {
   /** Produces a blank item for New. */
   newItem: () => T
   /** Renders the item at the cursor. */
-  children: (item: T, index: number) => UiComponent
+  renderItem: (item: T, index: number) => UiComponent
   /** Shown when the collection is empty. */
   empty: { icon: string; message: string }
   /** Host-supplied copy for the delete confirmation. */
   confirmDelete: (item: T) => { title: string; message: string }
 }
+
+/** Pip slots rendered by the position readout before it falls back to `N of M`. */
+const PIP_SLOTS = 8
 
 /** Cursor control for generic value-in/value-out collections. */
 export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComponent {
@@ -50,6 +54,10 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
   const currentDeleteCopy = () => {
     const item = currentItem()
     return item === undefined ? undefined : props.confirmDelete(item)
+  }
+  const pipState = (index: number): string => {
+    if (hasItems() && index === cursor()) return 'selected'
+    return index < count() ? 'present' : 'absent'
   }
   const moveCursor = (nextCursor: number): void => {
     setCursor(nextCursor)
@@ -79,16 +87,17 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
     bodyRender()
     const index = untrack(cursor)
     const item = untrack(() => props.items[index])
-    return item === undefined ? undefined : props.children(item, index)
+    return item === undefined ? undefined : props.renderItem(item, index)
   })
 
   return (
     <section data-ui='collection-cursor'>
       <UiFormActions justify='split'>
-        <div data-ui='collection-cursor-position'>
+        <UiLayout variant='inline-fit' gap='tight'>
           <UiActionButton
             icon='chevron-left'
             label='Previous'
+            density='dense'
             disabled={count() < 2 || cursor() <= 0}
             onClick={() => moveCursor(Math.max(0, cursor() - 1))}
           />
@@ -96,35 +105,37 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
             aria-label={hasItems() ? `Item ${cursor() + 1} of ${count()}` : undefined}
             data-ui='collection-cursor-readout'
           >
-            <Show when={count() > 0 && count() <= 8}>
-              <For each={Array.from({ length: count() })}>
-                {(_, index) => (
-                  <span
-                    aria-hidden='true'
-                    data-ui='collection-cursor-pip'
-                    data-ui-current={index() === cursor() ? '' : undefined}
-                  >
-                    {index() === cursor() ? '○' : '●'}
-                  </span>
-                )}
-              </For>
-            </Show>
-            <Show when={count() > 8}>
+            <Show
+              when={count() > PIP_SLOTS}
+              fallback={
+                <For each={Array.from({ length: PIP_SLOTS })}>
+                  {(_, index) => (
+                    <span
+                      aria-hidden='true'
+                      data-ui='collection-cursor-pip'
+                      data-ui-pip={pipState(index())}
+                    />
+                  )}
+                </For>
+              }
+            >
               <span data-ui='collection-cursor-count'>{cursor() + 1} of {count()}</span>
             </Show>
           </div>
           <UiActionButton
             icon='chevron-right'
             label='Next'
+            density='dense'
             disabled={count() < 2 || cursor() >= count() - 1}
             onClick={() => moveCursor(Math.min(count() - 1, cursor() + 1))}
           />
-        </div>
-        <div data-ui='collection-cursor-actions'>
+        </UiLayout>
+        <UiLayout variant='inline-fit'>
           <UiActionButton
             icon='minus-circled'
             label='Delete'
             labelMode='visible'
+            density='dense'
             variant='danger'
             disabled={!hasItems()}
             onClick={() => setDeleteOpen(true)}
@@ -133,11 +144,11 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
             icon='plus-circled'
             label='New'
             labelMode='visible'
+            density='dense'
             onClick={addItem}
           />
-        </div>
+        </UiLayout>
       </UiFormActions>
-      <div data-ui='collection-cursor-rule' />
       <div ref={bodyElement} data-ui='collection-cursor-body'>
         <Show
           when={hasItems()}
@@ -164,10 +175,10 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
         <div data-ui='collection-cursor-confirm'>
           <h2 data-ui='collection-cursor-confirm-title'>{currentDeleteCopy()?.title}</h2>
           <p data-ui='collection-cursor-confirm-message'>{currentDeleteCopy()?.message}</p>
-          <div data-ui='collection-cursor-confirm-actions'>
+          <UiFormActions>
             <UiButton variant='ghost' onClick={() => setDeleteOpen(false)}>Cancel</UiButton>
             <UiButton variant='danger' disabled={!hasItems()} onClick={deleteItem}>Delete</UiButton>
-          </div>
+          </UiFormActions>
         </div>
       </UiDialog>
     </section>

@@ -44,7 +44,7 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
 
   return (
     <nav aria-label='Primary actions' data-widget='helm-widget'>
-      <UiLayout variant='inline'>
+      <UiLayout variant='inline-fit'>
         <For each={pairs()}>
           {pair => (
             <UiActionButton
