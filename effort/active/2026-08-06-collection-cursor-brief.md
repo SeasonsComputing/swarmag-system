@@ -4,8 +4,9 @@
 **Mode:** Foundation
 **Author:** Chief Architect (decisions); AI Architect (capture, brief)
 **Milestone:** M1 Customer Onboarding — Phase 2
-**Design:** `effort/active/2026-08-04-composition-editor-design.md` (superseded in
-part; this brief is authoritative where they differ)
+**Design:** `effort/completed/2026-08-04-composition-editor-design.md` — retired
+as superseded. It is history, not a target: this brief overrides it on the frame,
+the ceiling, the placement and the name. Do not build from it.
 
 Settled in conversation on 2026-08-05 and 2026-08-06. Design is closed — there
 are no open decisions in this document. Escalate rather than invent.
