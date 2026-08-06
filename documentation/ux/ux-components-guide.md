@@ -156,7 +156,7 @@ in their owning CSS rather than passed into shared Ui controls.
 
 ### 3.1 UiButton
 
-Action trigger for commands, form actions, and lightweight navigation affordances.
+Action trigger for commands, form actions, and lightweight navigation affordance.
 
 **Use When**
 
@@ -970,23 +970,23 @@ General layout container for block and inline child arrangement.
 
 Extends native `div` attributes, excluding styling and semantic hook props.
 
-| Prop       | Type                                                                                     | Default | Description       |
-| ---------- | ---------------------------------------------------------------------------------------- | ------- | ----------------- |
-| `variant`  | `'block-fill' \| 'block-fit' \| 'cluster' \| 'inline' \| 'inline-fill' \| 'inline-wrap'` | unset   | Layout direction. |
-| `gap`      | `'loose' \| 'tight' \| 'none'`                                                           | unset   | Gap density.      |
-| `children` | `UiComponent`                                                                            | unset   | Layout children.  |
+| Prop       | Type                                                                                              | Default | Description       |
+| ---------- | ------------------------------------------------------------------------------------------------- | ------- | ----------------- |
+| `variant`  | `'block-fill' \| 'block-fit' \| 'cluster-wrap' \| 'inline-fit' \| 'inline-fill' \| 'inline-wrap'` | unset   | Layout direction. |
+| `gap`      | `'loose' \| 'tight' \| 'none'`                                                                    | unset   | Gap density.      |
+| `children` | `UiComponent`                                                                                     | unset   | Layout children.  |
 
 **Variants**
 
-| Variant       | Use                                                        |
-| ------------- | ---------------------------------------------------------- |
-| unset         | Full-width vertical stack.                                 |
-| `block-fill`  | Full-height stack whose final child fills remaining space. |
-| `block-fit`   | Vertical stack that fits its content width.                |
-| `cluster`     | Wrapping compact horizontal action group.                  |
-| `inline`      | Horizontal wrapping layout.                                |
-| `inline-fill` | Horizontal layout where children share the width.          |
-| `inline-wrap` | Responsive row-oriented grid with column wrapping.         |
+| Variant        | Use                                                        |
+| -------------- | ---------------------------------------------------------- |
+| unset          | Full-width vertical stack.                                 |
+| `block-fill`   | Full-height stack whose final child fills remaining space. |
+| `block-fit`    | Vertical stack that fits its content width.                |
+| `cluster-wrap` | Wrapping compact horizontal action group.                  |
+| `inline-fit`   | Horizontal layout that fits its content width.             |
+| `inline-fill`  | Horizontal layout where children share the width.          |
+| `inline-wrap`  | Responsive row-oriented grid with column wrapping.         |
 
 **Example**
 

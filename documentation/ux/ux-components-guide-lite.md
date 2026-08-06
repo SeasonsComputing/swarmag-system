@@ -369,15 +369,15 @@ Key props: `variant`, `gap`, children.
 
 Variants:
 
-| Variant       | Use                                           |
-| ------------- | --------------------------------------------- |
-| unset         | Full-width vertical stack                     |
-| `block-fill`  | Full-height stack with a filling final child  |
-| `block-fit`   | Vertical stack fitted to content width        |
-| `cluster`     | Wrapping compact horizontal action group      |
-| `inline`      | Horizontal wrapping layout                    |
-| `inline-fill` | Horizontal layout with children sharing width |
-| `inline-wrap` | Responsive row-oriented grid with wrapping    |
+| Variant        | Use                                           |
+| -------------- | --------------------------------------------- |
+| unset          | Defaults to 'inline-fit'                      |
+| `block-fill`   | Full-height stack with a filling final child  |
+| `block-fit`    | Vertical stack fitted to content width        |
+| `cluster-wrap` | Wrapping compact horizontal action group      |
+| `inline-fit`   | Horizontal wrapping layout                    |
+| `inline-fill`  | Horizontal layout with children sharing width |
+| `inline-wrap`  | Responsive row-oriented grid with wrapping    |
 
 Gap values: `loose`, `tight`, `none`.
 
