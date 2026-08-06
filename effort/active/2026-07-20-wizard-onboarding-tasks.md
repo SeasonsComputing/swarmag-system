@@ -10,10 +10,11 @@ orders remain the gate.
 **Group B closes with one question outstanding against it** — fieldset
 redundancy, recorded in `documentation/project/project-backlog.md`. It reaches
 stages 1 and 2, which are otherwise finished, so B is not final-final until that
-rule is settled. See `effort/active/2026-08-04-composition-editor-design.md` §4.3.
+rule is settled. **CLOSED 2026-08-06** — it was about proper use of the
+component, not the component itself; renaming the contact stage fixed it.
 
 **Source design:** `effort/active/2026-07-20-wizard-onboarding-design.md`
-**Composition editor:** `effort/active/2026-08-04-composition-editor-design.md`
+**Collection cursor:** `effort/active/2026-08-06-collection-cursor-brief.md`
 
 Each group is a gated production: scope declared, go received, checks run,
 results reported. Delegation per budget discipline (haiku, git read-only).
@@ -197,7 +198,7 @@ end-to-end:
       survive and are verified as of 2026-08-04: added-sites list renders
       above the capture form; three nested legends; four-row textarea buried
       mid-form; `clearSite` hand-resets eleven signals. Design:
-      `effort/active/2026-08-04-composition-editor-design.md`. The field set
+      `effort/active/2026-08-06-collection-cursor-brief.md` §8. The field set
       does not change — this is a rehost, not a redesign
 - [ ] **Fieldset redundancy** — a panel with exactly one fieldset whose legend
       repeats the panel title (stage 1 is the live example). Recorded in
@@ -209,12 +210,12 @@ end-to-end:
 
 ## Group C — Notes-lite (Foundation)
 
-Notes rides the composition editor rather than inventing a second
+Notes rides `UiCollectionCursor` rather than inventing a second
 list-plus-form. `Note` is already a universal composition — twelve declared
-mount points, three needed now: **User, Customer, Site.** Design:
-`effort/active/2026-08-04-composition-editor-design.md`.
+mount points, three needed now: **User, Customer, Site.** Brief:
+`effort/active/2026-08-06-collection-cursor-brief.md`.
 
-- [ ] Composition editor in `front/ux/shell/` — generic over `T[]` + cursor,
+- [ ] `UiCollectionCursor` in `front/ux/ui/components/` — generic over `T[]`,
       not typed to `Composition*`. First consumer is stage 3 (Group B), which
       is what proves the shape before Notes reuses it
 - [ ] `front/ux/shell/notes.tsx` — value-in/value-out over

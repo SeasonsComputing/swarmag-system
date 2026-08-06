@@ -46,7 +46,14 @@ file, and the two hazards to carry through the rewrite.
    This is the milestone path.
 3. **Phase 3 — dirty/pristine primitive.** Does not exist anywhere in
    `source/front` today. Designed once, against two settled consumers — the
-   manager's fifth feedback-clearing rule and the list editor.
+   manager's fifth feedback-clearing rule and `UiCollectionCursor`.
+
+   Starting constraint, established 2026-08-04: **array length cannot carry
+   dirty-state.** New-then-delete restores the length with different content, and
+   editing a field changes no length at all — a differing length is a sufficient
+   positive test and never a necessary one. Dirty needs a baseline snapshot
+   compared structurally, which is cheap and legitimate here because these are
+   pure value objects with no identity and no methods.
 
 Ordering agreed: foundation first, in that sequence.
 
@@ -88,6 +95,11 @@ _settled_, not merely when it is _shared_.
   dedicated discussion.
 - **Undefined-token guard** — `guard:css` never checks that a referenced token
   exists. Still unbuilt.
+- **`architecture-front.md` §2** — the shell section is one clause covering 27
+  files, `PanelStepflow` appears in no document, and §10.1.4 states a
+  second-consumer test the CA does not practice (a component general by nature
+  goes to the general layer at one consumer). Rewrite §2 **once**, after the
+  `ux` / `app` shuffle, rather than patching per move.
 
 ## Standing protocol
 
