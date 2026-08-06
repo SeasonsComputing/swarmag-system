@@ -19,30 +19,31 @@ Primary architectural context lives in `documentation/architecture/architecture-
 
 ### 1.2 Documentation
 
-| Category     | File                             | Description                                              |
-| ------------ | -------------------------------- | -------------------------------------------------------- |
-| Governance   | `AGENTS.md`                      | AI agent protocol, operating modes, and production gates |
-|              | `CONSTITUTION.md`                | Highest architectural authority and role boundaries      |
-|              | `STYLE-GUIDE.md`                 | Binding code and content style conventions               |
-| Architecture | `architecture-core.md`           | Core architecture principles and system-wide structure   |
-|              | `architecture-back.md`           | Backend architecture, boundaries, and runtime model      |
-|              | `architecture-front.md`          | UX architecture and frontend layering                    |
-|              | `architecture-devops.md`         | Environment configuration, packaging, and guard suite    |
-| Domain       | `domain-model.md`                | Domain solution-space concepts and invariants            |
-|              | `domain-seed-data.md`            | Controlled vocabularies and canonical seed data          |
-|              | `domain-data-dictionary.md`      | Normalized implementation-ready type and relation model  |
-|              | `domain-archetypes.md`           | Domain implementation patterns for archetype artifacts   |
-| UX           | `ux-design-language.md`          | Visual language, interaction grammar, and layout rules   |
-|              | `ux-components-guide.md`         | Full UX component guide and usage contracts              |
-|              | `ux-components-guide-lite.md`    | Lightweight UX component reference                       |
-|              | `ux-components-internals.md`     | UX component implementation internals                    |
-| Genesis      | `genesis-domain-sdk.md`          | Prompt contract for domain sdk genesis                   |
-|              | `genesis-ux-scaffold.md`         | Prompt contract for UX applications scaffolding          |
-| Effort       | `{yymmdd}-{topic}-design.md`     | Approved or proposed project design decisions            |
-|              | `{yymmdd}-{topic}-handoff.md`    | Session transition notes and remaining work context      |
-|              | `{yymmdd}-{topic}-tasks.md`      | Project implementation checklist and verification status |
-| Project      | `project-feature-parking-lot.md` | Deferred features or architectural adjustments           |
-|              | `project-user-stories.md`        | Cross-application user stories and scenario narratives   |
+| Category     | File                              | Description                                                 |
+| ------------ | --------------------------------- | ----------------------------------------------------------- |
+| Governance   | `AGENTS.md`                       | AI agent protocol, operating modes, and production gates    |
+|              | `CONSTITUTION.md`                 | Highest architectural authority and role boundaries         |
+|              | `STYLE-GUIDE.md`                  | Binding code and content style conventions                  |
+| Architecture | `architecture-core.md`            | Core architecture principles and system-wide structure      |
+|              | `architecture-back.md`            | Backend architecture, boundaries, and runtime model         |
+|              | `architecture-front.md`           | UX architecture and frontend layering                       |
+|              | `architecture-devops.md`          | Environment configuration, packaging, and guard suite       |
+| Domain       | `domain-model.md`                 | Domain solution-space concepts and invariants               |
+|              | `domain-seed-data.md`             | Controlled vocabularies and canonical seed data             |
+|              | `domain-data-dictionary.md`       | Normalized implementation-ready type and relation model     |
+|              | `domain-archetypes.md`            | Domain implementation patterns for archetype artifacts      |
+| UX           | `ux-design-language.md`           | Visual language, interaction grammar, and layout rules      |
+|              | `ux-components-guide.md`          | Full UX component guide and usage contracts                 |
+|              | `ux-components-guide-lite.md`     | Lightweight UX component reference                          |
+|              | `ux-components-internals.md`      | UX component implementation internals                       |
+| Genesis      | `genesis-domain-sdk.md`           | Prompt contract for domain sdk genesis                      |
+|              | `genesis-ux-scaffold.md`          | Prompt contract for UX applications scaffolding             |
+| Effort       | `{yyyy-mm-dd}-{topic}-design.md`  | Approved or proposed project design decisions               |
+|              | `{yyyy-mm-dd}-{topic}-handoff.md` | Session transition notes and remaining work context         |
+|              | `{yyyy-mm-dd}-{topic}-tasks.md`   | Project implementation checklist and verification status    |
+|              | `{yyyy-mm-dd}-{topic}-brief.md`   | Written production gate when delegating to a mechanical ACE |
+| Project      | `project-feature-parking-lot.md`  | Deferred features or architectural adjustments              |
+|              | `project-user-stories.md`         | Cross-application user stories and scenario narratives      |
 
 ### 1.3 Source Layers (`source/`)
 
