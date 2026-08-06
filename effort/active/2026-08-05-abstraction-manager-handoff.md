@@ -27,32 +27,15 @@ traces history back to its creation on 2026-06-22.
 `README.md` §1.2; the dead `ActionWidget` bullet removed from the 2026-08-04
 handoff. Zero references remain. Both uncommitted.
 
-## The correction, settled
+## The correction
 
-Save, New, Cancel and everything following them are manager commands. The
+Save, New, Cancel and everything following them become manager commands; the
 specialization supplies domain parts only.
 
-**Boundary — three participants**
-
-| Participant        | Owns                                                                                                                                                                                                                                          |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Host props         | workbench close/cancel, as a required prop on the manager                                                                                                                                                                                     |
-| AbstractionManager | selected subject, editor mode, Save command, create-vs-update branch, pending and error state, success feedback and its clearing policy, validation banner, refresh timing, post-save editor state, epoch semantics, action-success lifecycle |
-| Provider           | list projection, loading, columns, cells, form field rendering, create/update operations, `refresh()` implementation                                                                                                                          |
-| Editor instance    | field signals, validation rings, `validate()` and draft projection via a per-instance handle                                                                                                                                                  |
-
-**Save policy** — create success composes feedback from the created result,
-refreshes, opens a fresh New editor. Update success refreshes, sets the selected
-subject to the returned persisted object, re-seeds the editor, remains on the
-record. Policy is expressed as **editor state, never navigation**, because
-"return to list" means different things at wide and collapsed widths.
-
-**Feedback** — split by source: rings belong to the editor instance, every banner
-belongs to the manager. Create-success feedback survives typing in the fresh New
-form because it describes a record that is not the subject on screen.
-
-Full detail, including the stale-handle hazard and the focus-jump consequence of
-re-seeding through an epoch bump, is in the brief. Do not re-derive it.
+**The correction is specified in the brief. It is not restated here** — one
+source, so the two cannot drift. The brief carries the ownership boundary, save
+and feedback policy, the per-instance editor handle, the production scope by
+file, and the two hazards to carry through the rewrite.
 
 ## Resume agenda
 
