@@ -7,7 +7,7 @@
 
 import { toTrimmed } from '@core/std'
 import type { CustomerCreate, CustomerUpdate } from '@domain/protocols/customer-protocol.ts'
-import { api } from '@front/api'
+import { api } from '@front/api/api.ts'
 import { OnboardingStageContact } from '@front/app-admin/onboarding/onboarding-stage-contact.tsx'
 import { OnboardingStageCustomer } from '@front/app-admin/onboarding/onboarding-stage-customer.tsx'
 import { OnboardingStageSites } from '@front/app-admin/onboarding/onboarding-stage-sites.tsx'

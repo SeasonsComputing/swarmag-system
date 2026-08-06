@@ -160,7 +160,6 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
 
     "@core/std": "./source/core/std/std.ts",
     "@core/stdx": "./source/core/std/stdx.ts",
-    "@front/api": "./source/front/api/api.ts",
     "@front/ux/ui": "./source/front/ux/ui/components/ui.ts",
 
     // ────────────────────────────────────────────────────────────────────────────
@@ -230,7 +229,8 @@ The system consists of five primary components:
 | **Backend Orchestration** | Edge Functions for complex operations             | Supabase Edge      |
 | **Persistent Storage**    | PostgreSQL with Row Level Security                | Supabase           |
 
-UX applications compose their API namespace (`@front/api`) using client makers that connect directly to Supabase or IndexedDB.
+UX applications consume the API namespace composed in `source/front/api/api.ts` through the
+`@front/api/api.ts` path.
 
 ## 5. System Boundary
 
@@ -416,7 +416,7 @@ const exists = await userExists.run({ email: 'ada@example.com' })
 UX applications import the composed API namespace:
 
 ```typescript
-import { api } from '@front/api'
+import { api } from '@front/api/api.ts'
 
 // CRUD operations - direct to database
 const user = await api.Users.get(userId)
@@ -437,7 +437,7 @@ const result = await api.deepCloneJob.run({ jobId })
 
 #### 5.4.2 Applications always
 
-- Import from `@front/api` namespace
+- Import from `@front/api/api.ts`
 - Work with domain types
 - Handle `ApiError` for failures
 
@@ -816,7 +816,7 @@ Field crews execute Jobs entirely from local storage:
 #### 9.2.1 Execution Pattern
 
 ```typescript
-import { api } from '@front/api'
+import { api } from '@front/api/api.ts'
 
 // All operations against IndexedDB clients
 const job = await api.JobsLocal.get(jobId)
@@ -901,7 +901,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.2 API namespace is the boundary
 
-- UX applications import from `@front/api`, never from backend or storage libraries
+- UX applications import from `@front/api/api.ts`, never from backend or storage libraries
 - Applications never import `@supabase/client`, IndexedDB APIs, or edge functions directly
 - The API namespace composes clients using maker factories, not runtime provider selection
 
@@ -944,7 +944,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.8 Import maps only
 
-- All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@front/api`)
+- All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@front/`)
 - No relative imports across top-level namespaces
 - Import maps defined in `deno.jsonc`
 - Platform-specific maps (per-function `deno.json` plus
@@ -991,7 +991,7 @@ Domain changes flow unidirectionally through the system.
 
 ### 11.2 Adding New API Clients
 
-New clients are added by composing makers in the `@front/api` namespace:
+New clients are added by composing makers in `source/front/api/api.ts`:
 
 1. **Identify storage mechanism** - Determine appropriate client maker (Supabase SDK, IndexedDB, HTTP)
 2. **Compose into API namespace** - Add to `source/front/api/api.ts` using appropriate maker

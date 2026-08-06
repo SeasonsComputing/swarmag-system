@@ -28,7 +28,7 @@ const SOURCE_DIR = `${ROOT}/source`
 
 const FORBIDDEN_UI_IMPORTS = [
   '@domain/',
-  '@front/api',
+  '@front/api/',
   '@front/ux/stores',
   '@front/ux/shell',
   '@front/ux/widgets',

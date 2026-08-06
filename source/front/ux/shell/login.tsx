@@ -18,7 +18,7 @@ PUBLIC
 Login Passwordless OTP login component.
 */
 
-import { api } from '@front/api'
+import { api } from '@front/api/api.ts'
 import {
   UiActionButton,
   UiAlert,

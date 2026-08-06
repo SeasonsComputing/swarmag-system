@@ -52,12 +52,16 @@ Ordering agreed: foundation first, in that sequence.
 
 ## Also settled this session, unscheduled
 
-**Embedded list editor is chrome only.** A specialized form-actions row — nav
-pair, position readout, lifecycle pair — holding no state; the host owns `items`
-and `cursor`. Consequence: no frame, therefore no nested-fieldset problem,
-therefore the window mechanism is not a prerequisite for notes-inside-a-site.
-Cost to keep visible: two lists on screen means two cursors, and the nav controls
-must read unambiguously as belonging to one of them.
+**Embedded list editor is chrome only.** Nav pair, position readout, lifecycle
+pair, holding no state; the host owns `items` and `cursor`. Consequence: no
+frame, therefore no nested-fieldset problem, therefore the window mechanism is
+not a prerequisite for notes-inside-a-site. Cost to keep visible: two lists on
+screen means two cursors, and the nav controls must read unambiguously as
+belonging to one of them.
+
+**Open** — its relationship to `UiFormActions`. Specialization
+(`EmbeddedListEditor --|> UiFormActions`) or aggregation, with CA leaning
+aggregation. Phase 2 is in design; treat nothing in it as closed.
 
 **`front/app` layer.** `ux` is the general-purpose library; `app` holds
 swarmAg-specific material — `components` (login, logout, about, notes), `stores`
@@ -68,7 +72,7 @@ registries, joins them, hands the collection to `bootstrap`.
 
 Layering is downward-only: `app-{product} → app → ux → domain/core`. Shared app
 features use `data-app`; no new dataset key is needed. This supersedes the
-`ux/screens` intermediate step rather than sitting beside it.
+`ux/app/components` intermediate step rather than sitting beside it.
 
 **The judgment rule for moving code down a layer:** access is free, validation is
 not. Everything above could already reach it, so moving down buys one definition

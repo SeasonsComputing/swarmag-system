@@ -14,7 +14,7 @@ PUBLIC
 logout  Ends the active session and clears local session state.
 */
 
-import { api } from '@front/api'
+import { api } from '@front/api/api.ts'
 
 /** End the active session and always clear local session state. */
 export async function logout(): Promise<void> {

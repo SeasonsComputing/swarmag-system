@@ -73,9 +73,7 @@ const namespaceForSpecifier = (specifier: string, fromFile: string): Namespace =
   }
 
   // UX
-  if (
-    specifier.startsWith('@front/') || specifier === '@front/api' || specifier.startsWith('@front/app-')
-  ) {
+  if (specifier.startsWith('@front/') || specifier.startsWith('@front/app-')) {
     return 'front'
   }
 
@@ -145,7 +143,7 @@ const checkFrontImports = (file: string, imports: Array<{ specifier: string }>):
     for (const forbidden of UX_FORBIDDEN_IMPORTS) {
       if (specifier.startsWith(forbidden)) {
         violations.push(
-          `Forbidden import: ${specifier} (use @front/api, @domain, or @core-std instead)`
+          `Forbidden import: ${specifier} (use @front/api/api.ts, @domain, or @core-std instead)`
         )
       }
     }

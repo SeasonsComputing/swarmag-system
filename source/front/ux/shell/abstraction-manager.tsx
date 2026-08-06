@@ -28,18 +28,25 @@ import {
   UiTableRow
 } from '@front/ux/ui'
 import { createEffect, createSignal, For, Show } from '@solid-js'
-import type { AbstractionAction, AbstractionManagerContract } from './abstraction-manager-contract.ts'
+import type {
+  AbstractionAction,
+  AbstractionEditorHandle,
+  AbstractionManagerContract
+} from './abstraction-manager-contract.ts'
 import { PanelContainer } from './panel-container.tsx'
+import type { PanelFeedback } from './panel-contract.ts'
 import { PanelForm } from './panel-form.tsx'
 import { PanelHeader } from './panel-header.tsx'
 import { PanelList } from './panel-list.tsx'
+import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import { focusFirstField } from './use-abstraction-form-keyboard.ts'
 
 import './abstraction-manager.css'
 
 /** Props for a generic abstraction manager. */
-export type AbstractionManagerProps<T extends Instance> = {
-  provider: AbstractionManagerContract<T>
+export type AbstractionManagerProps<T extends Instance, Draft> = {
+  onCancel: () => void
+  provider: AbstractionManagerContract<T, Draft>
 }
 
 /** Mode of the abstraction manager: 'list' or 'editor'. */
@@ -52,11 +59,15 @@ type PendingAction<T extends Instance> = {
 }
 
 /** Generic abstraction list and editor-panel manager. */
-export const AbstractionManager = <T extends Instance>(
-  props: AbstractionManagerProps<T>
+export const AbstractionManager = <T extends Instance, Draft>(
+  props: AbstractionManagerProps<T, Draft>
 ): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
   const [mode, setMode] = createSignal<AbstractionManagerMode>('list')
+  const [editorHandle, setEditorHandle] = createSignal<AbstractionEditorHandle<Draft> | null>(null)
+  const [editorFeedback, setEditorFeedback] = createSignal<PanelFeedback | null>(null)
+  const [savePending, setSavePending] = createSignal(false)
+  const [focusOnEpoch, setFocusOnEpoch] = createSignal(true)
   // Opening the editor is an event, not a state. Selection alone cannot express
   // it: New-then-New leaves `selected` null both times, so nothing downstream
   // re-runs and the previous attempt's error rings and focus survive into what
@@ -65,27 +76,83 @@ export const AbstractionManager = <T extends Instance>(
   let panelRef: HTMLElement | undefined
   createEffect(() => {
     editorEpoch()
-    if (mode() === 'editor') focusFirstField(() => panelRef)
+    if (mode() === 'editor' && focusOnEpoch()) focusFirstField(() => panelRef)
   })
   const [pendingAction, setPendingAction] = createSignal<PendingAction<T> | null>(null)
   const [actionError, setActionError] = createSignal<string | null>(null)
   const [actionPending, setActionPending] = createSignal(false)
+  const bumpEditorEpoch = (focus: boolean): void => {
+    setFocusOnEpoch(focus)
+    setEditorHandle(null)
+    setEditorEpoch(epoch => epoch + 1)
+  }
   const openEditor = (item: T | null): void => {
+    setEditorFeedback(null)
     setSelected(() => item)
     setMode('editor')
-    setEditorEpoch(epoch => epoch + 1)
+    bumpEditorEpoch(true)
   }
   const onSelect = (item: T): void => openEditor(item)
   const onNew = (): void => openEditor(null)
-  const clearSelection = (): void => {
+  const openFreshNew = (clearFeedback: boolean): void => {
+    if (clearFeedback) setEditorFeedback(null)
     setSelected(null)
-    setMode('list')
+    setMode('editor')
+    bumpEditorEpoch(true)
   }
-  const closeEditor = (): void => clearSelection()
-  const cancelDialog = (): void => props.provider.cancel?.() ?? closeEditor()
+  const cancelDialog = (): void => {
+    setEditorFeedback(null)
+    props.onCancel()
+  }
+  const itemLabel = (item: T): string => props.provider.itemLabel?.(item) ?? props.provider.entityLabel
+  const registerEditor = (handle: AbstractionEditorHandle<Draft>): () => void => {
+    setEditorHandle(() => handle)
+    return () => {
+      setEditorHandle(current => current === handle ? null : current)
+    }
+  }
+  const saveEditor = async (): Promise<void> => {
+    if (savePending()) return
+    setEditorFeedback(null)
+    const handle = editorHandle()
+    if (!handle) {
+      setEditorFeedback({ message: 'Editor is not ready to save.', variant: 'danger' })
+      return
+    }
+    if (!handle.validate()) {
+      setEditorFeedback({ message: FORM_FEEDBACK_MESSAGE, variant: 'danger' })
+      return
+    }
+    const item = selected()
+    const draft = handle.draft()
+    setSavePending(true)
+    try {
+      if (item) {
+        const updated = await props.provider.update(item, draft)
+        await props.provider.refresh()
+        setSelected(() => updated)
+        setMode('editor')
+        bumpEditorEpoch(false)
+        setEditorFeedback({ message: `Saved ${itemLabel(updated)}.`, variant: 'success' })
+      } else {
+        const created = await props.provider.create(draft)
+        await props.provider.refresh()
+        openFreshNew(false)
+        setEditorFeedback({ message: `Created ${itemLabel(created)}.`, variant: 'success' })
+      }
+    } catch (error) {
+      setEditorFeedback({
+        message: error instanceof Error ? error.message : `${props.provider.entityLabel} save failed.`,
+        variant: 'danger'
+      })
+    } finally {
+      setSavePending(false)
+    }
+  }
   const runAction = async (action: PendingAction<T>['action'], item: T): Promise<void> => {
     await action.handler(item)
-    if (selected()?.id === item.id) clearSelection()
+    await props.provider.refresh()
+    if (selected()?.id === item.id) openFreshNew(true)
   }
   const requestAction = (action: PendingAction<T>['action'], item: T): void => {
     if (!action.confirmation) {
@@ -201,7 +268,7 @@ export const AbstractionManager = <T extends Instance>(
         subjectRef={element => panelRef = element}
         subject={
           <PanelForm
-            feedback={props.provider.editorFeedback?.()}
+            feedback={editorFeedback()}
             header={{
               leading: (
                 <>
@@ -223,14 +290,19 @@ export const AbstractionManager = <T extends Instance>(
                   icon='check'
                   label='Save'
                   labelMode='visible'
-                  type='submit'
-                  form='abstraction-panel-form'
+                  disabled={savePending()}
+                  loading={savePending()}
+                  onClick={() => void saveEditor()}
                 />
               )
             }}
           >
             <Show when={editorEpoch()} keyed>
-              {props.provider.renderForm(selected(), closeEditor)}
+              {props.provider.renderForm(selected(), {
+                feedback: setEditorFeedback,
+                register: registerEditor,
+                saving: savePending
+              })}
             </Show>
           </PanelForm>
         }
