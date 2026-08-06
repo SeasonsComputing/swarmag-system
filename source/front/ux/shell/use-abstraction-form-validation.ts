@@ -42,7 +42,7 @@ export interface AbstractionFormValidation {
   inputField: (field: string) => void
   /** Revalidate a discrete control immediately on change. */
   changeField: (field: string) => void
-  /** Validate every field; returns true when the form is clean. */
+  /** Validate every field, focusing the first invalid control; true when clean. */
   validateForm: () => boolean
   /** Clear every shown error state (e.g. when the editor loads a new entity). */
   reset: () => void
@@ -67,10 +67,11 @@ export const useAbstractionFormValidation = (
     setErrors(previous => ({ ...previous, [field]: !valid }))
     return valid
   }
-  const validateForm = (): boolean =>
-    Object.keys(rules)
-      .map(validateField)
-      .every(valid => valid)
+  const validateForm = (): boolean => {
+    const invalid = Object.keys(rules).filter(field => !validateField(field))
+    focusInvalid(formRef(), invalid)
+    return invalid.length === 0
+  }
 
   onMount(() => {
     const form = formRef()
@@ -92,4 +93,20 @@ export const useAbstractionFormValidation = (
     validateForm,
     reset: () => setErrors({})
   }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// PRIVATE
+// ────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Focus the first invalid control the form exposes by name — rule keys match
+ * control `name` attributes. A composite without one is skipped, not trapped on.
+ */
+const focusInvalid = (form: HTMLFormElement | undefined, fields: string[]): void => {
+  if (!form) return
+  const control = fields
+    .map(field => form.querySelector<HTMLElement>(`[name="${field}"]`))
+    .find(element => element !== null)
+  control?.focus()
 }
