@@ -94,6 +94,18 @@ next value rather than asking permission. That is the value-in / value-out shape
 the design committed to, and it is the only one available: compositions have no
 identity until the root commits, so the control can never own "save."
 
+### 4.1 `children` is re-invoked on cursor change, never on items change
+
+**This is a correctness constraint, not a performance note.** The host's fields
+write back through `onItemsChange`, so typing produces a new `items` array on
+every keystroke. If the body re-renders on `items` identity, the form subtree is
+rebuilt per character and the caret is lost mid-word — the surface becomes
+unusable for text entry.
+
+Key the body on the cursor. The host's fields read through to `items[cursor]`
+reactively, so a keystroke updates a value without rebuilding the form that
+produced it.
+
 ## 5. Layout
 
 Row above, body below. **No frame.** The original design proposed a fieldset
@@ -129,6 +141,13 @@ SVG filename. **Verify each name against the catalog; do not invent one.**
 New **appends** rather than inserting after the cursor. The collections are
 unordered, so creation order is as good as any, and appending is least
 astonishing.
+
+**Focus after New is implemented locally.** `focusFirstField` in
+`ux/shell/use-abstraction-form-keyboard.ts` looks like the utility to reach for
+and is not: `ui` sits **below** `shell`, so importing it is an upward dependency
+and a `guard:namespaces` violation. It also carries panel-collapse motion timing
+and dialog focus-reclaim logic that exist for reasons which do not apply inside a
+form body. Query the body's first input or textarea and focus it after render.
 
 ### 6.2 Chrome degradation
 
