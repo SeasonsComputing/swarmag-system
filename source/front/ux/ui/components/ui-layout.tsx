@@ -20,7 +20,7 @@ import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
 export type UiLayoutVariant =
   | 'block-fill'
   | 'block-fit'
-  | 'cluster'
+  | 'cluster-wrap'
   | 'inline-fit'
   | 'inline-fill'
   | 'inline-wrap'

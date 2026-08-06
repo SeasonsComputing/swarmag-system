@@ -447,7 +447,7 @@ export const StyleGuide = (): UiComponent => {
               </UiToggle>
             </UiField>
             <UiFieldset legend='Variants'>
-              <UiLayout variant='cluster'>
+              <UiLayout variant='cluster-wrap'>
                 <For each={BUTTON_VARIANTS}>
                   {b => <UiButton variant={b.variant}>{b.label}</UiButton>}
                 </For>
@@ -792,7 +792,7 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='UiBadge'>
             <UiFieldset legend='Variants'>
-              <UiLayout variant='cluster'>
+              <UiLayout variant='cluster-wrap'>
                 <UiBadge>Pending</UiBadge>
                 <UiBadge variant='success'>Field ready</UiBadge>
                 <UiBadge variant='warning'>Wind watch</UiBadge>
