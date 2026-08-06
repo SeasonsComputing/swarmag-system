@@ -146,7 +146,7 @@ All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Chart rendering is prov
 All UX applications consume the **same API namespace** defined in `source/front/api/api.ts`:
 
 ```typescript
-import { api } from '@front/api'
+import { api } from '@front/api/api.ts'
 
 // Auth
 await api.Auth.signInWithOtp({ email })
@@ -295,7 +295,6 @@ The foundation provides:
 | ------------ | --------------------------------------------------------------- |
 | `@core/std`  | Standard types (Id, When, Dictionary)                           |
 | `@core/stdx` | Makers and wrappers to runtime project code from standard types |
-| `@front/api` | Composed API namespace                                          |
 
 **Aliases**
 
@@ -763,7 +762,7 @@ The app-local dashboard JSON conforms to `DashboardStoreView` from `source/front
 The shell is the closed IoC application framework. It owns the widget extension contracts in `source/front/ux/shell/widget-contract.ts` and shared shell services such as `getShellIdentity()`. Concrete widgets implement those contracts and may consume public shell services. The shell never imports the widget catalog or any concrete widget; applications bind concrete widgets at their composition roots. This direction keeps the shell closed when features are added and prevents a shell/widget dependency cycle. `guard:namespaces` enforces the shell-to-widget
 prohibition.
 
-Dashboard state remains a Reactive Store Module. The dashboard receives its namespace contract directly and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `@front/api` namespace.
+Dashboard state remains a Reactive Store Module. The dashboard receives its namespace contract directly and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `source/front/api/api.ts` namespace.
 
 ```json
 {

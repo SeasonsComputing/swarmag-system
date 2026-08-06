@@ -38,7 +38,6 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | -------------- | ------------------------------------- |
 | `@core/std`    | `source/core/std/std.ts`              |
 | `@core/stdx`   | `source/core/std/stdx.ts`             |
-| `@front/api`   | `source/front/api/api.ts`             |
 | `@front/ux/ui` | `source/front/ux/ui/components/ui.ts` |
 
 ### 3.3 Import Rules

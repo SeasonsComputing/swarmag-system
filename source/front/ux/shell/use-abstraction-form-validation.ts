@@ -12,8 +12,8 @@ user corrects them, and discrete controls (selects, multi-selects, checkboxes,
 radios) revalidate immediately on change. Rules are ExpectResult thunks over
 the editor's own state, so the same @core/std primitives that guard the domain
 boundary drive the error rings here. A capture-phase `invalid` listener lights
-the rings when native required validation blocks a submission — the feedback
-banner itself is owned by useAbstractionFormFeedback.
+the rings when native required validation blocks a save — the feedback banner
+itself is owned by the manager.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────

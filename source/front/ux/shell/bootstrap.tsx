@@ -26,7 +26,7 @@ import { Config } from '@front/config/ux-config.ts'
 // ────────────────────────────────────────────────────────────────────────────
 
 import type { Session } from '@core/api/api-auth-contract.ts'
-import { api } from '@front/api'
+import { api } from '@front/api/api.ts'
 import { onCleanup, onMount } from '@solid-js'
 import { render } from '@solid-js/web'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
