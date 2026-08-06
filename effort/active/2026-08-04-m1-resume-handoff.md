@@ -79,7 +79,6 @@ signups, the cause is a GoTrue lookup miss. Verified from a clean genesis.
 - **`architecture-front.md`** — the shell section is one clause covering 27
   files, and `PanelStepflow` appears in no document at all. Decomposition
   analysis exists; sequence it after `ux/screens` so §2 is rewritten once.
-- **`genesis-ux-dashboard.md`** still emits `action-widget.tsx` / `ActionWidget`.
 
 ## Standing protocol
 
