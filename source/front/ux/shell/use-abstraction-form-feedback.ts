@@ -8,10 +8,12 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Native `invalid` events don't bubble, so a form must listen during the capture
 phase to observe them at all. The native validation bubble is browser-rendered
-chrome that ignores a dialog's own bounds, so its default is suppressed here —
-the browser still focuses the invalid field, but only the manager-owned feedback
-banner is shown. Any AbstractionManager entity editor form can call this once
-instead of re-wiring the capture listener by hand.
+chrome that ignores a dialog's own bounds, so its default is suppressed here and
+only the manager-owned feedback banner is shown. Canceling the event also cancels
+the browser's own focus-first-invalid, so focusing the offending control belongs
+to `validateForm` in use-abstraction-form-validation.ts. Any AbstractionManager
+entity editor form can call this once instead of re-wiring the capture listener
+by hand.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────

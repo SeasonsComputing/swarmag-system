@@ -111,6 +111,15 @@ export const AbstractionManager = <T extends Instance, Draft>(
       setEditorHandle(current => current === handle ? null : current)
     }
   }
+  // Update remains on the saved record, so its epoch bump deliberately skips
+  // focus — which leaves focus on the body. The banner is the landing spot: it
+  // is the thing that changed, it announces the result, and Tab from there
+  // enters the form. Create needs none of this; it focuses its first field.
+  const focusFeedback = (): void => {
+    requestAnimationFrame(() => {
+      panelRef?.querySelector<HTMLElement>('[data-shell-panel="form-feedback"]')?.focus()
+    })
+  }
   const saveEditor = async (): Promise<void> => {
     if (savePending()) return
     setEditorFeedback(null)
@@ -134,6 +143,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
         setMode('editor')
         bumpEditorEpoch(false)
         setEditorFeedback({ message: `Saved ${itemLabel(updated)}.`, variant: 'success' })
+        focusFeedback()
       } else {
         const created = await props.provider.create(draft)
         await props.provider.refresh()
