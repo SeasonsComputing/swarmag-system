@@ -41,9 +41,9 @@ file, and the two hazards to carry through the rewrite.
 
 1. **Phase 1 — execute the brief.** One consumer today (`user-manager.tsx`);
    that window closes as soon as a second manager exists.
-2. **Phase 2 — embedded list editor, then Job sites rehost.** Blocked on a CA
-   design decision: what _initial_, _new_, _delete_, _post-new_ and _post-delete_
-   actually do. This is the milestone path.
+2. **Phase 2 — `UiCollectionCursor`, then Job sites rehost.** Design closed
+   2026-08-06; specified in `effort/active/2026-08-06-collection-cursor-brief.md`.
+   This is the milestone path.
 3. **Phase 3 — dirty/pristine primitive.** Does not exist anywhere in
    `source/front` today. Designed once, against two settled consumers — the
    manager's fifth feedback-clearing rule and the list editor.
