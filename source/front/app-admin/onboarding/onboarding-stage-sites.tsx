@@ -1,23 +1,13 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Customer onboarding sites stage                                              ║
-║ Collects optional customer job sites and location details.                    ║
+║ Collects optional customer job sites and location details.                   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { toTrimmed } from '@core/std'
-import type { Location, Note } from '@domain/abstractions/common.ts'
+import type { Location } from '@domain/abstractions/common.ts'
 import type { CustomerSite } from '@domain/abstractions/customer.ts'
-import {
-  UiButton,
-  type UiComponent,
-  UiField,
-  UiFieldset,
-  UiInput,
-  UiLayout,
-  UiTextArea
-} from '@front/ux/ui'
-import { For, Show } from '@solid-js'
+import { UiButton, UiCollectionCursor, type UiComponent, UiField, UiInput, UiLayout } from '@front/ux/ui'
 import type { OnboardingState } from './onboarding-state.ts'
 
 /** Props for the optional job-sites stage. */
@@ -29,122 +19,177 @@ export type OnboardingStageSitesProps = {
 export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiComponent => {
   const { state } = props
   const hasGeo = typeof navigator !== 'undefined' && 'geolocation' in navigator
-  const addSite = (): void => {
-    const customer = state.customer()
-    if (!customer) return
-    const latitude = numberValue(state.siteLatitude())
-    const longitude = numberValue(state.siteLongitude())
-    const acreage = numberValue(state.siteAcreage())
-    const location: Location = {}
-    if (state.siteLine1().trim()) location.line1 = toTrimmed(state.siteLine1())
-    if (state.siteLine2().trim()) location.line2 = toTrimmed(state.siteLine2())
-    if (state.siteCity().trim()) location.city = toTrimmed(state.siteCity())
-    if (state.siteState().trim()) location.state = toTrimmed(state.siteState())
-    if (state.sitePostalCode().trim()) location.postalCode = toTrimmed(state.sitePostalCode())
-    if (state.siteCountry().trim()) location.country = toTrimmed(state.siteCountry())
-    if (latitude !== undefined) location.latitude = latitude
-    if (longitude !== undefined) location.longitude = longitude
-    const notes: Note[] = state.siteNote().trim()
-      ? [{
-        attachments: [],
-        createdAt: new Date().toISOString(),
-        content: toTrimmed(state.siteNote()),
-        visibility: 'internal',
-        tags: []
-      }]
-      : []
-    const site: CustomerSite = {
-      label: toTrimmed(state.siteLabel()),
-      location: [location],
-      notes,
-      ...(acreage === undefined ? {} : { acreage })
-    }
-    state.setSites([...state.sites(), site])
-    clearSite(state)
+  const updateSite = (index: number, update: (site: CustomerSite) => CustomerSite): void => {
+    const sites = state.sites()
+    const site = sites[index]
+    if (!site) return
+    state.setSites(sites.map((item, itemIndex) => itemIndex === index ? update(site) : item))
   }
-  const canAddSite = (): boolean => {
-    const hasAddress = state.siteLine1().trim().length > 0 && state.siteCity().trim().length > 0
-    const hasCoordinates = numberValue(state.siteLatitude()) !== undefined
-      && numberValue(state.siteLongitude()) !== undefined
-    return state.siteLabel().trim().length > 0 && (hasAddress || hasCoordinates)
+  const updateLocation = (
+    index: number,
+    update: (location: Location) => Location
+  ): void => {
+    updateSite(index, site => ({ ...site, location: [update(site.location[0] ?? {})] }))
   }
-  const useMyLocation = (): void => {
+  const useMyLocation = (index: number): void => {
     if (!hasGeo) return
     navigator.geolocation.getCurrentPosition(position => {
-      state.setSiteLatitude(position.coords.latitude.toString())
-      state.setSiteLongitude(position.coords.longitude.toString())
+      updateLocation(index, location => ({
+        ...location,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      }))
     }, () => undefined)
   }
 
   return (
     <UiLayout data-app='onboarding-stage-sites'>
-      <Show when={state.sites().length > 0}>
-        <UiFieldset legend='Added Sites'>
-          <div data-app='onboarding-sites-list'>
-            <For each={state.sites()}>
-              {(site, index) => <SiteSummary site={site} index={index()} />}
-            </For>
-          </div>
-        </UiFieldset>
-      </Show>
-      <UiFieldset legend='Add Job Site'>
-        <UiLayout>
-          <SiteInput
-            state={state}
-            name='siteLabel'
-            label='Site Label'
-            required
-            placeholder='e.g., "Main Office" or "Project Alpha"'
+      <UiCollectionCursor
+        items={state.sites()}
+        onItemsChange={state.setSites}
+        newItem={newSite}
+        empty={{ icon: 'home', message: 'No job sites yet. Click New to add one.' }}
+        confirmDelete={site => ({
+          title: site.label.trim() ? `Delete ${site.label}?` : 'Delete this job site?',
+          message: 'This job site will be removed from the onboarding collection.'
+        })}
+      >
+        {(site, index) => (
+          <SiteForm
+            site={site}
+            index={index}
+            hasGeo={hasGeo}
+            updateSite={updateSite}
+            updateLocation={updateLocation}
+            useMyLocation={useMyLocation}
           />
-          <UiFieldset legend='Address'>
-            <UiLayout>
-              <SiteInput state={state} name='siteLine1' label='Address' />
-              <SiteInput state={state} name='siteLine2' label='Unit / Suite' />
-              <SiteInput state={state} name='siteCity' label='City' />
-              <SiteInput state={state} name='siteState' label='State / Province' />
-              <SiteInput state={state} name='sitePostalCode' label='ZIP / Postal Code' />
-              <SiteInput state={state} name='siteCountry' label='Country' />
-            </UiLayout>
-          </UiFieldset>
-          <UiFieldset legend='Coordinates'>
-            <UiLayout data-app='onboarding-coords-group'>
-              <SiteInput
-                state={state}
-                name='siteLatitude'
-                label='Latitude'
-                placeholder='e.g., 40.7128'
-              />
-              <SiteInput
-                state={state}
-                name='siteLongitude'
-                label='Longitude'
-                placeholder='e.g., -74.0060'
-              />
-              <Show when={hasGeo}>
-                <UiButton variant='secondary' onClick={useMyLocation}>Use my location</UiButton>
-              </Show>
-            </UiLayout>
-          </UiFieldset>
-          <SiteInput state={state} name='siteAcreage' label='Acreage' type='number' />
-          <UiField for='siteNote' label='Note'>
-            <UiTextArea
-              name='siteNote'
-              rows={4}
-              value={state.siteNote()}
-              onInput={event => state.setSiteNote(event.currentTarget.value)}
-            />
-          </UiField>
-          <div data-app='onboarding-add-site-actions'>
-            <UiButton variant='secondary' disabled={!canAddSite()} onClick={addSite}>Add Site</UiButton>
-          </div>
-        </UiLayout>
-      </UiFieldset>
+        )}
+      </UiCollectionCursor>
     </UiLayout>
   )
 }
 
-type SiteInputProps = {
-  state: OnboardingState
+type SiteFormProps = {
+  site: CustomerSite
+  index: number
+  hasGeo: boolean
+  updateSite: (index: number, update: (site: CustomerSite) => CustomerSite) => void
+  updateLocation: (index: number, update: (location: Location) => Location) => void
+  useMyLocation: (index: number) => void
+}
+
+const SiteForm = (props: SiteFormProps): UiComponent => {
+  const location = props.site.location[0] ?? {}
+  return (
+    <UiLayout>
+      <SiteTextInput
+        index={props.index}
+        name='siteLabel'
+        label='Site Label'
+        value={props.site.label}
+        required
+        placeholder='e.g., "Main Office" or "Project Alpha"'
+        onValue={value => props.updateSite(props.index, site => ({ ...site, label: value }))}
+      />
+      <SiteTextInput
+        index={props.index}
+        name='siteLine1'
+        label='Address'
+        value={location.line1}
+        onValue={value =>
+          props.updateLocation(props.index, location => ({ ...location, line1: optionalText(value) }))}
+      />
+      <SiteTextInput
+        index={props.index}
+        name='siteLine2'
+        label='Unit / Suite'
+        value={location.line2}
+        onValue={value =>
+          props.updateLocation(props.index, location => ({ ...location, line2: optionalText(value) }))}
+      />
+      <SiteTextInput
+        index={props.index}
+        name='siteCity'
+        label='City'
+        value={location.city}
+        onValue={value =>
+          props.updateLocation(props.index, location => ({ ...location, city: optionalText(value) }))}
+      />
+      <SiteTextInput
+        index={props.index}
+        name='siteState'
+        label='State / Province'
+        value={location.state}
+        onValue={value =>
+          props.updateLocation(props.index, location => ({ ...location, state: optionalText(value) }))}
+      />
+      <SiteTextInput
+        index={props.index}
+        name='sitePostalCode'
+        label='ZIP / Postal Code'
+        value={location.postalCode}
+        onValue={value =>
+          props.updateLocation(
+            props.index,
+            location => ({ ...location, postalCode: optionalText(value) })
+          )}
+      />
+      <SiteTextInput
+        index={props.index}
+        name='siteCountry'
+        label='Country'
+        value={location.country}
+        onValue={value =>
+          props.updateLocation(props.index, location => ({ ...location, country: optionalText(value) }))}
+      />
+      <UiLayout data-app='onboarding-coords-group'>
+        <SiteTextInput
+          index={props.index}
+          name='siteLatitude'
+          label='Latitude'
+          value={numberText(location.latitude)}
+          placeholder='e.g., 40.7128'
+          onValue={value =>
+            props.updateLocation(props.index, location => ({
+              ...location,
+              latitude: numberValue(value)
+            }))}
+        />
+        <SiteTextInput
+          index={props.index}
+          name='siteLongitude'
+          label='Longitude'
+          value={numberText(location.longitude)}
+          placeholder='e.g., -74.0060'
+          onValue={value =>
+            props.updateLocation(props.index, location => ({
+              ...location,
+              longitude: numberValue(value)
+            }))}
+        />
+        <UiButton
+          variant='secondary'
+          disabled={!props.hasGeo}
+          onClick={() => props.useMyLocation(props.index)}
+        >
+          Use my location
+        </UiButton>
+      </UiLayout>
+      <SiteTextInput
+        index={props.index}
+        name='siteAcreage'
+        label='Acreage'
+        type='number'
+        value={numberText(props.site.acreage)}
+        onValue={value =>
+          props.updateSite(props.index, site => ({ ...site, acreage: numberValue(value) }))}
+      />
+    </UiLayout>
+  )
+}
+
+type SiteTextInputProps = {
+  index: number
   name:
     | 'siteLabel'
     | 'siteLine1'
@@ -157,20 +202,22 @@ type SiteInputProps = {
     | 'siteLongitude'
     | 'siteAcreage'
   label: string
+  value?: string
   placeholder?: string
   required?: boolean
   type?: 'number'
+  onValue: (value: string) => void
 }
 
-const SiteInput = (props: SiteInputProps): UiComponent => {
-  const input = siteInput(props.state, props.name)
+const SiteTextInput = (props: SiteTextInputProps): UiComponent => {
+  const name = `${props.name}-${props.index}`
   return (
-    <UiField for={props.name} label={props.label} required={props.required}>
+    <UiField for={name} label={props.label} required={props.required}>
       <UiInput
-        name={props.name}
+        name={name}
         type={props.type}
-        value={input[0]()}
-        onInput={event => input[1](event.currentTarget.value)}
+        value={props.value ?? ''}
+        onInput={event => props.onValue(event.currentTarget.value)}
         placeholder={props.placeholder}
         required={props.required}
       />
@@ -178,69 +225,18 @@ const SiteInput = (props: SiteInputProps): UiComponent => {
   )
 }
 
-const siteInput = (state: OnboardingState, name: SiteInputProps['name']) => {
-  switch (name) {
-    case 'siteLabel':
-      return [state.siteLabel, state.setSiteLabel] as const
-    case 'siteLine1':
-      return [state.siteLine1, state.setSiteLine1] as const
-    case 'siteLine2':
-      return [state.siteLine2, state.setSiteLine2] as const
-    case 'siteCity':
-      return [state.siteCity, state.setSiteCity] as const
-    case 'siteState':
-      return [state.siteState, state.setSiteState] as const
-    case 'sitePostalCode':
-      return [state.sitePostalCode, state.setSitePostalCode] as const
-    case 'siteCountry':
-      return [state.siteCountry, state.setSiteCountry] as const
-    case 'siteLatitude':
-      return [state.siteLatitude, state.setSiteLatitude] as const
-    case 'siteLongitude':
-      return [state.siteLongitude, state.setSiteLongitude] as const
-    case 'siteAcreage':
-      return [state.siteAcreage, state.setSiteAcreage] as const
-  }
-}
+const newSite = (): CustomerSite => ({
+  label: '',
+  location: [{}],
+  notes: []
+})
 
-const SiteSummary = (props: { site: CustomerSite; index: number }): UiComponent => (
-  <div data-app='onboarding-site-item' data-app-index={props.index}>
-    <div data-app='onboarding-site-label'>{props.site.label}</div>
-    <div data-app='onboarding-site-details'>
-      {props.site.location[0]?.line1 && <div>{props.site.location[0].line1}</div>}
-      {props.site.location[0]?.city && (
-        <div>
-          {props.site.location[0].city}
-          {props.site.location[0].state ? `, ${props.site.location[0].state}` : ''}
-          {props.site.location[0].postalCode ? ` ${props.site.location[0].postalCode}` : ''}
-        </div>
-      )}
-      {props.site.location[0]?.latitude !== undefined && props.site.location[0]?.longitude !== undefined
-        && (
-          <div data-app='onboarding-site-coords'>
-            {props.site.location[0].latitude.toFixed(4)}, {props.site.location[0].longitude.toFixed(4)}
-          </div>
-        )}
-    </div>
-  </div>
-)
+const optionalText = (value: string): string | undefined => value.trim() ? value : undefined
+
+const numberText = (value: number | undefined): string => value === undefined ? '' : value.toString()
 
 const numberValue = (value: string): number | undefined => {
   if (!value.trim()) return undefined
   const number = Number(value)
   return Number.isFinite(number) ? number : undefined
-}
-
-const clearSite = (state: OnboardingState): void => {
-  state.setSiteLabel('')
-  state.setSiteLine1('')
-  state.setSiteLine2('')
-  state.setSiteCity('')
-  state.setSiteState('')
-  state.setSitePostalCode('')
-  state.setSiteCountry('')
-  state.setSiteLatitude('')
-  state.setSiteLongitude('')
-  state.setSiteAcreage('')
-  state.setSiteNote('')
 }
