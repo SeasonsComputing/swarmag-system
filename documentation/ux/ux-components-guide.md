@@ -85,6 +85,7 @@ This is a design-system boundary, not a stylistic preference.
 | `UiTable`                            | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
 | `UiFieldset`                         | `<fieldset>` + `<legend>`                               |
 | `UiField`                            | `<div>` + `<label>` + {control}                         |
+| `UiCollectionCursor`                 | ad hoc list-plus-capture-form                           |
 | `UiLayout`, `UiFormActions`          | ad hoc layout wrappers                                  |
 
 This rule keeps typography roles, semantic attributes, theme behavior, spacing,
@@ -990,7 +991,7 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 **Example**
 
 ```tsx
-<UiLayout variant='inline'>
+<UiLayout variant='inline-fit'>
   <UiBadge variant='success'>Active</UiBadge>
   <UiBadge variant='info'>Synced</UiBadge>
 </UiLayout>
@@ -1155,7 +1156,71 @@ Use when a form has a named group of related fields.
 </UiFieldset>
 ```
 
-### 5.7 UiFormActions
+### 5.7 UiCollectionCursor
+
+Cursor, position readout, and lifecycle controls for generic value-in/value-out
+collections.
+
+**Use When**
+
+Use when a host owns an editable collection and needs consistent New, Delete,
+previous/next, empty, and position readout behavior around a host-rendered item
+form.
+
+**Props**
+
+| Prop            | Type                                              | Required | Default | Description                                |
+| --------------- | ------------------------------------------------- | -------- | ------- | ------------------------------------------ |
+| `items`         | `T[]`                                             | yes      | —       | Host-owned collection.                     |
+| `onItemsChange` | `(items: T[]) => void`                            | yes      | —       | Receives the next collection array.        |
+| `newItem`       | `() => T`                                         | yes      | —       | Produces a blank item for New.             |
+| `renderItem`    | `(item: T, index: number) => UiComponent`         | yes      | —       | Renders the item at the cursor.            |
+| `empty`         | `{ icon: string; message: string }`               | yes      | —       | Empty-state icon catalog name and message. |
+| `confirmDelete` | `(item: T) => { title: string; message: string }` | yes      | —       | Host-supplied delete confirmation content. |
+
+`items` is never mutated in place. The control emits the next array through
+`onItemsChange`; a host that mutates and re-passes the same reference will not
+update.
+
+**Emitted Attributes**
+
+`data-ui='collection-cursor'`, `data-ui='collection-cursor-position'`,
+`data-ui='collection-cursor-readout'`, `data-ui='collection-cursor-pip'`,
+`data-ui-current`, `data-ui='collection-cursor-count'`,
+`data-ui='collection-cursor-actions'`, `data-ui='collection-cursor-rule'`,
+`data-ui='collection-cursor-body'`, `data-ui='collection-cursor-empty'`,
+`data-ui='collection-cursor-empty-icon'`, `data-ui-icon`,
+`data-ui='collection-cursor-empty-message'`,
+`data-ui='collection-cursor-confirm'`,
+`data-ui='collection-cursor-confirm-title'`,
+`data-ui='collection-cursor-confirm-message'`,
+`data-ui='collection-cursor-confirm-actions'`.
+
+**Example**
+
+```tsx
+<UiCollectionCursor
+  items={sites()}
+  onItemsChange={setSites}
+  newItem={newSite}
+  empty={{ icon: 'home', message: 'No job sites yet. Click New to add one.' }}
+  confirmDelete={site => ({
+    title: site.label.trim() ? `Delete ${site.label}?` : 'Delete this job site?',
+    message: 'This job site will be removed from the collection.'
+  })}
+  renderItem={(site, index) => (
+    <UiField label='Site label' for={`site-label-${index}`}>
+      <UiInput
+        name={`site-label-${index}`}
+        value={site.label}
+        onInput={event => updateSite(index, { label: event.currentTarget.value })}
+      />
+    </UiField>
+  )}
+/>
+```
+
+### 5.8 UiFormActions
 
 Right-aligned action row.
 

@@ -21,7 +21,7 @@ export type UiLayoutVariant =
   | 'block-fill'
   | 'block-fit'
   | 'cluster'
-  | 'inline'
+  | 'inline-fit'
   | 'inline-fill'
   | 'inline-wrap'
 

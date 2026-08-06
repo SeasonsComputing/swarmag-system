@@ -48,6 +48,7 @@ application code must use the shared control.
 | `UiTable`                            | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
 | `UiFieldset`                         | `<fieldset>` and `<legend>`                             |
 | `UiField`                            | ad hoc label/control wrapper                            |
+| `UiCollectionCursor`                 | ad hoc list-plus-capture-form                           |
 | `UiLayout`, `UiFormActions`          | ad hoc layout wrappers                                  |
 
 Native headings, paragraphs, and other content elements remain valid when no
@@ -433,7 +434,15 @@ Use for a named semantic group of related form fields.
 
 Key props: `legend`, children.
 
-### 5.7 UiFormActions
+### 5.7 UiCollectionCursor
+
+Use for editable collections where the host owns the array and item form, but
+shared chrome should own New, Delete, previous/next, empty state, and position
+readout behavior. The control receives `items`, emits next arrays through
+`onItemsChange`, creates blank entries through `newItem`, and renders the active
+item through `renderItem`.
+
+### 5.8 UiFormActions
 
 Use at the end of forms or dialogs for submit and dismissal buttons.
 

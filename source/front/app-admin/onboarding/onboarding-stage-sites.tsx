@@ -53,8 +53,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
           title: site.label.trim() ? `Delete ${site.label}?` : 'Delete this job site?',
           message: 'This job site will be removed from the onboarding collection.'
         })}
-      >
-        {(site, index) => (
+        renderItem={(site, index) => (
           <SiteForm
             site={site}
             index={index}
@@ -64,7 +63,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
             useMyLocation={useMyLocation}
           />
         )}
-      </UiCollectionCursor>
+      />
     </UiLayout>
   )
 }

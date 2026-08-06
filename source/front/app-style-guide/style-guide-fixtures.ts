@@ -14,12 +14,21 @@ COLOR_SWATCHES          Design token swatches for color validation.
 TEXT_TOKENS             Design token text colors.
 COLOR_TOKENS            Design token colors.
 BUTTON_VARIANTS         Button variant examples.
+COLLECTION_CURSOR_ITEMS Small editable collection cursor sample.
+COLLECTION_CURSOR_MANY  Larger collection cursor sample for count readout.
 STATUSES                Service status options.
 SERVICES                Service category options.
 DEFAULT_SERVICES        Default multi-select service values.
 ACCORDION_DEFAULT_VALUE Default open accordion value.
 EQUIPMENT               Grouped equipment records for section-row table rendering.
 */
+
+/** Local style-guide fixture item for collection cursor demonstrations. */
+export type StyleGuideCollectionItem = {
+  label: string
+  acreage: string
+  note: string
+}
 
 export const COLOR_SWATCHES = [
   {
@@ -91,6 +100,31 @@ export const SERVICES = [
 export const DEFAULT_SERVICES = ['Aerial', 'Ground'] as const
 
 export const ACCORDION_DEFAULT_VALUE = ['weather'] as const
+
+export const COLLECTION_CURSOR_ITEMS = [
+  {
+    label: 'North Field',
+    acreage: '142',
+    note: 'Primary spray block near the equipment barn.'
+  },
+  {
+    label: 'South Pasture',
+    acreage: '88',
+    note: 'Fence line requires operator confirmation.'
+  }
+] as const satisfies ReadonlyArray<StyleGuideCollectionItem>
+
+export const COLLECTION_CURSOR_MANY = [
+  { label: 'Block 1', acreage: '12', note: 'Readout sample.' },
+  { label: 'Block 2', acreage: '18', note: 'Readout sample.' },
+  { label: 'Block 3', acreage: '21', note: 'Readout sample.' },
+  { label: 'Block 4', acreage: '17', note: 'Readout sample.' },
+  { label: 'Block 5', acreage: '19', note: 'Readout sample.' },
+  { label: 'Block 6', acreage: '14', note: 'Readout sample.' },
+  { label: 'Block 7', acreage: '22', note: 'Readout sample.' },
+  { label: 'Block 8', acreage: '16', note: 'Readout sample.' },
+  { label: 'Block 9', acreage: '20', note: 'Readout sample.' }
+] as const satisfies ReadonlyArray<StyleGuideCollectionItem>
 
 export const EQUIPMENT = [
   {
