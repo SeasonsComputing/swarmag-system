@@ -1453,7 +1453,7 @@
   flex: 1 1 0;
 }
 
-[data-ui='layout'][data-ui-variant='cluster'] {
+[data-ui='layout'][data-ui-variant='cluster-wrap'] {
   align-items: center;
   display: flex;
   flex-wrap: wrap;
