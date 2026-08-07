@@ -674,7 +674,7 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='UiCheckbox'>
             <UiFieldset legend='Checkbox States'>
-              <UiLayout variant='inline-fit'>
+              <UiLayout variant='cluster-wrap'>
                 <UiCheckbox checked={checkboxChecked()} onChange={setCheckboxChecked}>
                   Label reviewed
                 </UiCheckbox>
@@ -691,7 +691,7 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='UiRadioGroup / UiRadioItem'>
             <UiFieldset legend='Radio States'>
-              <UiLayout variant='inline-wrap'>
+              <UiLayout variant='cluster-wrap'>
                 <UiRadioGroup value={radioValue()} onChange={setRadioValue}>
                   <UiRadioItem value='aerial'>Aerial application</UiRadioItem>
                   <UiRadioItem value='ground'>Ground machinery</UiRadioItem>
