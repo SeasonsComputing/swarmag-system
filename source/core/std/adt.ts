@@ -14,3 +14,13 @@ export class StringSet extends Set<string> {}
 /** Check whether value is undefined or null. */
 export const isNullish = (value: unknown): value is undefined | null =>
   value === undefined || value === null
+
+/** Compute a djb2 fingerprint of a string. */
+export const djb2hash = (str: string): string => {
+  let hash = 5381
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) + hash) ^ str.charCodeAt(i)
+    hash = hash & hash
+  }
+  return hash.toString(36)
+}

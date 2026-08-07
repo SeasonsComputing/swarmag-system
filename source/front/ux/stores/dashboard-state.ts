@@ -44,7 +44,7 @@ rowWidgets: DashboardWidgetsContract - Widget mutation contract
 
 import { ApiError, apiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
-import { type Dictionary, id, type Instance } from '@core/std'
+import { type Dictionary, djb2hash, id, type Instance } from '@core/std'
 import { Config } from '@front/config/ux-config.ts'
 import type {
   DashboardRowHeader,
@@ -128,15 +128,7 @@ const [dashboardStore, setDashboardStore] = createStore<DashboardStoreView>({
 type DashboardRecord = DashboardStoreView & { seedHash: string }
 
 /** Compute a djb2 fingerprint of the seed for change detection. */
-function seedFingerprint(seed: DashboardStateSeed): string {
-  const str = JSON.stringify(seed)
-  let hash = 5381
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash) ^ str.charCodeAt(i)
-    hash = hash & hash
-  }
-  return hash.toString(36)
-}
+const seedFingerprint = (seed: DashboardStateSeed): string => djb2hash(JSON.stringify(seed))
 
 /** Initialize store from db or seed */
 async function dashboardInit(seed: DashboardStateSeed): Promise<void> {
