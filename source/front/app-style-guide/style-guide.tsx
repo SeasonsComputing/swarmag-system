@@ -546,35 +546,35 @@ export const StyleGuide = (): UiComponent => {
                   />
                 </UiField>
               </UiLayout>
-              <form onSubmit={event => event.preventDefault()}>
-                <UiFieldset legend='Controlled form select'>
-                  <UiLayout>
-                    <UiField label='Controlled select' for='controlled-service-status'>
-                      <UiSingleSelect
-                        name='controlled-service-status'
-                        placeholder='Select service status'
-                        value={serviceStatus()}
-                        onChange={value => setServiceStatus(value as ServiceStatus)}
-                        error={selectError()}
-                        options={STATUSES}
-                      />
-                    </UiField>
-                    <UiField label='Default select' for='default-service-status'>
-                      <UiSingleSelect
-                        name='default-service-status'
-                        placeholder='Select service status'
-                        defaultValue='Ready'
-                        error={selectError()}
-                        options={STATUSES}
-                      />
-                    </UiField>
-                    <UiFormActions>
-                      <UiButton type='submit'>Submit</UiButton>
-                    </UiFormActions>
-                  </UiLayout>
-                </UiFieldset>
-              </form>
             </UiFieldset>
+            <form onSubmit={event => event.preventDefault()}>
+              <UiFieldset legend='Form controlled Single-select'>
+                <UiLayout>
+                  <UiField label='Controlled select' for='controlled-service-status'>
+                    <UiSingleSelect
+                      name='controlled-service-status'
+                      placeholder='Select service status'
+                      value={serviceStatus()}
+                      onChange={value => setServiceStatus(value as ServiceStatus)}
+                      error={selectError()}
+                      options={STATUSES}
+                    />
+                  </UiField>
+                  <UiField label='Default select' for='default-service-status'>
+                    <UiSingleSelect
+                      name='default-service-status'
+                      placeholder='Select service status'
+                      defaultValue='Ready'
+                      error={selectError()}
+                      options={STATUSES}
+                    />
+                  </UiField>
+                  <UiFormActions>
+                    <UiButton type='submit'>Submit</UiButton>
+                  </UiFormActions>
+                </UiLayout>
+              </UiFieldset>
+            </form>
             <UiFieldset legend='Multi-select'>
               <UiMultiSelect options={SERVICES} defaultValue={[...DEFAULT_SERVICES]} />
             </UiFieldset>
@@ -622,31 +622,34 @@ export const StyleGuide = (): UiComponent => {
                 message: 'This item will be removed from the local style-guide sample.'
               })}
               renderItem={(item, index) => (
-                <UiLayout variant='inline-wrap'>
-                  <UiField label='Block name' for={`collection-cursor-label-${index}`}>
-                    <UiInput
-                      name={`collection-cursor-label-${index}`}
-                      value={item.label}
-                      onInput={event =>
-                        updateCollectionItem(index, { label: event.currentTarget.value })}
-                    />
-                  </UiField>
-                  <UiField label='Acres' for={`collection-cursor-acreage-${index}`}>
-                    <UiInput
-                      name={`collection-cursor-acreage-${index}`}
-                      value={item.acreage}
-                      onInput={event =>
-                        updateCollectionItem(index, { acreage: event.currentTarget.value })}
-                    />
-                  </UiField>
-                  <UiField label='Note' for={`collection-cursor-note-${index}`}>
-                    <UiInput
-                      name={`collection-cursor-note-${index}`}
-                      value={item.note}
-                      onInput={event => updateCollectionItem(index, { note: event.currentTarget.value })}
-                    />
-                  </UiField>
-                </UiLayout>
+                <UiCard>
+                  <UiLayout variant='inline-wrap'>
+                    <UiField label='Block name' for={`collection-cursor-label-${index}`}>
+                      <UiInput
+                        name={`collection-cursor-label-${index}`}
+                        value={item.label}
+                        onInput={event =>
+                          updateCollectionItem(index, { label: event.currentTarget.value })}
+                      />
+                    </UiField>
+                    <UiField label='Acres' for={`collection-cursor-acreage-${index}`}>
+                      <UiInput
+                        name={`collection-cursor-acreage-${index}`}
+                        value={item.acreage}
+                        onInput={event =>
+                          updateCollectionItem(index, { acreage: event.currentTarget.value })}
+                      />
+                    </UiField>
+                    <UiField label='Note' for={`collection-cursor-note-${index}`}>
+                      <UiInput
+                        name={`collection-cursor-note-${index}`}
+                        value={item.note}
+                        onInput={event =>
+                          updateCollectionItem(index, { note: event.currentTarget.value })}
+                      />
+                    </UiField>
+                  </UiLayout>
+                </UiCard>
               )}
             />
             <UiFieldset legend='UiCollectionCursor count readout'>
