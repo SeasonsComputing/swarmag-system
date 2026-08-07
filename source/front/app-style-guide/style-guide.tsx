@@ -913,7 +913,7 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='UiLayout'>
             <UiLayout variant='inline-wrap'>
-              <UiFieldset legend='Stack (block-stack, default)'>
+              <UiFieldset legend='Stack (default)'>
                 <UiLayout>
                   <UiAlert>North Field spray window confirmed.</UiAlert>
                   <UiAlert variant='success'>Crew pre-check complete.</UiAlert>
@@ -934,7 +934,7 @@ export const StyleGuide = (): UiComponent => {
                 </UiLayout>
               </UiFieldset>
             </UiLayout>
-            <UiFieldset legend='Row (inline)'>
+            <UiFieldset legend='Row (inline-fit)'>
               <UiLayout variant='inline-fit'>
                 <UiButton>Cancel</UiButton>
                 <UiButton variant='primary'>Confirm dispatch</UiButton>
