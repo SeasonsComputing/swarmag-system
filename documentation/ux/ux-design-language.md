@@ -150,7 +150,7 @@ Foundation tokens are organized into categories: Font weight, Font size, Line he
 | `--sa-radius-`       | Corner scale                       | `--sa-radius-sm`, `--sa-radius-md`, `--sa-radius-lg`, `--sa-radius-xl`, `--sa-radius-full`                                                                        |
 | `--sa-space-`        | Base spacing grid                  | `--sa-space-xs`, `--sa-space-xx`, `--sa-space-sm`, `--sa-space-md`, `--sa-space-lg`, `--sa-space-xl`, `--sa-space-2xl`, `--sa-space-3xl`, `--sa-space-4xl`        |
 | `--sa-rhythm-`       | Responsive layout rhythm           | `--sa-rhythm-gutter`, `--sa-rhythm-pad`, `--sa-rhythm-gap`                                                                                                        |
-| `--sa-size-`         | Viewport and wrap sizes            | `--sa-size-wrap`, `--sa-size-min`, `--sa-size-xs`, `--sa-size-sm`, `--sa-size-md`, `--sa-size-lg`                                                                 |
+| `--sa-size-`         | Viewport and wrap sizes            | `--sa-size-wrap`, `--sa-size-min`, `--sa-size-xs`, `--sa-size-xx`, `--sa-size-sm`, `--sa-size-md`, `--sa-size-lg`                                                 |
 | `--sa-touch-`        | Field-safe and compact target size | `--sa-touch-target`, `--sa-touch-target-sm`                                                                                                                       |
 | `--sa-z-`            | Elevation ordering                 | `--sa-z-below`, `--sa-z-base`, `--sa-z-raised`, `--sa-z-docked`, `--sa-z-popover`, `--sa-z-overlay`, `--sa-z-toast`                                               |
 | `--sa-filter-`       | Filter values                      | `--sa-filter-blur`, `--sa-filter-mono`                                                                                                                            |
@@ -382,6 +382,7 @@ breakpoint composition is declared in `tokens.css`.
 | `--sa-size-wrap` | Minimum wrap reference    |
 | `--sa-size-min`  | Minimum application width |
 | `--sa-size-xs`   | Small/mobile breakpoint   |
+| `--sa-size-xx`   | Mobile breakpoint         |
 | `--sa-size-sm`   | Tablet breakpoint         |
 | `--sa-size-md`   | Desktop breakpoint        |
 | `--sa-size-lg`   | Wide layout breakpoint    |
