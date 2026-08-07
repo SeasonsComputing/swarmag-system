@@ -56,7 +56,7 @@
 
   /* Breakpoints */
   --sa-size-wrap: 270px;
-  --sa-size-min: 320px;
+  --sa-size-min: 380px;
   --sa-size-xs: 425px;
   --sa-size-sm: 768px;
   --sa-size-md: 1024px;
@@ -109,42 +109,49 @@
   /* Each token owns exactly one spatial role. Select by the KIND of space    */
   /* being created, never by which value happens to look right.               */
   /*                                                                          */
-  /*   gutter     — PAGE padding, and only page padding. Page-level surfaces  */
-  /*                only (dashboard, style guide). Sparse use is correct use. */
-  /*                Its wide range is deliberate: page margins scale hard,    */
-  /*                box interiors must not. NOT an inline-axis token — a      */
-  /*                surface needing an inline measure distinct from its block */
-  /*                measure requires a NEW token, not this one.               */
-  /*   pad        — BOX INTERIOR. Resolves to --sa-card-panel-pad and         */
-  /*                --sa-dialog-pad. Raising it widens every card and dialog  */
-  /*                interior at once; that reach is intended. Also            */
-  /*                participates in dialog SIZING math, so it can move        */
-  /*                surface dimensions as well as interior spacing.           */
-  /*   gap        — SPACE BETWEEN siblings: fieldsets, fields, grid tracks.   */
-  /*   gap-tight  — same role as gap, for dense control clusters.             */
+  /*   gutter    — PAGE padding, and only page padding. Page-level surfaces   */
+  /*               only (dashboard, style guide). Sparse use is correct use.  */
+  /*               Its wide range is deliberate: page margins scale hard,     */
+  /*               box interiors must not. NOT an inline-axis token — a       */
+  /*               surface needing an inline measure distinct from its block  */
+  /*               measure requires a NEW token, not this one.                */
+  /*   pad       — BOX INTERIOR. Resolves to --sa-card-panel-pad and          */
+  /*               --sa-dialog-pad. Raising it widens every card and dialog   */
+  /*               interior at once; that reach is intended. Also             */
+  /*               participates in dialog SIZING math, so it can move         */
+  /*               surface dimensions as well as interior spacing.            */
+  /*   gap       — SPACE BETWEEN siblings: fieldsets, fields, grid tracks.    */
+  /*   gap-tight — same role as gap, for dense control clusters.              */
   /*                                                                          */
   /* Normative definition: ux-design-language.md §5.2.                        */
+  /*                                                                          */
+  /* Annotated figures are POST-CALCULATION outcomes, not declared values: a  */
+  /* clamp with a vw slope cannot be read off the declaration. Each bound     */
+  /* carries its value AND the width at which it obtains, so an edit that     */
+  /* changes a slope without re-solving falsifies a claim sitting beside it.  */
+  /* Figures assume the normal base. At <=380px --sa-base-size collapses to   */
+  /* --sa-font-size-sm and every rem-derived value scales by 0.875.           */
   /* ──────────────────────────────────────────────────────────────────────── */
 
   --sa-rhythm-gutter: clamp(
-    var(--sa-space-md),
-    calc(-0.156rem + 4.934vw),
-    var(--sa-space-3xl)
+    var(--sa-space-md) /* 16px at 380 */,
+    calc(0.016rem + 4.145vw),
+    var(--sa-space-3xl) /* 48px at 1152 */
   );
   --sa-rhythm-pad: clamp(
-    calc(var(--sa-space-sm) + var(--sa-space-xs)),
+    calc(var(--sa-space-sm) + var(--sa-space-xs)) /* 10.5px at 294, collapsed base */,
     calc(-0.156rem + 4.934vw),
-    calc(var(--sa-space-md) + var(--sa-space-xs))
+    calc(var(--sa-space-md) + var(--sa-space-xs)) /* 20px at 456 */
   );
   --sa-rhythm-gap: clamp(
-    calc(var(--sa-space-sm) + var(--sa-space-xs)),
-    calc(-0.156rem + 4.934vw),
-    var(--sa-space-md)
+    var(--sa-space-sm) /* 8px at 380 */,
+    calc(0.010rem + 2.062vw),
+    var(--sa-space-md) /* 16px at 768 */
   );
   --sa-rhythm-gap-tight: clamp(
-    calc(var(--sa-space-xx) / 2),
-    calc(0.093rem + 0.353vw),
-    var(--sa-space-xx)
+    calc(var(--sa-space-xx) / 2) /* 3px at 380 */,
+    calc(0.004rem + 0.773vw),
+    var(--sa-space-xx) /* 6px at 768 */
   );
 }
 
