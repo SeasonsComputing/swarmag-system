@@ -622,34 +622,31 @@ export const StyleGuide = (): UiComponent => {
                 message: 'This item will be removed from the local style-guide sample.'
               })}
               renderItem={(item, index) => (
-                <UiCard>
-                  <UiLayout variant='inline-wrap'>
-                    <UiField label='Block name' for={`collection-cursor-label-${index}`}>
-                      <UiInput
-                        name={`collection-cursor-label-${index}`}
-                        value={item.label}
-                        onInput={event =>
-                          updateCollectionItem(index, { label: event.currentTarget.value })}
-                      />
-                    </UiField>
-                    <UiField label='Acres' for={`collection-cursor-acreage-${index}`}>
-                      <UiInput
-                        name={`collection-cursor-acreage-${index}`}
-                        value={item.acreage}
-                        onInput={event =>
-                          updateCollectionItem(index, { acreage: event.currentTarget.value })}
-                      />
-                    </UiField>
-                    <UiField label='Note' for={`collection-cursor-note-${index}`}>
-                      <UiInput
-                        name={`collection-cursor-note-${index}`}
-                        value={item.note}
-                        onInput={event =>
-                          updateCollectionItem(index, { note: event.currentTarget.value })}
-                      />
-                    </UiField>
-                  </UiLayout>
-                </UiCard>
+                <UiLayout>
+                  <UiField label='Block name' for={`collection-cursor-label-${index}`}>
+                    <UiInput
+                      name={`collection-cursor-label-${index}`}
+                      value={item.label}
+                      onInput={event =>
+                        updateCollectionItem(index, { label: event.currentTarget.value })}
+                    />
+                  </UiField>
+                  <UiField label='Acres' for={`collection-cursor-acreage-${index}`}>
+                    <UiInput
+                      name={`collection-cursor-acreage-${index}`}
+                      value={item.acreage}
+                      onInput={event =>
+                        updateCollectionItem(index, { acreage: event.currentTarget.value })}
+                    />
+                  </UiField>
+                  <UiField label='Note' for={`collection-cursor-note-${index}`}>
+                    <UiInput
+                      name={`collection-cursor-note-${index}`}
+                      value={item.note}
+                      onInput={event => updateCollectionItem(index, { note: event.currentTarget.value })}
+                    />
+                  </UiField>
+                </UiLayout>
               )}
             />
             <UiFieldset legend='UiCollectionCursor count readout'>
