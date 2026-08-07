@@ -40,29 +40,41 @@ export const Wizard = (props: WizardProps): UiComponent => {
   const [committing, setCommitting] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
 
+  /** Active wizard stage resolved from the current step index. */
   const stage = createMemo(() => props.contract.stages[stepIndex()])
+
+  /** Whether the current stage is the first stage. */
   const isFirst = () => stepIndex() === 0
+
+  /** Whether the current stage is the final stage. */
   const isLast = () => stepIndex() === props.contract.stages.length - 1
+
+  /** Whether the current stage permits forward navigation. */
   const canAdvance = () => stage().canAdvance()
 
+  /** Visual state for a step in the wizard progress list. */
   const stepState = (index: number) =>
     index < stepIndex() ? 'done' : index === stepIndex() ? 'current' : 'upcoming'
 
+  /** Fill width for the wizard progress bar. */
   const barFill = (): string =>
     `${(((stepIndex() + 0.5) / props.contract.stages.length) * 100).toFixed(3)}%`
 
+  /** Feedback banner combining local commit errors with provider feedback. */
   const banner = createMemo<PanelFeedback | null>(() => {
     const e = error()
     if (e) return { message: e, variant: 'danger' }
     return props.contract.feedback?.() ?? null
   })
 
+  /** Move to the previous wizard stage when allowed. */
   const back = (): void => {
     if (isFirst() || committing()) return
     setError(null)
     setStepIndex(i => i - 1)
   }
 
+  /** Validate, commit, and advance the active wizard stage. */
   const advance = async (): Promise<void> => {
     if (committing()) return
     const current = stage()
