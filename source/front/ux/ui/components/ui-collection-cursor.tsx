@@ -39,7 +39,7 @@ export type UiCollectionCursorProps<T> = {
 }
 
 /** Pip slots rendered by the position readout before it falls back to `N of M`. */
-const PIP_SLOTS = 8
+const PIP_SLOTS = 6
 
 /** Cursor control for generic value-in/value-out collections. */
 export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComponent {

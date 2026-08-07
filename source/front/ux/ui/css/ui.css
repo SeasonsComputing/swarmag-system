@@ -239,7 +239,7 @@
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size-compact);
   font-weight: var(--sa-ui-font-weight);
-  inline-size: calc(var(--sa-space-md) * 8);
+  inline-size: calc(var(--sa-space-md) * 6);
   justify-content: center;
   transition: var(--sa-transition-base);
   white-space: nowrap;
