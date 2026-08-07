@@ -742,10 +742,16 @@ Compact icon action button for dense surfaces such as tables and toolbars.
 **Use When**
 
 Use for row-level or surface-level actions where space is constrained and an
-icon communicates intent. Always provide a `label` — it is used as `aria-label`
-and is revealed on hover and focus by default. Use `labelMode='visible'` when
-the action sits in sparse command chrome and the label should be part of the
-hit target. Use `variant='danger'` for destructive actions.
+icon communicates intent. Always provide a `label` — it is the accessible name
+whether or not it is drawn. `labelMode` decides only whether the label is also
+rendered inline, and defaults to `hidden`, the dense case. Use
+`labelMode='visible'` when the action sits in sparse command chrome and the
+label should be part of the hit target. Use `variant='danger'` for destructive
+actions.
+
+Nothing reveals a hidden label on hover, by design: a control-layer hover rule
+outranks a consumer hiding labels for space, so label presence stays the
+consumer's decision at every viewport.
 
 **Props**
 
@@ -755,7 +761,7 @@ Extends native button attributes, excluding styling and semantic hook props.
 | ----------- | ----------------------- | ------------ | ------------------------------------------------- |
 | `icon`      | `string`                | —            | Icon catalog name to display.                     |
 | `label`     | `string`                | —            | Accessible label and optional visible label text. |
-| `labelMode` | `'reveal' \| 'visible'` | `'reveal'`   | Label presentation.                               |
+| `labelMode` | `'visible' \| 'hidden'` | `'hidden'`   | Whether the label is also rendered inline.        |
 | `density`   | `'standard' \| 'dense'` | `'standard'` | Visual ring and glyph density.                    |
 | `align`     | `'start' \| 'end'`      | `'end'`      | Icon position when the label is visible.          |
 | `variant`   | `'default' \| 'danger'` | unset        | Visual/action priority.                           |
@@ -978,15 +984,24 @@ Extends native `div` attributes, excluding styling and semantic hook props.
 
 **Variants**
 
-| Variant        | Use                                                        |
-| -------------- | ---------------------------------------------------------- |
-| unset          | Full-width vertical stack.                                 |
-| `block-fill`   | Full-height stack whose final child fills remaining space. |
-| `block-fit`    | Vertical stack that fits its content width.                |
-| `cluster-wrap` | Wrapping compact horizontal action group.                  |
-| `inline-fit`   | Horizontal layout that fits its content width.             |
-| `inline-fill`  | Horizontal layout where children share the width.          |
-| `inline-wrap`  | Responsive row-oriented grid with column wrapping.         |
+| Variant              | Use                                                        |
+| -------------------- | ---------------------------------------------------------- |
+| unset: "block-stack" | Full-width vertical stack, content height.                 |
+| `block-fill`         | Full-height stack whose final child fills remaining space. |
+| `block-fit`          | Vertical stack that fits its content width.                |
+| `cluster-wrap`       | Wrapping compact horizontal action group.                  |
+| `inline-fit`         | Horizontal layout that fits its content width.             |
+| `inline-fill`        | Horizontal layout where children share the width.          |
+| `inline-wrap`        | Responsive row-oriented grid with column wrapping.         |
+
+**Attributes**
+
+| Gap                 | Use                                                      |
+| ------------------- | -------------------------------------------------------- |
+| unset: "rhythm-gap" | Responsive layout rhythm for ordinary component spacing. |
+| `loose`             | Expanded spacing for visually separated groups.          |
+| `tight`             | Compact spacing for dense related controls.              |
+| `none`              | Removes spacing between direct layout children.          |
 
 **Example**
 

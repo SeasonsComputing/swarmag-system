@@ -305,10 +305,12 @@ Variants: `default`, `danger`.
 Other key props: `align`, `density` (`standard` or `dense`), `labelMode`, `loading`,
 `error`, `disabled`.
 
-`label` is the accessible `aria-label` and is revealed on hover and focus.
-Use `labelMode='visible'` when the label should be visible and part of the
-action hit target. With a visible label, `align='start'` places the icon before
-the label; `align='end'` is the default.
+`label` is the accessible `aria-label` whether or not it is drawn. `labelMode`
+decides only whether it is also rendered inline and defaults to `hidden`; a
+hidden label is never revealed on hover. Use `labelMode='visible'` when the
+label should be visible and part of the action hit target. With a visible
+label, `align='start'` places the icon before the label; `align='end'` is the
+default.
 `loading` and `disabled` both disable the button and suppress tab focus.
 
 ## 4. Display Controls

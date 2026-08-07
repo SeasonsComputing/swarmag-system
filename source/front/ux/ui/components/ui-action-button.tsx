@@ -1,16 +1,22 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Ui action button control                                                     ║
-║ Compact icon action button with accessible label reveal.                     ║
+║ Compact icon action button with an optional inline label.                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Emits compact action semantics for dense surfaces such as tables and toolbars.
 
+`label` is always the accessible name, whether or not it is drawn. `labelMode`
+decides only whether it is also rendered inline, and defaults to `hidden` — the
+dense case these surfaces are built for. Nothing reveals the label on hover: a
+control-layer hover rule outranks a consumer hiding labels for space, so label
+presence stays the consumer's decision at every viewport.
+
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiActionButton  Compact icon button with hover/focus label affordance.
+UiActionButton  Compact icon button with an optional inline label.
 */
 
 import { Button } from '@kobalte/core/button'
@@ -20,8 +26,8 @@ import { controlState, type UiComponent } from './ui-helpers.ts'
 /** Action button variants. */
 export type UiActionButtonVariant = 'default' | 'danger'
 
-/** Action button label presentation. */
-export type UiActionButtonLabelMode = 'reveal' | 'visible'
+/** Action button label presentation. The label is always the accessible name. */
+export type UiActionButtonLabelMode = 'visible' | 'hidden'
 
 /** Action button visual density. */
 export type UiActionButtonDensity = 'standard' | 'dense'
@@ -99,7 +105,7 @@ export const UiActionButton = (props: UiActionButtonProps): UiComponent => {
       data-ui-align={local.align ?? 'end'}
       data-ui-density={local.density ?? 'standard'}
       data-ui-icon={local.icon}
-      data-ui-label-mode={local.labelMode ?? 'reveal'}
+      data-ui-label-mode={local.labelMode ?? 'hidden'}
       data-ui-state={controlState(local)}
       data-ui-variant={local.variant}
       disabled={isDisabled()}
