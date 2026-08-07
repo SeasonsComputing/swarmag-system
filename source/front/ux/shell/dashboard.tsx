@@ -29,12 +29,19 @@ export const Dashboard = (props: {
 }): UiComponent => {
   const dashboard = props.state.store
   const widgets = props.widgets
+
+  /** Primary dashboard identity widget in the header. */
   const headerIdentity = () => dashboard.header.widgets[0]
+
+  /** Dashboard header widgets rendered between identity and terminal slots. */
   const headerFields = () => dashboard.header.widgets.slice(1, -1)
+
+  /** Optional terminal dashboard header widget. */
   const headerTerminal = () => {
     const headerWidgets = dashboard.header.widgets
     return headerWidgets.length > 1 ? headerWidgets.at(-1) : undefined
   }
+
   return (
     <div data-shell='dashboard'>
       <header data-shell='dashboard-header'>
@@ -74,6 +81,7 @@ export const Dashboard = (props: {
     </div>
   )
 
+  /** Dashboard widget frame for card-backed body widgets. */
   function DashboardWidget(props: { widget: DashboardStoreWidget }): UiComponent {
     return (
       <div
@@ -88,6 +96,7 @@ export const Dashboard = (props: {
     )
   }
 
+  /** Resolve and render the registered component for a dashboard widget. */
   function DashboardWidgetContent(props: { widget: DashboardStoreWidget }): UiComponent {
     const Widget = widgets[props.widget.type] as WidgetComponent | undefined
     return (

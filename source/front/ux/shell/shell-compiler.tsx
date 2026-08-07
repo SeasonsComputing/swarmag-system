@@ -90,12 +90,17 @@ const ShellOverlayRoute = (props: {
 }) => {
   const navigate = useNavigate()
   const OverlayComponent = props.component
+
+  /** Close the overlay route by navigating back to the shell root. */
   const close = (): void => {
     void navigate({ to: '/' })
   }
+
+  /** Converts dialog dismissal into route navigation. */
   const onOpenChange = (open: boolean): void => {
     if (!open) close()
   }
+
   return (
     <UiDialog
       open

@@ -81,30 +81,46 @@ export const AbstractionManager = <T extends Instance, Draft>(
   const [pendingAction, setPendingAction] = createSignal<PendingAction<T> | null>(null)
   const [actionError, setActionError] = createSignal<string | null>(null)
   const [actionPending, setActionPending] = createSignal(false)
+
+  /** Advances the editor epoch and resets editor registration for a fresh render. */
   const bumpEditorEpoch = (focus: boolean): void => {
     setFocusOnEpoch(focus)
     setEditorHandle(null)
     setEditorEpoch(epoch => epoch + 1)
   }
+
+  /** Opens the editor for a selected item or a new draft. */
   const openEditor = (item: T | null): void => {
     setEditorFeedback(null)
     setSelected(() => item)
     setMode('editor')
     bumpEditorEpoch(true)
   }
+
+  /** Opens the selected list item in the editor. */
   const onSelect = (item: T): void => openEditor(item)
+
+  /** Opens the editor for a new item. */
   const onNew = (): void => openEditor(null)
+
+  /** Reopens a new-item editor after create or destructive action completion. */
   const openFreshNew = (clearFeedback: boolean): void => {
     if (clearFeedback) setEditorFeedback(null)
     setSelected(null)
     setMode('editor')
     bumpEditorEpoch(true)
   }
+
+  /** Cancels the manager dialog and clears editor feedback. */
   const cancelDialog = (): void => {
     setEditorFeedback(null)
     props.onCancel()
   }
+
+  /** Resolve display copy for an abstraction instance. */
   const itemLabel = (item: T): string => props.provider.itemLabel?.(item) ?? props.provider.entityLabel
+
+  /** Registers the active editor handle and removes it when that editor unmounts. */
   const registerEditor = (handle: AbstractionEditorHandle<Draft>): () => void => {
     setEditorHandle(() => handle)
     return () => {
@@ -115,11 +131,14 @@ export const AbstractionManager = <T extends Instance, Draft>(
   // focus — which leaves focus on the body. The banner is the landing spot: it
   // is the thing that changed, it announces the result, and Tab from there
   // enters the form. Create needs none of this; it focuses its first field.
+  /** Moves focus to the feedback banner after an update save completes. */
   const focusFeedback = (): void => {
     requestAnimationFrame(() => {
       panelRef?.querySelector<HTMLElement>('[data-shell-panel="form-feedback"]')?.focus()
     })
   }
+
+  /** Validates and persists the active editor draft. */
   const saveEditor = async (): Promise<void> => {
     if (savePending()) return
     setEditorFeedback(null)
@@ -159,11 +178,15 @@ export const AbstractionManager = <T extends Instance, Draft>(
       setSavePending(false)
     }
   }
+
+  /** Runs a provider action and refreshes the list after completion. */
   const runAction = async (action: PendingAction<T>['action'], item: T): Promise<void> => {
     await action.handler(item)
     await props.provider.refresh()
     if (selected()?.id === item.id) openFreshNew(true)
   }
+
+  /** Requests an item action, opening confirmation when the action requires it. */
   const requestAction = (action: PendingAction<T>['action'], item: T): void => {
     if (!action.confirmation) {
       void runAction(action, item)
@@ -172,6 +195,8 @@ export const AbstractionManager = <T extends Instance, Draft>(
     setActionError(null)
     setPendingAction({ action, item })
   }
+
+  /** Confirms and runs the pending provider action. */
   const confirmAction = async (): Promise<void> => {
     const target = pendingAction()
     if (!target || actionPending()) return
@@ -186,6 +211,8 @@ export const AbstractionManager = <T extends Instance, Draft>(
       setActionPending(false)
     }
   }
+
+  /** Editor title copy for new and existing items. */
   const editorTitle = (): string =>
     selected()
       ? `Edit ${props.provider.entityLabel}`
