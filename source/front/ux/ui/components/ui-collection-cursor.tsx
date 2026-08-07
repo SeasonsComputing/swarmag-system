@@ -48,33 +48,48 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
   const [deleteOpen, setDeleteOpen] = createSignal(false)
   let bodyElement: HTMLDivElement | undefined
 
+  /** Cursor item count and presence. */
   const count = () => props.items.length
   const hasItems = () => count() > 0
+
+  /** Cursor item. */
   const currentItem = (): T | undefined => props.items[cursor()]
+
+  /** Delete confirmation copy for the current item, when one is selected. */
   const currentDeleteCopy = () => {
     const item = currentItem()
     return item === undefined ? undefined : props.confirmDelete(item)
   }
+
+  /** Visual state for a fixed pip slot in the bounded position readout. */
   const pipState = (index: number): string => {
     if (hasItems() && index === cursor()) return 'selected'
     return index < count() ? 'present' : 'absent'
   }
+
+  /** Moves the cursor and forces the host-rendered item body to refresh. */
   const moveCursor = (nextCursor: number): void => {
     setCursor(nextCursor)
     setBodyRender(value => value + 1)
   }
+
+  /** Focuses the first text field in the item body after an item is added. */
   const focusBodyFirstField = (): void => {
     queueMicrotask(() => {
       const field = bodyElement?.querySelector('input, textarea')
       if (field instanceof HTMLElement) field.focus()
     })
   }
+
+  /** Appends a new host-created item and moves the cursor to it. */
   const addItem = (): void => {
     const nextItems = [...props.items, props.newItem()]
     props.onItemsChange(nextItems)
     moveCursor(nextItems.length - 1)
     focusBodyFirstField()
   }
+
+  /** Removes the current item and keeps the cursor inside the next collection. */
   const deleteItem = (): void => {
     const index = cursor()
     const nextItems = props.items.filter((_, itemIndex) => itemIndex !== index)
@@ -83,6 +98,8 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
     setCursor(Math.min(index, nextItems.length - 1))
     setBodyRender(value => value + 1)
   }
+
+  /** Host-rendered current item body, refreshed only on cursor lifecycle changes. */
   const body = createMemo(() => {
     bodyRender()
     const index = untrack(cursor)
