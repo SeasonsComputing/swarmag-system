@@ -132,7 +132,7 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
         </UiLayout>
         <UiLayout variant='inline-fit'>
           <UiActionButton
-            icon='minus-circled'
+            icon='minus'
             label='Delete'
             labelMode='visible'
             density='dense'
@@ -141,7 +141,7 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
             onClick={() => setDeleteOpen(true)}
           />
           <UiActionButton
-            icon='plus-circled'
+            icon='plus'
             label='New'
             labelMode='visible'
             density='dense'
