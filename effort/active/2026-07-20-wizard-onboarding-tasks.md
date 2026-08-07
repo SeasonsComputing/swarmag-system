@@ -14,7 +14,7 @@ rule is settled. **CLOSED 2026-08-06** — it was about proper use of the
 component, not the component itself; renaming the contact stage fixed it.
 
 **Source design:** `effort/active/2026-07-20-wizard-onboarding-design.md`
-**Collection cursor:** `effort/active/2026-08-06-collection-cursor-brief.md`
+**Collection cursor:** `effort/completed/2026-08-06-collection-cursor-brief.md`
 
 Each group is a gated production: scope declared, go received, checks run,
 results reported. Delegation per budget discipline (haiku, git read-only).
@@ -198,7 +198,7 @@ end-to-end:
       survive and are verified as of 2026-08-04: added-sites list renders
       above the capture form; three nested legends; four-row textarea buried
       mid-form; `clearSite` hand-resets eleven signals. Design:
-      `effort/active/2026-08-06-collection-cursor-brief.md` §8. The field set
+      `effort/completed/2026-08-06-collection-cursor-brief.md` §8. The field set
       does not change — this is a rehost, not a redesign
 - [ ] **Fieldset redundancy** — a panel with exactly one fieldset whose legend
       repeats the panel title (stage 1 is the live example). Recorded in
@@ -213,7 +213,7 @@ end-to-end:
 Notes rides `UiCollectionCursor` rather than inventing a second
 list-plus-form. `Note` is already a universal composition — twelve declared
 mount points, three needed now: **User, Customer, Site.** Brief:
-`effort/active/2026-08-06-collection-cursor-brief.md`.
+`effort/completed/2026-08-06-collection-cursor-brief.md`.
 
 - [ ] `UiCollectionCursor` in `front/ux/ui/components/` — generic over `T[]`,
       not typed to `Composition*`. First consumer is stage 3 (Group B), which
