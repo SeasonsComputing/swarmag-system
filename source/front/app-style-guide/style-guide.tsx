@@ -916,10 +916,16 @@ export const StyleGuide = (): UiComponent => {
 
           <SgSection title='UiLayout'>
             <UiLayout variant='inline-wrap'>
-              <UiFieldset legend='Stack (block-fill, default)'>
+              <UiFieldset legend='Stack (block-stack, default)'>
                 <UiLayout>
                   <UiAlert>North Field spray window confirmed.</UiAlert>
-                  <UiAlert variant='warning'>Wind speed approaching threshold.</UiAlert>
+                  <UiAlert variant='success'>Crew pre-check complete.</UiAlert>
+                  <UiAlert variant='success'>Crew pre-check complete.</UiAlert>
+                </UiLayout>
+              </UiFieldset>
+              <UiFieldset legend='Stack (block-fill)'>
+                <UiLayout variant='block-fill'>
+                  <UiAlert>North Field spray window confirmed.</UiAlert>
                   <UiAlert variant='success'>Crew pre-check complete.</UiAlert>
                 </UiLayout>
               </UiFieldset>
