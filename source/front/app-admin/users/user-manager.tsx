@@ -54,7 +54,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       {
         name: 'delete',
         label: 'Delete',
-        icon: 'trash',
+        icon: 'minus',
         variant: 'danger',
         confirmation: {
           title: 'Delete user?',
