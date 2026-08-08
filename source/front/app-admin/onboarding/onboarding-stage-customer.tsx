@@ -113,6 +113,7 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
   )
 }
 
+/** TODO */
 type CustomerInputProps = {
   state: OnboardingState
   validation: ReturnType<typeof useAbstractionFormValidation>
@@ -121,6 +122,7 @@ type CustomerInputProps = {
   required?: boolean
 }
 
+/** TODO */
 const CustomerInput = (props: CustomerInputProps): UiComponent => {
   const setter = {
     line1: props.state.setLine1,
@@ -130,6 +132,7 @@ const CustomerInput = (props: CustomerInputProps): UiComponent => {
     postalCode: props.state.setPostalCode,
     country: props.state.setCountry
   }[props.name]
+
   const value = {
     line1: props.state.line1,
     line2: props.state.line2,

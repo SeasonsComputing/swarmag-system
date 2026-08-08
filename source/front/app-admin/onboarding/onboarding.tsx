@@ -30,6 +30,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   const [contactFormCheck, setContactFormCheck] = createSignal<() => boolean>(() => false)
   const [customerFormCheck, setCustomerFormCheck] = createSignal<() => boolean>(() => false)
 
+  /** TODO */
   const stageContact: WizardStage = {
     name: 'contact',
     title: 'Contact details',
@@ -46,6 +47,8 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
         && (!email || email.includes('@'))
     }
   }
+
+  /** TODO */
   const stageCustomer: WizardStage = {
     name: 'customer',
     title: 'Customer address',
@@ -88,6 +91,8 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
       state.setCustomer(await api.Customers.create(create))
     }
   }
+
+  /** */
   const stageSites: WizardStage = {
     name: 'sites',
     title: 'Job sites',
@@ -100,6 +105,8 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
       }
     }
   }
+
+  /** TODO */
   const contract: WizardContract = {
     formTitle: 'Customer Onboarding',
     stages: [stageContact, stageCustomer, stageSites]
