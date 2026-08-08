@@ -1,0 +1,21 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Panel probe styles                                                           ║
+║ Fixed affordance held out of the layout it measures.                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+/* Fixed, not in flow: a probe that occupied header or panel space would change
+the geometry it exists to report. Temporary — delete with panel-probe.tsx. */
+[data-shell='panel-probe'] {
+  inset-block-end: var(--sa-space-md);
+  inset-inline-end: var(--sa-space-md);
+  position: fixed;
+  z-index: var(--sa-z-toast);
+}
+
+[data-shell='panel-probe-report'] [data-ui='textarea'] {
+  font-family: var(--sa-data-font-family);
+  overflow-x: auto;
+  white-space: pre;
+}
