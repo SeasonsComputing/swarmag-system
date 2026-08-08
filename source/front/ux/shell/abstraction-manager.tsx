@@ -127,10 +127,12 @@ export const AbstractionManager = <T extends Instance, Draft>(
       setEditorHandle(current => current === handle ? null : current)
     }
   }
+
   // Update remains on the saved record, so its epoch bump deliberately skips
   // focus — which leaves focus on the body. The banner is the landing spot: it
   // is the thing that changed, it announces the result, and Tab from there
   // enters the form. Create needs none of this; it focuses its first field.
+
   /** Moves focus to the feedback banner after an update save completes. */
   const focusFeedback = (): void => {
     requestAnimationFrame(() => {
@@ -269,6 +271,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
                   >
                     <For each={props.provider.list()}>
                       {item => (
+                        // The row itself opens the editor — no edit action.
                         <UiTableRow onClick={() => onSelect(item)}>
                           {props.provider.renderListCells(item)}
                           <UiTableCell align='end'>
@@ -278,7 +281,6 @@ export const AbstractionManager = <T extends Instance, Draft>(
                                   icon={action.icon}
                                   label={action.label}
                                   variant={action.variant}
-                                  density='standard'
                                   onClick={event => {
                                     event.stopPropagation()
                                     requestAction(action, item)
@@ -286,12 +288,6 @@ export const AbstractionManager = <T extends Instance, Draft>(
                                 />
                               )}
                             </For>
-                            <UiActionButton
-                              icon='pencil-1'
-                              label='Edit'
-                              density='standard'
-                              onClick={() => onSelect(item)}
-                            />
                           </UiTableCell>
                         </UiTableRow>
                       )}

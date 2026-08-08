@@ -55,7 +55,6 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
         name: 'delete',
         label: 'Delete',
         icon: 'minus',
-        variant: 'danger',
         confirmation: {
           title: 'Delete user?',
           message: user =>
@@ -69,7 +68,6 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
         name: 'eject',
         label: 'Eject',
         icon: 'exit',
-        variant: 'danger',
         confirmation: {
           title: 'Eject user?',
           message: user =>
@@ -83,6 +81,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     renderListCells: user => <UserListCells user={user} />,
     renderForm: (user, context) => <UserEditor context={context} user={user} />
   }
+
   return (
     <div data-app='users-page'>
       <Show when={usersQuery.error}>

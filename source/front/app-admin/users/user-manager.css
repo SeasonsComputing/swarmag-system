@@ -11,6 +11,13 @@
   font-size: var(--sa-ui-font-size-compact);
 }
 
+/* An address carries no break opportunity inside its local part or domain, so a
+   narrow identity column overruns the status cell instead of wrapping. Roles
+   need no equivalent — they break at their separators. */
+[data-app='users-page'] [data-app='user-list-email'] {
+  overflow-wrap: anywhere;
+}
+
 /* Role labels carry the accent; the separating commas stay secondary. */
 [data-app='users-page'] [data-app='user-list-role'] {
   color: var(--sa-color-accent);
@@ -37,12 +44,16 @@
   width: calc(var(--sa-touch-target-sm) + var(--sa-space-sm));
 }
 
-/* 3 action buttons, 2 inter-button rhythm gaps, plus cell padding — the gaps
-   and the width MUST share the same token. */
+/* 2 action buttons, 1 inter-button rhythm gap, plus cell padding — the gap and
+   the width MUST share the same token, and the multipliers MUST match the
+   action count in user-manager.tsx. Under table-layout: fixed the identity
+   column is the remainder, so an overcount is not slack here: this read 3 after
+   the row's edit action was removed, stranding 42px and leaving identity at 129
+   in a narrow index — tight enough that an address overran the status cell. */
 [data-app='users-page'] [data-ui='table-cell']:last-child {
   white-space: nowrap;
   width: calc(
-    (var(--sa-touch-target-sm) - var(--sa-space-sm)) * 3 + var(--sa-rhythm-gap-tight) * 2 +
+    (var(--sa-touch-target-sm) - var(--sa-space-sm)) * 2 + var(--sa-rhythm-gap-tight) +
       var(--sa-space-sm) * 2 +
       var(--sa-space-xs)
   );
