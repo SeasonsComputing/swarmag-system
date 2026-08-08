@@ -1,5 +1,5 @@
 /**
- * Runtime provider -- specialized provider for runtime configuration.
+ * Runtime contract -- contact for runtime configuration providers
  */
 export interface RuntimeContract {
   /**
