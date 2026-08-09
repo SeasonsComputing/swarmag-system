@@ -87,7 +87,7 @@ const SiteForm = (props: SiteFormProps): UiComponent => {
         label='Site Label'
         value={props.site.label}
         required
-        placeholder='e.g., "Main Office" or "Project Alpha"'
+        placeholder='e.g., "Main Office" or "South Pasture"'
         onValue={value => props.updateSite(props.index, site => ({ ...site, label: value }))}
       />
       <SiteTextInput

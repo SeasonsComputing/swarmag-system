@@ -153,7 +153,6 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
             label='Delete'
             labelMode='visible'
             density='dense'
-            variant='danger'
             disabled={!hasItems()}
             onClick={() => setDeleteOpen(true)}
           />
