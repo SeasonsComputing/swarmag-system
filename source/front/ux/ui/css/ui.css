@@ -216,6 +216,11 @@
   min-block-size: var(--sa-action-button-ring-size);
 }
 
+[data-ui='action-button']:not([data-ui-state='disabled']):hover [data-ui='action-button-label'],
+[data-ui='action-button']:focus-visible [data-ui='action-button-label'] {
+  color: var(--sa-text-primary);
+}
+
 /* No hover or focus rule re-asserts `display` on the label part. A control    */
 /* layer that forces a label back on hover outranks any consumer hiding it for */
 /* space — 0,4,0 beats 0,3,0 — so a surface could not reliably suppress its    */
