@@ -108,16 +108,24 @@ backend environment axis.
 
 ## 4. Technology Stack
 
-| Layer         | Technology                      |
-| ------------- | ------------------------------- |
-| Framework     | SolidJS (reactive, compiled)    |
-| Routing       | TanStack Solid-Router           |
-| Data Fetching | TanStack Query                  |
-| UI Primitives | Kobalte (accessible components) |
-| Charting      | Chart.js (via UiChart adapter)  |
-| Styling       | Vanilla CSS (no preprocessor)   |
-| Build         | Vite                            |
-| Runtime       | Modern browsers (ES2022+)       |
+| Layer         | Technology                    |
+| ------------- | ----------------------------- |
+| Framework     | SolidJS (reactive, compiled)  |
+| Routing       | TanStack Solid-Router         |
+| Data Fetching | TanStack Query                |
+| Primitives    | Kobalte                       |
+| Charting      | Chart.js                      |
+| Styling       | Vanilla CSS (no preprocessor) |
+| Build         | Vite                          |
+| Runtime       | Modern browsers (ES2022+)     |
+
+The following technologies are used as implementation details of system APIs. DevOps architecture guards enforce they are not part of the public API surface nor imported outside the API surface.
+
+| Layer      | API Surface | Private Implementation |
+| ---------- | ----------- | ---------------------- |
+| Routing    | ux/shell    | TanStack Solid-Router  |
+| Primitives | ux/ui       | Kobalte                |
+| Charting   | ux/charts   | Charts.js              |
 
 ## 5. Key Principles
 
@@ -137,7 +145,11 @@ The system includes three SolidJS applications:
 | **Ops**      | Field execution                   | Operations crews |
 | **Customer** | Scheduling and status (read-only) | Customers        |
 
-All apps use SolidJS + TanStack + Kobalte + Vanilla CSS. Chart rendering is provided through `UiChart` (design-system primitive) with Chart.js as an implementation detail behind `ChartWidget`. Shared infrastructure lives in `source/front/ux/`.
+All apps use SolidJS + TanStack + Kobalte + Vanilla CSS.
+
+- `ui/components` contains the control catalog backed by Kobalte.
+- `ui/chart` contains the charting catalog backed by Chart.js.
+  Shared infrastructure lives in `source/front/ux/`.
 
 ## 7. API Namespace Integration
 
@@ -401,6 +413,12 @@ dashboard → domain page → back to dashboard
 ### 9.2 Routing
 
 Common routes are supplied by `makeAnonymousShell()` and `makeDashboardShell()` from `source/front/ux/shell/shell-makers.tsx`. Each app root declares its complete shell collection in `app.tsx`, including app-specific dashboard presentations. `bootstrap()` compiles that collection; it does not accept raw route extensions or optional composition fragments.
+
+The shell route grammar is the public routing API for all front applications. Applications declare route intent through `Routes` and shell composition contracts. Application, feature, page, and widget code must not import router-vendor APIs directly.
+
+Router libraries are shell runtime implementation details. The current shell runtime uses TanStack Solid Router to execute the shell route grammar, but TanStack route APIs do not define the application routing contract. Direct router-vendor imports are confined to shell runtime implementation files under `source/front/ux/shell/`.
+
+Imperative navigation flows through `useShellNavigate()`. Declarative route redirection flows through `ShellRedirect` and `ShellReplace`. This keeps navigation vocabulary owned by the shell and preserves a single implementation point if route behavior is enriched or the runtime substrate changes.
 
 A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
 
@@ -685,7 +703,7 @@ swarmag-app-customer = front/app-customer + front/ux + front/api + front/config
 - `ux/config/` contains two files when packaged: `ux-config.ts` and the target env file
 - The target env file binds the static bundle to one backend target; the same
   bundle may be served locally or remotely without changing that binding
-- `bootstrap()` owns global boot-time initialization — CSS barrel (`css.tsx`), config (`ux-config.ts`), session synchronization, and router mounting. App roots (`app.tsx`) declare a complete `Application` and pass it to `bootstrap(application)`
+- `bootstrap()` owns global boot-time initialization — CSS barrel (`css.tsx`), config (`ux-config.ts`), session synchronization, and shell route runtime mounting. App roots (`app.tsx`) declare a complete `Application` and pass it to `bootstrap(application)`
 - Packaging, artifact format, and deployment workflow: see `architecture-devops.md §7`
 - No build artifacts are checked into the repository
 
