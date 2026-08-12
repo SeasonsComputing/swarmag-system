@@ -23,7 +23,8 @@ export type WizardStage = {
   name: string
   title: string
   render: () => UiComponent
-  canAdvance: () => boolean
+  subheader?: UiComponent
+
   /**
    * Show the stage's own field-level errors and report validity. Called when the
    * user presses Next, so an incomplete stage explains itself rather than
