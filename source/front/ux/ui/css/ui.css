@@ -236,6 +236,11 @@
   width: 100%;
 }
 
+[data-ui='collection-cursor-nav'] {
+  container-type: inline-size;
+  width: 100%;
+}
+
 [data-ui='collection-cursor-readout'] {
   align-items: center;
   color: var(--sa-text-secondary);

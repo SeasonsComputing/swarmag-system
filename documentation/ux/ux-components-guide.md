@@ -1192,6 +1192,12 @@ form.
 | `renderItem`    | `(item: T, index: number) => UiComponent`         | yes      | —       | Renders the item at the cursor.            |
 | `empty`         | `{ icon: string; message: string }`               | yes      | —       | Empty-state icon catalog name and message. |
 | `confirmDelete` | `(item: T) => { title: string; message: string }` | yes      | —       | Host-supplied delete confirmation content. |
+| `renderNav`     | `(nav: UiComponent) => UiComponent`               | no       | —       | Wraps the navbar element in host chrome.   |
+
+`renderNav` receives the navbar element and returns whatever wraps it. Omit it
+and the navbar renders bare, above the item body. The navbar carries
+`data-ui='collection-cursor-nav'` in both cases, so a host may target it without
+reaching every form-actions row in the system.
 
 `items` is never mutated in place. The control emits the next array through
 `onItemsChange`; a host that mutates and re-passes the same reference will not
@@ -1199,7 +1205,8 @@ update.
 
 **Emitted Attributes**
 
-`data-ui='collection-cursor'`, `data-ui='collection-cursor-position'`,
+`data-ui='collection-cursor'`, `data-ui='collection-cursor-nav'`,
+`data-ui='collection-cursor-position'`,
 `data-ui='collection-cursor-readout'`, `data-ui='collection-cursor-pip'`,
 `data-ui-current`, `data-ui='collection-cursor-count'`,
 `data-ui='collection-cursor-actions'`, `data-ui='collection-cursor-rule'`,
@@ -1223,6 +1230,7 @@ update.
     title: site.label.trim() ? `Delete ${site.label}?` : 'Delete this job site?',
     message: 'This job site will be removed from the collection.'
   })}
+  renderNav={nav => <UiFieldset legend='Job sites'>{nav}</UiFieldset>}
   renderItem={(site, index) => (
     <UiField label='Site label' for={`site-label-${index}`}>
       <UiInput

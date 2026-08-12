@@ -444,6 +444,9 @@ readout behavior. The control receives `items`, emits next arrays through
 `onItemsChange`, creates blank entries through `newItem`, and renders the active
 item through `renderItem`.
 
+The navbar renders bare above the item body. Supply the optional `renderNav`
+prop to receive that navbar element and return host chrome around it.
+
 ### 5.8 UiFormActions
 
 Use at the end of forms or dialogs for submit and dismissal buttons.

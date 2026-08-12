@@ -36,6 +36,8 @@ export type UiCollectionCursorProps<T> = {
   empty: { icon: string; message: string }
   /** Host-supplied copy for the delete confirmation. */
   confirmDelete: (item: T) => { title: string; message: string }
+  /** Receives the navbar element and returns its wrapper. Omit to render it bare. */
+  renderNav?: (nav: UiComponent) => UiComponent
 }
 
 /** Pip slots rendered by the position readout before it falls back to `N of M`. */
@@ -107,8 +109,9 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
     return item === undefined ? undefined : props.renderItem(item, index)
   })
 
-  return (
-    <section data-ui='collection-cursor'>
+  /** Navbar element: cursor movement on one end, item lifecycle on the other. */
+  const nav = (): UiComponent => (
+    <div data-ui='collection-cursor-nav'>
       <UiFormActions justify='split'>
         <UiLayout variant='inline-fit' gap='tight'>
           <UiActionButton
@@ -165,6 +168,12 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
           />
         </UiLayout>
       </UiFormActions>
+    </div>
+  )
+
+  return (
+    <section data-ui='collection-cursor'>
+      {props.renderNav === undefined ? nav() : props.renderNav(nav())}
       <div ref={bodyElement} data-ui='collection-cursor-body'>
         <Show
           when={hasItems()}

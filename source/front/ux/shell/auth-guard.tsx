@@ -18,7 +18,7 @@ AuthGuard  Route-level auth guard component.
 import { SessionState } from '@front/ux/stores/session-state.ts'
 import { type UiComponent, type UiContainerProps } from '@front/ux/ui'
 import { Match, Show, Switch } from '@solid-js'
-import { Navigate } from '@tanstack/solid-router'
+import { ShellReplace } from './shell-navigate.tsx'
 
 /* Authorization guard properties */
 export type AuthGuardProps = UiContainerProps
@@ -29,7 +29,7 @@ export const AuthGuard = (props: AuthGuardProps): UiComponent => {
   return (
     <Switch>
       <Match when={!session.isLoading && !session.isAuthenticated}>
-        <Navigate to='/login' replace />
+        <ShellReplace to='/login' />
       </Match>
       <Match when={!session.isLoading && session.isAuthenticated}>
         <Show when={session.isAuthenticated}>

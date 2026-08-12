@@ -161,6 +161,9 @@ export const StyleGuide = (): UiComponent => {
   const [collectionItems, setCollectionItems] = createSignal<StyleGuideCollectionItem[]>([
     ...COLLECTION_CURSOR_ITEMS
   ])
+  const [collectionCard, setCollectionCard] = createSignal<StyleGuideCollectionItem[]>([
+    ...COLLECTION_CURSOR_ITEMS
+  ])
   const [collectionMany, setCollectionMany] = createSignal<StyleGuideCollectionItem[]>([
     ...COLLECTION_CURSOR_MANY
   ])
@@ -612,6 +615,7 @@ export const StyleGuide = (): UiComponent => {
           </SgSection>
 
           <SgSection title='UiCollectionCursor'>
+            <label>Navbar bare — renderNav omitted</label>
             <UiCollectionCursor
               items={collectionItems()}
               onItemsChange={setCollectionItems}
@@ -649,7 +653,30 @@ export const StyleGuide = (): UiComponent => {
                 </UiLayout>
               )}
             />
-            <UiFieldset legend='UiCollectionCursor count readout'>
+            <UiSeparator />
+            <label>Navbar wrapped in UiCard — renderNav supplied</label>
+            <UiFieldset legend='Service blocks'>
+              <UiCollectionCursor
+                items={collectionCard()}
+                onItemsChange={setCollectionCard}
+                newItem={newCollectionItem}
+                empty={{ icon: 'home', message: 'No service blocks in this sample.' }}
+                confirmDelete={item => ({
+                  title: item.label.trim() ? `Delete ${item.label}?` : 'Delete this item?',
+                  message: 'This item will be removed from the local style-guide sample.'
+                })}
+                renderNav={nav => <UiCard elevation='raised'>{nav}</UiCard>}
+                renderItem={(item, index) => (
+                  <UiLayout gap='tight'>
+                    <strong>{item.label}</strong>
+                    <p>{item.acreage} acres. Item {index + 1} sits below a card-wrapped navbar.</p>
+                  </UiLayout>
+                )}
+              />
+            </UiFieldset>
+            <UiSeparator />
+            <label>Navbar bare — renderNav omitted</label>
+            <UiFieldset legend='Service blocks'>
               <UiCollectionCursor
                 items={collectionMany()}
                 onItemsChange={setCollectionMany}
@@ -661,7 +688,7 @@ export const StyleGuide = (): UiComponent => {
                 })}
                 renderItem={(item, index) => (
                   <UiLayout gap='tight'>
-                    <h3>{item.label}</h3>
+                    <strong>{item.label}</strong>
                     <p>{item.acreage} acres. Item {index + 1} demonstrates the count readout.</p>
                   </UiLayout>
                 )}

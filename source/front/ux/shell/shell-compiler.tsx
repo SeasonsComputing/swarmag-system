@@ -17,14 +17,10 @@ compileApplicationRoutes  Compile an application declaration into a route tree.
 
 import { UiDialog, type UiDialogSize } from '@front/ux/ui'
 import { onMount } from '@solid-js'
-import {
-  type AnyRoute,
-  createRootRoute,
-  createRoute,
-  Navigate,
-  useNavigate
-} from '@tanstack/solid-router'
+import { type AnyRoute, createRootRoute, createRoute } from '@tanstack/solid-router'
+import { ShellRedirect } from './shell-navigate.tsx'
 import type { Shell, ShellApplication, ShellOverlayView, ShellRoute, ShellTransition } from './shell.ts'
+import { type ShellNavigate, useShellNavigate } from './use-shell-navigate.ts'
 
 /** Compile an application declaration into a TanStack route tree. */
 export const compileApplicationRoutes = (application: ShellApplication): AnyRoute => {
@@ -74,7 +70,7 @@ const routeComponent = (route: ShellRoute) => {
       )
     }
     case 'redirect': {
-      return () => <Navigate to={route.destination} />
+      return () => <ShellRedirect to={route.destination} />
     }
     case 'transition': {
       return () => <ShellTransitionRoute transition={route} />
@@ -88,12 +84,12 @@ const ShellOverlayRoute = (props: {
   dismissible: boolean
   size: UiDialogSize
 }) => {
-  const navigate = useNavigate()
+  const navigate = useShellNavigate()
   const OverlayComponent = props.component
 
   /** Close the overlay route by navigating back to the shell root. */
   const close = (): void => {
-    void navigate({ to: '/' })
+    void navigate.redirect('/')
   }
 
   /** Converts dialog dismissal into route navigation. */
@@ -115,7 +111,7 @@ const ShellOverlayRoute = (props: {
 
 /** Headless route component that runs a transition before navigating to its destination. */
 const ShellTransitionRoute = (props: { transition: ShellTransition }) => {
-  const navigate = useNavigate()
+  const navigate = useShellNavigate()
   onMount(() => void runShellTransition(props.transition, navigate))
   return null
 }
@@ -123,13 +119,13 @@ const ShellTransitionRoute = (props: { transition: ShellTransition }) => {
 /** Run transition work and always navigate to its declared destination. */
 async function runShellTransition(
   transition: ShellTransition,
-  navigate: ReturnType<typeof useNavigate>
+  navigate: ShellNavigate
 ): Promise<void> {
   try {
     await transition.run()
   } catch (error) {
     console.error('[shell-transition] transition failed', error)
   } finally {
-    await navigate({ to: transition.destination, replace: true })
+    await navigate.replace(transition.destination)
   }
 }
