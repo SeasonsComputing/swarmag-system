@@ -30,7 +30,7 @@ import { api } from '@front/api/api.ts'
 import { onCleanup, onMount } from '@solid-js'
 import { render } from '@solid-js/web'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
-  import { createRouter, RouterProvider } from '@tanstack/solid-router'
+import { createRouter, RouterProvider } from '@tanstack/solid-router'
 import { compileApplicationRoutes } from './shell-compiler.tsx'
 import type { ShellApplication } from './shell.ts'
 
