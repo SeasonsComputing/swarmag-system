@@ -24,6 +24,7 @@ export type WizardStage = {
   title: string
   render: () => UiComponent
   subheader?: UiComponent
+  canAdvance?: () => boolean
 
   /**
    * Show the stage's own field-level errors and report validity. Called when the
