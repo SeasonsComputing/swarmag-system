@@ -14,9 +14,9 @@ HelmWidget  Dashboard header navigation control cluster.
 */
 
 import type { Dictionary } from '@core/std'
+import { useShellNavigate } from '@front/ux/shell/use-shell-navigate.ts'
 import { UiActionButton, type UiComponent, UiLayout } from '@front/ux/ui'
 import { For } from '@solid-js'
-import { useNavigate } from '@tanstack/solid-router'
 
 import './helm-widget.css'
 
@@ -27,7 +27,7 @@ export type HelmWidgetProps = {
 
 /** Dashboard header navigation control cluster. */
 export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
-  const navigate = useNavigate()
+  const navigate = useShellNavigate()
   const pairs = () => {
     const actions = toStringArray(props.settings['actions'], 'HelmWidget settings.actions')
     const labels = toStringArray(props.settings['labels'], 'HelmWidget settings.labels')
@@ -52,7 +52,7 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
               label={pair.label}
               density='dense'
               labelMode='visible'
-              onClick={() => void navigate({ to: pair.action })}
+              onClick={() => void navigate.redirect(pair.action)}
             />
           )}
         </For>

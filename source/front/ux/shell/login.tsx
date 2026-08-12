@@ -29,10 +29,10 @@ import {
   UiLayout
 } from '@front/ux/ui'
 import { createSignal, onMount, Show } from '@solid-js'
-import { Navigate } from '@tanstack/solid-router'
 import { BrandHero } from './brand-hero.tsx'
 import { ConfigTable } from './config-table.tsx'
 import { getShellMetadata, type ShellMetadata } from './shell-metadata.ts'
+import { ShellReplace } from './shell-navigate.tsx'
 
 import './login.css'
 
@@ -125,7 +125,7 @@ const LoginClient = (props: LoginClientProps) => {
   return (
     <Show
       when={loginRequired()}
-      fallback={<Navigate to='/' replace />}
+      fallback={<ShellReplace to='/' />}
     >
       <div data-shell='login'>
         <div data-shell='login-layout'>
