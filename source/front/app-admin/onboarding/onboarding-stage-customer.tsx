@@ -113,7 +113,7 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
   )
 }
 
-/** TODO */
+/** Props for a customer address input bound to onboarding state. */
 type CustomerInputProps = {
   state: OnboardingState
   validation: ReturnType<typeof useAbstractionFormValidation>
@@ -122,7 +122,7 @@ type CustomerInputProps = {
   required?: boolean
 }
 
-/** TODO */
+/** Renders one customer address input and wires validation feedback. */
 const CustomerInput = (props: CustomerInputProps): UiComponent => {
   const setter = {
     line1: props.state.setLine1,
