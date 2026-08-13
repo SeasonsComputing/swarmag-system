@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Panel form                                                                   ║
-║ Card-backed form panel with optional subheader and header-local feedback.    ║
+║ Card-backed form panel with header-local feedback.                           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
@@ -16,7 +16,6 @@ type PanelFormProps = {
   children: UiComponent
   feedback?: PanelFeedback | null
   header: PanelHeaderProps
-  subheader?: UiComponent
 }
 
 /** Renders a card-backed form panel. */
@@ -25,7 +24,6 @@ export const PanelForm = (props: PanelFormProps) => (
     <UiCard elevation='raised'>
       <div data-shell-panel='form-header'>
         <PanelHeader {...props.header} />
-        {props.subheader && <div data-shell-panel='form-subheader'>{props.subheader}</div>}
         {props.feedback && (
           <UiAlert data-shell-panel='form-feedback' tabindex={-1} variant={props.feedback.variant}>
             {props.feedback.message}

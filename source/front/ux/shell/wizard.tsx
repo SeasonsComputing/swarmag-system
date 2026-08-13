@@ -197,7 +197,6 @@ export const Wizard = (props: WizardProps): UiComponent => {
               </Show>
             )
           }}
-          subheader={stage().subheader}
         >
           <Show when={stage()} keyed>
             {current => (
