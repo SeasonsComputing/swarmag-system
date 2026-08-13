@@ -44,6 +44,7 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 
 - All cross-file type references must use top-level `import type` declarations. Inline `import('...').TypeName` expressions in type positions are prohibited — every type used from another module must appear in the file's top-level import block.
 - Do not re-implement utilities already provided by `@core/std`. Use the canonical form: `isId` not a local `isIdString`; `isWhen` not a local date-string guard; etc.
+- This repository barrels **nothing except** the modules named in §3.2. Every other module is imported by its direct file path — `@front/ux/shell/wizard.tsx`, never a shell barrel. If a module is not in the §3.2 alias table, no barrel for it exists and none should be created; adding one is a Foundation decision, not a tidying step. The single barrel outside §3.2 is `source/tests/fixtures/samples.ts` (§12).
 
 ## 4. Naming Conventions
 
