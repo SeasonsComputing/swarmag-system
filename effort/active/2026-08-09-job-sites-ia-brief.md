@@ -28,10 +28,18 @@ depth 2  note       note text, ending in attachments
 depth 3  attachment attachment selection
 ```
 
+**This is one design pattern applied recursively, not four screens.** List and
+item, the same way the abstraction manager is index and subject at a larger
+scale. Every level is the same thing; the data decides how many levels there
+are.
+
 At every depth: a **bounded fixed-height list inside a fieldset**, a **`New …`
 action** above it aligned to the inline end, and an **inline delete** on the row
 that owns the thing. Selecting a row or creating a new item **slides the detail
 in from the inline end**; ascending slides it back out.
+
+Build it once and apply it at each level. If it ends up written three times,
+that is the signal it wanted to be a component.
 
 Height is fixed at every level, deliberately. It is not better here — a site has
 one collection and could grow — but it is better in the general case, and
@@ -51,8 +59,26 @@ edit, and come forward with work in progress intact.
 depth 0 and moves exactly one level up, to the panel owning the list the current
 object came from.
 
-The panel title slot holds **the current object's name** — `South pasture` at
-depth 1, `Access gate` at depth 2, the stage title at depth 0.
+### The panel header is shell-owned and unreachable
+
+`formTitle`, `Back`, the stage title, and `Next`/`Finish` are all rendered by
+`Wizard`. `WizardStage` exposes `title` as a plain `string` and a stage's only
+output surface is `render()`, which lands in the panel **body** — a sibling of
+the header block, structurally below it.
+
+**So the panel title stays the stage title at every depth.** It reads `Job sites`
+whether you are on the list, a site, or a note. Naming the current object in the
+title would require a reactive-title seam on `WizardStage`, which is a shell
+change and out of scope.
+
+An earlier draft of this brief required the title to hold the current object's
+name while also forbidding shell changes. Those cannot both hold; the
+requirement is struck. The object's identity belongs in the content, where the
+stage actually controls it: at depth the detail opens with the object's name as
+a heading, using the same rule that names it in the list.
+
+Two designs have now implied something in that header. Any future one must
+budget for a shell seam explicitly rather than discovering it mid-production.
 
 ### Return-to-list placement
 
@@ -85,15 +111,14 @@ An earlier design put an ancestry path in the header. It is **not** being built.
 
 Every element of the path is already on screen: the workbench header carries the
 wizard's title, the accessory rail carries all stage titles with the current one
-accented and is rendered unconditionally, the panel title carries the object, and
-the return control names its parent. An ancestry line would be a fourth
+accented and is rendered unconditionally, the content names the current object,
+and the return control names its parent. An ancestry line would be a fourth
 restatement of a path nothing has hidden.
 
-**The condition under which that holds:** the return control names the parent, so
-ancestry adds nothing while maximum depth is two. Sites → notes → attachments is
-the ceiling, because attachments are a set rendered inline rather than a depth.
-If a third depth ever appears the middle of the path goes unnamed and this
-decision reopens.
+This does not depend on how deep the stack goes. At any level the return control
+names the parent and the content names the current object, which is what a
+reader needs to know where they are. Depth is a property of the data, not a case
+to reason about.
 
 ### The header block is otherwise untouched
 
@@ -122,6 +147,39 @@ left at its `hidden` default. A labelled secondary button is the wrong register
 beside two compact coordinate fields. `crosshair-2` specifically: it carries no
 bounding circle, and the button already draws a ring — a `-circled` glyph inside
 a ring reads as two concentric borders.
+
+## Notes and attachments
+
+**A `Note` has no name.** Its shape is `{ attachments, createdAt, content,
+visibility, tags }` — there is no label or title field. Earlier sketches showed
+notes named `Access gate`; that was invented and there is no data behind it.
+
+**A note row shows the head of its own content, ellipsed by CSS.** Render the
+full `content` in a single-line element with `overflow: hidden`, `text-overflow:
+ellipsis`, `white-space: nowrap`. Do **not** truncate in TypeScript — a
+character count is a width guess baked into the markup, which is the same defect
+as a threshold and fails the width-invariance constraint below. The same string
+names the note at depth 2.
+
+A note whose content is still empty renders a muted placeholder rather than a
+blank row.
+
+**A new note must satisfy the domain type.** `createdAt` is a required `When`;
+`visibility` is a required `NoteVisibility`; `tags` and `attachments` are
+required compositions. Defaults:
+
+| Field         | Value                     |
+| ------------- | ------------------------- |
+| `content`     | `''`                      |
+| `createdAt`   | `when()` from `@core/std` |
+| `visibility`  | `'internal'`              |
+| `tags`        | `[]`                      |
+| `attachments` | `[]`                      |
+
+**Neither `visibility` nor `tags` is exposed as a control** in this production.
+The note form is content plus attachments. `'internal'` is the conservative
+default for an onboarding note — it is a decision, not a derivation, and the CA
+may flip it.
 
 ## Width invariance — a hard constraint
 
@@ -171,7 +229,8 @@ gate. No git operations — the Chief Architect commits.
   this scope.
 - **A long list is the one soft edge.** Bounded scroll inside a fieldset is the
   intended answer and is not a feed, but ten sites is the case to look at.
-- **Attachments at depth 2 are a set, not a sequence.** Render them as a chip or
-  thumbnail row with add and remove — no cursor, no pagination, no third depth.
+- **Attachments are the same pattern again.** A note's attachments are a list,
+  and selecting one descends to it exactly as selecting a site or a note does.
+  Nothing about that level is special.
 
 _End of Brief_

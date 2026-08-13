@@ -30,7 +30,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   const [contactFormCheck, setContactFormCheck] = createSignal<() => boolean>(() => false)
   const [customerFormCheck, setCustomerFormCheck] = createSignal<() => boolean>(() => false)
 
-  /** TODO */
+  /** Stage collecting the customer's primary contact details. */
   const stageContact: WizardStage = {
     name: 'contact',
     title: 'Contact details',
@@ -48,7 +48,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
     }
   }
 
-  /** TODO */
+  /** Stage collecting the customer account address and creating the customer record. */
   const stageCustomer: WizardStage = {
     name: 'customer',
     title: 'Customer address',
@@ -92,7 +92,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
     }
   }
 
-  /** */
+  /** Stage collecting optional job-site details after the customer record exists. */
   const stageSites: WizardStage = {
     name: 'sites',
     title: 'Job sites',
@@ -106,7 +106,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
     }
   }
 
-  /** TODO */
+  /** Wizard contract defining the ordered onboarding stages. */
   const contract: WizardContract = {
     formTitle: 'Customer Onboarding',
     stages: [stageContact, stageCustomer, stageSites]
