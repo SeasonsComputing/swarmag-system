@@ -168,25 +168,55 @@ to a site, sites belong to the customer. A `Note | Files` tab pair asserts that
 attachments belong to the _site_ and flattens exactly the relationship that
 matters.
 
-**Header: leaf as title, ancestry as a secondary rail.** The current object holds
-the title position, so its meaning is stable as you descend; ancestors sit on
-their own row, which exists only below the top level. The row never contains the
-leaf, so it holds at most two segments and owns full panel width — which is what
-makes it width-invariant, and why it is the display at every size.
+**Two axes, and no control serves both.** Sequence is the wizard's steps; depth
+is the drill-down stack inside one step. `‹ Back` is the previous step, full
+stop — it does not change meaning at depth and never returns to a list. Return-
+to-list is a separate control on the depth axis, in the content on an action row
+aligned to the inline start, mirroring `New …` at the inline end. Its glyph must
+not be `arrow-left`, which belongs to `Back`.
 
-It is not a standard breadcrumb and should not be named one.
+Conflating those two was the error that confused both this agent and ACE, and it
+was mine: I wrote `Back` as a single unwind control that took depth first. It
+isn't.
+
+**The title holds the current object** — the site at depth 1, the note at depth 2,
+the stage title at depth 0.
+
+**No ancestry line.** An earlier design put an ancestry path in the header. It is
+not being built. Every element of the path is already on screen — the workbench
+header has the wizard title, the accessory rail has the stage titles and renders
+unconditionally, the title has the object, and the return control names its
+parent. This holds while maximum depth is two, which sites → notes →
+attachments is, since attachments are a set rendered inline rather than a depth.
+A third depth would reopen it.
+
+**A fixed-position return control would need a header seam that does not exist.**
+`WizardStage` exposes no header content and the wizard owns that header outright.
+Such a seam — `subheader` on `PanelFormProps` and `WizardStage` — was built,
+found to have no consumer once the ancestry was dropped, and removed. Do not
+re-add it speculatively.
+
+**Consistency beats local rightness.** Fixed-height lists were chosen at every
+depth although a single-collection object could grow unbounded without harm. The
+same principle decided that one layout serves every width. Stated here because
+it decided more than one thing and will decide others.
 
 ## Open
 
-- **Collection cursor's future.** The API-surface work — compound component,
-  root as pure state provider, nav and body placed by the consumer — was designed
-  and authorised, then overtaken. If job sites drops the cursor, its only real
-  consumer is gone and the queued work should be re-priced before it is built.
-- **Stage controls at depth** — what `‹ Previous` means with a note editor open.
-  Likely a non-problem, since sites and notes are compositions of the customer
-  under construction and leaving discards nothing, but the wizard's state model
-  should be confirmed rather than assumed.
-- **Ancestry rail alignment** — left, as sketched, or centred under the title.
+- **The collection cursor has no consumer.** Its navbar seam shipped —
+  `renderNav` hands the navbar to the consumer to place and decorate, and the
+  navbar carries `data-ui='collection-cursor-nav'`. Job sites no longer uses the
+  control at all. It stays because it is the right answer for an object with
+  **two or more collection attributes**: a growing list is O(n) tall and three
+  stacked are unreadable, where three cursors are a constant. That selection
+  criterion is written nowhere yet and should go in the components guide.
+- **Phantom attributes in the components guide.** §5.7 documents
+  `collection-cursor-position`, `collection-cursor-actions` and
+  `collection-cursor-rule` as emitted. The component emits none of them and
+  never has. A foundational doc is asserting a contract that does not exist.
+- **Return-to-list placement is provisional.** Chosen from imagination, not from
+  use; the CA reserved the right to revisit. The accepted cost is that it
+  scrolls with the form.
 - **The manager's index floor** has no observation behind it. It errs generous,
   which collapses early rather than overflowing, and the file says so.
 - **Panel-role containment** remains unbuilt. Not needed for the cursor, which
