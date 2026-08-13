@@ -4,8 +4,7 @@
 **Mode:** Foundation
 **Milestone:** M1 Customer Onboarding
 **Design source:** `effort/active/2026-08-09-responsive-foundation-handoff.md`
-**Depends on:** the `subheader` seam on `PanelFormProps` and `WizardStage` (in the
-working tree, uncommitted at time of writing)
+**Depends on:** nothing. This production needs no shell change.
 
 Rebuild the onboarding job-sites stage as a bounded list with slide-to-detail,
 recursive at site and note depth. Replaces the collection cursor on this surface.
@@ -26,6 +25,7 @@ Three depths, one idiom repeated at each.
 depth 0  sites      list of site labels
 depth 1  site       the site form, ending in a notes list
 depth 2  note       note text, ending in attachments
+depth 3  attachment attachment selection
 ```
 
 At every depth: a **bounded fixed-height list inside a fieldset**, a **`New …`
@@ -37,48 +37,68 @@ Height is fixed at every level, deliberately. It is not better here — a site h
 one collection and could grow — but it is better in the general case, and
 consistency beats local rightness. A long list scrolls inside its own frame.
 
-## Header
+## Two axes, and no control serves both
 
-The panel header carries two rows.
+**Sequence** is the wizard's steps. **Depth** is the drill-down stack inside one
+step. They are different things and must never be conflated.
 
-**Row one** is the existing header. The title slot holds **the current object's
-name**, not the stage name — `South pasture` at depth 1, `Access gate` at depth
-2, the stage title only at depth 0. The leading control is **`Back`**.
+**`‹ Back` is the previous step in the sequence. Full stop.** It does not change
+meaning at depth, it is not disabled at depth, and it never returns to a list.
+Existing behaviour is unchanged and non-destructive: a user may go back a step,
+edit, and come forward with work in progress intact.
 
-**`Back` is a single unwind control.** At depth it returns to the list one level
-up; at depth 0 it returns to the previous wizard stage. Existing stage behaviour
-is unchanged and non-destructive: a user may go back a stage, edit, and come
-forward with work in progress intact. Do not add a second ascend control, and do
-not disable the stage controls at depth.
+**Return to list is a separate control on the depth axis.** It appears only below
+depth 0 and moves exactly one level up, to the panel owning the list the current
+object came from.
 
-**Row two** is the **ancestry rail**, supplied through the new `subheader` slot.
-It exists only below depth 0. It lists ancestors and never the current object, so
-it holds at most two segments.
+The panel title slot holds **the current object's name** — `South pasture` at
+depth 1, `Access gate` at depth 2, the stage title at depth 0.
 
-**The ancestry element is not interactive.** It is display only — no links, no
-buttons, no hit areas, not focusable, no `nav` landmark, no keyboard traversal.
-It answers _where am I_, and nothing more. Render it as text. It remains readable
-to assistive technology; not focusable is not the same as hidden.
+### Return-to-list placement
 
-This constrains the ancestry element alone, not the header block. The block keeps
-everything it does today, including hosting the feedback alert and whatever focus
-behaviour validation drives. Order inside the block is header row, then ancestry,
-then feedback — the alert stays closest to the form it concerns.
+The control sits **in the content, on an action row, aligned to the inline
+start** — mirroring the `New …` action that aligns to the inline end. It is not
+header chrome; the panel header is untouched by this production.
 
-One way in, one way out: descend by selecting a row or creating an item, ascend
-by `Back`. Cancel leaves the wizard entirely. There is no third path, and the
-ancestry must not become one.
+Label it with its destination, which is always the parent: `Sites` at depth 1,
+the site's own name at depth 2.
 
-Call it ancestry, not breadcrumb. A breadcrumb is a navigation control and this
-is not one; the leaf also sits in the title rather than at the end of the path.
+**Its glyph must not be `arrow-left`** — that is `Back`, and two ascend controls
+sharing a glyph is the exact collision this separation exists to prevent.
+`corner-top-left` reads as up-and-out; `enter` is the conventional return arrow.
+Either is plainly distinct at 16px.
 
-**Ancestry presentation:** left-aligned, annotation typography
-(`--sa-annotation-*` role tokens), compact. It is context, subordinate to the
-title above it.
+**This placement is provisional.** It was chosen from imagination rather than
+from use, and the CA reserved the right to revisit once it is real. The accepted
+cost is that the control scrolls with the form instead of staying fixed.
 
-Because the header block is `flex: 0 0 auto` and the body is the scrolling
-sibling, the rail stays fixed while the form scrolls under it. That is the point
-of putting it there.
+A fixed alternative would need a second row in the panel's header block, which a
+stage cannot reach today — `WizardStage` exposes no header content and the wizard
+owns that header outright. Such a seam was built and then removed once this
+placement was chosen; do not re-add it speculatively. If the scrolling control
+proves wrong in the hand, that is the change to make, deliberately and on its own
+gate.
+
+### No ancestry line
+
+An earlier design put an ancestry path in the header. It is **not** being built.
+
+Every element of the path is already on screen: the workbench header carries the
+wizard's title, the accessory rail carries all stage titles with the current one
+accented and is rendered unconditionally, the panel title carries the object, and
+the return control names its parent. An ancestry line would be a fourth
+restatement of a path nothing has hidden.
+
+**The condition under which that holds:** the return control names the parent, so
+ancestry adds nothing while maximum depth is two. Sites → notes → attachments is
+the ceiling, because attachments are a set rendered inline rather than a depth.
+If a third depth ever appears the middle of the path goes unnamed and this
+decision reopens.
+
+### The header block is otherwise untouched
+
+This production changes nothing about the header's existing behaviour, including
+its feedback alert and whatever focus handling validation drives.
 
 ## The site form
 
@@ -123,12 +143,13 @@ carry the reduced-motion branch.
 ## Scope
 
 **In:** `source/front/app-admin/onboarding/onboarding-stage-sites.tsx`, its
-app-local stylesheet, `onboarding.tsx` where the stage is declared (to supply
-`subheader`), and any new app-local components the stage needs.
+app-local stylesheet, and any new app-local components the stage needs. The
+stage's whole output goes through its existing `render()`, so `onboarding.tsx`
+should need no change — if it does, that is a signal to stop and report.
 
-**Out:** `source/front/ux/shell/**` beyond consuming the `subheader` prop —
-the seam is already built and this production does not extend it.
-`source/front/ux/ui/**`. `UiCollectionCursor`, which this surface no longer
+**Out:** `source/front/ux/shell/**` entirely — this production needs no shell
+change and must not introduce one. `source/front/ux/ui/**`. `UiCollectionCursor`,
+which this surface no longer
 uses and which must not be modified or deleted. The abstraction manager. The
 panel floors and thresholds settled in the source session. `panel-probe.*`.
 
