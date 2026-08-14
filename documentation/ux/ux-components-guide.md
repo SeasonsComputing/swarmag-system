@@ -37,6 +37,7 @@ code should not pass these props:
 - `data-ui-gap`
 - `data-ui-icon`
 - `data-ui-align`
+- `data-ui-interactive`
 - `data-ui-overflow`
 - `data-ui-state`
 
@@ -1060,17 +1061,27 @@ UiTable
 
 **Props**
 
-| Component       | Props                                                      | Notes                                          |
-| --------------- | ---------------------------------------------------------- | ---------------------------------------------- |
-| `UiTable`       | native table attrs, `name?: string`, `overflow?: Overflow` | Renders `<table>` or overflow wrapper + table. |
-| `UiTableHeader` | `children: UiComponent`                                    | Wraps children in header row.                  |
-| `UiTableBody`   | native table-section attrs                                 | Renders `<tbody>`.                             |
-| `UiTableRow`    | `variant?: 'section'` plus row attrs                       | Section rows span all columns.                 |
-| `UiTableCell`   | `align?: 'start' \| 'center' \| 'end'`                     | Renders `<th>` in headers.                     |
+| Component       | Props                                                           | Notes                                          |
+| --------------- | --------------------------------------------------------------- | ---------------------------------------------- |
+| `UiTable`       | native table attrs, `name?: string`, `overflow?: Overflow`      | Renders `<table>` or overflow wrapper + table. |
+| `UiTableHeader` | `children: UiComponent`                                         | Wraps children in header row.                  |
+| `UiTableBody`   | native table-section attrs                                      | Renders `<tbody>`.                             |
+| `UiTableRow`    | `variant?: 'section'`, `onActivate?: () => void` plus row attrs | Section rows span all columns.                 |
+| `UiTableCell`   | `align?: 'start' \| 'center' \| 'end'`                          | Renders `<th>` in headers.                     |
 
 `name` derives the rendered table target `id` when no explicit `id` is provided.
 `Overflow` is `'scroll' | 'hidden'`. Omit `overflow` for a plain semantic table.
 Use `overflow='scroll'` for wide tables that should scroll horizontally.
+
+`onActivate` makes a row interactive: it takes focus, shows the focus ring, and
+activates on click, Enter, and Space. A keypress that starts inside the row —
+on an action button, say — belongs to that control and never activates the row.
+Omit `onActivate` and the row is a read-only `<tr>`: not focusable, and with no
+hover treatment.
+
+An interactive row stays a `<tr>` and keeps its row and column semantics; it
+takes no `role`. Rows that carry their own action buttons should keep calling
+`event.stopPropagation()` in those handlers.
 
 **Example**
 
