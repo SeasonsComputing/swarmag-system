@@ -1,667 +1,267 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Customer onboarding sites stage                                              ║
-║ Collects optional customer job sites and location details.                   ║
+║ Collects optional customer job sites and nested internal notes.              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Renders the onboarding job-sites stage using shared list/edit collection
+composition. Site and note selection is local to each collection.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+OnboardingStageSitesProps  Props for the optional job-sites stage.
+OnboardingStageSites       Render the optional job-sites stage.
 */
 
 import { when } from '@core/std'
-import type { Attachment, AttachmentKind, Location, Note } from '@domain/abstractions/common.ts'
+import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { CustomerSite } from '@domain/abstractions/customer.ts'
+import { CollectionEditor } from '@front/ux/shell/collection-editor.tsx'
 import {
   UiActionButton,
-  UiButton,
   type UiComponent,
   UiField,
   UiFieldset,
   UiInput,
   UiLayout,
-  UiList,
-  UiListItem,
-  UiSingleSelect,
   UiTextArea
 } from '@front/ux/ui'
-import { createMemo, createSignal, For, Show } from '@solid-js'
 import type { OnboardingState } from './onboarding-state.ts'
+
+// ────────────────────────────────────────────────────────────────────────────
+// ONBOARDING: CUSTOMER SITES
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Props for the optional job-sites stage. */
 export type OnboardingStageSitesProps = {
   state: OnboardingState
 }
 
-/** Renders the optional job-sites stage. */
+/**
+ * Renders the optional job-sites stage.
+ *
+ * @param props Stage props carrying onboarding state.
+ * @returns Job-sites onboarding stage component.
+ */
 export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiComponent => {
-  const { state } = props
-  const [depth, setDepth] = createSignal<DepthState>({ level: 'sites' })
   const hasGeo = typeof navigator !== 'undefined' && 'geolocation' in navigator
-
-  const activeSite = createMemo(() => {
-    const current = depth()
-    if (current.level === 'sites') return null
-    return state.sites()[current.siteIndex] ?? null
-  })
-  const activeNote = createMemo(() => {
-    const current = depth()
-    if (current.level !== 'note' && current.level !== 'attachment') return null
-    return state.sites()[current.siteIndex]?.notes[current.noteIndex] ?? null
-  })
-  const activeAttachment = createMemo(() => {
-    const current = depth()
-    if (current.level !== 'attachment') return null
-    return state.sites()[current.siteIndex]?.notes[current.noteIndex]
-      ?.attachments[current.attachmentIndex] ?? null
-  })
-
-  const updateSite = (index: number, update: (site: CustomerSite) => CustomerSite): void => {
-    const sites = state.sites()
-    const site = sites[index]
-    if (!site) return
-    state.setSites(sites.map((item, itemIndex) => itemIndex === index ? update(site) : item))
-  }
-  const updateLocation = (
-    index: number,
-    update: (location: Location) => Location
-  ): void => {
-    updateSite(index, site => ({ ...site, location: [update(site.location[0] ?? {})] }))
-  }
-  const useMyLocation = (index: number): void => {
-    if (!hasGeo) return
-    navigator.geolocation.getCurrentPosition(position => {
-      updateLocation(index, location => ({
-        ...location,
-        latitude: position.coords.latitude,
-        longitude: position.coords.longitude
-      }))
-    }, () => undefined)
-  }
-
-  const addSite = (): void => {
-    const sites = [...state.sites(), newSite()]
-    state.setSites(sites)
-    setDepth({ level: 'site', siteIndex: sites.length - 1 })
-  }
-  const deleteSite = (index: number): void => {
-    state.setSites(state.sites().filter((_, itemIndex) => itemIndex !== index))
-    const current = depth()
-    if (current.level !== 'sites' && current.siteIndex === index) setDepth({ level: 'sites' })
-  }
-  const updateNote = (
-    siteIndex: number,
-    noteIndex: number,
-    update: (note: Note) => Note
-  ): void => {
-    updateSite(siteIndex, site => {
-      const note = site.notes[noteIndex]
-      if (!note) return site
-      return {
-        ...site,
-        notes: site.notes.map((item, itemIndex) => itemIndex === noteIndex ? update(note) : item)
-      }
-    })
-  }
-  const addNote = (siteIndex: number): void => {
-    const site = state.sites()[siteIndex]
-    if (!site) return
-    const notes = [...site.notes, newNote()]
-    updateSite(siteIndex, site => ({ ...site, notes }))
-    setDepth({ level: 'note', siteIndex, noteIndex: notes.length - 1 })
-  }
-  const deleteNote = (siteIndex: number, noteIndex: number): void => {
-    updateSite(siteIndex, site => ({
-      ...site,
-      notes: site.notes.filter((_, itemIndex) => itemIndex !== noteIndex)
-    }))
-    const current = depth()
-    if (current.level !== 'sites' && current.level !== 'site' && current.noteIndex === noteIndex) {
-      setDepth({ level: 'site', siteIndex })
-    }
-  }
-  const updateAttachment = (
-    siteIndex: number,
-    noteIndex: number,
-    attachmentIndex: number,
-    update: (attachment: Attachment) => Attachment
-  ): void => {
-    updateNote(siteIndex, noteIndex, note => {
-      const attachment = note.attachments[attachmentIndex]
-      if (!attachment) return note
-      return {
-        ...note,
-        attachments: note.attachments.map((item, itemIndex) =>
-          itemIndex === attachmentIndex ? update(attachment) : item
-        )
-      }
-    })
-  }
-  const addAttachment = (siteIndex: number, noteIndex: number): void => {
-    const note = state.sites()[siteIndex]?.notes[noteIndex]
-    if (!note) return
-    const attachments = [...note.attachments, newAttachment()]
-    updateNote(siteIndex, noteIndex, note => ({ ...note, attachments }))
-    setDepth({ level: 'attachment', siteIndex, noteIndex, attachmentIndex: attachments.length - 1 })
-  }
-  const deleteAttachment = (siteIndex: number, noteIndex: number, attachmentIndex: number): void => {
-    updateNote(siteIndex, noteIndex, note => ({
-      ...note,
-      attachments: note.attachments.filter((_, itemIndex) => itemIndex !== attachmentIndex)
-    }))
-    const current = depth()
-    if (current.level === 'attachment' && current.attachmentIndex === attachmentIndex) {
-      setDepth({ level: 'note', siteIndex, noteIndex })
-    }
-  }
+  const addSite = (): void => props.state.addSite(newSite())
 
   return (
-    <div data-app='onboarding-stage-sites' data-app-depth={depth().level}>
-      <div data-app='onboarding-depth-panel' data-app-panel='sites'>
-        <BoundedList
-          legend='Sites'
-          empty={state.sites().length === 0}
-          emptyMessage='No job sites yet. Use New site to add one.'
-          newLabel='New site'
-          onNew={addSite}
-        >
-          <For each={state.sites()}>
-            {(site, index) => (
-              <DepthListRow
-                label={siteName(site)}
-                placeholder='Untitled site'
-                deleteLabel={`Delete ${siteName(site)}`}
-                onSelect={() => setDepth({ level: 'site', siteIndex: index() })}
-                onDelete={() => deleteSite(index())}
-              />
-            )}
-          </For>
-        </BoundedList>
-      </div>
-      <div data-app='onboarding-depth-panel' data-app-panel='site'>
-        <Show when={activeSite()} keyed>
-          {site => {
-            const current = depth()
-            if (current.level === 'sites') return null
-            return (
-              <SiteForm
-                site={site}
-                index={current.siteIndex}
-                hasGeo={hasGeo}
-                updateSite={updateSite}
-                updateLocation={updateLocation}
-                useMyLocation={useMyLocation}
-                addNote={addNote}
-                deleteNote={deleteNote}
-                openSites={() => setDepth({ level: 'sites' })}
-                openNote={noteIndex =>
-                  setDepth({ level: 'note', siteIndex: current.siteIndex, noteIndex })}
-              />
-            )
-          }}
-        </Show>
-      </div>
-      <div data-app='onboarding-depth-panel' data-app-panel='note'>
-        <Show when={activeNote()} keyed>
-          {note => {
-            const current = depth()
-            if (current.level !== 'note' && current.level !== 'attachment') return null
-            const site = activeSite()
-            return (
-              <NoteForm
-                note={note}
-                siteIndex={current.siteIndex}
-                noteIndex={current.noteIndex}
-                parentName={site ? siteName(site) : 'Site'}
-                updateNote={updateNote}
-                addAttachment={addAttachment}
-                deleteAttachment={deleteAttachment}
-                openSite={() => setDepth({ level: 'site', siteIndex: current.siteIndex })}
-                openAttachment={attachmentIndex =>
-                  setDepth({
-                    level: 'attachment',
-                    siteIndex: current.siteIndex,
-                    noteIndex: current.noteIndex,
-                    attachmentIndex
-                  })}
-              />
-            )
-          }}
-        </Show>
-      </div>
-      <div data-app='onboarding-depth-panel' data-app-panel='attachment'>
-        <Show when={activeAttachment()} keyed>
-          {attachment => {
-            const current = depth()
-            if (current.level !== 'attachment') return null
-            const note = activeNote()
-            return (
-              <AttachmentForm
-                attachment={attachment}
-                siteIndex={current.siteIndex}
-                noteIndex={current.noteIndex}
-                attachmentIndex={current.attachmentIndex}
-                parentName={note ? noteName(note) : 'Note'}
-                updateAttachment={updateAttachment}
-                openNote={() =>
-                  setDepth({
-                    level: 'note',
-                    siteIndex: current.siteIndex,
-                    noteIndex: current.noteIndex
-                  })}
-              />
-            )
-          }}
-        </Show>
-      </div>
-    </div>
+    <CollectionEditor
+      legend='Sites'
+      items={props.state.sites}
+      label={siteName}
+      emptyMessage='No job sites yet. Use New site to add one.'
+      newLabel='New site'
+      onNew={addSite}
+      onRemove={props.state.removeSite}
+      renderEditor={(site, index) => (
+        <SiteEditor
+          state={props.state}
+          site={site}
+          index={index}
+          hasGeo={hasGeo}
+        />
+      )}
+    />
   )
 }
 
-type DepthState =
-  | { level: 'sites' }
-  | { level: 'site'; siteIndex: number }
-  | { level: 'note'; siteIndex: number; noteIndex: number }
-  | { level: 'attachment'; siteIndex: number; noteIndex: number; attachmentIndex: number }
-
-type SiteFormProps = {
+/** Props for the editor disclosed when a site row is selected. */
+type SiteEditorProps = {
+  state: OnboardingState
   site: CustomerSite
   index: number
   hasGeo: boolean
-  updateSite: (index: number, update: (site: CustomerSite) => CustomerSite) => void
-  updateLocation: (index: number, update: (location: Location) => Location) => void
-  useMyLocation: (index: number) => void
-  addNote: (siteIndex: number) => void
-  deleteNote: (siteIndex: number, noteIndex: number) => void
-  openSites: () => void
-  openNote: (noteIndex: number) => void
 }
 
-const SiteForm = (props: SiteFormProps): UiComponent => {
-  const location = props.site.location[0] ?? {}
-  return (
-    <UiLayout>
-      <DepthReturn label='Sites' onClick={props.openSites} />
-      <h3 data-app='onboarding-depth-title'>{siteName(props.site)}</h3>
-      <UiFieldset legend='Identity'>
+/** Renders one site's identity, address, and location fields above its notes collection. */
+const SiteEditor = (props: SiteEditorProps): UiComponent => (
+  <UiLayout>
+    <UiFieldset legend='Identity'>
+      <SiteTextInput
+        index={props.index}
+        name='siteLabel'
+        label='Site Label'
+        value={props.site.label}
+        required
+        placeholder='e.g., "Main Office" or "South Pasture"'
+        onValue={value => props.state.updateSite(props.index, site => site.label = value)}
+      />
+    </UiFieldset>
+    <UiFieldset legend='Address'>
+      <UiLayout>
         <SiteTextInput
           index={props.index}
-          name='siteLabel'
-          label='Site Label'
-          value={props.site.label}
-          required
-          placeholder='e.g., "Main Office" or "South Pasture"'
-          onValue={value => props.updateSite(props.index, site => ({ ...site, label: value }))}
+          name='siteLine1'
+          label='Address'
+          value={siteLocation(props.site).line1}
+          onValue={value =>
+            updateLocation(props.state, props.index, location => ({
+              ...location,
+              line1: optionalText(value)
+            }))}
         />
-      </UiFieldset>
-      <UiFieldset legend='Address'>
-        <UiLayout>
+        <SiteTextInput
+          index={props.index}
+          name='siteLine2'
+          label='Unit / Suite'
+          value={siteLocation(props.site).line2}
+          onValue={value =>
+            updateLocation(props.state, props.index, location => ({
+              ...location,
+              line2: optionalText(value)
+            }))}
+        />
+        <UiLayout variant='inline-wrap'>
           <SiteTextInput
             index={props.index}
-            name='siteLine1'
-            label='Address'
-            value={location.line1}
+            name='siteCity'
+            label='City'
+            value={siteLocation(props.site).city}
             onValue={value =>
-              props.updateLocation(props.index, location => ({
+              updateLocation(props.state, props.index, location => ({
                 ...location,
-                line1: optionalText(value)
+                city: optionalText(value)
               }))}
           />
           <SiteTextInput
             index={props.index}
-            name='siteLine2'
-            label='Unit / Suite'
-            value={location.line2}
+            name='siteState'
+            label='State / Province'
+            value={siteLocation(props.site).state}
             onValue={value =>
-              props.updateLocation(props.index, location => ({
+              updateLocation(props.state, props.index, location => ({
                 ...location,
-                line2: optionalText(value)
+                state: optionalText(value)
               }))}
           />
-          <UiLayout variant='inline-wrap'>
-            <SiteTextInput
-              index={props.index}
-              name='siteCity'
-              label='City'
-              value={location.city}
-              onValue={value =>
-                props.updateLocation(props.index, location => ({
-                  ...location,
-                  city: optionalText(value)
-                }))}
-            />
-            <SiteTextInput
-              index={props.index}
-              name='siteState'
-              label='State / Province'
-              value={location.state}
-              onValue={value =>
-                props.updateLocation(props.index, location => ({
-                  ...location,
-                  state: optionalText(value)
-                }))}
-            />
-            <SiteTextInput
-              index={props.index}
-              name='sitePostalCode'
-              label='ZIP / Postal Code'
-              value={location.postalCode}
-              onValue={value =>
-                props.updateLocation(
-                  props.index,
-                  location => ({ ...location, postalCode: optionalText(value) })
-                )}
-            />
-          </UiLayout>
           <SiteTextInput
             index={props.index}
-            name='siteCountry'
-            label='Country'
-            value={location.country}
+            name='sitePostalCode'
+            label='ZIP / Postal Code'
+            value={siteLocation(props.site).postalCode}
             onValue={value =>
-              props.updateLocation(props.index, location => ({
+              updateLocation(props.state, props.index, location => ({
                 ...location,
-                country: optionalText(value)
+                postalCode: optionalText(value)
               }))}
           />
         </UiLayout>
-      </UiFieldset>
-      <UiFieldset legend='Location'>
-        <div data-app='onboarding-coords-group'>
-          <SiteTextInput
-            index={props.index}
-            name='siteLatitude'
-            label='Latitude'
-            value={numberText(location.latitude)}
-            placeholder='e.g., 40.7128'
-            onValue={value =>
-              props.updateLocation(props.index, location => ({
-                ...location,
-                latitude: numberValue(value)
-              }))}
-          />
-          <SiteTextInput
-            index={props.index}
-            name='siteLongitude'
-            label='Longitude'
-            value={numberText(location.longitude)}
-            placeholder='e.g., -74.0060'
-            onValue={value =>
-              props.updateLocation(props.index, location => ({
-                ...location,
-                longitude: numberValue(value)
-              }))}
-          />
-          <UiActionButton
-            icon='crosshair-2'
-            label='Use my location'
-            disabled={!props.hasGeo}
-            onClick={() => props.useMyLocation(props.index)}
-          />
-        </div>
-      </UiFieldset>
-      <SiteTextInput
-        index={props.index}
-        name='siteAcreage'
-        label='Acreage'
-        type='number'
-        value={numberText(props.site.acreage)}
-        onValue={value =>
-          props.updateSite(props.index, site => ({ ...site, acreage: numberValue(value) }))}
-      />
-      <BoundedList
-        legend='Notes'
-        empty={props.site.notes.length === 0}
-        emptyMessage='No notes yet. Use New note to add one.'
-        newLabel='New note'
-        onNew={() => props.addNote(props.index)}
-      >
-        <For each={props.site.notes}>
-          {(note, noteIndex) => (
-            <DepthListRow
-              label={noteName(note)}
-              placeholder='Empty note'
-              deleteLabel='Delete note'
-              onSelect={() => props.openNote(noteIndex())}
-              onDelete={() => props.deleteNote(props.index, noteIndex())}
-            />
-          )}
-        </For>
-      </BoundedList>
-    </UiLayout>
-  )
-}
+        <SiteTextInput
+          index={props.index}
+          name='siteCountry'
+          label='Country'
+          value={siteLocation(props.site).country}
+          onValue={value =>
+            updateLocation(props.state, props.index, location => ({
+              ...location,
+              country: optionalText(value)
+            }))}
+        />
+      </UiLayout>
+    </UiFieldset>
+    <UiFieldset legend='Location'>
+      <div data-app='onboarding-coords-group'>
+        <SiteTextInput
+          index={props.index}
+          name='siteLatitude'
+          label='Latitude'
+          value={numberText(siteLocation(props.site).latitude)}
+          placeholder='e.g., 40.7128'
+          onValue={value =>
+            updateLocation(props.state, props.index, location => ({
+              ...location,
+              latitude: numberValue(value)
+            }))}
+        />
+        <SiteTextInput
+          index={props.index}
+          name='siteLongitude'
+          label='Longitude'
+          value={numberText(siteLocation(props.site).longitude)}
+          placeholder='e.g., -74.0060'
+          onValue={value =>
+            updateLocation(props.state, props.index, location => ({
+              ...location,
+              longitude: numberValue(value)
+            }))}
+        />
+        <UiActionButton
+          icon='crosshair-2'
+          label='Use my location'
+          disabled={!props.hasGeo}
+          onClick={() => useMyLocation(props.state, props.index, props.hasGeo)}
+        />
+        <SiteTextInput
+          index={props.index}
+          name='siteAcreage'
+          label='Acreage'
+          type='number'
+          value={numberText(props.site.acreage)}
+          onValue={value =>
+            props.state.updateSite(props.index, site => site.acreage = numberValue(value))}
+        />
+      </div>
+    </UiFieldset>
+    <CollectionEditor
+      legend='Notes'
+      items={() => props.site.notes}
+      label={noteName}
+      emptyMessage='No notes yet. Use New note to add one.'
+      newLabel='New note'
+      onNew={() => props.state.addNote(props.index, newNote())}
+      onRemove={notePosition => props.state.removeNote(props.index, notePosition)}
+      renderEditor={(note, notePosition) => (
+        <NoteEditor
+          state={props.state}
+          note={note}
+          sitePosition={props.index}
+          notePosition={notePosition}
+        />
+      )}
+    />
+  </UiLayout>
+)
 
-type NoteFormProps = {
+// ────────────────────────────────────────────────────────────────────────────
+// CUSTOMER SITE: NOTES
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Props for the editor disclosed when a note row is selected. */
+type NoteEditorProps = {
+  state: OnboardingState
   note: Note
-  siteIndex: number
-  noteIndex: number
-  parentName: string
-  updateNote: (siteIndex: number, noteIndex: number, update: (note: Note) => Note) => void
-  addAttachment: (siteIndex: number, noteIndex: number) => void
-  deleteAttachment: (siteIndex: number, noteIndex: number, attachmentIndex: number) => void
-  openSite: () => void
-  openAttachment: (attachmentIndex: number) => void
+  sitePosition: number
+  notePosition: number
 }
 
-const NoteForm = (props: NoteFormProps): UiComponent => (
-  <UiLayout>
-    <DepthReturn label={props.parentName} onClick={props.openSite} />
-    <h3 data-app='onboarding-depth-title'>
-      <span data-app='onboarding-note-title' data-app-empty={props.note.content.trim() ? undefined : ''}>
-        {noteName(props.note)}
-      </span>
-    </h3>
-    <UiField for={`site-note-content-${props.siteIndex}-${props.noteIndex}`} label='Note'>
+/** Renders one note's content, keyed to its position within its site. */
+const NoteEditor = (props: NoteEditorProps): UiComponent => {
+  const name = `site-note-content-${props.sitePosition}-${props.notePosition}`
+  return (
+    <UiField for={name} label='Note'>
       <UiTextArea
-        name={`site-note-content-${props.siteIndex}-${props.noteIndex}`}
+        name={name}
         rows={6}
         value={props.note.content}
         onInput={event =>
-          props.updateNote(props.siteIndex, props.noteIndex, note => ({
-            ...note,
-            content: event.currentTarget.value
-          }))}
-      />
-    </UiField>
-    <BoundedList
-      legend='Attachments'
-      empty={props.note.attachments.length === 0}
-      emptyMessage='No attachments yet. Use New attachment to add one.'
-      newLabel='New attachment'
-      onNew={() => props.addAttachment(props.siteIndex, props.noteIndex)}
-    >
-      <For each={props.note.attachments}>
-        {(attachment, attachmentIndex) => (
-          <DepthListRow
-            label={attachmentName(attachment)}
-            placeholder='Untitled attachment'
-            deleteLabel='Delete attachment'
-            onSelect={() => props.openAttachment(attachmentIndex())}
-            onDelete={() => props.deleteAttachment(props.siteIndex, props.noteIndex, attachmentIndex())}
-          />
-        )}
-      </For>
-    </BoundedList>
-  </UiLayout>
-)
-
-type AttachmentFormProps = {
-  attachment: Attachment
-  siteIndex: number
-  noteIndex: number
-  attachmentIndex: number
-  parentName: string
-  updateAttachment: (
-    siteIndex: number,
-    noteIndex: number,
-    attachmentIndex: number,
-    update: (attachment: Attachment) => Attachment
-  ) => void
-  openNote: () => void
-}
-
-const AttachmentForm = (props: AttachmentFormProps): UiComponent => (
-  <UiLayout>
-    <DepthReturn label={props.parentName} onClick={props.openNote} />
-    <h3 data-app='onboarding-depth-title'>{attachmentName(props.attachment)}</h3>
-    <AttachmentTextInput
-      siteIndex={props.siteIndex}
-      noteIndex={props.noteIndex}
-      attachmentIndex={props.attachmentIndex}
-      name='attachmentFilename'
-      label='Filename'
-      value={props.attachment.filename}
-      onValue={value => ({ filename: value })}
-      updateAttachment={props.updateAttachment}
-    />
-    <AttachmentTextInput
-      siteIndex={props.siteIndex}
-      noteIndex={props.noteIndex}
-      attachmentIndex={props.attachmentIndex}
-      name='attachmentUrl'
-      label='URL'
-      value={props.attachment.url}
-      onValue={value => ({ url: value })}
-      updateAttachment={props.updateAttachment}
-    />
-    <AttachmentTextInput
-      siteIndex={props.siteIndex}
-      noteIndex={props.noteIndex}
-      attachmentIndex={props.attachmentIndex}
-      name='attachmentContentType'
-      label='Content Type'
-      value={props.attachment.contentType}
-      placeholder='e.g., image/jpeg'
-      onValue={value => ({ contentType: value })}
-      updateAttachment={props.updateAttachment}
-    />
-    <UiField
-      for={`attachment-kind-${props.siteIndex}-${props.noteIndex}-${props.attachmentIndex}`}
-      label='Kind'
-    >
-      <UiSingleSelect
-        name={`attachment-kind-${props.siteIndex}-${props.noteIndex}-${props.attachmentIndex}`}
-        value={props.attachment.kind}
-        options={ATTACHMENT_KIND_OPTIONS}
-        onChange={value =>
-          props.updateAttachment(
-            props.siteIndex,
-            props.noteIndex,
-            props.attachmentIndex,
-            attachment => ({ ...attachment, kind: value as AttachmentKind })
-          )}
-      />
-    </UiField>
-  </UiLayout>
-)
-
-type AttachmentTextInputProps = {
-  siteIndex: number
-  noteIndex: number
-  attachmentIndex: number
-  name: 'attachmentFilename' | 'attachmentUrl' | 'attachmentContentType'
-  label: string
-  value: string
-  placeholder?: string
-  onValue: (value: string) => Partial<Attachment>
-  updateAttachment: (
-    siteIndex: number,
-    noteIndex: number,
-    attachmentIndex: number,
-    update: (attachment: Attachment) => Attachment
-  ) => void
-}
-
-const AttachmentTextInput = (props: AttachmentTextInputProps): UiComponent => {
-  const name = `${props.name}-${props.siteIndex}-${props.noteIndex}-${props.attachmentIndex}`
-  return (
-    <UiField for={name} label={props.label}>
-      <UiInput
-        name={name}
-        value={props.value}
-        placeholder={props.placeholder}
-        onInput={event =>
-          props.updateAttachment(
-            props.siteIndex,
-            props.noteIndex,
-            props.attachmentIndex,
-            attachment => ({ ...attachment, ...props.onValue(event.currentTarget.value) })
-          )}
+          props.state.updateNote(props.sitePosition, props.notePosition, note => {
+            note.content = event.currentTarget.value
+          })}
       />
     </UiField>
   )
 }
 
-type BoundedListProps = {
-  legend: string
-  empty: boolean
-  emptyMessage: string
-  newLabel: string
-  onNew: () => void
-  children: UiComponent
-}
+// ────────────────────────────────────────────────────────────────────────────
+// CUSTOMER SITE: TEXT INPUT FIELDS
+// ────────────────────────────────────────────────────────────────────────────
 
-const BoundedList = (props: BoundedListProps): UiComponent => (
-  <UiFieldset legend={props.legend}>
-    <div data-app='onboarding-depth-actions' data-app-align='end'>
-      <UiActionButton
-        icon='plus'
-        label={props.newLabel}
-        labelMode='visible'
-        onClick={props.onNew}
-      />
-    </div>
-    <div data-app='onboarding-bounded-list'>
-      <Show when={!props.empty} fallback={<p data-app='onboarding-empty-list'>{props.emptyMessage}</p>}>
-        <UiList>{props.children}</UiList>
-      </Show>
-    </div>
-  </UiFieldset>
-)
-
-type DepthListRowProps = {
-  label: string
-  placeholder: string
-  deleteLabel: string
-  onSelect: () => void
-  onDelete: () => void
-}
-
-const DepthListRow = (props: DepthListRowProps): UiComponent => {
-  const empty = () => !props.label.trim()
-  return (
-    <UiListItem>
-      <div data-app='onboarding-depth-row'>
-        <UiButton variant='ghost' onClick={props.onSelect}>
-          <span data-app='onboarding-depth-row-label' data-app-empty={empty() ? '' : undefined}>
-            {empty() ? props.placeholder : props.label}
-          </span>
-        </UiButton>
-        <UiActionButton
-          icon='trash'
-          label={props.deleteLabel}
-          variant='danger'
-          onClick={props.onDelete}
-        />
-      </div>
-    </UiListItem>
-  )
-}
-
-type DepthReturnProps = {
-  label: string
-  onClick: () => void
-}
-
-const DepthReturn = (props: DepthReturnProps): UiComponent => (
-  <div data-app='onboarding-depth-actions' data-app-align='start'>
-    <UiActionButton
-      align='start'
-      icon='corner-top-left'
-      label={props.label}
-      labelMode='visible'
-      onClick={props.onClick}
-    />
-  </div>
-)
-
+/** Props for one labelled site field; `name` selects the field and scopes its input id. */
 type SiteTextInputProps = {
   index: number
   name:
@@ -683,6 +283,7 @@ type SiteTextInputProps = {
   onValue: (value: string) => void
 }
 
+/** Renders one labelled site field, suffixing its input name with the site position. */
 const SiteTextInput = (props: SiteTextInputProps): UiComponent => {
   const name = `${props.name}-${props.index}`
   return (
@@ -699,11 +300,11 @@ const SiteTextInput = (props: SiteTextInputProps): UiComponent => {
   )
 }
 
-const newSite = (): CustomerSite => ({
-  label: '',
-  location: [{}],
-  notes: []
-})
+// ────────────────────────────────────────────────────────────────────────────
+// IMPLEMENTATION
+// ────────────────────────────────────────────────────────────────────────────
+
+const newSite = (): CustomerSite => ({ label: '', location: [{}], notes: [] })
 
 const newNote = (): Note => ({
   attachments: [],
@@ -713,30 +314,30 @@ const newNote = (): Note => ({
   tags: []
 })
 
-const newAttachment = (): Attachment => ({
-  filename: '',
-  url: '',
-  contentType: '',
-  kind: 'photo',
-  uploadedAt: when()
-})
-
-const ATTACHMENT_KIND_OPTIONS = [
-  { value: 'photo', label: 'Photo' },
-  { value: 'video', label: 'Video' },
-  { value: 'map', label: 'Map' },
-  { value: 'document', label: 'Document' }
-]
-
 const siteName = (site: CustomerSite): string => site.label.trim() || 'Untitled site'
+const noteName = (note: Note): string => note.content.trim()
+const siteLocation = (site: CustomerSite): Location => site.location[0] ?? {}
 
-const noteName = (note: Note): string => note.content.trim() || 'Empty note'
+const updateLocation = (
+  state: OnboardingState,
+  index: number,
+  update: (location: Location) => Location
+): void => {
+  state.updateSite(index, site => site.location = [update(siteLocation(site))])
+}
 
-const attachmentName = (attachment: Attachment): string =>
-  attachment.filename.trim() || 'Untitled attachment'
+const useMyLocation = (state: OnboardingState, index: number, hasGeo: boolean): void => {
+  if (!hasGeo) return
+  navigator.geolocation.getCurrentPosition(position => {
+    updateLocation(state, index, location => ({
+      ...location,
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude
+    }))
+  }, () => undefined)
+}
 
 const optionalText = (value: string): string | undefined => value.trim() ? value : undefined
-
 const numberText = (value: number | undefined): string => value === undefined ? '' : value.toString()
 
 const numberValue = (value: string): number | undefined => {
