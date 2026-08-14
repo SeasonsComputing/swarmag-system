@@ -30,7 +30,7 @@ guard-clean, type-clean, and format-clean, and its defects are structural:
   seven-to-ten-prop child signatures follow from that addressing.
 
 Each repair converges on the same replacement, so it is done once.
-**Harvest, do not rewrite from zero** — see *What survives*.
+**Harvest, do not rewrite from zero** — see _What survives_.
 
 ## The invariant this production must not violate
 
@@ -106,7 +106,7 @@ implementation renders each row as a visible ghost pushbutton, which is wrong.
 Do not solve it by removing the button: the element is what makes the row
 keyboard-reachable and announced as activatable. Strip the chrome instead —
 full-width, text aligned to the start, no ring, no fill, no padding of its own —
-so the row *is* the target and reads as a row.
+so the row _is_ the target and reads as a row.
 
 Do not copy `abstraction-manager.tsx`'s clickable `UiTableRow`; it has no
 focusable element and is a latent accessibility gap, not a pattern.
