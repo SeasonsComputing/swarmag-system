@@ -10,12 +10,12 @@ Code that conflicts with this guide is wrong — not the guide.
 
 ## 2. Language & Tooling
 
-| Item            | Guideline                                                                                                                                                                                                                                                                                                                                                                           |
-| --------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime         | Deno with strict TypeScript (`deno task check`)                                                                                                                                                                                                                                                                                                                                     |
-| Encoding        | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint.                                                                                                                                                                                                                                                                              |
-| Types           | Use `type` for data shapes, abstractions, aliases, and unions.<br>Use `interface` for encapsulated API contracts that something explicitly implements.<br>In the ambiguous case, decide on meta-type vs. data: an `interface` is a meta-type whose behavior methods and attribute metadata are immutable specification; an attribute whose value is a callback is a data shape not. |
-| Primitives/ADTs | Use `Id` (UUID v7 string), `When` (ISO 8601 UTC string), `StringSet`, `Dictionary` and `StringDictionary` from `@core/std`                                                                                                                                                                                                                                                          |
+| Item            | Guideline                                                                                                                                                                                                                                                                                                                                                                       |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime         | Deno with strict TypeScript (`deno task check`)                                                                                                                                                                                                                                                                                                                                 |
+| Encoding        | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint.                                                                                                                                                                                                                                                                          |
+| Types           | Use `type` for data shapes, abstractions, aliases, and unions.<br>Use `interface` for encapsulated API contracts that something explicitly implements.<br>In the ambiguous case, decide on meta-type vs. data: an `interface` is a meta-type whose behavior methods and attribute metadata are immutable specification; an attribute whose value is a callback is a data shape. |
+| Primitives/ADTs | The standard vocabulary comes from `@core/std` — primitives, containers, life-cycle shapes, and relations. `Id` is a UUID v7 string, `When` an ISO 8601 UTC string, and so on. §8.1 is the authoritative catalog; consult it rather than re-deriving one of these locally.                                                                                                      |
 
 ## 3. Import Aliases
 
@@ -32,7 +32,9 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | `@devops/` | `source/devops/` |
 | `@tests/`  | `source/tests/`  |
 
-### 3.2 Convenience barrel aliases
+### 3.2 Barrel aliases
+
+Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@front/ux/shell/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§12).
 
 | Alias          | Resolves to                           |
 | -------------- | ------------------------------------- |
@@ -44,7 +46,6 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 
 - All cross-file type references must use top-level `import type` declarations. Inline `import('...').TypeName` expressions in type positions are prohibited — every type used from another module must appear in the file's top-level import block.
 - Do not re-implement utilities already provided by `@core/std`. Use the canonical form: `isId` not a local `isIdString`; `isWhen` not a local date-string guard; etc.
-- This repository barrels **nothing except** the modules named in §3.2. Every other module is imported by its direct file path — `@front/ux/shell/wizard.tsx`, never a shell barrel. If a module is not in the §3.2 alias table, no barrel for it exists and none should be created; adding one is a Foundation decision, not a tidying step. The single barrel outside §3.2 is `source/tests/fixtures/samples.ts` (§12).
 
 ## 4. Naming Conventions
 
@@ -56,13 +57,13 @@ Minimize visual noise. Every naming rule derives from this. Names must be immedi
 
 Each symbol class has one casing convention. All words — regardless of their natural language form — are transformed into the convention for their class. There are no special cases for acronyms, abbreviations, or domain shorthand. The symbol class determines the transformation.
 
-| Symbol class                                             | Convention      | Example                                   |
-| -------------------------------------------------------- | --------------- | ----------------------------------------- |
-| File names                                               | kebab-case      | `job-adapter.ts`, `api-config.ts`         |
-| Types, type aliases, interfaces, classes, const-as-class | PascalCase      | `JobAssessment`, `ApiConfig`, `HttpCodes` |
-| Functions, methods, arrow functions                      | camelCase       | `fromJobAssessment`, `apiClient`          |
-| Global immutable constants                               | SCREAMING_SNAKE | `USER_ROLES`, `ASSET_STATUSES`            |
-| SQL tables and columns                                   | snake_case      | `created_at`, `deleted_at`                |
+| Symbol class                                             | Convention      | Example                                 |
+| -------------------------------------------------------- | --------------- | --------------------------------------- |
+| File names                                               | kebab-case      | `cache-adapter.ts`, `api-config.ts`     |
+| Types, type aliases, interfaces, classes, const-as-class | PascalCase      | `RetryPolicy`, `ApiConfig`, `HttpCodes` |
+| Functions, methods, arrow functions                      | camelCase       | `fromRetryPolicy`, `apiClient`          |
+| Global immutable constants                               | SCREAMING_SNAKE | `LOG_LEVELS`, `HTTP_METHODS`            |
+| SQL tables and columns                                   | snake_case      | `created_at`, `deleted_at`              |
 
 ### 4.3 The acronym corollary
 
@@ -180,10 +181,19 @@ Files with clear categories of declarations and functions divide the code body i
 // ────────────────────────────────────────────────────────────────────────────
 ```
 
-**Examples:**
+**A section label names subject matter, not visibility.** `export` already states visibility, and the `PUBLIC` block in the file header (§6.2) already inventories the exported symbols — a `PUBLIC`/`PRIVATE` body section therefore carries nothing the reader cannot see in the left margin. Label each section for what its code is _about_. Narrow with `PARENT: CHILD` when one file covers a subject at more than one level, and reserve a trailing `IMPLEMENTATION` for supporting machinery that serves every section above it.
 
-- `PUBLIC`
-- `PRIVATE`
+**Example** — `onboarding-stage-sites.tsx`:
+
+```typescript
+// ONBOARDING: CUSTOMER SITES        the stage, and the editor for one site
+// CUSTOMER SITE: NOTES              the editor for one note
+// CUSTOMER SITE: TEXT INPUT FIELDS  the shared labelled-field component
+// IMPLEMENTATION                    factories, label rules, helpers
+```
+
+**Other labels** where the file's categories warrant them:
+
 - `INTERNALS`
 - `PROTOCOLS`
 - `VALIDATORS`
@@ -471,7 +481,7 @@ Makers produce interface conformant implementations. They do not create instance
 
 ## 9. Error Handling
 
-- Throw `Error` with actionable messages: `'Asset dictionary missing required field: id'`.
+- Throw `Error` with actionable messages, for example: `'Asset dictionary missing required field: id'`.
 - Never swallow errors silently.
 - Never log and continue — log and throw, or throw without logging.
 - Never expose stack traces or internal state in HTTP responses.
