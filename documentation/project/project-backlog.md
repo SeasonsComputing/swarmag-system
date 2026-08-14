@@ -57,4 +57,85 @@ One trap for whoever builds it: `--sa-icon` is declared in `icons.css` and is a 
 binding rather than a provider token, so a guard that scans only the three provider files
 reports it as undefined. It is legitimate and must be included.
 
+### No guard enforces conformity to established conventions
+
+**Observed:** 2026-08-14 — low priority.
+
+Convention documented in a governing document reaches a human reviewer. It reaches a
+generative implementer only if the alternative is unavailable, because a model reaches for
+its prior rather than for the last instance in the tree. `guard-bare-html` does this for
+native elements that have control replacements; nothing does it for anything established in
+review.
+
+Full component-first enforcement over compositions is probably not mechanizable. Two
+narrower checks are, and both have specimens from the 2026-08-13 job-sites production:
+
+**Dataset key against stylesheet rule, bidirectionally.** Every `data-{layer}='name'`
+emitted in TSX should have a rule in the owning stylesheet, and every such rule should have
+an emitter. `CollectionEditor` emitted `data-shell-selected` on every row with no rule
+anywhere in the tree, so a selected state was plumbed and invisible. The reverse also
+occurs: a `data-app` cascade outliving the markup it styled. Neither condition is an error
+to any current check.
+
+**A local type structurally shadowing a domain abstraction.** `OnboardingSite` restated
+`CustomerSite` with `Location[]` and `Note[]` in place of `CompositionOne` and
+`CompositionMany`, discarding cardinality — a domain-invariant violation
+(`domain-model.md` §3.9). Mutable arrays are assignable to readonly ones, so the fork
+type-checked and all thirteen guards passed. The check is mechanical: compare the
+member-name set of every type declared under `source/front` or `source/back` against the
+exported abstractions in `source/domain`, and fail on an exact match.
+
+## Controls
+
+### Full-disclosure surfaces do not indicate the selected row
+
+**Observed:** 2026-08-14
+
+`AbstractionManager` shows its index and subject panels together above its 676px
+container threshold, so a user editing the fourth record has the entire list on screen
+with nothing marking which row is open. Below the threshold `mode` swaps the panels and
+the question does not arise. Above it, the reader loses their place in a long list.
+
+There is no state to style: `UiTableRow` renders a bare `<tr>` and forwards native
+attributes only. The fix belongs in the catalog rather than in the manager — a selected
+state on `UiTableRow` that any surface showing a list beside its subject opts into.
+
+One note for whoever builds it: this is a property of full-disclosure surfaces, not of
+lists. `CollectionEditor` exhibited the same defect while it rendered its editor inline,
+and the drill-down rework removes it structurally by never showing a row beside its own
+editor. Selective-disclosure surfaces need nothing here.
+
+## Design Language
+
+### `ux-design-language.md` has no UX archetypes section
+
+**Observed:** 2026-08-14
+
+Composition rules — how an application assembles controls into a user interface — have no
+home. `ux-components-guide.md` is a catalog of available components and their intended
+usage, and must not prescribe composition. The design language owns normative UX language
+and interaction patterns, and carries no archetypes.
+
+The consequence is already in the tree. A composition rule leaked into the components
+guide's component-first table as `UiCollectionCursor` versus "ad hoc
+list-plus-capture-form," and went stale the moment the job-sites surface adopted a
+drill-down instead. A useful test for whoever writes the section: if a design decision can
+falsify a row in the catalog, that row was an archetype rule in the wrong document.
+
+Rules currently orphaned, to be captured when the section is written:
+
+- **List management** — list/edit selective disclosure, composed from `CollectionEditor`.
+- **Full disclosure versus selective disclosure** — whether a surface shows a list beside
+  its subject or swaps between them. This is a property of the surface, not of the list.
+  The workbench affords two panes at its scale and carries the size and collapse rules
+  that make that work; nested frames do not inherit that machinery.
+- **A list is a list at every level** — depth changes nothing about a list's appearance or
+  behaviour, which is what lets a user who has learned one list predict every other.
+- **Columnar layout of the manager edit panel.**
+- **Form actions at the top of a form**, never trailing it.
+
+The section stays inert for feature work until `AGENTS.md` §1.1 lists
+`ux-design-language.md` as seed context for the Application features category; that row
+currently carries the components guide alone.
+
 _End of Backlog_
