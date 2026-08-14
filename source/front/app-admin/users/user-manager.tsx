@@ -10,7 +10,7 @@ import { api } from '@front/api/api.ts'
 import { type UserDraft, UserEditor } from '@front/app-admin/users/user-manager-editor.tsx'
 import type { AbstractionManagerContract } from '@front/ux/shell/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@front/ux/shell/abstraction-manager.tsx'
-import { labelFromKebabCase, UiAlert, type UiComponent, UiLayout, UiTableCell } from '@front/ux/ui'
+import { UiAlert, type UiComponent, UiLayout, UiTableCell, UiText } from '@front/ux/ui'
 import { For, Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 
@@ -105,7 +105,7 @@ function UserListCells(props: { user: User }): UiComponent {
               {(role, index) => (
                 <>
                   {index() > 0 ? ', ' : ''}
-                  <span data-app='user-list-role'>{labelFromKebabCase(role)}</span>
+                  <span data-app='user-list-role'>{UiText.label(role)}</span>
                 </>
               )}
             </For>
@@ -115,10 +115,10 @@ function UserListCells(props: { user: User }): UiComponent {
       <UiTableCell>
         <span data-app='user-status-pill' data-app-status={props.user.status}>
           <span
-            aria-label={labelFromKebabCase(props.user.status)}
+            aria-label={UiText.label(props.user.status)}
             data-app='user-status'
             role='img'
-            title={labelFromKebabCase(props.user.status)}
+            title={UiText.label(props.user.status)}
           />
         </span>
       </UiTableCell>
