@@ -411,8 +411,12 @@ UiTable
 Key props:
 
 - `UiTable`: `name`, `overflow`
-- `UiTableRow`: `variant='section'`
+- `UiTableRow`: `variant='section'`, `onActivate`
 - `UiTableCell`: `align='start' | 'center' | 'end'`
+
+`onActivate` makes a row interactive: focusable, with a focus ring, activating on
+click, Enter, and Space. Without it the row is read-only and has no hover
+treatment.
 
 ### 5.4 UiFooter
 

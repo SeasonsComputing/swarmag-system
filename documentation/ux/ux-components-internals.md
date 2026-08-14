@@ -158,15 +158,16 @@ Variants are only valid where explicitly declared.
 
 Controls and parts may additionally declare these extension attributes:
 
-| Control / Part    | Attribute          | Declared Values              |
-| ----------------- | ------------------ | ---------------------------- |
-| `action-button`   | `data-ui-align`    | `start`, `end`               |
-| `action-button`   | `data-ui-icon`     | Any `icons.css` catalog name |
-| `layout`          | `data-ui-gap`      | `loose`, `tight`, `none`     |
-| `tab-list`        | `data-ui-drag`     | `enabled`, `active`          |
-| `tab-list`        | `data-ui-layout`   | `between`                    |
-| `table-cell`      | `data-ui-align`    | `start`, `center`, `end`     |
-| `table-container` | `data-ui-overflow` | `hidden`, `scroll`           |
+| Control / Part    | Attribute             | Declared Values                       |
+| ----------------- | --------------------- | ------------------------------------- |
+| `action-button`   | `data-ui-align`       | `start`, `end`                        |
+| `action-button`   | `data-ui-icon`        | Any `icons.css` catalog name          |
+| `layout`          | `data-ui-gap`         | `loose`, `tight`, `none`              |
+| `tab-list`        | `data-ui-drag`        | `enabled`, `active`                   |
+| `tab-list`        | `data-ui-layout`      | `between`                             |
+| `table-cell`      | `data-ui-align`       | `start`, `center`, `end`              |
+| `table-container` | `data-ui-overflow`    | `hidden`, `scroll`                    |
+| `table-row`       | `data-ui-interactive` | Presence only — emitted, never valued |
 
 Rules:
 
@@ -268,9 +269,13 @@ data-ui-variant
 data-ui-gap
 data-ui-icon
 data-ui-align
+data-ui-interactive
 data-ui-overflow
 data-ui-state
 ```
+
+`data-ui-interactive` is a presence attribute: a control emits it bare or not at
+all. `[data-ui-interactive]` is the only valid selector form for it.
 
 Underlying primitives emit ARIA and library-specific state attributes. `ui.css`
 may consume Kobalte and ARIA runtime attributes when they represent real primitive
