@@ -1,6 +1,6 @@
 <img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
-# swarmAg Operations System - Component Guide Lite
+# swarmAg Operations System — Component Guide Lite
 
 ## 1. Purpose
 

@@ -1,6 +1,6 @@
 <img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
-# swarmAg Operations System – User Stories
+# swarmAg Operations System — User Stories
 
 ## 1. Customer Relationship Management
 
