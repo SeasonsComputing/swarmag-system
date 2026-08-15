@@ -272,7 +272,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
                     <For each={props.provider.list()}>
                       {item => (
                         // The row itself opens the editor — no edit action.
-                        <UiTableRow onClick={() => onSelect(item)}>
+                        <UiTableRow onActivate={() => onSelect(item)}>
                           {props.provider.renderListCells(item)}
                           <UiTableCell align='end'>
                             <For each={props.provider.actions}>
