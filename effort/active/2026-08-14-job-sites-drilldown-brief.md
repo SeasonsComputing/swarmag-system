@@ -64,13 +64,20 @@ At rest, depth 0:
 
 ```
 ┌─ Sites ──────────────────────────────── ⊕ New site ─┐
-│                                                      │
+│  Site                                       Actions  │
+│  ──────────────────────────────────────────────────  │
 │   South pasture                                  🗑  │
 │   North forty                                    🗑  │
 │   Untitled site                                  🗑  │   fixed height,
 │                                                      │   body scrolls
 └──────────────────────────────────────────────────────┘
 ```
+
+The legend is the frame's title and **New stays on the frame**, mirroring
+`AbstractionManager`, which puts its title and its New action in the panel header
+and reserves the table header for columns. Do not move New into the table header:
+that collapses two levels into one and leaves a frame-level action sharing a
+column with row-level ones.
 
 Selecting `South pasture` **replaces** that panel:
 
@@ -110,10 +117,10 @@ Empty replaces the rows, never the action:
 └──────────────────────────────────────────────────────┘
 ```
 
-## `Drill` — the interface
+## `DrillContract` — the interface _(new: `ux/shell/drill-contract.ts`)_
 
 ```
-Drill = {
+DrillContract = {
   open: (panel: UiComponent, title: string) => void
 }
 ```
@@ -131,14 +138,12 @@ preference and match STYLE-GUIDE §7.6 and `AbstractionManager`, which passes
 
 ## `DrillDown` — the host _(new: `ux/shell/drill-down.{tsx,css}`)_
 
-> Name provisional. The Chief Architect may rename it.
-
 Owns the surface on which panels appear.
 
 ```
 DrillDownProps
   rootTitle  string                              title of the root panel
-  root       (drill: Drill) => UiComponent       the root panel's content
+  root       (drill: DrillContract) => UiComponent   the root panel's content
 ```
 
 - Holds the **current panel and a return closure**. `open` captures the outgoing
@@ -160,11 +165,12 @@ the mechanism** — the grid overlay, the `translateX` distance, the opacity pai
 `--sa-transition-panel` / `--sa-transition-panel-active`, and the reduced-motion
 branch. Roughly six declarations. Do not attempt to reuse the selectors.
 
-## `CollectionEditor` — the list _(exists; reworked)_
+## `CollectionPanel` — the list _(exists; reworked)_
 
 ```
-CollectionEditor<T>
+CollectionPanel<T>
   legend         string                                  frame legend
+  itemColumn     string                                  header for the label column
   items          () => readonly T[]                      the collection
   label          (item: T, i: number) => string          row label rule
   emptyMessage   string                                  shown when empty
@@ -173,7 +179,7 @@ CollectionEditor<T>
   onRemove       (i: number) => void                     removes at index
   confirmRemove  (item: T, i: number) => { title: string; message: string }
   renderItem     (item: T, i: number) => UiComponent     the item's panel content
-  drill          Drill                                   handed in by the owner
+  drill          DrillContract                           handed in by the owner
 ```
 
 **It holds no state.** No selection signal. It renders a frame, rows, a New
@@ -211,30 +217,41 @@ moves between visits forces the user to re-find it. Derive the height from a
 whole number of rows off `--sa-touch-target-sm`; six rows is the inherited value
 and the count is the Chief Architect's to tune.
 
-**Rows keep the button element and lose the button appearance.** The element is
-what makes a row keyboard-reachable and announced as activatable. The current
-override zeroes five properties and `[data-ui='button']` carries more. Also
-override:
+**Rows are a `UiTable`, not hand-rolled markup.** The current implementation
+builds each row from a de-chromed `UiButton` inside a two-column CSS grid.
+Delete all of it. The table family already carries this exact treatment —
+`[data-ui='table-row'][data-ui-interactive]:hover`, an end-aligned action cell
+rule (`[data-ui='table-cell'][data-ui-align='end']:has([data-ui='action-button'])`),
+and buttons inside cells — and it is what `AbstractionManager` uses, so sites,
+notes, and the manager end up on one row idiom.
 
-- `border-radius` — pill corners
-- `min-height` — button-sized row
-- `font-family`, `font-size`, `font-weight` — the `--sa-button-*` family
-- the entire `:hover` rule — `background`, `box-shadow`, and
-  `transform: translateY(-1px)`. The lift is the strongest pushbutton tell.
+```
+UiTable
+├── UiTableHeader → UiTableCell {itemColumn}, UiTableCell align='end' 'Actions'
+└── UiTableBody   → UiTableRow onActivate={…}
+                    ├── UiTableCell  the label
+                    └── UiTableCell align='end'  the delete action
+```
 
-**Restore focus indication.** `outline: none` is present today and must go; the
-override's `box-shadow: none` must not defeat the control's own
-`:focus-visible` ring. A keyboard user must always see which row they are on.
+**Row activation is `UiTableRow onActivate`**, shipped in the preceding brief. It
+makes the row focusable, activates on click, Enter, and Space, guards against
+key events from its own descendants, and emits `data-ui-interactive` for the
+hover and focus treatments. **Do not add a button, a `tabIndex`, a `role`, or a
+key handler of your own** — the control owns all of it, and the no-role decision
+there was weighed and settled.
 
-> This override is interim. Un-styling a catalog control from outside means every
-> property `UiButton` later gains leaks back in. The durable fix is a bare/inline
-> `UiButton` variant in `ux/ui`, which is **out of scope here** and needs its own
-> gate. Do not add it.
+**Write no row CSS.** Hover, focus ring, and action-cell alignment come from
+`ui.css`. `collection-panel.css` styles the frame and nothing about rows.
+
+> `data-ui-interactive` is **not** in `guard-css`'s `ALLOWED_DATA_ATTRIBUTES`, so
+> a shell stylesheet selecting it fails `guard:css`. You will not need to — the
+> treatment already lives in `ui.css`. If you believe you do, stop and report;
+> that list is a guard rule and changing it is the Chief Architect's call.
 
 **Also remove:** the hardcoded `'Empty item'` fallback (the label rule is the
 consumer's), the `data-shell-selected` attribute (no row is on screen while its
 panel is open, so there is no selected state), the inert transition on
-`collection-editor-editor`, and the unbounded `overflow: auto`.
+`collection-panel-editor`, and the unbounded `overflow: auto`.
 
 ## Wiring
 
@@ -242,7 +259,7 @@ panel is open, so there is no selected state), the inert transition on
 <DrillDown
   rootTitle='Sites'
   root={drill => (
-    <CollectionEditor
+    <CollectionPanel
       legend='Sites'
       items={state.sites}
       label={siteName}
@@ -261,18 +278,18 @@ panel is open, so there is no selected state), the inert transition on
 />
 ```
 
-`SiteEditor` passes the same `drill` to its notes `CollectionEditor`. One prop,
+`SiteEditor` passes the same `drill` to its notes `CollectionPanel`. One prop,
 one boundary crossed, nothing hidden at the call site.
 
 ## `onboarding-stage-sites.tsx` — repairs
 
-| # | Repair                                                                                                                                                                                                                                                                                                          |
-| - | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | Mount `DrillDown` as the stage root; thread `drill` to the notes collection.                                                                                                                                                                                                                                    |
-| 2 | `siteLocation` becomes `demandOne(site.location)` from `@core/std`. Drop `?? {}` — it defends against an empty array `CompositionOne` forbids (§3.3, §7.3).                                                                                                                                                     |
-| 3 | `onboarding-coords-group` declares three grid columns and now holds four children, so acreage wraps to a second row under latitude. Fix the template.                                                                                                                                                           |
-| 4 | Latitude and longitude cannot accept a decimal point: `numberValue`/`numberText` round-trip strips a trailing `.`, so `40.7` is untypeable. Commit numeric fields on `change` rather than `onInput` so intermediate text survives. If that proves insufficient, stop and report rather than inventing a parser. |
-| 5 | `noteName` returns `''` for empty content; the empty-note label belongs here, not in shell.                                                                                                                                                                                                                     |
+| # | Repair                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| - | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1 | Mount `DrillDown` as the stage root; thread `drill` to the notes collection.                                                                                                                                                                                                                                                                                                                                                                     |
+| 2 | `siteLocation` becomes `demandOne(site.location)` from `@core/std`. Drop `?? {}` — it defends against an empty array `CompositionOne` forbids (§3.3, §7.3).                                                                                                                                                                                                                                                                                      |
+| 3 | `onboarding-coords-group` declares three grid columns and now holds four children, so acreage wraps to a second row under latitude. Fix the template.                                                                                                                                                                                                                                                                                            |
+| 4 | Latitude, longitude, and acreage cannot accept a decimal point: the `UiText.number`/`UiText.from` round-trip strips a trailing `.` on every keystroke, so `40.7` is untypeable. **Do not change `UiText`** — the converters are correct and their JSDoc already states this. Commit numeric fields on `change` rather than `onInput` so intermediate text survives. If that proves insufficient, stop and report rather than inventing a parser. |
+| 5 | `noteName` returns `''` for empty content; the empty-note label belongs here, not in shell.                                                                                                                                                                                                                                                                                                                                                      |
 
 ## Not deferred
 
@@ -310,12 +327,19 @@ by hand and report each result:
 6. Add rows past the frame's height — the frame does not grow; the body scrolls.
 7. Type `40.7` into **Latitude** — the decimal point survives.
 8. Tab through the rows — the focused row is visibly indicated.
-9. Click a row's delete — a confirmation appears and the row does not activate.
+9. Press **Enter** on a focused row — its panel opens, the same as a click.
+10. Press **Space** on a focused row — its panel opens and the page does not scroll.
+11. Tab to a row's delete and press **Enter** — the confirmation appears and the
+    row's panel does **not** open.
+12. Click a row's delete — a confirmation appears and the row does not activate.
 
 ## Scope
 
-**In:** `source/front/ux/shell/drill-down.{tsx,css}` (new),
-`source/front/ux/shell/collection-editor.{tsx,css}`,
+**In:** `source/front/ux/shell/drill-contract.ts` (new),
+`source/front/ux/shell/drill-down.{tsx,css}` (new),
+`source/front/ux/shell/collection-panel.{tsx,css}` (**renamed** from
+`collection-editor.{tsx,css}`; rename the files, the component, and the
+`data-shell` values together — leave no `collection-editor` anywhere),
 `source/front/app-admin/onboarding/onboarding-stage-sites.tsx`,
 `source/front/app-admin/onboarding/onboarding.css`.
 
