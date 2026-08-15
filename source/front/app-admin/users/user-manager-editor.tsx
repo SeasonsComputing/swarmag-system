@@ -34,7 +34,6 @@ import { useAbstractionFormFeedback } from '@front/ux/shell/use-abstraction-form
 import { useAbstractionFormKeyboard } from '@front/ux/shell/use-abstraction-form-keyboard.ts'
 import { useAbstractionFormValidation } from '@front/ux/shell/use-abstraction-form-validation.ts'
 import {
-  labelFromKebabCase,
   type UiComponent,
   UiField,
   UiFieldset,
@@ -42,6 +41,7 @@ import {
   UiLayout,
   UiMultiSelect,
   UiSingleSelect,
+  UiText,
   UiTextArea,
   UiToggleGroup,
   UiToggleItem
@@ -101,18 +101,18 @@ export function UserEditor(props: {
 
   //
   // Value Projections:
-  // - preferredChannelOptions: Preferred channel options -> labelFromKebabCase
-  // - roleOptions: Role options -> labelFromKebabCase
+  // - preferredChannelOptions: Preferred channel options -> UiText.label
+  // - roleOptions: Role options -> UiText.label
   // - nextNotes: Flattened into text
   //
 
   const preferredChannelOptions = CONTACT_PREFERRED_CHANNELS.map(value => ({
     value,
-    label: labelFromKebabCase(value)
+    label: UiText.label(value)
   }))
   const roleOptions = USER_ROLES.map(value => ({
     value,
-    label: labelFromKebabCase(value)
+    label: UiText.label(value)
   }))
   const nextNotes = (existingNotes: readonly Note[]): Note[] => {
     const content = notesText().trim()
@@ -240,7 +240,7 @@ export function UserEditor(props: {
                 <For each={USER_STATUSES}>
                   {value => (
                     <UiToggleItem value={value}>
-                      <span data-app='user-option-label'>{labelFromKebabCase(value)}</span>
+                      <span data-app='user-option-label'>{UiText.label(value)}</span>
                     </UiToggleItem>
                   )}
                 </For>
