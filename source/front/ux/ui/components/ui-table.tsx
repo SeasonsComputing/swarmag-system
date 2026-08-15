@@ -13,7 +13,7 @@ PUBLIC
 UiTable        Table root — optionally wraps <table> in an overflow container.
 UiTableHeader  Header row — renders <thead><tr>; children become <th>.
 UiTableBody    Body section — renders <tbody>.
-UiTableRow     Body row — renders <tr>. variant='section' for group-header rows.
+UiTableRow     Body row — renders <tr>. variant='section'; onActivate makes it interactive.
 UiTableCell    Cell — renders <th> inside UiTableHeader, <td> elsewhere. Accepts align prop.
 */
 
@@ -86,14 +86,17 @@ export type UiTableRowProps =
     | 'role'
     | 'data-ui'
     | 'data-ui-variant'
+    | 'data-ui-interactive'
   >
   & {
     variant?: 'section'
+    onActivate?: () => void
     class?: never
     classList?: never
     style?: never
     'data-ui'?: never
     'data-ui-variant'?: never
+    'data-ui-interactive'?: never
   }
 
 /** UiTableCell props. */
@@ -166,22 +169,44 @@ export const UiTableBody = (props: UiTableBodyProps): UiComponent => {
   return <tbody {...others} data-ui='table-body' />
 }
 
-/** Body row. Use variant='section' for a group-header row. */
+/**
+ * Body row. Use variant='section' for a group-header row.
+ *
+ * An `onActivate` row is focusable and activates on click, Enter, and Space; it
+ * emits `data-ui-interactive` for CSS. The element stays a plain `<tr>` with no
+ * role change, so row and column context survives for assistive technology.
+ */
 export const UiTableRow = (props: UiTableRowProps): UiComponent => {
   const [local, others] = splitProps(props, [
     'variant',
+    'onActivate',
     'class',
     'classList',
     'style',
     'data-ui',
-    'data-ui-variant'
+    'data-ui-variant',
+    'data-ui-interactive'
   ])
+  const interactive = (): boolean => local.onActivate !== undefined
+  const activate = (): void => local.onActivate?.()
+  // A row carries action buttons: a keydown from a descendant belongs to that
+  // control, not to the row. Space scrolls the page unless its default is taken.
+  const activateOnKey: JSX.EventHandler<HTMLTableRowElement, KeyboardEvent> = event => {
+    if (event.target !== event.currentTarget) return
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    if (event.key === ' ') event.preventDefault()
+    activate()
+  }
   return (
     <TableSectionCtx.Provider value={local.variant === 'section'}>
       <tr
         {...others}
         data-ui='table-row'
         data-ui-variant={local.variant}
+        data-ui-interactive={interactive() ? '' : undefined}
+        tabIndex={interactive() ? 0 : undefined}
+        onClick={interactive() ? activate : undefined}
+        onKeyDown={interactive() ? activateOnKey : undefined}
       />
     </TableSectionCtx.Provider>
   )
