@@ -117,10 +117,28 @@ Empty replaces the rows, never the action:
 └──────────────────────────────────────────────────────┘
 ```
 
+## The five artifacts, and what kind each one is
+
+This table fixes the kind of each one. A props type is a data shape and a
+contract is implemented, per STYLE-GUIDE §2; `AbstractionManager` is the
+precedent for all three. The blocks further down give shape and intent — their
+alignment is for reading, not syntax.
+
+| Artifact                  | Kind                       | File                               |
+| ------------------------- | -------------------------- | ---------------------------------- |
+| `DrillContract`           | `export interface`         | `ux/shell/drill-contract.ts` (new) |
+| `DrillDownProps`          | `export type`              | `ux/shell/drill-down.tsx` (new)    |
+| `DrillDown`               | `export const` — component | `ux/shell/drill-down.tsx` (new)    |
+| `CollectionPanelProps<T>` | `export type`              | `ux/shell/collection-panel.tsx`    |
+| `CollectionPanel`         | `export const` — component | `ux/shell/collection-panel.tsx`    |
+
+The generic belongs on the props type and on the component, never on a bare
+name: `export const CollectionPanel = <T,>(props: CollectionPanelProps<T>): UiComponent`.
+
 ## `DrillContract` — the interface _(new: `ux/shell/drill-contract.ts`)_
 
 ```
-DrillContract = {
+interface DrillContract {
   open: (panel: UiComponent, title: string) => void
 }
 ```
@@ -136,12 +154,12 @@ shoehorned into a context and the context was removed; props are the standing
 preference and match STYLE-GUIDE §7.6 and `AbstractionManager`, which passes
 `renderForm` its context object as an argument.
 
-## `DrillDown` — the host _(new: `ux/shell/drill-down.{tsx,css}`)_
+## `DrillDown` — the host component _(new: `ux/shell/drill-down.{tsx,css}`)_
 
 Owns the surface on which panels appear.
 
 ```
-DrillDownProps
+type DrillDownProps
   rootTitle  string                              title of the root panel
   root       (drill: DrillContract) => UiComponent   the root panel's content
 ```
@@ -165,10 +183,10 @@ the mechanism** — the grid overlay, the `translateX` distance, the opacity pai
 `--sa-transition-panel` / `--sa-transition-panel-active`, and the reduced-motion
 branch. Roughly six declarations. Do not attempt to reuse the selectors.
 
-## `CollectionPanel` — the list _(exists; reworked)_
+## `CollectionPanel` — the component _(renamed from `CollectionEditor`, reworked)_
 
 ```
-CollectionPanel<T>
+type CollectionPanelProps<T>
   legend         string                                  frame legend
   itemColumn     string                                  header for the label column
   items          () => readonly T[]                      the collection
