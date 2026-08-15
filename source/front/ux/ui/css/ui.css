@@ -616,13 +616,18 @@
   z-index: var(--sa-z-raised);
 }
 
-[data-ui='table-row']:hover {
+/* Hover advertises activation, so only an interactive row earns it. */
+[data-ui='table-row'][data-ui-interactive]:hover {
   background: var(--sa-bg-hover);
 }
 
 [data-ui='table-head'] [data-ui='table-row']:hover,
 [data-ui='table-row'][data-ui-variant='section']:hover {
   background: transparent;
+}
+
+[data-ui='table-row'][data-ui-interactive]:focus-visible {
+  box-shadow: var(--sa-focus-ring);
 }
 
 [data-ui='table-cell'] {
