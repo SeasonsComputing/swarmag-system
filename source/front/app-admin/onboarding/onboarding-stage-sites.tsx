@@ -26,6 +26,7 @@ import {
   UiFieldset,
   UiInput,
   UiLayout,
+  UiText,
   UiTextArea
 } from '@front/ux/ui'
 import type { OnboardingState } from './onboarding-state.ts'
@@ -102,7 +103,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           onValue={value =>
             updateLocation(props.state, props.index, location => ({
               ...location,
-              line1: optionalText(value)
+              line1: UiText.optional(value)
             }))}
         />
         <SiteTextInput
@@ -113,7 +114,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           onValue={value =>
             updateLocation(props.state, props.index, location => ({
               ...location,
-              line2: optionalText(value)
+              line2: UiText.optional(value)
             }))}
         />
         <UiLayout variant='inline-wrap'>
@@ -125,7 +126,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
             onValue={value =>
               updateLocation(props.state, props.index, location => ({
                 ...location,
-                city: optionalText(value)
+                city: UiText.optional(value)
               }))}
           />
           <SiteTextInput
@@ -136,7 +137,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
             onValue={value =>
               updateLocation(props.state, props.index, location => ({
                 ...location,
-                state: optionalText(value)
+                state: UiText.optional(value)
               }))}
           />
           <SiteTextInput
@@ -147,7 +148,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
             onValue={value =>
               updateLocation(props.state, props.index, location => ({
                 ...location,
-                postalCode: optionalText(value)
+                postalCode: UiText.optional(value)
               }))}
           />
         </UiLayout>
@@ -159,7 +160,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           onValue={value =>
             updateLocation(props.state, props.index, location => ({
               ...location,
-              country: optionalText(value)
+              country: UiText.optional(value)
             }))}
         />
       </UiLayout>
@@ -170,24 +171,24 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           index={props.index}
           name='siteLatitude'
           label='Latitude'
-          value={numberText(siteLocation(props.site).latitude)}
+          value={UiText.from(siteLocation(props.site).latitude)}
           placeholder='e.g., 40.7128'
           onValue={value =>
             updateLocation(props.state, props.index, location => ({
               ...location,
-              latitude: numberValue(value)
+              latitude: UiText.number(value)
             }))}
         />
         <SiteTextInput
           index={props.index}
           name='siteLongitude'
           label='Longitude'
-          value={numberText(siteLocation(props.site).longitude)}
+          value={UiText.from(siteLocation(props.site).longitude)}
           placeholder='e.g., -74.0060'
           onValue={value =>
             updateLocation(props.state, props.index, location => ({
               ...location,
-              longitude: numberValue(value)
+              longitude: UiText.number(value)
             }))}
         />
         <UiActionButton
@@ -201,9 +202,9 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           name='siteAcreage'
           label='Acreage'
           type='number'
-          value={numberText(props.site.acreage)}
+          value={UiText.from(props.site.acreage)}
           onValue={value =>
-            props.state.updateSite(props.index, site => site.acreage = numberValue(value))}
+            props.state.updateSite(props.index, site => site.acreage = UiText.number(value))}
         />
       </div>
     </UiFieldset>
@@ -335,13 +336,4 @@ const useMyLocation = (state: OnboardingState, index: number, hasGeo: boolean): 
       longitude: position.coords.longitude
     }))
   }, () => undefined)
-}
-
-const optionalText = (value: string): string | undefined => value.trim() ? value : undefined
-const numberText = (value: number | undefined): string => value === undefined ? '' : value.toString()
-
-const numberValue = (value: string): number | undefined => {
-  if (!value.trim()) return undefined
-  const number = Number(value)
-  return Number.isFinite(number) ? number : undefined
 }
