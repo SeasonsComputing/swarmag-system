@@ -9,8 +9,15 @@ import { expectEmail, expectNonEmptyString, toEmail } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS, type ContactPreferredChannel } from '@domain/abstractions/common.ts'
 import { useAbstractionFormKeyboard } from '@front/ux/shell/use-abstraction-form-keyboard.ts'
 import { useAbstractionFormValidation } from '@front/ux/shell/use-abstraction-form-validation.ts'
-import { type UiComponent, UiField, UiFieldset, UiInput, UiLayout, UiSingleSelect } from '@front/ux/ui'
-import { labelFromKebabCase } from '@front/ux/ui/components/ui-helpers.ts'
+import {
+  type UiComponent,
+  UiField,
+  UiFieldset,
+  UiInput,
+  UiLayout,
+  UiSingleSelect,
+  UiText
+} from '@front/ux/ui'
 import { onCleanup } from '@solid-js'
 import type { OnboardingState } from './onboarding-state.ts'
 
@@ -70,7 +77,7 @@ export const OnboardingStageContact = (props: OnboardingStageContactProps): UiCo
                 name='preferredChannel'
                 options={CONTACT_PREFERRED_CHANNELS.map(value => ({
                   value,
-                  label: labelFromKebabCase(value)
+                  label: UiText.label(value)
                 }))}
                 value={state.preferredChannel()}
                 onChange={value => state.setPreferredChannel(value as ContactPreferredChannel)}
