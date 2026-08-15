@@ -63,7 +63,7 @@ Reasoning may be shared. Authority is not shared.
 
 ## 3. Roles
 
-### 3.1 Chief Architect (CE)
+### 3.1 Chief Architect (CA)
 
 **The Chief Architect is the final and sole authority over:**
 
