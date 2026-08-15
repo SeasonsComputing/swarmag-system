@@ -15,10 +15,10 @@ import {
   UiFieldset,
   UiInput,
   UiLayout,
+  UiText,
   UiToggleGroup,
   UiToggleItem
 } from '@front/ux/ui'
-import { labelFromKebabCase } from '@front/ux/ui/components/ui-helpers.ts'
 import { For, onCleanup } from '@solid-js'
 import type { OnboardingState } from './onboarding-state.ts'
 
@@ -67,7 +67,7 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
                 <For each={CUSTOMER_STATUSES}>
                   {value => (
                     <UiToggleItem value={value}>
-                      <span>{labelFromKebabCase(value)}</span>
+                      <span>{UiText.label(value)}</span>
                     </UiToggleItem>
                   )}
                 </For>
