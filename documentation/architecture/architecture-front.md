@@ -139,17 +139,11 @@ The following technologies are used as implementation details of system APIs. De
 
 The system includes three SolidJS applications:
 
-| Application  | Purpose                           | Primary Users    |
-| ------------ | --------------------------------- | ---------------- |
-| **Admin**    | Management and configuration      | Leadership staff |
-| **Ops**      | Field execution                   | Operations crews |
-| **Customer** | Scheduling and status (read-only) | Customers        |
-
-All apps use SolidJS + TanStack + Kobalte + Vanilla CSS.
-
-- `ui/components` contains the control catalog backed by Kobalte.
-- `ui/chart` contains the charting catalog backed by Chart.js.
-  Shared infrastructure lives in `source/front/ux/`.
+| Application  | Purpose                       | Primary Users    |
+| ------------ | ----------------------------- | ---------------- |
+| **Admin**    | Management and configuration  | Leadership staff |
+| **Ops**      | Field execution               | Operations crews |
+| **Customer** | Scheduling, status, reporting | Customers        |
 
 ## 7. API Namespace Integration
 
@@ -194,7 +188,7 @@ All entries in `source/front/api/api.ts`:
 
 | Singleton       | Purpose                                                   |
 | --------------- | --------------------------------------------------------- |
-| `api.Users`     | User API; read/list direct, privileged mutations via edge |
+| `api.Users`     | User CRUD via Supabase with Auth synchronization via edge |
 | `api.Assets`    | Asset CRUD via Supabase                                   |
 | `api.Chemicals` | Chemical CRUD via Supabase                                |
 | `api.Customers` | Customer CRUD via Supabase                                |
@@ -390,13 +384,13 @@ shared shell primitive.
 
 All feature work should use an existing UX metaphor when one fits:
 
-| Metaphor                | Purpose                                                                |
-| ----------------------- | ---------------------------------------------------------------------- |
-| **Dashboard**           | Authenticated hub and primary navigation surface                       |
-| **Widget**              | Dashboard surface unit for status, data, and action entry points       |
-| **Abstraction Manager** | Standard domain list/detail management experience                      |
-| **Workflow Manager**    | Guided, sequenced task surface for operational work                    |
-| **Custom Full Device**  | Purpose-built UX when no existing metaphor fits the feature's workflow |
+| Metaphor                | Purpose                                                          |
+| ----------------------- | ---------------------------------------------------------------- |
+| **Dashboard**           | Authenticated hub and primary navigation surface                 |
+| **Widget**              | Dashboard surface unit for status, data, and action entry points |
+| **Abstraction Manager** | Standard domain "collection-detail" management experience        |
+| **Wizard**              | Complex user interface decomposed into a multi-step wizard       |
+| **Job Runner**          | Specialized, sequenced task surface for infield operational work |
 
 #### 9.1.2 Auth Guard
 
