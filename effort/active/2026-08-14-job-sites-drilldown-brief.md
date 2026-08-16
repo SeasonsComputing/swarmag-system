@@ -139,12 +139,20 @@ name: `export const CollectionPanel = <T,>(props: CollectionPanelProps<T>): UiCo
 
 ```
 interface DrillContract {
-  open: (panel: UiComponent, title: string) => void
+  open: (panel: () => UiComponent, title: string) => void
 }
 ```
 
 One method. `title` names the panel being opened; the host retains it to label
 the return control when something opens on top of it.
+
+**`panel` is a thunk, not a constructed element — corrected 2026-08-15.** This
+brief first specified `panel: UiComponent`, which forced the caller to build the
+panel inside its click handler. JSX created in an event handler is constructed
+outside the active Solid owner, so its computations belong to nothing and are
+never disposed. The host takes the closure and runs it under its own captured
+owner instead. The signature is the fix: an interface that accepts a constructed
+value has already decided where construction happens.
 
 No `ascend` — the host renders the return control itself, because it is the only
 thing that knows what it replaced. Do not add one speculatively.
@@ -204,8 +212,8 @@ type CollectionPanelProps<T>
 action, and an empty state, and calls out.
 
 ```
-row activate  →  drill.open(renderItem(item, i), label(item, i))
-New activate  →  onNew(); drill.open(renderItem(last), label(last))
+row activate  →  drill.open(() => renderItem(item, i), label(item, i))
+New activate  →  onNew(); drill.open(() => renderItem(last), label(last))
 ```
 
 `onNew` is synchronous, so the appended item is at `items().length - 1`
