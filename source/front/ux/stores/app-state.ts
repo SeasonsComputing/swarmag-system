@@ -27,6 +27,14 @@ import { createStore } from '@solid-js/store'
 /** Per application preferences state. */
 export type AppStateStore = StringDictionary
 
+/** Contract for the app state singleton and its mutation methods. */
+export interface AppStateContract {
+  store: AppStateStore
+  init: () => Promise<void>
+  set: (key: string, value: string) => Promise<void>
+  clear: () => void
+}
+
 /** Reactive storage */
 const [appStateStore, setAppStateStore] = createStore<AppStateStore>({})
 
@@ -48,11 +56,9 @@ async function setAppStatePreference(key: string, value: string) {
 const clearAppState = () => setAppStateStore({})
 
 /** AppState store singleton */
-const AppState = {
+export const AppState: AppStateContract = {
   store: appStateStore,
   init: initAppState,
   set: setAppStatePreference,
   clear: clearAppState
 }
-
-export { AppState }

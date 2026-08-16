@@ -374,12 +374,10 @@ function toDashboardStoreRow(input: unknown, field: string): DashboardStoreRow {
 // DASHBOARD STATE
 // ───────────────────────────────────────────────────────────────────────────────
 
-const DashboardState: DashboardStateContract = {
+export const DashboardState: DashboardStateContract = {
   store: dashboardStore,
   init: dashboardInit,
   headerWidgets: dashboardHeader,
   rows: dashboardRows,
   rowWidgets: dashboardWidgets
 }
-
-export { DashboardState }
