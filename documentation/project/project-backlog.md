@@ -15,62 +15,69 @@ evidence and where the fix belongs. `##` sections group entries by the layer tha
 work, and a section appears once a second entry needs it. Cite a selector, symbol, or
 document section — never a line number, which rots silently.
 
-## Design Language
+## Documentation
 
-### `ux-design-language.md` has no UX archetypes section
+### `architecture-devops.md` buries what an agent scan needs
 
-**Observed:** 2026-08-14 · high
+**Observed:** 2026-08-16 · normal
 
-Composition rules — how an application assembles controls into a user interface — have no
-home. `ux-components-guide.md` is a catalog of available components and their intended
-usage, and must not prescribe composition. The design language owns normative UX language
-and interaction patterns, and carries no archetypes.
+Fourteen sections across 929 lines, ordered as a manual rather than as context. The map
+is §2 Directory Structure, but the two sections a session actually reaches for —
+Architectural Guards and the `deno.jsonc` task surface — sit six hundred lines below it,
+behind packaging, environment files, the secret registry, and the secret scripts. A
+reader that stops early gets procedure it may not act on and never reaches the rules it
+must obey.
 
-The consequence is already in the tree. A composition rule leaked into the components
-guide's component-first table as `UiCollectionCursor` versus "ad hoc
-list-plus-capture-form", and went stale the moment the job-sites surface adopted a
-drill-down instead. A useful test for whoever writes the section: if a design decision can
-falsify a row in the catalog, that row was an archetype rule in the wrong document.
+The document left the Application features context on 2026-08-15, because Feature Mode is
+forbidden from acting on most of what it describes and a session that genuinely needs it
+reclassifies as DevOps. It is still seeded for DevOps sessions, where the ordering problem
+is live and unaddressed.
 
-Rules currently orphaned, to be captured when the section is written:
+The fix is ordering, not deletion: lead with the map and the constraints, let procedure
+follow. Nothing needs to be removed.
 
-- **Collection drill-down** — selecting an item replaces the panel its list lives in, and
-  drilling back restores it. Composed from `CollectionPanel`, specified in
-  `effort/active/2026-08-14-job-sites-drilldown-brief.md`.
-- **Full disclosure versus selective disclosure** — whether a surface shows a list beside
-  its subject or swaps between them. This is a property of the surface, not of the list.
-  The workbench affords two panes at its scale and carries the size and collapse rules
-  that make that work; nested frames do not inherit that machinery.
-- **A list is a list at every level** — depth changes nothing about a list's appearance or
-  behaviour, which is what lets a user who has learned one list predict every other.
-- **Columnar layout of the manager edit panel.**
-- **Form actions at the top of a form**, never trailing it.
+### `architecture-core.md` is base context and has never been measured for scan cost
 
-`AGENTS.md` §1.1 now lists `ux-design-language.md` as seed context for the Application
-features category, so the section reaches feature work as soon as it is written.
+**Observed:** 2026-08-16 · high
+
+At 1031 lines it is the largest document in the base context, which `AGENTS.md` §1.1
+combines into every topic context — Domain internals, UX internals, Application features,
+and DevOps alike. Base is roughly 1,888 lines and this document is more than half of it,
+so whatever cost it carries is paid by every session in the system.
+
+Nothing establishes which parts of it a session actually reaches for, whether its map is
+front-loaded, or how much is reference bulk that belongs in a document consulted on demand
+rather than seeded.
+
+**This is an analysis task, not a refactor.** Classify the content — what constrains, what
+maps, and what is reference — then decide whether the document reorders, decomposes, or
+gains a compact companion the way `ux-components-guide.md` gained
+`ux-components-guide-lite.md`. That companion is the proven precedent here and names
+itself an AI-ingestion companion in its own opening.
+
+Do not restructure before the analysis is reviewed. This is base context for every
+session, so a wrong cut is felt everywhere at once.
 
 ## Controls
 
-### Full-disclosure surfaces do not indicate the selected row
+### Index-Detail surfaces do not draw the Selection
 
 **Observed:** 2026-08-14 · normal
 
-`AbstractionManager` shows its index and subject panels together above its 676px container
-threshold, so a user editing the fourth record has the entire list on screen with nothing
-marking which row is open. Below the threshold `mode` swaps the panels and the question
-does not arise. Above it, the reader loses their place in a long list.
+`AbstractionManager` shows its index and subject panels together above its container
+threshold, so a user editing the fourth record has the whole Collection on screen with
+nothing marking which Item is open. Below the threshold the panels swap and the question
+does not arise. Above it, the reader loses their place in a long Collection.
+
+Index-Detail is the one archetype that owes a Selection treatment. `ux-design-archetypes.md`
+§2.4 makes a Selection drawable exactly when the Collection stays on screen, which is why
+Collection-Detail needs nothing here and this surface does.
 
 There is no state to style. `UiTableRow` takes `onActivate` and emits
-`data-ui-interactive` when a row is clickable, but nothing expresses selection, and
+`data-ui-interactive` when a row is clickable, but nothing expresses Selection, and
 `data-ui`, `data-ui-variant`, and `data-ui-interactive` are all `never` in its props, so a
 consumer cannot supply one. The fix belongs in the catalog rather than in the manager — a
-selected state on `UiTableRow` that any surface showing a list beside its subject opts
-into.
-
-One note for whoever builds it: this is a property of full-disclosure surfaces, not of
-lists. `CollectionPanel` exhibited the same defect while it rendered its editor inline,
-and the drill-down rework removes it structurally by never showing a row beside its own
-editor. Selective-disclosure surfaces need nothing here.
+selected state on `UiTableRow` that any Index-Detail surface opts into.
 
 ## Shell / Auth
 
