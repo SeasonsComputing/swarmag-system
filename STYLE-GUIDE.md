@@ -183,7 +183,7 @@ Files with clear categories of declarations and functions divide the code body i
 
 **A section label names subject matter, not visibility.** `export` already states visibility, and the `PUBLIC` block in the file header (§6.2) already inventories the exported symbols — a `PUBLIC`/`PRIVATE` body section therefore carries nothing the reader cannot see in the left margin. Label each section for what its code is _about_. Narrow with `PARENT: CHILD` when one file covers a subject at more than one level, and reserve a trailing `IMPLEMENTATION` for supporting machinery that serves every section above it.
 
-**Example** — `onboarding-stage-sites.tsx`:
+**Example**
 
 ```typescript
 // ONBOARDING: CUSTOMER SITES        the stage, and the editor for one site
