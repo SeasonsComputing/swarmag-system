@@ -40,6 +40,15 @@ export type SessionStore = {
   isDataReady: boolean
 }
 
+/** Contract for the session state singleton and its mutation methods. */
+export interface SessionStateContract {
+  store: SessionStore
+  setAuth: (userId: Id) => void
+  setUser: (user: User) => void
+  setReady: () => void
+  clear: () => void
+}
+
 /** Reactive storage */
 const [sessionStore, setSessionStore] = createStore<SessionStore>({
   userId: null,
@@ -74,12 +83,10 @@ const setSessionUser = (user: User): void => setSessionStore('user', user)
 const setDataReady = (): void => setSessionStore('isDataReady', true)
 
 /** Session state store singleton */
-const SessionState = {
+export const SessionState: SessionStateContract = {
   store: sessionStore,
   setAuth: setSessionAuth,
   setUser: setSessionUser,
   setReady: setDataReady,
   clear: clearSession
 }
-
-export { SessionState }
