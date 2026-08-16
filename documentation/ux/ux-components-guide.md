@@ -86,11 +86,17 @@ This is a design-system boundary, not a stylistic preference.
 | `UiTable`                            | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
 | `UiFieldset`                         | `<fieldset>` + `<legend>`                               |
 | `UiField`                            | `<div>` + `<label>` + {control}                         |
-| `UiCollectionCursor`                 | ad hoc list-plus-capture-form                           |
+| `UiCollectionCursor`                 | ad hoc position or paging controls                      |
 | `UiLayout`, `UiFormActions`          | ad hoc layout wrappers                                  |
+| `UiText`                             | hand-rolled label, number, or empty-value text rules    |
 
 This rule keeps typography roles, semantic attributes, theme behavior, spacing,
 state rendering, and accessibility behavior aligned with the design language.
+
+**This table is a catalog, not a composition rule.** It says which control to
+reach for, never how controls assemble into a surface. Composition is owned by
+`ux-design-archetypes.md`; a row here that a design decision could falsify
+belongs in that document instead.
 
 The architecture guard script `guard-bare-html` enforces the native-element
 subset of this boundary for elements that have direct UI control replacements
@@ -152,6 +158,33 @@ attributes or override the emitted attributes. Shell styling uses `data-shell`
 and `data-shell-*`; widget styling uses `data-widget` and `data-widget-*`; and
 app-local styling uses `data-app` and `data-app-*`. These attributes are rooted
 in their owning CSS rather than passed into shared Ui controls.
+
+### 2.8 Text Conversions
+
+`UiText` converts between a control's string value, the value an abstraction
+stores, and the display text derived from either. Use it rather than restating
+these rules locally.
+
+| Member                      | Converts                                                      |
+| --------------------------- | ------------------------------------------------------------- |
+| `optional(value)`           | Blank control text to `undefined`.                            |
+| `number(value)`             | Control text to a number; blank or non-finite to `undefined`. |
+| `label(value)`              | A kebab-case value to display text.                           |
+| `untitled(value, fallback)` | A value with no content to consumer-supplied display text.    |
+| `from(value)`               | A number to control text; `undefined` to blank.               |
+
+```tsx
+<UiTableCell>{UiText.untitled(site.label, 'Untitled site')}</UiTableCell>
+```
+
+`untitled` takes a required `fallback` because the wording belongs to the
+consumer that knows what the value names. The catalog owns the rule; the
+application owns the copy.
+
+`number` and `from` are not safe for a controlled round-trip on every input
+event: read back through `from` and `40.` becomes `40` before the user types
+the next digit, which makes a decimal untypeable. Commit numeric fields on
+`change` rather than `onInput`.
 
 ## 3. Interactive Controls
 

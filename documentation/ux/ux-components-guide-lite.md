@@ -48,11 +48,16 @@ application code must use the shared control.
 | `UiTable`                            | `<table>`, `<thead>`, `<tbody>`, `<tr>`, `<td>`, `<th>` |
 | `UiFieldset`                         | `<fieldset>` and `<legend>`                             |
 | `UiField`                            | ad hoc label/control wrapper                            |
-| `UiCollectionCursor`                 | ad hoc list-plus-capture-form                           |
+| `UiCollectionCursor`                 | ad hoc position or paging controls                      |
 | `UiLayout`, `UiFormActions`          | ad hoc layout wrappers                                  |
+| `UiText`                             | hand-rolled label, number, or empty-value text rules    |
 
 Native headings, paragraphs, and other content elements remain valid when no
 shared UI control owns that semantic role.
+
+**This table is a catalog, not a composition rule.** It says which control to
+reach for, never how controls assemble into a surface. Composition is owned by
+`ux-design-archetypes.md`.
 
 ### 2.3 Styling Boundary
 
@@ -126,6 +131,26 @@ type UiOption = {
 ```
 
 When `label` is omitted, visible text falls back to `value`.
+
+### 2.7 Text Conversions
+
+`UiText` owns conversions between control text, the value an abstraction stores,
+and display text. Do not restate these rules locally.
+
+| Member                      | Converts                                                      |
+| --------------------------- | ------------------------------------------------------------- |
+| `optional(value)`           | Blank control text to `undefined`.                            |
+| `number(value)`             | Control text to a number; blank or non-finite to `undefined`. |
+| `label(value)`              | A kebab-case value to display text.                           |
+| `untitled(value, fallback)` | A value with no content to consumer-supplied display text.    |
+| `from(value)`               | A number to control text; `undefined` to blank.               |
+
+`untitled` requires `fallback`: the catalog owns the rule, the application owns
+the copy — `UiText.untitled(site.label, 'Untitled site')`.
+
+`number` and `from` are unsafe for a controlled round-trip on every input event.
+`40.` becomes `40` before the next keystroke, making a decimal untypeable.
+Commit numeric fields on `change` rather than `onInput`.
 
 ## 3. Interactive Controls
 
