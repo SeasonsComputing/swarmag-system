@@ -58,6 +58,16 @@ itself an AI-ingestion companion in its own opening.
 Do not restructure before the analysis is reviewed. This is base context for every
 session, so a wrong cut is felt everywhere at once.
 
+### Retiring an effort document leaves its cross-references dangling
+
+**Observed:** 2026-08-17 · low
+
+`effort/completed/` carries roughly twenty references to `effort/active/` paths for documents that have since been retired — `2026-08-05-abstraction-manager-handoff.md` still cites `effort/active/2026-08-05-abstraction-manager-brief.md`, for one. The 2026-08-16 retirement of six documents added its own.
+
+This is the same failure class as the `ui.css:554–558` citation that rotted: a path is a location, and locations move. It is deliberate today only by default, not by decision.
+
+Two ways to settle it, and either is fine as long as it is chosen. Retirement rewrites the moved document's own forward references, which keeps links live at the cost of editing a historical record. Or historical links are frozen by design, and the parking lot and backlog say so once so a reader stops treating a dangling path as a defect.
+
 ## Controls
 
 ### HelmWidget action presentation leaks into the action-button primitive
@@ -208,5 +218,15 @@ to any current check.
 type-checked and all thirteen guards passed. The check is mechanical: compare the
 member-name set of every type declared under `source/front` or `source/back` against the
 exported abstractions in `source/domain`, and fail on an exact match.
+
+### `guard:leaf` does not sweep the repository root
+
+**Observed:** 2026-08-17 · normal
+
+`guard:leaf` scans `source/` and `documentation/`, so an empty directory at the repository root is invisible to it. On 2026-08-15 three empty directories were present, each named after a file that a real refactor had deleted months earlier — `source/core/cfg/runtime-provider.ts`, `source/domain/protocols/common-protocol.ts`, and root `supabase-import-map.json`. The guard caught the first two and could not see the third.
+
+The recurrence is the point. Deleted-file paths reappear as empty directories periodically; the Chief Architect counts two or three occurrences. The cause is unidentified — no live code references those names, and the repository's three `Deno.mkdir` calls all take genuine directory paths — so detection is worth more than a theory. Extending the sweep to the repository root catches all of them the moment they appear rather than whenever someone hits a red check.
+
+`rmdir` is the safe removal: it refuses a non-empty directory, so it cannot take anything real with it.
 
 _End of Backlog Document_

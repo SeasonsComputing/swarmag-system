@@ -1,5 +1,10 @@
 # UI Control State Normalization — Production Brief
 
+**Runs second.** `effort/active/2026-08-16-helm-button-boundary-repair-brief.md`
+goes first. Both edit `ui.css` and `ui-action-button.tsx`, so they cannot run in
+parallel, and the Helm repair removes leaked specialization that would otherwise
+be recorded as part of the state model this brief normalizes.
+
 ## What triggered this
 
 While inspecting the onboarding Job Sites panel and Helm action behavior, the
@@ -107,6 +112,12 @@ For each, identify current treatment for:
 Report inconsistencies before mutating files. If the state model requires Chief
 Architect decisions, stop and ask rather than encoding assumptions.
 
+**The audit is a gate, not a preface.** The matrix it produces must be reviewed
+and approved by the Chief Architect before any file is mutated, because it is the
+standard the behavioural verification below is measured against. A production
+that normalizes first and describes afterwards has verified nothing — it has only
+confirmed that the code agrees with itself.
+
 ## Recommended production
 
 Normalize shared control-state styling primarily in:
@@ -200,16 +211,21 @@ Run:
 ```sh
 deno task fmt
 deno task check
-deno task guard:namespaces
 ```
 
-If full `deno task check` is blocked by unrelated existing guard failures, report
-the unrelated failures and run targeted checks on all changed TypeScript files
-plus the relevant guards that can run.
+`deno task check` runs all thirteen guards, `guard:namespaces` among them. The
+tree is green as of 2026-08-17. Report any failure rather than working around it
+or declaring it unrelated.
 
 ## Behavioural verification
 
-Manual browser verification is required. Report each item:
+Manual browser verification is required. Report each item.
+
+**"Coherent" below means "matches the approved state matrix" — not "looks
+consistent to the implementer."** Each item is checked against the artifact
+approved at the audit gate, cell by cell. Without that matrix these items are not
+falsifiable, and an unfalsifiable check is the seam this production would drift
+through.
 
 1. `UiButton` rest, hover, focus-visible, disabled, primary, secondary, and
    danger treatments are coherent.
