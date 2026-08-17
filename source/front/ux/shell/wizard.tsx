@@ -34,9 +34,13 @@ export type WizardProps = {
   onCancel: () => void
 }
 
+/** Direction of travel along the wizard's sequence axis. */
+type WizardDirection = 'forward' | 'backward'
+
 /** The wizard host component. */
 export const Wizard = (props: WizardProps): UiComponent => {
   const [stepIndex, setStepIndex] = createSignal(0)
+  const [direction, setDirection] = createSignal<WizardDirection>('forward')
   const [committing, setCommitting] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
 
@@ -71,6 +75,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
   const back = (): void => {
     if (isFirst() || committing()) return
     setError(null)
+    setDirection('backward')
     setStepIndex(i => i - 1)
   }
 
@@ -102,6 +107,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
       props.onFinish()
       return
     }
+    setDirection('forward')
     setStepIndex(i => i + 1)
   }
 
@@ -200,7 +206,11 @@ export const Wizard = (props: WizardProps): UiComponent => {
         >
           <Show when={stage()} keyed>
             {current => (
-              <div data-shell='wizard-stage' data-shell-step={current.name}>
+              <div
+                data-shell='wizard-stage'
+                data-shell-direction={direction()}
+                data-shell-step={current.name}
+              >
                 {current.render()}
               </div>
             )}

@@ -110,8 +110,15 @@
   justify-content: center;
 }
 
-[data-shell='wizard-stage'] {
-  animation: sa-fade-in var(--sa-motion-page-fade) ease;
+/* The stage element is remounted per step, so the animation runs on mount and
+   needs no timing help. Direction is behaviour: Next enters from the inline end,
+   Back from the inline start. */
+[data-shell='wizard-stage'][data-shell-direction='forward'] {
+  animation: sa-slide-in-end var(--sa-motion-page-fade) ease;
+}
+
+[data-shell='wizard-stage'][data-shell-direction='backward'] {
+  animation: sa-slide-in-start var(--sa-motion-page-fade) ease;
 }
 
 [data-shell='wizard-form-stage-title'] {
@@ -128,7 +135,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  [data-shell='wizard-stage'] {
+  [data-shell='wizard-stage'][data-shell-direction] {
     animation: none;
   }
 }
