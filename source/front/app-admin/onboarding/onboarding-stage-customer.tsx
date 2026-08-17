@@ -85,27 +85,29 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
               label='Unit / Suite'
             />
             <CustomerInput state={state} validation={validation} name='city' label='City' required />
-            <CustomerInput
-              state={state}
-              validation={validation}
-              name='state'
-              label='State / Province'
-              required
-            />
-            <CustomerInput
-              state={state}
-              validation={validation}
-              name='postalCode'
-              label='ZIP / Postal Code'
-              required
-            />
-            <CustomerInput
-              state={state}
-              validation={validation}
-              name='country'
-              label='Country'
-              required
-            />
+            <UiLayout variant='inline-fill'>
+              <CustomerInput
+                state={state}
+                validation={validation}
+                name='state'
+                label='State / Region'
+                required
+              />
+              <CustomerInput
+                state={state}
+                validation={validation}
+                name='postalCode'
+                label='Postal Code'
+                required
+              />
+              <CustomerInput
+                state={state}
+                validation={validation}
+                name='country'
+                label='Country'
+                required
+              />
+            </UiLayout>
           </UiLayout>
         </UiFieldset>
       </UiLayout>

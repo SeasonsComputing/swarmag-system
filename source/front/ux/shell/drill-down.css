@@ -1,0 +1,38 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Drill-down host styles                                                       ║
+║ Directional panel entry for the shared shell drill-down host.                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-shell='drill-down'] {
+  display: grid;
+  gap: var(--sa-space-sm);
+  min-inline-size: 0;
+}
+
+[data-shell='drill-down-return'] {
+  display: flex;
+  justify-content: start;
+}
+
+[data-shell='drill-down-panel'] {
+  min-inline-size: 0;
+}
+
+/* The panel element is remounted per frame, so the animation runs on mount and
+   needs no timing help. Direction is behaviour: descending enters from the
+   inline end, drilling back from the inline start. */
+[data-shell='drill-down'][data-shell-direction='descend'] [data-shell='drill-down-panel'] {
+  animation: sa-slide-in-end var(--sa-motion-page-fade) ease;
+}
+
+[data-shell='drill-down'][data-shell-direction='ascend'] [data-shell='drill-down-panel'] {
+  animation: sa-slide-in-start var(--sa-motion-page-fade) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-shell='drill-down'][data-shell-direction] [data-shell='drill-down-panel'] {
+    animation: none;
+  }
+}

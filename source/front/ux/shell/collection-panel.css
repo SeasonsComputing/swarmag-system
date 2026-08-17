@@ -1,0 +1,42 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Collection panel styles                                                      ║
+║ Frame layout for shared drill-down collection panels.                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-shell='collection-panel'] {
+  min-inline-size: 0;
+}
+
+[data-shell='collection-panel'] [data-ui='fieldset'] {
+  min-inline-size: 0;
+  position: relative;
+}
+
+[data-shell='collection-panel-action'] {
+  background: var(--sa-surface-default);
+  font-size: var(--sa-annotation-font-size);
+  inset-block-start: 0;
+  inset-inline-end: var(--sa-space-sm);
+  padding-inline: var(--sa-space-xs);
+  position: absolute;
+  transform: translateY(-50%);
+}
+
+[data-shell='collection-panel-body'] {
+  block-size: calc(var(--sa-touch-target-sm) * 6);
+  min-inline-size: 0;
+  overflow: auto;
+}
+
+[data-shell='collection-panel-empty'] {
+  color: var(--sa-text-placeholder);
+  margin: 0;
+  padding: var(--sa-space-md);
+}
+
+[data-shell='collection-panel-confirmation'] {
+  display: grid;
+  gap: var(--sa-space-sm);
+}

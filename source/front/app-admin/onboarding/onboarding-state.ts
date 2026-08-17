@@ -13,9 +13,11 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 OnboardingState        Reactive state contract for customer onboarding stages.
 createOnboardingState  Create state for a single customer onboarding flow.
+siteLocation(site)     The site's single location.
 */
 
-import type { ContactPreferredChannel } from '@domain/abstractions/common.ts'
+import { demandOne, when } from '@core/std'
+import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer, CustomerSite } from '@domain/abstractions/customer.ts'
 import type { CustomerStatus } from '@domain/abstractions/customer.ts'
 import { type Accessor, createSignal, type Setter } from '@solid-js'
@@ -50,10 +52,11 @@ export type OnboardingState = {
   customer: Accessor<Customer | null>
   setCustomer: Setter<Customer | null>
   sites: Accessor<CustomerSite[]>
-  addSite: (site: CustomerSite) => void
+  addSite: (site?: CustomerSite) => void
   updateSite: (index: number, update: (site: CustomerSite) => void) => void
   removeSite: (index: number) => void
-  addNote: (sitePosition: number, note: CustomerSite['notes'][number]) => void
+  updateLocation: (index: number, update: (location: Location) => Location) => void
+  addNote: (sitePosition: number, note?: CustomerSite['notes'][number]) => void
   updateNote: (
     sitePosition: number,
     notePosition: number,
@@ -84,7 +87,7 @@ export const createOnboardingState = (): OnboardingState => {
   const [siteStore, setSiteStore] = createStore<CustomerSite[]>([])
 
   const sites = (): CustomerSite[] => siteStore
-  const addSite = (site: CustomerSite): void => {
+  const addSite = (site: CustomerSite = newSite()): void => {
     setSiteStore(siteStore.length, {
       ...site,
       location: [...site.location],
@@ -92,12 +95,16 @@ export const createOnboardingState = (): OnboardingState => {
     })
   }
   const updateSite = (index: number, update: (site: CustomerSite) => void): void => {
-    if (!siteStore[index]) return
     setSiteStore(index, produce(update))
   }
   const removeSite = (index: number): void => setSiteStore(sites => sites.filter((_, i) => i !== index))
-  const addNote = (sitePosition: number, note: CustomerSite['notes'][number]): void => {
-    if (!siteStore[sitePosition]) return
+  const updateLocation = (index: number, update: (location: Location) => Location): void => {
+    updateSite(index, site => site.location = [update(demandOne(site.location))])
+  }
+  const addNote = (
+    sitePosition: number,
+    note: CustomerSite['notes'][number] = newNote()
+  ): void => {
     setSiteStore(sitePosition, 'notes', notes => [...notes, note])
   }
   const updateNote = (
@@ -105,11 +112,9 @@ export const createOnboardingState = (): OnboardingState => {
     notePosition: number,
     update: (note: CustomerSite['notes'][number]) => void
   ): void => {
-    if (!siteStore[sitePosition]?.notes[notePosition]) return
     setSiteStore(sitePosition, produce(site => update(site.notes[notePosition])))
   }
   const removeNote = (sitePosition: number, notePosition: number): void => {
-    if (!siteStore[sitePosition]) return
     setSiteStore(sitePosition, 'notes', notes => notes.filter((_, i) => i !== notePosition))
   }
 
@@ -144,8 +149,28 @@ export const createOnboardingState = (): OnboardingState => {
     addSite,
     updateSite,
     removeSite,
+    updateLocation,
     addNote,
     updateNote,
     removeNote
   }
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// FACTORIES AND ACCESSORS
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Produces an empty customer site satisfying the domain's cardinality rules. */
+const newSite = (): CustomerSite => ({ label: '', location: [{}], notes: [] })
+
+/** Produces an empty internal note with every field the domain requires. */
+const newNote = (): Note => ({
+  attachments: [],
+  createdAt: when(),
+  content: '',
+  visibility: 'internal',
+  tags: []
+})
+
+/** Reads the site's single location. */
+export const siteLocation = (site: CustomerSite): Location => demandOne(site.location)

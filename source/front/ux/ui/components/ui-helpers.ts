@@ -8,7 +8,8 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Holds the semantics every control shares — component and prop shapes, control
 state, option display — alongside the text conversions consumers apply between
-a control's string value and the value an abstraction stores.
+a control's string value, the value an abstraction stores, and the display text
+derived from either.
 
 CONTROL SEMANTICS
 ───────────────────────────────────────────────────────────────────────────────
@@ -24,10 +25,11 @@ uiOptionLabel(o)     Display text for a UiOption.
 
 TEXT CONVERSION
 ───────────────────────────────────────────────────────────────────────────────
-UiText               Text conversions for control values.
+UiText               Text conversions for control values and display text.
 ├ optional           Blank text to undefined.
 ├ number             Text to number.
 ├ label              kebab-case to display text.
+├ untitled           Blank value to a consumer-supplied label.
 └ from               Number to text.
 */
 
@@ -105,6 +107,19 @@ const label = (value: string): string =>
     .join(' ')
 
 /**
+ * Produces display text for a value that may carry no content.
+ *
+ * The rule is shared; the copy is not. `fallback` is required so the wording
+ * stays with the consumer that knows what the value names — a default here
+ * would put application copy in the catalog.
+ *
+ * @param value The value's own text, which may be blank or whitespace.
+ * @param fallback Display text for a value with no content.
+ * @returns The trimmed value, or the fallback when it carries none.
+ */
+const untitled = (value: string, fallback: string): string => value.trim() || fallback
+
+/**
  * Produces control text from a number; undefined becomes blank text.
  *
  * Not safe for a controlled round-trip on every input event: pair with `number`
@@ -116,10 +131,11 @@ const label = (value: string): string =>
  */
 const from = (value: number | undefined): string => value === undefined ? '' : value.toString()
 
-/** Text conversions between a control's string value and the value it carries. */
+/** Text conversions for a control's string value and the display text derived from it. */
 export const UiText = {
   optional,
   number,
   label,
+  untitled,
   from
 }
