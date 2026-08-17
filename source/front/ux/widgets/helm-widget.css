@@ -28,10 +28,6 @@
     column-gap: var(--sa-rhythm-gap);
   }
 
-  [data-widget='helm-widget'] [data-ui='action-button'] {
-    color: var(--sa-color-primary);
-  }
-
   [data-widget='helm-widget'] [data-ui='action-button'] [data-ui='action-button-label'] {
     display: none;
   }
@@ -48,13 +44,5 @@
   [data-widget='helm-widget'] [data-ui='layout'] {
     flex-wrap: nowrap;
     width: fit-content;
-  }
-
-  [data-widget='helm-widget'] [data-ui-density='dense']:hover [data-ui='action-button-label'] {
-    display: none;
-  }
-
-  [data-widget='helm-widget'] [data-ui-density='dense']:focus-visible [data-ui='action-button-label'] {
-    display: none;
   }
 }
