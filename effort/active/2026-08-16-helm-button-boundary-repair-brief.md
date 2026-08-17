@@ -1,5 +1,12 @@
 # Helm Button Boundary Repair — Production Brief
 
+**Runs first.** This brief and
+`effort/active/2026-08-16-ui-control-state-normalization-brief.md` both edit
+`ui.css` and `ui-action-button.tsx`, so they cannot run in parallel. This one goes
+first: it removes the leaked Helm specialization, so the state audit that follows
+inspects a clean primitive rather than recording a state model this repair then
+changes.
+
 ## What triggered this
 
 The immediate symptom was observed in the dashboard header's terminal HelmWidget
@@ -142,31 +149,29 @@ Expected outcome:
 - No stacked-header rule targets action-button labels or HelmButton labels.
 - No hover/focus rule changes label display.
 
-## Acceptable implementation shapes
+## Implementation shape — decided, not offered
 
-Two implementation paths are acceptable. Prefer the one that leaves the cleanest
-boundary after inspection.
-
-### Option A — HelmButton owns markup
-
-`HelmButton` renders its own button structure and CSS under `data-widget` or
-another widget-owned selector. It does not reuse `UiActionButton`.
-
-Use this if Helm's behavior is sufficiently distinct that reusing
-`UiActionButton` would keep leaking widget concerns into `ux/ui`.
-
-### Option B — HelmButton wraps explicit UiActionButton presentations
-
-`HelmButton` may use `UiActionButton` internally if it renders explicit
-presentations rather than overriding internal parts:
+`HelmButton` wraps `UiActionButton` and renders **explicit presentations** rather
+than overriding internal parts:
 
 - labeled presentation uses `labelMode='visible'`;
 - icon-only presentation uses `labelMode='hidden'`;
 - Helm CSS switches between the two at Helm's labeled-action threshold.
 
-This duplicates a small amount of markup but keeps `UiActionButton` honest:
+This duplicates a small amount of markup and keeps `UiActionButton` honest:
 `labelMode` means exactly what it says, and no consumer mutates internal label
 parts.
+
+The alternative considered was `HelmButton` rendering its own button structure
+under a widget-owned selector, reusing nothing. It was rejected because it
+duplicates primitive behavior — focus ring, density, danger variant, icon
+binding — that would then drift from the catalog.
+
+**This is a Chief Architect decision and is recorded here so the production does
+not make it.** Whether a widget duplicates primitive markup or wraps it is an
+architectural boundary call, and this brief exists because that boundary was
+crossed once already. If the wrap proves untenable during implementation, stop
+and report; do not switch approaches mid-production.
 
 Do not use JavaScript measurement or post-mount layout mutation. The existing
 container-query architecture is the correct mechanism.
@@ -216,12 +221,11 @@ Run:
 ```sh
 deno task fmt
 deno task check
-deno task guard:namespaces
 ```
 
-If full `deno task check` is blocked by unrelated existing guard failures, report
-the unrelated failures and run targeted checks on all changed TypeScript files
-plus the relevant guards that can run.
+`deno task check` runs all thirteen guards, `guard:namespaces` among them. The
+tree is green as of 2026-08-17. Report any failure rather than working around it
+or declaring it unrelated.
 
 ## Behavioural verification
 
