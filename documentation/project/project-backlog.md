@@ -60,7 +60,55 @@ session, so a wrong cut is felt everywhere at once.
 
 ## Controls
 
-### Index-Detail surfaces do not draw the Selection
+### HelmWidget action presentation leaks into the action-button primitive
+
+**Observed:** 2026-08-16 · high
+
+HelmWidget has a legitimate responsive behavior: above its labeled-action threshold it
+shows labeled route actions, and at or below that threshold it optimizes the terminal
+field to dense icon actions while retaining accessible labels. That behavior belongs to
+the dashboard terminal widget, because `architecture-front.md` §7.3 makes HelmWidget the
+owner of action presentation within its allocated terminal field.
+
+The current implementation lets that specialization leak into the shared action-button
+foundation. `ui.css` carries action-button commentary about consumer specificity and label
+display, while HelmWidget has depended on action-button internals to collapse labels. That
+couples a cross-project primitive to one dashboard widget's responsive needs and makes
+future action-button changes preserve a workaround rather than a contract.
+
+The fix is a boundary repair. Keep `UiActionButton` as a boring primitive with explicit
+`label`, `icon`, `labelMode`, `align`, `density`, and `variant` semantics. Move the
+dashboard terminal presentation into widget space with a `HelmButton` owned under
+`source/front/ux/widgets`. The stacked-header threshold must control row structure only;
+HelmWidget's labeled-action threshold alone controls labeled versus icon-only
+presentation.
+
+### Shared UI controls do not use one state model
+
+**Observed:** 2026-08-16 · high
+
+The shared control layer does not assign one stable meaning to rest, hover, focus,
+selected, checked, active, open, and disabled states. `UiActionButton` distinguishes
+visible-label and hidden-label actions by resting color. `UiCollectionCursor` demonstrates
+the split in one surface: navigation action-buttons rest in primary color while
+life-cycle action-buttons rest closer to text color. Checkbox and radio, toggle, tabs,
+accordion, buttons, single-select, and multi-select each answer selected and hover states
+with different combinations of primary color, text color, border, background, and frame.
+
+This is design-language drift, not a feature defect. Primary color is currently doing too
+many jobs: resting affordance, hover affordance, checked state, selected state, active tab
+state, and open accordion state. A user cannot infer the state model from one control and
+apply it to another.
+
+The fix belongs in the shared UI control foundation. Audit `UiButton`, `UiActionButton`,
+`UiCheckbox`, `UiRadioGroup`, `UiToggle`, `UiTabs`, `UiAccordion`, `UiSingleSelect`,
+`UiMultiSelect`, and `UiCollectionCursor` against a common state matrix: rest, hover,
+focus-visible, disabled, selected/checked/active/open, selected-hover, and danger where
+applicable. Normalize `ui.css` so primary, text color, background, border, frame, and
+focus ring each have stable roles. Prefer deleting inconsistent special-case rules over
+adding compensating overrides.
+
+### Collection-Detail surfaces do not draw the Selection
 
 **Observed:** 2026-08-14 · normal
 
@@ -69,15 +117,16 @@ threshold, so a user editing the fourth record has the whole Collection on scree
 nothing marking which Item is open. Below the threshold the panels swap and the question
 does not arise. Above it, the reader loses their place in a long Collection.
 
-Index-Detail is the one archetype that owes a Selection treatment. `ux-design-archetypes.md`
-§2.4 makes a Selection drawable exactly when the Collection stays on screen, which is why
-Collection-Detail needs nothing here and this surface does.
+Collection-Detail is the one archetype that owes a Selection treatment.
+`ux-design-archetypes.md` §2.4 makes a Selection drawable exactly when the Collection and
+the Detail are met together, which is why Index-Detail needs nothing here and this surface
+does. Below its threshold the manager becomes Index-Detail and the question dissolves.
 
 There is no state to style. `UiTableRow` takes `onActivate` and emits
 `data-ui-interactive` when a row is clickable, but nothing expresses Selection, and
 `data-ui`, `data-ui-variant`, and `data-ui-interactive` are all `never` in its props, so a
 consumer cannot supply one. The fix belongs in the catalog rather than in the manager — a
-selected state on `UiTableRow` that any Index-Detail surface opts into.
+selected state on `UiTableRow` that any Collection-Detail surface opts into.
 
 ## Shell / Auth
 
