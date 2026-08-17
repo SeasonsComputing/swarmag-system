@@ -6,12 +6,12 @@
 
 This document defines the branded look and feel for the swarmAg ecosystem. It covers the design foundation, token catalog, typography, geometry, layout, motion, and theme mechanism shared by all applications.
 
-**Document Organization:**
+### 1.1 Document Organization
 
 | Document                     | Scope                                                                           |
 | ---------------------------- | ------------------------------------------------------------------------------- |
 | _This document_              | Design foundation, tokens, typography, geometry, layout, motion                 |
-| `ux-design-archetypes.md`    | Composition: archetypes, their vocabulary, and this repo's standard solutions   |
+| `ux-design-archetypes.md`    | Composition: archetypes, their vocabulary, and the supporting library           |
 | `ux-components-guide.md`     | Consumer reference: what controls exist, how to use them                        |
 | `ux-components-internals.md` | Implementation reference: CSS architecture, control contract, tokens, selectors |
 
