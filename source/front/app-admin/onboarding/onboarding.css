@@ -10,10 +10,3 @@
   flex-direction: column;
   min-height: 100%;
 }
-
-[data-app='onboarding-coords-group'] {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: var(--sa-rhythm-gap);
-  align-items: flex-end;
-}

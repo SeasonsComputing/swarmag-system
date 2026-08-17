@@ -6,19 +6,20 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Renders the onboarding job-sites stage using shared list/edit collection
-composition. Site and note selection is local to each collection.
+Renders the onboarding job-sites stage with drill-down collection panels. Sites
+and notes replace the current panel rather than rendering inline.
 
-PUBLIC
+EXPORTS
 ───────────────────────────────────────────────────────────────────────────────
 OnboardingStageSitesProps  Props for the optional job-sites stage.
 OnboardingStageSites       Render the optional job-sites stage.
 */
 
-import { when } from '@core/std'
-import type { Location, Note } from '@domain/abstractions/common.ts'
+import type { Note } from '@domain/abstractions/common.ts'
 import type { CustomerSite } from '@domain/abstractions/customer.ts'
-import { CollectionEditor } from '@front/ux/shell/collection-editor.tsx'
+import { CollectionPanel } from '@front/ux/shell/collection-panel.tsx'
+import type { DrillContract } from '@front/ux/shell/drill-contract.ts'
+import { DrillDown } from '@front/ux/shell/drill-down.tsx'
 import {
   UiActionButton,
   type UiComponent,
@@ -29,7 +30,7 @@ import {
   UiText,
   UiTextArea
 } from '@front/ux/ui'
-import type { OnboardingState } from './onboarding-state.ts'
+import { type OnboardingState, siteLocation } from './onboarding-state.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // ONBOARDING: CUSTOMER SITES
@@ -48,38 +49,50 @@ export type OnboardingStageSitesProps = {
  */
 export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiComponent => {
   const hasGeo = typeof navigator !== 'undefined' && 'geolocation' in navigator
-  const addSite = (): void => props.state.addSite(newSite())
 
   return (
-    <CollectionEditor
-      legend='Sites'
-      items={props.state.sites}
-      label={siteName}
-      emptyMessage='No job sites yet. Use New site to add one.'
-      newLabel='New site'
-      onNew={addSite}
-      onRemove={props.state.removeSite}
-      renderEditor={(site, index) => (
-        <SiteEditor
-          state={props.state}
-          site={site}
-          index={index}
-          hasGeo={hasGeo}
+    <DrillDown
+      rootTitle='Sites'
+      root={drill => (
+        <CollectionPanel
+          legend='Sites'
+          itemColumn='Site'
+          items={props.state.sites}
+          label={siteName}
+          emptyMessage='No job sites yet. Use New site to add one.'
+          newLabel='New site'
+          onNew={() => props.state.addSite()}
+          onRemove={props.state.removeSite}
+          confirmRemove={site => ({
+            title: `Delete ${siteName(site)}?`,
+            message: 'This job site will be removed from the customer.'
+          })}
+          renderItem={(site, index) => (
+            <SiteEditor
+              state={props.state}
+              site={site}
+              index={index}
+              hasGeo={hasGeo}
+              drill={drill}
+            />
+          )}
+          drill={drill}
         />
       )}
     />
   )
 }
 
-/** Props for the editor disclosed when a site row is selected. */
+/** Props for the panel disclosed when a site row is selected. */
 type SiteEditorProps = {
   state: OnboardingState
   site: CustomerSite
   index: number
   hasGeo: boolean
+  drill: DrillContract
 }
 
-/** Renders one site's identity, address, and location fields above its notes collection. */
+/** Renders one site's identity, address, location fields, and notes collection. */
 const SiteEditor = (props: SiteEditorProps): UiComponent => (
   <UiLayout>
     <UiFieldset legend='Identity'>
@@ -101,7 +114,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           label='Address'
           value={siteLocation(props.site).line1}
           onValue={value =>
-            updateLocation(props.state, props.index, location => ({
+            props.state.updateLocation(props.index, location => ({
               ...location,
               line1: UiText.optional(value)
             }))}
@@ -112,7 +125,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           label='Unit / Suite'
           value={siteLocation(props.site).line2}
           onValue={value =>
-            updateLocation(props.state, props.index, location => ({
+            props.state.updateLocation(props.index, location => ({
               ...location,
               line2: UiText.optional(value)
             }))}
@@ -124,7 +137,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
             label='City'
             value={siteLocation(props.site).city}
             onValue={value =>
-              updateLocation(props.state, props.index, location => ({
+              props.state.updateLocation(props.index, location => ({
                 ...location,
                 city: UiText.optional(value)
               }))}
@@ -135,7 +148,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
             label='State / Province'
             value={siteLocation(props.site).state}
             onValue={value =>
-              updateLocation(props.state, props.index, location => ({
+              props.state.updateLocation(props.index, location => ({
                 ...location,
                 state: UiText.optional(value)
               }))}
@@ -146,7 +159,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
             label='ZIP / Postal Code'
             value={siteLocation(props.site).postalCode}
             onValue={value =>
-              updateLocation(props.state, props.index, location => ({
+              props.state.updateLocation(props.index, location => ({
                 ...location,
                 postalCode: UiText.optional(value)
               }))}
@@ -158,7 +171,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           label='Country'
           value={siteLocation(props.site).country}
           onValue={value =>
-            updateLocation(props.state, props.index, location => ({
+            props.state.updateLocation(props.index, location => ({
               ...location,
               country: UiText.optional(value)
             }))}
@@ -166,27 +179,29 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
       </UiLayout>
     </UiFieldset>
     <UiFieldset legend='Location'>
-      <div data-app='onboarding-coords-group'>
+      <UiLayout variant='inline-fit'>
         <SiteTextInput
+          commit='change'
           index={props.index}
           name='siteLatitude'
           label='Latitude'
           value={UiText.from(siteLocation(props.site).latitude)}
           placeholder='e.g., 40.7128'
           onValue={value =>
-            updateLocation(props.state, props.index, location => ({
+            props.state.updateLocation(props.index, location => ({
               ...location,
               latitude: UiText.number(value)
             }))}
         />
         <SiteTextInput
+          commit='change'
           index={props.index}
           name='siteLongitude'
           label='Longitude'
           value={UiText.from(siteLocation(props.site).longitude)}
           placeholder='e.g., -74.0060'
           onValue={value =>
-            updateLocation(props.state, props.index, location => ({
+            props.state.updateLocation(props.index, location => ({
               ...location,
               longitude: UiText.number(value)
             }))}
@@ -195,28 +210,34 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           icon='crosshair-2'
           label='Use my location'
           disabled={!props.hasGeo}
-          onClick={() => useMyLocation(props.state, props.index, props.hasGeo)}
+          onClick={() => captureLocation(props.state, props.index, props.hasGeo)}
         />
-        <SiteTextInput
-          index={props.index}
-          name='siteAcreage'
-          label='Acreage'
-          type='number'
-          value={UiText.from(props.site.acreage)}
-          onValue={value =>
-            props.state.updateSite(props.index, site => site.acreage = UiText.number(value))}
-        />
-      </div>
+      </UiLayout>
+      <SiteTextInput
+        commit='change'
+        index={props.index}
+        name='siteAcreage'
+        label='Acreage'
+        type='number'
+        value={UiText.from(props.site.acreage)}
+        onValue={value =>
+          props.state.updateSite(props.index, site => site.acreage = UiText.number(value))}
+      />
     </UiFieldset>
-    <CollectionEditor
+    <CollectionPanel
       legend='Notes'
+      itemColumn='Note'
       items={() => props.site.notes}
       label={noteName}
       emptyMessage='No notes yet. Use New note to add one.'
       newLabel='New note'
-      onNew={() => props.state.addNote(props.index, newNote())}
+      onNew={() => props.state.addNote(props.index)}
       onRemove={notePosition => props.state.removeNote(props.index, notePosition)}
-      renderEditor={(note, notePosition) => (
+      confirmRemove={note => ({
+        title: `Delete ${noteName(note)}?`,
+        message: 'This note will be removed from the job site.'
+      })}
+      renderItem={(note, notePosition) => (
         <NoteEditor
           state={props.state}
           note={note}
@@ -224,6 +245,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           notePosition={notePosition}
         />
       )}
+      drill={props.drill}
     />
   </UiLayout>
 )
@@ -232,7 +254,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
 // CUSTOMER SITE: NOTES
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Props for the editor disclosed when a note row is selected. */
+/** Props for the panel disclosed when a note row is selected. */
 type NoteEditorProps = {
   state: OnboardingState
   note: Note
@@ -264,6 +286,7 @@ const NoteEditor = (props: NoteEditorProps): UiComponent => {
 
 /** Props for one labelled site field; `name` selects the field and scopes its input id. */
 type SiteTextInputProps = {
+  commit?: 'input' | 'change'
   index: number
   name:
     | 'siteLabel'
@@ -287,13 +310,19 @@ type SiteTextInputProps = {
 /** Renders one labelled site field, suffixing its input name with the site position. */
 const SiteTextInput = (props: SiteTextInputProps): UiComponent => {
   const name = `${props.name}-${props.index}`
+  const commitOnChange = (): boolean => props.commit === 'change'
   return (
     <UiField for={name} label={props.label} required={props.required}>
       <UiInput
         name={name}
         type={props.type}
         value={props.value ?? ''}
-        onInput={event => props.onValue(event.currentTarget.value)}
+        onChange={event => {
+          if (commitOnChange()) props.onValue(event.currentTarget.value)
+        }}
+        onInput={event => {
+          if (!commitOnChange()) props.onValue(event.currentTarget.value)
+        }}
         placeholder={props.placeholder}
         required={props.required}
       />
@@ -305,32 +334,19 @@ const SiteTextInput = (props: SiteTextInputProps): UiComponent => {
 // IMPLEMENTATION
 // ────────────────────────────────────────────────────────────────────────────
 
-const newSite = (): CustomerSite => ({ label: '', location: [{}], notes: [] })
+const siteName = (site: CustomerSite): string => UiText.untitled(site.label, 'Untitled site')
+const noteName = (note: Note): string => UiText.untitled(note.content, 'Untitled note')
 
-const newNote = (): Note => ({
-  attachments: [],
-  createdAt: when(),
-  content: '',
-  visibility: 'internal',
-  tags: []
-})
-
-const siteName = (site: CustomerSite): string => site.label.trim() || 'Untitled site'
-const noteName = (note: Note): string => note.content.trim()
-const siteLocation = (site: CustomerSite): Location => site.location[0] ?? {}
-
-const updateLocation = (
-  state: OnboardingState,
-  index: number,
-  update: (location: Location) => Location
-): void => {
-  state.updateSite(index, site => site.location = [update(siteLocation(site))])
-}
-
-const useMyLocation = (state: OnboardingState, index: number, hasGeo: boolean): void => {
+// The permission prompt can outlive the site. A CustomerSite has no identity, so
+// its position is the only handle, and removing a site shifts every position
+// after it — a late fix would land on whichever site now occupies this index.
+// Capture the site itself and abandon the result if the slot changed hands.
+const captureLocation = (state: OnboardingState, index: number, hasGeo: boolean): void => {
   if (!hasGeo) return
+  const requested = state.sites()[index]
   navigator.geolocation.getCurrentPosition(position => {
-    updateLocation(state, index, location => ({
+    if (state.sites()[index] !== requested) return
+    state.updateLocation(index, location => ({
       ...location,
       latitude: position.coords.latitude,
       longitude: position.coords.longitude
