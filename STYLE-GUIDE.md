@@ -10,12 +10,12 @@ Code that conflicts with this guide is wrong — not the guide.
 
 ## 2. Language & Tooling
 
-| Item            | Guideline                                                                                                                                                                                                                                                                                                                                                                       |
-| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime         | Deno with strict TypeScript (`deno task check`)                                                                                                                                                                                                                                                                                                                                 |
-| Encoding        | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint.                                                                                                                                                                                                                                                                          |
-| Types           | Use `type` for data shapes, abstractions, aliases, and unions.<br>Use `interface` for encapsulated API contracts that something explicitly implements.<br>In the ambiguous case, decide on meta-type vs. data: an `interface` is a meta-type whose behavior methods and attribute metadata are immutable specification; an attribute whose value is a callback is a data shape. |
-| Primitives/ADTs | The standard vocabulary comes from `@core/std` — primitives, containers, life-cycle shapes, and relations. `Id` is a UUID v7 string, `When` an ISO 8601 UTC string, and so on. §8.1 is the authoritative catalog; consult it rather than re-deriving one of these locally.                                                                                                      |
+| Item               | Guideline                                                                                                                                                                                                                                                                                                                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime            | Deno with strict TypeScript (`deno task check`)                                                                                                                                                                                                                                                                                                                                 |
+| Encoding           | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint.                                                                                                                                                                                                                                                                          |
+| Type vs. Interface | Use `type` for data shapes, abstractions, aliases, and unions.<br>Use `interface` for encapsulated API contracts that something explicitly implements.<br>In the ambiguous case, decide on meta-type vs. data: an `interface` is a meta-type whose behavior methods and attribute metadata are immutable specification; an attribute whose value is a callback is a data shape. |
+| Primitives/ADTs    | The standard vocabulary comes from `@core/std` — primitives, containers, life-cycle shapes, and relations. `Id` is a UUID v7 string, `When` an ISO 8601 UTC string, and so on. §8.1 is the authoritative catalog; consult it rather than re-deriving one of these locally.                                                                                                      |
 
 ## 3. Import Aliases
 
@@ -605,20 +605,6 @@ Every `schema.sql` begins with:
 ### 10.13 Drop order
 
 Emit `DROP TABLE IF EXISTS` for all domain tables in reverse dependency order at the top of the file, before any `CREATE TABLE` statements.
-
-### 10.14 Schema section order
-
-Sections within `schema.sql` follow this order:
-
-1. Users
-2. Asset Types & Assets
-3. Chemicals
-4. Customers
-5. Services
-6. Workflows, Tasks & Questions
-7. Jobs
-8. Seed Data
-
 ## 11. SQL DDL Conventions
 
 SQL DDL ownership is split by artifact type:
