@@ -1,4 +1,4 @@
-# swarmAg Operations System — AI Agent Protocol (2.0)
+# swarmAg Operations System — AI Agent Protocol (2.1)
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
 
@@ -103,13 +103,21 @@ For code-generation or regeneration tasks, include:
 
 ## 3. Style-guide Conformance
 
-For every production task in this repository, `STYLE-GUIDE.md` is a hard gate.
+For every production task in this repository, `STYLE-GUIDE.md` is a hard gate. This gate is granted by CONSTITUTION §10 and does not extend beyond it.
 
 ### 3.1 Non-negotiable Rule
 
 Treat any style-guide violation as a correctness failure. Do not proceed while violations exist.
 
-### 3.2 Block checks
+### 3.2 Authority Boundary
+
+The style guide gates production; it does not settle design.
+
+Where a style-guide rule conflicts with a domain, architecture, or design-language document, the higher document governs. Escalate the conflict; do not resolve it during production.
+
+Do not cite `STYLE-GUIDE.md` as the basis for a design, architecture, or domain decision it does not own.
+
+### 3.3 Block checks
 
 - Enforce `STYLE-GUIDE.md` exactly as written.
 - Treat `source/devops/guards/*.ts` as the executable enforcement layer for style and architecture checks.
