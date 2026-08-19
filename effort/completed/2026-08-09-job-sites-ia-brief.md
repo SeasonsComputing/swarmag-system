@@ -135,7 +135,7 @@ Currently nine full-width fields in one stack. Group them into fieldsets:
 | address  | line 1, unit/suite, then city / state / postal as one wrapping row |
 | location | latitude, longitude, locate action                                 |
 | —        | acreage                                                            |
-| notes    | bounded list + `New note`                                          |
+| notes    | bounded list + `New Note`                                          |
 
 Use `UiLayout variant='inline-wrap'` for the city/state/postal row — it is a
 responsive row grid with column wrapping and stacks itself when narrow, so no

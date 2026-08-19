@@ -229,8 +229,8 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
       itemColumn='Note'
       items={() => props.site.notes}
       label={noteName}
-      emptyMessage='No notes yet. Use New note to add one.'
-      newLabel='New note'
+      emptyMessage='No notes yet. Use New Note to add one.'
+      newLabel='New Note'
       onNew={() => props.state.addNote(props.index)}
       onRemove={notePosition => props.state.removeNote(props.index, notePosition)}
       confirmRemove={note => ({
