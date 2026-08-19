@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Architecture Constitution (2.0)
+# Software Architecture Constitution (2.1)
 
 - Source: [CONSTITUTION.md](CONSTITUTION.md)
-- Version: 2.0
-- Published: 2026 June 7th
+- Version: 2.1
+- Published: 2026 August 18th
 - Author: Ted V. Kremer
 
 ## 1. Purpose & Authority
@@ -24,11 +24,14 @@ This document is the highest governing authority for all work performed in this 
 **In case of conflict, the order of precedence is:**
 
 ```text
-Correctness 
-  → This Constitution 
-    → Domain and Architecture Documents 
-      → Style Guides & Conventions
-        → Agent Instructions
+Correctness
+  → This Constitution
+    → Domain Model Documents
+      → Architecture Documents
+        → UX and Design-Language Documents
+          → Style Guides & Conventions
+            → Agent Instructions
+              → Code Examples
 ```
 
 No tool, human, or AI may override this ordering.
@@ -51,7 +54,7 @@ No tool, human, or AI may override this ordering.
 3. Correct output does not imply correct authority.
 4. Passing tests does not imply architectural permission.
 
-All work operates under the Three-Role Model defined in [Model of Development with AI Coding](https://seasoncomputing/markdown.html?documentation/tvk-mod-3rm.md).
+All work operates under the Three-Role Model defined in [Model of Development with AI Coding](https://seasonscomputing.com/markdown.html?documentation/tvk-mod-3rm.md).
 
 | Reasoning            | Role                               |
 | -------------------- | ---------------------------------- |
@@ -337,7 +340,13 @@ If a failing check requires work outside scope, escalate.
 
 The project style guide is binding.
 
-Style violations are correctness failures when style checks apply.
+Style violations are correctness failures.
+
+This promotion is a matter of bindingness, not precedence. It governs whether work may proceed. It does not govern whose ruling wins in a conflict.
+
+The style guide's position in the documentation hierarchy is unchanged by this promotion. Where the style guide conflicts with a domain, architecture, or design-language document, the higher document governs. Such a conflict must be escalated, not resolved during production.
+
+The style guide gates construction. It does not settle design. Do not cite it as the authority for a decision it does not own.
 
 Do not duplicate style rules in operational prompts when they are already defined in governing documents or guards.
 
@@ -387,5 +396,15 @@ This Constitution supersedes and replaces all prior versions, rules or AI prompt
 All contributors, human or artificial, operate under this Constitution.
 
 Compliance with this Constitution is a condition of participation.
+
+## 15. Amendment Record
+
+Each published version supersedes the one before it. This document always resolves to the most recent version; prior versions remain available at the archived names below.
+
+| Version | Published        | Archived as                                                                                           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ------- | ---------------- | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2.1     | 2026 August 18th | current                                                                                               | §1 precedence chain expanded from five entries to eight; domain, architecture, and UX/design-language documents named separately and code examples restored as the lowest tier, a tier present in 1.0 and dropped in 2.0. §10 recast: style violations promote to correctness as a matter of bindingness, not precedence, and conflicts with higher documents escalate.                                                                                                                                                                                          |
+| 2.0     | 2026 June 7th    | [CONSTITUTION-v2-0.md](https://seasonscomputing.com/markdown.html?documentation/CONSTITUTION-v2-0.md) | Expanded from seven sections to fourteen. Added §2 Foundation, §4 Operating Modes, §5 Production Authorization, §6 Scope Discipline, §8 Documentation Authority, §9 Guard and Check Authority, §11 AI Memory, Rules, and Agent Instructions, and §13 Required Production Report. Roles restated under the Three-Role Model. §1 precedence chain revised from Correctness → Constitution → Architecture Documents → Convention → Examples: domain named alongside architecture, convention restated as style guides, and examples replaced by agent instructions. |
+| 1.0     | 2026 April 1st   | [CONSTITUTION-v1.md](https://seasonscomputing.com/markdown.html?documentation/CONSTITUTION-v1.md)     | Initial version.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 _End of Constitution Document_
