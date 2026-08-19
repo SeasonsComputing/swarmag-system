@@ -134,8 +134,6 @@ below the threshold — becomes Index-Detail
 └─────────────────────┘         └─────────────────────┘
 ```
 
-**Implementation seam.** The panels carry `data-shell-panel='index'` and `data-shell-panel='subject'`. `subject` is the generic panel role — the panel holding the thing being worked on — and the Sequence archetype uses the same role for a Step. Here the subject panel carries the Detail.
-
 **Known uses.** The Users manager in Admin, above its container threshold.
 
 ### 3.3 Index-Detail
