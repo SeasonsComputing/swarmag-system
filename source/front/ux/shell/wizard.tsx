@@ -146,7 +146,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
           </UiList>
         </div>
       }
-      index={
+      aside={
         <PanelStepflow
           items={props.contract.stages.map((item, index) => ({
             state: stepState(index),
@@ -154,7 +154,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
           }))}
         />
       }
-      subject={
+      main={
         <PanelForm
           feedback={banner()}
           header={{

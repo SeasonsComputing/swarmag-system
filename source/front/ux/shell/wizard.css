@@ -160,7 +160,7 @@
     grid-template-columns: 1fr;
   }
 
-  [data-shell='wizard'] > [data-shell-panel='index'] {
+  [data-shell='wizard'] > [data-shell-panel='aside'] {
     display: none;
   }
 }

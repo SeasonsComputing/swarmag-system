@@ -5,15 +5,14 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { UiCard, type UiComponent } from '@front/ux/ui'
+import { UiCard, type UiComponent, type UiContainerProps } from '@front/ux/ui'
 import type { PanelHeaderProps } from './panel-contract.ts'
 import { PanelHeader } from './panel-header.tsx'
 
 import './panel-list.css'
 
 /** Represents the props for the PanelList component. */
-type PanelListProps = {
-  children: UiComponent
+type PanelListProps = UiContainerProps & {
   header: PanelHeaderProps
   toolbar?: UiComponent
 }

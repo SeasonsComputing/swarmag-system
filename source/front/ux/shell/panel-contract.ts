@@ -1,26 +1,28 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Panel contract                                                               ║
-║ Shared composition contracts for shell panel surfaces.                       ║
+║ Prop shapes shared by the shell panel family.                                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Declares the container, header, role, and feedback shapes shared by panel
-compositions without imposing a provider contract on their callers.
+Declares the container, header, and feedback shapes shared by the panel family.
+PanelContainer contributes chrome only — landmark structure, the feature CSS
+namespace, and an optional mode attribute callers style against — while callers
+supply the content of every panel. It stays neutral to what a surface presents:
+the abstraction manager fills its two panels with a collection and an editor,
+the wizard with a stepflow and a step form, and later surfaces may fill them
+differently again. These are prop shapes, not provider contracts — nothing
+implements them.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 PanelContainerProps  Slots for a panel container composition.
 PanelHeaderProps     Leading and trailing content for a panel header.
-PanelRole            Named panel positions within a container.
 PanelFeedback        Feedback shown beneath a form header.
 */
 
 import type { UiAlertVariant, UiComponent } from '@front/ux/ui'
-
-/** Named panel positions within a container. */
-export type PanelRole = 'index' | 'subject'
 
 /** Leading and trailing content for a panel header. */
 export type PanelHeaderProps = {
@@ -38,9 +40,9 @@ export type PanelFeedback = {
 export type PanelContainerProps = {
   feature: string
   header: UiComponent
-  subject: UiComponent
+  main: UiComponent
   accessory?: UiComponent
-  index?: UiComponent
+  aside?: UiComponent
   mode?: string
-  subjectRef?: (element: HTMLElement) => void
+  mainRef?: (element: HTMLElement) => void
 }
