@@ -130,22 +130,22 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
               line2: UiText.optional(value)
             }))}
         />
-        <UiLayout variant='inline-wrap'>
-          <SiteTextInput
-            index={props.index}
-            name='siteCity'
-            label='City'
-            value={siteLocation(props.site).city}
-            onValue={value =>
-              props.state.updateLocation(props.index, location => ({
-                ...location,
-                city: UiText.optional(value)
-              }))}
-          />
+        <SiteTextInput
+          index={props.index}
+          name='siteCity'
+          label='City'
+          value={siteLocation(props.site).city}
+          onValue={value =>
+            props.state.updateLocation(props.index, location => ({
+              ...location,
+              city: UiText.optional(value)
+            }))}
+        />
+        <UiLayout variant='inline-fill'>
           <SiteTextInput
             index={props.index}
             name='siteState'
-            label='State / Province'
+            label='State / Region'
             value={siteLocation(props.site).state}
             onValue={value =>
               props.state.updateLocation(props.index, location => ({
@@ -156,7 +156,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           <SiteTextInput
             index={props.index}
             name='sitePostalCode'
-            label='ZIP / Postal Code'
+            label='Postal Code'
             value={siteLocation(props.site).postalCode}
             onValue={value =>
               props.state.updateLocation(props.index, location => ({
@@ -164,18 +164,18 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
                 postalCode: UiText.optional(value)
               }))}
           />
+          <SiteTextInput
+            index={props.index}
+            name='siteCountry'
+            label='Country'
+            value={siteLocation(props.site).country}
+            onValue={value =>
+              props.state.updateLocation(props.index, location => ({
+                ...location,
+                country: UiText.optional(value)
+              }))}
+          />
         </UiLayout>
-        <SiteTextInput
-          index={props.index}
-          name='siteCountry'
-          label='Country'
-          value={siteLocation(props.site).country}
-          onValue={value =>
-            props.state.updateLocation(props.index, location => ({
-              ...location,
-              country: UiText.optional(value)
-            }))}
-        />
       </UiLayout>
     </UiFieldset>
     <UiFieldset legend='Location'>
