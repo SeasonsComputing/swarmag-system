@@ -28,8 +28,8 @@ against itself. */
   grid-column: 1 / -1;
 }
 
-[data-shell-panel='container'] > [data-shell-panel='index'],
-[data-shell-panel='container'] > [data-shell-panel='subject'] {
+[data-shell-panel='container'] > [data-shell-panel='aside'],
+[data-shell-panel='container'] > [data-shell-panel='main'] {
   display: flex;
   flex-direction: column;
   min-block-size: 0;

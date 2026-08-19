@@ -233,7 +233,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
             }
           />
         }
-        index={
+        aside={
           <PanelList
             header={{
               leading: <h2>{props.provider.entityLabel}s</h2>,
@@ -298,8 +298,8 @@ export const AbstractionManager = <T extends Instance, Draft>(
             </Show>
           </PanelList>
         }
-        subjectRef={element => panelRef = element}
-        subject={
+        mainRef={element => panelRef = element}
+        main={
           <PanelForm
             feedback={editorFeedback()}
             header={{

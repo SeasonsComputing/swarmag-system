@@ -5,15 +5,14 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { UiAlert, UiCard, type UiComponent } from '@front/ux/ui'
+import { UiAlert, UiCard, type UiContainerProps } from '@front/ux/ui'
 import type { PanelFeedback, PanelHeaderProps } from './panel-contract.ts'
 import { PanelHeader } from './panel-header.tsx'
 
 import './panel-form.css'
 
 /** Represents the props for the PanelForm component. */
-type PanelFormProps = {
-  children: UiComponent
+type PanelFormProps = UiContainerProps & {
   feedback?: PanelFeedback | null
   header: PanelHeaderProps
 }

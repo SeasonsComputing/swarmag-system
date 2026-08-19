@@ -74,8 +74,8 @@
     grid-template-columns: 1fr;
   }
 
-  [data-shell='abstraction-manager'] > [data-shell-panel='index'],
-  [data-shell='abstraction-manager'] > [data-shell-panel='subject'] {
+  [data-shell='abstraction-manager'] > [data-shell-panel='aside'],
+  [data-shell='abstraction-manager'] > [data-shell-panel='main'] {
     block-size: 100%;
     grid-column: 1;
     grid-row: 2;
@@ -83,8 +83,8 @@
     transition: var(--sa-transition-panel);
   }
 
-  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='index'],
-  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='subject'] {
+  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='aside'],
+  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='main'] {
     opacity: 1;
     pointer-events: auto;
     transform: translateX(0);
@@ -93,8 +93,8 @@
     z-index: var(--sa-z-base);
   }
 
-  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='subject'],
-  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='index'] {
+  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='main'],
+  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='aside'] {
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
@@ -102,17 +102,17 @@
   }
 
   /* Spatial push: the list lives left of the editor. */
-  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='index'] {
+  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='aside'] {
     transform: translateX(calc(var(--sa-space-xl) * -1));
   }
 
-  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='subject'] {
+  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='main'] {
     transform: translateX(var(--sa-space-xl));
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-shell='abstraction-manager'] > [data-shell-panel='index'],
-    [data-shell='abstraction-manager'] > [data-shell-panel='subject'] {
+    [data-shell='abstraction-manager'] > [data-shell-panel='aside'],
+    [data-shell='abstraction-manager'] > [data-shell-panel='main'] {
       transition: none;
     }
   }
