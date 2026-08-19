@@ -605,6 +605,7 @@ Every `schema.sql` begins with:
 ### 10.13 Drop order
 
 Emit `DROP TABLE IF EXISTS` for all domain tables in reverse dependency order at the top of the file, before any `CREATE TABLE` statements.
+
 ## 11. SQL DDL Conventions
 
 SQL DDL ownership is split by artifact type:
