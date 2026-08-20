@@ -59,8 +59,8 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
           itemColumn='Site'
           items={props.state.sites}
           label={siteName}
-          emptyMessage='No job sites yet. Use New site to add one.'
-          newLabel='New site'
+          emptyMessage='No job sites yet. Use New Site to add one.'
+          newLabel='New Site'
           onNew={() => props.state.addSite()}
           onRemove={props.state.removeSite}
           confirmRemove={site => ({
