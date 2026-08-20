@@ -115,22 +115,13 @@ Documentation intensity follows implementation complexity. The code speaks first
 
 ```typescript
 /**
- * Common types and utilities for handling ISO datetime strings.
- * Provides type safety and validation for date-time values.
+ * Supabase edge function User Create service.
  */
 
-/** Represents a date-time in ISO 8601 string format. */
-export type When = string
+import handler from '@back/supabase-edge/functions/user-create.ts'
+import { wrapSupabaseShim } from '@core/service/wrap-supabase-shim.ts'
 
-/** Valid ISO datetime format regex. */
-const ISO_DATETIME_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/
-
-/** Gets the current UTC datetime as an ISO string */
-export const when = (): When => new Date().toISOString()
-
-/** Checks if a string is a valid ISO date-time. */
-export const isWhen = (value: unknown): value is When =>
-  typeof value === 'string' && ISO_DATETIME_REGEX.test(value)
+Deno.serve(wrapSupabaseShim(handler))
 ```
 
 ### 6.2 Functional files
