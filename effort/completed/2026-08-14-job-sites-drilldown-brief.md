@@ -63,7 +63,7 @@ Nothing built here may learn it is inside a wizard.
 At rest, depth 0:
 
 ```
-┌─ Sites ──────────────────────────────── ⊕ New site ─┐
+┌─ Sites ──────────────────────────────── ⊕ New Site ─┐
 │  Site                                       Actions  │
 │  ──────────────────────────────────────────────────  │
 │   South pasture                                  🗑  │
@@ -112,8 +112,8 @@ Selecting a note replaces that panel in turn:
 Empty replaces the rows, never the action:
 
 ```
-┌─ Sites ──────────────────────────────── ⊕ New site ─┐
-│   No job sites yet. Use New site to add one.         │
+┌─ Sites ──────────────────────────────── ⊕ New Site ─┐
+│   No job sites yet. Use New Site to add one.         │
 └──────────────────────────────────────────────────────┘
 ```
 
@@ -289,8 +289,8 @@ panel is open, so there is no selected state), the inert transition on
       legend='Sites'
       items={state.sites}
       label={siteName}
-      emptyMessage='No job sites yet. Use New site to add one.'
-      newLabel='New site'
+      emptyMessage='No job sites yet. Use New Site to add one.'
+      newLabel='New Site'
       onNew={() => state.addSite(newSite())}
       onRemove={state.removeSite}
       confirmRemove={site => ({
@@ -349,7 +349,7 @@ by hand and report each result:
 2. Open a site — the sites list is **not on screen**.
 3. Open a note — the site's fields are **not on screen**.
 4. Ascend from the note — the site panel returns, sliding the opposite way.
-5. Click **New site** — the new site's panel opens immediately.
+5. Click **New Site** — the new site's panel opens immediately.
 6. Add rows past the frame's height — the frame does not grow; the body scrolls.
 7. Type `40.7` into **Latitude** — the decimal point survives.
 8. Tab through the rows — the focused row is visibly indicated.
