@@ -149,7 +149,7 @@ below the threshold — becomes Index-Detail
 **Sketch**
 
 ```
-┌─ Sites ──────────────────────────────── ⊕ New site ─┐
+┌─ Sites ──────────────────────────────── ⊕ New Site ─┐
 │  Site                                       Actions │
 │  ─────────────────────────────────────────────────  │
 │   South pasture                                  🗑 │
