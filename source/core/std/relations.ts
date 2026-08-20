@@ -65,7 +65,7 @@ export const isCompositionPositive = <T>(
 
 /**
  * Extracts the single value from a CompositionOne.
- * Caller must pre-validate with isCompositionOne — no defensive check per Constitution §9.5.3.
+ * Caller must pre-validate with isCompositionOne — no gratutious defensive check per governance.
  */
 export const demandOne = <T>(c: CompositionOne<T>): T => c[0] as T
 
