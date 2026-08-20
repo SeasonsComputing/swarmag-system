@@ -11,7 +11,7 @@ with domain-layer serialization hooks and uniform ApiError mapping.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CrudSupabaseSpecification          CRUD Supabase client configuration.
+CrudSupabaseSpecification          CRUD Supabase client configuration, incl. validator.
 makeCrudSupabaseClient(spec)       Build CRUD/list client over Supabase.
 RpcSupabaseSpecification           RPC Supabase client configuration.
 makeBusRuleSupabaseRpcClient(spec) Build business-rule client over Supabase RPC.
@@ -29,6 +29,7 @@ import type {
 } from '@core/api/api-contract.ts'
 import {
   checkApiError,
+  checkValidatorError,
   listCursorValue,
   listPageLimitValue,
   throwApiError
@@ -41,6 +42,7 @@ import {
   type Instantiable,
   instantiable,
   type UpdateFromInstantiable,
+  type Validator,
   type When,
   when
 } from '@core/std'
@@ -51,9 +53,10 @@ import type { Adapter, AdapterPatch } from '@core/stdx'
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** Configuration for a CRUD Supabase API client. */
-export type CrudSupabaseSpecification<T> = {
+export type CrudSupabaseSpecification<T extends Instantiable> = {
   table: string
   adapter: Adapter<T>
+  validator: Validator<T>
 }
 
 /** Configuration for a Supabase business-rule client. */
@@ -71,10 +74,11 @@ export type BusRuleSupabaseSpecification = {
  * @returns API client object with CRUD/list methods.
  */
 export const makeCrudSupabaseClient = <T extends Instantiable>(
-  { table, adapter }: CrudSupabaseSpecification<T>
+  { table, adapter, validator }: CrudSupabaseSpecification<T>
 ): ApiCrudContract<T> => ({
   /* Create record in Supabase from create payload and return mapped entity. */
   async create(input: CreateFromInstantiable<T>): Promise<T> {
+    checkValidatorError(validator.validateCreate(input))
     const record = adapter.fromDomain(instantiable<T>(input) as AdapterPatch<T>)
     const { data, error } = await Supabase.client()
       .from(table)
@@ -99,6 +103,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
 
   /* Apply update patch to an existing non-deleted Supabase record. */
   async update(source: UpdateFromInstantiable<T>): Promise<T> {
+    checkValidatorError(validator.validateUpdate(source))
     const { id, ...patch } = source
     const record = adapter.fromDomain(patch as AdapterPatch<T>)
     const { data, error } = await Supabase.client()

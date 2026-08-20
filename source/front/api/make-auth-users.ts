@@ -12,10 +12,12 @@ synchronization behind the topic API implementation.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AuthUsersContract  Users API contract with auth synchronization operations.
-makeAuthUsers  Build the auth-synchronized Users CRUD client.
+makeAuthUsers      Build the auth-synchronized Users CRUD client, validated before
+                   dispatch even though create/update proxy to edge functions.
 */
 
 import type { ApiCrudContract, DeleteResult, ListOptions, ListResult } from '@core/api/api-contract.ts'
+import { checkValidatorError } from '@core/api/api-contract.ts'
 import {
   makeBusRuleSupabaseEdgeClient,
   makeBusRuleSupabaseRpcClient,
@@ -24,6 +26,7 @@ import {
 import type { CreateFromInstantiable, Dictionary, Id, UpdateFromInstantiable } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
+import { validateUserCreate, validateUserUpdate } from '@domain/validators/user-validator.ts'
 
 /** Users API contract with auth synchronization operations. */
 export type AuthUsersContract = ApiCrudContract<User> & {
@@ -33,7 +36,14 @@ export type AuthUsersContract = ApiCrudContract<User> & {
 
 /** Build the auth-synchronized Users CRUD client. */
 export const makeAuthUsers = (): AuthUsersContract => {
-  const users = makeCrudSupabaseClient<User>({ table: 'users', adapter: UserAdapter })
+  const users = makeCrudSupabaseClient<User>({
+    table: 'users',
+    adapter: UserAdapter,
+    validator: {
+      validateCreate: validateUserCreate,
+      validateUpdate: validateUserUpdate
+    }
+  })
   const create = makeBusRuleSupabaseEdgeClient<Dictionary, User>({ fn: 'user-create' })
   const update = makeBusRuleSupabaseEdgeClient<Dictionary, User>({ fn: 'user-update' })
   const remove = makeBusRuleSupabaseEdgeClient<Dictionary, DeleteResult>({ fn: 'user-delete' })
@@ -42,11 +52,14 @@ export const makeAuthUsers = (): AuthUsersContract => {
 
   return {
     /**
-     * Create a domain user and provision a Supabase Auth identity.
+     * Validate, then create a domain user and provision a Supabase Auth identity.
      * @param input User creation payload.
      * @returns The newly created domain user.
      */
-    create: (input: CreateFromInstantiable<User>): Promise<User> => create.run(input as Dictionary),
+    create: (input: CreateFromInstantiable<User>): Promise<User> => {
+      checkValidatorError(validateUserCreate(input))
+      return create.run(input as Dictionary)
+    },
 
     /**
      * Delete a domain user and revoke the Supabase Auth identity.
@@ -84,10 +97,13 @@ export const makeAuthUsers = (): AuthUsersContract => {
     hasAccess: (email: string): Promise<boolean> => hasAccess.run({ email }),
 
     /**
-     * Update a domain user and synchronize the Supabase Auth identity.
+     * Validate, then update a domain user and synchronize the Supabase Auth identity.
      * @param input User update payload.
      * @returns The updated domain user.
      */
-    update: (input: UpdateFromInstantiable<User>): Promise<User> => update.run(input as Dictionary)
+    update: (input: UpdateFromInstantiable<User>): Promise<User> => {
+      checkValidatorError(validateUserUpdate(input))
+      return update.run(input as Dictionary)
+    }
   }
 }

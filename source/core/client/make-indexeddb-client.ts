@@ -11,7 +11,7 @@ layer.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CrudIndexedDbSpecification     CRUD IndexedDB client configuration.
+CrudIndexedDbSpecification     CRUD IndexedDB client configuration, incl. validator.
 makeCrudIndexedDbClient(spec)  Build CRUD/list client over IndexedDB.
 */
 
@@ -22,7 +22,13 @@ import type {
   ListOptions,
   ListResult
 } from '@core/api/api-contract.ts'
-import { apiError, listCursorValue, listPageLimitValue, throwApiError } from '@core/api/api-contract.ts'
+import {
+  apiError,
+  checkValidatorError,
+  listCursorValue,
+  listPageLimitValue,
+  throwApiError
+} from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import {
   type CreateFromInstantiable,
@@ -31,6 +37,7 @@ import {
   type Instantiable,
   instantiable,
   type UpdateFromInstantiable,
+  type Validator,
   type When,
   when
 } from '@core/std'
@@ -40,16 +47,18 @@ import type { Adapter, AdapterPatch } from '@core/stdx'
 export type CrudIndexedDbSpecification<T extends Instantiable> = {
   store: string
   adapter: Adapter<T>
+  validator: Validator<T>
 }
 
 /** Maker to produce a CRUD/list API client over IndexedDB. */
 export const makeCrudIndexedDbClient = <T extends Instantiable>(
-  { store, adapter }: CrudIndexedDbSpecification<T>
+  { store, adapter, validator }: CrudIndexedDbSpecification<T>
 ): ApiCrudContract<T> => {
   IndexedDb.registerStore(store)
   return {
     /* Create record in IndexedDB from create payload and return mapped entity. */
     async create(input: CreateFromInstantiable<T>): Promise<T> {
+      checkValidatorError(validator.validateCreate(input))
       try {
         const data = instantiable<T>(input)
         const record = adapter.fromDomain(data)
@@ -77,6 +86,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
 
     /* Apply update patch to an existing non-deleted IndexedDB record. */
     async update(source: UpdateFromInstantiable<T>): Promise<T> {
+      checkValidatorError(validator.validateUpdate(source))
       try {
         const { id, ...patch } = source
         const record = adapter.fromDomain(patch as AdapterPatch<T>)

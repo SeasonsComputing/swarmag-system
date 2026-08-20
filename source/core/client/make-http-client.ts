@@ -12,7 +12,8 @@ envelope handling.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-HttpSpecification            CRUD & Business Rule HTTP client configuration.
+HttpSpecification            Business-rule HTTP client configuration.
+CrudHttpSpecification        CRUD HTTP client configuration, incl. validator.
 makeCrudHttpClient(spec)     Build CRUD/list client over HTTP.
 makeBusRuleHttpClient(spec)  Build business-rule runner over HTTP.
 */
@@ -25,12 +26,18 @@ import type {
   ListOptions,
   ListResult
 } from '@core/api/api-contract.ts'
-import { ApiError, checkApiError, throwApiError } from '@core/api/api-contract.ts'
-import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
+import { ApiError, checkApiError, checkValidatorError, throwApiError } from '@core/api/api-contract.ts'
+import type { CreateFromInstantiable, UpdateFromInstantiable, Validator } from '@core/std'
 import type { Dictionary, Id, Instantiable } from '@core/std'
 
 /** Configuration for a business-rule HTTP API client. */
 export type HttpSpecification = { basePath: string }
+
+/** Configuration for a CRUD HTTP API client. */
+export type CrudHttpSpecification<T extends Instantiable> = {
+  basePath: string
+  validator: Validator<T>
+}
 
 /**
  * Maker to produce an API client.
@@ -38,10 +45,11 @@ export type HttpSpecification = { basePath: string }
  * @returns API client object with CRUD methods.
  */
 export const makeCrudHttpClient = <T extends Instantiable>(
-  { basePath }: HttpSpecification
+  { basePath, validator }: CrudHttpSpecification<T>
 ): ApiCrudContract<T> => ({
   /* Create record over HTTP and unwrap API envelope. */
   async create(input: CreateFromInstantiable<T>): Promise<T> {
+    checkValidatorError(validator.validateCreate(input))
     const res = await request(`${basePath}/create`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -58,6 +66,7 @@ export const makeCrudHttpClient = <T extends Instantiable>(
 
   /* Update record over HTTP and unwrap API envelope. */
   async update(source: UpdateFromInstantiable<T>): Promise<T> {
+    checkValidatorError(validator.validateUpdate(source))
     const res = await request(`${basePath}/update`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
