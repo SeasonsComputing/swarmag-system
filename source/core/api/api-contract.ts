@@ -26,6 +26,7 @@ ApiErrorDetail - Normalized error detail shape for mapping.
 checkApiError(error, ...): void    Throw ApiError when provider error exists.
 throwApiError(error, ...): never   Always throw ApiError from provider error.
 apiError(error): boolean           Runtime type guard and logger for ApiError.
+checkValidatorError(result): void  Throw ApiError 422 when a validator rejects a payload.
 
 ApiCrudContract - Generic CRUD/list client contract.
 ├ create(input)       Create one resource.
@@ -57,6 +58,7 @@ listCursorValue(string): number    Parse/sanitize list cursor offset.
 import type {
   CreateFromInstantiable,
   Dictionary,
+  ExpectResult,
   Id,
   Instantiable,
   UpdateFromInstantiable,
@@ -126,6 +128,15 @@ export function apiError(error: unknown): boolean {
     return true
   }
   return false
+}
+
+/**
+ * Throw ApiError 422 when a validator rejects a payload.
+ * The result string is already the message — validation failures are
+ * expected, user-correctable feedback, not a fault worth a console trace.
+ */
+export function checkValidatorError(result: ExpectResult): void {
+  if (result !== null) throw new ApiError(result, 422)
 }
 
 // ────────────────────────────────────────────────────────────────────────────

@@ -1,12 +1,15 @@
 /**
- * Provides reusable validators (`is*`), validator helpers (`expect*`), and
- * normalizers (`to*`) used throughout the system. Optional guard fields admit
- * undefined (absent) and null (clear marker); required fields reject both.
+ * Provides the abstraction validation contract (`Validator<T>`), reusable
+ * validators (`is*`), validator helpers (`expect*`), and normalizers (`to*`)
+ * used throughout the system. Optional guard fields admit undefined (absent)
+ * and null (clear marker); required fields reject both.
  */
 
 import { isNullish } from './adt.ts'
 import { isWhen } from './datetime.ts'
 import { isId } from './identifier.ts'
+import type { Instantiable } from './instance.ts'
+import type { CreateFromInstantiable, UpdateFromInstantiable } from './protocols.ts'
 import {
   isCompositionMany,
   isCompositionOne,
@@ -188,6 +191,18 @@ export const expectCompositionPositive = <T>(
 ): ExpectResult => {
   if ((isNullish(value) && optional) || isCompositionPositive(value, guard)) return null
   return `${field} must be a non-empty array composition`
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// VALIDATOR SHAPE (Validator<T>)
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Domain validation for an abstraction's mutation boundary. Nothing implements
+ * this — it references functions that already exist, so it is a data shape,
+ * not a contract. */
+export type Validator<T extends Instantiable> = {
+  validateCreate: (input: CreateFromInstantiable<T>) => ExpectResult
+  validateUpdate: (input: UpdateFromInstantiable<T>) => ExpectResult
 }
 
 // ────────────────────────────────────────────────────────────────────────────
