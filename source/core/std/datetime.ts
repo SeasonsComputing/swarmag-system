@@ -1,7 +1,20 @@
-/**
- * Common types and utilities for handling ISO datetime strings.
- * Provides type safety and validation for date-time values.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Datetime primitive                                                           ║
+║ ISO UTC timestamp type, factory, and validator.                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Defines the canonical system timestamp primitive and provides helpers for
+creating and validating ISO 8601 UTC datetime strings.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+When            ISO 8601 UTC datetime string.
+when()          Return the current UTC datetime as an ISO string.
+isWhen(value)   Check whether value is a valid When.
+*/
 
 /** Represents a date-time in ISO 8601 string format. */
 export type When = string

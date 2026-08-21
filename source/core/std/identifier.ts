@@ -1,7 +1,20 @@
-/**
- * Common types and utilities for unique identifiers using UUID v7.
- * Provides generation and validation of unique IDs.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Identifier primitive                                                         ║
+║ UUID v7 identifier type, factory, and validator.                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Defines the canonical system identifier primitive and provides UUID v7 creation
+and validation helpers.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+Id              UUID v7 string identifier.
+id()            Create a new UUID v7 identifier.
+isId(value)     Check whether value is a valid Id.
+*/
 
 /** Represents a unique identifier as a UUID string. */
 export type Id = string

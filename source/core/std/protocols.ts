@@ -1,6 +1,20 @@
-/**
- * Provides reusable contracts for creating and updating Instantiable instances.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Mutation protocol primitives                                                 ║
+║ Create and update payload shapes derived from lifecycle abstractions.         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Provides reusable protocol shapes for creating and updating Instantiable and
+InstantiableOnly abstractions at system boundaries.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+CreateFromInstantiable<T>      Create payload for an Instantiable abstraction.
+UpdateFromInstantiable<T>      Update payload with id and clearable attributes.
+CreateFromInstantiableOnly<T>  Create payload for InstantiableOnly abstraction.
+*/
 
 import type {
   FromInstantiable,

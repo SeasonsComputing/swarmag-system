@@ -1,9 +1,41 @@
-/**
- * Provides the abstraction validation contract (`Validator<T>`), reusable
- * validators (`is*`), validator helpers (`expect*`), and normalizers (`to*`)
- * used throughout the system. Optional guard fields admit undefined (absent)
- * and null (clear marker); required fields reject both.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Validation primitives                                                        ║
+║ Reusable validators, validator helpers, and normalizers.                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Provides the standard validation vocabulary for boundary checks. Required
+helpers reject absent values; optional helpers admit undefined and null.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+ValidatorError                  Error thrown for failed validation.
+notValid(message)               Throw ValidatorError with message.
+isNonEmptyString(value)         Check whether value is a non-empty string.
+isPositiveNumber(value)         Check whether value is a positive number.
+isBoolean(value)                Check whether value is a boolean.
+isConstEnum(value, values)      Check whether value is in a const-enum tuple.
+isEmail(value)                  Check whether value is an email string.
+ExpectResult                    Standard validator return value.
+ExpectGuard<T>                  Type guard used by composition helpers.
+expectValid(...results)         Return first validation error or null.
+expectId(value, field, ...)     Validate a required or optional Id.
+expectWhen(value, field, ...)   Validate a required or optional When.
+expectNonEmptyString(...)       Validate a required or optional string.
+expectPositiveNumber(...)       Validate a required or optional positive number.
+expectBoolean(...)              Validate a required or optional boolean.
+expectConstEnum(...)            Validate a required or optional const-enum value.
+expectEmail(...)                Validate a required or optional email.
+expectCompositionOne(...)       Validate a required or optional CompositionOne.
+expectCompositionOptional(...)  Validate a required or optional CompositionOptional.
+expectCompositionMany(...)      Validate a required or optional CompositionMany.
+expectCompositionPositive(...)  Validate a required or optional CompositionPositive.
+Validator<T>                    Domain mutation boundary validation shape.
+toTrimmed(value)                Trim leading and trailing whitespace.
+toEmail(value)                  Trim and lowercase an email address.
+*/
 
 import { isNullish } from './adt.ts'
 import { isWhen } from './datetime.ts'
