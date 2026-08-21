@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Algebraic data primitives                                                   ║
+║ Algebraic data primitives                                                    ║
 ║ Shared dictionary, string-set, nullish, and fingerprint utilities.           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
