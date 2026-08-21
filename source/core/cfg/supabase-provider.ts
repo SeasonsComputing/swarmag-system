@@ -1,9 +1,21 @@
-/**
- * Supabase Edge Functions configuration provider.
- * Accesses environment variables via Deno.env — the Supabase Edge runtime
- * exposes configuration through the standard Deno API — and throws HTTP
- * Response errors on failure.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Supabase configuration provider                                              ║
+║ Edge runtime configuration access through Deno.env.                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Provides Config with environment variable access and HTTP Response failure
+behavior for Supabase Edge Function execution contexts.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+SupabaseProvider  Configuration provider for Supabase Edge Functions.
+├ constructor     Fail when the Deno runtime is unavailable.
+├ get(key)        Retrieve an environment variable from Deno.env.
+└ fail(msg)       Throw an HTTP 500 Response.
+*/
 
 import { type RuntimeContract } from './runtime-contract.ts'
 

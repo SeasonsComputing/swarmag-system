@@ -1,7 +1,21 @@
-/**
- * Netlify Edge Functions configuration provider.
- * Accesses environment variables via Netlify.env and throws HTTP Response errors.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Netlify configuration provider                                               ║
+║ Runtime configuration access through Netlify.env.                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Provides Config with environment variable access and HTTP Response failure
+behavior for Netlify Edge Function execution contexts.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+ProviderNetlify  Configuration provider for Netlify Edge Functions.
+├ constructor    Fail when the Netlify runtime is unavailable.
+├ get(key)       Retrieve an environment variable from Netlify.env.
+└ fail(msg)      Throw an HTTP 500 Response.
+*/
 
 import type { RuntimeContract } from './runtime-contract.ts'
 

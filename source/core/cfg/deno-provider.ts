@@ -1,7 +1,21 @@
-/**
- * Deno runtime configuration provider.
- * Accesses environment variables via Deno.env and exits process on error.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Deno configuration provider                                                  ║
+║ Runtime configuration access through Deno.env.                               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Provides Config with environment variable access and process-exit failure
+behavior for plain Deno execution contexts.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+DenoProvider    Configuration provider for Deno.
+├ constructor   Fail when the Deno runtime is unavailable.
+├ get(key)      Retrieve an environment variable from Deno.env.
+└ fail(msg)     Write the message and exit the process.
+*/
 
 import { type RuntimeContract } from './runtime-contract.ts'
 
