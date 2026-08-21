@@ -1,24 +1,30 @@
-/**
- * Abstraction relation type primitives
- *
- * Composition — inward, embedded subordinate values with no independent life-cycle.
- *   Stored as JSONB arrays. Always [] when empty, never null.
- *   All four Composition types resolve to readonly T[] at runtime — cardinality
- *   is a documentation contract enforced at boundaries via the is* guards.
- *
- *   CompositionOne      exactly 1
- *   CompositionOptional 0 or 1
- *   CompositionMany     0 or more
- *   CompositionPositive 1 or more
- *
- * Association — outward, foreign key references to independently life-cycle rows.
- *   Stored as UUID columns. Phantom type parameter carries the referenced type
- *   for documentation and tooling; resolves to Id at runtime.
- *
- *   AssociationOne      required FK — many side of 1:m or true 1:1
- *   AssociationOptional optional FK — nullable column
- *   AssociationJunction FK pair in an m:m junction table — both sides declare this
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Relation primitives                                                          ║
+║ Composition and association shapes with cardinality guards.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Defines canonical relationship primitives for embedded compositions and foreign
+key associations, plus guards and accessors for composition cardinality.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+CompositionOne<T>               Embedded subordinate with exactly one value.
+CompositionOptional<T>          Embedded subordinate with zero or one values.
+CompositionMany<T>              Embedded subordinate with zero or more values.
+CompositionPositive<T>          Embedded subordinate with one or more values.
+isCompositionOne(value, guard)  Check exactly-one composition cardinality.
+isCompositionOptional(...)      Check optional composition cardinality.
+isCompositionMany(value, guard) Check many composition cardinality.
+isCompositionPositive(...)      Check positive composition cardinality.
+demandOne(c)                    Extract the value from a CompositionOne.
+optionalOne(c)                  Extract value from a CompositionOptional.
+AssociationOne<T>               Required FK reference to a lifecycle row.
+AssociationOptional<T>          Optional FK reference to a lifecycle row.
+AssociationJunction<T>          Junction FK reference in an m:m row.
+*/
 
 import type { Id } from './identifier.ts'
 

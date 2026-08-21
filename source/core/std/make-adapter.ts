@@ -1,10 +1,24 @@
-/**
- * Use metadata of domain keys to storage columns to make adapters.
- * Supports recursive decomposition for Compositions and Instantiables.
- * Patch semantics: an absent/undefined key leaves its column untouched,
- * null clears the column, and any defined value — including falsy — is
- * written. Storage NULL maps to domain absence.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Adapter maker                                                                ║
+║ Metadata-driven domain and storage serialization.                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Builds adapters that map domain abstraction keys to storage columns, including
+nested delegate adapters for composed domain objects.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+AdapterPatch<T>   Partial domain patch where null clears a stored column.
+Adapter<T>        Domain serialization contract.
+├ toDomain(source)       Deserialize storage dictionary to domain shape.
+└ fromDomain(patch)      Serialize domain patch to storage dictionary.
+AdaptDelegate     Column mapping with optional nested adapter delegate.
+Adapt<T>          Metadata map from domain keys to storage columns.
+makeAdapter(meta) Create an Adapter from metadata.
+*/
 import { Dictionary, isNullish } from './adt.ts'
 
 /** Contract for domain serialization. Null on any attribute clears its column. */
