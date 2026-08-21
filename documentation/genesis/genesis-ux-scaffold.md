@@ -83,7 +83,7 @@ Pre-existing auth client integration remains unchanged and is out of scaffold
 generation scope:
 
 ```text
-source/core/client/auth-supabase-client.ts
+source/core/cli/auth-supabase-client.ts
 ```
 
 #### 2.2.2 Specifications

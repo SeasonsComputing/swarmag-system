@@ -79,8 +79,8 @@ orchestration must not become an open bypass.
 ```typescript
 // source/back/supabase-edge/functions/job-deep-clone.ts
 import { Config } from '@back/supabase-edge/config/supabase-config.ts'
-import { wrapBusRuleHttpHandler } from '@core/service/wrap-busrule-http-handler.ts'
 import type { Dictionary } from '@core/std'
+import { wrapBusRuleHttpHandler } from '@core/svc/wrap-busrule-http-handler.ts'
 
 const handler = async (params: Dictionary): Promise<Dictionary> => {
   const jobId = params.jobId as string
@@ -377,8 +377,8 @@ See `architecture-devops.md §4` for naming conventions, placeholder contract, a
 
 ```typescript
 import { Config } from '@back/supabase-edge/config/supabase-config.ts'
-import { wrapBusRuleHttpHandler } from '@core/service/wrap-busrule-http-handler.ts'
 import type { Dictionary } from '@core/std'
+import { wrapBusRuleHttpHandler } from '@core/svc/wrap-busrule-http-handler.ts'
 
 const runBusRule = async (input: Dictionary): Promise<Dictionary> => {
   const supabaseUrl = Config.get('SUPABASE_URL')

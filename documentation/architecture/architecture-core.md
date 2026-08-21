@@ -246,9 +246,9 @@ A single API namespace, defined in `source/front/api/api.ts`, is composed once f
 
 ```typescript
 // source/front/api/api.ts
-import { makeBusRuleHttpClient } from '@core/client/make-http-client.ts'
-import { makeCrudIndexedDbClient } from '@core/client/make-indexeddb-client.ts'
-import { makeCrudSupabaseClient } from '@core/client/make-supabase-client.ts'
+import { makeBusRuleHttpClient } from '@core/cli/make-http-client.ts'
+import { makeCrudIndexedDbClient } from '@core/cli/make-indexeddb-client.ts'
+import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import type { Job } from '@domain/abstractions/job.ts'
 import type { User } from '@domain/abstractions/user.ts'
@@ -382,7 +382,7 @@ Client makers are factory functions that produce clients conforming to contracts
 | `makeBusRuleHttpClient()`               | `ApiBusRuleContract` | Orchestration via HTTP edge endpoint | Fetch API          |
 
 Service wrappers mirror client makers at the inbound boundary.
-`source/core/service/wrap-busrule-http-handler.ts` provides
+`source/core/svc/wrap-busrule-http-handler.ts` provides
 `wrapBusRuleHttpHandler()` for exposing BusRule-shaped service handlers over
 HTTP while preserving the standard response envelopes used by HTTP clients.
 Provider-specific orchestration, such as Supabase Auth administration, remains
@@ -1002,7 +1002,7 @@ New clients are added by composing makers in `source/front/api/api.ts`:
 
 ```typescript
 // source/front/api/api.ts
-import { makeCrudSupabaseClient } from '@core/client/make-supabase-client.ts'
+import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
 
 export const api = {
   // ... existing clients
