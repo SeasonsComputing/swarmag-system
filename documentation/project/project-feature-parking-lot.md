@@ -3,7 +3,7 @@
 # swarmAg Operations System — Feature Parking Lot
 
 Living document. Each entry is something real, identified in the course of other work,
-that is explicitly **not** being actioned right now — deferred on purpose, not forgotten.
+that is explicitly **not** being worked on right now — deferred on purpose, not forgotten.
 An entry is here because a decision is still missing, so picking it up starts with making
 that decision. Do not resolve one as a drive-by fix in an unrelated session; each needs
 its own scoped conversation.
@@ -99,7 +99,7 @@ reinstatement is real.
 
 **What it is:** The sales pipeline truly begins before the prospect: leads arrive via
 voicemail, text, and email, and a rep transforms them into prospects for return calls. The
-domain has no Lead entity — today this is deliberately manual: the rep checks the three
+domain has no Lead abstraction — today this is deliberately manual: the rep checks the three
 inboxes three times a day and runs the onboarding wizard when a lead has enough substance
 (an email address, since User requires one and provisions auth).
 
@@ -126,7 +126,7 @@ list with time-since-creation") and story 1.2's sales widget, both arriving with
 assessment flow.
 
 **Why parked:** CA verdict — the query surface lives in the shared `ApiCrudContract` /
-`ListOptions` (`core/api`) plus the PostgREST translation (`core/client`), so it is a
+`ListOptions` (`core/api`) plus the PostgREST translation (`core/cli`), so it is a
 core-layer contract evolution, not a Customers-local add. Its shape is a deliberate
 architectural decision the CA intends to design directly, in keeping with the
 framework-free, minimal-dependency house standard — deferred until the hub milestone

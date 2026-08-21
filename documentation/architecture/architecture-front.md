@@ -85,7 +85,7 @@ source/
 
 Everything in `source/front/ux/` must be adaptive — usable across all three apps and all viewport sizes. Mobile-only or desktop-only components do not belong in the shared ux layer.
 
-Authentication and client makers are part of the core runtime and are sourced from `source/core/client/`.
+Authentication and client makers are part of the core runtime and are sourced from `source/core/cli/`.
 
 ## 3. Application Runtime Profiles
 
@@ -440,13 +440,13 @@ Protected routes wrap content in the auth guard component. The guard is a route-
 Authentication is handled by `auth-supabase-client.ts` — a singleton module that directly implements `ApiAuthContract`. It is not a maker; there is exactly one auth implementation.
 
 ```text
-source/core/client/auth-supabase-client.ts
+source/core/cli/auth-supabase-client.ts
 ```
 
 It is composed into the API namespace as `api.Auth`:
 
 ```typescript
-import { AuthSupabaseClient } from '@core/client/auth-supabase-client.ts'
+import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
 
 export const api = {
   Auth: AuthSupabaseClient,
@@ -601,7 +601,7 @@ IndexedDB usage is split into two layers:
 - Database namespace (physical DB name), `Config.get('LOCAL_DB_NAME')`, per deployment package.
 - Object Store names are not shared implicitly; they must be registered with `@core/db/indexeddb.ts` using `IndexedDb.registerStore('storeName')`
   - Object Store's for domain abstractions are named for the abstraction, for example, `Job` or `Workflow`.
-- A CRUD/List maker is provided to standardize usage of the local database with `@core/client/make-indexeddb-client.ts` conforming to `ApiCrudContract` in `@core/api/api-contract.ts`
+- A CRUD/List maker is provided to standardize usage of the local database with `@core/cli/make-indexeddb-client.ts` conforming to `ApiCrudContract` in `@core/api/api-contract.ts`
 
 **IndexedDB Database Names**
 
