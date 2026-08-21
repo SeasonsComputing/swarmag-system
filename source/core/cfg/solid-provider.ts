@@ -1,7 +1,21 @@
-/**
- * Solid application configuration provider.
- * Accesses environment variables via import.meta.env and throws Error.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Solid configuration provider                                                 ║
+║ Runtime configuration access through import.meta.env.                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Provides Config with environment variable access and Error-based failure
+behavior for Solid application execution contexts.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+SolidProvider   Configuration provider for Solid applications.
+├ constructor   Fail when import.meta.env is unavailable.
+├ get(key)      Retrieve an environment variable from import.meta.env.
+└ fail(msg)     Throw a configuration Error.
+*/
 
 import type { RuntimeContract } from './runtime-contract.ts'
 

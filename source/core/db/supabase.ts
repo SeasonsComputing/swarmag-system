@@ -1,6 +1,20 @@
-/**
- * Supabase client singleton for server or client RDBMS operations.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Supabase client manager                                                      ║
+║ Singleton RDBMS client configured from runtime configuration.                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Creates and caches the Supabase RDBMS client for browser and edge contexts, and
+maps common PostgREST error codes to HTTP-style status codes.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+Supabase              Supabase client manager.
+├ client()            Return the singleton Supabase client.
+└ errorToStatus(...)  Map PostgREST error codes to HTTP-style status codes.
+*/
 
 import { Config } from '@core/cfg/config.ts'
 import { createClient, PostgrestError, type SupabaseClient } from '@supabase/client'

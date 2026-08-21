@@ -1,6 +1,21 @@
-/**
- * Implementation internals of the runtime configuration.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Runtime configuration                                                        ║
+║ Singleton configuration registry backed by an injected runtime provider.     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Validates required configuration keys at bootstrap, resolves optional aliases,
+and provides fast-fail runtime access to registered configuration values.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+Config            Runtime configuration singleton.
+├ init(...)       Register provider, required keys, and optional aliases.
+├ get(name)       Return a required registered configuration value.
+└ fail(msg)       Delegate an invariant failure to the runtime provider.
+*/
 
 import { type StringDictionary, StringSet } from '@core/std'
 import { RuntimeContract } from './runtime-contract.ts'

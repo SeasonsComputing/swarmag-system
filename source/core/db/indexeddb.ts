@@ -1,6 +1,21 @@
-/**
- * Provides a managed, singleton connection to IndexedDB.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ IndexedDB connection manager                                                 ║
+║ Singleton browser database connections with registered object stores.         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Manages IndexedDB connections for the active local database name, upgrades the
+database when registered stores are missing, and maps storage errors to status.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+IndexedDb              IndexedDB connection manager.
+├ registerStore(name)  Register a store for the active local database.
+├ connection()         Return the singleton connection for the active database.
+└ errorToStatus(error) Map standard DOMExceptions to HTTP-style status codes.
+*/
 
 import { Config } from '@core/cfg/config.ts'
 import { type Dictionary, StringSet } from '@core/std'
