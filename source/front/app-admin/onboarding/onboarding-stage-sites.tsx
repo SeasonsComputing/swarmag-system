@@ -122,7 +122,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
         <SiteTextInput
           index={props.index}
           name='siteLine2'
-          label='Unit / Suite'
+          label='Unit'
           value={siteLocation(props.site).line2}
           onValue={value =>
             props.state.updateLocation(props.index, location => ({
@@ -145,7 +145,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           <SiteTextInput
             index={props.index}
             name='siteState'
-            label='State / Region'
+            label='Region'
             value={siteLocation(props.site).state}
             onValue={value =>
               props.state.updateLocation(props.index, location => ({
@@ -156,7 +156,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
           <SiteTextInput
             index={props.index}
             name='sitePostalCode'
-            label='Postal Code'
+            label='Postal'
             value={siteLocation(props.site).postalCode}
             onValue={value =>
               props.state.updateLocation(props.index, location => ({

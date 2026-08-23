@@ -293,7 +293,37 @@ A Decomposition is one subject presented in Parts. The Parts are not peers to ch
 
 Rules that govern how a surface is assembled, independent of archetype.
 
-- **Form actions sit at the top of a form, never trailing it.** Controls belong where the eye already is. A user who has finished a form is looking at the field they just completed, not hunting the bottom of a scroll region for the commit.
+### 5.1 Form Actions
+
+Form actions sit at the top of a form, never trailing it. Controls belong where the
+eye already is. A user who has finished a form is looking at the field they just
+completed, not hunting the bottom of a scroll region for the commit.
+
+### 5.2 Address Fields
+
+Address fields are a form composition pattern, not a single compound field.
+
+- **Labels identify fields.** Use `Address *`, `Unit`, `City *`, `Region *`,
+  `Postal *`, and `Country *`.
+- **Required fields mark the label.** Required address fields append `*` to the
+  visible label text.
+- **Grouping is spatial only.** `Region`, `Postal`, and `Country` may share one
+  inline row when room allows, but each field keeps its own label and control.
+
+**Sketch**
+
+```
+┌─ Customer Address ───────────────┐
+│  Address *                       │
+│  [                            ]  │
+│  Unit                            │
+│  [                            ]  │
+│  City *                          │
+│  [                            ]  │
+│  Region *  Postal *   Country *  │
+│  [      ]  [       ]  [       ]  │
+└──────────────────────────────────┘
+```
 
 ## 6. Supporting Library
 
