@@ -54,7 +54,6 @@ maps, and what is reference — then decide whether the document reorders, decom
 gains a compact companion the way `ux-components-guide.md` gained
 `ux-components-guide-lite.md`. That companion is the proven precedent here and names
 itself an AI-ingestion companion in its own opening.
-
 Do not restructure before the analysis is reviewed. This is base context for every
 session, so a wrong cut is felt everywhere at once.
 
@@ -228,5 +227,36 @@ exported abstractions in `source/domain`, and fail on an exact match.
 The recurrence is the point. Deleted-file paths reappear as empty directories periodically; the Chief Architect counts two or three occurrences. The cause is unidentified — no live code references those names, and the repository's three `Deno.mkdir` calls all take genuine directory paths — so detection is worth more than a theory. Extending the sweep to the repository root catches all of them the moment they appear rather than whenever someone hits a red check.
 
 `rmdir` is the safe removal: it refuses a non-empty directory, so it cannot take anything real with it.
+
+## DevOps
+
+### `source/devops/` is not held to STYLE-GUIDE
+
+**Observed:** 2026-08-23 · normal
+
+STYLE-GUIDE §1 claims to be authoritative "throughout the codebase," but nothing checks
+that claim against `source/devops/` — `guard-domain-style.ts` exists for domain, no
+equivalent exists for devops. Eleven of twelve TypeScript devops scripts already follow
+the box-header/PURPOSE/PUBLIC convention and the `@core/std` primitive-type discipline
+(§8.1) correctly; the gap is concentrated almost entirely in §9's "never swallow errors
+silently" rule — fifteen-plus bare `catch {}` / `.catch(() => {})` blocks across eight of
+the twelve scripts, every one discarding the caught error's type.
+
+Surfaced while investigating the phantom-directory recurrence above — the mechanism was
+never pinned down, but the investigation showed devops carries none of the discipline
+domain and front get.
+
+Two STYLE-GUIDE additions belong alongside the retrofit, not after it: (1) tooling
+namespaces (`devops`, `tests`) may call their host runtime's API directly, unabstracted,
+since each runs in one fixed known environment and was never trying to be portable across
+deployment targets — §8.5's `Config.get()` mandate currently reads as universal and needs
+this carve-out written in; (2) a non-product tooling namespace may have its own local,
+topic-free utility `lib/` as a barrel, independently, with no lateral dependency edge to
+its peers (`devops/lib` and, later, `tests/lib` if it ever accumulates real duplication —
+not today).
+
+Full plan, exact site counts, and sequencing (doc → `architecture-devops.md` → lib →
+retrofit → guard-last, so the new guard's first run is green) are in
+`effort/active/2026-08-23-devops-style-error-handling-brief.md`.
 
 _End of Backlog Document_
