@@ -480,7 +480,7 @@ Makers produce interface conformant implementations. They do not create instance
 
 ## 10. Schema
 
-General schema authoring conventions for canonical DDL (`source/domain/schema/schema.sql`).
+General schema authoring conventions for canonical DDL.
 
 ### 10.1 Identifiers
 
@@ -583,13 +583,13 @@ Every `schema.sql` begins with:
 
 ```sql
 -- =============================================================================
--- swarmAg System — Canonical Schema
--- source/domain/schema/schema.sql
+-- {Project} — Canonical Schema
+-- {path to schema.sql}
 --
 -- Authoritative current-state DDL. Generated from domain model.
 -- Do not edit manually — regenerate from domain model.
 -- Includes canonical seed data known at schema time.
--- Migrations in source/back/migrations/ express deltas from this state.
+-- Migrations in {path to migrations} express deltas from this state.
 -- =============================================================================
 ```
 
@@ -601,8 +601,8 @@ Emit `DROP TABLE IF EXISTS` for all domain tables in reverse dependency order at
 
 SQL DDL ownership is split by artifact type:
 
-- **Canonical schema DDL** (`@domain/schema/schema.sql`) defines the full current-state schema.
-- **Migration DDL** (`@back/migrations/`) defines forward-only deltas from one state to the next.
+- **Canonical schema DDL** defines the full current-state schema.
+- **Migration DDL** defines forward-only deltas from one state to the next.
 
 ### 11.1 Rules
 
