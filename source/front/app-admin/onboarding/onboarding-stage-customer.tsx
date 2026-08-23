@@ -82,7 +82,7 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
               state={state}
               validation={validation}
               name='line2'
-              label='Unit / Suite'
+              label='Unit'
             />
             <CustomerInput state={state} validation={validation} name='city' label='City' required />
             <UiLayout variant='inline-fill'>
@@ -90,14 +90,14 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
                 state={state}
                 validation={validation}
                 name='state'
-                label='State / Region'
+                label='Region'
                 required
               />
               <CustomerInput
                 state={state}
                 validation={validation}
                 name='postalCode'
-                label='Postal Code'
+                label='Postal'
                 required
               />
               <CustomerInput
