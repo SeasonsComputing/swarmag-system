@@ -132,3 +132,5 @@ For every task AI should decompose and delegate to a free-of-cost subagent where
 When the reasoning agent delegates to a free subagent, it should seek parallelism by employing multiple subagents simultaneously if appropriate.
 
 If no free subagent is available, the AI should inform the Chief Architect.
+
+_End of Agents Document_
