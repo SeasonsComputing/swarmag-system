@@ -71,7 +71,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
           preferredChannel: state.preferredChannel(),
           ...(state.email().trim() ? { email: toTrimmed(state.email()) } : {})
         }],
-        sites: state.sites(),
+        sites: state.customer()?.sites ?? [],
         notes: [],
         name: toTrimmed(state.name()),
         status: state.status(),
@@ -96,7 +96,12 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   const stageSites: WizardStage = {
     name: 'sites',
     title: 'Job sites',
-    render: () => <OnboardingStageSites state={state} />,
+    render: context => (
+      <OnboardingStageSites
+        state={state}
+        onReturnControl={context.registerDrillReturn}
+      />
+    ),
     canAdvance: () => true,
     commit: async () => {
       const customer = state.customer()

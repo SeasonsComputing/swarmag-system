@@ -179,6 +179,102 @@ minute for a code they already have.
 Needs an affordance on the request step that jumps straight to code entry for an already
 issued code.
 
+### Wizard stage title never gets its intended color or layout
+
+**Observed:** 2026-08-29 · normal
+
+`wizard.css`'s `[data-shell='wizard'] [data-shell-panel='header-title'] > h2` uses a
+direct-child combinator, but `PanelHeaderTitle` (introduced the same session) nests the `h2`
+one level deeper, inside `[data-shell-panel='header-title-path']`. The rule can never match.
+
+Confirmed the two color tokens actually differ (`--sa-color-primary` vs `--sa-text-h2`, both
+themes), so this isn't cosmetically inert — every wizard stage title silently falls back to
+the generic path heading color and loses the intended `flex`/`text-align: start` treatment.
+Visible immediately on any wizard stage; devtools shows the rule listed but unmatched.
+
+Fix is narrow: rescope the selector to match the actual nesting, e.g.
+`[data-shell='wizard'] [data-shell-panel='header-title-path'] > h2`.
+
+### DrillDown's return-path convention leaks into Wizard
+
+**Observed:** 2026-08-29 · low
+
+`wizard.tsx`'s `drillPath()` does `[stage().title, ...path.slice(1)]` to discard
+`DrillReturnControl.path()`'s first element, because that element is always `DrillDown`'s own
+`rootTitle` — a convention only `DrillDown` itself actually knows (`drill-down.tsx`'s
+`rootFrame = { path: [props.rootTitle], ... }`).
+
+Any future caller of `DrillReturnControl.path()` has to independently rediscover and
+reimplement the same `.slice(1)`, with no compiler signal if it's missed (both sides are
+`readonly string[]`). Belongs in `DrillDown`: expose only the descendant segments beyond the
+root, so a caller can do `[callerTitle, ...control.path()]` without knowing the internal
+indexing.
+
+### DrillDown's onReturnControl prop is both a data channel and a UI-takeover switch
+
+**Observed:** 2026-08-29 · low
+
+`drill-down.tsx`'s internal return button is gated by
+`<Show when={!props.onReturnControl && frame().returnTo !== undefined}>` — passing
+`onReturnControl` for any reason (e.g. logging drill depth) also silently suppresses
+`DrillDown`'s own return UI, with no type-level hint that the prop does double duty.
+
+A future consumer wanting both — notification and the built-in button — gets a working build
+with the back-navigation control silently missing, discoverable only by clicking through the
+UI. Splitting the two concerns (a separate `hideOwnReturn?: boolean`, or always rendering and
+letting layout hide it) would make the tradeoff visible in the type.
+
+### AbstractionManager renders its editor title twice, through two mechanisms
+
+**Observed:** 2026-08-29 · low
+
+The collapsed-width header renders `editorTitle()` through the new `PanelHeaderTitle`; the
+expanded-width header renders the same value again through a separate bare
+`<h2 data-shell='abstraction-manager-expanded-title'>`, each gated by its own CSS
+show/hide rule (`abstraction-manager.css`).
+
+`PanelHeaderTitle`'s `command` prop is already optional (`wizard.tsx` demonstrates the
+title-only call with `command={isFirst() ? undefined : {...}}`), so
+`abstraction-manager.tsx` could call `<PanelHeaderTitle title={editorTitle()} />`
+unconditionally instead of maintaining a parallel bare-`h2` path and a second CSS toggle pair.
+
+### CollectionPanel's detailLabel duplicates itemColumn at every call site
+
+**Observed:** 2026-08-29 · low
+
+`CollectionPanelProps.detailLabel` exists purely to feed the drill breadcrumb's kind label,
+but both call sites in `onboarding-stage-sites.tsx` set it to the exact string already passed
+as `itemColumn` (`'Site'`/`'Site'`, `'Note'`/`'Note'`).
+
+Every future consumer has to keep two props in sync by hand; a caller that sets `itemColumn`
+but forgets or mismatches `detailLabel` gets a table header and a breadcrumb segment that
+silently disagree. `props.itemColumn` could be passed directly as the path segment instead of
+introducing a second prop.
+
+### DrillReturnControl.isDrilled is always true by construction
+
+**Observed:** 2026-08-29 · low
+
+`isDrilled: () => frame().returnTo !== undefined` (`drill-down.tsx`) is only ever attached
+inside the branch `current.returnTo ? {...} : null`, so at the moment the field exists its
+value is always `true` — redundant state answering a question the object's own existence
+already answers. `wizard.tsx`'s `isDrilled()` does `drillReturn()?.isDrilled() ?? false`,
+which could simply be `drillReturn() !== null`.
+
+### PanelHeaderTitle's heading-depth mapping is already at its hardcoded ceiling
+
+**Observed:** 2026-08-29 · normal
+
+`TitleSegment` (`panel-header-title.tsx`) picks `h2`/`h3`/`h4` via nested `Show`/fallback
+rather than a level-to-tag mapping, so a 4th path segment would collapse onto the same `h4`
+as the 3rd, losing the depth cue. Not speculative: `onboarding-stage-sites.tsx` already nests
+Sites → Site → Notes → Note, a 3-segment path that's already at this ceiling today, and the
+project's own game plan (Phase 4: Notes+attachments+buckets) points at one more nesting
+level. `--sa-text-h5`/`--sa-heading-font-size-h5` already exist in `roles.css`/`themes.css`,
+unused here — generalizing to a small `h2`-through-`h5` lookup (or `solid-js/web`'s
+`Dynamic`) uses infrastructure the codebase already ships rather than adding a nesting layer
+each time depth grows.
+
 ## Guards
 
 ### `guard:css` does not verify that a referenced token resolves

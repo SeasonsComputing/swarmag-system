@@ -21,14 +21,17 @@
 }
 
 /* The panel element is remounted per frame, so the animation runs on mount and
-   needs no timing help. Direction is behaviour: descending enters from the
-   inline end, drilling back from the inline start. */
+   needs no timing help. Direction is behaviour, on the block axis rather than
+   inline: descending settles down from the block start, drilling back rises
+   up from the block end. Kept deliberately off the inline pair the Sequence
+   axis uses, so motion direction itself distinguishes drill travel from
+   Sequence travel rather than reusing one vocabulary for both. */
 [data-shell='drill-down'][data-shell-direction='descend'] [data-shell='drill-down-panel'] {
-  animation: sa-slide-in-end var(--sa-motion-page-fade) ease;
+  animation: sa-slide-in-block-start var(--sa-motion-page-fade) ease;
 }
 
 [data-shell='drill-down'][data-shell-direction='ascend'] [data-shell='drill-down-panel'] {
-  animation: sa-slide-in-start var(--sa-motion-page-fade) ease;
+  animation: sa-slide-in-block-end var(--sa-motion-page-fade) ease;
 }
 
 @media (prefers-reduced-motion: reduce) {

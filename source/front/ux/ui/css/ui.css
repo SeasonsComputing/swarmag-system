@@ -128,7 +128,6 @@
   align-items: center;
   background: var(--sa-bg-control);
   border: var(--sa-border-default);
-  backdrop-filter: var(--sa-filter-blur);
   border-radius: var(--sa-radius-full);
   block-size: var(--sa-action-button-ring-size);
   display: inline-flex;

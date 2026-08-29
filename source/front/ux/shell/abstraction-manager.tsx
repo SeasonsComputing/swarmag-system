@@ -36,6 +36,7 @@ import type {
 import { PanelContainer } from './panel-container.tsx'
 import type { PanelFeedback } from './panel-contract.ts'
 import { PanelForm } from './panel-form.tsx'
+import { PanelHeaderTitle } from './panel-header-title.tsx'
 import { PanelHeader } from './panel-header.tsx'
 import { PanelList } from './panel-list.tsx'
 import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
@@ -229,7 +230,13 @@ export const AbstractionManager = <T extends Instance, Draft>(
           <PanelHeader
             leading={<h1>{props.provider.formTitle}</h1>}
             trailing={
-              <UiActionButton icon='cross-1' label='Cancel' labelMode='visible' onClick={cancelDialog} />
+              <UiActionButton
+                icon='cross-1'
+                label='Cancel'
+                labelMode='visible'
+                density='dense'
+                onClick={cancelDialog}
+              />
             }
           />
         }
@@ -242,6 +249,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
                   icon='plus'
                   label={`New ${props.provider.entityLabel}`}
                   labelMode='visible'
+                  density='dense'
                   onClick={onNew}
                 />
               )
@@ -281,6 +289,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
                                   icon={action.icon}
                                   label={action.label}
                                   variant={action.variant}
+                                  density='dense'
                                   onClick={event => {
                                     event.stopPropagation()
                                     requestAction(action, item)
@@ -306,16 +315,18 @@ export const AbstractionManager = <T extends Instance, Draft>(
               leading: (
                 <>
                   <div data-shell='abstraction-manager-collapse-action'>
-                    <span data-shell='abstraction-manager-back-command'>
-                      <UiActionButton
-                        icon='arrow-left'
-                        label={`${props.provider.entityLabel}s`}
-                        onClick={() => setMode('list')}
-                      />
-                      <span aria-hidden='true' data-shell='abstraction-manager-command-divider' />
-                    </span>
+                    <PanelHeaderTitle
+                      title={editorTitle()}
+                      command={{
+                        icon: 'arrow-left',
+                        label: `${props.provider.entityLabel}s`,
+                        onClick: () => setMode('list')
+                      }}
+                    />
                   </div>
-                  <h2>{editorTitle()}</h2>
+                  <div data-shell='abstraction-manager-expanded-title'>
+                    <PanelHeaderTitle title={editorTitle()} />
+                  </div>
                 </>
               ),
               trailing: (
@@ -323,6 +334,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
                   icon='check'
                   label='Save'
                   labelMode='visible'
+                  density='dense'
                   disabled={savePending()}
                   loading={savePending()}
                   onClick={() => void saveEditor()}

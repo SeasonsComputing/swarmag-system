@@ -116,10 +116,11 @@ body::before {
   }
 }
 
-/* Directional entry. The pair exists so travel reads as direction rather than
-   appearance: `-end` enters from the inline end (forward, descend), `-start`
-   from the inline start (backward, drill-back). Animating both ways alike is
-   worse than no motion, because it misinforms. */
+/* Directional entry, inline axis. The pair exists so travel reads as
+   direction rather than appearance: `-end` enters from the inline end,
+   `-start` from the inline start. Animating both ways alike is worse than no
+   motion, because it misinforms. What each direction means to a given caller
+   belongs to that caller, not here. */
 @keyframes sa-slide-in-end {
   from {
     opacity: 0;
@@ -139,6 +140,32 @@ body::before {
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+/* Directional entry, block axis — the vertical counterpart to the inline
+   pair above, for a caller that wants travel direction kept distinct from
+   the inline axis. `-end` enters from the block end, `-start` from the block
+   start. */
+@keyframes sa-slide-in-block-end {
+  from {
+    opacity: 0;
+    transform: translateY(var(--sa-space-xl));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sa-slide-in-block-start {
+  from {
+    opacity: 0;
+    transform: translateY(calc(var(--sa-space-xl) * -1));
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

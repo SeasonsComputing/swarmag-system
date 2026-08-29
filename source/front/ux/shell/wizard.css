@@ -8,18 +8,18 @@
 /* The stepflow column is FIXED, not content-sized. Bare max-content made its
    width a function of stage-title text, which would make the collapse threshold
    below correct for one flow and silently wrong for the next. A fixed track
-   bounds the two-column minimum for EVERY wizard — track + gap + subject
+   bounds the two-column minimum for EVERY wizard — track + gap + main panel
    minimum — and gives short-labelled flows the same column as long ones. A stage
    title wider than the track wraps rather than widening the column.
    Changing this value REQUIRES changing the threshold below with it.
 
-   The floor is sized from the subject side, not the stepflow side: at the
-   narrowest supported container (738, iPad portrait) it leaves the subject 415,
+   The floor is sized from the main side, not the aside side: at the
+   narrowest supported container (738, iPad portrait) it leaves the main panel 415,
    which carries the collection cursor's 352 intrinsic plus 42 of panel interior
    with 21 to spare. Raise it and that margin is what pays.
 
    The fr weights are the manager's 1.7/1.3 reversed — this surface wants the
-   subject wider, that one wants the index wider. Weights distribute surplus
+   main panel wider, that one wants the aside wider. Weights distribute surplus
    only; the floors alone decide when the layout gives up, so the threshold
    below is unaffected by the ratio. */
 [data-shell='wizard'] {
@@ -121,17 +121,17 @@
   animation: sa-slide-in-start var(--sa-motion-page-fade) ease;
 }
 
-[data-shell='wizard-form-stage-title'] {
+[data-shell='wizard'] [data-shell-panel='header-title'] {
+  flex: 1 1 auto;
+}
+
+[data-shell='wizard'] [data-shell-panel='header-title-path'] > h2 {
   color: var(--sa-color-primary);
   flex: 1 1 auto;
   overflow: hidden;
-  text-align: center;
+  text-align: start;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-[data-shell='wizard-form-stage-title'][data-shell-align='start'] {
-  text-align: start;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -140,12 +140,12 @@
   }
 }
 
-/* Derived from this surface's own track sizes, not inherited: stepflow floor 280
-   plus --sa-rhythm-gap plus the subject's --sa-size-min floor 380. The gap term
+/* Derived from this surface's own track sizes, not inherited: aside floor 280
+   plus --sa-rhythm-gap plus the main panel's --sa-size-min floor 380. The gap term
    is NOT its 16px ceiling here — a 676 container sits at a 756 viewport, just
    under the 768 where --sa-rhythm-gap tops out, so it resolves to 15.75 and the
    sum is 675.75. 676 is the literal. At and below it the two tracks cannot both
-   be satisfied and the subject would be squeezed under its floor.
+   be satisfied and the main panel would be squeezed under its floor.
 
    Weights do not appear in this sum. minmax() floors are hard minimums and fr
    distributes surplus only, so the 1.3/1.7 split above cannot move the collapse
