@@ -18,7 +18,7 @@ OnboardingStageSites       Render the optional job-sites stage.
 import type { Note } from '@domain/abstractions/common.ts'
 import type { CustomerSite } from '@domain/abstractions/customer.ts'
 import { CollectionPanel } from '@front/ux/shell/collection-panel.tsx'
-import type { DrillContract } from '@front/ux/shell/drill-contract.ts'
+import type { DrillContract, DrillReturnControl } from '@front/ux/shell/drill-contract.ts'
 import { DrillDown } from '@front/ux/shell/drill-down.tsx'
 import {
   UiActionButton,
@@ -39,6 +39,7 @@ import { type OnboardingState, siteLocation } from './onboarding-state.ts'
 /** Props for the optional job-sites stage. */
 export type OnboardingStageSitesProps = {
   state: OnboardingState
+  onReturnControl?: (control: DrillReturnControl | null) => void
 }
 
 /**
@@ -49,10 +50,10 @@ export type OnboardingStageSitesProps = {
  */
 export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiComponent => {
   const hasGeo = typeof navigator !== 'undefined' && 'geolocation' in navigator
-
   return (
     <DrillDown
       rootTitle='Sites'
+      onReturnControl={props.onReturnControl}
       root={drill => (
         <CollectionPanel
           legend='Sites'
@@ -266,17 +267,19 @@ type NoteEditorProps = {
 const NoteEditor = (props: NoteEditorProps): UiComponent => {
   const name = `site-note-content-${props.sitePosition}-${props.notePosition}`
   return (
-    <UiField for={name} label='Note'>
-      <UiTextArea
-        name={name}
-        rows={6}
-        value={props.note.content}
-        onInput={event =>
-          props.state.updateNote(props.sitePosition, props.notePosition, note => {
-            note.content = event.currentTarget.value
-          })}
-      />
-    </UiField>
+    <UiFieldset legend='Note'>
+      <UiField for={name} label='Content'>
+        <UiTextArea
+          name={name}
+          rows={6}
+          value={props.note.content}
+          onInput={event =>
+            props.state.updateNote(props.sitePosition, props.notePosition, note => {
+              note.content = event.currentTarget.value
+            })}
+        />
+      </UiField>
+    </UiFieldset>
   )
 }
 

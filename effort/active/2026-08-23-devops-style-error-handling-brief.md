@@ -150,7 +150,7 @@ During an unrelated UX session, ACE tried to start a local dev server
 screenshot a wizard for L&F review. Both failed. CA had to interrupt to
 clarify: this is a greenfield, single-developer project — there is no
 separate local frontend or local backend permutation. `localhost:5173` is
-local *serving* of the stage-bound frontend, not an independent local dev
+local _serving_ of the stage-bound frontend, not an independent local dev
 environment. This is already captured for AA/CA reference in memory
 (`project_stage_deploy.md` — "stage is the ONLY environment"), but
 `architecture-devops.md` itself apparently doesn't lead with it clearly

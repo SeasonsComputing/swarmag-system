@@ -59,7 +59,7 @@ type PendingRemove<T> = {
 export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T>): UiComponent => {
   const [pendingRemove, setPendingRemove] = createSignal<PendingRemove<T> | null>(null)
   const openItem = (item: T, index: number): void => {
-    props.drill.open(() => props.renderItem(item, index), props.label(item, index))
+    props.drill.open(() => props.renderItem(item, index), props.label(item, index), props.itemColumn)
   }
   const addItem = (): void => {
     props.onNew()
@@ -84,6 +84,8 @@ export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T
             icon='plus'
             label={props.newLabel}
             labelMode='visible'
+            align='start'
+            density='dense'
             onClick={addItem}
           />
         </div>
@@ -104,9 +106,9 @@ export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T
                       <UiTableCell>{props.label(item, index())}</UiTableCell>
                       <UiTableCell align='end'>
                         <UiActionButton
-                          icon='trash'
+                          density='dense'
+                          icon='minus'
                           label={`Delete ${props.label(item, index())}`}
-                          variant='danger'
                           onClick={event => {
                             event.stopPropagation()
                             requestRemove(item, index())

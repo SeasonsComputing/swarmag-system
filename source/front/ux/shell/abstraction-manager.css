@@ -5,12 +5,12 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-/* Same floors as the wizard, weights reversed: this surface gives the index the
-   larger share of surplus, that one gives it to the subject. That is the only
+/* Same floors as the wizard, weights reversed: this surface gives the aside the
+   larger share of surplus, that one gives it to the main panel. That is the only
    difference between the two layouts, and it is deliberate — one mechanism, one
    collapse point, one place to be wrong.
 
-   The index floor is not a content requirement. The list table shrinks without
+   The aside floor is not a content requirement. The list table shrinks without
    a minimum once the row carries no edit action, so the floor exists to place
    the collapse point rather than to protect the table. It replaced 425
    (--sa-size-xs), a device-ladder rung that had been standing in for a measure
@@ -36,28 +36,20 @@
   justify-content: end;
 }
 
-[data-shell='abstraction-manager-back-command'] {
-  align-items: center;
-  display: inline-flex;
-  gap: var(--sa-space-xs);
-}
-
-[data-shell='abstraction-manager-command-divider'] {
-  align-self: stretch;
-  border-inline-start: var(--sa-border-default);
-  min-block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-sm));
-}
-
 [data-shell='abstraction-manager-collapse-action'] {
   display: none;
 }
 
-/* Derived from this surface's own track sizes: index floor 280 plus
-   --sa-rhythm-gap plus subject floor 380. The gap term is NOT its 16px ceiling
+[data-shell='abstraction-manager-expanded-title'] {
+  display: block;
+}
+
+/* Derived from this surface's own track sizes: aside floor 280 plus
+   --sa-rhythm-gap plus main floor 380. The gap term is NOT its 16px ceiling
    — a 676 container sits at a 756 viewport, just under the 768 where
    --sa-rhythm-gap tops out, so it resolves to 15.75 and the sum is 675.75. 676
-   is the literal. At and below it the two tracks cannot both be satisfied and a
-   panel would be squeezed under its floor.
+   is the literal. At and below it the two tracks cannot both be satisfied and the
+   main panel would be squeezed under its floor.
 
    Identical to the wizard's threshold, because the floors are identical. The
    weights differ between the surfaces and cannot appear in this sum: minmax()
@@ -119,5 +111,9 @@
 
   [data-shell='abstraction-manager-collapse-action'] {
     display: block;
+  }
+
+  [data-shell='abstraction-manager-expanded-title'] {
+    display: none;
   }
 }
