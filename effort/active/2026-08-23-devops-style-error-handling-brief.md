@@ -139,6 +139,32 @@ accretes.
    friction earlier this same session with `guard:leaf`. First run should be
    green.
 
+## Related, separate finding: `architecture-devops.md` needs the local/stage fact up front
+
+Not part of the retrofit scope above — a distinct doc-ordering problem CA
+flagged 2026-08-28, captured here only because it lands on the same file as
+step 2.
+
+During an unrelated UX session, ACE tried to start a local dev server
+(`deno task app-admin-stage-local`, then `deno task app-stage-local admin`) to
+screenshot a wizard for L&F review. Both failed. CA had to interrupt to
+clarify: this is a greenfield, single-developer project — there is no
+separate local frontend or local backend permutation. `localhost:5173` is
+local *serving* of the stage-bound frontend, not an independent local dev
+environment. This is already captured for AA/CA reference in memory
+(`project_stage_deploy.md` — "stage is the ONLY environment"), but
+`architecture-devops.md` itself apparently doesn't lead with it clearly
+enough for ACE to internalize before reaching for a dev-server command. CA's
+words: "ACE went down the dev server hole again" — implying this is a repeat,
+not a one-off.
+
+When `architecture-devops.md` gets touched (step 2 above, or its own small
+pass if that's cleaner sequencing) move the "stage is the only environment,
+no local dev server exists, `localhost:5173` = local serving of stage" fact
+to the front of the document, ahead of command-level detail — so it's read
+before any dev-server-shaped command is attempted, not discovered by failing
+one.
+
 ## Checks
 
 `deno task fmt`, `deno task check`, `deno task test` after each of steps 3, 5,
