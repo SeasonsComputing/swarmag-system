@@ -36,6 +36,18 @@ is live and unaddressed.
 The fix is ordering, not deletion: lead with the map and the constraints, let procedure
 follow. Nothing needs to be removed.
 
+**Recurrence, 2026-08-28:** During an unrelated UX session, ACE tried to start a local dev
+server twice (`app-admin-stage-local`, then `app-stage-local admin`) before CA interrupted
+to explain there is no separate local frontend/backend environment — this is a greenfield,
+single-developer project, and `localhost:5173` is local serving of the stage-bound
+frontend, not an independent local dev permutation. CA's own words: "ACE went down the dev
+server hole again," implying this is not the first time. This is a live specimen of the
+exact failure this entry already describes — the constraint a session needed
+("stage is the only environment") wasn't reached before the session acted on procedure it
+shouldn't have. Also noted in
+`effort/active/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
+already touches this file.
+
 ### `architecture-core.md` is base context and has never been measured for scan cost
 
 **Observed:** 2026-08-16 · high
