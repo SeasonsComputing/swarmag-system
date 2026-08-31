@@ -96,7 +96,7 @@
   background: transparent;
   border: none;
   border-radius: var(--sa-radius-full);
-  color: var(--sa-text-secondary);
+  color: var(--sa-text-primary);
   cursor: pointer;
   display: inline-flex;
   flex: 0 0 var(--sa-action-button-ring-size);
