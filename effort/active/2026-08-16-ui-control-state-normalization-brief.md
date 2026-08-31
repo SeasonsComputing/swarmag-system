@@ -1,9 +1,13 @@
 # UI Control State Normalization — Production Brief
 
-**Runs second.** `effort/active/2026-08-16-helm-button-boundary-repair-brief.md`
-goes first. Both edit `ui.css` and `ui-action-button.tsx`, so they cannot run in
-parallel, and the Helm repair removes leaked specialization that would otherwise
-be recorded as part of the state model this brief normalizes.
+**Sequencing note (2026-08-30):** originally gated behind
+`effort/active/2026-08-16-helm-button-boundary-repair-brief.md` on the
+assumption both would edit `ui.css`/`ui-action-button.tsx`. The Helm boundary
+repair has since shipped by a different mechanism (per-action `labelMode`
+config, no `HelmButton`, no shared-file changes — see
+`effort/completed/2026-08-16-helm-button-boundary-repair-brief.md`), so
+`ui.css`/`ui-action-button.tsx` carry no Helm-specific leakage today and there
+is no longer a file conflict gating this brief. It may run independently.
 
 ## What triggered this
 

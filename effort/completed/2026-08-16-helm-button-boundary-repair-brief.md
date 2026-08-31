@@ -1,5 +1,38 @@
 # Helm Button Boundary Repair — Production Brief
 
+**Outcome (2026-08-30), recorded by CA:** the root problem this brief exists
+to fix — Helm/Dashboard specialization leaking into `ui.css` and
+`ui-action-button.tsx` — is verified resolved. Both files carry zero
+Helm/dashboard references today.
+
+The specific architecture this brief marked "decided, not offered" — a
+`HelmButton` wrapping `UiActionButton`, switching labeled/icon-only
+presentation at a CSS-driven labeled-action threshold — is not what shipped.
+No `HelmButton` file exists. What shipped instead: HelmWidget renders
+`UiActionButton` directly, and each configured action carries its own static
+`labelMode` from the dashboard JSON seed. CA drove every decision and
+artifact behind that change directly, so this isn't an undocumented
+deviation from the brief's recorded call — it's CA revising CA's own prior
+call, which needs no escalation ritual to itself.
+
+The real lesson isn't about process, it's about where the mistake actually
+happened. The original responsive dashboard L&F this brief was defending —
+a labeled-action threshold collapsing Helm's actions across the terminal
+field — was CA's own envisioned design, and it turned out more complicated
+than it was worth. Pursuing it pushed that complexity down into
+`ux/ui`/`UiActionButton` — a shared, foundational primitive — before the
+feature had proven itself anywhere. That's the actual boundary violation
+this brief diagnosed correctly even while prescribing the wrong fix: not
+"Helm needs its own button," but "a feature's needs shouldn't be pushed into
+the foundation layer before they've been proven at a higher, more disposable
+layer first." What's committed now is both a de-pollution of `ux/ui` and a
+simplification of the dashboard itself — the responsive-threshold ambition
+dropped, HelmWidget's presentation reduced to static per-action config —
+deliberately, to stay functional for near-term development rather than
+carry unproven complexity forward.
+
+---
+
 **Runs first.** This brief and
 `effort/active/2026-08-16-ui-control-state-normalization-brief.md` both edit
 `ui.css` and `ui-action-button.tsx`, so they cannot run in parallel. This one goes

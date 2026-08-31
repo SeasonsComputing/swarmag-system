@@ -174,7 +174,8 @@ silently breaks at the next container size.
 
 **What it is:** The header HelmWidget should eventually contain only universal application
 commands — for example Support, About, and Logout. This keeps the shared header compact
-and makes its existing wrapped-lane icon treatment appropriate across all applications.
+and keeps per-action presentation (each action's own configured `labelMode`) legible
+across all applications, rather than crowding the terminal field with app-specific links.
 Application-specific navigation belongs in a separate dashboard body concept, not in
 HelmWidget and not in a header/body variant of it. Admin would move links such as Users
 and Onboarding to that future body surface; Ops would use its own composition when it has

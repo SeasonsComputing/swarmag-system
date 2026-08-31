@@ -81,29 +81,6 @@ Two ways to settle it, and either is fine as long as it is chosen. Retirement re
 
 ## Controls
 
-### HelmWidget action presentation leaks into the action-button primitive
-
-**Observed:** 2026-08-16 · high
-
-HelmWidget has a legitimate responsive behavior: above its labeled-action threshold it
-shows labeled route actions, and at or below that threshold it optimizes the terminal
-field to dense icon actions while retaining accessible labels. That behavior belongs to
-the dashboard terminal widget, because `architecture-front.md` §7.3 makes HelmWidget the
-owner of action presentation within its allocated terminal field.
-
-The current implementation lets that specialization leak into the shared action-button
-foundation. `ui.css` carries action-button commentary about consumer specificity and label
-display, while HelmWidget has depended on action-button internals to collapse labels. That
-couples a cross-project primitive to one dashboard widget's responsive needs and makes
-future action-button changes preserve a workaround rather than a contract.
-
-The fix is a boundary repair. Keep `UiActionButton` as a boring primitive with explicit
-`label`, `icon`, `labelMode`, `align`, `density`, and `variant` semantics. Move the
-dashboard terminal presentation into widget space with a `HelmButton` owned under
-`source/front/ux/widgets`. The stacked-header threshold must control row structure only;
-HelmWidget's labeled-action threshold alone controls labeled versus icon-only
-presentation.
-
 ### Shared UI controls do not use one state model
 
 **Observed:** 2026-08-16 · high
