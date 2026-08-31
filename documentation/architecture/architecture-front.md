@@ -723,32 +723,14 @@ widgets may adapt their presentation; when the field needs more space, it adds r
 while retaining ordered placement. The shell does not require horizontal scrolling.
 
 The header provides two deterministic responsive contexts, selected by container
-query against the header's own inline size — not the viewport. Above the shell's
-**stacked-header threshold**, the leading identity field (shell logo + BrandWidget)
-and the terminal HelmWidget share a single non-wrapping row, and the terminal field
-is anchored to the header's inline end. At or below that threshold, the identity
-field occupies its own row and the terminal field spans the following short action
-row. CSS selects the context before layout; the shell does not measure rendered
-positions or mutate context after mount.
-
-The terminal field is sized by the shell, not by its contents, so it is a valid
-query container. HelmWidget shrink-wraps its action cluster inside that field and
-stays anchored to the inline end; the field's own measure is what the widget
-queries.
-
-HelmWidget owns action placement within its field, and adapts to that field rather
-than to the window. Above the widget's **labeled-action threshold** it presents
-labeled controls; at or below it, dense icon controls. The stacked-header threshold
-governs only the header's row structure — when the field spans its own row,
-HelmWidget distributes its actions across that row. Each control retains its
-accessible label, and its circle and glyph scale together with density. A single
-viewport-level step in the shared base scale provides the remaining reduction on the
-narrowest devices.
+query against the header's own inline size — not the viewport. CSS selects the
+context before layout; the shell does not measure rendered positions or mutate
+context after mount.
 
 Threshold values are stylesheet-owned and are not restated here: the stacked-header
-threshold lives in `dashboard.css`, the labeled-action threshold in
-`helm-widget.css`, and the base-scale step in `tokens.css`. Each is expressed as the
-intrinsic width it protects, so the number can be re-derived rather than inherited.
+threshold lives in `dashboard.css`, and the base-scale step lives in `tokens.css`.
+Each is expressed as the intrinsic width it protects, so the number can be re-derived
+rather than inherited.
 
 `compact` and `landscape` are widget presentation shapes, not shell geometry. A
 widget uses its configured shape to express its data within the footprint allocated
@@ -763,11 +745,11 @@ and brand anchor the highest-priority region, remain legible and non-wrapping, a
 do not participate in content-driven transformation. The header and body use the
 same placement principles at their respective scales.
 
-**`source/front/app-{admin|ops|customer}/app-{admin|ops|customer}-dashboard.json`**
+**`source/front/app-{admin|ops|customer}/dashboard-{admin|ops|customer}.json`**
 
 Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/front/ux/stores/dashboard-state.ts`). Not hardcoded. The current contract uses one default config per app.
 
-The app-local dashboard JSON conforms to `DashboardStoreView` from `source/front/ux/views/dashboard-views.ts`. `DashboardState.init(seed)`validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity lto the dashboard, rows, and widgets before persisting the layout in IndexedDB.
+The app-local dashboard JSON conforms to the dashboard seed contract in `source/front/ux/shell/dashboard-contract.ts`. `DashboardState.init(seed)` validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
 `makeDashboardShell()` initializes `DashboardState`, then constructs `Dashboard` with the state contract and app-supplied widget registry as explicit inputs. The registry is composition data: each app package binds explicit dashboard widget type keys to concrete widgets alongside its dashboard JSON — the two halves of one dashboard-shell declaration.
 
@@ -780,41 +762,33 @@ Dashboard state remains a Reactive Store Module. The dashboard receives its name
 {
   "header": {
     "widgets": [
-      { "type": "BrandWidget", "settings": { "shape": "landscape" } },
-      {
-        "type": "HelmWidget",
-        "settings": {
-          "shape": "compact",
-          "actions": ["/about", "/logout"],
-          "labels": ["About", "Logout"],
-          "icons": ["info-circled", "exit"]
-        }
-      }
+      { "type": "BrandWidget", "settings": { "...": "..." } },
+      { "type": "HelmWidget", "settings": { "...": "..." } }
     ]
   },
   "rows": [
     {
       "size": "standard",
-      "label": "Operations at-a-glance",
-      "widgets": [
-        { "type": "UpcomingJobsWidget", "settings": { "shape": "landscape" } },
-        { "type": "AssetStatusWidget", "settings": { "shape": "compact" } }
-      ]
+      "label": "...",
+      "widgets": [{ "type": "SomeWidget", "settings": { "...": "..." } }]
     }
   ]
 }
 ```
 
+Per-widget `settings` shape is that widget's own contract, not restated here —
+see `source/front/app-admin/dashboard-admin.json` for a live, current example.
+
 ### 10.4 Views Catalog
 
 UX projection types — shapes that exist because the domain model does not surface cleanly to the UI as-is. No infrastructure imports, no SolidJS imports. Pure types only. Files follow the `{domain}-views.ts` naming convention.
 
-| File                 | Types                                                                      | Purpose                                             |
-| -------------------- | -------------------------------------------------------------------------- | --------------------------------------------------- |
-| `job-views.ts`       | `JobManifest`, `JobHub`                                                    | Job display projections                             |
-| `dashboard-views.ts` | `DashboardStoreView`, `DashboardHeader`, `DashboardRow`, `DashboardWidget` | Dashboard layout schema types                       |
-| `workflow-views.ts`  | `WorkflowView`                                                             | Ordered tasks + questions resolved for renderer     |
-| `question-views.ts`  | `QuestionView`                                                             | Discriminated union flattened for workflow renderer |
+| File                    | Types                                                             | Purpose                                             |
+| ----------------------- | ----------------------------------------------------------------- | --------------------------------------------------- |
+| `job-views.ts`          | `JobManifest`, `JobHub`                                           | Job display projections                             |
+| `dashboard-contract.ts` | `Dashboard`, `DashboardHeader`, `DashboardRow`, `DashboardWidget` | Dashboard seed contract types                       |
+| `workflow-views.ts`     | `WorkflowView`                                                    | Ordered tasks + questions resolved for renderer     |
+| `question-views.ts`     | `QuestionView`                                                    | Discriminated union flattened for workflow renderer |
 
 ## 11. Specialized Application Features
 
