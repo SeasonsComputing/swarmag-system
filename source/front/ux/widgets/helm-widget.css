@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Helm widget styles                                                           ║
-║ Terminal route action presentation for the dashboard field.                  ║
+║ Terminal action presentation for the dashboard field.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
@@ -19,18 +19,6 @@
   gap: var(--sa-rhythm-gap);
   row-gap: 0;
   width: fit-content;
-}
-
-/* Dense controls: the allocated field can no longer carry labeled actions. */
-/* Threshold is the labeled cluster's intrinsic width plus the header gap. */
-@container dashboard-helm-field (max-width: 464px) {
-  [data-widget='helm-widget'] [data-ui='layout'] {
-    column-gap: var(--sa-rhythm-gap);
-  }
-
-  [data-widget='helm-widget'] [data-ui='action-button'] [data-ui='action-button-label'] {
-    display: none;
-  }
 }
 
 /* Stacked header: the field spans its own row, so actions center within it. */

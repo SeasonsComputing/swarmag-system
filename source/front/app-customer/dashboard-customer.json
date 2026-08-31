@@ -7,9 +7,9 @@
         "type": "HelmWidget",
         "settings": {
           "shape": "landscape",
-          "actions": ["/logout"],
-          "labels": ["Logout"],
-          "icons": ["exit"]
+          "actions": [
+            { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }
+          ]
         }
       }
     ]

@@ -7,9 +7,14 @@
         "type": "HelmWidget",
         "settings": {
           "shape": "compact",
-          "actions": ["/users", "/onboarding", "/about", "/logout"],
-          "labels": ["Users", "Onboarding", "About", "Logout"],
-          "icons": ["person", "id-card", "info-circled", "exit"]
+          "actions": [
+            { "command": "/users", "label": "Users", "icon": "person" },
+            { "command": "/onboarding", "label": "Onboarding", "icon": "id-card" },
+            { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
+            { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
+            { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }
+          ],
+          "themes": ["dark", "light"]
         }
       }
     ]
