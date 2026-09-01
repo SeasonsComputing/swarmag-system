@@ -16,23 +16,36 @@ makeAuthUsers      Build the auth-synchronized Users CRUD client, validated befo
                    dispatch even though create/update proxy to edge functions.
 */
 
-import type { ApiCrudContract, DeleteResult, ListOptions, ListResult } from '@core/api/api-contract.ts'
+import type {
+  CrudBaseContract,
+  CrudListContract,
+  DeleteResult,
+  ListOptions,
+  ListResult,
+  PinnedUpdateContract
+} from '@core/api/api-contract.ts'
 import { checkValidatorError } from '@core/api/api-contract.ts'
 import {
   makeBusRuleSupabaseEdgeClient,
   makeBusRuleSupabaseRpcClient,
   makeCrudSupabaseClient
 } from '@core/client/make-supabase-client.ts'
-import type { CreateFromInstantiable, Dictionary, Id, UpdateFromInstantiable } from '@core/std'
+import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { validateUserCreate, validateUserUpdate } from '@domain/validators/user-validator.ts'
 
+type AllUserKeys = Extract<keyof typeof UserAdapter, keyof FromInstantiable<User>>
+
 /** Users API contract with auth synchronization operations. */
-export type AuthUsersContract = ApiCrudContract<User> & {
-  eject(id: Id): Promise<User>
-  hasAccess(email: string): Promise<boolean>
-}
+export type AuthUsersContract =
+  & CrudBaseContract<User>
+  & PinnedUpdateContract<User, AllUserKeys>
+  & CrudListContract<User>
+  & {
+    eject(id: Id): Promise<User>
+    hasAccess(email: string): Promise<boolean>
+  }
 
 /** Build the auth-synchronized Users CRUD client. */
 export const makeAuthUsers = (): AuthUsersContract => {
@@ -101,7 +114,7 @@ export const makeAuthUsers = (): AuthUsersContract => {
      * @param input User update payload.
      * @returns The updated domain user.
      */
-    update: (input: UpdateFromInstantiable<User>): Promise<User> => {
+    update: (input: ScopedUpdate<User, AllUserKeys>): Promise<User> => {
       checkValidatorError(validateUserUpdate(input))
       return update.run(input as Dictionary)
     }

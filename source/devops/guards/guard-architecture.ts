@@ -37,8 +37,7 @@ const UX_FORBIDDEN_IMPORTS = [
   '@core/api/',
   '@core/cfg/',
   '@back',
-  '@back-supabase-edge/',
-  '@domain/adapters/'
+  '@back-supabase-edge/'
 ]
 
 /** Import detection regexes */

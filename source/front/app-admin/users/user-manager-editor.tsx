@@ -15,7 +15,14 @@ UserDraft   Draft projected by the user editor.
 UserEditor  User Manager editor form.
 */
 
-import { expectEmail, expectNonEmptyString, toEmail, toTrimmed } from '@core/std'
+import {
+  expectEmail,
+  expectNonEmptyString,
+  type FromInstantiable,
+  type ScopedUpdate,
+  toEmail,
+  toTrimmed
+} from '@core/std'
 import {
   CONTACT_PREFERRED_CHANNELS,
   type ContactPreferredChannel,
@@ -28,7 +35,6 @@ import {
   type UserRole,
   type UserStatus
 } from '@domain/abstractions/user.ts'
-import type { UserCreate } from '@domain/protocols/user-protocol.ts'
 import type { AbstractionEditorContext } from '@front/ux/shell/abstraction-manager-contract.ts'
 import { useAbstractionFormFeedback } from '@front/ux/shell/use-abstraction-form-feedback.ts'
 import { useAbstractionFormKeyboard } from '@front/ux/shell/use-abstraction-form-keyboard.ts'
@@ -49,7 +55,9 @@ import {
 import { createEffect, createSignal, For, onCleanup, onMount } from '@solid-js'
 
 /** Draft projected by the user editor. */
-export type UserDraft = UserCreate
+export type UserDraft =
+  & Omit<ScopedUpdate<User, keyof FromInstantiable<User>>, 'id' | 'avatarUrl'>
+  & { avatarUrl: string | undefined }
 
 /** Renders the create or edit form for one user. */
 export function UserEditor(props: {
@@ -93,6 +101,7 @@ export function UserEditor(props: {
     preferredChannel: preferredChannel(),
     notes: nextNotes(props.user?.notes ?? []),
     roles: roles(),
+    avatarUrl: props.user?.avatarUrl,
     status: status()
   })
   const submit = (event: SubmitEvent): void => {
