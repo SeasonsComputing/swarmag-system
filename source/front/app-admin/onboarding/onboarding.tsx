@@ -6,7 +6,8 @@
 */
 
 import { toTrimmed } from '@core/std'
-import type { CustomerCreate, CustomerUpdate } from '@domain/protocols/customer-protocol.ts'
+import type { CustomerCreate } from '@domain/protocols/customer-protocol.ts'
+import { CustomerUpdateScopes } from '@front/api/api-update-scopes.ts'
 import { api } from '@front/api/api.ts'
 import { OnboardingStageContact } from '@front/app-admin/onboarding/onboarding-stage-contact.tsx'
 import { OnboardingStageCustomer } from '@front/app-admin/onboarding/onboarding-stage-customer.tsx'
@@ -84,8 +85,20 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
       }
       const customer = state.customer()
       if (customer) {
-        const update: CustomerUpdate = { ...customer, ...create }
-        state.setCustomer(await api.Customers.update(update))
+        state.setCustomer(
+          await api.Customers.update(CustomerUpdateScopes.address, {
+            id: customer.id,
+            primaryContact: create.primaryContact,
+            name: create.name,
+            status: create.status,
+            line1: create.line1,
+            line2: create.line2,
+            city: create.city,
+            state: create.state,
+            postalCode: create.postalCode,
+            country: create.country
+          })
+        )
         return
       }
       state.setCustomer(await api.Customers.create(create))
@@ -106,7 +119,10 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
     commit: async () => {
       const customer = state.customer()
       if (state.sites().length > 0 && customer) {
-        await api.Customers.update({ ...customer, sites: state.sites() })
+        await api.Customers.update(CustomerUpdateScopes.sites, {
+          id: customer.id,
+          sites: state.sites()
+        })
       }
     }
   }

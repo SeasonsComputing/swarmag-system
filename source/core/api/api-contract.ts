@@ -28,12 +28,25 @@ throwApiError(error, ...): never   Always throw ApiError from provider error.
 apiError(error): boolean           Runtime type guard and logger for ApiError.
 checkValidatorError(result): void  Throw ApiError 422 when a validator rejects a payload.
 
-ApiCrudContract - Generic CRUD/list client contract.
-├ create(input)       Create one resource.
-├ get(id)             Read one resource.
-├ update(input)       Update one resource.
-├ delete(id)          Delete one resource and return DeleteResult.
-└ list?(options?)     List resources with pagination.
+CrudBaseContract<T> - Non-mutating-shape CRUD primitives shared by every realization.
+├ create(input)  Create one resource.
+├ get(id)        Read one resource.
+└ delete(id)     Delete one resource and return DeleteResult.
+
+AdaptedUpdateContract<T> - Scoped update via a client-side ScopedUpdateAdapter (Supabase, IndexedDB).
+└ update(scoped, source)  Update declared fields through an adapter translation.
+
+DirectUpdateContract<T> - Scoped update with no adapter translation (abstraction-oriented HTTP).
+└ update(source)  Update declared fields directly.
+
+PinnedUpdateContract<T, K> - Scoped update pinned to one declared key set (e.g. a composed wrapper).
+└ update(source)  Update the fixed declared fields.
+
+CrudListContract<T> - Paginated listing.
+└ list?(options?)  List resources with pagination.
+
+ApiCrudContract<T> - CrudBaseContract<T> & AdaptedUpdateContract<T> & CrudListContract<T>. The default CRUD/list
+                      client contract (Supabase, IndexedDB — client-side adapter translation).
 
 ApiBusRuleContract<TParams, TResult> - Generic business-rule execution contract.
 └ run(params)  Execute business rule and return typed result.
@@ -52,18 +65,20 @@ ListResult<T> - Pagination response payload.
 └ hasMore  True when more rows remain.
 
 listPageLimitValue(string): number Parse/clamp list page size.
-listCursorValue(string): number    Parse/sanitize list cursor offset.
+listCursorValue(string):    number Parse/sanitize list cursor offset.
 */
 
 import type {
   CreateFromInstantiable,
   Dictionary,
   ExpectResult,
+  FromInstantiable,
   Id,
   Instantiable,
-  UpdateFromInstantiable,
+  ScopedUpdate,
   When
 } from '@core/std'
+import type { ScopedUpdateAdapter } from '@core/stdx'
 
 // ────────────────────────────────────────────────────────────────────────────
 // ERROR HANDLING
@@ -143,14 +158,41 @@ export function checkValidatorError(result: ExpectResult): void {
 // CRUD & BUSINESS RULE API CONTRACTS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** CRUD API contract */
-export interface ApiCrudContract<T extends Instantiable> {
+/** Non-mutating-shape CRUD primitives shared by every ApiCrudContract realization. */
+export interface CrudBaseContract<T extends Instantiable> {
   create(input: CreateFromInstantiable<T>): Promise<T>
   get(id: Id): Promise<T>
-  update(input: UpdateFromInstantiable<T>): Promise<T>
   delete(id: Id): Promise<DeleteResult>
+}
+
+/** Scoped update via a client-side ScopedUpdateAdapter (Supabase, IndexedDB). */
+export interface AdaptedUpdateContract<T extends Instantiable> {
+  update<K extends keyof FromInstantiable<T>>(
+    scoped: ScopedUpdateAdapter<T, K>,
+    source: ScopedUpdate<T, K>
+  ): Promise<T>
+}
+
+/** Scoped update with no adapter translation (abstraction-oriented HTTP endpoints). */
+export interface DirectUpdateContract<T extends Instantiable> {
+  update<K extends keyof FromInstantiable<T>>(source: ScopedUpdate<T, K>): Promise<T>
+}
+
+/** Scoped update pinned to one declared key set, e.g. a composed wrapper's fixed surface. */
+export interface PinnedUpdateContract<T extends Instantiable, K extends keyof FromInstantiable<T>> {
+  update(source: ScopedUpdate<T, K>): Promise<T>
+}
+
+/** Paginated listing. */
+export interface CrudListContract<T> {
   list(options?: ListOptions): Promise<ListResult<T>>
 }
+
+/** CRUD API contract for adapter-translated backing stores (Supabase, IndexedDB). */
+export type ApiCrudContract<T extends Instantiable> =
+  & CrudBaseContract<T>
+  & AdaptedUpdateContract<T>
+  & CrudListContract<T>
 
 /** Business rule API contract. Type parameters default to Dictionary for backward compatibility. */
 export interface ApiBusRuleContract<

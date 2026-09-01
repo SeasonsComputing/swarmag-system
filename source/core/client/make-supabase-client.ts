@@ -38,15 +38,17 @@ import { Supabase } from '@core/db/supabase.ts'
 import {
   type CreateFromInstantiable,
   type Dictionary,
+  type FromInstantiable,
   type Id,
   type Instantiable,
   instantiable,
+  type ScopedUpdate,
   type UpdateFromInstantiable,
   type Validator,
   type When,
   when
 } from '@core/std'
-import type { Adapter, AdapterPatch } from '@core/stdx'
+import type { Adapter, AdapterPatch, ScopedUpdateAdapter } from '@core/stdx'
 
 // ───────────────────────────────────────────────────────────────────────────────
 // SPECIFICATIONS
@@ -101,11 +103,14 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
     return adapter.toDomain(data)
   },
 
-  /* Apply update patch to an existing non-deleted Supabase record. */
-  async update(source: UpdateFromInstantiable<T>): Promise<T> {
-    checkValidatorError(validator.validateUpdate(source))
+  /* Apply a declared-scope update patch to an existing non-deleted Supabase record. */
+  async update<K extends keyof FromInstantiable<T>>(
+    scoped: ScopedUpdateAdapter<T, K>,
+    source: ScopedUpdate<T, K>
+  ): Promise<T> {
+    checkValidatorError(validator.validateUpdate(source as UpdateFromInstantiable<T>))
     const { id, ...patch } = source
-    const record = adapter.fromDomain(patch as AdapterPatch<T>)
+    const record = scoped.fromDomain(patch as Pick<AdapterPatch<T>, K>)
     const { data, error } = await Supabase.client()
       .from(table)
       .update({ ...record, updated_at: when() })

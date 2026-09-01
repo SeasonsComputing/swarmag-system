@@ -4,7 +4,7 @@
  * NULL maps to domain absence.
  */
 
-import { type AdapterPatch, makeAdapter } from '@core/stdx'
+import { type AdapterPatch, makeAdapter, makeScopedUpdate } from '@core/stdx'
 import { assertEquals } from '@std/assert'
 
 type Gauge = { kind: string; reading: number }
@@ -36,10 +36,33 @@ Deno.test('fromDomain writes falsy values through', () => {
   assertEquals(record, { is_active: false, count: 0, label: '' })
 })
 
+Deno.test('field adapters expose keys and serialize one storage column', () => {
+  assertEquals(WidgetAdapter.label.key, 'label')
+  assertEquals(WidgetAdapter.label.fromDomain('ok'), { label: 'ok' })
+})
+
 Deno.test('fromDomain skips absent keys and maps null to a column clear', () => {
   const patch: AdapterPatch<Widget> = { id: 'w1', note: null }
   const record = WidgetAdapter.fromDomain(patch)
   assertEquals(record, { id: 'w1', note: null })
+})
+
+Deno.test('makeScopedUpdate emits only declared fields', () => {
+  const scoped = makeScopedUpdate([WidgetAdapter.label])
+  const record = scoped.fromDomain({ label: 'ok' })
+  assertEquals(record, { label: 'ok' })
+})
+
+Deno.test('makeScopedUpdate preserves null clears', () => {
+  const scoped = makeScopedUpdate([WidgetAdapter.note])
+  const record = scoped.fromDomain({ note: null })
+  assertEquals(record, { note: null })
+})
+
+Deno.test('makeScopedUpdate preserves nested delegate arrays', () => {
+  const scoped = makeScopedUpdate([WidgetAdapter.gauges])
+  const record = scoped.fromDomain({ gauges: [{ kind: 'psi', reading: 0 }] })
+  assertEquals(record, { gauges: [{ kind: 'psi', reading: 0 }] })
 })
 
 Deno.test('toDomain omits NULL and undefined storage columns', () => {

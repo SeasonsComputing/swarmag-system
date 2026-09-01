@@ -289,19 +289,42 @@ The system defines three client contracts (in `source/core/api/api-contract.ts`)
 
 #### 5.2.1 CRUD & List Contract
 
+`ApiCrudContract` is composed from smaller capability interfaces rather than declared as one flat
+shape, so each backing-store family can carry the `update` signature that actually fits it:
+
 ```typescript
-interface ApiCrudContract<T extends Instantiable> {
+type ApiCrudContract<T extends Instantiable> =
+  & CrudBaseContract<T> // create, get, delete
+  & AdaptedUpdateContract<T> // update(scoped, source) — adapter-translated stores
+  & CrudListContract<T> // list
+
+interface CrudBaseContract<T extends Instantiable> {
   create(input: CreateFromInstantiable<T>): Promise<T>
   get(id: Id): Promise<T>
-  update(input: UpdateFromInstantiable<T>): Promise<T>
   delete(id: Id): Promise<DeleteResult>
-  list?(options?: ListOptions): Promise<ListResult<T>>
+}
+
+interface AdaptedUpdateContract<T extends Instantiable> {
+  update<K extends keyof FromInstantiable<T>>(
+    scoped: ScopedUpdateAdapter<T, K>,
+    source: ScopedUpdate<T, K>
+  ): Promise<T>
+}
+
+interface CrudListContract<T> {
+  list(options?: ListOptions): Promise<ListResult<T>>
 }
 
 type DeleteResult = { id: Id; deletedAt: When }
 type ListOptions = { limit?: number; cursor?: number }
 type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
 ```
+
+`ScopedUpdate<T, K>` already carries `id` (via `Pick<T, 'id'>`), so no method takes `id` as a
+separate parameter. Two sibling capability interfaces compose differently for other backing-store
+families: `DirectUpdateContract<T>` (`update(source)`, no adapter — abstraction-oriented HTTP
+endpoints) and `PinnedUpdateContract<T, K>` (`update(source)`, `K` fixed at the interface —
+composed wrappers like Users). See `source/core/api/api-contract.ts` for the full set.
 
 #### 5.2.2 Business Rule Contract
 
@@ -361,12 +384,52 @@ try {
 
 #### 5.2.5 Contract Properties
 
-- **Uniform interfaces** - Same method signatures regardless of underlying storage
+- **Uniform surface, provider-fit signatures** - Every backing-store family exposes the same
+  `create`/`get`/`delete`/`list` shape; `update` composes the capability interface that matches
+  how that family actually writes (adapter-translated, direct, or pinned-scope) rather than
+  forcing every provider through one signature
 - **Type-safe** - Full TypeScript generics (`T extends Instantiable`) for domain typing; protocol shapes derived via `CreateFromInstantiable<T>` and `UpdateFromInstantiable<T>`
 - **Consistent errors** - `ApiError` with status codes and optional details
 - **Domain-typed** - All inputs/outputs use domain abstractions, never storage primitives
 
 These contracts ensure **uniform interfaces** regardless of underlying storage or transport mechanism.
+
+#### 5.2.6 Data Binding, Validation, and Write Scope
+
+CRUD writes cross three distinct boundary checks:
+
+- Adapters translate between domain abstraction keys and storage columns.
+- Validators judge create and update payloads before a provider dispatches a write.
+- Write scope is declared by the editing surface, not inferred from runtime object keys.
+
+`UpdateFromInstantiable<T>` remains the broad update protocol for callers that may touch any subset of
+an abstraction. It is not a form authorization surface. A form that edits a known set of fields declares
+that set with a scoped update adapter and submits a `ScopedUpdate<T, K>`. Fields inside the scope are
+required by type, while fields outside the scope are unrepresentable in that call.
+
+This prevents a form from supplying placeholder values for columns it does not own. Optional attributes
+still retain their domain meaning: a value may be absent on the entity only when the domain field itself is
+optional. Omission from a scoped update is instead a persistence protocol decision: the declared scope says
+which columns may be written by that form.
+
+Every new form in the system must consider and declare its own update scope as part of its design, the same
+way validators are required for CRUD provider methods. This rule is binding for new design work. Existing
+forms are retrofitted only when authorized by explicit production scope.
+
+Application code still consumes the API namespace and does not import domain adapters directly. When a scoped
+update needs field adapters to compose storage dictionaries, the form owns the field-set decision and the API
+composition layer hosts the adapter-bound scope declaration.
+
+Customer Onboarding Wizard and User Manager are the reference implementations for this foundation. Customer
+Onboarding exercises the plain-table CRUD path: field-addressable adapters compose a scoped column dictionary
+before `makeCrudSupabaseClient` writes to Supabase. User Manager exercises the edge-function-mediated CRUD
+path: the Users wrapper keeps privileged Auth synchronization behind edge functions while tightening its
+update signature to a full-record scoped update before dispatch.
+
+Together with the Index-Detail and Decomposition-Sequence shell work, these two surfaces are intended as
+the production reference for later system expansion. Assets, Chemicals, Jobs, Services, and Workflows should
+be stamped out from these proven patterns when their production scope is authorized, not rediscovered from
+scratch.
 
 ### 5.3 Client Makers
 
@@ -378,7 +441,7 @@ Client makers are factory functions that produce clients conforming to contracts
 | `makeBusRuleSupabaseEdgeClient<P, R>()` | `ApiBusRuleContract` | Supabase Edge Function invocation    | Edge functions     |
 | `makeBusRuleSupabaseRpcClient<P, R>()`  | `ApiBusRuleContract` | Supabase RPC function invocation     | PostgreSQL via RPC |
 | `makeCrudIndexedDbClient<T>()`          | `ApiCrudContract`    | Offline local storage                | Browser IndexedDB  |
-| `makeCrudHttpClient<T>()`               | `ApiCrudContract`    | HTTP calls to edge functions         | Fetch API          |
+| `makeCrudHttpClient<T>()`               | `CrudHttpContract`   | HTTP calls to edge functions         | Fetch API          |
 | `makeBusRuleHttpClient()`               | `ApiBusRuleContract` | Orchestration via HTTP edge endpoint | Fetch API          |
 
 Service wrappers mirror client makers at the inbound boundary.

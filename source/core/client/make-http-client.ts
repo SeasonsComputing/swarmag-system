@@ -8,26 +8,37 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Builds transport-agnostic API contracts over HTTP by providing factory
 functions for CRUD resources and business-rule endpoints with uniform error
-envelope handling.
+envelope handling. CRUD resources are abstraction-oriented: the remote
+endpoint speaks domain shape directly, with no client-side adapter
+translation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 HttpSpecification            Business-rule HTTP client configuration.
 CrudHttpSpecification        CRUD HTTP client configuration, incl. validator.
+CrudHttpContract<T>          CRUD contract for abstraction-oriented HTTP endpoints.
 makeCrudHttpClient(spec)     Build CRUD/list client over HTTP.
 makeBusRuleHttpClient(spec)  Build business-rule runner over HTTP.
 */
 
 import type {
   ApiBusRuleContract,
-  ApiCrudContract,
   ApiErrorDetail,
+  CrudBaseContract,
+  CrudListContract,
   DeleteResult,
+  DirectUpdateContract,
   ListOptions,
   ListResult
 } from '@core/api/api-contract.ts'
 import { ApiError, checkApiError, checkValidatorError, throwApiError } from '@core/api/api-contract.ts'
-import type { CreateFromInstantiable, UpdateFromInstantiable, Validator } from '@core/std'
+import type {
+  CreateFromInstantiable,
+  FromInstantiable,
+  ScopedUpdate,
+  UpdateFromInstantiable,
+  Validator
+} from '@core/std'
 import type { Dictionary, Id, Instantiable } from '@core/std'
 
 /** Configuration for a business-rule HTTP API client. */
@@ -40,13 +51,24 @@ export type CrudHttpSpecification<T extends Instantiable> = {
 }
 
 /**
- * Maker to produce an API client.
+ * CRUD contract for HTTP-backed abstraction-oriented endpoints. The remote endpoint speaks
+ * domain shape directly — no client-side adapter translation, unlike a DB-oriented maker
+ * (Supabase, IndexedDB). `update` therefore takes the declared-scope source directly rather
+ * than a `ScopedUpdateAdapter`, which this maker would never use.
+ */
+export type CrudHttpContract<T extends Instantiable> =
+  & CrudBaseContract<T>
+  & DirectUpdateContract<T>
+  & CrudListContract<T>
+
+/**
+ * Maker to produce an API client over HTTP for an abstraction-oriented endpoint.
  * @param spec - API specification with base path.
  * @returns API client object with CRUD methods.
  */
 export const makeCrudHttpClient = <T extends Instantiable>(
   { basePath, validator }: CrudHttpSpecification<T>
-): ApiCrudContract<T> => ({
+): CrudHttpContract<T> => ({
   /* Create record over HTTP and unwrap API envelope. */
   async create(input: CreateFromInstantiable<T>): Promise<T> {
     checkValidatorError(validator.validateCreate(input))
@@ -64,9 +86,9 @@ export const makeCrudHttpClient = <T extends Instantiable>(
     return unwrap<T>(res)
   },
 
-  /* Update record over HTTP and unwrap API envelope. */
-  async update(source: UpdateFromInstantiable<T>): Promise<T> {
-    checkValidatorError(validator.validateUpdate(source))
+  /* Update declared-scope fields over HTTP and unwrap API envelope. */
+  async update<K extends keyof FromInstantiable<T>>(source: ScopedUpdate<T, K>): Promise<T> {
+    checkValidatorError(validator.validateUpdate(source as UpdateFromInstantiable<T>))
     const res = await request(`${basePath}/update`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },

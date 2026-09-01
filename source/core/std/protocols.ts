@@ -13,6 +13,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 CreateFromInstantiable<T>      Create payload for an Instantiable abstraction.
 UpdateFromInstantiable<T>      Update payload with id and clearable attributes.
+ScopedUpdate<T, K>             Update payload restricted to declared fields.
 CreateFromInstantiableOnly<T>  Create payload for InstantiableOnly abstraction.
 */
 
@@ -29,12 +30,25 @@ export type CreateFromInstantiable<T extends Instantiable> = FromInstantiable<T>
 /** Contract to update an Instantiable. Optional attributes admit null to clear the stored value. */
 export type UpdateFromInstantiable<T extends Instantiable> =
   & Pick<T, 'id'>
-  & Clearable<FromInstantiable<T>>
+  & {
+    [K in keyof FromInstantiable<T>]?: undefined extends FromInstantiable<T>[K]
+      ? FromInstantiable<T>[K] | null
+      : FromInstantiable<T>[K]
+  }
 
-/** Patch shape where optional attributes additionally admit null as a clear marker. */
-type Clearable<T> = {
-  [K in keyof T]?: undefined extends T[K] ? T[K] | null : T[K]
-}
+/**
+ * Contract to update declared fields of an Instantiable.
+ * Fields inside the declared scope are required.
+ */
+export type ScopedUpdate<T extends Instantiable, K extends keyof FromInstantiable<T>> =
+  & Pick<T, 'id'>
+  & {
+    [P in K]-?: OptionalKey<FromInstantiable<T>, P> extends true
+      ? FromInstantiable<T>[P] | null | undefined
+      : FromInstantiable<T>[P]
+  }
+
+type OptionalKey<T, K extends keyof T> = Record<string, never> extends Pick<T, K> ? true : false
 
 /** Contract to create an InstantiableOnly. */
 export type CreateFromInstantiableOnly<T extends InstantiableOnly> = FromInstantiableOnly<T>

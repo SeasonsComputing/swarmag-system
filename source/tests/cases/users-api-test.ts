@@ -39,7 +39,13 @@ Deno.test('users API supports full CRUD lifecycle with soft delete', async () =>
 
   const updated = await api.Users.update({
     id: created.id,
+    roles: fetched.roles,
+    notes: fetched.notes,
     displayName: `Updated Ops User ${nonce}`,
+    primaryEmail: fetched.primaryEmail,
+    phoneNumber: fetched.phoneNumber,
+    preferredChannel: fetched.preferredChannel,
+    avatarUrl: fetched.avatarUrl,
     status: 'inactive'
   })
   assertEquals(updated.id, created.id)
