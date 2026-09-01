@@ -26,9 +26,12 @@
 }
 
 [data-shell='collection-panel-empty'] {
+  block-size: 100%;
   color: var(--sa-text-placeholder);
-  margin: 0;
-  padding: var(--sa-space-md);
+  display: grid;
+  justify-items: center;
+  margin: var(--sa-space-lg) 0 0 0;
+  text-align: center;
 }
 
 [data-shell='collection-panel-confirmation'] {
