@@ -33,38 +33,7 @@
 }
 
 [data-shell-panel='header-leading'] > h1,
-[data-shell-panel='header-leading'] > h2 {
-  line-height: 1;
-  margin: 0;
-  min-inline-size: 0;
-}
-
-[data-shell-panel='header-leading'] > h1 {
-  font-size: var(--sa-font-size-md);
-}
-
-[data-shell-panel='header-leading'] > h2 {
-  font-size: calc(var(--sa-font-size-md) * 0.85);
-}
-
-[data-shell-panel='header-title'] {
-  align-items: center;
-  display: inline-flex;
-  gap: var(--sa-space-xs);
-  min-block-size: var(--sa-touch-target-sm);
-  min-inline-size: 0;
-}
-
-[data-shell-panel='header-title-path'] {
-  align-items: center;
-  display: inline-flex;
-  gap: 0;
-  min-inline-size: 0;
-  overflow: hidden;
-  white-space: nowrap;
-  transform: translateY(3px);
-}
-
+[data-shell-panel='header-leading'] > h2,
 [data-shell-panel='header-title-path'] > h2,
 [data-shell-panel='header-title-path'] > h3,
 [data-shell-panel='header-title-path'] > h4 {
@@ -76,19 +45,30 @@
   white-space: nowrap;
 }
 
+[data-shell-panel='header-title'],
+[data-shell-panel='header-title-path'] {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--sa-space-xs);
+  min-inline-size: 0;
+  transform: translateY(3px);
+}
+
+[data-shell-panel='header-leading'] > h1 {
+  font-size: calc(var(--sa-font-size-md) * 1);
+}
+
+[data-shell-panel='header-leading'] > h2,
 [data-shell-panel='header-title-path'] > h2 {
-  color: var(--sa-text-h2);
-  font-size: calc(var(--sa-heading-font-size-h2) * 0.85);
+  font-size: calc(var(--sa-font-size-md) * 0.9);
 }
 
 [data-shell-panel='header-title-path'] > h3 {
-  color: var(--sa-text-h3);
-  font-size: calc(var(--sa-heading-font-size-h3) * 0.85);
+  font-size: calc(var(--sa-font-size-md) * 0.85);
 }
 
 [data-shell-panel='header-title-path'] > h4 {
-  color: var(--sa-text-h4);
-  font-size: calc(var(--sa-heading-font-size-h4) * 0.85);
+  font-size: calc(var(--sa-font-size-md) * 0.8);
 }
 
 [data-shell-panel='header-title-separator'] {
@@ -96,7 +76,6 @@
   font-family: var(--sa-ui-font-family);
   font-size: var(--sa-ui-font-size);
   font-weight: var(--sa-ui-font-weight);
-  padding: var(--sa-space-xs);
 }
 
 [data-shell-panel='header-title-divider'] {
