@@ -60,7 +60,11 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
           itemColumn='Site'
           items={props.state.sites}
           label={siteName}
-          emptyMessage='No job sites yet. Use New Site to add one.'
+          emptyMessage={
+            <p>
+              No job sites yet. Use <kbd>New Site</kbd> to add one.
+            </p>
+          }
           newLabel='New Site'
           onNew={() => props.state.addSite()}
           onRemove={props.state.removeSite}
@@ -230,7 +234,11 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => (
       itemColumn='Note'
       items={() => props.site.notes}
       label={noteName}
-      emptyMessage='No notes yet. Use New Note to add one.'
+      emptyMessage={
+        <p>
+          No notes yet. Use <kbd>New Note</kbd> to add one.
+        </p>
+      }
       newLabel='New Note'
       onNew={() => props.state.addNote(props.index)}
       onRemove={notePosition => props.state.removeNote(props.index, notePosition)}

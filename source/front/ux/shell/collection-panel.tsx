@@ -39,7 +39,7 @@ export type CollectionPanelProps<T> = {
   itemColumn: string
   items: () => readonly T[]
   label: (item: T, index: number) => string
-  emptyMessage: string
+  emptyMessage: UiComponent
   newLabel: string
   onNew: () => void
   onRemove: (index: number) => void
