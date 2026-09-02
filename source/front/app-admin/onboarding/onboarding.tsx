@@ -7,6 +7,7 @@
 
 import { toTrimmed } from '@core/std'
 import type { CustomerCreate } from '@domain/protocols/customer-protocol.ts'
+import { isCustomerSite } from '@domain/validators/customer-validator.ts'
 import { CustomerUpdateScopes } from '@front/api/api-update-scopes.ts'
 import { api } from '@front/api/api.ts'
 import { OnboardingStageContact } from '@front/app-admin/onboarding/onboarding-stage-contact.tsx'
@@ -115,7 +116,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
         onReturnControl={context.registerDrillReturn}
       />
     ),
-    canAdvance: () => true,
+    canAdvance: () => state.sites().every(isCustomerSite),
     commit: async () => {
       const customer = state.customer()
       if (state.sites().length > 0 && customer) {

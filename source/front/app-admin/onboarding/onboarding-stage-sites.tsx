@@ -28,8 +28,11 @@ import {
   UiInput,
   UiLayout,
   UiText,
-  UiTextArea
+  UiTextArea,
+  UiToggleGroup,
+  UiToggleItem
 } from '@front/ux/ui'
+import { createSignal, Show } from '@solid-js'
 import { type OnboardingState, siteLocation } from './onboarding-state.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -97,167 +100,216 @@ type SiteEditorProps = {
   drill: DrillContract
 }
 
-/** Renders one site's identity, address, location fields, and notes collection. */
-const SiteEditor = (props: SiteEditorProps): UiComponent => (
-  <UiLayout>
-    <UiFieldset legend='Identity'>
-      <SiteTextInput
-        index={props.index}
-        name='siteLabel'
-        label='Site Label'
-        value={props.site.label}
-        required
-        placeholder='e.g., "Main Office" or "South Pasture"'
-        onValue={value => props.state.updateSite(props.index, site => site.label = value)}
-      />
-    </UiFieldset>
-    <UiFieldset legend='Address'>
-      <UiLayout>
+/** Which mutually-exclusive way a site's location is currently specified. */
+type LocationMode = 'address' | 'coordinates'
+
+/** Determines which location mode a site's current data represents. */
+const locationMode = (site: CustomerSite): LocationMode => {
+  const location = siteLocation(site)
+  return location.latitude !== undefined || location.longitude !== undefined
+    ? 'coordinates'
+    : 'address'
+}
+
+/** Renders one site's identity, address-or-coordinates location, and notes collection. */
+const SiteEditor = (props: SiteEditorProps): UiComponent => {
+  const [mode, setMode] = createSignal<LocationMode>(locationMode(props.site))
+
+  /** Switches location mode, clearing the fields the other mode owns. */
+  const changeMode = (next: LocationMode): void => {
+    setMode(next)
+    props.state.updateLocation(props.index, location =>
+      next === 'coordinates'
+        ? {
+          ...location,
+          line1: undefined,
+          line2: undefined,
+          city: undefined,
+          state: undefined,
+          postalCode: undefined,
+          country: undefined
+        }
+        : { ...location, latitude: undefined, longitude: undefined })
+  }
+
+  return (
+    <UiLayout>
+      <UiFieldset legend='Identity'>
         <SiteTextInput
           index={props.index}
-          name='siteLine1'
-          label='Address'
-          value={siteLocation(props.site).line1}
-          onValue={value =>
-            props.state.updateLocation(props.index, location => ({
-              ...location,
-              line1: UiText.optional(value)
-            }))}
-        />
-        <SiteTextInput
-          index={props.index}
-          name='siteLine2'
-          label='Unit'
-          value={siteLocation(props.site).line2}
-          onValue={value =>
-            props.state.updateLocation(props.index, location => ({
-              ...location,
-              line2: UiText.optional(value)
-            }))}
-        />
-        <SiteTextInput
-          index={props.index}
-          name='siteCity'
-          label='City'
-          value={siteLocation(props.site).city}
-          onValue={value =>
-            props.state.updateLocation(props.index, location => ({
-              ...location,
-              city: UiText.optional(value)
-            }))}
-        />
-        <UiLayout variant='inline-fill'>
-          <SiteTextInput
-            index={props.index}
-            name='siteState'
-            label='Region'
-            value={siteLocation(props.site).state}
-            onValue={value =>
-              props.state.updateLocation(props.index, location => ({
-                ...location,
-                state: UiText.optional(value)
-              }))}
-          />
-          <SiteTextInput
-            index={props.index}
-            name='sitePostalCode'
-            label='Postal'
-            value={siteLocation(props.site).postalCode}
-            onValue={value =>
-              props.state.updateLocation(props.index, location => ({
-                ...location,
-                postalCode: UiText.optional(value)
-              }))}
-          />
-          <SiteTextInput
-            index={props.index}
-            name='siteCountry'
-            label='Country'
-            value={siteLocation(props.site).country}
-            onValue={value =>
-              props.state.updateLocation(props.index, location => ({
-                ...location,
-                country: UiText.optional(value)
-              }))}
-          />
-        </UiLayout>
-      </UiLayout>
-    </UiFieldset>
-    <UiFieldset legend='Location'>
-      <UiLayout variant='inline-fit'>
-        <SiteTextInput
-          commit='change'
-          index={props.index}
-          name='siteLatitude'
-          label='Latitude'
-          value={UiText.from(siteLocation(props.site).latitude)}
-          placeholder='e.g., 40.7128'
-          onValue={value =>
-            props.state.updateLocation(props.index, location => ({
-              ...location,
-              latitude: UiText.number(value)
-            }))}
+          name='siteLabel'
+          label='Site Label'
+          value={props.site.label}
+          required
+          placeholder='e.g., "Main Office" or "South Pasture"'
+          onValue={value => props.state.updateSite(props.index, site => site.label = value)}
         />
         <SiteTextInput
           commit='change'
           index={props.index}
-          name='siteLongitude'
-          label='Longitude'
-          value={UiText.from(siteLocation(props.site).longitude)}
-          placeholder='e.g., -74.0060'
+          name='siteAcreage'
+          label='Acreage'
+          type='number'
+          value={UiText.from(props.site.acreage)}
           onValue={value =>
-            props.state.updateLocation(props.index, location => ({
-              ...location,
-              longitude: UiText.number(value)
-            }))}
+            props.state.updateSite(props.index, site => site.acreage = UiText.number(value))}
         />
-        <UiActionButton
-          icon='crosshair-2'
-          label='Use my location'
-          disabled={!props.hasGeo}
-          onClick={() => captureLocation(props.state, props.index, props.hasGeo)}
-        />
-      </UiLayout>
-      <SiteTextInput
-        commit='change'
-        index={props.index}
-        name='siteAcreage'
-        label='Acreage'
-        type='number'
-        value={UiText.from(props.site.acreage)}
-        onValue={value =>
-          props.state.updateSite(props.index, site => site.acreage = UiText.number(value))}
+      </UiFieldset>
+      <UiFieldset legend='Site Location'>
+        <UiToggleGroup<LocationMode> value={mode()} onChange={changeMode}>
+          <UiToggleItem value='address'>
+            <span>Address</span>
+          </UiToggleItem>
+          <UiToggleItem value='coordinates'>
+            <span>Coordinates</span>
+          </UiToggleItem>
+        </UiToggleGroup>
+        <Show when={mode() === 'address'}>
+          <UiLayout>
+            <SiteTextInput
+              index={props.index}
+              name='siteLine1'
+              label='Address'
+              value={siteLocation(props.site).line1}
+              required
+              onValue={value =>
+                props.state.updateLocation(props.index, location => ({
+                  ...location,
+                  line1: UiText.optional(value)
+                }))}
+            />
+            <SiteTextInput
+              index={props.index}
+              name='siteLine2'
+              label='Unit'
+              value={siteLocation(props.site).line2}
+              onValue={value =>
+                props.state.updateLocation(props.index, location => ({
+                  ...location,
+                  line2: UiText.optional(value)
+                }))}
+            />
+            <SiteTextInput
+              index={props.index}
+              name='siteCity'
+              label='City'
+              value={siteLocation(props.site).city}
+              required
+              onValue={value =>
+                props.state.updateLocation(props.index, location => ({
+                  ...location,
+                  city: UiText.optional(value)
+                }))}
+            />
+            <UiLayout variant='inline-fill'>
+              <SiteTextInput
+                index={props.index}
+                name='siteState'
+                label='Region'
+                required
+                value={siteLocation(props.site).state}
+                onValue={value =>
+                  props.state.updateLocation(props.index, location => ({
+                    ...location,
+                    state: UiText.optional(value)
+                  }))}
+              />
+              <SiteTextInput
+                index={props.index}
+                name='sitePostalCode'
+                label='Postal'
+                required
+                value={siteLocation(props.site).postalCode}
+                onValue={value =>
+                  props.state.updateLocation(props.index, location => ({
+                    ...location,
+                    postalCode: UiText.optional(value)
+                  }))}
+              />
+              <SiteTextInput
+                index={props.index}
+                name='siteCountry'
+                label='Country'
+                required
+                value={siteLocation(props.site).country}
+                onValue={value =>
+                  props.state.updateLocation(props.index, location => ({
+                    ...location,
+                    country: UiText.optional(value)
+                  }))}
+              />
+            </UiLayout>
+          </UiLayout>
+        </Show>
+        <Show when={mode() === 'coordinates'}>
+          <UiLayout variant='inline-fit'>
+            <SiteTextInput
+              commit='change'
+              index={props.index}
+              name='siteLatitude'
+              label='Latitude'
+              value={UiText.from(siteLocation(props.site).latitude)}
+              required
+              placeholder='e.g., 40.7128'
+              onValue={value =>
+                props.state.updateLocation(props.index, location => ({
+                  ...location,
+                  latitude: UiText.number(value)
+                }))}
+            />
+            <SiteTextInput
+              commit='change'
+              index={props.index}
+              name='siteLongitude'
+              label='Longitude'
+              value={UiText.from(siteLocation(props.site).longitude)}
+              required
+              placeholder='e.g., -74.0060'
+              onValue={value =>
+                props.state.updateLocation(props.index, location => ({
+                  ...location,
+                  longitude: UiText.number(value)
+                }))}
+            />
+            <UiActionButton
+              icon='crosshair-2'
+              label='Use my location'
+              disabled={!props.hasGeo}
+              onClick={() => captureLocation(props.state, props.index, props.hasGeo)}
+            />
+          </UiLayout>
+        </Show>
+      </UiFieldset>
+      <CollectionPanel
+        legend='Notes'
+        itemColumn='Note'
+        items={() => props.site.notes}
+        label={noteName}
+        emptyMessage={
+          <p>
+            No notes yet. Use <kbd>New Note</kbd> to add one.
+          </p>
+        }
+        newLabel='New Note'
+        onNew={() => props.state.addNote(props.index)}
+        onRemove={notePosition => props.state.removeNote(props.index, notePosition)}
+        confirmRemove={note => ({
+          title: `Delete ${noteName(note)}?`,
+          message: 'This note will be removed from the job site.'
+        })}
+        renderItem={(note, notePosition) => (
+          <NoteEditor
+            state={props.state}
+            note={note}
+            sitePosition={props.index}
+            notePosition={notePosition}
+          />
+        )}
+        drill={props.drill}
       />
-    </UiFieldset>
-    <CollectionPanel
-      legend='Notes'
-      itemColumn='Note'
-      items={() => props.site.notes}
-      label={noteName}
-      emptyMessage={
-        <p>
-          No notes yet. Use <kbd>New Note</kbd> to add one.
-        </p>
-      }
-      newLabel='New Note'
-      onNew={() => props.state.addNote(props.index)}
-      onRemove={notePosition => props.state.removeNote(props.index, notePosition)}
-      confirmRemove={note => ({
-        title: `Delete ${noteName(note)}?`,
-        message: 'This note will be removed from the job site.'
-      })}
-      renderItem={(note, notePosition) => (
-        <NoteEditor
-          state={props.state}
-          note={note}
-          sitePosition={props.index}
-          notePosition={notePosition}
-        />
-      )}
-      drill={props.drill}
-    />
-  </UiLayout>
-)
+    </UiLayout>
+  )
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // CUSTOMER SITE: NOTES
@@ -276,7 +328,7 @@ const NoteEditor = (props: NoteEditorProps): UiComponent => {
   const name = `site-note-content-${props.sitePosition}-${props.notePosition}`
   return (
     <UiFieldset legend='Note'>
-      <UiField for={name} label='Content'>
+      <UiField for={name} label='Content' required>
         <UiTextArea
           name={name}
           rows={6}
