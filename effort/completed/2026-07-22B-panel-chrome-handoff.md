@@ -131,7 +131,7 @@ orientation is essential, which the portrait-idiom argument itself denies.
   latter two also reach across the app→ux boundary via `../../ux/ui/icons/`,
   which `guard-namespaces` catches for TS imports but nothing catches for CSS
   `url()`.
-- Effort docs live in `effort/active|completed`, not `documentation/project/`.
+- Dated effort docs live in `effort/active|completed`, not project-level effort docs.
 
 ## Open / parked
 

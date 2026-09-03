@@ -68,7 +68,7 @@ Reference-surface survey (2026-07-19, at `03a7214`): 3 alias lines in
 ## Task Group E — Documentation (delegated)
 
 - [x] Living docs patched: architecture (3), ux guides (4), agent genesis
-      docs (2); `documentation/project/` history left verbatim
+      docs (2); `effort/project/` history left verbatim
 - [x] `architecture-ux.md` → `architecture-front.md` (git mv) + content,
       title, and normative tree patched to the implemented structure —
       ACE's drift closed

@@ -78,10 +78,10 @@ Implemented:
 
 - Renamed root style guide to `STYLE-GUIDE.md`.
 - Moved documentation into flat category directories:
-  - `documentation/genesis/`
+  - `effort/genesis/`
   - `documentation/architecture/`
   - `documentation/domain/`
-  - `documentation/project/`
+  - `effort/project/`
   - `documentation/ux/`
 - Kept files only at the root and category-root levels.
 - Updated markdown links and documentation category references.

@@ -35,7 +35,7 @@ domain documentation.
   - [x] Add `Customer.primaryContactId`.
   - [x] Add `CustomerUser` Junction.
   - [x] Split crew assignment roles from `UserRole`.
-- [x] Update `documentation/project/project-user-stories.md`
+- [x] Update `effort/project/project-user-stories.md`
   - [x] Replace embedded contact capture wording.
   - [x] Align primary-contact language with `Customer.primaryContactId`.
 - [x] Decide whether to update `documentation/domain/domain-archetypes.md`

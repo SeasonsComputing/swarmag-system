@@ -137,7 +137,7 @@ generalized _from_ a specific case.
   `ux` / `app` shuffle, not per move.
 - **`ux` / `app` refactor** — agreed in shape, unscheduled.
 - **Undefined-token guard** — now recorded in
-  `documentation/project/project-backlog.md` under Guards, with both specimens
+  `effort/project/project-backlog.md` under Guards, with both specimens
   and the `--sa-icon` trap for whoever builds it.
 - **Session close-out procedure** — parked for a dedicated discussion.
 - **The 500px directive is not written.** What shipped removes the override that

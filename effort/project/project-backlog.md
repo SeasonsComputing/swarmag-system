@@ -5,7 +5,7 @@
 Accepted work whose shape is already known. An entry is here because the decision has been
 made and only a slot is missing, so picking it up starts with doing it.
 
-Distinct from `documentation/project/project-feature-parking-lot.md`, which holds work
+Distinct from `effort/project/project-feature-parking-lot.md`, which holds work
 where a decision is still missing and picking it up starts with making that decision. The
 test is decided versus undecided — not near-term versus far.
 

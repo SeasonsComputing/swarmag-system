@@ -15,7 +15,7 @@ verified end-to-end (see
 `effort/completed/2026-07-14-user-create-hang-handoff.md` and the
 edge-functions remediation series). User Manager's UX (confirmations, editor
 feedback, generalized shell primitives) is also now complete — see
-`effort/completed/2026-07-16-user-manager-ux-rework.md`. The next
+`effort/completed/2026-07-16-user-manager-ux-rework-brief.md`. The next
 milestone is **Customer Onboarding**: a serialized, wizard-like flow that
 walks an admin or sales rep through:
 
@@ -61,7 +61,7 @@ before relying on them):
   should go through this, not bespoke fetch calls.
 
 **Already-built reusable primitives, ready to use (from the User Manager UX
-rework — see `2026-07-16-user-manager-ux-rework.md` for full detail):**
+rework — see `2026-07-16-user-manager-ux-rework-brief.md` for full detail):**
 
 - `useAbstractionFormFeedback(formRef, onFeedback)`
   (`source/ux/common/shell/use-abstraction-form-feedback.ts`) — bridges native

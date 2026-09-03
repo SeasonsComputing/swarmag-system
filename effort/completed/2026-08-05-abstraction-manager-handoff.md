@@ -18,7 +18,7 @@ source code changed.
 **`effort/active/2026-08-05-abstraction-manager-brief.md`** — Phase 1 production
 instruction. Closed: no open decisions in it. Not yet executed.
 
-**`a71222e`** — `documentation/genesis/genesis-ux-dashboard.md` renamed and moved
+**`a71222e`** — `effort/genesis/genesis-ux-dashboard.md` renamed and moved
 to `effort/completed/2026-06-22-dashboard-inception.md`. It was an archived first
 draft being mis-ingested as authoritative. Committed by CA. `git log --follow`
 traces history back to its creation on 2026-06-22.

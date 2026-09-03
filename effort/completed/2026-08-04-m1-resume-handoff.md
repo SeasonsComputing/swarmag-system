@@ -67,7 +67,7 @@ signups, the cause is a GoTrue lookup miss. Verified from a clean genesis.
 
 - **Fieldset redundancy** — a panel with exactly one fieldset whose legend
   repeats the panel title. Reaches Group B stages 1 and 2, so B is not final
-  until it is settled. `documentation/project/project-backlog.md`.
+  until it is settled. `effort/project/project-backlog.md`.
 - **Undefined-token guard** — `guard:css` forbids raw literals but never checks
   that a referenced token exists, so an unresolvable `var()` is dropped silently
   by the browser. This produced square site tiles for weeks. Unbuilt.
