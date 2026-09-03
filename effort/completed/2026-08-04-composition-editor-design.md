@@ -117,7 +117,7 @@ graph until the host writes the aggregate. The editor therefore can never own
    blank can exist when the host commits. Proposal: commit prunes empties and the
    gate tests _substance_. Forced by the fact that dirtiness fires the instant
    `New` is pressed, which makes it useless as a gate.
-3. **Fieldset redundancy.** See `documentation/project/project-backlog.md` — a
+3. **Fieldset redundancy.** See `effort/project/project-backlog.md` — a
    panel containing exactly one fieldset whose legend repeats the panel title.
    Bears on this control directly, since its frame _is_ a fieldset. Affects M1
    Group B stages 1 and 2 as well as the stage-3 rework.

@@ -8,7 +8,7 @@ complete.** CA accepted the stage layout on 2026-08-04 after the rework shipped
 orders remain the gate.
 
 **Group B closes with one question outstanding against it** — fieldset
-redundancy, recorded in `documentation/project/project-backlog.md`. It reaches
+redundancy, recorded in `effort/project/project-backlog.md`. It reaches
 stages 1 and 2, which are otherwise finished, so B is not final-final until that
 rule is settled. **CLOSED 2026-08-06** — it was about proper use of the
 component, not the component itself; renaming the contact stage fixed it.
@@ -202,7 +202,7 @@ end-to-end:
       does not change — this is a rehost, not a redesign
 - [ ] **Fieldset redundancy** — a panel with exactly one fieldset whose legend
       repeats the panel title (stage 1 is the live example). Recorded in
-      `documentation/project/project-backlog.md`; reaches stages 1 and 2
+      `effort/project/project-backlog.md`; reaches stages 1 and 2
 - [ ] DEFERRED (recorded, not lost): `accountManagerId` capture (no user
       picker, commits `undefined`); geolocation-denied feedback (currently
       silent); post-Finish success confirmation — the create-only /

@@ -19,31 +19,46 @@ Primary architectural context lives in `documentation/architecture/architecture-
 
 ### 1.2 Documentation
 
-| Category     | File                              | Description                                                 |
-| ------------ | --------------------------------- | ----------------------------------------------------------- |
-| Governance   | `AGENTS.md`                       | AI agent protocol, operating modes, and production gates    |
-|              | `CONSTITUTION.md`                 | Highest architectural authority and role boundaries         |
-|              | `STYLE-GUIDE.md`                  | Binding code and content style conventions                  |
-| Architecture | `architecture-core.md`            | Core architecture principles and system-wide structure      |
-|              | `architecture-back.md`            | Backend architecture, boundaries, and runtime model         |
-|              | `architecture-front.md`           | UX architecture and frontend layering                       |
-|              | `architecture-devops.md`          | Environment configuration, packaging, and guard suite       |
-| Domain       | `domain-model.md`                 | Domain solution-space concepts and invariants               |
-|              | `domain-seed-data.md`             | Controlled vocabularies and canonical seed data             |
-|              | `domain-data-dictionary.md`       | Normalized implementation-ready type and relation model     |
-|              | `domain-archetypes.md`            | Domain implementation patterns for archetype artifacts      |
-| UX           | `ux-design-language.md`           | Visual language, interaction grammar, and layout rules      |
-|              | `ux-components-guide.md`          | Full UX component guide and usage contracts                 |
-|              | `ux-components-guide-lite.md`     | Lightweight UX component reference                          |
-|              | `ux-components-internals.md`      | UX component implementation internals                       |
-| Genesis      | `genesis-domain-sdk.md`           | Prompt contract for domain sdk genesis                      |
-|              | `genesis-ux-scaffold.md`          | Prompt contract for UX applications scaffolding             |
-| Effort       | `{yyyy-mm-dd}-{topic}-design.md`  | Approved or proposed project design decisions               |
-|              | `{yyyy-mm-dd}-{topic}-handoff.md` | Session transition notes and remaining work context         |
-|              | `{yyyy-mm-dd}-{topic}-tasks.md`   | Project implementation checklist and verification status    |
-|              | `{yyyy-mm-dd}-{topic}-brief.md`   | Written production gate when delegating to a mechanical ACE |
-| Project      | `project-feature-parking-lot.md`  | Deferred features or architectural adjustments              |
-|              | `project-user-stories.md`         | Cross-application user stories and scenario narratives      |
+#### 1.2.1 Specifications
+
+Specifications are settled system documents that define governance, architecture, domain
+meaning, UX language, and implementation standards.
+
+| Category     | File                          | Description                                              |
+| ------------ | ----------------------------- | -------------------------------------------------------- |
+| Governance   | `AGENTS.md`                   | AI agent protocol, operating modes, and production gates |
+|              | `CONSTITUTION.md`             | Highest architectural authority and role boundaries      |
+|              | `STYLE-GUIDE.md`              | Binding code and content style conventions               |
+| Architecture | `architecture-core.md`        | Core architecture principles and system-wide structure   |
+|              | `architecture-back.md`        | Backend architecture, boundaries, and runtime model      |
+|              | `architecture-front.md`       | UX architecture and frontend layering                    |
+|              | `architecture-devops.md`      | Environment configuration, packaging, and guard suite    |
+| Domain       | `domain-model.md`             | Domain solution-space concepts and invariants            |
+|              | `domain-seed-data.md`         | Controlled vocabularies and canonical seed data          |
+|              | `domain-data-dictionary.md`   | Normalized implementation-ready type and relation model  |
+|              | `domain-archetypes.md`        | Domain implementation patterns for archetype artifacts   |
+| UX           | `ux-design-language.md`       | Visual language, interaction grammar, and layout rules   |
+|              | `ux-design-archetypes.md`     | UX implementation archetypes and composition patterns    |
+|              | `ux-components-guide.md`      | Full UX component guide and usage contracts              |
+|              | `ux-components-guide-lite.md` | Lightweight UX component reference                       |
+|              | `ux-components-internals.md`  | UX component implementation internals                    |
+
+#### 1.2.2 Effort
+
+Effort documents capture working project context. Status-bearing effort records begin in
+`effort/active/` and move to `effort/completed/` when the effort is closed.
+
+| Category | File                              | Description                                               |
+| -------- | --------------------------------- | --------------------------------------------------------- |
+| _Status_ | `{yyyy-mm-dd}-{topic}-design.md`  | Current approved or proposed project design decisions     |
+|          | `{yyyy-mm-dd}-{topic}-handoff.md` | Session transition notes and remaining work context       |
+|          | `{yyyy-mm-dd}-{topic}-tasks.md`   | Current implementation checklist and verification status  |
+|          | `{yyyy-mm-dd}-{topic}-brief.md`   | Current production gate for delegated or scoped execution |
+| Genesis  | `genesis-domain-sdk.md`           | Prompt contract for domain sdk genesis                    |
+|          | `genesis-ux-scaffold.md`          | Prompt contract for UX applications scaffolding           |
+| Project  | `project-backlog.md`              | Accepted work whose shape is already known                |
+|          | `project-feature-parking-lot.md`  | Deferred features or architectural adjustments            |
+|          | `project-user-stories.md`         | Cross-application user stories and scenario narratives    |
 
 ### 1.3 Source Layers (`source/`)
 

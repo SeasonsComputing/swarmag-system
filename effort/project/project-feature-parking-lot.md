@@ -8,7 +8,7 @@ An entry is here because a decision is still missing, so picking it up starts wi
 that decision. Do not resolve one as a drive-by fix in an unrelated session; each needs
 its own scoped conversation.
 
-Distinct from `documentation/project/project-backlog.md`, which holds work already decided
+Distinct from `effort/project/project-backlog.md`, which holds work already decided
 and awaiting only a slot. The test is decided versus undecided — not near-term versus far.
 
 **Format per entry:** a `**Parked:**` line carrying the date and where it surfaced, then
@@ -68,7 +68,7 @@ removed once referential integrity no longer requires it.
 ## Eject should ban, not delete, the Auth identity
 
 **Parked:** 2026-07-16 — during the User Manager UX rework
-(`effort/completed/2026-07-16-user-manager-ux-rework.md`).
+(`effort/completed/2026-07-16-user-manager-ux-rework-brief.md`).
 
 **What it is:** `UserOrchestra.eject()`
 (`source/back/supabase-edge/orchestration/user-orchestra.ts`) currently calls the same

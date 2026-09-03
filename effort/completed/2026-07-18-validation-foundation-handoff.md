@@ -53,7 +53,7 @@ shell: `use-abstraction-form-validation.ts` (new),
 app-admin: `users/user-manager.tsx` (rules, wiring, normalization, cluster
 cells). Also `.claude/launch.json` (+app-admin-stage-local entry),
 `effort/completed/` (design, tasks, this handoff) and
-`documentation/project/project-feature-parking-lot.md` (parking lot entry).
+`effort/project/project-feature-parking-lot.md` (parking lot entry).
 
 ## 3. Verification state
 
