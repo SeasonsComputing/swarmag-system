@@ -79,6 +79,32 @@ This is the same failure class as the `ui.css:554–558` citation that rotted: a
 
 Two ways to settle it, and either is fine as long as it is chosen. Retirement rewrites the moved document's own forward references, which keeps links live at the cost of editing a historical record. Or historical links are frozen by design, and the parking lot and backlog say so once so a reader stops treating a dangling path as a defect.
 
+### `STYLE-GUIDE.md` should be `CONVENTIONS.md`, and governing-doc tables need `EFFORT.md`
+
+**Observed:** 2026-09-04 · normal
+
+`STYLE-GUIDE.md` covers more than style — §8.6/§8.7 (adapter and maker shape) and §12
+(testing) are structural pattern conventions, not aesthetics, and the name has undersold
+the document's actual scope since before this entry. Decided in conversation: rename to
+`CONVENTIONS.md`.
+
+Separately, `EFFORT.md` (root, same tier as `CONSTITUTION.md`/`AGENTS.md`) shipped
+2026-09-04, governing the lifecycle of tracked work — this document you're reading is
+itself an instance of what it describes. No governing-doc table yet references it:
+`README.md` §1.2's documentation table and `AGENTS.md` §1.1's ingestion table both still
+list only `CONSTITUTION.md`/`AGENTS.md`/`STYLE-GUIDE.md`.
+
+Both are decided, both are real, and neither is urgent enough to interrupt the current
+roadmap for. Bundled into the refactoring milestone (`ux/shell`→`ux/shell`+`front/app`
+split, UI control-state normalization, devops-style retrofit — third in the M1 → Notes
+editor → Refactor sequence) so the tables get updated once, when `CONVENTIONS.md` and
+`EFFORT.md` are both in their final state, not twice.
+
+**Fix:** rename `STYLE-GUIDE.md` to `CONVENTIONS.md`, updating every citation (`AGENTS.md`,
+`CONSTITUTION.md`, `documentation/`, `effort/`) — a real rename, not a same-night one, since
+the name is heavily cross-referenced. Then update `README.md` and `AGENTS.md`'s governing-
+doc tables to reference both `EFFORT.md` and the renamed `CONVENTIONS.md`.
+
 ## Controls
 
 ### Shared UI controls do not use one state model
