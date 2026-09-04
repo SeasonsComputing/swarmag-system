@@ -2,10 +2,14 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation (A0/A/C) + Feature (B)
-**Status:** IN PROGRESS — D1–D17 ratified 2026-07-20; **A0, A1, A, B0 and B all
-complete.** CA accepted the stage layout on 2026-08-04 after the rework shipped
-2026-07-30 → 08-02. **C (Notes-lite) and D (verification) remain.** Per-group go
-orders remain the gate.
+**Status:** CLOSING 2026-09-04 — CA called this milestone complete. D1–D17
+ratified 2026-07-20; **A0, A1, A, B0, and B all complete.** Stage 3 (Sites) was
+rebuilt beyond the "rehost" scope this doc's own Group B item named — see the
+onboarding commit-timing brief in `effort/completed/`. **Group C (Notes-lite)
+is retired as an item of this milestone** — Notes is now its own milestone,
+next in the roadmap, not a dependency of closing this one. **Group D
+(verification) is the one remaining task** — the literal last thing before
+this ledger closes.
 
 **Group B closes with one question outstanding against it** — fieldset
 redundancy, recorded in `effort/project/project-backlog.md`. It reaches

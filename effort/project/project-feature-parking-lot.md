@@ -233,7 +233,7 @@ name (`fmt`, `lock:update`, `gen:*`), never a `check`/`guard` name. Reverted onc
 The broader question the specific case sits inside: **should `check`/`check:guards`
 orchestration ever mutate**, as a convenience, even though the individual `guard:*` units
 it composes stay strictly pure? `.DS_Store` deletion seems safe either way — no context
-ever wants to *know* about a stray `.DS_Store`, so removing it loses no information. Auto-
+ever wants to _know_ about a stray `.DS_Store`, so removing it loses no information. Auto-
 running `fmt` (not just `fmt:check`) at the same orchestration level is a sharper version of
 the same question, raised in the same conversation — reformatting **is** meaningful
 information (a real diff), so silently applying it inside something named `check` could let
