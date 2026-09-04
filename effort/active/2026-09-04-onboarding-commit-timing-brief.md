@@ -120,4 +120,64 @@ covering: `onboarding.tsx` (collapse the three-stage commit into one at Finish),
 `onboarding-stage-sites.tsx` (Save/Cancel UI on `SiteEditor`/`NoteEditor`), and a decision on
 the open question above before any of it is built.
 
+## Amended (2026-09-04): shipped, reviewed, and two follow-on decisions
+
+Production landed and was reviewed against this brief line by line, not taken on the
+production report's word — traced the geolocation-lifecycle fix through the actual token
+comparisons, confirmed the nested-draft-into-parent model by reading where each `onSave`
+callback actually writes, ran the full check suite independently rather than trust the
+report. All confirmed correct.
+
+`deno task check:guards` was separately hitting `.DS_Store` noise on `guard:leaf` every
+macOS session — genuinely unrelated to this brief, closed and then reopened in the same
+sitting. First attempt chained a `clean:ds-store` sweep directly into `guard:leaf`'s own
+task; ACE's review of the addendum scope caught that this makes an individual guard task
+mutate before it checks, breaking the implicit contract every `guard:*`/`check:*` task in
+`deno.jsonc` otherwise honors — a mutating operation there always gets an honest verb name
+(`fmt`, `lock:update`, `gen:*`), never a `check`/`guard` name. Agreed, and reverted —
+`deno.jsonc` is back to matching `HEAD` exactly. The real fix (mutation belongs at the
+orchestration level, not inside an individual guard; `chk` vs. `check` may want to split
+into a convenience-mutates alias versus a strict report-only one, the same question extends
+to whether `fmt` — not just `fmt:check` — belongs in that convenience path) is parked as its
+own devops decision, not resolved here. `.DS_Store` recurrence is back to `rmdir`-by-hand
+until that decision gets made.
+
+**The open question above resolved to a third option neither branch named.** Not "promote
+into `DrillDown`" and not "stay fully local" — the actual fix was `WizardStage` gaining one
+optional field, `trailingAction?: () => UiActionButtonProps | undefined`, the same shape as
+the `commit`/`validate`/`canAdvance`/`feedback` optional-accessor pattern `WizardStage`/
+`WizardContract` already used. `wizard.tsx`'s own `PanelForm` header already had an empty
+`trailing` slot while drilled (`<Show when={!isDrilled()}>` renders nothing when drilled,
+since Next/Finish don't apply there) — that's the seat Save needed, not a new capability on
+`DrillDown`. `DrillDown`/`CollectionPanel` stayed untouched exactly as scoped; `Wizard`'s
+contract did change, which is what the escalation boundary named as the stop-and-rescope
+trigger. In practice this was authorized directly, in conversation, once the precedent
+(`WizardContract.feedback`) was pointed out and the change sized correctly — not routed
+back through a full ACE rescoping round-trip. `SiteEditor`/`NoteEditor` report their own
+Save descriptor up through `onTrailingAction`, gated by the same `isActiveDraft()` token
+check already verified correct for the geolocation fix, so a stale reporter can never
+clobber a fresher one. Verified live: Site's Save and Note's Save correctly occupy the same
+single header slot, one at a time, deferring to whichever is the innermost drilled panel.
+
+**Two more decisions, discussed after the fact, not yet built:**
+
+- **Save navigates up, at both levels.** Consistent with the Sequence rail's own
+  `Next`/`Finish`, which already do "commit, then advance" as one click — Save doing the same
+  at the Index-Detail level isn't a new convention. It also closes a real gap: today, saving
+  an already-valid, unchanged draft produces no visible confirmation at all — navigating up
+  is the confirmation, for free. The "want to keep adding notes right after saving the site"
+  case isn't actually lossy under this design — a Note's own Save already commits into the
+  Site's local draft before the Site's Save ever fires, so nothing added is at risk, only an
+  extra re-drill if the user wants to keep going.
+- **Up/Cancel warns on unsaved edits, gated by a real dirty-check** (draft vs. the original
+  committed value, or vs. blank for a new item — not an unconditional prompt). This is the
+  same principle the whole effort is built on, applied in the other direction: everything
+  else here prevents _silent persistence_ of the wrong thing; this prevents _silent discard_
+  of the right thing. `CollectionPanel.confirmRemove` already proves the confirmation-dialog
+  pattern exists in this exact file for exactly this shape of "are you sure" — reuse it
+  rather than a native `confirm()` or a new mechanism.
+
+Neither is built yet. Next session starts with a look at the shipped code, then scopes these
+two as a small follow-on.
+
 _End of Backlog Brief_
