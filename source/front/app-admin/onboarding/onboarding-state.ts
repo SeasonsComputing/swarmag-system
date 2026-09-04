@@ -11,9 +11,13 @@ signal-backed; the sites collection is store-backed for leaf updates.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-OnboardingState        Reactive state contract for customer onboarding stages.
-createOnboardingState  Create state for a single customer onboarding flow.
-siteLocation(site)     The site's single location.
+OnboardingState         Reactive state contract for customer onboarding stages.
+createOnboardingState   Create state for a single customer onboarding flow.
+cloneCustomerSite       Clone a customer site for draft editing.
+cloneNote               Clone a note for draft editing.
+newOnboardingSite       Create a blank site draft.
+newOnboardingNote       Create a blank note draft.
+siteLocation(site)      The site's single location.
 */
 
 import { demandOne, when } from '@core/std'
@@ -53,6 +57,7 @@ export type OnboardingState = {
   setCustomer: Setter<Customer | null>
   sites: Accessor<CustomerSite[]>
   addSite: (site?: CustomerSite) => void
+  setSite: (index: number, site: CustomerSite) => void
   updateSite: (index: number, update: (site: CustomerSite) => void) => void
   removeSite: (index: number) => void
   updateLocation: (index: number, update: (location: Location) => Location) => void
@@ -87,13 +92,10 @@ export const createOnboardingState = (): OnboardingState => {
   const [siteStore, setSiteStore] = createStore<CustomerSite[]>([])
 
   const sites = (): CustomerSite[] => siteStore
-  const addSite = (site: CustomerSite = newSite()): void => {
-    setSiteStore(siteStore.length, {
-      ...site,
-      location: [...site.location],
-      notes: [...site.notes]
-    })
-  }
+  const addSite = (site: CustomerSite = newOnboardingSite()): void =>
+    setSiteStore(siteStore.length, cloneCustomerSite(site))
+  const setSite = (index: number, site: CustomerSite): void =>
+    setSiteStore(index, cloneCustomerSite(site))
   const updateSite = (index: number, update: (site: CustomerSite) => void): void => {
     setSiteStore(index, produce(update))
   }
@@ -103,9 +105,9 @@ export const createOnboardingState = (): OnboardingState => {
   }
   const addNote = (
     sitePosition: number,
-    note: CustomerSite['notes'][number] = newNote()
+    note: CustomerSite['notes'][number] = newOnboardingNote()
   ): void => {
-    setSiteStore(sitePosition, 'notes', notes => [...notes, note])
+    setSiteStore(sitePosition, 'notes', notes => [...notes, cloneNote(note)])
   }
   const updateNote = (
     sitePosition: number,
@@ -147,6 +149,7 @@ export const createOnboardingState = (): OnboardingState => {
     setCustomer,
     sites,
     addSite,
+    setSite,
     updateSite,
     removeSite,
     updateLocation,
@@ -161,15 +164,29 @@ export const createOnboardingState = (): OnboardingState => {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Produces an empty customer site satisfying the domain's cardinality rules. */
-const newSite = (): CustomerSite => ({ label: '', location: [{}], notes: [] })
+export const newOnboardingSite = (): CustomerSite => ({ label: '', location: [{}], notes: [] })
 
 /** Produces an empty internal note with every field the domain requires. */
-const newNote = (): Note => ({
+export const newOnboardingNote = (): Note => ({
   attachments: [],
   createdAt: when(),
   content: '',
   visibility: 'internal',
   tags: []
+})
+
+/** Clones a note so a draft can be edited without mutating committed state. */
+export const cloneNote = (note: Note): Note => ({
+  ...note,
+  attachments: [...note.attachments],
+  tags: [...note.tags]
+})
+
+/** Clones a customer site so a draft can be edited without mutating committed state. */
+export const cloneCustomerSite = (site: CustomerSite): CustomerSite => ({
+  ...site,
+  location: site.location.map(location => ({ ...location })) as CustomerSite['location'],
+  notes: site.notes.map(cloneNote)
 })
 
 /** Reads the site's single location. */

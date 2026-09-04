@@ -8,7 +8,6 @@
 import { toTrimmed } from '@core/std'
 import type { CustomerCreate } from '@domain/protocols/customer-protocol.ts'
 import { isCustomerSite } from '@domain/validators/customer-validator.ts'
-import { CustomerUpdateScopes } from '@front/api/api-update-scopes.ts'
 import { api } from '@front/api/api.ts'
 import { OnboardingStageContact } from '@front/app-admin/onboarding/onboarding-stage-contact.tsx'
 import { OnboardingStageCustomer } from '@front/app-admin/onboarding/onboarding-stage-customer.tsx'
@@ -16,7 +15,7 @@ import { OnboardingStageSites } from '@front/app-admin/onboarding/onboarding-sta
 import { createOnboardingState } from '@front/app-admin/onboarding/onboarding-state.ts'
 import type { WizardContract, WizardStage } from '@front/ux/shell/wizard-contract.ts'
 import { Wizard } from '@front/ux/shell/wizard.tsx'
-import type { UiComponent } from '@front/ux/ui'
+import type { UiActionButtonProps, UiComponent } from '@front/ux/ui'
 import { createSignal } from '@solid-js'
 
 import './onboarding.css'
@@ -31,6 +30,9 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
   const state = createOnboardingState()
   const [contactFormCheck, setContactFormCheck] = createSignal<() => boolean>(() => false)
   const [customerFormCheck, setCustomerFormCheck] = createSignal<() => boolean>(() => false)
+  const [sitesTrailingAction, setSitesTrailingAction] = createSignal<
+    (() => UiActionButtonProps | undefined) | null
+  >(null)
 
   /** Stage collecting the customer's primary contact details. */
   const stageContact: WizardStage = {
@@ -50,7 +52,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
     }
   }
 
-  /** Stage collecting the customer account address and creating the customer record. */
+  /** Stage collecting the customer account address. */
   const stageCustomer: WizardStage = {
     name: 'customer',
     title: 'Customer address',
@@ -63,7 +65,22 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
     validate: () => customerFormCheck()(),
     canAdvance: () =>
       [state.name, state.line1, state.city, state.state, state.postalCode, state.country]
-        .every(value => value().trim().length > 0),
+        .every(value => value().trim().length > 0)
+  }
+
+  /** Stage collecting optional job-site details and creating the customer record. */
+  const stageSites: WizardStage = {
+    name: 'sites',
+    title: 'Job sites',
+    render: context => (
+      <OnboardingStageSites
+        state={state}
+        onReturnControl={context.registerDrillReturn}
+        onTrailingAction={action => setSitesTrailingAction(() => action)}
+      />
+    ),
+    canAdvance: () => state.sites().every(isCustomerSite),
+    trailingAction: () => sitesTrailingAction()?.(),
     commit: async () => {
       const create: CustomerCreate = {
         accountManagerId: undefined,
@@ -73,7 +90,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
           preferredChannel: state.preferredChannel(),
           ...(state.email().trim() ? { email: toTrimmed(state.email()) } : {})
         }],
-        sites: state.customer()?.sites ?? [],
+        sites: state.sites(),
         notes: [],
         name: toTrimmed(state.name()),
         status: state.status(),
@@ -84,47 +101,7 @@ export const Onboarding = (props: OnboardingProps): UiComponent => {
         postalCode: toTrimmed(state.postalCode()),
         country: toTrimmed(state.country())
       }
-      const customer = state.customer()
-      if (customer) {
-        state.setCustomer(
-          await api.Customers.update(CustomerUpdateScopes.address, {
-            id: customer.id,
-            primaryContact: create.primaryContact,
-            name: create.name,
-            status: create.status,
-            line1: create.line1,
-            line2: create.line2,
-            city: create.city,
-            state: create.state,
-            postalCode: create.postalCode,
-            country: create.country
-          })
-        )
-        return
-      }
       state.setCustomer(await api.Customers.create(create))
-    }
-  }
-
-  /** Stage collecting optional job-site details after the customer record exists. */
-  const stageSites: WizardStage = {
-    name: 'sites',
-    title: 'Job sites',
-    render: context => (
-      <OnboardingStageSites
-        state={state}
-        onReturnControl={context.registerDrillReturn}
-      />
-    ),
-    canAdvance: () => state.sites().every(isCustomerSite),
-    commit: async () => {
-      const customer = state.customer()
-      if (state.sites().length > 0 && customer) {
-        await api.Customers.update(CustomerUpdateScopes.sites, {
-          id: customer.id,
-          sites: state.sites()
-        })
-      }
     }
   }
 

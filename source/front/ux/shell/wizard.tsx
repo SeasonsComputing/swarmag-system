@@ -200,7 +200,14 @@ export const Wizard = (props: WizardProps): UiComponent => {
               </Show>
             ),
             trailing: (
-              <Show when={!isDrilled()}>
+              <Show
+                when={!isDrilled()}
+                fallback={
+                  <Show when={stage().trailingAction?.()}>
+                    {action => <UiActionButton {...action()} />}
+                  </Show>
+                }
+              >
                 <Show
                   when={isLast()}
                   fallback={
