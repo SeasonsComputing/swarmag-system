@@ -217,4 +217,45 @@ building merge tooling later — reconciling two already-diverged records after 
 much harder problem than catching it once at the point of entry, and most systems at any
 scale never build real merge tooling once duplicates exist.
 
+## Task-chain purity — where does a mechanical auto-fix belong
+
+**Parked:** 2026-09-04 — surfaced fixing a recurring `.DS_Store`/`guard:leaf` annoyance,
+reverted after ACE's review of an unrelated production caught the underlying question.
+
+**What it is:** `guard:leaf` keeps failing on macOS-Finder-generated `.DS_Store` files, a
+real, recurring, low-grade annoyance (Ted: "this will continue to fire guard errors — which
+it should" — the detection is correct, the noise source isn't worth manual cleanup every
+time). A first fix chained a `clean:ds-store` sweep directly into `guard:leaf`'s own task,
+making an individual guard mutate the tree before checking it — which breaks the pattern
+every other task in `deno.jsonc` follows: a mutating operation always gets an honest verb
+name (`fmt`, `lock:update`, `gen:*`), never a `check`/`guard` name. Reverted once named.
+
+The broader question the specific case sits inside: **should `check`/`check:guards`
+orchestration ever mutate**, as a convenience, even though the individual `guard:*` units
+it composes stay strictly pure? `.DS_Store` deletion seems safe either way — no context
+ever wants to *know* about a stray `.DS_Store`, so removing it loses no information. Auto-
+running `fmt` (not just `fmt:check`) at the same orchestration level is a sharper version of
+the same question, raised in the same conversation — reformatting **is** meaningful
+information (a real diff), so silently applying it inside something named `check` could let
+a future strict/CI use of that name mean "the repo, after being quietly rewritten, is
+correct" rather than "the repo, as committed, is correct."
+
+**Amended (2026-09-04, same sitting):** the proposed seam for this — splitting `chk` (bare
+alias for `check`, created only to match `fmt`'s three-letter brevity for fast typing) into
+a deliberately-mutating convenience path — is gone as an option. Ted removed `chk` from
+`deno.jsonc` entirely rather than give it its own behavior: a second, non-standardly-named
+command sitting next to the fully-spelled `check` broke the consistency of an otherwise
+clean `verb`/`verb:noun` task surface, and that problem outranked the convenience. No
+`chk`-shaped seam exists anymore to hang a split on. The underlying question — does `fmt`
+(mutating) or the `.DS_Store` sweep belong chained into `check`/`check:guards` itself, given
+`check` is now the only name in play — is still open and narrower than before.
+
+**Why parked:** A real devops/task-architecture decision, not a drive-by fix — deserves its
+own pass rather than being resolved as a side effect of an unrelated onboarding production.
+
+**Picking this up:** With no `chk` alias to split behavior onto, decide per mutation —
+`.DS_Store` sweep and `fmt` are the two concrete candidates already on the table — whether
+either belongs chained into `check`/`check:guards` at all, or stays a separate, deliberately
+typed step. Until then, `.DS_Store` is `rmdir`-by-hand when `guard:leaf` reports it.
+
 _End of Feature Parking Lot Document_
