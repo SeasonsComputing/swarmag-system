@@ -191,4 +191,30 @@ responsive presentation, and the app dashboard seed compositions together. Then 
 Admin-only header actions to that surface and add the corresponding Ops composition only
 when it has real app-specific destinations.
 
+## Duplicate customer detection
+
+**Parked:** 2026-09-01 — Ted, during onboarding Sites-stage bug investigation.
+
+**What it is:** `customers` has no uniqueness constraint on anything identifying — not
+`name`, not the contact email/phone buried in `primary_contact` JSONB, nothing beyond the
+trivially-unique `id` every `create()` call mints fresh. The onboarding wizard has no
+search-before-create step either. Nothing anywhere stops the same real-world customer from
+being onboarded twice as two separate, unrelated `Customer` rows, each silently
+accumulating its own sites/notes/job history.
+
+**Why parked:** Confirmed this is not the same category of gap as `users_primary_email_unique`
+— that constraint exists because email is the access mechanism (Auth/OTP identity), and one
+email must resolve to exactly one login. A customer's name/contact fields play no such role;
+nothing in the system keys access off them, and two distinct real customers can legitimately
+share a name, so there's no field that could safely be declared unique the way email is for
+users. Ted's read: not an issue at current onboarding volume/team size — parked on judgment,
+not on missing information.
+
+**Picking this up:** If it ever becomes real, the fix is soft (a search-before-create nudge —
+"a customer named X already exists, is this them?"), not a hard constraint, since no natural
+unique key exists for customer identity. Bias toward prevention at creation time over
+building merge tooling later — reconciling two already-diverged records after the fact is a
+much harder problem than catching it once at the point of entry, and most systems at any
+scale never build real merge tooling once duplicates exist.
+
 _End of Feature Parking Lot Document_
