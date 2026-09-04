@@ -1,9 +1,9 @@
 # Scoped Update Adapters — Backlog Brief
 
-**Backlog, not dispatched.** Captured at the close of a session that shipped the Index/Detail
-shell foundation (wizard drill navigation, `PanelHeaderTitle`, `CollectionPanel` styling) and,
-in review of that work, found a real data-loss bug this brief exists to prevent as a class,
-not just patch once.
+**CLOSED 2026-08-31.** Shipped, reviewed by ACE, and independently re-verified. Originally
+captured at the close of a session that shipped the Index/Detail shell foundation (wizard
+drill navigation, `PanelHeaderTitle`, `CollectionPanel` styling) and, in review of that work,
+found a real data-loss bug this brief exists to prevent as a class, not just patch once.
 
 ## The incident that surfaced this
 
