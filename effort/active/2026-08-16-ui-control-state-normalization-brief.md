@@ -9,6 +9,12 @@ config, no `HelmButton`, no shared-file changes — see
 `ui.css`/`ui-action-button.tsx` carry no Helm-specific leakage today and there
 is no longer a file conflict gating this brief. It may run independently.
 
+**Roadmap sequencing (2026-09-04):** CA has bundled this brief with the
+`ux/shell` → `ux/shell` + `front/app` split into a single future refactoring
+milestone, third in the current roadmap (after M1, after the Notes editor
+milestone). Fully designed and ready to dispatch, but not picked up standalone
+before that milestone starts — deferred on purpose, not blocked technically.
+
 ## What triggered this
 
 While inspecting the onboarding Job Sites panel and Helm action behavior, the

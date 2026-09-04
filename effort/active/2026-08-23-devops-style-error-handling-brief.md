@@ -15,6 +15,12 @@ claims to be authoritative "throughout the codebase," but nothing checks that
 claim against devops — there is no `guard-devops-style.ts` the way
 `guard-domain-style.ts` exists for domain.
 
+**Roadmap sequencing (2026-09-04):** CA has bundled this brief with the
+`ux/shell` → `ux/shell` + `front/app` split into a single future refactoring
+milestone, third in the current roadmap (after M1, after the Notes editor
+milestone). Fully designed and ready to dispatch, but not picked up standalone
+before that milestone starts — deferred on purpose, not blocked technically.
+
 ## What's actually true about devops today (verified, not assumed)
 
 - 11 of 12 TypeScript devops scripts already use the box-header/PURPOSE/PUBLIC

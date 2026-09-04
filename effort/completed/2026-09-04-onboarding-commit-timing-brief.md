@@ -1,11 +1,13 @@
 # Onboarding Commit Timing — Sequence and Index-Detail Draft State
 
-**Backlog, not dispatched.** Surfaced live-testing the fix for the "sites must be an array
-composition" bug (`2026-09-04`, same investigation, different topic from the scoped-update-
-adapter work it grew out of — that brief is closed; this one starts fresh). Two related but
-distinct problems in how the onboarding wizard persists state, both traced to the same root
-cause: nothing in the wizard or its nested Index-Detail panels distinguishes "the user is
-editing" from "the user is done."
+**CLOSED 2026-09-04.** Shipped, reviewed, and independently verified — including both
+follow-on decisions in the amendment below (Save navigates up; drill-back warns on a real
+dirty-check). Originally surfaced live-testing the fix for the "sites must be an array
+composition" bug, same investigation but a different topic from the scoped-update-adapter
+work it grew out of (that brief closed first). Two related but distinct problems in how the
+onboarding wizard persists state, both traced to the same root cause: nothing in the wizard
+or its nested Index-Detail panels distinguishes "the user is editing" from "the user is
+done."
 
 ## The incidents that surfaced this
 
@@ -177,7 +179,15 @@ single header slot, one at a time, deferring to whichever is the innermost drill
   pattern exists in this exact file for exactly this shape of "are you sure" — reuse it
   rather than a native `confirm()` or a new mechanism.
 
-Neither is built yet. Next session starts with a look at the shipped code, then scopes these
-two as a small follow-on.
+**Both shipped (2026-09-04, same sitting), verified against the actual code, not narration.**
+`saveSite`/`saveNote` call `onReturnAfterSave()` only after a successful validated commit,
+using the *raw* drill-return control so a successful save never triggers its own discard
+warning. `isDirty` compares a JSON fingerprint of the live draft against one taken from the
+original seed at mount — blank factory shape for a new item, the cloned committed value for
+an existing one — exactly the comparison specified above. `requestDrillReturn` gates on it:
+clean drafts return immediately, dirty ones hold the control and open a `UiDialog`
+("Discard unsaved changes?" / Cancel / Discard), reusing the primitive
+`CollectionPanel.confirmRemove` is itself built on rather than inventing a parallel
+mechanism. Full check suite (types, lint, fmt, all 13 guards) clean.
 
 _End of Backlog Brief_
