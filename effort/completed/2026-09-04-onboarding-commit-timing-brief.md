@@ -181,7 +181,7 @@ single header slot, one at a time, deferring to whichever is the innermost drill
 
 **Both shipped (2026-09-04, same sitting), verified against the actual code, not narration.**
 `saveSite`/`saveNote` call `onReturnAfterSave()` only after a successful validated commit,
-using the *raw* drill-return control so a successful save never triggers its own discard
+using the _raw_ drill-return control so a successful save never triggers its own discard
 warning. `isDirty` compares a JSON fingerprint of the live draft against one taken from the
 original seed at mount — blank factory shape for a new item, the cloned committed value for
 an existing one — exactly the comparison specified above. `requestDrillReturn` gates on it:
