@@ -325,6 +325,15 @@ Address fields are a form composition pattern, not a single compound field.
 └──────────────────────────────────┘
 ```
 
+### 5.3 Form State Management
+
+**An archetype that stages editable content does not decide when that content is written.** A Sequence's Steps and an Index-Detail's Items are both places a user edits state before it is real; neither archetype has an opinion about when "before" ends. That choice belongs to the instance, and it takes one of two shapes:
+
+- **Commit with progression** — each Step or Item writes as the user leaves it. State is real the moment it is entered.
+- **Commit on completion** — edits are held as a draft and written once, when the user explicitly confirms the surface is done. Nothing is real until then.
+
+**Neither is the default, and a surface may choose differently at each level it uses.** The customer onboarding wizard commits on completion throughout: the Sequence writes once at Finish rather than after each Step, and each Item opened through its nested Index-Detail (a Site, a Note) holds a local draft that commits into its parent only on that panel's own Save, discarding on drill-back otherwise. That combination suits Onboarding, where an abandoned or cancelled flow must leave nothing behind. It is not a rule for every Sequence or Index-Detail — a surface editing a record that already exists, where each Step is a change to something real rather than a step toward creating it, may have good reason to commit with progression instead.
+
 ## 6. Supporting Library
 
 The machinery this repository already builds for the common cases. Reach for the row before designing a surface. Where no row fits, the work is the special case the Pareto split exists to protect — say so and escalate rather than bending a row to cover it.
