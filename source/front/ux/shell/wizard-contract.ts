@@ -11,12 +11,13 @@ a host sequences, gates, commits, and presents.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-WizardStage         One stage strategy: render, validity gate, optional commit.
+WizardStage         One stage strategy: render, validity gate, optional commit,
+                    optional drilled-state trailing action.
 WizardStageContext  Host context available to wizard stages.
 WizardContract      Provider contract for a guided, linear wizard flow.
 */
 
-import type { UiComponent } from '@front/ux/ui'
+import type { UiActionButtonProps, UiComponent } from '@front/ux/ui'
 import type { DrillReturnControl } from './drill-contract.ts'
 import type { PanelFeedback } from './panel-contract.ts'
 
@@ -38,6 +39,12 @@ export type WizardStage = {
    */
   validate?: () => boolean
   commit?: () => void | Promise<void>
+  /**
+   * Trailing header action while this stage is presenting drilled detail, in place
+   * of the wizard's own Next/Finish. Undefined renders nothing. Irrelevant, and
+   * never consulted, while the stage is not drilled.
+   */
+  trailingAction?: () => UiActionButtonProps | undefined
 }
 
 /** Provider contract for guided, linear wizard flows. */
