@@ -1479,6 +1479,10 @@
   font-weight: var(--sa-label-font-weight);
 }
 
+[data-ui='field'] > figcaption {
+  white-space: nowrap;
+}
+
 [data-ui='field'][data-ui-required] > label::after,
 [data-ui='field'][data-ui-required] > figcaption::after {
   color: var(--sa-field-required-mark);
