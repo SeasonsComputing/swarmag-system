@@ -37,9 +37,6 @@ export type UiTextAreaProps =
     'data-ui-state'?: never
   }
 
-const TextFieldRoot = TextField as unknown as typeof TextField
-const TextFieldTextArea = TextField.TextArea as unknown as typeof TextField.TextArea
-
 /** Multiline input control with declared states. */
 export const UiTextArea = (props: UiTextAreaProps): UiComponent => {
   const [local, others] = splitProps(props, [
@@ -53,20 +50,20 @@ export const UiTextArea = (props: UiTextAreaProps): UiComponent => {
     'readOnly'
   ])
   return (
-    <TextFieldRoot
+    <TextField
       name={local.name}
       required={local.required}
       disabled={local.disabled || local.loading}
       readOnly={local.readOnly}
       validationState={local.error ? 'invalid' : undefined}
     >
-      <TextFieldTextArea
+      <TextField.TextArea
         id={local.id ?? local.name}
         rows={local.rows}
         {...others as unknown as TextFieldTextAreaProps}
         data-ui='textarea'
         data-ui-state={controlState(local) as string | undefined}
       />
-    </TextFieldRoot>
+    </TextField>
   )
 }

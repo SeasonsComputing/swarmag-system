@@ -33,9 +33,6 @@ export type UiProgressProps = UiComponentProps & {
   'data-ui-state'?: never
 }
 
-const ProgressTrack = Progress.Track as unknown as typeof Progress.Track
-const ProgressFill = Progress.Fill as unknown as typeof Progress.Fill
-
 /** Progress control with declared states. */
 export const UiProgress = (props: UiProgressProps): UiComponent => {
   const [local] = splitProps(props, [
@@ -57,9 +54,9 @@ export const UiProgress = (props: UiProgressProps): UiComponent => {
       minValue={local.minValue}
       maxValue={local.maxValue}
     >
-      <ProgressTrack data-ui='progress-track'>
-        <ProgressFill data-ui='progress-fill' />
-      </ProgressTrack>
+      <Progress.Track data-ui='progress-track'>
+        <Progress.Fill data-ui='progress-fill' />
+      </Progress.Track>
       {local.children}
     </Progress>
   )

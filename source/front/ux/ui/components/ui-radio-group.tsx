@@ -51,7 +51,6 @@ export type UiRadioItemProps<Value extends string = string> = UiComponentProps &
 
 const RadioGroupRoot = RadioGroup as Component<WithDataUi<RadioGroupRootProps>>
 const RadioItem = RadioGroup.Item as Component<WithDataUi<RadioGroupItemProps>>
-const RadioItemControl = RadioGroup.ItemControl as unknown as typeof RadioGroup.ItemControl
 
 /** Radio-group control with declared states. */
 export const UiRadioGroup = <Value extends string = string>(
@@ -111,9 +110,9 @@ export const UiRadioItem = <Value extends string = string>(
       disabled={local.disabled}
     >
       <RadioGroup.ItemInput ref={radioInputElement} />
-      <RadioItemControl data-ui='radio'>
+      <RadioGroup.ItemControl data-ui='radio'>
         <RadioGroup.ItemIndicator />
-      </RadioItemControl>
+      </RadioGroup.ItemControl>
       <RadioGroup.ItemLabel>{local.children}</RadioGroup.ItemLabel>
     </RadioItem>
   )

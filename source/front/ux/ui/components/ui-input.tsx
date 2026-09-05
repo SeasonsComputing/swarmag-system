@@ -37,9 +37,6 @@ export type UiInputProps =
     'data-ui-state'?: never
   }
 
-const TextFieldRoot = TextField as unknown as typeof TextField
-const TextFieldInput = TextField.Input as unknown as typeof TextField.Input
-
 /** Text input control with declared states. */
 export const UiInput = (props: UiInputProps): UiComponent => {
   const [local, others] = splitProps(props, [
@@ -52,19 +49,19 @@ export const UiInput = (props: UiInputProps): UiComponent => {
     'readOnly'
   ])
   return (
-    <TextFieldRoot
+    <TextField
       name={local.name}
       required={local.required}
       disabled={local.disabled || local.loading}
       readOnly={local.readOnly}
       validationState={local.error ? 'invalid' : undefined}
     >
-      <TextFieldInput
+      <TextField.Input
         id={local.id ?? local.name}
         {...others as unknown as TextFieldInputProps}
         data-ui='input'
         data-ui-state={controlState(local) as string | undefined}
       />
-    </TextFieldRoot>
+    </TextField>
   )
 }
