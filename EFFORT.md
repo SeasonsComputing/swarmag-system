@@ -83,15 +83,15 @@ A milestone closes with an explicit verification pass, not by informal agreement
 
 ## 7. Escalation Is a Default, Not a Wall
 
-A stated escalation boundary — named in a brief, a production scope statement, or an operating mode — requires the Chief Architect's attention before it is crossed. It is not self-authorizing, and it is not permanently closed either.
+A stated escalation boundary — named in a brief, a production scope statement, or an operating mode — requires the CA's attention before it is crossed. It is not self-authorizing, and it is not permanently closed either.
 
-The Chief Architect may authorize crossing it directly, in conversation, without a full formal rescoping cycle, once the change is sized and understood well enough to judge in the moment.
+The CA may authorize crossing it directly, in conversation, without a full formal rescoping cycle, once the change is sized and understood well enough to judge in the moment.
 
 Such a crossing must still be named and recorded — in the brief, in the production report — never silent, even when the authorization itself was quick.
 
 ## 8. Relationship to Other Governing Documents
 
-This document does not amend `CONSTITUTION.md` §1's precedence chain. Where it sits in that ordering, if anywhere, is the Chief Architect's decision to ratify, not this document's to presume.
+This document does not amend `CONSTITUTION.md` §1's precedence chain. Where it sits in that ordering, if anywhere, is the CA's decision to ratify, not this document's to presume.
 
 Where this document and `CONSTITUTION.md` conflict, `CONSTITUTION.md` governs.
 
