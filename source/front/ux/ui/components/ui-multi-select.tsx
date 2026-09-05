@@ -36,6 +36,7 @@ export type UiMultiSelectProps = {
   'data-ui-state'?: never
 }
 
+/** Re-typed listbox root and item components from Kobalte. */
 const ListboxRoot = Listbox as unknown as typeof Listbox
 const ListboxItem = Listbox.Item as unknown as typeof Listbox.Item
 
