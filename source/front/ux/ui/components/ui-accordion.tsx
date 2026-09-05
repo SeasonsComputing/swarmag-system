@@ -67,7 +67,6 @@ export type UiAccordionContentProps = UiComponentProps & {
 }
 
 const AccordionRoot = Accordion as Component<WithDataUi<AccordionRootProps>>
-const AccordionItem = Accordion.Item as unknown as typeof Accordion.Item
 const AccordionTrigger = Accordion.Trigger as Component<WithDataUi<AccordionTriggerProps>>
 const AccordionContent = Accordion.Content as Component<WithDataUi<AccordionContentProps>>
 
@@ -104,9 +103,9 @@ export const UiAccordionItem = (props: UiAccordionItemProps): UiComponent => {
     'disabled'
   ])
   return (
-    <AccordionItem data-ui='accordion-item' value={local.value} disabled={local.disabled}>
+    <Accordion.Item data-ui='accordion-item' value={local.value} disabled={local.disabled}>
       {local.children}
-    </AccordionItem>
+    </Accordion.Item>
   )
 }
 

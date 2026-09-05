@@ -36,10 +36,6 @@ export type UiMultiSelectProps = {
   'data-ui-state'?: never
 }
 
-/** Re-typed listbox root and item components from Kobalte. */
-const ListboxRoot = Listbox as unknown as typeof Listbox
-const ListboxItem = Listbox.Item as unknown as typeof Listbox.Item
-
 /** Inline multi-value select control with declared states. */
 export const UiMultiSelect = (props: UiMultiSelectProps): UiComponent => {
   const [local] = splitProps(props, [
@@ -54,7 +50,7 @@ export const UiMultiSelect = (props: UiMultiSelectProps): UiComponent => {
     'onChange'
   ])
   return (
-    <ListboxRoot
+    <Listbox
       id={local.id ?? local.name}
       data-ui='multi-select'
       data-ui-state={controlState(local)}
@@ -66,9 +62,9 @@ export const UiMultiSelect = (props: UiMultiSelectProps): UiComponent => {
       defaultValue={local.defaultValue}
       onChange={(selected: StringSet) => local.onChange?.([...selected])}
       renderItem={(item: ListboxItemOptions['item']) => (
-        <ListboxItem data-ui='multi-select-item' item={item}>
+        <Listbox.Item data-ui='multi-select-item' item={item}>
           {uiOptionLabel((item as unknown as { rawValue: UiOption }).rawValue)}
-        </ListboxItem>
+        </Listbox.Item>
       )}
     />
   )

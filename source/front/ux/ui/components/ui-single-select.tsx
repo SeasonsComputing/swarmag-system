@@ -38,10 +38,6 @@ export type UiSingleSelectProps = {
   'data-ui-state'?: never
 }
 
-const SelectRoot = Select as unknown as typeof Select
-const SelectContent = Select.Content as unknown as typeof Select.Content
-const SelectItem = Select.Item as unknown as typeof Select.Item
-
 /** Single-value select control with declared states. */
 export const UiSingleSelect = (props: UiSingleSelectProps): UiComponent => {
   const [local] = splitProps(props, [
@@ -63,7 +59,7 @@ export const UiSingleSelect = (props: UiSingleSelectProps): UiComponent => {
   }
 
   return (
-    <SelectRoot
+    <Select
       name={local.name}
       options={local.options as UiOption[]}
       optionValue='value'
@@ -80,9 +76,9 @@ export const UiSingleSelect = (props: UiSingleSelectProps): UiComponent => {
       defaultValue={local.options.find(o => o.value === local.defaultValue)}
       onChange={handleChange}
       itemComponent={(item: SelectRootItemComponentProps<UiOption>) => (
-        <SelectItem data-ui='single-select-item' item={item.item}>
+        <Select.Item data-ui='single-select-item' item={item.item}>
           {uiOptionLabel(item.item.rawValue)}
-        </SelectItem>
+        </Select.Item>
       )}
     >
       <Select.Trigger
@@ -100,10 +96,10 @@ export const UiSingleSelect = (props: UiSingleSelectProps): UiComponent => {
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <SelectContent data-ui='single-select-content'>
+        <Select.Content data-ui='single-select-content'>
           <Select.Listbox autofocus />
-        </SelectContent>
+        </Select.Content>
       </Select.Portal>
-    </SelectRoot>
+    </Select>
   )
 }
