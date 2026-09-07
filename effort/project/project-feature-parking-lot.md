@@ -258,4 +258,30 @@ own pass rather than being resolved as a side effect of an unrelated onboarding 
 either belongs chained into `check`/`check:guards` at all, or stays a separate, deliberately
 typed step. Until then, `.DS_Store` is `rmdir`-by-hand when `guard:leaf` reports it.
 
+## Region as a free-text field, not a picklist
+
+**Parked:** 2026-09-07 — Ted, during Group D's live onboarding E2E pass on stage.
+
+**What it is:** `Region` (Customer billing address and Site address both) is a plain
+`UiInput`, so a user can type anything — no state abbreviation enforcement, no
+autocomplete, nothing stopping "Texas" and "TX" from both existing across different
+records for the same real state. A picklist would be the more correct control for a field
+with a small, known, enumerable domain.
+
+**Why parked:** Real fork buried inside what sounds like a small UI swap. `Country` on the
+same forms is free text too, which at minimum implies the system doesn't assume US-only
+today — so is `Region` always US states specifically (a fixed 50-plus-territories list),
+or does it need to generalize into a country-aware region picker if international address
+support is ever real rather than theoretical? Picking the wrong one now means redoing it
+once an international customer actually shows up, or over-building region-picker
+generality for a system that may only ever serve US customers. That's a product-scope
+question, not a control-design one — CA's call, not inferred from the field's current
+shape.
+
+**Picking this up:** Settle the US-only-vs-international question first; the control
+choice (a `UiSingleSelect` of US state abbreviations, versus something country-aware)
+follows directly once that's answered. Touches both `onboarding-stage-customer.tsx`'s
+`CustomerInput` and `onboarding-stage-sites.tsx`'s `SiteTextInput` — same shape, two call
+sites, per the existing free-text-field pattern in each.
+
 _End of Feature Parking Lot Document_
