@@ -164,7 +164,11 @@ export const createOnboardingState = (): OnboardingState => {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Produces an empty customer site satisfying the domain's cardinality rules. */
-export const newOnboardingSite = (): CustomerSite => ({ label: '', location: [{}], notes: [] })
+export const newOnboardingSite = (): CustomerSite => ({
+  label: '',
+  location: [{ country: 'US' }],
+  notes: []
+})
 
 /** Produces an empty internal note with every field the domain requires. */
 export const newOnboardingNote = (): Note => ({

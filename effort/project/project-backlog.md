@@ -391,4 +391,30 @@ Full plan, exact site counts, and sequencing (doc → `architecture-devops.md` �
 retrofit → guard-last, so the new guard's first run is green) are in
 `effort/active/2026-08-23-devops-style-error-handling-brief.md`.
 
+## Testing
+
+### No automated coverage above the domain/API layer — today's manual live pass proved it
+
+**Observed:** 2026-09-07 · normal
+
+Group D's live E2E verification (create a real prospect through the onboarding wizard, ≥2
+sites, one address-only and one coordinates) was done entirely by hand: Ted read a table of
+field values off screen and typed them into the deployed stage app one field at a time,
+losing a site along the way when Finish fired before the second site was added. Nothing
+about that pass is repeatable without re-typing the same data by hand again.
+
+This is the live, felt consequence of the gap `[[project_testing_gap_backlog_pending]]`
+already named structurally: `STYLE-GUIDE.md` §12's testing convention
+(`source/tests/cases/{abstraction}-api-test.ts`) covers domain/adapter/API only —
+`ux/shell`'s Wizard host, `DrillDown`, the onboarding stages themselves have no test
+mechanism to land in, by convention, not oversight. Today's session is a second, concrete
+data point: a JSON fixture (the exact prospect/site field data used for a manual pass could
+be captured once as data) plus a driver over it would make this pass repeatable and immune
+to the exact slip that happened today (finishing early, losing a site).
+
+Deserves its own scoped brief, not a drive-by fix here — needs a decision on where such a
+driver would even run (headless browser against a deployed stage URL, per `smoke-ux.ts`'s
+existing pattern? something narrower against the wizard's own state layer?) before scoping
+begins.
+
 _End of Backlog Document_
