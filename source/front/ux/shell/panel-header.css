@@ -51,7 +51,7 @@
   display: inline-flex;
   gap: var(--sa-space-xs);
   min-inline-size: 0;
-  transform: translateY(3px);
+  transform: translateY(2px);
 }
 
 [data-shell-panel='header-leading'] > h1 {
@@ -60,7 +60,7 @@
 
 [data-shell-panel='header-leading'] > h2,
 [data-shell-panel='header-title-path'] > h2 {
-  font-size: calc(var(--sa-font-size-md) * 0.9);
+  font-size: calc(var(--sa-font-size-md) * 0.95);
 }
 
 [data-shell-panel='header-title-path'] > h3 {
@@ -68,7 +68,7 @@
 }
 
 [data-shell-panel='header-title-path'] > h4 {
-  font-size: calc(var(--sa-font-size-md) * 0.8);
+  font-size: calc(var(--sa-font-size-md) * 0.75);
 }
 
 [data-shell-panel='header-title-separator'] {
