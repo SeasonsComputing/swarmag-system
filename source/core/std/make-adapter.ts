@@ -11,16 +11,18 @@ nested delegate adapters for composed domain objects.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AdapterPatch<T>   Partial domain patch where null clears a stored column.
-FieldAdapter<T>   Serialization adapter for one domain field.
-AnyFieldAdapter<T>  Union of field adapters for a domain abstraction.
-ScopedUpdateAdapter<T, K>  Serialization adapter for a declared field set.
-Adapter<T>        Domain serialization contract.
-├ toDomain(source)       Deserialize storage dictionary to domain shape.
-└ fromDomain(patch)      Serialize domain patch to storage dictionary.
-AdaptDelegate     Column mapping with optional nested adapter delegate.
-Adapt<T>          Metadata map from domain keys to storage columns.
-makeAdapter(meta) Create an Adapter from metadata.
+AdapterPatch<T>           Partial domain patch where null clears a stored column.
+FieldAdapter<T>           Serialization adapter for one domain field.
+AnyFieldAdapter<T>        Union of field adapters for a domain abstraction.
+ScopedUpdateAdapter<T, K> Serialization adapter for a declared field set.
+
+Adapter<T>                Domain serialization contract.
+├ toDomain(source)        Deserialize storage dictionary to domain shape.
+└ fromDomain(patch)       Serialize domain patch to storage dictionary.
+AdaptDelegate             Column mapping with optional nested adapter delegate.
+Adapt<T>                  Metadata map from domain keys to storage columns.
+
+makeAdapter(meta)         Create an Adapter from metadata.
 makeScopedUpdate(fields)  Create a scoped update adapter from field adapters.
 */
 import { Dictionary, isNullish } from './adt.ts'
