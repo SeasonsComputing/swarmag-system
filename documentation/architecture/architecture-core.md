@@ -412,24 +412,9 @@ still retain their domain meaning: a value may be absent on the entity only when
 optional. Omission from a scoped update is instead a persistence protocol decision: the declared scope says
 which columns may be written by that form.
 
-Every new form in the system must consider and declare its own update scope as part of its design, the same
-way validators are required for CRUD provider methods. This rule is binding for new design work. Existing
-forms are retrofitted only when authorized by explicit production scope.
-
 Application code still consumes the API namespace and does not import domain adapters directly. When a scoped
 update needs field adapters to compose storage dictionaries, the form owns the field-set decision and the API
 composition layer hosts the adapter-bound scope declaration.
-
-Customer Onboarding Wizard and User Manager are the reference implementations for this foundation. Customer
-Onboarding exercises the plain-table CRUD path: field-addressable adapters compose a scoped column dictionary
-before `makeCrudSupabaseClient` writes to Supabase. User Manager exercises the edge-function-mediated CRUD
-path: the Users wrapper keeps privileged Auth synchronization behind edge functions while tightening its
-update signature to a full-record scoped update before dispatch.
-
-Together with the Index-Detail and Decomposition-Sequence shell work, these two surfaces are intended as
-the production reference for later system expansion. Assets, Chemicals, Jobs, Services, and Workflows should
-be stamped out from these proven patterns when their production scope is authorized, not rediscovered from
-scratch.
 
 ### 5.3 Client Makers
 
