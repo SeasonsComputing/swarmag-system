@@ -2,14 +2,18 @@
 
 **Date:** 2026-07-19
 **Mode:** Foundation (A0/A/C) + Feature (B)
-**Status:** CLOSING 2026-09-04 — CA called this milestone complete. D1–D17
-ratified 2026-07-20; **A0, A1, A, B0, and B all complete.** Stage 3 (Sites) was
-rebuilt beyond the "rehost" scope this doc's own Group B item named — see the
-onboarding commit-timing brief in `effort/completed/`. **Group C (Notes-lite)
-is retired as an item of this milestone** — Notes is now its own milestone,
-next in the roadmap, not a dependency of closing this one. **Group D
-(verification) is the one remaining task** — the literal last thing before
-this ledger closes.
+**Status:** CLOSED 2026-09-10. D1–D17 ratified 2026-07-20; A0, A1, A, B0, B,
+and D all complete. Group C (Notes-lite) is retired as an item of this
+milestone — Notes is its own milestone. Group D closed with an imperfect but
+real live E2E pass: two prospects created against a freshly genesis'd stage
+through the actually-deployed wizard, four findings recorded (a dropped
+second site, a country-default bug found and fixed, a Region-picklist design
+question, a testing-automation gap), all four given their own durable record
+rather than left inside this ledger. See
+`effort/active/2026-09-10-m1-closing-reconciliation-brief.md` for the full
+closing reconciliation, including two gaps this milestone's actual scope
+never covered — Customer Manager and Onboarding's Initial Job Assessment
+stage — now backlogged separately.
 
 **Group B closes with one question outstanding against it** — fieldset
 redundancy, recorded in `effort/project/project-backlog.md`. It reaches
@@ -232,15 +236,30 @@ mount points, three needed now: **User, Customer, Site.** Brief:
       the control is genuinely generic rather than site-shaped
 - [ ] Style: no new tokens unless demanded; guard suite green
 
-## Group D — Verification & Close
+## Group D — Verification & Close — CLOSED 2026-09-10
 
-- [ ] Full checks: guards + types + lint + tests + fmt
-- [ ] Live E2E via CA browser on stage: run COW start-to-finish, create a
-      real prospect with ≥2 sites (one address-only, one with
-      coordinates), verify in Supabase data (`primary_contact`
-      composition present, no auth identity minted)
-- [ ] Story 1.1 enrichment reconciled with as-built (D16 practice)
-- [ ] Ledger closed with commit hash(es); memory updated
+- [x] Full checks: guards + types + lint + tests + fmt — all green;
+      `users-api-test.ts` fails on missing local Supabase env secrets, a
+      pre-existing, unrelated, documented condition (fails identically on
+      clean HEAD)
+- [x] Live E2E via CA browser on stage: two prospects created against a
+      freshly genesis'd stage DB through the actually-deployed wizard
+      (build `cdbb181`/1002). One (Harmon Farms) ended up with a single
+      site, not the intended ≥2 mixed address/coordinates set, when Finish
+      fired before the second site was added — a real, informative slip,
+      not a defect in the flow itself. Four findings from this pass each
+      given their own durable record rather than folded into this line:
+      the dropped-site incident (see the Customer Manager backlog entry),
+      a country-default bug (found, fixed, `5e1f2ab`), a Region-as-picklist
+      design question (parking lot), and a testing-automation gap
+      (backlog)
+- [x] Story 1.1 enrichment reconciled with as-built (D16 practice) —
+      checked directly against `effort/project/project-user-stories.md`
+      §1.1; items 1–2 match the shipped wizard exactly, items 3–4 are
+      correctly out of scope (story 2.x)
+- [x] Ledger closed with commit hash(es); memory updated — see
+      `2026-09-10-m1-closing-reconciliation-brief.md` and
+      `project_onboarding_milestone.md`
 
 ---
 

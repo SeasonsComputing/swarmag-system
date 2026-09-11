@@ -417,4 +417,53 @@ driver would even run (headless browser against a deployed stage URL, per `smoke
 existing pattern? something narrower against the wizard's own state layer?) before scoping
 begins.
 
+## Customer
+
+### Customer Manager
+
+**Observed:** 2026-09-10 · normal
+
+There is no surface for editing an existing Customer — `/onboarding` is the only route that
+touches `Customer`, and it is create-only. Surfaced live during Group D's E2E verification: a
+prospect created with one site by mistake has no way to gain a second one after Finish.
+
+The fix is ordinary `AbstractionManager`, Collection-Detail⇄Index-Detail, the same machinery
+User Manager already runs. It reuses the `SiteEditor`/`NoteEditor` Index-Detail panels the
+onboarding wizard's Sites stage already built — no new component, per the precedent
+`[[project_panel_chrome]]` recorded when the panel-chrome unification first made
+Wizard-as-a-Manager's-create-path viable (`renderForm(item: T | null, onClose)` already takes
+`null` to mean create; a real `Customer` is the same slot's non-null branch).
+
+### Onboarding — Initial Job Assessment stage
+
+**Observed:** 2026-09-10 · normal
+
+Customer Onboarding's Finish does not belong at Sites. The intended flow continues into initial
+job assessment — selecting services and applying initial templates — making the three built
+stages (Contact, Customer, Sites) a near-term slice of a four-stage design, not a complete
+surface. The fourth stage's own design (service selection UI, template application mechanism)
+has not started.
+
+## UX
+
+### Hub widget
+
+**Observed:** 2026-09-10 · normal
+
+A dashboard widget archetype that groups commands by topic — Users Hub, Customers Hub,
+Equipment & Chemicals Hub, Workflows/Tasks/Questions Hub, Jobs Hub — full disclosure, bespoke
+per-topic content, no fixed visualization (a row of action buttons, a full-bleed artistic
+surface with hotspot triggers, and an inline data table are all legitimate presentations of the
+same archetype). Distinct from `JobHub` (`source/front/ux/views/job-views.ts`), an existing,
+shipped data-projection type for the same underlying idea at the data layer, not the widget
+layer.
+
+This is the primary approach, not a coin flip — CA wants it built and proven before falling
+back to the alternative: a hierarchical command panel on the dashboard's left side, which
+stays the named, ready fallback if Hub doesn't earn its keep. Whichever wins, `Job`'s three
+independently-tabled phases (`jobs`/`job_assessments`/`job_plans`/`job_work`) are the clearest
+motivating case — `architecture-front.md` §11.7 already names a "colloquial UX hub:
+`job: [assessment, plan, work]`," so this connects to existing language rather than inventing
+it fresh.
+
 _End of Backlog Document_
