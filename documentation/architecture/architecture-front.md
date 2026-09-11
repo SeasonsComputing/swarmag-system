@@ -637,6 +637,8 @@ IndexedDB usage is split into two layers:
 - Stores for shared cross-component state — session, app preferences, dashboard config
 - TanStack Query for all server data — caching, loading, error states
 - No prop-drilling of session or user — read from session store directly
+- A form declares its own update scope as part of its design, submitting a `ScopedUpdate<T, K>`
+  rather than the broad `UpdateFromInstantiable<T>` protocol
 
 ## 10. Shared Application Features
 
