@@ -34,6 +34,8 @@ Tracked work lives in `effort/`, in four namespaces:
 
 A document's namespace states its status. Do not let a document's namespace and its own internal framing disagree — when a brief closes, its own opening line changes to say so; it does not simply move while still describing itself as open.
 
+A closed document's cross-references to other documents are frozen at the moment it closes, not maintained afterward. When a document it cites later retires or moves, the closed document keeps citing the old path — it is a historical record of what was true when it was written, not a live index. Do not treat a dangling path inside `effort/completed/` as a defect, and do not edit a closed document to repair one.
+
 ## 3. Backlog and Parking Lot
 
 Two kinds of not-yet-started work exist, and they are not the same kind of thing:

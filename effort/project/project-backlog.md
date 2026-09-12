@@ -69,16 +69,6 @@ itself an AI-ingestion companion in its own opening.
 Do not restructure before the analysis is reviewed. This is base context for every
 session, so a wrong cut is felt everywhere at once.
 
-### Retiring an effort document leaves its cross-references dangling
-
-**Observed:** 2026-08-17 · low
-
-`effort/completed/` carries roughly twenty references to `effort/active/` paths for documents that have since been retired — `2026-08-05-abstraction-manager-handoff.md` still cites `effort/active/2026-08-05-abstraction-manager-brief.md`, for one. The 2026-08-16 retirement of six documents added its own.
-
-This is the same failure class as the `ui.css:554–558` citation that rotted: a path is a location, and locations move. It is deliberate today only by default, not by decision.
-
-Two ways to settle it, and either is fine as long as it is chosen. Retirement rewrites the moved document's own forward references, which keeps links live at the cost of editing a historical record. Or historical links are frozen by design, and the parking lot and backlog say so once so a reader stops treating a dangling path as a defect.
-
 ### `STYLE-GUIDE.md` should be `CONVENTIONS.md`, and governing-doc tables need `EFFORT.md`
 
 **Observed:** 2026-09-04 · normal
