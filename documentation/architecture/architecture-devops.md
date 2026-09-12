@@ -33,6 +33,7 @@ source/devops/
 │   ├── guard-architecture.ts
 │   ├── guard-bare-html.ts
 │   ├── guard-chart.ts
+│   ├── guard-completed-immutable.ts
 │   ├── guard-core-std-types.ts
 │   ├── guard-css.ts
 │   ├── guard-domain-style.ts
@@ -41,6 +42,7 @@ source/devops/
 │   ├── guard-imports.ts
 │   ├── guard-leaf.ts
 │   ├── guard-namespaces.ts
+│   ├── guard-tokens.ts
 │   ├── guard-utils.ts
 │   └── guard-validation.ts
 └── scripts/
@@ -58,6 +60,7 @@ source/devops/
     ├── gen-ai-context.ts
     ├── gen-id-seeds.ts
     ├── gen-jwt-secret.ts
+    ├── git-hooks-pre-commit
     ├── list-netlify-targets.ts
     ├── list-supabase-targets.ts
     ├── read-secret.ts
@@ -633,6 +636,7 @@ supported task groups; individual task bodies remain in `deno.jsonc`.
 | Packaging     | `app-{name}-package-{target}`, `app-{name}-package-{target}-verify`  |
 | Deployment    | `deploy`, `app-deploy-auth-config`, `ux-smoke`, `ux-stage-smoke`     |
 | Local servers | `app-dev-local`, `app-stage-local`, `app-style-guide-local`          |
+| Git hooks     | `hooks:install`                                                      |
 
 ## 11. Architectural Guards
 
@@ -640,21 +644,23 @@ Guards are Deno scripts that enforce structural and operational invariants. They
 
 ### 11.1 Guard Inventory
 
-| Task                   | Script                    | What it enforces                                               |
-| ---------------------- | ------------------------- | -------------------------------------------------------------- |
-| `guard:architecture`   | `guard-architecture.ts`   | Dependency direction across layers                             |
-| `guard:env`            | `guard-env.ts`            | Env file structure and required keys                           |
-| `guard:leaf`           | `guard-leaf.ts`           | Leaf-module export discipline                                  |
-| `guard:validation`     | `guard-validation.ts`     | Validator shape conventions                                    |
-| `guard:domain-style`   | `guard-domain-style.ts`   | Domain layer code style conventions                            |
-| `guard:core-std-types` | `guard-core-std-types.ts` | Core std type usage                                            |
-| `guard:front-state`    | `guard-front-state.ts`    | Front state management conventions                             |
-| `guard:chart`          | `guard-chart.ts`          | Chart component conventions                                    |
-| `guard:imports`        | `guard-imports.ts`        | Import discipline across all layers                            |
-| `guard:namespaces`     | `guard-namespaces.ts`     | Front namespace boundaries: ui seam, widget SPI, app isolation |
-| `guard:css`            | `guard-css.ts`            | CSS architecture conventions                                   |
-| `guard:bare-html`      | `guard-bare-html.ts`      | HTML shell constraints                                         |
-| `guard:secrets`        | `validate-secrets.ts`     | `secrets.jsonc` structure and composite key identity           |
+| Task                        | Script                         | What it enforces                                               |
+| --------------------------- | ------------------------------ | -------------------------------------------------------------- |
+| `guard:architecture`        | `guard-architecture.ts`        | Dependency direction across layers                             |
+| `guard:env`                 | `guard-env.ts`                 | Env file structure and required keys                           |
+| `guard:leaf`                | `guard-leaf.ts`                | Leaf-module export discipline                                  |
+| `guard:validation`          | `guard-validation.ts`          | Validator shape conventions                                    |
+| `guard:domain-style`        | `guard-domain-style.ts`        | Domain layer code style conventions                            |
+| `guard:core-std-types`      | `guard-core-std-types.ts`      | Core std type usage                                            |
+| `guard:front-state`         | `guard-front-state.ts`         | Front state management conventions                             |
+| `guard:chart`               | `guard-chart.ts`               | Chart component conventions                                    |
+| `guard:imports`             | `guard-imports.ts`             | Import discipline across all layers                            |
+| `guard:namespaces`          | `guard-namespaces.ts`          | Front namespace boundaries: ui seam, widget SPI, app isolation |
+| `guard:css`                 | `guard-css.ts`                 | CSS architecture conventions                                   |
+| `guard:bare-html`           | `guard-bare-html.ts`           | HTML shell constraints                                         |
+| `guard:tokens`              | `guard-tokens.ts`              | Documentation does not restate a token's value beside its name |
+| `guard:completed-immutable` | `guard-completed-immutable.ts` | A path already in `effort/completed/` at HEAD is not changed   |
+| `guard:secrets`             | `validate-secrets.ts`          | `secrets.jsonc` structure and composite key identity           |
 
 ### 11.2 Guard Scope
 
@@ -689,6 +695,20 @@ Guards that enforce a specific rule may append a hint line after the violation l
 - All packaging tasks
 
 Its development server is started via `deno task app-style-guide-local`, which has no secrets or env file dependency.
+
+### 11.5 Diff-Scoped Guards and the Pre-Commit Hook
+
+Every guard above inspects file content: it reads what currently exists and judges it.
+`guard:completed-immutable` inspects change instead — whether a path already present at
+`HEAD` differs in the staged diff — which needs git, not a file read, and is meaningless
+on a clean tree with nothing staged.
+
+`check:guards` runs it for consistency, but a clean-tree run is a silent no-op: there is
+nothing staged to inspect. The guard's real enforcement point is `deno task hooks:install`,
+which copies the tracked template at `source/devops/scripts/git-hooks-pre-commit` into
+`.git/hooks/pre-commit`. `.git/hooks/` is not version-controlled, so this is a one-time
+local setup step, not something a fresh clone gets automatically — re-run it after pulling
+a change to the tracked template at `source/devops/scripts/git-hooks-pre-commit`.
 
 ## 12. Supabase Schema Management
 

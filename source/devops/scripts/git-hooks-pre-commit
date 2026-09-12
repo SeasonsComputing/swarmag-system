@@ -1,0 +1,8 @@
+#!/bin/sh
+# Pre-commit hook template, installed by `deno task hooks:install`.
+# Do not edit the copy at .git/hooks/pre-commit directly — it is gitignored
+# and regenerated from here.
+set -e
+ROOT="$(git rev-parse --show-toplevel)"
+cd "$ROOT"
+exec deno run --allow-read --allow-run=git source/devops/guards/guard-completed-immutable.ts
