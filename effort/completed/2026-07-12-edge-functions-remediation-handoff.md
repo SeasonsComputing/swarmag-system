@@ -50,7 +50,7 @@ the target state — trust them; they lead the code.
 - **Phase 2** — shared edge foundation: `HttpCodes` 401/403/409;
   `makeBusRuleSupabaseEdgeClient` reads the error `Response` body; `sendOtp`
   passes `shouldCreateUser: false`; `supabase-config.ts` uses the D3 alias
-  form; NEW `core/svc/make-supabase-edge-auth.ts` (`makeSupabaseEdgeAuth`
+  form; NEW `core/service/make-supabase-edge-auth.ts` (`makeSupabaseEdgeAuth`
   → `verifyCaller` → `EdgeCallerContext`); tests in
   `make-supabase-edge-auth-test.ts`.
 - **Phase 3, orchestration item** — `back/supabase-edge/orchestration/user-orchestra.ts`
