@@ -47,6 +47,8 @@ Entries in both are flat and chronological, appended as they are identified, and
 
 Do not resolve a parking-lot entry as a drive-by fix inside an unrelated session. Each one needs its own scoped conversation before it is picked up.
 
+An entry that stops being true — verified against the actual code, not assumed — is removed outright, not archived in place. Neither document is a history; each describes only what is currently pending. The record of removal is the commit that makes it, with a message naming why. This differs from closing a brief (§4): a backlog entry resolved incidentally, with no dedicated production of its own, has no report to move into `effort/completed/`.
+
 ## 4. The Brief
 
 A brief is a written design record for one unit of work.
