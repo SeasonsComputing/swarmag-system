@@ -515,6 +515,90 @@ The smoke script verifies:
 Chrome is auto-detected from common local paths and executable names. Operators
 may pass `chrome=/path/to/chrome` when auto-detection is insufficient.
 
+### 8.5 Edge Deployment
+
+Edge deployment uses `deno task edge-deploy`. The operator must be authenticated
+with the Supabase CLI. Run `deno task check`, formatting checks, and relevant
+tests before deployment; inspect the working tree and identify the revision
+being deployed. The edge task does not run these checks or enforce a clean tree.
+
+Resolve and confirm the intended target through the repository's target listing
+task (§14.3). For stage:
+
+```bash
+deno task list-supabase-targets --target stage
+```
+
+Set `STAGE_PROJECT_REF` to the returned `stage.projectRef`. Deploy the intended
+functions with that explicit reference:
+
+```bash
+deno task edge-deploy user-create user-update user-delete user-eject \
+  --project-ref "$STAGE_PROJECT_REF"
+```
+
+One function name deploys only that function; multiple names deploy the selected
+functions. Omitting function names deploys all local functions. Omitting
+`--project-ref` uses the linked project. `edge-deploy` forwards CLI arguments;
+it does not resolve `--target stage` into a project reference.
+
+The task performs these steps:
+
+1. Run `edge-sync` to replace the generated `supabase/functions/_shared/` tree
+   from source, regenerate per-function `deno.json` manifests from the committed
+   import map, and stamp build metadata with VERSION, commit count, and SHA.
+2. Create `build/tmp` and set `TMPDIR` to that Docker-VM-shared path.
+3. Invoke `supabase functions deploy` with the supplied arguments.
+
+Use the repository task so deployment includes current source and metadata.
+See [Architecture Backend §7.1](architecture-back.md#71-supabase-edge-functions)
+for function registration and runtime constraints. Deployment can partially
+succeed; record the result for each function and stop on failures before
+expanding scope into repairs.
+
+### 8.6 Edge Deployment Verification
+
+Verification is a separate operator step; `edge-deploy` does not run smoke tests.
+Inspect the deployed functions:
+
+```bash
+supabase functions list --project-ref "$STAGE_PROJECT_REF" --output-format json
+```
+
+Confirm each selected function is `ACTIVE`, has the expected deployment version,
+and retains `verify_jwt: true`. Record the build stamp printed by `edge-sync`.
+
+For the four user-management functions, check CORS preflight and a GET that
+passes gateway authentication. Set `STAGE_ANON_KEY` to the target's public anon
+JWT key through the operator's credential mechanism; keep credentials out of
+logs and do not enable shell tracing or verbose curl output.
+
+```bash
+for function in user-create user-update user-delete user-eject; do
+  curl --silent --show-error --max-time 20 --include --request OPTIONS \
+    --header 'Origin: https://admin-stage.swarmag.com' \
+    --header 'Access-Control-Request-Method: POST' \
+    --header 'Access-Control-Request-Headers: authorization,apikey,content-type' \
+    "https://${STAGE_PROJECT_REF}.supabase.co/functions/v1/${function}"
+  curl --silent --show-error --max-time 20 --include \
+    --header 'Origin: https://admin-stage.swarmag.com' \
+    --header "apikey: ${STAGE_ANON_KEY}" \
+    --header "Authorization: Bearer ${STAGE_ANON_KEY}" \
+    "https://${STAGE_PROJECT_REF}.supabase.co/functions/v1/${function}"
+done
+```
+
+Inspect each response; these curl commands print results without asserting HTTP
+status codes. OPTIONS must return `204` with the expected CORS headers. GET must
+return the application's `405` response with `x-swarmag-build` matching the
+recorded stamp. A gateway rejection alone does not prove the function loaded.
+Stop and investigate unexpected responses, missing or stale build stamps, and
+deployment failures.
+
+These checks exercise deployed module loading and the HTTP wrapper without
+modifying user records. They do not verify authenticated CRUD behavior; that
+requires separately scoped integration testing.
+
 ## 9. Local Development Servers
 
 Local UX hosting is development tooling. It serves a bundle bound to a real

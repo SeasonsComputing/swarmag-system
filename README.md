@@ -211,9 +211,14 @@ Edge functions are Supabase orchestration handlers authored under
 generated `_shared` tree and pin `TMPDIR` to a Docker-VM-shared path:
 
 ```bash
-dot edge-serve               # serve all functions against the local stack
-dot edge-deploy <function>   # deploy one function to the linked project
+dot edge-serve                                      # serve all functions against the local stack
+dot edge-deploy <function...> --project-ref <ref>   # deploy to a resolved project (§3.4)
 ```
+
+See [Architecture DevOps §8.5](documentation/architecture/architecture-devops.md#85-edge-deployment)
+for target resolution, deployment, and verification in full, and
+[Architecture Backend §7.1](documentation/architecture/architecture-back.md#71-supabase-edge-functions)
+for function registration and runtime constraints.
 
 **Backend OTP sign-in email deployment:**
 
