@@ -785,9 +785,9 @@ swarmag-system/
 │   ├── core/
 │   │   ├── api/
 │   │   ├── cfg/
-│   │   ├── client/
+│   │   ├── cli/
 │   │   ├── db/
-│   │   ├── service/
+│   │   ├── svc/
 │   │   └── std/
 │   ├── domain/
 │   │   ├── abstractions/

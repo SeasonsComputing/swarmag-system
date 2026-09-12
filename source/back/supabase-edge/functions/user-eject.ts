@@ -20,7 +20,7 @@ import {
   type UserIdRequest,
   UserOrchestra
 } from '@back/supabase-edge/orchestration/user-orchestra.ts'
-import { wrapBusRuleHttpHandler } from '@core/service/wrap-busrule-http-handler.ts'
+import { wrapBusRuleHttpHandler } from '@core/svc/wrap-busrule-http-handler.ts'
 import type { User } from '@domain/abstractions/user.ts'
 
 export default wrapBusRuleHttpHandler<UserIdRequest, User, UserEdgeContext>({

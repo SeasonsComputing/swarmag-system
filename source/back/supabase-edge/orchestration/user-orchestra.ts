@@ -22,8 +22,6 @@ UserOrchestra           User orchestration singleton.
 import { Config } from '@back/supabase-edge/config/supabase-config.ts'
 import { type DeleteResult } from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
-import { type EdgeClients, makeSupabaseEdgeAuth } from '@core/service/make-supabase-edge-auth.ts'
-import { HttpServiceError } from '@core/service/wrap-busrule-http-handler.ts'
 import {
   type CreateFromInstantiable,
   type Dictionary,
@@ -36,6 +34,8 @@ import {
   when
 } from '@core/std'
 import { AdapterPatch, HttpCodes, type HttpRequest } from '@core/stdx'
+import { type EdgeClients, makeSupabaseEdgeAuth } from '@core/svc/make-supabase-edge-auth.ts'
+import { HttpServiceError } from '@core/svc/wrap-busrule-http-handler.ts'
 import { type User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
@@ -73,14 +73,12 @@ export const UserOrchestra: UserOrchestraContract = {
     if (caller.status !== 'active' || !caller.roles.includes('administrator')) {
       throw new HttpServiceError(HttpCodes.forbidden, 'Administrator authorization required')
     }
-
     return { caller, ...clients }
   },
 
   async create(input: UserCreate, context: UserEdgeContext): Promise<User> {
     const user = userFromCreate(input)
     await createAuthUser(context, user)
-
     try {
       return await insertUserRow(context.serviceClient, user)
     } catch (error) {
@@ -93,10 +91,8 @@ export const UserOrchestra: UserOrchestraContract = {
     const previousEmail = input.primaryEmail !== undefined
       ? (await getUserRow(context.serviceClient, input.id)).primaryEmail
       : undefined
-
     const user = await updateUserRow(context.serviceClient, input)
     if (previousEmail === undefined || previousEmail === user.primaryEmail) return user
-
     try {
       await updateAuthEmail(context, user)
       return user

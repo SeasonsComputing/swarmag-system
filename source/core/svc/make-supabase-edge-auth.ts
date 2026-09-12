@@ -19,9 +19,9 @@ SupabaseEdgeAuthContract       Edge caller verification contract.
 makeSupabaseEdgeAuth(spec)     Build the edge caller verification handshake.
 */
 
-import { HttpServiceError } from '@core/service/wrap-busrule-http-handler.ts'
 import { type Id } from '@core/std'
 import { HEADER_AUTHORIZATION, HttpCodes, type HttpRequest } from '@core/stdx'
+import { HttpServiceError } from '@core/svc/wrap-busrule-http-handler.ts'
 import { createClient, type SupabaseClient } from '@supabase/client'
 
 // ────────────────────────────────────────────────────────────────────────────

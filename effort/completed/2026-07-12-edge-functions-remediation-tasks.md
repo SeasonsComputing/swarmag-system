@@ -35,7 +35,7 @@ phase is one authorized production with its own checks.
   - [x] §3.2.3 flat authoring decoupled from platform discovery
   - [x] §3.2.4 import-map wiring via `config.toml`; snippet synced to `deno.jsonc`
   - [x] §6.3.1 backend config example in alias form
-  - [x] §8 trees add `core/service/` and `orchestration/`
+  - [x] §8 trees add `core/svc/` and `orchestration/`
   - [x] §10.1.7 invariant updated
 - [x] `architecture-devops.md`
   - [x] §4.4 logical-name → platform-injected-name binding table (D3)
@@ -57,14 +57,14 @@ phase is one authorized production with its own checks.
 
 - [x] `core/std/wrap-http-handler.ts` — `HttpCodes` gains `unauthorized: 401`,
       `forbidden: 403`, `conflict: 409`; orchestration local constants removed
-- [x] `core/client/make-supabase-client.ts` — edge client reads error
+- [x] `core/cli/make-supabase-client.ts` — edge client reads error
       `Response` body (`await error.context.json()`) so server messages reach UX
-- [x] `core/client/auth-supabase-client.ts` — `sendOtp` passes
+- [x] `core/cli/auth-supabase-client.ts` — `sendOtp` passes
       `shouldCreateUser: false` (D6)
 - [x] `back/supabase-edge/config/supabase-config.ts` — alias form per D3
-- [x] NEW `core/service/make-supabase-edge-auth.ts` — `makeSupabaseEdgeAuth(spec)` / `verifyCaller`
+- [x] NEW `core/svc/make-supabase-edge-auth.ts` — `makeSupabaseEdgeAuth(spec)` / `verifyCaller`
       per D9
-- [x] Import path consistency: `@core/stdx` barrel in `core/service`
+- [x] Import path consistency: `@core/stdx` barrel in `core/svc`
 - [x] Unit tests: `source/tests/cases/make-supabase-edge-auth-test.ts` (401 paths, 3/3 passing)
 
 ## Phase 3 — Orchestration Fixes and Deployment Seam
@@ -172,7 +172,7 @@ logs is the cheaper loop once the deployment seam itself is proven (it is).
       `apikey, x-client-info`; exported for reuse (was previously
       unexported despite being documented as public).
 - [x] `HttpCodes.gatewayTimeout` (504) added
-- [x] NEW `core/service/wrap-supabase-shim.ts` — timeout + slow/failure-only
+- [x] NEW `core/svc/wrap-supabase-shim.ts` — timeout + slow/failure-only
       logging wrapper, composed into all four `index.ts` entrypoints
 - [x] Re-verified live: CORS preflight simulation + real browser
       create/update/delete/eject, all four functions, all confirmed working

@@ -129,7 +129,7 @@ else. This isn't a gap to close; it's the same decoupling principle one level up
 ## Client layer addition
 
 ```ts
-// core/client/make-supabase-client.ts
+// core/cli/make-supabase-client.ts
 
 async updateScoped<K extends keyof T>(
   id: Id,
@@ -321,13 +321,13 @@ exceed the 105-char single-line budget and format as multiline `&`-per-line, mat
 
 Design is settled. Next step is a production-gate scope statement for the code itself:
 `core/std/protocols.ts` (`ScopedUpdate<T,K>`, shared by both realizations),
-`core/std/make-adapter.ts` and `core/client/make-supabase-client.ts` (Customer's composition
+`core/std/make-adapter.ts` and `core/cli/make-supabase-client.ts` (Customer's composition
 path + the COW retrofit), and `make-auth-users.ts` (User's signature-only retrofit) — not more
 planning.
 
 **2026-08-31 addendum:** plus the interface-decomposition + id-in-source scope above —
-`core/api/api-contract.ts`, `core/client/make-supabase-client.ts`, `core/client/make-indexeddb-
-client.ts`, `core/client/make-http-client.ts`, `front/api/make-auth-users.ts`,
+`core/api/api-contract.ts`, `core/cli/make-supabase-client.ts`, `core/cli/make-indexeddb-
+client.ts`, `core/cli/make-http-client.ts`, `front/api/make-auth-users.ts`,
 `front/app-admin/onboarding/onboarding.tsx`, `tests/cases/make-adapter-test.ts`,
 `tests/cases/users-api-test.ts`.
 

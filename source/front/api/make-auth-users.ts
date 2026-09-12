@@ -29,7 +29,7 @@ import {
   makeBusRuleSupabaseEdgeClient,
   makeBusRuleSupabaseRpcClient,
   makeCrudSupabaseClient
-} from '@core/client/make-supabase-client.ts'
+} from '@core/cli/make-supabase-client.ts'
 import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'

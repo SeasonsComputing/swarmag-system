@@ -111,7 +111,7 @@ tests in `source/tests/cases/`.
 
 ### D9 — Shared edge caller handshake in core
 
-`core/service/make-supabase-edge-auth.ts` provides `makeSupabaseEdgeAuth({ url, publicKey,
+`core/svc/make-supabase-edge-auth.ts` provides `makeSupabaseEdgeAuth({ url, publicKey,
 serviceKey })` returning `verifyCaller(request) → EdgeCallerContext
 { authUserId, callerClient, serviceClient }`, throwing 401 on failure. The
 platform handshake is core; the administrator predicate is domain policy and
@@ -211,7 +211,7 @@ regardless of this bug — curl was structurally incapable of revealing it.
 already being documented as public in the file's own header) so it has a
 single source of truth reusable outside `wrap-http-handler.ts`.
 
-**Also added:** `core/service/wrap-supabase-shim.ts` — wraps
+**Also added:** `core/svc/wrap-supabase-shim.ts` — wraps
 `Deno.serve(handler)` for all four functions with slow/failure-only logging
 (silent on the happy path) and a 30s timeout that fails loud with a
 CORS-correct response instead of an unexplained platform idle shutdown; a

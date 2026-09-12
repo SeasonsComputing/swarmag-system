@@ -137,9 +137,9 @@ as the security boundary.
 
 In:
 
-- `source/core/client/make-supabase-client.ts`
-- `source/core/client/make-indexeddb-client.ts`
-- `source/core/client/make-http-client.ts`
+- `source/core/cli/make-supabase-client.ts`
+- `source/core/cli/make-indexeddb-client.ts`
+- `source/core/cli/make-http-client.ts`
 - `source/front/api/api.ts`
 - `source/front/api/make-auth-users.ts`
 

@@ -24,8 +24,8 @@ api  Shared API namespace for UX applications.
 └ Workflows       Workflow CRUD client.
 */
 
-import { AuthSupabaseClient } from '@core/client/auth-supabase-client.ts'
-import { makeCrudSupabaseClient } from '@core/client/make-supabase-client.ts'
+import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
+import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
 import { type Customer } from '@domain/abstractions/customer.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { validateCustomerCreate, validateCustomerUpdate } from '@domain/validators/customer-validator.ts'
