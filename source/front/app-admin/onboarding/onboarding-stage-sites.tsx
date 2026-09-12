@@ -181,8 +181,9 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
                 <UiButton
                   variant='danger'
                   onClick={() => {
+                    const control = target()
                     setPendingDiscard(null)
-                    target().returnToIndex()
+                    control.returnToIndex()
                   }}
                 >
                   Discard
