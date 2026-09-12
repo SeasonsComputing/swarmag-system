@@ -3,10 +3,10 @@
  * and empty bearer tokens are rejected with 401 before any network call.
  */
 
-import { makeSupabaseEdgeAuth } from '@core/service/make-supabase-edge-auth.ts'
-import { HttpServiceError } from '@core/service/wrap-busrule-http-handler.ts'
 import { type StringDictionary } from '@core/std'
 import { type HttpRequest } from '@core/stdx'
+import { makeSupabaseEdgeAuth } from '@core/svc/make-supabase-edge-auth.ts'
+import { HttpServiceError } from '@core/svc/wrap-busrule-http-handler.ts'
 import { assertEquals, assertRejects } from '@std/assert'
 
 const EdgeAuth = makeSupabaseEdgeAuth({

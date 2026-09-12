@@ -73,14 +73,14 @@ Effort documents capture working project context. Status-bearing effort records 
 
 #### 1.3.1 Core (`source/core/`)
 
-| Path       | Description                                                      |
-| ---------- | ---------------------------------------------------------------- |
-| `api/`     | Client makers and provider adapters (CRUD, HTTP, business rules) |
-| `cfg/`     | Configuration management (Config singleton, runtime providers)   |
-| `client/`  | API client implementations and makers                            |
-| `db/`      | Cached database client (`supabase.ts`)                           |
-| `service/` | Inbound service handler wrappers (BusRule HTTP handler)          |
-| `std/`     | Standard types (Id, When, Dictionary, Instantiable)              |
+| Path   | Description                                                      |
+| ------ | ---------------------------------------------------------------- |
+| `api/` | Client makers and provider adapters (CRUD, HTTP, business rules) |
+| `cfg/` | Configuration management (Config singleton, runtime providers)   |
+| `cli/` | API client implementations and makers                            |
+| `db/`  | Cached database client (`supabase.ts`)                           |
+| `svc/` | Inbound service handler wrappers (BusRule HTTP handler)          |
+| `std/` | Standard types (Id, When, Dictionary, Instantiable)              |
 
 #### 1.3.2 Domain (`source/domain/`)
 

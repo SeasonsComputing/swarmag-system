@@ -20,7 +20,7 @@ AppState      - Singleton API for reading and writing persisted app state values
 └ clear()          Clear reactive app-state cache.
 */
 
-import { Preferences } from '@core/client/preferences.ts'
+import { Preferences } from '@core/cli/preferences.ts'
 import type { StringDictionary } from '@core/std'
 import { createStore } from '@solid-js/store'
 

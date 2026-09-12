@@ -16,7 +16,7 @@ default  Wrapped Supabase Edge HTTP handler.
 
 import { BUILD_META, HEADER_BUILD } from '@back/supabase-edge/config/build-meta.ts'
 import { type UserEdgeContext, UserOrchestra } from '@back/supabase-edge/orchestration/user-orchestra.ts'
-import { wrapBusRuleHttpHandler } from '@core/service/wrap-busrule-http-handler.ts'
+import { wrapBusRuleHttpHandler } from '@core/svc/wrap-busrule-http-handler.ts'
 import type { User } from '@domain/abstractions/user.ts'
 import type { UserUpdate } from '@domain/protocols/user-protocol.ts'
 

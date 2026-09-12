@@ -80,7 +80,7 @@ or the fast bearer-token-missing check, neither of which reaches the hang.
 Only the CA's real logged-in browser session ever exercised the full path:
 
 ```
-verifyCaller(request)                                    // core/service/make-supabase-edge-auth.ts
+verifyCaller(request)                                    // core/svc/make-supabase-edge-auth.ts
   → serviceClient.auth.getUser(token)                     // network call #1
   → callerClient (caller-scoped, public key + forwarded caller JWT)
 callerUserRow(callerClient, authUserId)                   // user-orchestra.ts
@@ -92,7 +92,7 @@ Prime suspects for the hang, in likely order:
 1. **`callerClient.from('users').select(...)` under RLS** — this is a
    PostgREST query using the caller-scoped client (anon key + forwarded user
    JWT as an `Authorization` header, not a Supabase session). This exact
-   client construction (`core/service/make-supabase-edge-auth.ts`'s
+   client construction (`core/svc/make-supabase-edge-auth.ts`'s
    `supabaseClient()` helper) has never been proven to work end-to-end
    against RLS on real infrastructure before this session — Phase 4's RLS
    verification used the MCP `execute_sql` tool (superuser, bypasses RLS
