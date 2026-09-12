@@ -109,7 +109,7 @@ expected HTTP status mapping through binding errors.
 import type { Dictionary } from '@core/std'
 import type { HttpRequest, HttpResponse } from '@core/stdx'
 import { toBadRequest, toMethodNotAllowed, toOk, toUnprocessable, wrapHttpHandler } from '@core/stdx'
-import { validateJobBatchUpdate } from '@domain/validators/job-validator.ts'
+import { validateJobBatchUpdate } from './jobs-batch-validator.ts'
 
 const handler = async (req: HttpRequest): Promise<HttpResponse> => {
   if (req.method !== 'POST') return toMethodNotAllowed()
