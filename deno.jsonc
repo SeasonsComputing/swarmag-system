@@ -49,7 +49,7 @@
     // ────────────────────────────────────────────────────────────────────────────
 
     "check": "deno task check:guards && deno task check:types && deno task check:lint",
-    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:front-state && deno task guard:chart && deno task guard:imports && deno task guard:css && deno task guard:bare-html && deno task guard:namespaces && deno task guard:tokens",
+    "check:guards": "deno task guard:architecture && deno task guard:env && deno task guard:leaf && deno task guard:validation && deno task guard:domain-style && deno task guard:core-std-types && deno task guard:front-state && deno task guard:chart && deno task guard:imports && deno task guard:css && deno task guard:bare-html && deno task guard:namespaces && deno task guard:tokens && deno task guard:completed-immutable",
     "check:types": "deno check --lock=deno.lock --frozen source/**/*.ts source/**/*.tsx",
     "check:lint": "deno task lint",
     "check:domain-genesis": "deno task guard:domain-style && deno task guard:core-std-types && deno check --lock=deno.lock --frozen source/domain/**/*.ts && deno lint source/domain/**/*.ts",
@@ -104,6 +104,15 @@
     "guard:css": "deno run --allow-read source/devops/guards/guard-css.ts",
     "guard:tokens": "deno run --allow-read source/devops/guards/guard-tokens.ts",
     "guard:bare-html": "deno run --allow-read source/devops/guards/guard-bare-html.ts",
+    "guard:completed-immutable": "deno run --allow-read --allow-run=git source/devops/guards/guard-completed-immutable.ts",
+
+    // ────────────────────────────────────────────────────────────────────────────
+    // GIT HOOKS
+    // ────────────────────────────────────────────────────────────────────────────
+
+    // .git/hooks/ is not version-controlled; this installs the tracked template.
+    // Re-run after pulling a change to source/devops/scripts/git-hooks/pre-commit.
+    "hooks:install": "sh -c 'ROOT=\"$(git rev-parse --show-toplevel)\" && cp \"$ROOT/source/devops/scripts/git-hooks-pre-commit\" \"$ROOT/.git/hooks/pre-commit\" && chmod +x \"$ROOT/.git/hooks/pre-commit\" && echo \"Installed pre-commit hook\"'",
 
     // ────────────────────────────────────────────────────────────────────────────
     // DEPLOYMENT PACKAGING
