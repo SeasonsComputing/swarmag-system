@@ -391,6 +391,35 @@ Full plan, exact site counts, and sequencing (doc → `architecture-devops.md` �
 retrofit → guard-last, so the new guard's first run is green) are in
 `effort/active/2026-08-23-devops-style-error-handling-brief.md`.
 
+### `edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already has
+
+**Observed:** 2026-09-12 · high
+
+`app-deploy.sh` (UX) accepts `--target {dev|stage|prod}` directly and resolves Netlify site
+IDs internally. `edge-deploy` is a one-line shell wrapper — `edge-sync && supabase functions
+deploy "$@"` — with no target-resolution logic of its own; the operator must run
+`list-supabase-targets` by hand, extract a project ref, and pass `--project-ref` explicitly.
+UX also has an automated smoke test (`smoke-ux.ts`, asserts and exits nonzero on failure);
+edge has no equivalent — verification is a 40-line manual curl procedure with no asserted
+pass/fail, checked in `deno.jsonc` directly: only `edge-sync`, `edge-serve`, and `edge-deploy`
+exist, nothing named smoke.
+
+**High, not normal, because this has already cost two separate rounds of documentation-only
+fixes.** The original edge-functions-remediation effort (closed 2026-07-14) updated the arch
+docs for this territory once already. A 2026-09 core-namespace rename (`core/client` →
+`core/cli`, `core/service` → `core/svc`) required redeploying edge functions for validation,
+and the same confusion recurred — surfaced as a 44-line addition to `README.md` (62% of its
+own section, the largest single addition in the file) plus 84 lines added to
+`architecture-devops.md`, both purely descriptive. Writing more prose a third time is not a
+plan with a track record here; the two prior attempts already show prose alone doesn't
+prevent the misfire.
+
+**Picking this up:** give `edge-deploy` a `--target` flag that resolves the project ref
+internally (mirroring `app-deploy.sh`), and build an `edge-smoke` task mirroring
+`smoke-ux.ts` — asserted CORS/405/build-header checks, not a copy-pasted curl loop. Once both
+exist, `README.md` and `architecture-devops.md`'s edge sections shrink to match their UX
+counterparts' brevity, describing what the tooling checks rather than how to check it by hand.
+
 ## Testing
 
 ### No automated coverage above the domain/API layer — today's manual live pass proved it
