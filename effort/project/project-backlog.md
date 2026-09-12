@@ -146,7 +146,10 @@ selected state on `UiTableRow` that any Collection-Detail surface opts into.
 
 ### A stale session survives genesis and is not ejected
 
-**Observed:** 2026-08-04 · high
+**Observed:** 2026-08-04 · normal (downgraded from high 2026-09-12 — genesis is rare and
+deliberate, and the only person who can trigger it is currently the only user on the
+system, so the exposure window is small and self-diagnosing today. Revisit before a second
+user or a real customer exists, since they would hit this cold, with no context for why.)
 
 Supabase persists the session in `localStorage`, so a browser holding a session keeps it
 after a genesis run wipes `auth.users`. The signed-in user is left holding a token for a
@@ -156,6 +159,42 @@ The session is structurally valid — correct signature, unexpired — so detect
 on the principal being unresolvable rather than on token validity. Related: genesis became
 total on 2026-08-04, so this state is now reachable every time the database is regenerated
 rather than only when auth happened to be cleared by hand.
+
+**Bundled 2026-09-12** with "Eject should ban, not delete, the Auth identity" (below) and
+the DevOps `edge-deploy` parity entry — one shared investigation serves all three; see the
+eject entry for why.
+
+### Eject should ban, not delete, the Auth identity
+
+**Observed:** 2026-09-12 (parked 2026-07-16 during the User Manager UX rework; promoted
+here once its investigation bundled with two related entries) · normal
+
+`UserOrchestra.eject()` (`source/back/supabase-edge/orchestration/user-orchestra.ts`)
+currently calls the same `deleteAuthUser` (`auth.admin.deleteUser`) as `delete()` — fully
+removing the Supabase Auth identity. Per D5 in the edge-functions remediation design doc,
+this makes reactivation genuinely impossible: setting the domain row's `status` back to
+`active` doesn't restore an Auth identity, because there is nothing left to restore. The
+correct model is closer to a ban: `auth.admin.updateUserById(id, { ban_duration: '<long>' })`
+blocks future logins/token refreshes while preserving the identity, so reinstatement is just
+unbanning.
+
+**Bundled 2026-09-12 with two other entries sharing the same unresolved question**: "A
+stale session survives genesis and is not ejected" (above) and "`edge-deploy` lacks the
+target-resolution and verification parity `app-deploy.sh` already has" (DevOps). All three
+turn on one fact nobody has verified yet: does Supabase invalidate an already-issued access
+token immediately when its Auth identity is deleted or banned, or only on its next refresh?
+Genesis deleting all of `auth.users` and eject deleting one identity are the same structural
+event at different scope — verifying this once answers both the session-staleness detection
+design and whether eject's redesign needs an explicit revocation call beyond the ban itself.
+If eject's mechanism does change as a result, that redeploys `user-eject`, so the edge-deploy
+parity fix belongs first — paying that tax a third time is exactly the pattern already on
+record.
+
+**Picking this up:** Foundation Mode (reopens D4/D5). Start with the shared verification
+above, not the eject redesign directly. Then decide whether eject and a future explicit
+reinstate both live in `user-orchestra.ts` as symmetric operations, and whether the editor's
+status toggle should be disabled/warned against for ejected users until reinstatement is
+real.
 
 ### Login needs an "Already have a code?" action
 
@@ -343,6 +382,11 @@ internally (mirroring `app-deploy.sh`), and build an `edge-smoke` task mirroring
 `smoke-ux.ts` — asserted CORS/405/build-header checks, not a copy-pasted curl loop. Once both
 exist, `README.md` and `architecture-devops.md`'s edge sections shrink to match their UX
 counterparts' brevity, describing what the tooling checks rather than how to check it by hand.
+
+**Bundled 2026-09-12** with the Auth entries "A stale session survives genesis..." and
+"Eject should ban, not delete..." — a likely downstream trigger of their shared
+investigation, not an independent reason to prioritize this on its own; see the eject
+entry for why.
 
 ## Testing
 
