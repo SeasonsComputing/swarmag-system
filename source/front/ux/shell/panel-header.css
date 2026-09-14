@@ -51,7 +51,6 @@
   display: inline-flex;
   gap: var(--sa-space-xs);
   min-inline-size: 0;
-  transform: translateY(2px);
 }
 
 [data-shell-panel='header-leading'] > h1 {

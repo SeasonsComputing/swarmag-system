@@ -17,8 +17,6 @@ import { Select, type SelectRootItemComponentProps } from '@kobalte/core/select'
 import { splitProps } from '@solid-js'
 import { controlState, type UiComponent, type UiOption, uiOptionLabel } from './ui-helpers.ts'
 
-type CollectionItem = { rawValue: UiOption; key: string }
-
 /** Select control props. */
 export type UiSingleSelectProps = {
   disabled?: boolean
