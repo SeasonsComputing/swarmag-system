@@ -459,10 +459,10 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
                   longitude: UiText.number(value)
                 }))}
             />
-            <UiField label='Device Coordinates' variant='caption'>
+            <UiField label='Get GPS Coords' variant='caption'>
               <UiActionButton
                 icon='crosshair-2'
-                label='Device Coordinates'
+                label='Get GPS Coords'
                 disabled={!props.hasGeo}
                 onClick={() => captureLocation(setDraft, props.hasGeo, isActiveDraft)}
               />
