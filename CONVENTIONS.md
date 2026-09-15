@@ -1,12 +1,12 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Coding Style Guide, Standards & Conventions
+# Software Construction Conventions
 
 ## 1. Overview
 
-This guide is the authoritative reference for coding standards and conventions throughout the codebase.
+This document is the authoritative reference of software construction conventions employed throughout the codebase.
 
-Code that conflicts with this guide is wrong — not the guide.
+Code that conflicts with these conventions is wrong — not this document.
 
 ## 2. Language & Tooling
 
@@ -632,4 +632,4 @@ source/tests/
 - Tests exercise the public contract of each layer, not implementation details.
 - Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.
 
-_End of Style Guide Document_
+_End of Conventions Document_

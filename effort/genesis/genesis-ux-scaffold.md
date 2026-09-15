@@ -12,7 +12,7 @@ Authoritative source set, in order:
 2. `documentation/architecture/architecture-core.md`
 3. `documentation/architecture/architecture-front.md`
 4. `documentation/domain/domain-model.md`
-5. `STYLE-GUIDE.md`
+5. `CONVENTIONS.md`
 
 Do not restate or fork these rules in this prompt. This prompt is orchestration only.
 
@@ -410,8 +410,8 @@ Before reporting `STYLE_AUDIT: PASS`:
   `isLoaded: true`; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from
   `session-state.ts` directly.
-- All exported symbols have `/** */` JSDoc per `STYLE-GUIDE.md` §6.5.
-- All section headers use the canonical width per `STYLE-GUIDE.md` §6.4.
+- All exported symbols have `/** */` JSDoc per `CONVENTIONS.md` §6.5.
+- All section headers use the canonical width per `CONVENTIONS.md` §6.4.
 - No `@back/*` imports anywhere in `source/front/`.
 - No direct `@core/cfg` imports in any `app.tsx` — config flows through
   `@front/config/ux-config.ts`.
