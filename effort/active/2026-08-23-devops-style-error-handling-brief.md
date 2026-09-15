@@ -10,7 +10,7 @@ session's visibility (editor/LSP/agent-tooling state) and would need live
 instrumentation (`fs_usage`) to catch definitively.
 
 That investigation surfaced the real, actionable finding: `source/devops/`
-carries none of the discipline `domain/` and `front/` get. STYLE-GUIDE §1
+carries none of the discipline `domain/` and `front/` get. CONVENTIONS §1
 claims to be authoritative "throughout the codebase," but nothing checks that
 claim against devops — there is no `guard-devops-style.ts` the way
 `guard-domain-style.ts` exists for domain.
@@ -26,26 +26,26 @@ before that milestone starts — deferred on purpose, not blocked technically.
 - 11 of 12 TypeScript devops scripts already use the box-header/PURPOSE/PUBLIC
   convention (`edge-sync.ts` is the one outlier).
 - Zero raw `Record<string,...>` or `Set<...>` outside `@core/std` — the
-  primitive-type discipline (STYLE-GUIDE §8.1) is already followed.
+  primitive-type discipline (CONVENTIONS §8.1) is already followed.
 - `dprint`'s excludes are just binary/vendor assets — formatting already
   applies repo-wide, devops included.
-- The real, concentrated gap is STYLE-GUIDE §9 ("Never swallow errors
+- The real, concentrated gap is CONVENTIONS §9 ("Never swallow errors
   silently... log and throw, or throw without logging"): **15+ bare
   `catch {}` / `.catch(() => {})` blocks across 8 of the 12 scripts**, every
   one discarding the error's type entirely.
 - `source/tests/` has zero instances of this pattern today (checked). No live
   need there — see the `tests/lib` note below.
 
-## Two principles agreed this session — proposed for STYLE-GUIDE, not this repo alone
+## Two principles agreed this session — proposed for CONVENTIONS, not this repo alone
 
-CA's framing: STYLE-GUIDE and CONSTITUTION are meant to travel across every
+CA's framing: CONVENTIONS and CONSTITUTION are meant to travel across every
 project CA has authority over, past and future (a standing docs/src/tests/devops
 top-level namespace pattern, soon adding `effort/`). CONSTITUTION.md already
-achieves this — it contains zero swarmAg-specific content today. STYLE-GUIDE
+achieves this — it contains zero swarmAg-specific content today. CONVENTIONS
 isn't there yet (§10-11 are Postgres/Supabase schema conventions with
 swarmAg's literal domain topics baked into section ordering) — that's a
 separate, larger, later problem, not in scope here. These two principles
-belong in STYLE-GUIDE now, worded at the portable altitude, not the
+belong in CONVENTIONS now, worded at the portable altitude, not the
 project-specific one:
 
 **1. Tooling namespaces get looser runtime-API constraints than product
@@ -124,11 +124,11 @@ accretes.
 `edge-sync.ts` (1 site + missing header), `gen-id-seeds.ts` (1),
 `db-genesis.ts` (3), `db-genesis-verify.ts` (1), `list-netlify-targets.ts` (2),
 `list-supabase-targets.ts` (2), `validate-secrets.ts` (1), `smoke-ux.ts` (6+).
-`.sh` scripts are out of scope — STYLE-GUIDE governs TypeScript, not shell.
+`.sh` scripts are out of scope — CONVENTIONS governs TypeScript, not shell.
 
 ## Sequencing (CONSTITUTION §8 — documentation leads code)
 
-1. Update `STYLE-GUIDE.md` with the two principles above, and the §8.5
+1. Update `CONVENTIONS.md` with the two principles above, and the §8.5
    tooling-namespace carve-out.
 2. Update `architecture-devops.md` to describe the `devops/lib` layer as
    target structure (matching how `architecture-front.md` already documents
@@ -136,7 +136,7 @@ accretes.
    this needs explicit authorization — foundational documentation is CA's
    call**, not something ACE/AA assumes by default.
 3. Build `source/devops/lib/` to match — the two helpers above.
-4. Add the `@devops/lib` barrel entry to STYLE-GUIDE §3.2's table
+4. Add the `@devops/lib` barrel entry to CONVENTIONS §3.2's table
    (`source/devops/lib/lib.ts`, same form as `@core/std`).
 5. Retrofit the 8 scripts listed above against the new helpers.
 6. Add `guard-devops-style.ts` (mirroring `guard-domain-style.ts`) **last**,
