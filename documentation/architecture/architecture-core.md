@@ -24,7 +24,7 @@ Authority decreases from top to bottom.
 | └→ **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace inventory and field-level references          |
 | └→ **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns                           |
 | └→ **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction rules     |
-| └→ **Style Guide**            | `STYLE-GUIDE.md`            | Coding standards, file formats, and implementation conventions    |
+| └→ **Conventions**            | `CONVENTIONS.md`            | Coding standards, file formats, and implementation conventions    |
 | └→ **Architecture Backend**   | `architecture-back.md`      | Backend integration architecture and runtime constraints          |
 | └→ **Architecture UX**        | `architecture-front.md`     | UX-layer integration architecture and app-specific UX contracts   |
 | └→ **Architecture DevOps**    | `architecture-devops.md`    | Environment configuration, secret registry, packaging, and guards |
@@ -38,7 +38,7 @@ Authority decreases from top to bottom.
 | **Domain Data Dictionary** | Topic namespaces, abstraction inventory, field-level references         |
 | **Domain Archetypes**      | Domain implementation patterns for archetype artifacts                  |
 | **UX Design Language**     | Normative UX language and interaction patterns across applications      |
-| **Style Guide**            | Implementation conventions, file formats, and coding standards          |
+| **Conventions**            | Implementation conventions, file formats, and coding standards          |
 | **Architecture Backend**   | Backend integration architecture and runtime constraints                |
 | **Architecture UX**        | UX-layer integration architecture and app-specific UX contracts         |
 | **Architecture DevOps**    | Environment configuration, secret registry, packaging, and guards       |

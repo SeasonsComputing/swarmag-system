@@ -13,7 +13,7 @@ Authoritative source set, in order:
 3. `documentation/domain/domain-model.md`
 4. `documentation/domain/domain-archetypes.md`
 5. `documentation/domain/domain-data-dictionary.md`
-6. `STYLE-GUIDE.md`
+6. `CONVENTIONS.md`
 
 Do not restate or fork these rules in this prompt. This prompt is orchestration only.
 
@@ -33,11 +33,11 @@ Next proceed generation in the following order using the above parameters.
 
 Generate `source/domain/abstractions/` as canonical domain abstractions.
 
-Per `domain-data-dictionary.md`, `domain-archetypes.md` and `STYLE-GUIDE.md`.
+Per `domain-data-dictionary.md`, `domain-archetypes.md` and `CONVENTIONS.md`.
 
 The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Phase II:
 
-- Any inline `import('...').TypeName` expression in type positions — use top-level `import type` per `STYLE-GUIDE.md` §3.3.
+- Any inline `import('...').TypeName` expression in type positions — use top-level `import type` per `CONVENTIONS.md` §3.3.
 - Missing file-header `PUBLIC` subsection, or `PUBLIC` entries without aligned description column.
 - Missing single-line JSDoc comment above exported abstractions.
 - For const-enum abstraction pairs, missing shared single-line JSDoc comment above the exported tuple.
@@ -48,7 +48,7 @@ Ingest `source/domain/abstractions/*.ts`.
 
 Generate `source/domain/adapters/`, `source/domain/protocols/` and `source/domain/validators/`.
 
-Per ingested abstractions, `domain-archetypes.md` and `STYLE-GUIDE.md`.
+Per ingested abstractions, `domain-archetypes.md` and `CONVENTIONS.md`.
 
 The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Phase III:
 
@@ -64,7 +64,7 @@ The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Ph
 Generate `source/domain/schema/schema.sql` as canonical current-state DDL.
 Not a migration — must be idempotent and fully reproducible.
 
-Per `STYLE-GUIDE.md` §10–11 and `domain-archetypes.md` §7.
+Per `CONVENTIONS.md` §10–11 and `domain-archetypes.md` §7.
 
 #### 2.3.1 Seed ID Protocol
 

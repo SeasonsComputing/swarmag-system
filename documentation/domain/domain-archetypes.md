@@ -19,7 +19,7 @@ Implementation patterns for the `source/domain/` package. This document governs 
 | -------------------------- | --------------------------- | ----------------------------------------------------------------------- |
 | **Domain Model**           | `domain-model.md`           | Domain meaning and canonical semantics                                  |
 | **Domain Data Dictionary** | `domain-data-dictionary.md` | Topic namespaces, abstraction inventory, field-level references         |
-| **Style Guide**            | `STYLE-GUIDE.md`            | Implementation/file conventions and coding standards                    |
+| **Conventions**            | `CONVENTIONS.md`            | Implementation/file conventions and coding standards                    |
 | **Domain Archetypes**      | `domain-archetypes.md`      | Archetype-specific production patterns derived from the data dictionary |
 
 ## 2. File Organization
@@ -36,7 +36,7 @@ The domain layer follows a file-per-topic-namespace pattern, where each file con
 
 ### 2.1 File Format
 
-All domain files conform to `STYLE-GUIDE.md` Functional files format.
+All domain files conform to `CONVENTIONS.md` Functional files format.
 
 ### 2.2 Header Public Formatting
 
@@ -175,7 +175,7 @@ export type UserRole = (typeof USER_ROLES)[number]
 
 ### 3.7 Union-Type
 
-Discriminated union of named intersection-type constituents sharing a discriminator field. Follow `STYLE-GUIDE.md` `union-type` pattern exactly.
+Discriminated union of named intersection-type constituents sharing a discriminator field. Follow `CONVENTIONS.md` `union-type` pattern exactly.
 
 ```typescript
 /** Supported question input modes. */
@@ -618,7 +618,7 @@ Round-trip integrity is enforced by fixture tests in `source/tests/fixtures/fixt
 
 Source: `@domain/schema/schema.sql`
 
-DDL is derived from domain abstractions per `STYLE-GUIDE.md` sections 10–11. This section covers archetype-to-table mappings and shapes that require explicit specification.
+DDL is derived from domain abstractions per `CONVENTIONS.md` sections 10–11. This section covers archetype-to-table mappings and shapes that require explicit specification.
 
 ### 7.1 Archetype-to-table mapping
 

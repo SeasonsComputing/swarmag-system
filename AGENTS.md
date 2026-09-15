@@ -37,7 +37,7 @@ Topic context combines the base context with any declared or observed topic cont
 
 | Context              | Documents                                                                                                                                                                                                                                                    |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Base                 | 1. `documentation/domain/domain-model.md`<br>2. `documentation/architecture/architecture-core.md`<br>3. `STYLE-GUIDE.md`                                                                                                                                     |
+| Base                 | 1. `CONVENTIONS.md`<br>2. `documentation/domain/domain-model.md`<br>3. `documentation/architecture/architecture-core.md`                                                                                                                                     |
 | Domain internals     | 1. `documentation/domain/domain-seed-data.md`<br>2. `documentation/domain/domain-data-dictionary.md`<br>3. `documentation/domain/domain-archetypes.md`                                                                                                       |
 | UX internals         | 1. `documentation/architecture/architecture-front.md`<br>2. `documentation/ux/ux-design-archetypes.md`<br>3. `documentation/ux/ux-design-language.md`<br>4. `documentation/ux/ux-components-guide.md`                                                        |
 | Application features | 1. `documentation/architecture/architecture-front.md`<br>2. `documentation/ux/ux-design-archetypes.md`<br>3. `documentation/ux/ux-design-language.md`<br>4. `documentation/ux/ux-components-guide-lite.md`<br>5. `documentation/domain/domain-archetypes.md` |
@@ -45,7 +45,7 @@ Topic context combines the base context with any declared or observed topic cont
 
 **For all other sessions:**
 
-Report that the session has minimal context (constitution, domain model, core architecture and coding style-guide) and advise the Chief Architect to provide additional context prior to initiating any productions.
+Report that the session has minimal context (constitution, domain model, core architecture and development conventions) and advise the Chief Architect to provide additional context prior to initiating any productions.
 
 ### 1.2 Operating Mode
 
@@ -101,25 +101,25 @@ For code-generation or regeneration tasks, include:
 - If `FAIL`: violations list (`- path:line — rule — issue`)
 - If `PASS`: brief confirmation of audited files
 
-## 3. Style-guide Conformance
+## 3. Conventions Conformance
 
-For every production task in this repository, `STYLE-GUIDE.md` is a hard gate. This gate is granted by CONSTITUTION §10 and does not extend beyond it.
+For every production task in this repository, `CONVENTIONS.md` is a hard gate. This gate is granted by CONSTITUTION §10 and does not extend beyond it.
 
 ### 3.1 Non-negotiable Rule
 
-Treat any style-guide violation as a correctness failure. Do not proceed while violations exist.
+Treat any conventions violation as a correctness failure. Do not proceed while violations exist.
 
 ### 3.2 Authority Boundary
 
-The style guide gates production; it does not settle design.
+The conventions document gates production; it does not settle design.
 
-Where a style-guide rule conflicts with a domain, architecture, or design-language document, the higher document governs. Escalate the conflict; do not resolve it during production.
+Where a conventions rule conflicts with a domain, architecture, or design-language document, the higher document governs. Escalate the conflict; do not resolve it during production.
 
-Do not cite `STYLE-GUIDE.md` as the basis for a design, architecture, or domain decision it does not own.
+Do not cite `CONVENTIONS.md` as the basis for a design, architecture, or domain decision it does not own.
 
 ### 3.3 Block checks
 
-- Enforce `STYLE-GUIDE.md` exactly as written.
+- Enforce `CONVENTIONS.md` exactly as written.
 - Treat `source/devops/guards/*.ts` as the executable enforcement layer for style and architecture checks.
 - If foundation rules change, update guards/tasks; do not fork rules into operational prompt docs.
 
