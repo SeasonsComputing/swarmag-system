@@ -5,7 +5,7 @@
 Accepted work whose shape is already known. An entry is here because the decision has been
 made and only a slot is missing, so picking it up starts with doing it.
 
-Distinct from `effort/project/project-feature-parking-lot.md`, which holds work
+Distinct from `effort/project/project-parking-lot.md`, which holds work
 where a decision is still missing and picking it up starts with making that decision. The
 test is decided versus undecided — not near-term versus far.
 
@@ -68,32 +68,6 @@ gains a compact companion the way `ux-components-guide.md` gained
 itself an AI-ingestion companion in its own opening.
 Do not restructure before the analysis is reviewed. This is base context for every
 session, so a wrong cut is felt everywhere at once.
-
-### `STYLE-GUIDE.md` should be `CONVENTIONS.md`, and governing-doc tables need `EFFORT.md`
-
-**Observed:** 2026-09-04 · normal
-
-`STYLE-GUIDE.md` covers more than style — §8.6/§8.7 (adapter and maker shape) and §12
-(testing) are structural pattern conventions, not aesthetics, and the name has undersold
-the document's actual scope since before this entry. Decided in conversation: rename to
-`CONVENTIONS.md`.
-
-Separately, `EFFORT.md` (root, same tier as `CONSTITUTION.md`/`AGENTS.md`) shipped
-2026-09-04, governing the lifecycle of tracked work — this document you're reading is
-itself an instance of what it describes. No governing-doc table yet references it:
-`README.md` §1.2's documentation table and `AGENTS.md` §1.1's ingestion table both still
-list only `CONSTITUTION.md`/`AGENTS.md`/`STYLE-GUIDE.md`.
-
-Both are decided, both are real, and neither is urgent enough to interrupt the current
-roadmap for. Bundled into the refactoring milestone (`ux/shell`→`ux/shell`+`front/app`
-split, UI control-state normalization, devops-style retrofit — third in the M1 → Notes
-editor → Refactor sequence) so the tables get updated once, when `CONVENTIONS.md` and
-`EFFORT.md` are both in their final state, not twice.
-
-**Fix:** rename `STYLE-GUIDE.md` to `CONVENTIONS.md`, updating every citation (`AGENTS.md`,
-`CONSTITUTION.md`, `documentation/`, `effort/`) — a real rename, not a same-night one, since
-the name is heavily cross-referenced. Then update `README.md` and `AGENTS.md`'s governing-
-doc tables to reference both `EFFORT.md` and the renamed `CONVENTIONS.md`.
 
 ## Controls
 
@@ -325,11 +299,11 @@ The recurrence is the point. Deleted-file paths reappear as empty directories pe
 
 ## DevOps
 
-### `source/devops/` is not held to STYLE-GUIDE
+### `source/devops/` is not held to CONVENTIONS
 
 **Observed:** 2026-08-23 · normal
 
-STYLE-GUIDE §1 claims to be authoritative "throughout the codebase," but nothing checks
+CONVENTIONS §1 claims to be authoritative "throughout the codebase," but nothing checks
 that claim against `source/devops/` — `guard-domain-style.ts` exists for domain, no
 equivalent exists for devops. Eleven of twelve TypeScript devops scripts already follow
 the box-header/PURPOSE/PUBLIC convention and the `@core/std` primitive-type discipline
@@ -341,7 +315,7 @@ Surfaced while investigating the phantom-directory recurrence above — the mech
 never pinned down, but the investigation showed devops carries none of the discipline
 domain and front get.
 
-Two STYLE-GUIDE additions belong alongside the retrofit, not after it: (1) tooling
+Two CONVENTIONS additions belong alongside the retrofit, not after it: (1) tooling
 namespaces (`devops`, `tests`) may call their host runtime's API directly, unabstracted,
 since each runs in one fixed known environment and was never trying to be portable across
 deployment targets — §8.5's `Config.get()` mandate currently reads as universal and needs
@@ -401,7 +375,7 @@ losing a site along the way when Finish fired before the second site was added. 
 about that pass is repeatable without re-typing the same data by hand again.
 
 This is the live, felt consequence of the gap `[[project_testing_gap_backlog_pending]]`
-already named structurally: `STYLE-GUIDE.md` §12's testing convention
+already named structurally: `CONVENTIONS.md` §12's testing convention
 (`source/tests/cases/{abstraction}-api-test.ts`) covers domain/adapter/API only —
 `ux/shell`'s Wizard host, `DrillDown`, the onboarding stages themselves have no test
 mechanism to land in, by convention, not oversight. Today's session is a second, concrete
