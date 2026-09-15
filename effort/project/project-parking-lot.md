@@ -1,6 +1,6 @@
 <img src="../../swarmag-ops-logo.png" title="" alt="swarmAg Operations System" data-align="center">
 
-# swarmAg Operations System — Feature Parking Lot
+# swarmAg Operations System — Parking Lot
 
 Living document. Each entry is something real, identified in the course of other work,
 that is explicitly **not** being worked on right now — deferred on purpose, not forgotten.
