@@ -28,7 +28,8 @@ meaning, UX language, and implementation standards.
 | ------------ | ----------------------------- | -------------------------------------------------------- |
 | Governance   | `AGENTS.md`                   | AI agent protocol, operating modes, and production gates |
 |              | `CONSTITUTION.md`             | Highest architectural authority and role boundaries      |
-|              | `STYLE-GUIDE.md`              | Binding code and content style conventions               |
+|              | `CONVENTIONS.md`              | Binding code and content style conventions               |
+|              | `EFFORT.md`                   | Effort lifecycle, tracking, sequencing, and closure      |
 | Architecture | `architecture-core.md`        | Core architecture principles and system-wide structure   |
 |              | `architecture-back.md`        | Backend architecture, boundaries, and runtime model      |
 |              | `architecture-front.md`       | UX architecture and frontend layering                    |
@@ -57,19 +58,20 @@ Effort documents capture working project context. Status-bearing effort records 
 | Genesis  | `genesis-domain-sdk.md`           | Prompt contract for domain sdk genesis                    |
 |          | `genesis-ux-scaffold.md`          | Prompt contract for UX applications scaffolding           |
 | Project  | `project-backlog.md`              | Accepted work whose shape is already known                |
-|          | `project-feature-parking-lot.md`  | Deferred features or architectural adjustments            |
+|          | `project-roadmap.md`              | Intended execution sequence for decided work              |
+|          | `project-parking-lot.md`          | Deferred features or architectural adjustments            |
 |          | `project-user-stories.md`         | Cross-application user stories and scenario narratives    |
 
 ### 1.3 Source Layers (`source/`)
 
 | Path      | Description                                                       |
 | --------- | ----------------------------------------------------------------- |
-| `back/`   | Backend runtime modules (config, functions, migrations)           |
 | `core/`   | Fundamental types and utilities used by all layers                |
-| `devops/` | Architecture and environment `guard-*` scripts                    |
-| `domain/` | Domain model and domain-layer contracts                           |
-| `tests/`  | Test suites and supporting fixtures                               |
+| `back/`   | Backend runtime modules (config, functions, migrations)           |
 | `front/`  | Client-facing user experiences, apps, contracts, and UI libraries |
+| `domain/` | Domain model and domain-layer contracts                           |
+| `devops/` | Architecture and environment `guard-*` scripts                    |
+| `tests/`  | Test suites and supporting fixtures                               |
 
 #### 1.3.1 Core (`source/core/`)
 
@@ -78,7 +80,7 @@ Effort documents capture working project context. Status-bearing effort records 
 | `api/` | Client makers and provider adapters (CRUD, HTTP, business rules) |
 | `cfg/` | Configuration management (Config singleton, runtime providers)   |
 | `cli/` | API client implementations and makers                            |
-| `db/`  | Cached database client (`supabase.ts`)                           |
+| `db/`  | Database APIs (Supabase, IndexedDB)                              |
 | `svc/` | Inbound service handler wrappers (BusRule HTTP handler)          |
 | `std/` | Standard types (Id, When, Dictionary, Instantiable)              |
 
