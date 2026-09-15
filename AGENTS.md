@@ -1,4 +1,11 @@
+![swarmAg Operations System](swarmag-ops-logo.png)
+
 # swarmAg Operations System — AI Agent Protocol (2.1)
+
+- Source: [AGENTS.md](AGENTS.md)
+- Version: 2.1
+- Published: 2026 August 18th
+- Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
 

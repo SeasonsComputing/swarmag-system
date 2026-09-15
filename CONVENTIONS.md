@@ -1,6 +1,13 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions
+# Software Construction Conventions (1.0)
+
+- Source: [CONVENTIONS.md](CONVENTIONS.md)
+- Version: 1.0
+- Published: 2026 September 15th
+- Author: Ted V. Kremer
+
+**MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
 
 ## 1. Overview
 
@@ -173,7 +180,6 @@ Files with clear categories of declarations and functions divide the code body i
 ```
 
 **A section label names subject matter, not visibility.** `export` already states visibility, and the `PUBLIC` block in the file header (§6.2) already inventories the exported symbols — a `PUBLIC`/`PRIVATE` body section therefore carries nothing the reader cannot see in the left margin. Label each section for what its code is _about_. Narrow with `PARENT: CHILD` when one file covers a subject at more than one level, and reserve a trailing `IMPLEMENTATION` for supporting machinery that serves every section above it.
-
 **Example**
 
 ```typescript
@@ -631,5 +637,20 @@ source/tests/
 - `fixtures-test.ts` — validates fixture integrity: Id format, required fields, association linkage. If a fixture fails here the domain types have drifted.
 - Tests exercise the public contract of each layer, not implementation details.
 - Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.
+
+## 13. Amendment Record
+
+Each published version supersedes the one before it. Versions below 1.0 were never tracked as versions at the time — they are reconstructed retroactively from git, one per path rename, marking substantive content shifts within each era rather than the rename itself.
+
+| Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0.1     | 2025 December 9th   | Created as `STYLEGUIDE.md`, 82 lines — the third commit in the repository's entire history.                                                                                                                                                                                                                                                                                                                                                                         |
+| 0.2     | 2025 December 10th  | Backend reorganized into `core/` with default-only handlers; the core API moved to serverless.                                                                                                                                                                                                                                                                                                                                                                      |
+| 0.3     | 2026 January 5th    | Documentation and session-hygiene rules formalized, an AUTHORITY concept introduced, and the first enforcement guards (leaf layout) added as the domain reorganized into abstractions/validators/protocol.                                                                                                                                                                                                                                                          |
+| 0.4     | 2026 February 12th  | The `Id`/`isId` naming convention was established, `@core/std` container type aliases enforced, and `dprint` adopted as the authoritative formatter.                                                                                                                                                                                                                                                                                                                |
+| 0.5     | 2026 March 14th     | `makeAdapter` and the `std`/`stdx` split were documented, alongside runtime config guidance (`LOCAL_DB_NAME`) and union-type/validator protocol conventions.                                                                                                                                                                                                                                                                                                        |
+| 0.6     | 2026 June 30th      | Its busiest era, and its first as a root-level, governance-tier document: barrel-import restrictions, the type/interface distinction, and the `core/cli`/`core/svc` namespace-length rule were all clarified here, alongside `@front/api` reconciliation and DevOps gap documentation.                                                                                                                                                                              |
+| 0.7     | 2026 September 13th | Path renamed to `CONVENTIONS.md` (commit `5272c25`) with no content change of its own — bundled quietly into an unrelated commit, internal references still said "STYLE-GUIDE" for two more days.                                                                                                                                                                                                                                                                   |
+| 1.0     | 2026 September 15th | Cross-references in this document and every document citing it (`AGENTS.md`, the architecture docs, the genesis prompts) caught up to the new name (commit `ca77878`), and it gained explicit metadata and this amendment record for the first time. The rename's rationale: the document covers more than style — §8.6/§8.7 adapter and maker shape, §12 testing are structural pattern conventions, not aesthetics — and the old name undersold its actual scope. |
 
 _End of Conventions Document_

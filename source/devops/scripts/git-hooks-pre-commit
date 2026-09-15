@@ -5,4 +5,5 @@
 set -e
 ROOT="$(git rev-parse --show-toplevel)"
 cd "$ROOT"
-exec deno run --allow-read --allow-run=git source/devops/guards/guard-completed-immutable.ts
+deno run --allow-read --allow-run=git source/devops/guards/guard-completed-immutable.ts
+exec deno run --allow-read --allow-run=git source/devops/guards/guard-governance-gate.ts

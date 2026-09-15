@@ -7,6 +7,8 @@
 - Published: 2026 August 18th
 - Author: Ted V. Kremer
 
+**MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
+
 ## 1. Purpose & Authority
 
 This document is the highest governing authority for all work performed in this repository by humans, AI reasoning systems, AI coding systems, tools, scripts, or future automation.
