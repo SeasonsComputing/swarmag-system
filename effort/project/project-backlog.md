@@ -220,15 +220,18 @@ Everything currently under `ux/shell/` is being built and reviewed today as if i
 one flat directory indefinitely — this entry exists so that assumption doesn't calcify
 before the split actually happens.
 
-The split itself is decided; the boundary is not. The working hypothesis, unconfirmed: truly
-reusable, app-agnostic composition machinery (`CollectionPanel`, `DrillDown`, `Wizard`,
-`PanelHeader` — the "Supporting Library" rows in `ux-design-archetypes.md` §6) stays in
-`ux/shell/`, while app-orchestration concerns that happen to live there today but aren't
-really reusable UI primitives (candidates, unconfirmed: `shell.ts`'s six-arm `ShellRoute`
-union, `shell-makers.tsx`, `bootstrap.tsx`, `dashboard.tsx`, `login.tsx`) move to
-`front/app/`.
+**Boundary confirmed 2026-09-15** — the original hypothesis here was wrong on most of its named
+candidates. `shell.ts`, `bootstrap.tsx`, and `dashboard.tsx` all stay in `ux/shell/`: each is
+generic IoC machinery that an app's own composition root calls into, not app-specific
+composition itself (confirmed by tracing `app-admin/app.tsx`'s actual `bootstrap(...)` call, not
+by the files' own comments, which read more app-specific than they are). Only `login.tsx` (and
+its sibling branded components `about-box.tsx`/`brand-hero.tsx`) move to `front/app/components/`
+outright; `shell-makers.tsx` doesn't move either — it gets parameterized to stop hardcoding
+`Login`/`AboutBox`, with a new thin `front/app/shell/shell-makers.tsx` wrapper pre-binding them
+for swarmAg. Full file-level triage, the governing registry-vs-instance principle, and exact
+sequencing: `effort/active/2026-09-15-shell-app-split-brief.md`.
 
-**Picking this up:** a Foundation-mode design pass on the actual boundary, once M1 closes.
+**Picking this up:** the brief above is fully designed and ready to dispatch.
 Until then, new `ux/shell/` work (e.g. the in-flight stock Notes editor) should assume it
 may be re-homed rather than be built as if the directory's current shape is permanent.
 
