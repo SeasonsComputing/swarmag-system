@@ -8,7 +8,8 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Prevents circular and upward dependencies in the front architecture. Ensures
 ux/ui remains domain-agnostic and reusable, apps stay isolated leaves, and
-shared layers do not depend on apps.
+shared layers (ux/*, api/*) do not import out of their own front sub-namespace
+— not merely "no app-* imports," any front/ sibling is off limits.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -64,6 +65,12 @@ const isForbiddenUiImport = (spec: string): boolean => {
 /** Check if an import specifier is an app import @front/app-X/... */
 const isAppImport = (spec: string): string | null => {
   const match = spec.match(/^@front\/(app-[^/]+)(?:\/|$)/)
+  return match ? match[1] : null
+}
+
+/** Extract the top-level front sub-namespace a specifier targets, e.g. '@front/ux/shell' -> 'ux'. */
+const frontSubNamespace = (spec: string): string | null => {
+  const match = spec.match(/^@front\/([^/]+)/)
   return match ? match[1] : null
 }
 
@@ -146,8 +153,15 @@ const main = async () => {
         violations.push(`${relative} — ${spec} — Rule 1`)
       }
 
-      // Rule 2: Shared layers (ux/*, api/*) cannot import @front/app-*
-      if ((isUxFile || isApiFile) && isAppImport(spec)) {
+      // Rule 2: Shared layers (ux/*, api/*) cannot import out of their own
+      // front sub-namespace — not just @front/app-*, any @front/* sibling.
+      // ux may depend on ux, domain, core, and external packages; nothing
+      // else under front/ is a shared layer's to import.
+      const importedFrontNamespace = frontSubNamespace(spec)
+      if (isUxFile && importedFrontNamespace !== null && importedFrontNamespace !== 'ux') {
+        violations.push(`${relative} — ${spec} — Rule 2`)
+      }
+      if (isApiFile && importedFrontNamespace !== null && importedFrontNamespace !== 'api') {
         violations.push(`${relative} — ${spec} — Rule 2`)
       }
 
