@@ -4,12 +4,8 @@
 
 Living document. Each entry is something real, identified in the course of other work,
 that is explicitly **not** being worked on right now — deferred on purpose, not forgotten.
-An entry is here because a decision is still missing, so picking it up starts with making
-that decision. Do not resolve one as a drive-by fix in an unrelated session; each needs
-its own scoped conversation.
-
-Distinct from `effort/project/project-backlog.md`, which holds work already decided
-and awaiting only a slot. The test is decided versus undecided — not near-term versus far.
+See `EFFORT.md` §3 for what distinguishes this from the backlog and the roadmap, and the
+rule against resolving an entry as a drive-by fix in an unrelated session.
 
 **Format per entry:** a `**Parked:**` line carrying the date and where it surfaced, then
 `**What it is:**`, `**Why parked:**`, and `**Picking this up:**`. Entries are flat and
@@ -255,5 +251,28 @@ choice (a `UiSingleSelect` of US state abbreviations, versus something country-a
 follows directly once that's answered. Touches both `onboarding-stage-customer.tsx`'s
 `CustomerInput` and `onboarding-stage-sites.tsx`'s `SiteTextInput` — same shape, two call
 sites, per the existing free-text-field pattern in each.
+
+## Equipment & Chemical Maintenance Workbench
+
+**Parked:** 2026-09-15 — Ted, during roadmap review, distinguishing the stock Manager work
+in `project-roadmap.md` §5 from a bigger idea the theme's "Maintenance" name was standing in
+for.
+
+**What it is:** `project-user-stories.md` §3/§4 name their themes "Asset Maintenance" and
+"Chemical Maintenance," but the near-term roadmap work under those themes is an ordinary
+`AbstractionManager` — the same stock CRUD shape as Users/Customers. "Maintenance" was a
+placeholder for something larger: schedules, inventories, and parts specialized to the needs
+of equipment and chemicals, possibly warranting its own centralized, dedicated workbench
+container rather than living inside either Manager.
+
+**Why parked:** Genuinely undecided — no shape, no archetype, no scope statement, just an
+imagined destination. The prudent near-term move is the stock Manager (`project-roadmap.md`
+§5); Maintenance proper is a later project. Conflating the two would have made the near-term
+item sound bigger than it is and buried a real future idea inside mechanical stamp-out.
+
+**Picking this up:** Its own scoped conversation once Users & Customers (`project-roadmap.md`
+§1) is closed — the roadmap already earmarks a `project-user-stories.md` iteration as part of
+§5 Mechanical Productions, and this is the natural moment to scope Maintenance for real rather
+than leave it as a name.
 
 _End of Feature Parking Lot Document_

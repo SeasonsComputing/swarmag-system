@@ -2,12 +2,8 @@
 
 # swarmAg Operations System — Backlog
 
-Accepted work whose shape is already known. An entry is here because the decision has been
-made and only a slot is missing, so picking it up starts with doing it.
-
-Distinct from `effort/project/project-parking-lot.md`, which holds work
-where a decision is still missing and picking it up starts with making that decision. The
-test is decided versus undecided — not near-term versus far.
+Accepted work whose shape is already known — see `EFFORT.md` §3 for what distinguishes this
+from the parking lot and the roadmap.
 
 **Format per entry:** the defect or gap stated as a sentence, an `**Observed:**` line
 carrying the date and a priority of `high`, `normal`, or `low`, then what it is with its
