@@ -2,12 +2,8 @@
 
 # swarmAg Operations System — Roadmap
 
-The intended execution sequence for decided work. Distinct from `project-backlog.md` and
-`project-parking-lot.md`, both of which are deliberately flat and carry no ordering
-(EFFORT.md §3) — this document _is_ the ordering. Themes and stories come from
-`project-user-stories.md`; shaped, decided items come from `project-backlog.md`; the sequence
-itself is a standing judgment call, revisited as building teaches what a plan couldn't know in
-advance (EFFORT.md §6).
+The intended execution sequence for decided work — see `EFFORT.md` §3 for what this document
+is and how it relates to the backlog and parking lot.
 
 **Format per entry:** what it comprises, why it sits where it does, and what backlog items
 block or ride with it. An entry marked **(open)** has no settled position yet — stated as open
@@ -21,7 +17,9 @@ rather than guessed at.
 Users and Customers stand as this project's **reference implementations** — meant to be
 copied for the remaining ~80% of the app, not iterated on again in their own right.
 
-Not closed pending:
+Positioned first because it's the origin of the reusable archetypes, not because it closes
+first — it stays open until both dependencies below land, which puts its actual closure after
+§3 and §4:
 
 1. Notes Editor completed & integrated into User Manager
 2. Notes Editor integrated with Customer Manager feature completion
@@ -52,27 +50,29 @@ ARCHETYPE: Abstraction Manager | Wizard
 
 ## 4. Notes Editor
 
-Stock, parameterized `NotesEditor`, lands at `front/app/notes-editor.tsx`. Tags-freeform-vs-
-controlled is still unresolved and gates scoping.
+Stock, parameterized Index-Detail archetype `NotesEditor`, lands at `front/app/notes-editor.tsx`.
 
-Rides with it: User Manager needs updating to consume it once built, User Management is closed once integrated)
+**Tags Component**
+Several ux features include tags. We need a tag component that is reusable. Tags-freeform-vs-controlled is still unresolved and gates scoping.
+
+Rides with it: User Manager needs updating to consume it once built, User Management is closed once integrated.
 
 ## 5. Mechanical Productions
 
 Standard production from the Users/Customers reference implementations — no design conversation
-needed, pick up whenever convenient once §2 lands:
+needed, pick up whenever convenient once §2 lands. Named "Asset Manager"/"Chemical Manager" here
+deliberately, not "Maintenance": that's `project-user-stories.md` §3/§4's own theme name, but it
+describes a larger destination (schedules, inventories, parts — parking lot: "Equipment & Chemical
+Maintenance Workbench") than the stock CRUD shipping first. A `project-user-stories.md` iteration
+rides with this milestone, once §1 is closed, to scope both themes properly before that fuller
+work is picked up:
 
-- **Asset Maintenance** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`.
-- **Chemical Maintenance** — Manager, wire `api.Chemicals`.
+- **Asset Manager** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`.
+- **Chemical Manager** (`project-user-stories.md` §4) — Manager, wire `api.Chemicals`.
 
 ## 6. Workflow, Task, Question & Service
 
-`project-user-stories.md` §5, currently unwritten, plus `Service` (domain type exists,
-`api.Services` commented out). Needs the Workflow Builder archetype — named in
-`architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme
-with no existing archetype to extend at all, and the most depended-upon: Job Definition's own
-§2.1 "workflow seeding" (preload a default workflow per Service/SKU) can't be built until this
-exists.
+`project-user-stories.md` §5, currently unwritten, plus `Service` (domain type exists, `api.Services` commented out). Needs the Workflow Builder archetype — named in `architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme with no existing archetype to extend at all, and the most depended-upon: Job Definition's own §2.1 "workflow seeding" (preload a default workflow per Service/SKU) can't be built until this exists.
 
 ## 7. Job Definition
 
