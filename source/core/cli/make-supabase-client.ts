@@ -78,7 +78,7 @@ export type BusRuleSupabaseSpecification = {
 export const makeCrudSupabaseClient = <T extends Instantiable>(
   { table, adapter, validator }: CrudSupabaseSpecification<T>
 ): ApiCrudContract<T> => ({
-  /* Create record in Supabase from create payload and return mapped entity. */
+  /** Create record in Supabase from create payload and return mapped entity. */
   async create(input: CreateFromInstantiable<T>): Promise<T> {
     checkValidatorError(validator.validateCreate(input))
     const record = adapter.fromDomain(instantiable<T>(input) as AdapterPatch<T>)
@@ -91,7 +91,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
     return adapter.toDomain(data)
   },
 
-  /* Get non-deleted record by id from Supabase and map to domain entity. */
+  /** Get non-deleted record by id from Supabase and map to domain entity. */
   async get(id: Id): Promise<T> {
     const { data, error } = await Supabase.client()
       .from(table)
@@ -103,7 +103,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
     return adapter.toDomain(data)
   },
 
-  /* Apply a declared-scope update patch to an existing non-deleted Supabase record. */
+  /** Apply a declared-scope update patch to an existing non-deleted Supabase record. */
   async update<K extends keyof FromInstantiable<T>>(
     scoped: ScopedUpdateAdapter<T, K>,
     source: ScopedUpdate<T, K>
@@ -122,7 +122,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
     return adapter.toDomain(data)
   },
 
-  /* Soft-delete record in Supabase and return delete contract payload. */
+  /** Soft-delete record in Supabase and return delete contract payload. */
   async delete(id: Id): Promise<DeleteResult> {
     const now = when()
     const del: Dictionary = { deleted_at: now, updated_at: now }
@@ -138,7 +138,7 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
     return { id: row['id'] as Id, deletedAt: row['deleted_at'] as When }
   },
 
-  /* List paginated non-deleted records from Supabase. */
+  /** List paginated non-deleted records from Supabase. */
   async list(options?: ListOptions): Promise<ListResult<T>> {
     const limit = listPageLimitValue(options?.limit?.toString())
     const cursor = listCursorValue(options?.cursor?.toString())

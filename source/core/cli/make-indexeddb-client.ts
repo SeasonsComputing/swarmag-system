@@ -58,7 +58,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
 ): ApiCrudContract<T> => {
   IndexedDb.registerStore(store)
   return {
-    /* Create record in IndexedDB from create payload and return mapped entity. */
+    /** Create record in IndexedDB from create payload and return mapped entity. */
     async create(input: CreateFromInstantiable<T>): Promise<T> {
       checkValidatorError(validator.validateCreate(input))
       try {
@@ -73,7 +73,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
       }
     },
 
-    /* Get non-deleted record by id from IndexedDB and map to domain entity. */
+    /** Get non-deleted record by id from IndexedDB and map to domain entity. */
     async get(id: Id): Promise<T> {
       try {
         const db = await IndexedDb.connection()
@@ -86,7 +86,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
       }
     },
 
-    /* Apply declared-scope update patch to an existing non-deleted IndexedDB record. */
+    /** Apply declared-scope update patch to an existing non-deleted IndexedDB record. */
     async update<K extends keyof FromInstantiable<T>>(
       scoped: ScopedUpdateAdapter<T, K>,
       source: ScopedUpdate<T, K>
@@ -109,7 +109,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
       }
     },
 
-    /* Soft-delete record in IndexedDB and return delete contract payload. */
+    /** Soft-delete record in IndexedDB and return delete contract payload. */
     async delete(id: Id): Promise<DeleteResult> {
       try {
         const db = await IndexedDb.connection()
@@ -127,7 +127,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
       }
     },
 
-    /* List non-deleted records with cursor-based pagination. */
+    /** List non-deleted records with cursor-based pagination. */
     async list(options: ListOptions = {}): Promise<ListResult<T>> {
       try {
         const db = await IndexedDb.connection()
