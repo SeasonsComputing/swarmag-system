@@ -69,7 +69,7 @@ export type CrudHttpContract<T extends Instantiable> =
 export const makeCrudHttpClient = <T extends Instantiable>(
   { basePath, validator }: CrudHttpSpecification<T>
 ): CrudHttpContract<T> => ({
-  /* Create record over HTTP and unwrap API envelope. */
+  /** Create record over HTTP and unwrap API envelope. */
   async create(input: CreateFromInstantiable<T>): Promise<T> {
     checkValidatorError(validator.validateCreate(input))
     const res = await request(`${basePath}/create`, {
@@ -80,13 +80,13 @@ export const makeCrudHttpClient = <T extends Instantiable>(
     return unwrap<T>(res)
   },
 
-  /* Get record by id over HTTP and unwrap API envelope. */
+  /** Get record by id over HTTP and unwrap API envelope. */
   async get(id: Id): Promise<T> {
     const res = await request(`${basePath}/get?id=${encodeURIComponent(id)}`)
     return unwrap<T>(res)
   },
 
-  /* Update declared-scope fields over HTTP and unwrap API envelope. */
+  /** Update declared-scope fields over HTTP and unwrap API envelope. */
   async update<K extends keyof FromInstantiable<T>>(source: ScopedUpdate<T, K>): Promise<T> {
     checkValidatorError(validator.validateUpdate(source as UpdateFromInstantiable<T>))
     const res = await request(`${basePath}/update`, {
@@ -97,7 +97,7 @@ export const makeCrudHttpClient = <T extends Instantiable>(
     return unwrap<T>(res)
   },
 
-  /* Soft-delete record over HTTP and unwrap delete payload. */
+  /** Soft-delete record over HTTP and unwrap delete payload. */
   async delete(id: Id): Promise<DeleteResult> {
     const res = await request(`${basePath}/delete`, {
       method: 'DELETE',
@@ -107,7 +107,7 @@ export const makeCrudHttpClient = <T extends Instantiable>(
     return unwrap<DeleteResult>(res)
   },
 
-  /* List records over HTTP using list payload options. */
+  /** List records over HTTP using list payload options. */
   async list(options?: ListOptions): Promise<ListResult<T>> {
     const res = await request(`${basePath}/list`, {
       method: 'POST',
