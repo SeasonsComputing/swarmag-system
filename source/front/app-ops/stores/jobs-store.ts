@@ -19,7 +19,7 @@ CA NOTE -- THIS MUST BE REFACTORED TO FOLLOW THE CONVENTIONS OF THE REST OF THE 
            SEE ux/stores
 */
 
-import type { JobManifest } from '@front/ux/views/job-views.ts'
+import type { JobManifest } from '@front/app/views/job-views.ts'
 import { createStore } from '@solid-js/store'
 
 /** Ops job manifest store shape. */

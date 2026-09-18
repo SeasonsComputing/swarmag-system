@@ -15,10 +15,11 @@ BrandWidget  Dashboard header brand widget.
 */
 
 import { getShellIdentity } from '@front/ux/shell/shell-metadata.ts'
-import { type UiComponent, UiLayout } from '@front/ux/ui'
+import { UiLayout } from '@front/ux/ui'
+import type { UiComponent } from '@front/ux/ui'
 
 import './brand-widget.css'
-import headerLogo from '@front/ux/assets/logos/swarmag-ops-logo-flat.png'
+import headerLogo from '@front/app/assets/swarmag-ops-logo-flat.png'
 
 /** Dashboard header brand widget. */
 export const BrandWidget = (): UiComponent => {

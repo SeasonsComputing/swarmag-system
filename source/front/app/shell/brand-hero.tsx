@@ -14,11 +14,11 @@ PUBLIC
 BrandHero  Logo, product name, and application name hero block.
 */
 
+import { getShellMetadata } from '@front/ux/shell/shell-metadata.ts'
 import { type UiComponent, UiLayout } from '@front/ux/ui'
-import { getShellMetadata } from './shell-metadata.ts'
 
 import './brand-hero.css'
-import logoArt from '@front/ux/assets/logos/swarmag-ops-logo-art.png'
+import logoArt from '@front/app/assets/swarmag-ops-logo-art.png'
 
 /** Logo, product name, and application name hero block. */
 export const BrandHero = (): UiComponent => {

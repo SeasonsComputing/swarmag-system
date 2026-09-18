@@ -29,8 +29,8 @@ import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
 import { type Customer } from '@domain/abstractions/customer.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { validateCustomerCreate, validateCustomerUpdate } from '@domain/validators/customer-validator.ts'
-import { AppState } from '@front/ux/stores/app-state.ts'
-import { SessionState } from '@front/ux/stores/session-state.ts'
+import { AppState } from '@front/ux/shell/app-state.ts'
+import { SessionState } from '@front/ux/shell/session-state.ts'
 import { makeAuthUsers } from './make-auth-users.ts'
 
 /** Shared UX API namespace for authentication, state, and domain clients. */
@@ -38,7 +38,7 @@ export const api = {
   /** Passwordless authentication and session observation. */
   Auth: AuthSupabaseClient,
 
-  /** Persistent state. */
+  /** Persistent and ephemoral state. */
   AppState,
   SessionState,
 

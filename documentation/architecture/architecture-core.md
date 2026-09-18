@@ -803,13 +803,17 @@ swarmag-system/
 │   │   │   └── orchestration/
 │   ├── front/
 │   │   ├── api/
+│   │   ├── app/
+│   │   │   ├── assets/
+│   │   │   ├── shell/
+│   │   │   ├── views/
+│   │   │   └── widgets/
 │   │   ├── app-admin/
 │   │   ├── app-customer/
 │   │   ├── app-ops/
 │   │   ├── app-style-guide/
 │   │   ├── config/
 │   │   └── ux/
-│   │       ├── assets/
 │   │       ├── shell/
 │   │       ├── stores/
 │   │       ├── ui/

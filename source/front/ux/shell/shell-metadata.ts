@@ -1,7 +1,7 @@
 /*
 ╔═════════════════════════════════════════════════════════════════════════════╗
-║ Shell metadata for UX application chrome                                    ║
-║ Runtime shell identity and configuration diagnostics                        ║
+║ Shell metadata for UX application chrome                                     ║
+║ Runtime shell identity and configuration diagnostics                         ║
 ╚═════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -33,7 +33,7 @@ getShellIdentity(): ShellIdentity  Return shell identity values.
 getShellConfig(): ShellConfig      Return shell config values.
 */
 
-import { Config } from '@front/config/ux-config.ts'
+import { Config } from '@core/cfg/config.ts'
 
 /** Identity of the application shell. */
 export type ShellIdentity = {

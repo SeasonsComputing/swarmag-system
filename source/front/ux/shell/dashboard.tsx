@@ -14,18 +14,19 @@ PUBLIC
 Dashboard  Shared shell dashboard component.
 */
 
-import type { DashboardStateContract, DashboardStoreWidget } from '@front/ux/stores/dashboard-state.ts'
-import { UiCard, type UiComponent, UiFooter } from '@front/ux/ui'
+import { UiCard } from '@front/ux/ui'
+import type { UiComponent } from '@front/ux/ui'
 import { For, Show } from '@solid-js'
+import type { DashboardStateContract, DashboardStoreWidget } from './dashboard-state.ts'
 import type { WidgetComponent, WidgetRegistry } from './widget-contract.ts'
 
 import './dashboard.css'
-import footerLogo from '@front/ux/assets/logos/swarmag-logo-wordmark.png'
 
 /** Shared shell dashboard component. */
 export const Dashboard = (props: {
   state: DashboardStateContract
   widgets: WidgetRegistry
+  footer: () => UiComponent
 }): UiComponent => {
   const dashboard = props.state.store
   const widgets = props.widgets
@@ -77,7 +78,7 @@ export const Dashboard = (props: {
         </For>
       </div>
 
-      <UiFooter logo={footerLogo} alt='swarmAg' />
+      <props.footer />
     </div>
   )
 
