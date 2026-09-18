@@ -14,19 +14,17 @@ makeAnonymousShell  Creates a shell with no authentication required.
 makeDashboardShell  Creates a dashboard shell with authentication required.
 */
 
-import { DashboardState, DashboardStateSeed } from '@front/ux/stores/dashboard-state.ts'
-import { type UiComponent } from '@front/ux/ui'
+import type { UiComponent } from '@front/ux/ui'
 import { Outlet } from '@tanstack/solid-router'
-import { AboutBox } from './about-box.tsx'
 import { AuthGuard } from './auth-guard.tsx'
+import { DashboardState, type DashboardStateSeed } from './dashboard-state.ts'
 import { Dashboard } from './dashboard.tsx'
-import { Login } from './login.tsx'
-import { logout } from './logout.ts'
-import { Routes, type Shell, type ShellRoute } from './shell.ts'
-import { type WidgetRegistry } from './widget-contract.ts'
+import { Routes } from './shell.ts'
+import type { Shell, ShellOverlayView, ShellPageView, ShellRoute } from './shell.ts'
+import type { WidgetRegistry } from './widget-contract.ts'
 
 /** Create the lightweight shell and its common non-dashboard routes. */
-export const makeAnonymousShell = (): Shell => ({
+export const makeAnonymousShell = (Login: ShellPageView, logout: () => Promise<void>): Shell => ({
   component: () => <Outlet />,
   initializers: [],
   routes: [
@@ -39,12 +37,14 @@ export const makeAnonymousShell = (): Shell => ({
 export const makeDashboardShell = (
   seed: DashboardStateSeed,
   widgets: WidgetRegistry,
+  AboutBox: ShellOverlayView,
+  Footer: () => UiComponent,
   routes: ShellRoute[]
 ): Shell => {
   const DashboardShell = (): UiComponent => (
     <AuthGuard>
       <main>
-        <Dashboard state={DashboardState} widgets={widgets} />
+        <Dashboard state={DashboardState} widgets={widgets} footer={Footer} />
         <Outlet />
       </main>
     </AuthGuard>

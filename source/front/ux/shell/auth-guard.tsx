@@ -15,9 +15,9 @@ PUBLIC
 AuthGuard  Route-level auth guard component.
 */
 
-import { SessionState } from '@front/ux/stores/session-state.ts'
 import { type UiComponent, type UiContainerProps } from '@front/ux/ui'
 import { Match, Show, Switch } from '@solid-js'
+import { SessionState } from './session-state.ts'
 import { ShellReplace } from './shell-navigate.tsx'
 
 /* Authorization guard properties */

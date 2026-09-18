@@ -326,7 +326,7 @@ Violations detected by architectural guards are build failures.
 
 ### 8.2 Configuration Pattern
 
-All applications import `Config` from `@front/config/ux-config.ts` — never directly from `@core/cfg/config.ts`. Direct core imports in app files are a guard violation.
+Each application root imports `@front/config/ux-config.ts` before application dependencies to initialize the package configuration. Generic `ux/` modules consume `Config` from `@core/cfg/config.ts`; they never import package configuration. Application consumers use the package configuration module. Configuration-property ownership is deferred; this boundary governs imports and initialization only.
 
 - Update `ux-config.ts` keys and aliases as required env variables expand
 - Environment file naming and placeholder conventions: see `architecture-devops.md §4`
@@ -339,7 +339,7 @@ The Reactive Store Module Pattern is the required architecture for UX reactive s
 - Keep framework internals (`createStore`, setter functions, signals) **module-private**.
 - Expose:
   - `store` for read access
-  - intent-based mutation methods (`setAuth`, `setUser`, `setReady`, `clear`)
+  - intent-based mutation methods (`setAuth`, `setReady`, `clear`)
 - Mutation methods must be **domain-intent names**, not framework/mechanical names.
   - Use `setAuth`, not `setSessionStore`.
 - No module outside the store may call reactive setters directly.
@@ -386,7 +386,7 @@ Authenticated routes render their primary application surface inside a semantic
 `main` landmark. `main` is required accessibility plumbing, not a UX metaphor or
 shared shell primitive.
 
-`AuthGuard` and `Dashboard` live in `source/front/ux/shell` — fully generic. `Login` is swarmAg-branded presentation and lives in `source/front/app/shell/`; `source/front/ux/shell/shell-makers.tsx`'s `makeAnonymousShell()`/`makeDashboardShell()` take it (and `AboutBox`) as parameters rather than importing them directly, and `source/front/app/shell/shell-makers.tsx` re-exports both names pre-bound to swarmAg's versions — every app root imports the app-tier maker, not the generic one. Each app package declares a complete `Application`: a common anonymous shell plus a dashboard shell. The dashboard shell receives its app-local dashboard configuration (`app-{admin|ops|customer}-dashboard.json`), the merged widget registry (`§10.3`), and app-specific route presentations before shared bootstrap mounts it.
+`AuthGuard` and `Dashboard` live in `source/front/ux/shell` — fully generic. `Login` is swarmAg-branded presentation and lives in `source/front/app/shell/`; `source/front/ux/shell/shell-makers.tsx`'s `makeAnonymousShell()`/`makeDashboardShell()` take it (and `AboutBox`) as route-component parameters rather than importing them directly, and `source/front/app/shell/shell-makers.tsx` re-exports both names pre-bound to swarmAg's versions — every app root imports the app-tier maker, not the generic one. Each app package declares a complete `Application`: a common anonymous shell plus a dashboard shell, and the application-owned session coordinator. The dashboard shell receives its app-local dashboard configuration (`app-{admin|ops|customer}-dashboard.json`), the merged widget registry (`§10.3`), and app-specific route presentations before shared bootstrap mounts it.
 
 #### 9.1.1 UX Metaphors
 
@@ -462,141 +462,69 @@ export const api = {
 }
 ```
 
-#### 9.3.1 Auth State Binding
+#### 9.3.1 Application-Owned Session Coordination
 
-`auth-supabase-client.ts` exposes Supabase `onAuthStateChange` through `api.Auth`. Each app shell registers the listener in `app.tsx` during `onMount`. On auth events, the shell writes to `SessionState` via named methods (`setAuth`, `setUser`, `setReady`, `clear`). This keeps Supabase Auth isolated to the auth client and shell boot layer. No component touches Supabase Auth directly.
+`ShellApplication` requires a `session: SessionCoordinator` alongside its shells.
+The UX-owned `SessionCoordinator` interface exposes `init(): void`. Bootstrap calls it
+synchronously during its Solid mount callback. The application supplies the implementation
+from `source/front/app/shell/session-coordinator.ts`; generic bootstrap does not consume `api`.
+`Routes.application(shells, session)` assembles these dependencies without changing route behavior.
 
-Session termination events — token expiry, idle timeout, browser close — all flow through `onAuthStateChange`. The shell callback calls `SessionState.clear()`, and the auth guard redirects to login.
+The coordinator starts persisted-session resolution, subscribes to `api.Auth.onAuthStateChange`,
+and registers subscription cleanup synchronously with the current Solid owner. It owns user
+hydration and eligibility policy. The shell owns the lifecycle invocation and baseline session state.
 
-#### 9.3.2 OTP Flow
+#### 9.3.2 OTP and Session Flow
 
-All apps use passwordless email OTP. No passwords are stored or transmitted.
+Login remains an application-owned passwordless email OTP surface. It checks
+`api.Users.hasAccess` before sending an OTP, then verifies the submitted code through `api.Auth`.
+Auth events and initial `getSession()` resolution enter the same coordinator:
 
-```text
-user submits email
-  → api.Users.hasAccess({ email })
-  → if false: login displays 'Email address not registered' — OTP flow does not proceed
-  → api.Auth.sendOtp(email)
-  → Supabase delivers one-time code to email address
-  → user submits code
-  → api.Auth.verifyOtp(email, code)
-  → returns Session { userId }
-  → onAuthStateChange fires
-  → app shell calls applySession(session)
-  → applySession calls SessionState.setAuth(userId)
-  → applySession calls api.Users.get(userId) to hydrate domain user
-  → applySession calls api.Auth.validateUser(user)
-  → if user.status !== 'active':
-      api.Auth.logout()
-      SessionState.clear()
-      redirect to /login
-  → SessionState.setUser(user)
-  → SessionState.setReady()
-  → auth guard reacts → renders dashboard
-```
+1. A null session clears the prepared-identity sentinel and `SessionState`.
+2. An identity change invalidates previous readiness and the sentinel.
+3. `SessionState.setAuth(userId)` publishes the authenticated identity, preserving existing timing.
+4. An already-prepared matching user ID skips repeat hydration.
+5. Otherwise `api.Users.get(userId)` loads the domain user. An inactive user is signed out.
+6. An active user is discarded after validation; only its prepared user ID is cached.
+7. `SessionState.setReady()` marks application data ready.
 
-#### 9.3.3 Post-Authentication Validation
+The prepared user ID is private coordinator state, not a domain-user cache or a replacement user
+object. `isDataReady` remains a separate application-readiness signal. Broader changes to auth
+publication timing and asynchronous session orchestration are outside this split.
 
-Authentication confirms that the caller possesses a valid OTP token. It does not confirm that the caller is an eligible swarmAg application user. Post-authentication validation is a required boot-sequence step that runs immediately after the domain user is hydrated.
+A missing domain record is an integrity error and must propagate; it is not treated as an inactive
+user. `ApiAuthContract` remains transport-oriented and has no domain `validateUser` method.
 
-**Invariant:** `SessionState.store.isAuthenticated` is set to `true` only for users whose domain record exists and whose `status` is `'active'`. No session may proceed to the dashboard for a user who fails this check.
+#### 9.3.3 Logout
 
-**`ApiAuthContract.validateUser(user: User): void`**
-
-`validateUser` is a synchronous guard declared on `ApiAuthContract` and implemented in `auth-supabase-client.ts`. It receives the hydrated domain `User` and throws `ApiError` (status 403) when the user is not eligible. The shell boot sequence calls it between `api.Users.get()` and `SessionState.setUser()`.
-
-Validation rules enforced by `validateUser`:
-
-- `user.status === 'active'` — inactive users are rejected
-
-When `validateUser` throws, the boot sequence must:
-
-1. Call `api.Auth.logout()` to end the Supabase session
-2. Call `SessionState.clear()` to reset all UX session state
-3. Redirect to `/login`
-
-**Failure modes:**
-
-| Condition                     | Cause                                            | Response                                 |
-| ----------------------------- | ------------------------------------------------ | ---------------------------------------- |
-| `api.Users.get()` returns 404 | Auth identity has no matching domain user record | Hard failure — log and surface error     |
-| `user.status === 'inactive'`  | User account has been deactivated                | Logout, clear session, redirect to login |
-
-A 404 on user hydration is a system integrity violation — an auth identity exists with no corresponding domain user. This condition must not be silently swallowed; it warrants a visible error.
-
-#### 9.3.4 Logout Flow
-
-```text
-user triggers logout
-  → api.Auth.logout()
-  → Supabase signOut
-  → onAuthStateChange fires
-  → app shell calls SessionState.clear()
-  → auth guard reacts → renders login
-```
+The generic logout function receives `ApiAuthContract` explicitly and clears local session state
+in its completion path. The app-tier shell maker binds that dependency and clears the coordinator's
+prepared-identity sentinel even if remote sign-out fails. Normal auth sign-out events also clear it.
+Route transition behavior remains owned by the generic shell.
 
 ### 9.4 Session State Store
 
-The session state store is a SolidJS store shared across all apps via `source/front/ux/stores/session-state.ts` and conforms to `8.3 Reactive Store Module Pattern`
+`source/front/ux/stores/session-state.ts` is a closed baseline store following §8.3:
 
 ```typescript
 type SessionStore = {
   userId: Id | null
-  user: User | null
   isAuthenticated: boolean
   isLoading: boolean
   isDataReady: boolean
 }
 ```
 
-- `isLoading` prevents a flash of the login screen for already-authenticated
-  users on page load — the shell renders nothing until the boot check resolves
-- `userId` is set immediately from `Session` on auth; `user` is populated after
-  `api.Users.get(userId)` resolves
-- `isDataReady` is set `true` by Admin and Customer immediately on session
-  establishment; set `true` by Ops only after the IndexedDB job manifest load
-  completes
-- No component reads from Supabase Auth directly — all session state is
-  consumed from this store
+It exports the `SessionState` namespace with `store`, `setAuth`, `setReady`, and `clear`.
+It has no domain `User`, `user` field, or `setUser` operation. Applications requiring additional
+reactive session data use their own Store/State modules. `AppState` remains the generic persistent
+key/value preference store. The application-facing API may re-export both stores; UX imports its
+own stores directly and never imports `front/api`.
 
-#### 9.4.1 Session Store Write Interface
-
-`session-state.ts` keeps `setSessionStore` private and exports a singleton `SessionState` interface. Callers read from `SessionState.store` and mutate only through named methods.
-
-```typescript
-const [sessionStore, setSessionStore] = createStore<SessionStore>({
-  userId: null,
-  user: null,
-  isAuthenticated: false,
-  isLoading: true,
-  isDataReady: false
-})
-
-const setSessionAuth = (userId: Id): void =>
-  setSessionStore({ userId, isAuthenticated: true, isLoading: false })
-
-const clearSession = (): void =>
-  setSessionStore({
-    userId: null,
-    user: null,
-    isAuthenticated: false,
-    isLoading: false,
-    isDataReady: false
-  })
-
-const setSessionUser = (user: User): void => setSessionStore('user', user)
-const setDataReady = (): void => setSessionStore('isDataReady', true)
-
-const SessionState = {
-  store: sessionStore,
-  setAuth: setSessionAuth,
-  setUser: setSessionUser,
-  setReady: setDataReady,
-  clear: clearSession
-}
-
-export { SessionState }
-```
+`isLoading` prevents a login flash while the initial auth check is unresolved. `userId` is
+published from the auth session. `isDataReady` means application data preparation is complete;
+it is not the identity sentinel. Ops may defer readiness until its local job manifest is loaded
+when that preparation is integrated. Components consume session state rather than Supabase Auth.
 
 ### 9.5 IndexedDb Usage
 
@@ -680,7 +608,7 @@ ux/
 ```
 
 `shell-makers.tsx`'s `makeAnonymousShell()`/`makeDashboardShell()` take `Login`/`AboutBox` as
-parameters rather than importing them directly, so this tier carries no reference to branded
+route-component parameters rather than importing them directly, so this tier carries no reference to branded
 components (`§9.1`).
 
 #### 10.1.3 swarmAg-suite foundation (`app/`)
@@ -727,10 +655,10 @@ swarmag-app-customer = front/app-customer + front/app + front/ux + front/api + f
 - Three Vite configs, one per app
 - Three Netlify sites, one per app
 - `front/ux/` and `front/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
-- `ux/config/` contains two files when packaged: `ux-config.ts` and the target env file
+- `front/config/` contains two files when packaged: `ux-config.ts` and the target env file
 - The target env file binds the static bundle to one backend target; the same
   bundle may be served locally or remotely without changing that binding
-- `bootstrap()` owns global boot-time initialization — CSS barrel (`css.tsx`), config (`ux-config.ts`), session synchronization, and shell route runtime mounting. App roots (`app.tsx`) declare a complete `Application` and pass it to `bootstrap(application)`
+- `bootstrap()` owns generic boot-time initialization — CSS barrel (`css.tsx`), preference state, application-supplied session initialization, and shell route runtime mounting. App roots (`app.tsx`) declare a complete `Application` and pass it to `bootstrap(application)`; application roots initialize package configuration first
 - Packaging, artifact format, and deployment workflow: see `architecture-devops.md §7`
 - No build artifacts are checked into the repository
 
@@ -1010,5 +938,15 @@ until an attachment or note is provided.
 │  [<-]  o o o o o O o o  [===>]  │
 └─────────────────────────────────┘
 ```
+
+## 12. Shell/App Split Bindings
+
+The app-tier shell makers bind Login, About, auth-backed logout, and a footer component.
+Dashboard owns footer placement; the supplied component owns content and branding. Generic makers
+use `ShellPageView` and `ShellOverlayView` for route components, not rendered `UiComponent` values.
+All logo assets live flat in `front/app/assets/`. The style guide owns a separate local logo copy.
+Moved presentation imports generic helpers through `@front/ux/`; only co-located imports stay relative.
+`ConfigTable`, `PanelProbe`, and shell metadata remain generic UX modules. Configuration-property
+semantics and existing Seasons Computing diagnostic attribution are unchanged by this split.
 
 _End of Architecture UX Document_

@@ -14,15 +14,16 @@ PUBLIC
 logout  Ends the active session and clears local session state.
 */
 
-import { api } from '@front/api/api.ts'
+import type { ApiAuthContract } from '@core/api/api-auth-contract.ts'
+import { SessionState } from './session-state.ts'
 
 /** End the active session and always clear local session state. */
-export async function logout(): Promise<void> {
+export async function logout(auth: ApiAuthContract): Promise<void> {
   try {
-    await api.Auth.logout()
+    await auth.logout()
   } catch (error) {
     console.error('[logout] logout failed', error)
   } finally {
-    api.SessionState.clear()
+    SessionState.clear()
   }
 }

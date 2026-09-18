@@ -21,8 +21,8 @@ import {
 import '@front/ux/ui/css/css.tsx'
 import './style-guide.css'
 
-import logo from '@front/ux/assets/logos/swarmag-logo-wordmark.png'
 import icon from './favicon.ico'
+import logo from './swarmag-logo-wordmark.png'
 
 import {
   ACCORDION_DEFAULT_VALUE,
