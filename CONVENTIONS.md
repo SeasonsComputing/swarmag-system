@@ -36,18 +36,20 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 | `@domain/` | `source/domain/` |
 | `@back/`   | `source/back/`   |
 | `@front/`  | `source/front/`  |
+| `@ux/`     | `source/ux/`     |
 | `@devops/` | `source/devops/` |
 | `@tests/`  | `source/tests/`  |
 
 ### 3.2 Barrel aliases
 
-Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@front/ux/shell/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§12).
+Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@ux/shell/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§12).
 
-| Alias          | Resolves to                           |
-| -------------- | ------------------------------------- |
-| `@core/std`    | `source/core/std/std.ts`              |
-| `@core/stdx`   | `source/core/std/stdx.ts`             |
-| `@front/ux/ui` | `source/front/ux/ui/components/ui.ts` |
+| Alias        | Resolves to                     |
+| ------------ | ------------------------------- |
+| `@core/std`  | `source/core/std/std.ts`        |
+| `@core/stdx` | `source/core/std/stdx.ts`       |
+| `@ux/ui`     | `source/ux/ui/components/ui.ts` |
+| `@ux/css`    | `source/ux/ui/css/css.tsx`      |
 
 ### 3.3 Import Rules
 
