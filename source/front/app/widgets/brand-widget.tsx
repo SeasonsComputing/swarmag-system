@@ -14,9 +14,9 @@ PUBLIC
 BrandWidget  Dashboard header brand widget.
 */
 
-import { getShellIdentity } from '@front/ux/shell/shell-metadata.ts'
-import { UiLayout } from '@front/ux/ui'
-import type { UiComponent } from '@front/ux/ui'
+import { getShellIdentity } from '@ux/shell/shell-metadata.ts'
+import { UiLayout } from '@ux/ui'
+import type { UiComponent } from '@ux/ui'
 
 import './brand-widget.css'
 import headerLogo from '@front/app/assets/swarmag-ops-logo-flat.png'

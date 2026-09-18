@@ -3,8 +3,8 @@ import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 import { walk } from '@std/walk'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
-const COMMON_DIR = `${ROOT}/source/front/ux`
-const CSS_DIR = `${ROOT}/source/front/ux/ui/css`
+const COMMON_DIR = `${ROOT}/source/ux`
+const CSS_DIR = `${ROOT}/source/ux/ui/css`
 const APP_DIRS = [
   `${ROOT}/source/front/app-admin`,
   `${ROOT}/source/front/app-customer`,
@@ -390,8 +390,8 @@ const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
 }
 
 const featureNamespace = (filePath: string): string => {
-  if (filePath.startsWith('source/front/ux/shell/')) return 'data-shell'
-  if (filePath.startsWith('source/front/ux/widgets/')) return 'data-widget'
+  if (filePath.startsWith('source/ux/shell/')) return 'data-shell'
+  if (filePath.startsWith('source/ux/widgets/')) return 'data-widget'
   return 'data-app'
 }
 
@@ -590,7 +590,7 @@ const main = async () => {
 
   for (const fileName of CSS_FILES) {
     const filePath = `${CSS_DIR}/${fileName}`
-    const relative = `source/front/ux/ui/css/${fileName}`
+    const relative = `source/ux/ui/css/${fileName}`
     designSystemFiles.add(filePath)
 
     const content = await Deno.readTextFile(filePath)

@@ -24,7 +24,7 @@ import { AppState } from './app-state.ts'
 import { compileApplicationRoutes } from './shell-compiler.tsx'
 import type { ShellApplication } from './shell.ts'
 
-import '@front/ux/ui/css/css.tsx'
+import '@ux/css'
 
 // ────────────────────────────────────────────────────────────────────────────
 // APPLICATION BOOTSTRAP

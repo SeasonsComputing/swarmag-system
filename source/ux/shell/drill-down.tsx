@@ -15,8 +15,8 @@ DrillDownProps  Props for the drill-down host.
 DrillDown       Render the drill-down host surface.
 */
 
-import { UiActionButton, type UiComponent } from '@front/ux/ui'
 import { createEffect, createSignal, getOwner, onCleanup, runWithOwner, Show } from '@solid-js'
+import { UiActionButton, type UiComponent } from '@ux/ui'
 import type { DrillContract, DrillReturnControl } from './drill-contract.ts'
 
 import './drill-down.css'

@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { UiCard, type UiComponent, type UiContainerProps } from '@front/ux/ui'
+import { UiCard, type UiComponent, type UiContainerProps } from '@ux/ui'
 import type { PanelHeaderProps } from './panel-contract.ts'
 import { PanelHeader } from './panel-header.tsx'
 

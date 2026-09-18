@@ -8,11 +8,11 @@
 import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
 import { type UserDraft, UserEditor } from '@front/app-admin/users/user-manager-editor.tsx'
-import type { AbstractionManagerContract } from '@front/ux/shell/abstraction-manager-contract.ts'
-import { AbstractionManager } from '@front/ux/shell/abstraction-manager.tsx'
-import { UiAlert, type UiComponent, UiLayout, UiTableCell, UiText } from '@front/ux/ui'
 import { For, Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
+import type { AbstractionManagerContract } from '@ux/shell/abstraction-manager-contract.ts'
+import { AbstractionManager } from '@ux/shell/abstraction-manager.tsx'
+import { UiAlert, type UiComponent, UiLayout, UiTableCell, UiText } from '@ux/ui'
 
 import './user-manager.css'
 

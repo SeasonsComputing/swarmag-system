@@ -7,18 +7,10 @@
 
 import { expectEmail, expectNonEmptyString, toEmail } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS, type ContactPreferredChannel } from '@domain/abstractions/common.ts'
-import { useAbstractionFormKeyboard } from '@front/ux/shell/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@front/ux/shell/use-abstraction-form-validation.ts'
-import {
-  type UiComponent,
-  UiField,
-  UiFieldset,
-  UiInput,
-  UiLayout,
-  UiSingleSelect,
-  UiText
-} from '@front/ux/ui'
 import { onCleanup } from '@solid-js'
+import { useAbstractionFormKeyboard } from '@ux/shell/use-abstraction-form-keyboard.ts'
+import { useAbstractionFormValidation } from '@ux/shell/use-abstraction-form-validation.ts'
+import { type UiComponent, UiField, UiFieldset, UiInput, UiLayout, UiSingleSelect, UiText } from '@ux/ui'
 import type { OnboardingState } from './onboarding-state.ts'
 
 /** Props for the contact stage. */

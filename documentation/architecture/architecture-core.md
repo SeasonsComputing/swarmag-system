@@ -151,6 +151,7 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
     "@domain/": "./source/domain/",
     "@back/": "./source/back/",
     "@front/": "./source/front/",
+    "@ux/": "./source/ux/",
     "@devops/": "./source/devops/",
     "@tests/": "./source/tests/",
 
@@ -160,7 +161,8 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
 
     "@core/std": "./source/core/std/std.ts",
     "@core/stdx": "./source/core/std/stdx.ts",
-    "@front/ux/ui": "./source/front/ux/ui/components/ui.ts",
+    "@ux/ui": "./source/ux/ui/components/ui.ts",
+    "@ux/css": "./source/ux/ui/css/css.tsx",
 
     // ────────────────────────────────────────────────────────────────────────────
     // VENDOR ALIASES
@@ -761,15 +763,12 @@ Configuration is declared in higher layers but accessible in lower layers throug
 **Dependency Rules:**
 
 ```text
-tests/devops  ──> ux, back, domain, core
-  ↓
- ux           ──> domain, core
-  ↓
+tests/devops  ──> front, ux, back, domain, core
+front         ──> ux, domain, core
+ux            ──> domain, core
 back          ──> domain, core
-  ↓
 domain        ──> core
-  ↓
-core          (no dependencies)
+core          (no internal layer dependencies)
 ```
 
 These rules are enforced through import discipline and architectural guards. Violations are build failures.
@@ -812,13 +811,16 @@ swarmag-system/
 │   │   ├── app-customer/
 │   │   ├── app-ops/
 │   │   ├── app-style-guide/
-│   │   ├── config/
-│   │   └── ux/
-│   │       ├── shell/
-│   │       ├── stores/
-│   │       ├── ui/
-│   │       ├── views/
-│   │       └── widgets/
+│   │   └── config/
+│   ├── ux/
+│   │   ├── shell/
+│   │   ├── ui/
+│   │   │   ├── charts/
+│   │   │   ├── components/
+│   │   │   ├── css/
+│   │   │   ├── fonts/
+│   │   │   └── icons/
+│   │   └── widgets/
 │   ├── devops/
 │   └── tests/
 │       ├── cases/
@@ -996,7 +998,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 #### 10.1.8 Import maps only
 
-- All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@front/`)
+- All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@front/`, `@ux/`)
 - No relative imports across top-level namespaces
 - Import maps defined in `deno.jsonc`
 - Platform-specific maps (per-function `deno.json` plus

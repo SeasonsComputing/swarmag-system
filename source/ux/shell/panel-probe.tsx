@@ -20,8 +20,8 @@ PUBLIC
 PanelProbe  Floating action that opens a measurement readout.
 */
 
-import { UiActionButton, UiDialog, UiTextArea } from '@front/ux/ui'
 import { createSignal } from '@solid-js'
+import { UiActionButton, UiDialog, UiTextArea } from '@ux/ui'
 
 import './panel-probe.css'
 

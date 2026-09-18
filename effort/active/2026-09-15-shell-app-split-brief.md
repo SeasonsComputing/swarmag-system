@@ -5,7 +5,7 @@ This scope supersedes the earlier proposed identity callback and AuthenticatedUs
 
 ## Objective
 
-Keep `front/ux/` portable, bind swarmAg behavior and branding in `front/app/`, and compose both
+Keep `ux/` portable, bind swarmAg behavior and branding in `front/app/`, and compose both
 in each application root. Preserve route behavior, visual presentation, and auth publication timing.
 
 ## The governing principle: registry vs. instance

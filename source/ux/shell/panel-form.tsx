@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { UiAlert, UiCard, type UiContainerProps } from '@front/ux/ui'
+import { UiAlert, UiCard, type UiContainerProps } from '@ux/ui'
 import type { PanelFeedback, PanelHeaderProps } from './panel-contract.ts'
 import { PanelHeader } from './panel-header.tsx'
 

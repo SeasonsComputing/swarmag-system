@@ -19,9 +19,11 @@ import type { Location, Note } from '@domain/abstractions/common.ts'
 import type { CustomerSite } from '@domain/abstractions/customer.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 import { isCustomerSite } from '@domain/validators/customer-validator.ts'
-import { CollectionPanel } from '@front/ux/shell/collection-panel.tsx'
-import type { DrillContract, DrillReturnControl } from '@front/ux/shell/drill-contract.ts'
-import { DrillDown } from '@front/ux/shell/drill-down.tsx'
+import { createEffect, createSignal, onCleanup, onMount, Show } from '@solid-js'
+import { createStore, produce, type SetStoreFunction } from '@solid-js/store'
+import { CollectionPanel } from '@ux/shell/collection-panel.tsx'
+import type { DrillContract, DrillReturnControl } from '@ux/shell/drill-contract.ts'
+import { DrillDown } from '@ux/shell/drill-down.tsx'
 import {
   UiActionButton,
   type UiActionButtonProps,
@@ -38,9 +40,7 @@ import {
   UiTextArea,
   UiToggleGroup,
   UiToggleItem
-} from '@front/ux/ui'
-import { createEffect, createSignal, onCleanup, onMount, Show } from '@solid-js'
-import { createStore, produce, type SetStoreFunction } from '@solid-js/store'
+} from '@ux/ui'
 import {
   cloneCustomerSite,
   cloneNote,

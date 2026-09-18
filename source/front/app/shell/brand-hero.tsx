@@ -14,8 +14,8 @@ PUBLIC
 BrandHero  Logo, product name, and application name hero block.
 */
 
-import { getShellMetadata } from '@front/ux/shell/shell-metadata.ts'
-import { type UiComponent, UiLayout } from '@front/ux/ui'
+import { getShellMetadata } from '@ux/shell/shell-metadata.ts'
+import { type UiComponent, UiLayout } from '@ux/ui'
 
 import './brand-hero.css'
 import logoArt from '@front/app/assets/swarmag-ops-logo-art.png'

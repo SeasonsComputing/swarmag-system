@@ -424,7 +424,7 @@ A dashboard widget archetype that groups commands by topic — Users Hub, Custom
 Equipment & Chemicals Hub, Workflows/Tasks/Questions Hub, Jobs Hub — full disclosure, bespoke
 per-topic content, no fixed visualization (a row of action buttons, a full-bleed artistic
 surface with hotspot triggers, and an inline data table are all legitimate presentations of the
-same archetype). Distinct from `JobHub` (`source/front/ux/views/job-views.ts`), an existing,
+same archetype). Distinct from `JobHub` (`source/front/app/views/job-views.ts`), an existing,
 shipped data-projection type for the same underlying idea at the data layer, not the widget
 layer.
 

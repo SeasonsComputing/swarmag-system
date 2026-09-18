@@ -63,20 +63,18 @@ Generate the shared UX infrastructure consumed by all three apps.
 #### 2.2.1 Files
 
 ```text
-source/front/ux/
-  views/
-    job.ts
-  components/
-    login/
-      login.tsx
-    forms/
-      form-panel.tsx
-    shell/
-      auth-guard.tsx
-      content.tsx
-  lib/
+source/ux/
+  shell/
+    auth-guard.tsx
+    panel-container.tsx
+    panel-form.tsx
     session-state.ts
     app-state.ts
+source/front/app/
+  shell/
+    login.tsx
+  views/
+    job-views.ts
 ```
 
 Pre-existing auth client integration remains unchanged and is out of scaffold
@@ -88,7 +86,7 @@ source/core/cli/auth-supabase-client.ts
 
 #### 2.2.2 Specifications
 
-**`views/job-views.ts`**
+**`source/front/app/views/job-views.ts`**
 
 UX-local shared view types for job display. Consumed by both `app-admin` and
 `app-ops`. Not domain types — these are display projections only. No
@@ -117,7 +115,7 @@ export type JobHub = {
 Imports: `Id` from `@core/std`; `JobStatus`, `Job`, `JobAssessment`,
 `JobPlan` from `@domain/abstractions/job.ts`.
 
-**`lib/session-state.ts`**
+**`source/ux/shell/session-state.ts`**
 
 SolidJS store module for auth/session state. Shared across all apps. Implements
 the contract defined in `architecture-front.md` §6.4.
@@ -162,7 +160,7 @@ export { SessionState }
 
 `SessionState` API shape per `architecture-front.md` §6.4.
 
-**`lib/app-state.ts`**
+**`source/ux/shell/app-state.ts`**
 
 Per-app IndexedDB preferences store. Takes the app's store name (per
 `architecture-front.md` §6.5.1) and manages preference key reads/writes.
@@ -171,7 +169,7 @@ Implemented using `makeCrudIndexedDbClient<AppState>` where
 `AppState = Dictionary`. Use real IndexedDB reads/writes through the client
 maker (no stubbed IDB operations).
 
-**`components/`**
+**`source/ux/shell/` and `source/front/app/shell/`**
 
 Common UX behavior is defined by architecture and is not restated here:
 
@@ -180,7 +178,7 @@ Common UX behavior is defined by architecture and is not restated here:
 - File inventory baseline: `architecture-front.md` §6.8
 
 Path note: `auth-guard.tsx` is at
-`source/front/ux/ui/shell/auth-guard.tsx`.
+`source/ux/shell/auth-guard.tsx`.
 
 ### 2.3 Phase II — App Admin Shell
 
@@ -272,7 +270,7 @@ this device — not full aggregates. Full job trees are read from IDB on demand
 by the workflow engine only.
 
 - Backed by SolidJS `createStore`.
-- Import `JobManifest` from `@front/ux/views/job-views.ts`.
+- Import `JobManifest` from `@front/app/views/job-views.ts`.
 - Shape:
 
 ```typescript
@@ -387,9 +385,9 @@ Responses that include code changes must include:
 Before reporting `STYLE_AUDIT: PASS`:
 
 - All Common UX artifacts conform to `architecture-front.md` §6.3-§6.8.
-- `source/front/ux/views/job-views.ts` exists and exports `JobManifest` and
+- `source/front/app/views/job-views.ts` exists and exports `JobManifest` and
   `JobHub` as pure types with no infrastructure imports.
-- `auth-guard.tsx` is at `source/front/ux/ui/shell/auth-guard.tsx`.
+- `auth-guard.tsx` is at `source/ux/shell/auth-guard.tsx`.
 - `session-state.ts` exports `SessionState` with `store`, `setAuth`, `setUser`,
   `setReady`, and `clear`. No raw setter calls outside this module.
 - `app-state.ts` uses `makeCrudIndexedDbClient<AppState>` for IDB persistence
@@ -405,7 +403,7 @@ Before reporting `STYLE_AUDIT: PASS`:
   result to `SessionState.setUser`; calls `SessionState.setReady`; uses store name
   `'swarmag-customer-app'`; imports `Config` from `@front/config/ux-config.ts`;
   does not write `dashboard:panels` key.
-- `jobs-store.ts`: imports `JobManifest` from `@front/ux/views/job-views.ts`; shape
+- `jobs-store.ts`: imports `JobManifest` from `@front/app/views/job-views.ts`; shape
   uses `JobManifest[]` and `isLoaded`; `loadJobs()` reads from IDB and sets
   `isLoaded: true`; no Supabase calls.
 - No prop-drilling of session or user — all consumers read from

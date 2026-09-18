@@ -15,6 +15,7 @@ AbstractionManager  Generic list+panel manager component.
 */
 
 import type { Instance } from '@core/std'
+import { createEffect, createSignal, For, Show } from '@solid-js'
 import {
   UiActionButton,
   UiAlert,
@@ -26,8 +27,7 @@ import {
   UiTableCell,
   UiTableHeader,
   UiTableRow
-} from '@front/ux/ui'
-import { createEffect, createSignal, For, Show } from '@solid-js'
+} from '@ux/ui'
 import type {
   AbstractionAction,
   AbstractionEditorHandle,

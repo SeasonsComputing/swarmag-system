@@ -21,9 +21,9 @@ HelmWidget  Dashboard header navigation control cluster.
 */
 
 import type { Dictionary } from '@core/std'
-import { useShellNavigate } from '@front/ux/shell/use-shell-navigate.ts'
-import { UiActionButton, type UiActionButtonLabelMode, type UiComponent, UiLayout } from '@front/ux/ui'
 import { createSignal, For } from '@solid-js'
+import { useShellNavigate } from '@ux/shell/use-shell-navigate.ts'
+import { UiActionButton, type UiActionButtonLabelMode, type UiComponent, UiLayout } from '@ux/ui'
 
 import './helm-widget.css'
 

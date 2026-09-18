@@ -19,20 +19,12 @@ Login Passwordless OTP login component.
 */
 
 import { api } from '@front/api/api.ts'
-import { ConfigTable } from '@front/ux/shell/config-table.tsx'
-import { getShellMetadata } from '@front/ux/shell/shell-metadata.ts'
-import type { ShellMetadata } from '@front/ux/shell/shell-metadata.ts'
-import { ShellReplace } from '@front/ux/shell/shell-navigate.tsx'
-import {
-  UiActionButton,
-  UiAlert,
-  UiButton,
-  UiField,
-  UiFormActions,
-  UiInput,
-  UiLayout
-} from '@front/ux/ui'
 import { createSignal, onMount, Show } from '@solid-js'
+import { ConfigTable } from '@ux/shell/config-table.tsx'
+import { getShellMetadata } from '@ux/shell/shell-metadata.ts'
+import type { ShellMetadata } from '@ux/shell/shell-metadata.ts'
+import { ShellReplace } from '@ux/shell/shell-navigate.tsx'
+import { UiActionButton, UiAlert, UiButton, UiField, UiFormActions, UiInput, UiLayout } from '@ux/ui'
 import { BrandHero } from './brand-hero.tsx'
 
 import './login.css'

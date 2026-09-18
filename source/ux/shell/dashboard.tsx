@@ -14,9 +14,9 @@ PUBLIC
 Dashboard  Shared shell dashboard component.
 */
 
-import { UiCard } from '@front/ux/ui'
-import type { UiComponent } from '@front/ux/ui'
 import { For, Show } from '@solid-js'
+import { UiCard } from '@ux/ui'
+import type { UiComponent } from '@ux/ui'
 import type { DashboardStateContract, DashboardStoreWidget } from './dashboard-state.ts'
 import type { WidgetComponent, WidgetRegistry } from './widget-contract.ts'
 

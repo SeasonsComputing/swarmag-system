@@ -132,12 +132,12 @@ confirmed that the code agrees with itself.
 
 Normalize shared control-state styling primarily in:
 
-- `source/front/ux/ui/css/ui.css`
+- `source/ux/ui/css/ui.css`
 
 Update component comments only where stale or misleading:
 
-- `source/front/ux/ui/components/ui-action-button.tsx`
-- other `source/front/ux/ui/components/ui-*.tsx` files only if their comments
+- `source/ux/ui/components/ui-action-button.tsx`
+- other `source/ux/ui/components/ui-*.tsx` files only if their comments
   misstate the normalized state contract.
 
 The production should prefer deleting inconsistent special-case rules over adding
@@ -184,20 +184,20 @@ that should be consistent with the wider hover model rather than an accident.
 
 In:
 
-- `source/front/ux/ui/css/ui.css`
+- `source/ux/ui/css/ui.css`
 
 Possibly in:
 
-- `source/front/ux/ui/components/ui-action-button.tsx`
-- `source/front/ux/ui/components/ui-button.tsx`
-- `source/front/ux/ui/components/ui-checkbox.tsx`
-- `source/front/ux/ui/components/ui-radio-group.tsx`
-- `source/front/ux/ui/components/ui-toggle.tsx`
-- `source/front/ux/ui/components/ui-tabs.tsx`
-- `source/front/ux/ui/components/ui-accordion.tsx`
-- `source/front/ux/ui/components/ui-single-select.tsx`
-- `source/front/ux/ui/components/ui-multi-select.tsx`
-- `source/front/ux/ui/components/ui-collection-cursor.tsx`
+- `source/ux/ui/components/ui-action-button.tsx`
+- `source/ux/ui/components/ui-button.tsx`
+- `source/ux/ui/components/ui-checkbox.tsx`
+- `source/ux/ui/components/ui-radio-group.tsx`
+- `source/ux/ui/components/ui-toggle.tsx`
+- `source/ux/ui/components/ui-tabs.tsx`
+- `source/ux/ui/components/ui-accordion.tsx`
+- `source/ux/ui/components/ui-single-select.tsx`
+- `source/ux/ui/components/ui-multi-select.tsx`
+- `source/ux/ui/components/ui-collection-cursor.tsx`
 
 Only touch component files if their comments, emitted state attributes, or
 contracts are stale or insufficient for the normalized state model.

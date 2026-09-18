@@ -14,7 +14,7 @@ redirecting.
 SHELL COMPOSITION
 ───────────────────────────────────────────────────────────────────────────────
 ShellApplication          Complete application shell composition.
-SessionCoordinator        Application-owned session initialization.
+SessionCoordinatorContract  Application-owned session initialization.
 Shell                     Component, initializers, and routes for one shell.
 ShellInitializer          Initializer contract for a shell.
 
@@ -47,7 +47,7 @@ Routes                    Route factory convenience container.
 
 */
 
-import type { UiComponent, UiDialogSize } from '@front/ux/ui'
+import type { UiComponent, UiDialogSize } from '@ux/ui'
 
 // ────────────────────────────────────────────────────────────────────────────
 // SHELL COMPOSITION
@@ -56,12 +56,13 @@ import type { UiComponent, UiDialogSize } from '@front/ux/ui'
 /** Complete shell composition supplied by one application package. */
 export type ShellApplication = {
   shells: Shell[]
-  session: SessionCoordinator
+  session: SessionCoordinatorContract
 }
 
 /** Application-owned session initialization, called synchronously during mount. */
-export interface SessionCoordinator {
+export interface SessionCoordinatorContract {
   init(): void
+  clear(): void
 }
 
 /** One application shell compiled beneath the TanStack root route. */
@@ -144,7 +145,7 @@ export type ShellOverlayOptions = {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Create a complete application composition. */
-const application = (shells: Shell[], session: SessionCoordinator): ShellApplication => ({
+const application = (shells: Shell[], session: SessionCoordinatorContract): ShellApplication => ({
   shells,
   session
 })

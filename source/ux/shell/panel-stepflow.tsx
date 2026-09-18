@@ -10,8 +10,8 @@ Renders a compact, read-only stepflow from ordered stage labels and their
 workflow state.
 */
 
-import { UiCard, type UiComponent, UiList, UiListItem } from '@front/ux/ui'
 import { For } from '@solid-js'
+import { UiCard, type UiComponent, UiList, UiListItem } from '@ux/ui'
 import type { PanelHeaderProps } from './panel-contract.ts'
 import { PanelHeader } from './panel-header.tsx'
 
