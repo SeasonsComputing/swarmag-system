@@ -8,8 +8,8 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Prevents circular and upward dependencies in the front architecture. Ensures
 ux/ui remains domain-agnostic and reusable, apps stay isolated leaves, and
-ux/* does not import out of its own front sub-namespace — not merely
-"no app-* imports," any front/ sibling is off limits to ux/*.
+source/ux does not import front application code. Front API consumers may
+import the generic UX stores.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -30,10 +30,10 @@ const SOURCE_DIR = `${ROOT}/source`
 const FORBIDDEN_UI_IMPORTS = [
   '@domain/',
   '@front/api/',
-  '@front/ux/stores',
-  '@front/ux/shell',
-  '@front/ux/widgets',
-  '@front/ux/views',
+  '@ux/stores',
+  '@ux/shell',
+  '@ux/widgets',
+  '@ux/views',
   '@front/app-',
   '@back/',
   '@devops/',
@@ -68,7 +68,7 @@ const isAppImport = (spec: string): string | null => {
   return match ? match[1] : null
 }
 
-/** Extract the top-level front sub-namespace a specifier targets, e.g. '@front/ux/shell' -> 'ux'. */
+/** Extract the top-level front sub-namespace a specifier targets, e.g. '@front/app/shell' -> 'app'. */
 const frontSubNamespace = (spec: string): string | null => {
   const match = spec.match(/^@front\/([^/]+)/)
   return match ? match[1] : null
@@ -107,9 +107,9 @@ const resolveRelativeImport = (file: string, spec: string): string => {
 
 /** Check if an import specifier reaches the shared widget catalog. */
 const isWidgetImport = (file: string, spec: string): boolean => {
-  if (spec.startsWith('@front/ux/widgets/') || spec === '@front/ux/widgets') return true
+  if (spec.startsWith('@ux/widgets/') || spec === '@ux/widgets') return true
   if (!spec.startsWith('.')) return false
-  const widgetsDir = `${SOURCE_DIR}/front/ux/widgets`
+  const widgetsDir = `${SOURCE_DIR}/ux/widgets`
   const importedPath = resolveRelativeImport(file, spec)
   return importedPath === widgetsDir || isUnder(importedPath, widgetsDir)
 }
@@ -129,7 +129,7 @@ const main = async () => {
   const frontDir = `${SOURCE_DIR}/front`
 
   for await (
-    const entry of walk(frontDir, {
+    const entry of walk(SOURCE_DIR, {
       includeDirs: false,
       exts: ['.ts', '.tsx'],
       skip: [/[/\\]dist[/\\]?/, /[/\\]node_modules[/\\]?/]
@@ -140,11 +140,12 @@ const main = async () => {
     const source = await Deno.readTextFile(file)
     const imports = extractImports(source)
 
-    const isUiFile = isUnder(file, `${frontDir}/ux/ui`)
-    const isUxFile = isUnder(file, `${frontDir}/ux`)
-    const isAppFile = isUnder(file, `${frontDir}/app-`)
-    const isShellFile = isUnder(file, `${frontDir}/ux/shell`)
+    const isUiFile = isUnder(file, `${SOURCE_DIR}/ux/ui`)
+    const isUxFile = isUnder(file, `${SOURCE_DIR}/ux`)
+    const isShellFile = isUnder(file, `${SOURCE_DIR}/ux/shell`)
     const fileAppName = extractAppName(file)
+
+    if (!isUxFile && !isUnder(file, frontDir)) continue
 
     for (const spec of imports) {
       // Rule 1: ux/ui files cannot import forbidden namespaces
@@ -152,17 +153,14 @@ const main = async () => {
         violations.push(`${relative} — ${spec} — Rule 1`)
       }
 
-      // Rule 2: ux/* cannot import out of its own
-      // front sub-namespace — not just @front/app-*, any @front/* sibling.
-      // ux may depend on ux, domain, core, and external packages; nothing
-      // else under front/ is available for ux to import.
+      // Rule 2: The generic UX toolkit cannot import any front application namespace.
       const importedFrontNamespace = frontSubNamespace(spec)
-      if (isUxFile && importedFrontNamespace !== null && importedFrontNamespace !== 'ux') {
+      if (isUxFile && importedFrontNamespace !== null) {
         violations.push(`${relative} — ${spec} — Rule 2`)
       }
 
       // Rule 3: Apps cannot import other apps
-      if (isAppFile && isAppImport(spec)) {
+      if (fileAppName && isAppImport(spec)) {
         const importedApp = isAppImport(spec)
         if (fileAppName && importedApp && fileAppName !== importedApp) {
           violations.push(`${relative} — ${spec} — Rule 3`)

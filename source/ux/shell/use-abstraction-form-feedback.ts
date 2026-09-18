@@ -21,8 +21,8 @@ FORM_FEEDBACK_MESSAGE                                      Standard failure copy
 useAbstractionFormFeedback(formRef, feedback, message?)    Wire the bridge.
 */
 
-import type { PanelFeedback } from '@front/ux/shell/panel-contract.ts'
 import { onCleanup, onMount } from '@solid-js'
+import type { PanelFeedback } from '@ux/shell/panel-contract.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC

@@ -14,8 +14,8 @@ makeAnonymousShell  Creates a shell with no authentication required.
 makeDashboardShell  Creates a dashboard shell with authentication required.
 */
 
-import type { UiComponent } from '@front/ux/ui'
 import { Outlet } from '@tanstack/solid-router'
+import type { UiComponent } from '@ux/ui'
 import { AuthGuard } from './auth-guard.tsx'
 import { DashboardState, type DashboardStateSeed } from './dashboard-state.ts'
 import { Dashboard } from './dashboard.tsx'

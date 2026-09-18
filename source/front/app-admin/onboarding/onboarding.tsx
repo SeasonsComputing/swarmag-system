@@ -13,10 +13,10 @@ import { OnboardingStageContact } from '@front/app-admin/onboarding/onboarding-s
 import { OnboardingStageCustomer } from '@front/app-admin/onboarding/onboarding-stage-customer.tsx'
 import { OnboardingStageSites } from '@front/app-admin/onboarding/onboarding-stage-sites.tsx'
 import { createOnboardingState } from '@front/app-admin/onboarding/onboarding-state.ts'
-import type { WizardContract, WizardStage } from '@front/ux/shell/wizard-contract.ts'
-import { Wizard } from '@front/ux/shell/wizard.tsx'
-import type { UiActionButtonProps, UiComponent } from '@front/ux/ui'
 import { createSignal } from '@solid-js'
+import type { WizardContract, WizardStage } from '@ux/shell/wizard-contract.ts'
+import { Wizard } from '@ux/shell/wizard.tsx'
+import type { UiActionButtonProps, UiComponent } from '@ux/ui'
 
 import './onboarding.css'
 

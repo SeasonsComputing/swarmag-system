@@ -1,26 +1,30 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Widget contract                                                              ║
-║ Shell-owned extension contracts for dashboard widgets.                       ║
+║ Drill contract                                                               ║
+║ Explicit shell contract for opening one drill-down panel from another.       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines the stable contracts through which applications bind concrete widgets
-to the shell. Widgets may consume public shell services, while the shell remains
-closed to concrete widget implementations.
+Defines the prop-threaded panel opening contract used by drill-down hosts and
+collections.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-WidgetComponent        Dashboard widget component contract.
-WidgetRegistry         Widget registry keyed by dashboard widget type string.
+DrillContract       Contract implemented by a drill-down host.
+DrillReturnControl  Host-owned command surface for drill return navigation.
 */
 
-import type { Dictionary } from '@core/std'
-import type { UiComponent } from '@front/ux/ui'
+import type { UiComponent } from '@ux/ui'
 
-/** Dashboard widget component contract. */
-export type WidgetComponent = (props: { settings: Dictionary }) => UiComponent
+/** Contract implemented by a drill-down host to replace the current panel. */
+export interface DrillContract {
+  open: (panel: () => UiComponent, title: string, pathSegment?: string) => void
+}
 
-/** Widget registry keyed by dashboard widget type string. */
-export type WidgetRegistry = Dictionary<WidgetComponent>
+/** Host-owned command surface for returning from the active drill panel. */
+export type DrillReturnControl = {
+  path: () => readonly string[]
+  returnTitle: () => string
+  returnToIndex: () => void
+}

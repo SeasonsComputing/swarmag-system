@@ -64,14 +64,15 @@ Effort documents capture working project context. Status-bearing effort records 
 
 ### 1.3 Source Layers (`source/`)
 
-| Path      | Description                                                       |
-| --------- | ----------------------------------------------------------------- |
-| `core/`   | Fundamental types and utilities used by all layers                |
-| `back/`   | Backend runtime modules (config, functions, migrations)           |
-| `front/`  | Client-facing user experiences, apps, contracts, and UI libraries |
-| `domain/` | Domain model and domain-layer contracts                           |
-| `devops/` | Architecture and environment `guard-*` scripts                    |
-| `tests/`  | Test suites and supporting fixtures                               |
+| Path      | Description                                                           |
+| --------- | --------------------------------------------------------------------- |
+| `core/`   | Fundamental types and utilities used by all layers                    |
+| `back/`   | Backend runtime modules (config, functions, migrations)               |
+| `front/`  | swarmAg applications, shared application modules, and API composition |
+| `ux/`     | Portable UX toolkit, shell runtime, state, widgets, and UI foundation |
+| `domain/` | Domain model and domain-layer contracts                               |
+| `devops/` | Architecture and environment `guard-*` scripts                        |
+| `tests/`  | Test suites and supporting fixtures                                   |
 
 #### 1.3.1 Core (`source/core/`)
 
@@ -103,14 +104,28 @@ Effort documents capture working project context. Status-bearing effort records 
 
 #### 1.3.4 Frontend (`source/front/`)
 
-| Path               | Description                                          |
-| ------------------ | ---------------------------------------------------- |
-| `app-admin/`       | Admin PWA application (desktop/tablet)               |
-| `app-ops/`         | Operations PWA application (mobile, field execution) |
-| `app-customer/`    | Customer portal application (static, read-only)      |
-| `app-style-guide/` | Style-guide harness application                      |
-| `config/`          | Configuration bootstrap for UX applications          |
-| `ux/`              | Shared UX components, state, views, and UI libraries |
+| Path               | Description                                                 |
+| ------------------ | ----------------------------------------------------------- |
+| `app-admin/`       | Admin PWA application (desktop/tablet)                      |
+| `app-ops/`         | Operations PWA application (mobile, field execution)        |
+| `app-customer/`    | Customer portal application (static, read-only)             |
+| `app-style-guide/` | Style-guide harness application                             |
+| `app/`             | Shared swarmAg shell bindings, branding, views, and widgets |
+| `api/`             | Composed application API                                    |
+| `config/`          | Configuration bootstrap for UX applications                 |
+
+#### 1.3.5 UX Toolkit (`source/ux/`)
+
+| Path       | Description                                                    |
+| ---------- | -------------------------------------------------------------- |
+| `shell/`   | Bootstrap, routing, shell components, and shared state modules |
+| `ui/`      | UI primitives, CSS, fonts, and icons                           |
+| `widgets/` | Application-neutral widgets and their registry                 |
+
+Import toolkit modules through `@ux/`; `@ux/ui` exposes the UI component barrel and
+`@ux/css` loads the shared CSS foundation. `AppState`, `SessionState`, and `DashboardState`
+live in `source/ux/shell/`. swarmAg session coordination lives in
+`source/front/app/shell/session-coordinator.ts`.
 
 ## 2. Local Configuration
 

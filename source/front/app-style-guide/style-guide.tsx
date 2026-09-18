@@ -16,9 +16,9 @@ import {
   UiSkeleton, UiSpinner, UiTab, UiTable, UiTableBody, UiTableCell, UiTableHeader,
   UiTableRow, UiTabList, UiTabPanel, UiTabs, UiTextArea, UiToggle, UiToggleGroup,
   UiToggleItem, UiTooltip, type UiComponent, type UiContainerProps
-} from '@front/ux/ui'
+} from '@ux/ui'
 
-import '@front/ux/ui/css/css.tsx'
+import '@ux/css'
 import './style-guide.css'
 
 import icon from './favicon.ico'

@@ -16,8 +16,8 @@ ShellRedirect       Redirect to a route and preserve the current history entry.
 ShellReplace        Redirect to a route and replace the current history entry.
 */
 
-import { type UiComponent } from '@front/ux/ui'
 import { onMount } from '@solid-js'
+import { type UiComponent } from '@ux/ui'
 import { useShellNavigate } from './use-shell-navigate.ts'
 
 /** Properties for declarative shell navigation components. */

@@ -1,22 +1,26 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Widget registry                                                              ║
-║ Catalog of available widgets.                                                ║
+║ Widget contract                                                              ║
+║ Shell-owned extension contracts for dashboard widgets.                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Creates the concrete widget registry bound by each application composition root.
+Defines the stable contracts through which applications bind concrete widgets
+to the shell. Widgets may consume public shell services, while the shell remains
+closed to concrete widget implementations.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-widgetRegistry  Creates the concrete widget registry.
+WidgetComponent        Dashboard widget component contract.
+WidgetRegistry         Widget registry keyed by dashboard widget type string.
 */
 
-import type { WidgetRegistry } from '@front/ux/shell/widget-contract.ts'
-import { HelmWidget } from './helm-widget.tsx'
+import type { Dictionary } from '@core/std'
+import type { UiComponent } from '@ux/ui'
 
-/** Create the widget registry. */
-export const widgetRegistry = (): WidgetRegistry => ({
-  HelmWidget
-})
+/** Dashboard widget component contract. */
+export type WidgetComponent = (props: { settings: Dictionary }) => UiComponent
+
+/** Widget registry keyed by dashboard widget type string. */
+export type WidgetRegistry = Dictionary<WidgetComponent>

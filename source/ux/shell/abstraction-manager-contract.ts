@@ -19,7 +19,7 @@ AbstractionManagerContract     Provider contract for list-and-panel managers.
 */
 
 import type { Instance } from '@core/std'
-import type { UiActionButtonVariant, UiComponent } from '@front/ux/ui'
+import type { UiActionButtonVariant, UiComponent } from '@ux/ui'
 import type { PanelFeedback } from './panel-contract.ts'
 
 /** Confirmation copy for a consequential abstraction action. */

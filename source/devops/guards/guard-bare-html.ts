@@ -3,9 +3,9 @@ import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 import { walk } from '@std/walk'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
-const UX_DIR = `${ROOT}/source/front`
+const SOURCE_DIR = `${ROOT}/source`
 const SKIP_DIRS = [
-  'source/front/ux/ui/components',
+  'source/ux/ui/components',
   'source/front/app-style-guide'
 ]
 
@@ -46,7 +46,7 @@ const main = async () => {
   const violations: string[] = []
 
   for await (
-    const entry of walk(UX_DIR, {
+    const entry of walk(SOURCE_DIR, {
       includeDirs: false,
       exts: ['.tsx'],
       skip: [/[/\\]dist[/\\]?/, /[/\\]node_modules[/\\]?/]
@@ -54,6 +54,7 @@ const main = async () => {
   ) {
     const file = entry.path.replaceAll('\\', '/')
 
+    if (!file.startsWith(`${SOURCE_DIR}/front/`) && !file.startsWith(`${SOURCE_DIR}/ux/`)) continue
     if (shouldSkip(file)) continue
 
     const relative = file.replace(`${ROOT}/`, '')

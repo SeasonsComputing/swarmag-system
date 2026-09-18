@@ -15,8 +15,8 @@ PUBLIC
 AuthGuard  Route-level auth guard component.
 */
 
-import { type UiComponent, type UiContainerProps } from '@front/ux/ui'
 import { Match, Show, Switch } from '@solid-js'
+import { type UiComponent, type UiContainerProps } from '@ux/ui'
 import { SessionState } from './session-state.ts'
 import { ShellReplace } from './shell-navigate.tsx'
 

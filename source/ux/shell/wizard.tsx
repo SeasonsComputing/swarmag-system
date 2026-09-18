@@ -15,8 +15,8 @@ Wizard                  The wizard host component.
 WizardProps             Props for the wizard host.
 */
 
-import { UiActionButton, type UiComponent, UiList, UiListItem } from '@front/ux/ui'
 import { createMemo, createSignal, For, Show } from '@solid-js'
+import { UiActionButton, type UiComponent, UiList, UiListItem } from '@ux/ui'
 import type { DrillReturnControl } from './drill-contract.ts'
 import { PanelContainer } from './panel-container.tsx'
 import type { PanelFeedback } from './panel-contract.ts'

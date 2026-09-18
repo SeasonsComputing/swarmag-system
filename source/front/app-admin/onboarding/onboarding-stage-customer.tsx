@@ -7,8 +7,9 @@
 
 import { expectNonEmptyString } from '@core/std'
 import { CUSTOMER_STATUSES, type CustomerStatus } from '@domain/abstractions/customer.ts'
-import { useAbstractionFormKeyboard } from '@front/ux/shell/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@front/ux/shell/use-abstraction-form-validation.ts'
+import { For, onCleanup } from '@solid-js'
+import { useAbstractionFormKeyboard } from '@ux/shell/use-abstraction-form-keyboard.ts'
+import { useAbstractionFormValidation } from '@ux/shell/use-abstraction-form-validation.ts'
 import {
   type UiComponent,
   UiField,
@@ -18,8 +19,7 @@ import {
   UiText,
   UiToggleGroup,
   UiToggleItem
-} from '@front/ux/ui'
-import { For, onCleanup } from '@solid-js'
+} from '@ux/ui'
 import type { OnboardingState } from './onboarding-state.ts'
 
 /** Props for the customer and billing stage. */

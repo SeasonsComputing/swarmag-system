@@ -1,30 +1,22 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Drill contract                                                               ║
-║ Explicit shell contract for opening one drill-down panel from another.       ║
+║ Widget registry                                                              ║
+║ Catalog of available widgets.                                                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines the prop-threaded panel opening contract used by drill-down hosts and
-collections.
+Creates the concrete widget registry bound by each application composition root.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-DrillContract       Contract implemented by a drill-down host.
-DrillReturnControl  Host-owned command surface for drill return navigation.
+widgetRegistry  Creates the concrete widget registry.
 */
 
-import type { UiComponent } from '@front/ux/ui'
+import type { WidgetRegistry } from '@ux/shell/widget-contract.ts'
+import { HelmWidget } from './helm-widget.tsx'
 
-/** Contract implemented by a drill-down host to replace the current panel. */
-export interface DrillContract {
-  open: (panel: () => UiComponent, title: string, pathSegment?: string) => void
-}
-
-/** Host-owned command surface for returning from the active drill panel. */
-export type DrillReturnControl = {
-  path: () => readonly string[]
-  returnTitle: () => string
-  returnToIndex: () => void
-}
+/** Create the widget registry. */
+export const widgetRegistry = (): WidgetRegistry => ({
+  HelmWidget
+})

@@ -1,6 +1,6 @@
 /**
  * Guard against architectural boundary violations.
- * Enforces dependency rules: tests/devops -> front -> back -> domain -> core
+ * Enforces dependency rules: tests/devops -> front -> ux -> domain -> core; back -> domain -> core
  */
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
@@ -13,6 +13,7 @@ const NAMESPACE_DIRS = {
   domain: '/source/domain',
   back: '/source/back',
   front: '/source/front',
+  ux: '/source/ux',
   devops: '/source/devops',
   tests: '/source/tests'
 } as const
@@ -23,9 +24,10 @@ type Namespace =
 
 /** Allowed dependencies per namespace (downward dependency flow) */
 const ALLOWED_DEPS: Record<Namespace, Set<Namespace>> = {
-  tests: new Set(['tests', 'front', 'back', 'domain', 'core', 'external']),
-  devops: new Set(['devops', 'front', 'back', 'domain', 'core', 'external']),
-  front: new Set(['front', 'domain', 'core', 'external']),
+  tests: new Set(['tests', 'ux', 'front', 'back', 'domain', 'core', 'external']),
+  devops: new Set(['devops', 'ux', 'front', 'back', 'domain', 'core', 'external']),
+  ux: new Set(['ux', 'domain', 'core', 'external']),
+  front: new Set(['front', 'ux', 'domain', 'core', 'external']),
   back: new Set(['back', 'domain', 'core', 'external']),
   domain: new Set(['domain', 'core', 'external']),
   core: new Set(['core', 'external']),
@@ -71,7 +73,10 @@ const namespaceForSpecifier = (specifier: string, fromFile: string): Namespace =
     return 'back'
   }
 
-  // UX
+  // Generic UX toolkit
+  if (specifier.startsWith('@ux/')) return 'ux'
+
+  // Front applications
   if (specifier.startsWith('@front/') || specifier.startsWith('@front/app-')) {
     return 'front'
   }

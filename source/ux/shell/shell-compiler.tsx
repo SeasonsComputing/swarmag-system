@@ -15,9 +15,9 @@ PUBLIC
 compileApplicationRoutes  Compile an application declaration into a route tree.
 */
 
-import { UiDialog, type UiDialogSize } from '@front/ux/ui'
 import { onMount } from '@solid-js'
 import { type AnyRoute, createRootRoute, createRoute } from '@tanstack/solid-router'
+import { UiDialog, type UiDialogSize } from '@ux/ui'
 import { ShellRedirect } from './shell-navigate.tsx'
 import type { Shell, ShellApplication, ShellOverlayView, ShellRoute, ShellTransition } from './shell.ts'
 import { type ShellNavigate, useShellNavigate } from './use-shell-navigate.ts'

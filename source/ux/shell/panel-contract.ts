@@ -22,7 +22,7 @@ PanelHeaderProps     Leading and trailing content for a panel header.
 PanelFeedback        Feedback shown beneath a form header.
 */
 
-import type { UiAlertVariant, UiComponent } from '@front/ux/ui'
+import type { UiAlertVariant, UiComponent } from '@ux/ui'
 
 /** Leading and trailing content for a panel header. */
 export type PanelHeaderProps = {

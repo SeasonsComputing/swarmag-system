@@ -8,6 +8,7 @@
     "@domain/": "./source/domain/",
     "@back/": "./source/back/",
     "@front/": "./source/front/",
+    "@ux/": "./source/ux/",
     "@devops/": "./source/devops/",
     "@tests/": "./source/tests/",
 
@@ -17,7 +18,8 @@
 
     "@core/std": "./source/core/std/std.ts",
     "@core/stdx": "./source/core/std/stdx.ts",
-    "@front/ux/ui": "./source/front/ux/ui/components/ui.ts",
+    "@ux/ui": "./source/ux/ui/components/ui.ts",
+    "@ux/css": "./source/ux/ui/css/css.tsx",
 
     // ────────────────────────────────────────────────────────────────────────────
     // VENDOR ALIASES

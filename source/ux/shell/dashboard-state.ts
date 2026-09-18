@@ -47,13 +47,13 @@ import { Config } from '@core/cfg/config.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import { djb2hash, id } from '@core/std'
 import type { Dictionary, Instance } from '@core/std'
+import { createStore, produce } from '@solid-js/store'
 import type {
   DashboardRowHeader,
   DashboardSettings,
   DashboardWidget,
   DashboardWidgetSettings
-} from '@front/ux/shell/dashboard-contract.ts'
-import { createStore, produce } from '@solid-js/store'
+} from '@ux/shell/dashboard-contract.ts'
 
 // ───────────────────────────────────────────────────────────────────────────────
 // DASHBOARD STATE STORE & CONTRACT

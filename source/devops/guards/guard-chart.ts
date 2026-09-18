@@ -6,8 +6,8 @@
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
-const TARGET_DIR = `${ROOT}/source/front`
-const ALLOWED_DIR = '/source/front/ux/ui/charts/'
+const TARGET_DIRS = [`${ROOT}/source/front`, `${ROOT}/source/ux`]
+const ALLOWED_DIR = '/source/ux/ui/charts/'
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
 const CHART_SPECIFIERS = [
@@ -52,7 +52,7 @@ const isChartSpecifier = (specifier: string): boolean =>
   CHART_SPECIFIERS.some(prefix => specifier === prefix || specifier.startsWith(`${prefix}/`))
 
 const main = async () => {
-  const files = await collectFiles(TARGET_DIR)
+  const files = (await Promise.all(TARGET_DIRS.map(collectFiles))).flat()
   const violations: string[] = []
 
   for (const file of files) {

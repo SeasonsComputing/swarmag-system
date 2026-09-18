@@ -15,6 +15,7 @@ CollectionPanelProps  Props for CollectionPanel.
 CollectionPanel       Render a bounded collection list panel.
 */
 
+import { createSignal, For, Show } from '@solid-js'
 import {
   UiActionButton,
   UiButton,
@@ -27,8 +28,7 @@ import {
   UiTableCell,
   UiTableHeader,
   UiTableRow
-} from '@front/ux/ui'
-import { createSignal, For, Show } from '@solid-js'
+} from '@ux/ui'
 import type { DrillContract } from './drill-contract.ts'
 
 import './collection-panel.css'

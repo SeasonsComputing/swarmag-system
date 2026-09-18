@@ -18,8 +18,8 @@ ConfigTableProps  Props for ConfigTable.
 ConfigTable       Renders labeled configuration data as a definition list.
 */
 
-import { type UiComponent } from '@front/ux/ui'
 import { For, Show } from '@solid-js'
+import { type UiComponent } from '@ux/ui'
 import { type ShellMetadata } from './shell-metadata.ts'
 
 import './config-table.css'

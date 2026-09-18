@@ -30,25 +30,24 @@ The following is the normative target structure. Directories not yet present are
 
 ```text
 source/
+├── ux/                              — generic UX toolkit, portable beyond swarmAg
+│   ├── shell/                       — bootstrap, route/shell makers, form-panel machinery, state
+│   │   ├── app-state.ts
+│   │   ├── session-state.ts
+│   │   └── dashboard-state.ts
+│   ├── views/                      — generic UX projection types (placeholder — none yet)
+│   ├── widgets/                    — app-neutral widgets (e.g. HelmWidget)
+│   │   └── widget-registry.ts       — exports widgetRegistry(); generic-tier catalog only
+│   └── ui/                         — portable shared UI foundation
+│       ├── components/             — Ui{Control} primitives (ui-{name}.tsx, barreled by ui.ts)
+│       ├── charts/                 — reserved chart primitive directory
+│       ├── css/                    — CSS barrel, tokens, roles, themes, base, ui, icons
+│       ├── fonts/                  — self-hosted font assets
+│       └── icons/                  — shared icon assets
 └── front/
     ├── api/
     │   └── api.ts                   - API client and request/response types
     ├── config/
-    ├── ux/                           — generic UX toolkit, portable beyond swarmAg
-    │   ├── stores/                   — reactive stores every toolkit application gets by default
-    │   │   ├── app-state.ts
-    │   │   ├── session-state.ts
-    │   │   └── dashboard-state.ts
-    │   ├── views/                    — generic UX projection types (placeholder — none yet)
-    │   ├── widgets/                  — app-neutral widgets (already parameterized, e.g. HelmWidget)
-    │   │   └── widget-registry.ts    — exports widgetRegistry(); generic-tier catalog only
-    │   ├── shell/                    — bootstrap, IoC route/shell makers, form-panel machinery
-    │   └── ui/                       — portable shared UI foundation
-    │       ├── components/           — Ui{Control} primitives (ui-{name}.tsx, barreled by ui.ts)
-    │       ├── charts/               — PieChart, BarChart, LineChart, Sparkline
-    │       ├── css/                  — CSS barrel, tokens, roles, themes, base, ui, icons
-    │       ├── fonts/                — self-hosted font assets
-    │       └── icons/                — shared icon assets
     ├── app/                          — swarmAg-suite-wide, shared across all three apps, not generic
     │   ├── assets/                   — swarmAg brand assets (logo files, flat — one asset kind today)
     │   ├── components/               — swarmAg-specific reusable UI controls (placeholder — none yet)
@@ -57,7 +56,8 @@ source/
     │   ├── widgets/                  — swarmAg-suite widgets (e.g. BrandWidget)
     │   │   └── widget-registry.ts    — exports widgetRegistry(); app-tier catalog only
     │   └── shell/                    — branded chrome + wiring: about-box, brand-hero, login, and the
-    │                                   maker wrapper binding ux/shell's generic makers to swarmAg branding
+    │                                   maker wrapper binding ux/shell's generic makers to swarmAg branding,
+    │                                   and session-coordinator.ts
     ├── app-admin/
     │   ├── app.tsx
     │   ├── dashboard-admin.json     — default dashboard layout for app-admin
@@ -91,7 +91,7 @@ source/
     └── app-style-guide/             — design-system demonstration harness
 ```
 
-Everything in `source/front/ux/` must be adaptive and portable beyond swarmAg — mobile-only or desktop-only components do not belong there, and neither does anything that assumes swarmAg branding or swarmAg's own domain. `source/front/app/` carries that narrower scope instead: adaptive across all three swarmAg apps and all viewport sizes, but not required to generalize past swarmAg itself.
+Everything in `source/ux/` must be adaptive and portable beyond swarmAg — mobile-only or desktop-only components do not belong there, and neither does anything that assumes swarmAg branding or swarmAg's own domain. `source/front/app/` carries that narrower scope instead: adaptive across all three swarmAg apps and all viewport sizes, but not required to generalize past swarmAg itself.
 
 Authentication and client makers are part of the core runtime and are sourced from `source/core/cli/`.
 
@@ -138,7 +138,7 @@ The following technologies are used as implementation details of system APIs. De
 ## 5. Key Principles
 
 1. **Apps consume, don't configure** — API namespace pre-composed, just import and use
-2. **Types flow from domain** — All data structures defined in `@domain/abstractions/`; generic UX view types in `@front/ux/views/`, swarmAg domain projections (e.g. `job-views.ts`) in `@front/app/views/`
+2. **Types flow from domain** — All data structures defined in `@domain/abstractions/`; generic UX view types in `@ux/views/`, swarmAg domain projections (e.g. `job-views.ts`) in `@front/app/views/`
 3. **Storage is transparent** — Client makers handle Supabase, IndexedDB, HTTP
 4. **Import discipline enforced** — Architectural guards prevent boundary violations
 5. **UX design language** — All applications conform to a unified design-language
@@ -312,13 +312,14 @@ The foundation provides:
 
 **Aliases**
 
-| Alias                                 | Purpose                          |
-| ------------------------------------- | -------------------------------- |
-| `@core/*`                             | Core modules                     |
-| `@domain/*`                           | Domain modules                   |
-| `@front/ux/*`                         | Shared UX modules                |
-| `@front/config/*`                     | Configuration module             |
-| `@front/app-{admin\|ops\|customer}/*` | App-local modules (own app only) |
+| Alias                                 | Purpose                            |
+| ------------------------------------- | ---------------------------------- |
+| `@core/*`                             | Core modules                       |
+| `@domain/*`                           | Domain modules                     |
+| `@ux/*`                               | Generic UX toolkit modules         |
+| `@front/app/*`                        | Shared swarmAg application modules |
+| `@front/config/*`                     | Configuration module               |
+| `@front/app-{admin\|ops\|customer}/*` | App-local modules (own app only)   |
 
 #### 8.1.2 Violations
 
@@ -386,7 +387,7 @@ Authenticated routes render their primary application surface inside a semantic
 `main` landmark. `main` is required accessibility plumbing, not a UX metaphor or
 shared shell primitive.
 
-`AuthGuard` and `Dashboard` live in `source/front/ux/shell` — fully generic. `Login` is swarmAg-branded presentation and lives in `source/front/app/shell/`; `source/front/ux/shell/shell-makers.tsx`'s `makeAnonymousShell()`/`makeDashboardShell()` take it (and `AboutBox`) as route-component parameters rather than importing them directly, and `source/front/app/shell/shell-makers.tsx` re-exports both names pre-bound to swarmAg's versions — every app root imports the app-tier maker, not the generic one. Each app package declares a complete `Application`: a common anonymous shell plus a dashboard shell, and the application-owned session coordinator. The dashboard shell receives its app-local dashboard configuration (`app-{admin|ops|customer}-dashboard.json`), the merged widget registry (`§10.3`), and app-specific route presentations before shared bootstrap mounts it.
+`AuthGuard` and `Dashboard` live in `source/ux/shell` — fully generic. `Login` is swarmAg-branded presentation and lives in `source/front/app/shell/`; `source/ux/shell/shell-makers.tsx`'s `makeAnonymousShell()`/`makeDashboardShell()` take it (and `AboutBox`) as route-component parameters rather than importing them directly, and `source/front/app/shell/shell-makers.tsx` re-exports both names pre-bound to swarmAg's versions — every app root imports the app-tier maker, not the generic one. Each app package declares a complete `Application`: a common anonymous shell plus a dashboard shell, and the application-owned session coordinator. The dashboard shell receives its app-local dashboard configuration (`app-{admin|ops|customer}-dashboard.json`), the merged widget registry (`§10.3`), and app-specific route presentations before shared bootstrap mounts it.
 
 #### 9.1.1 UX Metaphors
 
@@ -414,11 +415,11 @@ dashboard → domain page → back to dashboard
 
 ### 9.2 Routing
 
-Common routes are supplied by `makeAnonymousShell()` and `makeDashboardShell()`, generic in `source/front/ux/shell/shell-makers.tsx` and re-exported pre-bound to swarmAg branding from `source/front/app/shell/shell-makers.tsx` — app roots import the latter. Each app root declares its complete shell collection in `app.tsx`, including app-specific dashboard presentations. `bootstrap()` compiles that collection; it does not accept raw route extensions or optional composition fragments.
+Common routes are supplied by `makeAnonymousShell()` and `makeDashboardShell()`, generic in `source/ux/shell/shell-makers.tsx` and re-exported pre-bound to swarmAg branding from `source/front/app/shell/shell-makers.tsx` — app roots import the latter. Each app root declares its complete shell collection in `app.tsx`, including app-specific dashboard presentations. `bootstrap()` compiles that collection; it does not accept raw route extensions or optional composition fragments.
 
 The shell route grammar is the public routing API for all front applications. Applications declare route intent through `Routes` and shell composition contracts. Application, feature, page, and widget code must not import router-vendor APIs directly.
 
-Router libraries are shell runtime implementation details. The current shell runtime uses TanStack Solid Router to execute the shell route grammar, but TanStack route APIs do not define the application routing contract. Direct router-vendor imports are confined to shell runtime implementation files under `source/front/ux/shell/`.
+Router libraries are shell runtime implementation details. The current shell runtime uses TanStack Solid Router to execute the shell route grammar, but TanStack route APIs do not define the application routing contract. Direct router-vendor imports are confined to shell runtime implementation files under `source/ux/shell/`.
 
 Imperative navigation flows through `useShellNavigate()`. Declarative route redirection flows through `ShellRedirect` and `ShellReplace`. This keeps navigation vocabulary owned by the shell and preserves a single implementation point if route behavior is enriched or the runtime substrate changes.
 
@@ -504,7 +505,7 @@ Route transition behavior remains owned by the generic shell.
 
 ### 9.4 Session State Store
 
-`source/front/ux/stores/session-state.ts` is a closed baseline store following §8.3:
+`source/ux/shell/session-state.ts` is a closed baseline store following §8.3:
 
 ```typescript
 type SessionStore = {
@@ -549,7 +550,7 @@ IndexedDB usage is split into two layers:
 
 #### 9.5.2 Application Preferences
 
-`AppState` (`@front/ux/stores/app-state.ts`) manages per-app preferences — persisted key/value pairs backed by a named IndexedDB object store. Conforms to the Reactive Store Module Pattern (§8.3).
+`AppState` (`@ux/shell/app-state.ts`) manages per-app preferences — persisted key/value pairs backed by a named IndexedDB object store. Conforms to the Reactive Store Module Pattern (§8.3).
 
 | Key                | Admin | Ops | Customer |
 | ------------------ | ----- | --- | -------- |
@@ -560,9 +561,9 @@ IndexedDB usage is split into two layers:
 
 | Concern          | Mechanism       | Location                       |
 | ---------------- | --------------- | ------------------------------ |
-| auth / session   | SolidJS store   | `ux/stores/session-state.ts`   |
-| app preferences  | IndexedDB       | `ux/stores/app-state.ts`       |
-| dashboard config | IndexedDB       | `ux/stores/dashboard-state.ts` |
+| auth / session   | SolidJS store   | `ux/shell/session-state.ts`    |
+| app preferences  | IndexedDB       | `ux/shell/app-state.ts`        |
+| dashboard config | IndexedDB       | `ux/shell/dashboard-state.ts`  |
 | server data      | TanStack Query  | per-page query hooks           |
 | local ui state   | SolidJS signals | component-local                |
 | ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts` |
@@ -580,7 +581,7 @@ IndexedDB usage is split into two layers:
 
 ### 10.1 Common Component Boundaries
 
-Three tiers, not two. `source/front/ux/` is the generic UX toolkit — portable to any future
+Three tiers, not two. `source/ux/` is the generic UX toolkit — portable to any future
 Seasons Computing project, not just swarmAg. `source/front/app/` is swarmAg-suite-wide: shared
 across all three apps, reactive and adaptive by default like `ux/`, but under no obligation to
 generalize past swarmAg itself. Each `app-{admin|ops|customer}/` is the single-application tier.
@@ -601,8 +602,8 @@ ux/
 
 ```text
 ux/
-├── shell/    — bootstrap, IoC route/shell makers, auth guard, dashboard host, wizard, form panel
-├── stores/   — session, app preference, and dashboard state stores every toolkit app gets
+├── shell/    — bootstrap, IoC route/shell makers, auth guard, dashboard host, wizard, form panel,
+│               and session, app preference, and dashboard state stores
 ├── views/    — generic UX projection types (placeholder — none exist yet)
 └── widgets/  — app-neutral widget catalog (already parameterized, e.g. HelmWidget)
 ```
@@ -618,7 +619,7 @@ app/
 ├── assets/     — swarmAg brand assets (logo files, flat — one asset kind today)
 ├── components/ — swarmAg-specific reusable UI controls (placeholder — none yet)
 ├── shell/      — branded chrome + wiring: about-box, brand-hero, login, and the maker wrapper
-│                 binding ux/shell's generic makers to swarmAg branding
+│                 binding ux/shell's generic makers to swarmAg branding, plus session-coordinator.ts
 ├── stores/     — swarmAg-suite state beyond the toolkit baseline (placeholder — none yet)
 ├── views/      — swarmAg domain projections (job-views.ts)
 └── widgets/    — swarmAg-suite widget catalog (e.g. BrandWidget)
@@ -647,14 +648,14 @@ Premature generalization is a violation.
 Each app is an independent Vite build producing a deployable PWA bundle:
 
 ```text
-swarmag-app-admin    = front/app-admin    + front/app + front/ux + front/api + front/config
-swarmag-app-ops      = front/app-ops      + front/app + front/ux + front/api + front/config
-swarmag-app-customer = front/app-customer + front/app + front/ux + front/api + front/config
+swarmag-app-admin    = front/app-admin    + front/app + ux + front/api + front/config
+swarmag-app-ops      = front/app-ops      + front/app + ux + front/api + front/config
+swarmag-app-customer = front/app-customer + front/app + ux + front/api + front/config
 ```
 
 - Three Vite configs, one per app
 - Three Netlify sites, one per app
-- `front/ux/` and `front/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
+- `ux/` and `front/config/` are compile-time inclusions via path aliases — not packages, not runtime imports
 - `front/config/` contains two files when packaged: `ux-config.ts` and the target env file
 - The target env file binds the static bundle to one backend target; the same
   bundle may be served locally or remotely without changing that binding
@@ -708,13 +709,13 @@ same placement principles at their respective scales.
 
 **`source/front/app-{admin|ops|customer}/dashboard-{admin|ops|customer}.json`**
 
-Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/front/ux/stores/dashboard-state.ts`). Not hardcoded. The current contract uses one default config per app.
+Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/ux/shell/dashboard-state.ts`). Not hardcoded. The current contract uses one default config per app.
 
-The app-local dashboard JSON conforms to the dashboard seed contract in `source/front/ux/shell/dashboard-contract.ts`. `DashboardState.init(seed)` validates the seed and converts it into `DashboardStoreView` from `source/front/ux/stores/dashboard-state.ts` by assigning stable store identity to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
+The app-local dashboard JSON conforms to the dashboard seed contract in `source/ux/shell/dashboard-contract.ts`. `DashboardState.init(seed)` validates the seed and converts it into `DashboardStoreView` from `source/ux/shell/dashboard-state.ts` by assigning stable store identity to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
 `makeDashboardShell()` initializes `DashboardState`, then constructs `Dashboard` with the state contract and the app-supplied widget registry as explicit inputs. A registry is the right shape here because the widget type is variant: the dashboard JSON picks a widget by an arbitrary type string, so something has to resolve that string to a component, and neither the JSON author nor the registry author can know the other's exact set in advance. Each app root merges two registries into one — `ux/widgets/widget-registry.ts`'s generic catalog and `app/widgets/widget-registry.ts`'s swarmAg-suite catalog, both exporting the same `widgetRegistry()` name, combined by object spread — alongside its dashboard JSON: the two halves of one dashboard-shell declaration.
 
-The shell is the closed IoC application framework. It owns the widget extension contracts in `source/front/ux/shell/widget-contract.ts` and shared shell services such as `getShellIdentity()`. Concrete widgets implement those contracts and may consume public shell services. The shell never imports the widget catalog or any concrete widget; applications bind concrete widgets at their composition roots. This direction keeps the shell closed when features are added and prevents a shell/widget dependency cycle. `guard:namespaces` enforces the shell-to-widget
+The shell is the closed IoC application framework. It owns the widget extension contracts in `source/ux/shell/widget-contract.ts` and shared shell services such as `getShellIdentity()`. Concrete widgets implement those contracts and may consume public shell services. The shell never imports the widget catalog or any concrete widget; applications bind concrete widgets at their composition roots. This direction keeps the shell closed when features are added and prevents a shell/widget dependency cycle. `guard:namespaces` enforces the shell-to-widget
 prohibition.
 
 Dashboard state remains a Reactive Store Module. The dashboard receives its namespace contract directly and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `source/front/api/api.ts` namespace.
@@ -945,7 +946,7 @@ The app-tier shell makers bind Login, About, auth-backed logout, and a footer co
 Dashboard owns footer placement; the supplied component owns content and branding. Generic makers
 use `ShellPageView` and `ShellOverlayView` for route components, not rendered `UiComponent` values.
 All logo assets live flat in `front/app/assets/`. The style guide owns a separate local logo copy.
-Moved presentation imports generic helpers through `@front/ux/`; only co-located imports stay relative.
+Moved presentation imports generic helpers through `@ux/`; only co-located imports stay relative.
 `ConfigTable`, `PanelProbe`, and shell metadata remain generic UX modules. Configuration-property
 semantics and existing Seasons Computing diagnostic attribution are unchanged by this split.
 

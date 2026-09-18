@@ -5,7 +5,7 @@
 ## 1. Overview
 
 This document is the consumer guide for the shared SolidJS UI controls exported
-from `@front/ux/ui`. It describes the public TypeScript API:
+from `@ux/ui`. It describes the public TypeScript API:
 what each control is for, which props it accepts, how controlled and
 uncontrolled state work, and how compound controls are composed.
 
@@ -18,7 +18,7 @@ and internal primitive bindings are covered by `ux-components-internals.md`.
 Import controls from the barrel:
 
 ```typescript
-import { UiButton, UiField, UiInput, UiSingleSelect } from '@front/ux/ui'
+import { UiButton, UiField, UiInput, UiSingleSelect } from '@ux/ui'
 ```
 
 Most controls accept `children?: UiComponent`, where `UiComponent` is the
@@ -1312,7 +1312,7 @@ Use at the end of a form or dialog surface for submit and dismissal buttons.
 
 ## 6. Charts
 
-The chart directory is reserved at `source/front/ux/ui/charts`, but the
+The chart directory is reserved at `source/ux/ui/charts`, but the
 current component library does not export public chart controls. Consumers should
 not import Chart.js directly; use chart controls only after they are exposed through
 the shared chart barrel.
