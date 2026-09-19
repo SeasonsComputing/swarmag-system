@@ -13,7 +13,7 @@ export default defineConfig({
   },
   server: {
     fs: {
-      allow: ['..']
+      allow: ['..', resolve(root, 'source/ux')]
     }
   },
   resolve: {
@@ -21,14 +21,8 @@ export default defineConfig({
       { find: /^@core\/std$/, replacement: resolve(root, 'source/core/std/std.ts') },
       { find: /^@core\/stdx$/, replacement: resolve(root, 'source/core/std/stdx.ts') },
       { find: /^@front\/api$/, replacement: resolve(root, 'source/front/api/api.ts') },
-      {
-        find: /^@front\/ux\/ui$/,
-        replacement: resolve(root, 'source/front/ux/ui/components/ui.ts')
-      },
-      {
-        find: /^@front\/ux\/ui\/forms$/,
-        replacement: resolve(root, 'source/front/ux/ui/forms/forms.ts')
-      },
+      { find: /^@ux\/ui$/, replacement: resolve(root, 'source/ux/ui/components/ui.ts') },
+      { find: /^@ux\/css$/, replacement: resolve(root, 'source/ux/ui/css/css.tsx') },
       { find: /^@solid-js$/, replacement: 'solid-js' },
       { find: /^@solid-js\/jsx-runtime$/, replacement: 'solid-js/jsx-runtime' },
       { find: /^@solid-js\/store$/, replacement: 'solid-js/store' },
@@ -41,6 +35,7 @@ export default defineConfig({
       { find: /^@domain\/(.+)$/, replacement: `${resolve(root, 'source/domain')}/$1` },
       { find: /^@back\/(.+)$/, replacement: `${resolve(root, 'source/back')}/$1` },
       { find: /^@front\/(.+)$/, replacement: `${resolve(root, 'source/front')}/$1` },
+      { find: /^@ux\/(.+)$/, replacement: `${resolve(root, 'source/ux')}/$1` },
       { find: /^@devops\/(.+)$/, replacement: `${resolve(root, 'source/devops')}/$1` },
       { find: /^@tests\/(.+)$/, replacement: `${resolve(root, 'source/tests')}/$1` }
     ]
