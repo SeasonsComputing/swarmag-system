@@ -30,7 +30,7 @@
   color: var(--sa-text-placeholder);
   display: grid;
   justify-items: center;
-  margin: var(--sa-space-lg) 0 0 0;
+  padding: var(--sa-space-lg) 0 0 0;
   text-align: center;
 }
 
