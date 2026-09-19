@@ -139,16 +139,12 @@ Deployable UX packages bind to a remote backend target at build time:
 | `stage` | Hosted Supabase project for acceptance validation |
 | `prod`  | Hosted Supabase project for production            |
 
-Local UX hosting is development tooling. A locally served app is still bound to
-the backend target embedded in its package env file. The local runner appends
-`-local` to the package version in the Vite process environment so login
-diagnostics identify local hosting without changing package identity or the
-generated `.env` file.
+Local UX hosting is development tooling. A locally served app is still bound to the backend target embedded in its package env file. The local runner appends `-local` to the package version in the Vite process environment so login
+diagnostics identify local hosting without changing package identity or the generated `.env` file.
 
 ### 2.2 Environment Files
 
-Committed env templates live under `source/front/config/` and
-`source/back/supabase-edge/config/`.
+Committed env templates live under `source/front/config/` and `source/back/supabase-edge/config/`.
 
 | File pattern                                                               | Role                       |
 | -------------------------------------------------------------------------- | -------------------------- |
@@ -181,9 +177,7 @@ See `architecture-core.md` section 6 for complete configuration management detai
 
 ## 3. DevOps Commands
 
-The examples below use `dot` as a local shell alias for `deno task`.
-`deno.jsonc` is the authoritative task registry. Detailed workflow contracts live
-in `documentation/architecture/architecture-devops.md`.
+The examples below use `dot` as a local shell alias for `deno task`. `deno.jsonc` is the authoritative task registry. Detailed workflow contracts live in `documentation/architecture/architecture-devops.md`.
 
 ### 3.1 Validation
 
