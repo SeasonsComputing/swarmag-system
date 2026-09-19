@@ -101,12 +101,12 @@
   [data-app='user-status-pill'][data-app-status='active']
   [data-app='user-status'] {
   color: var(--sa-state-success-text);
-  mask: url('../../ux/ui/icons/check.svg') center / contain no-repeat;
+  mask: url('@ux/ui/icons/check.svg') center / contain no-repeat;
 }
 
 [data-app='users-page']
   [data-app='user-status-pill'][data-app-status='inactive']
   [data-app='user-status'] {
   color: var(--sa-state-warning-text);
-  mask: url('../../ux/ui/icons/minus.svg') center / contain no-repeat;
+  mask: url('@ux/ui/icons/minus.svg') center / contain no-repeat;
 }
