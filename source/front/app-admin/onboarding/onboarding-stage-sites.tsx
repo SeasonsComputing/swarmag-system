@@ -21,9 +21,9 @@ import { isNote } from '@domain/validators/common-validator.ts'
 import { isCustomerSite } from '@domain/validators/customer-validator.ts'
 import { createEffect, createSignal, onCleanup, onMount, Show } from '@solid-js'
 import { createStore, produce, type SetStoreFunction } from '@solid-js/store'
-import { CollectionPanel } from '@ux/shell/collection-panel.tsx'
-import type { DrillContract, DrillReturnControl } from '@ux/shell/drill-contract.ts'
-import { DrillDown } from '@ux/shell/drill-down.tsx'
+import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
+import type { DrillContract, DrillReturnControl } from '@ux/shell/panel/drill-contract.ts'
+import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import {
   UiActionButton,
   type UiActionButtonProps,

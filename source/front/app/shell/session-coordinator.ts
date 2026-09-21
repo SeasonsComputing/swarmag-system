@@ -19,7 +19,7 @@ import type { Session } from '@core/api/api-auth-contract.ts'
 import type { Id } from '@core/std'
 import { api } from '@front/api/api.ts'
 import { onCleanup } from '@solid-js'
-import type { SessionCoordinatorContract } from '@ux/shell/shell.ts'
+import type { SessionCoordinatorContract } from '@ux/shell/runtime/shell.ts'
 
 /** Application-owned identity preparation and auth subscription. */
 class AppSessionCoordinator implements SessionCoordinatorContract {

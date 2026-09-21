@@ -14,7 +14,7 @@ PUBLIC
 BrandWidget  Dashboard header brand widget.
 */
 
-import { getShellIdentity } from '@ux/shell/shell-metadata.ts'
+import { getShellIdentity } from '@ux/shell/runtime/shell-metadata.ts'
 import { UiLayout } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 

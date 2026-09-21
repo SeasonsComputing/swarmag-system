@@ -14,8 +14,8 @@ import { OnboardingStageCustomer } from '@front/app-admin/onboarding/onboarding-
 import { OnboardingStageSites } from '@front/app-admin/onboarding/onboarding-stage-sites.tsx'
 import { createOnboardingState } from '@front/app-admin/onboarding/onboarding-state.ts'
 import { createSignal } from '@solid-js'
-import type { WizardContract, WizardStage } from '@ux/shell/wizard-contract.ts'
-import { Wizard } from '@ux/shell/wizard.tsx'
+import type { WizardContract, WizardStage } from '@ux/shell/workbench/wizard-contract.ts'
+import { Wizard } from '@ux/shell/workbench/wizard.tsx'
 import type { UiActionButtonProps, UiComponent } from '@ux/ui'
 
 import './onboarding.css'

@@ -8,8 +8,8 @@
 import { expectNonEmptyString } from '@core/std'
 import { CUSTOMER_STATUSES, type CustomerStatus } from '@domain/abstractions/customer.ts'
 import { For, onCleanup } from '@solid-js'
-import { useAbstractionFormKeyboard } from '@ux/shell/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/use-abstraction-form-validation.ts'
+import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
+import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
 import {
   type UiComponent,
   UiField,

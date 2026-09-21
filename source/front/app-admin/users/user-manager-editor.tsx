@@ -36,10 +36,10 @@ import {
   type UserStatus
 } from '@domain/abstractions/user.ts'
 import { createEffect, createSignal, For, onCleanup, onMount } from '@solid-js'
-import type { AbstractionEditorContext } from '@ux/shell/abstraction-manager-contract.ts'
-import { useAbstractionFormFeedback } from '@ux/shell/use-abstraction-form-feedback.ts'
-import { useAbstractionFormKeyboard } from '@ux/shell/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/use-abstraction-form-validation.ts'
+import type { AbstractionEditorContext } from '@ux/shell/workbench/abstraction-manager-contract.ts'
+import { useAbstractionFormFeedback } from '@ux/shell/workbench/use-abstraction-form-feedback.ts'
+import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
+import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
 import {
   type UiComponent,
   UiField,

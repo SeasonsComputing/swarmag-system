@@ -22,7 +22,7 @@ useAbstractionFormFeedback(formRef, feedback, message?)    Wire the bridge.
 */
 
 import { onCleanup, onMount } from '@solid-js'
-import type { PanelFeedback } from '@ux/shell/panel-contract.ts'
+import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC
