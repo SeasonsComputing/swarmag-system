@@ -8,8 +8,8 @@
 import { expectEmail, expectNonEmptyString, toEmail } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS, type ContactPreferredChannel } from '@domain/abstractions/common.ts'
 import { onCleanup } from '@solid-js'
-import { useAbstractionFormKeyboard } from '@ux/shell/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/use-abstraction-form-validation.ts'
+import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
+import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
 import { type UiComponent, UiField, UiFieldset, UiInput, UiLayout, UiSingleSelect, UiText } from '@ux/ui'
 import type { OnboardingState } from './onboarding-state.ts'
 

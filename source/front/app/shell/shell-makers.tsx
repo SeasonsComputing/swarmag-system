@@ -17,14 +17,14 @@ makeDashboardShell  Create the swarmAg dashboard shell.
 
 import { api } from '@front/api/api.ts'
 import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
-import type { DashboardStateSeed } from '@ux/shell/dashboard-state.ts'
-import { logout } from '@ux/shell/logout.ts'
+import type { DashboardStateSeed } from '@ux/shell/dashboard/dashboard-state.ts'
+import type { WidgetRegistry } from '@ux/shell/dashboard/widget-contract.ts'
+import { logout } from '@ux/shell/runtime/logout.ts'
 import {
   makeAnonymousShell as makeAppAnonymousShell,
   makeDashboardShell as makeAppDashboardShell
-} from '@ux/shell/shell-makers.tsx'
-import type { Shell, ShellRoute } from '@ux/shell/shell.ts'
-import type { WidgetRegistry } from '@ux/shell/widget-contract.ts'
+} from '@ux/shell/runtime/shell-makers.tsx'
+import type { Shell, ShellRoute } from '@ux/shell/runtime/shell.ts'
 import { UiFooter } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { AboutBox } from './about-box.tsx'

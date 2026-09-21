@@ -15,13 +15,13 @@ makeDashboardShell  Creates a dashboard shell with authentication required.
 */
 
 import { Outlet } from '@tanstack/solid-router'
+import { DashboardState, type DashboardStateSeed } from '@ux/shell/dashboard/dashboard-state.ts'
+import { Dashboard } from '@ux/shell/dashboard/dashboard.tsx'
+import type { WidgetRegistry } from '@ux/shell/dashboard/widget-contract.ts'
 import type { UiComponent } from '@ux/ui'
 import { AuthGuard } from './auth-guard.tsx'
-import { DashboardState, type DashboardStateSeed } from './dashboard-state.ts'
-import { Dashboard } from './dashboard.tsx'
 import { Routes } from './shell.ts'
 import type { Shell, ShellOverlayView, ShellPageView, ShellRoute } from './shell.ts'
-import type { WidgetRegistry } from './widget-contract.ts'
 
 /** Create the lightweight shell and its common non-dashboard routes. */
 export const makeAnonymousShell = (Login: ShellPageView, logout: () => Promise<void>): Shell => ({

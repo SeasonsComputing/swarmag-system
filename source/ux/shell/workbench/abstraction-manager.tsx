@@ -16,6 +16,12 @@ AbstractionManager  Generic list+panel manager component.
 
 import type { Instance } from '@core/std'
 import { createEffect, createSignal, For, Show } from '@solid-js'
+import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
+import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
+import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
+import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
+import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
+import { PanelList } from '@ux/shell/panel/panel-list.tsx'
 import {
   UiActionButton,
   UiAlert,
@@ -33,12 +39,6 @@ import type {
   AbstractionEditorHandle,
   AbstractionManagerContract
 } from './abstraction-manager-contract.ts'
-import { PanelContainer } from './panel-container.tsx'
-import type { PanelFeedback } from './panel-contract.ts'
-import { PanelForm } from './panel-form.tsx'
-import { PanelHeaderTitle } from './panel-header-title.tsx'
-import { PanelHeader } from './panel-header.tsx'
-import { PanelList } from './panel-list.tsx'
 import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import { focusFirstField } from './use-abstraction-form-keyboard.ts'
 

@@ -115,7 +115,7 @@ export type JobHub = {
 Imports: `Id` from `@core/std`; `JobStatus`, `Job`, `JobAssessment`,
 `JobPlan` from `@domain/abstractions/job.ts`.
 
-**`source/ux/shell/session-state.ts`**
+**`source/ux/shell/runtime/session-state.ts`**
 
 SolidJS store module for auth/session state. Shared across all apps. Implements
 the contract defined in `architecture-front.md` §6.4.
@@ -160,7 +160,7 @@ export { SessionState }
 
 `SessionState` API shape per `architecture-front.md` §6.4.
 
-**`source/ux/shell/app-state.ts`**
+**`source/ux/shell/runtime/app-state.ts`**
 
 Per-app IndexedDB preferences store. Takes the app's store name (per
 `architecture-front.md` §6.5.1) and manages preference key reads/writes.
@@ -178,7 +178,7 @@ Common UX behavior is defined by architecture and is not restated here:
 - File inventory baseline: `architecture-front.md` §6.8
 
 Path note: `auth-guard.tsx` is at
-`source/ux/shell/auth-guard.tsx`.
+`source/ux/shell/runtime/auth-guard.tsx`.
 
 ### 2.3 Phase II — App Admin Shell
 
@@ -387,7 +387,7 @@ Before reporting `STYLE_AUDIT: PASS`:
 - All Common UX artifacts conform to `architecture-front.md` §6.3-§6.8.
 - `source/front/app/views/job-views.ts` exists and exports `JobManifest` and
   `JobHub` as pure types with no infrastructure imports.
-- `auth-guard.tsx` is at `source/ux/shell/auth-guard.tsx`.
+- `auth-guard.tsx` is at `source/ux/shell/runtime/auth-guard.tsx`.
 - `session-state.ts` exports `SessionState` with `store`, `setAuth`, `setUser`,
   `setReady`, and `clear`. No raw setter calls outside this module.
 - `app-state.ts` uses `makeCrudIndexedDbClient<AppState>` for IDB persistence

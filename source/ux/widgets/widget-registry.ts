@@ -13,7 +13,7 @@ PUBLIC
 widgetRegistry  Creates the concrete widget registry.
 */
 
-import type { WidgetRegistry } from '@ux/shell/widget-contract.ts'
+import type { WidgetRegistry } from '@ux/shell/dashboard/widget-contract.ts'
 import { HelmWidget } from './helm-widget.tsx'
 
 /** Create the widget registry. */

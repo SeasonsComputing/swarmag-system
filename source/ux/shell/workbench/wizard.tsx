@@ -16,14 +16,14 @@ WizardProps             Props for the wizard host.
 */
 
 import { createMemo, createSignal, For, Show } from '@solid-js'
+import type { DrillReturnControl } from '@ux/shell/panel/drill-contract.ts'
+import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
+import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
+import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
+import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
+import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
+import { PanelStepflow } from '@ux/shell/panel/panel-stepflow.tsx'
 import { UiActionButton, type UiComponent, UiList, UiListItem } from '@ux/ui'
-import type { DrillReturnControl } from './drill-contract.ts'
-import { PanelContainer } from './panel-container.tsx'
-import type { PanelFeedback } from './panel-contract.ts'
-import { PanelForm } from './panel-form.tsx'
-import { PanelHeaderTitle } from './panel-header-title.tsx'
-import { PanelHeader } from './panel-header.tsx'
-import { PanelStepflow } from './panel-stepflow.tsx'
 import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import type { WizardContract } from './wizard-contract.ts'
 

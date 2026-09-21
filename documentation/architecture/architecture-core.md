@@ -814,6 +814,10 @@ swarmag-system/
 │   │   └── config/
 │   ├── ux/
 │   │   ├── shell/
+│   │   │   ├── runtime/
+│   │   │   ├── dashboard/
+│   │   │   ├── panel/
+│   │   │   └── workbench/
 │   │   ├── ui/
 │   │   │   ├── charts/
 │   │   │   ├── components/

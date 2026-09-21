@@ -17,9 +17,9 @@ WizardStageContext  Host context available to wizard stages.
 WizardContract      Provider contract for a guided, linear wizard flow.
 */
 
+import type { DrillReturnControl } from '@ux/shell/panel/drill-contract.ts'
+import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import type { UiActionButtonProps, UiComponent } from '@ux/ui'
-import type { DrillReturnControl } from './drill-contract.ts'
-import type { PanelFeedback } from './panel-contract.ts'
 
 /** Host context available to a wizard stage render function. */
 export type WizardStageContext = {

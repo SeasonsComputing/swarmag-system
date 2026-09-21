@@ -13,8 +13,8 @@ PUBLIC
 AboutBox  Shell about dialog content.
 */
 
-import { ConfigTable } from '@ux/shell/config-table.tsx'
-import { getShellMetadata } from '@ux/shell/shell-metadata.ts'
+import { ConfigTable } from '@ux/shell/runtime/config-table.tsx'
+import { getShellMetadata } from '@ux/shell/runtime/shell-metadata.ts'
 import type { UiComponent } from '@ux/ui'
 import { BrandHero } from './brand-hero.tsx'
 

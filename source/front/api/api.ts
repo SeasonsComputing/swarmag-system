@@ -29,8 +29,8 @@ import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
 import { type Customer } from '@domain/abstractions/customer.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { validateCustomerCreate, validateCustomerUpdate } from '@domain/validators/customer-validator.ts'
-import { AppState } from '@ux/shell/app-state.ts'
-import { SessionState } from '@ux/shell/session-state.ts'
+import { AppState } from '@ux/shell/runtime/app-state.ts'
+import { SessionState } from '@ux/shell/runtime/session-state.ts'
 import { makeAuthUsers } from './make-auth-users.ts'
 
 /** Shared UX API namespace for authentication, state, and domain clients. */

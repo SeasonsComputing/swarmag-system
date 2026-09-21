@@ -14,7 +14,7 @@ PUBLIC
 BrandHero  Logo, product name, and application name hero block.
 */
 
-import { getShellMetadata } from '@ux/shell/shell-metadata.ts'
+import { getShellMetadata } from '@ux/shell/runtime/shell-metadata.ts'
 import { type UiComponent, UiLayout } from '@ux/ui'
 
 import './brand-hero.css'

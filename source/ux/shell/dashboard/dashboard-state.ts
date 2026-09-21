@@ -53,7 +53,7 @@ import type {
   DashboardSettings,
   DashboardWidget,
   DashboardWidgetSettings
-} from '@ux/shell/dashboard-contract.ts'
+} from '@ux/shell/dashboard/dashboard-contract.ts'
 
 // ───────────────────────────────────────────────────────────────────────────────
 // DASHBOARD STATE STORE & CONTRACT
