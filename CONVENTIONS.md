@@ -42,7 +42,7 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 
 ### 3.2 Barrel aliases
 
-Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@ux/shell/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§12).
+Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@ux/shell/workbench/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§12).
 
 | Alias        | Resolves to                     |
 | ------------ | ------------------------------- |
