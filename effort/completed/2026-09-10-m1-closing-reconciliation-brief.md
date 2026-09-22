@@ -1,8 +1,8 @@
 # M1 Closing Reconciliation — Verification Discipline Applied to the Session Itself
 
-**Status:** Decided and produced in the same sitting. Captures a multi-day drift-and-recovery,
-per EFFORT.md §4 ("a decision that took several turns to reach is worth being able to see
-again, including the turns that were wrong").
+**CLOSED 2026-09-21.** Decided and produced in the same sitting. Captures a multi-day
+drift-and-recovery, per EFFORT.md §4 ("a decision that took several turns to reach is worth
+being able to see again, including the turns that were wrong").
 
 ## What happened
 
