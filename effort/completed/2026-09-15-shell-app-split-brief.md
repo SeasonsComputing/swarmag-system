@@ -1,5 +1,13 @@
 # Shell/App Split — Approved Foundation Scope
 
+**CLOSED 2026-09-21.** Shipped, reviewed, and independently verified — all guards, type check,
+and lint green; live-tested on Netlify stage by CA. Landed one structural step beyond this
+brief's own text: after approval, CA worked directly with ACE to promote `ux/` from `front/ux/`
+to a top-level `source/ux/` namespace with its own `@ux/` import alias, and to cluster
+`ux/shell/`'s flat file list into `runtime/`/`dashboard/`/`panel/`/`workbench/` sub-namespaces.
+Not a departure from this brief's design — its logical conclusion: `ux/` is now structurally,
+not just conventionally, independent of `front/`.
+
 Approved by the Chief Architect in the 2026-09-17 session after exploration of the original brief.
 This scope supersedes the earlier proposed identity callback and AuthenticatedUser design.
 

@@ -24,10 +24,12 @@ first — it stays open until both dependencies below land, which puts its actua
 1. Notes Editor completed & integrated into User Manager
 2. Notes Editor integrated with Customer Manager feature completion
 
-## 2. Shell/App Split
+## 2. Shell/App Split — Closed 2026-09-21
 
-`ux/shell/` splits into `ux/shell/` and `front/app/`. Backlog: "`ux/shell/` conflates reusable
-composition machinery with app orchestration" (`high`).
+`ux/shell/` split into `ux/shell/` and `front/app/`; CA then promoted `ux/` itself to a
+top-level `source/ux/` namespace with its own `@ux/` import alias, sibling to `front/` rather
+than nested under it — the literal conclusion of treating `ux/` as a third-party library.
+`effort/completed/2026-09-15-shell-app-split-brief.md`.
 
 ## 3. Customer Manager
 
