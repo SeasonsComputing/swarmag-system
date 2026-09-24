@@ -2,7 +2,7 @@
  * swarmAg Customer Application
  */
 
-// Package configuration must initialize before application dependencies.
+// initialize config 1st
 import '@front/config/ux-config.ts'
 
 // bootstrap
