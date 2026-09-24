@@ -118,19 +118,19 @@ Collection → Select(Item) → Drill-down → Detail → Drill-back
 ```
 above the threshold — full disclosure
 
-┌─ Users ──────────────┬─ Ada Lovelace ────────────────┐
-│ ▸ Ada Lovelace       │  Display name [ Ada Lovelace ]│
-│   Grace Hopper       │  Email        [ ada@…       ] │
-│   Alan Turing        │  Role         [ admin      ▾] │
-└──────────────────────┴───────────────────────────────┘
+┌─ Users ──────────────┬─ Ada Lovelace ─────────────────┐
+│ ▸ Ada Lovelace       │  Display name [ Ada Lovelace ] │
+│   Grace Hopper       │  Email        [ ada@…        ] │
+│   Alan Turing        │  Role         [ admin       ▾] │
+└──────────────────────┴────────────────────────────────┘
    index                 the Detail
    ▸ is the Selection, and it is visible
 
 below the threshold — becomes Index-Detail
 
 ┌─ Users ─────────────┐         ┌─ Ada Lovelace ──────┐
-│   Ada Lovelace      │    ⇄    │  Display name [ … ] │
-│   Grace Hopper      │         │  Email        [ … ] │
+│   Ada Lovelace      │  -->    │  Display name [ … ] │
+│   Grace Hopper      │  <--    │  Email        [ … ] │
 └─────────────────────┘         └─────────────────────┘
 ```
 
@@ -149,25 +149,30 @@ below the threshold — becomes Index-Detail
 **Sketch**
 
 ```
-┌─ Sites ──────────────────────────────── ⊕ New Site ─┐
-│  Site                                       Actions │
-│  ─────────────────────────────────────────────────  │
-│   South pasture                                  🗑 │
-│   North forty                                    🗑 │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│  (←) Job sites                          (✓) Finish   │
+│  ┌─ Sites ────────────────────────────────────────┐  │
+│  │ (+) New Site                                   │  │
+│  │ South pasture                             (-)  │  │
+│  │ North forty                               (-)  │  │
+│  └────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────┘
 
-        Select "South pasture"  ↓  the panel is replaced
+   Select "South pasture"  ↓  the panel is replaced
 
-┌─────────────────────────────────────────────────────┐
-│  ⌐ Sites                                            │
-│  ┌─ Identity ────────────────────────────────────┐  │
-│  │  Site Label  [ South pasture              ]   │  │
-│  └───────────────────────────────────────────────┘  │
-│  ┌─ Notes ──────────────────────── ⊕ New Note ──┐   │
-│  │   Gate code is 4417                       🗑 │   │
-│  └──────────────────────────────────────────────┘   │
-└─────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────┐
+│  (↑) Job sites / Site                     (✓) Save   │
+│  ┌─ Identity ─────────────────────────────────────┐  │
+│  │ Site Label   [ South pasture              ]    │  │
+│  └────────────────────────────────────────────────┘  │
+│  ┌─ Notes ────────────────────────────────────────┐  │
+│  │ (+) New Note                                   │  │
+│  │ Gate code is 4417                         (-)  │  │
+│  └────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────┘
 ```
+
+The sketch shows an Index embedded in a form, where a Detail commits into its parent's draft (§5.3). A standalone Index, such as the Users manager's, presents differently and commits its own record — the same archetype on a different surface (§2.2).
 
 **Rules**
 
@@ -175,7 +180,7 @@ below the threshold — becomes Index-Detail
 - Drill-back restores the panel that was replaced.
 - This holds identically at every depth. A note's Detail replaces the _site's_ panel.
 - Creating an Item opens it. That is one behaviour, not two.
-- The drill-back control must not share a glyph with the Sequence archetype's Back (§4.1).
+- Hosted inside a Sequence Step, drill-back replaces the Sequence's controls rather than joining them (§4.2).
 - An Index-Detail surface nests freely. A Collection nested inside a Detail is another Index-Detail, and the Index it replaces is the panel it was opened from.
 
 **Known uses.** The onboarding job-sites stage — sites, and notes within a site. The Users manager in Admin, below its container threshold.
@@ -192,7 +197,7 @@ below the threshold — becomes Index-Detail
 
 ```
 ┌─ Job sites ─────────────────────────────────────────┐
-│  ● ○ ○ ○      1 of 4          ⊕ New      🗑 Delete  │
+│  ● ○ ○ ○      1 of 4        (+) New     (-) Delete  │
 │  ─────────────────────────────────────────────────  │
 │   Site Label   [ South pasture                  ]   │
 │   Address      [ 1180 County Road 12            ]   │
@@ -227,9 +232,9 @@ A Decomposition is one subject presented in Parts. The Parts are not peers to ch
 | **Sequence axis** | axis | Movement between Steps — Back and Next                        |
 | **Depth axis**    | axis | Movement into a Detail — drill-down and drill-back            |
 
-**Sequence is not Depth.** They are different axes and must never be conflated. Back is the previous _step_, always: it does not change meaning inside a Detail, is not disabled there, and never returns to a Collection. An Index-Detail nested inside a Step carries its own drill-back control on the depth axis.
+**Sequence is not Depth.** They are different axes and must never be conflated. Back is the previous _step_; it never returns to a Collection. Drill-back returns to the Collection a Detail was opened from; it never changes the Step.
 
-**Two ascend controls must not share a glyph.** Back owns `arrow-left`. A drill-back control uses `corner-top-left`, which reads as up-and-out and is plainly distinct at a compact icon size. This separation is the whole reason the two axes stay legible.
+**Only one axis is live at a time.** A surface never offers two ascend controls together: side by side they are ambiguous and clutter the chrome. §4.2 states how a Sequence hands its controls to a nested Index-Detail and takes them back.
 
 **Interchange is what divides this family.** A Sequence's Parts are bespoke — authored for this subject, in this order, and not substitutable. A Chassis-Part's Parts are catalog stock conforming to a common fitting, so any of them may occupy any position. Ask which kind of Part a surface has before asking anything else about it.
 
@@ -249,18 +254,32 @@ A Decomposition is one subject presented in Parts. The Parts are not peers to ch
 **Sketch**
 
 ```
-┌─ Customer Onboarding ───────────────────────────────┐
-│  ‹ Back                                     Next ›  │
-│  ┌──────────────────┬────────────────────────────┐  │
-│  │ Contact details  │                            │  │
-│  │ Customer address │  the current Step's form   │  │
-│  │ Job sites      ◂ │                            │  │
-│  └──────────────────┴────────────────────────────┘  │
-└─────────────────────────────────────────────────────┘
-     stepflow           the Step, in the subject panel
+┌─ Customer Onboarding ─────────────────────────────────────────┐
+│  ┌────────────────────┬────────────────────────────────────┐  │
+│  │ Contact details    │ (←) Customer address      (→) Next │  │
+│  │ Customer address ◂ │ ────────────────────────────────── │  │
+│  │ Job sites          │  the current Step's form           │  │
+│  └────────────────────┴────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────────────┘
+     stepflow            the Step, in the subject panel
+                         Back and Next head the Step
 ```
 
-**Known uses.** The customer onboarding wizard in Admin.
+**Composed with Index-Detail.** A Step may host an Index-Detail. The surface then has two states, and only one axis is live in each (§4.1):
+
+- **At the Index**, the sequence axis is live. Back and Next (or Finish) head the Step, and the Step's Collection is in view.
+- **In a Detail**, the depth axis is live. The Sequence's controls are absent, drill-back is the only ascend control, and the Detail's commit takes the advance position. Returning to the Index restores the Sequence's controls.
+
+Rules for the composition:
+
+- A Detail's commit validates, then returns to the Index it was opened from. A commit that fails validation stays on the Detail.
+- Only the innermost Detail's commit is offered.
+- Drill-back from a Detail whose draft differs from the value it opened with asks before discarding. An unchanged Detail returns in one act.
+- Depth is oriented the way the Sequence is: the Step's header names the path from the Step to the current Detail — the kinds of Item, not their instances. Selective disclosure at depth costs orientation just as it does across Steps.
+
+§3.3's sketch shows this composition at the onboarding job-sites Step.
+
+**Known uses.** The customer onboarding wizard in Admin; its job-sites Step hosts the sites and notes Index-Detail.
 
 ### 4.3 Chassis-Part
 
