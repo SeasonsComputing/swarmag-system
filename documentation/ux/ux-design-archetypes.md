@@ -113,7 +113,7 @@ Collection → Select(Item) → Drill-down → Detail → Drill-back
 
 **Composed with Index-Detail.** Full disclosure needs room it does not always have. `AbstractionManager` is Collection-Detail above its container threshold and Index-Detail below it, swapping the two panels rather than shrinking them. That is a composition decision belonging to the surface — the threshold is the manager's discriminant, not a rule about either archetype.
 
-**Composed with Sequence.** A Detail too large to meet at once decomposes into a Sequence of Steps (§4.2). The Detail presents the Sequence's progress. The Collection keeps its own place and never presents it. The Sequence's final advance position holds the Detail's commit. Which ascend control is live depends on the disclosure in effect:
+**Composed with Sequence.** A Detail too large to meet at once decomposes into a Sequence of Steps (§4.2). The Sequence's final advance position holds the Detail's commit. Which ascend control is live depends on the disclosure in effect:
 
 - **Collection-Detail, above the threshold.** The Collection is in view, and selecting another Item or creating one leaves the Detail from any Step.
 - **Index-Detail, below it.** Only one axis is live (§4.1). The first Step's ascend control returns to the Index; every later Step's returns to the previous Step. Nothing reaches the Index from a later Step.
@@ -254,9 +254,9 @@ A Decomposition is one subject presented in Parts. The Parts are not peers to ch
 
 **Disclosure.** Selective, and the clearest case of it: the user meets one Step at a time because the subject is too complex to meet whole. The same principle as Index-Detail, applied to the complexity of one subject rather than the cardinality of a set.
 
-**Orientation.** Selective disclosure costs orientation, so a Sequence must return it. It presents its progress: every Step, with the current one marked, whatever visualization shows it (§2.2). That is the compensation, not decoration. A Sequence of one Step has no progress to present.
+**Orientation.** Selective disclosure costs orientation, and the surface must return enough of it for the task. That is the compensation, not decoration. How much, and in what form, is the surface's decision (§2.3).
 
-**Progress belongs to the whole.** Only what composes a Sequence knows all of its Steps, so progress is presented for the composed whole, never for a Step or for a group of Steps inside it. A group of Steps may be composed into more than one Sequence, and in each it is a fragment.
+**Progress belongs to the whole.** Only what composes a Sequence knows all of its Steps. Where a surface presents progress, it presents it for the composed whole, never for a Step or for a group of Steps inside it. A group of Steps may be composed into more than one Sequence, and in each it is a fragment.
 
 **Sketch**
 
@@ -371,8 +371,8 @@ The machinery this repository already builds for the common cases. Reach for the
 | Edit one record from a set of records    | `AbstractionManager`            | Collection-Detail ⇄ Index-Detail |
 | Present a nested Collection at any depth | `DrillDown` + `CollectionPanel` | Index-Detail                     |
 | Capture or review Items one at a time    | `UiCollectionCursor`            | Collection-Cursor                |
-| Decompose a complex subject into steps   | `Wizard` + `WizardStage`        | Sequence                         |
-| Gate a form's panels in order, any host  | `PanelSequence`                 | Sequence                         |
+| Decompose a complex subject into steps   | `Wizard` + `PanelStep`          | Sequence                         |
+| Gate steps in order, in any workbench    | `createPanelSequence`           | Sequence                         |
 | A per-application configurable surface   | dashboard + widget catalog      | Chassis-Part                     |
 
 **Adding a row is a Foundation decision.** A new entry means this repository has a second way to do something it already did, and that requires the Chief Architect's judgment about whether the existing one should have been extended instead.
