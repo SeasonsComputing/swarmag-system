@@ -1,34 +1,72 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Customer onboarding state                                                    ║
-║ Feature-local state shared by the onboarding wizard stages.                  ║
+║ Customer draft state                                                         ║
+║ Feature-local state shared by the Customer steps.                            ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Holds transient state for one customer onboarding flow. Flat fields remain
+Holds transient state for one Customer draft. Flat fields remain
 signal-backed; the sites collection is store-backed for leaf updates.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-OnboardingState         Reactive state contract for customer onboarding stages.
-createOnboardingState   Create state for a single customer onboarding flow.
-cloneCustomerSite       Clone a customer site for draft editing.
-cloneNote               Clone a note for draft editing.
-newOnboardingSite       Create a blank site draft.
-newOnboardingNote       Create a blank note draft.
-siteLocation(site)      The site's single location.
+CustomerDraft         Fields edited by the Customer surface.
+customerDraft         Project state into an isolated aggregate draft.
+CustomerState         Reactive state contract for Customer steps.
+createCustomerState   Create state for a single Customer draft.
+cloneCustomerSite     Clone a customer site for draft editing.
+cloneNote             Clone a note for draft editing.
+newCustomerSite       Create a blank site draft.
+newCustomerNote       Create a blank note draft.
+siteLocation(site)    The site's single location.
 */
 
-import { demandOne, when } from '@core/std'
+import { demandOne, toTrimmed, when } from '@core/std'
 import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer, CustomerSite } from '@domain/abstractions/customer.ts'
 import type { CustomerStatus } from '@domain/abstractions/customer.ts'
-import { type Accessor, createSignal, type Setter } from '@solid-js'
+import { createSignal } from '@solid-js'
+import type { Accessor, Setter } from '@solid-js'
 import { createStore, produce } from '@solid-js/store'
+import { UiText } from '@ux/ui'
 
-/** Reactive state used by the customer onboarding wizard. */
-export type OnboardingState = {
+/** Domain fields owned by the Customer workbench. */
+export type CustomerDraft = Pick<
+  Customer,
+  | 'primaryContact'
+  | 'name'
+  | 'status'
+  | 'line1'
+  | 'line2'
+  | 'city'
+  | 'state'
+  | 'postalCode'
+  | 'country'
+  | 'sites'
+>
+
+/** Project an isolated Customer draft; optional control text becomes domain absence. */
+export const customerDraft = (state: CustomerState): CustomerDraft => ({
+  primaryContact: [{
+    displayName: toTrimmed(state.displayName()),
+    phoneNumber: toTrimmed(state.phoneNumber()),
+    preferredChannel: state.preferredChannel(),
+    ...(state.email().trim() ? { email: toTrimmed(state.email()) } : {})
+  }],
+  sites: state.sites().map(cloneCustomerSite),
+  name: toTrimmed(state.name()),
+  status: state.status(),
+  line1: toTrimmed(state.line1()),
+  line2: UiText.optional(state.line2()),
+  city: toTrimmed(state.city()),
+  state: toTrimmed(state.state()),
+  postalCode: toTrimmed(state.postalCode()),
+  country: toTrimmed(state.country())
+})
+
+/** Reactive state used by the Customer workbench. */
+export type CustomerState = {
   displayName: Accessor<string>
   setDisplayName: Setter<string>
   phoneNumber: Accessor<string>
@@ -53,8 +91,6 @@ export type OnboardingState = {
   setPostalCode: Setter<string>
   country: Accessor<string>
   setCountry: Setter<string>
-  customer: Accessor<Customer | null>
-  setCustomer: Setter<Customer | null>
   sites: Accessor<CustomerSite[]>
   addSite: (site?: CustomerSite) => void
   setSite: (index: number, site: CustomerSite) => void
@@ -71,28 +107,32 @@ export type OnboardingState = {
 }
 
 /**
- * Creates the feature-local state for a single onboarding flow.
+ * Creates the feature-local state for a single Customer draft.
  *
- * @returns Onboarding state scoped to one wizard instance.
+ * @returns Customer state scoped to one workbench instance.
  */
-export const createOnboardingState = (): OnboardingState => {
-  const [displayName, setDisplayName] = createSignal('')
-  const [phoneNumber, setPhoneNumber] = createSignal('')
-  const [preferredChannel, setPreferredChannel] = createSignal<ContactPreferredChannel>('email')
-  const [email, setEmail] = createSignal('')
-  const [name, setName] = createSignal('')
-  const [status, setStatus] = createSignal<CustomerStatus>('prospect')
-  const [line1, setLine1] = createSignal('')
-  const [line2, setLine2] = createSignal('')
-  const [city, setCity] = createSignal('')
-  const [state, setState] = createSignal('')
-  const [postalCode, setPostalCode] = createSignal('')
-  const [country, setCountry] = createSignal('US')
-  const [customer, setCustomer] = createSignal<Customer | null>(null)
-  const [siteStore, setSiteStore] = createStore<CustomerSite[]>([])
+export const createCustomerState = (customer: Customer | null = null): CustomerState => {
+  const contact = customer ? demandOne(customer.primaryContact) : null
+  const [displayName, setDisplayName] = createSignal(contact?.displayName ?? '')
+  const [phoneNumber, setPhoneNumber] = createSignal(contact?.phoneNumber ?? '')
+  const [preferredChannel, setPreferredChannel] = createSignal<ContactPreferredChannel>(
+    contact?.preferredChannel ?? 'email'
+  )
+  const [email, setEmail] = createSignal(contact?.email ?? '')
+  const [name, setName] = createSignal(customer?.name ?? '')
+  const [status, setStatus] = createSignal<CustomerStatus>(customer?.status ?? 'prospect')
+  const [line1, setLine1] = createSignal(customer?.line1 ?? '')
+  const [line2, setLine2] = createSignal(customer?.line2 ?? '')
+  const [city, setCity] = createSignal(customer?.city ?? '')
+  const [state, setState] = createSignal(customer?.state ?? '')
+  const [postalCode, setPostalCode] = createSignal(customer?.postalCode ?? '')
+  const [country, setCountry] = createSignal(customer?.country ?? 'US')
+  const [siteStore, setSiteStore] = createStore<CustomerSite[]>(
+    customer?.sites.map(cloneCustomerSite) ?? []
+  )
 
   const sites = (): CustomerSite[] => siteStore
-  const addSite = (site: CustomerSite = newOnboardingSite()): void =>
+  const addSite = (site: CustomerSite = newCustomerSite()): void =>
     setSiteStore(siteStore.length, cloneCustomerSite(site))
   const setSite = (index: number, site: CustomerSite): void =>
     setSiteStore(index, cloneCustomerSite(site))
@@ -105,7 +145,7 @@ export const createOnboardingState = (): OnboardingState => {
   }
   const addNote = (
     sitePosition: number,
-    note: CustomerSite['notes'][number] = newOnboardingNote()
+    note: CustomerSite['notes'][number] = newCustomerNote()
   ): void => {
     setSiteStore(sitePosition, 'notes', notes => [...notes, cloneNote(note)])
   }
@@ -145,8 +185,6 @@ export const createOnboardingState = (): OnboardingState => {
     setPostalCode,
     country,
     setCountry,
-    customer,
-    setCustomer,
     sites,
     addSite,
     setSite,
@@ -164,14 +202,14 @@ export const createOnboardingState = (): OnboardingState => {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Produces an empty customer site satisfying the domain's cardinality rules. */
-export const newOnboardingSite = (): CustomerSite => ({
+export const newCustomerSite = (): CustomerSite => ({
   label: '',
   location: [{ country: 'US' }],
   notes: []
 })
 
 /** Produces an empty internal note with every field the domain requires. */
-export const newOnboardingNote = (): Note => ({
+export const newCustomerNote = (): Note => ({
   attachments: [],
   createdAt: when(),
   content: '',
@@ -182,7 +220,7 @@ export const newOnboardingNote = (): Note => ({
 /** Clones a note so a draft can be edited without mutating committed state. */
 export const cloneNote = (note: Note): Note => ({
   ...note,
-  attachments: [...note.attachments],
+  attachments: note.attachments.map(attachment => ({ ...attachment })),
   tags: [...note.tags]
 })
 

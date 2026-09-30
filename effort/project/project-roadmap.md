@@ -52,7 +52,18 @@ ARCHETYPE: Abstraction Manager | Wizard
 
 ## 4. Notes Editor
 
-Stock, parameterized Index-Detail archetype `NotesEditor`, lands at `front/app/notes-editor.tsx`.
+Stock, parameterized Index-Detail archetype `NotesEditor`, lands in `front/app/shell/`. It is
+an application feature, not toolkit, so it belongs in `front/app/`, not `ux/`. It is built for
+inclusion in a workbench archetype, which rules out other surfaces such as a simple popup
+dialog.
+
+Three capabilities, each landing with the milestone that first needs it:
+
+- **Tags** — this milestone.
+- **Attachments** — with §5 Mechanical Productions, for operator and maintenance documents on
+  assets.
+- **Device media recording** — with onsite Job Assessment (§7). Assessment, planning, and
+  running all need it.
 
 **Tags Component**
 Several ux features include tags. We need a tag component that is reusable. Tags-freeform-vs-controlled is still unresolved and gates scoping.
@@ -83,6 +94,9 @@ planning, finalization, and followup. Backlog: "Onboarding — Initial Job Asses
 (`normal`) covers §2.1 specifically. Needs `api.Jobs` wired (currently commented out in
 `api.ts` — not itself a backlog entry, a real gap) and depends on §6 above for Service/Workflow
 seeding.
+
+Rides with it: backlog "A Customer with Jobs can be deleted" (`normal`) — the first Job that
+references a Customer is where the delete guard lands.
 
 ## 8. Job Runner
 
@@ -139,5 +153,9 @@ Features not belonging to any theme are added to whatever session happens to tou
   afterward. `CONVENTIONS.md` §12's convention only covers domain/adapter/API today; extending it
   to the UX layer is foundation work belonging with whichever milestone needs it first (most
   likely §2 or §3).
+- **Style guide into `ux/`** — "`app-style-guide` belongs in `ux/`, not `front/`" (`low`), after
+  the Customer Manager production lands, since both touch `architecture-front.md`.
+- **Managers load only the first page of their Collection** (`normal`) — one shared fix for User
+  Manager and Customer Manager, not one per manager.
 
 _End of Roadmap Document_

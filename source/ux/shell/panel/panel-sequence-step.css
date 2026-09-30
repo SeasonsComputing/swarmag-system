@@ -1,0 +1,17 @@
+/* Shared sequence step motion and header orientation. */
+/* The step element is remounted per step, so the animation runs on mount and
+   needs no timing help. Direction is behaviour: Next enters from the inline end,
+   Back from the inline start. */
+[data-shell='sequence-panel'][data-shell-direction='forward'] {
+  animation: sa-slide-in-end var(--sa-motion-page-fade) ease;
+}
+
+[data-shell='sequence-panel'][data-shell-direction='backward'] {
+  animation: sa-slide-in-start var(--sa-motion-page-fade) ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-shell='sequence-panel'][data-shell-direction] {
+    animation: none;
+  }
+}

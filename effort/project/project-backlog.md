@@ -102,7 +102,7 @@ nothing marking which Item is open. Below the threshold the panels swap and the 
 does not arise. Above it, the reader loses their place in a long Collection.
 
 Collection-Detail is the one archetype that owes a Selection treatment.
-`ux-design-archetypes.md` §2.4 makes a Selection drawable exactly when the Collection and
+`ux-design-archetypes.md` §3.1 makes a Selection drawable exactly when the Collection and
 the Detail are met together, which is why Index-Detail needs nothing here and this surface
 does. Below its threshold the manager becomes Index-Detail and the question dissolves.
 
@@ -210,6 +210,20 @@ level. `--sa-text-h5`/`--sa-heading-font-size-h5` already exist in `roles.css`/`
 unused here — generalizing to a small `h2`-through-`h5` lookup (or `solid-js/web`'s
 `Dynamic`) uses infrastructure the codebase already ships rather than adding a nesting layer
 each time depth grows.
+
+### Managers load only the first page of their Collection
+
+**Observed:** 2026-09-24 · normal
+
+User Manager's list query calls `api.Users.list({ limit: 100 })` once and ignores the result's
+`hasMore`, so a 101st user is silently absent from the Collection — no count, no indication.
+`100` is also the ceiling `ListOptions.limit` clamps to, so raising it is not a fix. Customer
+Manager matches this deliberately, so the two reference implementations load the same way
+rather than diverging.
+
+`ListResult<T>` already carries `cursor` and `hasMore`. The fix belongs in one place both
+managers use, not duplicated per manager. Surfaced in ACE's review of the Customer Manager
+scope.
 
 ## Guards
 
@@ -363,6 +377,13 @@ driver would even run (headless browser against a deployed stage URL, per `smoke
 existing pattern? something narrower against the wizard's own state layer?) before scoping
 begins.
 
+**Amended 2026-09-24:** a second, structural case. The Customer Manager production introduces
+`PanelSequence` in `ux/shell/panel/`, a UX-layer controller with real gating logic, and its
+tests were scoped out for exactly this reason: only the API-level tests (the combined Customer
+update scope, excluded-field preservation, optional-field clearing) have a conventional home.
+Extending the testing convention to the UX layer is a `CONVENTIONS.md` amendment and needs CA
+authorization before any UX test lands.
+
 ## Customer
 
 ### Customer Manager
@@ -390,6 +411,18 @@ stages (Contact, Customer, Sites) a near-term slice of a four-stage design, not 
 surface. The fourth stage's own design (service selection UI, template application mechanism)
 has not started.
 
+### A Customer with Jobs can be deleted
+
+**Observed:** 2026-09-24 · normal
+
+Customer Manager ships Delete as a soft delete through `api.Customers.delete`. Delete is for a
+Customer that should not exist — entered by mistake, a duplicate, an abandoned prospect. A real
+customer no longer doing business is set `inactive`, which keeps it and its history visible.
+
+Once Jobs exist, a Customer with Jobs has history and must not be deletable; only inactivated.
+Nothing guards this today because no Jobs exist yet. Picking this up: with Job Definition
+(roadmap §7), where the first Job references a Customer.
+
 ## UX
 
 ### Hub widget
@@ -411,5 +444,25 @@ independently-tabled phases (`jobs`/`job_assessments`/`job_plans`/`job_work`) ar
 motivating case — `architecture-front.md` §11.7 already names a "colloquial UX hub:
 `job: [assessment, plan, work]`," so this connects to existing language rather than inventing
 it fresh.
+
+### `app-style-guide` belongs in `ux/`, not `front/`
+
+**Observed:** 2026-09-24 · low
+
+`source/front/app-style-guide/` is the design-system demonstration harness, and every import it
+makes resolves to `@ux/`, `@core/`, Solid, or Kobalte — nothing from `@front/`. It showcases the
+UX toolkit and belongs with it, at `source/ux/style-guide/`, where the rule that `ux/` cannot
+import `front/` starts enforcing what it already honors.
+
+One content change rides with the move: its own copy of `swarmag-logo-wordmark.png` goes, since
+nothing in `ux/` may carry swarmAg branding. The proposed replacement is the Seasons Computing
+mark (`seasonscomputing-logo.png`, repository root); confirm at pickup.
+
+References to update: `deno.jsonc` tasks, `source/devops/scripts/app-style-guide-local.sh`,
+`guard-bare-html.ts`, `guard-css.ts`, `architecture-front.md`, `architecture-core.md`,
+`architecture-devops.md`, and `README.md`.
+
+**Picking this up:** after the Customer Manager production lands. Both touch
+`architecture-front.md`'s directory tree.
 
 _End of Backlog Document_

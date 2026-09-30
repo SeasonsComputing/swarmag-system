@@ -655,6 +655,104 @@ either way.
 
 Premature generalization is a violation.
 
+#### 10.1.6 Workbench steps and the shared panel sequence
+
+Both workbenches host a sequence of one or more steps. A step is one panel; a drill-down inside a
+step replaces that panel's content and remains the same step. The workbench owns the aggregate
+draft and commits it once. Steps never commit.
+
+**Library: `source/ux/shell/panel/`.** The step contract is shared by both workbenches, so it
+lives in `panel/`:
+
+| Name                                           | Responsibility                                                                              |
+| ---------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| `PanelStep`                                    | One step: `name`, `title`, optional `validate`, `render(context)`                           |
+| `PanelSequence`                                | `readonly PanelStep[]`                                                                      |
+| `PanelStepContext`                             | Validation, drill-return, trailing-action, and dirty-check registration; `feedback`; `busy`              |
+| `createPanelSequence` / `PanelSequenceControl` | Instance-local cursor, Back, validated Next, completion validation, validation registration |
+| `PanelSequenceStep`                            | Renders the current step and owns the step transition motion                                |
+| `PanelSequenceHeader`                          | The composed header: Back, Next, the advance slot, and the nested Index-Detail hand-off     |
+| `PanelSequenceProgress`                        | The horizontal progress indicator, presented for any sequence of more than one step         |
+
+The controller has no draft, persistence, or chrome. Advancement validates the current step;
+after Back, that step is validated again on the next forward traversal. There is no arbitrary
+jump API. `PanelSequenceHeader` follows `ux-design-archetypes.md` §§3.3 and 4.2:
+
+- At a step's Index, Back and Next are live. The final step's advance slot holds the commit
+  action the host supplies.
+- Inside a nested Detail, those controls are absent. Drill-back is the only ascend control, and
+  the innermost Detail's Save takes the advance slot. It validates and returns to its parent
+  Index, or stays on failure.
+- The header names the path by kind.
+
+With one step, the header reduces to the host's simple header and no progress is presented.
+Glyphs, header states, and transition motion are defined here once; no feature restates them.
+
+**Workbenches: `source/ux/shell/workbench/`.**
+
+- `Wizard` takes `WizardContract = { formTitle, steps: PanelSequence, commit, feedback? }`.
+  - It commits once, at Finish. The commit may write one abstraction, several, or none.
+  - It presents `PanelSequenceProgress`.
+  - Above its container threshold, it also lays the sequence out as a tree in its aside
+    (`PanelStepflow`). That tree is Wizard chrome.
+- `AbstractionManager` takes `detail: (item: T | null) => AbstractionDetail<Draft>`, where
+  `AbstractionDetail<Draft> = { steps: PanelSequence; draft: () => Draft }`.
+  - It calls `detail` for each Item it opens; that is how an Item hydrates its steps.
+  - It validates through sequence completion and persists through its provider's `create` or
+    `update`.
+  - Save takes the final advance slot and is offered only when no nested Detail is open.
+  - Its aside is always its Collection. It contributes no progress chrome: a multi-step Detail
+    presents its own sequence's progress.
+  - Below the threshold, step 1's leading control returns to the Index and later steps show
+    Back; nothing reaches the Index from a later step. Above it, selecting another Item or New
+    leaves the Detail from any step.
+  - The Manager snapshots the draft when it opens an Item. Any exit that would discard a changed
+    draft asks first: another Item, New, the collapsed return, and Cancel.
+
+Dirty-state belongs to each draft's context. `PanelStepContext.registerDirty(check)` exposes a
+local change check to the workbench and returns its cleanup callback. Retained feature-state
+checks last for the session, across step remounts; nested draft checks are cleaned up when their
+draft closes. The sequence controller does not own dirty-state. Local Up asks only about the
+Detail it discards. Workbench Cancel and collection select/New check the aggregate and all open
+nested drafts, then ask once before abandoning the session. The collapsed first-step return
+receives the same protection. Back/Next preserves drafts and does not prompt.
+
+Non-dismissible `UiDialog` surfaces block both outside-click and Escape dismissal. Workbenches
+therefore exit through their explicit controls and contextual dirty checks. Dismissible dialogs
+retain both dismissal paths.
+
+**Features: `source/front/app-admin/`.**
+
+- `customers/` supplies the Customer steps and nothing about their host.
+  - `customer-steps.tsx` exports `customerSteps(state)`: contact, detail, and sites.
+  - `customer-state.ts` owns the state, `CustomerDraft`, and the `customerDraft(state)`
+    projection.
+  - The Customer steps are a fragment. They know nothing of position, progress, or what
+    precedes or follows them.
+- `CustomerManager` returns `customerSteps(state)` and the draft projection from `detail`. It
+  seeds state from the opened Customer, or blank for New.
+- `OnboardingWizard` is the only composer of Onboarding's sequence. It builds that sequence from
+  `customers/` today, and from Initial Job Assessment's steps later. Its `commit` writes the
+  aggregate once, at Finish. Both of the Wizard's progress presentations derive from the
+  composed sequence.
+- `UserManager` returns the single `user-step-detail` step.
+- Steps are named `{topic}-step-{name}.tsx`, where `detail` names the primary or only step.
+  "Editor" is reserved for a reusable form kind, such as the notes editor, or a drill-down
+  editor inside a step.
+
+Customer Manager is available at `/customers` from the Admin dashboard. It supports New, editing,
+and confirmed soft Delete through the existing Customer API.
+
+- Delete is for an account that should not exist. Inactive status is for a real former customer.
+- A Jobs dependency guard is deferred to Job Definition.
+- Lists match User Manager's first-page `limit: 100`; pagination is separate work.
+- The combined Manager update scope in `front/api/api-update-scopes.ts` covers primary contact,
+  identity, status, billing address, and sites. It excludes account-manager assignment and
+  account-level notes.
+- Clearing an optional stored address field uses the existing explicit-null update protocol.
+
+Onboarding keeps its create-only workflow, defaults, and completion behavior.
+
 ### 10.2 Build Composition
 
 Each app is an independent Vite build producing a deployable PWA bundle:

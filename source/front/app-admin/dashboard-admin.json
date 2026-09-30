@@ -9,6 +9,7 @@
           "shape": "compact",
           "actions": [
             { "command": "/users", "label": "Users", "icon": "person" },
+            { "command": "/customers", "label": "Customers", "icon": "id-card" },
             { "command": "/onboarding", "label": "Onboarding", "icon": "id-card" },
             { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
             { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },

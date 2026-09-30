@@ -1,18 +1,18 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Customer onboarding sites stage                                              ║
+║ Customer sites step                                                          ║
 ║ Collects optional customer job sites and nested internal notes.              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Renders the onboarding job-sites stage with drill-down collection panels. Sites
+Renders the Customer job-sites step with drill-down collection panels. Sites
 and notes replace the current panel rather than rendering inline.
 
-EXPORTS
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-OnboardingStageSitesProps  Props for the optional job-sites stage.
-OnboardingStageSites       Render the optional job-sites stage.
+CustomerStepSitesProps  Props for the optional job-sites step.
+CustomerStepSites       Render the optional job-sites step.
 */
 
 import type { Location, Note } from '@domain/abstractions/common.ts'
@@ -20,16 +20,16 @@ import type { CustomerSite } from '@domain/abstractions/customer.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 import { isCustomerSite } from '@domain/validators/customer-validator.ts'
 import { createEffect, createSignal, onCleanup, onMount, Show } from '@solid-js'
-import { createStore, produce, type SetStoreFunction } from '@solid-js/store'
+import { createStore, produce } from '@solid-js/store'
+import type { SetStoreFunction } from '@solid-js/store'
 import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
 import type { DrillContract, DrillReturnControl } from '@ux/shell/panel/drill-contract.ts'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
+import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import {
   UiActionButton,
-  type UiActionButtonProps,
   UiAlert,
   UiButton,
-  type UiComponent,
   UiDialog,
   UiField,
   UiFieldset,
@@ -41,17 +41,18 @@ import {
   UiToggleGroup,
   UiToggleItem
 } from '@ux/ui'
+import type { UiActionButtonProps, UiComponent } from '@ux/ui'
 import {
   cloneCustomerSite,
   cloneNote,
-  newOnboardingNote,
-  newOnboardingSite,
-  type OnboardingState,
+  newCustomerNote,
+  newCustomerSite,
   siteLocation
-} from './onboarding-state.ts'
+} from './customer-state.ts'
+import type { CustomerState } from './customer-state.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// ONBOARDING: CUSTOMER SITES
+// CUSTOMER: SITES
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Trailing header action reported by whichever drilled panel is currently active. */
@@ -59,20 +60,19 @@ type TrailingAction = (() => UiActionButtonProps | undefined) | null
 /** Dirty-state guard reported by whichever drilled panel is currently active. */
 type DirtyCheck = (() => boolean) | null
 
-/** Props for the optional job-sites stage. */
-export type OnboardingStageSitesProps = {
-  state: OnboardingState
-  onReturnControl?: (control: DrillReturnControl | null) => void
-  onTrailingAction?: (action: TrailingAction) => void
+/** Props for the optional job-sites step. */
+export type CustomerStepSitesProps = {
+  state: CustomerState
+  context: PanelStepContext
 }
 
 /**
- * Renders the optional job-sites stage.
+ * Renders the optional job-sites step.
  *
- * @param props Stage props carrying onboarding state.
- * @returns Job-sites onboarding stage component.
+ * @param props Step props carrying Customer state.
+ * @returns Customer job-sites step component.
  */
-export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiComponent => {
+export const CustomerStepSites = (props: CustomerStepSitesProps): UiComponent => {
   const hasGeo = typeof navigator !== 'undefined' && 'geolocation' in navigator
   const [pendingSite, setPendingSite] = createSignal<CustomerSite | null>(null)
   const [drillReturn, setDrillReturn] = createSignal<DrillReturnControl | null>(null)
@@ -93,7 +93,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
   }
   const registerDrillReturn = (control: DrillReturnControl | null): void => {
     setDrillReturn(() => control)
-    props.onReturnControl?.(
+    props.context.registerDrillReturn(
       control
         ? {
           path: control.path,
@@ -104,7 +104,7 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
     )
   }
   const addSiteDraft = (): void => {
-    setPendingSite(newOnboardingSite())
+    setPendingSite(newCustomerSite())
   }
   const removeSite = (index: number): void => {
     if (index < props.state.sites().length) {
@@ -157,7 +157,8 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
                 onSaveNew={() => setPendingSite(null)}
                 onReturnAfterSave={() => drillReturn()?.returnToIndex()}
                 onDirtyCheck={check => setDirtyCheck(() => check)}
-                onTrailingAction={action => props.onTrailingAction?.(action)}
+                onTrailingAction={props.context.registerTrailingAction}
+                context={props.context}
               />
             )}
             drill={drill}
@@ -199,7 +200,8 @@ export const OnboardingStageSites = (props: OnboardingStageSitesProps): UiCompon
 
 /** Props for the panel disclosed when a site row is selected. */
 type SiteEditorProps = {
-  state: OnboardingState
+  context: PanelStepContext
+  state: CustomerState
   site: CustomerSite
   index: number
   hasGeo: boolean
@@ -241,6 +243,9 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
   const siteError = (): boolean => saveAttempted() && !isCustomerSite(draft)
   const isActiveDraft = (): boolean => props.activeDraft() === token && props.drillPath()[0] === 'Site'
   const isDirty = (): boolean => draftFingerprint(draft) !== draftFingerprint(original)
+  createEffect(() => {
+    if (isActiveDraft()) onCleanup(props.context.registerDirty(isDirty))
+  })
 
   /** Switches location mode, clearing the fields the other mode owns. */
   const changeMode = (next: LocationMode): void => {
@@ -259,7 +264,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
         : { ...location, latitude: undefined, longitude: undefined })
   }
   const addNoteDraft = (): void => {
-    setPendingNote(newOnboardingNote())
+    setPendingNote(newCustomerNote())
   }
   const removeNote = (notePosition: number): void => {
     if (notePosition < draft.notes.length) {
@@ -292,13 +297,10 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
   })
 
   // Deferred to the Note's own report once a Note is drilled beneath this Site —
-  // only the innermost active panel occupies the wizard's trailing header slot.
+  // only the innermost active panel occupies the host's trailing header slot.
+  // Inactive frames must not clear the action published by the restored parent.
   createEffect(() => {
-    if (!isActiveDraft() || props.drillPath()[1] === 'Note') {
-      props.onTrailingAction(null)
-      props.onDirtyCheck(null)
-      return
-    }
+    if (!isActiveDraft() || props.drillPath()[1] === 'Note') return
     props.onDirtyCheck(isDirty)
     props.onTrailingAction(() => ({
       icon: 'check',
@@ -489,6 +491,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
         })}
         renderItem={(note, notePosition) => (
           <NoteEditor
+            context={props.context}
             note={note}
             sitePosition={props.index}
             notePosition={notePosition}
@@ -523,6 +526,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
 
 /** Props for the panel disclosed when a note row is selected. */
 type NoteEditorProps = {
+  context: PanelStepContext
   note: Note
   sitePosition: number
   notePosition: number
@@ -545,6 +549,9 @@ const NoteEditor = (props: NoteEditorProps): UiComponent => {
   const noteError = (): boolean => saveAttempted() && !isNote(draft)
   const isActiveDraft = (): boolean => props.activeDraft() === token && props.drillPath()[1] === 'Note'
   const isDirty = (): boolean => draftFingerprint(draft) !== draftFingerprint(original)
+  createEffect(() => {
+    if (isActiveDraft()) onCleanup(props.context.registerDirty(isDirty))
+  })
   const saveNote = (): void => {
     setSaveAttempted(true)
     if (!isActiveDraft() || !isNote(draft)) return
@@ -558,11 +565,7 @@ const NoteEditor = (props: NoteEditorProps): UiComponent => {
   })
 
   createEffect(() => {
-    if (!isActiveDraft()) {
-      props.onTrailingAction(null)
-      props.onDirtyCheck(null)
-      return
-    }
+    if (!isActiveDraft()) return
     props.onDirtyCheck(isDirty)
     props.onTrailingAction(() => ({
       icon: 'check',

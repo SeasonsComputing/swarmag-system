@@ -1,32 +1,34 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Wizard                                                                       ║
-║ Guided multi-step form host with commit sequencing and error handling.       ║
+║ Guided sequence host with one final commit.                                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Renders a multi-step wizard shell that sequences stages, manages local commit
-state, displays provider feedback, and orchestrates navigation and completion.
+Hosts reusable steps, contextual drafts, sequence orientation, and completion.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Wizard                  The wizard host component.
-WizardProps             Props for the wizard host.
+Wizard       The wizard host component.
+WizardProps  Props for the wizard host.
 */
 
-import { createMemo, createSignal, For, Show } from '@solid-js'
-import type { DrillReturnControl } from '@ux/shell/panel/drill-contract.ts'
+import { createMemo, createSignal, Show } from '@solid-js'
 import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
-import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
 import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
+import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
+import { PanelSequenceProgress } from '@ux/shell/panel/panel-sequence-progress.tsx'
+import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
+import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
 import { PanelStepflow } from '@ux/shell/panel/panel-stepflow.tsx'
-import { UiActionButton, type UiComponent, UiList, UiListItem } from '@ux/ui'
+import { UiActionButton } from '@ux/ui'
+import type { UiComponent } from '@ux/ui'
 import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import type { WizardContract } from './wizard-contract.ts'
-
+import { createWorkbenchContext, WorkbenchDiscard } from './workbench-context.tsx'
 import './wizard.css'
 
 /** Props for the wizard host component. */
@@ -36,219 +38,113 @@ export type WizardProps = {
   onCancel: () => void
 }
 
-/** Direction of travel along the wizard's sequence axis. */
-type WizardDirection = 'forward' | 'backward'
-
-/** The wizard host component. */
+/** Host a complete sequence and persist only at Finish. */
 export const Wizard = (props: WizardProps): UiComponent => {
-  const [stepIndex, setStepIndex] = createSignal(0)
-  const [direction, setDirection] = createSignal<WizardDirection>('forward')
+  const sequence = createPanelSequence(() => props.contract.steps)
   const [committing, setCommitting] = createSignal(false)
-  const [error, setError] = createSignal<string | null>(null)
-  const [drillReturn, setDrillReturn] = createSignal<DrillReturnControl | null>(null)
-
-  /** Active wizard stage resolved from the current step index. */
-  const stage = createMemo(() => props.contract.stages[stepIndex()])
-
-  /** Whether the current stage is the first stage. */
-  const isFirst = () => stepIndex() === 0
-
-  /** Whether the current stage is the final stage. */
-  const isLast = () => stepIndex() === props.contract.stages.length - 1
-
-  /** Whether the active stage is presenting nested drill-down detail. */
-  const isDrilled = () => drillReturn() !== null
-
-  /** Header orientation path for nested drill-down detail inside the active stage. */
-  const drillPath = (): readonly string[] => [stage().title, ...(drillReturn()?.path() ?? [])]
-
-  /** Whether the current stage permits forward navigation. */
-  const canAdvance = () => stage().canAdvance()
-
-  /** Visual state for a step in the wizard progress list. */
-  const stepState = (index: number) =>
-    index < stepIndex() ? 'done' : index === stepIndex() ? 'current' : 'upcoming'
-
-  /** Fill width for the wizard progress bar. */
-  const barFill = (): string =>
-    `${(((stepIndex() + 0.5) / props.contract.stages.length) * 100).toFixed(3)}%`
-
-  /** Feedback banner combining local commit errors with provider feedback. */
-  const banner = createMemo<PanelFeedback | null>(() => {
-    const e = error()
-    if (e) return { message: e, variant: 'danger' }
-    return props.contract.feedback?.() ?? null
-  })
-
-  /** Move to the previous wizard stage when allowed. */
+  const [feedback, setFeedback] = createSignal<PanelFeedback | null>(null)
+  const [discard, setDiscard] = createSignal(false)
+  const workbench = createWorkbenchContext(sequence, setFeedback, committing)
+  const banner = createMemo(() => feedback() ?? props.contract.feedback?.() ?? null)
   const back = (): void => {
-    if (isFirst() || committing() || isDrilled()) return
-    setError(null)
-    setDirection('backward')
-    setDrillReturn(null)
-    setStepIndex(i => i - 1)
+    if (committing() || workbench.drillReturn()) return
+    setFeedback(null)
+    sequence.back()
   }
-
-  /** Validate, commit, and advance the active wizard stage. */
   const advance = async (): Promise<void> => {
-    if (committing() || isDrilled()) return
-    const current = stage()
-    // Next stays live on an incomplete stage. Asking the stage to validate makes
-    // it show its own field errors and say why, which a disabled button cannot.
-    if (!(current.validate?.() ?? true) || !canAdvance()) {
-      setError(FORM_FEEDBACK_MESSAGE)
+    if (committing() || workbench.drillReturn()) return
+    const last = sequence.isLast()
+    if (!(last ? sequence.complete() : sequence.next())) {
+      setFeedback({ message: FORM_FEEDBACK_MESSAGE, variant: 'danger' })
       return
     }
-    setError(null)
-    if (current.commit) {
-      setCommitting(true)
-      try {
-        await current.commit()
-      } catch (error) {
-        setError(
-          error instanceof Error ? error.message : `${current.title} could not be saved.`
-        )
-        return
-      } finally {
-        setCommitting(false)
-      }
-    }
-    if (isLast()) {
+    setFeedback(null)
+    if (!last) return
+    setCommitting(true)
+    try {
+      await props.contract.commit()
       props.onFinish()
-      return
+    } catch (error) {
+      setFeedback({
+        message: error instanceof Error ? error.message : 'Unable to finish.',
+        variant: 'danger'
+      })
+    } finally {
+      setCommitting(false)
     }
-    setDirection('forward')
-    setDrillReturn(null)
-    setStepIndex(i => i + 1)
   }
-
+  const cancel = (): void => {
+    if (committing()) return
+    if (workbench.isDirty()) setDiscard(true)
+    else props.onCancel()
+  }
   return (
-    <PanelContainer
-      feature='wizard'
-      header={
-        <PanelHeader
-          leading={<h1>{props.contract.formTitle}</h1>}
-          trailing={
-            <UiActionButton
-              icon='cross-1'
-              label='Cancel'
-              labelMode='visible'
-              density='dense'
-              onClick={() => props.onCancel()}
+    <>
+      <PanelContainer
+        feature='wizard'
+        mode={props.contract.steps.length === 1 ? 'single' : 'sequence'}
+        header={
+          <PanelHeader
+            leading={<h1>{props.contract.formTitle}</h1>}
+            trailing={
+              <UiActionButton
+                icon='cross-1'
+                label='Cancel'
+                labelMode='visible'
+                density='dense'
+                disabled={committing()}
+                onClick={cancel}
+              />
+            }
+          />
+        }
+        accessory={props.contract.steps.length > 1
+          ? <PanelSequenceProgress sequence={sequence} />
+          : undefined}
+        aside={props.contract.steps.length > 1
+          ? (
+            <PanelStepflow
+              items={props.contract.steps.map((step, index) => ({
+                title: step.title,
+                state: index < sequence.index()
+                  ? 'done'
+                  : index === sequence.index()
+                  ? 'current'
+                  : 'upcoming'
+              }))}
             />
-          }
-        />
-      }
-      accessory={
-        <div data-shell='wizard-indicator'>
-          <div aria-hidden='true' data-shell='wizard-bar'>
-            <div data-shell='wizard-bar-fill' style={{ 'inline-size': barFill() }} />
-          </div>
-          <UiList data-shell='wizard-steps'>
-            <For each={props.contract.stages}>
-              {(item, index) => (
-                <UiListItem data-shell='wizard-step' data-shell-state={stepState(index())}>
-                  <span data-shell='wizard-step-label'>
-                    <span data-shell='wizard-step-ordinal'>{index() + 1}</span>
-                    <span data-shell='wizard-step-title'>{item.title}</span>
-                  </span>
-                </UiListItem>
-              )}
-            </For>
-          </UiList>
-        </div>
-      }
-      aside={
-        <PanelStepflow
-          items={props.contract.stages.map((item, index) => ({
-            state: stepState(index),
-            title: item.title
-          }))}
-        />
-      }
-      main={
-        <PanelForm
-          feedback={banner()}
-          header={{
-            leading: (
-              <Show
-                when={isDrilled()}
-                fallback={
-                  <PanelHeaderTitle
-                    title={stage().title}
-                    command={isFirst()
-                      ? undefined
-                      : {
-                        icon: 'arrow-left',
-                        label: 'Back',
-                        disabled: committing(),
-                        onClick: back
-                      }}
-                  />
-                }
-              >
-                <PanelHeaderTitle
-                  title={stage().title}
-                  path={drillPath()}
-                  command={{
-                    icon: 'arrow-up',
-                    label: drillReturn()?.returnTitle() ?? stage().title,
-                    disabled: committing(),
-                    onClick: () => drillReturn()?.returnToIndex()
-                  }}
-                />
-              </Show>
-            ),
-            trailing: (
-              <Show
-                when={!isDrilled()}
-                fallback={
-                  <Show when={stage().trailingAction?.()}>
-                    {action => <UiActionButton {...action()} />}
-                  </Show>
-                }
-              >
-                <Show
-                  when={isLast()}
-                  fallback={
-                    <UiActionButton
-                      icon='arrow-right'
-                      label='Next'
-                      labelMode='visible'
-                      density='dense'
-                      disabled={committing()}
-                      loading={committing()}
-                      onClick={() => void advance()}
-                    />
-                  }
-                >
-                  <UiActionButton
-                    icon='check'
-                    label='Finish'
-                    labelMode='visible'
-                    density='dense'
-                    disabled={committing()}
-                    loading={committing()}
-                    onClick={() => void advance()}
-                  />
-                </Show>
-              </Show>
-            )
-          }}
-        >
-          <Show when={stage()} keyed>
-            {current => (
-              <div
-                data-shell='wizard-stage'
-                data-shell-direction={direction()}
-                data-shell-step={current.name}
-              >
-                {current.render({ registerDrillReturn: setDrillReturn })}
-              </div>
-            )}
-          </Show>
-        </PanelForm>
-      }
-    />
+          )
+          : undefined}
+        main={
+          <PanelForm
+            feedback={banner()}
+            header={
+              <PanelSequenceHeader
+                sequence={sequence}
+                busy={committing()}
+                drillReturn={workbench.drillReturn()}
+                trailingAction={workbench.trailingAction()}
+                onBack={back}
+                onNext={() => void advance()}
+                commit={{
+                  icon: 'check',
+                  label: 'Finish',
+                  labelMode: 'visible',
+                  density: 'dense',
+                  disabled: committing(),
+                  loading: committing(),
+                  onClick: () => void advance()
+                }}
+              />
+            }
+          >
+            <PanelSequenceStep sequence={sequence} context={workbench.context} />
+          </PanelForm>
+        }
+      />
+      <Show when={discard()}>
+        <WorkbenchDiscard onCancel={() => setDiscard(false)} onDiscard={props.onCancel} />
+      </Show>
+    </>
   )
 }

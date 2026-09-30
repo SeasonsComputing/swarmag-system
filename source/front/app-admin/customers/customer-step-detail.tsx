@@ -1,35 +1,39 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Customer onboarding customer stage                                           ║
+║ Customer detail step                                                         ║
 ║ Collects and validates customer identity and billing address details.        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Renders Customer identity, status, and billing-address fields and registers
+mounted field validation with the containing sequence.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+CustomerStepDetailProps  Customer detail panel inputs.
+CustomerStepDetail       Identity and address fields with validation.
 */
 
 import { expectNonEmptyString } from '@core/std'
-import { CUSTOMER_STATUSES, type CustomerStatus } from '@domain/abstractions/customer.ts'
+import { CUSTOMER_STATUSES } from '@domain/abstractions/customer.ts'
+import type { CustomerStatus } from '@domain/abstractions/customer.ts'
 import { For, onCleanup } from '@solid-js'
+import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
 import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
-import {
-  type UiComponent,
-  UiField,
-  UiFieldset,
-  UiInput,
-  UiLayout,
-  UiText,
-  UiToggleGroup,
-  UiToggleItem
-} from '@ux/ui'
-import type { OnboardingState } from './onboarding-state.ts'
+import { UiField, UiFieldset, UiInput, UiLayout, UiText, UiToggleGroup, UiToggleItem } from '@ux/ui'
+import type { UiComponent } from '@ux/ui'
+import type { CustomerState } from './customer-state.ts'
 
-/** Props for the customer and billing stage. */
-export type OnboardingStageCustomerProps = {
-  state: OnboardingState
-  onFormCheck: (check: () => boolean) => void
+/** Props for the customer and billing step. */
+export type CustomerStepDetailProps = {
+  state: CustomerState
+  context: PanelStepContext
 }
 
-/** Renders the customer and billing-address stage. */
-export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): UiComponent => {
+/** Renders the customer and billing-address step. */
+export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent => {
   let formRef: HTMLFormElement | undefined
   const { state } = props
   const validation = useAbstractionFormValidation(() => formRef, {
@@ -40,13 +44,12 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
     postalCode: () => expectNonEmptyString(state.postalCode(), 'ZIP / Postal Code'),
     country: () => expectNonEmptyString(state.country(), 'Country')
   })
-  props.onFormCheck(validation.validateForm)
-  onCleanup(() => props.onFormCheck(() => false))
+  onCleanup(props.context.registerValidation(validation.validateForm))
   useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
 
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
-      <UiLayout data-app='onboarding-stage-customer'>
+      <UiLayout data-app='customer-step-detail'>
         <UiFieldset legend='Customer Information'>
           <UiLayout>
             <UiField for='name' label='Name' required>
@@ -115,9 +118,9 @@ export const OnboardingStageCustomer = (props: OnboardingStageCustomerProps): Ui
   )
 }
 
-/** Props for a customer address input bound to onboarding state. */
+/** Props for a customer address input bound to Customer state. */
 type CustomerInputProps = {
-  state: OnboardingState
+  state: CustomerState
   validation: ReturnType<typeof useAbstractionFormValidation>
   name: 'line1' | 'line2' | 'city' | 'state' | 'postalCode' | 'country'
   label: string

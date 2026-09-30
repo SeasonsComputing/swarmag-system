@@ -113,6 +113,11 @@ Collection → Select(Item) → Drill-down → Detail → Drill-back
 
 **Composed with Index-Detail.** Full disclosure needs room it does not always have. `AbstractionManager` is Collection-Detail above its container threshold and Index-Detail below it, swapping the two panels rather than shrinking them. That is a composition decision belonging to the surface — the threshold is the manager's discriminant, not a rule about either archetype.
 
+**Composed with Sequence.** A Detail too large to meet at once decomposes into a Sequence of Steps (§4.2). The Detail presents the Sequence's progress. The Collection keeps its own place and never presents it. The Sequence's final advance position holds the Detail's commit. Which ascend control is live depends on the disclosure in effect:
+
+- **Collection-Detail, above the threshold.** The Collection is in view, and selecting another Item or creating one leaves the Detail from any Step.
+- **Index-Detail, below it.** Only one axis is live (§4.1). The first Step's ascend control returns to the Index; every later Step's returns to the previous Step. Nothing reaches the Index from a later Step.
+
 **Sketch**
 
 ```
@@ -249,7 +254,9 @@ A Decomposition is one subject presented in Parts. The Parts are not peers to ch
 
 **Disclosure.** Selective, and the clearest case of it: the user meets one Step at a time because the subject is too complex to meet whole. The same principle as Index-Detail, applied to the complexity of one subject rather than the cardinality of a set.
 
-**Orientation.** Selective disclosure costs orientation, so a Sequence must return it: the rail names every Step and marks the current one, and it is rendered unconditionally. That is the compensation, not decoration.
+**Orientation.** Selective disclosure costs orientation, so a Sequence must return it. It presents its progress: every Step, with the current one marked, whatever visualization shows it (§2.2). That is the compensation, not decoration. A Sequence of one Step has no progress to present.
+
+**Progress belongs to the whole.** Only what composes a Sequence knows all of its Steps, so progress is presented for the composed whole, never for a Step or for a group of Steps inside it. A group of Steps may be composed into more than one Sequence, and in each it is a fragment.
 
 **Sketch**
 
@@ -353,6 +360,8 @@ Address fields are a form composition pattern, not a single compound field.
 
 **Neither is the default, and a surface may choose differently at each level it uses.** The customer onboarding wizard commits on completion throughout: the Sequence writes once at Finish rather than after each Step, and each Item opened through its nested Index-Detail (a Site, a Note) holds a local draft that commits into its parent only on that panel's own Save, discarding on drill-back otherwise. That combination suits Onboarding, where an abandoned or cancelled flow must leave nothing behind. It is not a rule for every Sequence or Index-Detail — a surface editing a record that already exists, where each Step is a change to something real rather than a step toward creating it, may have good reason to commit with progression instead.
 
+**Leaving a changed draft asks.** Any act that would discard a draft differing from the value it opened with asks before discarding. That includes selecting another Item, creating one, drilling back, and cancelling the surface. An unchanged draft is left in one act. This holds wherever a draft is held, at every depth.
+
 ## 6. Supporting Library
 
 The machinery this repository already builds for the common cases. Reach for the row before designing a surface. Where no row fits, the work is the special case the Pareto split exists to protect — say so and escalate rather than bending a row to cover it.
@@ -363,6 +372,7 @@ The machinery this repository already builds for the common cases. Reach for the
 | Present a nested Collection at any depth | `DrillDown` + `CollectionPanel` | Index-Detail                     |
 | Capture or review Items one at a time    | `UiCollectionCursor`            | Collection-Cursor                |
 | Decompose a complex subject into steps   | `Wizard` + `WizardStage`        | Sequence                         |
+| Gate a form's panels in order, any host  | `PanelSequence`                 | Sequence                         |
 | A per-application configurable surface   | dashboard + widget catalog      | Chassis-Part                     |
 
 **Adding a row is a Foundation decision.** A new entry means this repository has a second way to do something it already did, and that requires the Chief Architect's judgment about whether the existing one should have been extended instead.

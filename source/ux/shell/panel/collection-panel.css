@@ -20,7 +20,7 @@
 }
 
 [data-shell='collection-panel-body'] {
-  block-size: calc(var(--sa-touch-target-sm) * 6);
+  block-size: calc(var(--sa-touch-target-sm) * 5);
   min-inline-size: 0;
   overflow: auto;
 }

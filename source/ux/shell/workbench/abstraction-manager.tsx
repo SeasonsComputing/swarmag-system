@@ -15,18 +15,19 @@ AbstractionManager  Generic list+panel manager component.
 */
 
 import type { Instance } from '@core/std'
-import { createEffect, createSignal, For, Show } from '@solid-js'
+import { createEffect, createSignal, For, onCleanup, Show, untrack } from '@solid-js'
 import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
-import { PanelHeaderTitle } from '@ux/shell/panel/panel-header-title.tsx'
 import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
 import { PanelList } from '@ux/shell/panel/panel-list.tsx'
+import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
+import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
+import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
 import {
   UiActionButton,
   UiAlert,
   UiButton,
-  type UiComponent,
   UiDialog,
   UiTable,
   UiTableBody,
@@ -34,13 +35,11 @@ import {
   UiTableHeader,
   UiTableRow
 } from '@ux/ui'
-import type {
-  AbstractionAction,
-  AbstractionEditorHandle,
-  AbstractionManagerContract
-} from './abstraction-manager-contract.ts'
+import type { UiComponent } from '@ux/ui'
+import type { AbstractionAction, AbstractionManagerContract } from './abstraction-manager-contract.ts'
 import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import { focusFirstField } from './use-abstraction-form-keyboard.ts'
+import { createWorkbenchContext, WorkbenchDiscard } from './workbench-context.tsx'
 
 import './abstraction-manager.css'
 
@@ -65,7 +64,15 @@ export const AbstractionManager = <T extends Instance, Draft>(
 ): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
   const [mode, setMode] = createSignal<AbstractionManagerMode>('list')
-  const [editorHandle, setEditorHandle] = createSignal<AbstractionEditorHandle<Draft> | null>(null)
+  const [session, setSession] = createSignal<
+    {
+      draft: () => Draft
+      complete: () => boolean
+      isDirty: () => boolean
+      isDrilled: () => boolean
+    } | null
+  >(null)
+  const [pendingExit, setPendingExit] = createSignal<(() => void) | null>(null)
   const [editorFeedback, setEditorFeedback] = createSignal<PanelFeedback | null>(null)
   const [savePending, setSavePending] = createSignal(false)
   const [focusOnEpoch, setFocusOnEpoch] = createSignal(true)
@@ -86,12 +93,12 @@ export const AbstractionManager = <T extends Instance, Draft>(
   /** Advances the editor epoch and resets editor registration for a fresh render. */
   const bumpEditorEpoch = (focus: boolean): void => {
     setFocusOnEpoch(focus)
-    setEditorHandle(null)
     setEditorEpoch(epoch => epoch + 1)
   }
 
   /** Opens the editor for a selected item or a new draft. */
   const openEditor = (item: T | null): void => {
+    if (savePending() || actionPending()) return
     setEditorFeedback(null)
     setSelected(() => item)
     setMode('editor')
@@ -99,10 +106,10 @@ export const AbstractionManager = <T extends Instance, Draft>(
   }
 
   /** Opens the selected list item in the editor. */
-  const onSelect = (item: T): void => openEditor(item)
+  const onSelect = (item: T): void => requestExit(() => openEditor(item))
 
   /** Opens the editor for a new item. */
-  const onNew = (): void => openEditor(null)
+  const onNew = (): void => requestExit(() => openEditor(null))
 
   /** Reopens a new-item editor after create or destructive action completion. */
   const openFreshNew = (clearFeedback: boolean): void => {
@@ -112,22 +119,17 @@ export const AbstractionManager = <T extends Instance, Draft>(
     bumpEditorEpoch(true)
   }
 
-  /** Cancels the manager dialog and clears editor feedback. */
-  const cancelDialog = (): void => {
-    setEditorFeedback(null)
-    props.onCancel()
+  /** Shortcuts discard the enclosing context only after one confirmation. */
+  const requestExit = (action: () => void): void => {
+    if (savePending() || actionPending()) return
+    if (session()?.isDirty()) setPendingExit(() => action)
+    else action()
   }
+
+  const cancelDialog = (): void => requestExit(props.onCancel)
 
   /** Resolve display copy for an abstraction instance. */
   const itemLabel = (item: T): string => props.provider.itemLabel?.(item) ?? props.provider.entityLabel
-
-  /** Registers the active editor handle and removes it when that editor unmounts. */
-  const registerEditor = (handle: AbstractionEditorHandle<Draft>): () => void => {
-    setEditorHandle(() => handle)
-    return () => {
-      setEditorHandle(current => current === handle ? null : current)
-    }
-  }
 
   // Update remains on the saved record, so its epoch bump deliberately skips
   // focus — which leaves focus on the body. The banner is the landing spot: it
@@ -143,14 +145,14 @@ export const AbstractionManager = <T extends Instance, Draft>(
 
   /** Validates and persists the active editor draft. */
   const saveEditor = async (): Promise<void> => {
-    if (savePending()) return
+    if (savePending() || session()?.isDrilled()) return
     setEditorFeedback(null)
-    const handle = editorHandle()
+    const handle = session()
     if (!handle) {
       setEditorFeedback({ message: 'Editor is not ready to save.', variant: 'danger' })
       return
     }
-    if (!handle.validate()) {
+    if (!handle.complete()) {
       setEditorFeedback({ message: FORM_FEEDBACK_MESSAGE, variant: 'danger' })
       return
     }
@@ -221,6 +223,75 @@ export const AbstractionManager = <T extends Instance, Draft>(
       ? `Edit ${props.provider.entityLabel}`
       : `New ${props.provider.entityLabel}`
 
+  /** Each open creates one owned state lifetime, shared across its step mounts. */
+  const Detail = (): UiComponent => {
+    const detail = props.provider.detail(untrack(selected))
+    const baseline = JSON.stringify(detail.draft())
+    const sequence = createPanelSequence(() => detail.steps)
+    const workbench = createWorkbenchContext(sequence, setEditorFeedback, savePending)
+    const active = {
+      draft: detail.draft,
+      complete: sequence.complete,
+      isDrilled: () => workbench.drillReturn() !== null,
+      isDirty: () => JSON.stringify(detail.draft()) !== baseline || workbench.isDirty()
+    }
+    setSession(() => active)
+    onCleanup(() => setSession(current => current === active ? null : current))
+    const back = (): void => {
+      if (savePending() || active.isDrilled()) return
+      setEditorFeedback(null)
+      sequence.back()
+    }
+    const next = (): void => {
+      if (savePending() || active.isDrilled()) return
+      setEditorFeedback(sequence.next() ? null : { message: FORM_FEEDBACK_MESSAGE, variant: 'danger' })
+    }
+    const header = (collapsed: boolean): UiComponent => (
+      <PanelSequenceHeader
+        sequence={sequence}
+        title={detail.steps.length === 1 ? editorTitle() : undefined}
+        busy={savePending()}
+        drillReturn={workbench.drillReturn()}
+        trailingAction={workbench.trailingAction()}
+        onBack={back}
+        onNext={next}
+        firstReturn={collapsed
+          ? {
+            label: `${props.provider.entityLabel}s`,
+            onClick: () =>
+              requestExit(() => {
+                setMode('list')
+                setSelected(null)
+                bumpEditorEpoch(false)
+              })
+          }
+          : undefined}
+        commit={{
+          icon: 'check',
+          label: 'Save',
+          labelMode: 'visible',
+          density: 'dense',
+          disabled: savePending(),
+          loading: savePending(),
+          onClick: () => void saveEditor()
+        }}
+      />
+    )
+    return (
+      <PanelForm
+        feedback={editorFeedback()}
+        header={
+          <>
+            <div data-shell='abstraction-manager-collapse-action'>{header(true)}</div>
+            <div data-shell='abstraction-manager-expanded-title'>{header(false)}</div>
+          </>
+        }
+      >
+        <PanelSequenceStep sequence={sequence} context={workbench.context} />
+      </PanelForm>
+    )
+  }
+
   return (
     <>
       <PanelContainer
@@ -235,6 +306,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
                 label='Cancel'
                 labelMode='visible'
                 density='dense'
+                disabled={savePending() || actionPending()}
                 onClick={cancelDialog}
               />
             }
@@ -250,6 +322,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
                   label={`New ${props.provider.entityLabel}`}
                   labelMode='visible'
                   density='dense'
+                  disabled={savePending() || actionPending()}
                   onClick={onNew}
                 />
               )
@@ -289,6 +362,7 @@ export const AbstractionManager = <T extends Instance, Draft>(
                                   icon={action.icon}
                                   label={action.label}
                                   variant={action.variant}
+                                  disabled={savePending() || actionPending()}
                                   density='dense'
                                   onClick={event => {
                                     event.stopPropagation()
@@ -308,50 +382,20 @@ export const AbstractionManager = <T extends Instance, Draft>(
           </PanelList>
         }
         mainRef={element => panelRef = element}
-        main={
-          <PanelForm
-            feedback={editorFeedback()}
-            header={{
-              leading: (
-                <>
-                  <div data-shell='abstraction-manager-collapse-action'>
-                    <PanelHeaderTitle
-                      title={editorTitle()}
-                      command={{
-                        icon: 'arrow-left',
-                        label: `${props.provider.entityLabel}s`,
-                        onClick: () => setMode('list')
-                      }}
-                    />
-                  </div>
-                  <div data-shell='abstraction-manager-expanded-title'>
-                    <PanelHeaderTitle title={editorTitle()} />
-                  </div>
-                </>
-              ),
-              trailing: (
-                <UiActionButton
-                  icon='check'
-                  label='Save'
-                  labelMode='visible'
-                  density='dense'
-                  disabled={savePending()}
-                  loading={savePending()}
-                  onClick={() => void saveEditor()}
-                />
-              )
-            }}
-          >
-            <Show when={editorEpoch()} keyed>
-              {props.provider.renderForm(selected(), {
-                feedback: setEditorFeedback,
-                register: registerEditor,
-                saving: savePending
-              })}
-            </Show>
-          </PanelForm>
-        }
+        main={<Show when={editorEpoch()} keyed>{_epoch => <Detail />}</Show>}
       />
+      <Show when={pendingExit()}>
+        {action => (
+          <WorkbenchDiscard
+            onCancel={() => setPendingExit(null)}
+            onDiscard={() => {
+              const proceed = action()
+              setPendingExit(null)
+              proceed()
+            }}
+          />
+        )}
+      </Show>
       <Show when={pendingAction()}>
         {target => (
           <UiDialog
