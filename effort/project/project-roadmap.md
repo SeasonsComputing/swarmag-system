@@ -66,7 +66,7 @@ Three capabilities, each landing with the milestone that first needs it:
   running all need it.
 
 **Tags Component**
-Several ux features include tags. We need a tag component that is reusable. Tags-freeform-vs-controlled is still unresolved and gates scoping.
+Several app features include tags. We need a tag component that is reusable. Tags-freeform-vs-controlled is still unresolved and gates scoping.
 
 Rides with it: User Manager needs updating to consume it once built, User Management is closed once integrated.
 
