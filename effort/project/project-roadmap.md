@@ -31,24 +31,14 @@ top-level `source/ux/` namespace with its own `@ux/` import alias, sibling to `f
 than nested under it — the literal conclusion of treating `ux/` as a third-party library.
 `effort/completed/2026-09-15-shell-app-split-brief.md`.
 
-## 3. Customer Manager
+## 3. Customer Manager — Closed 2026-09-30
 
-Closes the Users & Customers vertical slice (`project-user-stories.md` §1.1: post-genesis editing
-and additional-contact assignment, neither built today). Backlog: "Customer Manager" (`normal`).
+Post-genesis Customer editing through `AbstractionManager`, reusing Onboarding's Customer steps.
+Both workbenches now host a sequence of one or more steps over one shared `panel/` step contract.
+`effort/completed/2026-09-22-customer-manager-brief.md`.
 
-The Customer Manager is not a new form — it's the onboarding wizard's Contact/Customer/Sites stages,
-reused as the edit surface. May touch foundation lightly: a second instance of the Manager/Wizard
-cross-pollination that produced `AbstractionManager`/`Wizard` in the first place, this time
-surfacing whatever lets one stage sequence serve both a bounded create-flow and a loop-until-
-cancel edit-flow. Minimal work expected, but worth naming as its own reusable shape if the
-pattern repeats a third time.
-
-```
-    TOPIC: Customer
-ARCHETYPE: Abstraction Manager | Wizard
-    ASIDE: Collection/Index    | Progress tree
-     MAIN: Customer Form       | Customer Form + Initial Job Assessment Form
-```
+It does not close the Users & Customers slice (§1). Additional-contact assignment
+(`project-user-stories.md` §1.1) is still unbuilt and has no slot yet.
 
 ## 4. Notes Editor
 
@@ -153,8 +143,8 @@ Features not belonging to any theme are added to whatever session happens to tou
   afterward. `CONVENTIONS.md` §12's convention only covers domain/adapter/API today; extending it
   to the UX layer is foundation work belonging with whichever milestone needs it first (most
   likely §2 or §3).
-- **Style guide into `ux/`** — "`app-style-guide` belongs in `ux/`, not `front/`" (`low`), after
-  the Customer Manager production lands, since both touch `architecture-front.md`.
+- **Style guide into `ux/`** — "`app-style-guide` belongs in `ux/`, not `front/`" (`low`).
+  Unblocked now that the Customer Manager production has landed.
 - **Managers load only the first page of their Collection** (`normal`) — one shared fix for User
   Manager and Customer Manager, not one per manager.
 
