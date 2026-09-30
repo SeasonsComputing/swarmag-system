@@ -1,47 +1,33 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ User manager editor                                                          ║
-║ User editor fields and draft projection for the User Manager.                ║
+║ User detail step                                                             ║
+║ User step fields and draft projection for the User Manager.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Renders the mounted User Manager editor instance, owns field-local state and
-validation rings, and exposes validation plus draft projection to the manager.
+Renders the User detail step against host-owned state and registers mounted
+validation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UserDraft   Draft projected by the user editor.
-UserEditor  User Manager editor form.
+UserDraft        Draft projected by User state.
+createUserState  Create signals and a stable draft projection.
+UserStepDetail  User Manager detail step.
 */
 
-import {
-  expectEmail,
-  expectNonEmptyString,
-  type FromInstantiable,
-  type ScopedUpdate,
-  toEmail,
-  toTrimmed
-} from '@core/std'
-import {
-  CONTACT_PREFERRED_CHANNELS,
-  type ContactPreferredChannel,
-  type Note
-} from '@domain/abstractions/common.ts'
-import {
-  type User,
-  USER_ROLES,
-  USER_STATUSES,
-  type UserRole,
-  type UserStatus
-} from '@domain/abstractions/user.ts'
-import { createEffect, createSignal, For, onCleanup, onMount } from '@solid-js'
-import type { AbstractionEditorContext } from '@ux/shell/workbench/abstraction-manager-contract.ts'
+import { expectEmail, expectNonEmptyString, toEmail, toTrimmed } from '@core/std'
+import type { FromInstantiable, ScopedUpdate } from '@core/std'
+import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
+import type { ContactPreferredChannel, Note } from '@domain/abstractions/common.ts'
+import { USER_ROLES, USER_STATUSES } from '@domain/abstractions/user.ts'
+import type { User, UserRole, UserStatus } from '@domain/abstractions/user.ts'
+import { createSignal, For, onCleanup } from '@solid-js'
+import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useAbstractionFormFeedback } from '@ux/shell/workbench/use-abstraction-form-feedback.ts'
 import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
 import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
 import {
-  type UiComponent,
   UiField,
   UiFieldset,
   UiInput,
@@ -53,26 +39,86 @@ import {
   UiToggleGroup,
   UiToggleItem
 } from '@ux/ui'
+import type { UiComponent } from '@ux/ui'
 
-/** Draft projected by the user editor. */
+/** Draft projected by the User state. */
 export type UserDraft =
   & Omit<ScopedUpdate<User, keyof FromInstantiable<User>>, 'id' | 'avatarUrl'>
   & { avatarUrl: string | undefined }
 
-/** Renders the create or edit form for one user. */
-export function UserEditor(props: {
-  context: AbstractionEditorContext<UserDraft>
-  user: User | null
-}): UiComponent {
-  const [displayName, setDisplayName] = createSignal(props.user?.displayName ?? '')
-  const [primaryEmail, setPrimaryEmail] = createSignal(props.user?.primaryEmail ?? '')
-  const [phoneNumber, setPhoneNumber] = createSignal(props.user?.phoneNumber ?? '')
+/** Create one User draft lifetime, independently of mounted step controls. */
+export const createUserState = (user: User | null) => {
+  const [displayName, setDisplayName] = createSignal(user?.displayName ?? '')
+  const [primaryEmail, setPrimaryEmail] = createSignal(user?.primaryEmail ?? '')
+  const [phoneNumber, setPhoneNumber] = createSignal(user?.phoneNumber ?? '')
   const [preferredChannel, setPreferredChannel] = createSignal<ContactPreferredChannel>(
-    props.user?.preferredChannel ?? 'email'
+    user?.preferredChannel ?? 'email'
   )
-  const [notesText, setNotesText] = createSignal(noteContent(props.user?.notes ?? []))
-  const [roles, setRoles] = createSignal<UserRole[]>(props.user ? [...props.user.roles] : [])
-  const [status, setStatus] = createSignal<UserStatus>(props.user?.status ?? 'active')
+  const [notesText, setNotesText] = createSignal(noteContent(user?.notes ?? []))
+  const [roles, setRoles] = createSignal<UserRole[]>(user ? [...user.roles] : [])
+  const [status, setStatus] = createSignal<UserStatus>(user?.status ?? 'active')
+  const noteCreatedAt = user?.notes[0]?.createdAt ?? new Date().toISOString()
+  const nextNotes = (existingNotes: readonly Note[]): Note[] => {
+    const content = notesText().trim()
+    if (content.length === 0) return []
+    return [{
+      attachments: [],
+      createdAt: existingNotes[0]?.createdAt ?? noteCreatedAt,
+      content,
+      visibility: 'internal',
+      tags: []
+    }]
+  }
+  const userDraft = (): UserDraft => ({
+    displayName: toTrimmed(displayName()),
+    primaryEmail: toEmail(primaryEmail()),
+    phoneNumber: toTrimmed(phoneNumber()),
+    preferredChannel: preferredChannel(),
+    notes: nextNotes(user?.notes ?? []),
+    roles: roles(),
+    avatarUrl: user?.avatarUrl,
+    status: status()
+  })
+  return {
+    displayName,
+    setDisplayName,
+    primaryEmail,
+    setPrimaryEmail,
+    phoneNumber,
+    setPhoneNumber,
+    preferredChannel,
+    setPreferredChannel,
+    notesText,
+    setNotesText,
+    roles,
+    setRoles,
+    status,
+    setStatus,
+    draft: userDraft
+  }
+}
+
+/** Renders the create or edit step for one user. */
+export function UserStepDetail(props: {
+  context: PanelStepContext
+  state: ReturnType<typeof createUserState>
+}): UiComponent {
+  const {
+    displayName,
+    setDisplayName,
+    primaryEmail,
+    setPrimaryEmail,
+    phoneNumber,
+    setPhoneNumber,
+    preferredChannel,
+    setPreferredChannel,
+    notesText,
+    setNotesText,
+    roles,
+    setRoles,
+    status,
+    setStatus
+  } = props.state
   let formRef: HTMLFormElement | undefined
   useAbstractionFormFeedback(() => formRef, props.context.feedback)
   const validation = useAbstractionFormValidation(() => formRef, {
@@ -83,27 +129,6 @@ export function UserEditor(props: {
   })
   useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
 
-  createEffect(() => {
-    setDisplayName(props.user?.displayName ?? '')
-    setPrimaryEmail(props.user?.primaryEmail ?? '')
-    setPhoneNumber(props.user?.phoneNumber ?? '')
-    setPreferredChannel(props.user?.preferredChannel ?? 'email')
-    setNotesText(noteContent(props.user?.notes ?? []))
-    setRoles(props.user ? [...props.user.roles] : [])
-    setStatus(props.user?.status ?? 'active')
-    validation.reset()
-  })
-
-  const userDraft = (): UserDraft => ({
-    displayName: toTrimmed(displayName()),
-    primaryEmail: toEmail(primaryEmail()),
-    phoneNumber: toTrimmed(phoneNumber()),
-    preferredChannel: preferredChannel(),
-    notes: nextNotes(props.user?.notes ?? []),
-    roles: roles(),
-    avatarUrl: props.user?.avatarUrl,
-    status: status()
-  })
   const submit = (event: SubmitEvent): void => {
     event.preventDefault()
   }
@@ -123,30 +148,13 @@ export function UserEditor(props: {
     value,
     label: UiText.label(value)
   }))
-  const nextNotes = (existingNotes: readonly Note[]): Note[] => {
-    const content = notesText().trim()
-    if (content.length === 0) return []
-    return [{
-      attachments: [],
-      createdAt: existingNotes[0]?.createdAt ?? new Date().toISOString(),
-      content,
-      visibility: 'internal',
-      tags: []
-    }]
-  }
-  const checkEditor = (): boolean => {
+  const checkStep = (): boolean => {
     const nativeValid = formRef?.reportValidity() ?? true
     const fieldsValid = validation.validateForm()
     return nativeValid && fieldsValid
   }
 
-  onMount(() => {
-    const unregister = props.context.register({
-      validate: checkEditor,
-      draft: userDraft
-    })
-    onCleanup(unregister)
-  })
+  onCleanup(props.context.registerValidation(checkStep))
 
   return (
     <form id='abstraction-panel-form' ref={formRef} onSubmit={submit}>
@@ -163,7 +171,7 @@ export function UserEditor(props: {
                 }}
                 onBlur={() => validation.blurField('displayName')}
                 error={validation.isInvalid('displayName')}
-                disabled={props.context.saving()}
+                disabled={props.context.busy()}
                 required
               />
             </UiField>
@@ -178,7 +186,7 @@ export function UserEditor(props: {
                 }}
                 onBlur={() => validation.blurField('primaryEmail')}
                 error={validation.isInvalid('primaryEmail')}
-                disabled={props.context.saving()}
+                disabled={props.context.busy()}
                 required
               />
             </UiField>
@@ -193,7 +201,7 @@ export function UserEditor(props: {
                 }}
                 onBlur={() => validation.blurField('phoneNumber')}
                 error={validation.isInvalid('phoneNumber')}
-                disabled={props.context.saving()}
+                disabled={props.context.busy()}
                 required
               />
             </UiField>
@@ -207,7 +215,7 @@ export function UserEditor(props: {
                 options={preferredChannelOptions}
                 value={preferredChannel()}
                 onChange={value => setPreferredChannel(value as ContactPreferredChannel)}
-                disabled={props.context.saving()}
+                disabled={props.context.busy()}
               />
             </UiField>
           </UiLayout>
@@ -220,7 +228,7 @@ export function UserEditor(props: {
                 rows={5}
                 value={notesText()}
                 onInput={event => setNotesText(event.currentTarget.value)}
-                disabled={props.context.saving()}
+                disabled={props.context.busy()}
               />
             </UiField>
           </UiLayout>
@@ -237,14 +245,14 @@ export function UserEditor(props: {
                   validation.changeField('roles')
                 }}
                 error={validation.isInvalid('roles')}
-                disabled={props.context.saving()}
+                disabled={props.context.busy()}
               />
             </UiField>
             <UiField variant='caption' label='Status'>
               <UiToggleGroup<UserStatus>
                 value={status()}
                 onChange={setStatus}
-                disabled={props.context.saving()}
+                disabled={props.context.busy()}
               >
                 <For each={USER_STATUSES}>
                   {value => (

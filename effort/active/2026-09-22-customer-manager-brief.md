@@ -210,4 +210,254 @@ still creates a Customer correctly after its rewrite and rename; Customer Manage
 edits, and saves an existing Customer through all three panels; sign-out/back-in and Job Sites
 functionality (which already depends on `job-views.ts`, unaffected here) remain unaffected.
 
+## Amendment — 2026-09-24 — Chief Architect production decisions
+
+Foundation production is authorized by the Chief Architect's decisions below. This amendment
+supersedes conflicting proposals above while preserving their reasoning history.
+
+1. **Ownership.** The Customer editor owns state and `draft()`. `PanelSequence` owns ordered
+   panels, cursor, Back, validated Next, completion validation, and validation registration/cleanup.
+   It owns no persistence, draft, or chrome. The earlier assignment of draft aggregation to the
+   primitive is superseded. Customer edits commit once on final Save.
+2. **Navigation composition.** The CA updated UX archetypes §§3.3, 4.1, and 4.2 to the shipped
+   Wizard design. This is not a Wizard correction. Only one axis is live: inside Detail, sequence
+   controls are absent, drill-back is the sole ascend action, and the innermost Detail's commit
+   occupies the advance position. Commit validates and returns to its Index; failure stays in
+   Detail. Drill-back confirms discard only for a changed draft. Headers name paths by kind,
+   not instance. Glyphs and motion belong to design language. Customer Manager reproduces this
+   composition. Read and report divergences in `ux-design-archetypes.md`; do not edit it or add
+   a Supporting Library row without a separate CA decision.
+3. **New included.** New opens a blank Customer draft in the same Manager editor. Customers
+   exist independently; Onboarding remains the intake workflow and shares the stage panels.
+4. **Delete included.** Use `api.Customers.delete` with confirmation, following User Manager.
+   Delete removes a mistaken, duplicate, or abandoned account; inactive identifies a real former
+   customer. Soft deletion preserves recoverability and references. Hard deletion belongs only
+   to explicit retention policy. A Jobs dependency guard is deferred to Job Definition because
+   no Jobs exist yet.
+5. **Integration accepted.** Add optional Manager editor navigation registration. Aggregate Save
+   is available only at sequence completion without an open nested draft. Host nested Sites
+   Save/drill-return. Add one combined update scope excluding `accountManagerId` and account-level
+   `notes`, `/customers`, and its dashboard entry. The seed-hash reset is accepted. Complete the
+   named stage/host renames. This effort supplies post-genesis editing; it does **not** close the
+   Users & Customers vertical slice, since additional-contact assignment remains out of scope.
+6. **State port.** Port existing state, adding hydration and draft isolation. Introduce intent-method
+   setters only if those requirements need them, and justify any such change in the production report.
+7. **List cap.** Match User Manager's `list({ limit: 100 })`. Full-collection pagination is excluded;
+   the shared first-page cap is separate backlog work for both managers.
+8. **Tests.** Add API-level tests only, under `source/tests/cases/`: combined update scope,
+   excluded-field preservation, and optional-field clearing. UX controller tests are excluded until
+   the testing convention is extended through a separately authorized CONVENTIONS amendment.
+
+Documentation precedes code: this amendment, then `architecture-front.md`. Expected production
+touches Customer and Onboarding files, User detail naming/imports, panel sequence and workbench
+integration, the API update-scope declaration, Admin route/dashboard composition, and API tests.
+Domain/schema, backend, deployment, governance documents, UX archetypes, and unrelated repairs
+remain excluded. Run `deno task check` at integration checkpoints, focused API tests, formatting
+verification, and the live regression checks above (including New/Delete and nested draft behavior).
+Record checks actually performed and remaining verification; closure requires CA review and
+independent verification under EFFORT.md.
+
+## Amendment — 2026-09-25 — Chief Architect review: both workbenches host steps
+
+The Chief Architect and AI Architect reviewed the uncommitted production against this brief.
+The committed foundation (User Manager, Onboarding, `Wizard`, `AbstractionManager`) was sound;
+the defects were in production. Two were structural:
+
+- `customer-editor.tsx` added a layer the design never had. It copied `Wizard`'s composed header
+  logic, glyphs included, into feature code.
+- The same file rendered the Wizard's stepflow inside the Manager's main panel. That shows the
+  Customer's three steps as a whole Sequence. They are a fragment of Onboarding's.
+
+The review settled why the layer appeared. `AbstractionManager` hands one opaque form to
+`renderForm`, so a multi-step Detail had nowhere to live except a wrapper.
+
+**Superseded.** This amendment replaces:
+
+- from "How each host embeds it", `Wizard`'s per-stage independent `commit()` and
+  `renderForm` embedding the primitive;
+- from the 2026-09-24 amendment, item 1's "The Customer editor owns state and `draft()`";
+- item 5's optional Manager editor-navigation registration;
+- the "File-level plan" names `*-stage-*` and `customer-panels`.
+
+Everything else in the 2026-09-24 amendment stands: New, Delete, update scope, list cap, tests,
+route, and dashboard.
+
+### Decisions
+
+1. **Vocabulary is _step_,** as in the pattern book. The code follows: `*-stage-*` files become
+   `*-step-*`, and the `WizardStage` types are removed (decision 4).
+2. **Both workbenches host a sequence of one or more steps.** A step is one panel. A drill-down
+   inside a step replaces that panel's content and is still the same step. User Manager has one
+   step and Customer Manager three. Onboarding has the Customer's three today, and more once
+   Initial Job Assessment joins.
+3. **The workbench owns the aggregate draft and commits it once.** `Wizard` commits at Finish
+   through its contract. That commit may write one abstraction, several, or none. The Manager
+   commits at Save through its existing `create`/`update`. Steps never commit.
+4. **The step contract lives in `ux/shell/panel/`,** because both workbenches share it:
+
+   | Name                                           | Role                                                                                                                                |
+   | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+   | `PanelStep`                                    | `name`, `title`, optional `validate`, `render(context)`                                                                             |
+   | `PanelSequence`                                | `readonly PanelStep[]` — the type, not a component                                                                                  |
+   | `PanelStepContext`                             | Validation registration, drill-return and trailing-action registration, `feedback`, `busy`                                          |
+   | `createPanelSequence` / `PanelSequenceControl` | Cursor, Back, validated Next, completion validation, validation registration. Role unchanged; no chrome, draft, or persistence      |
+   | `PanelSequenceStep`                            | Renders the current step and owns the step transition motion (renamed from the `PanelSequence` component)                           |
+   | `PanelSequenceHeader`                          | The composed header of UX archetypes §4.2, lifted from `wizard.tsx`. The host supplies its commit action for the final advance slot |
+   | `PanelSequenceProgress`                        | The horizontal progress indicator, lifted from `Wizard`'s accessory. Rendered for any sequence of more than one step                |
+
+   The glyphs, the header states, and the transition motion exist once, here. No feature restates
+   them.
+5. **Progress belongs to the Sequence, not to either workbench.** A sequence of more than one step
+   presents `PanelSequenceProgress` in whatever host it runs. A one-step sequence presents none.
+   `Wizard` also lays the sequence out as a tree in its aside (`PanelStepflow`); that is Wizard
+   chrome and it stays so. The Manager contributes no progress chrome, and its aside is always its
+   Collection.
+6. **Only the composer of a sequence knows the whole of it.** `customerSteps(state)` is a
+   fragment. It knows nothing of position, progress, or what precedes or follows it.
+   `onboarding-wizard.tsx` composes Onboarding's sequence from `customers/` today, and from Initial
+   Job Assessment's steps later. Both of the Wizard's progress presentations derive from that
+   composed sequence.
+7. **Wizard contract:** `WizardContract = { formTitle, steps: PanelSequence, commit, feedback? }`.
+   `WizardStage`, `WizardStageContext`, `canAdvance`, `trailingAction`, and per-step `commit` are
+   removed. There is one mechanism for each concern: sequence validation, context-registered
+   trailing action, and one commit.
+8. **Manager contract:** `renderForm` is removed, and so is every `AbstractionEditor*` type:
+   handle, registration, navigation, and context. They are replaced by
+   `detail: (item: T | null) => AbstractionDetail<Draft>`, where
+   `AbstractionDetail<Draft> = { steps: PanelSequence; draft: () => Draft }`. The Manager calls
+   `detail` for each Item it opens, which is how hydration works, and it validates through
+   sequence completion. Save occupies the final advance slot and is offered only when no nested
+   Detail is open.
+9. **Manager navigation.**
+   - **Collapsed (Index-Detail).** One axis is live. Step 1's leading control returns to the
+     Index; later steps show Back. There is no shortcut to the Index.
+   - **Expanded (Collection-Detail).** Selecting another Item, or New, is a shortcut from any step.
+10. **Any exit that discards a changed draft asks first.** That covers another Item, New, the
+    collapsed return from step 1, and Cancel. The Manager snapshots the draft when it opens an Item
+    and compares before any exit. This is new behavior for both managers: User Manager discards
+    silently today.
+11. **Feature files.**
+
+    | Now                                                     | Becomes                                                                         |
+    | ------------------------------------------------------- | ------------------------------------------------------------------------------- |
+    | `customers/customer-editor.tsx`                         | Deleted                                                                         |
+    | `customers/customer-panels.tsx`                         | `customers/customer-steps.tsx`, exporting `customerSteps(state)` only           |
+    | `CustomerDraft`, `customerDraft()`                      | Move to `customers/customer-state.ts`, beside the state they project            |
+    | `CustomerPanelContext`                                  | Deleted — `PanelStepContext` replaces it                                        |
+    | `customers/customer-stage-{contact,detail,sites}.tsx`   | `customers/customer-step-{contact,detail,sites}.tsx` (`CustomerStepContact`, …) |
+    | `users/user-stage-detail.tsx`                           | `users/user-step-detail.tsx` (`UserStepDetail`)                                 |
+    | Step name `'customer'` (title "Customer address")       | `'detail'`, matching its file                                                   |
+    | Sites step's `onReturnControl`/`onTrailingAction` props | `PanelStepContext`, like every other step                                       |
+    | `customer-manager.css` step motion                      | Removed — owned by `PanelSequenceStep`                                          |
+
+    - `customer-manager.tsx`: `detail` creates Customer state and returns `customerSteps(state)`
+      and `customerDraft(state)`.
+    - `onboarding-wizard.tsx`: passes `customerSteps(state)` and a `commit` that creates the
+      Customer. It no longer mutates a stage array.
+12. **Corrections.** In `Wizard.advance`, validate once. Replace stale headers in the renamed and
+    moved files: "User manager editor", "Customer editor state", and `onboarding-wizard.css`.
+
+UX archetypes and `architecture-front.md` §10.1.6 were updated alongside this amendment by the
+AI Architect under Chief Architect authorization. Production resumes from these documents.
+The 2026-09-24 amendment's checks and verification stand, with these additions:
+
+- **User Manager.** Edit and save a user; dirty-exit confirmation on another Item, New, and Cancel.
+- **Customer Manager.** No progress chrome outside the Detail. Collapsed return only from step 1.
+- **Onboarding.** Both progress presentations unchanged.
+
+## Amendment — 2026-09-28 — Round 2 production and contextual dirty exits
+
+The Chief Architect authorized Round 2 Foundation production against the September 25
+amendment. Dirty-state remains local to the context holding a draft. Local Save validates and
+applies to the parent; local Up discards only that Detail, confirming only when changed.
+Sequence Back/Next preserves state and does not prompt.
+
+Workbench Cancel and collection select/New abandon the enclosing session. The workbench checks
+its aggregate and open nested drafts and asks once before discarding. The collapsed first-step
+return to the collection receives the same protection. Declining preserves the entire session.
+`PanelStepContext.registerDirty` registers a change check and returns cleanup. Checks for retained
+feature state live for the workbench session, independently of mounted step controls; checks for
+local nested drafts are removed when those drafts close. Dirty-state does not enter the sequence
+controller. Equivalent dialog dismissal paths are inspected; any required new shell contract is
+an escalation boundary. Browser-tab closure is excluded.
+
+Production covers the shared sequence contracts and presentation, both workbench integrations,
+and Customer, User, and Onboarding adaptation. Verification remains API-level automated tests,
+repository checks, formatting/style audit, and live walkthroughs. UX archetypes and governance
+remain read-only. CA review and independent verification remain required for closure.
+
+### Round 2 production record — 2026-09-28
+
+**Mode:** Foundation. Implementation follows the September 25 amendment and the contextual
+dirty-exit agreement above. This record is not effort closure; CA review and independent
+verification remain outstanding.
+
+**Created or renamed relative to Round 1:**
+
+- `source/ux/shell/panel/panel-sequence-contract.ts`.
+- `source/ux/shell/panel/panel-sequence-header.tsx` and `.css`.
+- `source/ux/shell/panel/panel-sequence-progress.tsx` and `.css`.
+- `source/ux/shell/panel/panel-sequence-step.tsx` and `.css`.
+- `source/ux/shell/workbench/workbench-context.tsx` for contextual registration and discard confirmation.
+- `source/front/app-admin/customers/customer-steps.tsx`, replacing `customer-panels.tsx`.
+- Customer `customer-step-contact.tsx`, `customer-step-detail.tsx`, and `customer-step-sites.tsx`,
+  replacing the corresponding Round 1 `customer-stage-*` files.
+- `source/front/app-admin/users/user-step-detail.tsx`, replacing `user-stage-detail.tsx`.
+
+**Modified:** this brief; `documentation/architecture/architecture-front.md`; shared
+`panel-sequence.tsx` and `panel-form.tsx`; both workbench contracts and components; `wizard.css`;
+Customer state, manager, and manager CSS; User Manager; Onboarding wizard and its CSS.
+`customer-editor.tsx` was deleted. Renames remove the superseded Round 1 paths above. Existing
+Round 1 API scope, route/dashboard integration, and API tests remain in the working tree.
+CA-owned archetype, roadmap, backlog, and unrelated brief edits were preserved.
+
+**Implementation notes:** no Customer intent-method setter refactor was introduced. User signals
+and draft projection were ported into a per-open factory so the Manager owns their lifetime.
+A new User note's timestamp is allocated once per draft, keeping repeated projections stable.
+Nested dirty checks follow active draft contexts; retained Customer state checks survive step
+unmount. Busy step content is inert while aggregate persistence is pending.
+
+**Checks and results:**
+
+- `deno task check`: passes after integration (guards, type check, lint).
+- `deno test --allow-env --allow-read source/tests/cases/customer-api-test.ts`: 3 passed.
+- Targeted dprint verification, `git diff --check`, and header/line-width audit: passed.
+- `STYLE_AUDIT: PASS` for Round 2 panel, workbench, Customer, User, and Onboarding source changes.
+- Local Admin walkthrough at port 5173 used browser-intercepted fixture API/auth responses, with
+  no live-record writes and no application runtime exceptions. Verified Customer hydration,
+  validation gates, nested Note/Site saves, one aggregate update, optional address clearing,
+  failed-write retry, New, confirmed soft Delete, changed/unchanged/reverted exits, and a dirty
+  parent Site beneath an unchanged Note. Verified narrow first-step return, later-step Back,
+  and nested drill-back/local Save. Verified User save and select/New/Cancel guards, Onboarding
+  progress, retained earlier-step dirty detection, one Finish write, and mocked sign-out/sign-in.
+- Production fixes during verification: Solid keyed-render callback typing; a progress/content
+  CSS selector collision; stale naming and header alignment. Fixture harness mapping/response
+  issues were corrected separately from application code.
+
+**Remaining:** Escape closes a changed workbench through the shell route without its dirty check.
+This was reproduced in the browser. Approval was requested to make non-dismissible `UiDialog`
+surfaces block Escape as they already block outside clicks; the primitive remains unchanged
+pending that decision. UX archetypes §6 still names the removed `WizardStage`; reported only.
+No UX automated tests, pagination, Jobs deletion guard, additional contacts, domain/schema,
+backend, deployment, or browser-tab closure changes were made. Real-service auth/persistence
+verification and independent review remain outside this fixture walkthrough.
+
+### Amendment — 2026-09-30 — Escape dismissal
+
+The Chief Architect authorized blocking Escape for non-dismissible dialogs. Foundation scope:
+`UiDialog` applies its existing `dismissible` policy to Escape as well as outside clicks.
+Workbenches continue to leave through explicit controls and their contextual dirty checks.
+Dismissible dialogs retain Escape dismissal. No new shell navigation contract is introduced.
+Expected changes are the dialog primitive, this brief, and architecture-front; verification is
+repository checks, formatting, and a focused browser walkthrough. No files are created or deleted.
+
+**Result:** implemented in `source/ux/ui/components/ui-dialog.tsx`; this brief and
+`documentation/architecture/architecture-front.md` document the policy. `deno task check`, targeted
+dprint verification, and `git diff --check` pass. The fixture-backed local browser walkthrough
+confirmed that Escape preserves a changed Customer workbench and its discard confirmation,
+explicit Cancel still invokes the dirty check, declining discard retains the draft, and the
+dismissible About dialog still closes with Escape. `STYLE_AUDIT: PASS` for the dialog change.
+The September 28 Escape escalation is resolved. No credential rotation or other out-of-scope
+production was performed. CA review and independent verification remain required for effort closure.
+
 _End of Backlog Brief_

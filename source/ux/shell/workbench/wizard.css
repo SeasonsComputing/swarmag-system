@@ -6,10 +6,10 @@
 */
 
 /* The stepflow column is FIXED, not content-sized. Bare max-content made its
-   width a function of stage-title text, which would make the collapse threshold
+   width a function of step-title text, which would make the collapse threshold
    below correct for one flow and silently wrong for the next. A fixed track
    bounds the two-column minimum for EVERY wizard — track + gap + main panel
-   minimum — and gives short-labelled flows the same column as long ones. A stage
+   minimum — and gives short-labelled flows the same column as long ones. A step
    title wider than the track wraps rather than widening the column.
    Changing this value REQUIRES changing the threshold below with it.
 
@@ -26,118 +26,8 @@
   grid-template-columns: minmax(280px, 1.3fr) minmax(var(--sa-size-min), 1.7fr);
 }
 
-[data-shell='wizard-indicator'] {
-  display: flex;
-  flex-direction: column;
-  gap: var(--sa-space-sm);
-}
-
-/* One contiguous progress rail, echoing the progress-bar language;
-   the fill inline-size is driven by the host per step. */
-[data-shell='wizard-bar'] {
-  background: var(--sa-bg-progress-track);
-  border-radius: var(--sa-radius-full);
-  min-block-size: calc(var(--sa-progress-height) / 2);
-  overflow: hidden;
-}
-
-[data-shell='wizard-bar-fill'] {
-  background: var(--sa-gradient-brand);
-  block-size: calc(var(--sa-progress-height) / 2);
-  border-radius: var(--sa-radius-full);
-  transition: var(--sa-transition-base);
-}
-
-[data-shell='wizard-steps'] {
-  display: flex;
-  gap: 0;
-  justify-content: space-between;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* Neutralize the list-item primitive's content-list spacing. */
-[data-shell='wizard-steps'] [data-shell='wizard-step'] {
-  margin-block: 0;
-  padding-inline-start: 0;
-}
-
-/* Labels sit beneath the rail, one per segment; upcoming is the dim default. */
-[data-shell='wizard-step'] {
-  color: var(--sa-text-dim);
-  display: flex;
-  flex: 0 1 auto;
-  font-size: var(--sa-ui-font-size-compact);
-  justify-content: flex-start;
-  min-inline-size: 0;
-}
-
-[data-shell='wizard-step'][data-shell-state='done'] {
-  color: var(--sa-text-secondary);
-}
-
-[data-shell='wizard-step'][data-shell-state='current'] {
-  color: var(--sa-color-accent);
-  font-weight: var(--sa-ui-font-weight-strong);
-}
-
-[data-shell='wizard-step-label'] {
-  align-items: center;
-  display: inline-flex;
-  gap: var(--sa-space-xs);
-  justify-content: center;
-  min-inline-size: 0;
-  text-align: start;
-}
-
-[data-shell='wizard-step-title'] {
-  line-height: 1.1;
-  min-inline-size: 0;
-}
-
-[data-shell='wizard-step-ordinal'] {
-  align-items: center;
-  background: transparent;
-  block-size: var(--sa-space-lg);
-  border: var(--sa-border-default);
-  border-radius: var(--sa-radius-full);
-  color: inherit;
-  display: inline-flex;
-  flex: 0 0 auto;
-  font-family: var(--sa-data-font-family);
-  inline-size: var(--sa-space-lg);
-  justify-content: center;
-}
-
-/* The stage element is remounted per step, so the animation runs on mount and
-   needs no timing help. Direction is behaviour: Next enters from the inline end,
-   Back from the inline start. */
-[data-shell='wizard-stage'][data-shell-direction='forward'] {
-  animation: sa-slide-in-end var(--sa-motion-page-fade) ease;
-}
-
-[data-shell='wizard-stage'][data-shell-direction='backward'] {
-  animation: sa-slide-in-start var(--sa-motion-page-fade) ease;
-}
-
-[data-shell='wizard'] [data-shell-panel='header-title'] {
-  flex: 1 1 auto;
-}
-
-[data-shell='wizard'] [data-shell-panel='header-title-path'] > h2 {
-  color: var(--sa-color-primary);
-  flex: 1 1 auto;
-  overflow: hidden;
-  text-align: start;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-shell='wizard-stage'][data-shell-direction] {
-    animation: none;
-  }
+[data-shell='wizard'][data-shell-mode='single'] {
+  grid-template-columns: minmax(0, 1fr);
 }
 
 /* Derived from this surface's own track sizes, not inherited: aside floor 280

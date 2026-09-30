@@ -13,13 +13,12 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AbstractionActionConfirmation  Confirmation copy for a consequential action.
 AbstractionAction              A named action executable on an abstraction instance.
-AbstractionEditorHandle        Per-instance editor validation and draft surface.
-AbstractionEditorContext       Manager-owned editor services exposed to a form.
+AbstractionDetail              Steps and aggregate draft for one opened item.
 AbstractionManagerContract     Provider contract for list-and-panel managers.
 */
 
 import type { Instance } from '@core/std'
-import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
+import type { PanelSequence } from '@ux/shell/panel/panel-sequence-contract.ts'
 import type { UiActionButtonVariant, UiComponent } from '@ux/ui'
 
 /** Confirmation copy for a consequential abstraction action. */
@@ -38,22 +37,10 @@ export type AbstractionAction<T extends Instance> = {
   handler: (item: T) => void | Promise<void>
 }
 
-/** Per-instance surface a mounted editor exposes to its manager. */
-export type AbstractionEditorHandle<Draft> = {
-  validate: () => boolean
+/** Steps and aggregate draft for one opened item. */
+export type AbstractionDetail<Draft> = {
+  steps: PanelSequence
   draft: () => Draft
-}
-
-/** Registers a mounted editor handle and returns its cleanup callback. */
-export type AbstractionEditorRegistration<Draft> = (
-  handle: AbstractionEditorHandle<Draft>
-) => () => void
-
-/** Manager-owned editor services exposed to a rendered editor form. */
-export type AbstractionEditorContext<Draft> = {
-  feedback: (feedback: PanelFeedback | null) => void
-  register: AbstractionEditorRegistration<Draft>
-  saving: () => boolean
 }
 
 /** Provider contract for list-and-panel abstraction managers. */
@@ -69,5 +56,5 @@ export interface AbstractionManagerContract<T extends Instance, Draft> {
   update: (item: T, draft: Draft) => T | Promise<T>
   actions: AbstractionAction<T>[]
   renderListCells: (item: T) => UiComponent
-  renderForm: (item: T | null, context: AbstractionEditorContext<Draft>) => UiComponent
+  detail: (item: T | null) => AbstractionDetail<Draft>
 }

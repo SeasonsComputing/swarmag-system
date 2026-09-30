@@ -7,12 +7,14 @@
 
 import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
-import { type UserDraft, UserEditor } from '@front/app-admin/users/user-manager-editor.tsx'
 import { For, Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
-import { UiAlert, type UiComponent, UiLayout, UiTableCell, UiText } from '@ux/ui'
+import { UiAlert, UiLayout, UiTableCell, UiText } from '@ux/ui'
+import type { UiComponent } from '@ux/ui'
+import { createUserState, UserStepDetail } from './user-step-detail.tsx'
+import type { UserDraft } from './user-step-detail.tsx'
 
 import './user-manager.css'
 
@@ -79,7 +81,17 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       }
     ],
     renderListCells: user => <UserListCells user={user} />,
-    renderForm: (user, context) => <UserEditor context={context} user={user} />
+    detail: user => {
+      const state = createUserState(user)
+      return {
+        steps: [{
+          name: 'detail',
+          title: 'User details',
+          render: context => <UserStepDetail context={context} state={state} />
+        }],
+        draft: state.draft
+      }
+    }
   }
 
   return (

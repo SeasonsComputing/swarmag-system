@@ -9,7 +9,8 @@ import '@front/config/ux-config.ts'
 import { bootstrap } from '@ux/shell/runtime/bootstrap.tsx'
 
 // shell bindings
-import { Onboarding } from '@front/app-admin/onboarding/onboarding.tsx'
+import { CustomerManager } from '@front/app-admin/customers/customer-manager.tsx'
+import { OnboardingWizard } from '@front/app-admin/onboarding/onboarding-wizard.tsx'
 import { UserManager } from '@front/app-admin/users/user-manager.tsx'
 import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
 import { makeAnonymousShell, makeDashboardShell } from '@front/app/shell/shell-makers.tsx'
@@ -25,8 +26,9 @@ void bootstrap(
   Routes.application([
     makeAnonymousShell(),
     makeDashboardShell(dashboardSeed, { ...uxWidgetRegistry(), ...appWidgetRegistry() }, [
-      Routes.workbench('/onboarding', Onboarding),
-      Routes.workbench('/users', UserManager)
+      Routes.workbench('/onboarding', OnboardingWizard),
+      Routes.workbench('/users', UserManager),
+      Routes.workbench('/customers', CustomerManager)
     ])
   ], SessionCoordinator)
 )

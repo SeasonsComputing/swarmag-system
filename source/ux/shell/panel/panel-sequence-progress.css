@@ -1,0 +1,84 @@
+/* Shared horizontal sequence progress. */
+[data-shell='sequence-indicator'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-sm);
+}
+
+/* One contiguous progress rail, echoing the progress-bar language;
+   the fill inline-size is driven by the host per step. */
+[data-shell='sequence-bar'] {
+  background: var(--sa-bg-progress-track);
+  border-radius: var(--sa-radius-full);
+  min-block-size: calc(var(--sa-progress-height) / 2);
+  overflow: hidden;
+}
+
+[data-shell='sequence-bar-fill'] {
+  background: var(--sa-gradient-brand);
+  block-size: calc(var(--sa-progress-height) / 2);
+  border-radius: var(--sa-radius-full);
+  transition: var(--sa-transition-base);
+}
+
+[data-shell='sequence-steps'] {
+  display: flex;
+  gap: 0;
+  justify-content: space-between;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Neutralize the list-item primitive's content-list spacing. */
+[data-shell='sequence-steps'] [data-shell='sequence-step'] {
+  margin-block: 0;
+  padding-inline-start: 0;
+}
+
+/* Labels sit beneath the rail, one per segment; upcoming is the dim default. */
+[data-shell='sequence-step'] {
+  color: var(--sa-text-dim);
+  display: flex;
+  flex: 0 1 auto;
+  font-size: var(--sa-ui-font-size-compact);
+  justify-content: flex-start;
+  min-inline-size: 0;
+}
+
+[data-shell='sequence-step'][data-shell-state='done'] {
+  color: var(--sa-text-secondary);
+}
+
+[data-shell='sequence-step'][data-shell-state='current'] {
+  color: var(--sa-color-accent);
+  font-weight: var(--sa-ui-font-weight-strong);
+}
+
+[data-shell='sequence-step-label'] {
+  align-items: center;
+  display: inline-flex;
+  gap: var(--sa-space-xs);
+  justify-content: center;
+  min-inline-size: 0;
+  text-align: start;
+}
+
+[data-shell='sequence-step-title'] {
+  line-height: 1.1;
+  min-inline-size: 0;
+}
+
+[data-shell='sequence-step-ordinal'] {
+  align-items: center;
+  background: transparent;
+  block-size: var(--sa-space-lg);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-full);
+  color: inherit;
+  display: inline-flex;
+  flex: 0 0 auto;
+  font-family: var(--sa-data-font-family);
+  inline-size: var(--sa-space-lg);
+  justify-content: center;
+}

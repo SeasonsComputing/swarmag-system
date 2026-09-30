@@ -15,8 +15,10 @@ UiDialog  Dialog control with declared states.
 
 import { Dialog } from '@kobalte/core/dialog'
 import { splitProps } from '@solid-js'
-import { UiButton, type UiButtonVariant } from './ui-button.tsx'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { UiButton } from './ui-button.tsx'
+import type { UiButtonVariant } from './ui-button.tsx'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Dialog size treatments declared by the design language. */
 export type UiDialogSize = 'content' | 'panel' | 'workbench'
@@ -28,6 +30,7 @@ export type UiDialogProps = UiComponentProps & {
   size?: UiDialogSize
   open?: boolean
   defaultOpen?: boolean
+  /** Permit outside-click and Escape dismissal. */
   dismissible?: boolean
   error?: boolean
   loading?: boolean
@@ -78,6 +81,9 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
           data-ui='dialog'
           data-ui-size={local.size ?? 'panel'}
           data-ui-state={controlState(local)}
+          onEscapeKeyDown={event => {
+            if (!local.dismissible) event.preventDefault()
+          }}
           onPointerDownOutside={event => {
             if (!local.dismissible) event.preventDefault()
           }}

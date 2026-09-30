@@ -5,16 +5,16 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { UiAlert, UiCard, type UiContainerProps } from '@ux/ui'
-import type { PanelFeedback, PanelHeaderProps } from './panel-contract.ts'
-import { PanelHeader } from './panel-header.tsx'
+import { UiAlert, UiCard } from '@ux/ui'
+import type { UiComponent, UiContainerProps } from '@ux/ui'
+import type { PanelFeedback } from './panel-contract.ts'
 
 import './panel-form.css'
 
 /** Represents the props for the PanelForm component. */
-type PanelFormProps = UiContainerProps & {
+export type PanelFormProps = UiContainerProps & {
   feedback?: PanelFeedback | null
-  header: PanelHeaderProps
+  header: UiComponent
 }
 
 /** Renders a card-backed form panel. */
@@ -22,7 +22,7 @@ export const PanelForm = (props: PanelFormProps) => (
   <section data-shell-panel='form'>
     <UiCard elevation='raised'>
       <div data-shell-panel='form-header'>
-        <PanelHeader {...props.header} />
+        {props.header}
         {props.feedback && (
           <UiAlert data-shell-panel='form-feedback' tabindex={-1} variant={props.feedback.variant}>
             {props.feedback.message}

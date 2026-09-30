@@ -1,0 +1,13 @@
+/* Shared sequence header orientation. */
+[data-shell='sequence-header'] [data-shell-panel='header-title'] {
+  flex: 1 1 auto;
+}
+
+[data-shell='sequence-header'] [data-shell-panel='header-title-path'] > h2 {
+  color: var(--sa-color-primary);
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

@@ -1,26 +1,39 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Customer onboarding contact stage                                            ║
+║ Customer contact step                                                        ║
 ║ Collects and validates the customer's primary contact details.               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Renders primary-contact fields and registers mounted field validation with
+the containing sequence. State belongs to the workbench.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+CustomerStepContactProps  Contact panel inputs.
+CustomerStepContact       Primary-contact fields and validation.
 */
 
 import { expectEmail, expectNonEmptyString, toEmail } from '@core/std'
-import { CONTACT_PREFERRED_CHANNELS, type ContactPreferredChannel } from '@domain/abstractions/common.ts'
+import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
+import type { ContactPreferredChannel } from '@domain/abstractions/common.ts'
 import { onCleanup } from '@solid-js'
+import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
 import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
-import { type UiComponent, UiField, UiFieldset, UiInput, UiLayout, UiSingleSelect, UiText } from '@ux/ui'
-import type { OnboardingState } from './onboarding-state.ts'
+import { UiField, UiFieldset, UiInput, UiLayout, UiSingleSelect, UiText } from '@ux/ui'
+import type { UiComponent } from '@ux/ui'
+import type { CustomerState } from './customer-state.ts'
 
-/** Props for the contact stage. */
-export type OnboardingStageContactProps = {
-  state: OnboardingState
-  onFormCheck: (check: () => boolean) => void
+/** Props for the contact step. */
+export type CustomerStepContactProps = {
+  state: CustomerState
+  context: PanelStepContext
 }
 
-/** Renders the contact-details stage. */
-export const OnboardingStageContact = (props: OnboardingStageContactProps): UiComponent => {
+/** Renders the contact-details step. */
+export const CustomerStepContact = (props: CustomerStepContactProps): UiComponent => {
   let formRef: HTMLFormElement | undefined
   const { state } = props
   const validation = useAbstractionFormValidation(() => formRef, {
@@ -28,13 +41,12 @@ export const OnboardingStageContact = (props: OnboardingStageContactProps): UiCo
     phoneNumber: () => expectNonEmptyString(state.phoneNumber(), 'Phone'),
     email: () => state.email().trim() ? expectEmail(toEmail(state.email()), 'Email') : null
   })
-  props.onFormCheck(validation.validateForm)
-  onCleanup(() => props.onFormCheck(() => false))
+  onCleanup(props.context.registerValidation(validation.validateForm))
   useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
 
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
-      <UiLayout data-app='onboarding-stage-contact'>
+      <UiLayout data-app='customer-step-contact'>
         <UiFieldset legend='Primary Contact'>
           <UiLayout>
             <UiField for='displayName' label='Name' required>
