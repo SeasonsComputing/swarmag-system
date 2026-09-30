@@ -664,15 +664,15 @@ draft and commits it once. Steps never commit.
 **Library: `source/ux/shell/panel/`.** The step contract is shared by both workbenches, so it
 lives in `panel/`:
 
-| Name                                           | Responsibility                                                                              |
-| ---------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| `PanelStep`                                    | One step: `name`, `title`, optional `validate`, `render(context)`                           |
-| `PanelSequence`                                | `readonly PanelStep[]`                                                                      |
-| `PanelStepContext`                             | Validation, drill-return, trailing-action, and dirty-check registration; `feedback`; `busy` |
-| `createPanelSequence` / `PanelSequenceControl` | Instance-local cursor, Back, validated Next, completion validation, validation registration |
-| `PanelSequenceStep`                            | Renders the current step and owns the step transition motion                                |
-| `PanelSequenceHeader`                          | The composed header: Back, Next, the advance slot, and the nested Index-Detail hand-off     |
-| `PanelSequenceProgress`                        | The horizontal progress indicator, presented for any sequence of more than one step         |
+| Name                                           | Responsibility                                                                                 |
+| ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `PanelStep`                                    | One step: `name`, `title`, optional `validate`, `render(context)`                              |
+| `PanelSequence`                                | `readonly PanelStep[]`                                                                         |
+| `PanelStepContext`                             | Validation, drill-return, trailing-action, and dirty-check registration; `feedback`; `busy`    |
+| `createPanelSequence` / `PanelSequenceControl` | Instance-local cursor, Back, validated Next, completion validation, validation registration    |
+| `PanelSequenceStep`                            | Renders the current step and owns the step transition motion                                   |
+| `PanelSequenceHeader`                          | The composed header: Back, Next, the advance slot, and the nested Index-Detail hand-off        |
+| `PanelSequenceProgress`                        | The horizontal progress indicator for a sequence of more than one step; the Wizard presents it |
 
 The controller has no draft, persistence, or chrome. Advancement validates the current step;
 after Back, that step is validated again on the next forward traversal. There is no arbitrary
@@ -685,14 +685,14 @@ jump API. `PanelSequenceHeader` follows `ux-design-archetypes.md` §§3.3 and 4.
   Index, or stays on failure.
 - The header names the path by kind.
 
-With one step, the header reduces to the host's simple header and no progress is presented.
+With one step, the header reduces to the host's simple header.
 Glyphs, header states, and transition motion are defined here once; no feature restates them.
 
 **Workbenches: `source/ux/shell/workbench/`.**
 
 - `Wizard` takes `WizardContract = { formTitle, steps: PanelSequence, commit, feedback? }`.
   - It commits once, at Finish. The commit may write one abstraction, several, or none.
-  - It presents `PanelSequenceProgress`.
+  - It presents progress with `PanelSequenceProgress` when its sequence has more than one step.
   - Above its container threshold, it also lays the sequence out as a tree in its aside
     (`PanelStepflow`). That tree is Wizard chrome.
 - `AbstractionManager` takes `detail: (item: T | null) => AbstractionDetail<Draft>`, where
@@ -701,8 +701,8 @@ Glyphs, header states, and transition motion are defined here once; no feature r
   - It validates through sequence completion and persists through its provider's `create` or
     `update`.
   - Save takes the final advance slot and is offered only when no nested Detail is open.
-  - Its aside is always its Collection. It contributes no progress chrome: a multi-step Detail
-    presents its own sequence's progress.
+  - Its aside is always its Collection. It presents no progress, whatever the step count: the
+    step title in the header and Next versus Save orient the user within an existing record.
   - Below the threshold, step 1's leading control returns to the Index and later steps show
     Back; nothing reaches the Index from a later step. Above it, selecting another Item or New
     leaves the Detail from any step.
