@@ -386,21 +386,6 @@ authorization before any UX test lands.
 
 ## Customer
 
-### Customer Manager
-
-**Observed:** 2026-09-10 · normal
-
-There is no surface for editing an existing Customer — `/onboarding` is the only route that
-touches `Customer`, and it is create-only. Surfaced live during Group D's E2E verification: a
-prospect created with one site by mistake has no way to gain a second one after Finish.
-
-The fix is ordinary `AbstractionManager`, Collection-Detail⇄Index-Detail, the same machinery
-User Manager already runs. It reuses the `SiteEditor`/`NoteEditor` Index-Detail panels the
-onboarding wizard's Sites stage already built — no new component, per the precedent
-`[[project_panel_chrome]]` recorded when the panel-chrome unification first made
-Wizard-as-a-Manager's-create-path viable (`renderForm(item: T | null, onClose)` already takes
-`null` to mean create; a real `Customer` is the same slot's non-null branch).
-
 ### Onboarding — Initial Job Assessment stage
 
 **Observed:** 2026-09-10 · normal
@@ -462,7 +447,7 @@ References to update: `deno.jsonc` tasks, `source/devops/scripts/app-style-guide
 `guard-bare-html.ts`, `guard-css.ts`, `architecture-front.md`, `architecture-core.md`,
 `architecture-devops.md`, and `README.md`.
 
-**Picking this up:** after the Customer Manager production lands. Both touch
-`architecture-front.md`'s directory tree.
+**Picking this up:** unblocked. The Customer Manager production, which also touched
+`architecture-front.md`'s directory tree, landed 2026-09-30.
 
 _End of Backlog Document_

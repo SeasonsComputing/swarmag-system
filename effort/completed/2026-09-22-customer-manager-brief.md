@@ -1,6 +1,13 @@
 # Customer Manager — Backlog Brief
 
-**Backlog, not dispatched.** Captured from a design conversation that started with one question —
+**CLOSED 2026-09-30.** Shipped in `bce9fec`, reviewed by the Chief Architect in a live
+walkthrough, and independently verified by the AI Architect against the commit (checks, API tests,
+and each September 25 decision). The one divergence was corrected in the documents
+(Amendment — 2026-09-30 — Progress is the Wizard's, not the Manager's). This brief supplied
+post-genesis Customer editing; it did not close the Users & Customers vertical slice, since
+additional-contact assignment remains open.
+
+Originally captured from a design conversation that started with one question —
 can Onboarding's Contact/Customer/Sites panels be reused as Customer Manager's edit surface —
 and found that the honest answer required understanding why the two workbench archetypes
 differ, not just where their files happen to sit. Closes the Users & Customers vertical slice
@@ -459,5 +466,49 @@ explicit Cancel still invokes the dirty check, declining discard retains the dra
 dismissible About dialog still closes with Escape. `STYLE_AUDIT: PASS` for the dialog change.
 The September 28 Escape escalation is resolved. No credential rotation or other out-of-scope
 production was performed. CA review and independent verification remain required for effort closure.
+
+## Amendment — 2026-09-30 — Progress is the Wizard's, not the Manager's
+
+The AI Architect's independent verification of `bce9fec` found one divergence. The Customer
+Manager's three-step Detail presents no progress. September 25 decision 5 required
+`PanelSequenceProgress` "in whatever host it runs", and UX archetypes §3.2 and §4.2 required a
+Detail's Sequence to present its progress.
+
+**The Chief Architect ruled the documents wrong, not the code.**
+
+- A Manager edits an existing record, almost always as one vertically scrolling form. The step
+  title in the header, and Next versus Save, orient the user well enough.
+- Progress toward completion belongs to the Wizard, whose user is traveling toward something
+  that does not exist yet.
+- A drill-down into an embedded composition is no reason to require a progress indicator.
+- The pattern book must not decide this. How much orientation a surface returns, and in what
+  form, is that surface's decision (UX archetypes §2.3).
+
+**Superseded:** decision 5's "in whatever host it runs" and "the Manager contributes no progress
+chrome … a multi-step Detail presents its own sequence's progress". `PanelSequenceProgress`
+stays in `panel/` as a shared part; the Wizard presents it today. The Manager presents no
+progress, whatever the step count. Decision 6 stands: where progress is presented, only the
+composer of the whole sequence presents it.
+
+**Documents corrected alongside this amendment:**
+
+- UX archetypes §4.2 Orientation now leaves the form of orientation to the surface.
+- UX archetypes §4.2 "Progress belongs to the whole" now applies only where progress is
+  presented.
+- UX archetypes §3.2 "Composed with Sequence" no longer requires the Detail to present progress.
+- `architecture-front.md` §10.1.6 now states that the Wizard presents `PanelSequenceProgress` and
+  the Manager presents none.
+
+No code change is needed.
+
+**Verification findings the Chief Architect resolved directly:**
+
+- Four committed files failed `dprint check`: `customer-manager.tsx`, `customer-manager.css`,
+  `customer-steps.tsx`, and `architecture-front.md`.
+- The `onboarding-wizard.css` header was stale.
+
+**Remaining observation, recorded and not pursued:** "editor" remains in older workbench
+wording. That covers the Manager's `'editor'` mode and the `use-abstraction-form-*` hook comments.
+Both predate the reserved-word rule, and no decision covers them.
 
 _End of Backlog Brief_
