@@ -1,13 +1,13 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Customer onboarding wizard                                                   ║
-║ Composes shared Customer steps into the intake workflow.                     ║
+║ Onboarding of a customer and initial job assessment.                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Composes shared Customer steps into the existing create-only intake workflow.
-The workbench persists once and returns to the dashboard.
+Collection and record a new customer, contact, sites and initial job assessment
+using the Wizard UX archetype
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
