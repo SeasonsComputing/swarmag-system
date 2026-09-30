@@ -668,7 +668,7 @@ lives in `panel/`:
 | ---------------------------------------------- | ------------------------------------------------------------------------------------------- |
 | `PanelStep`                                    | One step: `name`, `title`, optional `validate`, `render(context)`                           |
 | `PanelSequence`                                | `readonly PanelStep[]`                                                                      |
-| `PanelStepContext`                             | Validation, drill-return, trailing-action, and dirty-check registration; `feedback`; `busy`              |
+| `PanelStepContext`                             | Validation, drill-return, trailing-action, and dirty-check registration; `feedback`; `busy` |
 | `createPanelSequence` / `PanelSequenceControl` | Instance-local cursor, Back, validated Next, completion validation, validation registration |
 | `PanelSequenceStep`                            | Renders the current step and owns the step transition motion                                |
 | `PanelSequenceHeader`                          | The composed header: Back, Next, the advance slot, and the nested Index-Detail hand-off     |

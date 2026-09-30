@@ -24,9 +24,9 @@ import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import { UiAlert, UiTableCell, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-import { customerSteps } from './customer-steps.tsx'
 import { createCustomerState, customerDraft } from './customer-state.ts'
 import type { CustomerDraft } from './customer-state.ts'
+import { customerSteps } from './customer-steps.tsx'
 
 import './customer-manager.css'
 
