@@ -14,7 +14,7 @@ PUBLIC
 AbstractionManager  Generic list+panel manager component.
 */
 
-import type { Instance } from '@core/std'
+import type { Instantiable } from '@core/std'
 import { createEffect, createSignal, For, onCleanup, Show, untrack } from '@solid-js'
 import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
@@ -44,7 +44,7 @@ import { createWorkbenchContext, WorkbenchDiscard } from './workbench-context.ts
 import './abstraction-manager.css'
 
 /** Props for a generic abstraction manager. */
-export type AbstractionManagerProps<T extends Instance, Draft> = {
+export type AbstractionManagerProps<T extends Instantiable, Draft> = {
   onCancel: () => void
   provider: AbstractionManagerContract<T, Draft>
 }
@@ -53,13 +53,13 @@ export type AbstractionManagerProps<T extends Instance, Draft> = {
 type AbstractionManagerMode = 'list' | 'editor'
 
 /** An action and instance awaiting confirmation. */
-type PendingAction<T extends Instance> = {
+type PendingAction<T extends Instantiable> = {
   action: AbstractionAction<T>
   item: T
 }
 
 /** Generic abstraction list and editor-panel manager. */
-export const AbstractionManager = <T extends Instance, Draft>(
+export const AbstractionManager = <T extends Instantiable, Draft>(
   props: AbstractionManagerProps<T, Draft>
 ): UiComponent => {
   const [selected, setSelected] = createSignal<T | null>(null)
