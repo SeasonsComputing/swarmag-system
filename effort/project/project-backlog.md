@@ -286,6 +286,23 @@ The recurrence is the point. Deleted-file paths reappear as empty directories pe
 
 `rmdir` is the safe removal: it refuses a non-empty directory, so it cannot take anything real with it.
 
+### `guard:css` misreads multiline selectors and misses selector-list branches
+
+**Observed:** 2026-10-03 · normal
+
+`guard-css.ts`'s `extractSelector` reads only physical lines containing `{`. When dprint wraps a
+valid Helm-rooted selector, `auditFeatureCSS` sees only its trailing Ui part and reports a
+namespace violation. Earlier branches in comma-separated selector lists can also escape audit.
+
+The `visible-no-icon` Helm production shortened its selectors with a standalone Helm-named
+attribute to pass the guard. CA rejected that symptom-level workaround because it discarded the
+widget ancestor's containment boundary. Fix complete-selector parsing and audit every list branch
+under the existing policies; then restore Helm containment in a separately authorized correction.
+
+Foundation scope, evidence, regression cases, and escalation boundaries are in
+[CSS Guard — Complete Selector Parsing](../active/2026-10-03-css-guard-selector-parsing-brief.md).
+Backlog, not dispatched; priority is normal, with guard repair preceding the Helm correction.
+
 ## DevOps
 
 ### `source/devops/` is not held to CONVENTIONS
@@ -407,6 +424,24 @@ customer no longer doing business is set `inactive`, which keeps it and its hist
 Once Jobs exist, a Customer with Jobs has history and must not be deletable; only inactivated.
 Nothing guards this today because no Jobs exist yet. Picking this up: with Job Definition
 (roadmap §7), where the first Job references a Customer.
+
+### Customer Manager cannot edit account-level notes
+
+**Observed:** 2026-10-03 · normal
+
+`Customer.notes` holds notes on the account itself, separate from the notes on each job site.
+Customer Manager does not edit it: `scopes.Customers.detail` deliberately excludes it, and
+Onboarding creates every Customer with `notes: []`. Site notes are editable today, through the
+Sites step's local `NoteEditor`.
+
+When the Notes Editor (roadmap §4) is integrated into User Manager, integrate it into Customer
+Manager in the same production:
+
+- an account-notes surface in the Customer Detail;
+- `CustomerAdapter.notes` added to `scopes.Customers.detail`;
+- the Sites step's local `NoteEditor` replaced, so both note surfaces share one editor.
+
+Picking this up: with roadmap §4.
 
 ## UX
 
