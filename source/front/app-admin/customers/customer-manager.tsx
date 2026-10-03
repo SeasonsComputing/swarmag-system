@@ -15,6 +15,7 @@ CustomerManagerProps  Props for the Customer Manager route workbench.
 CustomerManager       Customer collection and editor host.
 */
 
+import { demandOne } from '@core/std'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import { CustomerUpdateScopes } from '@front/api/api-update-scopes.ts'
 import { api } from '@front/api/api.ts'
@@ -44,7 +45,7 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
   const provider: AbstractionManagerContract<Customer, CustomerDraft> = {
     formTitle: 'Customer Manager',
     entityLabel: 'Customer',
-    listColumns: ['Customer', 'Status'],
+    listColumns: ['Customer', 'Contact', 'Status'],
     list: () => customersQuery.data ?? [],
     isListLoading: () => customersQuery.isPending,
     itemLabel: customer => customer.name,
@@ -73,6 +74,7 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
     renderListCells: customer => (
       <>
         <UiTableCell>{customer.name}</UiTableCell>
+        <UiTableCell>{demandOne(customer.primaryContact).displayName}</UiTableCell>
         <UiTableCell>{UiText.label(customer.status)}</UiTableCell>
       </>
     ),
