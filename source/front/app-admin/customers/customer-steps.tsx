@@ -30,19 +30,19 @@ export const customerSteps = (state: CustomerState): PanelSequence => {
   }
   return [
     {
-      name: 'contact',
-      title: 'Contact details',
-      render: context => {
-        retainCheck(context)
-        return <CustomerStepContact state={state} context={context} />
-      }
-    },
-    {
       name: 'detail',
-      title: 'Customer address',
+      title: 'Name and Address',
       render: context => {
         retainCheck(context)
         return <CustomerStepDetail state={state} context={context} />
+      }
+    },
+    {
+      name: 'contact',
+      title: 'Primary contact',
+      render: context => {
+        retainCheck(context)
+        return <CustomerStepContact state={state} context={context} />
       }
     },
     {
