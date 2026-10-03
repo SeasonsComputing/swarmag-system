@@ -17,18 +17,18 @@ AbstractionDetail              Steps and aggregate draft for one opened item.
 AbstractionManagerContract     Provider contract for list-and-panel managers.
 */
 
-import type { Instance } from '@core/std'
+import type { Instantiable } from '@core/std'
 import type { PanelSequence } from '@ux/shell/panel/panel-sequence-contract.ts'
 import type { UiActionButtonVariant, UiComponent } from '@ux/ui'
 
 /** Confirmation copy for a consequential abstraction action. */
-export type AbstractionActionConfirmation<T extends Instance> = {
+export type AbstractionActionConfirmation<T extends Instantiable> = {
   message: (item: T) => string
   title: string
 }
 
 /** A named action executable on an abstraction instance. */
-export type AbstractionAction<T extends Instance> = {
+export type AbstractionAction<T extends Instantiable> = {
   name: string
   label: string
   icon: string
@@ -44,7 +44,7 @@ export type AbstractionDetail<Draft> = {
 }
 
 /** Provider contract for list-and-panel abstraction managers. */
-export interface AbstractionManagerContract<T extends Instance, Draft> {
+export interface AbstractionManagerContract<T extends Instantiable, Draft> {
   formTitle: string
   entityLabel: string
   listColumns: string[]
