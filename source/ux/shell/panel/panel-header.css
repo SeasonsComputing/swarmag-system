@@ -37,7 +37,7 @@
 [data-shell-panel='header-title-path'] > h2,
 [data-shell-panel='header-title-path'] > h3,
 [data-shell-panel='header-title-path'] > h4 {
-  line-height: 1;
+  line-height: 1.1;
   margin: 0;
   min-inline-size: 0;
   overflow: hidden;
