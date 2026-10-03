@@ -26,6 +26,8 @@ Before Phase 1, the CA asked to discuss Users. Nothing has been discussed yet. R
 - **Where Users stands now:** on `DirectUpdateContract`, with a field-tuple scope in
   `scopes.Users.detail`. It may adopt `makeFormScope` later, without an adapter (`architecture-core.md`
   §5.2.6, `architecture-front.md` §7.4).
+- **User state:** should the state object in user-step-detail be refactored into user-state.ts
+  consistent with customer manager?
 
 ## Inputs for Phase 1 and Phase 2
 
