@@ -53,7 +53,7 @@ holds, not assume that a missing CONVENTIONS entry means a missing rule.
   - Construction rule, for CONVENTIONS.
 - **The CRUD contract decomposition:** the 08-31 provider-fit update contracts and their
   reasons, recorded in `effort/completed/2026-08-29-scoped-update-adapter-brief.md` and
-  `effort/active/2026-10-02-update-scopes-brief.md`.
+  `effort/completed/2026-10-02-update-scopes-brief.md`.
 - **The layer-6 form-scope abstraction,** once it is designed. Exploration began 2026-10-03, and
   its outcome feeds this brief; it is not decided here.
 

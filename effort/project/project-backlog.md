@@ -417,6 +417,27 @@ update scope, excluded-field preservation, optional-field clearing) have a conve
 Extending the testing convention to the UX layer is a `CONVENTIONS.md` amendment and needs CA
 authorization before any UX test lands.
 
+### The shared test configuration cannot bootstrap `api`
+
+**Observed:** 2026-10-03 · normal
+
+Since 2026-07-19 (`cdc6ebb`), `front/api/api.ts` re-exports `AppState`, which is backed by
+IndexedDB. Importing `api` therefore needs `LOCAL_DB_NAME` registered in `Config`.
+`source/tests/config/test-config.ts` registers only `SUPABASE_RDBMS_URL`,
+`SUPABASE_PUBLIC_KEY`, and `SUPABASE_CLIENT_MODE`.
+
+- **Affected:** `users-api-test.ts`, the only test that loads the shared config. It fails at
+  bootstrap, before any test runs, and has likely been unrunnable since 07-19 without anyone
+  noticing. It is a live integration test that needs stage credentials, so it rarely runs.
+- **Workaround in place:** `customer-api-test.ts` sidesteps the problem with its own
+  `Config.init`, which registers `LOCAL_DB_NAME`, and an in-memory transport.
+- **Unexecuted coverage:** the avatar-preservation case added by
+  `effort/completed/2026-10-02-update-scopes-brief.md` has never run. No UI can set an avatar,
+  so no live walkthrough can verify that property either.
+
+The fix belongs in the shared test configuration, not in each test. Also decide whether a test
+runtime should load browser-backed stores through `api` at all.
+
 ## Customer
 
 ### Onboarding — Initial Job Assessment stage
