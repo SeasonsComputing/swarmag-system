@@ -69,10 +69,7 @@ export const isCompositionPositive = <T>(
   guard: (v: unknown) => v is T
 ): value is CompositionPositive<T> => Array.isArray(value) && value.length >= 1 && value.every(guard)
 
-/**
- * Extracts the single value from a CompositionOne.
- * Caller must pre-validate with isCompositionOne — no gratutious defensive check per governance.
- */
+/** Extracts the single value from a CompositionOne.Caller must pre-validate. */
 export const demandOne = <T>(c: CompositionOne<T>): T => c[0] as T
 
 /** Extracts the value from a CompositionOptional, or undefined if empty. */
