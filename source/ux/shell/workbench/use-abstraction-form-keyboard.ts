@@ -38,7 +38,7 @@ export const focusFirstField = (container: () => HTMLElement | undefined): void 
   const focusFirst = (): void => {
     const host = container()
     const first = host?.querySelector<HTMLElement>('input:not([type=hidden]), textarea')
-    first?.focus()
+    first?.focus({ preventScroll: true })
   }
   requestAnimationFrame(() => requestAnimationFrame(focusFirst))
   // The panel-collapse transition delays hiding the outgoing panel; when it
