@@ -7,8 +7,11 @@ import { assert, assertEquals } from '@std/assert'
 import '@tests/config/test-config.ts'
 import type { UserCreate } from '@domain/protocols/user-protocol.ts'
 import { api } from '@front/api/api.ts'
+import { scopes } from '@front/api/form-scopes.ts'
 
-Deno.test('users API supports full CRUD lifecycle with soft delete', async () => {
+type UserDetailKeys = (typeof scopes.Users.detail)[number]['key']
+
+Deno.test('users API supports full CRUD lifecycle with soft delete', async context => {
   if (!api.Users.list) throw new Error('Users API list contract is required for this test')
 
   const nonce = `${Date.now()}`
@@ -37,7 +40,7 @@ Deno.test('users API supports full CRUD lifecycle with soft delete', async () =>
   assertEquals(fetched.preferredChannel, createInput.preferredChannel)
   assertEquals(fetched.notes, createInput.notes)
 
-  const updated = await api.Users.update({
+  const updated = await api.Users.update<UserDetailKeys>({
     id: created.id,
     roles: fetched.roles,
     notes: fetched.notes,
@@ -45,12 +48,19 @@ Deno.test('users API supports full CRUD lifecycle with soft delete', async () =>
     primaryEmail: fetched.primaryEmail,
     phoneNumber: fetched.phoneNumber,
     preferredChannel: fetched.preferredChannel,
-    avatarUrl: fetched.avatarUrl,
     status: 'inactive'
   })
   assertEquals(updated.id, created.id)
   assertEquals(updated.displayName, `Updated Ops User ${nonce}`)
   assertEquals(updated.status, 'inactive')
+
+  await context.step('User detail scope preserves excluded avatarUrl', async () => {
+    assertEquals(updated.avatarUrl, createInput.avatarUrl)
+    const stored = await api.Users.get(created.id)
+    assertEquals(stored.avatarUrl, createInput.avatarUrl)
+    assertEquals(stored.displayName, updated.displayName)
+    assertEquals(stored.status, 'inactive')
+  })
 
   const deleted = await api.Users.delete(created.id)
   assertEquals(deleted.id, created.id)

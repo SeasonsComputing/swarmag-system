@@ -17,8 +17,8 @@ CustomerManager       Customer collection and editor host.
 
 import { demandOne } from '@core/std'
 import type { Customer } from '@domain/abstractions/customer.ts'
-import { CustomerUpdateScopes } from '@front/api/api-update-scopes.ts'
 import { api } from '@front/api/api.ts'
+import { scopes } from '@front/api/form-scopes.ts'
 import { Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
@@ -42,6 +42,7 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
     queryKey: ['customers'],
     queryFn: async () => (await api.Customers.list({ limit: 100 })).data
   }))
+  const scope = scopes.Customers.detail
   const provider: AbstractionManagerContract<Customer, CustomerDraft> = {
     formTitle: 'Customer Manager',
     entityLabel: 'Customer',
@@ -52,13 +53,8 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
     refresh: async () => {
       await customersQuery.refetch()
     },
-    create: draft => api.Customers.create({ ...draft, accountManagerId: undefined, notes: [] }),
-    update: (customer, draft) =>
-      api.Customers.update(CustomerUpdateScopes.manager, {
-        id: customer.id,
-        ...draft,
-        line2: draft.line2 ?? null
-      }),
+    create: draft => api.Customers.create(scope.toCreate(draft)),
+    update: (customer, draft) => api.Customers.update(scope.adapter, scope.toUpdate(customer.id, draft)),
     actions: [{
       name: 'delete',
       label: 'Delete',

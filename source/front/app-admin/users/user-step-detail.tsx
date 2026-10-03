@@ -11,17 +11,19 @@ validation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+UserDetailKeys  Fields owned by the User detail form.
 UserDraft        Draft projected by User state.
 createUserState  Create signals and a stable draft projection.
 UserStepDetail  User Manager detail step.
 */
 
 import { expectEmail, expectNonEmptyString, toEmail, toTrimmed } from '@core/std'
-import type { FromInstantiable, ScopedUpdate } from '@core/std'
+import type { ScopedUpdate } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
 import type { ContactPreferredChannel, Note } from '@domain/abstractions/common.ts'
 import { USER_ROLES, USER_STATUSES } from '@domain/abstractions/user.ts'
 import type { User, UserRole, UserStatus } from '@domain/abstractions/user.ts'
+import { scopes } from '@front/api/form-scopes.ts'
 import { createSignal, For, onCleanup } from '@solid-js'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useAbstractionFormFeedback } from '@ux/shell/workbench/use-abstraction-form-feedback.ts'
@@ -41,10 +43,11 @@ import {
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
-/** Draft projected by the User state. */
-export type UserDraft =
-  & Omit<ScopedUpdate<User, keyof FromInstantiable<User>>, 'id' | 'avatarUrl'>
-  & { avatarUrl: string | undefined }
+/** Fields owned by the User detail form. */
+export type UserDetailKeys = (typeof scopes.Users.detail)[number]['key']
+
+/** Draft projected by the User detail state. */
+export type UserDraft = Omit<ScopedUpdate<User, UserDetailKeys>, 'id'>
 
 /** Create one User draft lifetime, independently of mounted step controls. */
 export const createUserState = (user: User | null) => {
@@ -76,7 +79,6 @@ export const createUserState = (user: User | null) => {
     preferredChannel: preferredChannel(),
     notes: nextNotes(user?.notes ?? []),
     roles: roles(),
-    avatarUrl: user?.avatarUrl,
     status: status()
   })
   return {

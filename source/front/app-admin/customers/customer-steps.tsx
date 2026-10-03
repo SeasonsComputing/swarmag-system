@@ -31,7 +31,7 @@ export const customerSteps = (state: CustomerState): PanelSequence => {
   return [
     {
       name: 'detail',
-      title: 'Name and Address',
+      title: 'Customer details',
       render: context => {
         retainCheck(context)
         return <CustomerStepDetail state={state} context={context} />

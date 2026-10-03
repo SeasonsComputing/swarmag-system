@@ -16,6 +16,7 @@ OnboardingWizard       Customer intake composition root.
 */
 
 import { api } from '@front/api/api.ts'
+import { scopes } from '@front/api/form-scopes.ts'
 import { createCustomerState, customerDraft } from '@front/app-admin/customers/customer-state.ts'
 import { customerSteps } from '@front/app-admin/customers/customer-steps.tsx'
 import type { WizardContract } from '@ux/shell/workbench/wizard-contract.ts'
@@ -36,7 +37,7 @@ export const OnboardingWizard = (props: OnboardingWizardProps): UiComponent => {
     formTitle: 'Customer Onboarding',
     steps: customerSteps(state),
     commit: async () => {
-      await api.Customers.create({ ...customerDraft(state), accountManagerId: undefined, notes: [] })
+      await api.Customers.create(scopes.Customers.detail.toCreate(customerDraft(state)))
     }
   }
   return (

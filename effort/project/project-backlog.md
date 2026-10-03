@@ -65,6 +65,22 @@ itself an AI-ingestion companion in its own opening.
 Do not restructure before the analysis is reviewed. This is base context for every
 session, so a wrong cut is felt everywhere at once.
 
+### `core/`, `architecture-core.md`, and `CONVENTIONS.md` have never been reconciled
+
+**Observed:** 2026-10-03 · normal
+
+CONVENTIONS covers `core/`'s vocabulary (types, configuration, adapters) but hardly any of
+the patterns built on it: protocols, validation, CRUD contracts, `ApiError`, client makers,
+and service wrappers. Some of that lives in `architecture-core.md` §5. Nothing establishes
+which document owns what. Several decided rules are documented nowhere durable, among them
+the 08-30 rule that every form must declare its update scope and the 10-03 rule that a
+scope's unit is the attribute.
+
+Design record: `effort/active/2026-10-03-core-reconciliation-brief.md`.
+
+Picking this up: together with, or sequenced against, the scan-cost entry above, since both
+restructure `architecture-core.md`.
+
 ## Controls
 
 ### Shared UI controls do not use one state model
