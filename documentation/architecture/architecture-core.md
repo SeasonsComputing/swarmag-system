@@ -323,10 +323,9 @@ type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
 ```
 
 `ScopedUpdate<T, K>` already carries `id` (via `Pick<T, 'id'>`), so no method takes `id` as a
-separate parameter. Two sibling capability interfaces compose differently for other backing-store
-families: `DirectUpdateContract<T>` (`update(source)`, no adapter — abstraction-oriented HTTP
-endpoints) and `PinnedUpdateContract<T, K>` (`update(source)`, `K` fixed at the interface —
-composed wrappers like Users). See `source/core/api/api-contract.ts` for the full set.
+separate parameter. `DirectUpdateContract<T>` composes the update capability for abstraction-oriented
+HTTP endpoints and Users: `update(source)` performs no client-side adapter translation, and `K` is
+chosen per call. See `source/core/api/api-contract.ts` for the full set.
 
 #### 5.2.2 Business Rule Contract
 
@@ -388,7 +387,7 @@ try {
 
 - **Uniform surface, provider-fit signatures** - Every backing-store family exposes the same
   `create`/`get`/`delete`/`list` shape; `update` composes the capability interface that matches
-  how that family actually writes (adapter-translated, direct, or pinned-scope) rather than
+  how that family actually writes (adapter-translated or direct) rather than
   forcing every provider through one signature
 - **Type-safe** - Full TypeScript generics (`T extends Instantiable`) for domain typing; protocol shapes derived via `CreateFromInstantiable<T>` and `UpdateFromInstantiable<T>`
 - **Consistent errors** - `ApiError` with status codes and optional details
@@ -406,15 +405,42 @@ CRUD writes cross three distinct boundary checks:
 
 `UpdateFromInstantiable<T>` remains the broad update protocol for callers that may touch any subset of
 an abstraction. It is not a form authorization surface. A form that edits a known set of fields declares
-that set with a scoped update adapter and submits a `ScopedUpdate<T, K>`. Fields inside the scope are
-required by type, while fields outside the scope are unrepresentable in that call.
+that set explicitly through adapter field metadata, never by deriving every key of the abstraction.
+The API composition layer hosts these declarations in `front/api/form-scopes.ts`:
 
-This prevents a form from supplying placeholder values for columns it does not own. Optional attributes
-still retain their domain meaning: a value may be absent on the entity only when the domain field itself is
-optional. Omission from a scoped update is instead a persistence protocol decision: the declared scope says
-which columns may be written by that form.
+- A form whose client translates (Adapted) declares its fields and create defaults through
+  `makeFormScope({ fields: [XAdapter.field, …], defaults })`. Its client accepts
+  `update(scope.adapter, source)` with `ScopedUpdate<T, K>`.
+- A form whose client does not translate (Direct; today only Users) declares
+  `[XAdapter.field, …] as const`. The keys are `(typeof scopes.X.name)[number]['key']`, and
+  the form's draft is `ScopedUpdate<T, thoseKeys>`. Its client accepts `update(source)`.
 
-Application code still consumes the API namespace and does not import domain adapters directly. When a scoped
+The layer chain is domain metadata → declaration → contract → client → composition → form.
+The form owns its field set; the API composition layer hosts its adapter-bound declaration.
+Every field in `ScopedUpdate<T, K>` is present. An attribute whose value type admits `undefined`
+also admits `null` to clear storage, whether or not its property is syntactically optional.
+Direct clients choose `K` per call; every form declares its own scope.
+
+Form-layer draft derivation and create/update projection mechanics are defined in
+[`architecture-front.md` §7.4](architecture-front.md#74-form-scope-integration).
+
+Three rules govern every declared scope:
+
+- **The unit of a scope is the attribute, and an attribute is written atomically, whatever its type or
+  cardinality.** An embedded composition (`CompositionOne`, `CompositionOptional`, `CompositionMany`,
+  `CompositionPositive`) is owned and written whole, never addressed in part. Compositions have no
+  independent life-cycle and are not referenced independently (`domain-model.md` §3.3.1, §3.6). Clearing a
+  value inside a composition is part of the composition's new value. Two surfaces that own the same
+  attribute can overwrite each other's edits, under the same rule for every attribute type.
+- **Create values for out-of-scope attributes are declared with the scope.** A form that creates its
+  abstraction supplies values for exactly the attributes that create requires and its scope does not
+  cover. An attribute is never both in scope and defaulted.
+- **A newly introduced derived attribute is optional by default.** Derived means calculated, never edited
+  by a form. Making it optional keeps existing forms unaware of it. A required derived attribute needs its
+  migration to backfill existing rows, and a create default in every scope that creates the abstraction.
+  The default is a create value; it does not put the attribute in the form's scope.
+
+Application code consumes the API namespace and does not import domain adapters directly. When a scoped
 update needs field adapters to compose storage dictionaries, the form owns the field-set decision and the API
 composition layer hosts the adapter-bound scope declaration.
 

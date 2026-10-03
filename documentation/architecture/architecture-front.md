@@ -220,7 +220,7 @@ All entries in `source/front/api/api.ts`:
 api.Users.get(id: Id): Promise<User>
 api.Users.list(options?: ListOptions): Promise<ListResult<User>>
 api.Users.create(input: UserCreate): Promise<User>
-api.Users.update(input: UserUpdate): Promise<User>
+api.Users.update<K>(source: ScopedUpdate<User, K>): Promise<User>
 api.Users.delete(id: Id): Promise<DeleteResult>
 api.Users.eject(id: Id): Promise<User>
 api.Users.hasAccess(input: { email: string }): Promise<boolean>
@@ -297,6 +297,30 @@ The foundation provides:
 - Ops app uses for field execution
 - Deep clone via `api.deepCloneJob` business rule
 - Log upload via `api.uploadJobLogs` business rule
+
+### 7.4 Form-Scope Integration
+
+The form layer owns a domain-shaped draft and the projections for create and update, so feature
+code does not restate the fields or persistence rules. The layer chain and scope rules are defined
+in `architecture-core.md` §5.2.6.
+
+`front/api/make-form-scope.ts` exports `makeFormScope`, `FormScope`, `FormDraft`, and `DraftOf`.
+`front/api/form-scopes.ts` hosts the `scopes` housing object parallel to `api.ts`.
+`makeFormScope({ fields, defaults })` infers from adapter field metadata without type arguments.
+`FormDraft<T, K>` selects the scope's domain attributes, preserving domain optionality.
+`DraftOf<typeof scope>` derives that draft without restating its fields. The declaration exposes
+`adapter`, `toCreate(draft)`, and `toUpdate(id, draft)`.
+
+Defaults supply the required out-of-scope create attributes. The generic constraint rejects
+scoped, lifecycle, and unknown default keys, including keys supplied through typed variables.
+`toCreate` constructs its payload from declared defaults and selected draft fields; it never
+spreads the draft. `toUpdate` selects the same fields and converts absent or `undefined` values
+to `null`. Required properties may admit `undefined`, as optional associations do; required
+values that do not admit absence remain unchanged. Both projections exclude unowned draft
+attributes supplied through structurally compatible variables. Compositions pass through whole.
+The existing scoped adapter translates the projected update.
+
+The maker stays in `front/api/` until further consumers justify a separately authorized promotion.
 
 ## 8. Architectural Boundaries
 
@@ -740,13 +764,22 @@ retain both dismissal paths.
   "Editor" is reserved for a reusable form kind, such as the notes editor, or a drill-down
   editor inside a step.
 
+Customer Detail declares contact, identity, status, address, and sites in
+`front/api/form-scopes.ts`, with `{ accountManagerId: undefined, notes: [] }` as create defaults.
+`CustomerDraft` in `customer-state.ts` is `DraftOf<typeof scopes.Customers.detail>`; its state and
+projection remain domain-shaped. Customer Manager and Onboarding create through
+`scope.toCreate(draft)`. The Manager updates through
+`api.Customers.update(scope.adapter, scope.toUpdate(id, draft))`; no caller patches `line2` locally.
+Users retains its Direct update contract and explicit field tuple in the same housing object;
+it does not adopt the form-scope maker in this production.
+
 Customer Manager is available at `/customers` from the Admin dashboard. It supports New, editing,
 and confirmed soft Delete through the existing Customer API.
 
 - Delete is for an account that should not exist. Inactive status is for a real former customer.
 - A Jobs dependency guard is deferred to Job Definition.
 - Lists match User Manager's first-page `limit: 100`; pagination is separate work.
-- The combined Manager update scope in `front/api/api-update-scopes.ts` covers primary contact,
+- `scopes.Customers.detail` in `front/api/form-scopes.ts` covers primary contact,
   identity, status, billing address, and sites. It excludes account-manager assignment and
   account-level notes.
 - Clearing an optional stored address field uses the existing explicit-null update protocol.

@@ -16,15 +16,15 @@ makeAuthUsers      Build the auth-synchronized Users CRUD client, validated befo
                    dispatch even though create/update proxy to edge functions.
 */
 
-import type {
-  CrudBaseContract,
-  CrudListContract,
-  DeleteResult,
-  ListOptions,
-  ListResult,
-  PinnedUpdateContract
+import {
+  checkValidatorError,
+  type CrudBaseContract,
+  type CrudListContract,
+  type DeleteResult,
+  type DirectUpdateContract,
+  type ListOptions,
+  type ListResult
 } from '@core/api/api-contract.ts'
-import { checkValidatorError } from '@core/api/api-contract.ts'
 import {
   makeBusRuleSupabaseEdgeClient,
   makeBusRuleSupabaseRpcClient,
@@ -35,12 +35,10 @@ import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { validateUserCreate, validateUserUpdate } from '@domain/validators/user-validator.ts'
 
-type AllUserKeys = Extract<keyof typeof UserAdapter, keyof FromInstantiable<User>>
-
 /** Users API contract with auth synchronization operations. */
 export type AuthUsersContract =
   & CrudBaseContract<User>
-  & PinnedUpdateContract<User, AllUserKeys>
+  & DirectUpdateContract<User>
   & CrudListContract<User>
   & {
     eject(id: Id): Promise<User>
@@ -114,7 +112,7 @@ export const makeAuthUsers = (): AuthUsersContract => {
      * @param input User update payload.
      * @returns The updated domain user.
      */
-    update: (input: ScopedUpdate<User, AllUserKeys>): Promise<User> => {
+    update: <K extends keyof FromInstantiable<User>>(input: ScopedUpdate<User, K>): Promise<User> => {
       checkValidatorError(validateUserUpdate(input))
       return update.run(input as Dictionary)
     }

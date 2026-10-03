@@ -12,58 +12,51 @@ and query-string pagination normalization.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+ApiCrudContract<T> - CrudBaseContract<T> & AdaptedUpdateContract<T> & CrudListContract<T>
+ApiBusRuleContract<TParams, TResult> - Generic business-rule execution contract.
+└ run(params)  Execute business rule and return typed result.
+
+ERROR HANDLING
+───────────────────────────────────────────────────────────────────────────────
 ApiError - Standard API failure error shape.
 ├ message  Error message.
 ├ status   HTTP-like status code.
 └ details  Optional provider detail/code.
-
 ApiErrorDetail - Normalized error detail shape for mapping.
 ├ message  Optional provider message.
 ├ status   Optional provider status.
 ├ details  Optional provider detail.
 └ code     Optional provider code.
-
 checkApiError(error, ...): void    Throw ApiError when provider error exists.
 throwApiError(error, ...): never   Always throw ApiError from provider error.
 apiError(error): boolean           Runtime type guard and logger for ApiError.
 checkValidatorError(result): void  Throw ApiError 422 when a validator rejects a payload.
 
+CRUD CONTRACTS
+───────────────────────────────────────────────────────────────────────────────
 CrudBaseContract<T> - Non-mutating-shape CRUD primitives shared by every realization.
 ├ create(input)  Create one resource.
 ├ get(id)        Read one resource.
 └ delete(id)     Delete one resource and return DeleteResult.
-
 AdaptedUpdateContract<T> - Scoped update via a client-side ScopedUpdateAdapter (Supabase, IndexedDB).
 └ update(scoped, source)  Update declared fields through an adapter translation.
-
 DirectUpdateContract<T> - Scoped update with no adapter translation (abstraction-oriented HTTP).
 └ update(source)  Update declared fields directly.
-
-PinnedUpdateContract<T, K> - Scoped update pinned to one declared key set (e.g. a composed wrapper).
-└ update(source)  Update the fixed declared fields.
-
-CrudListContract<T> - Paginated listing.
-└ list?(options?)  List resources with pagination.
-
-ApiCrudContract<T> - CrudBaseContract<T> & AdaptedUpdateContract<T> & CrudListContract<T>. The default CRUD/list
-                      client contract (Supabase, IndexedDB — client-side adapter translation).
-
-ApiBusRuleContract<TParams, TResult> - Generic business-rule execution contract.
-└ run(params)  Execute business rule and return typed result.
-
 DeleteResult - Uniform soft-delete response payload.
 ├ id         Deleted resource id.
 └ deletedAt  Soft-delete timestamp.
 
+LISTING CONTRACTS
+───────────────────────────────────────────────────────────────────────────────
+CrudListContract<T> - Paginated listing.
+└ list?(options?)  List resources with pagination.
 ListOptions - Pagination request options.
 ├ limit   Requested page size.
 └ cursor  Requested pagination cursor.
-
 ListResult<T> - Pagination response payload.
 ├ data     Page data set.
 ├ cursor   Cursor for next read position.
 └ hasMore  True when more rows remain.
-
 listPageLimitValue(string): number Parse/clamp list page size.
 listCursorValue(string):    number Parse/sanitize list cursor offset.
 */
@@ -176,11 +169,6 @@ export interface AdaptedUpdateContract<T extends Instantiable> {
 /** Scoped update with no adapter translation (abstraction-oriented HTTP endpoints). */
 export interface DirectUpdateContract<T extends Instantiable> {
   update<K extends keyof FromInstantiable<T>>(source: ScopedUpdate<T, K>): Promise<T>
-}
-
-/** Scoped update pinned to one declared key set, e.g. a composed wrapper's fixed surface. */
-export interface PinnedUpdateContract<T extends Instantiable, K extends keyof FromInstantiable<T>> {
-  update(source: ScopedUpdate<T, K>): Promise<T>
 }
 
 /** Paginated listing. */

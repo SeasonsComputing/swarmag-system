@@ -14,7 +14,7 @@ import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import { UiAlert, UiLayout, UiTableCell, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { createUserState, UserStepDetail } from './user-step-detail.tsx'
-import type { UserDraft } from './user-step-detail.tsx'
+import type { UserDetailKeys, UserDraft } from './user-step-detail.tsx'
 
 import './user-manager.css'
 
@@ -48,7 +48,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     },
     create: draft => api.Users.create(draft),
     update: (user, draft) =>
-      api.Users.update({
+      api.Users.update<UserDetailKeys>({
         id: user.id,
         ...draft
       }),

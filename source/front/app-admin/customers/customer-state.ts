@@ -26,25 +26,15 @@ import { demandOne, toTrimmed, when } from '@core/std'
 import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer, CustomerSite } from '@domain/abstractions/customer.ts'
 import type { CustomerStatus } from '@domain/abstractions/customer.ts'
+import type { scopes } from '@front/api/form-scopes.ts'
+import type { DraftOf } from '@front/api/make-form-scope.ts'
 import { createSignal } from '@solid-js'
 import type { Accessor, Setter } from '@solid-js'
 import { createStore, produce } from '@solid-js/store'
 import { UiText } from '@ux/ui'
 
 /** Domain fields owned by the Customer workbench. */
-export type CustomerDraft = Pick<
-  Customer,
-  | 'primaryContact'
-  | 'name'
-  | 'status'
-  | 'line1'
-  | 'line2'
-  | 'city'
-  | 'state'
-  | 'postalCode'
-  | 'country'
-  | 'sites'
->
+export type CustomerDraft = DraftOf<typeof scopes.Customers.detail>
 
 /** Project an isolated Customer draft; optional control text becomes domain absence. */
 export const customerDraft = (state: CustomerState): CustomerDraft => ({

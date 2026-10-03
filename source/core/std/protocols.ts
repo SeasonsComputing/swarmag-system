@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Mutation protocol primitives                                                 ║
-║ Create and update payload shapes derived from lifecycle abstractions.         ║
+║ Create and update payload shapes derived from lifecycle abstractions.        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -38,17 +38,14 @@ export type UpdateFromInstantiable<T extends Instantiable> =
 
 /**
  * Contract to update declared fields of an Instantiable.
- * Fields inside the declared scope are required.
+ * Fields inside the declared scope are required; values admitting undefined also admit null.
  */
 export type ScopedUpdate<T extends Instantiable, K extends keyof FromInstantiable<T>> =
   & Pick<T, 'id'>
   & {
-    [P in K]-?: OptionalKey<FromInstantiable<T>, P> extends true
-      ? FromInstantiable<T>[P] | null | undefined
+    [P in K]-?: undefined extends FromInstantiable<T>[P] ? FromInstantiable<T>[P] | null
       : FromInstantiable<T>[P]
   }
-
-type OptionalKey<T, K extends keyof T> = Record<string, never> extends Pick<T, K> ? true : false
 
 /** Contract to create an InstantiableOnly. */
 export type CreateFromInstantiableOnly<T extends InstantiableOnly> = FromInstantiableOnly<T>
