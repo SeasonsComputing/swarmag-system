@@ -21,6 +21,15 @@
   width: fit-content;
 }
 
+[data-widget='helm-widget'] [data-widget-icon='hidden'] [data-ui='action-button-frame'] {
+  display: none;
+}
+
+[data-widget='helm-widget'] [data-widget-icon='hidden'] [data-ui='action-button-label']::before,
+[data-widget='helm-widget'] [data-widget-icon='hidden'] [data-ui='action-button-label']::after {
+  content: none;
+}
+
 /* Stacked header: the field spans its own row, so actions center within it. */
 @container dashboard-header (max-width: 610px) {
   [data-widget='helm-widget'] {

@@ -9,8 +9,9 @@ PURPOSE
 Renders configured navigation and reserved commands in the dashboard header's
 terminal field, adapting to that field's own measured width rather than the
 viewport. Each action carries its accessible label, icon, and optional
-labelMode (omitted defaults to visible); reserved commands use an adorned
-symbol such as `@theme`, ordinary commands are route paths. Below the
+labelMode (omitted defaults to visible; visible-no-icon draws only the label).
+Reserved commands use an adorned symbol such as `@theme`, ordinary commands
+are route paths. Below the
 dashboard's stacked-header threshold the field spans its own row and actions
 distribute across it; control size scales with density and the shared
 base-scale step.
@@ -23,7 +24,8 @@ HelmWidget  Dashboard header navigation control cluster.
 import type { Dictionary } from '@core/std'
 import { createSignal, For } from '@solid-js'
 import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
-import { UiActionButton, type UiActionButtonLabelMode, type UiComponent, UiLayout } from '@ux/ui'
+import { UiActionButton, UiLayout } from '@ux/ui'
+import type { UiComponent } from '@ux/ui'
 
 import './helm-widget.css'
 
@@ -32,12 +34,16 @@ export type HelmWidgetProps = {
   settings: Dictionary
 }
 
+/** Label presentation modes accepted by the Helm configuration. */
+const HELM_LABEL_MODES = ['hidden', 'visible', 'visible-no-icon'] as const
+type HelmLabelMode = (typeof HELM_LABEL_MODES)[number]
+
 /** Helm action configured from the dashboard seed. */
 type HelmAction = {
   command: string
   icon: string
   label: string
-  labelMode: UiActionButtonLabelMode
+  labelMode: HelmLabelMode
 }
 
 /** Helm action with executable widget behavior. */
@@ -90,7 +96,8 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
               density='dense'
               icon={action.icon()}
               label={action.label}
-              labelMode={action.labelMode}
+              labelMode={action.labelMode === 'visible-no-icon' ? 'visible' : action.labelMode}
+              data-widget-icon={action.labelMode === 'visible-no-icon' ? 'hidden' : undefined}
               onClick={action.execute}
             />
           )}
@@ -140,11 +147,13 @@ const toString = (input: unknown, field: string): string => {
   return input
 }
 
-/** Require hidden or visible when a label mode is configured. */
-const toLabelMode = (value: unknown, field: string): UiActionButtonLabelMode => {
+/** Require a supported Helm label mode when configured. */
+const toLabelMode = (value: unknown, field: string): HelmLabelMode => {
   if (value === undefined) return 'visible'
-  if (value === 'hidden' || value === 'visible') return value
-  throw new Error(`${field} must be hidden or visible`)
+  if (typeof value !== 'string' || !HELM_LABEL_MODES.includes(value as HelmLabelMode)) {
+    throw new Error(`${field} must be ${HELM_LABEL_MODES.join(', ')}`)
+  }
+  return value as HelmLabelMode
 }
 
 /** Require a non-empty string array. */
