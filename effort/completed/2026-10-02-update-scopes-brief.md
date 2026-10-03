@@ -1,8 +1,19 @@
 # Update Scopes & Manager Typing — Backlog Brief
 
-**Backlog, not dispatched.** This brief corrects two type-level defects in the reference
-implementations (User Manager, Customer Manager). Both must land before roadmap §5 Mechanical
-Productions, which copies the reference implementations.
+**CLOSED 2026-10-03.** Shipped in `d654096`. Reviewed by the Chief Architect, independently
+verified by the AI Architect against the code, checks, and tests, and live-verified by the CA in
+the running app. The effort grew past its original two defects: the 2026-10-03 amendments added
+the form-scope abstraction (`makeFormScope`, `DraftOf`, `front/api/form-scopes.ts`) and restored
+`ScopedUpdate`'s value-based nullability.
+
+Known gap, recorded rather than repaired: the Users API test's avatar-preservation case has not
+executed. The shared test configuration cannot bootstrap `api` (backlog: "The shared test
+configuration cannot bootstrap `api`"), and no UI can set an avatar, so no live check covers that
+property.
+
+Originally: this brief corrects two type-level defects in the reference implementations (User
+Manager, Customer Manager). Both must land before roadmap §5 Mechanical Productions, which copies
+the reference implementations.
 
 The work was surfaced in two places:
 
