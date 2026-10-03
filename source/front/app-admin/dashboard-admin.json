@@ -8,9 +8,19 @@
         "settings": {
           "shape": "compact",
           "actions": [
-            { "command": "/users", "label": "Users", "icon": "person" },
-            { "command": "/customers", "label": "Customers", "icon": "id-card" },
-            { "command": "/onboarding", "label": "Onboarding", "icon": "id-card" },
+            { "command": "/users", "label": "Users", "icon": "person", "labelMode": "visible-no-icon" },
+            {
+              "command": "/customers",
+              "label": "Customers",
+              "icon": "id-card",
+              "labelMode": "visible-no-icon"
+            },
+            {
+              "command": "/onboarding",
+              "label": "Onboarding",
+              "icon": "id-card",
+              "labelMode": "visible-no-icon"
+            },
             { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
             { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
             { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }
