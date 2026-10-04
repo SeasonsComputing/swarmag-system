@@ -1,12 +1,22 @@
 # Users Form Scope & User State — Brief
 
-**Active.** Written 2026-10-03 by the AI Architect from a CA + AA session. Two amendments follow
-the original steps; read them first.
+**CLOSED 2026-10-04.** Shipped in two commits: Phase 1 in `181e0c5`, Phase 2 in `e4a4cf1`. Each
+phase was independently verified by the AI Architect against the diff and fresh check runs, and
+each passed the CA's Admin walkthrough. Written 2026-10-03 by the AI Architect from a CA + AA
+session; two amendments follow the original steps.
 
-- **Phase 1 (Steps 1–4, as amended by the ACE review): produced 2026-10-03** and independently
-  verified by the AI Architect on 2026-10-04, and passed the CA's Admin walkthrough on 2026-10-04.
-- **Phase 2 (the scope promotion to `core/`): produced 2026-10-04** and independently verified by
-  the AI Architect the same day. The CA's Admin walkthrough is pending.
+- **Phase 1 (Steps 1–4, as amended by the ACE review):** `scopes.Users.detail` became a real
+  scope, without an adapter; User state moved to `user-state.ts`.
+- **Phase 2 (the 2026-10-04 amendment):** the maker moved to `core/std/make-scope.ts` as
+  `makeScope`, exported through `@core/stdx`.
+- **Small fixes made during verification, at CA direction:** the User projection test uses `id()`;
+  `DraftOf`'s type parameter is `S`, so it no longer shadows `Scope`; `core/std/make-scope.ts`
+  and `core/std/wrap-http-handler.ts` import their siblings directly, not through a `core/std`
+  barrel; `core/svc/make-supabase-edge-auth.ts` imports its sibling relatively.
+
+Known gap, recorded rather than repaired: live Users API coverage. `users-api-test.ts` still fails
+at bootstrap and has no authenticated administrator (backlog: "The shared test configuration
+cannot bootstrap `api`"). Avatar preservation has structural coverage only.
 
 **Operating mode: Foundation.** The work changes a shared declaration shape in `front/api/` and the
 text of `architecture-core.md` §5.2.6 and `architecture-front.md` §§7.4, 10.1.6.

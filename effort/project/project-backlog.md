@@ -433,7 +433,8 @@ IndexedDB. Importing `api` therefore needs `LOCAL_DB_NAME` registered in `Config
   `Config.init`, which registers `LOCAL_DB_NAME`, and an in-memory transport.
 - **Unexecuted coverage:** the avatar-preservation case added by
   `effort/completed/2026-10-02-update-scopes-brief.md` has never run. No UI can set an avatar,
-  so no live walkthrough can verify that property either.
+  so no live walkthrough can verify that property either. Since 2026-10-04 it has structural
+  coverage: `make-scope-test.ts` shows the Users scope's projections never emit `avatarUrl`.
 
 The fix belongs in the shared test configuration, not in each test. Also decide whether a test
 runtime should load browser-backed stores through `api` at all.

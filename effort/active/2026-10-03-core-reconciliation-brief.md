@@ -94,4 +94,19 @@ holds, not assume that a missing CONVENTIONS entry means a missing rule.
 `deno task fmt:check` and `deno task check` after each document change. Every pointer between the
 two documents must resolve, and every statement must match the code as it stands.
 
+## Amendment — 2026-10-04 — Inputs from the Users form-scope effort
+
+Recorded by the AI Architect when `effort/completed/2026-10-03-users-form-scope-brief.md` closed.
+Two inputs for the inventory:
+
+- **A new `core/` export.** `core/std/make-scope.ts` (`makeScope`, `makeAdaptedScope`, `Scope`,
+  `AdaptedScope`, `ScopeDraft`, `DraftOf`) is exported through `@core/stdx` (`e4a4cf1`). Whether
+  CONVENTIONS names `makeScope` beside `makeAdapter` (§8.6) was deferred to this brief.
+- **An unwritten import rule, now uniform in the code.** No module imports its own namespace
+  through a barrel or an alias: a `core/std` file imports siblings directly, never `@core/std` or
+  `@core/stdx`, and a `core/{namespace}` file imports siblings relatively (`./…`). The CA
+  confirmed the rule on 2026-10-04, and the last exceptions (`make-scope.ts`,
+  `wrap-http-handler.ts`, `make-supabase-edge-auth.ts`) were fixed. CONVENTIONS §3 bans relative
+  imports only across top-level namespaces; it does not yet state this rule.
+
 _End of Backlog Brief_
