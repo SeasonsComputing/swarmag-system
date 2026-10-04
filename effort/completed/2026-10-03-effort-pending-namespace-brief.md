@@ -1,9 +1,12 @@
 # Effort — Pending Namespace
 
-**Backlog, not dispatched.** Recorded 2026-10-03 from a CA + AI Architect process session.
-Writing this brief is authorized; amending `EFFORT.md` requires its own production
-authorization. This brief lives in `effort/active/` only because the namespace it establishes
-does not exist yet.
+**CLOSED 2026-10-04.** Shipped in two commits: `59a1d5e` (the four undispatched briefs migrated
+to `effort/pending/`, their backlog links, and `README.md` §1.4) and `72b0787` (`EFFORT.md` 1.1).
+Produced by an AI Architect and reviewed by the CA. The scope widened during production, as the
+2026-10-04 amendment records.
+
+Originally recorded 2026-10-03 from a CA + AI Architect process session. It lived in
+`effort/active/` because the namespace it established did not yet exist.
 
 ## What triggered it
 

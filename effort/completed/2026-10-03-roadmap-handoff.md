@@ -1,5 +1,10 @@
 # Roadmap to Mechanical Productions — Handoff
 
+**CLOSED 2026-10-04.** Its knowledge transfer completed in the thread that followed: Users was
+discussed, briefed, and closed (`effort/completed/2026-10-03-users-form-scope-brief.md`), and the
+plan's remaining sequence moved to `project-roadmap.md` §4 Notes Editor. The plan's phase numbers
+are retired with this record; the roadmap lists the sequence as steps.
+
 **Session-end snapshot, 2026-10-03.** This closes the thread "Customer Manager, workbench steps & form
 scopes (09-22 → 10-03)". The next thread resumes from this record, not from that thread's memory.
 
