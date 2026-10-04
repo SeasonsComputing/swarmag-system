@@ -9,8 +9,6 @@ import type { UserCreate } from '@domain/protocols/user-protocol.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/form-scopes.ts'
 
-type UserDetailKeys = (typeof scopes.Users.detail)[number]['key']
-
 Deno.test('users API supports full CRUD lifecycle with soft delete', async context => {
   if (!api.Users.list) throw new Error('Users API list contract is required for this test')
 
@@ -40,8 +38,7 @@ Deno.test('users API supports full CRUD lifecycle with soft delete', async conte
   assertEquals(fetched.preferredChannel, createInput.preferredChannel)
   assertEquals(fetched.notes, createInput.notes)
 
-  const updated = await api.Users.update<UserDetailKeys>({
-    id: created.id,
+  const updated = await api.Users.update(scopes.Users.detail.toUpdate(created.id, {
     roles: fetched.roles,
     notes: fetched.notes,
     displayName: `Updated Ops User ${nonce}`,
@@ -49,7 +46,7 @@ Deno.test('users API supports full CRUD lifecycle with soft delete', async conte
     phoneNumber: fetched.phoneNumber,
     preferredChannel: fetched.preferredChannel,
     status: 'inactive'
-  })
+  }))
   assertEquals(updated.id, created.id)
   assertEquals(updated.displayName, `Updated Ops User ${nonce}`)
   assertEquals(updated.status, 'inactive')

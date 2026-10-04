@@ -2,10 +2,15 @@
  * Form-scope inference, constraints, and create/update projection tests.
  */
 
-import type { CreateFromInstantiable, Dictionary, FromInstantiable, ScopedUpdate } from '@core/std'
+import type { CrudBaseContract, DirectUpdateContract } from '@core/api/api-contract.ts'
+import { id } from '@core/std'
+import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
 import type { Customer } from '@domain/abstractions/customer.ts'
+import type { User } from '@domain/abstractions/user.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
-import { makeFormScope } from '@front/api/make-form-scope.ts'
+import { UserAdapter } from '@domain/adapters/user-adapter.ts'
+import { scopes } from '@front/api/form-scopes.ts'
+import { makeAdaptedFormScope, makeFormScope } from '@front/api/make-form-scope.ts'
 import type { DraftOf } from '@front/api/make-form-scope.ts'
 import { assertEquals } from '@std/assert'
 import { blueMesaRanchCustomer } from '@tests/fixtures/customer-samples.ts'
@@ -23,6 +28,10 @@ const DETAIL_FIELDS = [
   CustomerAdapter.sites
 ] as const
 const scope = makeFormScope({
+  fields: DETAIL_FIELDS,
+  defaults: { accountManagerId: undefined, notes: [] }
+})
+const adaptedScope = makeAdaptedFormScope({
   fields: DETAIL_FIELDS,
   defaults: { accountManagerId: undefined, notes: [] }
 })
@@ -50,6 +59,23 @@ Deno.test('makeFormScope infers the exact draft and create protocol without type
   const exactCreate: Equal<ReturnType<typeof scope.toCreate>, CreateFromInstantiable<Customer>> = true
   assertEquals(exactDraft, true)
   assertEquals(exactCreate, true)
+  // @ts-expect-error Direct form scopes have no scoped adapter.
+  const adapter = scope.adapter
+  assertEquals(adapter, undefined)
+})
+
+Deno.test('makeAdaptedFormScope adds translation without changing projections', () => {
+  const draft = detailDraft()
+  const exactDraft: Equal<DraftOf<typeof adaptedScope>, Draft> = true
+  assertEquals(exactDraft, true)
+  assertEquals(adaptedScope.toCreate(draft), scope.toCreate(draft))
+  assertEquals(
+    adaptedScope.toUpdate(blueMesaRanchCustomer.id, draft),
+    scope.toUpdate(blueMesaRanchCustomer.id, draft)
+  )
+  const overlap = { accountManagerId: undefined, notes: [], name: 'Unowned default' }
+  // @ts-expect-error Adapted declarations retain the base's disjoint-default constraint.
+  makeAdaptedFormScope({ fields: DETAIL_FIELDS, defaults: overlap })
 })
 
 Deno.test('makeFormScope compiler constraints reject missing and overlapping attributes', () => {
@@ -124,7 +150,7 @@ Deno.test('toUpdate clears omitted and undefined scoped values without leaking o
   assertEquals(explicit, omitted)
   assertEquals('notes' in omitted, false)
   assertEquals('unrelated' in omitted, false)
-  assertEquals(scope.adapter.fromDomain(omitted).line2, null)
+  assertEquals(adaptedScope.adapter.fromDomain(omitted).line2, null)
 })
 
 Deno.test('form-scope projections preserve present values and whole compositions', () => {
@@ -139,7 +165,7 @@ Deno.test('form-scope projections preserve present values and whole compositions
   assertEquals(updated.sites, [])
   assertEquals(created.primaryContact, draft.primaryContact)
   assertEquals(updated.primaryContact, draft.primaryContact)
-  assertEquals(scope.adapter.fromDomain(updated).primary_contact, [{
+  assertEquals(adaptedScope.adapter.fromDomain(updated).primary_contact, [{
     display_name: draft.primaryContact[0].displayName,
     phone_number: draft.primaryContact[0].phoneNumber,
     preferred_channel: draft.primaryContact[0].preferredChannel,
@@ -149,7 +175,7 @@ Deno.test('form-scope projections preserve present values and whole compositions
 
 Deno.test('Id | undefined admits null in ScopedUpdate and clears through the form adapter', () => {
   const draft = detailDraft()
-  const assignmentScope = makeFormScope({
+  const assignmentScope = makeAdaptedFormScope({
     fields: [CustomerAdapter.accountManagerId],
     defaults: { ...draft, notes: [] }
   })
@@ -171,3 +197,67 @@ Deno.test('Id | undefined admits null in ScopedUpdate and clears through the for
   const invalid: ScopedUpdate<Customer, 'name'> = { id: blueMesaRanchCustomer.id, name: null }
   assertEquals((invalid as Dictionary).name, null)
 })
+
+Deno.test('User projections exclude avatarUrl even when a richer draft carries it', () => {
+  const draft: DraftOf<typeof scopes.Users.detail> = {
+    displayName: 'Ada Lovelace',
+    primaryEmail: 'ada@example.com',
+    phoneNumber: '+1-325-555-0100',
+    preferredChannel: 'email',
+    notes: [],
+    roles: ['administrator'],
+    status: 'active'
+  }
+  const userId = id()
+  const richerDraft = { ...draft, avatarUrl: 'https://example.com/ada.png' }
+  const created = scopes.Users.detail.toCreate(richerDraft)
+  const updated = scopes.Users.detail.toUpdate(userId, richerDraft)
+  assertEquals(created, draft)
+  assertEquals(updated, { id: userId, ...draft })
+  assertEquals('avatarUrl' in created, false)
+  assertEquals('avatarUrl' in updated, false)
+  assertEquals('adapter' in scopes.Users.detail, false)
+})
+
+declare const directUsers: DirectUpdateContract<User>
+declare const userCreates: CrudBaseContract<User>
+
+// Type assertions only: the declared clients have no runtime implementation.
+function checkUserInference(draft: DraftOf<typeof scopes.Users.detail>, id: Id): void {
+  const scope = scopes.Users.detail
+  type UserDraft = DraftOf<typeof scope>
+  const exactKeys: Equal<
+    keyof UserDraft,
+    'displayName' | 'primaryEmail' | 'phoneNumber' | 'preferredChannel' | 'notes' | 'roles' | 'status'
+  > = true
+  const updated: Promise<User> = directUsers.update(scope.toUpdate(id, draft))
+  const created: Promise<User> = userCreates.create(scope.toCreate(draft))
+  // @ts-expect-error User drafts exclude avatarUrl.
+  const avatarDraft: UserDraft = { ...draft, avatarUrl: 'https://example.com/ada.png' }
+  const overlap = { displayName: 'Unowned default' }
+  makeFormScope({
+    fields: [
+      UserAdapter.displayName,
+      UserAdapter.primaryEmail,
+      UserAdapter.phoneNumber,
+      UserAdapter.preferredChannel,
+      UserAdapter.notes,
+      UserAdapter.roles,
+      UserAdapter.status
+    ],
+    // @ts-expect-error An in-scope User field cannot also be defaulted.
+    defaults: overlap
+  })
+
+  const inferKeys = <K extends keyof FromInstantiable<User>>(source: ScopedUpdate<User, K>): K => {
+    directUsers.update(source)
+    return null as unknown as K
+  }
+  const inferred = inferKeys(scope.toUpdate(id, draft))
+  const exactInference: Equal<typeof inferred, keyof UserDraft> = true
+  const exactCreate: Equal<ReturnType<typeof scope.toCreate>, CreateFromInstantiable<User>> = true
+  const exactDraft: Equal<UserDraft, Pick<FromInstantiable<User>, keyof UserDraft>> = true
+  void [exactKeys, updated, created, avatarDraft, exactInference, exactCreate, exactDraft]
+}
+
+void checkUserInference

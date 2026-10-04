@@ -3,29 +3,31 @@
 ║ User manager                                                                 ║
 ║ User management provider.                                                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Composes the User workbench with its collection, draft state, and Direct writes.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+UserManagerProps  Route modal cancellation contract.
+UserManager       User management workbench.
 */
 
 import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
+import { scopes } from '@front/api/form-scopes.ts'
 import { For, Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
 import { UiAlert, UiLayout, UiTableCell, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-import { createUserState, UserStepDetail } from './user-step-detail.tsx'
-import type { UserDetailKeys, UserDraft } from './user-step-detail.tsx'
+import { createUserState, userDraft } from './user-state.ts'
+import type { UserDraft } from './user-state.ts'
+import { UserStepDetail } from './user-step-detail.tsx'
 
 import './user-manager.css'
-
-/** Loads the user list for the user manager. */
-async function loadUsers(): Promise<User[]> {
-  const result = await api.Users.list({ limit: 100 })
-  return result.data
-}
-
-/** Query key for the users list. */
-const USERS_QUERY_KEY = ['users'] as const
 
 /** Props for the user manager route modal. */
 export type UserManagerProps = {
@@ -34,6 +36,7 @@ export type UserManagerProps = {
 
 /** User manager component. */
 export const UserManager = (props: UserManagerProps): UiComponent => {
+  const scope = scopes.Users.detail
   const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY, queryFn: loadUsers }))
 
   const userManager: AbstractionManagerContract<User, UserDraft> = {
@@ -46,12 +49,8 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     refresh: async () => {
       await usersQuery.refetch()
     },
-    create: draft => api.Users.create(draft),
-    update: (user, draft) =>
-      api.Users.update<UserDetailKeys>({
-        id: user.id,
-        ...draft
-      }),
+    create: draft => api.Users.create(scope.toCreate(draft)),
+    update: (user, draft) => api.Users.update(scope.toUpdate(user.id, draft)),
     actions: [
       {
         name: 'delete',
@@ -89,7 +88,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
           title: 'User details',
           render: context => <UserStepDetail context={context} state={state} />
         }],
-        draft: state.draft
+        draft: () => userDraft(state)
       }
     }
   }
@@ -102,6 +101,15 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       <AbstractionManager onCancel={props.onCancel} provider={userManager} />
     </div>
   )
+}
+
+/** Query key for the users list. */
+const USERS_QUERY_KEY = ['users'] as const
+
+/** Loads the user list for the user manager. */
+async function loadUsers(): Promise<User[]> {
+  const result = await api.Users.list({ limit: 100 })
+  return result.data
 }
 
 /** Renders table cells for one user. */

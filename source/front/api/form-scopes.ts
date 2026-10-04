@@ -7,8 +7,8 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Companion seam to api.ts: declared form fields and create defaults.
-Customer forms derive drafts and write projections from adapter metadata.
-Users retains its Direct update field tuple.
+Customer and User forms derive drafts and write projections from field metadata.
+Customer declarations add scoped adapters; User declarations project Direct writes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -19,12 +19,12 @@ scopes  Declared form write scopes keyed by API topic.
 
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
-import { makeFormScope } from './make-form-scope.ts'
+import { makeAdaptedFormScope, makeFormScope } from './make-form-scope.ts'
 
 /** Declared form write scopes keyed by API topic. */
 export const scopes = {
   Customers: {
-    detail: makeFormScope({
+    detail: makeAdaptedFormScope({
       fields: [
         CustomerAdapter.primaryContact,
         CustomerAdapter.name,
@@ -41,14 +41,17 @@ export const scopes = {
     })
   },
   Users: {
-    detail: [
-      UserAdapter.displayName,
-      UserAdapter.primaryEmail,
-      UserAdapter.phoneNumber,
-      UserAdapter.preferredChannel,
-      UserAdapter.notes,
-      UserAdapter.roles,
-      UserAdapter.status
-    ] as const
+    detail: makeFormScope({
+      fields: [
+        UserAdapter.displayName,
+        UserAdapter.primaryEmail,
+        UserAdapter.phoneNumber,
+        UserAdapter.preferredChannel,
+        UserAdapter.notes,
+        UserAdapter.roles,
+        UserAdapter.status
+      ],
+      defaults: {}
+    })
   }
 }
