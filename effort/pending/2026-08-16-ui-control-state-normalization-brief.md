@@ -1,5 +1,7 @@
 # UI Control State Normalization — Production Brief
 
+**Backlog, not dispatched.** Fully designed and audited; awaiting selection from the roadmap.
+
 **Sequencing note (2026-08-30):** originally gated behind
 `effort/active/2026-08-16-helm-button-boundary-repair-brief.md` on the
 assumption both would edit `ui.css`/`ui-action-button.tsx`. The Helm boundary

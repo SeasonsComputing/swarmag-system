@@ -41,7 +41,7 @@ server hole again," implying this is not the first time. This is a live specimen
 exact failure this entry already describes — the constraint a session needed
 ("stage is the only environment") wasn't reached before the session acted on procedure it
 shouldn't have. Also noted in
-`effort/active/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
+`effort/pending/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
 already touches this file.
 
 ### `architecture-core.md` is base context and has never been measured for scan cost
@@ -76,7 +76,7 @@ which document owns what. Several decided rules are documented nowhere durable, 
 the 08-30 rule that every form must declare its update scope and the 10-03 rule that a
 scope's unit is the attribute.
 
-Design record: `effort/active/2026-10-03-core-reconciliation-brief.md`.
+Design record: `effort/pending/2026-10-03-core-reconciliation-brief.md`.
 
 Picking this up: together with, or sequenced against, the scan-cost entry above, since both
 restructure `architecture-core.md`.
@@ -316,7 +316,7 @@ widget ancestor's containment boundary. Fix complete-selector parsing and audit 
 under the existing policies; then restore Helm containment in a separately authorized correction.
 
 Foundation scope, evidence, regression cases, and escalation boundaries are in
-[CSS Guard — Complete Selector Parsing](../active/2026-10-03-css-guard-selector-parsing-brief.md).
+[CSS Guard — Complete Selector Parsing](../pending/2026-10-03-css-guard-selector-parsing-brief.md).
 Backlog, not dispatched; priority is normal, with guard repair preceding the Helm correction.
 
 ## DevOps
@@ -348,7 +348,7 @@ not today).
 
 Full plan, exact site counts, and sequencing (doc → `architecture-devops.md` → lib →
 retrofit → guard-last, so the new guard's first run is green) are in
-`effort/active/2026-08-23-devops-style-error-handling-brief.md`.
+`effort/pending/2026-08-23-devops-style-error-handling-brief.md`.
 
 ### `edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already has
 

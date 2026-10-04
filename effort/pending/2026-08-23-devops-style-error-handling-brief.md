@@ -1,5 +1,7 @@
 # DevOps Style Conformance & Shared Error Handling — Backlog Brief
 
+**Backlog, not dispatched.**
+
 **Amended 2026-09-24 — placement decided by CA.** DevOps conventions are a subset of
 `CONVENTIONS.md` with devops and tests allowances. Documented that way, they live in a
 section of `architecture-devops.md`, not in `CONVENTIONS.md`. This supersedes sequencing
@@ -8,7 +10,7 @@ steps 1 and 4 below: the two principles, the §8.5 tooling-namespace carve-out, 
 document), stated as allowances against `CONVENTIONS.md` rather than as edits to it.
 `CONVENTIONS.md` is not touched by this brief.
 
-**Backlog, not dispatched.** Captured at the close of a session that investigated
+Captured at the close of a session that investigated
 a recurring phantom-directory bug (empty directories reappearing at the exact
 path of files retired by past refactors — `runtime-provider.ts`,
 `common-protocol.ts`, `supabase-import-map.json`, months apart). The mechanism

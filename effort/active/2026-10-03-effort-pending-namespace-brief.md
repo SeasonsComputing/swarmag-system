@@ -94,6 +94,24 @@ not from git history.
 
 The production scope's `EFFORT.md` row is updated to include this change.
 
+## Amendment — 2026-10-04 — Scope widened during production
+
+Recorded by the AI Architect who produced it. Each widening was authorized by the CA in
+conversation (EFFORT §8 Escalation Is a Default, Not a Wall).
+
+- **Migration came in.** The four undispatched briefs (ui-control-state-normalization,
+  devops-style-error-handling, core-reconciliation, css-guard-selector-parsing) moved to
+  `effort/pending/`, each opening "Backlog, not dispatched.", and their backlog links moved with
+  them. That also gives `effort/pending/` content, which git needs to track it.
+- **`README.md` §1.4 Effort** said status-bearing records begin in `effort/active/`. It now
+  describes `pending`.
+- **Record kinds and file naming.** README §1.4 declared four record kinds and a file-naming
+  pattern that `EFFORT.md` never defined. Two of the kinds, `design` and `tasks`, were retired in
+  practice before EFFORT 1.0: none has been written since 2026-08-04, and the brief absorbed both.
+  `EFFORT.md` §2 now names the two kinds, brief and handoff, and the
+  `{yyyy-mm-dd}-{topic}-{kind}.md` pattern. README §1.4 lists only those two and points to
+  EFFORT for both.
+
 ## Explicitly out of scope
 
 - **Migrating existing briefs.** Once the namespace exists, moving today's undispatched briefs
