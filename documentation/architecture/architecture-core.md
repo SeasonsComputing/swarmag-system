@@ -409,13 +409,13 @@ that set explicitly through adapter field metadata, never by deriving every key 
 The API composition layer hosts these declarations in `front/api/form-scopes.ts`:
 
 - A form declares its fields and create defaults through
-  `makeFormScope({ fields: [XAdapter.field, …], defaults })`. The declaration owns the form's
+  `makeScope({ fields: [XAdapter.field, …], defaults })`. The declaration owns the form's
   draft and its create and update projections, `toCreate(draft)` and `toUpdate(id, draft)`.
-- A form whose client translates (Adapted) declares through `makeAdaptedFormScope`, which adds
+- A form whose client translates (Adapted) declares through `makeAdaptedScope`, which adds
   the scoped adapter as `adapter`. Its client accepts
   `update(scope.adapter, scope.toUpdate(id, draft))`.
 - A form whose client does not translate (Direct; today only Users) declares through
-  `makeFormScope`. Its client accepts `update(scope.toUpdate(id, draft))`; `K` is inferred
+  `makeScope`. Its client accepts `update(scope.toUpdate(id, draft))`; `K` is inferred
   from the projection.
 
 The layer chain is domain metadata → declaration → contract → client → composition → form.

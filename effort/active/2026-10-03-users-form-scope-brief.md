@@ -5,7 +5,8 @@ the original steps; read them first.
 
 - **Phase 1 (Steps 1–4, as amended by the ACE review): produced 2026-10-03** and independently
   verified by the AI Architect on 2026-10-04, and passed the CA's Admin walkthrough on 2026-10-04.
-- **Phase 2 (the scope promotion to `core/`): not dispatched.** It awaits the production gate.
+- **Phase 2 (the scope promotion to `core/`): produced 2026-10-04** and independently verified by
+  the AI Architect the same day. The CA's Admin walkthrough is pending.
 
 **Operating mode: Foundation.** The work changes a shared declaration shape in `front/api/` and the
 text of `architecture-core.md` §5.2.6 and `architecture-front.md` §§7.4, 10.1.6.

@@ -1,17 +1,17 @@
 /**
- * Form-scope inference, constraints, and create/update projection tests.
+ * Scope inference, constraints, and create/update projection tests.
  */
 
 import type { CrudBaseContract, DirectUpdateContract } from '@core/api/api-contract.ts'
 import { id } from '@core/std'
 import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
+import { makeAdaptedScope, makeScope } from '@core/stdx'
+import type { DraftOf } from '@core/stdx'
 import type { Customer } from '@domain/abstractions/customer.ts'
 import type { User } from '@domain/abstractions/user.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { scopes } from '@front/api/form-scopes.ts'
-import { makeAdaptedFormScope, makeFormScope } from '@front/api/make-form-scope.ts'
-import type { DraftOf } from '@front/api/make-form-scope.ts'
 import { assertEquals } from '@std/assert'
 import { blueMesaRanchCustomer } from '@tests/fixtures/customer-samples.ts'
 
@@ -27,11 +27,11 @@ const DETAIL_FIELDS = [
   CustomerAdapter.country,
   CustomerAdapter.sites
 ] as const
-const scope = makeFormScope({
+const scope = makeScope({
   fields: DETAIL_FIELDS,
   defaults: { accountManagerId: undefined, notes: [] }
 })
-const adaptedScope = makeAdaptedFormScope({
+const adaptedScope = makeAdaptedScope({
   fields: DETAIL_FIELDS,
   defaults: { accountManagerId: undefined, notes: [] }
 })
@@ -51,7 +51,7 @@ const detailDraft = (): Draft => ({
   sites: blueMesaRanchCustomer.sites
 })
 
-Deno.test('makeFormScope infers the exact draft and create protocol without type arguments', () => {
+Deno.test('makeScope infers the exact draft and create protocol without type arguments', () => {
   const exactDraft: Equal<
     Draft,
     Pick<FromInstantiable<Customer>, (typeof DETAIL_FIELDS)[number]['key']>
@@ -64,7 +64,7 @@ Deno.test('makeFormScope infers the exact draft and create protocol without type
   assertEquals(adapter, undefined)
 })
 
-Deno.test('makeAdaptedFormScope adds translation without changing projections', () => {
+Deno.test('makeAdaptedScope adds translation without changing projections', () => {
   const draft = detailDraft()
   const exactDraft: Equal<DraftOf<typeof adaptedScope>, Draft> = true
   assertEquals(exactDraft, true)
@@ -75,10 +75,10 @@ Deno.test('makeAdaptedFormScope adds translation without changing projections', 
   )
   const overlap = { accountManagerId: undefined, notes: [], name: 'Unowned default' }
   // @ts-expect-error Adapted declarations retain the base's disjoint-default constraint.
-  makeAdaptedFormScope({ fields: DETAIL_FIELDS, defaults: overlap })
+  makeAdaptedScope({ fields: DETAIL_FIELDS, defaults: overlap })
 })
 
-Deno.test('makeFormScope compiler constraints reject missing and overlapping attributes', () => {
+Deno.test('makeScope compiler constraints reject missing and overlapping attributes', () => {
   const draft = detailDraft()
   // @ts-expect-error The fresh draft cannot include excluded notes.
   const excluded: Draft = { ...draft, notes: [] }
@@ -94,25 +94,25 @@ Deno.test('makeFormScope compiler constraints reject missing and overlapping att
   const deletedAt = { ...defaults, deletedAt: undefined }
   const unknownKey = { ...defaults, unrelated: 'Unowned default' }
   // @ts-expect-error Scoped defaults are rejected even through a variable.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: overlap })
+  makeScope({ fields: DETAIL_FIELDS, defaults: overlap })
   // @ts-expect-error An explicitly undefined scoped default still overlaps.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: undefinedOverlap })
+  makeScope({ fields: DETAIL_FIELDS, defaults: undefinedOverlap })
   // @ts-expect-error Lifecycle id is not a create default.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: lifecycle })
+  makeScope({ fields: DETAIL_FIELDS, defaults: lifecycle })
   // @ts-expect-error Lifecycle createdAt is not a create default.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: createdAt })
+  makeScope({ fields: DETAIL_FIELDS, defaults: createdAt })
   // @ts-expect-error Lifecycle updatedAt is not a create default.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: updatedAt })
+  makeScope({ fields: DETAIL_FIELDS, defaults: updatedAt })
   // @ts-expect-error Lifecycle deletedAt is not a create default.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: deletedAt })
+  makeScope({ fields: DETAIL_FIELDS, defaults: deletedAt })
   // @ts-expect-error Unknown defaults are rejected even through a variable.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: unknownKey })
+  makeScope({ fields: DETAIL_FIELDS, defaults: unknownKey })
   const missingDefaults = { accountManagerId: undefined }
   // @ts-expect-error Required excluded notes must be defaulted.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: missingDefaults })
+  makeScope({ fields: DETAIL_FIELDS, defaults: missingDefaults })
   const wrongDefaults = { accountManagerId: undefined, notes: 'Wrong domain shape' }
   // @ts-expect-error Defaults must retain the domain attribute's value type.
-  makeFormScope({ fields: DETAIL_FIELDS, defaults: wrongDefaults })
+  makeScope({ fields: DETAIL_FIELDS, defaults: wrongDefaults })
   assertEquals(excluded.name, draft.name)
   assertEquals('name' in missing, false)
 })
@@ -153,7 +153,7 @@ Deno.test('toUpdate clears omitted and undefined scoped values without leaking o
   assertEquals(adaptedScope.adapter.fromDomain(omitted).line2, null)
 })
 
-Deno.test('form-scope projections preserve present values and whole compositions', () => {
+Deno.test('scope projections preserve present values and whole compositions', () => {
   const draft = { ...detailDraft(), name: '', line2: 'Suite 2', sites: [] }
   const created = scope.toCreate(draft)
   const updated = scope.toUpdate(blueMesaRanchCustomer.id, draft)
@@ -175,7 +175,7 @@ Deno.test('form-scope projections preserve present values and whole compositions
 
 Deno.test('Id | undefined admits null in ScopedUpdate and clears through the form adapter', () => {
   const draft = detailDraft()
-  const assignmentScope = makeAdaptedFormScope({
+  const assignmentScope = makeAdaptedScope({
     fields: [CustomerAdapter.accountManagerId],
     defaults: { ...draft, notes: [] }
   })
@@ -235,7 +235,7 @@ function checkUserInference(draft: DraftOf<typeof scopes.Users.detail>, id: Id):
   // @ts-expect-error User drafts exclude avatarUrl.
   const avatarDraft: UserDraft = { ...draft, avatarUrl: 'https://example.com/ada.png' }
   const overlap = { displayName: 'Unowned default' }
-  makeFormScope({
+  makeScope({
     fields: [
       UserAdapter.displayName,
       UserAdapter.primaryEmail,

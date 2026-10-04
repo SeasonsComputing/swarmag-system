@@ -23,11 +23,11 @@ siteLocation(site)    The site's single location.
 */
 
 import { demandOne, toTrimmed, when } from '@core/std'
+import type { DraftOf } from '@core/stdx'
 import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer, CustomerSite } from '@domain/abstractions/customer.ts'
 import type { CustomerStatus } from '@domain/abstractions/customer.ts'
 import type { scopes } from '@front/api/form-scopes.ts'
-import type { DraftOf } from '@front/api/make-form-scope.ts'
 import { createSignal } from '@solid-js'
 import type { Accessor, Setter } from '@solid-js'
 import { createStore, produce } from '@solid-js/store'

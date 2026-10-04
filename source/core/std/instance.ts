@@ -11,19 +11,21 @@ objects, along with factories that stamp identifiers and timestamps.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Instance                         Identity-only object shape.
-InstantiableOnly                 Identity plus created timestamp.
-Instantiable                     Identity plus created, updated, deleted fields.
-FromInstance<T>                  Type with Instance fields removed.
-FromInstantiableOnly<T>          Type with InstantiableOnly fields removed.
-FromInstantiable<T>              Type with Instantiable fields removed.
-instance(state)                  Create an Instance with a new Id.
-instantiableOnly(state)          Create an InstantiableOnly with Id and createdAt.
-instantiable(state)              Create an Instantiable with Id and lifecycle dates.
+Instance                 Identity-only object shape.
+InstantiableOnly         Identity plus created timestamp.
+Instantiable             Identity plus created, updated, deleted fields.
+FromInstance<T>          Type with Instance fields removed.
+FromInstantiableOnly<T>  Type with InstantiableOnly fields removed.
+FromInstantiable<T>      Type with Instantiable fields removed.
+instance(state)          Create an Instance with a new Id.
+instantiableOnly(state)  Create an InstantiableOnly with Id and createdAt.
+instantiable(state)      Create an Instantiable with Id and lifecycle dates.
 */
 
-import { type When, when } from './datetime.ts'
-import { type Id, id } from './identifier.ts'
+import type { When } from './datetime.ts'
+import { when } from './datetime.ts'
+import type { Id } from './identifier.ts'
+import { id } from './identifier.ts'
 
 /** Type instance specifications. */
 export type Instance = { id: Id }

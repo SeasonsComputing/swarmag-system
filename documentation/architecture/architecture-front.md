@@ -304,11 +304,11 @@ The form layer owns a domain-shaped draft and the projections for create and upd
 code does not restate the fields or persistence rules. The layer chain and scope rules are defined
 in `architecture-core.md` §5.2.6.
 
-`front/api/make-form-scope.ts` exports `makeFormScope`, `makeAdaptedFormScope`, `FormScope`,
-`AdaptedFormScope`, `FormDraft`, and `DraftOf`.
+`@core/stdx` (`core/std/make-scope.ts`) exports `makeScope`, `makeAdaptedScope`, `Scope`,
+`AdaptedScope`, `ScopeDraft`, and `DraftOf`.
 `front/api/form-scopes.ts` hosts the `scopes` housing object parallel to `api.ts`.
 Both makers infer from adapter field metadata without type arguments.
-`FormDraft<T, K>` selects the scope's domain attributes, preserving domain optionality.
+`ScopeDraft<T, K>` selects the scope's domain attributes, preserving domain optionality.
 `DraftOf<typeof scope>` derives that draft without restating its fields. The declaration exposes
 `toCreate(draft)` and `toUpdate(id, draft)`; an Adapted declaration also exposes `adapter`.
 
@@ -321,8 +321,6 @@ values that do not admit absence remain unchanged. Both projections exclude unow
 attributes supplied through structurally compatible variables. Compositions pass through whole.
 For an Adapted declaration, the scoped adapter translates the projected update; a Direct client
 receives the projection untranslated.
-
-The maker stays in `front/api/` until further consumers justify a separately authorized promotion.
 
 ## 8. Architectural Boundaries
 
@@ -768,13 +766,13 @@ retain both dismissal paths.
   editor inside a step.
 
 Customer Detail declares contact, identity, status, address, and sites in
-`front/api/form-scopes.ts` through `makeAdaptedFormScope`, with
+`front/api/form-scopes.ts` through `makeAdaptedScope`, with
 `{ accountManagerId: undefined, notes: [] }` as create defaults.
 `CustomerDraft` in `customer-state.ts` is `DraftOf<typeof scopes.Customers.detail>`; its state and
 projection remain domain-shaped. Customer Manager and Onboarding create through
 `scope.toCreate(draft)`. The Manager updates through
 `api.Customers.update(scope.adapter, scope.toUpdate(id, draft))`; no caller patches `line2` locally.
-Users declares `scopes.Users.detail` through `makeFormScope` and writes through the Direct update
+Users declares `scopes.Users.detail` through `makeScope` and writes through the Direct update
 contract.
 
 Customer Manager is available at `/customers` from the Admin dashboard. It supports New, editing,

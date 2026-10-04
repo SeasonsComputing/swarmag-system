@@ -19,10 +19,10 @@ createUserState  Create state for a single User draft.
 
 import { toEmail, toTrimmed, when } from '@core/std'
 import type { When } from '@core/std'
+import type { DraftOf } from '@core/stdx'
 import type { ContactPreferredChannel, Note } from '@domain/abstractions/common.ts'
 import type { User, UserRole, UserStatus } from '@domain/abstractions/user.ts'
 import type { scopes } from '@front/api/form-scopes.ts'
-import type { DraftOf } from '@front/api/make-form-scope.ts'
 import { createSignal } from '@solid-js'
 import type { Accessor, Setter } from '@solid-js'
 
