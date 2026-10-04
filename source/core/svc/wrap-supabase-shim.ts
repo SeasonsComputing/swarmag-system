@@ -19,7 +19,8 @@ WrapSupabaseShimConfig             Shim configuration (timeout, CORS).
 wrapSupabaseShim(handler, config)  Wrap a Deno.serve handler with timeout + logging.
 */
 
-import { HttpCodes, type HttpHandlerConfig, makeCorsHeaders } from '@core/stdx'
+import type { HttpHandlerConfig } from '@core/stdx'
+import { HttpCodes, makeCorsHeaders } from '@core/stdx'
 
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC TYPES

@@ -20,15 +20,8 @@ HttpServiceError            Expected service error carrying an HTTP status.
 wrapBusRuleHttpHandler(spec) Wrap a BusRule-shaped service as an HTTP handler.
 */
 
-import {
-  type HttpHeaders,
-  type HttpRequest,
-  type HttpResponse,
-  toInternalError,
-  toMethodNotAllowed,
-  toOk,
-  wrapHttpHandler
-} from '@core/stdx'
+import type { HttpHeaders, HttpRequest, HttpResponse } from '@core/stdx'
+import { toInternalError, toMethodNotAllowed, toOk, wrapHttpHandler } from '@core/stdx'
 
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC TYPES

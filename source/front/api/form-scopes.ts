@@ -17,14 +17,14 @@ scopes  Declared form write scopes keyed by API topic.
 └ Users.detail      Identity, contact preferences, notes, roles, and status.
 */
 
+import { makeAdaptedScope, makeScope } from '@core/stdx'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
-import { makeAdaptedFormScope, makeFormScope } from './make-form-scope.ts'
 
 /** Declared form write scopes keyed by API topic. */
 export const scopes = {
   Customers: {
-    detail: makeAdaptedFormScope({
+    detail: makeAdaptedScope({
       fields: [
         CustomerAdapter.primaryContact,
         CustomerAdapter.name,
@@ -41,7 +41,7 @@ export const scopes = {
     })
   },
   Users: {
-    detail: makeFormScope({
+    detail: makeScope({
       fields: [
         UserAdapter.displayName,
         UserAdapter.primaryEmail,
