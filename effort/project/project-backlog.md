@@ -438,6 +438,13 @@ IndexedDB. Importing `api` therefore needs `LOCAL_DB_NAME` registered in `Config
 The fix belongs in the shared test configuration, not in each test. Also decide whether a test
 runtime should load browser-backed stores through `api` at all.
 
+- **Second blocker, behind the first (found 2026-10-03):** `users-api-test.ts` never signs in.
+  Every User write passes `UserOrchestra.authorizeAdmin`, which requires a verified caller with an
+  active `administrator` domain row. Sign-in is passwordless OTP only, so the test needs its own
+  route to an administrator session (an admin-generated link, or a dedicated test identity on
+  stage). Stage is the only environment, so that is an authorization-boundary decision. Fixing
+  bootstrap alone moves the failure from import to authorization.
+
 ## Customer
 
 ### Onboarding — Initial Job Assessment stage
