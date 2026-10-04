@@ -110,6 +110,7 @@ Shared widget catalog plus per-app instances — specialization direction, build
 content atop already-generalized primitives (contrast with §2's generalization direction).
 Houses:
 
+- **ux/ui/charts** - 4 chart types available to dashboard widgets
 - **Hub widget** (backlog, `normal`) — primary approach for grouping dashboard commands by
   topic; hierarchical left-nav panel is the named fallback if it doesn't prove out. Job's three
   independently-tabled phases are its clearest motivating case, so this milestone likely follows
