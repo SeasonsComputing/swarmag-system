@@ -71,10 +71,8 @@ holds, not assume that a missing CONVENTIONS entry means a missing rule.
 1. Inventory `core/`'s exports by namespace, from the code.
 2. Map each export to where `architecture-core.md` and CONVENTIONS describe it, if anywhere.
 3. Classify each mapping as meaning, rule, or reference, and propose a placement.
-4. The CA decides the placements.
-5. Draft the document changes. The AA drafts them only with explicit CA authorization:
-   CONVENTIONS is a governance document, and `architecture-core.md` is foundational
-   documentation.
+4. Decide the placements.
+5. Draft the document changes.
 
 ## Constraints
 
