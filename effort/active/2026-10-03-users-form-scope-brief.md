@@ -1,7 +1,8 @@
 # Users Form Scope & User State — Brief
 
-**Backlog, not dispatched.** Written 2026-10-03 by the AI Architect from a CA + AA session. Awaiting
-AI Coding Engine review.
+**Backlog, not dispatched.** Written 2026-10-03 by the AI Architect from a CA + AA session.
+Reviewed by the AI Coding Engine the same day; the amendment at the end supersedes Step 0 and parts
+of Step 2, Checks, and Verification. Read it before the steps.
 
 **Operating mode: Foundation.** The work changes a shared declaration shape in `front/api/` and the
 text of `architecture-core.md` §5.2.6 and `architecture-front.md` §§7.4, 10.1.6.
@@ -263,5 +264,53 @@ Stop and report if:
 - inference fails in the real code where the probe passed;
 - any change reaches `core/`, `domain/`, a contract, or `api.ts`;
 - a Customer test or call site needs more than the maker rename.
+
+## Amendment — 2026-10-03 — ACE review: live Users coverage dropped
+
+The AI Coding Engine reviewed this brief statically (no probes or tests run) and found the design
+coherent with the code. It raised three points. The AI Architect verified the first against the
+code; the CA decided all three.
+
+### 1. The live Users test needs an authenticated administrator
+
+`users-api-test.ts` never signs in, and no file under `source/tests/` establishes a session.
+Every User write passes `UserOrchestra.authorizeAdmin`
+(`back/supabase-edge/orchestration/user-orchestra.ts`), which verifies the caller and requires an
+active domain row with the `administrator` role. Sign-in is passwordless OTP only, so a test
+cannot obtain that session the way a person does; it would need its own route (an
+admin-generated link, or a dedicated test identity on stage). Stage is the only environment, so
+that is an authorization-boundary decision of its own, not a ride-along.
+
+Decision 9 bought the test-configuration fix for its verification value: letting
+`users-api-test.ts` exercise this change and run the avatar-preservation case. Registering
+`LOCAL_DB_NAME` supplies neither. The test would move from failing at bootstrap to failing at
+authorization, and `deno task test` would stay red either way.
+
+**Decision (CA): drop live Users coverage from this effort.**
+
+- **Superseded:** Decision 9, Step 0, the `test-config.ts` row in Files and its environment-file
+  note, Step 0's escalation boundary, and the live-test lines in Checks and Verification.
+- **Step 4 stands.** `users-api-test.ts` still moves to the scope projection, so it type-checks
+  against the new declaration. It does not run.
+- **Checks:** `deno task test` still globs `users-api-test.ts`, which fails at bootstrap. Report
+  that failure as pre-existing and known; every other test must pass.
+- **Verification** rests on the permanent type tests (below) and the CA's live walkthrough in
+  Admin.
+- **The backlog entry** "The shared test configuration cannot bootstrap `api`" records the second
+  blocker: the missing authenticated administrator identity.
+
+### 2. Declared contracts stay out of executed code
+
+Step 2's Direct-inference tests use a declared `DirectUpdateContract<User>`. A `declare` compiles
+to nothing, so a call against it inside a `Deno.test` body throws `ReferenceError` at runtime.
+Those assertions go inside an uncalled function: `deno test` type-checks the file before running
+it, so the claims are enforced, and nothing executes the declared client.
+
+### 3. All six probe claims become permanent
+
+Step 2 named claims 1, 3, and 6. Claims 2, 4, and 5 join them: create compatibility with
+`defaults: {}`, rejection of `avatarUrl` in the draft, and rejection of a default naming an
+in-scope User key. The Customer tests cover the same constraints, but not the Users declaration
+this brief introduces.
 
 _End of Brief_
