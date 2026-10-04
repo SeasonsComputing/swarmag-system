@@ -408,12 +408,15 @@ an abstraction. It is not a form authorization surface. A form that edits a know
 that set explicitly through adapter field metadata, never by deriving every key of the abstraction.
 The API composition layer hosts these declarations in `front/api/form-scopes.ts`:
 
-- A form whose client translates (Adapted) declares its fields and create defaults through
-  `makeFormScope({ fields: [XAdapter.field, …], defaults })`. Its client accepts
-  `update(scope.adapter, source)` with `ScopedUpdate<T, K>`.
-- A form whose client does not translate (Direct; today only Users) declares
-  `[XAdapter.field, …] as const`. The keys are `(typeof scopes.X.name)[number]['key']`, and
-  the form's draft is `ScopedUpdate<T, thoseKeys>`. Its client accepts `update(source)`.
+- A form declares its fields and create defaults through
+  `makeFormScope({ fields: [XAdapter.field, …], defaults })`. The declaration owns the form's
+  draft and its create and update projections, `toCreate(draft)` and `toUpdate(id, draft)`.
+- A form whose client translates (Adapted) declares through `makeAdaptedFormScope`, which adds
+  the scoped adapter as `adapter`. Its client accepts
+  `update(scope.adapter, scope.toUpdate(id, draft))`.
+- A form whose client does not translate (Direct; today only Users) declares through
+  `makeFormScope`. Its client accepts `update(scope.toUpdate(id, draft))`; `K` is inferred
+  from the projection.
 
 The layer chain is domain metadata → declaration → contract → client → composition → form.
 The form owns its field set; the API composition layer hosts its adapter-bound declaration.

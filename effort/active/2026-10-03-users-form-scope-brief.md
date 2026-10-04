@@ -1,8 +1,11 @@
 # Users Form Scope & User State — Brief
 
-**Backlog, not dispatched.** Written 2026-10-03 by the AI Architect from a CA + AA session.
-Reviewed by the AI Coding Engine the same day; the amendment at the end supersedes Step 0 and parts
-of Step 2, Checks, and Verification. Read it before the steps.
+**Active.** Written 2026-10-03 by the AI Architect from a CA + AA session. Two amendments follow
+the original steps; read them first.
+
+- **Phase 1 (Steps 1–4, as amended by the ACE review): produced 2026-10-03** and independently
+  verified by the AI Architect on 2026-10-04, and passed the CA's Admin walkthrough on 2026-10-04.
+- **Phase 2 (the scope promotion to `core/`): not dispatched.** It awaits the production gate.
 
 **Operating mode: Foundation.** The work changes a shared declaration shape in `front/api/` and the
 text of `architecture-core.md` §5.2.6 and `architecture-front.md` §§7.4, 10.1.6.
@@ -312,5 +315,128 @@ Step 2 named claims 1, 3, and 6. Claims 2, 4, and 5 join them: create compatibil
 `defaults: {}`, rejection of `avatarUrl` in the draft, and rejection of a default naming an
 in-scope User key. The Customer tests cover the same constraints, but not the Users declaration
 this brief introduces.
+
+## Amendment — 2026-10-04 — Phase 2: promote the scope maker to `core/` as `makeScope`
+
+### What changed
+
+Phase 1 produced, and the AI Architect verified against the diff and fresh check runs:
+
+- `deno task check` (guards, types, lint) and `deno task fmt:check` exit 0;
+- 56 of 56 tests pass outside `users-api-test.ts`, which fails at bootstrap as known;
+- the six Direct-inference claims hold as permanent type tests.
+
+Reviewing the result, the CA judged `make-form-scope.ts` reference-implementation quality and
+proposed promoting it to `core/`. The AI Architect reached the same conclusion independently.
+
+### Why now
+
+The 2026-10-03 amendment to `effort/completed/2026-10-02-update-scopes-brief.md` held the maker in
+`front/api/` under "prove at the higher layer first": promotion "after Assets and Chemicals prove
+it". The risk that guarded against was fixing the shape in `core/` before a second consumer tested
+it.
+
+- **Users was that second consumer, and it changed the shape.** The base/Adapted split exists
+  because of it. A promotion on 10-03 would have locked the wrong shape into `core/`.
+- **Assets and Chemicals are Adapted, like Customers,** so they are unlikely to teach the shape
+  anything new.
+- **Before §5, not after.** Roadmap §5 Mechanical Productions copies the reference
+  implementations. Promoting first means every copy imports the maker from its permanent home;
+  promoting after means re-pointing every copy.
+- **It is already `core/`-clean.** It imports only `@core/std` types and `makeScopedUpdate`,
+  `FieldAdapter`, and `ScopedUpdateAdapter` from `@core/stdx`, nothing from `front/`, `ux/`, or
+  `domain/`.
+
+### Naming: drop "form"
+
+`core/` is to become a portable Seasons library, and "form" is UI vocabulary naming the maker's
+first consumer, not what it declares. What it declares is a scope: the attributes owned, the
+create defaults, and the create and update projections. The word is already used at every layer:
+
+- the housing object is `scopes`;
+- `core/` already has `ScopedUpdate<T, K>`, `makeScopedUpdate`, and `ScopedUpdateAdapter`;
+- `architecture-core.md` §5.2.6 states its rules about "every declared scope";
+- the 10-03 amendment's first name for the draft was `ScopeDraft`.
+
+`Write` was considered as the replacement qualifier and not taken. `makeAttributeScope` was the
+precise alternative; it was not taken because bare `Scope` reads clearly beside `ScopedUpdate`
+and inside `scopes.X.y`.
+
+| Phase 1                  | Phase 2                 |
+| ------------------------ | ----------------------- |
+| `makeFormScope`          | `makeScope`             |
+| `makeAdaptedFormScope`   | `makeAdaptedScope`      |
+| `FormScope<T, K>`        | `Scope<T, K>`           |
+| `AdaptedFormScope<T, K>` | `AdaptedScope<T, K>`    |
+| `FormDraft<T, K>`        | `ScopeDraft<T, K>`      |
+| `DraftOf<S>`             | `DraftOf<S>`, unchanged |
+
+### Decisions
+
+1. **Placement:** `source/core/std/make-scope.ts`, beside `make-adapter.ts`, exported through the
+   existing `@core/stdx` barrel. This extends a listed barrel; it adds none (CONVENTIONS §3.2).
+2. **Names:** the table above. Behaviour, constraints, and projection semantics are unchanged.
+3. **`front/api/form-scopes.ts` keeps its name and the `scopes` housing object.** It is the front
+   layer's declaration seam, and its declarations are made by forms.
+4. **The test file follows the module:** `make-form-scope-test.ts` becomes `make-scope-test.ts`.
+
+### Steps
+
+1. **Documentation first.**
+   - `architecture-core.md` §5.2.6: the maker names.
+   - `architecture-front.md` §7.4: the module is `@core/stdx` (`core/std/make-scope.ts`), with the
+     new names. The sentence "The maker stays in `front/api/` until further consumers justify a
+     separately authorized promotion" is removed.
+   - `architecture-front.md` §10.1.6: the maker names in the Customer and Users statements.
+2. **Move and rename.**
+   - `source/front/api/make-form-scope.ts` → `source/core/std/make-scope.ts`, with the new names
+     and its header updated.
+   - `source/core/std/stdx.ts`: export it; the barrel's header names scopes.
+3. **Consumers:** `front/api/form-scopes.ts`, `customers/customer-state.ts`, `users/user-state.ts`,
+   `tests/cases/customer-api-test.ts`, and the renamed `tests/cases/make-scope-test.ts`. Imports
+   come from `@core/stdx`.
+
+### Files
+
+| File                                                 | Change                                 |
+| ---------------------------------------------------- | -------------------------------------- |
+| `documentation/architecture/architecture-core.md`    | §5.2.6 names                           |
+| `documentation/architecture/architecture-front.md`   | §7.4 module and names; §10.1.6 names   |
+| `source/front/api/make-form-scope.ts`                | Deleted (moved)                        |
+| `source/core/std/make-scope.ts`                      | New (moved, renamed)                   |
+| `source/core/std/stdx.ts`                            | Export; header                         |
+| `source/front/api/form-scopes.ts`                    | Import and names                       |
+| `source/front/app-admin/customers/customer-state.ts` | `DraftOf` import                       |
+| `source/front/app-admin/users/user-state.ts`         | `DraftOf` import                       |
+| `source/tests/cases/customer-api-test.ts`            | `DraftOf` import                       |
+| `source/tests/cases/make-form-scope-test.ts`         | Renamed to `make-scope-test.ts`; names |
+
+### Out of scope
+
+- Any change to behaviour, constraints, or the projection semantics.
+- `CONVENTIONS.md`. Whether the conventions name `makeScope` beside `makeAdapter` (§8.6) belongs
+  to the core-reconciliation brief, which inventories `core/` exports; this promotion gives that
+  inventory one export already in its final place.
+- Renaming `form-scopes.ts` or the `scopes` housing object.
+- Everything Phase 1 excluded.
+
+### Checks and verification
+
+- `deno task check`, `deno task fmt:check`, and `deno task test`, reported as Phase 1 reported
+  them (the `users-api-test.ts` bootstrap failure is known).
+- No residual `FormScope`, `makeFormScope`, `FormDraft`, or `make-form-scope` reference in
+  `source/` or `documentation/`.
+- `STYLE_AUDIT` per `AGENTS.md` §2.2.
+- The AA re-derives the report against the diff and the check output (EFFORT §6).
+- The CA's Admin walkthrough of Phase 2: User Manager New, edit, and Save; notes text round-trips
+  with its timestamp kept; Customer Manager Save unchanged.
+
+### Escalation boundaries
+
+Stop and report if:
+
+- any guard objects to `make-scope.ts` in `core/std/` or to the `stdx` export;
+- a consumer needs more than an import and name change;
+- any change reaches `domain/`, a contract, or `api.ts`.
 
 _End of Brief_

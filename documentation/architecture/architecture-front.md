@@ -304,12 +304,13 @@ The form layer owns a domain-shaped draft and the projections for create and upd
 code does not restate the fields or persistence rules. The layer chain and scope rules are defined
 in `architecture-core.md` §5.2.6.
 
-`front/api/make-form-scope.ts` exports `makeFormScope`, `FormScope`, `FormDraft`, and `DraftOf`.
+`front/api/make-form-scope.ts` exports `makeFormScope`, `makeAdaptedFormScope`, `FormScope`,
+`AdaptedFormScope`, `FormDraft`, and `DraftOf`.
 `front/api/form-scopes.ts` hosts the `scopes` housing object parallel to `api.ts`.
-`makeFormScope({ fields, defaults })` infers from adapter field metadata without type arguments.
+Both makers infer from adapter field metadata without type arguments.
 `FormDraft<T, K>` selects the scope's domain attributes, preserving domain optionality.
 `DraftOf<typeof scope>` derives that draft without restating its fields. The declaration exposes
-`adapter`, `toCreate(draft)`, and `toUpdate(id, draft)`.
+`toCreate(draft)` and `toUpdate(id, draft)`; an Adapted declaration also exposes `adapter`.
 
 Defaults supply the required out-of-scope create attributes. The generic constraint rejects
 scoped, lifecycle, and unknown default keys, including keys supplied through typed variables.
@@ -318,7 +319,8 @@ spreads the draft. `toUpdate` selects the same fields and converts absent or `un
 to `null`. Required properties may admit `undefined`, as optional associations do; required
 values that do not admit absence remain unchanged. Both projections exclude unowned draft
 attributes supplied through structurally compatible variables. Compositions pass through whole.
-The existing scoped adapter translates the projected update.
+For an Adapted declaration, the scoped adapter translates the projected update; a Direct client
+receives the projection untranslated.
 
 The maker stays in `front/api/` until further consumers justify a separately authorized promotion.
 
@@ -759,19 +761,21 @@ retain both dismissal paths.
   `customers/` today, and from Initial Job Assessment's steps later. Its `commit` writes the
   aggregate once, at Finish. Both of the Wizard's progress presentations derive from the
   composed sequence.
-- `UserManager` returns the single `user-step-detail` step.
+- `UserManager` returns the single `user-step-detail` step; `user-state.ts` owns the state,
+  `UserDraft`, and the `userDraft(state)` projection.
 - Steps are named `{topic}-step-{name}.tsx`, where `detail` names the primary or only step.
   "Editor" is reserved for a reusable form kind, such as the notes editor, or a drill-down
   editor inside a step.
 
 Customer Detail declares contact, identity, status, address, and sites in
-`front/api/form-scopes.ts`, with `{ accountManagerId: undefined, notes: [] }` as create defaults.
+`front/api/form-scopes.ts` through `makeAdaptedFormScope`, with
+`{ accountManagerId: undefined, notes: [] }` as create defaults.
 `CustomerDraft` in `customer-state.ts` is `DraftOf<typeof scopes.Customers.detail>`; its state and
 projection remain domain-shaped. Customer Manager and Onboarding create through
 `scope.toCreate(draft)`. The Manager updates through
 `api.Customers.update(scope.adapter, scope.toUpdate(id, draft))`; no caller patches `line2` locally.
-Users retains its Direct update contract and explicit field tuple in the same housing object;
-it does not adopt the form-scope maker in this production.
+Users declares `scopes.Users.detail` through `makeFormScope` and writes through the Direct update
+contract.
 
 Customer Manager is available at `/customers` from the Admin dashboard. It supports New, editing,
 and confirmed soft Delete through the existing Customer API.

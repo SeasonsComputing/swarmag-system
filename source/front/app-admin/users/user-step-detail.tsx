@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ User detail step                                                             ║
-║ User step fields and draft projection for the User Manager.                  ║
+║ User step fields and validation for the User Manager.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -11,20 +11,15 @@ validation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UserDetailKeys  Fields owned by the User detail form.
-UserDraft        Draft projected by User state.
-createUserState  Create signals and a stable draft projection.
 UserStepDetail  User Manager detail step.
 */
 
-import { expectEmail, expectNonEmptyString, toEmail, toTrimmed } from '@core/std'
-import type { ScopedUpdate } from '@core/std'
+import { expectEmail, expectNonEmptyString, toEmail } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
-import type { ContactPreferredChannel, Note } from '@domain/abstractions/common.ts'
+import type { ContactPreferredChannel } from '@domain/abstractions/common.ts'
 import { USER_ROLES, USER_STATUSES } from '@domain/abstractions/user.ts'
-import type { User, UserRole, UserStatus } from '@domain/abstractions/user.ts'
-import { scopes } from '@front/api/form-scopes.ts'
-import { createSignal, For, onCleanup } from '@solid-js'
+import type { UserRole, UserStatus } from '@domain/abstractions/user.ts'
+import { For, onCleanup } from '@solid-js'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { useAbstractionFormFeedback } from '@ux/shell/workbench/use-abstraction-form-feedback.ts'
 import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
@@ -42,68 +37,12 @@ import {
   UiToggleItem
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-
-/** Fields owned by the User detail form. */
-export type UserDetailKeys = (typeof scopes.Users.detail)[number]['key']
-
-/** Draft projected by the User detail state. */
-export type UserDraft = Omit<ScopedUpdate<User, UserDetailKeys>, 'id'>
-
-/** Create one User draft lifetime, independently of mounted step controls. */
-export const createUserState = (user: User | null) => {
-  const [displayName, setDisplayName] = createSignal(user?.displayName ?? '')
-  const [primaryEmail, setPrimaryEmail] = createSignal(user?.primaryEmail ?? '')
-  const [phoneNumber, setPhoneNumber] = createSignal(user?.phoneNumber ?? '')
-  const [preferredChannel, setPreferredChannel] = createSignal<ContactPreferredChannel>(
-    user?.preferredChannel ?? 'email'
-  )
-  const [notesText, setNotesText] = createSignal(noteContent(user?.notes ?? []))
-  const [roles, setRoles] = createSignal<UserRole[]>(user ? [...user.roles] : [])
-  const [status, setStatus] = createSignal<UserStatus>(user?.status ?? 'active')
-  const noteCreatedAt = user?.notes[0]?.createdAt ?? new Date().toISOString()
-  const nextNotes = (existingNotes: readonly Note[]): Note[] => {
-    const content = notesText().trim()
-    if (content.length === 0) return []
-    return [{
-      attachments: [],
-      createdAt: existingNotes[0]?.createdAt ?? noteCreatedAt,
-      content,
-      visibility: 'internal',
-      tags: []
-    }]
-  }
-  const userDraft = (): UserDraft => ({
-    displayName: toTrimmed(displayName()),
-    primaryEmail: toEmail(primaryEmail()),
-    phoneNumber: toTrimmed(phoneNumber()),
-    preferredChannel: preferredChannel(),
-    notes: nextNotes(user?.notes ?? []),
-    roles: roles(),
-    status: status()
-  })
-  return {
-    displayName,
-    setDisplayName,
-    primaryEmail,
-    setPrimaryEmail,
-    phoneNumber,
-    setPhoneNumber,
-    preferredChannel,
-    setPreferredChannel,
-    notesText,
-    setNotesText,
-    roles,
-    setRoles,
-    status,
-    setStatus,
-    draft: userDraft
-  }
-}
+import type { UserState } from './user-state.ts'
 
 /** Renders the create or edit step for one user. */
 export function UserStepDetail(props: {
   context: PanelStepContext
-  state: ReturnType<typeof createUserState>
+  state: UserState
 }): UiComponent {
   const {
     displayName,
@@ -139,7 +78,6 @@ export function UserStepDetail(props: {
   // Value Projections:
   // - preferredChannelOptions: Preferred channel options -> UiText.label
   // - roleOptions: Role options -> UiText.label
-  // - nextNotes: Flattened into text
   //
 
   const preferredChannelOptions = CONTACT_PREFERRED_CHANNELS.map(value => ({
@@ -270,11 +208,4 @@ export function UserStepDetail(props: {
       </UiLayout>
     </form>
   )
-}
-
-function noteContent(notes: readonly Note[]): string {
-  return notes
-    .map(note => note.content)
-    .filter(content => content.length > 0)
-    .join('\n\n')
 }
