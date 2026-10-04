@@ -140,9 +140,7 @@ accretes.
    tooling-namespace carve-out.
 2. Update `architecture-devops.md` to describe the `devops/lib` layer as
    target structure (matching how `architecture-front.md` already documents
-   unbuilt directories as normative target, not drift). **Whoever drafts
-   this needs explicit authorization — foundational documentation is CA's
-   call**, not something ACE/AA assumes by default.
+   unbuilt directories as normative target, not drift).
 3. Build `source/devops/lib/` to match — the two helpers above.
 4. Add the `@devops/lib` barrel entry to CONVENTIONS §3.2's table
    (`source/devops/lib/lib.ts`, same form as `@core/std`).

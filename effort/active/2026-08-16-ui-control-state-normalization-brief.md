@@ -101,8 +101,7 @@ Recommended semantic direction:
 - Hover and focus must not change whether labels participate in layout.
 - State changes must not cause layout oscillation.
 
-The exact token choices remain a Chief Architect/design-language decision. The
-production is not authorized to invent a new color theory ad hoc while editing.
+The production is not authorized to invent a new color theory ad hoc while editing.
 
 **Vocabulary — open CA decision, found by the 2026-09-22 audit.** Nothing in the repo's
 documentation currently defines "rest/hover/focus-visible/selected-checked-active-open/
