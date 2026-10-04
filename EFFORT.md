@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Effort Methodology (1.0)
+# Effort Methodology (1.1)
 
 - Source: [EFFORT.md](EFFORT.md)
-- Version: 1.0
-- Published: 2026 September 15th
+- Version: 1.1
+- Published: 2026 October 4th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -19,14 +19,17 @@ It applies to every reasoning system, human or artificial, that captures, tracks
 
 ## 2. The Effort Namespace
 
-Tracked work lives in `effort/`, in four namespaces:
+Tracked work lives in `effort/`, in five namespaces:
 
 | Namespace   | Purpose                                                                                |
 | ----------- | -------------------------------------------------------------------------------------- |
+| `pending`   | Captured briefs not yet chosen as current work.                                        |
 | `active`    | In-flight project records: production briefs and their handoffs.                       |
 | `completed` | Closed work. A permanent historical record, not a staging area.                        |
 | `project`   | Project work definitions organized into backlog, parking lot, roadmap or user-stories. |
 | `genesis`   | Regenerable scaffolding prompt contracts, a separate lifecycle.                        |
+
+Status-bearing records come in two kinds, the brief (§4 The Brief) and the handoff (§5 The Handoff). Each is named `{yyyy-mm-dd}-{topic}-{kind}.md`, where the date is the day the record was written and `{kind}` is `brief` or `handoff`.
 
 A document's namespace and internal framing must state the same status. When a brief closes, update its opening line to state closure and move it to the completed namespace.
 
@@ -55,14 +58,18 @@ A brief is a written design record for one unit of work.
 
 **Capture it close to when the need is found.** A real incident or design decision, left ungrounded until later, is reconstructed from memory instead of recorded from evidence. Capture it at the close of the session that surfaced it, even if production is not yet authorized — mark it explicitly as backlog, not dispatched.
 
+**Place it by whether its effort is current work.** A newly captured brief begins in `effort/pending/`. It goes directly to `effort/active/` only when dispatched immediately — for example, a repair brief taken straight to production. A pending brief moves to `effort/active/` when its effort is chosen from the roadmap. The move happens at selection, not at the production gate: a chosen effort's first step is an exploration review, which is already in-flight work. Handoffs never enter `effort/pending/`; a handoff records in-flight work by definition (§5 The Handoff).
+
+When a brief is created for work that already has a `project-backlog.md` entry, the entry's text is replaced by a link to the brief, so the work is described in one place. When the brief moves, the link is updated to its new path.
+
 **Amend it, never silently rewrite it.** A brief accumulates dated, named amendments as understanding deepens or a conclusion reverses. State what changed and why. Preserve the original reasoning trail even after it is superseded — a decision that took several turns to reach is worth being able to see again, including the turns that were wrong.
 
 **It reaches production through the production gate**, not through this document. `CONSTITUTION.md` §5 and `AGENTS.md` §2.1 define that mechanic; this document does not restate it.
 
-**It closes when its production is shipped, reviewed, and independently verified** — not when a scope statement is merely approved, and not on a producer's own account that the work is done (§6 Verification Discipline). On closing:
+**It closes when its production is shipped, reviewed, and independently verified** — not when a scope statement is merely approved, and not on a producer's own account that the work is done (§6 Verification Discipline). It also closes when it is withdrawn — superseded or abandoned — with its opening line saying which and why. On closing:
 
 - Rewrite the brief's own opening framing to state closure plainly.
-- Move the file from `effort/active/` to `effort/completed/`.
+- Move the file to `effort/completed/`.
 - Fix cross-references to the old path — in other documents and in AI memory — subject to the historical-reference rule in §2 The Effort Namespace.
 
 A brief carries the decision. Carrying an unfinished session's working state to the next one is a different job — see §5 The Handoff.
@@ -107,8 +114,9 @@ Such a crossing must still be named and recorded — in the brief, in the produc
 
 Each published version supersedes the one before it. Amendments reference sections by name as well as number, since number alone drifts silently when a section moves — the mismatch between a stated number and its actual target is only visible when the name is stated alongside it.
 
-| Version | Published           | Change           |
-| ------- | ------------------- | ---------------- |
-| 1.0     | 2026 September 15th | Initial version. |
+| Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| ------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.1     | 2026 October 4th    | §2 The Effort Namespace gains a fifth namespace, `pending`, and names the two status-bearing record kinds, brief and handoff, with their file-naming pattern. §4 The Brief places a newly captured brief in `effort/pending/`, moves it to `effort/active/` when its effort is chosen from the roadmap, keeps handoffs out of `pending`, replaces an existing backlog entry's text with a link to its brief, and closes a brief that is withdrawn as well as one that ships. |
+| 1.0     | 2026 September 15th | Initial version.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
 _End of Effort Document_
