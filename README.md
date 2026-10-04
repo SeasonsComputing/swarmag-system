@@ -4,11 +4,23 @@
 
 The swarmAg Operations System (`swarmAg System`) supports operations across aerial and ground agricultural services. The monorepo is organized around a typed domain core, backend/runtime infrastructure, and user experience applications.
 
-Primary architectural context lives in `documentation/architecture/architecture-core.md`.
-
 ## 1. Repository Structure
 
-### 1.1 Top-level Namespaces
+### 1.1 Governance Invariants
+
+Four root documents govern all work in this repository, by humans and AI systems alike. They sit
+above every specification: `CONSTITUTION.md` §1 sets the order of precedence, and the others bind
+within it. Each carries a no-AI-edit mark, and `guard:governance-gate` fails any commit that
+changes one.
+
+| File              | Description                                              |
+| ----------------- | -------------------------------------------------------- |
+| `AGENTS.md`       | AI agent protocol, operating modes, and production gates |
+| `CONSTITUTION.md` | Highest architectural authority and role boundaries      |
+| `CONVENTIONS.md`  | Binding code and content style conventions               |
+| `EFFORT.md`       | Effort lifecycle, tracking, sequencing, and closure      |
+
+### 1.2 Top-level Namespaces
 
 | Path             | Description                                          |
 | ---------------- | ---------------------------------------------------- |
@@ -17,52 +29,48 @@ Primary architectural context lives in `documentation/architecture/architecture-
 | `source/`        | Source code organized into layers                    |
 | `supabase/`      | Supabase project configuration and local metadata    |
 
-### 1.2 Documentation
+### 1.3 Documentation (`documentation/`)
 
-#### 1.2.1 Specifications
+Specifications are settled system documents that define architecture, domain
+meaning, UX language, and implementation standards in accordance with governance invariants.
 
-Specifications are settled system documents that define governance, architecture, domain
-meaning, UX language, and implementation standards.
+| Category        | File                          | Description                                             |
+| --------------- | ----------------------------- | ------------------------------------------------------- |
+| `architecture/` | `architecture-core.md`        | Core architecture principles and system-wide structure  |
+|                 | `architecture-back.md`        | Backend architecture, boundaries, and runtime model     |
+|                 | `architecture-front.md`       | UX architecture and frontend layering                   |
+|                 | `architecture-devops.md`      | Environment configuration, packaging, and guard suite   |
+| `domain/`       | `domain-model.md`             | Domain solution-space concepts and invariants           |
+|                 | `domain-seed-data.md`         | Controlled vocabularies and canonical seed data         |
+|                 | `domain-data-dictionary.md`   | Normalized implementation-ready type and relation model |
+|                 | `domain-archetypes.md`        | Domain implementation patterns for archetype artifacts  |
+| `ux/`           | `ux-design-language.md`       | Visual language, interaction grammar, and layout rules  |
+|                 | `ux-design-archetypes.md`     | UX implementation archetypes and composition patterns   |
+|                 | `ux-components-guide.md`      | Full UX component guide and usage contracts             |
+|                 | `ux-components-guide-lite.md` | Lightweight UX component reference                      |
+|                 | `ux-components-internals.md`  | UX component implementation internals                   |
 
-| Category     | File                          | Description                                              |
-| ------------ | ----------------------------- | -------------------------------------------------------- |
-| Governance   | `AGENTS.md`                   | AI agent protocol, operating modes, and production gates |
-|              | `CONSTITUTION.md`             | Highest architectural authority and role boundaries      |
-|              | `CONVENTIONS.md`              | Binding code and content style conventions               |
-|              | `EFFORT.md`                   | Effort lifecycle, tracking, sequencing, and closure      |
-| Architecture | `architecture-core.md`        | Core architecture principles and system-wide structure   |
-|              | `architecture-back.md`        | Backend architecture, boundaries, and runtime model      |
-|              | `architecture-front.md`       | UX architecture and frontend layering                    |
-|              | `architecture-devops.md`      | Environment configuration, packaging, and guard suite    |
-| Domain       | `domain-model.md`             | Domain solution-space concepts and invariants            |
-|              | `domain-seed-data.md`         | Controlled vocabularies and canonical seed data          |
-|              | `domain-data-dictionary.md`   | Normalized implementation-ready type and relation model  |
-|              | `domain-archetypes.md`        | Domain implementation patterns for archetype artifacts   |
-| UX           | `ux-design-language.md`       | Visual language, interaction grammar, and layout rules   |
-|              | `ux-design-archetypes.md`     | UX implementation archetypes and composition patterns    |
-|              | `ux-components-guide.md`      | Full UX component guide and usage contracts              |
-|              | `ux-components-guide-lite.md` | Lightweight UX component reference                       |
-|              | `ux-components-internals.md`  | UX component implementation internals                    |
+### 1.4 Effort (`effort/`)
 
-#### 1.2.2 Effort
+Effort documents capture working project context. Status-bearing effort records live in
+`active` while their effort is current work and move to `completed` when it
+closes. A brief captured before its effort is chosen waits in `pending`. Record kinds and file
+naming are defined in `EFFORT.md` §2; the lifecycle in §4 and §5.
 
-Effort documents capture working project context. Status-bearing effort records begin in
-`effort/active/` and move to `effort/completed/` when the effort is closed.
+{status} = `active` | `pending` | `completed`
 
-| Category | File                              | Description                                               |
-| -------- | --------------------------------- | --------------------------------------------------------- |
-| _Status_ | `{yyyy-mm-dd}-{topic}-design.md`  | Current approved or proposed project design decisions     |
-|          | `{yyyy-mm-dd}-{topic}-handoff.md` | Session transition notes and remaining work context       |
-|          | `{yyyy-mm-dd}-{topic}-tasks.md`   | Current implementation checklist and verification status  |
-|          | `{yyyy-mm-dd}-{topic}-brief.md`   | Current production gate for delegated or scoped execution |
-| Genesis  | `genesis-domain-sdk.md`           | Prompt contract for domain sdk genesis                    |
-|          | `genesis-ux-scaffold.md`          | Prompt contract for UX applications scaffolding           |
-| Project  | `project-backlog.md`              | Accepted work whose shape is already known                |
-|          | `project-roadmap.md`              | Intended execution sequence for decided work              |
-|          | `project-parking-lot.md`          | Deferred features or architectural adjustments            |
-|          | `project-user-stories.md`         | Cross-application user stories and scenario narratives    |
+| Category    | File                              | Description                                            |
+| ----------- | --------------------------------- | ------------------------------------------------------ |
+| `{status}/` | `{yyyy-mm-dd}-{topic}-brief.md`   | Written design record for one unit of work             |
+|             | `{yyyy-mm-dd}-{topic}-handoff.md` | Session-end snapshot of an in-flight effort            |
+| `genesis/`  | `genesis-domain-sdk.md`           | Prompt contract for domain sdk genesis                 |
+|             | `genesis-ux-scaffold.md`          | Prompt contract for UX applications scaffolding        |
+| `project/`  | `project-backlog.md`              | Accepted work whose shape is already known             |
+|             | `project-roadmap.md`              | Intended execution sequence for decided work           |
+|             | `project-parking-lot.md`          | Deferred features or architectural adjustments         |
+|             | `project-user-stories.md`         | Cross-application user stories and scenario narratives |
 
-### 1.3 Source Layers (`source/`)
+### 1.5 Source Layers (`source/`)
 
 | Path      | Description                                                           |
 | --------- | --------------------------------------------------------------------- |
@@ -74,7 +82,7 @@ Effort documents capture working project context. Status-bearing effort records 
 | `devops/` | Architecture and environment `guard-*` scripts                        |
 | `tests/`  | Test suites and supporting fixtures                                   |
 
-#### 1.3.1 Core (`source/core/`)
+#### 1.5.1 Core (`source/core/`)
 
 | Path   | Description                                                      |
 | ------ | ---------------------------------------------------------------- |
@@ -85,7 +93,7 @@ Effort documents capture working project context. Status-bearing effort records 
 | `svc/` | Inbound service handler wrappers (BusRule HTTP handler)          |
 | `std/` | Standard types (Id, When, Dictionary, Instantiable)              |
 
-#### 1.3.2 Domain (`source/domain/`)
+#### 1.5.2 Domain (`source/domain/`)
 
 | Path            | Description                                         |
 | --------------- | --------------------------------------------------- |
@@ -95,14 +103,14 @@ Effort documents capture working project context. Status-bearing effort records 
 | `schema/`       | Generated canonical schema (`schema.sql`)           |
 | `validators/`   | Domain validation rules and invariants              |
 
-#### 1.3.3 Backend (`source/back/`)
+#### 1.5.3 Backend (`source/back/`)
 
 | Path             | Description                                                       |
 | ---------------- | ----------------------------------------------------------------- |
 | `migrations/`    | Forward-only SQL deltas and RLS policies                          |
 | `supabase-edge/` | Supabase Edge Functions (config, functions, shared orchestration) |
 
-#### 1.3.4 Frontend (`source/front/`)
+#### 1.5.4 Frontend (`source/front/`)
 
 | Path               | Description                                                 |
 | ------------------ | ----------------------------------------------------------- |
@@ -114,7 +122,7 @@ Effort documents capture working project context. Status-bearing effort records 
 | `api/`             | Composed application API                                    |
 | `config/`          | Configuration bootstrap for UX applications                 |
 
-#### 1.3.5 UX Toolkit (`source/ux/`)
+#### 1.5.5 UX Toolkit (`source/ux/`)
 
 | Path       | Description                                                    |
 | ---------- | -------------------------------------------------------------- |
