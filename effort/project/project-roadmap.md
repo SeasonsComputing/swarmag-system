@@ -23,6 +23,8 @@ first — it stays open until both dependencies below land, which puts its actua
 
 1. Notes Editor completed & integrated into User Manager
 2. Notes Editor integrated with Customer Manager feature completion
+3. **(open)** Additional-contact assignment (`project-user-stories.md` §1.1): build it before §5,
+   or move it to a later milestone (`EFFORT.md` §7). Until decided, it blocks closing this slice.
 
 ## 2. Shell/App Split — Closed 2026-09-21
 
@@ -58,7 +60,21 @@ Three capabilities, each landing with the milestone that first needs it:
 **Tags Component**
 Several app features include tags. We need a tag component that is reusable. Tags-freeform-vs-controlled is still unresolved and gates scoping.
 
+**Sequence:**
+
+1. **Tags decision.** Are tags freeform (`Note.tags` is `string[]`) or drawn from a controlled
+   set, and where does `TagsField` live? Controlled fits `UiMultiSelect`; freeform needs a control
+   the catalog lacks, and `TagsField` in `ux/ui` would be Foundation and design-language work.
+   This decision gates the brief.
+2. **Notes Editor brief.**
+3. **Notes Editor production.**
+4. **Milestone verification,** this milestone, then §1.
+
 Rides with it: User Manager needs updating to consume it once built, User Management is closed once integrated.
+
+- It replaces the local `NoteEditor` in `customer-step-sites.tsx` and User Manager's notes text
+  area, which flattens notes into a single note.
+- The backlog entry "Customer Manager cannot edit account-level notes" rides with it.
 
 ## 5. Mechanical Productions
 
