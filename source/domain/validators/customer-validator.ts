@@ -29,7 +29,8 @@ import {
   expectValid
 } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
-import { type Contact, CUSTOMER_STATUSES, type CustomerSite } from '@domain/abstractions/customer.ts'
+import type { Contact, CustomerSite } from '@domain/abstractions/customer.ts'
+import { CUSTOMER_STATUSES } from '@domain/abstractions/customer.ts'
 import type {
   CustomerCreate,
   CustomerUpdate,
