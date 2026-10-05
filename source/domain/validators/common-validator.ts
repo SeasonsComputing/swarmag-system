@@ -23,13 +23,8 @@ import {
   expectWhen,
   isNonEmptyString
 } from '@core/std'
-import {
-  type Attachment,
-  ATTACHMENT_KINDS,
-  type Location,
-  type Note,
-  NOTE_VISIBILITIES
-} from '@domain/abstractions/common.ts'
+import type { Attachment, Location, Note } from '@domain/abstractions/common.ts'
+import { ATTACHMENT_KINDS, NOTE_VISIBILITIES } from '@domain/abstractions/common.ts'
 
 /** Guard for Location values: coordinate substance (latitude+longitude) or address substance (line1+city). */
 export const isLocation = (v: unknown): v is Location => {
