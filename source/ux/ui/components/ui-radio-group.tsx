@@ -14,13 +14,11 @@ UiRadioGroup  Radio-group control with declared states.
 UiRadioItem   Radio item control for UiRadioGroup.
 */
 
-import {
-  RadioGroup,
-  type RadioGroupItemProps,
-  type RadioGroupRootProps
-} from '@kobalte/core/radio-group'
+import { RadioGroup } from '@kobalte/core/radio-group'
+import type { RadioGroupItemProps, RadioGroupRootProps } from '@kobalte/core/radio-group'
 import { type Component, onCleanup, onMount, splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps, WithDataUi } from './ui-helpers.ts'
 
 /** Radio-group control props. */
 export type UiRadioGroupProps<Value extends string = string> = UiComponentProps & {

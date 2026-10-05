@@ -16,14 +16,14 @@ makeAuthUsers      Build the auth-synchronized Users CRUD client, validated befo
                    dispatch even though create/update proxy to edge functions.
 */
 
-import {
-  checkValidatorError,
-  type CrudBaseContract,
-  type CrudListContract,
-  type DeleteResult,
-  type DirectUpdateContract,
-  type ListOptions,
-  type ListResult
+import { checkValidatorError } from '@core/api/api-contract.ts'
+import type {
+  CrudBaseContract,
+  CrudListContract,
+  DeleteResult,
+  DirectUpdateContract,
+  ListOptions,
+  ListResult
 } from '@core/api/api-contract.ts'
 import {
   makeBusRuleSupabaseEdgeClient,

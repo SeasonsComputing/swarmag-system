@@ -15,7 +15,8 @@ UiProgress  Progress control with declared states.
 
 import { Progress } from '@kobalte/core/progress'
 import { splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Progress control props. */
 export type UiProgressProps = UiComponentProps & {

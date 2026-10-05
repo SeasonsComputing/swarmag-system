@@ -15,7 +15,8 @@ UiToggle  Toggle control with declared states.
 
 import { ToggleButton } from '@kobalte/core/toggle-button'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Toggle control props. */
 export type UiToggleProps =

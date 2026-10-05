@@ -16,7 +16,8 @@ UiTooltip  Tooltip control with declared states.
 import { Tooltip } from '@kobalte/core/tooltip'
 import { splitProps } from '@solid-js'
 import { UiButton, type UiButtonVariant } from './ui-button.tsx'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Tooltip control props. */
 export type UiTooltipProps = UiComponentProps & {

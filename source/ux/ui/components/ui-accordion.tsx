@@ -16,14 +16,15 @@ UiAccordionTrigger  Accordion trigger control for UiAccordionItem.
 UiAccordionContent  Accordion content control for UiAccordionItem.
 */
 
-import {
-  Accordion,
-  type AccordionContentProps,
-  type AccordionRootProps,
-  type AccordionTriggerProps
+import { Accordion } from '@kobalte/core/accordion'
+import type {
+  AccordionContentProps,
+  AccordionRootProps,
+  AccordionTriggerProps
 } from '@kobalte/core/accordion'
 import { type Component, splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps, WithDataUi } from './ui-helpers.ts'
 
 /** Accordion root props. */
 export type UiAccordionProps = UiComponentProps & {

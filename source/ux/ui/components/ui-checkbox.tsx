@@ -15,7 +15,8 @@ UiCheckbox  Checkbox control with declared states.
 
 import { Checkbox } from '@kobalte/core/checkbox'
 import { splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Checkbox control props. */
 export type UiCheckboxProps = UiComponentProps & {

@@ -15,11 +15,8 @@ default  Wrapped Supabase Edge HTTP handler.
 */
 
 import { BUILD_META, HEADER_BUILD } from '@back/supabase-edge/config/build-meta.ts'
-import {
-  type UserEdgeContext,
-  type UserIdRequest,
-  UserOrchestra
-} from '@back/supabase-edge/orchestration/user-orchestra.ts'
+import { UserOrchestra } from '@back/supabase-edge/orchestration/user-orchestra.ts'
+import type { UserEdgeContext, UserIdRequest } from '@back/supabase-edge/orchestration/user-orchestra.ts'
 import type { DeleteResult } from '@core/api/api-contract.ts'
 import { wrapBusRuleHttpHandler } from '@core/svc/wrap-busrule-http-handler.ts'
 

@@ -15,7 +15,8 @@ PanelHeaderTitle  Shell panel title with optional leading action.
 */
 
 import { For, Show } from '@solid-js'
-import { UiActionButton, type UiActionButtonProps, type UiComponent } from '@ux/ui'
+import { UiActionButton } from '@ux/ui'
+import type { UiActionButtonProps, UiComponent } from '@ux/ui'
 
 import './panel-header.css'
 
