@@ -20,7 +20,7 @@ import {
   type UserIdRequest,
   UserOrchestra
 } from '@back/supabase-edge/orchestration/user-orchestra.ts'
-import { type DeleteResult } from '@core/api/api-contract.ts'
+import type { DeleteResult } from '@core/api/api-contract.ts'
 import { wrapBusRuleHttpHandler } from '@core/svc/wrap-busrule-http-handler.ts'
 
 export default wrapBusRuleHttpHandler<UserIdRequest, DeleteResult, UserEdgeContext>({

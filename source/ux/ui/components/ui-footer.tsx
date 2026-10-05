@@ -15,7 +15,7 @@ PUBLIC
 UiFooter  Footer control component.
 */
 
-import { type UiComponent } from './ui-helpers.ts'
+import type { UiComponent } from './ui-helpers.ts'
 
 /** UiFooter props. */
 export type UiFooterProps = {

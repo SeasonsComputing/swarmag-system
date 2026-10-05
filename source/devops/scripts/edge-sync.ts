@@ -14,7 +14,7 @@
  * the `edge-serve` and `edge-deploy` tasks do this automatically.
  */
 
-import { type StringDictionary } from '@core/std'
+import type { StringDictionary } from '@core/std'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const FUNCTIONS = `${ROOT}/supabase/functions`

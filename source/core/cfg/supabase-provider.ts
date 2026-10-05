@@ -17,7 +17,7 @@ SupabaseProvider  Configuration provider for Supabase Edge Functions.
 └ fail(msg)       Throw an HTTP 500 Response.
 */
 
-import { type RuntimeContract } from './runtime-contract.ts'
+import type { RuntimeContract } from './runtime-contract.ts'
 
 /**
  * Configuration provider for Supabase edge functions.

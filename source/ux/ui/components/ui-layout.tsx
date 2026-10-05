@@ -14,7 +14,7 @@ UiLayout  Layout container with declared variant and gap density.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Layout variant. Omit for a full-width vertical stack. */
 export type UiLayoutVariant =
