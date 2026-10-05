@@ -16,7 +16,8 @@ UiPopover  Popover control with declared states.
 import { Popover } from '@kobalte/core/popover'
 import { splitProps } from '@solid-js'
 import { UiButton, type UiButtonVariant } from './ui-button.tsx'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Popover control props. */
 export type UiPopoverProps = UiComponentProps & {

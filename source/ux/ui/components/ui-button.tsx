@@ -15,7 +15,8 @@ UiButton  Button control with declared variants and states.
 
 import { Button } from '@kobalte/core/button'
 import { type JSX, splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Button variants declared by the design language. */
 export type UiButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger'

@@ -8,15 +8,8 @@
 import { createEffect, createSignal, For } from '@solid-js'
 
 // dprint-ignore
-import {
-  UiAccordion, UiAccordionContent, UiAccordionItem, UiAccordionTrigger, UiAlert, UiAvatar,
-  UiBadge, UiButton, UiCard, UiCheckbox, UiCollectionCursor, UiDialog, UiField,
-  UiFieldset, UiFooter, UiFormActions, UiInput, UiLayout, UiList, UiListItem, UiMultiSelect,
-  UiPopover, UiProgress, UiRadioGroup, UiRadioItem, UiSingleSelect, UiSeparator,
-  UiSkeleton, UiSpinner, UiTab, UiTable, UiTableBody, UiTableCell, UiTableHeader,
-  UiTableRow, UiTabList, UiTabPanel, UiTabs, UiTextArea, UiToggle, UiToggleGroup,
-  UiToggleItem, UiTooltip, type UiComponent, type UiContainerProps
-} from '@ux/ui'
+import { UiAccordion, UiAccordionContent, UiAccordionItem, UiAccordionTrigger, UiAlert, UiAvatar, UiBadge, UiButton, UiCard, UiCheckbox, UiCollectionCursor, UiDialog, UiField, UiFieldset, UiFooter, UiFormActions, UiInput, UiLayout, UiList, UiListItem, UiMultiSelect, UiPopover, UiProgress, UiRadioGroup, UiRadioItem, UiSingleSelect, UiSeparator, UiSkeleton, UiSpinner, UiTab, UiTable, UiTableBody, UiTableCell, UiTableHeader, UiTableRow, UiTabList, UiTabPanel, UiTabs, UiTextArea, UiToggle, UiToggleGroup, UiToggleItem, UiTooltip } from '@ux/ui'
+import type { UiComponent, UiContainerProps } from '@ux/ui'
 
 import '@ux/css'
 import './style-guide.css'

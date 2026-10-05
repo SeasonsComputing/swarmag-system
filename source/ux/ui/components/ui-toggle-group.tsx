@@ -14,13 +14,11 @@ UiToggleGroup  Toggle-group control with declared states.
 UiToggleItem   Toggle item control for UiToggleGroup.
 */
 
-import {
-  ToggleGroup,
-  type ToggleGroupItemProps,
-  type ToggleGroupRootProps
-} from '@kobalte/core/toggle-group'
+import { ToggleGroup } from '@kobalte/core/toggle-group'
+import type { ToggleGroupItemProps, ToggleGroupRootProps } from '@kobalte/core/toggle-group'
 import { type Component, createEffect, createSignal, splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps, WithDataUi } from './ui-helpers.ts'
 
 /** Toggle-group control props. */
 export type UiToggleGroupProps<Value extends string = string> = UiComponentProps & {

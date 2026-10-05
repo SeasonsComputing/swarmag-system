@@ -16,23 +16,17 @@ UiTabList   Tab list control for UiTabs.
 UiTabPanel  Tab panel control for UiTabs.
 */
 
-import {
-  Tabs,
-  type TabsContentProps,
-  type TabsListProps,
-  type TabsRootProps,
-  type TabsTriggerProps
+import { Tabs } from '@kobalte/core/tabs'
+import type {
+  TabsContentProps,
+  TabsListProps,
+  TabsRootProps,
+  TabsTriggerProps
 } from '@kobalte/core/tabs'
-import {
-  type Accessor,
-  type Component,
-  createContext,
-  onCleanup,
-  onMount,
-  splitProps,
-  useContext
-} from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps, type WithDataUi } from './ui-helpers.ts'
+import { createContext, onCleanup, onMount, splitProps, useContext } from '@solid-js'
+import type { Accessor, Component } from '@solid-js'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps, WithDataUi } from './ui-helpers.ts'
 
 /** Tabs control props. */
 export type UiTabsActivationMode = 'automatic' | 'manual'

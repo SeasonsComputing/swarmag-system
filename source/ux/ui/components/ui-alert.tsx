@@ -14,7 +14,8 @@ UiAlert  Alert control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Alert variants declared by the design language. */
 export type UiAlertVariant = 'success' | 'warning' | 'danger' | 'info'

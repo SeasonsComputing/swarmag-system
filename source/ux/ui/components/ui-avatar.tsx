@@ -14,7 +14,8 @@ UiAvatar  Avatar control with declared states.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { controlState, type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import { controlState } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Avatar control props. */
 export type UiAvatarProps =
