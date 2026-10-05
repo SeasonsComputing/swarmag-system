@@ -17,7 +17,7 @@ DenoProvider    Configuration provider for Deno.
 └ fail(msg)     Write the message and exit the process.
 */
 
-import { type RuntimeContract } from './runtime-contract.ts'
+import type { RuntimeContract } from './runtime-contract.ts'
 
 /**
  * Configuration provider for Deno.

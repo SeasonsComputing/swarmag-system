@@ -16,7 +16,7 @@ AuthGuard  Route-level auth guard component.
 */
 
 import { Match, Show, Switch } from '@solid-js'
-import { type UiComponent, type UiContainerProps } from '@ux/ui'
+import type { UiComponent, UiContainerProps } from '@ux/ui'
 import { SessionState } from './session-state.ts'
 import { ShellReplace } from './shell-navigate.tsx'
 

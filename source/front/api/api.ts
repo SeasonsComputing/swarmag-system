@@ -26,7 +26,7 @@ api  Shared API namespace for UX applications.
 
 import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
 import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
-import { type Customer } from '@domain/abstractions/customer.ts'
+import type { Customer } from '@domain/abstractions/customer.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { validateCustomerCreate, validateCustomerUpdate } from '@domain/validators/customer-validator.ts'
 import { AppState } from '@ux/shell/runtime/app-state.ts'

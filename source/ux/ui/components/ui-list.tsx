@@ -15,7 +15,7 @@ UiListItem  List item — child of UiList.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** List variant. Omit for a clean unstyled list. */
 export type UiListVariant = 'bullet' | 'numbered'

@@ -19,8 +19,8 @@ ConfigTable       Renders labeled configuration data as a definition list.
 */
 
 import { For, Show } from '@solid-js'
-import { type UiComponent } from '@ux/ui'
-import { type ShellMetadata } from './shell-metadata.ts'
+import type { UiComponent } from '@ux/ui'
+import type { ShellMetadata } from './shell-metadata.ts'
 
 import './config-table.css'
 

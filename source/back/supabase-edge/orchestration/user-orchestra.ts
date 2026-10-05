@@ -20,7 +20,7 @@ UserOrchestra           User orchestration singleton.
 */
 
 import { Config } from '@back/supabase-edge/config/supabase-config.ts'
-import { type DeleteResult } from '@core/api/api-contract.ts'
+import type { DeleteResult } from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import {
   type CreateFromInstantiable,
@@ -36,11 +36,11 @@ import {
 import { AdapterPatch, HttpCodes, type HttpRequest } from '@core/stdx'
 import { type EdgeClients, makeSupabaseEdgeAuth } from '@core/svc/make-supabase-edge-auth.ts'
 import { HttpServiceError } from '@core/svc/wrap-busrule-http-handler.ts'
-import { type User } from '@domain/abstractions/user.ts'
+import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 import { validateUserCreate, validateUserUpdate } from '@domain/validators/user-validator.ts'
-import { type SupabaseClient } from '@supabase/client'
+import type { SupabaseClient } from '@supabase/client'
 
 // ────────────────────────────────────────────────────────────────────────────
 // PUBLIC TYPES

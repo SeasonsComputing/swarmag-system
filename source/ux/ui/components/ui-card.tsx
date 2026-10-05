@@ -14,7 +14,7 @@ UiCard  Card control.
 */
 
 import { type JSX, splitProps } from '@solid-js'
-import { type UiComponent, type UiComponentProps } from './ui-helpers.ts'
+import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Card decoration values declared by the design language. */
 export type UiCardDecoration = 'gradient' | 'none'

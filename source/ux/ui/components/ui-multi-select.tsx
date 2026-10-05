@@ -13,7 +13,7 @@ PUBLIC
 UiMultiSelect  Inline multi-value select control with declared states.
 */
 
-import { type StringSet } from '@core/std'
+import type { StringSet } from '@core/std'
 import { Listbox, type ListboxItemOptions } from '@kobalte/core/listbox'
 import { splitProps } from '@solid-js'
 import { controlState, type UiComponent, type UiOption, uiOptionLabel } from './ui-helpers.ts'
