@@ -182,10 +182,12 @@ Attributes: **State**
 | `active`       | boolean  |
 
 Consumers reference a facet by the string `scheme:code`, never by `id`. `:` is reserved: neither
-`scheme` nor `code` may contain it; `code` may contain `/`. `(scheme, code)` is unique, so a code
-is never reused with another meaning. Retiring a facet sets `active` to false: the row stays
-readable and still resolves the label of existing references. Soft delete is reserved for a facet
-created by mistake and never referenced.
+`scheme` nor `code` may contain it; `code` may contain `/`, with no hierarchy semantics yet.
+`(scheme, code)` is unique. Retiring a facet sets `active` to false: the row stays readable and
+still resolves the label of existing references. Once a facet is referenced, its `scheme` and
+`code` never change and it is never soft-deleted; soft delete is for a facet created by mistake
+and never referenced. Those are curation obligations, enforced by the curation surface, not by
+the database.
 
 ## 5. Assets
 

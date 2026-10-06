@@ -1,7 +1,8 @@
 # Tags → Facets — Brief
 
 **Active, not yet dispatched.** Chosen 2026-10-06 as roadmap §4's tags step and written the same
-day from a CA + AI Architect exploration session. It awaits AI Coding Engine review and the
+day from a CA + AI Architect exploration session. Reviewed by the AI Coding Engine on 2026-10-06;
+the amendment at the end resolves that review and marks the items it changes. It awaits the
 production gate. The documentation half of the production is done. Seeding questions it raised
 are carried by `effort/pending/2026-10-06-facets-workflow-seeding-brief.md`.
 
@@ -64,7 +65,8 @@ that happened before the repository's history. No fixture carries a Service or W
      read and curators edit (country codes, ICD codes, FHIR `{ system, code, display }`).
    - **`:`** is the reserved separator. `/` would collide with path-like hierarchy in codes;
      `service:aerial/spray` is unambiguous.
-   - **Integrity without a foreign key.** A reference is a natural key, so a code never changes
+   - **Integrity without a foreign key.** _[Clarified by the amendment "ACE review resolved", Decision 1: a curation obligation,
+     not a database guarantee.]_ A reference is a natural key, so a code never changes
      once used, and `UNIQUE (scheme, code)` prevents reuse with another meaning. Membership is
      enforced where references are created (a picker fed from the index); domain validators are
      infrastructure-agnostic and check only the reference's format.
@@ -76,7 +78,8 @@ that happened before the repository's history. No fixture carries a Service or W
 7. **`Facet` lives in Common.** Common groups abstractions used across topics and owned by none of
    them, whatever their archetype; classification is cross-cutting. `domain-model.md` §3.6 had
    drifted from that definition and is restored.
-8. **Read access is a Query State module** (`architecture-front.md` §8.4). The catalog is server
+8. **Read access is a Query State module** _[Revised by the amendment "ACE review resolved", Decisions 2–4: no derived index;
+   `failed()` added.]_ (`architecture-front.md` §8.4). The catalog is server
    data, which §9.6.1 assigns to TanStack Query. `useFacets(): FacetsState` hides the query behind
    `ready`, `schemes`, `codes`, `label`, `labelRef`, `labelRefs` (an array of `scheme:code`
    references to their labels, in order), and `refresh`. The `QueryClient` lives in the
@@ -94,9 +97,10 @@ Operating mode: **Foundation** (domain attributes, a shared common abstraction, 
 
 2. **Domain, by hand.** `common.ts`: `Note` loses `tags`; `Facet` added. `common-adapter.ts`: `NoteAdapter` loses `tags`; `FacetAdapter` added. `common-validator.ts`: `isNote` loses its `tags` check; `validateFacetCreate`/`validateFacetUpdate` (non-empty `scheme`, `code`, `label`; no `:` in `scheme` or `code`; boolean `active`); an exported `isFacetRef` guard (exactly one `:`, non-empty on both sides). New `common-protocol.ts`: `FacetCreate`, `FacetUpdate`. `service.ts`, `workflow.ts`, their adapters, and validators: `facets` replaces `tagsWorkflowCandidates`/`tags`, validated with `isFacetRef`. `schema.sql`: a `facets` table (drop order, `UNIQUE (scheme, code)`, RLS and indexes on the pattern of the other catalog tables); `services.facets` and `workflows.facets` replace the two tag columns (JSONB, array CHECK); the seeded Service row. Hand edits must equal what domain genesis would produce from the data dictionary.
 
-3. **Front.** `api.Facets`: `makeCrudSupabaseClient<Facet>` in `api.ts`. `front/app/stores/facets-state.ts`: `useFacets` per §8.4, suite-wide, over a pure index builder and a loader that reads every page (the list contract is paged; a first-page load would silently truncate the catalog). `customer-state.ts` (`newCustomerNote`, `cloneNote`) and `user-state.ts` (`userDraft`) note literals.
+3. **Front.** _[Revised by the amendment "ACE review resolved", Decisions 3 and 4: no index builder; the loader reads the first
+   page.]_ `api.Facets`: `makeCrudSupabaseClient<Facet>` in `api.ts`. `front/app/stores/facets-state.ts`: `useFacets` per §8.4, suite-wide, over a pure index builder and a loader that reads every page (the list contract is paged; a first-page load would silently truncate the catalog). `customer-state.ts` (`newCustomerNote`, `cloneNote`) and `user-state.ts` (`userDraft`) note literals.
 
-4. **Tests.** `customer-api-test.ts`, `make-scope-test.ts` note literals. `Facet` adapter round-trip. Validators: `:` rejected in `scheme`/`code`; `isFacetRef` accepts `service:aerial/spray` and rejects `service`, `:x`, `x:`, `a:b:c`. Index builder: grouping by scheme, `codes()` returns only active codes, `label()` resolves inactive codes, `labelRefs()` preserves order.
+4. **Tests.** `customer-api-test.ts`, `make-scope-test.ts` note literals. `Facet` adapter round-trip. Validators: `:` rejected in `scheme`/`code`; `isFacetRef` accepts `service:aerial/spray` and rejects `service`, `:x`, `x:`, `a:b:c`. Index builder: grouping by scheme, `codes()` returns only active codes, `label()` resolves inactive codes, `labelRefs()` preserves order. _[Removed by the amendment "ACE review resolved", Decision 3.]_
 
 5. **RDBMS genesis.** The CA runs `db-reset --target stage`.
 
@@ -148,7 +152,56 @@ How the decisions were reached, kept because each turn changed the design:
   (`777238a`) confirmed it.
 - **Retirement:** first soft delete, then `active`, when CONVENTIONS §10.10 showed soft-deleted
   rows are unreadable through RLS.
-- **The Query State module** was nearly deferred for lack of a consumer; built now because its
+- _[Revised by the amendment "ACE review resolved", Decision 3.]_ **The Query State module** was nearly deferred for lack of a consumer; built now because its
   design is fixed and its logic testable without one.
+
+## Amendment — 2026-10-06 — ACE review resolved
+
+The AI Coding Engine reviewed the brief statically and found the design sound, retaining the
+catalog-plus-reference model, Common placement, `active` retirement, the Query State hook, and the
+release order. It raised four points. The AI Architect proposed resolutions; the CA rejected
+those that were design specific to facets ("hyper-localized feature design tends to be revisited")
+and decided the rest. The test applied: would the next Query State module, or the next catalog
+table, do the same thing?
+
+### Decisions
+
+1. **Key stability is a curation obligation, stated as one.** `UNIQUE (scheme, code)` prevents
+   duplicate pairs only; it does not stop a row's `scheme` or `code` from changing, or a referenced
+   row from being soft-deleted. Once referenced, `scheme` and `code` never change, and soft delete
+   is only for a facet created by mistake and never referenced. Nothing can edit facets yet; the
+   Facet Manager will enforce it by making `scheme` and `code` create-only in its update scope.
+   `facets` takes the standard catalog RLS, like `services`. Rejected: a key-immutability trigger
+   (the schema's first) and omitting the `DELETE` policy, which would make `facets` the one table
+   with special rules, guarding against an editor that does not exist yet. Changing a code's
+   meaning cannot be enforced either way.
+2. **Lookups return the reference when unresolved.** `label()`, `labelRef()`, and `labelRefs()`
+   return the `scheme:code` reference itself while the catalog loads or when a reference is
+   unknown, showing real data rather than inventing a label. `schemes()` includes schemes whose
+   facets are all inactive; `codes()` offers only active ones.
+3. **No derived index.** The catalog is small, so `FacetsState`'s methods work directly on the
+   loaded `Facet[]`: `codes()` is a filter, `label()` a find. With nothing derived, no companion
+   module or index tests are needed, and §8.4 needs no rewording. Query code is verified with its
+   first consumer, as the managers' `createQuery` usage is. Rejected: a companion `facet-index.ts`
+   imported by the hook and its tests.
+4. **Paging is fixed once, for every list.** Loading a whole collection is the defect in the
+   backlog entry "Managers load only the first page of their Collection", and its fix belongs
+   there. The catalog is empty in this production (facet values are §6), so a first-page load is
+   correct now. That backlog entry is a prerequisite for §6, before any facet values exist.
+   Rejected: a facets-specific loader that reads every page, and its tests.
+5. **`failed()` joins the Query State contract.** `ready()` alone makes a failed load
+   indistinguishable from one still loading. Every Query State module exposes both
+   (`architecture-front.md` §8.4); facets is the only one today.
+6. **`/` carries no meaning yet.** A code may contain `/`, with no hierarchy or prefix-matching
+   semantics until roadmap §6 decides otherwise.
+
+### Production scope changes
+
+- **Step 1, documentation (done 2026-10-06):** `architecture-front.md` §8.4 adds `failed()` and
+  shows lookups over the loaded list; `domain-data-dictionary.md` §4.5 states key stability as a
+  curation obligation; the backlog entry on paging records the §6 prerequisite.
+- **Step 3, front:** `useFacets` over the loaded list, with no index builder; the loader reads the
+  first page.
+- **Step 4, tests:** the index-builder tests are removed; the adapter and validator tests stand.
 
 _End of Brief_

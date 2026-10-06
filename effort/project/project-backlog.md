@@ -261,6 +261,11 @@ rather than diverging.
 managers use, not duplicated per manager. Surfaced in ACE's review of the Customer Manager
 scope.
 
+**Prerequisite for roadmap §6:** the facet catalog (`useFacets`) loads with one first-page list
+call, which is correct while the catalog is empty. This fix must land before facet values are
+seeded, or the catalog will silently truncate
+(`effort/active/2026-10-06-tags-classification-brief.md`).
+
 ## Guards
 
 ### `guard:css` does not verify that a referenced token resolves
