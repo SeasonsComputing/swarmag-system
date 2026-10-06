@@ -179,11 +179,13 @@ Attributes: **State**
 | `code`         | string   |
 | `label`        | string   |
 | `description?` | string   |
+| `active`       | boolean  |
 
 Consumers reference a facet by the string `scheme:code`, never by `id`. `:` is reserved: neither
-`scheme` nor `code` may contain it; `code` may contain `/`. `(scheme, code)` is unique across live
-and retired rows, so a code is never reused. A retired facet is soft-deleted and still resolves
-the label of existing references.
+`scheme` nor `code` may contain it; `code` may contain `/`. `(scheme, code)` is unique, so a code
+is never reused with another meaning. Retiring a facet sets `active` to false: the row stays
+readable and still resolves the label of existing references. Soft delete is reserved for a facet
+created by mistake and never referenced.
 
 ## 5. Assets
 
