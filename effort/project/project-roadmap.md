@@ -14,17 +14,16 @@ rather than guessed at.
 - **User Manager** (`project-user-stories.md` §6) → generalized `AbstractionManager`.
 - **Onboarding Wizard** (§1.1's "Prospect genesis") → generalized `Wizard`.
 
-Users and Customers stand as this project's **reference implementations** — meant to be
-copied for the remaining ~80% of the app, not iterated on again in their own right.
+Users and Customers stand as this project's **reference implementations** for Abstractions meant to be copied for the remaining ~80% of the app, not iterated on again in their own right. Onboarding wizard is the reference implementation for complex ux workflows.
 
-Positioned first because it's the origin of the reusable archetypes, not because it closes
-first — it stays open until both dependencies below land, which puts its actual closure after
-§3 and §4:
+Positioned first because it's the origin of the reusable archetypes, not because it closes first — it stays open until the dependencies below land, which puts its actual closure after §6:
 
 1. Notes Editor completed & integrated into User Manager
 2. Notes Editor integrated with Customer Manager feature completion
 3. **(open)** Additional-contact assignment (`project-user-stories.md` §1.1): build it before §5,
    or move it to a later milestone (`EFFORT.md` §7). Until decided, it blocks closing this slice.
+4. Onboarding's Initial Job Assessment stage, which needs §6: the Onboarding Wizard cannot finish
+   before Services, Workflows, and seeding exist.
 
 ## 2. Shell/App Split — Closed 2026-09-21
 
@@ -40,7 +39,7 @@ Both workbenches now host a sequence of one or more steps over one shared `panel
 `effort/completed/2026-09-22-customer-manager-brief.md`.
 
 It does not close the Users & Customers slice (§1). Additional-contact assignment
-(`project-user-stories.md` §1.1) is still unbuilt and has no slot yet.
+(`project-user-stories.md` §1.1) is not built and has no slot yet.
 
 ## 4. Notes Editor
 
@@ -49,23 +48,19 @@ an application feature, not toolkit, so it belongs in `front/app/`, not `ux/`. I
 inclusion in a workbench archetype, which rules out other surfaces such as a simple popup
 dialog.
 
-Three capabilities, each landing with the milestone that first needs it:
+Two capabilities, each landing with the milestone that first needs it:
 
-- **Tags** — this milestone.
 - **Attachments** — with §5 Mechanical Productions, for operator and maintenance documents on
   assets.
 - **Device media recording** — with onsite Job Assessment (§7). Assessment, planning, and
   running all need it.
 
-**Tags Component**
-Several app features include tags. We need a tag component that is reusable. Tags-freeform-vs-controlled is still unresolved and gates scoping.
+**Tags:** decided 2026-10-06. There is no tag capability: `Note.tags` is removed, and Service and
+Workflow classification moves to curated facets. The Notes Editor shows no tags.
 
 **Sequence:**
 
-1. **Tags decision.** Are tags freeform (`Note.tags` is `string[]`) or drawn from a controlled
-   set, and where does `TagsField` live? Controlled fits `UiMultiSelect`; freeform needs a control
-   the catalog lacks, and `TagsField` in `ux/ui` would be Foundation and design-language work.
-   This decision gates the brief.
+1. **Tags → facets** — active: `effort/active/2026-10-06-tags-classification-brief.md`.
 2. **Notes Editor brief.**
 3. **Notes Editor production.**
 4. **Milestone verification,** this milestone, then §1.
@@ -92,6 +87,10 @@ work is picked up:
 ## 6. Workflow, Task, Question & Service
 
 `project-user-stories.md` §5, currently unwritten, plus `Service` (domain type exists, `api.Services` commented out). Needs the Workflow Builder archetype — named in `architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme with no existing archetype to extend at all, and the most depended-upon: Job Definition's own §2.1 "workflow seeding" (preload a default workflow per Service/SKU) can't be built until this exists.
+
+Seeding filters the Workflow library by the selected Services' facets, and the rep chooses from the
+result. Design input, including the open questions on facet values, curation, and Service versus
+Service Category: `effort/pending/2026-10-06-facets-workflow-seeding-brief.md`.
 
 ## 7. Job Definition
 

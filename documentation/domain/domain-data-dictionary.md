@@ -18,6 +18,7 @@ The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping
 |           |                                    | ContactPreferredChannel  |
 |           |                                    | Attachment               |
 |           |                                    | Note                     |
+|           |                                    | Facet                    |
 | Assets    | `@domain/abstractions/asset.ts`    | AssetType                |
 |           |                                    | AssetStatus              |
 |           |                                    | Asset                    |
@@ -146,7 +147,7 @@ Attributes: **State**
 
 ### 4.4 Note
 
-Purpose: **Freeform note with visibility and taxonomy**
+Purpose: **Freeform note with visibility**
 
 Type: **object**
 
@@ -163,7 +164,26 @@ Attributes: **State**
 | `createdAt`   | When                                               |
 | `content`     | string                                             |
 | `visibility`  | `'internal'` \| `'shared'` (default: `'internal'`) |
-| `tags`        | CompositionMany\<string\>                          |
+
+### 4.5 Facet
+
+Purpose: **Curated classification catalog entry: one code within a scheme**
+
+Type: **Instantiable**
+
+Attributes: **State**
+
+| **Attribute**  | **Type** |
+| -------------- | -------- |
+| `scheme`       | string   |
+| `code`         | string   |
+| `label`        | string   |
+| `description?` | string   |
+
+Consumers reference a facet by the string `scheme:code`, never by `id`. `:` is reserved: neither
+`scheme` nor `code` may contain it; `code` may contain `/`. `(scheme, code)` is unique across live
+and retired rows, so a code is never reused. A retired facet is soft-deleted and still resolves
+the label of existing references.
 
 ## 5. Assets
 
@@ -383,13 +403,13 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**            | **Type**                  |
-| ------------------------ | ------------------------- |
-| `name`                   | string                    |
-| `sku`                    | string                    |
-| `description?`           | string                    |
-| `category`               | ServiceCategory           |
-| `tagsWorkflowCandidates` | CompositionMany\<string\> |
+| **Attribute**  | **Type**                                  |
+| -------------- | ----------------------------------------- |
+| `name`         | string                                    |
+| `sku`          | string                                    |
+| `description?` | string                                    |
+| `category`     | ServiceCategory                           |
+| `facets`       | CompositionMany\<string\> (`scheme:code`) |
 
 ### 8.3 ServiceRequiredAssetType
 
@@ -627,12 +647,12 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**  | **Type**                  |
-| -------------- | ------------------------- |
-| `name`         | string                    |
-| `description?` | string                    |
-| `version`      | number                    |
-| `tags`         | CompositionMany\<string\> |
+| **Attribute**  | **Type**                                  |
+| -------------- | ----------------------------------------- |
+| `name`         | string                                    |
+| `description?` | string                                    |
+| `version`      | number                                    |
+| `facets`       | CompositionMany\<string\> (`scheme:code`) |
 
 ### 10.12 WorkflowTask
 

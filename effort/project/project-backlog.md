@@ -81,6 +81,26 @@ Design record: `effort/pending/2026-10-03-core-reconciliation-brief.md`.
 Picking this up: together with, or sequenced against, the scan-cost entry above, since both
 restructure `architecture-core.md`.
 
+### `architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`
+
+**Observed:** 2026-10-06 · low
+
+`source/ux/` is the portable toolkit, intended as a Seasons library; `source/front/` is swarmAg's
+own composition. `architecture-front.md` documents both in one file, and several sections pair a
+generic mechanism with swarmAg's implementation of it: §9.3 Authentication
+(`SessionCoordinatorContract` and `logout` beside `AuthSupabaseClient`, the coordinator, and
+Login), §9.4 Session State, and §10.1.6 Workbench steps (the `panel/` and `workbench/` library
+beside the Customer, User, and Onboarding features). The toolkit's architecture should travel with
+the toolkit.
+
+The fix is a `ux` architecture document in `documentation/ux/`, taking the generic material:
+§8.3 Reactive Store Module Pattern, §9.1–§9.2 shell structure and routing, the generic halves of
+§9.3 and §9.4, §9.5.2 Application Preferences, §10.3 Dashboard Layout Contract, and the library
+half of §10.1.6. `architecture-front.md` keeps the API namespace and form scopes (§7), the `app/`
+tier and its rules, swarmAg's halves of the split sections, and §11. Two placements need a
+decision when the split is made: §8.4 Query State Pattern, generic as a pattern but swarmAg in its
+example, and §10.1.6, divided down the middle.
+
 ## Controls
 
 ### Shared UI controls do not use one state model

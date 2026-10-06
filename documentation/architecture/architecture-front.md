@@ -164,11 +164,11 @@ All UX applications consume the **same API namespace** defined in `source/front/
 import { api } from '@front/api/api.ts'
 
 // Auth
-await api.Auth.signInWithOtp({ email })
+await api.Auth.sendOtp(email)
 
 // Users API
 const user = await api.Users.get(userId)
-const canLogin = await api.Users.hasAccess({ email })
+const canLogin = await api.Users.hasAccess(email)
 
 // CRUD — direct to Supabase where no orchestration is required
 const jobs = await api.Jobs.list()
@@ -223,7 +223,7 @@ api.Users.create(input: UserCreate): Promise<User>
 api.Users.update<K>(source: ScopedUpdate<User, K>): Promise<User>
 api.Users.delete(id: Id): Promise<DeleteResult>
 api.Users.eject(id: Id): Promise<User>
-api.Users.hasAccess(input: { email: string }): Promise<boolean>
+api.Users.hasAccess(email: string): Promise<boolean>
 ```
 
 `api.Users` is the user topic boundary. Callers do not know whether an operation
@@ -394,6 +394,57 @@ const ThingState = {
 export { ThingState }
 ```
 
+### 8.4 Query State Pattern
+
+The Query State Pattern is the required architecture for shared, read-mostly server data that many
+components consume, such as a curated catalog. It applies §8.3's information hiding to data the
+server owns, which §9.6.1 assigns to TanStack Query.
+
+- Export a **single hook**, `use{Name}(): {Name}State`, not a query object.
+- Keep the query key, the loader, and any derived index **module-private**. Consumers never
+  import TanStack Query.
+- `{Name}State` exposes intent-named reads, plus:
+  - `ready()`, distinguishing loading from empty;
+  - `refresh()`, invalidating the query after the data is edited elsewhere.
+- The hook is called inside the component tree, where bootstrap provides the `QueryClient`
+  (§10.2). Every caller shares one cached query.
+
+**Example Query State Module:**
+
+```typescript
+// facets-state.ts
+
+export type FacetsState = {
+  ready: () => boolean
+  schemes: () => readonly string[]
+  codes: (scheme: string) => readonly string[]
+  label: (scheme: string, code: string) => string
+  labelRef: (ref: string) => string
+  refresh: () => Promise<void>
+}
+
+const FACETS_QUERY_KEY = ['facets'] as const
+
+export const useFacets = (): FacetsState => {
+  const client = useQueryClient()
+  const query = createQuery(() => ({
+    queryKey: FACETS_QUERY_KEY,
+    queryFn: loadFacetIndex,
+    staleTime: Infinity
+  }))
+  const index = () => query.data ?? EMPTY_INDEX
+  const label = (scheme: string, code: string) => index().label(scheme, code)
+  return {
+    ready: () => query.isSuccess,
+    schemes: () => index().schemes,
+    codes: scheme => index().codes(scheme),
+    label,
+    labelRef: ref => label(...splitRef(ref)),
+    refresh: () => client.invalidateQueries({ queryKey: FACETS_QUERY_KEY })
+  }
+}
+```
+
 ## 9. Application Runtime Patterns
 
 ### 9.1 Application Shell Structure
@@ -471,86 +522,88 @@ Protected routes wrap content in the auth guard component. The guard is a route-
 
 ### 9.3 Authentication
 
-Authentication is handled by `auth-supabase-client.ts` — a singleton module that directly implements `ApiAuthContract`. It is not a maker; there is exactly one auth implementation.
+`AuthSupabaseClient` (`source/core/cli/auth-supabase-client.ts`) is a singleton that directly
+implements `ApiAuthContract` (`source/core/api/api-auth-contract.ts`). It is not a maker; there is
+exactly one auth implementation. It is composed into the API namespace as `api.Auth`.
 
-```text
-source/core/cli/auth-supabase-client.ts
-```
+| Method                        | Purpose                                                        |
+| ----------------------------- | -------------------------------------------------------------- |
+| `sendOtp(email)`              | Send a one-time code; never provisions a new Auth identity     |
+| `verifyOtp(email, code)`      | Verify the code and return a normalized `Session`              |
+| `logout()`                    | End the remote session                                         |
+| `getSession()`                | Resolve the persisted browser session, or `null`               |
+| `onAuthStateChange(callback)` | Subscribe to session changes; returns the unsubscribe function |
 
-It is composed into the API namespace as `api.Auth`:
-
-```typescript
-import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
-
-export const api = {
-  Auth: AuthSupabaseClient,
-  ...
-}
-```
+`ApiAuthContract` is transport-oriented: it carries sessions, not domain users, and has no
+domain `validateUser` method.
 
 #### 9.3.1 Application-Owned Session Coordination
 
-`ShellApplication` requires a `session: SessionCoordinator` alongside its shells.
-The UX-owned `SessionCoordinator` interface exposes `init(): void`. Bootstrap calls it
-synchronously during its Solid mount callback. The application supplies the implementation
-from `source/front/app/shell/session-coordinator.ts`; generic bootstrap does not consume `api`.
-`Routes.application(shells, session)` assembles these dependencies without changing route behavior.
+`ShellApplication` requires a `session: SessionCoordinatorContract` alongside its shells. The
+UX-owned contract (`source/ux/shell/runtime/shell.ts`) has two methods: `init()` and `clear()`.
+Bootstrap calls `init()` synchronously during its Solid mount callback; generic bootstrap does not
+consume `api`. `Routes.application(shells, session)` assembles the two.
 
-The coordinator starts persisted-session resolution, subscribes to `api.Auth.onAuthStateChange`,
-and registers subscription cleanup synchronously with the current Solid owner. It owns user
-hydration and eligibility policy. The shell owns the lifecycle invocation and baseline session state.
+The application supplies `SessionCoordinator` from `source/front/app/shell/session-coordinator.ts`.
+`init()` starts persisted-session resolution, subscribes to `api.Auth.onAuthStateChange`, and
+registers cleanup with the current Solid owner: unsubscribe, then `clear()`. `clear()` drops the
+prepared identity and clears `SessionState`. The coordinator owns user hydration and eligibility;
+the shell owns the lifecycle invocation and baseline session state.
 
 #### 9.3.2 OTP and Session Flow
 
-Login remains an application-owned passwordless email OTP surface. It checks
-`api.Users.hasAccess` before sending an OTP, then verifies the submitted code through `api.Auth`.
-Auth events and initial `getSession()` resolution enter the same coordinator:
+Login (`source/front/app/shell/login.tsx`) is the application's passwordless email OTP surface. It
+checks `api.Users.hasAccess` before sending a code, then verifies the submitted code through
+`api.Auth.verifyOtp`. Auth events and the initial `getSession()` resolution enter the coordinator
+through one path:
 
-1. A null session clears the prepared-identity sentinel and `SessionState`.
-2. An identity change invalidates previous readiness and the sentinel.
-3. `SessionState.setAuth(userId)` publishes the authenticated identity, preserving existing timing.
-4. An already-prepared matching user ID skips repeat hydration.
-5. Otherwise `api.Users.get(userId)` loads the domain user. An inactive user is signed out.
-6. An active user is discarded after validation; only its prepared user ID is cached.
-7. `SessionState.setReady()` marks application data ready.
+1. A null session clears the coordinator.
+2. An identity change clears the coordinator before anything else.
+3. `SessionState.setAuth(userId)` publishes the authenticated identity.
+4. An already-prepared matching user ID stops here; hydration does not repeat.
+5. Otherwise `api.Users.get(userId)` loads the domain user.
+6. If the identity changed while the user loaded, the result is discarded.
+7. An inactive user is signed out through `api.Auth.logout()`, and the coordinator clears even if
+   remote sign-out fails.
+8. An active user is discarded after validation; only its prepared user ID is kept.
+9. `SessionState.setReady()` marks application data ready.
 
-The prepared user ID is private coordinator state, not a domain-user cache or a replacement user
-object. `isDataReady` remains a separate application-readiness signal. Broader changes to auth
-publication timing and asynchronous session orchestration are outside this split.
-
-A missing domain record is an integrity error and must propagate; it is not treated as an inactive
-user. `ApiAuthContract` remains transport-oriented and has no domain `validateUser` method.
+The prepared user ID is private coordinator state, not a domain-user cache. `isDataReady` is a
+separate application-readiness signal. A missing domain record is an integrity error and
+propagates; it is not treated as an inactive user.
 
 #### 9.3.3 Logout
 
-The generic logout function receives `ApiAuthContract` explicitly and clears local session state
-in its completion path. The app-tier shell maker binds that dependency and clears the coordinator's
-prepared-identity sentinel even if remote sign-out fails. Normal auth sign-out events also clear it.
-Route transition behavior remains owned by the generic shell.
+The generic `logout(auth)` (`source/ux/shell/runtime/logout.ts`) receives `ApiAuthContract`
+explicitly, ends the remote session, and always clears `SessionState`, logging a failed remote
+sign-out. The app-tier shell maker wraps it so that `SessionCoordinator.clear()` also runs even if
+remote sign-out fails. Auth sign-out events clear the coordinator too. The `/logout` route
+transition to `/login` belongs to the generic shell (`makeAnonymousShell`).
 
-### 9.4 Session State Store
+### 9.4 Session State
 
-`source/ux/shell/runtime/session-state.ts` is a closed baseline store following §8.3:
+`SessionState` (`source/ux/shell/runtime/session-state.ts`) is the baseline session module, a
+Reactive Store Module (§8.3) typed by `SessionStateContract`. It holds authentication and readiness
+only; domain data about the user belongs to application modules.
 
-```typescript
-type SessionStore = {
-  userId: Id | null
-  isAuthenticated: boolean
-  isLoading: boolean
-  isDataReady: boolean
-}
-```
+| Field             | Meaning                                                                 |
+| ----------------- | ----------------------------------------------------------------------- |
+| `userId`          | The authenticated user's id, published from the auth session, or `null` |
+| `isAuthenticated` | A session is active                                                     |
+| `isLoading`       | The initial auth check is unresolved; prevents a login flash            |
+| `isDataReady`     | Application data preparation is complete; not the identity sentinel     |
 
-It exports the `SessionState` namespace with `store`, `setAuth`, `setReady`, and `clear`.
-It has no domain `User`, `user` field, or `setUser` operation. Applications requiring additional
-reactive session data use their own Store/State modules. `AppState` remains the generic persistent
-key/value preference store. The application-facing API may re-export both stores; UX imports its
-own stores directly and never imports `front/api`.
+| Intent method     | Effect                                                   |
+| ----------------- | -------------------------------------------------------- |
+| `setAuth(userId)` | Publish the identity: authenticated, loading cleared     |
+| `setReady()`      | Mark application data ready                              |
+| `clear()`         | Reset to signed out: no identity, not loading, not ready |
 
-`isLoading` prevents a login flash while the initial auth check is unresolved. `userId` is
-published from the auth session. `isDataReady` means application data preparation is complete;
-it is not the identity sentinel. Ops may defer readiness until its local job manifest is loaded
-when that preparation is integrated. Components consume session state rather than Supabase Auth.
+Components consume `SessionState.store`, never Supabase Auth. The session coordinator (§9.3.1)
+publishes identity and readiness; logout (§9.3.3) also clears it. Applications that need further
+reactive session data define their own Reactive Store Modules. `AppState` is the generic persistent
+key/value preference store (§9.5.2). The application-facing API re-exports both stores; UX imports
+its own stores directly and never imports `front/api`.
 
 ### 9.5 IndexedDb Usage
 
@@ -590,6 +643,7 @@ IndexedDB usage is split into two layers:
 | app preferences  | IndexedDB       | `ux/shell/runtime/app-state.ts`         |
 | dashboard config | IndexedDB       | `ux/shell/dashboard/dashboard-state.ts` |
 | server data      | TanStack Query  | per-page query hooks                    |
+| shared catalogs  | TanStack Query  | Query State modules (§8.4)              |
 | local ui state   | SolidJS signals | component-local                         |
 | ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts`          |
 
@@ -998,7 +1052,7 @@ Standard domain pages follow a list → form pattern. Each root abstraction not 
 | ----------- | -------------- | --------------------------------------------- |
 | `/user`     | `UserForm`     | Role multi-select, status                     |
 | `/asset`    | `AssetForm`    | Type association, status                      |
-| `/service`  | `ServiceForm`  | Required asset types, workflow candidate tags |
+| `/service`  | `ServiceForm`  | Required asset types, facets                  |
 | `/chemical` | `ChemicalForm` | Signal word severity, restricted use, SDS url |
 
 ### 11.7 Job Runner Interaction Contract (app-ops)

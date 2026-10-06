@@ -596,8 +596,7 @@ export const NoteAdapter = makeAdapter<Note>({
   attachments: ['attachments', AttachmentAdapter],
   createdAt: ['created_at'],
   content: ['content'],
-  visibility: ['visibility'],
-  tags: ['tags']
+  visibility: ['visibility']
 })
 ```
 

@@ -34,11 +34,11 @@ Workflows guide how work is assessed and inform how it is later planned and exec
 
 A Job represents a work agreement with a customer and serves as the hub of the model. A Job is created first and anchors all related work artifacts.
 
-### 2.4 Job Assessment, Job Plan, & Job Work Log
+### 2.4 Job: Assessment, Plan & Log
 
 A Job Assessment evaluates the work to be completed on behalf of a customer. Assessments define the locations involved and gather the information required to determine scope, feasibility, approach, cost and price. Job Assessments scope the Job using Workflow definitions that direct the Job. A Job Assessment must exist before a Job Plan may be created.
 
-Multispectral mapping drones, employed during Onsite Assessment, increase precison of Job parameters during assessment and planning. A Job Assessment contains one or more annotations, Notes, which in turn may include Attachments which may include maps or images.
+Multispectral mapping drones, employed during Onsite Assessment, increase precision of Job parameters during assessment and planning. A Job Assessment contains one or more annotations, Notes, which in turn may include Attachments which may include maps or images.
 
 A Job Plan defines how a specific Job will be executed. Plans are created after assessment and translate intent into concrete, job-specific instruction. Job Plans are the primary means by which field crews are informed of the work to be performed and are prepared prior to execution to support guided field operation.
 
@@ -49,7 +49,7 @@ A Job has an Assessment, a Plan, and a collection of Log entries. Log entries ar
 Temporal attributes follow a consistent pattern across assessment, plan and work phases. Scheduled timestamps are persisted as well as actual start timestamps.
 Actual timestamps — started and completed — are recorded in the field and are never backfilled from scheduled values.
 
-### 2.5 Job Workflow & Job Work
+### 2.5 Job: Workflow & Work
 
 Work is the physical execution of a Job. It produces the progress and knowledge captured by field crews during a job. Work is directed by a sequence of Workflows. Each Workflow and its associated Tasks and Questions are a template used to assess and plan the job.
 
@@ -139,23 +139,15 @@ These abstractions describe **domain meaning**, not persistence, API shape, or u
 
 ### 3.6 Common abstractions shared within the model
 
-The following abstractions are shared across multiple domain topics.
+The following abstractions are shared within the model: used across domain topics and owned by
+none of them.
 
-| Abstraction  | Description                                              |
-| ------------ | -------------------------------------------------------- |
-| `Location`   | Geographic coordinates with optional address information |
-| `Note`       | Freeform text with author and timestamp                  |
-| `Attachment` | Metadata describing an uploaded file or artifact         |
-
-These abstractions are **composed into** higher-level domain objects
-
-- Do not join with Instantiable
-
-- Are not referenced independently
-
-- Represented as pure value objects or embedded subordinate-compositions
-
-- Do not have independent life-cycles
+| Abstraction  | Description                                                                       |
+| ------------ | --------------------------------------------------------------------------------- |
+| `Location`   | Geographic coordinates with optional address information; composed into its owner |
+| `Note`       | Freeform text with author and timestamp; composed into its owner                  |
+| `Attachment` | Metadata describing an uploaded file or artifact; composed into a Note            |
+| `Facet`      | Curated classification catalog entry; Instantiable, referenced by `scheme:code`   |
 
 ### 3.7 Supporting domain relationships and junctions
 
