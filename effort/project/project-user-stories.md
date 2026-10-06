@@ -24,7 +24,7 @@
    flow's entry — see 2.1.)
 4. **Additional contact assignment** — Add any additional customer contact Users as account relationships.
 
-### 1.2 Prospect Pipeline Visibility _(future feature — stub)_
+### 1.2 Prospect Pipeline Visibility
 
 1. **Prospects widget** — An admin dashboard widget listing current
    prospects with time-since-creation, so aging leads surface before they
