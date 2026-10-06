@@ -73,4 +73,7 @@ Service type (default workflow per category/SKU)."
 Initial Job Assessment cannot be built until §6 lands, so the Onboarding Wizard (roadmap §1)
 cannot finish before §6.
 
+§6 itself depends on the backlog entry "Managers load only the first page of their Collection":
+`useFacets` reads the catalog's first page, so that fix must land before facet values are seeded.
+
 _End of Brief_

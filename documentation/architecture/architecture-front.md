@@ -408,7 +408,8 @@ server owns, which §9.6.1 assigns to TanStack Query.
 - Keep the query key, the loader, and any derived index **module-private**. Consumers never
   import TanStack Query.
 - `{Name}State` exposes intent-named reads, plus:
-  - `ready()`, distinguishing loading from empty;
+  - `ready()`, true once the data has loaded, distinguishing loading from empty;
+  - `failed()`, true when the load failed, distinguishing failure from loading;
   - `refresh()`, invalidating the query after the data is edited elsewhere.
 - The hook is called inside the component tree, where bootstrap provides the `QueryClient`
   (§10.2). Every caller shares one cached query.
@@ -420,6 +421,7 @@ server owns, which §9.6.1 assigns to TanStack Query.
 
 export type FacetsState = {
   ready: () => boolean
+  failed: () => boolean
   schemes: () => readonly string[]
   codes: (scheme: string) => readonly string[]
   label: (scheme: string, code: string) => string
@@ -434,16 +436,23 @@ export const useFacets = (): FacetsState => {
   const client = useQueryClient()
   const query = createQuery(() => ({
     queryKey: FACETS_QUERY_KEY,
-    queryFn: loadFacetIndex,
+    queryFn: loadFacets,
     staleTime: Infinity
   }))
-  const index = () => query.data ?? EMPTY_INDEX
-  const label = (scheme: string, code: string) => index().label(scheme, code)
-  const labelRef = (ref: string) => label(...splitRef(ref))
+  const facets = (): readonly Facet[] => query.data ?? []
+  const label = (scheme: string, code: string): string =>
+    facets().find(facet => facet.scheme === scheme && facet.code === code)?.label
+      ?? `${scheme}:${code}`
+  const labelRef = (ref: string): string => {
+    const [scheme, code] = ref.split(':')
+    return label(scheme, code)
+  }
   return {
     ready: () => query.isSuccess,
-    schemes: () => index().schemes,
-    codes: scheme => index().codes(scheme),
+    failed: () => query.isError,
+    schemes: () => [...new Set(facets().map(facet => facet.scheme))].sort(),
+    codes: scheme =>
+      facets().filter(facet => facet.scheme === scheme && facet.active).map(facet => facet.code).sort(),
     label,
     labelRef,
     labelRefs: refs => refs.map(labelRef),
