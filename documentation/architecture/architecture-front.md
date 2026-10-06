@@ -31,34 +31,34 @@ The following is the normative target structure. Directories not yet present are
 ```text
 source/
 ├── ux/                              — generic UX toolkit, portable beyond swarmAg
-│   ├── shell/                      — generic shell framework
-│   │   ├── runtime/                — bootstrap, routing, session, preferences, metadata
-│   │   ├── dashboard/              — dashboard host, state, and widget contracts
-│   │   ├── panel/                  — panel foundation, collections, and drill-down
-│   │   └── workbench/              — manager, wizard, and supporting form behavior
-│   ├── views/                      — generic UX projection types (placeholder — none yet)
-│   ├── widgets/                    — app-neutral widgets (e.g. HelmWidget)
+│   ├── shell/                       — generic shell framework
+│   │   ├── runtime/                 — bootstrap, routing, session, preferences, metadata
+│   │   ├── dashboard/               — dashboard host, state, and widget contracts
+│   │   ├── panel/                   — panel foundation, collections, and drill-down
+│   │   └── workbench/               — manager, wizard, and supporting form behavior
+│   ├── views/                       — generic UX projection types (placeholder — none yet)
+│   ├── widgets/                     — app-neutral widgets (e.g. HelmWidget)
 │   │   └── widget-registry.ts       — exports widgetRegistry(); generic-tier catalog only
-│   └── ui/                         — portable shared UI foundation
-│       ├── components/             — Ui{Control} primitives (ui-{name}.tsx, barreled by ui.ts)
-│       ├── charts/                 — reserved chart primitive directory
-│       ├── css/                    — CSS barrel, tokens, roles, themes, base, ui, icons
-│       ├── fonts/                  — self-hosted font assets
-│       └── icons/                  — shared icon assets
+│   └── ui/                          — portable shared UI foundation
+│       ├── components/              — Ui{Control} primitives (ui-{name}.tsx, barreled by ui.ts)
+│       ├── charts/                  — reserved chart primitive directory
+│       ├── css/                     — CSS barrel, tokens, roles, themes, base, ui, icons
+│       ├── fonts/                   — self-hosted font assets
+│       └── icons/                   — shared icon assets
 └── front/
     ├── api/
-    │   └── api.ts                   - API client and request/response types
+    │   ├── api.ts                   — API client and request/response types
+    │   ├── form-scopes.ts           — declared form write scopes (§7.4)
+    │   └── make-auth-users.ts       — Users client over the edge functions (§7.2.3)
     ├── config/
-    ├── app/                          — swarmAg-suite-wide, shared across all three apps, not generic
-    │   ├── assets/                   — swarmAg brand assets (logo files, flat — one asset kind today)
-    │   ├── components/               — swarmAg-specific reusable UI controls (placeholder — none yet)
-    │   ├── stores/                   — swarmAg-suite state beyond the toolkit baseline (placeholder)
-    │   ├── views/                    — swarmAg domain projections (job-views.ts)
-    │   ├── widgets/                  — swarmAg-suite widgets (e.g. BrandWidget)
-    │   │   └── widget-registry.ts    — exports widgetRegistry(); app-tier catalog only
-    │   └── shell/                    — branded chrome + wiring: about-box, brand-hero, login, and the
-    │                                   maker wrapper binding ux/shell's generic makers to swarmAg branding,
-    │                                   and session-coordinator.ts
+    ├── app/                         — swarmAg-suite-wide, shared across all three apps, not generic
+    │   ├── assets/                  — swarmAg brand assets (logo files, flat — one asset kind today)
+    │   ├── components/              — swarmAg-specific reusable UI controls (placeholder — none yet)
+    │   ├── stores/                  — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
+    │   ├── views/                   — swarmAg domain projections (job-views.ts)
+    │   ├── widgets/                 — swarmAg-suite widgets (e.g. BrandWidget)
+    │   │   └── widget-registry.ts   — exports widgetRegistry(); app-tier catalog only
+    │   └── shell/                   — branded chrome and application wiring (*)
     ├── app-admin/
     │   ├── app.tsx
     │   ├── dashboard-admin.json     — default dashboard layout for app-admin
@@ -67,6 +67,7 @@ source/
     │   ├── sw.js
     │   ├── vite.config.ts
     │   ├── users/                   — user manager
+    │   ├── customers/               — customer manager and its steps
     │   ├── onboarding/              — guided new customer intake (COW)
     │   ├── workflow-builder/        — workflow authoring/editing
     │   ├── job-assessment/          — guided onsite detailed assessment (maps, photos, workflow mods)
@@ -91,6 +92,9 @@ source/
     │   └── job-runner/              — guided job execution engine
     └── app-style-guide/             — design-system demonstration harness
 ```
+
+(*) `shell/` holds `about-box`, `brand-hero`, and `login`; the maker wrapper binding `ux/shell`'s
+generic makers to swarmAg branding; and `session-coordinator.ts`.
 
 Everything in `source/ux/` must be adaptive and portable beyond swarmAg — mobile-only or desktop-only components do not belong there, and neither does anything that assumes swarmAg branding or swarmAg's own domain. `source/front/app/` carries that narrower scope instead: adaptive across all three swarmAg apps and all viewport sizes, but not required to generalize past swarmAg itself.
 
@@ -420,6 +424,7 @@ export type FacetsState = {
   codes: (scheme: string) => readonly string[]
   label: (scheme: string, code: string) => string
   labelRef: (ref: string) => string
+  labelRefs: (refs: readonly string[]) => readonly string[]
   refresh: () => Promise<void>
 }
 
@@ -434,12 +439,14 @@ export const useFacets = (): FacetsState => {
   }))
   const index = () => query.data ?? EMPTY_INDEX
   const label = (scheme: string, code: string) => index().label(scheme, code)
+  const labelRef = (ref: string) => label(...splitRef(ref))
   return {
     ready: () => query.isSuccess,
     schemes: () => index().schemes,
     codes: scheme => index().codes(scheme),
     label,
-    labelRef: ref => label(...splitRef(ref)),
+    labelRef,
+    labelRefs: refs => refs.map(labelRef),
     refresh: () => client.invalidateQueries({ queryKey: FACETS_QUERY_KEY })
   }
 }
@@ -708,12 +715,14 @@ components (`§9.1`).
 app/
 ├── assets/     — swarmAg brand assets (logo files, flat — one asset kind today)
 ├── components/ — swarmAg-specific reusable UI controls (placeholder — none yet)
-├── shell/      — branded chrome + wiring: about-box, brand-hero, login, and the maker wrapper
-│                 binding ux/shell's generic makers to swarmAg branding, plus session-coordinator.ts
-├── stores/     — swarmAg-suite state beyond the toolkit baseline (placeholder — none yet)
+├── shell/      — branded chrome and application wiring (*)
+├── stores/     — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
 ├── views/      — swarmAg domain projections (job-views.ts)
 └── widgets/    — swarmAg-suite widget catalog (e.g. BrandWidget)
 ```
+
+(*) `shell/` holds `about-box`, `brand-hero`, and `login`; the maker wrapper binding `ux/shell`'s
+generic makers to swarmAg branding; and `session-coordinator.ts`.
 
 #### 10.1.4 Stays in the app
 
