@@ -202,15 +202,13 @@ export const newCustomerNote = (): Note => ({
   attachments: [],
   createdAt: when(),
   content: '',
-  visibility: 'internal',
-  tags: []
+  visibility: 'internal'
 })
 
 /** Clones a note so a draft can be edited without mutating committed state. */
 export const cloneNote = (note: Note): Note => ({
   ...note,
-  attachments: note.attachments.map(attachment => ({ ...attachment })),
-  tags: [...note.tags]
+  attachments: note.attachments.map(attachment => ({ ...attachment }))
 })
 
 /** Clones a customer site so a draft can be edited without mutating committed state. */

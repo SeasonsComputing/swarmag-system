@@ -21,8 +21,7 @@ import {
   expectId,
   expectNonEmptyString,
   type ExpectResult,
-  expectValid,
-  isNonEmptyString
+  expectValid
 } from '@core/std'
 import { SERVICE_CATEGORIES } from '@domain/abstractions/service.ts'
 import type {
@@ -30,7 +29,7 @@ import type {
   ServiceRequiredAssetTypeCreate,
   ServiceUpdate
 } from '@domain/protocols/service-protocol.ts'
-import { isNote } from '@domain/validators/common-validator.ts'
+import { isFacetRef, isNote } from '@domain/validators/common-validator.ts'
 
 /** Validate ServiceCreate payloads. */
 export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
@@ -40,7 +39,7 @@ export const validateServiceCreate = (input: ServiceCreate): ExpectResult =>
     expectNonEmptyString(input.sku, 'sku'),
     expectNonEmptyString(input.description, 'description', true),
     expectConstEnum(input.category, 'category', SERVICE_CATEGORIES),
-    expectCompositionMany(input.tagsWorkflowCandidates, 'tagsWorkflowCandidates', isNonEmptyString)
+    expectCompositionMany(input.facets, 'facets', isFacetRef)
   )
 
 /** Validate ServiceUpdate payloads. */
@@ -53,9 +52,9 @@ export const validateServiceUpdate = (input: ServiceUpdate): ExpectResult =>
     expectNonEmptyString(input.description, 'description', true),
     expectConstEnum(input.category, 'category', SERVICE_CATEGORIES, true),
     expectCompositionMany(
-      input.tagsWorkflowCandidates,
-      'tagsWorkflowCandidates',
-      isNonEmptyString,
+      input.facets,
+      'facets',
+      isFacetRef,
       true
     )
   )

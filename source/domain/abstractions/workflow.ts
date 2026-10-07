@@ -120,7 +120,7 @@ export type Workflow = Instantiable & {
   name: string
   description?: string
   version: number
-  tags: CompositionMany<string>
+  facets: CompositionMany<string>
 }
 
 /** Junction from workflow to task with sequence. */

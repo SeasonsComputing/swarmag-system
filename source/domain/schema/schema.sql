@@ -39,6 +39,40 @@ DROP TABLE IF EXISTS chemicals CASCADE;
 DROP TABLE IF EXISTS assets CASCADE;
 DROP TABLE IF EXISTS asset_types CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
+DROP TABLE IF EXISTS facets CASCADE;
+
+-- ──────────────────────────────────────────────────────────────────────────────────────
+-- facets
+-- ──────────────────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE facets (
+  id UUID PRIMARY KEY,
+  scheme TEXT NOT NULL,
+  code TEXT NOT NULL,
+  label TEXT NOT NULL,
+  description TEXT,
+  active BOOLEAN NOT NULL,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  deleted_at TIMESTAMPTZ,
+  CONSTRAINT facets_scheme_code_unique UNIQUE (scheme, code)
+);
+
+ALTER TABLE facets ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "facets_select_active" ON facets
+  FOR SELECT USING (deleted_at IS NULL);
+
+CREATE POLICY "facets_insert_all" ON facets
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "facets_update_all" ON facets
+  FOR UPDATE USING (deleted_at IS NULL) WITH CHECK (true);
+
+CREATE POLICY "facets_delete_all" ON facets
+  FOR DELETE USING (deleted_at IS NULL);
+
+CREATE INDEX facets_deleted_at_idx ON facets (deleted_at);
 
 -- ──────────────────────────────────────────────────────────────────────────────────────
 -- users
@@ -262,7 +296,7 @@ CREATE TABLE services (
   sku TEXT NOT NULL,
   description TEXT,
   category TEXT NOT NULL,
-  tags_workflow_candidates JSONB NOT NULL DEFAULT '[]'::jsonb,
+  facets JSONB NOT NULL DEFAULT '[]'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ,
@@ -271,9 +305,7 @@ CREATE TABLE services (
     'ground-machinery-services'
   )),
   CONSTRAINT services_notes_array_check CHECK (jsonb_typeof(notes) = 'array'),
-  CONSTRAINT services_tags_workflow_candidates_array_check CHECK (
-    jsonb_typeof(tags_workflow_candidates) = 'array'
-  )
+  CONSTRAINT services_facets_array_check CHECK (jsonb_typeof(facets) = 'array')
 );
 
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
@@ -323,12 +355,12 @@ CREATE TABLE workflows (
   name TEXT NOT NULL,
   description TEXT,
   version INTEGER NOT NULL,
-  tags JSONB NOT NULL DEFAULT '[]'::jsonb,
+  facets JSONB NOT NULL DEFAULT '[]'::jsonb,
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   deleted_at TIMESTAMPTZ,
   CONSTRAINT workflows_notes_array_check CHECK (jsonb_typeof(notes) = 'array'),
-  CONSTRAINT workflows_tags_array_check CHECK (jsonb_typeof(tags) = 'array')
+  CONSTRAINT workflows_facets_array_check CHECK (jsonb_typeof(facets) = 'array')
 );
 
 ALTER TABLE workflows ENABLE ROW LEVEL SECURITY;
@@ -797,7 +829,7 @@ INSERT INTO auth.users (
 );
 
 -- GoTrue resolves an email sign-in through auth.identities, not auth.users alone. Without
--- this row the seed user is invisible to the OTP flow and sign-in fails with "Signups not
+-- this row the seed user is invisible to the OTP flow and sign-in fails with "Sign-ups not
 -- allowed for otp" because the client requests shouldCreateUser: false.
 INSERT INTO auth.identities (
   provider_id,
@@ -863,7 +895,7 @@ INSERT INTO services (
   sku,
   description,
   category,
-  tags_workflow_candidates,
+  facets,
   created_at,
   updated_at,
   deleted_at

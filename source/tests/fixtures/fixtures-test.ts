@@ -10,6 +10,7 @@ import {
   assetTypeSamples,
   customerSamples,
   customerUserSamples,
+  facetSamples,
   jobSamples,
   sharedQuestionSamples
 } from './samples.ts'
@@ -85,5 +86,19 @@ Deno.test('fixture integrity: shared questions include labels and values', () =>
         ) => option.value && option.label)
       )
     }
+  }
+})
+
+Deno.test('fixture integrity: facet fixtures carry reserved-free keys and unique pairs', () => {
+  const seen = new StringSet()
+  for (const facet of facetSamples) {
+    assert(isId(facet.id))
+    assert(facet.scheme.length > 0 && !facet.scheme.includes(':'))
+    assert(facet.code.length > 0 && !facet.code.includes(':'))
+    assert(facet.label.length > 0)
+    assertEquals(typeof facet.active, 'boolean')
+    const ref = `${facet.scheme}:${facet.code}`
+    assert(!seen.has(ref))
+    seen.add(ref)
   }
 })

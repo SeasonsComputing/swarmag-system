@@ -59,7 +59,7 @@ export const WorkflowAdapter = makeAdapter<Workflow>({
   name: ['name'],
   description: ['description'],
   version: ['version'],
-  tags: ['tags']
+  facets: ['facets']
 })
 
 /** Deserialize/Serialize WorkflowTask. */

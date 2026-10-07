@@ -34,8 +34,7 @@ import {
   expectPositiveNumber,
   type ExpectResult,
   expectValid,
-  expectWhen,
-  isNonEmptyString
+  expectWhen
 } from '@core/std'
 import type { Answer, SelectOption } from '@domain/abstractions/workflow.ts'
 import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
@@ -51,7 +50,7 @@ import type {
   WorkflowTaskUpdate,
   WorkflowUpdate
 } from '@domain/protocols/workflow-protocol.ts'
-import { isNote } from '@domain/validators/common-validator.ts'
+import { isFacetRef, isNote } from '@domain/validators/common-validator.ts'
 
 /** Validate QuestionCreate payloads. */
 export const validateQuestionCreate = (input: QuestionCreate): ExpectResult => {
@@ -139,7 +138,7 @@ export const validateWorkflowCreate = (input: WorkflowCreate): ExpectResult =>
     expectNonEmptyString(input.name, 'name'),
     expectNonEmptyString(input.description, 'description', true),
     expectPositiveNumber(input.version, 'version'),
-    expectCompositionMany(input.tags, 'tags', isNonEmptyString)
+    expectCompositionMany(input.facets, 'facets', isFacetRef)
   )
 
 /** Validate WorkflowUpdate payloads. */
@@ -150,7 +149,7 @@ export const validateWorkflowUpdate = (input: WorkflowUpdate): ExpectResult =>
     expectNonEmptyString(input.name, 'name', true),
     expectNonEmptyString(input.description, 'description', true),
     expectPositiveNumber(input.version, 'version', true),
-    expectCompositionMany(input.tags, 'tags', isNonEmptyString, true)
+    expectCompositionMany(input.facets, 'facets', isFacetRef, true)
   )
 
 /** Validate WorkflowTaskCreate payloads. */
