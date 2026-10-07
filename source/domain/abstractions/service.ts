@@ -34,7 +34,7 @@ export type Service = Instantiable & {
   sku: string
   description?: string
   category: ServiceCategory
-  tagsWorkflowCandidates: CompositionMany<string>
+  facets: CompositionMany<string>
 }
 
 /** Junction for service-to-asset-type requirement. */

@@ -25,6 +25,7 @@ Adapt<T>                  Metadata map from domain keys to storage columns.
 makeAdapter(meta)         Create an Adapter from metadata.
 makeScopedUpdate(fields)  Create a scoped update adapter from field adapters.
 */
+
 import { Dictionary, isNullish } from './adt.ts'
 
 /** Contract for domain serialization. Null on any attribute clears its column. */

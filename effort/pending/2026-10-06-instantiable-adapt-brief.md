@@ -1,0 +1,73 @@
+# Instantiable Adapter Metadata — Brief
+
+**Backlog, not dispatched.** Recorded 2026-10-06 from a CA + AI Architect session, during
+verification of the tags → facets production (`effort/active/2026-10-06-tags-classification-brief.md`).
+
+## What triggered it
+
+Every Instantiable adapter restates the same four lifecycle mappings:
+
+```ts
+id: ['id'],
+createdAt: ['created_at'],
+updatedAt: ['updated_at'],
+deletedAt: ['deleted_at'],
+```
+
+`domain-archetypes.md` §3.2 already forbids this at the abstraction layer: extend `Instantiable` via
+intersection and never redeclare `id`, `createdAt`, `updatedAt`, or `deletedAt` inline. The
+adapters break the same rule. The CA proposed shared lifecycle metadata spread into each adapter,
+so the adapter layer follows the abstraction layer's rule.
+
+## Decisions
+
+1. **Shared lifecycle metadata in `core/std/make-adapter.ts`,** exported through `@core/stdx`:
+
+   ```ts
+   /** Adapter metadata for the InstantiableOnly lifecycle columns. */
+   export const INSTANTIABLE_ONLY_ADAPT: Adapt<InstantiableOnly> = {
+     id: ['id'],
+     createdAt: ['created_at']
+   }
+
+   /** Adapter metadata for the Instantiable lifecycle columns. */
+   export const INSTANTIABLE_ADAPT: Adapt<Instantiable> = {
+     ...INSTANTIABLE_ONLY_ADAPT,
+     updatedAt: ['updated_at'],
+     deletedAt: ['deleted_at']
+   }
+   ```
+
+   The full form composes the partial one, as `Instantiable` composes `InstantiableOnly`.
+2. **The name says what it is.** Every `XAdapter` is a real `Adapter<T>` (`toDomain`,
+   `fromDomain`, per-field adapters); this is metadata, an `Adapt<Instantiable>`. A global
+   immutable constant is SCREAMING_SNAKE (CONVENTIONS §4.2). The CA's first name,
+   `InstantiableAdapter`, would have shared the suffix without the kind.
+3. **The type annotation is required.** Untyped, `['id']` infers as `string[]` and does not spread
+   into `Adapt<T>`'s `[string, Adapter?]` tuple.
+4. **Every lifecycle adapter, and only those.** Each Instantiable adapter spreads
+   `INSTANTIABLE_ADAPT`; each InstantiableOnly adapter (`JobWorkLogEntry`) spreads
+   `INSTANTIABLE_ONLY_ADAPT`. Applying it to some adapters would be an idiom genesis does not know,
+   in some generated files (the D6 incident). A composition's own `createdAt` (`Note`) is a domain
+   attribute, not lifecycle, and stays as it is.
+
+## Production scope
+
+Operating mode: **Foundation** (`core/`, every domain topic, governance documentation).
+
+1. **Documentation.** `domain-archetypes.md` §6 adapter examples spread the metadata; the genesis
+   prompt defers to that document and needs no change. CONVENTIONS §8.6's `QuestionAdapter`
+   example likewise (governance file: committed with the governance-gate bypass).
+2. **Core.** `INSTANTIABLE_ONLY_ADAPT` and `INSTANTIABLE_ADAPT` in `make-adapter.ts`, with the
+   header's PUBLIC block.
+3. **Domain, by hand.** Every Instantiable and InstantiableOnly adapter across the eight adapter
+   files; hand edits must equal what domain genesis would produce from the updated archetypes.
+4. **Tests.** The existing adapter round-trip tests must pass unchanged; no behaviour changes.
+
+**Out of scope:** any other adapter metadata, and any change to `makeAdapter` itself.
+
+## Sequencing
+
+After the tags → facets production closes. It touches `FacetAdapter`, which that production adds.
+
+_End of Brief_

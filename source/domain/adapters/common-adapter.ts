@@ -1,22 +1,23 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Common domain adapters                                                       ║
-║ Dictionary serialization for shared value objects.                           ║
+║ Dictionary serialization for shared abstractions.                            ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Maps storage dictionaries to shared value objects and back.
+Maps storage dictionaries to shared abstractions and back.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 LocationAdapter      Deserialize/Serialize Location.
 AttachmentAdapter    Deserialize/Serialize Attachment.
 NoteAdapter          Deserialize/Serialize Note.
+FacetAdapter         Deserialize/Serialize Facet.
 */
 
 import { makeAdapter } from '@core/stdx'
-import type { Attachment, Location, Note } from '@domain/abstractions/common.ts'
+import type { Attachment, Facet, Location, Note } from '@domain/abstractions/common.ts'
 
 /** Deserialize/Serialize Location. */
 export const LocationAdapter = makeAdapter<Location>({
@@ -48,6 +49,18 @@ export const NoteAdapter = makeAdapter<Note>({
   attachments: ['attachments', AttachmentAdapter],
   createdAt: ['created_at'],
   content: ['content'],
-  visibility: ['visibility'],
-  tags: ['tags']
+  visibility: ['visibility']
+})
+
+/** Deserialize/Serialize Facet. */
+export const FacetAdapter = makeAdapter<Facet>({
+  id: ['id'],
+  createdAt: ['created_at'],
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at'],
+  scheme: ['scheme'],
+  code: ['code'],
+  label: ['label'],
+  description: ['description'],
+  active: ['active']
 })

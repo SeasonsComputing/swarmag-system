@@ -17,6 +17,7 @@ api  Shared API namespace for UX applications.
 ├ SessionState    Reactive authenticated-user session state.
 ├ Assets          Asset CRUD client.
 ├ Chemicals       Chemical CRUD client.
+├ Facets          Curated classification catalog CRUD client.
 ├ Customers       Customer CRUD client.
 ├ Jobs            Job CRUD client.
 ├ Services        Service CRUD client.
@@ -26,8 +27,11 @@ api  Shared API namespace for UX applications.
 
 import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
 import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
+import type { Facet } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
+import { FacetAdapter } from '@domain/adapters/common-adapter.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
+import { validateFacetCreate, validateFacetUpdate } from '@domain/validators/common-validator.ts'
 import { validateCustomerCreate, validateCustomerUpdate } from '@domain/validators/customer-validator.ts'
 import { AppState } from '@ux/shell/runtime/app-state.ts'
 import { SessionState } from '@ux/shell/runtime/session-state.ts'
@@ -43,6 +47,14 @@ export const api = {
   SessionState,
 
   /** Domain clients. */
+  Facets: makeCrudSupabaseClient<Facet>({
+    table: 'facets',
+    adapter: FacetAdapter,
+    validator: {
+      validateCreate: validateFacetCreate,
+      validateUpdate: validateFacetUpdate
+    }
+  }),
   // Assets: makeCrudSupabaseClient<Asset>({ table: 'assets', adapter: AssetAdapter }),
   // Chemicals: makeCrudSupabaseClient<Chemical>({ table: 'chemicals', adapter: ChemicalAdapter }),
   Customers: makeCrudSupabaseClient<Customer>({

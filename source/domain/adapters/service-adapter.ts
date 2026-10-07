@@ -29,7 +29,7 @@ export const ServiceAdapter = makeAdapter<Service>({
   sku: ['sku'],
   description: ['description'],
   category: ['category'],
-  tagsWorkflowCandidates: ['tags_workflow_candidates']
+  facets: ['facets']
 })
 
 /** Deserialize/Serialize ServiceRequiredAssetType. */

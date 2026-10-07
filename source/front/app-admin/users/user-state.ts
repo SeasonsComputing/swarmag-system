@@ -41,8 +41,7 @@ export const userDraft = (state: UserState): UserDraft => {
       attachments: [],
       createdAt: state.noteCreatedAt,
       content,
-      visibility: 'internal',
-      tags: []
+      visibility: 'internal'
     }],
     roles: state.roles(),
     status: state.status()

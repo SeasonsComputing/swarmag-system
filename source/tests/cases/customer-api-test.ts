@@ -113,7 +113,6 @@ const withCustomer = async (run: (customer: Customer) => Promise<void>): Promise
       content: 'Account history must survive editing.',
       createdAt: blueMesaRanchCustomer.createdAt,
       attachments: [],
-      tags: ['history'],
       visibility: 'internal'
     }]
   }

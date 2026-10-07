@@ -1,17 +1,15 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Common domain abstractions                                                   ║
-║ Canonical types for shared value objects.                                    ║
+║ Canonical types for shared abstractions.                                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines shared domain value objects.
+Defines shared domain abstractions and value objects.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-LOCATION_FIELDS             Canonical field keys for Location.
-LocationField               Location field derived from LOCATION_FIELDS.
 Location                    Place with coordinate and/or address substance.
 CONTACT_PREFERRED_CHANNELS  Allowed contact communication channels.
 ContactPreferredChannel     Channel type derived from CONTACT_PREFERRED_CHANNELS.
@@ -20,12 +18,13 @@ AttachmentKind              Attachment kind derived from ATTACHMENT_KINDS.
 Attachment                  Uploaded artifact metadata.
 NOTE_VISIBILITIES           Allowed note visibility values.
 NoteVisibility              Note visibility derived from NOTE_VISIBILITIES.
-Note                        Freeform note with visibility and taxonomy.
+Note                        Free form note with visibility.
+Facet                       Curated classification catalog entry.
 */
 
-import type { CompositionMany, When } from '@core/std'
+import type { CompositionMany, Instantiable, When } from '@core/std'
 
-/** Place carrying coordinate substance (latitude+longitude) or address substance (line1+city), or both; a present coordinate must be paired. */
+/** Place with paired coordinates, address substance (line1+city), or both. */
 export type Location = {
   latitude?: number
   longitude?: number
@@ -62,11 +61,19 @@ export type Attachment = {
 export const NOTE_VISIBILITIES = ['internal', 'shared'] as const
 export type NoteVisibility = (typeof NOTE_VISIBILITIES)[number]
 
-/** Freeform note with visibility and taxonomy. */
+/** Freeform note with visibility. */
 export type Note = {
   attachments: CompositionMany<Attachment>
   createdAt: When
   content: string
   visibility: NoteVisibility
-  tags: CompositionMany<string>
+}
+
+/** Curated classification catalog entry: one code within a scheme. */
+export type Facet = Instantiable & {
+  scheme: string
+  code: string
+  label: string
+  description?: string
+  active: boolean
 }
