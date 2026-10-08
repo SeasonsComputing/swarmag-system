@@ -1,11 +1,14 @@
 # Workbench List Layout — Brief
 
-**Active, not yet dispatched.** Written 2026-10-08 from a CA + AI Architect exploration session,
-after the CA's stage walkthrough of the tags → facets production found cosmetic defects in the
-workbench. Chosen for immediate production, so it starts in `effort/active/`. Reviewed by the AI Coding
-Engine on 2026-10-08; the amendment at the end resolves that review and marks the items it
-changes. It awaits the production gate. It also settles the workbench Aside/Main proportion the CA
-had asked to revisit after the 2026-10-04 walkthrough.
+**Closed 2026-10-08: shipped, reviewed, and independently verified.** Written 2026-10-08 from a
+CA + AI Architect exploration session, after the CA's stage walkthrough of the tags → facets
+production found cosmetic defects in the workbench. Chosen for immediate production, so it started
+in `effort/active/`. Reviewed by the AI Coding Engine; the amendments at the end resolve that
+review and record the corrections made during production and verification. Produced by the AI
+Coding Engine and verified by the AI Architect against the diff, the check output, and a scratch
+guard fixture; the CA's app walkthrough and style-guide regression check passed. Shipped in
+`fc54364`. It also settled the workbench Aside/Main proportion the CA had asked to revisit after
+the 2026-10-04 walkthrough.
 
 ## What triggered it
 
