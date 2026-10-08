@@ -1,10 +1,12 @@
 # Tags → Facets — Brief
 
-**Active, not yet dispatched.** Chosen 2026-10-06 as roadmap §4's tags step and written the same
-day from a CA + AI Architect exploration session. Reviewed by the AI Coding Engine on 2026-10-06;
-the amendment at the end resolves that review and marks the items it changes. It awaits the
-production gate. The documentation half of the production is done. Seeding questions it raised
-are carried by `effort/pending/2026-10-06-facets-workflow-seeding-brief.md`.
+**Closed 2026-10-08: shipped, reviewed, and independently verified.** Chosen 2026-10-06 as
+roadmap §4's tags step and written the same day from a CA + AI Architect exploration session.
+Reviewed by the AI Coding Engine on 2026-10-06; the amendment at the end resolves that review and
+marks the items it changes. Produced by the AI Coding Engine and verified by the AI Architect
+against the diff and check output; stage genesis and the edge deploy preceded the CA's walkthrough,
+which passed. Shipped in `56a2b99`. Seeding questions it raised are carried by
+`effort/pending/2026-10-06-facets-workflow-seeding-brief.md`.
 
 ## What triggered it
 

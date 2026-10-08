@@ -60,7 +60,7 @@ Workflow classification moves to curated facets. The Notes Editor shows no tags.
 
 **Sequence:**
 
-1. **Tags → facets** — active: `effort/active/2026-10-06-tags-classification-brief.md`.
+1. **Tags → facets** — completed 2026-10-08: `effort/completed/2026-10-06-tags-classification-brief.md`.
 2. **Notes Editor brief.**
 3. **Notes Editor production.**
 4. **Milestone verification,** this milestone, then §1.
