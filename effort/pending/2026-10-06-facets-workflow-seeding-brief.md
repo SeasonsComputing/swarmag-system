@@ -2,9 +2,8 @@
 
 **Backlog, not dispatched.** Recorded 2026-10-06 from a CA + AI Architect exploration session as
 design input for roadmap §6 (Workflow, Task, Question & Service). It carries the seeding questions
-handed off by `effort/active/2026-10-06-tags-classification-brief.md`, which decided the facet
-catalog and its references. The CA describes the vision as rough at the edges: details may need rethinking when §6 is
-designed in full.
+handed off by `effort/completed/2026-10-06-tags-classification-brief.md`, which decided the facet
+catalog and its references. The CA describes the vision as rough at the edges: details may need rethinking when §6 is designed in full.
 
 ## The vision (CA, 2026-10-06)
 

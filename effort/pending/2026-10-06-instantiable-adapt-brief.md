@@ -1,7 +1,7 @@
 # Instantiable Adapter Metadata — Brief
 
 **Backlog, not dispatched.** Recorded 2026-10-06 from a CA + AI Architect session, during
-verification of the tags → facets production (`effort/active/2026-10-06-tags-classification-brief.md`).
+verification of the tags → facets production (`effort/completed/2026-10-06-tags-classification-brief.md`).
 
 ## What triggered it
 
