@@ -1,9 +1,13 @@
 # Instantiable Adapter Metadata — Brief
 
-**Active, not yet dispatched.** Recorded 2026-10-06 from a CA + AI Architect session, during
-verification of the tags → facets production (`effort/completed/2026-10-06-tags-classification-brief.md`).
-Chosen 2026-10-08 and reviewed by the AI Coding Engine the same day; the amendment at the end
-resolves that review and marks the items it changes. It awaits the production gate.
+**Closed 2026-10-08: shipped, reviewed, and independently verified.** Recorded 2026-10-06 from a
+CA + AI Architect session, during verification of the tags → facets production
+(`effort/completed/2026-10-06-tags-classification-brief.md`). Chosen 2026-10-08 and reviewed by the
+AI Coding Engine the same day; the amendment at the end resolves that review. Produced by the AI
+Coding Engine; the CA corrected one import (`make-adapter.ts` imported `instance.ts` through its
+own namespace's alias, against the 2026-10-04 import rule). Verified by the AI Architect against the
+diff and check output: 17 `InstantiableAdapt` spreads, one `InstantiableOnlyAdapt` spread, no
+lifecycle mapping left inline, and `NoteAdapter.createdAt` explicit.
 
 ## What triggered it
 
