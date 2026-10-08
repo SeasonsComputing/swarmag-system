@@ -499,19 +499,7 @@ Nothing guards this today because no Jobs exist yet. Picking this up: with Job D
 
 **Observed:** 2026-10-03 · normal
 
-`Customer.notes` holds notes on the account itself, separate from the notes on each job site.
-Customer Manager does not edit it: `scopes.Customers.detail` deliberately excludes it, and
-Onboarding creates every Customer with `notes: []`. Site notes are editable today, through the
-Sites step's local `NoteEditor`.
-
-When the Notes Editor (roadmap §4) is integrated into User Manager, integrate it into Customer
-Manager in the same production:
-
-- an account-notes surface in the Customer Detail;
-- `CustomerAdapter.notes` added to `scopes.Customers.detail`;
-- the Sites step's local `NoteEditor` replaced, so both note surfaces share one editor.
-
-Picking this up: with roadmap §4.
+Carried by [Notes Editor — Brief](../active/2026-10-08-notes-editor-brief.md), scope item 5.
 
 ## UX
 
