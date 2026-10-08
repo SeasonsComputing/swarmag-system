@@ -113,7 +113,7 @@ Two inputs for the inventory:
 ## Amendment — 2026-10-08 — Constant naming rule
 
 Added at the CA's direction during the 2026-10-08 review of
-`effort/active/2026-10-06-instantiable-adapt-brief.md`. The rule is general, not specific to
+`effort/completed/2026-10-06-instantiable-adapt-brief.md`. The rule is general, not specific to
 `core/`; the CA placed it here as the CONVENTIONS reconciliation task, which narrows the
 out-of-scope line above for this one rule.
 
@@ -131,7 +131,12 @@ out-of-scope line above for this one rule.
 - **For the reconciliation:** state the distinction in §4.2 (a governance file: committed with the
   governance-gate bypass), and consider whether a guard can enforce it.
 - **Also for the reconciliation: CONVENTIONS §8.6.** Its `QuestionAdapter` example restates the
-  lifecycle mappings. Once `effort/active/2026-10-06-instantiable-adapt-brief.md` ships, it spreads
-  `InstantiableAdapt`, as `domain-archetypes.md` §6 will; deferred here from that brief.
+  lifecycle mappings. It should spread `InstantiableAdapt`, as `domain-archetypes.md` §6 now does
+  (`effort/completed/2026-10-06-instantiable-adapt-brief.md`, shipped 2026-10-08); deferred here
+  from that brief.
+- **Evidence for the import rule's guard.** In the same production, `make-adapter.ts` imported
+  `instance.ts` through its own namespace's alias; the CA caught it in review. The 2026-10-04
+  import rule (amendment above) is still written nowhere a producer would read it, and no guard
+  enforces it.
 
 _End of Backlog Brief_
