@@ -563,6 +563,36 @@ export type Adapt<T> = { [K in keyof T]: AdaptDelegate }
 
 `makeAdapter(meta)` is the canonical adapter maker for domain archetypes.
 
+Lifecycle metadata is shared from `@core/stdx`: every `Instantiable` adapter spreads
+`InstantiableAdapt`, and every `InstantiableOnly` adapter spreads `InstantiableOnlyAdapt`.
+No adapter restates lifecycle mappings inline. These constants are `Adapt<T>` metadata, not
+`Adapter<T>` instances.
+
+```typescript
+import { InstantiableAdapt, InstantiableOnlyAdapt, makeAdapter } from '@core/stdx'
+import type { Facet } from '@domain/abstractions/common.ts'
+import type { JobWorkLogEntry } from '@domain/abstractions/job.ts'
+import { AnswerAdapter } from '@domain/adapters/workflow-adapter.ts'
+
+/** Deserialize/Serialize Facet. */
+export const FacetAdapter = makeAdapter<Facet>({
+  ...InstantiableAdapt,
+  scheme: ['scheme'],
+  code: ['code'],
+  label: ['label'],
+  description: ['description'],
+  active: ['active']
+})
+
+/** Deserialize/Serialize JobWorkLogEntry. */
+export const JobWorkLogEntryAdapter = makeAdapter<JobWorkLogEntry>({
+  ...InstantiableOnlyAdapt,
+  jobId: ['job_id'],
+  userId: ['user_id'],
+  answer: ['answer', AnswerAdapter]
+})
+```
+
 ### 6.3 Column and Key Conventions
 
 Domain fields use `camelCase`. Storage columns use `snake_case`.\
@@ -579,6 +609,9 @@ Every mapped field is explicit through metadata.
 ### 6.4 Composition and Delegation
 
 For nested composition values, metadata uses delegate adapters. Delegates apply recursively to both object and array values.
+
+A composition's own `createdAt`, such as `Note.createdAt`, is a domain attribute rather than
+lifecycle metadata. Map it explicitly; compositions and junctions do not spread lifecycle metadata.
 
 ```typescript
 import { makeAdapter } from '@core/stdx'

@@ -16,7 +16,7 @@ CustomerUserAdapter  Deserialize/Serialize CustomerUser.
 CustomerAdapter      Deserialize/Serialize Customer.
 */
 
-import { makeAdapter } from '@core/stdx'
+import { InstantiableAdapt, makeAdapter } from '@core/stdx'
 import type { Contact, Customer, CustomerSite, CustomerUser } from '@domain/abstractions/customer.ts'
 import { LocationAdapter, NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
@@ -44,10 +44,7 @@ export const CustomerUserAdapter = makeAdapter<CustomerUser>({
 
 /** Deserialize/Serialize Customer. */
 export const CustomerAdapter = makeAdapter<Customer>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   accountManagerId: ['account_manager_id'],
   primaryContact: ['primary_contact', ContactAdapter],
   sites: ['sites', CustomerSiteAdapter],

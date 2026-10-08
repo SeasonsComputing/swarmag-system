@@ -21,7 +21,7 @@ JobWorkAdapter            Deserialize/Serialize JobWork.
 JobWorkLogEntryAdapter    Deserialize/Serialize JobWorkLogEntry.
 */
 
-import { makeAdapter } from '@core/stdx'
+import { InstantiableAdapt, InstantiableOnlyAdapt, makeAdapter } from '@core/stdx'
 import type {
   Job,
   JobAssessment,
@@ -38,20 +38,14 @@ import { AnswerAdapter } from '@domain/adapters/workflow-adapter.ts'
 
 /** Deserialize/Serialize Job. */
 export const JobAdapter = makeAdapter<Job>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   customerId: ['customer_id'],
   status: ['status']
 })
 
 /** Deserialize/Serialize JobAssessment. */
 export const JobAssessmentAdapter = makeAdapter<JobAssessment>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   scheduledAt: ['scheduled_at'],
   startedAt: ['started_at'],
   completedAt: ['completed_at'],
@@ -64,10 +58,7 @@ export const JobAssessmentAdapter = makeAdapter<JobAssessment>({
 
 /** Deserialize/Serialize JobWorkflow. */
 export const JobWorkflowAdapter = makeAdapter<JobWorkflow>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   jobId: ['job_id'],
   basisWorkflowId: ['basis_workflow_id'],
   modifiedWorkflowId: ['modified_workflow_id']
@@ -75,10 +66,7 @@ export const JobWorkflowAdapter = makeAdapter<JobWorkflow>({
 
 /** Deserialize/Serialize JobPlan. */
 export const JobPlanAdapter = makeAdapter<JobPlan>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   jobId: ['job_id'],
   plannerId: ['planner_id'],
   notes: ['notes', NoteAdapter],
@@ -88,10 +76,7 @@ export const JobPlanAdapter = makeAdapter<JobPlan>({
 
 /** Deserialize/Serialize JobPlanAssignment. */
 export const JobPlanAssignmentAdapter = makeAdapter<JobPlanAssignment>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   planId: ['plan_id'],
   crewMemberId: ['crew_member_id'],
   notes: ['notes', NoteAdapter],
@@ -100,10 +85,7 @@ export const JobPlanAssignmentAdapter = makeAdapter<JobPlanAssignment>({
 
 /** Deserialize/Serialize JobPlanChemical. */
 export const JobPlanChemicalAdapter = makeAdapter<JobPlanChemical>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   planId: ['plan_id'],
   chemicalId: ['chemical_id'],
   amount: ['amount'],
@@ -120,10 +102,7 @@ export const JobPlanAssetAdapter = makeAdapter<JobPlanAsset>({
 
 /** Deserialize/Serialize JobWork. */
 export const JobWorkAdapter = makeAdapter<JobWork>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   jobId: ['job_id'],
   startedById: ['started_by_id'],
   work: ['work'],
@@ -133,8 +112,7 @@ export const JobWorkAdapter = makeAdapter<JobWork>({
 
 /** Deserialize/Serialize JobWorkLogEntry. */
 export const JobWorkLogEntryAdapter = makeAdapter<JobWorkLogEntry>({
-  id: ['id'],
-  createdAt: ['created_at'],
+  ...InstantiableOnlyAdapt,
   jobId: ['job_id'],
   userId: ['user_id'],
   answer: ['answer', AnswerAdapter]

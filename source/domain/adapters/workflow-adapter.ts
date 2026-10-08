@@ -19,7 +19,7 @@ QuestionAdapter      Deserialize/Serialize Question.
 AnswerAdapter        Deserialize/Serialize Answer.
 */
 
-import { makeAdapter } from '@core/stdx'
+import { InstantiableAdapt, makeAdapter } from '@core/stdx'
 import type {
   Answer,
   Question,
@@ -33,10 +33,7 @@ import { NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
 /** Deserialize/Serialize Task. */
 export const TaskAdapter = makeAdapter<Task>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   notes: ['notes', NoteAdapter],
   label: ['label'],
   description: ['description']
@@ -51,10 +48,7 @@ export const TaskQuestionAdapter = makeAdapter<TaskQuestion>({
 
 /** Deserialize/Serialize Workflow. */
 export const WorkflowAdapter = makeAdapter<Workflow>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   notes: ['notes', NoteAdapter],
   name: ['name'],
   description: ['description'],
@@ -78,10 +72,7 @@ export const SelectOptionAdapter = makeAdapter<SelectOption>({
 
 /** Deserialize/Serialize Question. */
 export const QuestionAdapter = makeAdapter<Question>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   type: ['type'],
   prompt: ['prompt'],
   helpText: ['help_text'],

@@ -21,12 +21,15 @@ Adapter<T>                Domain serialization contract.
 └ fromDomain(patch)       Serialize domain patch to storage dictionary.
 AdaptDelegate             Column mapping with optional nested adapter delegate.
 Adapt<T>                  Metadata map from domain keys to storage columns.
+InstantiableOnlyAdapt     Metadata for identity and created timestamp columns.
+InstantiableAdapt         Metadata for all Instantiable lifecycle columns.
 
 makeAdapter(meta)         Create an Adapter from metadata.
 makeScopedUpdate(fields)  Create a scoped update adapter from field adapters.
 */
 
 import { Dictionary, isNullish } from './adt.ts'
+import type { Instantiable, InstantiableOnly } from './instance.ts'
 
 /** Contract for domain serialization. Null on any attribute clears its column. */
 export type AdapterPatch<T> = { [K in keyof T]?: T[K] | null } & Dictionary
@@ -56,6 +59,19 @@ export type Adapter<T> = {
  */
 export type AdaptDelegate = [string, Adapter<unknown>?]
 export type Adapt<T> = { [K in keyof T]: AdaptDelegate }
+
+/** Adapter metadata for the InstantiableOnly lifecycle columns. */
+export const InstantiableOnlyAdapt: Adapt<InstantiableOnly> = {
+  id: ['id'],
+  createdAt: ['created_at']
+}
+
+/** Adapter metadata for the Instantiable lifecycle columns. */
+export const InstantiableAdapt: Adapt<Instantiable> = {
+  ...InstantiableOnlyAdapt,
+  updatedAt: ['updated_at'],
+  deletedAt: ['deleted_at']
+}
 
 /** Maker for domain adapters. */
 export function makeAdapter<T>(meta: Adapt<T>): Adapter<T> {

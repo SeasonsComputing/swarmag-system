@@ -13,16 +13,13 @@ PUBLIC
 UserAdapter  Deserialize/Serialize User.
 */
 
-import { makeAdapter } from '@core/stdx'
+import { InstantiableAdapt, makeAdapter } from '@core/stdx'
 import type { User } from '@domain/abstractions/user.ts'
 import { NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
 /** Deserialize/Serialize User. */
 export const UserAdapter = makeAdapter<User>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   roles: ['roles'],
   notes: ['notes', NoteAdapter],
   displayName: ['display_name'],

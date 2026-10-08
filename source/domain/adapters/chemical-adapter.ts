@@ -14,7 +14,7 @@ ChemicalLabelAdapter  Deserialize/Serialize ChemicalLabel.
 ChemicalAdapter       Deserialize/Serialize Chemical.
 */
 
-import { makeAdapter } from '@core/stdx'
+import { InstantiableAdapt, makeAdapter } from '@core/stdx'
 import type { Chemical, ChemicalLabel } from '@domain/abstractions/chemical.ts'
 import { NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
@@ -26,10 +26,7 @@ export const ChemicalLabelAdapter = makeAdapter<ChemicalLabel>({
 
 /** Deserialize/Serialize Chemical. */
 export const ChemicalAdapter = makeAdapter<Chemical>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   labels: ['labels', ChemicalLabelAdapter],
   notes: ['notes', NoteAdapter],
   name: ['name'],

@@ -16,7 +16,7 @@ NoteAdapter          Deserialize/Serialize Note.
 FacetAdapter         Deserialize/Serialize Facet.
 */
 
-import { makeAdapter } from '@core/stdx'
+import { InstantiableAdapt, makeAdapter } from '@core/stdx'
 import type { Attachment, Facet, Location, Note } from '@domain/abstractions/common.ts'
 
 /** Deserialize/Serialize Location. */
@@ -54,10 +54,7 @@ export const NoteAdapter = makeAdapter<Note>({
 
 /** Deserialize/Serialize Facet. */
 export const FacetAdapter = makeAdapter<Facet>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   scheme: ['scheme'],
   code: ['code'],
   label: ['label'],
