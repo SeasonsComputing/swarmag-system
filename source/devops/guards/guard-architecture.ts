@@ -8,7 +8,7 @@ import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
 /** Namespace to directory mapping */
-const NAMESPACE_DIRS = {
+const NamespaceDirs = {
   core: '/source/core',
   domain: '/source/domain',
   back: '/source/back',
@@ -19,11 +19,11 @@ const NAMESPACE_DIRS = {
 } as const
 
 type Namespace =
-  | keyof typeof NAMESPACE_DIRS
+  | keyof typeof NamespaceDirs
   | 'external'
 
 /** Allowed dependencies per namespace (downward dependency flow) */
-const ALLOWED_DEPS: Record<Namespace, Set<Namespace>> = {
+const AllowedDeps: Record<Namespace, Set<Namespace>> = {
   tests: new Set(['tests', 'ux', 'front', 'back', 'domain', 'core', 'external']),
   devops: new Set(['devops', 'ux', 'front', 'back', 'domain', 'core', 'external']),
   ux: new Set(['ux', 'domain', 'core', 'external']),
@@ -55,7 +55,7 @@ const normalizePath = (value: string): string => value.replaceAll('\\', '/')
 
 const namespaceForPath = (path: string): Namespace | null => {
   const normalized = normalizePath(path)
-  for (const [namespace, dir] of Object.entries(NAMESPACE_DIRS)) {
+  for (const [namespace, dir] of Object.entries(NamespaceDirs)) {
     if (normalized.includes(dir)) return namespace as Namespace
   }
   return null
@@ -192,7 +192,7 @@ const exists = async (path: string): Promise<boolean> => {
 }
 
 const main = async () => {
-  const roots = Object.values(NAMESPACE_DIRS).map(dir => `${ROOT}${dir}`)
+  const roots = Object.values(NamespaceDirs).map(dir => `${ROOT}${dir}`)
   const existingRoots = []
   for (const root of roots) {
     if (await exists(root)) existingRoots.push(root)
@@ -210,7 +210,7 @@ const main = async () => {
     const relative = file.replace(`${ROOT}/`, '')
 
     // Check namespace dependency rules
-    const allowed = ALLOWED_DEPS[namespace]
+    const allowed = AllowedDeps[namespace]
     for (const entry of imports) {
       const target = namespaceForSpecifier(entry.specifier, file)
       if (!allowed.has(target)) {

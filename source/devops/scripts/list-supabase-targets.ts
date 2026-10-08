@@ -41,7 +41,7 @@ type TargetMap = { [target: string]: ProjectEntry }
 
 const TARGETS: Target[] = ['dev', 'stage', 'prod']
 
-const TARGET_KEYWORDS: { [target in Target]: string[] } = {
+const TargetKeywords: { [target in Target]: string[] } = {
   dev: ['dev', 'development'],
   stage: ['stage', 'staging'],
   prod: ['prod', 'production']
@@ -116,7 +116,7 @@ const fetchProjects = async (): Promise<SupabaseProject[]> => {
 const projectMatchesTarget = (project: SupabaseProject, target: Target): boolean => {
   const name = project.name.toLowerCase()
   if (!name.includes('swarmag')) return false
-  return TARGET_KEYWORDS[target].some(keyword => name.includes(keyword))
+  return TargetKeywords[target].some(keyword => name.includes(keyword))
 }
 
 const resolveProject = (projects: SupabaseProject[], target: Target): ProjectEntry => {

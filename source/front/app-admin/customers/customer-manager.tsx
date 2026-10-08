@@ -64,8 +64,8 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
         align: 'center',
         render: customer => (
           <StatusBadge
-            variant={CUSTOMER_STATUS_BADGES[customer.status].variant}
-            icon={CUSTOMER_STATUS_BADGES[customer.status].icon}
+            variant={CustomerStatusBadges[customer.status].variant}
+            icon={CustomerStatusBadges[customer.status].icon}
             label={UiText.label(customer.status)}
           />
         )
@@ -111,7 +111,7 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
 }
 
 /** Status tones and glyphs cover every Customer status. */
-const CUSTOMER_STATUS_BADGES: Record<CustomerStatus, { variant: UiBadgeVariant; icon: string }> = {
+const CustomerStatusBadges: Record<CustomerStatus, { variant: UiBadgeVariant; icon: string }> = {
   active: { variant: 'success', icon: 'check' },
   inactive: { variant: 'warning', icon: 'minus' },
   prospect: { variant: 'info', icon: 'target' }
