@@ -17,11 +17,12 @@ UserManager       User management workbench.
 import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/form-scopes.ts'
+import { StatusBadge } from '@front/app/shell/status-badge.tsx'
 import { For, Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
-import { UiAlert, UiLayout, UiTableCell, UiText } from '@ux/ui'
+import { UiAlert, UiLayout, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { createUserState, userDraft } from './user-state.ts'
 import type { UserDraft } from './user-state.ts'
@@ -42,7 +43,20 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
   const userManager: AbstractionManagerContract<User, UserDraft> = {
     formTitle: 'User Manager',
     entityLabel: 'User',
-    listColumns: ['User', 'Active'],
+    listColumns: [
+      { label: 'User', render: user => <UserListIdentity user={user} /> },
+      {
+        label: 'Active',
+        align: 'center',
+        render: user => (
+          <StatusBadge
+            variant={user.status === 'active' ? 'success' : 'warning'}
+            icon={user.status === 'active' ? 'check' : 'minus'}
+            label={UiText.label(user.status)}
+          />
+        )
+      }
+    ],
     list: () => usersQuery.data ?? [],
     isListLoading: () => usersQuery.isPending,
     itemLabel: user => user.displayName,
@@ -79,7 +93,6 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
         }
       }
     ],
-    renderListCells: user => <UserListCells user={user} />,
     detail: user => {
       const state = createUserState(user)
       return {
@@ -112,37 +125,23 @@ async function loadUsers(): Promise<User[]> {
   return result.data
 }
 
-/** Renders table cells for one user. */
-function UserListCells(props: { user: User }): UiComponent {
+/** Renders the identity content for one user. */
+function UserListIdentity(props: { user: User }): UiComponent {
   return (
-    <>
-      <UiTableCell>
-        <UiLayout variant='block-fit' gap='none'>
-          <span>{props.user.displayName}</span>
-          <span data-app='user-list-email'>{props.user.primaryEmail}</span>
-          <span data-app='user-list-roles'>
-            <For each={props.user.roles}>
-              {(role, index) => (
-                <>
-                  {index() > 0 ? ', ' : ''}
-                  <span data-app='user-list-role'>{UiText.label(role)}</span>
-                </>
-              )}
-            </For>
-          </span>
-        </UiLayout>
-      </UiTableCell>
-      <UiTableCell>
-        <span data-app='user-status-pill' data-app-status={props.user.status}>
-          <span
-            aria-label={UiText.label(props.user.status)}
-            data-app='user-status'
-            role='img'
-            title={UiText.label(props.user.status)}
-          />
-        </span>
-      </UiTableCell>
-    </>
+    <UiLayout variant='block-fit' gap='none'>
+      <span>{props.user.displayName}</span>
+      <span data-app='user-list-email'>{props.user.primaryEmail}</span>
+      <span data-app='user-list-roles'>
+        <For each={props.user.roles}>
+          {(role, index) => (
+            <>
+              {index() > 0 ? ', ' : ''}
+              <span data-app='user-list-role'>{UiText.label(role)}</span>
+            </>
+          )}
+        </For>
+      </span>
+    </UiLayout>
   )
 }
 

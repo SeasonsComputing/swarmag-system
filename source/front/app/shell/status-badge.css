@@ -1,0 +1,8 @@
+/* Status graphic inherits UiBadge's variant color and the catalog glyph. */
+[data-app='status-badge'] [data-app='status-badge-icon'] {
+  background: currentColor;
+  block-size: var(--sa-space-md);
+  display: inline-block;
+  inline-size: var(--sa-space-md);
+  mask: var(--sa-icon) center / contain no-repeat;
+}

@@ -332,52 +332,58 @@ export const AbstractionManager = <T extends Instantiable, Draft>(
               when={!props.provider.isListLoading()}
               fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
             >
-              <UiTable overflow='scroll'>
-                <UiTableHeader>
-                  <For each={props.provider.listColumns}>
-                    {column => <UiTableCell>{column}</UiTableCell>}
-                  </For>
-                  <UiTableCell align='end'>Actions</UiTableCell>
-                </UiTableHeader>
-                <UiTableBody>
-                  <Show
-                    when={props.provider.list().length > 0}
-                    fallback={
-                      <UiTableRow variant='section'>
-                        <UiTableCell>
-                          No {props.provider.entityLabel.toLowerCase()}s found.
-                        </UiTableCell>
-                      </UiTableRow>
-                    }
-                  >
-                    <For each={props.provider.list()}>
-                      {item => (
-                        // The row itself opens the editor — no edit action.
-                        <UiTableRow onActivate={() => onSelect(item)}>
-                          {props.provider.renderListCells(item)}
-                          <UiTableCell align='end'>
-                            <For each={props.provider.actions}>
-                              {action => (
-                                <UiActionButton
-                                  icon={action.icon}
-                                  label={action.label}
-                                  variant={action.variant}
-                                  disabled={savePending() || actionPending()}
-                                  density='dense'
-                                  onClick={event => {
-                                    event.stopPropagation()
-                                    requestAction(action, item)
-                                  }}
-                                />
-                              )}
-                            </For>
+              <div data-shell='abstraction-manager-list'>
+                <UiTable>
+                  <UiTableHeader>
+                    <For each={props.provider.listColumns}>
+                      {column => <UiTableCell align={column.align}>{column.label}</UiTableCell>}
+                    </For>
+                    <UiTableCell align='end'>Actions</UiTableCell>
+                  </UiTableHeader>
+                  <UiTableBody>
+                    <Show
+                      when={props.provider.list().length > 0}
+                      fallback={
+                        <UiTableRow variant='section'>
+                          <UiTableCell>
+                            No {props.provider.entityLabel.toLowerCase()}s found.
                           </UiTableCell>
                         </UiTableRow>
-                      )}
-                    </For>
-                  </Show>
-                </UiTableBody>
-              </UiTable>
+                      }
+                    >
+                      <For each={props.provider.list()}>
+                        {item => (
+                          // The row itself opens the editor — no edit action.
+                          <UiTableRow onActivate={() => onSelect(item)}>
+                            <For each={props.provider.listColumns}>
+                              {column => (
+                                <UiTableCell align={column.align}>{column.render(item)}</UiTableCell>
+                              )}
+                            </For>
+                            <UiTableCell align='end'>
+                              <For each={props.provider.actions}>
+                                {action => (
+                                  <UiActionButton
+                                    icon={action.icon}
+                                    label={action.label}
+                                    variant={action.variant}
+                                    disabled={savePending() || actionPending()}
+                                    density='dense'
+                                    onClick={event => {
+                                      event.stopPropagation()
+                                      requestAction(action, item)
+                                    }}
+                                  />
+                                )}
+                              </For>
+                            </UiTableCell>
+                          </UiTableRow>
+                        )}
+                      </For>
+                    </Show>
+                  </UiTableBody>
+                </UiTable>
+              </div>
             </Show>
           </PanelList>
         }

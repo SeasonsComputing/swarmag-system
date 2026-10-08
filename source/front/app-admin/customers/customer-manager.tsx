@@ -16,15 +16,16 @@ CustomerManager       Customer collection and editor host.
 */
 
 import { demandOne } from '@core/std'
-import type { Customer } from '@domain/abstractions/customer.ts'
+import type { Customer, CustomerStatus } from '@domain/abstractions/customer.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/form-scopes.ts'
+import { StatusBadge } from '@front/app/shell/status-badge.tsx'
 import { Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
-import { UiAlert, UiTableCell, UiText } from '@ux/ui'
-import type { UiComponent } from '@ux/ui'
+import { UiAlert, UiLayout, UiText } from '@ux/ui'
+import type { UiBadgeVariant, UiComponent } from '@ux/ui'
 import { createCustomerState, customerDraft } from './customer-state.ts'
 import type { CustomerDraft } from './customer-state.ts'
 import { customerSteps } from './customer-steps.tsx'
@@ -46,7 +47,30 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
   const provider: AbstractionManagerContract<Customer, CustomerDraft> = {
     formTitle: 'Customer Manager',
     entityLabel: 'Customer',
-    listColumns: ['Customer', 'Contact', 'Status'],
+    listColumns: [
+      {
+        label: 'Customer',
+        render: customer => (
+          <UiLayout variant='block-fit' gap='none'>
+            <span data-app='customer-list-name'>{customer.name}</span>
+            <span data-app='customer-list-contact'>
+              {demandOne(customer.primaryContact).displayName}
+            </span>
+          </UiLayout>
+        )
+      },
+      {
+        label: 'Status',
+        align: 'center',
+        render: customer => (
+          <StatusBadge
+            variant={CUSTOMER_STATUS_BADGES[customer.status].variant}
+            icon={CUSTOMER_STATUS_BADGES[customer.status].icon}
+            label={UiText.label(customer.status)}
+          />
+        )
+      }
+    ],
     list: () => customersQuery.data ?? [],
     isListLoading: () => customersQuery.isPending,
     itemLabel: customer => customer.name,
@@ -67,13 +91,6 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
         await api.Customers.delete(customer.id)
       }
     }],
-    renderListCells: customer => (
-      <>
-        <UiTableCell>{customer.name}</UiTableCell>
-        <UiTableCell>{demandOne(customer.primaryContact).displayName}</UiTableCell>
-        <UiTableCell>{UiText.label(customer.status)}</UiTableCell>
-      </>
-    ),
     detail: customer => {
       const state = createCustomerState(customer)
       return { steps: customerSteps(state), draft: () => customerDraft(state) }
@@ -91,4 +108,11 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
       <AbstractionManager provider={provider} onCancel={props.onCancel} />
     </div>
   )
+}
+
+/** Status tones and glyphs cover every Customer status. */
+const CUSTOMER_STATUS_BADGES: Record<CustomerStatus, { variant: UiBadgeVariant; icon: string }> = {
+  active: { variant: 'success', icon: 'check' },
+  inactive: { variant: 'warning', icon: 'minus' },
+  prospect: { variant: 'info', icon: 'target' }
 }

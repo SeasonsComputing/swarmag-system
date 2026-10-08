@@ -10,6 +10,7 @@ Emits table semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+UiTableAlign   Shared header and body cell alignment.
 UiTable        Table root — optionally wraps <table> in an overflow container.
 UiTableHeader  Header row — renders <thead><tr>; children become <th>.
 UiTableBody    Body section — renders <tbody>.
@@ -23,7 +24,13 @@ import type { UiComponent, UiComponentProps, UiContainerProps } from './ui-helpe
 const TableHeaderCtx = createContext(false)
 const TableSectionCtx = createContext(false)
 
-/** UiTable overflow behavior. */
+/** Shared alignment for table header and body cells. */
+export type UiTableAlign = 'start' | 'center' | 'end'
+
+/**
+ * UiTable overflow behavior. `scroll` makes the table container a scroll container on both
+ * axes, so the sticky header sticks only if that container also has a bounded height.
+ */
 export type UiTableOverflow = 'hidden' | 'scroll'
 
 /** UiTable props. */
@@ -114,7 +121,7 @@ export type UiTableCellProps =
     | 'align'
   >
   & {
-    align?: 'start' | 'center' | 'end'
+    align?: UiTableAlign
     class?: never
     classList?: never
     style?: never

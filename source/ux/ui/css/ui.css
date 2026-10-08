@@ -670,11 +670,13 @@
   text-align: end;
 }
 
-[data-ui='table-cell'][data-ui-align='end']:has([data-ui='action-button']) {
-  align-items: center;
-  display: flex;
-  gap: var(--sa-space-xx);
-  justify-content: end;
+[data-ui='table-cell']:has([data-ui='action-button']) {
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+[data-ui='table-cell'] [data-ui='action-button'] + [data-ui='action-button'] {
+  margin-inline-start: var(--sa-rhythm-gap-tight);
 }
 
 [data-ui='table-cell']:last-child {

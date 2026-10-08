@@ -101,9 +101,51 @@ const parseLines = (content: string): CSSLine[] => {
   return result
 }
 
-const extractSelector = (line: string): string | null => {
-  const match = line.match(SELECTOR_REGEX)
+const extractSelector = (lines: CSSLine[], index: number): string | null => {
+  const parts: string[] = []
+  // Formatting may split a selector before its opening brace. Read back to the
+  // preceding declaration or block, retaining every selector attribute.
+  for (let i = index; i >= 0; i--) {
+    const { line, isComment } = lines[i]
+    if (isComment) continue
+    if (i < index && /[{};]/.test(line)) break
+    parts.unshift(line.trim())
+  }
+  const match = parts.join(' ').match(SELECTOR_REGEX)
   return match ? match[1].trim() : null
+}
+
+// A comma inside a functional selector or quoted attribute is not a list boundary.
+const splitSelectors = (selector: string): string[] => {
+  const selectors: string[] = []
+  let start = 0
+  let depth = 0
+  let quote = ''
+  let escaped = false
+  for (let i = 0; i < selector.length; i++) {
+    const char = selector[i]
+    if (escaped) {
+      escaped = false
+      continue
+    }
+    if (char === '\\') {
+      escaped = true
+      continue
+    }
+    if (quote) {
+      if (char === quote) quote = ''
+      continue
+    }
+    if (char === '\'' || char === '"') quote = char
+    else if (char === '(' || char === '[') depth++
+    else if (char === ')' || char === ']') depth--
+    else if (char === ',' && depth === 0) {
+      selectors.push(selector.slice(start, i).trim())
+      start = i + 1
+    }
+  }
+  selectors.push(selector.slice(start).trim())
+  return selectors
 }
 
 const isAtRule = (selector: string): boolean => selector.startsWith('@')
@@ -200,7 +242,7 @@ const auditTokensCSS = (
   for (const { line, lineNumber, isComment } of lines) {
     if (isComment || !line.includes('{')) continue
 
-    const selector = extractSelector(line)
+    const selector = extractSelector(lines, lineNumber - 1)
     if (!selector) continue
 
     if (isAtRule(selector)) continue
@@ -238,7 +280,7 @@ const auditBaseCSS = (lines: CSSLine[], filePath: string): string[] => {
   for (const { line, lineNumber, isComment } of lines) {
     if (isComment || !line.includes('{')) continue
 
-    const selector = extractSelector(line)
+    const selector = extractSelector(lines, lineNumber - 1)
     if (!selector) continue
 
     if (isAtRule(selector)) continue
@@ -259,7 +301,7 @@ const auditControlsCSS = (lines: CSSLine[], filePath: string): string[] => {
   for (const { line, lineNumber, isComment } of lines) {
     if (isComment || !line.includes('{')) continue
 
-    const selector = extractSelector(line)
+    const selector = extractSelector(lines, lineNumber - 1)
     if (!selector) continue
 
     if (isAtRule(selector)) continue
@@ -277,7 +319,7 @@ const auditControlsCSS = (lines: CSSLine[], filePath: string): string[] => {
 const auditIconCatalogCSS = (lines: CSSLine[], filePath: string): string[] => {
   const violations: string[] = []
   const iconNames = new StringSet()
-  let iconName: string | undefined
+  let ruleIconNames: string[] = []
   let iconLineNumber = 0
   let hasIconDeclaration = false
 
@@ -288,49 +330,60 @@ const auditIconCatalogCSS = (lines: CSSLine[], filePath: string): string[] => {
     if (trimmed === '') continue
 
     if (trimmed === '}') {
-      if (iconName && !hasIconDeclaration) {
-        violations.push(
-          `${filePath}:${iconLineNumber} — icon catalog entry missing --sa-icon declaration — ${iconName}`
-        )
+      if (!hasIconDeclaration) {
+        for (const iconName of ruleIconNames) {
+          violations.push(
+            `${filePath}:${iconLineNumber} — icon catalog entry missing --sa-icon declaration`
+              + ` — ${iconName}`
+          )
+        }
       }
-      iconName = undefined
+      ruleIconNames = []
       hasIconDeclaration = false
       continue
     }
 
     if (line.includes('{')) {
-      const selector = extractSelector(line)
+      const selector = extractSelector(lines, lineNumber - 1)
       if (!selector || isAtRule(selector)) continue
-      const iconMatch = selector.match(/^\[data-ui-icon='([^']+)'\]$/)
-      if (!iconMatch) {
-        violations.push(
-          `${filePath}:${lineNumber} — icon catalog selector must be [data-ui-icon='{name}'] — found: ${selector}`
-        )
-        continue
+      ruleIconNames = []
+      for (const part of splitSelectors(selector)) {
+        const iconMatch = part.match(/^\[data-ui-icon='([^']+)'\]$/)
+        if (!iconMatch) {
+          violations.push(
+            `${filePath}:${lineNumber} — icon catalog selector must be [data-ui-icon='{name}']`
+              + ` — found: ${part}`
+          )
+          continue
+        }
+        const iconName = iconMatch[1]
+        if (iconNames.has(iconName)) {
+          violations.push(`${filePath}:${lineNumber} — duplicate icon catalog name — ${iconName}`)
+        }
+        iconNames.add(iconName)
+        ruleIconNames.push(iconName)
       }
-      iconName = iconMatch[1]
-      if (iconNames.has(iconName)) {
-        violations.push(`${filePath}:${lineNumber} — duplicate icon catalog name — ${iconName}`)
-      }
-      iconNames.add(iconName)
       iconLineNumber = lineNumber
       hasIconDeclaration = false
       continue
     }
 
-    if (trimmed.includes(':')) {
+    if (ruleIconNames.length > 0 && trimmed.includes(':')) {
       const property = trimmed.substring(0, trimmed.indexOf(':')).trim()
       if (property !== '--sa-icon') {
         violations.push(
           `${filePath}:${lineNumber} — icon catalog declares non --sa-icon property — ${property}`
         )
-      } else if (iconName) {
+      } else {
         hasIconDeclaration = true
-        const expected = `--sa-icon: url('../icons/${iconName}.svg');`
-        if (trimmed !== expected) {
-          violations.push(
-            `${filePath}:${lineNumber} — icon catalog name must match SVG asset — expected: ${expected}`
-          )
+        for (const iconName of ruleIconNames) {
+          const expected = `--sa-icon: url('../icons/${iconName}.svg');`
+          if (trimmed !== expected) {
+            violations.push(
+              `${filePath}:${lineNumber} — icon catalog name must match SVG asset`
+                + ` — expected: ${expected}`
+            )
+          }
         }
       }
     }
@@ -346,15 +399,17 @@ const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
   for (const { line, lineNumber, isComment } of lines) {
     if (isComment || !line.includes('{')) continue
 
-    const selector = extractSelector(line)
+    const selector = extractSelector(lines, lineNumber - 1)
     if (!selector) continue
 
     if (isAtRule(selector)) continue
 
-    if (!selector.startsWith(`[${namespace}`)) {
-      violations.push(
-        `${filePath}:${lineNumber} — selector not rooted at [${namespace} — found: ${selector}`
-      )
+    for (const part of splitSelectors(selector)) {
+      if (!part.startsWith(`[${namespace}`)) {
+        violations.push(
+          `${filePath}:${lineNumber} — selector not rooted at [${namespace} — found: ${part}`
+        )
+      }
     }
 
     DATA_ATTRIBUTE_REGEX.lastIndex = 0
