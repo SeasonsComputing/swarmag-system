@@ -13,13 +13,14 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AbstractionActionConfirmation  Confirmation copy for a consequential action.
 AbstractionAction              A named action executable on an abstraction instance.
+AbstractionListColumn          One labelled, aligned column and its item content.
 AbstractionDetail              Steps and aggregate draft for one opened item.
 AbstractionManagerContract     Provider contract for list-and-panel managers.
 */
 
 import type { Instantiable } from '@core/std'
 import type { PanelSequence } from '@ux/shell/panel/panel-sequence-contract.ts'
-import type { UiActionButtonVariant, UiComponent } from '@ux/ui'
+import type { UiActionButtonVariant, UiComponent, UiTableAlign } from '@ux/ui'
 
 /** Confirmation copy for a consequential abstraction action. */
 export type AbstractionActionConfirmation<T extends Instantiable> = {
@@ -43,11 +44,18 @@ export type AbstractionDetail<Draft> = {
   draft: () => Draft
 }
 
+/** One labelled, aligned list column and its item content. */
+export type AbstractionListColumn<T extends Instantiable> = {
+  label: string
+  align?: UiTableAlign
+  render: (item: T) => UiComponent
+}
+
 /** Provider contract for list-and-panel abstraction managers. */
 export interface AbstractionManagerContract<T extends Instantiable, Draft> {
   formTitle: string
   entityLabel: string
-  listColumns: string[]
+  listColumns: AbstractionListColumn<T>[]
   list: () => T[]
   isListLoading: () => boolean
   itemLabel?: (item: T) => string
@@ -55,6 +63,5 @@ export interface AbstractionManagerContract<T extends Instantiable, Draft> {
   create: (draft: Draft) => T | Promise<T>
   update: (item: T, draft: Draft) => T | Promise<T>
   actions: AbstractionAction<T>[]
-  renderListCells: (item: T) => UiComponent
   detail: (item: T | null) => AbstractionDetail<Draft>
 }

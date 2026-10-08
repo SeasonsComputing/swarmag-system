@@ -19,6 +19,11 @@ against itself. */
   min-block-size: 0;
 }
 
+/* Surface collapse rules override this shared default without relying on load order. */
+[data-shell-panel='container']:where(:has(> [data-shell-panel='aside'])) {
+  grid-template-columns: minmax(280px, 1fr) minmax(var(--sa-size-min), 1fr);
+}
+
 [data-shell-panel='container']:has(> [data-shell-panel='accessory']) {
   grid-template-rows: auto auto minmax(0, 1fr);
 }

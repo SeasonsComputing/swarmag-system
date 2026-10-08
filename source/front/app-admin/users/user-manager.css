@@ -11,13 +11,6 @@
   font-size: var(--sa-ui-font-size-compact);
 }
 
-/* An address carries no break opportunity inside its local part or domain, so a
-   narrow identity column overruns the status cell instead of wrapping. Roles
-   need no equivalent — they break at their separators. */
-[data-app='users-page'] [data-app='user-list-email'] {
-  overflow-wrap: anywhere;
-}
-
 /* Role labels carry the accent; the separating commas stay secondary. */
 [data-app='users-page'] [data-app='user-list-role'] {
   color: var(--sa-color-accent);
@@ -27,86 +20,6 @@
   color: var(--sa-text-primary);
 }
 
-[data-app='users-page'] [data-ui='table-container'][data-ui-overflow='scroll'] {
-  overflow-x: clip;
-}
-
 [data-app='users-page'] [data-ui='table-row'] {
   cursor: default;
-}
-
-[data-app='users-page'] [data-ui='table-container'] > [data-ui='table'] {
-  table-layout: fixed;
-  width: 100%;
-}
-
-[data-app='users-page'] [data-ui='table-cell']:nth-child(2) {
-  width: calc(var(--sa-touch-target-sm) + var(--sa-space-sm));
-}
-
-/* 2 action buttons, 1 inter-button rhythm gap, plus cell padding — the gap and
-   the width MUST share the same token, and the multipliers MUST match the
-   action count in user-manager.tsx. Under table-layout: fixed the identity
-   column is the remainder, so an overcount is not slack here: this read 3 after
-   the row's edit action was removed, stranding 42px and leaving identity at 129
-   in a narrow index — tight enough that an address overran the status cell. */
-[data-app='users-page'] [data-ui='table-cell']:last-child {
-  white-space: nowrap;
-  width: calc(
-    (var(--sa-touch-target-sm) - var(--sa-space-sm)) * 2 + var(--sa-rhythm-gap-tight) +
-      var(--sa-space-sm) * 2 +
-      var(--sa-space-xs)
-  );
-}
-
-[data-app='users-page'] [data-ui='table-cell'][data-ui-align='end']:has([data-ui='action-button']) {
-  display: table-cell;
-  text-align: end;
-  vertical-align: middle;
-}
-
-[data-app='users-page'] table [data-ui='action-button'] + [data-ui='action-button'] {
-  margin-inline-start: var(--sa-rhythm-gap-tight);
-}
-
-[data-app='users-page'] [data-app='user-status-pill'] {
-  align-items: center;
-  background: var(--sa-state-default-bg);
-  border: var(--sa-border-default);
-  border-radius: var(--sa-radius-full);
-  display: inline-flex;
-  justify-content: center;
-  block-size: calc(var(--sa-space-xl) - var(--sa-space-xs));
-  inline-size: calc(var(--sa-space-xl) - var(--sa-space-xs));
-}
-
-[data-app='users-page'] [data-app='user-status-pill'][data-app-status='active'] {
-  background: var(--sa-state-success-bg);
-  border-color: var(--sa-state-success-border);
-}
-
-[data-app='users-page'] [data-app='user-status-pill'][data-app-status='inactive'] {
-  background: var(--sa-state-warning-bg);
-  border-color: var(--sa-state-warning-border);
-}
-
-[data-app='users-page'] [data-app='user-status'] {
-  background: currentColor;
-  block-size: var(--sa-space-md);
-  display: inline-block;
-  inline-size: var(--sa-space-md);
-}
-
-[data-app='users-page']
-  [data-app='user-status-pill'][data-app-status='active']
-  [data-app='user-status'] {
-  color: var(--sa-state-success-text);
-  mask: url('@ux/ui/icons/check.svg') center / contain no-repeat;
-}
-
-[data-app='users-page']
-  [data-app='user-status-pill'][data-app-status='inactive']
-  [data-app='user-status'] {
-  color: var(--sa-state-warning-text);
-  mask: url('@ux/ui/icons/minus.svg') center / contain no-repeat;
 }
