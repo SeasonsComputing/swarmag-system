@@ -14,26 +14,20 @@ AssetTypeAdapter  Deserialize/Serialize AssetType.
 AssetAdapter      Deserialize/Serialize Asset.
 */
 
-import { makeAdapter } from '@core/stdx'
+import { InstantiableAdapt, makeAdapter } from '@core/stdx'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import { NoteAdapter } from '@domain/adapters/common-adapter.ts'
 
 /** Deserialize/Serialize AssetType. */
 export const AssetTypeAdapter = makeAdapter<AssetType>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   label: ['label'],
   active: ['active']
 })
 
 /** Deserialize/Serialize Asset. */
 export const AssetAdapter = makeAdapter<Asset>({
-  id: ['id'],
-  createdAt: ['created_at'],
-  updatedAt: ['updated_at'],
-  deletedAt: ['deleted_at'],
+  ...InstantiableAdapt,
   type: ['type_id'],
   notes: ['notes', NoteAdapter],
   label: ['label'],
