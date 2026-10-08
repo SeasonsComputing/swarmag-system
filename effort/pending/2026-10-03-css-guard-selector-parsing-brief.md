@@ -151,4 +151,42 @@ At CA direction, restored the first triggering selector sample to one line. Dpri
 both samples identically during brief production, erasing the before/after evidence. The first
 sample now carries a formatter-ignore directive; the second retains the wrapped form.
 
+## Amendment — 2026-10-08 — Partly delivered by the workbench list layout production
+
+`effort/completed/2026-10-08-workbench-list-layout-brief.md` hit the same defect: a shell-hooked
+row selector wrapped by dprint failed `guard-css.ts`. The CA approved extending that production to
+the guard (its amendment "Guard scope extension"); the AI Architect then found the first patch let
+an unrooted second selector pass, and it was corrected. This brief was not consulted at the time.
+Shipped in `fc54364`.
+
+**Delivered, against the implementation requirements:**
+
+- **1, partly.** `extractSelector` reads back from the `{` line to the preceding declaration or
+  block, skipping comment lines, so a wrapped selector is audited whole. Diagnostics still report
+  the `{` line, not the line of the offending branch.
+- **2, partly.** `splitSelectors` splits at top-level commas, and each branch is checked for its
+  root in the feature audit and for its form in the icon-catalog audit. The control audit
+  (`[data-ui` root) and the token-provider audit (`:root`, `[data-theme…]`) still check the joined
+  list as one selector.
+- **3, partly.** List splitting respects quotes, escapes, brackets, and parentheses. Braces inside
+  comments or strings on a selector's own lines are not handled.
+- **5, partly.** Every audit uses the shared extraction; only the two audits above split branches.
+  Icon-catalog declarations are now checked only inside a recognized icon rule.
+- **4, 6, and 7** were not changed deliberately and were not regression-tested.
+
+**Verified** with scratch fixtures, since removed: an unrooted second selector in a wrapped list
+fails; commas inside `:is()` and `:not()` and a three-line rooted selector pass.
+
+**Remaining scope:**
+
+1. `source/tests/cases/css-guard-test.ts` and a pure audit entry point. Not started; the regression
+   cases above remain the acceptance criteria.
+2. Branch splitting in the control and token-provider audits.
+3. Branch-line diagnostics, and braces in comments or strings.
+4. **The Helm correction, to be re-examined.** The committed Helm CSS (`5fe8c4b`) does not match
+   the workaround described above: its selectors are already rooted at
+   `[data-widget='helm-widget']` and descend through a per-button marker,
+   `data-widget-icon='hidden'`, emitted in `helm-widget.tsx`. Whether that per-button marker still
+   needs replacing with ancestor-level label-mode selection is the CA's decision.
+
 _End of Backlog Brief_

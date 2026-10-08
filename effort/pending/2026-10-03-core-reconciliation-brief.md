@@ -87,7 +87,8 @@ holds, not assume that a missing CONVENTIONS entry means a missing rule.
 - Changes to `core/` code.
 - `domain/`.
 - The design of the layer-6 form-scope abstraction (only its outcome feeds this brief).
-- Any CONVENTIONS content not about `core/`.
+- Any CONVENTIONS content not about `core/`. _[Narrowed by the amendment "Constant naming rule": the CA added one
+  general naming rule.]_
 
 ## Checks
 
@@ -108,5 +109,26 @@ Two inputs for the inventory:
   confirmed the rule on 2026-10-04, and the last exceptions (`make-scope.ts`,
   `wrap-http-handler.ts`, `make-supabase-edge-auth.ts`) were fixed. CONVENTIONS §3 bans relative
   imports only across top-level namespaces; it does not yet state this rule.
+
+## Amendment — 2026-10-08 — Constant naming rule
+
+Added at the CA's direction during the 2026-10-08 review of
+`effort/pending/2026-10-06-instantiable-adapt-brief.md`. The rule is general, not specific to
+`core/`; the CA placed it here as the CONVENTIONS reconciliation task, which narrows the
+out-of-scope line above for this one rule.
+
+- **Objects are PascalCase; values are SCREAMING_SNAKE.** CONVENTIONS §4.2 has two rows for
+  constants: "const-as-class" (PascalCase, example `HttpCodes`) and "Global immutable constants"
+  (SCREAMING_SNAKE, examples `LOG_LEVELS`, `HTTP_METHODS`). It does not state what separates them.
+  The CA ruled 2026-10-08: SCREAMING_SNAKE is for scalar values and collections of values,
+  including const-enum tuples (§8.2, `CUSTOMER_STATUSES`); every object constant is PascalCase,
+  whether pure data (`HttpCodes`) or behavior (`Routes`, `AppState`), exported or module-private.
+  The const-enum idiom is the reason: a SCREAMING_SNAKE name reads as a tuple with a derived type.
+- **Applied in the code the same day.** The five module-private SCREAMING_SNAKE objects were
+  renamed: `TargetKeywords` (`list-supabase-targets.ts`), `Replacements` (`guard-bare-html.ts`),
+  `NamespaceDirs` and `AllowedDeps` (`guard-architecture.ts`), `CustomerStatusBadges`
+  (`customer-manager.tsx`). No SCREAMING_SNAKE object constant remains.
+- **For the reconciliation:** state the distinction in §4.2 (a governance file: committed with the
+  governance-gate bypass), and consider whether a guard can enforce it.
 
 _End of Backlog Brief_

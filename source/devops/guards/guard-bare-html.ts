@@ -13,7 +13,7 @@ const BARE_HTML_REGEX =
   /<(button|input|textarea|select|ul|ol|li|table|thead|tbody|tfoot|tr|td|th|fieldset|legend)[\s/>]/g
 const COMMENT_LINE_REGEX = /^\s*\/\//
 
-const REPLACEMENTS: StringDictionary = {
+const Replacements: StringDictionary = {
   'button': 'UiButton',
   'input': 'UiInput',
   'textarea': 'UiTextArea',
@@ -70,7 +70,7 @@ const main = async () => {
       let match: RegExpExecArray | null
       while ((match = BARE_HTML_REGEX.exec(line)) !== null) {
         const element = match[1]
-        const replacement = REPLACEMENTS[element]
+        const replacement = Replacements[element]
         violations.push(
           `${relative}:${i + 1} — bare ${element} — use ${replacement}`
         )
