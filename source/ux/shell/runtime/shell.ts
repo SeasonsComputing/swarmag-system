@@ -44,7 +44,6 @@ Routes                    Route factory convenience container.
 ├ dialog                  Create a dialog route.
 ├ redirect                Create an immediate redirect route.
 └ transition              Create a work-then-redirect route.
-
 */
 
 import type { UiComponent, UiDialogSize } from '@ux/ui'
@@ -76,6 +75,18 @@ export type Shell = {
 export type ShellInitializer = () => Promise<void>
 
 // ────────────────────────────────────────────────────────────────────────────
+// ROUTE LANUGAGE
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Forward declaration of entire route language of grammar and content. */
+export type ShellRoute =
+  | ShellIndex
+  | ShellPage
+  | ShellOverlay
+  | ShellRedirect
+  | ShellTransition
+
+// ────────────────────────────────────────────────────────────────────────────
 // ROUTE GRAMMAR
 // ────────────────────────────────────────────────────────────────────────────
 
@@ -102,14 +113,6 @@ export type ShellTransition = ShellPath & {
   destination: string
   run: () => Promise<void>
 }
-
-/** Route behavior supported by an application shell. */
-export type ShellRoute =
-  | ShellIndex
-  | ShellPage
-  | ShellOverlay
-  | ShellRedirect
-  | ShellTransition
 
 // ────────────────────────────────────────────────────────────────────────────
 // ROUTE CONTENT
