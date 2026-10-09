@@ -13,7 +13,7 @@ Customer declarations add scoped adapters; User declarations project Direct writ
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 scopes  Declared form write scopes keyed by API topic.
-├ Customers.detail  Contact, identity, address, and sites.
+├ Customers.detail  Contact, identity, address, sites, and notes.
 └ Users.detail      Identity, contact preferences, notes, roles, and status.
 */
 
@@ -35,9 +35,10 @@ export const scopes = {
         CustomerAdapter.state,
         CustomerAdapter.postalCode,
         CustomerAdapter.country,
-        CustomerAdapter.sites
+        CustomerAdapter.sites,
+        CustomerAdapter.notes
       ],
-      defaults: { accountManagerId: undefined, notes: [] }
+      defaults: { accountManagerId: undefined }
     })
   },
   Users: {

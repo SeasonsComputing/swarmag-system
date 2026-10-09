@@ -17,6 +17,7 @@ import { isCustomerSite } from '@domain/validators/customer-validator.ts'
 import type { PanelSequence, PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import { customerDraft } from './customer-state.ts'
 import type { CustomerState } from './customer-state.ts'
+import { CustomerStepBilling } from './customer-step-billing.tsx'
 import { CustomerStepContact } from './customer-step-contact.tsx'
 import { CustomerStepDetail } from './customer-step-detail.tsx'
 import { CustomerStepSites } from './customer-step-sites.tsx'
@@ -43,6 +44,14 @@ export const customerSteps = (state: CustomerState): PanelSequence => {
       render: context => {
         retainCheck(context)
         return <CustomerStepContact state={state} context={context} />
+      }
+    },
+    {
+      name: 'billing',
+      title: 'Billing address',
+      render: context => {
+        retainCheck(context)
+        return <CustomerStepBilling state={state} context={context} />
       }
     },
     {

@@ -1,9 +1,10 @@
 /**
- * Guard against premature access to SessionState.user.
+ * Guard state module runtime dependencies and premature access to SessionState.user.
  * Enforces that any component or hook accessing the user object must also
  * reference the isDataReady flag to handle the hydration gap.
  */
 
+import { StringSet } from '@core/std'
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
@@ -12,6 +13,8 @@ const TARGET_DIRS = [
   `${ROOT}/source/front/app-ops`,
   `${ROOT}/source/front/app-customer`
 ]
+
+const STATE_DIRS = [`${ROOT}/source/front`, `${ROOT}/source/ux`]
 
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
@@ -42,9 +45,56 @@ const collectFiles = async (dir: string): Promise<string[]> => {
 
 const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
+// Follow local runtime imports and exports; type-only dependencies do not load JSX.
+const runtimeDependencies = (source: string, file: string): string[] => {
+  const pattern = /\b(?:import|export)\s+(?!type\b)(?:[^'";]*?\sfrom\s*)?['"]([^'"]+)['"]/g
+  const dynamicPattern = /\bimport\s*\(\s*['"]([^'"]+)['"]/g
+  const matches = [...source.matchAll(pattern), ...source.matchAll(dynamicPattern)]
+  return matches.flatMap(match => {
+    const specifier = match[1]
+    if (specifier === '@ux/ui') return [`${ROOT}/source/ux/ui/components/ui.ts`]
+    if (specifier === '@ux/css') return [`${ROOT}/source/ux/ui/css/css.tsx`]
+    if (specifier === '@core/std') return [`${ROOT}/source/core/std/std.ts`]
+    if (specifier === '@core/stdx') return [`${ROOT}/source/core/std/stdx.ts`]
+    if (/^@(front|ux|domain|core)\//.test(specifier)) {
+      return [`${ROOT}/source/${specifier.slice(1)}`]
+    }
+    if (specifier.startsWith('.')) return [new URL(specifier, `file://${file}`).pathname]
+    return []
+  })
+}
+
+const findJsxDependency = async (
+  file: string,
+  visited: StringSet = new StringSet()
+): Promise<string | null> => {
+  if (file.endsWith('.tsx')) return file
+  if (visited.has(file)) return null
+  visited.add(file)
+  const source = await Deno.readTextFile(file)
+  for (const dependency of runtimeDependencies(source, file)) {
+    const jsx = await findJsxDependency(dependency, visited)
+    if (jsx) return jsx
+  }
+  return null
+}
+
 const main = async () => {
   const files = (await Promise.all(TARGET_DIRS.map(collectFiles))).flat()
   const violations: string[] = []
+
+  const stateFiles = (await Promise.all(STATE_DIRS.map(collectFiles))).flat()
+    .filter(file => /-(state|store)\.ts$/.test(file))
+  for (const file of stateFiles) {
+    const jsx = await findJsxDependency(file)
+    if (jsx) {
+      violations.push(
+        `${file.replace(`${ROOT}/`, '')} - State runtime dependency loads ${
+          jsx.replace(`${ROOT}/`, '')
+        }.`
+      )
+    }
+  }
 
   for (const file of files) {
     const source = await Deno.readTextFile(file)
@@ -66,7 +116,7 @@ const main = async () => {
     guardFail(
       'UX state',
       violations,
-      'Rule: You must guard User access with isDataReady to prevent hydration-gap crashes.'
+      'Rules: State runtime dependencies must not load JSX; guard User access with isDataReady.'
     )
   }
 

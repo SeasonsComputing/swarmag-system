@@ -327,6 +327,16 @@ The recurrence is the point. Deleted-file paths reappear as empty directories pe
 
 `rmdir` is the safe removal: it refuses a non-empty directory, so it cannot take anything real with it.
 
+### `guard:leaf` fails on git-ignored files
+
+**Observed:** 2026-10-08 · low
+
+`guard:leaf` fails when macOS Finder leaves `.DS_Store` files in non-leaf directories (on
+2026-10-08: `source/`, `source/ux/`, `source/ux/ui/`). They are git-ignored, so they never reach a
+commit, but the guard walks the file system rather than the tracked tree, and `deno task check`
+fails until someone deletes them. Skip git-ignored files (or list files through `git ls-files`).
+Pair with the entry above, which also changes what the sweep covers.
+
 ### `guard:css` misreads multiline selectors and misses selector-list branches
 
 **Observed:** 2026-10-03 · normal
