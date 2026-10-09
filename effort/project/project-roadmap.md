@@ -18,8 +18,9 @@ Users and Customers stand as this project's **reference implementations** for Ab
 
 Positioned first because it's the origin of the reusable archetypes, not because it closes first — it stays open until the dependencies below land, which puts its actual closure after §6:
 
-1. Notes Editor completed & integrated into User Manager
-2. Notes Editor integrated with Customer Manager feature completion
+1. ~~Notes Editor completed & integrated into User Manager~~ — delivered 2026-10-08 (§4).
+2. ~~Notes Editor integrated with Customer Manager feature completion~~ — delivered 2026-10-08
+   (§4), including account notes and a Billing step.
 3. **(open)** Additional-contact assignment (`project-user-stories.md` §1.1): build it before §5,
    or move it to a later milestone (`EFFORT.md` §7). Until decided, it blocks closing this slice.
 4. Onboarding's Initial Job Assessment stage, which needs §6: the Onboarding Wizard cannot finish
@@ -63,7 +64,8 @@ Workflow classification moves to curated facets. The Notes Editor shows no tags.
 1. **Tags → facets** — completed 2026-10-08: `effort/completed/2026-10-06-tags-classification-brief.md`.
 2. **Notes Editor brief** — completed 2026-10-08: `effort/completed/2026-10-08-notes-editor-brief.md`.
 3. **Notes Editor production** — shipped 2026-10-08 (`991bc90`), with the brief.
-4. **Milestone verification,** this milestone, then §1.
+4. **Milestone verification,** this milestone, then §1. Next: steps 1–3 are done; the pass is not
+   yet defined (`EFFORT.md` §7 requires one).
 
 Rode with it, delivered 2026-10-08: User Manager consumes it, so User Management is closed; the
 Sites step's local `NoteEditor` and User Manager's flattening text area are replaced; Customer

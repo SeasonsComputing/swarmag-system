@@ -101,6 +101,38 @@ tier and its rules, swarmAg's halves of the split sections, and §11. Two placem
 decision when the split is made: §8.4 Query State Pattern, generic as a pattern but swarmAg in its
 example, and §10.1.6, divided down the middle.
 
+### `EFFORT.md` does not codify roadmap reconciliation, milestones, or deferrals
+
+**Observed:** 2026-10-08 · normal
+
+`EFFORT.md` §3 says the roadmap "draws its content from the backlog … and from user stories" and §7
+defines milestones, but neither says how the roadmap is kept in step with them. On 2026-10-08 the CA
+went to ask for a backlog/roadmap reconciliation and found no protocol to follow. The same day's
+ad hoc reconciliation found §1's Notes Editor dependencies satisfied but still listed, and a §1
+condition ("build it before §5, or move it") due before §5 starts. The CA also observed that
+backlog additions slow while briefs are produced and closed in-effort: findings land in
+amendments, out-of-scope lines, and "not taken" notes, and some were recorded only in briefs that
+then closed into frozen `effort/completed/`.
+
+Decided by the CA on 2026-10-08, to codify:
+
+- **Deferrals at closure.** Before a brief moves to `effort/completed/`, every deferred or
+  not-taken item either becomes a backlog entry, joins a pending brief, or is explicitly dropped.
+- **Milestones.** Each numbered roadmap section is a milestone (§7).
+- **Reconciliation happens when a milestone closes.**
+
+To settle when this is picked up:
+
+- What a reconciliation checks, in both directions: backlog entries the roadmap should carry, and
+  roadmap items whose dependencies have landed.
+- How a backlog entry records that the roadmap has placed it, as §4 does for a brief.
+- What a milestone verification pass consists of beyond its briefs' own verification.
+- Whether the rule that drafts are edited in place until hand-off, then amended and marked, belongs
+  in §4.
+
+`EFFORT.md` is a governance file: changes need the CA's authorization and are committed with the
+governance-gate bypass. The roadmap's preamble ("entries") is updated alongside.
+
 ## Controls
 
 ### Shared UI controls do not use one state model
@@ -127,6 +159,17 @@ focus-visible, disabled, selected/checked/active/open, selected-hover, and dange
 applicable. Normalize `ui.css` so primary, text color, background, border, frame, and
 focus ring each have stable roles. Prefer deleting inconsistent special-case rules over
 adding compensating overrides.
+
+**Evidence, 2026-10-08** (CA walkthroughs of the workbench list layout and Notes Editor
+productions):
+
+- Hover and selected are nearly indistinguishable: `--sa-bg-hover` and `--sa-bg-selected` are the
+  same hue at 0.2 and 0.28 alpha. In a `UiToggleGroup` only the pressed item's border separates
+  them, so a hovered item reads as a second selection (Customer Status showed Inactive and
+  Prospect apparently both selected).
+- Hover is not guarded for touch. `ui.css` applies `:hover` without `@media (hover: hover)`, so on
+  a touch device, or Chrome's device emulation, a tapped table row or toggle item keeps its hover
+  state and reads as selected.
 
 ### Collection-Detail surfaces do not draw the Selection
 
@@ -246,6 +289,27 @@ level. `--sa-text-h5`/`--sa-heading-font-size-h5` already exist in `roles.css`/`
 unused here — generalizing to a small `h2`-through-`h5` lookup (or `solid-js/web`'s
 `Dynamic`) uses infrastructure the codebase already ships rather than adding a nesting layer
 each time depth grows.
+
+### Draft fingerprints are written four times
+
+**Observed:** 2026-10-08 · low
+
+"Has the draft changed?" is answered by a `JSON.stringify` comparison in four places:
+`abstraction-manager.tsx`, `customer-steps.tsx`, the Sites step's `draftFingerprint`, and
+`notes-editor.tsx`. It is the natural second service of `ux/shell/workbench/workbench-draft.ts`,
+which was created as a dedicated file on the expectation that it would grow
+(`effort/completed/2026-10-08-notes-editor-brief.md`, amendment "Draft module"). Consolidate it
+there, and decide whether a key-order-insensitive comparison is wanted.
+
+### `workbench-context.tsx` mixes draft services with a component
+
+**Observed:** 2026-10-08 · low
+
+`workbench-context.tsx`'s header describes "Local draft checks and shared step services", but the
+file also holds `WorkbenchDiscard`, a JSX dialog. Any pure module that imports it loads JSX, which
+is what broke the state tests during the Notes Editor production. Moving `WorkbenchDiscard` to its
+own file and renaming the context module to `.ts` (seven importers) was weighed and not taken then
+because the problem did not require it (same brief, amendment "Draft module").
 
 ### Managers load only the first page of their Collection
 
@@ -493,6 +557,18 @@ stages (Contact, Customer, Sites) a near-term slice of a four-stage design, not 
 surface. The fourth stage's own design (service selection UI, template application mechanism)
 has not started.
 
+### Customers have no account manager
+
+**Observed:** 2026-10-08 · normal
+
+Design record: [Account Manager & User Picker — Brief](../active/2026-10-08-account-manager-brief.md).
+
+### There is no Customer Portal
+
+**Observed:** 2026-10-08 · normal
+
+Design record: [Customer Portal — Brief](../pending/2026-10-08-customer-portal-brief.md).
+
 ### A Customer with Jobs can be deleted
 
 **Observed:** 2026-09-24 · normal
@@ -504,6 +580,29 @@ customer no longer doing business is set `inactive`, which keeps it and its hist
 Once Jobs exist, a Customer with Jobs has history and must not be deletable; only inactivated.
 Nothing guards this today because no Jobs exist yet. Picking this up: with Job Definition
 (roadmap §7), where the first Job references a Customer.
+
+## Job
+
+### Assessor and planner are chosen with the User picker
+
+**Observed:** 2026-10-08 · normal
+
+`JobAssessment.assessorId` and `JobPlan.plannerId` name a person. The person creating the record
+sets themself (CA, 2026-10-08): each is a User picker field defaulting to the session user,
+changeable. The assessor is often assigned when the assessment is scheduled
+(`project-user-stories.md` §2: "assign assessor/crew"). The picker is built by
+[Account Manager & User Picker — Brief](../active/2026-10-08-account-manager-brief.md).
+
+Picking this up: with roadmap §7 Job Definition.
+
+### Job work records stamp the session user
+
+**Observed:** 2026-10-08 · normal
+
+The work log entry's `userId` and `JobWork.startedById` record who acted, so they are stamped with
+the session user at write time, with no picker (CA, 2026-10-08).
+
+Picking this up: with roadmap §8 Job Runner.
 
 ## UX
 
