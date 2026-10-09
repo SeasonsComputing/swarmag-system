@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Customer sites step                                                          ║
-║ Collects optional customer job sites and nested internal notes.              ║
+║ Collects optional customer job sites and nested notes.                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -15,50 +15,32 @@ CustomerStepSitesProps  Props for the optional job-sites step.
 CustomerStepSites       Render the optional job-sites step.
 */
 
-import type { Location, Note } from '@domain/abstractions/common.ts'
+import type { Location } from '@domain/abstractions/common.ts'
 import type { CustomerSite } from '@domain/abstractions/customer.ts'
-import { isNote } from '@domain/validators/common-validator.ts'
 import { isCustomerSite } from '@domain/validators/customer-validator.ts'
-import { createEffect, createSignal, onCleanup, onMount, Show } from '@solid-js'
+import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
+import { createSignal, onCleanup, Show } from '@solid-js'
 import { createStore, produce } from '@solid-js/store'
 import type { SetStoreFunction } from '@solid-js/store'
 import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
-import type { DrillContract, DrillReturnControl } from '@ux/shell/panel/drill-contract.ts'
+import type { DrillContract, DrillPanelContext } from '@ux/shell/panel/drill-contract.ts'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
+import { copyDraft } from '@ux/shell/workbench/workbench-draft.ts'
 import {
   UiActionButton,
   UiAlert,
-  UiButton,
-  UiDialog,
   UiField,
   UiFieldset,
-  UiFormActions,
   UiInput,
   UiLayout,
   UiText,
-  UiTextArea,
   UiToggleGroup,
   UiToggleItem
 } from '@ux/ui'
-import type { UiActionButtonProps, UiComponent } from '@ux/ui'
-import {
-  cloneCustomerSite,
-  cloneNote,
-  newCustomerNote,
-  newCustomerSite,
-  siteLocation
-} from './customer-state.ts'
+import type { UiComponent } from '@ux/ui'
+import { newCustomerSite, siteLocation } from './customer-state.ts'
 import type { CustomerState } from './customer-state.ts'
-
-// ────────────────────────────────────────────────────────────────────────────
-// CUSTOMER: SITES
-// ────────────────────────────────────────────────────────────────────────────
-
-/** Trailing header action reported by whichever drilled panel is currently active. */
-type TrailingAction = (() => UiActionButtonProps | undefined) | null
-/** Dirty-state guard reported by whichever drilled panel is currently active. */
-type DirtyCheck = (() => boolean) | null
 
 /** Props for the optional job-sites step. */
 export type CustomerStepSitesProps = {
@@ -66,187 +48,81 @@ export type CustomerStepSitesProps = {
   context: PanelStepContext
 }
 
-/**
- * Renders the optional job-sites step.
- *
- * @param props Step props carrying Customer state.
- * @returns Customer job-sites step component.
- */
+/** Render Site drafts inside a step-owned drill host. */
 export const CustomerStepSites = (props: CustomerStepSitesProps): UiComponent => {
   const hasGeo = typeof navigator !== 'undefined' && 'geolocation' in navigator
   const [pendingSite, setPendingSite] = createSignal<CustomerSite | null>(null)
-  const [drillReturn, setDrillReturn] = createSignal<DrillReturnControl | null>(null)
-  const [dirtyCheck, setDirtyCheck] = createSignal<DirtyCheck>(null)
-  const [pendingDiscard, setPendingDiscard] = createSignal<DrillReturnControl | null>(null)
-  const [activeSiteToken, setActiveSiteToken] = createSignal<symbol | null>(null)
   const sites = (): readonly CustomerSite[] => {
-    const draft = pendingSite()
-    return draft ? [...props.state.sites(), draft] : props.state.sites()
+    const pending = pendingSite()
+    return pending ? [...props.state.sites(), pending] : props.state.sites()
   }
-  const drillPath = (): readonly string[] => drillReturn()?.path() ?? []
-  const requestDrillReturn = (control: DrillReturnControl): void => {
-    if (dirtyCheck()?.()) {
-      setPendingDiscard(control)
-      return
-    }
-    control.returnToIndex()
-  }
-  const registerDrillReturn = (control: DrillReturnControl | null): void => {
-    setDrillReturn(() => control)
-    props.context.registerDrillReturn(
-      control
-        ? {
-          path: control.path,
-          returnTitle: control.returnTitle,
-          returnToIndex: () => requestDrillReturn(control)
-        }
-        : null
-    )
-  }
-  const addSiteDraft = (): void => {
-    setPendingSite(newCustomerSite())
-  }
-  const removeSite = (index: number): void => {
-    if (index < props.state.sites().length) {
-      props.state.removeSite(index)
-      return
-    }
-    setPendingSite(null)
-  }
-
-  createEffect(() => {
-    if (drillPath()[0] === 'Site') return
-    setPendingSite(null)
-    setActiveSiteToken(null)
-    setDirtyCheck(null)
-  })
-
   return (
-    <>
-      <DrillDown
-        rootTitle='Sites'
-        onReturnControl={registerDrillReturn}
-        root={drill => (
-          <CollectionPanel
-            legend='Sites'
-            itemColumn='Site'
-            items={sites}
-            label={siteName}
-            emptyMessage={
-              <p>
-                No job sites yet. Use <kbd>New Site</kbd> to add one.
-              </p>
-            }
-            newLabel='New Site'
-            onNew={addSiteDraft}
-            onRemove={removeSite}
-            confirmRemove={site => ({
-              title: `Delete ${siteName(site)}?`,
-              message: 'This job site will be removed from the customer.'
-            })}
-            renderItem={(site, index) => (
+    <DrillDown
+      rootTitle='Sites'
+      context={props.context}
+      root={drill => (
+        <CollectionPanel
+          legend='Sites'
+          itemColumn='Site'
+          items={sites}
+          label={siteName}
+          emptyMessage={
+            <>
+              No job sites yet. Use <kbd>New Site</kbd> to add one.
+            </>
+          }
+          newLabel='New Site'
+          onNew={() => setPendingSite(newCustomerSite())}
+          onRemove={props.state.removeSite}
+          confirmRemove={site => ({
+            title: `Delete ${siteName(site)}?`,
+            message: 'This job site will be removed from the customer.'
+          })}
+          renderItem={(site, index, context) => {
+            onCleanup(() => setPendingSite(null))
+            return (
               <SiteEditor
                 state={props.state}
                 site={site}
                 index={index}
                 hasGeo={hasGeo}
                 drill={drill}
-                drillPath={drillPath}
-                activeDraft={activeSiteToken}
-                registerActiveDraft={setActiveSiteToken}
-                onSaveNew={() => setPendingSite(null)}
-                onReturnAfterSave={() => drillReturn()?.returnToIndex()}
-                onDirtyCheck={check => setDirtyCheck(() => check)}
-                onTrailingAction={props.context.registerTrailingAction}
-                context={props.context}
+                context={context}
               />
-            )}
-            drill={drill}
-          />
-        )}
-      />
-      <Show when={pendingDiscard()}>
-        {target => (
-          <UiDialog
-            open
-            size='content'
-            onOpenChange={open => {
-              if (!open) setPendingDiscard(null)
-            }}
-          >
-            <div data-shell='collection-panel-confirmation'>
-              <h2>Discard unsaved changes?</h2>
-              <p>Changes in this panel will be discarded.</p>
-              <UiFormActions>
-                <UiButton variant='ghost' onClick={() => setPendingDiscard(null)}>Cancel</UiButton>
-                <UiButton
-                  variant='danger'
-                  onClick={() => {
-                    const control = target()
-                    setPendingDiscard(null)
-                    control.returnToIndex()
-                  }}
-                >
-                  Discard
-                </UiButton>
-              </UiFormActions>
-            </div>
-          </UiDialog>
-        )}
-      </Show>
-    </>
+            )
+          }}
+          drill={drill}
+        />
+      )}
+    />
   )
 }
 
-/** Props for the panel disclosed when a site row is selected. */
+// ────────────────────────────────────────────────────────────────────────────
+// CUSTOMER: SITE DRAFT
+// ────────────────────────────────────────────────────────────────────────────
+
+/** Props for one Site draft and its host-owned lifetime. */
 type SiteEditorProps = {
-  context: PanelStepContext
   state: CustomerState
   site: CustomerSite
   index: number
   hasGeo: boolean
   drill: DrillContract
-  drillPath: () => readonly string[]
-  activeDraft: () => symbol | null
-  registerActiveDraft: (token: symbol | null) => void
-  onSaveNew: () => void
-  onReturnAfterSave: () => void
-  onDirtyCheck: (check: DirtyCheck) => void
-  onTrailingAction: (action: TrailingAction) => void
+  context: DrillPanelContext
 }
 
-/** Which mutually-exclusive way a site's location is currently specified. */
+/** Location input modes for a Site. */
 type LocationMode = 'address' | 'coordinates'
 
-/** Determines which location mode a site's current data represents. */
-const locationMode = (site: CustomerSite): LocationMode => {
-  const location = siteLocation(site)
-  return location.latitude !== undefined || location.longitude !== undefined
-    ? 'coordinates'
-    : 'address'
-}
-
-/** Renders one site's identity, address-or-coordinates location, and notes collection. */
 const SiteEditor = (props: SiteEditorProps): UiComponent => {
-  const token = Symbol('site-draft')
-  const original = cloneCustomerSite(props.site)
-  const [draft, setDraft] = createStore<CustomerSite>(cloneCustomerSite(props.site))
+  const original = copyDraft(props.site)
+  const [draft, setDraft] = createStore<CustomerSite>(copyDraft(props.site))
   const [mode, setMode] = createSignal<LocationMode>(locationMode(draft))
   const [saveAttempted, setSaveAttempted] = createSignal(false)
-  const [activeNoteToken, setActiveNoteToken] = createSignal<symbol | null>(null)
-  const [pendingNote, setPendingNote] = createSignal<Note | null>(null)
-  const notes = (): readonly Note[] => {
-    const note = pendingNote()
-    return note ? [...draft.notes, note] : draft.notes
-  }
-  const isNewSite = (): boolean => props.index >= props.state.sites().length
   const siteError = (): boolean => saveAttempted() && !isCustomerSite(draft)
-  const isActiveDraft = (): boolean => props.activeDraft() === token && props.drillPath()[0] === 'Site'
-  const isDirty = (): boolean => draftFingerprint(draft) !== draftFingerprint(original)
-  createEffect(() => {
-    if (isActiveDraft()) onCleanup(props.context.registerDirty(isDirty))
-  })
-
+  const isActiveDraft = props.context.isActive
+  props.context.registerDirty(() => draftFingerprint(draft) !== draftFingerprint(original))
   /** Switches location mode, clearing the fields the other mode owns. */
   const changeMode = (next: LocationMode): void => {
     setMode(next)
@@ -263,54 +139,22 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
         }
         : { ...location, latitude: undefined, longitude: undefined })
   }
-  const addNoteDraft = (): void => {
-    setPendingNote(newCustomerNote())
-  }
-  const removeNote = (notePosition: number): void => {
-    if (notePosition < draft.notes.length) {
-      setDraft('notes', notes => notes.filter((_, i) => i !== notePosition))
-      return
-    }
-    setPendingNote(null)
-  }
   const saveSite = (): void => {
+    if (!isActiveDraft()) return
     setSaveAttempted(true)
     if (!isCustomerSite(draft)) return
-    if (isNewSite()) {
-      props.state.addSite(draft)
-      props.onSaveNew()
-      props.onReturnAfterSave()
-      return
-    }
-    props.state.setSite(props.index, draft)
-    props.onReturnAfterSave()
+    if (props.index >= props.state.sites().length) props.state.addSite(draft)
+    else props.state.setSite(props.index, draft)
+    props.context.returnToParent()
   }
-
-  createEffect(() => {
-    if (props.drillPath()[1] === 'Note') return
-    setPendingNote(null)
-    setActiveNoteToken(null)
-  })
-  onMount(() => props.registerActiveDraft(token))
-  onCleanup(() => {
-    if (props.activeDraft() === token) props.registerActiveDraft(null)
-  })
-
-  // Deferred to the Note's own report once a Note is drilled beneath this Site —
-  // only the innermost active panel occupies the host's trailing header slot.
-  // Inactive frames must not clear the action published by the restored parent.
-  createEffect(() => {
-    if (!isActiveDraft() || props.drillPath()[1] === 'Note') return
-    props.onDirtyCheck(isDirty)
-    props.onTrailingAction(() => ({
-      icon: 'check',
-      label: 'Save',
-      labelMode: 'visible',
-      density: 'dense',
-      error: siteError(),
-      onClick: saveSite
-    }))
-  })
+  props.context.registerSave(() => ({
+    icon: 'check',
+    label: 'Save',
+    labelMode: 'visible',
+    density: 'dense',
+    error: siteError(),
+    onClick: saveSite
+  }))
 
   return (
     <UiLayout>
@@ -472,127 +316,11 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
           </UiLayout>
         </Show>
       </UiFieldset>
-      <CollectionPanel
-        legend='Notes'
-        itemColumn='Note'
-        items={notes}
-        label={noteName}
-        emptyMessage={
-          <p>
-            No notes yet. Use <kbd>New Note</kbd> to add one.
-          </p>
-        }
-        newLabel='New Note'
-        onNew={addNoteDraft}
-        onRemove={removeNote}
-        confirmRemove={note => ({
-          title: `Delete ${noteName(note)}?`,
-          message: 'This note will be removed from the job site.'
-        })}
-        renderItem={(note, notePosition) => (
-          <NoteEditor
-            context={props.context}
-            note={note}
-            sitePosition={props.index}
-            notePosition={notePosition}
-            activeDraft={activeNoteToken}
-            registerActiveDraft={setActiveNoteToken}
-            drillPath={props.drillPath}
-            onReturnAfterSave={props.onReturnAfterSave}
-            onDirtyCheck={props.onDirtyCheck}
-            onTrailingAction={props.onTrailingAction}
-            onSave={saved => {
-              if (notePosition >= draft.notes.length) {
-                setDraft('notes', notes => [...notes, cloneNote(saved)])
-                setPendingNote(null)
-                return
-              }
-              setDraft(
-                'notes',
-                notes => notes.map((note, i) => i === notePosition ? cloneNote(saved) : note)
-              )
-            }}
-          />
-        )}
+      <NotesEditor
+        notes={() => draft.notes}
+        onChange={notes => setDraft('notes', copyDraft(notes))}
         drill={props.drill}
       />
-    </UiLayout>
-  )
-}
-
-// ────────────────────────────────────────────────────────────────────────────
-// CUSTOMER SITE: NOTES
-// ────────────────────────────────────────────────────────────────────────────
-
-/** Props for the panel disclosed when a note row is selected. */
-type NoteEditorProps = {
-  context: PanelStepContext
-  note: Note
-  sitePosition: number
-  notePosition: number
-  activeDraft: () => symbol | null
-  registerActiveDraft: (token: symbol | null) => void
-  drillPath: () => readonly string[]
-  onReturnAfterSave: () => void
-  onDirtyCheck: (check: DirtyCheck) => void
-  onTrailingAction: (action: TrailingAction) => void
-  onSave: (note: Note) => void
-}
-
-/** Renders one note's content, keyed to its position within its site. */
-const NoteEditor = (props: NoteEditorProps): UiComponent => {
-  const token = Symbol('note-draft')
-  const original = cloneNote(props.note)
-  const [draft, setDraft] = createStore<Note>(cloneNote(props.note))
-  const [saveAttempted, setSaveAttempted] = createSignal(false)
-  const name = `site-note-content-${props.sitePosition}-${props.notePosition}`
-  const noteError = (): boolean => saveAttempted() && !isNote(draft)
-  const isActiveDraft = (): boolean => props.activeDraft() === token && props.drillPath()[1] === 'Note'
-  const isDirty = (): boolean => draftFingerprint(draft) !== draftFingerprint(original)
-  createEffect(() => {
-    if (isActiveDraft()) onCleanup(props.context.registerDirty(isDirty))
-  })
-  const saveNote = (): void => {
-    setSaveAttempted(true)
-    if (!isActiveDraft() || !isNote(draft)) return
-    props.onSave(draft)
-    props.onReturnAfterSave()
-  }
-
-  onMount(() => props.registerActiveDraft(token))
-  onCleanup(() => {
-    if (props.activeDraft() === token) props.registerActiveDraft(null)
-  })
-
-  createEffect(() => {
-    if (!isActiveDraft()) return
-    props.onDirtyCheck(isDirty)
-    props.onTrailingAction(() => ({
-      icon: 'check',
-      label: 'Save',
-      labelMode: 'visible',
-      density: 'dense',
-      error: noteError(),
-      onClick: saveNote
-    }))
-  })
-
-  return (
-    <UiLayout>
-      <Show when={noteError()}>
-        <UiAlert variant='danger'>Complete the note before saving.</UiAlert>
-      </Show>
-      <UiFieldset legend='Note'>
-        <UiField for={name} label='Content' required>
-          <UiTextArea
-            name={name}
-            rows={6}
-            value={draft.content}
-            error={saveAttempted() && draft.content.trim().length === 0}
-            onInput={event => setDraft('content', event.currentTarget.value)}
-          />
-        </UiField>
-      </UiFieldset>
     </UiLayout>
   )
 }
@@ -654,8 +382,7 @@ const SiteTextInput = (props: SiteTextInputProps): UiComponent => {
 // ────────────────────────────────────────────────────────────────────────────
 
 const siteName = (site: CustomerSite): string => UiText.untitled(site.label, 'Untitled site')
-const noteName = (note: Note): string => UiText.untitled(note.content, 'Untitled note')
-const draftFingerprint = (draft: CustomerSite | Note): string => JSON.stringify(draft)
+const draftFingerprint = (draft: CustomerSite): string => JSON.stringify(draft)
 
 const updateDraftLocation = (
   setDraft: SetStoreFunction<CustomerSite>,
@@ -680,4 +407,9 @@ const captureLocation = (
       longitude: position.coords.longitude
     }))
   }, () => undefined)
+}
+
+const locationMode = (site: CustomerSite): LocationMode => {
+  const location = siteLocation(site)
+  return location.latitude !== undefined || location.longitude !== undefined ? 'coordinates' : 'address'
 }

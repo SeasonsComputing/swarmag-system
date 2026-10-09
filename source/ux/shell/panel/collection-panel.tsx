@@ -16,10 +16,10 @@ CollectionPanel       Render a bounded collection list panel.
 */
 
 import { createSignal, For, Show } from '@solid-js'
+import type { UiComponent } from '@ux/ui'
 import {
   UiActionButton,
   UiButton,
-  type UiComponent,
   UiDialog,
   UiFieldset,
   UiFormActions,
@@ -29,7 +29,7 @@ import {
   UiTableHeader,
   UiTableRow
 } from '@ux/ui'
-import type { DrillContract } from './drill-contract.ts'
+import type { DrillContract, DrillPanelContext } from './drill-contract.ts'
 
 import './collection-panel.css'
 
@@ -44,7 +44,7 @@ export type CollectionPanelProps<T> = {
   onNew: () => void
   onRemove: (index: number) => void
   confirmRemove: (item: T, index: number) => { title: string; message: string }
-  renderItem: (item: T, index: number) => UiComponent
+  renderItem: (item: T, index: number, context: DrillPanelContext) => UiComponent
   drill: DrillContract
 }
 
@@ -59,7 +59,11 @@ type PendingRemove<T> = {
 export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T>): UiComponent => {
   const [pendingRemove, setPendingRemove] = createSignal<PendingRemove<T> | null>(null)
   const openItem = (item: T, index: number): void => {
-    props.drill.open(() => props.renderItem(item, index), props.label(item, index), props.itemColumn)
+    props.drill.open(
+      context => props.renderItem(item, index, context),
+      props.label(item, index),
+      props.itemColumn
+    )
   }
   const addItem = (): void => {
     props.onNew()
@@ -92,7 +96,11 @@ export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T
         <div data-shell='collection-panel-body'>
           <Show
             when={props.items().length > 0}
-            fallback={<p data-shell='collection-panel-empty'>{props.emptyMessage}</p>}
+            fallback={
+              <p data-shell='collection-panel-empty'>
+                <span>{props.emptyMessage}</span>
+              </p>
+            }
           >
             <UiTable>
               <UiTableHeader>

@@ -15,14 +15,11 @@ CustomerDraft         Fields edited by the Customer surface.
 customerDraft         Project state into an isolated aggregate draft.
 CustomerState         Reactive state contract for Customer steps.
 createCustomerState   Create state for a single Customer draft.
-cloneCustomerSite     Clone a customer site for draft editing.
-cloneNote             Clone a note for draft editing.
 newCustomerSite       Create a blank site draft.
-newCustomerNote       Create a blank note draft.
-siteLocation(site)    The site's single location.
+siteLocation(site)     The site's single location.
 */
 
-import { demandOne, toTrimmed, when } from '@core/std'
+import { demandOne, toTrimmed } from '@core/std'
 import type { DraftOf } from '@core/stdx'
 import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer, CustomerSite, CustomerStatus } from '@domain/abstractions/customer.ts'
@@ -30,29 +27,32 @@ import type { scopes } from '@front/api/form-scopes.ts'
 import { createSignal } from '@solid-js'
 import type { Accessor, Setter } from '@solid-js'
 import { createStore, produce } from '@solid-js/store'
-import { UiText } from '@ux/ui'
+import { copyDraft } from '@ux/shell/workbench/workbench-draft.ts'
+import { UiText } from '@ux/ui/components/ui-helpers.ts'
 
 /** Domain fields owned by the Customer workbench. */
 export type CustomerDraft = DraftOf<typeof scopes.Customers.detail>
 
 /** Project an isolated Customer draft; optional control text becomes domain absence. */
-export const customerDraft = (state: CustomerState): CustomerDraft => ({
-  primaryContact: [{
-    displayName: toTrimmed(state.displayName()),
-    phoneNumber: toTrimmed(state.phoneNumber()),
-    preferredChannel: state.preferredChannel(),
-    ...(state.email().trim() ? { email: toTrimmed(state.email()) } : {})
-  }],
-  sites: state.sites().map(cloneCustomerSite),
-  name: toTrimmed(state.name()),
-  status: state.status(),
-  line1: toTrimmed(state.line1()),
-  line2: UiText.optional(state.line2()),
-  city: toTrimmed(state.city()),
-  state: toTrimmed(state.state()),
-  postalCode: toTrimmed(state.postalCode()),
-  country: toTrimmed(state.country())
-})
+export const customerDraft = (state: CustomerState): CustomerDraft =>
+  copyDraft({
+    primaryContact: [{
+      displayName: toTrimmed(state.displayName()),
+      phoneNumber: toTrimmed(state.phoneNumber()),
+      preferredChannel: state.preferredChannel(),
+      ...(state.email().trim() ? { email: toTrimmed(state.email()) } : {})
+    }],
+    sites: state.sites(),
+    notes: state.notes(),
+    name: toTrimmed(state.name()),
+    status: state.status(),
+    line1: toTrimmed(state.line1()),
+    line2: UiText.optional(state.line2()),
+    city: toTrimmed(state.city()),
+    state: toTrimmed(state.state()),
+    postalCode: toTrimmed(state.postalCode()),
+    country: toTrimmed(state.country())
+  })
 
 /** Reactive state used by the Customer workbench. */
 export type CustomerState = {
@@ -80,19 +80,14 @@ export type CustomerState = {
   setPostalCode: Setter<string>
   country: Accessor<string>
   setCountry: Setter<string>
+  notes: Accessor<readonly Note[]>
+  setNotes: (notes: readonly Note[]) => void
   sites: Accessor<CustomerSite[]>
   addSite: (site?: CustomerSite) => void
   setSite: (index: number, site: CustomerSite) => void
   updateSite: (index: number, update: (site: CustomerSite) => void) => void
   removeSite: (index: number) => void
   updateLocation: (index: number, update: (location: Location) => Location) => void
-  addNote: (sitePosition: number, note?: CustomerSite['notes'][number]) => void
-  updateNote: (
-    sitePosition: number,
-    notePosition: number,
-    update: (note: CustomerSite['notes'][number]) => void
-  ) => void
-  removeNote: (sitePosition: number, notePosition: number) => void
 }
 
 /**
@@ -108,6 +103,7 @@ export const createCustomerState = (customer: Customer | null = null): CustomerS
     contact?.preferredChannel ?? 'email'
   )
   const [email, setEmail] = createSignal(contact?.email ?? '')
+  const [notes, setNotes] = createSignal<readonly Note[]>(copyDraft(customer?.notes ?? []))
   const [name, setName] = createSignal(customer?.name ?? '')
   const [status, setStatus] = createSignal<CustomerStatus>(customer?.status ?? 'prospect')
   const [line1, setLine1] = createSignal(customer?.line1 ?? '')
@@ -117,36 +113,19 @@ export const createCustomerState = (customer: Customer | null = null): CustomerS
   const [postalCode, setPostalCode] = createSignal(customer?.postalCode ?? '')
   const [country, setCountry] = createSignal(customer?.country ?? 'US')
   const [siteStore, setSiteStore] = createStore<CustomerSite[]>(
-    customer?.sites.map(cloneCustomerSite) ?? []
+    copyDraft([...(customer?.sites ?? [])])
   )
 
   const sites = (): CustomerSite[] => siteStore
   const addSite = (site: CustomerSite = newCustomerSite()): void =>
-    setSiteStore(siteStore.length, cloneCustomerSite(site))
-  const setSite = (index: number, site: CustomerSite): void =>
-    setSiteStore(index, cloneCustomerSite(site))
+    setSiteStore(siteStore.length, copyDraft(site))
+  const setSite = (index: number, site: CustomerSite): void => setSiteStore(index, copyDraft(site))
   const updateSite = (index: number, update: (site: CustomerSite) => void): void => {
     setSiteStore(index, produce(update))
   }
   const removeSite = (index: number): void => setSiteStore(sites => sites.filter((_, i) => i !== index))
   const updateLocation = (index: number, update: (location: Location) => Location): void => {
     updateSite(index, site => site.location = [update(demandOne(site.location))])
-  }
-  const addNote = (
-    sitePosition: number,
-    note: CustomerSite['notes'][number] = newCustomerNote()
-  ): void => {
-    setSiteStore(sitePosition, 'notes', notes => [...notes, cloneNote(note)])
-  }
-  const updateNote = (
-    sitePosition: number,
-    notePosition: number,
-    update: (note: CustomerSite['notes'][number]) => void
-  ): void => {
-    setSiteStore(sitePosition, produce(site => update(site.notes[notePosition])))
-  }
-  const removeNote = (sitePosition: number, notePosition: number): void => {
-    setSiteStore(sitePosition, 'notes', notes => notes.filter((_, i) => i !== notePosition))
   }
 
   return {
@@ -174,15 +153,14 @@ export const createCustomerState = (customer: Customer | null = null): CustomerS
     setPostalCode,
     country,
     setCountry,
+    notes,
+    setNotes: notes => setNotes(copyDraft(notes)),
     sites,
     addSite,
     setSite,
     updateSite,
     removeSite,
-    updateLocation,
-    addNote,
-    updateNote,
-    removeNote
+    updateLocation
   }
 }
 
@@ -195,27 +173,6 @@ export const newCustomerSite = (): CustomerSite => ({
   label: '',
   location: [{ country: 'US' }],
   notes: []
-})
-
-/** Produces an empty internal note with every field the domain requires. */
-export const newCustomerNote = (): Note => ({
-  attachments: [],
-  createdAt: when(),
-  content: '',
-  visibility: 'internal'
-})
-
-/** Clones a note so a draft can be edited without mutating committed state. */
-export const cloneNote = (note: Note): Note => ({
-  ...note,
-  attachments: note.attachments.map(attachment => ({ ...attachment }))
-})
-
-/** Clones a customer site so a draft can be edited without mutating committed state. */
-export const cloneCustomerSite = (site: CustomerSite): CustomerSite => ({
-  ...site,
-  location: site.location.map(location => ({ ...location })) as CustomerSite['location'],
-  notes: site.notes.map(cloneNote)
 })
 
 /** Reads the site's single location. */

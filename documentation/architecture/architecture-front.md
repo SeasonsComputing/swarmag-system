@@ -59,6 +59,7 @@ source/
     │   ├── widgets/                 — swarmAg-suite widgets (e.g. BrandWidget)
     │   │   └── widget-registry.ts   — exports widgetRegistry(); app-tier catalog only
     │   └── shell/                   — branded chrome and application wiring (*)
+    │       └── notes-editor.tsx      — stock notes Index-Detail editor
     ├── app-admin/
     │   ├── app.tsx
     │   ├── dashboard-admin.json     — default dashboard layout for app-admin
@@ -93,7 +94,7 @@ source/
     └── app-style-guide/             — design-system demonstration harness
 ```
 
-(*) `shell/` holds `about-box`, `brand-hero`, and `login`; the maker wrapper binding `ux/shell`'s
+(*) `shell/` holds `about-box`, `brand-hero`, `login`, and `notes-editor`; the maker wrapper binding `ux/shell`'s
 generic makers to swarmAg branding; and `session-coordinator.ts`.
 
 Everything in `source/ux/` must be adaptive and portable beyond swarmAg — mobile-only or desktop-only components do not belong there, and neither does anything that assumes swarmAg branding or swarmAg's own domain. `source/front/app/` carries that narrower scope instead: adaptive across all three swarmAg apps and all viewport sizes, but not required to generalize past swarmAg itself.
@@ -663,8 +664,17 @@ IndexedDB usage is split into two layers:
 | local ui state   | SolidJS signals | component-local                         |
 | ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts`          |
 
+Drafts never share object or array structure with their source, coming in or going out.
+Compositions have no identity; draft owners copy their values when opening, accepting changes,
+snapshotting a baseline, and projecting a result. `copyDraft<T>(value: T): T` in
+`ux/shell/workbench/workbench-draft.ts` uses `structuredClone(unwrap(value))` to copy plain
+domain values and Solid store data at every nested level. Draft data must remain plain and
+cloneable; functions and class instances do not belong in it.
+
 #### 9.6.1 Rules
 
+- State modules must not import JSX modules, directly or through runtime dependencies, so
+  state remains testable without a browser. Type-only imports do not load those modules.
 - Signals for local, transient UI state — inputs, open/close, hover
 - Stores for shared cross-component state — session, app preferences, dashboard config
 - TanStack Query for all server data — caching, loading, error states
@@ -725,12 +735,13 @@ app/
 ├── assets/     — swarmAg brand assets (logo files, flat — one asset kind today)
 ├── components/ — swarmAg-specific reusable UI controls (placeholder — none yet)
 ├── shell/      — branded chrome and application wiring (*)
+│   └── notes-editor.tsx — stock notes Index-Detail editor
 ├── stores/     — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
 ├── views/      — swarmAg domain projections (job-views.ts)
 └── widgets/    — swarmAg-suite widget catalog (e.g. BrandWidget)
 ```
 
-(*) `shell/` holds `about-box`, `brand-hero`, and `login`; the maker wrapper binding `ux/shell`'s
+(*) `shell/` holds `about-box`, `brand-hero`, `login`, and `notes-editor`; the maker wrapper binding `ux/shell`'s
 generic makers to swarmAg branding; and `session-coordinator.ts`.
 
 #### 10.1.4 Stays in the app
@@ -805,6 +816,23 @@ Glyphs, header states, and transition motion are defined here once; no feature r
   - The Manager snapshots the draft when it opens an Item. Any exit that would discard a changed
     draft asks first: another Item, New, the collapsed return, and Cancel.
 
+A step containing a drill-down hosts `DrillDown` at its root and supplies its
+`PanelStepContext`. Opened panels receive `DrillPanelContext`: `isActive`,
+`registerDirty`, `registerSave`, and `returnToParent`. `CollectionPanel` passes that
+context to its item renderer. Panel activity is host-owned and independent of depth.
+Only the active panel supplies the header Save; a covered panel retains its working
+copy and dirty checks. Every open panel contributes to workbench discard protection.
+Local drill-back checks only the active panel and asks before discarding changes.
+Successful Save validates and updates the parent draft before `returnToParent` returns
+without a discard prompt. Closing a panel disposes its registrations and pending draft;
+covering it does not. Restoring its parent restores that parent's Save.
+
+`NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
+`notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`, and
+`drill: DrillContract`. It edits Content and Visibility, defaults new notes to Internal,
+and never persists. Existing timestamps and attachments are preserved. Billing-address
+fields and their validation occupy the separate Customer Billing step.
+
 Dirty-state belongs to each draft's context. `PanelStepContext.registerDirty(check)` exposes a
 local change check to the workbench and returns its cleanup callback. Retained feature-state
 checks last for the session, across step remounts; nested draft checks are cleaned up when their
@@ -820,7 +848,7 @@ retain both dismissal paths.
 **Features: `source/front/app-admin/`.**
 
 - `customers/` supplies the Customer steps and nothing about their host.
-  - `customer-steps.tsx` exports `customerSteps(state)`: contact, detail, and sites.
+  - `customer-steps.tsx` exports `customerSteps(state)`: Detail, Contact, Billing, and Sites.
   - `customer-state.ts` owns the state, `CustomerDraft`, and the `customerDraft(state)`
     projection.
   - The Customer steps are a fragment. They know nothing of position, progress, or what
@@ -837,9 +865,9 @@ retain both dismissal paths.
   "Editor" is reserved for a reusable form kind, such as the notes editor, or a drill-down
   editor inside a step.
 
-Customer Detail declares contact, identity, status, address, and sites in
+The Customer workbench declares contact, identity, status, address, sites, and notes in
 `front/api/form-scopes.ts` through `makeAdaptedScope`, with
-`{ accountManagerId: undefined, notes: [] }` as create defaults.
+`{ accountManagerId: undefined }` as create defaults.
 `CustomerDraft` in `customer-state.ts` is `DraftOf<typeof scopes.Customers.detail>`; its state and
 projection remain domain-shaped. Customer Manager and Onboarding create through
 `scope.toCreate(draft)`. The Manager updates through
@@ -854,11 +882,11 @@ and confirmed soft Delete through the existing Customer API.
 - A Jobs dependency guard is deferred to Job Definition.
 - Lists match User Manager's first-page `limit: 100`; pagination is separate work.
 - `scopes.Customers.detail` in `front/api/form-scopes.ts` covers primary contact,
-  identity, status, billing address, and sites. It excludes account-manager assignment and
-  account-level notes.
+  identity, status, billing address, sites, and account notes. It excludes account-manager assignment.
 - Clearing an optional stored address field uses the existing explicit-null update protocol.
 
-Onboarding keeps its create-only workflow, defaults, and completion behavior.
+Onboarding inherits the four Customer steps and account-note editing, retaining its create-only
+workflow and single commit at Finish.
 
 ### 10.2 Build Composition
 

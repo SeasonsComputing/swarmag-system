@@ -7,7 +7,7 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Holds transient state for one User draft and projects its declared fields.
-The notes text area flattens notes while keeping the first note's timestamp.
+Notes remain an isolated collection with their original metadata.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -17,35 +17,29 @@ UserState        Reactive state contract for the User step.
 createUserState  Create state for a single User draft.
 */
 
-import { toEmail, toTrimmed, when } from '@core/std'
-import type { When } from '@core/std'
+import { toEmail, toTrimmed } from '@core/std'
 import type { DraftOf } from '@core/stdx'
 import type { ContactPreferredChannel, Note } from '@domain/abstractions/common.ts'
 import type { User, UserRole, UserStatus } from '@domain/abstractions/user.ts'
 import type { scopes } from '@front/api/form-scopes.ts'
 import { createSignal } from '@solid-js'
 import type { Accessor, Setter } from '@solid-js'
+import { copyDraft } from '@ux/shell/workbench/workbench-draft.ts'
 
 /** Domain fields owned by the User workbench. */
 export type UserDraft = DraftOf<typeof scopes.Users.detail>
 
-/** Project User fields, flattening the notes text with its stable timestamp. */
+/** Project User fields, preserving each note and its metadata. */
 export const userDraft = (state: UserState): UserDraft => {
-  const content = state.notesText().trim()
-  return {
+  return copyDraft({
     displayName: toTrimmed(state.displayName()),
     primaryEmail: toEmail(state.primaryEmail()),
     phoneNumber: toTrimmed(state.phoneNumber()),
     preferredChannel: state.preferredChannel(),
-    notes: content.length === 0 ? [] : [{
-      attachments: [],
-      createdAt: state.noteCreatedAt,
-      content,
-      visibility: 'internal'
-    }],
+    notes: state.notes(),
     roles: state.roles(),
     status: state.status()
-  }
+  })
 }
 
 /** Reactive state used by the User workbench for one draft lifetime. */
@@ -58,11 +52,10 @@ export type UserState = {
   setPhoneNumber: Setter<string>
   preferredChannel: Accessor<ContactPreferredChannel>
   setPreferredChannel: Setter<ContactPreferredChannel>
-  notesText: Accessor<string>
-  setNotesText: Setter<string>
-  noteCreatedAt: When
+  notes: Accessor<readonly Note[]>
+  setNotes: (notes: readonly Note[]) => void
   roles: Accessor<UserRole[]>
-  setRoles: Setter<UserRole[]>
+  setRoles: (roles: UserRole[]) => void
   status: Accessor<UserStatus>
   setStatus: Setter<UserStatus>
 }
@@ -70,7 +63,7 @@ export type UserState = {
 /**
  * Create one User draft lifetime independently of mounted step controls.
  * @param user The opened User, or null for a new draft.
- * @returns Signals and the stable timestamp used by the notes text area.
+ * @returns Signals and an isolated notes collection.
  */
 export const createUserState = (user: User | null): UserState => {
   const [displayName, setDisplayName] = createSignal(user?.displayName ?? '')
@@ -79,10 +72,9 @@ export const createUserState = (user: User | null): UserState => {
   const [preferredChannel, setPreferredChannel] = createSignal<ContactPreferredChannel>(
     user?.preferredChannel ?? 'email'
   )
-  const [notesText, setNotesText] = createSignal(noteContent(user?.notes ?? []))
-  const [roles, setRoles] = createSignal<UserRole[]>(user ? [...user.roles] : [])
+  const [notes, setNotes] = createSignal<readonly Note[]>(copyDraft(user?.notes ?? []))
+  const [roles, setRoles] = createSignal<UserRole[]>(copyDraft([...(user?.roles ?? [])]))
   const [status, setStatus] = createSignal<UserStatus>(user?.status ?? 'active')
-  const noteCreatedAt = user?.notes[0]?.createdAt ?? when()
   return {
     displayName,
     setDisplayName,
@@ -92,19 +84,11 @@ export const createUserState = (user: User | null): UserState => {
     setPhoneNumber,
     preferredChannel,
     setPreferredChannel,
-    notesText,
-    setNotesText,
-    noteCreatedAt,
+    notes,
+    setNotes: notes => setNotes(copyDraft(notes)),
     roles,
-    setRoles,
+    setRoles: roles => setRoles(copyDraft(roles)),
     status,
     setStatus
   }
-}
-
-function noteContent(notes: readonly Note[]): string {
-  return notes
-    .map(note => note.content)
-    .filter(content => content.length > 0)
-    .join('\n\n')
 }

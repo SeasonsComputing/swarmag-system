@@ -33,7 +33,7 @@ Deno.test('Customer API creates from detail fields and declared defaults', async
     const created = await api.Customers.create(scope.toCreate(richerDraft))
     assertEquals(detailDraft(created), draft)
     assertEquals(created.accountManagerId, undefined)
-    assertEquals(created.notes, [])
+    assertEquals(created.notes, draft.notes)
     assertEquals(created.id === customer.id, false)
   })
 })
@@ -59,13 +59,35 @@ Deno.test('Customer API detail scope writes all declared fields in one update', 
   })
 })
 
-Deno.test('Customer API detail scope preserves excluded account fields', async () => {
+Deno.test('Customer API detail scope preserves excluded account-manager assignment', async () => {
   await withCustomer(async customer => {
-    const input = { ...detailDraft(customer), accountManagerId: null, notes: [] }
+    const input = { ...detailDraft(customer), accountManagerId: null }
     const updated = await api.Customers.update(scope.adapter, scope.toUpdate(customer.id, input))
     assertEquals(updated.accountManagerId, customer.accountManagerId)
     assertEquals(updated.notes, customer.notes)
     assertEquals(updated.createdAt, customer.createdAt)
+  })
+})
+
+Deno.test('Customer API detail scope replaces and clears account notes', async () => {
+  await withCustomer(async customer => {
+    const notes = [{
+      ...customer.notes[0],
+      content: 'Customer-facing account update.',
+      visibility: 'shared' as const
+    }]
+    const updated = await api.Customers.update(
+      scope.adapter,
+      scope.toUpdate(customer.id, { ...detailDraft(customer), notes })
+    )
+    assertEquals(updated.notes, notes)
+    assertEquals(updated.accountManagerId, customer.accountManagerId)
+    const cleared = await api.Customers.update(
+      scope.adapter,
+      scope.toUpdate(customer.id, { ...detailDraft(updated), notes: [] })
+    )
+    assertEquals(cleared.notes, [])
+    assertEquals((await api.Customers.get(customer.id)).notes, [])
   })
 })
 
@@ -101,7 +123,8 @@ const detailDraft = (customer: Customer): DraftOf<typeof scope> => ({
   state: customer.state,
   postalCode: customer.postalCode,
   country: customer.country,
-  sites: customer.sites
+  sites: customer.sites,
+  notes: customer.notes
 })
 
 // Exercise the public composed API, validators, SDK, and adapters without a live database.
@@ -129,14 +152,14 @@ const withCustomer = async (run: (customer: Customer) => Promise<void>): Promise
           record = await request.json() as Dictionary
           assertEquals('account_manager_id' in record, false)
           assertEquals('line2' in record, false)
-          assertEquals(record.notes, [])
+          assertEquals(record.notes, CustomerAdapter.fromDomain(customer).notes)
         } else {
           assertEquals(url.searchParams.get('id'), `eq.${customer.id}`)
           assertEquals(url.searchParams.get('deleted_at'), 'is.null')
           if (request.method === 'PATCH') {
             const patch = await request.json() as Dictionary
             assertEquals('account_manager_id' in patch, false)
-            assertEquals('notes' in patch, false)
+            assertEquals('notes' in patch, true)
             record = { ...record, ...patch }
           } else assertEquals(request.method, 'GET')
         }
