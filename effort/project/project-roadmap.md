@@ -61,15 +61,14 @@ Workflow classification moves to curated facets. The Notes Editor shows no tags.
 **Sequence:**
 
 1. **Tags → facets** — completed 2026-10-08: `effort/completed/2026-10-06-tags-classification-brief.md`.
-2. **Notes Editor brief** — active: `effort/active/2026-10-08-notes-editor-brief.md`.
-3. **Notes Editor production.**
+2. **Notes Editor brief** — completed 2026-10-08: `effort/completed/2026-10-08-notes-editor-brief.md`.
+3. **Notes Editor production** — shipped 2026-10-08 (`991bc90`), with the brief.
 4. **Milestone verification,** this milestone, then §1.
 
-Rides with it: User Manager needs updating to consume it once built, User Management is closed once integrated.
-
-- It replaces the local `NoteEditor` in `customer-step-sites.tsx` and User Manager's notes text
-  area, which flattens notes into a single note.
-- The backlog entry "Customer Manager cannot edit account-level notes" rides with it.
+Rode with it, delivered 2026-10-08: User Manager consumes it, so User Management is closed; the
+Sites step's local `NoteEditor` and User Manager's flattening text area are replaced; Customer
+account notes are editable (the backlog entry "Customer Manager cannot edit account-level notes",
+now removed).
 
 ## 5. Mechanical Productions
 

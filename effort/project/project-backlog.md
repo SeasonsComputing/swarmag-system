@@ -505,12 +505,6 @@ Once Jobs exist, a Customer with Jobs has history and must not be deletable; onl
 Nothing guards this today because no Jobs exist yet. Picking this up: with Job Definition
 (roadmap §7), where the first Job references a Customer.
 
-### Customer Manager cannot edit account-level notes
-
-**Observed:** 2026-10-03 · normal
-
-Carried by [Notes Editor — Brief](../active/2026-10-08-notes-editor-brief.md), scope item 5.
-
 ## UX
 
 ### Hub widget
