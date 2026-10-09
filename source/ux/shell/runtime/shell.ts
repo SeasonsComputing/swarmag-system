@@ -44,7 +44,6 @@ Routes                    Route factory convenience container.
 ├ dialog                  Create a dialog route.
 ├ redirect                Create an immediate redirect route.
 └ transition              Create a work-then-redirect route.
-
 */
 
 import type { UiComponent, UiDialogSize } from '@ux/ui'
