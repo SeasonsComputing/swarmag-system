@@ -79,7 +79,7 @@ export type ShellInitializer = () => Promise<void>
 // ROUTE LANUGAGE
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Forward declaration of entire route language of grammar and content */
+/** Forward declaration of entire route language of grammar and content. */
 export type ShellRoute =
   | ShellIndex
   | ShellPage
