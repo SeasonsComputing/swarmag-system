@@ -275,4 +275,25 @@ item sound bigger than it is and buried a real future idea inside mechanical sta
 §5 Mechanical Productions, and this is the natural moment to scope Maintenance for real rather
 than leave it as a name.
 
+## Request model — customer and staff requests that staff fulfill
+
+**Parked:** 2026-10-08 — CA + AI Architect session designing the Customer Portal
+(`effort/pending/2026-10-08-customer-portal-brief.md`).
+
+**What it is:** One abstraction for anything a customer, or a rep, asks staff to do: schedule a
+mesquite follow-up or a spray, send swarmAg a message, grant a portal user access ("can you give
+Sara customer portal access?"). Requesters only ever create Requests; staff review them and turn
+them into real changes (a Job, an account update, a portal User). A sketch: kind, requester,
+Customer, status, staff response. It would give the Customer Portal a single, narrow, auditable
+write path, so portal users never write real records directly.
+
+**Why parked:** The portal's first release is read only (CA, 2026-10-08): a dashboard of customer
+widgets and a report page with maps by site. Requests are what a later portal release would write
+through. Its shape, kinds, statuses, and who fulfills what are all undecided.
+
+**Picking this up:** When the portal first needs to write. Decide the abstraction's shape and its
+first kinds, and whether portal-access requests come first, since they also serve staff (option (c)
+of the brief's Open 1). Consider its relation to the parked Lead abstraction above: a Lead is an
+inbound request from someone not yet a customer.
+
 _End of Feature Parking Lot Document_
