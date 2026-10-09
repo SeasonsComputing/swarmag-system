@@ -14,9 +14,9 @@ import { OnboardingWizard } from '@front/app-admin/onboarding/onboarding-wizard.
 import { UserManager } from '@front/app-admin/users/user-manager.tsx'
 import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
 import { makeAnonymousShell, makeDashboardShell } from '@front/app/shell/shell-makers.tsx'
-import { widgetRegistry as appWidgetRegistry } from '@front/app/widgets/widget-registry.ts'
+import { AppWidgetRegistry } from '@front/app/widgets/widget-registry.ts'
 import { Routes } from '@ux/shell/runtime/shell.ts'
-import { widgetRegistry as uxWidgetRegistry } from '@ux/widgets/widget-registry.ts'
+import { UxWidgetRegistry } from '@ux/widgets/widget-registry.ts'
 
 // application specialalized dashboard
 import dashboardSeed from './dashboard-admin.json' with { type: 'json' }
@@ -25,7 +25,7 @@ import dashboardSeed from './dashboard-admin.json' with { type: 'json' }
 void bootstrap(
   Routes.application([
     makeAnonymousShell(),
-    makeDashboardShell(dashboardSeed, { ...uxWidgetRegistry(), ...appWidgetRegistry() }, [
+    makeDashboardShell(dashboardSeed, { ...UxWidgetRegistry, ...AppWidgetRegistry }, [
       Routes.workbench('/onboarding', OnboardingWizard),
       Routes.workbench('/users', UserManager),
       Routes.workbench('/customers', CustomerManager)

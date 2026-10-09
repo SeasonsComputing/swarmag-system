@@ -6,17 +6,17 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Creates the concrete widget registry bound by each application composition root.
+Provides the generic widget catalog bound by each application composition root.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-widgetRegistry  Creates the concrete widget registry.
+UxWidgetRegistry  Generic widget catalog.
 */
 
 import type { WidgetRegistry } from '@ux/shell/dashboard/widget-contract.ts'
 import { HelmWidget } from './helm-widget.tsx'
 
-/** Create the widget registry. */
-export const widgetRegistry = (): WidgetRegistry => ({
+/** Generic widget catalog. */
+export const UxWidgetRegistry: WidgetRegistry = {
   HelmWidget
-})
+}
