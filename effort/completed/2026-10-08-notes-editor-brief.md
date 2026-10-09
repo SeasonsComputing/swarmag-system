@@ -1,10 +1,14 @@
 # Notes Editor — Brief
 
-**Active, not yet dispatched.** Chosen 2026-10-08 as roadmap §4's second step and written the same
-day from a CA + AI Architect exploration session. Reviewed by the AI Coding Engine the
-same day; the amendment at the end resolves that review and marks the items it changes. It awaits
-the production gate. Its predecessor step, tags → facets, closed 2026-10-08
-(`effort/completed/2026-10-06-tags-classification-brief.md`).
+**Closed 2026-10-08: shipped, reviewed, and independently verified.** Chosen 2026-10-08 as roadmap
+§4's second step and written the same day from a CA + AI Architect exploration session. Reviewed by
+the AI Coding Engine; the amendments at the end resolve that review and record the decisions and
+corrections made during production: the Customer step layout (Detail, Contact, Billing, Sites),
+draft copies (`copyDraft`), the JSX-free draft module, and the state module rule and its guard.
+Produced by the AI Coding Engine and verified by the AI Architect against the diff, the check
+output, and scratch guard fixtures; the engine's browser checks covered Solid store Proxy
+isolation, and the CA's Admin walkthrough passed. Shipped in `991bc90`. Its predecessor step,
+tags → facets, closed 2026-10-08 (`effort/completed/2026-10-06-tags-classification-brief.md`).
 
 ## What triggered it
 
