@@ -38,7 +38,7 @@ source/
 │   │   └── workbench/               — manager, wizard, and supporting form behavior
 │   ├── views/                       — generic UX projection types (placeholder — none yet)
 │   ├── widgets/                     — app-neutral widgets (e.g. HelmWidget)
-│   │   └── widget-registry.ts       — exports widgetRegistry(); generic-tier catalog only
+│   │   └── widget-registry.ts       — exports UxWidgetRegistry; generic-tier catalog only
 │   └── ui/                          — portable shared UI foundation
 │       ├── components/              — Ui{Control} primitives (ui-{name}.tsx, barreled by ui.ts)
 │       ├── charts/                  — reserved chart primitive directory
@@ -57,7 +57,7 @@ source/
     │   ├── stores/                  — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
     │   ├── views/                   — swarmAg domain projections (job-views.ts)
     │   ├── widgets/                 — swarmAg-suite widgets (e.g. BrandWidget)
-    │   │   └── widget-registry.ts   — exports widgetRegistry(); app-tier catalog only
+    │   │   └── widget-registry.ts   — exports AppWidgetRegistry; app-tier catalog only
     │   └── shell/                   — branded chrome and application wiring (*)
     │       └── notes-editor.tsx      — stock notes Index-Detail editor
     ├── app-admin/
@@ -958,7 +958,15 @@ Layout is data-driven via app-local dashboard JSON, rendered by the shared dashb
 
 The app-local dashboard JSON conforms to the dashboard seed contract in `source/ux/shell/dashboard/dashboard-contract.ts`. `DashboardState.init(seed)` validates the seed and converts it into `DashboardStoreView` from `source/ux/shell/dashboard/dashboard-state.ts` by assigning stable store identity to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
 
-`makeDashboardShell()` initializes `DashboardState`, then constructs `Dashboard` with the state contract and the app-supplied widget registry as explicit inputs. A registry is the right shape here because the widget type is variant: the dashboard JSON picks a widget by an arbitrary type string, so something has to resolve that string to a component, and neither the JSON author nor the registry author can know the other's exact set in advance. Each app root merges two registries into one — `ux/widgets/widget-registry.ts`'s generic catalog and `app/widgets/widget-registry.ts`'s swarmAg-suite catalog, both exporting the same `widgetRegistry()` name, combined by object spread — alongside its dashboard JSON: the two halves of one dashboard-shell declaration.
+`makeDashboardShell()` initializes `DashboardState`, then constructs `Dashboard` with the state contract and the app-supplied widget registry as explicit inputs. A registry is the right shape here because the widget type is variant: the dashboard JSON picks a widget by an arbitrary type string, so something has to resolve that string to a component, and neither the JSON author nor the registry author can know the other's exact set in advance.
+
+`ux/widgets/widget-registry.ts` exports the generic catalog object `UxWidgetRegistry`;
+`front/app/widgets/widget-registry.ts` exports the swarmAg-suite catalog object
+`AppWidgetRegistry`. Both conform to `WidgetRegistry`. Each app root imports these objects
+after package configuration (§8.2) and merges them with
+`{ ...UxWidgetRegistry, ...AppWidgetRegistry }`, so app entries take precedence for shared keys.
+The merged registry and app-local dashboard JSON form the two halves of one dashboard-shell
+declaration.
 
 The shell is the closed IoC application framework. It owns the widget extension contracts in `source/ux/shell/dashboard/widget-contract.ts` and shared shell services such as `getShellIdentity()`. Concrete widgets implement those contracts and may consume public shell services. The shell never imports the widget catalog or any concrete widget; applications bind concrete widgets at their composition roots. This direction keeps the shell closed when features are added and prevents a shell/widget dependency cycle. `guard:namespaces` enforces the shell-to-widget
 prohibition.
