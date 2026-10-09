@@ -7,8 +7,6 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Companion seam to api.ts: declared form fields and create defaults.
-Customer and User forms derive drafts and write projections from field metadata.
-Customer declarations add scoped adapters; User declarations project Direct writes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
