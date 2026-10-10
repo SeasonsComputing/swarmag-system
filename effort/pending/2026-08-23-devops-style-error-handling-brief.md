@@ -184,4 +184,12 @@ one.
 `deno task fmt`, `deno task check`, `deno task test` after each of steps 3, 5,
 and 6.
 
+## Amendment — 2026-10-09 — File headers move to the header conformance brief
+
+Header conformance for `source/devops/`, including `edge-sync.ts`'s missing header, is now carried
+by `effort/pending/2026-10-09-file-header-conformance-brief.md` (its Decisions 2–3), which every
+file in the repository follows. This brief's retrofit keeps its error-handling work and leaves
+headers to that one. The guards (`source/devops/guards/`), outside this brief's script retrofit,
+are covered there too.
+
 _End of Backlog Brief_
