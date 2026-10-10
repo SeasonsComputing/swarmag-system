@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Seed ID generator                                                           ║
-║ Rotates and populates genesis seed IDs using UUIDv7 contiguous ordering.    ║
+║ Seed ID generator                                                            ║
+║ Rotates and populates genesis seed IDs using UUIDv7 contiguous ordering.     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ UX smoke test                                                                ║
-║ Validates deployed UX apps with HTTP checks and a real browser boot check.  ║
+║ Validates deployed UX apps with HTTP checks and a real browser boot check.   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

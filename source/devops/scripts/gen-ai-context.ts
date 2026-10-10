@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ AI context generator                                                        ║
-║ Produces topic-scoped code context packets for reasoning-model prompts.     ║
+║ AI context generator                                                         ║
+║ Produces topic-scoped code context packets for reasoning-model prompts.      ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

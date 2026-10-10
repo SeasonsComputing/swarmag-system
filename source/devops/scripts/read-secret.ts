@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Secret reader                                                               ║
-║ Reads one secret value by composite key from a JSONC secrets file.          ║
+║ Secret reader                                                                ║
+║ Reads one secret value by composite key from a JSONC secrets file.           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

@@ -1,8 +1,8 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ API contracts for CRUD, List & business rule operations                     ║
-║ Shared transport-agnostic contracts and pagination helpers                  ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ API contracts for CRUD, List & business rule operations                      ║
+║ Shared transport-agnostic contracts and pagination helpers                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────

@@ -1,8 +1,8 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Make client implementation for API contracts over IndexedDB                 ║
-║ IndexedDB transport bindings for CRUD/list API contracts                    ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Make client implementation for API contracts over IndexedDB                  ║
+║ IndexedDB transport bindings for CRUD/list API contracts                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────

@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ IndexedDB connection manager                                                 ║
-║ Singleton browser database connections with registered object stores.         ║
+║ Singleton browser database connections with registered object stores.        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

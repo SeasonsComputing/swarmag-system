@@ -1,8 +1,8 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Make client implementation for API contracts over HTTP                      ║
-║ HTTP transport bindings for CRUD and business-rule API contracts            ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Make client implementation for API contracts over HTTP                       ║
+║ HTTP transport bindings for CRUD and business-rule API contracts             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
