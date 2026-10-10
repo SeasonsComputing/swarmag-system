@@ -133,6 +133,18 @@ To settle when this is picked up:
 `EFFORT.md` is a governance file: changes need the CA's authorization and are committed with the
 governance-gate bypass. The roadmap's preamble ("entries") is updated alongside.
 
+### File headers do not conform to CONVENTIONS §6
+
+**Observed:** 2026-10-09 · high
+
+Design record: [File Header Conformance — Brief](../pending/2026-10-09-file-header-conformance-brief.md).
+
+### CONVENTIONS does not describe containers
+
+**Observed:** 2026-10-09 · normal
+
+Design record: [Containers in CONVENTIONS — Brief](../pending/2026-10-09-containers-conventions-brief.md).
+
 ## Controls
 
 ### Shared UI controls do not use one state model
