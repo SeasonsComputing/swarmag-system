@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Supabase database genesis runner                                            ║
-║ Applies the canonical schema to the linked Supabase target after approval.  ║
+║ Supabase database genesis runner                                             ║
+║ Applies the canonical schema to the linked Supabase target after approval.   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

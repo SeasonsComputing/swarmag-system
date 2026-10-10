@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Secrets validator                                                           ║
-║ Enforces composed secret-key identity from app, env, and config attributes. ║
+║ Secrets validator                                                            ║
+║ Enforces composed secret-key identity from app, env, and config attributes.  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

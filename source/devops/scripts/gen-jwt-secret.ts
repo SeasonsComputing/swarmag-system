@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ JWT secret generator                                                        ║
-║ Generates a cryptographically secure hex JWT secret for environment config. ║
+║ JWT secret generator                                                         ║
+║ Generates a cryptographically secure hex JWT secret for environment config.  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

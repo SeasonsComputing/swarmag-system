@@ -1,8 +1,8 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Supabase client for OTP auth API contract                                   ║
-║ Passwordless auth operations and auth state subscription mapping            ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Supabase client for OTP auth API contract                                    ║
+║ Passwordless auth operations and auth state subscription mapping             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────

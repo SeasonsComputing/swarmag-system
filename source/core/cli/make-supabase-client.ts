@@ -1,8 +1,8 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ Make client implementation for API contracts over Supabase                  ║
-║ Supabase transport bindings for CRUD, list & business-rule API contracts    ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Make client implementation for API contracts over Supabase                   ║
+║ Supabase transport bindings for CRUD, list & business-rule API contracts     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────

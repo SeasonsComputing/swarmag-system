@@ -1,8 +1,8 @@
 /*
-╔═════════════════════════════════════════════════════════════════════════════╗
-║ API contract for passwordless OTP authentication                            ║
-║ Shared transport-agnostic auth session and lifecycle interface              ║
-╚═════════════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ API contract for passwordless OTP authentication                             ║
+║ Shared transport-agnostic auth session and lifecycle interface               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────

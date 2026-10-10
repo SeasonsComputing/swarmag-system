@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Secret setter                                                               ║
-║ Updates one secret value by key in a JSONC secrets file.                    ║
+║ Secret setter                                                                ║
+║ Updates one secret value by key in a JSONC secrets file.                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE

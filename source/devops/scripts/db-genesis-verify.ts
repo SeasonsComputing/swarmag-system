@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Supabase database seed verification                                         ║
-║ Verifies seed data integrity without modifying the database schema.         ║
+║ Supabase database seed verification                                          ║
+║ Verifies seed data integrity without modifying the database schema.          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
