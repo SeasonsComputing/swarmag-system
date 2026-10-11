@@ -88,11 +88,11 @@ move server-side.
    | scalar or const-enum                          | `eq`, `in`                     |
    | `When` or number                              | `eq`, `gt`, `gte`, `lt`, `lte` |
    | string                                        | `contains`                     |
-   | `Composition*` of scalars (`roles`, `facets`) | `hasSome`, `hasEvery`          |
+   | `Composition*` of scalars (`roles`, `facets`) | `hasAny`, `hasAll`             |
 
    ```ts
    api.Users.list({
-     query: queries.Users.byRole.where({ roles: { hasSome: ['sales'] }, status: { eq: 'active' } }),
+     query: queries.Users.byRole.where({ roles: { hasAny: ['sales'] }, status: { eq: 'active' } }),
      order: 'displayName',
      limit: 50
    })
