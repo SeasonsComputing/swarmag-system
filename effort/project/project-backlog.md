@@ -327,22 +327,7 @@ because the problem did not require it (same brief, amendment "Draft module").
 
 **Observed:** 2026-09-24 · normal
 
-User Manager's list query calls `api.Users.list({ limit: 100 })` once and ignores the result's
-`hasMore`, so a 101st user is silently absent from the Collection — no count, no indication.
-`100` is also the ceiling `ListOptions.limit` clamps to, so raising it is not a fix. Customer
-Manager matches this deliberately, so the two reference implementations load the same way
-rather than diverging.
-
-`ListResult<T>` already carries `cursor` and `hasMore`. The fix belongs in one place both
-managers use, not duplicated per manager. Surfaced in ACE's review of the Customer Manager
-scope.
-
-**Prerequisite for roadmap §6:** the facet catalog (`useFacets`) loads with one first-page list
-call, which is correct while the catalog is empty. This fix must land before facet values are
-seeded, or the catalog will silently truncate
-(`effort/completed/2026-10-06-tags-classification-brief.md`).
-
-## Guards
+Design record: [List Query — Brief](../active/2026-10-11-list-query-brief.md).
 
 ### `guard:css` does not verify that a referenced token resolves
 
@@ -614,7 +599,7 @@ Picking this up: with roadmap §7 Job Definition.
 The work log entry's `userId` and `JobWork.startedById` record who acted, so they are stamped with
 the session user at write time, with no picker (CA, 2026-10-08).
 
-Picking this up: with roadmap §8 Job Runner.
+Picking this up: with roadmap §8 Ops Application.
 
 ## UX
 
