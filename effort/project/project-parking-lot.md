@@ -82,27 +82,6 @@ integration/automation, pipeline measurement (lead→prospect conversion, respon
 a Leads widget on the sales dashboard, and retiring the auth-identity-at-genesis wrinkle
 (leads carry no login).
 
-## Customers query API — status filter & ordering
-
-**Parked:** 2026-07-21 — CA, during B0 close.
-
-**What it is:** `api.Customers.list` is pagination-only (`limit`/`cursor`) and scoped to
-active rows by RLS. It cannot filter by domain `status` (`prospect` vs `active`) or order
-by `created_at`. M1 does not need it — the COW never lists customers (D17 stage 1 is pure
-contact capture). The real consumers are downstream: the prospect hub (D15 — "prospect
-list with time-since-creation") and story 1.2's sales widget, both arriving with the
-assessment flow.
-
-**Why parked:** CA verdict — the query surface lives in the shared `ApiCrudContract` /
-`ListOptions` (`core/api`) plus the PostgREST translation (`core/cli`), so it is a
-core-layer contract evolution, not a Customers-local add. Its shape is a deliberate
-architectural decision the CA intends to design directly, in keeping with the
-framework-free, minimal-dependency house standard — deferred until the hub milestone
-provides a real consumer to pin requirements.
-
-**Picking this up:** A Foundation pass on the core query contract, designed against the
-hub as first consumer — not an ad-hoc filter bolted onto the topic client.
-
 ## Table header gradient seams at fractional column widths
 
 **Parked:** 2026-07-22 — CA, during the panel decomposition.

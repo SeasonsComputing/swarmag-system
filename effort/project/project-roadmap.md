@@ -9,22 +9,49 @@ is and how it relates to the backlog and parking lot.
 block or ride with it. An entry marked **(open)** has no settled position yet — stated as open
 rather than guessed at.
 
-## 1. Users & Customers Vertical Slice
+## 0. Platform Foundation — Closed 2026-06-28
+
+Everything built before application features, from the first commit (2025-12-09) to the first
+feature design, `effort/completed/2026-06-28-user-contact-customer-design.md`:
+
+- **Physical architecture** — static PWA bundles on Netlify's CDN, bound to their Supabase backend
+  at package time; Postgres under row-level security, called directly by the applications;
+  Supabase Auth for passwordless sign-in; edge functions for privileged orchestration only; and
+  IndexedDB on the field device, designed to carry a job's working set offline and return only an
+  append-only log, so field work never needs a two-way sync (built in §8).
+- **Governance** — `CONSTITUTION.md`, `AGENTS.md`, `CONVENTIONS.md` (grown from an 82-line style
+  guide), and the Three-Role Model with its operating modes and production gate.
+- **Domain** — the domain model and data dictionary; abstractions, protocols, validators, and
+  adapters for every topic; the canonical schema generated from the domain; genesis prompts that
+  regenerate it.
+- **Core** — `@core/std` primitives and relations, `makeAdapter`, the API contracts, client makers
+  for Supabase, IndexedDB, HTTP, and RPC, and runtime `Config` with injected providers.
+- **Back end** — Supabase edge functions behind committed entrypoint shims, passwordless OTP
+  authentication, and administrator-only User orchestration.
+- **UX toolkit** — the design language (layered tokens and themes, typography, rhythm), the Ui
+  control catalog over Kobalte, the icon catalog, and the shell: bootstrap, routing, and the
+  dashboard with its widget contract.
+- **DevOps** — architecture guards, packaging, the stage environment, and deployment of the three
+  app bundles.
+
+## 1. Users & Customers Reference Implementations — Closed 2026-10-11
 
 - **User Manager** (`project-user-stories.md` §6) → generalized `AbstractionManager`.
 - **Onboarding Wizard** (§1.1's "Prospect genesis") → generalized `Wizard`.
+- **Customer Manager** (§3) → both workbenches over one shared `panel/` step contract.
 
 Users and Customers stand as this project's **reference implementations** for Abstractions meant to be copied for the remaining ~80% of the app, not iterated on again in their own right. Onboarding wizard is the reference implementation for complex ux workflows.
 
-Positioned first because it's the origin of the reusable archetypes, not because it closes first — it stays open until the dependencies below land, which puts its actual closure after §6:
+Closed with its productions shipped and reviewed. Its remaining items moved to the milestones that
+build them (`EFFORT.md` §7):
 
 1. ~~Notes Editor completed & integrated into User Manager~~ — delivered 2026-10-08 (§4).
 2. ~~Notes Editor integrated with Customer Manager feature completion~~ — delivered 2026-10-08
    (§4), including account notes and a Billing step.
-3. **(open)** Additional-contact assignment (`project-user-stories.md` §1.1): build it before §5,
-   or move it to a later milestone (`EFFORT.md` §7). Until decided, it blocks closing this slice.
-4. Onboarding's Initial Job Assessment stage, which needs §6: the Onboarding Wizard cannot finish
-   before Services, Workflows, and seeding exist.
+3. Additional-contact assignment (`project-user-stories.md` §1.1) is portal users; moved to §9
+   Customer Portal.
+4. Onboarding's Initial Job Assessment stage needs Services, Workflows, and seeding (§6); moved to
+   §7 Job Definition.
 
 ## 2. Shell/App Split — Closed 2026-09-21
 
@@ -39,8 +66,8 @@ Post-genesis Customer editing through `AbstractionManager`, reusing Onboarding's
 Both workbenches now host a sequence of one or more steps over one shared `panel/` step contract.
 `effort/completed/2026-09-22-customer-manager-brief.md`.
 
-It does not close the Users & Customers slice (§1). Additional-contact assignment
-(`project-user-stories.md` §1.1) is not built and has no slot yet.
+Additional-contact assignment (`project-user-stories.md` §1.1) is not built; it is slotted in §9
+Customer Portal.
 
 ## 4. Notes Editor
 
@@ -64,7 +91,7 @@ Workflow classification moves to curated facets. The Notes Editor shows no tags.
 1. **Tags → facets** — completed 2026-10-08: `effort/completed/2026-10-06-tags-classification-brief.md`.
 2. **Notes Editor brief** — completed 2026-10-08: `effort/completed/2026-10-08-notes-editor-brief.md`.
 3. **Notes Editor production** — shipped 2026-10-08 (`991bc90`), with the brief.
-4. **Milestone verification,** this milestone, then §1. Next: steps 1–3 are done; the pass is not
+4. **Milestone verification,** this milestone. Next: steps 1–3 are done; the pass is not
    yet defined (`EFFORT.md` §7 requires one).
 
 Rode with it, delivered 2026-10-08: User Manager consumes it, so User Management is closed; the
@@ -93,20 +120,34 @@ Seeding filters the Workflow library by the selected Services' facets, and the r
 result. Design input, including the open questions on facet values, curation, and Service versus
 Service Category: `effort/pending/2026-10-06-facets-workflow-seeding-brief.md`.
 
+Assessment and planning edit job-specific Workflow clones with the Workflow builder
+(`architecture-front.md` §11.2.3), so this milestone is expected to produce the job assessment and
+job planning briefs that §7 builds.
+
 ## 7. Job Definition
 
 Admin-side (`project-user-stories.md` §2.1–2.6, 2.9): service selection through assessment,
 planning, finalization, and followup. Backlog: "Onboarding — Initial Job Assessment stage"
-(`normal`) covers §2.1 specifically. Needs `api.Jobs` wired (currently commented out in
-`api.ts` — not itself a backlog entry, a real gap) and depends on §6 above for Service/Workflow
-seeding.
+(`normal`) covers §2.1 specifically, and completes the Onboarding Wizard (moved from §1). Needs
+`api.Jobs` wired (currently commented out in `api.ts` — not itself a backlog entry, a real gap)
+and depends on §6 above for Service/Workflow seeding.
 
 Rides with it: backlog "A Customer with Jobs can be deleted" (`normal`) — the first Job that
-references a Customer is where the delete guard lands.
+references a Customer is where the delete guard lands. Also the **Hub widget** (backlog, `normal`),
+the primary approach for grouping dashboard commands by topic, with a hierarchical left-nav panel
+as the named fallback. Job's three independently-tabled phases are its motivating case, so it is
+built with the first milestone that presents a Job — this one — and reused by §8 and §9.
 
-## 8. Job Runner
+## 8. Ops Application
 
-Ops-side (§2.7–2.8): offline field execution. `architecture-front.md`'s normative tree already
+The `app-ops` app, at minimum a hub widget for the Jobs that are its subject plus the Job Runner.
+It closes when a crew member can open an assigned Job and run it offline.
+
+The first app to need the access model, so it lands here: app entry by role, the capability
+module, the `SubjectWidget`, and RLS for the job-reaching tables
+(`effort/pending/2026-10-10-access-model-brief.md`).
+
+**Job Runner** — Ops-side (§2.7–2.8): offline field execution. `architecture-front.md`'s normative tree already
 names `job-runner/` as its own directory, distinct from `job-assessment/`/`job-planning/` —
 the architecture anticipated this as a separate concern, not a sub-case of Job Definition.
 
@@ -120,17 +161,22 @@ clients (`JobsLocal`/`JobAssessmentsLocal`/`JobPlansLocal`/`JobLogsLocal`), and
 `api.uploadJobLogs` — none built yet, but none requiring a design decision either. This is Job
 Runner's own prerequisite plumbing, not a separate milestone with its own feature payload.
 
-## 9. Dashboard Widget Development
+## 9. Customer Portal
 
-Shared widget catalog plus per-app instances — specialization direction, building diverse
-content atop already-generalized primitives (contrast with §2's generalization direction).
-Houses:
+The `app-customer` app, at minimum a hub widget and a customer job report, plus portal users in
+Customer Manager, which carries §1's additional-contact assignment.
+Design outline: `effort/pending/2026-10-08-customer-portal-brief.md`.
+
+Gate: RLS for every customer- and job-reaching table is locked down before the first `customer`
+User exists. Under today's `_all` policies such a User could read and write every table.
+
+## 10. Dashboard Widget Development
+
+The read-only dashboard widgets each app wants: a shared widget catalog plus per-app instances —
+specialization direction, building diverse content atop already-generalized primitives (contrast
+with §2's generalization direction). Last, because it decorates apps that already work. Houses:
 
 - **ux/ui/charts** - 4 chart types available to dashboard widgets
-- **Hub widget** (backlog, `normal`) — primary approach for grouping dashboard commands by
-  topic; hierarchical left-nav panel is the named fallback if it doesn't prove out. Job's three
-  independently-tabled phases are its clearest motivating case, so this milestone likely follows
-  real Job data existing (Job Definition/Job Runner), not precede it.
 - **Prospect Pipeline Visibility** (§1.2) — a prospects-by-age widget plus aging charts, buildable
   off `Customer.status = 'prospect'` alone. The simplest entry in this milestone: no new
   archetype needed, doesn't depend on the parked `Lead` abstraction.
