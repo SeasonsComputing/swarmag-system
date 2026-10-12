@@ -19,21 +19,6 @@ EdgeSupabaseSpecification          Edge Function client configuration.
 makeBusRuleSupabaseEdgeClient(spec) Build business-rule client over Supabase Edge Functions.
 */
 
-import type {
-  ApiBusRuleContract,
-  ApiCrudContract,
-  ApiErrorDetail,
-  DeleteResult,
-  ListOptions,
-  ListResult
-} from '@core/api/api-contract.ts'
-import {
-  checkApiError,
-  checkValidatorError,
-  listCursorValue,
-  listPageLimitValue,
-  throwApiError
-} from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import { instantiable, when } from '@core/std'
 import type {
@@ -47,6 +32,21 @@ import type {
   Validator,
   When
 } from '@core/std'
+import type {
+  ApiBusRuleContract,
+  ApiCrudContract,
+  ApiErrorDetail,
+  DeleteResult,
+  ListOptions,
+  ListResult
+} from '@core/stdx'
+import {
+  checkApiError,
+  checkValidatorError,
+  listCursorValue,
+  listPageLimitValue,
+  throwApiError
+} from '@core/stdx'
 import type { Adapter, AdapterPatch, ScopedUpdateAdapter } from '@core/stdx'
 
 // ───────────────────────────────────────────────────────────────────────────────

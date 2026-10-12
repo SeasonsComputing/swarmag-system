@@ -2,7 +2,7 @@
  * CRUD contract tests for Users API.
  */
 
-import { ApiError } from '@core/api/api-contract.ts'
+import { ApiError } from '@core/stdx'
 import { assert, assertEquals } from '@std/assert'
 import '@tests/config/test-config.ts'
 import type { UserCreate } from '@domain/protocols/user-protocol.ts'

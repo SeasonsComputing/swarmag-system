@@ -15,10 +15,10 @@ AuthSupabaseClient             Authentication singleton
 └ onAuthStateChange(callback)  Subscribe to Supabase auth-state changes
 */
 
-import type { ApiAuthContract, Session } from '@core/api/api-auth-contract.ts'
-import { checkApiError, throwApiError } from '@core/api/api-contract.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import type { Id } from '@core/std'
+import type { ApiAuthContract, Session } from '@core/stdx'
+import { checkApiError, throwApiError } from '@core/stdx'
 
 /** Supabase passwordless OTP auth client. Implements ApiAuthContract. */
 export const AuthSupabaseClient: ApiAuthContract = {

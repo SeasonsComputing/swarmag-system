@@ -1,9 +1,46 @@
-/**
- * Guard against architectural boundary violations.
- * Enforces dependency rules: tests/devops -> front -> ux -> domain -> core; back -> domain -> core
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Architecture boundary guard                                                  ║
+║ Enforce layer direction and the closed core standard library                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Checks source imports for layer, application, configuration, and closed-std
+boundary violations. Runs as a script; exposes the std check for focused tests.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+checkCoreStdBoundary(file, source)  Report imports escaping the std boundary.
+*/
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
+
+/**
+ * Report dependencies outside the closed core standard library.
+ * @param file Absolute source file path.
+ * @param source Source text to inspect.
+ * @returns Violations with source line numbers; empty for files outside std.
+ */
+export const checkCoreStdBoundary = (file: string, source: string): string[] => {
+  const directory = `${ROOT}/source/core/std/`
+  const normalized = normalizePath(file)
+  if (!normalized.startsWith(directory)) return []
+
+  const violations: string[] = []
+  for (const { specifier, index } of findImports(source)) {
+    const relative = specifier.startsWith('./') || specifier.startsWith('../')
+    if (relative) {
+      const target = new URL(specifier, new URL(`file://${normalized}`))
+      if (decodeURIComponent(target.pathname).startsWith(directory)) continue
+    }
+    violations.push(
+      `${normalized.replace(`${ROOT}/`, '')}:${lineNumber(source, index)} - `
+        + `core/std requires relative imports within std (imports "${specifier}")`
+    )
+  }
+  return violations
+}
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 
@@ -24,7 +61,7 @@ type Namespace =
 
 /** Allowed dependencies per namespace (downward dependency flow) */
 const AllowedDeps: Record<Namespace, Set<Namespace>> = {
-  tests: new Set(['tests', 'ux', 'front', 'back', 'domain', 'core', 'external']),
+  tests: new Set(['tests', 'devops', 'ux', 'front', 'back', 'domain', 'core', 'external']),
   devops: new Set(['devops', 'ux', 'front', 'back', 'domain', 'core', 'external']),
   ux: new Set(['ux', 'domain', 'core', 'external']),
   front: new Set(['front', 'ux', 'domain', 'core', 'external']),
@@ -36,7 +73,6 @@ const AllowedDeps: Record<Namespace, Set<Namespace>> = {
 
 /** UX apps forbidden from importing these internals */
 const UX_FORBIDDEN_IMPORTS = [
-  '@core/api/',
   '@core/cfg/',
   '@back',
   '@back-supabase-edge/'
@@ -44,9 +80,12 @@ const UX_FORBIDDEN_IMPORTS = [
 
 /** Import detection regexes */
 const IMPORT_REGEXES = [
-  /\bimport\s+(?:type\s+)?[\s\S]*?from\s+['"]([^'"]+)['"]/g,
-  /\bexport\s+(?:type\s+)?[\s\S]*?from\s+['"]([^'"]+)['"]/g,
-  /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g
+  /\b(?:import|export)\s+(?:type\s+)?\{[^}]*\}\s*from\s+['"]([^'"]+)['"]/g,
+  /\b(?:import|export)\s+(?:type\s+)?\*\s*(?:as\s+\w+)?\s*from\s+['"]([^'"]+)['"]/g,
+  /\bimport\s+[\w$]+(?:\s*,\s*\{[^}]*\})?\s*from\s+['"]([^'"]+)['"]/g,
+  /\bimport\s+[\w$]+\s*,\s*\*\s+as\s+\w+\s*from\s+['"]([^'"]+)['"]/g,
+  /\bimport\s*\(\s*['"]([^'"]+)['"]\s*\)/g,
+  /\bimport\s*['"]([^'"]+)['"]/g
 ]
 
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
@@ -116,11 +155,16 @@ const collectFiles = async (dir: string): Promise<string[]> => {
 
 const findImports = (source: string): Array<{ specifier: string; index: number }> => {
   const imports: Array<{ specifier: string; index: number }> = []
-  for (const regex of IMPORT_REGEXES) {
-    let match: RegExpExecArray | null
-    while ((match = regex.exec(source)) !== null) {
-      imports.push({ specifier: match[1], index: match.index })
-    }
+  // Consume comments and quoted text before trying module-reference patterns.
+  const ignored = /'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|\/\/[^\n]*|\/\*[\s\S]*?\*\//
+  const scanner = new RegExp(
+    [ignored.source, ...IMPORT_REGEXES.map(regex => regex.source)].join('|'),
+    'g'
+  )
+  let match: RegExpExecArray | null
+  while ((match = scanner.exec(source)) !== null) {
+    const specifier = match.slice(1).find(value => value !== undefined)
+    if (specifier !== undefined) imports.push({ specifier, index: match.index })
   }
   return imports
 }
@@ -147,7 +191,8 @@ const checkFrontImports = (file: string, imports: Array<{ specifier: string }>):
     for (const forbidden of UX_FORBIDDEN_IMPORTS) {
       if (specifier.startsWith(forbidden)) {
         violations.push(
-          `Forbidden import: ${specifier} (use @front/api/api.ts, @domain, or @core-std instead)`
+          `Forbidden import: ${specifier} `
+            + '(use @front/api/api.ts, @domain, @core/std, or @core/stdx instead)'
         )
       }
     }
@@ -167,7 +212,8 @@ const checkConfigImports = (file: string, imports: Array<{ specifier: string }>)
     // Direct Config import only in config modules
     if (specifier === '@core/cfg/config.ts' && !configModule) {
       violations.push(
-        'Direct Config import (use package config module: @back-supabase-edge/config/... or @front/app-*/config/...)'
+        'Direct Config import (use package config module: '
+          + '@back-supabase-edge/config/... or @front/app-*/config/...)'
       )
     }
 
@@ -216,10 +262,13 @@ const main = async () => {
       if (!allowed.has(target)) {
         const line = lineNumber(source, entry.index)
         violations.push(
-          `${relative}:${line} - ${namespace} cannot import from ${target} (imports "${entry.specifier}")`
+          `${relative}:${line} - ${namespace} cannot import from ${target} `
+            + `(imports "${entry.specifier}")`
         )
       }
     }
+
+    violations.push(...checkCoreStdBoundary(file, source))
 
     // UX-specific rules
     const frontViolations = checkFrontImports(file, imports)
@@ -241,4 +290,4 @@ const main = async () => {
   guardPass('Architecture')
 }
 
-await main()
+if (import.meta.main) await main()

@@ -335,10 +335,10 @@ receives the projection untranslated.
 
 **Convenience Barrels**
 
-| Import       | Purpose                                                         |
-| ------------ | --------------------------------------------------------------- |
-| `@core/std`  | Standard types (Id, When, Dictionary)                           |
-| `@core/stdx` | Makers and wrappers to runtime project code from standard types |
+| Import       | Purpose                                                   |
+| ------------ | --------------------------------------------------------- |
+| `@core/std`  | Standard types (Id, When, Dictionary)                     |
+| `@core/stdx` | Contracts, makers, and wrappers built from standard types |
 
 **Aliases**
 
@@ -540,7 +540,7 @@ Protected routes wrap content in the auth guard component. The guard is a route-
 ### 9.3 Authentication
 
 `AuthSupabaseClient` (`source/core/cli/auth-supabase-client.ts`) is a singleton that directly
-implements `ApiAuthContract` (`source/core/api/api-auth-contract.ts`). It is not a maker; there is
+implements `ApiAuthContract` (`source/core/std/auth-contract.ts`). It is not a maker; there is
 exactly one auth implementation. It is composed into the API namespace as `api.Auth`.
 
 | Method                        | Purpose                                                        |
@@ -633,7 +633,7 @@ IndexedDB usage is split into two layers:
 - Database namespace (physical DB name), `Config.get('LOCAL_DB_NAME')`, per deployment package.
 - Object Store names are not shared implicitly; they must be registered with `@core/db/indexeddb.ts` using `IndexedDb.registerStore('storeName')`
   - Object Store's for domain abstractions are named for the abstraction, for example, `Job` or `Workflow`.
-- A CRUD/List maker is provided to standardize usage of the local database with `@core/cli/make-indexeddb-client.ts` conforming to `ApiCrudContract` in `@core/api/api-contract.ts`
+- A CRUD/List maker is provided to standardize usage of the local database with `@core/cli/make-indexeddb-client.ts` conforming to `ApiCrudContract` in `@core/stdx`
 
 **IndexedDB Database Names**
 

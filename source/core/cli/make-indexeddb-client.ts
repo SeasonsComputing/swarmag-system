@@ -15,20 +15,6 @@ CrudIndexedDbSpecification     CRUD IndexedDB client configuration, incl. valida
 makeCrudIndexedDbClient(spec)  Build CRUD/list client over IndexedDB.
 */
 
-import type {
-  ApiCrudContract,
-  ApiErrorDetail,
-  DeleteResult,
-  ListOptions,
-  ListResult
-} from '@core/api/api-contract.ts'
-import {
-  apiError,
-  checkValidatorError,
-  listCursorValue,
-  listPageLimitValue,
-  throwApiError
-} from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import { instantiable, when } from '@core/std'
 import type {
@@ -42,6 +28,14 @@ import type {
   Validator,
   When
 } from '@core/std'
+import type { ApiCrudContract, ApiErrorDetail, DeleteResult, ListOptions, ListResult } from '@core/stdx'
+import {
+  apiError,
+  checkValidatorError,
+  listCursorValue,
+  listPageLimitValue,
+  throwApiError
+} from '@core/stdx'
 import type { Adapter, AdapterPatch, ScopedUpdateAdapter } from '@core/stdx'
 
 /** Configuration for a CRUD IndexedDB API client. */

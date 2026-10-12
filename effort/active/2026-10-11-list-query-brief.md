@@ -155,7 +155,7 @@ field can claim them.
 
 ## Scope the production will touch
 
-- `core/api/api-contract.ts`: `ListOptions`, `ListResult`, and the cursor helpers.
+- `core/std/api-contracts.ts` (Core API Dissolution target): `ListOptions`, `ListResult`, and the cursor helpers.
 - `core/std/make-adapter.ts`: `FieldAdapter.column`.
 - `makeQuery` and its types, beside `makeScope`, exported through `@core/stdx`.
 - `core/cli/make-supabase-client.ts` and `make-indexeddb-client.ts`: translation and evaluation.
