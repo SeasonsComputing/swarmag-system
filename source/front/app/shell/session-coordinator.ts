@@ -15,8 +15,8 @@ PUBLIC
 SessionCoordinator  Initialize session coordination or clear prepared state.
 */
 
-import type { Session } from '@core/api/api-auth-contract.ts'
 import type { Id } from '@core/std'
+import type { Session } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 import { onCleanup } from '@solid-js'
 import type { SessionCoordinatorContract } from '@ux/shell/runtime/shell.ts'

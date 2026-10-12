@@ -14,7 +14,7 @@ PUBLIC
 logout  Ends the active session and clears local session state.
 */
 
-import type { ApiAuthContract } from '@core/api/api-auth-contract.ts'
+import type { ApiAuthContract } from '@core/stdx'
 import { SessionState } from './session-state.ts'
 
 /** End the active session and always clear local session state. */

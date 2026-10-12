@@ -42,11 +42,11 @@ rowWidgets: DashboardWidgetsContract - Widget mutation contract
 └ move(row, id, dir)    Reorder widgets.
 */
 
-import { ApiError, apiError } from '@core/api/api-contract.ts'
 import { Config } from '@core/cfg/config.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import { djb2hash, id } from '@core/std'
 import type { Dictionary, Instance } from '@core/std'
+import { ApiError, apiError } from '@core/stdx'
 import { createStore, produce } from '@solid-js/store'
 import type {
   DashboardRowHeader,

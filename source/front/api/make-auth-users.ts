@@ -16,7 +16,13 @@ makeAuthUsers      Build the auth-synchronized Users CRUD client, validated befo
                    dispatch even though create/update proxy to edge functions.
 */
 
-import { checkValidatorError } from '@core/api/api-contract.ts'
+import {
+  makeBusRuleSupabaseEdgeClient,
+  makeBusRuleSupabaseRpcClient,
+  makeCrudSupabaseClient
+} from '@core/cli/make-supabase-client.ts'
+import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
+import { checkValidatorError } from '@core/stdx'
 import type {
   CrudBaseContract,
   CrudListContract,
@@ -24,13 +30,7 @@ import type {
   DirectUpdateContract,
   ListOptions,
   ListResult
-} from '@core/api/api-contract.ts'
-import {
-  makeBusRuleSupabaseEdgeClient,
-  makeBusRuleSupabaseRpcClient,
-  makeCrudSupabaseClient
-} from '@core/cli/make-supabase-client.ts'
-import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
+} from '@core/stdx'
 import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { validateUserCreate, validateUserUpdate } from '@domain/validators/user-validator.ts'

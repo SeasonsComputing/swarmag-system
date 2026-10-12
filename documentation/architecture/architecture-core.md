@@ -49,13 +49,13 @@ All code, schemas, and infrastructure are derived artifacts. If code conflicts w
 
 The system is built on the following technology stack:
 
-| Platform     | Purpose                      | Features/Technology                                              |
-| ------------ | ---------------------------- | ---------------------------------------------------------------- |
-| **Netlify**  | Static hosting, DNS          | SPA delivery, SSL certificates, DNS management                   |
-| **Supabase** | Backend services, Data, Auth | Edge Functions, PostgreSQL, Storage buckets, JWT authentication  |
-| **GitHub**   | Version control, CI/CD       | Source control, Build pipelines                                  |
-| **SolidJS**  | Application UX               | PWA, SPA, TanStack, Kobalte, Chart.js (via UiChart), Vanilla CSS |
-| **Deno**     | TypeScript runtime           | Development, testing, backend edge functions                     |
+| Platform     | Purpose                      | Features/Technology                                             |
+| ------------ | ---------------------------- | --------------------------------------------------------------- |
+| **Netlify**  | Static hosting, DNS          | SPA delivery, SSL certificates, DNS management                  |
+| **Supabase** | Backend services, Data, Auth | Edge Functions, PostgreSQL, Storage buckets, JWT authentication |
+| **GitHub**   | Version control, CI/CD       | Source control, Build pipelines                                 |
+| **SolidJS**  | Application UX               | PWA, SPA, TanStack, Kobalte, Chart.js, Vanilla CSS              |
+| **Deno**     | TypeScript runtime           | Development, testing, backend edge functions                    |
 
 ### 2.1 Platform Responsibilities
 
@@ -287,7 +287,8 @@ export const api = {
 
 ### 5.2 Client Contracts
 
-The system defines three client contracts (in `source/core/api/api-contract.ts`):
+The client contracts live in `source/core/std/api-contracts.ts` and
+`source/core/std/auth-contract.ts`, exported through `@core/stdx`:
 
 #### 5.2.1 CRUD & List Contract
 
@@ -325,7 +326,7 @@ type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
 `ScopedUpdate<T, K>` already carries `id` (via `Pick<T, 'id'>`), so no method takes `id` as a
 separate parameter. `DirectUpdateContract<T>` composes the update capability for abstraction-oriented
 HTTP endpoints and Users: `update(source)` performs no client-side adapter translation, and `K` is
-chosen per call. See `source/core/api/api-contract.ts` for the full set.
+chosen per call. See `source/core/std/api-contracts.ts` for the full set.
 
 #### 5.2.2 Business Rule Contract
 
@@ -792,7 +793,8 @@ Configuration is declared in higher layers but accessible in lower layers throug
 **Dependency Rules:**
 
 ```text
-tests/devops  ──> front, ux, back, domain, core
+tests         ──> devops, front, ux, back, domain, core
+devops        ──> front, ux, back, domain, core
 front         ──> ux, domain, core
 ux            ──> domain, core
 back          ──> domain, core
@@ -801,6 +803,9 @@ core          (no internal layer dependencies)
 ```
 
 These rules are enforced through import discipline and architectural guards. Violations are build failures.
+
+Tests may import `devops` because tests verify behavior, tooling included. `devops` never imports
+`tests`: it runs them through tasks.
 
 **Key Principle:** Dependencies flow downward. Lower layers have no knowledge of higher layers. Core is the foundation with no dependencies.
 
@@ -811,7 +816,6 @@ swarmag-system/
 ├── documentation/
 ├── source/
 │   ├── core/
-│   │   ├── api/
 │   │   ├── cfg/
 │   │   ├── cli/
 │   │   ├── db/
@@ -1051,6 +1055,16 @@ These rules must never be violated. Code that violates these invariants is wrong
 - Stop and escalate rather than proceeding with assumptions
 - Applies to both human and AI contributors
 - Fast-fail configuration over defensive programming
+
+#### 10.1.11 Core standard library is closed
+
+- Files under `source/core/std/` import and re-export only relative modules resolving within that
+  directory.
+- The rule covers static and type imports, re-exports, side-effect imports, and literal dynamic
+  imports.
+- No aliases, other core namespaces, higher layers, or third-party dependencies are permitted.
+- Internal references use individual modules, avoiding cycles through the public barrels.
+- Consumers use `@core/std` for primitives and `@core/stdx` for contracts, makers, and wrappers.
 
 ### 10.2 Enforcement
 

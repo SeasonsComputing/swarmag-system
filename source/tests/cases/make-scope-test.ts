@@ -2,9 +2,9 @@
  * Scope inference, constraints, and create/update projection tests.
  */
 
-import type { CrudBaseContract, DirectUpdateContract } from '@core/api/api-contract.ts'
 import { id } from '@core/std'
 import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
+import type { CrudBaseContract, DirectUpdateContract } from '@core/stdx'
 import { makeAdaptedScope, makeScope } from '@core/stdx'
 import type { DraftOf } from '@core/stdx'
 import type { Customer } from '@domain/abstractions/customer.ts'

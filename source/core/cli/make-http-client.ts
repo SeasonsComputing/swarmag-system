@@ -22,17 +22,6 @@ makeBusRuleHttpClient(spec)  Build business-rule runner over HTTP.
 */
 
 import type {
-  ApiBusRuleContract,
-  ApiErrorDetail,
-  CrudBaseContract,
-  CrudListContract,
-  DeleteResult,
-  DirectUpdateContract,
-  ListOptions,
-  ListResult
-} from '@core/api/api-contract.ts'
-import { ApiError, checkApiError, checkValidatorError, throwApiError } from '@core/api/api-contract.ts'
-import type {
   CreateFromInstantiable,
   Dictionary,
   FromInstantiable,
@@ -42,6 +31,17 @@ import type {
   UpdateFromInstantiable,
   Validator
 } from '@core/std'
+import type {
+  ApiBusRuleContract,
+  ApiErrorDetail,
+  CrudBaseContract,
+  CrudListContract,
+  DeleteResult,
+  DirectUpdateContract,
+  ListOptions,
+  ListResult
+} from '@core/stdx'
+import { ApiError, checkApiError, checkValidatorError, throwApiError } from '@core/stdx'
 
 /** Configuration for a business-rule HTTP API client. */
 export type HttpSpecification = { basePath: string }

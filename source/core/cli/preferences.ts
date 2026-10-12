@@ -16,9 +16,10 @@ Preferences - Persistent preferences backed by IndexedDB.
 └ set(key, value)  Persist one preference value by key.
 */
 
-import { apiError, type ApiErrorDetail, throwApiError } from '@core/api/api-contract.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import type { Instance, StringDictionary } from '@core/std'
+import { apiError, throwApiError } from '@core/stdx'
+import type { ApiErrorDetail } from '@core/stdx'
 
 /** Preference store must have an id for the db. */
 type PreferencesStore = Instance & { state: StringDictionary }

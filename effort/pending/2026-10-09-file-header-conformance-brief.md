@@ -228,6 +228,10 @@ authorization.
 
 ## Production scope (sketch)
 
+Core API Dissolution relocates the audited `source/core/api/api-contract.ts` to
+`source/core/std/api-contracts.ts`; use the new path for remaining header work. Historical audit
+paths above are retained.
+
 First, the CONVENTIONS amendment rewriting §6 as Decisions 1–5, with the same rules in
 `architecture-devops.md` (governance file: committed with the governance-gate bypass), then a
 re-audit against it. Then bring each remaining file into conformance with the rules as settled: add missing

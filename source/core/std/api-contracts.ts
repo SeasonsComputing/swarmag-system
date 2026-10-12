@@ -49,7 +49,10 @@ DeleteResult - Uniform soft-delete response payload.
 LISTING CONTRACTS
 ───────────────────────────────────────────────────────────────────────────────
 CrudListContract<T> - Paginated listing.
-└ list?(options?)  List resources with pagination.
+└ list(options?)  List resources with pagination.
+DEFAULT_LIMIT - Default list page size.
+MAX_LIMIT - Maximum list page size.
+DEFAULT_CURSOR - Initial list offset.
 ListOptions - Pagination request options.
 ├ limit   Requested page size.
 └ cursor  Requested pagination cursor.
@@ -61,17 +64,13 @@ listPageLimitValue(string): number Parse/clamp list page size.
 listCursorValue(string):    number Parse/sanitize list cursor offset.
 */
 
-import type {
-  CreateFromInstantiable,
-  Dictionary,
-  ExpectResult,
-  FromInstantiable,
-  Id,
-  Instantiable,
-  ScopedUpdate,
-  When
-} from '@core/std'
-import type { ScopedUpdateAdapter } from '@core/stdx'
+import type { Dictionary } from './adt.ts'
+import type { When } from './datetime.ts'
+import type { Id } from './identifier.ts'
+import type { FromInstantiable, Instantiable } from './instance.ts'
+import type { ScopedUpdateAdapter } from './make-adapter.ts'
+import type { CreateFromInstantiable, ScopedUpdate } from './protocols.ts'
+import type { ExpectResult } from './validators.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // ERROR HANDLING
