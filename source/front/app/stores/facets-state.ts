@@ -7,7 +7,7 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Hides the cached query and resolves facet references, including inactive entries.
-First-page loading remains until the shared paging repair required before seeding.
+Loads every visible catalog page before exposing the cached result.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -16,6 +16,7 @@ useFacets()  Access the shared cached catalog inside the component tree.
 */
 
 import { StringSet } from '@core/std'
+import { listAll } from '@core/stdx'
 import type { Facet } from '@domain/abstractions/common.ts'
 import { api } from '@front/api/api.ts'
 import { createQuery, useQueryClient } from '@tanstack/solid-query'
@@ -63,4 +64,4 @@ export const useFacets = (): FacetsState => {
 
 const FACETS_QUERY_KEY = ['facets'] as const
 
-const loadFacets = async (): Promise<readonly Facet[]> => (await api.Facets.list()).data
+const loadFacets = (): Promise<readonly Facet[]> => Array.fromAsync(listAll(api.Facets))

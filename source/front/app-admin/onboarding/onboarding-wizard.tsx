@@ -16,7 +16,7 @@ OnboardingWizard       Customer intake composition root.
 */
 
 import { api } from '@front/api/api.ts'
-import { scopes } from '@front/api/form-scopes.ts'
+import { scopes } from '@front/api/scopes.ts'
 import { createCustomerState, customerDraft } from '@front/app-admin/customers/customer-state.ts'
 import { customerSteps } from '@front/app-admin/customers/customer-steps.tsx'
 import type { WizardContract } from '@ux/shell/workbench/wizard-contract.ts'

@@ -131,8 +131,10 @@ source/ux/widgets/helm-widget.tsx
 
 Also, in files counted above:
 
-- `source/core/cli/make-supabase-client.ts` lists obsolete `RpcSupabaseSpecification` and
-  `EdgeSupabaseSpecification`.
+- ~~`source/core/cli/make-supabase-client.ts` lists obsolete `RpcSupabaseSpecification` and
+  `EdgeSupabaseSpecification`.~~ Resolved 2026-10-11 by the list-query production
+  (`effort/active/2026-10-11-list-query-brief.md`, production review correction 4): the header now
+  names `BusRuleSupabaseSpecification` and lists every export.
 - `source/core/std/wrap-http-handler.ts` places several symbol descriptions on the line after the
   symbol.
 

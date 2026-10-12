@@ -38,6 +38,9 @@ Deno.test('fromDomain writes falsy values through', () => {
 
 Deno.test('field adapters expose keys and serialize one storage column', () => {
   assertEquals(WidgetAdapter.label.key, 'label')
+  assertEquals(WidgetAdapter.active.column, 'is_active')
+  assertEquals(WidgetAdapter.label.column, 'label')
+  assertEquals(WidgetAdapter.gauges.column, 'gauges')
   assertEquals(WidgetAdapter.label.fromDomain('ok'), { label: 'ok' })
 })
 

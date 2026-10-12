@@ -48,7 +48,8 @@ source/
 └── front/
     ├── api/
     │   ├── api.ts                   — API client and request/response types
-    │   ├── form-scopes.ts           — declared form write scopes (§7.4)
+    │   ├── scopes.ts                — declared form write scopes (§7.4)
+    │   ├── queries.ts               — declared typed list queries (§7.4)
     │   └── make-auth-users.ts       — Users client over the edge functions (§7.2.3)
     ├── config/
     ├── app/                         — swarmAg-suite-wide, shared across all three apps, not generic
@@ -223,7 +224,7 @@ All entries in `source/front/api/api.ts`:
 
 ```typescript
 api.Users.get(id: Id): Promise<User>
-api.Users.list(options?: ListOptions): Promise<ListResult<User>>
+api.Users.list(options?: ListOptions<User>): Promise<ListResult<User>>
 api.Users.create(input: UserCreate): Promise<User>
 api.Users.update<K>(source: ScopedUpdate<User, K>): Promise<User>
 api.Users.delete(id: Id): Promise<DeleteResult>
@@ -311,7 +312,7 @@ in `architecture-core.md` §5.2.6.
 
 `@core/stdx` (`core/std/make-scope.ts`) exports `makeScope`, `makeAdaptedScope`, `Scope`,
 `AdaptedScope`, `ScopeDraft`, and `DraftOf`.
-`front/api/form-scopes.ts` hosts the `scopes` housing object parallel to `api.ts`.
+`front/api/scopes.ts` hosts the `scopes` housing object parallel to `api.ts`.
 Both makers infer from adapter field metadata without type arguments.
 `ScopeDraft<T, K>` selects the scope's domain attributes, preserving domain optionality.
 `DraftOf<typeof scope>` derives that draft without restating its fields. The declaration exposes
@@ -326,6 +327,16 @@ values that do not admit absence remain unchanged. Both projections exclude unow
 attributes supplied through structurally compatible variables. Compositions pass through whole.
 For an Adapted declaration, the scoped adapter translates the projected update; a Direct client
 receives the projection untranslated.
+
+Declared list queries are hosted in `front/api/queries.ts`, beside the scopes. Application callers
+build a readonly query and pass it as `api.Users.list({ query, limit, cursor })`. `Users.byRole`
+filters roles and status, searches display name, primary email, and phone number, and orders by
+display name. It supplies the User picker contract; the picker itself is a separate feature.
+
+Managers and the facet catalog collect `listAll(client)` through `Array.fromAsync`; paging stays
+inside the shared iterator until the cursor is null. The list contract,
+operator set, cursor rejection, search bounds, and store-specific ordering are defined in
+`architecture-core.md` §5.2.1. Changing a filter requires starting without a cursor.
 
 ## 8. Architectural Boundaries
 
@@ -866,7 +877,7 @@ retain both dismissal paths.
   editor inside a step.
 
 The Customer workbench declares contact, identity, status, address, sites, and notes in
-`front/api/form-scopes.ts` through `makeAdaptedScope`, with
+`front/api/scopes.ts` through `makeAdaptedScope`, with
 `{ accountManagerId: undefined }` as create defaults.
 `CustomerDraft` in `customer-state.ts` is `DraftOf<typeof scopes.Customers.detail>`; its state and
 projection remain domain-shaped. Customer Manager and Onboarding create through
@@ -880,8 +891,8 @@ and confirmed soft Delete through the existing Customer API.
 
 - Delete is for an account that should not exist. Inactive status is for a real former customer.
 - A Jobs dependency guard is deferred to Job Definition.
-- Lists match User Manager's first-page `limit: 100`; pagination is separate work.
-- `scopes.Customers.detail` in `front/api/form-scopes.ts` covers primary contact,
+- Lists load all visible rows through keyset pages of up to 100, as User Manager does.
+- `scopes.Customers.detail` in `front/api/scopes.ts` covers primary contact,
   identity, status, billing address, sites, and account notes. It excludes account-manager assignment.
 - Clearing an optional stored address field uses the existing explicit-null update protocol.
 

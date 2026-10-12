@@ -7,7 +7,7 @@ import { assert, assertEquals } from '@std/assert'
 import '@tests/config/test-config.ts'
 import type { UserCreate } from '@domain/protocols/user-protocol.ts'
 import { api } from '@front/api/api.ts'
-import { scopes } from '@front/api/form-scopes.ts'
+import { scopes } from '@front/api/scopes.ts'
 
 Deno.test('users API supports full CRUD lifecycle with soft delete', async context => {
   if (!api.Users.list) throw new Error('Users API list contract is required for this test')
@@ -72,6 +72,6 @@ Deno.test('users API supports full CRUD lifecycle with soft delete', async conte
   assert(deletedGetError instanceof ApiError)
   assertEquals(deletedGetError.status, 404)
 
-  const listed = await api.Users.list({ limit: 100, cursor: 0 })
+  const listed = await api.Users.list({ limit: 100 })
   assertEquals(listed.data.some(user => user.id === created.id), false)
 })

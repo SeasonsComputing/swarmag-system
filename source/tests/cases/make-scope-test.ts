@@ -11,7 +11,7 @@ import type { Customer } from '@domain/abstractions/customer.ts'
 import type { User } from '@domain/abstractions/user.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
-import { scopes } from '@front/api/form-scopes.ts'
+import { scopes } from '@front/api/scopes.ts'
 import { assertEquals } from '@std/assert'
 import { blueMesaRanchCustomer } from '@tests/fixtures/customer-samples.ts'
 

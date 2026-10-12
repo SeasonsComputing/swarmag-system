@@ -541,6 +541,11 @@ runtime should load browser-backed stores through `api` at all.
   route to an administrator session (an admin-generated link, or a dedicated test identity on
   stage). Stage is the only environment, so that is an authorization-boundary decision. Fixing
   bootstrap alone moves the failure from import to authorization.
+- **No standard way to supply stage configuration (found 2026-10-11):** `deno task test` loads
+  no env file, so a configured test runs only where someone has exported the variables by hand,
+  and none is run routinely. The list-query production therefore carries no database-backed
+  automated tests: its Postgres behavior is verified in the app against a checklist, and its
+  automated tests need no database (`effort/active/2026-10-11-list-query-brief.md`).
 
 ## Customer
 
