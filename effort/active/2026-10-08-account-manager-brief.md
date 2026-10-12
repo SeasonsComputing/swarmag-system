@@ -42,8 +42,8 @@ themself, so the default is the session user**, changeable through a picker.
 1. **A shared User picker.** One single-select control that chooses a User and defaults to the
    session user where a person names themself. **The roles it lists are a parameter** set by each
    use: the account manager lists `sales`; job crew lists `operations`. It serves the account
-   manager now; the assessor and planner reuse it (backlog: "Assessor and planner are chosen with the User
-   picker").
+   manager now; the assessor and planner reuse it (backlog: "Assessor and planner are chosen with
+   the User picker").
 2. **The account manager** is a User picker field on the Customer Detail step, with Name and Status
    and above the account notes. Onboarding and Customer Manager share that step, so it is set
    during Onboarding, defaulting to the session user, and changeable in Customer Manager.
@@ -70,10 +70,25 @@ themself, so the default is the session user**, changeable through a picker.
    and sales Users also hold `administrator`
    (`effort/pending/2026-10-10-access-model-brief.md`, decisions 2 and 6). Finer rules by role
    wait for `app-leads`, when sales Users leave the administrator role.
-9. **The picker issues its own query** through `queries.Users.byRole` (`roles` has some of the
-   listed roles, `status` is active), plus the current account manager by id when needed. There is
-   no shared user cache: a `useUsers` Query State module is added when a surface first needs
-   user names resolved from ids. User Manager is unchanged.
+9. **The picker issues its own query,** built from a declaration in `front/api/queries.ts`
+   (`effort/active/2026-10-11-list-query-brief.md`, decision 14):
+
+   ```ts
+   const query = queries.Users.byRole.build({
+     where: { roles: { hasAny: listedRoles }, status: { eq: 'active' } }
+   })
+   api.Users.list({ query })
+   ```
+
+   - `queries.Users.byRole` declares `roles` and `status` as filters and `displayName` as its
+     order, so options list alphabetically. This production adds the declaration if the list-query
+     production did not. The picker offers no search box.
+   - `listedRoles` is the picker's roles parameter, a non-empty tuple (list-query decision 18): the
+     account manager passes `['sales']`.
+   - A current account manager who no longer qualifies is fetched by id (`api.Users.get`) and
+     added to the options (decision 7).
+   - There is no shared user cache: a `useUsers` Query State module is added when a surface first
+     needs user names resolved from ids. User Manager is unchanged.
 10. **`scopes.Customers.detail` gains `CustomerAdapter.accountManagerId`** and its create defaults
     become `{}`, since an attribute is never both in scope and defaulted (`architecture-core.md`
     §5.2.6).
@@ -81,7 +96,8 @@ themself, so the default is the session user**, changeable through a picker.
 ## Dependencies
 
 - **`effort/active/2026-10-11-list-query-brief.md`** ships first: decision 9 needs declared
-  queries, and that brief renames `form-scopes.ts` to `scopes.ts`.
+  queries and `build`, and that brief renames `form-scopes.ts` to `scopes.ts`, where decision 10's
+  scope lives.
 - **The account manager gains access meaning.** A sales User's Ops subjects are the Jobs of
   Customers they are account manager for (access model brief, decision 10). Nothing in this
   production depends on it.
@@ -109,6 +125,8 @@ a shared user cache.
   may set only themself or None while an administrator chooses from the full list, and that only
   an administrator may delete a Customer. Examining them led to the access model brief, under which
   the two office roles are trusted equally until `app-leads`; the rules wait for it.
+- **2026-10-11:** decision 9 rewritten to the list-query call shape (`build` producing a
+  `Query<T>`, `hasAny`, a non-empty roles tuple) as that brief's design settled.
 - **A shared `useUsers` cache was proposed and rejected for now.** With declared queries the
   server filters by role, so a cache's remaining value is resolving names from ids, which no
   surface needs yet.
