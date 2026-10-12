@@ -315,18 +315,59 @@ interface AdaptedUpdateContract<T extends Instantiable> {
 }
 
 interface CrudListContract<T> {
-  list(options?: ListOptions): Promise<ListResult<T>>
+  list(options?: ListOptions<T>): Promise<ListResult<T>>
 }
 
 type DeleteResult = { id: Id; deletedAt: When }
-type ListOptions = { limit?: number; cursor?: number }
-type ListResult<T> = { data: T[]; cursor: number; hasMore: boolean }
+type ListOptions<T> = { query?: Query<T>; limit?: number; cursor?: string }
+type ListResult<T> = { data: T[]; cursor: string | null; hasMore: boolean }
 ```
 
 `ScopedUpdate<T, K>` already carries `id` (via `Pick<T, 'id'>`), so no method takes `id` as a
 separate parameter. `DirectUpdateContract<T>` composes the update capability for abstraction-oriented
 HTTP endpoints and Users: `update(source)` performs no client-side adapter translation, and `K` is
 chosen per call. See `source/core/std/api-contracts.ts` for the full set.
+
+Declared reads live in `front/api/queries.ts`. `makeQuery` selects adapter fields for filters,
+search, and a non-empty order declaration; `build` produces readonly, branded `Query<T>` data.
+The brand guards construction at compile time, not authorization. Applications consume declarations
+without importing adapters. Every field adapter exposes its storage `column` explicitly.
+
+`listAll(client, query?)` yields records as an async iterator, paging internally at `MAX_LIMIT`
+until the returned cursor is null. Collection consumers use `Array.fromAsync`; a caller may stop
+iteration early. `listPageLimit(number?)` clamps numeric limits to 1–`MAX_LIMIT`, defaulting to
+`DEFAULT_LIMIT` when omitted. A shared page assembler retains each store's native sort value, and
+`resolveQueryFields` in `api-contracts.ts` rejects unknown fields before either store evaluates
+the query. Adapter makers retain serialization alone; standard-library dependencies are acyclic,
+including type-only imports.
+
+Filters are ANDed. Scalars support `eq` and non-empty `in`; strings and numbers also support
+`gt`, `gte`, `lt`, and `lte`. Scalar compositions support non-empty `hasAny` and `hasAll`.
+Object compositions and reserved names (`and`, `or`, `not`, `search`) cannot be declared as filters.
+Absent optional values match no operator. Set non-emptiness is enforced at compile time only.
+
+Search is offered only over declared text fields, excluding timestamps by declaration policy.
+One term is matched across these fields with OR, then ANDed with filters. Building removes stars,
+trims, and normalizes to NFC before omitting an empty term. Search is case-insensitive and
+accent-sensitive within the stated Latin casing bounds; stored NFC is assumed, not enforced.
+Supabase applies targeted SDK filters for ordinary conditions and JSONB containment; generated
+alternatives use separate OR parameters, ANDed by PostgREST. OR operands escape only backslashes
+and quotes before wrapping in quotes, preserving control characters. Search uses escaped `ilike`;
+local evaluation uses `toLocaleLowerCase('en-US')`.
+
+Order fields are required strings or numbers. Build resolves the requested order, or the first
+field ascending. `id` breaks ties in the same direction. Without a query, clients order by
+`createdAt` then `id`, ascending. Ordering and paging are consistent within each store; cross-store
+order parity is not promised. Local text ordering and cursor comparisons use the same
+`Intl.Collator('en-US')`, including its ties. Chronological local timestamp comparison depends on
+the future deep clone establishing one timestamp form; this contract does not canonicalize `When`.
+
+Cursors are base64url JSON retaining the exact returned sort value, id, order and direction,
+issuing store/resource, and a stable criteria/search fingerprint. A missing cursor starts a list;
+a final page returns `cursor: null` and `hasMore: false`. Clients fetch one extra row. Malformed,
+foreign-store/resource, or query-mismatched cursors throw `ApiError` 400. Supabase timestamp
+predicates compare instants without reducing their returned precision. Keyset paging is not a
+snapshot across concurrent edits. HTTP clients forward query data unchanged.
 
 #### 5.2.2 Business Rule Contract
 
@@ -407,7 +448,7 @@ CRUD writes cross three distinct boundary checks:
 `UpdateFromInstantiable<T>` remains the broad update protocol for callers that may touch any subset of
 an abstraction. It is not a form authorization surface. A form that edits a known set of fields declares
 that set explicitly through adapter field metadata, never by deriving every key of the abstraction.
-The API composition layer hosts these declarations in `front/api/form-scopes.ts`:
+The API composition layer hosts these declarations in `front/api/scopes.ts`:
 
 - A form declares its fields and create defaults through
   `makeScope({ fields: [XAdapter.field, …], defaults })`. The declaration owns the form's

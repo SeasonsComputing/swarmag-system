@@ -110,7 +110,7 @@ export const makeCrudHttpClient = <T extends Instantiable>(
   },
 
   /** List records over HTTP using list payload options. */
-  async list(options?: ListOptions): Promise<ListResult<T>> {
+  async list(options?: ListOptions<T>): Promise<ListResult<T>> {
     const res = await request(`${basePath}/list`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -214,7 +214,7 @@ async function unwrapList<T>(
   }
   return {
     data: body.data as T[],
-    cursor: body.cursor as number,
+    cursor: body.cursor as string | null,
     hasMore: body.hasMore as boolean
   }
 }

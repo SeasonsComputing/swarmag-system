@@ -16,9 +16,10 @@ CustomerManager       Customer collection and editor host.
 */
 
 import { demandOne } from '@core/std'
+import { listAll } from '@core/stdx'
 import type { Customer, CustomerStatus } from '@domain/abstractions/customer.ts'
 import { api } from '@front/api/api.ts'
-import { scopes } from '@front/api/form-scopes.ts'
+import { scopes } from '@front/api/scopes.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
 import { Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
@@ -37,11 +38,11 @@ export type CustomerManagerProps = {
   onCancel: () => void
 }
 
-/** Customer CRUD provider using the same first-page limit as User Manager. */
+/** Customer CRUD provider loading the whole collection through keyset pages. */
 export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
   const customersQuery = createQuery(() => ({
     queryKey: ['customers'],
-    queryFn: async () => (await api.Customers.list({ limit: 100 })).data
+    queryFn: loadCustomers
   }))
   const scope = scopes.Customers.detail
   const provider: AbstractionManagerContract<Customer, CustomerDraft> = {
@@ -115,4 +116,9 @@ const CustomerStatusBadges: Record<CustomerStatus, { variant: UiBadgeVariant; ic
   active: { variant: 'success', icon: 'check' },
   inactive: { variant: 'warning', icon: 'minus' },
   prospect: { variant: 'info', icon: 'target' }
+}
+
+/** Load every visible Customer, retaining keyset ordering across pages. */
+function loadCustomers(): Promise<Customer[]> {
+  return Array.fromAsync(listAll(api.Customers))
 }

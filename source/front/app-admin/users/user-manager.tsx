@@ -14,9 +14,10 @@ UserManagerProps  Route modal cancellation contract.
 UserManager       User management workbench.
 */
 
+import { listAll } from '@core/stdx'
 import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
-import { scopes } from '@front/api/form-scopes.ts'
+import { scopes } from '@front/api/scopes.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
 import { For, Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
@@ -120,9 +121,8 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
 const USERS_QUERY_KEY = ['users'] as const
 
 /** Loads the user list for the user manager. */
-async function loadUsers(): Promise<User[]> {
-  const result = await api.Users.list({ limit: 100 })
-  return result.data
+function loadUsers(): Promise<User[]> {
+  return Array.fromAsync(listAll(api.Users))
 }
 
 /** Renders the identity content for one user. */

@@ -37,6 +37,7 @@ export type AdapterPatch<T> = { [K in keyof T]?: T[K] | null } & Dictionary
 /** Serialization adapter for one domain field. */
 export type FieldAdapter<T, K extends keyof T> = {
   readonly key: K
+  readonly column: string
   fromDomain(value: AdapterPatch<T>[K]): Dictionary
 }
 
@@ -118,6 +119,7 @@ export function makeAdapter<T>(meta: Adapt<T>): Adapter<T> {
     Object.assign(adapter, {
       [key]: {
         key,
+        column: col,
         fromDomain: (value: AdapterPatch<T>[keyof T]): Dictionary => fieldRecord(col, delegate, value)
       }
     })

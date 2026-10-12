@@ -11,12 +11,19 @@ with domain-layer serialization hooks and uniform ApiError mapping.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CrudSupabaseSpecification          CRUD Supabase client configuration, incl. validator.
-makeCrudSupabaseClient(spec)       Build CRUD/list client over Supabase.
-RpcSupabaseSpecification           RPC Supabase client configuration.
-makeBusRuleSupabaseRpcClient(spec) Build business-rule client over Supabase RPC.
-EdgeSupabaseSpecification          Edge Function client configuration.
-makeBusRuleSupabaseEdgeClient(spec) Build business-rule client over Supabase Edge Functions.
+CrudSupabaseSpecification              CRUD Supabase configuration, including validator.
+BusRuleSupabaseSpecification           RPC or Edge Function configuration.
+SupabaseBaseFilter                     Common SDK filter discriminant.
+SupabaseScalarFilter                   Scalar equality and ordered comparisons.
+SupabaseInFilter                       Membership filter.
+SupabaseContainsFilter                 JSONB containment filter.
+SupabaseOrFilter                       Generated alternatives.
+SupabaseListFilter                     Ordered SDK filter operation union.
+SupabaseListRequest<T>                 Constructed list request and paging context.
+makeCrudSupabaseClient(spec)           Build CRUD/list client over Supabase.
+makeSupabaseListRequest(spec, options) Construct list operations without dispatch.
+makeBusRuleSupabaseRpcClient(spec)     Build business-rule client over Supabase RPC.
+makeBusRuleSupabaseEdgeClient(spec)    Build business-rule client over Edge Functions.
 */
 
 import { Supabase } from '@core/db/supabase.ts'
@@ -38,13 +45,19 @@ import type {
   ApiErrorDetail,
   DeleteResult,
   ListOptions,
-  ListResult
+  ListQuery,
+  ListResult,
+  QueryOperator,
+  QueryScalar
 } from '@core/stdx'
 import {
   checkApiError,
   checkValidatorError,
-  listCursorValue,
-  listPageLimitValue,
+  listPage,
+  listPageLimit,
+  listQuery,
+  readListCursor,
+  resolveQueryFields,
   throwApiError
 } from '@core/stdx'
 import type { Adapter, AdapterPatch, ScopedUpdateAdapter } from '@core/stdx'
@@ -137,27 +150,149 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
     return { id: row['id'] as Id, deletedAt: row['deleted_at'] as When }
   },
 
-  /** List paginated non-deleted records from Supabase. */
-  async list(options?: ListOptions): Promise<ListResult<T>> {
-    const limit = listPageLimitValue(options?.limit?.toString())
-    const cursor = listCursorValue(options?.cursor?.toString())
-    const { data, error } = await Supabase.client()
-      .from(table)
-      .select('*')
-      .is('deleted_at', null)
-      .order('created_at', { ascending: true })
-      .range(cursor, cursor + limit)
-    checkApiError(error, 'Failed to list records', Supabase.errorToStatus)
-    const rows = (data ?? []) as Dictionary[]
-    const hasMore = rows.length > limit
-    const page = hasMore ? rows.slice(0, limit) : rows
-    return {
-      data: page.map(row => adapter.toDomain(row)),
-      cursor: cursor + page.length,
-      hasMore
+  /** List non-deleted records through typed criteria and a store-local keyset cursor. */
+  async list(options?: ListOptions<T>): Promise<ListResult<T>> {
+    const request = makeSupabaseListRequest({ table, adapter }, options)
+    let builder = Supabase.client().from(table).select('*').is('deleted_at', null)
+      .order(request.column, { ascending: request.query.order.direction === 'asc' })
+    if (request.column !== adapter.id.column) {
+      builder = builder.order(adapter.id.column, {
+        ascending: request.query.order.direction === 'asc'
+      })
     }
+    for (const filter of request.filters) {
+      switch (filter.method) {
+        case 'eq':
+          builder = builder.eq(filter.column, filter.value)
+          break
+        case 'in':
+          builder = builder.in(filter.column, filter.value)
+          break
+        case 'gt':
+          builder = builder.gt(filter.column, filter.value)
+          break
+        case 'gte':
+          builder = builder.gte(filter.column, filter.value)
+          break
+        case 'lt':
+          builder = builder.lt(filter.column, filter.value)
+          break
+        case 'lte':
+          builder = builder.lte(filter.column, filter.value)
+          break
+        case 'contains':
+          builder = builder.contains(filter.column, filter.value)
+          break
+        case 'or':
+          builder = builder.or(filter.expression)
+          break
+      }
+    }
+    const { data, error } = await builder.limit(request.limit + 1)
+    checkApiError(error, 'Failed to list records', Supabase.errorToStatus)
+    const page = listPage(
+      (data ?? []) as Dictionary[],
+      request.limit,
+      request.issuer,
+      request.query,
+      row => row[request.column] as string | number,
+      row => row[adapter.id.column] as Id
+    )
+    return { ...page, data: page.data.map(row => adapter.toDomain(row)) }
   }
 })
+
+/** Common discriminant for targeted SDK filters and generated alternatives. */
+export type SupabaseBaseFilter = {
+  method: Exclude<QueryOperator, 'hasAny' | 'hasAll'> | 'contains' | 'or'
+}
+
+/** Targeted scalar equality or ordered comparison. */
+export type SupabaseScalarFilter = SupabaseBaseFilter & {
+  method: Exclude<QueryOperator, 'in' | 'hasAny' | 'hasAll'>
+  column: string
+  value: QueryScalar
+}
+
+/** Targeted membership filter. */
+export type SupabaseInFilter = SupabaseBaseFilter & {
+  method: 'in'
+  column: string
+  value: readonly QueryScalar[]
+}
+
+/** JSONB containment; the SDK must receive a JSON string, not a Postgres array. */
+export type SupabaseContainsFilter = SupabaseBaseFilter & {
+  method: 'contains'
+  column: string
+  value: string
+}
+
+/** Generated alternatives preserving complete PostgREST operands. */
+export type SupabaseOrFilter = SupabaseBaseFilter & {
+  method: 'or'
+  expression: string
+}
+
+/** Ordered SDK filter operations, exposed only to test request construction. */
+export type SupabaseListFilter =
+  | SupabaseScalarFilter
+  | SupabaseInFilter
+  | SupabaseContainsFilter
+  | SupabaseOrFilter
+  
+/** Constructed Supabase request and paging context. */
+export type SupabaseListRequest<T> = {
+  query: ListQuery<T>
+  issuer: string
+  column: string
+  filters: SupabaseListFilter[]
+  limit: number
+}
+
+/**
+ * Translate a list request without dispatching it to Supabase.
+ * @param spec Table identity and field-column metadata.
+ * @param options Typed query and optional paging token.
+ * @returns Ordered SDK filters, ordering, limit, and cursor context.
+ */
+export const makeSupabaseListRequest = <T extends Instantiable>(
+  spec: Pick<CrudSupabaseSpecification<T>, 'table' | 'adapter'>,
+  options?: ListOptions<T>
+): SupabaseListRequest<T> => {
+  const query = listQuery(options)
+  const issuer = `supabase:${spec.table}`
+  const fields = resolveQueryFields(spec.adapter, query)
+  const cursor = readListCursor(options?.cursor, issuer, query)
+  const column = fields[query.order.field as string].column
+  const filters: SupabaseListFilter[] = []
+  for (const [field, input] of Object.entries(query.where)) {
+    const mapped = fields[field].column
+    for (const [operator, value] of Object.entries(input as Dictionary) as [QueryOperator, unknown][]) {
+      filters.push(translateOperator(mapped, operator, value))
+    }
+  }
+  if (query.search) {
+    const pattern = `%${query.search.term.replace(/[\\%_]/g, char => `\\${char}`)}%`
+    filters.push({
+      method: 'or',
+      expression: query.search.fields.map(field =>
+        `${fields[field as string].column}.ilike.${filterValue(pattern)}`
+      ).join(',')
+    })
+  }
+  if (cursor) {
+    const comparison = query.order.direction === 'asc' ? 'gt' : 'lt'
+    const value = filterValue(cursor.value)
+    const idColumn = fields.id.column
+    filters.push({
+      method: 'or',
+      expression: `${column}.${comparison}.${value},and(${column}.eq.${value},`
+        + `${idColumn}.${comparison}.${filterValue(cursor.id)})`
+    })
+  }
+  return { query, issuer, column, filters, limit: listPageLimit(options?.limit) }
+}
 
 /**
  * Maker to produce a business-rule client over a Supabase RPC function.
@@ -239,4 +374,34 @@ const edgeErrorBody = async (context: unknown): Promise<Dictionary | undefined> 
 const edgeErrorStatus = (error: unknown): number => {
   const context = (error as Dictionary)['context']
   return context instanceof Response ? context.status : 500
+}
+
+// PostgREST consumes a backslash plus its next character; JSON control escapes would alter values.
+const filterValue = (value: unknown): string =>
+  '"' + String(value).replaceAll('\\', '\\\\').replaceAll('"', '\\"') + '"'
+
+const translateOperator = (
+  column: string,
+  operator: QueryOperator,
+  value: unknown
+): SupabaseListFilter => {
+  switch (operator) {
+    case 'eq':
+    case 'gt':
+    case 'gte':
+    case 'lt':
+    case 'lte':
+      return { method: operator, column, value: value as QueryScalar }
+    case 'in':
+      return { method: 'in', column, value: value as readonly QueryScalar[] }
+    case 'hasAll':
+      return { method: 'contains', column, value: JSON.stringify(value) }
+    case 'hasAny':
+      return {
+        method: 'or',
+        expression: (value as readonly QueryScalar[]).map(item =>
+          `${column}.cs.${filterValue(JSON.stringify([item]))}`
+        ).join(',')
+      }
+  }
 }

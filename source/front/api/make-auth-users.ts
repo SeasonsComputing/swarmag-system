@@ -98,7 +98,7 @@ export const makeAuthUsers = (): AuthUsersContract => {
      * @param options Optional pagination and filter options.
      * @returns Paginated list result.
      */
-    list: (options?: ListOptions): Promise<ListResult<User>> => users.list(options),
+    list: (options?: ListOptions<User>): Promise<ListResult<User>> => users.list(options),
 
     /**
      * Check whether an email belongs to an active registered user.
