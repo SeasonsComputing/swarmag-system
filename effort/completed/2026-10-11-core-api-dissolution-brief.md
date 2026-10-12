@@ -1,9 +1,10 @@
 # Core API Dissolution — Brief
 
-**Active, production scope approved.** Recorded 2026-10-11 from a CA + AI Architect session. A Foundation
-change to `core/`: the `core/api/` namespace is removed and its two contracts move into
-`core/std/`, exported through `@core/stdx`. AI Coding Engine review and CA scope authorization are
-complete.
+**Closed 2026-10-11.** Shipped in `f246072`, reviewed by the CA and AI Architect, and verified
+(`deno task check`, `deno task fmt:check`, and the full test suite including the Users
+integration test). Recorded 2026-10-11 from a CA + AI Architect session. A Foundation change to
+`core/`: the `core/api/` namespace is removed and its two contracts move into `core/std/`,
+exported through `@core/stdx`.
 
 ## What triggered it
 
