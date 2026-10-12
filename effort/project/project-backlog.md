@@ -580,6 +580,22 @@ Nothing guards this today because no Jobs exist yet. Picking this up: with Job D
 
 ## Job
 
+### Timestamps read from Postgres are not in the form the app writes
+
+**Observed:** 2026-10-11 · normal
+
+PostgREST returns `TIMESTAMPTZ` as `2026-10-11T15:08:14.27+00:00`: an offset, and zero to six
+fractional digits. The app writes `toISOString()` form, and `isWhen` accepts only that, with a `Z`.
+Nothing fails today because no read path validates a timestamp column. Evidence:
+`effort/completed/2026-10-11-canonical-when-brief.md`.
+
+Two decisions follow, each where it is first needed:
+
+- **`isWhen` accepts the offset form** when a Job screen first sends a column timestamp back
+  through `expectWhen`. Postgres parses either form. Picking this up: roadmap §7 Job Definition.
+- **The deep clone writes one timestamp form into IndexedDB,** so the in-memory list evaluator
+  compares `When` values correctly. Picking this up: roadmap §8 Ops Application.
+
 ### Assessor and planner are chosen with the User picker
 
 **Observed:** 2026-10-08 · normal
