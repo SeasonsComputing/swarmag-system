@@ -139,4 +139,19 @@ out-of-scope line above for this one rule.
   import rule (amendment above) is still written nowhere a producer would read it, and no guard
   enforces it.
 
+## Amendment — 2026-10-11 — When a contract gets its own file
+
+Added at the CA's direction during the 2026-10-11 list-query design
+(`effort/active/2026-10-11-list-query-brief.md`). The rule is followed throughout `core/std` and
+`core/cli`, and stated nowhere.
+
+- **A contract gets its own file when more than one implementation makes it substitutable; a maker
+  whose types only it produces keeps them in its own file.** `api-contracts.ts` stands apart
+  because several makers in `core/cli` implement the CRUD contract and `front` consumes it.
+  `make-adapter.ts` and `make-scope.ts` keep their types beside their makers: nothing substitutes
+  for them, so a separate contract file would add a hop with no benefit.
+- **A branded type must share its producer's file.** `make-query.ts` keeps `Query<T>` beside
+  `build`: the brand's `unique symbol` stays unexported, so only `build` can construct a value.
+- **For the reconciliation:** state the rule in CONVENTIONS §8.7 Makers, a governance file.
+
 _End of Backlog Brief_
