@@ -15,6 +15,7 @@ import { scopes } from '@front/api/scopes.ts'
 import { assertEquals } from '@std/assert'
 import { blueMesaRanchCustomer } from '@tests/fixtures/customer-samples.ts'
 
+/** Customer detail fields shared by both scopes. */
 const DETAIL_FIELDS = [
   CustomerAdapter.primaryContact,
   CustomerAdapter.name,
@@ -27,18 +28,23 @@ const DETAIL_FIELDS = [
   CustomerAdapter.country,
   CustomerAdapter.sites
 ] as const
+/** Direct scope over the detail fields. */
 const scope = makeScope({
   fields: DETAIL_FIELDS,
   defaults: { accountManagerId: undefined, notes: [] }
 })
+/** Adapted scope over the same fields. */
 const adaptedScope = makeAdaptedScope({
   fields: DETAIL_FIELDS,
   defaults: { accountManagerId: undefined, notes: [] }
 })
+/** Draft type the scopes accept. */
 type Draft = DraftOf<typeof scope>
+/** Compile-time type equality. */
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true
   : false
 
+/** Detail draft built from the sample Customer. */
 const detailDraft = (): Draft => ({
   primaryContact: blueMesaRanchCustomer.primaryContact,
   name: blueMesaRanchCustomer.name,
@@ -218,10 +224,15 @@ Deno.test('User projections exclude avatarUrl even when a richer draft carries i
   assertEquals('adapter' in scopes.Users.detail, false)
 })
 
+/** Declared direct-update client, for type assertions only. */
 declare const directUsers: DirectUpdateContract<User>
+/** Declared create client, for type assertions only. */
 declare const userCreates: CrudBaseContract<User>
 
-// Type assertions only: the declared clients have no runtime implementation.
+/**
+ * Assert the Users detail scope's inferred draft and client types.
+ * Type assertions only: the declared clients have no runtime implementation.
+ */
 function checkUserInference(draft: DraftOf<typeof scopes.Users.detail>, id: Id): void {
   const scope = scopes.Users.detail
   type UserDraft = DraftOf<typeof scope>

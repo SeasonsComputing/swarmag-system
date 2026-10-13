@@ -186,6 +186,8 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
         case 'or':
           builder = builder.or(filter.expression)
           break
+        default:
+          filter satisfies never
       }
     }
     const { data, error } = await builder.limit(request.limit + 1)
@@ -240,7 +242,7 @@ export type SupabaseListFilter =
   | SupabaseInFilter
   | SupabaseContainsFilter
   | SupabaseOrFilter
-  
+
 /** Constructed Supabase request and paging context. */
 export type SupabaseListRequest<T> = {
   query: ListQuery<T>
@@ -336,6 +338,7 @@ export const makeBusRuleSupabaseEdgeClient = <
 // INTERNALS
 // ───────────────────────────────────────────────────────────────────────────────
 
+/** Return an edge response's data, or throw the error it carries. */
 const unwrapEdgeData = <TResult>(data: unknown): TResult => {
   const body = data as Dictionary
   if (body['error']) {
@@ -351,6 +354,7 @@ const unwrapEdgeData = <TResult>(data: unknown): TResult => {
   return body['data'] as TResult
 }
 
+/** Extract message, status, and details from a failed edge invocation. */
 const edgeErrorDetail = async (error: unknown): Promise<ApiErrorDetail> => {
   const detail = error as Dictionary
   const body = await edgeErrorBody(detail['context'])
@@ -361,7 +365,10 @@ const edgeErrorDetail = async (error: unknown): Promise<ApiErrorDetail> => {
   }
 }
 
-// non-2xx edge responses carry `{ error, details? }`; gateway failures may not be JSON
+/**
+ * Read a failed edge response's JSON body, when it has one.
+ * Non-2xx edge responses carry `{ error, details? }`; gateway failures may not be JSON.
+ */
 const edgeErrorBody = async (context: unknown): Promise<Dictionary | undefined> => {
   if (!(context instanceof Response)) return undefined
   try {
@@ -371,15 +378,20 @@ const edgeErrorBody = async (context: unknown): Promise<Dictionary | undefined> 
   }
 }
 
+/** HTTP status of a failed edge invocation, or 500 when it has no response. */
 const edgeErrorStatus = (error: unknown): number => {
   const context = (error as Dictionary)['context']
   return context instanceof Response ? context.status : 500
 }
 
-// PostgREST consumes a backslash plus its next character; JSON control escapes would alter values.
+/**
+ * Quote a value as a PostgREST operand: escape backslash and quote, then wrap.
+ * PostgREST consumes a backslash plus its next character; JSON control escapes would alter values.
+ */
 const filterValue = (value: unknown): string =>
   '"' + String(value).replaceAll('\\', '\\\\').replaceAll('"', '\\"') + '"'
 
+/** Translate one criterion operator into an SDK filter or a generated alternative. */
 const translateOperator = (
   column: string,
   operator: QueryOperator,

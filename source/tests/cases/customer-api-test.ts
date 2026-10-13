@@ -111,8 +111,10 @@ Deno.test('Customer API detail scope clears optional address and contact values'
   })
 })
 
+/** The Customer detail scope under test. */
 const scope = scopes.Customers.detail
 
+/** Project a Customer onto its detail-scope draft. */
 const detailDraft = (customer: Customer): DraftOf<typeof scope> => ({
   primaryContact: customer.primaryContact,
   name: customer.name,
@@ -127,7 +129,10 @@ const detailDraft = (customer: Customer): DraftOf<typeof scope> => ({
   notes: customer.notes
 })
 
-// Exercise the public composed API, validators, SDK, and adapters without a live database.
+/**
+ * Run a test against a sample Customer through the composed API and a stubbed transport.
+ * Exercise the public composed API, validators, SDK, and adapters without a live database.
+ */
 const withCustomer = async (run: (customer: Customer) => Promise<void>): Promise<void> => {
   const customer: Customer = {
     ...structuredClone(blueMesaRanchCustomer),

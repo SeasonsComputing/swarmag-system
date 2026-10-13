@@ -125,26 +125,35 @@ export function makeQuery<
 // IMPLEMENTATION
 // ────────────────────────────────────────────────────────────────────────────
 
+/** Phantom brand; it exists only in the type, so only `build` makes a `Query<T>`. */
 declare const queryBrand: unique symbol
 
+/** Criteria names no domain field may claim. */
 type ReservedKey = 'and' | 'or' | 'not' | 'search'
+
+/** Fields filterable by type: scalars and compositions of scalars, never reserved. */
 type FilterKey<T> = {
   [K in keyof T]-?: K extends ReservedKey ? never
     : NonNullable<T[K]> extends QueryScalar | readonly QueryScalar[] ? K
     : never
 }[keyof T]
 
+/** Text fields eligible for declared search. */
 type SearchKey<T> = {
   [K in keyof T]-?: NonNullable<T[K]> extends string ? K : never
 }[keyof T]
 
+/** Required string or number fields eligible for ordering. */
 type OrderKey<T> = {
   [K in keyof T]-?: undefined extends T[K] ? never
     : T[K] extends string | number ? K
     : never
 }[keyof T]
 
-// Excess-property checks cover literals only; this also rejects extra keys in typed variables.
+/**
+ * Reject undeclared fields and operators in criteria.
+ * Excess-property checks cover literals only; this also rejects extra keys in typed variables.
+ */
 type ExactCriteria<T, F extends keyof T, W> = {
   [K in keyof W]: K extends F ? {
       [Op in keyof W[K]]: Op extends keyof QueryOperators<T[K]> ? QueryOperators<T[K]>[Op]
@@ -153,6 +162,7 @@ type ExactCriteria<T, F extends keyof T, W> = {
     : never
 }
 
+/** Copy one field's supplied operators, cloning set values and dropping absent ones. */
 const copyOperators = (input: unknown): Dictionary => {
   const result: Dictionary = {}
   for (const [operator, value] of Object.entries(input as Dictionary)) {

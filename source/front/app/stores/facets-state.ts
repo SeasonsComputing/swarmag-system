@@ -11,8 +11,9 @@ Loads every visible catalog page before exposing the cached result.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-FacetsState  Intent-based catalog reads and refresh.
-useFacets()  Access the shared cached catalog inside the component tree.
+FACETS_QUERY_KEY  TanStack Query cache key for the facet catalog.
+FacetsState       Intent-based catalog reads and refresh.
+useFacets()       Access the shared cached catalog inside the component tree.
 */
 
 import { StringSet } from '@core/std'
@@ -20,6 +21,9 @@ import { listAll } from '@core/stdx'
 import type { Facet } from '@domain/abstractions/common.ts'
 import { api } from '@front/api/api.ts'
 import { createQuery, useQueryClient } from '@tanstack/solid-query'
+
+/** TanStack Query cache key for the facet catalog. */
+export const FACETS_QUERY_KEY = ['facets'] as const
 
 /** Shared catalog access; unresolved labels preserve their scheme:code reference. */
 export type FacetsState = {
@@ -36,6 +40,7 @@ export type FacetsState = {
 /** Access the cached facet catalog within the QueryClient component tree. */
 export const useFacets = (): FacetsState => {
   const client = useQueryClient()
+  const loadFacets = (): Promise<readonly Facet[]> => Array.fromAsync(listAll(api.Facets))
   const query = createQuery(() => ({
     queryKey: FACETS_QUERY_KEY,
     queryFn: loadFacets,
@@ -57,11 +62,3 @@ export const useFacets = (): FacetsState => {
     refresh: () => client.invalidateQueries({ queryKey: FACETS_QUERY_KEY })
   }
 }
-
-// ────────────────────────────────────────────────────────────────────────────
-// HELPERS
-// ────────────────────────────────────────────────────────────────────────────
-
-const FACETS_QUERY_KEY = ['facets'] as const
-
-const loadFacets = (): Promise<readonly Facet[]> => Array.fromAsync(listAll(api.Facets))

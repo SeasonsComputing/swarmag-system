@@ -390,6 +390,7 @@ export const resolveQueryFields = <T>(
   return resolved
 }
 
+/** Copy a value with object keys sorted and absent members dropped, for fingerprints. */
 const stableValue = (value: unknown): unknown => {
   if (Array.isArray(value)) return value.map(stableValue)
   if (value === null || typeof value !== 'object') return value

@@ -7,7 +7,9 @@
 import { type AdapterPatch, makeAdapter, makeScopedUpdate } from '@core/stdx'
 import { assertEquals } from '@std/assert'
 
+/** Nested composition shape for delegate tests. */
 type Gauge = { kind: string; reading: number }
+/** Instance shape covering scalar, optional, renamed, and nested fields. */
 type Widget = {
   id: string
   active: boolean
@@ -17,11 +19,13 @@ type Widget = {
   gauges?: Gauge[]
 }
 
+/** Adapter for the nested Gauge. */
 const GaugeAdapter = makeAdapter<Gauge>({
   kind: ['kind'],
   reading: ['reading']
 })
 
+/** Adapter for Widget, renaming `active` and delegating `gauges`. */
 const WidgetAdapter = makeAdapter<Widget>({
   id: ['id'],
   active: ['is_active'],

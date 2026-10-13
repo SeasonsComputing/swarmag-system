@@ -10,8 +10,9 @@ Composes the User workbench with its collection, draft state, and Direct writes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UserManagerProps  Route modal cancellation contract.
-UserManager       User management workbench.
+USERS_QUERY_KEY   TanStack Query cache key for the User collection.
+UserManagerProps  Props for the User Manager route workbench.
+UserManager       User collection and editor host.
 */
 
 import { listAll } from '@core/stdx'
@@ -31,17 +32,24 @@ import { UserStepDetail } from './user-step-detail.tsx'
 
 import './user-manager.css'
 
-/** Props for the user manager route modal. */
+/** TanStack Query cache key for the User collection. */
+export const USERS_QUERY_KEY = ['users'] as const
+
+/** Props for the User Manager route workbench. */
 export type UserManagerProps = {
   onCancel: () => void
 }
 
-/** User manager component. */
+/** User collection and editor host. */
 export const UserManager = (props: UserManagerProps): UiComponent => {
   const scope = scopes.Users.detail
-  const usersQuery = createQuery(() => ({ queryKey: USERS_QUERY_KEY, queryFn: loadUsers }))
+  const loadUsers = (): Promise<User[]> => Array.fromAsync(listAll(api.Users))
+  const usersQuery = createQuery(() => ({
+    queryKey: USERS_QUERY_KEY,
+    queryFn: loadUsers
+  }))
 
-  const userManager: AbstractionManagerContract<User, UserDraft> = {
+  const provider: AbstractionManagerContract<User, UserDraft> = {
     formTitle: 'User Manager',
     entityLabel: 'User',
     listColumns: [
@@ -112,17 +120,9 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
       <Show when={usersQuery.error}>
         <UiAlert variant='danger'>{errorMessage(usersQuery.error)}</UiAlert>
       </Show>
-      <AbstractionManager onCancel={props.onCancel} provider={userManager} />
+      <AbstractionManager provider={provider} onCancel={props.onCancel} />
     </div>
   )
-}
-
-/** Query key for the users list. */
-const USERS_QUERY_KEY = ['users'] as const
-
-/** Loads the user list for the user manager. */
-function loadUsers(): Promise<User[]> {
-  return Array.fromAsync(listAll(api.Users))
 }
 
 /** Renders the identity content for one user. */
@@ -145,6 +145,7 @@ function UserListIdentity(props: { user: User }): UiComponent {
   )
 }
 
+/** Message shown for a failed User operation. */
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'User operation failed.'
 }

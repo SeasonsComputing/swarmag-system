@@ -23,8 +23,11 @@ import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert'
 import { createClient } from '@supabase/client'
 import { salesUserSample } from '@tests/fixtures/user-samples.ts'
 
+/** Users table spec shared by the Supabase translation tests. */
 const spec = { table: 'users', adapter: UserAdapter }
+/** Validator that accepts everything; validation is not under test. */
 const validator: Validator<User> = { validateCreate: () => null, validateUpdate: () => null }
+/** A sales User sample with a fresh id, the given name, and the given changes. */
 const sample = (displayName: string, changes: Partial<User> = {}): User => ({
   ...salesUserSample,
   id: id(),
@@ -350,6 +353,7 @@ Deno.test('IndexedDB boolean equality and in retain false as a scalar value', as
   })
 })
 
+/** Run a test against an IndexedDB client stubbed to hold the given records. */
 const withRecords = async <T extends Instantiable>(
   adapter: Adapter<T>,
   entities: T[],
@@ -375,6 +379,7 @@ const withRecords = async <T extends Instantiable>(
   }
 }
 
+/** Follow cursors to the last page, collecting every record and checking termination. */
 const allPages = async <T extends Instantiable>(
   client: CrudListContract<T>,
   options: ListOptions<T>
