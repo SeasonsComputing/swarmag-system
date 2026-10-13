@@ -11,6 +11,7 @@ and confirmed soft-delete action.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+CUSTOMERS_QUERY_KEY   TanStack Query cache key for the Customer collection.
 CustomerManagerProps  Props for the Customer Manager route workbench.
 CustomerManager       Customer collection and editor host.
 */
@@ -33,18 +34,23 @@ import { customerSteps } from './customer-steps.tsx'
 
 import './customer-manager.css'
 
+/** TanStack Query cache key for the Customer collection. */
+export const CUSTOMERS_QUERY_KEY = ['customers'] as const
+
 /** Props for the Customer Manager route workbench. */
 export type CustomerManagerProps = {
   onCancel: () => void
 }
 
-/** Customer CRUD provider loading the whole collection through keyset pages. */
+/** Customer collection and editor host. */
 export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
+  const scope = scopes.Customers.detail
+  const loadCustomers = (): Promise<Customer[]> => Array.fromAsync(listAll(api.Customers))
   const customersQuery = createQuery(() => ({
-    queryKey: ['customers'],
+    queryKey: CUSTOMERS_QUERY_KEY,
     queryFn: loadCustomers
   }))
-  const scope = scopes.Customers.detail
+
   const provider: AbstractionManagerContract<Customer, CustomerDraft> = {
     formTitle: 'Customer Manager',
     entityLabel: 'Customer',
@@ -116,9 +122,4 @@ const CustomerStatusBadges: Record<CustomerStatus, { variant: UiBadgeVariant; ic
   active: { variant: 'success', icon: 'check' },
   inactive: { variant: 'warning', icon: 'minus' },
   prospect: { variant: 'info', icon: 'target' }
-}
-
-/** Load every visible Customer, retaining keyset ordering across pages. */
-function loadCustomers(): Promise<Customer[]> {
-  return Array.fromAsync(listAll(api.Customers))
 }

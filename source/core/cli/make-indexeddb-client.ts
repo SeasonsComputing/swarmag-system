@@ -169,6 +169,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
 // QUERY EVALUATION
 // ────────────────────────────────────────────────────────────────────────────
 
+/** Order two rows by the query's field and direction, breaking ties by id. */
 const compareRows = <T extends Instantiable>(
   left: T,
   right: T,
@@ -180,6 +181,7 @@ const compareRows = <T extends Instantiable>(
   return (query.order.direction === 'asc' ? 1 : -1) * (value || identity)
 }
 
+/** True when a row sorts after the cursor's position. */
 const afterCursor = <T extends Instantiable>(
   entity: T,
   cursor: ListCursor | undefined,
@@ -192,12 +194,14 @@ const afterCursor = <T extends Instantiable>(
   return (query.order.direction === 'asc' ? 1 : -1) * (value || identity) > 0
 }
 
+/** Compare two sort values of one type: text by the collator, numbers numerically. */
 const compareValue = (left: unknown, right: unknown, collator: Intl.Collator): number => {
   if (typeof left === 'number' && typeof right === 'number') return left - right
   if (typeof left === 'string' && typeof right === 'string') return collator.compare(left, right)
   throw new ApiError('List sort values must be required strings or numbers of the same type', 400)
 }
 
+/** True when a row meets every criterion and, when searched, the search term. */
 const matchesQuery = <T>(entity: T, query: ListQuery<T>, collator: Intl.Collator): boolean => {
   for (const [key, input] of Object.entries(query.where)) {
     const value = entity[key as keyof T]
@@ -216,6 +220,7 @@ const matchesQuery = <T>(entity: T, query: ListQuery<T>, collator: Intl.Collator
   })
 }
 
+/** True when a value satisfies one criterion operator. */
 const matchesOperator = (
   value: unknown,
   operator: QueryOperator,

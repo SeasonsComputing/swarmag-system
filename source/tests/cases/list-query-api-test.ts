@@ -42,6 +42,7 @@ export type QueryProbe = Instantiable & {
   search: string
 }
 
+/** Adapter over a probe type covering every field kind and reserved name. */
 const ProbeAdapter = makeAdapter<QueryProbe>({
   ...InstantiableAdapt,
   title: ['title'],
@@ -56,6 +57,7 @@ const ProbeAdapter = makeAdapter<QueryProbe>({
   not: ['not'],
   search: ['search']
 })
+/** The User role query under test. */
 const declaration = queries.Users.byRole
 
 Deno.test('build copies declared fields, criteria arrays, defaults, and normalized search', () => {

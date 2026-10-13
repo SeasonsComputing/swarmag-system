@@ -144,6 +144,7 @@ export function makeScopedUpdate<T, K extends keyof T>(
   }
 }
 
+/** Serialize one field to its column, delegating nested adapters and keeping null. */
 const fieldRecord = (
   col: string,
   delegate: Adapter<unknown> | undefined,
