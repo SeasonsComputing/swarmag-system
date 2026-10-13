@@ -60,7 +60,7 @@ export const UiTextArea = (props: UiTextAreaProps): UiComponent => {
       <TextField.TextArea
         id={local.id ?? local.name}
         rows={local.rows}
-        {...others as unknown as TextFieldTextAreaProps}
+        {...others as TextFieldTextAreaProps}
         data-ui='textarea'
         data-ui-state={controlState(local) as string | undefined}
       />
