@@ -29,6 +29,13 @@
   border-radius: var(--sa-radius-sm);
 }
 
+[data-app='style-guide-popover-image'] {
+  block-size: auto;
+  display: block;
+  filter: var(--sa-footer-logo-filter);
+  inline-size: 100%;
+}
+
 [data-app='style-guide-header-contents'] [data-app='style-guide-nowrap'] {
   white-space: nowrap;
 }
