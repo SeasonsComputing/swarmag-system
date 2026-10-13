@@ -71,7 +71,7 @@ themself, so the default is the session user**, changeable through a picker.
    (`effort/pending/2026-10-10-access-model-brief.md`, decisions 2 and 6). Finer rules by role
    wait for `app-leads`, when sales Users leave the administrator role.
 9. **The picker issues its own query,** built from a declaration in `front/api/queries.ts`
-   (`effort/active/2026-10-11-list-query-brief.md`, decision 14):
+   (`effort/completed/2026-10-11-list-query-brief.md`, decision 14):
 
    ```ts
    const query = queries.Users.byRole.build({
@@ -95,9 +95,9 @@ themself, so the default is the session user**, changeable through a picker.
 
 ## Dependencies
 
-- **`effort/active/2026-10-11-list-query-brief.md`** ships first: decision 9 needs declared
-  queries and `build`, and that brief renames `form-scopes.ts` to `scopes.ts`, where decision 10's
-  scope lives.
+- **`effort/completed/2026-10-11-list-query-brief.md`** shipped first (closed 2026-10-13):
+  declared queries, `build`, `listAll`, and `queries.Users.byRole` in `front/api/queries.ts`; it
+  renamed `form-scopes.ts` to `scopes.ts`, where decision 10's scope lives.
 - **The account manager gains access meaning.** A sales User's Ops subjects are the Jobs of
   Customers they are account manager for (access model brief, decision 10). Nothing in this
   production depends on it.
@@ -109,6 +109,18 @@ themself, so the default is the session user**, changeable through a picker.
 - **`architecture-front.md` §10.1.6:** the Customer scope covers account-manager assignment, and
   its create defaults are `{}`.
 
+## Verification
+
+The User picker is the first consumer of `queries.Users.byRole`, so the list-query production's
+Postgres checks run here, by the CA in the app:
+
+- The picker lists only active Users holding a listed role.
+- Options order by display name, including Users sharing a name.
+- A current account manager who no longer qualifies still appears (decision 7).
+- Where a surface pages or searches through the query: search containing `%`, `_`, quotes, commas,
+  and parentheses matches literally; descending order holds across pages; a cursor reused after a
+  filter change fails with `ApiError` 400.
+
 ## Out of scope
 
 Portal users and the Customer Portal (`effort/pending/2026-10-08-customer-portal-brief.md`); the
@@ -118,6 +130,7 @@ a shared user cache.
 ## Design history
 
 - **2026-10-08:** decisions 1–3 recorded.
+- **2026-10-13:** the list-query brief closed; its Postgres checks moved here as Verification.
 - **2026-10-10/11 review:** the AI Architect raised six gaps: picker placement, the default
   against the role filter, when the default applies, clearing and inactive Users, how the picker
   loads Users, and the documentation the scope change implies. They resolved as decisions 4–10.

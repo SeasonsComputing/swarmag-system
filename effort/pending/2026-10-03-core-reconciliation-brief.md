@@ -142,7 +142,7 @@ out-of-scope line above for this one rule.
 ## Amendment — 2026-10-11 — When a contract gets its own file
 
 Added at the CA's direction during the 2026-10-11 list-query design
-(`effort/active/2026-10-11-list-query-brief.md`). The rule is followed throughout `core/std` and
+(`effort/completed/2026-10-11-list-query-brief.md`). The rule is followed throughout `core/std` and
 `core/cli`, and stated nowhere.
 
 - **A contract gets its own file when more than one implementation makes it substitutable; a maker

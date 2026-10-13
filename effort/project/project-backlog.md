@@ -329,12 +329,6 @@ is what broke the state tests during the Notes Editor production. Moving `Workbe
 own file and renaming the context module to `.ts` (seven importers) was weighed and not taken then
 because the problem did not require it (same brief, amendment "Draft module").
 
-### Managers load only the first page of their Collection
-
-**Observed:** 2026-09-24 · normal
-
-Design record: [List Query — Brief](../active/2026-10-11-list-query-brief.md).
-
 ### `guard:css` does not verify that a referenced token resolves
 
 **Observed:** 2026-08-06 · normal
@@ -551,7 +545,7 @@ runtime should load browser-backed stores through `api` at all.
   no env file, so a configured test runs only where someone has exported the variables by hand,
   and none is run routinely. The list-query production therefore carries no database-backed
   automated tests: its Postgres behavior is verified in the app against a checklist, and its
-  automated tests need no database (`effort/active/2026-10-11-list-query-brief.md`).
+  automated tests need no database (`effort/completed/2026-10-11-list-query-brief.md`).
 
 ## Customer
 

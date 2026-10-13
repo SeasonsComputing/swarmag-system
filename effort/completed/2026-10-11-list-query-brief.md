@@ -1,12 +1,14 @@
 # List Query — Brief
 
-**Active, not yet dispatched.** Recorded 2026-10-11 from a CA + AI Architect session. A Foundation
-evolution of the core list contract, from pagination-only to declared, typed queries. It resolves
-the parking-lot entry "Customers query API — status filter & ordering" (parked 2026-07-21), which
-deferred the design until a real consumer pinned its requirements. The User picker in
-`effort/active/2026-10-08-account-manager-brief.md` is that consumer. Reviewed by ACE 2026-10-11;
-its findings are resolved below, and its third review found the brief ready for the production
-gate.
+**Closed 2026-10-13.** Shipped in `a4953a7` and `32cdc51`, reviewed (three ACE reviews, then the
+production review's corrections 1–11), and verified (`deno task check`, `deno task fmt:check`, 94
+tests passing with the known Users configuration failure, and in-app regression of creating and
+listing). The query-specific Postgres checks move to the account manager production, whose User
+picker is the first consumer of `Users.byRole`. Recorded 2026-10-11 from a CA + AI Architect
+session. A Foundation evolution of the core list contract, from pagination-only to declared, typed
+queries. It resolves the parking-lot entry "Customers query API — status filter & ordering" (parked
+2026-07-21), which deferred the design until a real consumer pinned its requirements. The User
+picker in `effort/active/2026-10-08-account-manager-brief.md` is that consumer.
 
 ## What triggered it
 
