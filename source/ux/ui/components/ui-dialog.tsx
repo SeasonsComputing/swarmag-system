@@ -30,7 +30,7 @@ export type UiDialogProps = UiComponentProps & {
   size?: UiDialogSize
   open?: boolean
   defaultOpen?: boolean
-  /** Permit outside-click and Escape dismissal. */
+  /** Outside-click and Escape dismissal; default true, false blocks both. */
   dismissible?: boolean
   error?: boolean
   loading?: boolean
@@ -82,10 +82,10 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
           data-ui-size={local.size ?? 'panel'}
           data-ui-state={controlState(local)}
           onEscapeKeyDown={event => {
-            if (!local.dismissible) event.preventDefault()
+            if (local.dismissible === false) event.preventDefault()
           }}
           onPointerDownOutside={event => {
-            if (!local.dismissible) event.preventDefault()
+            if (local.dismissible === false) event.preventDefault()
           }}
         >
           {local.children}

@@ -189,7 +189,7 @@ export const PanelProbe = () => {
       <div data-shell='panel-probe'>
         <UiActionButton icon='ruler-square' label='Probe' density='dense' onClick={run} />
       </div>
-      <UiDialog open={open()} onOpenChange={setOpen} size='panel' dismissible>
+      <UiDialog open={open()} onOpenChange={setOpen} size='panel'>
         <div data-shell='panel-probe-report'>
           <UiTextArea name='panel-probe-report' readOnly rows={20} value={report()} />
         </div>
