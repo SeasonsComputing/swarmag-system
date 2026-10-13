@@ -58,7 +58,7 @@ export const UiInput = (props: UiInputProps): UiComponent => {
     >
       <TextField.Input
         id={local.id ?? local.name}
-        {...others as unknown as TextFieldInputProps}
+        {...others as TextFieldInputProps}
         data-ui='input'
         data-ui-state={controlState(local) as string | undefined}
       />

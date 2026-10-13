@@ -14,7 +14,7 @@ UiMultiSelect  Inline multi-value select control with declared states.
 */
 
 import type { StringSet } from '@core/std'
-import { Listbox, type ListboxItemOptions } from '@kobalte/core/listbox'
+import { Listbox } from '@kobalte/core/listbox'
 import { splitProps } from '@solid-js'
 import { controlState, uiOptionLabel } from './ui-helpers.ts'
 import type { UiComponent, UiOption } from './ui-helpers.ts'
@@ -62,9 +62,9 @@ export const UiMultiSelect = (props: UiMultiSelectProps): UiComponent => {
       value={local.value}
       defaultValue={local.defaultValue}
       onChange={(selected: StringSet) => local.onChange?.([...selected])}
-      renderItem={(item: ListboxItemOptions['item']) => (
+      renderItem={item => (
         <Listbox.Item data-ui='multi-select-item' item={item}>
-          {uiOptionLabel((item as unknown as { rawValue: UiOption }).rawValue)}
+          {uiOptionLabel(item.rawValue)}
         </Listbox.Item>
       )}
     />
