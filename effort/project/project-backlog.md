@@ -203,11 +203,11 @@ There is no state to style. `UiTableRow` takes `onActivate` and emits
 consumer cannot supply one. The fix belongs in the catalog rather than in the manager — a
 selected state on `UiTableRow` that any Collection-Detail surface opts into.
 
-### `UiTooltip` forces its trigger into a button
+### The overlay controls over-specify their triggers
 
 **Observed:** 2026-10-13 · normal
 
-Design record: [Tooltip Trigger & Secondary Window Examples — Brief](../pending/2026-10-13-tooltip-trigger-brief.md).
+Design record: [Overlay Controls API — Brief](../pending/2026-10-13-overlay-trigger-brief.md).
 
 ## Auth
 
