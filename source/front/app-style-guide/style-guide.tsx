@@ -854,10 +854,13 @@ export const StyleGuide = (): UiComponent => {
               </UiFieldset>
               <UiFieldset legend='UiPopover'>
                 <UiLayout variant='inline-fit'>
-                  <UiPopover trigger='Open field menu'>
-                    <UiLayout>
-                      <p>Field actions, notes, and service history.</p>
-                    </UiLayout>
+                  <UiPopover trigger='About swarmAg'>
+                    <UiCard>
+                      <UiLayout>
+                        <img data-app='style-guide-popover-image' src={logo} alt='swarmAg' />
+                        <p>Aerial and ground agricultural services, planned and run in the field.</p>
+                      </UiLayout>
+                    </UiCard>
                   </UiPopover>
                 </UiLayout>
               </UiFieldset>
