@@ -648,19 +648,19 @@ controlled mode when open state is owned externally.
 
 **Props**
 
-| Prop             | Type                                  | Required | Default       | Description                                      |
-| ---------------- | ------------------------------------- | -------- | ------------- | ------------------------------------------------ |
-| `trigger`        | `UiComponent`                         | no       | unset         | Opener button content. Omit for controlled mode. |
-| `triggerVariant` | `UiButtonVariant`                     | no       | `'secondary'` | Trigger button variant.                          |
-| `size`           | `'content' \| 'panel' \| 'workbench'` | no       | `'panel'`     | Dialog width treatment.                          |
-| `children`       | `UiComponent`                         | no       | unset         | Dialog content.                                  |
-| `open`           | `boolean`                             | no       | unset         | Controlled open state.                           |
-| `defaultOpen`    | `boolean`                             | no       | unset         | Initial open state.                              |
-| `dismissible`    | `boolean`                             | no       | `false`       | Allows outside clicks to close the dialog.       |
-| `onOpenChange`   | `(open: boolean) => void`             | no       | unset         | Receives open state.                             |
-| `disabled`       | `boolean`                             | no       | `false`       | Disables the trigger.                            |
-| `error`          | `boolean`                             | no       | `false`       | Emits error state.                               |
-| `loading`        | `boolean`                             | no       | `false`       | Disables trigger as busy.                        |
+| Prop             | Type                                  | Required | Default       | Description                                                      |
+| ---------------- | ------------------------------------- | -------- | ------------- | ---------------------------------------------------------------- |
+| `trigger`        | `UiComponent`                         | no       | unset         | Opener button content. Omit for controlled mode.                 |
+| `triggerVariant` | `UiButtonVariant`                     | no       | `'secondary'` | Trigger button variant.                                          |
+| `size`           | `'content' \| 'panel' \| 'workbench'` | no       | `'panel'`     | Dialog width treatment.                                          |
+| `children`       | `UiComponent`                         | no       | unset         | Dialog content.                                                  |
+| `open`           | `boolean`                             | no       | unset         | Controlled open state.                                           |
+| `defaultOpen`    | `boolean`                             | no       | unset         | Initial open state.                                              |
+| `dismissible`    | `boolean`                             | no       | `true`        | Outside clicks and Escape close the dialog; `false` blocks both. |
+| `onOpenChange`   | `(open: boolean) => void`             | no       | unset         | Receives open state.                                             |
+| `disabled`       | `boolean`                             | no       | `false`       | Disables the trigger.                                            |
+| `error`          | `boolean`                             | no       | `false`       | Emits error state.                                               |
+| `loading`        | `boolean`                             | no       | `false`       | Disables trigger as busy.                                        |
 
 **Sizes**
 

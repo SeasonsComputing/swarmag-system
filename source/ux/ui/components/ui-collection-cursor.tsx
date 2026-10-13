@@ -195,7 +195,6 @@ export function UiCollectionCursor<T>(props: UiCollectionCursorProps<T>): UiComp
         open={deleteOpen()}
         onOpenChange={setDeleteOpen}
         size='content'
-        dismissible
       >
         <div data-ui='collection-cursor-confirm'>
           <h2 data-ui='collection-cursor-confirm-title'>{currentDeleteCopy()?.title}</h2>
