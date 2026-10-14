@@ -4,8 +4,8 @@
 after the Notes Editor milestone shipped. The same session's portal design was split out to
 `effort/pending/2026-10-08-customer-portal-brief.md`. Chosen 2026-10-08 to be built before roadmap
 §5. Reviewed 2026-10-10/11 by the CA and AI Architect and refreshed 2026-10-13 (see Design
-history); one question is open, a prerequisite brief is pending, and it awaits AI Coding Engine
-review and the production gate.
+history); a prerequisite brief is pending, and it awaits AI Coding Engine review and the
+production gate.
 
 ## What triggered it
 
@@ -69,8 +69,8 @@ themself, so the default is the session user**, changeable through a picker.
 5. **The default applies only on create.** Onboarding and Customer Manager's New default to the
    session user **if they hold a listed role**; otherwise the field starts unset. An existing
    Customer opens with its stored value, and an unset one stays unset: it is never filled
-   automatically, which would assign silently and register a change with the discard check. **How
-   the session user's roles are known is Open 1.**
+   automatically, which would assign silently and register a change with the discard check. The
+   session user and their roles come from `SessionUser` (decision 11).
 6. **None is selectable,** mapping to `undefined`; an update writes `null` through the existing
    explicit-null protocol. The picker supplies it as its own option, so `UiSingleSelect` does not
    change.
@@ -105,13 +105,80 @@ themself, so the default is the session user**, changeable through a picker.
     become `{}`, since an attribute is never both in scope and defaulted (`architecture-core.md`
     §5.2.6).
 
-## Open
+### CA, 2026-10-13
 
-1. **The session user's roles.** The create default (decision 5) needs them, and the session holds
-   none. Applied after an asynchronous load, the default would make an untouched New draft fail the
-   discard check, and could overwrite an early choice of None. Whether `SessionCoordinator`, which
-   already loads the User, keeps the roles so the default seeds synchronously when the create draft
-   is built; existing drafts bypass the default entirely.
+11. **The signed-in User is held for the session.** `SessionCoordinator` already loads the session
+    User and discards it, keeping only the id; it now hands the User to a session user provider.
+    The create default (decision 5) reads it synchronously when the create draft is built, so the
+    default never registers with the discard check; existing drafts bypass the default. Like the
+    id, the User refreshes at the next session preparation.
+
+    - **`ux/shell/runtime/shell.ts`** declares the contract beside `SessionCoordinatorContract`,
+      with domain-free roles, and lists it in the header's PUBLIC:
+
+      ```ts
+      /** Application-owned signed-in user, held for the session's lifetime. */
+      export interface SessionUserContract {
+        id(): Id | null
+        roles(): readonly string[]
+      }
+      ```
+
+    - **`front/app/shell/session-user.ts`** (new) is the swarmAg provider: a proxy over the domain
+      User, reactive through a signal, set and cleared only by the coordinator.
+      `idWithAnyRole` carries the pattern that a person naming themself on a record defaults to
+      the session user when they hold a listed role; the assessor and planner reuse it:
+
+      ```ts
+      /** swarmAg signed-in user: the domain User behind the shell's user contract. */
+      class AppSessionUser implements SessionUserContract {
+        readonly #user = createSignal<User | null>(null)
+
+        /** Signed-in user id, or null when signed out. */
+        id(): Id | null {
+          return this.#user[0]()?.id ?? null
+        }
+
+        /** Signed-in user's roles; empty when signed out. */
+        roles(): readonly string[] {
+          return this.#user[0]()?.roles ?? []
+        }
+
+        /** Signed-in domain User, or null when signed out. */
+        user(): User | null {
+          return this.#user[0]()
+        }
+
+        /** Signed-in user's id when they hold any of the roles; otherwise undefined. */
+        idWithAnyRole(roles: readonly UserRole[]): Id | undefined {
+          const user = this.#user[0]()
+          return user?.roles.some(role => roles.includes(role)) ? user.id : undefined
+        }
+
+        /** Hold the prepared User for the session; only the coordinator calls it. */
+        set(user: User): void {
+          this.#user[1](user)
+        }
+
+        /** Release the User on sign-out or identity change. */
+        clear(): void {
+          this.#user[1](null)
+        }
+      }
+
+      /** Shared suite signed-in user. */
+      export const SessionUser = new AppSessionUser()
+      ```
+
+    - **`front/app/shell/session-coordinator.ts`:** `#preparedUserId` is removed. `clear()` calls
+      `SessionUser.clear()`; the prepared check reads `SessionUser.id() === session.userId`; an
+      eligible User is held with `SessionUser.set(user)` before `setReady()`. The export drops its
+      superfluous annotation: `export const SessionCoordinator = new AppSessionCoordinator()`;
+      `implements SessionCoordinatorContract` already checks the class.
+    - **The account manager's create default:**
+      `const accountManagerId = SessionUser.idWithAnyRole(listedRoles)`.
+    - Nothing in `ux/` consumes `SessionUserContract` yet; the access model's role gate on app
+      entry is its first consumer.
 
 ## Dependencies
 
@@ -128,7 +195,10 @@ themself, so the default is the session user**, changeable through a picker.
 ## Documentation the production amends
 
 - **`architecture-front.md` §2, its `shell/` footnote, and §10.1.3:** list `user-picker` beside
-  `notes-editor`.
+  `notes-editor`, and `session-user` beside `session-coordinator.ts`.
+- **`architecture-front.md` §9.3.1–§9.3.2:** the application supplies `SessionUser` behind
+  `SessionUserContract`; step 8 holds the eligible User in `SessionUser` instead of discarding it,
+  and "The prepared user ID is private coordinator state, not a domain-user cache" is withdrawn.
 - **`architecture-front.md` §10.1.5:** reconciled with decision 4, which places the shared
   `UserPicker` in `app/shell/` before a second app consumes it.
 - **`architecture-front.md` §10.1.6:** the Customer scope covers account-manager assignment, and
@@ -137,7 +207,7 @@ themself, so the default is the session user**, changeable through a picker.
 ## Operating mode
 
 **Foundation:** the production amends governing architecture and introduces a shared picker
-contract. It does not extend into the access model.
+contract and the session user contract. It does not extend into the access model.
 
 ## Verification
 
@@ -190,5 +260,12 @@ a shared user cache.
   mode. The deleted account manager led to
   `effort/active/2026-10-13-soft-deleted-references-brief.md`, now a prerequisite: soft delete
   keeps a record so references survive, yet every read hid it.
+- **2026-10-13: Open 1 resolved as decision 11.** Keeping only the prepared id was a holdover
+  from the shell/app split, when the coordinator's side could not hold a domain User; nothing in
+  the architecture's dependencies prevents it now. Two other homes were weighed: a session-user
+  Query State module, which outlives sign-out unless purged, and a keyed store in `SessionState`,
+  which is generic but invites a grab bag. The contract and proxy won: they follow
+  `SessionCoordinatorContract`'s own idiom, live and die with the session, and are typed by
+  construction. The contract ships now, ahead of its first `ux/` consumer, to fix its shape.
 
 _End of Brief_
