@@ -154,4 +154,19 @@ Added at the CA's direction during the 2026-10-11 list-query design
   `build`: the brand's `unique symbol` stays unexported, so only `build` can construct a value.
 - **For the reconciliation:** state the rule in CONVENTIONS §8.7 Makers, a governance file.
 
+## Amendment — 2026-10-13 — Soft-delete read rule
+
+Added at the CA's direction during the AI Coding Engine review of
+`effort/active/2026-10-13-soft-deleted-references-brief.md`.
+
+- **CONVENTIONS §10.10 conflicts with that brief's decision 2.** Its third bullet reads "RLS
+  `SELECT` policies must filter soft-deleted rows". Under the brief, a reference resolves its
+  soft-deleted target: deleted rows stay readable by id, RLS governs who may read, and lists
+  exclude deleted rows as an API contract (its amendment 4).
+- **A targeted gate override** for that bullet, at the CA's discretion, lets the brief's
+  production proceed before this reconciliation (its amendment 1).
+- **For the reconciliation:** §10.10 states that RLS `SELECT` policies do not filter soft-deleted
+  rows and that lists do; "Active rows are `deleted_at IS NULL`" stands. A governance file:
+  committed with the governance-gate bypass.
+
 _End of Backlog Brief_
