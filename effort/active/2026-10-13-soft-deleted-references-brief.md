@@ -1,6 +1,6 @@
 # Soft-Deleted References — Brief
 
-**Pending; prerequisite to `effort/active/2026-10-08-account-manager-brief.md`.** Recorded
+**Active; prerequisite to `effort/active/2026-10-08-account-manager-brief.md`.** Recorded
 2026-10-13 from a CA + AI Architect session, while resolving the account manager brief's AI Coding
 Engine review.
 
@@ -12,7 +12,7 @@ option, and the field shows unassigned while the Customer still holds the id. Th
 misrepresents the record.
 
 The failure is not the account manager's. Soft delete keeps a record so that what references it
-survives, yet every read hides it, so any association whose target is soft-deleted holds an id
+survives, yet every read hides it, so any reference whose target is soft-deleted holds an id
 nothing can resolve.
 
 ## What the repository holds
@@ -40,46 +40,57 @@ nothing can resolve.
 
 ## Decisions (CA, 2026-10-13)
 
-1. **An association resolves its target when the target is soft-deleted.** This holds for every
-   association, not only those to a User.
+1. **A reference resolves its target when the target is soft-deleted.** A reference is a
+   single-target association (`AssociationOne` or `AssociationOptional`) declared
+   `ON DELETE RESTRICT`: a record pointing at an independent record, to any target, not only a
+   User. Out of scope:
+   - **Ownership** (`ON DELETE CASCADE`): a child belongs to its owner, is reached through it, and
+     goes with it, so it never shows a deleted owner. Cardinality is not the test:
+     `jobs.customer_id` is 1:M from the Customer's side, yet a Job references its Customer, and is
+     in scope.
+   - **Junctions** (`AssociationJunction`): relation rows without life-cycle fields, hard-deleted
+     only.
 2. **The label comes from the target.** The association stays an id; the deleted record remains
    readable as a reference target, and `get` fetches it with `deletedAt` set. Lists continue to
-   exclude deleted records.
+   exclude deleted records. New references come from lists, which exclude deleted records.
 3. **Consumers indicate a deleted target,** showing its label and that it is deleted.
 
 ## Obligations
 
 1. **Deleted records are read, never acted on.** `update` and `delete` keep refusing deleted rows.
-2. **No new reference to a deleted target.** An existing reference is kept; a new one is refused.
-3. **A successful `get` is not a liveness check.** A caller that needs a live record checks
+2. **A successful `get` is not a liveness check.** A caller that needs a live record checks
    `deletedAt`; `SessionCoordinator` rejects a deleted User.
 
 ## Production scope
 
 Operating mode: **Foundation** (`core/`, `domain/`, RLS, governing architecture).
 
+**The architecture amendments land first,** as their own production; the code productions follow
+them.
+
 | Where                                    | Change                                                                       |
 | ---------------------------------------- | ---------------------------------------------------------------------------- |
+| `architecture-core.md` §3.2.5, §10.1.6   | Reference rule (decision 1); filter rule narrows to lists; anonymization.    |
+| `architecture-back.md` §4.6              | The `users` `SELECT` grant covers deleted rows.                              |
 | `core/cli/make-supabase-client.ts`       | `get` drops its `deleted_at` filter; `list`, `update`, `delete` keep theirs. |
 | `core/cli/make-indexeddb-client.ts`      | `get`'s doc comment corrected; the code already conforms.                    |
 | `domain/schema/schema.sql`               | The 18 `SELECT` policies admit deleted rows; regenerated from the model.     |
 | `back/migrations/`                       | A migration carrying the policy change to stage.                             |
 | `front/app/shell/session-coordinator.ts` | A User with `deletedAt` set is ineligible.                                   |
 | `tests/cases/users-api-test.ts`          | `get` of a deleted User returns it with `deletedAt` set.                     |
-| `architecture-core.md` §3.2.5, §10.1.6   | The filter rule narrows to lists; references resolve deleted targets.        |
-| `architecture-back.md` §4.6              | The `users` `SELECT` grant covers deleted rows.                              |
+
+**Anonymization** in `architecture-core.md`: designs do not preclude anonymizing personal data;
+it lives on its record, and references carry ids, never copies.
 
 **Unchanged:** edge orchestration and `user_has_access`, whose filters guard write and
 authorization paths. **Consumers** adopt the deleted indication as they are built; the User picker
 is the first (account manager brief, decision 7).
 
-## Open
+## Note
 
-1. **Where a new reference to a deleted target is refused** (obligation 2): validation at ingress,
-   the database, or both.
-2. **Anonymization of deleted people.** With deleted records readable, a deleted User's personal
-   data stays visible to authenticated readers; anonymizing it would keep the reference and replace
-   the personal fields. Whether it belongs to this brief or stays deferred.
+Anonymization of deleted people is deferred until operations expand beyond Texas. The reference
+rule keeps it possible: the label comes from the target, so anonymizing a record updates every
+reference to it.
 
 ## Checks
 

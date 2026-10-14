@@ -115,7 +115,7 @@ themself, so the default is the session user**, changeable through a picker.
 
 ## Dependencies
 
-- **`effort/pending/2026-10-13-soft-deleted-references-brief.md`** ships first: an association
+- **`effort/active/2026-10-13-soft-deleted-references-brief.md`** ships first: a reference
   resolves its soft-deleted target, `get` fetches deleted records, and consumers indicate a deleted
   target. Decision 7 rests on it.
 - **`effort/completed/2026-10-11-list-query-brief.md`** shipped first (closed 2026-10-13):
@@ -188,7 +188,7 @@ a shared user cache.
   repository facts refreshed, and Foundation mode. Decision 4 stands, and §10.1.5 is reconciled
   with it; decision 9 now reads every page; the rest became Open 1, Verification, and Operating
   mode. The deleted account manager led to
-  `effort/pending/2026-10-13-soft-deleted-references-brief.md`, now a prerequisite: soft delete
+  `effort/active/2026-10-13-soft-deleted-references-brief.md`, now a prerequisite: soft delete
   keeps a record so references survive, yet every read hid it.
 
 _End of Brief_
