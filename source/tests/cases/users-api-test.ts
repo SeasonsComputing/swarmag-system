@@ -3,7 +3,7 @@
  */
 
 import { ApiError } from '@core/stdx'
-import { assert, assertEquals } from '@std/assert'
+import { assert, assertEquals, assertRejects } from '@std/assert'
 import '@tests/config/test-config.ts'
 import type { UserCreate } from '@domain/protocols/user-protocol.ts'
 import { api } from '@front/api/api.ts'
@@ -45,11 +45,11 @@ Deno.test('users API supports full CRUD lifecycle with soft delete', async conte
     primaryEmail: fetched.primaryEmail,
     phoneNumber: fetched.phoneNumber,
     preferredChannel: fetched.preferredChannel,
-    status: 'inactive'
+    status: 'active'
   }))
   assertEquals(updated.id, created.id)
   assertEquals(updated.displayName, `Updated Ops User ${nonce}`)
-  assertEquals(updated.status, 'inactive')
+  assertEquals(updated.status, 'active')
 
   await context.step('User detail scope preserves excluded avatarUrl', async () => {
     assertEquals(updated.avatarUrl, createInput.avatarUrl)
@@ -63,14 +63,24 @@ Deno.test('users API supports full CRUD lifecycle with soft delete', async conte
   assertEquals(deleted.id, created.id)
   assert(deleted.deletedAt.length > 0)
 
-  let deletedGetError: unknown = null
-  try {
-    await api.Users.get(created.id)
-  } catch (error) {
-    deletedGetError = error
-  }
-  assert(deletedGetError instanceof ApiError)
-  assertEquals(deletedGetError.status, 404)
+  const deletedUser = await api.Users.get(created.id)
+  assertEquals(deletedUser.id, created.id)
+  assertEquals(deletedUser.deletedAt, deleted.deletedAt)
+  assertEquals(deletedUser.displayName, updated.displayName)
+  assertEquals(deletedUser.status, 'active')
+
+  const updateError = await assertRejects(
+    () =>
+      api.Users.update(scopes.Users.detail.toUpdate(created.id, {
+        ...updated,
+        displayName: 'Cannot update deleted User'
+      })),
+    ApiError
+  )
+  assertEquals(updateError.status, 404)
+  const deleteError = await assertRejects(() => api.Users.delete(created.id), ApiError)
+  assertEquals(deleteError.status, 404)
+  assertEquals(await api.Users.get(created.id), deletedUser)
 
   const listed = await api.Users.list({ limit: 100 })
   assertEquals(listed.data.some(user => user.id === created.id), false)

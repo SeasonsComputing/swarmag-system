@@ -16,7 +16,7 @@ makeCrudIndexedDbClient(spec)  Build CRUD/list client over IndexedDB.
 */
 
 import { IndexedDb } from '@core/db/indexeddb.ts'
-import { instantiable, when } from '@core/std'
+import { instantiable, isNullish, when } from '@core/std'
 import type {
   CreateFromInstantiable,
   Dictionary,
@@ -79,7 +79,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
       }
     },
 
-    /** Get non-deleted record by id from IndexedDB and map to domain entity. */
+    /** Get record by id from IndexedDB, including soft-deleted reference targets. */
     async get(id: Id): Promise<T> {
       try {
         const db = await IndexedDb.connection()
@@ -104,7 +104,9 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
         const db = await IndexedDb.connection()
         const tx = db.transaction(store, 'readwrite')
         const curr = await tx.store.get(id)
-        if (curr === undefined) throwApiError({ details: `id=[${id}]` }, 'Record not found', 404)
+        if (curr === undefined || !isNullish(curr['deleted_at'])) {
+          throwApiError({ details: `id=[${id}]` }, 'Record not found', 404)
+        }
         const next: T = { ...curr, ...record, updated_at: when() }
         await tx.store.put(next)
         await tx.done
@@ -121,7 +123,9 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
         const db = await IndexedDb.connection()
         const tx = db.transaction(store, 'readwrite')
         const curr = await tx.store.get(id)
-        if (curr === undefined) throwApiError({ details: `id=[${id}]` }, 'Record not found', 404)
+        if (curr === undefined || !isNullish(curr['deleted_at'])) {
+          throwApiError({ details: `id=[${id}]` }, 'Record not found', 404)
+        }
         const now = when()
         const del: Dictionary = { ...curr, updated_at: now, deleted_at: now }
         await tx.store.put(del)
@@ -129,7 +133,7 @@ export const makeCrudIndexedDbClient = <T extends Instantiable>(
         return { id: del['id'] as Id, deletedAt: del['deleted_at'] as When }
       } catch (error) {
         if (apiError(error)) throw error
-        throwApiError(error as ApiErrorDetail, 'Read Failure', IndexedDb.errorToStatus(error))
+        throwApiError(error as ApiErrorDetail, 'Delete Failure', IndexedDb.errorToStatus(error))
       }
     },
 

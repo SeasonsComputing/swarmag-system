@@ -61,7 +61,7 @@ CREATE TABLE facets (
 ALTER TABLE facets ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "facets_select_active" ON facets
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "facets_insert_all" ON facets
   FOR INSERT WITH CHECK (true);
@@ -105,7 +105,7 @@ CREATE TABLE users (
 ALTER TABLE users ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "users_select_active" ON users
-  FOR SELECT TO authenticated USING (deleted_at IS NULL);
+  FOR SELECT TO authenticated USING (true);
 
 CREATE INDEX users_deleted_at_idx ON users (deleted_at);
 
@@ -125,7 +125,7 @@ CREATE TABLE asset_types (
 ALTER TABLE asset_types ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "asset_types_select_active" ON asset_types
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "asset_types_insert_all" ON asset_types
   FOR INSERT WITH CHECK (true);
@@ -156,7 +156,7 @@ CREATE TABLE assets (
 ALTER TABLE assets ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "assets_select_active" ON assets
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "assets_insert_all" ON assets
   FOR INSERT WITH CHECK (true);
@@ -205,7 +205,7 @@ CREATE TABLE chemicals (
 ALTER TABLE chemicals ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "chemicals_select_active" ON chemicals
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "chemicals_insert_all" ON chemicals
   FOR INSERT WITH CHECK (true);
@@ -249,7 +249,7 @@ CREATE TABLE customers (
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "customers_select_active" ON customers
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "customers_insert_all" ON customers
   FOR INSERT WITH CHECK (true);
@@ -311,7 +311,7 @@ CREATE TABLE services (
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "services_select_active" ON services
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "services_insert_all" ON services
   FOR INSERT WITH CHECK (true);
@@ -366,7 +366,7 @@ CREATE TABLE workflows (
 ALTER TABLE workflows ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "workflows_select_active" ON workflows
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "workflows_insert_all" ON workflows
   FOR INSERT WITH CHECK (true);
@@ -393,7 +393,7 @@ CREATE TABLE tasks (
 ALTER TABLE tasks ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "tasks_select_active" ON tasks
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "tasks_insert_all" ON tasks
   FOR INSERT WITH CHECK (true);
@@ -434,7 +434,7 @@ CREATE TABLE questions (
 ALTER TABLE questions ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "questions_select_active" ON questions
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "questions_insert_all" ON questions
   FOR INSERT WITH CHECK (deleted_at IS NULL);
@@ -517,7 +517,7 @@ CREATE TABLE jobs (
 ALTER TABLE jobs ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "jobs_select_active" ON jobs
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "jobs_insert_all" ON jobs
   FOR INSERT WITH CHECK (true);
@@ -554,7 +554,7 @@ CREATE TABLE job_assessments (
 ALTER TABLE job_assessments ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "job_assessments_select_active" ON job_assessments
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "job_assessments_insert_all" ON job_assessments
   FOR INSERT WITH CHECK (true);
@@ -584,7 +584,7 @@ CREATE TABLE job_workflows (
 ALTER TABLE job_workflows ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "job_workflows_select_active" ON job_workflows
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "job_workflows_insert_all" ON job_workflows
   FOR INSERT WITH CHECK (true);
@@ -619,7 +619,7 @@ CREATE TABLE job_plans (
 ALTER TABLE job_plans ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "job_plans_select_active" ON job_plans
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "job_plans_insert_all" ON job_plans
   FOR INSERT WITH CHECK (true);
@@ -661,7 +661,7 @@ CREATE TABLE job_plan_assignments (
 ALTER TABLE job_plan_assignments ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "job_plan_assignments_select_active" ON job_plan_assignments
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "job_plan_assignments_insert_all" ON job_plan_assignments
   FOR INSERT WITH CHECK (true);
@@ -696,7 +696,7 @@ CREATE TABLE job_plan_chemicals (
 ALTER TABLE job_plan_chemicals ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "job_plan_chemicals_select_active" ON job_plan_chemicals
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "job_plan_chemicals_insert_all" ON job_plan_chemicals
   FOR INSERT WITH CHECK (true);
@@ -751,7 +751,7 @@ CREATE TABLE job_work (
 ALTER TABLE job_work ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "job_work_select_active" ON job_work
-  FOR SELECT USING (deleted_at IS NULL);
+  FOR SELECT USING (true);
 
 CREATE POLICY "job_work_insert_all" ON job_work
   FOR INSERT WITH CHECK (true);
