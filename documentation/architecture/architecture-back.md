@@ -287,10 +287,16 @@ and therefore run through authenticated Supabase Edge functions. They are
 user-invoked privileged operations, not open endpoints.
 
 The `users` table is read-only to direct callers. Its RLS grants `SELECT` to
-authenticated users on non-deleted rows and defines no `INSERT`, `UPDATE`, or
-`DELETE` policies for any direct caller. All domain user writes flow through
-these edge functions via the service-role client after administrator
-authorization.
+authenticated users, including soft-deleted rows, and defines no `INSERT`,
+`UPDATE`, or `DELETE` policies for any direct caller. All domain user writes
+flow through these edge functions via the service-role client after
+administrator authorization.
+
+`get` returns a soft-deleted User with `deletedAt` set so existing references
+can resolve it. API lists exclude deleted Users; RLS does not enforce that
+list filter. A successful read is not a liveness check: session preparation
+rejects a deleted User. User-management orchestration and `user_has_access`
+retain their deletion filters for write and authorization paths.
 
 Every user-management edge function must:
 

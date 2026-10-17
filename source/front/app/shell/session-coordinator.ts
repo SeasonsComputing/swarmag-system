@@ -59,7 +59,7 @@ class AppSessionCoordinator implements SessionCoordinatorContract {
 
     const user = await api.Users.get(session.userId)
     if (api.SessionState.store.userId !== session.userId) return
-    if (user.status !== 'active') {
+    if (user.deletedAt !== undefined || user.status !== 'active') {
       try {
         await api.Auth.logout()
       } finally {
@@ -73,4 +73,4 @@ class AppSessionCoordinator implements SessionCoordinatorContract {
 }
 
 /** Shared suite session coordinator. */
-export const SessionCoordinator: SessionCoordinatorContract = new AppSessionCoordinator()
+export const SessionCoordinator = new AppSessionCoordinator()

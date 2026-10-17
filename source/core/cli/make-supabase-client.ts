@@ -103,13 +103,12 @@ export const makeCrudSupabaseClient = <T extends Instantiable>(
     return adapter.toDomain(data)
   },
 
-  /** Get non-deleted record by id from Supabase and map to domain entity. */
+  /** Get record by id from Supabase, including soft-deleted reference targets. */
   async get(id: Id): Promise<T> {
     const { data, error } = await Supabase.client()
       .from(table)
       .select('*')
       .eq('id', id)
-      .is('deleted_at', null)
       .single()
     checkApiError(error, 'Failed to get record', Supabase.errorToStatus)
     return adapter.toDomain(data)

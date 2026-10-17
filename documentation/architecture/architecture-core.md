@@ -202,6 +202,30 @@ Import maps must be kept in sync manually. Path aliases use root-relative paths 
 
 All life-cycle entities support soft delete via `deletedAt?: When`. Hard deletes occur only under explicit data retention policy execution. Exceptions: append-only logs and pure join tables.
 
+A reference resolves its target even when the target is soft-deleted. Here, a reference is a
+single-target association (`AssociationOne` or `AssociationOptional`) declared `ON DELETE RESTRICT`,
+pointing to an independent record. Cardinality from the target's side does not change this rule:
+a Job references its Customer through `jobs.customer_id`.
+
+Ownership associations (`ON DELETE CASCADE`) are outside this reference rule because a child is
+reached through its owner. The cascade governs physical deletion; it implies neither cascading soft
+delete nor owner-based visibility. Junctions (`AssociationJunction`) have no life-cycle fields and
+are hard-deleted only.
+
+The association carries an id, and the label comes from the target. `get` returns a soft-deleted
+target with `deletedAt` set; consumers show its label and indicate that it is deleted. Lists exclude
+soft-deleted records and supply the choices for new references. Deleted records remain readable,
+but `update` and `delete` refuse them. A successful `get` does not establish liveness: callers that
+require a live record check `deletedAt`, including session preparation for a User.
+
+RLS governs who may read a record and does not filter soft-deleted rows. List exclusion is an API
+contract, not a database guarantee; otherwise-authorized callers may select deleted rows outside
+the API client without proving that an existing reference points to them.
+
+Designs must preserve the ability to anonymize personal data on its record. References carry ids,
+never copies of the target's personal data, so anonymizing the target changes the label
+resolved by every reference to it. Anonymization implementation is deferred.
+
 ### 3.3 Non-Goals
 
 #### 3.3.1 Not building
@@ -1062,7 +1086,11 @@ These rules must never be violated. Code that violates these invariants is wrong
 
 - All life-cycle abstractions extend `Instantiable` from `@core/std`, which carries `id`, `createdAt`, `updatedAt`, `deletedAt?`
 - Do not redeclare these fields inline — extend via intersection
-- Queries filter `WHERE deleted_at IS NULL`
+- References resolve soft-deleted targets under §3.2.5; `get` returns them with `deletedAt` set
+- API lists filter `WHERE deleted_at IS NULL`; new reference choices come from lists
+- RLS governs read authorization without filtering soft-deleted rows
+- `update` and `delete` refuse soft-deleted records
+- Callers requiring a live record check `deletedAt`; session preparation rejects a deleted User
 - Hard deletes only under explicit data retention policies
 - Exceptions: append-only logs and pure join tables
 
