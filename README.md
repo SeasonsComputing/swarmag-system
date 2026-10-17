@@ -361,6 +361,22 @@ Where:
 
 See [Architecture DevOps §14](documentation/architecture/architecture-devops.md#14-platform-target-listings) for output shape, error conditions, and naming conventions.
 
+### 5.5 Database
+
+Reset a Supabase target from the canonical schema, `source/domain/schema/schema.sql`.
+
+| Command                                   | Purpose                                                                 |
+| ----------------------------------------- | ----------------------------------------------------------------------- |
+| `dot db-reset --target {target}`          | Run genesis, then verify it                                             |
+| `dot db-genesis --target {target}`        | Drop and recreate the schema and seed data, after confirming the target |
+| `dot db-genesis-verify --target {target}` | Check the seeded users, seed counts, and `user_has_access`; read-only   |
+
+Where:
+
+- `{target}`: `dev` | `stage` | `prod` (required).
+
+See [Architecture DevOps §12](documentation/architecture/architecture-devops.md#12-supabase-schema-management) for the genesis run, target confirmation, and seed conventions.
+
 ## 6. Working Rules
 
 | Rule                                      | Description                                                                |
