@@ -25,6 +25,10 @@
   overflow: auto;
 }
 
+[data-shell='collection-panel-body']:has(> [data-shell='collection-panel-empty']:only-child) {
+  block-size: calc(var(--sa-touch-target-sm) * 2.5);
+}
+
 [data-shell='collection-panel-empty'] {
   block-size: 100%;
   color: var(--sa-text-placeholder);
