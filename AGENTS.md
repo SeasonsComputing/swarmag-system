@@ -11,7 +11,7 @@
 
 ## 1. Operating Session
 
-Operating sessions are characterized by seeding the session content, declaring the operating mode, and assigning the session to an AI agent.
+Operating sessions are characterized by seeding the session context, declaring the operating mode, and assigning the session to an AI agent.
 
 **Conversation Decorum**
 
