@@ -169,4 +169,34 @@ Added at the CA's direction during the AI Coding Engine review of
   rows and that lists do; "Active rows are `deleted_at IS NULL`" stands. A governance file:
   committed with the governance-gate bypass.
 
+## Amendment — 2026-10-18 — Makers as a first-class mechanism
+
+Added at the CA's direction. Makers are a considered, substantive, generative feature of the
+architecture, yet they lack prominence and an explicit definition, and CONVENTIONS reads as if it
+forbids them.
+
+- **The census.** 18 exported makers across `core/std` (`makeAdapter`, `makeScopedUpdate`,
+  `makeScope`, `makeAdaptedScope`, `makeQuery`, `makeCorsHeaders`), `core/cli` (the CRUD and
+  business-rule clients, `makeSupabaseListRequest`), `core/svc` (`makeSupabaseEdgeAuth`),
+  `front/api` (`makeAuthUsers`), and `ux/shell` with `front/app/shell` (`makeAnonymousShell`,
+  `makeDashboardShell`, generic then swarmAg-bound). Service wrappers (`wrap*`) mirror makers at
+  the inbound boundary.
+- **Where they are defined.** `architecture-core.md` §5.3 covers only client makers, as "factory
+  functions that produce clients conforming to contracts". CONVENTIONS §8.7 is three sentences;
+  one reads "They do not create instances of an object they create code."
+- **The apparent conflict.** CONVENTIONS §7.6 bans "meta-programming"; §8.7 says makers "create
+  code". `source/` uses no `Proxy`, `Reflect`, `eval`, or `new Function`.
+- **For the reconciliation:**
+  - `architecture-core.md` gives makers their own section as a fundamental mechanism: a maker
+    takes a declarative, typed specification and returns an implementation conforming to a stated
+    contract, with no hidden behavior. It covers the tiers and wrappers as the inbound mirror;
+    §5.3 points to it.
+  - CONVENTIONS §7.6 is restated as the rule it is, **No magic**, with its corollary **Explicit
+    and obvious**, and without exceptions or carve-outs. Makers conform because they are explicit
+    and obvious: the specification is visible at the call site, and the contract is stated in an
+    interface.
+  - CONVENTIONS §8.7 is rewritten clearly, and carries the 2026-10-11 contract-file rule (above).
+  - README §2.4.1 names makers.
+  - Both CONVENTIONS edits are to a governance file: committed with the governance-gate bypass.
+
 _End of Backlog Brief_
