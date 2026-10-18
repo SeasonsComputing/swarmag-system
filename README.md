@@ -4,7 +4,21 @@
 
 The swarmAg Operations System (`swarmAg System`) supports operations across aerial and ground agricultural services. The monorepo is organized around a typed domain core, backend/runtime infrastructure, and user experience applications.
 
-## 1. Technology Stack
+## 1. Foundation
+
+### 1.1 Governance Invariants
+
+Four documents govern all work in this repository, by humans and AI systems alike. They sit
+above every specification: [`CONSTITUTION.md` §1](CONSTITUTION.md#1-purpose--authority) sets the order of precedence, and the others bind within it. Each carries a no-AI-edit mark, and `guard:governance-gate` fails any commit that changes one.
+
+| File                                 | Description                                              |
+| ------------------------------------ | -------------------------------------------------------- |
+| [`AGENTS.md`](AGENTS.md)             | AI agent protocol, operating modes, and production gates |
+| [`CONSTITUTION.md`](CONSTITUTION.md) | Highest architectural authority and role boundaries      |
+| [`CONVENTIONS.md`](CONVENTIONS.md)   | Binding code and content style conventions               |
+| [`EFFORT.md`](EFFORT.md)             | Effort lifecycle, tracking, sequencing, and closure      |
+
+### 1.2 Technology Stack
 
 | Platform     | Purpose                      | Features/Technology                                             |
 | ------------ | ---------------------------- | --------------------------------------------------------------- |
@@ -17,23 +31,32 @@ The swarmAg Operations System (`swarmAg System`) supports operations across aeri
 Platform responsibilities are in
 [Architecture Core §2](documentation/architecture/architecture-core.md#2-core-platforms).
 
+### 1.3 Physical Architecture
+
+| Tier          | Platform                       | Role                                                                    |
+| ------------- | ------------------------------ | ----------------------------------------------------------------------- |
+| Applications  | Netlify CDN                    | Static PWA bundles: `app-admin`, `app-ops`, `app-customer`              |
+| Data          | Supabase Postgres              | Canonical schema with row-level security; applications call it directly |
+| Identity      | Supabase Auth                  | Passwordless one-time-code sign-in                                      |
+| Orchestration | Supabase Edge Functions (Deno) | Privileged operations only, such as User create, update, delete, eject  |
+| Field device  | IndexedDB, in the Ops PWA      | The offline copy of a job, and its append-only work log                 |
+
+The applications are static bundles with no application server of their own. The backend they bind
+to is embedded at package time (Supabase endpoint, public key, and client mode), not chosen by the
+host that serves them. Most operations go directly to the database through the Supabase client
+under row-level security; edge functions exist only for orchestration that simple CRUD cannot
+express. The Ops application carries a job's complete working set onto the device and returns only
+an append-only log, so field work never needs a two-way sync.
+
+Deployment details, packages, and environment files are in
+[Architecture DevOps](documentation/architecture/architecture-devops.md); application runtime
+profiles are in
+[Architecture Front §3](documentation/architecture/architecture-front.md#3-application-runtime-profiles),
+and edge functions in [Architecture Back](documentation/architecture/architecture-back.md).
+
 ## 2. Repository Structure
 
-### 2.1 Governance Invariants
-
-Four root documents govern all work in this repository, by humans and AI systems alike. They sit
-above every specification: [`CONSTITUTION.md` §1](CONSTITUTION.md#1-purpose--authority) sets the order of precedence, and the others bind
-within it. Each carries a no-AI-edit mark, and `guard:governance-gate` fails any commit that
-changes one.
-
-| File                                 | Description                                              |
-| ------------------------------------ | -------------------------------------------------------- |
-| [`AGENTS.md`](AGENTS.md)             | AI agent protocol, operating modes, and production gates |
-| [`CONSTITUTION.md`](CONSTITUTION.md) | Highest architectural authority and role boundaries      |
-| [`CONVENTIONS.md`](CONVENTIONS.md)   | Binding code and content style conventions               |
-| [`EFFORT.md`](EFFORT.md)             | Effort lifecycle, tracking, sequencing, and closure      |
-
-### 2.2 Top-level Namespaces
+### 2.1 Top-level Namespaces
 
 | Path             | Description                                          |
 | ---------------- | ---------------------------------------------------- |
@@ -42,7 +65,7 @@ changes one.
 | `source/`        | Source code organized into layers                    |
 | `supabase/`      | Supabase project configuration and local metadata    |
 
-### 2.3 Documentation (`documentation/`)
+### 2.2 Documentation (`documentation/`)
 
 Specifications are settled system documents that define architecture, domain
 meaning, UX language, and implementation standards in accordance with governance invariants.
@@ -63,7 +86,7 @@ meaning, UX language, and implementation standards in accordance with governance
 |                 | [`ux-components-guide-lite.md`](documentation/ux/ux-components-guide-lite.md) | Lightweight UX component reference                      |
 |                 | [`ux-components-internals.md`](documentation/ux/ux-components-internals.md)   | UX component implementation internals                   |
 
-### 2.4 Effort (`effort/`)
+### 2.3 Effort (`effort/`)
 
 Effort documents capture working project context. Status-bearing effort records live in
 `active` while their effort is current work and move to `completed` when it
@@ -84,7 +107,7 @@ naming are defined in [`EFFORT.md` §2](EFFORT.md#2-the-effort-namespace); the l
 |             | [`project-parking-lot.md`](effort/project/project-parking-lot.md)   | Deferred features or architectural adjustments         |
 |             | [`project-user-stories.md`](effort/project/project-user-stories.md) | Cross-application user stories and scenario narratives |
 
-### 2.5 Source (`source/`)
+### 2.4 Source (`source/`)
 
 | Path      | Description                                                           |
 | --------- | --------------------------------------------------------------------- |
@@ -102,7 +125,7 @@ framework, and the architecture into its lock-in, the capability is owned instea
 decisions stay under the project's control. The applications' runtime dependencies are about
 seven: Solid, Kobalte, TanStack Query and Router, Chart.js, `idb`, and Supabase.
 
-#### 2.5.1 Core (`source/core/`)
+#### 2.4.1 Core (`source/core/`)
 
 | Path   | Description                                                                      |
 | ------ | -------------------------------------------------------------------------------- |
@@ -130,7 +153,7 @@ are owned here, built to one model of the domain:
 Fewer dependencies to upgrade, audit, or work around, and the pieces agree with each other because
 they share one design.
 
-#### 2.5.2 Domain (`source/domain/`)
+#### 2.4.2 Domain (`source/domain/`)
 
 | Path            | Description                                         |
 | --------------- | --------------------------------------------------- |
@@ -148,14 +171,14 @@ generates each archetype for every topic in the
 A change to the domain starts in the data dictionary or the archetypes, and a hand edit is made
 only where it equals what genesis would produce.
 
-#### 2.5.3 Backend (`source/back/`)
+#### 2.4.3 Backend (`source/back/`)
 
 | Path             | Description                                                       |
 | ---------------- | ----------------------------------------------------------------- |
 | `migrations/`    | Forward-only SQL deltas and RLS policies                          |
 | `supabase-edge/` | Supabase Edge Functions (config, functions, shared orchestration) |
 
-#### 2.5.4 Frontend (`source/front/`)
+#### 2.4.4 Frontend (`source/front/`)
 
 | Path               | Description                                                 |
 | ------------------ | ----------------------------------------------------------- |
@@ -167,7 +190,7 @@ only where it equals what genesis would produce.
 | `api/`             | Composed application API                                    |
 | `config/`          | Configuration bootstrap for UX applications                 |
 
-#### 2.5.5 UX Toolkit (`source/ux/`)
+#### 2.4.5 UX Toolkit (`source/ux/`)
 
 | Path       | Description                                                    |
 | ---------- | -------------------------------------------------------------- |
@@ -194,32 +217,9 @@ language, styling, and application shell are owned, and designed to fit each oth
 | Dashboard and widget-grid libraries              | `shell/dashboard` and `widgets/`                                                         |
 | Application bootstrap and route configuration    | `shell/runtime`: a route grammar compiled onto TanStack Router                           |
 
-## 3. Physical Architecture
+## 3. Environments & Configuration
 
-| Tier          | Platform                       | Role                                                                    |
-| ------------- | ------------------------------ | ----------------------------------------------------------------------- |
-| Applications  | Netlify CDN                    | Static PWA bundles: `app-admin`, `app-ops`, `app-customer`              |
-| Data          | Supabase Postgres              | Canonical schema with row-level security; applications call it directly |
-| Identity      | Supabase Auth                  | Passwordless one-time-code sign-in                                      |
-| Orchestration | Supabase Edge Functions (Deno) | Privileged operations only, such as User create, update, delete, eject  |
-| Field device  | IndexedDB, in the Ops PWA      | The offline copy of a job, and its append-only work log                 |
-
-The applications are static bundles with no application server of their own. The backend they bind
-to is embedded at package time (Supabase endpoint, public key, and client mode), not chosen by the
-host that serves them. Most operations go directly to the database through the Supabase client
-under row-level security; edge functions exist only for orchestration that simple CRUD cannot
-express. The Ops application carries a job's complete working set onto the device and returns only
-an append-only log, so field work never needs a two-way sync.
-
-Deployment details, packages, and environment files are in
-[Architecture DevOps](documentation/architecture/architecture-devops.md); application runtime
-profiles are in
-[Architecture Front §3](documentation/architecture/architecture-front.md#3-application-runtime-profiles),
-and edge functions in [Architecture Back](documentation/architecture/architecture-back.md).
-
-## 4. Environments & Configuration
-
-### 4.1 Package Targets
+### 3.1 Package Targets
 
 Deployable UX packages bind to a remote backend target at build time:
 
@@ -243,7 +243,7 @@ adding one is configuration, not rework.
 Local UX hosting is development tooling. A locally served app is still bound to the backend target embedded in its package env file. The local runner appends `-local` to the package version in the Vite process environment so login
 diagnostics identify local hosting without changing package identity or the generated `.env` file.
 
-### 4.2 Environment Files
+### 3.2 Environment Files
 
 Committed env templates live under `source/front/config/` and `source/back/supabase-edge/config/`.
 
@@ -258,7 +258,7 @@ Package scripts recreate generated UX `.env` files from templates when `--init-e
 
 Resolved values are not written back into generated `.env` files.
 
-### 4.3 Configuration Pattern
+### 3.3 Configuration Pattern
 
 The system uses a singleton `Config` defined in `@core/cfg/config.ts`, initialized once per deployment context via `Config.init(provider, keys, aliases?)`:
 
@@ -269,7 +269,7 @@ The system uses a singleton `Config` defined in `@core/cfg/config.ts`, initializ
 See [Architecture Core §6](documentation/architecture/architecture-core.md#6-configuration-management)
 for complete configuration management detail.
 
-### 4.4 Configuration Rules
+### 3.4 Configuration Rules
 
 - Never commit actual `.env` files — only commit `.env.example` templates
 - Generated env files are gitignored package inputs
@@ -277,12 +277,12 @@ for complete configuration management detail.
 - UX package targets are `dev`, `stage`, and `prod`
 - All runtime config values validated at bootstrap via `Config.init()`
 
-## 5. DevOps Commands
+## 4. DevOps Commands
 
 The examples below use `dot` as a local shell alias for `deno task`. `deno.jsonc` is the authoritative task registry. Detailed workflow contracts live in
 [Architecture DevOps](documentation/architecture/architecture-devops.md).
 
-### 5.1 Validation
+### 4.1 Validation
 
 | Command     | Purpose                           |
 | ----------- | --------------------------------- |
@@ -293,7 +293,7 @@ The examples below use `dot` as a local shell alias for `deno task`. `deno.jsonc
 Individual `guard:*` tasks are documented in
 [Architecture DevOps](documentation/architecture/architecture-devops.md).
 
-### 5.2 Local Servers
+### 4.2 Local Servers
 
 | Command                     | Purpose                            |
 | --------------------------- | ---------------------------------- |
@@ -305,7 +305,7 @@ Where:
 
 - `{app}`: `admin` | `ops` | `customer`.
 
-### 5.3 Packaging And Deployment
+### 4.3 Packaging And Deployment
 
 **Frontend deployment:**
 
@@ -327,7 +327,7 @@ generated `_shared` tree and pin `TMPDIR` to a Docker-VM-shared path:
 
 ```bash
 dot edge-serve                                      # serve all functions against the local stack
-dot edge-deploy <function...> --project-ref <ref>   # deploy to a resolved project (§5.4)
+dot edge-deploy <function...> --project-ref <ref>   # deploy to a resolved project (§4.4)
 ```
 
 See [Architecture DevOps §8.5](documentation/architecture/architecture-devops.md#85-edge-deployment)
@@ -345,7 +345,7 @@ applied to the linked Supabase project.
 supabase db push
 ```
 
-### 5.4 Platform Listings
+### 4.4 Platform Listings
 
 Query live platform topology. Both scripts write JSON to stdout.
 
@@ -361,7 +361,7 @@ Where:
 
 See [Architecture DevOps §14](documentation/architecture/architecture-devops.md#14-platform-target-listings) for output shape, error conditions, and naming conventions.
 
-### 5.5 Database
+### 4.5 Database
 
 Reset a Supabase target from the canonical schema, `source/domain/schema/schema.sql`.
 
@@ -377,7 +377,7 @@ Where:
 
 See [Architecture DevOps §12](documentation/architecture/architecture-devops.md#12-supabase-schema-management) for the genesis run, target confirmation, and seed conventions.
 
-## 6. Working Rules
+## 5. Working Rules
 
 | Rule                                      | Description                                                                |
 | ----------------------------------------- | -------------------------------------------------------------------------- |
@@ -389,7 +389,7 @@ See [Architecture DevOps §12](documentation/architecture/architecture-devops.md
 | Respect generated artifacts               | Do not commit `.env` files, build outputs, package zips, or local secrets. |
 | Use architecture docs for depth           | Keep detailed rationale in `documentation/architecture/architecture-*.md`. |
 
-## 7. Working Sessions
+## 6. Working Sessions
 
 All software construction activity operates in conformance with the governing principles defined in [CONSTITUTION.md](CONSTITUTION.md).
 
