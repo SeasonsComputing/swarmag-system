@@ -24,9 +24,7 @@ declare const Netlify:
   | { env: { get(key: string): string | undefined } }
   | undefined
 
-/**
- * Configuration provider for Netlify Edge Functions.
- */
+/** Configuration provider for Netlify Edge Functions. */
 export class ProviderNetlify implements RuntimeContract {
   constructor() {
     const isNetlify = 'Netlify' in globalThis

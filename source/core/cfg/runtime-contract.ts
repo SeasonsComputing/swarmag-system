@@ -15,6 +15,8 @@ RuntimeContract   Runtime configuration provider interface.
 ├ get(key)        Retrieve an environment variable value.
 └ fail(msg)       Fail with a runtime-specific error path.
 */
+
+/** Contract for all configuration providers. */
 export interface RuntimeContract {
   /**
    * Retrieve an environment variable value.
