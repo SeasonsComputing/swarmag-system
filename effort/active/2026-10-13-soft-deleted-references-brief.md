@@ -135,6 +135,10 @@ stage that a deleted User is fetched by id with `deletedAt` set and does not app
 7. **17 `SELECT` policies, not 18.** The AI Architect miscounted: 17 policies used
    `deleted_at IS NULL` (16 plain, plus `users`' `TO authenticated`). The production changed all 17,
    as the AI Coding Engine reported.
+8. **The 17 policies are renamed `{table}_select_all`** (CA, at stage acceptance). Their
+   `*_select_active` names contradicted `USING (true)`; the six policies already using `true`
+   were named `{table}_select_all`. `schema.sql` only; stage takes it through a second genesis
+   run.
 
 ## Design history
 
