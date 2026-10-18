@@ -64,13 +64,13 @@ password sign-in for a test user (a second sign-in method on stage that producti
 
 Operating mode: **Foundation** (authentication boundary, seed data, test infrastructure).
 
-| Where                                         | Change                                                                |
-| --------------------------------------------- | --------------------------------------------------------------------- |
-| `domain/schema/schema.sql`                    | Seed the test administrator in `auth.users` and `users`.              |
-| `source/tests/config/test-config.ts`          | Register `LOCAL_DB_NAME`.                                             |
-| `source/tests/` (a shared session fixture)    | Mint and redeem the test administrator's session in setup.            |
-| `source/tests/cases/users-api-test.ts`        | Sign in through the fixture before its calls.                         |
-| `architecture-devops.md`                      | Running integration tests against stage: identity, key, genesis.      |
+| Where                                      | Change                                                           |
+| ------------------------------------------ | ---------------------------------------------------------------- |
+| `domain/schema/schema.sql`                 | Seed the test administrator in `auth.users` and `users`.         |
+| `source/tests/config/test-config.ts`       | Register `LOCAL_DB_NAME`.                                        |
+| `source/tests/` (a shared session fixture) | Mint and redeem the test administrator's session in setup.       |
+| `source/tests/cases/users-api-test.ts`     | Sign in through the fixture before its calls.                    |
+| `architecture-devops.md`                   | Running integration tests against stage: identity, key, genesis. |
 
 **Out of scope:** coverage above the domain/API layer (backlog: "No automated coverage above the
 domain/API layer"); test isolation beyond genesis resets; a test environment other than stage.
