@@ -19,9 +19,7 @@ DenoProvider    Configuration provider for Deno.
 
 import type { RuntimeContract } from './runtime-contract.ts'
 
-/**
- * Configuration provider for Deno.
- */
+/** Configuration provider for Deno. */
 export class DenoProvider implements RuntimeContract {
   constructor() {
     const isDeno = 'Deno' in globalThis

@@ -26,9 +26,7 @@ declare global {
   }
 }
 
-/**
- * Configuration provider for Solid app.
- */
+/** Configuration provider for Solid app. */
 export class SolidProvider implements RuntimeContract {
   constructor() {
     const env = import.meta.env

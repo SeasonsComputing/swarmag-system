@@ -19,9 +19,7 @@ SupabaseProvider  Configuration provider for Supabase Edge Functions.
 
 import type { RuntimeContract } from './runtime-contract.ts'
 
-/**
- * Configuration provider for Supabase edge functions.
- */
+/** Configuration provider for Supabase edge functions. */
 export class SupabaseProvider implements RuntimeContract {
   constructor() {
     const isDeno = 'Deno' in globalThis
