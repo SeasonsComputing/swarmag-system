@@ -1,8 +1,13 @@
 # Soft-Deleted References — Brief
 
-**Active; prerequisite to `effort/active/2026-10-08-account-manager-brief.md`.** Recorded
-2026-10-13 from a CA + AI Architect session, while resolving the account manager brief's AI Coding
-Engine review.
+**Completed 2026-10-18.** Shipped in `c92da14` and `e7ad470` (the policy rename, amendment 8),
+and verified by the CA on stage after genesis: every `SELECT` policy is `*_select_all` with
+`USING (true)`, a deleted User leaves User Manager's list, and a soft-deleted administrator is
+signed out on reload while an active live one is accepted. `users-api-test.ts` and
+`session-coordinator-test.ts` are written and run once
+`effort/active/2026-10-13-stage-test-authorization-brief.md` ships. Prerequisite to
+`effort/active/2026-10-08-account-manager-brief.md`. Recorded 2026-10-13 from a CA + AI Architect
+session, while resolving the account manager brief's AI Coding Engine review.
 
 ## What triggered it
 

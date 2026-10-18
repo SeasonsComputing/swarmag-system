@@ -4,7 +4,7 @@
 after the Notes Editor milestone shipped. The same session's portal design was split out to
 `effort/pending/2026-10-08-customer-portal-brief.md`. Chosen 2026-10-08 to be built before roadmap
 §5. Reviewed 2026-10-10/11 by the CA and AI Architect and refreshed 2026-10-13 (see Design
-history); a prerequisite brief is pending, and it awaits AI Coding Engine review and the
+history); its prerequisite shipped 2026-10-18, and it awaits AI Coding Engine review and the
 production gate.
 
 ## What triggered it
@@ -182,8 +182,8 @@ themself, so the default is the session user**, changeable through a picker.
 
 ## Dependencies
 
-- **`effort/active/2026-10-13-soft-deleted-references-brief.md`** ships first: a reference
-  resolves its soft-deleted target, `get` fetches deleted records, and consumers indicate a deleted
+- **`effort/completed/2026-10-13-soft-deleted-references-brief.md`** shipped first (closed
+  2026-10-18): a reference resolves its soft-deleted target, `get` fetches deleted records, and consumers indicate a deleted
   target. Decision 7 rests on it.
 - **`effort/completed/2026-10-11-list-query-brief.md`** shipped first (closed 2026-10-13):
   declared queries, `build`, `listAll`, and `queries.Users.byRole` in `front/api/queries.ts`; it
@@ -258,7 +258,7 @@ a shared user cache.
   repository facts refreshed, and Foundation mode. Decision 4 stands, and §10.1.5 is reconciled
   with it; decision 9 now reads every page; the rest became Open 1, Verification, and Operating
   mode. The deleted account manager led to
-  `effort/active/2026-10-13-soft-deleted-references-brief.md`, now a prerequisite: soft delete
+  `effort/completed/2026-10-13-soft-deleted-references-brief.md`, now a prerequisite: soft delete
   keeps a record so references survive, yet every read hid it.
 - **2026-10-13: Open 1 resolved as decision 11.** Keeping only the prepared id was a holdover
   from the shell/app split, when the coordinator's side could not hold a domain User; nothing in
