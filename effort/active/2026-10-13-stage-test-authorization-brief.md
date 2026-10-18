@@ -2,7 +2,7 @@
 
 **Active.** Recorded 2026-10-13 from a CA + AI Architect session, after the soft-deleted references
 production left two test files written but unrunnable
-(`effort/active/2026-10-13-soft-deleted-references-brief.md`, amendment 6). It awaits AI Coding
+(`effort/completed/2026-10-13-soft-deleted-references-brief.md`, amendment 6). It awaits AI Coding
 Engine review and the production gate.
 
 ## What triggered it

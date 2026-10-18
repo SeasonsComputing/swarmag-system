@@ -157,7 +157,7 @@ Added at the CA's direction during the 2026-10-11 list-query design
 ## Amendment — 2026-10-13 — Soft-delete read rule
 
 Added at the CA's direction during the AI Coding Engine review of
-`effort/active/2026-10-13-soft-deleted-references-brief.md`.
+`effort/completed/2026-10-13-soft-deleted-references-brief.md`.
 
 - **CONVENTIONS §10.10 conflicts with that brief's decision 2.** Its third bullet reads "RLS
   `SELECT` policies must filter soft-deleted rows". Under the brief, a reference resolves its

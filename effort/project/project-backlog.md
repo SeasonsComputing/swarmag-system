@@ -329,6 +329,26 @@ is what broke the state tests during the Notes Editor production. Moving `Workbe
 own file and renaming the context module to `.ts` (seven importers) was weighed and not taken then
 because the problem did not require it (same brief, amendment "Draft module").
 
+### A fresh New editor shows stale feedback and a premature field error
+
+**Observed:** 2026-10-18 · normal
+
+Found by the CA during stage acceptance of the soft-deleted references production, in User
+Manager; neither is caused by it. Both come from `AbstractionManager`'s reopen-after-success path
+(`source/ux/shell/workbench/abstraction-manager.tsx`):
+
+- **Stale feedback.** After a create, `openFreshNew(false)` reopens a blank New editor and keeps
+  the "Created …" banner. Deleting a list item then runs `runAction`, which resets the editor only
+  when the deleted item is the one open (`selected()?.id === item.id`). The open editor is a new
+  draft, so "Created Frances V. Kremer." stayed on screen after that User was deleted.
+- **A premature field error.** The fresh editor focuses its first field; only that field (Name) is
+  then drawn as an error, with the other empty required fields unmarked. That is the per-field
+  blur path (`blurField` in `use-abstraction-form-validation.ts`), not `validateForm`: something
+  takes focus from Name right after it is focused. The likely cause, not yet confirmed in the
+  browser, is the success banner mounting after `openFreshNew` in `saveEditor`'s create branch.
+
+`ux/shell` is under strict scrutiny; the fix belongs in the workbench, not in an application.
+
 ### `guard:css` does not verify that a referenced token resolves
 
 **Observed:** 2026-08-06 · normal
@@ -546,6 +566,27 @@ runtime should load browser-backed stores through `api` at all.
   and none is run routinely. The list-query production therefore carries no database-backed
   automated tests: its Postgres behavior is verified in the app against a checklist, and its
   automated tests need no database (`effort/completed/2026-10-11-list-query-brief.md`).
+
+## Core
+
+### A unique-key conflict with a soft-deleted record reports a general failure
+
+**Observed:** 2026-10-18 · normal
+
+Found by the CA during stage acceptance of the soft-deleted references production: deleting a
+User, then creating another with the same email, fails with a general error. The constraint is
+correct. A soft-deleted record still holds its natural key, because references resolve to it
+(`architecture-core.md` §3.2.5); a second live record with the same key would make two records
+answer to one identity. The message is what fails the person.
+
+- **Keys today:** `users_primary_email_unique` and `facets_scheme_code_unique` in `schema.sql`.
+- **The status is already right:** `Supabase.errorToStatus` (`core/db/supabase.ts`) maps `23505`
+  to 409. The message reaching User Manager does not name the key, or say that a deleted record
+  holds it.
+- **The fix, as an idiom:** a unique natural key spans soft-deleted records, and a conflict says
+  so, for example "A deleted user already has this email." The rule is one sentence in
+  `architecture-core.md` §3.2.5; the wording lands at the edge (`user-create`) and client
+  boundaries, for every unique key.
 
 ## Customer
 
