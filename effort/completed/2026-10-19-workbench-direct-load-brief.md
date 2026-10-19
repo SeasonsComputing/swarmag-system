@@ -1,6 +1,7 @@
 # Workbench Direct Load — Brief
 
-**Active.** Recorded 2026-10-19 from a CA + AI Architect session, during app acceptance of
+**Completed 2026-10-19.** Fixed in `1bc7550` and verified by the CA in the app (see Resolution).
+Recorded 2026-10-19 from a CA + AI Architect session, during app acceptance of
 `effort/completed/2026-10-08-account-manager-brief.md`. Repair: the failure authorizes
 investigation; the cause, repair scope, and checks come back to the CA before any change.
 
@@ -53,5 +54,20 @@ routing or shell composition contracts, escalate.
 `deno task check`, `deno task fmt:check`, and `deno task test`; `STYLE_AUDIT`. The CA verifies in
 the app: a direct load and a reload of `/users`, `/customers`, and `/onboarding` each open the
 workbench; cancelling still returns to `/`; header navigation is unchanged.
+
+## Resolution — 2026-10-19
+
+Found and fixed by the AI Coding Engine; reviewed by the AI Architect.
+
+- **Cause:** on a fresh load the session store starts with `userId: null`, so
+  `SessionCoordinator` called `clear()` and then `setAuth()` for the persisted session. Between
+  the two writes the store read "resolved, not authenticated" for one reactive tick; `AuthGuard`
+  routed to `/login`, and Login, finding a valid session, went home to `/`. The original route
+  was lost before its overlay could open. The transient predates the readiness gate, which is why
+  both ruled-out experiments changed nothing.
+- **Fix:** `front/app/shell/session-coordinator.ts` applies the identity-change `clear()` and
+  `setAuth()` inside one Solid `batch`, so no observer sees the intermediate state. The diff is
+  that wrapper and the `batch` import.
+- **Verified by the CA:** direct load and reload of the workbench routes open the workbench.
 
 _End of Brief_
