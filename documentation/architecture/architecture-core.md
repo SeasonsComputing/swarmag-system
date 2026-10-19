@@ -14,34 +14,42 @@ This document defines the foundational architectural structure and principles fo
 
 ### 1.1 Authority Chain
 
-Authority decreases from top to bottom.
+A document refines those above it and never contradicts them. Siblings under one parent are
+peers.
 
-| Document                      | File                        | Intent                                                            |
-| ----------------------------- | --------------------------- | ----------------------------------------------------------------- |
-| **Constitution**              | `CONSTITUTION.md`           | Governance model, roles, and operating philosophy                 |
-| └→ **Architecture Core**      | `architecture-core.md`      | System boundary, platform constraints, and invariants             |
-| └→ **Domain Model**           | `domain-model.md`           | Problem/solution semantics and domain meaning                     |
-| └→ **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace inventory and field-level references          |
-| └→ **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns                           |
-| └→ **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction rules     |
-| └→ **Conventions**            | `CONVENTIONS.md`            | Coding standards, file formats, and implementation conventions    |
-| └→ **Architecture Backend**   | `architecture-back.md`      | Backend integration architecture and runtime constraints          |
-| └→ **Architecture UX**        | `architecture-front.md`     | UX-layer integration architecture and app-specific UX contracts   |
-| └→ **Architecture DevOps**    | `architecture-devops.md`    | Environment configuration, secret registry, packaging, and guards |
+```text
+Constitution
+├── Domain Model
+│   └── Domain Data Dictionary
+│       ├── Domain Archetypes
+│       └── Domain Seed Data
+├── Architecture Core
+│   ├── Architecture Back
+│   ├── Architecture Front
+│   └── Architecture DevOps
+├── UX Design Language
+│   └── UX Design Archetypes
+│       └── UX Components Guide
+│           └── UX Components Internals
+└── Conventions
+```
 
-### 1.2 Scope Boundary of Governing Documents
-
-| Document                   | Scope Ownership                                                         |
-| -------------------------- | ----------------------------------------------------------------------- |
-| **Architecture Core**      | System boundary, platform constraints, dependency direction, invariants |
-| **Domain Model**           | Domain meaning and canonical business semantics                         |
-| **Domain Data Dictionary** | Topic namespaces, abstraction inventory, field-level references         |
-| **Domain Archetypes**      | Domain implementation patterns for archetype artifacts                  |
-| **UX Design Language**     | Normative UX language and interaction patterns across applications      |
-| **Conventions**            | Implementation conventions, file formats, and coding standards          |
-| **Architecture Backend**   | Backend integration architecture and runtime constraints                |
-| **Architecture UX**        | UX-layer integration architecture and app-specific UX contracts         |
-| **Architecture DevOps**    | Environment configuration, secret registry, packaging, and guards       |
+| Document                | File                         | Owns                                                          |
+| ----------------------- | ---------------------------- | ------------------------------------------------------------- |
+| Constitution            | `CONSTITUTION.md`            | Governance model, roles, and operating philosophy             |
+| Domain Model            | `domain-model.md`            | Problem/solution semantics and domain meaning                 |
+| Domain Data Dictionary  | `domain-data-dictionary.md`  | Canonical namespace inventory and field-level references      |
+| Domain Archetypes       | `domain-archetypes.md`       | Domain artifact implementation patterns                       |
+| Domain Seed Data        | `domain-seed-data.md`        | Canonical records conforming to the dictionary                |
+| Architecture Core       | `architecture-core.md`       | System boundary, platform constraints, and invariants         |
+| Architecture Back       | `architecture-back.md`       | Backend integration architecture and runtime constraints      |
+| Architecture Front      | `architecture-front.md`      | Front-end and UX-layer integration architecture               |
+| Architecture DevOps     | `architecture-devops.md`     | Environments, packaging, secrets, and guards                  |
+| UX Design Language      | `ux-design-language.md`      | Normative UX language and cross-application interaction rules |
+| UX Design Archetypes    | `ux-design-archetypes.md`    | Surface archetypes built from the language                    |
+| UX Components Guide     | `ux-components-guide.md`     | Component usage and contracts                                 |
+| UX Components Internals | `ux-components-internals.md` | How the components are built                                  |
+| Conventions             | `CONVENTIONS.md`             | Construction rules; gates production, settles no design       |
 
 All code, schemas, and infrastructure are derived artifacts. If code conflicts with these documents, the code is wrong.
 

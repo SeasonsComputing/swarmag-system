@@ -6,23 +6,6 @@
 
 This document defines the operational architecture for building, packaging, and deploying the swarmAg system. It governs environment configuration, the local secret registry, the packaging workflow, and the guard suite that enforces architectural and operational invariants.
 
-### 1.1 Authority Chain
-
-| Document                      | File                        | Intent                                                                     |
-| ----------------------------- | --------------------------- | -------------------------------------------------------------------------- |
-| **Canonical Authority Chain** | `architecture-core.md §1.1` | Defines global documentation precedence for the system                     |
-| └→ **Architecture DevOps**    | _(this file)_               | Environment configuration, secret registry, packaging workflow, and guards |
-
-### 1.2 Scope Boundary of Governing Documents
-
-| Document                 | File                    | Scope Ownership                                                            |
-| ------------------------ | ----------------------- | -------------------------------------------------------------------------- |
-| **Architecture Core**    | `architecture-core.md`  | System boundary, platform constraints, and dependency direction            |
-| **Conventions**          | `CONVENTIONS.md`        | Implementation conventions and coding/file standards                       |
-| **Architecture Backend** | `architecture-back.md`  | Backend integration architecture and runtime constraints                   |
-| **Architecture UX**      | `architecture-front.md` | UX-layer boundaries, composition contracts, and app-specific architecture  |
-| **Architecture DevOps**  | _(this file)_           | Environment configuration, secret registry, packaging workflow, and guards |
-
 ## 2. Directory Structure
 
 The devops layer contains two subdirectories: guards that enforce architectural invariants, and scripts that implement the packaging and tooling workflows.

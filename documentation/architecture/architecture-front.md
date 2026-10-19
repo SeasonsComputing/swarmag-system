@@ -6,24 +6,6 @@
 
 This document defines UX-layer architecture for swarmAg applications. It governs UX integration boundaries, architectural composition, and application-specific UX architecture contracts.
 
-### 1.1 Authority Chain
-
-| Document                      | File                        | Intent                                                                                       |
-| ----------------------------- | --------------------------- | -------------------------------------------------------------------------------------------- |
-| **Canonical Authority Chain** | `architecture-core.md §1.1` | Defines global documentation precedence for the system                                       |
-| └→ **Architecture Front**     | _(this file)_               | Front-layer architecture contracts, integration boundaries, and app-specific UX architecture |
-
-### 1.2 Scope Boundary of Governing Documents
-
-| Document                   | File                        | Scope Ownership                                                              |
-| -------------------------- | --------------------------- | ---------------------------------------------------------------------------- |
-| **Architecture Core**      | `architecture-core.md`      | System boundary, platform constraints, dependency direction                  |
-| **Domain Model**           | `domain-model.md`           | Domain meaning consumed by UX architecture                                   |
-| **Domain Data Dictionary** | `domain-data-dictionary.md` | Canonical namespace and field-level references used by UX contracts          |
-| **Domain Archetypes**      | `domain-archetypes.md`      | Domain artifact implementation patterns consumed by UX integrations          |
-| **UX Design Language**     | `ux-design-language.md`     | Normative UX language and cross-application interaction patterns             |
-| **Architecture Front**     | _(this file)_               | Front-layer boundaries, composition contracts, and app-specific architecture |
-
 ## 2. Directory Structure
 
 The following is the normative target structure. Directories not yet present are created as pages are built.
