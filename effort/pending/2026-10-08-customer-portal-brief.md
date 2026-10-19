@@ -4,7 +4,7 @@
 the portal's milestone, not a design: its details are written when the roadmap reaches it. It
 carries roadmap §1's open item "Additional-contact assignment" (`project-user-stories.md` §1.1,
 story 4), which is portal users. The same session's account-manager work is
-`effort/active/2026-10-08-account-manager-brief.md`.
+`effort/completed/2026-10-08-account-manager-brief.md`.
 
 ## What the repository holds
 

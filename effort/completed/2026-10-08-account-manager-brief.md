@@ -1,11 +1,17 @@
 # Account Manager & User Picker — Brief
 
-**Active.** Recorded 2026-10-08 from a CA + AI Architect session, while reconciling roadmap §1
-after the Notes Editor milestone shipped. The same session's portal design was split out to
+**Completed 2026-10-19.** Shipped in `4a3c403`, reviewed by the AI Architect, and verified by the
+CA in the app: the create default by role, the discard check, selection and None across step
+remounts, assignment and clearing after save and reopen, option filtering and order, and a stored
+account manager who no longer qualifies retained and marked. Load-failure presentation (check 8)
+is left to the CA's later pass; `users-api-test.ts` and `session-coordinator-test.ts` run once
+`effort/active/2026-10-13-stage-test-authorization-brief.md` ships.
+
+Recorded 2026-10-08 from a CA and AI Architect session, while reconciling roadmap §1 after the
+Notes Editor milestone shipped. The same session's portal design was split out to
 `effort/pending/2026-10-08-customer-portal-brief.md`. Chosen 2026-10-08 to be built before roadmap
-§5. Reviewed 2026-10-10/11 by the CA and AI Architect and refreshed 2026-10-13 (see Design
-history); its prerequisite shipped 2026-10-18, and it awaits AI Coding Engine review and the
-production gate.
+§5. Reviewed 2026-10-10/11 by the CA and AI Architect, refreshed 2026-10-13, and amended after AI
+Coding Engine review on 2026-10-19 (see Addendums and Design history).
 
 ## What triggered it
 

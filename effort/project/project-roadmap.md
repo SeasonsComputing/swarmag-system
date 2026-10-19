@@ -60,7 +60,7 @@ top-level `source/ux/` namespace with its own `@ux/` import alias, sibling to `f
 than nested under it — the literal conclusion of treating `ux/` as a third-party library.
 `effort/completed/2026-09-15-shell-app-split-brief.md`.
 
-## 3. Customer Manager
+## 3. Customer Manager — Closed 2026-10-19
 
 Post-genesis Customer editing through `AbstractionManager`, reusing Onboarding's Customer steps.
 Both workbenches now host a sequence of one or more steps over one shared `panel/` step contract.
@@ -69,18 +69,19 @@ Shipped 2026-09-30: `effort/completed/2026-09-22-customer-manager-brief.md`.
 Additional-contact assignment (`project-user-stories.md` §1.1) is not built; it is slotted in §9
 Customer Portal.
 
-**Remaining: the account manager field,** a User, set during Onboarding to the session user and
-changeable in Customer Manager through a shared User picker:
-`effort/active/2026-10-08-account-manager-brief.md`.
+**The account manager field,** a User, set during Onboarding to the session user and changeable
+in Customer Manager through a shared User picker — shipped 2026-10-19 (`4a3c403`) and verified by
+the CA: `effort/completed/2026-10-08-account-manager-brief.md`.
 
 1. **Soft-deleted references** — completed 2026-10-18:
    `effort/completed/2026-10-13-soft-deleted-references-brief.md`. A deleted account manager is
    still shown, so references had to resolve soft-deleted targets.
-2. **Session user** — `SessionUserContract` and `SessionUser` (account manager brief, decision 11),
-   built as its own production ahead of the account manager.
-3. **Stage test authorization** — `effort/active/2026-10-13-stage-test-authorization-brief.md`, so
-   the integration tests that soft-deleted references wrote can run.
-4. **Account manager production.**
+2. **Account manager production** — completed 2026-10-19, including the session user
+   (`SessionUserContract` and `UserProvider`, the brief's decision 11 and Addendum 5).
+
+**Continues on its own:** stage test authorization
+(`effort/active/2026-10-13-stage-test-authorization-brief.md`), so `users-api-test.ts` and
+`session-coordinator-test.ts` can run.
 
 ## 4. Notes Editor — Closed 2026-10-18
 
