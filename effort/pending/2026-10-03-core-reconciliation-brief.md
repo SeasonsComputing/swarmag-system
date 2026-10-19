@@ -203,7 +203,7 @@ forbids them.
 
 Added at the CA's direction during the CA+AA review of the account manager brief's production
 scope (`effort/active/2026-10-08-account-manager-brief.md`), when the session user contract was
-placed in `ux/shell/runtime/shell-contracts.ts` beside `SessionCoordinatorContract`.
+placed in `ux/shell/runtime/session-contracts.ts` beside `SessionCoordinatorContract`.
 
 - **The 2026-10-11 rule covers one case: substitutability.** A contract gets its own file when
   more than one implementation makes it substitutable, as the `makeCrud*` clients implement
@@ -213,8 +213,9 @@ placed in `ux/shell/runtime/shell-contracts.ts` beside `SessionCoordinatorContra
   swapped at runtime; the contract exists so the dependency runs one way (open-closed applied to
   dependency direction: `ux/` never imports `front/`). `SessionCoordinatorContract` and the session
   user contract are the cases: every application supplies one session coordinator and one user
-  provider. Such contracts share a file by what they answer, here what an application supplies to
-  the shell.
+  provider. Such contracts share a file named by their subject, here the session; a contract the
+  toolkit implements itself stays with its implementation (`SessionStateContract` in
+  `session-state.ts`).
 - **For the reconciliation:** CONVENTIONS §8.7 states both cases beside the 2026-10-11 rule. A
   governance file: committed with the governance-gate bypass.
 
