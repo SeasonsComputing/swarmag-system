@@ -694,4 +694,10 @@ Stop and report if the repair appears to require:
   brief;
 - accepting an inconsistency because it is difficult to normalize.
 
+## Amendment — 2026-10-19 — The lite components guide is retired
+
+`ux-components-guide-lite.md` was retired by the CA because its presence did not improve AI work.
+Where this brief names it, the documentation work applies to `ux-components-guide.md` alone; the
+audit's list of files read stands as the record of what was read.
+
 _End of Brief_

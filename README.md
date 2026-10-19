@@ -83,7 +83,6 @@ meaning, UX language, and implementation standards in accordance with governance
 | `ux/`           | [`ux-design-language.md`](documentation/ux/ux-design-language.md)             | Visual language, interaction grammar, and layout rules  |
 |                 | [`ux-design-archetypes.md`](documentation/ux/ux-design-archetypes.md)         | UX implementation archetypes and composition patterns   |
 |                 | [`ux-components-guide.md`](documentation/ux/ux-components-guide.md)           | Full UX component guide and usage contracts             |
-|                 | [`ux-components-guide-lite.md`](documentation/ux/ux-components-guide-lite.md) | Lightweight UX component reference                      |
 |                 | [`ux-components-internals.md`](documentation/ux/ux-components-internals.md)   | UX component implementation internals                   |
 
 ### 2.3 Effort (`effort/`)

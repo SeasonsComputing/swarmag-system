@@ -58,10 +58,9 @@ front-loaded, or how much is reference bulk that belongs in a document consulted
 rather than seeded.
 
 **This is an analysis task, not a refactor.** Classify the content — what constrains, what
-maps, and what is reference — then decide whether the document reorders, decomposes, or
-gains a compact companion the way `ux-components-guide.md` gained
-`ux-components-guide-lite.md`. That companion is the proven precedent here and names
-itself an AI-ingestion companion in its own opening.
+maps, and what is reference — then decide whether the document reorders or decomposes. A
+compact companion is not an option: `ux-components-guide-lite.md`, the precedent once cited
+here, was retired 2026-10-19 (CA) because its presence did not improve AI work.
 Do not restructure before the analysis is reviewed. This is base context for every
 session, so a wrong cut is felt everywhere at once.
 

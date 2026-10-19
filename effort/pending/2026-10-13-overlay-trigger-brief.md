@@ -78,7 +78,8 @@ Operating mode: **Foundation** (`ux/ui`, under strict scrutiny).
 3. **`front/app-style-guide/style-guide.tsx`:** the tooltip example as a label with an info icon,
    without `defaultOpen`; the dialog and popover examples unchanged in content.
 4. **Documentation:** `ux-components-guide.md` §3.12–§3.14 and `ux-components-guide-lite.md`, the
-   removed props and the trigger parts.
+   removed props and the trigger parts. **Amended 2026-10-19:** the lite guide is retired; only
+   `ux-components-guide.md` changes.
 
 **Out of scope:** the overlays' content parts (Kobalte's Title, Description, CloseButton, Arrow);
 any menu control.
