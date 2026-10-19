@@ -84,7 +84,7 @@ export const UiDialog = (props: UiDialogProps): UiComponent => {
           onEscapeKeyDown={event => {
             if (local.dismissible === false) event.preventDefault()
           }}
-          onPointerDownOutside={event => {
+          onInteractOutside={event => {
             if (local.dismissible === false) event.preventDefault()
           }}
         >
