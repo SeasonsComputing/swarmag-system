@@ -68,17 +68,7 @@ session, so a wrong cut is felt everywhere at once.
 
 **Observed:** 2026-10-03 · normal
 
-CONVENTIONS covers `core/`'s vocabulary (types, configuration, adapters) but hardly any of
-the patterns built on it: protocols, validation, CRUD contracts, `ApiError`, client makers,
-and service wrappers. Some of that lives in `architecture-core.md` §5. Nothing establishes
-which document owns what. Several decided rules are documented nowhere durable, among them
-the 08-30 rule that every form must declare its update scope and the 10-03 rule that a
-scope's unit is the attribute.
-
-Design record: `effort/pending/2026-10-03-core-reconciliation-brief.md`.
-
-Picking this up: together with, or sequenced against, the scan-cost entry above, since both
-restructure `architecture-core.md`.
+Design record: [`core/` Reconciliation — Backlog Brief](../pending/2026-10-03-core-reconciliation-brief.md).
 
 ### `architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`
 
@@ -150,37 +140,7 @@ Design record: [Containers in CONVENTIONS — Brief](../pending/2026-10-09-conta
 
 **Observed:** 2026-08-16 · high
 
-The shared control layer does not assign one stable meaning to rest, hover, focus,
-selected, checked, active, open, and disabled states. `UiActionButton` distinguishes
-visible-label and hidden-label actions by resting color. `UiCollectionCursor` demonstrates
-the split in one surface: navigation action-buttons rest in primary color while
-life-cycle action-buttons rest closer to text color. Checkbox and radio, toggle, tabs,
-accordion, buttons, single-select, and multi-select each answer selected and hover states
-with different combinations of primary color, text color, border, background, and frame.
-
-This is design-language drift, not a feature defect. Primary color is currently doing too
-many jobs: resting affordance, hover affordance, checked state, selected state, active tab
-state, and open accordion state. A user cannot infer the state model from one control and
-apply it to another.
-
-The fix belongs in the shared UI control foundation. Audit `UiButton`, `UiActionButton`,
-`UiCheckbox`, `UiRadioGroup`, `UiToggle`, `UiTabs`, `UiAccordion`, `UiSingleSelect`,
-`UiMultiSelect`, and `UiCollectionCursor` against a common state matrix: rest, hover,
-focus-visible, disabled, selected/checked/active/open, selected-hover, and danger where
-applicable. Normalize `ui.css` so primary, text color, background, border, frame, and
-focus ring each have stable roles. Prefer deleting inconsistent special-case rules over
-adding compensating overrides.
-
-**Evidence, 2026-10-08** (CA walkthroughs of the workbench list layout and Notes Editor
-productions):
-
-- Hover and selected are nearly indistinguishable: `--sa-bg-hover` and `--sa-bg-selected` are the
-  same hue at 0.2 and 0.28 alpha. In a `UiToggleGroup` only the pressed item's border separates
-  them, so a hovered item reads as a second selection (Customer Status showed Inactive and
-  Prospect apparently both selected).
-- Hover is not guarded for touch. `ui.css` applies `:hover` without `@media (hover: hover)`, so on
-  a touch device, or Chrome's device emulation, a tapped table row or toggle item keeps its hover
-  state and reads as selected.
+Design record: [UI Control State Normalization — Production Brief](../pending/2026-08-16-ui-control-state-normalization-brief.md).
 
 ### Collection-Detail surfaces do not draw the Selection
 
@@ -212,10 +172,12 @@ Design record: [Overlay Controls API — Brief](../pending/2026-10-13-overlay-tr
 
 ### A stale session survives genesis and is not ejected
 
-**Observed:** 2026-08-04 · normal (downgraded from high 2026-09-12 — genesis is rare and
-deliberate, and the only person who can trigger it is currently the only user on the
-system, so the exposure window is small and self-diagnosing today. Revisit before a second
-user or a real customer exists, since they would hit this cold, with no context for why.)
+**Observed:** 2026-08-04 · normal
+
+**Downgraded from high 2026-09-12:** genesis is rare and deliberate, and the only person who
+can trigger it is currently the only user on the system, so the exposure window is small and
+self-diagnosing today. Revisit before a second user or a real customer exists, since they would
+hit this cold, with no context for why.
 
 Supabase persists the session in `localStorage`, so a browser holding a session keeps it
 after a genesis run wipes `auth.users`. The signed-in user is left holding a token for a
@@ -232,8 +194,10 @@ eject entry for why.
 
 ### Eject should ban, not delete, the Auth identity
 
-**Observed:** 2026-09-12 (parked 2026-07-16 during the User Manager UX rework; promoted
-here once its investigation bundled with two related entries) · normal
+**Observed:** 2026-09-12 · normal
+
+Parked 2026-07-16 during the User Manager UX rework; promoted here once its investigation
+bundled with two related entries.
 
 `UserOrchestra.eject()` (`source/back/supabase-edge/orchestration/user-orchestra.ts`)
 currently calls the same `deleteAuthUser` (`auth.admin.deleteUser`) as `delete()` — fully
@@ -348,6 +312,8 @@ Manager; neither is caused by it. Both come from `AbstractionManager`'s reopen-a
 
 `ux/shell` is under strict scrutiny; the fix belongs in the workbench, not in an application.
 
+## Guards
+
 ### `guard:css` does not verify that a referenced token resolves
 
 **Observed:** 2026-08-06 · normal
@@ -421,18 +387,7 @@ Pair with the entry above, which also changes what the sweep covers.
 
 **Observed:** 2026-10-03 · normal
 
-`guard-css.ts`'s `extractSelector` reads only physical lines containing `{`. When dprint wraps a
-valid Helm-rooted selector, `auditFeatureCSS` sees only its trailing Ui part and reports a
-namespace violation. Earlier branches in comma-separated selector lists can also escape audit.
-
-The `visible-no-icon` Helm production shortened its selectors with a standalone Helm-named
-attribute to pass the guard. CA rejected that symptom-level workaround because it discarded the
-widget ancestor's containment boundary. Fix complete-selector parsing and audit every list branch
-under the existing policies; then restore Helm containment in a separately authorized correction.
-
-Foundation scope, evidence, regression cases, and escalation boundaries are in
-[CSS Guard — Complete Selector Parsing](../pending/2026-10-03-css-guard-selector-parsing-brief.md).
-Backlog, not dispatched; priority is normal, with guard repair preceding the Helm correction.
+Design record: [CSS Guard — Complete Selector Parsing](../pending/2026-10-03-css-guard-selector-parsing-brief.md).
 
 ## DevOps
 
@@ -440,30 +395,7 @@ Backlog, not dispatched; priority is normal, with guard repair preceding the Hel
 
 **Observed:** 2026-08-23 · normal
 
-CONVENTIONS §1 claims to be authoritative "throughout the codebase," but nothing checks
-that claim against `source/devops/` — `guard-domain-style.ts` exists for domain, no
-equivalent exists for devops. Eleven of twelve TypeScript devops scripts already follow
-the box-header/PURPOSE/PUBLIC convention and the `@core/std` primitive-type discipline
-(§8.1) correctly; the gap is concentrated almost entirely in §9's "never swallow errors
-silently" rule — fifteen-plus bare `catch {}` / `.catch(() => {})` blocks across eight of
-the twelve scripts, every one discarding the caught error's type.
-
-Surfaced while investigating the phantom-directory recurrence above — the mechanism was
-never pinned down, but the investigation showed devops carries none of the discipline
-domain and front get.
-
-Two CONVENTIONS additions belong alongside the retrofit, not after it: (1) tooling
-namespaces (`devops`, `tests`) may call their host runtime's API directly, unabstracted,
-since each runs in one fixed known environment and was never trying to be portable across
-deployment targets — §8.5's `Config.get()` mandate currently reads as universal and needs
-this carve-out written in; (2) a non-product tooling namespace may have its own local,
-topic-free utility `lib/` as a barrel, independently, with no lateral dependency edge to
-its peers (`devops/lib` and, later, `tests/lib` if it ever accumulates real duplication —
-not today).
-
-Full plan, exact site counts, and sequencing (doc → `architecture-devops.md` → lib →
-retrofit → guard-last, so the new guard's first run is green) are in
-`effort/pending/2026-08-23-devops-style-error-handling-brief.md`.
+Design record: [DevOps Style Conformance & Shared Error Handling — Backlog Brief](../pending/2026-08-23-devops-style-error-handling-brief.md).
 
 ### `edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already has
 
@@ -536,35 +468,7 @@ authorization before any UX test lands.
 
 **Observed:** 2026-10-03 · normal
 
-Since 2026-07-19 (`cdc6ebb`), `front/api/api.ts` re-exports `AppState`, which is backed by
-IndexedDB. Importing `api` therefore needs `LOCAL_DB_NAME` registered in `Config`.
-`source/tests/config/test-config.ts` registers only `SUPABASE_RDBMS_URL`,
-`SUPABASE_PUBLIC_KEY`, and `SUPABASE_CLIENT_MODE`.
-
-- **Affected:** `users-api-test.ts`, the only test that loads the shared config. It fails at
-  bootstrap, before any test runs, and has likely been unrunnable since 07-19 without anyone
-  noticing. It is a live integration test that needs stage credentials, so it rarely runs.
-- **Workaround in place:** `customer-api-test.ts` sidesteps the problem with its own
-  `Config.init`, which registers `LOCAL_DB_NAME`, and an in-memory transport.
-- **Unexecuted coverage:** the avatar-preservation case added by
-  `effort/completed/2026-10-02-update-scopes-brief.md` has never run. No UI can set an avatar,
-  so no live walkthrough can verify that property either. Since 2026-10-04 it has structural
-  coverage: `make-scope-test.ts` shows the Users scope's projections never emit `avatarUrl`.
-
-The fix belongs in the shared test configuration, not in each test. Also decide whether a test
-runtime should load browser-backed stores through `api` at all.
-
-- **Second blocker, behind the first (found 2026-10-03):** `users-api-test.ts` never signs in.
-  Every User write passes `UserOrchestra.authorizeAdmin`, which requires a verified caller with an
-  active `administrator` domain row. Sign-in is passwordless OTP only, so the test needs its own
-  route to an administrator session (an admin-generated link, or a dedicated test identity on
-  stage). Stage is the only environment, so that is an authorization-boundary decision. Fixing
-  bootstrap alone moves the failure from import to authorization.
-- **No standard way to supply stage configuration (found 2026-10-11):** `deno task test` loads
-  no env file, so a configured test runs only where someone has exported the variables by hand,
-  and none is run routinely. The list-query production therefore carries no database-backed
-  automated tests: its Postgres behavior is verified in the app against a checklist, and its
-  automated tests need no database (`effort/completed/2026-10-11-list-query-brief.md`).
+Design record: [Stage Test Authorization — Brief](../active/2026-10-13-stage-test-authorization-brief.md).
 
 ## Core
 
@@ -586,6 +490,22 @@ answer to one identity. The message is what fails the person.
   so, for example "A deleted user already has this email." The rule is one sentence in
   `architecture-core.md` §3.2.5; the wording lands at the edge (`user-create`) and client
   boundaries, for every unique key.
+
+### Timestamps read from Postgres are not in the form the app writes
+
+**Observed:** 2026-10-11 · normal
+
+PostgREST returns `TIMESTAMPTZ` as `2026-10-11T15:08:14.27+00:00`: an offset, and zero to six
+fractional digits. The app writes `toISOString()` form, and `isWhen` accepts only that, with a `Z`.
+Nothing fails today because no read path validates a timestamp column. Evidence:
+`effort/completed/2026-10-11-canonical-when-brief.md`.
+
+Two decisions follow, each where it is first needed:
+
+- **`isWhen` accepts the offset form** when a Job screen first sends a column timestamp back
+  through `expectWhen`. Postgres parses either form. Picking this up: roadmap §7 Job Definition.
+- **The deep clone writes one timestamp form into IndexedDB,** so the in-memory list evaluator
+  compares `When` values correctly. Picking this up: roadmap §8 Ops Application.
 
 ## Customer
 
@@ -618,22 +538,6 @@ Nothing guards this today because no Jobs exist yet. Picking this up: with Job D
 (roadmap §7), where the first Job references a Customer.
 
 ## Job
-
-### Timestamps read from Postgres are not in the form the app writes
-
-**Observed:** 2026-10-11 · normal
-
-PostgREST returns `TIMESTAMPTZ` as `2026-10-11T15:08:14.27+00:00`: an offset, and zero to six
-fractional digits. The app writes `toISOString()` form, and `isWhen` accepts only that, with a `Z`.
-Nothing fails today because no read path validates a timestamp column. Evidence:
-`effort/completed/2026-10-11-canonical-when-brief.md`.
-
-Two decisions follow, each where it is first needed:
-
-- **`isWhen` accepts the offset form** when a Job screen first sends a column timestamp back
-  through `expectWhen`. Postgres parses either form. Picking this up: roadmap §7 Job Definition.
-- **The deep clone writes one timestamp form into IndexedDB,** so the in-memory list evaluator
-  compares `When` values correctly. Picking this up: roadmap §8 Ops Application.
 
 ### Assessor and planner are chosen with the User picker
 

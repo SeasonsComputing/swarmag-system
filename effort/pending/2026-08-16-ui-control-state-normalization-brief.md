@@ -700,4 +700,41 @@ Stop and report if the repair appears to require:
 Where this brief names it, the documentation work applies to `ux-components-guide.md` alone; the
 audit's list of files read stands as the record of what was read.
 
+## Amendment — 2026-10-19 — Backlog entry text folded in
+
+The backlog entry "Shared UI controls do not use one state model" carried its own description, now replaced there by a link to this
+brief. Its text, kept here so nothing is lost:
+
+> The shared control layer does not assign one stable meaning to rest, hover, focus,
+> selected, checked, active, open, and disabled states. `UiActionButton` distinguishes
+> visible-label and hidden-label actions by resting color. `UiCollectionCursor` demonstrates
+> the split in one surface: navigation action-buttons rest in primary color while
+> life-cycle action-buttons rest closer to text color. Checkbox and radio, toggle, tabs,
+> accordion, buttons, single-select, and multi-select each answer selected and hover states
+> with different combinations of primary color, text color, border, background, and frame.
+>
+> This is design-language drift, not a feature defect. Primary color is currently doing too
+> many jobs: resting affordance, hover affordance, checked state, selected state, active tab
+> state, and open accordion state. A user cannot infer the state model from one control and
+> apply it to another.
+>
+> The fix belongs in the shared UI control foundation. Audit `UiButton`, `UiActionButton`,
+> `UiCheckbox`, `UiRadioGroup`, `UiToggle`, `UiTabs`, `UiAccordion`, `UiSingleSelect`,
+> `UiMultiSelect`, and `UiCollectionCursor` against a common state matrix: rest, hover,
+> focus-visible, disabled, selected/checked/active/open, selected-hover, and danger where
+> applicable. Normalize `ui.css` so primary, text color, background, border, frame, and
+> focus ring each have stable roles. Prefer deleting inconsistent special-case rules over
+> adding compensating overrides.
+>
+> **Evidence, 2026-10-08** (CA walkthroughs of the workbench list layout and Notes Editor
+> productions):
+>
+> - Hover and selected are nearly indistinguishable: `--sa-bg-hover` and `--sa-bg-selected` are the
+>   same hue at 0.2 and 0.28 alpha. In a `UiToggleGroup` only the pressed item's border separates
+>   them, so a hovered item reads as a second selection (Customer Status showed Inactive and
+>   Prospect apparently both selected).
+> - Hover is not guarded for touch. `ui.css` applies `:hover` without `@media (hover: hover)`, so on
+>   a touch device, or Chrome's device emulation, a tapped table row or toggle item keeps its hover
+>   state and reads as selected.
+
 _End of Brief_

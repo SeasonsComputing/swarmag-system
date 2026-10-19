@@ -91,4 +91,39 @@ domain/API layer"); test isolation beyond genesis resets; a test environment oth
 - **2026-10-13:** recorded as the soft-deleted references production left its tests unrunnable;
   the CA moved testing up in priority.
 
+## Amendment — 2026-10-19 — Backlog entry text folded in
+
+The backlog entry "The shared test configuration cannot bootstrap `api`" carried its own description, now replaced there by a link to this
+brief. Its text, kept here so nothing is lost:
+
+> Since 2026-07-19 (`cdc6ebb`), `front/api/api.ts` re-exports `AppState`, which is backed by
+> IndexedDB. Importing `api` therefore needs `LOCAL_DB_NAME` registered in `Config`.
+> `source/tests/config/test-config.ts` registers only `SUPABASE_RDBMS_URL`,
+> `SUPABASE_PUBLIC_KEY`, and `SUPABASE_CLIENT_MODE`.
+>
+> - **Affected:** `users-api-test.ts`, the only test that loads the shared config. It fails at
+>   bootstrap, before any test runs, and has likely been unrunnable since 07-19 without anyone
+>   noticing. It is a live integration test that needs stage credentials, so it rarely runs.
+> - **Workaround in place:** `customer-api-test.ts` sidesteps the problem with its own
+>   `Config.init`, which registers `LOCAL_DB_NAME`, and an in-memory transport.
+> - **Unexecuted coverage:** the avatar-preservation case added by
+>   `effort/completed/2026-10-02-update-scopes-brief.md` has never run. No UI can set an avatar,
+>   so no live walkthrough can verify that property either. Since 2026-10-04 it has structural
+>   coverage: `make-scope-test.ts` shows the Users scope's projections never emit `avatarUrl`.
+>
+> The fix belongs in the shared test configuration, not in each test. Also decide whether a test
+> runtime should load browser-backed stores through `api` at all.
+>
+> - **Second blocker, behind the first (found 2026-10-03):** `users-api-test.ts` never signs in.
+>   Every User write passes `UserOrchestra.authorizeAdmin`, which requires a verified caller with an
+>   active `administrator` domain row. Sign-in is passwordless OTP only, so the test needs its own
+>   route to an administrator session (an admin-generated link, or a dedicated test identity on
+>   stage). Stage is the only environment, so that is an authorization-boundary decision. Fixing
+>   bootstrap alone moves the failure from import to authorization.
+> - **No standard way to supply stage configuration (found 2026-10-11):** `deno task test` loads
+>   no env file, so a configured test runs only where someone has exported the variables by hand,
+>   and none is run routinely. The list-query production therefore carries no database-backed
+>   automated tests: its Postgres behavior is verified in the app against a checklist, and its
+>   automated tests need no database (`effort/completed/2026-10-11-list-query-brief.md`).
+
 _End of Brief_
