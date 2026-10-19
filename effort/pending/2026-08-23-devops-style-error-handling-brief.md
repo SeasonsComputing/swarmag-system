@@ -192,4 +192,34 @@ file in the repository follows. This brief's retrofit keeps its error-handling w
 headers to that one. The guards (`source/devops/guards/`), outside this brief's script retrofit,
 are covered there too.
 
+## Amendment — 2026-10-19 — Backlog entry text folded in
+
+The backlog entry "`source/devops/` is not held to CONVENTIONS" carried its own description, now replaced there by a link to this
+brief. Its text, kept here so nothing is lost:
+
+> CONVENTIONS §1 claims to be authoritative "throughout the codebase," but nothing checks
+> that claim against `source/devops/` — `guard-domain-style.ts` exists for domain, no
+> equivalent exists for devops. Eleven of twelve TypeScript devops scripts already follow
+> the box-header/PURPOSE/PUBLIC convention and the `@core/std` primitive-type discipline
+> (§8.1) correctly; the gap is concentrated almost entirely in §9's "never swallow errors
+> silently" rule — fifteen-plus bare `catch {}` / `.catch(() => {})` blocks across eight of
+> the twelve scripts, every one discarding the caught error's type.
+>
+> Surfaced while investigating the phantom-directory recurrence above — the mechanism was
+> never pinned down, but the investigation showed devops carries none of the discipline
+> domain and front get.
+>
+> Two CONVENTIONS additions belong alongside the retrofit, not after it: (1) tooling
+> namespaces (`devops`, `tests`) may call their host runtime's API directly, unabstracted,
+> since each runs in one fixed known environment and was never trying to be portable across
+> deployment targets — §8.5's `Config.get()` mandate currently reads as universal and needs
+> this carve-out written in; (2) a non-product tooling namespace may have its own local,
+> topic-free utility `lib/` as a barrel, independently, with no lateral dependency edge to
+> its peers (`devops/lib` and, later, `tests/lib` if it ever accumulates real duplication —
+> not today).
+>
+> Full plan, exact site counts, and sequencing (doc → `architecture-devops.md` → lib →
+> retrofit → guard-last, so the new guard's first run is green) are in
+> `effort/pending/2026-08-23-devops-style-error-handling-brief.md`.
+
 _End of Backlog Brief_

@@ -219,4 +219,21 @@ placed in `ux/shell/runtime/session-contracts.ts` beside `SessionCoordinatorCont
 - **For the reconciliation:** CONVENTIONS §8.7 states both cases beside the 2026-10-11 rule. A
   governance file: committed with the governance-gate bypass.
 
+## Amendment — 2026-10-19 — Backlog entry text folded in
+
+The backlog entry "`core/`, `architecture-core.md`, and `CONVENTIONS.md` have never been reconciled" carried its own description, now replaced there by a link to this
+brief. Its text, kept here so nothing is lost:
+
+> CONVENTIONS covers `core/`'s vocabulary (types, configuration, adapters) but hardly any of
+> the patterns built on it: protocols, validation, CRUD contracts, `ApiError`, client makers,
+> and service wrappers. Some of that lives in `architecture-core.md` §5. Nothing establishes
+> which document owns what. Several decided rules are documented nowhere durable, among them
+> the 08-30 rule that every form must declare its update scope and the 10-03 rule that a
+> scope's unit is the attribute.
+>
+> Design record: `effort/pending/2026-10-03-core-reconciliation-brief.md`.
+>
+> Picking this up: together with, or sequenced against, the scan-cost entry above, since both
+> restructure `architecture-core.md`.
+
 _End of Backlog Brief_

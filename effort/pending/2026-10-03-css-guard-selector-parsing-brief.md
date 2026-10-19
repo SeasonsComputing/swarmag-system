@@ -189,4 +189,22 @@ fails; commas inside `:is()` and `:not()` and a three-line rooted selector pass.
    `data-widget-icon='hidden'`, emitted in `helm-widget.tsx`. Whether that per-button marker still
    needs replacing with ancestor-level label-mode selection is the CA's decision.
 
+## Amendment — 2026-10-19 — Backlog entry text folded in
+
+The backlog entry "`guard:css` misreads multiline selectors and misses selector-list branches" carried its own description, now replaced there by a link to this
+brief. Its text, kept here so nothing is lost:
+
+> `guard-css.ts`'s `extractSelector` reads only physical lines containing `{`. When dprint wraps a
+> valid Helm-rooted selector, `auditFeatureCSS` sees only its trailing Ui part and reports a
+> namespace violation. Earlier branches in comma-separated selector lists can also escape audit.
+>
+> The `visible-no-icon` Helm production shortened its selectors with a standalone Helm-named
+> attribute to pass the guard. CA rejected that symptom-level workaround because it discarded the
+> widget ancestor's containment boundary. Fix complete-selector parsing and audit every list branch
+> under the existing policies; then restore Helm containment in a separately authorized correction.
+>
+> Foundation scope, evidence, regression cases, and escalation boundaries are in
+> [CSS Guard — Complete Selector Parsing](../pending/2026-10-03-css-guard-selector-parsing-brief.md).
+> Backlog, not dispatched; priority is normal, with guard repair preceding the Helm correction.
+
 _End of Backlog Brief_
