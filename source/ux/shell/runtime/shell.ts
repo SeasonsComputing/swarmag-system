@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Application shell composition                                                ║
-║ Contracts and makers for application, shell, and route declarations.         ║
+║ Makers for application, shell, and route declarations.                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -14,7 +14,6 @@ redirecting.
 SHELL COMPOSITION
 ───────────────────────────────────────────────────────────────────────────────
 ShellApplication          Complete application shell composition.
-SessionCoordinatorContract  Application-owned session initialization.
 Shell                     Component, initializers, and routes for one shell.
 ShellInitializer          Initializer contract for a shell.
 
@@ -47,6 +46,7 @@ Routes                    Route factory convenience container.
 */
 
 import type { UiComponent, UiDialogSize } from '@ux/ui'
+import type { SessionCoordinatorContract } from './session-contracts.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
 // SHELL COMPOSITION
@@ -56,12 +56,6 @@ import type { UiComponent, UiDialogSize } from '@ux/ui'
 export type ShellApplication = {
   shells: Shell[]
   session: SessionCoordinatorContract
-}
-
-/** Application-owned session initialization, called synchronously during mount. */
-export interface SessionCoordinatorContract {
-  init(): void
-  clear(): void
 }
 
 /** One application shell compiled beneath the TanStack root route. */
@@ -75,7 +69,7 @@ export type Shell = {
 export type ShellInitializer = () => Promise<void>
 
 // ────────────────────────────────────────────────────────────────────────────
-// ROUTE LANUGAGE
+// ROUTE LANGUAGE
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Forward declaration of entire route language of grammar and content. */

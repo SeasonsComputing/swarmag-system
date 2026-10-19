@@ -11,7 +11,7 @@ Companion seam to api.ts: declared form fields and create defaults.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 scopes  Declared form write scopes keyed by API topic.
-├ Customers.detail  Contact, identity, address, sites, and notes.
+├ Customers.detail  Contact, identity, account manager, address, sites, and notes.
 └ Users.detail      Identity, contact preferences, notes, roles, and status.
 */
 
@@ -27,6 +27,7 @@ export const scopes = {
         CustomerAdapter.primaryContact,
         CustomerAdapter.name,
         CustomerAdapter.status,
+        CustomerAdapter.accountManagerId,
         CustomerAdapter.line1,
         CustomerAdapter.line2,
         CustomerAdapter.city,
@@ -36,7 +37,7 @@ export const scopes = {
         CustomerAdapter.sites,
         CustomerAdapter.notes
       ],
-      defaults: { accountManagerId: undefined }
+      defaults: {}
     })
   },
   Users: {

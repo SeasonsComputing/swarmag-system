@@ -60,7 +60,9 @@ source/
     │   ├── widgets/                 — swarmAg-suite widgets (e.g. BrandWidget)
     │   │   └── widget-registry.ts   — exports AppWidgetRegistry; app-tier catalog only
     │   └── shell/                   — branded chrome and application wiring (*)
-    │       └── notes-editor.tsx      — stock notes Index-Detail editor
+    │       ├── notes-editor.tsx     — stock notes Index-Detail editor
+    │       ├── user-picker.tsx      — role-filtered User assignment
+    │       └── user-provider.ts     — prepared domain User proxy
     ├── app-admin/
     │   ├── app.tsx
     │   ├── dashboard-admin.json     — default dashboard layout for app-admin
@@ -95,8 +97,9 @@ source/
     └── app-style-guide/             — design-system demonstration harness
 ```
 
-(*) `shell/` holds `about-box`, `brand-hero`, `login`, and `notes-editor`; the maker wrapper binding `ux/shell`'s
-generic makers to swarmAg branding; and `session-coordinator.ts`.
+(*) `shell/` holds `about-box`, `brand-hero`, `login`, `notes-editor`, `user-picker`, and
+`user-provider`; the maker wrapper binding `ux/shell`'s generic makers to swarmAg branding;
+and `session-coordinator.ts`.
 
 Everything in `source/ux/` must be adaptive and portable beyond swarmAg — mobile-only or desktop-only components do not belong there, and neither does anything that assumes swarmAg branding or swarmAg's own domain. `source/front/app/` carries that narrower scope instead: adaptive across all three swarmAg apps and all viewport sizes, but not required to generalize past swarmAg itself.
 
@@ -299,10 +302,8 @@ The foundation provides:
 
 #### 7.3.3 Offline Capability
 
-- `api.JobsLocal` (IndexedDB client) available to all apps
-- Ops app uses for field execution
-- Deep clone via `api.deepCloneJob` business rule
-- Log upload via `api.uploadJobLogs` business rule
+Offline execution, deep clone, log upload, and session preparation policy are defined in
+`architecture-core.md` §9. The API operations are cataloged in §7.2.3.
 
 ### 7.4 Form-Scope Integration
 
@@ -507,7 +508,7 @@ All feature work should use an existing UX metaphor when one fits:
 
 #### 9.1.2 Auth Guard
 
-The shell root reads `SessionState.store.isAuthenticated` before rendering any authenticated content. Unauthenticated users are redirected to login. This is the only authorization check in the UX layer — all data authorization is enforced by RLS at the database layer.
+The shell root asks `SessionState.isPrepared()` before rendering any authenticated content. Unauthenticated users are redirected to login. This is the only authorization check in the UX layer — all data authorization is enforced by RLS at the database layer.
 
 #### 9.1.3 Dashboard as Primary Navigation
 
@@ -568,15 +569,25 @@ domain `validateUser` method.
 #### 9.3.1 Application-Owned Session Coordination
 
 `ShellApplication` requires a `session: SessionCoordinatorContract` alongside its shells. The
-UX-owned contract (`source/ux/shell/runtime/shell.ts`) has two methods: `init()` and `clear()`.
+UX-owned contract (`source/ux/shell/runtime/session-contracts.ts`) has two methods:
+`init()` and `clear()`.
 Bootstrap calls `init()` synchronously during its Solid mount callback; generic bootstrap does not
 consume `api`. `Routes.application(shells, session)` assembles the two.
 
 The application supplies `SessionCoordinator` from `source/front/app/shell/session-coordinator.ts`.
 `init()` starts persisted-session resolution, subscribes to `api.Auth.onAuthStateChange`, and
-registers cleanup with the current Solid owner: unsubscribe, then `clear()`. `clear()` drops the
-prepared identity and clears `SessionState`. The coordinator owns user hydration and eligibility;
+registers cleanup with the current Solid owner: unsubscribe, then `clear()`. `clear()` clears
+`UserProvider` before clearing `SessionState`. The coordinator owns user hydration and eligibility;
 the shell owns the lifecycle invocation and baseline session state.
+
+The same contract module declares `SessionUserContract`: `id(): Id | null` and
+`roles(): readonly string[]`. The application supplies the concrete `UserProvider` from
+`front/app/shell/user-provider.ts`, a reactive proxy over its domain User. The session holds that
+provider through the domain-free contract. `ShellApplication` gains no user field.
+
+`AuthGuard` asks `SessionState.isPrepared()` to render authenticated content and
+`SessionState.isSignedOut()` to redirect to login. During preparation it renders nothing.
+Session preparation policy is defined in `architecture-core.md` §9.5.
 
 #### 9.3.2 OTP and Session Flow
 
@@ -591,14 +602,15 @@ through one path:
 4. An already-prepared matching user ID stops here; hydration does not repeat.
 5. Otherwise `api.Users.get(userId)` loads the domain user.
 6. If the identity changed while the user loaded, the result is discarded.
-7. An inactive user is signed out through `api.Auth.logout()`, and the coordinator clears even if
-   remote sign-out fails.
-8. An active user is discarded after validation; only its prepared user ID is kept.
-9. `SessionState.setReady()` marks application data ready.
+7. An inactive or soft-deleted user is signed out through `api.Auth.logout()`, and the coordinator
+   clears even if remote sign-out fails.
+8. An eligible User is held with `UserProvider.set(user)`.
+9. `SessionState.setReady(UserProvider)` holds the provider and marks application data ready.
 
-The prepared user ID is private coordinator state, not a domain-user cache. `isDataReady` is a
-separate application-readiness signal. A missing domain record is an integrity error and
-propagates; it is not treated as an inactive user.
+The prepared identity is read from `UserProvider.id()`. The User and its roles refresh at the next
+session preparation, not during the prepared session. `isDataReady` is the application-readiness
+signal. A missing domain record is an integrity error and propagates; it is not treated as an
+inactive user.
 
 #### 9.3.3 Logout
 
@@ -612,7 +624,7 @@ transition to `/login` belongs to the generic shell (`makeAnonymousShell`).
 
 `SessionState` (`source/ux/shell/runtime/session-state.ts`) is the baseline session module, a
 Reactive Store Module (§8.3) typed by `SessionStateContract`. It holds authentication and readiness
-only; domain data about the user belongs to application modules.
+and the application-supplied user contract; the domain User remains behind the application provider.
 
 | Field             | Meaning                                                                 |
 | ----------------- | ----------------------------------------------------------------------- |
@@ -620,15 +632,18 @@ only; domain data about the user belongs to application modules.
 | `isAuthenticated` | A session is active                                                     |
 | `isLoading`       | The initial auth check is unresolved; prevents a login flash            |
 | `isDataReady`     | Application data preparation is complete; not the identity sentinel     |
+| `user`            | Prepared `SessionUserContract`, or `null` when unprepared               |
 
-| Intent method     | Effect                                                   |
-| ----------------- | -------------------------------------------------------- |
-| `setAuth(userId)` | Publish the identity: authenticated, loading cleared     |
-| `setReady()`      | Mark application data ready                              |
-| `clear()`         | Reset to signed out: no identity, not loading, not ready |
+| Intent method     | Effect                                                          |
+| ----------------- | --------------------------------------------------------------- |
+| `setAuth(userId)` | Publish the identity: authenticated, loading cleared            |
+| `setReady(user)`  | Hold the prepared user contract and mark application data ready |
+| `clear()`         | Reset to signed out, dropping the user and readiness            |
 
 Components consume `SessionState.store`, never Supabase Auth. The session coordinator (§9.3.1)
-publishes identity and readiness; logout (§9.3.3) also clears it. Applications that need further
+publishes identity, the prepared user, and readiness; logout (§9.3.3) also clears it. `isPrepared()`
+means resolution finished, authenticated, and data ready; `isSignedOut()` means resolution finished
+without authentication. The prepared session holds its user contract. Applications that need further
 reactive session data define their own Reactive Store Modules. `AppState` is the generic persistent
 key/value preference store (§9.5.2). The application-facing API re-exports both stores; UX imports
 its own stores directly and never imports `front/api`.
@@ -746,14 +761,17 @@ app/
 ├── assets/     — swarmAg brand assets (logo files, flat — one asset kind today)
 ├── components/ — swarmAg-specific reusable UI controls (placeholder — none yet)
 ├── shell/      — branded chrome and application wiring (*)
-│   └── notes-editor.tsx — stock notes Index-Detail editor
+│   ├── notes-editor.tsx — stock notes Index-Detail editor
+│   ├── user-picker.tsx — role-filtered User assignment
+│   └── user-provider.ts — prepared domain User proxy
 ├── stores/     — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
 ├── views/      — swarmAg domain projections (job-views.ts)
 └── widgets/    — swarmAg-suite widget catalog (e.g. BrandWidget)
 ```
 
-(*) `shell/` holds `about-box`, `brand-hero`, `login`, and `notes-editor`; the maker wrapper binding `ux/shell`'s
-generic makers to swarmAg branding; and `session-coordinator.ts`.
+(*) `shell/` holds `about-box`, `brand-hero`, `login`, `notes-editor`, `user-picker`, and
+`user-provider`; the maker wrapper binding `ux/shell`'s generic makers to swarmAg branding;
+and `session-coordinator.ts`.
 
 #### 10.1.4 Stays in the app
 
@@ -762,16 +780,13 @@ generic makers to swarmAg branding; and `session-coordinator.ts`.
 - app-specific route tree
 - app-specific IndexedDB store instance
 
-#### 10.1.5 Rule
+#### 10.1.5 Placement
 
-A component moves from an `app-{name}/` to `app/` when a second swarmAg app needs it — not
-before. A component moves from `app/` to `ux/` only when it is generic enough to be useful
-outside swarmAg entirely, not merely because all three swarmAg apps already need it — being
-shared suite-wide is what `app/` is for, and does not by itself earn a component the toolkit
-tier. Premature generalization past the tier a component has actually earned is a violation
-either way.
-
-Premature generalization is a violation.
+Place a component in the tier that matches its intended reach. Application-specific work belongs
+in `app-{name}/`; work meant for the swarmAg suite belongs in `app/`; only what is useful outside
+swarmAg entirely belongs in `ux/`. Placement is a design decision made with the component, and a
+component moves when its reach changes. Prefer the narrower tier when reach is uncertain:
+widening later costs a move, and generalizing early costs an abstraction nobody needed.
 
 #### 10.1.6 Workbench steps and the shared panel sequence
 
@@ -876,9 +891,8 @@ retain both dismissal paths.
   "Editor" is reserved for a reusable form kind, such as the notes editor, or a drill-down
   editor inside a step.
 
-The Customer workbench declares contact, identity, status, address, sites, and notes in
-`front/api/scopes.ts` through `makeAdaptedScope`, with
-`{ accountManagerId: undefined }` as create defaults.
+The Customer workbench declares contact, identity, status, account-manager assignment, address,
+sites, and notes in `front/api/scopes.ts` through `makeAdaptedScope`, with `{}` as create defaults.
 `CustomerDraft` in `customer-state.ts` is `DraftOf<typeof scopes.Customers.detail>`; its state and
 projection remain domain-shaped. Customer Manager and Onboarding create through
 `scope.toCreate(draft)`. The Manager updates through
@@ -893,8 +907,24 @@ and confirmed soft Delete through the existing Customer API.
 - A Jobs dependency guard is deferred to Job Definition.
 - Lists load all visible rows through keyset pages of up to 100, as User Manager does.
 - `scopes.Customers.detail` in `front/api/scopes.ts` covers primary contact,
-  identity, status, billing address, sites, and account notes. It excludes account-manager assignment.
+  identity, status, account-manager assignment, billing address, sites, and account notes.
 - Clearing an optional stored address field uses the existing explicit-null update protocol.
+
+`UserPicker` in `front/app/shell/user-picker.tsx` receives a non-empty roles tuple, the stored
+assignment separately from the draft value, and a change callback. Customer Detail passes `sales`.
+Eligible Users load through the declared role/status query and `listAll` under TanStack Query's
+default behavior. `USER_PICKER_QUERY_KEY` is `['users', 'picker']`; eligible keys append
+`'eligible'` and the roles tuple, and stored-target keys append `'stored'` and the id. The `users`
+prefix intentionally allows User invalidation to refresh both reads. An absent stored manager is
+resolved with `api.Users.get` under its own query. Options compose at render: live eligible Users
+plus the stored manager when absent, ordered by display name, with a deleted indication when
+needed. The stored manager remains available throughout the edit, including after choosing None
+or another User. No other ineligible User is offered.
+
+Customer state defaults assignment synchronously through `UserProvider.idWithAnyRole(['sales'])`
+only when creating a draft. Existing Customers retain their stored value, including absence.
+Selecting None sets the draft assignment to `undefined`; the update projection writes `null`.
+The default is established before discard baselines, and None survives step remounts.
 
 Onboarding inherits the four Customer steps and account-note editing, retaining its create-only
 workflow and single commit at Finish.
