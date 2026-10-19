@@ -202,7 +202,7 @@ forbids them.
 ## Amendment — 2026-10-19 — Deferred encapsulation, the second contract-file case
 
 Added at the CA's direction during the CA+AA review of the account manager brief's production
-scope (`effort/active/2026-10-08-account-manager-brief.md`), when the session user contract was
+scope (`effort/completed/2026-10-08-account-manager-brief.md`), when the session user contract was
 placed in `ux/shell/runtime/session-contracts.ts` beside `SessionCoordinatorContract`.
 
 - **The 2026-10-11 rule covers one case: substitutability.** A contract gets its own file when

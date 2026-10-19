@@ -4,7 +4,7 @@
 of the first release's access model: which apps a role may enter, what an app is about, and where
 rules are enforced. It is decided but not scheduled; its productions are written when the roadmap
 reaches them. The account manager work that surfaced it is
-`effort/active/2026-10-08-account-manager-brief.md`; portal isolation is designed in
+`effort/completed/2026-10-08-account-manager-brief.md`; portal isolation is designed in
 `effort/pending/2026-10-08-customer-portal-brief.md`.
 
 ## What triggered it

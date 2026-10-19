@@ -600,12 +600,6 @@ stages (Contact, Customer, Sites) a near-term slice of a four-stage design, not 
 surface. The fourth stage's own design (service selection UI, template application mechanism)
 has not started.
 
-### Customers have no account manager
-
-**Observed:** 2026-10-08 · normal
-
-Design record: [Account Manager & User Picker — Brief](../active/2026-10-08-account-manager-brief.md).
-
 ### There is no Customer Portal
 
 **Observed:** 2026-10-08 · normal
@@ -650,7 +644,7 @@ Two decisions follow, each where it is first needed:
 sets themself (CA, 2026-10-08): each is a User picker field defaulting to the session user,
 changeable. The assessor is often assigned when the assessment is scheduled
 (`project-user-stories.md` §2: "assign assessor/crew"). The picker is built by
-[Account Manager & User Picker — Brief](../active/2026-10-08-account-manager-brief.md).
+[Account Manager & User Picker — Brief](../completed/2026-10-08-account-manager-brief.md).
 
 Picking this up: with roadmap §7 Job Definition.
 
