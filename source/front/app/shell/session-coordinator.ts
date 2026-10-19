@@ -17,7 +17,7 @@ SessionCoordinator  Initialize session coordination or clear prepared state.
 
 import type { Session } from '@core/stdx'
 import { api } from '@front/api/api.ts'
-import { onCleanup } from '@solid-js'
+import { batch, onCleanup } from '@solid-js'
 import type { SessionCoordinatorContract } from '@ux/shell/runtime/session-contracts.ts'
 import { UserProvider } from './user-provider.ts'
 
@@ -51,8 +51,10 @@ class AppSessionCoordinator implements SessionCoordinatorContract {
       return
     }
 
-    if (api.SessionState.store.userId !== session.userId) this.clear()
-    api.SessionState.setAuth(session.userId)
+    batch(() => {
+      if (api.SessionState.store.userId !== session.userId) this.clear()
+      api.SessionState.setAuth(session.userId)
+    })
     if (UserProvider.id() === session.userId) return
 
     const user = await api.Users.get(session.userId)
