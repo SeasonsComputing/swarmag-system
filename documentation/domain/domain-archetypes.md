@@ -6,22 +6,6 @@
 
 Implementation patterns for the `source/domain/` package. This document governs **how** domain meaning is expressed in code. For **what** the domain means, see `domain-model.md`.
 
-### 1.1 Authority Chain
-
-| Document                      | File                        | Intent                                                            |
-| ----------------------------- | --------------------------- | ----------------------------------------------------------------- |
-| **Canonical Authority Chain** | `architecture-core.md §1.1` | Defines global documentation precedence for the system            |
-| --> **Domain Archetypes**     | _(this file)_               | Governs how domain meaning is translated into archetype artifacts |
-
-### 1.2 Scope Boundary of Governing Documents
-
-| Document                   | File                        | Scope Ownership                                                         |
-| -------------------------- | --------------------------- | ----------------------------------------------------------------------- |
-| **Domain Model**           | `domain-model.md`           | Domain meaning and canonical semantics                                  |
-| **Domain Data Dictionary** | `domain-data-dictionary.md` | Topic namespaces, abstraction inventory, field-level references         |
-| **Conventions**            | `CONVENTIONS.md`            | Implementation/file conventions and coding standards                    |
-| **Domain Archetypes**      | `domain-archetypes.md`      | Archetype-specific production patterns derived from the data dictionary |
-
 ## 2. File Organization
 
 The domain layer follows a file-per-topic-namespace pattern, where each file contains the abstractions that define the topic namespace, organized by archetype directory.
@@ -550,7 +534,7 @@ interface Adapter<T> {
 ```
 
 - `toDomain` deserializes storage dictionaries into domain abstractions.
-- `fromDomain` accepts a patch of an Instantialble or object (`AdapterPatch<T>`), so both full abstractions and partial protocol/update payloads are valid inputs.
+- `fromDomain` accepts a patch of an Instantiable or object (`AdapterPatch<T>`), so both full abstractions and partial protocol/update payloads are valid inputs.
 
 ### 6.2 Metadata Mapping Model
 

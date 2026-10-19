@@ -1,6 +1,14 @@
 # Documentation Authority Chain — Brief
 
-**Pending draft, not dispatched.** Recorded 2026-10-08 from a CA + AI Architect session, after the
+**Withdrawn 2026-10-19, superseded.** The CA rebuilt `architecture-core.md` §1.1 directly: one
+text tree and one table of the governing documents (domain, then architecture, then UX, then
+conventions) and what each owns, closing with the derived-artifacts rule. Its §1.2 Scope Boundary
+was folded in, and the authority-chain pointers and scope tables in `architecture-back.md`,
+`architecture-front.md`, `architecture-devops.md`, and `domain-archetypes.md` were removed, so the
+governing documents are described once. `ux-components-guide-lite.md` was retired the same day.
+The proposal below, deferring to the constitution's precedence, was not taken.
+
+Recorded 2026-10-08 from a CA + AI Architect session, after the
 AI Coding Engine noted, while preparing the workbench list layout production, that "Architecture
 Core's authority table differs from the constitution's precedence order; the constitution
 governs." The AI Architect verified the note and found the drift reaches four more documents.

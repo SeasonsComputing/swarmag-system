@@ -11,7 +11,7 @@ reconciled against each other. Backlog entry: "`core/`, `architecture-core.md`, 
 Give `core/` one coherent account across its three artifacts, with each concern stated once.
 
 - **`source/core/`** is what exists. It is a derived artifact: where it conflicts with the
-  documents, the code is wrong (`architecture-core.md` §1.2).
+  documents, the code is wrong (`architecture-core.md` §1.2; **amended 2026-10-19:** now §1.1).
 - **`architecture-core.md`** owns meaning: system boundaries, contracts, dependency direction,
   and invariants.
 - **`CONVENTIONS.md`** owns construction: checkable rules for building with `core/`. It gates
