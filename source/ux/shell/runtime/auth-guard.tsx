@@ -6,16 +6,15 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Renders children only when the session is authenticated and the boot check
-has completed. Redirects to /login when unauthenticated. Shows nothing
-while isLoading is true to prevent a flash of unauthenticated content.
+Renders children only after session preparation. Redirects to /login once
+resolution finishes without authentication; renders nothing while preparing.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AuthGuard  Route-level auth guard component.
 */
 
-import { Match, Show, Switch } from '@solid-js'
+import { Match, Switch } from '@solid-js'
 import type { UiComponent, UiContainerProps } from '@ux/ui'
 import { SessionState } from './session-state.ts'
 import { ShellReplace } from './shell-navigate.tsx'
@@ -25,17 +24,12 @@ export type AuthGuardProps = UiContainerProps
 
 /** Route-level auth guard; redirects to /login when unauthenticated. */
 export const AuthGuard = (props: AuthGuardProps): UiComponent => {
-  const { store: session } = SessionState
   return (
     <Switch>
-      <Match when={!session.isLoading && !session.isAuthenticated}>
+      <Match when={SessionState.isSignedOut()}>
         <ShellReplace to='/login' />
       </Match>
-      <Match when={!session.isLoading && session.isAuthenticated}>
-        <Show when={session.isAuthenticated}>
-          {props.children}
-        </Show>
-      </Match>
+      <Match when={SessionState.isPrepared()}>{props.children}</Match>
     </Switch>
   )
 }

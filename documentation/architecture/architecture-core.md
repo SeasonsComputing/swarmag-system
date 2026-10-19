@@ -1042,6 +1042,17 @@ This pattern eliminates sync complexity:
 
 **Critical Principle:** Offline is not a degraded mode—it is the **primary execution environment** for field operations. Network connectivity is only required for clone preparation and log upload, not execution.
 
+### 9.5 Session Preparation
+
+Applications prepare a session before authenticated content renders. Admin and the Customer
+Portal prepare online only. Ops prepares offline from the last User prepared online, retained
+on the device, so a reload without coverage does not interrupt field execution. Eligibility is
+re-checked at the next online preparation. RLS and edge functions remain the authorization
+boundary; log upload meets the live record.
+
+The current production gates all applications on online preparation. Ops' device-held User and
+offline preparation path ship with the job runner (roadmap §8).
+
 ## 10. Architectural Invariants
 
 These rules must never be violated. Code that violates these invariants is wrong, regardless of whether it "works."
@@ -1080,7 +1091,8 @@ These rules must never be violated. Code that violates these invariants is wrong
 - Offline execution via deep clones, not degraded sync mode
 - Job Plans locked during execution (immutable)
 - Logs are append-only (no merge conflicts)
-- Network required only for clone preparation and log upload
+- Field execution requires network only for clone preparation and log upload
+- Session preparation precedes authenticated rendering; online and offline policy follows §9.5
 
 #### 10.1.6 Soft delete via Instantiable
 

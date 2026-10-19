@@ -11,24 +11,31 @@ signal-backed; the sites collection is store-backed for leaf updates.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-CustomerDraft         Fields edited by the Customer surface.
-customerDraft         Project state into an isolated aggregate draft.
-CustomerState         Reactive state contract for Customer steps.
-createCustomerState   Create state for a single Customer draft.
-newCustomerSite       Create a blank site draft.
-siteLocation(site)     The site's single location.
+ACCOUNT_MANAGER_ROLES  Roles for account-manager defaults and choices.
+CustomerDraft          Fields edited by the Customer surface.
+customerDraft          Project state into an isolated aggregate draft.
+CustomerState          Reactive state contract for Customer steps.
+createCustomerState    Create state for a single Customer draft.
+newCustomerSite        Create a blank site draft.
+siteLocation(site)      The site's single location.
 */
 
 import { demandOne, toTrimmed } from '@core/std'
-import type { DraftOf } from '@core/stdx'
+import type { Id } from '@core/std'
+import type { DraftOf, QuerySet } from '@core/stdx'
 import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
 import type { Customer, CustomerSite, CustomerStatus } from '@domain/abstractions/customer.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
 import type { scopes } from '@front/api/scopes.ts'
+import { UserProvider } from '@front/app/shell/user-provider.ts'
 import { createSignal } from '@solid-js'
 import type { Accessor, Setter } from '@solid-js'
 import { createStore, produce } from '@solid-js/store'
 import { copyDraft } from '@ux/shell/workbench/workbench-draft.ts'
 import { UiText } from '@ux/ui/components/ui-helpers.ts'
+
+/** Roles shared by account-manager defaults and picker choices. */
+export const ACCOUNT_MANAGER_ROLES = ['sales'] as const satisfies QuerySet<UserRole>
 
 /** Domain fields owned by the Customer workbench. */
 export type CustomerDraft = DraftOf<typeof scopes.Customers.detail>
@@ -46,6 +53,7 @@ export const customerDraft = (state: CustomerState): CustomerDraft =>
     notes: state.notes(),
     name: toTrimmed(state.name()),
     status: state.status(),
+    accountManagerId: state.accountManagerId(),
     line1: toTrimmed(state.line1()),
     line2: UiText.optional(state.line2()),
     city: toTrimmed(state.city()),
@@ -56,6 +64,9 @@ export const customerDraft = (state: CustomerState): CustomerDraft =>
 
 /** Reactive state used by the Customer workbench. */
 export type CustomerState = {
+  readonly storedAccountManagerId: Id | undefined
+  accountManagerId: Accessor<Id | undefined>
+  setAccountManagerId: Setter<Id | undefined>
   displayName: Accessor<string>
   setDisplayName: Setter<string>
   phoneNumber: Accessor<string>
@@ -96,6 +107,10 @@ export type CustomerState = {
  * @returns Customer state scoped to one workbench instance.
  */
 export const createCustomerState = (customer: Customer | null = null): CustomerState => {
+  const storedAccountManagerId = customer?.accountManagerId
+  const [accountManagerId, setAccountManagerId] = createSignal<Id | undefined>(
+    customer ? storedAccountManagerId : UserProvider.idWithAnyRole(ACCOUNT_MANAGER_ROLES)
+  )
   const contact = customer ? demandOne(customer.primaryContact) : null
   const [displayName, setDisplayName] = createSignal(contact?.displayName ?? '')
   const [phoneNumber, setPhoneNumber] = createSignal(contact?.phoneNumber ?? '')
@@ -129,6 +144,9 @@ export const createCustomerState = (customer: Customer | null = null): CustomerS
   }
 
   return {
+    storedAccountManagerId,
+    accountManagerId,
+    setAccountManagerId,
     displayName,
     setDisplayName,
     phoneNumber,

@@ -1,0 +1,10 @@
+/* Customer account-manager sizing in both workbench hosts. */
+[data-app='customer-account-manager'] {
+  min-inline-size: 0;
+}
+
+[data-app='customer-account-manager'] > [data-ui='layout'] {
+  justify-items: stretch;
+  min-inline-size: min(16rem, 100%);
+  max-inline-size: 100%;
+}

@@ -1,9 +1,12 @@
 /** Session eligibility; execution awaits the shared API bootstrap backlog fix. */
 
 import '@tests/config/test-config.ts'
+import { id } from '@core/std'
+import type { Session } from '@core/stdx'
 import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
 import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
+import { UserProvider } from '@front/app/shell/user-provider.ts'
 import { createRoot } from '@solid-js'
 import { assertEquals } from '@std/assert'
 import { operationsUserSample } from '@tests/fixtures/user-samples.ts'
@@ -51,9 +54,12 @@ const verifyEligibility = async (user: User, eligible: boolean): Promise<void> =
     logoutCount++
     return Promise.resolve()
   }
-  api.SessionState.setReady = () => {
+  api.SessionState.setReady = provider => {
+    assertEquals(provider, UserProvider)
+    assertEquals(UserProvider.user(), user)
+    assertEquals(api.SessionState.isPrepared(), false)
     readyCount++
-    originalReady()
+    originalReady(provider)
     completed.resolve()
   }
   api.SessionState.clear = () => {
@@ -71,6 +77,8 @@ const verifyEligibility = async (user: User, eligible: boolean): Promise<void> =
     assertEquals(api.SessionState.store.isDataReady, eligible)
     assertEquals(api.SessionState.store.isAuthenticated, eligible)
     assertEquals(api.SessionState.store.userId, eligible ? user.id : null)
+    assertEquals(api.SessionState.store.user, eligible ? UserProvider : null)
+    assertEquals(UserProvider.user(), eligible ? user : null)
   } finally {
     dispose()
     api.Users.get = originalGet
@@ -83,3 +91,52 @@ const verifyEligibility = async (user: User, eligible: boolean): Promise<void> =
   }
   assertEquals(unsubscribeCount, 1)
 }
+
+Deno.test('SessionCoordinator waits for hydration and clears on identity change', async () => {
+  const originalGet = api.Users.get
+  const originalSession = api.Auth.getSession
+  const originalSubscribe = api.Auth.onAuthStateChange
+  const firstLoad = Promise.withResolvers<User>()
+  const secondLoad = Promise.withResolvers<User>()
+  const secondUser = { ...operationsUserSample, id: id() }
+  let emit: (session: Session | null) => void = () => {}
+  let dispose = () => {}
+  SessionCoordinator.clear()
+  api.Auth.getSession = () => Promise.resolve({ userId: operationsUserSample.id })
+  api.Auth.onAuthStateChange = callback => {
+    emit = callback
+    return () => {}
+  }
+  api.Users.get = id => id === operationsUserSample.id ? firstLoad.promise : secondLoad.promise
+  try {
+    createRoot(cleanup => {
+      dispose = cleanup
+      SessionCoordinator.init()
+    })
+    await Promise.resolve()
+    assertEquals(api.SessionState.isPrepared(), false)
+    assertEquals(api.SessionState.store.user, null)
+    firstLoad.resolve(operationsUserSample)
+    await Promise.resolve()
+    assertEquals(api.SessionState.isPrepared(), true)
+    assertEquals(api.SessionState.store.user, UserProvider)
+    emit({ userId: secondUser.id })
+    assertEquals(UserProvider.user(), null)
+    assertEquals(api.SessionState.store.user, null)
+    assertEquals(api.SessionState.isPrepared(), false)
+    secondLoad.resolve(secondUser)
+    await Promise.resolve()
+    assertEquals(UserProvider.id(), secondUser.id)
+    assertEquals(api.SessionState.isPrepared(), true)
+    emit(null)
+    assertEquals(UserProvider.user(), null)
+    assertEquals(api.SessionState.store.user, null)
+    assertEquals(api.SessionState.isSignedOut(), true)
+  } finally {
+    dispose()
+    api.Users.get = originalGet
+    api.Auth.getSession = originalSession
+    api.Auth.onAuthStateChange = originalSubscribe
+    SessionCoordinator.clear()
+  }
+})

@@ -292,11 +292,12 @@ authenticated users, including soft-deleted rows, and defines no `INSERT`,
 flow through these edge functions via the service-role client after
 administrator authorization.
 
-`get` returns a soft-deleted User with `deletedAt` set so existing references
-can resolve it. API lists exclude deleted Users; RLS does not enforce that
-list filter. A successful read is not a liveness check: session preparation
-rejects a deleted User. User-management orchestration and `user_has_access`
-retain their deletion filters for write and authorization paths.
+`get` returns a soft-deleted User with `deletedAt` set so existing
+references can resolve it. API lists exclude deleted Users; RLS does not
+enforce that list filter. Liveness checks, including session eligibility,
+follow `architecture-core.md` §3.2.5. User-management orchestration and
+`user_has_access` retain their deletion filters for write and authorization
+paths.
 
 Every user-management edge function must:
 

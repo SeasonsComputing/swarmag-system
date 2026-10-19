@@ -37,7 +37,7 @@ themself, so the default is the session user**, changeable through a picker.
   `front/api/queries.ts`. A single `list` returns one page, 25 records by default (`DEFAULT_LIMIT`);
   `listAll` reads every page.
 - **`api.Users.get`** excludes soft-deleted Users (`deleted_at` is null). Inactive Users and Users
-  holding other roles remain fetchable.
+  holding other roles remain fetchable. **Amended 2026-10-19, see Addendum 4.**
 - **`SessionCoordinator`** (`front/app/shell/session-coordinator.ts`) loads the session User to
   check that it is active, then keeps only the user id: by its header, "only the prepared identity,
   not the domain User". The session holds no roles.
@@ -77,7 +77,8 @@ themself, so the default is the session user**, changeable through a picker.
 7. **The current value is always shown.** The options are active Users holding a listed role, plus
    the record's current account manager when they no longer qualify, so the field shows who
    actually manages the account and can move it. **A soft-deleted current account manager is shown
-   with a deleted indication (2026-10-13); see Dependencies.**
+   with a deleted indication (2026-10-13); see Dependencies.** **Amended 2026-10-19, see
+   Addendum 3.**
 8. **One picker for everyone in Admin** for release 1. Within an app its roles are trusted equally,
    and sales Users also hold `administrator`
    (`effort/pending/2026-10-10-access-model-brief.md`, decisions 2 and 6). Finer rules by role
@@ -111,7 +112,8 @@ themself, so the default is the session user**, changeable through a picker.
     User and discards it, keeping only the id; it now hands the User to a session user provider.
     The create default (decision 5) reads it synchronously when the create draft is built, so the
     default never registers with the discard check; existing drafts bypass the default. Like the
-    id, the User refreshes at the next session preparation.
+    id, the User refreshes at the next session preparation. **Amended 2026-10-19, see Addendums 1,
+    4, and 5.**
 
     - **`ux/shell/runtime/shell.ts`** declares the contract beside `SessionCoordinatorContract`,
       with domain-free roles, and lists it in the header's PUBLIC:
@@ -194,13 +196,16 @@ themself, so the default is the session user**, changeable through a picker.
 
 ## Documentation the production amends
 
+**Amended 2026-10-19, see Addendums 1 and 5.**
+
 - **`architecture-front.md` §2, its `shell/` footnote, and §10.1.3:** list `user-picker` beside
   `notes-editor`, and `session-user` beside `session-coordinator.ts`.
 - **`architecture-front.md` §9.3.1–§9.3.2:** the application supplies `SessionUser` behind
   `SessionUserContract`; step 8 holds the eligible User in `SessionUser` instead of discarding it,
   and "The prepared user ID is private coordinator state, not a domain-user cache" is withdrawn.
-- **`architecture-front.md` §10.1.5:** reconciled with decision 4, which places the shared
-  `UserPicker` in `app/shell/` before a second app consumes it.
+- **Amended 2026-10-19, see Addendum 7.** **`architecture-front.md` §10.1.5:** reconciled with
+  decision 4, which places the shared `UserPicker` in `app/shell/` before a second app consumes
+  it.
 - **`architecture-front.md` §10.1.6:** the Customer scope covers account-manager assignment, and
   its create defaults are `{}`.
 
@@ -211,12 +216,14 @@ contract and the session user contract. It does not extend into the access model
 
 ## Verification
 
+**Amended 2026-10-19, see Addendums 1, 2, and 4.**
+
 By the CA in the app:
 
 - The picker lists only active Users holding a listed role, except a current account manager who
   no longer qualifies, who still appears (decision 7).
 - Options order by display name, including Users sharing a name.
-- More than one page of eligible Users all appear.
+- More than one page of eligible Users all appear. **Withdrawn 2026-10-19, see Addendum 4.**
 - Both create hosts, Onboarding and Customer Manager's New: a session user holding a listed role is
   the default; one who does not leaves the field unset.
 - An untouched New draft passes the discard check.
@@ -235,6 +242,186 @@ filter change fails with `ApiError` 400. They run with the first such surface.
 Portal users and the Customer Portal (`effort/pending/2026-10-08-customer-portal-brief.md`); the
 assessor, planner, and job work records (backlog entries under Job); finer picker rules by role;
 a shared user cache.
+
+## Addendums — 2026-10-19 — CA+AA review of AI Coding Engine findings
+
+The AI Coding Engine reviewed the brief for production on 2026-10-18 and raised four findings. The
+CA and AI Architect resolved them as follows.
+
+1. **No authenticated route renders before session preparation completes** (decision 11).
+   **Amended 2026-10-19, see Addendum 5.** `AuthGuard` renders authenticated content once
+   `isAuthenticated` is set, before the coordinator has loaded the User and called `setReady()`. A
+   direct reload into Onboarding can therefore build its create draft with no `SessionUser`, and the
+   default (decision 5) stays unset; applying it afterward would undo decisions 5 and 6. Readiness
+   gates rendering instead, for every authenticated route in every app.
+
+   - **`ux/shell/runtime/session-state.ts`:** `SessionState` owns the meaning of its flags and
+     answers two questions, added to `SessionStateContract`:
+
+     ```ts
+     export interface SessionStateContract {
+       // existing members unchanged
+       /** Signed in and prepared: authenticated content may render. */
+       isPrepared: () => boolean
+       /** Resolution finished with no session: the login route applies. */
+       isSignedOut: () => boolean
+     }
+     ```
+
+     ```ts
+     /** Signed in and prepared: authenticated content may render. */
+     const isSessionPrepared = (): boolean =>
+       !sessionStore.isLoading && sessionStore.isAuthenticated && sessionStore.isDataReady
+
+     /** Resolution finished with no session: the login route applies. */
+     const isSessionSignedOut = (): boolean => !sessionStore.isLoading && !sessionStore.isAuthenticated
+     ```
+
+   - **`ux/shell/runtime/auth-guard.tsx`** asks them; the redundant inner `Show` goes. Between
+     authenticated and prepared nothing renders, as nothing renders while `isLoading` holds today.
+     `clear()` resets `isDataReady`, so sign-out still routes to `/login`. An inactive or deleted
+     User is signed out before any authenticated content renders:
+
+     ```tsx
+     <Switch>
+       <Match when={SessionState.isSignedOut()}>
+         <ShellReplace to='/login' />
+       </Match>
+       <Match when={SessionState.isPrepared()}>{props.children}</Match>
+     </Switch>
+     ```
+
+   - **The session preparation policy,** stated once in `architecture-core.md` and referenced
+     elsewhere: applications prepare a session before authenticated content renders. Admin and the
+     Customer Portal prepare online only. Ops prepares offline from the last User prepared online,
+     kept on the device, because crews work where coverage is worst and a reload without signal is
+     routine (sleep, OS eviction of a backgrounded PWA, battery). Eligibility is re-checked at the
+     next online preparation; RLS and the edge functions remain the boundary, since log upload
+     meets the live record. This production gates on online preparation; Ops' offline path is
+     built with the job runner (roadmap §8).
+   - **Documentation, first and stated once:**
+     - `architecture-core.md` §9 Field Execution Guarantees gains a Session preparation section
+       with the policy: §9 guarantees a job executes offline but not how the application starts
+       offline. §10.1.5 Offline is first-class gains one invariant bullet.
+     - `architecture-front.md` §9.3 keeps the mechanics only (`AuthGuard` on
+       `SessionState.isPrepared()`, `SessionUser`, the preparation steps) and references core §9
+       for the policy.
+     - `architecture-front.md` §7.3.3 Offline Capability restates core §9's deep clone and log
+       upload; it becomes a reference.
+     - `architecture-back.md` §4.6's "session preparation rejects a deleted User" restates core
+       §3.2.5; it becomes a reference.
+   - **Verification:** with User loading deliberately delayed, a direct reload into Onboarding
+     renders nothing until prepared, then defaults the account manager for a session user holding
+     a listed role.
+
+2. **Tests and checks are named in scope.**
+   - `source/tests/cases/customer-api-test.ts`: its assertions that `account_manager_id` is
+     excluded from create and update reverse under decision 10, with the draft helper. Its fake
+     transport asserts `deleted_at=is.null` on every non-POST request; `get` no longer sends it
+     (`effort/completed/2026-10-13-soft-deleted-references-brief.md`), so the assertion applies to
+     `PATCH` only. Three of its five tests fail on `main` until then.
+   - `session-coordinator-test.ts` covers holding the User before readiness, and clearing it on
+     sign-out and on identity change. It is written now and runs once
+     `effort/active/2026-10-13-stage-test-authorization-brief.md` ships, as `users-api-test.ts`
+     does.
+   - Checks: `deno task check`, `deno task fmt:check`, and `deno task test`, passing except the
+     two tests awaiting stage test authorization; `STYLE_AUDIT`.
+
+3. **Amended 2026-10-19, see Addendum 6.** **The picker's options are fixed when the editor opens**
+   (decision 7): qualifying Users, plus the stored account manager when they no longer qualify.
+   They stay the same for the whole edit,
+   so reselecting the stored account manager restores the saved value; it is not a new reference.
+   The next open rebuilds them from what is then stored.
+
+4. **Repository facts.**
+   - `api.Users.get` returns the User if it exists.
+   - Decision 11's removal of the coordinator export's annotation is already done
+     (`export const SessionCoordinator = new AppSessionCoordinator()`); nothing remains for it.
+   - The Verification check "More than one page of eligible Users all appear" is withdrawn. The
+     picker reads every eligible User through `listAll`, which `core/` already tests; paging in the
+     interface is not addressed (backlog: "Managers load only the first page of their
+     Collection").
+
+5. **The session user, as settled on 2026-10-14** (decision 11). The CA designed a contract in
+   `ux/shell/runtime` and a proxy provider in `front/app/shell`, held by the session, with the
+   keyed store's benefits but not its grab bag. Decision 11 recorded a sketch that departed from
+   it; this restores the design.
+
+   - **`ux/shell/runtime/session-contracts.ts`** (new) holds the session contracts an application
+     supplies: `SessionCoordinatorContract`, moved unchanged from `shell.ts`, and
+     `SessionUserContract`. Both are deferred encapsulation, each application supplying exactly one
+     implementation (`effort/pending/2026-10-03-core-reconciliation-brief.md`, amendment
+     2026-10-19). `SessionStateContract` stays in `session-state.ts`: `ux/` implements it itself,
+     so it is not deferred encapsulation. Only application-supplied session contracts belong here:
+
+     ```ts
+     /** Application-supplied signed-in user, held by the session for its lifetime. */
+     export interface SessionUserContract {
+       id(): Id | null
+       roles(): readonly string[]
+     }
+     ```
+
+   - **`ux/shell/runtime/shell.ts`** keeps its name and imports `SessionCoordinatorContract` from
+     `session-contracts.ts` for `ShellApplication`; its header subtitle drops "Contracts and" and
+     its PUBLIC loses the moved contract. Importers of the moved contract follow it.
+   - **`front/app/shell/user-provider.ts`** (new): `UserProvider`, the swarmAg proxy over the
+     domain User, `implements SessionUserContract`, with decision 11's `user()`, `idWithAnyRole`,
+     `set`, and `clear`, and exported as its concrete type: `export const UserProvider = new
+     AppUserProvider()`.
+   - **The session holds the user** (`ux/shell/runtime/session-state.ts`). `SessionStore` gains
+     `user: SessionUserContract | null`; `setReady(user: SessionUserContract)` sets it with
+     `isDataReady`, and `clear()` drops it. `ux/` reads the signed-in user from the session;
+     `ShellApplication` gains no field. `isPrepared()` (Addendum 1) therefore holds exactly when the
+     session has its user.
+   - **The coordinator:** `#preparedUserId` is removed; the prepared check reads
+     `UserProvider.id() === session.userId`; an eligible User is held with `UserProvider.set(user)`
+     and handed over with `api.SessionState.setReady(UserProvider)`; `clear()` calls
+     `UserProvider.clear()` before `api.SessionState.clear()`.
+   - **The create default:** `const accountManagerId = UserProvider.idWithAnyRole(listedRoles)`.
+   - **Withdrawn from decision 11:** the contract in `shell.ts`; the names `SessionUser`,
+     `AppSessionUser`, and `session-user.ts`; "Nothing in `ux/` consumes `SessionUserContract`
+     yet".
+   - **Documentation:** where the Documentation section and Addendum 1 name `session-user` or
+     `SessionUser`, read `user-provider` and `UserProvider`; `architecture-front.md` §9.3.1, which
+     names `shell.ts` as the coordinator contract's home, names `session-contracts.ts`, and §9.3
+     describes the session holding the user.
+
+6. **The rule behind Addendum 3, and how the picker loads** (decision 7, decision 9). The AI
+   Coding Engine's production scope proposed freezing the options with an editor-scoped query: a
+   per-editor key, `staleTime: Infinity`, refetch disabled, and the query removed on close. That
+   is a new pattern, and the rule does not need it. Addendum 3's fixed list was a mechanism for a
+   rule that holds by construction once the options are built from the stored value.
+
+   - **The rule:** the stored account manager remains an option for the whole edit; the eligible
+     Users are live. Nobody else who no longer qualifies is offered. A refetch mid-edit can only
+     add a newly eligible User or drop one who stopped qualifying; neither breaks the rule.
+   - **Eligible Users:** one app-wide query over `queries.Users.byRole` through `listAll`, with an
+     exported key in the existing `*_QUERY_KEY` idiom and default TanStack Query behavior.
+   - **The stored account manager, when they no longer qualify:** `api.Users.get(storedId)` under
+     its own query, keyed by that id.
+   - **The picker composes the two at render:** the eligible Users, plus the stored account
+     manager when absent, ordered by display name. It takes the **stored** assignment separately
+     from the draft value: the options follow the stored value, the selection follows the draft.
+   - **None:** selecting it sets the draft `accountManagerId` to `undefined`; the update projection
+     writes `null` (decision 6).
+   - **Not needed for this rule:** an editor-instance key, per-editor query lifetime or removal, disabled
+     refetches, and changes to `customer-steps.tsx` for them.
+
+7. **`architecture-front.md` §10.1.5 is placement strategy, not a rule** (CA, at CA+AA review of
+   the production). Reconciling the old rule with decision 4 led the AI Coding Engine to coin
+   "explicitly designated suite components"; the CA judged the section a strategy whose framing as
+   a rule had delayed placement decisions repeatedly. The CA approved this text, which replaces
+   §10.1.5 in full and was applied directly:
+
+   > #### 10.1.5 Placement
+   >
+   > Place a component in the tier that matches its intended reach. Application-specific work
+   > belongs in `app-{name}/`; work meant for the swarmAg suite belongs in `app/`; only what is
+   > useful outside swarmAg entirely belongs in `ux/`. Placement is a design decision made with
+   > the component, and a component moves when its reach changes. Prefer the narrower tier when
+   > reach is uncertain: widening later costs a move, and generalizing early costs an abstraction
+   > nobody needed.
 
 ## Design history
 
@@ -267,5 +454,10 @@ a shared user cache.
   which is generic but invites a grab bag. The contract and proxy won: they follow
   `SessionCoordinatorContract`'s own idiom, live and die with the session, and are typed by
   construction. The contract ships now, ahead of its first `ux/` consumer, to fix its shape.
+- **2026-10-19: an editor-scoped query was proposed and not needed.** The AI Coding Engine
+  proposed holding the picker's options fixed with an editor-scoped query: a per-editor key,
+  `staleTime: Infinity`, and removal on close. The design is sound, but the rule holds once the
+  options are built from the stored value, so the existing app-wide query idiom serves
+  (Addendum 6).
 
 _End of Brief_

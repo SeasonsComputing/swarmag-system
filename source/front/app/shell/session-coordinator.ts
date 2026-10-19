@@ -6,8 +6,8 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Owns swarmAg user eligibility and the auth subscription. Retains only the
-prepared identity, not the domain User. Initialization runs under the shell's
+Owns swarmAg user eligibility and the auth subscription. Holds the prepared
+User through UserProvider. Initialization runs under the shell's
 Solid mount owner so subscription cleanup follows application disposal.
 
 PUBLIC
@@ -15,16 +15,14 @@ PUBLIC
 SessionCoordinator  Initialize session coordination or clear prepared state.
 */
 
-import type { Id } from '@core/std'
 import type { Session } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 import { onCleanup } from '@solid-js'
-import type { SessionCoordinatorContract } from '@ux/shell/runtime/shell.ts'
+import type { SessionCoordinatorContract } from '@ux/shell/runtime/session-contracts.ts'
+import { UserProvider } from './user-provider.ts'
 
 /** Application-owned identity preparation and auth subscription. */
 class AppSessionCoordinator implements SessionCoordinatorContract {
-  #preparedUserId: Id | null = null
-
   /** Start persisted-session resolution and subscribe under the active mount owner. */
   init(): void {
     void this.#syncSession()
@@ -37,7 +35,7 @@ class AppSessionCoordinator implements SessionCoordinatorContract {
 
   /** Clear both application preparation and generic session state. */
   clear(): void {
-    this.#preparedUserId = null
+    UserProvider.clear()
     api.SessionState.clear()
   }
 
@@ -55,7 +53,7 @@ class AppSessionCoordinator implements SessionCoordinatorContract {
 
     if (api.SessionState.store.userId !== session.userId) this.clear()
     api.SessionState.setAuth(session.userId)
-    if (this.#preparedUserId === session.userId) return
+    if (UserProvider.id() === session.userId) return
 
     const user = await api.Users.get(session.userId)
     if (api.SessionState.store.userId !== session.userId) return
@@ -67,8 +65,8 @@ class AppSessionCoordinator implements SessionCoordinatorContract {
       }
       return
     }
-    this.#preparedUserId = session.userId
-    api.SessionState.setReady()
+    UserProvider.set(user)
+    api.SessionState.setReady(UserProvider)
   }
 }
 

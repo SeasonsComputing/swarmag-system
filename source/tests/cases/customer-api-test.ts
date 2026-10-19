@@ -12,6 +12,7 @@ import { scopes } from '@front/api/scopes.ts'
 import { assertEquals } from '@std/assert'
 import { createClient } from '@supabase/client'
 import { blueMesaRanchCustomer } from '@tests/fixtures/customer-samples.ts'
+import { salesUserSample } from '@tests/fixtures/user-samples.ts'
 
 Config.init({
   get: key => key === 'LOCAL_DB_NAME' ? 'customer-api-test' : undefined,
@@ -32,7 +33,7 @@ Deno.test('Customer API creates from detail fields and declared defaults', async
     }
     const created = await api.Customers.create(scope.toCreate(richerDraft))
     assertEquals(detailDraft(created), draft)
-    assertEquals(created.accountManagerId, undefined)
+    assertEquals(created.accountManagerId, customer.accountManagerId)
     assertEquals(created.notes, draft.notes)
     assertEquals(created.id === customer.id, false)
   })
@@ -59,11 +60,19 @@ Deno.test('Customer API detail scope writes all declared fields in one update', 
   })
 })
 
-Deno.test('Customer API detail scope preserves excluded account-manager assignment', async () => {
+Deno.test('Customer API detail scope assigns and explicitly clears the account manager', async () => {
   await withCustomer(async customer => {
-    const input = { ...detailDraft(customer), accountManagerId: null }
-    const updated = await api.Customers.update(scope.adapter, scope.toUpdate(customer.id, input))
-    assertEquals(updated.accountManagerId, customer.accountManagerId)
+    const assigned = await api.Customers.update(
+      scope.adapter,
+      scope.toUpdate(customer.id, { ...detailDraft(customer), accountManagerId: salesUserSample.id })
+    )
+    assertEquals((await api.Customers.get(customer.id)).accountManagerId, salesUserSample.id)
+    const input = { ...detailDraft(assigned), accountManagerId: undefined }
+    const projected = scope.toUpdate(customer.id, input)
+    assertEquals(projected.accountManagerId, null)
+    const updated = await api.Customers.update(scope.adapter, projected)
+    assertEquals(updated.accountManagerId, undefined)
+    assertEquals((await api.Customers.get(customer.id)).accountManagerId, undefined)
     assertEquals(updated.notes, customer.notes)
     assertEquals(updated.createdAt, customer.createdAt)
   })
@@ -119,6 +128,7 @@ const detailDraft = (customer: Customer): DraftOf<typeof scope> => ({
   primaryContact: customer.primaryContact,
   name: customer.name,
   status: customer.status,
+  accountManagerId: customer.accountManagerId,
   line1: customer.line1,
   line2: customer.line2,
   city: customer.city,
@@ -155,18 +165,21 @@ const withCustomer = async (run: (customer: Customer) => Promise<void>): Promise
         assertEquals(url.pathname, '/rest/v1/customers')
         if (request.method === 'POST') {
           record = await request.json() as Dictionary
-          assertEquals('account_manager_id' in record, false)
+          assertEquals(record.account_manager_id, customer.accountManagerId)
           assertEquals('line2' in record, false)
           assertEquals(record.notes, CustomerAdapter.fromDomain(customer).notes)
         } else {
           assertEquals(url.searchParams.get('id'), `eq.${customer.id}`)
-          assertEquals(url.searchParams.get('deleted_at'), 'is.null')
           if (request.method === 'PATCH') {
+            assertEquals(url.searchParams.get('deleted_at'), 'is.null')
             const patch = await request.json() as Dictionary
-            assertEquals('account_manager_id' in patch, false)
+            assertEquals('account_manager_id' in patch, true)
             assertEquals('notes' in patch, true)
             record = { ...record, ...patch }
-          } else assertEquals(request.method, 'GET')
+          } else {
+            assertEquals(request.method, 'GET')
+            assertEquals(url.searchParams.get('deleted_at'), null)
+          }
         }
         return Response.json(record)
       }
