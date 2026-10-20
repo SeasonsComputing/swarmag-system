@@ -164,47 +164,6 @@ building merge tooling later — reconciling two already-diverged records after 
 much harder problem than catching it once at the point of entry, and most systems at any
 scale never build real merge tooling once duplicates exist.
 
-## Task-chain purity — where does a mechanical auto-fix belong
-
-**Parked:** 2026-09-04 — surfaced fixing a recurring `.DS_Store`/`guard:leaf` annoyance,
-reverted after ACE's review of an unrelated production caught the underlying question.
-
-**What it is:** `guard:leaf` keeps failing on macOS-Finder-generated `.DS_Store` files, a
-real, recurring, low-grade annoyance (Ted: "this will continue to fire guard errors — which
-it should" — the detection is correct, the noise source isn't worth manual cleanup every
-time). A first fix chained a `clean:ds-store` sweep directly into `guard:leaf`'s own task,
-making an individual guard mutate the tree before checking it — which breaks the pattern
-every other task in `deno.jsonc` follows: a mutating operation always gets an honest verb
-name (`fmt`, `lock:update`, `gen:*`), never a `check`/`guard` name. Reverted once named.
-
-The broader question the specific case sits inside: **should `check`/`check:guards`
-orchestration ever mutate**, as a convenience, even though the individual `guard:*` units
-it composes stay strictly pure? `.DS_Store` deletion seems safe either way — no context
-ever wants to _know_ about a stray `.DS_Store`, so removing it loses no information. Auto-
-running `fmt` (not just `fmt:check`) at the same orchestration level is a sharper version of
-the same question, raised in the same conversation — reformatting **is** meaningful
-information (a real diff), so silently applying it inside something named `check` could let
-a future strict/CI use of that name mean "the repo, after being quietly rewritten, is
-correct" rather than "the repo, as committed, is correct."
-
-**Amended (2026-09-04, same sitting):** the proposed seam for this — splitting `chk` (bare
-alias for `check`, created only to match `fmt`'s three-letter brevity for fast typing) into
-a deliberately-mutating convenience path — is gone as an option. Ted removed `chk` from
-`deno.jsonc` entirely rather than give it its own behavior: a second, non-standardly-named
-command sitting next to the fully-spelled `check` broke the consistency of an otherwise
-clean `verb`/`verb:noun` task surface, and that problem outranked the convenience. No
-`chk`-shaped seam exists anymore to hang a split on. The underlying question — does `fmt`
-(mutating) or the `.DS_Store` sweep belong chained into `check`/`check:guards` itself, given
-`check` is now the only name in play — is still open and narrower than before.
-
-**Why parked:** A real devops/task-architecture decision, not a drive-by fix — deserves its
-own pass rather than being resolved as a side effect of an unrelated onboarding production.
-
-**Picking this up:** With no `chk` alias to split behavior onto, decide per mutation —
-`.DS_Store` sweep and `fmt` are the two concrete candidates already on the table — whether
-either belongs chained into `check`/`check:guards` at all, or stays a separate, deliberately
-typed step. Until then, `.DS_Store` is `rmdir`-by-hand when `guard:leaf` reports it.
-
 ## Region as a free-text field, not a picklist
 
 **Parked:** 2026-09-07 — Ted, during Group D's live onboarding E2E pass on stage.
@@ -227,8 +186,8 @@ shape.
 
 **Picking this up:** Settle the US-only-vs-international question first; the control
 choice (a `UiSingleSelect` of US state abbreviations, versus something country-aware)
-follows directly once that's answered. Touches both `onboarding-stage-customer.tsx`'s
-`CustomerInput` and `onboarding-stage-sites.tsx`'s `SiteTextInput` — same shape, two call
+follows directly once that's answered. Touches both `customers/customer-step-billing.tsx`'s
+`CustomerInput` and `customers/customer-step-sites.tsx`'s `SiteTextInput` — same shape, two call
 sites, per the existing free-text-field pattern in each.
 
 ## Equipment & Chemical Maintenance Workbench
@@ -244,15 +203,31 @@ placeholder for something larger: schedules, inventories, and parts specialized 
 of equipment and chemicals, possibly warranting its own centralized, dedicated workbench
 container rather than living inside either Manager.
 
-**Why parked:** Genuinely undecided — no shape, no archetype, no scope statement, just an
-imagined destination. The prudent near-term move is the stock Manager (`project-roadmap.md`
-§5); Maintenance proper is a later project. Conflating the two would have made the near-term
-item sound bigger than it is and buried a real future idea inside mechanical stamp-out.
+Its shape is internal workflows on the Workflow, Task, and Question model, as the domain has
+always intended: a drone check-up is a workflow much like drone flight prep. Maintenance
+workflows per asset type; inventory workflows per kind of chemical.
 
-**Picking this up:** Its own scoped conversation once Users & Customers (`project-roadmap.md`
-§1) is closed — the roadmap already earmarks a `project-user-stories.md` iteration as part of
-§5 Mechanical Productions, and this is the natural moment to scope Maintenance for real rather
-than leave it as a name.
+A direction under consideration (CA, 2026-10-20): recurring internal work as recurring Jobs for a
+swarmAg customer, reusing crew assignment, the work log, offline execution, and the job runner. A
+drone check-up would run and be logged like a customer job, proving the job model on routine
+work. Open details:
+
+- **Recurrence.** The domain has no schedule or recurrence concept; something must generate the
+  next Job.
+- **Life cycle.** A customer Job runs assessment, plan, then work. A routine check-up may skip
+  assessment or carry a standing plan.
+- **swarmAg as a customer.** Pricing and billing fields go unused on internal Jobs, which must
+  stay out of customer-facing reports and the portal.
+
+**Why parked:** Its shape is known (internal workflows); its scope, its archetype, and whether it
+needs a dedicated workbench are undecided. The prudent near-term move is the stock Manager
+(`project-roadmap.md` §5); Maintenance proper is a later project. Conflating the two would have
+made the near-term item sound bigger than it is and buried a real future idea inside mechanical
+stamp-out.
+
+**Picking this up:** After this release, as a standalone project with its own roadmap and
+milestones. It is a major feature, like the Lead abstraction, and is scoped in its own
+conversation. §5 builds only the stock Asset and Chemical Managers.
 
 ## Request model — customer and staff requests that staff fulfill
 
@@ -276,20 +251,3 @@ of the brief's Open 1). Consider its relation to the parked Lead abstraction abo
 inbound request from someone not yet a customer.
 
 _End of Feature Parking Lot Document_
-
-## Prune the remaining architecture and UX documents to the system
-
-**Parked:** 2026-10-20 — at the close of `effort/completed/2026-10-03-core-reconciliation-brief.md`.
-
-**What it is:** The reconciliation cut `architecture-core.md` to the system and moved its portable
-`core/` construction material into CONVENTIONS. The same test may apply to
-`architecture-front.md`, `architecture-back.md`, `architecture-devops.md`, and parts of the UX
-documents: portable construction material to CONVENTIONS, system material stays. Design meaning
-in the UX design-language and archetype documents ranks above CONVENTIONS and stays there. The
-backlog entry on `architecture-front.md` mixing the `ux/` toolkit with `front/` is one instance.
-
-**Why parked:** The CA expects it but has not decided it; the pattern was proven on one document
-first.
-
-**Picking this up:** classify each document by rank before cutting, as the reconciliation did for
-`architecture-core.md` §5, §6, and §10.1.11.
