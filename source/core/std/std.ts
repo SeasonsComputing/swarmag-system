@@ -1,9 +1,9 @@
-/**
- * Core standard barrel for shared primitives.
- *
- * Use `@core/std` as the single import surface for foundational types,
- * lifecycle utilities, relation helpers, and generic validators.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Core standard barrel                                                         ║
+║ Shared primitives: types, lifecycle, relations, and validators.              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 export * from './adt.ts'
 export * from './datetime.ts'
