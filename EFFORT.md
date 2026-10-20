@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Effort Methodology (1.1)
+# Effort Methodology (1.2)
 
 - Source: [EFFORT.md](EFFORT.md)
-- Version: 1.1
-- Published: 2026 October 4th
+- Version: 1.2
+- Published: 2026 October 20th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -62,12 +62,13 @@ A brief is a written design record for one unit of work.
 
 When a brief is created for work that already has a `project-backlog.md` entry, the entry's text is replaced by a link to the brief, so the work is described in one place. When the brief moves, the link is updated to its new path.
 
-**Amend it, never silently rewrite it.** A brief accumulates dated, named amendments as understanding deepens or a conclusion reverses. State what changed and why. Preserve the original reasoning trail even after it is superseded — a decision that took several turns to reach is worth being able to see again, including the turns that were wrong.
+**Edit a draft; amend a dispatched brief.** Until a brief is dispatched for review or production, it is edited in place, and a direction it overturns is recorded in its Design history. Once dispatched, it accumulates dated, named amendments as understanding deepens or a conclusion reverses: state what changed and why, and mark what it overturns. Either way, preserve the reasoning trail — a decision that took several turns to reach is worth being able to see again, including the turns that were wrong.
 
 **It reaches production through the production gate**, not through this document. `CONSTITUTION.md` §5 and `AGENTS.md` §2.1 define that mechanic; this document does not restate it.
 
 **It closes when its production is shipped, reviewed, and independently verified** — not when a scope statement is merely approved, and not on a producer's own account that the work is done (§6 Verification Discipline). It also closes when it is withdrawn — superseded or abandoned — with its opening line saying which and why. On closing:
 
+- Settle every deferred or not-taken item: it becomes a backlog entry, joins a pending brief, or is dropped, and the brief says which.
 - Rewrite the brief's own opening framing to state closure plainly.
 - Move the file to `effort/completed/`.
 - Fix cross-references to the old path — in other documents and in AI memory — subject to the historical-reference rule in §2 The Effort Namespace.
@@ -94,13 +95,15 @@ This applies regardless of who or what produced the account — human, AI Coding
 
 ## 7. Milestones
 
-A milestone groups related efforts toward one coherent outcome.
+A milestone groups related efforts toward one coherent outcome. Each numbered roadmap section is a milestone.
+
+A milestone lists its enablers ahead of its features. An enabler is work the features depend on: it makes them buildable or copy-ready, whatever else it delivers. Work that lands in the same window without enabling the milestone rides along with it. The milestone closes only when its enablers and features are done.
 
 Milestone boundaries are living decisions, not fixed at the plan's inception. Building teaches things a plan cannot know in advance — a task item may turn out to be a different, larger piece of work than its own name described, or a navigation pattern chosen early may not survive contact with real usage. Renegotiate the boundary when that happens; do not force the outcome to match the original plan's shape.
 
 An item may move between milestones, or a milestone may be split, as understanding improves. State the move and why. Do not silently reassign it.
 
-A milestone closes with an explicit verification pass, not by informal agreement that it is basically done.
+A milestone closes with an explicit verification pass, not by informal agreement that it is basically done. Its closing reconciles the roadmap with the backlog.
 
 ## 8. Escalation Is a Default, Not a Wall
 
@@ -116,6 +119,7 @@ Each published version supersedes the one before it. Amendments reference sectio
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | ------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.2     | 2026 October 20th   | §4 The Brief edits a draft in place, recording overturned directions in its Design history, and amends a brief only once dispatched; on closing, every deferred or not-taken item is settled. §7 Milestones names each numbered roadmap section a milestone, lists enablers ahead of features with ride-along work beside them, and reconciles the roadmap when a milestone closes.                                                                                          |
 | 1.1     | 2026 October 4th    | §2 The Effort Namespace gains a fifth namespace, `pending`, and names the two status-bearing record kinds, brief and handoff, with their file-naming pattern. §4 The Brief places a newly captured brief in `effort/pending/`, moves it to `effort/active/` when its effort is chosen from the roadmap, keeps handoffs out of `pending`, replaces an existing backlog entry's text with a link to its brief, and closes a brief that is withdrawn as well as one that ships. |
 | 1.0     | 2026 September 15th | Initial version.                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 
