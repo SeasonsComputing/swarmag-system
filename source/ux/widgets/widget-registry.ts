@@ -1,12 +1,8 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Widget registry                                                              ║
-║ Catalog of available widgets.                                                ║
+║ Generic widget catalog, bound by each application composition root.          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-PURPOSE
-───────────────────────────────────────────────────────────────────────────────
-Provides the generic widget catalog bound by each application composition root.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
