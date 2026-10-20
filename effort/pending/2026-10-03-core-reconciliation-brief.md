@@ -236,4 +236,16 @@ brief. Its text, kept here so nothing is lost:
 > Picking this up: together with, or sequenced against, the scan-cost entry above, since both
 > restructure `architecture-core.md`.
 
+## Amendment — 2026-10-05 — Type-import form (recorded 2026-10-19)
+
+Decided by the CA on 2026-10-05; the code base conforms.
+
+- An import where every name is a type uses `import type`.
+- An import that mixes values and more than one type name is split into a value import and an
+  `import type` from the same module.
+- An import that mixes values and exactly one type name may keep it inline.
+
+**For the reconciliation:** CONVENTIONS §3 states the rule. A governance file: committed with the
+governance-gate bypass.
+
 _End of Backlog Brief_
