@@ -19,13 +19,15 @@ SessionStore - Session data
 ├ isDataReady      True when required post-auth data is loaded.
 └ user             Prepared application user, or null.
 
-SessionState - Session data and mutation methods
+SessionStateContract - Contract for the SessionState singleton
 ├ store            Reactive session state snapshot.
 ├ setAuth(userId)  Mark session active and clear loading.
 ├ setReady(user)   Hold the prepared user and mark data ready.
 ├ isPrepared()     Authenticated content may render.
 ├ isSignedOut()    Resolution finished without a session.
 └ clear()          Reset session state to signed-out defaults.
+
+SessionState - Provider for SessionStateContract
 */
 
 import type { Id } from '@core/std'
