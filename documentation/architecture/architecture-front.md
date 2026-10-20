@@ -293,23 +293,8 @@ The form layer owns a domain-shaped draft and the projections for create and upd
 code does not restate the fields or persistence rules. The layer chain is defined in
 `architecture-core.md` §5.2.1, and the scope rules in `CONVENTIONS.md` §10.4.
 
-`@core/stdx` (`core/std/make-scope.ts`) exports `makeScope`, `makeAdaptedScope`, `Scope`,
-`AdaptedScope`, `ScopeDraft`, and `DraftOf`.
-`front/api/scopes.ts` hosts the `scopes` housing object parallel to `api.ts`.
-Both makers infer from adapter field metadata without type arguments.
-`ScopeDraft<T, K>` selects the scope's domain attributes, preserving domain optionality.
-`DraftOf<typeof scope>` derives that draft without restating its fields. The declaration exposes
-`toCreate(draft)` and `toUpdate(id, draft)`; an Adapted declaration also exposes `adapter`.
-
-Defaults supply the required out-of-scope create attributes. The generic constraint rejects
-scoped, lifecycle, and unknown default keys, including keys supplied through typed variables.
-`toCreate` constructs its payload from declared defaults and selected draft fields; it never
-spreads the draft. `toUpdate` selects the same fields and converts absent or `undefined` values
-to `null`. Required properties may admit `undefined`, as optional associations do; required
-values that do not admit absence remain unchanged. Both projections exclude unowned draft
-attributes supplied through structurally compatible variables. Compositions pass through whole.
-For an Adapted declaration, the scoped adapter translates the projected update; a Direct client
-receives the projection untranslated.
+`front/api/scopes.ts` hosts the `scopes` housing object parallel to `api.ts`; the projection
+semantics are stated in the `@core/std/make-scope.ts` header.
 
 Declared list queries are hosted in `front/api/queries.ts`, beside the scopes. Application callers
 build a readonly query and pass it as `api.Users.list({ query, limit, cursor })`. `Users.byRole`
@@ -640,7 +625,6 @@ IndexedDB usage is split into two layers:
 
 - Database namespace (physical DB name), `Config.get('LOCAL_DB_NAME')`, per deployment package.
 - Object Store names are not shared implicitly; they must be registered with `@core/db/indexeddb.ts` using `IndexedDb.registerStore('storeName')`
-  - Object Store's for domain abstractions are named for the abstraction, for example, `Job` or `Workflow`.
 - A CRUD/List maker is provided to standardize usage of the local database with `@core/cli/make-indexeddb-client.ts` conforming to `ApiCrudContract` in `@core/stdx`
 
 **IndexedDB Database Names**
