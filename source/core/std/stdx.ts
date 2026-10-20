@@ -1,7 +1,9 @@
-/**
- * Extended core standard barrel for API/auth contracts, adapters, scopes, queries,
- * and HTTP-handler primitives.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Core standard extended barrel                                                ║
+║ API and auth contracts, adapters, scopes, queries, and HTTP handlers.        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 export * from './api-contracts.ts'
 export * from './auth-contract.ts'

@@ -1,6 +1,9 @@
-/**
- * Barrel for common control primitives.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Ui controls barrel                                                           ║
+║ Common control primitives.                                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 export * from './ui-accordion.tsx'
 export * from './ui-action-button.tsx'
