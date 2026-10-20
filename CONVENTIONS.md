@@ -779,6 +779,9 @@ operation, then wrap it once.
 - `wrapBusRuleHttpHandler` (`@core/svc/wrap-busrule-http-handler.ts`) wraps a business-rule
   operation, the server side of a business-rule client. Throw `HttpServiceError` for an expected
   failure with its status.
+- Choose `wrapBusRuleHttpHandler` when a function exposes one operation, accepts one request
+  body, and returns the standard `{ data }` envelope. Choose `wrapHttpHandler` when it needs method
+  routing, its own status codes, query parameters, or its own response shape.
 - `makeSupabaseEdgeAuth` (`@core/svc/make-supabase-edge-auth.ts`) verifies the caller and
   provides its clients. It is the platform handshake only: authorization stays with the caller.
 - `wrapSupabaseShim` (`@core/svc/wrap-supabase-shim.ts`) is the `Deno.serve` entry, adding a
@@ -957,6 +960,9 @@ SQL DDL ownership is split by artifact type:
 - Keep canonical schema and migrations aligned; either artifact may be used to reconstruct expected runtime state.
 - Canonical schema is idempotent and reproducible.
 - Migrations are append-only and never rewritten after application in shared environments.
+- One migration per conceptual change, named `YYYYMMDDHHMMSS_description.sql`.
+- A migration expresses deltas only (`ALTER TABLE`, `CREATE INDEX`, policy changes); full table
+  definitions belong in the canonical schema.
 - A migration changes only what is required for that versioned step.
 - Destructive changes must be explicit and reviewed (drop/rename/type narrowing/data rewrite).
 - Data backfills in migrations must be deterministic and safe to rerun when possible.
