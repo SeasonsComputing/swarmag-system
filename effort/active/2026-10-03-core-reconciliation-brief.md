@@ -25,18 +25,18 @@ the other. Neither restates the other's half.
 
 ## What a first survey found (2026-10-03)
 
-| `core/` namespace | Contents                                                                      | CONVENTIONS coverage                                                     |
-| ----------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| `cfg/`            | `Config`, runtime providers                                                   | §8.5, thorough                                                           |
-| `std/`            | Primitives, relations, compositions                                           | §8.1 type table                                                          |
-| `std/`            | `makeAdapter`                                                                 | §8.6                                                                     |
-| `std/`            | Protocols: `CreateFromInstantiable`, `UpdateFromInstantiable`, `ScopedUpdate` | None                                                                     |
-| `std/`            | Validators: `expect*`, `ExpectResult`, `notValid`                             | Only inside the §8.4 example                                             |
-| `std/`            | Helpers such as `demandOne`                                                   | None                                                                     |
-| `api/`            | Contract decomposition, `ApiError`, `checkApiError`, pagination helpers       | None. §9 says to throw `Error`; the API layer's convention is `ApiError` |
-| `cli/`            | Client makers                                                                 | §8.7: one generic paragraph                                              |
-| `svc/`            | Service wrappers: `wrapBusRuleHttpHandler`, shims                             | None                                                                     |
-| `db/`             | Supabase and IndexedDB singletons                                             | None; `architecture-core.md` covers "apps never import these"            |
+| `core/` namespace | Contents                                                                      | CONVENTIONS coverage                                                      |
+| ----------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| `cfg/`            | `Config`, runtime providers                                                   | §9.4, thorough                                                            |
+| `std/`            | Primitives, relations, compositions                                           | §8.1 type table                                                           |
+| `std/`            | `makeAdapter`                                                                 | §9.5                                                                      |
+| `std/`            | Protocols: `CreateFromInstantiable`, `UpdateFromInstantiable`, `ScopedUpdate` | None                                                                      |
+| `std/`            | Validators: `expect*`, `ExpectResult`, `notValid`                             | Only inside the §9.3 example                                              |
+| `std/`            | Helpers such as `demandOne`                                                   | None                                                                      |
+| `api/`            | Contract decomposition, `ApiError`, `checkApiError`, pagination helpers       | None. §10 says to throw `Error`; the API layer's convention is `ApiError` |
+| `cli/`            | Client makers                                                                 | §9.6: one generic paragraph                                               |
+| `svc/`            | Service wrappers: `wrapBusRuleHttpHandler`, shims                             | None                                                                      |
+| `db/`             | Supabase and IndexedDB singletons                                             | None; `architecture-core.md` covers "apps never import these"             |
 
 The survey checked CONVENTIONS only. `architecture-core.md` §5 covers part of the missing
 material (contracts, `ApiError`, makers), so the reconciliation must establish what each document
@@ -63,7 +63,7 @@ holds, not assume that a missing CONVENTIONS entry means a missing rule.
 - For each `core/` namespace, which concerns are meaning (`architecture-core.md`), which are
   construction rules (CONVENTIONS), and which are reference that belongs to neither.
 - Whether material moves out of `architecture-core.md` §5 into CONVENTIONS, or the other way.
-- How to resolve the §9 conflict between "throw `Error`" and `ApiError`.
+- How to resolve the §10 conflict between "throw `Error`" and `ApiError`.
 - Which new conventions are guard-enforceable, as candidates for the backlog entry "No guard
   enforces conformity to established conventions".
 
@@ -103,7 +103,7 @@ Two inputs for the inventory:
 
 - **A new `core/` export.** `core/std/make-scope.ts` (`makeScope`, `makeAdaptedScope`, `Scope`,
   `AdaptedScope`, `ScopeDraft`, `DraftOf`) is exported through `@core/stdx` (`e4a4cf1`). Whether
-  CONVENTIONS names `makeScope` beside `makeAdapter` (§8.6) was deferred to this brief.
+  CONVENTIONS names `makeScope` beside `makeAdapter` (§9.5) was deferred to this brief.
 - **An unwritten import rule, now uniform in the code.** No module imports its own namespace
   through a barrel or an alias: a `core/std` file imports siblings directly, never `@core/std` or
   `@core/stdx`, and a `core/{namespace}` file imports siblings relatively (`./…`). The CA
@@ -122,7 +122,7 @@ out-of-scope line above for this one rule.
   constants: "const-as-class" (PascalCase, example `HttpCodes`) and "Global immutable constants"
   (SCREAMING_SNAKE, examples `LOG_LEVELS`, `HTTP_METHODS`). It does not state what separates them.
   The CA ruled 2026-10-08: SCREAMING_SNAKE is for scalar values and collections of values,
-  including const-enum tuples (§8.2, `CUSTOMER_STATUSES`); every object constant is PascalCase,
+  including const-enum tuples (§9.1, `CUSTOMER_STATUSES`); every object constant is PascalCase,
   whether pure data (`HttpCodes`) or behavior (`Routes`, `AppState`), exported or module-private.
   The const-enum idiom is the reason: a SCREAMING_SNAKE name reads as a tuple with a derived type.
 - **Applied in the code the same day.** The five module-private SCREAMING_SNAKE objects were
@@ -131,7 +131,7 @@ out-of-scope line above for this one rule.
   (`customer-manager.tsx`). No SCREAMING_SNAKE object constant remains.
 - **For the reconciliation:** state the distinction in §4.2 (a governance file: committed with the
   governance-gate bypass), and consider whether a guard can enforce it.
-- **Also for the reconciliation: CONVENTIONS §8.6.** Its `QuestionAdapter` example restates the
+- **Also for the reconciliation: CONVENTIONS §9.5.** Its `QuestionAdapter` example restates the
   lifecycle mappings. It should spread `InstantiableAdapt`, as `domain-archetypes.md` §6 now does
   (`effort/completed/2026-10-06-instantiable-adapt-brief.md`, shipped 2026-10-08); deferred here
   from that brief.
@@ -153,20 +153,20 @@ Added at the CA's direction during the 2026-10-11 list-query design
   for them, so a separate contract file would add a hop with no benefit.
 - **A branded type must share its producer's file.** `make-query.ts` keeps `Query<T>` beside
   `build`: the brand's `unique symbol` stays unexported, so only `build` can construct a value.
-- **For the reconciliation:** state the rule in CONVENTIONS §8.7 Makers, a governance file.
+- **For the reconciliation:** state the rule in CONVENTIONS §9.6 Makers, a governance file.
 
 ## Amendment — 2026-10-13 — Soft-delete read rule
 
 Added at the CA's direction during the AI Coding Engine review of
 `effort/completed/2026-10-13-soft-deleted-references-brief.md`.
 
-- **CONVENTIONS §10.10 conflicts with that brief's decision 2.** Its third bullet reads "RLS
+- **CONVENTIONS §11.10 conflicts with that brief's decision 2.** Its third bullet reads "RLS
   `SELECT` policies must filter soft-deleted rows". Under the brief, a reference resolves its
   soft-deleted target: deleted rows stay readable by id, RLS governs who may read, and lists
   exclude deleted rows as an API contract (its amendment 4).
 - **A targeted gate override** for that bullet, at the CA's discretion, lets the brief's
   production proceed before this reconciliation (its amendment 1).
-- **For the reconciliation:** §10.10 states that RLS `SELECT` policies do not filter soft-deleted
+- **For the reconciliation:** §11.10 states that RLS `SELECT` policies do not filter soft-deleted
   rows and that lists do; "Active rows are `deleted_at IS NULL`" stands. A governance file:
   committed with the governance-gate bypass.
 
@@ -183,9 +183,9 @@ forbids them.
   `makeDashboardShell`, generic then swarmAg-bound). Service wrappers (`wrap*`) mirror makers at
   the inbound boundary.
 - **Where they are defined.** `architecture-core.md` §5.3 covers only client makers, as "factory
-  functions that produce clients conforming to contracts". CONVENTIONS §8.7 is three sentences;
+  functions that produce clients conforming to contracts". CONVENTIONS §9.6 is three sentences;
   one reads "They do not create instances of an object they create code."
-- **The apparent conflict.** CONVENTIONS §7.6 bans "meta-programming"; §8.7 says makers "create
+- **The apparent conflict.** CONVENTIONS §7.6 bans "meta-programming"; §9.6 says makers "create
   code". `source/` uses no `Proxy`, `Reflect`, `eval`, or `new Function`.
 - **For the reconciliation:**
   - `architecture-core.md` gives makers their own section as a fundamental mechanism: a maker
@@ -196,7 +196,7 @@ forbids them.
     and obvious**, and without exceptions or carve-outs. Makers conform because they are explicit
     and obvious: the specification is visible at the call site, and the contract is stated in an
     interface.
-  - CONVENTIONS §8.7 is rewritten clearly, and carries the 2026-10-11 contract-file rule (above).
+  - CONVENTIONS §9.6 is rewritten clearly, and carries the 2026-10-11 contract-file rule (above).
   - README §2.4.1 names makers.
   - Both CONVENTIONS edits are to a governance file: committed with the governance-gate bypass.
 
@@ -217,7 +217,7 @@ placed in `ux/shell/runtime/session-contracts.ts` beside `SessionCoordinatorCont
   provider. Such contracts share a file named by their subject, here the session; a contract the
   toolkit implements itself stays with its implementation (`SessionStateContract` in
   `session-state.ts`).
-- **For the reconciliation:** CONVENTIONS §8.7 states both cases beside the 2026-10-11 rule. A
+- **For the reconciliation:** CONVENTIONS §9.6 states both cases beside the 2026-10-11 rule. A
   governance file: committed with the governance-gate bypass.
 
 ## Amendment — 2026-10-19 — Backlog entry text folded in
