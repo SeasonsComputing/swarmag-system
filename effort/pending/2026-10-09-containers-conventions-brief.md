@@ -1,7 +1,7 @@
 # Containers in CONVENTIONS — Brief
 
 **Backlog, not dispatched.** Recorded 2026-10-09 from a CA + AI Architect session, while settling
-file-header conventions (`effort/pending/2026-10-09-file-header-conformance-brief.md`).
+file-header conventions (`effort/active/2026-10-09-file-header-conformance-brief.md`).
 
 ## What triggered it
 
@@ -41,7 +41,7 @@ elsewhere, but no section states when to use each, or when a free function is th
    namespace is written up as an exception. `core/` is frozen apart from mechanical header cleanup
    and is code newcomers read; its `core/std` modules (`validators.ts`, `relations.ts`) are
    cohesive families of functions, and their headers name those families
-   (`effort/pending/2026-10-09-file-header-conformance-brief.md`, Decision 7).
+   (`effort/active/2026-10-09-file-header-conformance-brief.md`, Decision 7).
 
 ## Open
 
