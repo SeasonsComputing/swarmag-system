@@ -18,6 +18,26 @@ AdaptedScope<T, K>  Scope projections with a scoped adapter.
 DraftOf<S>          Draft inferred from a scope declaration.
 makeScope           Declare fields and disjoint create defaults.
 makeAdaptedScope    Declare a scope with scoped adapter translation.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+Inference  Both makers infer from adapter field metadata without type
+           arguments. ScopeDraft<T, K> selects the scope's domain attributes,
+           preserving domain optionality; DraftOf<typeof scope> derives the
+           draft without restating its fields.
+Defaults   Defaults supply the required out-of-scope create attributes. The
+           generic constraint rejects scoped, lifecycle, and unknown default
+           keys, including keys supplied through typed variables.
+Create     toCreate builds its payload from declared defaults and selected
+           draft fields; it never spreads the draft.
+Update     toUpdate selects the same fields and converts absent or undefined
+           values to null. Required properties may admit undefined, as
+           optional associations do; required values that do not admit
+           absence remain unchanged.
+Both       Projections exclude unowned draft attributes supplied through
+           structurally compatible variables. Compositions pass through whole.
+           An adapted scope's adapter translates the projected update; a
+           direct client receives it untranslated.
 */
 
 import type { Dictionary } from './adt.ts'
