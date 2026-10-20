@@ -1,8 +1,15 @@
-/**
- * Edge build metadata. The committed value is a development placeholder;
- * `deno task edge-sync` stamps the deployed `_shared` copy with the real
- * build id (VERSION line, git build count, short SHA).
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Edge build metadata                                                          ║
+║ Build id for edge function responses.                                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+The committed value is a development placeholder; `deno task edge-sync` stamps
+the deployed `_shared` copy with the real build id (VERSION line, git build
+count, short SHA).
+*/
 
 /** Response header carrying the edge build id. */
 export const HEADER_BUILD = 'x-swarmag-build'

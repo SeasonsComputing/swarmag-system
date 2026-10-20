@@ -1,6 +1,9 @@
-/**
- * swarmAg Customer Application
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Customer application                                                         ║
+║ swarmAg customer application entrypoint.                                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 // initialize config 1st
 import '@front/config/ux-config.ts'

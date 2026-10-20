@@ -1,6 +1,9 @@
-/**
- * UX projection types for dashboard layout configuration and rendering.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Dashboard contract                                                           ║
+║ UX projection types for dashboard layout configuration and rendering.        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 import type { Dictionary } from '@core/std'
 

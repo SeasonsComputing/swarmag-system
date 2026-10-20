@@ -1,6 +1,9 @@
-/**
- * Declared list queries shared by swarmAg application consumers.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Declared queries                                                             ║
+║ List queries shared by application consumers.                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 import { makeQuery } from '@core/stdx'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'

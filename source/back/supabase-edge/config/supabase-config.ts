@@ -1,6 +1,9 @@
-/**
- * Supabase edge runtime configuration bootstrap
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Supabase edge configuration                                                  ║
+║ Edge runtime configuration bootstrap.                                        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 import { Config } from '@core/cfg/config.ts'
 import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'

@@ -1,6 +1,9 @@
-/**
- * swarmAg Operations Application
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Ops application                                                              ║
+║ swarmAg operations application entrypoint.                                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 // initialize config 1st
 import '@front/config/ux-config.ts'
