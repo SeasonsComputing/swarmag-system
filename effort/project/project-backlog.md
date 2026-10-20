@@ -109,6 +109,10 @@ Decided by the CA on 2026-10-08, to codify:
   not-taken item either becomes a backlog entry, joins a pending brief, or is explicitly dropped.
 - **Milestones.** Each numbered roadmap section is a milestone (§7).
 - **Reconciliation happens when a milestone closes.**
+- **Enablers (2026-10-19).** A milestone lists its enablers ahead of its features: work that
+  delivers no feature itself but makes the features buildable or copy-ready. Enablers are briefs
+  or backlog entries like any other work, and the milestone closes only when both lists are done.
+  First used in roadmap §5.
 
 To settle when this is picked up:
 
