@@ -129,14 +129,24 @@ them; each fix lands once instead of chasing every copy:
   one shared dirty check, and draft services that load no JSX.
 - **Fresh editor feedback** — `effort/active/2026-10-19-fresh-editor-feedback-brief.md`:
   `AbstractionManager`, which every new manager uses.
-- **File header conformance** — `effort/active/2026-10-09-file-header-conformance-brief.md`:
-  copied files carry their headers.
 - **Stage test authorization** — `effort/active/2026-10-13-stage-test-authorization-brief.md`: new
   managers arrive with integration tests that run.
 
-**Rides along:** `effort/active/2026-10-19-effort-milestones-brief.md` codifies milestones,
-reconciliation, deferrals, and enablers in `EFFORT.md`. It makes nothing here copy-ready; it lands in
-the same window so the method is written down as practiced.
+**Rides along:**
+
+- **File header conformance** — `effort/active/2026-10-09-file-header-conformance-brief.md`:
+  copied files carry their headers.
+- **CONVENTIONS reconciliation** — `effort/active/2026-10-03-core-reconciliation-brief.md` fills
+  CONVENTIONS out from `core/`.
+- **Containers in CONVENTIONS** — `effort/active/2026-10-09-containers-conventions-brief.md`:
+  types, interfaces, classes, and module singletons as containers.
+- **EFFORT milestones** — `effort/active/2026-10-19-effort-milestones-brief.md` codifies
+  milestones, reconciliation, deferrals, and enablers in `EFFORT.md`. It makes nothing here
+  copy-ready; it lands in the same window so the method is written down as practiced.
+
+File header conformance, the CONVENTIONS reconciliation, and Containers in CONVENTIONS ride along
+for the same reason: mechanical productions are built on conformant conventions, and together
+these settle CONVENTIONS and bring the code into conformance in the same window.
 
 **Features:**
 

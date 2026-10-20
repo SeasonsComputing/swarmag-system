@@ -1,6 +1,7 @@
 # `core/` Reconciliation — Backlog Brief
 
-**Backlog, not dispatched.** On 2026-10-03 the Chief Architect and AI Architect asked where a new
+**Active.** Chosen 2026-10-20 to ride along with roadmap §5 beside file header conformance:
+both write CONVENTIONS in the same window. Recorded 2026-10-03: on that day the Chief Architect and AI Architect asked where a new
 rule about update scopes should live. That question showed that `source/core/`,
 `documentation/architecture/architecture-core.md`, and `CONVENTIONS.md` have never been
 reconciled against each other. Backlog entry: "`core/`, `architecture-core.md`, and
@@ -231,7 +232,7 @@ brief. Its text, kept here so nothing is lost:
 > the 08-30 rule that every form must declare its update scope and the 10-03 rule that a
 > scope's unit is the attribute.
 >
-> Design record: `effort/pending/2026-10-03-core-reconciliation-brief.md`.
+> Design record: `effort/active/2026-10-03-core-reconciliation-brief.md`.
 >
 > Picking this up: together with, or sequenced against, the scan-cost entry above, since both
 > restructure `architecture-core.md`.
