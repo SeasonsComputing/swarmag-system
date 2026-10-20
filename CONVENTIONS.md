@@ -810,6 +810,7 @@ Local data lives in the browser's IndexedDB, reached through clients.
 - `IndexedDb` (`@core/db/indexeddb.ts`) owns the connection for the active local database and its
   registered stores. `makeCrudIndexedDbClient` registers its store; application code never
   touches `IndexedDb` directly.
+- An object store for a domain abstraction is named for the abstraction (`Job`, `Workflow`).
 - `Preferences` (`@core/cli/preferences.ts`) persists small key and value settings.
 - The local database name comes from configuration (`LOCAL_DB_NAME`, §11).
 
