@@ -96,12 +96,6 @@ example, and §10.1.6, divided down the middle.
 
 Design record: [EFFORT.md: Milestones, Reconciliation, Deferrals, Enablers — Brief](../active/2026-10-19-effort-milestones-brief.md).
 
-### CONVENTIONS does not describe containers
-
-**Observed:** 2026-10-09 · normal
-
-Design record: [Containers in CONVENTIONS — Brief](../active/2026-10-09-containers-conventions-brief.md).
-
 ## Controls
 
 ### Shared UI controls do not use one state model

@@ -138,8 +138,9 @@ them; each fix lands once instead of chasing every copy:
   `effort/completed/2026-10-09-file-header-conformance-brief.md`: copied files carry their headers.
 - **CONVENTIONS reconciliation** — `effort/active/2026-10-03-core-reconciliation-brief.md` fills
   CONVENTIONS out from `core/`.
-- **Containers in CONVENTIONS** — `effort/active/2026-10-09-containers-conventions-brief.md`:
-  types, interfaces, classes, and module singletons as containers.
+- **Containers in CONVENTIONS** — closed 2026-10-20,
+  `effort/completed/2026-10-09-containers-conventions-brief.md`: types, interfaces, classes, and
+  module singletons as containers.
 - **EFFORT milestones** — `effort/active/2026-10-19-effort-milestones-brief.md` codifies
   milestones, reconciliation, deferrals, and enablers in `EFFORT.md`. It makes nothing here
   copy-ready; it lands in the same window so the method is written down as practiced.
