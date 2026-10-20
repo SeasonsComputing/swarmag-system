@@ -246,7 +246,7 @@ target has key `swarmag-app-admin.stage.VITE_SUPABASE_PUBLIC_KEY`.
 
 The canonical secret scopes are the four deployable package App IDs from §3
 plus `swarmag-system` for repository-level platform operations such as database
-administration. Prefixless aliases such as `app-admin` are invalid.
+administration. No prefix aliases such as `app-admin` are invalid.
 
 ### 5.4 Schema
 
@@ -662,12 +662,8 @@ The correct placement of `guard:secrets` is:
 
 ### 11.3 Guard Output Contract
 
-All guards report results using the shared `guard-utils.ts` utility. The contract is:
-
-- **Pass:** `✓ {Name} guard passed` — written to stdout
-- **Fail:** `✗ {Name} guard failed:` followed by an indented violation list — written to stderr, then `Deno.exit(1)`
-
-Guards that enforce a specific rule may append a hint line after the violation list. Guards must use `guardPass` and `guardFail` from `@devops/guards/guard-utils.ts` — inline `console.log`/`console.error` at the result boundary is a violation of this contract.
+Guards report through `guardPass` and `guardFail` in `@devops/guards/guard-utils.ts`, as
+CONVENTIONS §17.1 states.
 
 ### 11.4 Non-Deployable Package Exemptions
 
@@ -864,7 +860,7 @@ Rationale — none of these are inherited defaults:
   delay and user context-switching while staying well inside Supabase's
   production-checklist guidance (≤ 1 hour). The platform default (3600)
   was rejected as an undecided inheritance.
-- **`max_frequency = "60s"`** — the per-address resend cooldown is the
+- **`max_frequency = "60s"`** — the per-address resend cool-down is the
   abuse control; the project-wide email rate ceiling (60/hour) is a
   blast-radius cap, not a substitute. The two are separate layers.
 
