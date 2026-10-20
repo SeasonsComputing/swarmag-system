@@ -7,13 +7,14 @@ that is explicitly **not** being worked on right now — deferred on purpose, no
 See `EFFORT.md` §3 for what distinguishes this from the backlog and the roadmap, and the
 rule against resolving an entry as a drive-by fix in an unrelated session.
 
-**Format per entry:** a `**Parked:**` line carrying the date and where it surfaced, then
+**Format per entry:** a heading carrying a permanent ID (`P-n`, never reused) and the open
+question, then a `**Parked:**` line carrying the date and where it surfaced, then
 `**What it is:**`, `**Why parked:**`, and `**Picking this up:**`. Entries are flat and
 chronological, appended as they are parked, and carry no priority — an undecided item has
 nothing to order. Cite a selector, symbol, or document section — never a line number,
 which rots silently.
 
-## Equipment/Asset naming convention review
+## P-1 · Should equipment identity be a structured call sign rather than a free-form name?
 
 **Parked:** ~2026-05-08 — during UX foundational work (session
 `2a7c772d-99ba-45e3-b6bb-c7909ba5a1f3`). _Stale: re-verify the current state of
@@ -36,7 +37,7 @@ shared mental state under operational load.
 model changes for CA review. Do not modify domain abstractions directly without an
 explicit go.
 
-## PII retention on soft-deleted users
+## P-2 · How, and when, is a soft-deleted user's personal data erased?
 
 **Parked:** 2026-07-14 — during Edge Functions Remediation verification
 (`effort/completed/2026-07-14-user-create-hang-handoff.md`).
@@ -61,7 +62,7 @@ operations in the UI/API, (2) what retention window (if any) applies before PII 
 scrubbed, (3) whether anonymization replaces PII fields in place or the row is fully
 removed once referential integrity no longer requires it.
 
-## Lead abstraction — inbound pipeline automation
+## P-3 · Should leads become a domain abstraction, so the inbound pipeline can be automated?
 
 **Parked:** 2026-07-19 — CA executive decision during Phase 3 design.
 
@@ -82,7 +83,7 @@ integration/automation, pipeline measurement (lead→prospect conversion, respon
 a Leads widget on the sales dashboard, and retiring the auth-identity-at-genesis wrinkle
 (leads carry no login).
 
-## Table header gradient seams at fractional column widths
+## P-4 · How should the table header be built so its gradient has no seams at fractional column widths?
 
 **Parked:** 2026-07-22 — CA, during the panel decomposition.
 
@@ -115,7 +116,7 @@ separate borders) may want a different structure rather than a fix. Do not "solv
 choosing `fr` values that happen to yield integer widths — that is luck, not a fix, and it
 silently breaks at the next container size.
 
-## HelmWidget header action scope
+## P-5 · Which commands belong in the header HelmWidget, and where does app-specific navigation go?
 
 **Parked:** 2026-07-22 — CA, during dashboard HelmWidget responsive work.
 
@@ -138,7 +139,7 @@ responsive presentation, and the app dashboard seed compositions together. Then 
 Admin-only header actions to that surface and add the corresponding Ops composition only
 when it has real app-specific destinations.
 
-## Duplicate customer detection
+## P-6 · Should onboarding warn before creating a likely duplicate customer?
 
 **Parked:** 2026-09-01 — Ted, during onboarding Sites-stage bug investigation.
 
@@ -164,7 +165,7 @@ building merge tooling later — reconciling two already-diverged records after 
 much harder problem than catching it once at the point of entry, and most systems at any
 scale never build real merge tooling once duplicates exist.
 
-## Region as a free-text field, not a picklist
+## P-7 · Is Region always a US state, or does it need to be country-aware?
 
 **Parked:** 2026-09-07 — Ted, during Group D's live onboarding E2E pass on stage.
 
@@ -190,7 +191,7 @@ follows directly once that's answered. Touches both `customers/customer-step-bil
 `CustomerInput` and `customers/customer-step-sites.tsx`'s `SiteTextInput` — same shape, two call
 sites, per the existing free-text-field pattern in each.
 
-## Equipment & Chemical Maintenance Workbench
+## P-8 · How should equipment and chemical maintenance be built, as its own project?
 
 **Parked:** 2026-09-15 — Ted, during roadmap review, distinguishing the stock Manager work
 in `project-roadmap.md` §5 from a bigger idea the theme's "Maintenance" name was standing in
@@ -229,7 +230,7 @@ stamp-out.
 milestones. It is a major feature, like the Lead abstraction, and is scoped in its own
 conversation. §5 builds only the stock Asset and Chemical Managers.
 
-## Request model — customer and staff requests that staff fulfill
+## P-9 · Should customer and staff requests become one abstraction that staff fulfill?
 
 **Parked:** 2026-10-08 — CA + AI Architect session designing the Customer Portal
 (`effort/pending/2026-10-08-customer-portal-brief.md`).
@@ -247,7 +248,7 @@ through. Its shape, kinds, statuses, and who fulfills what are all undecided.
 
 **Picking this up:** When the portal first needs to write. Decide the abstraction's shape and its
 first kinds, and whether portal-access requests come first, since they also serve staff (option (c)
-of the brief's Open 1). Consider its relation to the parked Lead abstraction above: a Lead is an
+of the brief's Open 1). Consider its relation to the Lead abstraction (P-3): a Lead is an
 inbound request from someone not yet a customer.
 
 _End of Feature Parking Lot Document_

@@ -5,6 +5,9 @@
 The intended execution sequence for decided work — see `EFFORT.md` §3 for what this document
 is and how it relates to the backlog and parking lot.
 
+Each milestone carries a permanent ID (`M-n`), never reused or renumbered; references written as
+`roadmap §n` mean `M-n`.
+
 **Format per entry:** what it comprises, why it sits where it does, and what backlog items
 block or ride with it. An entry marked **(open)** has no settled position yet — stated as open
 rather than guessed at.
@@ -12,7 +15,7 @@ rather than guessed at.
 A milestone lists its **Enablers** ahead of its **Features**; work landing in the same window
 without enabling it is listed as **Rides along**.
 
-## 0. Platform Foundation — Closed 2026-06-28
+## M-0 · Platform Foundation — Closed 2026-06-28
 
 Everything built before application features, from the first commit (2025-12-09) to the first
 feature design, `effort/completed/2026-06-28-user-contact-customer-design.md`:
@@ -37,7 +40,7 @@ feature design, `effort/completed/2026-06-28-user-contact-customer-design.md`:
 - **DevOps** — architecture guards, packaging, the stage environment, and deployment of the three
   app bundles.
 
-## 1. Users & Customers Reference Implementations — Closed 2026-10-11
+## M-1 · Users & Customers Reference Implementations — Closed 2026-10-11
 
 - **User Manager** (`project-user-stories.md` §6) → generalized `AbstractionManager`.
 - **Onboarding Wizard** (§1.1's "Prospect genesis") → generalized `Wizard`.
@@ -56,14 +59,14 @@ build them (`EFFORT.md` §7):
 4. Onboarding's Initial Job Assessment stage needs Services, Workflows, and seeding (§6); moved to
    §7 Job Definition.
 
-## 2. Shell/App Split — Closed 2026-09-21
+## M-2 · Shell/App Split — Closed 2026-09-21
 
 `ux/shell/` split into `ux/shell/` and `front/app/`; CA then promoted `ux/` itself to a
 top-level `source/ux/` namespace with its own `@ux/` import alias, sibling to `front/` rather
 than nested under it — the literal conclusion of treating `ux/` as a third-party library.
 `effort/completed/2026-09-15-shell-app-split-brief.md`.
 
-## 3. Customer Manager — Closed 2026-10-19
+## M-3 · Customer Manager — Closed 2026-10-19
 
 Post-genesis Customer editing through `AbstractionManager`, reusing Onboarding's Customer steps.
 Both workbenches now host a sequence of one or more steps over one shared `panel/` step contract.
@@ -86,7 +89,7 @@ the CA: `effort/completed/2026-10-08-account-manager-brief.md`.
 (`effort/active/2026-10-13-stage-test-authorization-brief.md`), so `users-api-test.ts` and
 `session-coordinator-test.ts` can run.
 
-## 4. Notes Editor — Closed 2026-10-18
+## M-4 · Notes Editor — Closed 2026-10-18
 
 Stock, parameterized Index-Detail archetype `NotesEditor`, lands in `front/app/shell/`. It is
 an application feature, not toolkit, so it belongs in `front/app/`, not `ux/`. It is built for
@@ -115,12 +118,12 @@ Sites step's local `NoteEditor` and User Manager's flattening text area are repl
 account notes are editable (the backlog entry "Customer Manager cannot edit account-level notes",
 now removed).
 
-## 5. Mechanical Productions
+## M-5 · Mechanical Productions
 
 Standard production from the Users/Customers reference implementations — no design conversation
 needed, pick up whenever convenient once §2 lands. Named "Asset Manager"/"Chemical Manager" here
 deliberately, not "Maintenance": that's `project-user-stories.md` §3/§4's own theme name, but it
-describes a larger destination (schedules, inventories, parts — parking lot: "Equipment & Chemical
+describes a larger destination (schedules, inventories, parts — parking lot: P-8 "Equipment & Chemical
 Maintenance Workbench") than the stock CRUD shipping first. A `project-user-stories.md` iteration
 rides with this milestone, once §1 is closed, to scope both themes properly before that fuller
 work is picked up.
@@ -145,6 +148,9 @@ them; each fix lands once instead of chasing every copy:
 - **Containers in CONVENTIONS** — closed 2026-10-20,
   `effort/completed/2026-10-09-containers-conventions-brief.md`: types, interfaces, classes, and
   module singletons as containers.
+- **Architecture documents cut to the system** — closed 2026-10-20,
+  `effort/completed/2026-10-20-architecture-system-cut-brief.md`: `architecture-back`, `-devops`,
+  and `-front` keep the system; portable material moves to CONVENTIONS.
 - **EFFORT milestones** — closed 2026-10-20,
   `effort/completed/2026-10-19-effort-milestones-brief.md`: codifies milestones, reconciliation,
   deferrals, and enablers in `EFFORT.md`. It makes nothing here copy-ready; it lands in the same
@@ -159,7 +165,7 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 - **Asset Manager** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`.
 - **Chemical Manager** (`project-user-stories.md` §4) — Manager, wire `api.Chemicals`.
 
-## 6. Workflow, Task, Question & Service
+## M-6 · Workflow, Task, Question & Service
 
 `project-user-stories.md` §5, currently unwritten, plus `Service` (domain type exists, `api.Services` commented out). Needs the Workflow Builder archetype — named in `architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme with no existing archetype to extend at all, and the most depended-upon: Job Definition's own §2.1 "workflow seeding" (preload a default workflow per Service/SKU) can't be built until this exists.
 
@@ -171,21 +177,21 @@ Assessment and planning edit job-specific Workflow clones with the Workflow buil
 (`architecture-front.md` §11.2.3), so this milestone is expected to produce the job assessment and
 job planning briefs that §7 builds.
 
-## 7. Job Definition
+## M-7 · Job Definition
 
 Admin-side (`project-user-stories.md` §2.1–2.6, 2.9): service selection through assessment,
-planning, finalization, and followup. Backlog: "Onboarding — Initial Job Assessment stage"
+planning, finalization, and followup. Backlog: B-25 "Onboarding has no Initial Job Assessment stage"
 (`normal`) covers §2.1 specifically, and completes the Onboarding Wizard (moved from §1). Needs
 `api.Jobs` wired (currently commented out in `api.ts` — not itself a backlog entry, a real gap)
 and depends on §6 above for Service/Workflow seeding.
 
-Rides with it: backlog "A Customer with Jobs can be deleted" (`normal`) — the first Job that
-references a Customer is where the delete guard lands. Also the **Hub widget** (backlog, `normal`),
+Rides with it: backlog B-27 "A Customer with Jobs can be deleted" (`normal`) — the first Job that
+references a Customer is where the delete guard lands. Also the **Hub widget** (B-30, `normal`),
 the primary approach for grouping dashboard commands by topic, with a hierarchical left-nav panel
 as the named fallback. Job's three independently-tabled phases are its motivating case, so it is
 built with the first milestone that presents a Job — this one — and reused by §8 and §9.
 
-## 8. Ops Application
+## M-8 · Ops Application
 
 The `app-ops` app, at minimum a hub widget for the Jobs that are its subject plus the Job Runner.
 It closes when a crew member can open an assigned Job and run it offline.
@@ -208,7 +214,7 @@ clients (`JobsLocal`/`JobAssessmentsLocal`/`JobPlansLocal`/`JobLogsLocal`), and
 `api.uploadJobLogs` — none built yet, but none requiring a design decision either. This is Job
 Runner's own prerequisite plumbing, not a separate milestone with its own feature payload.
 
-## 9. Customer Portal
+## M-9 · Customer Portal
 
 The `app-customer` app, at minimum a hub widget and a customer job report, plus portal users in
 Customer Manager, which carries §1's additional-contact assignment.
@@ -217,7 +223,7 @@ Design outline: `effort/pending/2026-10-08-customer-portal-brief.md`.
 Gate: RLS for every customer- and job-reaching table is locked down before the first `customer`
 User exists. Under today's `_all` policies such a User could read and write every table.
 
-## 10. Dashboard Widget Development
+## M-10 · Dashboard Widget Development
 
 The read-only dashboard widgets each app wants: a shared widget catalog plus per-app instances —
 specialization direction, building diverse content atop already-generalized primitives (contrast
@@ -232,19 +238,21 @@ with §2's generalization direction). Last, because it decorates apps that alrea
 
 Features not belonging to any theme are added to whatever session happens to touch its territory.
 
-- **DevOps hygiene** — "`source/devops/` is not held to CONVENTIONS" (`normal`) bundled with
-  "`edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already
+- **DevOps hygiene** — B-19 "`source/devops/` is not held to CONVENTIONS" (`normal`) bundled with
+  B-20 "`edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already
   has" (`high`) — same territory, same session.
-- **Doc hygiene** — "`architecture-core.md` is base context and has never been measured for scan
-  cost" (`high`), "`architecture-devops.md` buries what an agent scan needs" (`normal`).
-- **Guard gaps** — "`guard:css` does not verify that a referenced token resolves" (`normal`),
-  "`guard:leaf` does not sweep the repository root" (`normal`), "No guard enforces conformity to
-  established conventions" (`low`).
+- **Doc hygiene** — B-1 "`architecture-devops.md` buries what an agent scan needs" (`normal`),
+  B-2 "`domain-archetypes.md` and the domain genesis prompt restate CONVENTIONS" (`normal`),
+  B-3 "`architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`" (`low`).
+- **Guard gaps** — B-14 "`guard:css` does not verify that a referenced token resolves" (`normal`),
+  B-16 "`guard:leaf` does not sweep the repository root" (`normal`), B-17 "`guard:leaf` fails on
+  git-ignored files" (`low`), B-18 "`guard:css` misreads multiline selectors and misses selector-list
+  branches" (`normal`), B-15 "No guard enforces conformity to established conventions" (`low`).
 - **Shared UI controls do not use one state model** (`high`) — rides with no milestone for now.
   Real and fully scoped, but not assigned to any of the above; pick up on its own schedule.
 - **Collection-Detail surfaces do not draw the Selection** (`normal`) — small UX gap on every
   shipped and future `AbstractionManager` above its container threshold.
-- **Auth bundle** — "A stale session survives genesis..." and "Eject should ban, not delete..."
+- **Auth bundle** — B-7 "A stale session survives genesis..." and B-8 "Eject should ban, not delete..."
   (both `normal`, downgraded/bundled 2026-09-12 — see backlog for why), sharing one unresolved
   verification with the DevOps `edge-deploy` entry above.
 - **Login needs an "Already have a code?" action** (`normal`).
@@ -253,9 +261,11 @@ Features not belonging to any theme are added to whatever session happens to tou
   afterward. `CONVENTIONS.md` §16's convention only covers domain/adapter/API today; extending it
   to the UX layer is foundation work belonging with whichever milestone needs it first (most
   likely §2 or §3).
-- **Style guide into `ux/`** — "`app-style-guide` belongs in `ux/`, not `front/`" (`low`).
+- **Style guide into `ux/`** — B-31 "`app-style-guide` belongs in `ux/`, not `front/`" (`low`).
   Unblocked now that the Customer Manager production has landed.
-- **Managers load only the first page of their Collection** (`normal`) — one shared fix for User
-  Manager and Customer Manager, not one per manager.
+- **UX gaps** — B-6 "The overlay controls over-specify their triggers" (`normal`), B-10 "PanelHeaderTitle's
+  heading-depth mapping is already at its hardcoded ceiling" (`normal`).
+- **Data gaps** — B-23 "A unique-key conflict with a soft-deleted record reports a general failure"
+  (`normal`), B-24 "Timestamps read from Postgres are not in the form the app writes" (`normal`).
 
 _End of Roadmap Document_
