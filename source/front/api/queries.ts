@@ -3,6 +3,11 @@
 ║ Declared queries                                                             ║
 ║ List queries shared by application consumers.                                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+queries          Typed list query declarations.
+└ Users.byRole   Users by role and status; searchable by name, email, phone.
 */
 
 import { makeQuery } from '@core/stdx'

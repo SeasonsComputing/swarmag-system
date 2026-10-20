@@ -1,14 +1,13 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Edge build metadata                                                          ║
-║ Build id for edge function responses.                                        ║
+║ Build id for edge function responses, stamped by edge-sync.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-PURPOSE
+PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-The committed value is a development placeholder; `deno task edge-sync` stamps
-the deployed `_shared` copy with the real build id (VERSION line, git build
-count, short SHA).
+HEADER_BUILD  Response header carrying the build id.
+BUILD_META    Build id; 'dev' in the repository.
 */
 
 /** Response header carrying the edge build id. */
