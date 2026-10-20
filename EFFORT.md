@@ -11,7 +11,7 @@
 
 ## 1. Purpose & Scope
 
-This document governs the lifecycle of effort itself: how an idea becomes tracked work, how tracked work is sequenced, and how it closes as deployed code.
+The effort methodology at Seasons Computing: how an idea becomes tracked work, how tracked work is sequenced, and how it closes as deployed code.
 
 It governs the _shape of work_ — how a real incident, a design need, or a decision becomes a durable record, moves through review, and closes — independent of who performs it or what mode authorizes it.
 
