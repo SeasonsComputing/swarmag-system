@@ -195,7 +195,7 @@ for `source/devops/` and `source/tests/` is back here.]_
 
 ## Amendment — 2026-10-19 — Backlog entry text folded in
 
-The backlog entry "`source/devops/` is not held to CONVENTIONS" carried its own description, now replaced there by a link to this
+The backlog entry B-19 "`source/devops/` is not held to CONVENTIONS" carried its own description, now replaced there by a link to this
 brief. Its text, kept here so nothing is lost:
 
 > CONVENTIONS §1 claims to be authoritative "throughout the codebase," but nothing checks

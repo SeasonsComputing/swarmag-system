@@ -191,7 +191,7 @@ fails; commas inside `:is()` and `:not()` and a three-line rooted selector pass.
 
 ## Amendment — 2026-10-19 — Backlog entry text folded in
 
-The backlog entry "`guard:css` misreads multiline selectors and misses selector-list branches" carried its own description, now replaced there by a link to this
+The backlog entry B-18 "`guard:css` misreads multiline selectors and misses selector-list branches" carried its own description, now replaced there by a link to this
 brief. Its text, kept here so nothing is lost:
 
 > `guard-css.ts`'s `extractSelector` reads only physical lines containing `{`. When dprint wraps a

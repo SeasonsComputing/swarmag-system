@@ -123,10 +123,9 @@ now removed).
 Standard production from the Users/Customers reference implementations — no design conversation
 needed, pick up whenever convenient once §2 lands. Named "Asset Manager"/"Chemical Manager" here
 deliberately, not "Maintenance": that's `project-user-stories.md` §3/§4's own theme name, but it
-describes a larger destination (schedules, inventories, parts — parking lot: P-8 "Equipment & Chemical
-Maintenance Workbench") than the stock CRUD shipping first. A `project-user-stories.md` iteration
-rides with this milestone, once §1 is closed, to scope both themes properly before that fuller
-work is picked up.
+describes a larger destination (schedules, inventories, parts — parking lot: P-8) than the stock
+CRUD shipping first. A `project-user-stories.md` iteration rides with this milestone, once §1 is
+closed, to scope both themes properly before that fuller work is picked up.
 
 **Enablers** — make the reference implementations copy-ready before this milestone replicates
 them; each fix lands once instead of chasing every copy:
