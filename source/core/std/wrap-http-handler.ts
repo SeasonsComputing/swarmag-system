@@ -27,6 +27,14 @@ HttpResponse<Body, Headers>
 HttpHandler<RequestBody, Query, ResponseBody>
   → Type alias for handler functions: async (request: Request): Promise<Response>
 
+HTTP HEADER NAMES
+───────────────────────────────────────────────────────────────────────────────
+HEADER_CONTENT_TYPE, HEADER_AUTHORIZATION, HEADER_VARY
+  → Request and response header names, lowercase
+HEADER_ALLOW_ORIGIN, HEADER_ALLOW_METHODS, HEADER_ALLOW_HEADERS,
+HEADER_ALLOW_CREDENTIALS
+  → CORS response header names
+
 RESPONSE BUILDER HELPERS
 ───────────────────────────────────────────────────────────────────────────────
 Success builders:
