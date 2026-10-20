@@ -261,42 +261,19 @@ each time depth grows.
 
 **Observed:** 2026-10-08 · low
 
-"Has the draft changed?" is answered by a `JSON.stringify` comparison in four places:
-`abstraction-manager.tsx`, `customer-steps.tsx`, the Sites step's `draftFingerprint`, and
-`notes-editor.tsx`. It is the natural second service of `ux/shell/workbench/workbench-draft.ts`,
-which was created as a dedicated file on the expectation that it would grow
-(`effort/completed/2026-10-08-notes-editor-brief.md`, amendment "Draft module"). Consolidate it
-there, and decide whether a key-order-insensitive comparison is wanted.
+Design record: [Workbench Draft Services — Brief](../active/2026-10-19-workbench-draft-services-brief.md).
 
 ### `workbench-context.tsx` mixes draft services with a component
 
 **Observed:** 2026-10-08 · low
 
-`workbench-context.tsx`'s header describes "Local draft checks and shared step services", but the
-file also holds `WorkbenchDiscard`, a JSX dialog. Any pure module that imports it loads JSX, which
-is what broke the state tests during the Notes Editor production. Moving `WorkbenchDiscard` to its
-own file and renaming the context module to `.ts` (seven importers) was weighed and not taken then
-because the problem did not require it (same brief, amendment "Draft module").
+Design record: [Workbench Draft Services — Brief](../active/2026-10-19-workbench-draft-services-brief.md).
 
 ### A fresh New editor shows stale feedback and a premature field error
 
 **Observed:** 2026-10-18 · normal
 
-Found by the CA during stage acceptance of the soft-deleted references production, in User
-Manager; neither is caused by it. Both come from `AbstractionManager`'s reopen-after-success path
-(`source/ux/shell/workbench/abstraction-manager.tsx`):
-
-- **Stale feedback.** After a create, `openFreshNew(false)` reopens a blank New editor and keeps
-  the "Created …" banner. Deleting a list item then runs `runAction`, which resets the editor only
-  when the deleted item is the one open (`selected()?.id === item.id`). The open editor is a new
-  draft, so "Created Frances V. Kremer." stayed on screen after that User was deleted.
-- **A premature field error.** The fresh editor focuses its first field; only that field (Name) is
-  then drawn as an error, with the other empty required fields unmarked. That is the per-field
-  blur path (`blurField` in `use-abstraction-form-validation.ts`), not `validateForm`: something
-  takes focus from Name right after it is focused. The likely cause, not yet confirmed in the
-  browser, is the success banner mounting after `openFreshNew` in `saveEditor`'s create branch.
-
-`ux/shell` is under strict scrutiny; the fix belongs in the workbench, not in an application.
+Design record: [Fresh Editor Feedback — Brief](../active/2026-10-19-fresh-editor-feedback-brief.md).
 
 ## Guards
 

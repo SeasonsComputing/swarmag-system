@@ -125,11 +125,10 @@ work is picked up.
 **Enablers** — make the reference implementations copy-ready before this milestone replicates
 them; each fix lands once instead of chasing every copy:
 
-- **Workbench draft services** — backlog "Draft fingerprints are written four times" and
-  "`workbench-context.tsx` mixes draft services with a component": one shared dirty check, and
-  draft services that load no JSX.
-- **Fresh New editor feedback** — backlog "A fresh New editor shows stale feedback and a
-  premature field error": `AbstractionManager`, which every new manager uses.
+- **Workbench draft services** — `effort/active/2026-10-19-workbench-draft-services-brief.md`:
+  one shared dirty check, and draft services that load no JSX.
+- **Fresh editor feedback** — `effort/active/2026-10-19-fresh-editor-feedback-brief.md`:
+  `AbstractionManager`, which every new manager uses.
 - **File header conformance** — `effort/active/2026-10-09-file-header-conformance-brief.md`:
   copied files carry their headers.
 - **Stage test authorization** — `effort/active/2026-10-13-stage-test-authorization-brief.md`: new
