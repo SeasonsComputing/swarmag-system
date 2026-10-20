@@ -10,16 +10,22 @@ Defines create and update protocol payload shapes for workflow abstractions.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-TaskCreate          Create payload for Task.
-TaskUpdate          Update payload for Task.
-QuestionCreate      Union create payload for Question variants.
-QuestionUpdate      Union update payload for Question variants.
-TaskQuestionCreate  Create payload for TaskQuestion junction.
-TaskQuestionUpdate  Update payload for TaskQuestion junction.
-WorkflowCreate      Create payload for Workflow.
-WorkflowUpdate      Update payload for Workflow.
-WorkflowTaskCreate  Create payload for WorkflowTask junction.
-WorkflowTaskUpdate  Update payload for WorkflowTask junction.
+TaskCreate                Create payload for Task.
+TaskUpdate                Update payload for Task.
+QuestionCreate            Union create payload for Question variants.
+├ InternalQuestionCreate  Create payload for internal questions.
+├ ScalarQuestionCreate    Create payload for scalar questions.
+└ SelectQuestionCreate    Create payload for select questions.
+QuestionUpdate            Union update payload for Question variants.
+├ InternalQuestionUpdate  Update payload for internal questions.
+├ ScalarQuestionUpdate    Update payload for scalar questions.
+└ SelectQuestionUpdate    Update payload for select questions.
+TaskQuestionCreate        Create payload for TaskQuestion junction.
+TaskQuestionUpdate        Update payload for TaskQuestion junction.
+WorkflowCreate            Create payload for Workflow.
+WorkflowUpdate            Update payload for Workflow.
+WorkflowTaskCreate        Create payload for WorkflowTask junction.
+WorkflowTaskUpdate        Update payload for WorkflowTask junction.
 */
 
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
