@@ -1,19 +1,19 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ App state store                                                              ║
-║ Per-app IndexedDB preference store factory.                                  ║
+║ Per-app reactive preferences, persisted to IndexedDB.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Creates a per-app preference store bound to a named IndexedDB store. Each app
-constructs one instance using its canonical store name. IDB operations are
-stubbed pending makeCrudIndexedDbClient implementation.
+Holds the application's preferences in a reactive store and persists each change
+through `Preferences`.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AppStateStore - Application state store structure (StringDictionary)
-AppState      - Singleton API for reading and writing persisted app state values.
+AppStateStore    - Application preferences (StringDictionary)
+AppStateContract - App state singleton contract
+AppState         - Singleton API for reading and writing persisted app state values.
 ├ store            Reactive app-state preference snapshot.
 ├ init()           Load all preferences from persistent storage.
 ├ set(key, value)  Persist a preference and refresh reactive cache.

@@ -11,10 +11,9 @@ terminal field, adapting to that field's own measured width rather than the
 viewport. Each action carries its accessible label, icon, and optional
 labelMode (omitted defaults to visible; visible-no-icon draws only the label).
 Reserved commands use an adorned symbol such as `@theme`, ordinary commands
-are route paths. Below the
-dashboard's stacked-header threshold the field spans its own row and actions
-distribute across it; control size scales with density and the shared
-base-scale step.
+are route paths. Below the dashboard's stacked-header threshold the field
+spans its own row and actions distribute across it; control size scales with
+density and the shared base-scale step.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
