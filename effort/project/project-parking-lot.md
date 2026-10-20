@@ -276,3 +276,20 @@ of the brief's Open 1). Consider its relation to the parked Lead abstraction abo
 inbound request from someone not yet a customer.
 
 _End of Feature Parking Lot Document_
+
+## Prune the remaining architecture and UX documents to the system
+
+**Parked:** 2026-10-20 — at the close of `effort/completed/2026-10-03-core-reconciliation-brief.md`.
+
+**What it is:** The reconciliation cut `architecture-core.md` to the system and moved its portable
+`core/` construction material into CONVENTIONS. The same test may apply to
+`architecture-front.md`, `architecture-back.md`, `architecture-devops.md`, and parts of the UX
+documents: portable construction material to CONVENTIONS, system material stays. Design meaning
+in the UX design-language and archetype documents ranks above CONVENTIONS and stays there. The
+backlog entry on `architecture-front.md` mixing the `ux/` toolkit with `front/` is one instance.
+
+**Why parked:** The CA expects it but has not decided it; the pattern was proven on one document
+first.
+
+**Picking this up:** classify each document by rank before cutting, as the reconciliation did for
+`architecture-core.md` §5, §6, and §10.1.11.

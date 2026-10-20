@@ -229,4 +229,11 @@ At the CA's direction, header and comment conformance for `source/devops/` and `
 deferred from `effort/completed/2026-10-09-file-header-conformance-brief.md` and returns here. The
 rules are CONVENTIONS §5.1 and §6; that brief's repair and header guard cover product code only.
 
+## Amendment — 2026-10-20 — A DevOps and guards chapter in CONVENTIONS
+
+Deferred here from `effort/completed/2026-10-03-core-reconciliation-brief.md`. CONVENTIONS is
+now the portable programming guide, and guards and devops tooling travel to every Seasons
+project. Whether CONVENTIONS gains a chapter on devops and guards, revisiting the 2026-09-24
+placement in `architecture-devops.md`, is decided with this brief.
+
 _End of Backlog Brief_

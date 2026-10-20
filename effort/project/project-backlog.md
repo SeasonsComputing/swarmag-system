@@ -44,17 +44,16 @@ shouldn't have. Also noted in
 `effort/pending/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
 already touches this file.
 
-### `architecture-core.md` is base context and has never been measured for scan cost
+### `domain-archetypes.md` and the domain genesis prompt restate CONVENTIONS
 
-**Observed:** 2026-08-16 · high
+**Observed:** 2026-10-20 · normal
 
-Design record: [`core/` Reconciliation — Brief](../active/2026-10-03-core-reconciliation-brief.md).
-
-### `core/`, `architecture-core.md`, and `CONVENTIONS.md` have never been reconciled
-
-**Observed:** 2026-10-03 · normal
-
-Design record: [`core/` Reconciliation — Backlog Brief](../active/2026-10-03-core-reconciliation-brief.md).
+CONVENTIONS 1.1 §9 Domain Shapes and §10 Makers and Contracts state how abstractions, protocols,
+validators, and adapters are expressed with `core/`. `domain-archetypes.md` and
+`effort/genesis/genesis-domain-sdk.md` restate parts of it; they can point to CONVENTIONS and keep
+only what is specific to the domain. `domain-archetypes.md` still cites "`CONVENTIONS.md`
+Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close of
+`effort/completed/2026-10-03-core-reconciliation-brief.md`.
 
 ### `architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`
 
