@@ -3,6 +3,13 @@
 ║ Panel form                                                                   ║
 ║ Card-backed form panel with header-local feedback.                           ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+PanelForm        Card-backed form panel.
+PanelFormProps   Form panel container properties.
+├ feedback       Header-local alert, if any.
+└ header         Header content.
 */
 
 import { UiAlert, UiCard } from '@ux/ui'

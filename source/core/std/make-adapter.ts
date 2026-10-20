@@ -49,6 +49,7 @@ export interface ScopedUpdateAdapter<T, K extends keyof T> {
   fromDomain(patch: Pick<AdapterPatch<T>, K>): Dictionary
 }
 
+/** Serialization adapter for a domain abstraction, with a field adapter per attribute. */
 export type Adapter<T> = {
   toDomain(source: Dictionary): T
   fromDomain(patch: AdapterPatch<T>): Dictionary

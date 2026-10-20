@@ -3,6 +3,10 @@
 ║ Panel list                                                                   ║
 ║ Card-backed list panel with optional toolbar content.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+PanelList  Card-backed list panel.
 */
 
 import { UiCard } from '@ux/ui'
