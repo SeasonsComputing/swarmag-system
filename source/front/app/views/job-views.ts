@@ -7,6 +7,18 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Display projections only, not domain types. No infrastructure imports.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+JobManifest   Device-local job manifest entry.
+├ id          Job id.
+├ status      Job status.
+└ title       Display title.
+JobHub        Job display composite across lifecycle phases.
+├ manifest    Manifest entry.
+├ job         The job.
+├ assessment  Assessment, once assessed.
+└ plan        Plan, once planned.
 */
 
 import type { Id } from '@core/std'
