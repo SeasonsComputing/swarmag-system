@@ -1,8 +1,9 @@
 # File Header Conformance — Brief
 
-**Active.** Chosen 2026-10-19 for roadmap §5 Mechanical Productions; rides along since 2026-10-20:
-copied files carry their headers, so the reference implementations conform before they are
-replicated. Worked by the CA and AI Architect directly from 2026-10-20, without an AI Coding
+**Closed 2026-10-20.** Product-code headers conform to CONVENTIONS 1.1 §5.1 and §6; `devops/`
+and `tests/` are carried by the devops brief (Scope). Chosen 2026-10-19 for roadmap §5 Mechanical
+Productions; rode along from 2026-10-20: copied files carry their headers, so the reference
+implementations conform before they are replicated. Worked by the CA and AI Architect directly from 2026-10-20, without an AI Coding
 Engine review cycle. Recorded 2026-10-09 from an AI Coding Engine audit, converted to a brief by
 the AI Architect at the CA's direction. The audit records findings only and authorized no repairs.
 
@@ -26,22 +27,14 @@ Product code: `source/core`, `source/domain`, `source/front`, `source/back`, and
 `source/devops/` and `source/tests/` follow the same rules (Decision 3); their conformance is
 deferred to `effort/pending/2026-08-23-devops-style-error-handling-brief.md` (2026-10-20).
 
-## Status (2026-10-20)
+## Status (closed 2026-10-20)
 
-| Category                         | Audit 2026-10-09 | Now                                                      |
-| -------------------------------- | ---------------: | -------------------------------------------------------- |
-| Missing file-header comment      |                7 | Done: level 1 boxes (`bb484ce`)                          |
-| Missing required header sections |                8 | 6 open; `shell.ts` and `ui-helpers.ts` conform (level 3) |
-| Misaligned header box            |                2 | Done 2026-10-09                                          |
-| Incomplete PUBLIC inventory      |               42 | 39 open; three resolved (below)                          |
-| JSDoc file header (Decision 2)   |              ~44 | 15 in product code                                       |
-| Uncommented exported type (§5.1) |                — | 2 open: `Adapter<T>` (`make-adapter.ts`), `IndexedDb`    |
-
-The JSDoc headers in product code: `core/std/std.ts`, `core/std/stdx.ts`,
-`back/supabase-edge/config/supabase-config.ts`, `back/supabase-edge/config/build-meta.ts`, the four
-`front/app-*/app.tsx`, `front/app/views/job-views.ts`, `front/app/widgets/widget-registry.ts`,
-`front/config/ux-config.ts`, `front/api/queries.ts`, `ux/ui/css/css.tsx`,
-`ux/ui/components/ui.ts`, and `ux/shell/dashboard/dashboard-contract.ts`.
+Every finding in product code is resolved. The seven headerless files took level 1 boxes; the 15
+JSDoc headers became boxes (the four barrels and four `app.tsx` entry points at level 1); every
+export is listed, `ux-config.ts` and `supabase-config.ts` excepted by the CA as instances of the
+runtime configuration pattern; `Adapter<T>` and `IndexedDb` are commented; `validators.ts` and
+`relations.ts` name their families (Decision 7). Component props are listed under a COMPONENT
+PROPERTIES section after PUBLIC, without the attributes their `Omit<…>` removes.
 
 ## Findings (audit, 2026-10-09)
 
@@ -208,7 +201,7 @@ defects to correct in the file.
    ├ untitled           Blank value to a consumer-supplied label.
    └ from               Number to text.
    ```
-6. **A header guard enforces Decisions 1–5.** It checks box alignment and the 80-character limit,
+6. **Dropped 2026-10-20 (Design history).** ~~A header guard enforces Decisions 1–5.~~ It checks box alignment and the 80-character limit,
    the level each file requires, the section order, PUBLIC (or its groups) naming every export,
    and each container's tree naming exactly its own members. With member trees, the guard is what
    keeps headers from drifting from their types. It lands last, after the repair, so its first run
@@ -222,17 +215,11 @@ defects to correct in the file.
      RESULT (`notValid`, `expectValid`).
    - **`relations.ts`:** GUARDS (`isComposition*`), ACCESSORS (`demandOne`, `optionalOne`).
 
-## Production scope (sketch)
+## Production
 
-Done: CONVENTIONS §5.1 and §6 (version 1.1), the seven level 1 headers, and the
-`wrap-http-handler.ts` header.
-
-Remaining, product code only: re-audit against CONVENTIONS 1.1, then bring each file into
-conformance. Add PURPOSE and PUBLIC where required, complete PUBLIC inventories (props types
-included, with member trees), convert the 15 JSDoc headers to boxes, and comment the two exported
-types. Comment-only: no code changes. Last, the header guard (Decision 6), added to
-`deno task check`. Checks: `deno task check`, `deno task fmt:check`, `deno task test`, and
-`STYLE_AUDIT`.
+CA and AI Architect, with the AI Coding Engine on the 34 `ux/` component headers, 2026-10-20:
+CONVENTIONS §5.1 and §6 (1.1), then comment-only header repairs. Checks: `deno task fmt:check`
+and `deno task check`, green.
 
 ## Design history
 
@@ -254,5 +241,12 @@ types. Comment-only: no code changes. Last, the header guard (Decision 6), added
   CONVENTIONS under a single version, 1.1, for this roadmap §5 window.
 - **`devops/` and `tests/` deferred (2026-10-20).** This brief first carried their header work,
   taken over from the devops brief on 2026-10-09; it has returned there.
+
+- **COMPONENT PROPERTIES (2026-10-20).** Props trees were first written into PUBLIC. The CA gave
+  them their own section after PUBLIC, so PUBLIC stays the quick glance; the keys each `Omit<…>`
+  removes were then dropped from the trees, since they are not members.
+- **Header guard dropped (2026-10-20).** Decision 6 would fail on deliberate judgment: exports left
+  out on purpose, box-only barrels and entry points, a tree left to the member that already shows
+  it, whether a PURPOSE adds value. Headers are held by review.
 
 _End of Brief_
