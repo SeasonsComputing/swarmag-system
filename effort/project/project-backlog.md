@@ -375,7 +375,7 @@ losing a site along the way when Finish fired before the second site was added. 
 about that pass is repeatable without re-typing the same data by hand again.
 
 This is the live, felt consequence of the gap `[[project_testing_gap_backlog_pending]]`
-already named structurally: `CONVENTIONS.md` §12's testing convention
+already named structurally: `CONVENTIONS.md` §13's testing convention
 (`source/tests/cases/{abstraction}-api-test.ts`) covers domain/adapter/API only —
 `ux/shell`'s Wizard host, `DrillDown`, the onboarding stages themselves have no test
 mechanism to land in, by convention, not oversight. Today's session is a second, concrete

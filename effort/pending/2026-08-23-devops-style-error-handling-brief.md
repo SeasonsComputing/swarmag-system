@@ -5,7 +5,7 @@
 **Amended 2026-09-24 — placement decided by CA.** DevOps conventions are a subset of
 `CONVENTIONS.md` with devops and tests allowances. Documented that way, they live in a
 section of `architecture-devops.md`, not in `CONVENTIONS.md`. This supersedes sequencing
-steps 1 and 4 below: the two principles, the §8.5 tooling-namespace carve-out, and the
+steps 1 and 4 below: the two principles, the §9.4 tooling-namespace carve-out, and the
 `@devops/lib` barrel entry all go into that `architecture-devops.md` section (step 2's
 document), stated as allowances against `CONVENTIONS.md` rather than as edits to it.
 `CONVENTIONS.md` is not touched by this brief.
@@ -39,7 +39,7 @@ before that milestone starts — deferred on purpose, not blocked technically.
   primitive-type discipline (CONVENTIONS §8.1) is already followed.
 - `dprint`'s excludes are just binary/vendor assets — formatting already
   applies repo-wide, devops included.
-- The real, concentrated gap is CONVENTIONS §9 ("Never swallow errors
+- The real, concentrated gap is CONVENTIONS §10 ("Never swallow errors
   silently... log and throw, or throw without logging"): **15+ bare
   `catch {}` / `.catch(() => {})` blocks across 8 of the 12 scripts**, every
   one discarding the error's type entirely.
@@ -52,7 +52,7 @@ CA's framing: CONVENTIONS and CONSTITUTION are meant to travel across every
 project CA has authority over, past and future (a standing docs/src/tests/devops
 top-level namespace pattern, soon adding `effort/`). CONSTITUTION.md already
 achieves this — it contains zero swarmAg-specific content today. CONVENTIONS
-isn't there yet (§10-11 are Postgres/Supabase schema conventions with
+isn't there yet (§11-12 are Postgres/Supabase schema conventions with
 swarmAg's literal domain topics baked into section ordering) — that's a
 separate, larger, later problem, not in scope here. These two principles
 belong in CONVENTIONS now, worded at the portable altitude, not the
@@ -65,7 +65,7 @@ across deployment targets the way product code is — so they may call their
 host runtime's native API directly, unabstracted. This is the general form of
 "use `Deno.*` directly in devops scripts"; "Deno" is just this project's
 current instantiation of "host runtime." **Concrete consequence found tonight:
-§8.5 currently reads as universal** ("Never access `Deno.env` or
+§9.4 currently reads as universal** ("Never access `Deno.env` or
 `import.meta.env` directly. Always go through `Config.get()`.") — that rule is
 scoped to product namespaces (front/back/domain) and needs the tooling
 carve-out written in explicitly; it was never meant to bind devops/tests, but
@@ -138,7 +138,7 @@ accretes.
 
 ## Sequencing (CONSTITUTION §8 — documentation leads code)
 
-1. Update `CONVENTIONS.md` with the two principles above, and the §8.5
+1. Update `CONVENTIONS.md` with the two principles above, and the §9.4
    tooling-namespace carve-out.
 2. Update `architecture-devops.md` to describe the `devops/lib` layer as
    target structure (matching how `architecture-front.md` already documents
