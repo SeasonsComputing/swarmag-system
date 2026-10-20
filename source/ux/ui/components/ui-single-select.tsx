@@ -10,7 +10,21 @@ Emits select control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiSingleSelect  Single-value select control with declared states.
+UiSingleSelect       Single-value select control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiSingleSelectProps  Select control props.
+├ disabled           Disables interaction.
+├ error              Marks the error state.
+├ id                 Control element ID.
+├ name               Form control name.
+├ loading            Marks the loading state.
+├ options            Available options.
+├ value              Controlled value.
+├ defaultValue       Initial uncontrolled value.
+├ onChange           Receives value changes.
+└ placeholder        Text shown when no option is selected.
 */
 
 import { Select, type SelectRootItemComponentProps } from '@kobalte/core/select'

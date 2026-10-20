@@ -10,7 +10,14 @@ Emits avatar control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiAvatar  Avatar control with declared states.
+UiAvatar         Avatar control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiAvatarProps    Avatar control props; extends UiComponentProps and filtered span attributes.
+├ error          Marks the error state.
+├ loading        Marks the loading state.
+└ disabled       Disables interaction.
 */
 
 import { type JSX, splitProps } from '@solid-js'

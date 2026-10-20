@@ -10,8 +10,23 @@ Emits radio-group control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiRadioGroup  Radio-group control with declared states.
-UiRadioItem   Radio item control for UiRadioGroup.
+UiRadioGroup       Radio-group control with declared states.
+UiRadioItem        Radio item control for UiRadioGroup.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiRadioGroupProps  Radio-group control props; extends UiComponentProps.
+├ disabled         Disables interaction.
+├ error            Marks the error state.
+├ loading          Marks the loading state.
+├ name             Form control name.
+├ required         Marks the control as required.
+├ value            Controlled value.
+├ defaultValue     Initial uncontrolled value.
+└ onChange         Receives value changes.
+UiRadioItemProps   Radio item control props; extends UiComponentProps.
+├ value            Unique radio option value.
+└ disabled         Disables interaction.
 */
 
 import { RadioGroup } from '@kobalte/core/radio-group'

@@ -17,7 +17,9 @@ density and the shared base-scale step.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-HelmWidget  Dashboard header navigation control cluster.
+HelmWidgetProps  Dashboard helm widget props.
+└ settings       Dashboard settings.
+HelmWidget       Dashboard header navigation control cluster.
 */
 
 import type { Dictionary } from '@core/std'

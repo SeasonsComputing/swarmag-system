@@ -10,7 +10,20 @@ Emits checkbox control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiCheckbox  Checkbox control with declared states.
+UiCheckbox        Checkbox control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiCheckboxProps   Checkbox control props; extends UiComponentProps.
+├ checked         Controlled checked state.
+├ defaultChecked  Initial uncontrolled checked state.
+├ disabled        Disables interaction.
+├ error           Marks the error state.
+├ loading         Marks the loading state.
+├ name            Form control name.
+├ required        Marks the control as required.
+├ value           Submitted form value.
+└ onChange        Receives checked-state changes.
 */
 
 import { Checkbox } from '@kobalte/core/checkbox'

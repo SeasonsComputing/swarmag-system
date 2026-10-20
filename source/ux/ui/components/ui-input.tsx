@@ -10,7 +10,13 @@ Emits input control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiInput  Text input control with declared states.
+UiInput          Text input control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiInputProps     Input control props; extends filtered input attributes.
+├ error          Marks the error state.
+└ loading        Marks the loading state.
 */
 
 import { TextField, type TextFieldInputProps } from '@kobalte/core/text-field'

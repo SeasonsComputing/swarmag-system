@@ -10,7 +10,14 @@ Emits skeleton control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiSkeleton  Skeleton control with declared states.
+UiSkeleton       Skeleton control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiSkeletonProps  Skeleton control props; extends UiComponentProps and filtered div attributes.
+├ error          Marks the error state.
+├ loading        Marks the loading state.
+└ disabled       Disables interaction.
 */
 
 import { type JSX, splitProps } from '@solid-js'

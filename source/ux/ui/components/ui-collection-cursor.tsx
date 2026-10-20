@@ -11,7 +11,18 @@ collection and the item form.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiCollectionCursor  Cursor control for generic value-in/value-out collections.
+UiCollectionCursor       Cursor control for generic value-in/value-out collections.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiCollectionCursorProps  Cursor surface over a bounded collection: position and lifecycle.
+├ items                  Host-owned collection; never mutated in place.
+├ onItemsChange          Receives the collection after New or Delete.
+├ newItem                Creates a blank item for New.
+├ renderItem             Renders the item at the cursor.
+├ empty                  Empty-collection icon and message.
+├ confirmDelete          Supplies delete confirmation copy.
+└ renderNav              Optionally wraps the navigation element.
 */
 
 import { createMemo, createSignal, For, Show, untrack } from '@solid-js'

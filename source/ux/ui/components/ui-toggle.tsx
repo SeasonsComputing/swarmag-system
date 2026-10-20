@@ -10,7 +10,16 @@ Emits toggle control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiToggle  Toggle control with declared states.
+UiToggle          Toggle control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiToggleProps     Toggle control props; extends UiComponentProps and filtered button attributes.
+├ error           Marks the error state.
+├ loading         Marks the loading state.
+├ pressed         Controlled pressed state.
+├ defaultPressed  Initial uncontrolled pressed state.
+└ onChange        Receives pressed-state changes.
 */
 
 import { ToggleButton } from '@kobalte/core/toggle-button'

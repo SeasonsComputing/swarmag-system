@@ -10,7 +10,22 @@ Emits dialog control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiDialog  Dialog control with declared states.
+UiDialogSize      Dialog size treatments declared by the design language.
+UiDialog          Dialog control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiDialogProps     Dialog control props; extends UiComponentProps.
+├ trigger         Content of the built-in trigger button.
+├ triggerVariant  Visual variant of the trigger button.
+├ size            Dialog size treatment.
+├ open            Controlled open state.
+├ defaultOpen     Initial uncontrolled open state.
+├ dismissible     Allows Escape and outside interaction to dismiss.
+├ error           Marks the error state.
+├ loading         Marks the loading state.
+├ disabled        Disables interaction.
+└ onOpenChange    Receives open-state changes.
 */
 
 import { Dialog } from '@kobalte/core/dialog'

@@ -10,7 +10,14 @@ Emits spinner control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiSpinner  Spinner control with declared states.
+UiSpinner        Spinner control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiSpinnerProps   Spinner control props; extends UiComponentProps and filtered div attributes.
+├ error          Marks the error state.
+├ loading        Marks the loading state.
+└ disabled       Disables interaction.
 */
 
 import { type JSX, splitProps } from '@solid-js'

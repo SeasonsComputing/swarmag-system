@@ -10,7 +10,13 @@ Emits text area control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiTextArea  Multiline input control with declared states.
+UiTextArea       Multiline input control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiTextAreaProps  Text area control props; extends filtered textarea attributes.
+├ error          Marks the error state.
+└ loading        Marks the loading state.
 */
 
 import { TextField, type TextFieldTextAreaProps } from '@kobalte/core/text-field'

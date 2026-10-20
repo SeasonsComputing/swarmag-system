@@ -10,7 +10,18 @@ Emits progress control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiProgress  Progress control with declared states.
+UiProgress       Progress control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiProgressProps  Progress control props; extends UiComponentProps.
+├ label          Accessible progress label.
+├ value          Current progress value.
+├ minValue       Lower progress bound.
+├ maxValue       Upper progress bound.
+├ error          Marks the error state.
+├ loading        Marks the loading state.
+└ disabled       Disables interaction.
 */
 
 import { Progress } from '@kobalte/core/progress'

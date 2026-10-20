@@ -11,7 +11,8 @@ resolution finishes without authentication; renders nothing while preparing.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AuthGuard  Route-level auth guard component.
+AuthGuardProps  Authorization guard props; extends UiContainerProps.
+AuthGuard       Route-level auth guard component.
 */
 
 import { Match, Switch } from '@solid-js'

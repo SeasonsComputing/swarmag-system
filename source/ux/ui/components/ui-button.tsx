@@ -10,7 +10,15 @@ Emits button control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiButton  Button control with declared variants and states.
+UiButtonVariant    Button variants declared by the design language.
+UiButton           Button control with declared variants and states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiButtonProps      Button control props; extends UiComponentProps and filtered button attributes.
+├ variant          Declared visual variant.
+├ error            Marks the error state.
+└ loading          Marks the loading state.
 */
 
 import { Button } from '@kobalte/core/button'

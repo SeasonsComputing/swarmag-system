@@ -11,8 +11,14 @@ grid — never nested inside an UiField.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiFormActions  Action button row. Defaults to end-aligned; justify='split'
-               pushes buttons to opposite ends.
+UiFormActionsJustify  UiFormActions justify options.
+UiFormActions         Action button row. Defaults to end-aligned; justify='split' pushes buttons to
+                      opposite ends.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiFormActionsProps    UiFormActions props; extends UiContainerProps.
+└ justify             Action row alignment.
 */
 
 import type { UiComponent, UiContainerProps } from './ui-helpers.ts'

@@ -10,7 +10,16 @@ Emits alert control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiAlert  Alert control with declared states.
+UiAlertVariant     Alert variants declared by the design language.
+UiAlert            Alert control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiAlertProps       Alert control props; extends UiComponentProps and filtered div attributes.
+├ variant          Declared visual variant.
+├ error            Marks the error state.
+├ loading          Marks the loading state.
+└ disabled         Disables interaction.
 */
 
 import { type JSX, splitProps } from '@solid-js'
