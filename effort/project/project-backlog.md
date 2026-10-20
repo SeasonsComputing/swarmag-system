@@ -286,6 +286,8 @@ The recurrence is the point. Deleted-file paths reappear as empty directories pe
 commit, but the guard walks the file system rather than the tracked tree, and `deno task check`
 fails until someone deletes them. Skip git-ignored files (or list files through `git ls-files`).
 Pair with the entry above, which also changes what the sweep covers.
+Fixing it also settles the task-chain question: `check` stays read-only, and nothing sweeps
+`.DS_Store` (CA, 2026-10-20).
 
 ### `guard:css` misreads multiline selectors and misses selector-list branches
 
