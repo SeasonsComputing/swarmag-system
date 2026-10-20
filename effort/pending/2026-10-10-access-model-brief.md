@@ -106,7 +106,7 @@ active user.
   which in Supabase is the Postgres role, and roles live in `users.roles`.
 - **`architecture-core.md` §5.5:** its example policy names a `job_logs` table and a
   `created_by_id` column that the schema does not have, and its name does not follow
-  `CONVENTIONS.md` §11.8.
+  `CONVENTIONS.md` §14.2.8.
 - **`domain-model.md` §3.5:** User is "role membership, and application access"; the model derives
   application access from roles.
 

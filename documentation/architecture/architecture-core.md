@@ -319,157 +319,22 @@ export const api = {
 
 ### 5.2 Client Contracts
 
-The client contracts live in `source/core/std/api-contracts.ts` and
-`source/core/std/auth-contract.ts`, exported through `@core/stdx`:
+Clients conform to the contracts in `@core/std/api-contracts.ts`. CONVENTIONS §10 shows how they
+are declared and used; the `core/std` module headers state their semantics, including list
+filtering, search, ordering, and cursors (`make-query.ts`, `api-contracts.ts`).
 
-#### 5.2.1 CRUD & List Contract
+This system relies on these properties of every client:
 
-`ApiCrudContract` is composed from smaller capability interfaces rather than declared as one flat
-shape, so each backing-store family can carry the `update` signature that actually fits it:
+- **Uniform surface, provider-fit signatures.** Every backing-store family exposes the same
+  `create`/`get`/`delete`/`list` shape; `update` takes the form that matches how that family
+  writes (adapter-translated or direct), rather than forcing every provider through one signature.
+- **Consistent errors.** Every client maker throws `ApiError` on failure (CONVENTIONS §15).
+- **Domain-typed.** All inputs and outputs are domain abstractions, never storage primitives.
 
-```typescript
-type ApiCrudContract<T extends Instantiable> =
-  & CrudBaseContract<T> // create, get, delete
-  & AdaptedUpdateContract<T> // update(scoped, source) — adapter-translated stores
-  & CrudListContract<T> // list
+Declared reads for this system live in `front/api/queries.ts`. Applications consume the
+declarations without importing adapters.
 
-interface CrudBaseContract<T extends Instantiable> {
-  create(input: CreateFromInstantiable<T>): Promise<T>
-  get(id: Id): Promise<T>
-  delete(id: Id): Promise<DeleteResult>
-}
-
-interface AdaptedUpdateContract<T extends Instantiable> {
-  update<K extends keyof FromInstantiable<T>>(
-    scoped: ScopedUpdateAdapter<T, K>,
-    source: ScopedUpdate<T, K>
-  ): Promise<T>
-}
-
-interface CrudListContract<T> {
-  list(options?: ListOptions<T>): Promise<ListResult<T>>
-}
-
-type DeleteResult = { id: Id; deletedAt: When }
-type ListOptions<T> = { query?: Query<T>; limit?: number; cursor?: string }
-type ListResult<T> = { data: T[]; cursor: string | null; hasMore: boolean }
-```
-
-`ScopedUpdate<T, K>` already carries `id` (via `Pick<T, 'id'>`), so no method takes `id` as a
-separate parameter. `DirectUpdateContract<T>` composes the update capability for abstraction-oriented
-HTTP endpoints and Users: `update(source)` performs no client-side adapter translation, and `K` is
-chosen per call. See `source/core/std/api-contracts.ts` for the full set.
-
-Declared reads live in `front/api/queries.ts`. `makeQuery` selects adapter fields for filters,
-search, and a non-empty order declaration; `build` produces readonly, branded `Query<T>` data.
-The brand guards construction at compile time, not authorization. Applications consume declarations
-without importing adapters. Every field adapter exposes its storage `column` explicitly.
-
-`listAll(client, query?)` yields records as an async iterator, paging internally at `MAX_LIMIT`
-until the returned cursor is null. Collection consumers use `Array.fromAsync`; a caller may stop
-iteration early. `listPageLimit(number?)` clamps numeric limits to 1–`MAX_LIMIT`, defaulting to
-`DEFAULT_LIMIT` when omitted. A shared page assembler retains each store's native sort value, and
-`resolveQueryFields` in `api-contracts.ts` rejects unknown fields before either store evaluates
-the query. Adapter makers retain serialization alone; standard-library dependencies are acyclic,
-including type-only imports.
-
-Filters are ANDed. Scalars support `eq` and non-empty `in`; strings and numbers also support
-`gt`, `gte`, `lt`, and `lte`. Scalar compositions support non-empty `hasAny` and `hasAll`.
-Object compositions and reserved names (`and`, `or`, `not`, `search`) cannot be declared as filters.
-Absent optional values match no operator. Set non-emptiness is enforced at compile time only.
-
-Search is offered only over declared text fields, excluding timestamps by declaration policy.
-One term is matched across these fields with OR, then ANDed with filters. Building removes stars,
-trims, and normalizes to NFC before omitting an empty term. Search is case-insensitive and
-accent-sensitive within the stated Latin casing bounds; stored NFC is assumed, not enforced.
-Supabase applies targeted SDK filters for ordinary conditions and JSONB containment; generated
-alternatives use separate OR parameters, ANDed by PostgREST. OR operands escape only backslashes
-and quotes before wrapping in quotes, preserving control characters. Search uses escaped `ilike`;
-local evaluation uses `toLocaleLowerCase('en-US')`.
-
-Order fields are required strings or numbers. Build resolves the requested order, or the first
-field ascending. `id` breaks ties in the same direction. Without a query, clients order by
-`createdAt` then `id`, ascending. Ordering and paging are consistent within each store; cross-store
-order parity is not promised. Local text ordering and cursor comparisons use the same
-`Intl.Collator('en-US')`, including its ties. Chronological local timestamp comparison depends on
-the future deep clone establishing one timestamp form; this contract does not canonicalize `When`.
-
-Cursors are base64url JSON retaining the exact returned sort value, id, order and direction,
-issuing store/resource, and a stable criteria/search fingerprint. A missing cursor starts a list;
-a final page returns `cursor: null` and `hasMore: false`. Clients fetch one extra row. Malformed,
-foreign-store/resource, or query-mismatched cursors throw `ApiError` 400. Supabase timestamp
-predicates compare instants without reducing their returned precision. Keyset paging is not a
-snapshot across concurrent edits. HTTP clients forward query data unchanged.
-
-#### 5.2.2 Business Rule Contract
-
-```typescript
-interface ApiBusRuleContract {
-  run(params: Dictionary): Promise<Dictionary>
-}
-```
-
-#### 5.2.3 Generic Contract Typing
-
-`ApiBusRuleContract` accepts optional type parameters for callers that require typed inputs and outputs beyond `Dictionary`:
-
-```typescript
-interface ApiBusRuleContract<
-  TParams extends Dictionary = Dictionary,
-  TResult = Dictionary
-> {
-  run(params: TParams): Promise<TResult>
-}
-```
-
-Default type parameters preserve backward compatibility. Makers and compositions that do not require typed results continue to use the unparameterized form. Makers that target specific operations — such as RPC functions returning scalar values — supply explicit type parameters.
-
-```typescript
-// Untyped — backward compatible
-const cloneJob: ApiBusRuleContract = makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
-
-// Typed — explicit params and result
-const userExists: ApiBusRuleContract<{ email: string }, boolean> = makeBusRuleSupabaseRpcClient({
-  fn: 'user_exists'
-})
-```
-
-#### 5.2.4 Error Propagation
-
-```typescript
-class ApiError extends Error {
-  constructor(
-    message: string,
-    public readonly status: number,
-    public readonly details?: string
-  )
-}
-```
-
-All client makers throw `ApiError` on failures. Applications handle errors uniformly:
-
-```typescript
-try {
-  const user = await api.Users.get(userId)
-  ...
-} catch (error) {
-  if (!apiError(error)) throw error
-}
-```
-
-#### 5.2.5 Contract Properties
-
-- **Uniform surface, provider-fit signatures** - Every backing-store family exposes the same
-  `create`/`get`/`delete`/`list` shape; `update` composes the capability interface that matches
-  how that family actually writes (adapter-translated or direct) rather than
-  forcing every provider through one signature
-- **Type-safe** - Full TypeScript generics (`T extends Instantiable`) for domain typing; protocol shapes derived via `CreateFromInstantiable<T>` and `UpdateFromInstantiable<T>`
-- **Consistent errors** - `ApiError` with status codes and optional details
-- **Domain-typed** - All inputs/outputs use domain abstractions, never storage primitives
-
-These contracts ensure **uniform interfaces** regardless of underlying storage or transport mechanism.
-
-#### 5.2.6 Data Binding, Validation, and Write Scope
+#### 5.2.1 Data Binding, Validation, and Write Scope
 
 CRUD writes cross three distinct boundary checks:
 
@@ -480,42 +345,23 @@ CRUD writes cross three distinct boundary checks:
 `UpdateFromInstantiable<T>` remains the broad update protocol for callers that may touch any subset of
 an abstraction. It is not a form authorization surface. A form that edits a known set of fields declares
 that set explicitly through adapter field metadata, never by deriving every key of the abstraction.
-The API composition layer hosts these declarations in `front/api/scopes.ts`:
-
-- A form declares its fields and create defaults through
-  `makeScope({ fields: [XAdapter.field, …], defaults })`. The declaration owns the form's
-  draft and its create and update projections, `toCreate(draft)` and `toUpdate(id, draft)`.
-- A form whose client translates (Adapted) declares through `makeAdaptedScope`, which adds
-  the scoped adapter as `adapter`. Its client accepts
-  `update(scope.adapter, scope.toUpdate(id, draft))`.
-- A form whose client does not translate (Direct; today only Users) declares through
-  `makeScope`. Its client accepts `update(scope.toUpdate(id, draft))`; `K` is inferred
-  from the projection.
+The API composition layer hosts these declarations in `front/api/scopes.ts`, built with
+`makeScope` or `makeAdaptedScope` (CONVENTIONS §10.4). Users is the one client that does not
+translate through an adapter (Direct); every other client is Adapted.
 
 The layer chain is domain metadata → declaration → contract → client → composition → form.
 The form owns its field set; the API composition layer hosts its adapter-bound declaration.
 Every field in `ScopedUpdate<T, K>` is present. An attribute whose value type admits `undefined`
 also admits `null` to clear storage, whether or not its property is syntactically optional.
-Direct clients choose `K` per call; every form declares its own scope.
 
 Form-layer draft derivation and create/update projection mechanics are defined in
 [`architecture-front.md` §7.4](architecture-front.md#74-form-scope-integration).
 
-Three rules govern every declared scope:
-
-- **The unit of a scope is the attribute, and an attribute is written atomically, whatever its type or
-  cardinality.** An embedded composition (`CompositionOne`, `CompositionOptional`, `CompositionMany`,
-  `CompositionPositive`) is owned and written whole, never addressed in part. Compositions have no
-  independent life-cycle and are not referenced independently (`domain-model.md` §3.3.1, §3.6). Clearing a
-  value inside a composition is part of the composition's new value. Two surfaces that own the same
-  attribute can overwrite each other's edits, under the same rule for every attribute type.
-- **Create values for out-of-scope attributes are declared with the scope.** A form that creates its
-  abstraction supplies values for exactly the attributes that create requires and its scope does not
-  cover. An attribute is never both in scope and defaulted.
-- **A newly introduced derived attribute is optional by default.** Derived means calculated, never edited
-  by a form. Making it optional keeps existing forms unaware of it. A required derived attribute needs its
-  migration to backfill existing rows, and a create default in every scope that creates the abstraction.
-  The default is a create value; it does not put the attribute in the form's scope.
+The scope rules (CONVENTIONS §10.4) follow from the domain. Compositions have no independent
+life-cycle and are not referenced independently (`domain-model.md` §3.3.1, §3.6), so the unit of
+a scope is the attribute, written atomically whatever its type or cardinality. Two surfaces that
+own the same attribute can overwrite each other's edits, under the same rule for every attribute
+type.
 
 Application code consumes the API namespace and does not import domain adapters directly. When a scoped
 update needs field adapters to compose storage dictionaries, the form owns the field-set decision and the API
@@ -523,46 +369,10 @@ composition layer hosts the adapter-bound scope declaration.
 
 ### 5.3 Client Makers
 
-Client makers are factory functions that produce clients conforming to contracts:
-
-| Maker                                   | Contract             | Purpose                              | Implementation     |
-| --------------------------------------- | -------------------- | ------------------------------------ | ------------------ |
-| `makeCrudSupabaseClient<T>()`           | `ApiCrudContract`    | Direct Supabase RDBMS SDK access     | PostgreSQL via RLS |
-| `makeBusRuleSupabaseEdgeClient<P, R>()` | `ApiBusRuleContract` | Supabase Edge Function invocation    | Edge functions     |
-| `makeBusRuleSupabaseRpcClient<P, R>()`  | `ApiBusRuleContract` | Supabase RPC function invocation     | PostgreSQL via RPC |
-| `makeCrudIndexedDbClient<T>()`          | `ApiCrudContract`    | Offline local storage                | Browser IndexedDB  |
-| `makeCrudHttpClient<T>()`               | `CrudHttpContract`   | HTTP calls to edge functions         | Fetch API          |
-| `makeBusRuleHttpClient()`               | `ApiBusRuleContract` | Orchestration via HTTP edge endpoint | Fetch API          |
-
-Service wrappers mirror client makers at the inbound boundary.
-`source/core/svc/wrap-busrule-http-handler.ts` provides
-`wrapBusRuleHttpHandler()` for exposing BusRule-shaped service handlers over
-HTTP while preserving the standard response envelopes used by HTTP clients.
-Provider-specific orchestration, such as Supabase Auth administration, remains
-outside the service wrapper in backend orchestration modules.
-
-#### 5.3.1 Maker Pattern
-
-Each maker takes a specification object and returns a fully-typed client:
-
-```typescript
-// CRUD maker
-const Users = makeCrudSupabaseClient<User>({
-  table: 'users',
-  adapter: UserAdapter
-})
-await Users.create({ displayName: 'Ada', primaryEmail: 'ada@example.com' })
-
-// Business rule maker — HTTP edge endpoint
-const cloneJob = makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
-await cloneJob.run({ jobId: 'job-123' })
-
-// Business rule maker — Supabase RPC function
-const userExists = makeBusRuleSupabaseRpcClient<{ email: string }, boolean>({
-  fn: 'user_exists'
-})
-const exists = await userExists.run({ email: 'ada@example.com' })
-```
+Clients are produced by makers (CONVENTIONS §10.1, §10.6). This system binds Supabase for tables
+under RLS, IndexedDB for offline field data, and Supabase Edge Functions and RPC for orchestration.
+Edge functions are wrapped as services (CONVENTIONS §12). Provider-specific orchestration, such as
+Supabase Auth administration, remains in backend orchestration modules.
 
 ### 5.4 Application Usage
 
@@ -645,15 +455,9 @@ Supabase RPC functions are PostgreSQL functions invoked via the Supabase client'
 - Multi-step orchestration (use `makeBusRuleSupabaseEdgeClient` or `makeBusRuleHttpClient`)
 - Operations expressible as table selects within the authenticated caller's RLS context
 
-#### 5.7.3 Naming Convention
+RPC naming and parameter conventions are in CONVENTIONS §14.4.
 
-| Artifact       | Convention                 | Example       |
-| -------------- | -------------------------- | ------------- |
-| Function name  | `{verb}_{noun}` snake_case | `user_exists` |
-| Parameter name | snake_case                 | `p_email`     |
-| Return columns | snake_case                 | `exists`      |
-
-#### 5.7.4 Security Model
+#### 5.7.3 Security Model
 
 RPC functions declare one of two execution security modes:
 
@@ -667,14 +471,7 @@ RPC functions declare one of two execution security modes:
 
 Every `SECURITY DEFINER` function must include a `SET search_path = public` clause to prevent search path injection.
 
-#### 5.7.5 Parameter and Return Conventions
-
-- Parameters are named and passed as a keyed object: `supabase.rpc('user_exists', { p_email: value })`
-- Scalar return values (`boolean`, `integer`, `text`) are returned directly as `TResult`
-- Record return values are returned as objects and map to `TResult`
-- All return values surface through `ApiBusRuleContract<TParams, TResult>` at the client layer
-
-#### 5.7.6 Where Functions Live
+#### 5.7.4 Where Functions Live
 
 | Timing                     | Location                                                       |
 | -------------------------- | -------------------------------------------------------------- |
@@ -685,71 +482,21 @@ RPC functions are not deployed as separate files. They are PostgreSQL DDL and ar
 
 ## 6. Configuration Management
 
-### 6.1 Runtime Configuration Pattern
+Configuration follows the runtime configuration pattern in CONVENTIONS §11: one `Config`
+singleton, a provider injected once per deployment package.
 
-The system uses a **singleton configuration pattern** with runtime-specific providers. The `Config` singleton lives in `@core/cfg/config.ts` and is initialized by each deployment package with the appropriate provider.
+### 6.1 Packages
 
-#### 6.1.1 Design Principles
+| Package                 | Config module                                   | Provider           |
+| ----------------------- | ----------------------------------------------- | ------------------ |
+| Supabase Edge Functions | `@back/supabase-edge/config/supabase-config.ts` | `SupabaseProvider` |
+| UX applications         | `@front/config/ux-config.ts`                    | `SolidProvider`    |
 
-The configuration pattern is built on three invariants:
+The Supabase Edge runtime injects reserved `SUPABASE_*` variables and forbids custom secrets under
+that prefix, so the backend aliases bind the repository's logical names to the platform-injected
+names, as the UX aliases bind logical names to `VITE_*` names.
 
-- Core defines the singleton — configuration abstraction lives at the lowest layer
-- Packages inject providers — higher layers supply runtime-specific implementations
-- Dependencies flow downward — core has no knowledge of specific providers
-
-### 6.2 Configuration Provider Interface
-
-Runtime providers implement the `RuntimeContract` interface:
-
-```typescript
-// source/core/cfg/runtime-contract.ts
-export interface RuntimeContract {
-  get(key: string): string | undefined
-  fail(key: string): never
-}
-```
-
-#### 6.2.1 Available Providers
-
-- `SupabaseProvider` — Supabase Edge Functions runtime (`@core/cfg/supabase-provider.ts`)
-- `NetlifyProvider` — Netlify Edge Functions runtime (`@core/cfg/netlify-provider.ts`)
-- `DenoProvider` — Deno development/testing runtime (`@core/cfg/deno-provider.ts`)
-- `SolidProvider` — Vite/SolidJS browser runtime (`@core/cfg/solid-provider.ts`)
-
-### 6.3 Package Configuration Pattern
-
-Each deployment package creates a configuration module that:
-
-1. Imports the `Config` singleton from `@core/cfg/config.ts`
-2. Creates the appropriate runtime provider
-3. Initializes with required environment variables and optional aliases
-4. Re-exports the configured singleton
-
-#### 6.3.1 Backend example (aliases bind platform-injected names)
-
-The Supabase Edge runtime injects reserved `SUPABASE_*` variables and forbids
-custom secrets under that prefix. The alias map binds the repository's logical
-names to the platform-injected names, exactly as the UX alias map binds
-logical names to `VITE_*` names:
-
-```typescript
-// source/back/supabase-edge/config/supabase-config.ts
-import { Config } from '@core/cfg/config.ts'
-import { SupabaseProvider } from '@core/cfg/supabase-provider.ts'
-
-Config.init(
-  new SupabaseProvider(),
-  ['SUPABASE_URL', 'SUPABASE_ANON_KEY', 'SUPABASE_SERVICE_ROLE_KEY'],
-  {
-    SUPABASE_PUBLIC_KEY: 'SUPABASE_ANON_KEY',
-    SUPABASE_SERVICE_KEY: 'SUPABASE_SERVICE_ROLE_KEY'
-  }
-)
-
-export { Config }
-```
-
-#### 6.3.2 UX backend binding
+### 6.2 UX backend binding
 
 UX applications are static browser bundles. Their concrete backend binding is
 selected at package/build time and embedded into the bundle. The location from
@@ -770,96 +517,9 @@ This means the meaningful UX package matrix is application × backend binding
 target. A stage-bound `app-admin` bundle remains stage-bound whether served from
 Netlify, a local static file server, or any other static host.
 
-#### 6.3.3 UX example (aliases required)
-
-Vite requires client-side environment variables to carry a `VITE_` prefix. The alias map declares the mapping once at bootstrap so consuming code uses clean logical names throughout:
-
-```typescript
-// source/front/config/ux-config.ts
-import { Config } from '@core/cfg/config.ts'
-import { SolidProvider } from '@core/cfg/solid-provider.ts'
-
-Config.init(
-  new SolidProvider(),
-  [
-    'VITE_PACKAGE_APP_ID',
-    'VITE_PACKAGE_TARGET',
-    'VITE_PACKAGE_VERSION',
-    'VITE_SUPABASE_EDGE_URL',
-    'VITE_SUPABASE_RDBMS_URL',
-    'VITE_SUPABASE_PUBLIC_KEY',
-    'VITE_SUPABASE_CLIENT_MODE',
-    'VITE_SERVICE_WORKER_ENABLED',
-    'VITE_LOCAL_DB_NAME'
-  ],
-  {
-    PACKAGE_APP_ID: 'VITE_PACKAGE_APP_ID',
-    PACKAGE_TARGET: 'VITE_PACKAGE_TARGET',
-    PACKAGE_VERSION: 'VITE_PACKAGE_VERSION',
-    SUPABASE_EDGE_URL: 'VITE_SUPABASE_EDGE_URL',
-    SUPABASE_RDBMS_URL: 'VITE_SUPABASE_RDBMS_URL',
-    SUPABASE_PUBLIC_KEY: 'VITE_SUPABASE_PUBLIC_KEY',
-    SUPABASE_CLIENT_MODE: 'VITE_SUPABASE_CLIENT_MODE',
-    SERVICE_WORKER_ENABLED: 'VITE_SERVICE_WORKER_ENABLED',
-    LOCAL_DB_NAME: 'VITE_LOCAL_DB_NAME'
-  }
-)
-
-export { Config }
-```
-
-Consuming code calls `Config.get('SUPABASE_EDGE_URL')` — no `VITE_` prefix, no platform knowledge.
-
-### 6.4 Usage Pattern
-
-Code within a package always imports from the package-local configuration module:
-
-```typescript
-// Import from package config using alias (CORRECT)
-import { Config } from '@back/supabase-edge/config/supabase-config.ts'
-const url = Config.get('SUPABASE_RDBMS_URL')
-
-// It's ok for configs to be shared across packages
-// This same config is bundled with each deployment package
-//
-import { Config } from '@front/config/ux-config.ts'
-const url = Config.get('SUPABASE_RDBMS_URL')
-
-// Never use relative paths climbing namespace tree (INCORRECT)
-// ❌ import { Config } from '../config/config.ts'
-
-// When lower layers unaware of which package they've been
-// imported into require config, user `core` runtime config
-import { Config } from '@core/cfg/config.ts'
-```
-
-### 6.5 Environment Files
+### 6.3 Environment Files
 
 See `architecture-devops.md §4` for environment file naming conventions, the `__SECRET__` placeholder contract, and security rules.
-
-### 6.6 Why This Works
-
-#### 6.6.1 Core utilities can access configuration
-
-The `Config` singleton lives at the lowest layer, accessible anywhere in the dependency graph without creating upward dependencies.
-
-#### 6.6.2 Proper dependency flow
-
-Higher layers inject providers; core has no knowledge of specific runtime implementations. The pattern enforces the dependency direction without exception.
-
-#### 6.6.3 Runtime flexibility
-
-The same code works across Deno, Supabase Edge Functions, Netlify, and browser runtimes. Only the provider changes — the consumption pattern is identical.
-
-#### 6.6.4 Fast-fail at bootstrap
-
-Required keys are declared at initialization. Missing keys throw immediately — not at the call site, not in production. Problems surface before the application reaches a running state.
-
-#### 6.6.5 Testability
-
-Mock providers can be injected for testing without environment dependencies. Test contexts initialize `Config` with a `MockProvider` carrying whatever values they need.
-
-Configuration is declared in higher layers but accessible in lower layers through dependency injection, maintaining proper architectural boundaries throughout.
 
 ## 7. Dependency Direction
 
@@ -1144,16 +804,6 @@ These rules must never be violated. Code that violates these invariants is wrong
 - Stop and escalate rather than proceeding with assumptions
 - Applies to both human and AI contributors
 - Fast-fail configuration over defensive programming
-
-#### 10.1.11 Core standard library is closed
-
-- Files under `source/core/std/` import and re-export only relative modules resolving within that
-  directory.
-- The rule covers static and type imports, re-exports, side-effect imports, and literal dynamic
-  imports.
-- No aliases, other core namespaces, higher layers, or third-party dependencies are permitted.
-- Internal references use individual modules, avoiding cycles through the public barrels.
-- Consumers use `@core/std` for primitives and `@core/stdx` for contracts, makers, and wrappers.
 
 ### 10.2 Enforcement
 

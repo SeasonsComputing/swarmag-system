@@ -265,8 +265,9 @@ The system uses a singleton `Config` defined in `@core/cfg/config.ts`, initializ
 - `keys` — required environment variable names; bootstrap fails immediately if any are missing
 - `aliases` — optional map of logical name → environment key for platform-specific prefixing
 
-See [Architecture Core §6](documentation/architecture/architecture-core.md#6-configuration-management)
-for complete configuration management detail.
+See [CONVENTIONS §11](CONVENTIONS.md#11-runtime-configuration) for the configuration pattern, and
+[Architecture Core §6](documentation/architecture/architecture-core.md#6-configuration-management)
+for this system's packages.
 
 ### 3.4 Configuration Rules
 

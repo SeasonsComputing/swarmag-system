@@ -12,64 +12,100 @@ and keyset cursor validation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-ApiCrudContract<T> - CrudBaseContract<T> & AdaptedUpdateContract<T> & CrudListContract<T>
-ApiBusRuleContract<TParams, TResult> - Generic business-rule execution contract.
-└ run(params)  Execute business rule and return typed result.
+ApiCrudContract<T>   CrudBaseContract<T> & AdaptedUpdateContract<T> & CrudListContract<T>
+ApiBusRuleContract<TParams, TResult>  Generic business-rule execution contract.
+└ run(params)                         Execute business rule and return typed result.
 
 ERROR HANDLING
 ───────────────────────────────────────────────────────────────────────────────
-ApiError - Standard API failure error shape.
-├ message  Error message.
-├ status   HTTP-like status code.
-└ details  Optional provider detail/code.
-ApiErrorDetail - Normalized error detail shape for mapping.
-├ message  Optional provider message.
-├ status   Optional provider status.
-├ details  Optional provider detail.
-└ code     Optional provider code.
-checkApiError(error, ...): void    Throw ApiError when provider error exists.
-throwApiError(error, ...): never   Always throw ApiError from provider error.
-apiError(error): boolean           Runtime type guard and logger for ApiError.
-checkValidatorError(result): void  Throw ApiError 422 when a validator rejects a payload.
+ApiError                              Standard API failure error shape.
+├ message                             Error message.
+├ status                              HTTP-like status code.
+└ details                             Optional provider detail/code.
+ApiErrorDetail                        Normalized error detail shape for mapping.
+├ message                             Optional provider message.
+├ status                              Optional provider status.
+├ details                             Optional provider detail.
+└ code                                Optional provider code.
+
+ERROR CONSUMERS
+───────────────────────────────────────────────────────────────────────────────
+apiError(error): boolean              Runtime type guard and logger for ApiError.
+
+ERROR MAPPING
+───────────────────────────────────────────────────────────────────────────────
+checkApiError(error, ...): void       Throw ApiError when provider error exists.
+throwApiError(error, ...): never      Always throw ApiError from provider error.
+checkValidatorError(result): void     Throw ApiError 422 when a validator rejects a payload.
 
 CRUD CONTRACTS
 ───────────────────────────────────────────────────────────────────────────────
-CrudBaseContract<T> - Non-mutating-shape CRUD primitives shared by every realization.
-├ create(input)  Create one resource.
-├ get(id)        Read one resource.
-└ delete(id)     Delete one resource and return DeleteResult.
-AdaptedUpdateContract<T> - Scoped update via a client-side ScopedUpdateAdapter (Supabase, IndexedDB).
-└ update(scoped, source)  Update declared fields through an adapter translation.
-DirectUpdateContract<T> - Scoped update with no adapter translation (abstraction-oriented HTTP).
-└ update(source)  Update declared fields directly.
-DeleteResult - Uniform soft-delete response payload.
-├ id         Deleted resource id.
-└ deletedAt  Soft-delete timestamp.
+CrudBaseContract<T>                   Non-mutating-shape CRUD primitives shared by every realization.
+├ create(input)                       Create one resource.
+├ get(id)                             Read one resource.
+└ delete(id)                          Delete one resource and return DeleteResult.
+AdaptedUpdateContract<T>              Scoped update via a client-side ScopedUpdateAdapter (Supabase, IndexedDB).
+└ update(scoped, source)              Update declared fields through an adapter translation.
+DirectUpdateContract<T>               Scoped update with no adapter translation (abstraction-oriented HTTP).
+└ update(source)                      Update declared fields directly.
+DeleteResult                          Uniform soft-delete response payload.
+├ id                                  Deleted resource id.
+└ deletedAt                           Soft-delete timestamp.
 
 LISTING CONTRACTS
 ───────────────────────────────────────────────────────────────────────────────
-CrudListContract<T> - Paginated listing.
-└ list(options?)  List resources with pagination.
-DEFAULT_LIMIT - Default list page size.
-MAX_LIMIT - Maximum list page size.
-ListOptions<T> - Query and pagination request options.
-├ query   Built query, or unfiltered default ordering.
-├ limit   Requested page size.
-└ cursor  Requested pagination cursor.
-ListResult<T> - Pagination response payload.
-├ data     Page data set.
-├ cursor   Cursor for next read position.
-└ hasMore  True when more rows remain.
-listPageLimit(number): number      Clamp the numeric page size.
-listAll(client, query)             Iterate records with paging internal.
-listPage(rows, ...)                Assemble a page and its cursor.
-resolveQueryFields(...)            Resolve query fields or throw ApiError 400.
-listQuery(options)                 Resolve a query or default ordering.
-listFingerprint(query)             Stable criteria/search fingerprint.
-readListCursor(token, issuer, query) Validate a store-local keyset cursor.
-writeListCursor(issuer, query, value, id) Encode a keyset cursor.
-ListQuery<T>                        Resolved query data without a brand.
-ListCursor                         Decoded store-local cursor.
+CrudListContract<T>                   Paginated listing.
+└ list(options?)                      List resources with pagination.
+DEFAULT_LIMIT                         Default list page size.
+MAX_LIMIT                             Maximum list page size.
+ListOptions<T>                        Query and pagination request options.
+├ query                               Built query, or unfiltered default ordering.
+├ limit                               Requested page size.
+└ cursor                              Requested pagination cursor.
+ListResult<T>                         Pagination response payload.
+├ data                                Page data set.
+├ cursor                              Cursor for next read position.
+└ hasMore                             True when more rows remain.
+
+LISTING CONSUMERS
+───────────────────────────────────────────────────────────────────────────────
+listAll(client, query)                Iterate records with paging internal.
+listPageLimit(number)                 Clamp the numeric page size.
+
+LISTING STORE SUPPORT
+───────────────────────────────────────────────────────────────────────────────
+listQuery(options)                    Resolve a query or default ordering.
+resolveQueryFields(...)               Resolve query fields or throw ApiError 400.
+ListQuery<T>                          Resolved query data without a brand.
+listPage(rows, ...)                   Assemble a page and its cursor.
+listFingerprint(query)                Stable criteria/search fingerprint.
+readListCursor(token, issuer, query)       Validate a store-local keyset cursor.
+writeListCursor(issuer, query, value, id)  Encode a keyset cursor.
+ListCursor                            Decoded store-local cursor.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+Paging    listAll pages at MAX_LIMIT until the cursor is null; a caller may
+          stop early. listPageLimit clamps to 1–MAX_LIMIT, default
+          DEFAULT_LIMIT. Without a query, lists order by createdAt then id,
+          ascending. resolveQueryFields rejects unknown fields before a store
+          evaluates the query.
+Ordering  Consistent within each store; cross-store parity is not promised.
+          Local text ordering and cursor comparison share Intl.Collator
+          ('en-US'), ties included. Chronological local timestamp comparison
+          awaits one timestamp form; this contract does not canonicalize When.
+Cursors   base64url JSON holding the exact sort value, id, order and
+          direction, issuing store and resource, and a criteria/search
+          fingerprint. No cursor starts a list; a final page returns cursor
+          null and hasMore false. Clients fetch one extra row. A malformed,
+          foreign, or mismatched cursor throws ApiError 400. Keyset paging is
+          not a snapshot across concurrent edits. Supabase timestamp
+          predicates compare instants at full returned precision.
+Stores    Supabase uses targeted SDK filters and JSONB containment; generated
+          alternatives use separate OR parameters, ANDed by PostgREST, whose
+          operands escape only backslashes and quotes. Search uses escaped
+          ilike; local evaluation uses toLocaleLowerCase('en-US'). HTTP
+          clients forward query data unchanged.
 */
 
 import type { Dictionary } from './adt.ts'
