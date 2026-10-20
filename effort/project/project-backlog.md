@@ -90,12 +90,6 @@ tier and its rules, swarmAg's halves of the split sections, and §11. Two placem
 decision when the split is made: §8.4 Query State Pattern, generic as a pattern but swarmAg in its
 example, and §10.1.6, divided down the middle.
 
-### `EFFORT.md` does not codify roadmap reconciliation, milestones, or deferrals
-
-**Observed:** 2026-10-08 · normal
-
-Design record: [EFFORT.md: Milestones, Reconciliation, Deferrals, Enablers — Brief](../active/2026-10-19-effort-milestones-brief.md).
-
 ## Controls
 
 ### Shared UI controls do not use one state model
