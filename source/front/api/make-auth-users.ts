@@ -59,7 +59,7 @@ export const makeAuthUsers = (): AuthUsersContract => {
   const update = makeBusRuleSupabaseEdgeClient<Dictionary, User>({ fn: 'user-update' })
   const remove = makeBusRuleSupabaseEdgeClient<Dictionary, DeleteResult>({ fn: 'user-delete' })
   const eject = makeBusRuleSupabaseEdgeClient<Dictionary, User>({ fn: 'user-eject' })
-  const hasAccess = makeBusRuleSupabaseRpcClient<{ email: string }, boolean>({ fn: 'user_has_access' })
+  const hasAccess = makeBusRuleSupabaseRpcClient<{ p_email: string }, boolean>({ fn: 'user_has_access' })
 
   return {
     /**
@@ -105,7 +105,7 @@ export const makeAuthUsers = (): AuthUsersContract => {
      * @param input Email access-check payload.
      * @returns True when the email may start OTP login.
      */
-    hasAccess: (email: string): Promise<boolean> => hasAccess.run({ email }),
+    hasAccess: (email: string): Promise<boolean> => hasAccess.run({ p_email: email }),
 
     /**
      * Validate, then update a domain user and synchronize the Supabase Auth identity.

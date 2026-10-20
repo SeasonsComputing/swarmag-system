@@ -1075,7 +1075,7 @@ INSERT INTO questions (
 -- rpc_functions
 -- ──────────────────────────────────────────────────────────────────────────────────────
 
-CREATE OR REPLACE FUNCTION user_has_access(email text)
+CREATE OR REPLACE FUNCTION user_has_access(p_email text)
 RETURNS boolean
 LANGUAGE plpgsql
 SECURITY DEFINER
@@ -1084,7 +1084,7 @@ AS $$
 BEGIN
   RETURN EXISTS (
     SELECT 1 FROM users
-    WHERE primary_email = email
+    WHERE primary_email = p_email
       AND status = 'active'
       AND deleted_at IS NULL
   );
