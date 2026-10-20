@@ -68,7 +68,7 @@ session, so a wrong cut is felt everywhere at once.
 
 **Observed:** 2026-10-03 · normal
 
-Design record: [`core/` Reconciliation — Backlog Brief](../pending/2026-10-03-core-reconciliation-brief.md).
+Design record: [`core/` Reconciliation — Backlog Brief](../active/2026-10-03-core-reconciliation-brief.md).
 
 ### `architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`
 
@@ -106,7 +106,7 @@ Design record: [File Header Conformance — Brief](../active/2026-10-09-file-hea
 
 **Observed:** 2026-10-09 · normal
 
-Design record: [Containers in CONVENTIONS — Brief](../pending/2026-10-09-containers-conventions-brief.md).
+Design record: [Containers in CONVENTIONS — Brief](../active/2026-10-09-containers-conventions-brief.md).
 
 ## Controls
 

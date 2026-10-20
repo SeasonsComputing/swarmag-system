@@ -1,6 +1,7 @@
 # Containers in CONVENTIONS — Brief
 
-**Backlog, not dispatched.** Recorded 2026-10-09 from a CA + AI Architect session, while settling
+**Active.** Chosen 2026-10-20 to ride along with roadmap §5 beside file header conformance:
+both write CONVENTIONS in the same window. Recorded 2026-10-09 from a CA + AI Architect session, while settling
 file-header conventions (`effort/active/2026-10-09-file-header-conformance-brief.md`).
 
 ## What triggered it
