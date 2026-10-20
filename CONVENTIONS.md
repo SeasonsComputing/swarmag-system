@@ -318,10 +318,40 @@ you write a function, first ask which container owns it.
 
 | Form             | Prefer it when                                                      | Example                            |
 | ---------------- | ------------------------------------------------------------------- | ---------------------------------- |
-| Module singleton | One set of state or operations for the whole runtime                | `Config`, `HttpCodes`              |
+| Module singleton | One set of state or operations for the whole runtime                | `UiText`                           |
 | Class            | Instances, or a runtime-specific implementation of a contract       | `DenoProvider` (`RuntimeContract`) |
 | Cohesive module  | A family of related functions sharing no state; the header names it | `@core/std/validators.ts`          |
 | Maker            | An implementation produced from a declarative specification (§9.6)  | `makeAdapter`                      |
+
+```typescript
+// Module singleton: one named set of operations for the runtime
+const optional = (value: string): string | undefined => value.trim() ? value : undefined
+const untitled = (value: string, fallback: string): string => value.trim() || fallback
+const from = (value: number | undefined): string => value === undefined ? '' : value.toString()
+
+export const UiText = { optional, untitled, from }
+
+// Class: a runtime-specific implementation of a contract
+export class DenoProvider implements RuntimeContract {
+  get(key: string): string | undefined {
+    return Deno.env.get(key)
+  }
+  fail(msg: string): never {
+    console.error(msg)
+    Deno.exit(1)
+  }
+}
+
+// Cohesive module: a family of functions sharing no state; the header names it (PREDICATES)
+export const isBoolean = (value: unknown): value is boolean => typeof value === 'boolean'
+export const isEmail = (value: unknown): value is string => …
+
+// Maker: an implementation produced from a declarative specification
+export const SelectOptionAdapter = makeAdapter<SelectOption>({
+  value: ['value'],
+  label: ['label']
+})
+```
 
 A contract gets an interface (§8.2) when more than one implementation makes it substitutable, or
 when a toolkit declares what an application must supply.
