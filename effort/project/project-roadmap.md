@@ -134,8 +134,8 @@ them; each fix lands once instead of chasing every copy:
 
 **Rides along:**
 
-- **File header conformance** — `effort/active/2026-10-09-file-header-conformance-brief.md`:
-  copied files carry their headers.
+- **File header conformance** — closed 2026-10-20,
+  `effort/completed/2026-10-09-file-header-conformance-brief.md`: copied files carry their headers.
 - **CONVENTIONS reconciliation** — `effort/active/2026-10-03-core-reconciliation-brief.md` fills
   CONVENTIONS out from `core/`.
 - **Containers in CONVENTIONS** — `effort/active/2026-10-09-containers-conventions-brief.md`:
