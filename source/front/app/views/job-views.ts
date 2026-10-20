@@ -1,7 +1,13 @@
-/**
- * UX-local shared view types for job display.
- * Display projections only — not domain types. No infrastructure imports.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Job views                                                                    ║
+║ UX-local view types for job display.                                         ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Display projections only, not domain types. No infrastructure imports.
+*/
 
 import type { Id } from '@core/std'
 import type { Job, JobAssessment, JobPlan, JobStatus } from '@domain/abstractions/job.ts'

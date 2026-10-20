@@ -1,6 +1,9 @@
-/**
- * swarmAg style guide application entrypoint.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Style guide application                                                      ║
+║ swarmAg style guide application entrypoint.                                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 import { onMount } from '@solid-js'
 import { render } from '@solid-js/web'

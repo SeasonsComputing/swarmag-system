@@ -1,6 +1,9 @@
-/**
- * UX/SolidJS application runtime configuration bootstrap
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ UX configuration                                                             ║
+║ UX/SolidJS application runtime configuration bootstrap.                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
 
 import { Config } from '@core/cfg/config.ts'
 import { SolidProvider } from '@core/cfg/solid-provider.ts'
