@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Widget registry                                                              ║
-║ swarmAg-suite widget catalog, composed by each application root.             ║
+║ swarmAg-suite widget catalog, bound by each application composition root.    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PUBLIC
