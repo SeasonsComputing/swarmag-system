@@ -9,6 +9,8 @@
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
 
+The protocol for AI agents working on the swarmAg Operations System.
+
 ## 1. Operating Session
 
 Operating sessions are characterized by seeding the session context, declaring the operating mode, and assigning the session to an AI agent.
