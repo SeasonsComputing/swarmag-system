@@ -4,23 +4,23 @@
 ║ Static fixture data for the living style guide application.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-PURPOSE
-───────────────────────────────────────────────────────────────────────────────
-Provides fixture data used to render static style-guide examples.
-
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-COLOR_SWATCHES          Design token swatches for color validation.
-TEXT_TOKENS             Design token text colors.
-COLOR_TOKENS            Design token colors.
-BUTTON_VARIANTS         Button variant examples.
-COLLECTION_CURSOR_ITEMS Small editable collection cursor sample.
-COLLECTION_CURSOR_MANY  Larger collection cursor sample for count readout.
-STATUSES                Service status options.
-SERVICES                Service category options.
-DEFAULT_SERVICES        Default multi-select service values.
-ACCORDION_DEFAULT_VALUE Default open accordion value.
-EQUIPMENT               Grouped equipment records for section-row table rendering.
+StyleGuideCollectionItem  Collection cursor demonstration item.
+├ label                   Item label.
+├ acreage                 Acreage text.
+└ note                    Item note.
+COLOR_SWATCHES            Design token swatches for color validation.
+COLOR_GRADIENTS           Design token gradients.
+TEXT_TOKENS               Design token text colors.
+BUTTON_VARIANTS           Button variant examples.
+STATUSES                  Service status options.
+SERVICES                  Service category options.
+DEFAULT_SERVICES          Default multi-select service values.
+ACCORDION_DEFAULT_VALUE   Default open accordion value.
+COLLECTION_CURSOR_ITEMS   Small editable collection cursor sample.
+COLLECTION_CURSOR_MANY    Larger collection cursor sample for count readout.
+EQUIPMENT                 Grouped equipment records for section-row table rendering.
 */
 
 /** Local style-guide fixture item for collection cursor demonstrations. */
