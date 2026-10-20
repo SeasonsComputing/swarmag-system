@@ -1,7 +1,9 @@
 # `core/` Reconciliation — Brief
 
-**Active.** Chosen 2026-10-20 to ride along with roadmap §5 beside file header conformance:
-both write CONVENTIONS in the same window. Recorded 2026-10-03: on that day the Chief Architect and AI Architect asked where a new
+**Closed 2026-10-20.** CONVENTIONS 1.1 is the programming guide with full `core/` coverage,
+`architecture-core.md` is cut to the system, and the `core/std` headers carry the list semantics.
+Chosen 2026-10-20 to ride along with roadmap §5 beside file header conformance: both write
+CONVENTIONS in the same window. Recorded 2026-10-03: on that day the Chief Architect and AI Architect asked where a new
 rule about update scopes should live. That question showed that `source/core/`,
 `documentation/architecture/architecture-core.md`, and `CONVENTIONS.md` have never been
 reconciled against each other. Backlog entry: "`core/`, `architecture-core.md`, and
@@ -96,11 +98,13 @@ holds, not assume that a missing CONVENTIONS entry means a missing rule.
 - **The layer-6 form-scope abstraction,** once it is designed. Exploration began 2026-10-03, and
   its outcome feeds this brief; it is not decided here.
 
-## Open — decided during this effort, not before
+## Open, settled 2026-10-20
 
-- How to resolve the §15 conflict between "throw `Error`" and `ApiError`.
-- Which new conventions are guard-enforceable, as candidates for the backlog entry "No guard
-  enforces conformity to established conventions".
+- **`Error` versus `ApiError`.** Resolved in CONVENTIONS §15: libraries throw `Error`, validation
+  throws `ValidatorError`, clients throw `ApiError`, services throw `HttpServiceError` or return
+  `toInternalError`.
+- **Guard-enforceable conventions.** Dropped: a guard fails on judgment the conventions leave
+  open, as the dropped header guard showed. The general backlog entry stands.
 
 ## Approach
 
@@ -285,6 +289,24 @@ Decided by the CA on 2026-10-05; the code base conforms.
 
 **For the reconciliation:** CONVENTIONS §3 states the rule. A governance file: committed with the
 governance-gate bypass.
+
+## Closure (2026-10-20)
+
+Production by the CA and AI Architect: CONVENTIONS 1.1 (`8cf40f6`, `7f84c36`, and the closing
+commit), `architecture-core.md` cut and `core/std` header semantics (`db10d9d`), and the
+`user_has_access` repair surfaced by the RPC convention (`0dc1185`).
+
+- **Amendments carried into CONVENTIONS:** the own-namespace and type-import rules (§3), the
+  constant rule (§4.2), makers and both contract-file cases (§10.1, §10.2), `InstantiableAdapt`
+  in adapters (§10.3), `makeScope` and the scope rules (§10.4), the soft-delete read rule
+  (§14.2.10), No magic with its corollary (§7.6).
+- **Superseded:** the 10-18 plan for a makers section in `architecture-core.md`; Decision 3 puts
+  makers in CONVENTIONS §10.1. README §2.4.1 already names makers.
+- **Deferred to the devops brief:** whether CONVENTIONS gains a DevOps and guards chapter,
+  revisiting the 2026-09-24 placement.
+- **Deferred to the backlog:** `domain-archetypes.md` and the domain genesis prompt restate what
+  CONVENTIONS now covers.
+- **Parked:** pruning the remaining architecture and UX documents the same way.
 
 ## Design history
 
