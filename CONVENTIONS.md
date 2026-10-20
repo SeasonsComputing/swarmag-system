@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.0)
+# Software Construction Conventions (1.1)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.0
-- Published: 2026 September 15th
+- Version: 1.1
+- Published: 2026 October 20th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -15,14 +15,15 @@ This document is the authoritative reference of software construction convention
 
 Code that conflicts with these conventions is wrong — not this document.
 
+Some conventions are preferences, written as such and applied with judgment; review holds them,
+not a guard. Departing from a preference with a stated reason is not a violation.
+
 ## 2. Language & Tooling
 
-| Item               | Guideline                                                                                                                                                                                                                                                                                                                                                                       |
-| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime            | Deno with strict TypeScript (`deno task check`)                                                                                                                                                                                                                                                                                                                                 |
-| Encoding           | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint.                                                                                                                                                                                                                                                                          |
-| Type vs. Interface | Use `type` for data shapes, abstractions, aliases, and unions.<br>Use `interface` for encapsulated API contracts that something explicitly implements.<br>In the ambiguous case, decide on meta-type vs. data: an `interface` is a meta-type whose behavior methods and attribute metadata are immutable specification; an attribute whose value is a callback is a data shape. |
-| Primitives/ADTs    | The standard vocabulary comes from `@core/std` — primitives, containers, life-cycle shapes, and relations. `Id` is a UUID v7 string, `When` an ISO 8601 UTC string, and so on. §8.1 is the authoritative catalog; consult it rather than re-deriving one of these locally.                                                                                                      |
+| Item     | Guideline                                                                                              |
+| -------- | ------------------------------------------------------------------------------------------------------ |
+| Runtime  | Deno with strict TypeScript (`deno task check`)                                                        |
+| Encoding | UTF-8 (Unicode). Avoid non-ASCII only where required by a specific file format or external constraint. |
 
 ## 3. Import Aliases
 
@@ -42,7 +43,7 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 
 ### 3.2 Barrel aliases
 
-Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@ux/shell/workbench/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§12).
+Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@ux/shell/workbench/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§13).
 
 | Alias        | Resolves to                     |
 | ------------ | ------------------------------- |
@@ -95,7 +96,7 @@ All TypeScript is formatted by `dprint` via `deno task fmt`. The formatter is au
 - **Line length** — maximum length of any line is `105` characters.
 - **Comment box length** — comment box maximum length is `80` characters
 - **File order of symbols** — exported symbols are listed at the top of the file with non-exports below them, when possible.
-- **Comment exported types** — every exported type has a comment. Single-line if sufficient. Multi-line if warranted.
+- **Comment exported types** — every exported type has a comment; a const-enum pair or a group of related declarations may share one. Single-line if sufficient. Multi-line if warranted.
 
 ### 5.2 Single-line statements
 
@@ -120,29 +121,21 @@ for (const item of items) process(item)
 
 Documentation intensity follows implementation complexity. The code speaks first; commentary fills only what the code cannot.
 
-### 6.1 Spec files
+### 6.1 File headers
 
-```typescript
-/**
- * Supabase edge function User Create service.
- */
+Every file begins with a box header. Headers are written in expanding levels, in a fixed order:
+box, then PURPOSE, then PUBLIC or its groups, then any further sections.
 
-import handler from '@back/supabase-edge/functions/user-create.ts'
-import { wrapSupabaseShim } from '@core/svc/wrap-supabase-shim.ts'
+| Level | Applies to                        | Header                                                                        |
+| ----- | --------------------------------- | ----------------------------------------------------------------------------- |
+| 1     | Every file                        | A box with a title and a one-line description                                 |
+| 2     | Every file another module imports | Level 1, then PURPOSE and PUBLIC                                              |
+| 3     | Complex files                     | Level 2, with PUBLIC replaced by named groups; named sections may follow them |
 
-Deno.serve(wrapSupabaseShim(handler))
-```
+Tooling and tests conform like product code. Test cases and files used only by packaging or the
+runtime, such as build configurations and service workers, stop at level 1.
 
-### 6.2 Functional files
-
-Files where behavior matters and the public surface benefits from a documented contract.
-
-A box header replaces the file-header JSDoc, followed by a detailed "PURPOSE" subsection header.
-Finally a "PUBLIC" subsection header where symbols are enumerated with brief description of each symbol on the same line.
-
-Boxes should have equal length lines to ensure the box sides align with the box corners.
-
-Example:
+A level 2 header:
 
 ```typescript
 /*
@@ -162,9 +155,51 @@ validateUserUpdate(input)  Validate UserUpdate payloads.
 */
 ```
 
+At level 3, named groups replace the PUBLIC heading, and further sections may follow them:
+
+```text
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Route grammar, construction, and content for an application shell.
+
+ROUTE GRAMMAR
+───────────────────────────────────────────────────────────────────────────────
+RouteKind     Kinds of route the shell resolves.
+
+ROUTE FACTORY
+───────────────────────────────────────────────────────────────────────────────
+makeRoutes    Builds the route table from declarations.
+
+DESIGN PRINCIPLES
+───────────────────────────────────────────────────────────────────────────────
+Routes are declared, never discovered.
+```
+
+`@core/std/wrap-http-handler.ts` is the level 3 reference: named groups followed by examples,
+design principles, and the request-response flow.
+
+### 6.2 PUBLIC
+
+- PUBLIC, or its named groups, lists every exported symbol, props types included.
+- Each entry, symbol or member, is its name and a brief description.
+- A container, whether of operations (a namespace object, a class) or of data (a props type),
+  lists its public members beneath it with `├` and `└`, aligned with the other entries.
+- A type built by intersection lists its own members and one line naming what it extends, never
+  the inherited members.
+- Explanation that a phrase cannot carry goes in a doc comment on the member.
+
+```text
+UiText               Text conversions for control values and display text.
+├ optional           Blank text to undefined.
+├ number             Text to number.
+├ label              kebab-case to display text.
+├ untitled           Blank value to a consumer-supplied label.
+└ from               Number to text.
+```
+
 ### 6.3 Header rules
 
-- Ensure box sides align with box corners
+- Box lines are of equal length, so the sides meet the corners.
 - Subsection header (e.g. PURPOSE, PUBLIC)
   - 1 blank line prior to subsection
   - Subsection heading in ALL CAPS
@@ -200,12 +235,12 @@ Files with clear categories of declarations and functions divide the code body i
 
 ### 6.5 Comment conventions
 
-| Context                       | Style                                                               |
-| ----------------------------- | ------------------------------------------------------------------- |
-| Spec file types               | Single-line `/** */` — one sentence, only when name is insufficient |
-| Functional exported functions | JSDoc with `@param` and `@returns` for non-obvious args             |
-| Private helpers               | Inline `//` — only when intent isn't obvious from the code          |
-| Dead comments                 | Delete them. Version control exists.                                |
+| Context            | Style                                                        |
+| ------------------ | ------------------------------------------------------------ |
+| Type declarations  | Single-line `/** */` — one sentence; multi-line if warranted |
+| Exported functions | JSDoc with `@param` and `@returns` for non-obvious args      |
+| Private helpers    | Inline `//` — only when intent isn't obvious from the code   |
+| Dead comments      | Delete them. Version control exists.                         |
 
 ## 7. Code Tone
 
@@ -235,9 +270,13 @@ Export only what callers need. Private helpers stay private.
 
 No implicit behavior, no runtime reflection, no meta-programming. Configuration is explicit; providers are injected; contracts are stated in interfaces; structured data as types.
 
-## 8. Implementation Patterns
+## 8. Types and Containers
 
-### 8.1 `@core/std` types
+### 8.1 Primitives and ADTs
+
+The standard vocabulary comes from `@core/std`: primitives, containers, life-cycle shapes, and
+relations. `Id` is a UUID v7 string, `When` an ISO 8601 UTC string, and so on. This catalog is
+authoritative; consult it rather than re-deriving one of these locally.
 
 Use types from `@core/std` instead of ad-hoc primitives and container generics.
 
@@ -265,7 +304,33 @@ Use types from `@core/std` instead of ad-hoc primitives and container generics.
 - When narrowing unknown objects in guards, use `Dictionary` casts (`const x = v as Dictionary`) instead of `Record<string, unknown>`.
 - Use `StringDictionary` for key/value string/string maps.
 
-### 8.2 `const-enum`
+### 8.2 Type vs. interface
+
+Use `type` for data shapes, abstractions, aliases, and unions. Use `interface` for encapsulated API
+contracts that something explicitly implements. In the ambiguous case, decide on meta-type vs. data:
+an `interface` is a meta-type whose behavior methods and attribute metadata are immutable
+specification; an attribute whose value is a callback is a data shape.
+
+### 8.3 Containers
+
+Encapsulate behavior in a named container. This is a preference, applied with judgment (§1): when
+you write a function, first ask which container owns it.
+
+| Form             | Prefer it when                                                      | Example                            |
+| ---------------- | ------------------------------------------------------------------- | ---------------------------------- |
+| Module singleton | One set of state or operations for the whole runtime                | `Config`, `HttpCodes`              |
+| Class            | Instances, or a runtime-specific implementation of a contract       | `DenoProvider` (`RuntimeContract`) |
+| Cohesive module  | A family of related functions sharing no state; the header names it | `@core/std/validators.ts`          |
+| Maker            | An implementation produced from a declarative specification (§9.6)  | `makeAdapter`                      |
+
+A contract gets an interface (§8.2) when more than one implementation makes it substitutable, or
+when a toolkit declares what an application must supply.
+
+A free function is right for a pure primitive used across containers, and for a maker.
+
+## 9. Implementation Patterns
+
+### 9.1 `const-enum`
 
 Any value set requiring runtime validation is expressed as a `const` tuple paired with a derived type alias.
 
@@ -288,7 +353,7 @@ SHAPE_KINDS.includes(input.kind as ShapeKind)
 const SHAPE_KINDS = ['circle', 'rect'] as const
 ```
 
-### 8.3 `intersection-type`
+### 9.2 `intersection-type`
 
 When a type extends a base type with additional or narrowed fields, express as a named intersection.
 
@@ -303,7 +368,7 @@ export type CircleShape = BaseShape & {
 - The narrowed discriminator field must appear in the intersection body, not the base.
 - Used as constituents of a `union-type`.
 
-### 8.4 `union-type`
+### 9.3 `union-type`
 
 When a concept has structurally distinct variants sharing a discriminator field, express as a named base type, named intersection-type constituents, and a discriminated union.
 
@@ -368,7 +433,7 @@ export const validateShapeCreate = (input: ShapeCreate): ExpectResult => {
 }
 ```
 
-### 8.5 Runtime configuration pattern
+### 9.4 Runtime configuration pattern
 
 The system uses a singleton `Config` with injected runtime providers. Defined in `@core/cfg/config.ts`; initialized once per deployment context.
 
@@ -421,7 +486,7 @@ export { Config }
 - `Config.fail(msg)` — throws `never`; use for invariant violations.
 - Never access `Deno.env` or `import.meta.env` directly. Always go through `Config.get()`.
 
-### 8.6 Adapters
+### 9.5 Adapters
 
 Domain adapters use metadata-driven generation via `makeAdapter` from `@core/stdx`.
 
@@ -474,11 +539,11 @@ export const AnswerAdapter = makeAdapter<Answer>({
 })
 ```
 
-### 8.7 Makers
+### 9.6 Makers
 
 Makers produce interface conformant implementations. They do not create instances of an object they create code. Makers are typically contained in `make-{concept}-{role}.ts`. Where concept is the concrete type of maker, for example `indexeddb` or `supabase`. The role of the interface, for example, `client` or `provider`
 
-## 9. Error Handling
+## 10. Error Handling
 
 - Throw `Error` with actionable messages, for example: `'Asset dictionary missing required field: id'`.
 - Never swallow errors silently.
@@ -486,17 +551,17 @@ Makers produce interface conformant implementations. They do not create instance
 - Never expose stack traces or internal state in HTTP responses.
 - Use `toInternalError()` for unexpected server failures in edge functions.
 
-## 10. Schema
+## 11. Schema
 
 General schema authoring conventions for canonical DDL.
 
-### 10.1 Identifiers
+### 11.1 Identifiers
 
 - All table names, column names, constraint names, index names, and policy names use `snake_case`.
 - Table names are plural nouns.
 - No quoted identifiers.
 
-### 10.2 Column ordering
+### 11.2 Column ordering
 
 Columns within a table follow this order:
 
@@ -505,7 +570,7 @@ Columns within a table follow this order:
 3. Domain columns
 4. Lifecycle columns (`created_at`, `updated_at`, `deleted_at`)
 
-### 10.3 Data types
+### 11.3 Data types
 
 | Domain type       | PostgreSQL type | Notes                                     |
 | ----------------- | --------------- | ----------------------------------------- |
@@ -518,7 +583,7 @@ Columns within a table follow this order:
 | `Composition*<T>` | `JSONB`         | Embedded subordinate; never normalized    |
 | `const-enum`      | `TEXT`          | Constrained via named `CHECK`             |
 
-### 10.4 NOT NULL discipline
+### 11.4 NOT NULL discipline
 
 - Required columns are `NOT NULL`.
 - Optional fields are nullable.
@@ -526,26 +591,26 @@ Columns within a table follow this order:
 - `deleted_at` is nullable.
 - Junction foreign keys are `NOT NULL`.
 
-### 10.5 CHECK constraints for const-enum columns
+### 11.5 CHECK constraints for const-enum columns
 
 - Every const-enum-backed column has a named `CHECK` constraint.
 - Constraint naming: `{table}_{column}_check`.
 
-### 10.6 Foreign key cascade policies
+### 11.6 Foreign key cascade policies
 
 | Relationship type             | Policy               | Rationale                                         |
 | ----------------------------- | -------------------- | ------------------------------------------------- |
 | Ownership (parent owns child) | `ON DELETE CASCADE`  | Child has no meaning without parent               |
 | Cross-entity reference        | `ON DELETE RESTRICT` | Prevent silent data loss across entity boundaries |
 
-### 10.7 Indexes
+### 11.7 Indexes
 
 - Primary keys are indexed automatically.
 - Add an explicit index on every foreign key column.
 - Add explicit indexes for columns referenced by RLS `USING` clauses.
 - Index naming: `{table}_{column}_idx`.
 
-### 10.8 Row Level Security
+### 11.8 Row Level Security
 
 - Enable RLS on every table.
 - Define policies immediately after each `CREATE TABLE` block.
@@ -554,21 +619,21 @@ Columns within a table follow this order:
 - Junction tables: `SELECT`, `INSERT`, `DELETE` only — no `UPDATE` policy.
 - `InstantiableOnly` (append-only) tables: `SELECT`, `INSERT` only — no `UPDATE`, no `DELETE` policy.
 
-### 10.9 JSONB columns
+### 11.9 JSONB columns
 
 - JSONB is only for `Composition*<T>` subordinate compositions.
 - Composition columns store arrays regardless of cardinality.
 - Use `DEFAULT '[]'::jsonb` for `CompositionMany` and `CompositionPositive`.
 - `CompositionOne` is required and has no empty-array default.
 
-### 10.10 Soft delete
+### 11.10 Soft delete
 
 - `Instantiable` tables use `deleted_at TIMESTAMPTZ`.
 - Active rows are `deleted_at IS NULL`.
 - RLS `SELECT` policies must filter soft-deleted rows.
 - `InstantiableOnly` tables have no `updated_at` or `deleted_at` columns.
 
-### 10.11 SQL comment and spacing conventions
+### 11.11 SQL comment and spacing conventions
 
 Use this fixed-width section divider:
 
@@ -585,7 +650,7 @@ Spacing:
 - One blank line between consecutive `CREATE POLICY` blocks.
 - One blank line between consecutive `CREATE INDEX` blocks.
 
-### 10.12 Schema file header
+### 11.12 Schema file header
 
 Every `schema.sql` begins with:
 
@@ -601,18 +666,18 @@ Every `schema.sql` begins with:
 -- =============================================================================
 ```
 
-### 10.13 Drop order
+### 11.13 Drop order
 
 Emit `DROP TABLE IF EXISTS` for all domain tables in reverse dependency order at the top of the file, before any `CREATE TABLE` statements.
 
-## 11. SQL DDL Conventions
+## 12. SQL DDL Conventions
 
 SQL DDL ownership is split by artifact type:
 
 - **Canonical schema DDL** defines the full current-state schema.
 - **Migration DDL** defines forward-only deltas from one state to the next.
 
-### 11.1 Rules
+### 12.1 Rules
 
 - Keep canonical schema and migrations aligned; either artifact may be used to reconstruct expected runtime state.
 - Canonical schema is idempotent and reproducible.
@@ -620,10 +685,10 @@ SQL DDL ownership is split by artifact type:
 - A migration changes only what is required for that versioned step.
 - Destructive changes must be explicit and reviewed (drop/rename/type narrowing/data rewrite).
 - Data backfills in migrations must be deterministic and safe to rerun when possible.
-- Constraint, index, and policy naming follows section 10 naming conventions.
+- Constraint, index, and policy naming follows section 11 naming conventions.
 - If canonical schema and migrations conflict, treat it as a release blocker until reconciled.
 
-## 12. Testing Conventions
+## 13. Testing Conventions
 
 ```text
 source/tests/
@@ -640,7 +705,7 @@ source/tests/
 - Tests exercise the public contract of each layer, not implementation details.
 - Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.
 
-## 13. Amendment Record
+## 14. Amendment Record
 
 Each published version supersedes the one before it. Versions below 1.0 were never tracked as versions at the time — they are reconstructed retroactively from git, one per path rename, marking substantive content shifts within each era rather than the rename itself.
 
@@ -654,5 +719,6 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 | 0.6     | 2026 June 30th      | Its busiest era, and its first as a root-level, governance-tier document: barrel-import restrictions, the type/interface distinction, and the `core/cli`/`core/svc` namespace-length rule were all clarified here, alongside `@front/api` reconciliation and DevOps gap documentation.                                                                                                                                                                              |
 | 0.7     | 2026 September 13th | Path renamed to `CONVENTIONS.md` (commit `5272c25`) with no content change of its own — bundled quietly into an unrelated commit, internal references still said "STYLE-GUIDE" for two more days.                                                                                                                                                                                                                                                                   |
 | 1.0     | 2026 September 15th | Cross-references in this document and every document citing it (`AGENTS.md`, the architecture docs, the genesis prompts) caught up to the new name (commit `ca77878`), and it gained explicit metadata and this amendment record for the first time. The rename's rationale: the document covers more than style — §8.6/§8.7 adapter and maker shape, §12 testing are structural pattern conventions, not aesthetics — and the old name undersold its actual scope. |
+| 1.1     | 2026 October 20th   | §6 rewritten. The spec-file JSDoc header is retired: every file begins with a box header, written in expanding levels, with level 2 for files another module imports (§6.1). PUBLIC, or its named groups, lists every export, props types included, and containers list their members as a tree (§6.2). Tooling and tests conform like product code.                                                                                                                |
 
 _End of Conventions Document_
