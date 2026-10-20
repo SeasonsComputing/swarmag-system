@@ -243,20 +243,6 @@ issued code.
 
 ## Shell
 
-### DrillDown's onReturnControl prop is both a data channel and a UI-takeover switch
-
-**Observed:** 2026-08-29 · low
-
-`drill-down.tsx`'s internal return button is gated by
-`<Show when={!props.onReturnControl && frame().returnTo !== undefined}>` — passing
-`onReturnControl` for any reason (e.g. logging drill depth) also silently suppresses
-`DrillDown`'s own return UI, with no type-level hint that the prop does double duty.
-
-A future consumer wanting both — notification and the built-in button — gets a working build
-with the back-navigation control silently missing, discoverable only by clicking through the
-UI. Splitting the two concerns (a separate `hideOwnReturn?: boolean`, or always rendering and
-letting layout hide it) would make the tradeoff visible in the type.
-
 ### PanelHeaderTitle's heading-depth mapping is already at its hardcoded ceiling
 
 **Observed:** 2026-08-29 · normal
