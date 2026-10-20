@@ -134,6 +134,10 @@ them; each fix lands once instead of chasing every copy:
 - **Stage test authorization** — `effort/active/2026-10-13-stage-test-authorization-brief.md`: new
   managers arrive with integration tests that run.
 
+**Rides along:** `effort/active/2026-10-19-effort-milestones-brief.md` codifies milestones,
+reconciliation, deferrals, and enablers in `EFFORT.md`. It makes nothing here copy-ready; it lands in
+the same window so the method is written down as practiced.
+
 **Features:**
 
 - **Asset Manager** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`.

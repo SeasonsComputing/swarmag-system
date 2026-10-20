@@ -94,37 +94,7 @@ example, and §10.1.6, divided down the middle.
 
 **Observed:** 2026-10-08 · normal
 
-`EFFORT.md` §3 says the roadmap "draws its content from the backlog … and from user stories" and §7
-defines milestones, but neither says how the roadmap is kept in step with them. On 2026-10-08 the CA
-went to ask for a backlog/roadmap reconciliation and found no protocol to follow. The same day's
-ad hoc reconciliation found §1's Notes Editor dependencies satisfied but still listed, and a §1
-condition ("build it before §5, or move it") due before §5 starts. The CA also observed that
-backlog additions slow while briefs are produced and closed in-effort: findings land in
-amendments, out-of-scope lines, and "not taken" notes, and some were recorded only in briefs that
-then closed into frozen `effort/completed/`.
-
-Decided by the CA on 2026-10-08, to codify:
-
-- **Deferrals at closure.** Before a brief moves to `effort/completed/`, every deferred or
-  not-taken item either becomes a backlog entry, joins a pending brief, or is explicitly dropped.
-- **Milestones.** Each numbered roadmap section is a milestone (§7).
-- **Reconciliation happens when a milestone closes.**
-- **Enablers (2026-10-19).** A milestone lists its enablers ahead of its features: work that
-  delivers no feature itself but makes the features buildable or copy-ready. Enablers are briefs
-  or backlog entries like any other work, and the milestone closes only when both lists are done.
-  First used in roadmap §5.
-
-To settle when this is picked up:
-
-- What a reconciliation checks, in both directions: backlog entries the roadmap should carry, and
-  roadmap items whose dependencies have landed.
-- How a backlog entry records that the roadmap has placed it, as §4 does for a brief.
-- What a milestone verification pass consists of beyond its briefs' own verification.
-- Whether the rule that drafts are edited in place until hand-off, then amended and marked, belongs
-  in §4.
-
-`EFFORT.md` is a governance file: changes need the CA's authorization and are committed with the
-governance-gate bypass. The roadmap's preamble ("entries") is updated alongside.
+Design record: [EFFORT.md: Milestones, Reconciliation, Deferrals, Enablers — Brief](../active/2026-10-19-effort-milestones-brief.md).
 
 ### File headers do not conform to CONVENTIONS §6
 
