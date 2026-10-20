@@ -12,7 +12,7 @@ Integration tests against stage cannot run, for two reasons:
 1. **The shared test configuration cannot bootstrap `api`.** `front/api/api.ts` re-exports
    `AppState`, which is backed by IndexedDB, so importing `api` needs `LOCAL_DB_NAME` registered in
    `Config`; `source/tests/config/test-config.ts` registers only `SUPABASE_RDBMS_URL`,
-   `SUPABASE_PUBLIC_KEY`, and `SUPABASE_CLIENT_MODE` (backlog: "The shared test configuration
+   `SUPABASE_PUBLIC_KEY`, and `SUPABASE_CLIENT_MODE` (backlog: B-22 "The shared test configuration
    cannot bootstrap `api`").
 2. **No test holds a session.** `users-api-test.ts` calls `api.Users.create` with no
    authenticated caller, but every user write runs through an edge function that requires an
@@ -72,7 +72,7 @@ Operating mode: **Foundation** (authentication boundary, seed data, test infrast
 | `source/tests/cases/users-api-test.ts`     | Sign in through the fixture before its calls.                    |
 | `architecture-devops.md`                   | Running integration tests against stage: identity, key, genesis. |
 
-**Out of scope:** coverage above the domain/API layer (backlog: "No automated coverage above the
+**Out of scope:** coverage above the domain/API layer (backlog: B-21 "No automated coverage above the
 domain/API layer"); test isolation beyond genesis resets; a test environment other than stage.
 
 ## Open
@@ -93,7 +93,7 @@ domain/API layer"); test isolation beyond genesis resets; a test environment oth
 
 ## Amendment — 2026-10-19 — Backlog entry text folded in
 
-The backlog entry "The shared test configuration cannot bootstrap `api`" carried its own description, now replaced there by a link to this
+The backlog entry B-22 "The shared test configuration cannot bootstrap `api`" carried its own description, now replaced there by a link to this
 brief. Its text, kept here so nothing is lost:
 
 > Since 2026-07-19 (`cdc6ebb`), `front/api/api.ts` re-exports `AppState`, which is backed by

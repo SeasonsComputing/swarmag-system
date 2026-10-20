@@ -74,7 +74,7 @@ active user.
     subject; the whole dashboard narrows to that one subject; the choice is remembered per app.
     A User with a single fixed subject is offered no choice.
 12. **Work records stamp the session User.** Whoever performs the work is logged, whatever the
-    subject (backlog: "Job work records stamp the session user"). Anyone who chose a Job may run
+    subject (backlog: B-29 "Job work records stamp the session user"). Anyone who chose a Job may run
     it.
 13. **Starting Job Work is an office feature.** It transitions the Job to `executing` and finalizes
     the manifest. It lives in `front/app/shell/` so that Admin uses it now and `app-leads` later.

@@ -2,7 +2,7 @@
 
 **Active, draft.** Recorded 2026-10-19 from a CA + AI Architect session as an enabler of roadmap
 §5 Mechanical Productions: both defects live in `AbstractionManager`, which every new manager
-uses. Absorbs the backlog entry "A fresh New editor shows stale feedback and a premature field
+uses. Absorbs the backlog entry B-13 "A fresh New editor shows stale feedback and a premature field
 error". Awaits CA review, AI Coding Engine review, and the production gate.
 
 ## What triggered it

@@ -3,7 +3,7 @@
 **Active, draft.** Recorded 2026-10-19 from a CA + AI Architect session as an enabler of roadmap
 §5 Mechanical Productions: the reference implementations are about to be copied into new
 managers, so each fix lands once here instead of in every copy. Absorbs the backlog entries "Draft
-fingerprints are written four times" and "`workbench-context.tsx` mixes draft services with a
+fingerprints are written four times" and B-12 "`workbench-context.tsx` mixes draft services with a
 component". Awaits CA review, AI Coding Engine review, and the production gate.
 
 ## What triggered it

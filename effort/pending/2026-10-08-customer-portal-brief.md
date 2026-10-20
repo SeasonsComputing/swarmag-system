@@ -68,7 +68,7 @@ story 4), which is portal users. The same session's account-manager work is
    - **(b) Delegated creation:** `sales` may create `customer`-role Users only. Loosens an
      authorization boundary; a Foundation decision.
    - **(c) A tracked request:** the rep records a portal-access request; an administrator fulfills
-     it. A first use of the parked Request model.
+     it. A first use of the parked Request model (P-9).
 2. **What a Portal user's drill-down holds,** given Open 1, and what unassigning does (the User
    survives).
 3. **Lifecycle:** what happens to access when the job ends, the Customer goes inactive, or the

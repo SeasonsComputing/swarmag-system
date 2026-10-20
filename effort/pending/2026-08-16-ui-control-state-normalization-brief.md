@@ -702,7 +702,7 @@ audit's list of files read stands as the record of what was read.
 
 ## Amendment — 2026-10-19 — Backlog entry text folded in
 
-The backlog entry "Shared UI controls do not use one state model" carried its own description, now replaced there by a link to this
+The backlog entry B-4 "Shared UI controls do not use one state model" carried its own description, now replaced there by a link to this
 brief. Its text, kept here so nothing is lost:
 
 > The shared control layer does not assign one stable meaning to rest, hover, focus,
