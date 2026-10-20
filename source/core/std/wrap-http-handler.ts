@@ -11,7 +11,7 @@ Request/Response contract for building REST APIs. Works identically on
 Netlify or Supabase functions (edge runtime) or Node and Deno-based
 application server (host runtime).
 
-PUBLIC
+HTTP PRIMITIVES
 ───────────────────────────────────────────────────────────────────────────────
 HttpMethod, HttpQuery, HttpHeaders
   → Fundamental HTTP primitives used throughout
