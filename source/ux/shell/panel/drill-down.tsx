@@ -36,7 +36,6 @@ export type DrillDownProps = {
   rootTitle: string
   root: (drill: DrillContract) => UiComponent
   context?: PanelStepContext
-  onReturnControl?: (control: DrillReturnControl | null) => void
 }
 
 /** Direction of the current drill panel transition. */
@@ -144,7 +143,6 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
       }
       : null
     props.context?.registerDrillReturn(control)
-    props.onReturnControl?.(control)
     props.context?.registerTrailingAction(current.save())
   })
   onCleanup(() => {
@@ -155,12 +153,11 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
     }
     props.context?.registerDrillReturn(null)
     props.context?.registerTrailingAction(null)
-    props.onReturnControl?.(null)
   })
 
   return (
     <section ref={hostRef} data-shell='drill-down' data-shell-direction={direction() ?? undefined}>
-      <Show when={!props.context && !props.onReturnControl && frame().parent !== undefined}>
+      <Show when={!props.context && frame().parent !== undefined}>
         <div data-shell='drill-down-return'>
           <UiActionButton
             icon='corner-top-left'
