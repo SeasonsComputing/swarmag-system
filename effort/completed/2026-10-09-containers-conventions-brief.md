@@ -1,6 +1,7 @@
 # Containers in CONVENTIONS — Brief
 
-**Active.** Chosen 2026-10-20 to ride along with roadmap §5 beside file header conformance:
+**Closed 2026-10-20.** CONVENTIONS 1.1 states the preference (§1) and gains §8 Types and
+Containers. Chosen 2026-10-20 to ride along with roadmap §5 beside file header conformance:
 both write CONVENTIONS in the same window. Recorded 2026-10-09 from a CA + AI Architect session, while settling
 file-header conventions (`effort/completed/2026-10-09-file-header-conformance-brief.md`).
 
@@ -44,28 +45,22 @@ elsewhere, but no section states when to use each, or when a free function is th
    cohesive families of functions, and their headers name those families
    (`effort/completed/2026-10-09-file-header-conformance-brief.md`, Decision 7).
 
-## Open
+## Open, resolved 2026-10-20
 
-1. **Prescriptive guidance enforced by review.** CONVENTIONS already holds rules no guard can check
-   ("Documentation intensity follows implementation complexity", "Headers stay current"). The CA
-   holds that CONVENTIONS should allow prescriptive guidance that is not guard-enforced. AGENTS §3.1
-   treats any CONVENTIONS violation as a correctness failure, so CONVENTIONS should name the
-   category: guidance enforced by review, which the AI Coding Engine follows by default and departs
-   from only with a stated reason. How it is marked in the text is open; both edits are governance
-   edits.
-2. **The section's content:** when a class, when a module singleton, when an interface versus a
-   type (the substitutability test already used for Contract versus Context naming), and when a
-   free function is right (a maker; a pure primitive).
-3. **The census.** Exported free functions outside `core/`, grouped by module, showing where a
-   container would own them. It informs the section's examples and identifies candidates for
-   later, separately authorized refactoring; the census changes no code.
-4. **Domain.** `domain/` is regenerated from genesis prompts that follow `domain-archetypes.md`, so
-   any container preference for domain artifacts is stated there, not by hand edits.
+1. **Prescriptive guidance enforced by review.** CONVENTIONS §1: some conventions are preferences,
+   applied with judgment and held by review; departing from one with a stated reason is not a
+   violation. AGENTS needs no edit.
+2. **The section's content.** §8 Types and Containers: §8.1 Primitives and ADTs and §8.2 Type vs.
+   interface, both moved out of §2; §8.3 Containers, the forms with `core/` examples and sample
+   code. The old §8 to §13 became §9 to §14.
+3. **The census.** Dropped: the section's examples come from `core/`, and no refactoring is planned.
+4. **Domain.** Dropped: domain artifacts already take container forms (maker-produced adapters,
+   validator modules, types), and genesis follows CONVENTIONS.
 
-## Production scope (sketch)
+## Production
 
-The census first, then the CONVENTIONS section (governance file: committed with the governance-gate
-bypass), with the preference marking from Open 1. No code changes.
+CA and AI Architect, 2026-10-20: CONVENTIONS 1.1, committed with live references renumbered.
+Checks: `deno task fmt:check` and `deno task check`, green.
 
 ## Design history
 
