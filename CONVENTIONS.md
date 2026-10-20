@@ -765,6 +765,7 @@ export { Config }
 - Code in a package imports its package's config module. Code that cannot know its package imports
   `@core/cfg/config.ts`.
 - Never read `Deno.env` or `import.meta.env` directly; only providers do.
+- The provider seam lets a test inject its own provider in place of the environment.
 
 ## 12. Services
 
