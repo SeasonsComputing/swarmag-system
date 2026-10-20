@@ -290,8 +290,8 @@ Offline execution, deep clone, log upload, and session preparation policy are de
 ### 7.4 Form-Scope Integration
 
 The form layer owns a domain-shaped draft and the projections for create and update, so feature
-code does not restate the fields or persistence rules. The layer chain and scope rules are defined
-in `architecture-core.md` §5.2.6.
+code does not restate the fields or persistence rules. The layer chain is defined in
+`architecture-core.md` §5.2.1, and the scope rules in `CONVENTIONS.md` §10.4.
 
 `@core/stdx` (`core/std/make-scope.ts`) exports `makeScope`, `makeAdaptedScope`, `Scope`,
 `AdaptedScope`, `ScopeDraft`, and `DraftOf`.
@@ -318,8 +318,8 @@ display name. It supplies the User picker contract; the picker itself is a separ
 
 Managers and the facet catalog collect `listAll(client)` through `Array.fromAsync`; paging stays
 inside the shared iterator until the cursor is null. The list contract,
-operator set, cursor rejection, search bounds, and store-specific ordering are defined in
-`architecture-core.md` §5.2.1. Changing a filter requires starting without a cursor.
+operator set, cursor rejection, search bounds, and store-specific ordering are stated in the
+`@core/std/make-query.ts` and `@core/std/api-contracts.ts` headers. Changing a filter requires starting without a cursor.
 
 ## 8. Architectural Boundaries
 

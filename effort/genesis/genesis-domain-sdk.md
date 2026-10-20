@@ -64,7 +64,7 @@ The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Ph
 Generate `source/domain/schema/schema.sql` as canonical current-state DDL.
 Not a migration — must be idempotent and fully reproducible.
 
-Per `CONVENTIONS.md` §11–12 and `domain-archetypes.md` §7.
+Per `CONVENTIONS.md` §14 and `domain-archetypes.md` §7.
 
 #### 2.3.1 Seed ID Protocol
 

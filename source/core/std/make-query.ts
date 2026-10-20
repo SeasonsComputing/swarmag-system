@@ -22,6 +22,21 @@ QueryOperators    Operators available for one domain field.
 Criteria          Readonly ANDed domain-field criteria.
 Query             Readonly branded query sent to stores.
 makeQuery         Declare fields and build typed queries.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+Filters   Criteria are ANDed. Scalars support eq and non-empty in; strings and
+          numbers also gt, gte, lt, and lte. Scalar compositions support
+          non-empty hasAny and hasAll. Object compositions and the reserved
+          names (and, or, not, search) cannot be filters. An absent optional
+          value matches no operator. Set non-emptiness is compile-time only.
+Search    Only over declared text fields; timestamps are excluded by policy.
+          One term matches across them with OR, then ANDs with the filters.
+          Build removes stars, trims, and normalizes to NFC, omitting an empty
+          term. Case-insensitive, accent-sensitive within Latin casing; stored
+          NFC is assumed, not enforced.
+Order     Required strings or numbers. Build resolves the requested order, or
+          the first field ascending; id breaks ties in the same direction.
 */
 
 import type { Dictionary } from './adt.ts'

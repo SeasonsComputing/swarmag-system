@@ -1,11 +1,24 @@
-# `core/` Reconciliation — Backlog Brief
+# `core/` Reconciliation — Brief
 
 **Active.** Chosen 2026-10-20 to ride along with roadmap §5 beside file header conformance:
 both write CONVENTIONS in the same window. Recorded 2026-10-03: on that day the Chief Architect and AI Architect asked where a new
 rule about update scopes should live. That question showed that `source/core/`,
 `documentation/architecture/architecture-core.md`, and `CONVENTIONS.md` have never been
 reconciled against each other. Backlog entry: "`core/`, `architecture-core.md`, and
-`CONVENTIONS.md` have never been reconciled" (`normal`).
+`CONVENTIONS.md` have never been reconciled" (`normal`). Recast 2026-10-20 as the doc effort below.
+
+## Decisions (CA, 2026-10-20)
+
+1. **CONVENTIONS is the programming guide:** style, best practice, and full `core/` coverage, in
+   one document.
+2. **The `core/` file headers are the reference.** CONVENTIONS points to a module by its `@core/`
+   alias and never repeats its symbol list.
+3. **`architecture-core.md` is cut back to the system:** how swarmAg composes `core/`, and every
+   guarantee, including those `core/` implements. Its `core/` construction detail moves to
+   CONVENTIONS, which points up for the guarantees it relies on. Each statement stays at its rank
+   in the authority chain.
+4. **The backlog entry "`architecture-core.md` is base context and has never been measured for
+   scan cost" joins this effort.**
 
 ## Objective
 
@@ -13,28 +26,53 @@ Give `core/` one coherent account across its three artifacts, with each concern 
 
 - **`source/core/`** is what exists. It is a derived artifact: where it conflicts with the
   documents, the code is wrong (`architecture-core.md` §1.2; **amended 2026-10-19:** now §1.1).
-- **`architecture-core.md`** owns meaning: system boundaries, contracts, dependency direction,
-  and invariants.
-- **`CONVENTIONS.md`** owns construction: checkable rules for building with `core/`. It gates
-  production but does not settle design (AGENTS §3.2). It is meant to travel across projects,
-  and `core/` is meant to become a portable Seasons library. That makes `core/`'s construction
-  patterns exactly the portable material CONVENTIONS exists to carry.
+- **`architecture-core.md`** owns the system: how swarmAg composes `core/` (the `api` namespace as
+  boundary, RLS, edge functions, offline), its invariants, and dependency direction.
+- **`CONVENTIONS.md`** is the guide to building with `core/` in any repository: when and how to use
+  each capability, pointing to its module for what it provides. It travels with `core/` as a
+  Seasons asset.
 
-Where a concern needs both meaning and a rule, each document states its own half and points to
-the other. Neither restates the other's half.
+Done means every `core/` namespace in the survey below has guidance in CONVENTIONS.
+
+## Placements: `architecture-core.md` §5, §6, §10.1.11 (reviewed by the CA, 2026-10-20)
+
+| Content                                                                   | Placement                                                                                       |
+| ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| §5 intro, 5.1: the `api` namespace as boundary                            | stays                                                                                           |
+| 5.2.1 contract shapes; `makeQuery`, `listAll`, `listPageLimit` usage      | CONVENTIONS, makers and contracts                                                               |
+| 5.2.1 filter, search, order, and cursor semantics                         | `core/std` headers (`make-query.ts`, `api-contracts.ts`); §5.2.1 keeps swarmAg's declared reads |
+| 5.2.2, 5.2.3 business-rule contract and typing                            | CONVENTIONS, makers and contracts                                                               |
+| 5.2.4 `ApiError` and its handling                                         | CONVENTIONS, error handling; "all client makers throw `ApiError`" stays                         |
+| 5.2.5 contract properties; 5.2.6 boundary checks and declared write scope | stays                                                                                           |
+| 5.2.6 `makeScope` usage                                                   | CONVENTIONS, makers and contracts                                                               |
+| 5.2.6 the three scope rules                                               | split: meaning stays, rule to CONVENTIONS                                                       |
+| 5.3, 5.3.1 maker catalog and pattern                                      | CONVENTIONS, makers and contracts; wrappers to services                                         |
+| 5.4–5.6 application rules, RLS, edge functions                            | stays                                                                                           |
+| 5.7.1, 5.7.2, 5.7.4, 5.7.6 RPC use, security model, location              | stays                                                                                           |
+| 5.7.3, 5.7.5 RPC naming and parameters                                    | CONVENTIONS, remote persistence                                                                 |
+| 6.1–6.4, 6.6 configuration pattern, providers, examples                   | CONVENTIONS, runtime configuration, merged into §11                                             |
+| 6.3.2 UX backend binding; 6.5 environment files                           | stays                                                                                           |
+| 10.1.11 closed `core/std` imports                                         | CONVENTIONS §3 Imports                                                                          |
+
+Query and cursor semantics belong to `core/`, which every repository using it relies on: kept in
+`architecture-core.md` they would stay in swarmAg, and in CONVENTIONS a behavioral contract would
+sit in a guide. The headers are the reference (Decision 2); `wrap-http-handler.ts` is the precedent
+for semantics in a level 3 header. Code ranks lowest, so the semantics move down the chain,
+accepted for a library whose code is its specification. The closed-imports rule governs
+`core/std` internals, travels with `core/`, and is guard-enforced.
 
 ## What a first survey found (2026-10-03)
 
 | `core/` namespace | Contents                                                                      | CONVENTIONS coverage                                                      |
 | ----------------- | ----------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| `cfg/`            | `Config`, runtime providers                                                   | §9.4, thorough                                                            |
+| `cfg/`            | `Config`, runtime providers                                                   | §11, thorough                                                             |
 | `std/`            | Primitives, relations, compositions                                           | §8.1 type table                                                           |
-| `std/`            | `makeAdapter`                                                                 | §9.5                                                                      |
+| `std/`            | `makeAdapter`                                                                 | §10.3                                                                     |
 | `std/`            | Protocols: `CreateFromInstantiable`, `UpdateFromInstantiable`, `ScopedUpdate` | None                                                                      |
-| `std/`            | Validators: `expect*`, `ExpectResult`, `notValid`                             | Only inside the §9.3 example                                              |
+| `std/`            | Validators: `expect*`, `ExpectResult`, `notValid`                             | Only inside the §9.4 example                                              |
 | `std/`            | Helpers such as `demandOne`                                                   | None                                                                      |
-| `api/`            | Contract decomposition, `ApiError`, `checkApiError`, pagination helpers       | None. §10 says to throw `Error`; the API layer's convention is `ApiError` |
-| `cli/`            | Client makers                                                                 | §9.6: one generic paragraph                                               |
+| `api/`            | Contract decomposition, `ApiError`, `checkApiError`, pagination helpers       | None. §15 says to throw `Error`; the API layer's convention is `ApiError` |
+| `cli/`            | Client makers                                                                 | §10.1: one generic paragraph                                              |
 | `svc/`            | Service wrappers: `wrapBusRuleHttpHandler`, shims                             | None                                                                      |
 | `db/`             | Supabase and IndexedDB singletons                                             | None; `architecture-core.md` covers "apps never import these"             |
 
@@ -60,10 +98,7 @@ holds, not assume that a missing CONVENTIONS entry means a missing rule.
 
 ## Open — decided during this effort, not before
 
-- For each `core/` namespace, which concerns are meaning (`architecture-core.md`), which are
-  construction rules (CONVENTIONS), and which are reference that belongs to neither.
-- Whether material moves out of `architecture-core.md` §5 into CONVENTIONS, or the other way.
-- How to resolve the §10 conflict between "throw `Error`" and `ApiError`.
+- How to resolve the §15 conflict between "throw `Error`" and `ApiError`.
 - Which new conventions are guard-enforceable, as candidates for the backlog entry "No guard
   enforces conformity to established conventions".
 
@@ -77,19 +112,21 @@ holds, not assume that a missing CONVENTIONS entry means a missing rule.
 
 ## Constraints
 
-- **Documentation only.** The reconciliation changes no code. A divergence found in `core/` is
-  a strict-scrutiny matter: report it and escalate, never fix it in passing.
-- **Coordinate with the backlog entry "`architecture-core.md` is base context and has never been
-  measured for scan cost" (`high`).** Both restructure the same document, so they should be
-  sequenced or done together, and neither should undo the other.
+- **Documentation only,** apart from comment-only header edits in `core/` that carry `core/`
+  semantics (Placements). A divergence found in `core/` is a strict-scrutiny matter: report it
+  and escalate, never fix it in passing.
+
+- **From the scan-cost backlog entry (Decision 4).** `architecture-core.md` is base context for
+  every topic, and the largest part of it. Classify its content (what constrains, what maps, what
+  is reference) before cutting, and review that analysis before restructuring: a wrong cut is felt
+  in every session at once. A compact companion document is not an option; the precedent,
+  `ux-components-guide-lite.md`, was retired 2026-10-19 because it did not improve AI work.
 
 ## Out of scope
 
 - Changes to `core/` code.
 - `domain/`.
 - The design of the layer-6 form-scope abstraction (only its outcome feeds this brief).
-- Any CONVENTIONS content not about `core/`. _[Narrowed by the amendment "Constant naming rule": the CA added one
-  general naming rule.]_
 
 ## Checks
 
@@ -103,7 +140,7 @@ Two inputs for the inventory:
 
 - **A new `core/` export.** `core/std/make-scope.ts` (`makeScope`, `makeAdaptedScope`, `Scope`,
   `AdaptedScope`, `ScopeDraft`, `DraftOf`) is exported through `@core/stdx` (`e4a4cf1`). Whether
-  CONVENTIONS names `makeScope` beside `makeAdapter` (§9.5) was deferred to this brief.
+  CONVENTIONS names `makeScope` beside `makeAdapter` (§10.3) was deferred to this brief.
 - **An unwritten import rule, now uniform in the code.** No module imports its own namespace
   through a barrel or an alias: a `core/std` file imports siblings directly, never `@core/std` or
   `@core/stdx`, and a `core/{namespace}` file imports siblings relatively (`./…`). The CA
@@ -122,7 +159,7 @@ out-of-scope line above for this one rule.
   constants: "const-as-class" (PascalCase, example `HttpCodes`) and "Global immutable constants"
   (SCREAMING_SNAKE, examples `LOG_LEVELS`, `HTTP_METHODS`). It does not state what separates them.
   The CA ruled 2026-10-08: SCREAMING_SNAKE is for scalar values and collections of values,
-  including const-enum tuples (§9.1, `CUSTOMER_STATUSES`); every object constant is PascalCase,
+  including const-enum tuples (§9.2, `CUSTOMER_STATUSES`); every object constant is PascalCase,
   whether pure data (`HttpCodes`) or behavior (`Routes`, `AppState`), exported or module-private.
   The const-enum idiom is the reason: a SCREAMING_SNAKE name reads as a tuple with a derived type.
 - **Applied in the code the same day.** The five module-private SCREAMING_SNAKE objects were
@@ -131,7 +168,7 @@ out-of-scope line above for this one rule.
   (`customer-manager.tsx`). No SCREAMING_SNAKE object constant remains.
 - **For the reconciliation:** state the distinction in §4.2 (a governance file: committed with the
   governance-gate bypass), and consider whether a guard can enforce it.
-- **Also for the reconciliation: CONVENTIONS §9.5.** Its `QuestionAdapter` example restates the
+- **Also for the reconciliation: CONVENTIONS §10.3.** Its `QuestionAdapter` example restates the
   lifecycle mappings. It should spread `InstantiableAdapt`, as `domain-archetypes.md` §6 now does
   (`effort/completed/2026-10-06-instantiable-adapt-brief.md`, shipped 2026-10-08); deferred here
   from that brief.
@@ -153,20 +190,20 @@ Added at the CA's direction during the 2026-10-11 list-query design
   for them, so a separate contract file would add a hop with no benefit.
 - **A branded type must share its producer's file.** `make-query.ts` keeps `Query<T>` beside
   `build`: the brand's `unique symbol` stays unexported, so only `build` can construct a value.
-- **For the reconciliation:** state the rule in CONVENTIONS §9.6 Makers, a governance file.
+- **For the reconciliation:** state the rule in CONVENTIONS §10.2 Contracts, a governance file.
 
 ## Amendment — 2026-10-13 — Soft-delete read rule
 
 Added at the CA's direction during the AI Coding Engine review of
 `effort/completed/2026-10-13-soft-deleted-references-brief.md`.
 
-- **CONVENTIONS §11.10 conflicts with that brief's decision 2.** Its third bullet reads "RLS
+- **CONVENTIONS §14.2.10 conflicts with that brief's decision 2.** Its third bullet reads "RLS
   `SELECT` policies must filter soft-deleted rows". Under the brief, a reference resolves its
   soft-deleted target: deleted rows stay readable by id, RLS governs who may read, and lists
   exclude deleted rows as an API contract (its amendment 4).
 - **A targeted gate override** for that bullet, at the CA's discretion, lets the brief's
   production proceed before this reconciliation (its amendment 1).
-- **For the reconciliation:** §11.10 states that RLS `SELECT` policies do not filter soft-deleted
+- **For the reconciliation:** §14.2.10 states that RLS `SELECT` policies do not filter soft-deleted
   rows and that lists do; "Active rows are `deleted_at IS NULL`" stands. A governance file:
   committed with the governance-gate bypass.
 
@@ -183,9 +220,9 @@ forbids them.
   `makeDashboardShell`, generic then swarmAg-bound). Service wrappers (`wrap*`) mirror makers at
   the inbound boundary.
 - **Where they are defined.** `architecture-core.md` §5.3 covers only client makers, as "factory
-  functions that produce clients conforming to contracts". CONVENTIONS §9.6 is three sentences;
+  functions that produce clients conforming to contracts". CONVENTIONS §10.1 is three sentences;
   one reads "They do not create instances of an object they create code."
-- **The apparent conflict.** CONVENTIONS §7.6 bans "meta-programming"; §9.6 says makers "create
+- **The apparent conflict.** CONVENTIONS §7.6 bans "meta-programming"; §10.1 says makers "create
   code". `source/` uses no `Proxy`, `Reflect`, `eval`, or `new Function`.
 - **For the reconciliation:**
   - `architecture-core.md` gives makers their own section as a fundamental mechanism: a maker
@@ -196,7 +233,7 @@ forbids them.
     and obvious**, and without exceptions or carve-outs. Makers conform because they are explicit
     and obvious: the specification is visible at the call site, and the contract is stated in an
     interface.
-  - CONVENTIONS §9.6 is rewritten clearly, and carries the 2026-10-11 contract-file rule (above).
+  - CONVENTIONS §10.1 is rewritten clearly, and carries the 2026-10-11 contract-file rule (above).
   - README §2.4.1 names makers.
   - Both CONVENTIONS edits are to a governance file: committed with the governance-gate bypass.
 
@@ -217,7 +254,7 @@ placed in `ux/shell/runtime/session-contracts.ts` beside `SessionCoordinatorCont
   provider. Such contracts share a file named by their subject, here the session; a contract the
   toolkit implements itself stays with its implementation (`SessionStateContract` in
   `session-state.ts`).
-- **For the reconciliation:** CONVENTIONS §9.6 states both cases beside the 2026-10-11 rule. A
+- **For the reconciliation:** CONVENTIONS §10.2 states both cases beside the 2026-10-11 rule. A
   governance file: committed with the governance-gate bypass.
 
 ## Amendment — 2026-10-19 — Backlog entry text folded in
@@ -249,4 +286,13 @@ Decided by the CA on 2026-10-05; the code base conforms.
 **For the reconciliation:** CONVENTIONS §3 states the rule. A governance file: committed with the
 governance-gate bypass.
 
-_End of Backlog Brief_
+## Design history
+
+- **From reconciliation to guide (2026-10-20).** The brief first divided `core/` into meaning
+  (`architecture-core.md`), checkable rules (CONVENTIONS), and reference belonging to neither,
+  with CONVENTIONS content not about `core/` out of scope. The CA recast it: CONVENTIONS becomes
+  the whole programming guide with full `core/` coverage, the file headers are the reference, and
+  `architecture-core.md` keeps only the system. A separate reference document was considered and
+  rejected: it would duplicate the headers and add to every session's base context.
+
+_End of Brief_

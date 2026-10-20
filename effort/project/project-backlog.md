@@ -48,21 +48,7 @@ already touches this file.
 
 **Observed:** 2026-08-16 · high
 
-At 1031 lines it is the largest document in the base context, which `AGENTS.md` §1.1
-combines into every topic context — Domain internals, UX internals, Application features,
-and DevOps alike. Base is roughly 1,888 lines and this document is more than half of it,
-so whatever cost it carries is paid by every session in the system.
-
-Nothing establishes which parts of it a session actually reaches for, whether its map is
-front-loaded, or how much is reference bulk that belongs in a document consulted on demand
-rather than seeded.
-
-**This is an analysis task, not a refactor.** Classify the content — what constrains, what
-maps, and what is reference — then decide whether the document reorders or decomposes. A
-compact companion is not an option: `ux-components-guide-lite.md`, the precedent once cited
-here, was retired 2026-10-19 (CA) because its presence did not improve AI work.
-Do not restructure before the analysis is reviewed. This is base context for every
-session, so a wrong cut is felt everywhere at once.
+Design record: [`core/` Reconciliation — Brief](../active/2026-10-03-core-reconciliation-brief.md).
 
 ### `core/`, `architecture-core.md`, and `CONVENTIONS.md` have never been reconciled
 
@@ -363,7 +349,7 @@ losing a site along the way when Finish fired before the second site was added. 
 about that pass is repeatable without re-typing the same data by hand again.
 
 This is the live, felt consequence of the gap `[[project_testing_gap_backlog_pending]]`
-already named structurally: `CONVENTIONS.md` §13's testing convention
+already named structurally: `CONVENTIONS.md` §16's testing convention
 (`source/tests/cases/{abstraction}-api-test.ts`) covers domain/adapter/API only —
 `ux/shell`'s Wizard host, `DrillDown`, the onboarding stages themselves have no test
 mechanism to land in, by convention, not oversight. Today's session is a second, concrete
