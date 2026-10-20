@@ -187,7 +187,7 @@ and 6.
 ## Amendment — 2026-10-09 — File headers move to the header conformance brief
 
 Header conformance for `source/devops/`, including `edge-sync.ts`'s missing header, is now carried
-by `effort/active/2026-10-09-file-header-conformance-brief.md` (its Decisions 2–3), which every
+by `effort/completed/2026-10-09-file-header-conformance-brief.md` (its Decisions 2–3), which every
 file in the repository follows. This brief's retrofit keeps its error-handling work and leaves
 headers to that one. The guards (`source/devops/guards/`), outside this brief's script retrofit,
 are covered there too. _[Superseded by the amendment "Headers return to this brief": header work
@@ -226,7 +226,7 @@ brief. Its text, kept here so nothing is lost:
 ## Amendment — 2026-10-20 — Headers return to this brief
 
 At the CA's direction, header and comment conformance for `source/devops/` and `source/tests/` is
-deferred from `effort/active/2026-10-09-file-header-conformance-brief.md` and returns here. The
+deferred from `effort/completed/2026-10-09-file-header-conformance-brief.md` and returns here. The
 rules are CONVENTIONS §5.1 and §6; that brief's repair and header guard cover product code only.
 
 _End of Backlog Brief_

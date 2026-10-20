@@ -96,12 +96,6 @@ example, and §10.1.6, divided down the middle.
 
 Design record: [EFFORT.md: Milestones, Reconciliation, Deferrals, Enablers — Brief](../active/2026-10-19-effort-milestones-brief.md).
 
-### File headers do not conform to CONVENTIONS §6
-
-**Observed:** 2026-10-09 · high
-
-Design record: [File Header Conformance — Brief](../active/2026-10-09-file-header-conformance-brief.md).
-
 ### CONVENTIONS does not describe containers
 
 **Observed:** 2026-10-09 · normal
