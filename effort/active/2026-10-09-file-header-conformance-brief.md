@@ -1,6 +1,8 @@
 # File Header Conformance — Brief
 
-**Backlog, not dispatched.** Recorded 2026-10-09 from an AI Coding Engine audit, converted to a
+**Active.** Chosen 2026-10-19 as an enabler of roadmap §5 Mechanical Productions: copied files
+carry their headers, so the reference implementations conform before they are replicated. Awaits
+AI Coding Engine review and the production gate. Recorded 2026-10-09 from an AI Coding Engine audit, converted to a
 brief by the AI Architect at the CA's direction. The audit records findings only and authorized no
 repairs.
 

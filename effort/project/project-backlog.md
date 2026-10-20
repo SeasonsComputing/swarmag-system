@@ -126,7 +126,7 @@ governance-gate bypass. The roadmap's preamble ("entries") is updated alongside.
 
 **Observed:** 2026-10-09 · high
 
-Design record: [File Header Conformance — Brief](../pending/2026-10-09-file-header-conformance-brief.md).
+Design record: [File Header Conformance — Brief](../active/2026-10-09-file-header-conformance-brief.md).
 
 ### CONVENTIONS does not describe containers
 
