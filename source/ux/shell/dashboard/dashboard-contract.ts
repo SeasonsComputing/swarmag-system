@@ -3,6 +3,26 @@
 ║ Dashboard contract                                                           ║
 ║ UX projection types for dashboard layout configuration and rendering.        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+DashboardWidgetSettings  Widget layout and component settings.
+└ shape                  Compact or landscape.
+DashboardWidget          Widget reference.
+├ type                   Component type.
+└ settings               Widget settings.
+DashboardRowHeader       Row header.
+├ size                   Standard or short.
+└ label                  Row label.
+DashboardWidgets         Widget collection.
+└ widgets                Widgets in display order.
+DashboardRow             Row header with its widgets.
+DashboardHeader          Header widget strip.
+DashboardSettings        Dashboard feature settings.
+Dashboard                Settings, header strip, and rows.
+├ settings               Feature settings.
+├ header                 Header widget strip.
+└ rows                   Rows in display order.
 */
 
 import type { Dictionary } from '@core/std'
