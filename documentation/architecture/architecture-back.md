@@ -56,59 +56,9 @@ orchestration must not become an open bypass.
 
 ### 3.2 Edge Function Patterns
 
-#### 3.2.1 Business Rule Pattern (Simple Orchestration)
-
-```typescript
-// source/back/supabase-edge/functions/job-deep-clone.ts
-import { Config } from '@back/supabase-edge/config/supabase-config.ts'
-import type { Dictionary } from '@core/std'
-import { wrapBusRuleHttpHandler } from '@core/svc/wrap-busrule-http-handler.ts'
-
-const handler = async (params: Dictionary): Promise<Dictionary> => {
-  const jobId = params.jobId as string
-  const job = await fetchJob(jobId)
-  const assessment = await fetchAssessment(job.assessmentId)
-  const plan = await fetchPlan(job.planId)
-  const logs = await fetchLogs(job.id)
-  const clonedJob = await createJobClone(job, assessment, plan, logs)
-  return { clonedJobId: clonedJob.id }
-}
-
-export default wrapBusRuleHttpHandler({
-  context: () => Config,
-  handle: handler
-})
-```
-
-Use when: a function exposes one business-rule operation over HTTP, accepts
-one request body, returns the standard `{ data }` envelope, and only needs
-expected HTTP status mapping through binding errors.
-
-#### 3.2.2 REST Pattern (Full HTTP Control)
-
-```typescript
-// source/back/supabase-edge/functions/jobs-batch-update.ts
-import type { Dictionary } from '@core/std'
-import type { HttpRequest, HttpResponse } from '@core/stdx'
-import { toBadRequest, toMethodNotAllowed, toOk, toUnprocessable, wrapHttpHandler } from '@core/stdx'
-import { validateJobBatchUpdate } from './jobs-batch-validator.ts'
-
-const handler = async (req: HttpRequest): Promise<HttpResponse> => {
-  if (req.method !== 'POST') return toMethodNotAllowed()
-  const validated = validateJobBatchUpdate(req.body)
-  if (!validated.success) return toUnprocessable(validated.error)
-  const dryRun = req.query.dry_run === 'true'
-  const results = await batchUpdateJobs(validated.data, dryRun)
-  return toOk({ updated: results.updated, failed: results.failed, dryRun })
-}
-
-export default wrapHttpHandler(handler, {
-  cors: true,
-  maxBodySize: 1024 * 1024
-})
-```
-
-Use when: HTTP method routing, custom error codes (400/422), query parameters, or custom response structures needed.
+A function is either one business-rule operation wrapped with `wrapBusRuleHttpHandler`, or a
+handler needing full HTTP control wrapped with `wrapHttpHandler`. CONVENTIONS §12 says when to use
+each.
 
 ### 3.3 Function Responsibilities
 
@@ -151,8 +101,9 @@ Each function therefore has:
 ```typescript
 // supabase/functions/user-create/index.ts
 import handler from '@back/supabase-edge/functions/user-create.ts'
+import { wrapSupabaseShim } from '@core/svc/wrap-supabase-shim.ts'
 
-Deno.serve(handler)
+Deno.serve(wrapSupabaseShim(handler))
 ```
 
 - A generated per-function `deno.json` declaring the alias imports into
@@ -179,11 +130,7 @@ Migrations in `source/back/migrations/` are forward-only change records expressi
 
 ### 4.2 Migration Rules
 
-- One migration per conceptual change
-- Timestamp-based naming: `YYYYMMDDHHMMSS_description.sql`
-- Forward-only — never modify a deployed migration
-- Express deltas only: `ALTER TABLE`, `CREATE INDEX`, new or changed RLS policies, etc.
-- Do not repeat full table definitions — those belong in `schema.sql`
+Migrations follow CONVENTIONS §14.3.
 
 ### 4.3 Row Level Security
 
@@ -327,7 +274,8 @@ not restore an Auth identity. Restoring access requires a future
 
 ## 5. Configuration Management
 
-Edge functions use the singleton `Config` pattern defined in `architecture-core.md` section 6.
+Edge functions use the runtime configuration pattern in CONVENTIONS §11; this system's packages
+are listed in `architecture-core.md` §6.
 
 ### 5.1 Supabase Edge Function Configuration
 
@@ -362,29 +310,6 @@ See `architecture-devops.md §4.4` for the name-binding table.
 
 See `architecture-devops.md §4` for naming conventions, placeholder contract, and security rules.
 
-### 5.3 Usage in Edge Functions
-
-```typescript
-import { Config } from '@back/supabase-edge/config/supabase-config.ts'
-import type { Dictionary } from '@core/std'
-import { wrapBusRuleHttpHandler } from '@core/svc/wrap-busrule-http-handler.ts'
-
-const runBusRule = async (input: Dictionary): Promise<Dictionary> => {
-  const supabaseUrl = Config.get('SUPABASE_URL')
-  const publicKey = Config.get('SUPABASE_PUBLIC_KEY')
-  const serviceKey = Config.get('SUPABASE_SERVICE_KEY')
-  // ... orchestration logic
-  return result
-}
-
-export default wrapBusRuleHttpHandler({
-  context: () => Config,
-  handle: runBusRule
-})
-```
-
-See `architecture-core.md` section 6 for the complete configuration pattern and rationale.
-
 ## 6. Testing Strategy
 
 ### 6.1 Integration Tests
@@ -400,7 +325,7 @@ See `architecture-core.md` section 6 for the complete configuration pattern and 
 - Test RLS policies with different user contexts
 - Automated via `supabase test db`
 
-See `CONVENTIONS.md` section 11 for general testing conventions.
+See `CONVENTIONS.md` §16 for general testing conventions.
 
 ## 7. Deployment
 
@@ -475,18 +400,6 @@ Migration Safety:
 - **Privileged orchestration:** Edge functions using elevated credentials must
   verify the caller and enforce the required administrator authorization check
 - **Never:** UX-layer authorization or open service-role endpoints
-
-### 8.3 Input Validation
-
-```typescript
-import { validateJobCreateInput } from '@domain/validators/job-validator.ts'
-
-const handler = async (input: Dictionary): Promise<Dictionary> => {
-  const error = validateJobCreateInput(input)
-  if (error) throw new Error(error)
-  // ... proceed with validated input
-}
-```
 
 ## 9. Key Principles
 
