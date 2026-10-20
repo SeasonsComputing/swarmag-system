@@ -10,12 +10,26 @@ Emits table semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiTableAlign   Shared header and body cell alignment.
-UiTable        Table root — optionally wraps <table> in an overflow container.
-UiTableHeader  Header row — renders <thead><tr>; children become <th>.
-UiTableBody    Body section — renders <tbody>.
-UiTableRow     Body row — renders <tr>. variant='section'; onActivate makes it interactive.
-UiTableCell    Cell — renders <th> inside UiTableHeader, <td> elsewhere. Accepts align prop.
+UiTableAlign           Shared header and body cell alignment.
+UiTableOverflow        Table overflow behavior: hidden or scroll.
+UiTable                Table root — optionally wraps <table> in an overflow container.
+UiTableHeader          Header row — renders <thead><tr>; children become <th>.
+UiTableBody            Body section — renders <tbody>.
+UiTableRow             Body row — renders <tr>. variant='section'; onActivate makes it interactive.
+UiTableCell            Cell — renders <th> inside UiTableHeader, <td> elsewhere. Accepts align prop.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiTableProps           UiTable props; extends UiComponentProps and filtered table attributes.
+├ name                 Accessible table name.
+└ overflow             Hidden or scrollable overflow.
+UiTableHeaderProps     Header row props; aliases UiContainerProps.
+UiTableBodyProps       UiTableBody props; extends UiComponentProps and filtered table section attributes.
+UiTableRowProps        UiTableRow props; extends UiComponentProps and filtered table row attributes.
+├ variant              Section row treatment.
+└ onActivate           Activates an interactive row.
+UiTableCellProps       UiTableCell props; extends UiComponentProps and filtered table cell attributes.
+└ align                Cell content alignment.
 */
 
 import { createContext, type JSX, splitProps, useContext } from '@solid-js'

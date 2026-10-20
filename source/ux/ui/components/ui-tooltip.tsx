@@ -10,7 +10,19 @@ Emits tooltip control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiTooltip  Tooltip control with declared states.
+UiTooltip         Tooltip control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiTooltipProps    Tooltip control props; extends UiComponentProps.
+├ trigger         Content of the built-in trigger button.
+├ triggerVariant  Visual variant of the trigger button.
+├ open            Controlled open state.
+├ defaultOpen     Initial uncontrolled open state.
+├ error           Marks the error state.
+├ loading         Marks the loading state.
+├ disabled        Disables interaction.
+└ onOpenChange    Receives open-state changes.
 */
 
 import { Tooltip } from '@kobalte/core/tooltip'

@@ -10,10 +10,25 @@ Emits accordion control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiAccordion         Accordion root with declared states.
-UiAccordionItem     Accordion item control for UiAccordion.
-UiAccordionTrigger  Accordion trigger control for UiAccordionItem.
-UiAccordionContent  Accordion content control for UiAccordionItem.
+UiAccordion              Accordion root with declared states.
+UiAccordionItem          Accordion item control for UiAccordion.
+UiAccordionTrigger       Accordion trigger control for UiAccordionItem.
+UiAccordionContent       Accordion content control for UiAccordionItem.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiAccordionProps         Accordion root props; extends UiComponentProps.
+├ error                  Marks the error state.
+├ loading                Marks the loading state.
+├ multiple               Allows multiple expanded items.
+├ value                  Controlled expanded item values.
+├ defaultValue           Initial expanded item values.
+└ onValueChange          Receives expanded item values.
+UiAccordionItemProps     Accordion item props; extends UiComponentProps.
+├ value                  Unique item value.
+└ disabled               Disables interaction.
+UiAccordionTriggerProps  Accordion trigger props; extends UiComponentProps.
+UiAccordionContentProps  Accordion content props; extends UiComponentProps.
 */
 
 import { Accordion } from '@kobalte/core/accordion'

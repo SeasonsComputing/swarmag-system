@@ -12,7 +12,12 @@ when focus enters the group.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiFieldset  Semantic field group wrapper with named legend.
+UiFieldset       Semantic field group wrapper with named legend.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiFieldsetProps  UiFieldset props; extends UiContainerProps.
+└ legend         Field group legend.
 */
 
 import type { UiComponent, UiContainerProps } from './ui-helpers.ts'

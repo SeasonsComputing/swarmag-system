@@ -10,7 +10,15 @@ Emits card control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiCard  Card control.
+UiCardDecoration      Card decoration values declared by the design language.
+UiCardElevation       Card elevation values declared by the design language.
+UiCard                Card control.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiCardProps           Card control props; extends UiComponentProps and filtered div attributes.
+├ decoration          Card decoration treatment.
+└ elevation           Card elevation treatment.
 */
 
 import { type JSX, splitProps } from '@solid-js'

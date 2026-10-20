@@ -10,8 +10,16 @@ Emits list semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiList      List with declared variant. Renders <ol> for numbered, <ul> otherwise.
-UiListItem  List item — child of UiList.
+UiListVariant      List variant. Omit for a clean unstyled list.
+UiList             List with declared variant. Renders <ol> for numbered, <ul> otherwise.
+UiListItem         List item — child of UiList.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiListProps        List control props; extends UiComponentProps and filtered list attributes.
+├ name             Accessible list name.
+└ variant          Declared visual variant.
+UiListItemProps    List item props; extends UiComponentProps and filtered list item attributes.
 */
 
 import { type JSX, splitProps } from '@solid-js'

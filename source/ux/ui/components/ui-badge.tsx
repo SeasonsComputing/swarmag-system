@@ -10,7 +10,16 @@ Emits badge control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiBadge  Badge control with declared states.
+UiBadgeVariant     Badge variants declared by the design language.
+UiBadge            Badge control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiBadgeProps       Badge control props; extends UiComponentProps and filtered span attributes.
+├ variant          Declared visual variant.
+├ error            Marks the error state.
+├ loading          Marks the loading state.
+└ disabled         Disables interaction.
 */
 
 import { type JSX, splitProps } from '@solid-js'

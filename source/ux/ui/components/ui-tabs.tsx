@@ -10,10 +10,30 @@ Emits tabs control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiTabs      Tabs control with declared states.
-UiTab       Tab trigger control for UiTabs.
-UiTabList   Tab list control for UiTabs.
-UiTabPanel  Tab panel control for UiTabs.
+UiTabsActivationMode  Automatic or manual tab activation.
+UiTabListLayout       Tab list layout modes.
+UiTabs                Tabs control with declared states.
+UiTabList             Tab list control for UiTabs.
+UiTab                 Tab trigger control for UiTabs.
+UiTabPanel            Tab panel control for UiTabs.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiTabsProps           Tabs control props; extends UiComponentProps.
+├ disabled            Disables interaction.
+├ error               Marks the error state.
+├ loading             Marks the loading state.
+├ value               Controlled value.
+├ defaultValue        Initial uncontrolled value.
+├ activationMode      Automatic or manual tab activation.
+└ onChange            Receives value changes.
+UiTabListProps        Tab list control props; extends UiComponentProps.
+└ layout              Tab list layout.
+UiTabProps            Tab trigger control props; extends UiComponentProps.
+├ value               Value identifying the tab.
+└ disabled            Disables interaction.
+UiTabPanelProps       Tab panel control props; extends UiComponentProps.
+└ value               Value of the corresponding tab.
 */
 
 import { Tabs } from '@kobalte/core/tabs'

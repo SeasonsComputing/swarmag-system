@@ -10,7 +10,15 @@ Single layout primitive covering block and inline arrangements.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiLayout  Layout container with declared variant and gap density.
+UiLayoutVariant    Layout variant. Omit for a full-width vertical stack.
+UiLayoutGap        Layout gap density. Omit for standard spacing.
+UiLayout           Layout container with declared variant and gap density.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiLayoutProps      Layout control props; extends UiComponentProps and filtered div attributes.
+├ gap              Layout spacing density.
+└ variant          Declared visual variant.
 */
 
 import { type JSX, splitProps } from '@solid-js'

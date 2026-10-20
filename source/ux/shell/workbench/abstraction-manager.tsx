@@ -11,7 +11,10 @@ content to an abstraction-specific provider.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AbstractionManager  Generic list+panel manager component.
+AbstractionManagerProps  Props for a generic abstraction manager.
+├ onCancel               Closes the manager.
+└ provider               Abstraction-specific list and editor provider.
+AbstractionManager       Generic list+panel manager component.
 */
 
 import type { Instantiable } from '@core/std'

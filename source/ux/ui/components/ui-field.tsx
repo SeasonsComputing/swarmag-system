@@ -12,7 +12,20 @@ for non-labelable controls.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiField  Label/caption + control field wrapper.
+UiField              Label/caption + control field wrapper.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiFieldLabelProps    UiField label-mode props; extends UiContainerProps.
+├ label              Field label text.
+├ for                ID of the associated control.
+├ required           Shows the required mark.
+└ variant            Inline label and control layout.
+UiFieldCaptionProps  UiField caption-mode props; extends UiContainerProps.
+├ label              Field caption text.
+├ required           Shows the required mark.
+└ variant            Caption mode for non-labelable controls.
+UiFieldProps         Label-mode or caption-mode field props.
 */
 
 import type { UiComponent, UiContainerProps } from './ui-helpers.ts'

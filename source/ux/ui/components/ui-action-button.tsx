@@ -16,7 +16,24 @@ presence stays the consumer's decision at every viewport.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiActionButton  Compact icon button with an optional inline label.
+UiActionButtonVariant    Action button variants.
+UiActionButtonLabelMode  Action button label presentation. The label is always the accessible name.
+UiActionButtonDensity    Action button visual density.
+UiActionButtonAlign      Action button icon alignment when the label is visible.
+UiActionButton           Compact icon button with an optional inline label.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiActionButtonProps      Action button control props; extends filtered button attributes.
+├ align                  Icon alignment beside the label.
+├ disabled               Disables interaction.
+├ density                Button density.
+├ error                  Marks the error state.
+├ icon                   Icon name.
+├ label                  Accessible name and display label.
+├ labelMode              Visible or hidden label presentation.
+├ loading                Marks the loading state.
+└ variant                Declared visual variant.
 */
 
 import { Button } from '@kobalte/core/button'

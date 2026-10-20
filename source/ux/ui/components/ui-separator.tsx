@@ -10,7 +10,14 @@ Emits separator control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiSeparator  Separator control with declared states.
+UiSeparator       Separator control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiSeparatorProps  Separator control props; extends UiComponentProps and filtered HTML attributes.
+├ error           Marks the error state.
+├ loading         Marks the loading state.
+└ disabled        Disables interaction.
 */
 
 import { Separator } from '@kobalte/core/separator'

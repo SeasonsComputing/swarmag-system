@@ -10,8 +10,21 @@ Emits toggle-group control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiToggleGroup  Toggle-group control with declared states.
-UiToggleItem   Toggle item control for UiToggleGroup.
+UiToggleGroup       Toggle-group control with declared states.
+UiToggleItem        Toggle item control for UiToggleGroup.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiToggleGroupProps  Toggle-group control props; extends UiComponentProps.
+├ disabled          Disables interaction.
+├ error             Marks the error state.
+├ loading           Marks the loading state.
+├ value             Controlled value.
+├ defaultValue      Initial uncontrolled value.
+└ onChange          Receives value changes.
+UiToggleItemProps   Toggle item control props; extends UiComponentProps.
+├ value             Unique toggle item value.
+└ disabled          Disables interaction.
 */
 
 import { ToggleGroup } from '@kobalte/core/toggle-group'

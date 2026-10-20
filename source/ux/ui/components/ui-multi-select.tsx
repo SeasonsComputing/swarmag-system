@@ -10,7 +10,20 @@ Emits multi-select control semantics without styling concerns.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiMultiSelect  Inline multi-value select control with declared states.
+UiMultiSelect       Inline multi-value select control with declared states.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiMultiSelectProps  Multi-select control props.
+├ disabled          Disables interaction.
+├ error             Marks the error state.
+├ id                Control element ID.
+├ loading           Marks the loading state.
+├ name              Form control name.
+├ options           Available options.
+├ value             Controlled value.
+├ defaultValue      Initial uncontrolled value.
+└ onChange          Receives value changes.
 */
 
 import type { StringSet } from '@core/std'

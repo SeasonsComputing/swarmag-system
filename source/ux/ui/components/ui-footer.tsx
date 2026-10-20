@@ -12,7 +12,13 @@ app layer — the control remains domain-free.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-UiFooter  Footer control component.
+UiFooter       Footer control component.
+
+COMPONENT PROPERTIES
+───────────────────────────────────────────────────────────────────────────────
+UiFooterProps  UiFooter props.
+├ logo         Logo image source.
+└ alt          Logo alternative text.
 */
 
 import type { UiComponent } from './ui-helpers.ts'
