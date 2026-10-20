@@ -1,11 +1,11 @@
 # EFFORT.md: Milestones, Reconciliation, Deferrals, Enablers — Brief
 
-**Active, draft.** Recorded 2026-10-19 from a CA + AI Architect session. It rides along with the
+**Closed 2026-10-20.** `EFFORT.md` 1.2 (`94a8da2`) codifies the four decisions and the draft rule
+(Open 4). Recorded 2026-10-19 from a CA + AI Architect session. It rides along with the
 enablers of roadmap §5 Mechanical Productions: it makes nothing there copy-ready, but `EFFORT.md`
 should describe the method as it is now practiced, since the repository is shown to engineering
 peers as an example of governed AI-assisted development. Absorbs the backlog entry "`EFFORT.md`
-does not codify roadmap reconciliation, milestones, or deferrals". Awaits CA review and the
-production gate.
+does not codify roadmap reconciliation, milestones, or deferrals".
 
 `EFFORT.md` is a governance file: its edits need the CA's explicit authorization and are committed
 with the governance-gate bypass.
@@ -35,30 +35,30 @@ From 2026-10-08:
 
 From 2026-10-19:
 
-4. **Enablers.** A milestone lists its enablers ahead of its features: work that delivers no
-   feature itself but makes the features buildable or copy-ready. Enablers are briefs or backlog
+4. **Enablers.** A milestone lists its enablers ahead of its features: work the features depend
+   on, making them buildable or copy-ready, whatever else it delivers. Enablers are briefs or backlog
    entries like any other work, and the milestone closes only when both lists are done. First
    used in roadmap §5.
 
-## Open
+## Open, settled 2026-10-20
 
-1. **What a reconciliation checks,** in both directions: backlog entries the roadmap should carry,
-   and roadmap items whose dependencies have landed.
-2. **How a backlog entry records that the roadmap has placed it,** as §4 does for a brief.
-3. **What a milestone verification pass consists of** beyond its briefs' own verification. Roadmap
-   §4 Notes Editor closed on the CA's validation in the app.
-4. **Whether the rule that drafts are edited in place until hand-off, then amended and marked,
-   belongs in §4.**
-5. **Whether a brief may be withdrawn as superseded** when the CA makes the change directly, as
-   the authority chain brief was on 2026-10-19; §4 already allows withdrawal, but not this path
-   by name.
+1. **What a reconciliation checks.** Dropped: practiced throughout, never needed describing.
+2. **How a backlog entry records its roadmap placement.** Dropped: never needed.
+3. **What a milestone verification pass consists of.** Dropped: §7 requires one; its form is
+   judgment.
+4. **The draft rule.** Resolved: §4 "Edit a draft; amend a dispatched brief."
+5. **Withdrawal as superseded.** Dropped: §4 already allows it.
 
-## Production scope
+## Production
 
-Operating mode: **Foundation** (governance document). `EFFORT.md` §3, §4, and §7, with a version
-bump and an Amendment Record row; the roadmap's preamble ("Format per entry") gains the enablers
-and features layout. The CA authorizes the exact text before it is applied.
+CA and AI Architect, 2026-10-20: `EFFORT.md` 1.2, §4 The Brief and §7 Milestones, with the
+Amendment Record row; the roadmap preamble names Enablers, Features, and Rides along (`ba361a7`).
+Ride-along work, practiced for over a month, joined §7 with the enablers.
 
-**Out of scope:** CONSTITUTION, AGENTS, CONVENTIONS.
+## Design history
+
+- **Enablers deliver features too.** Decision 4 first defined an enabler as work that delivers no
+  feature itself. The CA corrected it: an enabler is defined by what the features depend on, not
+  by what it withholds.
 
 _End of Brief_
