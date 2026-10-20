@@ -5,7 +5,8 @@
 Accepted work whose shape is already known — see `EFFORT.md` §3 for what distinguishes this
 from the parking lot and the roadmap.
 
-**Format per entry:** the defect or gap stated as a sentence, an `**Observed:**` line
+**Format per entry:** a heading carrying a permanent ID (`B-n`, never reused) and the defect or
+gap stated as a sentence, an `**Observed:**` line
 carrying the date and a priority of `high`, `normal`, or `low`, then what it is with its
 evidence and where the fix belongs. `##` sections group entries by the layer that owns the
 work, and a section appears once a second entry needs it. Cite a selector, symbol, or
@@ -13,7 +14,7 @@ document section — never a line number, which rots silently.
 
 ## Documentation
 
-### `architecture-devops.md` buries what an agent scan needs
+### B-1 · `architecture-devops.md` buries what an agent scan needs
 
 **Observed:** 2026-08-16 · normal
 
@@ -44,7 +45,7 @@ shouldn't have. Also noted in
 `effort/pending/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
 already touches this file.
 
-### `domain-archetypes.md` and the domain genesis prompt restate CONVENTIONS
+### B-2 · `domain-archetypes.md` and the domain genesis prompt restate CONVENTIONS
 
 **Observed:** 2026-10-20 · normal
 
@@ -55,7 +56,7 @@ only what is specific to the domain. `domain-archetypes.md` still cites "`CONVEN
 Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close of
 `effort/completed/2026-10-03-core-reconciliation-brief.md`.
 
-### `architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`
+### B-3 · `architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`
 
 **Observed:** 2026-10-06 · low
 
@@ -77,13 +78,13 @@ example, and §10.1.6, divided down the middle.
 
 ## Controls
 
-### Shared UI controls do not use one state model
+### B-4 · Shared UI controls do not use one state model
 
 **Observed:** 2026-08-16 · high
 
 Design record: [UI Control State Normalization — Production Brief](../pending/2026-08-16-ui-control-state-normalization-brief.md).
 
-### Collection-Detail surfaces do not draw the Selection
+### B-5 · Collection-Detail surfaces do not draw the Selection
 
 **Observed:** 2026-08-14 · normal
 
@@ -103,7 +104,7 @@ There is no state to style. `UiTableRow` takes `onActivate` and emits
 consumer cannot supply one. The fix belongs in the catalog rather than in the manager — a
 selected state on `UiTableRow` that any Collection-Detail surface opts into.
 
-### The overlay controls over-specify their triggers
+### B-6 · The overlay controls over-specify their triggers
 
 **Observed:** 2026-10-13 · normal
 
@@ -111,7 +112,7 @@ Design record: [Overlay Controls API — Brief](../pending/2026-10-13-overlay-tr
 
 ## Auth
 
-### A stale session survives genesis and is not ejected
+### B-7 · A stale session survives genesis and is not ejected
 
 **Observed:** 2026-08-04 · normal
 
@@ -133,7 +134,7 @@ rather than only when auth happened to be cleared by hand.
 the DevOps `edge-deploy` parity entry — one shared investigation serves all three; see the
 eject entry for why.
 
-### Eject should ban, not delete, the Auth identity
+### B-8 · Eject should ban, not delete, the Auth identity
 
 **Observed:** 2026-09-12 · normal
 
@@ -167,7 +168,7 @@ reinstate both live in `user-orchestra.ts` as symmetric operations, and whether 
 status toggle should be disabled/warned against for ejected users until reinstatement is
 real.
 
-### Login needs an "Already have a code?" action
+### B-9 · Login needs an "Already have a code?" action
 
 **Observed:** 2026-08-04 · normal
 
@@ -184,7 +185,7 @@ issued code.
 
 ## Shell
 
-### PanelHeaderTitle's heading-depth mapping is already at its hardcoded ceiling
+### B-10 · PanelHeaderTitle's heading-depth mapping is already at its hardcoded ceiling
 
 **Observed:** 2026-08-29 · normal
 
@@ -198,19 +199,19 @@ unused here — generalizing to a small `h2`-through-`h5` lookup (or `solid-js/w
 `Dynamic`) uses infrastructure the codebase already ships rather than adding a nesting layer
 each time depth grows.
 
-### Draft fingerprints are written four times
+### B-11 · Draft fingerprints are written four times
 
 **Observed:** 2026-10-08 · low
 
 Design record: [Workbench Draft Services — Brief](../active/2026-10-19-workbench-draft-services-brief.md).
 
-### `workbench-context.tsx` mixes draft services with a component
+### B-12 · `workbench-context.tsx` mixes draft services with a component
 
 **Observed:** 2026-10-08 · low
 
 Design record: [Workbench Draft Services — Brief](../active/2026-10-19-workbench-draft-services-brief.md).
 
-### A fresh New editor shows stale feedback and a premature field error
+### B-13 · A fresh New editor shows stale feedback and a premature field error
 
 **Observed:** 2026-10-18 · normal
 
@@ -218,7 +219,7 @@ Design record: [Fresh Editor Feedback — Brief](../active/2026-10-19-fresh-edit
 
 ## Guards
 
-### `guard:css` does not verify that a referenced token resolves
+### B-14 · `guard:css` does not verify that a referenced token resolves
 
 **Observed:** 2026-08-06 · normal
 
@@ -239,7 +240,7 @@ One trap for whoever builds it: `--sa-icon` is declared in `icons.css` and is a 
 binding rather than a provider token, so a guard that scans only the three provider files
 reports it as undefined. It is legitimate and must be included.
 
-### No guard enforces conformity to established conventions
+### B-15 · No guard enforces conformity to established conventions
 
 **Observed:** 2026-08-14 · low
 
@@ -267,7 +268,7 @@ type-checked and all thirteen guards passed. The check is mechanical: compare th
 member-name set of every type declared under `source/front` or `source/back` against the
 exported abstractions in `source/domain`, and fail on an exact match.
 
-### `guard:leaf` does not sweep the repository root
+### B-16 · `guard:leaf` does not sweep the repository root
 
 **Observed:** 2026-08-17 · normal
 
@@ -277,7 +278,7 @@ The recurrence is the point. Deleted-file paths reappear as empty directories pe
 
 `rmdir` is the safe removal: it refuses a non-empty directory, so it cannot take anything real with it.
 
-### `guard:leaf` fails on git-ignored files
+### B-17 · `guard:leaf` fails on git-ignored files
 
 **Observed:** 2026-10-08 · low
 
@@ -289,7 +290,7 @@ Pair with the entry above, which also changes what the sweep covers.
 Fixing it also settles the task-chain question: `check` stays read-only, and nothing sweeps
 `.DS_Store` (CA, 2026-10-20).
 
-### `guard:css` misreads multiline selectors and misses selector-list branches
+### B-18 · `guard:css` misreads multiline selectors and misses selector-list branches
 
 **Observed:** 2026-10-03 · normal
 
@@ -297,13 +298,13 @@ Design record: [CSS Guard — Complete Selector Parsing](../pending/2026-10-03-c
 
 ## DevOps
 
-### `source/devops/` is not held to CONVENTIONS
+### B-19 · `source/devops/` is not held to CONVENTIONS
 
 **Observed:** 2026-08-23 · normal
 
 Design record: [DevOps Style Conformance & Shared Error Handling — Backlog Brief](../pending/2026-08-23-devops-style-error-handling-brief.md).
 
-### `edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already has
+### B-20 · `edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already has
 
 **Observed:** 2026-09-12 · high
 
@@ -339,7 +340,7 @@ entry for why.
 
 ## Testing
 
-### No automated coverage above the domain/API layer — today's manual live pass proved it
+### B-21 · No automated coverage above the domain/API layer — today's manual live pass proved it
 
 **Observed:** 2026-09-07 · normal
 
@@ -370,7 +371,7 @@ update scope, excluded-field preservation, optional-field clearing) have a conve
 Extending the testing convention to the UX layer is a `CONVENTIONS.md` amendment and needs CA
 authorization before any UX test lands.
 
-### The shared test configuration cannot bootstrap `api`
+### B-22 · The shared test configuration cannot bootstrap `api`
 
 **Observed:** 2026-10-03 · normal
 
@@ -378,7 +379,7 @@ Design record: [Stage Test Authorization — Brief](../active/2026-10-13-stage-t
 
 ## Core
 
-### A unique-key conflict with a soft-deleted record reports a general failure
+### B-23 · A unique-key conflict with a soft-deleted record reports a general failure
 
 **Observed:** 2026-10-18 · normal
 
@@ -397,7 +398,7 @@ answer to one identity. The message is what fails the person.
   `architecture-core.md` §3.2.5; the wording lands at the edge (`user-create`) and client
   boundaries, for every unique key.
 
-### Timestamps read from Postgres are not in the form the app writes
+### B-24 · Timestamps read from Postgres are not in the form the app writes
 
 **Observed:** 2026-10-11 · normal
 
@@ -415,7 +416,7 @@ Two decisions follow, each where it is first needed:
 
 ## Customer
 
-### Onboarding — Initial Job Assessment stage
+### B-25 · Onboarding has no Initial Job Assessment stage
 
 **Observed:** 2026-09-10 · normal
 
@@ -425,13 +426,13 @@ stages (Contact, Customer, Sites) a near-term slice of a four-stage design, not 
 surface. The fourth stage's own design (service selection UI, template application mechanism)
 has not started.
 
-### There is no Customer Portal
+### B-26 · There is no Customer Portal
 
 **Observed:** 2026-10-08 · normal
 
 Design record: [Customer Portal — Brief](../pending/2026-10-08-customer-portal-brief.md).
 
-### A Customer with Jobs can be deleted
+### B-27 · A Customer with Jobs can be deleted
 
 **Observed:** 2026-09-24 · normal
 
@@ -445,7 +446,7 @@ Nothing guards this today because no Jobs exist yet. Picking this up: with Job D
 
 ## Job
 
-### Assessor and planner are chosen with the User picker
+### B-28 · Assessor and planner are chosen with the User picker
 
 **Observed:** 2026-10-08 · normal
 
@@ -457,7 +458,7 @@ changeable. The assessor is often assigned when the assessment is scheduled
 
 Picking this up: with roadmap §7 Job Definition.
 
-### Job work records stamp the session user
+### B-29 · Job work records stamp the session user
 
 **Observed:** 2026-10-08 · normal
 
@@ -468,7 +469,7 @@ Picking this up: with roadmap §8 Ops Application.
 
 ## UX
 
-### Hub widget
+### B-30 · There is no Hub widget
 
 **Observed:** 2026-09-10 · normal
 
@@ -488,7 +489,7 @@ motivating case — `architecture-front.md` §11.7 already names a "colloquial U
 `job: [assessment, plan, work]`," so this connects to existing language rather than inventing
 it fresh.
 
-### `app-style-guide` belongs in `ux/`, not `front/`
+### B-31 · `app-style-guide` belongs in `ux/`, not `front/`
 
 **Observed:** 2026-09-24 · low
 
