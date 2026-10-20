@@ -9,6 +9,9 @@ is and how it relates to the backlog and parking lot.
 block or ride with it. An entry marked **(open)** has no settled position yet — stated as open
 rather than guessed at.
 
+A milestone lists its **Enablers** ahead of its **Features**; work landing in the same window
+without enabling it is listed as **Rides along**.
+
 ## 0. Platform Foundation — Closed 2026-06-28
 
 Everything built before application features, from the first commit (2025-12-09) to the first
