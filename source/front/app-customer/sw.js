@@ -1,3 +1,10 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Customer service worker                                                      ║
+║ Caches the app shell and hashed assets, with an offline index fallback.      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
 const CACHE_NAME = 'swarmag-app-customer-shell-v2'
 const APP_SHELL = ['/manifest.webmanifest', '/icon.png']
 
