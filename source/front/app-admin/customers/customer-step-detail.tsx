@@ -84,7 +84,7 @@ export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent 
               </UiLayout>
             </UiFieldset>
             <UiFieldset legend='Account'>
-              <UiField for='account-manager' label='Account manager'>
+              <UiField for='account-manager' label='Manager'>
                 <div data-app='customer-account-manager'>
                   <UserPicker
                     name='account-manager'
