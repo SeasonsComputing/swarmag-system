@@ -9,21 +9,30 @@ PURPOSE
 Defines canonical relationship primitives for embedded compositions and foreign
 key associations, plus guards and accessors for composition cardinality.
 
-PUBLIC
+COMPOSITIONS
 ───────────────────────────────────────────────────────────────────────────────
-CompositionOne<T>               Embedded subordinate with exactly one value.
-CompositionOptional<T>          Embedded subordinate with zero or one values.
-CompositionMany<T>              Embedded subordinate with zero or more values.
-CompositionPositive<T>          Embedded subordinate with one or more values.
-isCompositionOne(value, guard)  Check exactly-one composition cardinality.
-isCompositionOptional(...)      Check optional composition cardinality.
-isCompositionMany(value, guard) Check many composition cardinality.
-isCompositionPositive(...)      Check positive composition cardinality.
-demandOne(c)                    Extract the value from a CompositionOne.
-optionalOne(c)                  Extract value from a CompositionOptional.
-AssociationOne<T>               Required FK reference to a lifecycle row.
-AssociationOptional<T>          Optional FK reference to a lifecycle row.
-AssociationJunction<T>          Junction FK reference in an m:m row.
+CompositionOne<T>                Embedded subordinate with exactly one value.
+CompositionOptional<T>           Embedded subordinate with zero or one values.
+CompositionMany<T>               Embedded subordinate with zero or more values.
+CompositionPositive<T>           Embedded subordinate with one or more values.
+
+GUARDS
+───────────────────────────────────────────────────────────────────────────────
+isCompositionOne(value, guard)   Check exactly-one composition cardinality.
+isCompositionOptional(...)       Check optional composition cardinality.
+isCompositionMany(value, guard)  Check many composition cardinality.
+isCompositionPositive(...)       Check positive composition cardinality.
+
+ACCESSORS
+───────────────────────────────────────────────────────────────────────────────
+demandOne(c)                     Extract the value from a CompositionOne.
+optionalOne(c)                   Extract value from a CompositionOptional.
+
+ASSOCIATIONS
+───────────────────────────────────────────────────────────────────────────────
+AssociationOne<T>                Required FK reference to a lifecycle row.
+AssociationOptional<T>           Optional FK reference to a lifecycle row.
+AssociationJunction<T>           Junction FK reference in an m:m row.
 */
 
 import type { Id } from './identifier.ts'
