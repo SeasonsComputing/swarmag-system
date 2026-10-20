@@ -3,6 +3,10 @@
 ║ Panel header                                                                 ║
 ║ Two-zone bar shared by container and panel-level headers.                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+PanelHeader  Leading and trailing header zones.
 */
 
 import type { PanelHeaderProps } from './panel-contract.ts'

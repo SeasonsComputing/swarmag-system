@@ -27,6 +27,7 @@ type ConnectionCache = Dictionary<Promise<IDBPDatabase>>
 /** Internal registry type for tracking stores per database namespace. */
 type StoreRegistry = Dictionary<StringSet>
 
+/** IndexedDB connection manager for the active local database. */
 export class IndexedDb {
   /** Internal registry of store names. */
   static #registry: StoreRegistry = {}

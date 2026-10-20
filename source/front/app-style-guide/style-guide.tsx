@@ -3,6 +3,10 @@
 ║ swarmAg living style guide                                                   ║
 ║ Browser validation page for design tokens and common controls.               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+StyleGuide  Living style guide page.
 */
 
 import { createEffect, createSignal, For } from '@solid-js'

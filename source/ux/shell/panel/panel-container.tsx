@@ -3,6 +3,10 @@
 ║ Panel container                                                              ║
 ║ Shared chrome and semantic roles for two-panel shell surfaces.               ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+PanelContainer  Two-panel shell chrome with semantic roles.
 */
 
 import type { PanelContainerProps } from './panel-contract.ts'

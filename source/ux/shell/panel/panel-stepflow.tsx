@@ -8,6 +8,10 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Renders a compact, read-only stepflow from ordered stage labels and their
 workflow state.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+PanelStepflow  Read-only stage index.
 */
 
 import { For } from '@solid-js'
