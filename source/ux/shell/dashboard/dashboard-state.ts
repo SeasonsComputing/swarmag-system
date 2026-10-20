@@ -12,6 +12,14 @@ state. All dashboard mutations flow through this module and persist through
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
+DashboardStoreWidget   Stored widget (Instance)
+DashboardStoreWidgets  Stored widget collection
+DashboardStoreHeader   Stored header widget strip
+DashboardStoreRow      Stored row: header and widgets (Instance)
+DashboardStoreView     Stored dashboard view (Instance)
+DashboardStateSeed     Dashboard seed data, from JSON
+DashboardStateContract Contract for the DashboardState singleton
+
 DashboardState - Dashboard state and mutation methods
 ├ store          Reactive dashboard view snapshot.
 │ ├ settings     Dashboard layout and display settings.
