@@ -17,10 +17,11 @@ customerDraft          Project state into an isolated aggregate draft.
 CustomerState          Reactive state contract for Customer steps.
 createCustomerState    Create state for a single Customer draft.
 newCustomerSite        Create a blank site draft.
-siteLocation(site)      The site's single location.
+customerSiteDraft      Project an edited site for saving.
+siteLocation(site)     The site's single location.
 */
 
-import { demandOne, toTrimmed } from '@core/std'
+import { demandOne, toEmail, toTrimmed } from '@core/std'
 import type { Id } from '@core/std'
 import type { DraftOf, QuerySet } from '@core/stdx'
 import type { ContactPreferredChannel, Location, Note } from '@domain/abstractions/common.ts'
@@ -47,7 +48,7 @@ export const customerDraft = (state: CustomerState): CustomerDraft =>
       displayName: toTrimmed(state.displayName()),
       phoneNumber: toTrimmed(state.phoneNumber()),
       preferredChannel: state.preferredChannel(),
-      ...(state.email().trim() ? { email: toTrimmed(state.email()) } : {})
+      email: UiText.optional(toEmail(state.email()))
     }],
     sites: state.sites(),
     notes: state.notes(),
@@ -55,7 +56,7 @@ export const customerDraft = (state: CustomerState): CustomerDraft =>
     status: state.status(),
     accountManagerId: state.accountManagerId(),
     line1: toTrimmed(state.line1()),
-    line2: UiText.optional(state.line2()),
+    line2: UiText.optional(toTrimmed(state.line2())),
     city: toTrimmed(state.city()),
     state: toTrimmed(state.state()),
     postalCode: toTrimmed(state.postalCode()),
@@ -193,5 +194,27 @@ export const newCustomerSite = (): CustomerSite => ({
   notes: []
 })
 
+/** Project an edited site for saving; text is trimmed and blank optional text becomes absence. */
+export const customerSiteDraft = (site: CustomerSite): CustomerSite => {
+  const location = siteLocation(site)
+  return copyDraft({
+    ...site,
+    label: toTrimmed(site.label),
+    location: [{
+      ...location,
+      line1: optionalText(location.line1),
+      line2: optionalText(location.line2),
+      city: optionalText(location.city),
+      state: optionalText(location.state),
+      postalCode: optionalText(location.postalCode),
+      country: optionalText(location.country)
+    }]
+  })
+}
+
 /** Reads the site's single location. */
 export const siteLocation = (site: CustomerSite): Location => demandOne(site.location)
+
+/** Trimmed optional text, or absence when blank. */
+const optionalText = (value: string | undefined): string | undefined =>
+  UiText.optional(toTrimmed(value ?? ''))

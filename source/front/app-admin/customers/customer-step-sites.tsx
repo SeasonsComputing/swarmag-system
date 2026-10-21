@@ -39,7 +39,7 @@ import {
   UiToggleItem
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
-import { newCustomerSite, siteLocation } from './customer-state.ts'
+import { customerSiteDraft, newCustomerSite, siteLocation } from './customer-state.ts'
 import type { CustomerState } from './customer-state.ts'
 
 /** Props for the optional job-sites step. */
@@ -142,9 +142,10 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
   const saveSite = (): void => {
     if (!isActiveDraft()) return
     setSaveAttempted(true)
-    if (!isCustomerSite(draft)) return
-    if (props.index >= props.state.sites().length) props.state.addSite(draft)
-    else props.state.setSite(props.index, draft)
+    const site = customerSiteDraft(draft)
+    if (!isCustomerSite(site)) return
+    if (props.index >= props.state.sites().length) props.state.addSite(site)
+    else props.state.setSite(props.index, site)
     props.context.returnToParent()
   }
   props.context.registerSave(() => ({
