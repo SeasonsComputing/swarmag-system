@@ -46,7 +46,7 @@ All cross-boundary imports use path aliases defined in `deno.jsonc`. Never use r
 
 ### 3.2 Barrel aliases
 
-Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@ux/shell/workbench/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§16). Tooling may keep one local utility barrel (§17.2).
+Barrels are an exception, not a tool. Import every module through its root namespace alias by direct file path — `@ux/shell/workbench/wizard.tsx` — never through a barrel. The table below is the complete inventory: if a module is not listed here, no barrel for it exists and none may be created. Adding one is a Foundation decision, not a tidying step. The sole barrel outside this table is `source/tests/fixtures/samples.ts` (§18). Tooling may keep one local utility barrel (§19.2).
 
 | Alias        | Resolves to                     |
 | ------------ | ------------------------------- |
@@ -118,6 +118,10 @@ export const SHAPE_KINDS = ['circle', 'rect', 'triangle'] as const
 /** HTTP status codes by name. */
 export const HttpCodes = { ok: 200, badRequest: 400, notFound: 404 } as const
 ```
+
+A workbench Step lives in `{topic}-step-{name}.tsx`, where `detail` names the primary or only Step.
+_Editor_ is reserved for a reusable form kind or a drill-down editor inside a Step (UX design
+archetypes).
 
 ### 4.3 The acronym corollary
 
@@ -765,7 +769,7 @@ export { Config }
 - Code in a package imports its package's config module. Code that cannot know its package imports
   `@core/cfg/config.ts`.
 - Product code never reads `Deno.env` or `import.meta.env` directly; only providers do (tooling:
-  §17.2).
+  §19.2).
 - The provider seam lets a test inject its own provider in place of the environment.
 
 ## 12. Services
@@ -1004,7 +1008,183 @@ try {
 }
 ```
 
-## 16. Testing Conventions
+## 16. UX Shell
+
+The shell is the application framework in `@ux/shell`: the runtime that boots an application, routes
+it, holds its state, and runs its session. An application supplies its parts; the shell composes
+them. The patterns a feature builds are §17; how to use the `ux/ui` controls is the UX components
+guide.
+
+### 16.1 Composition
+
+- `ux/` has three parts: `ux/ui` (controls, CSS, fonts, icons), `ux/shell` (`runtime/`, `dashboard/`,
+  `panel/`, `workbench/`, grouped by topic), and `ux/widgets` (application-neutral widgets).
+  Consumers import files directly.
+- An application declares a complete `Application`: its anonymous shell, its dashboard shell, and
+  its session coordinator, passed to `bootstrap(application)`. Bootstrap owns generic boot: the
+  CSS barrel, preference state, session initialization, and mounting the route runtime. The
+  application root initializes its configuration first (§11).
+- `makeAnonymousShell` and `makeDashboardShell` take branded route components (a login, an about
+  box, a footer) as parameters; the shell never imports a branded component. An application binds
+  its brand once, and every root uses the bound makers.
+- The shell is a closed framework. It owns its extension contracts (widgets, session) and never
+  imports their implementations; applications bind implementations at their composition roots.
+- An authenticated route renders its primary surface inside a semantic `main` landmark.
+
+### 16.2 Routing
+
+- The shell route grammar is the routing API. Applications declare routes through `Routes` and the
+  shell composition contracts. No application, feature, page, or widget imports the router vendor;
+  router imports stay in `ux/shell/runtime/`.
+- Navigate imperatively with `useShellNavigate()`; redirect declaratively with `ShellRedirect` and
+  `ShellReplace`. The runtime currently executes the grammar with TanStack Solid Router, whose APIs
+  are not the routing contract; the shell owning the vocabulary keeps one point of change.
+- A page is a routable, context-scoped, guarded module: a domain page (a list or object view) or a
+  feature page (a guided interface). Both take the same route shape.
+- Guarding is a route-level concern, through `AuthGuard`, never a per-component one.
+
+```text
+/                          dashboard (guarded)
+/login                     login
+/{page}                    page (guarded)
+/{page}/{id}               item-scoped page
+/{page}/{operation}        operation-scoped page
+/{page}/{operation}/{id}   item-scoped operation page
+```
+
+### 16.3 State
+
+| Concern                                                     | Mechanism               |
+| ----------------------------------------------------------- | ----------------------- |
+| local, transient UI state (inputs, open/close, hover)       | Solid signals           |
+| shared cross-component state (session, preferences, layout) | a reactive store module |
+| server data                                                 | TanStack Query          |
+| shared, read-mostly server data (catalogs)                  | a query state module    |
+
+**Reactive store module.** Export one namespace object. Keep `createStore`, setters, and signals
+module-private; expose `store` for reads and intent-named mutations (`setAuth`, not
+`setSessionStore`). Nothing outside the module calls a setter.
+
+```typescript
+export type ThingStore = { field: number }
+
+const [thingStore, setThingStore] = createStore<ThingStore>({ field: 1971 })
+
+const setField = (field: number) => setThingStore({ field })
+const clear = () => setThingStore({ field: 1971 })
+
+export const ThingState = { store: thingStore, setField, clear }
+```
+
+**Query state module.** Export one hook, `use{Name}(): {Name}State`. Keep the query key, the loader,
+and any derived index module-private; consumers never import TanStack Query. The state exposes
+intent-named reads plus `ready()` (loaded, distinguishing loading from empty), `failed()`, and
+`refresh()`. The hook is called inside the component tree, where bootstrap provides the
+`QueryClient`, and every caller shares one cached query.
+
+```typescript
+export type CountriesState = {
+  ready: () => boolean
+  failed: () => boolean
+  label: (code: string) => string
+  refresh: () => Promise<void>
+}
+
+const COUNTRIES_QUERY_KEY = ['countries'] as const
+
+export const useCountries = (): CountriesState => {
+  const client = useQueryClient()
+  const query = createQuery(() => ({
+    queryKey: COUNTRIES_QUERY_KEY,
+    queryFn: loadCountries,
+    staleTime: Infinity
+  }))
+  const countries = (): readonly Country[] => query.data ?? []
+  return {
+    ready: () => query.isSuccess,
+    failed: () => query.isError,
+    label: code => countries().find(country => country.code === code)?.label ?? code,
+    refresh: () => client.invalidateQueries({ queryKey: COUNTRIES_QUERY_KEY })
+  }
+}
+```
+
+- A state module never imports a JSX module, directly or through its runtime dependencies, so state
+  stays testable without a browser. Type-only imports do not load one.
+- `ux/` imports its own stores directly and never an application's API namespace.
+- `AppState` (`@ux/shell/runtime/app-state.ts`) is the generic persistent key/value preference store.
+- Session and user are read from the session store, never passed down through props.
+- Draft data stays plain and cloneable (`@ux/shell/workbench/workbench-draft.ts`), and a form
+  declares its update scope (§10.4).
+
+### 16.4 Session
+
+- The application supplies a session coordinator (`SessionCoordinatorContract`: `init`, `clear`) and
+  its user (`SessionUserContract`: `id`, `roles`), both declared in
+  `@ux/shell/runtime/session-contracts.ts`. The shell invokes the life cycle and keeps baseline
+  session state in `SessionState`; the coordinator owns user hydration and eligibility.
+  `Routes.application(shells, session)` assembles the two.
+- An application that needs further reactive session data defines its own reactive store modules.
+- Components read `SessionState.store`, never the auth provider. `AuthGuard` renders authenticated
+  content only once the session is prepared.
+- Logout goes through the generic `logout(auth)`; an application wraps it to clear its own state.
+
+## 17. Building UX Patterns
+
+Every surface realizes an archetype from the UX design archetypes, the pattern language that owns
+their vocabulary, purpose, and composition rules. Reach for its supporting library before designing
+a surface. Each section here names the archetype it builds; behavior detail is in the module
+headers.
+
+### 17.1 Steps and sequences
+
+- A workbench hosts a sequence of one or more Steps. A Step is one panel; a drill-down inside it
+  replaces that panel's content and stays the same Step. The workbench owns the aggregate draft and
+  commits once; Steps never commit.
+- A Step is a `PanelStep` (`name`, `title`, optional `validate`, `render(context)`), and a sequence
+  is `readonly PanelStep[]` (`@ux/shell/panel/panel-sequence-contract.ts`). `createPanelSequence`
+  gates Steps in order; `PanelSequenceHeader` presents the controls the Sequence archetype names.
+- A dialog hosts a workbench; it is not the workbench's defining boundary.
+- A Step is a fragment: it knows nothing of its position, progress, or neighbors. Whatever composes
+  the sequence owns its progress.
+- A Step registers its dirty check through `PanelStepContext.registerDirty`; its draft stays in its
+  own context.
+
+### 17.2 Collection-Detail: `AbstractionManager`
+
+`AbstractionManager` (`@ux/shell/workbench/abstraction-manager.tsx`) edits one record from a set.
+It takes a provider with `create` and `update`, and `detail: (item: T | null) => AbstractionDetail`,
+which returns the Item's `steps` and a `draft` projection. It calls `detail` for each Item it
+opens, `null` for New.
+
+### 17.3 Sequence: `Wizard`
+
+`Wizard` (`@ux/shell/workbench/wizard.tsx`) decomposes one subject into Steps. It takes
+`{ formTitle, steps, commit, feedback? }` and commits once, at Finish; the commit may write one
+abstraction, several, or none.
+
+### 17.4 Index-Detail at depth: `DrillDown`
+
+A Step containing a nested Collection hosts `DrillDown` (`@ux/shell/panel/drill-down.tsx`) at its
+root and supplies its `PanelStepContext`. `CollectionPanel` lists the Collection and passes
+`DrillPanelContext` to its item renderer; an opened panel registers its Save and dirty check and
+returns through `returnToParent`.
+
+### 17.5 Chassis-Part: the dashboard
+
+- A dashboard is seeded from an application's dashboard JSON, conforming to
+  `@ux/shell/dashboard/dashboard-contract.ts`. `DashboardState.init(seed)` validates it, assigns
+  stable identity, and persists the layout locally. Dashboard state is a reactive store module.
+- A widget is resolved by its type string through a `WidgetRegistry`: catalog objects map type
+  names to components, and an application merges the toolkit catalog with its own, its entries
+  winning.
+- The shell owns the widget extension contracts (`@ux/shell/dashboard/widget-contract.ts`) and
+  never imports a concrete widget; applications bind widgets at their composition roots. Widgets
+  may consume public shell services, such as `getShellIdentity()`.
+- A widget's presentation shape (`compact`, `landscape`) is how it uses its allocated footprint,
+  not shell geometry.
+
+## 18. Testing Conventions
 
 ```text
 source/tests/
@@ -1021,13 +1201,13 @@ source/tests/
 - Tests exercise the public contract of each layer, not implementation details.
 - Each abstraction's adapter must have a round-trip test: `toAbstraction(fromAbstraction(obj))` round-trips cleanly.
 
-## 17. DevOps and Guards
+## 19. DevOps and Guards
 
 Guards are conventions made executable. A guard enforces what is mechanical; judgment stays with
 review (§1). Guard a deliberate boundary, never a judgment call: a guard that fails on correct
 code teaches people to work around it.
 
-### 17.1 Guards
+### 19.1 Guards
 
 - A guard is a script under `devops/guards/`, run alone as `deno task guard:{name}` and together
   in `deno task check`.
@@ -1046,7 +1226,7 @@ if (violations.length) guardFail('Imports', violations, 'Import siblings relativ
 guardPass('Imports')
 ```
 
-### 17.2 Tooling
+### 19.2 Tooling
 
 Tooling namespaces (`devops/`, `tests/`) run in one known host and conform like product code
 (§6.1), with two allowances:
@@ -1056,20 +1236,20 @@ Tooling namespaces (`devops/`, `tests/`) run in one known host and conform like 
 - Each may keep one local, topic-free utility barrel, with no edge to its peers. A helper both
   need moves to `@core/std` or `@core/stdx`.
 
-## 18. Amendment Record
+## 20. Amendment Record
 
 Each published version supersedes the one before it. Versions below 1.0 were never tracked as versions at the time — they are reconstructed retroactively from git, one per path rename, marking substantive content shifts within each era rather than the rename itself.
 
-| Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ------- | ------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 1.1     | 2026 October 20th   | Recast as the programming guide for software construction at Seasons Computing. The `core/` file headers are the reference, and some conventions are preferences held by review (§1 Overview). §3 Imports adds the type-import form and the own-namespace and closed `core/std` rules. §4 Naming makes object constants PascalCase and values SCREAMING_SNAKE. §6 Source Code File Format is rewritten: every file opens with a box header written in expanding levels, PUBLIC lists every export, and containers list their members as trees. §7.6 No magic gains its corollary, explicit and obvious. New chapters: §8 Types and Containers, §9 Domain Shapes, §10 Makers and Contracts, §11 Runtime Configuration, §12 Services, §13 Local Persistence, and §14 Remote Persistence. §15 Error Handling separates `Error`, `ValidatorError`, `ApiError`, and service errors. New §17 DevOps and Guards covers guards and the tooling allowances. The former §8–§13 are renumbered. |
-| 1.0     | 2026 September 15th | Cross-references in this document and every document citing it (`AGENTS.md`, the architecture docs, the genesis prompts) caught up to the new name (commit `ca77878`), and it gained explicit metadata and this amendment record for the first time. The rename's rationale: the document covers more than style — §8.6/§8.7 adapter and maker shape, §12 testing are structural pattern conventions, not aesthetics — and the old name undersold its actual scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
-| 0.7     | 2026 September 13th | Path renamed to `CONVENTIONS.md` (commit `5272c25`) with no content change of its own — bundled quietly into an unrelated commit, internal references still said "STYLE-GUIDE" for two more days.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
-| 0.6     | 2026 June 30th      | Its busiest era, and its first as a root-level, governance-tier document: barrel-import restrictions, the type/interface distinction, and the `core/cli`/`core/svc` namespace-length rule were all clarified here, alongside `@front/api` reconciliation and DevOps gap documentation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| 0.5     | 2026 March 14th     | `makeAdapter` and the `std`/`stdx` split were documented, alongside runtime config guidance (`LOCAL_DB_NAME`) and union-type/validator protocol conventions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| 0.4     | 2026 February 12th  | The `Id`/`isId` naming convention was established, `@core/std` container type aliases enforced, and `dprint` adopted as the authoritative formatter.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| 0.3     | 2026 January 5th    | Documentation and session-hygiene rules formalized, an AUTHORITY concept introduced, and the first enforcement guards (leaf layout) added as the domain reorganized into abstractions/validators/protocol.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| 0.2     | 2025 December 10th  | Backend reorganized into `core/` with default-only handlers; the core API moved to serverless.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| 0.1     | 2025 December 9th   | Created as `STYLEGUIDE.md`, 82 lines — the third commit in the repository's entire history.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.1     | 2026 October 20th   | Recast as the programming guide for software construction at Seasons Computing. The `core/` file headers are the reference, and some conventions are preferences held by review (§1 Overview). §3 Imports adds the type-import form and the own-namespace and closed `core/std` rules. §4 Naming makes object constants PascalCase and values SCREAMING_SNAKE. §6 Source Code File Format is rewritten: every file opens with a box header written in expanding levels, PUBLIC lists every export, and containers list their members as trees. §7.6 No magic gains its corollary, explicit and obvious. New chapters: §8 Types and Containers, §9 Domain Shapes, §10 Makers and Contracts, §11 Runtime Configuration, §12 Services, §13 Local Persistence, and §14 Remote Persistence. §15 Error Handling separates `Error`, `ValidatorError`, `ApiError`, and service errors. New §16 UX Shell and §17 Building UX Patterns cover `ux/`; new §19 DevOps and Guards covers guards and the tooling allowances. The former §8–§13 are renumbered. |
+| 1.0     | 2026 September 15th | Cross-references in this document and every document citing it (`AGENTS.md`, the architecture docs, the genesis prompts) caught up to the new name (commit `ca77878`), and it gained explicit metadata and this amendment record for the first time. The rename's rationale: the document covers more than style — §8.6/§8.7 adapter and maker shape, §12 testing are structural pattern conventions, not aesthetics — and the old name undersold its actual scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| 0.7     | 2026 September 13th | Path renamed to `CONVENTIONS.md` (commit `5272c25`) with no content change of its own — bundled quietly into an unrelated commit, internal references still said "STYLE-GUIDE" for two more days.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 0.6     | 2026 June 30th      | Its busiest era, and its first as a root-level, governance-tier document: barrel-import restrictions, the type/interface distinction, and the `core/cli`/`core/svc` namespace-length rule were all clarified here, alongside `@front/api` reconciliation and DevOps gap documentation.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| 0.5     | 2026 March 14th     | `makeAdapter` and the `std`/`stdx` split were documented, alongside runtime config guidance (`LOCAL_DB_NAME`) and union-type/validator protocol conventions.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| 0.4     | 2026 February 12th  | The `Id`/`isId` naming convention was established, `@core/std` container type aliases enforced, and `dprint` adopted as the authoritative formatter.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| 0.3     | 2026 January 5th    | Documentation and session-hygiene rules formalized, an AUTHORITY concept introduced, and the first enforcement guards (leaf layout) added as the domain reorganized into abstractions/validators/protocol.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| 0.2     | 2025 December 10th  | Backend reorganized into `core/` with default-only handlers; the core API moved to serverless.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| 0.1     | 2025 December 9th   | Created as `STYLEGUIDE.md`, 82 lines — the third commit in the repository's entire history.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 _End of Conventions Document_
