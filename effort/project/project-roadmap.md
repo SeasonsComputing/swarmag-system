@@ -150,7 +150,8 @@ them; each fix lands once instead of chasing every copy:
 - **Architecture documents cut to the system** — closed 2026-10-20,
   `effort/completed/2026-10-20-architecture-system-cut-brief.md`: `architecture-back`, `-devops`,
   and `-front` keep the system; portable material moves to CONVENTIONS.
-- **UX toolkit decomposition** — `effort/active/2026-10-20-ux-toolkit-decomposition-brief.md` (B-3):
+- **UX toolkit decomposition** — closed 2026-10-20,
+  `effort/completed/2026-10-20-ux-toolkit-decomposition-brief.md` (B-3):
   `architecture-front.md`'s toolkit material moves by rank to the archetypes, the components guide,
   CONVENTIONS, and the `ux/` headers.
 - **EFFORT milestones** — closed 2026-10-20,
@@ -244,8 +245,7 @@ Features not belonging to any theme are added to whatever session happens to tou
   B-20 "`edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already
   has" (`high`) — same territory, same session.
 - **Doc hygiene** — B-1 "`architecture-devops.md` buries what an agent scan needs" (`normal`),
-  B-2 "`domain-archetypes.md` and the domain genesis prompt restate CONVENTIONS" (`normal`),
-  B-3 "`architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`" (`low`).
+  B-2 "`domain-archetypes.md` and the domain genesis prompt restate CONVENTIONS" (`normal`).
 - **Guard gaps** — B-14 "`guard:css` does not verify that a referenced token resolves" (`normal`),
   B-16 "`guard:leaf` does not sweep the repository root" (`normal`), B-17 "`guard:leaf` fails on
   git-ignored files" (`low`), B-18 "`guard:css` misreads multiline selectors and misses selector-list
