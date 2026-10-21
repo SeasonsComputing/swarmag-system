@@ -60,7 +60,9 @@ import type { UiComponent } from '@ux/ui'
 import type { AbstractionAction, AbstractionManagerContract } from './abstraction-manager-contract.ts'
 import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import { focusFirstField } from './use-abstraction-form-keyboard.ts'
-import { createWorkbenchContext, WorkbenchDiscard } from './workbench-context.tsx'
+import { createWorkbenchContext } from './workbench-context.ts'
+import { WorkbenchDiscard } from './workbench-discard.tsx'
+import { copyDraft, isDraftChanged } from './workbench-draft.ts'
 
 import './abstraction-manager.css'
 
@@ -247,14 +249,14 @@ export const AbstractionManager = <T extends Instantiable, Draft>(
   /** Each open creates one owned state lifetime, shared across its step mounts. */
   const Detail = (): UiComponent => {
     const detail = props.provider.detail(untrack(selected))
-    const baseline = JSON.stringify(detail.draft())
+    const baseline = copyDraft(detail.draft())
     const sequence = createPanelSequence(() => detail.steps)
     const workbench = createWorkbenchContext(sequence, setEditorFeedback, savePending)
     const active = {
       draft: detail.draft,
       complete: sequence.complete,
       isDrilled: () => workbench.drillReturn() !== null,
-      isDirty: () => JSON.stringify(detail.draft()) !== baseline || workbench.isDirty()
+      isDirty: () => isDraftChanged(detail.draft(), baseline) || workbench.isDirty()
     }
     setSession(() => active)
     onCleanup(() => setSession(current => current === active ? null : current))

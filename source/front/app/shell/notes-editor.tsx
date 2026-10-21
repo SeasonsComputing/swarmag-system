@@ -23,7 +23,7 @@ import { createSignal, For, onCleanup, Show } from '@solid-js'
 import { createStore } from '@solid-js/store'
 import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
 import type { DrillContract, DrillPanelContext } from '@ux/shell/panel/drill-contract.ts'
-import { copyDraft } from '@ux/shell/workbench/workbench-draft.ts'
+import { copyDraft, isDraftChanged } from '@ux/shell/workbench/workbench-draft.ts'
 import {
   UiAlert,
   UiField,
@@ -107,7 +107,7 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
   const [draft, setDraft] = createStore(copyDraft(props.note))
   const [saveAttempted, setSaveAttempted] = createSignal(false)
   const error = (): boolean => saveAttempted() && !isNote(draft)
-  props.context.registerDirty(() => JSON.stringify(draft) !== JSON.stringify(original))
+  props.context.registerDirty(() => isDraftChanged(draft, original))
   const save = (): void => {
     if (!props.context.isActive()) return
     setSaveAttempted(true)

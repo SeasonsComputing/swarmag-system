@@ -26,7 +26,7 @@ import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
 import type { DrillContract, DrillPanelContext } from '@ux/shell/panel/drill-contract.ts'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
-import { copyDraft } from '@ux/shell/workbench/workbench-draft.ts'
+import { copyDraft, isDraftChanged } from '@ux/shell/workbench/workbench-draft.ts'
 import {
   UiActionButton,
   UiAlert,
@@ -122,7 +122,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
   const [saveAttempted, setSaveAttempted] = createSignal(false)
   const siteError = (): boolean => saveAttempted() && !isCustomerSite(draft)
   const isActiveDraft = props.context.isActive
-  props.context.registerDirty(() => draftFingerprint(draft) !== draftFingerprint(original))
+  props.context.registerDirty(() => isDraftChanged(draft, original))
   /** Switches location mode, clearing the fields the other mode owns. */
   const changeMode = (next: LocationMode): void => {
     setMode(next)
@@ -382,7 +382,6 @@ const SiteTextInput = (props: SiteTextInputProps): UiComponent => {
 // ────────────────────────────────────────────────────────────────────────────
 
 const siteName = (site: CustomerSite): string => UiText.untitled(site.label, 'Untitled site')
-const draftFingerprint = (draft: CustomerSite): string => JSON.stringify(draft)
 
 const updateDraftLocation = (
   setDraft: SetStoreFunction<CustomerSite>,

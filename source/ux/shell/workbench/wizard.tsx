@@ -12,6 +12,9 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Wizard       The wizard host component.
 WizardProps  Props for the wizard host.
+├ contract   Aggregate draft, composed steps, and final commit.
+├ onFinish   Called after a successful commit.
+└ onCancel   Closes the wizard after discard protection.
 
 SEMANTICS
 ───────────────────────────────────────────────────────────────────────────────
@@ -19,6 +22,10 @@ Commits once, at Finish; the commit may write one abstraction, several, or
 none. Presents progress with PanelSequenceProgress when its sequence has more
 than one step. Above its container threshold it also lays the sequence out as a
 tree in its aside (PanelStepflow); that tree is Wizard chrome.
+
+Snapshots the aggregate draft on mount. Cancel checks that aggregate and all
+registered local drafts, asking once before discarding changes. Back/Next
+preserves the aggregate draft and its baseline across step mounts.
 */
 
 import { createMemo, createSignal, Show } from '@solid-js'
@@ -35,18 +42,21 @@ import { UiActionButton } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { FORM_FEEDBACK_MESSAGE } from './use-abstraction-form-feedback.ts'
 import type { WizardContract } from './wizard-contract.ts'
-import { createWorkbenchContext, WorkbenchDiscard } from './workbench-context.tsx'
+import { createWorkbenchContext } from './workbench-context.ts'
+import { WorkbenchDiscard } from './workbench-discard.tsx'
+import { copyDraft, isDraftChanged } from './workbench-draft.ts'
 import './wizard.css'
 
 /** Props for the wizard host component. */
-export type WizardProps = {
-  contract: WizardContract
+export type WizardProps<Draft> = {
+  contract: WizardContract<Draft>
   onFinish: () => void
   onCancel: () => void
 }
 
 /** Host a complete sequence and persist only at Finish. */
-export const Wizard = (props: WizardProps): UiComponent => {
+export const Wizard = <Draft extends unknown>(props: WizardProps<Draft>): UiComponent => {
+  const baseline = copyDraft(props.contract.draft())
   const sequence = createPanelSequence(() => props.contract.steps)
   const [committing, setCommitting] = createSignal(false)
   const [feedback, setFeedback] = createSignal<PanelFeedback | null>(null)
@@ -82,7 +92,7 @@ export const Wizard = (props: WizardProps): UiComponent => {
   }
   const cancel = (): void => {
     if (committing()) return
-    if (workbench.isDirty()) setDiscard(true)
+    if (isDraftChanged(props.contract.draft(), baseline) || workbench.isDirty()) setDiscard(true)
     else props.onCancel()
   }
   return (
