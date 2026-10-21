@@ -15,7 +15,7 @@ NotesEditorProps  Controlled collection and drill host inputs.
 NotesEditor       Render the notes Index-Detail pair.
 */
 
-import { when } from '@core/std'
+import { toTrimmed, when } from '@core/std'
 import { NOTE_VISIBILITIES } from '@domain/abstractions/common.ts'
 import type { Note, NoteVisibility } from '@domain/abstractions/common.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
@@ -111,8 +111,9 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
   const save = (): void => {
     if (!props.context.isActive()) return
     setSaveAttempted(true)
-    if (!isNote(draft)) return
-    props.onSave(copyDraft(draft))
+    const note = { ...copyDraft(draft), content: toTrimmed(draft.content) }
+    if (!isNote(note)) return
+    props.onSave(note)
     props.context.returnToParent()
   }
   props.context.registerSave(() => ({
