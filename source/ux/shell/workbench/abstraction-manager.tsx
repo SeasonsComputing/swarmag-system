@@ -151,6 +151,13 @@ export const AbstractionManager = <T extends Instantiable, Draft>(
 
   const cancelDialog = (): void => requestExit(props.onCancel)
 
+  /** The collection's load failure as display copy, or null when it loaded. */
+  const listErrorMessage = (): string | null => {
+    const error = props.provider.listError()
+    if (error == null) return null
+    return error instanceof Error ? error.message : `${props.provider.entityLabel}s failed to load.`
+  }
+
   /** Resolve display copy for an abstraction instance. */
   const itemLabel = (item: T): string => props.provider.itemLabel?.(item) ?? props.provider.entityLabel
 
@@ -352,6 +359,9 @@ export const AbstractionManager = <T extends Instantiable, Draft>(
               )
             }}
           >
+            <Show when={listErrorMessage()}>
+              {message => <UiAlert variant='danger'>{message()}</UiAlert>}
+            </Show>
             <Show
               when={!props.provider.isListLoading()}
               fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}

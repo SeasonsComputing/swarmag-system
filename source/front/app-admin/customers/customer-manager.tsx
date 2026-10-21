@@ -22,11 +22,10 @@ import type { Customer, CustomerStatus } from '@domain/abstractions/customer.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
-import { Show } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
-import { UiAlert, UiLayout, UiText } from '@ux/ui'
+import { UiLayout, UiText } from '@ux/ui'
 import type { UiBadgeVariant, UiComponent } from '@ux/ui'
 import { createCustomerState, customerDraft } from './customer-state.ts'
 import type { CustomerDraft } from './customer-state.ts'
@@ -80,6 +79,7 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
     ],
     list: () => customersQuery.data ?? [],
     isListLoading: () => customersQuery.isPending,
+    listError: () => customersQuery.error,
     itemLabel: customer => customer.name,
     refresh: async () => {
       await customersQuery.refetch()
@@ -105,13 +105,6 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
   }
   return (
     <div data-app='customers-page'>
-      <Show when={customersQuery.error}>
-        <UiAlert variant='danger'>
-          {customersQuery.error instanceof Error
-            ? customersQuery.error.message
-            : 'Customer operation failed.'}
-        </UiAlert>
-      </Show>
       <AbstractionManager provider={provider} onCancel={props.onCancel} />
     </div>
   )

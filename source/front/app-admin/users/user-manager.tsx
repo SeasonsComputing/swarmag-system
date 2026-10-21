@@ -20,11 +20,11 @@ import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
-import { For, Show } from '@solid-js'
+import { For } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
-import { UiAlert, UiLayout, UiText } from '@ux/ui'
+import { UiLayout, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { createUserState, userDraft } from './user-state.ts'
 import type { UserDraft } from './user-state.ts'
@@ -68,6 +68,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     ],
     list: () => usersQuery.data ?? [],
     isListLoading: () => usersQuery.isPending,
+    listError: () => usersQuery.error,
     itemLabel: user => user.displayName,
     refresh: async () => {
       await usersQuery.refetch()
@@ -117,9 +118,6 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
 
   return (
     <div data-app='users-page'>
-      <Show when={usersQuery.error}>
-        <UiAlert variant='danger'>{errorMessage(usersQuery.error)}</UiAlert>
-      </Show>
       <AbstractionManager provider={provider} onCancel={props.onCancel} />
     </div>
   )
@@ -143,9 +141,4 @@ function UserListIdentity(props: { user: User }): UiComponent {
       </span>
     </UiLayout>
   )
-}
-
-/** Message shown for a failed User operation. */
-function errorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : 'User operation failed.'
 }
