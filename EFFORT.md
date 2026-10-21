@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Effort Methodology (1.2)
+# Effort Methodology (1.3)
 
 - Source: [EFFORT.md](EFFORT.md)
-- Version: 1.2
-- Published: 2026 October 20th
+- Version: 1.3
+- Published: 2026 October 21st
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -60,7 +60,7 @@ A brief is a written design record for one unit of work.
 
 **Capture it close to when the need is found.** A real incident or design decision, left ungrounded until later, is reconstructed from memory instead of recorded from evidence. Capture it at the close of the session that surfaced it, even if production is not yet authorized — mark it explicitly as backlog, not dispatched.
 
-**Place it by whether its effort is current work.** A newly captured brief begins in `effort/pending/`. It goes directly to `effort/active/` only when dispatched immediately — for example, a repair brief taken straight to production. A pending brief moves to `effort/active/` when its effort is chosen from the roadmap. The move happens at selection, not at the production gate: a chosen effort's first step is an exploration review, which is already in-flight work. Handoffs never enter `effort/pending/`; a handoff records in-flight work by definition (§5 The Handoff).
+**Place it by whether its effort is current work.** A newly captured brief begins in `effort/pending/`. It goes directly to `effort/active/` only when dispatched immediately — for example, a repair brief taken straight to production. A pending brief moves to `effort/active/` when its effort is chosen from the roadmap, and no work on it begins before then. The move happens at selection, not at the production gate: a chosen effort's first step is an exploration review, which is already in-flight work. Handoffs never enter `effort/pending/`; a handoff records in-flight work by definition (§5 The Handoff).
 
 When a brief is created for work that already has a `project-backlog.md` entry, the entry's text is replaced by a link to the brief, so the work is described in one place. When the brief moves, the link is updated to its new path.
 
@@ -121,6 +121,7 @@ Each published version supersedes the one before it. Amendments reference sectio
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.3     | 2026 October 21st   | §4 The Brief: no work on a pending brief begins before it moves to `effort/active/`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | 1.2     | 2026 October 20th   | §4 The Brief edits a draft in place, recording overturned directions in its Design history, and amends a brief only once dispatched; on closing, every deferred or not-taken item is settled. §7 Milestones names each numbered roadmap section a milestone, lists enablers ahead of features with ride-along work beside them, and reconciles the roadmap when a milestone closes. §3 Work Definitions gives every backlog and parking-lot entry a permanent ID, and asks backlog titles to state the gap and parking-lot titles the open question; §7 Milestones gives each milestone a permanent `M-n`. |
 | 1.1     | 2026 October 4th    | §2 The Effort Namespace gains a fifth namespace, `pending`, and names the two status-bearing record kinds, brief and handoff, with their file-naming pattern. §4 The Brief places a newly captured brief in `effort/pending/`, moves it to `effort/active/` when its effort is chosen from the roadmap, keeps handoffs out of `pending`, replaces an existing backlog entry's text with a link to its brief, and closes a brief that is withdrawn as well as one that ships.                                                                                                                               |
 | 1.0     | 2026 September 15th | Initial version.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
