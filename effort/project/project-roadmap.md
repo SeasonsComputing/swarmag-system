@@ -138,6 +138,9 @@ them; each fix lands once instead of chasing every copy:
   banner in `AbstractionManager`, which every new manager uses.
 - **Stage test authorization** — `effort/active/2026-10-13-stage-test-authorization-brief.md`: new
   managers arrive with integration tests that run.
+- **Host-owned list errors** — added and closed 2026-10-21, `a744ee6`: `AbstractionManager`
+  presents the collection's load failure from `listError`; copied managers supply it, not the
+  banner.
 
 **Rides along:**
 
@@ -167,8 +170,9 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 
 **Features:**
 
-- **Asset Manager** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`.
-- **Chemical Manager** (`project-user-stories.md` §4) — Manager, wire `api.Chemicals`.
+- **Asset Manager** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`;
+  `effort/active/2026-10-21-asset-chemical-managers-brief.md`.
+- **Chemical Manager** (`project-user-stories.md` §4) — Manager, wire `api.Chemicals`; same brief.
 
 ## M-6 · Workflow, Task, Question & Service
 
