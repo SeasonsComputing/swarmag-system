@@ -58,6 +58,7 @@ export interface AbstractionManagerContract<T extends Instantiable, Draft> {
   listColumns: AbstractionListColumn<T>[]
   list: () => T[]
   isListLoading: () => boolean
+  listError: () => unknown
   itemLabel?: (item: T) => string
   refresh: () => void | Promise<void>
   create: (draft: Draft) => T | Promise<T>
