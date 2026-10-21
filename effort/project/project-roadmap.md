@@ -130,8 +130,9 @@ closed, to scope both themes properly before that fuller work is picked up.
 **Enablers** — make the reference implementations copy-ready before this milestone replicates
 them; each fix lands once instead of chasing every copy:
 
-- **Workbench draft services** — `effort/active/2026-10-19-workbench-draft-services-brief.md`:
-  one shared dirty check, and draft services that load no JSX.
+- **Workbench draft services** — closed 2026-10-21,
+  `effort/completed/2026-10-19-workbench-draft-services-brief.md`: one shared dirty check, draft
+  services that load no JSX, and each host owning its aggregate draft check.
 - **Fresh editor feedback** — `effort/active/2026-10-19-fresh-editor-feedback-brief.md`:
   `AbstractionManager`, which every new manager uses.
 - **Stage test authorization** — `effort/active/2026-10-13-stage-test-authorization-brief.md`: new

@@ -179,18 +179,6 @@ unused here — generalizing to a small `h2`-through-`h5` lookup (or `solid-js/w
 `Dynamic`) uses infrastructure the codebase already ships rather than adding a nesting layer
 each time depth grows.
 
-### B-11 · Draft fingerprints are written four times
-
-**Observed:** 2026-10-08 · low
-
-Design record: [Workbench Draft Services — Brief](../active/2026-10-19-workbench-draft-services-brief.md).
-
-### B-12 · `workbench-context.tsx` mixes draft services with a component
-
-**Observed:** 2026-10-08 · low
-
-Design record: [Workbench Draft Services — Brief](../active/2026-10-19-workbench-draft-services-brief.md).
-
 ### B-13 · A fresh New editor shows stale feedback and a premature field error
 
 **Observed:** 2026-10-18 · normal
