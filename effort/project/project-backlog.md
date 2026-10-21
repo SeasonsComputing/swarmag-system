@@ -56,12 +56,6 @@ only what is specific to the domain. `domain-archetypes.md` still cites "`CONVEN
 Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close of
 `effort/completed/2026-10-03-core-reconciliation-brief.md`.
 
-### B-3 · `architecture-front.md` mixes the portable `ux/` toolkit with swarmAg's `front/`
-
-**Observed:** 2026-10-06 · low
-
-Design record: [UX Toolkit Decomposition — Brief](../active/2026-10-20-ux-toolkit-decomposition-brief.md).
-
 ## Controls
 
 ### B-4 · Shared UI controls do not use one state model
