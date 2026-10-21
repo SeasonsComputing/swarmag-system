@@ -1,12 +1,11 @@
 # Workbench Draft Services — Brief
 
-**Active.** Recorded 2026-10-19 from a CA + AI Architect session as an enabler of M-5
-Mechanical Productions: the reference implementations are about to be copied into new managers, so
-each fix lands once here instead of in every copy. Absorbs backlog entries B-11 "Draft fingerprints
-are written four times" and B-12 "`workbench-context.tsx` mixes draft services with a component".
-The AI Coding Engine reviewed it on 2026-10-21; the amendment "ACE review resolved" records the
-outcome. The first round was produced on 2026-10-21; the amendment "Wizard owns its aggregate
-draft" adds a second round, which awaits AI Coding Engine review and the production gate.
+**Closed 2026-10-21.** One shared draft comparison, a JSX-free workbench context, and each host
+owning its aggregate draft check; the reference implementations are copy-ready for M-5. Recorded
+2026-10-19 from a CA + AI Architect session as an enabler of M-5 Mechanical Productions. Absorbed
+backlog entries B-11 "Draft fingerprints are written four times" and B-12 "`workbench-context.tsx`
+mixes draft services with a component". Two amendments follow the original design: "ACE review
+resolved" and "Wizard owns its aggregate draft".
 
 ## What triggered it
 
@@ -136,5 +135,25 @@ one.
 
 Out of scope: `AbstractionManager`, the drill-down relay, and nested editors. The walkthrough adds
 Onboarding: edit an earlier step, go Next, then Cancel; the wizard asks first.
+
+## Closure (2026-10-21)
+
+Production by the AI Coding Engine in two rounds, committed together (`216d36c`), with CONVENTIONS
+§17.3 brought in line with the new `WizardContract` (`6c7252b`). The AI Architect verified both
+rounds against the diff and re-ran the checks: guards, types, lint, formatting, and 105 tests with
+the two blocked tests excluded. The CA reviewed and closed the brief.
+
+Settled at closure:
+
+- **Test header box:** deferred to the devops brief, which owns header conformance for
+  `source/tests/` (`effort/pending/2026-08-23-devops-style-error-handling-brief.md`).
+- **A named type for the dirty check:** dropped; copied code passes a lambda to `registerDirty` and
+  never spells the type.
+- **Key-order normalization:** not taken (Decision 2); `isDraftChanged` is the one place to
+  change it.
+- **The fresh editor feedback brief's test-exclusion line:** joins that brief, to be made a command
+  as here when it is picked up.
+
+B-11 and B-12 are removed from the backlog.
 
 _End of Brief_
