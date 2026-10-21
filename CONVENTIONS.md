@@ -1160,8 +1160,8 @@ opens, `null` for New.
 ### 17.3 Sequence: `Wizard`
 
 `Wizard` (`@ux/shell/workbench/wizard.tsx`) decomposes one subject into Steps. It takes
-`{ formTitle, steps, commit, feedback? }` and commits once, at Finish; the commit may write one
-abstraction, several, or none.
+`{ formTitle, steps, draft, commit, feedback? }`, where `draft` is the aggregate draft projection,
+and commits once, at Finish; the commit may write one abstraction, several, or none.
 
 ### 17.4 Index-Detail at depth: `DrillDown`
 
