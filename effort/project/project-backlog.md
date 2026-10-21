@@ -179,12 +179,6 @@ unused here — generalizing to a small `h2`-through-`h5` lookup (or `solid-js/w
 `Dynamic`) uses infrastructure the codebase already ships rather than adding a nesting layer
 each time depth grows.
 
-### B-13 · A list action leaves a stale banner on a fresh New editor
-
-**Observed:** 2026-10-18 · normal
-
-Design record: [Fresh Editor Feedback — Brief](../active/2026-10-19-fresh-editor-feedback-brief.md).
-
 ## Guards
 
 ### B-14 · `guard:css` does not verify that a referenced token resolves
