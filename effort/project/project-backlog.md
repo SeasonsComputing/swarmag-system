@@ -179,7 +179,7 @@ unused here — generalizing to a small `h2`-through-`h5` lookup (or `solid-js/w
 `Dynamic`) uses infrastructure the codebase already ships rather than adding a nesting layer
 each time depth grows.
 
-### B-13 · A fresh New editor shows stale feedback and a premature field error
+### B-13 · A list action leaves a stale banner on a fresh New editor
 
 **Observed:** 2026-10-18 · normal
 
