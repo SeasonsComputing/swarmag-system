@@ -207,8 +207,9 @@ export const AbstractionManager = <T extends Instantiable, Draft>(
     }
   }
 
-  /** Runs a provider action and refreshes the list after completion. */
+  /** Clears editor feedback, runs a provider action, and refreshes the list. */
   const runAction = async (action: PendingAction<T>['action'], item: T): Promise<void> => {
+    setEditorFeedback(null)
     await action.handler(item)
     await props.provider.refresh()
     if (selected()?.id === item.id) openFreshNew(true)
