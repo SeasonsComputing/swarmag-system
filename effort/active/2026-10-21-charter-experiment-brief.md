@@ -60,7 +60,7 @@ needed to keep the tooling honest.
 **Delegated decisions.**
 
 - Writing its own brief in `effort/active/`, and amending it as it works.
-- Scoping and ordering its own productions, and dispatching them to free subagents.
+- Scoping and ordering its own productions, and which subagent takes each.
 - Repairing a guard: making it check correctly what it already enforces, or reach where it
   already claims to.
 - Conforming `source/devops/` and `source/tests/` to CONVENTIONS.
@@ -75,6 +75,9 @@ needed to keep the tooling honest.
 
 **Obligations.**
 
+- Productions run on free subagents (AGENTS §4), in parallel where their files are disjoint; the
+  agent itself plans, dispatches, integrates, and verifies. If no free subagent is available, it
+  reports that to the CA and stops.
 - Its brief records every decision it made under the charter, and why.
 - A list of doc changes owed, as future effort.
 - A closing report per AGENTS §2.2, with `STYLE_AUDIT`, which the AI Architect verifies against the
@@ -124,6 +127,7 @@ The experiment is judged on what it shows, not only on what it resolves:
 4. **The record leads:** a cold session could resume from the agent's brief alone.
 5. **CA time:** what the CA spent, against what the same work would cost scope-first.
 6. **Rework:** what the AI Architect's verification sent back.
+7. **Delegation:** how the work divided across free subagents, and what integrating it cost.
 
 ## Open
 
