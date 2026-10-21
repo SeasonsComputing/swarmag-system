@@ -13,6 +13,20 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 DrillDownProps  Props for the drill-down host.
 DrillDown       Render the drill-down host surface.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+Opened panels receive DrillPanelContext: isActive, registerDirty, registerSave,
+and returnToParent; CollectionPanel passes that context to its item renderer.
+Panel activity is host-owned and independent of depth. Only the active panel
+supplies the header Save; a covered panel retains its working copy and dirty
+checks. Every open panel contributes to workbench discard protection.
+
+Local drill-back checks only the active panel and asks before discarding
+changes. A successful Save validates and updates the parent draft before
+returnToParent returns without a discard prompt. Closing a panel disposes its
+registrations and pending draft; covering it does not. Restoring its parent
+restores that parent's Save.
 */
 
 import {

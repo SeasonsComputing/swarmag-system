@@ -12,6 +12,12 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 PanelSequenceControl  Cursor and gated traversal.
 createPanelSequence   Create a sequence controller.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+The controller has no draft, persistence, or chrome. Advancement validates the
+current step; after Back, that step is validated again on the next forward
+traversal. There is no arbitrary jump API.
 */
 
 import { createMemo, createSignal } from '@solid-js'

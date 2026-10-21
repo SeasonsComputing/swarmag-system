@@ -13,6 +13,14 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 SessionCoordinatorContract  Application-owned session initialization.
 SessionUserContract         Application-supplied prepared user.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+Bootstrap calls the coordinator's init() synchronously during its Solid mount
+callback; generic bootstrap does not consume the application API. The
+application's init() starts session resolution and registers its cleanup with
+the current Solid owner. The session holds the application user through
+SessionUserContract; the shell application gains no user field.
 */
 
 import type { Id } from '@core/std'

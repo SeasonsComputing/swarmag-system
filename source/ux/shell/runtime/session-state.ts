@@ -23,8 +23,8 @@ SessionStateContract - Contract for the SessionState singleton
 ├ store            Reactive session state snapshot.
 ├ setAuth(userId)  Mark session active and clear loading.
 ├ setReady(user)   Hold the prepared user and mark data ready.
-├ isPrepared()     Authenticated content may render.
-├ isSignedOut()    Resolution finished without a session.
+├ isPrepared()     Resolution finished, authenticated, and data ready.
+├ isSignedOut()    Resolution finished without authentication.
 └ clear()          Reset session state to signed-out defaults.
 
 SessionState - Provider for SessionStateContract
