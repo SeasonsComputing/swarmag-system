@@ -181,7 +181,7 @@ box, then PURPOSE, then PUBLIC or its groups, then any further sections.
 | 3     | Complex files                     | Level 2, with PUBLIC replaced by named groups; named sections may follow them |
 
 Tooling and tests conform like product code. Test cases and files used only by packaging or the
-runtime, such as build configurations and service workers, stop at level 1.
+runtime, such as build configurations and service workers, need only level 1.
 
 A level 2 header:
 
