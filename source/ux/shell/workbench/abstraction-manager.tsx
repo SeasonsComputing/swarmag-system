@@ -15,6 +15,24 @@ AbstractionManagerProps  Props for a generic abstraction manager.
 ├ onCancel               Closes the manager.
 └ provider               Abstraction-specific list and editor provider.
 AbstractionManager       Generic list+panel manager component.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+Calls detail for each Item it opens; that is how an Item hydrates its steps.
+Validates through sequence completion and persists through its provider's
+create or update. Save takes the final advance slot and is offered only when no
+nested Detail is open.
+
+Its aside is always its Collection. It presents no progress, whatever the step
+count: the step title in the header and Next versus Save orient the user within
+an existing record. Below the threshold, step 1's leading control returns to
+the Index and later steps show Back; nothing reaches the Index from a later
+step. Above it, selecting another Item or New leaves the Detail from any step.
+
+Snapshots the draft when it opens an Item. Any exit that would discard a
+changed draft asks first: another Item, New, the collapsed return, and Cancel.
+Hosted in a non-dismissible dialog, it exits only through these explicit
+controls and their dirty checks.
 */
 
 import type { Instantiable } from '@core/std'

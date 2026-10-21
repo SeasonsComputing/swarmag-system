@@ -12,6 +12,13 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Wizard       The wizard host component.
 WizardProps  Props for the wizard host.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+Commits once, at Finish; the commit may write one abstraction, several, or
+none. Presents progress with PanelSequenceProgress when its sequence has more
+than one step. Above its container threshold it also lays the sequence out as a
+tree in its aside (PanelStepflow); that tree is Wizard chrome.
 */
 
 import { createMemo, createSignal, Show } from '@solid-js'

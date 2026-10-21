@@ -13,6 +13,19 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 createWorkbenchContext  Bind step services to a workbench instance.
 WorkbenchDiscard        One confirmation for an enclosing discard action.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+Dirty-state belongs to each draft's context: registerDirty(check) exposes a
+local change check to the workbench and returns its cleanup callback. Retained
+feature-state checks last for the session, across step remounts; nested draft
+checks are cleaned up when their draft closes. The sequence controller does not
+own dirty-state.
+
+Local Up asks only about the Detail it discards. Workbench Cancel and
+collection select/New check the aggregate and all open nested drafts, then ask
+once before abandoning the session; the collapsed first-step return receives
+the same protection. Back/Next preserves drafts and does not prompt.
 */
 
 import { createSignal, onCleanup } from '@solid-js'

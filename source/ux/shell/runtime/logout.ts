@@ -7,7 +7,7 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Terminates the remote auth session when possible and always clears local session
-state. Route navigation is owned by the shell transition that invokes this work.
+state, logging a failed remote sign-out. Route navigation is owned by the shell transition that invokes this work.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────

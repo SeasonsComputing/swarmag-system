@@ -11,6 +11,17 @@ Presents one navigation axis at a time. Hosts supply their final commit action.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 PanelSequenceHeader  Shared workbench detail header.
+
+SEMANTICS
+───────────────────────────────────────────────────────────────────────────────
+At a step's Index, Back and Next are live; the final step's advance slot holds
+the commit action the host supplies. Inside a nested Detail those controls are
+absent: drill-back is the only ascend control, and the innermost Detail's Save
+takes the advance slot, validating and returning to its parent Index, or
+staying on failure. The header names the path by kind.
+
+With one step, the header reduces to the host's simple header. Glyphs, header
+states, and transition motion are defined here once; no feature restates them.
 */
 
 import { Show } from '@solid-js'
