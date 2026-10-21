@@ -32,7 +32,7 @@ Give `core/` one coherent account across its three artifacts, with each concern 
   boundary, RLS, edge functions, offline), its invariants, and dependency direction.
 - **`CONVENTIONS.md`** is the guide to building with `core/` in any repository: when and how to use
   each capability, pointing to its module for what it provides. It travels with `core/` as a
-  Seasons asset.
+  Seasons Computing asset.
 
 Done means every `core/` namespace in the survey below has guidance in CONVENTIONS.
 
