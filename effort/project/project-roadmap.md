@@ -150,6 +150,9 @@ them; each fix lands once instead of chasing every copy:
 - **Architecture documents cut to the system** — closed 2026-10-20,
   `effort/completed/2026-10-20-architecture-system-cut-brief.md`: `architecture-back`, `-devops`,
   and `-front` keep the system; portable material moves to CONVENTIONS.
+- **UX toolkit decomposition** — `effort/active/2026-10-20-ux-toolkit-decomposition-brief.md` (B-3):
+  `architecture-front.md`'s toolkit material moves by rank to the archetypes, the components guide,
+  CONVENTIONS, and the `ux/` headers.
 - **EFFORT milestones** — closed 2026-10-20,
   `effort/completed/2026-10-19-effort-milestones-brief.md`: codifies milestones, reconciliation,
   deferrals, and enablers in `EFFORT.md`. It makes nothing here copy-ready; it lands in the same
