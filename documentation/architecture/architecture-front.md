@@ -343,103 +343,12 @@ Each application root imports `@front/config/ux-config.ts` before application de
 
 ### 8.3 Reactive Store Module Pattern
 
-The Reactive Store Module Pattern is the required architecture for UX reactive state modules.
-
-- Export a **single namespace object** (for example `SessionState`), not raw primitives.
-- Keep framework internals (`createStore`, setter functions, signals) **module-private**.
-- Expose:
-  - `store` for read access
-  - intent-based mutation methods (`setAuth`, `setReady`, `clear`)
-- Mutation methods must be **domain-intent names**, not framework/mechanical names.
-  - Use `setAuth`, not `setSessionStore`.
-- No module outside the store may call reactive setters directly.
-- Components and app shells consume state through `StoreNamespace.store` and mutate through `StoreNamespace.<intentMethod>()`.
-
-**Example Reactive Store Module:**
-
-```typescript
-// thing-state.ts
-
-export type ThingStore = {
-  field: number
-}
-
-const [thingStore, setThingStore] = createStore<ThingStore>({ field: 1971 })
-
-const setField = (field: number) => setThingStore({ field })
-const clear = () => setThingStore({ field: 1971 })
-
-const ThingState = {
-  store: thingStore,
-  setField,
-  clear
-}
-
-export { ThingState }
-```
+Reactive state modules follow the reactive store module pattern (CONVENTIONS §16.3).
 
 ### 8.4 Query State Pattern
 
-The Query State Pattern is the required architecture for shared, read-mostly server data that many
-components consume, such as a curated catalog. It applies §8.3's information hiding to data the
-server owns, which §9.6.1 assigns to TanStack Query.
-
-- Export a **single hook**, `use{Name}(): {Name}State`, not a query object.
-- Keep the query key, the loader, and any derived index **module-private**. Consumers never
-  import TanStack Query.
-- `{Name}State` exposes intent-named reads, plus:
-  - `ready()`, true once the data has loaded, distinguishing loading from empty;
-  - `failed()`, true when the load failed, distinguishing failure from loading;
-  - `refresh()`, invalidating the query after the data is edited elsewhere.
-- The hook is called inside the component tree, where bootstrap provides the `QueryClient`
-  (§10.2). Every caller shares one cached query.
-
-**Example Query State Module:**
-
-```typescript
-// facets-state.ts
-
-export type FacetsState = {
-  ready: () => boolean
-  failed: () => boolean
-  schemes: () => readonly string[]
-  codes: (scheme: string) => readonly string[]
-  label: (scheme: string, code: string) => string
-  labelRef: (ref: string) => string
-  labelRefs: (refs: readonly string[]) => readonly string[]
-  refresh: () => Promise<void>
-}
-
-const FACETS_QUERY_KEY = ['facets'] as const
-
-export const useFacets = (): FacetsState => {
-  const client = useQueryClient()
-  const query = createQuery(() => ({
-    queryKey: FACETS_QUERY_KEY,
-    queryFn: loadFacets,
-    staleTime: Infinity
-  }))
-  const facets = (): readonly Facet[] => query.data ?? []
-  const label = (scheme: string, code: string): string =>
-    facets().find(facet => facet.scheme === scheme && facet.code === code)?.label
-      ?? `${scheme}:${code}`
-  const labelRef = (ref: string): string => {
-    const [scheme, code] = ref.split(':')
-    return label(scheme, code)
-  }
-  return {
-    ready: () => query.isSuccess,
-    failed: () => query.isError,
-    schemes: () => [...new Set(facets().map(facet => facet.scheme))].sort(),
-    codes: scheme =>
-      facets().filter(facet => facet.scheme === scheme && facet.active).map(facet => facet.code).sort(),
-    label,
-    labelRef,
-    labelRefs: refs => refs.map(labelRef),
-    refresh: () => client.invalidateQueries({ queryKey: FACETS_QUERY_KEY })
-  }
-}
-```
+Shared, read-mostly server data follows the query state module pattern (CONVENTIONS §16.3);
+`front/app/stores/facets-state.ts` is swarmAg's instance.
 
 ## 9. Application Runtime Patterns
 
@@ -455,23 +364,18 @@ app.tsx
     └── Dashboard          — primary navigation surface
 ```
 
-Authenticated routes render their primary application surface inside a semantic
-`main` landmark. `main` is required accessibility plumbing, not a UX metaphor or
-shared shell primitive.
-
-`AuthGuard` and `Dashboard` live in `source/ux/shell` — fully generic. `Login` is swarmAg-branded presentation and lives in `source/front/app/shell/`; `source/ux/shell/runtime/shell-makers.tsx`'s `makeAnonymousShell()`/`makeDashboardShell()` take it (and `AboutBox`) as route-component parameters rather than importing them directly, and `source/front/app/shell/shell-makers.tsx` re-exports both names pre-bound to swarmAg's versions — every app root imports the app-tier maker, not the generic one. Each app package declares a complete `Application`: a common anonymous shell plus a dashboard shell, and the application-owned session coordinator. The dashboard shell receives its app-local dashboard configuration (`app-{admin|ops|customer}-dashboard.json`), the merged widget registry (`§10.3`), and app-specific route presentations before shared bootstrap mounts it.
+The shell composition is described in CONVENTIONS §16.1. `Login` is swarmAg-branded presentation
+in `source/front/app/shell/`; `source/front/app/shell/shell-makers.tsx` re-exports the generic
+makers pre-bound to swarmAg's `Login` and `AboutBox`, and every app root imports the app-tier
+maker. Each app package declares a complete `Application`: a common anonymous shell, a dashboard
+shell receiving its app-local dashboard configuration (`app-{admin|ops|customer}-dashboard.json`),
+the merged widget registry (§10.3), and app-specific route presentations, plus the
+application-owned session coordinator.
 
 #### 9.1.1 UX Metaphors
 
-All feature work should use an existing UX metaphor when one fits:
-
-| Metaphor                | Purpose                                                          |
-| ----------------------- | ---------------------------------------------------------------- |
-| **Dashboard**           | Authenticated hub and primary navigation surface                 |
-| **Widget**              | Dashboard surface unit for status, data, and action entry points |
-| **Abstraction Manager** | Standard domain "collection-detail" management experience        |
-| **Wizard**              | Complex user interface decomposed into a multi-step wizard       |
-| **Job Runner**          | Specialized, sequenced task surface for infield operational work |
+Feature work starts from an existing archetype and its supporting library
+(`ux-design-archetypes.md` §6).
 
 #### 9.1.2 Auth Guard
 
@@ -479,42 +383,14 @@ The shell root asks `SessionState.isPrepared()` before rendering any authenticat
 
 #### 9.1.3 Dashboard as Primary Navigation
 
-There is no navigation menu in any app. The dashboard is the primary interface and the primary navigation surface. Dashboard widgets and cards are the entry points into domain pages. Navigation is:
-
-```text
-dashboard → domain page → back to dashboard
-```
+The dashboard is the primary navigation surface (`ux-design-archetypes.md` §4.3, Chassis-Part).
 
 ### 9.2 Routing
 
-Common routes are supplied by `makeAnonymousShell()` and `makeDashboardShell()`, generic in `source/ux/shell/runtime/shell-makers.tsx` and re-exported pre-bound to swarmAg branding from `source/front/app/shell/shell-makers.tsx` — app roots import the latter. Each app root declares its complete shell collection in `app.tsx`, including app-specific dashboard presentations. `bootstrap()` compiles that collection; it does not accept raw route extensions or optional composition fragments.
-
-The shell route grammar is the public routing API for all front applications. Applications declare route intent through `Routes` and shell composition contracts. Application, feature, page, and widget code must not import router-vendor APIs directly.
-
-Router libraries are shell runtime implementation details. The current shell runtime uses TanStack Solid Router to execute the shell route grammar, but TanStack route APIs do not define the application routing contract. Direct router-vendor imports are confined to shell runtime implementation files under `source/ux/shell/runtime/`.
-
-Imperative navigation flows through `useShellNavigate()`. Declarative route redirection flows through `ShellRedirect` and `ShellReplace`. This keeps navigation vocabulary owned by the shell and preserves a single implementation point if route behavior is enriched or the runtime substrate changes.
-
-A **page** is a routable, context-scoped, auth-guarded UX module. Pages may be a **domain page** — a standard list or object view — or a **feature page** — a specialized guided interface. There is no architectural distinction between them — `{page}` in the route shape below refers to either.
-
-#### 9.2.1 Route Shape
-
-```text
-/                          → dashboard (auth-guarded)
-/login                     → login (unauthenticated)
-/{page}                    → page (auth-guarded)
-/{page}/{id}               → item-scoped page (auth-guarded)
-/{page}/{operation}        → operation-scoped page (auth-guarded)
-/{page}/{operation}/{id}   → item-scoped operation page (auth-guarded)
-```
-
-The first two routes are provided by the shared shell makers and are common to all apps. App-local `app.tsx` files extend the tree with app-specific pages as the application is built out.
-
-Examples: `/user/list`, `/user/get/{id}`, `/job-runner/{id}`.
-
-#### 9.2.2 Protected Routes
-
-Protected routes wrap content in the auth guard component. The guard is a route-level concern, not a per-component concern.
+Routing follows the shell route grammar (CONVENTIONS §16.2). Common routes come from the shared
+makers, which app roots import pre-bound from `source/front/app/shell/shell-makers.tsx`. Each app
+root declares its complete shell collection in `app.tsx`, including app-specific dashboard
+presentations. Examples: `/user/list`, `/user/get/{id}`, `/job-runner/{id}`.
 
 ### 9.3 Authentication
 
@@ -522,24 +398,15 @@ Protected routes wrap content in the auth guard component. The guard is a route-
 implements `ApiAuthContract` (`source/core/std/auth-contract.ts`). It is not a maker; there is
 exactly one auth implementation. It is composed into the API namespace as `api.Auth`.
 
-| Method                        | Purpose                                                        |
-| ----------------------------- | -------------------------------------------------------------- |
-| `sendOtp(email)`              | Send a one-time code; never provisions a new Auth identity     |
-| `verifyOtp(email, code)`      | Verify the code and return a normalized `Session`              |
-| `logout()`                    | End the remote session                                         |
-| `getSession()`                | Resolve the persisted browser session, or `null`               |
-| `onAuthStateChange(callback)` | Subscribe to session changes; returns the unsubscribe function |
+Its methods are listed in the `@core/std/auth-contract.ts` header.
 
 `ApiAuthContract` is transport-oriented: it carries sessions, not domain users, and has no
 domain `validateUser` method.
 
 #### 9.3.1 Application-Owned Session Coordination
 
-`ShellApplication` requires a `session: SessionCoordinatorContract` alongside its shells. The
-UX-owned contract (`source/ux/shell/runtime/session-contracts.ts`) has two methods:
-`init()` and `clear()`.
-Bootstrap calls `init()` synchronously during its Solid mount callback; generic bootstrap does not
-consume `api`. `Routes.application(shells, session)` assembles the two.
+The generic session contracts and their life cycle are in CONVENTIONS §16.4 and the
+`@ux/shell/runtime/session-contracts.ts` header.
 
 The application supplies `SessionCoordinator` from `source/front/app/shell/session-coordinator.ts`.
 `init()` starts persisted-session resolution, subscribes to `api.Auth.onAuthStateChange`, and
@@ -547,14 +414,9 @@ registers cleanup with the current Solid owner: unsubscribe, then `clear()`. `cl
 `UserProvider` before clearing `SessionState`. The coordinator owns user hydration and eligibility;
 the shell owns the lifecycle invocation and baseline session state.
 
-The same contract module declares `SessionUserContract`: `id(): Id | null` and
-`roles(): readonly string[]`. The application supplies the concrete `UserProvider` from
-`front/app/shell/user-provider.ts`, a reactive proxy over its domain User. The session holds that
-provider through the domain-free contract. `ShellApplication` gains no user field.
-
-`AuthGuard` asks `SessionState.isPrepared()` to render authenticated content and
-`SessionState.isSignedOut()` to redirect to login. During preparation it renders nothing.
-Session preparation policy is defined in `architecture-core.md` §9.5.
+The application supplies the concrete `UserProvider` from `front/app/shell/user-provider.ts`, a
+reactive proxy over its domain User. Session preparation policy is defined in
+`architecture-core.md` §9.5.
 
 #### 9.3.2 OTP and Session Flow
 
@@ -581,39 +443,16 @@ inactive user.
 
 #### 9.3.3 Logout
 
-The generic `logout(auth)` (`source/ux/shell/runtime/logout.ts`) receives `ApiAuthContract`
-explicitly, ends the remote session, and always clears `SessionState`, logging a failed remote
-sign-out. The app-tier shell maker wraps it so that `SessionCoordinator.clear()` also runs even if
+The generic `logout(auth)` is described in CONVENTIONS §16.4. The app-tier shell maker wraps it so that `SessionCoordinator.clear()` also runs even if
 remote sign-out fails. Auth sign-out events clear the coordinator too. The `/logout` route
 transition to `/login` belongs to the generic shell (`makeAnonymousShell`).
 
 ### 9.4 Session State
 
-`SessionState` (`source/ux/shell/runtime/session-state.ts`) is the baseline session module, a
-Reactive Store Module (§8.3) typed by `SessionStateContract`. It holds authentication and readiness
-and the application-supplied user contract; the domain User remains behind the application provider.
-
-| Field             | Meaning                                                                 |
-| ----------------- | ----------------------------------------------------------------------- |
-| `userId`          | The authenticated user's id, published from the auth session, or `null` |
-| `isAuthenticated` | A session is active                                                     |
-| `isLoading`       | The initial auth check is unresolved; prevents a login flash            |
-| `isDataReady`     | Application data preparation is complete; not the identity sentinel     |
-| `user`            | Prepared `SessionUserContract`, or `null` when unprepared               |
-
-| Intent method     | Effect                                                          |
-| ----------------- | --------------------------------------------------------------- |
-| `setAuth(userId)` | Publish the identity: authenticated, loading cleared            |
-| `setReady(user)`  | Hold the prepared user contract and mark application data ready |
-| `clear()`         | Reset to signed out, dropping the user and readiness            |
-
-Components consume `SessionState.store`, never Supabase Auth. The session coordinator (§9.3.1)
-publishes identity, the prepared user, and readiness; logout (§9.3.3) also clears it. `isPrepared()`
-means resolution finished, authenticated, and data ready; `isSignedOut()` means resolution finished
-without authentication. The prepared session holds its user contract. Applications that need further
-reactive session data define their own Reactive Store Modules. `AppState` is the generic persistent
-key/value preference store (§9.5.2). The application-facing API re-exports both stores; UX imports
-its own stores directly and never imports `front/api`.
+`SessionState` (`source/ux/shell/runtime/session-state.ts`) is the baseline session module
+(CONVENTIONS §16.4); its fields and intents are in its header. The session coordinator (§9.3.1)
+publishes identity, the prepared user, and readiness; logout (§9.3.3) also clears it. The
+application-facing API re-exports `SessionState` and `AppState`.
 
 ### 9.5 IndexedDb Usage
 
@@ -637,7 +476,7 @@ IndexedDB usage is split into two layers:
 
 #### 9.5.2 Application Preferences
 
-`AppState` (`@ux/shell/runtime/app-state.ts`) manages per-app preferences — persisted key/value pairs backed by a named IndexedDB object store. Conforms to the Reactive Store Module Pattern (§8.3).
+`AppState` (CONVENTIONS §16.3) holds each app's persisted preferences:
 
 | Key                | Admin | Ops | Customer |
 | ------------------ | ----- | --- | -------- |
@@ -656,23 +495,8 @@ IndexedDB usage is split into two layers:
 | local ui state   | SolidJS signals | component-local                         |
 | ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts`          |
 
-Drafts never share object or array structure with their source, coming in or going out.
-Compositions have no identity; draft owners copy their values when opening, accepting changes,
-snapshotting a baseline, and projecting a result. `copyDraft<T>(value: T): T` in
-`ux/shell/workbench/workbench-draft.ts` uses `structuredClone(unwrap(value))` to copy plain
-domain values and Solid store data at every nested level. Draft data must remain plain and
-cloneable; functions and class instances do not belong in it.
-
-#### 9.6.1 Rules
-
-- State modules must not import JSX modules, directly or through runtime dependencies, so
-  state remains testable without a browser. Type-only imports do not load those modules.
-- Signals for local, transient UI state — inputs, open/close, hover
-- Stores for shared cross-component state — session, app preferences, dashboard config
-- TanStack Query for all server data — caching, loading, error states
-- No prop-drilling of session or user — read from session store directly
-- A form declares its own update scope as part of its design, submitting a `ScopedUpdate<T, K>`
-  rather than the broad `UpdateFromInstantiable<T>` protocol
+Draft copying is in the `@ux/shell/workbench/workbench-draft.ts` header, and the state rules are in
+CONVENTIONS §16.3.
 
 ## 10. Shared Application Features
 
@@ -683,44 +507,11 @@ Seasons Computing project, not just swarmAg. `source/front/app/` is swarmAg-suit
 across all three apps, reactive and adaptive by default like `ux/`, but under no obligation to
 generalize past swarmAg itself. Each `app-{admin|ops|customer}/` is the single-application tier.
 
-#### 10.1.1 General-purpose UI foundation (`ux/ui/`)
+#### 10.1.1 The `ux/` toolkit
 
-```text
-ux/
-└── ui/            — portable shared UI foundation
-    ├── components/ — HTML and Kobalte-backed Ui{Control} primitives
-    ├── charts/    — reserved chart primitive directory
-    ├── css/       — CSS barrel, tokens, roles, themes, base, ui, and icon styles
-    ├── fonts/     — self-hosted font assets
-    └── icons/     — shared icon assets
-```
+The `ux/` toolkit's structure is described in CONVENTIONS §16.1.
 
-#### 10.1.2 Generic UX toolkit foundation (`ux/`)
-
-```text
-ux/
-├── shell/
-│   ├── runtime/    — bootstrap, shell composition, routing, session, preferences, metadata
-│   ├── dashboard/  — dashboard host, layout state, seed and widget contracts
-│   ├── panel/      — panel foundation, headers, collections, drill-down and return controls
-│   └── workbench/  — abstraction manager, wizard, provider contracts and form behavior
-├── views/    — generic UX projection types (placeholder — none exist yet)
-└── widgets/  — app-neutral widget catalog (already parameterized, e.g. HelmWidget)
-```
-
-Shell modules are grouped by topic in these four leaf directories. Components, contracts,
-state, and companion styles remain together within their topic; consumers import files directly.
-`panel/` supplies the shared foundation, including collection and drill-down behavior.
-`workbench/` composes responsive working surfaces using that foundation: the abstraction
-manager and wizard coordinate interaction and their supporting form behavior. A dialog is
-a host for a workbench, not its defining boundary. Existing responsive collapse, sizing,
-spacing, rhythm, and presentation behavior remain unchanged.
-
-`shell-makers.tsx`'s `makeAnonymousShell()`/`makeDashboardShell()` take `Login`/`AboutBox` as
-route-component parameters rather than importing them directly, so this tier carries no reference to branded
-components (`§9.1`).
-
-#### 10.1.3 swarmAg-suite foundation (`app/`)
+#### 10.1.2 swarmAg-suite foundation (`app/`)
 
 ```text
 app/
@@ -739,14 +530,14 @@ app/
 `user-provider`; the maker wrapper binding `ux/shell`'s generic makers to swarmAg branding;
 and `session-coordinator.ts`.
 
-#### 10.1.4 Stays in the app
+#### 10.1.3 Stays in the app
 
 - dashboard default configuration and app-specific widget composition
 - domain pages and feature pages
 - app-specific route tree
 - app-specific IndexedDB store instance
 
-#### 10.1.5 Placement
+#### 10.1.4 Placement
 
 Place a component in the tier that matches its intended reach. Application-specific work belongs
 in `app-{name}/`; work meant for the swarmAg suite belongs in `app/`; only what is useful outside
@@ -754,88 +545,16 @@ swarmAg entirely belongs in `ux/`. Placement is a design decision made with the 
 component moves when its reach changes. Prefer the narrower tier when reach is uncertain:
 widening later costs a move, and generalizing early costs an abstraction nobody needed.
 
-#### 10.1.6 Workbench steps and the shared panel sequence
+#### 10.1.5 Workbench steps and the shared panel sequence
 
-Both workbenches host a sequence of one or more steps. A step is one panel; a drill-down inside a
-step replaces that panel's content and remains the same step. The workbench owns the aggregate
-draft and commits it once. Steps never commit.
-
-**Library: `source/ux/shell/panel/`.** The step contract is shared by both workbenches, so it
-lives in `panel/`:
-
-| Name                                           | Responsibility                                                                                 |
-| ---------------------------------------------- | ---------------------------------------------------------------------------------------------- |
-| `PanelStep`                                    | One step: `name`, `title`, optional `validate`, `render(context)`                              |
-| `PanelSequence`                                | `readonly PanelStep[]`                                                                         |
-| `PanelStepContext`                             | Validation, drill-return, trailing-action, and dirty-check registration; `feedback`; `busy`    |
-| `createPanelSequence` / `PanelSequenceControl` | Instance-local cursor, Back, validated Next, completion validation, validation registration    |
-| `PanelSequenceStep`                            | Renders the current step and owns the step transition motion                                   |
-| `PanelSequenceHeader`                          | The composed header: Back, Next, the advance slot, and the nested Index-Detail hand-off        |
-| `PanelSequenceProgress`                        | The horizontal progress indicator for a sequence of more than one step; the Wizard presents it |
-
-The controller has no draft, persistence, or chrome. Advancement validates the current step;
-after Back, that step is validated again on the next forward traversal. There is no arbitrary
-jump API. `PanelSequenceHeader` follows `ux-design-archetypes.md` §§3.3 and 4.2:
-
-- At a step's Index, Back and Next are live. The final step's advance slot holds the commit
-  action the host supplies.
-- Inside a nested Detail, those controls are absent. Drill-back is the only ascend control, and
-  the innermost Detail's Save takes the advance slot. It validates and returns to its parent
-  Index, or stays on failure.
-- The header names the path by kind.
-
-With one step, the header reduces to the host's simple header.
-Glyphs, header states, and transition motion are defined here once; no feature restates them.
-
-**Workbenches: `source/ux/shell/workbench/`.**
-
-- `Wizard` takes `WizardContract = { formTitle, steps: PanelSequence, commit, feedback? }`.
-  - It commits once, at Finish. The commit may write one abstraction, several, or none.
-  - It presents progress with `PanelSequenceProgress` when its sequence has more than one step.
-  - Above its container threshold, it also lays the sequence out as a tree in its aside
-    (`PanelStepflow`). That tree is Wizard chrome.
-- `AbstractionManager` takes `detail: (item: T | null) => AbstractionDetail<Draft>`, where
-  `AbstractionDetail<Draft> = { steps: PanelSequence; draft: () => Draft }`.
-  - It calls `detail` for each Item it opens; that is how an Item hydrates its steps.
-  - It validates through sequence completion and persists through its provider's `create` or
-    `update`.
-  - Save takes the final advance slot and is offered only when no nested Detail is open.
-  - Its aside is always its Collection. It presents no progress, whatever the step count: the
-    step title in the header and Next versus Save orient the user within an existing record.
-  - Below the threshold, step 1's leading control returns to the Index and later steps show
-    Back; nothing reaches the Index from a later step. Above it, selecting another Item or New
-    leaves the Detail from any step.
-  - The Manager snapshots the draft when it opens an Item. Any exit that would discard a changed
-    draft asks first: another Item, New, the collapsed return, and Cancel.
-
-A step containing a drill-down hosts `DrillDown` at its root and supplies its
-`PanelStepContext`. Opened panels receive `DrillPanelContext`: `isActive`,
-`registerDirty`, `registerSave`, and `returnToParent`. `CollectionPanel` passes that
-context to its item renderer. Panel activity is host-owned and independent of depth.
-Only the active panel supplies the header Save; a covered panel retains its working
-copy and dirty checks. Every open panel contributes to workbench discard protection.
-Local drill-back checks only the active panel and asks before discarding changes.
-Successful Save validates and updates the parent draft before `returnToParent` returns
-without a discard prompt. Closing a panel disposes its registrations and pending draft;
-covering it does not. Restoring its parent restores that parent's Save.
+Workbench steps, the shared panel sequence, the Wizard, the Abstraction Manager, and drill-down
+are built as CONVENTIONS §17 describes; their behavior is in their module headers.
 
 `NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
 `notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`, and
 `drill: DrillContract`. It edits Content and Visibility, defaults new notes to Internal,
 and never persists. Existing timestamps and attachments are preserved. Billing-address
 fields and their validation occupy the separate Customer Billing step.
-
-Dirty-state belongs to each draft's context. `PanelStepContext.registerDirty(check)` exposes a
-local change check to the workbench and returns its cleanup callback. Retained feature-state
-checks last for the session, across step remounts; nested draft checks are cleaned up when their
-draft closes. The sequence controller does not own dirty-state. Local Up asks only about the
-Detail it discards. Workbench Cancel and collection select/New check the aggregate and all open
-nested drafts, then ask once before abandoning the session. The collapsed first-step return
-receives the same protection. Back/Next preserves drafts and does not prompt.
-
-Non-dismissible `UiDialog` surfaces block both outside-click and Escape dismissal. Workbenches
-therefore exit through their explicit controls and contextual dirty checks. Dismissible dialogs
-retain both dismissal paths.
 
 **Features: `source/front/app-admin/`.**
 
@@ -853,9 +572,7 @@ retain both dismissal paths.
   composed sequence.
 - `UserManager` returns the single `user-step-detail` step; `user-state.ts` owns the state,
   `UserDraft`, and the `userDraft(state)` projection.
-- Steps are named `{topic}-step-{name}.tsx`, where `detail` names the primary or only step.
-  "Editor" is reserved for a reusable form kind, such as the notes editor, or a drill-down
-  editor inside a step.
+- Steps follow the naming in CONVENTIONS §4.2.
 
 The Customer workbench declares contact, identity, status, account-manager assignment, address,
 sites, and notes in `front/api/scopes.ts` through `makeAdaptedScope`, with `{}` as create defaults.
@@ -917,55 +634,16 @@ swarmag-app-customer = front/app-customer + front/app + ux + front/api + front/c
 
 ### 10.3 Dashboard Layout Contract
 
-```text
-Dashboard
-  ├─ HeaderPresentationRegion
-  │  ├─ LeadingIdentityField (shell logo + BrandWidget)
-  │  ├─ OrderedHeaderField[]
-  │  └─ TerminalActionField
-  │     └─ normal/tall or wrapped/short; full inner field when wrapped
-  └─ BodyPresentationRegion (vertical scroll)
-     └─ DashboardRow[] (ordered body presentation regions)
-        └─ Widget[] (presentation shape: compact | landscape)
-```
-
-The Dashboard is a responsive presentation field. The shell owns ordered placement,
-row rhythm, allocated fields, containment, and responsive expansion. It preserves
-visual and keyboard order together. Each allocated field provides a widget's available
-inline and block footprint together with its row context. As available space contracts,
-widgets may adapt their presentation; when the field needs more space, it adds rows
-while retaining ordered placement. The shell does not require horizontal scrolling.
-
-The header provides two deterministic responsive contexts, selected by container
-query against the header's own inline size — not the viewport. CSS selects the
-context before layout; the shell does not measure rendered positions or mutate
-context after mount.
-
-Threshold values are stylesheet-owned and are not restated here: the stacked-header
-threshold lives in `dashboard.css`, and the base-scale step lives in `tokens.css`.
-Each is expressed as the intrinsic width it protects, so the number can be re-derived
-rather than inherited.
-
-`compact` and `landscape` are widget presentation shapes, not shell geometry. A
-widget uses its configured shape to express its data within the footprint allocated
-by the presentation field; the shell does not impose a fixed width or height from
-that shape, or define a finite vocabulary of visual transformations. Widget intrinsic
-minimum, optimal, and maximum useful measures remain implementation-local behavior:
-no Widget SPI, registry, seed, state, or Dashboard-schema allocation metadata is
-introduced.
-
-Shell identity is the intentional exception to ordinary dashboard content. The logo
-and brand anchor the highest-priority region, remain legible and non-wrapping, and
-do not participate in content-driven transformation. The header and body use the
-same placement principles at their respective scales.
+The dashboard is the Chassis-Part archetype (`ux-design-archetypes.md` §4.3), built as CONVENTIONS
+§17.5 describes. The header has two deterministic responsive contexts, selected by container query
+against its own inline size, not the viewport; CSS selects the context before layout, and the shell
+does not measure rendered positions or change the context after mount. Its geometry is
+stylesheet-owned: the stacked-header threshold lives in
+`dashboard.css`, and the base-scale step in `tokens.css`.
 
 **`source/front/app-{admin|ops|customer}/dashboard-{admin|ops|customer}.json`**
 
 Layout is data-driven via app-local dashboard JSON, rendered by the shared dashboard shell/harness, and hydrated into `DashboardState` (`source/ux/shell/dashboard/dashboard-state.ts`). Not hardcoded. The current contract uses one default config per app.
-
-The app-local dashboard JSON conforms to the dashboard seed contract in `source/ux/shell/dashboard/dashboard-contract.ts`. `DashboardState.init(seed)` validates the seed and converts it into `DashboardStoreView` from `source/ux/shell/dashboard/dashboard-state.ts` by assigning stable store identity to the dashboard, rows, and widgets before persisting the layout in IndexedDB.
-
-`makeDashboardShell()` initializes `DashboardState`, then constructs `Dashboard` with the state contract and the app-supplied widget registry as explicit inputs. A registry is the right shape here because the widget type is variant: the dashboard JSON picks a widget by an arbitrary type string, so something has to resolve that string to a component, and neither the JSON author nor the registry author can know the other's exact set in advance.
 
 `ux/widgets/widget-registry.ts` exports the generic catalog object `UxWidgetRegistry`;
 `front/app/widgets/widget-registry.ts` exports the swarmAg-suite catalog object
@@ -974,11 +652,6 @@ after package configuration (§8.2) and merges them with
 `{ ...UxWidgetRegistry, ...AppWidgetRegistry }`, so app entries take precedence for shared keys.
 The merged registry and app-local dashboard JSON form the two halves of one dashboard-shell
 declaration.
-
-The shell is the closed IoC application framework. It owns the widget extension contracts in `source/ux/shell/dashboard/widget-contract.ts` and shared shell services such as `getShellIdentity()`. Concrete widgets implement those contracts and may consume public shell services. The shell never imports the widget catalog or any concrete widget; applications bind concrete widgets at their composition roots. This direction keeps the shell closed when features are added and prevents a shell/widget dependency cycle. `guard:namespaces` enforces the shell-to-widget
-prohibition.
-
-Dashboard state remains a Reactive Store Module. The dashboard receives its namespace contract directly and never exposes framework setters. Dashboard state is shell-local UX state and is not part of the composed `source/front/api/api.ts` namespace.
 
 ```json
 {

@@ -663,7 +663,7 @@ The correct placement of `guard:secrets` is:
 ### 11.3 Guard Output Contract
 
 Guards report through `guardPass` and `guardFail` in `@devops/guards/guard-utils.ts`, as
-CONVENTIONS §17.1 states.
+CONVENTIONS §19.1 states.
 
 ### 11.4 Non-Deployable Package Exemptions
 
