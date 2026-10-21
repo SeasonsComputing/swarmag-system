@@ -298,6 +298,11 @@ Rules for the composition:
 
 **What the Chassis owns.** Position, ordering, and which Parts appear. A Part owns its own content and nothing about where it sits. When a Part starts caring where it is, either the fitting is wrong or the surface is not a Chassis-Part.
 
+**Responsiveness.** The Chassis keeps visual and keyboard order together. As room contracts, each
+Part adapts its presentation within the footprint the Chassis allocates, and the Chassis adds rows
+rather than scrolling sideways. The application's identity is the exception: it anchors the first
+position and does not adapt.
+
 **Sketch**
 
 ```
@@ -313,7 +318,7 @@ Rules for the composition:
    which Parts appear, and where, is configuration
 ```
 
-**Known uses.** The Admin, Customer, and Ops dashboards, composed from the shared widget catalog. Each application supplies only its dashboard JSON — the catalog is the kit, the dashboard is the chassis.
+**Known uses.** The Admin, Customer, and Ops dashboards, composed from the shared widget catalog. Each application supplies only its dashboard JSON — the catalog is the kit, the dashboard is the chassis. In each application the dashboard is also the primary navigation: dashboard, then a page, then back to the dashboard; there is no navigation menu.
 
 ## 5. Composition Rules
 
@@ -374,6 +379,9 @@ The machinery this repository already builds for the common cases. Reach for the
 | Decompose a complex subject into steps   | `Wizard` + `PanelStep`          | Sequence                         |
 | Gate steps in order, in any workbench    | `createPanelSequence`           | Sequence                         |
 | A per-application configurable surface   | dashboard + widget catalog      | Chassis-Part                     |
+
+Both workbenches host Steps. _Editor_ is reserved for a reusable form kind, such as a notes editor,
+or a drill-down editor inside a Step.
 
 **Adding a row is a Foundation decision.** A new entry means this repository has a second way to do something it already did, and that requires the Chief Architect's judgment about whether the existing one should have been extended instead.
 

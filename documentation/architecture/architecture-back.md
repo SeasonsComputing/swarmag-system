@@ -325,7 +325,7 @@ See `architecture-devops.md §4` for naming conventions, placeholder contract, a
 - Test RLS policies with different user contexts
 - Automated via `supabase test db`
 
-See `CONVENTIONS.md` §16 for general testing conventions.
+See `CONVENTIONS.md` §18 for general testing conventions.
 
 ## 7. Deployment
 

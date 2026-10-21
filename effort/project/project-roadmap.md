@@ -260,7 +260,7 @@ Features not belonging to any theme are added to whatever session happens to tou
 - **Login needs an "Already have a code?" action** (`normal`).
 - **Testing** — not a slot, a practice change: every milestone from here forward scopes its own
   test coverage as part of its own brief, rather than shipping and being driven-and-reported
-  afterward. `CONVENTIONS.md` §16's convention only covers domain/adapter/API today; extending it
+  afterward. `CONVENTIONS.md` §18's convention only covers domain/adapter/API today; extending it
   to the UX layer is foundation work belonging with whichever milestone needs it first (most
   likely §2 or §3).
 - **Style guide into `ux/`** — B-31 "`app-style-guide` belongs in `ux/`, not `front/`" (`low`).
