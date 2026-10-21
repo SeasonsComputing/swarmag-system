@@ -1188,14 +1188,15 @@ returns through `returnToParent`.
 
 ```text
 source/tests/
-  cases/                      <- test files: {abstraction}-api-test.ts
+  cases/                      <- test files: {subject}-test.ts
   fixtures/
     samples.ts                <- barrel export for all fixtures
     {abstraction}-samples.ts  <- named constants producing valid domain objects
     fixtures-test.ts          <- fixture integrity checks
 ```
 
-- Test files live in `source/tests/cases/`, named `{abstraction}-api-test.ts`.
+- Test files live in `source/tests/cases/`, named `{subject}-test.ts`, where the subject is what the
+  file tests: a module, a guard, or a topic's API.
 - `{abstraction}-samples.ts` — exports named constants and factory functions producing valid, realistic domain objects. These are the ground truth for tests.
 - `fixtures-test.ts` — validates fixture integrity: Id format, required fields, association linkage. If a fixture fails here the domain types have drifted.
 - Tests exercise the public contract of each layer, not implementation details.
