@@ -1,10 +1,11 @@
 # Stage Test Authorization — Brief
 
-**Active.** Recorded 2026-10-13 from a CA + AI Architect session, after the soft-deleted references
-production left two test files written but unrunnable
-(`effort/completed/2026-10-13-soft-deleted-references-brief.md`, amendment 6). It awaits AI Coding
-Engine review and the production gate. Its Open items are settled by the amendment "Open items
-settled"; the AI Coding Engine's review by "ACE review resolved".
+**Closed 2026-10-23.** Integration tests run against stage as a seeded test administrator, through
+real RLS and edge functions, and database-free tests stay credential-free. Recorded 2026-10-13 from
+a CA + AI Architect session, after the soft-deleted references production left two test files
+written but unrunnable (`effort/completed/2026-10-13-soft-deleted-references-brief.md`, amendment
+6). Its Open items were settled by the amendment "Open items settled"; the AI Coding Engine's review
+by "ACE review resolved".
 
 ## What triggered it
 
@@ -319,5 +320,27 @@ Independent code review by the schema agent found the new session setup/cleanup 
 This is supporting implementation review; live stage behavior remains unverified and CA/AA review
 and CA-run genesis/live validation remain outstanding. The documented stage command in DevOps
 §12.4 was wrapped with shell continuations without changing its invocation; no source code changed.
+
+## Closure (2026-10-23)
+
+Production by the AI Coding Engine (`1490f26`); the AI Architect verified the diff against the
+scope: `schema.sql` gained only the three seed rows, the locked documents changed only in their
+opened sections, `db-genesis-verify.ts` only in its comment, and no credential is committed. Checks
+passed. The first genesis failed on `user_has_access`, whose parameter rename (`0dc1185`) `CREATE OR
+REPLACE` cannot apply; `schema.sql` now drops the function before recreating it (`27d13e1`). The CA
+then ran genesis on stage, `db-genesis-verify` passed, and the acceptance check passed:
+`users-api-test.ts` (full CRUD lifecycle, signed in as the test administrator) and
+`session-coordinator-test.ts` (four tests), 5 passed and none failed.
+
+Settled at closure:
+
+- **"ACE review resolved" item 2 overstated the genesis prompt.** Its authority set does not include
+  `architecture-back.md`, so documentation leading the seed does not yet make it regenerable. That
+  gap, and the missing rule to drop functions, are B-33.
+- **Production seed exclusion:** parked as P-11.
+- **Assembling stage configuration** took five variables from three places, two of them behind
+  placeholders: B-34.
+
+This was M-5's last enabler.
 
 _End of Brief_
