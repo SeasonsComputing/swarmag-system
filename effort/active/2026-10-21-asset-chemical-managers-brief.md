@@ -1,7 +1,7 @@
-# Asset and Chemical Managers — Brief
+# Asset Type, Asset, and Chemical Managers — Brief
 
 **Active, draft.** Recorded 2026-10-21 from a CA + AI Architect session, after a qualitative
-assessment of the workbench for M-5 Mechanical Productions. The two managers are M-5's features:
+assessment of the workbench for M-5 Mechanical Productions. The three managers are M-5's features:
 stock CRUD copied from the reference implementations. Chosen from the roadmap 2026-10-21. Awaits
 the design moments, CA review, and the production gate.
 
@@ -16,9 +16,10 @@ picked.
 ## What the repository holds
 
 - **The domain is ready.** `domain/abstractions/asset.ts` and `chemical.ts`, with their adapters,
-  validators, protocols, and `assets` and `chemicals` tables in `schema.sql`.
+  validators, protocols, and `asset_types`, `assets`, and `chemicals` tables in `schema.sql`.
 - **The API wiring is not.** `front/api/api.ts` carries `Assets` and `Chemicals` as commented
-  stubs, without validators; `front/api/scopes.ts` declares no scope for either.
+  stubs, without validators, and has no `AssetTypes` entry; `front/api/scopes.ts` declares no scope
+  for any of the three.
 - **Two references,** in `front/app-admin/`:
   - `customers/`: table CRUD through `makeCrudSupabaseClient` and `makeAdaptedScope`, updated with
     `api.Customers.update(scope.adapter, scope.toUpdate(…))`.
@@ -35,7 +36,7 @@ picked.
 3. **Status badges are an exhaustive `Record<Status, …>`,** as Customer's are, not an inline
    ternary: `AssetStatus` has four values, and the type catches a missing one.
 4. **Steps are declared inline in the manager** unless another host composes the same steps, as
-   Onboarding does Customer's. Both managers are expected to be single-step.
+   Onboarding does Customer's. All three managers are expected to be single-step.
 5. **The delete confirmation states a soft delete,** in Customer's form ("removes the … from active
    records"), not User's "This cannot be undone."
 6. **Text crosses three directions,** and the Customer form is the model: control state holds raw
@@ -56,16 +57,19 @@ picked.
 
 The recipe does not cover these; each is a design conversation before its manager is produced.
 
-1. **`Asset.type` is an `AssociationOne<AssetType>`:** a picker over a reference list, as
-   `UserPicker` is over Users. No `AssetType` API topic, provider, or picker exists, and nothing
-   yet manages the list of types.
+1. **`Asset.type` is an `AssociationOne<AssetType>`.** Settled 2026-10-23: asset types are a
+   catalog extended as facets are, and the admin app manages it with a third manager, Asset Types,
+   copied from Customers and produced first. Delete and `active` keep their own meanings: delete is
+   CRUD's delete, and `active` is a field on the form. The Asset Manager's type picker reads the
+   list through `useAssetTypes`, which follows `useFacets`, and offers only active types.
 2. **`Chemical.labels` is a `CompositionMany<ChemicalLabel>`** of `{ url, description? }`: a nested
    editor, as Sites and Notes are.
 
 ## Production scope
 
-Operating mode: **Feature**, in `front/` only: `api.ts`, `scopes.ts`, and new `app-admin/assets/`
-and `app-admin/chemicals/` folders, with their routes. A need to change `ux/`, `core/`, or
+Operating mode: **Feature**, in `front/` only: `api.ts`, `scopes.ts`, a new
+`app/stores/asset-types-state.ts`, and new `app-admin/asset-types/`, `app-admin/assets/`, and
+`app-admin/chemicals/` folders, with their routes. A need to change `ux/`, `core/`, or
 `domain/` is an escalation: those namespaces are locked.
 
 ## Design history
@@ -78,5 +82,9 @@ and `app-admin/chemicals/` folders, with their routes. A need to change `ux/`, `
 - **2026-10-21, error-message form dissolved.** The draft left open Customer's inline form or
   User's helper. Both were the one error a manager rendered itself; `AbstractionManager` now owns
   it (`a744ee6`), so neither form remains to copy.
+- **2026-10-23, asset types managed.** The draft left open who manages the list of asset types. The
+  CA designed `AssetType` to extend as `Facet` does, and settled that the admin app manages it with
+  its own manager. Asked whether retiring a type means deleting it or clearing `active`, the CA
+  kept CRUD as CRUD: delete means what it means, and so does `active`.
 
 _End of Brief_
