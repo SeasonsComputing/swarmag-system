@@ -268,4 +268,18 @@ of brief EFFORT recognizes, or nothing is undecided.
 **Picking this up:** From the brief's "What we learn" and its amendments; decide the form, then
 whether independent review is a required part of it.
 
+## P-11 · How does a production genesis exclude stage-only seed identities?
+
+**Parked:** 2026-10-23 — while settling the stage test authorization brief
+(`effort/active/2026-10-13-stage-test-authorization-brief.md`).
+
+**What it is:** Genesis applies one `schema.sql` to every target. Stage seeds a test administrator
+that production must not have.
+
+**Why parked:** Stage is the only environment, so the seed is correct today. How a production
+genesis excludes it (a separate seed file, a target-aware step in `db-genesis.ts`, or a verifier
+check) depends on how production is set up.
+
+**Picking this up:** When production is created, before its first genesis.
+
 _End of Feature Parking Lot Document_

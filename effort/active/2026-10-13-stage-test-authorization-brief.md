@@ -4,7 +4,7 @@
 production left two test files written but unrunnable
 (`effort/completed/2026-10-13-soft-deleted-references-brief.md`, amendment 6). It awaits AI Coding
 Engine review and the production gate. Its Open items are settled by the amendment "Open items
-settled".
+settled"; the AI Coding Engine's review by "ACE review resolved".
 
 ## What triggered it
 
@@ -38,18 +38,18 @@ Integration tests against stage cannot run, for two reasons:
 
 ## Decisions (CA, 2026-10-13)
 
-1. **A seeded test administrator.** Genesis seeds a dedicated test identity in `auth.users` and
-   `users`, with the `administrator` role, beside `devops-admin`. It is separate so that test
-   activity is attributable and never mistaken for real use. It belongs to stage only: genesis
-   applies one `schema.sql` everywhere, so a production genesis, when production exists, must
-   exclude it.
+1. _[Stage-only stated as a condition by "ACE review resolved".]_ **A seeded test administrator.**
+   Genesis seeds a dedicated test identity in `auth.users` and `users`, with the `administrator`
+   role, beside `devops-admin`. It is separate so that test activity is attributable and never
+   mistaken for real use. It belongs to stage only: genesis applies one `schema.sql` everywhere, so
+   a production genesis, when production exists, must exclude it.
 2. **Real sessions, minted in setup.** Test setup uses the service key only to generate a sign-in
    token for the test identity (`auth.admin.generateLink`), then redeems it through the public
    client (`verifyOtp`). Tests run as that user, through real RLS and real edge functions. The
    fixture asserts that the redeemed session's user id is the seeded test administrator's id, so a
    misconfigured email cannot run the tests as another administrator. `generateLink` sends no
    mail, so the address need not be deliverable.
-3. **The service key stays in setup.** It comes from local environment, never from the
+3. _[Entry point settled by "ACE review resolved".]_ **The service key stays in setup.** It comes from local environment, never from the
    repository, and is never used for a test's own calls: those would bypass RLS, and the edge
    functions require a domain user's JWT. The fixture reads the key itself, only when a test asks
    for a session; `test-config.ts` does not require it, so database-free tests run without it.
@@ -65,13 +65,15 @@ password sign-in for a test user (a second sign-in method on stage that producti
 
 Operating mode: **Foundation** (authentication boundary, seed data, test infrastructure).
 
-| Where                                      | Change                                                           |
-| ------------------------------------------ | ---------------------------------------------------------------- |
-| `domain/schema/schema.sql`                 | Seed the test administrator in `auth.users` and `users`.         |
-| `source/tests/config/test-config.ts`       | Register `LOCAL_DB_NAME`.                                        |
-| `source/tests/` (a shared session fixture) | Mint and redeem the test administrator's session in setup.       |
-| `source/tests/cases/users-api-test.ts`     | Sign in through the fixture before its calls.                    |
-| `architecture-devops.md`                   | Running integration tests against stage: identity, key, genesis. |
+| Where                                           | Change                                                           |
+| ----------------------------------------------- | ---------------------------------------------------------------- |
+| `domain/schema/schema.sql`                      | Seed the test administrator in `auth.users` and `users`.         |
+| `source/tests/config/test-config.ts`            | Register `LOCAL_DB_NAME`.                                        |
+| `source/tests/` (a shared session fixture)      | Mint and redeem the test administrator's session in setup.       |
+| `source/tests/cases/users-api-test.ts`          | Sign in through the fixture before its calls.                    |
+| `architecture-devops.md`                        | Running integration tests against stage: identity, key, genesis. |
+| `architecture-back.md` (amended)                | The test administrator; the stale seed-upsert paragraph.         |
+| `source/tests/config/stage-config.ts` (amended) | New: the stage tests' configuration entry point.                 |
 
 **Out of scope:** coverage above the domain/API layer (backlog: B-21 "No automated coverage above the
 domain/API layer"); test isolation beyond genesis resets; a test environment other than stage.
@@ -145,5 +147,35 @@ runs the test.
    key across the system.
 3. **Scope narrows by one row.** `test-config.ts` already registers `LOCAL_DB_NAME`: B-22 was
    repaired in the charter experiment (`effort/completed/2026-10-21-charter-experiment-brief.md`).
+
+## Amendment — 2026-10-23 — ACE review resolved
+
+The AI Coding Engine reviewed the brief and its amendments; the AI Architect verified each point in
+the source.
+
+1. **Genesis is total; its documentation is not.** `schema.sql` deletes every `auth.users` row and
+   recreates the seeds, but `architecture-back.md` still describes an email-preserving
+   `ON CONFLICT (id) DO UPDATE`. The code is current: the paragraph is corrected in this
+   production.
+2. **The seed is authored in `architecture-back.md`.** The genesis prompt regenerates `schema.sql`
+   from the authority documents, and only `architecture-back.md` describes the bootstrap
+   administrator. The test administrator is described there first; `schema.sql` follows, seeding
+   `auth.users`, its `auth.identities` row as `devops-admin` has, and `users`.
+3. **Stage-only is a stated condition, not a mechanism.** Genesis applies one `schema.sql` to every
+   target, and stage is the only environment, so the seed is correct today. Excluding it from a
+   production genesis is decided when production is created (parking lot: P-11).
+4. **Stage tests have their own configuration entry point.** A `-test.ts` file is the driver: its
+   bootstrap import declares what its runtime needs. `source/tests/config/stage-config.ts`, built
+   like `test-config.ts`, registers the service key as the edge functions do
+   (`SUPABASE_SERVICE_KEY` from `SUPABASE_SERVICE_ROLE_KEY`) and re-exports `Config`. A test that
+   signs in imports it; every other test keeps `test-config.ts` and never needs the key. The
+   session is redeemed into the public client `api` uses.
+5. **`session-coordinator-test.ts` needs no session;** it stubs `api` and needs only the bootstrap,
+   which B-22 repaired.
+
+**Locked files opened for this brief only,** by the CA, 2026-10-23:
+`source/domain/schema/schema.sql` (the test administrator's seed rows),
+`documentation/architecture/architecture-back.md` (the test administrator and the seed paragraph),
+and `documentation/architecture/architecture-devops.md` (the running-tests section).
 
 _End of Brief_
