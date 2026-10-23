@@ -163,21 +163,28 @@ Canonical seed data known at schema time is part of `schema.sql` — not a migra
 - **Asset types** — canonical `asset_types` records from `domain-seed-data.md §4`
 - **Services** — canonical `services` records from `domain-seed-data.md §2` and `§3`
 - **Internal questions** — canonical `questions` seed records with `QuestionType = 'internal'` from `domain-seed-data.md §5`
-- **Bootstrap admin user** — `devops-admin@swarmag.com` with `administrator` role and stable UUID; authenticates via the same passwordless OTP flow as every other user. No password is ever set for this or any account: Supabase provides no config toggle to disable password-grant login, so the passwordless invariant is enforced entirely by the absence of any password-setting code path in this system. Never set a password for any user via the Supabase dashboard or Auth admin API — doing so creates a login path that bypasses `sendOtp`, `shouldCreateUser: false`, and every edge-function authorization check, and is indistinguishable from an OTP-issued session at the RLS layer.
+  - **Bootstrap admin user** — `devops-admin@swarmag.com` with `administrator` role and stable UUID; authenticates via the same passwordless OTP flow as every other user. No password is ever set for this or any account: Supabase provides no config toggle to disable password-grant login, so the passwordless invariant is enforced entirely by the absence of any password-setting code path in this system. Never set a password for any user via the Supabase dashboard or Auth admin API — doing so creates a login path that bypasses `sendOtp`, `shouldCreateUser: false`, and every edge-function authorization check, and is indistinguishable from an OTP-issued session at the RLS layer.
+- **Stage test administrator** — `test-admin@swarmag.com`, display name `Test Administrator`,
+  stable UUID v7 `01a1679c-be97-76f3-befc-8dd3e23161ab`, with role `administrator`, status `active`,
+  and no deletion timestamp. Genesis seeds this identity beside the bootstrap administrator in
+  `auth.users`, its email-provider `auth.identities` row, and `public.users`, sharing the same fixed
+  ID across all three. It uses the same confirmed-email, non-null auth-field conventions as the
+  bootstrap administrator and has no password. Tests mint and redeem an email sign-in token in
+  setup, assert the redeemed user ID matches this seed, then use that user's public-client session
+  for real RLS and edge authorization. The service key is setup-only, never a test-call credential.
+  The dedicated identity makes automated writes attributable. It belongs to stage: genesis has
+  one schema for every target, and stage is the only environment today; excluding this seed from
+  a future production genesis remains the P-11 decision, not an implemented target switch.
 
 All seed record IDs are stable UUID v7 values drawn from `source/devops/genesis/seed-ids.txt`. No seed record uses a database-generated ID.
 
-**Seed email edits do not propagate to an existing `auth.users` row.** The
-`auth.users` seed statement's `ON CONFLICT (id) DO UPDATE SET` clause
-deliberately excludes `email` — this protects a real, already-changed login
-email from being silently reverted by an unrelated future genesis run. The
-consequence: editing the bootstrap admin's seed email in this file has no
-effect on a target where genesis has already run before; `auth.users.email`
-and `public.users.primary_email` will disagree until explicitly reconciled
-(SQL, dashboard, or `user-update` once deployed). `db-genesis-verify` asserts
-the two never disagree and fails loudly if they do — it does not attempt to
-auto-resolve the direction, since either direction can silently discard a
-legitimate change.
+**Genesis is a total reset of authentication and domain data.** The canonical schema deletes
+all existing `auth.users` rows, allowing their dependent identity/session rows to be removed, and
+recreates the documented auth seeds and their email identities alongside the recreated public
+schema. There is no email-preserving seed upsert. A genesis run therefore replaces user state,
+including changed seed emails, with current seed authority; it is not a migration or a way to
+preserve live accounts. `db-genesis-verify` checks the resulting bootstrap identity and auth/domain
+email agreement without choosing or repairing divergent values.
 
 ### 4.5 Auth / Domain User Boundary
 

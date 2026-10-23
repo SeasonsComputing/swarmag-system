@@ -161,11 +161,9 @@ const verify = async (_target: Target): Promise<void> => {
   if (rpcRows[0].registered !== true) fail('RPC registered user check failed')
   if (rpcRows[0].not_registered !== false) fail('RPC unregistered user check failed')
 
-  // auth.users.email is excluded from the seed upsert's ON CONFLICT SET clause
-  // (protects a real, already-changed login email from being clobbered by an
-  // unrelated genesis run); a seed email edit therefore never propagates to an
-  // existing row on its own. Detect drift here rather than let it surface as
-  // a silent login failure.
+  // Genesis totally resets auth users and recreates their domain seed rows.
+  // Their email addresses must agree after reset and subsequent account changes.
+  // Detect drift here rather than let it surface as a silent login failure.
   const syncRows = await queryRows(
     'SELECT a.email AS auth_email, u.primary_email AS domain_email '
       + 'FROM auth.users a JOIN public.users u ON u.id = a.id '
