@@ -3,7 +3,8 @@
 **Active.** Recorded 2026-10-13 from a CA + AI Architect session, after the soft-deleted references
 production left two test files written but unrunnable
 (`effort/completed/2026-10-13-soft-deleted-references-brief.md`, amendment 6). It awaits AI Coding
-Engine review and the production gate.
+Engine review and the production gate. Its Open items are settled by the amendment "Open items
+settled".
 
 ## What triggered it
 
@@ -77,9 +78,10 @@ domain/API layer"); test isolation beyond genesis resets; a test environment oth
 
 ## Open
 
-1. **The test identity's email,** for example `test-admin@swarmag.com`.
-2. **The environment variable** that carries the service key into test setup, and whether it
-   reuses `SUPABASE_SERVICE_KEY`.
+1. _[Settled by "Open items settled".]_ **The test identity's email,** for example
+   `test-admin@swarmag.com`.
+2. _[Settled by "Open items settled".]_ **The environment variable** that carries the service key
+   into test setup, and whether it reuses `SUPABASE_SERVICE_KEY`.
 
 ## Checks
 
@@ -132,5 +134,16 @@ Found by the charter experiment (`effort/completed/2026-10-21-charter-experiment
 `users-api-test.ts:62` expects an inactive status after an update the neighboring assertions treat
 as active. The test has never run, so nothing has shown it. It is corrected when this brief first
 runs the test.
+
+## Amendment — 2026-10-22 — Open items settled
+
+1. **The test identity is `test-admin@swarmag.com`,** which delivers to the CA's inbox. Tests never
+   read it: the fixture mints the session with the service key.
+2. **The service key reaches tests as the edge functions receive it:** `Config` name
+   `SUPABASE_SERVICE_KEY`, sourced from Supabase's standard environment variable
+   `SUPABASE_SERVICE_ROLE_KEY` (`back/supabase-edge/config/supabase-config.ts`). One name for the
+   key across the system.
+3. **Scope narrows by one row.** `test-config.ts` already registers `LOCAL_DB_NAME`: B-22 was
+   repaired in the charter experiment (`effort/completed/2026-10-21-charter-experiment-brief.md`).
 
 _End of Brief_
