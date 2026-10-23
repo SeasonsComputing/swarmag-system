@@ -17,6 +17,8 @@
 -- cascade from this delete. The seed identity is recreated in seed_data.
 DELETE FROM auth.users;
 
+DROP FUNCTION IF EXISTS user_has_access(text);
+
 DROP TABLE IF EXISTS job_plan_assets CASCADE;
 DROP TABLE IF EXISTS service_required_asset_types CASCADE;
 DROP TABLE IF EXISTS task_questions CASCADE;
