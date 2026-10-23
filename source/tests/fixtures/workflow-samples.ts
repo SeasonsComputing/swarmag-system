@@ -1,11 +1,36 @@
-/**
- * Workflow question fixtures for tests.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Workflow fixtures                                                            ║
+║ Shared single-select, numeric, and multi-select questions.                   ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Workflow question fixtures for tests.
+
+Shared single-select, numeric, and multi-select questions.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+WorkflowSamples  Shared fixture samples.
+├ preflightInspection     Required preflight selection.
+│ ├ BaseQuestion           Inherited BaseQuestion fields.
+│ ├ type                   Question response format.
+│ └ options                Selectable answers.
+├ chemicalMixRatio        Numeric mix-ratio capture.
+│ ├ BaseQuestion           Inherited BaseQuestion fields.
+│ └ type                   Question response format.
+├ ppeVerification         Multiple crew-member selection.
+│ ├ BaseQuestion           Inherited BaseQuestion fields.
+│ ├ type                   Question response format.
+│ └ options                Selectable answers.
+└ all                     All shared questions.
+*/
 
 import { id } from '@core/std'
 import type { Question } from '@domain/abstractions/workflow.ts'
 
-export const preflightInspectionQuestion: Question = {
+const PreflightInspection: Question = {
   id: id(),
   prompt: 'Has the drone passed the preflight inspection?',
   type: 'single-select',
@@ -19,7 +44,7 @@ export const preflightInspectionQuestion: Question = {
   updatedAt: '2025-01-01T00:00:00Z'
 }
 
-export const chemicalMixRatioQuestion: Question = {
+const ChemicalMixRatio: Question = {
   id: id(),
   prompt: 'Recorded mix ratio (oz/gal)',
   type: 'number',
@@ -28,7 +53,7 @@ export const chemicalMixRatioQuestion: Question = {
   updatedAt: '2025-01-01T00:00:00Z'
 }
 
-export const ppeVerificationQuestion: Question = {
+const PpeVerification: Question = {
   id: id(),
   prompt: 'Select every crew member who completed PPE verification',
   type: 'multi-select',
@@ -40,8 +65,16 @@ export const ppeVerificationQuestion: Question = {
   updatedAt: '2025-01-01T00:00:00Z'
 }
 
-export const sharedQuestionSamples: Question[] = [
-  preflightInspectionQuestion,
-  chemicalMixRatioQuestion,
-  ppeVerificationQuestion
+const ALL: Question[] = [
+  PreflightInspection,
+  ChemicalMixRatio,
+  PpeVerification
 ]
+
+/** Shared fixture samples. */
+export const WorkflowSamples = {
+  preflightInspection: PreflightInspection,
+  chemicalMixRatio: ChemicalMixRatio,
+  ppeVerification: PpeVerification,
+  all: ALL
+}

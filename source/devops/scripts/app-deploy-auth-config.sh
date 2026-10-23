@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Hosted Auth configuration deployment                                     ║
+# ║ Applies and verifies repository-owned Supabase Auth configuration.       ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
 set -euo pipefail
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -6,6 +11,7 @@ set -euo pipefail
 #
 # Usage: app-deploy-auth-config.sh --target {dev|stage|prod}
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 TARGET=""
 

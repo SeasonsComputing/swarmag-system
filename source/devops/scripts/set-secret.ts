@@ -14,8 +14,8 @@ PUBLIC
 (script entry point — no exported symbols)
 */
 
-const [filePath, composedKey, secretValue] = Deno.args
-if (!filePath || !composedKey || !secretValue) {
+const [FILE_PATH, COMPOSED_KEY, SECRET_VALUE] = Deno.args
+if (!FILE_PATH || !COMPOSED_KEY || !SECRET_VALUE) {
   console.error(
     'Usage: deno run --allow-read --allow-write source/devops/scripts/set-secret.ts <secrets-file> <key> <secret>'
   )
@@ -24,19 +24,19 @@ if (!filePath || !composedKey || !secretValue) {
 
 const escapeRegex = (value: string): string => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
-const source = await Deno.readTextFile(filePath)
-const keyPattern = `"${escapeRegex(composedKey)}"\\s*:\\s*\\{[\\s\\S]*?"secret"\\s*:\\s*"([^"]*)"`
-const keyRegex = new RegExp(keyPattern)
+const SOURCE = await Deno.readTextFile(FILE_PATH)
+const KEY_PATTERN = `"${escapeRegex(COMPOSED_KEY)}"\\s*:\\s*\\{[\\s\\S]*?"secret"\\s*:\\s*"([^"]*)"`
+const KeyRegex = new RegExp(KEY_PATTERN)
 
-const match = source.match(keyRegex)
-if (!match) {
-  console.error(`Secret key not found: ${composedKey}`)
+const MATCH = SOURCE.match(KeyRegex)
+if (!MATCH) {
+  console.error(`Secret key not found: ${COMPOSED_KEY}`)
   Deno.exit(1)
 }
 
-const updated = source.replace(
-  keyRegex,
-  match[0].replace(`"secret": "${match[1]}"`, `"secret": "${secretValue}"`)
+const UPDATED = SOURCE.replace(
+  KeyRegex,
+  MATCH[0].replace(`"secret": "${MATCH[1]}"`, `"secret": "${SECRET_VALUE}"`)
 )
 
-await Deno.writeTextFile(filePath, updated)
+await Deno.writeTextFile(FILE_PATH, UPDATED)

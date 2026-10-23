@@ -1,7 +1,14 @@
-/**
- * Unit tests for the edge caller verification handshake: missing, malformed,
- * and empty bearer tokens are rejected with 401 before any network call.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Supabase edge authentication tests                                           ║
+║ Verify bearer-token rejection before any network call.                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Unit tests for the edge caller verification handshake: missing, malformed,
+and empty bearer tokens are rejected with 401 before any network call.
+*/
 
 import type { StringDictionary } from '@core/std'
 import type { HttpRequest } from '@core/stdx'

@@ -22,18 +22,18 @@ type SeedTopic = {
   count: number
 }
 
-const seedTopics: SeedTopic[] = [
+const SEED_TOPICS: SeedTopic[] = [
   { name: 'asset_types', count: 9 },
   { name: 'services', count: 12 },
   { name: 'internal_questions', count: 14 }
 ]
 
-const totalSeedIds = seedTopics.reduce((total, topic) => total + topic.count, 0)
+const TOTAL_SEED_IDS = SEED_TOPICS.reduce((total, topic) => total + topic.count, 0)
 
-const repoRoot = Deno.cwd()
-const legacySeedIdsPath = `${repoRoot}/source/devops/seed-ids.txt`
-const genesisDir = `${repoRoot}/source/devops/genesis`
-const genesisSeedIdsPath = `${genesisDir}/seed-ids.txt`
+const REPO_ROOT = Deno.cwd()
+const LEGACY_SEED_IDS_PATH = `${REPO_ROOT}/source/devops/seed-ids.txt`
+const GENESIS_DIR = `${REPO_ROOT}/source/devops/genesis`
+const GENESIS_SEED_IDS_PATH = `${GENESIS_DIR}/seed-ids.txt`
 
 const fileExists = async (path: string): Promise<boolean> => {
   try {
@@ -56,12 +56,12 @@ const makeSeedIds = (count: number): string[] => {
   return ids
 }
 
-if (await fileExists(legacySeedIdsPath)) await Deno.remove(legacySeedIdsPath)
-await Deno.mkdir(genesisDir, { recursive: true })
+if (await fileExists(LEGACY_SEED_IDS_PATH)) await Deno.remove(LEGACY_SEED_IDS_PATH)
+await Deno.mkdir(GENESIS_DIR, { recursive: true })
 
-const seedIds = makeSeedIds(totalSeedIds)
-await Deno.writeTextFile(genesisSeedIdsPath, `${seedIds.join('\n')}\n`)
+const SEED_IDS = makeSeedIds(TOTAL_SEED_IDS)
+await Deno.writeTextFile(GENESIS_SEED_IDS_PATH, `${SEED_IDS.join('\n')}\n`)
 
-console.log(`seed_ids_path=${genesisSeedIdsPath}`)
-console.log(`seed_ids_total=${totalSeedIds}`)
-seedTopics.forEach(topic => console.log(`${topic.name}=${topic.count}`))
+console.log(`seed_ids_path=${GENESIS_SEED_IDS_PATH}`)
+console.log(`seed_ids_total=${TOTAL_SEED_IDS}`)
+SEED_TOPICS.forEach(topic => console.log(`${topic.name}=${topic.count}`))

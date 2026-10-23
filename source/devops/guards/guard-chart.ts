@@ -1,7 +1,14 @@
-/**
- * Guard Chart.js boundary usage.
- * Enforces Chart.js imports only within UX chart primitives.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Chart import guard                                                           ║
+║ Restrict Chart.js dependencies to UX chart primitives.                       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Guard Chart.js boundary usage.
+Enforces Chart.js imports only within UX chart primitives.
+*/
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 

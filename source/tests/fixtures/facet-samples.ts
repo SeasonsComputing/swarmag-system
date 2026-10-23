@@ -1,12 +1,33 @@
-/**
- * Facet catalog fixture for adapter and boundary validation tests.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Facet fixtures                                                               ║
+║ Shared classification catalog for adapter and validation tests.              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Facet catalog fixture for adapter and boundary validation tests.
+
+Shared classification catalog for adapter and validation tests.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+FacetSamples  Shared fixture samples.
+├ aerialSpray             Service facet with a path-like code.
+│ ├ Instantiable           Inherited Instantiable fields.
+│ ├ scheme                 Classification scheme.
+│ ├ code                   Classification code.
+│ ├ label                  Display label.
+│ ├ description            Optional descriptive text.
+│ └ active                 Catalog availability.
+└ all                     All facet records.
+*/
 
 import { id } from '@core/std'
 import type { Facet } from '@domain/abstractions/common.ts'
 
 /** A path-like code whose slash carries no matching semantics. */
-export const aerialSprayFacet: Facet = {
+const AerialSpray: Facet = {
   id: id(),
   scheme: 'service',
   code: 'aerial/spray',
@@ -18,4 +39,10 @@ export const aerialSprayFacet: Facet = {
 }
 
 /** Every facet fixture, for integrity checks. */
-export const facetSamples: readonly Facet[] = [aerialSprayFacet]
+const ALL: readonly Facet[] = [AerialSpray]
+
+/** Shared fixture samples. */
+export const FacetSamples = {
+  aerialSpray: AerialSpray,
+  all: ALL
+}

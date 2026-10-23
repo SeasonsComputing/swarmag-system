@@ -1,4 +1,13 @@
-/** Draft services isolate plain values and Solid stores and compare baseline snapshots. */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Workbench draft tests                                                        ║
+║ Verify draft copying, store isolation, and baseline comparisons.             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Draft services isolate plain values and Solid stores and compare baseline snapshots.
+*/
 
 import { createStore } from '@solid-js/store'
 import { assertEquals, assertNotStrictEquals } from '@std/assert'

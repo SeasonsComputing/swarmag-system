@@ -13,6 +13,8 @@ Pass --target {dev|stage|prod} (default: stage) and optional app=url positional
 arguments to override the default target list. Stage defaults to all three apps
 at swarmag.com; other targets require explicit app=url arguments.
 
+Stage defaults to all three deployed apps; other targets need app=url arguments.
+
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 (script entry point — no exported symbols)

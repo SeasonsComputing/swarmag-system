@@ -23,14 +23,14 @@ main()  Audit documentation for token-value restatement.
 */
 
 const DOCS_ROOT = 'documentation'
-const TOKEN = /--sa-[a-z0-9-]+/
-const FENCE = /^\s*(```|~~~)/
+const Token = /--sa-[a-z0-9-]+/
+const Fence = /^\s*(```|~~~)/
 
 /** A literal measure: a number carrying a CSS unit, or a bare integer cell. */
-const LITERAL = /(?<![\w-])\d+(\.\d+)?(rem|px|em|%|s|ms|dvh|dvw|vh|vw|ch|fr)(?![\w-])/
+const Literal = /(?<![\w-])\d+(\.\d+)?(rem|px|em|%|s|ms|dvh|dvw|vh|vw|ch|fr)(?![\w-])/
 
 /** Bare numeric table cell, e.g. a z-index ordering column. */
-const BARE_NUMBER_CELL = /\|\s*-?\d+(\.\d+)?\s*\|/
+const BareNumberCell = /\|\s*-?\d+(\.\d+)?\s*\|/
 
 /** One reported violation. */
 type Violation = {
@@ -39,7 +39,7 @@ type Violation = {
   text: string
 }
 
-/** Collect markdown files under a directory. */
+// Collect markdown files under a directory.
 async function collectMarkdown(root: string): Promise<string[]> {
   const found: string[] = []
   for await (const entry of Deno.readDir(root)) {
@@ -50,26 +50,26 @@ async function collectMarkdown(root: string): Promise<string[]> {
   return found
 }
 
-/** Audit one file for token lines that also carry a literal value. */
+// Audit one file for token lines that also carry a literal value.
 function auditFile(file: string, source: string): Violation[] {
   const violations: Violation[] = []
   let fenced = false
   const lines = source.split('\n')
   for (let index = 0; index < lines.length; index += 1) {
     const text = lines[index]
-    if (FENCE.test(text)) {
+    if (Fence.test(text)) {
       fenced = !fenced
       continue
     }
     if (fenced) continue
-    if (!TOKEN.test(text)) continue
-    if (!LITERAL.test(text) && !BARE_NUMBER_CELL.test(text)) continue
+    if (!Token.test(text)) continue
+    if (!Literal.test(text) && !BareNumberCell.test(text)) continue
     violations.push({ file, line: index + 1, text: text.trim() })
   }
   return violations
 }
 
-/** Audit documentation for token-value restatement. */
+// Audit documentation for token-value restatement.
 async function main(): Promise<void> {
   const files = await collectMarkdown(DOCS_ROOT)
   const violations = files

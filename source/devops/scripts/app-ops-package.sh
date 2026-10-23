@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Ops application package                                                  ║
+# ║ Builds a target-bound Ops archive and checks packaged assets.            ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
 set -euo pipefail
 
 TARGET="${1:-}"

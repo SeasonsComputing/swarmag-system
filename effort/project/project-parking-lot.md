@@ -251,4 +251,21 @@ first kinds, and whether portal-access requests come first, since they also serv
 of the brief's Open 1). Consider its relation to the Lead abstraction (P-3): a Lead is an
 inbound request from someone not yet a customer.
 
+## P-10 · Should a charter become a way of authorizing work, and if so, in what form?
+
+**Parked:** 2026-10-22 — at the close of the charter experiment
+(`effort/completed/2026-10-21-charter-experiment-brief.md`).
+
+**What it is:** A charter authorizes an outcome, an intent with bounds, delegated and reserved
+decisions, and obligations, instead of a scope per production; the agent scopes its own work and
+review moves to the end. The experiment ran one on the tests and DevOps backlog.
+
+**Why parked:** The experiment's record holds the evidence: the bounds held and the stop rule worked,
+but the charter itself had defects found only in review, and independent forensic review was what
+made the delegation safe. Whether that becomes a fifth operating mode (CONSTITUTION, AGENTS), a kind
+of brief EFFORT recognizes, or nothing is undecided.
+
+**Picking this up:** From the brief's "What we learn" and its amendments; decide the form, then
+whether independent review is a required part of it.
+
 _End of Feature Parking Lot Document_

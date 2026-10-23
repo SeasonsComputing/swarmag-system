@@ -126,4 +126,11 @@ brief. Its text, kept here so nothing is lost:
 >   automated tests: its Postgres behavior is verified in the app against a checklist, and its
 >   automated tests need no database (`effort/completed/2026-10-11-list-query-brief.md`).
 
+## Amendment — 2026-10-22 — A contradictory assertion in `users-api-test.ts`
+
+Found by the charter experiment (`effort/completed/2026-10-21-charter-experiment-brief.md`):
+`users-api-test.ts:62` expects an inactive status after an update the neighboring assertions treat
+as active. The test has never run, so nothing has shown it. It is corrected when this brief first
+runs the test.
+
 _End of Brief_

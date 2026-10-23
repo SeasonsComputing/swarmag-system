@@ -1,7 +1,14 @@
-/**
- * Database-free list clients: real SDK request construction, HTTP forwarding,
- * and IndexedDB paging over a test connection's records.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ List client API tests                                                        ║
+║ Verify database-free Supabase, HTTP, and IndexedDB list contracts.           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Database-free list clients: real SDK request construction, HTTP forwarding,
+and IndexedDB paging over a test connection's records.
+*/
 
 import { makeCrudHttpClient } from '@core/cli/make-http-client.ts'
 import { makeCrudIndexedDbClient } from '@core/cli/make-indexeddb-client.ts'
@@ -21,15 +28,15 @@ import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { queries } from '@front/api/queries.ts'
 import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert'
 import { createClient } from '@supabase/client'
-import { salesUserSample } from '@tests/fixtures/user-samples.ts'
+import { UserSamples } from '@tests/fixtures/user-samples.ts'
 
 /** Users table spec shared by the Supabase translation tests. */
-const spec = { table: 'users', adapter: UserAdapter }
+const Spec = { table: 'users', adapter: UserAdapter }
 /** Validator that accepts everything; validation is not under test. */
-const validator: Validator<User> = { validateCreate: () => null, validateUpdate: () => null }
-/** A sales User sample with a fresh id, the given name, and the given changes. */
+const AcceptAllValidator: Validator<User> = { validateCreate: () => null, validateUpdate: () => null }
+// A sales User sample with a fresh id, the given name, and the given changes.
 const sample = (displayName: string, changes: Partial<User> = {}): User => ({
-  ...salesUserSample,
+  ...UserSamples.sales,
   id: id(),
   displayName,
   ...changes
@@ -44,7 +51,7 @@ Deno.test('Supabase translation combines roles, search, and both keyset directio
     })
     const rowId = id()
     const cursor = writeListCursor('supabase:users', query, 'Ada', rowId)
-    const request = makeSupabaseListRequest(spec, { query, cursor, limit: 2 })
+    const request = makeSupabaseListRequest(Spec, { query, cursor, limit: 2 })
     const comparison = direction === 'asc' ? 'gt' : 'lt'
     assertEquals(request.column, 'display_name')
     assertEquals(request.limit, 2)
@@ -77,7 +84,7 @@ Deno.test('Supabase range and in operands use native columns and fully quoted va
       status: { eq: 'active' }
     }
   })
-  assertEquals(makeSupabaseListRequest(spec, { query }).filters, [
+  assertEquals(makeSupabaseListRequest(Spec, { query }).filters, [
     { method: 'gte', column: 'created_at', value: '2026-10-07T03:30:32.719719+00:00' },
     { method: 'lt', column: 'created_at', value: '2026-10-08T00:00:00Z' },
     { method: 'in', column: 'primary_email', value: ['a,b@example.com', 'quote"@example.com'] },
@@ -108,7 +115,7 @@ Deno.test('Supabase requests encode search once and preserve raw cursors', async
   })
   Supabase.client = () => sdk
   try {
-    const client = makeCrudSupabaseClient({ ...spec, validator })
+    const client = makeCrudSupabaseClient({ ...Spec, validator: AcceptAllValidator })
     const term = '%_\\"(),*'
     const query = queries.Users.byRole.build({ search: term })
     await client.list({ query, limit: 1 })
@@ -125,7 +132,7 @@ Deno.test('Supabase requests encode search once and preserve raw cursors', async
       const query = queries.Users.byRole.build({ search: term })
       await client.list({ query, limit: 1 })
       const url = urls[urls.length - 1]
-      const request = makeSupabaseListRequest(spec, { query, limit: 1 })
+      const request = makeSupabaseListRequest(Spec, { query, limit: 1 })
       assertEquals(
         url.searchParams.getAll('or'),
         request.filters.flatMap(filter => filter.method === 'or' ? [`(${filter.expression})`] : [])
@@ -186,7 +193,7 @@ Deno.test('Supabase translation fails fast for unknown filter, search, or order 
     ]
   ) {
     const error = assertThrows(() =>
-      makeSupabaseListRequest(spec, {
+      makeSupabaseListRequest(Spec, {
         query: query as unknown as Query<User>
       }), ApiError)
     assertEquals(error.status, 400)
@@ -288,7 +295,10 @@ Deno.test('HTTP lists forward queries and preserve cursors', async () => {
     )
   }
   try {
-    const client = makeCrudHttpClient<User>({ basePath: 'http://list.test/users', validator })
+    const client = makeCrudHttpClient<User>({
+      basePath: 'http://list.test/users',
+      validator: AcceptAllValidator
+    })
     const query = queries.Users.byRole.build({ search: 'a' })
     assertEquals((await client.list({ query, cursor: 'incoming', limit: 50 })).cursor, cursor)
     assertEquals(sent[0], { query, cursor: 'incoming', limit: 50 })
@@ -307,9 +317,9 @@ Deno.test('IndexedDB numeric ranges and numeric cursors page ties in both direct
     plannerId: id(),
     notes: [],
     durationEstimate,
-    scheduledStart: salesUserSample.createdAt,
-    createdAt: salesUserSample.createdAt,
-    updatedAt: salesUserSample.updatedAt
+    scheduledStart: UserSamples.sales.createdAt,
+    createdAt: UserSamples.sales.createdAt,
+    updatedAt: UserSamples.sales.updatedAt
   }))
   const declaration = makeQuery({
     filter: [JobPlanAdapter.durationEstimate],
@@ -343,8 +353,8 @@ Deno.test('IndexedDB boolean equality and in retain false as a scalar value', as
     code: active ? 'active' : 'retired',
     label: 'Example',
     active,
-    createdAt: salesUserSample.createdAt,
-    updatedAt: salesUserSample.updatedAt
+    createdAt: UserSamples.sales.createdAt,
+    updatedAt: UserSamples.sales.updatedAt
   }))
   const declaration = makeQuery({ filter: [FacetAdapter.active], order: [FacetAdapter.code] })
   await withRecords(FacetAdapter, facets, async client => {
@@ -353,7 +363,7 @@ Deno.test('IndexedDB boolean equality and in retain false as a scalar value', as
   })
 })
 
-/** Run a test against an IndexedDB client stubbed to hold the given records. */
+// Run a test against an IndexedDB client stubbed to hold the given records.
 const withRecords = async <T extends Instantiable>(
   adapter: Adapter<T>,
   entities: T[],
@@ -379,7 +389,7 @@ const withRecords = async <T extends Instantiable>(
   }
 }
 
-/** Follow cursors to the last page, collecting every record and checking termination. */
+// Follow cursors to the last page, collecting every record and checking termination.
 const allPages = async <T extends Instantiable>(
   client: CrudListContract<T>,
   options: ListOptions<T>

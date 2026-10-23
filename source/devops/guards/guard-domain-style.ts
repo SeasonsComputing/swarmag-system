@@ -1,12 +1,21 @@
-/**
- * Guard against style-guide/header drift and const-enum violations in domain files.
- *
- * Scope:
- * - Ensures domain ts files use functional-file style header sections
- * - Enforces PUBLIC entries to be single-line symbol+description
- * - Enforces const-enum tuple/type adjacency in abstraction source-of-truth files
- * - Disallows inline multi-literal unions in abstraction files when const-enum is required
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Domain style guard                                                           ║
+║ Audit domain headers, PUBLIC entries, and const-enum declarations.           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Guard against style-guide/header drift and const-enum violations in domain
+files.
+
+Scope:
+- Ensures domain ts files use functional-file style header sections
+- Enforces PUBLIC entries to be single-line symbol+description
+- Enforces const-enum tuple/type adjacency in abstraction source-of-truth files
+- Disallows inline multi-literal unions in abstraction files when const-enum is
+  required
+*/
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
@@ -15,10 +24,10 @@ const DOMAIN_DIR = `${ROOT}/source/domain`
 const DOMAIN_ABSTRACTIONS_DIR = `${DOMAIN_DIR}/abstractions`
 const EXCLUDED_DIRS = new Set(['schema'])
 
-const SECTION_BLOCK_REGEX = /^\/\*([\s\S]*?)\*\//m
-const CONST_ENUM_DECLARATION_REGEX = /export const ([A-Z0-9_]+)\s*=\s*\[[\s\S]*?\]\s*as const/gm
-const INLINE_LITERAL_UNION_REGEX = /:\s*'[^']+'\s*\|\s*'[^']+'/g
-const INLINE_LITERAL_UNION_TYPE_ALIAS_REGEX = /export type [A-Za-z0-9_]+\s*=\s*'[^']+'\s*\|\s*'[^']+'/g
+const SectionBlockRegex = /^\/\*([\s\S]*?)\*\//m
+const ConstEnumDeclarationRegex = /export const ([A-Z0-9_]+)\s*=\s*\[[\s\S]*?\]\s*as const/gm
+const InlineLiteralUnionRegex = /:\s*'[^']+'\s*\|\s*'[^']+'/g
+const InlineLiteralUnionTypeAliasRegex = /export type [A-Za-z0-9_]+\s*=\s*'[^']+'\s*\|\s*'[^']+'/g
 
 const collectFiles = async (dir: string): Promise<string[]> => {
   const entries: string[] = []
@@ -159,9 +168,9 @@ const checkConstEnumPair = (
 const auditAbstractionConstEnums = (source: string, relative: string): string[] => {
   const violations: string[] = []
 
-  CONST_ENUM_DECLARATION_REGEX.lastIndex = 0
+  ConstEnumDeclarationRegex.lastIndex = 0
   let tupleMatch: RegExpExecArray | null
-  while ((tupleMatch = CONST_ENUM_DECLARATION_REGEX.exec(source)) !== null) {
+  while ((tupleMatch = ConstEnumDeclarationRegex.exec(source)) !== null) {
     const tupleName = tupleMatch[1]
     const tupleEndIndex = tupleMatch.index + tupleMatch[0].length
     if (!checkConstEnumPair(source, tupleName, tupleEndIndex)) {
@@ -172,17 +181,17 @@ const auditAbstractionConstEnums = (source: string, relative: string): string[] 
     }
   }
 
-  INLINE_LITERAL_UNION_REGEX.lastIndex = 0
+  InlineLiteralUnionRegex.lastIndex = 0
   let unionMatch: RegExpExecArray | null
-  while ((unionMatch = INLINE_LITERAL_UNION_REGEX.exec(source)) !== null) {
+  while ((unionMatch = InlineLiteralUnionRegex.exec(source)) !== null) {
     const lineNo = lineNumber(source, unionMatch.index)
     violations.push(
       `${relative}:${lineNo} inline multi-literal union detected; use const-enum tuple + derived type alias`
     )
   }
 
-  INLINE_LITERAL_UNION_TYPE_ALIAS_REGEX.lastIndex = 0
-  while ((unionMatch = INLINE_LITERAL_UNION_TYPE_ALIAS_REGEX.exec(source)) !== null) {
+  InlineLiteralUnionTypeAliasRegex.lastIndex = 0
+  while ((unionMatch = InlineLiteralUnionTypeAliasRegex.exec(source)) !== null) {
     const lineNo = lineNumber(source, unionMatch.index)
     violations.push(
       `${relative}:${lineNo} type alias uses inline multi-literal union; use const-enum tuple + derived type alias`
@@ -200,7 +209,7 @@ const main = async () => {
     const relative = file.replace(`${ROOT}/`, '')
     const source = await Deno.readTextFile(file)
 
-    const headerMatch = SECTION_BLOCK_REGEX.exec(source)
+    const headerMatch = SectionBlockRegex.exec(source)
     if (!headerMatch) {
       violations.push(`${relative} is missing top functional-file header block comment`)
       continue

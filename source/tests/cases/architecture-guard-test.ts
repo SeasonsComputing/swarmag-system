@@ -1,8 +1,12 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Architecture guard tests                                                     ║
-║ Verify the closed standard-library boundary across module reference forms    ║
+║ Verify the closed standard-library boundary across reference forms.          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Verify the closed standard-library boundary across module reference forms
 */
 
 import { checkCoreStdBoundary } from '@devops/guards/guard-architecture.ts'

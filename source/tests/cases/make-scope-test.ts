@@ -1,6 +1,13 @@
-/**
- * Scope inference, constraints, and create/update projection tests.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Scope tests                                                                  ║
+║ Verify inference, constraints, and create and update projections.            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Scope inference, constraints, and create/update projection tests.
+*/
 
 import { id } from '@core/std'
 import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
@@ -13,7 +20,7 @@ import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { scopes } from '@front/api/scopes.ts'
 import { assertEquals } from '@std/assert'
-import { blueMesaRanchCustomer } from '@tests/fixtures/customer-samples.ts'
+import { CustomerSamples } from '@tests/fixtures/customer-samples.ts'
 
 /** Customer detail fields shared by both scopes. */
 const DETAIL_FIELDS = [
@@ -29,32 +36,32 @@ const DETAIL_FIELDS = [
   CustomerAdapter.sites
 ] as const
 /** Direct scope over the detail fields. */
-const scope = makeScope({
+const Scope = makeScope({
   fields: DETAIL_FIELDS,
   defaults: { accountManagerId: undefined, notes: [] }
 })
 /** Adapted scope over the same fields. */
-const adaptedScope = makeAdaptedScope({
+const AdaptedScope = makeAdaptedScope({
   fields: DETAIL_FIELDS,
   defaults: { accountManagerId: undefined, notes: [] }
 })
 /** Draft type the scopes accept. */
-type Draft = DraftOf<typeof scope>
+type Draft = DraftOf<typeof Scope>
 /** Compile-time type equality. */
 type Equal<A, B> = (<T>() => T extends A ? 1 : 2) extends (<T>() => T extends B ? 1 : 2) ? true
   : false
 
-/** Detail draft built from the sample Customer. */
+// Detail draft built from the sample Customer.
 const detailDraft = (): Draft => ({
-  primaryContact: blueMesaRanchCustomer.primaryContact,
-  name: blueMesaRanchCustomer.name,
-  status: blueMesaRanchCustomer.status,
-  line1: blueMesaRanchCustomer.line1,
-  city: blueMesaRanchCustomer.city,
-  state: blueMesaRanchCustomer.state,
-  postalCode: blueMesaRanchCustomer.postalCode,
-  country: blueMesaRanchCustomer.country,
-  sites: blueMesaRanchCustomer.sites
+  primaryContact: CustomerSamples.blueMesaRanch.primaryContact,
+  name: CustomerSamples.blueMesaRanch.name,
+  status: CustomerSamples.blueMesaRanch.status,
+  line1: CustomerSamples.blueMesaRanch.line1,
+  city: CustomerSamples.blueMesaRanch.city,
+  state: CustomerSamples.blueMesaRanch.state,
+  postalCode: CustomerSamples.blueMesaRanch.postalCode,
+  country: CustomerSamples.blueMesaRanch.country,
+  sites: CustomerSamples.blueMesaRanch.sites
 })
 
 Deno.test('makeScope infers the exact draft and create protocol without type arguments', () => {
@@ -62,22 +69,22 @@ Deno.test('makeScope infers the exact draft and create protocol without type arg
     Draft,
     Pick<FromInstantiable<Customer>, (typeof DETAIL_FIELDS)[number]['key']>
   > = true
-  const exactCreate: Equal<ReturnType<typeof scope.toCreate>, CreateFromInstantiable<Customer>> = true
+  const exactCreate: Equal<ReturnType<typeof Scope.toCreate>, CreateFromInstantiable<Customer>> = true
   assertEquals(exactDraft, true)
   assertEquals(exactCreate, true)
   // @ts-expect-error Direct form scopes have no scoped adapter.
-  const adapter = scope.adapter
+  const adapter = Scope.adapter
   assertEquals(adapter, undefined)
 })
 
 Deno.test('makeAdaptedScope adds translation without changing projections', () => {
   const draft = detailDraft()
-  const exactDraft: Equal<DraftOf<typeof adaptedScope>, Draft> = true
+  const exactDraft: Equal<DraftOf<typeof AdaptedScope>, Draft> = true
   assertEquals(exactDraft, true)
-  assertEquals(adaptedScope.toCreate(draft), scope.toCreate(draft))
+  assertEquals(AdaptedScope.toCreate(draft), Scope.toCreate(draft))
   assertEquals(
-    adaptedScope.toUpdate(blueMesaRanchCustomer.id, draft),
-    scope.toUpdate(blueMesaRanchCustomer.id, draft)
+    AdaptedScope.toUpdate(CustomerSamples.blueMesaRanch.id, draft),
+    Scope.toUpdate(CustomerSamples.blueMesaRanch.id, draft)
   )
   const overlap = { accountManagerId: undefined, notes: [], name: 'Unowned default' }
   // @ts-expect-error Adapted declarations retain the base's disjoint-default constraint.
@@ -94,9 +101,9 @@ Deno.test('makeScope compiler constraints reject missing and overlapping attribu
   const defaults = { accountManagerId: undefined, notes: [] }
   const overlap = { ...defaults, name: 'Unowned default' }
   const undefinedOverlap = { ...defaults, line2: undefined }
-  const lifecycle = { ...defaults, id: blueMesaRanchCustomer.id }
-  const createdAt = { ...defaults, createdAt: blueMesaRanchCustomer.createdAt }
-  const updatedAt = { ...defaults, updatedAt: blueMesaRanchCustomer.updatedAt }
+  const lifecycle = { ...defaults, id: CustomerSamples.blueMesaRanch.id }
+  const createdAt = { ...defaults, createdAt: CustomerSamples.blueMesaRanch.createdAt }
+  const updatedAt = { ...defaults, updatedAt: CustomerSamples.blueMesaRanch.updatedAt }
   const deletedAt = { ...defaults, deletedAt: undefined }
   const unknownKey = { ...defaults, unrelated: 'Unowned default' }
   // @ts-expect-error Scoped defaults are rejected even through a variable.
@@ -129,16 +136,16 @@ Deno.test('toCreate selects draft fields and preserves defaults against richer v
     ...draft,
     notes: [{
       content: 'Must not override declared defaults',
-      createdAt: blueMesaRanchCustomer.createdAt,
+      createdAt: CustomerSamples.blueMesaRanch.createdAt,
       attachments: [],
       visibility: 'internal' as const
     }],
-    accountManagerId: blueMesaRanchCustomer.accountManagerId,
-    id: blueMesaRanchCustomer.id,
-    createdAt: blueMesaRanchCustomer.createdAt,
+    accountManagerId: CustomerSamples.blueMesaRanch.accountManagerId,
+    id: CustomerSamples.blueMesaRanch.id,
+    createdAt: CustomerSamples.blueMesaRanch.createdAt,
     unrelated: 'Must not be emitted'
   }
-  const created = scope.toCreate(richerDraft)
+  const created = Scope.toCreate(richerDraft)
   assertEquals(created, { accountManagerId: undefined, notes: [], ...draft, line2: undefined })
   assertEquals('id' in created, false)
   assertEquals('createdAt' in created, false)
@@ -149,19 +156,19 @@ Deno.test('toCreate selects draft fields and preserves defaults against richer v
 Deno.test('toUpdate clears omitted and undefined scoped values without leaking other fields', () => {
   const draft = detailDraft()
   const richerDraft = { ...draft, notes: [], id: 'Wrong id', unrelated: 'Must not be emitted' }
-  const omitted = scope.toUpdate(blueMesaRanchCustomer.id, richerDraft)
-  const explicit = scope.toUpdate(blueMesaRanchCustomer.id, { ...draft, line2: undefined })
-  assertEquals(omitted, { id: blueMesaRanchCustomer.id, ...draft, line2: null })
+  const omitted = Scope.toUpdate(CustomerSamples.blueMesaRanch.id, richerDraft)
+  const explicit = Scope.toUpdate(CustomerSamples.blueMesaRanch.id, { ...draft, line2: undefined })
+  assertEquals(omitted, { id: CustomerSamples.blueMesaRanch.id, ...draft, line2: null })
   assertEquals(explicit, omitted)
   assertEquals('notes' in omitted, false)
   assertEquals('unrelated' in omitted, false)
-  assertEquals(adaptedScope.adapter.fromDomain(omitted).line2, null)
+  assertEquals(AdaptedScope.adapter.fromDomain(omitted).line2, null)
 })
 
 Deno.test('scope projections preserve present values and whole compositions', () => {
   const draft = { ...detailDraft(), name: '', line2: 'Suite 2', sites: [] }
-  const created = scope.toCreate(draft)
-  const updated = scope.toUpdate(blueMesaRanchCustomer.id, draft)
+  const created = Scope.toCreate(draft)
+  const updated = Scope.toUpdate(CustomerSamples.blueMesaRanch.id, draft)
   assertEquals(created.name, '')
   assertEquals(updated.name, '')
   assertEquals(created.line2, 'Suite 2')
@@ -170,7 +177,7 @@ Deno.test('scope projections preserve present values and whole compositions', ()
   assertEquals(updated.sites, [])
   assertEquals(created.primaryContact, draft.primaryContact)
   assertEquals(updated.primaryContact, draft.primaryContact)
-  assertEquals(adaptedScope.adapter.fromDomain(updated).primary_contact, [{
+  assertEquals(AdaptedScope.adapter.fromDomain(updated).primary_contact, [{
     display_name: draft.primaryContact[0].displayName,
     phone_number: draft.primaryContact[0].phoneNumber,
     preferred_channel: draft.primaryContact[0].preferredChannel,
@@ -185,21 +192,23 @@ Deno.test('Id | undefined admits null in ScopedUpdate and clears through the for
     defaults: { ...draft, notes: [] }
   })
   const expected: ScopedUpdate<Customer, 'accountManagerId'> = {
-    id: blueMesaRanchCustomer.id,
+    id: CustomerSamples.blueMesaRanch.id,
     accountManagerId: null
   }
-  const cleared = assignmentScope.toUpdate(blueMesaRanchCustomer.id, { accountManagerId: undefined })
+  const cleared = assignmentScope.toUpdate(CustomerSamples.blueMesaRanch.id, {
+    accountManagerId: undefined
+  })
   assertEquals(cleared, expected)
   assertEquals(assignmentScope.adapter.fromDomain(cleared), { account_manager_id: null })
-  const assigned = assignmentScope.toUpdate(blueMesaRanchCustomer.id, {
-    accountManagerId: blueMesaRanchCustomer.id
+  const assigned = assignmentScope.toUpdate(CustomerSamples.blueMesaRanch.id, {
+    accountManagerId: CustomerSamples.blueMesaRanch.id
   })
-  assertEquals(assigned.accountManagerId, blueMesaRanchCustomer.id)
+  assertEquals(assigned.accountManagerId, CustomerSamples.blueMesaRanch.id)
   const created = assignmentScope.toCreate({ accountManagerId: undefined })
   assertEquals(created.accountManagerId, undefined)
   assertEquals(Object.values(created).some(value => value === null), false)
   // @ts-expect-error The required name value does not admit a null clear.
-  const invalid: ScopedUpdate<Customer, 'name'> = { id: blueMesaRanchCustomer.id, name: null }
+  const invalid: ScopedUpdate<Customer, 'name'> = { id: CustomerSamples.blueMesaRanch.id, name: null }
   assertEquals((invalid as Dictionary).name, null)
 })
 
@@ -229,19 +238,17 @@ declare const directUsers: DirectUpdateContract<User>
 /** Declared create client, for type assertions only. */
 declare const userCreates: CrudBaseContract<User>
 
-/**
- * Assert the Users detail scope's inferred draft and client types.
- * Type assertions only: the declared clients have no runtime implementation.
- */
+// Assert the Users detail scope's inferred draft and client types.
+// Type assertions only: the declared clients have no runtime implementation.
 function checkUserInference(draft: DraftOf<typeof scopes.Users.detail>, id: Id): void {
-  const scope = scopes.Users.detail
-  type UserDraft = DraftOf<typeof scope>
+  const Scope = scopes.Users.detail
+  type UserDraft = DraftOf<typeof Scope>
   const exactKeys: Equal<
     keyof UserDraft,
     'displayName' | 'primaryEmail' | 'phoneNumber' | 'preferredChannel' | 'notes' | 'roles' | 'status'
   > = true
-  const updated: Promise<User> = directUsers.update(scope.toUpdate(id, draft))
-  const created: Promise<User> = userCreates.create(scope.toCreate(draft))
+  const updated: Promise<User> = directUsers.update(Scope.toUpdate(id, draft))
+  const created: Promise<User> = userCreates.create(Scope.toCreate(draft))
   // @ts-expect-error User drafts exclude avatarUrl.
   const avatarDraft: UserDraft = { ...draft, avatarUrl: 'https://example.com/ada.png' }
   const overlap = { displayName: 'Unowned default' }
@@ -263,9 +270,9 @@ function checkUserInference(draft: DraftOf<typeof scopes.Users.detail>, id: Id):
     directUsers.update(source)
     return null as unknown as K
   }
-  const inferred = inferKeys(scope.toUpdate(id, draft))
+  const inferred = inferKeys(Scope.toUpdate(id, draft))
   const exactInference: Equal<typeof inferred, keyof UserDraft> = true
-  const exactCreate: Equal<ReturnType<typeof scope.toCreate>, CreateFromInstantiable<User>> = true
+  const exactCreate: Equal<ReturnType<typeof Scope.toCreate>, CreateFromInstantiable<User>> = true
   const exactDraft: Equal<UserDraft, Pick<FromInstantiable<User>, keyof UserDraft>> = true
   void [exactKeys, updated, created, avatarDraft, exactInference, exactCreate, exactDraft]
 }

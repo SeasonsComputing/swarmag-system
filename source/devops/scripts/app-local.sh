@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Application local serving                                                ║
+# ║ Serves a target-bound application bundle through the local Vite host.    ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
 set -euo pipefail
 
 TARGET="${1:-}"

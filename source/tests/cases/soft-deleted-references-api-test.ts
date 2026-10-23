@@ -1,4 +1,13 @@
-/** Soft-delete read, list, and write contracts across Supabase and IndexedDB clients. */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Soft-deleted reference API tests                                             ║
+║ Verify read, list, and write contracts for deleted references.               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Soft-delete read, list, and write contracts across Supabase and IndexedDB clients.
+*/
 
 import { makeCrudIndexedDbClient } from '@core/cli/make-indexeddb-client.ts'
 import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
@@ -12,9 +21,9 @@ import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { assertEquals, assertRejects } from '@std/assert'
 import { createClient } from '@supabase/client'
-import { operationsUserSample } from '@tests/fixtures/user-samples.ts'
+import { UserSamples } from '@tests/fixtures/user-samples.ts'
 
-const validator: Validator<User> = { validateCreate: () => null, validateUpdate: () => null }
+const AcceptAllValidator: Validator<User> = { validateCreate: () => null, validateUpdate: () => null }
 const DisplayNameUpdate = makeScopedUpdate([UserAdapter.displayName])
 
 Deno.test('IndexedDB resolves deleted references and refuses subsequent writes', async () => {
@@ -39,7 +48,7 @@ Deno.test('IndexedDB resolves deleted references and refuses subsequent writes',
     } as unknown as Awaited<ReturnType<typeof IndexedDb.connection>>)
   try {
     await verifyContract(
-      makeCrudIndexedDbClient({ store: 'users', adapter: UserAdapter, validator }),
+      makeCrudIndexedDbClient({ store: 'users', adapter: UserAdapter, validator: AcceptAllValidator }),
       users
     )
   } finally {
@@ -78,7 +87,7 @@ Deno.test('Supabase resolves deleted references and retains list and write filte
   Supabase.client = () => sdk
   try {
     await verifyContract(
-      makeCrudSupabaseClient({ table: 'users', adapter: UserAdapter, validator }),
+      makeCrudSupabaseClient({ table: 'users', adapter: UserAdapter, validator: AcceptAllValidator }),
       users
     )
   } finally {
@@ -86,18 +95,18 @@ Deno.test('Supabase resolves deleted references and retains list and write filte
   }
 })
 
-/** Independent live and deleted Users for each backing-store contract test. */
+// Independent live and deleted Users for each backing-store contract test.
 const records = (): User[] => [
-  { ...structuredClone(operationsUserSample), id: id() },
+  { ...structuredClone(UserSamples.operations), id: id() },
   {
-    ...structuredClone(operationsUserSample),
+    ...structuredClone(UserSamples.operations),
     id: id(),
     displayName: 'Deleted reference target',
     deletedAt: '2026-10-13T12:00:00Z'
   }
 ]
 
-/** Verify observable behavior without depending on provider-specific error messages. */
+// Verify observable behavior without depending on provider-specific error messages.
 const verifyContract = async (client: ApiCrudContract<User>, [live, deleted]: User[]): Promise<void> => {
   assertEquals(await client.get(deleted.id), deleted)
   assertEquals((await client.list()).data.map(user => user.id), [live.id])
@@ -119,6 +128,6 @@ const verifyContract = async (client: ApiCrudContract<User>, [live, deleted]: Us
   assertEquals(missingError.status, 404)
 }
 
-/** Encode the storage response consumed by the real Supabase SDK. */
+// Encode the storage response consumed by the real Supabase SDK.
 const jsonResponse = (body: unknown, status = 200): Response =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } })

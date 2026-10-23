@@ -42,7 +42,7 @@ server hole again," implying this is not the first time. This is a live specimen
 exact failure this entry already describes — the constraint a session needed
 ("stage is the only environment") wasn't reached before the session acted on procedure it
 shouldn't have. Also noted in
-`effort/pending/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
+`effort/completed/2026-08-23-devops-style-error-handling-brief.md`, since that brief's step 2
 already touches this file.
 
 ### B-2 · `domain-archetypes.md` and the domain genesis prompt restate CONVENTIONS
@@ -252,19 +252,39 @@ Pair with the entry above, which also changes what the sweep covers.
 Fixing it also settles the task-chain question: `check` stays read-only, and nothing sweeps
 `.DS_Store` (CA, 2026-10-20).
 
-### B-18 · `guard:css` misreads multiline selectors and misses selector-list branches
+**Finding, 2026-10-21:** honoring git-ignore needs `--allow-run=git` on the leaf task in
+`deno.jsonc`, or an approved ignore-matcher dependency; the charter experiment could do neither
+(`effort/completed/2026-10-21-charter-experiment-brief.md`).
 
-**Observed:** 2026-10-03 · normal
+### B-32 · `guard:css` checks values line by line, so a literal in a wrapped declaration passes
 
-Design record: [CSS Guard — Complete Selector Parsing](../pending/2026-10-03-css-guard-selector-parsing-brief.md).
+**Observed:** 2026-10-21 · normal
+
+The selector-parsing repair (B-18) reads complete rules, but value and token audits stay per
+physical line: a spacing literal inside a `clamp()` the formatter wraps across lines passes, while
+the same literal on one line fails. Broadening the audit would newly fail
+`source/ux/shell/dashboard/dashboard.css:29`. Found by the charter experiment
+(`effort/completed/2026-10-21-charter-experiment-brief.md`); a new check, so its own decision.
 
 ## DevOps
 
-### B-19 · `source/devops/` is not held to CONVENTIONS
+### B-19 · `source/devops/` and `source/tests/` break CONVENTIONS where fixing changes behavior
 
 **Observed:** 2026-08-23 · normal
 
-Design record: [DevOps Style Conformance & Shared Error Handling — Backlog Brief](../pending/2026-08-23-devops-style-error-handling-brief.md).
+Header, naming, and comment conformance shipped 2026-10-21 (charter experiment). What remains changes
+runtime behavior, so it is its own production:
+
+- **Silent catches (§15):** `guard-architecture.ts:236`, `guard-core-std-types.ts:51`,
+  `guard-env.ts:55`, `guard-validation.ts:43`, `edge-sync.ts:92`, `gen-id-seeds.ts:32`,
+  `db-genesis.ts:77`, and `smoke-ux.ts` (140, 204, 214, 219, 223, 227).
+- **Broad error classification:** catches that report and exit but may mislabel an unexpected
+  failure, in `db-genesis.ts`, `db-genesis-verify.ts`, `list-netlify-targets.ts`,
+  `list-supabase-targets.ts`, and `validate-secrets.ts`.
+- **Reporting (§19.1):** `guard-tokens.ts` bypasses `guardFail` and `guardPass`.
+- **Imports (§3.3):** thirteen guards import their own namespace through the alias.
+
+Design record: [DevOps Style Conformance & Shared Error Handling — Backlog Brief](../completed/2026-08-23-devops-style-error-handling-brief.md).
 
 ### B-20 · `edge-deploy` lacks the target-resolution and verification parity `app-deploy.sh` already has
 
@@ -332,12 +352,6 @@ tests were scoped out for exactly this reason: only the API-level tests (the com
 update scope, excluded-field preservation, optional-field clearing) have a conventional home.
 Extending the testing convention to the UX layer is a `CONVENTIONS.md` amendment and needs CA
 authorization before any UX test lands.
-
-### B-22 · The shared test configuration cannot bootstrap `api`
-
-**Observed:** 2026-10-03 · normal
-
-Design record: [Stage Test Authorization — Brief](../active/2026-10-13-stage-test-authorization-brief.md).
 
 ## Core
 

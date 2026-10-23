@@ -1,18 +1,28 @@
-/**
- * Sync shared source trees into the Supabase functions mount boundary.
- *
- * Supabase Edge tooling mounts only `supabase/functions/` into its runtime
- * container, so function imports cannot reach `source/`. This script:
- *
- * 1. Copies the source trees the edge function graph needs into the
- *    generated, gitignored `supabase/functions/_shared/` directory.
- * 2. Generates each function's `deno.json` from the committed
- *    `supabase/functions/import_map.json` (single source of truth).
- * 3. Stamps `_shared` build metadata with VERSION, git build count, and SHA.
- *
- * Run before `supabase functions serve` or `supabase functions deploy` —
- * the `edge-serve` and `edge-deploy` tasks do this automatically.
- */
+/*
+╔════════════════════════════════════════════════════════════════════════════╗
+║ Supabase edge source sync                                                  ║
+║ Copies edge source trees and generates manifests and build metadata.       ║
+╚════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Sync shared source trees into the Supabase functions mount boundary.
+
+Supabase Edge tooling mounts only `supabase/functions/` into its runtime
+container, so function imports cannot reach `source/`. This script:
+
+1. Copies the source trees the edge function graph needs into the
+   generated, gitignored `supabase/functions/_shared/` directory.
+2. Generates each function's `deno.json` from the committed
+   `supabase/functions/import_map.json` (single source of truth).
+3. Stamps `_shared` build metadata with VERSION, git build count, and SHA.
+
+Run before `supabase functions serve` or `supabase functions deploy` —
+the `edge-serve` and `edge-deploy` tasks do this automatically.
+
+Edge tooling mounts only supabase/functions; _shared holds its source graph.
+Run through edge-serve or edge-deploy before serving or deploying functions.
+*/
 
 import type { StringDictionary } from '@core/std'
 
@@ -46,7 +56,7 @@ const copyTree = async (from: string, to: string): Promise<number> => {
   return copied
 }
 
-/** Generate per-function deno.json manifests from the committed import map. */
+// Function manifests share the committed import map.
 const generateManifests = async (): Promise<number> => {
   const map = JSON.parse(await Deno.readTextFile(IMPORT_MAP)) as {
     imports: StringDictionary
@@ -67,7 +77,7 @@ const generateManifests = async (): Promise<number> => {
   return generated
 }
 
-/** Stamp the synced build-meta module with the real build id. */
+// Synced metadata identifies the repository build, rather than the source placeholder.
 const stampBuildMeta = async (): Promise<string> => {
   const version = (await Deno.readTextFile(`${ROOT}/VERSION`)).trim()
   const count = (await git('rev-list', '--count', 'HEAD')).trim()
