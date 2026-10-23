@@ -340,6 +340,17 @@ entry for why.
 
 ## Testing
 
+### B-34 · Running stage tests means assembling five variables from three places by hand
+
+**Observed:** 2026-10-23 · normal
+
+`architecture-devops.md` §12.4 needs `SUPABASE_RDBMS_URL`, `SUPABASE_PUBLIC_KEY`,
+`SUPABASE_CLIENT_MODE`, `LOCAL_DB_NAME`, and `SUPABASE_SERVICE_ROLE_KEY`. The first two are
+placeholders (`__SECRET__`) in the stage env file, with the real values in `secrets.jsonc` behind
+`read-secret.ts`; the service key comes from the Supabase CLI; the client mode must be `edge`. The
+first stage run took several attempts (`effort/completed/2026-10-13-stage-test-authorization-brief.md`).
+A script that sets the environment for a target would make it one command.
+
 ### B-21 · No automated coverage above the domain/API layer — today's manual live pass proved it
 
 **Observed:** 2026-09-07 · normal
@@ -504,3 +515,4 @@ References to update: `deno.jsonc` tasks, `source/devops/scripts/app-style-guide
 `architecture-front.md`'s directory tree, landed 2026-09-30.
 
 _End of Backlog Document_
+ 

@@ -86,7 +86,7 @@ the CA: `effort/completed/2026-10-08-account-manager-brief.md`.
    (`SessionUserContract` and `UserProvider`, the brief's decision 11 and Addendum 5).
 
 **Continues on its own:** stage test authorization
-(`effort/active/2026-10-13-stage-test-authorization-brief.md`), so `users-api-test.ts` and
+(`effort/completed/2026-10-13-stage-test-authorization-brief.md`), so `users-api-test.ts` and
 `session-coordinator-test.ts` can run.
 
 ## M-4 · Notes Editor — Closed 2026-10-18
@@ -136,8 +136,9 @@ them; each fix lands once instead of chasing every copy:
 - **Fresh editor feedback** — closed 2026-10-21,
   `effort/completed/2026-10-19-fresh-editor-feedback-brief.md`: a list action clears the stale
   banner in `AbstractionManager`, which every new manager uses.
-- **Stage test authorization** — `effort/active/2026-10-13-stage-test-authorization-brief.md`: new
-  managers arrive with integration tests that run.
+- **Stage test authorization** — closed 2026-10-23,
+  `effort/completed/2026-10-13-stage-test-authorization-brief.md`: new managers arrive with
+  integration tests that run against stage.
 - **Host-owned list errors** — added and closed 2026-10-21, `a744ee6`: `AbstractionManager`
   presents the collection's load failure from `listError`; copied managers supply it, not the
   banner.

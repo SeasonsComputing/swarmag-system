@@ -271,7 +271,7 @@ whether independent review is a required part of it.
 ## P-11 · How does a production genesis exclude stage-only seed identities?
 
 **Parked:** 2026-10-23 — while settling the stage test authorization brief
-(`effort/active/2026-10-13-stage-test-authorization-brief.md`).
+(`effort/completed/2026-10-13-stage-test-authorization-brief.md`).
 
 **What it is:** Genesis applies one `schema.sql` to every target. Stage seeds a test administrator
 that production must not have.

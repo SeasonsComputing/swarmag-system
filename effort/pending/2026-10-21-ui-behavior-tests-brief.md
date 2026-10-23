@@ -12,7 +12,7 @@ feedback briefs ended in walkthroughs of discard prompts, success banners, and f
 User Manager, Customer Manager, Onboarding, the Sites step, and the notes editor. M-5 copies those
 managers, so each copy repeats the same flows and the same hand checks.
 
-Stage test authorization (`effort/active/2026-10-13-stage-test-authorization-brief.md`) takes the
+Stage test authorization (`effort/completed/2026-10-13-stage-test-authorization-brief.md`) takes the
 API path off the CA: once tests hold a session, a copied manager's create, read, update, and soft
 delete run under `deno task test`. It does not reach UI behavior.
 
@@ -37,7 +37,7 @@ delete run under `deno task test`. It does not reach UI behavior.
 2. **How a browser test signs in to stage,** and whether it shares the session fixture that stage
    test authorization introduces.
 3. **Where the tests live and how they run:** beside `source/tests/cases/` under
-   `deno task test`, or as a separate task; CONVENTIONS §18 names only API tests today.
+   `deno task test`, or as a separate task.
 4. **Which flows come first:** the discard prompt, the feedback banner, and New/Save/Delete in
    `AbstractionManager`, which every copied manager inherits, are the likely candidates.
 
