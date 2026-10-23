@@ -32,7 +32,7 @@ picked.
    with the topic's validators in `api.ts`, and `makeAdaptedScope` in `scopes.ts`.
 2. **Every setter for a structured field copies its value** (`copyDraft`), as `notes`, `roles`, and
    `sites` do; scalar setters do not. The rule is in the `workbench-draft.ts` header: a draft never
-   shares structure with its source. `Chemical.labels` and both topics' `notes` need it.
+   shares structure with its source. Both topics' `notes` need it.
 3. **Status badges are an exhaustive `Record<Status, …>`,** as Customer's are, not an inline
    ternary: `AssetStatus` has four values, and the type catches a missing one.
 4. **Steps are declared inline in the manager** unless another host composes the same steps, as
@@ -48,8 +48,8 @@ picked.
    | While typing, control to state | raw text, untouched                                                                                    | `UiText.number(v)`   |
    | Out, projection or save        | required `toTrimmed(v)`; optional `UiText.optional(toTrimmed(v))`; email `UiText.optional(toEmail(v))` | already parsed       |
 
-   A nested editor that writes domain values as it types (Sites, and `Chemical.labels`) applies
-   the "out" column when it saves, as `customerSiteDraft` does.
+   A nested editor that writes domain values as it types (Sites) applies the "out" column when it
+   saves, as `customerSiteDraft` does.
 7. **The collection's load error is supplied, not rendered:** `listError: () => query.error`.
    `AbstractionManager` presents it.
 
@@ -62,8 +62,10 @@ The recipe does not cover these; each is a design conversation before its manage
    copied from Customers and produced first. Delete and `active` keep their own meanings: delete is
    CRUD's delete, and `active` is a field on the form. The Asset Manager's type picker reads the
    list through `useAssetTypes`, which follows `useFacets`, and offers only active types.
-2. **`Chemical.labels` is a `CompositionMany<ChemicalLabel>`** of `{ url, description? }`: a nested
-   editor, as Sites and Notes are.
+2. **`Chemical.labels` is a `CompositionMany<ChemicalLabel>`** of `{ url, description? }`. Settled
+   2026-10-23: a label is a title and a reference to a document already in storage; its editor
+   never uploads. The Chemical Manager ships without a labels editor, which waits for document
+   storage, as additional-contact assignment waits for portal users.
 
 ## Production scope
 
@@ -86,5 +88,8 @@ Operating mode: **Feature**, in `front/` only: `api.ts`, `scopes.ts`, a new
   CA designed `AssetType` to extend as `Facet` does, and settled that the admin app manages it with
   its own manager. Asked whether retiring a type means deleting it or clearing `active`, the CA
   kept CRUD as CRUD: delete means what it means, and so does `active`.
+- **2026-10-23, chemical labels wait for storage.** The draft planned a labels editor beside Sites
+  and Notes. The CA set a label as a reference to an already-uploaded document, so the editor has
+  nothing to reference until document storage lands.
 
 _End of Brief_

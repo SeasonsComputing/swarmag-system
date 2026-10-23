@@ -176,6 +176,9 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 - **Asset Manager** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`;
   `effort/active/2026-10-21-asset-chemical-managers-brief.md`.
 - **Chemical Manager** (`project-user-stories.md` §4) — Manager, wire `api.Chemicals`; same brief.
+  The labels editor waits for document storage.
+- **Document storage** — the Attachments capability M-4 assigned to this milestone; asset
+  documents and Chemical labels reference it. Brief to come.
 
 ## M-6 · Workflow, Task, Question & Service
 
