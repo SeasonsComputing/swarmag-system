@@ -19,7 +19,7 @@ AssetUpdate      Update payload for Asset.
 import type { CreateFromInstantiable, UpdateFromInstantiable } from '@core/std'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 
-/* AssetType protolocl */
+/* AssetType protocol */
 export type AssetTypeCreate = CreateFromInstantiable<AssetType>
 export type AssetTypeUpdate = UpdateFromInstantiable<AssetType>
 
