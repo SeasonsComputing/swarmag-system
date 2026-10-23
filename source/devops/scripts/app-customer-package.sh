@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Customer application package                                             ║
+# ║ Builds a target-bound Customer archive and checks packaged assets.       ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
 set -euo pipefail
 
 TARGET="${1:-}"

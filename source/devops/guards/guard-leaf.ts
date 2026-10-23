@@ -1,6 +1,13 @@
-/**
- * Guard against files living in non-leaf directories.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Leaf directory guard                                                         ║
+║ Reject files in non-leaf source and documentation directories.               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Guard against files living in non-leaf directories.
+*/
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
@@ -20,10 +27,10 @@ const ALLOWED_NON_LEAF_DIRS = new Set([
   `${ROOT}/source/front/app-customer`
 ])
 
-/** Normalize path separators for stable comparisons across platforms. */
+// Normalize path separators for stable comparisons across platforms.
 const normalizePath = (value: string): string => value.replaceAll('\\', '/')
 
-/** Collect violations for files in non-leaf directories. */
+// Collect violations for files in non-leaf directories.
 const collectViolations = async (dir: string): Promise<string[]> => {
   const violations: string[] = []
   let hasSubdirs = false

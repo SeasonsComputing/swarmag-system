@@ -1,6 +1,13 @@
-/**
- * CRUD contract tests for Users API.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Users API tests                                                              ║
+║ Verify the stage Users CRUD lifecycle and soft-delete contract.              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+CRUD contract tests for Users API.
+*/
 
 import { ApiError } from '@core/stdx'
 import { assert, assertEquals, assertRejects } from '@std/assert'

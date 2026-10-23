@@ -1,4 +1,9 @@
 #!/bin/sh
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Pre-commit hook template                                                 ║
+# ║ Runs completed-record and governance guards before a commit.             ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
 # Pre-commit hook template, installed by `deno task hooks:install`.
 # Do not edit the copy at .git/hooks/pre-commit directly — it is gitignored
 # and regenerated from here.

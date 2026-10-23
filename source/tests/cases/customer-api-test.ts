@@ -1,6 +1,13 @@
-/**
- * Customer API update-scope tests using the real client and an in-memory HTTP transport.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Customer API scope tests                                                     ║
+║ Verify Customer update scopes through an in-memory HTTP transport.           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Customer API update-scope tests using the real client and an in-memory HTTP transport.
+*/
 
 import { Config } from '@core/cfg/config.ts'
 import { Supabase } from '@core/db/supabase.ts'
@@ -11,8 +18,8 @@ import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
 import { scopes } from '@front/api/scopes.ts'
 import { assertEquals } from '@std/assert'
 import { createClient } from '@supabase/client'
-import { blueMesaRanchCustomer } from '@tests/fixtures/customer-samples.ts'
-import { salesUserSample } from '@tests/fixtures/user-samples.ts'
+import { CustomerSamples } from '@tests/fixtures/customer-samples.ts'
+import { UserSamples } from '@tests/fixtures/user-samples.ts'
 
 Config.init({
   get: key => key === 'LOCAL_DB_NAME' ? 'customer-api-test' : undefined,
@@ -31,7 +38,7 @@ Deno.test('Customer API creates from detail fields and declared defaults', async
       notes: customer.notes,
       id: customer.id
     }
-    const created = await api.Customers.create(scope.toCreate(richerDraft))
+    const created = await api.Customers.create(Scope.toCreate(richerDraft))
     assertEquals(detailDraft(created), draft)
     assertEquals(created.accountManagerId, customer.accountManagerId)
     assertEquals(created.notes, draft.notes)
@@ -54,7 +61,7 @@ Deno.test('Customer API detail scope writes all declared fields in one update', 
       country: 'US',
       sites: [{ ...customer.sites[0], label: 'Updated site' }]
     }
-    const updated = await api.Customers.update(scope.adapter, scope.toUpdate(customer.id, input))
+    const updated = await api.Customers.update(Scope.adapter, Scope.toUpdate(customer.id, input))
     assertEquals(detailDraft(updated), input)
     assertEquals(await api.Customers.get(customer.id), updated)
   })
@@ -63,14 +70,14 @@ Deno.test('Customer API detail scope writes all declared fields in one update', 
 Deno.test('Customer API detail scope assigns and explicitly clears the account manager', async () => {
   await withCustomer(async customer => {
     const assigned = await api.Customers.update(
-      scope.adapter,
-      scope.toUpdate(customer.id, { ...detailDraft(customer), accountManagerId: salesUserSample.id })
+      Scope.adapter,
+      Scope.toUpdate(customer.id, { ...detailDraft(customer), accountManagerId: UserSamples.sales.id })
     )
-    assertEquals((await api.Customers.get(customer.id)).accountManagerId, salesUserSample.id)
+    assertEquals((await api.Customers.get(customer.id)).accountManagerId, UserSamples.sales.id)
     const input = { ...detailDraft(assigned), accountManagerId: undefined }
-    const projected = scope.toUpdate(customer.id, input)
+    const projected = Scope.toUpdate(customer.id, input)
     assertEquals(projected.accountManagerId, null)
-    const updated = await api.Customers.update(scope.adapter, projected)
+    const updated = await api.Customers.update(Scope.adapter, projected)
     assertEquals(updated.accountManagerId, undefined)
     assertEquals((await api.Customers.get(customer.id)).accountManagerId, undefined)
     assertEquals(updated.notes, customer.notes)
@@ -86,14 +93,14 @@ Deno.test('Customer API detail scope replaces and clears account notes', async (
       visibility: 'shared' as const
     }]
     const updated = await api.Customers.update(
-      scope.adapter,
-      scope.toUpdate(customer.id, { ...detailDraft(customer), notes })
+      Scope.adapter,
+      Scope.toUpdate(customer.id, { ...detailDraft(customer), notes })
     )
     assertEquals(updated.notes, notes)
     assertEquals(updated.accountManagerId, customer.accountManagerId)
     const cleared = await api.Customers.update(
-      scope.adapter,
-      scope.toUpdate(customer.id, { ...detailDraft(updated), notes: [] })
+      Scope.adapter,
+      Scope.toUpdate(customer.id, { ...detailDraft(updated), notes: [] })
     )
     assertEquals(cleared.notes, [])
     assertEquals((await api.Customers.get(customer.id)).notes, [])
@@ -104,8 +111,8 @@ Deno.test('Customer API detail scope clears optional address and contact values'
   await withCustomer(async customer => {
     const { email: _email, ...contact } = customer.primaryContact[0]
     const updated = await api.Customers.update(
-      scope.adapter,
-      scope.toUpdate(customer.id, {
+      Scope.adapter,
+      Scope.toUpdate(customer.id, {
         ...detailDraft(customer),
         line2: undefined,
         primaryContact: [contact]
@@ -121,10 +128,10 @@ Deno.test('Customer API detail scope clears optional address and contact values'
 })
 
 /** The Customer detail scope under test. */
-const scope = scopes.Customers.detail
+const Scope = scopes.Customers.detail
 
-/** Project a Customer onto its detail-scope draft. */
-const detailDraft = (customer: Customer): DraftOf<typeof scope> => ({
+// Project a Customer onto its detail-scope draft.
+const detailDraft = (customer: Customer): DraftOf<typeof Scope> => ({
   primaryContact: customer.primaryContact,
   name: customer.name,
   status: customer.status,
@@ -139,17 +146,15 @@ const detailDraft = (customer: Customer): DraftOf<typeof scope> => ({
   notes: customer.notes
 })
 
-/**
- * Run a test against a sample Customer through the composed API and a stubbed transport.
- * Exercise the public composed API, validators, SDK, and adapters without a live database.
- */
+// Run a test against a sample Customer through the composed API and a stubbed transport.
+// Exercise the public composed API, validators, SDK, and adapters without a live database.
 const withCustomer = async (run: (customer: Customer) => Promise<void>): Promise<void> => {
   const customer: Customer = {
-    ...structuredClone(blueMesaRanchCustomer),
+    ...structuredClone(CustomerSamples.blueMesaRanch),
     line2: 'Suite 2',
     notes: [{
       content: 'Account history must survive editing.',
-      createdAt: blueMesaRanchCustomer.createdAt,
+      createdAt: CustomerSamples.blueMesaRanch.createdAt,
       attachments: [],
       visibility: 'internal'
     }]

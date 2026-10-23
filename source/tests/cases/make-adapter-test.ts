@@ -1,8 +1,15 @@
-/**
- * Unit tests for make-adapter patch and NULL semantics: absent keys leave
- * columns untouched, null clears, falsy values write through, and storage
- * NULL maps to domain absence.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Adapter tests                                                                ║
+║ Verify patch, null, falsy value, and composition mapping semantics.          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Unit tests for make-adapter patch and NULL semantics: absent keys leave
+columns untouched, null clears, falsy values write through, and storage
+NULL maps to domain absence.
+*/
 
 import { type AdapterPatch, makeAdapter, makeScopedUpdate } from '@core/stdx'
 import { assertEquals } from '@std/assert'

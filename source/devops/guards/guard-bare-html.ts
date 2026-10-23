@@ -1,3 +1,10 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Bare HTML guard                                                              ║
+║ Enforce shared UI controls in application and UX markup.                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
 import type { StringDictionary } from '@core/std'
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 import { walk } from '@std/walk'
@@ -9,9 +16,9 @@ const SKIP_DIRS = [
   'source/front/app-style-guide'
 ]
 
-const BARE_HTML_REGEX =
+const BareHtmlRegex =
   /<(button|input|textarea|select|ul|ol|li|table|thead|tbody|tfoot|tr|td|th|fieldset|legend)[\s/>]/g
-const COMMENT_LINE_REGEX = /^\s*\/\//
+const CommentLineRegex = /^\s*\/\//
 
 const Replacements: StringDictionary = {
   'button': 'UiButton',
@@ -39,7 +46,7 @@ const shouldSkip = (filePath: string): boolean => {
 
 const isCommentLine = (line: string): boolean => {
   const trimmed = line.trim()
-  return COMMENT_LINE_REGEX.test(trimmed) || trimmed.includes('{/*')
+  return CommentLineRegex.test(trimmed) || trimmed.includes('{/*')
 }
 
 const main = async () => {
@@ -66,9 +73,9 @@ const main = async () => {
 
       if (isCommentLine(line)) continue
 
-      BARE_HTML_REGEX.lastIndex = 0
+      BareHtmlRegex.lastIndex = 0
       let match: RegExpExecArray | null
-      while ((match = BARE_HTML_REGEX.exec(line)) !== null) {
+      while ((match = BareHtmlRegex.exec(line)) !== null) {
         const element = match[1]
         const replacement = Replacements[element]
         violations.push(

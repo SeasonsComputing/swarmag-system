@@ -1,8 +1,15 @@
-/**
- * Unit tests for validator guard null/undefined semantics: optional fields
- * admit undefined (absent) and null (clear marker); required fields reject
- * both. Also covers domain guards with substance rules (isLocation).
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Validator tests                                                              ║
+║ Verify optional and required values, normalization, and substance.           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Unit tests for validator guard null/undefined semantics: optional fields
+admit undefined (absent) and null (clear marker); required fields reject
+both. Also covers domain guards with substance rules (isLocation).
+*/
 
 import {
   expectBoolean,

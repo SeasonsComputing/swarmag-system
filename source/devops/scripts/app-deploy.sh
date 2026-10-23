@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Application deployment                                                   ║
+# ║ Checks, packages, deploys, and smoke-tests selected UX applications.     ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
 set -euo pipefail
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -6,6 +11,7 @@ set -euo pipefail
 #
 # Usage: app-deploy.sh --app {admin|ops|customer} [app …] --target {dev|stage|prod}
 # ──────────────────────────────────────────────────────────────────────────────
+
 
 APPS=()
 TARGET=""

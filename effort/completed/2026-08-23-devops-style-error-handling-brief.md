@@ -1,6 +1,9 @@
 # DevOps Style Conformance & Shared Error Handling — Backlog Brief
 
-**Backlog, not dispatched.**
+**Closed 2026-10-22, in part.** Header, naming, and comment conformance for `source/devops/` and
+`source/tests/` shipped in the charter experiment (`2026-10-21-charter-experiment-brief.md`,
+amendment "Production record"). The shared error-handling retrofit changes runtime behavior and was
+not done; it remains as backlog B-19. Recorded 2026-08-23.
 
 **Amended 2026-09-24 — placement decided by CA.** DevOps conventions are a subset of
 `CONVENTIONS.md` with devops and tests allowances. Documented that way, they live in a

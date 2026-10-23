@@ -55,6 +55,7 @@ const NamespaceDirs = {
   tests: '/source/tests'
 } as const
 
+/** Source namespace or external dependency classification. */
 type Namespace =
   | keyof typeof NamespaceDirs
   | 'external'
@@ -200,7 +201,7 @@ const checkFrontImports = (file: string, imports: Array<{ specifier: string }>):
   return violations
 }
 
-/** Validate Config singleton usage */
+// Validate Config singleton usage
 const checkConfigImports = (file: string, imports: Array<{ specifier: string }>): string[] => {
   const violations: string[] = []
   const configModule = isConfigModule(file)

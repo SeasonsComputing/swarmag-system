@@ -1,8 +1,10 @@
 # CSS Guard — Complete Selector Parsing
 
-**Backlog, not dispatched.** Recorded 2026-10-03 following CA review of the Helm widget's
-`visible-no-icon` production. Writing this brief and its backlog entry is authorized; guard
-implementation and the subsequent Helm correction require their own production authorization.
+**Closed 2026-10-22.** The guard repair shipped in the charter experiment
+(`2026-10-21-charter-experiment-brief.md`, amendment "Production record"): complete-selector parsing
+with fifteen regression tests. The Helm correction in step 5 is moot: Helm no longer has a
+`visible-no-icon` mode or the workaround marker. Recorded 2026-10-03 following CA review of the Helm
+widget's `visible-no-icon` production.
 
 ## What triggered it
 

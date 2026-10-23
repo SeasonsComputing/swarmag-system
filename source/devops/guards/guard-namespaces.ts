@@ -55,26 +55,26 @@ const ALLOWED_UI_PREFIXES = [
 // HELPERS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Check if an import specifier is forbidden for ux/ui files. */
+// Check if an import specifier is forbidden for ux/ui files.
 const isForbiddenUiImport = (spec: string): boolean => {
   if (spec.startsWith('.')) return false // Relative imports allowed
   if (ALLOWED_UI_PREFIXES.some(p => spec.startsWith(p))) return false
   return FORBIDDEN_UI_IMPORTS.some(p => spec.startsWith(p))
 }
 
-/** Check if an import specifier is an app import @front/app-X/... */
+// Check if an import specifier is an app import @front/app-X/...
 const isAppImport = (spec: string): string | null => {
   const match = spec.match(/^@front\/(app-[^/]+)(?:\/|$)/)
   return match ? match[1] : null
 }
 
-/** Extract the top-level front sub-namespace a specifier targets, e.g. '@front/app/shell' -> 'app'. */
+// Extract the top-level front sub-namespace a specifier targets, e.g. '@front/app/shell' -> 'app'.
 const frontSubNamespace = (spec: string): string | null => {
   const match = spec.match(/^@front\/([^/]+)/)
   return match ? match[1] : null
 }
 
-/** Extract all import specifiers from source code. */
+// Extract all import specifiers from source code.
 const extractImports = (source: string): string[] => {
   const imports: string[] = []
   const staticImportRegex = /\b(?:import|export)\s+(?:type\s+)?(?:[^'"]*?\s+from\s+)?['"]([^'"]+)['"]/g
@@ -86,14 +86,14 @@ const extractImports = (source: string): string[] => {
   return imports
 }
 
-/** Determine if a path is under a given directory. */
+// Determine if a path is under a given directory.
 const isUnder = (path: string, dir: string): boolean => {
   const normalized = path.replace(/\\/g, '/')
   const normalizedDir = dir.replace(/\\/g, '/')
   return normalized.startsWith(normalizedDir + '/')
 }
 
-/** Resolve a relative import specifier against its importing file. */
+// Resolve a relative import specifier against its importing file.
 const resolveRelativeImport = (file: string, spec: string): string => {
   const normalized = `${file.slice(0, file.lastIndexOf('/'))}/${spec}`.replaceAll('\\', '/')
   const resolved: string[] = []
@@ -105,7 +105,7 @@ const resolveRelativeImport = (file: string, spec: string): string => {
   return `${normalized.startsWith('/') ? '/' : ''}${resolved.join('/')}`
 }
 
-/** Check if an import specifier reaches the shared widget catalog. */
+// Check if an import specifier reaches the shared widget catalog.
 const isWidgetImport = (file: string, spec: string): boolean => {
   if (spec.startsWith('@ux/widgets/') || spec === '@ux/widgets') return true
   if (!spec.startsWith('.')) return false
@@ -114,7 +114,7 @@ const isWidgetImport = (file: string, spec: string): boolean => {
   return importedPath === widgetsDir || isUnder(importedPath, widgetsDir)
 }
 
-/** Extract app name from a path like source/front/app-admin/... */
+// Extract app name from a path like source/front/app-admin/...
 const extractAppName = (path: string): string | null => {
   const match = path.match(/source[/\\]front[/\\](app-[^/\\]+)/)
   return match ? match[1] : null

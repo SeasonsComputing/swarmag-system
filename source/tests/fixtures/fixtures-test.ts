@@ -1,21 +1,20 @@
-/**
- * Fixture integrity checks for shared sample data.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Fixture integrity tests                                                      ║
+║ Verify shared samples satisfy domain identity and linkage constraints.       ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Fixture integrity checks for shared sample data.
+*/
 
 import { isId, isWhen, StringSet } from '@core/std'
 import type { AssetStatus } from '@domain/abstractions/asset.ts'
 import { assert, assertEquals } from '@std/assert'
-import {
-  assetSamples,
-  assetTypeSamples,
-  customerSamples,
-  customerUserSamples,
-  facetSamples,
-  jobSamples,
-  sharedQuestionSamples
-} from './samples.ts'
+import { AssetSamples, CustomerSamples, FacetSamples, JobSamples, WorkflowSamples } from './samples.ts'
 
-const allowedAssetStatuses: AssetStatus[] = [
+const ALLOWED_ASSET_STATUSES: AssetStatus[] = [
   'active',
   'maintenance',
   'retired',
@@ -25,7 +24,7 @@ const allowedAssetStatuses: AssetStatus[] = [
 Deno.test('fixture integrity: asset fixtures respect domain constraints', () => {
   const seenAssetTypes = new StringSet()
 
-  for (const assetType of assetTypeSamples) {
+  for (const assetType of AssetSamples.types) {
     assert(isId(assetType.id))
     assert(!seenAssetTypes.has(assetType.id))
     seenAssetTypes.add(assetType.id)
@@ -36,9 +35,9 @@ Deno.test('fixture integrity: asset fixtures respect domain constraints', () => 
     assert(isWhen(assetType.updatedAt))
   }
 
-  for (const asset of assetSamples) {
+  for (const asset of AssetSamples.all) {
     assert(isId(asset.id))
-    assert(allowedAssetStatuses.includes(asset.status))
+    assert(ALLOWED_ASSET_STATUSES.includes(asset.status))
     assert(isId(asset.type))
     assert(isWhen(asset.createdAt))
     assert(isWhen(asset.updatedAt))
@@ -46,7 +45,7 @@ Deno.test('fixture integrity: asset fixtures respect domain constraints', () => 
 })
 
 Deno.test('fixture integrity: job assessment fixture always carries locations and timestamps', () => {
-  const { assessment } = jobSamples
+  const { assessment } = JobSamples.all
   assert(isId(assessment.id))
   assert(isId(assessment.jobId))
   assert(isId(assessment.assessorId))
@@ -57,7 +56,7 @@ Deno.test('fixture integrity: job assessment fixture always carries locations an
 })
 
 Deno.test('fixture integrity: customer fixtures keep primary contact composition intact', () => {
-  for (const customer of customerSamples) {
+  for (const customer of CustomerSamples.all) {
     assert(isId(customer.id))
     assert(customer.primaryContact.filter(Boolean).length === 1)
     assert(isWhen(customer.createdAt))
@@ -66,9 +65,9 @@ Deno.test('fixture integrity: customer fixtures keep primary contact composition
 })
 
 Deno.test('fixture integrity: customer contact junction fixtures carry valid keys', () => {
-  const customerIds = new StringSet(customerSamples.map(customer => customer.id))
+  const customerIds = new StringSet(CustomerSamples.all.map(customer => customer.id))
 
-  for (const contact of customerUserSamples) {
+  for (const contact of CustomerSamples.users) {
     assert(isId(contact.customerId))
     assert(isId(contact.userId))
     assert(customerIds.has(contact.customerId))
@@ -76,7 +75,7 @@ Deno.test('fixture integrity: customer contact junction fixtures carry valid key
 })
 
 Deno.test('fixture integrity: shared questions include labels and values', () => {
-  for (const question of sharedQuestionSamples) {
+  for (const question of WorkflowSamples.all) {
     assert(isId(question.id))
     assert(question.prompt.length > 0)
     if (question.type === 'single-select' || question.type === 'multi-select') {
@@ -91,7 +90,7 @@ Deno.test('fixture integrity: shared questions include labels and values', () =>
 
 Deno.test('fixture integrity: facet fixtures carry reserved-free keys and unique pairs', () => {
   const seen = new StringSet()
-  for (const facet of facetSamples) {
+  for (const facet of FacetSamples.all) {
     assert(isId(facet.id))
     assert(facet.scheme.length > 0 && !facet.scheme.includes(':'))
     assert(facet.code.length > 0 && !facet.code.includes(':'))

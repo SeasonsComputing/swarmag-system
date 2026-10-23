@@ -1,6 +1,13 @@
-/**
- * Facet adapter and protocol validation contract tests.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Facet API tests                                                              ║
+║ Verify facet adapters, references, and protocol validation.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Facet adapter and protocol validation contract tests.
+*/
 
 import type { Facet } from '@domain/abstractions/common.ts'
 import { FacetAdapter } from '@domain/adapters/common-adapter.ts'
@@ -14,11 +21,11 @@ import {
 import { validateServiceCreate, validateServiceUpdate } from '@domain/validators/service-validator.ts'
 import { validateWorkflowCreate, validateWorkflowUpdate } from '@domain/validators/workflow-validator.ts'
 import { assert, assertEquals } from '@std/assert'
-import { aerialSprayFacet } from '@tests/fixtures/facet-samples.ts'
+import { FacetSamples } from '@tests/fixtures/facet-samples.ts'
 
 Deno.test('Facet adapter round-trips active and retired catalog entries', () => {
   for (const active of [true, false]) {
-    const facet: Facet = { ...aerialSprayFacet, active }
+    const facet: Facet = { ...FacetSamples.aerialSpray, active }
     const record = FacetAdapter.fromDomain(facet)
     assertEquals(record.scheme, facet.scheme)
     assertEquals(record.created_at, facet.createdAt)
@@ -28,26 +35,32 @@ Deno.test('Facet adapter round-trips active and retired catalog entries', () => 
 })
 
 Deno.test('Facet create validates required fields and reserved separators', () => {
-  assertEquals(validateFacetCreate(aerialSprayFacet), null)
-  assertEquals(validateFacetCreate({ ...aerialSprayFacet, active: false }), null)
+  assertEquals(validateFacetCreate(FacetSamples.aerialSpray), null)
+  assertEquals(validateFacetCreate({ ...FacetSamples.aerialSpray, active: false }), null)
   for (const field of ['scheme', 'code', 'label'] as const) {
     for (const value of ['', '   ', undefined]) {
-      assert(validateFacetCreate({ ...aerialSprayFacet, [field]: value } as FacetCreate) !== null)
+      assert(
+        validateFacetCreate({ ...FacetSamples.aerialSpray, [field]: value } as FacetCreate) !== null
+      )
     }
   }
   for (const field of ['scheme', 'code'] as const) {
-    assert(validateFacetCreate({ ...aerialSprayFacet, [field]: 'a:b' }) !== null)
+    assert(validateFacetCreate({ ...FacetSamples.aerialSpray, [field]: 'a:b' }) !== null)
   }
-  assert(validateFacetCreate({ ...aerialSprayFacet, active: 'true' } as unknown as FacetCreate) !== null)
   assert(
-    validateFacetCreate({ ...aerialSprayFacet, active: undefined } as unknown as FacetCreate) !== null
+    validateFacetCreate({ ...FacetSamples.aerialSpray, active: 'true' } as unknown as FacetCreate)
+      !== null
+  )
+  assert(
+    validateFacetCreate({ ...FacetSamples.aerialSpray, active: undefined } as unknown as FacetCreate)
+      !== null
   )
 })
 
 Deno.test('Facet update validates supplied fields while allowing partial updates', () => {
-  const patch: FacetUpdate = { id: aerialSprayFacet.id, active: false, label: 'Retired spray' }
+  const patch: FacetUpdate = { id: FacetSamples.aerialSpray.id, active: false, label: 'Retired spray' }
   assertEquals(validateFacetUpdate(patch), null)
-  assertEquals(validateFacetUpdate({ id: aerialSprayFacet.id }), null)
+  assertEquals(validateFacetUpdate({ id: FacetSamples.aerialSpray.id }), null)
   assert(validateFacetUpdate({ ...patch, id: 'invalid' }) !== null)
   for (const field of ['scheme', 'code'] as const) {
     assert(validateFacetUpdate({ ...patch, [field]: 'a:b' }) !== null)
@@ -67,7 +80,7 @@ Deno.test('Facet references require exactly one separator and non-empty parts', 
 Deno.test('Note validation accepts notes without tags', () => {
   assert(isNote({
     attachments: [],
-    createdAt: aerialSprayFacet.createdAt,
+    createdAt: FacetSamples.aerialSpray.createdAt,
     content: 'Operational knowledge',
     visibility: 'internal'
   }))
@@ -84,7 +97,7 @@ Deno.test('Service and Workflow create and update validate facet references', ()
   const workflow = { name: 'Spray preparation', version: 1, notes: [], facets: service.facets }
   assertEquals(validateServiceCreate(service), null)
   assertEquals(validateWorkflowCreate(workflow), null)
-  const patch = { id: aerialSprayFacet.id, facets: service.facets }
+  const patch = { id: FacetSamples.aerialSpray.id, facets: service.facets }
   assertEquals(validateServiceUpdate(patch), null)
   assertEquals(validateWorkflowUpdate(patch), null)
   for (const facets of [[], ['service:aerial/spray', 'asset:drone']]) {

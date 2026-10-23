@@ -1,26 +1,68 @@
-import { StringSet } from '@core/std'
-import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
-import { walk } from '@std/walk'
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ CSS policy guard                                                             ║
+║ Audits complete selectors and declarations under existing layer policies.    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
-const ROOT = Deno.cwd().replaceAll('\\', '/')
-const COMMON_DIR = `${ROOT}/source/ux`
-const CSS_DIR = `${ROOT}/source/ux/ui/css`
-const APP_DIRS = [
-  `${ROOT}/source/front/app-admin`,
-  `${ROOT}/source/front/app-customer`,
-  `${ROOT}/source/front/app-ops`,
-  `${ROOT}/source/front/app-style-guide`
-]
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Checks CSS ownership, attributes, token declarations, and values independently
+of physical selector layout. Runs the repository sweep only as a CLI entry.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+auditCss(content, filePath)  Return located violations for one CSS source.
+*/
+
+import { StringSet } from '@core/std'
+import { walk } from '@std/walk'
+import { guardFail, guardPass } from './guard-utils.ts'
+
+/**
+ * Audit one CSS source without reading the repository or terminating the host.
+ * @param content CSS source text.
+ * @param filePath Repository-relative path selecting the existing layer policies.
+ * @returns Located policy violations, or an empty list.
+ */
+export const auditCss = (content: string, filePath: string): string[] => {
+  const { rules, declarations } = parseCss(content)
+  // Selector parsing must not broaden the existing physical-line value audits.
+  // Complete declarations remain attached to rules for icon association.
+  const lines = declarations.flatMap(declaration =>
+    declaration.line.split('\n').map((line, index) => ({
+      line,
+      lineNumber: declaration.lineNumber + index,
+      fontFace: declaration.fontFace
+    }))
+  )
+  const fileName = filePath.split('/').at(-1) ?? ''
+  const designSystem = filePath.startsWith('source/ux/ui/css/') && CSS_FILES.includes(fileName)
+  const tokenOnly = designSystem && TOKEN_ONLY_FILES.has(fileName)
+  const violations = auditTokenDeclarations(lines, filePath, fileName)
+  if (tokenOnly) violations.push(...auditTokenOnlyDeclarations(lines, filePath))
+
+  if (!designSystem) violations.push(...auditFeatureCss(rules, filePath))
+  else if (fileName === 'tokens.css' || fileName === 'roles.css') {
+    violations.push(...auditTokensCss(rules, filePath, true, false))
+  } else if (fileName === 'themes.css') {
+    violations.push(...auditTokensCss(rules, filePath, false, true))
+  } else if (fileName === 'base.css') violations.push(...auditBaseCss(rules, filePath))
+  else if (fileName === 'ui.css') violations.push(...auditControlsCss(rules, filePath))
+  else if (fileName === 'icons.css') violations.push(...auditIconCatalogCss(rules, filePath))
+
+  violations.push(...auditValueRules(lines, filePath, tokenOnly))
+  return violations
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// POLICY DEFINITIONS
+// ────────────────────────────────────────────────────────────────────────────
 
 const CSS_FILES = ['tokens.css', 'roles.css', 'themes.css', 'base.css', 'ui.css', 'icons.css']
 const TOKEN_ONLY_FILES = new StringSet(['tokens.css', 'roles.css', 'themes.css'])
 
-const SELECTOR_REGEX = /^([^/{\n]*)\{/
-const DATA_ATTRIBUTE_REGEX = /\[(data-[a-zA-Z0-9_-]+)(?:=(['"]?)([^'"\]\s]+)\2)?\]/g
-const TOKEN_DECLARATION_REGEX = /^\s*(--sa-[^:]+)\s*:/
-const COMMENT_LINE_REGEX = /^\s*\/\//
-const BLOCK_COMMENT_START = /\/\*/
-const BLOCK_COMMENT_END = /\*\//
+const DataAttributeRegex = /\[(data-[a-zA-Z0-9_-]+)(?:=(['"]?)([^'"\]\s]+)\2)?\]/g
+const TokenDeclarationRegex = /^\s*(--sa-[^:]+)\s*:/
 
 const IMMUTABLE_TOKEN_NAMES = new StringSet([
   '--sa-base-size'
@@ -63,108 +105,209 @@ const ALLOWED_DATA_ATTRIBUTES = new StringSet([
   'data-selected'
 ])
 
-const DATA_ATTRIBUTE_VALUE_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
-const FEATURE_ATTRIBUTE_REGEX = /^data-(?:shell|widget|app)(?:-[a-z0-9]+)*$/
+const DataAttributeValueRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+const FeatureAttributeRegex = /^data-(?:shell|widget|app)(?:-[a-z0-9]+)*$/
 
-interface CSSLine {
+// ────────────────────────────────────────────────────────────────────────────
+// CSS SCANNING
+// ────────────────────────────────────────────────────────────────────────────
+
+/** A declaration statement and its source location. */
+type CssDeclaration = {
   line: string
   lineNumber: number
-  isComment: boolean
+  fontFace: boolean
 }
 
-const parseLines = (content: string): CSSLine[] => {
-  const lines = content.split('\n')
-  const result: CSSLine[] = []
-  let inBlockComment = false
+/** One branch of a complete rule selector. */
+type CssSelector = {
+  selector: string
+  lineNumber: number
+}
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]
-    const isCommentLine = COMMENT_LINE_REGEX.test(line)
-    let isCommentBlock = false
+/** A qualified rule with declarations owned by its own block. */
+type CssRule = {
+  selectors: CssSelector[]
+  declarations: CssDeclaration[]
+}
 
-    if (BLOCK_COMMENT_START.test(line)) {
-      inBlockComment = true
-      isCommentBlock = true
-    }
-    if (BLOCK_COMMENT_END.test(line)) {
-      inBlockComment = false
-      isCommentBlock = true
-    }
+/** An open rule or at-rule block during bounded scanning. */
+type CssBlock = {
+  rule: CssRule | undefined
+  fontFace: boolean
+}
 
-    result.push({
-      line,
-      lineNumber: i + 1,
-      isComment: isCommentLine || inBlockComment || isCommentBlock
-    })
+// Comments become whitespace so punctuation inside them cannot affect parsing.
+// Newlines remain intact for branch and declaration diagnostics.
+const stripComments = (content: string): string => {
+  let result = ''
+  let comment = false
+  let quote = ''
+  let escaped = false
+  for (let i = 0; i < content.length; i++) {
+    const char = content[i]
+    if (comment) {
+      if (char === '*' && content[i + 1] === '/') {
+        result += '  '
+        i++
+        comment = false
+      } else result += char === '\n' ? '\n' : ' '
+    } else if (escaped) {
+      result += char
+      escaped = false
+    } else if (char === '\\') {
+      result += char
+      escaped = true
+    } else if (quote) {
+      result += char
+      if (char === quote) quote = ''
+    } else if (char === '\'' || char === '"') {
+      result += char
+      quote = char
+    } else if (char === '/' && content[i + 1] === '*') {
+      result += '  '
+      i++
+      comment = true
+    } else result += char
   }
-
   return result
 }
 
-const extractSelector = (lines: CSSLine[], index: number): string | null => {
-  const parts: string[] = []
-  // Formatting may split a selector before its opening brace. Read back to the
-  // preceding declaration or block, retaining every selector attribute.
-  for (let i = index; i >= 0; i--) {
-    const { line, isComment } = lines[i]
-    if (isComment) continue
-    if (i < index && /[{};]/.test(line)) break
-    parts.unshift(line.trim())
-  }
-  const match = parts.join(' ').match(SELECTOR_REGEX)
-  return match ? match[1].trim() : null
-}
-
-// A comma inside a functional selector or quoted attribute is not a list boundary.
-const splitSelectors = (selector: string): string[] => {
-  const selectors: string[] = []
+// Split only rule preludes: commas in declaration values and at-rules are not
+// selector branches. Source lines advance even inside quoted selectors.
+const splitSelectors = (text: string, firstLine: number): CssSelector[] => {
+  const selectors: CssSelector[] = []
   let start = 0
-  let depth = 0
+  let lineNumber = firstLine
+  let branchLine = firstLine
   let quote = ''
   let escaped = false
-  for (let i = 0; i < selector.length; i++) {
-    const char = selector[i]
-    if (escaped) {
-      escaped = false
-      continue
+  let depth = 0
+  let started = false
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i]
+    if (!started && !/\s/.test(char)) {
+      branchLine = lineNumber
+      started = true
     }
-    if (char === '\\') {
-      escaped = true
-      continue
-    }
-    if (quote) {
+    if (escaped) escaped = false
+    else if (char === '\\') escaped = true
+    else if (quote) {
       if (char === quote) quote = ''
-      continue
-    }
-    if (char === '\'' || char === '"') quote = char
-    else if (char === '(' || char === '[') depth++
-    else if (char === ')' || char === ']') depth--
+    } else if (char === '\'' || char === '"') quote = char
+    else if (char === '[' || char === '(') depth++
+    else if (char === ']' || char === ')') depth--
     else if (char === ',' && depth === 0) {
-      selectors.push(selector.slice(start, i).trim())
+      selectors.push({ selector: text.slice(start, i).trim(), lineNumber: branchLine })
       start = i + 1
+      started = false
     }
+    if (char === '\n') lineNumber++
   }
-  selectors.push(selector.slice(start).trim())
+  selectors.push({ selector: text.slice(start).trim(), lineNumber: branchLine })
   return selectors
 }
 
-const isAtRule = (selector: string): boolean => selector.startsWith('@')
+// The same lexical boundaries govern blocks and selector-list commas. A branch's
+// first non-whitespace character owns its diagnostic, even after a comment.
+const parseCss = (content: string): { rules: CssRule[]; declarations: CssDeclaration[] } => {
+  const rules: CssRule[] = []
+  const declarations: CssDeclaration[] = []
+  const blocks: CssBlock[] = []
+  const source = stripComments(content)
+  let text = ''
+  let lineNumber = 1
+  let startLine = 1
+  let quote = ''
+  let escaped = false
+  let brackets = 0
+  let parentheses = 0
+
+  const reset = () => {
+    text = ''
+  }
+  const declaration = (terminated: boolean) => {
+    const block = blocks.at(-1)
+    if (block && text.includes(':') && !text.trimStart().startsWith('@')) {
+      const item = {
+        line: text.trim() + (terminated ? ';' : ''),
+        lineNumber: startLine,
+        fontFace: block.fontFace
+      }
+      declarations.push(item)
+      block.rule?.declarations.push(item)
+    }
+    reset()
+  }
+
+  for (const char of source) {
+    if (text === '' && /\s/.test(char)) {
+      if (char === '\n') lineNumber++
+      continue
+    }
+    if (text === '') startLine = lineNumber
+    if (escaped) {
+      text += char
+      escaped = false
+    } else if (char === '\\') {
+      text += char
+      escaped = true
+    } else if (quote) {
+      text += char
+      if (char === quote) quote = ''
+    } else if (char === '\'' || char === '"') {
+      text += char
+      quote = char
+    } else if (char === '[') {
+      brackets++
+      text += char
+    } else if (char === ']') {
+      brackets--
+      text += char
+    } else if (char === '(') {
+      parentheses++
+      text += char
+    } else if (char === ')') {
+      parentheses--
+      text += char
+    } else if (brackets === 0 && parentheses === 0 && char === '{') {
+      const atRule = text.trimStart().startsWith('@')
+      if (atRule) {
+        blocks.push({ rule: undefined, fontFace: text.trimStart().startsWith('@font-face') })
+      } else {
+        const rule = { selectors: splitSelectors(text, startLine), declarations: [] }
+        rules.push(rule)
+        blocks.push({ rule, fontFace: false })
+      }
+      reset()
+    } else if (brackets === 0 && parentheses === 0 && char === '}') {
+      declaration(false)
+      blocks.pop()
+    } else if (brackets === 0 && parentheses === 0 && char === ';') {
+      declaration(true)
+    } else text += char
+    if (char === '\n') lineNumber++
+  }
+  return { rules, declarations }
+}
+
+// ────────────────────────────────────────────────────────────────────────────
+// POLICY AUDITS
+// ────────────────────────────────────────────────────────────────────────────
 
 const isImmutableToken = (name: string): boolean =>
   IMMUTABLE_TOKEN_NAMES.has(name)
   || IMMUTABLE_TOKEN_PREFIXES.some(prefix => name.startsWith(prefix))
 
 const auditTokenDeclarations = (
-  lines: CSSLine[],
+  lines: CssDeclaration[],
   filePath: string,
   fileName: string
 ): string[] => {
   const violations: string[] = []
 
-  for (const { line, lineNumber, isComment } of lines) {
-    if (isComment) continue
-
-    const match = line.match(TOKEN_DECLARATION_REGEX)
+  for (const { line, lineNumber } of lines) {
+    const match = line.match(TokenDeclarationRegex)
     if (!match) continue
 
     const name = match[1]
@@ -202,14 +345,12 @@ const auditTokenDeclarations = (
 }
 
 const auditTokenOnlyDeclarations = (
-  lines: CSSLine[],
+  lines: CssDeclaration[],
   filePath: string
 ): string[] => {
   const violations: string[] = []
 
-  for (const { line, lineNumber, isComment } of lines) {
-    if (isComment) continue
-
+  for (const { line, lineNumber } of lines) {
     const trimmed = line.trim()
     if (
       trimmed === ''
@@ -231,22 +372,15 @@ const auditTokenOnlyDeclarations = (
   return violations
 }
 
-const auditTokensCSS = (
-  lines: CSSLine[],
+const auditTokensCss = (
+  rules: CssRule[],
   filePath: string,
   allowRoot: boolean,
   allowThemeSelectors: boolean
 ): string[] => {
   const violations: string[] = []
 
-  for (const { line, lineNumber, isComment } of lines) {
-    if (isComment || !line.includes('{')) continue
-
-    const selector = extractSelector(lines, lineNumber - 1)
-    if (!selector) continue
-
-    if (isAtRule(selector)) continue
-
+  for (const { selector, lineNumber } of rules.flatMap(rule => rule.selectors)) {
     if (!allowRoot && selector === ':root') {
       violations.push(
         `${filePath}:${lineNumber} — forbidden root selector — found: ${selector}`
@@ -274,17 +408,10 @@ const auditTokensCSS = (
   return violations
 }
 
-const auditBaseCSS = (lines: CSSLine[], filePath: string): string[] => {
+const auditBaseCss = (rules: CssRule[], filePath: string): string[] => {
   const violations: string[] = []
 
-  for (const { line, lineNumber, isComment } of lines) {
-    if (isComment || !line.includes('{')) continue
-
-    const selector = extractSelector(lines, lineNumber - 1)
-    if (!selector) continue
-
-    if (isAtRule(selector)) continue
-
+  for (const { selector, lineNumber } of rules.flatMap(rule => rule.selectors)) {
     if (selector.includes('[')) {
       violations.push(
         `${filePath}:${lineNumber} — attribute selector in base.css — found: ${selector}`
@@ -295,17 +422,10 @@ const auditBaseCSS = (lines: CSSLine[], filePath: string): string[] => {
   return violations
 }
 
-const auditControlsCSS = (lines: CSSLine[], filePath: string): string[] => {
+const auditControlsCss = (rules: CssRule[], filePath: string): string[] => {
   const violations: string[] = []
 
-  for (const { line, lineNumber, isComment } of lines) {
-    if (isComment || !line.includes('{')) continue
-
-    const selector = extractSelector(lines, lineNumber - 1)
-    if (!selector) continue
-
-    if (isAtRule(selector)) continue
-
+  for (const { selector, lineNumber } of rules.flatMap(rule => rule.selectors)) {
     if (!selector.startsWith('[data-ui')) {
       violations.push(
         `${filePath}:${lineNumber} — selector not rooted at [data-ui — found: ${selector}`
@@ -316,69 +436,42 @@ const auditControlsCSS = (lines: CSSLine[], filePath: string): string[] => {
   return violations
 }
 
-const auditIconCatalogCSS = (lines: CSSLine[], filePath: string): string[] => {
+const auditIconCatalogCss = (rules: CssRule[], filePath: string): string[] => {
   const violations: string[] = []
   const iconNames = new StringSet()
-  let ruleIconNames: string[] = []
-  let iconLineNumber = 0
-  let hasIconDeclaration = false
 
-  for (const { line, lineNumber, isComment } of lines) {
-    if (isComment) continue
-
-    const trimmed = line.trim()
-    if (trimmed === '') continue
-
-    if (trimmed === '}') {
-      if (!hasIconDeclaration) {
-        for (const iconName of ruleIconNames) {
-          violations.push(
-            `${filePath}:${iconLineNumber} — icon catalog entry missing --sa-icon declaration`
-              + ` — ${iconName}`
-          )
-        }
+  for (const rule of rules) {
+    const entries: { name: string; lineNumber: number }[] = []
+    for (const { selector, lineNumber } of rule.selectors) {
+      const iconMatch = selector.match(/^\[data-ui-icon='([^']+)'\]$/)
+      if (!iconMatch) {
+        violations.push(
+          `${filePath}:${lineNumber} — icon catalog selector must be [data-ui-icon='{name}']`
+            + ` — found: ${selector}`
+        )
+        continue
       }
-      ruleIconNames = []
-      hasIconDeclaration = false
-      continue
+      const name = iconMatch[1]
+      if (iconNames.has(name)) {
+        violations.push(`${filePath}:${lineNumber} — duplicate icon catalog name — ${name}`)
+      }
+      iconNames.add(name)
+      entries.push({ name, lineNumber })
     }
 
-    if (line.includes('{')) {
-      const selector = extractSelector(lines, lineNumber - 1)
-      if (!selector || isAtRule(selector)) continue
-      ruleIconNames = []
-      for (const part of splitSelectors(selector)) {
-        const iconMatch = part.match(/^\[data-ui-icon='([^']+)'\]$/)
-        if (!iconMatch) {
-          violations.push(
-            `${filePath}:${lineNumber} — icon catalog selector must be [data-ui-icon='{name}']`
-              + ` — found: ${part}`
-          )
-          continue
-        }
-        const iconName = iconMatch[1]
-        if (iconNames.has(iconName)) {
-          violations.push(`${filePath}:${lineNumber} — duplicate icon catalog name — ${iconName}`)
-        }
-        iconNames.add(iconName)
-        ruleIconNames.push(iconName)
-      }
-      iconLineNumber = lineNumber
-      hasIconDeclaration = false
-      continue
-    }
-
-    if (ruleIconNames.length > 0 && trimmed.includes(':')) {
-      const property = trimmed.substring(0, trimmed.indexOf(':')).trim()
+    let hasIconDeclaration = false
+    for (const { line, lineNumber } of rule.declarations) {
+      if (entries.length === 0) continue
+      const property = line.substring(0, line.indexOf(':')).trim()
       if (property !== '--sa-icon') {
         violations.push(
           `${filePath}:${lineNumber} — icon catalog declares non --sa-icon property — ${property}`
         )
       } else {
         hasIconDeclaration = true
-        for (const iconName of ruleIconNames) {
-          const expected = `--sa-icon: url('../icons/${iconName}.svg');`
-          if (trimmed !== expected) {
+        for (const { name } of entries) {
+          const expected = `--sa-icon: url('../icons/${name}.svg');`
+          if (line !== expected) {
             violations.push(
               `${filePath}:${lineNumber} — icon catalog name must match SVG asset`
                 + ` — expected: ${expected}`
@@ -387,38 +480,35 @@ const auditIconCatalogCSS = (lines: CSSLine[], filePath: string): string[] => {
         }
       }
     }
-  }
-
-  return violations
-}
-
-const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
-  const violations: string[] = []
-  const namespace = featureNamespace(filePath)
-
-  for (const { line, lineNumber, isComment } of lines) {
-    if (isComment || !line.includes('{')) continue
-
-    const selector = extractSelector(lines, lineNumber - 1)
-    if (!selector) continue
-
-    if (isAtRule(selector)) continue
-
-    for (const part of splitSelectors(selector)) {
-      if (!part.startsWith(`[${namespace}`)) {
+    if (!hasIconDeclaration) {
+      for (const { name, lineNumber } of entries) {
         violations.push(
-          `${filePath}:${lineNumber} — selector not rooted at [${namespace} — found: ${part}`
+          `${filePath}:${lineNumber} — icon catalog entry missing --sa-icon declaration — ${name}`
         )
       }
     }
+  }
+  return violations
+}
 
-    DATA_ATTRIBUTE_REGEX.lastIndex = 0
+const auditFeatureCss = (rules: CssRule[], filePath: string): string[] => {
+  const violations: string[] = []
+  const namespace = featureNamespace(filePath)
+
+  for (const { selector, lineNumber } of rules.flatMap(rule => rule.selectors)) {
+    if (!selector.startsWith(`[${namespace}`)) {
+      violations.push(
+        `${filePath}:${lineNumber} — selector not rooted at [${namespace} — found: ${selector}`
+      )
+    }
+
+    DataAttributeRegex.lastIndex = 0
     let match: RegExpExecArray | null
-    while ((match = DATA_ATTRIBUTE_REGEX.exec(selector)) !== null) {
+    while ((match = DataAttributeRegex.exec(selector)) !== null) {
       const attribute = match[1]
       const value = match[3]
 
-      if (!ALLOWED_DATA_ATTRIBUTES.has(attribute) && !FEATURE_ATTRIBUTE_REGEX.test(attribute)) {
+      if (!ALLOWED_DATA_ATTRIBUTES.has(attribute) && !FeatureAttributeRegex.test(attribute)) {
         violations.push(
           `${filePath}:${lineNumber} — forbidden data attribute selector — found: ${attribute}`
         )
@@ -432,7 +522,7 @@ const auditFeatureCSS = (lines: CSSLine[], filePath: string): string[] => {
           || attribute === namespace
           || attribute.startsWith(`${namespace}-`)
         )
-        && !DATA_ATTRIBUTE_VALUE_REGEX.test(value)
+        && !DataAttributeValueRegex.test(value)
       ) {
         violations.push(
           `${filePath}:${lineNumber} — data attribute value not kebab-case — ${attribute}='${value}'`
@@ -450,23 +540,14 @@ const featureNamespace = (filePath: string): string => {
   return 'data-app'
 }
 
-const isInFontFaceBlock = (lines: CSSLine[], currentIndex: number): boolean => {
-  for (let i = currentIndex - 1; i >= 0; i--) {
-    const line = lines[i].line.trim()
-    if (line.includes('@font-face')) return true
-    if (line.includes('}') && !lines[i].isComment) break
-  }
-  return false
-}
-
 const auditValueRules = (
-  lines: CSSLine[],
+  lines: CssDeclaration[],
   filePath: string,
   skipTokensFile: boolean
 ): string[] => {
   const violations: string[] = []
 
-  const exemptProps = new Set([
+  const exemptProps = new StringSet([
     'width',
     'height',
     'flex',
@@ -484,10 +565,8 @@ const auditValueRules = (
   ])
 
   for (let i = 0; i < lines.length; i++) {
-    const { line, lineNumber, isComment } = lines[i]
-    if (isComment) continue
-
-    if (isInFontFaceBlock(lines, i)) continue
+    const { line, lineNumber } = lines[i]
+    if (lines[i].fontFace) continue
 
     const trimmed = line.trim()
     if (!trimmed.includes(':') || trimmed.startsWith('@')) continue
@@ -639,78 +718,48 @@ const auditValueRules = (
   return violations
 }
 
-const main = async () => {
+// ────────────────────────────────────────────────────────────────────────────
+// REPOSITORY SWEEP
+// ────────────────────────────────────────────────────────────────────────────
+
+const main = async (): Promise<void> => {
+  const root = Deno.cwd().replaceAll('\\', '/')
+  const cssDirectory = `${root}/source/ux/ui/css`
+  const directories = [
+    `${root}/source/ux`,
+    `${root}/source/front/app-admin`,
+    `${root}/source/front/app-customer`,
+    `${root}/source/front/app-ops`,
+    `${root}/source/front/app-style-guide`
+  ]
   const violations: string[] = []
   const designSystemFiles = new StringSet()
 
   for (const fileName of CSS_FILES) {
-    const filePath = `${CSS_DIR}/${fileName}`
-    const relative = `source/ux/ui/css/${fileName}`
+    const filePath = `${cssDirectory}/${fileName}`
     designSystemFiles.add(filePath)
-
     const content = await Deno.readTextFile(filePath)
-    const lines = parseLines(content)
+    violations.push(...auditCss(content, `source/ux/ui/css/${fileName}`))
+  }
 
-    if (TOKEN_ONLY_FILES.has(fileName)) {
-      violations.push(...auditTokenDeclarations(lines, relative, fileName))
-      violations.push(...auditTokenOnlyDeclarations(lines, relative))
-    }
-
-    if (fileName === 'tokens.css') {
-      violations.push(...auditTokensCSS(lines, relative, true, false))
-      violations.push(...auditValueRules(lines, relative, true))
-    } else if (fileName === 'roles.css') {
-      violations.push(...auditTokensCSS(lines, relative, true, false))
-      violations.push(...auditValueRules(lines, relative, true))
-    } else if (fileName === 'themes.css') {
-      violations.push(...auditTokensCSS(lines, relative, false, true))
-      violations.push(...auditValueRules(lines, relative, true))
-    } else if (fileName === 'base.css') {
-      violations.push(...auditTokenDeclarations(lines, relative, fileName))
-      violations.push(...auditBaseCSS(lines, relative))
-      violations.push(...auditValueRules(lines, relative, false))
-    } else if (fileName === 'ui.css') {
-      violations.push(...auditTokenDeclarations(lines, relative, fileName))
-      violations.push(...auditControlsCSS(lines, relative))
-      violations.push(...auditValueRules(lines, relative, false))
-    } else if (fileName === 'icons.css') {
-      violations.push(...auditTokenDeclarations(lines, relative, fileName))
-      violations.push(...auditIconCatalogCSS(lines, relative))
-      violations.push(...auditValueRules(lines, relative, false))
+  for (const directory of directories) {
+    for await (
+      const entry of walk(directory, {
+        includeDirs: false,
+        exts: ['.css'],
+        skip: [/[/\\]dist[/\\]?/, /[/\\]node_modules[/\\]?/]
+      })
+    ) {
+      const filePath = entry.path.replaceAll('\\', '/')
+      if (designSystemFiles.has(filePath)) continue
+      const relative = filePath.replace(`${root}/`, '')
+      const content = await Deno.readTextFile(filePath)
+      violations.push(...auditCss(content, relative))
     }
   }
 
-  await auditFeatureCSSDirectory(COMMON_DIR, designSystemFiles, violations)
-  for (const appDir of APP_DIRS) await auditFeatureCSSDirectory(appDir, designSystemFiles, violations)
-
   if (violations.length > 0) guardFail('CSS', violations)
-
   guardPass('CSS')
 }
 
-await main()
-
-async function auditFeatureCSSDirectory(
-  directory: string,
-  skippedFiles: StringSet,
-  violations: string[]
-): Promise<void> {
-  for await (
-    const entry of walk(directory, {
-      includeDirs: false,
-      exts: ['.css'],
-      skip: [/[/\\]dist[/\\]?/, /[/\\]node_modules[/\\]?/]
-    })
-  ) {
-    const filePath = entry.path.replaceAll('\\', '/')
-    if (skippedFiles.has(filePath)) continue
-
-    const relative = filePath.replace(`${ROOT}/`, '')
-    const content = await Deno.readTextFile(filePath)
-    const lines = parseLines(content)
-
-    violations.push(...auditTokenDeclarations(lines, relative, relative.split('/').at(-1) ?? ''))
-    violations.push(...auditFeatureCSS(lines, relative))
-    violations.push(...auditValueRules(lines, relative, false))
-  }
-}
+if (import.meta.main) await main()

@@ -1,6 +1,13 @@
-/**
- * Guard against re-implementing domain invariants outside the domain layer.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Domain validation guard                                                      ║
+║ Reject validation declarations outside the domain boundary.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Guard against re-implementing domain invariants outside the domain layer.
+*/
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
@@ -15,7 +22,7 @@ const TARGET_DIRS = [
 
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
-const VALIDATE_DECLARATION = /\b(function|const|let)\s+validate[A-Za-z0-9_]*\b/g
+const ValidateDeclaration = /\b(function|const|let)\s+validate[A-Za-z0-9_]*\b/g
 
 const collectFiles = async (dir: string): Promise<string[]> => {
   const entries: string[] = []
@@ -54,7 +61,7 @@ const main = async () => {
   for (const file of files) {
     const source = await Deno.readTextFile(file)
     let match: RegExpExecArray | null
-    while ((match = VALIDATE_DECLARATION.exec(source)) !== null) {
+    while ((match = ValidateDeclaration.exec(source)) !== null) {
       const line = lineNumber(source, match.index)
       const relative = file.replace(`${ROOT}/`, '')
       violations.push(`${relative}:${line} declares ${match[0]}`)

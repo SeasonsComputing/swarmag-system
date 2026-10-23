@@ -15,7 +15,8 @@ genuine, CA-authorized edit is committed with the guard deliberately bypassed
 guard-completed-immutable.ts already established for a different class of
 change nothing should silently pass through.
 
-Found necessary 2026-09-15: an AI Coding Engine, asked to fix one confrontational
+Found necessary 2026-09-15: an AI Coding Engine, asked to fix one
+confrontational
 sentence in EFFORT.md, generalized that into a tone rewrite across the whole
 document and quietly dropped several substantive distinctions along with the
 tone — caught only because one line was checked against the source by hand. A
@@ -37,7 +38,7 @@ const git = async (...args: string[]): Promise<{ success: boolean; stdout: strin
   return { success, stdout: new TextDecoder().decode(stdout) }
 }
 
-/** Staged paths that differ from HEAD — added, changed, or deleted. */
+// Staged paths that differ from HEAD — added, changed, or deleted.
 const stagedPaths = async (): Promise<string[]> => {
   const { stdout } = await git('diff', '--cached', '--name-only')
   return stdout.split('\n').map(line => line.trim()).filter(Boolean)

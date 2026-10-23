@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Style guide local serving                                                ║
+# ║ Serves the style guide through the local Vite host.                      ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"

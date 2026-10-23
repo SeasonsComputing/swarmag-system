@@ -1,23 +1,55 @@
-/**
- * Customer fixture samples for tests.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Customer fixtures                                                            ║
+║ Shared customer aggregate and contact association for tests.                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Customer fixture samples for tests.
+
+Shared customer aggregate and contact association for tests.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+CustomerSamples  Shared fixture samples.
+├ blueMesaRanch           Customer with a primary contact and two sites.
+│ ├ Instantiable           Inherited Instantiable fields.
+│ ├ accountManagerId       Optional account-manager reference.
+│ ├ primaryContact         Primary reachability details.
+│ ├ sites                  Customer sites.
+│ ├ notes                  Note collection.
+│ ├ name                   Account name.
+│ ├ status                 Lifecycle status.
+│ ├ line1                  Street address.
+│ ├ line2                  Optional additional address.
+│ ├ city                   City.
+│ ├ state                  State or region.
+│ ├ postalCode             Postal code.
+│ └ country                Country code.
+├ blueMesaRanchContact    Customer-to-User association.
+│ ├ customerId             Customer reference.
+│ └ userId                 User reference.
+├ all                     All customer records.
+└ users                   All customer-to-User associations.
+*/
 
 import { id } from '@core/std'
 import type { Location } from '@domain/abstractions/common.ts'
 import type { Contact, Customer, CustomerUser } from '@domain/abstractions/customer.ts'
 
-const customerId = id()
-const accountManagerId = id()
-const relatedContactId = id()
+const CUSTOMER_ID = id()
+const ACCOUNT_MANAGER_ID = id()
+const RELATED_CONTACT_ID = id()
 
-const ranchOfficeContact: Contact = {
+const RanchOfficeContact: Contact = {
   displayName: 'Marta Reyes',
   phoneNumber: '806-555-0142',
   preferredChannel: 'phone',
   email: 'marta@bluemesaranch.com'
 }
 
-const headquartersLocation: Location = {
+const HeadquartersLocation: Location = {
   latitude: 33.5779,
   longitude: -101.8552,
   line1: '1200 AgriTech Way',
@@ -28,7 +60,7 @@ const headquartersLocation: Location = {
   description: 'Corporate HQ and main equipment depot'
 }
 
-const southFortyLocation: Location = {
+const SouthFortyLocation: Location = {
   line1: '4400 County Road 2100',
   city: 'Slaton',
   state: 'TX',
@@ -37,8 +69,8 @@ const southFortyLocation: Location = {
   description: 'Leased pasture pending onsite GPS capture'
 }
 
-export const blueMesaRanchCustomer: Customer = {
-  id: customerId,
+const BlueMesaRanch: Customer = {
+  id: CUSTOMER_ID,
   name: 'Blue Mesa Ranch Co.',
   status: 'active',
   line1: 'PO Box 410',
@@ -46,16 +78,16 @@ export const blueMesaRanchCustomer: Customer = {
   state: 'TX',
   postalCode: '76902',
   country: 'US',
-  accountManagerId,
-  primaryContact: [ranchOfficeContact],
+  accountManagerId: ACCOUNT_MANAGER_ID,
+  primaryContact: [RanchOfficeContact],
   sites: [{
     label: 'North Pasture HQ',
-    location: [headquartersLocation],
+    location: [HeadquartersLocation],
     acreage: 2400,
     notes: []
   }, {
     label: 'South Forty',
-    location: [southFortyLocation],
+    location: [SouthFortyLocation],
     notes: []
   }],
   notes: [],
@@ -63,10 +95,18 @@ export const blueMesaRanchCustomer: Customer = {
   updatedAt: '2025-01-15T12:00:00Z'
 }
 
-export const blueMesaRanchContact: CustomerUser = {
-  customerId,
-  userId: relatedContactId
+const BlueMesaRanchContact: CustomerUser = {
+  customerId: CUSTOMER_ID,
+  userId: RELATED_CONTACT_ID
 }
 
-export const customerSamples = [blueMesaRanchCustomer]
-export const customerUserSamples = [blueMesaRanchContact]
+const ALL = [BlueMesaRanch]
+const USERS = [BlueMesaRanchContact]
+
+/** Shared fixture samples. */
+export const CustomerSamples = {
+  blueMesaRanch: BlueMesaRanch,
+  blueMesaRanchContact: BlueMesaRanchContact,
+  all: ALL,
+  users: USERS
+}

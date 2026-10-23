@@ -1,6 +1,13 @@
-/**
- * Guard against direct Deno.env usage outside config providers.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Environment access guard                                                     ║
+║ Restrict direct environment access to approved runtime providers.            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Guard against direct Deno.env usage outside config providers.
+*/
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 
@@ -24,10 +31,10 @@ const ALLOWED_FILES = new Set([
   'source/core/cfg/solid-provider.ts'
 ])
 
-/** Match direct Deno.env or Deno.test access. */
-const DISALLOWED_USAGE = /\bDeno\.env\b/g
+/** Match direct Deno.env access. */
+const DisallowedUsage = /\bDeno\.env\b/g
 
-/** Collect all file paths under a directory. */
+// Collect all file paths under a directory.
 const collectFiles = async (dir: string): Promise<string[]> => {
   const entries: string[] = []
   for await (const entry of Deno.readDir(dir)) {
@@ -42,7 +49,7 @@ const collectFiles = async (dir: string): Promise<string[]> => {
   return entries
 }
 
-/** Convert a zero-based index into a 1-based line number. */
+// Convert a zero-based index into a 1-based line number.
 const lineNumber = (source: string, index: number): number => source.slice(0, index).split('\n').length
 
 const exists = async (path: string): Promise<boolean> => {
@@ -69,7 +76,7 @@ const main = async () => {
 
     const source = await Deno.readTextFile(file)
     let match: RegExpExecArray | null
-    while ((match = DISALLOWED_USAGE.exec(source)) !== null) {
+    while ((match = DisallowedUsage.exec(source)) !== null) {
       const line = lineNumber(source, match.index)
       violations.push(`${relative}:${line} uses ${match[0]}`)
     }

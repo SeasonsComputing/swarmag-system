@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║ Customer package verification                                            ║
+# ║ Checks required files in an existing Customer package archive.           ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+
 set -euo pipefail
 
 TARGET="${1:-}"

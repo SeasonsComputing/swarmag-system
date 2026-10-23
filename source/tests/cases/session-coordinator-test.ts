@@ -1,4 +1,14 @@
-/** Session eligibility; execution awaits the shared API bootstrap backlog fix. */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Session coordinator tests                                                    ║
+║ Verify session eligibility, hydration, and identity changes.                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Session eligibility; the shared API bootstrap is repaired, but this test remains
+excluded by the charter.
+*/
 
 import '@tests/config/test-config.ts'
 import { id } from '@core/std'
@@ -9,25 +19,25 @@ import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
 import { UserProvider } from '@front/app/shell/user-provider.ts'
 import { createRoot } from '@solid-js'
 import { assertEquals } from '@std/assert'
-import { operationsUserSample } from '@tests/fixtures/user-samples.ts'
+import { UserSamples } from '@tests/fixtures/user-samples.ts'
 
 Deno.test('SessionCoordinator rejects an active deleted User before data readiness', async () => {
   await verifyEligibility({
-    ...operationsUserSample,
+    ...UserSamples.operations,
     status: 'active',
     deletedAt: '2026-10-13T12:00:00Z'
   }, false)
 })
 
 Deno.test('SessionCoordinator prepares an active live User', async () => {
-  await verifyEligibility({ ...operationsUserSample, status: 'active' }, true)
+  await verifyEligibility({ ...UserSamples.operations, status: 'active' }, true)
 })
 
 Deno.test('SessionCoordinator rejects an inactive live User', async () => {
-  await verifyEligibility({ ...operationsUserSample, status: 'inactive' }, false)
+  await verifyEligibility({ ...UserSamples.operations, status: 'inactive' }, false)
 })
 
-/** Exercise initialization under a Solid owner and restore the shared API after each case. */
+// Exercise initialization under a Solid owner and restore the shared API after each case.
 const verifyEligibility = async (user: User, eligible: boolean): Promise<void> => {
   const originalGet = api.Users.get
   const originalSession = api.Auth.getSession
@@ -98,16 +108,16 @@ Deno.test('SessionCoordinator waits for hydration and clears on identity change'
   const originalSubscribe = api.Auth.onAuthStateChange
   const firstLoad = Promise.withResolvers<User>()
   const secondLoad = Promise.withResolvers<User>()
-  const secondUser = { ...operationsUserSample, id: id() }
+  const secondUser = { ...UserSamples.operations, id: id() }
   let emit: (session: Session | null) => void = () => {}
   let dispose = () => {}
   SessionCoordinator.clear()
-  api.Auth.getSession = () => Promise.resolve({ userId: operationsUserSample.id })
+  api.Auth.getSession = () => Promise.resolve({ userId: UserSamples.operations.id })
   api.Auth.onAuthStateChange = callback => {
     emit = callback
     return () => {}
   }
-  api.Users.get = id => id === operationsUserSample.id ? firstLoad.promise : secondLoad.promise
+  api.Users.get = id => id === UserSamples.operations.id ? firstLoad.promise : secondLoad.promise
   try {
     createRoot(cleanup => {
       dispose = cleanup
@@ -116,7 +126,7 @@ Deno.test('SessionCoordinator waits for hydration and clears on identity change'
     await Promise.resolve()
     assertEquals(api.SessionState.isPrepared(), false)
     assertEquals(api.SessionState.store.user, null)
-    firstLoad.resolve(operationsUserSample)
+    firstLoad.resolve(UserSamples.operations)
     await Promise.resolve()
     assertEquals(api.SessionState.isPrepared(), true)
     assertEquals(api.SessionState.store.user, UserProvider)

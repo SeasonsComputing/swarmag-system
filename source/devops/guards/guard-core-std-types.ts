@@ -1,6 +1,13 @@
-/**
- * Guard against bypassing @core/std container primitives.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Core standard types guard                                                    ║
+║ Enforce standard dictionary and string-set type vocabulary.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Guard against bypassing @core/std container primitives.
+*/
 
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
 

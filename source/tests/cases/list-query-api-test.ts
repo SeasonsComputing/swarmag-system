@@ -1,6 +1,13 @@
-/**
- * Query declarations, compile-time constraints, and store-local cursor boundaries.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ List query API tests                                                         ║
+║ Verify query declarations, type constraints, and cursor boundaries.          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Query declarations, compile-time constraints, and store-local cursor boundaries.
+*/
 
 import { id } from '@core/std'
 import type { Instantiable } from '@core/std'
@@ -25,7 +32,7 @@ import type { User } from '@domain/abstractions/user.ts'
 import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { queries } from '@front/api/queries.ts'
 import { assert, assertEquals, assertThrows } from '@std/assert'
-import { salesUserSample } from '@tests/fixtures/user-samples.ts'
+import { UserSamples } from '@tests/fixtures/user-samples.ts'
 
 /** Test-only scalar field inventory, including names forbidden in declarations. */
 export type QueryProbe = Instantiable & {
@@ -58,12 +65,12 @@ const ProbeAdapter = makeAdapter<QueryProbe>({
   search: ['search']
 })
 /** The User role query under test. */
-const declaration = queries.Users.byRole
+const Declaration = queries.Users.byRole
 
 Deno.test('build copies declared fields, criteria arrays, defaults, and normalized search', () => {
   const roles: QuerySet<'sales' | 'operations'> = ['sales', 'operations']
   const input = { roles: { hasAny: roles }, status: { eq: 'active' as const } }
-  const query = declaration.build({ where: input, search: ' *Jose\u0301* ' })
+  const query = Declaration.build({ where: input, search: ' *Jose\u0301* ' })
   assertEquals(query.where, input)
   assert(query.where.roles?.hasAny !== roles)
   assertEquals(query.search, {
@@ -74,7 +81,7 @@ Deno.test('build copies declared fields, criteria arrays, defaults, and normaliz
   assertEquals(Object.getOwnPropertySymbols(query), [])
   assertEquals(JSON.parse(JSON.stringify(query)).search.term, 'José')
   for (const search of ['', ' ', '*', '* *']) {
-    assertEquals(declaration.build({ search }).search, undefined)
+    assertEquals(Declaration.build({ search }).search, undefined)
   }
 })
 
@@ -94,7 +101,7 @@ Deno.test('build omits absent operators and allows numeric, boolean, and optiona
 Deno.test('query constraints reject invalid declarations and inputs, including typed variables', () => {
   // Compile these examples without executing invalid application calls.
   const invalidUsage = (users: CrudListContract<User>, customers: CrudListContract<Customer>) => {
-    const good = declaration.build({ where: { roles: { hasAll: ['sales', 'operations'] } } })
+    const good = Declaration.build({ where: { roles: { hasAll: ['sales', 'operations'] } } })
     // @ts-expect-error Queries remain typed by their domain abstraction.
     customers.list({ query: good })
     users.list({ query: good })
@@ -109,40 +116,40 @@ Deno.test('query constraints reject invalid declarations and inputs, including t
     // @ts-expect-error Set members are readonly.
     good.where.roles!.hasAll![0] = 'operations'
     // @ts-expect-error Search fields are readonly.
-    declaration.build({ search: 'a' }).search!.fields[0] = 'status'
+    Declaration.build({ search: 'a' }).search!.fields[0] = 'status'
     // @ts-expect-error Undeclared filter field inline.
-    declaration.build({ where: { primaryEmail: { eq: 'a' } } })
+    Declaration.build({ where: { primaryEmail: { eq: 'a' } } })
     const badField = { status: { eq: 'active' as const }, primaryEmail: { eq: 'a' } }
     // @ts-expect-error Undeclared filter field through a structurally compatible variable.
-    declaration.build({ where: badField })
+    Declaration.build({ where: badField })
     // @ts-expect-error Undeclared order field inline.
-    declaration.build({ order: { field: 'primaryEmail', direction: 'asc' } })
+    Declaration.build({ order: { field: 'primaryEmail', direction: 'asc' } })
     const badOrder = { field: 'primaryEmail' as const, direction: 'asc' as const }
     // @ts-expect-error Undeclared order field through a variable.
-    declaration.build({ order: badOrder })
+    Declaration.build({ order: badOrder })
     // @ts-expect-error Unsupported operator inline.
-    declaration.build({ where: { status: { eq: 'active', contains: 'a' } } })
+    Declaration.build({ where: { status: { eq: 'active', contains: 'a' } } })
     const badOperator = { status: { eq: 'active' as const, contains: 'a' } }
     // @ts-expect-error Unsupported operator through a compatible variable.
-    declaration.build({ where: badOperator })
+    Declaration.build({ where: badOperator })
     // @ts-expect-error Wrong role item values.
-    declaration.build({ where: { roles: { hasAny: ['unknown'] } } })
+    Declaration.build({ where: { roles: { hasAny: ['unknown'] } } })
     // @ts-expect-error Empty hasAny inline.
-    declaration.build({ where: { roles: { hasAny: [] } } })
+    Declaration.build({ where: { roles: { hasAny: [] } } })
     // @ts-expect-error Empty hasAll inline.
-    declaration.build({ where: { roles: { hasAll: [] } } })
+    Declaration.build({ where: { roles: { hasAll: [] } } })
     // @ts-expect-error Empty in inline.
-    declaration.build({ where: { status: { in: [] } } })
+    Declaration.build({ where: { status: { in: [] } } })
     const empty: readonly [] = []
     // @ts-expect-error Empty hasAny through a variable.
-    declaration.build({ where: { roles: { hasAny: empty } } })
+    Declaration.build({ where: { roles: { hasAny: empty } } })
     // @ts-expect-error Empty hasAll through a variable.
-    declaration.build({ where: { roles: { hasAll: empty } } })
+    Declaration.build({ where: { roles: { hasAll: empty } } })
     // @ts-expect-error Empty in through a variable.
-    declaration.build({ where: { status: { in: empty } } })
+    Declaration.build({ where: { status: { in: empty } } })
     const unproven: ('sales' | 'operations')[] = ['sales']
     // @ts-expect-error An ordinary array is not proof of non-emptiness.
-    declaration.build({ where: { roles: { hasAny: unproven } } })
+    Declaration.build({ where: { roles: { hasAny: unproven } } })
     // @ts-expect-error Object compositions cannot be filter declarations inline.
     makeQuery({ filter: [UserAdapter.notes], order: [UserAdapter.displayName] })
     const objectFields = [UserAdapter.notes]
@@ -190,7 +197,7 @@ Deno.test('keyset cursor preserves raw precision, Unicode, issuer, and query fin
   assertEquals(readListCursor(token, 'supabase:users', query)?.value, value)
   assertEquals(readListCursor(token, 'supabase:users', query)?.id, rowId)
   assertEquals(readListCursor(undefined, 'supabase:users', query), undefined)
-  const nameQuery = declaration.build({
+  const nameQuery = Declaration.build({
     search: 'José',
     order: { field: 'displayName', direction: 'desc' }
   })
@@ -199,21 +206,21 @@ Deno.test('keyset cursor preserves raw precision, Unicode, issuer, and query fin
   assertThrows(() => readListCursor(token, 'indexeddb:local:users', query), ApiError)
   assertThrows(() => readListCursor(token, 'supabase:customers', query), ApiError)
   assertThrows(() => readListCursor(token, 'supabase:users', nameQuery), ApiError)
-  const changedSearch = declaration.build({
+  const changedSearch = Declaration.build({
     search: 'Reese',
     order: { field: 'displayName', direction: 'desc' }
   })
   assertThrows(() => readListCursor(nameToken, 'indexeddb:local:users', changedSearch), ApiError)
-  const changedDirection = declaration.build({ search: 'José' })
+  const changedDirection = Declaration.build({ search: 'José' })
   assertThrows(() => readListCursor(nameToken, 'indexeddb:local:users', changedDirection), ApiError)
-  const filtered = declaration.build({ where: { status: { eq: 'active' } } })
+  const filtered = Declaration.build({ where: { status: { eq: 'active' } } })
   const filteredToken = writeListCursor('supabase:users', filtered, 'Ada', rowId)
-  assertThrows(() => readListCursor(filteredToken, 'supabase:users', declaration.build()), ApiError)
+  assertThrows(() => readListCursor(filteredToken, 'supabase:users', Declaration.build()), ApiError)
 })
 
 Deno.test('cursor fingerprints are stable across criteria and operator key insertion order', () => {
-  const first = declaration.build({ where: { status: { eq: 'active' }, roles: { hasAny: ['sales'] } } })
-  const second = declaration.build({ where: { roles: { hasAny: ['sales'] }, status: { eq: 'active' } } })
+  const first = Declaration.build({ where: { status: { eq: 'active' }, roles: { hasAny: ['sales'] } } })
+  const second = Declaration.build({ where: { roles: { hasAny: ['sales'] }, status: { eq: 'active' } } })
   assertEquals(listFingerprint(first), listFingerprint(second))
   assertEquals(listFingerprint(listQuery<User>()), '{"where":{}}')
   const probe = makeQuery({ filter: [ProbeAdapter.count], order: [ProbeAdapter.title] })
@@ -232,10 +239,10 @@ Deno.test('malformed cursors fail with 400 instead of starting a new list', () =
 })
 
 Deno.test('listAll owns page size and cursors, forwards queries, and stops at null', async () => {
-  const query = declaration.build({ where: { status: { eq: 'active' } } })
+  const query = Declaration.build({ where: { status: { eq: 'active' } } })
   const options: ListOptions<User>[] = []
-  const first: User = { ...salesUserSample, id: id() }
-  const second: User = { ...salesUserSample, id: id() }
+  const first: User = { ...UserSamples.sales, id: id() }
+  const second: User = { ...UserSamples.sales, id: id() }
   const client: CrudListContract<User> = {
     list(input) {
       options.push(input!)

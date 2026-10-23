@@ -10,6 +10,8 @@ Validates repository secrets metadata format in secrets.jsonc and enforces
 that each key equals the composed identity "<app>.<env>.<config>" derived from
 its attributes.
 
+Checks composed secret-key identity from app, env, and config fields.
+
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 (script entry point — no exported symbols)

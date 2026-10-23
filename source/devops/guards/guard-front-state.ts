@@ -1,8 +1,16 @@
-/**
- * Guard state module runtime dependencies and premature access to SessionState.user.
- * Enforces that any component or hook accessing the user object must also
- * reference the isDataReady flag to handle the hydration gap.
- */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Front state guard                                                            ║
+║ Audit state runtime dependencies and session hydration checks.               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+Guard state module runtime dependencies and premature access to
+SessionState.user.
+Enforces that any component or hook accessing the user object must also
+reference the isDataReady flag to handle the hydration gap.
+*/
 
 import { StringSet } from '@core/std'
 import { guardFail, guardPass } from '@devops/guards/guard-utils.ts'
@@ -19,7 +27,7 @@ const STATE_DIRS = [`${ROOT}/source/front`, `${ROOT}/source/ux`]
 const EXCLUDED_DIRS = new Set(['dist', 'node_modules'])
 
 // Violation: Accessing properties on the user object
-const USER_ACCESS_PATTERN = /SessionState\.store\.user\./g
+const UserAccessPattern = /SessionState\.store\.user\./g
 
 // Safety signals: These indicate the developer is aware of the hydration state
 const SAFETY_PATTERNS = [
@@ -101,7 +109,7 @@ const main = async () => {
     const relative = file.replace(`${ROOT}/`, '')
 
     let match: RegExpExecArray | null
-    while ((match = USER_ACCESS_PATTERN.exec(source)) !== null) {
+    while ((match = UserAccessPattern.exec(source)) !== null) {
       if (!SAFETY_PATTERNS.some(pattern => pattern.test(source))) {
         const line = lineNumber(source, match.index)
         violations.push(

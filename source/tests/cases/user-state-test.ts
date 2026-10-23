@@ -1,10 +1,19 @@
-/** User draft notes retain independent metadata and isolate source records. */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ User state tests                                                             ║
+║ Verify draft note metadata and isolation of source records.                  ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+PURPOSE
+───────────────────────────────────────────────────────────────────────────────
+User draft notes retain independent metadata and isolate source records.
+*/
 
 import type { Note } from '@domain/abstractions/common.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
 import { createUserState, userDraft } from '@front/app-admin/users/user-state.ts'
 import { assertEquals, assertNotStrictEquals } from '@std/assert'
-import { administratorUserSample } from '@tests/fixtures/user-samples.ts'
+import { UserSamples } from '@tests/fixtures/user-samples.ts'
 
 Deno.test('User draft preserves independent notes and isolates source and projected metadata', () => {
   const notes: Note[] = [
@@ -27,7 +36,7 @@ Deno.test('User draft preserves independent notes and isolates source and projec
       }]
     }
   ]
-  const user = { ...administratorUserSample, notes }
+  const user = { ...UserSamples.administrator, notes }
   const state = createUserState(user)
   assertEquals(userDraft(state).notes, notes)
   notes[0].content = 'Changed source'
@@ -48,7 +57,7 @@ Deno.test('New User draft begins with an empty notes collection', () => {
 
 Deno.test('User draft copies accepted notes and roles and isolates projected roles', () => {
   const roles: UserRole[] = ['administrator']
-  const user = { ...structuredClone(administratorUserSample), roles }
+  const user = { ...structuredClone(UserSamples.administrator), roles }
   const state = createUserState(user)
   user.roles.push('operations')
   assertEquals(state.roles(), ['administrator'])

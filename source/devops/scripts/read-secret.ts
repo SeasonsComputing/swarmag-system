@@ -26,18 +26,18 @@ const stripJsoncComments = (source: string): string => {
     .join('\n')
 }
 
-const [filePath, composedKey] = Deno.args
-if (!filePath || !composedKey) {
+const [FILE_PATH, COMPOSED_KEY] = Deno.args
+if (!FILE_PATH || !COMPOSED_KEY) {
   console.error('Usage: deno run --allow-read source/devops/scripts/read-secret.ts <secrets-file> <key>')
   Deno.exit(1)
 }
 
-const source = await Deno.readTextFile(filePath)
-const parsed = JSON.parse(stripJsoncComments(source)) as Dictionary<SecretRecord>
-const value = parsed[composedKey]
-if (!value || typeof value.secret !== 'string') {
+const SOURCE = await Deno.readTextFile(FILE_PATH)
+const Parsed = JSON.parse(stripJsoncComments(SOURCE)) as Dictionary<SecretRecord>
+const Value = Parsed[COMPOSED_KEY]
+if (!Value || typeof Value.secret !== 'string') {
   console.log('')
   Deno.exit(0)
 }
 
-console.log(value.secret)
+console.log(Value.secret)

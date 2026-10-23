@@ -34,13 +34,13 @@ const git = async (...args: string[]): Promise<{ success: boolean; stdout: strin
   return { success, stdout: new TextDecoder().decode(stdout) }
 }
 
-/** Staged paths that differ from HEAD — added, changed, or deleted. */
+// Staged paths that differ from HEAD — added, changed, or deleted.
 const stagedPaths = async (): Promise<string[]> => {
   const { stdout } = await git('diff', '--cached', '--name-only')
   return stdout.split('\n').map(line => line.trim()).filter(Boolean)
 }
 
-/** True when the given path already existed at HEAD. */
+// True when the given path already existed at HEAD.
 const existedAtHead = async (path: string): Promise<boolean> => {
   const { success } = await git('cat-file', '-e', `HEAD:${path}`)
   return success
