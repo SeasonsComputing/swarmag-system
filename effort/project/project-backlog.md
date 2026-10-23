@@ -70,6 +70,10 @@ Bring the backend seed authority into the prompt's source set in a separate auth
 The stage-test-authorization production records this gap without changing the prompt or expanding
 schema generation beyond the three approved test administrator rows.
 
+**Also, 2026-10-23:** nothing in the generation rules drops functions, so a genesis after a
+parameter rename fails (`user_has_access`, `email` to `p_email`, in `0dc1185`). `schema.sql` gained
+`DROP FUNCTION IF EXISTS user_has_access(text)` by hand; the genesis rules should produce it.
+
 ## Controls
 
 ### B-4 · Shared UI controls do not use one state model
