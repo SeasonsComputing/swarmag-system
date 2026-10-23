@@ -56,6 +56,20 @@ only what is specific to the domain. `domain-archetypes.md` still cites "`CONVEN
 Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close of
 `effort/completed/2026-10-03-core-reconciliation-brief.md`.
 
+### B-33 · The domain SDK genesis prompt omits backend seed authority
+
+**Observed:** 2026-10-23 · normal
+
+`effort/genesis/genesis-domain-sdk.md` §1 lists the authority documents used for generation but
+omits `documentation/architecture/architecture-back.md`. Backend §4.4 is the authority for the
+bootstrap administrator and the dedicated stage test administrator, including the fixed test
+identity shared by auth and domain seed rows. A cold schema generation following only the
+prompt's declared source set cannot reconstruct that backend-owned seed meaning reliably.
+
+Bring the backend seed authority into the prompt's source set in a separate authorized production.
+The stage-test-authorization production records this gap without changing the prompt or expanding
+schema generation beyond the three approved test administrator rows.
+
 ## Controls
 
 ### B-4 · Shared UI controls do not use one state model

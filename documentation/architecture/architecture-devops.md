@@ -710,7 +710,12 @@ A **genesis run** is a full reset of the Supabase instance from `schema.sql`. It
 
 **Supabase auth schema constraint:**
 
-Supabase manages the `auth` schema internally — `auth.users` cannot be dropped or recreated. `schema.sql` handles this by using `INSERT ... ON CONFLICT (id) DO UPDATE SET ...` for all `auth.users` seed rows. This makes the genesis run idempotent with respect to existing auth users: existing rows are updated to the correct seed state, and new rows are inserted.
+Supabase manages the `auth` schema internally — its tables are not dropped or recreated by
+`schema.sql`. Genesis instead deletes every `auth.users` row and inserts the documented seeds and
+their email-provider `auth.identities` rows. Dependent auth identities and sessions are removed
+with the deleted users. This is a total reset: rerunning genesis recreates seed state rather than
+preserving existing accounts or their changed email addresses. Seed identity authority is
+`architecture-back.md` §4.4; a genesis run is not an incremental account update.
 
 **Primary run path:**
 
@@ -747,11 +752,15 @@ If the Supabase CLI is unavailable or the task is blocked, execute the full cont
 
 ### 12.3 auth.users Seed Convention
 
-All `auth.users` seed rows in `schema.sql` must use the upsert form:
+After the total auth-user deletion in §12.2, `auth.users` seed rows in `schema.sql` use plain
+inserts, followed by their email-provider `auth.identities` rows. Both the bootstrap administrator
+and the dedicated stage test administrator are defined in `architecture-back.md` §4.4. The
+following illustrates the required auth-user fields:
 
 ```sql
 INSERT INTO auth.users (
   id,
+  instance_id,
   aud,
   role,
   email,
@@ -766,6 +775,7 @@ INSERT INTO auth.users (
   updated_at
 ) VALUES (
   '{devops-generated-UUID}',
+  '00000000-0000-0000-0000-000000000000',
   'authenticated',
   'authenticated',
   '{email}',
@@ -778,19 +788,18 @@ INSERT INTO auth.users (
   '{}'::jsonb,
   now(),
   now()
-)
-ON CONFLICT (id) DO UPDATE SET
-  confirmation_token = EXCLUDED.confirmation_token,
-  recovery_token = EXCLUDED.recovery_token,
-  email_change = EXCLUDED.email_change,
-  email_change_token_new = EXCLUDED.email_change_token_new,
-  email_confirmed_at = EXCLUDED.email_confirmed_at,
-  updated_at = now();
+);
 ```
 
-This ensures genesis runs are safe to execute against instances where the auth user already exists (e.g. created via the Supabase dashboard).
+The preceding total deletion removes existing auth users, including users created through the
+Supabase dashboard, before these inserts. Genesis is destructive to that prior account state;
+it does not reconcile or upsert it. The seed user ID is reused for its `auth.identities` row and
+`public.users` row so authentication and domain authorization refer to one identity.
 
-The Supabase Go auth server scans several `auth.users` string columns as non-nullable. Any column seeded as `NULL` instead of `''` causes a `500: Database error finding user` on the OTP endpoint. The following fields must be explicitly set to `''` in every seed row:
+The Supabase Go auth server scans several `auth.users` string columns as non-nullable. Any column seeded
+as `NULL` instead of `''` causes a `500: Database error finding user` on the OTP endpoint. The four
+string fields below must be explicitly set to `''` in every seed row; `email_confirmed_at` must instead
+hold a non-null confirmation timestamp:
 
 | Field                    | Reason                                                               |
 | ------------------------ | -------------------------------------------------------------------- |
@@ -799,6 +808,47 @@ The Supabase Go auth server scans several `auth.users` string columns as non-nul
 | `email_change`           | Scanned as string on every user lookup                               |
 | `email_change_token_new` | Scanned as string on every user lookup                               |
 | `email_confirmed_at`     | Required non-null timestamp for the user to be treated as confirmed. |
+
+### 12.4 Running Stage Integration Tests
+
+Stage test authorization is defined by
+`effort/active/2026-10-13-stage-test-authorization-brief.md`. After the CA applies genesis to stage,
+`architecture-back.md` §4.4 supplies the dedicated active administrator `test-admin@swarmag.com`
+and its fixed ID. Genesis and live stage test execution require separate CA action; authoring the
+schema and test setup does not run either operation.
+
+A stage test that requires a real session imports `source/tests/config/stage-config.ts`. Its runtime
+needs `SUPABASE_RDBMS_URL`, `SUPABASE_PUBLIC_KEY`, `SUPABASE_CLIENT_MODE`, `LOCAL_DB_NAME`, and the
+service key in standard Supabase environment variable `SUPABASE_SERVICE_ROLE_KEY`. The stage entry point
+exposes that last value as Config name `SUPABASE_SERVICE_KEY`, matching the edge configuration alias.
+Supply values from the local process environment; no credential is committed and no environment-file
+loader is added. Client mode for these CLI tests must be `edge`; the stage entry point fast-fails on any
+other mode before the Supabase singleton is created, preventing browser persistence and token refresh.
+The shared `test-config.ts` remains service-key-free for tests that need only API bootstrap.
+
+Setup uses the service client only for `auth.admin.generateLink` for the fixed test identity, then
+redeems the returned sign-in token with `verifyOtp` into the public client used by `api`. It asserts the
+redeemed session user ID equals the seeded administrator ID before running test calls. Generate-link
+sends no email; tests never read an inbox. API calls use that user's session and pass through real RLS
+and edge authorization; they never use service credentials. The shared fixture exposes its fixed identity
+as `StageSession.id` and `StageSession.email` and runs the caller through `StageSession.run(callback)`.
+Its `finally` cleanup calls the public client's `auth.signOut({ scope: 'local' })`, including after a
+failing callback, so the test session is not retained for subsequent calls.
+
+`users-api-test.ts` signs in through the shared session fixture before live CRUD calls.
+`session-coordinator-test.ts` needs no session: it stubs API members and retains the shared
+bootstrap import. The CA can run the two tests after genesis with the required environment set:
+
+```bash
+deno test --allow-env --allow-net --allow-read \
+  source/tests/cases/users-api-test.ts \
+  source/tests/cases/session-coordinator-test.ts
+```
+
+That command can write stage data and is documented for the CA, not executed as part of code
+production. Soft-deleted test rows may remain; the next authorized genesis resets them. There is
+no additional isolation mechanism or alternate test backend. Stage-only seed exclusion for a
+future production environment remains P-11.
 
 ## 13. Supabase Auth Configuration
 

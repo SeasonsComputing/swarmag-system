@@ -7,88 +7,93 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 CRUD contract tests for Users API.
+Runs through real RLS and edge functions as the seeded Test Administrator;
+the session fixture verifies identity and signs out locally after the test.
 */
 
 import { ApiError } from '@core/stdx'
 import { assert, assertEquals, assertRejects } from '@std/assert'
-import '@tests/config/test-config.ts'
+import '../config/stage-config.ts'
 import type { UserCreate } from '@domain/protocols/user-protocol.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
+import { StageSession } from '../fixtures/stage-session.ts'
 
 Deno.test('users API supports full CRUD lifecycle with soft delete', async context => {
-  if (!api.Users.list) throw new Error('Users API list contract is required for this test')
+  await StageSession.run(async () => {
+    if (!api.Users.list) throw new Error('Users API list contract is required for this test')
 
-  const nonce = `${Date.now()}`
-  const createInput: UserCreate = {
-    roles: ['operations'],
-    displayName: `Ops User ${nonce}`,
-    primaryEmail: `ops-${nonce}@swarmag.example`,
-    phoneNumber: `+1-325-555-${nonce.slice(-4)}`,
-    preferredChannel: 'text',
-    notes: [],
-    avatarUrl: `https://example.com/avatars/ops-${nonce}.png`,
-    status: 'active'
-  }
+    const nonce = `${Date.now()}`
+    const createInput: UserCreate = {
+      roles: ['operations'],
+      displayName: `Ops User ${nonce}`,
+      primaryEmail: `ops-${nonce}@swarmag.example`,
+      phoneNumber: `+1-325-555-${nonce.slice(-4)}`,
+      preferredChannel: 'text',
+      notes: [],
+      avatarUrl: `https://example.com/avatars/ops-${nonce}.png`,
+      status: 'active'
+    }
 
-  const created = await api.Users.create(createInput)
-  assert(created.id)
-  assertEquals(created.displayName, createInput.displayName)
-  assertEquals(created.primaryEmail, createInput.primaryEmail)
-  assertEquals(created.preferredChannel, createInput.preferredChannel)
-  assertEquals(created.notes, createInput.notes)
-  assertEquals(created.status, 'active')
+    const created = await api.Users.create(createInput)
+    assert(created.id)
+    assertEquals(created.displayName, createInput.displayName)
+    assertEquals(created.primaryEmail, createInput.primaryEmail)
+    assertEquals(created.preferredChannel, createInput.preferredChannel)
+    assertEquals(created.notes, createInput.notes)
+    assertEquals(created.status, 'active')
 
-  const fetched = await api.Users.get(created.id)
-  assertEquals(fetched.id, created.id)
-  assertEquals(fetched.primaryEmail, createInput.primaryEmail)
-  assertEquals(fetched.preferredChannel, createInput.preferredChannel)
-  assertEquals(fetched.notes, createInput.notes)
+    const fetched = await api.Users.get(created.id)
+    assertEquals(fetched.id, created.id)
+    assertEquals(fetched.primaryEmail, createInput.primaryEmail)
+    assertEquals(fetched.preferredChannel, createInput.preferredChannel)
+    assertEquals(fetched.notes, createInput.notes)
 
-  const updated = await api.Users.update(scopes.Users.detail.toUpdate(created.id, {
-    roles: fetched.roles,
-    notes: fetched.notes,
-    displayName: `Updated Ops User ${nonce}`,
-    primaryEmail: fetched.primaryEmail,
-    phoneNumber: fetched.phoneNumber,
-    preferredChannel: fetched.preferredChannel,
-    status: 'active'
-  }))
-  assertEquals(updated.id, created.id)
-  assertEquals(updated.displayName, `Updated Ops User ${nonce}`)
-  assertEquals(updated.status, 'active')
+    const updated = await api.Users.update(scopes.Users.detail.toUpdate(created.id, {
+      roles: fetched.roles,
+      notes: fetched.notes,
+      displayName: `Updated Ops User ${nonce}`,
+      primaryEmail: fetched.primaryEmail,
+      phoneNumber: fetched.phoneNumber,
+      preferredChannel: fetched.preferredChannel,
+      status: 'active'
+    }))
+    assertEquals(updated.id, created.id)
+    assertEquals(updated.displayName, `Updated Ops User ${nonce}`)
+    assertEquals(updated.status, 'active')
 
-  await context.step('User detail scope preserves excluded avatarUrl', async () => {
-    assertEquals(updated.avatarUrl, createInput.avatarUrl)
-    const stored = await api.Users.get(created.id)
-    assertEquals(stored.avatarUrl, createInput.avatarUrl)
-    assertEquals(stored.displayName, updated.displayName)
-    assertEquals(stored.status, 'inactive')
+    await context.step('User detail scope preserves excluded avatarUrl', async () => {
+      assertEquals(updated.avatarUrl, createInput.avatarUrl)
+      const stored = await api.Users.get(created.id)
+      assertEquals(stored.avatarUrl, createInput.avatarUrl)
+      assertEquals(stored.displayName, updated.displayName)
+      assertEquals(stored.status, 'active')
+    })
+
+    const deleted = await api.Users.delete(created.id)
+    assertEquals(deleted.id, created.id)
+    assert(deleted.deletedAt.length > 0)
+
+    const deletedUser = await api.Users.get(created.id)
+    assertEquals(deletedUser.id, created.id)
+    assertEquals(deletedUser.deletedAt, deleted.deletedAt)
+    assertEquals(deletedUser.displayName, updated.displayName)
+    assertEquals(deletedUser.status, 'active')
+
+    const updateError = await assertRejects(
+      () =>
+        api.Users.update(scopes.Users.detail.toUpdate(created.id, {
+          ...updated,
+          displayName: 'Cannot update deleted User'
+        })),
+      ApiError
+    )
+    assertEquals(updateError.status, 404)
+    const deleteError = await assertRejects(() => api.Users.delete(created.id), ApiError)
+    assertEquals(deleteError.status, 404)
+    assertEquals(await api.Users.get(created.id), deletedUser)
+
+    const listed = await api.Users.list({ limit: 100 })
+    assertEquals(listed.data.some(user => user.id === created.id), false)
   })
-
-  const deleted = await api.Users.delete(created.id)
-  assertEquals(deleted.id, created.id)
-  assert(deleted.deletedAt.length > 0)
-
-  const deletedUser = await api.Users.get(created.id)
-  assertEquals(deletedUser.id, created.id)
-  assertEquals(deletedUser.deletedAt, deleted.deletedAt)
-  assertEquals(deletedUser.displayName, updated.displayName)
-  assertEquals(deletedUser.status, 'active')
-
-  const updateError = await assertRejects(
-    () =>
-      api.Users.update(scopes.Users.detail.toUpdate(created.id, {
-        ...updated,
-        displayName: 'Cannot update deleted User'
-      })),
-    ApiError
-  )
-  assertEquals(updateError.status, 404)
-  const deleteError = await assertRejects(() => api.Users.delete(created.id), ApiError)
-  assertEquals(deleteError.status, 404)
-  assertEquals(await api.Users.get(created.id), deletedUser)
-
-  const listed = await api.Users.list({ limit: 100 })
-  assertEquals(listed.data.some(user => user.id === created.id), false)
 })

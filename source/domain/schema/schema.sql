@@ -877,6 +877,89 @@ INSERT INTO users (
   NULL
 );
 
+INSERT INTO auth.users (
+  instance_id,
+  id,
+  aud,
+  role,
+  email,
+  confirmation_token,
+  recovery_token,
+  email_change,
+  email_change_token_new,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at
+) VALUES (
+  '00000000-0000-0000-0000-000000000000',
+  '01a1679c-be97-76f3-befc-8dd3e23161ab',
+  'authenticated',
+  'authenticated',
+  'test-admin@swarmag.com',
+  '',
+  '',
+  '',
+  '',
+  now(),
+  '{"provider":"email","providers":["email"]}'::jsonb,
+  '{}'::jsonb,
+  now(),
+  now()
+);
+
+INSERT INTO auth.identities (
+  provider_id,
+  user_id,
+  identity_data,
+  provider,
+  last_sign_in_at,
+  created_at,
+  updated_at
+) VALUES (
+  '01a1679c-be97-76f3-befc-8dd3e23161ab',
+  '01a1679c-be97-76f3-befc-8dd3e23161ab',
+  '{
+    "sub":"01a1679c-be97-76f3-befc-8dd3e23161ab",
+    "email":"test-admin@swarmag.com",
+    "email_verified":true,
+    "phone_verified":false
+  }'::jsonb,
+  'email',
+  now(),
+  now(),
+  now()
+);
+
+INSERT INTO users (
+  id,
+  roles,
+  notes,
+  display_name,
+  primary_email,
+  phone_number,
+  preferred_channel,
+  avatar_url,
+  status,
+  created_at,
+  updated_at,
+  deleted_at
+) VALUES (
+  '01a1679c-be97-76f3-befc-8dd3e23161ab',
+  '["administrator"]'::jsonb,
+  '[]'::jsonb,
+  'Test Administrator',
+  'test-admin@swarmag.com',
+  '+1-000-000-0000',
+  'email',
+  NULL,
+  'active',
+  now(),
+  now(),
+  NULL
+);
+
 INSERT INTO asset_types (id, label, active, created_at, updated_at, deleted_at) VALUES
   ('0195b5b0-3c10-7a21-8a8f-1d2c3b4a5e61', 'Transport Truck', true, now(), now(), NULL),
   ('0195b5b0-3c11-7b32-9c4d-2e3f4a5b6c72', 'Transport Trailer', true, now(), now(), NULL),

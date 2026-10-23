@@ -6,8 +6,8 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Session eligibility; the shared API bootstrap is repaired, but this test remains
-excluded by the charter.
+Session eligibility; the shared API bootstrap is repaired. This test uses stubs
+and needs no authenticated session.
 */
 
 import '@tests/config/test-config.ts'
