@@ -171,6 +171,8 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 
 **Features:**
 
+- **Asset Type Manager** — Manager, wire `api.AssetTypes`; produced first, since the Asset
+  Manager's type picker reads its list; same brief.
 - **Asset Manager** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`;
   `effort/active/2026-10-21-asset-chemical-managers-brief.md`.
 - **Chemical Manager** (`project-user-stories.md` §4) — Manager, wire `api.Chemicals`; same brief.
