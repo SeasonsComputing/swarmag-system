@@ -1,7 +1,7 @@
 # Field Mapping — Brief
 
 **Pending, design input.** Recorded 2026-10-24 from a CA + AI Architect session, while extending
-the document storage brief (`effort/pending/2026-10-23-document-storage-brief.md`). It records the
+the document storage brief (`effort/active/2026-10-23-document-storage-brief.md`). It records the
 depth considered so far; job definition, the workflow workbench, and document storage will flesh
 out the details. Chosen from the roadmap when job definition is.
 

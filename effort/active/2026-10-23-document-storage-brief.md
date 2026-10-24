@@ -1,9 +1,9 @@
 # Document Storage — Brief
 
-**Pending, draft.** Recorded 2026-10-23 from a CA + AI Architect session, while settling the Asset
+**Active, draft.** Recorded 2026-10-23 from a CA + AI Architect session, while settling the Asset
 and Chemical Managers brief, and extended 2026-10-24. M-4 assigned Attachments to M-5; the roadmap
-lists Document storage among M-5's features. Awaits the design moments, CA review, and selection
-from the roadmap. Field mapping, the main consumer of surveys and photos, is
+lists Document storage among M-5's features. Chosen from the roadmap 2026-10-24. Awaits the design
+moments, CA review, and the production gate. Field mapping, the main consumer of surveys and photos, is
 `effort/pending/2026-10-24-field-mapping-brief.md`.
 
 ## What triggered it
