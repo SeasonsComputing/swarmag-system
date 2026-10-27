@@ -122,14 +122,14 @@ client reaches the provider through a maker, as the CRUD clients do.
 ## API sketch
 
 Names proposed; the shape follows the architecture. Two contracts, because the multi-cloud seam
-is not the seam the client calls. `DocumentPath` is branded with `Branded<B>`, and its `Id` is
-branded first (`effort/pending/2026-10-27-branded-types-brief.md`). In M-5 the client contract is
+is not the seam the client calls. `DocumentPath` is a `NominalType`, and its `Id` is made
+nominal first (`effort/active/2026-10-27-nominal-types-brief.md`). In M-5 the client contract is
 implemented by `makeSupabaseDocumentClient`; the provider contract arrives with the broker.
 
 ```ts
 /** Logical accessor: `${namespace}/${bucket}/${id}`; never a physical URL. */
 declare const documentPathBrand: unique symbol
-export type DocumentPath = string & Branded<typeof documentPathBrand>
+export type DocumentPath = NominalType<string, typeof documentPathBrand>
 
 /** The source of truth for one document: provider metadata in M-5, a sidecar later. */
 export type DocumentMetadata = {
