@@ -14,6 +14,9 @@ carries a `url`, and nothing defines what that URL names or who may write it.
 
 ## The architecture
 
+The ten points are the target. Staging says what M-5 builds and which consumer brings each later
+piece.
+
 1. **A closed hierarchy.** `swarmAg ─* namespace ─* bucket ─* document`. Depth is fixed at three
    levels: arbitrary nesting, and the complexity, storage, and compute it costs, are traded for
    buckets that may hold many documents. Identity and affinity come from the hierarchy, by
@@ -58,6 +61,33 @@ carries a `url`, and nothing defines what that URL names or who may write it.
     - **Work:** one execution under `jobs/{job work id}/`: GPS-tagged photos in the order taken.
     - **Raw:** a flight's raw captures, packaged with a checksum manifest for the archive.
 
+## Staging
+
+The repository's rule for the backend holds for storage: what can be a direct operation under RLS
+is not an edge function (`architecture-back.md` §3). Supabase Storage enforces RLS on
+`storage.objects` on the server, so policies cover the broker's two reasons in M-5: they check the
+path's namespace and owner segments and the caller's role where no client can bypass them, and the
+client reaches the provider through a maker, as the CRUD clients do.
+
+**M-5 builds:**
+
+- The closed hierarchy and the logical `DocumentPath` (points 1–3, 9).
+- `ApiDocumentContract` and `makeSupabaseDocumentClient`, selected by maker (point 4).
+- Storage policies as the server-side check, with buckets and configuration owned by the
+  repository (DevOps 1–3, 7).
+- Write-once documents: replacing one creates a new id, the reference moves to it, and the old
+  document is deleted.
+
+**Each later piece arrives with its consumer:**
+
+| Piece                 | Arrives with                                                            |
+| --------------------- | ----------------------------------------------------------------------- |
+| The broker (point 5)  | An alternative provider: S3 and MinIO need presigned URLs from a server |
+| Sidecars (point 6)    | Survey properties (bounds, CRS, bands) beyond the provider's metadata   |
+| Leases (point 7)      | Offline Ops editing                                                     |
+| Cron sweeps (point 8) | The broker's two-step create and commit                                 |
+| Packages (point 10)   | Field mapping                                                           |
+
 ## Document types
 
 - **Reference material:** `Chemical.labels`, `sdsUrl`, `User.avatarUrl`, asset manuals. Small,
@@ -93,13 +123,15 @@ carries a `url`, and nothing defines what that URL names or who may write it.
 
 Names proposed; the shape follows the architecture. Two contracts, because the multi-cloud seam
 is not the seam the client calls. `DocumentPath` is branded with `Branded<B>`, and its `Id` is
-branded first (`effort/pending/2026-10-27-branded-types-brief.md`).
+branded first (`effort/pending/2026-10-27-branded-types-brief.md`). In M-5 the client contract is
+implemented by `makeSupabaseDocumentClient`; the provider contract arrives with the broker.
 
 ```ts
 /** Logical accessor: `${namespace}/${bucket}/${id}`; never a physical URL. */
-export type DocumentPath = string & { readonly __brand: 'DocumentPath' }
+declare const documentPathBrand: unique symbol
+export type DocumentPath = string & Branded<typeof documentPathBrand>
 
-/** Sidecar metadata, the source of truth for one document. */
+/** The source of truth for one document: provider metadata in M-5, a sidecar later. */
 export type DocumentMetadata = {
   id: Id
   path: DocumentPath
@@ -114,10 +146,10 @@ export type DocumentMetadata = {
 /** Short-lived, provider-signed access to bytes. */
 export type DocumentTransfer = { url: string; protocol: 'single' | 'resumable'; expiresAt: When }
 
-/** Exclusive right to replace one document. */
+/** Exclusive right to replace one document; arrives with leases. */
 export type DocumentLease = { path: DocumentPath; holder: Id; token: string; expiresAt: When }
 
-/** Client contract, implemented only by the service. */
+/** Client contract: a client maker in M-5, the service once the broker arrives. */
 export interface ApiDocumentContract {
   create(
     namespace: string,
@@ -127,13 +159,13 @@ export interface ApiDocumentContract {
   commit(path: DocumentPath): Promise<DocumentMetadata>
   read(path: DocumentPath): Promise<{ meta: DocumentMetadata; download: DocumentTransfer }>
   list(namespace: string, bucket: Id): Promise<readonly DocumentMetadata[]>
-  lease(path: DocumentPath): Promise<DocumentLease>
-  replace(lease: DocumentLease, file: DocumentFile): Promise<DocumentTransfer>
-  release(lease: DocumentLease): Promise<void>
+  lease(path: DocumentPath): Promise<DocumentLease> // arrives with leases
+  replace(lease: DocumentLease, file: DocumentFile): Promise<DocumentTransfer> // arrives with leases
+  release(lease: DocumentLease): Promise<void> // arrives with leases
   delete(path: DocumentPath): Promise<DeleteResult>
 }
 
-/** Provider contract: the multi-cloud seam, held only by the service. */
+/** Provider contract: the multi-cloud seam, held only by the service; arrives with the broker. */
 export interface DocumentStoreContract {
   signUpload(key: string, file: DocumentFile): Promise<DocumentTransfer>
   signDownload(key: string): Promise<DocumentTransfer>
@@ -147,7 +179,9 @@ export interface DocumentStoreContract {
 
 Creating is two steps: `create` reserves the path and signs the upload; `commit` runs after the
 bytes land, verifies them, reads their properties, and writes the sidecar. A sidecar without bytes
-cannot exist, so sweeps remove only uncommitted bytes. `list` is the on-demand aggregate. Type
+cannot exist, so sweeps remove only uncommitted bytes. In M-5, `create` signs the upload in the
+client under RLS, which Supabase supports, and `commit` reads the stored object's metadata, so the
+contract does not change when the broker arrives. `list` is the on-demand aggregate. Type
 names spell out `Metadata`; variables and fields may use `meta`.
 
 ## DevOps
@@ -168,6 +202,8 @@ and the architecture documents name storage only in passing.
 3. **Genesis and reset.** `db-genesis` resets the database and leaves stored objects behind, so a
    stage reset leaves documents whose owners no longer exist. A storage reset and its verification
    join `db-reset`.
+   Items 4–6 arrive with the broker; M-5 needs 1–3 and 7.
+
 4. **Cron.** The `pg_cron` and `pg_net` extensions, the job definitions, and the credential the job
    uses to call the sweep entry point, held in Vault. Open: where the job definitions live and how
    each target receives them.
@@ -188,7 +224,7 @@ The production is Foundation mode and reads the DevOps context beside Base.
 
 1. **The path's form.** The document segment is the id, so renames and replacements never move a
    path; the name lives in the sidecar. Open: whether the path carries a scheme (`doc://…`).
-2. **Lease duration** and who may break a lease.
+2. **Lease duration** and who may break a lease. Deferred: arrives with leases.
 3. **`Attachment` and `ChemicalLabel`.** `url` becomes `path: DocumentPath`; whether `Attachment`'s
    `filename` and `contentType` duplicate the sidecar. The Chemical labels editor and `sdsUrl`'s
    storage integration, deferred by the managers brief, land here.
@@ -196,18 +232,19 @@ The production is Foundation mode and reads the DevOps context beside Base.
 5. **Access rules.** Which roles read or write which namespaces; a customer receives signed URLs
    only for shared documents on their own jobs.
 6. **Supabase specifics.** Signed and resumable uploads; the open DevOps questions (bucket mapping,
-   policy ownership, Cron definitions) are in DevOps.
+   policy ownership) are in DevOps.
 7. **Batch import.** A flight is thousands of files: a batch `create`/`commit`, or a manifest the
-   service accepts whole.
+   service accepts whole. Deferred: arrives with surveys.
 8. **Raw retention.** Raw archived cold and products hot is the leaning; the decision is the CA's.
+   Deferred: arrives with surveys.
 
 ## Records
 
 The architecture earns its own section in `architecture-core.md` and its rules a section in
-`CONVENTIONS.md`. The service earns a section in `architecture-back.md`, as user management has
-(§4.6), and storage configuration a section in `architecture-devops.md`, as Auth has (§13). All
-four are locked; the CA opens them for this brief's production, recorded here, as he does
-`domain/`.
+`CONVENTIONS.md`. Storage policies earn a section in `architecture-back.md` beside Row Level
+Security (§4.3), and storage configuration a section in `architecture-devops.md`, as Auth has
+(§13). All four are locked; the CA opens them for this brief's production, recorded here, as he
+does `domain/`.
 
 ## Design history
 
@@ -219,3 +256,9 @@ four are locked; the CA opens them for this brief's production, recorded here, a
 - **2026-10-24, buckets by owner, not by time.** The CA's prior buckets were a timestamp plus an
   id, one per manifest exchange. swarmAg's documents belong to records, so a bucket is its owner's
   UUID v7, which keeps the time ordering in one segment.
+- **2026-10-27, the broker is deferred.** The draft put a brokering edge function in front of
+  storage from the start. The repository's rule is that what can be a direct operation under RLS is
+  not an edge function, and storage policies give M-5 the server-side check. The broker is the seam
+  an alternative provider needs, and none is chosen: building it now would build that seam for a
+  provider that may never arrive. Sidecars, leases, sweeps, and packages are staged with their
+  consumers for the same reason.
