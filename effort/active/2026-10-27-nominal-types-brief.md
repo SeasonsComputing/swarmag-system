@@ -117,8 +117,12 @@ edit, and a resolution that would force one fails.
      form the system writes; a string is checked with `isWhen` and returned unchanged, and anything
      else fails fast. It is not parsed or canonicalized, so it produces only what the system
      writes and leaves values read from storage as stored (2026-10-11). Capture times and picked
-     dates use it; the test literals compile either way, so moving them onto it is consistency,
-     not reach.
+     dates use it.
+   - **Tests use `when(at)` for every timestamp the system would write** (55 literals), to keep the
+     API closed. The five store-form literals (`…32.719719+00:00`) in the list-query and
+     list-clients tests stay raw strings: they stand for values read back from Postgres and prove
+     the cursor and filters carry them unchanged, so they are data-seam values, which `when` does
+     not produce.
 5. **Where casts may appear. Settled: a guard.** `as Id` fails outside a closed set of files: the
    producer (`identifier.ts`), the named data seams
    (`make-supabase-client.ts`, `make-indexeddb-client.ts`, `auth-supabase-client.ts`,
