@@ -118,7 +118,11 @@ export type DocumentLease = { path: DocumentPath; holder: Id; token: string; exp
 
 /** Client contract, implemented only by the service. */
 export interface ApiDocumentContract {
-  create(namespace: string, bucket: Id, file: DocumentFile): Promise<{ path: DocumentPath; upload: DocumentTransfer }>
+  create(
+    namespace: string,
+    bucket: Id,
+    file: DocumentFile
+  ): Promise<{ path: DocumentPath; upload: DocumentTransfer }>
   commit(path: DocumentPath): Promise<DocumentMetadata>
   read(path: DocumentPath): Promise<{ meta: DocumentMetadata; download: DocumentTransfer }>
   list(namespace: string, bucket: Id): Promise<readonly DocumentMetadata[]>

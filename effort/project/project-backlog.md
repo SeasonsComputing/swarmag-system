@@ -525,4 +525,3 @@ References to update: `deno.jsonc` tasks, `source/devops/scripts/app-style-guide
 `architecture-front.md`'s directory tree, landed 2026-09-30.
 
 _End of Backlog Document_
- 

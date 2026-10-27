@@ -15,6 +15,7 @@ api  Shared API namespace for UX applications.
 ├ Auth            Passwordless authentication and session observation.
 ├ AppState        Persistent state.
 ├ SessionState    Reactive authenticated-user session state.
+├ AssetTypes      Asset type catalog CRUD client.
 ├ Assets          Asset CRUD client.
 ├ Chemicals       Chemical CRUD client.
 ├ Facets          Curated classification catalog CRUD client.
@@ -27,10 +28,21 @@ api  Shared API namespace for UX applications.
 
 import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
 import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
+import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
+import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Facet } from '@domain/abstractions/common.ts'
 import type { Customer } from '@domain/abstractions/customer.ts'
+import { AssetAdapter, AssetTypeAdapter } from '@domain/adapters/asset-adapter.ts'
+import { ChemicalAdapter } from '@domain/adapters/chemical-adapter.ts'
 import { FacetAdapter } from '@domain/adapters/common-adapter.ts'
 import { CustomerAdapter } from '@domain/adapters/customer-adapter.ts'
+import {
+  validateAssetCreate,
+  validateAssetTypeCreate,
+  validateAssetTypeUpdate,
+  validateAssetUpdate
+} from '@domain/validators/asset-validator.ts'
+import { validateChemicalCreate, validateChemicalUpdate } from '@domain/validators/chemical-validator.ts'
 import { validateFacetCreate, validateFacetUpdate } from '@domain/validators/common-validator.ts'
 import { validateCustomerCreate, validateCustomerUpdate } from '@domain/validators/customer-validator.ts'
 import { AppState } from '@ux/shell/runtime/app-state.ts'
@@ -55,8 +67,21 @@ export const api = {
       validateUpdate: validateFacetUpdate
     }
   }),
-  // Assets: makeCrudSupabaseClient<Asset>({ table: 'assets', adapter: AssetAdapter }),
-  // Chemicals: makeCrudSupabaseClient<Chemical>({ table: 'chemicals', adapter: ChemicalAdapter }),
+  AssetTypes: makeCrudSupabaseClient<AssetType>({
+    table: 'asset_types',
+    adapter: AssetTypeAdapter,
+    validator: { validateCreate: validateAssetTypeCreate, validateUpdate: validateAssetTypeUpdate }
+  }),
+  Assets: makeCrudSupabaseClient<Asset>({
+    table: 'assets',
+    adapter: AssetAdapter,
+    validator: { validateCreate: validateAssetCreate, validateUpdate: validateAssetUpdate }
+  }),
+  Chemicals: makeCrudSupabaseClient<Chemical>({
+    table: 'chemicals',
+    adapter: ChemicalAdapter,
+    validator: { validateCreate: validateChemicalCreate, validateUpdate: validateChemicalUpdate }
+  }),
   Customers: makeCrudSupabaseClient<Customer>({
     table: 'customers',
     adapter: CustomerAdapter,

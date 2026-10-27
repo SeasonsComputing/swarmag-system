@@ -21,6 +21,19 @@
               "icon": "id-card",
               "labelMode": "visible-no-icon"
             },
+            {
+              "command": "/asset-types",
+              "label": "Asset Types",
+              "icon": "gear",
+              "labelMode": "visible-no-icon"
+            },
+            { "command": "/assets", "label": "Assets", "icon": "gear", "labelMode": "visible-no-icon" },
+            {
+              "command": "/chemicals",
+              "label": "Chemicals",
+              "icon": "exclamation-triangle",
+              "labelMode": "visible-no-icon"
+            },
             { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
             { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
             { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }

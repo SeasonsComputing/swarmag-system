@@ -12,6 +12,9 @@ import '@front/config/ux-config.ts'
 import { bootstrap } from '@ux/shell/runtime/bootstrap.tsx'
 
 // shell bindings
+import { AssetTypeManager } from '@front/app-admin/asset-types/asset-type-manager.tsx'
+import { AssetManager } from '@front/app-admin/assets/asset-manager.tsx'
+import { ChemicalManager } from '@front/app-admin/chemicals/chemical-manager.tsx'
 import { CustomerManager } from '@front/app-admin/customers/customer-manager.tsx'
 import { OnboardingWizard } from '@front/app-admin/onboarding/onboarding-wizard.tsx'
 import { UserManager } from '@front/app-admin/users/user-manager.tsx'
@@ -31,7 +34,10 @@ void bootstrap(
     makeDashboardShell(dashboardSeed, { ...UxWidgetRegistry, ...AppWidgetRegistry }, [
       Routes.workbench('/onboarding', OnboardingWizard),
       Routes.workbench('/users', UserManager),
-      Routes.workbench('/customers', CustomerManager)
+      Routes.workbench('/customers', CustomerManager),
+      Routes.workbench('/asset-types', AssetTypeManager),
+      Routes.workbench('/assets', AssetManager),
+      Routes.workbench('/chemicals', ChemicalManager)
     ])
   ], SessionCoordinator)
 )

@@ -30,11 +30,11 @@ processing, so the walkthrough needs no survey:
 The process uses three ribbons, and a bow is tied at each with the prospect as physical
 confirmation:
 
-| Ribbon | Intent  | Work                                          |
-| ------ | ------- | --------------------------------------------- |
+| Ribbon | Intent  | Work                                            |
+| ------ | ------- | ----------------------------------------------- |
 | Red    | Protect | Do not touch; buffered; a geofence for machines |
-| Green  | Remove  | Mechanical work                               |
-| Yellow | Spray   | Chemical application                          |
+| Green  | Remove  | Mechanical work                                 |
+| Yellow | Spray   | Chemical application                            |
 
 Choosing what not to touch matters as much as what to treat, above all for destructive ground
 machinery and chemical applications.

@@ -97,11 +97,11 @@ settled each as stated.
 
 **Form ownership:**
 
-| Manager     | Editable fields                                                                                                    |
-| ----------- | ------------------------------------------------------------------------------------------------------------------ |
-| Asset Types | label, active                                                                                                      |
-| Assets      | type, label, description, serial number, status, notes                                                             |
-| Chemicals   | name, EPA number, usage, signal word, restricted use, re-entry interval, storage location, SDS URL, notes          |
+| Manager     | Editable fields                                                                                           |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| Asset Types | label, active                                                                                             |
+| Assets      | type, label, description, serial number, status, notes                                                    |
+| Chemicals   | name, EPA number, usage, signal word, restricted use, re-entry interval, storage location, SDS URL, notes |
 
 **Scope adds** admin route registration (`front/app-admin/app.tsx`) and dashboard navigation
 (`front/app-admin/dashboard-admin.json`): routes alone leave the managers undiscoverable. Asset
