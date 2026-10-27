@@ -67,6 +67,16 @@ identity shared by auth and domain seed rows. A cold schema generation following
 prompt's declared source set cannot reconstruct that backend-owned seed meaning reliably.
 
 Bring the backend seed authority into the prompt's source set in a separate authorized production.
+
+### B-35 · The Chemical validator accepts fractional re-entry intervals the schema cannot store
+
+**Observed:** 2026-10-27 · normal
+
+`validateChemicalCreate` checks `reEntryIntervalHours` with `expectPositiveNumber`, so 1.5
+passes, while `chemicals.re_entry_interval_hours` is `INTEGER`. The Chemical Manager accepts only
+blank or positive whole hours (`effort/active/2026-10-21-asset-chemical-managers-brief.md`,
+Amendment 1). Whether the domain means whole hours, and whether zero is valid, is a Foundation
+question for genesis.
 The stage-test-authorization production records this gap without changing the prompt or expanding
 schema generation beyond the three approved test administrator rows.
 

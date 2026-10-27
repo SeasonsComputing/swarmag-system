@@ -75,6 +75,42 @@ Operating mode: **Feature**, in `front/` only: `api.ts`, `scopes.ts`, a new
 `app-admin/chemicals/` folders, with their routes. A need to change `ux/`, `core/`, or
 `domain/` is an escalation: those namespaces are locked.
 
+## Amendment 1 · 2026-10-27, ACE review
+
+ACE's review found the brief feasible in Feature mode and made five details explicit. The CA
+settled each as stated.
+
+1. **The type picker resolves the stored type.** Active, undeleted types supply new choices. An
+   existing Asset whose type is inactive or deleted still shows and keeps it, through a stored
+   lookup as `UserPicker` makes (`front/app/shell/user-picker.tsx`). With no types, creating an
+   Asset awaits a selection; no type is assigned silently.
+2. **Asset Type mutations refresh the catalog.** The catalog reader caches indefinitely, as
+   `useFacets` does; the Asset Types manager's create, update, and delete invalidate it as well as
+   the manager's collection.
+3. **Labels stay out of the Chemical form.** `labels` is not an owned field, and `labels: []` is a
+   create default, so the scope preserves labels on update. No hidden labels field.
+4. **Re-entry interval is blank or positive whole hours,** surfaced before saving, with the number
+   converted on `change`. The validator accepts fractions and the column is an integer; that
+   mismatch is B-35.
+5. **`sdsUrl` is optional external-reference text** under its existing contract. No document
+   selection or upload.
+
+**Form ownership:**
+
+| Manager     | Editable fields                                                                                                    |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ |
+| Asset Types | label, active                                                                                                      |
+| Assets      | type, label, description, serial number, status, notes                                                             |
+| Chemicals   | name, EPA number, usage, signal word, restricted use, re-entry interval, storage location, SDS URL, notes          |
+
+**Scope adds** admin route registration (`front/app-admin/app.tsx`) and dashboard navigation
+(`front/app-admin/dashboard-admin.json`): routes alone leave the managers undiscoverable. Asset
+Types first; Assets depends on it; Chemicals is independent.
+
+**Verification** covers CRUD and soft deletion, clearing optional fields, nested-note discard,
+preservation of chemical labels, catalog refresh, and resolution of inactive and deleted stored
+types; then guards, type checks, lint, formatting, and a browser review at both manager layouts.
+
 ## Design history
 
 - **2026-10-21, optional-field idiom settled.** The draft left open whether optional text used
