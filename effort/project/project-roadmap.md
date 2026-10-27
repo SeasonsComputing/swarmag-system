@@ -142,6 +142,9 @@ them; each fix lands once instead of chasing every copy:
 - **Host-owned list errors** — added and closed 2026-10-21, `a744ee6`: `AbstractionManager`
   presents the collection's load failure from `listError`; copied managers supply it, not the
   banner.
+- **Nominal types** — dispatched 2026-10-27,
+  `effort/active/2026-10-27-nominal-types-brief.md`: `Id` becomes a nominal type with a closed
+  producer and guard, before document storage builds `DocumentPath` on it.
 
 **Rides along:**
 

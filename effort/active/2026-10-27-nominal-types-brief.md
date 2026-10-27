@@ -1,10 +1,10 @@
 # Nominal Types — Brief
 
-**Active, draft.** Recorded 2026-10-27 from a CA + AI Architect session, while reviewing the
-document storage brief (`effort/active/2026-10-23-document-storage-brief.md`), whose
-`DocumentPath` is a nominal string built on `Id`. Chosen the same day, ahead of the storage
-production: making `Id` nominal first means `DocumentPath` is built on a nominal `Id` rather than
-retrofitted later.
+**Dispatched 2026-10-27** for ACE review and production; later changes are amendments. Recorded
+2026-10-27 from a CA + AI Architect session, while reviewing the document storage brief
+(`effort/active/2026-10-23-document-storage-brief.md`), whose `DocumentPath` is a nominal string
+built on `Id`. Chosen the same day, ahead of the storage production: making `Id` nominal first
+means `DocumentPath` is built on a nominal `Id` rather than retrofitted later.
 
 ## What triggered it
 
