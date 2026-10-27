@@ -1,9 +1,10 @@
 # Asset Type, Asset, and Chemical Managers — Brief
 
-**Active, draft.** Recorded 2026-10-21 from a CA + AI Architect session, after a qualitative
-assessment of the workbench for M-5 Mechanical Productions. The three managers are M-5's features:
-stock CRUD copied from the reference implementations. Chosen from the roadmap 2026-10-21. Awaits
-the design moments, CA review, and the production gate.
+**Active, dispatched 2026-10-27.** Recorded 2026-10-21 from a CA + AI Architect session, after a
+qualitative assessment of the workbench for M-5 Mechanical Productions. The three managers are
+M-5's features: stock CRUD copied from the reference implementations, so the forms follow the
+domain types and the recipe; `project-user-stories.md` §3–4 are not needed for them. Chosen from
+the roadmap 2026-10-21.
 
 ## What triggered it
 
