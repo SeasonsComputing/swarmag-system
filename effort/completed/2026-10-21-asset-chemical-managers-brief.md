@@ -1,6 +1,7 @@
 # Asset Type, Asset, and Chemical Managers — Brief
 
-**Active, dispatched 2026-10-27.** Recorded 2026-10-21 from a CA + AI Architect session, after a
+**Completed 2026-10-27.** The three managers shipped in `c5403ca`, reviewed by the AI Architect
+and verified by the CA's walkthrough. Recorded 2026-10-21 from a CA + AI Architect session, after a
 qualitative assessment of the workbench for M-5 Mechanical Productions. The three managers are
 M-5's features: stock CRUD copied from the reference implementations, so the forms follow the
 domain types and the recipe; `project-user-stories.md` §3–4 are not needed for them. Chosen from
@@ -128,5 +129,12 @@ types; then guards, type checks, lint, formatting, and a browser review at both 
 - **2026-10-23, chemical labels wait for storage.** The draft planned a labels editor beside Sites
   and Notes. The CA set a label as a reference to an already-uploaded document, so the editor has
   nothing to reference until document storage lands.
+
+## Closure
+
+- **Chemical labels editor:** joins the document storage brief
+  (`effort/active/2026-10-23-document-storage-brief.md`, design moment 3).
+- **`sdsUrl` storage integration:** joins the same brief, same moment.
+- **Re-entry interval validator and schema mismatch:** backlog B-35.
 
 _End of Brief_

@@ -171,11 +171,10 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 
 **Features:**
 
-- **Asset Type Manager** — Manager, wire `api.AssetTypes`; produced first, since the Asset
-  Manager's type picker reads its list; same brief.
-- **Asset Manager** (`project-user-stories.md` §3.1–3.2) — Manager, wire `api.Assets`;
-  `effort/active/2026-10-21-asset-chemical-managers-brief.md`.
-- **Chemical Manager** (`project-user-stories.md` §4) — Manager, wire `api.Chemicals`; same brief.
+- **Asset Type Manager** — shipped 2026-10-27 (`c5403ca`); same brief.
+- **Asset Manager** (`project-user-stories.md` §3.1–3.2) — shipped 2026-10-27 (`c5403ca`);
+  `effort/completed/2026-10-21-asset-chemical-managers-brief.md`.
+- **Chemical Manager** (`project-user-stories.md` §4) — shipped 2026-10-27 (`c5403ca`); same brief.
   The labels editor waits for document storage.
 - **Document storage** — the Attachments capability M-4 assigned to this milestone; asset
   documents and Chemical labels reference it;

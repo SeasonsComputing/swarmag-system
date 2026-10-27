@@ -155,7 +155,8 @@ names spell out `Metadata`; variables and fields may use `meta`.
    path; the name lives in the sidecar. Open: whether the path carries a scheme (`doc://…`).
 2. **Lease duration** and who may break a lease.
 3. **`Attachment` and `ChemicalLabel`.** `url` becomes `path: DocumentPath`; whether `Attachment`'s
-   `filename` and `contentType` duplicate the sidecar.
+   `filename` and `contentType` duplicate the sidecar. The Chemical labels editor and `sdsUrl`'s
+   storage integration, deferred by the managers brief, land here.
 4. **The namespace catalog** and its validation.
 5. **Access rules.** Which roles read or write which namespaces; a customer receives signed URLs
    only for shared documents on their own jobs.

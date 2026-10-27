@@ -74,7 +74,7 @@ Bring the backend seed authority into the prompt's source set in a separate auth
 
 `validateChemicalCreate` checks `reEntryIntervalHours` with `expectPositiveNumber`, so 1.5
 passes, while `chemicals.re_entry_interval_hours` is `INTEGER`. The Chemical Manager accepts only
-blank or positive whole hours (`effort/active/2026-10-21-asset-chemical-managers-brief.md`,
+blank or positive whole hours (`effort/completed/2026-10-21-asset-chemical-managers-brief.md`,
 Amendment 1). Whether the domain means whole hours, and whether zero is valid, is a Foundation
 question for genesis.
 The stage-test-authorization production records this gap without changing the prompt or expanding
