@@ -67,9 +67,19 @@ IndexedDB clients, the Supabase auth client, edge auth, user orchestration, and 
 
 ## Design moments
 
-1. **The empty Id.** `''` stands for "no Id" in dashboard state, the asset form, and a test. The
-   nominal type makes it visible: `Id | undefined`, as `AssociationOptional` already declares, or a named
-   value.
+Every moment leaves `domain/` unbroken: the nominal types are taken because the domain needs no
+edit, and a resolution that would force one fails.
+
+1. **The empty Id. Settled.** `''` stands for "no Id" in dashboard state, the asset form, and a
+   test. There is no empty `Id`. `AssociationOptional` means the domain allows no reference; a form
+   that has not chosen a required reference yet never borrows it. The workbench decomposes an
+   abstraction into its constituent fields, so form state has a lifecycle of its own: "not chosen"
+   lives there.
+   - **Asset form:** the type signal holds `Id | undefined`, narrowed at submit, within `front/`;
+     `core/` and the workbench are untouched.
+   - **Dashboard state:** recoded so its id is never a placeholder; the `DASHBOARD_ID` literal
+     follows moment 4.
+   - **The rejection test:** follows moment 4.
 2. **Select values.** `ux/ui` selects emit `string` and stay generic, as a catalog must. The Id
    pickers in `front/` (`UserPicker`, `AssetTypePicker`) become the boundary: narrow with `isId`, or
    cast because the options were built from stored ids.
