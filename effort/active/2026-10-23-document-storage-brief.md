@@ -149,6 +149,40 @@ bytes land, verifies them, reads their properties, and writes the sidecar. A sid
 cannot exist, so sweeps remove only uncommitted bytes. `list` is the on-demand aggregate. Type
 names spell out `Metadata`; variables and fields may use `meta`.
 
+## DevOps
+
+Storage is the first platform service since Auth that the repository must own, and it is a
+feature set of its own. Auth's configuration sets the pattern (`architecture-devops.md` §13): the
+repository is authoritative, not the dashboard; `config.toml` owns local behavior, a per-target
+contract owns hosted behavior, and a task applies it and reads back every value. Nothing of this
+exists for storage: `config.toml`'s `[storage]` block is the scaffold default (50 MiB, no buckets),
+and the architecture documents name storage only in passing.
+
+1. **Storage configuration.** Physical buckets, file size limit, MIME restrictions, and the S3
+   protocol switch: local in `config.toml`, hosted in a per-target contract, applied by a task and
+   verified by reading back. Open: one physical bucket for every namespace, or one per namespace
+   (design moment 1).
+2. **Storage policies.** SQL on `storage.objects`, a schema Supabase manages as it does `auth`.
+   Open: whether `schema.sql` owns them, as genesis owns the `auth.users` seeds.
+3. **Genesis and reset.** `db-genesis` resets the database and leaves stored objects behind, so a
+   stage reset leaves documents whose owners no longer exist. A storage reset and its verification
+   join `db-reset`.
+4. **Cron.** The `pg_cron` and `pg_net` extensions, the job definitions, and the credential the job
+   uses to call the sweep entry point, held in Vault. Open: where the job definitions live and how
+   each target receives them.
+5. **Secrets and runtime configuration.** Secret Registry entries (§5) and edge runtime
+   configuration (§4.4): the Cron credential now; the archive's S3 credentials and the provider
+   selection later.
+6. **Edge deployment.** The broker and the sweep, one service with two entry points, deploy through
+   `edge-deploy` and its verification (§8.6). Stage integration tests remove the objects they
+   write.
+7. **Free-tier usage.** Keeping infrastructure at $0 means watching the 1 GB limit: a task reports
+   storage usage per target.
+8. **The import node** (ODM, GDAL, ExifTool) is a deployable outside Supabase, and not this brief's:
+   it belongs with field mapping or a later brief of its own.
+
+The production is Foundation mode and reads the DevOps context beside Base.
+
 ## Design moments
 
 1. **The path's form.** The document segment is the id, so renames and replacements never move a
@@ -160,7 +194,8 @@ names spell out `Metadata`; variables and fields may use `meta`.
 4. **The namespace catalog** and its validation.
 5. **Access rules.** Which roles read or write which namespaces; a customer receives signed URLs
    only for shared documents on their own jobs.
-6. **Supabase specifics.** Signed and resumable uploads, storage policies, and Cron setup.
+6. **Supabase specifics.** Signed and resumable uploads; the open DevOps questions (bucket mapping,
+   policy ownership, Cron definitions) are in DevOps.
 7. **Batch import.** A flight is thousands of files: a batch `create`/`commit`, or a manifest the
    service accepts whole.
 8. **Raw retention.** Raw archived cold and products hot is the leaning; the decision is the CA's.
@@ -168,8 +203,10 @@ names spell out `Metadata`; variables and fields may use `meta`.
 ## Records
 
 The architecture earns its own section in `architecture-core.md` and its rules a section in
-`CONVENTIONS.md`. Both are locked; the CA opens them for this brief's production, recorded here, as
-he does `domain/` and `architecture-devops.md` where the production needs them.
+`CONVENTIONS.md`. The service earns a section in `architecture-back.md`, as user management has
+(§4.6), and storage configuration a section in `architecture-devops.md`, as Auth has (§13). All
+four are locked; the CA opens them for this brief's production, recorded here, as he does
+`domain/`.
 
 ## Design history
 
