@@ -92,7 +92,8 @@ carries a `url`, and nothing defines what that URL names or who may write it.
 ## API sketch
 
 Names proposed; the shape follows the architecture. Two contracts, because the multi-cloud seam
-is not the seam the client calls.
+is not the seam the client calls. `DocumentPath` is branded with `Branded<B>`, and its `Id` is
+branded first (`effort/pending/2026-10-27-branded-types-brief.md`).
 
 ```ts
 /** Logical accessor: `${namespace}/${bucket}/${id}`; never a physical URL. */
