@@ -108,10 +108,9 @@ The pattern is taught, not chosen:
 Opened for this production: `core/std/adt.ts` and `api-contracts.ts`; `domain/validators/`;
 `ux/shell/dashboard/dashboard-state.ts`; `ux/widgets/helm-widget.tsx`;
 `devops/scripts/smoke-ux.ts`; `effort/genesis/genesis-domain-sdk.md`; and
-`documentation/domain/domain-archetypes.md` §5.3 and §5.5 _(per Amendment 1)_. `domain/` and
-`documentation/` are locked; the
-CA opens them for this brief, recorded here. CONVENTIONS 1.3 is already written (`287d283`) and
-is not part of the production.
+`documentation/domain/domain-archetypes.md` §5.3 and §5.5 _(per Amendment 1; §5.2 and §5.4 per
+Amendment 2)_. `domain/` and `documentation/` are locked; the CA opens them for this brief,
+recorded here. CONVENTIONS 1.3 is already written (`287d283`) and is not part of the production.
 
 ## Amendment 1 (2026-10-27): ACE's review
 
@@ -139,6 +138,28 @@ the documents.
      `ValidatorError`.
    - **Completion:** `deno task check`, formatting, the relevant tests (`deno task check` runs
      none), and the sandbox comparison.
+
+## Amendment 2 (2026-10-28): while the files are open
+
+The CA's review of the production found two more taught or misplaced patterns in the files this
+brief already opens.
+
+1. **Domain validators import types on their own line.** `domain-archetypes.md` §5 shows
+   `type ExpectResult,` inline in the value import of its three validator examples (lines 324,
+   371, 454), so every generated validator copies it; `chemical-validator.ts` (`type ChemicalLabel`)
+   and `user-validator.ts` (`type UserRole`) do the same for a second type. CONVENTIONS §3.3 allows
+   either form for one type; domain validators take the separate `import type` line. The three
+   examples show `import type { ExpectResult } from '@core/std'`, and all eight validators are
+   retrofitted by hand. The sandbox comparison also checks import form.
+2. **`isNullish` moves to `validators.ts`'s PREDICATES.** A guard lives beside its type (`isId`,
+   `isWhen`, `isDictionary`); a predicate with no type of its own lives with the predicates, as
+   `isBoolean` does. `isNullish` guards no `adt.ts` type. `make-adapter.ts` imports it from
+   `validators.ts`; consumers through `@core/std` are unchanged, and `validators.ts` does not import
+   `make-adapter.ts`, so `core/std` stays acyclic.
+
+**Records:** `core/std/validators.ts` and `make-adapter.ts` are opened, with the validator files
+already open. The three examples sit in archetypes §5.2, §5.3, and §5.4, so §5.2 and §5.4 are
+opened beside §5.3 and §5.5.
 
 ## Design history
 
