@@ -142,6 +142,9 @@ them; each fix lands once instead of chasing every copy:
 - **Host-owned list errors** — added and closed 2026-10-21, `a744ee6`: `AbstractionManager`
   presents the collection's load failure from `listError`; copied managers supply it, not the
   banner.
+- **Junction client** — active 2026-10-28, `effort/active/2026-10-28-junction-client-brief.md`:
+  `makeJunctionSupabaseClient` in `core/cli`, so a manager edits a many-to-many from its owning
+  side; the Service Manager is its first consumer.
 
 **Rides along:**
 
@@ -184,6 +187,8 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
   `effort/completed/2026-10-21-asset-chemical-managers-brief.md`.
 - **Chemical Manager** (`project-user-stories.md` §4) — shipped 2026-10-27 (`c5403ca`); same brief.
   The labels editor waits for document storage.
+- **Service Manager** — active 2026-10-28, `effort/active/2026-10-28-service-manager-brief.md`:
+  missed from the mechanical productions; the first many-to-many (required asset types).
 - **Document storage** — the Attachments capability M-4 assigned to this milestone; asset
   documents and Chemical labels reference it;
   `effort/active/2026-10-23-document-storage-brief.md`.
