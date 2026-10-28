@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.1)
+# Software Construction Conventions (1.2)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.1
-- Published: 2026 October 20th
+- Version: 1.2
+- Published: 2026 October 27th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -360,6 +360,7 @@ Use types from `@core/std` instead of ad-hoc primitives and container generics.
 | `AssociationOne<T>`       | raw `Id` for required FK references                                        |
 | `AssociationOptional<T>`  | raw `Id \| undefined` for optional FK references                           |
 | `AssociationJunction<T>`  | raw `Id` in junction abstractions                                          |
+| `NominalType<T, B>`       | an inline `{ readonly [brand]: true }` intersection                        |
 | `ValidatorError`          | thrown by `notValid()`; generic `Error` for validation failures            |
 
 - Import std primitives from `@core/std` only.
@@ -420,6 +421,53 @@ A contract gets an interface (§8.2) when more than one implementation makes it 
 when a toolkit declares what an application must supply.
 
 A free function is right for a pure primitive used across containers, and for a maker.
+
+### 8.4 Nominal types
+
+TypeScript compares types by shape, so `type Id = string` is another name for `string`, and any
+string passes as one. A nominal type is a base type the compiler tells apart from all others. Use
+`NominalType<T, B>` from `@core/std` when a value has a domain of its own: a format, a producer
+that makes it, and a guard that recognizes it. A role is not a domain: an acreage and a price are
+both numbers, and names, validators, and review keep them apart.
+
+The brand `B` is a `declare const … : unique symbol`, written directly under the type's comment and
+never exported. `declare` emits no code: the brand exists only for the checker, and at runtime the
+value is its base type. Only the brand's file can name it, so only that file constructs the type
+(§10.2).
+
+```typescript
+/** A URL-safe page name; the symbol exists only in the type. */
+declare const slugBrand: unique symbol
+export type Slug = NominalType<string, typeof slugBrand>
+
+/** Valid Slug format. */
+const SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+
+/** Guard: recognizes a Slug. */
+export const isSlug = (value: unknown): value is Slug =>
+  typeof value === 'string' && SLUG_REGEX.test(value)
+
+/** Producer: the one construction; the guard narrows, so no cast. */
+export const toSlug = (value: string): Slug => {
+  if (isSlug(value)) return value
+  return notValid('Invalid Slug')
+}
+```
+
+An object type takes its brand the same way. A producer that builds the value from its parts
+vouches for it with an `as` cast.
+
+```typescript
+/** A map position in degrees; the symbol exists only in the type. */
+declare const positionBrand: unique symbol
+export type Position = NominalType<{ readonly lat: number; readonly lng: number }, typeof positionBrand>
+
+/** Producer: the one construction; it checks the parts, then vouches once. */
+export const toPosition = (lat: number, lng: number): Position => {
+  if (Math.abs(lat) > 90 || Math.abs(lng) > 180) return notValid('Invalid Position')
+  return { lat, lng } as Position
+}
+```
 
 ## 9. Domain Shapes
 
@@ -583,6 +631,10 @@ predicates (`is*`), expectations (`expect*`), normalizers (`to*`), and the resul
 - An expectation returns an `ExpectResult`: an error message, or `null` when valid. Compose them
   with `expectValid`, which returns the first error.
 - `notValid` throws a `ValidatorError`; never throw a generic `Error` for a validation failure.
+- A normalizer may check as well as normalize: `toId` and `toWhen` fail through `notValid` on input
+  they cannot accept.
+- A fixed identifier or timestamp written in code goes through its checker (`toId('…')`,
+  `toWhen('…')`); a new one comes from its producer (`id()`, `when()`).
 - A union validates with the same discriminator switch as its consumers (§9.4).
 
 ```typescript
@@ -620,7 +672,7 @@ A contract gets a file of its own in two cases:
   toolkit implements itself stays with its implementation.
 
 A maker whose types only it produces keeps them in its own file (`make-adapter.ts`,
-`make-scope.ts`). A branded type shares its producer's file, so only the producer can construct
+`make-scope.ts`). A nominal type shares its producer's file, so only the producer can construct
 it (`make-query.ts`).
 
 ```typescript
@@ -1243,6 +1295,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.2     | 2026 October 27th   | New §8.4 Nominal types: `NominalType<T, B>` from `@core/std` for a value with a domain of its own, keyed by a producer-private phantom brand declared under the type's comment; §8.1 lists it, and §10.2 says nominal type where it said branded type. §9.6 Validators: a normalizer may check, failing through `notValid`, and a fixed identifier or timestamp written in code goes through its checker (`toId`, `toWhen`) while a new one comes from its producer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 1.1     | 2026 October 20th   | Recast as the programming guide for software construction at Seasons Computing. The `core/` file headers are the reference, and some conventions are preferences held by review (§1 Overview). §3 Imports adds the type-import form and the own-namespace and closed `core/std` rules. §4 Naming makes object constants PascalCase and values SCREAMING_SNAKE. §6 Source Code File Format is rewritten: every file opens with a box header written in expanding levels, PUBLIC lists every export, and containers list their members as trees. §7.6 No magic gains its corollary, explicit and obvious. New chapters: §8 Types and Containers, §9 Domain Shapes, §10 Makers and Contracts, §11 Runtime Configuration, §12 Services, §13 Local Persistence, and §14 Remote Persistence. §15 Error Handling separates `Error`, `ValidatorError`, `ApiError`, and service errors. New §16 UX Shell and §17 Building UX Patterns cover `ux/`; new §19 DevOps and Guards covers guards and the tooling allowances. The former §8–§13 are renumbered. |
 | 1.0     | 2026 September 15th | Cross-references in this document and every document citing it (`AGENTS.md`, the architecture docs, the genesis prompts) caught up to the new name (commit `ca77878`), and it gained explicit metadata and this amendment record for the first time. The rename's rationale: the document covers more than style — §8.6/§8.7 adapter and maker shape, §12 testing are structural pattern conventions, not aesthetics — and the old name undersold its actual scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | 0.7     | 2026 September 13th | Path renamed to `CONVENTIONS.md` (commit `5272c25`) with no content change of its own — bundled quietly into an unrelated commit, internal references still said "STYLE-GUIDE" for two more days.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
