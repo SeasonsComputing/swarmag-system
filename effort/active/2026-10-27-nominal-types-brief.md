@@ -3,8 +3,9 @@
 **Dispatched 2026-10-27** for ACE review and production; later changes are amendments. Recorded
 2026-10-27 from a CA + AI Architect session, while reviewing the document storage brief
 (`effort/active/2026-10-23-document-storage-brief.md`), whose `DocumentPath` is a nominal string
-built on `Id`. Chosen the same day, ahead of the storage production: making `Id` nominal first
-means `DocumentPath` is built on a nominal `Id` rather than retrofitted later.
+built on `Id`. Chosen the same day, ahead of the storage production (no longer a prerequisite, per
+Amendment 1): making `Id` nominal first means `DocumentPath` is built on a nominal `Id` rather than
+retrofitted later.
 
 ## What triggered it
 
@@ -29,10 +30,12 @@ makes one. `Id` and `When` are the only primitive aliases in `core/` and `domain
    `declare const … : unique symbol`, never exported, in its producer's file. The declaration emits
    no code; it exists only for the checker, a phantom type. Only that file can name the brand, so
    §10.2 holds: the producer constructs, everyone else receives.
-3. **`Id` is nominal.** `id()` returns `Id`, and `isId` narrows to it. At runtime it stays a
-   plain string: JSON, the database, and URLs do not change. `When` stays `string`.
+3. **`Id` is nominal.** _Deferred by Amendment 1._ `id()` returns `Id`, and `isId` narrows to it. At
+   runtime it stays a plain string: JSON, the database, and URLs do not change. `When` stays
+   `string`.
 4. **`Query<T>` adopts `NominalType`**, so the repository has one spelling of the idiom.
-5. **`DocumentPath`** is the first type born nominal (document storage brief).
+5. **`DocumentPath`** is the first type born nominal (document storage brief). _Superseded by
+   Amendment 1: storage does not depend on this brief._
 6. **Two entry points per type.** Each nominal type has a producer, for a new or a fixed value, and
    a guard; any other value crosses a data seam (moment 3).
 
@@ -43,10 +46,11 @@ makes one. `Id` and `When` are the only primitive aliases in `core/` and `domain
 
    `When` keeps the pair while it stays `string`, so the API is closed for both.
 
-7. **Producer first, then the type.** The overload is additive and backward compatible, so the
-   production runs in two steps. First `id()` gains its argument and the literal ids move onto it
-   while `Id` is still `string`; every step type-checks. Then `Id` becomes nominal, which leaves
-   only the sites the moments decide. The first step stands on its own if the second stops.
+7. **Producer first, then the type.** _Amendment 1 produces the first step only._ The overload is
+   additive and backward compatible, so the production runs in two steps. First `id()` gains its
+   argument and the literal ids move onto it while `Id` is still `string`; every step type-checks.
+   Then `Id` becomes nominal, which leaves only the sites the moments decide. The first step stands
+   on its own if the second stops.
 
 ```ts
 // core/std/nominal-type.ts: the named idiom
@@ -84,19 +88,19 @@ clients, the Supabase auth client, edge auth, user orchestration, and one test.
 Every moment leaves `domain/` unbroken: the nominal types are taken because the domain needs no
 edit, and a resolution that would force one fails.
 
-1. **The empty Id. Settled.** `''` stands for "no Id" in dashboard state, the asset form, and a
-   test. There is no empty `Id`. `AssociationOptional` means the domain allows no reference; a form
-   that has not chosen a required reference yet never borrows it. The workbench decomposes an
-   abstraction into its constituent fields, so form state has a lifecycle of its own: "not chosen"
-   lives there.
+1. **The empty Id. Settled.** _Deferred by Amendment 1._ `''` stands for "no Id" in dashboard state,
+   the asset form, and a test. There is no empty `Id`. `AssociationOptional` means the domain allows
+   no reference; a form that has not chosen a required reference yet never borrows it. The workbench
+   decomposes an abstraction into its constituent fields, so form state has a lifecycle of its own:
+   "not chosen" lives there.
    - **Asset form:** the type signal holds `Id | undefined`, narrowed at submit, within `front/`;
      `core/` and the workbench are untouched.
    - **Dashboard state:** recoded so its id is never a placeholder; `DASHBOARD_ID` comes from
      `id(literal)` (moment 4).
    - **The rejection test:** follows moment 4.
-2. **Select values. Settled.** `ux/ui` selects emit `string` and stay generic, as a catalog must.
-   The Id pickers in `front/` (`UserPicker`, `AssetTypePicker`) build their options from stored
-   records, so each resolves the selected value back to its own record
+2. **Select values. Settled.** _Deferred by Amendment 1._ `ux/ui` selects emit `string` and stay
+   generic, as a catalog must. The Id pickers in `front/` (`UserPicker`, `AssetTypePicker`) build
+   their options from stored records, so each resolves the selected value back to its own record
    (`users.find(user => user.id === value)?.id`): no cast and no format check, the least clever of
    the three. `AssetTypePicker`'s value becomes `Id | undefined` (moment 1).
 3. **Boundary entry. Settled.** Stored rows enter by cast at the named boundaries: the CRUD
@@ -109,10 +113,10 @@ edit, and a resolution that would force one fails.
 4. **Literals. Settled.** Fixtures already build ids with `id()`. Each producer gains an optional
    argument and stays the one producer, additive and backward compatible:
    - `id(literal?: string): Id` returns a new UUID v7 without one, and with one checks it and fails
-     fast. `DASHBOARD_ID`, the stage seed ids, and stable fixture ids use it. All 37 literal UUIDs in
-     the TypeScript sources are v7; the nil UUID in `schema.sql`'s auth seeds never reaches
-     TypeScript. Rejection tests cast their deliberately invalid values (`'invalid' as Id`), which
-     states what they prove.
+     fast. `DASHBOARD_ID`, the stage seed ids, and stable fixture ids use it. All 37 literal UUIDs
+     (4, per Amendment 1) in the TypeScript sources are v7; the nil UUID in `schema.sql`'s auth
+     seeds never reaches TypeScript. Rejection tests cast their deliberately invalid values
+     (`'invalid' as Id`), which states what they prove.
    - `when(at?: Date | string): When` returns now without one. A `Date` becomes `toISOString()`, the
      form the system writes; a string is checked with `isWhen` and returned unchanged, and anything
      else fails fast. It is not parsed or canonicalized, so it produces only what the system
@@ -123,8 +127,8 @@ edit, and a resolution that would force one fails.
      list-clients tests stay raw strings: they stand for values read back from Postgres and prove
      the cursor and filters carry them unchanged, so they are data-seam values, which `when` does
      not produce.
-5. **Where casts may appear. Settled: a guard.** `as Id` fails outside a closed set of files: the
-   producer (`identifier.ts`), the named data seams
+5. **Where casts may appear. Settled: a guard.** _Deferred by Amendment 1._ `as Id` fails outside a
+   closed set of files: the producer (`identifier.ts`), the named data seams
    (`make-supabase-client.ts`, `make-indexeddb-client.ts`, `auth-supabase-client.ts`,
    `make-supabase-edge-auth.ts`, `user-orchestra.ts`), and `source/tests/`. The rule joins
    `guard-core-std-types.ts`, which already enforces `@core/std` vocabulary; a new data seam joins
@@ -142,6 +146,41 @@ the sites above. CONVENTIONS §10.2 says nominal type where it says branded type
 `NominalType`, and states the cast rule; CONVENTIONS is locked and the CA opens it. The guard rule
 lands in `guard-core-std-types.ts`, and `architecture-devops.md` §11.1 describes it; that document
 is locked and the CA opens it. `domain/` is not opened: the measured reach needs no domain edit.
+
+## Amendment 1 (2026-10-27): rescoped after ACE's review
+
+ACE's review found the design coherent and raised five points, each verified against the code: the
+asset draft is read at open and at every dirty check, before a type is chosen; `Preferences`
+declares its row an `Instance` while keying it by store name; pickers must resolve against every
+record in their options, stored references included; verification was unspecified; and the UUID
+inventory counted `schema.sql`, not TypeScript. In review the CA and AI Architect found the brief
+was not a prerequisite for document storage, which needs no nominal `Id`. The brief is rescoped to
+what is useful now; making `Id` nominal is deferred.
+
+**The production:**
+
+1. **`NominalType<T, B>`** in `core/std/nominal-type.ts`, exported through `std.ts`; `Query<T>`
+   adopts it (design points 1, 2, 4). Additive.
+2. **`id(literal?)` and `when(at?)`** as moment 4 settles them. Additive and backward compatible.
+3. **Literals move onto the producers:** `DASHBOARD_ID` and the stage-session ids through
+   `id('…')`; test timestamps through `when('…')`, with the five store-form literals raw.
+4. **`Preferences` keeps string keys:** `PreferencesStore = { id: string; state: StringDictionary
+   }`. A preferences row is keyed by name, not identified, so it is not an `Instance`; stored keys
+   do not change.
+5. **Verification:** runtime tests for both producers, including the fail-fast paths.
+
+**Corrected:** the TypeScript sources hold 4 literal UUIDs, all v7 (`DASHBOARD_ID`, two
+stage-session ids, one in `db-genesis-verify.ts`); the 37 counted earlier were `schema.sql` seeds.
+
+**Deferred:** making `Id` nominal (design point 3), with moments 1, 2, and 5, which apply only once
+it is. ACE's asset draft and picker findings belong to them: the form owns `AssetFormDraft` with
+`type: Id | undefined`, which the workbench baseline and dirty checks read, and the asset provider
+narrows before scope projection; each picker resolves against the list its options came from. The
+deferred items are settled when the brief closes (EFFORT §4).
+
+**Records:** `core/std` and `core/cli/preferences.ts` are opened for this production, with
+`ux/shell` and `source/tests/` for the literal sites. CONVENTIONS §10.2 names `NominalType`; it is
+opened for that. `architecture-devops.md` §11.1 is not touched: the cast guard is deferred.
 
 ## Design history
 
