@@ -6,12 +6,13 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Builds transport-agnostic CRUD/list API contracts over Supabase PostgREST
+Builds transport-agnostic CRUD/list and junction API contracts over Supabase PostgREST
 with domain-layer serialization hooks and uniform ApiError mapping.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 CrudSupabaseSpecification              CRUD Supabase configuration, including validator.
+JunctionSupabaseSpecification<J>       Unordered junction configuration and key fields.
 BusRuleSupabaseSpecification           RPC or Edge Function configuration.
 SupabaseBaseFilter                     Common SDK filter discriminant.
 SupabaseScalarFilter                   Scalar equality and ordered comparisons.
@@ -21,6 +22,7 @@ SupabaseOrFilter                       Generated alternatives.
 SupabaseListFilter                     Ordered SDK filter operation union.
 SupabaseListRequest<T>                 Constructed list request and paging context.
 makeCrudSupabaseClient(spec)           Build CRUD/list client over Supabase.
+makeJunctionSupabaseClient(spec)       Build owner-side unordered junction client.
 makeSupabaseListRequest(spec, options) Construct list operations without dispatch.
 makeBusRuleSupabaseRpcClient(spec)     Build business-rule client over Supabase RPC.
 makeBusRuleSupabaseEdgeClient(spec)    Build business-rule client over Edge Functions.
@@ -34,7 +36,9 @@ import type {
   FromInstantiable,
   Id,
   Instantiable,
+  JunctionValidator,
   ScopedUpdate,
+  StringSet,
   UpdateFromInstantiable,
   Validator,
   When
@@ -43,6 +47,7 @@ import type {
   ApiBusRuleContract,
   ApiCrudContract,
   ApiErrorDetail,
+  ApiJunctionContract,
   DeleteResult,
   ListOptions,
   ListQuery,
@@ -56,6 +61,7 @@ import {
   listPage,
   listPageLimit,
   listQuery,
+  MAX_LIMIT,
   readListCursor,
   resolveQueryFields,
   throwApiError
@@ -73,6 +79,16 @@ export type CrudSupabaseSpecification<T extends Instantiable> = {
   validator: Validator<T>
 }
 
+/** Configuration for an unordered junction Supabase API client. */
+type IdKey<J> = { [K in keyof J]: J[K] extends Id ? K : never }[keyof J]
+export type JunctionSupabaseSpecification<J> = {
+  table: string
+  adapter: Adapter<J>
+  validator: JunctionValidator<J>
+  owner: IdKey<J>
+  partner: IdKey<J>
+}
+
 /** Configuration for a Supabase business-rule client. */
 export type BusRuleSupabaseSpecification = {
   fn: string
@@ -81,6 +97,56 @@ export type BusRuleSupabaseSpecification = {
 // ───────────────────────────────────────────────────────────────────────────────
 // MAKERS
 // ───────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Maker to produce an unordered junction API client over Supabase.
+ * @param spec Table, domain adapter, create validator, and the two identifier fields.
+ * @returns Complete membership reads and non-atomic, retryable set replacement.
+ */
+export const makeJunctionSupabaseClient = <J>(
+  { table, adapter, validator, owner, partner }: JunctionSupabaseSpecification<J>
+): ApiJunctionContract => {
+  const ownerColumn = adapter[owner].column
+  const partnerColumn = adapter[partner].column
+
+  const partners = async (ownerId: Id): Promise<readonly Id[]> => {
+    const members: Id[] = []
+    let after: Id | undefined
+    while (true) {
+      let builder = Supabase.client().from(table).select(partnerColumn)
+        .eq(ownerColumn, ownerId).order(partnerColumn).limit(MAX_LIMIT)
+      if (after !== undefined) builder = builder.gt(partnerColumn, after)
+      const { data, error } = await builder.returns<Dictionary[]>()
+      checkApiError(error, 'Failed to read junction partners', Supabase.errorToStatus)
+      const rows = data as Dictionary[]
+      if (rows.length === 0) return members
+      for (const row of rows) members.push(row[partnerColumn] as Id)
+      after = members[members.length - 1]
+    }
+  }
+
+  const replace = async (ownerId: Id, partnerIds: readonly Id[]): Promise<void> => {
+    const requested: StringSet = new Set(partnerIds)
+    const current: StringSet = new Set(await partners(ownerId))
+    const added = [...requested].filter(partnerId => !current.has(partnerId)).map(partnerId => {
+      const pair = { [owner]: ownerId, [partner]: partnerId } as J
+      checkValidatorError(validator.validateCreate(pair))
+      return adapter.fromDomain(pair as AdapterPatch<J>)
+    })
+    const removed = [...current].filter(partnerId => !requested.has(partnerId))
+    if (removed.length > 0) {
+      const { error } = await Supabase.client().from(table).delete()
+        .eq(ownerColumn, ownerId).in(partnerColumn, removed)
+      checkApiError(error, 'Failed to delete junction partners', Supabase.errorToStatus)
+    }
+    if (added.length > 0) {
+      const { error } = await Supabase.client().from(table).insert(added)
+      checkApiError(error, 'Failed to insert junction partners', Supabase.errorToStatus)
+    }
+  }
+
+  return { partners, replace }
+}
 
 /**
  * Maker to produce a CRUD/list API client over Supabase.

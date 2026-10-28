@@ -7,12 +7,15 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Defines the canonical client contracts used across the API composition layer:
-CRUD operations, business-rule operations, uniform delete/list result shapes,
+CRUD operations, junction membership, business-rule operations, uniform delete/list result shapes,
 and keyset cursor validation.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 ApiCrudContract<T>   CrudBaseContract<T> & AdaptedUpdateContract<T> & CrudListContract<T>
+ApiJunctionContract                  Owner-side junction membership contract.
+├ partners(owner)                    Read complete unordered partner membership.
+└ replace(owner, partners)           Replace membership as a set.
 ApiBusRuleContract<TParams, TResult>  Generic business-rule execution contract.
 └ run(params)                         Execute business rule and return typed result.
 
@@ -194,8 +197,20 @@ export function checkValidatorError(result: ExpectResult): void {
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// CRUD & BUSINESS RULE API CONTRACTS
+// CRUD, JUNCTION & BUSINESS RULE API CONTRACTS
 // ────────────────────────────────────────────────────────────────────────────
+
+/** A junction seen from its owning side. */
+export interface ApiJunctionContract {
+  /** Read the owner's complete, unordered partner membership. */
+  partners(owner: Id): Promise<readonly Id[]>
+  /**
+   * Replace membership as a set, validating additions before any deletion.
+   * Retries converge without competing writers when permissions allow the operations.
+   * Writes are not atomic across requests.
+   */
+  replace(owner: Id, partners: readonly Id[]): Promise<void>
+}
 
 /** Non-mutating-shape CRUD primitives shared by every ApiCrudContract realization. */
 export interface CrudBaseContract<T extends Instantiable> {

@@ -45,6 +45,7 @@ ValidatorError                  Error thrown for failed validation.
 ExpectResult                    Standard validator return value.
 ExpectGuard<T>                  Type guard used by composition helpers.
 Validator<T>                    Domain mutation boundary validation shape.
+JunctionValidator<J>            Create-only junction boundary validation shape.
 notValid(message)               Throw ValidatorError with message.
 expectValid(...results)         Return first validation error or null.
 */
@@ -243,7 +244,7 @@ export const expectCompositionPositive = <T>(
 }
 
 // ────────────────────────────────────────────────────────────────────────────
-// VALIDATOR SHAPE (Validator<T>)
+// VALIDATOR SHAPES
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Domain validation for an abstraction's mutation boundary. Nothing implements
@@ -252,6 +253,11 @@ export const expectCompositionPositive = <T>(
 export type Validator<T extends Instantiable> = {
   validateCreate: (input: CreateFromInstantiable<T>) => ExpectResult
   validateUpdate: (input: UpdateFromInstantiable<T>) => ExpectResult
+}
+
+/** Domain validation for a junction: rows are inserted and deleted, never updated. */
+export type JunctionValidator<J> = {
+  validateCreate: (input: J) => ExpectResult
 }
 
 // ────────────────────────────────────────────────────────────────────────────
