@@ -1,6 +1,7 @@
 # Junction Client — Brief
 
-**Active, draft.** Recorded and chosen 2026-10-28 from a CA + AI Architect session, while scoping
+**Active, dispatched 2026-10-28** for ACE review; later changes are amendments. Recorded and chosen
+2026-10-28 from a CA + AI Architect session, while scoping
 the Service Manager (`effort/active/2026-10-28-service-manager-brief.md`), whose required asset
 types are the first many-to-many a manager edits. An M-5 enabler: the Service Manager is produced
 after it. Foundation mode: it adds to `core/std` and `core/cli`.
@@ -87,12 +88,12 @@ ServiceRequiredAssetTypes: makeJunctionSupabaseClient<ServiceRequiredAssetType>(
 5. **`replace` compares and writes:** it reads the owner's partners, deletes the removed pairs, and
    validates and inserts the added ones. It is idempotent and convergent: replaying it after a
    partial failure ends in the same state.
-6. **No transaction.** PostgREST runs each request in its own transaction, so a client cannot span
+6. **No transaction.** _Example corrected by Amendment 1._ PostgREST runs each request in its own transaction, so a client cannot span
    requests. The question is who recovers a partial write: configuration (catalogs, services) is
    edited by a person who sees a failure and saves again, and a convergent replace survives retries
    anyway. A transaction, through an RPC or a server-side step, belongs to the first feature that
    writes non-convergent, multi-step changes with no one watching, such as an offline sync.
-7. **The ordered variant is additive:** a `sequence` field in the specification makes `partners`
+7. **The ordered variant is additive:** _Understated; see Amendment 1._ a `sequence` field in the specification makes `partners`
    return in order and `replace` write `sequence`, and `JunctionValidator<J>` gains the
    `validateUpdate` the ordered junctions already have. It arrives with workflows.
 
@@ -107,3 +108,33 @@ the junction's. With `deno task check` and formatting.
 Opened for this production: `core/std/api-contracts.ts` and `validators.ts`;
 `core/cli/make-supabase-client.ts`; and `source/tests/`. `core/` is locked; the CA opens it for this
 brief, recorded here. The Service Manager brief composes the client in `front/api/api.ts`.
+
+## Amendment 1 (2026-10-28): ACE's review
+
+ACE found no blocker for unordered junctions. Each point below was verified against the code,
+schema, and architecture.
+
+1. **`replace` treats partners as a set.** Duplicate ids collapse to one membership; an empty list
+   clears the owner's partners; an unchanged list dispatches no writes.
+2. **Every addition is validated before anything is deleted,** so invalid input leaves the
+   existing membership intact.
+3. **`partners` reads complete membership,** paging internally past the provider's response limit
+   (1,000 rows by default on Supabase); the contract does not expose paging.
+4. **Convergence is bounded:** replaying the same requested membership converges after a partial
+   failure when no competing writer is present and permissions allow the operations. Concurrent
+   replacement is not coordinated.
+5. **The transaction example is corrected.** Offline Ops does not sync multi-step writes: it deep
+   clones a job and uploads append-only logs (`architecture-core.md` §3.2.2, §9.1). Multi-step
+   atomic work in this architecture goes through business-rule orchestration, as `deepCloneJob`
+   does, and a transaction belongs there.
+6. **The ordered variant needs schema work too.** `workflow_tasks` and `task_questions` have no
+   `UPDATE` policy, so writing `sequence` needs RLS and schema changes beside the specification
+   field and validator. It stays deferred to workflows.
+7. **Documentation follows the production, written by the AI Architect** with the CA's go:
+   CONVENTIONS §10.6 gains the junction client beside the CRUD and business-rule clients, and
+   `architecture-core.md` §5.2 and §5.3 recognize it as a third client family. ACE's production is
+   code and tests only.
+8. **Verification adds:** clearing, duplicates, unchanged saves, owner isolation, complete paged
+   reads, validation before mutation, provider failures, and a retry after a successful deletion
+   followed by a failed insertion. Compile-time checks reject an unknown field and an existing
+   numeric field (`sequence`). Tests are database-free, using the existing SDK/fetch test pattern.
