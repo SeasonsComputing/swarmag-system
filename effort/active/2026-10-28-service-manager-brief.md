@@ -117,3 +117,53 @@ a failure of the production, which built the best design the brief and the contr
 **Verification adds:** `partnersOf` returns every listed owner, empty owners as `[]`, grouped
 correctly across pages and split owner lists; `loadServices` makes one membership read; a new
 service cannot save without a category; the list renders the stacked column.
+
+## Amendment 3 (2026-10-28): one row identity across managers
+
+The CA's review of Amendment 2's list column found the managers each style their collection rows
+by hand: Users stacks name, email, and roles; Customers name and contact; Services now name, SKU,
+and asset types. The three share one shape, three lines of decreasing prominence, and the Users
+look is the one to keep.
+
+1. **`PanelRowIdentity` in `ux/shell/panel/panel-row-identity.tsx`,** its CSS beside it: a
+   collection row's identity, presented by `AbstractionManager`'s list and available to
+   `CollectionPanel`'s. A row identity means something only inside a collection panel, so it
+   belongs with the panel family, not the `ux/ui` catalog. Its lines are named by role:
+
+   ```ts
+   export const PanelRowIdentity = (props: {
+     title: UiComponent | string
+     subtitle?: UiComponent | string
+     annotation?: UiComponent | string
+   }): UiComponent
+   ```
+
+   The component owns each line's style: title in the primary text color, subtitle in the
+   secondary color at the compact size, annotation in the accent color, one color for the line.
+   The provider owns the content; a provider that wants styling within a line passes a Solid
+   component of its own. `aside` was set aside: it names the panel slot that holds the collection.
+   `caption` names `UiField`'s caption mode. `annotation` is the design language's existing role
+   for small annotating text.
+2. **The three managers use it:**
+
+   | Manager   | Title        | Subtitle               | Annotation                                    |
+   | --------- | ------------ | ---------------------- | --------------------------------------------- |
+   | Users     | display name | primary email          | roles, comma-separated                        |
+   | Customers | name         | primary contact's name | account manager's display name, when assigned |
+   | Services  | name         | SKU                    | required asset types, comma-separated         |
+
+   Customers resolves its account manager's name from the Users already cached under the user
+   picker's query keys, marking a deleted manager as the reference policy requires
+   (`effort/completed/2026-10-13-soft-deleted-references-brief.md`). The managers' hand-written
+   row styles (`user-list-*`, `customer-list-*`, `service-list-*`) go; Users' `UserListIdentity`
+   becomes its annotation line.
+3. **The `api-contracts.ts` header's two over-length lines are wrapped, not shortened.** Amendment
+   2's production shortened the descriptions of `AdaptedUpdateContract` and `DirectUpdateContract`,
+   at 115 and 111 characters against CONVENTIONS' 105, and lost meaning ("via a client-side
+   `ScopedUpdateAdapter`", "abstraction-oriented HTTP"). Their full descriptions return, each
+   wrapped onto a continuation line within 105 characters.
+4. **Documentation leads code:** CONVENTIONS 1.7 §17.2.
+5. **Records** open `ux/shell/panel/` for the new component and `front/app-admin/users/` and
+   `front/app-admin/customers/` for their list columns.
+6. **Verification:** the CA's walkthrough of all three collections: titles, subtitles, and
+   annotations in their styles; Customers with and without an account manager.
