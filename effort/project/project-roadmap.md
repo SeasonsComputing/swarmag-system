@@ -145,10 +145,10 @@ them; each fix lands once instead of chasing every copy:
 
 **Rides along:**
 
-- **Dictionary guard** — active 2026-10-27,
-  `effort/active/2026-10-27-dictionary-guard-brief.md`: `isDictionary` in `core/std`, taught to the
-  domain genesis and retrofitted into the domain guards; HelmWidget reads its settings through
-  `@core/std`.
+- **Dictionary guard** — closed 2026-10-28, `4e0f84e`,
+  `effort/completed/2026-10-27-dictionary-guard-brief.md`: `isDictionary` in `core/std`, taught to
+  the domain genesis and retrofitted into the domain guards; HelmWidget and dashboard state read
+  through `@core/std`; CONVENTIONS 1.3.
 - **Nominal types** — closed 2026-10-27, `9ce287a`,
   `effort/completed/2026-10-27-nominal-types-brief.md`: the `NominalType` idiom in `core/std`, the
   `toId` and `toWhen` checkers, and Preferences binding an explicit row `Id`; CONVENTIONS 1.2.

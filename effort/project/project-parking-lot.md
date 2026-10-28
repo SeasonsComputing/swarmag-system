@@ -137,7 +137,10 @@ incidental rearrangement of current links.
 **Picking this up:** Foundation Mode. Define the separate body action surface, its
 responsive presentation, and the app dashboard seed compositions together. Then move
 Admin-only header actions to that surface and add the corresponding Ops composition only
-when it has real app-specific destinations.
+when it has real app-specific destinations. The dashboard seed's validation is decided with it: dashboard
+state reads its seed with `ApiError` 400, which its handlers test to reach `Config.fail`, and
+whether seed validation fails as a client error at all is open
+(`effort/completed/2026-10-27-dictionary-guard-brief.md`, design moment 4).
 
 ## P-6 · Should onboarding warn before creating a likely duplicate customer?
 

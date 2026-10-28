@@ -1,6 +1,7 @@
 # Dictionary Guard — Brief
 
-**Active, dispatched 2026-10-27** for ACE review; later changes are amendments. Recorded and chosen
+**Completed 2026-10-28.** Shipped in `4e0f84e`, with CONVENTIONS 1.3 in `287d283`, reviewed by the
+AI Architect and verified by the CA's review and HelmWidget walkthrough. Recorded and chosen
 2026-10-27 from a CA + AI Architect session, while reviewing HelmWidget's settings validation after
 the nominal types brief (`effort/completed/2026-10-27-nominal-types-brief.md`). Foundation mode: it
 reaches `core/std`, `domain/`, the domain genesis, the domain archetypes, and CONVENTIONS.
@@ -160,6 +161,11 @@ brief already opens.
 **Records:** `core/std/validators.ts` and `make-adapter.ts` are opened, with the validator files
 already open. The three examples sit in archetypes §5.2, §5.3, and §5.4, so §5.2 and §5.4 are
 opened beside §5.3 and §5.5.
+
+## Closure
+
+- **Whether the dashboard seed validates with `ApiError`** (design moment 4): joins parking lot
+  P-5, with the dashboard's design.
 
 ## Design history
 
