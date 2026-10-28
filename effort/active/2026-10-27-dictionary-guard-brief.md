@@ -107,9 +107,10 @@ The pattern is taught, not chosen:
 
 Opened for this production: `core/std/adt.ts` and `api-contracts.ts`; `domain/validators/`;
 `ux/shell/dashboard/dashboard-state.ts`; `ux/widgets/helm-widget.tsx`;
-`effort/genesis/genesis-domain-sdk.md`; `documentation/domain/domain-archetypes.md` §5.6; and
-CONVENTIONS §8.1. `domain/`, `documentation/`, and CONVENTIONS are locked; the CA opens them for
-this brief, recorded here.
+`devops/scripts/smoke-ux.ts`; `effort/genesis/genesis-domain-sdk.md`; and
+`documentation/domain/domain-archetypes.md` §5.6. `domain/` and `documentation/` are locked; the
+CA opens them for this brief, recorded here. CONVENTIONS 1.3 is already written (`287d283`) and
+is not part of the production.
 
 ## Design history
 
