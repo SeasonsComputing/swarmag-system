@@ -36,7 +36,8 @@ makes one. `Id` and `When` are the only primitive aliases in `core/` and `domain
 4. **`Query<T>` adopts `NominalType`**, so the repository has one spelling of the idiom.
 5. **`DocumentPath`** is the first type born nominal (document storage brief). _Superseded by
    Amendment 1: storage does not depend on this brief._
-6. **Two entry points per type.** Each nominal type has a producer, for a new or a fixed value, and
+6. **Two entry points per type.** _Superseded by Amendment 2: producers generate; `toId` and
+   `toWhen` check._ Each nominal type has a producer, for a new or a fixed value, and
    a guard; any other value crosses a data seam (moment 3).
 
    | Type   | Producer               | Guard           |
@@ -110,8 +111,8 @@ edit, and a resolution that would force one fails.
    validator-bound clients guard what enters, so re-checking every read would defend against the
    repository's own database. The premise does not hold for `When`: `timestamptz` guarantees a
    valid instant, not one spelling.
-4. **Literals. Settled.** Fixtures already build ids with `id()`. Each producer gains an optional
-   argument and stays the one producer, additive and backward compatible:
+4. **Literals. Settled.** _Superseded by Amendment 2._ Fixtures already build ids with `id()`. Each
+   producer gains an optional argument and stays the one producer, additive and backward compatible:
    - `id(literal?: string): Id` returns a new UUID v7 without one, and with one checks it and fails
      fast. `DASHBOARD_ID`, the stage seed ids, and stable fixture ids use it. All 37 literal UUIDs
      (4, per Amendment 1) in the TypeScript sources are v7; the nil UUID in `schema.sql`'s auth
@@ -161,12 +162,14 @@ what is useful now; making `Id` nominal is deferred.
 
 1. **`NominalType<T, B>`** in `core/std/nominal-type.ts`, exported through `std.ts`; `Query<T>`
    adopts it (design points 1, 2, 4). Additive.
-2. **`id(literal?)` and `when(at?)`** as moment 4 settles them. Additive and backward compatible.
-3. **Literals move onto the producers:** `DASHBOARD_ID` and the stage-session ids through
-   `id('…')`; test timestamps through `when('…')`, with the five store-form literals raw.
-4. **`Preferences` keeps string keys:** `PreferencesStore = { id: string; state: StringDictionary
-   }`. A preferences row is keyed by name, not identified, so it is not an `Instance`; stored keys
-   do not change.
+2. **`id(literal?)` and `when(at?)`** as moment 4 settles them. _Superseded by Amendment 2._
+   Additive and backward compatible.
+3. **Literals move onto the producers:** _Superseded by Amendment 2: onto the checkers._
+   `DASHBOARD_ID` and the stage-session ids through `id('…')`; test timestamps through `when('…')`,
+   with the five store-form literals raw.
+4. **`Preferences` keeps string keys:** _Superseded by Amendment 2._ `PreferencesStore = { id:
+   string; state: StringDictionary }`. A preferences row is keyed by name, not identified, so it is
+   not an `Instance`; stored keys do not change.
 5. **Verification:** runtime tests for both producers, including the fail-fast paths.
 
 **Corrected:** the TypeScript sources hold 4 literal UUIDs, all v7 (`DASHBOARD_ID`, two
@@ -181,6 +184,41 @@ deferred items are settled when the brief closes (EFFORT §4).
 **Records:** `core/std` and `core/cli/preferences.ts` are opened for this production, with
 `ux/shell` and `source/tests/` for the literal sites. CONVENTIONS §10.2 names `NominalType`; it is
 opened for that. `architecture-devops.md` §11.1 is not touched: the cast guard is deferred.
+
+## Amendment 2 (2026-10-27): checkers, not overloads
+
+The CA's review of the production found the overloads changed the most primitive files in
+`core/std`. A generator that also checks imports the validation layer, which put a cycle in
+`core/std` (`validators.ts` imports `isId` and `isWhen` back); it forced a decision on which
+literals are acceptable (`id` retained uppercase, which never equals a stored lowercase id); and
+`when` failed two ways (`ValidatorError` for strings, `RangeError` for an invalid `Date`). Each
+came from giving a primitive a second verb. Checking moves to the validators, beside `toTrimmed`
+and `toEmail`, and the primitives keep one job each.
+
+1. **`id()` and `when()` are generators only:** `identifier.ts` and `datetime.ts` revert to their
+   committed versions, which restores the `dprint-ignore` on the UUID template.
+2. **`toId` and `toWhen` in `validators.ts`.** `toId(value: string): Id` checks with `isId` and
+   returns the lowercase form, as `toEmail` lowercases, so a literal always equals the stored id.
+   `toWhen(value: Date | string): When` serializes a valid `Date` with `toISOString()` and returns
+   a string `isWhen` accepts unchanged. Every other input fails through `notValid`, so both fail
+   one way. `validators.ts` already imports `isId` and `isWhen`, so `core/std` stays acyclic.
+   `toWhen` parses nothing: it is not the canonicalizing `toWhen` withdrawn on 2026-10-11.
+3. **Literals go through the checkers:** `DASHBOARD_ID` and the stage-session ids through
+   `toId('…')`; the 54 test timestamps through `toWhen('…')`, the five store-form literals raw. The
+   producer tests become checker tests.
+4. **Fixed ids come from `id()`.** UUID v7s from other generators are not interchangeable with the
+   repository's, which is why seed ids are generated by its scripts. A fixed id is generated once
+   with `id()` and then written into the code through `toId`.
+5. **`Preferences` separates the store's name from its row's identity:** `Preferences(storeName,
+   id: Id)` with no default, and the row `Instance & { state: StringDictionary }` again.
+   `app-state.ts` names `APP_STATE_STORE` and `APP_STATE_ID = toId('…')`, as the dashboard names
+   `DASHBOARD_STORE` and `DASHBOARD_ID`. Each device's app state resets once; there are no
+   deployments, and `app-state.ts` is the only consumer.
+6. **`make-query.ts` declares its brand directly above `Query<T>`,** with a comment, so the symbol
+   is defined where it is first read.
+7. **CONVENTIONS reverts to its committed version.** The AI Architect writes the nominal type rule
+   after the production, as the CA authorizes: a §8.4 Nominal types with an example, a §8.1
+   vocabulary row, and §10.2 kept to file placement.
 
 ## Design history
 
