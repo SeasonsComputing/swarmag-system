@@ -223,6 +223,15 @@ work. Open details:
 - **swarmAg as a customer.** Pricing and billing fields go unused on internal Jobs, which must
   stay out of customer-facing reports and the portal.
 
+**Assets on internal work (CA and AI Architect, 2026-10-28, scoping the Service Manager):** assets
+reach a job in one chain: a service requires asset types (assessment), planning assigns actual
+assets of those types (`job_plan_assets`), and the job runner deploys them. An internal job has an
+internal service, without a customer or price, and that service requires its in-house asset types:
+a machine-cleaning tool is a delivery asset of a maintenance service. Assets need no in-house or
+purpose attribute: the same chain narrows them for customer and internal work. Whether an internal
+service is a `Service` with a flag or a category such as `maintenance-services` is an opening
+question.
+
 **Why parked:** Its shape is known (internal workflows); its scope, its archetype, and whether it
 needs a dedicated workbench are undecided. The prudent near-term move is the stock Manager
 (`project-roadmap.md` §5); Maintenance proper is a later project. Conflating the two would have
