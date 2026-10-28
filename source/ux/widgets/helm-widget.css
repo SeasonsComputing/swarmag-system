@@ -21,6 +21,34 @@
   width: fit-content;
 }
 
+/* The menu trigger is a bare glyph at the end: no hover cue; keyboard focus shows primary. */
+[data-widget='helm-widget'] [data-ui='button'] {
+  --sa-action-button-icon-size: 1rem;
+  background: transparent;
+  border: none;
+  color: var(--sa-text-secondary);
+  min-height: 0;
+  min-width: 0;
+  padding: var(--sa-space-xs);
+}
+
+[data-widget='helm-widget'] [data-ui='button']:hover {
+  background: transparent;
+}
+
+[data-widget='helm-widget'] [data-ui='button']:focus-visible {
+  background: transparent;
+  color: var(--sa-color-primary);
+}
+
+[data-widget='helm-widget'] [data-widget='helm-menu-icon'] {
+  background: currentColor;
+  block-size: var(--sa-action-button-icon-size);
+  display: block;
+  inline-size: var(--sa-action-button-icon-size);
+  mask: var(--sa-icon) center / contain no-repeat;
+}
+
 [data-widget='helm-widget'] [data-widget-icon='hidden'] [data-ui='action-button-frame'] {
   display: none;
 }

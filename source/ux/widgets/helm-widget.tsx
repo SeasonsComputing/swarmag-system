@@ -11,7 +11,9 @@ terminal field, adapting to that field's own measured width rather than the
 viewport. Each action carries its accessible label, icon, and optional
 labelMode (omitted defaults to visible; visible-no-icon draws only the label).
 Reserved commands use an adorned symbol such as `@theme`, ordinary commands
-are route paths. Below the dashboard's stacked-header threshold the field
+are route paths. Icon-only actions stay inline; labelled actions collect in an
+overflow menu at the end, shown with icon and label, which appears only when it
+holds one. Below the dashboard's stacked-header threshold the field
 spans its own row and actions distribute across it; control size scales with
 density and the shared base-scale step.
 
@@ -24,9 +26,9 @@ HelmWidget       Dashboard header navigation control cluster.
 
 import { isConstEnum, isDictionary, isNonEmptyString, notValid } from '@core/std'
 import type { Dictionary } from '@core/std'
-import { createSignal, For } from '@solid-js'
+import { createSignal, For, Show } from '@solid-js'
 import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
-import { UiActionButton, UiLayout } from '@ux/ui'
+import { UiActionButton, UiLayout, UiPopover } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 import './helm-widget.css'
@@ -60,8 +62,11 @@ const HELM_THEME_COMMAND = '@theme'
 export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
   const navigate = useShellNavigate()
   const [theme, setTheme] = createSignal(document.documentElement.dataset.theme ?? '')
+  const [menuOpen, setMenuOpen] = createSignal(false)
   const actions = () =>
     readHelmActions(props.settings['actions'], 'HelmWidget settings.actions').map(resolveAction)
+  const inlineActions = () => actions().filter(action => action.labelMode === 'hidden')
+  const menuActions = () => actions().filter(action => action.labelMode !== 'hidden')
 
   const cycleTheme = () => {
     const themes = readHelmThemes(props.settings['themes'])
@@ -92,18 +97,41 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
   return (
     <nav aria-label='Primary actions' data-widget='helm-widget'>
       <UiLayout variant='inline-fit'>
-        <For each={actions()}>
-          {action => (
-            <UiActionButton
-              density='dense'
-              icon={action.icon()}
-              label={action.label}
-              labelMode={action.labelMode === 'visible-no-icon' ? 'visible' : action.labelMode}
-              data-widget-icon={action.labelMode === 'visible-no-icon' ? 'hidden' : undefined}
-              onClick={action.execute}
-            />
-          )}
+        <For each={inlineActions()}>
+          {action => <HelmActionButton action={action} onClick={action.execute} />}
         </For>
+        <Show when={menuActions().length > 0}>
+          <UiPopover
+            trigger={
+              <span
+                aria-label='More actions'
+                data-widget='helm-menu-icon'
+                data-ui-icon='dots-vertical'
+              />
+            }
+            triggerVariant='ghost'
+            open={menuOpen()}
+            onOpenChange={setMenuOpen}
+          >
+            <UiLayout variant='block-fit'>
+              <For each={menuActions()}>
+                {action => (
+                  <UiActionButton
+                    density='dense'
+                    icon={action.icon()}
+                    label={action.label}
+                    labelMode='visible'
+                    align='start'
+                    onClick={() => {
+                      setMenuOpen(false)
+                      action.execute()
+                    }}
+                  />
+                )}
+              </For>
+            </UiLayout>
+          </UiPopover>
+        </Show>
       </UiLayout>
     </nav>
   )
@@ -112,6 +140,18 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
 // ───────────────────────────────────────────────────────────────────────────────
 // INTERNALS
 // ───────────────────────────────────────────────────────────────────────────────
+
+/** One Helm action, presented by its labelMode. */
+const HelmActionButton = (props: { action: ResolvedHelmAction; onClick: () => void }): UiComponent => (
+  <UiActionButton
+    density='dense'
+    icon={props.action.icon()}
+    label={props.action.label}
+    labelMode={props.action.labelMode === 'visible-no-icon' ? 'visible' : props.action.labelMode}
+    data-widget-icon={props.action.labelMode === 'visible-no-icon' ? 'hidden' : undefined}
+    onClick={props.onClick}
+  />
+)
 
 /** Parse Helm action records from widget settings. */
 const readHelmActions = (value: unknown, field: string): HelmAction[] => {
