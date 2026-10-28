@@ -1,7 +1,7 @@
 # Junction Client — Brief
 
-**Active, dispatched 2026-10-28** for ACE review; later changes are amendments. Recorded and chosen
-2026-10-28 from a CA + AI Architect session, while scoping
+**Completed 2026-10-28.** Shipped in `cfa753d`, its documentation leading in `34d18f7`, reviewed by
+the AI Architect and verified by the CA's review. Recorded and chosen 2026-10-28 from a CA + AI Architect session, while scoping
 the Service Manager (`effort/active/2026-10-28-service-manager-brief.md`), whose required asset
 types are the first many-to-many a manager edits. An M-5 enabler: the Service Manager is produced
 after it. Foundation mode: it adds to `core/std` and `core/cli`.
@@ -148,3 +148,12 @@ documentation must lead code." A third client family is an architecture change, 
 architecture. The AI Architect wrote the documentation before ACE's production, with the CA's go:
 `architecture-core.md` §5.1.2, §5.2, and §5.3 recognize the junction client, and CONVENTIONS 1.4
 adds it to §10.6. ACE's production remains code and tests only.
+
+## Closure
+
+- **The ordered variant** (`sequence`, a `validateUpdate`, and the `UPDATE` policies the ordered
+  junctions lack): backlog B-36.
+- **An IndexedDB junction client:** dropped until offline work needs one; `ApiJunctionContract` is
+  substitutable, so it adds without change.
+- **Transactions:** no entry. The criterion is recorded in design point 6 and Amendment 1: they
+  belong to business-rule orchestration.

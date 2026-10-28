@@ -3,7 +3,7 @@
 **Active, draft.** Recorded and chosen 2026-10-28 from a CA + AI Architect session: Services was
 missed from M-5's mechanical productions. Minimal by intent: the reference implementations stand on
 their own, so this brief names only the deviations, which also tests that they do. Produced after
-the junction client (`effort/active/2026-10-28-junction-client-brief.md`), which it uses.
+the junction client (`effort/completed/2026-10-28-junction-client-brief.md`), which it uses.
 
 ## The recipe
 

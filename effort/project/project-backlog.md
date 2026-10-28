@@ -429,6 +429,17 @@ Two decisions follow, each where it is first needed:
 - **The deep clone writes one timestamp form into IndexedDB,** so the in-memory list evaluator
   compares `When` values correctly. Picking this up: roadmap §8 Ops Application.
 
+### B-36 · Ordered junctions have no client
+
+**Observed:** 2026-10-28 · normal
+
+`workflow_tasks` and `task_questions` carry `sequence`, but `makeJunctionSupabaseClient` serves
+unordered junctions only (`effort/completed/2026-10-28-junction-client-brief.md`). The ordered
+variant is designed: a `sequence` field in the specification, so `partners` returns in order and
+`replace` writes `sequence`, and a `validateUpdate` in `JunctionValidator<J>`, as those junctions'
+validators already have. Both tables also need an `UPDATE` policy, which they lack. Picked up with
+workflows.
+
 ## Customer
 
 ### B-25 · Onboarding has no Initial Job Assessment stage
