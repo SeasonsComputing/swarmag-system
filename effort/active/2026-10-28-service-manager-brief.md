@@ -80,3 +80,40 @@ was verified against `AbstractionManager`.
 5. **Verification adds** the delegate's tests: create then complete; a failed complete followed by a
    retry that updates rather than creates; update then complete; a fresh delegate per editor
    session. And membership present in the baseline when the editor opens.
+
+## Amendment 2 (2026-10-28): the CA and AI Architect's review
+
+The production matched Amendment 1. The review found three things before it was committed; none is
+a failure of the production, which built the best design the brief and the contracts allowed.
+
+1. **Membership loads in one set-based read.** `loadServices` read each service's partners
+   separately, two requests each (about 25 for 12 services), and any one failure failed the list.
+   The junction contract gains `partnersOf(owners)`, one read over the owner set grouped by owner,
+   paged internally, owners without partners mapping to `[]`; the maker splits a long owner list
+   so its ids fit a request. `loadServices` then makes two reads: the services, then every
+   membership. The records are unchanged: an abstraction loads whole, and only the round trips
+   change. A join (PostgREST resource embedding) was set aside: IndexedDB has no joins, so a list
+   returning embedded memberships would fork the store-agnostic contract; it would make the CRUD
+   maker's list relation-aware; and it would complicate keyset paging. Relational questions, such
+   as reports across services, belong in the database through a business-rule client
+   (CONVENTIONS §10.6), never in application loops.
+
+   ```ts
+   /** The partners of each owner, in one set-based read. Owners without partners map to []. */
+   partnersOf(owners: readonly Id[]): Promise<ReadonlyMap<Id, readonly Id[]>>
+   ```
+
+   Documentation leads code: CONVENTIONS 1.6 §10.6. `core/std/api-contracts.ts` and
+   `core/cli/make-supabase-client.ts` are opened for this addition.
+2. **A new service has no category until one is chosen.** The state defaulted `category` to the
+   first value (`aerial-drone-services`), so a service saved without anyone choosing was filed as
+   aerial. New starts with no category, and saving requires one, as the Asset form leaves its type
+   unchosen ("Asset creation has no silently assigned type").
+3. **The list's first column stacks name, SKU, and required asset types,** the last as a
+   comma-separated line of labels resolved through the asset type catalog, with a stored inactive
+   or deleted type marked as in the form. Category keeps its own column. Users and Customers stack
+   their identity columns the same way.
+
+**Verification adds:** `partnersOf` returns every listed owner, empty owners as `[]`, grouped
+correctly across pages and split owner lists; `loadServices` makes one membership read; a new
+service cannot save without a category; the list renders the stacked column.
