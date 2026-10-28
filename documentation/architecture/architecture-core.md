@@ -313,7 +313,7 @@ export const api = {
 #### 5.1.2 Key Properties
 
 - **Domain-driven** - API surface mirrors domain model, not storage technology
-- **Contract-based** - All clients conform to `ApiCrudContract` or `ApiBusRuleContract` contracts
+- **Contract-based** - All clients conform to `ApiCrudContract`, `ApiJunctionContract`, or `ApiBusRuleContract`
 - **Composition over abstraction** - Select bindings explicitly rather than runtime provider switching
 - **Type-safe** - Full TypeScript typing from domain through to storage
 
@@ -321,7 +321,10 @@ export const api = {
 
 Clients conform to the contracts in `@core/std/api-contracts.ts`. CONVENTIONS §10 shows how they
 are declared and used; the `core/std` module headers state their semantics, including list
-filtering, search, ordering, and cursors (`make-query.ts`, `api-contracts.ts`).
+filtering, search, ordering, and cursors (`make-query.ts`, `api-contracts.ts`). A junction client
+edits a many-to-many from its owning side: it reads an owner's partners and replaces them
+(`ApiJunctionContract`). A table with its own id and life cycle is a record, edited through CRUD,
+not a junction.
 
 This system relies on these properties of every client:
 
@@ -370,7 +373,8 @@ composition layer hosts the adapter-bound scope declaration.
 ### 5.3 Client Makers
 
 Clients are produced by makers (CONVENTIONS §10.1, §10.6). This system binds Supabase for tables
-under RLS, IndexedDB for offline field data, and Supabase Edge Functions and RPC for orchestration.
+and junctions under RLS, IndexedDB for offline field data, and Supabase Edge Functions and RPC for
+orchestration.
 Edge functions are wrapped as services (CONVENTIONS §12). Provider-specific orchestration, such as
 Supabase Auth administration, remains in backend orchestration modules.
 

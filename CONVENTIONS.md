@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.3)
+# Software Construction Conventions (1.4)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.3
-- Published: 2026 October 27th
+- Version: 1.4
+- Published: 2026 October 28th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -768,21 +768,32 @@ const users = await Array.fromAsync(listAll(Users, query))
 
 ### 10.6 API clients
 
-A client implements `ApiCrudContract` or `ApiBusRuleContract` (`@core/std/api-contracts.ts`) over
-one store. Choose the maker by store; compose the clients once and consume the composition.
+A client implements `ApiCrudContract`, `ApiJunctionContract`, or `ApiBusRuleContract`
+(`@core/std/api-contracts.ts`) over one store. Choose the maker by store; compose the clients once and consume the composition.
 
-| Store     | CRUD maker                | Update                                   | Business-rule maker                                             |
-| --------- | ------------------------- | ---------------------------------------- | --------------------------------------------------------------- |
-| Supabase  | `makeCrudSupabaseClient`  | Adapted: `update(scope.adapter, source)` | `makeBusRuleSupabaseRpcClient`, `makeBusRuleSupabaseEdgeClient` |
-| IndexedDB | `makeCrudIndexedDbClient` | Adapted                                  | —                                                               |
-| HTTP      | `makeCrudHttpClient`      | Direct: `update(source)`                 | `makeBusRuleHttpClient`                                         |
+| Store     | CRUD maker                | Update                                   | Junction maker               | Business-rule maker                                             |
+| --------- | ------------------------- | ---------------------------------------- | ---------------------------- | --------------------------------------------------------------- |
+| Supabase  | `makeCrudSupabaseClient`  | Adapted: `update(scope.adapter, source)` | `makeJunctionSupabaseClient` | `makeBusRuleSupabaseRpcClient`, `makeBusRuleSupabaseEdgeClient` |
+| IndexedDB | `makeCrudIndexedDbClient` | Adapted                                  | —                            | —                                                               |
+| HTTP      | `makeCrudHttpClient`      | Direct: `update(source)`                 | —                            | `makeBusRuleHttpClient`                                         |
 
 An adapted client translates through a scoped adapter; a direct client sends domain shape. The two
 update forms fit how each store writes; never collapse them into one.
 
+A junction client reads an owner's partners and replaces them as a set (`partners`, `replace`):
+removed pairs are hard-deleted and added pairs validated and inserted. The specification names the
+owner and partner by domain field; the adapter supplies their columns.
+
 ```typescript
 const Questions = makeCrudSupabaseClient<Question>({ table: 'questions', adapter: QuestionAdapter })
 const cloneJob = makeBusRuleHttpClient({ basePath: '/api/jobs/deep-clone' })
+const CourseStudents = makeJunctionSupabaseClient<CourseStudent>({
+  table: 'course_students',
+  adapter: CourseStudentAdapter,
+  validator: { validateCreate: validateCourseStudentCreate },
+  owner: 'courseId',
+  partner: 'studentId'
+})
 ```
 
 ### 10.7 Authentication
@@ -1303,6 +1314,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.4     | 2026 October 28th   | §10.6: a third client family, the junction client (`ApiJunctionContract`, `makeJunctionSupabaseClient`), which reads an owner's partners and replaces them as a set, with the owner and partner named by domain field and their columns supplied by the adapter.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.3     | 2026 October 27th   | §8.1: `isDictionary` from `@core/std` replaces inline object checks, and a guard narrows an unknown object through it rather than casting. §4.2: a local function that reads unknown input and fails on it is named `read{Owner}*`, and `to*` names the shared conversions and normalizers. §9.6: the validator families are distinguished by what they return, a normalizer returning the canonical value or failing through `notValid`; it replaces 1.2's bullet that a normalizer may check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 1.2     | 2026 October 27th   | New §8.4 Nominal types: `NominalType<T, B>` from `@core/std` for a value with a domain of its own, keyed by a producer-private phantom brand declared under the type's comment; §8.1 lists it, and §10.2 says nominal type where it said branded type. §9.6 Validators: a normalizer may check, failing through `notValid`, and a fixed identifier or timestamp written in code goes through its checker (`toId`, `toWhen`) while a new one comes from its producer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 1.1     | 2026 October 20th   | Recast as the programming guide for software construction at Seasons Computing. The `core/` file headers are the reference, and some conventions are preferences held by review (§1 Overview). §3 Imports adds the type-import form and the own-namespace and closed `core/std` rules. §4 Naming makes object constants PascalCase and values SCREAMING_SNAKE. §6 Source Code File Format is rewritten: every file opens with a box header written in expanding levels, PUBLIC lists every export, and containers list their members as trees. §7.6 No magic gains its corollary, explicit and obvious. New chapters: §8 Types and Containers, §9 Domain Shapes, §10 Makers and Contracts, §11 Runtime Configuration, §12 Services, §13 Local Persistence, and §14 Remote Persistence. §15 Error Handling separates `Error`, `ValidatorError`, `ApiError`, and service errors. New §16 UX Shell and §17 Building UX Patterns cover `ux/`; new §19 DevOps and Guards covers guards and the tooling allowances. The former §8–§13 are renumbered. |

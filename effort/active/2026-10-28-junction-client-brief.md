@@ -130,11 +130,21 @@ schema, and architecture.
 6. **The ordered variant needs schema work too.** `workflow_tasks` and `task_questions` have no
    `UPDATE` policy, so writing `sequence` needs RLS and schema changes beside the specification
    field and validator. It stays deferred to workflows.
-7. **Documentation follows the production, written by the AI Architect** with the CA's go:
-   CONVENTIONS §10.6 gains the junction client beside the CRUD and business-rule clients, and
-   `architecture-core.md` §5.2 and §5.3 recognize it as a third client family. ACE's production is
-   code and tests only.
+7. _Superseded by Amendment 2: documentation leads code._ **Documentation follows the production,
+   written by the AI Architect** with the CA's go: CONVENTIONS §10.6 gains the junction client
+   beside the CRUD and business-rule clients, and `architecture-core.md` §5.2 and §5.3 recognize it
+   as a third client family. ACE's production is code and tests only.
 8. **Verification adds:** clearing, duplicates, unchanged saves, owner isolation, complete paged
    reads, validation before mutation, provider failures, and a retry after a successful deletion
    followed by a failed insertion. Compile-time checks reject an unknown field and an existing
    numeric field (`sequence`). Tests are database-free, using the existing SDK/fetch test pattern.
+
+## Amendment 2 (2026-10-28): documentation leads code
+
+ACE's scoping found Amendment 1 point 7 backwards. CONSTITUTION §8: "For foundational concerns,
+documentation must lead code." A third client family is an architecture change, and
+`architecture-core.md` §5.1.2 said every client conforms to `ApiCrudContract` or
+`ApiBusRuleContract`. Point 7 followed the nominal types precedent, whose changes were idioms, not
+architecture. The AI Architect wrote the documentation before ACE's production, with the CA's go:
+`architecture-core.md` §5.1.2, §5.2, and §5.3 recognize the junction client, and CONVENTIONS 1.4
+adds it to §10.6. ACE's production remains code and tests only.
