@@ -308,4 +308,29 @@ through this adoption:
 
 **Picking this up:** When `core` or `ux` first ships from its own repository.
 
+## P-13 · How should the Collection and Index archetypes support large datasets?
+
+**Parked:** 2026-10-28, while scoping the Service Manager's required asset types. Deferred, not
+abandoned: the abstraction manager brief
+(`effort/completed/2026-08-05-abstraction-manager-brief.md`) gave the manager "a home for" list
+traversal (sort, direction, page index, page size, search), "not an implementation", and the
+list-query brief (`effort/completed/2026-10-11-list-query-brief.md`) built declared search fields
+and keyset paging. Nothing tracked the deferral until now.
+
+**What it is:** general-purpose support for large datasets in the Collection and Index archetypes,
+for every CRUD list rather than each surface:
+
+- **Collection search:** a search box over a query's declared search fields, a considered feature
+  of each surface (list-query decision 6).
+- **Traversal:** sort, direction, and paging in `AbstractionManager`'s home for them.
+- **Large multi-selects** (junction partners, pickers): selected items first, fixed when the editor
+  opens and never reordered while editing; clear all; type to filter. `UiMultiSelect` is an inline
+  listbox and offers none of them.
+
+**Why parked:** Catalogs are still small, and none of it is in this release. Asset types are
+expected to run to dozens, the first real pressure.
+
+**Picking this up:** When a catalog or collection outgrows a screen, or as one design across the
+Collection, Index, and multi-select controls, so search and filtering behave the same everywhere.
+
 _End of Feature Parking Lot Document_
