@@ -1,9 +1,9 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.6)
+# Software Construction Conventions (1.7)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.6
+- Version: 1.7
 - Published: 2026 October 28th
 - Author: Ted V. Kremer
 
@@ -1234,6 +1234,24 @@ A provider whose save spans more than one write declares it with `makeAggregateS
 editor session. A retry after a failed `complete` updates the pending record; it never creates
 another.
 
+A collection row presents its Item through `PanelRowIdentity`
+(`@ux/shell/panel/panel-row-identity.tsx`): a `title`, an optional `subtitle`, and an optional
+`annotation`, in decreasing prominence. The component owns each line's style; the provider owns
+its content, a string or a component of its own.
+
+```typescript
+const identity: AbstractionListColumn<User> = {
+  label: 'User',
+  render: user => (
+    <PanelRowIdentity
+      title={user.displayName}
+      subtitle={user.primaryEmail}
+      annotation={roleLine(user)}
+    />
+  )
+}
+```
+
 ### 17.3 Sequence: `Wizard`
 
 `Wizard` (`@ux/shell/workbench/wizard.tsx`) decomposes one subject into Steps. It takes
@@ -1320,6 +1338,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.7     | 2026 October 28th   | §17.2: a collection row presents its Item through `PanelRowIdentity`, a title, an optional subtitle, and an optional annotation in decreasing prominence; the component owns each line's style and the provider its content.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 1.6     | 2026 October 28th   | §10.6: a list of owners reads its junction partners in one set-based read (`partnersOf`), never one read per owner.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | 1.5     | 2026 October 28th   | §17.2: a provider whose save spans more than one write declares it with `makeAggregateSave` (`create`, `update`, `complete`), one delegate per editor session, so a retry after a failed `complete` updates the pending record and never creates another.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | 1.4     | 2026 October 28th   | §10.6: a third client family, the junction client (`ApiJunctionContract`, `makeJunctionSupabaseClient`), which reads an owner's partners and replaces them as a set, with the owner and partner named by domain field and their columns supplied by the adapter.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
