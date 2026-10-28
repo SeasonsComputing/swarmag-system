@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { id, instantiable } from '@core/std'
+import { id, instantiable, toWhen } from '@core/std'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 import { scopes } from '@front/api/scopes.ts'
@@ -66,7 +66,7 @@ Deno.test('Re-entry form accepts blank or positive whole hours and rejects inval
 })
 
 const note = (): Note => ({
-  createdAt: '2026-10-27T12:00:00Z',
+  createdAt: toWhen('2026-10-27T12:00:00Z'),
   content: 'Original note',
   visibility: 'internal',
   attachments: []

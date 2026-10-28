@@ -34,7 +34,7 @@ CustomerSamples  Shared fixture samples.
 └ users                   All customer-to-User associations.
 */
 
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { Location } from '@domain/abstractions/common.ts'
 import type { Contact, Customer, CustomerUser } from '@domain/abstractions/customer.ts'
 
@@ -91,8 +91,8 @@ const BlueMesaRanch: Customer = {
     notes: []
   }],
   notes: [],
-  createdAt: '2025-01-10T00:00:00Z',
-  updatedAt: '2025-01-15T12:00:00Z'
+  createdAt: toWhen('2025-01-10T00:00:00Z'),
+  updatedAt: toWhen('2025-01-15T12:00:00Z')
 }
 
 const BlueMesaRanchContact: CustomerUser = {

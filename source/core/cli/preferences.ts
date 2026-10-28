@@ -11,26 +11,27 @@ Provides a small persistence wrapper for preferences store in IndexedDb.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Preferences - Persistent preferences backed by IndexedDB.
-├ state()          Return the full persisted preferences dictionary.
-├ get(key)         Return one preference value by key.
-└ set(key, value)  Persist one preference value by key.
+├ constructor(storeName, id)  Register the store and bind its row identity.
+├ state()                    Return the full persisted preferences dictionary.
+├ get(key)                   Return one preference value by key.
+└ set(key, value)            Persist one preference value by key.
 */
 
 import { IndexedDb } from '@core/db/indexeddb.ts'
-import type { Instance, StringDictionary } from '@core/std'
+import type { Id, Instance, StringDictionary } from '@core/std'
 import { apiError, throwApiError } from '@core/stdx'
 import type { ApiErrorDetail } from '@core/stdx'
 
-/** Preference store must have an id for the db. */
+/** Preferences row with its own identity in IndexedDB. */
 type PreferencesStore = Instance & { state: StringDictionary }
 
 /** IndexedDB-backed Preferences persistence. */
 export class Preferences {
   #storeName: string
-  #id: string
+  #id: Id
 
-  /** Registers the store name. To make  */
-  constructor(storeName: string, id: string = storeName) {
+  /** Register the store and bind this instance to its explicit row identity. */
+  constructor(storeName: string, id: Id) {
     this.#storeName = storeName
     this.#id = id
     IndexedDb.registerStore(this.#storeName)

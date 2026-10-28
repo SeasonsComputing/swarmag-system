@@ -5,7 +5,7 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import { scopes } from '@front/api/scopes.ts'
 import { assetTypeDraft, createAssetTypeState } from '@front/app-admin/asset-types/asset-type-state.ts'
@@ -62,7 +62,7 @@ Deno.test('Asset projection trims text and explicitly clears optional fields', (
 })
 
 const note = (): Note => ({
-  createdAt: '2026-10-27T12:00:00Z',
+  createdAt: toWhen('2026-10-27T12:00:00Z'),
   content: 'Original note',
   visibility: 'internal',
   attachments: []

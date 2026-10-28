@@ -33,7 +33,7 @@ JobSamples  Shared fixture samples.
   └ logEntry              Shared work-log record.
 */
 
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { JobAssessment, JobWorkLogEntry } from '@domain/abstractions/job.ts'
 
 const JOB_ID = id()
@@ -46,7 +46,7 @@ const RanchMappingAssessment: JobAssessment = {
   id: ASSESSMENT_ID,
   jobId: JOB_ID,
   assessorId: ASSESSOR_ID,
-  scheduledAt: '2025-01-12T13:30:00Z',
+  scheduledAt: toWhen('2025-01-12T13:30:00Z'),
   locations: [{
     latitude: 31.9686,
     longitude: -99.9018,
@@ -58,8 +58,8 @@ const RanchMappingAssessment: JobAssessment = {
   }],
   risks: [],
   notes: [],
-  createdAt: '2025-01-12T14:00:00Z',
-  updatedAt: '2025-01-12T14:10:00Z'
+  createdAt: toWhen('2025-01-12T14:00:00Z'),
+  updatedAt: toWhen('2025-01-12T14:10:00Z')
 }
 
 const FieldMetadataLogEntry: JobWorkLogEntry = {
@@ -69,10 +69,10 @@ const FieldMetadataLogEntry: JobWorkLogEntry = {
   answer: [{
     questionId: TELEMETRY_QUESTION_ID,
     value: '32.2144,-97.1234',
-    capturedAt: '2025-01-18T16:21:00Z',
+    capturedAt: toWhen('2025-01-18T16:21:00Z'),
     notes: []
   }],
-  createdAt: '2025-01-18T16:21:00Z'
+  createdAt: toWhen('2025-01-18T16:21:00Z')
 }
 
 const All = {

@@ -20,7 +20,7 @@ QueryScalar       Supported scalar criterion value.
 QuerySet          Non-empty readonly criterion values.
 QueryOperators    Operators available for one domain field.
 Criteria          Readonly ANDed domain-field criteria.
-Query             Readonly branded query sent to stores.
+Query             Readonly nominal query sent to stores.
 makeQuery         Declare fields and build typed queries.
 
 SEMANTICS
@@ -42,6 +42,7 @@ Order     Required strings or numbers. Build resolves the requested order, or
 import type { Dictionary } from './adt.ts'
 import type { Instantiable } from './instance.ts'
 import type { FieldAdapter } from './make-adapter.ts'
+import type { NominalType } from './nominal-type.ts'
 
 /** Sort direction; cursors must match the query's direction. */
 export type QueryDirection = 'asc' | 'desc'
@@ -88,12 +89,12 @@ export type Criteria<T> = {
 }
 
 /** Readonly serializable query; the symbol exists only in the type. */
-export type Query<T> = {
+declare const queryBrand: unique symbol
+export type Query<T> = NominalType<{
   readonly where: Criteria<T>
   readonly search?: { readonly term: string; readonly fields: readonly (keyof T)[] }
   readonly order: { readonly field: keyof T; readonly direction: QueryDirection }
-  readonly [queryBrand]: true
-}
+}, typeof queryBrand>
 
 /**
  * Declare filters, optional text search fields, and a required order default.
@@ -139,9 +140,6 @@ export function makeQuery<
 // ────────────────────────────────────────────────────────────────────────────
 // IMPLEMENTATION
 // ────────────────────────────────────────────────────────────────────────────
-
-/** Phantom brand; it exists only in the type, so only `build` makes a `Query<T>`. */
-declare const queryBrand: unique symbol
 
 /** Criteria names no domain field may claim. */
 type ReservedKey = 'and' | 'or' | 'not' | 'search'

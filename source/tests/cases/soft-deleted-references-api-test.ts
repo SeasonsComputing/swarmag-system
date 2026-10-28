@@ -13,7 +13,7 @@ import { makeCrudIndexedDbClient } from '@core/cli/make-indexeddb-client.ts'
 import { makeCrudSupabaseClient } from '@core/cli/make-supabase-client.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import { Supabase } from '@core/db/supabase.ts'
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { Dictionary, Id, Validator } from '@core/std'
 import { ApiError, makeScopedUpdate } from '@core/stdx'
 import type { ApiCrudContract } from '@core/stdx'
@@ -102,7 +102,7 @@ const records = (): User[] => [
     ...structuredClone(UserSamples.operations),
     id: id(),
     displayName: 'Deleted reference target',
-    deletedAt: '2026-10-13T12:00:00Z'
+    deletedAt: toWhen('2026-10-13T12:00:00Z')
   }
 ]
 

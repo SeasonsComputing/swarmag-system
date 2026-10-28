@@ -9,6 +9,7 @@ PURPOSE
 User draft notes retain independent metadata and isolate source records.
 */
 
+import { toWhen } from '@core/std'
 import type { Note } from '@domain/abstractions/common.ts'
 import type { UserRole } from '@domain/abstractions/user.ts'
 import { createUserState, userDraft } from '@front/app-admin/users/user-state.ts'
@@ -20,19 +21,19 @@ Deno.test('User draft preserves independent notes and isolates source and projec
     {
       content: 'Internal history',
       visibility: 'internal',
-      createdAt: '2026-10-01T12:00:00.000Z',
+      createdAt: toWhen('2026-10-01T12:00:00.000Z'),
       attachments: []
     },
     {
       content: 'Shared history',
       visibility: 'shared',
-      createdAt: '2026-10-02T12:00:00.000Z',
+      createdAt: toWhen('2026-10-02T12:00:00.000Z'),
       attachments: [{
         filename: 'history.pdf',
         url: 'https://example.com/history.pdf',
         contentType: 'application/pdf',
         kind: 'document',
-        uploadedAt: '2026-10-02T12:00:00.000Z'
+        uploadedAt: toWhen('2026-10-02T12:00:00.000Z')
       }]
     }
   ]
@@ -72,7 +73,7 @@ Deno.test('User draft copies accepted notes and roles and isolates projected rol
     content: 'Accepted',
     visibility: 'internal',
     attachments: [],
-    createdAt: '2026-10-08T12:00:00Z'
+    createdAt: toWhen('2026-10-08T12:00:00Z')
   }]
   state.setNotes(notes)
   notes[0].content = 'Input edit'

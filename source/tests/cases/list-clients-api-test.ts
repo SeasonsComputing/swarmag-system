@@ -15,7 +15,7 @@ import { makeCrudIndexedDbClient } from '@core/cli/make-indexeddb-client.ts'
 import { makeCrudSupabaseClient, makeSupabaseListRequest } from '@core/cli/make-supabase-client.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
 import { Supabase } from '@core/db/supabase.ts'
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { Dictionary, Instantiable, Validator } from '@core/std'
 import { ApiError, listQuery, makeQuery, readListCursor, writeListCursor } from '@core/stdx'
 import type { Adapter, CrudListContract, ListOptions, Query } from '@core/stdx'
@@ -79,14 +79,14 @@ Deno.test('Supabase range and in operands use native columns and fully quoted va
   })
   const query = declaration.build({
     where: {
-      createdAt: { gte: '2026-10-07T03:30:32.719719+00:00', lt: '2026-10-08T00:00:00Z' },
+      createdAt: { gte: '2026-10-07T03:30:32.719719+00:00', lt: toWhen('2026-10-08T00:00:00Z') },
       primaryEmail: { in: ['a,b@example.com', 'quote"@example.com'] },
       status: { eq: 'active' }
     }
   })
   assertEquals(makeSupabaseListRequest(Spec, { query }).filters, [
     { method: 'gte', column: 'created_at', value: '2026-10-07T03:30:32.719719+00:00' },
-    { method: 'lt', column: 'created_at', value: '2026-10-08T00:00:00Z' },
+    { method: 'lt', column: 'created_at', value: toWhen('2026-10-08T00:00:00Z') },
     { method: 'in', column: 'primary_email', value: ['a,b@example.com', 'quote"@example.com'] },
     { method: 'eq', column: 'status', value: 'active' }
   ])
@@ -207,7 +207,7 @@ Deno.test('IndexedDB pages all records in both directions including collator tie
     sample('Jose\u0301'),
     sample('Ana'),
     sample('Deleted', {
-      deletedAt: '2026-10-11T00:00:00Z'
+      deletedAt: toWhen('2026-10-11T00:00:00Z')
     })
   ]
   await withRecords(UserAdapter, users, async client => {

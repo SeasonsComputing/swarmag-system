@@ -13,6 +13,7 @@ cleanup follows success and failure without revoking unrelated sessions.
 
 import { DenoProvider } from '@core/cfg/deno-provider.ts'
 import { Supabase } from '@core/db/supabase.ts'
+import { toId, toWhen } from '@core/std'
 import type { Dictionary, StringDictionary } from '@core/std'
 import { assert, assertEquals, assertRejects, assertStrictEquals } from '@std/assert'
 import { StageSession } from '../fixtures/stage-session.ts'
@@ -87,7 +88,7 @@ Deno.test('stage session authenticates the public API and cleans up only its ses
           role: 'authenticated',
           app_metadata: { provider: 'email', providers: ['email'] },
           user_metadata: {},
-          created_at: '2026-10-23T00:00:00Z'
+          created_at: toWhen('2026-10-23T00:00:00Z')
         }
       })
     }
@@ -130,7 +131,7 @@ Deno.test('stage session authenticates the public API and cleans up only its ses
     })
 
     await context.step('wrong redeemed identity prevents test work and cleans up', async () => {
-      verifiedId = '01a1679c-be97-76f3-befc-8dd3e23161ac'
+      verifiedId = toId('01a1679c-be97-76f3-befc-8dd3e23161ac')
       let called = false
       await assertRejects(
         () =>

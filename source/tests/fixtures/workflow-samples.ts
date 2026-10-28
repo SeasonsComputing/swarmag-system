@@ -27,7 +27,7 @@ WorkflowSamples  Shared fixture samples.
 └ all                     All shared questions.
 */
 
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { Question } from '@domain/abstractions/workflow.ts'
 
 const PreflightInspection: Question = {
@@ -40,8 +40,8 @@ const PreflightInspection: Question = {
     label: 'Fail',
     requiresNote: true
   }],
-  createdAt: '2024-11-01T00:00:00Z',
-  updatedAt: '2025-01-01T00:00:00Z'
+  createdAt: toWhen('2024-11-01T00:00:00Z'),
+  updatedAt: toWhen('2025-01-01T00:00:00Z')
 }
 
 const ChemicalMixRatio: Question = {
@@ -49,8 +49,8 @@ const ChemicalMixRatio: Question = {
   prompt: 'Recorded mix ratio (oz/gal)',
   type: 'number',
   helpText: 'Enter the actual ounces per gallon observed during mixing.',
-  createdAt: '2024-11-01T00:00:00Z',
-  updatedAt: '2025-01-01T00:00:00Z'
+  createdAt: toWhen('2024-11-01T00:00:00Z'),
+  updatedAt: toWhen('2025-01-01T00:00:00Z')
 }
 
 const PpeVerification: Question = {
@@ -61,8 +61,8 @@ const PpeVerification: Question = {
     value: 'technician',
     label: 'Field Technician'
   }, { value: 'observer', label: 'Observer', requiresNote: true }],
-  createdAt: '2024-11-01T00:00:00Z',
-  updatedAt: '2025-01-01T00:00:00Z'
+  createdAt: toWhen('2024-11-01T00:00:00Z'),
+  updatedAt: toWhen('2025-01-01T00:00:00Z')
 }
 
 const ALL: Question[] = [

@@ -11,7 +11,7 @@ and needs no authenticated session.
 */
 
 import '@tests/config/test-config.ts'
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { Session } from '@core/stdx'
 import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
@@ -25,7 +25,7 @@ Deno.test('SessionCoordinator rejects an active deleted User before data readine
   await verifyEligibility({
     ...UserSamples.operations,
     status: 'active',
-    deletedAt: '2026-10-13T12:00:00Z'
+    deletedAt: toWhen('2026-10-13T12:00:00Z')
   }, false)
 })
 

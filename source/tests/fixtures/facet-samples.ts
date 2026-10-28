@@ -23,7 +23,7 @@ FacetSamples  Shared fixture samples.
 └ all                     All facet records.
 */
 
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { Facet } from '@domain/abstractions/common.ts'
 
 /** A path-like code whose slash carries no matching semantics. */
@@ -34,8 +34,8 @@ const AerialSpray: Facet = {
   label: 'Aerial spray',
   description: 'Classification for aerial spraying workflows.',
   active: true,
-  createdAt: '2026-10-06T00:00:00Z',
-  updatedAt: '2026-10-06T00:00:00Z'
+  createdAt: toWhen('2026-10-06T00:00:00Z'),
+  updatedAt: toWhen('2026-10-06T00:00:00Z')
 }
 
 /** Every facet fixture, for integrity checks. */

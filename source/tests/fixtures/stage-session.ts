@@ -21,11 +21,12 @@ StageSession       Authenticated stage test fixture.
 
 import { Config } from '@core/cfg/config.ts'
 import { Supabase } from '@core/db/supabase.ts'
+import { toId } from '@core/std'
 import { createClient } from '@supabase/client'
 
 /** Authenticated stage test fixture for the dedicated seeded administrator. */
 export const StageSession = {
-  id: '01a1679c-be97-76f3-befc-8dd3e23161ab',
+  id: toId('01a1679c-be97-76f3-befc-8dd3e23161ab'),
   email: 'test-admin@swarmag.com',
 
   /**

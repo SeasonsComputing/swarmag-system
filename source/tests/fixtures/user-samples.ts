@@ -46,7 +46,7 @@ UserSamples  Shared fixture samples.
 └ all                     All User records.
 */
 
-import { id } from '@core/std'
+import { id, toWhen } from '@core/std'
 import type { User } from '@domain/abstractions/user.ts'
 
 const Administrator: User = {
@@ -59,8 +59,8 @@ const Administrator: User = {
   notes: [],
   avatarUrl: 'https://example.com/avatars/morgan-dale.png',
   status: 'active',
-  createdAt: '2025-01-10T00:00:00Z',
-  updatedAt: '2025-01-10T00:00:00Z'
+  createdAt: toWhen('2025-01-10T00:00:00Z'),
+  updatedAt: toWhen('2025-01-10T00:00:00Z')
 }
 
 const Operations: User = {
@@ -73,8 +73,8 @@ const Operations: User = {
   notes: [],
   avatarUrl: 'https://example.com/avatars/sloane-mercer.png',
   status: 'active',
-  createdAt: '2025-01-10T00:00:00Z',
-  updatedAt: '2025-01-11T00:00:00Z'
+  createdAt: toWhen('2025-01-10T00:00:00Z'),
+  updatedAt: toWhen('2025-01-11T00:00:00Z')
 }
 
 const Sales: User = {
@@ -87,8 +87,8 @@ const Sales: User = {
   notes: [],
   avatarUrl: 'https://example.com/avatars/reese-vaughn.png',
   status: 'active',
-  createdAt: '2025-01-12T00:00:00Z',
-  updatedAt: '2025-01-12T00:00:00Z'
+  createdAt: toWhen('2025-01-12T00:00:00Z'),
+  updatedAt: toWhen('2025-01-12T00:00:00Z')
 }
 
 const ALL: User[] = [

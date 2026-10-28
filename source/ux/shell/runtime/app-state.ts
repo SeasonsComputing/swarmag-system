@@ -21,6 +21,7 @@ AppState         - Singleton API for reading and writing persisted app state val
 */
 
 import { Preferences } from '@core/cli/preferences.ts'
+import { toId } from '@core/std'
 import type { StringDictionary } from '@core/std'
 import { createStore } from '@solid-js/store'
 
@@ -35,11 +36,15 @@ export interface AppStateContract {
   clear: () => void
 }
 
+/** App-state object store and stable row identity. */
+const APP_STATE_STORE = 'AppStateStore'
+const APP_STATE_ID = toId('01a18023-e2d9-7ac0-8652-9f67d97e1c96')
+
 /** Reactive storage */
 const [appStateStore, setAppStateStore] = createStore<AppStateStore>({})
 
 /** Persistent storage */
-const appStatePrefs = new Preferences('AppStateStore')
+const appStatePrefs = new Preferences(APP_STATE_STORE, APP_STATE_ID)
 
 /** Load application state from preferences into store */
 async function initAppState() {

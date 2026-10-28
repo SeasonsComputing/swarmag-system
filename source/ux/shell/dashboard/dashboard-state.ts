@@ -52,7 +52,7 @@ rowWidgets: DashboardWidgetsContract - Widget mutation contract
 
 import { Config } from '@core/cfg/config.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
-import { djb2hash, id } from '@core/std'
+import { djb2hash, id, toId } from '@core/std'
 import type { Dictionary, Instance } from '@core/std'
 import { ApiError, apiError } from '@core/stdx'
 import { createStore, produce } from '@solid-js/store'
@@ -122,7 +122,7 @@ export interface DashboardStateContract {
 
 /** Dashboard store */
 const DASHBOARD_STORE = 'DashboardStore'
-const DASHBOARD_ID = '019daa39-2d7c-76fb-877f-495169374178'
+const DASHBOARD_ID = toId('019daa39-2d7c-76fb-877f-495169374178')
 
 /** Initializa local and transient stores */
 IndexedDb.registerStore(DASHBOARD_STORE)

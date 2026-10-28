@@ -9,6 +9,7 @@ PURPOSE
 Customer drafts isolate source, accepted collections, and projected results.
 */
 
+import { toWhen } from '@core/std'
 import { createCustomerState, customerDraft } from '@front/app-admin/customers/customer-state.ts'
 import { UserProvider } from '@front/app/shell/user-provider.ts'
 import { assertEquals, assertNotStrictEquals } from '@std/assert'
@@ -39,7 +40,7 @@ Deno.test('Customer draft copies accepted notes, added sites, and replaced sites
     content: 'Accepted note',
     visibility: 'internal' as const,
     attachments: [],
-    createdAt: '2026-10-08T12:00:00Z'
+    createdAt: toWhen('2026-10-08T12:00:00Z')
   }]
   state.setNotes(notes)
   notes[0].content = 'Source edit'
