@@ -282,4 +282,25 @@ check) depends on how production is set up.
 
 **Picking this up:** When production is created, before its first genesis.
 
+## P-12 · How does swarmAg adopt `core` and `ux` once they ship as Seasons Computing libraries?
+
+**Parked:** 2026-10-27, while rescoping the nominal types brief
+(`effort/active/2026-10-27-nominal-types-brief.md`, Amendment 1).
+
+**What it is:** `core/` and `ux/` move to repositories of their own as Seasons Computing's
+essential tools. swarmAg then consumes them as third-party libraries in place of its `@core/` and
+`@ux/` source trees.
+
+**Why parked:** The libraries do not exist yet. How swarmAg takes them (package source,
+versioning, the alias replacement) depends on how they ship. Changes held for them land in swarmAg
+through this adoption:
+
+- **Nominal `Id`:** swarmAg's adoption sites are designed in the nominal types brief's deferred
+  moments: the empty Id and the form-owned asset draft (1), pickers resolving against their
+  options' records (2), and the cast guard (5). The type checker lists the sites (8 when measured).
+- **`When` as `Temporal.Instant`:** waits on stable Safari and Supabase's hosted runtime (the
+  nominal types brief's design history).
+
+**Picking this up:** When `core` or `ux` first ships from its own repository.
+
 _End of Feature Parking Lot Document_
