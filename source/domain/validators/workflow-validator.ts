@@ -32,10 +32,11 @@ import {
   expectId,
   expectNonEmptyString,
   expectPositiveNumber,
-  type ExpectResult,
   expectValid,
-  expectWhen
+  expectWhen,
+  isDictionary
 } from '@core/std'
+import type { ExpectResult } from '@core/std'
 import type { Answer, SelectOption } from '@domain/abstractions/workflow.ts'
 import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
 import type {
@@ -166,8 +167,8 @@ export const validateWorkflowTaskUpdate = (input: WorkflowTaskUpdate): ExpectRes
 
 /** Guard for SelectOption values. */
 export const isSelectOption = (v: unknown): v is SelectOption => {
-  if (v === null || typeof v !== 'object') return false
-  const option = v as SelectOption
+  if (!isDictionary(v)) return false
+  const option = v
   return expectValid(
     expectNonEmptyString(option.value, 'value'),
     expectNonEmptyString(option.label, 'label', true),
@@ -177,8 +178,8 @@ export const isSelectOption = (v: unknown): v is SelectOption => {
 
 /** Guard for Answer values. */
 export const isAnswer = (v: unknown): v is Answer => {
-  if (v === null || typeof v !== 'object') return false
-  const answer = v as Answer
+  if (!isDictionary(v)) return false
+  const answer = v
   const value = answer.value
   const isAllowedValue = typeof value === 'string' || typeof value === 'number'
     || typeof value === 'boolean'

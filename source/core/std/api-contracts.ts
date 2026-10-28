@@ -109,6 +109,7 @@ Stores    Supabase uses targeted SDK filters and JSONB containment; generated
 */
 
 import type { Dictionary } from './adt.ts'
+import { isDictionary } from './adt.ts'
 import type { When } from './datetime.ts'
 import { isId } from './identifier.ts'
 import type { Id } from './identifier.ts'
@@ -325,7 +326,7 @@ export const readListCursor = <T>(
       char => char.charCodeAt(0)
     )
     input = JSON.parse(new TextDecoder('utf-8', { fatal: true }).decode(bytes))
-    if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+    if (!isDictionary(input)) {
       throw new Error('Invalid cursor shape')
     }
   } catch {

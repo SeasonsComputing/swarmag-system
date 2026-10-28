@@ -20,6 +20,7 @@ PUBLIC
 (script entry point — no exported symbols)
 */
 
+import { isDictionary } from '@core/std'
 import type { Dictionary } from '@core/std'
 
 type Json =
@@ -99,8 +100,6 @@ const withTimeout = <T>(promise: Promise<T>, timeoutMs: number, label: string): 
       }
     )
   })
-
-const isRecord = (value: unknown): value is Dictionary => typeof value === 'object' && value !== null
 
 const asString = (value: unknown): string => typeof value === 'string' ? value : ''
 
@@ -324,8 +323,8 @@ class CdpClient {
       this.errors.push(`exception: ${JSON.stringify(message.params)}`)
     }
     if (message.method === 'Network.requestWillBeSent') {
-      const params = isRecord(message.params) ? message.params : {}
-      const request = isRecord(params.request) ? params.request : {}
+      const params = isDictionary(message.params) ? message.params : {}
+      const request = isDictionary(params.request) ? params.request : {}
       const url = asString(request.url)
       if (url) this.requestedUrls.push(url)
     }
@@ -336,12 +335,12 @@ class CdpClient {
       this.errors.push(`dialog: ${JSON.stringify(message.params)}`)
     }
     if (message.method === 'Log.entryAdded') {
-      const params = isRecord(message.params) ? message.params : {}
-      const entry = isRecord(params.entry) ? params.entry : {}
+      const params = isDictionary(message.params) ? message.params : {}
+      const entry = isDictionary(params.entry) ? params.entry : {}
       if (entry.level === 'error') this.errors.push(`log: ${asString(entry.text)}`)
     }
     if (message.method === 'Runtime.consoleAPICalled') {
-      const params = isRecord(message.params) ? message.params : {}
+      const params = isDictionary(message.params) ? message.params : {}
       const type = asString(params.type)
       if (type !== 'error' && type !== 'assert') return
       this.errors.push(`console.${type}: ${JSON.stringify(params.args ?? [])}`)
@@ -371,8 +370,8 @@ const evaluate = async (cdp: CdpClient, expression: string): Promise<Json | unde
     awaitPromise: true,
     returnByValue: true
   })
-  if (!isRecord(result)) return undefined
-  const value = isRecord(result.result) ? result.result.value : undefined
+  if (!isDictionary(result)) return undefined
+  const value = isDictionary(result.result) ? result.result.value : undefined
   return value as Json | undefined
 }
 
@@ -507,8 +506,8 @@ const smokeProtectedRoute = async (
         text: document.body.innerText
       })`
     )
-    const href = isRecord(state) ? asString(state.href) : ''
-    const text = isRecord(state) ? asString(state.text) : ''
+    const href = isDictionary(state) ? asString(state.href) : ''
+    const text = isDictionary(state) ? asString(state.text) : ''
     if (!href.endsWith('/login')) {
       throw new Error(`${target.app} protected route did not settle on /login: ${href}`)
     }

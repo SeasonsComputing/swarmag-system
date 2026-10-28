@@ -35,11 +35,11 @@ import {
   expectConstEnum,
   expectId,
   expectPositiveNumber,
-  type ExpectResult,
   expectValid,
   expectWhen,
   isId
 } from '@core/std'
+import type { ExpectResult } from '@core/std'
 import {
   JOB_PLAN_ASSIGNMENT_ROLES,
   JOB_PLAN_CHEMICAL_UNITS,

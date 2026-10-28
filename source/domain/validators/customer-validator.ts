@@ -25,9 +25,10 @@ import {
   expectId,
   expectNonEmptyString,
   expectPositiveNumber,
-  type ExpectResult,
-  expectValid
+  expectValid,
+  isDictionary
 } from '@core/std'
+import type { ExpectResult } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
 import type { Contact, CustomerSite } from '@domain/abstractions/customer.ts'
 import { CUSTOMER_STATUSES } from '@domain/abstractions/customer.ts'
@@ -82,8 +83,8 @@ export const validateCustomerUserCreate = (input: CustomerUserCreate): ExpectRes
 
 /** Guard for Contact values. */
 export const isContact = (v: unknown): v is Contact => {
-  if (v === null || typeof v !== 'object') return false
-  const contact = v as Contact
+  if (!isDictionary(v)) return false
+  const contact = v
   return expectValid(
     expectNonEmptyString(contact.displayName, 'displayName'),
     expectNonEmptyString(contact.phoneNumber, 'phoneNumber'),
@@ -94,8 +95,8 @@ export const isContact = (v: unknown): v is Contact => {
 
 /** Guard for CustomerSite values. */
 export const isCustomerSite = (v: unknown): v is CustomerSite => {
-  if (v === null || typeof v !== 'object') return false
-  const site = v as CustomerSite
+  if (!isDictionary(v)) return false
+  const site = v
   return expectValid(
     expectCompositionOne(site.location, 'location', isLocation),
     expectCompositionMany(site.notes, 'notes', isNote),

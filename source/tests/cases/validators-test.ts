@@ -97,6 +97,12 @@ Deno.test('isLocation accepts coordinate substance alone', () => {
   assertEquals(isLocation({ latitude: 31.9686, longitude: -99.9018 }), true)
 })
 
+Deno.test('isLocation rejects arrays carrying otherwise-valid coordinate fields', () => {
+  const location = { latitude: 31.9686, longitude: -99.9018 }
+  assertEquals(isLocation(location), true)
+  assertEquals(isLocation(Object.assign([], location)), false)
+})
+
 Deno.test('isLocation accepts address substance alone', () => {
   assertEquals(isLocation({ line1: '1200 AgriTech Way', city: 'Lubbock' }), true)
 })

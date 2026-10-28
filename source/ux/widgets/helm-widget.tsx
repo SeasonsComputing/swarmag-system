@@ -22,6 +22,7 @@ HelmWidgetProps  Dashboard helm widget props.
 HelmWidget       Dashboard header navigation control cluster.
 */
 
+import { isConstEnum, isDictionary, isNonEmptyString, notValid } from '@core/std'
 import type { Dictionary } from '@core/std'
 import { createSignal, For } from '@solid-js'
 import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
@@ -60,10 +61,10 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
   const navigate = useShellNavigate()
   const [theme, setTheme] = createSignal(document.documentElement.dataset.theme ?? '')
   const actions = () =>
-    toHelmActions(props.settings['actions'], 'HelmWidget settings.actions').map(resolveAction)
+    readHelmActions(props.settings['actions'], 'HelmWidget settings.actions').map(resolveAction)
 
   const cycleTheme = () => {
-    const themes = toThemes(props.settings['themes'])
+    const themes = readHelmThemes(props.settings['themes'])
     const index = themes.indexOf(theme())
     const nextTheme = themes[index + 1] ?? themes[0]
     document.documentElement.dataset.theme = nextTheme
@@ -73,7 +74,7 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
   const resolveAction = (action: HelmAction): ResolvedHelmAction => {
     switch (action.command) {
       case HELM_THEME_COMMAND:
-        toThemes(props.settings['themes'])
+        readHelmThemes(props.settings['themes'])
         return {
           ...action,
           execute: cycleTheme,
@@ -113,59 +114,49 @@ export const HelmWidget = (props: HelmWidgetProps): UiComponent => {
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** Parse Helm action records from widget settings. */
-const toHelmActions = (value: unknown, field: string): HelmAction[] => {
-  if (!Array.isArray(value)) throw new Error(`${field} must be an array`)
-  return value.map((item, index) => toHelmAction(item, `${field}[${index}]`))
+const readHelmActions = (value: unknown, field: string): HelmAction[] => {
+  if (!Array.isArray(value)) return notValid(`${field} must be an array`)
+  return value.map((item, index) => readHelmAction(item, `${field}[${index}]`))
 }
 
 /** Parse one Helm action record. */
-const toHelmAction = (value: unknown, field: string): HelmAction => {
-  const action = toDictionary(value, field)
+const readHelmAction = (value: unknown, field: string): HelmAction => {
+  const action = readHelmDictionary(value, field)
   return {
-    command: toString(action['command'], `${field}.command`),
-    icon: toString(action['icon'], `${field}.icon`),
-    label: toString(action['label'], `${field}.label`),
-    labelMode: toLabelMode(action['labelMode'], `${field}.labelMode`)
+    command: readHelmString(action['command'], `${field}.command`),
+    icon: readHelmString(action['icon'], `${field}.icon`),
+    label: readHelmString(action['label'], `${field}.label`),
+    labelMode: readHelmLabelMode(action['labelMode'], `${field}.labelMode`)
   }
 }
 
 /** Parse the configured theme cycle. */
-const toThemes = (value: unknown): string[] => toStringArray(value, 'HelmWidget settings.themes')
+const readHelmThemes = (value: unknown): string[] =>
+  readHelmStringArray(value, 'HelmWidget settings.themes')
 
 /** Require an object dictionary. */
-const toDictionary = (input: unknown, field: string): Dictionary => {
-  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
-    throw new Error(`${field} must be an object`)
-  }
-  return input as Dictionary
+const readHelmDictionary = (input: unknown, field: string): Dictionary => {
+  if (isDictionary(input)) return input
+  return notValid(`${field} must be an object`)
 }
 
 /** Require a non-empty string value. */
-const toString = (input: unknown, field: string): string => {
-  if (typeof input !== 'string' || input.trim().length === 0) {
-    throw new Error(`${field} must be a non-empty string`)
-  }
-  return input
+const readHelmString = (input: unknown, field: string): string => {
+  if (isNonEmptyString(input)) return input
+  return notValid(`${field} must be a non-empty string`)
 }
 
 /** Require a supported Helm label mode when configured. */
-const toLabelMode = (value: unknown, field: string): HelmLabelMode => {
+const readHelmLabelMode = (value: unknown, field: string): HelmLabelMode => {
   if (value === undefined) return 'visible'
-  if (typeof value !== 'string' || !HELM_LABEL_MODES.includes(value as HelmLabelMode)) {
-    throw new Error(`${field} must be ${HELM_LABEL_MODES.join(', ')}`)
-  }
-  return value as HelmLabelMode
+  if (isConstEnum(value, HELM_LABEL_MODES)) return value
+  return notValid(`${field} must be ${HELM_LABEL_MODES.join(', ')}`)
 }
 
 /** Require a non-empty string array. */
-const toStringArray = (value: unknown, field: string): string[] => {
-  if (!Array.isArray(value)) throw new Error(`${field} must be an array`)
-  return value.map((item, index) => {
-    if (typeof item !== 'string' || item.trim().length === 0) {
-      throw new Error(`${field}[${index}] must be a non-empty string`)
-    }
-    return item
-  })
+const readHelmStringArray = (value: unknown, field: string): string[] => {
+  if (!Array.isArray(value)) return notValid(`${field} must be an array`)
+  return value.map((item, index) => readHelmString(item, `${field}[${index}]`))
 }
 
 /** Resolve the action icon for a named theme. */

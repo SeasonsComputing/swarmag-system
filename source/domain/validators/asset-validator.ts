@@ -22,9 +22,9 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
-  type ExpectResult,
   expectValid
 } from '@core/std'
+import type { ExpectResult } from '@core/std'
 import { ASSET_STATUSES } from '@domain/abstractions/asset.ts'
 import type {
   AssetCreate,

@@ -20,11 +20,12 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
-  type ExpectResult,
   expectValid
 } from '@core/std'
+import type { ExpectResult } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
-import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/user.ts'
+import { USER_ROLES, USER_STATUSES } from '@domain/abstractions/user.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 

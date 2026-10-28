@@ -321,10 +321,11 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
-  type ExpectResult,
   expectValid
 } from '@core/std'
-import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/user.ts'
+import type { ExpectResult } from '@core/std'
+import { USER_ROLES, USER_STATUSES } from '@domain/abstractions/user.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 
 /** Validate UserCreate payloads. */
@@ -368,10 +369,12 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
-  type ExpectResult,
-  expectValid
+  expectValid,
+  isDictionary
 } from '@core/std'
-import { QUESTION_TYPES, type SelectOption } from '@domain/abstractions/workflow.ts'
+import type { ExpectResult } from '@core/std'
+import { QUESTION_TYPES } from '@domain/abstractions/workflow.ts'
+import type { SelectOption } from '@domain/abstractions/workflow.ts'
 import type { QuestionCreate, QuestionUpdate } from '@domain/protocols/workflow-protocol.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -430,8 +433,8 @@ export const validateQuestionUpdate = (input: QuestionUpdate): ExpectResult => {
 
 /** Guard for SelectOption values. */
 export const isSelectOption = (v: unknown): v is SelectOption => {
-  if (v === null || typeof v !== 'object') return false
-  const option = v as SelectOption
+  if (!isDictionary(v)) return false
+  const option = v
   return expectValid(
     expectNonEmptyString(option.value, 'value'),
     expectNonEmptyString(option.label, 'label', true),
@@ -450,10 +453,11 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
-  type ExpectResult,
   expectValid
 } from '@core/std'
-import { USER_ROLES, USER_STATUSES, type UserRole } from '@domain/abstractions/user.ts'
+import type { ExpectResult } from '@core/std'
+import { USER_ROLES, USER_STATUSES } from '@domain/abstractions/user.ts'
+import type { UserRole } from '@domain/abstractions/user.ts'
 import type { UserCreate, UserUpdate } from '@domain/protocols/user-protocol.ts'
 
 /** Validate UserCreate payloads. */
@@ -490,11 +494,14 @@ const isUserRole = (v: unknown): v is UserRole => expectConstEnum(v, 'role', USE
 
 Every object-type abstraction that appears as a `CompositionOne`, `CompositionMany`, or `CompositionPositive` member must have a named, exported type guard in its topic's validator file. Guards must be typed to the specific abstraction — never generic.
 
+Each structural guard opens with `isDictionary` from `@core/std`, then reads fields from the
+narrowed dictionary without casting it to the abstraction being validated.
+
 ```typescript
 // workflow-validator.ts — guards are full structural validators, not shallow object checks
 export const isSelectOption = (v: unknown): v is SelectOption => {
-  if (v === null || typeof v !== 'object') return false
-  const option = v as SelectOption
+  if (!isDictionary(v)) return false
+  const option = v
   return expectValid(
     expectNonEmptyString(option.value, 'value'),
     expectNonEmptyString(option.label, 'label', true),
@@ -503,7 +510,7 @@ export const isSelectOption = (v: unknown): v is SelectOption => {
 }
 ```
 
-Where the data dictionary declares a substance rule — validity requiring one of several named field groups rather than any single field — the guard expresses it as named boolean predicates over the cast value with a single disjunctive return (`isLocation` is canonical). Per-field shape checks still precede the substance evaluation.
+Where the data dictionary declares a substance rule — validity requiring one of several named field groups rather than any single field — the guard expresses it as named boolean predicates over the narrowed dictionary with a single disjunctive return (`isLocation` is canonical). Per-field shape checks still precede the substance evaluation.
 
 Validators that compose object types from another topic import the typed guard — they do not define their own:
 

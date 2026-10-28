@@ -11,6 +11,7 @@ helpers reject absent values; optional helpers admit undefined and null.
 
 PREDICATES
 ───────────────────────────────────────────────────────────────────────────────
+isNullish(value)                Check whether value is undefined or null.
 isNonEmptyString(value)         Check whether value is a non-empty string.
 isPositiveNumber(value)         Check whether value is a positive number.
 isBoolean(value)                Check whether value is a boolean.
@@ -48,7 +49,6 @@ notValid(message)               Throw ValidatorError with message.
 expectValid(...results)         Return first validation error or null.
 */
 
-import { isNullish } from './adt.ts'
 import { isWhen } from './datetime.ts'
 import type { When } from './datetime.ts'
 import { isId } from './identifier.ts'
@@ -87,6 +87,10 @@ export const notValid = (message: string): never => {
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATOR OF TYPE (is*)
 // ────────────────────────────────────────────────────────────────────────────
+
+/** Check whether value is undefined or null. */
+export const isNullish = (value: unknown): value is undefined | null =>
+  value === undefined || value === null
 
 /** Check whether value is a non-empty string. */
 export const isNonEmptyString = (value: unknown): value is string =>

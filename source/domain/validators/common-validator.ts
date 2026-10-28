@@ -24,19 +24,20 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
-  type ExpectResult,
   expectValid,
   expectWhen,
+  isDictionary,
   isNonEmptyString
 } from '@core/std'
+import type { ExpectResult } from '@core/std'
 import type { Attachment, Location, Note } from '@domain/abstractions/common.ts'
 import { ATTACHMENT_KINDS, NOTE_VISIBILITIES } from '@domain/abstractions/common.ts'
 import type { FacetCreate, FacetUpdate } from '@domain/protocols/common-protocol.ts'
 
 /** Guard for Location with paired coordinates or address substance (line1+city). */
 export const isLocation = (v: unknown): v is Location => {
-  if (v === null || typeof v !== 'object') return false
-  const location = v as Location
+  if (!isDictionary(v)) return false
+  const location = v
   if (
     expectValid(
       expectNonEmptyString(location.line1, 'line1', true),
@@ -56,8 +57,8 @@ export const isLocation = (v: unknown): v is Location => {
 
 /** Guard for Attachment values. */
 export const isAttachment = (v: unknown): v is Attachment => {
-  if (v === null || typeof v !== 'object') return false
-  const attachment = v as Attachment
+  if (!isDictionary(v)) return false
+  const attachment = v
   return expectValid(
     expectNonEmptyString(attachment.filename, 'filename'),
     expectNonEmptyString(attachment.url, 'url'),
@@ -69,8 +70,8 @@ export const isAttachment = (v: unknown): v is Attachment => {
 
 /** Guard for Note values. */
 export const isNote = (v: unknown): v is Note => {
-  if (v === null || typeof v !== 'object') return false
-  const note = v as Note
+  if (!isDictionary(v)) return false
+  const note = v
   return expectValid(
     expectCompositionMany(note.attachments, 'attachments', isAttachment),
     expectWhen(note.createdAt, 'createdAt'),

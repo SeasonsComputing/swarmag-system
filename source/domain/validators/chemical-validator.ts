@@ -22,14 +22,12 @@ import {
   expectId,
   expectNonEmptyString,
   expectPositiveNumber,
-  type ExpectResult,
-  expectValid
+  expectValid,
+  isDictionary
 } from '@core/std'
-import {
-  CHEMICAL_SIGNAL_WORDS,
-  CHEMICAL_USAGES,
-  type ChemicalLabel
-} from '@domain/abstractions/chemical.ts'
+import type { ExpectResult } from '@core/std'
+import { CHEMICAL_SIGNAL_WORDS, CHEMICAL_USAGES } from '@domain/abstractions/chemical.ts'
+import type { ChemicalLabel } from '@domain/abstractions/chemical.ts'
 import type { ChemicalCreate, ChemicalUpdate } from '@domain/protocols/chemical-protocol.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 
@@ -66,8 +64,8 @@ export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
 
 /** Guard for ChemicalLabel values. */
 export const isChemicalLabel = (v: unknown): v is ChemicalLabel => {
-  if (v === null || typeof v !== 'object') return false
-  const label = v as ChemicalLabel
+  if (!isDictionary(v)) return false
+  const label = v
   return expectValid(
     expectNonEmptyString(label.url, 'url'),
     expectNonEmptyString(label.description, 'description', true)

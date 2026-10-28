@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Algebraic data primitives                                                    ║
-║ Shared dictionary, string-set, nullish, and fingerprint utilities.           ║
+║ Shared dictionary, string-set, and fingerprint utilities.                    ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -11,25 +11,28 @@ the system through the core standard import surface.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Dictionary<V>     String-keyed dictionary with configurable value type.
-StringDictionary  String-keyed dictionary where all values are strings.
-StringSet         Set specialized for string membership collections.
-isNullish(value)  Check whether value is undefined or null.
-djb2hash(str)     Compute a djb2 fingerprint of a string.
+Dictionary<V>        String-keyed dictionary with configurable value type.
+isDictionary(value)  Check whether value is a plain or null-prototype object.
+StringDictionary     String-keyed dictionary where all values are strings.
+StringSet            Set specialized for string membership collections.
+djb2hash(str)        Compute a djb2 fingerprint of a string.
 */
 
 /** String-keyed dictionary with configurable value type. */
 export type Dictionary<V = unknown> = Record<string, V>
+
+/** Check whether value is a dictionary: a plain or null-prototype object. */
+export const isDictionary = (value: unknown): value is Dictionary => {
+  if (value === null || typeof value !== 'object') return false
+  const prototype = Object.getPrototypeOf(value)
+  return prototype === Object.prototype || prototype === null
+}
 
 /** String-keyed dictionary where all values are strings. */
 export type StringDictionary = Dictionary<string>
 
 /** Set specialized for string membership collections. */
 export class StringSet extends Set<string> {}
-
-/** Check whether value is undefined or null. */
-export const isNullish = (value: unknown): value is undefined | null =>
-  value === undefined || value === null
 
 /** Compute a djb2 fingerprint of a string. */
 export const djb2hash = (str: string): string => {

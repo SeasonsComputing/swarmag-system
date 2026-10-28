@@ -52,7 +52,7 @@ rowWidgets: DashboardWidgetsContract - Widget mutation contract
 
 import { Config } from '@core/cfg/config.ts'
 import { IndexedDb } from '@core/db/indexeddb.ts'
-import { djb2hash, id, toId } from '@core/std'
+import { djb2hash, id, isDictionary, toId } from '@core/std'
 import type { Dictionary, Instance } from '@core/std'
 import { ApiError, apiError } from '@core/stdx'
 import { createStore, produce } from '@solid-js/store'
@@ -150,7 +150,7 @@ async function dashboardInit(seed: DashboardStateSeed): Promise<void> {
       record = undefined
     }
     if (record === undefined) {
-      record = { ...toDashboardStoreView(seed), seedHash: fingerprint }
+      record = { ...readDashboardStoreView(seed), seedHash: fingerprint }
       await db.put(DASHBOARD_STORE, record)
     }
     setDashboardStore(record)
@@ -304,35 +304,35 @@ const dashboardRows: DashboardRowsContract = {
 // ───────────────────────────────────────────────────────────────────────────────
 
 /** Validate and convert input to dashboard store */
-function toDashboardStoreView(seed: DashboardStateSeed): DashboardStoreView {
-  const view = toDictionary(seed, 'Dashboard view')
-  const settings = toDashboardSettings(view['settings'], 'Dashboard view.settings')
-  const header = toDictionary(view['header'], 'Dashboard view.header')
-  const rows = toArray(view['rows'], 'Dashboard view.rows')
+function readDashboardStoreView(seed: DashboardStateSeed): DashboardStoreView {
+  const view = readDashboardDictionary(seed, 'Dashboard view')
+  const settings = readDashboardSettings(view['settings'], 'Dashboard view.settings')
+  const header = readDashboardDictionary(view['header'], 'Dashboard view.header')
+  const rows = readDashboardArray(view['rows'], 'Dashboard view.rows')
   return {
     id: DASHBOARD_ID,
     settings,
-    header: { widgets: toDashboardStoreWidgets(header['widgets'], 'Dashboard view.header.widgets') },
-    rows: rows.map((r, i) => toDashboardStoreRow(r, `Dashboard view.rows[${i}]`))
+    header: { widgets: readDashboardStoreWidgets(header['widgets'], 'Dashboard view.header.widgets') },
+    rows: rows.map((r, i) => readDashboardStoreRow(r, `Dashboard view.rows[${i}]`))
   }
 }
 
 /** Require an object dictionary. */
-function toDictionary(input: unknown, field: string): Dictionary {
-  if (input === null || typeof input !== 'object' || Array.isArray(input)) {
+function readDashboardDictionary(input: unknown, field: string): Dictionary {
+  if (!isDictionary(input)) {
     throw new ApiError(`${field} must be an object`, 400)
   }
-  return input as Dictionary
+  return input
 }
 
 /** Require an array value. */
-function toArray(input: unknown, field: string): unknown[] {
+function readDashboardArray(input: unknown, field: string): unknown[] {
   if (!Array.isArray(input)) throw new ApiError(`${field} must be an array`, 400)
   return input
 }
 
 /** Require a non-empty string value. */
-function toString(input: unknown, field: string): string {
+function readDashboardString(input: unknown, field: string): string {
   if (typeof input !== 'string' || input.trim().length === 0) {
     throw new ApiError(`${field} must be a non-empty string`, 400)
   }
@@ -340,17 +340,17 @@ function toString(input: unknown, field: string): string {
 }
 
 /** Validate one dashboard widget. */
-function toDashboardStoreWidget(input: unknown, field: string): DashboardStoreWidget {
-  const widget = toDictionary(input, field)
-  const type = toString(widget['type'], `${field}.type`)
-  const settings = toDashboardWidgetSettings(widget['settings'], `${field}.settings`)
+function readDashboardStoreWidget(input: unknown, field: string): DashboardStoreWidget {
+  const widget = readDashboardDictionary(input, field)
+  const type = readDashboardString(widget['type'], `${field}.type`)
+  const settings = readDashboardWidgetSettings(widget['settings'], `${field}.settings`)
   return { id: id(), type, settings }
 }
 
 /** Validate dashboard widget settings. */
-function toDashboardWidgetSettings(input: unknown, field: string): DashboardWidgetSettings {
-  const settings = toDictionary(input, field)
-  const shape = toString(settings['shape'], `${field}.shape`)
+function readDashboardWidgetSettings(input: unknown, field: string): DashboardWidgetSettings {
+  const settings = readDashboardDictionary(input, field)
+  const shape = readDashboardString(settings['shape'], `${field}.shape`)
   if (shape !== 'compact' && shape !== 'landscape') {
     throw new ApiError(`${field}.shape must be compact or landscape`, 400)
   }
@@ -358,24 +358,24 @@ function toDashboardWidgetSettings(input: unknown, field: string): DashboardWidg
 }
 
 /** Validate a dashboard widget array. */
-function toDashboardStoreWidgets(input: unknown, field: string): DashboardStoreWidget[] {
-  return toArray(input, field).map((w, i) => toDashboardStoreWidget(w, `${field}[${i}]`))
+function readDashboardStoreWidgets(input: unknown, field: string): DashboardStoreWidget[] {
+  return readDashboardArray(input, field).map((w, i) => readDashboardStoreWidget(w, `${field}[${i}]`))
 }
 
 /** Validate dashboard settings. */
-function toDashboardSettings(input: unknown, field: string): DashboardSettings {
-  return toDictionary(input, field)
+function readDashboardSettings(input: unknown, field: string): DashboardSettings {
+  return readDashboardDictionary(input, field)
 }
 
 /** Validate one dashboard row. */
-function toDashboardStoreRow(input: unknown, field: string): DashboardStoreRow {
-  const row = toDictionary(input, field)
-  const size = toString(row['size'], `${field}.size`)
+function readDashboardStoreRow(input: unknown, field: string): DashboardStoreRow {
+  const row = readDashboardDictionary(input, field)
+  const size = readDashboardString(row['size'], `${field}.size`)
   if (size !== 'standard' && size !== 'short') {
     throw new ApiError(`${field}.size must be standard or short`, 400)
   }
-  const label = toString(row['label'], `${field}.label`)
-  const widgets = toDashboardStoreWidgets(row['widgets'], `${field}.widgets`)
+  const label = readDashboardString(row['label'], `${field}.label`)
+  const widgets = readDashboardStoreWidgets(row['widgets'], `${field}.widgets`)
   return { id: id(), size, label, widgets }
 }
 

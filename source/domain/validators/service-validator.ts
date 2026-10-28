@@ -20,9 +20,9 @@ import {
   expectConstEnum,
   expectId,
   expectNonEmptyString,
-  type ExpectResult,
   expectValid
 } from '@core/std'
+import type { ExpectResult } from '@core/std'
 import { SERVICE_CATEGORIES } from '@domain/abstractions/service.ts'
 import type {
   ServiceCreate,

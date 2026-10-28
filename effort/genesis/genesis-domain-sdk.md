@@ -53,7 +53,7 @@ Per ingested abstractions, `domain-archetypes.md` and `CONVENTIONS.md`.
 The following are `STYLE_AUDIT: FAIL` violations — fix before proceeding to Phase III:
 
 - `CreateFromInstantiable` or `UpdateFromInstantiable` applied directly to a union type — use per-variant types per `domain-archetypes.md` §4.4.
-- Any `isObject` guard in a validator — use named exported guards per `domain-archetypes.md` §5.6.
+- Any `isObject` guard, or any guard that is only an object check — use named exported structural guards per `domain-archetypes.md` §5.5, each opening with `isDictionary` from `@core/std`.
 - Any local id-string guard (e.g. `isIdString`) — use `isId` from `@core/std`.
 - Missing file-header `PUBLIC` subsection, or `PUBLIC` entries without aligned description column.
 - Missing single-line JSDoc comment above exported adapter, protocol, or validator symbols.

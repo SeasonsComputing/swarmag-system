@@ -28,8 +28,9 @@ makeAdapter(meta)         Create an Adapter from metadata.
 makeScopedUpdate(fields)  Create a scoped update adapter from field adapters.
 */
 
-import { Dictionary, isNullish } from './adt.ts'
+import type { Dictionary } from './adt.ts'
 import type { Instantiable, InstantiableOnly } from './instance.ts'
+import { isNullish } from './validators.ts'
 
 /** Contract for domain serialization. Null on any attribute clears its column. */
 export type AdapterPatch<T> = { [K in keyof T]?: T[K] | null } & Dictionary
