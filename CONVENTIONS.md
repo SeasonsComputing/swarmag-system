@@ -1,9 +1,9 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.2)
+# Software Construction Conventions (1.3)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.2
+- Version: 1.3
 - Published: 2026 October 27th
 - Author: Ted V. Kremer
 
@@ -118,6 +118,11 @@ export const SHAPE_KINDS = ['circle', 'rect', 'triangle'] as const
 /** HTTP status codes by name. */
 export const HttpCodes = { ok: 200, badRequest: 400, notFound: 404 } as const
 ```
+
+A local function that reads unknown input and fails on it is named `read{Owner}*`, for the module
+that owns it (`readSettingsString`, not `readString`), so it is not mistaken for a shared primitive.
+`to*` names the shared conversions and normalizers of `@core/std` and the makers (`toTrimmed`,
+`toId`, `toDomain`, `toCreate`).
 
 A workbench Step lives in `{topic}-step-{name}.tsx`, where `detail` names the primary or only Step.
 _Editor_ is reserved for a reusable form kind or a drill-down editor inside a Step (UX design
@@ -361,11 +366,13 @@ Use types from `@core/std` instead of ad-hoc primitives and container generics.
 | `AssociationOptional<T>`  | raw `Id \| undefined` for optional FK references                           |
 | `AssociationJunction<T>`  | raw `Id` in junction abstractions                                          |
 | `NominalType<T, B>`       | an inline `{ readonly [brand]: true }` intersection                        |
+| `isDictionary`            | inline `null`, `typeof 'object'`, and array checks on an unknown value     |
 | `ValidatorError`          | thrown by `notValid()`; generic `Error` for validation failures            |
 
 - Import std primitives from `@core/std` only.
 - Never declare `Record<string, unknown>`, `Record<string, string>`, or `Set<string>` outside `source/core/std/`.
-- When narrowing unknown objects in guards, use `Dictionary` casts (`const x = v as Dictionary`) instead of `Record<string, unknown>`.
+- When narrowing an unknown object in a guard, check it with `isDictionary` first, which narrows it to
+  `Dictionary`; never use `Record<string, unknown>`.
 - Use `StringDictionary` for key/value string/string maps.
 
 ### 8.2 Type vs. interface
@@ -631,8 +638,9 @@ predicates (`is*`), expectations (`expect*`), normalizers (`to*`), and the resul
 - An expectation returns an `ExpectResult`: an error message, or `null` when valid. Compose them
   with `expectValid`, which returns the first error.
 - `notValid` throws a `ValidatorError`; never throw a generic `Error` for a validation failure.
-- A normalizer may check as well as normalize: `toId` and `toWhen` fail through `notValid` on input
-  they cannot accept.
+- The families differ by what they return: a predicate (`is*`) a `boolean`, an expectation
+  (`expect*`) an `ExpectResult`, and a normalizer (`to*`) the value in its canonical form, failing
+  through `notValid` on input it cannot accept.
 - A fixed identifier or timestamp written in code goes through its checker (`toId('…')`,
   `toWhen('…')`); a new one comes from its producer (`id()`, `when()`).
 - A union validates with the same discriminator switch as its consumers (§9.4).
@@ -1295,6 +1303,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.3     | 2026 October 27th   | §8.1: `isDictionary` from `@core/std` replaces inline object checks, and a guard narrows an unknown object through it rather than casting. §4.2: a local function that reads unknown input and fails on it is named `read{Owner}*`, and `to*` names the shared conversions and normalizers. §9.6: the validator families are distinguished by what they return, a normalizer returning the canonical value or failing through `notValid`; it replaces 1.2's bullet that a normalizer may check.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 | 1.2     | 2026 October 27th   | New §8.4 Nominal types: `NominalType<T, B>` from `@core/std` for a value with a domain of its own, keyed by a producer-private phantom brand declared under the type's comment; §8.1 lists it, and §10.2 says nominal type where it said branded type. §9.6 Validators: a normalizer may check, failing through `notValid`, and a fixed identifier or timestamp written in code goes through its checker (`toId`, `toWhen`) while a new one comes from its producer.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | 1.1     | 2026 October 20th   | Recast as the programming guide for software construction at Seasons Computing. The `core/` file headers are the reference, and some conventions are preferences held by review (§1 Overview). §3 Imports adds the type-import form and the own-namespace and closed `core/std` rules. §4 Naming makes object constants PascalCase and values SCREAMING_SNAKE. §6 Source Code File Format is rewritten: every file opens with a box header written in expanding levels, PUBLIC lists every export, and containers list their members as trees. §7.6 No magic gains its corollary, explicit and obvious. New chapters: §8 Types and Containers, §9 Domain Shapes, §10 Makers and Contracts, §11 Runtime Configuration, §12 Services, §13 Local Persistence, and §14 Remote Persistence. §15 Error Handling separates `Error`, `ValidatorError`, `ApiError`, and service errors. New §16 UX Shell and §17 Building UX Patterns cover `ux/`; new §19 DevOps and Guards covers guards and the tooling allowances. The former §8–§13 are renumbered. |
 | 1.0     | 2026 September 15th | Cross-references in this document and every document citing it (`AGENTS.md`, the architecture docs, the genesis prompts) caught up to the new name (commit `ca77878`), and it gained explicit metadata and this amendment record for the first time. The rename's rationale: the document covers more than style — §8.6/§8.7 adapter and maker shape, §12 testing are structural pattern conventions, not aesthetics — and the old name undersold its actual scope.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
