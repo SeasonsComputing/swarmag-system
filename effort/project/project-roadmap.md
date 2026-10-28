@@ -145,10 +145,10 @@ them; each fix lands once instead of chasing every copy:
 
 **Rides along:**
 
-- **Nominal types** — dispatched 2026-10-27, rescoped by its Amendment 1,
-  `effort/active/2026-10-27-nominal-types-brief.md`: the `NominalType` idiom in `core/std`, checked
-  `id(literal?)` and `when(at?)` producers, and a string-keyed Preferences row; making `Id` nominal
-  is deferred, and document storage does not depend on it.
+- **Nominal types** — closed 2026-10-27, `9ce287a`,
+  `effort/completed/2026-10-27-nominal-types-brief.md`: the `NominalType` idiom in `core/std`, the
+  `toId` and `toWhen` checkers, and Preferences binding an explicit row `Id`; CONVENTIONS 1.2.
+  Making `Id` nominal is held in P-12; document storage does not depend on it.
 - **File header conformance** — closed 2026-10-20,
   `effort/completed/2026-10-09-file-header-conformance-brief.md`: copied files carry their headers.
 - **CONVENTIONS reconciliation** — closed 2026-10-20,

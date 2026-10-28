@@ -285,7 +285,7 @@ check) depends on how production is set up.
 ## P-12 · How does swarmAg adopt `core` and `ux` once they ship as Seasons Computing libraries?
 
 **Parked:** 2026-10-27, while rescoping the nominal types brief
-(`effort/active/2026-10-27-nominal-types-brief.md`, Amendment 1).
+(`effort/completed/2026-10-27-nominal-types-brief.md`, Amendment 1).
 
 **What it is:** `core/` and `ux/` move to repositories of their own as Seasons Computing's
 essential tools. swarmAg then consumes them as third-party libraries in place of its `@core/` and
@@ -298,6 +298,8 @@ through this adoption:
 - **Nominal `Id`:** swarmAg's adoption sites are designed in the nominal types brief's deferred
   moments: the empty Id and the form-owned asset draft (1), pickers resolving against their
   options' records (2), and the cast guard (5). The type checker lists the sites (8 when measured).
+  `toId` then takes the guard-first form (`if (isId(value)) return …; return notValid(…)`); its
+  current form narrows nothing and is valid only while `Id` is `string`.
 - **`When` as `Temporal.Instant`:** waits on stable Safari and Supabase's hosted runtime (the
   nominal types brief's design history).
 

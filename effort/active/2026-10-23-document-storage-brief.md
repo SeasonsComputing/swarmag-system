@@ -157,7 +157,7 @@ signed paper, and the field that refers to it says which form it is. Every docum
 
 Names proposed; the shape follows the architecture. Two contracts, because the multi-cloud seam
 is not the seam the client calls. `DocumentPath` follows `Id`'s pattern, one producer and one
-guard, as a `NominalType` (`effort/active/2026-10-27-nominal-types-brief.md` adds it); nothing here
+guard, as a `NominalType` (`effort/completed/2026-10-27-nominal-types-brief.md` adds it); nothing here
 waits on a nominal `Id`. In M-5 the client contract is
 implemented by `makeSupabaseDocumentClient`; the provider contract arrives with the broker.
 

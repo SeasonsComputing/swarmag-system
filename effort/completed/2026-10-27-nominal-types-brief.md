@@ -1,7 +1,7 @@
 # Nominal Types — Brief
 
-**Dispatched 2026-10-27** for ACE review and production; later changes are amendments. Recorded
-2026-10-27 from a CA + AI Architect session, while reviewing the document storage brief
+**Completed 2026-10-27.** Shipped in `9ce287a`, with CONVENTIONS 1.2 in `30374a4`, reviewed by
+the AI Architect and verified by the CA's review. Recorded 2026-10-27 from a CA + AI Architect session, while reviewing the document storage brief
 (`effort/active/2026-10-23-document-storage-brief.md`), whose `DocumentPath` is a nominal string
 built on `Id`. Chosen the same day, ahead of the storage production (no longer a prerequisite, per
 Amendment 1): making `Id` nominal first means `DocumentPath` is built on a nominal `Id` rather than
@@ -219,6 +219,14 @@ and `toEmail`, and the primitives keep one job each.
 7. **CONVENTIONS reverts to its committed version.** The AI Architect writes the nominal type rule
    after the production, as the CA authorizes: a §8.4 Nominal types with an example, a §8.1
    vocabulary row, and §10.2 kept to file placement.
+
+## Closure
+
+- **Making `Id` nominal** (design point 3), with moments 1, 2, and 5 and ACE's asset draft and
+  picker findings: joins parking lot P-12, held for `core`'s own repository.
+- **`When` as `Temporal.Instant`:** already in P-12.
+- **`toId` once `Id` is nominal:** P-12 notes that it takes the guard-first form, which the
+  current form, valid only while `Id` is `string`, is not.
 
 ## Design history
 
