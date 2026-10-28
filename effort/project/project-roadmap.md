@@ -142,12 +142,13 @@ them; each fix lands once instead of chasing every copy:
 - **Host-owned list errors** — added and closed 2026-10-21, `a744ee6`: `AbstractionManager`
   presents the collection's load failure from `listError`; copied managers supply it, not the
   banner.
-- **Nominal types** — dispatched 2026-10-27,
-  `effort/active/2026-10-27-nominal-types-brief.md`: `Id` becomes a nominal type with a closed
-  producer and guard, before document storage builds `DocumentPath` on it.
 
 **Rides along:**
 
+- **Nominal types** — dispatched 2026-10-27, rescoped by its Amendment 1,
+  `effort/active/2026-10-27-nominal-types-brief.md`: the `NominalType` idiom in `core/std`, checked
+  `id(literal?)` and `when(at?)` producers, and a string-keyed Preferences row; making `Id` nominal
+  is deferred, and document storage does not depend on it.
 - **File header conformance** — closed 2026-10-20,
   `effort/completed/2026-10-09-file-header-conformance-brief.md`: copied files carry their headers.
 - **CONVENTIONS reconciliation** — closed 2026-10-20,
