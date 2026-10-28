@@ -98,7 +98,7 @@
     rgb(30 41 59 / 0.8) 0%,
     rgb(51 65 85 / 0.6) 100%
   );
-  --sa-bg-backdrop: oklch(0% 0 0 / 0.6);
+  --sa-bg-backdrop: oklch(0% 0 0 / 0.3);
 
   /* Text */
   --sa-text-primary: oklch(var(--sa-lch-neutral-1));
