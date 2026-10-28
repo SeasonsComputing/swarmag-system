@@ -1,9 +1,9 @@
 # Dictionary Guard — Brief
 
-**Active, draft.** Recorded and chosen 2026-10-27 from a CA + AI Architect session, while
-reviewing HelmWidget's settings validation after the nominal types brief
-(`effort/completed/2026-10-27-nominal-types-brief.md`). Foundation mode: it reaches `core/std`,
-`domain/`, the domain genesis, the domain archetypes, and CONVENTIONS.
+**Active, dispatched 2026-10-27** for ACE review; later changes are amendments. Recorded and chosen
+2026-10-27 from a CA + AI Architect session, while reviewing HelmWidget's settings validation after
+the nominal types brief (`effort/completed/2026-10-27-nominal-types-brief.md`). Foundation mode: it
+reaches `core/std`, `domain/`, the domain genesis, the domain archetypes, and CONVENTIONS.
 
 ## What triggered it
 
@@ -14,10 +14,10 @@ judgment: the gap would not have been allowed to stand at any point in the proje
 
 The pattern is taught, not chosen:
 
-- **`documentation/domain/domain-archetypes.md` §5.6** opens its canonical guards with
-  `if (v === null || typeof v !== 'object') return false`.
+- **`documentation/domain/domain-archetypes.md` §5.5 _(corrected from §5.6 by Amendment 1)_** opens
+  its canonical guards with `if (v === null || typeof v !== 'object') return false`.
 - **`effort/genesis/genesis-domain-sdk.md`** forbids "any `isObject` guard in a validator" and
-  points to §5.6's named guards, so genesis copies the inline check.
+  points to §5.5's named guards, so genesis copies the inline check.
 - **CONVENTIONS §8.1** says to narrow unknown objects with a `Dictionary` cast, with no guard to
   narrow through first.
 
@@ -53,9 +53,9 @@ The pattern is taught, not chosen:
 
 2. **Structural guards open with it.** `if (!isDictionary(v)) return false` replaces the inline
    check, and the guard then validates every field as it does today. `isDictionary` is the first
-   line of a structural guard, never the guard: §5.6's rule that guards are full structural
+   line of a structural guard, never the guard: §5.5's rule that guards are full structural
    validators, not shallow object checks, stands.
-3. **Genesis learns it from the documents it reads:** §5.6's examples, the genesis prompt's
+3. **Genesis learns it from the documents it reads:** §5.5's examples, the genesis prompt's
    `isObject` line, and a CONVENTIONS §8.1 row (`isDictionary` instead of inline `null`, `object`,
    and array checks).
 4. **`domain/` is retrofitted by hand and stays regenerable:** a sandbox genesis run confirms the
@@ -70,9 +70,9 @@ The pattern is taught, not chosen:
    `readDashboardDictionary`, `readDashboardArray`, `readDashboardString`, and the dashboard readers
    (`readDashboardStoreView` and the rest). The owner in the name marks a local reader, which a
    generic `readString` would not, so it is not mistaken for a shared primitive. `to*` names the
-   shared conversions and normalizers of `@core/std` and the makers (`toTrimmed`, `toId`, `toDomain`,
-   `toCreate`), which may fail through `notValid` (CONVENTIONS §9.6); HelmWidget's `toThemeIcon`, a
-   conversion, keeps its name. `toString` also shadows `Object.prototype.toString`.
+   shared conversions and normalizers of `@core/std` and the makers (`toTrimmed`, `toId`,
+   `toDomain`, `toCreate`), which may fail through `notValid` (CONVENTIONS §9.6); HelmWidget's
+   `toThemeIcon`, a conversion, keeps its name. `toString` also shadows `Object.prototype.toString`.
 
 ## Design moments
 
@@ -88,8 +88,8 @@ The pattern is taught, not chosen:
    other difference the sandbox shows is out of scope, neither fixed nor recorded here.
 3. **The genesis prompt's `isObject` line. Settled:** it reads "Any `isObject` guard, or any guard
    that is only an object check — use named exported structural guards per `domain-archetypes.md`
-   §5.6, each opening with `isDictionary` from `@core/std`." The ban on shallow guards stands, and
-   the primitive's place is named. §5.6's examples open with `if (!isDictionary(v)) return false`,
+   §5.5, each opening with `isDictionary` from `@core/std`." The ban on shallow guards stands, and
+   the primitive's place is named. §5.5's examples open with `if (!isDictionary(v)) return false`,
    so both documents teach the same line.
 4. **Dashboard state. Settled.** Its seed reader checks with `isDictionary` and keeps throwing
    `ApiError` 400: its handlers test `apiError(error)` to reach `Config.fail`, so `notValid` would
@@ -108,9 +108,37 @@ The pattern is taught, not chosen:
 Opened for this production: `core/std/adt.ts` and `api-contracts.ts`; `domain/validators/`;
 `ux/shell/dashboard/dashboard-state.ts`; `ux/widgets/helm-widget.tsx`;
 `devops/scripts/smoke-ux.ts`; `effort/genesis/genesis-domain-sdk.md`; and
-`documentation/domain/domain-archetypes.md` §5.6. `domain/` and `documentation/` are locked; the
+`documentation/domain/domain-archetypes.md` §5.3 and §5.5 _(per Amendment 1)_. `domain/` and
+`documentation/` are locked; the
 CA opens them for this brief, recorded here. CONVENTIONS 1.3 is already written (`287d283`) and
 is not part of the production.
+
+## Amendment 1 (2026-10-27): ACE's review
+
+ACE found the design coherent and its sites accurate, and raised three gaps, each verified against
+the documents.
+
+1. **The archetype sections.** Object guards are §5.5, not §5.6, which does not exist; the genesis
+   prompt's own `isObject` line points to §5.6, the source of the error here. The §5.3 union
+   example (`isSelectOption`) also opens with the inline check. Both examples open with
+   `if (!isDictionary(v)) return false` and read their fields from the narrowed dictionary, with no
+   `as` cast (`const option = v as SelectOption` goes), as CONVENTIONS 1.3 §8.1 now says. The eight
+   domain guards are retrofitted the same way, and the genesis prompt's line names §5.5.
+2. **The sandbox genesis run is bounded.** The genesis execution contract runs Phase 3 after the
+   validators: `schema.sql`, seed id rotation, and a schema lint in a database, which a copied
+   folder does not isolate. The sandbox runs Phase 2's validator archetype only, against the
+   existing abstractions, protocols, and adapters, in an isolated copy, with no Phase 3: no schema,
+   no seed ids, no database. It compares all eight guards' opening checks, and the absence of a
+   cast, with the hand edits.
+3. **Verification:**
+   - **New tests:** `isDictionary` is true for plain and null-prototype objects and false for
+     arrays, primitives, `Date`, `Map`, `RegExp`, and class instances; a domain guard rejects an
+     array that carries otherwise-valid fields.
+   - **Preserved:** the fixtures validate; the list cursor's malformed-token failure stays
+     `ApiError` 400; HelmWidget's label mode defaults to `visible`, and bad settings throw
+     `ValidatorError`.
+   - **Completion:** `deno task check`, formatting, the relevant tests (`deno task check` runs
+     none), and the sandbox comparison.
 
 ## Design history
 
