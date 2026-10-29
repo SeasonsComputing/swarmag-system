@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Junction client tests                                                        ║
-║ Verify unordered membership through the Supabase SDK without a database.    ║
+║ Verify unordered membership through the Supabase SDK without a database.     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
@@ -34,6 +34,7 @@ type Harness = {
   rows: Dictionary[]
   requests: Request[]
   fail: string | undefined
+  failAt?: number
 }
 
 Deno.test('junction membership round-trips, replaces as a set, and isolates owners', async () => {
@@ -72,6 +73,72 @@ Deno.test('junction reads and replaces complete membership despite a smaller pro
     assertEquals(await test.client.partners(owner), [members[6]])
     const reads = test.requests.filter(request => request.method === 'GET')
     assert(reads.some(request => new URL(request.url).searchParams.has('asset_type_id')))
+  })
+})
+
+Deno.test('junction owner-set reads group complete pages and include empty owners', async () => {
+  await withJunction(async test => {
+    const owners = [id(), id(), id()].sort()
+    const shared = id()
+    const others = [id(), id(), id()].sort()
+    test.rows.push(
+      { service_id: owners[0], asset_type_id: shared },
+      ...others.map(partner => ({ service_id: owners[0], asset_type_id: partner })),
+      { service_id: owners[1], asset_type_id: shared },
+      { service_id: id(), asset_type_id: shared }
+    )
+    const grouped = await test.client.partnersOf([...owners].reverse().concat(owners[0]))
+    assertEquals(grouped.size, 3)
+    assertEquals(grouped.get(owners[0]), [shared, ...others].sort())
+    assertEquals(grouped.get(owners[1]), [shared])
+    assertEquals(grouped.get(owners[2]), [])
+    assertEquals(test.requests.length, 3)
+    assert(test.requests.slice(1).every(request => new URL(request.url).searchParams.has('or')))
+    assert(test.requests.every(request => request.method === 'GET'))
+  })
+})
+
+Deno.test('junction owner-set reads split long lists without losing owners', async () => {
+  await withJunction(async test => {
+    const owners = Array.from({ length: 111 }, () => id())
+    const shared = id()
+    test.rows.push(
+      ...owners.filter((_, index) => index % 3 === 0)
+        .map(owner => ({ service_id: owner, asset_type_id: shared }))
+    )
+    const grouped = await test.client.partnersOf(owners)
+    assertEquals(grouped.size, owners.length)
+    for (const [index, owner] of owners.entries()) {
+      assertEquals(grouped.get(owner), index % 3 === 0 ? [shared] : [])
+    }
+    const filters = new Set(
+      test.requests.map(request => new URL(request.url).searchParams.get('service_id'))
+    )
+    assertEquals(filters.size, 3)
+    for (const request of test.requests) {
+      const url = new URL(request.url)
+      assert(url.searchParams.get('service_id')!.slice(4, -1).split(',').length <= 50)
+      assert(request.url.length < 2500)
+    }
+  })
+})
+
+Deno.test('junction empty sets skip reads and page failures reject the whole read', async () => {
+  await withJunction(async test => {
+    assertEquals(await test.client.partnersOf([]), new Map())
+    assertEquals(test.requests, [])
+    const owner = id()
+    test.rows.push(...Array.from({ length: 3 }, () => ({ service_id: owner, asset_type_id: id() })))
+    test.failAt = 2
+    const error = await assertRejects(
+      () => test.client.partnersOf([owner]),
+      ApiError,
+      'Injected failure'
+    )
+    assertEquals(error.status, 409)
+    assertEquals(test.requests.length, 2)
+    test.failAt = undefined
+    assertEquals((await test.client.partnersOf([owner])).get(owner)?.length, 3)
   })
 })
 
@@ -165,7 +232,7 @@ const withJunction = async (run: (test: Harness) => Promise<void>): Promise<void
       fetch: async (input, init) => {
         const request = new Request(input, init)
         test.requests.push(request)
-        if (test.fail === request.method) {
+        if (test.fail === request.method || test.failAt === test.requests.length) {
           test.fail = undefined
           return new Response(
             JSON.stringify({
@@ -181,6 +248,26 @@ const withJunction = async (run: (test: Harness) => Promise<void>): Promise<void
         const owner = url.searchParams.get('service_id')?.slice(3)
         switch (request.method) {
           case 'GET': {
+            if (url.searchParams.get('select') === 'service_id,asset_type_id') {
+              assertEquals(url.searchParams.get('order'), 'service_id.asc,asset_type_id.asc')
+              assertEquals(request.headers.get('prefer'), 'count=exact')
+              const owners = url.searchParams.get('service_id')!.slice(4, -1).split(',')
+              const cursor = url.searchParams.get('or')?.match(
+                /^\(service_id.gt.([^,]+),and\(service_id.eq.([^,]+),asset_type_id.gt.([^)]+)\)\)$/
+              )
+              if (url.searchParams.has('or')) assert(cursor)
+              if (cursor) assertEquals(cursor[1], cursor[2])
+              const filtered = test.rows.filter(row =>
+                owners.includes(row.service_id as Id)
+                && (!cursor || (row.service_id as Id) > cursor[1]
+                  || (row.service_id === cursor[1] && (row.asset_type_id as Id) > cursor[3]))
+              ).sort((a, b) =>
+                (a.service_id as Id).localeCompare(b.service_id as Id)
+                || (a.asset_type_id as Id).localeCompare(b.asset_type_id as Id)
+              )
+              const rows = filtered.slice(0, Math.min(2, Number(url.searchParams.get('limit'))))
+              return Response.json(rows, { headers: { 'Content-Range': `*/${filtered.length}` } })
+            }
             assertEquals(url.searchParams.get('select'), 'asset_type_id')
             assertEquals(url.searchParams.get('order'), 'asset_type_id.asc')
             const after = url.searchParams.get('asset_type_id')?.slice(3)

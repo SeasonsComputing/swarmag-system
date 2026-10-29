@@ -34,6 +34,12 @@
               "icon": "exclamation-triangle",
               "labelMode": "visible-no-icon"
             },
+            {
+              "command": "/services",
+              "label": "Services",
+              "icon": "gear",
+              "labelMode": "visible-no-icon"
+            },
             { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
             { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
             { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }

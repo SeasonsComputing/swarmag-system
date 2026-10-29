@@ -101,13 +101,44 @@ export type BusRuleSupabaseSpecification = {
 /**
  * Maker to produce an unordered junction API client over Supabase.
  * @param spec Table, domain adapter, create validator, and the two identifier fields.
- * @returns Complete membership reads and non-atomic, retryable set replacement.
+ * @returns Complete single/set-owner membership reads and non-atomic, retryable set replacement.
  */
 export const makeJunctionSupabaseClient = <J>(
   { table, adapter, validator, owner, partner }: JunctionSupabaseSpecification<J>
 ): ApiJunctionContract => {
   const ownerColumn = adapter[owner].column
   const partnerColumn = adapter[partner].column
+
+  const partnersOf = async (ownerIds: readonly Id[]): Promise<ReadonlyMap<Id, readonly Id[]>> => {
+    const grouped = new Map<Id, Id[]>(ownerIds.map(ownerId => [ownerId, []]))
+    const owners = [...grouped.keys()]
+    // Fifty UUIDs keep each owner filter below 2 KB, leaving room for paging and the endpoint.
+    const OWNER_BATCH_LIMIT = 50
+    for (let start = 0; start < owners.length; start += OWNER_BATCH_LIMIT) {
+      const batch = owners.slice(start, start + OWNER_BATCH_LIMIT)
+      let after: { owner: Id; partner: Id } | undefined
+      while (true) {
+        let builder = Supabase.client().from(table)
+          .select(`${ownerColumn},${partnerColumn}`, { count: 'exact' })
+          .in(ownerColumn, batch).order(ownerColumn).order(partnerColumn).limit(MAX_LIMIT)
+        if (after !== undefined) {
+          builder = builder.or(
+            `${ownerColumn}.gt.${after.owner},`
+              + `and(${ownerColumn}.eq.${after.owner},${partnerColumn}.gt.${after.partner})`
+          )
+        }
+        const { data, error, count } = await builder.returns<Dictionary[]>()
+        checkApiError(error, 'Failed to read junction partners', Supabase.errorToStatus)
+        const rows = data as Dictionary[]
+        if (rows.length === 0) break
+        for (const row of rows) grouped.get(row[ownerColumn] as Id)!.push(row[partnerColumn] as Id)
+        if (rows.length === count) break
+        const last = rows[rows.length - 1]
+        after = { owner: last[ownerColumn] as Id, partner: last[partnerColumn] as Id }
+      }
+    }
+    return grouped
+  }
 
   const partners = async (ownerId: Id): Promise<readonly Id[]> => {
     const members: Id[] = []
@@ -145,7 +176,7 @@ export const makeJunctionSupabaseClient = <J>(
     }
   }
 
-  return { partners, replace }
+  return { partners, partnersOf, replace }
 }
 
 /**

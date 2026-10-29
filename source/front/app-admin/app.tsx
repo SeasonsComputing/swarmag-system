@@ -17,6 +17,7 @@ import { AssetManager } from '@front/app-admin/assets/asset-manager.tsx'
 import { ChemicalManager } from '@front/app-admin/chemicals/chemical-manager.tsx'
 import { CustomerManager } from '@front/app-admin/customers/customer-manager.tsx'
 import { OnboardingWizard } from '@front/app-admin/onboarding/onboarding-wizard.tsx'
+import { ServiceManager } from '@front/app-admin/services/service-manager.tsx'
 import { UserManager } from '@front/app-admin/users/user-manager.tsx'
 import { SessionCoordinator } from '@front/app/shell/session-coordinator.ts'
 import { makeAnonymousShell, makeDashboardShell } from '@front/app/shell/shell-makers.tsx'
@@ -37,7 +38,8 @@ void bootstrap(
       Routes.workbench('/customers', CustomerManager),
       Routes.workbench('/asset-types', AssetTypeManager),
       Routes.workbench('/assets', AssetManager),
-      Routes.workbench('/chemicals', ChemicalManager)
+      Routes.workbench('/chemicals', ChemicalManager),
+      Routes.workbench('/services', ServiceManager)
     ])
   ], SessionCoordinator)
 )

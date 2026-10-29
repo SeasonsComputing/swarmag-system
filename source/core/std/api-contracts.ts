@@ -13,9 +13,10 @@ and keyset cursor validation.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 ApiCrudContract<T>   CrudBaseContract<T> & AdaptedUpdateContract<T> & CrudListContract<T>
-ApiJunctionContract                  Owner-side junction membership contract.
-├ partners(owner)                    Read complete unordered partner membership.
-└ replace(owner, partners)           Replace membership as a set.
+ApiJunctionContract                   Owner-side junction membership contract.
+├ partners(owner)                     Read complete unordered partner membership.
+├ partnersOf(owners)                  Read complete membership grouped by owner.
+└ replace(owner, partners)            Replace membership as a set.
 ApiBusRuleContract<TParams, TResult>  Generic business-rule execution contract.
 └ run(params)                         Execute business rule and return typed result.
 
@@ -43,48 +44,48 @@ checkValidatorError(result): void     Throw ApiError 422 when a validator reject
 
 CRUD CONTRACTS
 ───────────────────────────────────────────────────────────────────────────────
-CrudBaseContract<T>                   Non-mutating-shape CRUD primitives shared by every realization.
-├ create(input)                       Create one resource.
-├ get(id)                             Read one resource.
-└ delete(id)                          Delete one resource and return DeleteResult.
-AdaptedUpdateContract<T>              Scoped update via a client-side ScopedUpdateAdapter (Supabase, IndexedDB).
-└ update(scoped, source)              Update declared fields through an adapter translation.
-DirectUpdateContract<T>               Scoped update with no adapter translation (abstraction-oriented HTTP).
-└ update(source)                      Update declared fields directly.
-DeleteResult                          Uniform soft-delete response payload.
-├ id                                  Deleted resource id.
-└ deletedAt                           Soft-delete timestamp.
+CrudBaseContract<T>       Non-mutating-shape CRUD primitives shared by every realization.
+├ create(input)           Create one resource.
+├ get(id)                 Read one resource.
+└ delete(id)              Delete one resource and return DeleteResult.
+AdaptedUpdateContract<T>  Scoped update via a client-side ScopedUpdateAdapter (Supabase, IndexedDB).
+└ update(scoped, source)  Update declared fields through an adapter translation.
+DirectUpdateContract<T>   Scoped update with no adapter translation (abstraction-oriented HTTP).
+└ update(source)          Update declared fields directly.
+DeleteResult              Uniform soft-delete response payload.
+├ id                      Deleted resource id.
+└ deletedAt               Soft-delete timestamp.
 
 LISTING CONTRACTS
 ───────────────────────────────────────────────────────────────────────────────
-CrudListContract<T>                   Paginated listing.
-└ list(options?)                      List resources with pagination.
-DEFAULT_LIMIT                         Default list page size.
-MAX_LIMIT                             Maximum list page size.
-ListOptions<T>                        Query and pagination request options.
-├ query                               Built query, or unfiltered default ordering.
-├ limit                               Requested page size.
-└ cursor                              Requested pagination cursor.
-ListResult<T>                         Pagination response payload.
-├ data                                Page data set.
-├ cursor                              Cursor for next read position.
-└ hasMore                             True when more rows remain.
+CrudListContract<T>       Paginated listing.
+└ list(options?)          List resources with pagination.
+DEFAULT_LIMIT             Default list page size.
+MAX_LIMIT                 Maximum list page size.
+ListOptions<T>            Query and pagination request options.
+├ query                   Built query, or unfiltered default ordering.
+├ limit                   Requested page size.
+└ cursor                  Requested pagination cursor.
+ListResult<T>             Pagination response payload.
+├ data                    Page data set.
+├ cursor                  Cursor for next read position.
+└ hasMore                 True when more rows remain.
 
 LISTING CONSUMERS
 ───────────────────────────────────────────────────────────────────────────────
-listAll(client, query)                Iterate records with paging internal.
-listPageLimit(number)                 Clamp the numeric page size.
+listAll(client, query)    Iterate records with paging internal.
+listPageLimit(number)     Clamp the numeric page size.
 
 LISTING STORE SUPPORT
 ───────────────────────────────────────────────────────────────────────────────
-listQuery(options)                    Resolve a query or default ordering.
-resolveQueryFields(...)               Resolve query fields or throw ApiError 400.
-ListQuery<T>                          Resolved query data without a brand.
-listPage(rows, ...)                   Assemble a page and its cursor.
-listFingerprint(query)                Stable criteria/search fingerprint.
+listQuery(options)        Resolve a query or default ordering.
+resolveQueryFields(...)   Resolve query fields or throw ApiError 400.
+ListQuery<T>              Resolved query data without a brand.
+listPage(rows, ...)       Assemble a page and its cursor.
+listFingerprint(query)    Stable criteria/search fingerprint.
 readListCursor(token, issuer, query)       Validate a store-local keyset cursor.
 writeListCursor(issuer, query, value, id)  Encode a keyset cursor.
-ListCursor                            Decoded store-local cursor.
+ListCursor                Decoded store-local cursor.
 
 SEMANTICS
 ───────────────────────────────────────────────────────────────────────────────
@@ -204,6 +205,10 @@ export function checkValidatorError(result: ExpectResult): void {
 export interface ApiJunctionContract {
   /** Read the owner's complete, unordered partner membership. */
   partners(owner: Id): Promise<readonly Id[]>
+
+  /** Read complete membership for every listed owner, including [] for owners without partners. */
+  partnersOf(owners: readonly Id[]): Promise<ReadonlyMap<Id, readonly Id[]>>
+
   /**
    * Replace membership as a set, validating additions before any deletion.
    * Retries converge without competing writers when permissions allow the operations.
@@ -219,7 +224,7 @@ export interface CrudBaseContract<T extends Instantiable> {
   delete(id: Id): Promise<DeleteResult>
 }
 
-/** Scoped update via a client-side ScopedUpdateAdapter (Supabase, IndexedDB). */
+/** Scoped adapter-based update (Supabase, IndexedDB). */
 export interface AdaptedUpdateContract<T extends Instantiable> {
   update<K extends keyof FromInstantiable<T>>(
     scoped: ScopedUpdateAdapter<T, K>,

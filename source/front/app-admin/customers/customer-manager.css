@@ -1,15 +1,11 @@
-/* Customer Manager page layout. */
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Customer Manager page layout.                                                ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
 [data-app='customers-page'] {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-}
-
-[data-app='customers-page'] [data-app='customer-list-name'] {
-  color: var(--sa-text-primary);
-}
-
-[data-app='customers-page'] [data-app='customer-list-contact'] {
-  color: var(--sa-text-secondary);
-  font-size: var(--sa-ui-font-size-compact);
 }

@@ -3,6 +3,7 @@
 ║ Chemical Manager page layout.                                                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
+
 [data-app='chemicals-page'] {
   display: flex;
   flex-direction: column;

@@ -3,6 +3,7 @@
 ║ Asset Type Manager page layout.                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
+
 [data-app='asset-types-page'] {
   display: flex;
   flex-direction: column;

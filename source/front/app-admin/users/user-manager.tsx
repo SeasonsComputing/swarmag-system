@@ -12,6 +12,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 USERS_QUERY_KEY   TanStack Query cache key for the User collection.
 UserManagerProps  Props for the User Manager route workbench.
+└ onCancel        Return to the dashboard.
 UserManager       User collection and editor host.
 */
 
@@ -20,11 +21,11 @@ import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
-import { For } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
+import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
-import { UiLayout, UiText } from '@ux/ui'
+import { UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { createUserState, userDraft } from './user-state.ts'
 import type { UserDraft } from './user-state.ts'
@@ -53,7 +54,16 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     formTitle: 'User Manager',
     entityLabel: 'User',
     listColumns: [
-      { label: 'User', render: user => <UserListIdentity user={user} /> },
+      {
+        label: 'User',
+        render: user => (
+          <PanelRowIdentity
+            title={user.displayName}
+            subtitle={user.primaryEmail}
+            annotation={<UserListIdentity user={user} />}
+          />
+        )
+      },
       {
         label: 'Active',
         align: 'center',
@@ -123,22 +133,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
   )
 }
 
-/** Renders the identity content for one user. */
+/** Supply the User identity's annotation content. */
 function UserListIdentity(props: { user: User }): UiComponent {
-  return (
-    <UiLayout variant='block-fit' gap='none'>
-      <span>{props.user.displayName}</span>
-      <span data-app='user-list-email'>{props.user.primaryEmail}</span>
-      <span data-app='user-list-roles'>
-        <For each={props.user.roles}>
-          {(role, index) => (
-            <>
-              {index() > 0 ? ', ' : ''}
-              <span data-app='user-list-role'>{UiText.label(role)}</span>
-            </>
-          )}
-        </For>
-      </span>
-    </UiLayout>
-  )
+  return <>{props.user.roles.map(UiText.label).join(', ')}</>
 }

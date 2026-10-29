@@ -1,0 +1,20 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Panel row identity styles                                                    ║
+║ Three shared line roles for a collection Item's identity.                    ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-shell-panel='row-identity'] [data-shell-panel='row-title'] {
+  color: var(--sa-text-primary);
+}
+
+[data-shell-panel='row-identity'] [data-shell-panel='row-subtitle'] {
+  color: var(--sa-text-secondary);
+  font-size: var(--sa-ui-font-size-compact);
+}
+
+[data-shell-panel='row-identity'] [data-shell-panel='row-annotation'] {
+  color: var(--sa-color-accent);
+  font-size: var(--sa-ui-font-size-compact);
+}

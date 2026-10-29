@@ -1,24 +1,9 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ User manager styles                                                          ║
-║ Compact user-record presentation for the administrative list.                ║
+║ Application-local User collection behavior.                                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
-
-[data-app='users-page'] [data-app='user-list-email'],
-[data-app='users-page'] [data-app='user-list-roles'] {
-  color: var(--sa-text-secondary);
-  font-size: var(--sa-ui-font-size-compact);
-}
-
-/* Role labels carry the accent; the separating commas stay secondary. */
-[data-app='users-page'] [data-app='user-list-role'] {
-  color: var(--sa-color-accent);
-}
-
-[data-app='users-page'] [data-ui='table-cell']:first-child > [data-ui='layout'] > span:first-child {
-  color: var(--sa-text-primary);
-}
 
 [data-app='users-page'] [data-ui='table-row'] {
   cursor: default;
