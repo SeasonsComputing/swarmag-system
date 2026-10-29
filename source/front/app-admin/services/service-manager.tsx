@@ -84,7 +84,7 @@ export const ServiceManager = (props: ServiceManagerProps): UiComponent => {
           />
         )
       },
-      { label: 'SKU', render: item => <span>{item.sku}</span> }
+      { label: 'SKU', align: 'end', render: item => <span>{item.sku}</span> }
     ],
     list: () => query.data ?? [],
     isListLoading: () => query.isPending,

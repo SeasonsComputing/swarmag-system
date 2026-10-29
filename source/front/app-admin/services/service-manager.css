@@ -9,3 +9,13 @@
   flex-direction: column;
   min-height: 100%;
 }
+
+[data-app='services-page'] [data-ui='table-cell']:nth-child(2) {
+  white-space: nowrap;
+}
+
+[data-app='services-page'] td[data-ui='table-cell']:nth-child(2) {
+  font-family: var(--sa-data-font-family);
+  font-size: var(--sa-ui-font-size-compact);
+  font-weight: var(--sa-data-font-weight);
+}
