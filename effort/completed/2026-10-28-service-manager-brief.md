@@ -1,6 +1,7 @@
 # Service Manager — Brief
 
-**Active, dispatched 2026-10-28** for ACE review; later changes are amendments. Recorded and chosen
+**Completed 2026-10-29.** Shipped in `0c8b9c2`, its look refined in `740b45d`, its documentation
+leading in `47d9d2f` and `098494e`, verified by the CA's walkthrough. Recorded and chosen
 2026-10-28 from a CA + AI Architect session: Services was
 missed from M-5's mechanical productions. Minimal by intent: the reference implementations stand on
 their own, so this brief names only the deviations, which also tests that they do. Produced after
@@ -167,3 +168,11 @@ look is the one to keep.
    `front/app-admin/customers/` for their list columns.
 6. **Verification:** the CA's walkthrough of all three collections: titles, subtitles, and
    annotations in their styles; Customers with and without an account manager.
+
+## Closure
+
+- **Services list:** shipped with category as the subtitle and SKU in its own column, reversing
+  the Services row of Amendment 3's table, by the CA's walkthrough.
+- **A save error seen once:** backlog B-37.
+- **Facets and large catalogs:** unchanged from Deviations 1 and 3; the facet picker waits for a
+  facet manager, large catalogs for parking lot P-13.

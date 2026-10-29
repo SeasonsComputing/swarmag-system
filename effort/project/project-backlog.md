@@ -440,6 +440,19 @@ variant is designed: a `sequence` field in the specification, so `partners` retu
 validators already have. Both tables also need an `UPDATE` policy, which they lack. Picked up with
 workflows.
 
+### B-37 · A Service save once failed with a `deleted_at` error
+
+**Observed:** 2026-10-29 · normal
+
+During the CA's walkthrough, opening a service, checking asset types, and saving raised an error
+naming `deleted_at` as undefined. It repeated in that session, then could not be reproduced, and
+the database was reset before it was captured. Stage's API logs for that window show every
+`services` PATCH returning 200 and no database error naming `deleted_at`, so the failure was
+likely raised in the client. The save is the service update followed by
+`replace` on its required asset types (`effort/completed/2026-10-28-service-manager-brief.md`,
+Amendment 1). Picking this up: capture the error text and the failing request from the Network
+tab when it next appears.
+
 ## Customer
 
 ### B-25 · Onboarding has no Initial Job Assessment stage
