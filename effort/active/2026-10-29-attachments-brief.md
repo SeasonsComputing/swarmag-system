@@ -19,12 +19,12 @@ the field, and who may see them.
 No domain change. Four fields can hold a document, and each may hold an external URL or a stored
 document:
 
-| Field               | Lives on                          | Shape                                                |
-| ------------------- | --------------------------------- | ---------------------------------------------------- |
-| `Attachment.url`    | `Note.attachments`, nowhere else  | `{ filename, url, contentType, kind, uploadedAt }`   |
-| `ChemicalLabel.url` | `Chemical.labels`                 | `{ url, description? }`                              |
-| `Chemical.sdsUrl`   | `Chemical`                        | `string?`                                            |
-| `User.avatarUrl`    | `User`                            | `string?`                                            |
+| Field               | Lives on                         | Shape                                              |
+| ------------------- | -------------------------------- | -------------------------------------------------- |
+| `Attachment.url`    | `Note.attachments`, nowhere else | `{ filename, url, contentType, kind, uploadedAt }` |
+| `ChemicalLabel.url` | `Chemical.labels`                | `{ url, description? }`                            |
+| `Chemical.sdsUrl`   | `Chemical`                       | `string?`                                          |
+| `User.avatarUrl`    | `User`                           | `string?`                                          |
 
 - **Notes are the general attachment point.** Notes are on Asset, Customer, CustomerSite,
   Chemical, User, Service, Job, JobPlan, Workflow, Task, Question, and `Answer`. A photo is an

@@ -72,14 +72,14 @@ so every id locates its node directly.
 
 ## The review's findings
 
-| Finding              | Disposition                                                  |
-| -------------------- | ------------------------------------------------------------ |
-| Link lifetime        | Settled: fixed when issued; not revocable (point 9)          |
-| Provider persistence | Settled: Storage's own metadata (points 1–3)                 |
-| Identity             | The kernel's: the document storage brief, points 2 and 4     |
-| Policy ownership     | Open (design moment 1)                                       |
-| Reset sequencing     | Settled: through the Storage API (DevOps 3)                  |
-| Soft delete          | Settled: not the store's (design moment 5)                   |
+| Finding              | Disposition                                              |
+| -------------------- | -------------------------------------------------------- |
+| Link lifetime        | Settled: fixed when issued; not revocable (point 9)      |
+| Provider persistence | Settled: Storage's own metadata (points 1–3)             |
+| Identity             | The kernel's: the document storage brief, points 2 and 4 |
+| Policy ownership     | Open (design moment 1)                                   |
+| Reset sequencing     | Settled: through the Storage API (DevOps 3)              |
+| Soft delete          | Settled: not the store's (design moment 5)               |
 
 ## The CLI
 

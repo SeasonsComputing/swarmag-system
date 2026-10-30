@@ -262,25 +262,25 @@ The CLI is `document-store {noun} {verb}`. Every node is named by an address, so
 names: `{address}` is the node acted on, and `{namespace}` or `{bucket}` is the address of the
 parent a `create` or `list` acts in.
 
-| Noun      | Verb    | Arguments                       | Returns        |
-| --------- | ------- | ------------------------------- | -------------- |
-| namespace | create  | `--name`                        | NodeMetadata   |
-| namespace | get     | `{address}`                     | NodeMetadata   |
-| namespace | list    |                                 | NodeMetadata[] |
-| namespace | update  | `{address} --name`              | NodeMetadata   |
-| namespace | delete  | `{address}`                     | DeleteResult   |
-| bucket    | create  | `{namespace} --name`            | NodeMetadata   |
-| bucket    | get     | `{address}`                     | NodeMetadata   |
-| bucket    | list    | `{namespace}`                   | NodeMetadata[] |
-| bucket    | update  | `{address} --name`              | NodeMetadata   |
-| bucket    | delete  | `{address}`                     | DeleteResult   |
-| document  | create  | `{bucket} --name --file [--id]` | NodeMetadata   |
-| document  | get     | `{address}`                     | NodeMetadata   |
-| document  | list    | `{bucket}`                      | NodeMetadata[] |
-| document  | read    | `{address} [--out]`             | the bytes      |
-| document  | link    | `{address}`                     | DocumentLink   |
-| document  | update  | `{address} --name`              | NodeMetadata   |
-| document  | delete  | `{address}`                     | DeleteResult   |
+| Noun      | Verb   | Arguments                       | Returns        |
+| --------- | ------ | ------------------------------- | -------------- |
+| namespace | create | `--name`                        | NodeMetadata   |
+| namespace | get    | `{address}`                     | NodeMetadata   |
+| namespace | list   |                                 | NodeMetadata[] |
+| namespace | update | `{address} --name`              | NodeMetadata   |
+| namespace | delete | `{address}`                     | DeleteResult   |
+| bucket    | create | `{namespace} --name`            | NodeMetadata   |
+| bucket    | get    | `{address}`                     | NodeMetadata   |
+| bucket    | list   | `{namespace}`                   | NodeMetadata[] |
+| bucket    | update | `{address} --name`              | NodeMetadata   |
+| bucket    | delete | `{address}`                     | DeleteResult   |
+| document  | create | `{bucket} --name --file [--id]` | NodeMetadata   |
+| document  | get    | `{address}`                     | NodeMetadata   |
+| document  | list   | `{bucket}`                      | NodeMetadata[] |
+| document  | read   | `{address} [--out]`             | the bytes      |
+| document  | link   | `{address}`                     | DocumentLink   |
+| document  | update | `{address} --name`              | NodeMetadata   |
+| document  | delete | `{address}`                     | DeleteResult   |
 
 ## Processing and tiers
 
