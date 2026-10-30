@@ -56,6 +56,12 @@ only what is specific to the domain. `domain-archetypes.md` still cites "`CONVEN
 Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close of
 `effort/completed/2026-10-03-core-reconciliation-brief.md`.
 
+### B-38 · Parts of CONVENTIONS are written for a compiler, not an engineer
+
+**Observed:** 2026-10-30 · normal
+
+Design record: [Conventions for Engineers — Brief](../pending/2026-10-30-conventions-for-engineers-brief.md).
+
 ### B-33 · The domain SDK genesis prompt omits backend seed authority
 
 **Observed:** 2026-10-23 · normal
