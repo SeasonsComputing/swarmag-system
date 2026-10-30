@@ -1,9 +1,9 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.9)
+# Software Construction Conventions (1.12)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.9
+- Version: 1.12
 - Published: 2026 October 30th
 - Author: Ted V. Kremer
 
@@ -660,14 +660,20 @@ export const validateProfileCreate = (input: ProfileCreate): ExpectResult =>
 
 ### 10.1 Makers
 
-A maker takes a declarative, typed specification and returns an implementation conforming to a
-stated contract, with no hidden behavior. It does not create an instance of an object; it creates
-code. A maker is explicit and obvious (§7.6): the specification is visible at the call site, and
-the contract is stated in an interface.
+Reach for a maker when many things differ only in their settings: a client per table, an adapter
+per abstraction, a query per list. You write the settings once, at the call site, and the maker
+returns an implementation of a stated contract, with no hidden behavior. A maker does not create an
+instance of an object; it creates code. It is explicit and obvious (§7.6): the specification is
+visible at the call site, and the contract is stated in an interface.
 
 - A maker lives in `make-{concept}-{role}.ts`: the concept is its concrete binding (`supabase`,
   `indexeddb`), the role the contract it fulfils (`client`, `auth`).
 - Service wrappers (`wrap*`) mirror makers at the inbound boundary (§12).
+
+```typescript
+// The settings are the call site; the result is an ApiCrudContract<Contact>
+const Contacts = makeCrudSupabaseClient<Contact>({ table: 'contacts', adapter: ContactAdapter })
+```
 
 ### 10.2 Contracts
 
@@ -768,8 +774,18 @@ const users = await Array.fromAsync(listAll(Users, query))
 
 ### 10.6 API clients
 
-A client implements `ApiCrudContract`, `ApiJunctionContract`, or `ApiBusRuleContract`
-(`@core/std/api-contracts.ts`) over one store. Choose the maker by store; compose the clients once and consume the composition.
+An application reaches its data through clients: one per abstraction or operation, composed once
+into its API namespace and consumed from there. Choose the family by what you are doing:
+
+| Family         | Contract                   | For                                                           |
+| -------------- | -------------------------- | ------------------------------------------------------------- |
+| CRUD           | `ApiCrudContract`          | Records of an abstraction: create, read, update, delete, list |
+| Junction       | `ApiJunctionContract`      | An owner's set of partners in a many-to-many association      |
+| Business rule  | `ApiBusRuleContract`       | One operation that runs on the server                         |
+| Document store | `ApiDocumentStoreContract` | Files and images (§10.8)                                      |
+
+The first three are declared in `@core/std/api-contracts.ts`. Then choose the maker by where the
+data lives:
 
 | Store     | CRUD maker                | Update                                   | Junction maker               | Business-rule maker                                             |
 | --------- | ------------------------- | ---------------------------------------- | ---------------------------- | --------------------------------------------------------------- |
@@ -777,8 +793,10 @@ A client implements `ApiCrudContract`, `ApiJunctionContract`, or `ApiBusRuleCont
 | IndexedDB | `makeCrudIndexedDbClient` | Adapted                                  | —                            | —                                                               |
 | HTTP      | `makeCrudHttpClient`      | Direct: `update(source)`                 | —                            | `makeBusRuleHttpClient`                                         |
 
-An adapted client translates through a scoped adapter; a direct client sends domain shape. The two
-update forms fit how each store writes; never collapse them into one.
+Updates differ by store, because stores write differently. A Supabase or IndexedDB client is
+adapted: it writes through a scope's adapter, `update(scope.adapter, source)`, which maps fields
+to columns. An HTTP client is direct: the service receives the domain shape, `update(source)`.
+Never collapse the two forms into one.
 
 A junction client reads an owner's partners and replaces them as a set (`partners`, `replace`):
 removed pairs are hard-deleted and added pairs validated and inserted. A list of owners reads its
@@ -1140,19 +1158,37 @@ guide.
 
 ### 16.1 Composition
 
+An application is mostly declaration: its shells, its routes, and its session coordinator. Its root
+file declares them and hands them to `bootstrap`; the shell does the rest.
+
 - `ux/` has three parts: `ux/ui` (controls, CSS, fonts, icons), `ux/shell` (`runtime/`, `dashboard/`,
   `panel/`, `workbench/`, grouped by topic), and `ux/widgets` (application-neutral widgets).
   Consumers import files directly.
-- An application declares a complete `Application`: its anonymous shell, its dashboard shell, and
-  its session coordinator, passed to `bootstrap(application)`. Bootstrap owns generic boot: the
-  CSS barrel, preference state, session initialization, and mounting the route runtime. The
-  application root initializes its configuration first (§11).
-- `makeAnonymousShell` and `makeDashboardShell` take branded route components (a login, an about
-  box, a footer) as parameters; the shell never imports a branded component. An application binds
-  its brand once, and every root uses the bound makers.
+- **The root** initializes its configuration first (§11), then calls
+  `bootstrap(Routes.application(shells, coordinator))`. Bootstrap owns generic boot: the CSS barrel,
+  preference state, session initialization, and mounting the route runtime.
+- **Two shells:** an anonymous shell for signed-out routes and a dashboard shell for the signed-in
+  application. `makeAnonymousShell` and `makeDashboardShell` (`@ux/shell/runtime/shell-makers.tsx`)
+  take branded route components (a login, an about box, a footer) as parameters; the shell never
+  imports a branded component. An application binds its brand once, in makers of its own, and
+  every root uses the bound makers.
 - The shell is a closed framework. It owns its extension contracts (widgets, session) and never
   imports their implementations; applications bind implementations at their composition roots.
 - An authenticated route renders its primary surface inside a semantic `main` landmark.
+
+```typescript
+import './config.ts' // configuration first
+
+// makeAnonymousShell and makeDashboardShell here are the application's bound makers
+void bootstrap(
+  Routes.application([
+    makeAnonymousShell(),
+    makeDashboardShell(dashboardSeed, { ...UxWidgetRegistry, ...AppWidgetRegistry }, [
+      Routes.workbench('/accounts', AccountManager)
+    ])
+  ], SessionCoordinator)
+)
+```
 
 ### 16.2 Routing
 
@@ -1242,15 +1278,29 @@ export const useCountries = (): CountriesState => {
 
 ### 16.4 Session
 
-- The application supplies a session coordinator (`SessionCoordinatorContract`: `init`, `clear`) and
-  its user (`SessionUserContract`: `id`, `roles`), both declared in
-  `@ux/shell/runtime/session-contracts.ts`. The shell invokes the life cycle and keeps baseline
-  session state in `SessionState`; the coordinator owns user hydration and eligibility.
-  `Routes.application(shells, session)` assembles the two.
-- An application that needs further reactive session data defines its own reactive store modules.
+Signing in belongs to the shell; deciding who may use the application, and preparing their user,
+belongs to the application. The application supplies a session coordinator, and the shell runs it.
+
+- **The coordinator** implements `SessionCoordinatorContract` (`init`, `clear`), declared in
+  `@ux/shell/runtime/session-contracts.ts`. Bootstrap calls `init`, which subscribes to
+  authentication, checks eligibility, and prepares the user; `clear` drops what it prepared.
+- **The user** implements `SessionUserContract` (`id`, `roles`) and is held in `SessionState` for
+  the session's lifetime. `Routes.application(shells, coordinator)` assembles the two.
 - Components read `SessionState.store`, never the auth provider. `AuthGuard` renders authenticated
   content only once the session is prepared.
+- An application that needs further reactive session data defines its own reactive store modules.
 - Logout goes through the generic `logout(auth)`; an application wraps it to clear its own state.
+
+```typescript
+export const SessionCoordinator: SessionCoordinatorContract = {
+  init() {
+    // Subscribe to authentication; on sign-in, check eligibility, then SessionState.setReady(user)
+  },
+  clear() {
+    // Drop the prepared user and the subscription
+  }
+}
+```
 
 ## 17. Building UX Patterns
 
@@ -1261,17 +1311,37 @@ headers.
 
 ### 17.1 Steps and sequences
 
-- A workbench hosts a sequence of one or more Steps. A Step is one panel; a drill-down inside it
-  replaces that panel's content and stays the same Step. The workbench owns the aggregate draft and
-  commits once; Steps never commit.
+Use Steps when an editing surface is too much for one panel: a record with several groups of
+fields, or a guided flow. You write the Steps; a workbench (`AbstractionManager` §17.2, `Wizard`
+§17.3) sequences them, owns the aggregate draft, and commits once. Steps never commit.
+
 - A Step is a `PanelStep` (`name`, `title`, optional `validate`, `render(context)`), and a sequence
-  is `readonly PanelStep[]` (`@ux/shell/panel/panel-sequence-contract.ts`). `createPanelSequence`
-  gates Steps in order; `PanelSequenceHeader` presents the controls the Sequence archetype names.
+  is `readonly PanelStep[]` (`@ux/shell/panel/panel-sequence-contract.ts`), so a workbench's Steps
+  can be composed from shared fragments.
+- A Step is one panel and a fragment: it knows nothing of its position, progress, or neighbors.
+  Whatever composes the sequence owns its progress. A drill-down inside a Step replaces that
+  panel's content and stays the same Step (§17.4).
+- A Step registers its validation and its dirty check through its `PanelStepContext`; its draft
+  stays in its own context.
 - A dialog hosts a workbench; it is not the workbench's defining boundary.
-- A Step is a fragment: it knows nothing of its position, progress, or neighbors. Whatever composes
-  the sequence owns its progress.
-- A Step registers its dirty check through `PanelStepContext.registerDirty`; its draft stays in its
-  own context.
+- To build a new workbench, `createPanelSequence` gates Steps in order, and `PanelSequenceHeader`
+  presents the controls the Sequence archetype names.
+
+```typescript
+export const accountSteps = (state: AccountState): PanelSequence => [
+  {
+    name: 'detail',
+    title: 'Account details',
+    render: context => <AccountStepDetail state={state} context={context} />
+  },
+  {
+    name: 'contacts',
+    title: 'Contacts',
+    validate: () => state.contacts().every(isContact),
+    render: context => <AccountStepContacts state={state} context={context} />
+  }
+]
+```
 
 ### 17.2 Collection-Detail: `AbstractionManager`
 
@@ -1311,24 +1381,95 @@ and commits once, at Finish; the commit may write one abstraction, several, or n
 
 ### 17.4 Index-Detail at depth: `DrillDown`
 
-A Step containing a nested Collection hosts `DrillDown` (`@ux/shell/panel/drill-down.tsx`) at its
-root and supplies its `PanelStepContext`. `CollectionPanel` lists the Collection and passes
-`DrillPanelContext` to its item renderer; an opened panel registers its Save and dirty check and
-returns through `returnToParent`.
+Use it when a Step edits a list whose items have details of their own: an account's contacts, a
+contact's notes, with no fixed bottom to the nesting. Opening an item replaces the list with that
+item's panel; going back restores the list. The archetype is Index-Detail; the UX design archetypes
+own its behavior.
+
+Three parts work together:
+
+- **`DrillDown`** (`@ux/shell/panel/drill-down.tsx`) hosts the stack of panels for one Step. Give
+  it the Step's `PanelStepContext`, so the workbench's back control and header Save act on
+  whichever panel is open.
+- **`CollectionPanel`** (`@ux/shell/panel/collection-panel.tsx`) lists the items, with New and
+  confirmed Remove. Activating a row opens the item; New appends a pending item and opens it at
+  once, because creating an item opens it.
+- **The item's panel** receives a `DrillPanelContext`. It registers its Save and its dirty check,
+  and on a successful Save writes the item into the parent draft and calls `returnToParent`.
+
+What the host guarantees, so the panel does not have to:
+
+- Only the open panel's Save shows; a panel covered by a deeper one keeps its working copy.
+- Going back with unsaved changes asks before discarding; a Save goes back without asking.
+- Every open panel's dirty check joins the workbench's discard protection.
+- A list inside an item's panel opens through the same host: pass `drill` down. A Step has one
+  `DrillDown`, however deep the nesting.
+
+```typescript
+<DrillDown
+  rootTitle='Contacts'
+  context={context}
+  root={drill => (
+    <CollectionPanel
+      legend='Contacts'
+      itemColumn='Contact'
+      items={contacts}
+      label={contact => contact.name}
+      emptyMessage='No contacts yet.'
+      newLabel='New Contact'
+      onNew={addPendingContact}
+      onRemove={removeContact}
+      confirmRemove={contact => ({
+        title: `Delete ${contact.name}?`,
+        message: 'The contact will be removed.'
+      })}
+      renderItem={(contact, index, panel) => (
+        <ContactEditor contact={contact} index={index} drill={drill} context={panel} />
+      )}
+      drill={drill}
+    />
+  )}
+/>
+
+// In ContactEditor: a successful Save writes the parent draft, then returns
+context.registerDirty(() => isChanged(draft, original))
+context.registerSave(() => ({
+  icon: 'check',
+  label: 'Save',
+  onClick: () => {
+    setContact(index, toContact(draft))
+    context.returnToParent()
+  }
+}))
+```
 
 ### 17.5 Chassis-Part: the dashboard
 
-- A dashboard is seeded from an application's dashboard JSON, conforming to
-  `@ux/shell/dashboard/dashboard-contract.ts`. `DashboardState.init(seed)` validates it, assigns
-  stable identity, and persists the layout locally. Dashboard state is a reactive store module.
-- A widget is resolved by its type string through a `WidgetRegistry`: catalog objects map type
-  names to components, and an application merges the toolkit catalog with its own, its entries
-  winning.
-- The shell owns the widget extension contracts (`@ux/shell/dashboard/widget-contract.ts`) and
-  never imports a concrete widget; applications bind widgets at their composition roots. Widgets
-  may consume public shell services, such as `getShellIdentity()`.
+An application's home screen is a dashboard: a header strip and rows of widgets, declared as data.
+You seed its layout and register its widgets; the shell renders it, persists it, and lets the user
+rearrange it.
+
+- **The seed** is the application's dashboard JSON, conforming to
+  `@ux/shell/dashboard/dashboard-contract.ts`: settings, a header strip, and rows, each widget named
+  by its type string with its settings. `DashboardState.init(seed)` validates it, assigns stable
+  identity, and persists the layout locally; later sessions load the persisted layout. Dashboard
+  state is a reactive store module.
+- **A widget** is a component that takes its `settings` (`WidgetComponent`,
+  `@ux/shell/dashboard/widget-contract.ts`), resolved by its type string through a
+  `WidgetRegistry`. An application merges the toolkit catalog with its own, its entries winning.
+- The shell owns the widget extension contracts and never imports a concrete widget; applications
+  bind widgets at their composition roots. Widgets may consume public shell services, such as
+  `getShellIdentity()`.
 - A widget's presentation shape (`compact`, `landscape`) is how it uses its allocated footprint,
   not shell geometry.
+
+```json
+{
+  "settings": {},
+  "header": { "widgets": [{ "type": "LogoWidget", "settings": { "shape": "landscape" } }] },
+  "rows": []
+}
+```
 
 ## 18. Testing Conventions
 
@@ -1389,6 +1530,9 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.12    | 2026 October 30th   | §10.1 Makers and §10.6 API clients rewritten for the engineer: when to reach for a maker, with an example; the client families chosen by what is being done, then the maker by where the data lives, and why updates differ by store. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| 1.11    | 2026 October 30th   | §16.1 Composition and §16.4 Session rewritten for the engineer: an application root as declaration, the two shells, and an example root; what the shell and the application each own in a session, with an example coordinator. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| 1.10    | 2026 October 30th   | §17.1 Steps and sequences, §17.4 `DrillDown`, and §17.5 the dashboard rewritten for the engineer: when to use each, what its parts do, what the host guarantees, and an example of each; §17.4 states that a Step has one `DrillDown` however deep the nesting. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | 1.9     | 2026 October 30th   | §13 Local Persistence rewritten for the engineer who needs local storage: a table choosing the tool by what is kept, what happens to local data, and the rules; new §13.1 IndexedDb Indexes, how a maker declares a store's key path and indexes, upgrades that only add, and reorganization that stops rather than migrates. It replaces 1.8's §13 bullet. §10.8: the contract is `@core/std/docstore-contract.ts`, imported from `@core/stdx`; the store is a client family made by a maker per binding in `core/cli`. `DocumentAddress.id` is now `DocumentAddresses.id`, from `@core/std/docstore-document-addresses.ts`.                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 1.8     | 2026 October 30th   | New §10.8 Document store: the store is reached only through `ApiDocumentStoreContract`; a node's identity is its lineage, one nominal type per level, produced only by the store; a stored reference is an id-form address, turned into an identity by `DocumentAddress.id` without a lookup, while `resolve` serves names at each level's own depth; links are never stored; providers see plain lineage, never addresses. §13: a store may declare its key path and indexes when it registers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.7     | 2026 October 28th   | §17.2: a collection row presents its Item through `PanelRowIdentity`, a title, an optional subtitle, and an optional annotation in decreasing prominence; the component owns each line's style and the provider its content.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
