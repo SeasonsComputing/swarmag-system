@@ -6,69 +6,94 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Defines the document hierarchy independently of storage. DocumentAddresses
-(docstore-document-addresses.ts) builds, parses, and formats addresses. Provider support
-and identity producers serve the document store makers in core/cli.
+Defines the document hierarchy, namespace ─* bucket ─* document, independently
+of storage. DocumentAddresses (docstore-document-addresses.ts) builds, parses,
+and formats addresses. Provider support and identity producers serve the
+document store makers in core/cli.
 
-PUBLIC
+IDENTITIES
 ───────────────────────────────────────────────────────────────────────────────
-NamespaceId, BucketId, DocumentId, NodeId  Exact-level nominal identities.
-NodeMetadata                             Metadata shared by all levels.
-├ id                                     Exact-level nominal identity.
-├ name                                   Human name, not necessarily unique.
-├ createdAt                              Creation timestamp.
-└ count                                  Children or document bytes.
-DocumentLink                             Temporary document access.
-├ url                                    URL for browser display.
-└ expiresAt                              Fixed issuance-time expiry.
-AddressSegment                           A name or an explicit UUID segment.
-DocumentAddress                          One to three validated segments.
-StoreNodeContract                        Common node operations.
-├ get                                    Read metadata.
-├ find                                   Match names within a parent.
-├ list                                   Read direct children.
-├ resolve                                Resolve an address at this level.
-├ update                                 Rename a node.
-└ delete                                 Remove nodes; empty containers only.
-NamespaceContract                        Extends StoreNodeContract.
-└ create                                 Create a named namespace.
-BucketContract                           Extends StoreNodeContract.
-└ create                                 Create within a namespace.
-DocumentContract                         Extends StoreNodeContract.
-├ create                                 Create immutable content in a bucket.
-├ read                                   Read document bytes.
-└ link                                   Mint a temporary browser URL.
-ApiDocumentStoreContract                 The three node levels.
-├ namespace                              Namespace operations.
-├ bucket                                 Bucket operations.
-└ document                               Document operations.
-namespaceIdentity(lineage)               Construct a namespace identity.
-bucketIdentity(lineage)                  Construct a bucket identity.
-documentIdentity(lineage)                Construct a document identity.
-Lineage                                  Unbranded UUID lineage.
-├ namespace                              Namespace UUID.
-├ bucket                                 Bucket UUID, when present.
-└ document                               Document UUID, when present.
-LineageMetadata                          Provider metadata.
-├ lineage                                Unbranded identity.
-├ name                                   Human name.
-├ createdAt                              Creation timestamp.
-└ count                                  Children or document bytes.
-DocumentProviderContract                 Storage over validated lineage.
-├ get                                    Read metadata.
-├ find                                   Match child names.
-├ list                                   Read children.
-├ create                                 Store a node and optional bytes.
-├ update                                 Rename a node.
-├ delete                                 Remove a node.
-├ read                                   Read document bytes.
-└ link                                   Implement a kernel-supplied expiry.
+NamespaceId, BucketId, DocumentId  Exact-level nominal identities.
+NodeId                             Any level's identity.
+namespaceIdentity(lineage)         Construct a namespace identity.
+bucketIdentity(lineage)            Construct a bucket identity.
+documentIdentity(lineage)          Construct a document identity.
+
+METADATA
+───────────────────────────────────────────────────────────────────────────────
+NodeMetadata                       Metadata shared by all levels.
+├ id                               Exact-level nominal identity.
+├ name                             Human name, not necessarily unique.
+├ createdAt                        Creation timestamp.
+└ count                            Children or document bytes.
+DocumentLink                       Temporary document access.
+├ url                              URL for browser display.
+└ expiresAt                        Fixed issuance-time expiry.
+
+ADDRESSES
+───────────────────────────────────────────────────────────────────────────────
+AddressSegment                     A name or an explicit UUID segment.
+DocumentAddress                    One to three validated segments.
+
+NODE CONTRACTS
+───────────────────────────────────────────────────────────────────────────────
+StoreNodeContract                  Common node operations.
+├ get                              Read metadata.
+├ find                             Match names within a parent.
+├ list                             Read direct children.
+├ resolve                          Resolve an address at this level.
+├ update                           Rename a node.
+└ delete                           Remove nodes; empty containers only.
+NamespaceContract                  Extends StoreNodeContract.
+└ create                           Create a named namespace.
+BucketContract                     Extends StoreNodeContract.
+└ create                           Create within a namespace.
+DocumentContract                   Extends StoreNodeContract.
+├ create                           Create immutable content in a bucket.
+├ read                             Read document bytes.
+└ link                             Mint a temporary browser URL.
+ApiDocumentStoreContract           The three node levels.
+├ namespace                        Namespace operations.
+├ bucket                           Bucket operations.
+└ document                         Document operations.
+
+PROVIDER CONTRACT
+───────────────────────────────────────────────────────────────────────────────
+Lineage                            Unbranded UUID lineage.
+├ namespace                        Namespace UUID.
+├ bucket                           Bucket UUID, when present.
+└ document                         Document UUID, when present.
+LineageMetadata                    Provider metadata.
+├ lineage                          Unbranded identity.
+├ name                             Human name.
+├ createdAt                        Creation timestamp.
+└ count                            Children or document bytes.
+DocumentProviderContract           Storage over validated lineage.
+├ get                              Read metadata.
+├ find                             Match child names.
+├ list                             Read children.
+├ create                           Store a node and optional bytes.
+├ update                           Rename a node.
+├ delete                           Remove a node.
+├ read                             Read document bytes.
+└ link                             Implement a kernel-supplied expiry.
+
+DESIGN PRINCIPLES
+───────────────────────────────────────────────────────────────────────────────
+Names are for people and ids for code: only names need resolving.
+A node's identity is its lineage, fixed at creation, since nothing moves.
+Only the store produces identities; a consumer never builds one.
+A provider receives plain lineage, already validated, and never an address.
 */
 
 import type { DeleteResult } from './api-contracts.ts'
 import type { When } from './datetime.ts'
 import type { Id } from './identifier.ts'
 import type { NominalType } from './nominal-type.ts'
+
+// ────────────────────────────────────────────────────────────────────────────
+// IDENTITIES
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Namespace identity; produced only by the store. */
 declare const namespaceBrand: unique symbol
@@ -103,6 +128,10 @@ export const bucketIdentity = (node: Lineage): BucketId =>
 export const documentIdentity = (node: Lineage): DocumentId =>
   ({ namespace: node.namespace, bucket: node.bucket, document: node.document }) as DocumentId
 
+// ────────────────────────────────────────────────────────────────────────────
+// METADATA
+// ────────────────────────────────────────────────────────────────────────────
+
 /** Metadata shared by every level; count denotes children or document bytes. */
 export type NodeMetadata<I extends NodeId = NodeId> = {
   id: I
@@ -114,11 +143,19 @@ export type NodeMetadata<I extends NodeId = NodeId> = {
 /** A temporary document URL with its issuance-time expiry. */
 export type DocumentLink = { url: string; expiresAt: When }
 
+// ────────────────────────────────────────────────────────────────────────────
+// ADDRESSES
+// ────────────────────────────────────────────────────────────────────────────
+
 /** A human name or an explicit UUID; text form is name or id:{uuid}. */
 export type AddressSegment = string | { id: Id }
 
 /** A namespace, bucket, or document address, validated by the grammar. */
 export type DocumentAddress = readonly AddressSegment[]
+
+// ────────────────────────────────────────────────────────────────────────────
+// NODE CONTRACTS
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Common operations for one exact node level. */
 export interface StoreNodeContract<Self extends NodeId, Parent = void> {
@@ -153,6 +190,10 @@ export interface ApiDocumentStoreContract {
   bucket: BucketContract
   document: DocumentContract
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// PROVIDER CONTRACT
+// ────────────────────────────────────────────────────────────────────────────
 
 /** Validated lineage passed between the kernel and its provider. */
 export type Lineage = { readonly namespace: Id; readonly bucket?: Id; readonly document?: Id }
