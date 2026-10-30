@@ -2,9 +2,10 @@
 
 **Active, draft.** Recorded 2026-10-30 from a CA + AI Architect session, split from the document
 storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, which is the kernel and the
-contract this provider implements. The attachments brief,
-`effort/active/2026-10-29-attachments-brief.md`, depends on this one for documents shared across
-devices. Awaits the design moments, CA review, and the production gate.
+contract this provider implements. The upload brief,
+`effort/active/2026-10-30-document-upload-brief.md`, depends on this one for the shared store its
+drains fill. It is last of three features of roadmap M-6, Document Storage. Awaits the design
+moments, CA review, and the production gate.
 
 ## What triggered it
 
@@ -100,15 +101,15 @@ and the architecture documents name storage only in passing.
    S3 protocol switch: local in `config.toml`, hosted in a per-target contract, applied by a task
    and verified by reading back.
 2. **Storage policies.** SQL on `storage.objects` and `storage.buckets`, a schema Supabase manages
-   as it does `auth`, with the rename function beside them. M-5 starts from a baseline, signed-in
-   users only; the rules swarmAg's namespaces need are specified by the attachments brief and
+   as it does `auth`, with the rename function beside them. M-6 starts from a baseline, signed-in
+   users only; the rules swarmAg's namespaces need are specified by the upload brief and
    written here.
 3. **Genesis and reset.** `db-genesis` resets the database and leaves stored objects behind, so a
    stage reset leaves documents whose records no longer exist. A trigger on Supabase's storage
    tables refuses deletion by SQL, which would leave the files behind, so a storage reset empties
    the Supabase buckets through the Storage API, and joins `db-reset` with its verification.
 
-Items 4–6 arrive with the broker; M-5 needs 1–3 and 7.
+Items 4–6 arrive with the broker; M-6 needs 1–3 and 7.
 
 4. **Cron.** The `pg_cron` and `pg_net` extensions, the job definitions, and the credential the job
    uses to call the sweep entry point, held in Vault. Open: where the job definitions live and how

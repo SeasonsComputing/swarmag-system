@@ -1,7 +1,7 @@
 # Facets & Workflow Seeding — Brief
 
 **Backlog, not dispatched.** Recorded 2026-10-06 from a CA + AI Architect exploration session as
-design input for roadmap §6 (Workflow, Task, Question & Service). It carries the seeding questions
+design input for roadmap §7 (Workflow, Task, Question & Service). It carries the seeding questions
 handed off by `effort/completed/2026-10-06-tags-classification-brief.md`, which decided the facet
 catalog and its references. The CA describes the vision as rough at the edges: details may need rethinking when §6 is designed in full.
 
@@ -69,10 +69,10 @@ Service type (default workflow per category/SKU)."
 
 ## Dependency
 
-Initial Job Assessment cannot be built until §6 lands, so the Onboarding Wizard (roadmap §1)
-cannot finish before §6.
+Initial Job Assessment cannot be built until §7 lands, so the Onboarding Wizard (roadmap §1)
+cannot finish before §7.
 
-§6 itself depends on the backlog entry "Managers load only the first page of their Collection":
+§7 itself depends on the backlog entry "Managers load only the first page of their Collection":
 `useFacets` reads the catalog's first page, so that fix must land before facet values are seeded.
 
 _End of Brief_

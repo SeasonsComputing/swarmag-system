@@ -5,8 +5,10 @@
 The intended execution sequence for decided work — see `EFFORT.md` §3 for what this document
 is and how it relates to the backlog and parking lot.
 
-Each milestone carries a permanent ID (`M-n`), never reused or renumbered; references written as
-`roadmap §n` mean `M-n`.
+Each milestone carries an ID (`M-n`), never reused; references written as
+`roadmap §n` mean `M-n`. A closed milestone is locked, and its ID is permanent. A milestone not yet
+closed is a position: new milestones are created as the project needs them and numbered into
+place, and later ones renumbered, with live references updated in the same change.
 
 **Format per entry:** what it comprises, why it sits where it does, and what backlog items
 block or ride with it. An entry marked **(open)** has no settled position yet — stated as open
@@ -24,7 +26,7 @@ feature design, `effort/completed/2026-06-28-user-contact-customer-design.md`:
   at package time; Postgres under row-level security, called directly by the applications;
   Supabase Auth for passwordless sign-in; edge functions for privileged orchestration only; and
   IndexedDB on the field device, designed to carry a job's working set offline and return only an
-  append-only log, so field work never needs a two-way sync (built in §8).
+  append-only log, so field work never needs a two-way sync (built in §9).
 - **Governance** — `CONSTITUTION.md`, `AGENTS.md`, `CONVENTIONS.md` (grown from an 82-line style
   guide), and the Three-Role Model with its operating modes and production gate.
 - **Domain** — the domain model and data dictionary; abstractions, protocols, validators, and
@@ -56,8 +58,8 @@ build them (`EFFORT.md` §7):
    (§4), including account notes and a Billing step.
 3. Additional-contact assignment (`project-user-stories.md` §1.1) is portal users; moved to §9
    Customer Portal.
-4. Onboarding's Initial Job Assessment stage needs Services, Workflows, and seeding (§6); moved to
-   §7 Job Definition.
+4. Onboarding's Initial Job Assessment stage needs Services, Workflows, and seeding (§7); moved to
+   §8 Job Definition.
 
 ## M-2 · Shell/App Split — Closed 2026-09-21
 
@@ -100,7 +102,7 @@ Two capabilities, each landing with the milestone that first needs it:
 
 - **Attachments** — with §5 Mechanical Productions, for operator and maintenance documents on
   assets.
-- **Device media recording** — with onsite Job Assessment (§7). Assessment, planning, and
+- **Device media recording** — with onsite Job Assessment (§8). Assessment, planning, and
   running all need it.
 
 **Tags:** decided 2026-10-06. There is no tag capability: `Note.tags` is removed, and Service and
@@ -118,7 +120,7 @@ Sites step's local `NoteEditor` and User Manager's flattening text area are repl
 account notes are editable (the backlog entry "Customer Manager cannot edit account-level notes",
 now removed).
 
-## M-5 · Mechanical Productions
+## M-5 · Mechanical Productions — Closed 2026-10-30
 
 Standard production from the Users/Customers reference implementations — no design conversation
 needed, pick up whenever convenient once §2 lands. Named "Asset Manager"/"Chemical Manager" here
@@ -187,16 +189,43 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 - **Asset Manager** (`project-user-stories.md` §3.1–3.2) — shipped 2026-10-27 (`f709525`);
   `effort/completed/2026-10-21-asset-chemical-managers-brief.md`.
 - **Chemical Manager** (`project-user-stories.md` §4) — shipped 2026-10-27 (`f709525`); same brief.
-  The labels editor waits for document storage.
-- **Service Manager** — active 2026-10-28, `effort/active/2026-10-28-service-manager-brief.md`:
-  missed from the mechanical productions; the first many-to-many (required asset types).
-- **Document storage** — the Attachments capability M-4 assigned to this milestone; asset
-  documents and Chemical labels reference it. The kernel and IndexedDB provider shipped 2026-10-30
-  (`effort/completed/2026-10-23-document-storage-brief.md`); the Supabase provider is
-  `effort/active/2026-10-30-document-store-supabase-brief.md`, and swarmAg's use is
-  `effort/active/2026-10-29-attachments-brief.md`.
+  The labels editor moved to M-6, with document storage.
+- **Service Manager** — shipped 2026-10-29 (`a527ef0`),
+  `effort/completed/2026-10-28-service-manager-brief.md`: missed from the mechanical productions;
+  the first many-to-many (required asset types).
+- **Document storage** — moved to M-6 2026-10-30. M-4 assigned it here, but it proved a design
+  effort, not a mechanical production (`EFFORT.md` §7).
 
-## M-6 · Workflow, Task, Question & Service
+Closed 2026-10-30 with its managers shipped and verified: Asset Type, Asset, and Chemical
+(`f709525`) and Service (`a527ef0`) are routed in Admin, with their topic tests. Its remaining
+items moved: the Chemical labels editor and document storage to M-6. The `project-user-stories.md`
+iteration for the fuller Asset and Chemical themes was not done; it waits with that work, parked as
+P-8.
+
+## M-6 · Document Storage
+
+Created 2026-10-30, when document storage proved a design effort of its own. Admin
+attaches and shares documents; field capture and its upload are the Ops application's (M-9).
+
+**Enablers:**
+
+- **The kernel and IndexedDB provider** — closed 2026-10-30, `4381df5`,
+  `effort/completed/2026-10-23-document-storage-brief.md`: the contract and `DocumentAddresses` in
+  `core/std`, the kernel and `makeDocumentStoreIndexedDbClient` in `core/cli`, and key paths and
+  indexes in the IndexedDB wrapper.
+
+**Features**, in order; each builds and tests on IndexedDB until the last makes the store shared:
+
+1. **Attachments** (`effort/active/2026-10-29-attachments-brief.md`): the catalog, the inbox, the
+   editors (the Chemical labels editor and attachments on notes), and Admin capture, against a
+   second IndexedDB store, `Documents`.
+2. **Upload** (`effort/active/2026-10-30-document-upload-brief.md`): the Admin loop, draining the
+   inbox into `Documents`.
+3. **The Supabase provider** (`effort/active/2026-10-30-document-store-supabase-brief.md`): the
+   shared store, swapped into `api` for `Documents`, its provisioning, and upload's access rules
+   written into its policies.
+
+## M-7 · Workflow, Task, Question & Service
 
 `project-user-stories.md` §5, currently unwritten, plus `Service` (domain type exists, `api.Services` commented out). Needs the Workflow Builder archetype — named in `architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme with no existing archetype to extend at all, and the most depended-upon: Job Definition's own §2.1 "workflow seeding" (preload a default workflow per Service/SKU) can't be built until this exists.
 
@@ -206,23 +235,23 @@ Service Category: `effort/pending/2026-10-06-facets-workflow-seeding-brief.md`.
 
 Assessment and planning edit job-specific Workflow clones with the Workflow builder
 (`architecture-front.md` §11.2.3), so this milestone is expected to produce the job assessment and
-job planning briefs that §7 builds.
+job planning briefs that §8 builds.
 
-## M-7 · Job Definition
+## M-8 · Job Definition
 
 Admin-side (`project-user-stories.md` §2.1–2.6, 2.9): service selection through assessment,
 planning, finalization, and followup. Backlog: B-25 "Onboarding has no Initial Job Assessment stage"
 (`normal`) covers §2.1 specifically, and completes the Onboarding Wizard (moved from §1). Needs
 `api.Jobs` wired (currently commented out in `api.ts` — not itself a backlog entry, a real gap)
-and depends on §6 above for Service/Workflow seeding.
+and depends on §7 above for Service/Workflow seeding.
 
 Rides with it: backlog B-27 "A Customer with Jobs can be deleted" (`normal`) — the first Job that
 references a Customer is where the delete guard lands. Also the **Hub widget** (B-30, `normal`),
 the primary approach for grouping dashboard commands by topic, with a hierarchical left-nav panel
 as the named fallback. Job's three independently-tabled phases are its motivating case, so it is
-built with the first milestone that presents a Job — this one — and reused by §8 and §9.
+built with the first milestone that presents a Job — this one — and reused by §9 and §10.
 
-## M-8 · Ops Application
+## M-9 · Ops Application
 
 The `app-ops` app, at minimum a hub widget for the Jobs that are its subject plus the Job Runner.
 It closes when a crew member can open an assigned Job and run it offline.
@@ -245,7 +274,11 @@ clients (`JobsLocal`/`JobAssessmentsLocal`/`JobPlansLocal`/`JobLogsLocal`), and
 `api.uploadJobLogs` — none built yet, but none requiring a design decision either. This is Job
 Runner's own prerequisite plumbing, not a separate milestone with its own feature payload.
 
-## M-9 · Customer Portal
+**Field documents** — from M-6: photo capture on the phone (a file input with `capture`) into the
+inbox, and the job upload that drains it into the shared store back at base, beside
+`api.uploadJobLogs` (`effort/active/2026-10-30-document-upload-brief.md`).
+
+## M-10 · Customer Portal
 
 The `app-customer` app, at minimum a hub widget and a customer job report, plus portal users in
 Customer Manager, which carries §1's additional-contact assignment.
@@ -254,7 +287,7 @@ Design outline: `effort/pending/2026-10-08-customer-portal-brief.md`.
 Gate: RLS for every customer- and job-reaching table is locked down before the first `customer`
 User exists. Under today's `_all` policies such a User could read and write every table.
 
-## M-10 · Dashboard Widget Development
+## M-11 · Dashboard Widget Development
 
 The read-only dashboard widgets each app wants: a shared widget catalog plus per-app instances —
 specialization direction, building diverse content atop already-generalized primitives (contrast

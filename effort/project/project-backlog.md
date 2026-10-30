@@ -425,9 +425,9 @@ Nothing fails today because no read path validates a timestamp column. Evidence:
 Two decisions follow, each where it is first needed:
 
 - **`isWhen` accepts the offset form** when a Job screen first sends a column timestamp back
-  through `expectWhen`. Postgres parses either form. Picking this up: roadmap §7 Job Definition.
+  through `expectWhen`. Postgres parses either form. Picking this up: roadmap §8 Job Definition.
 - **The deep clone writes one timestamp form into IndexedDB,** so the in-memory list evaluator
-  compares `When` values correctly. Picking this up: roadmap §8 Ops Application.
+  compares `When` values correctly. Picking this up: roadmap §9 Ops Application.
 
 ### B-36 · Ordered junctions have no client
 
@@ -468,7 +468,7 @@ customer no longer doing business is set `inactive`, which keeps it and its hist
 
 Once Jobs exist, a Customer with Jobs has history and must not be deletable; only inactivated.
 Nothing guards this today because no Jobs exist yet. Picking this up: with Job Definition
-(roadmap §7), where the first Job references a Customer.
+(roadmap §8), where the first Job references a Customer.
 
 ## Job
 
@@ -482,7 +482,7 @@ changeable. The assessor is often assigned when the assessment is scheduled
 (`project-user-stories.md` §2: "assign assessor/crew"). The picker is built by
 [Account Manager & User Picker — Brief](../completed/2026-10-08-account-manager-brief.md).
 
-Picking this up: with roadmap §7 Job Definition.
+Picking this up: with roadmap §8 Job Definition.
 
 ### B-29 · Job work records stamp the session user
 
@@ -491,7 +491,7 @@ Picking this up: with roadmap §7 Job Definition.
 The work log entry's `userId` and `JobWork.startedById` record who acted, so they are stamped with
 the session user at write time, with no picker (CA, 2026-10-08).
 
-Picking this up: with roadmap §8 Ops Application.
+Picking this up: with roadmap §9 Ops Application.
 
 ## UX
 

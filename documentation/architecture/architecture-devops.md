@@ -811,11 +811,9 @@ hold a non-null confirmation timestamp:
 
 ### 12.4 Running Stage Integration Tests
 
-Stage test authorization is defined by
-`effort/completed/2026-10-13-stage-test-authorization-brief.md`. After the CA applies genesis to stage,
-`architecture-back.md` §4.4 supplies the dedicated active administrator `test-admin@swarmag.com`
-and its fixed ID. Genesis and live stage test execution require separate CA action; authoring the
-schema and test setup does not run either operation.
+After the CA applies genesis to stage, `architecture-back.md` §4.4 supplies the dedicated active
+administrator `test-admin@swarmag.com` and its fixed ID. Genesis and live stage test execution
+require separate CA action; authoring the schema and test setup does not run either operation.
 
 A stage test that requires a real session imports `source/tests/config/stage-config.ts`. Its runtime
 needs `SUPABASE_RDBMS_URL`, `SUPABASE_PUBLIC_KEY`, `SUPABASE_CLIENT_MODE`, `LOCAL_DB_NAME`, and the

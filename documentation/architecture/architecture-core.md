@@ -722,9 +722,6 @@ on the device, so a reload without coverage does not interrupt field execution. 
 re-checked at the next online preparation. RLS and edge functions remain the authorization
 boundary; log upload meets the live record.
 
-The current production gates all applications on online preparation. Ops' device-held User and
-offline preparation path ship with the job runner (roadmap §8).
-
 ## 10. Document Storage
 
 The system stores images and documents (labels, safety data sheets, manuals, photos, signed forms,
@@ -776,11 +773,12 @@ const link = await store.document.link(DocumentAddresses.id(reference))
 - **The kernel** mints ids, validates names and addresses, resolves addresses, and produces the
   nominal identities. A provider receives and returns plain lineage, and never sees an address.
 - **One kernel, three profiles.** One contract serves the browser, the back end (scripts, edge
-  functions, services), and a broker if one is ever needed. The kernel's feature set is the
+  functions, services), and a broker, for a provider whose transfers a server must sign. The kernel's feature set is the
   minimum every consumer needs; a provider is as capable as it is, and a capability is exposed
   only when its cost is worth paying.
 - **Placement.** A namespace is where placement binds: site, storage class, caching. It is chosen
-  when the namespace is created and never changes. Only the default placement exists today.
+  when the namespace is created and never changes; a namespace created without one takes the
+  default placement.
 - **Read and link.** `read` returns a document's bytes to code. `link` returns a short-lived URL the
   browser fetches itself. A link's lifetime is a fixed default supplied when the kernel is
   constructed, and a link is never stored: it is minted from the identity when needed.
@@ -795,19 +793,18 @@ const link = await store.document.link(DocumentAddresses.id(reference))
   browser for persistent storage. It stages documents locally before they reach a shared store.
 - **Supabase** keeps its nodes in Supabase Storage itself: a namespace is a Supabase bucket, a
   bucket a key prefix, and a document an object, its name in the object's metadata. Storage
-  policies are its server-side check. It is designed and not yet built.
+  policies are its server-side check.
 
 ### 10.5 Survey Maps
 
-Survey maps are the store's largest consumer, and none of what they need is built; each piece
-arrives with field mapping (`effort/pending/2026-10-24-field-mapping-brief.md`).
+Survey maps are the store's largest consumer.
 
 - **Volume.** A survey flight writes thousands of raw multispectral captures, several gigabytes.
   Processing yields per-band reflectance and index maps (NDVI, NDRE) as Cloud-Optimized GeoTIFFs.
 - **Tiers bind through placement.** Display-resolution maps go to the shared store; full-resolution
   products and raw captures stay on a locally hosted archive, which an S3 provider serves. Keeping
   raw data is the reversible choice; discarding it is not.
-- **What arrives with them:** resumable uploads for large files, batch import of a flight,
+- **What they use:** resumable uploads for large files, batch import of a flight,
   document properties (bounds, coordinate reference system, bands), packages (one flight's maps
   and their manifest), and the broker a provider needs when a server must sign its transfers.
 
