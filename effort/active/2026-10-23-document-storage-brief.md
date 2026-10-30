@@ -96,11 +96,11 @@ Three files in `core/db`, the storage backends, beside `supabase.ts` and `indexe
 not `core/cli`, which holds application clients. Each file is imported on its own, so a consumer
 that needs only `Supabase.client()` never loads the document store.
 
-| File                          | Holds                                                       |
-| ----------------------------- | ----------------------------------------------------------- |
-| `document-store.ts`           | The kernel: id minting, validation, resolution, a provider  |
-| `document-store-contract.ts`  | `NodeMetadata`, the node contracts, and the address grammar |
-| `document-store-indexeddb.ts` | The IndexedDB provider, over `IndexedDb.connection()`       |
+| File                          | Holds                                                     |
+| ----------------------------- | --------------------------------------------------------- |
+| `document-store.ts`           | The kernel, internal: ids, validation, resolution, brands |
+| `document-store-contract.ts`  | The node and provider contracts, and the address grammar  |
+| `document-store-indexeddb.ts` | The IndexedDB provider and `makeDocumentStoreIndexedDb`   |
 
 `document-store-supabase.ts` arrives with the Supabase provider brief.
 
@@ -126,7 +126,14 @@ the attachments brief's inbox.
    unless the app is installed.
 5. **The wrapper.** `IndexedDb` registers object stores but not indexes. It gains index
    declarations, an additive change to `core/db/indexeddb.ts` within this brief's scope, so
-   IndexedDB is still opened in one place.
+   IndexedDB is still opened in one place. _Amended 2026-10-30:_ a store may also declare its key
+   path, as lineage keys need; a store that declares neither keeps `keyPath: 'id'`, so existing
+   stores, their data, and their callers are unchanged.
+6. **Verification.** _Amended 2026-10-30._ The kernel and the grammar are tested in Deno against an
+   in-memory provider defined in the test. The IndexedDB provider is verified in the browser
+   preview, with the CA validating the results. No browser test harness and no new dependency:
+   the harness is the UI behavior tests brief's,
+   `effort/pending/2026-10-21-ui-behavior-tests-brief.md`.
 
 ## The second provider
 
@@ -244,7 +251,43 @@ interface ApiDocumentStoreContract {
   bucket: BucketContract
   document: DocumentContract
 }
+
+/** A node's lineage, unbranded: what a provider receives and returns. */
+type Lineage = { readonly namespace: Id; readonly bucket?: Id; readonly document?: Id }
+type LineageMetadata = { lineage: Lineage; name: string; createdAt: When; count: number }
+
+/** Contract for all document store providers; internal to core/db. Level is lineage depth. */
+interface DocumentProviderContract {
+  get(node: Lineage): Promise<LineageMetadata>
+  find(parent: Lineage | null, name: string): Promise<readonly LineageMetadata[]>
+  list(parent: Lineage | null): Promise<readonly LineageMetadata[]>
+  create(node: Lineage, name: string, body?: Blob): Promise<LineageMetadata> // id already minted
+  update(node: Lineage, name: string): Promise<LineageMetadata>
+  delete(node: Lineage): Promise<DeleteResult>
+  read(node: Lineage): Promise<Blob>
+  link(node: Lineage, expiresAt: When): Promise<string>
+}
+
+/** A maker per provider, as the CRUD clients are made per store. */
+makeDocumentStoreIndexedDb(spec: { linkLifetime: number }): ApiDocumentStoreContract
 ```
+
+An application composes a document store into its `api` as it composes its clients, choosing the
+maker by store:
+
+```ts
+export const api = {
+  …
+  DocumentInbox: makeDocumentStoreIndexedDb({ linkLifetime: … })
+}
+```
+
+The maker builds the kernel over its provider, so an application never sees a provider or the
+kernel. A provider is told everything: `create` receives the lineage with its id already minted,
+and `link` receives its expiry; it never mints, computes an expiry, or sees an address. Its
+lineage is plain, with optional fields, because only the kernel calls it, with input already
+validated; the strictness consumers need lives in the nominal identities. `linkLifetime` is in
+milliseconds.
 
 Every node is created with a name. `get` is metadata; `read` is bytes; `link` is a URL for the
 browser. Each level's identity is a nominal type, so a `DocumentId` is not accepted where a
@@ -314,6 +357,9 @@ Future context for placement and providers; nothing here is built in M-5.
    accepts whole. Deferred: arrives with surveys.
 8. **Raw retention.** Raw archived cold and products hot is the leaning; the decision is the CA's.
    Deferred: arrives with surveys.
+9. **The provider interface and the makers. Settled 2026-10-30,** from ACE's scope: one internal
+   provider contract in plain lineage, and a maker per provider, composed into `api` as the CRUD
+   clients are (API sketch).
 
 ## Records
 
@@ -321,6 +367,11 @@ The platform is `core` material: its architecture earns a section in `architectu
 its rules a section in `CONVENTIONS.md`. Both documents are locked; the CA opens them for this
 brief's production, recorded here, as he does `domain/`. The back and DevOps records are the
 Supabase provider brief's.
+
+_Amended 2026-10-30:_ both records shipped ahead of the production, written by the CA and AI
+Architect: `architecture-core.md` §10 Document Storage (`4d33d25`), and `CONVENTIONS.md` 1.8,
+§10.8 Document store and the §13 key path and indexes (`b065c2c`). The production does not write
+them; it reports anything it builds that departs from them.
 
 ## Design history
 
@@ -390,3 +441,8 @@ Supabase provider brief's.
   id-form reference became an identity by the grammar alone: names are for people and need
   resolving, ids are for code and do not. IndexedDB keys by lineage. A link's lifetime became a
   fixed default supplied when the kernel is constructed, not tied to the session.
+- **2026-10-30, a maker per provider.** ACE's scope asked how a provider is injected. The first
+  sketch followed `Config`: a concrete provider class handed to a kernel maker at the composition
+  point. That is the pattern for a process-wide runtime binding, not for a client. A document store
+  is made like every client, by a maker per store composed into `api`
+  (`makeDocumentStoreIndexedDb`), and the provider contract became internal to `core/db`.
