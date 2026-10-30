@@ -24,8 +24,8 @@ providers, that knows nothing of swarmAg. Its code is `core/db`, a Seasons Compu
 `core/db/supabase.ts` is. It delivers the kernel, the contract, the address grammar, and the
 IndexedDB provider, all in `core/db`, with nothing provisioned and nothing in `back/` or `devops/`.
 
-The Supabase provider, with its tables, storage configuration, policies, reset, and the CLI, is the
-Supabase provider brief. swarmAg's use of the platform (its namespaces and buckets, stored
+The Supabase provider, with its storage configuration, policies, one function, reset, and the CLI,
+is the Supabase provider brief. swarmAg's use of the platform (its namespaces and buckets, stored
 references in domain fields, capture and upload, and the access rules its consumers need) is the
 attachments brief, which depends on both.
 
@@ -38,12 +38,13 @@ piece.
    next. Life-cycles nest: a namespace is settled and long-lived, a bucket is kept as long as its
    consumer needs it, and a document's life is shorter than its bucket's. A document cannot exist
    without its bucket, nor a bucket without its namespace.
-2. **Identity and names.** Every node has an id and a name. The id is identity: a UUID, permanent,
-   never read by people. The kernel mints it. A document's id may instead be supplied by the
-   caller, since a document's identity may exist before its bytes are stored. A create with a
-   supplied id is idempotent within its bucket: the same id in the same bucket returns the existing
-   document, and in another bucket it is a conflict. The name is for people and is the only thing
-   that changes; a rename keeps identity. Names need not be unique among siblings.
+2. **Identity and names.** Every node has an id and a name. Its id is a UUID, permanent, never
+   read by people; the kernel mints it. A document's may instead be supplied by the caller, since a
+   document's identity may exist before its bytes are stored. Nothing moves, so a node's lineage is
+   fixed when it is created, and its identity is that lineage: its namespace's id, its bucket's,
+   and its own. A create with a supplied id is idempotent: the same lineage returns the existing
+   document. The name is for people and is the only thing that changes; a rename keeps identity.
+   Names need not be unique among siblings.
 3. **Metadata is the model.** Every node has the same metadata: `{ id, name, createdAt, count }`,
    where the count is what the node directly holds: a namespace's buckets, a bucket's documents, a
    document's bytes. Listing a container's children is a separate operation. A document's content
@@ -57,7 +58,8 @@ piece.
    kernel; storage validation, whether it resolves, needs the store. The kernel resolves an address
    one segment at a time, by id or by name within the parent; a name that matches more than one
    node is ambiguous and does not resolve. An `id:` segment resolves only to a node in the parent
-   the address names. Providers never see addresses. Stored references use the id form; names are
+   the address names. Resolution yields the node's identity, ids only; providers receive
+   identities and never see addresses. Stored references use the id form; names are
    for people and the CLI.
 5. **Placement.** A namespace is where the system takes advantage of what its provider offers:
    site, storage class, caching, edge. Placement is chosen when the namespace is created, through
@@ -77,7 +79,8 @@ piece.
    short-lived URL the browser fetches itself, for display. A link's lifetime is the kernel's
    default, fixed when the link is issued and no longer than the session that asked for it. A link
    is never stored; it is minted from the id when needed.
-10. **The CLI is the API.** `document-store {noun} {verb}` maps one to one onto the contract.
+10. **The CLI is the API.** `document-store {noun} {verb}` maps one to one onto the contract. It
+    names nodes by address, with names or ids, and resolves each before calling the contract.
 
 ## Code
 
@@ -99,9 +102,10 @@ that needs only `Supabase.client()` never loads the document store.
 The first provider: in the browser, with nothing to provision. It proves the contract, and it is
 the attachments brief's inbox.
 
-1. **Two object stores.** Nodes, `{ id, level, parentId, name, createdAt }`, indexed on `parentId`
-   and on `parentId` with `name`, for `list` and `find`. Content, a document's id to its `Blob`. A
-   document's count is its Blob's size; a container's is its number of children.
+1. **Two object stores.** Nodes, keyed by a node's own id: `{ id, level, parentId, name,
+   createdAt }`, indexed on `parentId` and on `parentId` with `name`, for `list` and `find`.
+   Content, a document's id to its `Blob`. A document's count is its Blob's size; a container's is
+   its number of children.
 2. **One transaction per operation.** A document's create writes its node and its bytes together. A
    container's delete checks for children and removes the node in the same transaction, so
    empty-only delete holds under concurrent writes. Nothing outside IndexedDB is awaited inside a
@@ -159,8 +163,14 @@ and `link`. The kernel mints ids, validates names and addresses, resolves addres
 provider only valid input.
 
 ```ts
+/** A node's identity: its lineage of ids, fixed at creation. Each level extends its parent's. */
+type NamespaceId = { namespace: Id }
+type BucketId = NamespaceId & { bucket: Id }
+type DocumentId = BucketId & { document: Id }
+type NodeId = NamespaceId | BucketId | DocumentId
+
 /** Every node's metadata; count is what the node directly holds: buckets, documents, or bytes. */
-type NodeMetadata = { id: Id; name: string; createdAt: When; count: number }
+type NodeMetadata = { id: NodeId; name: string; createdAt: When; count: number }
 
 type DocumentLink = { url: string; expiresAt: When }
 
@@ -183,26 +193,26 @@ const DocumentAddress = {
 }
 
 /** Common to every node: identity, naming, lookup within a parent, removal. */
-interface StoreNodeContract<ParentId = void> {
-  get(id: Id): Promise<NodeMetadata>
-  find(parentId: ParentId, name: string): Promise<readonly NodeMetadata[]> // resolve walks it
-  list(parentId: ParentId): Promise<readonly NodeMetadata[]>
-  update(id: Id, name: string): Promise<NodeMetadata> // rename only
-  delete(id: Id): Promise<DeleteResult> // containers: empty only
+interface StoreNodeContract<Self extends NodeId, Parent = void> {
+  get(id: Self): Promise<NodeMetadata>
+  find(parent: Parent, name: string): Promise<readonly NodeMetadata[]> // resolve walks it
+  list(parent: Parent): Promise<readonly NodeMetadata[]>
+  update(id: Self, name: string): Promise<NodeMetadata> // rename only
+  delete(id: Self): Promise<DeleteResult> // containers: empty only
 }
 
-interface NamespaceContract extends StoreNodeContract {
+interface NamespaceContract extends StoreNodeContract<NamespaceId> {
   create(name: string): Promise<NodeMetadata>
 }
 
-interface BucketContract extends StoreNodeContract<Id> {
-  create(namespaceId: Id, name: string): Promise<NodeMetadata>
+interface BucketContract extends StoreNodeContract<BucketId, NamespaceId> {
+  create(parent: NamespaceId, name: string): Promise<NodeMetadata>
 }
 
-interface DocumentContract extends StoreNodeContract<Id> {
-  create(bucketId: Id, name: string, body: Blob, id?: Id): Promise<NodeMetadata>
-  read(id: Id): Promise<Blob>
-  link(id: Id): Promise<DocumentLink>
+interface DocumentContract extends StoreNodeContract<DocumentId, BucketId> {
+  create(parent: BucketId, name: string, body: Blob, id?: Id): Promise<NodeMetadata>
+  read(id: DocumentId): Promise<Blob>
+  link(id: DocumentId): Promise<DocumentLink>
 }
 
 /** The kernel: the named hierarchy, and address resolution across it. */
@@ -214,34 +224,38 @@ interface ApiDocumentStoreContract {
 }
 ```
 
-Every node is created with a name. `get` is metadata; `read` is bytes; `link` is a
-URL for the browser. `validate` checks a whole address; the name check it applies to each segment
-is private to the grammar, and the kernel applies it on every `create` and `update`. `build` and
-`parse` produce the same value, so the kernel walks one form whether an address came from code or
-from a person.
+Every node is created with a name. `get` is metadata; `read` is bytes; `link` is a URL for the
+browser. A node's id is its lineage, and each level's extends its parent's, so a parent's id is a
+child's without its last field, and the compiler, not the kernel, keeps a document within a bucket.
+An address resolves to a `NodeId`; a stored reference is a `NodeId` in id form. `validate` checks a
+whole address; the name check it applies to each segment is private to the grammar, and the kernel
+applies it on every `create` and `update`. `build` and `parse` produce the same value, so the kernel
+walks one form whether an address came from code or from a person.
 
-The CLI is `document-store {noun} {verb}`:
+The CLI is `document-store {noun} {verb}`. Every node is named by an address, so a person may use
+names: `{address}` is the node acted on, and `{namespace}` or `{bucket}` is the address of the
+parent a `create` or `list` acts in.
 
-| Noun      | Verb    | Arguments                            | Returns         |
-| --------- | ------- | ------------------------------------ | --------------- |
-| namespace | create  | `--name`                             | NodeMetadata    |
-| namespace | get     | `--namespace-id`                     | NodeMetadata    |
-| namespace | list    |                                      | NodeMetadata[]  |
-| namespace | update  | `--namespace-id --name`              | NodeMetadata    |
-| namespace | delete  | `--namespace-id`                     | DeleteResult    |
-| bucket    | create  | `--namespace-id --name`              | NodeMetadata    |
-| bucket    | get     | `--bucket-id`                        | NodeMetadata    |
-| bucket    | list    | `--namespace-id`                     | NodeMetadata[]  |
-| bucket    | update  | `--bucket-id --name`                 | NodeMetadata    |
-| bucket    | delete  | `--bucket-id`                        | DeleteResult    |
-| document  | create  | `--bucket-id --name --file [--id]`   | NodeMetadata    |
-| document  | get     | `--document-id`                      | NodeMetadata    |
-| document  | list    | `--bucket-id`                        | NodeMetadata[]  |
-| document  | read    | `--document-id [--out]`              | the bytes       |
-| document  | link    | `--document-id`                      | DocumentLink    |
-| document  | update  | `--document-id --name`               | NodeMetadata    |
-| document  | delete  | `--document-id`                      | DeleteResult    |
-| —         | resolve | `{address}`                          | NodeMetadata    |
+| Noun      | Verb    | Arguments                       | Returns        |
+| --------- | ------- | ------------------------------- | -------------- |
+| namespace | create  | `--name`                        | NodeMetadata   |
+| namespace | get     | `{address}`                     | NodeMetadata   |
+| namespace | list    |                                 | NodeMetadata[] |
+| namespace | update  | `{address} --name`              | NodeMetadata   |
+| namespace | delete  | `{address}`                     | DeleteResult   |
+| bucket    | create  | `{namespace} --name`            | NodeMetadata   |
+| bucket    | get     | `{address}`                     | NodeMetadata   |
+| bucket    | list    | `{namespace}`                   | NodeMetadata[] |
+| bucket    | update  | `{address} --name`              | NodeMetadata   |
+| bucket    | delete  | `{address}`                     | DeleteResult   |
+| document  | create  | `{bucket} --name --file [--id]` | NodeMetadata   |
+| document  | get     | `{address}`                     | NodeMetadata   |
+| document  | list    | `{bucket}`                      | NodeMetadata[] |
+| document  | read    | `{address} [--out]`             | the bytes      |
+| document  | link    | `{address}`                     | DocumentLink   |
+| document  | update  | `{address} --name`              | NodeMetadata   |
+| document  | delete  | `{address}`                     | DeleteResult   |
+| —         | resolve | `{address}`                     | NodeMetadata   |
 
 ## Processing and tiers
 
@@ -337,3 +351,8 @@ Supabase provider brief's.
   policies, reset, and CLI became a brief of their own, and the contract keeps the second provider
   as a constraint, so nothing in it leans on what only a local store gives. The caller-supplied id
   was narrowed to documents, with its idempotency and conflict rules.
+- **2026-10-30, identity is lineage.** Storage-native Supabase keys an object by its Supabase
+  bucket and path, so a provider given a bare id could not find it without a lookup of its own.
+  Nothing moves, so a node's lineage is fixed at creation and serves as its identity: one id type
+  per level, each extending its parent's. Providers locate any node directly, the cross-bucket
+  conflict rule went away, and a level mismatch is a compile error rather than a runtime check.

@@ -15,9 +15,9 @@ lifetime, provider persistence, policy ownership, and reset, and all four are th
 
 ## Scope
 
-`core/db/document-store-supabase.ts`, beside `core/db/supabase.ts`, and what it needs to run, as
-the database has its own needs beside `core/db/supabase.ts`: its node table, storage configuration,
-storage policies, and reset, in `back/`, `devops/`, and Supabase's configuration. The CLI is here
+`core/db/document-store-supabase.ts`, beside `core/db/supabase.ts`, and what it needs to run, as the
+database has its own needs beside `core/db/supabase.ts`: storage configuration, storage policies,
+its one function, and reset, in `back/`, `devops/`, and Supabase's configuration. The CLI is here
 too: it serves the back profile, which runs in Deno and has no IndexedDB.
 
 ## The provider
@@ -27,58 +27,55 @@ is not an edge function (`architecture-back.md` §3). Supabase enforces RLS on i
 `storage.objects` on the server, so policies give the provider its server-side check, and a client
 reaches the provider through the kernel, as the CRUD clients reach theirs.
 
-Supabase Storage is flat: objects under keys in physical buckets, with no hierarchy of its own. So
-the provider keeps the nodes in Postgres and the bytes in Storage.
+Supabase Storage keeps its own nodes, so the provider keeps no table. Storage is flat: objects
+under keys in Supabase buckets. It records each object's size, content type, and creation time,
+and carries custom metadata, `user_metadata`, set at upload, as `auth.users` carries metadata for
+an application's users. A node's id is its lineage (the document storage brief, platform point 2),
+so every id locates its node directly.
 
-1. **Nodes, one table.** Every level in one table, its parent enforced by a foreign key:
-
-   ```sql
-   create table document_nodes (
-     id          uuid primary key,
-     parent_id   uuid references document_nodes (id) on delete restrict,
-     level       text not null check (level in ('namespace', 'bucket', 'document')),
-     name        text not null,
-     size        bigint,
-     created_at  timestamptz not null default now()
-   );
-   create index on document_nodes (parent_id, name);
-   ```
-
-   A namespace has no parent; `size` is a document's only.
-2. **Bytes, one physical bucket.** A document's bytes are the object keyed by its id, in one
-   physical bucket for the default placement. The content type is set on upload and served with
-   the bytes.
-3. **Counts are queried,** a container's children or a document's size, never stored, so they
-   cannot drift.
-4. **Empty-only delete is the database's.** The foreign key's `restrict` refuses a container with
-   children, under any concurrency.
-5. **Bytes first, then the node.** A document's create uploads the bytes, then writes its node. If
-   the node's write fails, the bytes are invisible, and the deferred sweep can collect them; the
-   other order would leave a visible document with nothing behind it.
-6. **Idempotent create.** A document's node is inserted on conflict do nothing. A node with the
-   same id under another bucket is a conflict (the document storage brief, platform point 2).
-7. **Links.** `link` is a signed URL whose expiry, the kernel's default, is fixed when it is issued.
+1. **A namespace is a Supabase bucket,** whose id is the namespace's id. Placement is the Supabase
+   bucket's own settings (file size limit, MIME types, public access), so a namespace binds its
+   placement directly. If a Supabase bucket cannot be renamed, the namespace keeps its name in a
+   marker object, as a bucket does (to verify).
+2. **A bucket is a key prefix,** `{bucket}/`, with a marker object, `{bucket}/.bucket`, whose
+   `user_metadata` holds the bucket's name and whose creation time is the bucket's.
+3. **A document is an object,** `{bucket}/{document}` in its namespace's Supabase bucket, its name
+   in `user_metadata`. Its size and content type are Storage's, set on upload and served with the
+   bytes.
+4. **Counts are never stored,** so they cannot drift: a container's is listed, a document's is
+   its size.
+5. **`find` lists and filters.** Storage's API cannot query `user_metadata`, so `find` lists the
+   parent and keeps the matching names; swarmAg's buckets are small.
+6. **Empty-only delete.** Supabase refuses to delete a non-empty Supabase bucket, so a namespace's
+   is native. A bucket's is the provider's: it lists the prefix and removes the marker only if
+   nothing else is there. The check and the removal are not atomic; a document arriving during a
+   bucket's deletion is the race, and bucket deletion is rare and deliberate. An RPC that makes it
+   atomic is a later piece, if the race ever matters.
+7. **Rename is one function.** Storage's API cannot update `user_metadata` after upload, so a
+   Postgres function updates it, called by RPC: the provider's only code in `back/`.
+8. **Idempotent create.** A document's create uploads without overwrite; if its object already
+   exists, the create returns the existing document.
+9. **Links.** `link` is a signed URL whose expiry, the kernel's default, is fixed when it is issued.
    A signed URL is not revocable.
 
-| Operation                    | Postgres                                 | Storage         |
-| ---------------------------- | ---------------------------------------- | --------------- |
-| namespace or bucket `create` | insert the node                          |                 |
-| document `create`            | insert the node, after the bytes         | upload `{id}`   |
-| `get`                        | select by id; count its children or size |                 |
-| `find`                       | select by parent and name                |                 |
-| `list`                       | select by parent                         |                 |
-| `update`                     | update the name                          |                 |
-| container `delete`           | delete the node; `restrict` refuses      |                 |
-| document `delete`            | delete the node                          | remove `{id}`   |
-| `read`                       |                                          | download `{id}` |
-| `link`                       |                                          | sign `{id}`     |
+| Operation          | Storage                                                    |
+| ------------------ | ---------------------------------------------------------- |
+| namespace `create` | create the Supabase bucket                                 |
+| bucket `create`    | upload the marker, its name in `user_metadata`             |
+| document `create`  | upload `{bucket}/{document}`, its name in `user_metadata`  |
+| `get`              | the Supabase bucket, the marker, or the object             |
+| `find`, `list`     | list the parent                                            |
+| `update`           | the rename function                                        |
+| `delete`           | remove; a bucket's only when its prefix is otherwise empty |
+| `read`             | download                                                   |
+| `link`             | sign                                                       |
 
 ## The review's findings
 
 | Finding              | Disposition                                                  |
 | -------------------- | ------------------------------------------------------------ |
-| Link lifetime        | Settled: fixed when issued; not revocable (point 7)          |
-| Provider persistence | Settled: the node table and one physical bucket (points 1–2) |
+| Link lifetime        | Settled: fixed when issued; not revocable (point 9)          |
+| Provider persistence | Settled: Storage's own metadata (points 1–3)                 |
 | Identity             | The kernel's: the document storage brief, points 2 and 4     |
 | Policy ownership     | Open (design moment 1)                                       |
 | Reset sequencing     | Settled: through the Storage API (DevOps 3)                  |
@@ -98,16 +95,17 @@ contract owns hosted behavior, and a task applies it and reads back every value.
 exists for storage: `config.toml`'s `[storage]` block is the scaffold default (50 MiB, no buckets),
 and the architecture documents name storage only in passing.
 
-1. **Storage configuration.** The physical bucket, file size limit, MIME restrictions, and the S3
-   protocol switch: local in `config.toml`, hosted in a per-target contract, applied by a task and
-   verified by reading back.
-2. **Storage policies.** RLS on the node table, and SQL on `storage.objects`, a schema Supabase
-   manages as it does `auth`. M-5 starts from a baseline, signed-in users only; the rules swarmAg's
-   namespaces need are specified by the attachments brief and written here.
+1. **Storage configuration.** Supabase bucket defaults, file size limit, MIME restrictions, and the
+   S3 protocol switch: local in `config.toml`, hosted in a per-target contract, applied by a task
+   and verified by reading back.
+2. **Storage policies.** SQL on `storage.objects` and `storage.buckets`, a schema Supabase manages
+   as it does `auth`, with the rename function beside them. M-5 starts from a baseline, signed-in
+   users only; the rules swarmAg's namespaces need are specified by the attachments brief and
+   written here.
 3. **Genesis and reset.** `db-genesis` resets the database and leaves stored objects behind, so a
-   stage reset leaves documents whose nodes no longer exist. Supabase does not allow deleting
-   objects by SQL (verify), so a storage reset empties the physical bucket through the Storage
-   API, and joins `db-reset` with its verification.
+   stage reset leaves documents whose records no longer exist. A trigger on Supabase's storage
+   tables refuses deletion by SQL, which would leave the files behind, so a storage reset empties
+   the Supabase buckets through the Storage API, and joins `db-reset` with its verification.
 
 Items 4–6 arrive with the broker; M-5 needs 1–3 and 7.
 
@@ -129,15 +127,17 @@ The production is Foundation mode and reads the DevOps context beside Base.
 
 ## Design moments
 
-1. **Policy ownership.** Where the node table's SQL and the storage policies live: `schema.sql`,
+1. **Policy ownership.** Where the storage policies and the rename function live: `schema.sql`,
    as genesis owns the `auth.users` seeds, or a file of their own beside it.
 2. **Uploads.** Signed and resumable uploads (TUS), and the free plan's 50 MB file cap.
-3. **Placement.** How the default placement, and later placements, map namespaces onto physical
-   buckets.
+3. **Placement. Settled 2026-10-30:** a namespace is a Supabase bucket, and its placement is that
+   bucket's settings.
 4. **The CLI's location.**
 5. **Soft delete. Settled 2026-10-30:** soft delete belongs to the domain's records, an abstraction
    over a relational database, and the document store is neither. It removes its nodes and bytes
-   physically; the node table is the provider's implementation, not a domain record.
+   physically.
+6. **To verify,** before production: that listing returns `user_metadata`, and whether a Supabase
+   bucket can be renamed.
 
 ## Records
 
@@ -150,6 +150,12 @@ locked; the CA opens them for this brief's production, recorded here, as he does
 - **2026-10-30, a brief of its own.** The document storage brief carried the Supabase provider, its
   configuration and policies, and the CLI, and ACE's review found every blocker there. A first
   provider in IndexedDB needs none of them, so the kernel closes without them, and this provider
-  became its own brief, the one that must pass the contract's test as a remote store. Its metadata
-  is a Postgres node table, since Supabase Storage is flat, with the bytes in Storage keyed by
-  document id, the pattern Rails' Active Storage uses.
+  became its own brief, the one that must pass the contract's test as a remote store.
+- **2026-10-30, Storage keeps its own nodes.** The first draft kept nodes in a Postgres table and
+  bytes in one physical bucket keyed by document id, the pattern Rails' Active Storage uses: a
+  table, its RLS, and the policies in `back/`. Supabase Storage carries custom metadata on its
+  objects, as `auth.users` does on its users, so the provider uses it instead: a namespace is a
+  Supabase bucket, a bucket a prefix with a marker, a document an object. Placement became the
+  Supabase bucket's settings, and `back/` became the policies and one rename function. Locating a
+  node by a bare id would have needed a second function; identity became lineage instead (the
+  document storage brief, 2026-10-30).
