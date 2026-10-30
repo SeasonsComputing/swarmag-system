@@ -158,15 +158,15 @@ interface StoreNodeContract<ParentId = void> {
 }
 
 interface NamespaceContract extends StoreNodeContract {
-  create(name: string, placement?: string, id?: Id): Promise<NodeMetadata>
+  create(name: string): Promise<NodeMetadata>
 }
 
 interface BucketContract extends StoreNodeContract<Id> {
-  create(namespaceId: Id, name: string, id?: Id): Promise<NodeMetadata>
+  create(namespaceId: Id, name: string): Promise<NodeMetadata>
 }
 
 interface DocumentContract extends StoreNodeContract<Id> {
-  create(bucketId: Id, body: Blob, name?: string, id?: Id): Promise<NodeMetadata>
+  create(bucketId: Id, name: string, body: Blob, id?: Id): Promise<NodeMetadata>
   read(id: Id): Promise<Blob>
   link(id: Id): Promise<DocumentLink>
 }
@@ -180,7 +180,7 @@ interface ApiDocumentStoreContract {
 }
 ```
 
-A document's name defaults to its file's name. `get` is metadata; `read` is bytes; `link` is a
+Every node is created with a name. `get` is metadata; `read` is bytes; `link` is a
 URL for the browser. `validate` checks a whole address; the name check it applies to each segment
 is private to the grammar, and the kernel applies it on every `create` and `update`. `build` and
 `parse` produce the same value, so the kernel walks one form whether an address came from code or
@@ -190,17 +190,17 @@ The CLI is `document-store {noun} {verb}`:
 
 | Noun      | Verb    | Arguments                            | Returns         |
 | --------- | ------- | ------------------------------------ | --------------- |
-| namespace | create  | `--name [--placement] [--id]`        | NodeMetadata    |
+| namespace | create  | `--name`                             | NodeMetadata    |
 | namespace | get     | `--namespace-id`                     | NodeMetadata    |
 | namespace | list    |                                      | NodeMetadata[]  |
 | namespace | update  | `--namespace-id --name`              | NodeMetadata    |
 | namespace | delete  | `--namespace-id`                     | DeleteResult    |
-| bucket    | create  | `--namespace-id --name [--id]`       | NodeMetadata    |
+| bucket    | create  | `--namespace-id --name`              | NodeMetadata    |
 | bucket    | get     | `--bucket-id`                        | NodeMetadata    |
 | bucket    | list    | `--namespace-id`                     | NodeMetadata[]  |
 | bucket    | update  | `--bucket-id --name`                 | NodeMetadata    |
 | bucket    | delete  | `--bucket-id`                        | DeleteResult    |
-| document  | create  | `--bucket-id --file [--name] [--id]` | NodeMetadata    |
+| document  | create  | `--bucket-id --name --file [--id]`   | NodeMetadata    |
 | document  | get     | `--document-id`                      | NodeMetadata    |
 | document  | list    | `--bucket-id`                        | NodeMetadata[]  |
 | document  | read    | `--document-id [--out]`              | the bytes       |
