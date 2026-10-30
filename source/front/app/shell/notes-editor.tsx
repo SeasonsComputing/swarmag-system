@@ -131,16 +131,25 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
       </Show>
       <UiFieldset legend='Note'>
         <UiLayout>
-          <UiField for='note-content' label='Content' required>
-            <UiTextArea
-              name='note-content'
-              rows={6}
-              value={draft.content}
-              error={saveAttempted() && draft.content.trim().length === 0}
-              onInput={event => setDraft('content', event.currentTarget.value)}
-              required
-            />
-          </UiField>
+          <UiLayout data-shell='note-content' gap='none'>
+            <time
+              data-shell='note-created-at'
+              dateTime={draft.createdAt}
+              title={new Date(draft.createdAt).toLocaleString()}
+            >
+              {UiText.relativeTime(draft.createdAt)}
+            </time>
+            <UiField for='note-content' label='Content' required>
+              <UiTextArea
+                name='note-content'
+                rows={6}
+                value={draft.content}
+                error={saveAttempted() && draft.content.trim().length === 0}
+                onInput={event => setDraft('content', event.currentTarget.value)}
+                required
+              />
+            </UiField>
+          </UiLayout>
           <UiField label='Visibility' variant='caption'>
             <UiToggleGroup<NoteVisibility>
               value={draft.visibility}
