@@ -1,7 +1,7 @@
 # Document Store Supabase Provider — Brief
 
 **Active, draft.** Recorded 2026-10-30 from a CA + AI Architect session, split from the document
-storage brief, `effort/active/2026-10-23-document-storage-brief.md`, which is the kernel and the
+storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, which is the kernel and the
 contract this provider implements. The attachments brief,
 `effort/active/2026-10-29-attachments-brief.md`, depends on this one for documents shared across
 devices. Awaits the design moments, CA review, and the production gate.

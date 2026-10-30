@@ -1,14 +1,15 @@
 # Document Storage — Brief
 
-**Active, draft.** Recorded 2026-10-23 from a CA + AI Architect session, while settling the Asset
-and Chemical Managers brief, and extended 2026-10-24. M-4 assigned Attachments to M-5; the roadmap
-lists Document storage among M-5's features. Chosen from the roadmap 2026-10-24. Split 2026-10-29:
-this is the `core/` brief, the platform and what it needs to run; swarmAg's use of it is the
-`front/` brief, `effort/active/2026-10-29-attachments-brief.md`, which depends on this one. Awaits
-CA review and the production gate. Split again 2026-10-30: this brief is the kernel and its first
-provider, IndexedDB, which needs nothing provisioned; the Supabase provider and what it needs to run
-are `effort/active/2026-10-30-document-store-supabase-brief.md`. Field mapping, the main consumer
-of surveys and photos, is `effort/pending/2026-10-24-field-mapping-brief.md`.
+**Completed 2026-10-30.** The kernel and its first provider shipped: the contract and
+`DocumentAddresses` in `core/std` through `@core/stdx`, the kernel and
+`makeDocumentStoreIndexedDbClient` in `core/cli`, and key paths and indexes in the `core/db`
+IndexedDB wrapper (`4381df5`); its records are architecture-core §10 and CONVENTIONS §10.8 and
+§13. Reviewed under core strict scrutiny by the CA and AI Architect, repaired, and verified by
+Deno tests and an app-local upgrade check on the repaired code. Every deferred item is settled
+under Closure. Recorded 2026-10-23 from a CA + AI Architect session and chosen from the roadmap
+2026-10-24; split 2026-10-29 from the attachments brief,
+`effort/active/2026-10-29-attachments-brief.md`, and 2026-10-30 from the Supabase provider brief,
+`effort/active/2026-10-30-document-store-supabase-brief.md`, both of which build on it.
 
 ## What triggered it
 
@@ -452,6 +453,19 @@ them; it reports anything it builds that departs from them.
   point. That is the pattern for a process-wide runtime binding, not for a client. A document store
   is made like every client, by a maker per store composed into `api`
   (now `makeDocumentStoreIndexedDbClient`), and the provider contract became internal.
+- **2026-10-30, a client family in `core/cli`.** The store's code was placed in `core/db` because
+  `core/cli` holds application clients. Once the store was made like every client, by a maker per
+  binding composed into `api`, it was an application client: CONVENTIONS §10.1 named its makers
+  `make-{concept}-{role}.ts`, and the store became a client family beside Crud, Junction, and
+  BusRule (`ApiDocumentStoreContract`, `makeDocumentStoreIndexedDbClient`). Its files moved to
+  `core/cli`, each maker in a file of its own; `core/db` keeps the storage backends. The contract
+  went where the CRUD contracts are, `core/std`, exported from `@core/stdx` with the other
+  contracts and makers, so it stays out of `@core/std` and out of bundles that do not use it.
+- **2026-10-30, `DocumentAddresses`.** The address operations were the type's companion, a const
+  named `DocumentAddress` beside the type. Out of the contract file, the pair could not split:
+  TypeScript will not export a type and a value of one name from two modules through one barrel.
+  Named for what it holds, the plural `DocumentAddresses` stands alone in
+  `core/std/docstore-document-addresses.ts`, and the types stay with the contracts.
 
 ## Production — 2026-10-30
 
@@ -549,16 +563,20 @@ supersedes the strict-scrutiny report's statement that no repaired-code browser 
 - No late registration, document-provider browser check, application wiring, new dependency,
   committed test harness, or runtime code change was involved. The temporary app-local server
   was stopped after verification. The provider browser check remains with attachments production.
-- **2026-10-30, a client family in `core/cli`.** The store's code was placed in `core/db` because
-  `core/cli` holds application clients. Once the store was made like every client, by a maker per
-  binding composed into `api`, it was an application client: CONVENTIONS §10.1 named its makers
-  `make-{concept}-{role}.ts`, and the store became a client family beside Crud, Junction, and
-  BusRule (`ApiDocumentStoreContract`, `makeDocumentStoreIndexedDbClient`). Its files moved to
-  `core/cli`, each maker in a file of its own; `core/db` keeps the storage backends. The contract
-  went where the CRUD contracts are, `core/std`, exported from `@core/stdx` with the other
-  contracts and makers, so it stays out of `@core/std` and out of bundles that do not use it.
-- **2026-10-30, `DocumentAddresses`.** The address operations were the type's companion, a const
-  named `DocumentAddress` beside the type. Out of the contract file, the pair could not split:
-  TypeScript will not export a type and a value of one name from two modules through one barrel.
-  Named for what it holds, the plural `DocumentAddresses` stands alone in
-  `core/std/docstore-document-addresses.ts`, and the types stay with the contracts.
+
+## Closure — 2026-10-30
+
+Every deferred or not-taken item, and where it went:
+
+- **The IndexedDB provider's browser check** joins the attachments production, its first
+  consumer (`effort/active/2026-10-29-attachments-brief.md`, design moment 4).
+- **The Supabase provider, the CLI, storage configuration, policies, and reset** are the Supabase
+  provider brief (`effort/active/2026-10-30-document-store-supabase-brief.md`), with sweeps of
+  orphaned bytes.
+- **Batch import, raw retention, document properties, packages, placement providers, and
+  renditions** join the field mapping brief (`effort/pending/2026-10-24-field-mapping-brief.md`);
+  architecture-core §10.5 records them.
+- **The broker** arrives with an alternative provider whose transfers a server must sign; no
+  brief holds it until one is chosen.
+- **A `link` lifetime argument** is dropped: the fixed lifetime supplied at composition serves
+  every consumer known.

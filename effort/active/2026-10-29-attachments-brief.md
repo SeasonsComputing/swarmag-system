@@ -1,7 +1,7 @@
 # Attachments — Brief
 
 **Active, draft.** Recorded 2026-10-29 from a CA + AI Architect session, split from the document
-storage brief, `effort/active/2026-10-23-document-storage-brief.md`, which is the `core/` platform
+storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, which is the `core/` platform
 this brief uses and depends on, as it depends on the Supabase provider,
 `effort/active/2026-10-30-document-store-supabase-brief.md`, for documents shared across devices.
 M-4 assigned Attachments to M-5. This is the `front/` brief: swarmAg's use of the platform. Awaits the design moments, CA review, and the production gate.
@@ -143,6 +143,8 @@ taken), and **Raw** (a flight's raw captures with a checksum manifest, for the a
 4. **The inbox.** It is the document store's IndexedDB provider: a local namespace with a bucket
    per destination, and a drain copies each document to the remote store under its id. Open: how
    an item names its destination, and how a view shows an item not yet stored.
+   Its production runs the IndexedDB provider's browser check, deferred to this first consumer
+   by the document storage brief's closure.
 
 ## Records
 

@@ -1,7 +1,7 @@
 # Field Mapping — Brief
 
 **Pending, design input.** Recorded 2026-10-24 from a CA + AI Architect session, while extending
-the document storage brief (`effort/active/2026-10-23-document-storage-brief.md`). It records the
+the document storage brief (`effort/completed/2026-10-23-document-storage-brief.md`). It records the
 depth considered so far; job definition, the workflow workbench, and document storage will flesh
 out the details. Chosen from the roadmap when job definition is.
 
@@ -94,3 +94,7 @@ elements, and the validator checks ranges, which rejects every swapped Texas coo
 3. **Protect-zone buffers:** whether walkthrough precision suffices before machine work.
 4. **The map widget's** placement and its three modes.
 5. **When the survey is flown:** during the visit, processed in the field, or beforehand.
+6. **Document storage for surveys,** from the document storage brief's closure: batch import of a
+   flight, raw retention (raw archived cold and products hot is the leaning; the decision is the
+   CA's), document properties (bounds, coordinate reference system, bands), packages, placement
+   providers for the tiers, and renditions. Architecture-core §10.5 records them.

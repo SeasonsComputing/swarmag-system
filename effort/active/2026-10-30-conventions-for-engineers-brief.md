@@ -1,9 +1,9 @@
 # Conventions for Engineers — Brief
 
-**Pending, not dispatched.** Recorded 2026-10-30 from a CA + AI Architect session, while reviewing
-the document store production. Rewriting CONVENTIONS §13 Local Persistence for the engineer who
-needs local storage (version 1.9) showed the same gap elsewhere in the document. It is chosen from
-the backlog (B-38) when a section is next touched, or as its own pass.
+**Active.** Recorded 2026-10-30 from a CA + AI Architect session, while reviewing the document
+store production, and chosen from the backlog (B-38) the same day. Rewriting CONVENTIONS §13 Local
+Persistence for the engineer who needs local storage (version 1.9) showed the same gap elsewhere in
+the document.
 
 ## What triggered it
 

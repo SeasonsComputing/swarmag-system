@@ -60,7 +60,7 @@ Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close 
 
 **Observed:** 2026-10-30 · normal
 
-Design record: [Conventions for Engineers — Brief](../pending/2026-10-30-conventions-for-engineers-brief.md).
+Design record: [Conventions for Engineers — Brief](../active/2026-10-30-conventions-for-engineers-brief.md).
 
 ### B-33 · The domain SDK genesis prompt omits backend seed authority
 

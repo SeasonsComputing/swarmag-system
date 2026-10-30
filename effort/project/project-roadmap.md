@@ -191,8 +191,10 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 - **Service Manager** — active 2026-10-28, `effort/active/2026-10-28-service-manager-brief.md`:
   missed from the mechanical productions; the first many-to-many (required asset types).
 - **Document storage** — the Attachments capability M-4 assigned to this milestone; asset
-  documents and Chemical labels reference it;
-  `effort/active/2026-10-23-document-storage-brief.md`.
+  documents and Chemical labels reference it. The kernel and IndexedDB provider shipped 2026-10-30
+  (`effort/completed/2026-10-23-document-storage-brief.md`); the Supabase provider is
+  `effort/active/2026-10-30-document-store-supabase-brief.md`, and swarmAg's use is
+  `effort/active/2026-10-29-attachments-brief.md`.
 
 ## M-6 · Workflow, Task, Question & Service
 
