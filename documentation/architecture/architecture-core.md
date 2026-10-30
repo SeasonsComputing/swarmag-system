@@ -728,7 +728,7 @@ offline preparation path ship with the job runner (roadmap §8).
 ## 10. Document Storage
 
 The system stores images and documents (labels, safety data sheets, manuals, photos, signed forms,
-and survey maps) in a document store: a kernel in `core/db` over replaceable providers. The store
+and survey maps) in a document store: a kernel in `core/cli` over replaceable providers. The store
 knows nothing of the domain; a record refers to a stored document by reference, and what the
 document means belongs to the field that refers to it.
 
@@ -768,7 +768,7 @@ Names are for people and the CLI; ids are for code.
 const label = await store.document.resolve('chemicals/labels/label.pdf')
 
 // A stored reference, by id: the grammar alone
-const link = await store.document.link(DocumentAddress.id(reference))
+const link = await store.document.link(DocumentAddresses.id(reference))
 ```
 
 ### 10.3 Kernel and Providers

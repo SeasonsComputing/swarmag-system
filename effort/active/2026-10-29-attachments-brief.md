@@ -51,7 +51,7 @@ document:
 1. **Namespaces are subjects.** A namespace is named by subject (`assets`, `chemicals`, `jobs`),
    not topic: topic is container-aligned.
 2. **A bucket per record.** A record's documents live in a bucket named by the record's id, so a
-   record reaches its bucket by address with nothing to store: `DocumentAddress.build('jobs',
+   record reaches its bucket by address with nothing to store: `DocumentAddresses.build('jobs',
    job.id)`. The bucket is created once, at a deliberate moment, with the record or its
    assignment, never lazily on a first upload, so no two buckets carry one record's name.
 3. **Compositions without an id** (a `Note`, a `CustomerSite`) keep their documents in the owning

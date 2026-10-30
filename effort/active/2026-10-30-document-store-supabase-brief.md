@@ -15,10 +15,11 @@ lifetime, provider persistence, policy ownership, and reset, and all four are th
 
 ## Scope
 
-`core/db/document-store-supabase.ts`, beside `core/db/supabase.ts`, and what it needs to run, as the
-database has its own needs beside `core/db/supabase.ts`: storage configuration, storage policies,
-its one function, and reset, in `back/`, `devops/`, and Supabase's configuration. The CLI is here
-too: it serves the back profile, which runs in Deno and has no IndexedDB.
+`core/cli/make-supabase-docstore-client.ts` (`makeDocumentStoreSupabaseClient`), over
+`core/db/supabase.ts`, and what it needs to run, as the database has its own needs beside
+`core/db/supabase.ts`: storage configuration, storage policies, its one function, and reset, in
+`back/`, `devops/`, and Supabase's configuration. The CLI is here too: it serves the back profile,
+which runs in Deno and has no IndexedDB.
 
 ## The provider
 

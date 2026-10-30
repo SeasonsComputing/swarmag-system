@@ -20,9 +20,10 @@ a stored document's URL names or who may write it.
 ## Scope
 
 This brief is the platform: general-purpose document storage, a minimal API over replaceable
-providers, that knows nothing of swarmAg. Its code is `core/db`, a Seasons Computing library, as
-`core/db/supabase.ts` is. It delivers the kernel, the contract, the address grammar, and the
-IndexedDB provider, all in `core/db`, with nothing provisioned and nothing in `back/` or `devops/`.
+providers, that knows nothing of swarmAg. Its code is `core/`, a Seasons Computing library: the
+contract and the address grammar in `core/std`, exported from `@core/stdx`, as the CRUD contracts
+are; the kernel and the IndexedDB provider in `core/cli`, over the `core/db` IndexedDB wrapper.
+Nothing is provisioned, and nothing is in `back/` or `devops/`.
 
 The Supabase provider, with its storage configuration, policies, one function, reset, and the CLI,
 is the Supabase provider brief. swarmAg's use of the platform (its namespaces and buckets, stored
@@ -91,18 +92,22 @@ piece.
 
 ## Code
 
-Three files in `core/db`, the storage backends, beside `supabase.ts` and `indexeddb.ts`. Not
-`core/std`, which ships to single-purpose edge functions and embedded devices and stays minimal;
-not `core/cli`, which holds application clients. Each file is imported on its own, so a consumer
-that needs only `Supabase.client()` never loads the document store.
+A document store is an application client: a maker per binding, composed into `api` as the CRUD
+clients are, so it is a client family of its own beside Crud, Junction, and BusRule, laid out as
+they are. Its contract is in `core/std`, beside `api-contracts.ts`, imported through `@core/stdx`,
+which keeps it out of `@core/std` and out of any bundle that does not use it; `core/std` is
+closed, so the contract imports only its siblings. Its makers are in `core/cli`, each in a file of
+its own rather than doubling its binding's client file. `core/db` keeps the storage backends the
+clients use (`indexeddb.ts`, `supabase.ts`). _Amended 2026-10-30; see the design history._
 
-| File                          | Holds                                                     |
-| ----------------------------- | --------------------------------------------------------- |
-| `document-store.ts`           | The kernel, internal: ids, validation, resolution, brands |
-| `document-store-contract.ts`  | The node and provider contracts, and the address grammar  |
-| `document-store-indexeddb.ts` | The IndexedDB provider and `makeDocumentStoreIndexedDb`   |
+| File                                         | Holds                                                      |
+| -------------------------------------------- | ---------------------------------------------------------- |
+| `core/std/docstore-contract.ts`              | The node and provider contracts and the nominal identities |
+| `core/std/docstore-document-addresses.ts`    | `DocumentAddresses`: build, parse, format, validate, id    |
+| `core/cli/make-docstore-client.ts`           | The kernel, internal: ids, validation, resolution          |
+| `core/cli/make-indexeddb-docstore-client.ts` | The IndexedDB provider and its maker                       |
 
-`document-store-supabase.ts` arrives with the Supabase provider brief.
+`make-supabase-docstore-client.ts` arrives with the Supabase provider brief.
 
 ## The IndexedDB provider
 
@@ -130,9 +135,10 @@ the attachments brief's inbox.
    path, as lineage keys need; a store that declares neither keeps `keyPath: 'id'`, so existing
    stores, their data, and their callers are unchanged.
 6. **Verification.** _Amended 2026-10-30._ The kernel and the grammar are tested in Deno against an
-   in-memory provider defined in the test. The IndexedDB provider is verified in the browser
-   preview, with the CA validating the results. No browser test harness and no new dependency:
-   the harness is the UI behavior tests brief's,
+   in-memory provider defined in the test. _Production amendment, CA 2026-10-30:_ the browser check
+   of the provider moves to the attachments production, its first consumer; this production
+   verifies the wrapper upgrade on an existing database through app-local. No browser test
+   harness and no new dependency: the harness is the UI behavior tests brief's,
    `effort/pending/2026-10-21-ui-behavior-tests-brief.md`.
 
 ## The second provider
@@ -208,8 +214,8 @@ type AddressSegment = string | { id: Id }
 /** One to three segments: a namespace, a bucket, or a document. */
 type DocumentAddress = readonly AddressSegment[]
 
-/** The address grammar: needs no store, shared by every profile. */
-const DocumentAddress = {
+/** Address operations: need no store, shared by every profile. */
+const DocumentAddresses = {
   build(
     namespace: AddressSegment,
     bucket?: AddressSegment,
@@ -256,7 +262,7 @@ interface ApiDocumentStoreContract {
 type Lineage = { readonly namespace: Id; readonly bucket?: Id; readonly document?: Id }
 type LineageMetadata = { lineage: Lineage; name: string; createdAt: When; count: number }
 
-/** Contract for all document store providers; internal to core/db. Level is lineage depth. */
+/** Contract for all document store providers; internal to core/cli. Level is lineage depth. */
 interface DocumentProviderContract {
   get(node: Lineage): Promise<LineageMetadata>
   find(parent: Lineage | null, name: string): Promise<readonly LineageMetadata[]>
@@ -269,7 +275,7 @@ interface DocumentProviderContract {
 }
 
 /** A maker per provider, as the CRUD clients are made per store. */
-makeDocumentStoreIndexedDb(spec: { linkLifetime: number }): ApiDocumentStoreContract
+makeDocumentStoreIndexedDbClient(spec: { linkLifetime: number }): ApiDocumentStoreContract
 ```
 
 An application composes a document store into its `api` as it composes its clients, choosing the
@@ -278,7 +284,7 @@ maker by store:
 ```ts
 export const api = {
   …
-  DocumentInbox: makeDocumentStoreIndexedDb({ linkLifetime: … })
+  DocumentInbox: makeDocumentStoreIndexedDbClient({ linkLifetime: … })
 }
 ```
 
@@ -295,7 +301,7 @@ browser. Each level's identity is a nominal type, so a `DocumentId` is not accep
 `list` returns `BucketId`s ready for `document.list`. A parent's identity is not derived from a
 child's; when a consumer needs that, it arrives as an operation. `resolve` serves names: the caller
 states the level, and the kernel checks depth and kind there, in one place. A stored reference needs
-no resolving: `DocumentAddress.id` turns an id-form document reference into a `DocumentId` by the
+no resolving: `DocumentAddresses.id` turns an id-form document reference into a `DocumentId` by the
 grammar alone, and a document that no longer exists fails at the `read` or `link` that needed it.
 `validate` checks a whole address; the name check it applies to each segment is private to the
 grammar, and the kernel applies it on every `create` and `update`. `build` and `parse` produce the
@@ -445,4 +451,114 @@ them; it reports anything it builds that departs from them.
   sketch followed `Config`: a concrete provider class handed to a kernel maker at the composition
   point. That is the pattern for a process-wide runtime binding, not for a client. A document store
   is made like every client, by a maker per store composed into `api`
-  (`makeDocumentStoreIndexedDb`), and the provider contract became internal to `core/db`.
+  (now `makeDocumentStoreIndexedDbClient`), and the provider contract became internal.
+
+## Production — 2026-10-30
+
+Foundation production implemented; awaiting CA review. This brief remains active.
+
+- **Created:** `source/core/std/docstore-contract.ts` and `docstore-document-addresses.ts`;
+  `source/core/cli/make-docstore-client.ts` and `make-indexeddb-docstore-client.ts`;
+  `source/tests/cases/document-store-test.ts`. _CA, 2026-10-30:_ produced in `core/db`, then moved
+  to `core/std` and `core/cli`, renamed as a client family (`makeDocumentStoreIndexedDbClient`),
+  and the family's files abbreviated to `docstore` inside `core/`, before commit.
+- **Modified:** `source/core/db/indexeddb.ts` and this brief. No files deleted. The architecture
+  and conventions records authored by CA + AA were consumed without alteration.
+- **Delivered:** the provider-neutral kernel and grammar, exact-level nominal identities, typed
+  resolution, lineage-keyed IndexedDB nodes and Blobs, a concrete provider maker, and additive
+  wrapper registration of key paths and indexes. Existing stores keep their original key paths
+  and data. Document bytes are immutable; supplied document ids are idempotent per lineage.
+- **Deno verification:** ten grammar/kernel/type-contract tests using an in-memory provider and
+  the existing Preferences regression test passed (eleven tests total). Repository-wide type
+  checking and lint passed. Formatting verification passed. Architecture, environment, and all
+  remaining guards passed except the leaf guard below.
+- **Initial wrapper verification through app-local:** Admin bound to stage, served locally on port 5174,
+  with an isolated browser profile. An existing app database advanced from version 2 to 3 when a
+  lineage-keyed probe store and nonunique parent/name indexes were registered. Both original
+  stores and their record counts survived; an existing-store sentinel record was unchanged and
+  its key path remained `id`. After reload, adding an index to the existing probe store advanced
+  version 3 to 4 and preserved both probe records; the new index returned both matching records.
+  No application source wiring, committed browser harness, or new dependency was added.
+- **Failures fixed within scope:** initial TypeScript errors in transaction-mode generics and
+  a nominal-identity test assertion.
+- **Remaining check failure:** `deno task check` stops at the leaf guard because
+  `source/front/app/.DS_Store` is in a non-leaf directory. This unrelated Finder file was left
+  untouched. Remaining checks were run separately; no guard was weakened or bypassed.
+- **Not done:** provider browser verification, explicitly assigned to attachments production;
+  application/inbox integration, Supabase provider, CLI, backend provisioning, deployments, or
+  resets. No change to the settled model or public API was required.
+- **STYLE_AUDIT: PASS** — the four core files and the new test file were audited against
+  `CONVENTIONS.md`; the full check suite remains blocked by the unrelated Finder file above.
+
+### Strict-scrutiny repair — 2026-10-30
+
+Repair Mode, authorized by CA from the core strict-scrutiny review. Modified the four core files,
+`source/tests/cases/document-store-test.ts`, and this report; no files created or deleted in this
+repair.
+
+- Removed the wrapper's cached-connection close/reopen block from `registerStore`; registration
+  remains a module-evaluation operation. Duplicate declarations still fail through `Config.fail`.
+- Moved all three nominal brands, their identity types, and their three plain-construction
+  producers into `docstore-contract.ts`. The kernel imports them from the contract; the
+  contract imports nothing from the kernel, eliminating the cycle.
+- Removed runtime validation of nominal identities and the Blob instance check. Validation stays
+  at name/address and caller-supplied document-id boundaries. Tests no longer bypass nominal
+  typing to demand runtime identity checks or require frozen identity objects; compile-time
+  identity separation remains checked.
+- Persistence is requested once without awaiting it. Link expiry is constructed through
+  `toWhen`, and Blob URL revocation uses one timeout. _CA, 2026-10-30:_ the link lifetime check
+  is removed with its test: the lifetime is a composition constant, not runtime configuration,
+  and an invalid one fails at the first `link`; the kernel no longer imports `@core/cfg`.
+- Restored standard PURPOSE/PUBLIC headers and documented internal support in PURPOSE.
+- Left both version-change `blocking` handlers unchanged for the CA's decision. _CA, 2026-10-30:_
+  kept. Without them a second open tab blocks every upgrade until it closes. Left the unrelated
+  Finder `.DS_Store` untouched (the CA removed it). No guard or governing document changed.
+- **Verification:** all eleven targeted Deno tests passed; repository-wide types and lint
+  passed; formatting passed. All guards passed except the leaf guard's existing
+  `source/front/app/.DS_Store` failure; guards after it were run separately.
+- **Browser evidence:** the app-local upgrade results above precede this repair and included
+  late registration, which this repair removes. They are historical results, not a re-run of the
+  repaired registration lifecycle. No new browser check was run for this repair; the provider's
+  browser check remains assigned to attachments production.
+- **STYLE_AUDIT: PASS** — the four repaired core files and the updated test file were audited.
+  No in-scope failures remain; the unrelated leaf-guard failure remains reported above.
+
+### Repaired wrapper app-local verification — 2026-10-30
+
+CA requested a browser re-run against the repaired registration lifecycle. **PASS.** This
+supersedes the strict-scrutiny report's statement that no repaired-code browser check had run.
+
+- Served stage-bound Admin through `app-stage-local` on port 5174 in isolated headless Chrome.
+  Test-only declarations were injected into the served app entry immediately before bootstrap,
+  during module evaluation and before the first wrapper connection; no project source was
+  modified to exercise registration. Each declaration change took effect on a full reload.
+- **Baseline:** the existing `swarmag-app-admin` database was version 2 with two stores. Captured
+  their keys, records, and key paths, including a sentinel in the legacy `id`-keyed store.
+- **Store upgrade, version 2 → 3:** registered a new lineage-keyed probe store with parent and
+  nonunique compound parent/name indexes before connecting. Both existing stores, all captured
+  keys and records, and their key paths remained unchanged. Both indexes correctly returned two
+  records sharing the same parent and name.
+- **Index-only upgrade, version 3 → 4:** on reload, declared an additional name index on the
+  existing probe store before connecting. Both probe records survived and were returned by the
+  new index. Original application records and key paths remained unchanged.
+- **Unchanged declaration on another reload:** database stayed at version 4, retained both probe
+  records and the index, and performed no additional upgrade.
+- **Browser errors:** zero in the final verification run. An initial HTML-interception approach
+  caused Vite client errors; an unmodified-page baseline was clean, and the final check preserved
+  normal HTML/Vite initialization by injecting only before the app's bootstrap call.
+- No late registration, document-provider browser check, application wiring, new dependency,
+  committed test harness, or runtime code change was involved. The temporary app-local server
+  was stopped after verification. The provider browser check remains with attachments production.
+- **2026-10-30, a client family in `core/cli`.** The store's code was placed in `core/db` because
+  `core/cli` holds application clients. Once the store was made like every client, by a maker per
+  binding composed into `api`, it was an application client: CONVENTIONS §10.1 named its makers
+  `make-{concept}-{role}.ts`, and the store became a client family beside Crud, Junction, and
+  BusRule (`ApiDocumentStoreContract`, `makeDocumentStoreIndexedDbClient`). Its files moved to
+  `core/cli`, each maker in a file of its own; `core/db` keeps the storage backends. The contract
+  went where the CRUD contracts are, `core/std`, exported from `@core/stdx` with the other
+  contracts and makers, so it stays out of `@core/std` and out of bundles that do not use it.
+- **2026-10-30, `DocumentAddresses`.** The address operations were the type's companion, a const
+  named `DocumentAddress` beside the type. Out of the contract file, the pair could not split:
+  TypeScript will not export a type and a value of one name from two modules through one barrel.
+  Named for what it holds, the plural `DocumentAddresses` stands alone in
+  `core/std/docstore-document-addresses.ts`, and the types stay with the contracts.
