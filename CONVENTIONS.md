@@ -1,9 +1,9 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.8)
+# Software Construction Conventions (1.9)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.8
+- Version: 1.9
 - Published: 2026 October 30th
 - Author: Ted V. Kremer
 
@@ -811,15 +811,15 @@ const unsubscribe = Auth.onAuthStateChange(session => …)
 
 ### 10.8 Document store
 
-`ApiDocumentStoreContract` (`@core/db/document-store-contract.ts`) stores documents in a fixed
-hierarchy, namespace, bucket, and document, over a provider. Application code reaches documents
-only through it, never through a provider or the provider's backend.
+`ApiDocumentStoreContract` (`@core/std/docstore-contract.ts`, from `@core/stdx`) stores
+documents in a fixed hierarchy, namespace, bucket, and document, over a provider. Application code
+reaches documents only through it, never through a provider or the provider's backend.
 
 - A node's identity is its lineage, one nominal type per level (`NamespaceId`, `BucketId`,
   `DocumentId`). Only the store produces them: code gets an identity from the store's results or
   from a stored reference, and never builds one.
 - A stored reference is an address in id form. Never store a name address, which a rename breaks.
-- `DocumentAddress.id` turns a stored reference into a `DocumentId` with no lookup. `resolve` is
+- `DocumentAddresses.id` turns a stored reference into a `DocumentId` with no lookup. `resolve` is
   for names, and each level resolves at its own: a document's address goes to `document.resolve`.
 - Never store a link; mint it when it is displayed.
 - A provider receives and returns plain lineage and never sees an address; the kernel produces
@@ -827,7 +827,7 @@ only through it, never through a provider or the provider's backend.
 
 ```typescript
 const manual = await store.document.resolve('manuals/pumps/install.pdf')
-const link = await store.document.link(DocumentAddress.id(reference))
+const link = await store.document.link(DocumentAddresses.id(reference))
 ```
 
 ## 11. Runtime Configuration
@@ -902,15 +902,22 @@ Deno.serve(wrapSupabaseShim(handler))
 
 ## 13. Local Persistence
 
-Local data lives in the browser's IndexedDB, reached through clients.
+Local data lives in the browser's IndexedDB. Choose by what you are keeping:
 
-- `IndexedDb` (`@core/db/indexeddb.ts`) owns the connection for the active local database and its
-  registered stores. `makeCrudIndexedDbClient` registers its store; application code never
-  touches `IndexedDb` directly.
-- A store may declare its key path and indexes when it registers; a store that declares neither
-  keeps the default key path, `id`.
+| You are keeping                         | Use                                                  | See   |
+| --------------------------------------- | ---------------------------------------------------- | ----- |
+| Records of a domain abstraction         | A client from `makeCrudIndexedDbClient`              | §10.6 |
+| Small settings, by key                  | `Preferences` (`@core/cli/preferences.ts`)           | below |
+| Files and images                        | A document store, `makeDocumentStoreIndexedDbClient` | §10.8 |
+| A new kind of store, searched by fields | A maker that registers its own store                 | §13.1 |
+
+**What happens to local data.** It belongs to one browser profile on one site: it is not shared
+across devices or users, and no server authorizes it. The browser may clear it when storage runs
+short, and Safari clears a site's storage after seven days without use unless the app is
+installed. A store that must survive asks for persistent storage; a refusal is a known condition.
+
+- Application code never touches `IndexedDb` directly; a maker registers its store.
 - An object store for a domain abstraction is named for the abstraction (`Job`, `Workflow`).
-- `Preferences` (`@core/cli/preferences.ts`) persists small key and value settings.
 - The local database name comes from configuration (`LOCAL_DB_NAME`, §11).
 
 ```typescript
@@ -918,6 +925,27 @@ const prefs = new Preferences('AppStateStore')
 
 await prefs.set('theme', 'dark')
 const all = await prefs.state()
+```
+
+### 13.1 IndexedDb Indexes
+
+A maker declares what its store's records are looked up by and what else they are searched by,
+and `IndexedDb` keeps the browser's database in step with those declarations.
+
+- **The key path** is what a record is looked up by. It defaults to `id`; an array makes a compound
+  key.
+- **An index** is another way to search a store, by a field or by fields together.
+- **Upgrades only add.** On open, `IndexedDb` adds the stores and indexes the database lacks. It
+  never changes or removes what exists, so records survive every upgrade.
+- **Reorganizing stops.** Changing an existing store's key path, or an existing index, fails
+  through `Config.fail`: reorganizing stored data is a deliberate migration, never a side effect.
+- **A store registers once,** at module evaluation, with one declaration.
+
+```typescript
+IndexedDb.registerStore('Readings', {
+  keyPath: ['siteId', 'takenAt'],
+  indexes: { bySensor: { keyPath: 'sensorId' } }
+})
 ```
 
 ## 14. Remote Persistence
@@ -1361,6 +1389,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.9     | 2026 October 30th   | §13 Local Persistence rewritten for the engineer who needs local storage: a table choosing the tool by what is kept, what happens to local data, and the rules; new §13.1 IndexedDb Indexes, how a maker declares a store's key path and indexes, upgrades that only add, and reorganization that stops rather than migrates. It replaces 1.8's §13 bullet. §10.8: the contract is `@core/std/docstore-contract.ts`, imported from `@core/stdx`; the store is a client family made by a maker per binding in `core/cli`. `DocumentAddress.id` is now `DocumentAddresses.id`, from `@core/std/docstore-document-addresses.ts`.                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 1.8     | 2026 October 30th   | New §10.8 Document store: the store is reached only through `ApiDocumentStoreContract`; a node's identity is its lineage, one nominal type per level, produced only by the store; a stored reference is an id-form address, turned into an identity by `DocumentAddress.id` without a lookup, while `resolve` serves names at each level's own depth; links are never stored; providers see plain lineage, never addresses. §13: a store may declare its key path and indexes when it registers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.7     | 2026 October 28th   | §17.2: a collection row presents its Item through `PanelRowIdentity`, a title, an optional subtitle, and an optional annotation in decreasing prominence; the component owns each line's style and the provider its content.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 1.6     | 2026 October 28th   | §10.6: a list of owners reads its junction partners in one set-based read (`partnersOf`), never one read per owner.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
