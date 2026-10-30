@@ -29,6 +29,7 @@ import { notValid, ValidatorError } from './validators.ts'
 
 /** Document address operations; id-form references need no store. */
 export const DocumentAddresses = {
+  /** Build an address from its segments; a document requires a bucket. */
   build(namespace: AddressSegment, bucket?: AddressSegment, document?: AddressSegment): DocumentAddress {
     if (document !== undefined && bucket === undefined) notValid('Document address requires a bucket')
     const segments = [namespace]
@@ -36,6 +37,8 @@ export const DocumentAddresses = {
     if (document !== undefined) segments.push(document)
     return DocumentAddresses.parse(DocumentAddresses.format(segments))
   },
+
+  /** Parse address text into one to three segments; fails through notValid. */
   parse(address: string): DocumentAddress {
     const segments = address.split('/')
     if (segments.length < 1 || segments.length > 3) notValid('Address requires one to three segments')
@@ -49,6 +52,8 @@ export const DocumentAddresses = {
       return segment
     })
   },
+
+  /** Render an address as text: names as written, ids as id:{uuid}. */
   format(address: DocumentAddress): string {
     if (address.length < 1 || address.length > 3) notValid('Address requires one to three segments')
     return address.map(segment => {
@@ -60,6 +65,8 @@ export const DocumentAddresses = {
       return `id:${segment.id}`
     }).join('/')
   },
+
+  /** Recognize valid address text without throwing. */
   validate(address: string): boolean {
     try {
       DocumentAddresses.parse(address)
@@ -69,6 +76,8 @@ export const DocumentAddresses = {
       throw error
     }
   },
+
+  /** Turn an id-form document reference into a DocumentId, with no store lookup. */
   id(reference: string): DocumentId {
     const address = DocumentAddresses.parse(reference)
     if (address.length !== 3 || address.some(segment => typeof segment === 'string')) {
@@ -83,5 +92,6 @@ export const DocumentAddresses = {
   }
 }
 
+/** A valid name: nonblank, no slash, and not in id form. */
 const validName = (value: string): boolean =>
   value.trim().length > 0 && !value.includes('/') && !value.startsWith('id:')
