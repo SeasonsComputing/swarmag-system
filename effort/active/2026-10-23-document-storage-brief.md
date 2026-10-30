@@ -5,8 +5,10 @@ and Chemical Managers brief, and extended 2026-10-24. M-4 assigned Attachments t
 lists Document storage among M-5's features. Chosen from the roadmap 2026-10-24. Split 2026-10-29:
 this is the `core/` brief, the platform and what it needs to run; swarmAg's use of it is the
 `front/` brief, `effort/active/2026-10-29-attachments-brief.md`, which depends on this one. Awaits
-CA review and the production gate. Field mapping, the main consumer of surveys and photos, is
-`effort/pending/2026-10-24-field-mapping-brief.md`.
+CA review and the production gate. Split again 2026-10-30: this brief is the kernel and its first
+provider, IndexedDB, which needs nothing provisioned; the Supabase provider and what it needs to run
+are `effort/active/2026-10-30-document-store-supabase-brief.md`. Field mapping, the main consumer
+of surveys and photos, is `effort/pending/2026-10-24-field-mapping-brief.md`.
 
 ## What triggered it
 
@@ -19,12 +21,13 @@ a stored document's URL names or who may write it.
 
 This brief is the platform: general-purpose document storage, a minimal API over replaceable
 providers, that knows nothing of swarmAg. Its code is `core/db`, a Seasons Computing library, as
-`core/db/supabase.ts` is. It also owns what the platform needs to run, as the database has its own
-needs beside `core/db/supabase.ts`: storage configuration and storage policies. Those live in
-`devops/`, Supabase's configuration, and `back/`, not in `core/`.
+`core/db/supabase.ts` is. It delivers the kernel, the contract, the address grammar, and the
+IndexedDB provider, all in `core/db`, with nothing provisioned and nothing in `back/` or `devops/`.
 
-swarmAg's use of the platform (its namespaces and buckets, stored references in domain fields,
-capture and upload, and the access rules its consumers need) is the attachments brief.
+The Supabase provider, with its tables, storage configuration, policies, reset, and the CLI, is the
+Supabase provider brief. swarmAg's use of the platform (its namespaces and buckets, stored
+references in domain fields, capture and upload, and the access rules its consumers need) is the
+attachments brief, which depends on both.
 
 ## The platform
 
@@ -36,10 +39,11 @@ piece.
    consumer needs it, and a document's life is shorter than its bucket's. A document cannot exist
    without its bucket, nor a bucket without its namespace.
 2. **Identity and names.** Every node has an id and a name. The id is identity: a UUID, permanent,
-   never read by people. The kernel mints it, unless the caller supplies one, since identity may
-   exist before storage; a create with a supplied id that already exists is the same object. The
-   name is for people and is the only thing that changes; a rename keeps identity. Names need not be
-   unique among siblings.
+   never read by people. The kernel mints it. A document's id may instead be supplied by the
+   caller, since a document's identity may exist before its bytes are stored. A create with a
+   supplied id is idempotent within its bucket: the same id in the same bucket returns the existing
+   document, and in another bucket it is a conflict. The name is for people and is the only thing
+   that changes; a rename keeps identity. Names need not be unique among siblings.
 3. **Metadata is the model.** Every node has the same metadata: `{ id, name, createdAt, count }`,
    where the count is what the node directly holds: a namespace's buckets, a bucket's documents, a
    document's bytes. Listing a container's children is a separate operation. A document's content
@@ -52,8 +56,9 @@ piece.
    namespace, a bucket, or a document. Grammar validation needs only the address and runs in the
    kernel; storage validation, whether it resolves, needs the store. The kernel resolves an address
    one segment at a time, by id or by name within the parent; a name that matches more than one
-   node is ambiguous and does not resolve. Providers never see addresses. Stored references use the
-   id form; names are for people and the CLI.
+   node is ambiguous and does not resolve. An `id:` segment resolves only to a node in the parent
+   the address names. Providers never see addresses. Stored references use the id form; names are
+   for people and the CLI.
 5. **Placement.** A namespace is where the system takes advantage of what its provider offers:
    site, storage class, caching, edge. Placement is chosen when the namespace is created, through
    a placement provider that loads its configuration, and never changes. It is not metadata, and
@@ -70,8 +75,8 @@ piece.
    means removing its documents first.
 9. **Read and link.** `read` returns a document's bytes to code, for processing. `link` returns a
    short-lived URL the browser fetches itself, for display. A link's lifetime is the kernel's
-   default, no longer than the session that asked for it, and a link is never stored; it is minted
-   from the id when needed.
+   default, fixed when the link is issued and no longer than the session that asked for it. A link
+   is never stored; it is minted from the id when needed.
 10. **The CLI is the API.** `document-store {noun} {verb}` maps one to one onto the contract.
 
 ## Code
@@ -81,29 +86,58 @@ Three files in `core/db`, the storage backends, beside `supabase.ts` and `indexe
 not `core/cli`, which holds application clients. Each file is imported on its own, so a consumer
 that needs only `Supabase.client()` never loads the document store.
 
-| File                         | Holds                                                         |
-| ---------------------------- | ------------------------------------------------------------- |
-| `document-store.ts`          | The kernel: id minting, validation, resolution, a provider    |
-| `document-store-contract.ts` | `NodeMetadata`, the node contracts, and the address grammar   |
-| `document-store-supabase.ts` | The Supabase provider, over `Supabase.client()`               |
+| File                          | Holds                                                       |
+| ----------------------------- | ----------------------------------------------------------- |
+| `document-store.ts`           | The kernel: id minting, validation, resolution, a provider  |
+| `document-store-contract.ts`  | `NodeMetadata`, the node contracts, and the address grammar |
+| `document-store-indexeddb.ts` | The IndexedDB provider, over `IndexedDb.connection()`       |
 
-The CLI's location is open (design moment 6).
+`document-store-supabase.ts` arrives with the Supabase provider brief.
+
+## The IndexedDB provider
+
+The first provider: in the browser, with nothing to provision. It proves the contract, and it is
+the attachments brief's inbox.
+
+1. **Two object stores.** Nodes, `{ id, level, parentId, name, createdAt }`, indexed on `parentId`
+   and on `parentId` with `name`, for `list` and `find`. Content, a document's id to its `Blob`. A
+   document's count is its Blob's size; a container's is its number of children.
+2. **One transaction per operation.** A document's create writes its node and its bytes together. A
+   container's delete checks for children and removes the node in the same transaction, so
+   empty-only delete holds under concurrent writes. Nothing outside IndexedDB is awaited inside a
+   transaction: the bytes are stored as the `Blob` given, its content type with it.
+3. **Links.** `link` returns a `blob:` URL. It ends when the page unloads, if not before, and the
+   provider revokes each link it issues when the link expires.
+4. **Durability.** Storage belongs to the browser profile and the origin: it is neither shared
+   across devices nor authorized by a server. The provider asks for persistent storage, and a
+   refusal is a known condition: Safari clears a site's storage after seven days without use,
+   unless the app is installed.
+5. **The wrapper.** `IndexedDb` registers object stores but not indexes. It gains index
+   declarations, an additive change to `core/db/indexeddb.ts` within this brief's scope, so
+   IndexedDB is still opened in one place.
+
+## The second provider
+
+The contract is written for remote providers too, and the Supabase provider is the test it must
+pass. What IndexedDB gives and a remote store does not, the contract does not promise:
+
+- `create` promises an outcome, not atomicity: a remote store writes the bytes and the node in
+  separate systems.
+- Every operation may fail on the network, and its result says so.
+- A link has a real expiry, `expiresAt`, fixed when it is issued.
 
 ## Staging
 
-The repository's rule for the backend holds for storage: what can be a direct operation under RLS
-is not an edge function (`architecture-back.md` §3). Supabase Storage enforces RLS on
-`storage.objects` on the server, so policies give M-5 its server-side check, and the client
-reaches the provider through the kernel, as the CRUD clients reach theirs.
-
-**M-5 builds:**
+**M-5 builds, in this brief:**
 
 - The kernel, the contract, and the address grammar (platform points 1–4, 6–9), with the default
-  placement only (point 5). The caller-supplied id is in M-5: the attachments brief's inbox mints
-  ids before storage.
-- The Supabase provider, serving the front and back profiles.
-- The CLI (point 10).
-- Storage configuration, storage policies, and reset (DevOps 1–3, 7).
+  placement only (point 5). The caller-supplied document id is in M-5: the attachments brief's
+  inbox mints ids before storage.
+- The IndexedDB provider, serving the front profile.
+
+**M-5 builds, in the Supabase provider brief:** the Supabase provider, serving the front and back
+profiles; the CLI (point 10), since the back profile runs in Deno, which has no IndexedDB; and the
+provider's configuration, policies, and reset.
 
 **Each later piece arrives with its consumer:**
 
@@ -227,45 +261,6 @@ Future context for placement and providers; nothing here is built in M-5.
   local storage for offline use, through one import action that validates the package. The cloud
   copy is the last resort.
 
-## DevOps
-
-Storage is the first platform service since Auth that the repository must own, and it is a
-feature set of its own. Auth's configuration sets the pattern (`architecture-devops.md` §13): the
-repository is authoritative, not the dashboard; `config.toml` owns local behavior, a per-target
-contract owns hosted behavior, and a task applies it and reads back every value. Nothing of this
-exists for storage: `config.toml`'s `[storage]` block is the scaffold default (50 MiB, no buckets),
-and the architecture documents name storage only in passing.
-
-1. **Storage configuration.** Physical buckets, file size limit, MIME restrictions, and the S3
-   protocol switch: local in `config.toml`, hosted in a per-target contract, applied by a task and
-   verified by reading back. How the default placement maps namespaces onto Supabase's physical
-   buckets is the provider's (design moment 6).
-2. **Storage policies.** SQL on `storage.objects`, a schema Supabase manages as it does `auth`. M-5
-   starts from a baseline, signed-in users only; the rules swarmAg's namespaces need are specified
-   by the attachments brief and written here. Open: whether `schema.sql` owns them, as genesis owns
-   the `auth.users` seeds.
-3. **Genesis and reset.** `db-genesis` resets the database and leaves stored objects behind, so a
-   stage reset leaves documents whose owners no longer exist. A storage reset and its verification
-   join `db-reset`.
-
-Items 4–6 arrive with the broker; M-5 needs 1–3 and 7.
-
-4. **Cron.** The `pg_cron` and `pg_net` extensions, the job definitions, and the credential the job
-   uses to call the sweep entry point, held in Vault. Open: where the job definitions live and how
-   each target receives them.
-5. **Secrets and runtime configuration.** Secret Registry entries (§5) and edge runtime
-   configuration (§4.4): the Cron credential now; the archive's S3 credentials and the provider
-   selection later.
-6. **Edge deployment.** The broker and the sweep, one service with two entry points, deploy through
-   `edge-deploy` and its verification (§8.6). Stage integration tests remove the objects they
-   write.
-7. **Free-tier usage.** Keeping infrastructure at $0 means watching the 1 GB limit: a task reports
-   storage usage per target.
-8. **The import node** (ODM, GDAL, ExifTool) is a deployable outside Supabase, and not this brief's:
-   it belongs with field mapping or a later brief of its own.
-
-The production is Foundation mode and reads the DevOps context beside Base.
-
 ## Design moments
 
 1. **The model, the address, and the API. Settled 2026-10-29.** Platform points 1–10, the code's
@@ -273,10 +268,9 @@ The production is Foundation mode and reads the DevOps context beside Base.
 2. **Lease duration. Withdrawn:** documents are immutable (point 7).
 3. **Consumers. Moved** to the attachments brief.
 4. **The catalog's M-5 entries. Moved** to the attachments brief.
-5. **Access.** The mechanism, storage policies, is here (DevOps 2); the rules are the attachments
-   brief's.
-6. **Supabase specifics.** Signed and resumable uploads; how namespaces map onto physical buckets;
-   policy ownership; and where the CLI lives.
+5. **Access. Moved** to the Supabase provider brief, which owns the mechanism, storage policies;
+   the rules are the attachments brief's.
+6. **Supabase specifics. Moved** to the Supabase provider brief, with the CLI's location.
 7. **Batch import.** A flight is thousands of files: a batch `create`, or a manifest the service
    accepts whole. Deferred: arrives with surveys.
 8. **Raw retention.** Raw archived cold and products hot is the leaning; the decision is the CA's.
@@ -285,10 +279,9 @@ The production is Foundation mode and reads the DevOps context beside Base.
 ## Records
 
 The platform is `core` material: its architecture earns a section in `architecture-core.md` and
-its rules a section in `CONVENTIONS.md`. Storage policies earn a section in `architecture-back.md`
-beside Row Level Security (§4.3), and storage configuration a section in `architecture-devops.md`,
-as Auth has (§13). The four documents are locked; the CA opens them for this brief's production,
-recorded here, as he does `domain/`.
+its rules a section in `CONVENTIONS.md`. Both documents are locked; the CA opens them for this
+brief's production, recorded here, as he does `domain/`. The back and DevOps records are the
+Supabase provider brief's.
 
 ## Design history
 
@@ -336,3 +329,11 @@ recorded here, as he does `domain/`.
 - **2026-10-29, two briefs.** The brief split by namespace: this one is `core/` and the platform's
   supporting configuration and policies; swarmAg's usage, its catalog and access rules, its stored
   references, and capture and upload, became the attachments brief in `front/`.
+- **2026-10-30, the first provider.** ACE's review found the brief blocked on link lifetime,
+  provider persistence, policy ownership, and reset, and all four were the Supabase provider's. A
+  provider that needs nothing provisioned proves the kernel without them: IndexedDB holds the
+  hierarchy as records with parent ids and the bytes as Blobs, in one transaction, and the inbox
+  the attachments brief needs is that provider. The Supabase provider and its configuration,
+  policies, reset, and CLI became a brief of their own, and the contract keeps the second provider
+  as a constraint, so nothing in it leans on what only a local store gives. The caller-supplied id
+  was narrowed to documents, with its idempotency and conflict rules.

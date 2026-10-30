@@ -2,8 +2,9 @@
 
 **Active, draft.** Recorded 2026-10-29 from a CA + AI Architect session, split from the document
 storage brief, `effort/active/2026-10-23-document-storage-brief.md`, which is the `core/` platform
-this brief uses and depends on. M-4 assigned Attachments to M-5. This is the `front/` brief:
-swarmAg's use of the platform. Awaits the design moments, CA review, and the production gate.
+this brief uses and depends on, as it depends on the Supabase provider,
+`effort/active/2026-10-30-document-store-supabase-brief.md`, for documents shared across devices.
+M-4 assigned Attachments to M-5. This is the `front/` brief: swarmAg's use of the platform. Awaits the design moments, CA review, and the production gate.
 
 ## What triggered it
 
@@ -95,7 +96,7 @@ the job and its bucket already in place: the photos drain, and the work log entr
 
 ## Access
 
-Storage policies are the document storage brief's mechanism (its DevOps 2); this brief specifies
+Storage policies are the Supabase provider brief's mechanism (its DevOps 2); this brief specifies
 the rules swarmAg's namespaces need, and they are written there.
 
 - Per bucket, which roles read or write it.
@@ -139,7 +140,9 @@ taken), and **Raw** (a flight's raw captures with a checksum manifest, for the a
 2. **Access rules,** per namespace and bucket, as written into the storage policies.
 3. **The editors.** The Chemical labels editor and `sdsUrl`'s storage integration, deferred by the
    managers brief, and attachments on notes: how a note shows, adds, and removes attachments.
-4. **The inbox.** Its local store, its item shape, and how a view shows an item not yet stored.
+4. **The inbox.** It is the document store's IndexedDB provider: a local namespace with a bucket
+   per destination, and a drain copies each document to the remote store under its id. Open: how
+   an item names its destination, and how a view shows an item not yet stored.
 
 ## Records
 
