@@ -1,9 +1,11 @@
 # Conventions for Engineers — Brief
 
-**Active.** Recorded 2026-10-30 from a CA + AI Architect session, while reviewing the document
-store production, and chosen from the backlog (B-38) the same day. Rewriting CONVENTIONS §13 Local
-Persistence for the engineer who needs local storage (version 1.9) showed the same gap elsewhere in
-the document.
+**Completed 2026-10-30.** CONVENTIONS 1.9 rewrote §13 (`32d41c7`), and 1.10–1.12 rewrote §17.1,
+§17.4, §17.5, §16.1, §16.4, §10.1, and §10.6 (`ebd986b`), each for the engineer who arrives with a
+need; the CA reviewed them and closed the brief. Nothing is deferred. Recorded 2026-10-30 from a CA
+
+- AI Architect session, while reviewing the document store production, and chosen from the backlog
+  (B-38) the same day; B-38 is removed with this closure.
 
 ## What triggered it
 
@@ -49,3 +51,18 @@ Worst first:
 - A rewrite changes how a section reads, never what it requires. A new or changed rule is its own
   CA decision.
 - One section at a time, each reviewed by the CA.
+
+## Production — 2026-10-30
+
+Written by the AI Architect at the CA's direction, all five at once, for the CA to review a chapter
+at a time; one version per chapter.
+
+- **1.10, chapter 17:** §17.1 Steps and sequences, §17.4 `DrillDown`, §17.5 the dashboard.
+- **1.11, chapter 16:** §16.1 Composition, §16.4 Session.
+- **1.12, chapter 10:** §10.1 Makers, §10.6 API clients.
+
+Each section now opens with when to reach for it, says what its parts do, and shows one neutral
+example; every rule it held is kept. One rule became explicit that was only implicit in the code:
+a Step has one `DrillDown`, however deep the nesting (§17.4).
+
+**Reviewed:** by the CA, 2026-10-30, including §17.4's one-host-per-Step rule.
