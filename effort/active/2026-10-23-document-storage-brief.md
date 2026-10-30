@@ -86,7 +86,8 @@ piece.
    it: one that outlives a sign-out by its remaining minutes is the accepted trade, as with signed
    URLs generally. A link is never stored; it is minted from the id when needed.
 10. **The CLI is the API.** `document-store {noun} {verb}` maps one to one onto the contract. It
-    names nodes by address, with names or ids, and resolves each before calling the contract.
+    names nodes by address, with names or ids, and resolves each before calling the contract, so
+    its `get` serves both `get` and `resolve`.
 
 ## Code
 
@@ -259,8 +260,7 @@ same value, so the kernel walks one form whether an address came from code or fr
 
 The CLI is `document-store {noun} {verb}`. Every node is named by an address, so a person may use
 names: `{address}` is the node acted on, and `{namespace}` or `{bucket}` is the address of the
-parent a `create` or `list` acts in. The noun-less `resolve` uses the contract of the address's
-depth.
+parent a `create` or `list` acts in.
 
 | Noun      | Verb    | Arguments                       | Returns        |
 | --------- | ------- | ------------------------------- | -------------- |
@@ -281,7 +281,6 @@ depth.
 | document  | link    | `{address}`                     | DocumentLink   |
 | document  | update  | `{address} --name`              | NodeMetadata   |
 | document  | delete  | `{address}`                     | DeleteResult   |
-| —         | resolve | `{address}`                     | NodeMetadata   |
 
 ## Processing and tiers
 
