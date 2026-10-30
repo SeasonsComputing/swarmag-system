@@ -26,7 +26,7 @@ Both trace to one cause: the overlay wrappers over-specify their triggers.
 - **The overlays depart from it.** `UiDialog`, `UiPopover`, and `UiTooltip` share one prop
   template: `trigger`, `triggerVariant`, `open`, `defaultOpen`, `onOpenChange`, `error`, `loading`,
   `disabled`, and each renders its trigger `as={UiButton}` with `triggerVariant`. The template dates
-  from the original control set (`ef2507d`, 2026-04-21).
+  from the original control set (`6b90cb2`, 2026-04-21).
 - **Kobalte's triggers** are plain, unstyled buttons whose content the caller supplies; the styled
   button is the wrapper's addition.
 - **Consumer census:** across all three controls, the only prop of the template any consumer passes

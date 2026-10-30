@@ -85,7 +85,7 @@ active user.
 - **UI shaping versus RLS was a false choice.** The AI Architect first asked whether rules would be
   enforced in RLS or applied only in the UI. The CA's position: a UX that adapts to the session
   User's roles is ordinary practice, and RLS enforces the same rules. Both, not either.
-- **`architecture-front.md` §9.1.2 was traced to its origin** (`be0010c`, 2026-03-14): it keeps
+- **`architecture-front.md` §9.1.2 was traced to its origin** (`3a2bb8e`, 2026-03-14): it keeps
   authorization decided in one place, the database. The model keeps that intent; the UX adapts to
   rules it never enforces.
 - **Route guards by role were proposed and rejected.** The AI Architect noted that a sales User in

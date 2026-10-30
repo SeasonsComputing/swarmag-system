@@ -76,7 +76,7 @@ Additional-contact assignment (`project-user-stories.md` §1.1) is not built; it
 Customer Portal.
 
 **The account manager field,** a User, set during Onboarding to the session user and changeable
-in Customer Manager through a shared User picker — shipped 2026-10-19 (`4a3c403`) and verified by
+in Customer Manager through a shared User picker — shipped 2026-10-19 (`2172f90`) and verified by
 the CA: `effort/completed/2026-10-08-account-manager-brief.md`.
 
 1. **Soft-deleted references** — completed 2026-10-18:
@@ -110,7 +110,7 @@ Workflow classification moves to curated facets. The Notes Editor shows no tags.
 
 1. **Tags → facets** — completed 2026-10-08: `effort/completed/2026-10-06-tags-classification-brief.md`.
 2. **Notes Editor brief** — completed 2026-10-08: `effort/completed/2026-10-08-notes-editor-brief.md`.
-3. **Notes Editor production** — shipped 2026-10-08 (`991bc90`), with the brief.
+3. **Notes Editor production** — shipped 2026-10-08 (`7e56e39`), with the brief.
 4. ~~**Milestone verification**~~ — verified by the CA in User Manager and Customer Manager.
 
 Rode with it, delivered 2026-10-08: User Manager consumes it, so User Management is closed; the
@@ -139,21 +139,21 @@ them; each fix lands once instead of chasing every copy:
 - **Stage test authorization** — closed 2026-10-23,
   `effort/completed/2026-10-13-stage-test-authorization-brief.md`: new managers arrive with
   integration tests that run against stage.
-- **Host-owned list errors** — added and closed 2026-10-21, `a744ee6`: `AbstractionManager`
+- **Host-owned list errors** — added and closed 2026-10-21, `665034a`: `AbstractionManager`
   presents the collection's load failure from `listError`; copied managers supply it, not the
   banner.
-- **Junction client** — closed 2026-10-28, `cfa753d`,
+- **Junction client** — closed 2026-10-28, `7d45a4b`,
   `effort/completed/2026-10-28-junction-client-brief.md`:
   `makeJunctionSupabaseClient` in `core/cli`, so a manager edits a many-to-many from its owning
   side; the Service Manager is its first consumer.
 
 **Rides along:**
 
-- **Dictionary guard** — closed 2026-10-28, `4e0f84e`,
+- **Dictionary guard** — closed 2026-10-28, `44b9e40`,
   `effort/completed/2026-10-27-dictionary-guard-brief.md`: `isDictionary` in `core/std`, taught to
   the domain genesis and retrofitted into the domain guards; HelmWidget and dashboard state read
   through `@core/std`; CONVENTIONS 1.3.
-- **Nominal types** — closed 2026-10-27, `9ce287a`,
+- **Nominal types** — closed 2026-10-27, `cefda19`,
   `effort/completed/2026-10-27-nominal-types-brief.md`: the `NominalType` idiom in `core/std`, the
   `toId` and `toWhen` checkers, and Preferences binding an explicit row `Id`; CONVENTIONS 1.2.
   Making `Id` nominal is held in P-12; document storage does not depend on it.
@@ -183,10 +183,10 @@ these settle CONVENTIONS and bring the code into conformance in the same window.
 
 **Features:**
 
-- **Asset Type Manager** — shipped 2026-10-27 (`c5403ca`); same brief.
-- **Asset Manager** (`project-user-stories.md` §3.1–3.2) — shipped 2026-10-27 (`c5403ca`);
+- **Asset Type Manager** — shipped 2026-10-27 (`f709525`); same brief.
+- **Asset Manager** (`project-user-stories.md` §3.1–3.2) — shipped 2026-10-27 (`f709525`);
   `effort/completed/2026-10-21-asset-chemical-managers-brief.md`.
-- **Chemical Manager** (`project-user-stories.md` §4) — shipped 2026-10-27 (`c5403ca`); same brief.
+- **Chemical Manager** (`project-user-stories.md` §4) — shipped 2026-10-27 (`f709525`); same brief.
   The labels editor waits for document storage.
 - **Service Manager** — active 2026-10-28, `effort/active/2026-10-28-service-manager-brief.md`:
   missed from the mechanical productions; the first many-to-many (required asset types).

@@ -81,7 +81,7 @@ The stage-test-authorization production records this gap without changing the pr
 schema generation beyond the three approved test administrator rows.
 
 **Also, 2026-10-23:** nothing in the generation rules drops functions, so a genesis after a
-parameter rename fails (`user_has_access`, `email` to `p_email`, in `0dc1185`). `schema.sql` gained
+parameter rename fails (`user_has_access`, `email` to `p_email`, in `43a4780`). `schema.sql` gained
 `DROP FUNCTION IF EXISTS user_has_access(text)` by hand; the genesis rules should produce it.
 
 ## Controls
