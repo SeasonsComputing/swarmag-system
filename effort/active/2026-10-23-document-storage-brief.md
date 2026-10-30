@@ -8,9 +8,10 @@ moments, CA review, and the production gate. Field mapping, the main consumer of
 
 ## What triggered it
 
-`Chemical.labels` reference documents that must already be stored, and asset documents need the
-Attachments capability M-4 assigned to this milestone. Nothing stores documents today: `Attachment`
-carries a `url`, and nothing defines what that URL names or who may write it.
+The system holds images and documents: chemical labels and SDSs, asset manuals and part diagrams,
+purchase and service records, job photos, and signed forms. M-4 assigned the Attachments capability
+to this milestone. Nothing stores them today: `Attachment` carries a `url`, and nothing defines what
+a stored document's URL names or who may write it.
 
 ## Two concepts
 
@@ -26,50 +27,50 @@ adds catalog entries; it does not redesign storage.
 The points are the target. Staging says what M-5 builds and which consumer brings each later
 piece.
 
-1. **A closed hierarchy.** `namespace ─* bucket ─* document`, closed by kind: namespaces, buckets,
-   and documents are the only kinds of thing, with no arbitrary folders. A namespace is a path, as
-   deep as its meaning needs (`assets`, `customers/{customer-id}/sites`). A bucket is one segment
-   and holds related documents. A document sits directly in its bucket. A path parses from the
-   right: the last two segments are the bucket and the document, and the rest is the namespace.
-   Identity and affinity come from the hierarchy, by convention and validation, never from the
-   storage provider.
-2. **Two identifiers.** A document has an `id()` and a path. The id is for machines: permanent and
-   never read by people. The path is for people: an organizational address that reaches the
-   document with nothing else to resolve.
-3. **The path is logical.** Supabase Storage is today's provider, not the model. Document management
-   may move whole to AWS S3, or in-house to OpenCloud, by system affinity. A provider maps the
-   logical path onto its own storage, whether or not that storage has buckets. The domain stores
-   only paths and ids, never a physical location.
-4. **Contract, providers, makers.** A `Documents` contract, one provider per cloud, and a maker that
-   selects the provider, as the repository's other contracts are built.
-5. **A thin brokering service.** One service, an edge function as user management is. It validates
-   the path against the hierarchy, applies access rules, records metadata, and returns a
-   short-lived signed URL. Bytes move directly between the client and the provider, never through
-   the function. Validation needs a server because client checks can be bypassed; a provider swap
-   stays server-side because the client never knows the provider.
-6. **Metadata lives with documents.** A sidecar beside each document (for example
-   `{path}.meta.json`), not a table and not one file per bucket. Each document owns its metadata,
-   so writes never contend. A bucket's view is an aggregate built from sidecars by common parent
-   path, only when needed, and disposable. Moving providers is a copy of objects, with no database
-   to migrate.
-7. **Documents are immutable.** A document is added or removed, never changed, so a path never
-   moves and its bytes never differ. A replacement is three steps: add the new document, repoint
-   the reference on the owning record, remove the old one. The only shared state is the reference,
-   an ordinary domain update, so no merging, conflict resolution, or partial write exists, and an
-   offline Ops device only ever adds.
-8. **Scheduled sweeps.** Supabase Cron (`pg_cron` invoking an edge function) runs the background
-   work as a second entry point of the same service: removing orphans (bytes without a sidecar, a
-   sidecar without bytes, or a document no record refers to, left when a replacement stops between
-   repointing and removing), and rebuilding stale aggregates.
-9. **Packages are typed buckets.** A bucket holding a `manifest.json` (type, version, contents,
-   checksums) is a package: self-describing offline, transferable as one file, and archived as one
-   unit. Depth stays closed.
+1. **A fixed hierarchy.** `namespace ─* bucket ─* document`: three levels, each holding only the
+   next. Life-cycles nest: a namespace is settled and long-lived, a bucket is kept as long as its
+   consumer needs it, and a document's life is shorter than its bucket's. A document cannot exist
+   without its bucket, nor a bucket without its namespace.
+2. **Identity and names.** Every node has an id and a name. The id is identity: a UUID the kernel
+   mints, permanent, never read by people. The name is for people and is the only thing that
+   changes; a rename keeps identity. Names need not be unique among siblings.
+3. **Metadata is the model.** Every node has the same metadata: `{ id, name, createdAt, count }`,
+   where the count is what the node directly holds: a namespace's buckets, a bucket's documents, a
+   document's bytes. Listing a container's children is a separate operation. A document's content
+   type belongs to its bytes: it arrives with them, is served with them, and is recorded by the
+   consumer's own field, as `Attachment.contentType`. How a provider keeps metadata and lays out
+   storage (tables, sidecars, object metadata, key shapes) is the provider's, and invisible through
+   the API.
+4. **The address.** `{namespace}/{bucket}/{document}`, each segment a name or `id:{id}`, so a name
+   never begins with `id:`. Grammar validation needs only the address and runs in the kernel;
+   storage validation, whether it resolves, needs the store. A name address that matches more than
+   one document is ambiguous and does not resolve. Stored references use the id form; names are
+   for people and the CLI.
+5. **Placement.** A namespace is where the system takes advantage of what its provider offers:
+   site, storage class, caching, edge. Placement is chosen when the namespace is created, through
+   a placement provider that loads its configuration, and never changes. It is not metadata, and
+   no consumer sees it. Omitted, the default placement applies.
+6. **One kernel, three profiles.** One contract serves every consumer: the front profile
+   (browsers), the back profile (scripts, edge functions, services), and a broker if one is ever
+   needed, which implements the same contract over a provider. The kernel's feature set is the
+   minimum every consumer needs; a provider is as capable as it is, and a capability is exposed
+   only when its cost is worth paying, as `ui` exposes Kobalte and `shell` exposes TanStack.
+7. **Documents are immutable.** A document is added or removed; only its name changes. A
+   replacement is add, repoint, remove: the only shared state is the reference on the owning
+   record, an ordinary domain update.
+8. **Only empty containers are deleted.** Nothing is removed as a side effect: removing a bucket
+   means removing its documents first.
+9. **Read and link.** `read` returns a document's bytes to code, for processing. `link` returns a
+   short-lived URL the browser fetches itself, for display. A link's lifetime is the kernel's
+   default, no longer than the session that asked for it, and a link is never stored; it is minted
+   from the id when needed.
+10. **The CLI is the API.** `doc-store {noun} {verb}` maps one to one onto the contract.
 
 ## swarmAg's usage
 
-1. **A catalog.** swarmAg declares its namespaces as templates, and validation matches a path
-   against them, so paths stay readable and their shapes finite. Each namespace declares its
-   buckets: a record's bucket, keyed by a domain id, or a named bucket.
+1. **A catalog.** swarmAg declares its namespaces and, for each, the buckets it holds: a record's
+   bucket or a named bucket. How a record reaches its bucket is settled in the domain walk (design
+   moment 3).
 2. **A bucket is the unit of access and lifecycle.** What can be read, by whom, and how long it is
    kept are decided per bucket. A customer's bucket holds everything about that customer: the
    customer portal sees it, and it goes when the customer goes. A shared library (an asset type's
@@ -90,28 +91,31 @@ piece.
 
 The repository's rule for the backend holds for storage: what can be a direct operation under RLS
 is not an edge function (`architecture-back.md` §3). Supabase Storage enforces RLS on
-`storage.objects` on the server, so policies cover the broker's two reasons in M-5: they check the
-path's namespace and owner segments and the caller's role where no client can bypass them, and the
-client reaches the provider through a maker, as the CRUD clients do.
+`storage.objects` on the server, so policies give M-5 its server-side check, and the client
+reaches the provider through a maker, as the CRUD clients do.
 
 **M-5 builds:**
 
-- The closed hierarchy and the logical `DocumentPath` (platform points 1–3), and the catalog's M-5
-  entries (usage 5).
-- `ApiDocumentContract` and `makeSupabaseDocumentClient`, selected by maker (point 4).
+- The kernel contract and the address grammar (platform points 1–4, 6–9), with the default
+  placement only (point 5).
+- A Supabase maker serving the front and back profiles.
+- The CLI (point 10).
+- The catalog's M-5 entries (usage 5).
 - Storage policies as the server-side check, with buckets and configuration owned by the
   repository (DevOps 1–3, 7).
-- Immutable documents (point 7): `create`, `commit`, `read`, `list`, and `delete`; a replacement
-  is add, repoint, remove.
 
 **Each later piece arrives with its consumer:**
 
-| Piece                 | Arrives with                                                            |
-| --------------------- | ----------------------------------------------------------------------- |
-| The broker (point 5)  | An alternative provider: S3 and MinIO need presigned URLs from a server |
-| Sidecars (point 6)    | Survey properties (bounds, CRS, bands) beyond the provider's metadata   |
-| Cron sweeps (point 8) | The broker's two-step create and commit                                 |
-| Packages (point 9)    | Field mapping                                                           |
+| Piece                                    | Arrives with                                                            |
+| ---------------------------------------- | ----------------------------------------------------------------------- |
+| The broker                               | An alternative provider: S3 and MinIO need presigned URLs from a server |
+| Placement providers                      | The first namespace that needs other than the default placement         |
+| A caller-supplied id on `create`         | Bulk upload, or ids minted before storage                               |
+| A `link` lifetime argument               | A consumer that needs a link other than the session's                   |
+| Renditions, a `link` option              | A view that needs smaller images than the originals                     |
+| Document properties (bounds, CRS, bands) | Field mapping                                                           |
+| Packages                                 | Field mapping                                                           |
+| Sweeps                                   | Orphaned documents that cost enough to collect                          |
 
 ## Document types
 
@@ -155,61 +159,84 @@ signed paper, and the field that refers to it says which form it is. Every docum
 
 ## API sketch
 
-Names proposed; the shape follows the architecture. Two contracts, because the multi-cloud seam
-is not the seam the client calls. `DocumentPath` follows `Id`'s pattern, one producer and one
-guard, as a `NominalType` (`effort/completed/2026-10-27-nominal-types-brief.md` adds it); nothing here
-waits on a nominal `Id`. In M-5 the client contract is
-implemented by `makeSupabaseDocumentClient`; the provider contract arrives with the broker.
+Names proposed; the shape follows the architecture. A common contract carries what every node
+shares, and each level's contract adds only its difference: its `create`, and for documents `read`
+and `link`. The kernel mints ids, validates names
+and addresses, and hands a provider only valid input.
 
 ```ts
-/** Logical accessor: `${namespace}/${bucket}/${id}`, the namespace a path; never a physical URL. */
-declare const documentPathBrand: unique symbol
-export type DocumentPath = NominalType<string, typeof documentPathBrand>
+/** Every node's metadata; count is what the node directly holds: buckets, documents, or bytes. */
+type NodeMetadata = { id: Id; name: string; createdAt: When; count: number }
 
-/** The source of truth for one document: provider metadata in M-5, a sidecar later. */
-export type DocumentMetadata = {
-  id: Id
-  path: DocumentPath
-  filename: string
-  contentType: string
-  size: number
-  createdAt: When
-  properties: Dictionary // read on arrival: geo bounds, CRS, position, bands
+type DocumentLink = { url: string; expiresAt: When }
+
+type AddressSegment = { name: string } | { id: Id } // string form: {name} | id:{id}
+type AddressTarget = { namespace: AddressSegment; bucket: AddressSegment; document: AddressSegment }
+type DocumentAddress = string | AddressTarget
+
+/** The address grammar: needs no store, shared by every profile. */
+const DocumentAddress = {
+  parse(address: string): AddressTarget
+  format(target: AddressTarget): string
+  validate(segment: AddressSegment): boolean
 }
 
-/** Short-lived, provider-signed access to bytes. */
-export type DocumentTransfer = { url: string; protocol: 'single' | 'resumable'; expiresAt: When }
-
-/** Client contract: a client maker in M-5, the service once the broker arrives. */
-export interface ApiDocumentContract {
-  create(
-    namespace: string,
-    bucket: string, // a domain id or a name, as the catalog declares
-    file: DocumentFile
-  ): Promise<{ path: DocumentPath; upload: DocumentTransfer }>
-  commit(path: DocumentPath): Promise<DocumentMetadata>
-  read(path: DocumentPath): Promise<{ meta: DocumentMetadata; download: DocumentTransfer }>
-  list(namespace: string, bucket: string): Promise<readonly DocumentMetadata[]>
-  delete(path: DocumentPath): Promise<DeleteResult>
+/** Common to every node: identity, naming, listing within a parent, removal. */
+interface StoreNodeContract<ParentId = void> {
+  get(id: Id): Promise<NodeMetadata>
+  list(parentId: ParentId): Promise<readonly NodeMetadata[]>
+  update(id: Id, name: string): Promise<NodeMetadata> // rename only
+  delete(id: Id): Promise<DeleteResult> // containers: empty only
 }
 
-/** Provider contract: the multi-cloud seam, held only by the service; arrives with the broker. */
-export interface DocumentStoreContract {
-  signUpload(key: string, file: DocumentFile): Promise<DocumentTransfer>
-  signDownload(key: string): Promise<DocumentTransfer>
-  readObject(key: string): Promise<string | null>
-  writeObject(key: string, body: string): Promise<void>
-  listKeys(prefix: string): Promise<readonly string[]>
-  remove(key: string): Promise<void>
+interface NamespaceContract extends StoreNodeContract {
+  create(name: string, placement?: string): Promise<NodeMetadata>
+}
+
+interface BucketContract extends StoreNodeContract<Id> {
+  create(namespaceId: Id, name: string): Promise<NodeMetadata>
+}
+
+interface DocumentContract extends StoreNodeContract<Id> {
+  create(bucketId: Id, body: Blob, name?: string): Promise<NodeMetadata>
+  read(id: Id): Promise<Blob>
+  link(id: Id): Promise<DocumentLink>
+}
+
+/** The kernel: the named hierarchy, and address resolution across it. */
+interface ApiDocStoreContract {
+  namespace: NamespaceContract
+  bucket: BucketContract
+  document: DocumentContract
+  resolve(address: DocumentAddress): Promise<NodeMetadata>
 }
 ```
 
-Creating is two steps: `create` reserves the path and signs the upload; `commit` runs after the
-bytes land, verifies them, reads their properties, and writes the sidecar. A sidecar without bytes
-cannot exist, so sweeps remove only uncommitted bytes. In M-5, `create` signs the upload in the
-client under RLS, which Supabase supports, and `commit` reads the stored object's metadata, so the
-contract does not change when the broker arrives. `list` is the on-demand aggregate. Type
-names spell out `Metadata`; variables and fields may use `meta`.
+A document's name defaults to its file's name. `get` is metadata; `read` is bytes; `link` is a
+URL for the browser.
+
+The CLI is `doc-store {noun} {verb}`:
+
+| Noun      | Verb   | Arguments                            | Returns              |
+| --------- | ------ | ------------------------------------ | -------------------- |
+| namespace | create | `--name [--placement]`               | NodeMetadata         |
+| namespace | get    | `--namespace-id`                     | NodeMetadata         |
+| namespace | list   |                                      | NodeMetadata[]       |
+| namespace | update | `--namespace-id --name`              | NodeMetadata         |
+| namespace | delete | `--namespace-id`                     | DeleteResult         |
+| bucket    | create | `--namespace-id --name`              | NodeMetadata         |
+| bucket    | get    | `--bucket-id`                        | NodeMetadata         |
+| bucket    | list   | `--namespace-id`                     | NodeMetadata[]       |
+| bucket    | update | `--bucket-id --name`                 | NodeMetadata         |
+| bucket    | delete | `--bucket-id`                        | DeleteResult         |
+| document  | create | `--bucket-id --file [--name]`        | NodeMetadata         |
+| document  | get    | `--document-id`                      | NodeMetadata         |
+| document  | list   | `--bucket-id`                        | NodeMetadata[]       |
+| document  | read   | `--document-id [--out]`              | the bytes            |
+| document  | link   | `--document-id`                      | DocumentLink         |
+| document  | update | `--document-id --name`               | NodeMetadata         |
+| document  | delete | `--document-id`                      | DeleteResult         |
+| —         | resolve | `{address}`                        | NodeMetadata         |
 
 ## DevOps
 
@@ -249,18 +276,13 @@ The production is Foundation mode and reads the DevOps context beside Base.
 
 ## Design moments
 
-1. **The path's form. Settled.** `{namespace}/{bucket}/{id}`, where the namespace is a path, parsed
-   from the right (platform point 1). It is a path in the sense an S3 key is: a flat string whose
-   `/` delimits a hierarchy, so a sorted listing reads as the hierarchy, and listing a bucket is a
-   prefix listing. Document ids are UUID v7, so a bucket lists in creation order. No scheme: a
-   `doc://` prefix is not part of a path, and the nominal type and separate fields already tell a
-   path from a URL. No extension: the content type lives in the metadata. The filename lives in the
-   metadata too, so a download takes it from there. `documentPath({ namespace, bucket, id })` is
-   the producer and `isDocumentPath` the guard, as for `Id`.
+1. **The model, the address, and the API. Settled 2026-10-29.** Platform points 1–10 and the API
+   sketch.
 2. **Lease duration. Withdrawn:** documents are immutable (point 7).
-3. **`Attachment` and `ChemicalLabel`.** `url` becomes `path: DocumentPath`; whether `Attachment`'s
-   `filename` and `contentType` duplicate the sidecar. The Chemical labels editor and `sdsUrl`'s
-   storage integration, deferred by the managers brief, land here.
+3. **Consumers.** No domain change is assumed: a `url` names a potentially remote resource. What a
+   consumer's field holds for a stored document, and how a record reaches its bucket, are settled
+   in the domain walk. The Chemical labels editor and `sdsUrl`'s storage integration, deferred by
+   the managers brief, land here.
 4. **The catalog's M-5 entries:** chemicals (labels, the SDS, signed regulatory forms), assets
    (purchase orders, service records), and asset types (manuals, part diagrams). For each: the
    namespace, its buckets, and whether a bucket is a record or named; and where the catalog lives.
@@ -312,3 +334,12 @@ opens them for this brief's production, recorded here, as he does `domain/`.
   the bucket became one segment, a record's id or a name, and the unit of access and lifecycle; and
   the fixed three-level depth gave way to a hierarchy closed by kind. Buckets by owner (2026-10-24)
   remain one bucket kind.
+- **2026-10-29, the kernel.** The draft's platform described storage layout: a slash-delimited key
+  whose leading segments, any number of them, named the namespace; sidecars; a two-step create and
+  commit; and a provider contract of keys and signed transfers. Working from the consumers inward
+  and from common practice outward, the platform became a model and a kernel API over it, and layout
+  became the provider's. The hierarchy is fixed at three levels; every node has an id and a name,
+  and only the name changes; the address takes names or ids per segment; a namespace is where
+  placement binds; and `create` takes the bytes, so commit, transfers, and the provider contract
+  left the kernel. Field capture travels in the job upload, which chooses its own environment, so
+  the kernel needs no offline queue, and photos are not scaled on the device.
