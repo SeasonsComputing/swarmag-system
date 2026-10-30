@@ -76,12 +76,15 @@ elements, and the validator checks ranges, which rejects every swapped Texas coo
 
 1. **A geometry type** beside `Location`'s point: point, line, and polygon.
 2. **Zone and pin** abstractions, and the intent catalog (protect, remove, spray).
-3. **A survey** owned by the job: capture time, sensor, bands, and its map's `DocumentPath`. Name
-   open (`Survey`, `Reconnaissance`).
+3. **A survey** owned by the job: capture time, sensor, bands, and a reference to its map. Name
+   open (`Survey`, `Reconnaissance`). _Amended 2026-10-30:_ `DocumentPath` is superseded; a stored
+   reference is an id-form address under the `docs:` scheme (attachments brief).
 4. **Photo steps by composition.** The closed set of question types is generative: a photo step is
    a select question whose option requires a photo. `SelectOption.requiresNote` becomes something
    like `requires: 'note' | 'attachment'`.
-5. **`ChemicalLabel.url` and `Attachment.url`** become `DocumentPath`s (document storage brief).
+5. ~~**`ChemicalLabel.url` and `Attachment.url`** become `DocumentPath`s (document storage
+   brief).~~ _Superseded 2026-10-29:_ a `url` stays a URL, and a stored document's is a `docs:`
+   reference, with no domain change (`effort/active/2026-10-29-attachments-brief.md`).
 
 ## Design moments
 

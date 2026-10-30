@@ -234,7 +234,7 @@ names `job-runner/` as its own directory, distinct from `job-assessment/`/`job-p
 the architecture anticipated this as a separate concern, not a sub-case of Job Definition.
 
 **Not a synchronization problem — the architecture already ruled that out.**
-`architecture-core.md` §9 and invariant §10.1.5 already decide this: Job Plan is locked/immutable
+`architecture-core.md` §9 and invariant §11.1.5 already decide this: Job Plan is locked/immutable
 the moment execution starts, `JobWorkLogEntry` is append-only, and log upload is explicitly "not
 synchronization — a one-way append operation." No conflict resolution, no last-write-wins, no
 distributed transaction coordination — the design deliberately avoids needing any of that. What's

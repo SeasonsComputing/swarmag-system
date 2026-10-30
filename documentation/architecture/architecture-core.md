@@ -725,40 +725,126 @@ boundary; log upload meets the live record.
 The current production gates all applications on online preparation. Ops' device-held User and
 offline preparation path ship with the job runner (roadmap §8).
 
-## 10. Architectural Invariants
+## 10. Document Storage
+
+The system stores images and documents (labels, safety data sheets, manuals, photos, signed forms,
+and survey maps) in a document store: a kernel in `core/db` over replaceable providers. The store
+knows nothing of the domain; a record refers to a stored document by reference, and what the
+document means belongs to the field that refers to it.
+
+### 10.1 Model
+
+- **A fixed hierarchy.** `namespace ─* bucket ─* document`: three levels, each holding only the
+  next. Life-cycles nest: a namespace is long-lived, a bucket lasts as long as its consumer needs
+  it, and a document cannot exist without its bucket, nor a bucket without its namespace.
+- **Identity is lineage.** Every node has a UUID, minted by the kernel; a document's may be
+  supplied by the caller, since its identity may exist before its bytes are stored. Nothing
+  moves, so a node's identity is its lineage: its namespace's id, its bucket's, and its own.
+- **Only the name changes.** Every node has a name, for people; a rename keeps identity, and names
+  need not be unique among siblings.
+- **One metadata shape.** Every node has `{ id, name, createdAt, count }`, where the count is what
+  the node directly holds: buckets, documents, or bytes.
+- **Documents are immutable.** A document is added or removed. A replacement is add, repoint,
+  remove: the only shared state is the reference on the owning record.
+- **Only empty containers are deleted.** Nothing is removed as a side effect. The store removes its
+  nodes and bytes physically: soft delete (§3.2.5) governs the domain's life-cycle entities, and a
+  store node is not one.
+
+### 10.2 Addresses and Identities
+
+An address is `{namespace}/{bucket}/{document}`, one to three segments, each a name or `id:{id}`.
+Names are for people and the CLI; ids are for code.
+
+- **Each level's identity is a nominal type** (`NamespaceId`, `BucketId`, `DocumentId`), and only
+  the store produces one. Each contract's results carry its own level's identity.
+- **`resolve` is for names.** Each level resolves addresses at its own depth, so the caller states
+  the level it expects; an ambiguous name does not resolve.
+- **A stored reference is an id-form address.** It never uses names, so a rename never breaks it,
+  and the grammar turns it into an identity with no lookup. A document that no longer exists fails
+  at the `read` or `link` that needed it.
+
+```typescript
+// A person's address, by name: the store resolves it
+const label = await store.document.resolve('chemicals/labels/label.pdf')
+
+// A stored reference, by id: the grammar alone
+const link = await store.document.link(DocumentAddress.id(reference))
+```
+
+### 10.3 Kernel and Providers
+
+- **The kernel** mints ids, validates names and addresses, resolves addresses, and produces the
+  nominal identities. A provider receives and returns plain lineage, and never sees an address.
+- **One kernel, three profiles.** One contract serves the browser, the back end (scripts, edge
+  functions, services), and a broker if one is ever needed. The kernel's feature set is the
+  minimum every consumer needs; a provider is as capable as it is, and a capability is exposed
+  only when its cost is worth paying.
+- **Placement.** A namespace is where placement binds: site, storage class, caching. It is chosen
+  when the namespace is created and never changes. Only the default placement exists today.
+- **Read and link.** `read` returns a document's bytes to code. `link` returns a short-lived URL the
+  browser fetches itself. A link's lifetime is a fixed default supplied when the kernel is
+  constructed, and a link is never stored: it is minted from the identity when needed.
+- **The CLI is the API.** `document-store {noun} {verb}` maps onto the contract, naming nodes by
+  address.
+
+### 10.4 Providers
+
+- **IndexedDB,** in the browser, needs nothing provisioned. Nodes and bytes are keyed by lineage,
+  each operation is one transaction, and a link is a `blob:` URL. Its storage belongs to the
+  browser profile: it is neither shared across devices nor authorized by a server, and it asks the
+  browser for persistent storage. It stages documents locally before they reach a shared store.
+- **Supabase** keeps its nodes in Supabase Storage itself: a namespace is a Supabase bucket, a
+  bucket a key prefix, and a document an object, its name in the object's metadata. Storage
+  policies are its server-side check. It is designed and not yet built.
+
+### 10.5 Survey Maps
+
+Survey maps are the store's largest consumer, and none of what they need is built; each piece
+arrives with field mapping (`effort/pending/2026-10-24-field-mapping-brief.md`).
+
+- **Volume.** A survey flight writes thousands of raw multispectral captures, several gigabytes.
+  Processing yields per-band reflectance and index maps (NDVI, NDRE) as Cloud-Optimized GeoTIFFs.
+- **Tiers bind through placement.** Display-resolution maps go to the shared store; full-resolution
+  products and raw captures stay on a locally hosted archive, which an S3 provider serves. Keeping
+  raw data is the reversible choice; discarding it is not.
+- **What arrives with them:** resumable uploads for large files, batch import of a flight,
+  document properties (bounds, coordinate reference system, bands), packages (one flight's maps
+  and their manifest), and the broker a provider needs when a server must sign its transfers.
+
+## 11. Architectural Invariants
 
 These rules must never be violated. Code that violates these invariants is wrong, regardless of whether it "works."
 
-### 10.1 Core Invariants
+### 11.1 Core Invariants
 
-#### 10.1.1 Domain is pure
+#### 11.1.1 Domain is pure
 
 - Domain layer (`source/domain/`) has no infrastructure dependencies
 - Domain depends only on `@core/std` (Id, When, Dictionary types)
 - No references to HTTP, SQL, storage, or runtime concerns
 - Validators, protocols, and adapters all remain infrastructure-agnostic
 
-#### 10.1.2 API namespace is the boundary
+#### 11.1.2 API namespace is the boundary
 
 - UX applications import from `@front/api/api.ts`, never from backend or storage libraries
 - Applications never import `@supabase/client`, IndexedDB APIs, or edge functions directly
 - The API namespace composes clients using maker factories, not runtime provider selection
 
-#### 10.1.3 Adapters are serialization boundaries
+#### 11.1.3 Adapters are serialization boundaries
 
 - Adapters live in `source/domain/adapters/`
 - Convert between storage representations (Dictionary) and domain abstractions
 - Shared by all storage mechanisms (Supabase, IndexedDB, HTTP)
 - No adapter contains business logic or validation
 
-#### 10.1.4 Authorization at database layer
+#### 11.1.4 Authorization at database layer
 
 - Row Level Security (RLS) policies enforce authorization
 - Authorization rules live in migrations, not application code
 - Cannot be bypassed by client code
 - Applies uniformly across all access paths
 
-#### 10.1.5 Offline is first-class
+#### 11.1.5 Offline is first-class
 
 - Offline execution via deep clones, not degraded sync mode
 - Job Plans locked during execution (immutable)
@@ -766,7 +852,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 - Field execution requires network only for clone preparation and log upload
 - Session preparation precedes authenticated rendering; online and offline policy follows §9.5
 
-#### 10.1.6 Soft delete via Instantiable
+#### 11.1.6 Soft delete via Instantiable
 
 - All life-cycle abstractions extend `Instantiable` from `@core/std`, which carries `id`, `createdAt`, `updatedAt`, `deletedAt?`
 - Do not redeclare these fields inline — extend via intersection
@@ -778,7 +864,7 @@ These rules must never be violated. Code that violates these invariants is wrong
 - Hard deletes only under explicit data retention policies
 - Exceptions: append-only logs and pure join tables
 
-#### 10.1.7 Edge functions stay flat
+#### 11.1.7 Edge functions stay flat
 
 - Supabase Edge Functions authored in `source/back/supabase-edge/functions/`
 - No subdirectories; each function is a single file
@@ -786,7 +872,7 @@ These rules must never be violated. Code that violates these invariants is wrong
   `supabase/functions/` (`architecture-back.md` section 3.4)
 - Functions are thin orchestration wrappers, not business logic
 
-#### 10.1.8 Import maps only
+#### 11.1.8 Import maps only
 
 - All cross-boundary imports use path aliases (`@core/`, `@domain/`, `@front/`, `@ux/`)
 - No relative imports across top-level namespaces
@@ -795,21 +881,21 @@ These rules must never be violated. Code that violates these invariants is wrong
   `supabase/functions/import_map.json`, generated/synced by
   `deno task edge-sync` — see `architecture-back.md` §3.4/§7.1)
 
-#### 10.1.9 Regenerable infrastructure
+#### 11.1.9 Regenerable infrastructure
 
 - Infrastructure code derivable from domain, schema, and contracts
 - If deleting infrastructure loses meaning, something upstream is wrong
 - Adapters, clients, providers are all mechanically regenerable
 - Meaning lives in `domain/`, not implementation
 
-#### 10.1.10 Conservative interpretation
+#### 11.1.10 Conservative interpretation
 
 - When intent is unclear, favor doing nothing over doing the wrong thing
 - Stop and escalate rather than proceeding with assumptions
 - Applies to both human and AI contributors
 - Fast-fail configuration over defensive programming
 
-### 10.2 Enforcement
+### 11.2 Enforcement
 
 These invariants are enforced through:
 
@@ -820,9 +906,9 @@ These invariants are enforced through:
 
 When invariants conflict with convenience, **invariants win**.
 
-## 11. Evolution & Maintenance
+## 12. Evolution & Maintenance
 
-### 11.1 Adding New Domain Concepts
+### 12.1 Adding New Domain Concepts
 
 1. Update `domain-model.md` (solution space, then domain model)
 2. Implement domain abstractions, validators, protocols, and adapters
@@ -833,7 +919,7 @@ When invariants conflict with convenience, **invariants win**.
 
 Domain changes flow unidirectionally through the system.
 
-### 11.2 Adding New API Clients
+### 12.2 Adding New API Clients
 
 New clients are added by composing makers in `source/front/api/api.ts`:
 
@@ -842,7 +928,7 @@ New clients are added by composing makers in `source/front/api/api.ts`:
 3. **Configure specification** - Provide table name, store name, or endpoint path
 4. **Test full life-cycle** - Verify create, read, update, delete, list operations
 
-#### 11.2.1 Example
+#### 12.2.1 Example
 
 ```typescript
 // source/front/api/api.ts
@@ -861,7 +947,7 @@ export const api = {
 
 Existing UX applications immediately have access to the new client via `api.Services`.
 
-### 11.3 Deprecation
+### 12.3 Deprecation
 
 Code is deleted, not commented out:
 
