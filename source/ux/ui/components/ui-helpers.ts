@@ -30,9 +30,11 @@ UiText               Text conversions for control values and display text.
 ├ number             Text to number.
 ├ label              kebab-case to display text.
 ├ untitled           Blank value to a consumer-supplied label.
+├ relativeTime       Timestamp relative to now, in local time.
 └ from               Number to text.
 */
 
+import type { When } from '@core/std'
 import type { JSX } from '@solid-js'
 
 // ────────────────────────────────────────────────────────────────────────────
@@ -131,11 +133,91 @@ const untitled = (value: string, fallback: string): string => value.trim() || fa
  */
 const from = (value: number | undefined): string => value === undefined ? '' : value.toString()
 
+/**
+ * Formats a past timestamp relative to now, using local calendar days and time.
+ *
+ * @param value The timestamp to display.
+ * @returns Relative text formatted based on elapsed time:
+ *
+ * +-------------------+---------------------------------------------+
+ * | Elapsed Time      | Output Format Example                       |
+ * +-------------------+---------------------------------------------+
+ * | < 1 minute        | Just now                                    |
+ * | Today             | 5 minutes ago / 2 hours ago                 |
+ * | Yesterday         | Yesterday at 3:15 in the evening            |
+ * | Past 7 days       | Monday at 3:15 in the evening               |
+ * | Older timestamps  | October 24th at 3:15 PM                     |
+ * +-------------------+---------------------------------------------+
+ */
+const relativeTime = (value: When): string => {
+  // Helper: format time with "in the morning / evening"
+  const formatTimeWithPeriod = (d: Date): string => {
+    const timeStr = d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+    return timeStr
+      .replace(/\s*AM/i, ' in the morning')
+      .replace(/\s*PM/i, ' in the evening')
+  }
+
+  // Handle now
+  const date = new Date(value)
+  const now = new Date()
+  const elapsed = now.getTime() - date.getTime()
+  if (elapsed < 60_000) return 'Just now'
+
+  // Handle today (earlier today)
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  if (date >= today) {
+    const relative = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
+    return elapsed < 3_600_000
+      ? relative.format(-Math.trunc(elapsed / 60_000), 'minute')
+      : relative.format(-Math.trunc(elapsed / 3_600_000), 'hour')
+  }
+
+  // Handle yesterday
+  const yesterday = new Date(today)
+  yesterday.setDate(yesterday.getDate() - 1)
+  if (date >= yesterday && date < today) {
+    return `Yesterday at ${formatTimeWithPeriod(date)}`
+  }
+
+  // Handle within the past 7 days (show weekday name + time)
+  const dayInMs = 24 * 3600 * 1000
+  if (elapsed < 7 * dayInMs) {
+    const weekday = date.toLocaleDateString(undefined, { weekday: 'long' })
+    return `${weekday} at ${formatTimeWithPeriod(date)}`
+  }
+
+  // Helper for ordinal day suffixes (1st, 2nd, 3rd, 4th, etc.)
+  const getOrdinalSuffix = (day: number): string => {
+    if (day > 3 && day < 21) return 'th'
+    switch (day % 10) {
+      case 1:
+        return 'st'
+      case 2:
+        return 'nd'
+      case 3:
+        return 'rd'
+      default:
+        return 'th'
+    }
+  }
+
+  const month = date.toLocaleDateString(undefined, { month: 'long' })
+  const dayNum = date.getDate()
+  const dayStr = `${dayNum}${getOrdinalSuffix(dayNum)}`
+  const standardTimeStr = date.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })
+  const yearStr = date.getFullYear() !== now.getFullYear() ? `, ${date.getFullYear()}` : ''
+
+  // Fallback to absolute date/time format for older timestamps (using standard AM/PM)
+  return `${month} ${dayStr}${yearStr} at ${standardTimeStr}`
+}
+
 /** Text conversions for a control's string value and the display text derived from it. */
 export const UiText = {
   optional,
   number,
   label,
   untitled,
+  relativeTime,
   from
 }
