@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.7)
+# Software Construction Conventions (1.8)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.7
-- Published: 2026 October 28th
+- Version: 1.8
+- Published: 2026 October 30th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -809,6 +809,27 @@ const session = await Auth.verifyOtp(email, code)
 const unsubscribe = Auth.onAuthStateChange(session => …)
 ```
 
+### 10.8 Document store
+
+`ApiDocumentStoreContract` (`@core/db/document-store-contract.ts`) stores documents in a fixed
+hierarchy, namespace, bucket, and document, over a provider. Application code reaches documents
+only through it, never through a provider or the provider's backend.
+
+- A node's identity is its lineage, one nominal type per level (`NamespaceId`, `BucketId`,
+  `DocumentId`). Only the store produces them: code gets an identity from the store's results or
+  from a stored reference, and never builds one.
+- A stored reference is an address in id form. Never store a name address, which a rename breaks.
+- `DocumentAddress.id` turns a stored reference into a `DocumentId` with no lookup. `resolve` is
+  for names, and each level resolves at its own: a document's address goes to `document.resolve`.
+- Never store a link; mint it when it is displayed.
+- A provider receives and returns plain lineage and never sees an address; the kernel produces
+  the nominal identities.
+
+```typescript
+const manual = await store.document.resolve('manuals/pumps/install.pdf')
+const link = await store.document.link(DocumentAddress.id(reference))
+```
+
 ## 11. Runtime Configuration
 
 Configuration is one `Config` singleton (`@core/cfg/config.ts`) with a runtime provider injected
@@ -886,6 +907,8 @@ Local data lives in the browser's IndexedDB, reached through clients.
 - `IndexedDb` (`@core/db/indexeddb.ts`) owns the connection for the active local database and its
   registered stores. `makeCrudIndexedDbClient` registers its store; application code never
   touches `IndexedDb` directly.
+- A store may declare its key path and indexes when it registers; a store that declares neither
+  keeps the default key path, `id`.
 - An object store for a domain abstraction is named for the abstraction (`Job`, `Workflow`).
 - `Preferences` (`@core/cli/preferences.ts`) persists small key and value settings.
 - The local database name comes from configuration (`LOCAL_DB_NAME`, §11).
@@ -1338,6 +1361,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.8     | 2026 October 30th   | New §10.8 Document store: the store is reached only through `ApiDocumentStoreContract`; a node's identity is its lineage, one nominal type per level, produced only by the store; a stored reference is an id-form address, turned into an identity by `DocumentAddress.id` without a lookup, while `resolve` serves names at each level's own depth; links are never stored; providers see plain lineage, never addresses. §13: a store may declare its key path and indexes when it registers.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.7     | 2026 October 28th   | §17.2: a collection row presents its Item through `PanelRowIdentity`, a title, an optional subtitle, and an optional annotation in decreasing prominence; the component owns each line's style and the provider its content.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | 1.6     | 2026 October 28th   | §10.6: a list of owners reads its junction partners in one set-based read (`partnersOf`), never one read per owner.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
 | 1.5     | 2026 October 28th   | §17.2: a provider whose save spans more than one write declares it with `makeAggregateSave` (`create`, `update`, `complete`), one delegate per editor session, so a retry after a failed `complete` updates the pending record and never creates another.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
