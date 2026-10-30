@@ -72,7 +72,7 @@ piece.
    short-lived URL the browser fetches itself, for display. A link's lifetime is the kernel's
    default, no longer than the session that asked for it, and a link is never stored; it is minted
    from the id when needed.
-10. **The CLI is the API.** `doc-store {noun} {verb}` maps one to one onto the contract.
+10. **The CLI is the API.** `document-store {noun} {verb}` maps one to one onto the contract.
 
 ## Code
 
@@ -172,7 +172,7 @@ interface DocumentContract extends StoreNodeContract<Id> {
 }
 
 /** The kernel: the named hierarchy, and address resolution across it. */
-interface ApiDocStoreContract {
+interface ApiDocumentStoreContract {
   namespace: NamespaceContract
   bucket: BucketContract
   document: DocumentContract
@@ -186,7 +186,7 @@ is private to the grammar, and the kernel applies it on every `create` and `upda
 `parse` produce the same value, so the kernel walks one form whether an address came from code or
 from a person.
 
-The CLI is `doc-store {noun} {verb}`:
+The CLI is `document-store {noun} {verb}`:
 
 | Noun      | Verb    | Arguments                            | Returns         |
 | --------- | ------- | ------------------------------------ | --------------- |
