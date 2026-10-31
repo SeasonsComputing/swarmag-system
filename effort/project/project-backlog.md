@@ -56,6 +56,17 @@ only what is specific to the domain. `domain-archetypes.md` still cites "`CONVEN
 Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close of
 `effort/completed/2026-10-03-core-reconciliation-brief.md`.
 
+### B-39 · `project-user-stories.md` no longer reflects the product
+
+**Observed:** 2026-10-31 · normal
+
+Its themes predate decisions made since. §3 Asset Maintenance and §4 Chemical Maintenance describe
+manager work that has shipped, while maintenance itself became a dedicated workbench, parked as
+P-8. The Job Definition sections (§2.3–§2.9) are empty. Features decided since, such as the Field
+Binder (`effort/pending/2026-10-31-document-storage-policy-brief.md`), have no story. The roadmap
+draws on the user stories (`EFFORT.md` §3), so bring them current before the next milestone is
+placed from them.
+
 ### B-33 · The domain SDK genesis prompt omits backend seed authority
 
 **Observed:** 2026-10-23 · normal
