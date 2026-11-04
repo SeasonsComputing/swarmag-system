@@ -4,7 +4,8 @@
 storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, which is the kernel and the
 contract this provider implements. The upload brief,
 `effort/active/2026-10-30-document-upload-brief.md`, depends on this one for the shared store its
-drains fill. It is last of three features of roadmap M-6, Document Storage. Awaits the design
+drains fill. It is third of four features of roadmap M-6, Document Storage, and provides
+`DocumentServer`, the shared store each app composes (the attachments brief). Awaits the design
 moments, CA review, and the production gate.
 
 ## What triggered it
@@ -56,7 +57,9 @@ so every id locates its node directly.
 7. **Rename is one function.** Storage's API cannot update `user_metadata` after upload, so a
    Postgres function updates it, called by RPC: the provider's only code in `back/`.
 8. **Idempotent create.** A document's create uploads without overwrite; if its object already
-   exists, the create returns the existing document.
+   exists, the create returns the existing document. Namespaces and buckets take supplied ids too
+   (the attachments brief's platform prerequisites): a namespace's create returns the Supabase
+   bucket with that id if it exists, and a bucket's returns its existing marker.
 9. **Links.** `link` is a signed URL whose expiry, the kernel's default, is fixed when it is issued.
    A signed URL is not revocable.
 
@@ -140,6 +143,8 @@ The production is Foundation mode and reads the DevOps context beside Base.
    physically.
 6. **To verify,** before production: that listing returns `user_metadata`, and whether a Supabase
    bucket can be renamed.
+7. **The maker's name.** Whether `makeDocumentStoreSupabaseClient` takes a `name`, as the IndexedDB
+   maker does; on the server there is one store.
 
 ## Records
 
@@ -161,3 +166,6 @@ locked; the CA opens them for this brief's production, recorded here, as he does
   Supabase bucket's settings, and `back/` became the policies and one rename function. Locating a
   node by a bare id would have needed a second function; identity became lineage instead (the
   document storage brief, 2026-10-30).
+- **2026-11-04, `DocumentServer`.** The provider became `DocumentServer`, the shared store in each
+  app's composition, and its creates became idempotent at every level, for the supplied namespace
+  and bucket ids the catalog uses.

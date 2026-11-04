@@ -213,17 +213,25 @@ attaches and shares documents; field capture and its upload are the Ops applicat
   `effort/completed/2026-10-23-document-storage-brief.md`: the contract and `DocumentAddresses` in
   `core/std`, the kernel and `makeDocumentStoreIndexedDbClient` in `core/cli`, and key paths and
   indexes in the IndexedDB wrapper.
+- **Supplied ids and the maker's name** — the attachments brief's platform prerequisites, additive
+  `core/cli` changes before Attachments: optional supplied ids on namespace and bucket `create`,
+  idempotent on an existing id, and a required `name` on the IndexedDB maker.
 
-**Features**, in order; each builds and tests on IndexedDB until the last makes the store shared:
+**Features**, in order; each builds and tests on IndexedDB until the Supabase provider makes the
+store shared:
 
-1. **Attachments** (`effort/active/2026-10-29-attachments-brief.md`): the catalog, the inbox, the
-   editors (the Chemical labels editor and attachments on notes), and Admin capture, against a
-   second IndexedDB store, `Documents`.
-2. **Upload** (`effort/active/2026-10-30-document-upload-brief.md`): the Admin loop, draining the
-   inbox into `Documents`.
+1. **Attachments** (`effort/active/2026-10-29-attachments-brief.md`): `Attachment.documentAddress`,
+   `Attachments` in `front/api` with its catalog, the inbox, the editors (attachments on notes,
+   and the URL app control with the Chemical labels editor and the SDS field), and Admin capture,
+   against a second IndexedDB store, `DocumentServer`.
+2. **Upload** (`effort/active/2026-10-30-document-upload-brief.md`): the Admin loop, draining
+   `DocumentInbox` into `DocumentServer`.
 3. **The Supabase provider** (`effort/active/2026-10-30-document-store-supabase-brief.md`): the
-   shared store, swapped into `api` for `Documents`, its provisioning, and upload's access rules
-   written into its policies.
+   shared store, swapped into `api` for `DocumentServer`, its provisioning, and upload's access
+   rules written into its policies.
+4. **The Field Binder** (`effort/pending/2026-11-04-field-binder-brief.md`): the Admin workbench,
+   a feature of its own, and its copies in `DocumentServer`, fetched or uploaded. Its Ops side is
+   M-9's.
 
 ## M-7 · Workflow, Task, Question & Service
 
@@ -274,9 +282,16 @@ clients (`JobsLocal`/`JobAssessmentsLocal`/`JobPlansLocal`/`JobLogsLocal`), and
 `api.uploadJobLogs` — none built yet, but none requiring a design decision either. This is Job
 Runner's own prerequisite plumbing, not a separate milestone with its own feature payload.
 
-**Field documents** — from M-6: photo capture on the phone (a file input with `capture`) into the
-inbox, and the job upload that drains it into the shared store back at base, beside
-`api.uploadJobLogs` (`effort/active/2026-10-30-document-upload-brief.md`).
+**Field documents** — from M-6: each job clone's inbox, in `DocumentInbox`; the job runner's photo
+answer, captured on the phone (a file input with `capture`); and the job upload that drains the
+job's inbox into `DocumentServer` back at base, beside `api.uploadJobLogs`
+(`effort/active/2026-10-29-attachments-brief.md`,
+`effort/active/2026-10-30-document-upload-brief.md`). Whether a job's inbox is a namespace or a
+bucket is designed here.
+
+**The Field Binder, Ops side** — every Ops device mirrors the binder into its `FieldBinder` store
+when behind its version, and a crew opens a document offline
+(`effort/pending/2026-11-04-field-binder-brief.md`).
 
 ## M-10 · Customer Portal
 
