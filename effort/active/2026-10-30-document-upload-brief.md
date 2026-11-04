@@ -14,9 +14,10 @@ The attachments brief carried capture and upload together. They are different wo
 puts documents in the inbox; upload moves them to their destination, with judgment about the
 connection, and decides who may see them once the destination is shared.
 
-## Two drains
+## Drains
 
-The inbox knows nothing of apps; each app decides when it drains. A drain copies each document to
+Every app has an inbox (the attachments brief). The inbox knows nothing of apps; each app decides
+when it drains. A drain copies each document to
 `DocumentServer` at the same address, then clears it from the inbox. The address does not change:
 `Attachments` places every document at its final address when it enters the inbox, with fixed
 namespace ids and the owner's id as its bucket's (the attachments brief), so a record saved before
@@ -28,6 +29,7 @@ upload is already correct after it.
   the job's inbox. Photos travel with the job and drain back at base, a deliberate act that
   qualifies the connection first, on wi-fi by default, since the data plan is the worker's. The
   work log entries are written with them. It is recorded here because it drains the same inbox.
+- **Customer Portal: its own drain,** designed with the portal (roadmap M-10).
 
 ## Access
 

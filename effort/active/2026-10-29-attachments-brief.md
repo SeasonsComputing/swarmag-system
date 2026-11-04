@@ -98,15 +98,19 @@ Every need is the document store composed for one purpose, its lifecycle set by 
 | `FieldBinder`    | IndexedDB | by its contents (the Field Binder)      |
 | `DocumentServer` | Supabase  | shared and permanent                    |
 
-| App             | DocumentServer                 | DocumentInbox   | FieldBinder |
-| --------------- | ------------------------------ | --------------- | ----------- |
-| Admin           | shows, receives uploads        | the Admin inbox |             |
-| Ops             | shows, receives the job upload | the job inbox   | ✓           |
-| Customer Portal | shows shared documents         |                 |             |
+| App             | DocumentServer                 | DocumentInbox    | FieldBinder |
+| --------------- | ------------------------------ | ---------------- | ----------- |
+| Admin           | shows, receives uploads        | the Admin inbox  |             |
+| Ops             | shows, receives the job upload | the job inbox    | ✓           |
+| Customer Portal | shows shared documents         | the portal inbox |             |
 
 What each app may do through `DocumentServer` is the access rules', enforced by the Supabase
-policies. Admin and Ops are separate bundles on separate origins, so the same store name in both
-does not collide.
+policies. The apps are separate bundles on separate origins, so the same store name in each does
+not collide.
+
+- **Every app has an inbox.** Every upload goes to it; each app drains it its own way (the upload
+  brief). The simplicity of one rule for every app outweighs the cost of an inbox an app may never
+  fill.
 
 - **Different lifecycles, different stores.** The inbox empties as it uploads; the Field Binder
   follows its version. Namespaces of one store were considered and set aside for that reason.
@@ -131,13 +135,13 @@ is a singleton behind a contract in `front/api`, as `AppState` is, listed in `ap
 - **Find or create.** The owner's bucket is created on first attach; with supplied ids, creating an
   existing one returns it, so attaching never checks first.
 - **A topic is a member,** each with its own typed `attach`: the owner is a `Customer` for
-  Customers, a `Job` for Jobs, and none for a shared bucket. `link`, `remove`, and `upload` are the
+  Customers, a `Job` for Jobs, and none for a company-wide topic, whose bucket is shared. `link`, `remove`, and `upload` are the
   container's: an attachment carries its full address, so they need no topic.
 
 ```ts
 /** Fixed placements; private, as AppState's id is. */
 const CUSTOMERS = { id: toId('019a…'), name: 'Customers' }
-const TEMPLATES = { id: toId('019a…'), name: 'Templates' }
+const LIBRARY = { id: toId('019a…'), name: 'Library' }
 const WORKFLOWS = { id: toId('019a…'), name: 'Workflows' } // a shared bucket
 // …
 
@@ -145,7 +149,7 @@ const WORKFLOWS = { id: toId('019a…'), name: 'Workflows' } // a shared bucket
 export const Attachments: AttachmentsContract = {
   Customers: { attach: (customer: Customer, file: File) => … }, // bucket = customer.id
   Jobs: { attach: (job: Job, file: File) => … },
-  Workflows: { attach: (file: File) => … }, // the shared bucket, no owner
+  Assets: { attach: (file: File) => … }, // company-wide: a shared bucket, no owner
   // …
   link: (attachment) => …,
   remove: (attachment) => …,
@@ -159,16 +163,21 @@ await Attachments.link(attachment)
 **The catalog.** Every type that carries notes has a topic. Compositions without an id (a `Note`,
 a `CustomerSite`, an `Answer`) keep their documents in the owning record's bucket.
 
-| Topic     | Namespace | Bucket                   | Notes on                                                                                       |
-| --------- | --------- | ------------------------ | ---------------------------------------------------------------------------------------------- |
-| Customers | Customers | the customer's id        | Customer, CustomerSite                                                                         |
-| Jobs      | Jobs      | the job's id             | JobAssessment (`notes`, `risks`), JobPlan, JobPlanAssignment, the job's Workflow, Task, Answer |
-| Workflows | Templates | `Workflows`, fixed       | Workflow                                                                                       |
-| Tasks     | Templates | `Tasks`, fixed           | Task                                                                                           |
-| Services  | Services  | one shared bucket, fixed | Service                                                                                        |
-| Users     | Users     | the user's id            | User                                                                                           |
-| Assets    | Assets    | the asset's id           | Asset                                                                                          |
-| Chemicals | Chemicals | the chemical's id        | Chemical                                                                                       |
+A namespace is the unit of placement and policy: on the server, a Supabase bucket with its own
+access rules. Namespaces divide by policy, so company-wide documents, maintained in Admin and read
+by everyone, share one namespace, `Library`, a shared bucket per topic; a topic's records need no
+bucket of their own, as no one of them has its own access or lifecycle.
+
+| Topic     | Namespace | Bucket             | Notes on                                                                                       |
+| --------- | --------- | ------------------ | ---------------------------------------------------------------------------------------------- |
+| Customers | Customers | the customer's id  | Customer, CustomerSite                                                                         |
+| Jobs      | Jobs      | the job's id       | JobAssessment (`notes`, `risks`), JobPlan, JobPlanAssignment, the job's Workflow, Task, Answer |
+| Workflows | Library   | `Workflows`, fixed | Workflow                                                                                       |
+| Tasks     | Library   | `Tasks`, fixed     | Task                                                                                           |
+| Services  | Library   | `Services`, fixed  | Service                                                                                        |
+| Users     | Users     | the user's id      | User                                                                                           |
+| Assets    | Library   | `Assets`, fixed    | Asset                                                                                          |
+| Chemicals | Library   | `Chemicals`, fixed | Chemical                                                                                       |
 
 AssetType, Job, and Question carry no notes. An asset's or a chemical's attachments are its
 records (a seller's order, an invoice, a warranty, service records); its usage manual, SDS, and
@@ -176,8 +185,8 @@ labels are the Field Binder's.
 
 ## Capture
 
-1. **One inbox.** Every new file, from the camera, a picker, a drop, or a paste, enters
-   `DocumentInbox`. The inbox mints the document's id on entry, at its final address, so the record
+1. **The app's inbox.** Every new file, from the camera, a picker, a drop, or a paste, enters the
+   app's `DocumentInbox`. The inbox mints the document's id on entry, at its final address, so the record
    holds its `documentAddress` at once and can be saved immediately; the bytes follow. The inbox
    holds only what has not been uploaded, and clears each item once it is (the upload brief).
 2. **No second step.** Choosing a file attaches it; storing it is the system's. Admin adds files on
@@ -349,3 +358,9 @@ export const api = {
   declarations were data, and only creating a document needs a placement), and exported
   declarations made the fixed ids public. `Attachments` became one singleton behind a contract, as
   `AppState` is, its placements private and its topics members.
+- **2026-11-04, an inbox per app, and the Library.** Every app has an inbox, the Customer Portal
+  included, for one rule over the cost of an empty inbox. Assets and chemicals first had a bucket
+  per record, in namespaces of their own; their documents are company-wide, so they joined
+  Services, Workflows, and Tasks in one namespace, `Library`, with a shared bucket per topic, and
+  `Templates` was folded into it. `Manuals` was considered and rejected: manuals are the Field
+  Binder's.
