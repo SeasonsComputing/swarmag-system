@@ -42,6 +42,7 @@ export const makeDocumentStore = (
   provider: DocumentProviderContract,
   linkLifetime: number
 ): ApiDocumentStoreContract => {
+  /** A provider's metadata with its lineage produced as this level's nominal identity. */
   const metadata = <I extends NodeId>(
     row: LineageMetadata,
     produce: (node: Lineage) => I
@@ -52,6 +53,7 @@ export const makeDocumentStore = (
     count: row.count
   })
 
+  /** The operations every level shares, at its depth and producing its identity. */
   const common = <I extends NodeId, P extends Lineage | void>(
     depth: number,
     produce: (node: Lineage) => I
@@ -135,6 +137,7 @@ export const makeDocumentStore = (
   }
 }
 
+/** Validate a node name by the address grammar, failing as a 422 ApiError. */
 const readDocumentStoreName = (name: string): void => {
   try {
     DocumentAddresses.build(name)
@@ -144,12 +147,14 @@ const readDocumentStoreName = (name: string): void => {
   }
 }
 
+/** A child's lineage: its parent's lineage extended by its own id. */
 const childLineage = (parent: Lineage | null, child: Id): Lineage => {
   if (parent === null) return { namespace: child }
   if (parent.bucket === undefined) return { namespace: parent.namespace, bucket: child }
   return { namespace: parent.namespace, bucket: parent.bucket, document: child }
 }
 
+/** Parse an address, text or segments, by the grammar, failing as a 422 ApiError. */
 const readDocumentStoreAddress = (address: string | DocumentAddress): DocumentAddress => {
   try {
     return typeof address === 'string'

@@ -49,9 +49,17 @@ export const makeDocumentStoreIndexedDbClient = (
   return store
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// INTERNALS
+// ────────────────────────────────────────────────────────────────────────────
+
+/** A stored node: its lineage key, its parent's lineage, depth, name, and creation time. */
 type StoredNode = { lineage: Id[]; parent: Id[]; level: number; name: string; createdAt: When }
+
+/** A document's bytes, keyed by the document's lineage. */
 type StoredContent = { lineage: Id[]; body: Blob }
 
+/** The two object stores: nodes, indexed by parent and by parent and name; content, by lineage. */
 interface DocumentDatabase extends DBSchema {
   DocumentNodes: {
     key: Id[]
@@ -61,6 +69,7 @@ interface DocumentDatabase extends DBSchema {
   DocumentContent: { key: Id[]; value: StoredContent }
 }
 
+/** A transaction spanning both stores, so a node and its bytes commit or fail together. */
 type DocumentTransaction<Mode extends 'readonly' | 'readwrite' = 'readonly' | 'readwrite'> =
   IDBPTransaction<
     DocumentDatabase,
@@ -68,9 +77,12 @@ type DocumentTransaction<Mode extends 'readonly' | 'readwrite' = 'readonly' | 'r
     Mode
   >
 
+/** Provider over the browser's IndexedDB; every operation is one transaction over both stores. */
 class IndexedDbDocumentProvider implements DocumentProviderContract {
+  /** Persistent storage, requested once and never awaited; a refusal leaves best-effort storage. */
   #persistence: Promise<boolean> | undefined
 
+  /** Run one operation in a transaction, aborting it on any failure so no partial write commits. */
   async #run<T, Mode extends 'readonly' | 'readwrite'>(
     mode: Mode,
     operation: (tx: DocumentTransaction<Mode>) => Promise<T>
@@ -102,18 +114,25 @@ class IndexedDbDocumentProvider implements DocumentProviderContract {
     }
   }
 
+  /** Read a node's metadata. */
   async get(node: Lineage): Promise<LineageMetadata> {
     return await this.#run('readonly', async tx => this.#metadata(tx, await this.#node(tx, keyOf(node))))
   }
 
+  /** Match a parent's children by name; names need not be unique, so several may match. */
   async find(parent: Lineage | null, name: string): Promise<readonly LineageMetadata[]> {
     return await this.#children(parent, name)
   }
 
+  /** Read a parent's children. */
   async list(parent: Lineage | null): Promise<readonly LineageMetadata[]> {
     return await this.#children(parent)
   }
 
+  /**
+   * Create a node under an existing parent. A document already at that lineage is returned as it
+   * is, so a supplied id is idempotent; a container already there is a conflict.
+   */
   async create(node: Lineage, name: string, body?: Blob): Promise<LineageMetadata> {
     return await this.#run('readwrite', async tx => {
       const lineage = keyOf(node)
@@ -139,6 +158,7 @@ class IndexedDbDocumentProvider implements DocumentProviderContract {
     })
   }
 
+  /** Rename a node; only its name changes. */
   async update(node: Lineage, name: string): Promise<LineageMetadata> {
     return await this.#run('readwrite', async tx => {
       const row = await this.#node(tx, keyOf(node))
@@ -148,6 +168,10 @@ class IndexedDbDocumentProvider implements DocumentProviderContract {
     })
   }
 
+  /**
+   * Delete a node; a container only when empty, counted in the same transaction so no child can
+   * arrive between the check and the delete.
+   */
   async delete(node: Lineage) {
     return await this.#run('readwrite', async tx => {
       const lineage = keyOf(node)
@@ -161,6 +185,7 @@ class IndexedDbDocumentProvider implements DocumentProviderContract {
     })
   }
 
+  /** Read a document's bytes. */
   async read(node: Lineage): Promise<Blob> {
     return await this.#run('readonly', async tx => {
       await this.#node(tx, keyOf(node))
@@ -168,6 +193,7 @@ class IndexedDbDocumentProvider implements DocumentProviderContract {
     })
   }
 
+  /** Mint a `blob:` URL for a document, revoked when the kernel's expiry passes. */
   async link(node: Lineage, expiresAt: When): Promise<string> {
     const body = await this.read(node)
     const remaining = new Date(expiresAt).getTime() - Date.now()
@@ -177,6 +203,7 @@ class IndexedDbDocumentProvider implements DocumentProviderContract {
     return url
   }
 
+  /** Read a parent's children, all or those with one name; a null parent lists namespaces. */
   async #children(parent: Lineage | null, name?: string): Promise<readonly LineageMetadata[]> {
     return await this.#run('readonly', async tx => {
       const parentKey = parent === null ? [] : keyOf(parent)
@@ -189,18 +216,21 @@ class IndexedDbDocumentProvider implements DocumentProviderContract {
     })
   }
 
+  /** Read a node in the transaction; a missing node is not found. */
   async #node(tx: DocumentTransaction, lineage: Id[]): Promise<StoredNode> {
     const row = await tx.objectStore('DocumentNodes').get(lineage)
     if (row === undefined) throw new ApiError('Document store node not found', 404)
     return row
   }
 
+  /** Read a document's bytes in the transaction; a node without its bytes is a store fault. */
   async #body(tx: DocumentTransaction, lineage: Id[]): Promise<Blob> {
     const content = await tx.objectStore('DocumentContent').get(lineage)
     if (content === undefined) throw new ApiError('Document content is missing', 500)
     return content.body
   }
 
+  /** A node's metadata; its count is a document's size or a container's number of children. */
   async #metadata(tx: DocumentTransaction, row: StoredNode): Promise<LineageMetadata> {
     const count = row.level === 3
       ? (await this.#body(tx, row.lineage)).size
@@ -209,12 +239,14 @@ class IndexedDbDocumentProvider implements DocumentProviderContract {
   }
 }
 
+/** A lineage as its array key, one id per level. */
 const keyOf = (node: Lineage): Id[] => {
   if (node.document !== undefined) return [node.namespace, node.bucket!, node.document]
   if (node.bucket !== undefined) return [node.namespace, node.bucket]
   return [node.namespace]
 }
 
+/** An array key as a lineage, the inverse of keyOf. */
 const lineageOf = (key: Id[]): Lineage => {
   if (key.length === 3) return { namespace: key[0], bucket: key[1], document: key[2] }
   if (key.length === 2) return { namespace: key[0], bucket: key[1] }
