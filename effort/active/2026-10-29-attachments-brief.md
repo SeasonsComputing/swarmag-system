@@ -263,19 +263,35 @@ taken), and **Raw** (a flight's raw captures with a checksum manifest, for the a
 
 ## Platform prerequisites
 
-Two additive changes to `core/cli`, each backward-compatible, produced apart from this brief's
-`front/` work. `core/` is locked: each is a CA decision.
+Two additive changes to the document store, each backward-compatible, produced apart from this
+brief's `front/` work: the contract in `core/std`, and the kernel and the IndexedDB maker in
+`core/cli`. `core/` is locked: each is a CA decision. Nothing outside `core/` consumes the store
+yet; only its tests change with it.
 
 1. **Supplied ids for namespaces and buckets.** `namespace.create` and `bucket.create` take an
-   optional id, as `document.create` does, checked as a UUID v7. Creating with an id that already
-   exists returns the existing node, as a document's create does; the IndexedDB provider's "a
-   container already there is a conflict" becomes idempotent for all three levels.
+   optional id, as `document.create` does, checked as a UUID v7:
+
+   ```ts
+   create(name: string, id?: Id): Promise<NodeMetadata<NamespaceId>>
+   create(parent: NamespaceId, name: string, id?: Id): Promise<NodeMetadata<BucketId>>
+   ```
+
+   - **Identity is lineage.** A node is unique by its parent and its id; the same id under two
+     parents is two nodes.
+   - **Names are labels.** A name is checked for format by the address grammar, and nothing else:
+     names repeat, and `find` returns every match.
+   - **Creating at an existing lineage returns the existing node,** unchanged, at every level: a
+     differing name is ignored, not compared, and renaming is `update`'s. The IndexedDB provider's
+     "a container already there is a conflict" goes. Without an id, create mints a fresh one.
 2. **The IndexedDB maker's name.** Every storage container is named, so a document store is too.
    The specification gains a required `name`, from which it derives its object stores; today's
    fixed names would make every IndexedDB document store on a device the same physical store. The
    provider takes its two store names in its constructor; the idb schema's literal names type them
    at the two access points. A `name` check is not added: like `linkLifetime`, it is a composition
    constant.
+
+Tests: create with a supplied id at each level; a second create at the same lineage returns the
+first node; two named stores do not see each other's nodes.
 
 ```ts
 export type DocumentStoreIndexedDbSpecification = { name: string; linkLifetime: number }
