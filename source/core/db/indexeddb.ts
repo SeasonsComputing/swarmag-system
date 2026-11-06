@@ -9,6 +9,20 @@ PURPOSE
 Manages IndexedDB connections for the active local database name, upgrades the
 database when registered stores or indexes are missing. Maps storage errors
 to status.
+
+PUBLIC
+───────────────────────────────────────────────────────────────────────────────
+IndexedDbStore         Optional store configuration.
+├ keyPath              Stored key path; defaults to id.
+└ indexes              Named index declarations.
+IndexedDbIndex         Index configuration.
+├ keyPath              Indexed field or compound fields.
+├ unique               Reject duplicate index keys when true.
+└ multiEntry           Index each array member when true.
+IndexedDb              IndexedDB connection manager.
+├ registerStore(...)   Register a store, optional key path, and indexes.
+├ connection()         Return the singleton connection for the active database.
+└ errorToStatus(error) Map standard DOMExceptions to HTTP-style status codes.
 */
 
 import { Config } from '@core/cfg/config.ts'
