@@ -101,7 +101,7 @@ export class IndexedDb {
     stores: Dictionary<IndexedDbStore>
   ): Promise<IDBPDatabase> {
     const handleBlocking = () => {
-      this.#cache[name]?.then(db => db.close())
+      this.#cache[name]?.then(db => db.close(), () => undefined)
       delete this.#cache[name]
     }
 
