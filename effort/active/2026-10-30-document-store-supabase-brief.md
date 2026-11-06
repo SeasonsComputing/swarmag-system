@@ -143,8 +143,9 @@ The production is Foundation mode and reads the DevOps context beside Base.
    physically.
 6. **To verify,** before production: that listing returns `user_metadata`, and whether a Supabase
    bucket can be renamed.
-7. **The maker's name.** Whether `makeDocumentStoreSupabaseClient` takes a `name`, as the IndexedDB
-   maker does; on the server there is one store.
+7. **The maker's store.** Whether `makeDocumentStoreSupabaseClient` takes anything naming its
+   store, as the IndexedDB maker takes its database's config key; on the server there is one
+   store.
 
 ## Records
 

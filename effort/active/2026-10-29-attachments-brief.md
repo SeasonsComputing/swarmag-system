@@ -263,10 +263,10 @@ taken), and **Raw** (a flight's raw captures with a checksum manifest, for the a
 
 ## Platform prerequisites
 
-Two additive changes to the document store, each backward-compatible, produced apart from this
-brief's `front/` work: the contract in `core/std`, and the kernel and the IndexedDB maker in
-`core/cli`. `core/` is locked: each is a CA decision. Nothing outside `core/` consumes the store
-yet; only its tests change with it.
+Additive changes to the document store and the IndexedDB wrapper, each backward-compatible,
+produced apart from this brief's `front/` work: the contract in `core/std`, the kernel and the
+IndexedDB maker in `core/cli`, and the wrapper in `core/db`. `core/` is locked: each is a CA
+decision. Nothing outside `core/` consumes the store yet; only its tests change with it.
 
 1. **Supplied ids for namespaces and buckets.** `namespace.create` and `bucket.create` take an
    optional id, as `document.create` does, checked as a UUID v7:
@@ -283,22 +283,38 @@ yet; only its tests change with it.
    - **Creating at an existing lineage returns the existing node,** unchanged, at every level: a
      differing name is ignored, not compared, and renaming is `update`'s. The IndexedDB provider's
      "a container already there is a conflict" goes. Without an id, create mints a fresh one.
-2. **The IndexedDB maker's name.** Every storage container is named, so a document store is too.
-   The specification gains a required `name`, from which it derives its object stores; today's
-   fixed names would make every IndexedDB document store on a device the same physical store. The
-   provider takes its two store names in its constructor; the idb schema's literal names type them
-   at the two access points. A `name` check is not added: like `linkLifetime`, it is a composition
-   constant.
+2. **A database per document store.** A browser origin has many IndexedDB databases, a database
+   many object stores, an object store many records. A document store is a database of its own,
+   independent of the app's data: its own version, so an index added to either never upgrades the
+   other, and its own lifecycle, cleared by deleting the database. Inside it the object stores keep
+   fixed names, `Nodes` and `Content`, and the idb schema's literal names type them.
+   - **The wrapper takes a database's config key.** `registerStore` and `connection` gain an
+     optional config key, defaulting to `LOCAL_DB_NAME`, so every current caller is unchanged; the
+     database's name is `Config.get(dbKey)`.
+   - **The maker takes the key.** A deployment names its databases in configuration, and tests
+     isolate themselves by the value. Each entry point declares the key, so a missing one fails at
+     `Config.init`. A transaction never spans two databases; the document store never shares one
+     with the app's data.
+
+   ```ts
+   // core/db/indexeddb.ts
+   static registerStore(storeName: string, specification: IndexedDbStore = {}, dbKey = 'LOCAL_DB_NAME')
+   static connection(dbKey = 'LOCAL_DB_NAME'): Promise<IDBPDatabase>
+
+   // core/cli/make-indexeddb-docstore-client.ts
+   export type DocumentStoreIndexedDbSpecification = { dbKey: string; linkLifetime: number }
+
+   DocumentInbox: makeDocumentStoreIndexedDbClient({ dbKey: 'DOCUMENT_INBOX_DB_NAME', linkLifetime })
+   // → the database Config names, with object stores Nodes and Content
+   ```
+
+   The key names are placeholders, the CA's to name. Open: whether the registry is keyed by the
+   config key and resolves the name in `connection()`, so registration at module evaluation no
+   longer reads `Config` and the maker's "configuration must be initialized before composition"
+   goes.
 
 Tests: create with a supplied id at each level; a second create at the same lineage returns the
-first node; two named stores do not see each other's nodes.
-
-```ts
-export type DocumentStoreIndexedDbSpecification = { name: string; linkLifetime: number }
-
-DocumentInbox: makeDocumentStoreIndexedDbClient({ name: 'DocumentInbox', linkLifetime }),
-// → DocumentInboxNodes, DocumentInboxContent
-```
+first node; two document stores, under two keys, do not see each other's nodes.
 
 ## Design moments
 
@@ -331,8 +347,8 @@ it in `api`, and no code or address changes:
 ```ts
 export const api = {
   …
-  DocumentInbox: makeDocumentStoreIndexedDbClient({ name: 'DocumentInbox', linkLifetime }),
-  DocumentServer: makeDocumentStoreIndexedDbClient({ name: 'DocumentServer', linkLifetime })
+  DocumentInbox: makeDocumentStoreIndexedDbClient({ dbKey: 'DOCUMENT_INBOX_DB_NAME', linkLifetime }),
+  DocumentServer: makeDocumentStoreIndexedDbClient({ dbKey: 'DOCUMENT_SERVER_DB_NAME', linkLifetime })
 }
 ```
 
@@ -380,3 +396,7 @@ export const api = {
   Services, Workflows, and Tasks in one namespace, `Library`, with a shared bucket per topic, and
   `Templates` was folded into it. `Manuals` was considered and rejected: manuals are the Field
   Binder's.
+- **2026-11-05, a database per document store.** The maker first took a `name` and derived two
+  object stores in the app's database from it, `{name}Nodes` and `{name}Content`. A document store
+  became a database of its own instead, named by a config key the maker takes, with fixed object
+  store names: independent versions and lifecycles, and no derived names to type.
