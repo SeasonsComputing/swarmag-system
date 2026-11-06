@@ -213,10 +213,11 @@ attaches and shares documents; field capture and its upload are the Ops applicat
   `effort/completed/2026-10-23-document-storage-brief.md`: the contract and `DocumentAddresses` in
   `core/std`, the kernel and `makeDocumentStoreIndexedDbClient` in `core/cli`, and key paths and
   indexes in the IndexedDB wrapper.
-- **Supplied ids and a database per document store** — the attachments brief's platform
-  prerequisites, additive `core/` changes before Attachments: optional supplied ids on namespace
-  and bucket `create`, idempotent on an existing id, and each IndexedDB document store a database
-  of its own, named by a config key.
+- **The store composed, supplied ids, and a database per document store** — the attachments
+  brief's platform prerequisites, `core/` changes before Attachments: `DocumentStore` constructed
+  over a provider class per binding; optional supplied ids on namespace and bucket `create`,
+  idempotent on an existing id; and each IndexedDB document store a database of its own, named by
+  a config key.
 
 **Features**, in order; each builds and tests on IndexedDB until the Supabase provider makes the
 store shared:

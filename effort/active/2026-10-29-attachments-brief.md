@@ -21,9 +21,7 @@ there, is the upload brief.
 
 ## Two kinds of thing
 
-Four domain fields seemed to hold documents: `Attachment.url`, `ChemicalLabel.url`,
-`Chemical.sdsUrl`, and `User.avatarUrl`. They are two kinds of thing: one attachment field and three
-URL fields.
+Four domain fields refer to documents: `Attachment.url`, `ChemicalLabel.url`, `Chemical.sdsUrl`, and `User.avatarUrl`. They are two kinds of thing: one attachment field and three URL fields.
 
 |          | Attachment                                               | URL                                          |
 | -------- | -------------------------------------------------------- | -------------------------------------------- |
@@ -39,8 +37,9 @@ URL fields.
   `upload | url` const-enum on `Attachment` was considered and dropped: with uploads only, there is
   nothing to discriminate.
 - **URL fields are URL-format text,** `type='url'` at minimum in the UI. Today all four fields are
-  validated only as non-empty strings, and `core/std` has no URL check. The SDS input renders as
-  plain text, a UX defect.
+  validated only as non-empty strings; `isUrl` joins `core/std`'s validators (Platform
+  prerequisites, 4), and each field's validator checks it. The SDS input renders as plain text, a
+  UX defect.
 - **A document the field must have offline** (an SDS, a label, a manual) is the Field Binder's: a
   copy of a URL, or an upload, kept on every Ops device. Its brief is apart.
 
@@ -263,13 +262,38 @@ taken), and **Raw** (a flight's raw captures with a checksum manifest, for the a
 
 ## Platform prerequisites
 
-Additive changes to the document store and the IndexedDB wrapper, each backward-compatible,
-produced apart from this brief's `front/` work: the contract in `core/std`, the kernel and the
-IndexedDB maker in `core/cli`, and the wrapper in `core/db`. `core/` is locked: each is a CA
-decision. Nothing outside `core/` consumes the store yet; only its tests change with it.
+Changes to the document store, the IndexedDB wrapper, and the validators, produced apart from this
+brief's `front/` work: the contract and the validators in `core/std`, the kernel and the IndexedDB
+provider in `core/cli`, and the wrapper in `core/db`. CONVENTIONS (§10.8, §13) and the architecture documents (architecture-front
+§9.5.1, architecture-back §4.7, architecture-devops §4) describe the result; architecture-core §10
+describes swarmAg's use of it. Nothing outside `core/`
+consumes the store yet; only its tests change with it.
 
-1. **Supplied ids for namespaces and buckets.** `namespace.create` and `bucket.create` take an
-   optional id, as `document.create` does, checked as a UUID v7:
+1. **A store is composed, not made.** The kernel is a class, `DocumentStore`, implementing
+   `ApiDocumentStoreContract` and constructed over a provider. A provider is a class per binding
+   implementing `DocumentProviderContract`, CONVENTIONS §8.3's runtime-specific implementation of a
+   contract, and the contract is no longer internal. The files are named for what they hold:
+
+   | File                                      | Holds                                  |
+   | ----------------------------------------- | -------------------------------------- |
+   | `core/cli/docstore-client.ts`             | `DocumentStore`, the kernel            |
+   | `core/cli/indexeddb-docstore-provider.ts` | `IndexedDbDocumentProvider`            |
+   | `core/cli/supabase-docstore-provider.ts`  | `SupabaseDocumentProvider` (its brief) |
+
+   ```ts
+   export class DocumentStore implements ApiDocumentStoreContract {
+     constructor(provider: DocumentProviderContract, settings: { linkLifetime: number })
+   }
+
+   export class IndexedDbDocumentProvider implements DocumentProviderContract {
+     constructor(dbKey: string) // registers Nodes and Content in the database Config names
+   }
+   ```
+
+   The kernel is tested on its own over an in-memory provider: the grammar, minted and supplied ids,
+   and create at an existing lineage. Each provider's tests cover what it adds.
+2. **Supplied ids at every level.** `namespace.create` and `bucket.create` take an optional id, as
+   `document.create` does, checked as a UUID v7:
 
    ```ts
    create(name: string, id?: Id): Promise<NodeMetadata<NamespaceId>>
@@ -283,38 +307,49 @@ decision. Nothing outside `core/` consumes the store yet; only its tests change 
    - **Creating at an existing lineage returns the existing node,** unchanged, at every level: a
      differing name is ignored, not compared, and renaming is `update`'s. The IndexedDB provider's
      "a container already there is a conflict" goes. Without an id, create mints a fresh one.
-2. **A database per document store.** A browser origin has many IndexedDB databases, a database
-   many object stores, an object store many records. A document store is a database of its own,
-   independent of the app's data: its own version, so an index added to either never upgrades the
-   other, and its own lifecycle, cleared by deleting the database. Inside it the object stores keep
-   fixed names, `Nodes` and `Content`, and the idb schema's literal names type them.
+3. **A database per document store.** A browser origin has many IndexedDB databases, a database
+   many object stores, an object store many records. Each IndexedDB document store is a database of
+   its own, independent of the app's data: its own version, so an index added to either never
+   upgrades the other, and its own lifecycle, cleared by deleting the database. Inside it the object
+   stores keep fixed names, `Nodes` and `Content`, and the idb schema's literal names type them.
    - **The wrapper takes a database's config key.** `registerStore` and `connection` gain an
      optional config key, defaulting to `LOCAL_DB_NAME`, so every current caller is unchanged; the
      database's name is `Config.get(dbKey)`.
-   - **The maker takes the key.** A deployment names its databases in configuration, and tests
+   - **The provider takes the key.** A deployment names its databases in configuration, and tests
      isolate themselves by the value. Each entry point declares the key, so a missing one fails at
-     `Config.init`. A transaction never spans two databases; the document store never shares one
-     with the app's data.
+     `Config.init`.
 
    ```ts
    // core/db/indexeddb.ts
    static registerStore(storeName: string, specification: IndexedDbStore = {}, dbKey = 'LOCAL_DB_NAME')
    static connection(dbKey = 'LOCAL_DB_NAME'): Promise<IDBPDatabase>
-
-   // core/cli/make-indexeddb-docstore-client.ts
-   export type DocumentStoreIndexedDbSpecification = { dbKey: string; linkLifetime: number }
-
-   DocumentInbox: makeDocumentStoreIndexedDbClient({ dbKey: 'DOCUMENT_INBOX_DB_NAME', linkLifetime })
-   // → the database Config names, with object stores Nodes and Content
    ```
 
-   The key names are placeholders, the CA's to name. Open: whether the registry is keyed by the
-   config key and resolves the name in `connection()`, so registration at module evaluation no
-   longer reads `Config` and the maker's "configuration must be initialized before composition"
-   goes.
+   | Key                       | Platform key                   | Database                  |
+   | ------------------------- | ------------------------------ | ------------------------- |
+   | `DOCUMENT_INBOX_DB_NAME`  | `VITE_DOCUMENT_INBOX_DB_NAME`  | `swarmag-docstore-inbox`  |
+   | `DOCUMENT_SERVER_DB_NAME` | `VITE_DOCUMENT_SERVER_DB_NAME` | `swarmag-docstore-server` |
 
-Tests: create with a supplied id at each level; a second create at the same lineage returns the
-first node; two document stores, under two keys, do not see each other's nodes.
+   Every app has an inbox, and each app is its own origin, so the names are the same in every app.
+   The server key lives only until the Supabase provider ships. Open: whether the registry is keyed
+   by the config key and resolves the name in `connection()`, so registration at module evaluation
+   no longer reads `Config`.
+4. **A URL check.** `core/std/validators.ts` gains `isUrl` beside `isEmail`, and `expectUrl` beside
+   `expectEmail`, so a domain validator can use it. A URL field holds an `https://` address of
+   something elsewhere: `isUrl` accepts a string the `URL` constructor parses with the `https:`
+   protocol. Through genesis, `Chemical.sdsUrl`, `ChemicalLabel.url`, and `User.avatarUrl` validate
+   with `expectUrl` instead of `expectNonEmptyString`.
+
+   ```ts
+   // core/std/validators.ts
+   export const isUrl = (value: unknown): value is string => …
+   export const expectUrl = (value: unknown, field: string, optional = false): ExpectResult => …
+   ```
+
+Tests: the kernel over an in-memory provider; create with a supplied id at each level; a second
+create at the same lineage returns the first node; two document stores, under two keys, do not see
+each other's nodes; `isUrl` accepts an `https://` URL and rejects other protocols, relative paths,
+and non-strings.
 
 ## Design moments
 
@@ -341,14 +376,20 @@ documents. The production is Feature mode in `front/`, over the platform the doc
 established, and Foundation for the domain change and the platform prerequisites.
 
 Attachment needs no shared store to build or test. Until the Supabase provider ships,
-`DocumentServer` is a second IndexedDB store, composed beside the inbox; the Supabase maker replaces
+`DocumentServer` is a second IndexedDB store, composed beside the inbox; the Supabase provider replaces
 it in `api`, and no code or address changes:
 
 ```ts
 export const api = {
   …
-  DocumentInbox: makeDocumentStoreIndexedDbClient({ dbKey: 'DOCUMENT_INBOX_DB_NAME', linkLifetime }),
-  DocumentServer: makeDocumentStoreIndexedDbClient({ dbKey: 'DOCUMENT_SERVER_DB_NAME', linkLifetime })
+  DocumentInbox: new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
+    linkLifetime
+  }),
+  DocumentServer: new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_SERVER_DB_NAME'), {
+    linkLifetime
+  })
+  // once the Supabase provider ships:
+  // DocumentServer: new DocumentStore(new SupabaseDocumentProvider(), { linkLifetime })
 }
 ```
 
@@ -400,3 +441,9 @@ export const api = {
   object stores in the app's database from it, `{name}Nodes` and `{name}Content`. A document store
   became a database of its own instead, named by a config key the maker takes, with fixed object
   store names: independent versions and lifecycles, and no derived names to type.
+- **2026-11-06, a store composed, not made.** The 10-30 design made a document store like every
+  client, by a maker per binding. A maker creates code from a declarative specification and never
+  an instance (CONVENTIONS §10.1), and the IndexedDB maker constructed a provider and handed it to
+  the kernel: a factory. Reviewing the code before anything consumed it, the kernel became a class
+  constructed over a provider class per binding, as architecture-core §10 already described it: "a
+  kernel in `core/cli` over replaceable providers". The kernel became testable on its own.

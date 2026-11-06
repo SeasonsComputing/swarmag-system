@@ -460,19 +460,29 @@ IndexedDb is the browser-side persistent store for all offline-data concerns.
 
 #### 9.5.1 IndexedDB Database Names
 
-IndexedDB usage is split into two layers:
+A browser keeps many IndexedDB databases per origin, a database many object stores, and an object
+store many records. Each app is its own origin, so its databases are its own.
 
-- Database namespace (physical DB name), `Config.get('LOCAL_DB_NAME')`, per deployment package.
-- Object Store names are not shared implicitly; they must be registered with `@core/db/indexeddb.ts` using `IndexedDb.registerStore('storeName')`
-- A CRUD/List maker is provided to standardize usage of the local database with `@core/cli/make-indexeddb-client.ts` conforming to `ApiCrudContract` in `@core/stdx`
+- **Every database is named by configuration.** The app's database is `LOCAL_DB_NAME`; each
+  document store's is its own key, given to its provider (CONVENTIONS §10.8). A database's
+  version and lifecycle are independent of every other.
+- **A document store's database** holds two object stores, `Nodes` and `Content`, keyed by
+  lineage. Each operation is one transaction, a link is a `blob:` URL, and the database asks the
+  browser for persistent storage. It belongs to the browser profile, neither shared across devices
+  nor authorized by a server, so it stages documents before they reach a shared store
+  (architecture-core §10.3).
+- **Object stores are registered,** never shared implicitly: `IndexedDb.registerStore` declares an
+  object store, its key path, and its indexes in the database a config key names, the app's by
+  default.
+- **Records of a domain abstraction** use `@core/cli/make-indexeddb-client.ts`, conforming to
+  `ApiCrudContract` in `@core/stdx`.
 
-**IndexedDB Database Names**
-
-| Database Name          | App      | Content                                                      |
-| ---------------------- | -------- | ------------------------------------------------------------ |
-| `swarmag-app-admin`    | Admin    | dashboard configuration, panel config, theme                 |
-| `swarmag-app-ops`      | Ops      | dashboard configuration, panel config, theme, job aggregates |
-| `swarmag-app-customer` | Customer | dashboard configuration, theme                               |
+| Key                      | Database Name            | App      | Content                                                      |
+| ------------------------ | ------------------------ | -------- | ------------------------------------------------------------ |
+| `LOCAL_DB_NAME`          | `swarmag-app-admin`      | Admin    | dashboard configuration, panel config, theme                 |
+| `LOCAL_DB_NAME`          | `swarmag-app-ops`        | Ops      | dashboard configuration, panel config, theme, job aggregates |
+| `LOCAL_DB_NAME`          | `swarmag-app-customer`   | Customer | dashboard configuration, theme                               |
+| `DOCUMENT_INBOX_DB_NAME` | `swarmag-docstore-inbox` | all      | the inbox: documents not yet uploaded                        |
 
 #### 9.5.2 Application Preferences
 

@@ -279,10 +279,18 @@ Reactivation is not supported: setting an ejected user back to `active` does
 not restore an Auth identity. Restoring access requires a future
 `user-reinstate` function.
 
+### 4.7 Document Storage
+
+The shared document store, `DocumentServer` (architecture-core §10.2), keeps its nodes in Supabase
+Storage itself: a namespace is a Supabase bucket, whose settings are its placement; a bucket is a
+key prefix; and a document is an object, its name in the object's metadata. Storage policies on
+`storage.objects` and `storage.buckets` are its authorization, enforced by Supabase as RLS is on
+tables (§4.3), so no client code bypasses them.
+
 ## 5. Configuration Management
 
-Edge functions use the runtime configuration pattern in CONVENTIONS §11; this system's packages
-are listed in `architecture-core.md` §6.
+Edge functions use the runtime configuration pattern in CONVENTIONS §11; this system's packages are
+listed in `architecture-core.md` §6.
 
 ### 5.1 Supabase Edge Function Configuration
 

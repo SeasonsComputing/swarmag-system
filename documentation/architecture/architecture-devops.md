@@ -129,6 +129,7 @@ VITE_SUPABASE_PUBLIC_KEY=__SECRET__
 VITE_SUPABASE_CLIENT_MODE=browser
 VITE_SERVICE_WORKER_ENABLED=true
 VITE_LOCAL_DB_NAME=swarmag-app-admin
+VITE_DOCUMENT_INBOX_DB_NAME=swarmag-docstore-inbox
 ```
 
 The packaging script resolves `__SECRET__` values from `secrets.jsonc` before
@@ -157,6 +158,7 @@ includes:
 - `VITE_SUPABASE_CLIENT_MODE`
 - `VITE_SERVICE_WORKER_ENABLED`
 - `VITE_LOCAL_DB_NAME`
+- `VITE_DOCUMENT_INBOX_DB_NAME`
 
 ### 4.3 Security Rules
 

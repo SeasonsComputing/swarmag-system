@@ -17,7 +17,7 @@ lifetime, provider persistence, policy ownership, and reset, and all four are th
 
 ## Scope
 
-`core/cli/make-supabase-docstore-client.ts` (`makeDocumentStoreSupabaseClient`), over
+`core/cli/supabase-docstore-provider.ts` (`SupabaseDocumentProvider`, composed under `DocumentStore`), over
 `core/db/supabase.ts`, and what it needs to run, as the database has its own needs beside
 `core/db/supabase.ts`: storage configuration, storage policies, its one function, and reset, in
 `back/`, `devops/`, and Supabase's configuration. The CLI is here too: it serves the back profile,
@@ -143,13 +143,12 @@ The production is Foundation mode and reads the DevOps context beside Base.
    physically.
 6. **To verify,** before production: that listing returns `user_metadata`, and whether a Supabase
    bucket can be renamed.
-7. **The maker's store.** Whether `makeDocumentStoreSupabaseClient` takes anything naming its
-   store, as the IndexedDB maker takes its database's config key; on the server there is one
-   store.
+7. **The provider's store.** Whether `SupabaseDocumentProvider` takes anything naming its store, as
+   the IndexedDB provider takes its database's config key; on the server there is one store.
 
 ## Records
 
-Storage policies earn a section in `architecture-back.md` beside Row Level Security (§4.3), and
+Storage policies join `architecture-back.md` §4.7, Document Storage, beside Row Level Security, and
 storage configuration a section in `architecture-devops.md`, as Auth has (§13). Both documents are
 locked; the CA opens them for this brief's production, recorded here, as he does `domain/`.
 
@@ -170,3 +169,6 @@ locked; the CA opens them for this brief's production, recorded here, as he does
 - **2026-11-04, `DocumentServer`.** The provider became `DocumentServer`, the shared store in each
   app's composition, and its creates became idempotent at every level, for the supplied namespace
   and bucket ids the catalog uses.
+- **2026-11-06, a provider, not a maker.** A document store is `DocumentStore` constructed over a
+  provider class per binding (the attachments brief), so this brief's maker became
+  `SupabaseDocumentProvider`.

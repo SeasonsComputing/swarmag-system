@@ -724,80 +724,104 @@ boundary; log upload meets the live record.
 
 ## 10. Document Storage
 
-The system stores images and documents (labels, safety data sheets, manuals, photos, signed forms,
-and survey maps) in a document store: a kernel in `core/cli` over replaceable providers. The store
-knows nothing of the domain; a record refers to a stored document by reference, and what the
-document means belongs to the field that refers to it.
+The system keeps images and documents (photos, signed forms, manuals, orders, and survey maps) in
+document stores: the `core/cli` kernel composed over a provider per purpose (CONVENTIONS §10.8).
+The store knows nothing of the domain; a record refers to a stored document by its address, and
+what the document means belongs to the field that refers to it.
 
-### 10.1 Model
+### 10.1 Attachments and URLs
 
-- **A fixed hierarchy.** `namespace ─* bucket ─* document`: three levels, each holding only the
-  next. Life-cycles nest: a namespace is long-lived, a bucket lasts as long as its consumer needs
-  it, and a document cannot exist without its bucket, nor a bucket without its namespace.
-- **Identity is lineage.** Every node has a UUID, minted by the kernel; a document's may be
-  supplied by the caller, since its identity may exist before its bytes are stored. Nothing
-  moves, so a node's identity is its lineage: its namespace's id, its bucket's, and its own.
-- **Only the name changes.** Every node has a name, for people; a rename keeps identity, and names
-  need not be unique among siblings.
-- **One metadata shape.** Every node has `{ id, name, createdAt, count }`, where the count is what
-  the node directly holds: buckets, documents, or bytes.
-- **Documents are immutable.** A document is added or removed. A replacement is add, repoint,
-  remove: the only shared state is the reference on the owning record.
-- **Only empty containers are deleted.** Nothing is removed as a side effect. The store removes its
-  nodes and bytes physically: soft delete (§3.2.5) governs the domain's life-cycle entities, and a
-  store node is not one.
+A record refers to a document in one of two ways, told apart by where the document lives.
 
-### 10.2 Addresses and Identities
+- **An attachment** is a document swarmAg's users uploaded, owned by the system. It lives in a
+  document store, and its record holds its id-form address: `Attachment.documentAddress`. Notes
+  carry attachments, and a job's answers carry the crew's photos.
+- **A URL** is an `https://` address of something elsewhere (`Chemical.sdsUrl`,
+  `ChemicalLabel.url`, `User.avatarUrl`), edited and shown by the URL app control. A link is never
+  an attachment.
+- **Nothing is hosted.** Netlify serves static bundles and Supabase serves data, so an upload is
+  never a URL. The app shows a document by minting a short-lived link from its identity under the
+  viewer's session, and never stores the link. Sharing a document outside the app, with an
+  inspector, an insurer, or another tool, is a capability of its own.
 
-An address is `{namespace}/{bucket}/{document}`, one to three segments, each a name or `id:{id}`.
-Names are for people and the CLI; ids are for code.
+### 10.2 Stores
 
-- **Each level's identity is a nominal type** (`NamespaceId`, `BucketId`, `DocumentId`), and only
-  the store produces one. Each contract's results carry its own level's identity.
-- **`resolve` is for names.** Each level resolves addresses at its own depth, so the caller states
-  the level it expects; an ambiguous name does not resolve.
-- **A stored reference is an id-form address.** It never uses names, so a rename never breaks it,
-  and the grammar turns it into an identity with no lookup. A document that no longer exists fails
-  at the `read` or `link` that needed it.
+Each app composes the stores it needs, each a document store with its own lifecycle:
 
-```typescript
-// A person's address, by name: the store resolves it
-const label = await store.document.resolve('chemicals/labels/label.pdf')
+| Store            | Binding   | Lifecycle                               |
+| ---------------- | --------- | --------------------------------------- |
+| `DocumentInbox`  | IndexedDB | until uploaded; in Ops, the job clone's |
+| `DocumentServer` | Supabase  | shared and permanent                    |
+| `FieldBinder`    | IndexedDB | the Field Binder's version, in Ops      |
 
-// A stored reference, by id: the grammar alone
-const link = await store.document.link(DocumentAddresses.id(reference))
-```
+| App             | DocumentServer                 | DocumentInbox    | FieldBinder |
+| --------------- | ------------------------------ | ---------------- | ----------- |
+| Admin           | shows, receives uploads        | the Admin inbox  |             |
+| Ops             | shows, receives the job upload | the job inbox    | ✓           |
+| Customer Portal | shows shared documents         | the portal inbox |             |
 
-### 10.3 Kernel and Providers
+- **Different lifecycles, different stores.** The inbox empties as it uploads, and the Field
+  Binder follows its version, so each is a store of its own rather than a namespace of another.
+- **Each app's stores are its own.** The apps are separate bundles on separate origins, so the same
+  store name in each does not collide. Each IndexedDB store is a database of its own
+  (architecture-front §9.5.1).
+- **Access is the server's.** What each app may do through `DocumentServer` is enforced by its
+  storage policies (architecture-back §4.7).
 
-- **The kernel** mints ids, validates names and addresses, resolves addresses, and produces the
-  nominal identities. A provider receives and returns plain lineage, and never sees an address.
-- **One kernel, three profiles.** One contract serves the browser, the back end (scripts, edge
-  functions, services), and a broker, for a provider whose transfers a server must sign. The kernel's feature set is the
-  minimum every consumer needs; a provider is as capable as it is, and a capability is exposed
-  only when its cost is worth paying.
-- **Placement.** A namespace is where placement binds: site, storage class, caching. It is chosen
-  when the namespace is created and never changes; a namespace created without one takes the
-  default placement.
-- **Read and link.** `read` returns a document's bytes to code. `link` returns a short-lived URL the
-  browser fetches itself. A link's lifetime is a fixed default supplied when the kernel is
-  constructed, and a link is never stored: it is minted from the identity when needed.
-- **The CLI is the API.** `document-store {noun} {verb}` maps onto the contract, naming nodes by
-  address.
+### 10.3 The Inbox and Its Drains
 
-### 10.4 Providers
+Every app has an inbox, and every upload goes to it. One rule for every app outweighs the cost of
+an inbox an app may never fill.
 
-- **IndexedDB,** in the browser, needs nothing provisioned. Nodes and bytes are keyed by lineage,
-  each operation is one transaction, and a link is a `blob:` URL. Its storage belongs to the
-  browser profile: it is neither shared across devices nor authorized by a server, and it asks the
-  browser for persistent storage. It stages documents locally before they reach a shared store.
-- **Supabase** keeps its nodes in Supabase Storage itself: a namespace is a Supabase bucket, a
-  bucket a key prefix, and a document an object, its name in the object's metadata. Storage
-  policies are its server-side check.
+- **A document enters at its final address.** Choosing a file attaches it: the inbox mints the
+  document's id on entry, the record holds its `documentAddress` at once and can be saved, and the
+  bytes follow. The device does no processing: photos are not scaled, and documents list by icon,
+  name, and size.
+- **A drain keeps the address.** It copies each document to `DocumentServer` at the same address,
+  then clears it from the inbox, so a record saved before upload is already correct after it.
+- **Each app drains its own way.** The inbox knows nothing of apps.
+  - **Admin:** a background loop in the page, draining as items arrive while the app is open; what
+    is left waits for the next session.
+  - **Ops:** the job upload, beside the log upload (§9.3). Photos travel with the job clone and
+    drain at base, a deliberate act that qualifies the connection first, on wi-fi by default, since
+    the data plan is the worker's.
+  - **Customer Portal:** a drain of its own.
+
+### 10.4 The Catalog
+
+`Attachments`, a singleton in `front/api` beside `AppState`, is the only code that places
+documents. Its catalog of placements is private: module constants with fixed ids, which every store
+on every device shares, so a document has one address in the inbox and on the server, computable
+from the catalog and its owner's id with no lookup.
+
+- **A topic per type that carries notes,** each with its own typed `attach`. A composition without
+  an id (a `Note`, a `CustomerSite`, an `Answer`) keeps its documents in its owning record's bucket.
+- **A bucket per owner, its id the owner's.** The owner's bucket is created on first attach, and
+  creating it again returns it, so attaching never checks first. Names are labels at every level,
+  for people and the CLI.
+- **Namespaces divide by policy.** A namespace is the unit of placement and access: on the server,
+  a Supabase bucket with its own storage policies. Company-wide documents, maintained in Admin and
+  read by everyone, share the `Library` namespace, a fixed bucket per topic.
+
+| Topic     | Namespace | Bucket            | Notes on                                                                                       |
+| --------- | --------- | ----------------- | ---------------------------------------------------------------------------------------------- |
+| Customers | Customers | the customer's id | Customer, CustomerSite                                                                         |
+| Jobs      | Jobs      | the job's id      | JobAssessment (`notes`, `risks`), JobPlan, JobPlanAssignment, the job's Workflow, Task, Answer |
+| Users     | Users     | the user's id     | User                                                                                           |
+| Assets    | Library   | `Assets`          | Asset                                                                                          |
+| Chemicals | Library   | `Chemicals`       | Chemical                                                                                       |
+| Services  | Library   | `Services`        | Service                                                                                        |
+| Workflows | Library   | `Workflows`       | Workflow                                                                                       |
+| Tasks     | Library   | `Tasks`           | Task                                                                                           |
+
+- **Records and the Field Binder.** An asset's or a chemical's attachments are its records: a
+  seller's order, an invoice, a warranty. A document day-to-day onsite operations require (a safety
+  data sheet, a label, a usage manual) is the Field Binder's, a copy kept on every Ops device for
+  work without signal.
 
 ### 10.5 Survey Maps
 
-Survey maps are the store's largest consumer.
+Survey maps are document storage's largest consumer.
 
 - **Volume.** A survey flight writes thousands of raw multispectral captures, several gigabytes.
   Processing yields per-band reflectance and index maps (NDVI, NDRE) as Cloud-Optimized GeoTIFFs.
