@@ -9,20 +9,6 @@ PURPOSE
 Manages IndexedDB connections for the active local database name, upgrades the
 database when registered stores or indexes are missing. Maps storage errors
 to status.
-
-PUBLIC
-───────────────────────────────────────────────────────────────────────────────
-IndexedDbStore         Optional store configuration.
-├ keyPath              Stored key path; defaults to id.
-└ indexes              Named index declarations.
-IndexedDbIndex         Index configuration.
-├ keyPath              Indexed field or compound fields.
-├ unique               Reject duplicate index keys when true.
-└ multiEntry           Index each array member when true.
-IndexedDb              IndexedDB connection manager.
-├ registerStore(...)   Register a store, optional key path, and indexes.
-├ connection()         Return the singleton connection for the active database.
-└ errorToStatus(error) Map standard DOMExceptions to HTTP-style status codes.
 */
 
 import { Config } from '@core/cfg/config.ts'
@@ -70,6 +56,7 @@ export class IndexedDb {
     const stores = this.#registry[dbName] ??= {}
     const declared = structuredClone(specification)
     const previous = stores[storeName]
+
     if (previous !== undefined) {
       if (JSON.stringify(previous) !== JSON.stringify(declared)) {
         Config.fail(`IndexedDB store already registered with another specification: ${storeName}`)
@@ -84,15 +71,12 @@ export class IndexedDb {
     const name = this.#activeDbName
 
     // 1. If the Promise exists in the Dictionary, return it immediately.
-    // Use an explicit undefined check to satisfy the linter.
     if (this.#cache[name] !== undefined) return this.#cache[name]
 
     // 2. Initialize the Promise and store it in the Dictionary.
-    // This "locks" the slot so concurrent calls await the same instance.
     const stores = this.#registry[name] ?? {}
     const connectionPromise = this.#openConnection(name, stores)
 
-    // Cache connection
     this.#cache[name] = connectionPromise
     return connectionPromise
   }
@@ -102,54 +86,63 @@ export class IndexedDb {
     name: string,
     stores: Dictionary<IndexedDbStore>
   ): Promise<IDBPDatabase> {
-    const db = await openDB(name, undefined, {
-      blocking: () => {
-        db.close()
-        delete this.#cache[name]
-      }
-    })
+    const handleBlocking = () => {
+      this.#cache[name]?.then(db => db.close())
+      delete this.#cache[name]
+    }
+
+    const db = await openDB(name, undefined, { blocking: handleBlocking })
     let needsUpgrade = false
+
     try {
       for (const [storeName, specification] of Object.entries(stores)) {
         if (!db.objectStoreNames.contains(storeName)) {
           needsUpgrade = true
           continue
         }
+
         const tx = db.transaction(storeName)
         const store = tx.objectStore(storeName)
+
         if (JSON.stringify(store.keyPath) !== JSON.stringify(specification.keyPath ?? 'id')) {
           Config.fail(`IndexedDB key path differs from its declaration: ${storeName}`)
         }
+
         for (const [indexName, declaration] of Object.entries(specification.indexes ?? {})) {
           if (!store.indexNames.contains(indexName)) {
             needsUpgrade = true
             continue
           }
+
           const index = store.index(indexName)
-          if (
-            JSON.stringify(index.keyPath) !== JSON.stringify(declaration.keyPath)
-            || index.unique !== (declaration.unique ?? false)
-            || index.multiEntry !== (declaration.multiEntry ?? false)
-          ) {
+          const isValidIndex = JSON.stringify(index.keyPath) === JSON.stringify(declaration.keyPath)
+            && index.unique === (declaration.unique ?? false)
+            && index.multiEntry === (declaration.multiEntry ?? false)
+
+          if (!isValidIndex) {
             Config.fail(`IndexedDB index differs from its declaration: ${storeName}.${indexName}`)
           }
         }
+
         await tx.done
       }
     } catch (error) {
       db.close()
       throw error
     }
+
     if (!needsUpgrade) return db
+
     const nextVersion = db.version + 1
     db.close()
 
-    const upgraded = await openDB(name, nextVersion, {
+    return await openDB(name, nextVersion, {
       upgrade(upgradeDb, _oldVersion, _newVersion, tx) {
         for (const [storeName, specification] of Object.entries(stores)) {
           const store = upgradeDb.objectStoreNames.contains(storeName)
             ? tx.objectStore(storeName)
             : upgradeDb.createObjectStore(storeName, { keyPath: specification.keyPath ?? 'id' })
+
           for (const [indexName, declaration] of Object.entries(specification.indexes ?? {})) {
             if (!store.indexNames.contains(indexName)) {
               store.createIndex(indexName, declaration.keyPath, {
@@ -160,12 +153,8 @@ export class IndexedDb {
           }
         }
       },
-      blocking: () => {
-        upgraded.close()
-        delete this.#cache[name]
-      }
+      blocking: handleBlocking
     })
-    return upgraded
   }
 
   /** Utility to map standard DOMExceptions to HTTP-style status codes.  */
