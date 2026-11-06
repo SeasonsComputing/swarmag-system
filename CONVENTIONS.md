@@ -1,17 +1,17 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.12)
+# Software Construction Conventions (1.13)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.12
-- Published: 2026 October 30th
+- Version: 1.13
+- Published: 2026 November 6th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
 
 ## 1. Overview
 
-The conventions for software construction at Seasons Computing: how code is written, the
+The full-stack conventions for software construction at Seasons Computing: how code is written, the
 practices it follows, and how to build with `core/`. The `core/` file headers are the reference;
 this guide points to a module by its `@core/` alias for what it provides, and never repeats its
 symbol list.
@@ -830,18 +830,44 @@ const unsubscribe = Auth.onAuthStateChange(session => …)
 ### 10.8 Document store
 
 `ApiDocumentStoreContract` (`@core/std/docstore-contract.ts`, from `@core/stdx`) stores
-documents in a fixed hierarchy, namespace, bucket, and document, over a provider. Application code
-reaches documents only through it, never through a provider or the provider's backend.
+documents in a fixed hierarchy, `namespace ─* bucket ─* document`, each level holding only the
+next. Application code reaches documents only through it, never through a provider or the
+provider's backend. One contract serves the browser, the back end (scripts, edge functions,
+services), and a broker, for a provider whose transfers a server must sign. The kernel offers the
+minimum every consumer needs; a provider is as capable as it is, and a capability is exposed only
+when its cost is worth paying.
+
+A store is composed, not made: `DocumentStore`, the kernel, is constructed over a provider, a class
+per binding that implements `DocumentProviderContract` (§8.3). The kernel mints ids, validates
+names and addresses, resolves addresses, and produces the nominal identities; a link's lifetime is
+fixed when it is constructed.
+
+```typescript
+const Media = new DocumentStore(new IndexedDbDocumentProvider('MEDIA_DB_NAME'), { linkLifetime })
+```
 
 - A node's identity is its lineage, one nominal type per level (`NamespaceId`, `BucketId`,
   `DocumentId`). Only the store produces them: code gets an identity from the store's results or
   from a stored reference, and never builds one.
+- A caller may supply a node's id on create, at any level, so it knows the identity before the node
+  exists. Creating at an existing lineage returns the node already there; a name is a label,
+  checked only for its format, and need not be unique.
+- An address is `{namespace}/{bucket}/{document}`, one to three segments, each a name or
+  `id:{id}`. Names are for people and the CLI, `document-store {noun} {verb}`; ids are for code.
 - A stored reference is an address in id form. Never store a name address, which a rename breaks.
 - `DocumentAddresses.id` turns a stored reference into a `DocumentId` with no lookup. `resolve` is
   for names, and each level resolves at its own: a document's address goes to `document.resolve`.
-- Never store a link; mint it when it is displayed.
-- A provider receives and returns plain lineage and never sees an address; the kernel produces
-  the nominal identities.
+  An ambiguous name does not resolve.
+- `read` returns a document's bytes to code; `link` returns a short-lived URL the browser fetches
+  itself. Never store a link; mint it when it is displayed.
+- Documents are immutable. Replace one by add, repoint, remove: the only shared state is the
+  reference on the owning record.
+- Only an empty container is deleted, and nothing is removed as a side effect. The store removes
+  its nodes and bytes physically; soft delete (§9.1) is for domain records, and a node is not
+  one.
+- A namespace's placement (site, storage class, caching) is chosen when it is created and never
+  changes; a namespace created without one takes the default.
+- A provider receives and returns plain lineage and never sees an address.
 
 ```typescript
 const manual = await store.document.resolve('manuals/pumps/install.pdf')
@@ -922,12 +948,12 @@ Deno.serve(wrapSupabaseShim(handler))
 
 Local data lives in the browser's IndexedDB. Choose by what you are keeping:
 
-| You are keeping                         | Use                                                  | See   |
-| --------------------------------------- | ---------------------------------------------------- | ----- |
-| Records of a domain abstraction         | A client from `makeCrudIndexedDbClient`              | §10.6 |
-| Small settings, by key                  | `Preferences` (`@core/cli/preferences.ts`)           | below |
-| Files and images                        | A document store, `makeDocumentStoreIndexedDbClient` | §10.8 |
-| A new kind of store, searched by fields | A maker that registers its own store                 | §13.1 |
+| You are keeping                         | Use                                                | See   |
+| --------------------------------------- | -------------------------------------------------- | ----- |
+| Records of a domain abstraction         | A client from `makeCrudIndexedDbClient`            | §10.6 |
+| Small settings, by key                  | `Preferences` (`@core/cli/preferences.ts`)         | below |
+| Files and images                        | A `DocumentStore` over `IndexedDbDocumentProvider` | §10.8 |
+| A new kind of store, searched by fields | A maker that registers its own store               | §13.1 |
 
 **What happens to local data.** It belongs to one browser profile on one site: it is not shared
 across devices or users, and no server authorizes it. The browser may clear it when storage runs
@@ -936,7 +962,8 @@ installed. A store that must survive asks for persistent storage; a refusal is a
 
 - Application code never touches `IndexedDb` directly; a maker registers its store.
 - An object store for a domain abstraction is named for the abstraction (`Job`, `Workflow`).
-- The local database name comes from configuration (`LOCAL_DB_NAME`, §11).
+- Every database name comes from configuration (§11): the application's is `LOCAL_DB_NAME`, and a
+  database of its own, such as a document store's, is named by its own key.
 
 ```typescript
 const prefs = new Preferences('AppStateStore')
@@ -957,13 +984,18 @@ and `IndexedDb` keeps the browser's database in step with those declarations.
   never changes or removes what exists, so records survive every upgrade.
 - **Reorganizing stops.** Changing an existing store's key path, or an existing index, fails
   through `Config.fail`: reorganizing stored data is a deliberate migration, never a side effect.
-- **A store registers once,** at module evaluation, with one declaration.
+- **A store registers once,** at module evaluation, with one declaration, in the database a config
+  key names: the application's, `LOCAL_DB_NAME`, unless another is given. A database of its own
+  keeps its version and its lifecycle apart from every other; a transaction never spans two.
 
 ```typescript
 IndexedDb.registerStore('Readings', {
   keyPath: ['siteId', 'takenAt'],
   indexes: { bySensor: { keyPath: 'sensorId' } }
 })
+
+IndexedDb.registerStore('Samples', { keyPath: 'id' }, 'ARCHIVE_DB_NAME')
+const archive = await IndexedDb.connection('ARCHIVE_DB_NAME')
 ```
 
 ## 14. Remote Persistence
@@ -1530,6 +1562,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.13    | 2026 November 6th   | §10.8: a document store is composed, `DocumentStore` over a provider class per binding, not made; any node's id may be supplied, and creating at an existing lineage returns the node; the store's model joins its rules: the address grammar, read and link, immutable documents, deletion of empty containers only, and fixed placement. §13: every database name comes from configuration, and a database of its own is named by its own key; §13.1: a store registers in the database a config key names, the application's by default.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 1.12    | 2026 October 30th   | §10.1 Makers and §10.6 API clients rewritten for the engineer: when to reach for a maker, with an example; the client families chosen by what is being done, then the maker by where the data lives, and why updates differ by store. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | 1.11    | 2026 October 30th   | §16.1 Composition and §16.4 Session rewritten for the engineer: an application root as declaration, the two shells, and an example root; what the shell and the application each own in a session, with an example coordinator. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | 1.10    | 2026 October 30th   | §17.1 Steps and sequences, §17.4 `DrillDown`, and §17.5 the dashboard rewritten for the engineer: when to use each, what its parts do, what the host guarantees, and an example of each; §17.4 states that a Step has one `DrillDown` however deep the nesting. No requirement changed.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
