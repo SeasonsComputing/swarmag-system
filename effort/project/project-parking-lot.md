@@ -314,6 +314,11 @@ through this adoption:
   current form narrows nothing and is valid only while `Id` is `string`.
 - **`When` as `Temporal.Instant`:** waits on stable Safari and Supabase's hosted runtime (the
   nominal types brief's design history).
+- **A URL type:** the domain has no type for a URL, as it has `Id` and `When`, so its validators
+  cannot know which attributes are URLs and check them as non-empty strings. A URL type, with
+  data-dictionary metadata identifying URL attributes, lets genesis validate them with `expectUrl`
+  (`core/std/validators.ts`). Until then the URL app control checks them at the UX seam (the
+  attachments brief, `effort/active/2026-10-29-attachments-brief.md`).
 
 **Picking this up:** When `core` or `ux` first ships from its own repository.
 

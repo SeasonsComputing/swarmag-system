@@ -37,9 +37,10 @@ Four domain fields refer to documents: `Attachment.url`, `ChemicalLabel.url`, `C
   `upload | url` const-enum on `Attachment` was considered and dropped: with uploads only, there is
   nothing to discriminate.
 - **URL fields are URL-format text,** `type='url'` at minimum in the UI. Today all four fields are
-  validated only as non-empty strings; `isUrl` joins `core/std`'s validators (Platform
-  prerequisites, 4), and each field's validator checks it. The SDS input renders as plain text, a
-  UX defect.
+  validated only as non-empty strings, and stay so: the domain has no URL type, as it has `Id` and
+  `When`, so its validators cannot know which attributes are URLs (parking lot P-12). The URL app
+  control checks the format at the UX seam with `isUrl` (Platform prerequisites, 4). The SDS input
+  renders as plain text, a UX defect.
 - **A document the field must have offline** (an SDS, a label, a manual) is the Field Binder's: a
   copy of a URL, or an upload, kept on every Ops device. Its brief is apart.
 
@@ -82,8 +83,8 @@ is for people and the CLI.
 
 ## The URL app control
 
-One control for every URL field: edits with `type='url'` and the browser's format check, shows the
-URL as a link by name or host, and opens it at its address. It starts in `front/app/shell/`, beside
+One control for every URL field: edits with `type='url'`, checks the value with `isUrl` and the
+schemes its field accepts, shows the URL as a link by name or host, and opens it at its address. It starts in `front/app/shell/`, beside
 `notes-editor` and `user-picker`, used first by the SDS field and the labels editor, and moves to
 `ux/ui` once proven.
 
@@ -331,25 +332,38 @@ consumes the store yet; only its tests change with it.
    | `DOCUMENT_SERVER_DB_NAME` | `VITE_DOCUMENT_SERVER_DB_NAME` | `swarmag-docstore-server` |
 
    Every app has an inbox, and each app is its own origin, so the names are the same in every app.
-   The server key lives only until the Supabase provider ships. Open: whether the registry is keyed
-   by the config key and resolves the name in `connection()`, so registration at module evaluation
-   no longer reads `Config`.
+   The server key lives only until the Supabase provider ships.
 4. **A URL check.** `core/std/validators.ts` gains `isUrl` beside `isEmail`, and `expectUrl` beside
-   `expectEmail`, so a domain validator can use it. A URL field holds an `https://` address of
-   something elsewhere: `isUrl` accepts a string the `URL` constructor parses with the `https:`
-   protocol. Through genesis, `Chemical.sdsUrl`, `ChemicalLabel.url`, and `User.avatarUrl` validate
-   with `expectUrl` instead of `expectNonEmptyString`.
+   `expectEmail`, parameterized by the schemes they accept, as `isConstEnum` is by its values.
+   `isUrl` accepts a string the `URL` constructor parses with one of the given schemes. The schemes
+   have no default, so a caller always names them and `javascript:` is never accepted by omission.
+   The URL app control uses them; the domain's validators do not change (Two kinds of thing).
 
    ```ts
    // core/std/validators.ts
-   export const isUrl = (value: unknown): value is string => …
-   export const expectUrl = (value: unknown, field: string, optional = false): ExpectResult => …
+   export type UrlScheme = 'http' | 'https' | 'mailto' | 'tel' | 'ftp' | 'data' | 'blob'
+
+   /** Check whether value parses as a URL with one of the given schemes. */
+   export const isUrl = (value: unknown, schemes: readonly UrlScheme[]): value is string => …
+
+   /** Validate a required or optional URL value. */
+   export const expectUrl = (
+     value: unknown,
+     field: string,
+     schemes: readonly UrlScheme[],
+     optional = false
+   ): ExpectResult => …
+   ```
+
+   ```ts
+   isUrl(value, ['https', 'http'])
+   expectUrl(value, 'sdsUrl', ['https', 'http'], true)
    ```
 
 Tests: the kernel over an in-memory provider; create with a supplied id at each level; a second
 create at the same lineage returns the first node; two document stores, under two keys, do not see
-each other's nodes; `isUrl` accepts an `https://` URL and rejects other protocols, relative paths,
-and non-strings.
+each other's nodes; `isUrl` accepts a URL with a given scheme and rejects other schemes, relative
+paths, and non-strings.
 
 ## Design moments
 
