@@ -1,10 +1,10 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Effort Methodology (1.3)
+# Effort Methodology (1.4)
 
 - Source: [EFFORT.md](EFFORT.md)
-- Version: 1.3
-- Published: 2026 October 21st
+- Version: 1.4
+- Published: 2026 November 6th
 - Author: Ted V. Kremer
 
 **MANDATORY: THIS FILE MAY NOT BE EDITED BY ANY AI AGENT WITHOUT PRIOR AUTHORIZATION**
@@ -97,7 +97,7 @@ This applies regardless of who or what produced the account — human, AI Coding
 
 ## 7. Milestones
 
-A milestone groups related efforts toward one coherent outcome. Each numbered roadmap section is a milestone, with a permanent ID (`M-n`) that is never reused or renumbered.
+A milestone groups related efforts toward one coherent outcome. Each numbered roadmap section is a milestone, with an ID (`M-n`) that is never reused. A closed milestone's ID is permanent; one not yet closed is a position, renumbered as milestones are added, with live references updated in the same change.
 
 A milestone lists its enablers ahead of its features. An enabler is work the features depend on: it makes them buildable or copy-ready, whatever else it delivers. Work that lands in the same window without enabling the milestone rides along with it. The milestone closes only when its enablers and features are done.
 
@@ -121,6 +121,7 @@ Each published version supersedes the one before it. Amendments reference sectio
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | ------- | ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.4     | 2026 November 6th   | §7 Milestones: a closed milestone's ID is permanent; one not yet closed is a position, renumbered as milestones are added, with live references updated in the same change.                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | 1.3     | 2026 October 21st   | §4 The Brief: no work on a pending brief begins before it moves to `effort/active/`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | 1.2     | 2026 October 20th   | §4 The Brief edits a draft in place, recording overturned directions in its Design history, and amends a brief only once dispatched; on closing, every deferred or not-taken item is settled. §7 Milestones names each numbered roadmap section a milestone, lists enablers ahead of features with ride-along work beside them, and reconciles the roadmap when a milestone closes. §3 Work Definitions gives every backlog and parking-lot entry a permanent ID, and asks backlog titles to state the gap and parking-lot titles the open question; §7 Milestones gives each milestone a permanent `M-n`. |
 | 1.1     | 2026 October 4th    | §2 The Effort Namespace gains a fifth namespace, `pending`, and names the two status-bearing record kinds, brief and handoff, with their file-naming pattern. §4 The Brief places a newly captured brief in `effort/pending/`, moves it to `effort/active/` when its effort is chosen from the roadmap, keeps handoffs out of `pending`, replaces an existing backlog entry's text with a link to its brief, and closes a brief that is withdrawn as well as one that ships.                                                                                                                               |
