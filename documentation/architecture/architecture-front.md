@@ -577,9 +577,8 @@ fields and their validation occupy the separate Customer Billing step.
 - `CustomerManager` returns `customerSteps(state)` and the draft projection from `detail`. It
   seeds state from the opened Customer, or blank for New.
 - `OnboardingWizard` is the only composer of Onboarding's sequence. It builds that sequence from
-  `customers/` today, and from Initial Job Assessment's steps later. Its `commit` writes the
-  aggregate once, at Finish. Both of the Wizard's progress presentations derive from the
-  composed sequence.
+  `customers/` and from Initial Job Assessment's steps. Its `commit` writes the aggregate once, at
+  Finish. Both of the Wizard's progress presentations derive from the composed sequence.
 - `UserManager` returns the single `user-step-detail` step; `user-state.ts` owns the state,
   `UserDraft`, and the `userDraft(state)` projection.
 - Steps follow the naming in CONVENTIONS §4.2.

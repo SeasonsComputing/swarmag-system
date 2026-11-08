@@ -172,9 +172,8 @@ Canonical seed data known at schema time is part of `schema.sql` — not a migra
   bootstrap administrator and has no password. Tests mint and redeem an email sign-in token in
   setup, assert the redeemed user ID matches this seed, then use that user's public-client session
   for real RLS and edge authorization. The service key is setup-only, never a test-call credential.
-  The dedicated identity makes automated writes attributable. It belongs to stage: genesis has
-  one schema for every target, and stage is the only environment today; excluding this seed from
-  a future production genesis remains the P-11 decision, not an implemented target switch.
+  The dedicated identity makes automated writes attributable. It belongs to stage, and genesis has
+  one schema for every target, so genesis seeds it wherever genesis runs.
 
 All seed record IDs are stable UUID v7 values drawn from `source/devops/genesis/seed-ids.txt`. No seed record uses a database-generated ID.
 
