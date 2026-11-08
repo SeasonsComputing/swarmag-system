@@ -1,15 +1,16 @@
 # Attachments — Brief
 
-**Active, draft.** Recorded 2026-10-29 from a CA + AI Architect session, split from the document
-storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, the `core/` platform this
-brief uses. M-4 assigned Attachments to M-5. This is the `front/` brief: how swarmAg's records
-attach documents. Split again 2026-10-30: attaching and uploading are different work, and upload,
-moving documents from the inbox to a shared store and who may see them there, is
+**Active, dispatched; amended 2026-11-08 after AI Coding Engine review.** Recorded 2026-10-29 from
+a CA + AI Architect session, split from the document storage brief,
+`effort/completed/2026-10-23-document-storage-brief.md`, the `core/` platform this brief uses. M-4
+assigned Attachments to M-5. This is the `front/` brief: how swarmAg's records attach documents.
+Split again 2026-10-30: attaching and uploading are different work, and upload, moving documents
+from the inbox to a shared store and who may see them there, is
 `effort/active/2026-10-30-document-upload-brief.md`. Revised 2026-11-04 with the document storage
-policy of 2026-10-31 and the catalog, design moment 1, settled; the Field Binder, the policy's other
-half, is `effort/pending/2026-11-04-field-binder-brief.md`. Its design moments are settled; it
-awaits CA review and the production gate. It is first of four features of roadmap M-6, Document
-Storage: the Admin side; field capture is the Ops application's (M-9).
+policy of 2026-10-31 and the catalog, design moment 1, settled; the Field Binder, the policy's
+other half, is `effort/pending/2026-11-04-field-binder-brief.md`. Its design moments are settled;
+it awaits the production gate. It is first of four features of roadmap M-6, Document Storage: the
+Admin side; field capture is the Ops application's (M-9).
 
 ## What triggered it
 
@@ -232,10 +233,11 @@ labels are the Field Binder's.
 
 ## Capture
 
-1. **The app's inbox.** Every new file, from the camera, a picker, a drop, or a paste, enters the
-   app's `DocumentInbox`. The inbox mints the document's id on entry, at its final address, so the record
-   holds its `documentAddress` at once and can be saved immediately; the bytes follow. The inbox
-   holds only what has not been uploaded, and clears each item once it is (the upload brief).
+1. _[Revised by the amendment "After AI Coding Engine review", item 1.]_ **The app's inbox.** Every
+   new file, from the camera, a picker, a drop, or a paste, enters the app's `DocumentInbox`. The
+   inbox mints the document's id on entry, at its final address, so the record holds its
+   `documentAddress` at once and can be saved immediately; the bytes follow. The inbox holds only
+   what has not been uploaded, and clears each item once it is (the upload brief).
 2. **No second step.** Choosing a file attaches it; storing it is the system's. Admin adds files on
    the Attachments tab (Surfaces). Ops takes photos through a file input with `capture`, which
    opens the phone's own camera; that is the Ops application's, with its job runner (roadmap M-9),
@@ -297,6 +299,8 @@ labels are the Field Binder's.
 
 ## Accepted files
 
+_[Clarified by the amendment "After AI Coding Engine review", item 3.]_
+
 What a file is decides its `kind`, from a closed table: a file in no kind is refused, with a
 message, never dropped silently. The table is swarmAg's attachment policy, owned by `Attachments`
 beside the catalog; the domain keeps `AttachmentKind`.
@@ -333,6 +337,8 @@ Attachments.accept(kinds) // → the file input's accept string, the union of th
   provider brief's storage configuration).
 
 ## Saving a record with attachments
+
+_[Revised by the amendment "After AI Coding Engine review", item 1.]_
 
 A record's editor saves through `makeAggregateSave`. The record is saved with its
 `documentAddress` values already set, since the inbox minted them; the inbox holds the bytes until
@@ -379,6 +385,8 @@ taken), and **Raw** (a flight's raw captures with a checksum manifest, for the a
 | 7 | An asset's usage manual, a chemical's label or SDS | the Field Binder                                                                                 |
 
 ## Platform prerequisites
+
+_[Extended by the amendment "After AI Coding Engine review", item 2.]_
 
 Changes to the document store, the IndexedDB wrapper, and the validators, produced apart from this
 brief's `front/` work: the contract and the validators in `core/std`, the kernel and the IndexedDB
@@ -517,6 +525,42 @@ export const api = {
   // DocumentServer: new DocumentStore(new SupabaseDocumentProvider(), { linkLifetime })
 }
 ```
+
+## Amendments — 2026-11-08 — After AI Coding Engine review
+
+1. **Attaching is a transaction** (findings 1 and 2: removal had no commit boundary, and abandoned
+   additions no lifecycle). An editing session is a transaction over the record and its documents.
+   - **The workspace:** the draft holds its edited fields and its documents. A chosen file is
+     staged in the inbox at once, durably, at its final address; the inbox is the draft's
+     document store.
+   - **Commit:** Save. The record write, through `makeAggregateSave`, is the single commit point;
+     once the record refers to its documents, they are committed.
+   - **Rollback:** Cancel discards the draft, and its staged documents with it.
+   - **Isolation:** the drain takes only committed documents; nothing uncommitted leaves the
+     device.
+   - **Removal** is a draft edit. A dropped or replaced document is deleted after the commit, in
+     `complete`.
+   - **Recovery is presumed abort:** a page closed mid-edit leaves staged documents with no
+     committed record, and they are cleared when the app next starts.
+   - **No two-phase commit:** the bytes are durable before the commit point, and the drain
+     finishes after it, retrying safely because ids are idempotent.
+
+   Reached in three turns: held in memory until Save (rejected: it defeats the inbox's durable
+   capture); staged at once with cleanup on cancel (better, still unbounded); the inbox as part of
+   the draft, which is classical transaction bounds.
+2. **A new record carries its id from New** (finding 3). Staged documents sit at their final
+   address, which includes the owner's bucket, so the owner's identity exists from New: the
+   application mints every id, and identity exists before storage. A fifth platform prerequisite,
+   additive: a new draft mints its id at New, and every create path accepts the id the draft
+   holds, minting one only when none is given. `instantiable` already lets a supplied id win;
+   the create protocol's type grows to admit it. Nothing that creates today changes.
+3. **File recognition** (finding 4). The Accepted files sketch is illustrative: the recognition
+   contract (synchronous or not, what it returns) and how a detected type becomes
+   `Attachment.contentType` and the stored type are settled in the production scope.
+4. **`uploadedAt`** (finding 5) is when the person attached the document: set when the file is
+   chosen, once, and never updated; distinct from the store's own timestamps. It is a fact on the
+   record, so a drain never writes it back, and a rename does not touch it. The field keeps its
+   name.
 
 ## Design history
 
