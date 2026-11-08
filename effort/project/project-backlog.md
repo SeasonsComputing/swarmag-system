@@ -75,6 +75,26 @@ Some of EFFORT's elements are not followed in practice, and are not missed. A me
 prescribes what is not done reads as if it were, so EFFORT should describe the practice: amend or
 remove each such element. The elements are named by the CA at pickup.
 
+The reverse also holds: the brief's practiced shape is described nowhere. §4 says what a brief is
+for and how it moves, not how it is written. The closed briefs share a shape, and the attachments
+brief of 2026-10-29, written without it, carried a shared `core/` contract change into a feature's
+production as a sentence (withdrawn 2026-11-08). §4 should describe the shape:
+
+- **One effort, one layer boundary,** stated under the status line as the brief's first rule
+  ("changes within `front/` only"); a need beyond it is an escalation. Platform work and the
+  feature that consumes it are separate briefs.
+- **The status line** carries mode, milestone, and dependencies; provenance belongs in the design
+  history, not the opening.
+- **What triggered it:** the concrete problem.
+- **What the repository holds:** verified facts with files and lines, before any design.
+- **Decisions:** numbered, one decision and its reason each; open items stated apart.
+- **Production scope:** a table of every file and its change, with **Records** naming the locked
+  files the brief opens, and **Unchanged** and **Out of scope** stated.
+- **Checks.**
+- **After dispatch,** dated, named amendments, with inline markers where a passage is revised; the
+  CA relays them to the AI Coding Engine.
+- **Closure** settles every deferred item; the design history keeps the reasoning.
+
 **Picking this up:** unblocked; a governance amendment, the CA's.
 
 ### B-33 · The domain SDK genesis prompt omits backend seed authority
