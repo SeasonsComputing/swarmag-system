@@ -7,9 +7,9 @@ attach documents. Split again 2026-10-30: attaching and uploading are different 
 moving documents from the inbox to a shared store and who may see them there, is
 `effort/active/2026-10-30-document-upload-brief.md`. Revised 2026-11-04 with the document storage
 policy of 2026-10-31 and the catalog, design moment 1, settled; the Field Binder, the policy's other
-half, is `effort/pending/2026-11-04-field-binder-brief.md`. Awaits the remaining design moments, CA
-review, and the production gate. It is first of four features of roadmap M-6, Document Storage:
-the Admin side; field capture is the Ops application's (M-9).
+half, is `effort/pending/2026-11-04-field-binder-brief.md`. Its design moments are settled; it
+awaits CA review and the production gate. It is first of four features of roadmap M-6, Document
+Storage: the Admin side; field capture is the Ops application's (M-9).
 
 ## What triggered it
 
@@ -29,7 +29,7 @@ Four domain fields refer to documents: `Attachment.url`, `ChemicalLabel.url`, `C
 | Lives    | in the document store                                    | wherever it points                           |
 | Held as  | its address in the document store                        | the URL                                      |
 | Shown by | a link the app mints                                     | the URL app control                          |
-| Used on  | notes, and task answers                                  | `sdsUrl`, `ChemicalLabel.url`, `avatarUrl`   |
+| Used on  | notes, and task answers                                  | `sdsUrl`, `ChemicalLabel.url`                |
 
 - **What separates them is where the thing lives.** The three URL fields point outside the
   system; an attachment points into the document store.
@@ -83,10 +83,57 @@ is for people and the CLI.
 
 ## The URL app control
 
-One control for every URL field: edits with `type='url'`, checks the value with `isUrl` and the
-schemes its field accepts, shows the URL as a link by name or host, and opens it at its address. It starts in `front/app/shell/`, beside
+One control for every URL field, `UrlField`. It starts in `front/app/shell/`, beside
 `notes-editor` and `user-picker`, used first by the SDS field and the labels editor, and moves to
 `ux/ui` once proven.
+
+- **It edits.** A `UiInput` with `type='url'`; the editor's rule checks the format with `expectUrl`
+  and its field's schemes, at the same moments as every other field.
+- **It opens the link in a secondary window.** A link icon beside the input, enabled when the value
+  passes `isUrl` with the field's schemes, opens the URL in a browser window of its own
+  (`window.open` with window features, `noopener,noreferrer`), so the app's window keeps its place
+  however deep the drill-down. A popover anchored at the field, holding the full URL, its host, and
+  Open, is the intended design; it is parked until the action buttons' current issues are
+  resolved.
+- **Elsewhere a URL shows by name or host:** a list row shows a label's description, or its host.
+
+```tsx
+// front/app/shell/url-field.tsx
+export type UrlFieldProps = {
+  name: string
+  value: string
+  schemes: readonly UrlScheme[]
+  onInput: (value: string) => void
+  onBlur?: () => void
+  error?: boolean
+}
+
+// chemical-step-detail.tsx
+const SDS_SCHEMES = ['https', 'http'] as const
+
+const validation = useAbstractionFormValidation(() => formRef, {
+  sdsUrl: () => expectUrl(UiText.optional(state.sdsUrl()), 'SDS URL', SDS_SCHEMES, true),
+  // …
+})
+
+<UiField for='sdsUrl' label='SDS URL'>
+  <UrlField
+    name='sdsUrl'
+    value={state.sdsUrl()}
+    schemes={SDS_SCHEMES}
+    onInput={value => {
+      state.setSdsUrl(value)
+      validation.inputField('sdsUrl')
+    }}
+    onBlur={() => validation.blurField('sdsUrl')}
+    error={validation.isInvalid('sdsUrl')}
+  />
+</UiField>
+```
+
+**The labels editor.** `Chemical.labels`, a list of `{ url, description? }`, follows the Sites
+pattern: a `CollectionPanel` beside the chemical's details, a row showing the description or the
+host, and a label's drill-down a `UrlField` and its description.
 
 ## The stores
 
@@ -202,17 +249,88 @@ labels are the Field Binder's.
 ## Surfaces
 
 - **NotesEditor.** Notes are its subject; attachments are secondary. Two tabs, Note and Attachments
-  with their count, chosen over a stacked panel by frequency of use: most notes are text.
+  with their count, chosen over a stacked panel by frequency of use: most notes are text. In the
+  notes list, a note with attachments shows a paperclip on its row, with no count, so the note
+  holding a document is found without opening each one.
+- **The host binds the topic.** The NotesEditor takes an `attach` callback, bound by its host to
+  the record's topic, so the editor knows nothing of the catalog and the type checker sees each
+  binding. It puts the returned `Attachment` on the note, and uses the container's `link` and
+  `remove`, since an attachment carries its full address.
+
+  ```tsx
+  // NotesEditorProps
+  attach: (file: File) => Promise<Attachment>
+
+  // customer-step-detail.tsx: the bucket is the customer's
+  <NotesEditor
+    notes={state.notes}
+    onChange={state.setNotes}
+    drill={drill}
+    attach={file => Attachments.Customers.attach(customer, file)}
+  />
+
+  // asset-step-detail.tsx: a shared bucket needs no owner
+  <NotesEditor … attach={file => Attachments.Assets.attach(file)} />
+  ```
+
+- **The host constrains the kinds.** An optional `attachmentKinds` limits what a NotesEditor
+  accepts; absent, every kind is accepted. A field that holds a signed form declares
+  `['document']`.
+
+  ```tsx
+  // NotesEditorProps
+  attachmentKinds?: readonly AttachmentKind[] // absent: every kind
+
+  <NotesEditor … attach={…} attachmentKinds={['photo']} />
+  ```
 - **The Attachments tab.** Files only: Add files opens the picker, with multiple selection;
   dropping onto the tab does the same; choosing attaches, with no second step. A row shows an icon,
-  its name, and its size; activating it opens the document (an image inline, a PDF in a new tab);
-  (-) removes it after confirmation. A row not yet uploaded shows the same and opens from the inbox.
+  its name, and its size; its name is editable; activating it opens the document (an image inline,
+  a PDF in a new tab); (-) removes it after confirmation. A row not yet uploaded shows the same and
+  opens from the inbox.
 - **The job runner.** In a task like "take a photo", the attachment is the answer, primary: the
   answer control captures. It is the job runner's custom UX (M-9), over the same `Attachment`, the
   same inbox, and the same store. The domain needs a question that requires an attachment: the
   field mapping brief's edit 4 (`requires: 'note' | 'attachment'`), or a photo question type.
-- **The avatar** stays a URL, shown by the URL control and the browser's cache, with the user's
-  initials when the image is unavailable.
+- **No avatar.** swarmAg is not an avatar kind of app: `User.avatarUrl` leaves the domain the next
+  time the schema changes (backlog B-41), and users show by their initials.
+
+## Accepted files
+
+What a file is decides its `kind`, from a closed table: a file in no kind is refused, with a
+message, never dropped silently. The table is swarmAg's attachment policy, owned by `Attachments`
+beside the catalog; the domain keeps `AttachmentKind`.
+
+```ts
+// front/api, owned by Attachments
+const ATTACHMENT_CONTENT_TYPES: Record<AttachmentKind, readonly string[]> = {
+  photo: ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'],
+  video: [], // deferred (Document types)
+  map: ['image/tiff'],
+  document: ['application/pdf', 'text/plain', 'text/markdown', 'application/json']
+}
+
+Attachments.kindOf(file) // → AttachmentKind | undefined; undefined is refused
+Attachments.accept(kinds) // → the file input's accept string, the union of their types
+```
+
+- **Video is deferred,** so its list is empty and no video is accepted; the kind stays in the
+  domain for when it returns.
+- **Every kind is inferred,** `map` included: `image/tiff` is a map's alone, so a GeoTIFF is never
+  taken for a photo. Choosing a file needs no second step.
+- **The bytes are checked, not only `file.type`,** which the browser guesses from the extension
+  and sometimes leaves empty (HEIC on Windows). A binary format matches its signature: PDF `%PDF-`,
+  JPEG `FF D8 FF`, PNG `89 50 4E 47`, TIFF `II*\0` or `MM\0*`, and HEIC an `ftyp` box. A text
+  format, which has none, matches its extension (`.txt`, `.md`, `.json`) and decodes as UTF-8 with
+  no NUL byte. Reading a file's first bytes is a check, not processing.
+- **The picker and the drop agree.** `accept` narrows the picker to the host's kinds; a drop or a
+  paste passes `kindOf` and the host's kinds.
+- **Text opens as plain text.** A minted link for a text document is `text/plain`, so nothing is
+  rendered: Markdown is not turned into HTML. Code that needs the content `read`s it.
+- **Formats that run in a browser are never accepted:** SVG, HTML, and XML. Adding a format is a
+  deliberate line in the table.
+- **The server enforces the same table:** each Supabase bucket's allowed MIME types (the Supabase
+  provider brief's storage configuration).
 
 ## Saving a record with attachments
 
@@ -224,13 +342,13 @@ repointed on save, and the replaced document is removed once its replacement is 
 ## Document types
 
 The store handles formats; meaning belongs to the domain field that refers to a document. A signed
-regulatory form is a role, not a format: it may be a signed PDF or a photo of the signed paper, and
-the field that refers to it says which form it is. Every document is immutable, which keeps a
-signature's promise that its bytes never change.
+regulatory form is a PDF: a paper form is scanned to one, which the phones' own document scanners
+do, straightened and legible. Every document is immutable, which keeps a signature's promise that
+its bytes never change.
 
-- **Documents (PDF):** purchase orders, invoices, warranties, service records, signed regulatory
-  forms. Small; a new revision is a new document.
-- **Images.** Photo evidence, asset photos, photos of signed forms. A workflow question asks for a
+- **Documents:** PDF for purchase orders, invoices, warranties, service records, and signed
+  regulatory forms; plain text, Markdown, and JSON. Small; a new revision is a new document.
+- **Images.** Photo evidence and asset photos. A workflow question asks for a
   photo; the crew takes it. iOS Safari strips GPS from web captures, so the app reads the position
   at the shutter; where the position, accuracy, heading, and capture time are kept arrives with
   field mapping, as document properties.
@@ -255,11 +373,10 @@ taken), and **Raw** (a flight's raw captures with a checksum manifest, for the a
 | 1 | A crew photographs the tank rinse as a task answer | captured into the job's inbox, drained by the job upload; the answer holds its `documentAddress` |
 | 2 | Admin adds a nozzle photo to an asset note         | `Attachments.Assets`, `DocumentInbox`, the Admin loop, `DocumentServer`                          |
 | 3 | A customer sees job photos in the portal           | the portal mints links from `DocumentServer`                                                     |
-| 4 | A signed record is photographed onto a job note    | as 1 or 2                                                                                        |
+| 4 | A signed record is added to a job note             | scanned to PDF on the phone, then as 2                                                           |
 | 5 | An asset's seller's order                          | an attachment on the asset's notes                                                               |
 | 6 | An inspector asks for a job's records              | sharing outside the app, a separate capability                                                   |
 | 7 | An asset's usage manual, a chemical's label or SDS | the Field Binder                                                                                 |
-| 8 | A user's photo                                     | a URL; the browser's cache, then initials                                                        |
 
 ## Platform prerequisites
 
@@ -369,19 +486,13 @@ paths, and non-strings.
 
 1. **The catalog. Settled 2026-11-04:** `Attachments`, its private placements, and its topics.
 2. **Access rules. Moved** to the upload brief.
-3. **The editors.** Attachments on notes, the NotesEditor's two tabs (Surfaces); the URL app
-   control, with the Chemical labels editor and the SDS field, deferred by the managers brief.
-4. **The inbox.** `DocumentInbox` holds each document at its final address, so upload copies it
-   under the same address and no item names its destination; a row not yet uploaded opens from the
-   inbox (Surfaces). Its production runs the IndexedDB provider's browser check, deferred to this
-   first consumer by the document storage brief's closure.
-
-## Open
-
-1. Whether an attachment's name is editable.
-2. Whether `kind` is inferred, chosen, or both; only `map` cannot be inferred.
-3. Whether the notes list shows a note's attachment count.
-4. A domain `Url` type and its validator, as `Id` and `When` have.
+3. **The editors. Settled 2026-11-06 and 2026-11-07:** attachments on notes, the NotesEditor's two
+   tabs, and an `attach` callback the host binds (Surfaces); `UrlField`, its link in a secondary
+   window, and the Chemical labels editor (The URL app control). The avatar is dropped (Surfaces).
+4. **The inbox. Settled 2026-11-07:** `DocumentInbox` holds each document at its final address,
+   so upload copies it under the same address and no item names its destination; a row not yet
+   uploaded opens from the inbox (Surfaces). Its production runs the IndexedDB provider's browser
+   check, deferred to this first consumer by the document storage brief's closure.
 
 ## Records
 
@@ -461,3 +572,30 @@ export const api = {
   the kernel: a factory. Reviewing the code before anything consumed it, the kernel became a class
   constructed over a provider class per binding, as architecture-core §10 already described it: "a
   kernel in `core/cli` over replaceable providers". The kernel became testable on its own.
+- **2026-11-06, the host binds the topic.** The NotesEditor is shared by every editor with notes,
+  and `Attachments` has a typed `attach` per topic. Passing the topic and owner as props was set
+  aside: a shell control would know the catalog `Attachments` keeps private. The host binds an
+  `attach` callback instead.
+- **2026-11-06, an editable name.** An attachment's name is for people first, so it is editable: it
+  is `Attachment.filename`, on the record, saved with the note; the document's address and bytes do
+  not change.
+- **2026-11-06, kinds inferred from a closed table.** `kind` was intended (the notes editor brief)
+  to let a host constrain what is uploaded, as `attachmentKinds`. Inference first mapped everything
+  not an image or a video to `document`, an open default; each kind became a closed list of content
+  types instead, checked by signature, with every other file refused. XML was considered for
+  documents and dropped: JSON replaces it, and a browser runs a script in rendered XML.
+- **2026-11-06, a signed form is a PDF.** A signed regulatory form had been a role, a signed PDF or
+  a photo of the signed paper. A paper form is now scanned to a PDF, so a field for one declares
+  `['document']`, and the photo is legible.
+- **2026-11-07, a paperclip in the notes list.** A count on the notes list's rows was considered: a
+  note typically carries one attachment, a handful at most, and the open note's tab label already
+  counts them. The row shows a paperclip alone.
+- **2026-11-07, the link in a secondary window.** An open button that opened a new tab was set
+  aside: a tab opened three levels into a drill-down pulls the user out of the app. A popover
+  anchored at the field was chosen, with hover (touch has none, and it fights the input) and an
+  embedded preview (many sources refuse framing; PDFs in frames render poorly on iOS) set aside.
+  The popover was then parked while the action buttons have issues, and the link opens in a
+  secondary browser window, the shortest path.
+- **2026-11-07, no avatar.** The avatar had stayed a URL, shown with the user's initials when the
+  image was unavailable. Asked where an avatar appears, nothing needed one: swarmAg is not an avatar
+  kind of app. `User.avatarUrl` is backlogged for removal with the next schema change.

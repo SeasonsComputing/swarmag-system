@@ -737,8 +737,7 @@ A record refers to a document in one of two ways, told apart by where the docume
   document store, and its record holds its id-form address: `Attachment.documentAddress`. Notes
   carry attachments, and a job's answers carry the crew's photos.
 - **A URL** is an `https://` address of something elsewhere (`Chemical.sdsUrl`,
-  `ChemicalLabel.url`, `User.avatarUrl`), edited and shown by the URL app control. A link is never
-  an attachment.
+  `ChemicalLabel.url`), edited and shown by the URL app control. A link is never an attachment.
 - **Nothing is hosted.** Netlify serves static bundles and Supabase serves data, so an upload is
   never a URL. The app shows a document by minting a short-lived link from its identity under the
   viewer's session, and never stores the link. Sharing a document outside the app, with an

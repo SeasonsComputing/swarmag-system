@@ -100,9 +100,10 @@ contract owns hosted behavior, and a task applies it and reads back every value.
 exists for storage: `config.toml`'s `[storage]` block is the scaffold default (50 MiB, no buckets),
 and the architecture documents name storage only in passing.
 
-1. **Storage configuration.** Supabase bucket defaults, file size limit, MIME restrictions, and the
-   S3 protocol switch: local in `config.toml`, hosted in a per-target contract, applied by a task
-   and verified by reading back.
+1. **Storage configuration.** Supabase bucket defaults, file size limit, MIME restrictions (the
+   attachments brief's accepted files table, enforced by the server), and the S3 protocol switch:
+   local in `config.toml`, hosted in a per-target contract, applied by a task and verified by
+   reading back.
 2. **Storage policies.** SQL on `storage.objects` and `storage.buckets`, a schema Supabase manages
    as it does `auth`, with the rename function beside them. M-6 starts from a baseline, signed-in
    users only; the rules swarmAg's namespaces need are specified by the upload brief and

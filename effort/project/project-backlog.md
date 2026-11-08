@@ -67,6 +67,16 @@ Binder (`effort/pending/2026-11-04-field-binder-brief.md`), have no story. The r
 the user stories (`EFFORT.md` §3), so bring them current before the next milestone is
 placed from them.
 
+### B-40 · `EFFORT.md` prescribes practices the project does not follow
+
+**Observed:** 2026-11-06 · low
+
+Some of EFFORT's elements are not followed in practice, and are not missed. A methodology that
+prescribes what is not done reads as if it were, so EFFORT should describe the practice: amend or
+remove each such element. The elements are named by the CA at pickup.
+
+**Picking this up:** unblocked; a governance amendment, the CA's.
+
 ### B-33 · The domain SDK genesis prompt omits backend seed authority
 
 **Observed:** 2026-10-23 · normal
@@ -130,6 +140,17 @@ selected state on `UiTableRow` that any Collection-Detail surface opts into.
 Design record: [Overlay Controls API — Brief](../pending/2026-10-13-overlay-trigger-brief.md).
 
 ## Auth
+
+### B-41 · `User.avatarUrl` serves no surface
+
+**Observed:** 2026-11-07 · low
+
+swarmAg is not an avatar kind of app: no surface shows a user's picture, and users show by their
+initials. Remove `avatarUrl` from `User` in the data dictionary (`domain-data-dictionary.md`), and
+regenerate through genesis: the abstraction, its validator and adapter, `users.avatar_url` in
+`schema.sql` and its views, and the domain archetypes' examples.
+
+**Picking this up:** carried with the next schema change; not a migration of its own.
 
 ### B-7 · A stale session survives genesis and is not ejected
 
