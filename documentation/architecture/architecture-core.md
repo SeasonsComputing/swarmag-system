@@ -772,12 +772,16 @@ Each app composes the stores it needs, each a document store with its own lifecy
 Every app has an inbox, and every upload goes to it. One rule for every app outweighs the cost of
 an inbox an app may never fill.
 
-- **A document enters at its final address.** Choosing a file attaches it: the inbox mints the
-  document's id on entry, the record holds its `documentAddress` at once and can be saved, and the
-  bytes follow. The device does no processing: photos are not scaled, and documents list by icon,
-  name, and size.
-- **A drain keeps the address.** It copies each document to `DocumentServer` at the same address,
-  then clears it from the inbox, so a record saved before upload is already correct after it.
+- **Attaching is a transaction over the record.** An editing session stages each chosen file in
+  the inbox at once, durably, at its final address, and the draft holds its `documentAddress`.
+  Saving the record commits its documents; cancelling discards them; a removed document is deleted
+  only after the save commits. A session cut short by a closed page is recovered on the next start:
+  what it staged is discarded, and a save in flight is kept.
+- **The device does no processing:** photos are not scaled, and documents list by icon, name, and
+  size.
+- **A drain takes committed documents only and keeps the address.** It copies each document to
+  `DocumentServer` at the same address, then clears it from the inbox, so a record saved before
+  upload is already correct after it.
 - **Each app drains its own way.** The inbox knows nothing of apps.
   - **Admin:** a background loop in the page, draining as items arrive while the app is open; what
     is left waits for the next session.
@@ -793,8 +797,9 @@ documents. Its catalog of placements is private: module constants with fixed ids
 on every device shares, so a document has one address in the inbox and on the server, computable
 from the catalog and its owner's id with no lookup.
 
-- **A topic per type that carries notes,** each with its own typed `attach`. A composition without
-  an id (a `Note`, a `CustomerSite`, an `Answer`) keeps its documents in its owning record's bucket.
+- **A topic per type that carries notes,** each with its own typed `attach` on an editing
+  session. A composition without an id (a `Note`, a `CustomerSite`, an `Answer`) keeps its
+  documents in its owning record's bucket.
 - **A bucket per owner, its id the owner's.** The owner's bucket is created on first attach, and
   creating it again returns it, so attaching never checks first. Names are labels at every level,
   for people and the CLI.

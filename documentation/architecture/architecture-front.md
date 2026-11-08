@@ -264,6 +264,14 @@ Returns a display title derived from the job's current status and available phas
 
 `JobHub` is defined in `source/front/app/views/job-views.ts`.
 
+#### 7.2.4 Document Storage
+
+| Singleton            | Purpose                                                                               |
+| -------------------- | ------------------------------------------------------------------------------------- |
+| `api.Attachments`    | Places documents; editing sessions over the document stores (architecture-core §10.4) |
+| `api.DocumentInbox`  | The device's inbox document store                                                     |
+| `api.DocumentServer` | The shared document store                                                             |
+
 ### 7.3 Provided Infrastructure
 
 The foundation provides:
@@ -561,9 +569,11 @@ Workbench steps, the shared panel sequence, the Wizard, the Abstraction Manager,
 are built as CONVENTIONS §17 describes; their behavior is in their module headers.
 
 `NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
-`notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`, and
-`drill: DrillContract`. It edits Content and Visibility, defaults new notes to Internal,
-and never persists. Existing timestamps and attachments are preserved. Billing-address
+`notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`,
+`drill: DrillContract`, and `attach`, bound by its host to the record's editing session, with
+optional `attachmentKinds`. It edits Content, Visibility, and the note's attachments, defaults new
+notes to Internal, and never persists: its attachments are staged through the host's session, and
+existing timestamps are preserved. Billing-address
 fields and their validation occupy the separate Customer Billing step.
 
 **Features: `source/front/app-admin/`.**
