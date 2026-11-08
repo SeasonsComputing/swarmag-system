@@ -61,7 +61,7 @@ export const isAttachment = (v: unknown): v is Attachment => {
   const attachment = v
   return expectValid(
     expectNonEmptyString(attachment.filename, 'filename'),
-    expectNonEmptyString(attachment.url, 'url'),
+    expectNonEmptyString(attachment.documentAddress, 'documentAddress'),
     expectNonEmptyString(attachment.contentType, 'contentType'),
     expectConstEnum(attachment.kind, 'kind', ATTACHMENT_KINDS),
     expectWhen(attachment.uploadedAt, 'uploadedAt')

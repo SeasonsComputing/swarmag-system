@@ -51,7 +51,7 @@ export type AttachmentKind = (typeof ATTACHMENT_KINDS)[number]
 /** Uploaded artifact metadata. */
 export type Attachment = {
   filename: string
-  url: string
+  documentAddress: string
   contentType: string
   kind: AttachmentKind
   uploadedAt: When

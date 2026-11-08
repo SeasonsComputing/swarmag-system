@@ -38,7 +38,7 @@ export const LocationAdapter = makeAdapter<Location>({
 /** Deserialize/Serialize Attachment. */
 export const AttachmentAdapter = makeAdapter<Attachment>({
   filename: ['filename'],
-  url: ['url'],
+  documentAddress: ['document_address'],
   contentType: ['content_type'],
   kind: ['kind'],
   uploadedAt: ['uploaded_at']

@@ -610,7 +610,7 @@ import type { Attachment, Note } from '@domain/abstractions/common.ts'
 
 export const AttachmentAdapter = makeAdapter<Attachment>({
   filename: ['filename'],
-  url: ['url'],
+  documentAddress: ['document_address'],
   contentType: ['content_type'],
   kind: ['kind'],
   uploadedAt: ['uploaded_at']

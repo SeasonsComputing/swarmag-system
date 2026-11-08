@@ -30,7 +30,8 @@ Deno.test('User draft preserves independent notes and isolates source and projec
       createdAt: toWhen('2026-10-02T12:00:00.000Z'),
       attachments: [{
         filename: 'history.pdf',
-        url: 'https://example.com/history.pdf',
+        documentAddress:
+          'id:019a5b3c-1d2e-7f40-8a1b-2c3d4e5f6a7b/id:019a5b3c-1d2e-7f40-8a1b-2c3d4e5f6a7c/id:019a5b3c-1d2e-7f40-8a1b-2c3d4e5f6a7d',
         contentType: 'application/pdf',
         kind: 'document',
         uploadedAt: toWhen('2026-10-02T12:00:00.000Z')

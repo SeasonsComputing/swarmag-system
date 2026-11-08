@@ -137,13 +137,13 @@ Type: **object**
 
 Attributes: **State**
 
-| **Attribute** | **Type**                                                               |
-| ------------- | ---------------------------------------------------------------------- |
-| `filename`    | string                                                                 |
-| `url`         | string                                                                 |
-| `contentType` | string                                                                 |
-| `kind`        | `'photo'` \| `'video'` \| `'map'` \| `'document'` (default: `'photo'`) |
-| `uploadedAt`  | When                                                                   |
+| **Attribute**     | **Type**                                                               |
+| ----------------- | ---------------------------------------------------------------------- |
+| `filename`        | string                                                                 |
+| `documentAddress` | string                                                                 |
+| `contentType`     | string                                                                 |
+| `kind`            | `'photo'` \| `'video'` \| `'map'` \| `'document'` (default: `'photo'`) |
+| `uploadedAt`      | When                                                                   |
 
 ### 4.4 Note
 
