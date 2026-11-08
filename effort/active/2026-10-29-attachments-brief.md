@@ -1,7 +1,7 @@
 # Attachments — Brief
 
-**Active, dispatched; amended 2026-11-08 after AI Coding Engine review.** Recorded 2026-10-29 from
-a CA + AI Architect session, split from the document storage brief,
+**Active, dispatched; amended 2026-11-08 after AI Coding Engine review and re-review.** Recorded
+2026-10-29 from a CA + AI Architect session, split from the document storage brief,
 `effort/completed/2026-10-23-document-storage-brief.md`, the `core/` platform this brief uses. M-4
 assigned Attachments to M-5. This is the `front/` brief: how swarmAg's records attach documents.
 Split again 2026-10-30: attaching and uploading are different work, and upload, moving documents
@@ -168,6 +168,8 @@ not collide.
   two is the Ops application's design (M-9).
 
 ## Attachments
+
+_[Revised by the amendment "After AI Coding Engine re-review", item 3.]_
 
 Attachments is an abstraction of its own, implemented over the document store contract: the rules
 and bindings by which swarmAg's records attach documents are encapsulated in code, not idioms. It
@@ -540,8 +542,9 @@ export const api = {
      device.
    - **Removal** is a draft edit. A dropped or replaced document is deleted after the commit, in
      `complete`.
-   - **Recovery is presumed abort:** a page closed mid-edit leaves staged documents with no
-     committed record, and they are cleared when the app next starts.
+   - _[Revised by the amendment "After AI Coding Engine re-review", items 1 and 2.]_ **Recovery is
+     presumed abort:** a page closed mid-edit leaves staged documents with no committed record, and
+     they are cleared when the app next starts.
    - **No two-phase commit:** the bytes are durable before the commit point, and the drain
      finishes after it, retrying safely because ids are idempotent.
 
@@ -561,6 +564,59 @@ export const api = {
    chosen, once, and never updated; distinct from the store's own timestamps. It is a fact on the
    record, so a drain never writes it back, and a rename does not touch it. The field keeps its
    name.
+
+## Amendments — 2026-11-08 — After AI Coding Engine re-review
+
+1. **Recovery keeps a save log** (ACE's finding: a record write that succeeds on the server while
+   the page closes before it learns so leaves a committed record whose documents look abandoned).
+   `Attachments` keeps a durable ledger on the device, one entry per staged document: its address,
+   its owner, its editing session, and its state.
+   - **_staged_** when the file is chosen; **_saving_**, written before the record write;
+     **_committed_** once the record write succeeds.
+   - Each step is ordered so that a crash at any point leaves a state recovery can classify; no
+     step depends on two writes landing together.
+   - **Recovery:** _staged_ from a dead session is abandoned, and its document and entry are
+     deleted. _saving_ from a dead session is in doubt, and is **presumed committed**: the drain
+     takes it. Should the record write in fact have failed, the document reaches the server
+     unreferenced, an orphan that costs bytes and that the platform's deferred sweep collects.
+   - **Cancel** removes only _staged_ entries; nothing on the server is ever rolled back.
+
+   ACE proposed resolving an in-doubt save by reading the owning record. Presuming commit was
+   chosen instead: its worst case is an orphan rather than a deleted document a saved record refers
+   to, and recovery stays local, with no read, no topic knowledge, and no offline wait.
+2. **Recovery touches only abandoned sessions.** An editing session holds a browser lock (Web
+   Locks) named for itself for its lifetime; the browser releases it when the tab closes or
+   crashes. Recovery classifies only entries whose session's lock is gone, so a live edit in
+   another tab is never cleared. ACE verifies lock behavior for suspended tabs on the target
+   devices.
+3. **The editing session is the transaction.** Attaching moves from the `Attachments` container to
+   a session begun with the record's editor; `link` and `upload` stay on the container. The ledger
+   is private to `Attachments`.
+
+   ```ts
+   /** One editing session: a transaction over a record and its documents. */
+   export interface AttachmentSession {
+     Customers: { attach(customer: Customer, file: File): Promise<Attachment> } // staged
+     Assets: { attach(file: File): Promise<Attachment> } // shared bucket, no owner
+     // …a member per topic
+     remove(attachment: Attachment): void // a draft edit; deleted after commit
+     commit<T>(write: () => Promise<T>): Promise<T> // saving → the write → committed
+     cancel(): Promise<void> // rollback: staged documents go
+   }
+
+   export interface AttachmentsContract {
+     begin(): AttachmentSession // takes the session's lock
+     link(attachment: Attachment): Promise<DocumentLink> // inbox first, then the server
+     recover(): Promise<void> // at start: classify dead sessions' entries
+     upload(): Promise<void> // the drain: committed documents only
+   }
+   ```
+
+   ```tsx
+   const edit = Attachments.begin()
+   <NotesEditor … attach={file => edit.Customers.attach(customer, file)} />
+   await edit.commit(() => provider.save(draft)) // the record write, through makeAggregateSave
+   ```
 
 ## Design history
 
