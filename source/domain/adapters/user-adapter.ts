@@ -26,6 +26,5 @@ export const UserAdapter = makeAdapter<User>({
   primaryEmail: ['primary_email'],
   phoneNumber: ['phone_number'],
   preferredChannel: ['preferred_channel'],
-  avatarUrl: ['avatar_url'],
   status: ['status']
 })

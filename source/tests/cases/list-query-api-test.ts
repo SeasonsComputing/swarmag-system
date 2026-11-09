@@ -156,8 +156,8 @@ Deno.test('query constraints reject invalid declarations and inputs, including t
     // @ts-expect-error Object compositions cannot be declared through a variable.
     makeQuery({ filter: objectFields, order: [UserAdapter.displayName] })
     // @ts-expect-error Optional order fields inline.
-    makeQuery({ filter: [], order: [UserAdapter.avatarUrl] })
-    const optionalOrder = [UserAdapter.avatarUrl] as const
+    makeQuery({ filter: [], order: [ProbeAdapter.optional] })
+    const optionalOrder = [ProbeAdapter.optional] as const
     // @ts-expect-error Optional order fields through a tuple variable.
     makeQuery({ filter: [], order: optionalOrder })
     // @ts-expect-error Nullable order fields.

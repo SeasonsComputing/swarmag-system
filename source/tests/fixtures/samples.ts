@@ -88,7 +88,6 @@ UserSamples  Shared fixture samples.
 │ ├ primaryEmail           Primary email address.
 │ ├ phoneNumber            Phone number.
 │ ├ preferredChannel       Preferred contact channel.
-│ ├ avatarUrl              Optional avatar URL.
 │ └ status                 Lifecycle status.
 ├ operations              Operations User.
 │ ├ Instantiable           Inherited Instantiable fields.
@@ -98,7 +97,6 @@ UserSamples  Shared fixture samples.
 │ ├ primaryEmail           Primary email address.
 │ ├ phoneNumber            Phone number.
 │ ├ preferredChannel       Preferred contact channel.
-│ ├ avatarUrl              Optional avatar URL.
 │ └ status                 Lifecycle status.
 ├ sales                   Sales User.
 │ ├ Instantiable           Inherited Instantiable fields.
@@ -108,7 +106,6 @@ UserSamples  Shared fixture samples.
 │ ├ primaryEmail           Primary email address.
 │ ├ phoneNumber            Phone number.
 │ ├ preferredChannel       Preferred contact channel.
-│ ├ avatarUrl              Optional avatar URL.
 │ └ status                 Lifecycle status.
 └ all                     All User records.
 WorkflowSamples  Shared fixture samples.

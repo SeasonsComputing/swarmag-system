@@ -27,9 +27,11 @@ import {
   expectValid,
   expectWhen,
   isDictionary,
-  isNonEmptyString
+  isNonEmptyString,
+  ValidatorError
 } from '@core/std'
 import type { ExpectResult } from '@core/std'
+import { DocumentAddresses } from '@core/stdx'
 import type { Attachment, Location, Note } from '@domain/abstractions/common.ts'
 import { ATTACHMENT_KINDS, NOTE_VISIBILITIES } from '@domain/abstractions/common.ts'
 import type { FacetCreate, FacetUpdate } from '@domain/protocols/common-protocol.ts'
@@ -61,7 +63,7 @@ export const isAttachment = (v: unknown): v is Attachment => {
   const attachment = v
   return expectValid(
     expectNonEmptyString(attachment.filename, 'filename'),
-    expectNonEmptyString(attachment.documentAddress, 'documentAddress'),
+    expectDocumentAddress(attachment.documentAddress, 'documentAddress'),
     expectNonEmptyString(attachment.contentType, 'contentType'),
     expectConstEnum(attachment.kind, 'kind', ATTACHMENT_KINDS),
     expectWhen(attachment.uploadedAt, 'uploadedAt')
@@ -117,4 +119,16 @@ const expectFacetKey = (value: unknown, field: string, optional = false): Expect
   if (error) return error
   if (typeof value === 'string' && value.includes(':')) return `${field} must not contain :`
   return null
+}
+
+const expectDocumentAddress = (value: unknown, field: string): ExpectResult => {
+  const message = `${field} must be an id-form document address`
+  if (!isNonEmptyString(value)) return message
+  try {
+    DocumentAddresses.id(value)
+    return null
+  } catch (error) {
+    if (error instanceof ValidatorError) return message
+    throw error
+  }
 }

@@ -9,7 +9,6 @@ PURPOSE
 Scope inference, constraints, and create/update projection tests.
 */
 
-import { id } from '@core/std'
 import type { CreateFromInstantiable, Dictionary, FromInstantiable, Id, ScopedUpdate } from '@core/std'
 import type { CrudBaseContract, DirectUpdateContract } from '@core/stdx'
 import { makeAdaptedScope, makeScope } from '@core/stdx'
@@ -212,27 +211,6 @@ Deno.test('Id | undefined admits null in ScopedUpdate and clears through the for
   assertEquals((invalid as Dictionary).name, null)
 })
 
-Deno.test('User projections exclude avatarUrl even when a richer draft carries it', () => {
-  const draft: DraftOf<typeof scopes.Users.detail> = {
-    displayName: 'Ada Lovelace',
-    primaryEmail: 'ada@example.com',
-    phoneNumber: '+1-325-555-0100',
-    preferredChannel: 'email',
-    notes: [],
-    roles: ['administrator'],
-    status: 'active'
-  }
-  const userId = id()
-  const richerDraft = { ...draft, avatarUrl: 'https://example.com/ada.png' }
-  const created = scopes.Users.detail.toCreate(richerDraft)
-  const updated = scopes.Users.detail.toUpdate(userId, richerDraft)
-  assertEquals(created, draft)
-  assertEquals(updated, { id: userId, ...draft })
-  assertEquals('avatarUrl' in created, false)
-  assertEquals('avatarUrl' in updated, false)
-  assertEquals('adapter' in scopes.Users.detail, false)
-})
-
 /** Declared direct-update client, for type assertions only. */
 declare const directUsers: DirectUpdateContract<User>
 /** Declared create client, for type assertions only. */
@@ -249,8 +227,6 @@ function checkUserInference(draft: DraftOf<typeof scopes.Users.detail>, id: Id):
   > = true
   const updated: Promise<User> = directUsers.update(Scope.toUpdate(id, draft))
   const created: Promise<User> = userCreates.create(Scope.toCreate(draft))
-  // @ts-expect-error User drafts exclude avatarUrl.
-  const avatarDraft: UserDraft = { ...draft, avatarUrl: 'https://example.com/ada.png' }
   const overlap = { displayName: 'Unowned default' }
   makeScope({
     fields: [
@@ -274,7 +250,7 @@ function checkUserInference(draft: DraftOf<typeof scopes.Users.detail>, id: Id):
   const exactInference: Equal<typeof inferred, keyof UserDraft> = true
   const exactCreate: Equal<ReturnType<typeof Scope.toCreate>, CreateFromInstantiable<User>> = true
   const exactDraft: Equal<UserDraft, Pick<FromInstantiable<User>, keyof UserDraft>> = true
-  void [exactKeys, updated, created, avatarDraft, exactInference, exactCreate, exactDraft]
+  void [exactKeys, updated, created, exactInference, exactCreate, exactDraft]
 }
 
 void checkUserInference

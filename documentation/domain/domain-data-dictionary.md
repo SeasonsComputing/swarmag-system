@@ -10,6 +10,15 @@ It is derived from `domain-model.md` and presents the same model in a table-firs
 
 The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping a conceptual solution space to physical artifacts that codify the solution as software.
 
+A string attribute may carry a **Domain**: a named format from a closed set, which selects its
+validation. A table shows the Domain column only when one of its attributes has one.
+
+| **Domain**         | **Format**                        | **Validation**                             |
+| ------------------ | --------------------------------- | ------------------------------------------ |
+| `email`            | An email address                  | `expectEmail`                              |
+| `url`              | An absolute `https://` URL        | `expectUrl` with `['https']`               |
+| `document-address` | An id-form document store address | `DocumentAddresses.id` (CONVENTIONS §10.8) |
+
 ## 2. Topic Namespace
 
 | Topic     | Source                             | Contents                 |
@@ -137,13 +146,13 @@ Type: **object**
 
 Attributes: **State**
 
-| **Attribute**     | **Type**                                                               |
-| ----------------- | ---------------------------------------------------------------------- |
-| `filename`        | string                                                                 |
-| `documentAddress` | string                                                                 |
-| `contentType`     | string                                                                 |
-| `kind`            | `'photo'` \| `'video'` \| `'map'` \| `'document'` (default: `'photo'`) |
-| `uploadedAt`      | When                                                                   |
+| **Attribute**     | **Type**                                                               | **Domain**         |
+| ----------------- | ---------------------------------------------------------------------- | ------------------ |
+| `filename`        | string                                                                 |                    |
+| `documentAddress` | string                                                                 | `document-address` |
+| `contentType`     | string                                                                 |                    |
+| `kind`            | `'photo'` \| `'video'` \| `'map'` \| `'document'` (default: `'photo'`) |                    |
+| `uploadedAt`      | When                                                                   |                    |
 
 ### 4.4 Note
 
@@ -267,10 +276,10 @@ Type: **object**
 
 Attributes: **State**
 
-| **Attribute**  | **Type** |
-| -------------- | -------- |
-| `url`          | string   |
-| `description?` | string   |
+| **Attribute**  | **Type** | **Domain** |
+| -------------- | -------- | ---------- |
+| `url`          | string   | `url`      |
+| `description?` | string   |            |
 
 ### 6.3 Chemical
 
@@ -287,16 +296,16 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**           | **Type**                                                                 |
-| ----------------------- | ------------------------------------------------------------------------ |
-| `name`                  | string                                                                   |
-| `epaNumber?`            | string                                                                   |
-| `usage`                 | ChemicalUsage                                                            |
-| `signalWord`            | `'none'` \| `'danger'` \| `'warning'` \| `'caution'` (default: `'none'`) |
-| `restrictedUse`         | boolean                                                                  |
-| `reEntryIntervalHours?` | number                                                                   |
-| `storageLocation?`      | string                                                                   |
-| `sdsUrl?`               | string                                                                   |
+| **Attribute**           | **Type**                                                                 | **Domain** |
+| ----------------------- | ------------------------------------------------------------------------ | ---------- |
+| `name`                  | string                                                                   |            |
+| `epaNumber?`            | string                                                                   |            |
+| `usage`                 | ChemicalUsage                                                            |            |
+| `signalWord`            | `'none'` \| `'danger'` \| `'warning'` \| `'caution'` (default: `'none'`) |            |
+| `restrictedUse`         | boolean                                                                  |            |
+| `reEntryIntervalHours?` | number                                                                   |            |
+| `storageLocation?`      | string                                                                   |            |
+| `sdsUrl?`               | string                                                                   | `url`      |
 
 ## 7. Customers
 
@@ -310,12 +319,12 @@ Type: **object**
 
 Attributes: **State**
 
-| **Attribute**      | **Type**                |
-| ------------------ | ----------------------- |
-| `displayName`      | string                  |
-| `phoneNumber`      | string                  |
-| `preferredChannel` | ContactPreferredChannel |
-| `email?`           | string                  |
+| **Attribute**      | **Type**                | **Domain** |
+| ------------------ | ----------------------- | ---------- |
+| `displayName`      | string                  |            |
+| `phoneNumber`      | string                  |            |
+| `preferredChannel` | ContactPreferredChannel |            |
+| `email?`           | string                  | `email`    |
 
 ### 7.2 CustomerSite
 
@@ -460,14 +469,13 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**      | **Type**                                         | **Constraints** |
-| ------------------ | ------------------------------------------------ | --------------- |
-| `displayName`      | string                                           |                 |
-| `primaryEmail`     | string                                           | unique          |
-| `phoneNumber`      | string                                           |                 |
-| `preferredChannel` | ContactPreferredChannel                          |                 |
-| `avatarUrl?`       | string                                           |                 |
-| `status`           | `'active'` \| `'inactive'` (default: `'active'`) |                 |
+| **Attribute**      | **Type**                                         | **Domain** | **Constraints** |
+| ------------------ | ------------------------------------------------ | ---------- | --------------- |
+| `displayName`      | string                                           |            |                 |
+| `primaryEmail`     | string                                           | `email`    | unique          |
+| `phoneNumber`      | string                                           |            |                 |
+| `preferredChannel` | ContactPreferredChannel                          |            |                 |
+| `status`           | `'active'` \| `'inactive'` (default: `'active'`) |            |                 |
 
 `public.users.id` is the domain user identifier. Backend auth synchronization keeps it equal to
 `auth.users.id` as a solution-space invariant. The shared UUID is supplied by application code

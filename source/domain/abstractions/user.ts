@@ -36,6 +36,5 @@ export type User = Instantiable & {
   primaryEmail: string
   phoneNumber: string
   preferredChannel: ContactPreferredChannel
-  avatarUrl?: string
   status: UserStatus
 }

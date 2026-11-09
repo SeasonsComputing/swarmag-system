@@ -21,7 +21,6 @@ UserSamples  Shared fixture samples.
 │ ├ primaryEmail           Primary email address.
 │ ├ phoneNumber            Phone number.
 │ ├ preferredChannel       Preferred contact channel.
-│ ├ avatarUrl              Optional avatar URL.
 │ └ status                 Lifecycle status.
 ├ operations              Operations User.
 │ ├ Instantiable           Inherited Instantiable fields.
@@ -31,7 +30,6 @@ UserSamples  Shared fixture samples.
 │ ├ primaryEmail           Primary email address.
 │ ├ phoneNumber            Phone number.
 │ ├ preferredChannel       Preferred contact channel.
-│ ├ avatarUrl              Optional avatar URL.
 │ └ status                 Lifecycle status.
 ├ sales                   Sales User.
 │ ├ Instantiable           Inherited Instantiable fields.
@@ -41,7 +39,6 @@ UserSamples  Shared fixture samples.
 │ ├ primaryEmail           Primary email address.
 │ ├ phoneNumber            Phone number.
 │ ├ preferredChannel       Preferred contact channel.
-│ ├ avatarUrl              Optional avatar URL.
 │ └ status                 Lifecycle status.
 └ all                     All User records.
 */
@@ -57,7 +54,6 @@ const Administrator: User = {
   phoneNumber: '+1-325-555-0111',
   preferredChannel: 'email',
   notes: [],
-  avatarUrl: 'https://example.com/avatars/morgan-dale.png',
   status: 'active',
   createdAt: toWhen('2025-01-10T00:00:00Z'),
   updatedAt: toWhen('2025-01-10T00:00:00Z')
@@ -71,7 +67,6 @@ const Operations: User = {
   phoneNumber: '+1-325-555-0122',
   preferredChannel: 'text',
   notes: [],
-  avatarUrl: 'https://example.com/avatars/sloane-mercer.png',
   status: 'active',
   createdAt: toWhen('2025-01-10T00:00:00Z'),
   updatedAt: toWhen('2025-01-11T00:00:00Z')
@@ -85,7 +80,6 @@ const Sales: User = {
   phoneNumber: '+1-325-555-0133',
   preferredChannel: 'phone',
   notes: [],
-  avatarUrl: 'https://example.com/avatars/reese-vaughn.png',
   status: 'active',
   createdAt: toWhen('2025-01-12T00:00:00Z'),
   updatedAt: toWhen('2025-01-12T00:00:00Z')

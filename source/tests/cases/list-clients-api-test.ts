@@ -28,6 +28,7 @@ import { UserAdapter } from '@domain/adapters/user-adapter.ts'
 import { queries } from '@front/api/queries.ts'
 import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert'
 import { createClient } from '@supabase/client'
+import { FacetSamples } from '@tests/fixtures/facet-samples.ts'
 import { UserSamples } from '@tests/fixtures/user-samples.ts'
 
 /** Users table spec shared by the Supabase translation tests. */
@@ -257,11 +258,11 @@ Deno.test('IndexedDB ANDs criteria, set predicates, and accent-sensitive search'
       search: ' JOSÉ '
     })
     assertEquals((await client.list({ query })).data.map(user => user.id), [users[0].id])
-    const optional = makeQuery({ filter: [UserAdapter.avatarUrl], order: [UserAdapter.displayName] })
-    const absentUsers = users.map(user => ({ ...user, avatarUrl: undefined }))
-    await withRecords(UserAdapter, absentUsers, async local => {
+    const optional = makeQuery({ filter: [FacetAdapter.description], order: [FacetAdapter.code] })
+    const undescribed = [{ ...FacetSamples.aerialSpray, description: undefined }]
+    await withRecords(FacetAdapter, undescribed, async local => {
       assertEquals(
-        (await local.list({ query: optional.build({ where: { avatarUrl: { eq: 'x' } } }) })).data,
+        (await local.list({ query: optional.build({ where: { description: { eq: 'x' } } }) })).data,
         []
       )
     })

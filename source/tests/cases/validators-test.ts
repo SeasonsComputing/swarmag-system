@@ -25,8 +25,8 @@ import { isContact } from '@domain/validators/customer-validator.ts'
 import { assertEquals, assertNotEquals } from '@std/assert'
 
 Deno.test('optional fields admit undefined and null', () => {
-  assertEquals(expectNonEmptyString(undefined, 'avatarUrl', true), null)
-  assertEquals(expectNonEmptyString(null, 'avatarUrl', true), null)
+  assertEquals(expectNonEmptyString(undefined, 'epaNumber', true), null)
+  assertEquals(expectNonEmptyString(null, 'epaNumber', true), null)
   assertEquals(expectPositiveNumber(null, 'acreage', true), null)
   assertEquals(expectBoolean(null, 'required', true), null)
 })
