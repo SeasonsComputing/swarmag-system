@@ -177,6 +177,7 @@ All cross-boundary imports use Deno import maps with path aliases defined in `de
     // ────────────────────────────────────────────────────────────────────────────
 
     "@kobalte/core": "npm:@kobalte/core@0.13.11",
+    "fake-indexeddb": "npm:fake-indexeddb@6.2.5",
     "@std/assert": "jsr:@std/assert@1.0.19",
     "@std/walk": "jsr:@std/fs@1.0.19/walk",
     "@supabase/client": "https://esm.sh/@supabase/supabase-js@2.108.1",
@@ -263,8 +264,7 @@ The system consists of five primary components:
 | **Backend Orchestration** | Edge Functions for complex operations             | Supabase Edge      |
 | **Persistent Storage**    | PostgreSQL with Row Level Security                | Supabase           |
 
-UX applications consume the API namespace composed in `source/front/api/api.ts` through the
-`@front/api/api.ts` path.
+UX applications consume the API namespace composed through the `@front/api/api.ts` module.
 
 ## 5. System Boundary
 
