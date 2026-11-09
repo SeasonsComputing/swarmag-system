@@ -1,7 +1,7 @@
 # Attachments — Brief
 
 **Active, draft.** First of four features of roadmap M-6, Document Storage: the Admin side. It
-depends on `effort/active/2026-11-08-document-store-platform-brief.md` shipping first. Feature
+depends on `effort/completed/2026-11-08-document-store-platform-brief.md`, shipped. Feature
 mode.
 
 **Its changes are within `front/` only,** with their tests in `source/tests/`. A need outside
@@ -104,7 +104,8 @@ Settled in the design conversation (the 2026-10-29 brief and its amendments).
 `deno task check`, `deno task fmt:check`, `deno task test` (the two stage-environment tests
 excluded); `STYLE_AUDIT`. Failure injection across stage, save, interrupted save, cancel, and
 restart; two tabs with recovery; lock behavior on a suspended tab on the target devices. The CA
-verifies attach, open, rename, remove, cancel, and the SDS and labels fields in Admin.
+verifies attach, open, rename, remove, cancel, and the SDS and labels fields in Admin, and, from
+the platform brief, that the inbox persists across a reload and requests persistent storage.
 
 ## Design history
 

@@ -126,13 +126,13 @@ seven: Solid, Kobalte, TanStack Query and Router, Chart.js, `idb`, and Supabase.
 
 #### 2.4.1 Core (`source/core/`)
 
-| Path   | Description                                                                      |
-| ------ | -------------------------------------------------------------------------------- |
-| `cfg/` | Configuration management (Config singleton, runtime providers)                   |
-| `cli/` | API client implementations and makers (HTTP, Supabase, IndexedDB)                |
-| `db/`  | Database APIs (Supabase, IndexedDB)                                              |
-| `svc/` | Edge service support (caller verification for privileged functions)              |
-| `std/` | Standard types, makers, and API contracts (Id, When, adapter, scope, CRUD, auth) |
+| Path   | Topic         | Description                                                                                      |
+| ------ | ------------- | ------------------------------------------------------------------------------------------------ |
+| `cfg/` | Configuration | Configuration management (Config singleton, runtime providers)                                   |
+| `cli/` | Client        | API clients: makers, classes, and providers (HTTP, Supabase, IndexedDB, document store)          |
+| `db/`  | Database      | Database APIs (Supabase, IndexedDB)                                                              |
+| `svc/` | Service       | Edge service support (caller verification for privileged functions)                              |
+| `std/` | Standard      | Standard types, makers, and API contracts (Id, When, adapter, scope, CRUD, auth, document store) |
 
 **Owned capabilities.** `core/` imports one third-party package, `@supabase/client`, in two files.
 Supabase sits behind the transport-agnostic contracts in `std/`, so it is a replaceable

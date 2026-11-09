@@ -1,7 +1,7 @@
 # Document Store Platform — Brief
 
-**Active, dispatched; amended 2026-11-08 after production review.** An enabler of roadmap M-6,
-consumed by `effort/active/2026-11-08-attachments-brief.md`. Foundation mode.
+**Completed 2026-11-08.** Shipped in `1249a05`, with the import map in `d6fcb4e`. An enabler of
+roadmap M-6, consumed by `effort/active/2026-11-08-attachments-brief.md`. Foundation mode.
 
 **Its changes are within `core/` only,** with their tests in `source/tests/`. A need outside
 `core/` is an escalation, not a change this brief makes.
@@ -136,6 +136,18 @@ The CA and AI Architect reviewed ACE's production against this brief. It stays w
    conventional container, but the contract objects, built as field initializers, would precede the
    provider's assignment and depend on every use sitting inside a deferred function. The declared
    API is honored either way, and the constructor form has no ordering trap.
+
+## Closure (2026-11-08)
+
+Production by the AI Coding Engine in two rounds, the second after the amendment; committed in
+`1249a05`. `architecture-core.md` §3.2.4 lists `fake-indexeddb` in its import map (`d6fcb4e`). The
+AI Architect verified the repairs against the diff and re-ran the checks: guards, types, lint,
+formatting, and 191 tests with the two stage-environment tests excluded; `STYLE_AUDIT: PASS`.
+
+Settled at closure:
+
+- **Persistence across a reload and the persistent-storage request,** which a fake cannot prove,
+  join the attachments brief's Checks, where the Admin inbox exercises them in a real browser.
 
 ## Design history
 
