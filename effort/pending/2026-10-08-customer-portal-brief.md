@@ -41,9 +41,6 @@ story 4), which is portal users. The same session's account-manager work is
   job_plan_*:     plan_id IN (SELECT id FROM job_plans WHERE job_id IN (…the jobs above…))
   ```
 
-- **RLS is row-level.** Notes and sites live inside the Customer row, so a portal user who sees the
-  row sees its `internal` notes too. Showing only `shared` notes needs a view or function, or notes
-  in their own table. A release that shows no notes can defer it.
 - **Someday:** self-service account fields (phone and the like), through a function that accepts
   only those fields; and customer requests (follow-ups, sprays, messages), parked as the Request
   model in `project-parking-lot.md`.

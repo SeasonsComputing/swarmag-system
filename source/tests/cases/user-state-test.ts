@@ -19,14 +19,12 @@ import { UserSamples } from '@tests/fixtures/user-samples.ts'
 Deno.test('User draft preserves independent notes and isolates source and projected metadata', () => {
   const notes: Note[] = [
     {
-      content: 'Internal history',
-      visibility: 'internal',
+      content: 'Earlier history',
       createdAt: toWhen('2026-10-01T12:00:00.000Z'),
       attachments: []
     },
     {
-      content: 'Shared history',
-      visibility: 'shared',
+      content: 'Later history',
       createdAt: toWhen('2026-10-02T12:00:00.000Z'),
       attachments: [{
         filename: 'history.pdf',
@@ -42,13 +40,13 @@ Deno.test('User draft preserves independent notes and isolates source and projec
   const state = createUserState(user)
   assertEquals(userDraft(state).notes, notes)
   notes[0].content = 'Changed source'
-  assertEquals(state.notes()[0].content, 'Internal history')
+  assertEquals(state.notes()[0].content, 'Earlier history')
   const projected = userDraft(state)
   projected.notes[1].attachments[0].filename = 'Changed projection'
   assertEquals(state.notes()[1].attachments[0].filename, 'history.pdf')
   state.setNotes(state.notes().map((note, index) => index === 0 ? { ...note, content: 'Edited' } : note))
   assertEquals(userDraft(state).notes[0].content, 'Edited')
-  assertEquals(userDraft(state).notes[1].visibility, 'shared')
+  assertEquals(userDraft(state).notes[1].content, 'Later history')
   state.setNotes([])
   assertEquals(userDraft(state).notes, [])
 })
@@ -72,7 +70,6 @@ Deno.test('User draft copies accepted notes and roles and isolates projected rol
   assertEquals(state.roles(), ['administrator', 'operations'])
   const notes: Note[] = [{
     content: 'Accepted',
-    visibility: 'internal',
     attachments: [],
     createdAt: toWhen('2026-10-08T12:00:00Z')
   }]

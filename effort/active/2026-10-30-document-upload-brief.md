@@ -39,9 +39,6 @@ Storage policies are the Supabase provider brief's mechanism (its DevOps 2); thi
 the rules swarmAg's namespaces need, and they are written there.
 
 - Per bucket, which roles read or write it.
-- A customer reaches documents only through the portal, signed in, and only the attachments of
-  shared notes (`Note.visibility`) in their own bucket. A customer email carries no document links: it links to the portal, and its
-  pictures are embedded, read by the sender on the server.
 
 ## Design moments
 

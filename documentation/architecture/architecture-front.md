@@ -571,10 +571,10 @@ are built as CONVENTIONS §17 describes; their behavior is in their module heade
 `NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
 `notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`,
 `drill: DrillContract`, and `attach`, which stages a chosen file (`Attachments.stage`), with
-optional `attachmentKinds`. It edits Content, Visibility, and the note's attachments, defaults new
-notes to Internal, and preserves existing timestamps. It never persists: its host saves the record
-and places its staged attachments in `makeAggregateSave`'s `complete`. Billing-address
-fields and their validation occupy the separate Customer Billing step.
+optional `attachmentKinds`. It edits Content and the note's attachments, and preserves existing
+timestamps. It never persists: its host saves the record and places its staged attachments in
+`makeAggregateSave`'s `complete`. Billing-address fields and their validation occupy the separate
+Customer Billing step.
 
 **Features: `source/front/app-admin/`.**
 

@@ -77,8 +77,7 @@ Deno.test('Note validation accepts notes without tags', () => {
   assert(isNote({
     attachments: [],
     createdAt: FacetSamples.aerialSpray.createdAt,
-    content: 'Operational knowledge',
-    visibility: 'internal'
+    content: 'Operational knowledge'
   }))
 })
 

@@ -48,8 +48,7 @@ export const AttachmentAdapter = makeAdapter<Attachment>({
 export const NoteAdapter = makeAdapter<Note>({
   attachments: ['attachments', AttachmentAdapter],
   createdAt: ['created_at'],
-  content: ['content'],
-  visibility: ['visibility']
+  content: ['content']
 })
 
 /** Deserialize/Serialize Facet. */

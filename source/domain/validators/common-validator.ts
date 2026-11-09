@@ -31,7 +31,7 @@ import {
 } from '@core/std'
 import type { ExpectResult } from '@core/std'
 import type { Attachment, Location, Note } from '@domain/abstractions/common.ts'
-import { ATTACHMENT_KINDS, NOTE_VISIBILITIES } from '@domain/abstractions/common.ts'
+import { ATTACHMENT_KINDS } from '@domain/abstractions/common.ts'
 import type { FacetCreate, FacetUpdate } from '@domain/protocols/common-protocol.ts'
 
 /** Guard for Location with paired coordinates or address substance (line1+city). */
@@ -75,8 +75,7 @@ export const isNote = (v: unknown): v is Note => {
   return expectValid(
     expectCompositionMany(note.attachments, 'attachments', isAttachment),
     expectWhen(note.createdAt, 'createdAt'),
-    expectNonEmptyString(note.content, 'content'),
-    expectConstEnum(note.visibility, 'visibility', NOTE_VISIBILITIES)
+    expectNonEmptyString(note.content, 'content')
   ) === null
 }
 

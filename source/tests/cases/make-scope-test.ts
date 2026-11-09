@@ -136,8 +136,7 @@ Deno.test('toCreate selects draft fields and preserves defaults against richer v
     notes: [{
       content: 'Must not override declared defaults',
       createdAt: CustomerSamples.blueMesaRanch.createdAt,
-      attachments: [],
-      visibility: 'internal' as const
+      attachments: []
     }],
     accountManagerId: CustomerSamples.blueMesaRanch.accountManagerId,
     id: CustomerSamples.blueMesaRanch.id,

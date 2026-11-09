@@ -16,24 +16,14 @@ NotesEditor       Render the notes Index-Detail pair.
 */
 
 import { toTrimmed, when } from '@core/std'
-import { NOTE_VISIBILITIES } from '@domain/abstractions/common.ts'
-import type { Note, NoteVisibility } from '@domain/abstractions/common.ts'
+import type { Note } from '@domain/abstractions/common.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
-import { createSignal, For, onCleanup, Show } from '@solid-js'
+import { createSignal, onCleanup, Show } from '@solid-js'
 import { createStore } from '@solid-js/store'
 import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
 import type { DrillContract, DrillPanelContext } from '@ux/shell/panel/drill-contract.ts'
 import { copyDraft, isDraftChanged } from '@ux/shell/workbench/workbench-draft.ts'
-import {
-  UiAlert,
-  UiField,
-  UiFieldset,
-  UiLayout,
-  UiText,
-  UiTextArea,
-  UiToggleGroup,
-  UiToggleItem
-} from '@ux/ui'
+import { UiAlert, UiField, UiFieldset, UiLayout, UiText, UiTextArea } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 
 import './notes-editor.css'
@@ -65,8 +55,7 @@ export const NotesEditor = (props: NotesEditorProps): UiComponent => {
           </>
         }
         newLabel='New Note'
-        onNew={() =>
-          setPendingNote({ attachments: [], createdAt: when(), content: '', visibility: 'internal' })}
+        onNew={() => setPendingNote({ attachments: [], createdAt: when(), content: '' })}
         onRemove={index => props.onChange(copyDraft(props.notes().filter((_, i) => i !== index)))}
         confirmRemove={() => ({ title: 'Delete note?', message: 'This note will be removed.' })}
         renderItem={(note, index, context) => {
@@ -150,16 +139,6 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
               />
             </UiField>
           </UiLayout>
-          <UiField label='Visibility' variant='caption'>
-            <UiToggleGroup<NoteVisibility>
-              value={draft.visibility}
-              onChange={value => setDraft('visibility', value)}
-            >
-              <For each={NOTE_VISIBILITIES}>
-                {value => <UiToggleItem value={value}>{UiText.label(value)}</UiToggleItem>}
-              </For>
-            </UiToggleGroup>
-          </UiField>
         </UiLayout>
       </UiFieldset>
     </UiLayout>

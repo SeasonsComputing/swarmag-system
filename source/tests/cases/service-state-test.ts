@@ -91,7 +91,6 @@ Deno.test('Service drafts copy source, accepted values, and projected arrays', (
 const note = (): Note => ({
   createdAt: toWhen('2026-10-28T12:00:00Z'),
   content: 'Original note',
-  visibility: 'internal',
   attachments: []
 })
 

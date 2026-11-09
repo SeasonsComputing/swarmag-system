@@ -38,7 +38,6 @@ Deno.test('Customer draft copies accepted notes, added sites, and replaced sites
   const state = createCustomerState()
   const notes = [{
     content: 'Accepted note',
-    visibility: 'internal' as const,
     attachments: [],
     createdAt: toWhen('2026-10-08T12:00:00Z')
   }]

@@ -16,9 +16,7 @@ ContactPreferredChannel     Channel type derived from CONTACT_PREFERRED_CHANNELS
 ATTACHMENT_KINDS            Allowed attachment kind values.
 AttachmentKind              Attachment kind derived from ATTACHMENT_KINDS.
 Attachment                  Uploaded artifact metadata.
-NOTE_VISIBILITIES           Allowed note visibility values.
-NoteVisibility              Note visibility derived from NOTE_VISIBILITIES.
-Note                        Free form note with visibility.
+Note                        Free form note.
 Facet                       Curated classification catalog entry.
 */
 
@@ -57,16 +55,11 @@ export type Attachment = {
   uploadedAt: When
 }
 
-/** Allowed note visibility values. */
-export const NOTE_VISIBILITIES = ['internal', 'shared'] as const
-export type NoteVisibility = (typeof NOTE_VISIBILITIES)[number]
-
-/** Freeform note with visibility. */
+/** Freeform note. */
 export type Note = {
   attachments: CompositionMany<Attachment>
   createdAt: When
   content: string
-  visibility: NoteVisibility
 }
 
 /** Curated classification catalog entry: one code within a scheme. */

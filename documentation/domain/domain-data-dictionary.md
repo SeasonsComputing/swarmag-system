@@ -158,7 +158,7 @@ Attributes: **State**
 
 ### 5.4 Note
 
-Purpose: **Freeform note with visibility**
+Purpose: **Freeform note**
 
 Type: **object**
 
@@ -170,11 +170,10 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute** | **Type**                                           |
-| ------------- | -------------------------------------------------- |
-| `createdAt`   | When                                               |
-| `content`     | string                                             |
-| `visibility`  | `'internal'` \| `'shared'` (default: `'internal'`) |
+| **Attribute** | **Type** |
+| ------------- | -------- |
+| `createdAt`   | When     |
+| `content`     | string   |
 
 ### 5.5 Facet
 

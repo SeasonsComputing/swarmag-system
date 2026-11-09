@@ -64,6 +64,5 @@ Deno.test('Asset projection trims text and explicitly clears optional fields', (
 const note = (): Note => ({
   createdAt: toWhen('2026-10-27T12:00:00Z'),
   content: 'Original note',
-  visibility: 'internal',
   attachments: []
 })

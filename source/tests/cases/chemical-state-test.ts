@@ -68,7 +68,6 @@ Deno.test('Re-entry form accepts blank or positive whole hours and rejects inval
 const note = (): Note => ({
   createdAt: toWhen('2026-10-27T12:00:00Z'),
   content: 'Original note',
-  visibility: 'internal',
   attachments: []
 })
 

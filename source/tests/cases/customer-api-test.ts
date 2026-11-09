@@ -89,8 +89,7 @@ Deno.test('Customer API detail scope replaces and clears account notes', async (
   await withCustomer(async customer => {
     const notes = [{
       ...customer.notes[0],
-      content: 'Customer-facing account update.',
-      visibility: 'shared' as const
+      content: 'Customer-facing account update.'
     }]
     const updated = await api.Customers.update(
       Scope.adapter,
@@ -155,8 +154,7 @@ const withCustomer = async (run: (customer: Customer) => Promise<void>): Promise
     notes: [{
       content: 'Account history must survive editing.',
       createdAt: CustomerSamples.blueMesaRanch.createdAt,
-      attachments: [],
-      visibility: 'internal'
+      attachments: []
     }]
   }
   let record = CustomerAdapter.fromDomain(customer)

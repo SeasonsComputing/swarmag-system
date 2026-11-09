@@ -59,8 +59,7 @@ machinery and chemical applications.
   pins. The Ops app is the most HCI-sensitive of the apps: outdoors, often one-handed, without
   signal.
 - **Customer portal** is the planning map and workflow over a base map, with pins the customer
-  opens to see the photo and notes from assessment, planning, and the work phase. It shows only
-  `shared` notes (`Note.visibility`) and their photos.
+  opens to see the photo and notes from assessment, planning, and the work phase.
 
 ## GeoJSON
 
