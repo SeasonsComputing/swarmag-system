@@ -222,7 +222,7 @@ attaches and shares documents; field capture and its upload are the Ops applicat
 **Features**, in order; each builds and tests on IndexedDB until the Supabase provider makes the
 store shared:
 
-1. **Attachments** (`effort/active/2026-11-08-attachments-brief.md`): `Attachment.documentAddress`,
+1. **Attachments** (`effort/active/2026-11-09-attachments-brief.md`): staging and placement,
    `Attachments` in `front/api` with its catalog, the inbox, the editors (attachments on notes,
    and the URL app control with the Chemical labels editor and the SDS field), and Admin capture,
    against a second IndexedDB store, `DocumentServer`.

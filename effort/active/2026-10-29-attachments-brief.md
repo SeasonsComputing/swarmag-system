@@ -296,8 +296,8 @@ labels are the Field Binder's.
   answer control captures. It is the job runner's custom UX (M-9), over the same `Attachment`, the
   same inbox, and the same store. The domain needs a question that requires an attachment: the
   field mapping brief's edit 4 (`requires: 'note' | 'attachment'`), or a photo question type.
-- **No avatar.** swarmAg is not an avatar kind of app: `User.avatarUrl` leaves the domain the next
-  time the schema changes (backlog B-41), and users show by their initials.
+- **No avatar.** swarmAg is not an avatar kind of app: `User.avatarUrl` is removed from the domain
+  (2026-11-09), and users show by their initials.
 
 ## Accepted files
 

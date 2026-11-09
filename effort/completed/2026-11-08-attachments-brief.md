@@ -1,8 +1,9 @@
 # Attachments — Brief
 
-**Active, draft.** First of four features of roadmap M-6, Document Storage: the Admin side. It
-depends on `effort/completed/2026-11-08-document-store-platform-brief.md`, shipped. Feature
-mode.
+**Withdrawn, 2026-11-09, superseded** by `effort/active/2026-11-09-attachments-brief.md`: a new
+record must attach as an existing one does, which decision 6 refused, and the transaction, ledger,
+and editing sessions of decisions 4 and 5 are withdrawn with it. Its other decisions carry into the
+new brief, which settles every item this one deferred.
 
 **Its changes are within `front/` only,** with their tests in `source/tests/`. A need outside
 `front/` is an escalation, not a change this brief makes.

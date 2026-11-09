@@ -161,17 +161,6 @@ Design record: [Overlay Controls API — Brief](../pending/2026-10-13-overlay-tr
 
 ## Auth
 
-### B-41 · `User.avatarUrl` serves no surface
-
-**Observed:** 2026-11-07 · low
-
-swarmAg is not an avatar kind of app: no surface shows a user's picture, and users show by their
-initials. Remove `avatarUrl` from `User` in the data dictionary (`domain-data-dictionary.md`), and
-regenerate through genesis: the abstraction, its validator and adapter, `users.avatar_url` in
-`schema.sql` and its views, and the domain archetypes' examples.
-
-**Picking this up:** carried with the next schema change; not a migration of its own.
-
 ### B-7 · A stale session survives genesis and is not ejected
 
 **Observed:** 2026-08-04 · normal
@@ -586,5 +575,19 @@ References to update: `deno.jsonc` tasks, `source/devops/scripts/app-style-guide
 
 **Picking this up:** unblocked. The Customer Manager production, which also touched
 `architecture-front.md`'s directory tree, landed 2026-09-30.
+
+## Document Storage
+
+### B-42 · Unreferenced documents are never swept
+
+**Observed:** 2026-11-09 · normal
+
+Nothing a record references is ever deleted (architecture-core §10.3), so a document no record
+refers to stays until a sweep clears it: a file staged and then cancelled, an editor closed
+mid-edit, a removed attachment, and the staged copy left behind once a document is placed. The
+sweep clears them in the inbox and on the server. Until it exists, an unreferenced document costs
+only its bytes. Deferred from `effort/active/2026-11-09-attachments-brief.md`.
+
+**Picking this up:** after the Supabase provider, since the server side sweeps `DocumentServer`.
 
 _End of Backlog Document_

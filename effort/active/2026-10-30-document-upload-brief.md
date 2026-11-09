@@ -14,14 +14,16 @@ The attachments brief carried capture and upload together. They are different wo
 puts documents in the inbox; upload moves them to their destination, with judgment about the
 connection, and decides who may see them once the destination is shared.
 
+The attachments brief is `effort/active/2026-11-09-attachments-brief.md`.
+
 ## Drains
 
 Every app has an inbox (the attachments brief). The inbox knows nothing of apps; each app decides
-when it drains. A drain copies each document to
-`DocumentServer` at the same address, then clears it from the inbox. The address does not change:
-`Attachments` places every document at its final address when it enters the inbox, with fixed
-namespace ids and the owner's id as its bucket's (the attachments brief), so a record saved before
-upload is already correct after it.
+when it drains. A drain copies each document in a bucket to `DocumentServer` at the same address,
+then clears it from the inbox, and never takes `Staging`. The address does not change:
+`Attachments` places a document at its final address when its record saves, with fixed namespace
+ids and the owner's id as its bucket's (the attachments brief), so a record saved before upload is
+already correct after it.
 
 - **Admin: a background loop** over `DocumentInbox` in the page, draining as items arrive while
   the app is open. What is left waits in the inbox for the next session. No Service Worker.
@@ -37,8 +39,8 @@ Storage policies are the Supabase provider brief's mechanism (its DevOps 2); thi
 the rules swarmAg's namespaces need, and they are written there.
 
 - Per bucket, which roles read or write it.
-- A customer reaches documents only through the portal, signed in, and only shared documents in
-  their own bucket. A customer email carries no document links: it links to the portal, and its
+- A customer reaches documents only through the portal, signed in, and only the attachments of
+  shared notes (`Note.visibility`) in their own bucket. A customer email carries no document links: it links to the portal, and its
   pictures are embedded, read by the sender on the server.
 
 ## Design moments
@@ -56,3 +58,7 @@ the rules swarmAg's namespaces need, and they are written there.
 - **2026-11-04, the same address.** The destination became `DocumentServer`, one of the stores
   each app composes (the attachments brief), and a drain keeps each document's address, which the
   catalog's supplied ids make possible.
+- **2026-11-09, staging is not drained.** Attaching stages a chosen file in `Staging` and places it
+  in its owner's bucket when the record saves (`effort/active/2026-11-09-attachments-brief.md`).
+  A drain takes buckets only, so a bucket on the server holds only documents a saved record refers
+  to.
