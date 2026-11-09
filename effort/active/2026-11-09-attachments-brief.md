@@ -95,7 +95,7 @@ no editor at all.
    paperclip on a note with attachments. Add files by picker or drop, with no second step; a row
    shows icon, name, and size, opens the document, renames, and removes after confirmation. An
    optional `attachmentKinds` limits what a host accepts.
-8. _[Clarified by the amendment "After AI Coding Engine review", item 5.]_ **Accepted files** come
+8. _[Revised by the amendment "After AI Coding Engine review", item 5.]_ **Accepted files** come
    from a closed table owned by `Attachments`: `document` is PDF, plain text, Markdown, and JSON;
    `photo` is images; `map` is GeoTIFF; video is deferred. Formats that run in a browser are never
    accepted. A signed form is a PDF. Recognition's contract is settled in the production scope.
@@ -169,9 +169,30 @@ and requests persistent storage.
      placed references, so a successful save leaves no staging reference in memory. A need
      outside `front/` to do so is an escalation.
 5. **Formats and URLs** (findings 6 and 7):
-   - SVG is excluded by decision 8: a format that runs in a browser is never accepted. The list
-     of formats, their signatures, and GeoTIFF recognition are the production scope's, as
-     decision 8 says.
+   - **The accepted-files table,** settled 2026-10-29 and dropped from this brief's rewrite, is
+     restored here; the production scope follows it and does not set its own.
+
+     ```ts
+     // front/api, owned by Attachments
+     const ATTACHMENT_CONTENT_TYPES: Record<AttachmentKind, readonly string[]> = {
+       photo: ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'],
+       video: [], // deferred
+       map: ['image/tiff'],
+       document: ['application/pdf', 'text/plain', 'text/markdown', 'application/json']
+     }
+     ```
+
+     - **Every kind is inferred,** `map` included: `image/tiff` is a map's alone, so a GeoTIFF is
+       never taken for a photo. A file in no kind is refused with a message.
+     - **The bytes decide, not `file.type`,** which the browser guesses from the extension and
+       sometimes leaves empty (HEIC on Windows). A binary format matches its signature: PDF
+       `%PDF-`, JPEG `FF D8 FF`, PNG `89 50 4E 47`, TIFF `II*\0` or `MM\0*`, HEIC/HEIF and WebP
+       their container headers. A text format matches its extension (`.txt`, `.md`, `.json`) and
+       decodes as UTF-8 with no NUL byte.
+     - **Formats that run in a browser are never accepted:** SVG, HTML, and XML. Adding a format is
+       a deliberate line in the table.
+     - **The picker and the drop agree:** `accept` narrows the picker to the host's kinds; a drop
+       passes recognition and the host's kinds.
    - A URL field holds a URL with the schemes its Domain declares (decision 10), not an
      `https://` address alone.
 
