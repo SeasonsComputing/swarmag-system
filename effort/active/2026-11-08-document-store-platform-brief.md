@@ -1,7 +1,7 @@
 # Document Store Platform — Brief
 
-**Active, draft.** An enabler of roadmap M-6, consumed by
-`effort/active/2026-11-08-attachments-brief.md`. Foundation mode.
+**Active, dispatched; amended 2026-11-08 after production review.** An enabler of roadmap M-6,
+consumed by `effort/active/2026-11-08-attachments-brief.md`. Foundation mode.
 
 **Its changes are within `core/` only,** with their tests in `source/tests/`. A need outside
 `core/` is an escalation, not a change this brief makes.
@@ -92,6 +92,8 @@ export const isUrl = (value: unknown, schemes: readonly UrlScheme[]): value is s
 | `source/tests/`                                                                 | The tests below                                                      |
 
 **Records:** `core/` is locked; the CA opens exactly the five files above for this brief.
+_[Extended by the amendment "After production review", item 3: `deno.jsonc`, for one test-only
+import.]_
 
 **Unchanged:** everything outside `core/` and its tests; within `core/`, the create protocol
 (`protocols.ts`), `makeScope`, and the CRUD makers.
@@ -105,10 +107,35 @@ export const isUrl = (value: unknown, schemes: readonly UrlScheme[]): value is s
   untouched.
 - `isUrl` accepts a URL with a given scheme and rejects other schemes, relative paths, and
   non-strings.
-- The IndexedDB provider in a real browser: isolation, supplied ids, repeated create, bytes, links,
-  deletion.
+- _[Revised by the amendment "After production review", item 3.]_ The IndexedDB provider in a
+  real browser: isolation, supplied ids, repeated create, bytes, links, deletion.
 - `deno task check`, `deno task fmt:check`, `deno task test` (the two stage-environment tests
   excluded); `STYLE_AUDIT`.
+
+## Amendment — 2026-11-08 — After production review
+
+The CA and AI Architect reviewed ACE's production against this brief. It stays within the five
+`core/` modules and their tests, and honors the API CONVENTIONS §10.8 declares.
+
+1. **`isUrl` parses portably.** `URL.parse` exists only from Chrome and Firefox 126 and Safari 18;
+   on an older device it throws instead of returning false. `isUrl` parses with `new URL` inside a
+   `try`: an invalid URL is expected input, not a failure.
+2. **Style repairs** (CONVENTIONS §6): the 79-character box lines in `url-validator-test.ts` and
+   `document-store-browser.ts`; the `constructor` entry's column in `docstore-client.ts` PUBLIC; the
+   `DocumentProviderContract` comment, one line or a proper multi-line comment.
+3. **The provider is tested in the suite,** not by a manual harness. Its behavior runs in
+   `deno task test` over `fake-indexeddb`, an in-memory IndexedDB: isolation of two stores under two
+   config keys, supplied ids at every level, repeated creation returning the node unchanged with its
+   bytes, links, deletion, and the app's database untouched. `deno.jsonc` gains `fake-indexeddb` as
+   a test-only import, used only under `source/tests/`. The browser harness
+   (`source/tests/fixtures/document-store-browser.ts`) is not committed. What a fake cannot prove,
+   persistence across a reload and the persistent-storage request, is the CA's verification in a
+   real browser.
+4. **The kernel's shape stands.** `DocumentStore` builds its three contract objects in its
+   constructor from local helpers. Private members were considered: they read as the more
+   conventional container, but the contract objects, built as field initializers, would precede the
+   provider's assignment and depend on every use sitting inside a deferred function. The declared
+   API is honored either way, and the constructor form has no ordering trap.
 
 ## Design history
 
