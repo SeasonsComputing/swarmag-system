@@ -1,7 +1,7 @@
 # Document Upload — Brief
 
 **Active, draft.** Recorded 2026-10-30 from a CA + AI Architect session, split from the attachments
-brief, `effort/active/2026-10-29-attachments-brief.md`, and current work with it: the second of
+brief's design conversation, `effort/completed/2026-10-29-attachments-brief.md`: the second of
 four features of roadmap M-6, Document Storage, for Admin. Attaching puts a document in the inbox
 and its address on the record; uploading moves it to the destination store, `DocumentServer`.
 The drains build and test against an IndexedDB `DocumentServer`; the Supabase provider brief,

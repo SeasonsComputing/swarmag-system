@@ -589,5 +589,7 @@ sweep clears them in the inbox and on the server. Until it exists, an unreferenc
 only its bytes. Deferred from `effort/active/2026-11-09-attachments-brief.md`.
 
 **Picking this up:** after the Supabase provider, since the server side sweeps `DocumentServer`.
+Its scheduled job and edge entry point are the Supabase provider brief's DevOps items 4–6
+(`effort/active/2026-10-30-document-store-supabase-brief.md`).
 
 _End of Backlog Document_

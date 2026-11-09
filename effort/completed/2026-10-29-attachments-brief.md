@@ -1,6 +1,7 @@
 # Attachments — Brief
 
-**Active, dispatched; amended 2026-11-08 after AI Coding Engine review and re-review.** Recorded
+**Withdrawn 2026-11-09, superseded** by `effort/active/2026-11-09-attachments-brief.md`, the brief of
+record; kept as the design conversation, including turns later reversed. Recorded
 2026-10-29 from a CA + AI Architect session, split from the document storage brief,
 `effort/completed/2026-10-23-document-storage-brief.md`, the `core/` platform this brief uses. M-4
 assigned Attachments to M-5. This is the `front/` brief: how swarmAg's records attach documents.
@@ -8,8 +9,7 @@ Split again 2026-10-30: attaching and uploading are different work, and upload, 
 from the inbox to a shared store and who may see them there, is
 `effort/active/2026-10-30-document-upload-brief.md`. Revised 2026-11-04 with the document storage
 policy of 2026-10-31 and the catalog, design moment 1, settled; the Field Binder, the policy's
-other half, is `effort/pending/2026-11-04-field-binder-brief.md`. Its design moments are settled;
-it awaits the production gate. It is first of four features of roadmap M-6, Document Storage: the
+other half, is `effort/pending/2026-11-04-field-binder-brief.md`. It was first of four features of roadmap M-6, Document Storage: the
 Admin side; field capture is the Ops application's (M-9).
 
 ## What triggered it

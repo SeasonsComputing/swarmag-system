@@ -287,7 +287,7 @@ Runner's own prerequisite plumbing, not a separate milestone with its own featur
 **Field documents** — from M-6: each job clone's inbox, in `DocumentInbox`; the job runner's photo
 answer, captured on the phone (a file input with `capture`); and the job upload that drains the
 job's inbox into `DocumentServer` back at base, beside `api.uploadJobLogs`
-(`effort/active/2026-10-29-attachments-brief.md`,
+(`effort/completed/2026-10-29-attachments-brief.md`,
 `effort/active/2026-10-30-document-upload-brief.md`). Whether a job's inbox is a namespace or a
 bucket is designed here.
 

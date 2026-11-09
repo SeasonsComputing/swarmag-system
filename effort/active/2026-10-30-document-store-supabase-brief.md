@@ -5,7 +5,7 @@ storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, which is
 contract this provider implements. The upload brief,
 `effort/active/2026-10-30-document-upload-brief.md`, depends on this one for the shared store its
 drains fill. It is third of four features of roadmap M-6, Document Storage, and provides
-`DocumentServer`, the shared store each app composes (the attachments brief). Awaits the design
+`DocumentServer`, the shared store each app composes (`architecture-core.md` §10.2). Awaits the design
 moments, CA review, and the production gate.
 
 ## What triggered it
@@ -58,7 +58,7 @@ so every id locates its node directly.
    Postgres function updates it, called by RPC: the provider's only code in `back/`.
 8. **Idempotent create.** A document's create uploads without overwrite; if its object already
    exists, the create returns the existing document. Namespaces and buckets take supplied ids too
-   (the attachments brief's platform prerequisites): a namespace's create returns the Supabase
+   (CONVENTIONS §10.8): a namespace's create returns the Supabase
    bucket with that id if it exists, and a bucket's returns its existing marker.
 9. **Links.** `link` is a signed URL whose expiry, the kernel's default, is fixed when it is issued.
    A signed URL is not revocable.
@@ -101,7 +101,8 @@ exists for storage: `config.toml`'s `[storage]` block is the scaffold default (5
 and the architecture documents name storage only in passing.
 
 1. **Storage configuration.** Supabase bucket defaults, file size limit, MIME restrictions (the
-   attachments brief's accepted files table, enforced by the server), and the S3 protocol switch:
+   attachments brief's accepted files table, `effort/active/2026-11-09-attachments-brief.md`
+   decision 8, enforced by the server), and the S3 protocol switch:
    local in `config.toml`, hosted in a per-target contract, applied by a task and verified by
    reading back.
 2. **Storage policies.** SQL on `storage.objects` and `storage.buckets`, a schema Supabase manages
@@ -113,7 +114,8 @@ and the architecture documents name storage only in passing.
    tables refuses deletion by SQL, which would leave the files behind, so a storage reset empties
    the Supabase buckets through the Storage API, and joins `db-reset` with its verification.
 
-Items 4–6 arrive with the broker; M-6 needs 1–3 and 7.
+Items 4–6 arrive with the broker or with the sweep of unreferenced documents (backlog B-42),
+whichever comes first; M-6 needs 1–3 and 7.
 
 4. **Cron.** The `pg_cron` and `pg_net` extensions, the job definitions, and the credential the job
    uses to call the sweep entry point, held in Vault. Open: where the job definitions live and how
@@ -173,3 +175,7 @@ locked; the CA opens them for this brief's production, recorded here, as he does
 - **2026-11-06, a provider, not a maker.** A document store is `DocumentStore` constructed over a
   provider class per binding (the attachments brief), so this brief's maker became
   `SupabaseDocumentProvider`.
+- **2026-11-09, the sweep's home.** The document storage brief gave this brief sweeps of orphaned
+  bytes, while items 4–6 waited on the broker, which no brief holds. The sweep of unreferenced
+  documents is backlog B-42; items 4–6 arrive with whichever of the two comes first. Pointers to
+  the attachments brief now name what each cites.

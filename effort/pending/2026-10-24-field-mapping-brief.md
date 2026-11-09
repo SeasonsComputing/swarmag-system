@@ -84,7 +84,7 @@ elements, and the validator checks ranges, which rejects every swapped Texas coo
    like `requires: 'note' | 'attachment'`.
 5. ~~**`ChemicalLabel.url` and `Attachment.url`** become `DocumentPath`s (document storage
    brief).~~ _Superseded 2026-10-29:_ a `url` stays a URL, and a stored document's is a `docs:`
-   reference, with no domain change (`effort/active/2026-10-29-attachments-brief.md`).
+   reference, with no domain change (`effort/completed/2026-10-29-attachments-brief.md`).
 
 ## Design moments
 

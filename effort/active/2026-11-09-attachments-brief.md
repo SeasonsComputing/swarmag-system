@@ -3,7 +3,7 @@
 **Active, draft.** First of four features of roadmap M-6, Document Storage: the Admin side. It
 depends on `effort/completed/2026-11-08-document-store-platform-brief.md`, shipped. Feature
 mode. It supersedes `effort/completed/2026-11-08-attachments-brief.md`; the design conversation is
-`effort/active/2026-10-29-attachments-brief.md`.
+`effort/completed/2026-10-29-attachments-brief.md`.
 
 **Its changes are within `front/` only,** with their tests in `source/tests/`. A need outside
 `front/` is an escalation, not a change this brief makes.
@@ -144,7 +144,7 @@ and requests persistent storage.
 ## Design history
 
 - **2026-10-29 to 2026-11-08,** the design conversation, its two amendments, and its decisions:
-  `effort/active/2026-10-29-attachments-brief.md`.
+  `effort/completed/2026-10-29-attachments-brief.md`.
 - **2026-11-08,** rewritten as a `front/`-only brief,
   `effort/completed/2026-11-08-attachments-brief.md`: attaching a transaction over the record, with
   staging at the final address, a ledger, recovery, and editing sessions. Because the final address
