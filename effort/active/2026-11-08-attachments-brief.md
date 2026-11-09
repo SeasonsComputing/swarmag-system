@@ -18,7 +18,7 @@ store. Beside it, the URL fields (`Chemical.sdsUrl`, `ChemicalLabel.url`) are pl
 
 - **The domain** (`b423087`): `Attachment` is
   `{ filename, documentAddress, contentType, kind, uploadedAt }`.
-- **The platform,** once its brief ships: `DocumentStore` over `IndexedDbDocumentProvider(dbKey)`,
+- **The platform** (`1249a05`): `DocumentStore` over `IndexedDbDocumentProvider(dbKey)`,
   supplied ids at every level, and `isUrl` / `expectUrl`.
 - **Records are created without an id until saved.** A new draft has no id; the client makers mint
   it inside `create`.

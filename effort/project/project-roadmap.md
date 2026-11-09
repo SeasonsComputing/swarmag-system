@@ -213,16 +213,16 @@ attaches and shares documents; field capture and its upload are the Ops applicat
   `effort/completed/2026-10-23-document-storage-brief.md`: the contract and `DocumentAddresses` in
   `core/std`, the kernel and `makeDocumentStoreIndexedDbClient` in `core/cli`, and key paths and
   indexes in the IndexedDB wrapper.
-- **The store composed, supplied ids, and a database per document store** — the attachments
-  brief's platform prerequisites, `core/` changes before Attachments: `DocumentStore` constructed
+- **The document store platform** — closed 2026-11-08, `1249a05`,
+  `effort/completed/2026-11-08-document-store-platform-brief.md`: `DocumentStore` constructed
   over a provider class per binding; optional supplied ids on namespace and bucket `create`,
-  idempotent on an existing id; and each IndexedDB document store a database of its own, named by
-  a config key.
+  idempotent on an existing id; each IndexedDB document store a database of its own, named by
+  a config key; and the URL validators in `core/std`.
 
 **Features**, in order; each builds and tests on IndexedDB until the Supabase provider makes the
 store shared:
 
-1. **Attachments** (`effort/active/2026-10-29-attachments-brief.md`): `Attachment.documentAddress`,
+1. **Attachments** (`effort/active/2026-11-08-attachments-brief.md`): `Attachment.documentAddress`,
    `Attachments` in `front/api` with its catalog, the inbox, the editors (attachments on notes,
    and the URL app control with the Chemical labels editor and the SDS field), and Admin capture,
    against a second IndexedDB store, `DocumentServer`.
