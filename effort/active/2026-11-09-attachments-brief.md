@@ -14,7 +14,8 @@ swarmAg's records carry notes, and notes carry attachments, but nothing can atta
 `Attachment` shape exists, no surface adds one, and no store holds the bytes. Admin needs to attach
 files to the notes of its records, new or existing, open them, rename and remove them, and have
 them reach the shared store. Beside it, the URL fields (`Chemical.sdsUrl`, `ChemicalLabel.url`)
-are plain text inputs.
+accept any text: nothing checks that they hold a URL, in the form or the domain, and the labels have
+no editor at all.
 
 ## What the repository holds
 
