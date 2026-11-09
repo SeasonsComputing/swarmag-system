@@ -773,19 +773,20 @@ Every app has an inbox, and every upload goes to it. One rule for every app outw
 an inbox an app may never fill.
 
 - **Choosing a file stages it; saving its record places it.** A chosen file is stored at once,
-  durably, in the inbox's `Staging` namespace, outside every bucket, and its note holds the staging
-  address. The record saves as it always does; then its staged documents are copied into the
+  durably, in the fixed bucket of the inbox's `Staging` namespace, outside every owner's bucket,
+  and its note holds the staging address. The record saves as it always does; then its staged documents are copied into the
   owner's bucket under the same document id, and the record's references are rewritten to them.
   Placement is idempotent: a save cut short before placement leaves the record referring to staged
   documents, and its next save places them.
-- **Nothing a record references is deleted.** Cancelling discards what its editor staged; removing
-  an attachment drops its reference. A sweep clears the documents nothing references.
+- **Nothing a record references is deleted.** Cancelling before any save attempt discards what its
+  editor staged; after one, the staged documents stay. Removing an attachment drops its reference.
+  A sweep clears the documents nothing references.
 - **The device does no processing:** photos are not scaled, and documents list by icon, name, and
   size.
-- **A drain takes buckets only and keeps the address.** It copies each document in a bucket to
-  `DocumentServer` at the same address, then clears it from the inbox, so a record saved before
-  upload is already correct after it. `Staging` never drains, so a bucket on the server holds only
-  documents a saved record refers to.
+- **A drain takes owners' buckets only and keeps the address.** It copies each document in an
+  owner's bucket to `DocumentServer` at the same address, then clears it from the inbox, so a
+  record saved before upload is already correct after it. The `Staging` namespace never drains,
+  so a bucket on the server holds only documents a saved record refers to.
 - **Each app drains its own way.** The inbox knows nothing of apps.
   - **Admin:** a background loop in the page, draining as items arrive while the app is open; what
     is left waits for the next session.
@@ -807,8 +808,8 @@ computable from the catalog and its owner's id with no lookup.
 - **A bucket per owner, its id the owner's.** The owner's bucket is created on first placement,
   and creating it again returns it, so placing never checks first. Names are labels at every
   level, for people and the CLI.
-- **`Staging`** is a private namespace outside every bucket, holding chosen files until their
-  record saves (§10.3).
+- **`Staging`** is a private namespace with one fixed bucket, outside every owner's, holding chosen
+  files until their record saves (§10.3).
 - **Namespaces divide by policy.** A namespace is the unit of placement and access: on the server,
   a Supabase bucket with its own storage policies. Company-wide documents, maintained in Admin and
   read by everyone, share the `Library` namespace, a fixed bucket per topic.

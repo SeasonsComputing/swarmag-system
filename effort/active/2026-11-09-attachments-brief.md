@@ -1,8 +1,9 @@
 # Attachments — Brief
 
-**Active, draft.** First of four features of roadmap M-6, Document Storage: the Admin side. It
-depends on `effort/completed/2026-11-08-document-store-platform-brief.md`, shipped. Feature
-mode. It supersedes `effort/completed/2026-11-08-attachments-brief.md`; the design conversation is
+**Active, dispatched; amended 2026-11-09 after AI Coding Engine review.** First of four features
+of roadmap M-6, Document Storage: the Admin side. It depends on
+`effort/completed/2026-11-08-document-store-platform-brief.md`, shipped. Feature mode. It
+supersedes `effort/completed/2026-11-08-attachments-brief.md`; the design conversation is
 `effort/completed/2026-10-29-attachments-brief.md`.
 
 **Its changes are within `front/` only,** with their tests in `source/tests/`. A need outside
@@ -43,20 +44,24 @@ no editor at all.
 
 - **A new record attaches as an existing one does,** in its Manager and in Onboarding.
 - **The domain's API does not change.** Records are created at Save, as rows always are.
-- **Access is per bucket.** A user, and a customer in the portal, reads their own bucket; the
-  portal's job report reads the job's.
+- _[Withdrawn by the amendment "After AI Coding Engine review", item 3.]_ ~~**Access is per
+  bucket.** A user, and a customer in the portal, reads their own bucket; the portal's job report
+  reads the job's.~~
 
 ## Decisions
 
-1. **Attachments are uploads; URLs point elsewhere.** An attachment is a document swarmAg owns,
-   held as its id-form `documentAddress`; a URL field holds an `https://` address.
-2. **Every app has an inbox,** `DocumentInbox`; `DocumentServer` is the shared store, an IndexedDB
-   stand-in until the Supabase provider ships. A drain copies each document in a bucket to the
-   server at the same address, and never takes staging; draining is the upload brief's.
-3. **`Attachments` places every document,** a singleton in `front/api` over the document store
-   contract. Its catalog is private, with fixed namespace ids: Customers, Jobs, Users, and
-   `Library`, whose shared bucket per company-wide topic (chemicals, assets, services) is fixed. An
-   owner's bucket is the owner's id. A private `Staging` namespace sits outside every bucket.
+1. _[Revised by the amendment "After AI Coding Engine review", item 5.]_ **Attachments are uploads;
+   URLs point elsewhere.** An attachment is a document swarmAg owns, held as its id-form
+   `documentAddress`; a URL field holds an `https://` address.
+2. _[Clarified by the amendment "After AI Coding Engine review", item 1.]_ **Every app has an
+   inbox,** `DocumentInbox`; `DocumentServer` is the shared store, an IndexedDB stand-in until the
+   Supabase provider ships. A drain copies each document in a bucket to the server at the same
+   address, and never takes staging; draining is the upload brief's.
+3. _[Revised by the amendment "After AI Coding Engine review", item 1.]_ **`Attachments` places
+   every document,** a singleton in `front/api` over the document store contract. Its catalog is
+   private, with fixed namespace ids: Customers, Jobs, Users, and `Library`, whose shared bucket per
+   company-wide topic (chemicals, assets, services) is fixed. An owner's bucket is the owner's id. A
+   private `Staging` namespace sits outside every bucket.
 4. **Choosing a file stages it; Save places it.** Choosing a file stores it in `Staging` at once,
    durably, and the note holds its staging address; the editor opens it from there. The record
    saves as it always does. In `makeAggregateSave`'s `complete`, every reference still in
@@ -64,10 +69,11 @@ no editor at all.
    rewritten to the bucket address, and the record is updated with it. New and existing records
    take this one path. Placement is idempotent: a save interrupted before `complete` leaves the
    record referring to staged documents, and its next Save places them.
-5. **Nothing a record references is ever deleted.** Cancel discards the documents its editor
-   staged, which nothing saved refers to. Removing an attachment drops its reference. A sweep
-   clears what nothing references, in the inbox and on the server; until it exists, an
-   unreferenced document costs only its bytes.
+5. _[Revised by the amendment "After AI Coding Engine review", item 2.]_ **Nothing a record
+   references is ever deleted.** Cancel discards the documents its editor staged, which nothing
+   saved refers to. Removing an attachment drops its reference. A sweep clears what nothing
+   references, in the inbox and on the server; until it exists, an unreferenced document costs only
+   its bytes.
 6. **The host binds staging and placement.** The `NotesEditor` takes an `attach` callback; the
    host's `makeAggregateSave` places in `complete`. The shape, settled in the production scope:
 
@@ -89,10 +95,10 @@ no editor at all.
    paperclip on a note with attachments. Add files by picker or drop, with no second step; a row
    shows icon, name, and size, opens the document, renames, and removes after confirmation. An
    optional `attachmentKinds` limits what a host accepts.
-8. **Accepted files** come from a closed table owned by `Attachments`: `document` is PDF, plain
-   text, Markdown, and JSON; `photo` is images; `map` is GeoTIFF; video is deferred. Formats that
-   run in a browser are never accepted. A signed form is a PDF. Recognition's contract is settled
-   in the production scope.
+8. _[Clarified by the amendment "After AI Coding Engine review", item 5.]_ **Accepted files** come
+   from a closed table owned by `Attachments`: `document` is PDF, plain text, Markdown, and JSON;
+   `photo` is images; `map` is GeoTIFF; video is deferred. Formats that run in a browser are never
+   accepted. A signed form is a PDF. Recognition's contract is settled in the production scope.
 9. **`uploadedAt`** is when the person attached the document: set when the file is chosen, once,
    never updated. A rename changes `filename` only.
 10. **`UrlField`** in `front/app/shell/` edits a URL with `type='url'`, checks it with `isUrl` and
@@ -125,6 +131,8 @@ no editor at all.
 
 Discarding a nested Note or Site drops its references; its staged documents are left to the sweep.
 
+_[Extended by the amendment "After AI Coding Engine review", item 4.]_
+
 **Unchanged:** everything outside `front/` and its tests: `core/`, `ux/`, `domain/`, `back/`.
 
 **Not in this brief:**
@@ -140,6 +148,32 @@ excluded); `STYLE_AUDIT`. Failure injection between the record write and placeme
 Save. The CA verifies attach on new and existing records, open, rename, remove, cancel, and the SDS
 and labels fields in Admin, and, from the platform brief, that the inbox persists across a reload
 and requests persistent storage.
+
+## Amendments — 2026-11-09 — After AI Coding Engine review
+
+1. **Staging is a bucket** (finding 1: a document lives in a bucket). `Staging` holds one fixed
+   private bucket, so a staged document's address is `Staging/{bucket}/{document}`, outside every
+   owner's bucket. A drain excludes the `Staging` namespace.
+2. **Cancel after a save attempt** (finding 2: a persisted record may refer to staged documents).
+   Cancel discards its editor's staged documents only when no record write was attempted. Once
+   one was, they stay, and the sweep clears what nothing references.
+3. **The access requirement is withdrawn** (finding 3: a bucket cannot separate notes by
+   visibility). Notes carry no visibility, so nothing in a bucket is separated. The bucket per
+   owner stands as the place an owner's documents live.
+4. **Save hosts** (findings 4 and 5):
+   - **Onboarding is a save host.** Its `commit` creates the customer directly; it adopts
+     `makeAggregateSave` and places in `complete` as the Managers do, so a completion retry
+     updates the pending record and never creates another.
+   - **The final references reach the editor.** `makeAggregateSave` returns the record written
+     before `complete`; the host reconciles the returned record and the editor's state with the
+     placed references, so a successful save leaves no staging reference in memory. A need
+     outside `front/` to do so is an escalation.
+5. **Formats and URLs** (findings 6 and 7):
+   - SVG is excluded by decision 8: a format that runs in a browser is never accepted. The list
+     of formats, their signatures, and GeoTIFF recognition are the production scope's, as
+     decision 8 says.
+   - A URL field holds a URL with the schemes its Domain declares (decision 10), not an
+     `https://` address alone.
 
 ## Design history
 
