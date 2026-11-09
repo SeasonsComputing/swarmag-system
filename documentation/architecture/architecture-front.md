@@ -266,11 +266,11 @@ Returns a display title derived from the job's current status and available phas
 
 #### 7.2.4 Document Storage
 
-| Singleton            | Purpose                                                                               |
-| -------------------- | ------------------------------------------------------------------------------------- |
-| `api.Attachments`    | Places documents; editing sessions over the document stores (architecture-core §10.4) |
-| `api.DocumentInbox`  | The device's inbox document store                                                     |
-| `api.DocumentServer` | The shared document store                                                             |
+| Singleton            | Purpose                                                                        |
+| -------------------- | ------------------------------------------------------------------------------ |
+| `api.Attachments`    | Stages and places documents over the document stores (architecture-core §10.4) |
+| `api.DocumentInbox`  | The device's inbox document store                                              |
+| `api.DocumentServer` | The shared document store                                                      |
 
 ### 7.3 Provided Infrastructure
 
@@ -570,10 +570,10 @@ are built as CONVENTIONS §17 describes; their behavior is in their module heade
 
 `NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
 `notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`,
-`drill: DrillContract`, and `attach`, bound by its host to the record's editing session, with
+`drill: DrillContract`, and `attach`, which stages a chosen file (`Attachments.stage`), with
 optional `attachmentKinds`. It edits Content, Visibility, and the note's attachments, defaults new
-notes to Internal, and never persists: its attachments are staged through the host's session, and
-existing timestamps are preserved. Billing-address
+notes to Internal, and preserves existing timestamps. It never persists: its host saves the record
+and places its staged attachments in `makeAggregateSave`'s `complete`. Billing-address
 fields and their validation occupy the separate Customer Billing step.
 
 **Features: `source/front/app-admin/`.**

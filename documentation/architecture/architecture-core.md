@@ -747,11 +747,11 @@ A record refers to a document in one of two ways, told apart by where the docume
 
 Each app composes the stores it needs, each a document store with its own lifecycle:
 
-| Store            | Binding   | Lifecycle                               |
-| ---------------- | --------- | --------------------------------------- |
-| `DocumentInbox`  | IndexedDB | until uploaded; in Ops, the job clone's |
-| `DocumentServer` | Supabase  | shared and permanent                    |
-| `FieldBinder`    | IndexedDB | the Field Binder's version, in Ops      |
+| Store            | Binding   | Lifecycle                                                           |
+| ---------------- | --------- | ------------------------------------------------------------------- |
+| `DocumentInbox`  | IndexedDB | staged until placed; placed until uploaded; in Ops, the job clone's |
+| `DocumentServer` | Supabase  | shared and permanent                                                |
+| `FieldBinder`    | IndexedDB | the Field Binder's version, in Ops                                  |
 
 | App             | DocumentServer                 | DocumentInbox    | FieldBinder |
 | --------------- | ------------------------------ | ---------------- | ----------- |
@@ -772,16 +772,20 @@ Each app composes the stores it needs, each a document store with its own lifecy
 Every app has an inbox, and every upload goes to it. One rule for every app outweighs the cost of
 an inbox an app may never fill.
 
-- **Attaching is a transaction over the record.** An editing session stages each chosen file in
-  the inbox at once, durably, at its final address, and the draft holds its `documentAddress`.
-  Saving the record commits its documents; cancelling discards them; a removed document is deleted
-  only after the save commits. A session cut short by a closed page is recovered on the next start:
-  what it staged is discarded, and a save in flight is kept.
+- **Choosing a file stages it; saving its record places it.** A chosen file is stored at once,
+  durably, in the inbox's `Staging` namespace, outside every bucket, and its note holds the staging
+  address. The record saves as it always does; then its staged documents are copied into the
+  owner's bucket under the same document id, and the record's references are rewritten to them.
+  Placement is idempotent: a save cut short before placement leaves the record referring to staged
+  documents, and its next save places them.
+- **Nothing a record references is deleted.** Cancelling discards what its editor staged; removing
+  an attachment drops its reference. A sweep clears the documents nothing references.
 - **The device does no processing:** photos are not scaled, and documents list by icon, name, and
   size.
-- **A drain takes committed documents only and keeps the address.** It copies each document to
+- **A drain takes buckets only and keeps the address.** It copies each document in a bucket to
   `DocumentServer` at the same address, then clears it from the inbox, so a record saved before
-  upload is already correct after it.
+  upload is already correct after it. `Staging` never drains, so a bucket on the server holds only
+  documents a saved record refers to.
 - **Each app drains its own way.** The inbox knows nothing of apps.
   - **Admin:** a background loop in the page, draining as items arrive while the app is open; what
     is left waits for the next session.
@@ -794,15 +798,17 @@ an inbox an app may never fill.
 
 `Attachments`, a singleton in `front/api` beside `AppState`, is the only code that places
 documents. Its catalog of placements is private: module constants with fixed ids, which every store
-on every device shares, so a document has one address in the inbox and on the server, computable
-from the catalog and its owner's id with no lookup.
+on every device shares, so a placed document has one address in the inbox and on the server,
+computable from the catalog and its owner's id with no lookup.
 
-- **A topic per type that carries notes,** each with its own typed `attach` on an editing
-  session. A composition without an id (a `Note`, a `CustomerSite`, an `Answer`) keeps its
-  documents in its owning record's bucket.
-- **A bucket per owner, its id the owner's.** The owner's bucket is created on first attach, and
-  creating it again returns it, so attaching never checks first. Names are labels at every level,
-  for people and the CLI.
+- **A topic per type that carries notes,** each with its own typed `place`, run when its record
+  saves; staging is common to every topic. A composition without an id (a `Note`, a
+  `CustomerSite`, an `Answer`) keeps its documents in its owning record's bucket.
+- **A bucket per owner, its id the owner's.** The owner's bucket is created on first placement,
+  and creating it again returns it, so placing never checks first. Names are labels at every
+  level, for people and the CLI.
+- **`Staging`** is a private namespace outside every bucket, holding chosen files until their
+  record saves (§10.3).
 - **Namespaces divide by policy.** A namespace is the unit of placement and access: on the server,
   a Supabase bucket with its own storage policies. Company-wide documents, maintained in Admin and
   read by everyone, share the `Library` namespace, a fixed bucket per topic.
