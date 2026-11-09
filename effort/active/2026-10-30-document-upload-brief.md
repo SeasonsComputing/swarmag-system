@@ -46,6 +46,8 @@ the rules swarmAg's namespaces need, and they are written there.
 1. **The Admin loop:** how it paces itself and how a failed item retries. The job upload's checks
    are designed with M-9.
 2. **Access rules,** per namespace and bucket, as written into the storage policies.
+3. **The drain's progress:** whether a pending-document state in the store records it is parking
+   lot P-14.
 
 ## Design history
 

@@ -51,7 +51,10 @@ Settled in the design conversation (the 2026-10-29 brief and its amendments).
    commit point; Cancel discards them; a removal is deleted after the commit. A private ledger
    records each staged document as staged, saving, or committed; recovery at start discards a dead
    session's staged documents and presumes its saving ones committed. A session holds a browser
-   lock (Web Locks), so recovery never touches a live session.
+   lock (Web Locks), so recovery never touches a live session. The ledger is a `Ledger` store in
+   the inbox's database, registered at module load. Its states and verbs (`stage`, `commit`,
+   `discard`, `pending`) are shaped as a document store API, so it can move into the contract
+   (parking lot P-14) as a lift, not a rewrite.
 5. **The editing session is the API.** `Attachments.begin()` returns a session with a typed
    `attach` per topic, `remove`, `commit(write)`, and `cancel()`; `link`, `recover`, and `upload`
    stay on the container. The host binds `attach` into the `NotesEditor`.
@@ -84,7 +87,7 @@ Settled in the design conversation (the 2026-10-29 brief and its amendments).
 | `front/app/shell/url-field.tsx`    | `UrlField` (new)                                                    |
 | The six NotesEditor hosts          | Begin a session, bind `attach`, commit and cancel with the record   |
 | `front/app-admin/chemicals/`       | `UrlField` for SDS; the labels editor                               |
-| The app roots                      | `Attachments.recover()` at start                                    |
+| `front/app-admin/app.tsx`          | `Attachments.recover()` at start                                    |
 | `source/tests/`                    | Sessions, the ledger, recovery, recognition, links                  |
 
 **Unchanged:** everything outside `front/` and its tests: `core/`, `ux/`, `domain/`, `back/`.

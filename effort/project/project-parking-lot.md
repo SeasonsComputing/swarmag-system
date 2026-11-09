@@ -347,4 +347,27 @@ expected to run to dozens, the first real pressure.
 **Picking this up:** When a catalog or collection outgrows a screen, or as one design across the
 Collection, Index, and multi-select controls, so search and filtering behave the same everywhere.
 
+## P-14 · Should the document store contract own pending documents?
+
+**Parked:** 2026-11-09, while settling the attachments brief's ledger
+(`effort/active/2026-11-08-attachments-brief.md`, decision 4).
+
+**What it is:** two-phase document creation in the store contract. A document is created pending,
+not yet visible, and later committed or discarded; recovery sweeps what is still pending:
+
+```ts
+document.create(parent, name, bytes, { id, pending: true })
+document.commit(addresses)
+document.discard(addresses)
+document.pending(parent?)
+```
+
+Each consumer holds a document before its fate is decided: an attachment until its record saves,
+a drained copy until the inbox releases it, a Field Binder version until it is current.
+
+**Why parked:** one consumer, and `core/` is locked. The Attachments ledger proves the shape in
+`front/` first, with the same states and verbs, so promotion is additive.
+
+**Picking this up:** when the upload brief designs the drain, its second consumer.
+
 _End of Feature Parking Lot Document_
