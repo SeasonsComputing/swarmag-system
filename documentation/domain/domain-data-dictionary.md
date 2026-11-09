@@ -10,15 +10,6 @@ It is derived from `domain-model.md` and presents the same model in a table-firs
 
 The `domain-model.md` and `domain-data-dictionary.md` go hand-in-hand in mapping a conceptual solution space to physical artifacts that codify the solution as software.
 
-A string attribute may carry a **Domain**: a named format from a closed set, which selects its
-validation. A table shows the Domain column only when one of its attributes has one.
-
-| **Domain**         | **Format**                        | **Validation**                             |
-| ------------------ | --------------------------------- | ------------------------------------------ |
-| `email`            | An email address                  | `expectEmail`                              |
-| `url`              | An absolute `https://` URL        | `expectUrl` with `['https']`               |
-| `document-address` | An id-form document store address | `DocumentAddresses.id` (CONVENTIONS §10.8) |
-
 ## 2. Topic Namespace
 
 | Topic     | Source                             | Contents                 |
@@ -67,11 +58,22 @@ validation. A table shows the Domain column only when one of its attributes has 
 |           |                                    | JobWork                  |
 |           |                                    | JobWorkLogEntry          |
 
-## 3. Core Standard
+## 3. Attribute Domains
+
+A string attribute may carry a **Domain**: the kind of string it holds, from a closed set. A table
+shows the Domain column only when one of its attributes has one.
+
+| **Domain**         | **Format**                            |
+| ------------------ | ------------------------------------- |
+| `email`            | An email address                      |
+| `url (schemes)`    | A URL, with one of the listed schemes |
+| `document-address` | A document store address              |
+
+## 4. Core Standard
 
 Source: `@core/std`
 
-### 3.1 Instantiable
+### 4.1 Instantiable
 
 Purpose: **Lifecycle base for all persisted abstractions with independent database rows; extend via intersection — do not redeclare these fields inline**
 
@@ -86,7 +88,7 @@ Attributes: **State**
 | `updatedAt`   | When     |
 | `deletedAt?`  | When     |
 
-### 3.2 InstantiableOnly
+### 4.2 InstantiableOnly
 
 Purpose: **Lifecycle base for append-only abstractions; no update or delete; extend via intersection — do not redeclare these fields inline**
 
@@ -99,11 +101,11 @@ Attributes: **State**
 | `id`          | Id       |
 | `createdAt`   | When     |
 
-## 4. Common
+## 5. Common
 
 Source: `@domain/abstractions/common.ts`
 
-### 4.1 Location
+### 5.1 Location
 
 Purpose: **Place carrying coordinate substance (latitude+longitude) or address substance (line1+city), or both; a present coordinate must be paired**
 
@@ -126,7 +128,7 @@ Attributes: **State**
 | `accuracyMeters?` | number   |
 | `description?`    | string   |
 
-### 4.2 ContactPreferredChannel
+### 5.2 ContactPreferredChannel
 
 Purpose: **Preferred communication channel for a reachable party**
 
@@ -138,7 +140,7 @@ Type: **const-enum**
 | `text`  |
 | `phone` |
 
-### 4.3 Attachment
+### 5.3 Attachment
 
 Purpose: **Uploaded artifact metadata**
 
@@ -154,7 +156,7 @@ Attributes: **State**
 | `kind`            | `'photo'` \| `'video'` \| `'map'` \| `'document'` (default: `'photo'`) |                    |
 | `uploadedAt`      | When                                                                   |                    |
 
-### 4.4 Note
+### 5.4 Note
 
 Purpose: **Freeform note with visibility**
 
@@ -174,7 +176,7 @@ Attributes: **State**
 | `content`     | string                                             |
 | `visibility`  | `'internal'` \| `'shared'` (default: `'internal'`) |
 
-### 4.5 Facet
+### 5.5 Facet
 
 Purpose: **Curated classification catalog entry: one code within a scheme**
 
@@ -198,11 +200,11 @@ still resolves the label of existing references. Once a facet is referenced, its
 and never referenced. Those are curation obligations, enforced by the curation surface, not by
 the database.
 
-## 5. Assets
+## 6. Assets
 
 Source: `@domain/abstractions/asset.ts`
 
-### 5.1 AssetType
+### 6.1 AssetType
 
 Purpose: **Reference type for categorizing assets**
 
@@ -215,7 +217,7 @@ Attributes: **State**
 | `label`       | string   |
 | `active`      | boolean  |
 
-### 5.2 AssetStatus
+### 6.2 AssetStatus
 
 Purpose: **Lifecycle/availability state**
 
@@ -228,7 +230,7 @@ Type: **const-enum**
 | `retired`     |
 | `reserved`    |
 
-### 5.3 Asset
+### 6.3 Asset
 
 Purpose: **Operational equipment or resource**
 
@@ -250,11 +252,11 @@ Attributes: **State**
 | `serialNumber?` | string      |
 | `status`        | AssetStatus |
 
-## 6. Chemicals
+## 7. Chemicals
 
 Source: `@domain/abstractions/chemical.ts`
 
-### 6.1 ChemicalUsage
+### 7.1 ChemicalUsage
 
 Purpose: **Domain usage classification**
 
@@ -268,7 +270,7 @@ Type: **const-enum**
 | `fungicide`  |
 | `adjuvant`   |
 
-### 6.2 ChemicalLabel
+### 7.2 ChemicalLabel
 
 Purpose: **Label/document pointer**
 
@@ -276,12 +278,12 @@ Type: **object**
 
 Attributes: **State**
 
-| **Attribute**  | **Type** | **Domain** |
-| -------------- | -------- | ---------- |
-| `url`          | string   | `url`      |
-| `description?` | string   |            |
+| **Attribute**  | **Type** | **Domain**          |
+| -------------- | -------- | ------------------- |
+| `url`          | string   | `url (https, http)` |
+| `description?` | string   |                     |
 
-### 6.3 Chemical
+### 7.3 Chemical
 
 Purpose: **Regulated material record**
 
@@ -296,22 +298,22 @@ Attributes: **Relations**
 
 Attributes: **State**
 
-| **Attribute**           | **Type**                                                                 | **Domain** |
-| ----------------------- | ------------------------------------------------------------------------ | ---------- |
-| `name`                  | string                                                                   |            |
-| `epaNumber?`            | string                                                                   |            |
-| `usage`                 | ChemicalUsage                                                            |            |
-| `signalWord`            | `'none'` \| `'danger'` \| `'warning'` \| `'caution'` (default: `'none'`) |            |
-| `restrictedUse`         | boolean                                                                  |            |
-| `reEntryIntervalHours?` | number                                                                   |            |
-| `storageLocation?`      | string                                                                   |            |
-| `sdsUrl?`               | string                                                                   | `url`      |
+| **Attribute**           | **Type**                                                                 | **Domain**          |
+| ----------------------- | ------------------------------------------------------------------------ | ------------------- |
+| `name`                  | string                                                                   |                     |
+| `epaNumber?`            | string                                                                   |                     |
+| `usage`                 | ChemicalUsage                                                            |                     |
+| `signalWord`            | `'none'` \| `'danger'` \| `'warning'` \| `'caution'` (default: `'none'`) |                     |
+| `restrictedUse`         | boolean                                                                  |                     |
+| `reEntryIntervalHours?` | number                                                                   |                     |
+| `storageLocation?`      | string                                                                   |                     |
+| `sdsUrl?`               | string                                                                   | `url (https, http)` |
 
-## 7. Customers
+## 8. Customers
 
 Source: `@domain/abstractions/customer.ts`
 
-### 7.1 Contact
+### 8.1 Contact
 
 Purpose: **Account reachability data — how to reach the party behind a record; not a person identity**
 
@@ -326,7 +328,7 @@ Attributes: **State**
 | `preferredChannel` | ContactPreferredChannel |            |
 | `email?`           | string                  | `email`    |
 
-### 7.2 CustomerSite
+### 8.2 CustomerSite
 
 Purpose: **Serviceable customer location**
 
@@ -346,7 +348,7 @@ Attributes: **State**
 | `label`       | string   |
 | `acreage?`    | number   |
 
-### 7.3 CustomerUser
+### 8.3 CustomerUser
 
 Purpose: **Pure-key relationship between a customer account and a user contact**
 
@@ -359,7 +361,7 @@ Attributes: **Relations**
 | `customerId`  | AssociationJunction | Customer        |
 | `userId`      | AssociationJunction | User            |
 
-### 7.4 Customer
+### 8.4 Customer
 
 Purpose: **Customer account aggregate with a required primary contact composition; portal access is the CustomerUser junction's concern, wired at activation**
 
@@ -387,11 +389,11 @@ Attributes: **State**
 | `postalCode`  | string                                                             |
 | `country`     | string                                                             |
 
-## 8. Services
+## 9. Services
 
 Source: `@domain/abstractions/service.ts`
 
-### 8.1 ServiceCategory
+### 9.1 ServiceCategory
 
 Purpose: **Service family classification**
 
@@ -402,7 +404,7 @@ Type: **const-enum**
 | `aerial-drone-services`     |
 | `ground-machinery-services` |
 
-### 8.2 Service
+### 9.2 Service
 
 Purpose: **Sellable operational offering**
 
@@ -424,7 +426,7 @@ Attributes: **State**
 | `category`     | ServiceCategory                           |
 | `facets`       | CompositionMany\<string\> (`scheme:code`) |
 
-### 8.3 ServiceRequiredAssetType
+### 9.3 ServiceRequiredAssetType
 
 Purpose: **Asset types required for a service**
 
@@ -437,11 +439,11 @@ Attributes: **Relations**
 | `serviceId`   | AssociationJunction | Service         |
 | `assetTypeId` | AssociationJunction | AssetType       |
 
-## 9. Users
+## 10. Users
 
 Source: `@domain/abstractions/user.ts`
 
-### 9.1 UserRole
+### 10.1 UserRole
 
 Purpose: **Canonical role set**
 
@@ -454,7 +456,7 @@ Type: **const-enum**
 | `operations`    |
 | `customer`      |
 
-### 9.2 User
+### 10.2 User
 
 Purpose: **System user identity, membership, contact preference, and person notes**
 
@@ -481,11 +483,11 @@ Attributes: **State**
 `auth.users.id` as a solution-space invariant. The shared UUID is supplied by application code
 using the system UUID v7 strategy; the database does not generate domain user IDs.
 
-## 10. Workflow
+## 11. Workflow
 
 Source: `@domain/abstractions/workflow.ts`
 
-### 10.1 QuestionType
+### 11.1 QuestionType
 
 Purpose: **Supported question input modes; `internal` is reserved for system-generated log entries such as telemetry, GPS, and operational metadata**
 
@@ -500,7 +502,7 @@ Type: **const-enum**
 | `single-select` |
 | `multi-select`  |
 
-### 10.2 BaseQuestion
+### 11.2 BaseQuestion
 
 Purpose: **Common shape shared by all Question constituents**
 
@@ -515,7 +517,7 @@ Attributes: **State**
 | `helpText?`   | string       |
 | `required?`   | boolean      |
 
-### 10.3 InternalQuestion
+### 11.3 InternalQuestion
 
 Purpose: **System-generated question; seed records referenced directly by log entries**
 
@@ -529,7 +531,7 @@ Attributes: **State**
 | ------------- | ------------ |
 | `type`        | `'internal'` |
 
-### 10.4 ScalarQuestion
+### 11.4 ScalarQuestion
 
 Purpose: **Scalar input question; no options**
 
@@ -543,7 +545,7 @@ Attributes: **State**
 | ------------- | ------------------------------------- |
 | `type`        | `'text'` \| `'number'` \| `'boolean'` |
 
-### 10.5 SelectOption
+### 11.5 SelectOption
 
 Purpose: **Selectable option metadata; only valid on SelectQuestion**
 
@@ -557,7 +559,7 @@ Attributes: **State**
 | `label?`        | string   |
 | `requiresNote?` | boolean  |
 
-### 10.6 SelectQuestion
+### 11.6 SelectQuestion
 
 Purpose: **Select input question; options required and non-empty**
 
@@ -577,7 +579,7 @@ Attributes: **State**
 | ------------- | ------------------------------------- |
 | `type`        | `'single-select'` \| `'multi-select'` |
 
-### 10.7 Question
+### 11.7 Question
 
 Purpose: **General purpose reusable prompt; shared across tasks**
 
@@ -587,7 +589,7 @@ Constituents: `ScalarQuestion | SelectQuestion | InternalQuestion`
 
 Discriminator: `type`
 
-### 10.8 Answer
+### 11.8 Answer
 
 Purpose: **Captured response to a question; notes carry crew annotations and attachments**
 
@@ -607,7 +609,7 @@ Attributes: **State**
 | `value`       | `string` \| `number` \| `boolean` \| `string[]` |
 | `capturedAt`  | When                                            |
 
-### 10.9 Task
+### 11.9 Task
 
 Purpose: **Reusable named grouping of ordered questions**
 
@@ -626,7 +628,7 @@ Attributes: **State**
 | `label`        | string   |
 | `description?` | string   |
 
-### 10.10 TaskQuestion
+### 11.10 TaskQuestion
 
 Purpose: **m:m junction — tasks to questions with explicit ordering; hard delete only**
 
@@ -645,7 +647,7 @@ Attributes: **State**
 | ------------- | -------- |
 | `sequence`    | number   |
 
-### 10.11 Workflow
+### 11.11 Workflow
 
 Purpose: **Versioned template of ordered tasks; read-only except for administrator role**
 
@@ -666,7 +668,7 @@ Attributes: **State**
 | `version`      | number                                    |
 | `facets`       | CompositionMany\<string\> (`scheme:code`) |
 
-### 10.12 WorkflowTask
+### 11.12 WorkflowTask
 
 Purpose: **Ordered tasks that define a workflow**
 
@@ -685,11 +687,11 @@ Attributes: **State**
 | ------------- | -------- |
 | `sequence`    | number   |
 
-## 11. Jobs
+## 12. Jobs
 
 Source: `@domain/abstractions/job.ts`
 
-### 11.1 JobStatus
+### 12.1 JobStatus
 
 Purpose: **Job life-cycle state**
 
@@ -706,7 +708,7 @@ Type: **const-enum**
 | `closed`     |
 | `cancelled`  |
 
-### 11.2 Job
+### 12.2 Job
 
 Purpose: **Work agreement life-cycle anchor**
 
@@ -724,7 +726,7 @@ Attributes: **State**
 | ------------- | --------- |
 | `status`      | JobStatus |
 
-### 11.3 JobAssessment
+### 12.3 JobAssessment
 
 Purpose: **Pre-planning job assessment; requires one or more locations**
 
@@ -748,7 +750,7 @@ Attributes: **Relations**
 | `risks`       | CompositionMany     | Note            |
 | `notes`       | CompositionMany     | Note            |
 
-### 11.4 JobWorkflow
+### 12.4 JobWorkflow
 
 Purpose: **Workflows required of a job; basis workflow may be customized for a job**
 
@@ -762,7 +764,7 @@ Attributes: **Relations**
 | `basisWorkflowId`    | AssociationOne      | Workflow        |
 | `modifiedWorkflowId` | AssociationOptional | Workflow        |
 
-### 11.5 JobPlan
+### 12.5 JobPlan
 
 Purpose: **Planning for a job, based on an assessment**
 
@@ -783,7 +785,7 @@ Attributes: **State**
 | `scheduledStart`   | When     |
 | `durationEstimate` | number   |
 
-### 11.6 JobPlanAssignmentRole
+### 12.6 JobPlanAssignmentRole
 
 Purpose: **Planned function a user performs as a member of a job crew**
 
@@ -798,7 +800,7 @@ Type: **const-enum**
 | `equipment-operator` |
 | `technician`         |
 
-### 11.7 JobPlanAssignment
+### 12.7 JobPlanAssignment
 
 Purpose: **Planned user assignments required for a job**
 
@@ -818,7 +820,7 @@ Attributes: **State**
 | ------------- | --------------------- |
 | `role`        | JobPlanAssignmentRole |
 
-### 11.8 JobPlanChemical
+### 12.8 JobPlanChemical
 
 Purpose: **Planned chemical usage required for a job**
 
@@ -840,7 +842,7 @@ Attributes: **State**
 | `targetArea?`    | number                                                                     |
 | `targetAreaUnit` | `'acre'` \| `'hectare'` (default: `'acre'`)                                |
 
-### 11.9 JobPlanAsset
+### 12.9 JobPlanAsset
 
 Purpose: **Planned assets required for a job**
 
@@ -853,7 +855,7 @@ Attributes: **Relations**
 | `planId`      | AssociationJunction | JobPlan         |
 | `assetId`     | AssociationJunction | Asset           |
 
-### 11.10 JobWork
+### 12.10 JobWork
 
 Purpose: **Execution record; creation transitions job to executing; `work` is an ordered array of resolved workflow IDs — the immutable execution manifest**
 
@@ -874,7 +876,7 @@ Attributes: **State**
 | `startedAt`    | When                      |
 | `completedAt?` | When                      |
 
-### 11.11 JobWorkLogEntry
+### 12.11 JobWorkLogEntry
 
 Purpose: **Work execution event; append-only log; event details as Answer to Question**
 

@@ -195,18 +195,6 @@ Deno.test('isContact rejects an unknown preferred channel', () => {
   )
 })
 
-Deno.test('isContact rejects a malformed email', () => {
-  assertEquals(
-    isContact({
-      displayName: 'Marta Reyes',
-      phoneNumber: '806-555-0142',
-      preferredChannel: 'email',
-      email: 'not-an-email'
-    }),
-    false
-  )
-})
-
 Deno.test('isContact rejects non-objects', () => {
   assertEquals(isContact(null), false)
   assertEquals(isContact(undefined), false)

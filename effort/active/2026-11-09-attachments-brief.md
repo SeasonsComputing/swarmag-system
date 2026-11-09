@@ -95,8 +95,9 @@ are plain text inputs.
 9. **`uploadedAt`** is when the person attached the document: set when the file is chosen, once,
    never updated. A rename changes `filename` only.
 10. **`UrlField`** in `front/app/shell/` edits a URL with `type='url'`, checks it with `isUrl` and
-    its field's schemes, and opens it in a secondary window. The Chemical labels editor follows the
-    Sites pattern.
+    its field's schemes, as its Domain declares them in the data dictionary
+    (`domain-data-dictionary.md` §3; `url (https, http)` for both fields), and opens it in a
+    secondary window. The Chemical labels editor follows the Sites pattern.
 
 ## Known risks
 
@@ -128,8 +129,6 @@ Discarding a nested Note or Site drops its references; its staged documents are 
 **Not in this brief:**
 
 - **The sweep.**
-- **The id-form check of `documentAddress`** in the domain's validators: genesis emits it once
-  the data dictionary identifies document addresses, beside the URL type (parking lot P-12).
 - **Draining** (the upload brief), the Supabase provider, the Field Binder, Ops capture, the
   Customer Portal, and video.
 

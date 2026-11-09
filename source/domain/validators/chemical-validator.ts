@@ -22,7 +22,6 @@ import {
   expectId,
   expectNonEmptyString,
   expectPositiveNumber,
-  expectUrl,
   expectValid,
   isDictionary
 } from '@core/std'
@@ -44,7 +43,7 @@ export const validateChemicalCreate = (input: ChemicalCreate): ExpectResult =>
     expectBoolean(input.restrictedUse, 'restrictedUse'),
     expectPositiveNumber(input.reEntryIntervalHours, 'reEntryIntervalHours', true),
     expectNonEmptyString(input.storageLocation, 'storageLocation', true),
-    expectUrl(input.sdsUrl, 'sdsUrl', ['https'], true)
+    expectNonEmptyString(input.sdsUrl, 'sdsUrl', true)
   )
 
 /** Validate ChemicalUpdate payloads. */
@@ -60,7 +59,7 @@ export const validateChemicalUpdate = (input: ChemicalUpdate): ExpectResult =>
     expectBoolean(input.restrictedUse, 'restrictedUse', true),
     expectPositiveNumber(input.reEntryIntervalHours, 'reEntryIntervalHours', true),
     expectNonEmptyString(input.storageLocation, 'storageLocation', true),
-    expectUrl(input.sdsUrl, 'sdsUrl', ['https'], true)
+    expectNonEmptyString(input.sdsUrl, 'sdsUrl', true)
   )
 
 /** Guard for ChemicalLabel values. */
@@ -68,7 +67,7 @@ export const isChemicalLabel = (v: unknown): v is ChemicalLabel => {
   if (!isDictionary(v)) return false
   const label = v
   return expectValid(
-    expectUrl(label.url, 'url', ['https']),
+    expectNonEmptyString(label.url, 'url'),
     expectNonEmptyString(label.description, 'description', true)
   ) === null
 }

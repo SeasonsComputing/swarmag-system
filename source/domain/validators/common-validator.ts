@@ -27,11 +27,9 @@ import {
   expectValid,
   expectWhen,
   isDictionary,
-  isNonEmptyString,
-  ValidatorError
+  isNonEmptyString
 } from '@core/std'
 import type { ExpectResult } from '@core/std'
-import { DocumentAddresses } from '@core/stdx'
 import type { Attachment, Location, Note } from '@domain/abstractions/common.ts'
 import { ATTACHMENT_KINDS, NOTE_VISIBILITIES } from '@domain/abstractions/common.ts'
 import type { FacetCreate, FacetUpdate } from '@domain/protocols/common-protocol.ts'
@@ -63,7 +61,7 @@ export const isAttachment = (v: unknown): v is Attachment => {
   const attachment = v
   return expectValid(
     expectNonEmptyString(attachment.filename, 'filename'),
-    expectDocumentAddress(attachment.documentAddress, 'documentAddress'),
+    expectNonEmptyString(attachment.documentAddress, 'documentAddress'),
     expectNonEmptyString(attachment.contentType, 'contentType'),
     expectConstEnum(attachment.kind, 'kind', ATTACHMENT_KINDS),
     expectWhen(attachment.uploadedAt, 'uploadedAt')
@@ -92,8 +90,8 @@ export const isFacetRef = (v: unknown): v is string => {
 /** Validate FacetCreate payloads. */
 export const validateFacetCreate = (input: FacetCreate): ExpectResult =>
   expectValid(
-    expectFacetKey(input.scheme, 'scheme'),
-    expectFacetKey(input.code, 'code'),
+    expectNonEmptyString(input.scheme, 'scheme'),
+    expectNonEmptyString(input.code, 'code'),
     expectNonEmptyString(input.label, 'label'),
     expectNonEmptyString(input.description, 'description', true),
     expectBoolean(input.active, 'active')
@@ -103,32 +101,9 @@ export const validateFacetCreate = (input: FacetCreate): ExpectResult =>
 export const validateFacetUpdate = (input: FacetUpdate): ExpectResult =>
   expectValid(
     expectId(input.id, 'id'),
-    expectFacetKey(input.scheme, 'scheme', true),
-    expectFacetKey(input.code, 'code', true),
+    expectNonEmptyString(input.scheme, 'scheme', true),
+    expectNonEmptyString(input.code, 'code', true),
     expectNonEmptyString(input.label, 'label', true),
     expectNonEmptyString(input.description, 'description', true),
     expectBoolean(input.active, 'active', true)
   )
-
-// ────────────────────────────────────────────────────────────────────────────
-// IMPLEMENTATION
-// ────────────────────────────────────────────────────────────────────────────
-
-const expectFacetKey = (value: unknown, field: string, optional = false): ExpectResult => {
-  const error = expectNonEmptyString(value, field, optional)
-  if (error) return error
-  if (typeof value === 'string' && value.includes(':')) return `${field} must not contain :`
-  return null
-}
-
-const expectDocumentAddress = (value: unknown, field: string): ExpectResult => {
-  const message = `${field} must be an id-form document address`
-  if (!isNonEmptyString(value)) return message
-  try {
-    DocumentAddresses.id(value)
-    return null
-  } catch (error) {
-    if (error instanceof ValidatorError) return message
-    throw error
-  }
-}

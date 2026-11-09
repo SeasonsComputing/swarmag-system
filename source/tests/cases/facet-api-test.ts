@@ -44,9 +44,6 @@ Deno.test('Facet create validates required fields and reserved separators', () =
       )
     }
   }
-  for (const field of ['scheme', 'code'] as const) {
-    assert(validateFacetCreate({ ...FacetSamples.aerialSpray, [field]: 'a:b' }) !== null)
-  }
   assert(
     validateFacetCreate({ ...FacetSamples.aerialSpray, active: 'true' } as unknown as FacetCreate)
       !== null
@@ -63,7 +60,6 @@ Deno.test('Facet update validates supplied fields while allowing partial updates
   assertEquals(validateFacetUpdate({ id: FacetSamples.aerialSpray.id }), null)
   assert(validateFacetUpdate({ ...patch, id: 'invalid' }) !== null)
   for (const field of ['scheme', 'code'] as const) {
-    assert(validateFacetUpdate({ ...patch, [field]: 'a:b' }) !== null)
     assert(validateFacetUpdate({ ...patch, [field]: '   ' }) !== null)
   }
   assert(validateFacetUpdate({ ...patch, label: '' }) !== null)

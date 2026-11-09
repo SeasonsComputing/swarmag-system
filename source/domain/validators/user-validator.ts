@@ -18,7 +18,6 @@ import {
   expectCompositionMany,
   expectCompositionPositive,
   expectConstEnum,
-  expectEmail,
   expectId,
   expectNonEmptyString,
   expectValid
@@ -36,7 +35,7 @@ export const validateUserCreate = (input: UserCreate): ExpectResult =>
     expectCompositionPositive(input.roles, 'roles', isUserRole),
     expectCompositionMany(input.notes, 'notes', isNote),
     expectNonEmptyString(input.displayName, 'displayName'),
-    expectEmail(input.primaryEmail, 'primaryEmail'),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
     expectConstEnum(input.preferredChannel, 'preferredChannel', CONTACT_PREFERRED_CHANNELS),
     expectConstEnum(input.status, 'status', USER_STATUSES)
@@ -49,7 +48,7 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
     expectCompositionPositive(input.roles, 'roles', isUserRole, true),
     expectCompositionMany(input.notes, 'notes', isNote, true),
     expectNonEmptyString(input.displayName, 'displayName', true),
-    expectEmail(input.primaryEmail, 'primaryEmail', true),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail', true),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber', true),
     expectConstEnum(input.preferredChannel, 'preferredChannel', CONTACT_PREFERRED_CHANNELS, true),
     expectConstEnum(input.status, 'status', USER_STATUSES, true)

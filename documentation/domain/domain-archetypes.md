@@ -318,7 +318,6 @@ All field checks use `expect*` helpers from `@core/std` (`validators.ts`).
 import {
   expectCompositionPositive,
   expectConstEnum,
-  expectEmail,
   expectId,
   expectNonEmptyString,
   expectValid
@@ -333,7 +332,7 @@ export const validateUserCreate = (input: UserCreate): ExpectResult =>
   expectValid(
     expectCompositionPositive(input.roles, 'roles', isUserRole),
     expectNonEmptyString(input.displayName, 'displayName'),
-    expectEmail(input.primaryEmail, 'primaryEmail'),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
     expectConstEnum(input.status, 'status', USER_STATUSES)
   )
@@ -344,7 +343,7 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
     expectId(input.id, 'id'),
     expectCompositionPositive(input.roles, 'roles', isUserRole, true),
     expectNonEmptyString(input.displayName, 'displayName', true),
-    expectEmail(input.primaryEmail, 'primaryEmail', true),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail', true),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber', true),
     expectConstEnum(input.status, 'status', USER_STATUSES, true)
   )
@@ -449,7 +448,6 @@ Update validators follow the same structure as create validators. Exports at top
 import {
   expectCompositionPositive,
   expectConstEnum,
-  expectEmail,
   expectId,
   expectNonEmptyString,
   expectValid
@@ -464,7 +462,7 @@ export const validateUserCreate = (input: UserCreate): ExpectResult =>
   expectValid(
     expectCompositionPositive(input.roles, 'roles', isUserRole),
     expectNonEmptyString(input.displayName, 'displayName'),
-    expectEmail(input.primaryEmail, 'primaryEmail'),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail'),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber'),
     expectConstEnum(input.status, 'status', USER_STATUSES)
   )
@@ -475,7 +473,7 @@ export const validateUserUpdate = (input: UserUpdate): ExpectResult =>
     expectId(input.id, 'id'),
     expectCompositionPositive(input.roles, 'roles', isUserRole, true),
     expectNonEmptyString(input.displayName, 'displayName', true),
-    expectEmail(input.primaryEmail, 'primaryEmail', true),
+    expectNonEmptyString(input.primaryEmail, 'primaryEmail', true),
     expectNonEmptyString(input.phoneNumber, 'phoneNumber', true),
     expectConstEnum(input.status, 'status', USER_STATUSES, true)
   )

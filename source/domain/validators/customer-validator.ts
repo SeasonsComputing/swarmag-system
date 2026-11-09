@@ -21,7 +21,6 @@ import {
   expectCompositionMany,
   expectCompositionOne,
   expectConstEnum,
-  expectEmail,
   expectId,
   expectNonEmptyString,
   expectPositiveNumber,
@@ -89,7 +88,7 @@ export const isContact = (v: unknown): v is Contact => {
     expectNonEmptyString(contact.displayName, 'displayName'),
     expectNonEmptyString(contact.phoneNumber, 'phoneNumber'),
     expectConstEnum(contact.preferredChannel, 'preferredChannel', CONTACT_PREFERRED_CHANNELS),
-    expectEmail(contact.email, 'email', true)
+    expectNonEmptyString(contact.email, 'email', true)
   ) === null
 }
 

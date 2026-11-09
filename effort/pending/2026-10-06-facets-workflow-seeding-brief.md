@@ -20,7 +20,7 @@ bind without changing the Workflow side.
 ## Decided elsewhere
 
 - The curated catalog is `Facet = Instantiable & { scheme, code, label, description?, active }`,
-  a `facets` table in Common (`domain-data-dictionary.md` §4.5). Retiring a facet sets `active`
+  a `facets` table in Common (`domain-data-dictionary.md` §5.5). Retiring a facet sets `active`
   to false; its label still resolves.
 - `Service` and `Workflow` carry `facets: CompositionMany<string>` of `scheme:code` references
   (§8.2, §10.11). Matching compares references within one scheme.
