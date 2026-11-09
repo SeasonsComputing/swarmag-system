@@ -9,7 +9,7 @@ PURPOSE
 Defines the document hierarchy, namespace ─* bucket ─* document, independently
 of storage. DocumentAddresses (docstore-document-addresses.ts) builds, parses,
 and formats addresses. Provider support and identity producers serve the
-document store makers in core/cli.
+document store kernel and providers in core/cli.
 
 IDENTITIES
 ───────────────────────────────────────────────────────────────────────────────
@@ -116,15 +116,15 @@ export type DocumentId = NominalType<
 /** Identities of the three node levels. */
 export type NodeId = NamespaceId | BucketId | DocumentId
 
-/** Construct a namespace identity from provider lineage; for the core/cli makers. */
+/** Construct a namespace identity from provider lineage; for the core/cli kernel. */
 export const namespaceIdentity = (node: Lineage): NamespaceId =>
   ({ namespace: node.namespace }) as NamespaceId
 
-/** Construct a bucket identity from provider lineage; for the core/cli makers. */
+/** Construct a bucket identity from provider lineage; for the core/cli kernel. */
 export const bucketIdentity = (node: Lineage): BucketId =>
   ({ namespace: node.namespace, bucket: node.bucket }) as BucketId
 
-/** Construct a document identity from validated lineage; for the core/cli makers. */
+/** Construct a document identity from validated lineage; for the core/cli kernel. */
 export const documentIdentity = (node: Lineage): DocumentId =>
   ({ namespace: node.namespace, bucket: node.bucket, document: node.document }) as DocumentId
 
@@ -169,12 +169,12 @@ export interface StoreNodeContract<Self extends NodeId, Parent = void> {
 
 /** Namespace operations; extends the common node contract. */
 export interface NamespaceContract extends StoreNodeContract<NamespaceId> {
-  create(name: string): Promise<NodeMetadata<NamespaceId>>
+  create(name: string, id?: Id): Promise<NodeMetadata<NamespaceId>>
 }
 
 /** Bucket operations within an existing namespace. */
 export interface BucketContract extends StoreNodeContract<BucketId, NamespaceId> {
-  create(parent: NamespaceId, name: string): Promise<NodeMetadata<BucketId>>
+  create(parent: NamespaceId, name: string, id?: Id): Promise<NodeMetadata<BucketId>>
 }
 
 /** Immutable document bytes, renameable metadata, and temporary links. */
@@ -201,7 +201,10 @@ export type Lineage = { readonly namespace: Id; readonly bucket?: Id; readonly d
 /** Provider metadata; identities acquire their brands in the kernel. */
 export type LineageMetadata = { lineage: Lineage; name: string; createdAt: When; count: number }
 
-/** Internal storage operations; providers never parse addresses or mint identities. */
+/**
+ * Public storage contract; providers never parse addresses or mint identities.
+ * Creating at an existing lineage returns its unchanged node, including bytes.
+ */
 export interface DocumentProviderContract {
   get(node: Lineage): Promise<LineageMetadata>
   find(parent: Lineage | null, name: string): Promise<readonly LineageMetadata[]>

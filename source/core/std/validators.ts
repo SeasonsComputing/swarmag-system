@@ -17,6 +17,8 @@ isPositiveNumber(value)         Check whether value is a positive number.
 isBoolean(value)                Check whether value is a boolean.
 isConstEnum(value, values)      Check whether value is in a const-enum tuple.
 isEmail(value)                  Check whether value is an email string.
+UrlScheme                       Supported URL schemes.
+isUrl(value, schemes)           Check an absolute URL against allowed schemes.
 
 EXPECTATIONS
 ───────────────────────────────────────────────────────────────────────────────
@@ -27,6 +29,7 @@ expectPositiveNumber(...)       Validate a required or optional positive number.
 expectBoolean(...)              Validate a required or optional boolean.
 expectConstEnum(...)            Validate a required or optional const-enum value.
 expectEmail(...)                Validate a required or optional email.
+expectUrl(...)                  Validate a required or optional URL.
 expectCompositionOne(...)       Validate a required or optional CompositionOne.
 expectCompositionOptional(...)  Validate a required or optional CompositionOptional.
 expectCompositionMany(...)      Validate a required or optional CompositionMany.
@@ -114,6 +117,20 @@ export const isConstEnum = <T extends readonly string[]>(
 export const isEmail = (value: unknown): value is string =>
   typeof value === 'string' && WHATWG_EMAIL.test(value)
 
+/** Supported schemes for URL boundary validation. */
+export type UrlScheme = 'http' | 'https' | 'mailto' | 'tel' | 'ftp' | 'data' | 'blob'
+
+/** Check an absolute URL against explicitly allowed schemes. */
+export const isUrl = (value: unknown, schemes: readonly UrlScheme[]): value is string => {
+  if (typeof value !== 'string') return false
+  try {
+    const url = new URL(value)
+    return schemes.some(scheme => url.protocol === `${scheme}:`)
+  } catch {
+    return false
+  }
+}
+
 // ────────────────────────────────────────────────────────────────────────────
 // VALIDATOR GAURDS (expect*)
 // ────────────────────────────────────────────────────────────────────────────
@@ -197,6 +214,17 @@ export const expectEmail = (
 ): ExpectResult => {
   if ((isNullish(value) && optional) || isEmail(value)) return null
   return `${field} must be a valid email address`
+}
+
+/** Validate a required or optional absolute URL with an allowed scheme. */
+export const expectUrl = (
+  value: unknown,
+  field: string,
+  schemes: readonly UrlScheme[],
+  optional = false
+): ExpectResult => {
+  if ((isNullish(value) && optional) || isUrl(value, schemes)) return null
+  return `${field} must be a valid URL with an allowed scheme`
 }
 
 /** Validate a required or optional CompositionOne value. */

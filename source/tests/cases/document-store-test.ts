@@ -5,8 +5,8 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-import { makeDocumentStore } from '@core/cli/make-docstore-client.ts'
-import { id, ValidatorError, when } from '@core/std'
+import { DocumentStore } from '@core/cli/docstore-client.ts'
+import { id, isId, ValidatorError, when } from '@core/std'
 import type { Id } from '@core/std'
 import { ApiError, DocumentAddresses } from '@core/stdx'
 import type {
@@ -92,6 +92,25 @@ Deno.test('document ids are idempotent per lineage and independent across parent
   assertEquals((await store.bucket.get(first.id)).count, 1)
 })
 
+Deno.test('supplied container ids are idempotent and scoped by lineage', async () => {
+  const { store } = memoryStore()
+  const namespaceId = id()
+  const bucketId = id()
+  const namespace = await store.namespace.create('original', namespaceId)
+  assertEquals(namespace.id.namespace, namespaceId)
+  assertEquals(await store.namespace.create('changed', namespaceId), namespace)
+  const bucket = await store.bucket.create(namespace.id, 'original', bucketId)
+  assertEquals(bucket.id.bucket, bucketId)
+  assertEquals(await store.bucket.create(namespace.id, 'changed', bucketId), bucket)
+  const other = await store.namespace.create('other')
+  const separate = await store.bucket.create(other.id, 'separate', bucketId)
+  assertEquals({ ...separate.id }, { namespace: other.id.namespace, bucket: bucketId })
+  assert(isId(other.id.namespace))
+  assert(isId((await store.bucket.create(other.id, 'minted')).id.bucket))
+  assertEquals((await store.namespace.resolve(`id:${namespaceId}`)).id, namespace.id)
+  assertEquals((await store.bucket.resolve(`id:${namespaceId}/id:${bucketId}`)).id, bucket.id)
+})
+
 Deno.test('resolution enforces depth, ambiguity, and parent membership', async () => {
   const { store } = memoryStore()
   const first = await store.namespace.create('first')
@@ -125,6 +144,8 @@ Deno.test('kernel validates names, addresses, and supplied ids before dispatch',
   const bucket = await store.bucket.create(namespace.id, 'pumps')
   const before = Calls.create
   await assertRejects(() => store.namespace.create(' '), ApiError)
+  await assertRejects(() => store.namespace.create('valid', 'bad'), ApiError)
+  await assertRejects(() => store.bucket.create(namespace.id, 'valid', 'bad'), ApiError)
   await assertRejects(() => store.bucket.create(namespace.id, 'a/b'), ApiError)
   await assertRejects(() => store.document.create(bucket.id, 'file', new Blob(), 'bad'), ApiError)
   await assertRejects(() => store.bucket.update(bucket.id, 'id:reserved'), ApiError)
@@ -221,6 +242,6 @@ const memoryStore = (linkLifetime = 60_000) => {
       return Promise.resolve('memory:document')
     }
   }
-  const store: ApiDocumentStoreContract = makeDocumentStore(Provider, linkLifetime)
+  const store: ApiDocumentStoreContract = new DocumentStore(Provider, { linkLifetime })
   return { store, Calls }
 }

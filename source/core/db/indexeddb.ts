@@ -6,7 +6,7 @@
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Manages IndexedDB connections for the active local database name, upgrades the
+Manages IndexedDB connections by configured database name. Upgrades each
 database when registered stores or indexes are missing. Maps storage errors
 to status.
 
@@ -21,7 +21,7 @@ IndexedDbIndex         Index configuration.
 └ multiEntry           Index each array member when true.
 IndexedDb              IndexedDB connection manager.
 ├ registerStore(...)   Register a store, optional key path, and indexes.
-├ connection()         Return the singleton connection for the active database.
+├ connection(dbKey?)   Return the singleton connection for the configured database.
 └ errorToStatus(error) Map standard DOMExceptions to HTTP-style status codes.
 */
 
@@ -48,7 +48,7 @@ type ConnectionCache = Dictionary<Promise<IDBPDatabase>>
 /** Internal registry type for tracking stores per database namespace. */
 type StoreRegistry = Dictionary<Dictionary<IndexedDbStore>>
 
-/** IndexedDB connection manager for the active local database. */
+/** IndexedDB connection manager for the configured databases. */
 export class IndexedDb {
   /** Internal registry of store names. */
   static #registry: StoreRegistry = {}
@@ -56,17 +56,16 @@ export class IndexedDb {
   /** Singleton connection instance cache indexed by database name. */
   static #cache: ConnectionCache = {}
 
-  /** Internal helper to resolve the physical database name from Config. */
-  static get #activeDbName(): string {
-    return Config.get('LOCAL_DB_NAME')
-  }
-
   /**
-   * Register a store name for the current deployment's database.
-   * MUST be called by makeCrudIndexedDbClient during module evaluation.
+   * Register a store name for the database named by a configuration key.
+   * MUST be called during module evaluation before the first connection.
    */
-  static registerStore(storeName: string, specification: IndexedDbStore = {}): void {
-    const dbName = this.#activeDbName
+  static registerStore(
+    storeName: string,
+    specification: IndexedDbStore = {},
+    dbKey = 'LOCAL_DB_NAME'
+  ): void {
+    const dbName = Config.get(dbKey)
     const stores = this.#registry[dbName] ??= {}
     const declared = structuredClone(specification)
     const previous = stores[storeName]
@@ -80,9 +79,9 @@ export class IndexedDb {
     stores[storeName] = declared
   }
 
-  /** Return the singleton connection for the active database. */
-  static connection(): Promise<IDBPDatabase> {
-    const name = this.#activeDbName
+  /** Return the singleton connection for the configured database. */
+  static connection(dbKey = 'LOCAL_DB_NAME'): Promise<IDBPDatabase> {
+    const name = Config.get(dbKey)
 
     // 1. If the Promise exists in the Dictionary, return it immediately.
     if (this.#cache[name] !== undefined) return this.#cache[name]

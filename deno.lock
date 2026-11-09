@@ -11,6 +11,7 @@
     "npm:@tanstack/solid-router@1.168.6": "1.168.6_solid-js@1.9.12",
     "npm:chart.js@^4.4.0": "4.5.1",
     "npm:dprint@*": "0.51.1",
+    "npm:fake-indexeddb@6.2.5": "6.2.5",
     "npm:idb@8": "8.0.3",
     "npm:markdownlint-cli2@0.13.0": "0.13.0",
     "npm:playwright@*": "1.61.0",
@@ -858,6 +859,9 @@
     "escalade@3.2.0": {
       "integrity": "sha512-WUj2qlxaQtO4g6Pq5c29GTcWGDyd8itL8zTlipgECz3JesAiiOKotd8JU6otB3PACgG6xkJUyVhboMS+bje/jA=="
     },
+    "fake-indexeddb@6.2.5": {
+      "integrity": "sha512-CGnyrvbhPlWYMngksqrSSUT1BAVP49dZocrHuK0SvtR0D5TMs5wP0o3j7jexDJW01KSadjBp1M/71o/KR3nD1w=="
+    },
     "fast-glob@3.3.3": {
       "integrity": "sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==",
       "dependencies": [
@@ -1422,6 +1426,7 @@
       "npm:@tanstack/solid-query@5.100.14",
       "npm:@tanstack/solid-router@1.168.6",
       "npm:chart.js@^4.4.0",
+      "npm:fake-indexeddb@6.2.5",
       "npm:idb@8",
       "npm:solid-js@1.9.12",
       "npm:vite-plugin-solid@2.11.11",
