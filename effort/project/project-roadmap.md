@@ -227,8 +227,9 @@ store shared:
    `Attachments` in `front/api` with its catalog, the inbox, the editors (attachments on notes,
    and the URL app control with the Chemical labels editor and the SDS field), and Admin capture,
    against a second IndexedDB store, `DocumentServer`.
-2. **Upload** (`effort/active/2026-10-30-document-upload-brief.md`): the Admin loop, draining
-   `DocumentInbox` into `DocumentServer`.
+2. **Upload** — closed 2026-11-10, `3a07a9c`,
+   `effort/completed/2026-10-30-document-upload-brief.md`: `Attachments.drain()` and Admin's
+   `DocumentDrain` loop, one tab at a time, draining `DocumentInbox` into `DocumentServer`.
 3. **The Supabase provider** (`effort/active/2026-10-30-document-store-supabase-brief.md`): the
    shared store, swapped into `api` for `DocumentServer`, its provisioning, and upload's access
    rules written into its policies.
@@ -296,7 +297,7 @@ Runner's own prerequisite plumbing, not a separate milestone with its own featur
 answer, captured on the phone (a file input with `capture`); and the job upload that drains the
 job's inbox into `DocumentServer` back at base, beside `api.uploadJobLogs`
 (`effort/completed/2026-10-29-attachments-brief.md`,
-`effort/active/2026-10-30-document-upload-brief.md`). Whether a job's inbox is a namespace or a
+`effort/completed/2026-10-30-document-upload-brief.md`). Whether a job's inbox is a namespace or a
 bucket is designed here.
 
 **The Field Binder, Ops side** — every Ops device mirrors the binder into its `FieldBinder` store

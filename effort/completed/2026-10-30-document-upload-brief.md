@@ -1,7 +1,7 @@
 # Document Upload — Brief
 
-**Active, dispatched; amended 2026-11-10 after AI Coding Engine review.** The second of four features of roadmap
-M-6, Document Storage: Admin's drain, which moves placed documents from the inbox to
+**Completed 2026-11-10.** Shipped in `3a07a9c`, with the documentation in `d8a9b94`. The second of
+four features of roadmap M-6, Document Storage: Admin's drain, which moves placed documents from the inbox to
 `DocumentServer` at the same address. Feature mode: its changes are within `front/` and their
 tests; a need outside `front/` is an escalation. It builds and tests against the IndexedDB
 `DocumentServer`; the Supabase provider brief,
@@ -102,6 +102,22 @@ for the server within a minute and still opens; two tabs open drain once.
 3. **One fallback, one place.** `link` and `size` repeated the inbox-then-server fallback; a private
    `#either(node, operation)` in `Attachments` holds it once. `#pending()`'s inline return type is
    named, `PendingDocument`.
+
+## Closure (2026-11-10)
+
+Production by the AI Coding Engine in two rounds, the second after the amendment "After production
+review"; committed in `3a07a9c`. The AI Architect re-ran the checks: guards, types, lint,
+formatting, and 200 tests, with the two environment-dependent files excluded; `STYLE_AUDIT: PASS`.
+The CA accepted in Admin: placed documents leave the inbox for the server and still open.
+
+Settled at closure:
+
+- **Visibility:** the background tasks brief, `effort/pending/2026-11-10-background-tasks-brief.md`.
+- **The drain before sign-in:** harmless against the IndexedDB stand-in; the Supabase provider
+  brief starts it only once a session is prepared.
+- **Ops' and the Customer Portal's drains:** roadmap M-9 and M-10.
+- **A document that can never upload:** the Supabase provider brief.
+- **Pending documents in the store contract:** parking lot P-14.
 
 ## Design history
 

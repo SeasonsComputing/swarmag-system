@@ -3,7 +3,7 @@
 **Active, draft.** Recorded 2026-10-30 from a CA + AI Architect session, split from the document
 storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, which is the kernel and the
 contract this provider implements. The upload brief,
-`effort/active/2026-10-30-document-upload-brief.md`, depends on this one for the shared store its
+`effort/completed/2026-10-30-document-upload-brief.md`, depends on this one for the shared store its
 drains fill. It is third of four features of roadmap M-6, Document Storage, and provides
 `DocumentServer`, the shared store each app composes (`architecture-core.md` §10.2). Awaits the design
 moments, CA review, and the production gate.
@@ -150,6 +150,10 @@ The production is Foundation mode and reads the DevOps context beside Base.
    the IndexedDB provider takes its database's config key; on the server there is one store.
 8. **Access rules.** Per namespace and bucket, which roles read and write it: Customers, Users,
    Jobs, and `Library` (architecture-core §10.4). Moved from the upload brief 2026-11-10.
+9. **The drain waits for a session.** Admin's `DocumentDrain` starts when bootstrap resolves,
+   before sign-in, which is harmless against the IndexedDB stand-in. Against Supabase an
+   unauthenticated pass fails and backs off, so the drain starts only once a session is prepared.
+   Settled at the upload brief's closure, 2026-11-10.
 
 ## Records
 

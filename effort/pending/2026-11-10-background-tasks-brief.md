@@ -1,7 +1,7 @@
 # Background Tasks — Brief
 
 **Pending, captured 2026-11-10** from a CA + AI Architect session, while settling the upload brief
-(`effort/active/2026-10-30-document-upload-brief.md`). Not dispatched. Foundation mode: it adds to
+(`effort/completed/2026-10-30-document-upload-brief.md`). Not dispatched. Foundation mode: it adds to
 `ux/`, locked since 2026-10-21, and that crossing is the CA's to authorize when this brief is
 chosen.
 
@@ -24,8 +24,9 @@ warn before the page closes on it.
    files"). Nothing shows when no task runs.
 3. **Leaving asks.** While a task runs, closing or reloading the page raises the browser's own
    "Leave site?" prompt (`beforeunload`).
-4. **Admin's drain publishes upload.** The loop in `front/app-admin/app.tsx` publishes "Uploading
-   N files" from `Attachments.drain()`'s `remaining`, and clears it when nothing remains.
+4. **Admin's drain publishes upload.** `DocumentDrain` (`front/app-admin/document-drain.ts`)
+   publishes "Uploading N files" from `Attachments.drain()`'s `remaining`, and clears it when
+   nothing remains.
 
 ## Why the Helm
 
