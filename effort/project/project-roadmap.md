@@ -233,7 +233,7 @@ store shared:
 3. **The Supabase provider** (`effort/active/2026-10-30-document-store-supabase-brief.md`): the
    shared store, swapped into `api` for `DocumentServer`, its provisioning, and upload's access
    rules written into its policies.
-4. **The Field Binder** (`effort/pending/2026-11-04-field-binder-brief.md`): the Admin workbench,
+4. **The Field Binder** (`effort/active/2026-11-04-field-binder-brief.md`): the Admin workbench,
    a feature of its own, and its copies in `DocumentServer`, fetched or uploaded. Its Ops side is
    M-9's.
 
@@ -302,7 +302,7 @@ bucket is designed here.
 
 **The Field Binder, Ops side** — every Ops device mirrors the binder into its `FieldBinder` store
 when behind its version, and a crew opens a document offline
-(`effort/pending/2026-11-04-field-binder-brief.md`).
+(`effort/active/2026-11-04-field-binder-brief.md`).
 
 ## M-10 · Customer Portal
 

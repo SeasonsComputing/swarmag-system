@@ -1,6 +1,6 @@
 # Field Binder — Brief
 
-**Pending, design input.** Recorded 2026-11-04 from a CA + AI Architect session, re-scoped from the
+**Active, design input; chosen 2026-11-10 from roadmap M-6.** Recorded 2026-11-04 from a CA + AI Architect session, re-scoped from the
 document storage policy brief of 2026-10-31, whose attachments, upload, and server parts were folded
 into roadmap M-6's briefs (`effort/completed/2026-10-29-attachments-brief.md`,
 `effort/completed/2026-10-30-document-upload-brief.md`,

@@ -63,7 +63,7 @@ Functional files format", retired by CONVENTIONS 1.1 §6. Recorded at the close 
 Its themes predate decisions made since. §3 Asset Maintenance and §4 Chemical Maintenance describe
 manager work that has shipped, while maintenance itself became a dedicated workbench, parked as
 P-8. The Job Definition sections (§2.3–§2.9) are empty. Features decided since, such as the Field
-Binder (`effort/pending/2026-11-04-field-binder-brief.md`), have no story. The roadmap draws on
+Binder (`effort/active/2026-11-04-field-binder-brief.md`), have no story. The roadmap draws on
 the user stories (`EFFORT.md` §3), so bring them current before the next milestone is
 placed from them.
 
