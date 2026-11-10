@@ -171,6 +171,7 @@ these rules locally.
 | `number(value)`             | Control text to a number; blank or non-finite to `undefined`. |
 | `label(value)`              | A kebab-case value to display text.                           |
 | `untitled(value, fallback)` | A value with no content to consumer-supplied display text.    |
+| `size(bytes)`               | A byte count to text in the largest fitting unit (`38 KB`).   |
 | `from(value)`               | A number to control text; `undefined` to blank.               |
 
 ```tsx
@@ -180,6 +181,9 @@ these rules locally.
 `untitled` takes a required `fallback` because the wording belongs to the
 consumer that knows what the value names. The catalog owns the rule; the
 application owns the copy.
+
+`size` writes a byte count the way a person reads it: abbreviated units, and the
+number formatted for the locale. Its steps are stated in its header.
 
 `number` and `from` are not safe for a controlled round-trip on every input
 event: read back through `from` and `40.` becomes `40` before the user types

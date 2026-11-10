@@ -43,6 +43,7 @@ source/
     │   │   └── widget-registry.ts   — exports AppWidgetRegistry; app-tier catalog only
     │   └── shell/                   — branded chrome and application wiring (*)
     │       ├── notes-editor.tsx     — stock notes Index-Detail editor
+    │       ├── table-cells.tsx      — LabelCell, the notes editor's row label
     │       ├── user-picker.tsx      — role-filtered User assignment
     │       └── user-provider.ts     — prepared domain User proxy
     ├── app-admin/
@@ -538,6 +539,7 @@ app/
 ├── components/ — swarmAg-specific reusable UI controls (placeholder — none yet)
 ├── shell/      — branded chrome and application wiring (*)
 │   ├── notes-editor.tsx — stock notes Index-Detail editor
+│   ├── table-cells.tsx — LabelCell, the notes editor's row label
 │   ├── user-picker.tsx — role-filtered User assignment
 │   └── user-provider.ts — prepared domain User proxy
 ├── stores/     — swarmAg-suite state beyond the toolkit baseline (facets-state.ts)
@@ -548,6 +550,13 @@ app/
 (*) `shell/` holds `about-box`, `brand-hero`, `login`, `notes-editor`, `user-picker`, and
 `user-provider`; the maker wrapper binding `ux/shell`'s generic makers to swarmAg branding;
 and `session-coordinator.ts`.
+
+`NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
+`notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`,
+`drill: DrillContract`, and `attach`, which stages a chosen file (`Attachments.stage`), with
+optional `attachmentKinds`. It edits Content and the note's attachments, and preserves existing
+timestamps. It never persists: its host saves the record and places its staged attachments in
+`makeAggregateSave`'s `complete`.
 
 #### 10.1.3 Stays in the app
 
@@ -569,18 +578,11 @@ widening later costs a move, and generalizing early costs an abstraction nobody 
 Workbench steps, the shared panel sequence, the Wizard, the Abstraction Manager, and drill-down
 are built as CONVENTIONS §17 describes; their behavior is in their module headers.
 
-`NotesEditor` in `front/app/shell/` is the stock notes Index-Detail pair. It takes
-`notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`,
-`drill: DrillContract`, and `attach`, which stages a chosen file (`Attachments.stage`), with
-optional `attachmentKinds`. It edits Content and the note's attachments, and preserves existing
-timestamps. It never persists: its host saves the record and places its staged attachments in
-`makeAggregateSave`'s `complete`. Billing-address fields and their validation occupy the separate
-Customer Billing step.
-
 **Features: `source/front/app-admin/`.**
 
 - `customers/` supplies the Customer steps and nothing about their host.
   - `customer-steps.tsx` exports `customerSteps(state)`: Detail, Contact, Billing, and Sites.
+    Billing-address fields and their validation occupy the Billing step.
   - `customer-state.ts` owns the state, `CustomerDraft`, and the `customerDraft(state)`
     projection.
   - The Customer steps are a fragment. They know nothing of position, progress, or what

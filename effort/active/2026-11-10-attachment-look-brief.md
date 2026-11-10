@@ -84,16 +84,16 @@ breadcrumb and its "Delete …" name.
 
 The AI Architect writes the documentation first; the AI Coding Engine writes the code.
 
-| Where                                                  | Change                                                                   |
-| ------------------------------------------------------ | ------------------------------------------------------------------------ |
-| `documentation/ux/ux-components-guide.md`              | `UiText.size`                                                            |
-| `documentation/architecture/architecture-front.md`     | §10.1.5: `LabelCell`, the notes editor's look                            |
-| `source/ux/ui/components/ui-helpers.ts`                | `UiText.size`                                                            |
-| `source/ux/shell/panel/collection-panel.tsx`           | `renderLabel`                                                            |
-| `source/front/app/shell/table-cells.tsx`, `.css` (new) | `LabelCell`                                                              |
-| `source/front/app/shell/notes-editor.tsx`, `.css`      | Tabs, `renderLabel`, no emoji                                            |
-| `source/front/app/shell/attachment-list.tsx`           | `LabelCell`, `UiText.size`, the fieldset and Add Attachment, the dialogs |
-| `source/tests/`                                        | `UiText.size`, `renderLabel`'s default, `LabelCell`'s labelling          |
+| Where                                                  | Change                                                                                 |
+| ------------------------------------------------------ | -------------------------------------------------------------------------------------- |
+| `documentation/ux/ux-components-guide.md`              | `UiText.size`                                                                          |
+| `documentation/architecture/architecture-front.md`     | _[Revised by the amendment "Documentation placement".]_ §2, §10.1.2: `table-cells.tsx` |
+| `source/ux/ui/components/ui-helpers.ts`                | `UiText.size`                                                                          |
+| `source/ux/shell/panel/collection-panel.tsx`           | `renderLabel`                                                                          |
+| `source/front/app/shell/table-cells.tsx`, `.css` (new) | `LabelCell`                                                                            |
+| `source/front/app/shell/notes-editor.tsx`, `.css`      | Tabs, `renderLabel`, no emoji                                                          |
+| `source/front/app/shell/attachment-list.tsx`           | `LabelCell`, `UiText.size`, the fieldset and Add Attachment, the dialogs               |
+| `source/tests/`                                        | `UiText.size`, `renderLabel`'s default, `LabelCell`'s labelling                        |
 
 **Unchanged:** `PanelRowIdentity`, `UiActionButton`, `UiTableRow`, `StatusBadge`, every other
 table and `CollectionPanel` consumer, the icon catalog and `ui.css`, storage and saves, `domain/`,
@@ -105,6 +105,14 @@ table and `CollectionPanel` consumer, the icon catalog and `ui.css`, storage and
 excluded); `STYLE_AUDIT`. The CA accepts in Admin: both tables at rest, hovered, and focused; long
 names wrapping; a note with and without attachments; Add Attachment opening the picker; sizes;
 rename and remove not opening the row; the Rename and Remove dialogs; both themes.
+
+## Amendment — 2026-11-10 — Documentation placement
+
+1. **The look is not architecture.** Its colors and glyphs live in this brief and the code's
+   headers. Architecture-front records only that `table-cells.tsx` joins the `shell/` trees of §2
+   and §10.1.2. The `NotesEditor` paragraph, which sat in §10.1.5 (workbench steps), moves to
+   §10.1.2 beside the tier that holds it, and its sentence on the Customer Billing step moves to
+   the Customer steps bullet. Both moves were made with the AI Architect's documentation changes.
 
 ## Design history
 
