@@ -26,8 +26,8 @@ import { UrlField } from '@front/app/shell/url-field.tsx'
 import { onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
-import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
+import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
+import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
 import {
   UiField,
   UiFieldset,
@@ -54,7 +54,7 @@ export type ChemicalStepDetailProps = {
 export const ChemicalStepDetail = (props: ChemicalStepDetailProps): UiComponent => {
   const { state } = props
   let formRef: HTMLFormElement | undefined
-  const validation = useAbstractionFormValidation(() => formRef, {
+  const validation = useFormValidation(() => formRef, {
     sdsUrl: () => expectUrl(state.sdsUrl().trim() || undefined, 'SDS URL', ['https', 'http'], true),
     labels: () =>
       state.labels().every(label => !expectUrl(label.url, 'Label URL', ['https', 'http']))
@@ -68,7 +68,7 @@ export const ChemicalStepDetail = (props: ChemicalStepDetailProps): UiComponent 
     const fieldsValid = validation.validateForm()
     return nativeValid && fieldsValid
   }))
-  useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
+  useFormKeyboard(() => formRef, field => validation.blurField(field))
   return (
     <DrillDown
       rootTitle='Chemical details'

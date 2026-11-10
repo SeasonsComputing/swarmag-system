@@ -25,8 +25,8 @@ import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
 import { onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
-import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
+import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
+import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
 import { UiField, UiFieldset, UiInput, UiLayout, UiSingleSelect, UiText, UiTextArea } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import type { AssetState } from './asset-state.ts'
@@ -43,12 +43,12 @@ export type AssetStepDetailProps = {
 export const AssetStepDetail = (props: AssetStepDetailProps): UiComponent => {
   const { state } = props
   let formRef: HTMLFormElement | undefined
-  const validation = useAbstractionFormValidation(() => formRef, {
+  const validation = useFormValidation(() => formRef, {
     label: () => expectNonEmptyString(state.label(), 'Label'),
     type: () => expectId(state.type(), 'Type')
   })
   onCleanup(props.context.registerValidation(validation.validateForm))
-  useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
+  useFormKeyboard(() => formRef, field => validation.blurField(field))
   return (
     <DrillDown
       rootTitle='Asset details'

@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Use abstraction form feedback                                                ║
+║ Use form feedback                                                            ║
 ║ Bridges native form validation into manager feedback.                        ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -11,21 +11,21 @@ phase to observe them at all. The native validation bubble is browser-rendered
 chrome that ignores a dialog's own bounds, so its default is suppressed here and
 only the manager-owned feedback banner is shown. Canceling the event also cancels
 the browser's own focus-first-invalid, so focusing the offending control belongs
-to `validateForm` in use-abstraction-form-validation.ts. Any AbstractionManager
-entity editor form can call this once instead of re-wiring the capture listener
+to `validateForm` in use-form-validation.ts. Any workbench
+form can call this once instead of re-wiring the capture listener
 by hand.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-FORM_FEEDBACK_MESSAGE                                      Standard failure copy.
-useAbstractionFormFeedback(formRef, feedback, message?)    Wire the bridge.
+FORM_FEEDBACK_MESSAGE                     Standard failure copy.
+useFormFeedback(formRef, feedback, message?)Wire the bridge.
 */
 
 import { onCleanup, onMount } from '@solid-js'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 
 // ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
+// FORM FEEDBACK
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Standard form-level validation failure copy. */
@@ -37,7 +37,7 @@ export const FORM_FEEDBACK_MESSAGE = 'Correct the highlighted fields.'
  * @param onFeedback Feedback reporter, typically the manager feedback callback.
  * @param message Feedback message shown on validation failure.
  */
-export const useAbstractionFormFeedback = (
+export const useFormFeedback = (
   formRef: () => HTMLFormElement | undefined,
   onFeedback: (feedback: PanelFeedback | null) => void,
   message = FORM_FEEDBACK_MESSAGE

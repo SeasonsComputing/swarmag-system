@@ -1,46 +1,44 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Abstraction manager styles                                                   ║
-║ Shell-owned layout for list and editor panel abstraction managers.           ║
+║ Manager styles                                                               ║
+║ Shell-owned layout for list and editor panel item managers.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
 /* Manager lists fit their aside; identity content wraps around intrinsic columns. */
-[data-shell='abstraction-manager-list'] [data-ui='table'] {
+[data-shell='manager-list'] [data-ui='table'] {
   width: 100%;
 }
 
-[data-shell='abstraction-manager-list'] [data-ui='table-body'] [data-ui='table-cell'] {
+[data-shell='manager-list'] [data-ui='table-body'] [data-ui='table-cell'] {
   overflow-wrap: anywhere;
 }
 
-[data-shell='abstraction-manager-list']
-  [data-ui='table-row']:not([data-ui-variant='section'])
-  > :last-child {
+[data-shell='manager-list'] [data-ui='table-row']:not([data-ui-variant='section']) > :last-child {
   width: 1%;
 }
 
-[data-shell='abstraction-manager-confirmation'] {
+[data-shell='manager-confirmation'] {
   display: grid;
   gap: var(--sa-rhythm-gap);
 }
 
-[data-shell='abstraction-manager-confirmation'] h2,
-[data-shell='abstraction-manager-confirmation'] p {
+[data-shell='manager-confirmation'] h2,
+[data-shell='manager-confirmation'] p {
   margin: 0;
 }
 
-[data-shell='abstraction-manager-confirmation-actions'] {
+[data-shell='manager-confirmation-actions'] {
   display: flex;
   gap: var(--sa-space-sm);
   justify-content: end;
 }
 
-[data-shell='abstraction-manager-collapse-action'] {
+[data-shell='manager-collapse-action'] {
   display: none;
 }
 
-[data-shell='abstraction-manager-expanded-title'] {
+[data-shell='manager-expanded-title'] {
   display: block;
 }
 
@@ -49,12 +47,12 @@
    minimum 675.75. A container query cannot take var(), so 676 is the literal;
    change either shared floor and re-solve this threshold. */
 @container (max-width: 676px) {
-  [data-shell='abstraction-manager'][data-shell-panel='container'] {
+  [data-shell='manager'][data-shell-panel='container'] {
     grid-template-columns: 1fr;
   }
 
-  [data-shell='abstraction-manager'] > [data-shell-panel='aside'],
-  [data-shell='abstraction-manager'] > [data-shell-panel='main'] {
+  [data-shell='manager'] > [data-shell-panel='aside'],
+  [data-shell='manager'] > [data-shell-panel='main'] {
     block-size: 100%;
     grid-column: 1;
     grid-row: 2;
@@ -62,8 +60,8 @@
     transition: var(--sa-transition-panel);
   }
 
-  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='aside'],
-  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='main'] {
+  [data-shell='manager'][data-shell-mode='list'] > [data-shell-panel='aside'],
+  [data-shell='manager'][data-shell-mode='editor'] > [data-shell-panel='main'] {
     opacity: 1;
     pointer-events: auto;
     transform: translateX(0);
@@ -72,8 +70,8 @@
     z-index: var(--sa-z-base);
   }
 
-  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='main'],
-  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='aside'] {
+  [data-shell='manager'][data-shell-mode='list'] > [data-shell-panel='main'],
+  [data-shell='manager'][data-shell-mode='editor'] > [data-shell-panel='aside'] {
     opacity: 0;
     pointer-events: none;
     visibility: hidden;
@@ -81,26 +79,26 @@
   }
 
   /* Spatial push: the list lives left of the editor. */
-  [data-shell='abstraction-manager'][data-shell-mode='editor'] > [data-shell-panel='aside'] {
+  [data-shell='manager'][data-shell-mode='editor'] > [data-shell-panel='aside'] {
     transform: translateX(calc(var(--sa-space-xl) * -1));
   }
 
-  [data-shell='abstraction-manager'][data-shell-mode='list'] > [data-shell-panel='main'] {
+  [data-shell='manager'][data-shell-mode='list'] > [data-shell-panel='main'] {
     transform: translateX(var(--sa-space-xl));
   }
 
   @media (prefers-reduced-motion: reduce) {
-    [data-shell='abstraction-manager'] > [data-shell-panel='aside'],
-    [data-shell='abstraction-manager'] > [data-shell-panel='main'] {
+    [data-shell='manager'] > [data-shell-panel='aside'],
+    [data-shell='manager'] > [data-shell-panel='main'] {
       transition: none;
     }
   }
 
-  [data-shell='abstraction-manager-collapse-action'] {
+  [data-shell='manager-collapse-action'] {
     display: block;
   }
 
-  [data-shell='abstraction-manager-expanded-title'] {
+  [data-shell='manager-expanded-title'] {
     display: none;
   }
 }

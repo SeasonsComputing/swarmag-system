@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Use abstraction form validation                                              ║
+║ Use form validation                                                          ║
 ║ Field-level validation timing for abstraction editors.                       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -17,23 +17,29 @@ itself is owned by the manager.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-AbstractionFieldRules                        Field name → validation rule map.
-AbstractionFormValidation                    Editor-facing validation surface.
-useAbstractionFormValidation(formRef, rules) Wire the timing state machine.
+FormFieldRules                            Field name → validation rule map.
+FormValidation                            Editor-facing validation surface.
+├ isInvalid                               Reads a field's error state.
+├ blurField                               Validates on blur.
+├ inputField                              Revalidates corrected text.
+├ changeField                             Revalidates discrete controls.
+├ validateForm                            Validates all fields and focuses the first error.
+└ reset                                   Clears error state.
+useFormValidation(formRef, rules) Wire the timing state machine.
 */
 
 import type { Dictionary, ExpectResult } from '@core/std'
 import { createSignal, onCleanup, onMount } from '@solid-js'
 
 // ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
+// FORM VALIDATION
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Field name → rule returning ExpectResult (null when valid). */
-export type AbstractionFieldRules = Dictionary<() => ExpectResult>
+export type FormFieldRules = Dictionary<() => ExpectResult>
 
-/** Editor-facing validation surface returned by useAbstractionFormValidation. */
-export interface AbstractionFormValidation {
+/** Editor-facing validation surface returned by useFormValidation. */
+export interface FormValidation {
   /** Whether the named field is currently shown in error. */
   isInvalid: (field: string) => boolean
   /** Validate a text field on blur; returns whether the field is valid. */
@@ -54,10 +60,10 @@ export interface AbstractionFormValidation {
  * @param rules Field validation rules over the editor's own state.
  * @returns Validation surface for wiring controls.
  */
-export const useAbstractionFormValidation = (
+export const useFormValidation = (
   formRef: () => HTMLFormElement | undefined,
-  rules: AbstractionFieldRules
-): AbstractionFormValidation => {
+  rules: FormFieldRules
+): FormValidation => {
   const [errors, setErrors] = createSignal<Dictionary<boolean>>({})
 
   const validateField = (field: string): boolean => {

@@ -16,8 +16,8 @@ CustomerStepBilling  Billing address step.
 import { expectNonEmptyString } from '@core/std'
 import { onCleanup } from '@solid-js'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
-import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
+import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
+import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
 import { UiField, UiFieldset, UiInput, UiLayout } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import type { CustomerState } from './customer-state.ts'
@@ -29,7 +29,7 @@ export const CustomerStepBilling = (props: {
 }): UiComponent => {
   let formRef: HTMLFormElement | undefined
   const { state } = props
-  const validation = useAbstractionFormValidation(() => formRef, {
+  const validation = useFormValidation(() => formRef, {
     line1: () => expectNonEmptyString(state.line1(), 'Address'),
     city: () => expectNonEmptyString(state.city(), 'City'),
     state: () => expectNonEmptyString(state.state(), 'State / Province'),
@@ -37,7 +37,7 @@ export const CustomerStepBilling = (props: {
     country: () => expectNonEmptyString(state.country(), 'Country')
   })
   onCleanup(props.context.registerValidation(validation.validateForm))
-  useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
+  useFormKeyboard(() => formRef, field => validation.blurField(field))
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
       <UiLayout>
@@ -84,7 +84,7 @@ export const CustomerStepBilling = (props: {
 /** Props for a customer address input bound to Customer state. */
 type CustomerInputProps = {
   state: CustomerState
-  validation: ReturnType<typeof useAbstractionFormValidation>
+  validation: ReturnType<typeof useFormValidation>
   name: 'line1' | 'line2' | 'city' | 'state' | 'postalCode' | 'country'
   label: string
   required?: boolean

@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Use abstraction form keyboard                                                ║
+║ Use form keyboard                                                            ║
 ║ Enter-advance keyboard flow for abstraction editors.                         ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
@@ -19,14 +19,14 @@ panel-collapse motion and the dialog's own focus management.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-focusFirstField(container)                  Focus a container's first field.
-useAbstractionFormKeyboard(formRef, guard?) Wire the Enter-advance behavior.
+focusFirstField(container)                Focus a container's first field.
+useFormKeyboard(formRef, guard?) Wire the Enter-advance behavior.
 */
 
 import { onCleanup, onMount } from '@solid-js'
 
 // ────────────────────────────────────────────────────────────────────────────
-// PUBLIC
+// FORM KEYBOARD
 // ────────────────────────────────────────────────────────────────────────────
 
 /**
@@ -55,7 +55,7 @@ export const focusFirstField = (container: () => HTMLElement | undefined): void 
  * @param formRef Getter returning the form element once mounted.
  * @param advanceGuard Optional per-field gate — return false to hold focus.
  */
-export const useAbstractionFormKeyboard = (
+export const useFormKeyboard = (
   formRef: () => HTMLFormElement | undefined,
   advanceGuard?: (field: string) => boolean
 ): void => {

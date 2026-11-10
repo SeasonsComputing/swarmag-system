@@ -25,9 +25,9 @@ import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
 import { For, onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
-import { useAbstractionFormFeedback } from '@ux/shell/workbench/use-abstraction-form-feedback.ts'
-import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
+import { useFormFeedback } from '@ux/shell/workbench/use-form-feedback.ts'
+import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
+import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
 import {
   UiField,
   UiFieldset,
@@ -65,14 +65,14 @@ export function UserStepDetail(props: {
     setStatus
   } = props.state
   let formRef: HTMLFormElement | undefined
-  useAbstractionFormFeedback(() => formRef, props.context.feedback)
-  const validation = useAbstractionFormValidation(() => formRef, {
+  useFormFeedback(() => formRef, props.context.feedback)
+  const validation = useFormValidation(() => formRef, {
     displayName: () => expectNonEmptyString(displayName(), 'Name'),
     primaryEmail: () => expectEmail(toEmail(primaryEmail()), 'Email'),
     phoneNumber: () => expectNonEmptyString(phoneNumber(), 'Phone'),
     roles: () => roles().length > 0 ? null : 'Select at least one role.'
   })
-  useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
+  useFormKeyboard(() => formRef, field => validation.blurField(field))
 
   const submit = (event: SubmitEvent): void => {
     event.preventDefault()

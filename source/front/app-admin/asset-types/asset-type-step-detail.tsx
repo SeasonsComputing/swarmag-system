@@ -19,8 +19,8 @@ AssetTypeStepDetail  Render the single detail Step.
 import { expectNonEmptyString } from '@core/std'
 import { onCleanup } from '@solid-js'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
-import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
+import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
+import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
 import { UiField, UiFieldset, UiInput, UiLayout, UiToggleGroup, UiToggleItem } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import type { AssetTypeState } from './asset-type-state.ts'
@@ -35,11 +35,11 @@ export type AssetTypeStepDetailProps = {
 export const AssetTypeStepDetail = (props: AssetTypeStepDetailProps): UiComponent => {
   const { state } = props
   let formRef: HTMLFormElement | undefined
-  const validation = useAbstractionFormValidation(() => formRef, {
+  const validation = useFormValidation(() => formRef, {
     label: () => expectNonEmptyString(state.label(), 'Label')
   })
   onCleanup(props.context.registerValidation(validation.validateForm))
-  useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
+  useFormKeyboard(() => formRef, field => validation.blurField(field))
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>
       <UiLayout>

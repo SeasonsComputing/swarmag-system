@@ -20,8 +20,8 @@ import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
 import type { ContactPreferredChannel } from '@domain/abstractions/common.ts'
 import { onCleanup } from '@solid-js'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
-import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
+import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
+import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
 import { UiField, UiFieldset, UiInput, UiLayout, UiSingleSelect, UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import type { CustomerState } from './customer-state.ts'
@@ -36,13 +36,13 @@ export type CustomerStepContactProps = {
 export const CustomerStepContact = (props: CustomerStepContactProps): UiComponent => {
   let formRef: HTMLFormElement | undefined
   const { state } = props
-  const validation = useAbstractionFormValidation(() => formRef, {
+  const validation = useFormValidation(() => formRef, {
     displayName: () => expectNonEmptyString(state.displayName(), 'Name'),
     phoneNumber: () => expectNonEmptyString(state.phoneNumber(), 'Phone'),
     email: () => state.email().trim() ? expectEmail(toEmail(state.email()), 'Email') : null
   })
   onCleanup(props.context.registerValidation(validation.validateForm))
-  useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
+  useFormKeyboard(() => formRef, field => validation.blurField(field))
 
   return (
     <form ref={formRef} onSubmit={event => event.preventDefault()}>

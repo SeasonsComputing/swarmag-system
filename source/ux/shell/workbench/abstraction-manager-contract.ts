@@ -1,68 +1,42 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Abstraction manager contract                                                 ║
-║ Provider contract for list-and-panel abstraction managers.                   ║
+║ Domain-record specializations of the Manager provider types.                 ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Declares the provider contract a manager consumes: list projection, row and
-form rendering, persistence operations, and named instance actions.
+Preserves the provider API for managers of domain records.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AbstractionActionConfirmation  Confirmation copy for a consequential action.
-AbstractionAction              A named action executable on an abstraction instance.
+AbstractionAction              A named action on a domain record.
 AbstractionListColumn          One labelled, aligned column and its item content.
-AbstractionDetail              Steps and aggregate draft for one opened item.
-AbstractionManagerContract     Provider contract for list-and-panel managers.
+AbstractionDetail              Steps and aggregate draft for one opened record.
+AbstractionManagerContract     Provider contract for domain-record managers.
 */
 
 import type { Instantiable } from '@core/std'
-import type { PanelSequence } from '@ux/shell/panel/panel-sequence-contract.ts'
-import type { UiActionButtonVariant, UiComponent, UiTableAlign } from '@ux/ui'
+import type {
+  ManagerAction,
+  ManagerActionConfirmation,
+  ManagerContract,
+  ManagerDetail,
+  ManagerListColumn
+} from './manager-contract.ts'
 
-/** Confirmation copy for a consequential abstraction action. */
-export type AbstractionActionConfirmation<T extends Instantiable> = {
-  message: (item: T) => string
-  title: string
-}
+/** Confirmation copy for a consequential domain-record action. */
+export type AbstractionActionConfirmation<T extends Instantiable> = ManagerActionConfirmation<T>
 
-/** A named action executable on an abstraction instance. */
-export type AbstractionAction<T extends Instantiable> = {
-  name: string
-  label: string
-  icon: string
-  variant?: UiActionButtonVariant
-  confirmation?: AbstractionActionConfirmation<T>
-  handler: (item: T) => void | Promise<void>
-}
+/** A named action executable on a domain record. */
+export type AbstractionAction<T extends Instantiable> = ManagerAction<T>
 
-/** Steps and aggregate draft for one opened item. */
-export type AbstractionDetail<Draft> = {
-  steps: PanelSequence
-  draft: () => Draft
-}
+/** Steps and aggregate draft for one opened record. */
+export type AbstractionDetail<Draft> = ManagerDetail<Draft>
 
-/** One labelled, aligned list column and its item content. */
-export type AbstractionListColumn<T extends Instantiable> = {
-  label: string
-  align?: UiTableAlign
-  render: (item: T) => UiComponent
-}
+/** One labelled, aligned list column and its record content. */
+export type AbstractionListColumn<T extends Instantiable> = ManagerListColumn<T>
 
-/** Provider contract for list-and-panel abstraction managers. */
-export interface AbstractionManagerContract<T extends Instantiable, Draft> {
-  formTitle: string
-  entityLabel: string
-  listColumns: AbstractionListColumn<T>[]
-  list: () => T[]
-  isListLoading: () => boolean
-  listError: () => unknown
-  itemLabel?: (item: T) => string
-  refresh: () => void | Promise<void>
-  create: (draft: Draft) => T | Promise<T>
-  update: (item: T, draft: Draft) => T | Promise<T>
-  actions: AbstractionAction<T>[]
-  detail: (item: T | null) => AbstractionDetail<Draft>
-}
+/** Provider contract for the domain-record specialization of Manager. */
+export type AbstractionManagerContract<T extends Instantiable, Draft> = ManagerContract<T, Draft>

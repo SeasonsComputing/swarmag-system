@@ -25,8 +25,8 @@ import { UserPicker } from '@front/app/shell/user-picker.tsx'
 import { For, onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
-import { useAbstractionFormKeyboard } from '@ux/shell/workbench/use-abstraction-form-keyboard.ts'
-import { useAbstractionFormValidation } from '@ux/shell/workbench/use-abstraction-form-validation.ts'
+import { useFormKeyboard } from '@ux/shell/workbench/use-form-keyboard.ts'
+import { useFormValidation } from '@ux/shell/workbench/use-form-validation.ts'
 import { UiField, UiFieldset, UiInput, UiLayout, UiText, UiToggleGroup, UiToggleItem } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { ACCOUNT_MANAGER_ROLES } from './customer-state.ts'
@@ -45,11 +45,11 @@ export type CustomerStepDetailProps = {
 export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent => {
   let formRef: HTMLFormElement | undefined
   const { state } = props
-  const validation = useAbstractionFormValidation(() => formRef, {
+  const validation = useFormValidation(() => formRef, {
     name: () => expectNonEmptyString(state.name(), 'Name')
   })
   onCleanup(props.context.registerValidation(validation.validateForm))
-  useAbstractionFormKeyboard(() => formRef, field => validation.blurField(field))
+  useFormKeyboard(() => formRef, field => validation.blurField(field))
 
   return (
     <DrillDown
