@@ -27,3 +27,7 @@
   min-inline-size: 0;
   overflow: auto;
 }
+
+[data-shell='attachment-size'] {
+  white-space: nowrap;
+}

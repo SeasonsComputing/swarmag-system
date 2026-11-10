@@ -31,6 +31,7 @@ UiText               Text conversions for control values and display text.
 ├ label              kebab-case to display text.
 ├ untitled           Blank value to a consumer-supplied label.
 ├ relativeTime       Timestamp relative to now, in local time.
+├ size               Bytes in decimal KB, MB, or GB, formatted for the locale.
 └ from               Number to text.
 */
 
@@ -212,6 +213,31 @@ const relativeTime = (value: When): string => {
   return `${month} ${dayStr}${yearStr} at ${standardTimeStr}`
 }
 
+/** Units in ascending size, with their byte divisors. */
+const SIZE_UNITS = [['KB', 1e3], ['MB', 1e6], ['GB', 1e9]] as const
+
+/**
+ * Display bytes in decimal units, capped at GB, promoting rounded unit boundaries.
+ * Below 1,000 bytes reads < 1 KB; rounded values under 10 have up to one decimal,
+ * and values at or above 10 have no decimals. Fractions below .1 or above .9
+ * round to a whole value; exactly .1 and .9 remain. Numbers use the locale.
+ */
+const size = (bytes: number): string => {
+  if (bytes < 1000) return '< 1 KB'
+  let unit = SIZE_UNITS.findLastIndex(([, divisor]) => bytes >= divisor)
+  if (Math.round(bytes / SIZE_UNITS[unit][1]) >= 1000 && unit < SIZE_UNITS.length - 1) unit++
+  const [name, divisor] = SIZE_UNITS[unit]
+  const remainder = bytes % divisor
+  const whole = remainder < divisor / 10 || remainder > divisor * 0.9
+  const value = whole ? Math.round(bytes / divisor) : bytes / divisor
+  const digits = Math.round(value * 10) / 10 < 10 ? 1 : 0
+  const text = value.toLocaleString(undefined, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: digits
+  })
+  return `${text} ${name}`
+}
+
 /** Text conversions for a control's string value and the display text derived from it. */
 export const UiText = {
   optional,
@@ -219,5 +245,6 @@ export const UiText = {
   label,
   untitled,
   relativeTime,
+  size,
   from
 }

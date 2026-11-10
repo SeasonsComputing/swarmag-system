@@ -1,0 +1,39 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Table label styles                                                           ║
+║ Wrapping labels and catalog glyphs that follow interactive row state.        ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-shell='label-cell'] {
+  align-items: center;
+  color: var(--sa-text-secondary);
+  display: flex;
+  gap: var(--sa-space-sm);
+  min-inline-size: 0;
+}
+
+[data-shell='label-cell'] [data-shell='label-cell-text'] {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+[data-shell='label-cell'] [data-shell='label-cell-icon'] {
+  background: currentColor;
+  block-size: var(--sa-space-md);
+  color: var(--sa-text-primary);
+  flex-shrink: 0;
+  inline-size: var(--sa-space-md);
+  mask: var(--sa-icon) center / contain no-repeat;
+}
+
+[data-ui='table-row'][data-ui-interactive]:is(:hover, :focus-visible) [data-shell='label-cell'] {
+  color: var(--sa-text-primary);
+}
+
+[data-ui='table-row'][data-ui-interactive]:is(:hover, :focus-visible)
+  [data-shell='label-cell']
+  [data-shell='label-cell-icon'] {
+  color: var(--sa-color-primary);
+}

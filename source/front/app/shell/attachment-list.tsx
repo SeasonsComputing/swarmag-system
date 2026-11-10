@@ -30,6 +30,7 @@ import {
   UiButton,
   UiDialog,
   UiField,
+  UiFieldset,
   UiFormActions,
   UiInput,
   UiLayout,
@@ -37,9 +38,11 @@ import {
   UiTableBody,
   UiTableCell,
   UiTableHeader,
-  UiTableRow
+  UiTableRow,
+  UiText
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
+import { LabelCell } from './table-cells.tsx'
 
 /** Controlled attachment collection inside a note draft. */
 export type AttachmentListProps = {
@@ -52,6 +55,7 @@ export type AttachmentListProps = {
 
 /** Render file capture and metadata-only editing without persisting the record. */
 export const AttachmentList = (props: AttachmentListProps): UiComponent => {
+  const [pickerOpen, setPickerOpen] = createSignal(false)
   const [busy, setBusy] = createSignal(false)
   const [error, setError] = createSignal('')
   const [remove, setRemove] = createSignal<number | null>(null)
@@ -70,6 +74,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
         const attachment = await props.attach(file)
         props.onChange([...props.attachments(), attachment])
       }
+      if (files.length) setPickerOpen(false)
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Unable to attach file.')
     } finally {
@@ -78,6 +83,7 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
     }
   }
   const open = async (attachment: Attachment): Promise<void> => {
+    if (busy()) return
     const viewer = globalThis.open('about:blank', '_blank')
     if (!viewer) {
       setError('Allow a secondary window to open this attachment.')
@@ -97,123 +103,136 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
       <Show when={error()}>
         <UiAlert variant='danger'>{error()}</UiAlert>
       </Show>
-      <UiField label='Add files' for='note-files'>
-        <UiInput
-          name='note-files'
-          type='file'
-          multiple
-          disabled={busy() || !api.Attachments.accept(props.kinds)}
-          accept={api.Attachments.accept(props.kinds)}
-          onInput={event => {
-            // Reset before the text-field primitive reads it; file inputs cannot accept text.
-            const files = Array.from(event.currentTarget.files ?? [])
-            event.currentTarget.value = ''
-            void capture(files)
-          }}
-        />
-      </UiField>
-      <Show when={busy()}>
-        <p role='status'>Attaching files…</p>
-      </Show>
-      <div data-shell='attachment-list'>
-        <UiTable>
-          <UiTableHeader>
-            <UiTableCell>File</UiTableCell>
-            <UiTableCell>Size</UiTableCell>
-            <UiTableCell align='end'>Actions</UiTableCell>
-          </UiTableHeader>
-          <UiTableBody>
-            <For each={props.attachments()}>
-              {(attachment, index) => (
-                <UiTableRow onActivate={() => void open(attachment)}>
-                  <UiTableCell>
-                    <UiActionButton
-                      icon={attachment.kind === 'photo' ? 'image' : 'file-text'}
-                      label={attachment.filename}
-                      labelMode='visible'
-                      disabled={busy()}
-                      onClick={event => {
-                        event.stopPropagation()
-                        void open(attachment)
-                      }}
-                    />
-                  </UiTableCell>
-                  <UiTableCell>
-                    <AttachmentSize attachment={attachment} />
-                  </UiTableCell>
-                  <UiTableCell align='end'>
-                    <UiActionButton
-                      icon='pencil-1'
-                      label='Rename'
-                      disabled={busy()}
-                      onClick={event => {
-                        event.stopPropagation()
-                        setFilename(attachment.filename)
-                        setRename(index())
-                      }}
-                    />
-                    <UiActionButton
-                      icon='minus'
-                      label='Remove'
-                      disabled={busy()}
-                      onClick={event => {
-                        event.stopPropagation()
-                        setRemove(index())
-                      }}
-                    />
-                  </UiTableCell>
-                </UiTableRow>
-              )}
-            </For>
-          </UiTableBody>
-        </UiTable>
-      </div>
+      <UiFieldset legend='Attachments'>
+        <UiLayout>
+          <UiLayout variant='inline-fit'>
+            <UiActionButton
+              icon='plus'
+              label='Add Attachment'
+              labelMode='visible'
+              align='start'
+              density='dense'
+              disabled={busy()}
+              onClick={() => setPickerOpen(true)}
+            />
+          </UiLayout>
+          <Show when={pickerOpen()}>
+            <UiField label='Add files' for='note-files'>
+              <UiInput
+                name='note-files'
+                type='file'
+                multiple
+                disabled={busy() || !api.Attachments.accept(props.kinds)}
+                accept={api.Attachments.accept(props.kinds)}
+                onInput={event => {
+                  // Reset before the text-field primitive reads it; file inputs cannot accept text.
+                  const files = Array.from(event.currentTarget.files ?? [])
+                  event.currentTarget.value = ''
+                  void capture(files)
+                }}
+              />
+            </UiField>
+          </Show>
+          <Show when={busy()}>
+            <p role='status'>Attaching files…</p>
+          </Show>
+          <div data-shell='attachment-list'>
+            <UiTable>
+              <UiTableHeader>
+                <UiTableCell>File</UiTableCell>
+                <UiTableCell align='end'>Size</UiTableCell>
+                <UiTableCell align='end'>Actions</UiTableCell>
+              </UiTableHeader>
+              <UiTableBody>
+                <For each={props.attachments()}>
+                  {(attachment, index) => (
+                    <UiTableRow onActivate={() => void open(attachment)}>
+                      <UiTableCell>
+                        <LabelCell text={attachment.filename} icon={AttachmentIcons[attachment.kind]} />
+                      </UiTableCell>
+                      <UiTableCell align='end'>
+                        <AttachmentSize attachment={attachment} />
+                      </UiTableCell>
+                      <UiTableCell align='end'>
+                        <UiActionButton
+                          icon='pencil-1'
+                          label='Rename'
+                          disabled={busy()}
+                          onClick={event => {
+                            event.stopPropagation()
+                            setFilename(attachment.filename)
+                            setRename(index())
+                          }}
+                        />
+                        <UiActionButton
+                          icon='minus'
+                          label='Remove'
+                          disabled={busy()}
+                          onClick={event => {
+                            event.stopPropagation()
+                            setRemove(index())
+                          }}
+                        />
+                      </UiTableCell>
+                    </UiTableRow>
+                  )}
+                </For>
+              </UiTableBody>
+            </UiTable>
+          </div>
+        </UiLayout>
+      </UiFieldset>
       <Show when={remove() !== null}>
         <UiDialog open size='content' onOpenChange={open => !open && setRemove(null)}>
-          <h2>Remove attachment?</h2>
-          <p>This attachment will be removed from the note.</p>
-          <UiFormActions>
-            <UiButton variant='ghost' onClick={() => setRemove(null)}>Cancel</UiButton>
-            <UiButton
-              variant='danger'
-              onClick={() => {
-                props.onChange(props.attachments().filter((_, i) => i !== remove()))
-                setRemove(null)
-              }}
-            >
-              Remove
-            </UiButton>
-          </UiFormActions>
+          <UiLayout>
+            <h2>Remove attachment?</h2>
+            <p>This attachment will be removed from the note.</p>
+            <UiFormActions>
+              <UiButton variant='ghost' onClick={() => setRemove(null)}>Cancel</UiButton>
+              <UiButton
+                variant='danger'
+                onClick={() => {
+                  props.onChange(props.attachments().filter((_, i) => i !== remove()))
+                  setRemove(null)
+                }}
+              >
+                Remove
+              </UiButton>
+            </UiFormActions>
+          </UiLayout>
         </UiDialog>
       </Show>
       <Show when={rename() !== null}>
-        <UiDialog open size='content' onOpenChange={open => !open && setRename(null)}>
-          <h2>Rename attachment</h2>
-          <UiField label='Filename' for='attachment-name'>
-            <UiInput
-              name='attachment-name'
-              value={filename()}
-              onInput={event => setFilename(event.currentTarget.value)}
-            />
-          </UiField>
-          <UiFormActions>
-            <UiButton variant='ghost' onClick={() => setRename(null)}>Cancel</UiButton>
-            <UiButton
-              disabled={!filename().trim()}
-              onClick={() => {
-                props.onChange(
-                  props.attachments().map((item, i) =>
-                    i === rename()
-                      ? { ...item, filename: filename().trim() }
-                      : item
+        <UiDialog open size='panel' onOpenChange={open => !open && setRename(null)}>
+          <UiLayout>
+            <h2>Rename attachment</h2>
+            <UiField label='Filename' for='attachment-name'>
+              <UiInput
+                name='attachment-name'
+                value={filename()}
+                onInput={event => setFilename(event.currentTarget.value)}
+              />
+            </UiField>
+            <UiFormActions justify='split'>
+              <UiButton variant='ghost' onClick={() => setRename(null)}>Cancel</UiButton>
+              <UiButton
+                variant='primary'
+                disabled={!filename().trim()}
+                onClick={() => {
+                  props.onChange(
+                    props.attachments().map((item, i) =>
+                      i === rename()
+                        ? { ...item, filename: filename().trim() }
+                        : item
+                    )
                   )
-                )
-                setRename(null)
-              }}
-            >
-              Save
-            </UiButton>
-          </UiFormActions>
+                  setRename(null)
+                }}
+              >
+                Save
+              </UiButton>
+            </UiFormActions>
+          </UiLayout>
         </UiDialog>
       </Show>
     </UiLayout>
@@ -227,8 +246,16 @@ const AttachmentSize = (props: { attachment: Attachment }): UiComponent => {
     () => api.Attachments.size(props.attachment)
   )
   return (
-    <span title={size.error ? 'Unable to read document size' : undefined}>
-      {size.error ? 'Unavailable' : size.loading ? '…' : `${size()} bytes`}
+    <span data-shell='attachment-size' title={size.error ? 'Unable to read document size' : undefined}>
+      {size.error ? 'Unavailable' : size.loading ? '…' : UiText.size(size()!)}
     </span>
   )
+}
+
+/** Exhaustive kind-to-catalog mapping; video uses the generic file glyph. */
+const AttachmentIcons: { [Kind in AttachmentKind]: string } = {
+  photo: 'image',
+  map: 'globe',
+  document: 'file-text',
+  video: 'file'
 }

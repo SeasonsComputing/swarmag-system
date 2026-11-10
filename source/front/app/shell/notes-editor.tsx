@@ -42,6 +42,7 @@ import {
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { AttachmentList } from './attachment-list.tsx'
+import { LabelCell } from './table-cells.tsx'
 
 import './notes-editor.css'
 
@@ -67,10 +68,14 @@ export const NotesEditor = (props: NotesEditorProps): UiComponent => {
         legend='Notes'
         itemColumn='Note'
         items={notes}
-        label={note =>
-          `${note.attachments.length ? '📎 ' : ''}${
-            UiText.untitled(note.content.split('\n')[0], 'Untitled note')
-          }`}
+        label={noteTitle}
+        renderLabel={note => (
+          <LabelCell
+            text={noteTitle(note)}
+            icon={note.attachments.length ? 'link-2' : undefined}
+            iconLabel={note.attachments.length ? 'Has attachments' : undefined}
+          />
+        )}
         emptyMessage={
           <>
             No notes yet. Use <kbd>New Note</kbd> to add one.
@@ -147,7 +152,7 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
         <UiAlert variant='danger'>Complete the note before saving.</UiAlert>
       </Show>
       <UiTabs defaultValue='note'>
-        <UiTabList>
+        <UiTabList layout='between'>
           <UiTab value='note' disabled={attaching()}>Note</UiTab>
           <UiTab value='attachments' disabled={attaching()}>
             Attachments ({draft.attachments.length})
@@ -191,3 +196,5 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
     </UiLayout>
   )
 }
+
+const noteTitle = (note: Note): string => UiText.untitled(note.content.split('\n')[0], 'Untitled note')

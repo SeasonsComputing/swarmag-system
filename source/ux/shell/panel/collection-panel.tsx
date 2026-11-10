@@ -39,6 +39,7 @@ export type CollectionPanelProps<T> = {
   itemColumn: string
   items: () => readonly T[]
   label: (item: T, index: number) => string
+  renderLabel?: (item: T, index: number) => UiComponent
   emptyMessage: UiComponent
   newLabel: string
   onNew: () => void
@@ -111,7 +112,11 @@ export const CollectionPanel = <T extends unknown>(props: CollectionPanelProps<T
                 <For each={props.items()}>
                   {(item, index) => (
                     <UiTableRow onActivate={() => openItem(item, index())}>
-                      <UiTableCell>{props.label(item, index())}</UiTableCell>
+                      <UiTableCell>
+                        {props.renderLabel
+                          ? props.renderLabel(item, index())
+                          : props.label(item, index())}
+                      </UiTableCell>
                       <UiTableCell align='end'>
                         <UiActionButton
                           density='dense'
