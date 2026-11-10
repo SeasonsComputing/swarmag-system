@@ -211,7 +211,7 @@ language, styling, and application shell are owned, and designed to fit each oth
 | Component library or design system (MUI, shadcn) | `ui/components`: about 30 `Ui*` controls in one design language, on Kobalte's primitives |
 | CSS framework (Tailwind, Bootstrap)              | `ui/css`: tokens, roles, and light and dark themes; guards hold every value to tokens    |
 | Icon package                                     | `ui/icons`: 347 SVGs behind one catalog; a guard keeps names and files in step           |
-| Admin or CRUD framework (React Admin, Refine)    | `shell/workbench`: `AbstractionManager` and `Wizard`                                     |
+| Admin or CRUD framework (React Admin, Refine)    | `shell/workbench`: `Manager`, `Lister`, and `Wizard`                                     |
 | Panel, layout, and nested-navigation components  | `shell/panel`: panel container, drill-down, step sequences                               |
 | Dashboard and widget-grid libraries              | `shell/dashboard` and `widgets/`                                                         |
 | Application bootstrap and route configuration    | `shell/runtime`: a route grammar compiled onto TanStack Router                           |

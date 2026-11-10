@@ -574,7 +574,7 @@ widening later costs a move, and generalizing early costs an abstraction nobody 
 
 #### 10.1.5 Workbench steps and the shared panel sequence
 
-Workbench steps, the shared panel sequence, the Wizard, the Abstraction Manager, and drill-down
+Workbench steps, the shared panel sequence, the Wizard, the Manager, the Lister, and drill-down
 are built as CONVENTIONS §17 describes; their behavior is in their module headers.
 
 **Features: `source/front/app-admin/`.**
@@ -656,7 +656,7 @@ swarmag-app-customer = front/app-customer + front/app + ux + front/api + front/c
 ### 10.3 Dashboard Layout Contract
 
 The dashboard is the Chassis-Part archetype (`ux-design-archetypes.md` §4.3), built as CONVENTIONS
-§17.5 describes. The header has two deterministic responsive contexts, selected by container query
+§17.6 describes. The header has two deterministic responsive contexts, selected by container query
 against its own inline size, not the viewport; CSS selects the context before layout, and the shell
 does not measure rendered positions or change the context after mount. Its geometry is
 stylesheet-owned: the stacked-header threshold lives in
