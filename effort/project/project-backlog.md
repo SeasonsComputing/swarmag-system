@@ -596,10 +596,6 @@ Its scheduled job and edge entry point are the Supabase provider brief's DevOps 
 
 **Observed:** 2026-11-09 · normal
 
-The Admin attachment list works but looks unfinished: the picker is the browser's own "Choose
-Files" control, each row's icon follows its name inside a ringed button, and a size reads as raw
-bytes ("38508 bytes"). Deferred from `effort/completed/2026-11-09-attachments-brief.md`.
-
-**Picking this up:** unblocked; `front/app/shell/attachment-list.tsx` and its CSS.
+`effort/active/2026-11-10-attachment-look-brief.md`.
 
 _End of Backlog Document_
