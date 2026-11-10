@@ -97,6 +97,7 @@ export class Attachments {
   readonly #inbox: ApiDocumentStoreContract
   readonly #server: ApiDocumentStoreContract
 
+  /** Bind the device inbox and shared server to the attachment topics. */
   constructor(inbox: ApiDocumentStoreContract, server: ApiDocumentStoreContract) {
     this.#inbox = inbox
     this.#server = server
@@ -171,6 +172,7 @@ export class Attachments {
     return { drained, remaining: (await this.#pending()).length }
   }
 
+  /** Try the inbox first; fall back to the server only for a missing, placed document. */
   async #either<T>(
     node: DocumentId,
     operation: (store: ApiDocumentStoreContract) => Promise<T>
@@ -183,7 +185,7 @@ export class Attachments {
     }
   }
 
-  // Containers stay, including empty ones. Staging never enters a drain snapshot.
+  /** Snapshot placed inbox documents, excluding Staging and retaining all containers. */
   async #pending(): Promise<readonly PendingDocument[]> {
     const pending = []
     for (const namespace of await this.#inbox.namespace.list()) {
@@ -197,6 +199,7 @@ export class Attachments {
     return pending
   }
 
+  /** Copy a placed document at its existing address before removing its inbox copy. */
   async #drainOne(
     namespace: NodeMetadata<NamespaceId>,
     bucket: NodeMetadata<BucketId>,
@@ -242,6 +245,7 @@ export class AttachmentTopic {
   readonly #inbox: ApiDocumentStoreContract
   readonly #placement: TopicPlacement
 
+  /** Bind a topic's placement to the device inbox. */
   constructor(inbox: ApiDocumentStoreContract, placement: TopicPlacement) {
     this.#inbox = inbox
     this.#placement = placement
@@ -264,6 +268,7 @@ export class AttachmentTopic {
     return placed
   }
 
+  /** Copy a staged attachment into its owner's placement; leave placed attachments unchanged. */
   async #placeOne(owner: Id, attachment: Attachment): Promise<Attachment> {
     const node = DocumentAddresses.id(attachment.documentAddress)
     if (node.namespace !== STAGING) return { ...attachment }
@@ -289,18 +294,18 @@ export class AttachmentTopic {
 // IMPLEMENTATION
 // ────────────────────────────────────────────────────────────────────────────
 
-// A topic whose bucket is each owner's id: Customers, Users, Jobs.
+/** Build an owner-specific topic: Customers, Users, or Jobs. */
 const ownerTopic = (inbox: ApiDocumentStoreContract, namespace: Id, name: string): AttachmentTopic =>
   new AttachmentTopic(inbox, { namespace: { id: namespace, name } })
 
-// A company-wide topic with a fixed bucket in the Library namespace.
+/** Build a company-wide topic with a fixed bucket in the Library namespace. */
 const libraryTopic = (inbox: ApiDocumentStoreContract, bucket: Id, name: string): AttachmentTopic =>
   new AttachmentTopic(inbox, {
     namespace: { id: LIBRARY, name: 'Library' },
     bucket: { id: bucket, name }
   })
 
-// A stored reference is a document's id-form address, never a name address, which a rename breaks.
+/** Format a document reference with ids so renaming a node cannot break it. */
 const addressOf = (node: DocumentId): string =>
   DocumentAddresses.format(DocumentAddresses.build({ id: node.namespace }, { id: node.bucket }, {
     id: node.document
