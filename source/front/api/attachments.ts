@@ -7,7 +7,8 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Places every attachment the application stores. A chosen file is staged in the
-inbox; when its record saves, its topic places it in the owner's bucket. The
+inbox; when its record saves, its topic places it in the owner's bucket. A drain
+copies placed documents to the server before deleting their inbox copies. The
 catalog of namespaces and buckets is private to this module.
 
 PUBLIC
@@ -17,6 +18,7 @@ Attachments      Attachment operations over the inbox and the server.
 ├ discard        Remove staged documents only.
 ├ link           Mint a link from the inbox or the server.
 ├ size           Read a document's size from its store.
+├ drain          Copy placed documents to the server, then clear their inbox copies.
 ├ accept         Picker filter for the allowed kinds.
 ├ Customers      Place customer and site notes.
 ├ Users          Place user notes.
@@ -31,9 +33,23 @@ AttachmentTopic  Placement for one topic's notes.
 import { notValid, toId, when } from '@core/std'
 import type { Id } from '@core/std'
 import { ApiError, DocumentAddresses } from '@core/stdx'
-import type { ApiDocumentStoreContract, DocumentId, DocumentLink } from '@core/stdx'
+import type {
+  ApiDocumentStoreContract,
+  BucketId,
+  DocumentId,
+  DocumentLink,
+  NamespaceId,
+  NodeMetadata
+} from '@core/stdx'
 import type { Attachment, AttachmentKind, Note } from '@domain/abstractions/common.ts'
 import { AttachmentFormats } from './attachment-formats.ts'
+
+/** One placed document captured with its source containers for a drain pass. */
+type PendingDocument = {
+  namespace: NodeMetadata<NamespaceId>
+  bucket: NodeMetadata<BucketId>
+  document: NodeMetadata<DocumentId>
+}
 
 // ────────────────────────────────────────────────────────────────────────────
 // CATALOG
@@ -111,13 +127,13 @@ export class Attachments {
   /** Mint a link to an attachment from whichever store holds it. */
   async link(attachment: Attachment): Promise<DocumentLink> {
     const node = DocumentAddresses.id(attachment.documentAddress)
-    return (await this.#storeFor(node)).document.link(node)
+    return await this.#either(node, store => store.document.link(node))
   }
 
   /** An attachment's size in bytes, from its store's metadata. */
   async size(attachment: Attachment): Promise<number> {
     const node = DocumentAddresses.id(attachment.documentAddress)
-    return (await (await this.#storeFor(node)).document.get(node)).count
+    return (await this.#either(node, store => store.document.get(node))).count
   }
 
   /** The picker's accept string for the host's kinds. */
@@ -125,15 +141,79 @@ export class Attachments {
     return AttachmentFormats.accept(kinds)
   }
 
-  // A placed document is in the inbox until it drains, then on the server at the same address; a
-  // staged document is only ever in the inbox.
-  async #storeFor(node: DocumentId): Promise<ApiDocumentStoreContract> {
+  /**
+   * Copy one snapshot of placed documents to the server at the same addresses.
+   * Attempts every document and rejects after the pass if any failed. Successful
+   * results count completed documents and a fresh snapshot of those still pending.
+   */
+  async drain(): Promise<{ drained: number; remaining: number }> {
+    const pending = await this.#pending()
+    const failures: unknown[] = []
+    let drained = 0
+    for (const { namespace, bucket, document } of pending) {
+      try {
+        await this.#drainOne(namespace, bucket, document)
+        drained++
+      } catch (error) {
+        failures.push(error)
+      }
+    }
+    if (failures.length) throw new AggregateError(failures, 'Some documents could not be drained.')
+    return { drained, remaining: (await this.#pending()).length }
+  }
+
+  async #either<T>(
+    node: DocumentId,
+    operation: (store: ApiDocumentStoreContract) => Promise<T>
+  ): Promise<T> {
     try {
-      await this.#inbox.document.get(node)
-      return this.#inbox
+      return await operation(this.#inbox)
     } catch (error) {
       if (!(error instanceof ApiError) || error.status !== 404 || node.namespace === STAGING) throw error
-      return this.#server
+      return await operation(this.#server)
+    }
+  }
+
+  // Containers stay, including empty ones. Staging never enters a drain snapshot.
+  async #pending(): Promise<readonly PendingDocument[]> {
+    const pending = []
+    for (const namespace of await this.#inbox.namespace.list()) {
+      if (namespace.id.namespace === STAGING) continue
+      for (const bucket of await this.#inbox.bucket.list(namespace.id)) {
+        for (const document of await this.#inbox.document.list(bucket.id)) {
+          pending.push({ namespace, bucket, document })
+        }
+      }
+    }
+    return pending
+  }
+
+  async #drainOne(
+    namespace: NodeMetadata<NamespaceId>,
+    bucket: NodeMetadata<BucketId>,
+    document: NodeMetadata<DocumentId>
+  ): Promise<void> {
+    let body: Blob
+    try {
+      body = await this.#inbox.document.read(document.id)
+    } catch (error) {
+      if (!(error instanceof ApiError) || error.status !== 404) throw error
+      // Another drain may have removed it since listing; only a server copy proves completion.
+      await this.#server.document.get(document.id)
+      return
+    }
+    const targetNamespace = await this.#server.namespace.create(namespace.name, namespace.id.namespace)
+    const targetBucket = await this.#server.bucket.create(
+      targetNamespace.id,
+      bucket.name,
+      bucket.id.bucket
+    )
+    await this.#server.document.create(targetBucket.id, document.name, body, document.id.document)
+    try {
+      await this.#inbox.document.delete(document.id)
+    } catch (error) {
+      if (!(error instanceof ApiError) || error.status !== 404) throw error
+      await this.#server.document.get(document.id)
     }
   }
 }

@@ -11,6 +11,8 @@ import '@front/config/ux-config.ts'
 // bootstrap
 import { bootstrap } from '@ux/shell/runtime/bootstrap.tsx'
 
+import { DocumentDrain } from './document-drain.ts'
+
 // shell bindings
 import { AssetTypeManager } from '@front/app-admin/asset-types/asset-type-manager.tsx'
 import { AssetManager } from '@front/app-admin/assets/asset-manager.tsx'
@@ -42,4 +44,4 @@ void bootstrap(
       Routes.workbench('/services', ServiceManager)
     ])
   ], SessionCoordinator)
-)
+).then(() => DocumentDrain.start())
