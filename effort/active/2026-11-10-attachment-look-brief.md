@@ -54,7 +54,7 @@ breadcrumb and its "Delete …" name.
    list (`effort/completed/2026-10-29-attachments-brief.md`): the catalog has none, and none is
    added.
 
-6. **`UiText.size(bytes)`** joins `UiText` beside `relativeTime`: a byte count the way a person
+6. _[Revised by the amendment "After production review", item 2.]_ **`UiText.size(bytes)`** joins `UiText` beside `relativeTime`: a byte count the way a person
    reads it, in the largest unit that keeps it at one or more, steps of 1,000, one decimal under 10
    and whole numbers above. The units are its own (`KB`, `MB`, `GB`), not `Intl`'s; the number is
    formatted for the locale.
@@ -68,7 +68,7 @@ breadcrumb and its "Delete …" name.
    | ≥ 1 GB        | 1.2 GB |
 
 7. **Tabs** spread across the bar: `UiTabList layout='between'`.
-8. **The Attachments tab** holds the attachments table in a fieldset. Above it, left-aligned, an
+8. _[Revised by the amendment "After production review", item 1.]_ **The Attachments tab** holds the attachments table in a fieldset. Above it, left-aligned, an
    **Add Attachment (+)** action expands the file picker beneath it on click; the picker is not
    shown until then.
 9. **Row activation is guarded:** while files are attaching, activating a row does nothing, as the
@@ -93,7 +93,7 @@ The AI Architect writes the documentation first; the AI Coding Engine writes the
 | `source/front/app/shell/table-cells.tsx`, `.css` (new) | `LabelCell`                                                                            |
 | `source/front/app/shell/notes-editor.tsx`, `.css`      | Tabs, `renderLabel`, no emoji                                                          |
 | `source/front/app/shell/attachment-list.tsx`           | `LabelCell`, `UiText.size`, the fieldset and Add Attachment, the dialogs               |
-| `source/tests/`                                        | `UiText.size`, `renderLabel`'s default, `LabelCell`'s labelling                        |
+| `source/tests/`                                        | _[Revised by the amendment "After production review", item 3.]_ `UiText.size`          |
 
 **Unchanged:** `PanelRowIdentity`, `UiActionButton`, `UiTableRow`, `StatusBadge`, every other
 table and `CollectionPanel` consumer, the icon catalog and `ui.css`, storage and saves, `domain/`,
@@ -113,6 +113,20 @@ rename and remove not opening the row; the Rename and Remove dialogs; both theme
    and §10.1.2. The `NotesEditor` paragraph, which sat in §10.1.5 (workbench steps), moves to
    §10.1.2 beside the tier that holds it, and its sentence on the Customer Billing step moves to
    the Customer steps bullet. Both moves were made with the AI Architect's documentation changes.
+
+## Amendment — 2026-11-10 — After production review
+
+1. **The icon leads:** the action reads **(+) Add Attachment**, its icon on the left, as
+   `CollectionPanel`'s New action does.
+2. **Sizes drop `.0` and snap near a whole number.** The unit and its decimals are decided on the
+   rounded value, so a size just under a step reads as the next unit: 999,999 bytes is `1 MB`.
+   Under 10, a size keeps up to one decimal, but a fraction under .1 or over .9 rounds to the whole
+   number, and a whole number shows no `.0`: `1 MB`, `1.5 MB`, and `2 MB` for 1.95 MB.
+3. **No component-rendering tests.** A test that rendered `LabelCell` and `CollectionPanel` through
+   a Vite server inside Deno failed under the test task's permissions and was a new harness, which
+   this brief does not authorize. It was removed; `LabelCell`'s labelling and `renderLabel`'s
+   default are covered by the CA's acceptance. A test that patched `Number.prototype` was removed
+   too; the remaining size test checks locale formatting through `toLocaleString`.
 
 ## Design history
 
