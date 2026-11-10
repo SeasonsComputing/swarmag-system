@@ -22,7 +22,10 @@ import { listAll } from '@core/stdx'
 import type { Customer, CustomerStatus } from '@domain/abstractions/customer.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
+import { makeAttachmentSave } from '@front/app/shell/make-attachment-save.ts'
+import type { AttachmentSave } from '@front/app/shell/make-attachment-save.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
+import { onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
@@ -52,6 +55,7 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
     queryFn: loadCustomers
   }))
 
+  let save: AttachmentSave<Customer, CustomerDraft>
   const provider: AbstractionManagerContract<Customer, CustomerDraft> = {
     formTitle: 'Customer Manager',
     entityLabel: 'Customer',
@@ -85,8 +89,8 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
     refresh: async () => {
       await customersQuery.refetch()
     },
-    create: draft => api.Customers.create(scope.toCreate(draft)),
-    update: (customer, draft) => api.Customers.update(scope.adapter, scope.toUpdate(customer.id, draft)),
+    create: draft => save.create(draft),
+    update: (record, draft) => save.update(record, draft),
     actions: [{
       name: 'delete',
       label: 'Delete',
@@ -101,7 +105,30 @@ export const CustomerManager = (props: CustomerManagerProps): UiComponent => {
     }],
     detail: customer => {
       const state = createCustomerState(customer)
-      return { steps: customerSteps(state), draft: () => customerDraft(state) }
+      save = makeAttachmentSave<Customer, CustomerDraft>({
+        create: draft => api.Customers.create(scope.toCreate(draft)),
+        update: (customer, draft) =>
+          api.Customers.update(scope.adapter, scope.toUpdate(customer.id, draft)),
+        place: async (owner, draft) => ({
+          ...draft,
+          notes: await api.Attachments.Customers.place(owner, draft.notes),
+          sites: await Promise.all(
+            draft.sites.map(async site => ({
+              ...site,
+              notes: await api.Attachments.Customers.place(owner, site.notes)
+            }))
+          )
+        }),
+        reconcile: draft => {
+          state.setNotes(draft.notes)
+          draft.sites.forEach((site, index) => state.setSite(index, site))
+        }
+      })
+      const editorSave = save
+      onCleanup(() => {
+        void editorSave.discard()
+      })
+      return { steps: customerSteps(state, editorSave.stage), draft: () => customerDraft(state) }
     }
   }
   return (

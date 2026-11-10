@@ -26,15 +26,17 @@ import type { DraftOf } from '@core/stdx'
 import type { AssetType } from '@domain/abstractions/asset.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
-import { makeAggregateSave } from '@ux/shell/workbench/workbench-save.ts'
-import type { AggregateSave } from '@ux/shell/workbench/workbench-save.ts'
+import { makeAttachmentSave } from '@front/app/shell/make-attachment-save.ts'
+import type { AttachmentSave } from '@front/app/shell/make-attachment-save.ts'
 import type { UiOption } from '@ux/ui'
 import type { ServiceDraft, ServiceRecord } from './service-state.ts'
 
 /** Build the save delegate when a Service editor session opens. */
-export const createServiceSave = (): AggregateSave<ServiceRecord, ServiceDraft> => {
+export const createServiceSave = (
+  reconcile: (draft: ServiceDraft) => void = () => {}
+): AttachmentSave<ServiceRecord, ServiceDraft> => {
   const scope = scopes.Services.detail
-  return makeAggregateSave<ServiceRecord, ServiceDraft>({
+  return makeAttachmentSave<ServiceRecord, ServiceDraft>({
     create: async draft => ({
       ...await api.Services.create(scope.toCreate(readServiceFields(draft))),
       requiredAssetTypes: [...draft.requiredAssetTypes]
@@ -43,6 +45,11 @@ export const createServiceSave = (): AggregateSave<ServiceRecord, ServiceDraft> 
       ...await api.Services.update(scope.adapter, scope.toUpdate(record.id, readServiceFields(draft))),
       requiredAssetTypes: [...draft.requiredAssetTypes]
     }),
+    place: async (owner, draft) => ({
+      ...draft,
+      notes: await api.Attachments.Services.place(owner, draft.notes)
+    }),
+    reconcile,
     complete: (record, draft) =>
       api.ServiceRequiredAssetTypes.replace(record.id, draft.requiredAssetTypes)
   })

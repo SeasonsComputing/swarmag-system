@@ -13,7 +13,7 @@ PUBLIC
 scopes              Declared form write scopes keyed by API topic.
 ├ AssetTypes.detail Label and catalog availability.
 ├ Assets.detail     Identity, type, status, and notes.
-├ Chemicals.detail  Identity, usage, handling, external SDS reference, and notes.
+├ Chemicals.detail  Identity, usage, handling, external SDS reference, labels, and notes.
 ├ Customers.detail  Contact, identity, account manager, address, sites, and notes.
 ├ Services.detail   Identity, category, description, and notes.
 └ Users.detail      Identity, contact preferences, notes, roles, and status.
@@ -58,9 +58,10 @@ export const scopes = {
         ChemicalAdapter.reEntryIntervalHours,
         ChemicalAdapter.storageLocation,
         ChemicalAdapter.sdsUrl,
+        ChemicalAdapter.labels,
         ChemicalAdapter.notes
       ],
-      defaults: { labels: [] }
+      defaults: {}
     })
   },
   Customers: {

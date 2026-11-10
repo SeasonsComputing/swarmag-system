@@ -1,3 +1,10 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Notes editor styles                                                          ║
+║ Layout for note metadata and the bounded attachment collection.              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
 [data-shell='notes-editor'] {
   min-inline-size: 0;
 }
@@ -13,4 +20,14 @@
   inset-block-start: 0;
   inset-inline-end: 0;
   position: absolute;
+}
+
+[data-shell='attachment-list'] {
+  block-size: calc(var(--sa-touch-target-sm) * 5);
+  min-inline-size: 0;
+  overflow: auto;
+}
+
+[data-shell='attachment-drop'] {
+  padding: var(--sa-rhythm-pad);
 }

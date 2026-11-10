@@ -20,7 +20,10 @@ import { listAll } from '@core/stdx'
 import type { Asset, AssetStatus } from '@domain/abstractions/asset.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
+import { makeAttachmentSave } from '@front/app/shell/make-attachment-save.ts'
+import type { AttachmentSave } from '@front/app/shell/make-attachment-save.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
+import { onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
@@ -47,6 +50,7 @@ export const AssetManager = (props: AssetManagerProps): UiComponent => {
     queryKey: ASSETS_QUERY_KEY,
     queryFn: () => Array.fromAsync(listAll(api.Assets))
   }))
+  let save: AttachmentSave<Asset, AssetDraft>
   const provider: AbstractionManagerContract<Asset, AssetDraft> = {
     formTitle: 'Asset Manager',
     entityLabel: 'Asset',
@@ -71,8 +75,8 @@ export const AssetManager = (props: AssetManagerProps): UiComponent => {
       await query.refetch()
     },
     itemLabel: item => item.label,
-    create: draft => api.Assets.create(scope.toCreate(draft)),
-    update: (item, draft) => api.Assets.update(scope.adapter, scope.toUpdate(item.id, draft)),
+    create: draft => save.create(draft),
+    update: (record, draft) => save.update(record, draft),
     actions: [{
       name: 'delete',
       label: 'Delete',
@@ -87,11 +91,26 @@ export const AssetManager = (props: AssetManagerProps): UiComponent => {
     }],
     detail: item => {
       const state = createAssetState(item)
+      save = makeAttachmentSave<Asset, AssetDraft>({
+        create: draft => api.Assets.create(scope.toCreate(draft)),
+        update: (item, draft) => api.Assets.update(scope.adapter, scope.toUpdate(item.id, draft)),
+        place: async (owner, draft) => ({
+          ...draft,
+          notes: await api.Attachments.Assets.place(owner, draft.notes)
+        }),
+        reconcile: draft => state.setNotes(draft.notes)
+      })
+      const editorSave = save
+      onCleanup(() => {
+        void editorSave.discard()
+      })
       return {
         steps: [{
           name: 'detail',
           title: 'Asset details',
-          render: context => <AssetStepDetail state={state} context={context} />
+          render: context => (
+            <AssetStepDetail attach={editorSave.stage} state={state} context={context} />
+          )
         }],
         draft: () => assetDraft(state)
       }

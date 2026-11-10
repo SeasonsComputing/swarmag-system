@@ -11,15 +11,18 @@ Edits owned fields with host-integrated validation and draft lifetime.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 ChemicalStepDetailProps  Detail Step inputs.
+├ attach  Stage files within the host editor lifetime.
 ├ state  The retained form draft.
 └ context  Host validation and drill context.
 ChemicalStepDetail  Render the single detail Step.
 */
 
-import { expectNonEmptyString } from '@core/std'
+import { expectNonEmptyString, expectUrl } from '@core/std'
 import { CHEMICAL_SIGNAL_WORDS, CHEMICAL_USAGES } from '@domain/abstractions/chemical.ts'
 import type { ChemicalSignalWord, ChemicalUsage } from '@domain/abstractions/chemical.ts'
+import type { Attachment } from '@domain/abstractions/common.ts'
 import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
+import { UrlField } from '@front/app/shell/url-field.tsx'
 import { onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
@@ -36,12 +39,14 @@ import {
   UiToggleItem
 } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
+import { ChemicalLabels } from './chemical-labels.tsx'
 import type { ChemicalState } from './chemical-state.ts'
 import { reEntryIntervalError } from './chemical-state.ts'
 
 /** Inputs for one Chemical detail Step. */
 export type ChemicalStepDetailProps = {
   state: ChemicalState
+  attach: (file: File) => Promise<Attachment>
   context: PanelStepContext
 }
 
@@ -50,6 +55,11 @@ export const ChemicalStepDetail = (props: ChemicalStepDetailProps): UiComponent 
   const { state } = props
   let formRef: HTMLFormElement | undefined
   const validation = useAbstractionFormValidation(() => formRef, {
+    sdsUrl: () => expectUrl(state.sdsUrl().trim() || undefined, 'SDS URL', ['https', 'http'], true),
+    labels: () =>
+      state.labels().every(label => !expectUrl(label.url, 'Label URL', ['https', 'http']))
+        ? null
+        : 'Enter valid label URLs.',
     name: () => expectNonEmptyString(state.name(), 'Name'),
     reEntryIntervalHours: () => reEntryIntervalError(state.reEntryIntervalHours())
   })
@@ -150,11 +160,12 @@ export const ChemicalStepDetail = (props: ChemicalStepDetailProps): UiComponent 
                   />
                 </UiField>
                 <UiField for='sdsUrl' label='SDS URL'>
-                  <UiInput
+                  <UrlField
                     name='sdsUrl'
                     value={state.sdsUrl()}
-                    onInput={event => {
-                      state.setSdsUrl(event.currentTarget.value)
+                    schemes={['https', 'http']}
+                    onValue={value => {
+                      state.setSdsUrl(value)
                       validation.inputField('sdsUrl')
                     }}
                     onBlur={() => validation.blurField('sdsUrl')}
@@ -163,7 +174,13 @@ export const ChemicalStepDetail = (props: ChemicalStepDetailProps): UiComponent 
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <NotesEditor notes={state.notes} onChange={state.setNotes} drill={drill} />
+            <ChemicalLabels labels={state.labels} onChange={state.setLabels} drill={drill} />
+            <NotesEditor
+              attach={props.attach}
+              notes={state.notes}
+              onChange={state.setNotes}
+              drill={drill}
+            />
           </UiLayout>
         </form>
       )}

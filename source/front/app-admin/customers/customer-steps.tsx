@@ -14,6 +14,7 @@ PUBLIC
 customerSteps  Compose the shared Customer step fragment.
 */
 
+import type { Attachment } from '@domain/abstractions/common.ts'
 import { isCustomerSite } from '@domain/validators/customer-validator.ts'
 import type { PanelSequence } from '@ux/shell/panel/panel-sequence-contract.ts'
 import type { CustomerState } from './customer-state.ts'
@@ -23,11 +24,14 @@ import { CustomerStepDetail } from './customer-step-detail.tsx'
 import { CustomerStepSites } from './customer-step-sites.tsx'
 
 /** Compose shared Customer steps without owning the aggregate discard check. */
-export const customerSteps = (state: CustomerState): PanelSequence => [
+export const customerSteps = (
+  state: CustomerState,
+  attach: (file: File) => Promise<Attachment>
+): PanelSequence => [
   {
     name: 'detail',
     title: 'Customer details',
-    render: context => <CustomerStepDetail state={state} context={context} />
+    render: context => <CustomerStepDetail attach={attach} state={state} context={context} />
   },
   {
     name: 'contact',
@@ -43,6 +47,6 @@ export const customerSteps = (state: CustomerState): PanelSequence => [
     name: 'sites',
     title: 'Job sites',
     validate: () => state.sites().every(isCustomerSite),
-    render: context => <CustomerStepSites state={state} context={context} />
+    render: context => <CustomerStepSites attach={attach} state={state} context={context} />
   }
 ]

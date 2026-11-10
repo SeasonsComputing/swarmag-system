@@ -11,20 +11,37 @@ local until Save; existing timestamps and attachments survive content edits.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-NotesEditorProps  Controlled collection and drill host inputs.
+NotesEditorProps    Controlled collection and drill host inputs.
+├ notes             Current notes.
+├ onChange          Replace notes in the parent draft.
+├ drill             Existing Step drill host.
+├ attach            Host-owned staging callback.
+└ attachmentKinds   Optional accepted kinds.
 NotesEditor       Render the notes Index-Detail pair.
 */
 
 import { toTrimmed, when } from '@core/std'
-import type { Note } from '@domain/abstractions/common.ts'
+import type { Attachment, AttachmentKind, Note } from '@domain/abstractions/common.ts'
 import { isNote } from '@domain/validators/common-validator.ts'
 import { createSignal, onCleanup, Show } from '@solid-js'
 import { createStore } from '@solid-js/store'
 import { CollectionPanel } from '@ux/shell/panel/collection-panel.tsx'
 import type { DrillContract, DrillPanelContext } from '@ux/shell/panel/drill-contract.ts'
 import { copyDraft, isDraftChanged } from '@ux/shell/workbench/workbench-draft.ts'
-import { UiAlert, UiField, UiFieldset, UiLayout, UiText, UiTextArea } from '@ux/ui'
+import {
+  UiAlert,
+  UiField,
+  UiFieldset,
+  UiLayout,
+  UiTab,
+  UiTabList,
+  UiTabPanel,
+  UiTabs,
+  UiText,
+  UiTextArea
+} from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
+import { AttachmentList } from './attachment-list.tsx'
 
 import './notes-editor.css'
 
@@ -33,6 +50,8 @@ export type NotesEditorProps = {
   notes: () => readonly Note[]
   onChange: (notes: readonly Note[]) => void
   drill: DrillContract
+  attach: (file: File) => Promise<Attachment>
+  attachmentKinds?: readonly AttachmentKind[]
 }
 
 /** Render stock note creation, editing, and confirmed removal. */
@@ -48,7 +67,10 @@ export const NotesEditor = (props: NotesEditorProps): UiComponent => {
         legend='Notes'
         itemColumn='Note'
         items={notes}
-        label={note => UiText.untitled(note.content.split('\n')[0], 'Untitled note')}
+        label={note =>
+          `${note.attachments.length ? '📎 ' : ''}${
+            UiText.untitled(note.content.split('\n')[0], 'Untitled note')
+          }`}
         emptyMessage={
           <>
             No notes yet. Use <kbd>New Note</kbd> to add one.
@@ -64,6 +86,8 @@ export const NotesEditor = (props: NotesEditorProps): UiComponent => {
           return (
             <NotePanel
               note={note}
+              attach={props.attach}
+              attachmentKinds={props.attachmentKinds}
               context={context}
               onSave={saved =>
                 props.onChange(copyDraft(
@@ -87,6 +111,8 @@ export const NotesEditor = (props: NotesEditorProps): UiComponent => {
 /** Inputs for one opened note draft. */
 type NotePanelProps = {
   note: Note
+  attach: (file: File) => Promise<Attachment>
+  attachmentKinds?: readonly AttachmentKind[]
   context: DrillPanelContext
   onSave: (note: Note) => void
 }
@@ -94,11 +120,12 @@ type NotePanelProps = {
 const NotePanel = (props: NotePanelProps): UiComponent => {
   const original = copyDraft(props.note)
   const [draft, setDraft] = createStore(copyDraft(props.note))
+  const [attaching, setAttaching] = createSignal(false)
   const [saveAttempted, setSaveAttempted] = createSignal(false)
   const error = (): boolean => saveAttempted() && !isNote(draft)
   props.context.registerDirty(() => isDraftChanged(draft, original))
   const save = (): void => {
-    if (!props.context.isActive()) return
+    if (!props.context.isActive() || attaching()) return
     setSaveAttempted(true)
     const note = { ...copyDraft(draft), content: toTrimmed(draft.content) }
     if (!isNote(note)) return
@@ -111,6 +138,7 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
     labelMode: 'visible',
     density: 'dense',
     error: error(),
+    disabled: attaching(),
     onClick: save
   }))
   return (
@@ -118,29 +146,48 @@ const NotePanel = (props: NotePanelProps): UiComponent => {
       <Show when={error()}>
         <UiAlert variant='danger'>Complete the note before saving.</UiAlert>
       </Show>
-      <UiFieldset legend='Note'>
-        <UiLayout>
-          <UiLayout data-shell='note-content' gap='none'>
-            <time
-              data-shell='note-created-at'
-              dateTime={draft.createdAt}
-              title={new Date(draft.createdAt).toLocaleString()}
-            >
-              {UiText.relativeTime(draft.createdAt)}
-            </time>
-            <UiField for='note-content' label='Content' required>
-              <UiTextArea
-                name='note-content'
-                rows={6}
-                value={draft.content}
-                error={saveAttempted() && draft.content.trim().length === 0}
-                onInput={event => setDraft('content', event.currentTarget.value)}
-                required
-              />
-            </UiField>
-          </UiLayout>
-        </UiLayout>
-      </UiFieldset>
+      <UiTabs defaultValue='note'>
+        <UiTabList>
+          <UiTab value='note' disabled={attaching()}>Note</UiTab>
+          <UiTab value='attachments' disabled={attaching()}>
+            Attachments ({draft.attachments.length})
+          </UiTab>
+        </UiTabList>
+        <UiTabPanel value='note'>
+          <UiFieldset legend='Note'>
+            <UiLayout>
+              <UiLayout data-shell='note-content' gap='none'>
+                <time
+                  data-shell='note-created-at'
+                  dateTime={draft.createdAt}
+                  title={new Date(draft.createdAt).toLocaleString()}
+                >
+                  {UiText.relativeTime(draft.createdAt)}
+                </time>
+                <UiField for='note-content' label='Content' required>
+                  <UiTextArea
+                    name='note-content'
+                    rows={6}
+                    value={draft.content}
+                    error={saveAttempted() && draft.content.trim().length === 0}
+                    onInput={event => setDraft('content', event.currentTarget.value)}
+                    required
+                  />
+                </UiField>
+              </UiLayout>
+            </UiLayout>
+          </UiFieldset>
+        </UiTabPanel>
+        <UiTabPanel value='attachments'>
+          <AttachmentList
+            attachments={() => draft.attachments}
+            onChange={attachments => setDraft('attachments', copyDraft(attachments))}
+            attach={props.attach}
+            kinds={props.attachmentKinds ?? ['photo', 'map', 'document']}
+            busy={setAttaching}
+          />
+        </UiTabPanel>
+      </UiTabs>
     </UiLayout>
   )
 }

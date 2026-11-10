@@ -23,6 +23,8 @@ Deno.test('stage session authenticates the public API and cleans up only its ses
     SUPABASE_RDBMS_URL: 'http://stage-session.invalid',
     SUPABASE_PUBLIC_KEY: 'offline-public-key',
     SUPABASE_CLIENT_MODE: 'edge',
+    DOCUMENT_INBOX_DB_NAME: 'stage-session-test-inbox',
+    DOCUMENT_SERVER_DB_NAME: 'stage-session-test-server',
     LOCAL_DB_NAME: 'stage-session-test',
     SUPABASE_SERVICE_ROLE_KEY: 'offline-service-key'
   }

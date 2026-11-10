@@ -16,6 +16,7 @@ CustomerStepSites       Render the optional job-sites step.
 */
 
 import type { Location } from '@domain/abstractions/common.ts'
+import type { Attachment } from '@domain/abstractions/common.ts'
 import type { CustomerSite } from '@domain/abstractions/customer.ts'
 import { isCustomerSite } from '@domain/validators/customer-validator.ts'
 import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
@@ -44,6 +45,7 @@ import type { CustomerState } from './customer-state.ts'
 
 /** Props for the optional job-sites step. */
 export type CustomerStepSitesProps = {
+  attach: (file: File) => Promise<Attachment>
   state: CustomerState
   context: PanelStepContext
 }
@@ -82,6 +84,7 @@ export const CustomerStepSites = (props: CustomerStepSitesProps): UiComponent =>
             onCleanup(() => setPendingSite(null))
             return (
               <SiteEditor
+                attach={props.attach}
                 state={props.state}
                 site={site}
                 index={index}
@@ -104,6 +107,7 @@ export const CustomerStepSites = (props: CustomerStepSitesProps): UiComponent =>
 
 /** Props for one Site draft and its host-owned lifetime. */
 type SiteEditorProps = {
+  attach: (file: File) => Promise<Attachment>
   state: CustomerState
   site: CustomerSite
   index: number
@@ -318,6 +322,7 @@ const SiteEditor = (props: SiteEditorProps): UiComponent => {
         </Show>
       </UiFieldset>
       <NotesEditor
+        attach={props.attach}
         notes={() => draft.notes}
         onChange={notes => setDraft('notes', copyDraft(notes))}
         drill={props.drill}

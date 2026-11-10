@@ -22,11 +22,11 @@ import { CustomerSamples } from '@tests/fixtures/customer-samples.ts'
 import { UserSamples } from '@tests/fixtures/user-samples.ts'
 
 Config.init({
-  get: key => key === 'LOCAL_DB_NAME' ? 'customer-api-test' : undefined,
+  get: key => key === 'LOCAL_DB_NAME' ? 'customer-api-test' : `${key}-customer-api-test`,
   fail: message => {
     throw new Error(message)
   }
-}, ['LOCAL_DB_NAME'])
+}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'DOCUMENT_SERVER_DB_NAME'])
 const { api } = await import('@front/api/api.ts')
 
 Deno.test('Customer API creates from detail fields and declared defaults', async () => {

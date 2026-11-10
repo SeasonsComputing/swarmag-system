@@ -21,6 +21,7 @@ ChemicalState  Reactive draft fields and setters.
 ├ reEntryIntervalHours, setReEntryIntervalHours  Read and edit reEntryIntervalHours.
 ├ storageLocation, setStorageLocation  Read and edit storageLocation.
 ├ sdsUrl, setSdsUrl  Read and edit sdsUrl.
+├ labels, setLabels  Read and edit label references.
 └ notes, setNotes  Read and edit notes.
 createChemicalState  Open an isolated draft.
 reEntryIntervalError  Check optional positive whole hours.
@@ -29,7 +30,12 @@ reEntryIntervalError  Check optional positive whole hours.
 import { expectPositiveNumber, toTrimmed } from '@core/std'
 import type { ExpectResult } from '@core/std'
 import type { DraftOf } from '@core/stdx'
-import type { Chemical, ChemicalSignalWord, ChemicalUsage } from '@domain/abstractions/chemical.ts'
+import type {
+  Chemical,
+  ChemicalLabel,
+  ChemicalSignalWord,
+  ChemicalUsage
+} from '@domain/abstractions/chemical.ts'
 import type { Note } from '@domain/abstractions/common.ts'
 import type { scopes } from '@front/api/scopes.ts'
 import { createSignal } from '@solid-js'
@@ -58,6 +64,8 @@ export type ChemicalState = {
   setStorageLocation: Setter<string>
   sdsUrl: Accessor<string>
   setSdsUrl: Setter<string>
+  labels: Accessor<readonly ChemicalLabel[]>
+  setLabels: (value: readonly ChemicalLabel[]) => void
   notes: Accessor<readonly Note[]>
   setNotes: (value: readonly Note[]) => void
 }
@@ -73,6 +81,7 @@ export const chemicalDraft = (state: ChemicalState): ChemicalDraft => {
     reEntryIntervalHours: state.reEntryIntervalHours(),
     storageLocation: UiText.optional(toTrimmed(state.storageLocation())),
     sdsUrl: UiText.optional(toTrimmed(state.sdsUrl())),
+    labels: state.labels(),
     notes: state.notes()
   })
 }
@@ -89,6 +98,7 @@ export const createChemicalState = (record: Chemical | null = null): ChemicalSta
   )
   const [storageLocation, setStorageLocation] = createSignal<string>(record?.storageLocation ?? '')
   const [sdsUrl, setSdsUrl] = createSignal<string>(record?.sdsUrl ?? '')
+  const [labels, setLabels] = createSignal<readonly ChemicalLabel[]>(copyDraft(record?.labels ?? []))
   const [notes, setNotes] = createSignal<readonly Note[]>(copyDraft(record?.notes ?? []))
   return {
     name,
@@ -107,6 +117,8 @@ export const createChemicalState = (record: Chemical | null = null): ChemicalSta
     setStorageLocation,
     sdsUrl,
     setSdsUrl,
+    labels,
+    setLabels: value => setLabels(copyDraft(value)),
     notes,
     setNotes: value => setNotes(copyDraft(value))
   }

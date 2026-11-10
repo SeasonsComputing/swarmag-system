@@ -19,13 +19,14 @@ ServiceManager       Collection and detail host.
 
 import { StringSet } from '@core/std'
 import { api } from '@front/api/api.ts'
+import type { AttachmentSave } from '@front/app/shell/make-attachment-save.ts'
 import { ASSET_TYPES_QUERY_KEY, useAssetTypes } from '@front/app/stores/asset-types-state.ts'
 import { Show } from '@solid-js'
+import { onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
-import type { AggregateSave } from '@ux/shell/workbench/workbench-save.ts'
 import { UiText } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import {
@@ -61,7 +62,7 @@ export const ServiceManager = (props: ServiceManagerProps): UiComponent => {
   }))
   const referenceFailure = (): boolean => catalog.failed() || references.isError
   // The host calls detail before either save callback; each detail replaces this delegate.
-  let save: AggregateSave<ServiceRecord, ServiceDraft>
+  let save: AttachmentSave<ServiceRecord, ServiceDraft>
   const provider: AbstractionManagerContract<ServiceRecord, ServiceDraft> = {
     formTitle: 'Service Manager',
     entityLabel: 'Service',
@@ -109,12 +110,18 @@ export const ServiceManager = (props: ServiceManagerProps): UiComponent => {
     }],
     detail: item => {
       const state = createServiceState(item)
-      save = createServiceSave()
+      save = createServiceSave(draft => state.setNotes(draft.notes))
+      const editorSave = save
+      onCleanup(() => {
+        void editorSave.discard()
+      })
       return {
         steps: [{
           name: 'detail',
           title: 'Service details',
-          render: context => <ServiceStepDetail state={state} context={context} />
+          render: context => (
+            <ServiceStepDetail attach={editorSave.stage} state={state} context={context} />
+          )
         }],
         draft: () => serviceDraft(state)
       }

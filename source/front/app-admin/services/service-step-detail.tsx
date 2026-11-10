@@ -11,12 +11,14 @@ Edits owned fields with host-integrated validation and draft lifetime.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 ServiceStepDetailProps  Detail Step inputs.
+├ attach  Stage files within the host editor lifetime.
 ├ state                 The retained form draft.
 └ context               Host validation and drill context.
 ServiceStepDetail       Render the single detail Step.
 */
 
 import { expectConstEnum, expectNonEmptyString } from '@core/std'
+import type { Attachment } from '@domain/abstractions/common.ts'
 import { SERVICE_CATEGORIES } from '@domain/abstractions/service.ts'
 import type { ServiceCategory } from '@domain/abstractions/service.ts'
 import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
@@ -42,6 +44,7 @@ import type { ServiceState } from './service-state.ts'
 /** Inputs for one Service detail Step. */
 export type ServiceStepDetailProps = {
   state: ServiceState
+  attach: (file: File) => Promise<Attachment>
   context: PanelStepContext
 }
 
@@ -126,7 +129,12 @@ export const ServiceStepDetail = (props: ServiceStepDetailProps): UiComponent =>
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <NotesEditor notes={state.notes} onChange={state.setNotes} drill={drill} />
+            <NotesEditor
+              attach={props.attach}
+              notes={state.notes}
+              onChange={state.setNotes}
+              drill={drill}
+            />
           </UiLayout>
         </form>
       )}

@@ -12,6 +12,9 @@ without coupling feature code to a specific storage or backend implementation.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 api                          Shared API namespace for UX applications.
+├ DocumentInbox              Device attachment inbox.
+├ DocumentServer             Shared-store stand-in.
+├ Attachments                Staging, placement, and document access.
 ├ Auth                       Passwordless authentication and session observation.
 ├ AppState                   Persistent state.
 ├ SessionState               Reactive authenticated-user session state.
@@ -28,6 +31,8 @@ api                          Shared API namespace for UX applications.
 */
 
 import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
+import { DocumentStore } from '@core/cli/docstore-client.ts'
+import { IndexedDbDocumentProvider } from '@core/cli/indexeddb-docstore-provider.ts'
 import { makeCrudSupabaseClient, makeJunctionSupabaseClient } from '@core/cli/make-supabase-client.ts'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
@@ -55,12 +60,32 @@ import {
 } from '@domain/validators/service-validator.ts'
 import { AppState } from '@ux/shell/runtime/app-state.ts'
 import { SessionState } from '@ux/shell/runtime/session-state.ts'
+import { Attachments } from './attachments.ts'
 import { makeAuthUsers } from './make-auth-users.ts'
+
+/** How long a minted document link stays valid: five minutes, in milliseconds. */
+const LINK_LIFETIME = 5 * 60_000
+
+/** The device's inbox: documents staged or placed and not yet uploaded. */
+const DocumentInbox = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
+  linkLifetime: LINK_LIFETIME
+})
+
+/** The shared document store; an IndexedDB stand-in until the Supabase provider replaces it. */
+const DocumentServer = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_SERVER_DB_NAME'), {
+  linkLifetime: LINK_LIFETIME
+})
 
 /** Shared UX API namespace for authentication, state, and domain clients. */
 export const api = {
   /** Passwordless authentication and session observation. */
   Auth: AuthSupabaseClient,
+  /** The device's inbox document store. */
+  DocumentInbox,
+  /** The shared document store. */
+  DocumentServer,
+  /** Staging, placement, and document access over the two stores. */
+  Attachments: new Attachments(DocumentInbox, DocumentServer),
 
   /** Persistent and ephemoral state. */
   AppState,

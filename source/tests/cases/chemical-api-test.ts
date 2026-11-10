@@ -15,11 +15,11 @@ import { assert, assertEquals, assertRejects } from '@std/assert'
 import { createClient } from '@supabase/client'
 
 Config.init({
-  get: key => key === 'LOCAL_DB_NAME' ? 'chemical-api-test' : undefined,
+  get: key => key === 'LOCAL_DB_NAME' ? 'chemical-api-test' : `${key}-chemical-api-test`,
   fail: message => {
     throw new Error(message)
   }
-}, ['LOCAL_DB_NAME'])
+}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'DOCUMENT_SERVER_DB_NAME'])
 const { api } = await import('@front/api/api.ts')
 
 Deno.test('Chemical client exercises CRUD and soft deletion', async () => {
@@ -60,6 +60,7 @@ Deno.test('Chemical updates preserve labels and clear owned optionals', async ()
     const created = await api.Chemicals.create(scopes.Chemicals.detail.toCreate(chemicalDraft(state)))
     const labels = [{ url: 'https://example.com/label.pdf', description: 'Keep label' }]
     tables.chemicals[0].labels = labels
+    state.setLabels(labels)
     state.setSdsUrl(' ')
     state.setReEntryIntervalHours(undefined)
     const updated = await api.Chemicals.update(

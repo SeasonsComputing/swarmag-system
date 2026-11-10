@@ -12,10 +12,12 @@ mounted field validation with the containing sequence.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 CustomerStepDetailProps  Customer detail panel inputs.
+├ attach  Stage files within the host editor lifetime.
 CustomerStepDetail       Identity, account manager, and notes with validation.
 */
 
 import { expectNonEmptyString } from '@core/std'
+import type { Attachment } from '@domain/abstractions/common.ts'
 import { CUSTOMER_STATUSES } from '@domain/abstractions/customer.ts'
 import type { CustomerStatus } from '@domain/abstractions/customer.ts'
 import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
@@ -35,6 +37,7 @@ import './customer-step-detail.css'
 /** Props for the Customer Detail step. */
 export type CustomerStepDetailProps = {
   state: CustomerState
+  attach: (file: File) => Promise<Attachment>
   context: PanelStepContext
 }
 
@@ -96,7 +99,12 @@ export const CustomerStepDetail = (props: CustomerStepDetailProps): UiComponent 
                 </div>
               </UiField>
             </UiFieldset>
-            <NotesEditor notes={state.notes} onChange={state.setNotes} drill={drill} />
+            <NotesEditor
+              attach={props.attach}
+              notes={state.notes}
+              onChange={state.setNotes}
+              drill={drill}
+            />
           </UiLayout>
         </form>
       )}

@@ -12,11 +12,13 @@ validation.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 UserStepDetail  User Manager detail step.
+├ attach  Stage files within the host editor lifetime.
 */
 
 import { expectEmail, expectNonEmptyString, toEmail } from '@core/std'
 import { CONTACT_PREFERRED_CHANNELS } from '@domain/abstractions/common.ts'
 import type { ContactPreferredChannel } from '@domain/abstractions/common.ts'
+import type { Attachment } from '@domain/abstractions/common.ts'
 import { USER_ROLES, USER_STATUSES } from '@domain/abstractions/user.ts'
 import type { UserRole, UserStatus } from '@domain/abstractions/user.ts'
 import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
@@ -42,6 +44,7 @@ import type { UserState } from './user-state.ts'
 
 /** Renders the create or edit step for one user. */
 export function UserStepDetail(props: {
+  attach: (file: File) => Promise<Attachment>
   context: PanelStepContext
   state: UserState
 }): UiComponent {
@@ -165,7 +168,7 @@ export function UserStepDetail(props: {
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <NotesEditor notes={notes} onChange={setNotes} drill={drill} />
+            <NotesEditor attach={props.attach} notes={notes} onChange={setNotes} drill={drill} />
             <UiFieldset legend='Access'>
               <UiLayout>
                 <UiField variant='caption' label='Roles' required>

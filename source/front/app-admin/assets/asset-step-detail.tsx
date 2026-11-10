@@ -11,6 +11,7 @@ Edits owned fields with host-integrated validation and draft lifetime.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AssetStepDetailProps  Detail Step inputs.
+├ attach  Stage files within the host editor lifetime.
 ├ state  The retained form draft.
 └ context  Host validation and drill context.
 AssetStepDetail  Render the single detail Step.
@@ -19,6 +20,7 @@ AssetStepDetail  Render the single detail Step.
 import { expectId, expectNonEmptyString } from '@core/std'
 import { ASSET_STATUSES } from '@domain/abstractions/asset.ts'
 import type { AssetStatus } from '@domain/abstractions/asset.ts'
+import type { Attachment } from '@domain/abstractions/common.ts'
 import { NotesEditor } from '@front/app/shell/notes-editor.tsx'
 import { onCleanup } from '@solid-js'
 import { DrillDown } from '@ux/shell/panel/drill-down.tsx'
@@ -33,6 +35,7 @@ import { AssetTypePicker } from './asset-type-picker.tsx'
 /** Inputs for one Asset detail Step. */
 export type AssetStepDetailProps = {
   state: AssetState
+  attach: (file: File) => Promise<Attachment>
   context: PanelStepContext
 }
 
@@ -113,7 +116,12 @@ export const AssetStepDetail = (props: AssetStepDetailProps): UiComponent => {
                 </UiField>
               </UiLayout>
             </UiFieldset>
-            <NotesEditor notes={state.notes} onChange={state.setNotes} drill={drill} />
+            <NotesEditor
+              attach={props.attach}
+              notes={state.notes}
+              onChange={state.setNotes}
+              drill={drill}
+            />
           </UiLayout>
         </form>
       )}

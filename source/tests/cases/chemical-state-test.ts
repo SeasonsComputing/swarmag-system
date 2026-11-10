@@ -16,18 +16,22 @@ import {
 } from '@front/app-admin/chemicals/chemical-state.ts'
 import { assert, assertEquals } from '@std/assert'
 
-Deno.test('Chemical scope defaults new labels and excludes existing labels from all updates', () => {
+Deno.test('Chemical scope owns labels and projects edits and clearing atomically', () => {
   const source = chemical()
   const state = createChemicalState(source)
-  state.setName('  Updated chemical  ')
+  assertEquals(chemicalDraft(createChemicalState()).labels, [])
+  assertEquals(chemicalDraft(state).labels, source.labels)
+  const labels = [{ url: 'http://example.com/new-label.pdf', description: 'New label' }]
+  state.setLabels(labels)
+  labels[0].description = 'Changed caller'
   const draft = chemicalDraft(state)
-  assertEquals('labels' in draft, false)
-  assertEquals(scopes.Chemicals.detail.toCreate(draft).labels, [])
-  const richerDraft = { ...draft, labels: [] }
-  const patch = scopes.Chemicals.detail.toUpdate(source.id, richerDraft)
-  assertEquals('labels' in patch, false)
-  assertEquals('labels' in scopes.Chemicals.detail.adapter.fromDomain(patch), false)
-  assertEquals(source.labels, [{ url: 'https://example.com/label.pdf', description: 'Original label' }])
+  assertEquals(draft.labels[0].description, 'New label')
+  const patch = scopes.Chemicals.detail.toUpdate(source.id, draft)
+  assertEquals(patch.labels, draft.labels)
+  assertEquals(scopes.Chemicals.detail.adapter.fromDomain(patch).labels, draft.labels)
+  state.setLabels([])
+  assertEquals(scopes.Chemicals.detail.toUpdate(source.id, chemicalDraft(state)).labels, [])
+  assertEquals(source.labels[0].description, 'Original label')
 })
 
 Deno.test('Chemical state isolates source, accepted notes, and projections', () => {

@@ -17,11 +17,11 @@ import { assert, assertEquals, assertRejects } from '@std/assert'
 import { createClient } from '@supabase/client'
 
 Config.init({
-  get: key => key === 'LOCAL_DB_NAME' ? 'asset-api-test' : undefined,
+  get: key => key === 'LOCAL_DB_NAME' ? 'asset-api-test' : `${key}-asset-api-test`,
   fail: message => {
     throw new Error(message)
   }
-}, ['LOCAL_DB_NAME'])
+}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'DOCUMENT_SERVER_DB_NAME'])
 const { api } = await import('@front/api/api.ts')
 
 Deno.test('Asset clients exercise CRUD and soft deletion', async () => {

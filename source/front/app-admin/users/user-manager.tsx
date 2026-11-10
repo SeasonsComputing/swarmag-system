@@ -20,7 +20,10 @@ import { listAll } from '@core/stdx'
 import type { User } from '@domain/abstractions/user.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
+import { makeAttachmentSave } from '@front/app/shell/make-attachment-save.ts'
+import type { AttachmentSave } from '@front/app/shell/make-attachment-save.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
+import { onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import { PanelRowIdentity } from '@ux/shell/panel/panel-row-identity.tsx'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
@@ -50,6 +53,7 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     queryFn: loadUsers
   }))
 
+  let save: AttachmentSave<User, UserDraft>
   const provider: AbstractionManagerContract<User, UserDraft> = {
     formTitle: 'User Manager',
     entityLabel: 'User',
@@ -83,8 +87,8 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     refresh: async () => {
       await usersQuery.refetch()
     },
-    create: draft => api.Users.create(scope.toCreate(draft)),
-    update: (user, draft) => api.Users.update(scope.toUpdate(user.id, draft)),
+    create: draft => save.create(draft),
+    update: (record, draft) => save.update(record, draft),
     actions: [
       {
         name: 'delete',
@@ -115,11 +119,24 @@ export const UserManager = (props: UserManagerProps): UiComponent => {
     ],
     detail: user => {
       const state = createUserState(user)
+      save = makeAttachmentSave<User, UserDraft>({
+        create: draft => api.Users.create(scope.toCreate(draft)),
+        update: (user, draft) => api.Users.update(scope.toUpdate(user.id, draft)),
+        place: async (owner, draft) => ({
+          ...draft,
+          notes: await api.Attachments.Users.place(owner, draft.notes)
+        }),
+        reconcile: draft => state.setNotes(draft.notes)
+      })
+      const editorSave = save
+      onCleanup(() => {
+        void editorSave.discard()
+      })
       return {
         steps: [{
           name: 'detail',
           title: 'User details',
-          render: context => <UserStepDetail context={context} state={state} />
+          render: context => <UserStepDetail attach={editorSave.stage} context={context} state={state} />
         }],
         draft: () => userDraft(state)
       }

@@ -20,7 +20,10 @@ import { listAll } from '@core/stdx'
 import type { Chemical, ChemicalSignalWord } from '@domain/abstractions/chemical.ts'
 import { api } from '@front/api/api.ts'
 import { scopes } from '@front/api/scopes.ts'
+import { makeAttachmentSave } from '@front/app/shell/make-attachment-save.ts'
+import type { AttachmentSave } from '@front/app/shell/make-attachment-save.ts'
 import { StatusBadge } from '@front/app/shell/status-badge.tsx'
+import { onCleanup } from '@solid-js'
 import { createQuery } from '@tanstack/solid-query'
 import type { AbstractionManagerContract } from '@ux/shell/workbench/abstraction-manager-contract.ts'
 import { AbstractionManager } from '@ux/shell/workbench/abstraction-manager.tsx'
@@ -47,6 +50,7 @@ export const ChemicalManager = (props: ChemicalManagerProps): UiComponent => {
     queryKey: CHEMICALS_QUERY_KEY,
     queryFn: () => Array.fromAsync(listAll(api.Chemicals))
   }))
+  let save: AttachmentSave<Chemical, ChemicalDraft>
   const provider: AbstractionManagerContract<Chemical, ChemicalDraft> = {
     formTitle: 'Chemical Manager',
     entityLabel: 'Chemical',
@@ -72,8 +76,8 @@ export const ChemicalManager = (props: ChemicalManagerProps): UiComponent => {
       await query.refetch()
     },
     itemLabel: item => item.name,
-    create: draft => api.Chemicals.create(scope.toCreate(draft)),
-    update: (item, draft) => api.Chemicals.update(scope.adapter, scope.toUpdate(item.id, draft)),
+    create: draft => save.create(draft),
+    update: (record, draft) => save.update(record, draft),
     actions: [{
       name: 'delete',
       label: 'Delete',
@@ -88,11 +92,26 @@ export const ChemicalManager = (props: ChemicalManagerProps): UiComponent => {
     }],
     detail: item => {
       const state = createChemicalState(item)
+      save = makeAttachmentSave<Chemical, ChemicalDraft>({
+        create: draft => api.Chemicals.create(scope.toCreate(draft)),
+        update: (item, draft) => api.Chemicals.update(scope.adapter, scope.toUpdate(item.id, draft)),
+        place: async (owner, draft) => ({
+          ...draft,
+          notes: await api.Attachments.Chemicals.place(owner, draft.notes)
+        }),
+        reconcile: draft => state.setNotes(draft.notes)
+      })
+      const editorSave = save
+      onCleanup(() => {
+        void editorSave.discard()
+      })
       return {
         steps: [{
           name: 'detail',
           title: 'Chemical details',
-          render: context => <ChemicalStepDetail state={state} context={context} />
+          render: context => (
+            <ChemicalStepDetail attach={editorSave.stage} state={state} context={context} />
+          )
         }],
         draft: () => chemicalDraft(state)
       }

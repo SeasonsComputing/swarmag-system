@@ -6,7 +6,7 @@
 */
 
 import { assertEquals, assertRejects } from '@std/assert'
-import { makeAggregateSave } from '@ux/shell/workbench/workbench-save.ts'
+import { makeAggregateSave } from '@ux/shell/workbench/make-aggregate-save.ts'
 
 Deno.test('aggregate writes precede completion and return persisted records', async () => {
   const calls: string[] = []
@@ -35,6 +35,16 @@ Deno.test('aggregate writes precede completion and return persisted records', as
     'create 3',
     'complete 3 3'
   ])
+})
+
+Deno.test('a completion that returns a record makes it the saved record', async () => {
+  const save = makeAggregateSave<number, number>({
+    create: draft => Promise.resolve(draft),
+    update: (_record, draft) => Promise.resolve(draft),
+    complete: record => Promise.resolve(record * 10)
+  })
+  assertEquals(await save.create(1), 10)
+  assertEquals(await save.update(10, 2), 20)
 })
 
 Deno.test('aggregate retries update the latest persisted record with the current draft', async () => {

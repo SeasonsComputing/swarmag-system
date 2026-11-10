@@ -21,6 +21,8 @@ import { scopes } from '@front/api/scopes.ts'
 import { createCustomerState, customerDraft } from '@front/app-admin/customers/customer-state.ts'
 import type { CustomerDraft } from '@front/app-admin/customers/customer-state.ts'
 import { customerSteps } from '@front/app-admin/customers/customer-steps.tsx'
+import { makeAttachmentSave } from '@front/app/shell/make-attachment-save.ts'
+import { onCleanup } from '@solid-js'
 import type { WizardContract } from '@ux/shell/workbench/wizard-contract.ts'
 import { Wizard } from '@ux/shell/workbench/wizard.tsx'
 import type { UiComponent } from '@ux/ui'
@@ -35,12 +37,34 @@ export type OnboardingWizardProps = {
 /** Customer intake persists once, at Finish. */
 export const OnboardingWizard = (props: OnboardingWizardProps): UiComponent => {
   const state = createCustomerState()
+  const scope = scopes.Customers.detail
+  const save = makeAttachmentSave({
+    create: (draft: CustomerDraft) => api.Customers.create(scope.toCreate(draft)),
+    update: (record, draft) => api.Customers.update(scope.adapter, scope.toUpdate(record.id, draft)),
+    place: async (owner, draft) => ({
+      ...draft,
+      notes: await api.Attachments.Customers.place(owner, draft.notes),
+      sites: await Promise.all(
+        draft.sites.map(async site => ({
+          ...site,
+          notes: await api.Attachments.Customers.place(owner, site.notes)
+        }))
+      )
+    }),
+    reconcile: draft => {
+      state.setNotes(draft.notes)
+      draft.sites.forEach((site, i) => state.setSite(i, site))
+    }
+  })
+  onCleanup(() => {
+    void save.discard()
+  })
   const contract: WizardContract<CustomerDraft> = {
     formTitle: 'Customer Onboarding',
-    steps: customerSteps(state),
+    steps: customerSteps(state, save.stage),
     draft: () => customerDraft(state),
     commit: async () => {
-      await api.Customers.create(scopes.Customers.detail.toCreate(customerDraft(state)))
+      await save.create(customerDraft(state))
     }
   }
   return (
