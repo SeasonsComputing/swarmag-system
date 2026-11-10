@@ -7,7 +7,8 @@ attachments, upload, and server parts were folded into roadmap M-6's briefs
 `effort/completed/2026-10-30-document-upload-brief.md`,
 `effort/completed/2026-10-30-document-store-supabase-brief.md`). What remained is the Field Binder: a
 first-class feature, its Admin workbench the last of M-6's features, and its Ops side M-9's. It
-depends on the Manager enabler (`effort/completed/2026-11-10-manager-brief.md`).
+depends on the Manager and Index enablers (`effort/completed/2026-11-10-manager-brief.md`,
+`effort/active/2026-11-10-index-brief.md`).
 
 ## What triggered it
 
@@ -73,11 +74,19 @@ its copy.
   onsite, and the whole loop is proven before Ops is built.
 - **Ops** syncs in the background on load; a crew has no choice. That is M-9's.
 
+## Viewing
+
+The Field Binder's viewer is an `Index` over the device's own inventory: each entry's description
+and source, and the sync status. Activating an entry opens its local copy through a link minted
+from the device's `FieldBinder` store, so it works without signal. It lives in the shared
+`front/app`, as it reads `api`: Admin opens it from the Helm, and it is Ops' binder screen in M-9.
+
 ## Admin
 
-- **The Helm:** a `backpack` icon opens a menu: **Open Field Binder**, **Sync this device**, and a
-  status line ("Current · 24 documents"). It is built as one generic Helm action with a menu, which
-  the background tasks brief (`effort/pending/2026-11-10-background-tasks-brief.md`) reuses.
+- **The Helm:** a `backpack` icon opens a menu: **Field Binder** (the viewer), **Manage Field
+  Binder** (the workbench), **Sync this device**, and a status line ("Current · 24 documents"). It
+  is built as one generic Helm action with a menu, which the background tasks brief
+  (`effort/pending/2026-11-10-background-tasks-brief.md`) reuses.
 - **The workbench is a `Manager`** over `FieldBinderEntry`, Collection-Detail above its threshold and
   Index-Detail below, in the stock look:
   - **The Collection:** each entry's description, its source (a URL's host, or "Uploaded"), and
@@ -104,13 +113,13 @@ its copy.
 | # | Scenario                                | Answer                                                          |
 | - | --------------------------------------- | --------------------------------------------------------------- |
 | 1 | A chemical's label and SDS              | URLs; added from the chemical, copied by fetch or upload        |
-| 2 | A crew needs an SDS with no signal      | opened from the Field Binder in Ops                             |
+| 2 | A crew needs an SDS with no signal      | opened from the Field Binder's viewer in Ops                    |
 | 3 | A sprayer's manual that came in the box | added by hand, uploaded, with no URL                            |
 | 4 | A drone's manual published online       | added by hand from its URL, fetched                             |
 | 5 | A source blocks the fetch               | upload the file into the entry; the workbench shows the failure |
 | 6 | A source publishes a revision           | refresh the entry; its id stays, its copy changes               |
 | 7 | An asset's seller's order               | not the binder's: an attachment on the asset's notes            |
-| 8 | An assessor onsite with no signal       | opened from the Field Binder on the Admin tablet                |
+| 8 | An assessor onsite with no signal       | opened from the Field Binder's viewer on the Admin tablet       |
 
 ## Open
 
@@ -121,6 +130,8 @@ its copy.
    it serves, as a manual serves a sprayer.
 3. **The `FieldBinder` namespace's provisioning:** it sits beside the attachments' namespaces on
    `DocumentServer`, and the storage configuration provisions it.
+4. **A chemical's links offline:** whether a chemical's SDS or label link opens the local copy
+   when there is no signal, the URL control falling back to the binder.
 
 ## Design history
 

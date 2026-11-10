@@ -222,6 +222,9 @@ attaches and shares documents; field capture and its upload are the Ops applicat
   `Manager`, the Collection-Detail
   manager over any identified items, with collection actions; `AbstractionManager` narrowed to it
   for domain records. The Field Binder's workbench is its first non-record consumer.
+- **Index** (`effort/active/2026-11-10-index-brief.md`): `Index`, a standalone list whose Items
+  the consumer activates, over `CollectionContract`, which `ManagerContract` extends. The Field
+  Binder's viewer is its first consumer.
 
 **Features**, in order; each builds and tests on IndexedDB until the Supabase provider makes the
 store shared:
