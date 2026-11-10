@@ -54,7 +54,8 @@ All in `source/ux/shell/workbench/`:
    export const Manager = <T extends Instance, Draft>(props: ManagerProps<T, Draft>): UiComponent
    ```
 
-2. **Collection actions** act on the whole Collection and sit beside New, in the same form:
+2. _[Extended by the amendment "After production review", item 2.]_ **Collection actions** act on
+   the whole Collection and sit beside New, in the same form:
 
    ```ts
    /** An action on the whole Collection, presented beside New. */
@@ -116,7 +117,8 @@ the Field Binder (which consumes `Manager` in its own production).
 ## Checks
 
 `deno task check`, `deno task fmt:check`, `deno task test` (the two environment-dependent files
-excluded); `STYLE_AUDIT`. A test covers `collectionActions` presented beside New. The CA verifies in
+excluded); `STYLE_AUDIT`. _[Revised by the amendment "After production review", item 1.]_ ~~A test covers
+`collectionActions` presented beside New.~~ The CA verifies in
 Admin that every manager behaves as before: open, New, Save, delete, and the collapse below the
 threshold.
 
@@ -139,3 +141,22 @@ _[Revised by the amendment "After AI Coding Engine review", item 2.]_ The AI Arc
    The records are `CONVENTIONS.md` §17.2 (1.16), which names `Manager` beneath it, and the
    supporting library's one row in `ux-design-archetypes.md` §6. §17.1, archetypes §2.3 and §3.2,
    `architecture-front.md`, and `README.md` are unchanged.
+
+## Amendment — 2026-11-10 — After production review
+
+The AI Architect reviewed the production: with names normalized, `Manager` is the former
+`AbstractionManager` line for line but for the renamed hooks and the collection actions;
+`AbstractionManager` and the five contract types narrow to it; the DOM hooks are `manager-*`; no old
+name remains.
+
+1. **No component-rendering test.** `manager-test.ts` starts a Vite server inside Deno, and under
+   the repository's test task (`--allow-env --allow-net --allow-read`) Rolldown cannot load its
+   native binding, so `deno task test` fails; it passed only with permissions the task does not
+   grant. The attachment look brief withdrew the same harness for the same reason
+   (`effort/completed/2026-11-10-attachment-look-brief.md`, amendment "After production review",
+   item 3), and a harness for components is a decision of its own. The test is removed. The Checks
+   asked for it; that wording was the AI Architect's, and it is withdrawn: collection actions are
+   verified when the Field Binder's "Add from chemicals" first uses them.
+2. **A collection action runs as an Item's action does,** under the manager's pending lock and its
+   error display. It was called directly, so a second click ran it twice while the first was still
+   running, and a failure showed nothing.
