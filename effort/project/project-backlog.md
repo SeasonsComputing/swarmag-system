@@ -395,6 +395,19 @@ counterparts' brevity, describing what the tooling checks rather than how to che
 investigation, not an independent reason to prioritize this on its own; see the eject
 entry for why.
 
+### B-45 · The edge deploy warns that `import_map` is no longer supported
+
+**Observed:** 2026-11-10 · low
+
+Every `deno task edge-deploy` prints "Specifying import_map through flags is no longer supported.
+Please use deno.json instead." for each function. Nothing breaks: each function's generated
+`deno.json` is what the runtime reads (`architecture-back.md` §3.4). The `import_map` lines in
+`supabase/config.toml`'s function blocks, and `supabase/functions/import_map.json` as the CLI's
+copy, are what the warning names; the CLI may drop them.
+
+**Picking this up:** unblocked; `supabase/config.toml`, `edge-sync`, and `architecture-back.md`
+§3.4 and §7.1 together.
+
 ## Testing
 
 ### B-34 · Running stage tests means assembling five variables from three places by hand
@@ -596,6 +609,17 @@ only its bytes. Deferred from `effort/completed/2026-11-09-attachments-brief.md`
 
 **Picking this up:** after the Supabase provider, since the server side sweeps `DocumentServer`.
 Its scheduled job and edge entry point are the Supabase provider brief's DevOps items 4–6
-(`effort/active/2026-10-30-document-store-supabase-brief.md`).
+(`effort/completed/2026-10-30-document-store-supabase-brief.md`).
+
+### B-44 · The document store has no CLI
+
+**Observed:** 2026-11-10 · low
+
+`document-store {noun} {verb}`, one to one with the store contract, was designed with the document
+storage brief (`effort/completed/2026-10-23-document-storage-brief.md`) for the back profile, which
+runs in Deno and has no IndexedDB. Nothing in M-6 uses it, so the Supabase provider brief
+(`effort/completed/2026-10-30-document-store-supabase-brief.md`) left it out.
+
+**Picking this up:** when a back-profile consumer needs it, the sweep (B-42) among them.
 
 _End of Backlog Document_

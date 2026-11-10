@@ -4,7 +4,7 @@
 document storage policy brief of 2026-10-31, whose attachments, upload, and server parts were folded
 into roadmap M-6's briefs (`effort/completed/2026-10-29-attachments-brief.md`,
 `effort/completed/2026-10-30-document-upload-brief.md`,
-`effort/active/2026-10-30-document-store-supabase-brief.md`). What remained is the Field Binder: a
+`effort/completed/2026-10-30-document-store-supabase-brief.md`). What remained is the Field Binder: a
 first-class feature, its Admin workbench the last of M-6's features, after the Supabase provider,
 and its Ops side M-9's.
 

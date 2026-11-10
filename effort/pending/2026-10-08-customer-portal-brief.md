@@ -79,5 +79,9 @@ story 4), which is portal users. The same session's account-manager work is
 6. **Roadmap placement.** No roadmap section builds `app-customer`. Roadmap §1 says
    additional-contact assignment is "built before §5, or moved to a later milestone"; this brief is
    that later milestone once it has a slot.
+7. **The customer role's storage access.** `DocumentServer`'s policies grant the staff roles
+   alone (the Supabase provider brief, `effort/completed/2026-10-30-document-store-supabase-brief.md`);
+   which namespaces and buckets a customer reads, its own Customer's and its jobs', is the portal's
+   to decide and write.
 
 _End of Brief_

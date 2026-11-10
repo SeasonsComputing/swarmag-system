@@ -230,9 +230,10 @@ store shared:
 2. **Upload** — closed 2026-11-10, `3a07a9c`,
    `effort/completed/2026-10-30-document-upload-brief.md`: `Attachments.drain()` and Admin's
    `DocumentDrain` loop, one tab at a time, draining `DocumentInbox` into `DocumentServer`.
-3. **The Supabase provider** (`effort/active/2026-10-30-document-store-supabase-brief.md`): the
-   shared store, swapped into `api` for `DocumentServer`, its provisioning, and upload's access
-   rules written into its policies.
+3. **The Supabase provider** — closed 2026-11-10, `81ce07c`,
+   `effort/completed/2026-10-30-document-store-supabase-brief.md`: `SupabaseDocumentProvider`
+   over Storage's API with names in its metadata, swapped into `api` for `DocumentServer`; storage
+   provisioning, reset, and usage tasks; the staff roles' storage policies; SDK 2.119.0.
 4. **The Field Binder** (`effort/active/2026-11-04-field-binder-brief.md`): the Admin workbench,
    a feature of its own, and its copies in `DocumentServer`, fetched or uploaded. Its Ops side is
    M-9's.

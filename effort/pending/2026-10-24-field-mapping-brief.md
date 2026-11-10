@@ -96,4 +96,6 @@ elements, and the validator checks ranges, which rejects every swapped Texas coo
 6. **Document storage for surveys,** from the document storage brief's closure: batch import of a
    flight, raw retention (raw archived cold and products hot is the leaning; the decision is the
    CA's), document properties (bounds, coordinate reference system, bands), packages, placement
-   providers for the tiers, and renditions. Architecture-core §10.5 records them.
+   providers for the tiers, and renditions. Architecture-core §10.5 records them. Resumable uploads
+   (TUS) past the free plan's 50 MB file cap join it, deferred from the Supabase provider brief
+   (`effort/completed/2026-10-30-document-store-supabase-brief.md`).

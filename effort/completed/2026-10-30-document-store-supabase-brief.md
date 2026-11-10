@@ -1,6 +1,7 @@
 # Document Store Supabase Provider — Brief
 
-**Active, dispatched; amended 2026-11-10 after AI Coding Engine review.** Recorded 2026-10-30 from a CA + AI Architect session, split
+**Completed 2026-11-10.** Shipped in `81ce07c`, with the architecture records in `e64e17b`. Recorded
+2026-10-30 from a CA + AI Architect session, split
 from the document storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, which is
 the kernel and the contract this provider implements. Third of four features of roadmap M-6,
 Document Storage: it provides `DocumentServer`, the shared store each app composes
@@ -308,6 +309,38 @@ refusal, the 405 namespace rename, and empty-only deletion all behave, once item
    The S3 protocol block stays removed.
 8. **The sign-out test.** The stage-session test now expects five sign-out requests, not seven.
    The production states the SDK change that caused it.
+
+## Closure (2026-11-10)
+
+Production by the AI Coding Engine in two rounds, the second after the amendment "After production
+review"; committed in `81ce07c`. Verified:
+
+- **Against local Supabase,** by the AI Architect: provisioning, run twice, and every provider
+  operation, unpatched: idempotent creates, listings, rename keeping name, creation time, and size,
+  read, link, and the 415, 405, and 409 refusals.
+- **The repository checks,** re-run by the AI Architect: guards, types, lint, formatting, and 201
+  tests, the two environment-dependent files excluded; `STYLE_AUDIT: PASS`.
+- **On stage,** by the CA: storage provisioning, `db-reset` with the storage reset and the policies,
+  the edge redeploy, and the stage contract test (1 passed), which includes the signed-out refusal.
+- **On stage,** by the AI Architect: the four edge functions `ACTIVE` with `verify_jwt`, OPTIONS 204,
+  GET 405, and build `0.1.1375+81ce07c`; the four namespaces as the contract declares them; and a
+  signed response carrying the stored content type and `X-Content-Type-Options: nosniff`, so the
+  gap item 4 of "After AI Coding Engine review" anticipated does not arise.
+
+The CA closed the brief on that evidence and his own use of Admin.
+
+Settled at closure:
+
+- **The CLI:** backlog B-44.
+- **Resumable uploads (TUS):** the field mapping brief, `effort/pending/2026-10-24-field-mapping-brief.md`,
+  design moment 6.
+- **Cron, secrets, the broker, and the sweep:** backlog B-42.
+- **The import node:** the field mapping brief.
+- **The customer role's storage access:** the Customer Portal brief,
+  `effort/pending/2026-10-08-customer-portal-brief.md`, Open 7.
+- **Showing a document that cannot upload:** the background tasks brief,
+  `effort/pending/2026-11-10-background-tasks-brief.md`.
+- **The CLI's `import_map` deprecation warning,** seen at the edge redeploy: backlog B-45.
 
 ## Design history
 
