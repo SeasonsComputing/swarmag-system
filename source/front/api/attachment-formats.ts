@@ -15,6 +15,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 AttachmentFormats  Format recognition and picker filters over the table.
 ├ recognize        A file's kind and content type, by its extension.
+├ contentTypes     Accepted content types for storage provisioning.
 └ accept           Picker filter for the given kinds.
 */
 
@@ -44,6 +45,11 @@ const ATTACHMENT_FORMATS: readonly AttachmentFormat[] = [
 
 /** Recognition and picker rules for Attachments. */
 export const AttachmentFormats = {
+  /** All accepted content types, without duplicates. */
+  contentTypes(): readonly string[] {
+    return [...new Set(ATTACHMENT_FORMATS.map(format => format.contentType))]
+  },
+
   /** The picker's accept string for the host's kinds: their content types and file extensions. */
   accept(kinds: readonly AttachmentKind[]): string {
     const formats = ATTACHMENT_FORMATS.filter(format => kinds.includes(format.kind))

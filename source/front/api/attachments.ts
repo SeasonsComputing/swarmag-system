@@ -14,6 +14,7 @@ catalog of namespaces and buckets is private to this module.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Attachments      Attachment operations over the inbox and the server.
+├ namespaces     Read-only provisioned namespace catalog.
 ├ stage          Store a recognized file in staging.
 ├ discard        Remove staged documents only.
 ├ link           Mint a link from the inbox or the server.
@@ -30,7 +31,7 @@ AttachmentTopic  Placement for one topic's notes.
 └ place          Place a record's staged documents in its topic's bucket.
 */
 
-import { notValid, toId, when } from '@core/std'
+import { immutable, notValid, toId, when } from '@core/std'
 import type { Id } from '@core/std'
 import { ApiError, DocumentAddresses } from '@core/stdx'
 import type {
@@ -79,6 +80,14 @@ const SERVICES = toId('019a6000-0000-7000-8000-000000000009')
 
 /** Attachment operations over the inbox and the server, composed once in api.ts. */
 export class Attachments {
+  /** The four placed namespaces, shared read-only with storage provisioning. */
+  static readonly namespaces = immutable([
+    immutable({ id: CUSTOMERS, name: 'Customers' }),
+    immutable({ id: USERS, name: 'Users' }),
+    immutable({ id: JOBS, name: 'Jobs' }),
+    immutable({ id: LIBRARY, name: 'Library' })
+  ])
+
   readonly Customers: AttachmentTopic
   readonly Users: AttachmentTopic
   readonly Jobs: AttachmentTopic

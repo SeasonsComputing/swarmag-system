@@ -35,12 +35,12 @@ Config.init({
     ({
       LOCAL_DB_NAME: 'attachments-app',
       DOCUMENT_INBOX_DB_NAME: 'attachments-inbox',
-      DOCUMENT_SERVER_DB_NAME: 'attachments-server'
+      ATTACHMENTS_TEST_SERVER: 'attachments-server'
     })[key],
   fail: message => {
     throw new Error(message)
   }
-}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'DOCUMENT_SERVER_DB_NAME'])
+}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'ATTACHMENTS_TEST_SERVER'])
 const { makeAttachmentSave } = await import('@front/app/shell/make-attachment-save.ts')
 Object.assign(globalThis, {
   IDBCursor,
@@ -69,7 +69,7 @@ Object.defineProperty(navigator, 'storage', {
 const Inbox = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
   linkLifetime: 5
 })
-const Server = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_SERVER_DB_NAME'), {
+const Server = new DocumentStore(new IndexedDbDocumentProvider('ATTACHMENTS_TEST_SERVER'), {
   linkLifetime: 5
 })
 const Attachments = new AttachmentsClass(Inbox, Server)

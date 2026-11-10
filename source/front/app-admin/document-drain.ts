@@ -20,7 +20,15 @@ import { ApiError } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 
 /** Admin's document upload loop, started once after bootstrap. */
-export const DocumentDrain = { start: drainDocuments }
+export const DocumentDrain = {
+  async start(): Promise<void> {
+    if (started) return
+    started = true
+    await drainDocuments()
+  }
+}
+
+let started = false
 
 const DRAIN_INTERVAL = 60_000
 const MAX_DRAIN_DELAY = 15 * DRAIN_INTERVAL
@@ -28,7 +36,7 @@ let drainDelay = DRAIN_INTERVAL
 
 async function drainDocuments(): Promise<void> {
   await navigator.locks.request('document-drain', { ifAvailable: true }, async lock => {
-    if (!lock) return
+    if (!lock || !api.SessionState.isPrepared()) return
     try {
       await api.Attachments.drain()
       drainDelay = DRAIN_INTERVAL
@@ -37,5 +45,5 @@ async function drainDocuments(): Promise<void> {
       drainDelay = Math.min(drainDelay * 2, MAX_DRAIN_DELAY)
     }
   })
-  setTimeout(() => void drainDocuments(), drainDelay)
+  setTimeout(() => drainDocuments(), drainDelay)
 }

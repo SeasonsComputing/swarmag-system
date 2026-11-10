@@ -16,7 +16,6 @@ Deno.test('DocumentDrain backs off only drain failures and surfaces lock and pro
     SUPABASE_PUBLIC_KEY: 'drain-public-key',
     SUPABASE_CLIENT_MODE: 'edge',
     DOCUMENT_INBOX_DB_NAME: 'drain-test-inbox',
-    DOCUMENT_SERVER_DB_NAME: 'drain-test-server',
     LOCAL_DB_NAME: 'drain-test'
   }
   Config.init({
@@ -28,6 +27,10 @@ Deno.test('DocumentDrain backs off only drain failures and surfaces lock and pro
   const { api } = await import('@front/api/api.ts')
   const { DocumentDrain } = await import('@front/app-admin/document-drain.ts')
   const drain = api.Attachments.drain
+  const prepared = api.SessionState.isPrepared
+  let ready = false
+  api.SessionState.isPrepared = () => ready
+  let scheduledPass: (() => Promise<void>) | undefined
   const timeout = globalThis.setTimeout
   const locks = Object.getOwnPropertyDescriptor(navigator, 'locks')
   const delays: number[] = []
@@ -50,7 +53,8 @@ Deno.test('DocumentDrain backs off only drain failures and surfaces lock and pro
       }
     }
   })
-  globalThis.setTimeout = ((_callback: TimerHandler, delay?: number) => {
+  globalThis.setTimeout = ((callback: TimerHandler, delay?: number) => {
+    scheduledPass = callback as () => Promise<void>
     delays.push(delay!)
     return 1
   }) as typeof setTimeout
@@ -61,32 +65,47 @@ Deno.test('DocumentDrain backs off only drain failures and surfaces lock and pro
   }
   try {
     await DocumentDrain.start()
+    assertEquals(calls, 0)
     assertEquals(delays, [60_000])
+    ready = true
+    await DocumentDrain.start()
+    assertEquals(calls, 0)
+    await scheduledPass!()
+    assertEquals(calls, 1)
+    assertEquals(delays, [60_000, 60_000])
     failure = new AggregateError([new ApiError('Upload failed', 503)])
-    await DocumentDrain.start()
+    await scheduledPass!()
     failure = new ApiError('List failed', 503)
-    await DocumentDrain.start()
-    await DocumentDrain.start()
-    await DocumentDrain.start()
-    await DocumentDrain.start()
-    assertEquals(delays, [60_000, 120_000, 240_000, 480_000, 900_000, 900_000])
+    await scheduledPass!()
+    await scheduledPass!()
+    await scheduledPass!()
+    await scheduledPass!()
+    assertEquals(delays, [60_000, 60_000, 120_000, 240_000, 480_000, 900_000, 900_000])
     available = false
     const beforeSkip = calls
-    await DocumentDrain.start()
+    await scheduledPass!()
     assertEquals(calls, beforeSkip)
     assertEquals(delays.at(-1), 900_000)
     available = true
     failure = undefined
-    await DocumentDrain.start()
+    await scheduledPass!()
     assertEquals(delays.at(-1), 60_000)
+    ready = false
+    const beforeLogout = calls
+    await scheduledPass!()
+    assertEquals(calls, beforeLogout)
+    ready = true
+    await DocumentDrain.start()
+    assertEquals(calls, beforeLogout)
     const scheduled = delays.length
     failure = new TypeError('Programming error')
-    await assertRejects(() => DocumentDrain.start(), TypeError, 'Programming error')
+    await assertRejects(() => scheduledPass!(), TypeError, 'Programming error')
     assertEquals(delays.length, scheduled)
     lockFailure = new TypeError('Locks unavailable')
-    await assertRejects(() => DocumentDrain.start(), TypeError, 'Locks unavailable')
+    await assertRejects(() => scheduledPass!(), TypeError, 'Locks unavailable')
     assertEquals(delays.length, scheduled)
   } finally {
+    api.SessionState.isPrepared = prepared
     api.Attachments.drain = drain
     globalThis.setTimeout = timeout
     if (locks) Object.defineProperty(navigator, 'locks', locks)

@@ -13,7 +13,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 api                          Shared API namespace for UX applications.
 ├ DocumentInbox              Device attachment inbox.
-├ DocumentServer             Shared-store stand-in.
+├ DocumentServer             Shared Supabase document store.
 ├ Attachments                Staging, placement, and document access.
 ├ Auth                       Passwordless authentication and session observation.
 ├ AppState                   Persistent state.
@@ -34,6 +34,8 @@ import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
 import { DocumentStore } from '@core/cli/docstore-client.ts'
 import { IndexedDbDocumentProvider } from '@core/cli/indexeddb-docstore-provider.ts'
 import { makeCrudSupabaseClient, makeJunctionSupabaseClient } from '@core/cli/make-supabase-client.ts'
+import { SupabaseDocumentProvider } from '@core/cli/supabase-docstore-provider.ts'
+import { Supabase } from '@core/db/supabase.ts'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Facet } from '@domain/abstractions/common.ts'
@@ -71,8 +73,8 @@ const DocumentInbox = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_
   linkLifetime: LINK_LIFETIME
 })
 
-/** The shared document store; an IndexedDB stand-in until the Supabase provider replaces it. */
-const DocumentServer = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_SERVER_DB_NAME'), {
+/** The shared document store, authorized by Storage policies. */
+const DocumentServer = new DocumentStore(new SupabaseDocumentProvider(Supabase.client), {
   linkLifetime: LINK_LIFETIME
 })
 
@@ -80,11 +82,10 @@ const DocumentServer = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT
 export const api = {
   /** Passwordless authentication and session observation. */
   Auth: AuthSupabaseClient,
-  /** The device's inbox document store. */
+
+  /** Document staging, placement and access over the two stores. */
   DocumentInbox,
-  /** The shared document store. */
   DocumentServer,
-  /** Staging, placement, and document access over the two stores. */
   Attachments: new Attachments(DocumentInbox, DocumentServer),
 
   /** Persistent and ephemoral state. */

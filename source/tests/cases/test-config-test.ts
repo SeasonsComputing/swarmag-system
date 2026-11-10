@@ -15,7 +15,6 @@ Deno.test('shared test configuration registers the local database before API imp
     SUPABASE_PUBLIC_KEY: 'bootstrap-public-key',
     SUPABASE_CLIENT_MODE: 'edge',
     DOCUMENT_INBOX_DB_NAME: 'test-config-test-inbox',
-    DOCUMENT_SERVER_DB_NAME: 'test-config-test-server',
     LOCAL_DB_NAME: 'bootstrap-test'
   }
   const originalGet = DenoProvider.prototype.get

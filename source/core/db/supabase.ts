@@ -11,9 +11,10 @@ maps common PostgREST error codes to HTTP-style status codes.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Supabase              Supabase client manager.
-├ client()            Return the singleton Supabase client.
-└ errorToStatus(...)  Map PostgREST error codes to HTTP-style status codes.
+Supabase               Supabase client manager.
+├ client()             Return the singleton Supabase client.
+├ storageRequest(...)  Authenticated Storage REST for SDK gaps.
+└ errorToStatus(...)   Map PostgREST error codes to HTTP-style status codes.
 */
 
 import { Config } from '@core/cfg/config.ts'
@@ -46,6 +47,23 @@ export class Supabase {
 
     Supabase.#cache = createClient(url, key, { auth })
     return Supabase.#cache
+  }
+
+  /** Issue a Storage API request with the given client's current caller session. */
+  static async storageRequest(
+    client: SupabaseClient,
+    path: string,
+    init: RequestInit
+  ): Promise<Response> {
+    const { data, error } = await client.auth.getSession()
+    if (error) throw error
+    const headers = new Headers(init.headers)
+    headers.set('apikey', Config.get('SUPABASE_PUBLIC_KEY'))
+    headers.set(
+      'authorization',
+      `Bearer ${data.session?.access_token ?? Config.get('SUPABASE_PUBLIC_KEY')}`
+    )
+    return await fetch(`${Config.get('SUPABASE_RDBMS_URL')}/storage/v1/${path}`, { ...init, headers })
   }
 
   /** Map postgrest error code to status */

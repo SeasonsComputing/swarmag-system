@@ -30,6 +30,7 @@ type SupabaseProjectsResponse = {
 
 const ROOT = Deno.cwd().replaceAll('\\', '/')
 const SCHEMA_PATH = `${ROOT}/source/domain/schema/schema.sql`
+const STORAGE_POLICIES_PATH = `${ROOT}/source/back/storage/storage-policies.sql`
 const MIGRATIONS_DIR = `${ROOT}/source/back/migrations`
 const PROJECT_REF_PATH = `${ROOT}/supabase/.temp/project-ref`
 
@@ -148,6 +149,7 @@ const main = async (): Promise<void> => {
   const target = parseTarget()
 
   await requireFile(SCHEMA_PATH)
+  await requireFile(STORAGE_POLICIES_PATH)
 
   const project = await findTargetProject(target)
   const linkedRef = await linkedProjectRef()
@@ -166,6 +168,8 @@ const main = async (): Promise<void> => {
   console.log('')
   console.log('Applying schema.sql through Supabase CLI...')
   await commandText('supabase', ['db', 'query', '--linked', '--file', SCHEMA_PATH])
+
+  await commandText('supabase', ['db', 'query', '--linked', '--file', STORAGE_POLICIES_PATH])
 
   console.log('DB_GENESIS=PASS')
 }

@@ -24,7 +24,6 @@ Deno.test('stage session authenticates the public API and cleans up only its ses
     SUPABASE_PUBLIC_KEY: 'offline-public-key',
     SUPABASE_CLIENT_MODE: 'edge',
     DOCUMENT_INBOX_DB_NAME: 'stage-session-test-inbox',
-    DOCUMENT_SERVER_DB_NAME: 'stage-session-test-server',
     LOCAL_DB_NAME: 'stage-session-test',
     SUPABASE_SERVICE_ROLE_KEY: 'offline-service-key'
   }
@@ -187,7 +186,10 @@ Deno.test('stage session authenticates the public API and cleans up only its ses
       assertEquals(await Api.Auth.getSession(), null)
     })
 
-    assertEquals(LOGOUT_SCOPES, ['local', 'local', 'local', 'local', 'local', 'local', 'local'])
+    // SDK 2.119.0 removes the local session before sending signOut's revocation request.
+    // The two follow-up cleanup calls therefore no longer issue remote logout requests.
+    assertEquals(LOGOUT_SCOPES.length, 5)
+    assertEquals([...new Set(LOGOUT_SCOPES)], ['local'])
     assert(
       CALLS.filter(call => call.key === Values.SUPABASE_SERVICE_ROLE_KEY)
         .every(call => call.path === '/auth/v1/admin/generate_link')

@@ -27,7 +27,6 @@ Config.init(new DenoProvider(), [
   'SUPABASE_PUBLIC_KEY',
   'SUPABASE_CLIENT_MODE',
   'DOCUMENT_INBOX_DB_NAME',
-  'DOCUMENT_SERVER_DB_NAME',
   'LOCAL_DB_NAME'
 ])
 
