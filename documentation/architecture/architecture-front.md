@@ -486,13 +486,12 @@ store many records. Each app is its own origin, so its databases are its own.
 - **Records of a domain abstraction** use `@core/cli/make-indexeddb-client.ts`, conforming to
   `ApiCrudContract` in `@core/stdx`.
 
-| Key                       | Database Name             | App      | Content                                                            |
-| ------------------------- | ------------------------- | -------- | ------------------------------------------------------------------ |
-| `LOCAL_DB_NAME`           | `swarmag-app-admin`       | Admin    | dashboard configuration, panel config, theme                       |
-| `LOCAL_DB_NAME`           | `swarmag-app-ops`         | Ops      | dashboard configuration, panel config, theme, job aggregates       |
-| `LOCAL_DB_NAME`           | `swarmag-app-customer`    | Customer | dashboard configuration, theme                                     |
-| `DOCUMENT_INBOX_DB_NAME`  | `swarmag-docstore-inbox`  | all      | the inbox: documents not yet uploaded                              |
-| `DOCUMENT_SERVER_DB_NAME` | `swarmag-docstore-server` | all      | `DocumentServer`'s IndexedDB stand-in, until the Supabase provider |
+| Key                      | Database Name            | App      | Content                                                      |
+| ------------------------ | ------------------------ | -------- | ------------------------------------------------------------ |
+| `LOCAL_DB_NAME`          | `swarmag-app-admin`      | Admin    | dashboard configuration, panel config, theme                 |
+| `LOCAL_DB_NAME`          | `swarmag-app-ops`        | Ops      | dashboard configuration, panel config, theme, job aggregates |
+| `LOCAL_DB_NAME`          | `swarmag-app-customer`   | Customer | dashboard configuration, theme                               |
+| `DOCUMENT_INBOX_DB_NAME` | `swarmag-docstore-inbox` | all      | the inbox: documents not yet uploaded                        |
 
 #### 9.5.2 Application Preferences
 

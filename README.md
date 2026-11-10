@@ -359,7 +359,7 @@ Where:
 - `{app}`: `admin` | `ops` | `customer` (optional — omit to return all apps).
 - `{target}`: `dev` | `stage` | `prod` (required).
 
-See [Architecture DevOps §14](documentation/architecture/architecture-devops.md#14-platform-target-listings) for output shape, error conditions, and naming conventions.
+See [Architecture DevOps §15](documentation/architecture/architecture-devops.md#15-platform-target-listings) for output shape, error conditions, and naming conventions.
 
 ### 4.5 Database
 

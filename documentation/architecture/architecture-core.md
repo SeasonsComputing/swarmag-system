@@ -801,7 +801,8 @@ an inbox an app may never fill.
 `Attachments`, composed once in `front/api/api.ts`, is the only code that places and drains
 documents. Its catalog of placements is private: module constants with fixed ids, which every store
 on every device shares, so a placed document has one address in the inbox and on the server,
-computable from the catalog and its owner's id with no lookup.
+computable from the catalog and its owner's id with no lookup. It exposes only the server's
+namespaces, read-only, to provisioning (architecture-devops §14).
 
 - **A topic per type that carries notes,** each with its own typed `place`, run when its record
   saves; staging is common to every topic. A composition without an id (a `Note`, a
@@ -813,7 +814,8 @@ computable from the catalog and its owner's id with no lookup.
   files until their record saves (§10.3).
 - **Namespaces divide by policy.** A namespace is the unit of placement and access: on the server,
   a Supabase bucket with its own storage policies. Company-wide documents, maintained in Admin and
-  read by everyone, share the `Library` namespace, a fixed bucket per topic.
+  read by every staff role, share the `Library` namespace, a fixed bucket per topic; what a
+  customer reads is the Customer Portal's.
 
 | Topic     | Namespace | Bucket            | Notes on                                                                                       |
 | --------- | --------- | ----------------- | ---------------------------------------------------------------------------------------------- |

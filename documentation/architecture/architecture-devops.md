@@ -35,6 +35,7 @@ source/devops/
     ├── app-customer-package-verify.sh
     ├── app-deploy.sh
     ├── app-deploy-auth-config.sh
+    ├── app-deploy-storage-config.sh
     ├── app-local.sh
     ├── app-ops-package.sh
     ├── app-ops-package-verify.sh
@@ -51,6 +52,8 @@ source/devops/
     ├── db-genesis-verify.ts
     ├── set-secret.ts
     ├── smoke-ux.ts
+    ├── storage-reset.ts
+    ├── storage-usage.ts
     └── validate-secrets.ts
 ```
 
@@ -130,7 +133,6 @@ VITE_SUPABASE_CLIENT_MODE=browser
 VITE_SERVICE_WORKER_ENABLED=true
 VITE_LOCAL_DB_NAME=swarmag-app-admin
 VITE_DOCUMENT_INBOX_DB_NAME=swarmag-docstore-inbox
-VITE_DOCUMENT_SERVER_DB_NAME=swarmag-docstore-server
 ```
 
 The packaging script resolves `__SECRET__` values from `secrets.jsonc` before
@@ -160,7 +162,6 @@ includes:
 - `VITE_SERVICE_WORKER_ENABLED`
 - `VITE_LOCAL_DB_NAME`
 - `VITE_DOCUMENT_INBOX_DB_NAME`
-- `VITE_DOCUMENT_SERVER_DB_NAME`
 
 ### 4.3 Security Rules
 
@@ -513,7 +514,7 @@ tests before deployment; inspect the working tree and identify the revision
 being deployed. The edge task does not run these checks or enforce a clean tree.
 
 Resolve and confirm the intended target through the repository's target listing
-task (§14.3). For stage:
+task (§15.3). For stage:
 
 ```bash
 deno task list-supabase-targets --target stage
@@ -612,18 +613,18 @@ package env or secret-registry dependency.
 `deno.jsonc` is the authoritative task registry. This section describes the
 supported task groups; individual task bodies remain in `deno.jsonc`.
 
-| Group         | Tasks                                                                |
-| ------------- | -------------------------------------------------------------------- |
-| Validation    | `check`, `check:guards`, `check:types`, `check:lint`, `test`, `lint` |
-| Formatting    | `fmt`, `fmt:check`                                                   |
-| Generators    | `gen:jwt-secret`, `gen:id-seeds`, `gen:ai-context`                   |
-| Guards        | `guard:*` tasks listed in Guard Inventory                            |
-| Database      | `db-reset`, `db-genesis`, `db-genesis-verify`                        |
-| Edge          | `edge-sync`, `edge-serve`, `edge-deploy`                             |
-| Packaging     | `app-{name}-package-{target}`, `app-{name}-package-{target}-verify`  |
-| Deployment    | `deploy`, `app-deploy-auth-config`, `ux-smoke`, `ux-stage-smoke`     |
-| Local servers | `app-dev-local`, `app-stage-local`, `app-style-guide-local`          |
-| Git hooks     | `hooks:install`                                                      |
+| Group         | Tasks                                                                                         |
+| ------------- | --------------------------------------------------------------------------------------------- |
+| Validation    | `check`, `check:guards`, `check:types`, `check:lint`, `test`, `lint`                          |
+| Formatting    | `fmt`, `fmt:check`                                                                            |
+| Generators    | `gen:jwt-secret`, `gen:id-seeds`, `gen:ai-context`                                            |
+| Guards        | `guard:*` tasks listed in Guard Inventory                                                     |
+| Database      | `db-reset`, `db-genesis`, `db-genesis-verify`, `storage-usage`                                |
+| Edge          | `edge-sync`, `edge-serve`, `edge-deploy`                                                      |
+| Packaging     | `app-{name}-package-{target}`, `app-{name}-package-{target}-verify`                           |
+| Deployment    | `deploy`, `app-deploy-auth-config`, `app-deploy-storage-config`, `ux-smoke`, `ux-stage-smoke` |
+| Local servers | `app-dev-local`, `app-stage-local`, `app-style-guide-local`                                   |
+| Git hooks     | `hooks:install`                                                                               |
 
 ## 11. Architectural Guards
 
@@ -731,9 +732,11 @@ deno task db-genesis-verify --target {dev|stage|prod}
 deno task db-reset --target {dev|stage|prod}
 ```
 
-`db-genesis` applies the full contents of `source/domain/schema/schema.sql` to the selected Supabase target. It does not run migrations.
+`db-genesis` applies the full contents of `source/domain/schema/schema.sql`, then
+`source/back/storage/storage-policies.sql`, to the selected Supabase target. It does not run migrations.
 `db-genesis-verify` checks the seeded auth user, public user row, seed table counts, and `user_has_access` RPC behavior without modifying schema or data.
-`db-reset` runs genesis first, then runs genesis verification for the same target.
+`db-reset` empties the provisioned Supabase buckets through the Storage API (a trigger refuses
+deleting Storage rows by SQL), runs genesis, then runs genesis verification for the same target.
 
 The selected target must exist and must print the resolved target identity before applying SQL. The operator must confirm the target before the schema is applied.
 
@@ -821,7 +824,7 @@ require separate CA action; authoring the schema and test setup does not run eit
 
 A stage test that requires a real session imports `source/tests/config/stage-config.ts`. Its runtime
 needs `SUPABASE_RDBMS_URL`, `SUPABASE_PUBLIC_KEY`, `SUPABASE_CLIENT_MODE`, `LOCAL_DB_NAME`,
-`DOCUMENT_INBOX_DB_NAME`, `DOCUMENT_SERVER_DB_NAME`, and the service key in standard Supabase
+`DOCUMENT_INBOX_DB_NAME`, and the service key in standard Supabase
 environment variable `SUPABASE_SERVICE_ROLE_KEY`. The stage entry point
 exposes that last value as Config name `SUPABASE_SERVICE_KEY`, matching the edge configuration alias.
 Supply values from the local process environment; no credential is committed and no environment-file
@@ -944,9 +947,46 @@ because the API does not return plaintext credentials. A target without
 `supabase/auth/{target}.jsonc` is intentionally not provisioned and fails
 without mutating hosted state.
 
-## 14. Platform Target Listings
+## 14. Supabase Storage Configuration
 
-### 14.1 Overview
+### 14.1 Ownership
+
+`DocumentServer`'s Supabase buckets are owned by this repository, as Auth's configuration is
+(§13.1); the Supabase dashboard is not an authoritative source. A per-target contract,
+`supabase/storage/{target}.jsonc`, declares the server's own settings, and a task applies it
+through the Storage API and reads back every value.
+
+### 14.2 What Is Provisioned
+
+Each namespace in `Attachments.namespaces` (`front/api/attachments.ts`) is a Supabase bucket with
+that namespace's id and name. Its allowed content types are `AttachmentFormats.contentTypes()`
+(`front/api/attachment-formats.ts`); its file size limit and public access are the contract's. The
+task imports those modules directly, never `api.ts`, so it needs no application configuration.
+Each fact therefore has one home: the catalog, the format table, or the contract.
+
+Runtime code never creates a Supabase bucket. The storage policies (`architecture-back.md` §4.7)
+grant no client the right to.
+
+### 14.3 Applying Storage Configuration
+
+```bash
+deno task app-deploy-storage-config --target {local|dev|stage|prod}
+```
+
+The task resolves the target (§15.3), creates or updates each namespace's Supabase bucket, and
+reads back every value it set. A target without `supabase/storage/{target}.jsonc` is not
+provisioned, and the task fails without changing hosted state.
+
+### 14.4 Reset and Usage
+
+`db-reset` empties the provisioned Supabase buckets through the Storage API before genesis, since
+genesis leaves stored objects behind and a trigger refuses deleting Storage rows by SQL
+(`storage-reset.ts`). `deno task storage-usage --target {dev|stage|prod}` reports storage used per
+target against the free tier's 1 GB.
+
+## 15. Platform Target Listings
+
+### 15.1 Overview
 
 Two scripts provide canonical platform topology queries. They are the single source of truth for target metadata across the devops layer. Other scripts consume their output rather than resolving platform topology independently.
 
@@ -957,7 +997,7 @@ Two scripts provide canonical platform topology queries. They are the single sou
 
 Both scripts write structured JSON to stdout and errors to stderr, then exit 1 on failure.
 
-### 14.2 Netlify Target Listing
+### 15.2 Netlify Target Listing
 
 **Task:**
 
@@ -1006,7 +1046,7 @@ swarmag-app-{app}-{target}
 
 A site missing from the Netlify account for any requested app/target pair is a hard failure.
 
-### 14.3 Supabase Target Listing
+### 15.3 Supabase Target Listing
 
 **Task:**
 
@@ -1053,7 +1093,7 @@ Supabase projects are matched by name. A project matches a target when its name 
 
 Exactly one project must match per target. Zero matches and multiple matches are both hard failures.
 
-### 14.4 Deno Task Group
+### 15.4 Deno Task Group
 
 Both scripts are registered under the `PLATFORM LISTINGS` task group in `deno.jsonc`:
 

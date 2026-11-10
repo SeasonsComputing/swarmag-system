@@ -18,6 +18,7 @@ The backend layer is intentionally minimal, consisting of forward-only migration
 ```text
 back/
 ├── migrations/          # Forward-only schema deltas and RLS policies
+├── storage/             # Storage policies for DocumentServer's namespaces
 └── supabase-edge/
     ├── config/          # Runtime configuration
     ├── functions/       # Flat orchestration functions (authoring layout)
@@ -285,6 +286,13 @@ Storage itself: a namespace is a Supabase bucket, whose settings are its placeme
 key prefix; and a document is an object, its name in the object's metadata. Storage policies on
 `storage.objects` and `storage.buckets` are its authorization, enforced by Supabase as RLS is on
 tables (§4.3), so no client code bypasses them.
+
+Every operation goes through the Storage API; no SQL writes Storage's tables. A rename is a copy of
+the object onto its own key with new metadata. The four namespaces are provisioned
+(`architecture-devops.md` §14), never created at runtime. The storage policies, in
+`back/storage/storage-policies.sql`, grant the staff roles reading and writing in those namespaces.
+`db-genesis` applies them after `schema.sql`, whose policies sit beside their own tables, while
+Storage's tables are Supabase's.
 
 ## 5. Configuration Management
 
