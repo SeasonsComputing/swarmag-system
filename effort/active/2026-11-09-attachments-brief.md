@@ -91,8 +91,9 @@ no editor at all.
    }
    ```
 
-7. **The NotesEditor** has two tabs, Note and Attachments with their count; the notes list shows a
-   paperclip on a note with attachments. Add files by picker or drop, with no second step; a row
+7. _[Revised by the amendment "Drop withdrawn".]_ **The NotesEditor** has two tabs, Note and
+   Attachments with their count; the notes list shows a paperclip on a note with attachments. Add
+   files by picker~~ or drop~~, with no second step; a row
    shows icon, name, and size, opens the document, renames, and removes after confirmation. An
    optional `attachmentKinds` limits what a host accepts.
 8. _[Revised by the amendment "After AI Coding Engine review", item 5.]_ **Accepted files** come
@@ -193,8 +194,9 @@ and requests persistent storage.
        byte.~~
      - **Formats that run in a browser are never accepted:** SVG, HTML, and XML. Adding a format is
        a deliberate line in the table.
-     - **The picker and the drop agree:** `accept` narrows the picker to the host's kinds; a drop
-       passes recognition and the host's kinds.
+     - _[Withdrawn by the amendment "Drop withdrawn".]_ ~~**The picker and the drop agree:**
+       `accept` narrows the picker to the host's kinds; a drop passes recognition and the host's
+       kinds.~~
    - A URL field holds a URL with the schemes its Domain declares (decision 10), not an
      `https://` address alone.
 
@@ -212,6 +214,13 @@ and requests persistent storage.
    in `ux/` instead. `complete` may return the final record, and `makeAggregateSave` returns it.
    The change is additive, and `ux/shell/workbench/workbench-save.ts` is renamed
    `make-aggregate-save.ts`, the maker's file name (CONVENTIONS §10.1).
+
+## Amendments — 2026-11-09 — Drop withdrawn
+
+1. **The picker is the one way to add files.** Ops is mobile only, nobody drags files on a tablet,
+   and on the desktop choosing a file serves. A drop target also had to be styled as one and guard
+   the page against a missed drop, which opens the file in the tab and loses the draft. The drop
+   target is removed; it returns if acceptance shows it is needed.
 
 ## Design history
 
