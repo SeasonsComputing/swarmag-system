@@ -34,7 +34,8 @@ Admin and Ops.
 ## Presence and the inventory
 
 1. **Membership is presence.** A document is in the binder because it is in the `FieldBinder`
-   namespace. No table records the binder.
+   namespace, with one exception: the inventory itself (item 3), which sync copies like any other
+   document but which no one sees as an entry. No table records the binder.
 2. **The set of document ids is the version.** Documents are immutable, so a device is current when
    it holds exactly the server's ids; there is no counter to bump or compare.
 3. **The inventory is a JSON document in the binder,** holding what presence cannot: each entry's
@@ -56,7 +57,8 @@ Admin and Ops.
    `updatedAt`. Each change writes a new inventory document and removes the old one, as documents
    are immutable (CONVENTIONS §10.8); a device finds the current one by its name. Only the Field
    Binder workbench writes it. Two Admins editing at once is no different from any other record in
-   the system.
+   the system. The inventory is hidden: the workbench's Collection and Ops' binder screen list its
+   entries, never the inventory document.
 4. **A source is optional.** An SDS or a label has a URL; a manual is often the PDF that came in the
    box, with no URL at all.
 
@@ -77,24 +79,31 @@ its copy.
   status line ("Current · 24 documents"). It is built as one generic Helm action with a menu, which
   the background tasks brief (`effort/pending/2026-11-10-background-tasks-brief.md`) reuses.
 - **The workbench is a `Manager`** over `FieldBinderEntry`, Collection-Detail above its threshold and
-  Index-Detail below:
+  Index-Detail below, in the stock look:
   - **The Collection:** each entry's description, its source (a URL's host, or "Uploaded"), and
     whether its copy is current or failed.
-  - **New** is the add form: a description, and a source, either a URL to fetch or a file to
-    upload.
-  - **An entry's Detail:** the same form, with when it was fetched, and **Refresh** and **Open**.
+  - **All action takes place in the Detail.** New opens it empty; an entry opens it filled. Its
+    header is the sequence header with the title and **Save**.
   - **Remove** is the manager's confirmed delete.
-  - **Add from chemicals** is a collection action: it adds each chemical's `sdsUrl` and label URLs
-    not already in the binder. Chemicals do not change; their URL fields stay the source the UI
-    links to. It is the first collection action in use, so its acceptance verifies them (the Manager
-    brief's closure).
+- **The Detail's form** opens with a **Source** toggle group, **URL**, **Upload**, or **Chemical**,
+  because the source decides the rest of the form.
+  - **URL:** a URL to fetch, and a description.
+  - **Upload:** **Choose File** reveals the picker, as attachments do; the chosen file shows its
+    name and size. The description defaults from the filename.
+  - **Chemical:** a chemical, then one of its documents not already in the binder, its SDS or a
+    label. Picking one fills a read-only URL and a description from the chemical and the document,
+    so it is a URL entry no one had to type. Chemicals do not change; their URL fields stay the
+    source the UI links to.
+  - **The description is required,** and every source suggests one.
+  - **An entry's Detail** adds when its copy was made, and **Refresh** and **Open**. An entry whose
+    fetch failed takes an uploaded file in its place (scenario 5).
 - **A failed fetch shows here,** before a crew finds the gap.
 
 ## Scenarios
 
 | # | Scenario                                | Answer                                                          |
 | - | --------------------------------------- | --------------------------------------------------------------- |
-| 1 | A chemical's label and SDS              | URLs; added from chemicals, copied by fetch or upload           |
+| 1 | A chemical's label and SDS              | URLs; added from the chemical, copied by fetch or upload        |
 | 2 | A crew needs an SDS with no signal      | opened from the Field Binder in Ops                             |
 | 3 | A sprayer's manual that came in the box | added by hand, uploaded, with no URL                            |
 | 4 | A drone's manual published online       | added by hand from its URL, fetched                             |
@@ -108,8 +117,8 @@ its copy.
 1. **The server fetch.** Its progress and failures are a background task's, shown with the others
    (the CA, 2026-11-10). Where the fetch itself runs is open: a source's site rarely allows a
    browser to read its bytes.
-2. **The add form:** whether a description is required or defaults from the file, whether an entry
-   names the Chemical or Asset it serves, and whether several files upload at once.
+2. **An entry's Asset.** The form is settled but for one question: whether an entry names the Asset
+   it serves, as a manual serves a sprayer.
 3. **The `FieldBinder` namespace's provisioning:** it sits beside the attachments' namespaces on
    `DocumentServer`, and the storage configuration provisions it.
 
@@ -142,3 +151,6 @@ its copy.
   entry gained its own id, stable across refreshes, so the Field Binder's workbench is a `Manager`
   and a refresh is an update. Admin mirrors the binder too, for its onsite assessors and to prove
   the sync before Ops; the binder's open question 2, its shape, is answered by the inventory.
+- **2026-11-10, the workbench.** "Add from chemicals" was first a collection action, adding every
+  chemical document not already in the binder. It was withdrawn: the binder's documents arrive one
+  at a time, and the only bulk is the sync. A chemical became one of the Detail's three sources.
