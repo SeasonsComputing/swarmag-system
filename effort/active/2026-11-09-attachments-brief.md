@@ -26,7 +26,7 @@ no editor at all.
   supplied ids at every level, and `isUrl` / `expectUrl`.
 - **Records are created without an id until saved.** A new draft has no id; the client makers mint
   it inside `create`.
-- **`makeAggregateSave`** (`ux/shell/workbench/workbench-save.ts`): `create`, `update`, and
+- **`makeAggregateSave`** (`ux/shell/workbench/make-aggregate-save.ts`): `create`, `update`, and
   `complete(record, draft)`, which receives the persisted record, its id included. A failed
   `complete` is retried against the pending record. The Service Manager uses it; the other hosts
   do not yet.
@@ -133,7 +133,8 @@ Discarding a nested Note or Site drops its references; its staged documents are 
 
 _[Extended by the amendment "After AI Coding Engine review", item 4.]_
 
-**Unchanged:** everything outside `front/` and its tests: `core/`, `ux/`, `domain/`, `back/`.
+_[Revised by the amendment "After production review", item 2.]_ **Unchanged:** everything
+outside `front/` and its tests: `core/`, `ux/`, `domain/`, `back/`.
 
 **Not in this brief:**
 
@@ -184,17 +185,33 @@ and requests persistent storage.
 
      - **Every kind is inferred,** `map` included: `image/tiff` is a map's alone, so a GeoTIFF is
        never taken for a photo. A file in no kind is refused with a message.
-     - **The bytes decide, not `file.type`,** which the browser guesses from the extension and
-       sometimes leaves empty (HEIC on Windows). A binary format matches its signature: PDF
-       `%PDF-`, JPEG `FF D8 FF`, PNG `89 50 4E 47`, TIFF `II*\0` or `MM\0*`, HEIC/HEIF and WebP
-       their container headers. A text format matches its extension (`.txt`, `.md`, `.json`) and
-       decodes as UTF-8 with no NUL byte.
+     - _[Withdrawn by the amendment "After production review", item 1.]_ ~~**The bytes decide,
+       not `file.type`,** which the browser guesses from the extension and sometimes leaves empty
+       (HEIC on Windows). A binary format matches its signature: PDF `%PDF-`, JPEG `FF D8 FF`, PNG
+       `89 50 4E 47`, TIFF `II*\0` or `MM\0*`, HEIC/HEIF and WebP their container headers. A text
+       format matches its extension (`.txt`, `.md`, `.json`) and decodes as UTF-8 with no NUL
+       byte.~~
      - **Formats that run in a browser are never accepted:** SVG, HTML, and XML. Adding a format is
        a deliberate line in the table.
      - **The picker and the drop agree:** `accept` narrows the picker to the host's kinds; a drop
        passes recognition and the host's kinds.
    - A URL field holds a URL with the schemes its Domain declares (decision 10), not an
      `https://` address alone.
+
+## Amendments — 2026-11-09 — After production review
+
+1. **A file is recognized by its extension.** The format table gives each accepted format its
+   kind, its content type, and its extensions; a file whose extension no entry owns is refused.
+   A document is stored, and opens, with the table's content type, never with what its bytes might
+   be, so a disguised file cannot run: an HTML file named `.pdf` opens as a PDF and fails. Checking
+   signatures guarded against what the assigned type already prevents, so it is withdrawn, with
+   the UTF-8 check on text. A mislabeled file is found when it is opened, not when it is attached.
+2. **The final record comes back from completion** (the escalation amendment "After AI Coding
+   Engine review", item 4, foresaw). The production worked around `makeAggregateSave` returning the
+   record written before `complete` by overwriting that object in place; the CA approved the change
+   in `ux/` instead. `complete` may return the final record, and `makeAggregateSave` returns it.
+   The change is additive, and `ux/shell/workbench/workbench-save.ts` is renamed
+   `make-aggregate-save.ts`, the maker's file name (CONVENTIONS §10.1).
 
 ## Design history
 

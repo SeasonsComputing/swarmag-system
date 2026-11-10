@@ -130,6 +130,7 @@ VITE_SUPABASE_CLIENT_MODE=browser
 VITE_SERVICE_WORKER_ENABLED=true
 VITE_LOCAL_DB_NAME=swarmag-app-admin
 VITE_DOCUMENT_INBOX_DB_NAME=swarmag-docstore-inbox
+VITE_DOCUMENT_SERVER_DB_NAME=swarmag-docstore-server
 ```
 
 The packaging script resolves `__SECRET__` values from `secrets.jsonc` before
@@ -159,6 +160,7 @@ includes:
 - `VITE_SERVICE_WORKER_ENABLED`
 - `VITE_LOCAL_DB_NAME`
 - `VITE_DOCUMENT_INBOX_DB_NAME`
+- `VITE_DOCUMENT_SERVER_DB_NAME`
 
 ### 4.3 Security Rules
 
@@ -818,8 +820,9 @@ administrator `test-admin@swarmag.com` and its fixed ID. Genesis and live stage 
 require separate CA action; authoring the schema and test setup does not run either operation.
 
 A stage test that requires a real session imports `source/tests/config/stage-config.ts`. Its runtime
-needs `SUPABASE_RDBMS_URL`, `SUPABASE_PUBLIC_KEY`, `SUPABASE_CLIENT_MODE`, `LOCAL_DB_NAME`, and the
-service key in standard Supabase environment variable `SUPABASE_SERVICE_ROLE_KEY`. The stage entry point
+needs `SUPABASE_RDBMS_URL`, `SUPABASE_PUBLIC_KEY`, `SUPABASE_CLIENT_MODE`, `LOCAL_DB_NAME`,
+`DOCUMENT_INBOX_DB_NAME`, `DOCUMENT_SERVER_DB_NAME`, and the service key in standard Supabase
+environment variable `SUPABASE_SERVICE_ROLE_KEY`. The stage entry point
 exposes that last value as Config name `SUPABASE_SERVICE_KEY`, matching the edge configuration alias.
 Supply values from the local process environment; no credential is committed and no environment-file
 loader is added. Client mode for these CLI tests must be `edge`; the stage entry point fast-fails on any
