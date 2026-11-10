@@ -9,6 +9,12 @@
   min-inline-size: 0;
 }
 
+[data-shell='notes-editor'] [data-shell='collection-panel-body'] {
+  block-size: auto;
+  max-block-size: calc(var(--sa-touch-target-sm) * 5);
+  min-block-size: calc(var(--sa-touch-target-sm) * 2.5);
+}
+
 [data-shell='note-content'] {
   position: relative;
 }
