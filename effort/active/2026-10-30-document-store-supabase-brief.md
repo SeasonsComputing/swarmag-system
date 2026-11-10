@@ -171,7 +171,7 @@ task applies it and reads back every value. Nothing of this exists for storage: 
 
 ## Checks
 
-_[Revised by the amendment "After AI Coding Engine review", item 4.]_ **Before production,** the AI Coding Engine verifies against stage: that listing returns
+_[Revised by the amendment "After AI Coding Engine review", item 4, and "After scope review", item 2.]_ **Before production,** the AI Coding Engine verifies against stage: that listing returns
 `user_metadata`; whether a Supabase bucket can be renamed (if not, a namespace keeps its name in a
 marker object, as a bucket does); and that a signed URL serves the stored content type with
 `X-Content-Type-Options: nosniff`.
@@ -205,7 +205,7 @@ Supabase, 2026-11-10, settled both.
 3. **Names come from `info`, not from listings.** Neither `list` nor `listV2` returns
    `user_metadata`; `info` does. `list` and `find` page the parent (100 per page) and read each
    object's name with `info`. Nothing in M-6 lists the server; the sweep and the CLI bear the cost.
-4. **Headers.** A signed URL serves the stored content type. Local Supabase sends no
+4. _[Revised by the amendment "After scope review", item 2.]_ **Headers.** A signed URL serves the stored content type. Local Supabase sends no
    `X-Content-Type-Options: nosniff`; before production, one request against stage shows whether
    hosted Supabase adds it. If it does not, the CA accepts the gap: a type the format table
    assigned is never one a browser renders as a page.
@@ -215,11 +215,29 @@ Supabase, 2026-11-10, settled both.
      `front/app-admin/app.tsx` joins the scope.
    - **`DOCUMENT_SERVER_DB_NAME` retires from the test configuration and fixtures** too.
    - **Every listing paginates,** for counts, lookup, deletion, reset, and the usage report.
-   - **The contract tests gain a stage form** that works within the provisioned namespaces and
+   - _[Revised by the amendment "After scope review", item 3.]_ **The contract tests gain a stage form** that works within the provisioned namespaces and
      removes what it writes, in place of creating and deleting arbitrary namespaces.
    - **The architecture records lead the code.** `architecture-core.md` §10.4 is reconciled:
      `Library` is read by every staff role until the Customer Portal's rules (M-10), and the
      catalog is private but for the namespaces it exposes, read-only, to provisioning.
+
+## Amendment — 2026-11-10 — After scope review
+
+1. **The architecture records are written,** in `e64e17b`, and the production builds to them; a
+   need for them to say otherwise is an escalation, not an edit the production makes.
+2. **The hosted header check comes at provisioning,** not before production: a signed response on
+   stage needs an object in a provisioned Supabase bucket. Right after the CA runs
+   `app-deploy-storage-config` against stage, and before the CA's acceptance in Admin, one signed
+   response is inspected for its content type and `X-Content-Type-Options: nosniff`; a missing
+   header is the gap item 4 of "After AI Coding Engine review" accepts.
+3. **Denied access is tested signed out.** The stage contract tests show the policies refusing a
+   caller with no session. A customer-role caller would need a second seeded identity, a change to
+   `schema.sql` this brief does not make; the customer's case comes with the Customer Portal's
+   rules (roadmap M-10).
+4. **A marker is an empty `text/plain` object,** a type the format table accepts, so a Supabase
+   bucket's allowed types admit it. Markers stay out of counts and listings.
+5. **A rename keeps `createdAt`.** The spike showed the object's creation time unchanged after the
+   copy; the production verifies it.
 
 ## Design history
 
