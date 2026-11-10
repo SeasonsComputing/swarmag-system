@@ -786,10 +786,11 @@ an inbox an app may never fill.
 - **A drain takes owners' buckets only and keeps the address.** It copies each document in an
   owner's bucket to `DocumentServer` at the same address, then clears it from the inbox, so a
   record saved before upload is already correct after it. The `Staging` namespace never drains,
-  so a bucket on the server holds only documents a saved record refers to.
+  so a bucket on the server holds only documents a saved record refers to. A drain cut short
+  repeats safely: copying a document again returns the one already there.
 - **Each app drains its own way.** The inbox knows nothing of apps.
-  - **Admin:** a background loop in the page, draining as items arrive while the app is open; what
-    is left waits for the next session.
+  - **Admin:** a background loop its root starts, draining while the app is open, one tab at a
+    time; what is left waits for the next session.
   - **Ops:** the job upload, beside the log upload (§9.3). Photos travel with the job clone and
     drain at base, a deliberate act that qualifies the connection first, on wi-fi by default, since
     the data plan is the worker's.
@@ -797,7 +798,7 @@ an inbox an app may never fill.
 
 ### 10.4 The Catalog
 
-`Attachments`, a singleton in `front/api` beside `AppState`, is the only code that places
+`Attachments`, composed once in `front/api/api.ts`, is the only code that places and drains
 documents. Its catalog of placements is private: module constants with fixed ids, which every store
 on every device shares, so a placed document has one address in the inbox and on the server,
 computable from the catalog and its owner's id with no lookup.

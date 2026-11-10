@@ -267,11 +267,11 @@ Returns a display title derived from the job's current status and available phas
 
 #### 7.2.4 Document Storage
 
-| Singleton            | Purpose                                                                        |
-| -------------------- | ------------------------------------------------------------------------------ |
-| `api.Attachments`    | Stages and places documents over the document stores (architecture-core §10.4) |
-| `api.DocumentInbox`  | The device's inbox document store                                              |
-| `api.DocumentServer` | The shared document store                                                      |
+| Singleton            | Purpose                                                        |
+| -------------------- | -------------------------------------------------------------- |
+| `api.Attachments`    | Stages, places, and drains documents (architecture-core §10.4) |
+| `api.DocumentInbox`  | The device's inbox document store                              |
+| `api.DocumentServer` | The shared document store                                      |
 
 ### 7.3 Provided Infrastructure
 
