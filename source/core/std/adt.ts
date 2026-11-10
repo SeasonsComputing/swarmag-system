@@ -43,3 +43,6 @@ export const djb2hash = (str: string): string => {
   }
   return hash.toString(36)
 }
+
+/** Create an immutable (frozen) copy of an object. */
+export const immutable = <T>(o: T): Readonly<T> => Object.freeze(o)
