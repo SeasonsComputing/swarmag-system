@@ -1,6 +1,6 @@
 # Manager — Brief
 
-**Active, 2026-11-10; for the AI Coding Engine's review.** An enabler of roadmap M-6, ahead of its
+**Active, dispatched; amended 2026-11-10 after AI Coding Engine review.** An enabler of roadmap M-6, ahead of its
 fourth feature, the Field Binder (`effort/active/2026-11-04-field-binder-brief.md`), whose workbench
 is the first Collection-Detail manager over items that are not domain records. Foundation mode: it
 changes `ux/`, locked since 2026-10-21, and the CA authorized that crossing in conversation on
@@ -68,7 +68,8 @@ All in `source/ux/shell/workbench/`:
 
    The field is optional; a manager without it presents New alone, as every manager does today.
 
-3. **`AbstractionManager` is a Manager of domain records.** Its files keep their symbols, narrowed
+3. _[Extended by the amendment "After AI Coding Engine review", item 1.]_ **`AbstractionManager`
+   is a Manager of domain records.** Its files keep their symbols, narrowed
    to `Instantiable`, and its component renders `<Manager {...props} />`. No consumer changes.
 
    ```ts
@@ -121,9 +122,20 @@ threshold.
 
 ## Records
 
-The AI Architect writes these before production:
+_[Revised by the amendment "After AI Coding Engine review", item 2.]_ The AI Architect writes these before production:
 
 - `CONVENTIONS.md` §17.1 and §17.2: `Manager` and `AbstractionManager` as its domain-record
   specialization, and collection actions. A governance change, committed separately.
 - `ux-design-archetypes.md` §3.2 and §6: the supporting library's row names `Manager`.
 - `architecture-front.md` §10.1.5 and `README.md`: the workbench names.
+
+## Amendment — 2026-11-10 — After AI Coding Engine review
+
+1. **`AbstractionActionConfirmation` keeps its symbol too,** narrowed like the others to
+   `ManagerActionConfirmation`, which the base exports beside `ManagerAction`. Every type
+   `abstraction-manager-contract.ts` exports today stays exported.
+2. **The records lead the production, and are fewer.** The review found them unwritten. Each
+   document keeps its own level: where it speaks of record managers, `AbstractionManager` stays.
+   The records are `CONVENTIONS.md` §17.2 (1.16), which names `Manager` beneath it, and the
+   supporting library's one row in `ux-design-archetypes.md` §6. §17.1, archetypes §2.3 and §3.2,
+   `architecture-front.md`, and `README.md` are unchanged.

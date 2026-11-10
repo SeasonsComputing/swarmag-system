@@ -371,14 +371,14 @@ Address fields are a form composition pattern, not a single compound field.
 
 The machinery this repository already builds for the common cases. Reach for the row before designing a surface. Where no row fits, the work is the special case the Pareto split exists to protect — say so and escalate rather than bending a row to cover it.
 
-| Task                                     | Use                             | Realizes                         |
-| ---------------------------------------- | ------------------------------- | -------------------------------- |
-| Edit one record from a set of records    | `AbstractionManager`            | Collection-Detail ⇄ Index-Detail |
-| Present a nested Collection at any depth | `DrillDown` + `CollectionPanel` | Index-Detail                     |
-| Capture or review Items one at a time    | `UiCollectionCursor`            | Collection-Cursor                |
-| Decompose a complex subject into steps   | `Wizard` + `PanelStep`          | Sequence                         |
-| Gate steps in order, in any workbench    | `createPanelSequence`           | Sequence                         |
-| A per-application configurable surface   | dashboard + widget catalog      | Chassis-Part                     |
+| Task                                     | Use                                                         | Realizes                            |
+| ---------------------------------------- | ----------------------------------------------------------- | ----------------------------------- |
+| Edit one item from a set                 | `AbstractionManager` for records; `Manager` for other items | Collection-Detail <--> Index-Detail |
+| Present a nested Collection at any depth | `DrillDown` + `CollectionPanel`                             | Index-Detail                        |
+| Capture or review Items one at a time    | `UiCollectionCursor`                                        | Collection-Cursor                   |
+| Decompose a complex subject into steps   | `Wizard` + `PanelStep`                                      | Sequence                            |
+| Gate steps in order, in any workbench    | `createPanelSequence`                                       | Sequence                            |
+| A per-application configurable surface   | dashboard + widget catalog                                  | Chassis-Part                        |
 
 Both workbenches host Steps. _Editor_ is reserved for a reusable form kind, such as a notes editor,
 or a drill-down editor inside a Step.
