@@ -1,24 +1,26 @@
 # Field Binder — Brief
 
-**Active, design input; chosen 2026-11-10 from roadmap M-6.** Recorded 2026-11-04 from a CA + AI Architect session, re-scoped from the
-document storage policy brief of 2026-10-31, whose attachments, upload, and server parts were folded
-into roadmap M-6's briefs (`effort/completed/2026-10-29-attachments-brief.md`,
+**Active, design input; chosen 2026-11-10 from roadmap M-6.** Recorded 2026-11-04 from a CA + AI
+Architect session, re-scoped from the document storage policy brief of 2026-10-31, whose
+attachments, upload, and server parts were folded into roadmap M-6's briefs
+(`effort/completed/2026-10-29-attachments-brief.md`,
 `effort/completed/2026-10-30-document-upload-brief.md`,
 `effort/completed/2026-10-30-document-store-supabase-brief.md`). What remained is the Field Binder: a
-first-class feature, its Admin workbench the last of M-6's features, after the Supabase provider,
-and its Ops side M-9's.
+first-class feature, its Admin workbench the last of M-6's features, and its Ops side M-9's. It
+depends on the Manager enabler (`effort/active/2026-11-10-manager-brief.md`).
 
 ## What triggered it
 
 Every truck carries an SDS binder by law, and a crew works from more than the law requires: a
 sprayer's manual, a drone's. Onsite there is often no signal. The documents a crew needs must be on
-the device before it leaves, and the system must know which ones they are.
+the device before it leaves, and the system must know which ones they are. An assessor onsite with
+an Admin tablet needs them too.
 
 ## The Field Binder
 
-Any document required by day-to-day onsite operations. The name is the same in every layer: the
-`FieldBinder` table, its namespace on `DocumentServer`, the `FieldBinder` store in Ops, and the
-Field Binder feature in Admin and Ops.
+Any document required by day-to-day onsite operations. The name is the same in every layer: its
+namespace on `DocumentServer`, the `FieldBinder` store on a device, and the Field Binder feature in
+Admin and Ops.
 
 - **Need decides what goes in it.** OSHA's Hazard Communication standard requires an SDS to be
   readily accessible to workers during their shift, and a pesticide's label is the law it is
@@ -29,48 +31,63 @@ Field Binder feature in Admin and Ops.
 - **Everything else leans on the browser's HTTP cache:** reference pages, avatars. It is best
   effort, and costs nothing to build.
 
-## Entries
+## Presence and the inventory
 
-The binder is a list of entries and one version for the whole set.
+1. **Membership is presence.** A document is in the binder because it is in the `FieldBinder`
+   namespace. No table records the binder.
+2. **The set of document ids is the version.** Documents are immutable, so a device is current when
+   it holds exactly the server's ids; there is no counter to bump or compare.
+3. **The inventory is a JSON document in the binder,** holding what presence cannot: each entry's
+   description and source.
 
-```ts
-/** A document day-to-day onsite operations require. */
-export type FieldBinderEntry = {
-  url?: string // the remote source, when there is one
-  description?: string
-  documentAddress?: string // the copy in the FieldBinder's namespace, once added
-}
-```
+   ```ts
+   /** One document in the Field Binder, stable across its refreshes. */
+   export type FieldBinderEntry = {
+     id: Id
+     description: string
+     url?: string // the remote source, when there is one
+     documentId: Id // the current copy in the FieldBinder namespace
+     createdAt: When
+     updatedAt: When
+   }
+   ```
 
-- **A source is optional.** An SDS or a label has a URL; a manual is often the PDF that came in the
-  box, with no URL at all. Neither `Asset` nor `AssetType` has a manual field, so manuals are added
-  by hand.
-- **Chemicals feed it by an explicit workflow,** "Add from chemicals", which copies each chemical's
-  `sdsUrl` and label URLs into the list, skipping any already there. Chemicals do not change: their
-  URL fields stay the source the UI links to.
-- **Three operations change it:** add, remove, and refresh a document, and each bumps the version.
-  Add and refresh are one act with two sources of bytes: the server fetches the entry's URL, or an
-  Admin uploads a file, when a source refuses or there is no URL. Either way the copy lands in the
-  FieldBinder's namespace on `DocumentServer`. Uploading into a URL field was rejected (it would
-  make the field URL-or-document); uploading into the binder is the same act as fetching.
-- **Freshness is deliberate.** An Admin refreshes an entry when its source publishes a revision; the
-  binder records no source versions of its own.
+   An entry keeps its id through every refresh; a refresh changes its `documentId` and
+   `updatedAt`. Each change writes a new inventory document and removes the old one, as documents
+   are immutable (CONVENTIONS §10.8); a device finds the current one by its name. Only the Field
+   Binder workbench writes it. Two Admins editing at once is no different from any other record in
+   the system.
+4. **A source is optional.** An SDS or a label has a URL; a manual is often the PDF that came in the
+   box, with no URL at all.
 
-## Admin: the workbench
+## Sync
 
-A workbench of its own, the Field Binder. It lists the binder's entries with their copies,
-failures, and actions: Add from chemicals, add by hand (a URL or an upload), refresh, and remove.
-The Chemical Manager is unchanged. A failed fetch shows here, before a crew finds the gap.
+`api.syncFieldBinder()` brings a device in step: it lists the server's ids, copies those the
+device lacks into its `FieldBinder` store, and drops those the server no longer has. Offline, the
+app finds a document through the inventory: the entry whose `url` is a chemical's `sdsUrl` holds
+its copy.
 
-## Ops: the mirror
+- **Admin** syncs from the Field Binder's Helm menu, so an assessor's tablet carries the binder
+  onsite, and the whole loop is proven before Ops is built.
+- **Ops** syncs in the background on load; a crew has no choice. That is M-9's.
 
-- **Ops mirrors it.** Preparing online, an Ops device compares its version with the binder's; when
-  behind, it mirrors the namespace into its `FieldBinder` store, copying the ids it lacks and
-  dropping those removed. Documents are immutable, so a revision is a new document and there is
-  nothing to reconcile. A device can say which version it carries.
-- **Offline, the app finds a copy through the binder:** the entry for a chemical's `sdsUrl` holds
-  the address of its copy.
-- **A crew opens the binder** and reads a document, offline.
+## Admin
+
+- **The Helm:** a `backpack` icon opens a menu: **Open Field Binder**, **Sync this device**, and a
+  status line ("Current · 24 documents"). It is built as one generic Helm action with a menu, which
+  the background tasks brief (`effort/pending/2026-11-10-background-tasks-brief.md`) reuses.
+- **The workbench is a `Manager`** over `FieldBinderEntry`, Collection-Detail above its threshold and
+  Index-Detail below:
+  - **The Collection:** each entry's description, its source (a URL's host, or "Uploaded"), and
+    whether its copy is current or failed.
+  - **New** is the add form: a description, and a source, either a URL to fetch or a file to
+    upload.
+  - **An entry's Detail:** the same form, with when it was fetched, and **Refresh** and **Open**.
+  - **Remove** is the manager's confirmed delete.
+  - **Add from chemicals** is a collection action: it adds each chemical's `sdsUrl` and label URLs
+    not already in the binder. Chemicals do not change; their URL fields stay the source the UI
+    links to.
+- **A failed fetch shows here,** before a crew finds the gap.
 
 ## Scenarios
 
@@ -81,14 +98,19 @@ The Chemical Manager is unchanged. A failed fetch shows here, before a crew find
 | 3 | A sprayer's manual that came in the box | added by hand, uploaded, with no URL                            |
 | 4 | A drone's manual published online       | added by hand from its URL, fetched                             |
 | 5 | A source blocks the fetch               | upload the file into the entry; the workbench shows the failure |
-| 6 | A source publishes a revision           | refresh the entry, which bumps the version                      |
+| 6 | A source publishes a revision           | refresh the entry; its id stays, its copy changes               |
 | 7 | An asset's seller's order               | not the binder's: an attachment on the asset's notes            |
+| 8 | An assessor onsite with no signal       | opened from the Field Binder on the Admin tablet                |
 
 ## Open
 
-1. The server fetch: where it runs and how it reports a failure to the workbench.
-2. The binder's shape: one record with its entries and version, or entries with the version beside
-   them.
+1. **The server fetch.** Its progress and failures are a background task's, shown with the others
+   (the CA, 2026-11-10). Where the fetch itself runs is open: a source's site rarely allows a
+   browser to read its bytes.
+2. **The add form:** whether a description is required or defaults from the file, whether an entry
+   names the Chemical or Asset it serves, and whether several files upload at once.
+3. **The `FieldBinder` namespace's provisioning:** it sits beside the attachments' namespaces on
+   `DocumentServer`, and the storage configuration provisions it.
 
 ## Design history
 
@@ -112,3 +134,10 @@ The Chemical Manager is unchanged. A failed fetch shows here, before a crew find
 - **2026-11-04, a brief of its own.** The document storage policy brief, recorded 2026-10-31, held
   the whole policy; its attachments, upload, and server parts were folded into M-6's briefs, and it
   was re-scoped to the Field Binder.
+- **2026-11-10, presence, not a table.** The `FieldBinder` table and the binder's version were
+  withdrawn: presence in the namespace is membership, and the set of document ids is the version.
+  What presence cannot hold, each entry's description and source, is a JSON inventory in the
+  binder; markdown was considered, but JSON parses for free and the app renders it for people. An
+  entry gained its own id, stable across refreshes, so the Field Binder's workbench is a `Manager`
+  and a refresh is an update. Admin mirrors the binder too, for its onsite assessors and to prove
+  the sync before Ops; the binder's open question 2, its shape, is answered by the inventory.
