@@ -107,8 +107,8 @@ and the architecture documents name storage only in passing.
    reading back.
 2. **Storage policies.** SQL on `storage.objects` and `storage.buckets`, a schema Supabase manages
    as it does `auth`, with the rename function beside them. M-6 starts from a baseline, signed-in
-   users only; the rules swarmAg's namespaces need are specified by the upload brief and
-   written here.
+   users only; the rules swarmAg's namespaces need, per namespace and bucket and by role, are
+   this brief's (design moment 8).
 3. **Genesis and reset.** `db-genesis` resets the database and leaves stored objects behind, so a
    stage reset leaves documents whose records no longer exist. A trigger on Supabase's storage
    tables refuses deletion by SQL, which would leave the files behind, so a storage reset empties
@@ -148,6 +148,8 @@ The production is Foundation mode and reads the DevOps context beside Base.
    bucket can be renamed.
 7. **The provider's store.** Whether `SupabaseDocumentProvider` takes anything naming its store, as
    the IndexedDB provider takes its database's config key; on the server there is one store.
+8. **Access rules.** Per namespace and bucket, which roles read and write it: Customers, Users,
+   Jobs, and `Library` (architecture-core §10.4). Moved from the upload brief 2026-11-10.
 
 ## Records
 
@@ -179,3 +181,5 @@ locked; the CA opens them for this brief's production, recorded here, as he does
   bytes, while items 4–6 waited on the broker, which no brief holds. The sweep of unreferenced
   documents is backlog B-42; items 4–6 arrive with whichever of the two comes first. Pointers to
   the attachments brief now name what each cites.
+- **2026-11-10, access moves here from the upload brief.** This brief writes the storage policies;
+  the upload brief builds against the IndexedDB stand-in, where no access rules exist.
