@@ -1,6 +1,6 @@
 # Document Upload — Brief
 
-**Active, 2026-11-10; for the AI Coding Engine's review.** The second of four features of roadmap
+**Active, dispatched; amended 2026-11-10 after AI Coding Engine review.** The second of four features of roadmap
 M-6, Document Storage: Admin's drain, which moves placed documents from the inbox to
 `DocumentServer` at the same address. Feature mode: its changes are within `front/` and their
 tests; a need outside `front/` is an escalation. It builds and tests against the IndexedDB
@@ -24,7 +24,8 @@ document opens only on the device it was attached on.
 
 ## Decisions
 
-1. **`Attachments.drain()` is one pass.** It lists the inbox's namespaces, skips `Staging`, and
+1. _[Extended by the amendment "After AI Coding Engine review", items 1 and 2.]_
+   **`Attachments.drain()` is one pass.** It lists the inbox's namespaces, skips `Staging`, and
    for each document in an owner's bucket creates it on `DocumentServer` with the same namespace,
    bucket, and document ids and names, reads its bytes from the inbox, then deletes it from the
    inbox. It returns `{ drained, remaining }`.
@@ -54,7 +55,7 @@ document opens only on the device it was attached on.
 
 | Where                      | Change                                                                             |
 | -------------------------- | ---------------------------------------------------------------------------------- |
-| `front/api/attachments.ts` | `drain()`                                                                          |
+| `front/api/attachments.ts` | `drain()`; `link` and `size` fall back to the server (amendment item 1)            |
 | `front/app-admin/app.tsx`  | The loop: pacing, the Web Lock, `drain()`                                          |
 | `source/tests/`            | Drain: copy, delete, `Staging` untouched, a repeated pass, a document already gone |
 
@@ -75,6 +76,17 @@ document opens only on the device it was attached on.
 `deno task check`, `deno task fmt:check`, `deno task test` (the two environment-dependent files
 excluded); `STYLE_AUDIT`. The CA verifies in Admin: an attachment placed on Save leaves the inbox
 for the server within a minute and still opens; two tabs open drain once.
+
+## Amendment — 2026-11-10 — After AI Coding Engine review
+
+1. **Opening during a drain.** `link` and `size` chose a store, then read from it, so a drain
+   deleting the inbox copy in between made the read fail. Each now tries the inbox and, on a 404,
+   the server: one attempt per store, not a check then a read. A document in `Staging` never falls
+   back, since it is never on the server.
+2. **A failing document does not stop the pass.** The pass attempts every document; a document
+   that fails stays in the inbox, with its source intact, while the rest drain. If any failed, the
+   pass fails at its end, so the loop backs off (decision 5). `{ drained, remaining }` is
+   unchanged.
 
 ## Design history
 
