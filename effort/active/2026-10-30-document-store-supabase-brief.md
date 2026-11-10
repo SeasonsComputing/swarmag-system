@@ -275,6 +275,40 @@ Supabase, 2026-11-10, settled both.
    `verify_jwt`, OPTIONS 204, GET 405, and the new build stamp. This joins the CA's operations in
    Checks, before acceptance in Admin.
 
+## Amendment — 2026-11-10 — After production review
+
+The AI Architect reviewed the production under strict scrutiny and ran it against local Supabase:
+provisioning, then every provider operation. Provisioning passes and repeats cleanly; create, the
+repeated create, list, read, link, rename (a Unicode name, creation time and size kept), the 415
+refusal, the 405 namespace rename, and empty-only deletion all behave, once item 1 is fixed.
+
+1. **Names are read from `metadata`.** The SDK's `info()` returns the name under `metadata`, not
+   `userMetadata`, so every `get`, `create`, and `list` failed against a real Storage. The tests
+   passed because their mocked `info` response carried a `user_metadata` field Storage does not
+   send. The provider reads `metadata`, and the mocks answer with Storage's real shape, as the
+   local spike recorded it.
+2. **No runtime deletion of a namespace.** The policies granted the staff roles `DELETE` on
+   `storage.buckets`, so the app could delete a provisioned namespace. That policy is removed;
+   provisioning and reset, under the service key, are the only paths that add or remove one.
+3. **The drain starts from the root, as declared.** `app.tsx` wrapped the session coordinator
+   inline with a reactive effect, against the root's declarative form (CONVENTIONS §16.1). The root
+   calls `DocumentDrain.start()` once after bootstrap; `start()` is idempotent and does not require
+   a session, and each pass checks for one (amendment "After AI Coding Engine review", item 5).
+4. **Composing `api` stays free of side effects.** `DocumentServer` called `Supabase.client()`
+   while `api.ts` loaded, which is why four API test fixtures had to supply Supabase
+   configuration. The provider takes `Supabase.client`, the getter, and calls it on first use; the
+   fixtures return to what they were.
+5. **A Storage status code outranks the message.** Error mapping matched message text before the
+   response's status code. The status code decides; the text is the fallback when there is none.
+6. **House form.** The provider holds its client as a `#private` field, as the other providers do,
+   not as a constructor parameter property.
+7. **`config.toml` keeps its explicit storage switches.** The brief said the `[storage]` block
+   keeps only its switch and size limit; that meant no bucket declarations, not dropping the
+   explicit `enabled = false` of `[storage.analytics]` and `[storage.vector]`. They are restored.
+   The S3 protocol block stays removed.
+8. **The sign-out test.** The stage-session test now expects five sign-out requests, not seven.
+   The production states the SDK change that caused it.
+
 ## Design history
 
 - **2026-10-30, a brief of its own.** The document storage brief carried the Supabase provider, its
