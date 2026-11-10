@@ -14,7 +14,7 @@ The attachments brief carried capture and upload together. They are different wo
 puts documents in the inbox; upload moves them to their destination, with judgment about the
 connection, and decides who may see them once the destination is shared.
 
-The attachments brief is `effort/active/2026-11-09-attachments-brief.md`.
+The attachments brief is `effort/completed/2026-11-09-attachments-brief.md`.
 
 ## Drains
 
@@ -56,6 +56,6 @@ the rules swarmAg's namespaces need, and they are written there.
   each app composes (the attachments brief), and a drain keeps each document's address, which the
   catalog's supplied ids make possible.
 - **2026-11-09, staging is not drained.** Attaching stages a chosen file in `Staging` and places it
-  in its owner's bucket when the record saves (`effort/active/2026-11-09-attachments-brief.md`).
+  in its owner's bucket when the record saves (`effort/completed/2026-11-09-attachments-brief.md`).
   A drain takes buckets only, so a bucket on the server holds only documents a saved record refers
   to.

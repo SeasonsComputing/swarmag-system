@@ -586,10 +586,20 @@ Nothing a record references is ever deleted (architecture-core §10.3), so a doc
 refers to stays until a sweep clears it: a file staged and then cancelled, an editor closed
 mid-edit, a removed attachment, and the staged copy left behind once a document is placed. The
 sweep clears them in the inbox and on the server. Until it exists, an unreferenced document costs
-only its bytes. Deferred from `effort/active/2026-11-09-attachments-brief.md`.
+only its bytes. Deferred from `effort/completed/2026-11-09-attachments-brief.md`.
 
 **Picking this up:** after the Supabase provider, since the server side sweeps `DocumentServer`.
 Its scheduled job and edge entry point are the Supabase provider brief's DevOps items 4–6
 (`effort/active/2026-10-30-document-store-supabase-brief.md`).
+
+### B-43 · The attachment list's look and feel is unfinished
+
+**Observed:** 2026-11-09 · normal
+
+The Admin attachment list works but looks unfinished: the picker is the browser's own "Choose
+Files" control, each row's icon follows its name inside a ringed button, and a size reads as raw
+bytes ("38508 bytes"). Deferred from `effort/completed/2026-11-09-attachments-brief.md`.
+
+**Picking this up:** unblocked; `front/app/shell/attachment-list.tsx` and its CSS.
 
 _End of Backlog Document_

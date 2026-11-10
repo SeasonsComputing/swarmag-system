@@ -101,7 +101,7 @@ exists for storage: `config.toml`'s `[storage]` block is the scaffold default (5
 and the architecture documents name storage only in passing.
 
 1. **Storage configuration.** Supabase bucket defaults, file size limit, MIME restrictions (the
-   attachments brief's accepted files table, `effort/active/2026-11-09-attachments-brief.md`
+   attachments brief's accepted files table, `effort/completed/2026-11-09-attachments-brief.md`
    decision 8, enforced by the server), and the S3 protocol switch:
    local in `config.toml`, hosted in a per-target contract, applied by a task and verified by
    reading back.

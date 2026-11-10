@@ -1,7 +1,7 @@
 # Attachments — Brief
 
-**Active, dispatched; amended 2026-11-09 after AI Coding Engine review.** First of four features
-of roadmap M-6, Document Storage: the Admin side. It depends on
+**Completed 2026-11-10.** Shipped in `ea870d0`, with the drop target withdrawn in `856a5b6`. First
+of four features of roadmap M-6, Document Storage: the Admin side. It depends on
 `effort/completed/2026-11-08-document-store-platform-brief.md`, shipped. Feature mode. It
 supersedes `effort/completed/2026-11-08-attachments-brief.md`; the design conversation is
 `effort/completed/2026-10-29-attachments-brief.md`.
@@ -221,6 +221,25 @@ and requests persistent storage.
    and on the desktop choosing a file serves. A drop target also had to be styled as one and guard
    the page against a missed drop, which opens the file in the tab and loses the draft. The drop
    target is removed; it returns if acceptance shows it is needed.
+
+## Closure (2026-11-10)
+
+Production by the AI Coding Engine, committed in `ea870d0`; the AI Architect reworked `front/api`
+after production review in the same commit, and withdrew the drop target in `856a5b6`. Checks:
+guards, types, lint, and formatting. The CA accepted attach on a new record, open from staging,
+Save placing the document in the owner's bucket, open after placement, and the paperclip in Admin,
+and closed the brief on that acceptance.
+
+Settled at closure:
+
+- **The sweep:** backlog B-42.
+- **Draining:** `effort/active/2026-10-30-document-upload-brief.md`.
+- **The Supabase provider:** `effort/active/2026-10-30-document-store-supabase-brief.md`.
+- **The Field Binder:** `effort/pending/2026-11-04-field-binder-brief.md`.
+- **Ops capture:** roadmap M-9.
+- **The Customer Portal:** backlog B-26 and `effort/pending/2026-10-08-customer-portal-brief.md`.
+- **Video:** dropped. Adding it is one entry in the format table.
+- **The attachment list's look and feel:** backlog B-43.
 
 ## Design history
 

@@ -318,7 +318,7 @@ through this adoption:
   cannot know which attributes are URLs and check them as non-empty strings. A URL type, with
   data-dictionary metadata identifying URL attributes, lets genesis validate them with `expectUrl`
   (`core/std/validators.ts`). Until then the URL app control checks them at the UX seam (the
-  attachments brief, `effort/active/2026-11-09-attachments-brief.md`, decision 10).
+  attachments brief, `effort/completed/2026-11-09-attachments-brief.md`, decision 10).
 
 **Picking this up:** When `core` or `ux` first ships from its own repository.
 
