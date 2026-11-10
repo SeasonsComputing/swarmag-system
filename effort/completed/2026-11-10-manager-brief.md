@@ -1,6 +1,6 @@
 # Manager — Brief
 
-**Active, dispatched; amended 2026-11-10 after AI Coding Engine review.** An enabler of roadmap M-6, ahead of its
+**Completed 2026-11-10.** Shipped in `795707a`, with the records in `e78643e` and `c896d4b`. An enabler of roadmap M-6, ahead of its
 fourth feature, the Field Binder (`effort/active/2026-11-04-field-binder-brief.md`), whose workbench
 is the first Collection-Detail manager over items that are not domain records. Foundation mode: it
 changes `ux/`, locked since 2026-10-21, and the CA authorized that crossing in conversation on
@@ -160,3 +160,18 @@ name remains.
 2. **A collection action runs as an Item's action does,** under the manager's pending lock and its
    error display. It was called directly, so a second click ran it twice while the first was still
    running, and a failure showed nothing.
+
+## Closure (2026-11-10)
+
+Production by the AI Coding Engine in two rounds, the second after the amendment "After production
+review"; committed in `795707a`. The AI Architect verified that `Manager` is the former
+`AbstractionManager` line for line but for the renamed hooks and the collection actions, that a
+collection action runs under the pending lock and shows its failure in the Collection, and re-ran
+the checks under the repository's own test task: guards, types, lint, formatting, and 201 tests,
+the two environment-dependent files excluded; `STYLE_AUDIT: PASS`. The CA accepted all six managers
+in Admin.
+
+Settled at closure:
+
+- **Collection actions in use:** the Field Binder's "Add from chemicals" is their first consumer,
+  and its acceptance verifies them (`effort/active/2026-11-04-field-binder-brief.md`).

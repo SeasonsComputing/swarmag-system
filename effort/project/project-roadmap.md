@@ -218,7 +218,8 @@ attaches and shares documents; field capture and its upload are the Ops applicat
   over a provider class per binding; optional supplied ids on namespace and bucket `create`,
   idempotent on an existing id; each IndexedDB document store a database of its own, named by
   a config key; and the URL validators in `core/std`.
-- **Manager** (`effort/active/2026-11-10-manager-brief.md`): `Manager`, the Collection-Detail
+- **Manager** — closed 2026-11-10, `795707a`, `effort/completed/2026-11-10-manager-brief.md`:
+  `Manager`, the Collection-Detail
   manager over any identified items, with collection actions; `AbstractionManager` narrowed to it
   for domain records. The Field Binder's workbench is its first non-record consumer.
 

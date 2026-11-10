@@ -7,7 +7,7 @@ attachments, upload, and server parts were folded into roadmap M-6's briefs
 `effort/completed/2026-10-30-document-upload-brief.md`,
 `effort/completed/2026-10-30-document-store-supabase-brief.md`). What remained is the Field Binder: a
 first-class feature, its Admin workbench the last of M-6's features, and its Ops side M-9's. It
-depends on the Manager enabler (`effort/active/2026-11-10-manager-brief.md`).
+depends on the Manager enabler (`effort/completed/2026-11-10-manager-brief.md`).
 
 ## What triggered it
 
@@ -86,7 +86,8 @@ its copy.
   - **Remove** is the manager's confirmed delete.
   - **Add from chemicals** is a collection action: it adds each chemical's `sdsUrl` and label URLs
     not already in the binder. Chemicals do not change; their URL fields stay the source the UI
-    links to.
+    links to. It is the first collection action in use, so its acceptance verifies them (the Manager
+    brief's closure).
 - **A failed fetch shows here,** before a crew finds the gap.
 
 ## Scenarios
