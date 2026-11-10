@@ -32,8 +32,9 @@ document opens only on the device it was attached on.
 2. **A cut-off pass needs no recovery.** A document copied but not yet deleted is copied again on
    the next pass, which returns the node already there, then deleted. A document another tab has
    already drained counts as drained.
-3. **Admin's loop lives in `front/app-admin/app.tsx`.** The inbox knows nothing of apps
-   (architecture-core §10.3), so the app starts its own loop.
+3. _[Revised by the amendment "After production review", item 2.]_ **Admin's loop lives in
+   `front/app-admin/app.tsx`.** The inbox knows nothing of apps (architecture-core §10.3), so the
+   app starts its own loop.
 4. **One tab drains at a time,** under a Web Lock the loop takes with `ifAvailable`: a tab that
    finds another draining skips the pass.
 
@@ -53,11 +54,12 @@ document opens only on the device it was attached on.
 
 ## Production scope
 
-| Where                      | Change                                                                             |
-| -------------------------- | ---------------------------------------------------------------------------------- |
-| `front/api/attachments.ts` | `drain()`; `link` and `size` fall back to the server (amendment item 1)            |
-| `front/app-admin/app.tsx`  | The loop: pacing, the Web Lock, `drain()`                                          |
-| `source/tests/`            | Drain: copy, delete, `Staging` untouched, a repeated pass, a document already gone |
+| Where                                     | Change                                                                             |
+| ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| `front/api/attachments.ts`                | `drain()`; `link` and `size` fall back to the server (amendment item 1)            |
+| `front/app-admin/app.tsx`                 | _[Revised by "After production review", item 2.]_ Starts `DocumentDrain`           |
+| `front/app-admin/document-drain.ts` (new) | `DocumentDrain`: pacing, the Web Lock, `drain()` (amendment item 2)                |
+| `source/tests/`                           | Drain: copy, delete, `Staging` untouched, a repeated pass, a document already gone |
 
 **Unchanged:** everything outside `front/` and its tests; Ops' and the Customer Portal's drains.
 
@@ -87,6 +89,19 @@ for the server within a minute and still opens; two tabs open drain once.
    that fails stays in the inbox, with its source intact, while the rest drain. If any failed, the
    pass fails at its end, so the loop backs off (decision 5). `{ drained, remaining }` is
    unchanged.
+
+## Amendment — 2026-11-10 — After production review
+
+1. **The loop backs off on drain failures only.** It caught every error, so a missing Web Locks
+   API or a bug would have backed off forever, unseen (CONVENTIONS §15). It catches the drain's
+   expected failures, `AggregateError` and `ApiError`, and lets any other error surface.
+2. **The loop is a container, started by the root.** Admin's root is declaration (CONVENTIONS
+   §16.1); the loop's state and schedule do not belong in it. `DocumentDrain`, in
+   `front/app-admin/document-drain.ts`, holds them and exposes `start()`; `app.tsx` calls it once
+   bootstrap resolves.
+3. **One fallback, one place.** `link` and `size` repeated the inbox-then-server fallback; a private
+   `#either(node, operation)` in `Attachments` holds it once. `#pending()`'s inline return type is
+   named, `PendingDocument`.
 
 ## Design history
 
