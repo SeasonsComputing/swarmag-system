@@ -1,9 +1,9 @@
 ![Seasons Computing logo](seasonscomputing-logo.png)
 
-# Software Construction Conventions (1.16)
+# Software Construction Conventions (1.17)
 
 - Source: [CONVENTIONS.md](CONVENTIONS.md)
-- Version: 1.16
+- Version: 1.17
 - Published: 2026 November 10th
 - Author: Ted V. Kremer
 
@@ -1355,14 +1355,14 @@ headers.
 
 Use Steps when an editing surface is too much for one panel: a record with several groups of
 fields, or a guided flow. You write the Steps; a workbench (`AbstractionManager` §17.2, `Wizard`
-§17.3) sequences them, owns the aggregate draft, and commits once. Steps never commit.
+§17.4) sequences them, owns the aggregate draft, and commits once. Steps never commit.
 
 - A Step is a `PanelStep` (`name`, `title`, optional `validate`, `render(context)`), and a sequence
   is `readonly PanelStep[]` (`@ux/shell/panel/panel-sequence-contract.ts`), so a workbench's Steps
   can be composed from shared fragments.
 - A Step is one panel and a fragment: it knows nothing of its position, progress, or neighbors.
   Whatever composes the sequence owns its progress. A drill-down inside a Step replaces that
-  panel's content and stays the same Step (§17.4).
+  panel's content and stays the same Step (§17.5).
 - A Step registers its validation and its dirty check through its `PanelStepContext`; its draft
   stays in its own context.
 - A dialog hosts a workbench; it is not the workbench's defining boundary.
@@ -1420,13 +1420,35 @@ const identity: AbstractionListColumn<User> = {
 }
 ```
 
-### 17.3 Sequence: `Wizard`
+### 17.3 Index: `Lister`
+
+`Lister` (`@ux/shell/workbench/lister.tsx`) presents a Collection alone, with no Detail beside
+it, and activates its Items; the consumer decides what activation means. It takes a provider of
+`CollectionContract` (`@ux/shell/workbench/collection-contract.ts`), the Collection's columns,
+list, and loading, and an `activate` prop. `ManagerContract` extends `CollectionContract`, so a
+Collection looks and behaves the same in both workbenches.
+
+```typescript
+const provider: CollectionContract<Report> = {
+  formTitle: 'Reports',
+  entityLabel: 'Report',
+  listColumns: [identity],
+  list: reports,
+  isListLoading: () => query.isLoading,
+  listError: () => query.error,
+  refresh: () => query.refetch()
+}
+
+<Lister provider={provider} activate={report => openReport(report)} onCancel={props.onCancel} />
+```
+
+### 17.4 Sequence: `Wizard`
 
 `Wizard` (`@ux/shell/workbench/wizard.tsx`) decomposes one subject into Steps. It takes
 `{ formTitle, steps, draft, commit, feedback? }`, where `draft` is the aggregate draft projection,
 and commits once, at Finish; the commit may write one abstraction, several, or none.
 
-### 17.4 Index-Detail at depth: `DrillDown`
+### 17.5 Index-Detail at depth: `DrillDown`
 
 Use it when a Step edits a list whose items have details of their own: an account's contacts, a
 contact's notes, with no fixed bottom to the nesting. Opening an item replaces the list with that
@@ -1490,7 +1512,7 @@ context.registerSave(() => ({
 }))
 ```
 
-### 17.5 Chassis-Part: the dashboard
+### 17.6 Chassis-Part: the dashboard
 
 An application's home screen is a dashboard: a header strip and rows of widgets, declared as data.
 You seed its layout and register its widgets; the shell renders it, persists it, and lets the user
@@ -1577,6 +1599,7 @@ Each published version supersedes the one before it. Versions below 1.0 were nev
 
 | Version | Published           | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1.17    | 2026 November 10th  | New §17.3 Index: `Lister`, a standalone list over `CollectionContract`, which `ManagerContract` extends; activation is the consumer's. The former §17.3–§17.5 are renumbered §17.4–§17.6.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | 1.16    | 2026 November 10th  | §17.2: `AbstractionManager` is the `Manager` of domain records; a surface whose items are not domain records uses `Manager` directly, and either may declare collection actions beside New.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | 1.15    | 2026 November 9th   | §17.2: `makeAggregateSave` lives in `@ux/shell/workbench/make-aggregate-save.ts`, its maker's file name (§10.1); a `complete` that writes the record again returns it, and the save returns that final record.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | 1.14    | 2026 November 8th   | §3.4 The `core/` namespaces: what each of `cfg`, `cli`, `db`, `svc`, and `std` holds.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
