@@ -1,8 +1,8 @@
 # Attachment Look and Feel — Brief
 
-**Active, 2026-11-10; for the AI Coding Engine's review.** Backlog B-43. The look of the notes
-editor's two tables, its tabs, its file picker, and its dialogs, settled by the CA. Foundation
-mode: it adds `UiText.size` and `CollectionPanel.renderLabel` to
+**Completed 2026-11-10.** Shipped in `ed03399`, with the documentation in `12ad7bb`. Backlog B-43,
+removed at closure. The look of the notes editor's two tables, its tabs, its file picker, and its
+dialogs, settled by the CA. Foundation mode: it adds `UiText.size` and `CollectionPanel.renderLabel` to
 `ux/`, locked since 2026-10-21, and the CA authorized that crossing in conversation on 2026-11-10
 (EFFORT §8).
 
@@ -127,6 +127,17 @@ rename and remove not opening the row; the Rename and Remove dialogs; both theme
    this brief does not authorize. It was removed; `LabelCell`'s labelling and `renderLabel`'s
    default are covered by the CA's acceptance. A test that patched `Number.prototype` was removed
    too; the remaining size test checks locale formatting through `toLocaleString`.
+
+## Closure (2026-11-10)
+
+Production by the AI Coding Engine, committed in `ed03399` after one round of review by the AI
+Architect: the rendering and patching tests withdrawn, size rounding decided on the rounded value,
+and the note title computed once. The AI Architect re-ran the checks: guards, types, lint,
+formatting, and 198 tests, with the two environment-dependent files excluded; `STYLE_AUDIT: PASS`.
+The CA accepted the look in Admin.
+
+Settled at closure: nothing deferred. A catalog control for the four hand-drawn glyphs is a
+question of its own (design history), not work this brief leaves.
 
 ## Design history
 

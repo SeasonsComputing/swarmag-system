@@ -236,6 +236,13 @@ store shared:
    a feature of its own, and its copies in `DocumentServer`, fetched or uploaded. Its Ops side is
    M-9's.
 
+**Rides along:**
+
+- **Attachment look** — closed 2026-11-10, `ed03399`,
+  `effort/completed/2026-11-10-attachment-look-brief.md`: one row look for the notes and
+  attachments tables through `LabelCell`, `CollectionPanel.renderLabel`, `UiText.size`, and the
+  Attachments tab's fieldset and Add Attachment action.
+
 ## M-7 · Workflow, Task, Question & Service
 
 `project-user-stories.md` §5, currently unwritten, plus `Service` (domain type exists, `api.Services` commented out). Needs the Workflow Builder archetype — named in `architecture-front.md`'s normative tree (`workflow-builder/`) but never built. The one theme with no existing archetype to extend at all, and the most depended-upon: Job Definition's own §2.1 "workflow seeding" (preload a default workflow per Service/SKU) can't be built until this exists.

@@ -592,10 +592,4 @@ only its bytes. Deferred from `effort/completed/2026-11-09-attachments-brief.md`
 Its scheduled job and edge entry point are the Supabase provider brief's DevOps items 4–6
 (`effort/active/2026-10-30-document-store-supabase-brief.md`).
 
-### B-43 · The attachment list's look and feel is unfinished
-
-**Observed:** 2026-11-09 · normal
-
-`effort/active/2026-11-10-attachment-look-brief.md`.
-
 _End of Backlog Document_
