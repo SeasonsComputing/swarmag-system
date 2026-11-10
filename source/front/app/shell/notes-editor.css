@@ -27,7 +27,3 @@
   min-inline-size: 0;
   overflow: auto;
 }
-
-[data-shell='attachment-drop'] {
-  padding: var(--sa-rhythm-pad);
-}

@@ -1,12 +1,12 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Note attachments                                                             ║
-║ Picker, drop target, and document actions for a note draft.                  ║
+║ Picker and document actions for a note draft.                                ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Picker, drop target, and document actions for a note draft.
+Picker and document actions for a note draft.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -97,30 +97,21 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
       <Show when={error()}>
         <UiAlert variant='danger'>{error()}</UiAlert>
       </Show>
-      <div
-        data-shell='attachment-drop'
-        onDragOver={event => event.preventDefault()}
-        onDrop={event => {
-          event.preventDefault()
-          void capture(Array.from(event.dataTransfer?.files ?? []))
-        }}
-      >
-        <UiField label='Add files or drop them here' for='note-files'>
-          <UiInput
-            name='note-files'
-            type='file'
-            multiple
-            disabled={busy() || !api.Attachments.accept(props.kinds)}
-            accept={api.Attachments.accept(props.kinds)}
-            onInput={event => {
-              // Reset before the text-field primitive reads it; file inputs cannot accept text.
-              const files = Array.from(event.currentTarget.files ?? [])
-              event.currentTarget.value = ''
-              void capture(files)
-            }}
-          />
-        </UiField>
-      </div>
+      <UiField label='Add files' for='note-files'>
+        <UiInput
+          name='note-files'
+          type='file'
+          multiple
+          disabled={busy() || !api.Attachments.accept(props.kinds)}
+          accept={api.Attachments.accept(props.kinds)}
+          onInput={event => {
+            // Reset before the text-field primitive reads it; file inputs cannot accept text.
+            const files = Array.from(event.currentTarget.files ?? [])
+            event.currentTarget.value = ''
+            void capture(files)
+          }}
+        />
+      </UiField>
       <Show when={busy()}>
         <p role='status'>Attaching files…</p>
       </Show>
