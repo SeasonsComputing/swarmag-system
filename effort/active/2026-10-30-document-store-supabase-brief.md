@@ -177,7 +177,8 @@ marker object, as a bucket does); and that a signed URL serves the stored conten
 `X-Content-Type-Options: nosniff`.
 
 `deno task check`, `deno task fmt:check`, `deno task test` (the two environment-dependent files
-excluded); `STYLE_AUDIT`; the provider passes the contract's tests against stage. The CA runs
+excluded); `STYLE_AUDIT`; the provider passes the contract's tests against stage. _[Extended by the amendment "After the AI
+Coding Engine's escalation", item 3.]_ The CA runs
 `app-deploy-storage-config` and `db-reset` against stage, then verifies in Admin: a document
 attached on one device opens on another after it drains; a signed-out tab drains nothing.
 
@@ -238,6 +239,41 @@ Supabase, 2026-11-10, settled both.
    bucket's allowed types admit it. Markers stay out of counts and listings.
 5. **A rename keeps `createdAt`.** The spike showed the object's creation time unchanged after the
    copy; the production verifies it.
+
+## Amendment — 2026-11-10 — After the AI Coding Engine's escalation
+
+1. **Rename goes through `Supabase.storageRequest`.** The SDK's `copy()` cannot send a custom name
+   or the overwrite flag, in 2.108.1, in the 2.119.0 release, or on its development branch; with
+   `copyMetadata: false` it drops custom metadata. The CA authorizes one additive static in
+   `core/db/supabase.ts`, beside `client()`: an authenticated Storage REST request, under the given
+   client's session so storage policies see the caller, for what the SDK cannot express. Rename is
+   its one caller; every other operation stays on the SDK.
+
+   ```ts
+   static async storageRequest(client: SupabaseClient, path: string, init: RequestInit): Promise<Response>
+   ```
+
+   ```ts
+   await Supabase.storageRequest(this.#client, 'object/copy', {
+     method: 'POST',
+     headers: {
+       'content-type': 'application/json',
+       'x-upsert': 'true',
+       'x-metadata': btoa(JSON.stringify({ name }))
+     },
+     body: JSON.stringify({ bucketId, sourceKey: path, destinationKey: path, copyMetadata: false })
+   })
+   ```
+
+2. **The SDK moves to 2.119.0.** The import map pins `@supabase/supabase-js@2.108.1` and the
+   lockfile records 2.89.0; the production pins 2.119.0 in `deno.jsonc` and the edge import maps
+   kept in step with it (`architecture-core.md` §3.2.4), reconciles the lockfile, and runs the full
+   checks. `core/db/supabase.ts` and the version pins join the scope.
+3. **The edge functions are redeployed.** They run on the same SDK, so after the production the CA
+   deploys `user-create`, `user-update`, `user-delete`, and `user-eject` to stage
+   (`architecture-devops.md` §8.5), and the AI Architect verifies them (§8.6): each `ACTIVE` with
+   `verify_jwt`, OPTIONS 204, GET 405, and the new build stamp. This joins the CA's operations in
+   Checks, before acceptance in Admin.
 
 ## Design history
 
