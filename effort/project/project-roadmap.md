@@ -344,7 +344,7 @@ Features not belonging to any theme are added to whatever session happens to tou
 - **Auth bundle** — B-7 "A stale session survives genesis..." and B-8 "Eject should ban, not delete..."
   (both `normal`, downgraded/bundled 2026-09-12 — see backlog for why), sharing one unresolved
   verification with the DevOps `edge-deploy` entry above.
-- **Login needs an "Already have a code?" action** (`normal`).
+- **Login has no way back to code entry, and takes the code in one plain field** (`normal`).
 - **Testing** — not a slot, a practice change: every milestone from here forward scopes its own
   test coverage as part of its own brief, rather than shipping and being driven-and-reported
   afterward. `CONVENTIONS.md` §18's convention only covers domain/adapter/API today; extending it
