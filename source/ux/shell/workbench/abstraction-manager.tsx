@@ -380,7 +380,7 @@ export const AbstractionManager = <T extends Instantiable, Draft>(
                       fallback={
                         <UiTableRow variant='section'>
                           <UiTableCell>
-                            No {props.provider.entityLabel.toLowerCase()}s found.
+                            No {props.provider.entityLabel.toLowerCase()}s.
                           </UiTableCell>
                         </UiTableRow>
                       }
