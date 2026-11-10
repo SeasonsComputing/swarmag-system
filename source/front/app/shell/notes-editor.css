@@ -34,6 +34,19 @@
   overflow: auto;
 }
 
+[data-shell='attachment-list']:has(> [data-shell='attachment-list-empty']:only-child) {
+  block-size: calc(var(--sa-touch-target-sm) * 2.5);
+}
+
+[data-shell='attachment-list-empty'] {
+  block-size: 100%;
+  color: var(--sa-text-placeholder);
+  display: grid;
+  justify-items: center;
+  padding: var(--sa-space-lg) 0 0 0;
+  text-align: center;
+}
+
 [data-shell='attachment-size'] {
   white-space: nowrap;
 }

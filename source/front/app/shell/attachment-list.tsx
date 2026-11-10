@@ -137,48 +137,62 @@ export const AttachmentList = (props: AttachmentListProps): UiComponent => {
             <p role='status'>Attaching files…</p>
           </Show>
           <div data-shell='attachment-list'>
-            <UiTable>
-              <UiTableHeader>
-                <UiTableCell>File</UiTableCell>
-                <UiTableCell align='end'>Size</UiTableCell>
-                <UiTableCell align='end'>Actions</UiTableCell>
-              </UiTableHeader>
-              <UiTableBody>
-                <For each={props.attachments()}>
-                  {(attachment, index) => (
-                    <UiTableRow onActivate={() => void open(attachment)}>
-                      <UiTableCell>
-                        <LabelCell text={attachment.filename} icon={AttachmentIcons[attachment.kind]} />
-                      </UiTableCell>
-                      <UiTableCell align='end'>
-                        <AttachmentSize attachment={attachment} />
-                      </UiTableCell>
-                      <UiTableCell align='end'>
-                        <UiActionButton
-                          icon='pencil-1'
-                          label='Rename'
-                          disabled={busy()}
-                          onClick={event => {
-                            event.stopPropagation()
-                            setFilename(attachment.filename)
-                            setRename(index())
-                          }}
-                        />
-                        <UiActionButton
-                          icon='minus'
-                          label='Remove'
-                          disabled={busy()}
-                          onClick={event => {
-                            event.stopPropagation()
-                            setRemove(index())
-                          }}
-                        />
-                      </UiTableCell>
-                    </UiTableRow>
-                  )}
-                </For>
-              </UiTableBody>
-            </UiTable>
+            <Show
+              when={props.attachments().length > 0}
+              fallback={
+                <p data-shell='attachment-list-empty'>
+                  <span>
+                    No attachments yet. Use <kbd>Add Attachment</kbd> to add one.
+                  </span>
+                </p>
+              }
+            >
+              <UiTable>
+                <UiTableHeader>
+                  <UiTableCell>File</UiTableCell>
+                  <UiTableCell align='end'>Size</UiTableCell>
+                  <UiTableCell align='end'>Actions</UiTableCell>
+                </UiTableHeader>
+                <UiTableBody>
+                  <For each={props.attachments()}>
+                    {(attachment, index) => (
+                      <UiTableRow onActivate={() => void open(attachment)}>
+                        <UiTableCell>
+                          <LabelCell
+                            text={attachment.filename}
+                            icon={AttachmentIcons[attachment.kind]}
+                          />
+                        </UiTableCell>
+                        <UiTableCell align='end'>
+                          <AttachmentSize attachment={attachment} />
+                        </UiTableCell>
+                        <UiTableCell align='end'>
+                          <UiActionButton
+                            icon='pencil-1'
+                            label='Rename'
+                            disabled={busy()}
+                            onClick={event => {
+                              event.stopPropagation()
+                              setFilename(attachment.filename)
+                              setRename(index())
+                            }}
+                          />
+                          <UiActionButton
+                            icon='minus'
+                            label='Remove'
+                            disabled={busy()}
+                            onClick={event => {
+                              event.stopPropagation()
+                              setRemove(index())
+                            }}
+                          />
+                        </UiTableCell>
+                      </UiTableRow>
+                    )}
+                  </For>
+                </UiTableBody>
+              </UiTable>
+            </Show>
           </div>
         </UiLayout>
       </UiFieldset>
