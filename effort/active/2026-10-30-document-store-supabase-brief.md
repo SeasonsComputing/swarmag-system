@@ -1,6 +1,6 @@
 # Document Store Supabase Provider — Brief
 
-**Active; for the AI Coding Engine's review.** Recorded 2026-10-30 from a CA + AI Architect session, split
+**Active, dispatched; amended 2026-11-10 after AI Coding Engine review.** Recorded 2026-10-30 from a CA + AI Architect session, split
 from the document storage brief, `effort/completed/2026-10-23-document-storage-brief.md`, which is
 the kernel and the contract this provider implements. Third of four features of roadmap M-6,
 Document Storage: it provides `DocumentServer`, the shared store each app composes
@@ -25,7 +25,7 @@ still a second IndexedDB database on the same device.
    key, `DOCUMENT_SERVER_DB_NAME`, retires from `front/config/ux-config.ts`, the env templates, and
    the documents that list it. The stand-in's documents are not migrated: stage's records are reset
    with the storage configuration, and no other target ever had the stand-in.
-3. **The drain waits for a session:** Admin's `DocumentDrain` starts once a session is prepared.
+3. _[Extended by the amendment "After AI Coding Engine review", item 5.]_ **The drain waits for a session:** Admin's `DocumentDrain` starts once a session is prepared.
 4. **What the server needs:** storage configuration, its provisioning task, storage policies and the
    rename function, and reset, in `supabase/`, `devops/`, and `back/`.
 
@@ -41,7 +41,7 @@ under keys in Supabase buckets. It records each object's size, content type, and
 and carries custom metadata, `user_metadata`, set at upload. A node's id is its lineage (the
 document storage brief, platform point 2), so every id locates its node directly.
 
-1. **A namespace is a Supabase bucket,** whose id is the namespace's id. Its placement is the
+1. _[Extended by the amendment "After AI Coding Engine review", item 2.]_ **A namespace is a Supabase bucket,** whose id is the namespace's id. Its placement is the
    Supabase bucket's own settings: file size limit, MIME types, public access. Namespaces are
    provisioned (DevOps 1), never created at runtime: a namespace's `create` returns the provisioned
    Supabase bucket with that id, and any other is refused by policy. `Staging` never exists on the
@@ -56,13 +56,13 @@ document storage brief, platform point 2), so every id locates its node directly
    there.
 4. **Counts are never stored,** so they cannot drift: a container's is listed, a document's is
    its size.
-5. **`find` lists and filters.** Storage's API cannot query `user_metadata`, so `find` lists the
+5. _[Revised by the amendment "After AI Coding Engine review", item 3.]_ **`find` lists and filters.** Storage's API cannot query `user_metadata`, so `find` lists the
    parent and keeps the matching names; swarmAg's buckets are small.
 6. **Empty-only delete.** Supabase refuses to delete a non-empty Supabase bucket, so a namespace's
    is native. A bucket's is the provider's: it lists the prefix and removes the marker only if
    nothing else is there. The check and the removal are not atomic; a document arriving during a
    bucket's deletion is the race, and bucket deletion is rare and deliberate.
-7. **Rename is one function.** Storage's API cannot update `user_metadata` after upload, so a
+7. _[Revised by the amendment "After AI Coding Engine review", item 1.]_ **Rename is one function.** Storage's API cannot update `user_metadata` after upload, so a
    Postgres function updates it, called by RPC: the provider's only code in `back/`.
 8. **Links.** `link` is a signed URL whose expiry, the kernel's default, is fixed when it is issued.
    A signed URL is not revocable. It serves the stored content type, so a disguised file never runs
@@ -133,7 +133,7 @@ task applies it and reads back every value. Nothing of this exists for storage: 
    The task imports these modules directly, never `api.ts`, so it needs no app configuration; devops
    may import `front` (`architecture-core.md` §7). Local Supabase is provisioned by the same task;
    `config.toml`'s `[storage]` block keeps only its switch and size limit.
-2. **Storage policies and the rename function,** in a file of their own under `back/`, which
+2. _[Revised by the amendment "After AI Coding Engine review", item 1.]_ **Storage policies and the rename function,** in a file of their own under `back/`, which
    `db-genesis` applies after `schema.sql`. They are not `schema.sql`'s: its policies sit beside
    their tables, and storage's tables are Supabase's; and `schema.sql` is the domain's genesis
    output, which takes no hand-written idiom.
@@ -154,7 +154,7 @@ task applies it and reads back every value. Nothing of this exists for storage: 
 | `front/app-admin/document-drain.ts`                 | Starts once a session is prepared                                     |
 | `supabase/config.toml`, `supabase/storage/`         | Local and per-target storage configuration                            |
 | `devops/scripts/`, `deno.jsonc`                     | `app-deploy-storage-config`, the storage reset, the usage report      |
-| `back/`                                             | Storage policies and the rename function                              |
+| `back/`                                             | Storage policies (amendment item 1: no rename function)               |
 | `source/tests/`                                     | The provider against the contract's tests                             |
 
 **Unchanged:** `domain/`, `schema.sql`, the kernel and the IndexedDB provider, `ux/`.
@@ -171,7 +171,7 @@ task applies it and reads back every value. Nothing of this exists for storage: 
 
 ## Checks
 
-**Before production,** the AI Coding Engine verifies against stage: that listing returns
+_[Revised by the amendment "After AI Coding Engine review", item 4.]_ **Before production,** the AI Coding Engine verifies against stage: that listing returns
 `user_metadata`; whether a Supabase bucket can be renamed (if not, a namespace keeps its name in a
 marker object, as a bucket does); and that a signed URL serves the stored content type with
 `X-Content-Type-Options: nosniff`.
@@ -187,6 +187,39 @@ attached on one device opens on another after it drains; a signed-out tab drains
 - `architecture-devops.md`: a section on storage configuration, as §13 is for Auth; the new tasks
   in §10; `DOCUMENT_SERVER_DB_NAME` out of §4.2 and §12.4.
 - `architecture-front.md` §9.5.1: the `DOCUMENT_SERVER_DB_NAME` row retires.
+
+## Amendment — 2026-11-10 — After AI Coding Engine review
+
+The review blocked on rename, which wrote `user_metadata` by SQL against Supabase's guidance that
+its storage tables are read-only, and on unverified Storage behavior. A spike against local
+Supabase, 2026-11-10, settled both.
+
+1. **Rename is a copy onto the same key, through Storage's API.** `POST /object/copy` with the
+   source and destination keys equal, `copyMetadata: false`, the new name in the `x-metadata`
+   header (base64 JSON), and `x-upsert: true`. The spike renamed a document with its key, object
+   id, bytes (eTag), and content type unchanged; Storage records a new internal version. No SQL
+   function exists, so `back/` holds the storage policies alone. A bucket renames its marker the
+   same way.
+2. **A namespace is not renamed at runtime.** Its name comes from `Attachments.namespaces` through
+   provisioning; the provider's namespace `update` is refused (405). No namespace marker exists.
+3. **Names come from `info`, not from listings.** Neither `list` nor `listV2` returns
+   `user_metadata`; `info` does. `list` and `find` page the parent (100 per page) and read each
+   object's name with `info`. Nothing in M-6 lists the server; the sweep and the CLI bear the cost.
+4. **Headers.** A signed URL serves the stored content type. Local Supabase sends no
+   `X-Content-Type-Options: nosniff`; before production, one request against stage shows whether
+   hosted Supabase adds it. If it does not, the CA accepts the gap: a type the format table
+   assigned is never one a browser renders as a page.
+5. **Scope details from the review:**
+   - **The drain checks for a session before every pass,** including after sign-out, and
+     `DocumentDrain.start()` is idempotent, so signing in again never starts a second loop.
+     `front/app-admin/app.tsx` joins the scope.
+   - **`DOCUMENT_SERVER_DB_NAME` retires from the test configuration and fixtures** too.
+   - **Every listing paginates,** for counts, lookup, deletion, reset, and the usage report.
+   - **The contract tests gain a stage form** that works within the provisioned namespaces and
+     removes what it writes, in place of creating and deleting arbitrary namespaces.
+   - **The architecture records lead the code.** `architecture-core.md` §10.4 is reconciled:
+     `Library` is read by every staff role until the Customer Portal's rules (M-10), and the
+     catalog is private but for the namespaces it exposes, read-only, to provisioning.
 
 ## Design history
 
