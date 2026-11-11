@@ -16,12 +16,12 @@ its threshold always draws a Detail panel beside the Collection.
 
 All in `source/ux/shell/workbench/`:
 
-| Change   | File                                                                  |
-| -------- | --------------------------------------------------------------------- |
-| New      | `lister.tsx`, `lister.css`                                            |
-| New      | `collection-contract.ts`, `collection-table.tsx`, shared by both      |
-| Modified | `manager-contract.ts`, `ManagerContract` extends `CollectionContract` |
-| Modified | `manager.tsx`, its Collection rendered through `collection-table.tsx` |
+| Change   | File                                                                          |
+| -------- | ----------------------------------------------------------------------------- |
+| New      | `lister.tsx`, `lister.css` _[revised: see "After production review", item 1]_ |
+| New      | `collection-contract.ts`, `collection-table.tsx`, shared by both              |
+| Modified | `manager-contract.ts`, `ManagerContract` extends `CollectionContract`         |
+| Modified | `manager.tsx`, its Collection rendered through `collection-table.tsx`         |
 
 ## Decisions
 
@@ -79,7 +79,8 @@ _[Renamed by the amendment "After AI Coding Engine review", item 1: the componen
    framed as every workbench is. Its header holds the title and **Close**.
 5. **Activation runs under a pending lock,** as a Manager's actions do: one at a time, and a failure
    shows in the Collection, as a collection action's does.
-6. _[Extended by the amendment "After AI Coding Engine review", item 2.]_ **The DOM hooks and
+6. _[Extended by the amendment "After AI Coding Engine review", item 2; revised by the amendment
+   "After production review", item 1.]_ **The DOM hooks and
    styles are the Lister's:** `data-shell='lister-*'`, styled by `lister.css` beside `lister.tsx`.
    The rules the Collection shares move from `manager.css` with it.
 
@@ -133,3 +134,13 @@ The AI Architect writes these before production:
    presentation, its Item actions' event handling, its pending locks, and its editor lifecycle.
 4. **The archetypes record grows** (Records): beside the new row in §6, the sentence "Both
    workbenches host Steps" changes, as `Lister` hosts none.
+
+## Amendment — 2026-11-10 — After production review
+
+1. **The shared Collection's styles are its own** (decision 6, Structural changes). Decision 6
+   moved the shared rules into `lister.css`, so production gave the Manager's Collection a
+   `data-shell='lister-list'` hook and `collection-table.tsx` imports `lister.css`: a Manager
+   carries a Lister's name. The rules go beside the component they style: `collection-table.css`,
+   imported by `collection-table.tsx`, with the hook `data-shell='collection-table'`. The
+   Manager's last-column rule targets that hook inside `[data-shell='manager']`. `lister.css`
+   holds nothing of the Lister's own, so it is removed.
