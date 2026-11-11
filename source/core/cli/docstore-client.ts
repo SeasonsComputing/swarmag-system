@@ -1,6 +1,6 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║ Document store kernel                                                        ║
+║ Document store client kernal implementation                                  ║
 ║ Boundary validation and address resolution over a provider.                  ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
