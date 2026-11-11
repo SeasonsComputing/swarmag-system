@@ -1,9 +1,10 @@
 # Upload — Brief
 
-**Active, draft for dispatch review; refreshed 2026-11-11.** Foundation mode: shared upload
-composition and concrete Supabase provider binding. The design below is the implementation target.
-Production requires CA-approved scope; physical data relocation and deployment require separate
-operational authorization.
+**Active, dispatched for ACE review; refreshed and amended 2026-11-11.** Foundation mode: shared
+upload composition and concrete Supabase provider binding. The amendment "After architecture
+reconciliation and ACE dispatch review" governs the records, configuration contract, and scope
+inventory below. Production requires CA-approved scope; physical data relocation and deployment
+require separate operational authorization.
 
 ## Purpose and boundaries
 
@@ -130,6 +131,9 @@ stable except that delivery is called through `api.AttachmentsUploads.drain()`.
 
 ## Production units and scope
 
+_[Unit B's file inventory and records prerequisite are revised by the amendment "After architecture
+reconciliation and ACE dispatch review", items 1–4. Unit A's independence is retained.]_
+
 Dispatch these units separately. Unit A is executable against the existing provider and does not
 depend on Unit B. Unit B supplies the explicit remote binding required by the binder pair.
 All implementation paths are under `source/`.
@@ -143,9 +147,10 @@ All implementation paths are under `source/`.
 | B: provisioning         | `devops/scripts/app-deploy-storage-config.ts`, `storage-reset.ts`, `back/storage/storage-policies.sql`                        | Provision the attachment root and express grants against physical bucket/root paths  |
 | B: verification         | `tests/cases/supabase-docstore-provider-test.ts`, `document-store-stage-test.ts`, and affected configuration/session fixtures | Exercise root mapping, grants, hierarchy, and configuration                          |
 
-For Unit B, the concrete config and test-fixture file inventory is enumerated by ACE before its
-production scope is approved. Existing environment bindings also require the new configured value;
-edit no secret values or deployment targets by implication. Binder roots/keys are Field Binder's
+_[Superseded by the named inventory in amendment item 3.]_ For Unit B, the concrete config and
+test-fixture file inventory is enumerated by ACE before its production scope is approved. Existing
+environment bindings also require the new configured value; edit no secret values or deployment
+targets by implication. Binder roots/keys are Field Binder's
 scope, not attachment extraction work.
 
 **Existing remote contents require an explicit transition decision.** Unit B changes physical
@@ -154,7 +159,8 @@ and stored references. Inventory deployed data before selecting relocation versu
 prepare a bounded transition plan for CA approval. Do not silently relocate, delete, reset, deploy,
 or introduce dual-layout fallback. This is an operational gate for Unit B, not a reason to block A.
 
-Architecture leads each unit: core §10.2–10.4; front §7.2.4 and §9.5.1; back storage mapping and
+_[The records status is revised by amendment item 1.]_ Architecture leads each unit:
+core §10.2–10.4; front §7.2.4 and §9.5.1; back storage mapping and
 policies; devops provisioning/configuration; CONVENTIONS §10.8 for the concrete provider binding
 where required. Present holistic, present-tense patches before editing those records. Any governance
 amendment and locked-core crossing receive explicit authorization before implementation.
@@ -199,3 +205,130 @@ CA Admin attachment checks are distinct from offline test success and require th
 - **2026-11-11 — Dispatch separation.** The extraction proceeds independently of the concrete
   provider change. Provider/provisioning scope and an authorized physical data transition accompany
   root binding; they are not hidden inside the mechanical extraction.
+
+## Amendment — 2026-11-11 — After architecture reconciliation and ACE dispatch review
+
+ACE's review identified two dispatch gaps: governing records still described a shared server and
+universal Uploads composition, and Unit B omitted the target contract's path through runtime,
+provisioning, and policies. The CA approved holistic architecture corrections, committed in
+`3743d3f`. This amendment closes the brief's record/scope omissions and supersedes the marked
+records prerequisite and open-ended Unit B inventory. It does not authorize implementation or
+operational actions.
+
+### 1. Governing records lead production
+
+Seed and review these current records, by section name as well as number:
+
+| Document                                            | Governing sections                                                              |
+| --------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `documentation/architecture/architecture-core.md`   | §10.2 Stores; §10.3 The Inbox and Its Drains; §10.4 The Catalog                 |
+| `documentation/architecture/architecture-front.md`  | §7.2.4 Document Storage; §9.5.1 IndexedDB Database Names                        |
+| `documentation/architecture/architecture-back.md`   | §4.7 Document Storage                                                           |
+| `documentation/architecture/architecture-devops.md` | §4.2 Placeholder Convention example; §14.1–§14.5 Supabase Storage Configuration |
+
+The records define independent attachment/binder upload pairs, a complete local reader mirror,
+Supabase root-as-native-bucket mapping, and one authoritative target configuration contract.
+There is no universal api.Uploads or attachment server containing the Binder source.
+
+The implementation conforms to these records. A need to change their design is escalated to the
+CA; ACE does not rewrite architecture as an incidental repair. The records' description of the
+complete design does not expand Unit A into Unit B or into the Field Binder feature. No additional
+architecture patch is a prerequisite merely because Unit B's implementation is absent.
+
+### 2. Unit A remains a bounded extraction
+
+Unit A uses the current attachment storage binding and provider constructor. Compose
+`api.AttachmentsInbox`, `api.AttachmentsServer`, and `api.AttachmentsUploads`, then inject the
+attachment Uploads instance into Attachments. Update the Admin drain and direct tests. Preserve
+`DOCUMENT_INBOX_DB_NAME`, its configured database value, logical UUIDs, and stored references.
+The class's two-pair test uses independent test stores, not a dependency on live Supabase roots.
+
+Only the Unit A source/test files in the original scope table change. No new runtime root key,
+provider mapping, provisioning contract, policy, packaging task, or binder API is required by A.
+The difference between the current concrete binding and the target Unit B mapping is intentional
+unit sequencing, not authority to implement both under one extraction scope.
+
+### 3. Unit B configuration and implementation inventory
+
+Architecture-devops §14 is the authority for the contract and consumer behavior. The following
+named paths replace the original inventory's unbounded "affected configuration/session fixtures".
+Paths are repository-relative.
+
+| Area                          | Files and bounded changes                                                                                                                                                                                                                                                                                                                                                       |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Concrete provider             | `source/core/cli/supabase-docstore-provider.ts`: constructor(client, root), root-relative markers/objects, operations and errors                                                                                                                                                                                                                                                |
+| Shared target reader          | New `source/devops/scripts/storage-contract.ts`: validate the per-target contract; expose roots/settings to TypeScript consumers and a non-secret packaging entry point                                                                                                                                                                                                         |
+| Target contracts              | `supabase/storage/local.jsonc`, `supabase/storage/stage.jsonc`: stores.attachments root and private size settings; no dev/prod contract creation without target selection                                                                                                                                                                                                       |
+| Runtime composition           | `source/front/api/api.ts`, `source/front/config/ux-config.ts`: supply ATTACHMENTS_SERVER_ROOT and its VITE alias to the attachment provider                                                                                                                                                                                                                                     |
+| Environment examples          | `source/front/config/app-admin-dev.env.example`, `app-admin-stage.env.example`, `app-admin-prod.env.example`, `app-ops-dev.env.example`, `app-ops-stage.env.example`, `app-ops-prod.env.example`, `app-customer-dev.env.example`, `app-customer-stage.env.example`, `app-customer-prod.env.example`: document contract-supplied roots; do not introduce independent root values |
+| Packaging                     | `source/devops/scripts/app-admin-package.sh`, `app-ops-package.sh`, `app-customer-package.sh`: consume target roots before required-key validation and build; reject conflicting env values                                                                                                                                                                                     |
+| Provisioning                  | `source/devops/scripts/app-deploy-storage-config.ts` and its `.sh` launcher: provision/read back native roots and restrictions using the target reader                                                                                                                                                                                                                          |
+| Reset and usage               | `source/devops/scripts/storage-reset.ts`, `storage-usage.ts`, `storage-utils.ts`: target-root enumeration and paginated traversal, retaining confirmation/credential handling                                                                                                                                                                                                   |
+| Policy materialization        | `source/devops/scripts/db-genesis.ts`, `source/back/storage/storage-policies.sql`: resolve named attachment root from the selected contract and apply safely quoted, target-materialized policies                                                                                                                                                                               |
+| Provider/live tests           | `source/tests/cases/supabase-docstore-provider-test.ts`, `document-store-stage-test.ts`: root constructor, namespace markers, mapping, caller-session behavior, policy assertions                                                                                                                                                                                               |
+| Shared test bootstrap         | `source/tests/config/test-config.ts`, `stage-config.ts`: register/provide the attachment root without requiring live storage for API bootstrap                                                                                                                                                                                                                                  |
+| Inline configuration fixtures | `source/tests/cases/attachments-test.ts`, `asset-api-test.ts`, `chemical-api-test.ts`, `customer-api-test.ts`, `service-api-test.ts`, `document-drain-test.ts`, `test-config-test.ts`, `stage-session-test.ts`: supply the configured attachment root where API composition needs it; retain each test's existing subject                                                       |
+| New configuration coverage    | `source/tests/cases/storage-contract-test.ts`, `storage-policy-config-test.ts`, `storage-package-config-test.ts`: contract validation, quoted policy materialization, packaging root agreement and conflict/missing-input failures                                                                                                                                              |
+
+In the grouped rows, abbreviated filenames are siblings of the first fully qualified file in that
+row. Existing stage-session fixtures and user/session test bodies retain their authentication
+meaning; bootstrap configuration is not an excuse to alter identity, grants, or seeded data.
+If constructor/import analysis discovers another affected file, ACE names it before expanding scope.
+No fixture file is implied to be authorized merely by a directory name.
+
+Unit B explicitly touches locked core/, storage authorization/provisioning, DevOps structure, and
+cross-application packaging. Its CA production scope must authorize those boundaries. It does not
+change the kernel interface, reference grammar, IndexedDB provider, domain, UX controls, binder
+feature, or application scheduling. CONVENTIONS remains a production gate; an actual conflict is
+escalated rather than assuming authority to amend governance.
+
+### 4. One configuration authority, three consumers
+
+`supabase/storage/{target}.jsonc` has a stores object. Unit B provisions the attachments entry:
+
+```text
+stores.attachments.root           native Supabase Storage bucket id
+stores.attachments.fileSizeLimit  positive safe integer byte count
+stores.attachments.public         false
+```
+
+The selected target contract owns the actual root value. Do not copy the architecture's
+illustrative root as an unreviewed deployment choice. Root ids are validated; configured roots are
+distinct. A required binding without its contract entry fails before hosted mutation or packaging.
+The absent dev/prod contracts remain absent unless the CA selects those targets for provisioning.
+Testing those target-failure paths does not require creating hosted resources.
+
+1. **Runtime:** the packaging task supplies `VITE_ATTACHMENTS_SERVER_ROOT` from the contract before
+   required-key validation. ux-config aliases it to `ATTACHMENTS_SERVER_ROOT`. It is non-secret;
+   no **SECRET** resolution, new Supabase project, or new auth session is involved. Env files do
+   not own a competing value. Offline fixtures supply explicit test roots; live stage bootstrap
+   uses the selected stage contract value. A supplied mismatch is an error, not a fallback.
+2. **Provisioning:** the deployment task creates/updates that native bucket and verifies its id,
+   privacy, size limit, and MIME settings. Attachments.namespaces remains the logical catalog;
+   it does not enumerate native buckets. Allowed attachment content types come from
+   AttachmentFormats.contentTypes(), with provider marker types admitted as specified by §14.
+3. **Policies:** db-genesis renders the named root input in storage-policies.sql from that same
+   validated contract, using SQL-literal quoting. Preserve attachment role/namespace access intent;
+   express logical restrictions against object prefixes rather than treating namespace UUIDs as
+   native bucket ids. Verify equality between the packaged root, provisioned id, and policy input.
+
+FieldBinder's independent root, format policy, role grants, local database keys, and route rollout
+belong to the Field Binder brief. Unit B neither composes that feature nor invents its grants.
+Binder examples in the architecture establish the common fitting, not additional Unit B work.
+
+### 5. Code verification and operational authorization are separate
+
+Unit A's records gap is resolved by the architecture baseline above. ACE rechecks the actual records
+and code and presents its Unit A production scope if no other blocker is found. This amendment is
+not itself that scope's approval. Unit B receives its own scope and locked-core authorization.
+
+Offline contract, provider, configuration, and policy-materialization tests run without deploying
+or resetting anything. Live readback, stage acceptance, deployed-data inventory, physical relocation,
+reset, and policy deployment retain explicit target/environment authorization requirements. The
+original Unit B data-transition gate remains in force and does not block Unit A.
+
+The architecture files describe the design in present tense. Transition planning, authorization,
+ACE findings, and verification results belong to this effort's amendment/records and production
+report, not migration commentary added to the architecture. The effort remains active until its
+productions are reviewed and independently verified under EFFORT; neither an approved brief nor a
+successful Unit A test run closes Unit B.
