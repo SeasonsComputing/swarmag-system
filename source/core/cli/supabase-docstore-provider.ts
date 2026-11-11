@@ -13,7 +13,7 @@ race between its empty check and marker removal. No SQL writes Storage metadata.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 SupabaseDocumentProvider      DocumentProviderContract over an injected client.
-├ constructor(client, rootKey) Resolve root configuration and bind a lazy client.
+├ constructor(client, rootKey) Bind a lazy client and the root its key names.
 ├ get                         Read metadata and count children.
 ├ find                        Match names within a parent.
 ├ list                        Read direct children, excluding markers.
@@ -24,7 +24,6 @@ SupabaseDocumentProvider      DocumentProviderContract over an injected client.
 └ link                        Sign for the kernel's fixed expiry.
 */
 
-import { Config } from '@core/cfg/config.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import { isDictionary, isId, toId, toWhen, when } from '@core/std'
 import type { When } from '@core/std'
@@ -39,12 +38,8 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
   readonly #root: string
 
   constructor(client: () => SupabaseClient, rootKey: string) {
-    const root = Config.get(rootKey)
-    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(root)) {
-      throw new ApiError('Invalid Storage root', 400)
-    }
     this.#client = client
-    this.#root = root
+    this.#root = Supabase.storageRoot(rootKey)
   }
 
   /** Read exact metadata, deriving counts from paginated direct children. */

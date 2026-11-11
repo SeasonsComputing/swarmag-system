@@ -13,6 +13,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 Supabase               Supabase client manager.
 ├ client()             Return the singleton Supabase client.
+├ storageRoot(rootKey) Resolve a configured native Storage root.
 ├ storageRequest(...)  Authenticated Storage REST for SDK gaps.
 └ errorToStatus(...)   Map PostgREST error codes to HTTP-style status codes.
 */
@@ -49,6 +50,17 @@ export class Supabase {
     return Supabase.#cache
   }
 
+  /**
+   * Resolve the native Storage root a configuration key names.
+   * @param rootKey - Configuration key naming the root.
+   * @returns The validated native bucket id.
+   */
+  static storageRoot(rootKey: string): string {
+    const root = Config.get(rootKey)
+    if (!STORAGE_ROOT_REGEX.test(root)) Config.fail(`Invalid Storage root: ${rootKey}`)
+    return root
+  }
+
   /** Issue a Storage API request with the given client's current caller session. */
   static async storageRequest(
     client: SupabaseClient,
@@ -76,3 +88,6 @@ export class Supabase {
     return 500
   }
 }
+
+/** Valid native Storage bucket id. */
+const STORAGE_ROOT_REGEX = /^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/

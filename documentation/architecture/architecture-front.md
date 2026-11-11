@@ -289,7 +289,8 @@ references, and invocation policy belong to their application consumers.
 Upload lifecycle and feature ownership are defined in architecture-core §§10.2–10.4.
 
 IndexedDB providers receive their configured database keys. Each Supabase provider receives the
-caller-client accessor and its configured native Storage bucket root. Physical roots are supplied
+caller-client accessor and the configuration key of its native Storage bucket root; `core/db`
+resolves both kinds of key. Physical roots are supplied
 by the target storage contract through packaging (architecture-devops §14); feature code supplies
 logical document and destination bucket identities, not physical object keys.
 

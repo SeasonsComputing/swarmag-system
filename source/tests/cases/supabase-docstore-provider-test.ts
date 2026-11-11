@@ -35,7 +35,7 @@ Deno.test('provider resolves configured roots before storage operations', () => 
   const client = () => {
     throw new Error('Client must remain lazy')
   }
-  assertThrows(() => new SupabaseDocumentProvider(client, 'INVALID_ROOT'), ApiError)
+  assertThrows(() => new SupabaseDocumentProvider(client, 'INVALID_ROOT'), Error, 'Invalid Storage root')
   assertThrows(() => new SupabaseDocumentProvider(client, 'MISSING_ROOT'))
   new SupabaseDocumentProvider(client, 'FIRST_ROOT')
 })
