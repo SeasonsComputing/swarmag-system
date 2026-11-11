@@ -1,250 +1,260 @@
 # Field Binder — Brief
 
-**Active, draft for CA dispatch review; revised 2026-11-11.** Recorded 2026-11-04; chosen from
-roadmap M-6 on 2026-11-10. This revision follows the CA's separation of remote management from the
-local Field Binder. It supersedes the draft's editable-Lister and direct-server-upload designs.
-Production is not dispatched. Foundation mode: storage policy, shared API, and architecture records.
+**Active, draft for dispatch review; refreshed 2026-11-11.** Roadmap M-6 delivers the Admin
+management and reader acceptance; application-specific rollout remains separately scoped.
+Foundation mode: feature composition, configuration, storage policy, and preparation lifecycle.
+The target design is below; outstanding CA decisions are isolated in Dispatch decisions.
 
 ## Purpose
 
-The Field Binder is the view-only local collection of documents needed for day-to-day onsite
-operations: SDSs, labels, manuals, and other working documents. It opens without signal. An
-asset's invoice, warranty, or seller's order remains an attachment on that record's notes.
+The Field Binder is a local, view-only collection of documents needed for onsite work: SDSs,
+labels, manuals, and other operational documents. It opens without signal. A record's invoices,
+warranties, and purchase paperwork remain attachments on that record's notes.
 
-Admin's **Field Binder Manager** manages the remote source collection. The **Field Binder** reads
-its local mirror. Admin can offer both; they are separate screens with separate providers and
-routes. There is no editable flag on the local reader.
+Admin's Field Binder Manager manages the remote source. The reader and Manager are separate
+screens with separate routes and providers. There is no editable-reader flag. List and icon are
+presentations of the local collection; Lister does not define the feature's meaning.
 
-The mechanism is a remote docstore collection mirrored into a local docstore, with an inventory
-JSON document carrying its descriptions, sources, and publication identity. The applications own
-when sync runs. The document-store kernel remains ignorant of binders, inventories, and sync.
+## Storage and enabling layers
 
-## Dependencies and order
+```text
+AttachmentsInbox ── AttachmentsUploads ── AttachmentsServer
 
-1. `effort/active/2026-11-11-upload-brief.md`: the shared durable upload lifecycle.
-2. `effort/active/2026-11-10-background-tasks-brief.md`: Helm command menus and task visibility.
-3. This feature: remote management, local reader, and explicit Admin sync. Ops integration remains
-   M-9; Customer Portal integration is not proposed.
+FieldBinderInbox ── FieldBinderUploads ── FieldBinderServer
+                                                │
+                                      application-triggered sync
+                                                ▼
+                                         FieldBinderStore
+                                                │
+                                          local reader
+```
 
-The existing `Manager`, `Lister`, and docstores are reused without changing `ux/` for this feature.
-Any required extension is an escalation, not implicit permission to cross the locked namespace.
+These are five independently bound docstores, not five object stores inside one database.
+Each local inbox and mirror has its own IndexedDB database. Each remote instance has its own
+provisioned native Supabase bucket root; its provider maps namespace → bucket → document beneath
+that root. Both remote roots can share a Supabase project/client. The attachment catalog does not
+organize binder documents.
 
-## Settled direction
+`Uploads` is the common implementation, instantiated once per upload pair. Every chosen file
+enters its pair's inbox durably; a pair's drain delivers to its own server. Binder sync is a
+separate source-to-local-copy operation. Ops reads only the local Binder; it does not open source
+files remotely. The local store is writable by preparation and read-only to the reader.
 
-- A chosen file is captured durably through `Uploads`; Attachments is not the binder's API.
-- Upload supplies staging, placement, delivery, and access. The Manager supplies the destination
-  and inventory reference; Attachments supplies its own catalog and note reference.
-- Files enter by Choose File. An optional source URL uses `UrlField`: Open, download in the
-  browser, then choose the downloaded file. There is no server fetch or automatic chemical import.
-- The local Binder is available to every authorized reader of the collection; management is an
-  Admin responsibility. Hiding a command is not authorization; storage policies enforce access.
-- Inventory and status are ordinary JSON in the docstore, not a database table or a new core API.
+Dependencies: `effort/active/2026-11-11-upload-brief.md` Unit A supplies Uploads; Unit B supplies
+root-bound remote docstores. `effort/active/2026-11-10-background-tasks-brief.md` supplies Helm menus
+and work visibility. Binder production depends on both Upload units. No binder-specific behavior
+belongs in the kernel, concrete provider, Uploads class, Helm widget, or task store.
 
-## Recommendations requiring CA approval at dispatch
+## Application composition and registration
 
-1. Use the stock `Manager` for remote management, and the stock `Lister` for the initial local
-   reader. An icon presentation can be added later without changing the inventory or sync API;
-   this production does not add a view switch or modify Lister.
-2. Treat creation of a complete new remote inventory as publication. Uploads finishing alone do
-   not change binder membership. A failed publication leaves the prior inventory authoritative.
-3. For this first version, remote inventory edits are whole-snapshot, last-publication-wins.
-   Detect a changed baseline before publishing and require reload, but acknowledge that the
-   docstore has no atomic compare-and-swap: simultaneous writers can still overwrite each other's
-   changes. This limitation requires explicit CA acceptance; otherwise concurrency is a design
-   blocker requiring a separately scoped publication authority.
-4. Keep superseded remote inventories and files initially. Immediate deletion can break a sync
-   already reading the previous publication. Automated reclamation is deferred; it must become a
-   backlog item before this effort closes, rather than being silently omitted.
+Shared API composition exposes the independently bound stores and binder services:
 
-## Remote source and inventory
+- `api.FieldBinderInbox`, `api.FieldBinderServer`, and `api.FieldBinderStore` are docstores.
+- `api.FieldBinderUploads` is the binder pair's Uploads instance.
+- `api.FieldBinder` supplies local entries, local links, status, and explicit preparation/sync.
+- `api.FieldBinderSource` supplies remote inventory reads and Manager mutations.
 
-A provisioned `FieldBinder` namespace on `DocumentServer` holds one fixed collection bucket.
-The same namespace and bucket identities are used in `DocumentInbox` and the local `FieldBinder`
-store. Catalog ids are allocated explicitly after the existing catalog; provisioning reads the
-binder's read-only namespace declaration as it reads Attachments' declaration.
+Every app has access to its own local Binder binding, including Customer Portal. App roots decide
+which routes and commands they register. Shared store availability does not itself register a
+reader screen, grant remote access, or require an editable mode. Admin registers `/field-binder`
+and `/field-binder-manager`; Ops and Portal route/command rollout is outside this production.
 
-The inventory is named `inventory.json`, has a schema version, and contains ordered entries:
+Binding keys in shared `ux-config.ts`, with VITE aliases and values in each app's env bindings:
+
+| Key                          | Binding                                                      |
+| ---------------------------- | ------------------------------------------------------------ |
+| `FIELD_BINDER_INBOX_DB_NAME` | Binder upload inbox database, distinct from attachment inbox |
+| `FIELD_BINDER_DB_NAME`       | Local reader mirror database, distinct from both inboxes     |
+| `FIELD_BINDER_SERVER_ROOT`   | Provisioned native Supabase Storage bucket for binder source |
+
+The nine app/target env examples, actual environment-value provisioning, and architecture-front
+§9.5.1 are explicit configuration scope. Configuration completeness is not evidence of an
+implemented reader route in an app. Do not change secrets while adding these non-secret values.
+
+## Source organization and references
+
+Within FieldBinderServer, a fixed logical namespace and collection bucket hold files and the
+inventory. FieldBinderInbox uses the same destination lineage for placed uploads; FieldBinderStore
+preserves source logical identities during sync. These identities are catalog constants belonging
+to this feature, not additions to Attachments' catalog. Store-produced identities and id-form
+references remain uniform across providers.
+
+The inventory is JSON named `inventory.json`:
 
 ```ts
-export type FieldBinderEntry = {
-  id: Id
+export type FieldBinderEntry = Instance & {
   description: string
   url?: string
-  documentId: Id
+  documentAddress: string
   createdAt: When
   updatedAt: When
 }
-
 export type FieldBinderInventory = {
   schemaVersion: 1
   entries: readonly FieldBinderEntry[]
 }
 ```
 
-The enclosing inventory document's identity is the publication identity. Its store metadata supplies
-publication time; no independent mutable version counter is needed. Entry identity survives file
-replacement. A replacement gets a new document id; uploaded document bytes remain immutable.
+`documentAddress` is a complete id-form docstore address, parsed through DocumentAddresses.
+Entry id survives file replacement. Description is inventory metadata, never a document rename;
+filename remains the uploaded file's name. URL is optional HTTP/HTTPS source metadata.
 
-The bucket supplies the namespace and bucket lineage; consumers obtain document identities through
-the store/reference grammar, never by casting constructed objects into nominal types.
+The inventory document's logical identity identifies a publication. There is no independent
+mutable version counter. Validate schema, addresses, unique entry ids, descriptions, timestamps,
+and URLs at the API boundary; missing, malformed, and unknown-version inventories are distinct.
+Published references define membership. Pending uploads and superseded source files never appear
+as current entries merely because they are present in the source root.
 
-**Membership is the published inventory's references.** Mere presence cannot define membership
-once uploads can be pending and old copies retained. Extra documents are not binder entries and
-never appear in the reader. This deliberately supersedes the earlier presence/set-of-all-ids rule.
-A local copy is complete when it holds the chosen inventory and every document it references.
-
-Multiple `inventory.json` documents may exist. Read candidates through the docstore's `find`,
-then select the newest by store `createdAt`, breaking ties by the document UUID. Do not assume
-names are unique or that listing order is publication order. Use this rule on both stores.
-Validate inventory structure, schema version, entry identities, URL schemes, and unique entry ids
-at the API boundary. Unknown versions and corrupt inventories are errors, not empty binders.
+Names are not unique in the docstore. Resolve inventory candidates explicitly by metadata creation
+time and document UUID as tie-breaker; capture the selected inventory bytes before copying files.
+Do not rely on listing order or use ambiguous name resolution. The local reader selects its inventory
+through the local status document described below, not by
+comparing source timestamps with timestamps manufactured during local copying.
 
 ## Field Binder Manager
 
-Admin route: `/field-binder-manager`. A stock `Manager` over remote inventory entries; New opens
-one Detail containing Choose File, Description, and optional URL. The Collection shows description,
-source host or Uploaded, and updated time; row activation edits. A separate item action opens the
-remote document through Uploads' inbox/server access while delivery is pending.
+Admin manages the source: Add stages a chosen file, edits description and optional source URL,
+then saves an inventory entry. Edit changes metadata or replaces the file under the same entry id.
+Remove confirms and removes the inventory reference. Accepted file formats and stored content types
+are explicit feature policy, independent of attachment kinds; reuse recognition only where the
+accepted formats actually agree.
 
-- Choose File stages immediately and durably. File is required for New; optional on edit.
-- Description is required, initially suggested from the selected filename. Suggestion must not
-  overwrite a description the user has already supplied.
-- URL is optional HTTP/HTTPS, edited by the existing complete `UrlField` row.
-- Save without a new file changes metadata only. Save with a new file preserves the entry id and
-  creation time, replaces its document reference, and updates its modification time.
-- Remove asks for confirmation and publishes an inventory omitting that entry. It does not delete
-  the bytes still referenced by older publications.
-- Existing workbench pending locks, validation, dirty checks, and Close behavior apply.
+Proposed initial presentation: stock Manager, one Detail step with Choose File, Description, and
+UrlField. Row actions include source Open and confirmed Remove. Description is required, initially
+suggested from filename without overwriting user-entered text. File is required on Add, optional
+on edit. Standard pending locks, validation, dirty checks, and editor Close behavior apply.
 
-### Save and publication
+Choose File uses FieldBinderUploads.stage immediately. The editor owns its staged selections,
+including completions after Close. Placement retains staging. Cancel before a write attempt can
+discard that editor's selections; once a write may reference them, retain them for recovery.
+Files remain durable independently of unsaved editor text; durable draft restoration is not promised.
 
-1. Retain the editor's staged file and chosen entry id across retries. Establish the target bucket
-   in the inbox and place the file through Uploads. Placement copies; it retains the staged source.
-2. Request delivery through `Uploads.drain()`. The existing Admin loop also drains independently;
-   concurrent delivery must remain idempotent. This feature does not add a second timer loop.
-3. Verify on `DocumentServer` that every file referenced by the proposed inventory exists. An
-   unrelated drain failure does not prove this file failed: after an expected aggregate drain
-   failure, inspect the required server documents. Other errors retain their original meaning.
-4. Re-read the current remote inventory and compare its identity with the editor's baseline. A
-   change requires reload and reconciliation; never silently publish a stale snapshot knowingly.
-5. Create the new immutable inventory directly on the server. Its JSON is generated metadata;
-   chosen file bytes still follow durable upload. Creation is the publication point. Return Save
-   success only after publication is confirmed. Reuse a reserved inventory document UUID on retry
-   of the same publication attempt and verify the stored contents before treating it as success.
-   Resolve an uncertain prior creation first, before comparing the baseline again: the new current
-   inventory may be this editor's own already-successful publication. A verified prior success
-   must not be misreported as a conflicting external edit.
+### Publication and Save
 
-Before a save attempt, Cancel discards only that editor's staged selections, including selections
-whose staging finishes after Close. After a publication attempt may have succeeded, retain staging
-and candidate identity for recovery; never delete a possibly referenced source. Do not promise
-transactional rollback across docstore operations. Save failure must retain enough state for retry
-within the editor; durable draft restoration after reload is not part of this production.
+Upload delivery, inventory publication, and local preparation are distinct operations. Manager
+Save does not modify the local reader or silently sync it. The proposed publication policy is:
 
-Upload completion, publication, and local synchronization are three distinct events. Saving in the
-Manager does not modify the local reader's inventory or silently sync the device.
+1. Place staged files in FieldBinderInbox through the binder Uploads instance. Retain entry ids
+   and staged references for retries; never create a second entry merely because delivery retries.
+2. Deliver and verify required files on FieldBinderServer. A partial aggregate drain failure can
+   coexist with this entry's successful delivery; verify the required documents rather than
+   equating an unrelated failure with this file's absence.
+3. Compare the current source inventory with the edit baseline and reject a known stale edit.
+4. Create a complete new inventory on FieldBinderServer. This generated JSON metadata is not a
+   chosen-file upload. Save succeeds after confirmed publication. Remove older inventories after
+   creation; cleanup failure does not undo publication or authorize deletion of the new inventory.
+5. Keep superseded files available to preparations that already captured an older inventory.
+   Remote reclamation has its own policy and is outside this production.
 
-## Local Field Binder
+Save requires signal and delivery. Closing the browser mid-Save can leave durable unreferenced
+bytes without a published entry; its unsaved description is not a durable draft. An uncertain
+inventory creation can produce a false stale-baseline conflict on retry. This first-version policy
+accepts reload/reconciliation rather than reserved publication UUID and transaction-recovery
+machinery. Duplicate valid inventory publications are tolerated and resolved by the explicit
+candidate ordering rule. No atomic compare-and-swap or multi-writer transaction is implied.
 
-Shared reader route: `/field-binder`. Its provider reads only the local store and presents the
-inventory entries through `Lister`. Activate mints a local link and opens that document. It does
-not fall back to the remote source when a local file is missing; report an incomplete local copy.
-Description, source host or Uploaded, and document copy time are sufficient for the initial list.
-Source URLs are metadata, not a substitute for the local document.
+This publication policy is a recommendation pending CA approval, not a condition imposed by Uploads.
 
-No local inventory means **Not downloaded**, not an empty synchronized binder. A published empty
-inventory is a valid empty binder. Reading existing local documents does not require a remote
-status request to succeed.
+## Local reader and preparation
 
-The reader's data provider is independent of its visual projection. An icon view remains possible;
-there is no claim that all future Binder presentations must use Lister.
+The reader uses only FieldBinderStore. Activate mints a local link and opens the local document.
+A source URL never substitutes for a missing local file. No local inventory means Not downloaded;
+a complete published empty inventory is a valid empty Binder.
 
-## Sync and status
+Preparation is a feature boundary like preparing a job clone: the reader sees a complete local
+collection or its previous complete collection, never a partly copied replacement.
 
-The shared API exposes an explicit sync operation; it does not schedule itself. Admin invokes it
-from the Helm menu. Ops' future startup/retry policy is selected by Ops in M-9.
+1. Capture and validate a source inventory and its publication identity.
+2. Obtain every referenced document, preserving logical identities, filenames, types, and bytes.
+   Retain the previous local inventory and its referenced files during preparation.
+3. Verify completeness, then copy the captured inventory into the local store at its source
+   logical identity. If any file is unavailable, preparation fails and the previous Binder remains
+   available. Failed first preparation remains Not downloaded even if some bytes have arrived.
+4. Create a local `status.json` document holding the prepared inventory's id-form address, the
+   source publication identity, and successful-sync time. This immutable status creation is the
+   local reader's commit point. Status is local metadata, excluded from upload and source sync.
+   Resolve status candidates by local creation time with UUID tie-breaker. The latest valid
+   status selects one inventory; validate that inventory and every referenced file on reload.
+   Before any status exists, the reader remains Not downloaded. A failed write retains the prior
+   status; an uncertain successful write is discoverable through ordinary candidate selection.
+5. Clean superseded status documents first, then inventories not referenced by any retained
+   status, then files not referenced by any retained inventory. Never delete recovery metadata
+   before the new status is confirmed. Retry incomplete cleanup safely; extra bytes do not make
+   a complete snapshot incomplete.
+6. Recheck the source publication. A change during copying means the local Binder is a complete
+   older snapshot with an update available; do not chase an unbounded stream of source changes.
 
-1. Resolve and validate a remote inventory snapshot and retain its publication identity.
-2. Copy its missing referenced documents into the local store, preserving their identities,
-   names, types, and bytes. Retain the previous local inventory and its documents while copying.
-3. After every referenced local document is verified, copy the chosen inventory into the local
-   store at the same identity. This commits the new local reader snapshot.
-4. Remove superseded local inventory documents first, then unreferenced local file copies. A
-   failed cleanup must not remove anything referenced by an inventory still retained locally.
-   Retry cleanup later; extra local bytes do not make a complete snapshot incomplete.
-5. Recheck the remote publication. If it changed during copying, this device has a complete older
-   snapshot; report an update available. Do not loop indefinitely chasing remote changes.
+Serialize preparation per origin with a Web Lock and suppress duplicate invocation. Use existing
+provider operations; no multi-operation transaction or kernel snapshot API is assumed. The
+status document is the authoritative local snapshot selector. Exercise interrupted commit/reload
+in tests before claiming acceptance. A matching source identity alone does not prove
+that all its referenced local bytes exist.
 
-A failed or interrupted sync keeps the last complete local snapshot readable. A first sync that
-fails remains Not downloaded, even if some files have arrived. Serialize sync within the origin
-using a Web Lock, and disable a duplicate menu invocation while it is running. Readers resolve one
-inventory snapshot per read; they do not recompute membership from a changing directory listing.
+Applications decide when preparation runs. Admin offers explicit Sync in Helm. Ops startup/retry
+policy belongs to its app scope. Offline status can say Available offline and show last verification;
+it cannot assert that the source remains unchanged without contacting it. Report Not downloaded,
+Syncing, Verified current at a stated time, Update available, and Last sync failed as appropriate.
 
-Write device status as a separate local JSON document with last successful sync time and the
-publication last verified against the server. It is device metadata, never synced back to the
-server or treated as a binder entry. Its persistence uses immutable replacement and the same
-explicit latest-document rule; exclude it from mirror cleanup.
+Proposed initial reader presentation is Lister, with description, source host or Uploaded, and copy
+time. Its provider and local entries are independent of presentation; an icon view requires no
+storage redesign. Viewer filtering belongs to application UI, not domain Facet. Initial list/icon
+choice and filtering delivery/deferment are explicit dispatch decisions, not hidden Lister changes.
 
-Status distinguishes Not downloaded, Available offline, Checking/Syncing, Verified current at a
-stated time, Update available, and Last sync failed. Offline cannot prove that the remote remains
-unchanged. Counts come from the selected inventory; progress counts files copied in this sync,
-not unrelated pending uploads. A status-write failure does not invalidate verified local bytes.
+## Helm and access
 
-## Helm entry and composition
+A backpack button opens a command popover. Admin supplies Manager, Binder, Sync, and a status line.
+Reader-only registrations supply Binder, Sync, and status. Route items navigate; Sync calls the app's
+bound preparation command. Shared UI never imports binder APIs.
 
-A backpack icon opens a command popover. Admin binds **Manager**, **Binder**, **Sync**, and a
-non-action status line. A reader-only application binds **Binder**, **Sync**, and status. Every
-registered reader can open its local Binder regardless of whether management is offered.
-
-The Background Tasks brief supplies the generic menu fitting and application-bound handlers.
-This feature supplies its menu data, routes, sync handler, and status. No binder imports enter
-HelmWidget or the generic task store. Do not implement reader-only Ops wiring in this production.
+Management is available in Admin. Exact role grants are a CA security decision: propose source
+read for authorized binder readers and source mutation only for authorized Admin managers. Resolve
+the actual role predicates before policy implementation; app identity/menu visibility is not a
+security principal. Availability of a local binding in all apps does not grant every remote role
+unconditional source access.
 
 ## Production scope
 
-All paths below are under `source/` unless otherwise stated; final dispatch confirms proposed names.
+All implementation paths are under `source/`.
 
-| Area          | Expected files and changes                                                                                                                                |
-| ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Shared API    | New `front/api/field-binder.ts` and, if needed for separation, `field-binder-inventory.ts`; compose local store and binder services in `front/api/api.ts` |
-| Reader        | New `front/app/field-binder.tsx`; existing Lister, no editable mode                                                                                       |
-| Manager       | New `front/app-admin/field-binder/field-binder-manager.tsx`, `field-binder-step-detail.tsx`, and local draft state module                                 |
-| Local styling | Colocated reader/Manager CSS only where existing composition requires it; hooks remain `data-app`                                                         |
-| Admin wiring  | `front/app-admin/app.tsx`, `dashboard-admin.json`: two routes and backpack menu bindings                                                                  |
-| Provisioning  | `devops/scripts/app-deploy-storage-config.ts`, `storage-reset.ts`, and `back/storage/storage-policies.sql`: binder namespace and Admin access             |
-| Verification  | New `tests/cases/field-binder-test.ts`, inventory/sync tests if split, and focused storage-policy coverage                                                |
+| Area              | Files                                                                                                                                     |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| API               | New `front/api/field-binder.ts`, `field-binder-inventory.ts`; modify `front/api/api.ts`                                                   |
+| Reader            | New `front/app/field-binder.tsx`; colocated `field-binder.css` for approved app-local composition                                         |
+| Manager           | New `front/app-admin/field-binder/field-binder-manager.tsx`, `field-binder-step-detail.tsx`, `field-binder-state.ts`                      |
+| Admin composition | `front/app-admin/app.tsx`, `dashboard-admin.json`, and attachment drain integration only where binder pair scheduling is explicitly bound |
+| Configuration     | `front/config/ux-config.ts`, the nine app/target `.env.example` files, and non-secret environment bindings                                |
+| Provisioning      | `devops/scripts/app-deploy-storage-config.ts`, `storage-reset.ts`, `back/storage/storage-policies.sql`: binder native root and grants     |
+| Tests             | New `tests/cases/field-binder-test.ts`, `field-binder-inventory-test.ts`; configuration and storage-policy integration coverage           |
 
-Out of scope: `core/`, `domain/`, attachment catalogs, shared workbench changes, automatic source
-fetching, Ops/Portal integration, icon-view implementation, durable editor drafts, remote garbage
-collection, and concurrency control beyond the explicitly accepted first-version policy.
+Confirm architecture-core §10.2–10.4, architecture-front §7.2.4/§9.5.1 and app registration records,
+architecture-back policies, and devops root/config records before code. Existing in-progress
+architecture edits need reconciliation with this design; they are not approval of a shared server
+root. Production scope names actual environment/fixture files before approval. No code scope implies
+permission to reset data or deploy policies.
 
-Before code: authorize updates to architecture-core §10.2 Stores and §10.4 Catalog, architecture-front
-for separate routes/composition and local-store lifecycle, and architecture-back storage policy
-records. The records must describe the new policy before code implements it. No production deploy,
-storage reset, or stage-data mutation follows merely from approving a code scope.
+Out of scope: attachment catalog/semantics, additional provider/kernel changes beyond the Upload
+prerequisite, locked UX extensions, source fetching, automatic chemical import, Ops/Portal route
+rollout, icon/filter implementation without dispatch approval, durable editor drafts, and remote
+reclamation. Record deferred work in the backlog before closing the effort.
 
-## Acceptance and checks
+## Dispatch decisions and acceptance
 
-- New/edit/replace/remove publish only complete remote inventories; failed upload, uncertain
-  publication, repeat Save, and concurrent-baseline change have explicit test cases.
-- Stage, Close before staging finishes, Cancel, and retry preserve the upload lifecycle.
-- Offline reader uses only local bytes. Failed first sync and failed replacement sync differ.
-- Interrupted copy retains the old snapshot; interrupted cleanup cannot invalidate it. Empty,
-  missing, corrupt, duplicate-name inventories, metadata-only publication, and remote change
-  during sync are covered. Pending/unreferenced files never appear as entries.
-- Admin: Manager and Binder open independently from Helm; Save does not masquerade as Sync.
-  CA verifies upload, metadata edit, replacement, confirmed removal, explicit sync, and offline open.
-- `deno task check`, `deno task fmt:check`, `deno task test` excluding
-  `users-api-test.ts` and `session-coordinator-test.ts`; `STYLE_AUDIT`. Stage policy checks require
-  their own environment and authorization. Do not report excluded or ignored checks as passed.
+CA settles: initial Manager/Lister presentation, viewer filtering delivery/deferment, inventory
+membership/publication/retention policy, concurrent-writer limitation, exact remote grants, and app
+rollout. The root-bound pairs and local-only reader/preparation boundary are settled.
 
-## Dispatch decisions
+Tests cover pair isolation, durable capture and Close races, metadata-only edit, replacement,
+removal, partial delivery, publication timeout/retry, concurrent-baseline change, duplicate inventory
+names, invalid versions/addresses, empty/missing inventories, and interrupted preparation/commit/
+cleanup/reload. Test that a source inventory with missing files cannot expose an incomplete Binder.
+CA verifies independent Manager/reader routes, actual uploads and explicit sync, then opens the
+local Binder with network disabled. A successful Manager save is not evidence of local preparation.
 
-CA approval is needed for the four recommendations above, including the limited concurrent-writer
-policy and retained remote history. Consumer acceptance verifies Lister on screen; code checks alone
-do not close this effort. Resolve remote reclamation into the backlog before closure.
+Run `deno task check`, `deno task fmt:check`, `deno task test` excluding `users-api-test.ts` and
+`session-coordinator-test.ts`, and STYLE_AUDIT. Live grants/provisioning tests require their separate
+environment and authorization. Consumer verification checks Lister on screen when it is selected.
 
-## Design history
+## Records
 
 - **2026-10-31, the cache's contents.** First proposed: everything the active jobs' working sets
   reference, plus pinning. Narrowed to obligation (regulatory documents), with everything else on
@@ -298,3 +308,21 @@ do not close this effort. Resolve remote reclamation into the backlog before clo
 - **2026-11-11, publication recommendation for dispatch review.** Inventory references define a
   published snapshot, replacing mere directory presence as membership. Proposed retention and
   concurrency limits are explicit CA decisions, not silently assumed guarantees.
+
+- **2026-11-11 — Independent upload pairs settled.** Field Binder Source is its own remote
+  docstore binding, not a namespace inside the attachment DocumentServer. Both features use the
+  same Uploads class over separate inbox/server pairs. The local reader mirror is a fifth store.
+- **2026-11-11 — Concrete root settled.** Supabase's provider binds a native Storage bucket root
+  and implements logical namespaces, buckets, and documents beneath it. Physical mapping belongs
+  to the provider; roots do not enter the logical reference grammar. S3 is outside current scope.
+- **2026-11-11 — Preparation boundary settled.** The CA identified complete Binder preparation,
+  analogous to job cloning, as the feature boundary preventing partial-reader exposure. This is
+  not a distributed transaction requirement imposed on Uploads. Reader writes occur only through
+  preparation/sync, not through an editable viewer mode.
+- **2026-11-11 — All-app local availability settled.** Each app has a local Binder binding.
+  App-root registration controls screens/commands; exact remote grants and app rollout remain
+  separate decisions. The earlier assumption that Customer cannot even compose a binder is removed.
+- **2026-11-11 — Review recommendations retained for decision.** Entry references use id-form
+  addresses and Instance identity. Simpler create-then-clean inventory publication is proposed;
+  membership, concurrency, retained-file cleanup, viewer filtering, and role grants require explicit
+  dispatch decisions. The detailed uncertain-publication recovery recommendation is not mandatory.

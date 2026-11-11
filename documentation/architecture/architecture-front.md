@@ -267,11 +267,25 @@ Returns a display title derived from the job's current status and available phas
 
 #### 7.2.4 Document Storage
 
-| Singleton            | Purpose                                                        |
-| -------------------- | -------------------------------------------------------------- |
-| `api.Attachments`    | Stages, places, and drains documents (architecture-core §10.4) |
-| `api.DocumentInbox`  | The device's inbox document store                              |
-| `api.DocumentServer` | The shared document store                                      |
+| Singleton            | Purpose                                                   |
+| -------------------- | --------------------------------------------------------- |
+| `api.Uploads`        | Durable staging, placement, document access, and delivery |
+| `api.Attachments`    | Attachment recognition, catalog placement, and references |
+| `api.DocumentInbox`  | The device's inbox document store                         |
+| `api.DocumentServer` | The shared document store                                 |
+
+`front/api/api.ts` composes one `Uploads` over the inbox and server and injects it, with the
+inbox, into `Attachments`. Upload lifecycle and attachment catalog policy are defined in
+`architecture-core.md` §§10.3–10.4. The docstore contract is defined in CONVENTIONS §10.8.
+
+Feature code supplies Uploads with store-produced document and destination bucket identities.
+Attachment editors use Attachments, which recognizes their files and translates between domain
+Attachment references and document identities. Consumers own their save ordering and staged-file
+lifetime; neither service owns form state.
+
+Admin's `DocumentDrain` in `front/app-admin/document-drain.ts` calls `api.Uploads.drain()`.
+The application root starts the loop after bootstrap. The loop owns session eligibility, Web Lock
+exclusion, scheduling, and retry pacing; the shared Uploads service owns each delivery pass.
 
 ### 7.3 Provided Infrastructure
 
@@ -554,8 +568,10 @@ and `session-coordinator.ts`.
 `notes: () => readonly Note[]`, `onChange: (notes: readonly Note[]) => void`,
 `drill: DrillContract`, and `attach`, which stages a chosen file (`Attachments.stage`), with
 optional `attachmentKinds`. It edits Content and the note's attachments, and preserves existing
-timestamps. It never persists: its host saves the record and places its staged attachments in
-`makeAggregateSave`'s `complete`.
+timestamps. It never persists. Its host's `makeAttachmentSave` delegate owns the staged-file
+lifetime and record writes, places attachments through the topic's `place`, and reconciles the
+record and editor references. The topic selects the destination and delegates document placement
+to Uploads; the editor does not schedule delivery.
 
 #### 10.1.3 Stays in the app
 

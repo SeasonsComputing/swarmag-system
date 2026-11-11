@@ -745,52 +745,75 @@ A record refers to a document in one of two ways, told apart by where the docume
 
 ### 10.2 Stores
 
-Each app composes the stores it needs, each a document store with its own lifecycle:
+Every app has its own local inbox and Field Binder. The shared `DocumentServer` holds remote
+documents, including the Field Binder Source: the authoritative binder collection managed in Admin.
+The source occupies its own namespace in `DocumentServer`; it is not another physical store.
 
-| Store            | Binding   | Lifecycle                                                           |
-| ---------------- | --------- | ------------------------------------------------------------------- |
-| `DocumentInbox`  | IndexedDB | staged until placed; placed until uploaded; in Ops, the job clone's |
-| `DocumentServer` | Supabase  | shared and permanent                                                |
-| `FieldBinder`    | IndexedDB | the Field Binder's version, in Ops                                  |
+| Store or collection | Binding                       | Lifecycle                                                             |
+| ------------------- | ----------------------------- | --------------------------------------------------------------------- |
+| `DocumentInbox`     | IndexedDB                     | staged recovery copies and placed documents awaiting upload           |
+| `DocumentServer`    | Supabase                      | shared and permanent                                                  |
+| Field Binder Source | namespace in `DocumentServer` | authoritative remote binder documents and inventory, managed in Admin |
+| `FieldBinder`       | IndexedDB                     | local mirror of the Field Binder Source for offline reading           |
 
-| App             | DocumentServer                 | DocumentInbox    | FieldBinder |
-| --------------- | ------------------------------ | ---------------- | ----------- |
-| Admin           | shows, receives uploads        | the Admin inbox  |             |
-| Ops             | shows, receives the job upload | the job inbox    | ✓           |
-| Customer Portal | shows shared documents         | the portal inbox |             |
+| App             | DocumentServer                                   | DocumentInbox    | Field Binder Source                  | FieldBinder  |
+| --------------- | ------------------------------------------------ | ---------------- | ------------------------------------ | ------------ |
+| Admin           | shows remote documents; receives drained uploads | the Admin inbox  | manages; syncs to local mirror       | local reader |
+| Ops             | receives drained job documents                   | the job inbox    | syncs to local mirror when connected | local reader |
+| Customer Portal | shows shared documents; receives drained uploads | the portal inbox | syncs to local mirror when connected | local reader |
 
-- **Different lifecycles, different stores.** The inbox empties as it uploads, and the Field
-  Binder follows its version, so each is a store of its own rather than a namespace of another.
-- **Each app's stores are its own.** The apps are separate bundles on separate origins, so the same
-  store name in each does not collide. Each IndexedDB store is a database of its own
-  (architecture-front §9.5.1).
-- **Access is the server's.** What each app may do through `DocumentServer` is enforced by its
-  storage policies (architecture-back §4.7).
+- **Uploads enter the inbox.** Every app stages and places uploaded files in its local inbox.
+  An application-controlled drain delivers placed documents to `DocumentServer`; file selection
+  does not upload directly to the server. Files for the Field Binder Source follow this same path.
+- **Management edits the source.** Admin's Field Binder Manager maintains the remote collection
+  and its inventory. It does not edit a device's local Field Binder.
+- **Sync copies source to mirror.** Each application controls when it synchronizes its local
+  Field Binder from the remote source. Sync requires connectivity; it is separate from upload
+  delivery and from opening a local document.
+- **The Field Binder reads locally.** Each app's reader opens documents from its local mirror.
+  Ops operates offline and has no remote fallback for binder reads.
+- **Different lifecycles, different stores.** The inbox holds staging and pending uploads; the
+  Field Binder retains a local mirror for reading. These are separate IndexedDB stores. The
+  remote source is a collection within the shared server, distinguished by namespace and policy.
+- **Each app's local stores are its own.** The apps are separate bundles on separate origins, so
+  the same local store name in each does not collide. Each IndexedDB store is a database of its
+  own (architecture-front §9.5.1).
+- **Access is the server's.** What each app may do through `DocumentServer`, including the Field
+  Binder Source, is enforced by its storage policies (architecture-back §4.7).
 
 ### 10.3 The Inbox and Its Drains
 
-Every app has an inbox, and every upload goes to it. One rule for every app outweighs the cost of
-an inbox an app may never fill.
+Every app has an inbox. `Uploads`, composed once over `DocumentInbox` and `DocumentServer` in
+`front/api/api.ts`, owns durable file capture, placement, document access, and delivery. Consumers
+own their destinations, references, and save ordering; Uploads knows neither notes nor inventories.
 
-- **Choosing a file stages it; saving its record places it.** A chosen file is stored at once,
-  durably, in the fixed bucket of the inbox's `Staging` namespace, outside every owner's bucket,
-  and its note holds the staging address. The record saves as it always does; then its staged documents are copied into the
-  owner's bucket under the same document id, and the record's references are rewritten to them.
-  Placement is idempotent: a save cut short before placement leaves the record referring to staged
-  documents, and its next save places them.
-- **Nothing a record references is deleted.** Cancelling before any save attempt discards what its
-  editor staged; after one, the staged documents stay. Removing an attachment drops its reference.
-  A sweep clears the documents nothing references.
-- **The device does no processing:** photos are not scaled, and documents list by icon, name, and
-  size.
-- **A drain takes owners' buckets only and keeps the address.** It copies each document in an
-  owner's bucket to `DocumentServer` at the same address, then clears it from the inbox, so a
-  record saved before upload is already correct after it. The `Staging` namespace never drains,
-  so a bucket on the server holds only documents a saved record refers to. A drain cut short
-  repeats safely: copying a document again returns the one already there.
-- **Each app drains its own way.** The inbox knows nothing of apps.
-  - **Admin:** a background loop its root starts, draining while the app is open, one tab at a
-    time; what is left waits for the next session.
+- **Choosing a file stages it durably.** Uploads stores the supplied file's name, bytes, and
+  content type in the fixed bucket of its private `Staging` namespace. The consumer holds the
+  store-produced identity in its draft reference.
+- **Placement copies into the consumer's bucket.** The consumer creates its destination through
+  the docstore and supplies its bucket identity. Uploads copies the staged document under the
+  same document UUID and returns its destination identity. Repeated placement is idempotent.
+  The staged source remains available for recovery from interrupted reference writes.
+- **Save owns commitment.** The consumer coordinates its reference writes and placement; these
+  operations are not one transaction. Placement makes a document eligible for delivery. The drain
+  does not inspect records or decide whether their references are committed.
+- **Discard removes staging only.** Uploads rejects discard of a placed document. The editor owns
+  which staged selections it can discard; a staged document that a write may reference is
+  retained. Reclamation of unreferenced documents is a separate responsibility.
+- **A drain preserves addresses.** Uploads snapshots every non-Staging inbox namespace and its
+  documents, creates their containers and bytes on the server at the same identities, then clears
+  their placed inbox copies. Staging never drains. A repeated copy returns the existing immutable
+  document, so interrupted and concurrent passes repeat safely. A pass attempts every document;
+  partial failure rejects after the pass, while success reports completed and remaining counts.
+- **Access follows the document.** Uploads reads metadata or mints a link from the inbox first,
+  falling back to the server only when a placed document is missing. Missing staging and other
+  failures propagate. The consumer stores a document reference, never a minted link.
+- **The device does no content processing.** Photos are not scaled. Consumers own accepted
+  formats and content-type normalization; Uploads preserves the supplied content.
+- **Each app owns delivery scheduling.** Uploads runs explicit passes and owns no timers.
+  - **Admin:** its root starts `DocumentDrain`, which drains while the app is open, under a
+    prepared session and a Web Lock that excludes other tabs. Each pass settles before the next
+    is scheduled; expected delivery failures back off and unexpected failures stop the loop.
   - **Ops:** the job upload, beside the log upload (§9.3). Photos travel with the job clone and
     drain at base, a deliberate act that qualifies the connection first, on wi-fi by default, since
     the data plan is the worker's.
@@ -798,20 +821,26 @@ an inbox an app may never fill.
 
 ### 10.4 The Catalog
 
-`Attachments`, composed once in `front/api/api.ts`, is the only code that places and drains
-documents. Its catalog of placements is private: module constants with fixed ids, which every store
-on every device shares, so a placed document has one address in the inbox and on the server,
-computable from the catalog and its owner's id with no lookup. It exposes only the server's
-namespaces, read-only, to provisioning (architecture-devops §14).
+`Attachments`, composed with Uploads and the inbox in `front/api/api.ts`, owns attachment
+recognition, metadata, catalog destinations, and note-reference rewriting. Its private placement
+catalog uses fixed ids shared by every store on every device. A placed attachment has the same
+address in the inbox and on the server. The server's namespace declarations are exposed read-only
+to provisioning (architecture-devops §14).
 
-- **A topic per type that carries notes,** each with its own typed `place`, run when its record
-  saves; staging is common to every topic. A composition without an id (a `Note`, a
-  `CustomerSite`, an `Answer`) keeps its documents in its owning record's bucket.
+- **Recognition belongs to Attachments.** Its format catalog recognizes a file by extension,
+  validates the accepted kind, and supplies the content type stored through Uploads. Its returned
+  Attachment carries the filename, kind, content type, chosen-file timestamp, and id-form address.
+- **A topic per type that carries notes** creates its catalog bucket and places staged documents
+  through Uploads. A composition without an id (a `Note`, a `CustomerSite`, an `Answer`) uses its
+  owning record's bucket. Names are labels at every level, for people and the CLI.
+- **Attachment Save preserves recovery references.** The host writes its record, places its
+  staged documents, and reconciles the record's references to the placed addresses. Cancel before
+  any write attempt discards that editor's staging; after an attempted write, staging remains.
+  Removing an attachment drops its reference rather than deleting possibly referenced bytes.
+- **Attachment access delegates to Uploads.** Links and sizes follow the document between inbox
+  and server. The attachment catalog selects destinations; it does not own delivery scheduling.
 - **A bucket per owner, its id the owner's.** The owner's bucket is created on first placement,
-  and creating it again returns it, so placing never checks first. Names are labels at every
-  level, for people and the CLI.
-- **`Staging`** is a private namespace with one fixed bucket, outside every owner's, holding chosen
-  files until their record saves (§10.3).
+  and creating it again returns it, so placing never checks first.
 - **Namespaces divide by policy.** A namespace is the unit of placement and access: on the server,
   a Supabase bucket with its own storage policies. Company-wide documents, maintained in Admin and
   read by every staff role, share the `Library` namespace, a fixed bucket per topic; what a

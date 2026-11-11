@@ -1,56 +1,29 @@
 # Background Tasks — Brief
 
-**Active, draft for CA dispatch review; selected 2026-11-11.** Captured 2026-11-10. Foundation
-mode: generic task state and an additive Helm menu fitting in locked `ux/`. Selection authorizes
-exploration; implementation still requires explicit CA authorization of that crossing and scope.
+**Active, draft for dispatch review; refreshed 2026-11-11.** Foundation mode: generic work
+reporting and one-level Helm command menus in locked `ux/`. Production and the locked-namespace
+crossing require explicit CA authorization. The main text is the implementation target; trailing
+records preserve decisions and replaced proposals.
 
-## Purpose
+## Purpose and dependencies
 
-Admin already uploads placed documents in the background, but people cannot see pending work or
-failures. The Field Binder adds a user-invoked sync and needs a Helm button whose popover contains
-Manager/Binder/Sync or Binder/Sync. These are related needs with distinct responsibilities:
+Applications need to expose delivery/preparation work and command failures. The Helm needs a
+button that opens a configured command popover, independent of its existing overflow menu.
 
-- A generic Helm menu presents configured commands and status.
-- A generic task store reports work owned and executed by applications.
+The task store reports work; it does not execute, persist, cancel, or schedule it. The menu fitting
+binds application commands; it does not import application APIs. Uploads remains a storage-neutral
+class with separate instances for separate inbox/server pairs.
 
-Neither becomes an upload service, binder API, job scheduler, or persistence engine. The menu
-fitting is useful even when no task is running. It is not the Helm's existing overflow menu.
+`effort/active/2026-11-11-upload-brief.md` Unit A supplies `api.AttachmentsUploads`, the first
+reporting consumer. This effort does not require the Supabase root change or a completed Binder.
+`effort/active/2026-11-04-field-binder-brief.md` supplies Binder menu bindings and preparation reports
+under its own feature scope.
 
-## Dependencies and recommended production order
+## Helm command/menu contract
 
-Upload (`effort/active/2026-11-11-upload-brief.md`) first; this brief then proves task visibility
-against the real Admin drain. Field Binder (`effort/active/2026-11-04-field-binder-brief.md`) then
-uses the menu fitting and publishes sync work. This brief must not require a finished binder.
-
-## Recommendations requiring CA approval at dispatch
-
-1. Add one level of configured Helm command menus, with code bindings supplied through a
-   `makeHelmWidget` maker at the application composition root. No nested menu tree or mutable
-   global command registry. Existing HelmWidget and JSON actions remain compatible.
-2. Keep a reserved `@tasks` entry, using `update` from the existing glyph catalog. It appears
-   while tasks are running, waiting with work remaining, or failed. Its popover lists task
-   labels, known counts, and failures. Do not sum counts with different meanings into one number.
-3. Warn on page exit for running work or queued work that this tab is responsible for progressing.
-   Durably queued work can survive closing, so explain it as pending delivery, not data loss.
-   The browser controls whether/how a beforeunload warning appears; it is not a guaranteed prompt.
-
-## Helm menu fitting
-
-A configured action is either an existing command or a menu with a label, icon, labelMode, and
-items. A menu item is a command action or a named status line. No JSON contains callbacks.
-Configuration parsing rejects ambiguous entries, empty/unknown command bindings, and nested menus.
-Ordinary route commands and @theme keep their existing interpretation.
-
-An application binds named executable commands and reactive status readers when it constructs a
-Helm widget implementation, then supplies that implementation under the existing HelmWidget key
-in its widget registry. Bindings are injected callbacks, not discoveries or imports from front/.
-The shell stays closed to concrete widget catalogs and feature implementations.
-
-For example, Field Binder later configures one icon-only backpack menu with route items Manager
-and Binder, a bound Sync command, and a bound status line. Reader-only apps omit Manager. This
-brief supplies the fitting only; it does not install binder commands before that feature exists.
-
-The maker binds a `HelmBindings` data shape; its callbacks are application code:
+Existing route commands, @theme, label modes, and default HelmWidget remain compatible. Add a
+`makeHelmWidget` maker whose result is registered under the existing HelmWidget key by app.tsx.
+The widget receives configured data through settings and executable behavior through bindings:
 
 ```ts
 export type HelmCommandBinding = {
@@ -64,131 +37,157 @@ export type HelmBindings = {
 export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent
 ```
 
-Keep those contracts in `ux/widgets/helm-widget-contract.ts`. The maker and existing HelmWidget
-live beside it in `helm-widget.tsx`; the default component uses empty bindings. Keep command
-names adorned (for example `@sync-field-binder`), distinct from route paths and reserved commands.
-An app cannot override @theme or @tasks. Registering the maker under HelmWidget in an app's widget
-registry needs no dashboard or route-runtime contract change.
+Contracts live in `ux/widgets/helm-widget-contract.ts`; maker and default component live in
+`ux/widgets/helm-widget.tsx`. The default uses empty bindings. No mutable global command registry
+or dashboard/route-runtime contract change is needed. Reserved @theme/@tasks cannot be overridden.
+Application command names are adorned, such as @sync-field-binder; route paths remain route paths.
 
-A menu setting uses `{ label, icon, labelMode?, items }`, with no command of its own. Items are
-existing `{ command, label, icon }` records or `{ status: bindingName }` records. Reject records
-with both/neither operation; a status key must resolve to a bound reader. Labels and icon modes
-remain existing Helm vocabulary, not a second presentation system.
+A configured top-level item is an existing command record or a menu record
+`{ label, icon, labelMode?, items }`, with no command of its own. A menu item is a command record
+`{ command, label, icon }` or a status record `{ status: bindingName }`. Reject both/neither
+operations, missing bindings, empty menus, and nested menus. JSON contains no callbacks.
 
-Menu presentation reuses UiPopover and labelled UiActionButtons, as Helm overflow does today.
-A command closes its popover before execution. Async failures must be observed and presented;
-no unhandled promise rejection. Commands that start background work publish failures through the
-task store; other bound async commands need menu-local feedback. Status is not focusable or
-clickable. Preserve accessible names, focus return, theme cycling, icon-only distribution, and
-existing overflow behavior at narrow allocated widths. If a configured menu itself enters the
-existing overflow surface, open its popover without leaving two competing popovers open.
+UiPopover and labelled UiActionButtons supply the existing control composition. Status text is
+neither clickable nor focusable. Commands close the popover before execution. Keyboard/focus
+return, icon-only layout, and allocated-width overflow retain their existing behavior. Opening a
+configured menu from overflow closes the overflow surface first; competing popovers are not kept
+open together. Async command execution is observed; rejections have a visible report, not an
+unhandled promise rejection or feedback hidden inside an already-closed popover.
 
-## Task reporting contract
+## Task and failure reporting
 
 `BackgroundTasks` is a reactive store module in `ux/shell/runtime/background-tasks.ts`, following
-CONVENTIONS §16.3. It exposes read-only task state and intent-named publish/clear operations;
-setters and Solid state machinery remain private. Entries use stable caller-owned string keys.
-
-The published task data shape is:
+CONVENTIONS §16.3. It exposes read-only `store` and intent-named `publish(key, task)`, `clear(key)`,
+and `clearAll()`. State machinery and setters remain private. Keys are stable caller-owned strings.
 
 ```ts
 export type BackgroundTask = {
   label: string
   phase: 'running' | 'waiting' | 'failed'
+  blocksExit: boolean
   remaining?: { count: number; unit: string }
   progress?: { completed: number; total: number; unit: string }
   error?: string
 }
 ```
 
-`BackgroundTasks` exposes `store` for reads, `publish(key, task)`, `clear(key)`, and `clearAll()`.
-Count values are nonnegative integers; completed cannot exceed total. Failed tasks require error
-copy; other phases omit it. Unknown count is explicit absence, never zero. Progress is optional
-and describes only a known finite batch. Validate the supplied state at this boundary.
+Validate nonnegative integer counts and completed <= total. Failed reports require error copy;
+other phases omit it. Missing counts mean unknown, never zero. Each task supplies its own units;
+there is no sum across unrelated workloads and no invented percentage for an unbounded drain.
+Use const-enum runtime declarations for validated phases in implementation, per CONVENTIONS.
 
-Applications publish; the store does not run callbacks, retry work, infer progress from elapsed
-time, or clear a task just because count is zero. The publisher clears only after verified
-completion, or explicitly dismisses a non-pending result. Failure remains visible until retry,
-resolution, or an explicit application-owned clear. Tasks are transient reports, not durable jobs;
-a reload reconstructs reports from the underlying inbox or feature state.
+`blocksExit` is supplied by the operation owner. It means this tab has work whose interruption
+warrants a warning. A failed command with no unfinished work sets false. Running, waiting, failed,
+and remaining counts do not independently imply exit-blocking responsibility.
 
-The @tasks popover renders state with text as well as glyphs. An empty store hides its trigger.
-A failure is visible even when its count is unknown. Do not add cancel/retry controls whose
-underlying operations do not support them. The publisher continues to own that behavior.
+The reserved @tasks action uses the existing update glyph and opens a popover of labels, phase,
+known counts/progress, and error text. It appears whenever reports exist, including non-blocking
+command failures. It disappears when the store is empty. Resolved work is explicitly cleared by
+its owner; zero count does not silently clear a running operation. Reports are transient; a reload
+reconstructs work state from the inbox or feature, not from persisted task history.
 
-## First consumer: Admin delivery
+### Command failures
 
-DocumentDrain continues to own the existing one-minute schedule, capped backoff, prepared-session
-check, and cross-tab Web Lock. It calls api.Uploads.drain after the Upload extraction.
+Helm reports a rejected bound command under that command's name, using its configured label. If
+the operation already published a failed report under that key, retain its detailed report. If
+not, publish failed with error copy and blocksExit false, preserving an existing operation-owned
+blocksExit value when present. A command's retry clears its previous report before executing;
+operation publishers use the same command key to avoid duplicate failure entries. A new execution
+must reestablish its actual exit responsibility rather than inheriting it blindly.
 
-- Publish running before the pass, with unknown count unless a known value exists. A drain's
-  returned `remaining` is measured after a pass; it cannot describe progress before that pass.
-- Success with remaining zero clears the report. Success with remaining nonzero publishes waiting
-  and that count. The next pass publishes running again.
-- Expected ApiError/AggregateError publishes failed with useful display copy and retains backoff.
-  An aggregate failure returns no reliable remaining count; omit it or explicitly retain the last
-  known observation, never invent a fresh count. Unexpected errors are reported and then rethrown
-  under the existing stop behavior, not swallowed into endless retry.
-- A tab that did not acquire the drain lock does not announce that it performed the work.
-  Cross-tab reporting is not added; this version reports the current tab's work. A previously
-  waiting/failed report in a follower tab may therefore be stale until its next owned pass.
-- On session clear, remove session reports and beforeunload participation without deleting durable
-  inbox data. Preserve one loop and one event-listener lifetime; reconnect the reporting to the
-  next prepared session. Do not duplicate timers on sign-in.
+A non-blocking failed report has an explicit Dismiss control. A blocking failed report is cleared
+by its operation when resolved or responsibility is released. The generic store offers no Retry or
+Cancel execution callbacks. The feature's command remains the execution entry point. Unexpected
+errors remain observable through their failure reports; worker loops retain their own rethrow/stop
+rules. No error is hidden merely because its popover closed.
 
-Queued reports appear only once work is observed by a pass. Immediate notification when a new file
-is placed is not promised by this production. Increasing reporting precision later must not force
-binder-specific callbacks into Uploads.
+## First consumer: Admin attachment delivery
 
-## Page exit
+`DocumentDrain` calls `api.AttachmentsUploads.drain()`. It retains the existing one-minute
+schedule, capped retry backoff, prepared-session predicate, and Web Lock. It owns the attachment
+pair only; Field Binder's app-owned delivery/preparation binding is separate. No global drain
+walks multiple inboxes and no feature routing is added to Uploads.
 
-Install beforeunload handling once through an explicit runtime lifecycle helper. Its predicate is
-reactive task state: running or unresolved waiting/failed work, including unknown counts. A retained
-failed report does not imply zero pending work. Clear listener state when the session clears. Use the browser-supported event cancellation/returnValue pattern; do not
-supply custom prompt wording or promise a warning on mobile process termination. There is no new
-logout veto or workbench Close guard in this scope.
+- Acquire the existing attachment drain lock before claiming work. Publish running before a pass,
+  with unknown count unless a known observation exists; blocksExit is true while the pass owns it.
+- On success, remaining zero clears the report. Nonzero remaining publishes waiting with that
+  count and blocksExit true while this tab retains responsibility for retrying it.
+- ApiError/AggregateError publishes failed and retains expected backoff. An aggregate failure
+  supplies no fresh remaining count. Omit the count or label a retained observation correctly.
+  Unexpected failures are reported and rethrown, preserving the loop's stop behavior.
+- Failure to acquire the lock clears this tab's attachment report and exit responsibility. A
+  follower does not retain a stale waiting/failed report about work another tab may have finished.
+  Cross-tab aggregation is outside scope; this UI reports locally observed responsibility.
+- When the session clears, clear reports and warning participation without deleting inbox bytes.
+  Repeated start/sign-in does not create duplicate loops, listeners, or report lifetimes.
+
+The report starts when a pass observes work; immediate placement notifications are not part of
+this contract. Generic Uploads does not publish UI state or depend on BackgroundTasks.
+
+## Exit warning lifecycle
+
+Implement `startBackgroundTaskWarnings` in `ux/shell/runtime/background-task-warnings.ts`, returning
+a cleanup callback. The application mounts it once for its root lifetime and releases it on
+teardown. Its predicate is whether any current report has blocksExit true. Session clearing removes
+reports, so no stale session warning survives. Repeated setup/cleanup has explicit tests.
+
+Use browser-supported beforeunload cancellation/returnValue. The browser controls whether a prompt
+appears and its wording. The popover explains pending delivery and durable capture; custom prompt
+text and guaranteed warnings on mobile process termination are not promised. No logout veto or
+workbench Close guard is introduced.
+
+## Field Binder integration fitting
+
+A backpack icon opens Manager/Binder/Sync/status in Admin, or Binder/Sync/status in a reader-only
+registration. Route registration and command selection belong to each app.tsx. Sync publishes the
+preparation task under its bound command key. Reader content remains local regardless of task state.
+This brief implements the menu fitting and attachment reporting; it does not register binder routes
+or presume reader rollout into Ops/Portal. Feature code binds those through the existing registry.
 
 ## Production scope
 
-All implementation paths below are under `source/`.
+All implementation paths are under `source/`.
 
-| Area              | Expected files and changes                                                                                                  |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| Task state        | New `ux/shell/runtime/background-tasks.ts`; new explicit exit-warning lifecycle helper if separated                         |
-| Helm contract     | New `ux/widgets/helm-widget-contract.ts`; modify `helm-widget.tsx` and colocated `helm-widget.css`                          |
-| Generic binding   | `ux/widgets/widget-registry.ts` only if needed to preserve the default HelmWidget export                                    |
-| Admin integration | `front/app-admin/document-drain.ts`, `dashboard-admin.json` for @tasks, `app.tsx` for lifecycle setup if needed             |
-| Session lifecycle | `front/app/shell/session-coordinator.ts` only for explicit report/listener cleanup; no authorization changes                |
-| Tests             | New background-task state/exit-warning tests, Helm menu contract tests, and updates to `tests/cases/document-drain-test.ts` |
+| Files                                                                                                                           | Work                                                            |
+| ------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| New `ux/shell/runtime/background-tasks.ts`                                                                                      | Reporting state, validation, intent operations                  |
+| New `ux/shell/runtime/background-task-warnings.ts`                                                                              | Explicit warning lifecycle                                      |
+| New `ux/widgets/helm-widget-contract.ts`                                                                                        | Binding/configuration contract                                  |
+| `ux/widgets/helm-widget.tsx`, `helm-widget.css`                                                                                 | Menus, reserved @tasks, command failures, default compatibility |
+| `front/app-admin/document-drain.ts`                                                                                             | Attachment-instance reporting with existing scheduling          |
+| `front/app-admin/app.tsx`, `dashboard-admin.json`                                                                               | Warning lifecycle and configured @tasks action                  |
+| `front/app/shell/session-coordinator.ts`                                                                                        | Report cleanup on session clear only                            |
+| New `tests/cases/background-tasks-test.ts`, `background-task-warnings-test.ts`, `helm-widget-test.ts`; `document-drain-test.ts` | State, parser/bindings, warning, and drain coverage             |
 
-Before code, authorize architecture-front's state management/extension-binding documentation,
-CONVENTIONS §16.3 reporting guidance if needed, and current Helm header/contract documentation.
-Any governance amendment requires its own explicit scope and separate commit. Do not assume
-architecture-front §9.6 is the correct location without checking the current section names.
+The public maker lives in helm-widget.tsx; the generic widget registry keeps its default binding.
+Do not alter registry, route, or dashboard contracts by implication. Before implementation approve
+present-tense architecture-front §8.3, §9.6 State Management, and §10.3 Dashboard Layout Contract
+patches plus current module headers. No CONVENTIONS amendment is required by this design; escalate
+any actual convention conflict rather than silently extending governance scope.
 
-Out of scope: docstore/core changes, new primitives or glyphs, upload scheduling changes, binder
-implementation, Ops/Portal wiring, persistent task history, cross-tab task aggregation, task
-execution/cancellation, per-document failure UI, and a new logout authorization flow.
+Out of scope: provider/core changes, new primitives/glyphs, execution engine, persistent task history,
+cross-tab reporting, upload scheduling changes, binder implementation, Ops/Portal rollout, per-file
+failure surfaces, and new logout policy. CA explicitly approves additive changes to locked ux/ and
+the task/menu contracts before production.
 
-## Verification and acceptance
+## Acceptance
 
-- Existing action configuration remains valid. Test malformed/unknown bindings, one-level menu
-  parsing, route/theme actions, disabled execution, observed async failures, and reactive status.
-- Cover unknown counts, waiting work, partial failures, retry clearing, beforeunload predicate,
-  session clear, repeat start, and lock-not-acquired behavior. Preserve drain backoff tests.
-- CA checks Helm at wide and narrow allocated widths: existing commands, configured popovers,
-  focus/keyboard behavior, task visibility, failed delivery, successful retry, and exit warning
-  where the browser permits it. Field Binder later supplies the second real menu/task consumer.
-- `deno task check`, `deno task fmt:check`, `deno task test` excluding
-  `users-api-test.ts` and `session-coordinator-test.ts`; `STYLE_AUDIT`. Report exclusions.
+Cover old configuration compatibility, malformed/ambiguous bindings, default maker, menu/status
+reactivity, disabled command execution, observed async rejection, one failure report per command,
+non-blocking failure dismissal, and retry. Verify focus, keyboard use, theme action, and menus
+within narrow Helm overflow.
 
-## Dispatch decisions
+Test unknown count, waiting/failed responsibility, lock-not-acquired clearing, prepared-session
+changes, complete clearing, partial-failure backoff, unexpected-error stop, teardown, and repeated
+start. Non-blocking command failure must not trigger beforeunload; an owned pending operation does.
+CA verifies real Admin attachment delivery and Helm behavior. Browser warning tests acknowledge
+browser limitations instead of asserting universal prompt display.
 
-CA approval is needed for the three recommendations and the additive crossing into locked ux/.
-The explicit command/task contracts above need CA/ACE review before production. No additional generic framework
-or new primitive is authorized by this draft.
+Run `deno task check`, `deno task fmt:check`, `deno task test` excluding `users-api-test.ts` and
+`session-coordinator-test.ts`, and STYLE_AUDIT; state exclusions. No passing unit test substitutes
+for visual/focus verification or authorizes locked-namespace changes.
 
-## Design history
+## Records
 
 - **2026-11-10, captured from upload work.** A shared running-task indicator and exit warning
   were proposed because Admin's drain was invisible. The original label/count model cleared at
@@ -197,3 +196,12 @@ or new primitive is authorized by this draft.
   direction establishes a reusable menu fitting, independent of task reporting. Replaced
   sum-of-all-counts and guaranteed-exit-prompt assumptions with per-task units, explicit unknown
   counts, and browser-limited warning behavior. Source-site fetch is no longer a binder task.
+
+- **2026-11-11 — Separate upload instances.** The first reporting consumer is attachment delivery
+  through AttachmentsUploads, not a universal Uploads singleton. Binder delivery/preparation has
+  its own pair and app-owned execution. The task store and menu fitting remain feature-independent.
+- **2026-11-11 — Review issues made explicit in the target draft.** Closed-popover command errors
+  use the task/failure surface; blocksExit separates error visibility from unfinished work. A tab
+  failing to acquire the drain lock clears its report. User-facing pending-work explanations live
+  in the popover, not browser prompt text. These contract refinements remain subject to dispatch
+  approval and do not imply implementation authorization.
