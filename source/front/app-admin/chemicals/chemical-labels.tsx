@@ -44,7 +44,11 @@ export const ChemicalLabels = (props: ChemicalLabelsProps): UiComponent => {
       itemColumn='Label'
       items={labels}
       label={label => label.description || label.url || 'New label'}
-      emptyMessage='No labels yet.'
+      emptyMessage={
+        <>
+          No labels yet. Use <kbd>New Label</kbd> to add one.
+        </>
+      }
       newLabel='New Label'
       onNew={() => setPending({ url: '' })}
       onRemove={index => props.onChange(props.labels().filter((_, i) => i !== index))}
