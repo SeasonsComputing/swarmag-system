@@ -133,6 +133,9 @@ VITE_SUPABASE_CLIENT_MODE=browser
 VITE_SERVICE_WORKER_ENABLED=true
 VITE_LOCAL_DB_NAME=swarmag-app-admin
 VITE_DOCUMENT_INBOX_DB_NAME=swarmag-docstore-inbox
+VITE_FIELD_BINDER_INBOX_DB_NAME=swarmag-field-binder-inbox
+VITE_FIELD_BINDER_DB_NAME=swarmag-field-binder
+# Remote root VITE values are supplied from supabase/storage/{target}.jsonc by packaging.
 ```
 
 The packaging script resolves `__SECRET__` values from `secrets.jsonc` before
@@ -951,38 +954,94 @@ without mutating hosted state.
 
 ### 14.1 Ownership
 
-`DocumentServer`'s Supabase buckets are owned by this repository, as Auth's configuration is
-(§13.1); the Supabase dashboard is not an authoritative source. A per-target contract,
-`supabase/storage/{target}.jsonc`, declares the server's own settings, and a task applies it
-through the Storage API and reads back every value.
+The repository owns each remote docstore's native Storage bucket root and restrictions. The
+Supabase dashboard is not authoritative. `supabase/storage/{target}.jsonc` is the per-target
+contract consumed by provisioning, policy materialization, and UX packaging. Runtime docstore
+namespaces are logical prefixes beneath those roots, not separate native buckets.
 
-### 14.2 What Is Provisioned
+The contract has a `stores` object keyed by logical binding name. Each configured entry declares
+`root`, `fileSizeLimit`, and `public: false`. Binding keys are `attachments` and `fieldBinder`;
+entries are present for the remote stores composed for that target. For example:
 
-Each namespace in `Attachments.namespaces` (`front/api/attachments.ts`) is a Supabase bucket with
-that namespace's id and name. Its allowed content types are `AttachmentFormats.contentTypes()`
-(`front/api/attachment-formats.ts`); its file size limit and public access are the contract's. The
-task imports those modules directly, never `api.ts`, so it needs no application configuration.
-Each fact therefore has one home: the catalog, the format table, or the contract.
+```json
+{
+  "stores": {
+    "attachments": {
+      "root": "swarmag-attachments",
+      "fileSizeLimit": 52428800,
+      "public": false
+    }
+  }
+}
+```
 
-Runtime code never creates a Supabase bucket. The storage policies (`architecture-back.md` §4.7)
-grant no client the right to.
+The example root is illustrative; the committed target contract owns its actual value. An enabled
+binder source has its own fieldBinder entry and a distinct root. Roots are valid nonblank native
+bucket ids, unique across the target's configured store bindings. Limits are positive safe integer
+byte counts. Missing or malformed required entries fail before hosted mutation or bundle creation.
+There are no default roots inferred from feature names or namespace UUIDs.
 
-### 14.3 Applying Storage Configuration
+### 14.2 Provisioning and Policy Inputs
+
+`app-deploy-storage-config.ts` reads the selected target contract and provisions one native bucket
+per configured root. Attachments owns logical placement identities; the target contract owns
+physical roots.
+
+Allowed file content types come from the feature's exported format policy: attachments uses
+AttachmentFormats.contentTypes(), binder uses its file-format policy. Provisioning also
+allows the provider marker type text/plain and generated inventory/status JSON where required.
+These policies are imported without api.ts or application bootstrap. Native-bucket size/public
+settings come only from the target contract.
+
+`back/storage/storage-policies.sql` supplies role predicates and operations, using named root
+inputs. db-genesis reads the same target contract through the storage configuration reader and
+materializes referenced roots as validated, SQL-quoted literals before applying policies. A policy
+cannot refer to an undeclared binding. Logical namespace restrictions use the feature catalog's
+fixed identities and are checked against that catalog in policy integration tests. Physical
+native-bucket ids have no independent copy in handwritten SQL.
+
+Runtime code creates logical namespace/bucket markers under authorized roots; it never provisions
+a native Storage bucket. Policy provisioning is explicit and separate from bucket creation.
+
+### 14.3 Runtime Configuration and Packaging
+
+Each UX packaging task resolves its target and reads that target's storage contract before checking
+required build configuration. It supplies:
+
+| Contract value            | Logical runtime key        | Build environment key           |
+| ------------------------- | -------------------------- | ------------------------------- |
+| `stores.attachments.root` | `ATTACHMENTS_SERVER_ROOT`  | `VITE_ATTACHMENTS_SERVER_ROOT`  |
+| `stores.fieldBinder.root` | `FIELD_BINDER_SERVER_ROOT` | `VITE_FIELD_BINDER_SERVER_ROOT` |
+
+Shared ux-config.ts declares those aliases. Non-secret root values are injected into the build
+from the contract. The target contract is the sole authority for remote roots; conflicting
+environment values are configuration errors. A required runtime key needs its corresponding target
+entry. App/target environment files supply local IndexedDB names independently of remote roots.
+
+The provisioning task, policy materializer in `db-genesis.ts`, and all three app packaging tasks
+use `source/devops/scripts/storage-contract.ts` as their shared validated storage-contract reader.
+Their configuration tests verify that the packaged root, provisioned bucket id, and materialized
+policy root agree. Configuration discovery is independent of application bootstrap.
+
+### 14.4 Applying Storage Configuration
 
 ```bash
 deno task app-deploy-storage-config --target {local|dev|stage|prod}
 ```
 
-The task resolves the target (§15.3), creates or updates each namespace's Supabase bucket, and
-reads back every value it set. A target without `supabase/storage/{target}.jsonc` is not
-provisioned, and the task fails without changing hosted state.
+The task resolves the target (§15.3), validates the whole contract, creates or updates its root
+buckets through the Storage API, and reads back every configured setting, including allowed MIME
+types. A target without its contract fails before hosted mutation. Production confirmation and
+credential handling follow the target deployment rules.
 
-### 14.4 Reset and Usage
+### 14.5 Reset and Usage
 
-`db-reset` empties the provisioned Supabase buckets through the Storage API before genesis, since
-genesis leaves stored objects behind and a trigger refuses deleting Storage rows by SQL
-(`storage-reset.ts`). `deno task storage-usage --target {dev|stage|prod}` reports storage used per
-target against the free tier's 1 GB.
+storage-reset.ts enumerates the selected target contract's roots and empties them through the
+Storage API. db-reset runs that explicitly selected reset before genesis. Storage metadata is not removed by SQL.
+Storage usage reports selected roots against the target's storage capacity.
+
+Reset and deployment are explicit operational actions scoped to the selected target and roots.
+CA authorization governs execution of destructive storage operations.
 
 ## 15. Platform Target Listings
 

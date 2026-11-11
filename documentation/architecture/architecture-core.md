@@ -745,51 +745,65 @@ A record refers to a document in one of two ways, told apart by where the docume
 
 ### 10.2 Stores
 
-Every app has its own local inbox and Field Binder. The shared `DocumentServer` holds remote
-documents, including the Field Binder Source: the authoritative binder collection managed in Admin.
-The source occupies its own namespace in `DocumentServer`; it is not another physical store.
+Each docstore instance binds the common namespace → bucket → document hierarchy to one provider
+and storage root. The root belongs to the concrete provider, not the address grammar. Consumers
+operate on injected docstores without knowing their physical mapping.
 
 #### 10.2.1 Lifecycle
 
-| Store or collection | Binding                       | Lifecycle                                                             |
+| Instance            | Binding                       | Lifecycle                                                             |
 | ------------------- | ----------------------------- | --------------------------------------------------------------------- |
-| `DocumentInbox`     | IndexedDB                     | staged recovery copies and placed documents awaiting upload           |
-| `DocumentServer`    | Supabase                      | shared and permanent                                                  |
-| Field Binder Source | namespace in `DocumentServer` | authoritative remote binder documents and inventory, managed in Admin |
-| `FieldBinder`       | IndexedDB                     | local mirror of the Field Binder Source for offline reading           |
+| `AttachmentsInbox`  | IndexedDB database            | attachment staging, recovery copies, and pending delivery             |
+| `AttachmentsServer` | remote docstore root          | shared attachment documents organized by the attachment catalog       |
+| `FieldBinderInbox`  | separate IndexedDB database   | binder staging, recovery copies, and pending delivery                 |
+| `FieldBinderServer` | separate remote docstore root | authoritative binder source documents and inventory, managed in Admin |
+| `FieldBinderStore`  | separate IndexedDB database   | complete local Binder mirror for offline reading                      |
+
+Each remote instance binds a provisioned native Supabase Storage bucket. The provider maps logical
+namespaces and buckets to marker-backed prefixes beneath that root (architecture-back §4.7).
+Separate roots can share one Supabase project and caller session. The attachment catalog and the
+binder's organization are independent.
 
 #### 10.2.2 Context
 
-| App             | DocumentServer                                   | DocumentInbox    | Field Binder Source                  | FieldBinder  |
-| --------------- | ------------------------------------------------ | ---------------- | ------------------------------------ | ------------ |
-| Admin           | shows remote documents; receives drained uploads | the Admin inbox  | manages; syncs to local mirror       | local reader |
-| Ops             | receives drained job documents                   | the job inbox    | syncs to local mirror when connected | local reader |
-| Customer Portal | shows shared documents; receives drained uploads | the portal inbox | syncs to local mirror when connected | local reader |
+Every app has its own local inboxes and Binder mirror. Availability of the shared API bindings does
+not itself register routes or commands; each app supplies its own registration and scheduling.
 
-- **Uploads enter the inbox.** Every app stages and places uploaded files in its local inbox.
-  An application-controlled drain delivers placed documents to `DocumentServer`; file selection
-  does not upload directly to the server. Files for the Field Binder Source follow this same path.
-- **Management edits the source.** Admin's Field Binder Manager maintains the remote collection
-  and its inventory. It does not edit a device's local Field Binder.
-- **Sync copies source to mirror.** Each application controls when it synchronizes its local
-  Field Binder from the remote source. Sync requires connectivity; it is separate from upload
-  delivery and from opening a local document.
-- **The Field Binder reads locally.** Each app's reader opens documents from its local mirror.
-  Ops operates offline and has no remote fallback for binder reads.
-- **Different lifecycles, different stores.** The inbox holds staging and pending uploads; the
-  Field Binder retains a local mirror for reading. These are separate IndexedDB stores. The
-  remote source is a collection within the shared server, distinguished by namespace and policy.
-- **Each app's local stores are its own.** The apps are separate bundles on separate origins, so
-  the same local store name in each does not collide. Each IndexedDB store is a database of its
-  own (architecture-front §9.5.1).
-- **Access is the server's.** What each app may do through `DocumentServer`, including the Field
-  Binder Source, is enforced by its storage policies (architecture-back §4.7).
+| App             | Attachments                                                  | Field Binder Source                                | Local Field Binder                    |
+| --------------- | ------------------------------------------------------------ | -------------------------------------------------- | ------------------------------------- |
+| Admin           | edits and delivers through the attachment pair               | manages through the binder pair; initiates sync    | local reader                          |
+| Ops             | captures into the attachment inbox; delivers with job upload | supplies preparation when connected                | local reader, without remote fallback |
+| Customer Portal | uses its attachment pair under server policy                 | supplies preparation when connected and authorized | local reader                          |
+
+- **Upload instances bind pairs.** `AttachmentsUploads` connects AttachmentsInbox to
+  AttachmentsServer; `FieldBinderUploads` connects FieldBinderInbox to FieldBinderServer. Each
+  drains its own inbox. There is no universal inbox, universal upload instance, or destination
+  routing inside Uploads.
+- **All chosen files enter an inbox.** Durable capture and placement precede application-controlled
+  delivery to the paired server. Binder files follow the same lifecycle as attachment files.
+- **Management edits the source.** Admin's Field Binder Manager maintains FieldBinderServer's
+  collection and inventory. It does not edit the local reader's mirror.
+- **Preparation exposes a complete Binder.** Application-triggered sync captures a source
+  inventory, obtains its referenced files, and makes the snapshot readable only after completeness
+  is verified. Failure retains the previous complete mirror; an incomplete first copy is unavailable.
+  Inventory and device status are docstore JSON, with no new database table or kernel snapshot API.
+- **The reader uses local bytes.** Each app's Binder reader opens only FieldBinderStore. Ops
+  operates offline; a missing local file does not trigger a remote read. Sync requires connectivity
+  and is separate from opening a document or delivering an upload.
+- **Local stores have independent lifecycles.** Each local docstore occupies its own IndexedDB
+  database, containing its own Nodes and Content object stores. App origins and browser profiles
+  separate their databases (architecture-front §9.5.1). The reader is read-only; preparation writes
+  its mirror.
+- **Server policies authorize remote access.** Physical roots provide storage organization;
+  Storage policies enforce grants. Application registration is not an authorization boundary
+  (architecture-back §4.7).
 
 ### 10.3 The Inbox and Its Drains
 
-Every app has an inbox. `Uploads`, composed once over `DocumentInbox` and `DocumentServer` in
-`front/api/api.ts`, owns durable file capture, placement, document access, and delivery. Consumers
-own their destinations, references, and save ordering; Uploads knows neither notes nor inventories.
+`Uploads` owns durable file capture, placement, document access, and delivery for one injected
+inbox/server pair. `front/api/api.ts` composes independent attachment and binder instances. Consumers
+own their destinations, references, and save ordering; the shared class knows neither notes nor
+inventories. Its logical operations are independent of the providers' physical root mappings.
 
 - **Choosing a file stages it durably.** Uploads stores the supplied file's name, bytes, and
   content type in the fixed bucket of its private `Staging` namespace. The consumer holds the
@@ -804,10 +818,10 @@ own their destinations, references, and save ordering; Uploads knows neither not
 - **Discard removes staging only.** Uploads rejects discard of a placed document. The editor owns
   which staged selections it can discard; a staged document that a write may reference is
   retained. Reclamation of unreferenced documents is a separate responsibility.
-- **A drain preserves addresses.** Uploads snapshots every non-Staging inbox namespace and its
-  documents, creates their containers and bytes on the server at the same identities, then clears
-  their placed inbox copies. Staging never drains. A repeated copy returns the existing immutable
-  document, so interrupted and concurrent passes repeat safely. A pass attempts every document;
+- **A drain preserves addresses.** Each Uploads instance snapshots every non-Staging namespace
+  in its inbox, creates the containers and documents on its paired server at the same identities,
+  then clears their placed inbox copies. Staging never drains. A repeated copy returns the immutable
+  document already at that identity, so interrupted and concurrent passes repeat safely. A pass attempts every document;
   partial failure rejects after the pass, while success reports completed and remaining counts.
 - **Access follows the document.** Uploads reads metadata or mints a link from the inbox first,
   falling back to the server only when a placed document is missing. Missing staging and other
@@ -815,9 +829,10 @@ own their destinations, references, and save ordering; Uploads knows neither not
 - **The device does no content processing.** Photos are not scaled. Consumers own accepted
   formats and content-type normalization; Uploads preserves the supplied content.
 - **Each app owns delivery scheduling.** Uploads runs explicit passes and owns no timers.
-  - **Admin:** its root starts `DocumentDrain`, which drains while the app is open, under a
-    prepared session and a Web Lock that excludes other tabs. Each pass settles before the next
-    is scheduled; expected delivery failures back off and unexpected failures stop the loop.
+  - **Admin:** its root starts `DocumentDrain` for AttachmentsUploads, under a prepared session
+    and a Web Lock that excludes other tabs. Each pass settles before the next is scheduled;
+    expected delivery failures back off and unexpected failures stop the loop. Binder delivery
+    and preparation have their own application-bound invocation; they do not share this inbox.
   - **Ops:** the job upload, beside the log upload (§9.3). Photos travel with the job clone and
     drain at base, a deliberate act that qualifies the connection first, on wi-fi by default, since
     the data plan is the worker's.
@@ -825,11 +840,11 @@ own their destinations, references, and save ordering; Uploads knows neither not
 
 ### 10.4 The Catalog
 
-`Attachments`, composed with Uploads and the inbox in `front/api/api.ts`, owns attachment
-recognition, metadata, catalog destinations, and note-reference rewriting. Its private placement
-catalog uses fixed ids shared by every store on every device. A placed attachment has the same
-address in the inbox and on the server. The server's namespace declarations are exposed read-only
-to provisioning (architecture-devops §14).
+`Attachments`, composed with AttachmentsUploads and AttachmentsInbox in `front/api/api.ts`, owns
+attachment recognition, metadata, catalog destinations, and note-reference rewriting. Its private
+placement catalog uses fixed logical ids shared by the attachment stores on every device. A placed
+attachment has the same logical address in its inbox and server. Physical root configuration is
+owned by the per-target storage contract (architecture-devops §14), not the attachment catalog.
 
 - **Recognition belongs to Attachments.** Its format catalog recognizes a file by extension,
   validates the accepted kind, and supplies the content type stored through Uploads. Its returned
@@ -845,10 +860,10 @@ to provisioning (architecture-devops §14).
   and server. The attachment catalog selects destinations; it does not own delivery scheduling.
 - **A bucket per owner, its id the owner's.** The owner's bucket is created on first placement,
   and creating it again returns it, so placing never checks first.
-- **Namespaces divide by policy.** A namespace is the unit of placement and access: on the server,
-  a Supabase bucket with its own storage policies. Company-wide documents, maintained in Admin and
-  read by every staff role, share the `Library` namespace, a fixed bucket per topic; what a
-  customer reads is the Customer Portal's.
+- **Namespaces organize attachment placement and access.** Namespaces are logical containers
+  within AttachmentsServer, not native Supabase buckets. Server policy can restrict the root and
+  namespace prefix. Company-wide documents, maintained in Admin and read by staff roles, share the
+  `Library` namespace with a fixed logical bucket per topic; customer access follows server policy.
 
 | Topic     | Namespace | Bucket            | Notes on                                                                                       |
 | --------- | --------- | ----------------- | ---------------------------------------------------------------------------------------------- |

@@ -267,25 +267,38 @@ Returns a display title derived from the job's current status and available phas
 
 #### 7.2.4 Document Storage
 
-| Singleton            | Purpose                                                   |
-| -------------------- | --------------------------------------------------------- |
-| `api.Uploads`        | Durable staging, placement, document access, and delivery |
-| `api.Attachments`    | Attachment recognition, catalog placement, and references |
-| `api.DocumentInbox`  | The device's inbox document store                         |
-| `api.DocumentServer` | The shared document store                                 |
+| Binding                  | Purpose                                                        |
+| ------------------------ | -------------------------------------------------------------- |
+| `api.AttachmentsInbox`   | Device attachment staging and pending delivery                 |
+| `api.AttachmentsServer`  | Remote attachment docstore root                                |
+| `api.AttachmentsUploads` | Uploads instance over the attachment pair                      |
+| `api.Attachments`        | Attachment recognition, catalog placement, and note references |
+| `api.FieldBinderInbox`   | Independent device binder upload inbox                         |
+| `api.FieldBinderServer`  | Independent remote binder source docstore root                 |
+| `api.FieldBinderUploads` | Uploads instance over the binder pair                          |
+| `api.FieldBinderStore`   | Complete local Binder mirror                                   |
+| `api.FieldBinder`        | Local reader access, status, and explicit preparation          |
+| `api.FieldBinderSource`  | Remote inventory access and Manager mutations                  |
 
-`front/api/api.ts` composes one `Uploads` over the inbox and server and injects it, with the
-inbox, into `Attachments`. Upload lifecycle and attachment catalog policy are defined in
-`architecture-core.md` §§10.3–10.4. The docstore contract is defined in CONVENTIONS §10.8.
+`front/api/api.ts` composes each Uploads instance over its own inbox/server pair. Attachments
+receives AttachmentsUploads and AttachmentsInbox. The binder source uses FieldBinderUploads;
+its reader uses FieldBinderStore. All bindings implement the common docstore contract.
+Upload lifecycle and feature ownership are defined in architecture-core §§10.2–10.4.
 
-Feature code supplies Uploads with store-produced document and destination bucket identities.
-Attachment editors use Attachments, which recognizes their files and translates between domain
-Attachment references and document identities. Consumers own their save ordering and staged-file
-lifetime; neither service owns form state.
+IndexedDB providers receive their configured database keys. Each Supabase provider receives the
+caller-client accessor and its configured native Storage bucket root. Physical roots are supplied
+by the target storage contract through packaging (architecture-devops §14); feature code supplies
+logical document and destination bucket identities, not physical object keys.
 
-Admin's `DocumentDrain` in `front/app-admin/document-drain.ts` calls `api.Uploads.drain()`.
-The application root starts the loop after bootstrap. The loop owns session eligibility, Web Lock
-exclusion, scheduling, and retry pacing; the shared Uploads service owns each delivery pass.
+Consumers own save ordering and staged-file lifetime; Uploads owns neither form state nor scheduling.
+Admin's DocumentDrain calls `api.AttachmentsUploads.drain()`. The application root starts the loop
+after bootstrap; the loop owns session eligibility, Web Lock exclusion, and retry pacing. Binder
+preparation and delivery are independently bound application operations.
+
+Every app composes the local Binder binding. App roots register their own reader/Manager routes,
+commands, and preparation triggers. Admin manages the remote source; the Binder reader uses only
+its complete local mirror. A shared API binding does not grant a role remote access or register
+an editable reader. Remote access is governed by storage policies.
 
 ### 7.3 Provided Infrastructure
 
@@ -492,20 +505,31 @@ store many records. Each app is its own origin, so its databases are its own.
 - **A document store's database** holds two object stores, `Nodes` and `Content`, keyed by
   lineage. Each operation is one transaction, a link is a `blob:` URL, and the database asks the
   browser for persistent storage. It belongs to the browser profile, neither shared across devices
-  nor authorized by a server, so it stages documents before they reach a shared store
-  (architecture-core §10.3).
+  nor authorized by a server. Upload inboxes retain staged and placed documents; the Binder mirror
+  retains complete prepared snapshots (architecture-core §§10.2–10.3).
 - **Object stores are registered,** never shared implicitly: `IndexedDb.registerStore` declares an
   object store, its key path, and its indexes in the database a config key names, the app's by
   default.
 - **Records of a domain abstraction** use `@core/cli/make-indexeddb-client.ts`, conforming to
   `ApiCrudContract` in `@core/stdx`.
 
-| Key                      | Database Name            | App      | Content                                                      |
-| ------------------------ | ------------------------ | -------- | ------------------------------------------------------------ |
-| `LOCAL_DB_NAME`          | `swarmag-app-admin`      | Admin    | dashboard configuration, panel config, theme                 |
-| `LOCAL_DB_NAME`          | `swarmag-app-ops`        | Ops      | dashboard configuration, panel config, theme, job aggregates |
-| `LOCAL_DB_NAME`          | `swarmag-app-customer`   | Customer | dashboard configuration, theme                               |
-| `DOCUMENT_INBOX_DB_NAME` | `swarmag-docstore-inbox` | all      | the inbox: documents not yet uploaded                        |
+| Key                          | Database Name                | App      | Content                                                            |
+| ---------------------------- | ---------------------------- | -------- | ------------------------------------------------------------------ |
+| `LOCAL_DB_NAME`              | `swarmag-app-admin`          | Admin    | dashboard configuration, panel config, theme                       |
+| `LOCAL_DB_NAME`              | `swarmag-app-ops`            | Ops      | dashboard configuration, panel config, theme, job aggregates       |
+| `LOCAL_DB_NAME`              | `swarmag-app-customer`       | Customer | dashboard configuration, theme                                     |
+| `DOCUMENT_INBOX_DB_NAME`     | `swarmag-docstore-inbox`     | all      | AttachmentsInbox: staging recovery and pending attachment delivery |
+| `FIELD_BINDER_INBOX_DB_NAME` | `swarmag-field-binder-inbox` | all      | FieldBinderInbox: staging recovery and pending binder delivery     |
+| `FIELD_BINDER_DB_NAME`       | `swarmag-field-binder`       | all      | FieldBinderStore: complete local Binder and device status          |
+
+Each local docstore has a distinct configuration key and physical database name. Shared
+`ux-config.ts` declares the logical keys and their `VITE_` aliases; each app/target environment
+supplies the local names.
+
+Remote root aliases are `ATTACHMENTS_SERVER_ROOT` → `VITE_ATTACHMENTS_SERVER_ROOT` and
+`FIELD_BINDER_SERVER_ROOT` → `VITE_FIELD_BINDER_SERVER_ROOT`. Packaging supplies their non-secret
+values from the selected target's storage contract, rather than maintaining independent values
+in app env files. A composed remote instance requires its root entry; there is no implicit root.
 
 #### 9.5.2 Application Preferences
 

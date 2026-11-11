@@ -18,7 +18,7 @@ The backend layer is intentionally minimal, consisting of forward-only migration
 ```text
 back/
 ├── migrations/          # Forward-only schema deltas and RLS policies
-├── storage/             # Storage policies for DocumentServer's namespaces
+├── storage/             # Storage policies for bound docstore roots and namespace prefixes
 └── supabase-edge/
     ├── config/          # Runtime configuration
     ├── functions/       # Flat orchestration functions (authoring layout)
@@ -281,18 +281,42 @@ not restore an Auth identity. Restoring access requires a future
 
 ### 4.7 Document Storage
 
-The shared document store, `DocumentServer` (architecture-core §10.2), keeps its nodes in Supabase
-Storage itself: a namespace is a Supabase bucket, whose settings are its placement; a bucket is a
-key prefix; and a document is an object, its name in the object's metadata. Storage policies on
-`storage.objects` and `storage.buckets` are its authorization, enforced by Supabase as RLS is on
-tables (§4.3), so no client code bypasses them.
+A remote docstore instance binds a caller-session client and one provisioned Supabase Storage
+bucket root. AttachmentsServer and FieldBinderServer have independent roots; their clients can
+use the same project and caller session. The concrete SupabaseDocumentProvider interprets that
+binding; the kernel and address grammar express namespace → bucket → document lineage.
 
-Every operation goes through the Storage API; no SQL writes Storage's tables. A rename is a copy of
-the object onto its own key with new metadata. The four namespaces are provisioned
-(`architecture-devops.md` §14), never created at runtime. The storage policies, in
-`back/storage/storage-policies.sql`, grant the staff roles reading and writing in those namespaces.
-`db-genesis` applies them after `schema.sql`, whose policies sit beside their own tables, while
-Storage's tables are Supabase's.
+Within the bound native bucket, objects have these keys:
+
+```text
+{namespaceId}/.namespace
+{namespaceId}/{bucketId}/.bucket
+{namespaceId}/{bucketId}/{documentId}
+```
+
+Namespace and bucket markers hold names and creation metadata. Documents hold bytes and human
+filename metadata. Root is not a fourth logical address segment. Namespace listing reads prefixes
+inside the bound root, not project-wide native buckets. Find, resolution, counts, parent checks,
+rename, deletion, reads, and signed links use that same mapping. Empty logical containers can be
+deleted; physical root creation and deletion are provisioning operations.
+
+Every node operation goes through the Storage API; no SQL writes Storage metadata tables. Runtime
+logical namespace creation writes a marker inside an authorized root. Rename copies the marker or
+document onto its own key with new metadata, retaining logical identity and document bytes.
+Provisioned roots, restrictions, and configuration are owned by architecture-devops §14.
+
+Policies on storage.buckets and storage.objects enforce authorization under the caller's session.
+A configured root is an instance binding, not an authorization grant. Policies match the native
+bucket id and, where required, logical namespace prefixes in object keys. Grants cover permitted
+container markers as well as documents; client code has no native bucket-creation grant.
+
+`back/storage/storage-policies.sql` owns role predicates and operation grants. Target root literals
+are materialized from the same per-target storage contract used by provisioning and packaging;
+they are not independently handwritten ids. db-genesis applies the target-materialized policies
+after schema.sql. Policy rendering validates root ids and quotes them as SQL literals, failing
+before application when a referenced root is absent or invalid. Root provisioning alone does not
+create a read or write grant. Attachment and Field Binder policies specify their authorized roles,
+operations, and logical namespace access within each physical root.
 
 ## 5. Configuration Management
 
