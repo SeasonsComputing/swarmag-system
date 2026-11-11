@@ -41,22 +41,12 @@ import { PanelContainer } from '@ux/shell/panel/panel-container.tsx'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import { PanelForm } from '@ux/shell/panel/panel-form.tsx'
 import { PanelHeader } from '@ux/shell/panel/panel-header.tsx'
-import { PanelList } from '@ux/shell/panel/panel-list.tsx'
 import { PanelSequenceHeader } from '@ux/shell/panel/panel-sequence-header.tsx'
 import { PanelSequenceStep } from '@ux/shell/panel/panel-sequence-step.tsx'
 import { createPanelSequence } from '@ux/shell/panel/panel-sequence.tsx'
-import {
-  UiActionButton,
-  UiAlert,
-  UiButton,
-  UiDialog,
-  UiTable,
-  UiTableBody,
-  UiTableCell,
-  UiTableHeader,
-  UiTableRow
-} from '@ux/ui'
+import { UiActionButton, UiAlert, UiButton, UiDialog } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
+import { CollectionTable } from './collection-table.tsx'
 import type { ManagerAction, ManagerCollectionAction, ManagerContract } from './manager-contract.ts'
 import { FORM_FEEDBACK_MESSAGE } from './use-form-feedback.ts'
 import { focusFirstField } from './use-form-keyboard.ts'
@@ -151,13 +141,6 @@ export const Manager = <T extends Instance, Draft>(
   }
 
   const cancelDialog = (): void => requestExit(props.onCancel)
-
-  /** The collection's load failure as display copy, or null when it loaded. */
-  const listErrorMessage = (): string | null => {
-    const error = props.provider.listError()
-    if (error == null) return null
-    return error instanceof Error ? error.message : `${props.provider.entityLabel}s failed to load.`
-  }
 
   /** Resolve display copy for an item. */
   const itemLabel = (item: T): string => props.provider.itemLabel?.(item) ?? props.provider.entityLabel
@@ -364,100 +347,53 @@ export const Manager = <T extends Instance, Draft>(
           />
         }
         aside={
-          <PanelList
-            header={{
-              leading: <h2>{props.provider.entityLabel}s</h2>,
-              trailing: (
-                <>
+          <CollectionTable
+            provider={props.provider}
+            activate={onSelect}
+            error={collectionError()}
+            headingActions={
+              <>
+                <UiActionButton
+                  icon='plus'
+                  label={`New ${props.provider.entityLabel}`}
+                  labelMode='visible'
+                  density='dense'
+                  disabled={savePending() || actionPending()}
+                  onClick={onNew}
+                />
+                <For each={props.provider.collectionActions}>
+                  {action => (
+                    <UiActionButton
+                      name={action.name}
+                      icon={action.icon}
+                      label={action.label}
+                      labelMode='visible'
+                      density='dense'
+                      disabled={savePending() || actionPending()}
+                      onClick={() => void runCollectionAction(action)}
+                    />
+                  )}
+                </For>
+              </>
+            }
+            renderActions={item => (
+              <For each={props.provider.actions}>
+                {action => (
                   <UiActionButton
-                    icon='plus'
-                    label={`New ${props.provider.entityLabel}`}
-                    labelMode='visible'
-                    density='dense'
+                    icon={action.icon}
+                    label={action.label}
+                    variant={action.variant}
                     disabled={savePending() || actionPending()}
-                    onClick={onNew}
+                    density='dense'
+                    onClick={event => {
+                      event.stopPropagation()
+                      requestAction(action, item)
+                    }}
                   />
-                  <For each={props.provider.collectionActions}>
-                    {action => (
-                      <UiActionButton
-                        name={action.name}
-                        icon={action.icon}
-                        label={action.label}
-                        labelMode='visible'
-                        density='dense'
-                        disabled={savePending() || actionPending()}
-                        onClick={() => void runCollectionAction(action)}
-                      />
-                    )}
-                  </For>
-                </>
-              )
-            }}
-          >
-            <Show when={collectionError()}>
-              {message => <UiAlert variant='danger'>{message()}</UiAlert>}
-            </Show>
-            <Show when={listErrorMessage()}>
-              {message => <UiAlert variant='danger'>{message()}</UiAlert>}
-            </Show>
-            <Show
-              when={!props.provider.isListLoading()}
-              fallback={<p>Loading {props.provider.entityLabel.toLowerCase()}s.</p>}
-            >
-              <div data-shell='manager-list'>
-                <UiTable>
-                  <UiTableHeader>
-                    <For each={props.provider.listColumns}>
-                      {column => <UiTableCell align={column.align}>{column.label}</UiTableCell>}
-                    </For>
-                    <UiTableCell align='end'>Actions</UiTableCell>
-                  </UiTableHeader>
-                  <UiTableBody>
-                    <Show
-                      when={props.provider.list().length > 0}
-                      fallback={
-                        <UiTableRow variant='section'>
-                          <UiTableCell>
-                            No {props.provider.entityLabel.toLowerCase()}s.
-                          </UiTableCell>
-                        </UiTableRow>
-                      }
-                    >
-                      <For each={props.provider.list()}>
-                        {item => (
-                          // The row itself opens the editor — no edit action.
-                          <UiTableRow onActivate={() => onSelect(item)}>
-                            <For each={props.provider.listColumns}>
-                              {column => (
-                                <UiTableCell align={column.align}>{column.render(item)}</UiTableCell>
-                              )}
-                            </For>
-                            <UiTableCell align='end'>
-                              <For each={props.provider.actions}>
-                                {action => (
-                                  <UiActionButton
-                                    icon={action.icon}
-                                    label={action.label}
-                                    variant={action.variant}
-                                    disabled={savePending() || actionPending()}
-                                    density='dense'
-                                    onClick={event => {
-                                      event.stopPropagation()
-                                      requestAction(action, item)
-                                    }}
-                                  />
-                                )}
-                              </For>
-                            </UiTableCell>
-                          </UiTableRow>
-                        )}
-                      </For>
-                    </Show>
-                  </UiTableBody>
-                </UiTable>
-              </div>
-            </Show>
-          </PanelList>
+                )}
+              </For>
+            )}
+          />
         }
         mainRef={element => panelRef = element}
         main={<Show when={editorEpoch()} keyed>{_epoch => <Detail />}</Show>}

@@ -5,16 +5,11 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
-/* Manager lists fit their aside; identity content wraps around intrinsic columns. */
-[data-shell='manager-list'] [data-ui='table'] {
-  width: 100%;
-}
-
-[data-shell='manager-list'] [data-ui='table-body'] [data-ui='table-cell'] {
-  overflow-wrap: anywhere;
-}
-
-[data-shell='manager-list'] [data-ui='table-row']:not([data-ui-variant='section']) > :last-child {
+/* Only the Manager has an Actions column to keep intrinsic. */
+[data-shell='manager']
+  [data-shell='collection-table']
+  [data-ui='table-row']:not([data-ui-variant='section'])
+  > :last-child {
   width: 1%;
 }
 

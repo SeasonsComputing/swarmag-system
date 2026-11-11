@@ -1,0 +1,15 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Collection table styles                                                      ║
+║ Shared Collection geometry for both workbenches.                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+/* Each workbench loads these rules through its Collection table. */
+[data-shell='collection-table'] [data-ui='table'] {
+  width: 100%;
+}
+
+[data-shell='collection-table'] [data-ui='table-body'] [data-ui='table-cell'] {
+  overflow-wrap: anywhere;
+}

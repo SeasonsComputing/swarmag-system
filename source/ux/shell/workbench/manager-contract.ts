@@ -34,14 +34,8 @@ ManagerDetail              Steps and aggregate draft for one opened item.
 ├ steps                    Item editing sequence.
 └ draft                    Reads the aggregate draft.
 ManagerContract            Provider contract for list-and-panel managers.
-├ formTitle                Workbench title.
-├ entityLabel              Singular item kind.
-├ listColumns              Collection column projections.
-├ list                     Reads the collection.
-├ isListLoading            Reports collection loading.
-├ listError                Reports collection load failure.
+├ CollectionContract       Collection projection and loading.
 ├ itemLabel                Optional item display label.
-├ refresh                  Reloads the collection.
 ├ create                   Creates an item from the draft.
 ├ update                   Updates an item from the draft.
 ├ actions                  Named item actions.
@@ -51,7 +45,8 @@ ManagerContract            Provider contract for list-and-panel managers.
 
 import type { Instance } from '@core/std'
 import type { PanelSequence } from '@ux/shell/panel/panel-sequence-contract.ts'
-import type { UiActionButtonVariant, UiComponent, UiTableAlign } from '@ux/ui'
+import type { UiActionButtonVariant } from '@ux/ui'
+import type { CollectionContract, CollectionListColumn } from './collection-contract.ts'
 
 /** Confirmation copy for a consequential item action. */
 export type ManagerActionConfirmation<T extends Instance> = {
@@ -76,22 +71,11 @@ export type ManagerDetail<Draft> = {
 }
 
 /** One labelled, aligned list column and its item content. */
-export type ManagerListColumn<T extends Instance> = {
-  label: string
-  align?: UiTableAlign
-  render: (item: T) => UiComponent
-}
+export type ManagerListColumn<T extends Instance> = CollectionListColumn<T>
 
 /** Provider contract for list-and-panel managers. */
-export interface ManagerContract<T extends Instance, Draft> {
-  formTitle: string
-  entityLabel: string
-  listColumns: ManagerListColumn<T>[]
-  list: () => T[]
-  isListLoading: () => boolean
-  listError: () => unknown
+export interface ManagerContract<T extends Instance, Draft> extends CollectionContract<T> {
   itemLabel?: (item: T) => string
-  refresh: () => void | Promise<void>
   create: (draft: Draft) => T | Promise<T>
   update: (item: T, draft: Draft) => T | Promise<T>
   actions: ManagerAction<T>[]
