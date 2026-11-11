@@ -800,10 +800,15 @@ not itself register routes or commands; each app supplies its own registration a
 
 ### 10.3 The Inbox and Its Drains
 
-`Uploads` owns durable file capture, placement, document access, and delivery for one injected
-inbox/server pair. `front/api/api.ts` composes independent attachment and binder instances. Consumers
-own their destinations, references, and save ordering; the shared class knows neither notes nor
-inventories. Its logical operations are independent of the providers' physical root mappings.
+`Uploads` in `core/cli/docstore-uploads.ts` is the reusable client capability for durable file
+capture, placement, document access, and delivery between two injected docstores. It operates over
+ApiDocumentStoreContract, separately from the docstore kernel and concrete providers. Its private
+Staging namespace and bucket are lifecycle machinery, independent of application catalogs.
+
+`front/api/api.ts` composes independent attachment and binder Uploads instances. Consumers own
+their destinations, references, and save ordering; the core class has no application configuration,
+feature, scheduling, or UI dependencies. Its logical operations are independent of the providers'
+physical root mappings.
 
 - **Choosing a file stages it durably.** Uploads stores the supplied file's name, bytes, and
   content type in the fixed bucket of its private `Staging` namespace. The consumer holds the

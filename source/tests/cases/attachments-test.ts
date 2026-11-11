@@ -7,6 +7,7 @@
 
 import { Config } from '@core/cfg/config.ts'
 import { DocumentStore } from '@core/cli/docstore-client.ts'
+import { Uploads } from '@core/cli/docstore-uploads.ts'
 import { IndexedDbDocumentProvider } from '@core/cli/indexeddb-docstore-provider.ts'
 import { id, ValidatorError } from '@core/std'
 import type { Id } from '@core/std'
@@ -72,7 +73,8 @@ const Inbox = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB
 const Server = new DocumentStore(new IndexedDbDocumentProvider('ATTACHMENTS_TEST_SERVER'), {
   linkLifetime: 5
 })
-const Attachments = new AttachmentsClass(Inbox, Server)
+const Delivery = new Uploads(Inbox, Server)
+const Attachments = new AttachmentsClass(Delivery, Inbox)
 
 Deno.test('attachment recognition goes by extension through the format table', async () => {
   const cases: [string, string, string][] = [
@@ -107,13 +109,14 @@ Deno.test('attachment recognition goes by extension through the format table', a
 })
 
 Deno.test('durable staging and idempotent placement preserve reference metadata', async () => {
-  const staged = await Attachments.stage(new File(['%PDF-body'], 'order.pdf'))
+  const staged = await Attachments.stage(new File(['%PDF-body'], 'order.pdf', { type: 'text/html' }))
   assert(persistenceRequests > 0)
   const source = DocumentAddresses.id(staged.documentAddress)
   const reopened = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
     linkLifetime: 5
   })
   assertEquals(await (await reopened.document.read(source)).text(), '%PDF-body')
+  assertEquals((await reopened.document.read(source)).type, 'application/pdf')
   const owner = id()
   const notes: Note[] = [{ content: 'Order', createdAt: staged.uploadedAt, attachments: [staged] }]
   const placed = await Attachments.Customers.place(owner, notes)
@@ -154,10 +157,13 @@ Deno.test('links use inbox first, server on not-found, and propagate other failu
   await Inbox.document.delete(node)
   const second = await Attachments.link(placed)
   assertEquals(await (await fetch(second.url)).text(), 'hello')
-  const failing = new AttachmentsClass({
-    ...Inbox,
-    document: { ...Inbox.document, link: () => Promise.reject(new ApiError('Unavailable', 503)) }
-  }, Server)
+  const failing = new AttachmentsClass(
+    new Uploads({
+      ...Inbox,
+      document: { ...Inbox.document, link: () => Promise.reject(new ApiError('Unavailable', 503)) }
+    }, Server),
+    Inbox
+  )
   await assertRejects(() => failing.link(placed), ApiError, 'Unavailable')
   await new Promise(resolve => setTimeout(resolve, 15))
 })
@@ -292,208 +298,4 @@ Deno.test('closing while staging is pending discards only the late unsaved docum
   release!()
   const late = await pending
   await assertRejects(() => Inbox.document.get(DocumentAddresses.id(late.documentAddress)), ApiError)
-})
-
-Deno.test('drain preserves placed documents, retries interruptions, and tolerates concurrent reads', async context => {
-  // Earlier placement tests share these stores; begin with no placed documents pending.
-  await Attachments.drain()
-  const place = async (text: string): Promise<Attachment> => {
-    const staged = await Attachments.stage(new File([text], `${text}.txt`))
-    const notes = await Attachments.Customers.place(id(), [{
-      content: text,
-      createdAt: staged.uploadedAt,
-      attachments: [staged]
-    }])
-    return notes[0].attachments[0]
-  }
-
-  await context.step(
-    'copy keeps ids, names, bytes and type; staging and empty containers stay',
-    async () => {
-      const staged = await Attachments.stage(new File(['staged'], 'staged.txt'))
-      const attachment = await place('placed')
-      const node = DocumentAddresses.id(attachment.documentAddress)
-      const metadata = await Inbox.document.get(node)
-      const ns = (await Inbox.namespace.list()).find(row => row.id.namespace === node.namespace)!
-      const bucket = (await Inbox.bucket.list(ns.id)).find(row => row.id.bucket === node.bucket)!
-      assertEquals(await Attachments.drain(), { drained: 1, remaining: 0 })
-      assertEquals((await Server.namespace.get(ns.id)).name, ns.name)
-      assertEquals((await Server.bucket.get(bucket.id)).name, bucket.name)
-      assertEquals((await Server.document.get(node)).name, metadata.name)
-      const body = await Server.document.read(node)
-      assertEquals(await body.text(), 'placed')
-      assertEquals(body.type, 'text/plain')
-      await assertRejects(() => Inbox.document.get(node), ApiError)
-      assertEquals((await Inbox.document.list(bucket.id)).length, 0)
-      assertEquals((await Inbox.namespace.get(ns.id)).name, ns.name)
-      assertEquals(await Attachments.size(staged), 6)
-      await assertRejects(
-        () => Server.document.get(DocumentAddresses.id(staged.documentAddress)),
-        ApiError
-      )
-      assertEquals(await Attachments.drain(), { drained: 0, remaining: 0 })
-      assertEquals(await Attachments.size(attachment), 6)
-    }
-  )
-
-  await context.step('a failed copy retains its source and does not prevent other copies', async () => {
-    const failed = await place('failed-copy')
-    const good = await place('good-copy')
-    const node = DocumentAddresses.id(failed.documentAddress)
-    const create = Server.document.create
-    Server.document.create = (parent, name, body, suppliedId) => {
-      if (suppliedId === node.document) return Promise.reject(new ApiError('Injected copy failure', 503))
-      return create(parent, name, body, suppliedId)
-    }
-    try {
-      const error = await assertRejects(() => Attachments.drain(), AggregateError)
-      assertEquals(error.errors.length, 1)
-      assertEquals(await (await Inbox.document.read(node)).text(), 'failed-copy')
-      assertEquals(
-        await (await Server.document.read(DocumentAddresses.id(good.documentAddress))).text(),
-        'good-copy'
-      )
-      await assertRejects(() => Inbox.document.get(DocumentAddresses.id(good.documentAddress)), ApiError)
-    } finally {
-      Server.document.create = create
-    }
-    assertEquals(await Attachments.drain(), { drained: 1, remaining: 0 })
-  })
-
-  await context.step('remaining counts documents placed after the pass snapshot', async () => {
-    await place('snapshot')
-    const create = Server.document.create
-    let added = false
-    Server.document.create = async (parent, name, body, suppliedId) => {
-      const result = await create(parent, name, body, suppliedId)
-      if (!added) {
-        added = true
-        await place('arrived-during-pass')
-      }
-      return result
-    }
-    try {
-      assertEquals(await Attachments.drain(), { drained: 1, remaining: 1 })
-    } finally {
-      Server.document.create = create
-    }
-    assertEquals(await Attachments.drain(), { drained: 1, remaining: 0 })
-  })
-
-  await context.step(
-    'a cut-off after copying retries without duplicating or replacing the server copy',
-    async () => {
-      const attachment = await place('delete-interrupted')
-      const node = DocumentAddresses.id(attachment.documentAddress)
-      const remove = Inbox.document.delete
-      Inbox.document.delete = () => Promise.reject(new ApiError('Injected delete failure', 503))
-      try {
-        await assertRejects(() => Attachments.drain(), AggregateError)
-        assertEquals(await (await Inbox.document.read(node)).text(), 'delete-interrupted')
-      } finally {
-        Inbox.document.delete = remove
-      }
-      const before = await Server.document.get(node)
-      assertEquals(await Attachments.drain(), { drained: 1, remaining: 0 })
-      assertEquals(await Server.document.get(node), before)
-      assertEquals(await (await Server.document.read(node)).text(), 'delete-interrupted')
-    }
-  )
-
-  await context.step(
-    'a document removed after listing counts only when the server holds it',
-    async () => {
-      const attachment = await place('another-drain')
-      const node = DocumentAddresses.id(attachment.documentAddress)
-      const read = Inbox.document.read
-      Inbox.document.read = async target => {
-        if (target.document === node.document) {
-          await new AttachmentsClass({ ...Inbox, document: { ...Inbox.document, read } }, Server).drain()
-        }
-        return read(target)
-      }
-      try {
-        assertEquals(await Attachments.drain(), { drained: 1, remaining: 0 })
-      } finally {
-        Inbox.document.read = read
-      }
-      assertEquals(await Attachments.size(attachment), 13)
-    }
-  )
-
-  await context.step('a missing source without a server copy is a failure', async () => {
-    const attachment = await place('missing')
-    const node = DocumentAddresses.id(attachment.documentAddress)
-    const read = Inbox.document.read
-    Inbox.document.read = async target => {
-      if (target.document === node.document) await Inbox.document.delete(target)
-      return read(target)
-    }
-    try {
-      await assertRejects(() => Attachments.drain(), AggregateError)
-    } finally {
-      Inbox.document.read = read
-    }
-  })
-
-  await context.step(
-    'link and size fall back when their actual inbox operation races with a drain',
-    async () => {
-      const attachment = await place('read-race')
-      const link = Inbox.document.link
-      Inbox.document.link = async target => {
-        await Attachments.drain()
-        return link(target)
-      }
-      try {
-        const result = await Attachments.link(attachment)
-        assertEquals(await (await fetch(result.url)).text(), 'read-race')
-        URL.revokeObjectURL(result.url)
-      } finally {
-        Inbox.document.link = link
-      }
-      const next = await place('size-race')
-      const get = Inbox.document.get
-      Inbox.document.get = async target => {
-        await Attachments.drain()
-        return get(target)
-      }
-      try {
-        assertEquals(await Attachments.size(next), 9)
-      } finally {
-        Inbox.document.get = get
-      }
-      await new Promise(resolve => setTimeout(resolve, 10))
-    }
-  )
-
-  await context.step('staging 404s and other inbox errors never fall back', async () => {
-    const staged = await Attachments.stage(new File(['private'], 'private.txt'))
-    await Attachments.discard([staged])
-    const link = Server.document.link
-    const get = Server.document.get
-    let fallbacks = 0
-    Server.document.link = target => {
-      fallbacks++
-      return link(target)
-    }
-    Server.document.get = target => {
-      fallbacks++
-      return get(target)
-    }
-    const inboxLink = Inbox.document.link
-    try {
-      await assertRejects(() => Attachments.link(staged), ApiError)
-      await assertRejects(() => Attachments.size(staged), ApiError)
-      const attachment = await place('refused')
-      Inbox.document.link = () => Promise.reject(new ApiError('Refused', 403))
-      await assertRejects(() => Attachments.link(attachment), ApiError, 'Refused')
-      assertEquals(fallbacks, 0)
-    } finally {
-      Server.document.link = link
-      Server.document.get = get
-      Inbox.document.link = inboxLink
-    }
-    await Attachments.drain()
-  })
 })

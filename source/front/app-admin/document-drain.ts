@@ -38,7 +38,7 @@ async function drainDocuments(): Promise<void> {
   await navigator.locks.request('document-drain', { ifAvailable: true }, async lock => {
     if (!lock || !api.SessionState.isPrepared()) return
     try {
-      await api.Attachments.drain()
+      await api.AttachmentsUploads.drain()
       drainDelay = DRAIN_INTERVAL
     } catch (error) {
       if (!(error instanceof AggregateError) && !(error instanceof ApiError)) throw error

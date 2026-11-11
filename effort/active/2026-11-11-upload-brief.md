@@ -3,7 +3,8 @@
 **Active, dispatched for ACE review; refreshed and amended 2026-11-11.** Foundation mode: shared
 upload composition and concrete Supabase provider binding. The amendment "After architecture
 reconciliation and ACE dispatch review" governs the records, configuration contract, and scope
-inventory below. Production requires CA-approved scope; physical data relocation and deployment
+inventory below. The amendment "Core client placement" revises Unit A's class location and
+locked-core boundary. Production requires CA-approved scope; physical data relocation and deployment
 require separate operational authorization.
 
 ## Purpose and boundaries
@@ -130,6 +131,9 @@ stable except that delivery is called through `api.AttachmentsUploads.drain()`.
   property name does not require renaming the existing database configuration key or its value.
 
 ## Production units and scope
+
+_[The Unit A class location is superseded by the amendment "Core client placement":
+`source/core/cli/docstore-uploads.ts`, not `source/front/api/uploads.ts`.]_
 
 _[Unit B's file inventory and records prerequisite are revised by the amendment "After architecture
 reconciliation and ACE dispatch review", items 1–4. Unit A's independence is retained.]_
@@ -332,3 +336,44 @@ ACE findings, and verification results belong to this effort's amendment/records
 report, not migration commentary added to the architecture. The effort remains active until its
 productions are reviewed and independently verified under EFFORT; neither an approved brief nor a
 successful Unit A test run closes Unit B.
+
+## Amendment — 2026-11-11 — Core client placement
+
+The CA approved placement of the reusable Uploads class in core/cli. The class supplies client
+operations over injected docstore contracts and has no swarmAg/domain, feature, configuration,
+scheduling, or UI dependency. Application composition and feature policy remain in front/.
+
+1. **Class location.** Create `source/core/cli/docstore-uploads.ts`, exporting `Uploads`. This
+   supersedes `source/front/api/uploads.ts` in the original Unit A scope. Import directly through
+   `@core/cli/docstore-uploads.ts`; no front re-export, duplicate implementation, or new barrel.
+   The docstore kernel and provider contracts are unchanged.
+2. **Responsibility.** The existing Uploads contract and lifecycle preservation rules remain in
+   force. Staging UUIDs, classification, placement, fallback, and delivery mechanics belong to the
+   core class. Attachment recognition, catalog destinations, and reference rewriting remain in
+   Attachments. Field Binder publication and preparation remain feature responsibilities.
+3. **Architecture leads this location.** Architecture-core §10.3, The Inbox and Its Drains, names
+   the core client capability and its boundaries. Architecture-front §7.2.4, Document Storage,
+   names the direct core import and application composition. Neither describes a migration or
+   delegates the placement decision to ACE. Back and DevOps root/provisioning policy is unchanged.
+4. **Revised Unit A scope.** Create the core file and `source/tests/cases/uploads-test.ts`;
+   modify `source/front/api/attachments.ts`, `source/front/api/api.ts`,
+   `source/front/app-admin/document-drain.ts`, `source/tests/cases/attachments-test.ts`, and
+   `source/tests/cases/document-drain-test.ts`. Update runtime and type imports to the core path.
+   If the front upload file exists in an in-progress production, relocate its implementation to
+   the core file and remove the front file as part of this revision. Do not retain a compatibility
+   shim for a newly introduced, unshipped module.
+5. **Locked-core boundary.** Unit A now explicitly crosses into core/ for this new client file.
+   This supersedes any Unit A out-of-scope statement excluding all core changes and the earlier
+   statement that only the original Unit A paths change. The CA has authorized this placement;
+   ACE presents the revised production scope before execution. That scope authorizes no existing
+   kernel/provider mutation, governance change, or Unit B work. Unit B retains its separate scope
+   and operational gates.
+6. **Verification.** Existing Unit A checks and failure/race coverage remain required. Add the
+   core file to STYLE_AUDIT. The class has no upward imports into front/, domain/, UX, or DevOps;
+   architecture guards verify its dependency direction. Offline two-pair tests demonstrate the
+   same behavior through the core import. Code already present in a working tree is inspected
+   before relocation; its presence alone is not acceptance or scope expansion.
+
+This amendment changes placement, not the shared contract, feature behavior, physical bindings,
+logical addresses, staging identities, or application scheduling. Production authorization and
+independent verification remain governed by CONSTITUTION and AGENTS.

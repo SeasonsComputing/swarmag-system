@@ -280,9 +280,12 @@ Returns a display title derived from the job's current status and available phas
 | `api.FieldBinder`        | Local reader access, status, and explicit preparation          |
 | `api.FieldBinderSource`  | Remote inventory access and Manager mutations                  |
 
-`front/api/api.ts` composes each Uploads instance over its own inbox/server pair. Attachments
-receives AttachmentsUploads and AttachmentsInbox. The binder source uses FieldBinderUploads;
-its reader uses FieldBinderStore. All bindings implement the common docstore contract.
+The reusable Uploads class is imported directly from `@core/cli/docstore-uploads.ts`.
+`front/api/api.ts` composes each instance over its own inbox/server pair. Attachments receives
+AttachmentsUploads and AttachmentsInbox. The binder source uses FieldBinderUploads; its reader
+uses FieldBinderStore. All store bindings implement the common docstore contract. Application code
+consumes the composed instances; lifecycle mechanics belong to core/cli, while catalogs, metadata,
+references, and invocation policy belong to their application consumers.
 Upload lifecycle and feature ownership are defined in architecture-core §§10.2–10.4.
 
 IndexedDB providers receive their configured database keys. Each Supabase provider receives the

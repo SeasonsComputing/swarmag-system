@@ -7,19 +7,18 @@
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Places every attachment the application stores. A chosen file is staged in the
-inbox; when its record saves, its topic places it in the owner's bucket. A drain
-copies placed documents to the server before deleting their inbox copies. The
-catalog of namespaces and buckets is private to this module.
+inbox through Uploads; when its record saves, its topic selects the owner's
+bucket. Uploads owns document mechanics; the catalog is private to this module.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-Attachments      Attachment operations over the inbox and the server.
+Attachments      Attachment recognition, catalog placement, and references.
+├ constructor    Bind Uploads and the inbox catalog.
 ├ namespaces     Read-only provisioned namespace catalog.
 ├ stage          Store a recognized file in staging.
 ├ discard        Remove staged documents only.
 ├ link           Mint a link from the inbox or the server.
 ├ size           Read a document's size from its store.
-├ drain          Copy placed documents to the server, then clear their inbox copies.
 ├ accept         Picker filter for the allowed kinds.
 ├ Customers      Place customer and site notes.
 ├ Users          Place user notes.
@@ -28,29 +27,17 @@ Attachments      Attachment operations over the inbox and the server.
 ├ Assets         Place library asset notes.
 └ Services       Place library service notes.
 AttachmentTopic  Placement for one topic's notes.
+├ constructor    Bind Uploads, the inbox, and a catalog destination.
 └ place          Place a record's staged documents in its topic's bucket.
 */
 
+import type { Uploads } from '@core/cli/docstore-uploads.ts'
 import { immutable, notValid, toId, when } from '@core/std'
 import type { Id } from '@core/std'
-import { ApiError, DocumentAddresses } from '@core/stdx'
-import type {
-  ApiDocumentStoreContract,
-  BucketId,
-  DocumentId,
-  DocumentLink,
-  NamespaceId,
-  NodeMetadata
-} from '@core/stdx'
+import { DocumentAddresses } from '@core/stdx'
+import type { ApiDocumentStoreContract, DocumentId, DocumentLink } from '@core/stdx'
 import type { Attachment, AttachmentKind, Note } from '@domain/abstractions/common.ts'
 import { AttachmentFormats } from './attachment-formats.ts'
-
-/** One placed document captured with its source containers for a drain pass. */
-type PendingDocument = {
-  namespace: NodeMetadata<NamespaceId>
-  bucket: NodeMetadata<BucketId>
-  document: NodeMetadata<DocumentId>
-}
 
 // ────────────────────────────────────────────────────────────────────────────
 // CATALOG
@@ -58,10 +45,6 @@ type PendingDocument = {
 
 // Fixed ids that every store on every device shares, so a placed document has one address in the
 // inbox and on the server, computed from the catalog and its owner's id.
-
-/** The staging namespace and its one bucket: chosen files whose record is not yet saved. */
-const STAGING = toId('019a6000-0000-7000-8000-000000000001')
-const STAGING_BUCKET = toId('019a6000-0000-7000-8000-000000000002')
 
 /** Namespaces whose buckets are their owners' ids. */
 const CUSTOMERS = toId('019a6000-0000-7000-8000-000000000003')
@@ -94,19 +77,17 @@ export class Attachments {
   readonly Chemicals: AttachmentTopic
   readonly Assets: AttachmentTopic
   readonly Services: AttachmentTopic
-  readonly #inbox: ApiDocumentStoreContract
-  readonly #server: ApiDocumentStoreContract
+  readonly #uploads: Uploads
 
-  /** Bind the device inbox and shared server to the attachment topics. */
-  constructor(inbox: ApiDocumentStoreContract, server: ApiDocumentStoreContract) {
-    this.#inbox = inbox
-    this.#server = server
-    this.Customers = ownerTopic(inbox, CUSTOMERS, 'Customers')
-    this.Users = ownerTopic(inbox, USERS, 'Users')
-    this.Jobs = ownerTopic(inbox, JOBS, 'Jobs')
-    this.Chemicals = libraryTopic(inbox, CHEMICALS, 'Chemicals')
-    this.Assets = libraryTopic(inbox, ASSETS, 'Assets')
-    this.Services = libraryTopic(inbox, SERVICES, 'Services')
+  /** Bind upload mechanics and the inbox catalog to the attachment topics. */
+  constructor(uploads: Uploads, inbox: ApiDocumentStoreContract) {
+    this.#uploads = uploads
+    this.Customers = ownerTopic(uploads, inbox, CUSTOMERS, 'Customers')
+    this.Users = ownerTopic(uploads, inbox, USERS, 'Users')
+    this.Jobs = ownerTopic(uploads, inbox, JOBS, 'Jobs')
+    this.Chemicals = libraryTopic(uploads, inbox, CHEMICALS, 'Chemicals')
+    this.Assets = libraryTopic(uploads, inbox, ASSETS, 'Assets')
+    this.Services = libraryTopic(uploads, inbox, SERVICES, 'Services')
   }
 
   /**
@@ -118,115 +99,33 @@ export class Attachments {
     const uploadedAt = when()
     const recognized = AttachmentFormats.recognize(file)
     if (kinds && !kinds.includes(recognized.kind)) notValid('This attachment kind is not accepted.')
-    const namespace = await this.#inbox.namespace.create('Staging', STAGING)
-    const bucket = await this.#inbox.bucket.create(namespace.id, 'Staging', STAGING_BUCKET)
-    const body = new Blob([file], { type: recognized.contentType })
-    const document = await this.#inbox.document.create(bucket.id, file.name, body)
+    const normalized = new File([file], file.name, { type: recognized.contentType })
+    const document = await this.#uploads.stage(normalized)
     return { filename: file.name, documentAddress: addressOf(document.id), ...recognized, uploadedAt }
   }
 
   /** Remove staged documents; a document in an owner's bucket is never deleted here. */
   async discard(attachments: readonly Attachment[]): Promise<void> {
-    for (const attachment of attachments) {
-      const node = DocumentAddresses.id(attachment.documentAddress)
-      if (node.namespace !== STAGING) notValid('Only staged attachments can be discarded.')
-      await this.#inbox.document.delete(node)
-    }
+    await this.#uploads.discard(
+      attachments.map(attachment => DocumentAddresses.id(attachment.documentAddress))
+    )
   }
 
   /** Mint a link to an attachment from whichever store holds it. */
   async link(attachment: Attachment): Promise<DocumentLink> {
     const node = DocumentAddresses.id(attachment.documentAddress)
-    return await this.#either(node, store => store.document.link(node))
+    return await this.#uploads.link(node)
   }
 
   /** An attachment's size in bytes, from its store's metadata. */
   async size(attachment: Attachment): Promise<number> {
     const node = DocumentAddresses.id(attachment.documentAddress)
-    return (await this.#either(node, store => store.document.get(node))).count
+    return (await this.#uploads.get(node)).count
   }
 
   /** The picker's accept string for the host's kinds. */
   accept(kinds: readonly AttachmentKind[]): string {
     return AttachmentFormats.accept(kinds)
-  }
-
-  /**
-   * Copy one snapshot of placed documents to the server at the same addresses.
-   * Attempts every document and rejects after the pass if any failed. Successful
-   * results count completed documents and a fresh snapshot of those still pending.
-   */
-  async drain(): Promise<{ drained: number; remaining: number }> {
-    const pending = await this.#pending()
-    const failures: unknown[] = []
-    let drained = 0
-    for (const { namespace, bucket, document } of pending) {
-      try {
-        await this.#drainOne(namespace, bucket, document)
-        drained++
-      } catch (error) {
-        failures.push(error)
-      }
-    }
-    if (failures.length) throw new AggregateError(failures, 'Some documents could not be drained.')
-    return { drained, remaining: (await this.#pending()).length }
-  }
-
-  /** Try the inbox first; fall back to the server only for a missing, placed document. */
-  async #either<T>(
-    node: DocumentId,
-    operation: (store: ApiDocumentStoreContract) => Promise<T>
-  ): Promise<T> {
-    try {
-      return await operation(this.#inbox)
-    } catch (error) {
-      if (!(error instanceof ApiError) || error.status !== 404 || node.namespace === STAGING) throw error
-      return await operation(this.#server)
-    }
-  }
-
-  /** Snapshot placed inbox documents, excluding Staging and retaining all containers. */
-  async #pending(): Promise<readonly PendingDocument[]> {
-    const pending = []
-    for (const namespace of await this.#inbox.namespace.list()) {
-      if (namespace.id.namespace === STAGING) continue
-      for (const bucket of await this.#inbox.bucket.list(namespace.id)) {
-        for (const document of await this.#inbox.document.list(bucket.id)) {
-          pending.push({ namespace, bucket, document })
-        }
-      }
-    }
-    return pending
-  }
-
-  /** Copy a placed document at its existing address before removing its inbox copy. */
-  async #drainOne(
-    namespace: NodeMetadata<NamespaceId>,
-    bucket: NodeMetadata<BucketId>,
-    document: NodeMetadata<DocumentId>
-  ): Promise<void> {
-    let body: Blob
-    try {
-      body = await this.#inbox.document.read(document.id)
-    } catch (error) {
-      if (!(error instanceof ApiError) || error.status !== 404) throw error
-      // Another drain may have removed it since listing; only a server copy proves completion.
-      await this.#server.document.get(document.id)
-      return
-    }
-    const targetNamespace = await this.#server.namespace.create(namespace.name, namespace.id.namespace)
-    const targetBucket = await this.#server.bucket.create(
-      targetNamespace.id,
-      bucket.name,
-      bucket.id.bucket
-    )
-    await this.#server.document.create(targetBucket.id, document.name, body, document.id.document)
-    try {
-      await this.#inbox.document.delete(document.id)
-    } catch (error) {
-      if (!(error instanceof ApiError) || error.status !== 404) throw error
-      await this.#server.document.get(document.id)
-    }
   }
 }
 
@@ -244,11 +143,13 @@ type TopicPlacement = {
 export class AttachmentTopic {
   readonly #inbox: ApiDocumentStoreContract
   readonly #placement: TopicPlacement
+  readonly #uploads: Uploads
 
   /** Bind a topic's placement to the device inbox. */
-  constructor(inbox: ApiDocumentStoreContract, placement: TopicPlacement) {
+  constructor(uploads: Uploads, inbox: ApiDocumentStoreContract, placement: TopicPlacement) {
     this.#inbox = inbox
     this.#placement = placement
+    this.#uploads = uploads
   }
 
   /**
@@ -271,7 +172,7 @@ export class AttachmentTopic {
   /** Copy a staged attachment into its owner's placement; leave placed attachments unchanged. */
   async #placeOne(owner: Id, attachment: Attachment): Promise<Attachment> {
     const node = DocumentAddresses.id(attachment.documentAddress)
-    if (node.namespace !== STAGING) return { ...attachment }
+    if (!this.#uploads.isStaged(node)) return { ...attachment }
     const { namespace, bucket } = this.#placement
     const container = await this.#inbox.namespace.create(namespace.name, namespace.id)
     const target = await this.#inbox.bucket.create(
@@ -279,13 +180,7 @@ export class AttachmentTopic {
       bucket?.name ?? owner,
       bucket?.id ?? owner
     )
-    const body = await this.#inbox.document.read(node)
-    const document = await this.#inbox.document.create(
-      target.id,
-      attachment.filename,
-      body,
-      node.document
-    )
+    const document = await this.#uploads.place(node, target.id)
     return { ...attachment, documentAddress: addressOf(document.id) }
   }
 }
@@ -295,12 +190,21 @@ export class AttachmentTopic {
 // ────────────────────────────────────────────────────────────────────────────
 
 /** Build an owner-specific topic: Customers, Users, or Jobs. */
-const ownerTopic = (inbox: ApiDocumentStoreContract, namespace: Id, name: string): AttachmentTopic =>
-  new AttachmentTopic(inbox, { namespace: { id: namespace, name } })
+const ownerTopic = (
+  uploads: Uploads,
+  inbox: ApiDocumentStoreContract,
+  namespace: Id,
+  name: string
+): AttachmentTopic => new AttachmentTopic(uploads, inbox, { namespace: { id: namespace, name } })
 
 /** Build a company-wide topic with a fixed bucket in the Library namespace. */
-const libraryTopic = (inbox: ApiDocumentStoreContract, bucket: Id, name: string): AttachmentTopic =>
-  new AttachmentTopic(inbox, {
+const libraryTopic = (
+  uploads: Uploads,
+  inbox: ApiDocumentStoreContract,
+  bucket: Id,
+  name: string
+): AttachmentTopic =>
+  new AttachmentTopic(uploads, inbox, {
     namespace: { id: LIBRARY, name: 'Library' },
     bucket: { id: bucket, name }
   })

@@ -12,9 +12,10 @@ without coupling feature code to a specific storage or backend implementation.
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 api                          Shared API namespace for UX applications.
-├ DocumentInbox              Device attachment inbox.
-├ DocumentServer             Shared Supabase document store.
-├ Attachments                Staging, placement, and document access.
+├ AttachmentsInbox           Device attachment inbox.
+├ AttachmentsServer          Shared Supabase attachment store.
+├ AttachmentsUploads         Durable capture, placement, access, and delivery.
+├ Attachments                Recognition, catalog placement, and references.
 ├ Auth                       Passwordless authentication and session observation.
 ├ AppState                   Persistent state.
 ├ SessionState               Reactive authenticated-user session state.
@@ -32,6 +33,7 @@ api                          Shared API namespace for UX applications.
 
 import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
 import { DocumentStore } from '@core/cli/docstore-client.ts'
+import { Uploads } from '@core/cli/docstore-uploads.ts'
 import { IndexedDbDocumentProvider } from '@core/cli/indexeddb-docstore-provider.ts'
 import { makeCrudSupabaseClient, makeJunctionSupabaseClient } from '@core/cli/make-supabase-client.ts'
 import { SupabaseDocumentProvider } from '@core/cli/supabase-docstore-provider.ts'
@@ -69,14 +71,17 @@ import { makeAuthUsers } from './make-auth-users.ts'
 const LINK_LIFETIME = 5 * 60_000
 
 /** The device's inbox: documents staged or placed and not yet uploaded. */
-const DocumentInbox = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
+const AttachmentsInbox = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
   linkLifetime: LINK_LIFETIME
 })
 
 /** The shared document store, authorized by Storage policies. */
-const DocumentServer = new DocumentStore(new SupabaseDocumentProvider(Supabase.client), {
+const AttachmentsServer = new DocumentStore(new SupabaseDocumentProvider(Supabase.client), {
   linkLifetime: LINK_LIFETIME
 })
+
+/** Attachment delivery over the existing storage bindings. */
+const AttachmentsUploads = new Uploads(AttachmentsInbox, AttachmentsServer)
 
 /** Shared UX API namespace for authentication, state, and domain clients. */
 export const api = {
@@ -84,9 +89,10 @@ export const api = {
   Auth: AuthSupabaseClient,
 
   /** Document staging, placement and access over the two stores. */
-  DocumentInbox,
-  DocumentServer,
-  Attachments: new Attachments(DocumentInbox, DocumentServer),
+  AttachmentsInbox,
+  AttachmentsServer,
+  AttachmentsUploads,
+  Attachments: new Attachments(AttachmentsUploads, AttachmentsInbox),
 
   /** Persistent and ephemoral state. */
   AppState,

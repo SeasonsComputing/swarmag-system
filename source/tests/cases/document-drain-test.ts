@@ -10,7 +10,7 @@ import type { StringDictionary } from '@core/std'
 import { ApiError } from '@core/stdx'
 import { assertEquals, assertRejects } from '@std/assert'
 
-Deno.test('DocumentDrain backs off only drain failures and surfaces lock and programming errors', async () => {
+Deno.test('DocumentDrain backs off expected failures and surfaces unexpected errors', async () => {
   const Values: StringDictionary = {
     SUPABASE_RDBMS_URL: 'http://drain.test',
     SUPABASE_PUBLIC_KEY: 'drain-public-key',
@@ -26,7 +26,7 @@ Deno.test('DocumentDrain backs off only drain failures and surfaces lock and pro
   }, Object.keys(Values))
   const { api } = await import('@front/api/api.ts')
   const { DocumentDrain } = await import('@front/app-admin/document-drain.ts')
-  const drain = api.Attachments.drain
+  const drain = api.AttachmentsUploads.drain
   const prepared = api.SessionState.isPrepared
   let ready = false
   api.SessionState.isPrepared = () => ready
@@ -58,7 +58,7 @@ Deno.test('DocumentDrain backs off only drain failures and surfaces lock and pro
     delays.push(delay!)
     return 1
   }) as typeof setTimeout
-  api.Attachments.drain = () => {
+  api.AttachmentsUploads.drain = () => {
     calls++
     if (failure) return Promise.reject(failure)
     return Promise.resolve({ drained: 0, remaining: 0 })
@@ -106,7 +106,7 @@ Deno.test('DocumentDrain backs off only drain failures and surfaces lock and pro
     assertEquals(delays.length, scheduled)
   } finally {
     api.SessionState.isPrepared = prepared
-    api.Attachments.drain = drain
+    api.AttachmentsUploads.drain = drain
     globalThis.setTimeout = timeout
     if (locks) Object.defineProperty(navigator, 'locks', locks)
     else Reflect.deleteProperty(navigator, 'locks')
