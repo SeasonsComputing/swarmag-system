@@ -749,12 +749,16 @@ Every app has its own local inbox and Field Binder. The shared `DocumentServer` 
 documents, including the Field Binder Source: the authoritative binder collection managed in Admin.
 The source occupies its own namespace in `DocumentServer`; it is not another physical store.
 
+#### 10.2.1 Lifecycle
+
 | Store or collection | Binding                       | Lifecycle                                                             |
 | ------------------- | ----------------------------- | --------------------------------------------------------------------- |
 | `DocumentInbox`     | IndexedDB                     | staged recovery copies and placed documents awaiting upload           |
 | `DocumentServer`    | Supabase                      | shared and permanent                                                  |
 | Field Binder Source | namespace in `DocumentServer` | authoritative remote binder documents and inventory, managed in Admin |
 | `FieldBinder`       | IndexedDB                     | local mirror of the Field Binder Source for offline reading           |
+
+#### 10.2.2 Context
 
 | App             | DocumentServer                                   | DocumentInbox    | Field Binder Source                  | FieldBinder  |
 | --------------- | ------------------------------------------------ | ---------------- | ------------------------------------ | ------------ |
