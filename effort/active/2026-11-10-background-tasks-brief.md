@@ -14,7 +14,7 @@ The task store reports work; it does not execute, persist, cancel, or schedule i
 binds application commands; it does not import application APIs. Uploads remains a storage-neutral
 class with separate instances for separate inbox/server pairs.
 
-`effort/active/2026-11-11-upload-brief.md` Unit A supplies `api.AttachmentsUploads`, the first
+`effort/completed/2026-11-11-upload-brief.md` Unit A supplies `api.AttachmentsUploads`, the first
 reporting consumer. This effort does not require the Supabase root change or a completed Binder.
 `effort/active/2026-11-04-field-binder-brief.md` supplies Binder menu bindings and preparation reports
 under its own feature scope.

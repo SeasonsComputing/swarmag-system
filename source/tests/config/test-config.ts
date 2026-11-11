@@ -22,11 +22,19 @@ Config       Initialized runtime configuration singleton.
 import { Config } from '@core/cfg/config.ts'
 import { DenoProvider } from '@core/cfg/deno-provider.ts'
 
-Config.init(new DenoProvider(), [
+const Provider = new DenoProvider()
+Config.init({
+  get: name =>
+    name === 'ATTACHMENTS_SERVER_ROOT'
+      ? Provider.get(name) ?? 'offline-attachments'
+      : Provider.get(name),
+  fail: message => Provider.fail(message)
+}, [
   'SUPABASE_RDBMS_URL',
   'SUPABASE_PUBLIC_KEY',
   'SUPABASE_CLIENT_MODE',
   'DOCUMENT_INBOX_DB_NAME',
+  'ATTACHMENTS_SERVER_ROOT',
   'LOCAL_DB_NAME'
 ])
 

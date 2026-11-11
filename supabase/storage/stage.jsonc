@@ -1,4 +1,9 @@
 {
-  "fileSizeLimit": 52428800,
-  "public": false
+  "stores": {
+    "attachments": {
+      "root": "swarmag-attachments",
+      "fileSizeLimit": 52428800,
+      "public": false
+    }
+  }
 }

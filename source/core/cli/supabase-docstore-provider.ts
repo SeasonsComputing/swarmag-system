@@ -1,29 +1,30 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Supabase document provider                                                   ║
-║ Storage API nodes over provisioned namespaces and immutable object keys.    ║
+║ Storage API nodes beneath a configured native root.                          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
-Maps lineage to Storage buckets, prefix markers, and objects. Names are read
-through info; all listings paginate. Bucket deletion has a documented race
-between the empty check and marker removal. No SQL writes Storage metadata.
+Maps lineage to marker-backed prefixes and immutable objects within one root.
+Names are read through info; all listings paginate. Container deletion has a
+race between its empty check and marker removal. No SQL writes Storage metadata.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-SupabaseDocumentProvider  DocumentProviderContract over an injected client.
-├ constructor(client)     Lazily obtain the caller's Supabase session.
-├ get                     Read metadata and count children.
-├ find                    Match names within a parent.
-├ list                    Read direct children, excluding markers.
-├ create                  Return existing nodes or upload without overwrite.
-├ update                  Rename a marker or document using same-key copy.
-├ delete                  Remove documents or empty containers.
-├ read                    Download immutable bytes.
-└ link                    Sign for the kernel's fixed expiry.
+SupabaseDocumentProvider      DocumentProviderContract over an injected client.
+├ constructor(client, rootKey) Resolve root configuration and bind a lazy client.
+├ get                         Read metadata and count children.
+├ find                        Match names within a parent.
+├ list                        Read direct children, excluding markers.
+├ create                      Return existing nodes or upload without overwrite.
+├ update                      Rename a marker or document using same-key copy.
+├ delete                      Remove documents or empty containers.
+├ read                        Download immutable bytes.
+└ link                        Sign for the kernel's fixed expiry.
 */
 
+import { Config } from '@core/cfg/config.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import { isDictionary, isId, toId, toWhen, when } from '@core/std'
 import type { When } from '@core/std'
@@ -31,27 +32,25 @@ import { ApiError } from '@core/stdx'
 import type { DocumentProviderContract, Lineage, LineageMetadata } from '@core/stdx'
 import type { SupabaseClient } from '@supabase/client'
 
-/** Storage-backed nodes; namespace creation is provisioning, never a runtime write. */
+/** Logical nodes stored beneath one provisioned native Storage root. */
 export class SupabaseDocumentProvider implements DocumentProviderContract {
   readonly #client: () => SupabaseClient
 
-  constructor(client: () => SupabaseClient) {
+  readonly #root: string
+
+  constructor(client: () => SupabaseClient, rootKey: string) {
+    const root = Config.get(rootKey)
+    if (!/^[a-zA-Z0-9][a-zA-Z0-9._-]{0,99}$/.test(root)) {
+      throw new ApiError('Invalid Storage root', 400)
+    }
     this.#client = client
+    this.#root = root
   }
 
   /** Read exact metadata, deriving counts from paginated direct children. */
   async get(node: Lineage): Promise<LineageMetadata> {
-    if (node.bucket === undefined) {
-      const bucket = unwrap(await this.#client().storage.getBucket(node.namespace))
-      return {
-        lineage: node,
-        name: bucket.name,
-        createdAt: toWhen(bucket.created_at),
-        count: (await this.#entries(node)).filter(entry => isId(entry.name)).length
-      }
-    }
     const info = readStorageInfo(
-      unwrap(await this.#client().storage.from(node.namespace).info(objectKey(node)))
+      unwrap(await this.#client().storage.from(this.#root).info(objectKey(node)))
     )
     return {
       lineage: node,
@@ -70,21 +69,13 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
 
   /** List direct children; folder rows have no name metadata, so read each marker. */
   async list(parent: Lineage | null): Promise<readonly LineageMetadata[]> {
-    if (parent === null) {
-      const nodes: LineageMetadata[] = []
-      for (let offset = 0;; offset += PAGE_SIZE) {
-        const page = unwrap(await this.#client().storage.listBuckets({ limit: PAGE_SIZE, offset }))
-        for (const bucket of page) {
-          if (isId(bucket.id)) nodes.push(await this.get({ namespace: toId(bucket.id) }))
-        }
-        if (page.length < PAGE_SIZE) return nodes
-      }
-    }
-    await this.get(parent)
+    if (parent !== null) await this.#marker(parent)
     const nodes: LineageMetadata[] = []
     for (const entry of await this.#entries(parent)) {
       if (!isId(entry.name)) continue
-      const child = parent.bucket === undefined
+      const child = parent === null
+        ? { namespace: toId(entry.name) }
+        : parent.bucket === undefined
         ? { ...parent, bucket: toId(entry.name) }
         : { ...parent, document: toId(entry.name) }
       nodes.push(await this.get(child))
@@ -94,19 +85,20 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
 
   /** Preserve existing metadata and bytes, including when another creator wins the upload. */
   async create(node: Lineage, name: string, body?: Blob): Promise<LineageMetadata> {
-    if (node.bucket === undefined) return await this.get(node)
-    await this.get(
-      node.document === undefined
-        ? { namespace: node.namespace }
-        : { namespace: node.namespace, bucket: node.bucket }
-    )
+    if (node.bucket !== undefined) {
+      await this.get(
+        node.document === undefined
+          ? { namespace: node.namespace }
+          : { namespace: node.namespace, bucket: node.bucket }
+      )
+    }
     try {
       return await this.get(node)
     } catch (error) {
       if (!(error instanceof ApiError) || error.status !== 404) throw error
     }
     const content = node.document === undefined ? new Blob([], { type: 'text/plain' }) : body!
-    const result = await this.#client().storage.from(node.namespace).upload(objectKey(node), content, {
+    const result = await this.#client().storage.from(this.#root).upload(objectKey(node), content, {
       contentType: content.type,
       metadata: { name },
       upsert: false
@@ -117,10 +109,9 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
 
   /** Rename only the name; same-key copy preserves lineage, bytes, and creation time. */
   async update(node: Lineage, name: string): Promise<LineageMetadata> {
-    if (node.bucket === undefined) throw new ApiError('Namespace names are provisioned', 405)
     const before = await this.get(node)
     const info = readStorageInfo(
-      unwrap(await this.#client().storage.from(node.namespace).info(objectKey(node)))
+      unwrap(await this.#client().storage.from(this.#root).info(objectKey(node)))
     )
     const metadata = { ...info.metadata, name }
     const encoded = btoa(
@@ -131,7 +122,7 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
       method: 'POST',
       headers: { 'content-type': 'application/json', 'x-upsert': 'true', 'x-metadata': encoded },
       body: JSON.stringify({
-        bucketId: node.namespace,
+        bucketId: this.#root,
         sourceKey: objectKey(node),
         destinationKey: objectKey(node),
         copyMetadata: false
@@ -148,22 +139,22 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
 
   /** Remove documents or empty containers; prefix empty-check and removal are not atomic. */
   async delete(node: Lineage) {
-    if (node.bucket === undefined) throw new ApiError('Namespaces are provisioned', 405)
     const metadata = await this.get(node)
     if (
       node.document === undefined && (metadata.count !== 0
-        || node.bucket !== undefined
-          && (await this.#entries(node)).some(entry => entry.name !== '.bucket'))
+        || (await this.#entries(node)).some(entry =>
+          entry.name !== (node.bucket === undefined ? '.namespace' : '.bucket')
+        ))
     ) {
       throw new ApiError('Only empty document containers can be deleted', 409)
     }
-    unwrap(await this.#client().storage.from(node.namespace).remove([objectKey(node)]))
+    unwrap(await this.#client().storage.from(this.#root).remove([objectKey(node)]))
     return { id: node.document ?? node.bucket ?? node.namespace, deletedAt: when() }
   }
 
   /** Download bytes with their stored content type. */
   async read(node: Lineage): Promise<Blob> {
-    return unwrap(await this.#client().storage.from(node.namespace).download(objectKey(node)))
+    return unwrap(await this.#client().storage.from(this.#root).download(objectKey(node)))
   }
 
   /** Floor the remaining lifetime so signing never extends the kernel's expiry. */
@@ -171,22 +162,32 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
     const seconds = Math.floor((Date.parse(expiresAt) - Date.now()) / 1000)
     if (seconds <= 0) throw new ApiError('Document link expired before issuance completed', 410)
     return unwrap(
-      await this.#client().storage.from(node.namespace).createSignedUrl(
+      await this.#client().storage.from(this.#root).createSignedUrl(
         objectKey(node),
         seconds
       )
     ).signedUrl
   }
 
-  async #entries(node: Lineage): Promise<{ name: string }[]> {
+  /** Read a marker to verify existence without recursively counting its children. */
+  async #marker(node: Lineage): Promise<void> {
+    unwrap(await this.#client().storage.from(this.#root).info(objectKey(node)))
+  }
+
+  async #entries(node: Lineage | null): Promise<{ name: string }[]> {
     const entries: { name: string }[] = []
     for (let offset = 0;; offset += PAGE_SIZE) {
       const page = unwrap(
-        await this.#client().storage.from(node.namespace).list(node.bucket ?? '', {
-          limit: PAGE_SIZE,
-          offset,
-          sortBy: { column: 'name', order: 'asc' }
-        })
+        await this.#client().storage.from(this.#root).list(
+          node === null ? '' : node.bucket === undefined
+            ? node.namespace
+            : `${node.namespace}/${node.bucket}`,
+          {
+            limit: PAGE_SIZE,
+            offset,
+            sortBy: { column: 'name', order: 'asc' }
+          }
+        )
       )
       entries.push(...page)
       if (page.length < PAGE_SIZE) return entries
@@ -197,7 +198,10 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
 const PAGE_SIZE = 100
 
 /** The marker or document's immutable object key. */
-const objectKey = (node: Lineage): string => `${node.bucket}/${node.document ?? '.bucket'}`
+const objectKey = (node: Lineage): string =>
+  node.bucket === undefined
+    ? `${node.namespace}/.namespace`
+    : `${node.namespace}/${node.bucket}/${node.document ?? '.bucket'}`
 
 /** Storage may carry its semantic HTTP status in statusCode rather than status. */
 const storageStatus = (error: { message: string; status?: number; statusCode?: string }): number => {

@@ -1,15 +1,16 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Stage document store contract tests                                          ║
-║ Exercise provisioned namespaces through a caller session and clean up.      ║
+║ Exercise provisioned namespaces through a caller session and clean up.       ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
+import { Config } from '@core/cfg/config.ts'
 import { DenoProvider } from '@core/cfg/deno-provider.ts'
 import { DocumentStore } from '@core/cli/docstore-client.ts'
 import { SupabaseDocumentProvider } from '@core/cli/supabase-docstore-provider.ts'
 import { Supabase } from '@core/db/supabase.ts'
-import { id } from '@core/std'
+import { id, toId } from '@core/std'
 import { ApiError } from '@core/stdx'
 import { Attachments } from '@front/api/attachments.ts'
 import { assertEquals, assertRejects } from '@std/assert'
@@ -21,14 +22,22 @@ Deno.test({
   async fn() {
     await import('@tests/config/stage-config.ts')
     const { StageSession } = await import('@tests/fixtures/stage-session.ts')
-    const store = new DocumentStore(new SupabaseDocumentProvider(Supabase.client), {
-      linkLifetime: 5000
-    })
+    const store = new DocumentStore(
+      new SupabaseDocumentProvider(Supabase.client, 'ATTACHMENTS_SERVER_ROOT'),
+      {
+        linkLifetime: 5000
+      }
+    )
     await StageSession.run(async () => {
+      await assertRejects(() =>
+        store.namespace.create(
+          'Staging',
+          toId('019a6000-0000-7000-8000-000000000001')
+        ), ApiError)
       for (const placement of Attachments.namespaces) {
         const ns = await store.namespace.create(placement.name, placement.id)
         assertEquals(ns.name, placement.name)
-        await assertRejects(() => store.namespace.update(ns.id, 'forbidden'), ApiError)
+        assertEquals((await store.namespace.update(ns.id, placement.name)).createdAt, ns.createdAt)
         const bucket = await store.bucket.create(ns.id, 'contract-owner', id())
         try {
           const documentId = id()
@@ -70,8 +79,8 @@ Deno.test({
     })
     // StageSession has signed out the public client. Neither bytes nor markers may be uploaded.
     const placement = Attachments.namespaces[0]
-    const denied = await Supabase.client().storage.from(placement.id).upload(
-      `${id()}/.bucket`,
+    const denied = await Supabase.client().storage.from(Config.get('ATTACHMENTS_SERVER_ROOT')).upload(
+      `${placement.id}/${id()}/.bucket`,
       new Blob([], { type: 'text/plain' }),
       { metadata: { name: 'denied' } }
     )

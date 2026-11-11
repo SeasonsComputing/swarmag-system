@@ -35,13 +35,14 @@ Config.init({
   get: key =>
     ({
       LOCAL_DB_NAME: 'attachments-app',
+      ATTACHMENTS_SERVER_ROOT: 'offline-attachments',
       DOCUMENT_INBOX_DB_NAME: 'attachments-inbox',
       ATTACHMENTS_TEST_SERVER: 'attachments-server'
     })[key],
   fail: message => {
     throw new Error(message)
   }
-}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'ATTACHMENTS_TEST_SERVER'])
+}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'ATTACHMENTS_SERVER_ROOT', 'ATTACHMENTS_TEST_SERVER'])
 const { makeAttachmentSave } = await import('@front/app/shell/make-attachment-save.ts')
 Object.assign(globalThis, {
   IDBCursor,
@@ -67,9 +68,12 @@ Object.defineProperty(navigator, 'storage', {
     }
   }
 })
-const Inbox = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
-  linkLifetime: 5
-})
+const Inbox = new DocumentStore(
+  new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'),
+  {
+    linkLifetime: 5
+  }
+)
 const Server = new DocumentStore(new IndexedDbDocumentProvider('ATTACHMENTS_TEST_SERVER'), {
   linkLifetime: 5
 })
@@ -112,9 +116,12 @@ Deno.test('durable staging and idempotent placement preserve reference metadata'
   const staged = await Attachments.stage(new File(['%PDF-body'], 'order.pdf', { type: 'text/html' }))
   assert(persistenceRequests > 0)
   const source = DocumentAddresses.id(staged.documentAddress)
-  const reopened = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
-    linkLifetime: 5
-  })
+  const reopened = new DocumentStore(
+    new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'),
+    {
+      linkLifetime: 5
+    }
+  )
   assertEquals(await (await reopened.document.read(source)).text(), '%PDF-body')
   assertEquals((await reopened.document.read(source)).type, 'application/pdf')
   const owner = id()

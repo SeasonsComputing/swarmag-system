@@ -622,4 +622,20 @@ runs in Deno and has no IndexedDB. Nothing in M-6 uses it, so the Supabase provi
 
 **Picking this up:** when a back-profile consumer needs it, the sweep (B-42) among them.
 
+### B-46 · Stage storage is not on the attachment root
+
+**Observed:** 2026-11-11 · high
+
+The code binds attachments to one native root, `swarmag-attachments`, named in
+`supabase/storage/stage.jsonc`. Stage still holds the earlier layout, a native bucket per
+namespace, and its policies grant by those buckets. Until stage is transitioned, attachments there
+stage and place on the device but do not deliver, and documents in the four legacy buckets are
+unreachable. Deferred from `effort/completed/2026-11-11-upload-brief.md`, which holds the contract
+and the transition gate.
+
+**Picking this up:** the CA runs it. Provision the root (`app-deploy-storage-config`), apply the
+materialized policies (`db-genesis`), decide relocation or removal for the legacy buckets, run
+`document-store-stage-test.ts`, then check attaching in Admin on screen: Choose File, open staged,
+Save, open placed, Cancel, and delivery. It precedes the Field Binder's stage verification.
+
 _End of Backlog Document_

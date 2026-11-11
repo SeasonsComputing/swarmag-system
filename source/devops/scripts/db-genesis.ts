@@ -15,6 +15,8 @@ PUBLIC
 (script entry point — no exported symbols)
 */
 
+import { materializeStoragePolicies, readStorageContract } from './storage-contract.ts'
+
 type Target = 'dev' | 'stage' | 'prod'
 
 type SupabaseProject = {
@@ -44,8 +46,19 @@ const fail = (message: string): never => {
   Deno.exit(1)
 }
 
-const commandText = async (command: string, args: string[]): Promise<string> => {
-  const result = await new Deno.Command(command, { args }).output()
+const commandText = async (command: string, args: string[], input?: string): Promise<string> => {
+  const process = new Deno.Command(command, {
+    args,
+    stdin: input === undefined ? 'null' : 'piped',
+    stdout: 'piped',
+    stderr: 'piped'
+  }).spawn()
+  if (input !== undefined) {
+    const writer = process.stdin.getWriter()
+    await writer.write(new TextEncoder().encode(input))
+    await writer.close()
+  }
+  const result = await process.output()
   if (!result.success) {
     const error = new TextDecoder().decode(result.stderr).trim()
     fail(error || `${command} ${args.join(' ')} failed`)
@@ -151,6 +164,8 @@ const main = async (): Promise<void> => {
   await requireFile(SCHEMA_PATH)
   await requireFile(STORAGE_POLICIES_PATH)
 
+  const contract = await readStorageContract(target)
+  const policies = materializeStoragePolicies(await Deno.readTextFile(STORAGE_POLICIES_PATH), contract)
   const project = await findTargetProject(target)
   const linkedRef = await linkedProjectRef()
   if (linkedRef !== project.ref) {
@@ -169,7 +184,7 @@ const main = async (): Promise<void> => {
   console.log('Applying schema.sql through Supabase CLI...')
   await commandText('supabase', ['db', 'query', '--linked', '--file', SCHEMA_PATH])
 
-  await commandText('supabase', ['db', 'query', '--linked', '--file', STORAGE_POLICIES_PATH])
+  await commandText('supabase', ['db', 'query', '--linked', '--file', '/dev/stdin'], policies)
 
   console.log('DB_GENESIS=PASS')
 }

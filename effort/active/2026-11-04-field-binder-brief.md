@@ -40,7 +40,7 @@ enters its pair's inbox durably; a pair's drain delivers to its own server. Bind
 separate source-to-local-copy operation. Ops reads only the local Binder; it does not open source
 files remotely. The local store is writable by preparation and read-only to the reader.
 
-Dependencies: `effort/active/2026-11-11-upload-brief.md` Unit A supplies Uploads; Unit B supplies
+Dependencies: `effort/completed/2026-11-11-upload-brief.md` Unit A supplies Uploads; Unit B supplies
 root-bound remote docstores. `effort/active/2026-11-10-background-tasks-brief.md` supplies Helm menus
 and work visibility. Binder production depends on both Upload units. No binder-specific behavior
 belongs in the kernel, concrete provider, Uploads class, Helm widget, or task store.

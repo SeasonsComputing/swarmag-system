@@ -1,22 +1,25 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Supabase document provider tests                                             ║
-║ Exercise paginated counts, info metadata, immutable creates, and refusals.   ║
+║ Verify isolated roots, marker lifecycle, pagination, and caller transport.   ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 */
 
 import { Config } from '@core/cfg/config.ts'
 import { DocumentStore } from '@core/cli/docstore-client.ts'
 import { SupabaseDocumentProvider } from '@core/cli/supabase-docstore-provider.ts'
-import { id, toId } from '@core/std'
+import { id } from '@core/std'
 import { ApiError } from '@core/stdx'
-import { assertEquals, assertRejects } from '@std/assert'
+import { assert, assertEquals, assertRejects, assertThrows } from '@std/assert'
 import { createClient } from '@supabase/client'
 
 const Values = {
   SUPABASE_RDBMS_URL: 'http://storage.test',
   SUPABASE_PUBLIC_KEY: 'public',
-  SUPABASE_CLIENT_MODE: 'edge'
+  SUPABASE_CLIENT_MODE: 'edge',
+  FIRST_ROOT: 'first-root',
+  SECOND_ROOT: 'second-root',
+  INVALID_ROOT: '../invalid'
 }
 Config.init({
   get: name => Values[name as keyof typeof Values],
@@ -25,80 +28,105 @@ Config.init({
   }
 }, Object.keys(Values))
 
-Deno.test('Storage provider pages lists, preserves immutable creates, and renames through caller transport', async () => {
-  const namespace = toId('019a6000-0000-7000-8000-000000000003')
-  const bucket = id()
-  const document = id()
-  const createdAt = '2026-11-10T00:00:00.000Z'
-  const rows = new Map<string, { name: string; size: number }>()
-  rows.set(`${bucket}/.bucket`, { name: 'owner', size: 0 })
-  for (let index = 0; index < 101; index++) {
-    rows.set(`${bucket}/${id()}`, { name: `file-${index}`, size: 3 })
+/** Transport rows model Storage objects, never logical docstore operations. */
+type StoredObject = { name: string; body: Blob; createdAt: string }
+
+Deno.test('provider resolves configured roots before storage operations', () => {
+  const client = () => {
+    throw new Error('Client must remain lazy')
   }
-  rows.set(`${bucket}/${document}`, { name: 'original', size: 3 })
-  let renameHeader = ''
+  assertThrows(() => new SupabaseDocumentProvider(client, 'INVALID_ROOT'), ApiError)
+  assertThrows(() => new SupabaseDocumentProvider(client, 'MISSING_ROOT'))
+  new SupabaseDocumentProvider(client, 'FIRST_ROOT')
+})
+
+Deno.test('Storage roots isolate lineage and preserve marker and document lifecycle', async () => {
+  const rows = new Map<string, StoredObject>()
+  const createdAt = '2026-11-10T00:00:00.000Z'
   let denial = 0
   let uploadDenial = 0
+  let listPages = 0
+  let signedSeconds = 0
   const originalFetch = globalThis.fetch
+  const missing = () => Response.json({ message: 'not found', statusCode: '404' }, { status: 404 })
   globalThis.fetch = async (input, init) => {
     const request = new Request(input, init)
-    const path = new URL(request.url).pathname.replace('/storage/v1/', '')
+    const path = decodeURIComponent(new URL(request.url).pathname.replace('/storage/v1/', ''))
     if (denial) {
-      return Response.json({
-        message: denial === 413 ? 'too large' : 'mime type refused',
-        statusCode: String(denial)
-      }, { status: 400 })
+      return Response.json({ message: 'refused', statusCode: String(denial) }, { status: 400 })
     }
-    if (path === `bucket/${namespace}`) {
-      return Response.json({ id: namespace, name: 'Customers', created_at: createdAt })
-    }
-    if (path.startsWith(`object/info/${namespace}/`)) {
-      const row = rows.get(path.slice(`object/info/${namespace}/`.length))
+    assert(!path.startsWith('bucket'), 'Provider must never discover or provision native buckets')
+    if (path.startsWith('object/info/')) {
+      const row = rows.get(path.slice('object/info/'.length))
       return row
-        ? Response.json({ size: row.size, created_at: createdAt, metadata: { name: row.name } })
-        : Response.json({ message: 'not found', statusCode: '404' }, { status: 404 })
+        ? Response.json({
+          size: row.body.size,
+          created_at: row.createdAt,
+          metadata: { name: row.name }
+        })
+        : missing()
     }
-    if (path === `object/list/${namespace}`) {
+    if (path.startsWith('object/list/')) {
+      const root = path.slice('object/list/'.length)
       const query = await request.json()
-      const names = query.prefix === '' ? [bucket] : [...rows.keys()].map(key => key.split('/')[1])
-      return Response.json(
-        names.sort().slice(query.offset, query.offset + query.limit).map(name => ({ name }))
-      )
-    }
-    if (path.startsWith(`object/${namespace}/`) && request.method === 'POST') {
-      const key = path.slice(`object/${namespace}/`.length)
-      if (uploadDenial) {
-        return Response.json({
-          message: uploadDenial === 413 ? 'too large' : 'mime type refused',
-          statusCode: String(uploadDenial)
-        }, { status: 400 })
-      }
-      const raw = await request.clone().text()
-      const form = await request.formData()
-      if (rows.has(key)) {
-        return Response.json({ message: 'already exists', statusCode: '409' }, { status: 400 })
-      }
-      const metadata = JSON.parse(String(form.get('metadata')))
-      assertEquals(raw.includes('abc') || raw.includes('def'), true)
-      rows.set(key, { name: metadata.name, size: 3 })
-      return Response.json({ Key: key })
+      const prefix = `${root}/${query.prefix ? `${query.prefix}/` : ''}`
+      const names = [
+        ...new Set(
+          [...rows.keys()].filter(key => key.startsWith(prefix))
+            .map(key => key.slice(prefix.length).split('/')[0])
+        )
+      ].sort()
+      listPages++
+      return Response.json(names.slice(query.offset, query.offset + query.limit).map(name => ({ name })))
     }
     if (path === 'object/copy') {
       assertEquals(request.headers.get('authorization'), 'Bearer caller-token')
       assertEquals(request.headers.get('x-upsert'), 'true')
-      renameHeader = request.headers.get('x-metadata')!
       const payload = await request.json()
       assertEquals(payload.sourceKey, payload.destinationKey)
       assertEquals(payload.copyMetadata, false)
-      const row = rows.get(payload.sourceKey)!
-      row.name = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(renameHeader), c =>
-        c.charCodeAt(0)))).name
+      const row = rows.get(`${payload.bucketId}/${payload.sourceKey}`)!
+      const metadata = JSON.parse(new TextDecoder().decode(Uint8Array.from(
+        atob(request.headers.get('x-metadata')!),
+        c => c.charCodeAt(0)
+      )))
+      row.name = metadata.name
       return Response.json({ Key: payload.sourceKey })
     }
-    if (path === `object/${namespace}/${bucket}/${document}` && request.method === 'GET') {
-      return new Response('abc', { headers: { 'content-type': 'text/plain' } })
+    if (path.startsWith('object/sign/')) {
+      const key = path.slice('object/sign/'.length)
+      if (!rows.has(key)) return missing()
+      signedSeconds = (await request.json()).expiresIn
+      return Response.json({ signedURL: `/object/sign/${key}?token=caller-signed` })
     }
-    throw new Error(`Unexpected storage request: ${request.method} ${path}`)
+    if (path.startsWith('object/')) {
+      const key = path.slice('object/'.length)
+      if (request.method === 'POST') {
+        if (uploadDenial) {
+          return Response.json({ message: 'upload refused', statusCode: String(uploadDenial) }, {
+            status: 400
+          })
+        }
+        if (rows.has(key)) {
+          return Response.json({ message: 'duplicate', statusCode: '409' }, { status: 400 })
+        }
+        const form = init?.body instanceof FormData ? init.body : await request.formData()
+        const body = [...form.values()].find((value): value is File => value instanceof File)
+        assert(body, `No upload bytes in multipart fields: ${[...form.keys()]}`)
+        const metadata = JSON.parse(String(form.get('metadata')))
+        rows.set(key, { name: metadata.name, body, createdAt })
+        return Response.json({ Key: key })
+      }
+      if (request.method === 'DELETE') {
+        for (const prefix of (await request.json()).prefixes) rows.delete(`${key}/${prefix}`)
+        return Response.json([])
+      }
+      if (request.method === 'GET') {
+        const row = rows.get(key)
+        return row ? new Response(row.body, { headers: { 'content-type': row.body.type } }) : missing()
+      }
+    }
+    throw new Error(`Unexpected request: ${request.method} ${path}`)
   }
   const client = createClient(Values.SUPABASE_RDBMS_URL, Values.SUPABASE_PUBLIC_KEY, {
     auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
@@ -112,7 +140,7 @@ Deno.test('Storage provider pages lists, preserves immutable creates, and rename
           token_type: 'bearer',
           expires_in: 3600,
           user: {
-            id: namespace,
+            id: id(),
             aud: 'authenticated',
             app_metadata: {},
             user_metadata: {},
@@ -123,58 +151,115 @@ Deno.test('Storage provider pages lists, preserves immutable creates, and rename
       error: null
     })
   let clientCalls = 0
-  const store = new DocumentStore(
-    new SupabaseDocumentProvider(() => {
-      clientCalls++
-      return client
-    }),
-    { linkLifetime: 5000 }
-  )
+  const accessor = () => {
+    clientCalls++
+    return client
+  }
+  const first = new DocumentStore(new SupabaseDocumentProvider(accessor, 'FIRST_ROOT'), {
+    linkLifetime: 5000
+  })
+  const second = new DocumentStore(new SupabaseDocumentProvider(accessor, 'SECOND_ROOT'), {
+    linkLifetime: 5000
+  })
   assertEquals(clientCalls, 0)
   try {
-    const ns = await store.namespace.create('ignored', namespace)
-    assertEquals(clientCalls > 0, true)
-    assertEquals(ns.name, 'Customers')
-    assertEquals(ns.count, 1)
-    const owner = await store.bucket.create(ns.id, 'ignored', bucket)
-    assertEquals(owner.count, 102)
-    const existing = await store.document.create(owner.id, 'changed', new Blob(['different']), document)
-    assertEquals(existing.name, 'original')
-    assertEquals((await store.document.list(owner.id)).length, 102)
+    const namespace = await first.namespace.create('Shared')
+    const otherNamespace = await second.namespace.create('Other', namespace.id.namespace)
+    assertEquals((await first.namespace.list()).map(node => node.name), ['Shared'])
+    assertEquals((await second.namespace.list()).map(node => node.name), ['Other'])
+    assertEquals((await first.namespace.resolve('Shared')).id, namespace.id)
+    const owner = await first.bucket.create(namespace.id, 'Owner')
+    const otherOwner = await second.bucket.create(otherNamespace.id, 'Owner', owner.id.bucket)
+    const document = await first.document.create(
+      owner.id,
+      'original',
+      new Blob(['abc'], {
+        type: 'text/plain'
+      })
+    )
+    const otherDocument = await second.document.create(
+      otherOwner.id,
+      'independent',
+      new Blob(['def']),
+      document.id.document
+    )
+    assertEquals(document.id, otherDocument.id)
+    assertEquals(await (await first.document.read(document.id)).text(), 'abc')
+    assertEquals(await (await second.document.read(document.id)).text(), 'def')
+    assertEquals(
+      await first.document.create(owner.id, 'changed', new Blob(['wrong']), document.id.document),
+      document
+    )
     const concurrentId = id()
-    const creates = await Promise.all([
-      store.document.create(owner.id, 'first', new Blob(['abc'], { type: 'text/plain' }), concurrentId),
-      store.document.create(owner.id, 'second', new Blob(['def'], { type: 'text/plain' }), concurrentId)
+    const concurrent = await Promise.all([
+      first.document.create(owner.id, 'winner', new Blob(['abc']), concurrentId),
+      first.document.create(owner.id, 'loser', new Blob(['def']), concurrentId)
     ])
-    assertEquals(creates[0], creates[1])
-    assertEquals(creates[0].name, 'first')
-    const renamed = await store.document.update(existing.id, '日本語')
-    assertEquals(renamed.name, '日本語')
-    assertEquals(renamed.createdAt, existing.createdAt)
-    assertEquals(await (await store.document.read(existing.id)).text(), 'abc')
-    await assertRejects(() => store.namespace.update(ns.id, 'no'), ApiError)
-    const namespaceDelete = await assertRejects(() => store.namespace.delete(ns.id), ApiError)
-    assertEquals(namespaceDelete.status, 405)
-    await assertRejects(() => store.bucket.delete(owner.id), ApiError)
+    assertEquals(concurrent[0], concurrent[1])
+    const renamed = await first.document.update(document.id, '日本語')
+    assertEquals(renamed.createdAt, document.createdAt)
+    assertEquals(renamed.count, 3)
+    assertEquals((await first.bucket.update(owner.id, 'Renamed owner')).createdAt, owner.createdAt)
+    assertEquals((await first.namespace.update(namespace.id, 'Renamed')).createdAt, namespace.createdAt)
+    assertEquals((await first.document.resolve('Renamed/Renamed owner/日本語')).id, document.id)
+    await first.document.link(document.id)
+    assert(signedSeconds > 0 && signedSeconds <= 5)
+    const missingNamespace = { namespace: id() }
+    await assertRejects(() =>
+      new SupabaseDocumentProvider(accessor, 'FIRST_ROOT').create(
+        { ...missingNamespace, bucket: id() },
+        'Orphan'
+      ), ApiError)
+    for (let index = 0; index < 101; index++) {
+      rows.set(`first-root/${namespace.id.namespace}/${owner.id.bucket}/${id()}`, {
+        name: 'duplicate',
+        body: new Blob(['abc']),
+        createdAt
+      })
+    }
+    for (let index = 0; index < 101; index++) {
+      rows.set(`first-root/${id()}/.namespace`, {
+        name: 'Repeated namespace',
+        body: new Blob([]),
+        createdAt
+      })
+    }
+    assertEquals((await first.namespace.list()).length, 102)
+    await assertRejects(() => first.namespace.resolve('Repeated namespace'), ApiError)
+    const pagesBefore = listPages
+    assertEquals((await first.document.list(owner.id)).length, 103)
+    assert(listPages - pagesBefore >= 2)
+    assertEquals((await first.bucket.get(owner.id)).count, 103)
+    assertEquals((await first.namespace.get(namespace.id)).count, 1)
+    await assertRejects(() => first.document.resolve('Renamed/Renamed owner/duplicate'), ApiError)
+    await assertRejects(() => first.bucket.delete(owner.id), ApiError)
+    await assertRejects(() => first.namespace.delete(namespace.id), ApiError)
+    const empty = await first.namespace.create('Empty')
+    const emptyBucket = await first.bucket.create(empty.id, 'Empty')
+    const strayKey = `first-root/${empty.id.namespace}/${emptyBucket.id.bucket}/unexpected`
+    rows.set(strayKey, { name: 'Stray', body: new Blob([]), createdAt })
+    await assertRejects(() => first.bucket.delete(emptyBucket.id), ApiError)
+    rows.delete(strayKey)
+    await first.bucket.delete(emptyBucket.id)
+    await first.namespace.delete(empty.id)
+    await assertRejects(() => first.namespace.get(empty.id), ApiError)
     for (const status of [403, 404, 409, 413, 415, 500]) {
       denial = status
-      try {
-        await store.document.get(existing.id)
-        throw new Error('Expected refusal')
-      } catch (error) {
-        assertEquals(error instanceof ApiError && error.status, status)
-      }
+      const error = await assertRejects(() => first.document.get(document.id), ApiError)
+      assertEquals(error.status, status)
     }
     denial = 0
     for (const status of [413, 415]) {
       uploadDenial = status
-      try {
-        await store.document.create(owner.id, 'refused', new Blob(['abc']), id())
-        throw new Error('Expected upload refusal')
-      } catch (error) {
-        assertEquals(error instanceof ApiError && error.status, status)
-      }
+      const error = await assertRejects(
+        () => first.document.create(owner.id, 'refused', new Blob(['abc'])),
+        ApiError
+      )
+      assertEquals(error.status, status)
     }
+    uploadDenial = 0
+    await first.document.delete(document.id)
+    assertEquals(await (await second.document.read(otherDocument.id)).text(), 'def')
   } finally {
     globalThis.fetch = originalFetch
   }

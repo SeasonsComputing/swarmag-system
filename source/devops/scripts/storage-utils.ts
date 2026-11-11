@@ -1,7 +1,7 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Storage operations support                                                   ║
-║ Resolve targets and traverse Storage without application bootstrap.         ║
+║ Resolve targets and traverse Storage without application bootstrap.          ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
@@ -13,7 +13,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 StorageTarget       Resolved Storage target and service client.
 readStorageTarget   Resolve explicit target using canonical topology.
-storageObjects      List every object, including markers, within a namespace.
+storageObjects      List every object, including markers, within a configured native root.
 confirmStorageReset Require target confirmation before removing any bytes.
 */
 
@@ -88,12 +88,12 @@ export async function readStorageTarget(): Promise<StorageTarget> {
 /** Traverse prefixes, paging each level; includes markers for reset and usage. */
 export async function storageObjects(
   client: SupabaseClient,
-  namespace: string,
+  root: string,
   prefix = ''
 ): Promise<{ name: string; size: number }[]> {
   const objects: { name: string; size: number }[] = []
   for (let offset = 0;; offset += 100) {
-    const { data, error } = await client.storage.from(namespace).list(prefix, {
+    const { data, error } = await client.storage.from(root).list(prefix, {
       limit: 100,
       offset,
       sortBy: { column: 'name', order: 'asc' }
@@ -101,7 +101,7 @@ export async function storageObjects(
     if (error) throw error
     for (const entry of data) {
       const name = prefix ? `${prefix}/${entry.name}` : entry.name
-      if (entry.id === null) objects.push(...await storageObjects(client, namespace, name))
+      if (entry.id === null) objects.push(...await storageObjects(client, root, name))
       else {
         if (!isDictionary(entry.metadata) || typeof entry.metadata.size !== 'number') {
           throw new Error('Storage object has no byte size')

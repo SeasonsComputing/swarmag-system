@@ -51,6 +51,13 @@ set -a
 source "${ENV_FILE}"
 set +a
 
+# Resolve the non-secret root from the same contract used by provisioning and policies.
+VITE_ATTACHMENTS_SERVER_ROOT="$(
+  deno run --allow-read "${ROOT}/source/devops/scripts/storage-contract.ts" \
+    "${TARGET}" "${VITE_ATTACHMENTS_SERVER_ROOT:-}"
+)"
+export VITE_ATTACHMENTS_SERVER_ROOT
+
 REQUIRED_KEYS=()
 while IFS= read -r key; do
   [[ -z "${key}" ]] && continue

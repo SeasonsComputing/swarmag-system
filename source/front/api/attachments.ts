@@ -61,7 +61,7 @@ const SERVICES = toId('019a6000-0000-7000-8000-000000000009')
 // ATTACHMENTS
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Attachment operations over the inbox and the server, composed once in api.ts. */
+/** Attachment operations bound to Uploads and the inbox catalog, composed once in api.ts. */
 export class Attachments {
   /** The four placed namespaces, shared read-only with storage provisioning. */
   static readonly namespaces = immutable([
@@ -145,7 +145,7 @@ export class AttachmentTopic {
   readonly #placement: TopicPlacement
   readonly #uploads: Uploads
 
-  /** Bind a topic's placement to the device inbox. */
+  /** Bind Uploads, the inbox, and a catalog destination. */
   constructor(uploads: Uploads, inbox: ApiDocumentStoreContract, placement: TopicPlacement) {
     this.#inbox = inbox
     this.#placement = placement

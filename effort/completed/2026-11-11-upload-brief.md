@@ -1,6 +1,9 @@
 # Upload — Brief
 
-**Active, dispatched for ACE review; refreshed and amended 2026-11-11.** Foundation mode: shared
+**Completed 2026-11-11.** Unit A shipped in `07a6ce5`; Unit B ships in the commit that carries
+this closure. Closed at the CA's direction after production review of both units; see "Closure"
+at the end. An enabler of roadmap M-6. The stage transition and on-screen acceptance it leaves
+are backlog B-46. Foundation mode: shared
 upload composition and concrete Supabase provider binding. The amendment "After architecture
 reconciliation and ACE dispatch review" governs the records, configuration contract, and scope
 inventory below. The amendment "Core client placement" revises Unit A's class location and
@@ -83,11 +86,12 @@ IndexedDB binds through `IndexedDbDocumentProvider(dbKey)`, with a distinct conf
 for each inbox and local mirror. Supabase binds through:
 
 ```ts
-new SupabaseDocumentProvider(client, root)
+new SupabaseDocumentProvider(client, rootKey)
 ```
 
-`client` remains a lazy caller-session accessor; `root` is the provisioned native Supabase Storage
-bucket id. Names shown below are illustrative configuration values, not literal feature names in
+`client` remains a lazy caller-session accessor; `rootKey` names a registered runtime configuration
+key. The provider resolves and validates its value internally as the provisioned native Supabase
+Storage bucket id. API composition passes the key, without importing Config or resolving its value. Names shown below are illustrative configuration values, not literal feature names in
 the provider:
 
 ```text
@@ -260,7 +264,7 @@ Paths are repository-relative.
 
 | Area                          | Files and bounded changes                                                                                                                                                                                                                                                                                                                                                       |
 | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Concrete provider             | `source/core/cli/supabase-docstore-provider.ts`: constructor(client, root), root-relative markers/objects, operations and errors                                                                                                                                                                                                                                                |
+| Concrete provider             | `source/core/cli/supabase-docstore-provider.ts`: constructor(client, rootKey), root-relative markers/objects, operations and errors                                                                                                                                                                                                                                             |
 | Shared target reader          | New `source/devops/scripts/storage-contract.ts`: validate the per-target contract; expose roots/settings to TypeScript consumers and a non-secret packaging entry point                                                                                                                                                                                                         |
 | Target contracts              | `supabase/storage/local.jsonc`, `supabase/storage/stage.jsonc`: stores.attachments root and private size settings; no dev/prod contract creation without target selection                                                                                                                                                                                                       |
 | Runtime composition           | `source/front/api/api.ts`, `source/front/config/ux-config.ts`: supply ATTACHMENTS_SERVER_ROOT and its VITE alias to the attachment provider                                                                                                                                                                                                                                     |
@@ -377,3 +381,137 @@ scheduling, or UI dependency. Application composition and feature policy remain 
 This amendment changes placement, not the shared contract, feature behavior, physical bindings,
 logical addresses, staging identities, or application scheduling. Production authorization and
 independent verification remain governed by CONSTITUTION and AGENTS.
+
+## Unit A production review — 2026-11-11
+
+**Technical review accepted; CA Admin acceptance pending.** Implementation is committed in
+`07a6ce5`. The subsequent correction in `source/front/api/attachments.ts` is reviewed in the
+working tree and is not yet committed at this record's writing. The effort remains active:
+this is a Unit A production record, not closure of Unit A acceptance or Unit B.
+
+### Artifact review
+
+- `source/core/cli/docstore-uploads.ts` exports the reusable Uploads class over injected stores.
+  It has no upward dependencies. Staging identities, durable capture, copy-and-retain placement,
+  inbox/server access fallback, drain aggregation, and interruption/concurrency behavior follow
+  the brief. The old front upload module is absent; consumers import the core module directly.
+- Attachments retains recognition, normalized stored content types, metadata, catalog destinations,
+  and note-reference rewriting. AttachmentTopic classifies already-placed references before
+  calling Uploads.place. Screens and makeAttachmentSave retain their behavior.
+- The API composes AttachmentsInbox, AttachmentsServer, AttachmentsUploads, and
+  Attachments(AttachmentsUploads, AttachmentsInbox). The inbox database key/value, reference
+  grammar, provider construction, and Admin drain scheduling are unchanged. No stale api.DocumentInbox,
+  api.DocumentServer, or api.Attachments.drain consumer remains under source/.
+- Unit A does not implement root binding, packaging, provisioning, policies, data transitions,
+  Field Binder, or Background Tasks. Those boundaries retain their separate scopes.
+
+### Review dispositions
+
+1. **Added boundary behavior retained.** Uploads.place rejects a non-Staging identity with
+   `notValid('Only staged documents can be placed.')`. This is explicit behavior on the extracted
+   public API beyond the previous private placement helper. It is retained as validation of the
+   staged-input contract; existing attachment behavior is unaffected because its topic classifies
+   first. The production is not described as wholly behavior-identical without this qualification.
+2. **Comment corrections verified.** The Attachments class comment now names Uploads and the
+   inbox catalog. AttachmentTopic's constructor comment now names Uploads, the inbox, and its
+   catalog destination. Diff against 07a6ce5 contains exactly those two comment edits in that file.
+   No signatures, behavior, or tests change in the correction.
+
+### Verification
+
+The reviewing session reran checks against the artifact including the comment corrections:
+
+- `deno task check`: PASS — guards, full source type checking, and lint (319 files).
+- `deno task fmt:check`: PASS.
+- `deno task test --ignore=source/tests/cases/users-api-test.ts,source/tests/cases/session-coordinator-test.ts`:
+  PASS — 202 tests, 13 steps, 0 failures, 1 ignored.
+- The exclusions are `source/tests/cases/users-api-test.ts` and
+  `source/tests/cases/session-coordinator-test.ts`; neither is claimed as passed.
+  `source/tests/cases/document-store-stage-test.ts` remains opt-in and ignored in this run;
+  no live provisioning or policy check is claimed.
+- `git diff --check`: PASS.
+- `STYLE_AUDIT: PASS` for the comment-corrected `source/front/api/attachments.ts`; its dependency
+  description and constructor comment match the implementation and file header. Core placement
+  and direct imports were also inspected. No in-scope review failures remain.
+
+### Remaining work
+
+CA verifies attaching in Admin: Choose File, open staged, Save, open placed, Cancel/discard, and
+eventual delivery. Record that outcome before declaring Unit A acceptance complete. Commit the
+reviewed comment correction and effort updates separately from unperformed Unit B work.
+
+Unit B is unstarted and requires its own CA-approved scope, locked-core authorization, target
+contract values, and operational transition decision. Offline Unit A success does not authorize
+hosted mutations or close the brief. The related Background Tasks and Field Binder briefs remain
+active dependencies/consumers; their designs and authorization are not changed by this review.
+
+## Amendment — 2026-11-11 — Provider configuration encapsulation
+
+The CA directed the Supabase provider to follow the existing configuration-key binding pattern.
+Its constructor accepts `(client, rootKey)` and resolves the configured native root internally.
+API composition passes `ATTACHMENTS_SERVER_ROOT` as a key; it does not import Config. This
+supersedes the earlier literal-root constructor wording without changing root ownership, target
+contracts, logical lineage, or the shared docstore interfaces.
+
+## Production record — 2026-11-11 — Unit B implementation
+
+Foundation production implements the approved instance-root mapping. The CA selected
+`swarmag-attachments` for both local and stage contracts. SupabaseDocumentProvider receives the
+configuration key and resolves its native root internally; API composition imports no Config.
+The shared target reader supplies packaging, direct local serving, provisioning, reset/usage,
+and policy materialization. Logical identities, stored references, attachment grants, and the
+upload scheduler retain their meanings. No Binder binding or grants were introduced.
+
+Created storage-contract.ts and the three named configuration test files. Modified the scoped
+provider, API/configuration/examples, local/stage contracts, packaging/local-serving scripts,
+storage tooling, genesis/policy template, provider/live tests, and named bootstrap fixtures.
+No files were deleted. Pre-existing roadmap changes are outside this production.
+
+Verification: the permitted full suite passed 206 tests and 13 steps, with zero failures and
+one ignored live-storage test. Excluded users-api-test.ts and session-coordinator-test.ts.
+Sixteen offline shell injection cases passed across all three packaging scripts and app-local.sh,
+covering supplied/missing roots, conflicts, and absent target contracts. Shell syntax checks pass.
+Provider coverage includes config resolution without client access, two roots sharing one client,
+identical logical lineages, marker metadata, namespace and document pagination, counts, resolution,
+rename, empty deletion, immutable/concurrent creates, read/link operations, and precise errors.
+
+No hosted mutation, provisioning, policy application, reset, or relocation was executed. Live stage
+verification requires separately authorized provisioning. Deployed-data inventory and the physical
+transition decision remain operational gates; no legacy-layout fallback was added. CA Admin
+attachment acceptance and CA review remain open. Unit B implementation does not close this effort.
+
+Final checks: deno task check passed (all guards, types, and lint); deno task fmt:check passed;
+git diff --check passed. STYLE_AUDIT: PASS for the 31 changed source-code files reviewed,
+including the previously approved attachment comment corrections. No verification failures remain.
+
+## Closure — 2026-11-11
+
+The CA directed closure after the AI Architect's production review of both units.
+
+**Reviewed against the artifact.** Unit A, in `07a6ce5`: `Uploads` in
+`source/core/cli/docstore-uploads.ts`, `Attachments` over it, and the attachment pair composed in
+`source/front/api/api.ts`. Unit B, in the working tree at closure: `SupabaseDocumentProvider`
+bound to a configured native root through its key; `source/devops/scripts/storage-contract.ts` as
+the one reader for packaging, local serving, provisioning, reset, usage, and policy
+materialization; `supabase/storage/local.jsonc` and `stage.jsonc` with the `attachments` store;
+and storage policies granting by root and by namespace prefix.
+
+**Verified by the reviewing session.** `deno task check` passed (guards, types, lint; 323 files).
+`deno task fmt:check` passed. `deno task test`, excluding `users-api-test.ts` and
+`session-coordinator-test.ts`, passed: 206 tests, 13 steps, none failed, one ignored
+(`document-store-stage-test.ts`, opt-in and live). `git diff --check` passed. The five changed
+shell scripts parse. The contract entry point prints the stage root and rejects a conflicting
+supplied value.
+
+**Not verified.** Nothing ran against hosted storage: no provisioning, policy application, reset,
+or relocation. The CA's on-screen Admin attachment check is not recorded.
+
+**Settled on closing.**
+
+- **Stage transition and acceptance** become backlog B-46: provision the attachment root, apply
+  the materialized policies, dispose of the four legacy namespace buckets, run the live stage
+  test, and make the CA's on-screen Admin attachment check. Until then, attachments on stage are staged
+  and placed on the device but not delivered.
+- **Binder root, grants, and local database keys** stay with the Field Binder brief, as amendment
+  item 4 assigned them.
+- **S3** was out of scope and is dropped from this effort.

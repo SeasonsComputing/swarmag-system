@@ -15,6 +15,7 @@ import { DenoProvider } from '@core/cfg/deno-provider.ts'
 import { Supabase } from '@core/db/supabase.ts'
 import { toId, toWhen } from '@core/std'
 import type { Dictionary, StringDictionary } from '@core/std'
+import { readStorageContract } from '@devops/scripts/storage-contract.ts'
 import { assert, assertEquals, assertRejects, assertStrictEquals } from '@std/assert'
 import { StageSession } from '../fixtures/stage-session.ts'
 
@@ -23,6 +24,7 @@ Deno.test('stage session authenticates the public API and cleans up only its ses
     SUPABASE_RDBMS_URL: 'http://stage-session.invalid',
     SUPABASE_PUBLIC_KEY: 'offline-public-key',
     SUPABASE_CLIENT_MODE: 'edge',
+    ATTACHMENTS_SERVER_ROOT: (await readStorageContract('stage')).stores.attachments.root,
     DOCUMENT_INBOX_DB_NAME: 'stage-session-test-inbox',
     LOCAL_DB_NAME: 'stage-session-test',
     SUPABASE_SERVICE_ROLE_KEY: 'offline-service-key'

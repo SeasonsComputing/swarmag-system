@@ -21,12 +21,22 @@ Config       Initialized runtime configuration singleton.
 
 import { Config } from '@core/cfg/config.ts'
 import { DenoProvider } from '@core/cfg/deno-provider.ts'
+import { readStorageContract, storageBuildRoot } from '@devops/scripts/storage-contract.ts'
 
-Config.init(new DenoProvider(), [
+const Provider = new DenoProvider()
+const root = storageBuildRoot(
+  await readStorageContract('stage'),
+  Provider.get('ATTACHMENTS_SERVER_ROOT')
+)
+Config.init({
+  get: name => name === 'ATTACHMENTS_SERVER_ROOT' ? root : Provider.get(name),
+  fail: message => Provider.fail(message)
+}, [
   'SUPABASE_RDBMS_URL',
   'SUPABASE_PUBLIC_KEY',
   'SUPABASE_CLIENT_MODE',
   'DOCUMENT_INBOX_DB_NAME',
+  'ATTACHMENTS_SERVER_ROOT',
   'LOCAL_DB_NAME',
   'SUPABASE_SERVICE_ROLE_KEY'
 ], {

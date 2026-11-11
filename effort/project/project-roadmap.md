@@ -227,6 +227,15 @@ attaches and shares documents; field capture and its upload are the Ops applicat
   the consumer activates, over `CollectionContract`, which `ManagerContract` extends. The Field
   Binder's viewer is its first consumer.
 
+- **Durable upload lifecycle and root binding** — closed 2026-11-11, `07a6ce5` and the closing
+  commit, `effort/completed/2026-11-11-upload-brief.md`: `Uploads` in `core/cli`, composed per
+  inbox/server pair, and `SupabaseDocumentProvider` bound to a configured native root from one
+  storage target contract. The stage transition and on-screen acceptance are backlog B-46. This
+  is distinct from the closed Upload feature below.
+- **Background Tasks and Helm menus** — active,
+  `effort/active/2026-11-10-background-tasks-brief.md`: application-bound command menus and task
+  reporting; uses attachment delivery first and supplies the Binder's command fitting.
+
 **Features**, in order; each builds and tests on IndexedDB until the Supabase provider makes the
 store shared:
 
@@ -242,9 +251,10 @@ store shared:
    `effort/completed/2026-10-30-document-store-supabase-brief.md`: `SupabaseDocumentProvider`
    over Storage's API with names in its metadata, swapped into `api` for `DocumentServer`; storage
    provisioning, reset, and usage tasks; the staff roles' storage policies; SDK 2.119.0.
-4. **The Field Binder** (`effort/active/2026-11-04-field-binder-brief.md`): the Admin workbench,
-   a feature of its own, and its copies in `DocumentServer`, fetched or uploaded. Its Ops side is
-   M-9's.
+4. **The Field Binder** (`effort/active/2026-11-04-field-binder-brief.md`): Admin manages an
+   independent remote source through its own upload pair; the reader opens a completely prepared
+   local mirror. Files enter by upload. Depends on root binding and Helm menus above; Ops route
+   and preparation-trigger integration is M-9's.
 
 **Rides along:**
 

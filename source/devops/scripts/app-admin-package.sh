@@ -75,6 +75,13 @@ if ! command -v zip >/dev/null 2>&1; then
   exit 1
 fi
 
+# Resolve the non-secret root from the same contract used by provisioning and policies.
+VITE_ATTACHMENTS_SERVER_ROOT="$(
+  deno run --allow-read "${ROOT}/source/devops/scripts/storage-contract.ts" \
+    "${TARGET}" "${VITE_ATTACHMENTS_SERVER_ROOT:-}"
+)"
+export VITE_ATTACHMENTS_SERVER_ROOT
+
 REQUIRED_KEYS=()
 while IFS= read -r key; do
   [[ -z "${key}" ]] && continue
@@ -165,7 +172,8 @@ mkdir -p "${DIST_DIR}"
 (
   cd "${APP_ROOT}"
   VITE_MODE="${TARGET}"
-  deno run -A npm:vite build --config vite.config.ts --mode "${VITE_MODE}" --outDir "${DIST_DIR}" --emptyOutDir
+  deno run -A npm:vite build --config vite.config.ts --mode "${VITE_MODE}" \
+    --outDir "${DIST_DIR}" --emptyOutDir
 )
 
 REQUIRED_STATIC_FILES=("manifest.webmanifest" "sw.js" "icon.png" "netlify.toml" "_redirects")

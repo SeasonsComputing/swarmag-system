@@ -14,6 +14,7 @@ Deno.test('shared test configuration registers the local database before API imp
     SUPABASE_RDBMS_URL: 'http://bootstrap.test',
     SUPABASE_PUBLIC_KEY: 'bootstrap-public-key',
     SUPABASE_CLIENT_MODE: 'edge',
+    ATTACHMENTS_SERVER_ROOT: 'offline-attachments',
     DOCUMENT_INBOX_DB_NAME: 'test-config-test-inbox',
     LOCAL_DB_NAME: 'bootstrap-test'
   }

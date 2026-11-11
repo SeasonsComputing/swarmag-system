@@ -71,14 +71,20 @@ import { makeAuthUsers } from './make-auth-users.ts'
 const LINK_LIFETIME = 5 * 60_000
 
 /** The device's inbox: documents staged or placed and not yet uploaded. */
-const AttachmentsInbox = new DocumentStore(new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'), {
-  linkLifetime: LINK_LIFETIME
-})
+const AttachmentsInbox = new DocumentStore(
+  new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'),
+  {
+    linkLifetime: LINK_LIFETIME
+  }
+)
 
 /** The shared document store, authorized by Storage policies. */
-const AttachmentsServer = new DocumentStore(new SupabaseDocumentProvider(Supabase.client), {
-  linkLifetime: LINK_LIFETIME
-})
+const AttachmentsServer = new DocumentStore(
+  new SupabaseDocumentProvider(Supabase.client, 'ATTACHMENTS_SERVER_ROOT'),
+  {
+    linkLifetime: LINK_LIFETIME
+  }
+)
 
 /** Attachment delivery over the existing storage bindings. */
 const AttachmentsUploads = new Uploads(AttachmentsInbox, AttachmentsServer)
@@ -102,17 +108,26 @@ export const api = {
   AssetTypes: makeCrudSupabaseClient<AssetType>({
     table: 'asset_types',
     adapter: AssetTypeAdapter,
-    validator: { validateCreate: validateAssetTypeCreate, validateUpdate: validateAssetTypeUpdate }
+    validator: {
+      validateCreate: validateAssetTypeCreate,
+      validateUpdate: validateAssetTypeUpdate
+    }
   }),
   Assets: makeCrudSupabaseClient<Asset>({
     table: 'assets',
     adapter: AssetAdapter,
-    validator: { validateCreate: validateAssetCreate, validateUpdate: validateAssetUpdate }
+    validator: {
+      validateCreate: validateAssetCreate,
+      validateUpdate: validateAssetUpdate
+    }
   }),
   Chemicals: makeCrudSupabaseClient<Chemical>({
     table: 'chemicals',
     adapter: ChemicalAdapter,
-    validator: { validateCreate: validateChemicalCreate, validateUpdate: validateChemicalUpdate }
+    validator: {
+      validateCreate: validateChemicalCreate,
+      validateUpdate: validateChemicalUpdate
+    }
   }),
   Customers: makeCrudSupabaseClient<Customer>({
     table: 'customers',
@@ -134,7 +149,10 @@ export const api = {
   Services: makeCrudSupabaseClient<Service>({
     table: 'services',
     adapter: ServiceAdapter,
-    validator: { validateCreate: validateServiceCreate, validateUpdate: validateServiceUpdate }
+    validator: {
+      validateCreate: validateServiceCreate,
+      validateUpdate: validateServiceUpdate
+    }
   }),
   ServiceRequiredAssetTypes: makeJunctionSupabaseClient<ServiceRequiredAssetType>({
     table: 'service_required_asset_types',
