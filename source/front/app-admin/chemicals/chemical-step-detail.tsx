@@ -159,19 +159,18 @@ export const ChemicalStepDetail = (props: ChemicalStepDetailProps): UiComponent 
                     error={validation.isInvalid('storageLocation')}
                   />
                 </UiField>
-                <UiField for='sdsUrl' label='SDS URL'>
-                  <UrlField
-                    name='sdsUrl'
-                    value={state.sdsUrl()}
-                    schemes={['https', 'http']}
-                    onValue={value => {
-                      state.setSdsUrl(value)
-                      validation.inputField('sdsUrl')
-                    }}
-                    onBlur={() => validation.blurField('sdsUrl')}
-                    error={validation.isInvalid('sdsUrl')}
-                  />
-                </UiField>
+                <UrlField
+                  label='SDS URL'
+                  name='sdsUrl'
+                  value={state.sdsUrl()}
+                  schemes={['https', 'http']}
+                  onValue={value => {
+                    state.setSdsUrl(value)
+                    validation.inputField('sdsUrl')
+                  }}
+                  onBlur={() => validation.blurField('sdsUrl')}
+                  error={validation.isInvalid('sdsUrl')}
+                />
               </UiLayout>
             </UiFieldset>
             <ChemicalLabels labels={state.labels} onChange={state.setLabels} drill={drill} />

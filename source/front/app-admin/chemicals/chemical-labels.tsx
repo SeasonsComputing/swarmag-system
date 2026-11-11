@@ -108,16 +108,15 @@ const LabelPanel = (props: LabelPanelProps): UiComponent => {
   }))
   return (
     <UiLayout>
-      <UiField label='URL' for='label-url' required>
-        <UrlField
-          name='label-url'
-          value={url()}
-          onValue={setUrl}
-          schemes={['https', 'http']}
-          required
-          error={attempted() && !isUrl(url().trim(), ['https', 'http'])}
-        />
-      </UiField>
+      <UrlField
+        label='URL'
+        name='label-url'
+        value={url()}
+        onValue={setUrl}
+        schemes={['https', 'http']}
+        required
+        error={attempted() && !isUrl(url().trim(), ['https', 'http'])}
+      />
       <UiField label='Description' for='label-description'>
         <UiInput
           name='label-description'

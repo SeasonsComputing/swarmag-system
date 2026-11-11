@@ -1,0 +1,10 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ URL field styles                                                             ║
+║ Keeps the open action compact beside the stretching URL input.               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-app='url-field'] > [data-ui='field'][data-ui-variant='caption'] {
+  flex: 0 0 auto;
+}
