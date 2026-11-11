@@ -8,7 +8,7 @@ attachments, upload, and server parts were folded into roadmap M-6's briefs
 `effort/completed/2026-10-30-document-store-supabase-brief.md`). What remained is the Field Binder: a
 first-class feature, its Admin workbench the last of M-6's features, and its Ops side M-9's. It
 depends on the Manager and Lister enablers (`effort/completed/2026-11-10-manager-brief.md`,
-`effort/active/2026-11-10-lister-brief.md`).
+`effort/completed/2026-11-10-lister-brief.md`).
 
 ## What triggered it
 
@@ -79,7 +79,9 @@ its copy.
 The Field Binder's viewer is a `Lister` over the device's own inventory: each entry's description
 and source, and the sync status. Activating an entry opens its local copy through a link minted
 from the device's `FieldBinder` store, so it works without signal. It lives in the shared
-`front/app`, as it reads `api`: Admin opens it from the Helm, and it is Ops' binder screen in M-9.
+`front/app`, as it reads `api`: Admin opens it from the Helm, and it is Ops' binder screen in M-9. It is
+the `Lister`'s first consumer, so its acceptance verifies the `Lister` on screen (the Lister brief's
+closure).
 
 ## Admin
 

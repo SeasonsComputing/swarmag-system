@@ -1,6 +1,7 @@
 # Lister — Brief
 
-**Active, draft; recorded 2026-11-10.** An enabler of roadmap M-6, ahead of its fourth feature, the
+**Completed 2026-11-10.** Shipped in `b980b19`, with the records in `9668a2c` and `44f48af`. An
+enabler of roadmap M-6, ahead of its fourth feature, the
 Field Binder (`effort/active/2026-11-04-field-binder-brief.md`), whose viewer is the first
 workbench that presents a Collection to read. Foundation mode: it changes `ux/`, locked since
 2026-10-21, and the CA authorized that crossing in conversation on 2026-11-10 (EFFORT §8).
@@ -144,3 +145,18 @@ The AI Architect writes these before production:
    imported by `collection-table.tsx`, with the hook `data-shell='collection-table'`. The
    Manager's last-column rule targets that hook inside `[data-shell='manager']`. `lister.css`
    holds nothing of the Lister's own, so it is removed.
+
+## Closure (2026-11-10)
+
+Production by the AI Coding Engine in two rounds, the second after the amendment "After production
+review"; committed in `b980b19`. The AI Architect verified the diff against the brief: the
+Collection drawn by `collection-table.tsx` for both workbenches, `ManagerContract` extending
+`CollectionContract` with no consumer changed, the Manager's Item actions and pending locks
+unchanged, and the shared styles beside the table. The AI Architect re-ran the checks: guards,
+types, lint, formatting, and 201 tests, the two environment-dependent files excluded;
+`STYLE_AUDIT: PASS`. The CA closed it.
+
+Settled at closure:
+
+- **`Lister` on screen:** the Field Binder's viewer is its first consumer, and its acceptance
+  verifies it (`effort/active/2026-11-04-field-binder-brief.md`).
