@@ -17,13 +17,21 @@ const Commands: HelmBindings = {
 const Route = { command: '/binder', label: 'Binder', icon: 'backpack' }
 const Menu = { label: 'Backpack', icon: 'backpack', items: [Route, { status: 'ready' }] }
 
-Deno.test('Helm accepts all current dashboards with empty bindings', async () => {
+const AdminBindings: HelmBindings = {
+  commands: { '@sync-field-binder': { execute: () => {} } },
+  status: { 'field-binder': () => 'Not downloaded' }
+}
+
+Deno.test('Helm accepts current dashboards with their app bindings', async () => {
   for (const app of ['admin', 'ops', 'customer']) {
     const seed = JSON.parse(await Deno.readTextFile(`source/front/app-${app}/dashboard-${app}.json`))
     const helm = seed.header.widgets.find((widget: { type: string }) => widget.type === 'HelmWidget')
-    const actions = readHelmActions(helm.settings.actions, {})
+    const actions = readHelmActions(helm.settings.actions, app === 'admin' ? AdminBindings : {})
     assertEquals(actions.length, helm.settings.actions.length)
   }
+})
+
+Deno.test('Helm accepts default routes and explicitly bound commands and status', () => {
   assertEquals(readHelmActions([Route], {}), [{ ...Route, labelMode: 'visible' }])
   assertEquals(readHelmActions([Menu], Commands), [{
     ...Menu,
