@@ -394,6 +394,11 @@ Shared, read-mostly server data follows the query state module pattern (CONVENTI
 
 ### 9.1 Application Shell Structure
 
+`bootstrap` accepts an optional application mount callback returning cleanup. It invokes that
+callback after session initialization under the Solid root mount owner and registers its cleanup
+for disposal. Applications use this fitting for root-lifetime services independently of identity
+coordination. Existing application declarations and one-argument bootstrap calls remain valid.
+
 Each app root (`source/front/app-{admin|customer|ops}/app.tsx`) composes the same shell primitives from `ux/`:
 
 ```text
@@ -546,15 +551,16 @@ in app env files. A composed remote instance requires its root entry; there is n
 
 ### 9.6 State Management
 
-| Concern          | Mechanism       | Location                                |
-| ---------------- | --------------- | --------------------------------------- |
-| auth / session   | SolidJS store   | `ux/shell/runtime/session-state.ts`     |
-| app preferences  | IndexedDB       | `ux/shell/runtime/app-state.ts`         |
-| dashboard config | IndexedDB       | `ux/shell/dashboard/dashboard-state.ts` |
-| server data      | TanStack Query  | per-page query hooks                    |
-| shared catalogs  | TanStack Query  | Query State modules (§8.4)              |
-| local ui state   | SolidJS signals | component-local                         |
-| ops field data   | IndexedDB       | `app-ops/stores/jobs-store.ts`          |
+| Concern                            | Mechanism       | Location                                |
+| ---------------------------------- | --------------- | --------------------------------------- |
+| background work / command failures | SolidJS store   | `ux/shell/runtime/background-tasks.ts`  |
+| auth / session                     | SolidJS store   | `ux/shell/runtime/session-state.ts`     |
+| app preferences                    | IndexedDB       | `ux/shell/runtime/app-state.ts`         |
+| dashboard config                   | IndexedDB       | `ux/shell/dashboard/dashboard-state.ts` |
+| server data                        | TanStack Query  | per-page query hooks                    |
+| shared catalogs                    | TanStack Query  | Query State modules (§8.4)              |
+| local ui state                     | SolidJS signals | component-local                         |
+| ops field data                     | IndexedDB       | `app-ops/stores/jobs-store.ts`          |
 
 Draft copying is in the `@ux/shell/workbench/workbench-draft.ts` header, and the state rules are in
 CONVENTIONS §16.3.
@@ -717,6 +723,11 @@ after package configuration (§8.2) and merges them with
 `{ ...UxWidgetRegistry, ...AppWidgetRegistry }`, so app entries take precedence for shared keys.
 The merged registry and app-local dashboard JSON form the two halves of one dashboard-shell
 declaration.
+
+Applications bind Helm behavior by registering `makeHelmWidget(bindings)` from
+`ux/widgets/make-helm-widget.tsx` under the existing `HelmWidget` key in their merged registry.
+The generic registry retains the default widget with empty bindings. Settings contain data;
+executable behavior arrives through bindings declared in `ux/widgets/helm-widget-contract.ts`.
 
 ```json
 {

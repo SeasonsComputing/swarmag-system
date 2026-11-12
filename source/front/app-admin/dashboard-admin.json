@@ -40,6 +40,7 @@
               "icon": "gear",
               "labelMode": "visible-no-icon"
             },
+            { "command": "@tasks", "label": "Tasks", "icon": "update", "labelMode": "hidden" },
             { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
             { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
             { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }

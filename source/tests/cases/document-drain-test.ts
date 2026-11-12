@@ -9,6 +9,7 @@ import { Config } from '@core/cfg/config.ts'
 import type { StringDictionary } from '@core/std'
 import { ApiError } from '@core/stdx'
 import { assertEquals, assertRejects } from '@std/assert'
+import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 
 Deno.test('DocumentDrain backs off expected failures and surfaces unexpected errors', async () => {
   const Values: StringDictionary = {
@@ -39,6 +40,8 @@ Deno.test('DocumentDrain backs off expected failures and surfaces unexpected err
   let lockFailure: Error | undefined
   let failure: Error | undefined
   let calls = 0
+  let remaining = 0
+  let pending: Promise<{ drained: number; remaining: number }> | undefined
   Object.defineProperty(navigator, 'locks', {
     configurable: true,
     value: {
@@ -61,8 +64,12 @@ Deno.test('DocumentDrain backs off expected failures and surfaces unexpected err
   }) as typeof setTimeout
   api.AttachmentsUploads.drain = () => {
     calls++
+    assertEquals(BackgroundTasks.store['attachment-delivery'].phase, 'running')
+    assertEquals(BackgroundTasks.store['attachment-delivery'].blocksExit, true)
+    assertEquals(BackgroundTasks.store['attachment-delivery'].remaining, undefined)
+    if (pending) return pending
     if (failure) return Promise.reject(failure)
-    return Promise.resolve({ drained: 0, remaining: 0 })
+    return Promise.resolve({ drained: 0, remaining })
   }
   try {
     await DocumentDrain.start()
@@ -74,24 +81,64 @@ Deno.test('DocumentDrain backs off expected failures and surfaces unexpected err
     await scheduledPass!()
     assertEquals(calls, 1)
     assertEquals(delays, [60_000, 60_000])
+    assertEquals(Object.keys(BackgroundTasks.store), [])
+    remaining = 3
+    await scheduledPass!()
+    assertEquals(BackgroundTasks.store['attachment-delivery'].remaining, { count: 3, unit: 'documents' })
+    assertEquals(BackgroundTasks.store['attachment-delivery'].phase, 'waiting')
+    assertEquals(BackgroundTasks.store['attachment-delivery'].blocksExit, true)
     failure = new AggregateError([new ApiError('Upload failed', 503)])
     await scheduledPass!()
+    assertEquals(BackgroundTasks.store['attachment-delivery'].phase, 'failed')
+    assertEquals(BackgroundTasks.store['attachment-delivery'].remaining, undefined)
+    assertEquals(BackgroundTasks.store['attachment-delivery'].blocksExit, true)
     failure = new ApiError('List failed', 503)
     await scheduledPass!()
     await scheduledPass!()
     await scheduledPass!()
     await scheduledPass!()
-    assertEquals(delays, [60_000, 60_000, 120_000, 240_000, 480_000, 900_000, 900_000])
+    assertEquals(delays, [60_000, 60_000, 60_000, 120_000, 240_000, 480_000, 900_000, 900_000])
     available = false
     const beforeSkip = calls
     await scheduledPass!()
     assertEquals(calls, beforeSkip)
+    assertEquals(Object.keys(BackgroundTasks.store), [])
     assertEquals(delays.at(-1), 900_000)
     available = true
     failure = undefined
     await scheduledPass!()
     assertEquals(delays.at(-1), 60_000)
+    remaining = 0
+    await scheduledPass!()
+    assertEquals(Object.keys(BackgroundTasks.store), [])
+    const { SessionCoordinator } = await import('@front/app/shell/session-coordinator.ts')
+    for (const rejected of [false, true]) {
+      const deferred = Promise.withResolvers<{ drained: number; remaining: number }>()
+      pending = deferred.promise
+      const pass = scheduledPass!()
+      assertEquals(BackgroundTasks.store['attachment-delivery'].phase, 'running')
+      ready = false
+      SessionCoordinator.clear()
+      assertEquals(Object.keys(BackgroundTasks.store), [])
+      if (rejected) deferred.reject(new ApiError('Signed-out pass failed', 503))
+      else deferred.resolve({ drained: 0, remaining: 4 })
+      await pass
+      assertEquals(Object.keys(BackgroundTasks.store), [])
+      ready = true
+      pending = undefined
+    }
+    const crossing = Promise.withResolvers<{ drained: number; remaining: number }>()
+    pending = crossing.promise
+    const crossingPass = scheduledPass!()
     ready = false
+    SessionCoordinator.clear()
+    ready = true
+    crossing.resolve({ drained: 0, remaining: 2 })
+    await crossingPass
+    assertEquals(BackgroundTasks.store['attachment-delivery'].remaining?.count, 2)
+    pending = undefined
+    ready = false
+    SessionCoordinator.clear()
     const beforeLogout = calls
     await scheduledPass!()
     assertEquals(calls, beforeLogout)
@@ -102,10 +149,12 @@ Deno.test('DocumentDrain backs off expected failures and surfaces unexpected err
     failure = new TypeError('Programming error')
     await assertRejects(() => scheduledPass!(), TypeError, 'Programming error')
     assertEquals(delays.length, scheduled)
+    assertEquals(BackgroundTasks.store['attachment-delivery'].error, 'Programming error')
     lockFailure = new TypeError('Locks unavailable')
     await assertRejects(() => scheduledPass!(), TypeError, 'Locks unavailable')
     assertEquals(delays.length, scheduled)
   } finally {
+    BackgroundTasks.clearAll()
     api.SessionState.isPrepared = prepared
     api.AttachmentsUploads.drain = drain
     globalThis.setTimeout = timeout

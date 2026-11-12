@@ -9,6 +9,7 @@
 import '@front/config/ux-config.ts'
 
 // bootstrap
+import { startBackgroundTaskWarnings } from '@ux/shell/runtime/background-task-warnings.ts'
 import { bootstrap } from '@ux/shell/runtime/bootstrap.tsx'
 
 import { DocumentDrain } from './document-drain.ts'
@@ -43,5 +44,6 @@ void bootstrap(
       Routes.workbench('/chemicals', ChemicalManager),
       Routes.workbench('/services', ServiceManager)
     ])
-  ], SessionCoordinator)
+  ], SessionCoordinator),
+  startBackgroundTaskWarnings
 ).then(() => DocumentDrain.start())

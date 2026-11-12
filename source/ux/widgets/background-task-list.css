@@ -1,0 +1,25 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Background task list styles                                                  ║
+║ Readable per-operation reports within the task popover.                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-widget='background-task-list'] {
+  max-block-size: 70dvh;
+  max-inline-size: min(30rem, 80vw);
+  overflow: auto;
+  overflow-wrap: anywhere;
+}
+
+[data-widget='background-task-list'] p {
+  margin: 0;
+}
+
+[data-widget='background-task-list'] [data-ui='list-item'] {
+  padding-block: var(--sa-space-xs);
+}
+
+[data-widget='background-task-list'] [data-widget-task-phase] {
+  color: var(--sa-text-secondary);
+}

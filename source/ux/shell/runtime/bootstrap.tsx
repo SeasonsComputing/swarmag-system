@@ -8,15 +8,17 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Boots a complete application composition. Shared bootstrap initializes global
 runtime state, mounts Solid, and invokes the supplied session coordinator.
-Applications own shell composition and session coordination.
+Applications own shell composition, session coordination, and optional mount
+setup. Mount setup returns cleanup registered under the application Solid owner.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-bootstrap  Mount a complete application.
+ApplicationMount  Application root setup returning disposal cleanup.
+bootstrap         Mount a complete application with optional root setup.
 */
 
 import { Config } from '@core/cfg/config.ts'
-import { onMount } from '@solid-js'
+import { onCleanup, onMount } from '@solid-js'
 import { render } from '@solid-js/web'
 import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 import { createRouter, RouterProvider } from '@tanstack/solid-router'
@@ -30,8 +32,14 @@ import '@ux/css'
 // APPLICATION BOOTSTRAP
 // ────────────────────────────────────────────────────────────────────────────
 
-/** Initialize a complete application composition and mount its router. */
-export async function bootstrap(application: ShellApplication): Promise<void> {
+/** Application-owned root mount setup returning disposal cleanup. */
+export type ApplicationMount = () => () => void
+
+/** Initialize an application; optional mount setup runs after session initialization. */
+export async function bootstrap(
+  application: ShellApplication,
+  mount?: ApplicationMount
+): Promise<void> {
   const showApplication = () => document.body.style.opacity = '1'
   try {
     const routeTree = compileApplicationRoutes(application)
@@ -43,6 +51,7 @@ export async function bootstrap(application: ShellApplication): Promise<void> {
       onMount(() => {
         showApplication()
         application.session.init()
+        if (mount) onCleanup(mount())
       })
       return (
         <QueryClientProvider client={queryClient}>

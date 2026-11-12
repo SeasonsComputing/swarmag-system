@@ -14,7 +14,7 @@
   min-inline-size: 0;
 }
 
-[data-widget='helm-widget'] [data-ui='layout'] {
+[data-widget='helm-widget'] > [data-ui='layout'] {
   block-size: 100%;
   gap: var(--sa-rhythm-gap);
   row-gap: 0;
@@ -66,8 +66,36 @@
     min-inline-size: 100%;
   }
 
-  [data-widget='helm-widget'] [data-ui='layout'] {
+  [data-widget='helm-widget'] > [data-ui='layout'] {
     flex-wrap: nowrap;
     width: fit-content;
   }
+}
+
+[data-widget='helm-command-menu'] > span {
+  color: var(--sa-text-secondary);
+}
+
+/* Task popovers keep the same dense circular frame as adjacent action buttons. */
+[data-widget='helm-widget'] [data-ui='button']:has([data-widget='helm-action-frame']) {
+  flex: 0 0 auto;
+  padding: 0;
+}
+
+[data-widget='helm-widget'] [data-widget='helm-action-frame'] {
+  align-items: center;
+  background: var(--sa-bg-control);
+  border: var(--sa-border-default);
+  border-radius: var(--sa-radius-full);
+  block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-md));
+  display: inline-flex;
+  inline-size: calc(var(--sa-touch-target-sm) - var(--sa-space-md));
+  justify-content: center;
+  transition: var(--sa-transition-fast);
+}
+
+[data-widget='helm-widget'] [data-ui='button']:not([disabled]):hover [data-widget='helm-action-frame'],
+[data-widget='helm-widget'] [data-ui='button']:focus-visible [data-widget='helm-action-frame'] {
+  background: var(--sa-bg-hover);
+  border-color: var(--sa-color-primary);
 }
