@@ -19,7 +19,6 @@ SessionCoordinator  Initialize session coordination or clear prepared state.
 import type { Session } from '@core/stdx'
 import { api } from '@front/api/api.ts'
 import { batch, onCleanup } from '@solid-js'
-import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 import type { SessionCoordinatorContract } from '@ux/shell/runtime/session-contracts.ts'
 import { UserProvider } from './user-provider.ts'
 
@@ -37,7 +36,7 @@ class AppSessionCoordinator implements SessionCoordinatorContract {
 
   /** Clear both application preparation and generic session state. */
   clear(): void {
-    BackgroundTasks.clearAll()
+    api.BackgroundTasks.clearAll()
     UserProvider.clear()
     api.SessionState.clear()
   }

@@ -36,13 +36,24 @@ Config.init({
     ({
       LOCAL_DB_NAME: 'attachments-app',
       ATTACHMENTS_SERVER_ROOT: 'offline-attachments',
+      FIELD_BINDER_SERVER_ROOT: 'offline-binder',
+      FIELD_BINDER_INBOX_DB_NAME: 'attachments-binder-inbox',
+      FIELD_BINDER_DB_NAME: 'attachments-binder',
       DOCUMENT_INBOX_DB_NAME: 'attachments-inbox',
       ATTACHMENTS_TEST_SERVER: 'attachments-server'
     })[key],
   fail: message => {
     throw new Error(message)
   }
-}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'ATTACHMENTS_SERVER_ROOT', 'ATTACHMENTS_TEST_SERVER'])
+}, [
+  'LOCAL_DB_NAME',
+  'DOCUMENT_INBOX_DB_NAME',
+  'ATTACHMENTS_SERVER_ROOT',
+  'FIELD_BINDER_SERVER_ROOT',
+  'FIELD_BINDER_INBOX_DB_NAME',
+  'FIELD_BINDER_DB_NAME',
+  'ATTACHMENTS_TEST_SERVER'
+])
 const { makeAttachmentSave } = await import('@front/app/shell/make-attachment-save.ts')
 Object.assign(globalThis, {
   IDBCursor,

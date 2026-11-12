@@ -4,6 +4,11 @@
       "root": "swarmag-attachments",
       "fileSizeLimit": 52428800,
       "public": false
+    },
+    "fieldBinder": {
+      "root": "swarmag-field-binder",
+      "fileSizeLimit": 52428800,
+      "public": false
     }
   }
 }

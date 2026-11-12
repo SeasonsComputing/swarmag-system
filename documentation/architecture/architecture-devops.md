@@ -988,8 +988,10 @@ per configured root. Attachments owns logical placement identities; the target c
 physical roots.
 
 Allowed file content types come from the feature's exported format policy: attachments uses
-AttachmentFormats.contentTypes(), binder uses its file-format policy. Provisioning also
+AttachmentFormats.contentTypes(), and Binder consumes that same established policy. Provisioning also
 allows the provider marker type text/plain and generated inventory/status JSON where required.
+Binder consumes the existing AttachmentFormats policy directly; no separate Binder format policy
+is introduced. Each root receives its declared restrictions without changing attachment behavior.
 These policies are imported without api.ts or application bootstrap. Native-bucket size/public
 settings come only from the target contract.
 

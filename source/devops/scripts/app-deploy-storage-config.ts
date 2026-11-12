@@ -10,9 +10,6 @@ import { readStorageContract } from './storage-contract.ts'
 import { readStorageTarget } from './storage-utils.ts'
 
 const contract = await readStorageContract(Deno.args[1])
-if (Object.keys(contract.stores).some(name => name !== 'attachments')) {
-  throw new Error('No provisioning format policy is supplied for this storage binding')
-}
 const target = await readStorageTarget()
 if (
   target.target === 'prod'

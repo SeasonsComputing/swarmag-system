@@ -21,9 +21,8 @@ DocumentDrain  Admin's document upload loop.
 
 import { ApiError } from '@core/stdx'
 import { api } from '@front/api/api.ts'
-import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 
-/** Admin's document upload loop, started once after bootstrap. */
+/** Admin's document upload loop, started once at application mount. */
 let started = false
 export const DocumentDrain = {
   async start(): Promise<void> {
@@ -54,10 +53,10 @@ async function drainDocuments(): Promise<void> {
   try {
     await navigator.locks.request('document-drain', { ifAvailable: true }, async lock => {
       if (!lock || !api.SessionState.isPrepared()) {
-        BackgroundTasks.clear(ATTACHMENT_TASK_KEY)
+        api.BackgroundTasks.clear(ATTACHMENT_TASK_KEY)
         return
       }
-      BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
+      api.BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
         label: ATTACHMENT_TASK_LABEL,
         phase: 'running',
         blocksExit: true
@@ -66,9 +65,9 @@ async function drainDocuments(): Promise<void> {
         const result = await api.AttachmentsUploads.drain()
         drainDelay = DRAIN_INTERVAL
         if (!api.SessionState.isPrepared()) return
-        if (result.remaining === 0) BackgroundTasks.clear(ATTACHMENT_TASK_KEY)
+        if (result.remaining === 0) api.BackgroundTasks.clear(ATTACHMENT_TASK_KEY)
         else {
-          BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
+          api.BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
             label: ATTACHMENT_TASK_LABEL,
             phase: 'waiting',
             blocksExit: true,
@@ -91,7 +90,7 @@ async function drainDocuments(): Promise<void> {
 /** Publich failures to tasks. */
 const reportFailure = (error: unknown): void => {
   if (!api.SessionState.isPrepared()) return
-  BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
+  api.BackgroundTasks.publish(ATTACHMENT_TASK_KEY, {
     label: ATTACHMENT_TASK_LABEL,
     phase: 'failed',
     blocksExit: true,

@@ -1,43 +1,46 @@
 /*
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║ Application API namespace                                                    ║
-║ Composed access to authentication, state, and domain clients.                ║
+║ Composed access to authentication, document stores, state, and clients.      ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
 PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Composes the shared UX API namespace, binding applications to their data clients
 without coupling feature code to a specific storage or backend implementation.
+The document stores are composed in their own modules and included here.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 api                          Shared API namespace for UX applications.
-├ AttachmentsInbox           Device attachment inbox.
-├ AttachmentsServer          Shared Supabase attachment store.
-├ AttachmentsUploads         Durable capture, placement, access, and delivery.
-├ Attachments                Recognition, catalog placement, and references.
 ├ Auth                       Passwordless authentication and session observation.
+├ DocumentStoreAttachments   Attachment stores and clients, included as members.
+│ ├ AttachmentsInbox         Device attachment inbox.
+│ ├ AttachmentsServer        Shared Supabase attachment store.
+│ ├ AttachmentsUploads       Durable capture, placement, access, and delivery.
+│ └ Attachments              Recognition, catalog placement, and references.
+├ DocumentStoreFieldBinder   Field Binder stores and clients, included as members.
+│ ├ FieldBinderInbox         Independent Binder staging and pending delivery.
+│ ├ FieldBinderServer        Remote Binder source.
+│ ├ FieldBinderStore         Complete local reader mirror.
+│ ├ FieldBinderUploads       Uploads over the Binder pair.
+│ ├ FieldBinderSource        Source inventory management.
+│ └ FieldBinder              Local reader and explicit complete preparation.
 ├ AppState                   Persistent state.
 ├ SessionState               Reactive authenticated-user session state.
+├ BackgroundTasks            Reactive reports of background work and failures.
 ├ AssetTypes                 Asset type catalog CRUD client.
 ├ Assets                     Asset CRUD client.
 ├ Chemicals                  Chemical CRUD client.
-├ Facets                     Curated classification catalog CRUD client.
 ├ Customers                  Customer CRUD client.
-├ Jobs                       Job CRUD client.
+├ Facets                     Curated classification catalog CRUD client.
 ├ Services                   Service CRUD client.
 ├ ServiceRequiredAssetTypes  Required asset type membership by Service.
-├ Users                      User CRUD with Supabase Auth synchronization.
-└ Workflows                  Workflow CRUD client.
+└ Users                      User CRUD with Supabase Auth synchronization.
 */
 
 import { AuthSupabaseClient } from '@core/cli/auth-supabase-client.ts'
-import { DocumentStore } from '@core/cli/docstore-client.ts'
-import { Uploads } from '@core/cli/docstore-uploads.ts'
-import { IndexedDbDocumentProvider } from '@core/cli/indexeddb-docstore-provider.ts'
 import { makeCrudSupabaseClient, makeJunctionSupabaseClient } from '@core/cli/make-supabase-client.ts'
-import { SupabaseDocumentProvider } from '@core/cli/supabase-docstore-provider.ts'
-import { Supabase } from '@core/db/supabase.ts'
 import type { Asset, AssetType } from '@domain/abstractions/asset.ts'
 import type { Chemical } from '@domain/abstractions/chemical.ts'
 import type { Facet } from '@domain/abstractions/common.ts'
@@ -63,42 +66,25 @@ import {
   validateServiceUpdate
 } from '@domain/validators/service-validator.ts'
 import { AppState } from '@ux/shell/runtime/app-state.ts'
+import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 import { SessionState } from '@ux/shell/runtime/session-state.ts'
-import { Attachments } from './attachments.ts'
+import { DocumentStoreAttachments } from './docstore-attachments.ts'
+import { DocumentStoreFieldBinder } from './docstore-field-binder.ts'
 import { makeAuthUsers } from './make-auth-users.ts'
-
-/** How long a minted document link stays valid: five minutes, in milliseconds. */
-const storeSettings = { linkLifetime: 5 * 60_000 }
-
-/** The device's inbox: documents staged or placed and not yet uploaded. */
-const AttachmentsInbox = new DocumentStore(
-  new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'),
-  storeSettings
-)
-
-/** The shared document store, authorized by Storage policies. */
-const AttachmentsServer = new DocumentStore(
-  new SupabaseDocumentProvider(Supabase.client, 'ATTACHMENTS_SERVER_ROOT'),
-  storeSettings
-)
-
-/** Attachment delivery over the existing storage bindings. */
-const AttachmentsUploads = new Uploads(AttachmentsInbox, AttachmentsServer)
 
 /** Shared UX API namespace for authentication, state, and domain clients. */
 export const api = {
   /** Passwordless authentication and session observation. */
   Auth: AuthSupabaseClient,
 
-  /** Document staging, placement and access over the two stores. */
-  AttachmentsInbox,
-  AttachmentsServer,
-  AttachmentsUploads,
-  Attachments: new Attachments(AttachmentsUploads, AttachmentsInbox),
+  /** Document Stores for Attachments and Field Binder. */
+  ...DocumentStoreAttachments,
+  ...DocumentStoreFieldBinder,
 
-  /** Persistent and ephemoral state. */
+  /** Persistent and ephemeral state. */
   AppState,
   SessionState,
+  BackgroundTasks,
 
   /** Domain clients. */
   AssetTypes: makeCrudSupabaseClient<AssetType>({

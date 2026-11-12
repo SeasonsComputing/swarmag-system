@@ -12,6 +12,7 @@ import {
   storageBuildRoot
 } from '@devops/scripts/storage-contract.ts'
 import { Attachments } from '@front/api/attachments.ts'
+import { FieldBinderMetadata } from '@front/api/field-binder-inventory.ts'
 import { assert, assertEquals, assertThrows } from '@std/assert'
 
 Deno.test('policy roots agree with build inputs and preserve namespace grants', async () => {
@@ -22,12 +23,22 @@ Deno.test('policy roots agree with build inputs and preserve namespace grants', 
   assert(sql.includes(`id = '${root}'`))
   assertEquals((sql.match(/bucket_id = 'swarmag-attachments'/g) ?? []).length, 2)
   assert(!sql.includes('{{storage.'))
-  assertEquals((sql.match(/split_part\(name, '\/', 1\)/g) ?? []).length, 2)
+  assertEquals((sql.match(/split_part\(name, '\/', 1\)/g) ?? []).length, 5)
   const namespaces = new Set(sql.match(/019a6000-0000-7000-8000-[0-9]{12}/g))
-  assertEquals(namespaces, new Set(Attachments.namespaces.map(entry => entry.id)))
+  assertEquals(
+    namespaces,
+    new Set([
+      ...Attachments.namespaces.map(entry => entry.id),
+      FieldBinderMetadata.catalog.namespace.id
+    ])
+  )
   assert(sql.includes('ARRAY[\'administrator\', \'sales\', \'operations\']'))
   assert(sql.includes('status = \'active\' AND deleted_at IS NULL'))
-  assertThrows(() => materializeStoragePolicies('{{storage.fieldBinder.root}}', contract))
+  assertEquals(
+    materializeStoragePolicies('{{storage.fieldBinder.root}}', contract),
+    '\'swarmag-field-binder\''
+  )
+  assert(sql.includes('roles ? \'administrator\''))
   const unsafe = readStorageContractValue({
     stores: {
       attachments: {
@@ -37,6 +48,7 @@ Deno.test('policy roots agree with build inputs and preserve namespace grants', 
       }
     }
   })
+  assertThrows(() => materializeStoragePolicies('{{storage.fieldBinder.root}}', unsafe))
   // The materializer quotes literals even when passed an already-typed object.
   unsafe.stores.attachments.root = 'literal\'quote'
   assertEquals(

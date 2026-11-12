@@ -43,7 +43,7 @@ async function browserHarness() {
   const { bootstrap } = await import('/source/ux/shell/runtime/bootstrap.tsx')
   const { AppState } = await import('/source/ux/shell/runtime/app-state.ts')
   const { BackgroundTasks } = await import('/source/ux/shell/runtime/background-tasks.ts')
-  const { startBackgroundTaskWarnings } = await import(
+  const { BackgroundTaskWarnings } = await import(
     '/source/ux/shell/runtime/background-task-warnings.ts'
   )
   const { makeHelmWidget } = await import('/source/ux/widgets/make-helm-widget.tsx')
@@ -95,7 +95,7 @@ async function browserHarness() {
   }
   const mount = () => {
     events.push('mount')
-    const stop = startBackgroundTaskWarnings()
+    const stop = BackgroundTaskWarnings.start()
     return () => { events.push('cleanup'); stop() }
   }
   const leave = () => {

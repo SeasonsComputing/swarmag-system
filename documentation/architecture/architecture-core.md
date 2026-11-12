@@ -787,6 +787,8 @@ not itself register routes or commands; each app supplies its own registration a
   inventory, obtains its referenced files, and makes the snapshot readable only after completeness
   is verified. Failure retains the previous complete mirror; an incomplete first copy is unavailable.
   Inventory and device status are docstore JSON, with no new database table or kernel snapshot API.
+  Published inventory references define source membership. A local status document selects the
+  complete prepared inventory; files copied before that commit do not become reader entries.
 - **The reader uses local bytes.** Each app's Binder reader opens only FieldBinderStore. Ops
   operates offline; a missing local file does not trigger a remote read. Sync requires connectivity
   and is separate from opening a document or delivering an upload.

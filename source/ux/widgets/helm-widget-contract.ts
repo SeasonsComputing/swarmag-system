@@ -27,6 +27,10 @@ readHelmActions     Validate settings actions against supplied bindings.
 import { isConstEnum, isDictionary, isNonEmptyString, notValid } from '@core/std'
 import type { Dictionary } from '@core/std'
 
+/** Label presentation modes a command record accepts. */
+const HELM_LABEL_MODES = ['hidden', 'visible', 'visible-no-icon'] as const
+type HelmLabelMode = (typeof HELM_LABEL_MODES)[number]
+
 /** Executable application command; expected failures are reported by its owner. */
 export type HelmCommandBinding = {
   execute: () => void | Promise<void>
@@ -116,9 +120,11 @@ export const readHelmActions = (value: unknown, bindings: HelmBindings): HelmAct
   })
 }
 
-const HELM_LABEL_MODES = ['hidden', 'visible', 'visible-no-icon'] as const
-type HelmLabelMode = (typeof HELM_LABEL_MODES)[number]
+// ────────────────────────────────────────────────────────────────────────────
+// HELPERS
+// ────────────────────────────────────────────────────────────────────────────
 
+/** Parse one command record; an application command must have a supplied binding. */
 const readHelmCommand = (
   record: Dictionary,
   field: string,
@@ -138,11 +144,13 @@ const readHelmCommand = (
   }
 }
 
+/** Require an object dictionary. */
 const readHelmDictionary = (value: unknown, field: string): Dictionary => {
   if (isDictionary(value)) return value
   return notValid(`${field} must be an object`)
 }
 
+/** Require a non-empty string. */
 const readHelmString = (value: unknown, field: string): string => {
   if (isNonEmptyString(value)) return value
   return notValid(`${field} must be a non-empty string`)

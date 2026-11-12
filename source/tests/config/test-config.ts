@@ -27,6 +27,8 @@ Config.init({
   get: name =>
     name === 'ATTACHMENTS_SERVER_ROOT'
       ? Provider.get(name) ?? 'offline-attachments'
+      : name === 'FIELD_BINDER_SERVER_ROOT'
+      ? Provider.get(name) ?? 'offline-binder'
       : Provider.get(name),
   fail: message => Provider.fail(message)
 }, [
@@ -35,6 +37,9 @@ Config.init({
   'SUPABASE_CLIENT_MODE',
   'DOCUMENT_INBOX_DB_NAME',
   'ATTACHMENTS_SERVER_ROOT',
+  'FIELD_BINDER_SERVER_ROOT',
+  'FIELD_BINDER_INBOX_DB_NAME',
+  'FIELD_BINDER_DB_NAME',
   'LOCAL_DB_NAME'
 ])
 

@@ -75,12 +75,22 @@ if ! command -v zip >/dev/null 2>&1; then
   exit 1
 fi
 
+set -a
+# shellcheck disable=SC1090
+source "${ENV_FILE}"
+set +a
+
 # Resolve the non-secret root from the same contract used by provisioning and policies.
 VITE_ATTACHMENTS_SERVER_ROOT="$(
   deno run --allow-read "${ROOT}/source/devops/scripts/storage-contract.ts" \
     "${TARGET}" "${VITE_ATTACHMENTS_SERVER_ROOT:-}"
 )"
 export VITE_ATTACHMENTS_SERVER_ROOT
+VITE_FIELD_BINDER_SERVER_ROOT="$(
+  deno run --allow-read "${ROOT}/source/devops/scripts/storage-contract.ts" \
+    "${TARGET}" "${VITE_FIELD_BINDER_SERVER_ROOT:-}" fieldBinder
+)"
+export VITE_FIELD_BINDER_SERVER_ROOT
 
 REQUIRED_KEYS=()
 while IFS= read -r key; do
@@ -91,11 +101,6 @@ if [[ "${#REQUIRED_KEYS[@]}" -eq 0 ]]; then
   echo "Could not determine required VITE_ keys from ${UX_CONFIG_FILE}"
   exit 1
 fi
-
-set -a
-# shellcheck disable=SC1090
-source "${ENV_FILE}"
-set +a
 
 if [[ "${VITE_PACKAGE_APP_ID:-}" != "swarmag-app-admin" ]]; then
   echo "Invalid VITE_PACKAGE_APP_ID='${VITE_PACKAGE_APP_ID:-}'. Expected 'swarmag-app-admin'"

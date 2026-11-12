@@ -57,6 +57,11 @@ VITE_ATTACHMENTS_SERVER_ROOT="$(
     "${TARGET}" "${VITE_ATTACHMENTS_SERVER_ROOT:-}"
 )"
 export VITE_ATTACHMENTS_SERVER_ROOT
+VITE_FIELD_BINDER_SERVER_ROOT="$(
+  deno run --allow-read "${ROOT}/source/devops/scripts/storage-contract.ts" \
+    "${TARGET}" "${VITE_FIELD_BINDER_SERVER_ROOT:-}" fieldBinder
+)"
+export VITE_FIELD_BINDER_SERVER_ROOT
 
 REQUIRED_KEYS=()
 while IFS= read -r key; do

@@ -13,18 +13,21 @@ this does not veto logout or guarantee mobile process-termination warnings.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
-startBackgroundTaskWarnings  Install warnings and return listener cleanup.
+BackgroundTaskWarnings  Exit warnings for explicitly owned pending work.
+└ start                 Install warnings and return listener cleanup.
 */
 
 import { BackgroundTasks } from './background-tasks.ts'
 
 /** Install one listener; the caller owns its returned cleanup. */
-export const startBackgroundTaskWarnings = (): () => void => {
+const start = (): () => void => {
   const beforeUnload = (event: BeforeUnloadEvent): void => {
     if (!Object.values(BackgroundTasks.store).some(task => task.blocksExit)) return
     event.preventDefault()
-    event.returnValue = ''
   }
   globalThis.addEventListener('beforeunload', beforeUnload)
   return () => globalThis.removeEventListener('beforeunload', beforeUnload)
 }
+
+/** Exit warnings for explicitly owned pending work. */
+export const BackgroundTaskWarnings = { start }

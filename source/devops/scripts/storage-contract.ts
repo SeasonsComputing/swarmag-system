@@ -19,7 +19,7 @@ StorageContract            Configured bindings, including required attachments.
 └ stores                   Named root bindings.
 readStorageContract        Read a selected target's validated contract.
 readStorageContractValue   Validate unknown contract input.
-storageBuildRoot           Check an optional environment value against the contract.
+storageBuildRoot           Check a named root against optional environment input.
 materializeStoragePolicies Replace named roots with SQL-quoted contract values.
 */
 
@@ -60,10 +60,16 @@ export function readStorageContractValue(value: unknown): StorageContract {
 }
 
 /** Resolve build input without accepting a competing environment-owned value. */
-export function storageBuildRoot(contract: StorageContract, supplied?: string): string {
-  const root = contract.stores.attachments.root
+export function storageBuildRoot(
+  contract: StorageContract,
+  supplied?: string,
+  name = 'attachments'
+): string {
+  const binding = contract.stores[name]
+  if (!binding) throw new Error(`Storage contract requires ${name}`)
+  const root = binding.root
   if (supplied !== undefined && supplied !== '' && supplied !== root) {
-    throw new Error('Attachment root conflicts with the target storage contract')
+    throw new Error(`${name} root conflicts with the target storage contract`)
   }
   return root
 }
@@ -79,5 +85,5 @@ export function materializeStoragePolicies(sql: string, contract: StorageContrac
 
 if (import.meta.main) {
   const contract = await readStorageContract(Deno.args[0])
-  console.log(storageBuildRoot(contract, Deno.args[1]))
+  console.log(storageBuildRoot(contract, Deno.args[1], Deno.args[2]))
 }

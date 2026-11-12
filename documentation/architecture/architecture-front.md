@@ -304,6 +304,14 @@ commands, and preparation triggers. Admin manages the remote source; the Binder 
 its complete local mirror. A shared API binding does not grant a role remote access or register
 an editable reader. Remote access is governed by storage policies.
 
+Admin registers `/field-binder-manager` with the stock Manager and one Detail step for file,
+description, and optional source URL. `/field-binder` uses the read-only Lister over local bytes.
+Its app-root Helm binding supplies Manager, Binder, Sync, and reactive status through the existing
+widget maker. Sync is explicit and reports its preparation state through BackgroundTasks; saving
+a source entry does not implicitly prepare the local reader. Binder consumes its own Uploads
+instance and the established document-format policy. Ops/Portal composition does not register
+these screens or commands.
+
 ### 7.3 Provided Infrastructure
 
 The foundation provides:

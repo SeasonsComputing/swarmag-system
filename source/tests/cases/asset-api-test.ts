@@ -21,7 +21,14 @@ Config.init({
   fail: message => {
     throw new Error(message)
   }
-}, ['LOCAL_DB_NAME', 'DOCUMENT_INBOX_DB_NAME', 'ATTACHMENTS_SERVER_ROOT'])
+}, [
+  'LOCAL_DB_NAME',
+  'DOCUMENT_INBOX_DB_NAME',
+  'ATTACHMENTS_SERVER_ROOT',
+  'FIELD_BINDER_INBOX_DB_NAME',
+  'FIELD_BINDER_DB_NAME',
+  'FIELD_BINDER_SERVER_ROOT'
+])
 const { api } = await import('@front/api/api.ts')
 
 Deno.test('Asset clients exercise CRUD and soft deletion', async () => {

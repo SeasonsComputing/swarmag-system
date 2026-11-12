@@ -317,6 +317,11 @@ after schema.sql. Policy rendering validates root ids and quotes them as SQL lit
 before application when a referenced root is absent or invalid. Root provisioning alone does not
 create a read or write grant. Attachment and Field Binder policies specify their authorized roles,
 operations, and logical namespace access within each physical root.
+Field Binder source reads require an active, undeleted User with administrator, sales, or operations
+membership. Source mutation requires administrator membership. Customer-only users have no source
+grant. Policies cover the Binder namespace and its required markers as well as documents; a
+provisioned native root does not by itself grant access. General app-entry and capability policy
+is separate from these feature storage grants.
 
 ## 5. Configuration Management
 

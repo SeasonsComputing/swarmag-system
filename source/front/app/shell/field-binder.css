@@ -1,0 +1,19 @@
+/*
+╔══════════════════════════════════════════════════════════════════════════════╗
+║ Field Binder reader styles                                                   ║
+║ Local status above the stock view-only collection workbench.                 ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+*/
+
+[data-app='field-binder'] {
+  block-size: 100%;
+  display: grid;
+  gap: var(--sa-rhythm-gap);
+  grid-template-rows: auto minmax(0, 1fr);
+  min-block-size: 0;
+}
+
+[data-app='field-binder'] > p {
+  color: var(--sa-text-secondary);
+  margin: 0;
+}

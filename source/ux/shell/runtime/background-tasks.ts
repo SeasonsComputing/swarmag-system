@@ -46,6 +46,9 @@ export type BackgroundTask = {
   readonly error?: string
 }
 
+/** The reports, keyed by caller-owned strings; the setter stays private to this module. */
+const [taskStore, setTaskStore] = createStore<Dictionary<BackgroundTask>>({})
+
 /** Transient reporting operations; no execution or scheduling callbacks. */
 export const BackgroundTasks = {
   get store(): Readonly<Dictionary<BackgroundTask>> {
@@ -89,12 +92,12 @@ export const BackgroundTasks = {
   }
 }
 
-const [taskStore, setTaskStore] = createStore<Dictionary<BackgroundTask>>({})
-
+/** Require a non-empty string for a task key or label. */
 const readBackgroundTaskString = (value: unknown, field: string): void => {
   if (!isNonEmptyString(value)) notValid(`${field} must be a non-empty string`)
 }
 
+/** Require a nonnegative safe integer for a count. */
 const readBackgroundTaskCount = (value: number, field: string): void => {
   if (!Number.isSafeInteger(value) || value < 0) notValid(`${field} must be a nonnegative integer`)
 }

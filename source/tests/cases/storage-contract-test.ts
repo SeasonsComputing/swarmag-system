@@ -16,6 +16,11 @@ Deno.test('target contracts validate all bindings before use', async () => {
       fileSizeLimit: 52428800,
       public: false
     })
+    assertEquals(contract.stores.fieldBinder, {
+      root: 'swarmag-field-binder',
+      fileSizeLimit: 52428800,
+      public: false
+    })
   }
   for (const target of ['dev', 'prod', '../stage']) {
     await assertRejects(() => readStorageContract(target))

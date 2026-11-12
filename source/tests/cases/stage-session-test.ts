@@ -25,6 +25,9 @@ Deno.test('stage session authenticates the public API and cleans up only its ses
     SUPABASE_PUBLIC_KEY: 'offline-public-key',
     SUPABASE_CLIENT_MODE: 'edge',
     ATTACHMENTS_SERVER_ROOT: (await readStorageContract('stage')).stores.attachments.root,
+    FIELD_BINDER_SERVER_ROOT: 'offline-binder',
+    FIELD_BINDER_INBOX_DB_NAME: 'stage-session-binder-inbox',
+    FIELD_BINDER_DB_NAME: 'stage-session-binder',
     DOCUMENT_INBOX_DB_NAME: 'stage-session-test-inbox',
     LOCAL_DB_NAME: 'stage-session-test',
     SUPABASE_SERVICE_ROLE_KEY: 'offline-service-key'

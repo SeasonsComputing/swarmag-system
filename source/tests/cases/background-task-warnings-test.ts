@@ -6,7 +6,7 @@
 */
 
 import { assertEquals } from '@std/assert'
-import { startBackgroundTaskWarnings } from '@ux/shell/runtime/background-task-warnings.ts'
+import { BackgroundTaskWarnings } from '@ux/shell/runtime/background-task-warnings.ts'
 import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
 
 Deno.test('Warnings read current responsibility and repeated cleanup removes listeners', () => {
@@ -23,7 +23,7 @@ Deno.test('Warnings read current responsibility and repeated cleanup removes lis
   let cleanup = () => {}
   try {
     BackgroundTasks.clearAll()
-    cleanup = startBackgroundTaskWarnings()
+    cleanup = BackgroundTaskWarnings.start()
     assertEquals(leave(), false)
     BackgroundTasks.publish('command', {
       label: 'Sync',
@@ -48,7 +48,7 @@ Deno.test('Warnings read current responsibility and repeated cleanup removes lis
       cleanup()
       BackgroundTasks.publish('delivery', { label: 'Delivery', phase: 'running', blocksExit: true })
       assertEquals(leave(), false)
-      cleanup = startBackgroundTaskWarnings()
+      cleanup = BackgroundTaskWarnings.start()
       assertEquals(leave(), true)
     }
     cleanup()

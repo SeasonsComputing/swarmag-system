@@ -41,6 +41,16 @@
               "labelMode": "visible-no-icon"
             },
             { "command": "@tasks", "label": "Tasks", "icon": "update", "labelMode": "hidden" },
+            {
+              "label": "Field Binder",
+              "icon": "backpack",
+              "items": [
+                { "command": "/field-binder-manager", "label": "Manager", "icon": "gear" },
+                { "command": "/field-binder", "label": "Field Binder", "icon": "backpack" },
+                { "command": "@sync-field-binder", "label": "Synchronize", "icon": "update" },
+                { "status": "field-binder" }
+              ]
+            },
             { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
             { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
             { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }
