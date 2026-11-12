@@ -32,32 +32,34 @@ Config.init({
     ({
       LOCAL_DB_NAME: 'platform-test-app',
       FIRST_DB: 'platform-test-first',
-      SECOND_DB: 'platform-test-second'
+      SECOND_DB: 'platform-test-second',
+      REJECTED_DB: 'platform-test-rejected'
     })[key],
   fail: message => {
     throw new Error(message)
   }
-}, ['LOCAL_DB_NAME', 'FIRST_DB', 'SECOND_DB'])
+}, ['LOCAL_DB_NAME', 'FIRST_DB', 'SECOND_DB', 'REJECTED_DB'])
 
 IndexedDb.registerStore('Sentinel')
 const First = new DocumentStore(new IndexedDbDocumentProvider('FIRST_DB'), { linkLifetime: 150 })
 const Second = new DocumentStore(new IndexedDbDocumentProvider('SECOND_DB'), { linkLifetime: 150 })
 
+Object.assign(globalThis, {
+  indexedDB,
+  IDBCursor,
+  IDBCursorWithValue,
+  IDBDatabase,
+  IDBFactory,
+  IDBIndex,
+  IDBKeyRange,
+  IDBObjectStore,
+  IDBOpenDBRequest,
+  IDBRequest,
+  IDBTransaction,
+  IDBVersionChangeEvent
+})
+
 Deno.test('IndexedDB document providers isolate databases and preserve idempotent nodes', async () => {
-  Object.assign(globalThis, {
-    indexedDB,
-    IDBCursor,
-    IDBCursorWithValue,
-    IDBDatabase,
-    IDBFactory,
-    IDBIndex,
-    IDBKeyRange,
-    IDBObjectStore,
-    IDBOpenDBRequest,
-    IDBRequest,
-    IDBTransaction,
-    IDBVersionChangeEvent
-  })
   Object.defineProperty(navigator, 'storage', {
     configurable: true,
     value: { persist: () => Promise.resolve(true) }
@@ -124,6 +126,36 @@ Deno.test('IndexedDB document providers isolate databases and preserve idempoten
   app.close()
   firstDb.close()
   secondDb.close()
+})
+
+Deno.test('persistence rejection is handled once without delaying or preventing local writes', async () => {
+  const persistence = Promise.withResolvers<boolean>()
+  let requests = 0
+  Object.defineProperty(navigator, 'storage', {
+    configurable: true,
+    value: {
+      persist: (): Promise<boolean> => {
+        requests++
+        return persistence.promise
+      }
+    }
+  })
+  const store = new DocumentStore(new IndexedDbDocumentProvider('REJECTED_DB'), { linkLifetime: 150 })
+  // A write completes while the persistence request is still pending.
+  const namespace = await store.namespace.create('Best effort')
+  persistence.reject(new TypeError('Persistence request rejected'))
+  // Allow an unhandled rejection to surface through the test runner before continuing.
+  await new Promise<void>(resolve => setTimeout(resolve, 0))
+  const bucket = await store.bucket.create(namespace.id, 'Documents')
+  const document = await store.document.create(bucket.id, 'manual.txt', new Blob(['retained']))
+  equal(await (await store.document.read(document.id)).text(), 'retained')
+  equal((await store.document.list(bucket.id)).length, 1)
+  equal(requests, 1)
+  await store.document.delete(document.id)
+  await store.bucket.delete(bucket.id)
+  await store.namespace.delete(namespace.id)
+  const db = await IndexedDb.connection('REJECTED_DB')
+  db.close()
 })
 
 const equal = (actual: unknown, expected: unknown): void => {

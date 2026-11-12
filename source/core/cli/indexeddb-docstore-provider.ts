@@ -10,7 +10,7 @@ Provides browser-owned persistence for a composed document kernel. Nodes and
 bytes are keyed by full lineage. Each operation uses one transaction; all participating
 writes include both stores to serialize parent deletion against child creation.
 Storage persistence is requested once on first use without delaying operations;
-refusal leaves best-effort storage available. No server authorization or
+refusal or request rejection leaves best-effort storage available. No server authorization or
 cross-device sharing is implied.
 
 PUBLIC
@@ -36,6 +36,9 @@ import type { DBSchema, IDBPDatabase, IDBPTransaction } from '@idb'
 
 /** Provider over the browser's IndexedDB; every operation is one transaction over both stores. */
 export class IndexedDbDocumentProvider implements DocumentProviderContract {
+  /** Requested once without awaiting; refusal or rejection leaves best-effort storage. */
+  #persistence: Promise<boolean> | undefined
+
   constructor(private readonly dbKey: string) {
     IndexedDb.registerStore('Nodes', {
       keyPath: 'lineage',
@@ -44,9 +47,6 @@ export class IndexedDbDocumentProvider implements DocumentProviderContract {
     IndexedDb.registerStore('Content', { keyPath: 'lineage' }, dbKey)
   }
 
-  /** Persistent storage, requested once and never awaited; a refusal leaves best-effort storage. */
-  #persistence: Promise<boolean> | undefined
-
   /** Run one operation in a transaction, aborting it on any failure so no partial write commits. */
   async #run<T, Mode extends 'readonly' | 'readwrite'>(
     mode: Mode,
@@ -54,7 +54,7 @@ export class IndexedDbDocumentProvider implements DocumentProviderContract {
   ): Promise<T> {
     let tx: DocumentTransaction<Mode> | undefined
     try {
-      this.#persistence ??= navigator.storage.persist()
+      this.#persistence ??= navigator.storage.persist().catch(() => false)
       const db = await IndexedDb.connection(this.dbKey) as IDBPDatabase<DocumentDatabase>
       tx = db.transaction(['Nodes', 'Content'], mode)
       const result = await operation(tx)
