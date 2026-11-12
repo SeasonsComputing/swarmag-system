@@ -1041,8 +1041,8 @@ empties and deletes every native bucket the contract does not name, so the targe
 holds only its contract's roots. db-reset runs that explicitly selected reset before genesis. Storage metadata is not removed by SQL.
 Storage usage reports selected roots against the target's storage capacity.
 
-Reset and deployment are explicit operational actions scoped to the selected target and roots.
-CA authorization governs execution of destructive storage operations.
+Reset and deployment are explicit operational actions scoped to the selected target: deployment
+to its contract's roots, reset to all of its Storage.
 
 ## 15. Platform Target Listings
 
