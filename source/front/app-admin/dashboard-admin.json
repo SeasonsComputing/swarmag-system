@@ -41,6 +41,7 @@
               "icon": "gear",
               "labelMode": "visible-no-icon"
             },
+            { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
             { "command": "@tasks", "label": "Tasks", "icon": "update", "labelMode": "hidden" },
             {
               "label": "Field Binder",
@@ -52,7 +53,6 @@
                 { "status": "field-binder" }
               ]
             },
-            { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
             { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "visible" }
           ],
           "themes": ["dark", "light"]
