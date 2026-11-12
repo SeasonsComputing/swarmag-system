@@ -21,43 +21,6 @@
   width: fit-content;
 }
 
-/* The menu trigger is a bare glyph at the end: no hover cue; keyboard focus shows primary. */
-[data-widget='helm-widget'] [data-ui='button'] {
-  --sa-action-button-icon-size: 1rem;
-  background: transparent;
-  border: none;
-  color: var(--sa-text-secondary);
-  min-height: 0;
-  min-width: 0;
-  padding: var(--sa-space-xs);
-}
-
-[data-widget='helm-widget'] [data-ui='button']:hover {
-  background: transparent;
-}
-
-[data-widget='helm-widget'] [data-ui='button']:focus-visible {
-  background: transparent;
-  color: var(--sa-color-primary);
-}
-
-[data-widget='helm-widget'] [data-widget='helm-menu-icon'] {
-  background: currentColor;
-  block-size: var(--sa-action-button-icon-size);
-  display: block;
-  inline-size: var(--sa-action-button-icon-size);
-  mask: var(--sa-icon) center / contain no-repeat;
-}
-
-[data-widget='helm-widget'] [data-widget-icon='hidden'] [data-ui='action-button-frame'] {
-  display: none;
-}
-
-[data-widget='helm-widget'] [data-widget-icon='hidden'] [data-ui='action-button-label']::before,
-[data-widget='helm-widget'] [data-widget-icon='hidden'] [data-ui='action-button-label']::after {
-  content: none;
-}
-
 /* Stacked header: the field spans its own row, so actions center within it. */
 @container dashboard-header (max-width: 610px) {
   [data-widget='helm-widget'] {
@@ -74,28 +37,4 @@
 
 [data-widget='helm-command-menu'] > span {
   color: var(--sa-text-secondary);
-}
-
-/* Task popovers keep the same dense circular frame as adjacent action buttons. */
-[data-widget='helm-widget'] [data-ui='button']:has([data-widget='helm-action-frame']) {
-  flex: 0 0 auto;
-  padding: 0;
-}
-
-[data-widget='helm-widget'] [data-widget='helm-action-frame'] {
-  align-items: center;
-  background: var(--sa-bg-control);
-  border: var(--sa-border-default);
-  border-radius: var(--sa-radius-full);
-  block-size: calc(var(--sa-touch-target-sm) - var(--sa-space-md));
-  display: inline-flex;
-  inline-size: calc(var(--sa-touch-target-sm) - var(--sa-space-md));
-  justify-content: center;
-  transition: var(--sa-transition-fast);
-}
-
-[data-widget='helm-widget'] [data-ui='button']:not([disabled]):hover [data-widget='helm-action-frame'],
-[data-widget='helm-widget'] [data-ui='button']:focus-visible [data-widget='helm-action-frame'] {
-  background: var(--sa-bg-hover);
-  border-color: var(--sa-color-primary);
 }

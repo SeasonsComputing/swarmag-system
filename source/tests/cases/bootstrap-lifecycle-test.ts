@@ -48,11 +48,21 @@ async function browserHarness() {
   )
   const { makeHelmWidget } = await import('/source/ux/widgets/make-helm-widget.tsx')
   const { HelmWidget } = await import('/source/ux/widgets/helm-widget.tsx')
+  const { HelmButton, HelmButtonGlyph } = await import('/source/ux/widgets/helm-button.tsx')
+  const { UiPopover } = await import('/source/ux/ui/components/ui-popover.tsx')
   const { createComponent, createSignal, onCleanup } = await import('solid-js')
+  const { render } = await import('solid-js/web')
   AppState.init = async () => {}
   const events = []
   const [status, setStatus] = createSignal('Ready offline')
   const [disabled, setDisabled] = createSignal(false)
+  const [probeLoading, setProbeLoading] = createSignal(false)
+  const [probeDisabled, setProbeDisabled] = createSignal(false)
+  let probeCalls = 0
+  let probeRef
+  let probeDispose
+  const probe = document.createElement('form')
+  document.body.append(probe)
   let calls = 0
   let mode = 'success'
   let closedOnExecute = false
@@ -105,6 +115,27 @@ async function browserHarness() {
   }
   globalThis.Harness = {
     events, setStatus, setDisabled, leave,
+    setProbeLoading, setProbeDisabled,
+    probeCalls: () => probeCalls,
+    probeRef: () => probeRef,
+    probeMount: () => {
+      probe.dataset.widget = 'helm-widget'
+      probeDispose = render(() => [
+        createComponent(HelmButton, {
+          icon: 'update', label: 'Probe command',
+          get loading() { return probeLoading() }, get disabled() { return probeDisabled() },
+          ref: element => { probeRef = element }, 'aria-describedby': 'probe-help',
+          onClick: () => { probeCalls++ }
+        }),
+        createComponent(UiPopover, {
+          trigger: createComponent(HelmButtonGlyph, { icon: 'backpack', label: 'Probe menu' }),
+          triggerVariant: 'ghost',
+          get loading() { return probeLoading() }, get disabled() { return probeDisabled() },
+          children: 'Probe content'
+        })
+      ], probe)
+    },
+    probeCleanup: () => { probeDispose(); probe.remove() },
     calls: () => calls, closedOnExecute: () => closedOnExecute,
     mode: value => { mode = value },
     publish: (key, task) => BackgroundTasks.publish(key, task),
@@ -158,17 +189,61 @@ try {
   await page.waitForSelector('body[data-ready="true"]')
   assert.deepEqual(await page.evaluate(() => Harness.events), ['session', 'mount'])
   assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true }).isDisabled(), true)
-  const taskFrame = () => page.getByRole('button', { name: 'Tasks', exact: true })
-    .locator('[data-widget="helm-action-frame"]').evaluate(element => {
+  const toolbar = page.locator('[data-widget="helm-widget"]')
+  const assertFrameless = async () => {
+    const styles = await toolbar.locator('button').evaluateAll(buttons => buttons.flatMap(button => {
+      const frame = button.querySelector('[data-ui="action-button-frame"]')
+      return [button, ...(frame ? [frame] : [])].map(element => {
+        const style = getComputedStyle(element)
+        return [style.borderWidth, style.backgroundColor]
+      })
+    }))
+    for (const style of styles) assert.deepEqual(style, ['0px', 'rgba(0, 0, 0, 0)'])
+    assert.equal(await toolbar.locator('[data-widget="helm-action-frame"]').count(), 0)
+    assert.equal(await toolbar.locator('[data-ui="action-button"]').count(), 0)
+    const centers = await toolbar.locator('button').evaluateAll(buttons => buttons.map(button => {
+      const target = button.getBoundingClientRect()
+      const glyph = button.querySelector('[data-widget="helm-button-glyph"]').getBoundingClientRect()
+      return [Math.abs(target.x + target.width / 2 - glyph.x - glyph.width / 2),
+        Math.abs(target.y + target.height / 2 - glyph.y - glyph.height / 2)]
+    }))
+    for (const [x, y] of centers) assert(x <= 0.5 && y <= 0.5, 'Toolbar glyph must be centered')
+  }
+  const targetSize = name => page.getByRole('button', { name, exact: true }).evaluate(element => {
+    const rect = element.getBoundingClientRect()
+    return [rect.width, rect.height]
+  })
+  const actionSize = await targetSize('Theme')
+  const assertHoverGlow = async name => {
+    const button = page.getByRole('button', { name, exact: true })
+    await button.evaluate(element => element.blur())
+    await page.mouse.move(0, 0)
+    await page.waitForFunction(element => getComputedStyle(element).boxShadow === 'none',
+      await button.elementHandle())
+    const restColor = await button.evaluate(element => getComputedStyle(element).color)
+    await button.hover()
+    await page.waitForFunction(({ element, restColor }) => {
       const style = getComputedStyle(element)
-      return [style.width, style.height, style.borderWidth, style.borderStyle, style.borderRadius]
-    })
-  const actionFrame = await page.getByRole('button', { name: 'Theme', exact: true })
-    .locator('[data-ui="action-button-frame"]').evaluate(element => {
-      const style = getComputedStyle(element)
-      return [style.width, style.height, style.borderWidth, style.borderStyle, style.borderRadius]
-    })
-  assert.deepEqual(await taskFrame(), actionFrame)
+      return style.boxShadow !== 'none' && style.color !== restColor
+    }, { element: await button.elementHandle(), restColor })
+    assert.notEqual(await button.evaluate(element => getComputedStyle(element).borderRadius), '0px')
+    await assertFrameless()
+  }
+  await assertFrameless()
+  assert.deepEqual(await targetSize('Tasks'), actionSize)
+  for (const name of ['Backpack', 'More actions']) assert.deepEqual(await targetSize(name), actionSize)
+  assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true })
+    .evaluate(element => Number(getComputedStyle(element).opacity) < 1), true)
+  await page.getByRole('button', { name: 'Tasks', exact: true }).hover()
+  assert.equal(await page.getByRole('button', { name: 'Tasks', exact: true })
+    .evaluate(element => getComputedStyle(element).boxShadow), 'none')
+  for (const name of ['Theme', 'Backpack', 'More actions']) await assertHoverGlow(name)
+  await page.getByRole('button', { name: 'Theme', exact: true }).focus()
+  await page.keyboard.press('Shift')
+  assert.equal(await page.getByRole('button', { name: 'Theme', exact: true })
+    .evaluate(element => element.matches(':focus-visible') &&
+      getComputedStyle(element).boxShadow !== 'none'), true)
+  await assertFrameless()
   await page.getByRole('button', { name: 'Backpack', exact: true }).focus()
   await page.keyboard.press('Enter')
   await page.getByRole('button', { name: 'Sync', exact: true }).waitFor()
@@ -187,7 +262,9 @@ try {
   await page.waitForFunction(() => Harness.calls() === 1)
   assert.equal(await page.evaluate(() => Harness.closedOnExecute()), true)
   assert.equal(await page.evaluate(() => Harness.leave()), false)
-  assert.deepEqual(await taskFrame(), actionFrame)
+  await assertFrameless()
+  assert.deepEqual(await targetSize('Tasks'), actionSize)
+  await assertHoverGlow('Tasks')
   await page.getByRole('button', { name: 'Tasks', exact: true }).click()
   await page.getByText('Unable to reach the server', { exact: true }).waitFor()
   await page.keyboard.press('Escape')
@@ -219,7 +296,17 @@ try {
   await page.keyboard.press('Escape')
   await page.getByRole('button', { name: 'Theme', exact: true }).click()
   assert.equal(await page.evaluate(() => document.documentElement.dataset.theme), 'dark')
+  for (const theme of ['dark', 'light']) {
+    await page.evaluate(theme => { document.documentElement.dataset.theme = theme }, theme)
+    for (const name of ['Theme', 'Tasks', 'Backpack', 'More actions']) await assertHoverGlow(name)
+  }
   await page.setViewportSize({ width: 360, height: 740 })
+  await toolbar.evaluate(element => Promise.all(element.getAnimations({ subtree: true })
+    .map(animation => animation.finished)))
+  const narrowSize = await targetSize('Theme')
+  for (const name of ['Theme', 'Tasks', 'Backpack', 'More actions']) {
+    assert.deepEqual(await targetSize(name), narrowSize)
+  }
   await page.getByRole('button', { name: 'More actions', exact: true }).click()
   await page.getByRole('button', { name: 'About', exact: true }).waitFor()
   await page.getByRole('button', { name: 'About', exact: true }).click()
@@ -244,6 +331,35 @@ try {
   assert.equal(events.filter(event => event === 'session-cleanup').length, 3)
   await page.evaluate(() => Harness.defaultMount())
   await page.getByRole('button', { name: 'Theme', exact: true }).waitFor()
+  await page.evaluate(() => Harness.probeMount())
+  const probeCommand = page.getByRole('button', { name: 'Probe command', exact: true })
+  const probeMenu = page.getByRole('button', { name: 'Probe menu', exact: true })
+  assert.equal(await probeCommand.getAttribute('type'), 'button')
+  assert.equal(await probeCommand.getAttribute('aria-describedby'), 'probe-help')
+  assert.equal(await probeCommand.evaluate(element => element === Harness.probeRef()), true)
+  assert.deepEqual(await targetSize('Probe menu'), await targetSize('Probe command'))
+  await probeCommand.focus()
+  await page.keyboard.press('Enter')
+  await page.keyboard.press('Space')
+  assert.equal(await page.evaluate(() => Harness.probeCalls()), 2)
+  await page.evaluate(() => Harness.setProbeLoading(true))
+  assert.equal(await probeCommand.isDisabled(), true)
+  assert.equal(await probeMenu.isDisabled(), true)
+  assert.equal(await probeCommand.getAttribute('aria-busy'), 'true')
+  await probeCommand.evaluate(element => element.click())
+  assert.equal(await page.evaluate(() => Harness.probeCalls()), 2)
+  await page.evaluate(() => { Harness.setProbeLoading(false); Harness.setProbeDisabled(true) })
+  assert.equal(await probeCommand.isDisabled(), true)
+  assert.equal(await probeMenu.isDisabled(), true)
+  assert.equal(await probeCommand.getAttribute('aria-busy'), null)
+  await page.evaluate(() => Harness.setProbeDisabled(false))
+  await probeMenu.focus()
+  await page.keyboard.press('Space')
+  await page.getByText('Probe content', { exact: true }).waitFor()
+  await page.keyboard.press('Escape')
+  await page.waitForFunction(() => document.activeElement?.textContent !== undefined &&
+    document.activeElement?.querySelector('[aria-label="Probe menu"]'))
+  await page.evaluate(() => Harness.probeCleanup())
   await page.evaluate(() => Harness.dispose())
   assert.deepEqual(errors, [])
   console.log('PASS: root lifecycle, default widget, reactive status/disabled, failure ownership, ' +

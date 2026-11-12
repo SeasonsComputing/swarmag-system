@@ -365,3 +365,57 @@ Existing lifecycle, interaction, and focus checks also passed. `deno task check`
 `deno task fmt:check`, and `git diff --check` passed. `STYLE_AUDIT: PASS` for the maker, widget CSS,
 and browser test; existing design tokens supply the frame styling. No files created/deleted for
 this repair, no remaining verification failure, and no deployment performed.
+
+## Amendment — 2026-11-12 — Frameless Helm toolbar icons
+
+The CA selected bare glyphs for all Helm toolbar icon buttons. This supersedes the circular
+Tasks frame amendment above. Toolbar action frames have transparent backgrounds and no border
+at rest, on hover, and during keyboard focus. The Tasks popover uses a single glyph inside its
+existing semantic button; its dense action target dimensions are retained on the button.
+Existing spacing, accessible names, keyboard focus indication, disabled dimming, and empty-state
+behavior remain. Backpack and overflow retain their bare-glyph presentation. Styling is scoped
+to the Helm toolbar; the shared UiActionButton primitive is unchanged.
+The CA clarified that every enabled toolbar button retains the existing hover glow. Both
+popover triggers and action buttons use the shared button-shadow token; disabled buttons do
+not glow, and keyboard focus retains the focus ring.
+
+Foundation production modifies make-helm-widget.tsx, helm-widget.css,
+bootstrap-lifecycle-test.ts, and this brief. No files are created or deleted. Local Chrome
+integration passes, including frameless rest/hover/focus states, retained Tasks target dimensions
+while disabled and enabled, disabled dimming, focus indication, and the existing lifecycle,
+menu, navigation, theme, and narrow-layout checks. The browser check also verifies hover glow
+on Theme, Tasks, Backpack, and overflow, and no hover glow on disabled Tasks.
+
+Verification: `deno task check`, `deno task fmt:check`, and `git diff --check` pass. The permitted
+unit suite passes 218 tests and 14 steps, with zero failures and three opt-in tests ignored;
+users-api-test.ts and session-coordinator-test.ts remain excluded. The local Chrome integration
+test passes separately. `STYLE_AUDIT: PASS` for the maker, widget CSS, and browser test. No
+verification failures remain. No deployment was performed, and this amendment does not close the effort.
+
+## Amendment — 2026-11-12 — Local Helm button
+
+The CA approved a Helm-owned button and glyph in helm-button.tsx with local styling in
+helm-button.css. This replaces toolbar UiActionButton composition and the frame/label-part
+overrides in helm-widget.css. UiButton supplies the semantic button required by the existing
+bare-HTML guard; the local component owns accessible naming, button type, glyph content,
+dimensions, and presentation. Popovers retain their existing trigger host and receive the same
+HelmButtonGlyph content. There are no nested buttons or changes to shared primitives or guards.
+
+The resting appearance is frameless. Enabled buttons retain the circular hover halo and primary
+color cue; keyboard focus retains its ring. Disabled/loading buttons suppress activation and
+hover effects. Loading exposes aria-busy. Component-owned naming, content, type, styling, and
+state attributes cannot be supplied through HelmButtonProps; native refs, events, and other ARIA
+attributes pass through. Labelled menu actions retain UiActionButton.
+
+Foundation production creates source/ux/widgets/helm-button.tsx and helm-button.css and modifies
+make-helm-widget.tsx, helm-widget.css, bootstrap-lifecycle-test.ts, and this brief. No files are
+deleted. The browser coverage compares command and popover hosts across themes and narrow
+layouts and exercises loading, disabled state, keyboard activation, focus return, and ref/event
+forwarding. Luna ran the final verification: `deno task check`, `deno task fmt:check`, the
+permitted unit suite, and `git diff --check` pass. The suite passes 218 tests with zero failures
+and three opt-in tests ignored; users-api-test.ts and session-coordinator-test.ts remain excluded.
+The separate local Chrome integration passes, including both button hosts, light/dark hover
+halo and color, responsive target sizing, glyph alignment, loading, disabled activation,
+Enter/Space/Escape, focus return, and ref/event forwarding. `STYLE_AUDIT: PASS` for the local
+component, CSS, maker, and browser test. No verification failures remain. No deployment or
+effort closure is included.

@@ -29,6 +29,7 @@ import { useShellNavigate } from '@ux/shell/runtime/use-shell-navigate.ts'
 import { UiActionButton, UiLayout, UiPopover } from '@ux/ui'
 import type { UiComponent } from '@ux/ui'
 import { BackgroundTaskList } from './background-task-list.tsx'
+import { HelmButton, HelmButtonGlyph } from './helm-button.tsx'
 import { readHelmActions } from './helm-widget-contract.ts'
 import type { HelmBindings, HelmCommand, HelmMenu } from './helm-widget-contract.ts'
 
@@ -109,28 +110,20 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
       })
     })
   }
-  const commandButton = (action: HelmCommand, labelled: boolean): UiComponent => (
+  const menuCommandButton = (action: HelmCommand): UiComponent => (
     <UiActionButton
       density='dense'
       icon={icon(action)}
       label={action.label}
-      labelMode={labelled ? 'visible' : 'hidden'}
+      labelMode='visible'
       align='start'
-      data-widget-icon={action.labelMode === 'visible-no-icon' && !labelled ? 'hidden' : undefined}
       disabled={disabled(action)}
       onClick={() => execute(action)}
     />
   )
-  const trigger = (label: string, glyph: string): UiComponent => (
-    <span role='img' aria-label={label} data-widget='helm-menu-icon' data-ui-icon={glyph} />
-  )
   const tasksPopover = (action: HelmCommand): UiComponent => (
     <UiPopover
-      trigger={
-        <span role='img' aria-label={action.label} data-widget='helm-action-frame'>
-          <span data-widget='helm-menu-icon' data-ui-icon='update' />
-        </span>
-      }
+      trigger={<HelmButtonGlyph label={action.label} icon='update' />}
       triggerVariant='ghost'
       disabled={Object.keys(BackgroundTasks.store).length === 0}
       open={open() === action}
@@ -148,7 +141,7 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
             'items' in action
               ? (
                 <UiPopover
-                  trigger={trigger(action.label, action.icon)}
+                  trigger={<HelmButtonGlyph label={action.label} icon={action.icon} />}
                   triggerVariant='ghost'
                   open={open() === action}
                   onOpenChange={value => changeOpen(action, value)}
@@ -171,7 +164,7 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
                                   onClick={() => setTaskView(true)}
                                 />
                               )
-                              : commandButton(item, true)}
+                              : menuCommandButton(item)}
                         </For>
                       </UiLayout>
                     }
@@ -182,17 +175,24 @@ export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
               )
               : action.command === '@tasks'
               ? tasksPopover(action)
-              : commandButton(action, false)}
+              : (
+                <HelmButton
+                  icon={icon(action)}
+                  label={action.label}
+                  disabled={disabled(action)}
+                  onClick={() => execute(action)}
+                />
+              )}
         </For>
         <Show when={overflow().length > 0}>
           <UiPopover
-            trigger={trigger('More actions', 'dots-vertical')}
+            trigger={<HelmButtonGlyph label='More actions' icon='dots-vertical' />}
             triggerVariant='ghost'
             open={open() === 'overflow'}
             onOpenChange={value => changeOpen('overflow', value)}
           >
             <UiLayout variant='block-fit' data-widget='helm-command-menu'>
-              <For each={overflow()}>{action => commandButton(action, true)}</For>
+              <For each={overflow()}>{action => menuCommandButton(action)}</For>
             </UiLayout>
           </UiPopover>
         </Show>
