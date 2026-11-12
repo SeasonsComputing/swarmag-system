@@ -232,9 +232,9 @@ attaches and shares documents; field capture and its upload are the Ops applicat
   inbox/server pair, and `SupabaseDocumentProvider` bound to a configured native root from one
   storage target contract. The stage transition and on-screen acceptance are backlog B-46. This
   is distinct from the closed Upload feature below.
-- **Stage on the attachment root** — backlog B-46: provision the root, apply the materialized
-  policies, dispose of the legacy namespace buckets, and accept attaching in Admin. The CA runs
-  it; it precedes the Field Binder's stage verification.
+- **Stage on its storage roots** — backlog B-46: provision the attachment and Field Binder roots,
+  apply the materialized policies, dispose of the legacy namespace buckets, and accept attaching
+  in Admin. The CA runs it; it precedes the Field Binder's stage verification.
 - **Background Tasks and Helm menus** — active,
   `effort/active/2026-11-10-background-tasks-brief.md`: application-bound command menus and task
   reporting; uses attachment delivery first and supplies the Binder's command fitting.

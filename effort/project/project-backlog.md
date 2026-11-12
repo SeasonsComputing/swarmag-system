@@ -633,9 +633,14 @@ stage and place on the device but do not deliver, and documents in the four lega
 unreachable. Deferred from `effort/completed/2026-11-11-upload-brief.md`, which holds the contract
 and the transition gate.
 
-**Picking this up:** the CA runs it. Provision the root (`app-deploy-storage-config`), apply the
-materialized policies (`db-genesis`), decide relocation or removal for the legacy buckets, run
-`document-store-stage-test.ts`, then check attaching in Admin on screen: Choose File, open staged,
-Save, open placed, Cancel, and delivery. It precedes the Field Binder's stage verification.
+The Field Binder's root, `swarmag-field-binder`, is named in the same contract and is equally
+absent from stage, with its split read and mutation policies. Both roots and both sets of policies
+move in one run.
+
+**Picking this up:** the CA runs it. Provision the roots (`app-deploy-storage-config --target
+stage`), reset and apply the materialized policies (`db-reset --target stage`, which also disposes
+of the legacy buckets), run `document-store-stage-test.ts`, then check attaching in Admin on
+screen: Choose File, open staged, Save, open placed, Cancel, and delivery. It precedes the Field
+Binder's stage verification.
 
 _End of Backlog Document_
