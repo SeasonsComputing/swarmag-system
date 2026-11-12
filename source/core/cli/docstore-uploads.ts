@@ -8,6 +8,8 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Owns durable capture and delivery for one inbox/server pair. Consumers own
 format policy, destinations, references, save ordering, and scheduling.
+Drain aggregates expected ApiError failures after attempting the remaining
+documents; unexpected errors stop the pass and propagate unchanged.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -17,7 +19,7 @@ Uploads          Document lifecycle over an injected inbox/server pair.
 ├ isStaged       Classify a document identity.
 ├ discard        Remove staging only.
 ├ place          Copy staging into a consumer's bucket, retaining its source.
-├ drain          Deliver every placed document in a snapshot.
+├ drain          Deliver a snapshot, aggregating expected failures.
 ├ link           Mint a link, falling back only for missing placed documents.
 └ get            Read metadata with the same fallback rule.
 */
@@ -95,18 +97,20 @@ export class Uploads {
 
   /**
    * Copy one snapshot of placed documents to the server at the same addresses.
-   * Attempts every document and rejects after the pass if any failed. Successful
+   * Aggregates expected ApiError failures after attempting the remaining documents;
+   * unexpected errors stop the pass and propagate unchanged. Successful
    * results count completed documents and a fresh snapshot of those still pending.
    */
   async drain(): Promise<{ drained: number; remaining: number }> {
     const pending = await this.#pending()
-    const failures: unknown[] = []
+    const failures: ApiError[] = []
     let drained = 0
     for (const { namespace, bucket, document } of pending) {
       try {
         await this.#drainOne(namespace, bucket, document)
         drained++
       } catch (error) {
+        if (!(error instanceof ApiError)) throw error
         failures.push(error)
       }
     }

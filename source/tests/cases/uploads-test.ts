@@ -12,7 +12,7 @@ import { IndexedDbDocumentProvider } from '@core/cli/indexeddb-docstore-provider
 import { ValidatorError } from '@core/std'
 import { ApiError } from '@core/stdx'
 import type { DocumentId } from '@core/stdx'
-import { assert, assertEquals, assertRejects } from '@std/assert'
+import { assert, assertEquals, assertRejects, assertStrictEquals } from '@std/assert'
 import {
   IDBCursor,
   IDBCursorWithValue,
@@ -136,6 +136,29 @@ Deno.test('drain preserves documents through interruptions and concurrent reads'
       Server.document.create = create
     }
     assertEquals(await Delivery.drain(), { drained: 1, remaining: 0 })
+  })
+
+  await context.step('unexpected errors propagate unchanged and stop the current pass', async () => {
+    const first = await place('unexpected-first')
+    const later = await place('unexpected-later')
+    const failure = new TypeError('Injected programming error')
+    const create = Server.document.create
+    let attempts = 0
+    Server.document.create = (): Promise<never> => {
+      attempts++
+      return Promise.reject(failure)
+    }
+    try {
+      assertStrictEquals(await assertRejects(() => Delivery.drain(), TypeError), failure)
+      assertEquals(attempts, 1)
+      assertEquals(await (await Inbox.document.read(first)).text(), 'unexpected-first')
+      assertEquals(await (await Inbox.document.read(later)).text(), 'unexpected-later')
+      await assertRejects(() => Server.document.get(first), ApiError)
+      await assertRejects(() => Server.document.get(later), ApiError)
+    } finally {
+      Server.document.create = create
+    }
+    assertEquals(await Delivery.drain(), { drained: 2, remaining: 0 })
   })
 
   await context.step('remaining counts documents placed after the pass snapshot', async () => {

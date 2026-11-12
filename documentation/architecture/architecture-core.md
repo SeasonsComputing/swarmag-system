@@ -828,8 +828,10 @@ physical root mappings.
 - **A drain preserves addresses.** Each Uploads instance snapshots every non-Staging namespace
   in its inbox, creates the containers and documents on its paired server at the same identities,
   then clears their placed inbox copies. Staging never drains. A repeated copy returns the immutable
-  document already at that identity, so interrupted and concurrent passes repeat safely. A pass attempts every document;
-  partial failure rejects after the pass, while success reports completed and remaining counts.
+  document already at that identity, so interrupted and concurrent passes repeat safely. Expected
+  delivery failures allow the pass to attempt the remaining documents and reject with an aggregate
+  of those failures afterward. Unexpected errors stop the pass immediately and propagate unchanged.
+  Success reports completed and remaining counts.
 - **Access follows the document.** Uploads reads metadata or mints a link from the inbox first,
   falling back to the server only when a placed document is missing. Missing staging and other
   failures propagate. The consumer stores a document reference, never a minted link.
