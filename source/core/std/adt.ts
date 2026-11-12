@@ -16,6 +16,7 @@ isDictionary(value)  Check whether value is a plain or null-prototype object.
 StringDictionary     String-keyed dictionary where all values are strings.
 StringSet            Set specialized for string membership collections.
 djb2hash(str)        Compute a djb2 fingerprint of a string.
+immutable(o)         Shallow-freeze an object and return the same reference.
 */
 
 /** String-keyed dictionary with configurable value type. */
@@ -44,5 +45,5 @@ export const djb2hash = (str: string): string => {
   return hash.toString(36)
 }
 
-/** Create an immutable (frozen) copy of an object. */
+/** Shallow-freeze an object and return the same reference. */
 export const immutable = <T>(o: T): Readonly<T> => Object.freeze(o)
