@@ -1420,13 +1420,15 @@ const identity: AbstractionListColumn<User> = {
 }
 ```
 
-### 17.3 Index: `Lister`
+### 17.3 Collection: `Lister`
 
 `Lister` (`@ux/shell/workbench/lister.tsx`) presents a Collection alone, with no Detail beside
 it, and activates its Items; the consumer decides what activation means. It takes a provider of
 `CollectionContract` (`@ux/shell/workbench/collection-contract.ts`), the Collection's columns,
 list, and loading, and an `activate` prop. `ManagerContract` extends `CollectionContract`, so a
-Collection looks and behaves the same in both workbenches.
+Collection looks and behaves the same in both workbenches. A Collection alone discloses
+nothing selectively, so it is a Collection, not an Index. A `Lister` is a `PanelSheet` (§17.7)
+around the Collection and is registered with `Routes.sheet`.
 
 ```typescript
 const provider: CollectionContract<Report> = {
@@ -1538,6 +1540,29 @@ rearrange it.
   "header": { "widgets": [{ "type": "LogoWidget", "settings": { "shape": "landscape" } }] },
   "rows": []
 }
+```
+
+### 17.7 Sheet: the full-device dialog
+
+A sheet is the general-purpose full-device dialog. On a phone it takes the whole device; on a
+larger screen it is a card at the workbench's collapse-point width. It carries any content that
+is one panel, and it is not tied to a Collection or to a list.
+
+- `Routes.sheet(path, component)` registers it, and its dialog size is `'sheet'`
+  (`UiDialogSize`). The route is the one place a sheet's size is declared.
+- `PanelSheet` (`@ux/shell/panel/panel-sheet.tsx`) supplies the chrome: a title, Close, and a
+  `main` slot, neutral to its content as `PanelContainer` is. `busy` disables Close while work
+  is in flight.
+- A sheet has no Detail, so it has no Aside, and no workbench collapse rule applies to it. Its
+  small-device behavior is the design language's: the full-device rule it shares with
+  `'workbench'`.
+
+```typescript
+Routes.sheet('/field-binder', FieldBinder)
+
+<PanelSheet title='Field Binder' onCancel={props.onCancel} busy={pending()}>
+  <CollectionTable provider={provider} activate={activate} />
+</PanelSheet>
 ```
 
 ## 18. Testing Conventions
