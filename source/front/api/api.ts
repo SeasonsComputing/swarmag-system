@@ -68,22 +68,18 @@ import { Attachments } from './attachments.ts'
 import { makeAuthUsers } from './make-auth-users.ts'
 
 /** How long a minted document link stays valid: five minutes, in milliseconds. */
-const LINK_LIFETIME = 5 * 60_000
+const storeSettings = { linkLifetime: 5 * 60_000 }
 
 /** The device's inbox: documents staged or placed and not yet uploaded. */
 const AttachmentsInbox = new DocumentStore(
   new IndexedDbDocumentProvider('DOCUMENT_INBOX_DB_NAME'),
-  {
-    linkLifetime: LINK_LIFETIME
-  }
+  storeSettings
 )
 
 /** The shared document store, authorized by Storage policies. */
 const AttachmentsServer = new DocumentStore(
   new SupabaseDocumentProvider(Supabase.client, 'ATTACHMENTS_SERVER_ROOT'),
-  {
-    linkLifetime: LINK_LIFETIME
-  }
+  storeSettings
 )
 
 /** Attachment delivery over the existing storage bindings. */
