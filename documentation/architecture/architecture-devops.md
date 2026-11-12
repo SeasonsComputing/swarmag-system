@@ -1036,8 +1036,9 @@ credential handling follow the target deployment rules.
 
 ### 14.5 Reset and Usage
 
-storage-reset.ts enumerates the selected target contract's roots and empties them through the
-Storage API. db-reset runs that explicitly selected reset before genesis. Storage metadata is not removed by SQL.
+storage-reset.ts empties the selected target contract's roots through the Storage API, then
+empties and deletes every native bucket the contract does not name, so the target's Storage
+holds only its contract's roots. db-reset runs that explicitly selected reset before genesis. Storage metadata is not removed by SQL.
 Storage usage reports selected roots against the target's storage capacity.
 
 Reset and deployment are explicit operational actions scoped to the selected target and roots.
