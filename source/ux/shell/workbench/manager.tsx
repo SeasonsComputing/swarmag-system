@@ -266,8 +266,8 @@ export const Manager = <T extends Instance, Draft>(
     const active = {
       draft: detail.draft,
       complete: sequence.complete,
-      isDrilled: () => workbench.drillReturn() !== null,
-      isDirty: () => isDraftChanged(detail.draft(), baseline) || workbench.isDirty()
+      isDrilled: (): boolean => workbench.drillReturn() !== null,
+      isDirty: (): boolean => isDraftChanged(detail.draft(), baseline) || workbench.isDirty()
     }
     setSession(() => active)
     onCleanup(() => setSession(current => current === active ? null : current))

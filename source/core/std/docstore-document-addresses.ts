@@ -9,7 +9,8 @@ PURPOSE
 An address names a namespace, bucket, or document by one to three segments,
 each a name or id:{uuid}. These operations need no store: names are resolved
 by the store's contracts, and an id-form document reference becomes a DocumentId
-here.
+here. Parsing normalizes raw ids to lowercase; typed ids are trusted and names
+retain their spelling.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -21,11 +22,10 @@ DocumentAddresses    Address operations; the type is DocumentAddress.
 └ id                 Parse an id-form document reference.
 */
 
-import { isDictionary } from './adt.ts'
 import { documentIdentity } from './docstore-contract.ts'
 import type { AddressSegment, DocumentAddress, DocumentId } from './docstore-contract.ts'
-import { type Id, isId } from './identifier.ts'
-import { notValid, ValidatorError } from './validators.ts'
+import type { Id } from './identifier.ts'
+import { notValid, toId, ValidatorError } from './validators.ts'
 
 /** Document address operations; id-form references need no store. */
 export const DocumentAddresses = {
@@ -35,7 +35,8 @@ export const DocumentAddresses = {
     const segments = [namespace]
     if (bucket !== undefined) segments.push(bucket)
     if (document !== undefined) segments.push(document)
-    return DocumentAddresses.parse(DocumentAddresses.format(segments))
+    DocumentAddresses.format(segments)
+    return segments
   },
 
   /** Parse address text into one to three segments; fails through notValid. */
@@ -44,16 +45,14 @@ export const DocumentAddresses = {
     if (segments.length < 1 || segments.length > 3) notValid('Address requires one to three segments')
     return segments.map(segment => {
       if (segment.startsWith('id:')) {
-        const value = segment.slice(3)
-        if (!isId(value)) return notValid('Address id must be a UUID v7')
-        return { id: value }
+        return { id: toId(segment.slice(3)) }
       }
       if (!validName(segment)) return notValid('Address name must be nonblank and contain no slash')
       return segment
     })
   },
 
-  /** Render an address as text: names as written, ids as id:{uuid}. */
+  /** Render an address as text, preserving names and already-canonical ids. */
   format(address: DocumentAddress): string {
     if (address.length < 1 || address.length > 3) notValid('Address requires one to three segments')
     return address.map(segment => {
@@ -61,7 +60,6 @@ export const DocumentAddresses = {
         if (!validName(segment)) return notValid('Invalid document store name')
         return segment
       }
-      if (!isDictionary(segment) || !isId(segment.id)) return notValid('Invalid address id')
       return `id:${segment.id}`
     }).join('/')
   },

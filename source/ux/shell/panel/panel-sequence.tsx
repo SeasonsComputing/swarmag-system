@@ -45,9 +45,9 @@ export const createPanelSequence = (
   const [index, setIndex] = createSignal(0)
   const [registered, setRegistered] = createSignal<(() => boolean) | null>(null)
   const current = createMemo(() => steps()[index()])
-  const isFirst = () => index() === 0
-  const isLast = () => index() === steps().length - 1
-  const validate = () => (registered()?.() ?? true) && (current().validate?.() ?? true)
+  const isFirst = (): boolean => index() === 0
+  const isLast = (): boolean => index() === steps().length - 1
+  const validate = (): boolean => (registered()?.() ?? true) && (current().validate?.() ?? true)
   const move = (position: number): void => {
     setRegistered(null)
     setIndex(position)
@@ -59,18 +59,20 @@ export const createPanelSequence = (
     isFirst,
     isLast,
     validate,
-    complete: () => isLast() && validate(),
-    back: () => {
+    complete: (): boolean => isLast() && validate(),
+    back: (): void => {
       if (!isFirst()) move(index() - 1)
     },
-    next: () => {
+    next: (): boolean => {
       if (isLast() || !validate()) return false
       move(index() + 1)
       return true
     },
-    registerValidation: validate => {
+    registerValidation: (validate: () => boolean): () => void => {
       setRegistered(() => validate)
-      return () => setRegistered(active => active === validate ? null : active)
+      return (): void => {
+        setRegistered(active => active === validate ? null : active)
+      }
     }
   }
 }

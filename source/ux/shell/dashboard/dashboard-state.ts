@@ -174,7 +174,7 @@ async function dashboardSave(): Promise<void> {
 /** Widgets contract provider */
 const dashboardWidgets: DashboardWidgetsContract = {
   /** Create and persist a widget, then append to local store. */
-  add: async (rowId, widget): Promise<DashboardStoreWidget> => {
+  add: async (rowId: string | null, widget: DashboardWidget): Promise<DashboardStoreWidget> => {
     if (rowId && !dashboardStore.rows.some(row => row.id === rowId)) {
       throw new ApiError('Dashboard row not found', 404)
     }
@@ -194,7 +194,7 @@ const dashboardWidgets: DashboardWidgetsContract = {
   },
 
   /** Persist widget updates and keep store in sync. */
-  update: async (rowId, widget): Promise<void> => {
+  update: async (rowId: string | null, widget: DashboardStoreWidget): Promise<void> => {
     setDashboardStore(
       produce(store => {
         const widgets = rowId
@@ -211,7 +211,7 @@ const dashboardWidgets: DashboardWidgetsContract = {
   },
 
   /** Delete widget from store and persistence layer. */
-  remove: async (rowId, id): Promise<void> => {
+  remove: async (rowId: string | null, id: string): Promise<void> => {
     setDashboardStore(
       produce(store => {
         const widgets = rowId
@@ -228,7 +228,7 @@ const dashboardWidgets: DashboardWidgetsContract = {
   },
 
   /** Reorder widgets by swapping positional/sort fields. */
-  move: async (rowId, id, direction): Promise<void> => {
+  move: async (rowId: string | null, id: string, direction: MoveDirection): Promise<void> => {
     setDashboardStore(
       produce(store => {
         const widgets = rowId
@@ -252,16 +252,17 @@ const dashboardWidgets: DashboardWidgetsContract = {
 
 /** Header contract provider */
 const dashboardHeader: DashboardHeaderContract = {
-  add: async (w): Promise<DashboardStoreWidget> => await dashboardWidgets.add(null, w),
-  update: async (w): Promise<void> => await dashboardWidgets.update(null, w),
-  remove: async (id): Promise<void> => await dashboardWidgets.remove(null, id),
-  move: async (id, dir): Promise<void> => await dashboardWidgets.move(null, id, dir)
+  add: async (w: DashboardWidget): Promise<DashboardStoreWidget> => await dashboardWidgets.add(null, w),
+  update: async (w: DashboardStoreWidget): Promise<void> => await dashboardWidgets.update(null, w),
+  remove: async (id: string): Promise<void> => await dashboardWidgets.remove(null, id),
+  move: async (id: string, dir: MoveDirection): Promise<void> =>
+    await dashboardWidgets.move(null, id, dir)
 }
 
 /** Row contract provider */
 const dashboardRows: DashboardRowsContract = {
   /** Create and persist a dashboard row, then append to local store. */
-  add: async (row): Promise<DashboardStoreRow> => {
+  add: async (row: DashboardRowHeader): Promise<DashboardStoreRow> => {
     const storeRow: DashboardStoreRow = { id: id(), ...row, widgets: [] }
     setDashboardStore('rows', produce(rows => rows.push(storeRow)))
     await dashboardSave()
@@ -269,7 +270,7 @@ const dashboardRows: DashboardRowsContract = {
   },
 
   /** Remove row from store and persistence; rely on cascading widget cleanup. */
-  remove: async (id): Promise<void> => {
+  remove: async (id: string): Promise<void> => {
     setDashboardStore(
       'rows',
       produce(rows => {
@@ -282,7 +283,7 @@ const dashboardRows: DashboardRowsContract = {
   },
 
   /** Reorder rows by swapping positional/sort fields and persisting changes. */
-  move: async (id, dir): Promise<void> => {
+  move: async (id: string, dir: MoveDirection): Promise<void> => {
     setDashboardStore(
       produce(store => {
         const index = store.rows.findIndex(row => row.id === id)

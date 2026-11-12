@@ -77,9 +77,9 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
     title: props.rootTitle,
     path: [],
     panel: null,
-    dispose: () => undefined,
+    dispose: (): void => undefined,
     dirty: new Set(),
-    save: () => null
+    save: (): (() => UiActionButtonProps | undefined) | null => null
   }
   const [frame, setFrame] = createSignal(rootFrame)
   const returnToParent = (current: DrillFrame): void => {
@@ -116,8 +116,8 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
           save
         }
         const context: DrillPanelContext = {
-          isActive: () => isOpen() && frame() === current,
-          registerDirty: check => {
+          isActive: (): boolean => isOpen() && frame() === current,
+          registerDirty: (check: () => boolean): () => void => {
             current.dirty.add(check)
             const unregister = props.context?.registerDirty(check)
             const cleanup = (): void => {
@@ -127,7 +127,7 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
             onCleanup(cleanup)
             return cleanup
           },
-          registerSave: action => {
+          registerSave: (action: () => UiActionButtonProps | undefined): () => void => {
             setSave(() => action)
             const cleanup = (): void => {
               setSave(active => active === action ? null : active)
@@ -135,7 +135,7 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
             onCleanup(cleanup)
             return cleanup
           },
-          returnToParent: () => {
+          returnToParent: (): void => {
             if (isOpen()) returnToParent(current)
           }
         }
@@ -151,8 +151,8 @@ export const DrillDown = (props: DrillDownProps): UiComponent => {
     const current = frame()
     const control: DrillReturnControl | null = current.parent
       ? {
-        path: () => frame().path,
-        returnTitle: () => frame().parent?.title ?? props.rootTitle,
+        path: (): readonly string[] => frame().path,
+        returnTitle: (): string => frame().parent?.title ?? props.rootTitle,
         returnToIndex: requestReturn
       }
       : null

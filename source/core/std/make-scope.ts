@@ -83,12 +83,12 @@ export function makeScope<
   }
 }): Scope<T, K> {
   return {
-    toCreate: draft => {
+    toCreate: (draft: ScopeDraft<T, K>): CreateFromInstantiable<T> => {
       const source: Dictionary = { ...spec.defaults }
       for (const field of spec.fields) source[field.key as string] = draft[field.key]
       return source as CreateFromInstantiable<T>
     },
-    toUpdate: (id, draft) => {
+    toUpdate: (id: Id, draft: ScopeDraft<T, K>): ScopedUpdate<T, K> => {
       const source: Dictionary = { id }
       for (const field of spec.fields) source[field.key as string] = draft[field.key] ?? null
       return source as ScopedUpdate<T, K>

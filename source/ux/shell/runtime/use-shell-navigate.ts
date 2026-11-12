@@ -27,7 +27,7 @@ export type ShellNavigate = {
 export const useShellNavigate = (): ShellNavigate => {
   const navigate = useNavigate()
   return {
-    redirect: path => navigate({ to: path }),
-    replace: path => navigate({ to: path, replace: true })
+    redirect: (path: string): Promise<void> => navigate({ to: path }),
+    replace: (path: string): Promise<void> => navigate({ to: path, replace: true })
   }
 }

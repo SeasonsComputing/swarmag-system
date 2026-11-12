@@ -25,7 +25,7 @@ import type { Shell, ShellOverlayView, ShellPageView, ShellRoute } from './shell
 
 /** Create the lightweight shell and its common non-dashboard routes. */
 export const makeAnonymousShell = (Login: ShellPageView, logout: () => Promise<void>): Shell => ({
-  component: () => <Outlet />,
+  component: (): UiComponent => <Outlet />,
   initializers: [],
   routes: [
     Routes.page('/login', Login),
@@ -51,7 +51,7 @@ export const makeDashboardShell = (
   )
   return {
     component: DashboardShell,
-    initializers: [() => DashboardState.init(seed)],
+    initializers: [(): Promise<void> => DashboardState.init(seed)],
     routes: [
       Routes.index(),
       Routes.dialog('/about', AboutBox, { size: 'content', dismissible: true }),

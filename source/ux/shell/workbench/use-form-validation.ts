@@ -90,14 +90,16 @@ export const useFormValidation = (
   })
 
   return {
-    isInvalid: field => errors()[field] === true,
+    isInvalid: (field: string): boolean => errors()[field] === true,
     blurField: validateField,
-    inputField: field => {
+    inputField: (field: string): void => {
       if (errors()[field]) validateField(field)
     },
     changeField: validateField,
     validateForm,
-    reset: () => setErrors({})
+    reset: (): void => {
+      setErrors({})
+    }
   }
 }
 

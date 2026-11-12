@@ -31,7 +31,7 @@ import { IndexedDb } from '@core/db/indexeddb.ts'
 import { when } from '@core/std'
 import type { Id, When } from '@core/std'
 import { ApiError } from '@core/stdx'
-import type { DocumentProviderContract, Lineage, LineageMetadata } from '@core/stdx'
+import type { DeleteResult, DocumentProviderContract, Lineage, LineageMetadata } from '@core/stdx'
 import type { DBSchema, IDBPDatabase, IDBPTransaction } from '@idb'
 
 /** Provider over the browser's IndexedDB; every operation is one transaction over both stores. */
@@ -136,7 +136,7 @@ export class IndexedDbDocumentProvider implements DocumentProviderContract {
    * Delete a node; a container only when empty, counted in the same transaction so no child can
    * arrive between the check and the delete.
    */
-  async delete(node: Lineage) {
+  async delete(node: Lineage): Promise<DeleteResult> {
     return await this.#run('readwrite', async tx => {
       const lineage = keyOf(node)
       const row = await this.#node(tx, lineage)

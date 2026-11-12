@@ -8,6 +8,7 @@ PURPOSE
 ───────────────────────────────────────────────────────────────────────────────
 Composes the hierarchy over an injected provider. Applications use the shared
 contract and address grammar; providers own persistence.
+Supplied Id values are already canonical; only raw address text is parsed.
 
 PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
@@ -18,7 +19,7 @@ DocumentStore                            Storage-neutral document kernel.
 └ document                               Document operations.
 */
 
-import { id, isId, toWhen, ValidatorError } from '@core/std'
+import { id, toWhen, ValidatorError } from '@core/std'
 import type { Id } from '@core/std'
 import {
   ApiError,
@@ -30,8 +31,10 @@ import {
 import type {
   ApiDocumentStoreContract,
   BucketId,
+  DeleteResult,
   DocumentAddress,
   DocumentId,
+  DocumentLink,
   DocumentProviderContract,
   Lineage,
   LineageMetadata,
@@ -67,21 +70,21 @@ export class DocumentStore implements ApiDocumentStoreContract {
       produce: (node: Lineage) => I
     ): StoreNodeContract<I, P> => {
       return {
-        async get(node) {
+        async get(node: I): Promise<NodeMetadata<I>> {
           return metadata(await provider.get(node), produce)
         },
-        async find(parent, name) {
+        async find(parent: P, name: string): Promise<readonly NodeMetadata<I>[]> {
           readDocumentStoreName(name)
           return (await provider.find(depth === 1 ? null : parent as Lineage, name)).map(row =>
             metadata(row, produce)
           )
         },
-        async list(parent) {
+        async list(parent: P): Promise<readonly NodeMetadata<I>[]> {
           return (await provider.list(depth === 1 ? null : parent as Lineage)).map(row =>
             metadata(row, produce)
           )
         },
-        async resolve(address) {
+        async resolve(address: string | DocumentAddress): Promise<NodeMetadata<I>> {
           const segments = readDocumentStoreAddress(address)
           if (segments.length !== depth) throw new ApiError('Address has the wrong node depth', 400)
           let parent: Lineage | null = null
@@ -99,11 +102,11 @@ export class DocumentStore implements ApiDocumentStoreContract {
           }
           return metadata(found!, produce)
         },
-        async update(node, name) {
+        async update(node: I, name: string): Promise<NodeMetadata<I>> {
           readDocumentStoreName(name)
           return metadata(await provider.update(node, name), produce)
         },
-        async delete(node) {
+        async delete(node: I): Promise<DeleteResult> {
           return await provider.delete(node)
         }
       }
@@ -111,35 +114,40 @@ export class DocumentStore implements ApiDocumentStoreContract {
 
     this.namespace = {
       ...common<NamespaceId, void>(1, namespaceIdentity),
-      async create(name, suppliedId) {
+      async create(name: string, suppliedId?: Id): Promise<NodeMetadata<NamespaceId>> {
         readDocumentStoreName(name)
         return metadata(
-          await provider.create({ namespace: readDocumentStoreId(suppliedId) }, name),
+          await provider.create({ namespace: suppliedId ?? id() }, name),
           namespaceIdentity
         )
       }
     }
     this.bucket = {
       ...common<BucketId, NamespaceId>(2, bucketIdentity),
-      async create(parent, name, suppliedId) {
+      async create(parent: NamespaceId, name: string, suppliedId?: Id): Promise<NodeMetadata<BucketId>> {
         readDocumentStoreName(name)
         return metadata(
-          await provider.create(childLineage(parent, readDocumentStoreId(suppliedId)), name),
+          await provider.create(childLineage(parent, suppliedId ?? id()), name),
           bucketIdentity
         )
       }
     }
     this.document = {
       ...common<DocumentId, BucketId>(3, documentIdentity),
-      async create(parent, name, body, suppliedId) {
+      async create(
+        parent: BucketId,
+        name: string,
+        body: Blob,
+        suppliedId?: Id
+      ): Promise<NodeMetadata<DocumentId>> {
         readDocumentStoreName(name)
-        const node = childLineage(parent, readDocumentStoreId(suppliedId))
+        const node = childLineage(parent, suppliedId ?? id())
         return metadata(await provider.create(node, name, body), documentIdentity)
       },
-      async read(node) {
+      async read(node: DocumentId): Promise<Blob> {
         return await provider.read(node)
       },
-      async link(node) {
+      async link(node: DocumentId): Promise<DocumentLink> {
         const expiresAt = toWhen(new Date(Date.now() + linkLifetime))
         return { url: await provider.link(node, expiresAt), expiresAt }
       }
@@ -164,22 +172,14 @@ const childLineage = (parent: Lineage | null, child: Id): Lineage => {
   return { namespace: parent.namespace, bucket: parent.bucket, document: child }
 }
 
-/** Parse an address, text or segments, by the grammar, failing as a 422 ApiError. */
+/** Parse raw text or check segmented address grammar, trusting typed ids; failures are 422. */
 const readDocumentStoreAddress = (address: string | DocumentAddress): DocumentAddress => {
   try {
-    return typeof address === 'string'
-      ? DocumentAddresses.parse(address)
-      : DocumentAddresses.parse(DocumentAddresses.format(address))
+    if (typeof address === 'string') return DocumentAddresses.parse(address)
+    DocumentAddresses.format(address)
+    return address
   } catch (error) {
     if (error instanceof ValidatorError) throw new ApiError(error.message, 422)
     throw error
   }
-}
-
-/** Validate a supplied id or mint one when absent. */
-const readDocumentStoreId = (suppliedId?: Id): Id => {
-  if (suppliedId !== undefined && !isId(suppliedId)) {
-    throw new ApiError('Document store id must be a UUID v7', 422)
-  }
-  return suppliedId ?? id()
 }

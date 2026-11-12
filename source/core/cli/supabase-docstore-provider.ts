@@ -28,7 +28,7 @@ import { Supabase } from '@core/db/supabase.ts'
 import { isDictionary, isId, toId, toWhen, when } from '@core/std'
 import type { When } from '@core/std'
 import { ApiError } from '@core/stdx'
-import type { DocumentProviderContract, Lineage, LineageMetadata } from '@core/stdx'
+import type { DeleteResult, DocumentProviderContract, Lineage, LineageMetadata } from '@core/stdx'
 import type { SupabaseClient } from '@supabase/client'
 
 /** Logical nodes stored beneath one provisioned native Storage root. */
@@ -133,7 +133,7 @@ export class SupabaseDocumentProvider implements DocumentProviderContract {
   }
 
   /** Remove documents or empty containers; prefix empty-check and removal are not atomic. */
-  async delete(node: Lineage) {
+  async delete(node: Lineage): Promise<DeleteResult> {
     const metadata = await this.get(node)
     if (
       node.document === undefined && (metadata.count !== 0

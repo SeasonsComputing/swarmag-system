@@ -65,7 +65,7 @@ export class HttpServiceError extends Error {
 /** Wrap a BusRule-shaped service as an HTTP handler. */
 export const wrapBusRuleHttpHandler = <TParams, TResult, TContext>(
   spec: BusRuleHttpSpecification<TParams, TResult, TContext>
-) =>
+): (request: Request) => Promise<Response> =>
   wrapHttpHandler<TParams>(async (
     request: HttpRequest<TParams>
   ): Promise<HttpResponse<{ data: TResult } | { error: string; details?: string }>> => {

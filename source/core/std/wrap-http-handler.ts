@@ -428,7 +428,10 @@ export const wrapHttpHandler = <
   RequestBody = unknown,
   Query = HttpQuery,
   ResponseBody = unknown
->(handler: HttpHandler<RequestBody, Query, ResponseBody>, config: HttpHandlerConfig = {}) => {
+>(
+  handler: HttpHandler<RequestBody, Query, ResponseBody>,
+  config: HttpHandlerConfig = {}
+): (request: Request) => Promise<Response> => {
   return async (request: Request): Promise<Response> => {
     try {
       //

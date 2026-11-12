@@ -6,7 +6,7 @@
 */
 
 import { DocumentStore } from '@core/cli/docstore-client.ts'
-import { id, isId, ValidatorError, when } from '@core/std'
+import { id, isId, toId, ValidatorError, when } from '@core/std'
 import type { Id } from '@core/std'
 import { ApiError, DocumentAddresses } from '@core/stdx'
 import type {
@@ -32,6 +32,25 @@ Deno.test('document addresses round-trip names and ids at every depth', () => {
     'manuals',
     'pumps',
     'install.pdf'
+  ])
+})
+
+Deno.test('document addresses canonicalize id segments while preserving names', () => {
+  const namespace = toId('019a6000-0000-7000-8000-000000000001')
+  const bucket = toId('019a6000-0000-7000-8000-000000000002')
+  const document = toId('019a6000-0000-7000-8000-000000000003')
+  const canonical = [{ id: namespace }, { id: bucket }, { id: document }]
+  const reference = `id:${namespace}/id:${bucket}/id:${document}`
+  const mixedReference = [namespace, bucket, document]
+    .map(value => `id:${value.toUpperCase()}`).join('/')
+  assertEquals(DocumentAddresses.parse(mixedReference), canonical)
+  assertEquals(DocumentAddresses.format(DocumentAddresses.parse(mixedReference)), reference)
+  assertEquals(DocumentAddresses.build(canonical[0], canonical[1], canonical[2]), canonical)
+  assertEquals({ ...DocumentAddresses.id(mixedReference) }, { namespace, bucket, document })
+  assertEquals(DocumentAddresses.build('Manuals', canonical[1], 'Pump.PDF'), [
+    'Manuals',
+    { id: bucket },
+    'Pump.PDF'
   ])
 })
 
@@ -111,6 +130,39 @@ Deno.test('supplied container ids are idempotent and scoped by lineage', async (
   assertEquals((await store.bucket.resolve(`id:${namespaceId}/id:${bucketId}`)).id, bucket.id)
 })
 
+Deno.test('mixed-case raw references resolve canonical nodes at every level', async () => {
+  const { store } = memoryStore()
+  const namespaceId = toId('019a6000-0000-7000-8000-000000000001')
+  const bucketId = toId('019a6000-0000-7000-8000-000000000002')
+  const documentId = toId('019a6000-0000-7000-8000-000000000003')
+  const namespace = await store.namespace.create('Manuals', namespaceId)
+  assertEquals(namespace.id.namespace, namespaceId)
+  assertEquals(await store.namespace.create('Other', namespaceId), namespace)
+  const bucket = await store.bucket.create(namespace.id, 'Pumps', bucketId)
+  assertEquals(bucket.id.bucket, bucketId)
+  assertEquals(await store.bucket.create(namespace.id, 'Other', bucketId), bucket)
+  const document = await store.document.create(
+    bucket.id,
+    'Pump.PDF',
+    new Blob(['original']),
+    documentId
+  )
+  assertEquals(document.id.document, documentId)
+  assertEquals(
+    await store.document.create(bucket.id, 'Other', new Blob(['replacement']), documentId),
+    document
+  )
+  const reference = [namespaceId, bucketId, documentId]
+    .map(value => `id:${value.toUpperCase()}`).join('/')
+  assertEquals((await store.namespace.resolve(`id:${namespaceId.toUpperCase()}`)).id, namespace.id)
+  assertEquals((await store.bucket.resolve(reference.split('/').slice(0, 2).join('/'))).id, bucket.id)
+  assertEquals((await store.document.resolve(reference)).id, document.id)
+  assertEquals(await (await store.document.read(DocumentAddresses.id(reference))).text(), 'original')
+  assertEquals((await store.namespace.list()).length, 1)
+  assertEquals((await store.bucket.list(namespace.id)).length, 1)
+  assertEquals((await store.document.list(bucket.id)).length, 1)
+})
+
 Deno.test('resolution enforces depth, ambiguity, and parent membership', async () => {
   const { store } = memoryStore()
   const first = await store.namespace.create('first')
@@ -138,16 +190,13 @@ Deno.test('reference parsing performs no lookup and missing documents fail on us
   await assertRejects(() => store.document.link(identity), ApiError, 'not found')
 })
 
-Deno.test('kernel validates names, addresses, and supplied ids before dispatch', async () => {
+Deno.test('kernel validates names and raw addresses before dispatch', async () => {
   const { store, Calls } = memoryStore()
   const namespace = await store.namespace.create('manuals')
   const bucket = await store.bucket.create(namespace.id, 'pumps')
   const before = Calls.create
   await assertRejects(() => store.namespace.create(' '), ApiError)
-  await assertRejects(() => store.namespace.create('valid', 'bad'), ApiError)
-  await assertRejects(() => store.bucket.create(namespace.id, 'valid', 'bad'), ApiError)
   await assertRejects(() => store.bucket.create(namespace.id, 'a/b'), ApiError)
-  await assertRejects(() => store.document.create(bucket.id, 'file', new Blob(), 'bad'), ApiError)
   await assertRejects(() => store.bucket.update(bucket.id, 'id:reserved'), ApiError)
   await assertRejects(() => store.document.resolve('a//b'), ApiError)
   assertEquals(Calls.create, before)

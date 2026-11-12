@@ -21,6 +21,7 @@ makeHelmWidget  Bind commands/status and return a dashboard widget component.
 */
 
 import { isNonEmptyString, notValid } from '@core/std'
+import type { Dictionary } from '@core/std'
 import { createEffect, createMemo, createSignal, For, Show } from '@solid-js'
 import type { WidgetComponent } from '@ux/shell/dashboard/widget-contract.ts'
 import { BackgroundTasks } from '@ux/shell/runtime/background-tasks.ts'
@@ -34,7 +35,10 @@ import type { HelmBindings, HelmCommand, HelmMenu } from './helm-widget-contract
 import './helm-widget.css'
 
 /** Bind application behavior; an empty binding preserves the generic default. */
-export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent => props => {
+export const makeHelmWidget = (bindings: HelmBindings): WidgetComponent =>
+(
+  props: { settings: Dictionary }
+): UiComponent => {
   const navigate = useShellNavigate()
   const [theme, setTheme] = createSignal(document.documentElement.dataset.theme ?? '')
   const [taskView, setTaskView] = createSignal(false)

@@ -47,18 +47,18 @@ const [appStateStore, setAppStateStore] = createStore<AppStateStore>({})
 const appStatePrefs = new Preferences(APP_STATE_STORE, APP_STATE_ID)
 
 /** Load application state from preferences into store */
-async function initAppState() {
+async function initAppState(): Promise<void> {
   setAppStateStore(await appStatePrefs.state())
 }
 
 /** Set preference and persist */
-async function setAppStatePreference(key: string, value: string) {
+async function setAppStatePreference(key: string, value: string): Promise<void> {
   setAppStateStore(key, value)
   await appStatePrefs.set(key, value)
 }
 
 /** Reset cache */
-const clearAppState = () => setAppStateStore({})
+const clearAppState = (): void => setAppStateStore({})
 
 /** AppState store singleton */
 export const AppState: AppStateContract = {

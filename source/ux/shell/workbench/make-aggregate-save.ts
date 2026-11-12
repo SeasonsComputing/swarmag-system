@@ -53,7 +53,7 @@ export const makeAggregateSave = <T, D>(
     return completed === undefined ? persisted : completed
   }
   return {
-    create: draft => save(pending, draft),
-    update: (record, draft) => save(pending ?? { record }, draft)
+    create: (draft: D): Promise<T> => save(pending, draft),
+    update: (record: T, draft: D): Promise<T> => save(pending ?? { record }, draft)
   }
 }

@@ -28,18 +28,27 @@ the same protection. Back/Next preserves drafts and does not prompt.
 */
 
 import { createSignal, onCleanup } from '@solid-js'
+import type { Accessor } from '@solid-js'
 import type { DrillReturnControl } from '@ux/shell/panel/drill-contract.ts'
 import type { PanelFeedback } from '@ux/shell/panel/panel-contract.ts'
 import type { PanelStepContext } from '@ux/shell/panel/panel-sequence-contract.ts'
 import type { PanelSequenceControl } from '@ux/shell/panel/panel-sequence.tsx'
 import type { UiActionButtonProps } from '@ux/ui'
 
+/** Workbench-owned step services, return controls, trailing action, and aggregate dirty state. */
+type WorkbenchContext = {
+  context: PanelStepContext
+  drillReturn: Accessor<DrillReturnControl | null>
+  trailingAction: () => UiActionButtonProps | undefined
+  isDirty: () => boolean
+}
+
 /** Bind contextual services to the lifetime of one workbench draft. */
 export const createWorkbenchContext = (
   sequence: PanelSequenceControl,
   feedback: (value: PanelFeedback | null) => void,
   busy: () => boolean
-) => {
+): WorkbenchContext => {
   const checks = new Set<() => boolean>()
   const [drillReturn, setDrillReturn] = createSignal<DrillReturnControl | null>(null)
   const [trailingAction, setTrailingAction] = createSignal<
@@ -49,10 +58,12 @@ export const createWorkbenchContext = (
   const context: PanelStepContext = {
     registerValidation: sequence.registerValidation,
     registerDrillReturn: setDrillReturn,
-    registerTrailingAction: action => setTrailingAction(() => action),
-    registerDirty: check => {
+    registerTrailingAction: (action: (() => UiActionButtonProps | undefined) | null): void => {
+      setTrailingAction(() => action)
+    },
+    registerDirty: (check: () => boolean): () => void => {
       checks.add(check)
-      return () => {
+      return (): void => {
         checks.delete(check)
       }
     },
@@ -62,7 +73,7 @@ export const createWorkbenchContext = (
   return {
     context,
     drillReturn,
-    trailingAction: () => trailingAction()?.(),
-    isDirty: () => [...checks].some(check => check())
+    trailingAction: (): UiActionButtonProps | undefined => trailingAction()?.(),
+    isDirty: (): boolean => [...checks].some(check => check())
   }
 }

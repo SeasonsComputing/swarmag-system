@@ -110,13 +110,11 @@ export function makeQuery<
   filter: readonly FieldAdapter<T, F>[]
   search?: readonly FieldAdapter<T, S>[]
   order: readonly [FieldAdapter<T, O>, ...FieldAdapter<T, O>[]]
-}) {
+}): QueryBuilder<T, F, O, S> {
   return {
-    build<W extends Criteria<Pick<T, F>> = Criteria<Pick<T, F>>>(input: {
-      where?: W & ExactCriteria<T, F, W>
-      search?: [S] extends [never] ? never : string
-      order?: { field: O; direction: QueryDirection }
-    } = {}): Query<T> {
+    build<W extends Criteria<Pick<T, F>> = Criteria<Pick<T, F>>>(
+      input: QueryInput<T, F, O, S, W> = {}
+    ): Query<T> {
       const where: Dictionary = {}
       const source = input.where as Dictionary | undefined
       for (const field of spec.filter) {
@@ -140,6 +138,20 @@ export function makeQuery<
 // ────────────────────────────────────────────────────────────────────────────
 // IMPLEMENTATION
 // ────────────────────────────────────────────────────────────────────────────
+
+/** Builder preserving the declaration's filter, order, search, and exact-criteria constraints. */
+interface QueryBuilder<T extends Instantiable, F extends FilterKey<T>, O extends OrderKey<T>, S> {
+  build<W extends Criteria<Pick<T, F>> = Criteria<Pick<T, F>>>(
+    input?: QueryInput<T, F, O, S, W>
+  ): Query<T>
+}
+
+/** Build input limited to the declared fields, exact criteria, and enabled search. */
+type QueryInput<T, F extends keyof T, O, S, W> = {
+  where?: W & ExactCriteria<T, F, W>
+  search?: [S] extends [never] ? never : string
+  order?: { field: O; direction: QueryDirection }
+}
 
 /** Criteria names no domain field may claim. */
 type ReservedKey = 'and' | 'or' | 'not' | 'search'
