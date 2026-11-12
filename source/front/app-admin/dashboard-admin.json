@@ -8,7 +8,8 @@
         "settings": {
           "shape": "compact",
           "actions": [
-            { "command": "/users", "label": "Users", "icon": "person", "labelMode": "visible-no-icon" },
+            { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "visible" },
+            { "command": "/users", "label": "Users", "icon": "person", "labelMode": "hidden" },
             {
               "command": "/customers",
               "label": "Customers",
@@ -19,7 +20,7 @@
               "command": "/onboarding",
               "label": "Onboarding",
               "icon": "id-card",
-              "labelMode": "visible-no-icon"
+              "labelMode": "hidden"
             },
             {
               "command": "/asset-types",
@@ -51,9 +52,8 @@
                 { "status": "field-binder" }
               ]
             },
-            { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
             { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
-            { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }
+            { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "visible" }
           ],
           "themes": ["dark", "light"]
         }

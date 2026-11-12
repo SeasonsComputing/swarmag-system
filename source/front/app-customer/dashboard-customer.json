@@ -8,9 +8,9 @@
         "settings": {
           "shape": "compact",
           "actions": [
-            { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "hidden" },
+            { "command": "/about", "label": "About", "icon": "info-circled", "labelMode": "visible" },
             { "command": "@theme", "label": "Theme", "icon": "moon", "labelMode": "hidden" },
-            { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "hidden" }
+            { "command": "/logout", "label": "Logout", "icon": "exit", "labelMode": "visible" }
           ],
           "themes": ["dark", "light"]
         }
