@@ -19,6 +19,7 @@ PUBLIC
 ───────────────────────────────────────────────────────────────────────────────
 PanelContainerProps  Slots for a panel container composition.
 PanelHeaderProps     Leading and trailing content for a panel header.
+PanelSheetProps      Title, Close, and content of a full-device dialog.
 PanelFeedback        Feedback shown beneath a form header.
 */
 
@@ -28,6 +29,15 @@ import type { UiAlertVariant, UiComponent } from '@ux/ui'
 export type PanelHeaderProps = {
   leading?: UiComponent
   trailing?: UiComponent
+}
+
+/** Title, Close, and content of a full-device dialog. */
+export type PanelSheetProps = {
+  title: string
+  onCancel: () => void
+  /** Disables Close while work is in flight. */
+  busy?: boolean
+  children: UiComponent
 }
 
 /** Feedback displayed beneath a panel form header. */

@@ -9,8 +9,8 @@
   grid-template-columns: minmax(0, 1fr);
 }
 
-/* PanelContainer owns the track floors: aside 280 plus main --sa-size-min
-   (380). At this threshold --sa-rhythm-gap resolves to 15.75, making the
+/* PanelContainer owns the track floors: aside --sa-size-wrap (280) plus main
+   --sa-size-min (380). At this threshold --sa-rhythm-gap resolves to 15.75, making the
    minimum 675.75. A container query cannot take var(), so 676 is the literal;
    change either shared floor and re-solve this threshold. */
 @container (max-width: 676px) {

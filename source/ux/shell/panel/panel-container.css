@@ -21,7 +21,7 @@ against itself. */
 
 /* Surface collapse rules override this shared default without relying on load order. */
 [data-shell-panel='container']:where(:has(> [data-shell-panel='aside'])) {
-  grid-template-columns: minmax(280px, 1fr) minmax(var(--sa-size-min), 1fr);
+  grid-template-columns: minmax(var(--sa-size-wrap), 1fr) minmax(var(--sa-size-min), 1fr);
 }
 
 [data-shell-panel='container']:has(> [data-shell-panel='accessory']) {

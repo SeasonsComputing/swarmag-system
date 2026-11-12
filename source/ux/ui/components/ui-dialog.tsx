@@ -36,7 +36,7 @@ import { controlState } from './ui-helpers.ts'
 import type { UiComponent, UiComponentProps } from './ui-helpers.ts'
 
 /** Dialog size treatments declared by the design language. */
-export type UiDialogSize = 'content' | 'panel' | 'workbench'
+export type UiDialogSize = 'content' | 'panel' | 'workbench' | 'sheet'
 
 /** Dialog control props. */
 export type UiDialogProps = UiComponentProps & {

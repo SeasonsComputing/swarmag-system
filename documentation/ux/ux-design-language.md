@@ -377,15 +377,15 @@ breakpoint composition is declared in `tokens.css`.
 
 ### 5.4 Viewport Tokens
 
-| Token            | Purpose                   |
-| ---------------- | ------------------------- |
-| `--sa-size-wrap` | Minimum wrap reference    |
-| `--sa-size-min`  | Minimum application width |
-| `--sa-size-xs`   | Small/mobile breakpoint   |
-| `--sa-size-xx`   | Mobile breakpoint         |
-| `--sa-size-sm`   | Tablet breakpoint         |
-| `--sa-size-md`   | Desktop breakpoint        |
-| `--sa-size-lg`   | Wide layout breakpoint    |
+| Token            | Purpose                                             |
+| ---------------- | --------------------------------------------------- |
+| `--sa-size-wrap` | Minimum wrap reference, and the aside panel's floor |
+| `--sa-size-min`  | Minimum application width                           |
+| `--sa-size-xs`   | Small/mobile breakpoint                             |
+| `--sa-size-xx`   | Mobile breakpoint                                   |
+| `--sa-size-sm`   | Tablet breakpoint                                   |
+| `--sa-size-md`   | Desktop breakpoint                                  |
+| `--sa-size-lg`   | Wide layout breakpoint                              |
 
 Viewport tokens are reusable CSS length references. They are not Dashboard
 allocated-field contracts, global widget measures, or universal presentation

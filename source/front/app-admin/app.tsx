@@ -58,7 +58,7 @@ void bootstrap(
           Routes.workbench('/chemicals', ChemicalManager),
           Routes.workbench('/services', ServiceManager),
           Routes.workbench('/field-binder-manager', FieldBinderManager),
-          Routes.workbench('/field-binder', FieldBinder)
+          Routes.sheet('/field-binder', FieldBinder)
         ]
       )
     ],

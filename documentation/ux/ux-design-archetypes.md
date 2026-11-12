@@ -374,7 +374,8 @@ The machinery this repository already builds for the common cases. Reach for the
 | Task                                             | Use                                                         | Realizes                            |
 | ------------------------------------------------ | ----------------------------------------------------------- | ----------------------------------- |
 | Edit one item from a set                         | `AbstractionManager` for records; `Manager` for other items | Collection-Detail <--> Index-Detail |
-| Present a standalone list and activate its Items | `Lister`                                                    | Index                               |
+| Present a standalone list and activate its Items | `Lister`                                                    | Collection                          |
+| Present one panel as a full-device dialog        | `Routes.sheet` + `PanelSheet`                               | —                                   |
 | Present a nested Collection at any depth         | `DrillDown` + `CollectionPanel`                             | Index-Detail                        |
 | Capture or review Items one at a time            | `UiCollectionCursor`                                        | Collection-Cursor                   |
 | Decompose a complex subject into steps           | `Wizard` + `PanelStep`                                      | Sequence                            |

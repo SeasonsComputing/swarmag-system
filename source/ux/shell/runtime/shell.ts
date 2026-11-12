@@ -40,6 +40,7 @@ Routes                    Route factory convenience container.
 ├ index                   Create a default shell child route.
 ├ page                    Create a direct page route.
 ├ workbench               Create a workbench route.
+├ sheet                   Create a full-device dialog route.
 ├ dialog                  Create a dialog route.
 ├ redirect                Create an immediate redirect route.
 └ transition              Create a work-then-redirect route.
@@ -167,6 +168,17 @@ const workbench = (
   options: { size: 'workbench', dismissible: false }
 })
 
+/** Create a route that presents one panel as a full-device dialog. */
+const sheet = (
+  path: string,
+  component: ShellOverlayView
+): ShellOverlay => ({
+  kind: 'overlay',
+  path,
+  component,
+  options: { size: 'sheet', dismissible: false }
+})
+
 /** Create a route that presents dialog content over its owning shell. */
 const dialog = (
   path: string,
@@ -193,6 +205,7 @@ export const Routes = {
   index,
   page,
   workbench,
+  sheet,
   dialog,
   redirect,
   transition

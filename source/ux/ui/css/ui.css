@@ -1316,23 +1316,39 @@
    fill it rather than size to content. The single row stretches the child, which
    keeps a page-level wrapper transparent to sizing — without it a wrapper with
    auto height breaks the surface's percentage chain silently. */
-[data-ui='dialog'][data-ui-size='workbench'] {
+[data-ui='dialog'][data-ui-size='workbench'],
+[data-ui='dialog'][data-ui-size='sheet'] {
   block-size: clamp(32rem, 85dvh, 42rem);
   display: grid;
   grid-template-rows: minmax(0, 1fr);
+  overflow: visible;
+}
+
+[data-ui='dialog'][data-ui-size='workbench'] {
   inline-size: min(var(--sa-size-md), calc(100vw - var(--sa-rhythm-pad) * 2));
   max-inline-size: min(var(--sa-size-lg), calc(100vw - var(--sa-rhythm-pad) * 2));
-  overflow: visible;
+}
+
+/* A sheet is the workbench held at its collapse point. The pad is added because
+   the panel container fills the content box. A changed floor must be re-solved in
+   manager.css and wizard.css, whose thresholds cannot take a token. */
+[data-ui='dialog'][data-ui-size='sheet'] {
+  inline-size: min(
+    calc(var(--sa-size-wrap) + var(--sa-size-min) + var(--sa-rhythm-gap) + var(--sa-dialog-pad) * 2),
+    calc(100vw - var(--sa-rhythm-pad) * 2)
+  );
 }
 
 /* Grid items default to min-block-size: auto, which lets content floor them
    above a bounded row. Release it so the row governs. */
-[data-ui='dialog'][data-ui-size='workbench'] > * {
+[data-ui='dialog'][data-ui-size='workbench'] > *,
+[data-ui='dialog'][data-ui-size='sheet'] > * {
   min-block-size: 0;
 }
 
 @media (max-width: 480px) {
-  [data-ui='dialog'][data-ui-size='workbench'] {
+  [data-ui='dialog'][data-ui-size='workbench'],
+  [data-ui='dialog'][data-ui-size='sheet'] {
     block-size: 100dvh;
     border: none;
     border-radius: 0;
