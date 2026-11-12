@@ -56,7 +56,7 @@ export const UrlField = (props: UrlFieldProps): UiComponent => {
           name={props.name}
           type='url'
           value={props.value}
-          placeholder={`e.g., ${props.schemes[0]}://…`}
+          placeholder={`${props.schemes[0]}://example.url?doc=1234`}
           required={props.required}
           error={props.error || (touched() && invalid())}
           onInput={event => props.onValue(event.currentTarget.value)}
